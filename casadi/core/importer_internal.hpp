@@ -51,11 +51,14 @@ namespace casadi {
     /// Destructor
     ~ImporterInternal() override;
 
-    /** \brief Print */
-    void print_long(std::ostream &stream) const override;
+    /** \brief Get type name */
+    std::string type_name() const override { return "Importer";}
 
-    /** \brief Print representation */
-    void print_short(std::ostream &stream) const override;
+    /** \brief Get type name */
+    std::string class_name() const override { return "ImporterInternal";}
+
+    /** \brief Print */
+    void disp(std::ostream& stream, bool more) const override;
 
     // Creator function for internal class
     typedef ImporterInternal* (*Creator)(const std::string& name);
@@ -160,6 +163,9 @@ namespace casadi {
 
     // Destructor
     ~DllLibrary() override;
+
+    /** \brief Get type name */
+    std::string class_name() const override { return "DllLibrary";}
 
     // Dummy type
     signal_t get_function(const std::string& symname) override;

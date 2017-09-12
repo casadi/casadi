@@ -54,22 +54,22 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w, int mem) const;
+    int eval_gen(const T** arg, T** res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
 
     /** \brief  Propagate sparsity forward */
-    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     // Sparsity pattern of the outputs
@@ -102,7 +102,7 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
     int op() const override { return OP_HORZSPLIT;}
@@ -136,7 +136,7 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
     int op() const override { return OP_DIAGSPLIT;}
@@ -170,7 +170,7 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
     int op() const override { return OP_VERTSPLIT;}

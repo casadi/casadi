@@ -65,8 +65,6 @@ namespace casadi {
   template<> bool SX::depends_on(const SX &x, const SX &arg);
   template<> std::vector<SX > SX::symvar(const SX &x);
   template<> SX SX::jacobian(const SX &f, const SX &x, const Dict& opts);
-  template<> SX SX::gradient(const SX &f, const SX &x);
-  template<> SX SX::tangent(const SX &f, const SX &x);
   template<> SX SX::hessian(const SX &f, const SX &x);
   template<> SX SX::hessian(const SX &f, const SX &x, SX &g);
   template<> std::vector<std::vector<SX> >

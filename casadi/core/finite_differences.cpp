@@ -143,7 +143,7 @@ namespace casadi {
     return Function::create(new CentralDiff(name, nfwd), opts_mod);
   }
 
-  void CentralDiff::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int CentralDiff::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Shorthands
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
 
@@ -199,7 +199,7 @@ namespace casadi {
         casadi_mv_dense(seed[j], nnz, n_, m->x, z1, false);
         z1 += nnz;
       }
-      derivative_of_(arg, res, iw, w, 0);
+      if (derivative_of_(arg, res, iw, w, 0)) return 1;
     }
 
     // Gather sensitivities
@@ -210,6 +210,7 @@ namespace casadi {
         m->J += nnz;
       }
     }
+    return 0;
   }
 
   void CentralDiff::codegen_declarations(CodeGenerator& g) const {
@@ -273,8 +274,8 @@ namespace casadi {
     g << "z1 = z;\n";
     for (int j=0; j<n_in; ++j) {
       int nnz = derivative_of_.nnz_in(j);
-      g << g.copy("r0[" + to_string(j) + "]", nnz, "z1") << "\n"
-        << g.mv("seed[" + to_string(j) + "]", nnz, n_, "m->x", "z1", false) << "\n"
+      g << g.copy("r0[" + str(j) + "]", nnz, "z1") << "\n"
+        << g.mv("seed[" + str(j) + "]", nnz, n_, "m->x", "z1", false) << "\n"
         << "z1 += " << nnz << ";\n";
     }
     if (derivative_of_->simplified_call()) {
@@ -289,8 +290,8 @@ namespace casadi {
     g << "for (i=0; i<" << n_ << "; ++i) {" << "\n";
     for (int j=0; j<n_out; ++j) {
       int nnz = derivative_of_.nnz_out(j);
-      string s = "sens[" + to_string(j) + "]";
-      g << "if (" << s << ") " << g.copy("m->J", nnz, s + "+i*" + to_string(nnz)) << "\n"
+      string s = "sens[" + str(j) + "]";
+      g << "if (" << s << ") " << g.copy("m->J", nnz, s + "+i*" + str(nnz)) << "\n"
         << "m->J += " << nnz << ";\n";
     }
     g << "}\n"; // for (i=0, ...)

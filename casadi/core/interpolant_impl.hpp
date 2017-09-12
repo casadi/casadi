@@ -49,11 +49,6 @@ namespace casadi {
     /// Destructor
     ~Interpolant() override;
 
-    /** \brief Get type name */
-    std::string type_name() const override {
-      return std::string("interpolant_") + plugin_name();
-    }
-
     ///@{
     /** \brief Number of function inputs and outputs */
     size_t get_n_in() override { return 1;}

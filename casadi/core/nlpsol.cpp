@@ -159,10 +159,11 @@ namespace casadi {
     warn_initial_bounds_ = false;
     iteration_callback_ignore_errors_ = false;
     print_time_ = true;
+    calc_multipliers_ = false;
   }
 
   Nlpsol::~Nlpsol() {
-    clear_memory();
+    clear_mem();
   }
 
   Sparsity Nlpsol::get_sparsity_in(int i) {
@@ -231,7 +232,10 @@ namespace casadi {
         "the different stages of initialization"}},
       {"discrete",
        {OT_BOOLVECTOR,
-        "Indicates which of the variables are discrete, i.e. integer-valued"}}
+        "Indicates which of the variables are discrete, i.e. integer-valued"}},
+      {"calc_multipliers",
+      {OT_BOOL,
+       "Calculate Lagrange multipliers in the Nlpsol base class"}}
      }
   };
 
@@ -258,6 +262,8 @@ namespace casadi {
         iteration_callback_ignore_errors_ = op.second;
       } else if (op.first=="discrete") {
         discrete_ = op.second;
+      } else if (op.first=="calc_multipliers") {
+        calc_multipliers_ = op.second;
       }
     }
 
@@ -294,38 +300,45 @@ namespace casadi {
       // Consistency checks
       casadi_assert(!fcallback_.is_null());
       casadi_assert_message(fcallback_.n_out()==1 && fcallback_.numel_out()==1,
-                            "Callback function must return a scalar.");
+        "Callback function must return a scalar.");
       casadi_assert_message(fcallback_.n_in()==n_out(),
-                            "Callback input signature must match the NLP solver output signature");
+        "Callback input signature must match the NLP solver output signature");
       for (int i=0; i<n_out(); ++i) {
         casadi_assert_message(fcallback_.size_in(i)==size_out(i),
-                              "Callback function input size mismatch. " <<
-                              "For argument '" << nlpsol_out(i) << "', callback has shape "
-                              << fcallback_.sparsity_in(i).dim() << " while NLP has " <<
-                              sparsity_out(i).dim() << ".");
+          "Callback function input size mismatch. For argument '" + nlpsol_out(i) + "', "
+          "callback has shape " + fcallback_.sparsity_in(i).dim() + " while NLP has " +
+          sparsity_out(i).dim() + ".");
         // TODO(@jaeandersson): Wrap fcallback_ in a function with correct sparsity
         casadi_assert_message(fcallback_.sparsity_in(i)==sparsity_out(i),
-                              "Callback function input size mismatch. " <<
-                              "For argument " << nlpsol_out(i) << "', callback has shape "
-                              << fcallback_.sparsity_in(i).dim() << " while NLP has " <<
-                              sparsity_out(i).dim() << ".");
+          "Callback function input size mismatch. "
+          "For argument " + nlpsol_out(i) + "', callback has shape " +
+          fcallback_.sparsity_in(i).dim() + " while NLP has " +
+          sparsity_out(i).dim() + ".");
       }
 
       // Allocate temporary memory
       alloc(fcallback_);
     }
+
+    // Function to calculate multiplers
+    if (calc_multipliers_) {
+      casadi_message("here");
+      create_function("nlp_mult", {"x", "p", "lam:f", "lam:g"},
+                      {"grad:gamma:x", "grad:gamma:p"}, {{"gamma", {"f", "g"}}});
+    }
   }
 
-  void Nlpsol::init_memory(void* mem) const {
-    OracleFunction::init_memory(mem);
+  int Nlpsol::init_mem(void* mem) const {
+    if (OracleFunction::init_mem(mem)) return 1;
     auto m = static_cast<NlpsolMemory*>(mem);
 
     m->fstats["mainloop"] = FStats();
     m->fstats["callback_fun"] = FStats();
     m->fstats["callback_prep"] = FStats();
+    return 0;
   }
 
-  void Nlpsol::checkInputs(void* mem) const {
+  void Nlpsol::check_inputs(void* mem) const {
     auto m = static_cast<NlpsolMemory*>(mem);
 
     // Skip check?
@@ -342,13 +355,12 @@ namespace casadi {
       double ub = m->ubx ? m->ubx[i] : 0;
       double x0 = m->x0 ? m->x0[i] : 0;
       casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
-                            "Ill-posed problem detected: " <<
-                            "LBX[" << i << "] <= UBX[" << i << "] was violated. "
-                            << "Got LBX[" << i << "]=" << lb <<
-                            " and UBX[" << i << "] = " << ub << ".");
+          "Ill-posed problem detected: "
+          "LBX[" + str(i) + "] <= UBX[" + str(i) + "] was violated. "
+          "Got LBX[" + str(i) + "]=" + str(lb) + " and UBX[" + str(i) + "] = " + str(ub) + ".");
       if (warn_initial_bounds_ && (x0>ub || x0<lb)) {
         casadi_warning("Nlpsol: The initial guess does not satisfy LBX and UBX. "
-                       "Option 'warn_initial_bounds' controls this warning.");
+          "Option 'warn_initial_bounds' controls this warning.");
         break;
       }
       if (lb==ub) n_eq++;
@@ -359,18 +371,17 @@ namespace casadi {
       double lb = m->lbg ? m->lbg[i] : 0;
       double ub = m->ubg ? m->ubg[i] : 0;
       casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
-                            "Ill-posed problem detected: " <<
-                            "LBG[" << i << "] <= UBG[" << i << "] was violated. "
-                            << "Got LBG[" << i << "] = " << lb <<
-                            " and UBG[" << i << "] = " << ub << ".");
+        "Ill-posed problem detected: "
+        "LBG[" + str(i) + "] <= UBG[" + str(i) + "] was violated. "
+        "Got LBG[" + str(i) + "] = " + str(lb) + " and UBG[" + str(i) + "] = " + str(ub) + ".");
       if (lb==ub) n_eq++;
     }
 
     // Make sure enough degrees of freedom
-    using casadi::to_string; // Workaround, MingGW bug, cf. CasADi issue #890
+    using casadi::str; // Workaround, MingGW bug, cf. CasADi issue #890
     if (n_eq> nx_) {
-      casadi_warning("NLP is overconstrained: There are " + to_string(n_eq)
-                         + " equality constraints but only " + to_string(nx_) + " variables.");
+      casadi_warning("NLP is overconstrained: There are " + str(n_eq) +
+      " equality constraints but only " + str(nx_) + " variables.");
     }
   }
 
@@ -379,25 +390,63 @@ namespace casadi {
   const std::string Nlpsol::infix_ = "nlpsol";
 
   DM Nlpsol::getReducedHessian() {
-    casadi_error("Nlpsol::getReducedHessian not defined for class "
-                 << typeid(*this).name());
+    casadi_error("getReducedHessian not defined for class " + class_name());
     return DM();
   }
 
   void Nlpsol::setOptionsFromFile(const std::string & file) {
-    casadi_error("Nlpsol::setOptionsFromFile not defined for class "
-                 << typeid(*this).name());
+    casadi_error("setOptionsFromFile not defined for class " + class_name());
   }
 
-  void Nlpsol::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int Nlpsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+    auto m = static_cast<NlpsolMemory*>(mem);
+
     // Reset the solver, prepare for solution
-    setup(mem, arg, res, iw, w);
+    setup(m, arg, res, iw, w);
+
+    // Set multipliers to nan
+    casadi_fill(m->lam_x, nx_, nan);
+    casadi_fill(m->lam_g, ng_, nan);
+    casadi_fill(m->lam_p, np_, nan);
 
     // Solve the NLP
-    solve(mem);
+    solve(m);
+
+    // Calculate multiplers
+    if (calc_multipliers_) {
+      casadi_assert_message(m->x!=0, "Not implemented");
+      casadi_assert_message(ng_==0 || m->lam_g!=0, "Not implemented");
+      double lam_f = 1.;
+      m->arg[0] = m->x;
+      m->arg[1] = m->p;
+      m->arg[2] = &lam_f;
+      m->arg[3] = m->lam_g;
+      m->res[0] = m->lam_x;
+      m->res[1] = m->lam_p;
+      if (calc_function(m, "nlp_mult")) {
+        casadi_warning("Failed to calculate multipliers");
+      }
+
+      if (m->lam_x) {
+        casadi_scal(nx_, -1., m->lam_x);
+        for (int i=0; i<nx_; ++i) {
+          if (m->lam_x[i]>0) {
+            // If upper bound isn't active, multiplier is zero
+            if (m->x[i] < (m->ubx ? m->ubx[i] : 0)) m->lam_x[i] = 0;
+          } else if (m->lam_x[i]<0) {
+            // If lower bound isn't active, multiplier is zero
+            if (m->x[i] > (m->lbx ? m->lbx[i] : 0)) m->lam_x[i] = 0;
+          }
+        }
+      }
+      if (m->lam_p) {
+        casadi_scal(np_, -1., m->lam_p);
+      }
+    }
 
     // Show statistics
-    if (print_time_)  print_fstats(static_cast<OracleMemory*>(mem));
+    if (print_time_)  print_fstats(m);
+    return 0;
   }
 
   void Nlpsol::set_work(void* mem, const double**& arg, double**& res,
@@ -435,6 +484,11 @@ namespace casadi {
 
   std::string nlpsol_option_info(const std::string& name, const std::string& op) {
     return Nlpsol::plugin_options(name).info(op);
+  }
+
+  void Nlpsol::disp_more(std::ostream& stream) const {
+    stream << "minimize f(x;p) subject to lbx<=x<=ubx, lbg<=g(x;p)<=ubg defined by:\n";
+    oracle_.disp(stream, true);
   }
 
 } // namespace casadi

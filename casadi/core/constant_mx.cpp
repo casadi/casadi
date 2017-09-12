@@ -87,15 +87,17 @@ namespace casadi {
                            std::vector<std::vector<MX> >& asens) const {
   }
 
-  void ConstantMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int ConstantMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     fill_n(res[0], nnz(), 0);
+    return 0;
   }
 
-  void ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     fill_n(res[0], nnz(), 0);
+    return 0;
   }
 
-  void ConstantDM::generate(CodeGenerator& g, const std::string& mem,
+  void ConstantDM::generate(CodeGenerator& g,
                                  const std::vector<int>& arg, const std::vector<int>& res) const {
     // Print the constant
     string ind = g.constant(x_.nonzeros());
@@ -209,7 +211,7 @@ namespace casadi {
     return true;
   }
 
-  std::string ZeroByZero::print(const std::vector<std::string>& arg) const {
+  std::string ZeroByZero::disp(const std::vector<std::string>& arg) const {
     return "0x0";
   }
 

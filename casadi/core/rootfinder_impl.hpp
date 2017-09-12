@@ -55,11 +55,6 @@ namespace casadi {
     /// Destructor
     ~Rootfinder() override = 0;
 
-    /** \brief Get type name */
-    std::string type_name() const override {
-      return std::string("rootfinder_") + plugin_name();
-    }
-
     ///@{
     /** \brief Number of function inputs and outputs */
     size_t get_n_in() override { return oracle_.n_in();}
@@ -88,23 +83,23 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const override;
 
     // Evaluate numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     // Solve the NLP
     virtual void solve(void* mem) const = 0;
 
     /** \brief  Propagate sparsity forward */
-    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?

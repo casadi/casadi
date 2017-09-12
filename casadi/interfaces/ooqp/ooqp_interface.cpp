@@ -143,10 +143,10 @@ namespace casadi {
     alloc_iw(na_); // casadi_trans
   }
 
-  void OoqpInterface::
-  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int OoqpInterface::
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     if (inputs_check_) {
-      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
 
     // Get problem data
@@ -409,9 +409,9 @@ namespace casadi {
     }
 
     if (ierr>0) {
-      casadi_warning("Unable to solve problem: " << errFlag(ierr));
+      casadi_warning("Unable to solve problem: " + str(errFlag(ierr)));
     } else if (ierr<0) {
-      casadi_error("Fatal error: " << errFlag(ierr));
+      casadi_error("Fatal error: " + str(errFlag(ierr)));
     }
 
     // Retrieve eliminated decision variables
@@ -466,6 +466,7 @@ namespace casadi {
 
     // Save dual solution (simple bounds)
     casadi_copy(gamma_, nx_, res[CONIC_LAM_X]);
+    return 0;
   }
 
   const char* OoqpInterface::errFlag(int flag) {

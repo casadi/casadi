@@ -33,24 +33,24 @@ namespace casadi {
     set_sparsity(sp);
   }
 
-  string Input::print(const vector<string>& arg) const {
+  string Input::disp(const vector<string>& arg) const {
     stringstream s;
     s << "input[" << ind_ << "][" << segment_ << "]";
     return s.str();
   }
 
-  void Input::generate(CodeGenerator& g, const string& mem,
+  void Input::generate(CodeGenerator& g,
                        const vector<int>& arg, const vector<int>& res) const {
     int nnz = this->nnz();
     if (nnz==0) return; // quick return
-    string a = "arg[" + to_string(ind_) + "]";
+    string a = "arg[" + str(ind_) + "]";
     int i = res.front();
     if (nnz==1) {
       g << g.workel(i) << " = " << a << " ? " << a << "[" << offset_ << "] : 0;\n";
     } else if (offset_==0) {
       g << g.copy(a, nnz, g.work(i, nnz)) << "\n";
     } else {
-      g << g.copy(a + " ? " + a + "+" + to_string(offset_) + " : 0",
+      g << g.copy(a + " ? " + a + "+" + str(offset_) + " : 0",
                           nnz, g.work(i, nnz)) << "\n";
     }
   }
@@ -60,25 +60,25 @@ namespace casadi {
     set_dep(x);
   }
 
-  string Output::print(const vector<string>& arg) const {
+  string Output::disp(const vector<string>& arg) const {
     stringstream s;
     s << "output[" << ind_ << "][" << segment_ << "]";
     return s.str();
   }
 
-  void Output::generate(CodeGenerator& g, const string& mem,
+  void Output::generate(CodeGenerator& g,
                        const vector<int>& arg, const vector<int>& res) const {
     int nnz = dep().nnz();
     if (nnz==0) return; // quick return
     int i = arg.front();
-    string r = "res[" + g.to_string(ind_) + "]";
+    string r = "res[" + str(ind_) + "]";
     if (nnz==1) {
       g << "if (" << r << ") " << r << "[" << offset_ << "] = " << g.workel(i) << ";\n";
     } else if (offset_==0) {
       g << g.copy(g.work(i, nnz), nnz, r) << "\n";
     } else {
       g << "if (" << r << ") "
-        << g.copy(g.work(i, nnz), nnz, r + "+" + to_string(offset_)) << "\n";
+        << g.copy(g.work(i, nnz), nnz, r + "+" + str(offset_)) << "\n";
     }
 
   }

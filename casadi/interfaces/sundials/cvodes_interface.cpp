@@ -27,7 +27,7 @@
 #include "casadi/core/std_vector_tools.hpp"
 
 #define THROWING(fcn, ...) \
-cvodes_error(CASADI_ASSERT_STR(fcn) CASADI_ASSERT_WHERE, fcn(__VA_ARGS__))
+cvodes_error(CASADI_STR(fcn), fcn(__VA_ARGS__))
 
 using namespace std;
 namespace casadi {
@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   CvodesInterface::~CvodesInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options CvodesInterface::options_
@@ -71,7 +71,7 @@ namespace casadi {
   };
 
   void CvodesInterface::init(const Dict& opts) {
-    log("CvodesInterface::init", "begin");
+    if (verbose_) casadi_message(name_ + "::init");
 
     // Initialize the base classes
     SundialsInterface::init(opts);
@@ -97,7 +97,7 @@ namespace casadi {
 
     // Algebraic variables not supported
     casadi_assert_message(nz_==0 && nrz_==0,
-                          "CVODES does not support algebraic variables");
+      "CVODES does not support algebraic variables");
 
     if (linear_multistep_method=="adams") {
       lmm_ = CV_ADAMS;
@@ -125,8 +125,8 @@ namespace casadi {
     }
   }
 
-  void CvodesInterface::init_memory(void* mem) const {
-    SundialsInterface::init_memory(mem);
+  int CvodesInterface::init_mem(void* mem) const {
+    if (SundialsInterface::init_mem(mem)) return 1;
     auto m = to_mem(mem);
 
     // Create CVodes memory block
@@ -201,6 +201,7 @@ namespace casadi {
     }
 
     m->first_callB = true;
+    return 0;
   }
 
   int CvodesInterface::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
@@ -224,7 +225,7 @@ namespace casadi {
 
   void CvodesInterface::reset(IntegratorMemory* mem, double t, const double* x,
                               const double* z, const double* _p) const {
-    casadi_msg("CvodesInterface::reset begin");
+    if (verbose_) casadi_message(name_ + "::reset");
     auto m = to_mem(mem);
 
     // Reset the base classes
@@ -246,7 +247,6 @@ namespace casadi {
 
     // Set the stop time of the integration -- don't integrate past this point
     if (stop_at_end_) setStopTime(m, grid_.back());
-    casadi_msg("CvodesInterface::reset end");
   }
 
   void CvodesInterface::advance(IntegratorMemory* mem, double t, double* x,
@@ -254,13 +254,12 @@ namespace casadi {
     auto m = to_mem(mem);
 
     casadi_assert_message(t>=grid_.front(),
-                          "CvodesInterface::integrate(" << t << "): "
-                          "Cannot integrate to a time earlier than t0 ("
-                          << grid_.front() << ")");
-    casadi_assert_message(t<=grid_.back() || !stop_at_end_, "CvodesInterface::integrate("
-                          << t << "):"
-                          " Cannot integrate past a time later than tf (" << grid_.back() << ") "
-                          "unless stop_at_end is set to False.");
+      "CvodesInterface::integrate(" + str(t) + "): "
+      "Cannot integrate to a time earlier than t0 (" + str(grid_.front()) + ")");
+    casadi_assert_message(t<=grid_.back() || !stop_at_end_,
+      "CvodesInterface::integrate(" + str(t) + "): "
+      "Cannot integrate past a time later than tf (" + str(grid_.back()) + ") "
+      "unless stop_at_end is set to False.");
 
     // Integrate, unless already at desired time
     const double ttol = 1e-9;
@@ -291,8 +290,6 @@ namespace casadi {
              &m->hlast, &m->hcur, &m->tcur);
 
     THROWING(CVodeGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
-
-    casadi_msg("CvodesInterface::integrate(" << t << ") end");
   }
 
   void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
@@ -344,7 +341,6 @@ namespace casadi {
       THROWING(CVodeReInitB, m->mem, m->whichB, grid_.back(), m->rxz);
       THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->rq);
     }
-    casadi_msg("CvodesInterface::resetB end");
   }
 
   void CvodesInterface::retreat(IntegratorMemory* mem, double t,
@@ -376,10 +372,9 @@ namespace casadi {
     // Successfull return or warning
     if (flag>=CV_SUCCESS) return;
     // Construct error message
-    stringstream ss;
     char* flagname = CVodeGetReturnFlagName(flag);
-    ss << module << " returned \"" << flagname << "\"."
-       << " Consult CVODES documentation.";
+    stringstream ss;
+    ss << module << " returned \"" << flagname << "\". Consult CVODES documentation.";
     free(flagname);
     casadi_error(ss.str());
   }
@@ -818,7 +813,7 @@ namespace casadi {
   }
 
   Function CvodesInterface::getJ(bool b) const {
-    return oracle_.is_a("sxfunction") ? getJ<SX>(b) : getJ<MX>(b);
+    return oracle_.is_a("SXFunction") ? getJ<SX>(b) : getJ<MX>(b);
   }
 
   template<typename MatType>

@@ -42,6 +42,11 @@
 using namespace std;
 
 namespace casadi {
+  // Throw informative error message
+  #define THROW_ERROR(FNAME, WHAT) \
+  throw CasadiException("Error in Function::" FNAME " for '" + this->name() + "' "\
+    "[" + this->class_name() + "] at " + CASADI_WHERE + ":\n"\
+    + string(WHAT));
 
   Function::Function() {
   }
@@ -92,142 +97,138 @@ namespace casadi {
   }
 
   Function::Function(const string& name,
-                     const std::vector<SX>& arg, const std::vector<SX>& res,
+                     const std::vector<SX>& ex_in, const std::vector<SX>& ex_out,
                      const Dict& opts) {
-    construct(name, arg, res, opts);
+    construct(name, ex_in, ex_out, {}, {}, opts);
   }
 
   Function::Function(const string& name,
-                     const std::vector<SX>& arg, const std::vector<SX>& res,
-                     const std::vector<string>& argn, const std::vector<string>& resn,
+                     const std::vector<SX>& ex_in, const std::vector<SX>& ex_out,
+                     const std::vector<string>& name_in,
+                     const std::vector<string>& name_out,
                      const Dict& opts) {
-    construct(name, arg, res, argn, resn, opts);
+    construct(name, ex_in, ex_out, name_in, name_out, opts);
   }
 
   Function::Function(const string& name,
-                     const std::vector<MX>& arg, const std::vector<MX>& res,
+                     const std::vector<MX>& ex_in, const std::vector<MX>& ex_out,
                      const Dict& opts) {
-    construct(name, arg, res, opts);
+    construct(name, ex_in, ex_out, {}, {}, opts);
   }
 
   Function::Function(const string& name,
-                     const std::vector<MX>& arg, const std::vector<MX>& res,
-                     const std::vector<string>& argn, const std::vector<string>& resn,
+                     const std::vector<MX>& ex_in, const std::vector<MX>& ex_out,
+                     const std::vector<string>& name_in,
+                     const std::vector<string>& name_out,
                      const Dict& opts) {
-    construct(name, arg, res, argn, resn, opts);
+    construct(name, ex_in, ex_out, name_in, name_out, opts);
   }
 
-  Function::Function(const string& name, SXIList arg, const SXVector& res, const Dict& opts) {
-    construct(name, SXVector(arg), res, opts);
+  Function::Function(const string& name, SXIList ex_in, const SXVector& ex_out, const Dict& opts) {
+    construct(name, SXVector(ex_in), ex_out, {}, {}, opts);
   }
 
-  Function::Function(const string& name, const SXVector& arg, SXIList res, const Dict& opts) {
-    construct(name, arg, SXVector(res), opts);
+  Function::Function(const string& name, const SXVector& ex_in, SXIList ex_out, const Dict& opts) {
+    construct(name, ex_in, SXVector(ex_out), {}, {}, opts);
   }
 
-  Function::Function(const string& name, SXIList arg, SXIList res, const Dict& opts) {
-    construct(name, SXVector(arg), SXVector(res), opts);
+  Function::Function(const string& name, SXIList ex_in, SXIList ex_out, const Dict& opts) {
+    construct(name, SXVector(ex_in), SXVector(ex_out), {}, {}, opts);
   }
 
-  Function::Function(const string& name, SXIList arg, const SXVector& res,
-                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
-    construct(name, SXVector(arg), res, argn, resn, opts);
+  Function::Function(const string& name, SXIList ex_in, const SXVector& ex_out,
+                     const StringVector& name_in,
+                     const StringVector& name_out, const Dict& opts) {
+    construct(name, SXVector(ex_in), ex_out, name_in, name_out, opts);
   }
 
-  Function::Function(const string& name, const SXVector& arg, SXIList res,
-                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
-    construct(name, arg, SXVector(res), argn, resn, opts);
+  Function::Function(const string& name, const SXVector& ex_in, SXIList ex_out,
+                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+    construct(name, ex_in, SXVector(ex_out), name_in, name_out, opts);
   }
 
-  Function::Function(const string& name, SXIList arg, SXIList res,
-                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
-    construct(name, SXVector(arg), SXVector(res), argn, resn, opts);
+  Function::Function(const string& name, SXIList ex_in, SXIList ex_out,
+                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+    construct(name, SXVector(ex_in), SXVector(ex_out), name_in, name_out, opts);
   }
 
-  Function::Function(const string& name, MXIList arg, const MXVector& res, const Dict& opts) {
-    construct(name, MXVector(arg), res, opts);
+  Function::Function(const string& name, MXIList ex_in, const MXVector& ex_out, const Dict& opts) {
+    construct(name, MXVector(ex_in), ex_out, {}, {}, opts);
   }
 
-  Function::Function(const string& name, const MXVector& arg, MXIList res, const Dict& opts) {
-    construct(name, arg, MXVector(res), opts);
+  Function::Function(const string& name, const MXVector& ex_in, MXIList ex_out, const Dict& opts) {
+    construct(name, ex_in, MXVector(ex_out), {}, {}, opts);
   }
 
-  Function::Function(const string& name, MXIList arg, MXIList res, const Dict& opts) {
-    construct(name, MXVector(arg), MXVector(res), opts);
+  Function::Function(const string& name, MXIList ex_in, MXIList ex_out, const Dict& opts) {
+    construct(name, MXVector(ex_in), MXVector(ex_out), {}, {}, opts);
   }
 
-  Function::Function(const string& name, MXIList arg, const MXVector& res,
-                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
-    construct(name, MXVector(arg), res, argn, resn, opts);
+  Function::Function(const string& name, MXIList ex_in, const MXVector& ex_out,
+                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+    construct(name, MXVector(ex_in), ex_out, name_in, name_out, opts);
   }
 
-  Function::Function(const string& name, const MXVector& arg, MXIList res,
-                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
-    construct(name, arg, MXVector(res), argn, resn, opts);
+  Function::Function(const string& name, const MXVector& ex_in, MXIList ex_out,
+                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+    construct(name, ex_in, MXVector(ex_out), name_in, name_out, opts);
   }
 
-  Function::Function(const string& name, MXIList arg, MXIList res,
-                     const StringVector& argn, const StringVector& resn, const Dict& opts) {
-    construct(name, MXVector(arg), MXVector(res), argn, resn, opts);
+  Function::Function(const string& name, MXIList ex_in, MXIList ex_out,
+                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+    construct(name, MXVector(ex_in), MXVector(ex_out), name_in, name_out, opts);
   }
 
   Function::Function(const string& name, const std::map<string, SX>& dict,
-                     const vector<string>& argn, const vector<string>& resn,
+                     const vector<string>& name_in, const vector<string>& name_out,
                      const Dict& opts) {
-    construct(name, dict, argn, resn, opts);
+    construct(name, dict, name_in, name_out, opts);
   }
 
   Function::Function(const string& name, const std::map<string, MX>& dict,
-                     const vector<string>& argn, const vector<string>& resn,
+                     const vector<string>& name_in, const vector<string>& name_out,
                      const Dict& opts) {
-    construct(name, dict, argn, resn, opts);
+    construct(name, dict, name_in, name_out, opts);
   }
 
   template<typename M>
   void Function::construct(const string& name, const std::map<string, M>& dict,
-                           const vector<string>& argn,
-                           const vector<string>& resn,
+                           const vector<string>& name_in,
+                           const vector<string>& name_out,
                            const Dict& opts) {
-    vector<M> arg(argn.size()), res(resn.size());
+    vector<M> ex_in(name_in.size()), ex_out(name_out.size());
     for (auto&& i : dict) {
       vector<string>::const_iterator it;
-      if ((it=find(argn.begin(), argn.end(), i.first))!=argn.end()) {
+      if ((it=find(name_in.begin(), name_in.end(), i.first))!=name_in.end()) {
         // Input expression
-        arg[it-argn.begin()] = i.second;
-      } else if ((it=find(resn.begin(), resn.end(), i.first))!=resn.end()) {
+        ex_in[it-name_in.begin()] = i.second;
+      } else if ((it=find(name_out.begin(), name_out.end(), i.first))!=name_out.end()) {
         // Output expression
-        res[it-resn.begin()] = i.second;
+        ex_out[it-name_out.begin()] = i.second;
       } else {
         // Neither
         casadi_error("Unknown dictionary entry: '" + i.first + "'");
       }
     }
-    construct(name, arg, res, argn, resn, opts);
+    construct(name, ex_in, ex_out, name_in, name_out, opts);
   }
 
   void Function::construct(const string& name,
-                           const vector<SX>& arg, const vector<SX>& res,
+                           const vector<SX>& ex_in, const vector<SX>& ex_out,
+                           const vector<string>& name_in,
+                           const vector<string>& name_out,
                            const Dict& opts) {
-    own(new SXFunction(name, arg, res));
+    own(new SXFunction(name, ex_in, ex_out, name_in, name_out));
     (*this)->construct(opts);
   }
 
   void Function::construct(const string& name,
-                           const vector<MX>& arg, const vector<MX>& res,
+                           const vector<MX>& ex_in, const vector<MX>& ex_out,
+                           const vector<string>& name_in,
+                           const vector<string>& name_out,
                            const Dict& opts) {
-    own(new MXFunction(name, arg, res));
+    own(new MXFunction(name, ex_in, ex_out, name_in, name_out));
     (*this)->construct(opts);
-  }
-
-  template<typename M>
-  void Function::construct(const string& name,
-                           const vector<M>& arg, const vector<M>& res,
-                           const vector<string>& argn, const vector<string>& resn,
-                           const Dict& opts) {
-    Dict opts2 = opts;
-    opts2["input_scheme"] = argn;
-    opts2["output_scheme"] = resn;
-    construct(name, arg, res, opts2);
   }
 
   Function Function::expand() const {
@@ -235,14 +236,9 @@ namespace casadi {
   }
 
   Function Function::expand(const string& name, const Dict& opts) const {
-    vector<SX> arg = sx_in();
-    vector<SX> res = Function(*this)(arg);
-    vector<string> name_in = this->name_in();
-    vector<string> name_out = this->name_out();
-    Dict opts2(opts);
-    if (!name_in.empty() && !opts.count("input_scheme")) opts2["input_scheme"]=name_in;
-    if (!name_out.empty() && !opts.count("output_scheme")) opts2["output_scheme"]=name_out;
-    return Function(name, arg, res, opts2);
+    vector<SX> ex_in = sx_in();
+    vector<SX> ex_out = Function(*this)(ex_in);
+    return Function(name, ex_in, ex_out, name_in(), name_out(), opts);
   }
 
   Function Function::create(FunctionInternal* node) {
@@ -258,6 +254,7 @@ namespace casadi {
   }
 
   FunctionInternal* Function::operator->() const {
+    casadi_assert(!is_null());
     return get();
   }
 
@@ -358,7 +355,7 @@ namespace casadi {
   }
 
   template<typename D>
-  void Function::_call(vector<const D*> arg, vector<D*> res) const {
+  void Function::call_gen(vector<const D*> arg, vector<D*> res) const {
     // Input buffer
     casadi_assert(arg.size()>=n_in());
     arg.resize(sz_arg());
@@ -377,18 +374,18 @@ namespace casadi {
 
 
   void Function::operator()(vector<const double*> arg, vector<double*> res) const {
-    return _call(arg, res);
+    return call_gen(arg, res);
   }
 
   void Function::operator()(vector<const bvec_t*> arg, vector<bvec_t*> res) const {
-    return _call(arg, res);
+    return call_gen(arg, res);
   }
 
   void Function::operator()(vector<const SXElem*> arg, vector<SXElem*> res) const {
-    return _call(arg, res);
+    return call_gen(arg, res);
   }
 
-  void Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
+  int Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
     // Input buffer
     casadi_assert(arg.size()>=n_in());
     arg.resize(sz_arg());
@@ -402,7 +399,7 @@ namespace casadi {
     vector<bvec_t> w(sz_w());
 
     // Evaluate memoryless
-    rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+    return rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
   Function Function::mapaccum(const string& name, int n, int n_accum,
@@ -424,7 +421,7 @@ namespace casadi {
     for (int iter=0; iter<n; ++iter) {
       // Stacked input expressions
       for (int i=n_accum; i<n_in; ++i) {
-        arg[i] = MX::sym(name_in(i) + "_" + to_string(i), sparsity_in(i));
+        arg[i] = MX::sym(name_in(i) + "_" + str(i), sparsity_in(i));
         varg[i].push_back(arg[i]);
       }
       // Call f
@@ -456,8 +453,8 @@ namespace casadi {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
-    casadi_assert(inBounds(accum_in, n_in) && isUnique(accum_in));
-    casadi_assert(inBounds(accum_out, n_out) && isUnique(accum_out));
+    casadi_assert(in_range(accum_in, n_in) && isUnique(accum_in));
+    casadi_assert(in_range(accum_out, n_out) && isUnique(accum_out));
     casadi_assert(accum_in.size()==accum_out.size());
     int n_accum=accum_in.size();
 
@@ -534,7 +531,7 @@ namespace casadi {
       std::vector<MX> tmp(n);
       for (int i=0; i<arg.size(); ++i) {
         for (int k=0; k<n; ++k) {
-          tmp[k] = v[k][i] = MX::sym(name_in(i)+"_"+to_string(k), sparsity_in(i));
+          tmp[k] = v[k][i] = MX::sym(name_in(i)+"_"+str(k), sparsity_in(i));
         }
         arg[i] = horzcat(tmp);
       }
@@ -547,7 +544,7 @@ namespace casadi {
         res[i] = horzcat(tmp);
       }
       // Construct function
-      return Function(name() + "_" + to_string(n), arg, res,
+      return Function(name() + "_" + str(n), arg, res,
                       name_in(), name_out());
     } else {
       // Create Map object
@@ -555,14 +552,23 @@ namespace casadi {
     }
   }
 
-  Function Function::slice(const std::string& name, const std::vector<int>& order_in,
-                           const std::vector<int>& order_out, const Dict& opts) const {
-    return (*this)->slice(name, order_in, order_out, opts);
+  Function Function::
+  slice(const std::string& name, const std::vector<int>& order_in,
+        const std::vector<int>& order_out, const Dict& opts) const {
+    try {
+      return (*this)->slice(name, order_in, order_out, opts);
+    } catch (exception& e) {
+      THROW_ERROR("slice", e.what());
+    }
   }
 
   vector<MX> Function::mapsum(const vector< MX > &x,
                               const string& parallelization) const {
-    return (*this)->mapsum_mx(x, parallelization);
+    try {
+      return (*this)->mapsum_mx(x, parallelization);
+    } catch (exception& e) {
+      THROW_ERROR("mapsum", e.what());
+    }
   }
 
   Function Function::conditional(const string& name, const vector<Function>& f,
@@ -660,7 +666,7 @@ namespace casadi {
     vector<string> s_in = name_in();
     vector<string> s_out = name_out();
     s_out.insert(s_out.begin(), "jac:" + name_out(oind) + ":" + name_in(iind));
-    return factory("jac_" + name(), s_in, s_out);
+    return factory(name() + "_jac", s_in, s_out);
   }
 
   Function Function::hessian_old(int iind, int oind) const {
@@ -670,11 +676,15 @@ namespace casadi {
     s_out.insert(s_out.begin(), "grad:" + name_out(oind) + ":" + name_in(iind));
     s_out.insert(s_out.begin(),
                  "sym:hess:" + name_out(oind) + ":" + name_in(iind) + ":" + name_in(iind));
-    return factory("hess_" + name(), s_in, s_out);
+    return factory(name() + "_hess", s_in, s_out);
   }
 
   Function Function::jacobian() const {
-    return (*this)->jacobian();
+    try {
+      return (*this)->jacobian();
+    } catch (exception& e) {
+      THROW_ERROR("jacobian", e.what());
+    }
   }
 
   bool Function::test_cast(const SharedObjectInternal* ptr) {
@@ -682,12 +692,16 @@ namespace casadi {
   }
 
   Dict Function::stats(int mem) const {
-    return (*this)->_get_stats(mem);
+    return (*this)->get_stats(memory(mem));
   }
 
   const Sparsity Function::
   sparsity_jac(int iind, int oind, bool compact, bool symmetric) const {
-    return (*this)->sparsity_jac(iind, oind, compact, symmetric);
+    try {
+      return (*this)->sparsity_jac(iind, oind, compact, symmetric);
+    } catch (exception& e) {
+      THROW_ERROR("sparsity_jac", e.what());
+    }
   }
 
   vector<string> Function::name_in() const {
@@ -699,35 +713,67 @@ namespace casadi {
   }
 
   int Function::index_in(const string &name) const {
-    return (*this)->index_in(name);
+    try {
+      return (*this)->index_in(name);
+    } catch (exception& e) {
+      THROW_ERROR("index_in", e.what());
+    }
   }
 
   int Function::index_out(const string &name) const {
-    return (*this)->index_out(name);
+    try {
+      return (*this)->index_out(name);
+    } catch (exception& e) {
+      THROW_ERROR("index_out", e.what());
+    }
   }
 
   string Function::name_in(int ind) const {
-    return (*this)->name_in(ind);
+    try {
+      return (*this)->name_in(ind);
+    } catch (exception& e) {
+      THROW_ERROR("name_in", e.what());
+    }
   }
 
   string Function::name_out(int ind) const {
-    return (*this)->name_out(ind);
+    try {
+      return (*this)->name_out(ind);
+    } catch (exception& e) {
+      THROW_ERROR("name_out", e.what());
+    }
   }
 
   const Sparsity& Function::sparsity_in(int ind) const {
-    return (*this)->sparsity_in(ind);
+    try {
+      return (*this)->sparsity_in(ind);
+    } catch (exception& e) {
+      THROW_ERROR("sparsity_in", e.what());
+    }
   }
 
   const Sparsity& Function::sparsity_in(const string &iname) const {
-    return (*this)->sparsity_in(iname);
+    try {
+      return (*this)->sparsity_in(iname);
+    } catch (exception& e) {
+      THROW_ERROR("sparsity_in", e.what());
+    }
   }
 
   const Sparsity& Function::sparsity_out(int ind) const {
-    return (*this)->sparsity_out(ind);
+    try {
+      return (*this)->sparsity_out(ind);
+    } catch (exception& e) {
+      THROW_ERROR("sparsity_out", e.what());
+    }
   }
 
   const Sparsity& Function::sparsity_out(const string &iname) const {
-    return (*this)->sparsity_out(iname);
+    try {
+      return (*this)->sparsity_out(iname);
+    } catch (exception& e) {
+      THROW_ERROR("sparsity_out", e.what());
+    }
   }
 
   void Function::sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const {
@@ -742,43 +788,63 @@ namespace casadi {
 
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
-  void Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    (*this)->sp_forward(arg, res, iw, w, mem);
+  int Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    try {
+      return (*this)->sp_forward(arg, res, iw, w, memory(mem));
+    } catch (exception& e) {
+      THROW_ERROR("operator()", e.what());
+    }
   }
 
-  void Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    (*this)->sp_reverse(arg, res, iw, w, mem);
+  int Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+    try {
+      return (*this)->sp_reverse(arg, res, iw, w, memory(mem));
+    } catch (exception& e) {
+      THROW_ERROR("rev", e.what());
+    }
   }
 
   void Function::set_work(const double**& arg, double**& res, int*& iw, double*& w,
                           int mem) const {
-    (*this)->_set_work(arg, res, iw, w, mem);
+    try {
+      (*this)->set_work(memory(mem), arg, res, iw, w);
+    } catch (exception& e) {
+      THROW_ERROR("set_work", e.what());
+    }
   }
 
   void Function::set_temp(const double** arg, double** res, int* iw, double* w,
                           int mem) const {
-    (*this)->_set_temp(arg, res, iw, w, mem);
+    try {
+      (*this)->set_temp(memory(mem), arg, res, iw, w);
+    } catch (exception& e) {
+      THROW_ERROR("set_temp", e.what());
+    }
   }
 
   void Function::setup(const double** arg, double** res, int* iw, double* w,
                           int mem) const {
-    (*this)->_setup(arg, res, iw, w, mem);
-  }
-
-  bool Function::spCanEvaluate(bool fwd) {
-    if (fwd) {
-      return (*this)->has_spfwd();
-    } else {
-      return (*this)->has_sprev();
+    try {
+      (*this)->setup(memory(mem), arg, res, iw, w);
+    } catch (exception& e) {
+      THROW_ERROR("setup", e.what());
     }
   }
 
   Function Function::forward(int nfwd) const {
-    return (*this)->forward(nfwd);
+    try {
+      return (*this)->forward(nfwd);
+    } catch (exception& e) {
+      THROW_ERROR("forward", e.what());
+    }
   }
 
   Function Function::reverse(int nadj) const {
-    return (*this)->reverse(nadj);
+    try {
+      return (*this)->reverse(nadj);
+    } catch (exception& e) {
+      THROW_ERROR("reverse", e.what());
+    }
   }
 
   void Function::print_dimensions(ostream &stream) const {
@@ -809,10 +875,6 @@ namespace casadi {
 
   std::string Function::generate_dependencies(const string& fname, const Dict& opts) const {
     return (*this)->generate_dependencies(fname, opts);
-  }
-
-  void Function::checkInputs() const {
-    return (*this)->checkInputs();
   }
 
   string Function::name() const {
@@ -905,7 +967,7 @@ namespace casadi {
   }
 
   template<typename M>
-  void Function::_call(const std::map<string, M>& arg, std::map<string, M>& res,
+  void Function::call_gen(const std::map<string, M>& arg, std::map<string, M>& res,
                        bool always_inline, bool never_inline) const {
     // Get default inputs
     vector<M> arg_v(n_in());
@@ -949,17 +1011,17 @@ namespace casadi {
 
   void Function::call(const DMDict& arg, DMDict& res,
                       bool always_inline, bool never_inline) const {
-    return _call(arg, res, always_inline, never_inline);
+    return call_gen(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const SXDict& arg, SXDict& res,
                       bool always_inline, bool never_inline) const {
-    return _call(arg, res, always_inline, never_inline);
+    return call_gen(arg, res, always_inline, never_inline);
   }
 
   void Function::call(const MXDict& arg, MXDict& res,
                       bool always_inline, bool never_inline) const {
-    return _call(arg, res, always_inline, never_inline);
+    return call_gen(arg, res, always_inline, never_inline);
   }
 
   double Function::default_in(int ind) const {
@@ -974,28 +1036,52 @@ namespace casadi {
     return (*this)->min_in(ind);
   }
 
-  void Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
-    (*this)->_eval(arg, res, iw, w, mem);
+  int Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
+    try {
+      return (*this)->eval_gen(arg, res, iw, w, memory(mem));
+    } catch (exception& e) {
+      THROW_ERROR("operator()", e.what());
+    }
   }
 
-  void Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    (*this)->eval_sx(arg, res, iw, w, mem);
+  int Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+    try {
+      return (*this)->eval_sx(arg, res, iw, w, memory(mem));
+    } catch (exception& e) {
+      THROW_ERROR("operator()", e.what());
+    }
   }
 
   const SX Function::sx_in(int ind) const {
-    return (*this)->sx_in(ind);
+    try {
+      return (*this)->sx_in(ind);
+    } catch (exception& e) {
+      THROW_ERROR("sx_in", e.what());
+    }
   }
 
   const SX Function::sx_out(int ind) const {
-    return (*this)->sx_out(ind);
+    try {
+      return (*this)->sx_out(ind);
+    } catch (exception& e) {
+      THROW_ERROR("sx_out", e.what());
+    }
   }
 
   const vector<SX> Function::sx_in() const {
-    return (*this)->sx_in();
+    try {
+      return (*this)->sx_in();
+    } catch (exception& e) {
+      THROW_ERROR("sx_in", e.what());
+    }
   }
 
   const vector<SX> Function::sx_out() const {
-    return (*this)->sx_out();
+    try {
+      return (*this)->sx_out();
+    } catch (exception& e) {
+      THROW_ERROR("sx_out", e.what());
+    }
   }
 
   const MX Function::mx_in(int ind) const {
@@ -1023,11 +1109,27 @@ namespace casadi {
   }
 
   vector<SX> Function::free_sx() const {
-    return (*this)->free_sx();
+    try {
+      return (*this)->free_sx();
+    } catch (exception& e) {
+      THROW_ERROR("free_sx", e.what());
+    }
   }
 
   vector<MX> Function::free_mx() const {
-    return (*this)->free_mx();
+    try {
+      return (*this)->free_mx();
+    } catch (exception& e) {
+      THROW_ERROR("free_mx", e.what());
+    }
+  }
+
+  bool Function::has_spfwd() const {
+    return (*this)->has_spfwd();
+  }
+
+  bool Function::has_sprev() const {
+    return (*this)->has_sprev();
   }
 
   bool Function::has_free() const {
@@ -1035,7 +1137,11 @@ namespace casadi {
   }
 
   void Function::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const {
-    (*this)->generate_lifted(vdef_fcn, vinit_fcn);
+    try {
+      (*this)->generate_lifted(vdef_fcn, vinit_fcn);
+    } catch (exception& e) {
+      THROW_ERROR("generate_lifted", e.what());
+    }
   }
 
   int Function::getAlgorithmSize() const {
@@ -1063,7 +1169,11 @@ namespace casadi {
   }
 
   int Function::n_nodes() const {
-    return (*this)->n_nodes();
+    try {
+      return (*this)->n_nodes();
+    } catch (exception& e) {
+      THROW_ERROR("n_nodes", e.what());
+    }
   }
 
   int Function::checkout() const {
@@ -1080,17 +1190,17 @@ namespace casadi {
 
   void Function::assert_size_in(int i, int nrow, int ncol) const {
     casadi_assert_message(size1_in(i)==nrow && size2_in(i)==ncol,
-                          "Incorrect shape for " << *this << " input " << i << " \""
-                          << name_in(i) << "\". Expected " << nrow << "-by-" << ncol
-                          << " but got " << size1_in(i) <<  "-by-" << size2_in(i));
+      "Incorrect shape for " + str(*this) + " input " + str(i) + " \""
+      + name_in(i) + "\". Expected " + str(nrow) + "-by-" + str(ncol)
+      + " but got " + str(size1_in(i)) +  "-by-" + str(size2_in(i)));
 
   }
 
   void Function::assert_size_out(int i, int nrow, int ncol) const {
     casadi_assert_message(size1_out(i)==nrow && size2_out(i)==ncol,
-                          "Incorrect shape for " << *this << " output " << i << " \""
-                          << name_out(i) << "\". Expected " << nrow << "-by-" << ncol
-                          << " but got " << size1_out(i) <<  "-by-" << size2_out(i));
+      "Incorrect shape for " + str(*this) + " output " + str(i) + " \""
+      + name_out(i) + "\". Expected " + str(nrow) + "-by-" + str(ncol)
+      + " but got " + str(size1_out(i)) +  "-by-" + str(size2_out(i)));
   }
 
   Function Function::
@@ -1099,20 +1209,37 @@ namespace casadi {
           const std::vector<std::string>& s_out,
           const AuxOut& aux,
           const Dict& opts) const {
-     return (*this)->factory(name, s_in, s_out, aux, opts);
+     try {
+       return (*this)->factory(name, s_in, s_out, aux, opts);
+     } catch (exception& e) {
+       THROW_ERROR("factory", "Failed to create " + name + ":" + str(s_in) + "->" + str(s_out)
+        + " with " + str(aux) + ":\n" + str(e.what()));
+     }
   }
 
-  vector<bool> Function::which_depends(const string& s_in,
-                                const vector<string>& s_out, int order, bool tr) const {
-    return (*this)->which_depends(s_in, s_out, order, tr);
+  vector<bool> Function::
+  which_depends(const string& s_in, const vector<string>& s_out, int order, bool tr) const {
+    try {
+      return (*this)->which_depends(s_in, s_out, order, tr);
+    } catch (exception& e) {
+      THROW_ERROR("which_depends", e.what());
+    }
   }
 
   std::vector<std::string> Function::get_function() const {
-    return (*this)->get_function();
+    try {
+      return (*this)->get_function();
+    } catch (exception& e) {
+      THROW_ERROR("get_function", e.what());
+    }
   }
 
   Function Function::get_function(const std::string &name) const {
-    return (*this)->get_function(name);
+    try {
+      return (*this)->get_function(name);
+    } catch (exception& e) {
+      THROW_ERROR("get_function", e.what());
+    }
   }
 
   bool Function::has_function(const std::string& fname) const {
@@ -1120,7 +1247,11 @@ namespace casadi {
   }
 
   Function Function::oracle() const {
-    return (*this)->oracle();
+    try {
+      return (*this)->oracle();
+    } catch (exception& e) {
+      THROW_ERROR("oracle", e.what());
+    }
   }
 
   Function Function::wrap() const {

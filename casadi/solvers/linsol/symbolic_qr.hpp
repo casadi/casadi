@@ -79,6 +79,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "symbolicqr";}
 
+    // Name of the class
+    std::string class_name() const override { return "SymbolicQr";}
+
     /** \brief  Create a new Linsol */
     static LinsolInternal* creator(const std::string& name) {
       return new SymbolicQr(name);
@@ -94,13 +97,13 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new SymbolicQrMemory();}
-
-    /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<SymbolicQrMemory*>(mem);}
+    void* alloc_mem() const override { return new SymbolicQrMemory();}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<SymbolicQrMemory*>(mem);}
 
     // Set sparsity pattern
     void reset(void* mem, const int* sp) const override;
@@ -112,8 +115,8 @@ namespace casadi {
     void solve(void* mem, double* x, int nrhs, bool tr) const override;
 
     /** \brief Evaluate symbolically (SX) */
-    void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
-                               bool tr, int nrhs) const override;
+    void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
+                        bool tr, int nrhs) const override;
 
     /// A documentation string
     static const std::string meta_doc;

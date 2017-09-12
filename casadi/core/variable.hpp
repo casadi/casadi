@@ -128,11 +128,11 @@ namespace casadi {
     /// Free attribute
     bool free;
 
-    /// Print a description of the object
-    void print_long(std::ostream &stream) const;
+    /// Readable name of the class
+    std::string type_name() const {return "Variable";}
 
-    /// Print a representation of the object
-    void print_short(std::ostream &stream) const;
+    /// Print a description of the object
+    void disp(std::ostream& stream, bool more=false) const;
   };
 } // namespace casadi
 

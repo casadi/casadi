@@ -115,7 +115,8 @@ namespace casadi {
     virtual bool has_function(const std::string& fname) const {return false;}
 
     /** \brief Which variables enter with some order
-    *
+    * \param[in] s_in Input name
+    * \param[in] s_out Output name(s)
     * \param[in] order Only 1 (linear) and 2 (nonlinear) allowed
     * \param[in] tr   Flip the relationship. Return which expressions contain the variables
     */
@@ -138,15 +139,15 @@ namespace casadi {
 
     ///@{
     /** \brief  Evaluate numerically */
-    void _eval(const double** arg, double** res, int* iw, double* w, int mem) const;
-    virtual void eval(void* mem, const double** arg, double** res, int* iw, double* w) const;
+    int eval_gen(const double** arg, double** res, int* iw, double* w, void* mem) const;
+    virtual int eval(const double** arg, double** res, int* iw, double* w, void* mem) const;
     ///@}
 
     /** \brief  Evaluate numerically, simplied syntax */
     virtual void simple(const double* arg, double* res) const;
 
     /** \brief  Evaluate with symbolic scalars */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    virtual int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const;
 
     ///@{
     /** \brief  Evaluate with symbolic matrices */
@@ -156,18 +157,22 @@ namespace casadi {
 
     ///@{
     /** \brief Evaluate a function, overloaded */
-    void _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
-    void _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    int eval_gen(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
+      return eval_sx(arg, res, iw, w, mem);
+    }
+    int eval_gen(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
+      return sp_forward(arg, res, iw, w, mem);
+    }
     ///@}
 
     ///@{
     /** \brief Call a function, overloaded */
-    void _call(const MXVector& arg, MXVector& res,
+    void call_gen(const MXVector& arg, MXVector& res,
                bool always_inline, bool never_inline) const {
       eval_mx(arg, res, always_inline, never_inline);
     }
     template<typename D>
-    void _call(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
+    void call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
                bool always_inline, bool never_inline) const;
     ///@}
 
@@ -399,16 +404,13 @@ namespace casadi {
     virtual void jit_dependencies(const std::string& fname) {}
 
     /** \brief  Print */
-    void print_long(std::ostream &stream) const override;
+    void disp(std::ostream& stream, bool more) const override;
 
-    /** \brief  Print */
-    void print_short(std::ostream &stream) const override;
+    /** \brief  Print more */
+    virtual void disp_more(std::ostream& stream) const {}
 
     /** \brief Get function signature: name:(inputs)->(outputs) */
     std::string definition() const;
-
-    /** \brief Check if the numerical values of the supplied bounds make sense */
-    virtual void checkInputs() const {}
 
     /** \brief Print dimensions of inputs and outputs */
     void print_dimensions(std::ostream &stream) const;
@@ -426,9 +428,6 @@ namespace casadi {
     void get_partition(int iind, int oind, Sparsity& D1, Sparsity& D2,
                       bool compact, bool symmetric,
                       bool allow_forward, bool allow_reverse) const;
-
-    /// Verbose mode?
-    bool verbose() const;
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -471,6 +470,9 @@ namespace casadi {
     /** \brief Name of the function */
     const std::string& name() const { return name_;}
 
+    /** \brief Get type name */
+    std::string type_name() const override {return "Function";}
+
     /// Generate the sparsity of a Jacobian block
     virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric) const;
 
@@ -500,7 +502,7 @@ namespace casadi {
         if (i->compare(0, col, name)==0) return i-v.begin();
       }
       casadi_error("FunctionInternal::index_in: could not find entry \""
-                   << name << "\". Available names are: " << v << ".");
+                   + name + "\". Available names are: " + str(v) + ".");
       return -1;
     }
 
@@ -512,7 +514,7 @@ namespace casadi {
         if (i->compare(0, col, name)==0) return i-v.begin();
       }
       casadi_error("FunctionInternal::index_out: could not find entry \""
-                   << name << "\". Available names are: " << v << ".");
+                   + name + "\". Available names are: " + str(v) + ".");
       return -1;
     }
 
@@ -563,17 +565,11 @@ namespace casadi {
     virtual Sparsity get_sparsity_out(int i);
     /// @}
 
-    /** \brief  Log the status of the solver */
-    void log(const std::string& msg) const;
-
-    /** \brief  Log the status of the solver, function given */
-    void log(const std::string& fcn, const std::string& msg) const;
-
     /** \brief  Propagate sparsity forward */
-    virtual void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    virtual int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    virtual int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const;
 
     /** \brief Get number of temporary variables needed */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
@@ -609,53 +605,30 @@ namespace casadi {
     void* memory(int ind) const;
 
     /** \brief Create memory block */
-    virtual void* alloc_memory() const {return 0;}
+    virtual void* alloc_mem() const {return 0;}
 
     /** \brief Initalize memory block */
-    virtual void init_memory(void* mem) const {}
+    virtual int init_mem(void* mem) const { return 0;}
 
     /** \brief Free memory block */
-    virtual void free_memory(void *mem) const;
-
-    /** \brief Maximum number of memory objects */
-    virtual int n_mem() const { return 0;}
+    virtual void free_mem(void *mem) const;
 
     /** \brief Clear all memory (called from destructor) */
-    void clear_memory();
+    void clear_mem();
 
-    ///@{
     /// Get all statistics
     virtual Dict get_stats(void* mem) const { return Dict();}
-    virtual Dict _get_stats(int mem) const { return get_stats(memory(mem));}
-    ///@}
 
-    ///@{
     /** \brief Set the (persistent) work vectors */
     virtual void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const {}
-    virtual void _set_work(const double**& arg, double**& res,
-                           int*& iw, double*& w, int mem) const {
-      set_work(memory(mem), arg, res, iw, w);
-    }
-    ///@}
 
-    ///@{
     /** \brief Set the (temporary) work vectors */
     virtual void set_temp(void* mem, const double** arg, double** res,
                           int* iw, double* w) const {}
-    virtual void _set_temp(const double** arg, double** res,
-                          int* iw, double* w, int mem) const {
-      set_temp(memory(mem), arg, res, iw, w);
-    }
-    ///@}
 
-    ///@{
     /** \brief Set the (persistent and temporary) work vectors */
     void setup(void* mem, const double** arg, double** res, int* iw, double* w) const;
-    void _setup(const double** arg, double** res, int* iw, double* w, int mem) const {
-      setup(memory(mem), arg, res, iw, w);
-    }
-    ///@}
 
     ///@{
     /** \brief Calculate derivatives by multiplying the full Jacobian and multiplying */
@@ -741,9 +714,6 @@ namespace casadi {
     // Finite difference step
     Dict fd_options_;
 
-    /** \brief Get type name */
-    virtual std::string type_name() const = 0;
-
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;
 
@@ -764,6 +734,10 @@ namespace casadi {
   protected:
     static void print_stats_line(int maxNameLen, std::string label, double n_call,
       double t_proc, double t_wall);
+
+    /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization */
+    void set_jac_sparsity(const Sparsity& sp);
+
   private:
     /// Memory objects
     mutable std::vector<void*> mem_;
@@ -796,7 +770,7 @@ namespace casadi {
     for (int dir=0; dir<nfwd; ++dir) {
       fseed[dir].resize(n_in);
       for (int iind=0; iind<n_in; ++iind) {
-        std::string n = "f" + to_string(dir) + "_" +  name_in(iind);
+        std::string n = "f" + str(dir) + "_" +  name_in(iind);
         fseed[dir][iind] = MatType::sym(n, sparsity_in(iind));
       }
     }
@@ -882,11 +856,11 @@ namespace casadi {
     }
 
     // Call the type-specific method
-    _call(arg, res, always_inline, never_inline);
+    call_gen(arg, res, always_inline, never_inline);
   }
 
   template<typename D>
-  void FunctionInternal::_call(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
+  void FunctionInternal::call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
                                bool always_inline, bool never_inline) const {
     casadi_assert_message(!never_inline, "Call-nodes only possible in MX expressions");
 
@@ -906,7 +880,7 @@ namespace casadi {
       for (int i=0; i<n_in; ++i)
         if (arg2[i].sparsity()!=sparsity_in(i))
           arg2[i] = project(arg2[i], sparsity_in(i));
-      return _call(arg2, res, always_inline, never_inline);
+      return call_gen(arg2, res, always_inline, never_inline);
     }
 
     // Allocate results
@@ -930,18 +904,19 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) resp[i]=get_ptr(res[i]);
 
     // Call memory-less
-    _eval(get_ptr(argp), get_ptr(resp), get_ptr(iw_tmp), get_ptr(w_tmp), 0);
+    (void)eval_gen(get_ptr(argp), get_ptr(resp),
+                get_ptr(iw_tmp), get_ptr(w_tmp), memory(0));
   }
 
   template<typename M>
   void FunctionInternal::check_arg(const std::vector<M>& arg) const {
     int n_in = this->n_in();
     casadi_assert_message(arg.size()==n_in, "Incorrect number of inputs: Expected "
-                          << n_in << ", got " << arg.size());
+                          + str(n_in) + ", got " + str(arg.size()));
     for (int i=0; i<n_in; ++i) {
       casadi_assert_message(check_mat(arg[i].sparsity(), sparsity_in(i)),
-                            "Input " << i << " (" << name_in(i) << ") has mismatching shape. "
-                            << "Expected " << size_in(i) << ", got " << arg[i].size());
+                            "Input " + str(i) + " (" + name_in(i) + ") has mismatching shape. "
+                            "Expected " + str(size_in(i)) + ", got " + str(arg[i].size()));
     }
   }
 
@@ -949,11 +924,11 @@ namespace casadi {
   void FunctionInternal::check_res(const std::vector<M>& res) const {
     int n_out = this->n_out();
     casadi_assert_message(res.size()==n_out, "Incorrect number of outputs: Expected "
-                          << n_out << ", got " << res.size());
+                          + str(n_out) + ", got " + str(res.size()));
     for (int i=0; i<n_out; ++i) {
       casadi_assert_message(check_mat(res[i].sparsity(), sparsity_out(i)),
-                            "Output " << i << " (" << name_out(i) << ") has mismatching shape. "
-                            "Expected " << size_out(i) << ", got " << res[i].size());
+                            "Output " + str(i) + " (" + name_out(i) + ") has mismatching shape. "
+                            "Expected " + str(size_out(i)) + ", got " + str(res[i].size()));
     }
   }
 

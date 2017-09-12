@@ -67,7 +67,7 @@ namespace casadi {
           std::vector<double> grid(
               knots_.begin()+offset_[i]+degree_[i],
               knots_.begin()+offset_[i+1]-degree_[i]);
-          casadi_assert(isIncreasing(grid) && isEquallySpaced(grid));
+          casadi_assert(is_increasing(grid) && is_equally_spaced(grid));
         } else {
           casadi_error("Unknown lookup_mode option '" + lookup_mode[i] + ". "
                        "Allowed values: linear, exact.");
@@ -145,16 +145,18 @@ namespace casadi {
       casadi::BSplineCommon::init(opts);
 
       casadi_assert_message(coeffs_size_==coeffs_.size(),
-        "Expected coefficient size " << coeffs_size_ << ", got " << coeffs_.size() << " instead.");
+        "Expected coefficient size " + str(coeffs_size_) + ", "
+        "got " + str(coeffs_.size()) + " instead.");
     }
 
-    void BSpline::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-      if (!res[0]) return;
+    int BSpline::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+      if (!res[0]) return 0;
 
       casadi_fill(res[0], m_, 0.0);
       casadi_nd_boor_eval(res[0], degree_.size(), get_ptr(knots_), get_ptr(offset_),
         get_ptr(degree_), get_ptr(strides_), get_ptr(coeffs_), m_, arg[0], get_ptr(lookup_mode_),
         false, iw, w);
+      return 0;
     }
 
     void BSpline::codegen_body(CodeGenerator& g) const {
@@ -305,8 +307,8 @@ namespace casadi {
       BSplineCommon::init(opts);
     }
 
-    void BSplineDual::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-      if (!res[0]) return;
+    int BSplineDual::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+      if (!res[0]) return 0;
       casadi_fill(res[0], reverse_? coeffs_size_: m_*N_, 0.0);
 
       int n_dims = degree_.size();
@@ -316,6 +318,7 @@ namespace casadi {
         get_ptr(degree_), get_ptr(strides_), arg[0]+(reverse_? i*m_ : 0), m_, get_ptr(x_)+i*n_dims,
         get_ptr(lookup_mode_), reverse_, iw, w);
       }
+      return 0;
     }
 
     void BSplineDual::codegen_body(CodeGenerator& g) const {
@@ -328,9 +331,9 @@ namespace casadi {
 
       // Input and output buffers
       g << "  if (res[0]) for (int i=0;i<" << N_ << ";++i) CASADI_PREFIX(nd_boor_eval)(res[0]"
-        << (reverse_? "" : "+i*" + to_string(m_)) << "," << n_dims << "," << g.constant(knots_)
+        << (reverse_? "" : "+i*" + str(m_)) << "," << n_dims << "," << g.constant(knots_)
         << "," << g.constant(offset_) << "," <<  g.constant(degree_)
-        << "," << g.constant(strides_) << ",arg[0]" << (reverse_? "i*" + to_string(m_) : "")
+        << "," << g.constant(strides_) << ",arg[0]" << (reverse_? "i*" + str(m_) : "")
         << "," << m_  << "," << g.constant(x_) <<"+i*" << n_dims << "," <<  g.constant(lookup_mode_)
         << ", 0, iw, w);\n";
     }
@@ -446,9 +449,9 @@ namespace casadi {
       }
     }
 
-    void BSplineDual::
-    sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-      if (!res[0]) return;
+    int BSplineDual::
+    sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
+      if (!res[0]) return 0;
       casadi_fill(res[0], reverse_? coeffs_size_: m_*N_, bvec_t(0));
 
       int n_dims = degree_.size();
@@ -457,18 +460,19 @@ namespace casadi {
           get_ptr(degree_), get_ptr(strides_), arg[0]+(reverse_? i*m_ : 0), m_,
           get_ptr(x_)+i*n_dims, get_ptr(lookup_mode_), reverse_, iw, w);
       }
+      return 0;
     }
 
-    void BSplineDual::
-    sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-      if (!res[0]) return;
-
+    int BSplineDual::
+    sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
+      if (!res[0]) return 0;
       int n_dims = degree_.size();
       for (int i=0;i<N_;++i) {
         nd_boor_eval_sp(arg[0]+(!reverse_? 0 : i*m_), n_dims, get_ptr(knots_), get_ptr(offset_),
           get_ptr(degree_), get_ptr(strides_), res[0]+(!reverse_? i*m_ : 0), m_,
           get_ptr(x_)+i*n_dims, get_ptr(lookup_mode_), !reverse_, iw, w);
       }
+      return 0;
     }
 
 } // namespace casadi

@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   WorhpInterface::~WorhpInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options WorhpInterface::options_
@@ -110,7 +110,7 @@ namespace casadi {
         int_opts_[op.first] = op.second;
         break;
       default:
-        casadi_error("Cannot handle WORHP option \"" + op.first + "\": Unknown type " + to_string(WorhpGetParamType(ind)) + ".");
+        casadi_error("Cannot handle WORHP option \"" + op.first + "\": Unknown type " + str(WorhpGetParamType(ind)) + ".");
         break;
       }
     }
@@ -130,7 +130,7 @@ namespace casadi {
     alloc_w(nx_); // for fetching diagonal entries form Hessian
   }
 
-  void worhp_print(int mode, const char message[]) {
+  void worhp_disp(int mode, const char message[]) {
     if (mode & WORHP_PRINT_MESSAGE) {
       userOut() << message << std::endl;
     }
@@ -142,8 +142,8 @@ namespace casadi {
     }
   }
 
-  void WorhpInterface::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
+  int WorhpInterface::init_mem(void* mem) const {
+    if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<WorhpMemory*>(mem);
 
     SetWorhpPrint(&worhp_print);
@@ -237,6 +237,7 @@ namespace casadi {
 
     // Mark the parameters as set
     m->worhp_p.initialised = true;
+    return 0;
   }
 
   void WorhpInterface::set_work(void* mem, const double**& arg, double**& res,
@@ -339,7 +340,7 @@ namespace casadi {
     for (auto&& s : m->fstats) s.second.reset();
 
     // Check the provided inputs
-    checkInputs(mem);
+    check_inputs(mem);
 
     m->fstats.at("mainloop").tic();
 
@@ -361,7 +362,7 @@ namespace casadi {
     for (int i=0; i<ng_; ++i) if (m->worhp_o.GL[i]==-inf) m->worhp_o.GL[i] = -m->worhp_p.Infty;
     for (int i=0; i<ng_; ++i) if (m->worhp_o.GU[i]== inf) m->worhp_o.GU[i] =  m->worhp_p.Infty;
 
-    log("WorhpInterface::starting iteration");
+    if (verbose_) casadi_message("WorhpInterface::starting iteration");
 
     bool firstIteration = true;
 

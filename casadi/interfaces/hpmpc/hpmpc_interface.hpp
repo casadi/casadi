@@ -138,6 +138,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "hpmpc";}
 
+    // Get name of the class
+    std::string class_name() const override { return "HpmpcInterface";}
+
     ///@{
     /** \brief Options */
     static Options options_;
@@ -148,16 +151,16 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new HpmpcMemory();}
-
-    /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<HpmpcMemory*>(mem);}
+    void* alloc_mem() const override { return new HpmpcMemory();}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<HpmpcMemory*>(mem);}
 
     /** \brief  Evaluate numerically */
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief Helper function */
     static void mproject(double factor, const double* x, const int* sp_x,

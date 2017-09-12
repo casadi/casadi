@@ -79,20 +79,23 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "clp";}
 
+    // Get name of the class
+    std::string class_name() const override { return "ClpInterface";}
+
     // Initialize the solver
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new ClpMemory();}
-
-    /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<ClpMemory*>(mem);}
+    void* alloc_mem() const override { return new ClpMemory();}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<ClpMemory*>(mem);}
 
     // Solve the QP
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;

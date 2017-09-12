@@ -64,52 +64,72 @@ namespace casadi {
     ///@{
     /** \brief Construct an SX function */
     Function(const std::string& name,
-             const std::vector<SX>& arg, const std::vector<SX>& res,
+             const std::vector<SX>& ex_in,
+             const std::vector<SX>& ex_out,
              const Dict& opts=Dict());
     Function(const std::string& name,
-             const std::vector<SX>& arg, const std::vector<SX>& res,
-             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const std::vector<SX>& ex_in,
+             const std::vector<SX>& ex_out,
+             const std::vector<std::string>& name_in,
+             const std::vector<std::string>& name_out,
              const Dict& opts=Dict());
     Function(const std::string& name, const std::map<std::string, SX>& dict,
-             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const std::vector<std::string>& name_in,
+             const std::vector<std::string>& name_out,
              const Dict& opts=Dict());
     ///@}
 
     ///@{
     /** \brief Construct an MX function */
     Function(const std::string& name,
-             const std::vector<MX>& arg, const std::vector<MX>& res,
+             const std::vector<MX>& ex_in,
+             const std::vector<MX>& ex_out,
              const Dict& opts=Dict());
     Function(const std::string& name,
-             const std::vector<MX>& arg, const std::vector<MX>& res,
-             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const std::vector<MX>& ex_in,
+             const std::vector<MX>& ex_out,
+             const std::vector<std::string>& name_in,
+             const std::vector<std::string>& name_out,
              const Dict& opts=Dict());
     Function(const std::string& name, const std::map<std::string, MX>& dict,
-             const std::vector<std::string>& argn, const std::vector<std::string>& resn,
+             const std::vector<std::string>& name_in,
+             const std::vector<std::string>& name_out,
              const Dict& opts=Dict());
     ///@}
 
     ///@{
     /** \brief To resolve ambiguity on some compilers */
 #ifndef SWIG
-    Function(const std::string& name, SXIList arg, const SXVector& res, const Dict& opts=Dict());
-    Function(const std::string& name, const SXVector& arg, SXIList res, const Dict& opts=Dict());
-    Function(const std::string& name, SXIList arg, SXIList res, const Dict& opts=Dict());
-    Function(const std::string& name, SXIList arg, const SXVector& res,
-             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
-    Function(const std::string& name, const SXVector& arg, SXIList res,
-             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
-    Function(const std::string& name, SXIList arg, SXIList res,
-             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
-    Function(const std::string& name, MXIList arg, const MXVector& res, const Dict& opts=Dict());
-    Function(const std::string& name, const MXVector& arg, MXIList res, const Dict& opts=Dict());
-    Function(const std::string& name, MXIList arg, MXIList res, const Dict& opts=Dict());
-    Function(const std::string& name, MXIList arg, const MXVector& res,
-             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
-    Function(const std::string& name, const MXVector& arg, MXIList res,
-             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
-    Function(const std::string& name, MXIList arg, MXIList res,
-             const StringVector& argn, const StringVector& resn, const Dict& opts=Dict());
+    Function(const std::string& name, SXIList ex_in,
+      const SXVector& ex_out, const Dict& opts=Dict());
+    Function(const std::string& name, const SXVector& ex_in,
+      SXIList ex_out, const Dict& opts=Dict());
+    Function(const std::string& name, SXIList ex_in,
+      SXIList ex_out, const Dict& opts=Dict());
+    Function(const std::string& name, SXIList ex_in, const SXVector& ex_out,
+             const StringVector& name_in, const StringVector& name_out,
+             const Dict& opts=Dict());
+    Function(const std::string& name, const SXVector& ex_in, SXIList ex_out,
+             const StringVector& name_in, const StringVector& name_out,
+             const Dict& opts=Dict());
+    Function(const std::string& name, SXIList ex_in, SXIList ex_out,
+             const StringVector& name_in, const StringVector& name_out,
+             const Dict& opts=Dict());
+    Function(const std::string& name, MXIList ex_in, const MXVector& ex_out,
+             const Dict& opts=Dict());
+    Function(const std::string& name, const MXVector& ex_in, MXIList ex_out,
+             const Dict& opts=Dict());
+    Function(const std::string& name, MXIList ex_in, MXIList ex_out,
+             const Dict& opts=Dict());
+    Function(const std::string& name, MXIList ex_in, const MXVector& ex_out,
+             const StringVector& name_in, const StringVector& name_out,
+             const Dict& opts=Dict());
+    Function(const std::string& name, const MXVector& ex_in, MXIList ex_out,
+             const StringVector& name_in, const StringVector& name_out,
+             const Dict& opts=Dict());
+    Function(const std::string& name, MXIList ex_in, MXIList ex_out,
+             const StringVector& name_in, const StringVector& name_out,
+             const Dict& opts=Dict());
 #endif // SWIG
     ///@}
 
@@ -347,7 +367,7 @@ namespace casadi {
     void operator()(std::vector<const double*> arg, std::vector<double*> res) const;
     void operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const;
     void operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res) const;
-    template<typename D> void _call(std::vector<const D*> arg, std::vector<D*> res) const;
+    template<typename D> void call_gen(std::vector<const D*> arg, std::vector<D*> res) const;
     ///@}
 
     ///@{
@@ -394,21 +414,21 @@ namespace casadi {
     ///@}
 
     /** \brief Evaluate memory-less, numerically */
-    void operator()(const double** arg, double** res, int* iw, double* w, int mem=0) const;
+    int operator()(const double** arg, double** res, int* iw, double* w, int mem=0) const;
 
     /** \brief Evaluate memory-less SXElem
         Same syntax as the double version, allowing use in templated code
      */
-    void operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem=0) const;
+    int operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem=0) const;
 
     /** \brief  Propagate sparsity forward */
-    void operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;
+    int operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief  Propagate sparsity backward */
-    void rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;
+    int rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;
 
     /** \brief Propagate sparsity backward with temporary memory allocation */
-    void rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const;
+    int rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const;
 
 #endif // SWIG
 
@@ -679,11 +699,17 @@ namespace casadi {
     /** \brief Number of nodes in the algorithm */
     int n_nodes() const;
 
+    ///@{
+    /** \brief  Is the class able to propagate seeds through the algorithm? */
+    bool has_spfwd() const;
+    bool has_sprev() const;
+    ///@}
+
     /// \cond INTERNAL
-    /** \brief Is the class able to propagate seeds through the algorithm?
-     *
-     * (for usage, see the example propagating_sparsity.cpp) */
-    bool spCanEvaluate(bool fwd);
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Use has_spfwd, has_sprev */
+    bool spCanEvaluate(bool fwd) const { return fwd ? has_spfwd() : has_sprev();}
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Get required length of arg field */
     size_t sz_arg() const;
@@ -709,14 +735,10 @@ namespace casadi {
 
     /** \brief Set the (persistent and temporary) work vectors */
     void setup(const double** arg, double** res, int* iw, double* w, int mem=0) const;
-#endif // SWIG
 
-    /** \brief Check if the numerical values of the supplied bounds make sense */
-    void checkInputs() const;
-#ifndef SWIG
     /** \brief Call using a map */
     template<typename M>
-    void _call(const std::map<std::string, M>& arg, std::map<std::string, M>& res,
+    void call_gen(const std::map<std::string, M>& arg, std::map<std::string, M>& res,
                bool always_inline, bool never_inline) const;
 #endif // SWIG
     /// \endcond
@@ -789,20 +811,19 @@ namespace casadi {
     ///@{
     /** \brief Called by constructors */
     void construct(const std::string& name,
-                   const std::vector<SX>& arg, const std::vector<SX>& res,
+                   const std::vector<SX>& ex_in, const std::vector<SX>& ex_out,
+                   const std::vector<std::string>& name_in,
+                   const std::vector<std::string>& name_out,
                    const Dict& opts);
     void construct(const std::string& name,
-                   const std::vector<MX>& arg, const std::vector<MX>& res,
+                   const std::vector<MX>& ex_in, const std::vector<MX>& ex_out,
+                   const std::vector<std::string>& name_in,
+                   const std::vector<std::string>& name_out,
                    const Dict& opts);
     template<typename M>
-      void construct(const std::string& name,
-                     const std::vector<M>& arg, const std::vector<M>& res,
-                     const std::vector<std::string>& argn, const std::vector<std::string>& resn,
-                     const Dict& opts);
-    template<typename M>
       void construct(const std::string& name, const std::map<std::string, M>& dict,
-                     const std::vector<std::string>& argn,
-                     const std::vector<std::string>& resn,
+                     const std::vector<std::string>& name_in,
+                     const std::vector<std::string>& name_out,
                      const Dict& opts);
     ///@}
 

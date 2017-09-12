@@ -59,7 +59,7 @@ namespace casadi {
   }
 
   Sqpmethod::~Sqpmethod() {
-    clear_memory();
+    clear_mem();
   }
 
   Options Sqpmethod::options_
@@ -108,7 +108,7 @@ namespace casadi {
         "Print the iterations"}},
       {"min_step_size",
        {OT_DOUBLE,
-        "The size (inf-norm) of the step size should not become smaller than this."}}
+        "The size (inf-norm) of the step size should not become smaller than this."}},
      }
   };
 
@@ -335,7 +335,7 @@ namespace casadi {
     auto m = static_cast<SqpmethodMemory*>(mem);
 
     // Check the provided inputs
-    checkInputs(mem);
+    check_inputs(mem);
 
     // Statistics
     for (auto&& s : m->fstats) s.second.reset();
@@ -350,15 +350,37 @@ namespace casadi {
     casadi_copy(m->lam_x0, nx_, m->mu_x);
 
     // Initial constraint Jacobian
-    eval_jac_g(m, m->xk, m->gk, m->Jk);
+    if (ng_) {
+      m->arg[0] = m->xk;
+      m->arg[1] = m->p;
+      m->res[0] = m->gk;
+      m->res[1] = m->Jk;
+      if (calc_function(m, "nlp_jac_g")) casadi_error("nlp_jac_g");
+    }
 
     // Initial objective gradient
-    eval_grad_f(m, m->xk, &m->fk, m->gf);
+    m->arg[0] = m->xk;
+    m->arg[1] = m->p;
+    m->res[0] = &m->fk;
+    m->res[1] = m->gf;
+    if (calc_function(m, "nlp_grad_f")) casadi_error("nlp_grad_f");
 
     // Initialize or reset the Hessian or Hessian approximation
     m->reg = 0;
     if (exact_hessian_) {
-      eval_h(m, m->xk, m->mu, 1.0, m->Bk);
+      double sigma = 1.;
+      m->arg[0] = m->xk;
+      m->arg[1] = m->p;
+      m->arg[2] = &sigma;
+      m->arg[3] = m->mu;
+      m->res[0] = m->Bk;
+      if (calc_function(m, "nlp_hess_l")) casadi_error("nlp_hess_l");
+
+      // Determing regularization parameter with Gershgorin theorem
+      if (regularize_) {
+        m->reg = getRegularization(m->Bk);
+        if (m->reg > 0) regularize(m->Bk, m->reg);
+      }
     } else {
       reset_h(m);
     }
@@ -465,7 +487,7 @@ namespace casadi {
       // Start a new iteration
       iter++;
 
-      log("Formulating QP");
+      if (verbose_) casadi_message("Formulating QP");
       // Formulate the QP
       transform(m->lbx, m->lbx + nx_, m->xk, m->qp_LBX, std::minus<double>());
       transform(m->ubx, m->ubx + nx_, m->xk, m->qp_UBX, std::minus<double>());
@@ -475,7 +497,7 @@ namespace casadi {
       // Solve the QP
       solve_QP(m, m->Bk, m->gf, m->qp_LBX, m->qp_UBX, m->Jk, m->qp_LBA,
                m->qp_UBA, m->dx, m->qp_DUAL_X, m->qp_DUAL_A);
-      log("QP solved");
+      if (verbose_) casadi_message("QP solved");
 
       // Detecting indefiniteness
       double gain = casadi_bilin(m->Bk, Hsp_, m->dx, m->dx);
@@ -511,7 +533,7 @@ namespace casadi {
       ls_success = true;
 
       // Line-search
-      log("Starting line-search");
+      if (verbose_) casadi_message("Starting line-search");
       if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
 
         // Line-search loop
@@ -520,8 +542,14 @@ namespace casadi {
 
           try {
             // Evaluating objective and constraints
-            fk_cand = eval_f(m, m->x_cand);
-            eval_g(m, m->x_cand, m->gk_cand);
+            m->arg[0] = m->x_cand;
+            m->arg[1] = m->p;
+            m->res[0] = &fk_cand;
+            if (calc_function(m, "nlp_f")) casadi_error("nlp_f failed");
+            if (ng_) {
+              m->res[0] = m->gk_cand;
+              if (calc_function(m, "nlp_g")) casadi_error("nlp_g failed");
+            }
           } catch(const CasadiException& ex) {
             (void)ex;
             // Silent ignore; line-search failed
@@ -541,14 +569,14 @@ namespace casadi {
           double meritmax = *max_element(m->merit_mem.begin(), m->merit_mem.end());
           if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
             // Accepting candidate
-            log("Line-search completed, candidate accepted");
+            if (verbose_) casadi_message("Line-search completed, candidate accepted");
             break;
           }
 
           // Line-search not successful, but we accept it.
           if (ls_iter == max_iter_ls_) {
             ls_success = false;
-            log("Line-search completed, maximum number of iterations");
+            if (verbose_) casadi_message("Line-search completed, maximum number of iterations");
             break;
           }
 
@@ -582,12 +610,22 @@ namespace casadi {
       }
 
       // Evaluate the constraint Jacobian
-      log("Evaluating jac_g");
-      eval_jac_g(m, m->xk, m->gk, m->Jk);
+      if (verbose_) casadi_message("Evaluating jac_g");
+      if (ng_) {
+        m->arg[0] = m->xk;
+        m->arg[1] = m->p;
+        m->res[0] = m->gk;
+        m->res[1] = m->Jk;
+        if (calc_function(m, "nlp_jac_g")) casadi_error("nlp_jac_g");
+      }
 
       // Evaluate the gradient of the objective function
-      log("Evaluating grad_f");
-      eval_grad_f(m, m->xk, &m->fk, m->gf);
+      if (verbose_) casadi_message("Evaluating grad_f");
+      m->arg[0] = m->xk;
+      m->arg[1] = m->p;
+      m->res[0] = &m->fk;
+      m->res[1] = m->gf;
+      if (calc_function(m, "nlp_grad_f")) casadi_error("nlp_grad_f");
 
       // Evaluate the gradient of the Lagrangian with the new x and new mu
       casadi_copy(m->gf, nx_, m->gLag);
@@ -598,7 +636,7 @@ namespace casadi {
 
       // Updating Lagrange Hessian
       if (!exact_hessian_) {
-        log("Updating Hessian (BFGS)");
+        if (verbose_) casadi_message("Updating Hessian (BFGS)");
         // BFGS with careful updates and restarts
         if (iter % lbfgs_memory_ == 0) {
           // Reset Hessian approximation by dropping all off-diagonal entries
@@ -626,8 +664,20 @@ namespace casadi {
 
       } else {
         // Exact Hessian
-        log("Evaluating hessian");
-        eval_h(m, m->xk, m->mu, 1.0, m->Bk);
+        if (verbose_) casadi_message("Evaluating hessian");
+        double sigma = 1.;
+        m->arg[0] = m->xk;
+        m->arg[1] = m->p;
+        m->arg[2] = &sigma;
+        m->arg[3] = m->mu;
+        m->res[0] = m->Bk;
+        if (calc_function(m, "nlp_hess_l")) casadi_error("nlp_hess_l");
+
+        // Determing regularization parameter with Gershgorin theorem
+        if (regularize_) {
+          m->reg = getRegularization(m->Bk);
+          if (m->reg > 0) regularize(m->Bk, m->reg);
+        }
       }
     }
 
@@ -713,86 +763,6 @@ namespace casadi {
           H[el] += reg;
         }
       }
-    }
-  }
-
-
-  void Sqpmethod::eval_h(SqpmethodMemory* m, const double* x, const double* lambda,
-                         double sigma, double* H) const {
-    try {
-      m->arg[0] = x;
-      m->arg[1] = m->p;
-      m->arg[2] = &sigma;
-      m->arg[3] = lambda;
-      m->res[0] = H;
-      calc_function(m, "nlp_hess_l");
-
-      // Determing regularization parameter with Gershgorin theorem
-      if (regularize_) {
-        m->reg = getRegularization(H);
-        if (m->reg > 0) {
-          regularize(H, m->reg);
-        }
-      }
-
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_h failed: " << ex.what() << endl;
-      throw;
-    }
-  }
-
-  void Sqpmethod::eval_g(SqpmethodMemory* m, const double* x, double* g) const {
-    try {
-      if (ng_==0) return; // Quick return if no constraints
-      m->arg[0] = x;
-      m->arg[1] = m->p;
-      m->res[0] = g;
-      calc_function(m, "nlp_g");
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_g failed: " << ex.what() << endl;
-      throw;
-    }
-  }
-
-  void Sqpmethod::eval_jac_g(SqpmethodMemory* m, const double* x, double* g, double* J) const {
-    try {
-      if (ng_==0) return; // Quich finish if no constraints
-      m->arg[0] = x;
-      m->arg[1] = m->p;
-      m->res[0] = g;
-      m->res[1] = J;
-      calc_function(m, "nlp_jac_g");
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_jac_g failed: " << ex.what() << endl;
-      throw;
-    }
-  }
-
-  void Sqpmethod::eval_grad_f(SqpmethodMemory* m, const double* x,
-                              double* f, double* grad_f) const {
-    try {
-      m->arg[0] = x;
-      m->arg[1] = m->p;
-      m->res[0] = f;
-      m->res[1] = grad_f;
-      calc_function(m, "nlp_grad_f");
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_grad_f failed: " << ex.what() << endl;
-      throw;
-    }
-  }
-
-  double Sqpmethod::eval_f(SqpmethodMemory* m, const double* x) const {
-    try {
-      double f;
-      m->arg[0] = x;
-      m->arg[1] = m->p;
-      m->res[0] = &f;
-      calc_function(m, "nlp_f");
-      return f;
-    } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "eval_f failed: " << ex.what() << endl;
-      throw;
     }
   }
 

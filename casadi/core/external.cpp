@@ -89,15 +89,18 @@ namespace casadi {
     sparsity_in_ = (sparsity_t)li_.get_function(name + "_sparsity_in");
     sparsity_out_ = (sparsity_t)li_.get_function(name + "_sparsity_out");
 
+    // Memory allocation functions
+    alloc_mem_ = (alloc_mem_t)li_.get_function(name_ + "_alloc_mem");
+    init_mem_ = (init_mem_t)li_.get_function(name_ + "_init_mem");
+    free_mem_ = (free_mem_t)li_.get_function(name_ + "_free_mem");
+
     // Function for numerical evaluation
     eval_ = (eval_t)li_.get_function(name_);
-
-    n_mem_ = 0;
   }
 
   External::~External() {
     if (decref_) decref_();
-    clear_memory();
+    clear_mem();
   }
 
   size_t External::get_n_in() {
@@ -176,6 +179,30 @@ namespace casadi {
     }
   }
 
+  void* GenericExternal::alloc_mem() const {
+    if (alloc_mem_) {
+      return alloc_mem_();
+    } else {
+      return FunctionInternal::alloc_mem();
+    }
+  }
+
+  int GenericExternal::init_mem(void* mem) const {
+    if (init_mem_) {
+      return init_mem_(mem);
+    } else {
+      return FunctionInternal::init_mem(mem);
+    }
+  }
+
+  void GenericExternal::free_mem(void *mem) const {
+    if (free_mem_) {
+      return free_mem_(mem);
+    } else {
+      return FunctionInternal::free_mem(mem);
+    }
+  }
+
   void External::init(const Dict& opts) {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
@@ -199,6 +226,16 @@ namespace casadi {
       sz_iw = v[2];
       sz_w = v[3];
     }
+
+    // Get information about Jacobian sparsity, if any
+    sparsity_t jac_sparsity_fcn = (sparsity_t)li_.get_function("jac_" + name_ + "_sparsity_out");
+    if (jac_sparsity_fcn) {
+      set_jac_sparsity(Sparsity::compressed(jac_sparsity_fcn(0)));
+    } else if (li_.has_meta("JAC_" + name_ + "_SPARSITY_OUT", 0)) {
+      vector<int> sp = li_.meta_vector<int>("jac_" + name_ + "_SPARSITY_OUT", 0);
+      set_jac_sparsity(Sparsity::compressed(sp));
+    }
+
     alloc_arg(sz_arg);
     alloc_res(sz_res);
     alloc_iw(sz_iw);
@@ -216,14 +253,6 @@ namespace casadi {
   void GenericExternal::init(const Dict& opts) {
     // Call recursively
     External::init(opts);
-
-    // Maximum number of memory objects
-    getint_t n_mem = (getint_t)li_.get_function(name_ + "_n_mem");
-    if (n_mem) {
-      n_mem_ = n_mem();
-    } else if (li_.has_meta(name_ + "_N_MEM")) {
-      n_mem_ = li_.meta_int(name_ + "_N_MEM");
-    }
   }
 
   void External::codegen(CodeGenerator& g, const std::string& fname,
@@ -288,7 +317,7 @@ namespace casadi {
   }
 
   bool External::has_forward(int nfwd) const {
-    return li_.has_function("fwd" + to_string(nfwd) + "_" + name_);
+    return li_.has_function("fwd" + str(nfwd) + "_" + name_);
   }
 
   Function External
@@ -309,7 +338,7 @@ namespace casadi {
   }
 
   bool External::has_reverse(int nadj) const {
-    return li_.has_function("adj" + to_string(nadj) + "_" + name_);
+    return li_.has_function("adj" + str(nadj) + "_" + name_);
   }
 
   Function External::factory(const std::string& name,
@@ -317,29 +346,36 @@ namespace casadi {
                              const std::vector<std::string>& s_out,
                              const Function::AuxOut& aux,
                              const Dict& opts) const {
+    // If not available, call base class function
+    if (!li_.has_function(name)) {
+      return FunctionInternal::factory(name, s_in, s_out, aux, opts);
+    }
+
     // Retrieve function
-    casadi_assert_message(li_.has_function(name),
-      "Cannot find \"" + name + "\"");
     Function ret = external(name, li_, opts);
 
     // Inputs consistency checks
     casadi_assert_message(s_in.size() == ret.n_in(),
-      "Inconsistent #in for \"" + name + "\"");
+      "Inconsistent number of inputs. Expected " + str(s_in.size())+ "  "
+      "(" + str(s_in) + "), got " + str(ret.n_in()) + ".");
     for (int i=0; i<s_in.size(); ++i) {
       string s = s_in[i];
       replace(s.begin(), s.end(), ':', '_');
       casadi_assert_message(s == ret.name_in(i),
-        "Inconsistent input names for \"" + name + "\"");
+        "Inconsistent input name. Expected: " + str(s_in) + ", "
+        "got " + ret.name_in(i) + " for input " + str(i));
     }
 
     // Outputs consistency checks
     casadi_assert_message(s_out.size() == ret.n_out(),
-      "inconsistent #out for \"" + name + "\"");
+      "Inconsistent number of outputs. Expected " + str(s_out.size()) + " "
+      "(" + str(s_out) + "), got " + str(ret.n_out()) + ".");
     for (int i=0; i<s_out.size(); ++i) {
       string s = s_out[i];
       replace(s.begin(), s.end(), ':', '_');
       casadi_assert_message(s == ret.name_out(i),
-        "inconsistent output names for \"" + name + "\"");
+        "Inconsistent output name. Expected: " + str(s_out) + ", "
+        "got " + ret.name_out(i) + " for output " + str(i));
     }
 
     return ret;

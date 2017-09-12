@@ -106,7 +106,7 @@ namespace casadi {
     }
   }
 
-  void ParsedFile::print(std::ostream &stream) const {
+  void ParsedFile::disp(std::ostream& stream) const {
     // Print all the commands
     for (auto&& c : commands) {
       stream << c.first << " (line " << c.second.first << "):" << endl;

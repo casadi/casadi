@@ -75,7 +75,11 @@ namespace casadi {
     virtual int to_int() const;  // only works for integer nodes
     ///@}
 
-    virtual const std::string& name() const; // get the name
+    // get the name
+    virtual const std::string& name() const;
+
+    /** \brief Get type name */
+    virtual std::string class_name() const = 0;
 
     /** \brief get the operation */
     virtual int op() const=0;
@@ -96,7 +100,7 @@ namespace casadi {
     virtual bool is_smooth() const { return true; }
 
     /** \brief  print */
-    virtual void print_long(std::ostream &stream) const;
+    virtual void disp(std::ostream& stream, bool more) const;
 
     /** \brief Find out which nodes can be inlined */
     void can_inline(std::map<const SXNode*, int>& nodeind) const;

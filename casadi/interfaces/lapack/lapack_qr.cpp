@@ -50,7 +50,7 @@ namespace casadi {
   }
 
   LapackQr::~LapackQr() {
-    clear_memory();
+    clear_mem();
   }
 
   Options LapackQr::options_
@@ -75,8 +75,8 @@ namespace casadi {
     }
   }
 
-  void LapackQr::init_memory(void* mem) const {
-    LinsolInternal::init_memory(mem);
+  int LapackQr::init_mem(void* mem) const {
+    return LinsolInternal::init_mem(mem);
   }
 
   void LapackQr::reset(void* mem, const int* sp) const {
@@ -102,8 +102,8 @@ namespace casadi {
     int lwork = m->work.size();
     dgeqrf_(&ncol, &ncol, get_ptr(m->mat), &ncol, get_ptr(m->tau),
             get_ptr(m->work), &lwork, &info);
-    casadi_assert_message(info == 0, "LapackQr::prepare: dgeqrf_ "
-                                      "failed to factorize the Jacobian. Info: " << info << ".");
+    casadi_assert_message(info == 0,
+      "LapackQr::prepare: dgeqrf_ failed to factorize the Jacobian. Info: " + str(info) + ".");
   }
 
   void LapackQr::solve(void* mem, double* x, int nrhs, bool tr) const {
@@ -148,16 +148,16 @@ namespace casadi {
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
               &ncol, get_ptr(m->work), &lwork, &info);
-      casadi_assert_message(info == 0, "LapackQr::solve: dormqr_ A failed "
-                                          "to solve the linear system. Info: " << info << ".");
+      casadi_assert_message(info == 0,
+        "LapackQr::solve: dormqr_ A failed to solve the linear system. Info: " + str(info) + ".");
     } else {
 
       // Multiply by transpose(Q)
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
               &ncol, get_ptr(m->work), &lwork, &info);
-      casadi_assert_message(info == 0, "LapackQr::solve: dormqr_ B failed to "
-                                          "solve the linear system. Info: " << info << ".");
+      casadi_assert_message(info == 0,
+        "LapackQr::solve: dormqr_ B failed to solve the linear system. Info: " + str(info) + ".");
 
       // Solve for R
       dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,

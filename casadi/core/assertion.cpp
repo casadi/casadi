@@ -32,13 +32,12 @@ namespace casadi {
   Assertion::Assertion(const MX& x, const MX& y, const std::string & fail_message)
       : fail_message_(fail_message) {
     casadi_assert_message(y.is_scalar(),
-                          "Assertion:: assertion expression y must be scalar, but got "
-                          << y.dim());
+      "Assertion:: assertion expression y must be scalar, but got " + y.dim());
     set_dep(x, y);
     set_sparsity(x.sparsity());
   }
 
-  std::string Assertion::print(const std::vector<std::string>& arg) const {
+  std::string Assertion::disp(const std::vector<std::string>& arg) const {
     return "assertion(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 
@@ -60,29 +59,33 @@ namespace casadi {
     }
   }
 
-  void Assertion::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int Assertion::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
+    return 0;
   }
 
-  void Assertion::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  int Assertion::eval(const double** arg, double** res, int* iw, double* w) const {
     if (arg[1][0]!=1) {
-      casadi_error("Assertion error: " << fail_message_);
+      casadi_error("Assertion error: " + fail_message_);
+      return 1;
     }
 
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
+    return 0;
   }
 
-  void Assertion::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Assertion::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     if (arg[0]!=res[0]) {
       copy(arg[0], arg[0]+nnz(), res[0]);
     }
+    return 0;
   }
 
-  void Assertion::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Assertion::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     bvec_t *a = arg[0];
     bvec_t *r = res[0];
     int n = nnz();
@@ -92,9 +95,10 @@ namespace casadi {
         *r++ = 0;
       }
     }
+    return 0;
   }
 
-  void Assertion::generate(CodeGenerator& g, const std::string& mem,
+  void Assertion::generate(CodeGenerator& g,
                            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Generate assertion
     g << "if (" << g.workel(arg[1]) << "!=1.) {\n"

@@ -229,7 +229,7 @@ namespace casadi {
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
         If there are symbolic primitives appearing more than once, the function will return
-        true and the names of the duplicate expressions will be printed to userOut<true, PL_WARN>().
+        true and the names of the duplicate expressions will be passed to casadi_warning.
         Note: Will mark the node using MX::set_temp.
         Make sure to call reset_input() after usage.
     */
@@ -399,8 +399,6 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
     static MX jacobian(const MX& f, const MX& x, const Dict& opts = Dict());
-    static MX gradient(const MX& f, const MX& x);
-    static MX tangent(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x, MX& g);
     static std::vector<std::vector<MX> >
@@ -592,13 +590,8 @@ namespace casadi {
     /** \brief Get free variables */
     static std::vector<MX> get_free(const Function& f);
 
-    /// Get name of the class
-    static std::string type_name();
-
-    ///@{
-    /// Readability typedefs
+    /// Readability typedef
     typedef std::map<std::string, MX> MXDict;
-    ///@}
 
 #ifndef SWIG
     /// Construct constant matrix with a given sparsity and values

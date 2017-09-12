@@ -76,12 +76,6 @@ namespace casadi {
     /** \brief Check if binary operation */
     virtual bool is_binary() const { return false;}
 
-    /** \brief  Print a representation */
-    void print_short(std::ostream &stream) const override;
-
-    /** \brief  Print a description */
-    void print_long(std::ostream &stream) const override;
-
     /** \brief Find out which nodes can be inlined */
     void can_inline(std::map<const MXNode*, int>& nodeind) const;
 
@@ -90,7 +84,7 @@ namespace casadi {
                              std::vector<std::string>& intermed) const;
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const = 0;
+    virtual std::string disp(const std::vector<std::string>& arg) const = 0;
 
     /** \brief Add a dependent function */
     virtual void add_dependency(CodeGenerator& g) const {}
@@ -105,14 +99,14 @@ namespace casadi {
     virtual void codegen_decref(CodeGenerator& g, std::set<void*>& added) const {}
 
     /** \brief Generate code for the operation */
-    virtual void generate(CodeGenerator& g, const std::string& mem,
+    virtual void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief  Evaluate numerically */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
+    virtual int eval(const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Evaluate symbolically (SX) */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    virtual int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const;
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
@@ -126,16 +120,22 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    virtual int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    virtual int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const;
 
     /** \brief  Get the name */
     virtual const std::string& name() const;
 
-    /** \brief Get type name */
-    virtual std::string type_name() const;
+    /** \brief Get name of public class */
+    virtual std::string type_name() const override {return "MX";}
+
+    /** \brief Get name of public class */
+    virtual std::string class_name() const override;
+
+    /** \brief  Print a description */
+    void disp(std::ostream& stream, bool more) const override;
 
     /** \brief  Check if valid function input */
     virtual bool is_valid_input() const { return false;}

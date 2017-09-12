@@ -103,11 +103,6 @@ namespace casadi {
     /// Short name
     static std::string shortname() { return "dple";}
 
-    /** \brief Get type name */
-    std::string type_name() const override {
-      return std::string("dple_") + plugin_name();
-    }
-
     /** \brief Get default input value */
     double default_in(int ind) const override;
 

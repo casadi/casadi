@@ -55,7 +55,7 @@ namespace casadi {
   }
 
   SnoptInterface::~SnoptInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options SnoptInterface::options_
@@ -169,20 +169,18 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
+  void SnoptInterface::init_mem(void* mem) const {
+    if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<SnoptMemory*>(mem);
 
     // Allocate data structures needed in evaluate
     m->A_data.resize(A_structure_.nnz());
-
+    return 0;
   }
 
   std::string SnoptInterface::formatStatus(int status) const {
     if (status_.find(status) == status_.end()) {
-      std::stringstream ss;
-      ss << "Unknown status: " << status;
-      return ss.str();
+      return "Unknown status: " + str(status);
     } else {
       return (*status_.find(status)).second;
     }
@@ -210,7 +208,7 @@ namespace casadi {
     auto m = static_cast<SnoptMemory*>(mem);
 
     // Check the provided inputs
-    checkInputs(mem);
+    check_inputs(mem);
 
     m->fstats.at("mainloop").tic();
 
@@ -363,9 +361,9 @@ namespace casadi {
           int lenru) const {
     try {
 
-      casadi_assert_message(nnCon_ == nnCon, "Con " << nnCon_ << " <-> " << nnCon);
-      casadi_assert_message(nnObj_ == nnObj, "Obj " << nnObj_ << " <-> " << nnObj);
-      casadi_assert_message(nnJac_ == nnJac, "Jac " << nnJac_ << " <-> " << nnJac);
+      casadi_assert_message(nnCon_ == nnCon, "Con " + str(nnCon_) + " <-> " + str(nnCon));
+      casadi_assert_message(nnObj_ == nnObj, "Obj " + str(nnObj_) + " <-> " + str(nnObj));
+      casadi_assert_message(nnJac_ == nnJac, "Jac " + str(nnJac_) + " <-> " + str(nnJac));
 
       // Get reduced decision variables
       casadi_fill(m->xk2, nx_, 0.);

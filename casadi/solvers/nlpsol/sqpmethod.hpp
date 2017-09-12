@@ -104,6 +104,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "sqpmethod";}
 
+    // Name of the class
+    std::string class_name() const override { return "Sqpmethod";}
+
     /** \brief  Create a new NLP Solver */
     static Nlpsol* creator(const std::string& name, const Function& nlp) {
       return new Sqpmethod(name, nlp);
@@ -119,10 +122,10 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new SqpmethodMemory();}
+    void* alloc_mem() const override { return new SqpmethodMemory();}
 
     /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<SqpmethodMemory*>(mem);}
+    void free_mem(void *mem) const override { delete static_cast<SqpmethodMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
@@ -189,23 +192,6 @@ namespace casadi {
 
     // Reset the Hessian or Hessian approximation
     void reset_h(SqpmethodMemory* m) const;
-
-    // Evaluate the gradient of the objective
-    virtual double eval_f(SqpmethodMemory* m, const double* x) const;
-
-    // Evaluate the gradient of the objective
-    virtual void eval_grad_f(SqpmethodMemory* m, const double* x, double* f,
-                             double* grad_f) const;
-
-    // Evaluate the constraints
-    virtual void eval_g(SqpmethodMemory* m, const double* x, double* g) const;
-
-    // Evaluate the Jacobian of the constraints
-    virtual void eval_jac_g(SqpmethodMemory* m, const double* x, double* g, double* J) const;
-
-    // Evaluate the Hessian of the Lagrangian
-    virtual void eval_h(SqpmethodMemory* m, const double* x, const double* lambda,
-                        double sigma, double* H) const;
 
     // Calculate the regularization parameter using Gershgorin theorem
     double getRegularization(const double* H) const;

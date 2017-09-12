@@ -35,35 +35,36 @@ using namespace std;
 namespace casadi {
 
   Multiplication::Multiplication(const MX& z, const MX& x, const MX& y) {
-    casadi_assert_message(
-      x.size2() == y.size1() && x.size1() == z.size1() && y.size2() == z.size2(),
+    casadi_assert_message(x.size2() == y.size1() && x.size1() == z.size1()
+      && y.size2() == z.size2(),
       "Multiplication::Multiplication: dimension mismatch. Attempting to multiply "
-      << x.dim() << " with " << y.dim()
-      << " and add the result to " << z.dim());
+      + x.dim() + " with " + y.dim()
+      + " and add the result to " + z.dim());
 
     set_dep(z, x, y);
     set_sparsity(z.sparsity());
   }
 
-  std::string Multiplication::print(const std::vector<std::string>& arg) const {
+  std::string Multiplication::disp(const std::vector<std::string>& arg) const {
     return "mac(" + arg.at(1) + "," + arg.at(2) + "," + arg.at(0) + ")";
   }
 
-  void Multiplication::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+  int Multiplication::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void Multiplication::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+  int Multiplication::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Multiplication::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int Multiplication::eval_gen(const T** arg, T** res, int* iw, T* w) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
     casadi_mtimes(arg[1], dep(1).sparsity(),
                arg[2], dep(2).sparsity(),
                res[0], sparsity(), w, false);
+    return 0;
   }
 
   void Multiplication::ad_forward(const std::vector<std::vector<MX> >& fseed,
@@ -88,23 +89,25 @@ namespace casadi {
     res[0] = mac(arg[1], arg[2], arg[0]);
   }
 
-  void Multiplication::
-  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Multiplication::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     copy_fwd(arg[0], res[0], nnz());
     Sparsity::mul_sparsityF(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);
+    return 0;
   }
 
-  void Multiplication::
-  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Multiplication::
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     Sparsity::mul_sparsityR(arg[1], dep(1).sparsity(),
                             arg[2], dep(2).sparsity(),
                             res[0], sparsity(), w);
     copy_rev(arg[0], res[0], nnz());
+    return 0;
   }
 
-  void Multiplication::generate(CodeGenerator& g, const std::string& mem,
+  void Multiplication::generate(CodeGenerator& g,
                                 const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
@@ -118,7 +121,7 @@ namespace casadi {
   }
 
   void DenseMultiplication::
-  generate(CodeGenerator& g, const std::string& mem,
+  generate(CodeGenerator& g,
            const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {

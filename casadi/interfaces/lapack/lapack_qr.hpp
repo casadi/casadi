@@ -94,13 +94,13 @@ namespace casadi {
     ///@}
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new LapackQrMemory();}
-
-    /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<LapackQrMemory*>(mem);}
+    void* alloc_mem() const override { return new LapackQrMemory();}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<LapackQrMemory*>(mem);}
 
     // Set sparsity pattern
     void reset(void* mem, const int* sp) const override;
@@ -119,6 +119,9 @@ namespace casadi {
 
     // Get name of the plugin
     const char* plugin_name() const override { return "lapackqr";}
+
+    // Get name of the class
+    std::string class_name() const override { return "LapackQr";}
 
     // Maximum number of right-hand-sides
     int max_nrhs_;

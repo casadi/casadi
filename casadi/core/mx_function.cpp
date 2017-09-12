@@ -38,10 +38,11 @@ namespace casadi {
 
   MXFunction::MXFunction(const std::string& name,
                          const std::vector<MX>& inputv,
-                         const std::vector<MX>& outputv) :
-    XFunction<MXFunction, MX, MXNode>(name, inputv, outputv) {
+                         const std::vector<MX>& outputv,
+                         const std::vector<std::string>& name_in,
+                         const std::vector<std::string>& name_out) :
+    XFunction<MXFunction, MX, MXNode>(name, inputv, outputv, name_in, name_out) {
   }
-
 
   MXFunction::~MXFunction() {
   }
@@ -58,10 +59,9 @@ namespace casadi {
   };
 
   void MXFunction::init(const Dict& opts) {
-    log("MXFunction::init begin");
-
     // Call the init function of the base class
     XFunction<MXFunction, MX, MXNode>::init(opts);
+    if (verbose_) casadi_message(name_ + "::init");
 
     // Default (temporary) options
     bool live_variables = true;
@@ -261,13 +261,12 @@ namespace casadi {
       }
     }
 
-    if (verbose()) {
+    if (verbose_) {
       if (live_variables) {
-        userOut() << "Using live variables: work array is "
-             <<  worksize << " instead of "
-             << nodes.size() << endl;
+        casadi_message("Using live variables: work array is " + str(worksize)
+                       + " instead of " + str(nodes.size()));
       } else {
-        userOut() << "Live variables disabled." << endl;
+        casadi_message("Live variables disabled.");
       }
     }
 
@@ -350,12 +349,10 @@ namespace casadi {
         break;
       }
     }
-
-    log("MXFunction::init end");
   }
 
-  void MXFunction::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-    casadi_msg("MXFunction::eval():begin "  << name_);
+  int MXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+    if (verbose_) casadi_message(name_ + "::eval");
     // Work vector and temporaries to hold pointers to operation input and outputs
     const double** arg1 = arg+n_in();
     double** res1 = res+n_out();
@@ -363,9 +360,9 @@ namespace casadi {
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
       std::stringstream ss;
-      print_short(ss);
-      casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables "
-                   << free_vars_ << " are free.");
+      disp(ss, false);
+      casadi_error("Cannot evaluate \"" + ss.str() + "\" since variables "
+                   + str(free_vars_) + " are free.");
     }
 
     // Evaluate all of the nodes of the algorithm:
@@ -397,11 +394,10 @@ namespace casadi {
           res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : 0;
 
         // Evaluate
-        e.data->eval(arg1, res1, iw, w, 0);
+        if (e.data->eval(arg1, res1, iw, w)) return 1;
       }
     }
-
-    casadi_msg("MXFunction::eval():end "  << name_);
+    return 0;
   }
 
   string MXFunction::print(const AlgEl& el) const {
@@ -414,9 +410,9 @@ namespace casadi {
         s << "@" << el.res.front() << " = @" << el.arg.at(0) << "; ";
       }
       vector<string> arg(2);
-      arg[0] = "@" + CodeGenerator::to_string(el.res.front());
-      arg[1] = "@" + CodeGenerator::to_string(el.arg.at(1));
-      s << el.data->print(arg);
+      arg[0] = "@" + str(el.res.front());
+      arg[1] = "@" + str(el.arg.at(1));
+      s << el.data->disp(arg);
     } else {
       if (el.res.size()==1) {
         s << "@" << el.res.front() << " = ";
@@ -437,26 +433,27 @@ namespace casadi {
         arg.resize(el.arg.size());
         for (int i=0; i<el.arg.size(); ++i) {
           if (el.arg[i]>=0) {
-            arg[i] = "@" + CodeGenerator::to_string(el.arg[i]);
+            arg[i] = "@" + str(el.arg[i]);
           } else {
             arg[i] = "NULL";
           }
         }
       }
-      s << el.data->print(arg);
+      s << el.data->disp(arg);
     }
     return s.str();
   }
 
-  void MXFunction::print_long(ostream &stream) const {
-    FunctionInternal::print_long(stream);
+  void MXFunction::disp_more(ostream &stream) const {
+    stream << "Algorithm:";
     for (auto&& e : algorithm_) {
       InterruptHandler::check();
-      stream << print(e) << endl;
+      stream << endl << print(e);
     }
   }
 
-  void MXFunction::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int MXFunction::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     // Temporaries to hold pointers to operation input and outputs
     const bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -491,12 +488,13 @@ namespace casadi {
           res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : 0;
 
         // Propagate sparsity forwards
-        e.data->sp_forward(arg1, res1, iw, w, 0);
+        if (e.data->sp_forward(arg1, res1, iw, w)) return 1;
       }
     }
+    return 0;
   }
 
-  void MXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int MXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     // Temporaries to hold pointers to operation input and outputs
     bvec_t** arg1=arg+n_in();
     bvec_t** res1=res+n_out();
@@ -534,9 +532,10 @@ namespace casadi {
           res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
 
         // Propagate sparsity backwards
-        it->data->sp_reverse(arg1, res1, iw, w, 0);
+        if (it->data->sp_reverse(arg1, res1, iw, w)) return 1;
       }
     }
+    return 0;
   }
 
   std::vector<MX> MXFunction::symbolic_output(const std::vector<MX>& arg) const {
@@ -559,7 +558,7 @@ namespace casadi {
 
   void MXFunction::eval_mx(const MXVector& arg, MXVector& res,
                            bool always_inline, bool never_inline) const {
-    log("MXFunction::eval_mx begin");
+    if (verbose_) casadi_message(name_ + "::eval_mx");
 
     // Resize the number of outputs
     casadi_assert_message(arg.size()==n_in(), "Wrong number of input arguments");
@@ -578,7 +577,7 @@ namespace casadi {
 
     // Symbolic work, non-differentiated
     vector<MX> swork(workloc_.size()-1);
-    log("MXFunction::eval_mx allocated work vector");
+    if (verbose_) casadi_message("Allocated work vector");
 
     // Split up inputs analogous to symbolic primitives
     vector<vector<MX> > arg_split(in_.size());
@@ -624,13 +623,11 @@ namespace casadi {
 
     // Join split outputs
     for (int i=0; i<res.size(); ++i) res[i] = out_[i].join_primitives(res_split[i]);
-
-    log("MXFunction::eval_mx end");
   }
 
   void MXFunction::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                 std::vector<std::vector<MX> >& fsens) const {
-    log("MXFunction::ad_forward begin");
+    if (verbose_) casadi_message(name_ + "::ad_forward");
 
     // Allocate results
     int nfwd = fseed.size();
@@ -681,7 +678,7 @@ namespace casadi {
     // Work vector, forward derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
-    log("MXFunction::ad_forward allocated derivative work vector (forward mode)");
+    if (verbose_) casadi_message("Allocated derivative work vector (forward mode)");
 
     // Split up fseed analogous to symbolic primitives
     vector<vector<vector<MX> > > fseed_split(nfwd);
@@ -772,13 +769,11 @@ namespace casadi {
         fsens[d][i] = out_[i].join_primitives(fsens_split[d][i]);
       }
     }
-
-    log("MXFunction::ad_forward end");
   }
 
   void MXFunction::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                                 std::vector<std::vector<MX> >& asens) const {
-    log("MXFunction::ad_reverse begin");
+    if (verbose_) casadi_message(name_ + "::ad_reverse");
 
     // Allocate results
     int nadj = aseed.size();
@@ -854,7 +849,7 @@ namespace casadi {
     // Work vector, adjoint derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
-    log("MXFunction::ad_reverse allocated derivative work vector (adjoint mode)");
+    if (verbose_) casadi_message("Allocated derivative work vector (adjoint mode)");
 
     // Loop over computational nodes in reverse order
     for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
@@ -961,11 +956,9 @@ namespace casadi {
         asens[d][i] = in_[i].join_primitives(asens_split[d][i]);
       }
     }
-
-    log("MXFunction::ad_reverse end");
   }
 
-  void MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int MXFunction::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
     // Work vector and temporaries to hold pointers to operation input and outputs
     vector<const SXElem*> argp(sz_arg());
     vector<SXElem*> resp(sz_res());
@@ -1001,9 +994,10 @@ namespace casadi {
           resp[i] = a.res[i]>=0 ? w+workloc_[a.res[i]] : 0;
 
         // Evaluate
-        a.data->eval_sx(get_ptr(argp), get_ptr(resp), iw, w, 0);
+        if (a.data->eval_sx(get_ptr(argp), get_ptr(resp), iw, w)) return 1;
       }
     }
+    return 0;
   }
 
   Function MXFunction::expand(const std::vector<SX>& inputvsx) {
@@ -1056,7 +1050,7 @@ namespace casadi {
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
       casadi_error("Code generation is not possible since variables "
-                   << free_vars_ << " are free.");
+                   + str(free_vars_) + " are free.");
     }
 
     // Generate code for the embedded functions
@@ -1081,8 +1075,8 @@ namespace casadi {
 
   void MXFunction::codegen_body(CodeGenerator& g) const {
     // Temporary variables and vectors
-    g.init_local("arg1", "arg+" + to_string(n_in()));
-    g.init_local("res1", "res+" + to_string(n_out()));
+    g.init_local("arg1", "arg+" + str(n_in()));
+    g.init_local("res1", "res+" + str(n_out()));
 
     // Declare scalar work vector elements as local variables
     bool first = true;
@@ -1146,7 +1140,7 @@ namespace casadi {
       }
 
       // Generate operation
-      e.data->generate(g, "0", arg, res);
+      e.data->generate(g, arg, res);
     }
   }
 
@@ -1251,7 +1245,7 @@ namespace casadi {
   }
 
   bool MXFunction::is_a(const std::string& type, bool recursive) const {
-    return type=="mxfunction"
+    return type=="MXFunction"
       || (recursive && XFunction<MXFunction,
           MX, MXNode>::is_a(type, recursive));
   }

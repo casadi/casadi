@@ -182,8 +182,16 @@ macro(swig_add_source_to_module name xmlmode outfiles infile)
     endif()
   endif()
 
+  # If CMAKE_SWIG_OUTDIR was specified then pass it to -outdir
+  if(CMAKE_SWIG_WRAP_OUTDIR)
+    set(swig_wrap_outdir ${CMAKE_SWIG_WRAP_OUTDIR})
+    # it may not exist, so create it:
+    file(MAKE_DIRECTORY ${CMAKE_SWIG_WRAP_OUTDIR})
+  else()
+    set(swig_wrap_outdir ${CMAKE_CURRENT_BINARY_DIR})
+  endif()
   set(swig_generated_file_fullname
-    "${CMAKE_CURRENT_BINARY_DIR}")
+    "${swig_wrap_outdir}")
   if(swig_source_file_relative_path)
     set(swig_generated_file_fullname
       "${swig_generated_file_fullname}/${swig_source_file_relative_path}")

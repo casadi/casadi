@@ -33,21 +33,23 @@ namespace casadi {
     set_sparsity(Sparsity::scalar());
   }
 
-  std::string NormF::print(const std::vector<std::string>& arg) const {
+  std::string NormF::disp(const std::vector<std::string>& arg) const {
     return "||" + arg.at(0) + "||_F";
   }
 
-  void NormF::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+  int NormF::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void NormF::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+  int NormF::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    eval_gen<SXElem>(arg, res, iw, w);
+    return 0;
   }
 
   template<typename T>
-  void NormF::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int NormF::eval_gen(const T** arg, T** res, int* iw, T* w) const {
     *res[0] = casadi_norm_2(dep().nnz(), arg[0]);
+    return 0;
   }
 
   void NormF::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
@@ -70,22 +72,22 @@ namespace casadi {
     }
   }
 
-  void NormF::generate(CodeGenerator& g, const std::string& mem,
+  void NormF::generate(CodeGenerator& g,
                        const std::vector<int>& arg, const std::vector<int>& res) const {
     g << g.workel(res[0]) << " = sqrt("
       << g.dot(dep().nnz(), g.work(arg[0], dep(0).nnz()), g.work(arg[0], dep(0).nnz()))
       << ");\n";
   }
 
-  std::string Norm2::print(const std::vector<std::string>& arg) const {
+  std::string Norm2::disp(const std::vector<std::string>& arg) const {
     return "||" + arg.at(0) + "||_2";
   }
 
-  std::string Norm1::print(const std::vector<std::string>& arg) const {
+  std::string Norm1::disp(const std::vector<std::string>& arg) const {
     return "||" + arg.at(0) + "||_1";
   }
 
-  std::string NormInf::print(const std::vector<std::string>& arg) const {
+  std::string NormInf::disp(const std::vector<std::string>& arg) const {
     return "||" + arg.at(0) + "||_inf";
   }
 

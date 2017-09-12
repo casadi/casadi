@@ -37,25 +37,26 @@ namespace casadi {
   Concat::~Concat() {
   }
 
-  void Concat::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w);
+  int Concat::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void Concat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w);
+  int Concat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Concat::evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
+  int Concat::eval_gen(const T* const* arg, T* const* res, int* iw, T* w) const {
     T* r = res[0];
     for (int i=0; i<n_dep(); ++i) {
       int n = dep(i).nnz();
       copy(arg[i], arg[i]+n, r);
       r += n;
     }
+    return 0;
   }
 
-  void Concat::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Concat::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<n_dep(); ++i) {
       int n_i = dep(i).nnz();
@@ -63,9 +64,10 @@ namespace casadi {
       copy(arg_i_ptr, arg_i_ptr+n_i, res_ptr);
       res_ptr += n_i;
     }
+    return 0;
   }
 
-  void Concat::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Concat::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     bvec_t *res_ptr = res[0];
     for (int i=0; i<n_dep(); ++i) {
       int n_i = dep(i).nnz();
@@ -75,9 +77,10 @@ namespace casadi {
         *res_ptr++ = 0;
       }
     }
+    return 0;
   }
 
-  void Concat::generate(CodeGenerator& g, const std::string& mem,
+  void Concat::generate(CodeGenerator& g,
                         const std::vector<int>& arg, const std::vector<int>& res) const {
     g.local("rr", "casadi_real", "*");
     g << "rr=" << g.work(res[0], nnz()) << ";\n";
@@ -143,7 +146,7 @@ namespace casadi {
     set_sparsity(diagcat(sp));
   }
 
-  std::string Diagcat::print(const std::vector<std::string>& arg) const {
+  std::string Diagcat::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "diagcat(" << arg.at(0);
     for (int i=1; i<n_dep(); ++i) ss << ", " << arg.at(i);
@@ -196,7 +199,7 @@ namespace casadi {
     set_sparsity(horzcat(sp));
   }
 
-  std::string Horzcat::print(const std::vector<std::string>& arg) const {
+  std::string Horzcat::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "horzcat(" << arg.at(0);
     for (int i=1; i<n_dep(); ++i) ss << ", " << arg.at(i);
@@ -247,7 +250,7 @@ namespace casadi {
     set_sparsity(vertcat(sp));
   }
 
-  std::string Vertcat::print(const std::vector<std::string>& arg) const {
+  std::string Vertcat::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "vertcat(" << arg.at(0);
     for (int i=1; i<n_dep(); ++i) ss << ", " << arg.at(i);

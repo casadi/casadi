@@ -66,6 +66,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "rk";}
 
+    // Get name of the class
+    std::string class_name() const override { return "RungeKutta";}
+
     /// Initialize stage
     void init(const Dict& opts) override;
 

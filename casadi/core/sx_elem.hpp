@@ -77,7 +77,7 @@ namespace casadi {
     /** \brief Create a symbolic primitive
          \param name Name of the symbolic primitive
 
-        This is the name that will be used by the "operator<<" and "to_string" methods.
+        This is the name that will be used by the "operator<<" and "str" methods.
         The name is not used as identifier; you may construct distinct
         SXElem objects with non-unique names.
     */
@@ -107,11 +107,11 @@ namespace casadi {
     /// Convert to a 1-by-1 Matrix
     operator Matrix<SXElem>() const;
 
-    /// Print a representation of the object
-    void print_short(std::ostream &stream) const;
+    /// Type name
+    static std::string type_name() {return "SXElem";}
 
     /// Print a description of the object
-    void print_long(std::ostream &stream) const;
+    void disp(std::ostream& stream, bool more) const;
 
     /// \cond INTERNAL
     /** \brief  Get a pointer to the node */

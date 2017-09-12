@@ -60,7 +60,7 @@ namespace casadi {
   }
 
   BonminInterface::~BonminInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options BonminInterface::options_
@@ -209,9 +209,8 @@ namespace casadi {
     }
   }
 
-  void BonminInterface::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
-    //auto m = static_cast<BonminMemory*>(mem);
+  int BonminInterface::init_mem(void* mem) const {
+    return Nlpsol::init_mem(mem);
   }
 
   void BonminInterface::set_work(void* mem, const double**& arg, double**& res,
@@ -294,7 +293,7 @@ namespace casadi {
     auto m = static_cast<BonminMemory*>(mem);
 
     // Check the provided inputs
-    checkInputs(mem);
+    check_inputs(mem);
 
     // Reset statistics
     m->inf_pr.clear();
@@ -406,7 +405,7 @@ namespace casadi {
                         int ls_trials, bool full_callback) const {
     m->n_iter += 1;
     try {
-      log("intermediate_callback started");
+      if (verbose_) casadi_message("intermediate_callback started");
       m->inf_pr.push_back(inf_pr);
       m->inf_du.push_back(inf_du);
       m->mu.push_back(mu);

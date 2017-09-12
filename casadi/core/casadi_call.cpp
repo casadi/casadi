@@ -49,8 +49,8 @@ namespace casadi {
       } else {
         // Mismatching dimensions
         casadi_error("Cannot create function call node: Dimension mismatch for argument "
-                     << i << ". Argument has shape " << x.size()
-                     << " but function input has shape " << sp.size());
+                     + str(i) + ". Argument has shape " + str(x.size())
+                     + " but function input has shape " + str(sp.size()));
       }
     }
   }
@@ -59,9 +59,9 @@ namespace casadi {
 
     // Number inputs and outputs
     int num_in = fcn.n_in();
-    casadi_assert_message(arg.size()==num_in, "Argument list length (" << arg.size()
-                          << ") does not match number of inputs (" << num_in << ")"
-                          << " for function " << fcn.name());
+    casadi_assert_message(arg.size()==num_in, "Argument list length (" + str(arg.size())
+                          + ") does not match number of inputs (" + str(num_in)
+                          + ") for function " + fcn.name());
 
     // Create arguments of the right dimensions and sparsity
     vector<MX> arg1(num_in);
@@ -72,7 +72,7 @@ namespace casadi {
     set_sparsity(Sparsity::scalar());
   }
 
-  std::string Call::print(const std::vector<std::string>& arg) const {
+  std::string Call::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << fcn_.name() << "(";
     for (int i=0; i<n_dep(); ++i) {
@@ -83,8 +83,8 @@ namespace casadi {
     return ss.str();
   }
 
-  void Call::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    fcn_(arg, res, iw, w, mem);
+  int Call::eval(const double** arg, double** res, int* iw, double* w) const {
+    return fcn_(arg, res, iw, w);
   }
 
   int Call::nout() const {
@@ -95,8 +95,8 @@ namespace casadi {
     return fcn_.sparsity_out(oind);
   }
 
-  void Call::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    fcn_(arg, res, iw, w, mem);
+  int Call::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return fcn_(arg, res, iw, w);
   }
 
   void Call::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
@@ -135,12 +135,12 @@ namespace casadi {
     }
   }
 
-  void Call::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    fcn_(arg, res, iw, w, mem);
+  int Call::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+    return fcn_(arg, res, iw, w);
   }
 
-  void Call::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    fcn_.rev(arg, res, iw, w, mem);
+  int Call::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+    return fcn_.rev(arg, res, iw, w);
   }
 
   void Call::add_dependency(CodeGenerator& g) const {
@@ -151,7 +151,7 @@ namespace casadi {
     return fcn_->has_refcount_;
   }
 
-  void Call::generate(CodeGenerator& g, const std::string& mem,
+  void Call::generate(CodeGenerator& g,
                       const vector<int>& arg, const vector<int>& res) const {
     if (fcn_->simplified_call()) {
 
@@ -161,7 +161,7 @@ namespace casadi {
       }
 
       // Call function
-      g << g(fcn_, "w", "w+"+g.to_string(arg.size())) << ";\n";
+      g << g(fcn_, "w", "w+"+str(arg.size())) << ";\n";
 
       // Collect output arguments
       for (int i=0; i<res.size(); ++i) {

@@ -130,12 +130,8 @@ namespace casadi {
     return *this = SXElem(scalar);
   }
 
-  void SXElem::print_short(std::ostream &stream) const {
-    print_long(stream);
-  }
-
-  void SXElem::print_long(std::ostream &stream) const {
-    node->print_long(stream);
+  void SXElem::disp(std::ostream& stream, bool more) const {
+    node->disp(stream, more);
   }
 
   SXElem SXElem::operator-() const {
@@ -509,7 +505,7 @@ namespace casadi {
   }
 
   SXElem SXElem::dep(int ch) const {
-    casadi_assert(ch==0 || ch==1;)
+    casadi_assert(ch==0 || ch==1)
     return node->dep(ch);
   }
 

@@ -617,8 +617,8 @@ class ADtests(casadiTestCase):
 
         # evalThings
         for sym in [MX.sym, SX.sym]:
-          if f.is_a('mxfunction') and sym==SX.sym: continue
-          if f.is_a('sxfunction') and sym==MX.sym: continue
+          if f.is_a('MXFunction') and sym==SX.sym: continue
+          if f.is_a('SXFunction') and sym==MX.sym: continue
 
           # dense
           for spmod,spmod2 in itertools.product(spmods,repeat=2):
@@ -684,8 +684,8 @@ class ADtests(casadiTestCase):
           # Second order sensitivities
           for sym2 in [MX.sym, SX.sym]:
 
-            if vf.is_a('mxfunction') and sym2==SX.sym: continue
-            if vf.is_a('sxfunction') and sym2==MX.sym: continue
+            if vf.is_a('MXFunction') and sym2==SX.sym: continue
+            if vf.is_a('MXFunction') and sym2==MX.sym: continue
 
             for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
               fseeds2 = [[sym2("f",vf_mx.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]

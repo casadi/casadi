@@ -92,19 +92,19 @@ namespace casadi {
     return node;
   }
 
-  void SharedObject::print_short(std::ostream &stream) const {
-    if (is_null()) {
-      stream << 0;
-    } else {
-      (*this)->print_short(stream);
-    }
+  std::string SharedObject::class_name() const {
+    return (*this)->class_name();
   }
 
-  void SharedObject::print_long(std::ostream &stream) const {
+  std::string SharedObject::type_name() const {
+    return (*this)->type_name();
+  }
+
+  void SharedObject::disp(std::ostream& stream, bool more) const {
     if (is_null()) {
-      stream << "Null pointer of class \"" << typeid(this).name() << "\"";
+      stream << "NULL";
     } else {
-      (*this)->print_long(stream);
+      (*this)->disp(stream, more);
     }
   }
 

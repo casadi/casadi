@@ -41,21 +41,23 @@ namespace casadi {
   }
 
 
-  void LinsolInternal::init_memory(void* mem) const {
+  int LinsolInternal::init_mem(void* mem) const {
+    if (!mem) return 1;
     //auto m = static_cast<LinsolMemory*>(mem);
+    return 0;
   }
 
-  void LinsolInternal::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem,
-                             bool tr, int nrhs) const {
-    casadi_error("eval_sx not defined for " + type_name());
+  void LinsolInternal::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w,
+                                      void* mem, bool tr, int nrhs) const {
+    casadi_error("eval_sx not defined for " + class_name());
   }
 
   void LinsolInternal::solve(void* mem, double* x, int nrhs, bool tr) const {
-    casadi_error("'solve' not defined for " + type_name());
+    casadi_error("'solve' not defined for " + class_name());
   }
 
   void LinsolInternal::solve_cholesky(void* mem, double* x, int nrhs, bool tr) const {
-    casadi_error("'solve_cholesky' not defined for " + type_name());
+    casadi_error("'solve_cholesky' not defined for " + class_name());
   }
 
   void LinsolInternal::reset(void* mem, const int* sp) const {
@@ -85,23 +87,23 @@ namespace casadi {
   }
 
   void LinsolInternal::factorize(void* mem, const double* A) const {
-    casadi_error("'factorize' not defined for " + type_name());
+    casadi_error("'factorize' not defined for " + class_name());
   }
 
   Sparsity LinsolInternal::linsol_cholesky_sparsity(void* mem, bool tr) const {
-    casadi_error("'linsol_cholesky_sparsity' not defined for " + type_name());
+    casadi_error("'linsol_cholesky_sparsity' not defined for " + class_name());
   }
 
   DM LinsolInternal::linsol_cholesky(void* mem, bool tr) const {
-    casadi_error("'linsol_cholesky' not defined for " + type_name());
+    casadi_error("'linsol_cholesky' not defined for " + class_name());
   }
 
   int LinsolInternal::neig(void* mem) const {
-    casadi_error("'neig' not defined for " + type_name());
+    casadi_error("'neig' not defined for " + class_name());
   }
 
   int LinsolInternal::rank(void* mem) const {
-    casadi_error("'rank' not defined for " + type_name());
+    casadi_error("'rank' not defined for " + class_name());
   }
 
   std::map<std::string, LinsolInternal::Plugin> LinsolInternal::solvers_;

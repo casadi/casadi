@@ -39,7 +39,7 @@ namespace casadi {
         const std::string& body, const Dict& opts);
 
     /** \brief Get type name */
-    std::string type_name() const override { return "jit";}
+    std::string class_name() const override { return "Jit";}
 
     /** \brief Destructor */
     ~Jit() override;

@@ -76,7 +76,7 @@ namespace casadi {
   }
 
   SlicotDple::~SlicotDple() {
-    clear_memory();
+    clear_mem();
   }
 
   void SlicotDple::init(const Dict& opts) {
@@ -170,8 +170,8 @@ namespace casadi {
 
 
   /** \brief Initalize memory block */
-  void SlicotDple::init_memory(void* mem) const {
-    Dple::init_memory(mem);
+  int SlicotDple::init_mem(void* mem) const {
+    if (Dple::init_mem(mem)) return 1;
     auto m = static_cast<SlicotDpleMemory*>(mem);
 
     // Construct linear solvers for low-order Discrete Periodic Sylvester Equations
@@ -196,6 +196,7 @@ namespace casadi {
         m->dpse_solvers[i][k].reset(sp);
       }
     }
+    return 0;
   }
 
   /// \cond INTERNAL
@@ -205,7 +206,7 @@ namespace casadi {
   }
   /// \endcond
 
-  void SlicotDple::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int SlicotDple::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<SlicotDpleMemory*>(mem);
 
     setup(mem, arg, res, iw, w);
@@ -221,11 +222,10 @@ namespace casadi {
         double modulus = sqrt(m->eig_real[i]*m->eig_real[i]+m->eig_imag[i]*m->eig_imag[i]);
         casadi_assert_message(modulus+eps_unstable_ <= 1,
           "SlicotDple: system is unstable."
-          "Found an eigenvalue " << m->eig_real[i] << " + " <<
-          m->eig_imag[i] << "j, with modulus " << modulus <<
-          " (corresponding eps= " << 1-modulus << ")." <<
-          std::endl << "Use options and 'error_unstable'"
-          "and 'eps_unstable' to influence this message.");
+          "Found an eigenvalue " + str(m->eig_real[i]) + " + " +
+          str(m->eig_imag[i]) + "j, with modulus " + str(modulus) +
+          " (corresponding eps= " + str(1-modulus) + ").\n" +
+          "Use options and 'error_unstable' and 'eps_unstable' to influence this message.");
       }
     }
 
@@ -396,7 +396,7 @@ namespace casadi {
       }
 
     }
-
+    return 0;
   }
 
 
@@ -413,11 +413,11 @@ namespace casadi {
     int ret;
 
     ret = slicot_mb03vd(n, K, 1, n, z, n, n, dwork+mem_base, n-1, dwork);
-    casadi_assert_message(ret==0, "mb03vd return code "<< ret);
+    casadi_assert_message(ret==0, "mb03vd return code " + str(ret));
     std::copy(z, z+n*n*K, t);
 
     ret = slicot_mb03vy(n, K, 1, n, z, n, n, dwork+mem_base, n-1, dwork, mem_needed);
-    casadi_assert_message(ret==0, "mb03vy return code "<< ret);
+    casadi_assert_message(ret==0, "mb03vy return code " + str(ret));
     // Set numerical zeros to zero
     if (num_zero>0) {
       for (int k = 0;k<n*n*K;++k) {
@@ -428,7 +428,7 @@ namespace casadi {
 
     ret = slicot_mb03wd('S', 'V', n, K, 1, n, 1, n, t, n, n, z, n, n,
                   eig_real, eig_imag, dwork, mem_needed);
-    casadi_assert_message(ret==0, "mb03wd return code "<< ret);
+    casadi_assert_message(ret==0, "mb03wd return code " + str(ret));
   }
 
 } // namespace casadi

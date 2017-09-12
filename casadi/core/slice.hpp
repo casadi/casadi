@@ -76,11 +76,11 @@ namespace casadi {
     /// Check inequality
     bool operator!=(const Slice& other) const { return !(*this == other);}
 
-    /// Print a representation of the object
-    void print_short(std::ostream &stream) const;
+    /// Get name of the class
+    std::string type_name() const {return "Slice";}
 
     /// Print a description of the object
-    void print_long(std::ostream &stream) const;
+    void disp(std::ostream& stream, bool more=false) const;
   };
 
   /// Construct from an index vector (requires is_slice(v) to be true)

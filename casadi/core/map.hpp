@@ -46,7 +46,7 @@ namespace casadi {
     ~Map() override;
 
     /** \brief Get type name */
-    std::string type_name() const override {return "map";}
+    std::string class_name() const override {return "Map";}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
@@ -75,22 +75,22 @@ namespace casadi {
 
     /** \brief  Evaluate or propagate sparsities */
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w) const;
+    int eval_gen(const T** arg, T** res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /// Type of parallellization
     virtual std::string parallelization() const { return "serial"; }
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
-    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const override;
 
     /** \brief  Propagate sparsity forward */
-    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?
@@ -155,8 +155,11 @@ namespace casadi {
     /** \brief  Destructor */
     ~MapOmp() override;
 
+    /** \brief Get type name */
+    std::string class_name() const override {return "MapOmp";}
+
     /// Evaluate the function numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;

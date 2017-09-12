@@ -41,7 +41,10 @@ namespace casadi {
     ~CallbackInternal() override;
 
     /** \brief Get type name */
-    std::string type_name() const override {return "callback";}
+    std::string type_name() const override {return "Callback";}
+
+    /** \brief Get type name */
+    std::string class_name() const override {return "CallbackInternal";}
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -68,10 +71,10 @@ namespace casadi {
     void finalize(const Dict& opts) override;
 
     /** \brief  Evaluate numerically, work vectors given */
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief  Evaluate symbolically, work vectors given */
-    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const override;
 
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const override;

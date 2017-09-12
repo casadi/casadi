@@ -59,7 +59,7 @@ namespace casadi {
     return std::vector<DM>();
   }
 
-  void Callback::eval(const double** arg, double** res, int* iw, double* w, int mem) {
+  int Callback::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
     // Allocate input matrices
     int n_in = this->n_in();
     std::vector<DM> argv(n_in);
@@ -72,12 +72,12 @@ namespace casadi {
     std::vector<DM> resv = eval(argv);
 
     casadi_assert_message(resv.size()==n_out(),
-      "Callback::eval: expected " + to_string(n_out()) + " outputs, got "
-      + to_string(resv.size()) +".");
+      "Callback::eval: expected " + str(n_out()) + " outputs, got "
+      + str(resv.size()) +".");
 
     for (int i=0; i<n_out(); ++i) {
       casadi_assert_message(resv[i].sparsity()==sparsity_out(i),
-        "Callback::eval: Shape mismatch for output " << i << ": got " + resv[i].dim() +
+        "Callback::eval: Shape mismatch for output " + str(i) + ": got " + resv[i].dim() +
         ", expected " + sparsity_out(i).dim() + ".");
     }
 
@@ -86,10 +86,12 @@ namespace casadi {
     for (int i=0; i<n_out; ++i) {
       casadi_copy(resv[i].ptr(), resv[i].nnz(), res[i]);
     }
+    return 0;
   }
 
-  void Callback::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int Callback::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
     casadi_error("Cannot expand");
+    return 0;
   }
 
   const CallbackInternal* Callback::operator->() const {

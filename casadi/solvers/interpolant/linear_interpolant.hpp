@@ -60,6 +60,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "linear";}
 
+    // Name of the class
+    std::string class_name() const override { return "LinearInterpolant";}
+
     /** \brief  Create a new Interpolant */
     static Interpolant* creator(const std::string& name,
                                 const std::vector<double>& grid,
@@ -72,7 +75,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// Evaluate numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     ///@{
     /** \brief Full Jacobian */
@@ -111,7 +114,7 @@ namespace casadi {
     ~LinearInterpolantJac() override {}
 
     /** \brief Get type name */
-    std::string type_name() const override { return "interpolant_linear_jac";}
+    std::string class_name() const override { return "LinearInterpolantJac";}
 
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
@@ -123,7 +126,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// Evaluate numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
   };
 
 } // namespace casadi

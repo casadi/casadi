@@ -36,28 +36,31 @@ namespace casadi {
     set_sparsity(sp);
   }
 
-  void Reshape::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+  int Reshape::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void Reshape::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+  int Reshape::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Reshape::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int Reshape::eval_gen(const T** arg, T** res, int* iw, T* w) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
+    return 0;
   }
 
-  void Reshape::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Reshape::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     copy_fwd(arg[0], res[0], nnz());
+    return 0;
   }
 
-  void Reshape::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Reshape::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     copy_rev(arg[0], res[0], nnz());
+    return 0;
   }
 
-  std::string Reshape::print(const std::vector<std::string>& arg) const {
+  std::string Reshape::disp(const std::vector<std::string>& arg) const {
     // For vectors, reshape is also a transpose
     if (dep().is_vector() && sparsity().is_vector()) {
       // Print as transpose: X'
@@ -90,7 +93,7 @@ namespace casadi {
     }
   }
 
-  void Reshape::generate(CodeGenerator& g, const std::string& mem,
+  void Reshape::generate(CodeGenerator& g,
                          const std::vector<int>& arg, const std::vector<int>& res) const {
     if (arg[0]==res[0]) return;
     g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << "\n";

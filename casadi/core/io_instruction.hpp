@@ -75,10 +75,10 @@ namespace casadi {
     int op() const override { return OP_INPUT;}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                   const std::vector<int>& arg, const std::vector<int>& res) const override;
   };
 
@@ -98,10 +98,10 @@ namespace casadi {
     int op() const override { return OP_OUTPUT;}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                   const std::vector<int>& arg, const std::vector<int>& res) const override;
   };
 

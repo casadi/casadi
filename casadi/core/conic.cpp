@@ -25,7 +25,6 @@
 
 #include "conic_impl.hpp"
 #include "nlpsol_impl.hpp"
-#include <typeinfo>
 
 using namespace std;
 namespace casadi {
@@ -208,12 +207,13 @@ namespace casadi {
     w = conic_f(w);
 
     // Get expressions for the solution
-    ret_out[NLPSOL_X] = w[CONIC_X];
+    ret_out[NLPSOL_X] = reshape(w[CONIC_X], x.size());
     ret_out[NLPSOL_F] = w[CONIC_COST];
-    ret_out[NLPSOL_G] = mtimes(v.at(2), w[CONIC_X]) + v.at(3);
-    ret_out[NLPSOL_LAM_X] = w[CONIC_LAM_X];
-    ret_out[NLPSOL_LAM_G] = w[CONIC_LAM_A];
+    ret_out[NLPSOL_G] = reshape(mtimes(v.at(2), w[CONIC_X]), g.size()) + v.at(3);
+    ret_out[NLPSOL_LAM_X] = reshape(w[CONIC_LAM_X], x.size());
+    ret_out[NLPSOL_LAM_G] = reshape(w[CONIC_LAM_A], g.size());
     ret_out[NLPSOL_LAM_P] = MX::nan(p.sparsity());
+
     return Function(name, ret_in, ret_out, nlpsol_in(), nlpsol_out(),
                     {{"default_in", nlpsol_default_in()}});
   }
@@ -237,7 +237,7 @@ namespace casadi {
       } else if (i->first=="h") {
         H_ = i->second;
       } else {
-        casadi_error("Unrecognized field in QP structure: " << i->first);
+        casadi_error("Unrecognized field in QP structure: " + str(i->first));
       }
     }
 
@@ -253,16 +253,16 @@ namespace casadi {
     } else {
       // Consistency check
       casadi_assert_message(A_.size2()==H_.size2(),
-        "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :"
-        << std::endl <<
-        "H: " << H_.dim() << " - A: " << A_.dim() << std::endl <<
-        "We need: H_.size2()==A_.size2()" << std::endl);
+        "Got incompatible dimensions.\n"
+        "min x'Hx + G'x s.t. LBA <= Ax <= UBA :\n"
+        "H: " + H_.dim() + " - A: " + A_.dim() + "\n"
+        "We need: H.size2()==A.size2()");
     }
 
     casadi_assert_message(H_.is_symmetric(),
-      "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
-      "H: " << H_.dim() <<
-      "We need H square & symmetric" << std::endl);
+      "Got incompatible dimensions. min x'Hx + G'x\n"
+      "H: " + H_.dim() +
+      "We need H square & symmetric");
 
     nx_ = A_.size2();
     na_ = A_.size1();
@@ -337,29 +337,26 @@ namespace casadi {
   Conic::~Conic() {
   }
 
-  void Conic::checkInputs(const double* lbx, const double* ubx,
+  void Conic::check_inputs(const double* lbx, const double* ubx,
                           const double* lba, const double* uba) const {
     for (int i=0; i<nx_; ++i) {
       double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;
       casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
-                            "Ill-posed problem detected: " <<
-                            "LBX[" << i << "] <= UBX[" << i << "] was violated. "
-                            << "Got LBX[" << i << "]=" << lb <<
-                            " and UBX[" << i << "] = " << ub << ".");
+        "Ill-posed problem detected: "
+        "LBX[" + str(i) + "] <= UBX[" + str(i) + "] was violated. "
+        "Got LBX[" + str(i) + "]=" + str(lb) + " and UBX[" + str(i) + "] = " + str(ub) + ".");
     }
     for (int i=0; i<na_; ++i) {
       double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
       casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
-                            "Ill-posed problem detected: " <<
-                            "LBA[" << i << "] <= UBA[" << i << "] was violated. "
-                            << "Got LBA[" << i << "] = " << lb <<
-                            " and UBA[" << i << "] = " << ub << ".");
+        "Ill-posed problem detected: "
+        "LBA[" + str(i) + "] <= UBA[" + str(i) + "] was violated. "
+        "Got LBA[" + str(i) + "] = " + str(lb) + " and UBA[" + str(i) + "] = " + str(ub) + ".");
     }
   }
 
   void Conic::generateNativeCode(std::ostream& file) const {
-    casadi_error("Conic::generateNativeCode not defined for class "
-                 << typeid(*this).name());
+    casadi_error("generateNativeCode not defined for class " + class_name());
   }
 
   std::map<std::string, Conic::Plugin> Conic::solvers_;

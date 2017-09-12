@@ -48,24 +48,24 @@ namespace casadi {
 
   }
 
-  std::string Einstein::print(const std::vector<std::string>& arg) const {
+  std::string Einstein::disp(const std::vector<std::string>& arg) const {
     return "einstein(" + arg.at(0) + "," + arg.at(1) + "," + arg.at(2) + ")";
   }
 
-  void Einstein::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+  int Einstein::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void Einstein::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+  int Einstein::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Einstein::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int Einstein::eval_gen(const T** arg, T** res, int* iw, T* w) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
 
     einstein_eval(n_iter_, iter_dims_, strides_a_, strides_b_, strides_c_, arg[1], arg[2], res[0]);
-
+    return 0;
   }
 
   void Einstein::ad_forward(const std::vector<std::vector<MX> >& fseed,
@@ -88,11 +88,11 @@ namespace casadi {
 
 
 
-  void Einstein::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    evalGen<bvec_t>(arg, res, iw, w, mem);
+  int Einstein::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+    return eval_gen<bvec_t>(arg, res, iw, w);
   }
 
-  void Einstein::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Einstein::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     //int* ind = iw;
     //int cumprod;
 
@@ -119,13 +119,14 @@ namespace casadi {
       Contraction<bvec_t>(0, *c, *b);
     }
     copy_rev(arg[0], res[0], nnz());
+    return 0;
   }
 
   void Einstein::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     res[0] = einstein(arg[1], arg[2], arg[0], dim_a_, dim_b_, dim_c_, a_, b_, c_);
   }
 
-  void Einstein::generate(CodeGenerator& g, const std::string& mem,
+  void Einstein::generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const {
 
     // Copy first argument if not inplace

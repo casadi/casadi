@@ -237,9 +237,6 @@ namespace casadi {
     /** \brief Add a built-in auxiliary function */
     void add_auxiliary(Auxiliary f, const std::vector<std::string>& inst = {"casadi_real"});
 
-    /** Convert in integer to a string */
-    static std::string to_string(int n);
-
     /** Get work vector name from index */
     std::string work(int n, int sz) const;
 
@@ -356,13 +353,11 @@ namespace casadi {
     std::vector<std::string> exposed_fname;
 
     // Set of already included header files
-    typedef std::map<const void*, int> PointerMap;
     std::set<std::string> added_includes_;
     std::set<std::string> added_externals_;
     std::set<std::string> added_shorthands_;
     std::multimap<Auxiliary, std::vector<std::string>> added_auxiliaries_;
-    PointerMap added_sparsities_;
-    PointerMap added_dependencies_;
+    std::vector<Function> added_dependencies_;
     std::multimap<size_t, size_t> added_double_constants_;
     std::multimap<size_t, size_t> added_integer_constants_;
     std::map<std::string, std::pair<std::string, std::string> > local_variables_;

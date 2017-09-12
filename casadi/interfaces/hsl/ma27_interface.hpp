@@ -129,13 +129,13 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new Ma27Memory();}
-
-    /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<Ma27Memory*>(mem);}
+    void* alloc_mem() const override { return new Ma27Memory();}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<Ma27Memory*>(mem);}
 
     // Set sparsity pattern
     void reset(void* mem, const int* sp) const override;
@@ -157,6 +157,9 @@ namespace casadi {
 
     // Get name of the plugin
     const char* plugin_name() const override { return "ma27";}
+
+    // Get name of the class
+    std::string class_name() const override { return "Ma27Interface";}
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,

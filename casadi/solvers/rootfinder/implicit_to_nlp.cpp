@@ -50,7 +50,7 @@ namespace casadi {
   }
 
   ImplicitToNlp::~ImplicitToNlp() {
-    clear_memory();
+    clear_mem();
   }
 
   Options ImplicitToNlp::options_

@@ -33,7 +33,7 @@ namespace casadi {
     casadi_assert_message((OBJ)!=0, "Callback object has been deleted"); \
     return (OBJ)->FCN(__VA_ARGS__);\
   } catch (std::exception& ex) { \
-    casadi_error("Error calling \"" CASADI_ASSERT_STR(FCN) "\" for object " \
+    casadi_error("Error calling \"" CASADI_STR(FCN) "\" for object " \
                  + name_ + ":\n" + std::string(ex.what())); \
   }
 
@@ -93,13 +93,13 @@ namespace casadi {
     FunctionInternal::finalize(opts);
   }
 
-  void CallbackInternal::
-  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int CallbackInternal::
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     TRY_CALL(eval, self_, arg, res, iw, w, 0);
   }
 
-  void CallbackInternal::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int CallbackInternal::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
     TRY_CALL(eval_sx, self_, arg, res, iw, w, mem);
   }
 

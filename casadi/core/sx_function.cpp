@@ -1,4 +1,4 @@
-/*
+ /*
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
@@ -43,19 +43,12 @@ namespace casadi {
 
 
   SXFunction::SXFunction(const std::string& name,
-                                         const vector<SX >& inputv,
-                                         const vector<SX >& outputv)
-    : XFunction<SXFunction, SX, SXNode>(name, inputv, outputv) {
+                         const vector<SX >& inputv,
+                         const vector<SX >& outputv,
+                         const vector<std::string>& name_in,
+                         const vector<std::string>& name_out)
+    : XFunction<SXFunction, SX, SXNode>(name, inputv, outputv, name_in, name_out) {
     casadi_assert(!out_.empty()); // NOTE: Remove?
-
-    // Reset OpenCL memory
-#ifdef WITH_OPENCL
-    kernel_ = 0;
-    program_ = 0;
-    sp_forward_kernel_ = 0;
-    sp_adj_kernel_ = 0;
-    sp_program_ = 0;
-#endif // WITH_OPENCL
 
     // Default (persistent) options
     just_in_time_opencl_ = false;
@@ -63,22 +56,17 @@ namespace casadi {
   }
 
   SXFunction::~SXFunction() {
-    // Free OpenCL memory
-#ifdef WITH_OPENCL
-    freeOpenCL();
-    spFreeOpenCL();
-#endif // WITH_OPENCL
   }
 
-  void SXFunction::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
-    casadi_msg("SXFunction::eval():begin  " << name_);
+  int SXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+    if (verbose_) casadi_message(name_ + "::eval");
 
     // Make sure no free parameters
     if (!free_vars_.empty()) {
       std::stringstream ss;
-      print_short(ss);
-      casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables "
-                   << free_vars_ << " are free.");
+      disp(ss, false);
+      casadi_error("Cannot evaluate \"" + ss.str() + "\" since variables "
+                   + str(free_vars_) + " are free.");
     }
 
     // NOTE: The implementation of this function is very delicate. Small changes in the
@@ -94,11 +82,10 @@ namespace casadi {
       case OP_INPUT: w[e.i0] = arg[e.i1]==0 ? 0 : arg[e.i1][e.i2]; break;
       case OP_OUTPUT: if (res[e.i0]!=0) res[e.i0][e.i2] = w[e.i1]; break;
       default:
-        casadi_error("SXFunction::eval: Unknown operation" << e.op);
+        casadi_error("Unknown operation" + str(e.op));
       }
     }
-
-    casadi_msg("SXFunction::eval():end " << name_);
+    return 0;
   }
 
   bool SXFunction::is_smooth() const {
@@ -111,8 +98,8 @@ namespace casadi {
     return true;
   }
 
-  void SXFunction::print_long(ostream &stream) const {
-    FunctionInternal::print_long(stream);
+  void SXFunction::disp_more(ostream &stream) const {
+    stream << "Algorithm:";
 
     // Iterator to free variables
     vector<SXElem>::const_iterator p_it = free_vars_.begin();
@@ -120,6 +107,7 @@ namespace casadi {
     // Normal, interpreted output
     for (auto&& a : algorithm_) {
       InterruptHandler::check();
+      stream << endl;
       if (a.op==OP_OUTPUT) {
         stream << "output[" << a.i0 << "][" << a.i2 << "] = @" << a.i1;
       } else {
@@ -147,7 +135,7 @@ namespace casadi {
           }
         }
       }
-      stream << ";" << endl;
+      stream << ";";
     }
   }
 
@@ -156,7 +144,7 @@ namespace casadi {
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
       casadi_error("Code generation is not possible since variables "
-                   << free_vars_ << " are free.");
+                   + str(free_vars_) + " are free.");
     }
   }
 
@@ -221,9 +209,9 @@ namespace casadi {
   };
 
   void SXFunction::init(const Dict& opts) {
-
     // Call the init function of the base class
     XFunction<SXFunction, SX, SXNode>::init(opts);
+    if (verbose_) casadi_message(name_ + "::init");
 
     // Default (temporary) options
     bool live_variables = true;
@@ -411,12 +399,12 @@ namespace casadi {
       }
     }
 
-    if (verbose()) {
+    if (verbose_) {
       if (live_variables) {
-        userOut() << "Using live variables: work array is "
-             <<  worksize_ << " instead of " << nodes.size() << endl;
+        casadi_message("Using live variables: work array is " + str(worksize_)
+         + " instead of " + str(nodes.size()));
       } else {
-        userOut() << "Live variables disabled." << endl;
+        casadi_message("Live variables disabled.");
       }
     }
 
@@ -469,36 +457,21 @@ namespace casadi {
 
     // Initialize just-in-time compilation for numeric evaluation using OpenCL
     if (just_in_time_opencl_) {
-#ifdef WITH_OPENCL
-      freeOpenCL();
-      allocOpenCL();
-#else // WITH_OPENCL
-      casadi_error("Option \"just_in_time_opencl\" true requires CasADi "
-                   "to have been compiled with WITH_OPENCL=ON");
-#endif // WITH_OPENCL
+      casadi_error("OpenCL is not supported in this version of CasADi");
     }
 
     // Initialize just-in-time compilation for sparsity propagation using OpenCL
     if (just_in_time_sparsity_) {
-#ifdef WITH_OPENCL
-      spFreeOpenCL();
-      spAllocOpenCL();
-#else // WITH_OPENCL
-      casadi_error("Option \"just_in_time_sparsity\" true requires CasADi to "
-                   "have been compiled with WITH_OPENCL=ON");
-#endif // WITH_OPENCL
+      casadi_error("OpenCL is not supported in this version of CasADi");
     }
 
     // Print
-    if (verbose()) {
-      userOut() << "SXFunction::init Initialized " << name_ << " ("
-           << algorithm_.size() << " elementary operations)" << endl;
-    }
+    if (verbose_) casadi_message(str(algorithm_.size()) + " elementary operations");
   }
 
-  void SXFunction::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    if (verbose()) userOut() << "SXFunction::eval_sxsparse begin" << endl;
+  int SXFunction::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
+    if (verbose_) casadi_message(name_ + "::eval_sx");
 
     // Iterator to the binary operations
     vector<SXElem>::const_iterator b_it=operations_.begin();
@@ -510,9 +483,7 @@ namespace casadi {
     vector<SXElem>::const_iterator p_it = free_vars_.begin();
 
     // Evaluate algorithm
-    if (verbose()) {
-      userOut() << "SXFunction::eval_sxsparse evaluating algorithm forward" << endl;
-    }
+    if (verbose_) casadi_message("Evaluating algorithm forward");
     for (auto&& a : algorithm_) {
       switch (a.op) {
       case OP_INPUT:
@@ -545,12 +516,12 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunction::eval_sx end" << endl;
+    return 0;
   }
 
   void SXFunction::ad_forward(const vector<vector<SX> >& fseed,
                                 vector<vector<SX> >& fsens) const {
-    if (verbose()) userOut() << "SXFunction::ad_forward begin" << endl;
+    if (verbose_) casadi_message(name_ + "::ad_forward");
 
     // Number of forward seeds
     int nfwd = fseed.size();
@@ -601,7 +572,7 @@ namespace casadi {
     vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose()) userOut() << "SXFunction::ad_forward evaluating algorithm forward" << endl;
+    if (verbose_) casadi_message("Evaluating algorithm forward");
     for (auto&& e : algorithm_) {
       switch (e.op) {
       case OP_INPUT:
@@ -623,8 +594,7 @@ namespace casadi {
     vector<SXElem> w(worksize_);
 
     // Calculate forward sensitivities
-    if (verbose())
-      userOut() << "SXFunction::ad_forward calculating forward derivatives" << endl;
+    if (verbose_) casadi_message("Calculating forward derivatives");
     for (int dir=0; dir<nfwd; ++dir) {
       vector<TapeEl<SXElem> >::const_iterator it2 = s_pdwork.begin();
       for (auto&& a : algorithm_) {
@@ -644,12 +614,11 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunction::ad_forward end" << endl;
   }
 
   void SXFunction::ad_reverse(const vector<vector<SX> >& aseed,
                                 vector<vector<SX> >& asens) const {
-    if (verbose()) userOut() << "SXFunction::ad_reverse begin" << endl;
+    if (verbose_) casadi_message(name_ + "::ad_reverse");
 
     // number of adjoint seeds
     int nadj = aseed.size();
@@ -707,7 +676,7 @@ namespace casadi {
     vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
 
     // Evaluate algorithm
-    if (verbose()) userOut() << "SXFunction::ad_forward evaluating algorithm forward" << endl;
+    if (verbose_) casadi_message("Evaluating algorithm forward");
     for (auto&& a : algorithm_) {
       switch (a.op) {
       case OP_INPUT:
@@ -726,8 +695,7 @@ namespace casadi {
     }
 
     // Calculate adjoint sensitivities
-    if (verbose()) userOut() << "SXFunction::ad_reverse calculating adjoint derivatives"
-                       << endl;
+    if (verbose_) casadi_message("Calculating adjoint derivatives");
 
     // Work vector
     vector<SXElem> w(worksize_, 0);
@@ -763,10 +731,10 @@ namespace casadi {
         }
       }
     }
-    if (verbose()) userOut() << "SXFunction::ad_reverse end" << endl;
   }
 
-  void SXFunction::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SXFunction::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
       switch (e.op) {
@@ -783,9 +751,10 @@ namespace casadi {
         w[e.i0] = w[e.i1] | w[e.i2]; break;
       }
     }
+    return 0;
   }
 
-  void SXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backward
@@ -816,6 +785,7 @@ namespace casadi {
         w[it->i2] |= seed;
       }
     }
+    return 0;
   }
 
   Function SXFunction::get_jacobian(const std::string& name,
@@ -840,534 +810,6 @@ namespace casadi {
     return Function(name, ret_in, {J}, inames, onames, opts);
   }
 
-
-#ifdef WITH_OPENCL
-
-  SparsityPropagationKernel::SparsityPropagationKernel() {
-    device_id = 0;
-    context = 0;
-    command_queue = 0;
-    platform_id = 0;
-    cl_int ret;
-
-    // Get Platform and Device Info
-    ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-    casadi_assert(ret == CL_SUCCESS);
-    ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1, &device_id, &ret_num_devices);
-    casadi_assert(ret == CL_SUCCESS);
-
-    // Create OpenCL context
-    context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
-    casadi_assert(ret == CL_SUCCESS);
-
-    // Create Command Queue
-    command_queue = clCreateCommandQueue(context, device_id, 0, &ret);
-    casadi_assert(ret == CL_SUCCESS);
-  }
-
-  SparsityPropagationKernel::~SparsityPropagationKernel() {
-    // Clean up
-    cl_int ret;
-    ret = clFlush(command_queue);
-    ret = clFinish(command_queue);
-    ret = clReleaseCommandQueue(command_queue);
-    ret = clReleaseContext(context);
-  }
-
-  // Memory for the kernel singleton
-  SparsityPropagationKernel SXFunction::sparsity_propagation_kernel_;
-
-  void SXFunction::spAllocOpenCL() {
-    // OpenCL return flag
-    cl_int ret;
-
-    // Generate the kernel source code
-    stringstream ss;
-
-    const char* fcn_name[2] = {"sp_evaluate_fwd", "sp_evaluate_adj"};
-    for (int kernel=0; kernel<2; ++kernel) {
-      bool use_fwd = kernel==0;
-      ss << "__kernel void " << fcn_name[kernel] << "(";
-      bool first=true;
-      for (int i=0; i<n_in(); ++i) {
-        if (first) first=false;
-        else      ss << ", ";
-        ss << "__global unsigned long *x" << i;
-      }
-      for (int i=0; i<n_out(); ++i) {
-        if (first) first=false;
-        else      ss << ", ";
-        ss << "__global unsigned long *r" << i;
-      }
-      ss << ") { " << endl;
-
-      if (use_fwd) {
-        // Which variables have been declared
-        vector<bool> declared(n_w_, false);
-
-        // Propagate sparsity forward
-        for (auto&& e : algorithm_) {
-          if (e.op==OP_OUTPUT) {
-            ss << "if (r" << e.i0 << "!=0) r" << e.i0 << "[" << e.i2 << "]=" << "a" << e.i1;
-          } else {
-            // Declare result if not already declared
-            if (!declared[e.i0]) {
-              ss << "ulong ";
-              declared[e.i0]=true;
-            }
-
-            // Where to store the result
-            ss << "a" << e.i0 << "=";
-
-            // What to store
-            if (e.op==OP_CONST || e.op==OP_PARAMETER) {
-              ss << "0";
-            } else if (e.op==OP_INPUT) {
-              ss << "x" << e.i1 << "[" << e.i2 << "]";
-            } else {
-              int ndep = casadi_math<double>::ndeps(e.op);
-              for (int c=0; c<ndep; ++c) {
-                if (c==0) {
-                  ss << "a" << e.i1;
-                } else {
-                  ss << "|";
-                  ss << "a" << e.i2;
-                }
-              }
-            }
-          }
-          ss  << ";" << endl;
-        }
-
-      } else { // Backward propagation
-        // Temporary variable
-        ss << "ulong t;" << endl;
-
-        // Declare and initialize work vector
-        for (int i=0; i<n_w_; ++i) {
-          ss << "ulong a" << i << "=0;"<< endl;
-        }
-
-        // Propagate sparsity backward
-        for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
-          if (it->op==OP_OUTPUT) {
-            ss << "if (r" << it->i0 << "!=0) a" << it->i1
-               << "|=r" << it->i0 << "[" << it->i2 << "];" << endl;
-          } else {
-            if (it->op==OP_INPUT) {
-              ss << "x" << it->i1 << "[" << it->i2 << "]=a" << it->i0 << "; ";
-              ss << "a" << it->i0 << "=0;" << endl;
-            } else if (it->op==OP_CONST || it->op==OP_PARAMETER) {
-              ss << "a" << it->i0 << "=0;" << endl;
-            } else {
-              int ndep = casadi_math<double>::ndeps(it->op);
-              ss << "t=a" << it->i0 << "; ";
-              ss << "a" << it->i0 << "=0; ";
-              ss << "a" << it->i1 << "|=" << "t" << "; ";
-              if (ndep>1) {
-                ss << "a" << it->i2 << "|=" << "t" << "; ";
-              }
-              ss << endl;
-            }
-          }
-        }
-      }
-      ss << "}" << endl << endl;
-    }
-
-    // Form c-string
-    std::string s = ss.str();
-    if (verbose()) {
-      userOut() << "Kernel source code for sparsity propagation:" << endl;
-      userOut() << " ***** " << endl;
-      userOut() << s;
-      userOut() << " ***** " << endl;
-    }
-    const char* cstr = s.c_str();
-
-    // Parse kernel source code
-    sp_program_ = clCreateProgramWithSource(sparsity_propagation_kernel_.context,
-                                            1, static_cast<const char **>(&cstr), 0, &ret);
-    casadi_assert(ret == CL_SUCCESS);
-    casadi_assert(sp_program_ != 0);
-
-    // Build Kernel Program
-    compileProgram(sp_program_);
-
-    // Create OpenCL kernel for forward propatation
-    sp_forward_kernel_ = clCreateKernel(sp_program_, fcn_name[0], &ret);
-    casadi_assert(ret == CL_SUCCESS);
-
-    // Create OpenCL kernel for backward propatation
-    sp_adj_kernel_ = clCreateKernel(sp_program_, fcn_name[1], &ret);
-    casadi_assert(ret == CL_SUCCESS);
-
-    // Memory buffer for each of the input arrays
-    sp_input_memobj_.resize(n_in(), static_cast<cl_mem>(0));
-    for (int i=0; i<sp_input_memobj_.size(); ++i) {
-      sp_input_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
-                                           CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
-                                           inputNoCheck(i).size() * sizeof(cl_ulong),
-                                           reinterpret_cast<void*>(inputNoCheck(i).ptr()), &ret);
-      casadi_assert(ret == CL_SUCCESS);
-    }
-
-    // Memory buffer for each of the output arrays
-    sp_output_memobj_.resize(n_out(), static_cast<cl_mem>(0));
-    for (int i=0; i<sp_output_memobj_.size(); ++i) {
-      sp_output_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
-                                            CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
-                                            outputNoCheck(i).size() * sizeof(cl_ulong),
-                                            reinterpret_cast<void*>(outputNoCheck(i).ptr()), &ret);
-      casadi_assert(ret == CL_SUCCESS);
-    }
-  }
-
-  void SXFunction::spEvaluateOpenCL(bool fwd) {
-    // OpenCL return flag
-    cl_int ret;
-
-    // Select a kernel
-    cl_kernel kernel = fwd ? sp_forward_kernel_ : sp_adj_kernel_;
-
-    // Set OpenCL Kernel Parameters
-    int kernel_arg = 0;
-
-    // Pass inputs
-    for (int i=0; i<n_in(); ++i) {
-      ret = clSetKernelArg(kernel, kernel_arg++,
-                           sizeof(cl_mem), static_cast<void *>(&sp_input_memobj_[i]));
-      casadi_assert(ret == CL_SUCCESS);
-    }
-
-    // Pass outputs
-    for (int i=0; i<n_out(); ++i) {
-      ret = clSetKernelArg(kernel, kernel_arg++,
-                           sizeof(cl_mem), static_cast<void *>(&sp_output_memobj_[i]));
-      casadi_assert(ret == CL_SUCCESS);
-    }
-
-    // Execute OpenCL Kernel
-    executeKernel(kernel);
-
-    // Get inputs
-    for (int i=0; i<sp_input_memobj_.size(); ++i) {
-      ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue,
-                                sp_input_memobj_[i], CL_TRUE, 0,
-                                inputNoCheck(i).size() * sizeof(cl_ulong),
-                                reinterpret_cast<void*>(inputNoCheck(i).ptr()), 0, NULL, NULL);
-      casadi_assert(ret == CL_SUCCESS);
-    }
-
-    // Get outputs
-    for (int i=0; i<sp_output_memobj_.size(); ++i) {
-      ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue,
-                                sp_output_memobj_[i], CL_TRUE, 0,
-                                outputNoCheck(i).size() * sizeof(cl_ulong),
-                                reinterpret_cast<void*>(outputNoCheck(i).ptr()), 0, NULL, NULL);
-      casadi_assert(ret == CL_SUCCESS);
-    }
-  }
-
-  void SXFunction::spFreeOpenCL() {
-    // OpenCL return flag
-    cl_int ret;
-
-    // Clean up memory for input buffers
-    for (vector<cl_mem>::iterator i=sp_input_memobj_.begin(); i!=sp_input_memobj_.end(); ++i) {
-      if (*i != 0) {
-        ret = clReleaseMemObject(*i);
-        casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-      }
-    }
-    sp_input_memobj_.clear();
-
-    // Clean up memory for output buffers
-    for (vector<cl_mem>::iterator i=sp_output_memobj_.begin(); i!=sp_output_memobj_.end(); ++i) {
-      if (*i != 0) {
-        ret = clReleaseMemObject(*i);
-        casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-      }
-    }
-    sp_output_memobj_.clear();
-
-    // Free opencl forward propagation kernel
-    if (sp_forward_kernel_!=0) {
-      ret = clReleaseKernel(sp_forward_kernel_);
-      casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-      sp_forward_kernel_ = 0;
-    }
-
-    // Free opencl backward propagation kernel
-    if (sp_adj_kernel_!=0) {
-      ret = clReleaseKernel(sp_adj_kernel_);
-      casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-      sp_adj_kernel_ = 0;
-    }
-
-    // Free opencl program
-    if (sp_program_!=0) {
-      ret = clReleaseProgram(sp_program_);
-      casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-      sp_program_ = 0;
-    }
-  }
-
-  void SXFunction::allocOpenCL() {
-    // OpenCL return flag
-    cl_int ret;
-
-    // Generate the kernel source code
-    stringstream ss;
-
-    // Add kernel prefix
-    ss << "__kernel ";
-
-    // Generate the function
-    CodeGenerator gen;
-    codegen(ss, "evaluate", "__global const double*", "__global double*", "double", gen);
-
-    // Form c-string
-    std::string s = ss.str();
-    if (verbose()) {
-      userOut() << "Kernel source code for numerical evaluation:" << endl;
-      userOut() << " ***** " << endl;
-      userOut() << s;
-      userOut() << " ***** " << endl;
-    }
-    const char* cstr = s.c_str();
-
-    // Parse kernel source code
-    program_ = clCreateProgramWithSource(sparsity_propagation_kernel_.context, 1,
-                                         static_cast<const char **>(&cstr), 0, &ret);
-    casadi_assert(ret == CL_SUCCESS);
-    casadi_assert(program_ != 0);
-
-    // Build Kernel Program
-    compileProgram(program_);
-
-    // Create OpenCL kernel for forward propatation
-    kernel_ = clCreateKernel(program_, "evaluate", &ret);
-    casadi_assert(ret == CL_SUCCESS);
-
-    // Memory buffer for each of the input arrays
-    input_memobj_.resize(n_in(), static_cast<cl_mem>(0));
-    for (int i=0; i<input_memobj_.size(); ++i) {
-      input_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
-                                        CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR,
-                                        inputNoCheck(i).size() * sizeof(cl_double),
-                                        static_cast<void*>(inputNoCheck(i).ptr()), &ret);
-      casadi_assert(ret == CL_SUCCESS);
-    }
-
-    // Memory buffer for each of the output arrays
-    output_memobj_.resize(n_out(), static_cast<cl_mem>(0));
-    for (int i=0; i<output_memobj_.size(); ++i) {
-      output_memobj_[i] = clCreateBuffer(sparsity_propagation_kernel_.context,
-                                         CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR,
-                                         outputNoCheck(i).size() * sizeof(cl_double),
-                                         static_cast<void*>(outputNoCheck(i).ptr()), &ret);
-      casadi_assert(ret == CL_SUCCESS);
-    }
-
-
-  }
-
-  void SXFunction::evaluateOpenCL() {
-    // OpenCL return flag
-    cl_int ret;
-
-    // Set OpenCL Kernel Parameters
-    int kernel_arg = 0;
-
-    // Pass inputs
-    for (int i=0; i<n_in(); ++i) {
-      ret = clSetKernelArg(kernel_, kernel_arg++,
-                           sizeof(cl_mem), static_cast<void *>(&input_memobj_[i]));
-      casadi_assert(ret == CL_SUCCESS);
-    }
-
-    // Pass outputs
-    for (int i=0; i<n_out(); ++i) {
-      ret = clSetKernelArg(kernel_, kernel_arg++, sizeof(cl_mem),
-                           static_cast<void *>(&output_memobj_[i]));
-      casadi_assert(ret == CL_SUCCESS);
-    }
-
-    // Execute OpenCL Kernel
-    executeKernel(kernel_);
-
-    // Get outputs
-    for (int i=0; i<output_memobj_.size(); ++i) {
-      ret = clEnqueueReadBuffer(sparsity_propagation_kernel_.command_queue, output_memobj_[i],
-                                CL_TRUE, 0,
-                                outputNoCheck(i).size() * sizeof(cl_double),
-                                reinterpret_cast<void*>(outputNoCheck(i).ptr()), 0, NULL, NULL);
-      casadi_assert(ret == CL_SUCCESS);
-    }
-  }
-
-  void SXFunction::freeOpenCL() {
-    // OpenCL return flag
-    cl_int ret;
-
-    // Clean up memory for input buffers
-    for (vector<cl_mem>::iterator i=input_memobj_.begin(); i!=input_memobj_.end(); ++i) {
-      if (*i != 0) {
-        ret = clReleaseMemObject(*i);
-        casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-      }
-    }
-    input_memobj_.clear();
-
-    // Clean up memory for output buffers
-    for (vector<cl_mem>::iterator i=output_memobj_.begin(); i!=output_memobj_.end(); ++i) {
-      if (*i != 0) {
-        ret = clReleaseMemObject(*i);
-        casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-      }
-    }
-    output_memobj_.clear();
-
-    // Free opencl numerical evaluation kernel
-    if (kernel_!=0) {
-      ret = clReleaseKernel(kernel_);
-      casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-      kernel_ = 0;
-    }
-
-    // Free opencl program
-    if (program_!=0) {
-      ret = clReleaseProgram(program_);
-      casadi_assert_warning(ret == CL_SUCCESS, "Freeing OpenCL memory failed");
-      program_ = 0;
-    }
-  }
-
-  void SXFunction::compileProgram(cl_program program) {
-    // OpenCL return flag
-    cl_int ret;
-
-    ret = clBuildProgram(program, 1, &sparsity_propagation_kernel_.device_id, NULL, NULL, NULL);
-    if (ret!=CL_SUCCESS) {
-      const char* msg;
-      switch (ret) {
-      case CL_INVALID_PROGRAM: msg = "Program is not a valid program object."; break;
-      case CL_INVALID_VALUE: msg = "(1) Device_list is NULL and num_devices is greater than zero, "
-              "or device_list is not NULL and num_devices is zero. (2) pfn_notify "
-              "is NULL but user_data is not NULL."; break;
-      case CL_INVALID_DEVICE: msg = "OpenCL devices listed in device_list are not in the "
-              "list of devices associated with program"; break;
-      case CL_INVALID_BINARY: msg = "Program is created with clCreateWithProgramBinary and "
-              "devices listed in device_list do not have a valid program binary loaded."; break;
-      case CL_INVALID_BUILD_OPTIONS: msg = "The build options specified by options are invalid. ";
-          break;
-      case CL_INVALID_OPERATION: msg = "(1) The build of a program executable for any of the "
-              "devices listed in device_list by a previous call to clBuildProgram for program "
-              "has not completed. (2) There are kernel objects attached to program. "; break;
-      case CL_COMPILER_NOT_AVAILABLE: msg = "Program is created with clCreateProgramWithSource "
-              "and a compiler is not available i.e. CL_DEVICE_COMPILER_AVAILABLE specified "
-              "in table 4.3 is set to CL_FALSE."; break;
-      case CL_BUILD_PROGRAM_FAILURE: {
-        msg = "There is a failure to build the program executable. This error will be "
-            "returned if clBuildProgram does not return until the build has completed. ";
-
-        // Determine the size of the log
-        size_t log_size;
-        clGetProgramBuildInfo(program, sparsity_propagation_kernel_.device_id,
-                              CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
-
-        // Allocate memory for the log
-        std::vector<char> log;
-        log.resize(log_size);
-
-        // Print the log
-        clGetProgramBuildInfo(program, sparsity_propagation_kernel_.device_id,
-                              CL_PROGRAM_BUILD_LOG, log_size, &(log[0]), NULL);
-        userOut<true, PL_WARN>() << log << endl;
-        break;
-      }
-      case CL_OUT_OF_RESOURCES: msg = "There is a failure to allocate resources required by the "
-              "OpenCL implementation on the device."; break;
-      case CL_OUT_OF_HOST_MEMORY: msg = "There is a failure to allocate resources required by "
-              "the OpenCL implementation on the host."; break;
-      default: msg = "Unknown error"; break;
-      }
-
-      casadi_error("clBuildProgram failed: " << msg);
-    }
-  }
-
-  void SXFunction::executeKernel(cl_kernel kernel) {
-    // OpenCL return flag
-    cl_int ret;
-
-    // Execute OpenCL kernel
-    ret = clEnqueueTask(sparsity_propagation_kernel_.command_queue, kernel, 0, NULL, NULL);
-    if (ret!=CL_SUCCESS) {
-      const char* msg;
-      switch (ret) {
-      case CL_INVALID_PROGRAM_EXECUTABLE:
-          msg = "There is no successfully built program executable available "
-                "for device associated with command_queue.";
-          break;
-      case CL_INVALID_COMMAND_QUEUE: msg = "Command_queue is not a valid command-queue."; break;
-      case CL_INVALID_KERNEL: msg = "Kernel is not a valid kernel object."; break;
-      case CL_INVALID_CONTEXT:
-          msg = "Context associated with command_queue and kernel are not the "
-                "same or if the context associated with command_queue and "
-                "events in event_wait_list are not the same.";
-          break;
-      case CL_INVALID_KERNEL_ARGS: msg = "The kernel argument values have not been specified.";
-          break;
-      case CL_INVALID_WORK_GROUP_SIZE:
-          msg = "A work-group size is specified for kernel using the "
-              "__attribute__((reqd_work_group_size(X, Y, Z))) qualifier in "
-              "program source and is not (1, 1, 1).";
-          break;
-      case CL_MISALIGNED_SUB_BUFFER_OFFSET:
-          msg = "A sub-buffer object is specified as the value for an argument"
-              " that is a buffer object and the offset specified when the "
-              "sub-buffer object is created is not aligned to "
-              "CL_DEVICE_MEM_BASE_ADDR_ALIGN value for device associated with "
-              "queue.";
-          break;
-      case CL_INVALID_IMAGE_SIZE:
-          msg = "n image object is specified as an argument value and the image"
-              " dimensions (image width, height, specified or compute col "
-              "and/or slice pitch) are not supported by device associated "
-              "with queue";
-          break;
-      case CL_OUT_OF_RESOURCES:
-          msg = "(1) There is a failure to queue the execution instance of "
-              "kernel on the command-queue because of insufficient resources"
-              " needed to execute the kernel. (2) There is a failure to "
-              "allocate resources required by the OpenCL implementation "
-              "on the device.";
-          break;
-      case CL_MEM_OBJECT_ALLOCATION_FAILURE:
-          msg = "There is a failure to allocate memory for data store "
-              "associated with image or buffer objects specified as "
-              "arguments to kernel.";
-          break;
-      case CL_INVALID_EVENT_WAIT_LIST:
-          msg = "Event_wait_list is NULL and num_events_in_wait_list > 0, or "
-              "event_wait_list is not NULL and num_events_in_wait_list is 0, "
-              "or if event objects in event_wait_list are not valid events. ";
-          break;
-      case CL_OUT_OF_HOST_MEMORY:
-          msg = "There is a failure to allocate resources required by the "
-              "OpenCL implementation on the host.";
-          break;
-      default: msg = "Unknown error"; break;
-      }
-
-      casadi_error("clEnqueueTask failed: " << msg);
-    }
-  }
-
-#endif // WITH_OPENCL
-
   const SX SXFunction::sx_in(int ind) const {
     return in_.at(ind);
   }
@@ -1376,12 +818,8 @@ namespace casadi {
     return in_;
   }
 
-  std::string SXFunction::type_name() const {
-    return "sxfunction";
-  }
-
   bool SXFunction::is_a(const std::string& type, bool recursive) const {
-    return type=="sxfunction" || (recursive && XFunction<SXFunction,
+    return type=="SXFunction" || (recursive && XFunction<SXFunction,
                                   SX, SXNode>::is_a(type, recursive));
   }
 

@@ -49,11 +49,6 @@ namespace casadi {
     // Destructor
     ~Conic() override = 0;
 
-    /** \brief Get type name */
-    std::string type_name() const override {
-      return std::string("conic_") + plugin_name();
-    }
-
     ///@{
     /** \brief Number of function inputs and outputs */
     size_t get_n_in() override { return CONIC_NUM_IN;}
@@ -82,7 +77,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// \brief Check if the numerical values of the supplied bounds make sense
-    virtual void checkInputs(const double* lbx, const double* ubx,
+    virtual void check_inputs(const double* lbx, const double* ubx,
                              const double* lba, const double* uba) const;
 
     /** Generate native code in the interfaced language for debugging */

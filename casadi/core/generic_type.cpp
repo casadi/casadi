@@ -81,7 +81,7 @@ namespace casadi {
     case OT_STRINGVECTOR:
       return std::vector<std::string>();
     default:
-      casadi_error("empty_from_type. Unsupported type " << type);
+      casadi_error("empty_from_type. Unsupported type " + str(type));
     }
   }
 
@@ -179,9 +179,9 @@ namespace casadi {
 
   ostream& operator<<(ostream &stream, const GenericType& ref) {
     if (ref.is_null()) {
-      stream << "None";
+      stream << "NULL";
     } else {
-      ref->print_long(stream);
+      ref->disp(stream, false);
     }
     return stream;
   }

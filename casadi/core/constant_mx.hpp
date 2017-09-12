@@ -60,11 +60,11 @@ namespace casadi {
     static ConstantMX* create(const Matrix<double>& val);
 
     /// Evaluate the function numerically
-    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override = 0;
+    int eval(const double** arg, double** res, int* iw, double* w) const override = 0;
 
     /// Evaluate the function symbolically (SX)
-    void eval_sx(const SXElem** arg, SXElem** res,
-                         int* iw, SXElem* w, int mem) const override = 0;
+    int eval_sx(const SXElem** arg, SXElem** res,
+                         int* iw, SXElem* w) const override = 0;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
@@ -78,10 +78,10 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward */
-    void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /** \brief Get the operation */
     int op() const override { return OP_CONST;}
@@ -134,23 +134,25 @@ namespace casadi {
     ~ConstantDM() override {}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override {
+    std::string disp(const std::vector<std::string>& arg) const override {
       return x_.get_str();
     }
 
     /** \brief  Evaluate the function numerically */
-    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override {
+    int eval(const double** arg, double** res, int* iw, double* w) const override {
       std::copy(x_->begin(), x_->end(), res[0]);
+      return 0;
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    void eval_sx(const SXElem** arg, SXElem** res,
-                         int* iw, SXElem* w, int mem) const override {
+    int eval_sx(const SXElem** arg, SXElem** res,
+                         int* iw, SXElem* w) const override {
       std::copy(x_->begin(), x_->end(), res[0]);
+      return 0;
     }
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /** \brief  Check if a particular integer value */
@@ -193,18 +195,22 @@ namespace casadi {
     }
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override {}
+    int eval(const double** arg, double** res, int* iw, double* w) const override {
+      return 0;
+    }
 
     /// Evaluate the function symbolically (SX)
-    void eval_sx(const SXElem** arg, SXElem** res,
-                         int* iw, SXElem* w, int mem) const override {}
+    int eval_sx(const SXElem** arg, SXElem** res,
+                         int* iw, SXElem* w) const override {
+      return 0;
+    }
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                       const std::vector<int>& arg, const std::vector<int>& res) const override {}
 
     /// Get the value (only for scalar constant nodes)
@@ -270,17 +276,17 @@ namespace casadi {
     ~Constant() override {}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate the function numerically */
     /// Evaluate the function numerically
-    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /** \brief  Check if a particular integer value */
@@ -463,18 +469,20 @@ namespace casadi {
   }
 
   template<typename Value>
-  void Constant<Value>::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  int Constant<Value>::eval(const double** arg, double** res, int* iw, double* w) const {
     std::fill(res[0], res[0]+nnz(), static_cast<double>(v_.value));
+    return 0;
   }
 
   template<typename Value>
-  void Constant<Value>::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int Constant<Value>::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
     std::fill(res[0], res[0]+nnz(), SXElem(v_.value));
+    return 0;
   }
 
   template<typename Value>
-  void Constant<Value>::generate(CodeGenerator& g, const std::string& mem,
+  void Constant<Value>::generate(CodeGenerator& g,
                                  const std::vector<int>& arg, const std::vector<int>& res) const {
     if (nnz()==0) {
       // Quick return
@@ -522,7 +530,7 @@ namespace casadi {
 
   template<typename Value>
   std::string
-  Constant<Value>::print(const std::vector<std::string>& arg) const {
+  Constant<Value>::disp(const std::vector<std::string>& arg) const {
     std::stringstream ss;
     if (sparsity().is_scalar()) {
       // Print scalar
@@ -533,7 +541,7 @@ namespace casadi {
       }
     } else if (sparsity().is_empty()) {
       // Print empty
-      sparsity().print_compact(ss);
+      sparsity().disp(ss);
     } else {
       // Print value
       if (v_.value==0) {
@@ -551,7 +559,7 @@ namespace casadi {
       }
 
       // Print sparsity
-      sparsity().print_compact(ss);
+      sparsity().disp(ss);
       ss << ")";
     }
     return ss.str();

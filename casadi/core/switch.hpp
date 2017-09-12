@@ -47,7 +47,7 @@ namespace casadi {
     ~Switch() override;
 
     /** \brief Get type name */
-    std::string type_name() const override {return "switch";}
+    std::string class_name() const override {return "Switch";}
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -65,10 +65,10 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief  Evaluate numerically, work vectors given */
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
-    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const override;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
@@ -89,7 +89,7 @@ namespace casadi {
     ///@}
 
     /** \brief  Print description */
-    void print_long(std::ostream &stream) const override;
+    void disp_more(std::ostream& stream) const override;
 
     /** \brief Generate code for the declarations of the C function */
     void codegen_declarations(CodeGenerator& g) const override;

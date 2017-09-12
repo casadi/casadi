@@ -53,15 +53,12 @@ class MyCallback(Callback):
     self.ng = ng
     self.np = np
 
-    opts['input_scheme'] = nlpsol_out()
-    opts['output_scheme'] = ['ret']
-
     figure(1)
     subplot(111)
-    
+
     x_,y_ = mgrid[-1:1.5:0.01,-1:1.5:0.01]
     z_ = DM.zeros(x_.shape)
-    
+
     for i in range(x_.shape[0]):
       for j in range(x_.shape[1]):
         z_[i,j] = fcn(x_[i,j],y_[i,j])
@@ -69,7 +66,7 @@ class MyCallback(Callback):
     colorbar()
     title('Iterations of Rosenbrock')
     draw()
-    
+
     self.x_sols = []
     self.y_sols = []
 
@@ -78,7 +75,8 @@ class MyCallback(Callback):
 
   def get_n_in(self): return nlpsol_n_out()
   def get_n_out(self): return 1
-
+  def get_name_in(self, i): return nlpsol_out(i)
+  def get_name_out(self, i): return "ret"
 
   def get_sparsity_in(self, i):
     n = nlpsol_out(i)

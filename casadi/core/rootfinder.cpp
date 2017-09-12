@@ -122,10 +122,8 @@ namespace casadi {
                           "Unknown must be a dense vector");
     n_ = oracle_.nnz_out(iout_);
     casadi_assert_message(n_ == oracle_.nnz_in(iin_),
-                          "Dimension mismatch. Input size is "
-                          << oracle_.nnz_in(iin_)
-                          << ", while output size is "
-                          << oracle_.nnz_out(iout_));
+      "Dimension mismatch. Input size is " + str(oracle_.nnz_in(iin_)) + ", "
+      "while output size is " + str(oracle_.nnz_out(iout_)));
 
     // Call the base class initializer
     OracleFunction::init(opts);
@@ -138,15 +136,15 @@ namespace casadi {
     // Check for structural singularity in the Jacobian
     casadi_assert_message(!sp_jac_.is_singular(),
       "Rootfinder::init: singularity - the jacobian is structurally rank-deficient. "
-      "sprank(J)=" << sprank(sp_jac_) << " (instead of "<< sp_jac_.size1() << ")");
+      "sprank(J)=" + str(sprank(sp_jac_)) + " (instead of " + str(sp_jac_.size1()) + ")");
 
     // Get the linear solver creator function
     linsol_ = Linsol("linsol", linear_solver, linear_solver_options);
 
     // Constraints
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),
-                          "Constraint vector if supplied, must be of length n, but got "
-                          << u_c_.size() << " and n = " << n_);
+      "Constraint vector if supplied, must be of length n, but got "
+      + str(u_c_.size()) + " and n = " + str(n_));
 
     // Allocate sufficiently large work vectors
     alloc(oracle_);
@@ -157,18 +155,20 @@ namespace casadi {
     alloc_w(sz_w + 2*static_cast<size_t>(n_));
   }
 
-  void Rootfinder::init_memory(void* mem) const {
-    OracleFunction::init_memory(mem);
+  int Rootfinder::init_mem(void* mem) const {
+    if (OracleFunction::init_mem(mem)) return 1;
     //auto m = static_cast<RootfinderMemory*>(mem);
     linsol_.reset(sp_jac_);
+    return 0;
   }
 
-  void Rootfinder::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int Rootfinder::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Reset the solver, prepare for solution
     setup(mem, arg, res, iw, w);
 
     // Solve the NLP
     solve(mem);
+    return 0;
   }
 
   void Rootfinder::set_work(void* mem, const double**& arg, double**& res,
@@ -239,7 +239,8 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  void Rootfinder::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Rootfinder::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     int num_out = n_out();
     int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
@@ -266,9 +267,10 @@ namespace casadi {
       res1[iout_] = 0;
       oracle_(arg1, res1, iw, w, 0);
     }
+    return 0;
   }
 
-  void Rootfinder::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Rootfinder::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     int num_out = n_out();
     int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
@@ -290,7 +292,7 @@ namespace casadi {
     copy(arg, arg+num_in, arg1);
     arg1[iin_] = tmp1;
     if (num_out>1) {
-      oracle_.rev(arg1, res1, iw, w, 0);
+      if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
     }
 
     // "Solve" in order to get seed
@@ -301,7 +303,8 @@ namespace casadi {
     for (int i=0; i<num_out; ++i) res1[i] = 0;
     res1[iout_] = tmp2;
     arg1[iin_] = 0; // just a guess
-    oracle_.rev(arg1, res1, iw, w, 0);
+    if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
+    return 0;
   }
 
   std::map<std::string, Rootfinder::Plugin> Rootfinder::solvers_;

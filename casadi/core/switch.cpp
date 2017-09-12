@@ -133,7 +133,7 @@ namespace casadi {
     alloc_w(sz_buf, true);
   }
 
-  void Switch::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int Switch::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Shorthands
     int n_in=this->n_in()-1, n_out=this->n_out();
 
@@ -180,7 +180,7 @@ namespace casadi {
     }
 
     // Evaluate the corresponding function
-    fk(arg1, res1, iw, w, 0);
+    if (fk(arg1, res1, iw, w, 0)) return 1;
 
     // Project results with different sparsity
     if (project_out_) {
@@ -192,6 +192,7 @@ namespace casadi {
         }
       }
     }
+    return 0;
   }
 
   Function Switch
@@ -252,18 +253,19 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  void Switch::print_long(ostream &stream) const {
+  void Switch::disp_more(ostream &stream) const {
+    // Print more
     if (f_.size()==1) {
       // Print as if-then-else
-      stream << "Switch(" << f_def_.name() << ", " << f_[0].name() << ")";
+      stream << f_def_.name() << ", " << f_[0].name();
     } else {
       // Print generic
-      stream << "Switch([";
+      stream << "[";
       for (int k=0; k<f_.size(); ++k) {
         if (k!=0) stream << ", ";
         stream << f_[k].name();
       }
-      stream << "], " << f_def_.name() << ")";
+      stream << "], " << f_def_.name();
     }
   }
 
@@ -274,7 +276,7 @@ namespace casadi {
     }
   }
 
-  void Switch::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int Switch::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
 
     // Shorthands
     int n_in=this->n_in()-1, n_out=this->n_out();
@@ -335,7 +337,7 @@ namespace casadi {
       }
 
       // Evaluate the corresponding function
-      fk(arg1, res1, iw, wl, 0);
+      if (fk(arg1, res1, iw, wl, 0)) return 1;
 
       // Project results with different sparsity
       for (int i=0; i<n_out; ++i) {
@@ -358,7 +360,7 @@ namespace casadi {
       }
 
     }
-
+    return 0;
   }
 
   void Switch::codegen_body(CodeGenerator& g) const {
@@ -420,7 +422,7 @@ namespace casadi {
             } else {
               g.local("t", "casadi_real", "*");
               g << "t=w, w+=" << f_sp.nnz() << ";\n"
-                << g.project("arg1[" + to_string(i) + "]", sp, "t", f_sp, "w") << "\n"
+                << g.project("arg1[" + str(i) + "]", sp, "t", f_sp, "w") << "\n"
                 << "arg1[" << i << "]=t;\n";
             }
           }
@@ -449,8 +451,8 @@ namespace casadi {
           const Sparsity& f_sp = fk.sparsity_out(i);
           const Sparsity& sp = sparsity_out(i);
           if (f_sp!=sp) {
-            g << g.project("res1[" + to_string(i) + "]", f_sp,
-                           "res[" + to_string(i) + "]", sp, "w") << "\n";
+            g << g.project("res1[" + str(i) + "]", f_sp,
+                           "res[" + str(i) + "]", sp, "w") << "\n";
           }
         }
 

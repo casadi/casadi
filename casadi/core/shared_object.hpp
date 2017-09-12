@@ -123,11 +123,14 @@ namespace casadi {
     /// \endcond
 #endif // SWIG
 
-    /// Print a representation of the object
-    void print_short(std::ostream &stream) const;
+    /** \brief Get class name */
+    std::string class_name() const;
+
+    /// Readable name of the class
+    std::string type_name() const;
 
     /// Print a description of the object
-    void print_long(std::ostream &stream) const;
+    void disp(std::ostream& stream, bool more=false) const;
 
     /// \cond INTERNAL
     /// Print the pointer to the internal class

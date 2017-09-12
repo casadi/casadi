@@ -28,13 +28,6 @@
 
 #include "x_function.hpp"
 
-#ifdef WITH_OPENCL
-#ifdef __APPLE__
-#include <OpenCL/opencl.h>
-#else
-#include <CL/cl.h>
-#endif
-#endif // WITH_OPENCL
 /// \cond INTERNAL
 
 namespace casadi {
@@ -48,36 +41,6 @@ namespace casadi {
     };
   };
 
-#ifdef WITH_OPENCL
-  /** \brief Singleton for the sparsity propagation kernel
-      TODO: Move to a separate file and make non sparsity pattern specific
-      \author Joel Andersson
-      \date 2013
-  */
-  class SparsityPropagationKernel {
-  public:
-    // Default constructor
-    SparsityPropagationKernel();
-
-    // Destructor
-    ~SparsityPropagationKernel();
-
-    // Copy constructor and equality operator
-    // (not implemented, declared to prevent use of the default ones)
-    SparsityPropagationKernel(const SparsityPropagationKernel& sparsityPropagationKernel);
-    SparsityPropagationKernel&
-      operator=(const SparsityPropagationKernel& sparsityPropagationKernel);
-
-    // Data members (all public)
-    cl_device_id device_id;
-    cl_context context;
-    cl_command_queue command_queue;
-    cl_platform_id platform_id;
-    cl_uint ret_num_devices;
-    cl_uint ret_num_platforms;
-  };
-#endif // WITH_OPENCL
-
 /** \brief  Internal node class for SXFunction
     Do not use any internal class directly - always use the public Function
     \author Joel Andersson
@@ -88,17 +51,19 @@ class CASADI_EXPORT SXFunction :
   public:
     /** \brief Constructor */
     SXFunction(const std::string& name,
-                       const std::vector<Matrix<SXElem> >& inputv,
-                       const std::vector<Matrix<SXElem> >& outputv);
+               const std::vector<Matrix<SXElem> >& inputv,
+               const std::vector<Matrix<SXElem> >& outputv,
+               const std::vector<std::string>& name_in,
+               const std::vector<std::string>& name_out);
 
   /** \brief  Destructor */
   ~SXFunction() override;
 
   /** \brief  Evaluate numerically, work vectors given */
-  void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+  int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
   /** \brief  evaluate symbolically while also propagating directional derivatives */
-  void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+  int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const override;
 
   /** Inline calls? */
   bool should_inline(bool always_inline, bool never_inline) const override {
@@ -117,10 +82,10 @@ class CASADI_EXPORT SXFunction :
   bool is_smooth() const;
 
   /** \brief  Print the algorithm */
-  void print_long(std::ostream &stream) const override;
+  void disp_more(std::ostream& stream) const override;
 
   /** \brief Get type name */
-  std::string type_name() const override;
+  std::string class_name() const override {return "SXFunction";}
 
   /** \brief Check if the function is of a particular type */
   bool is_a(const std::string& type, bool recursive) const override;
@@ -220,10 +185,10 @@ class CASADI_EXPORT SXFunction :
   void codegen_body(CodeGenerator& g) const override;
 
   /** \brief  Propagate sparsity forward */
-  void sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+  int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
   /** \brief  Propagate sparsity backwards */
-  void sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+  int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
   /** \brief Return Jacobian of all input elements with respect to all output elements */
   Function get_jacobian(const std::string& name,
@@ -239,50 +204,6 @@ class CASADI_EXPORT SXFunction :
 
   /// With just-in-time compilation for the sparsity propagation
   bool just_in_time_sparsity_;
-
-#ifdef WITH_OPENCL
-  // Initialize sparsity propagation using OpenCL
-  void allocOpenCL();
-
-  // Propagate sparsity using OpenCL
-  void evaluateOpenCL();
-
-  // Free memory for sparsity propagation using OpenCL
-  void freeOpenCL();
-
-  // Initialize sparsity propagation using OpenCL
-  void spAllocOpenCL();
-
-  // Propagate sparsity using OpenCL
-  void spEvaluateOpenCL(bool fwd);
-
-  // Free memory for sparsity propagation using OpenCL
-  void spFreeOpenCL();
-
-  // Compile OpenCL program
-  static void compileProgram(cl_program program);
-
-  // Execute OpenCL kernel
-  static void executeKernel(cl_kernel kernel);
-
-  // OpenCL memory object for the numerical evaluation
-  cl_program program_;
-
-  // OpenCL memory object for the sparsity propagation
-  cl_program sp_program_;
-
-  // Buffers and kernels for numerical evaluation
-  std::vector<cl_mem> input_memobj_, output_memobj_;
-  cl_kernel kernel_;
-
-  // Buffers and kernels for sparsity propagation
-  std::vector<cl_mem> sp_input_memobj_, sp_output_memobj_;
-  cl_kernel sp_forward_kernel_, sp_adj_kernel_;
-
-  // OpenCL context. TODO: Nothing class specific in this class, move to a central location
-  static SparsityPropagationKernel sparsity_propagation_kernel_;
-
-#endif // WITH_OPENCL
 };
 
 

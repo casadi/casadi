@@ -34,28 +34,31 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w);
+  int SubAssign::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void SubAssign::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w);
+  int SubAssign::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  void SubAssign::evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
+  int SubAssign::eval_gen(const T* const* arg, T* const* res, int* iw, T* w) const {
     casadi_error("not ready");
+    return 1;
   }
 
-  void SubAssign::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SubAssign::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     casadi_error("not ready");
+    return 1;
   }
 
-  void SubAssign::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SubAssign::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     casadi_error("not ready");
+    return 1;
   }
 
-  std::string SubAssign::print(const std::vector<std::string>& arg) const {
+  std::string SubAssign::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << "(" << arg.at(0) << "[" << i_ << ", " << j_ << "]=" << arg.at(1) << ")";
     return ss.str();
@@ -75,7 +78,7 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubAssign::generate(CodeGenerator& g, const std::string& mem,
+  void SubAssign::generate(CodeGenerator& g,
                            const std::vector<int>& arg, const std::vector<int>& res) const {
     casadi_error("not ready");
   }

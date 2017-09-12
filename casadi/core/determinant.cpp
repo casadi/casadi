@@ -34,7 +34,7 @@ namespace casadi {
     set_sparsity(Sparsity::dense(1, 1));
   }
 
-  std::string Determinant::print(const std::vector<std::string>& arg) const {
+  std::string Determinant::disp(const std::vector<std::string>& arg) const {
     return "det(" + arg.at(0) + ")";
   }
 

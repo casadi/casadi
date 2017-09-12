@@ -169,9 +169,9 @@ namespace casadi {
 
   }
 
-  void BSplineInterpolant::eval(void* mem, const double** arg, double** res,
-                               int* iw, double* w) const {
-    S_->eval(mem, arg, res, iw, w);
+  int BSplineInterpolant::eval(const double** arg, double** res,
+                                int* iw, double* w, void* mem) const {
+    return S_->eval(arg, res, iw, w, mem);
   }
 
   void BSplineInterpolant::codegen_body(CodeGenerator& g) const {

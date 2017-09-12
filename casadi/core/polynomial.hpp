@@ -82,11 +82,11 @@ namespace casadi {
     /// Remove excess zeros
     void trim();
 
-    /// Print a description of the object
-    void print_long(std::ostream &stream) const;
+    /// Readable name of the class
+    std::string type_name() const {return "Polynomial";}
 
-    /// Print a representation of the object
-    void print_short(std::ostream &stream) const;
+    /// Print a description of the object
+    void disp(std::ostream& stream, bool more=false) const;
 
     // Add
     Polynomial operator+(const Polynomial& b) const;

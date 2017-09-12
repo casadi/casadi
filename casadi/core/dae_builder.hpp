@@ -438,11 +438,11 @@ namespace casadi {
     /// Set the unit for a component
     void set_unit(const std::string& name, const std::string& val);
 
-    ///  Print representation
-    void print_short(std::ostream &stream) const;
+    /// Readable name of the class
+    std::string type_name() const {return "DaeBuilder";}
 
-    /// Print description
-    void print_long(std::ostream &stream) const;
+    ///  Print representation
+    void disp(std::ostream& stream, bool more=false) const;
 
     /// Add a variable
     void add_variable(const std::string& name, const Variable& var);

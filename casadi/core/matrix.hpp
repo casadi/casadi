@@ -35,6 +35,7 @@
 #include "runtime/casadi_runtime.hpp"
 #include "generic_matrix.hpp"
 #include "generic_expression.hpp"
+#include <random>
 
 namespace casadi {
 
@@ -275,8 +276,6 @@ namespace casadi {
     static Matrix<Scalar> simplify(const Matrix<Scalar> &x);
     static Matrix<Scalar> jacobian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
                                    const Dict& opts = Dict());
-    static Matrix<Scalar> gradient(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
-    static Matrix<Scalar> tangent(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
     static Matrix<Scalar> hessian(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
     static Matrix<Scalar> hessian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
                                     Matrix<Scalar>& g);
@@ -740,27 +739,24 @@ namespace casadi {
     /// Get name of the class
     static std::string type_name();
 
-    /// Print a description of the object
-    void print_long(std::ostream &stream) const;
-
     /// Get strings corresponding to the nonzeros and the interdependencies
     void print_split(std::vector<std::string>& SWIG_OUTPUT(nz),
                     std::vector<std::string>& SWIG_OUTPUT(inter)) const;
 
     /// Print a representation of the object
-    void print_short(std::ostream &stream) const;
+    void disp(std::ostream& stream, bool more=false) const;
 
     /// Print scalar
-    void print_scalar(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_scalar(std::ostream &stream) const;
 
     /// Print vector-style
-    void print_vector(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_vector(std::ostream &stream, bool truncate=true) const;
 
     /// Print dense matrix-stype
-    void print_dense(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_dense(std::ostream &stream, bool truncate=true) const;
 
     /// Print sparse matrix style
-    void print_sparse(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_sparse(std::ostream &stream, bool truncate=true) const;
 
     void clear();
     void resize(int nrow, int ncol);
@@ -874,7 +870,7 @@ namespace casadi {
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
         If there are symbolic primitives appearing more than once, the function will return
-        true and the names of the duplicate expressions will be printed to userOut<true, PL_WARN>().
+        true and the names of the duplicate expressions will be passed to casadi_warning.
         Note: Will mark the node using SXElem::set_temp.
         Make sure to call reset_input() after usage.
     */
@@ -909,6 +905,9 @@ namespace casadi {
 
     /** \brief Get all nonzeros */
     std::vector<Scalar> get_nonzeros() const { return nonzeros_;}
+
+    /** \brief Get all elements */
+    std::vector<Scalar> get_elements() const { return static_cast< std::vector<Scalar> >(*this);}
 
 #ifndef SWIG
     /** \brief Get all nonzeros */
@@ -949,6 +948,20 @@ namespace casadi {
     static void set_scientific(bool scientific);
     // @}
 
+    /// Seed the random number generator
+    static void rng(int seed);
+
+    ///@{
+    /** \brief Create a matrix with uniformly distributed random numbers */
+    static Matrix<Scalar> rand(int nrow=1, int ncol=1) { // NOLINT(runtime/threadsafe_fn)
+      return rand(Sparsity::dense(nrow, ncol)); // NOLINT(runtime/threadsafe_fn)
+    }
+    static Matrix<Scalar> rand(const Sparsity& sp); // NOLINT(runtime/threadsafe_fn)
+    static Matrix<Scalar> rand(const std::pair<int, int>& rc) { // NOLINT(runtime/threadsafe_fn)
+      return rand(rc.first, rc.second); // NOLINT(runtime/threadsafe_fn)
+    }
+    ///@}
+
 #ifndef SWIG
     /// Sparse matrix with a given sparsity with all values same
     Matrix(const Sparsity& sp, const Scalar& val, bool dummy);
@@ -971,6 +984,10 @@ namespace casadi {
     static int stream_precision_;
     static int stream_width_;
     static bool stream_scientific_;
+
+    /// Random number generator
+    static std::default_random_engine rng_;
+
 #endif // SWIG
   };
 

@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   QpoasesInterface::~QpoasesInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options QpoasesInterface::options_
@@ -307,7 +307,7 @@ namespace casadi {
     alloc_w(nx_+na_, true); // dual
   }
 
-  void QpoasesInterface::init_memory(void* mem) const {
+  int QpoasesInterface::init_mem(void* mem) const {
     auto m = static_cast<QpoasesMemory*>(mem);
     m->called_once = false;
 
@@ -328,10 +328,11 @@ namespace casadi {
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
     m->fstats["postprocessing"] = FStats();
+    return 0;
   }
 
-  void QpoasesInterface::
-  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int QpoasesInterface::
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<QpoasesMemory*>(mem);
 
     // Statistics
@@ -340,7 +341,7 @@ namespace casadi {
     m->fstats.at("preprocessing").tic();
 
     if (inputs_check_) {
-      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
 
     // Maxiumum number of working set changes
@@ -456,6 +457,7 @@ namespace casadi {
 
     // Show statistics
     if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
+    return 0;
   }
 
   std::string QpoasesInterface::getErrorMessage(int flag) {

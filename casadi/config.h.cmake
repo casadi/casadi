@@ -21,8 +21,8 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef BUILD_CASADI_CONFIG_H_
-#define BUILD_CASADI_CONFIG_H_
+#ifndef CASADI_CONFIG_H // NOLINT(build/header_guard)
+#define CASADI_CONFIG_H // NOLINT(build/header_guard)
 
 #define CASADI_MAJOR_VERSION ${CASADI_MAJOR_VERSION}
 #define CASADI_MINOR_VERSION ${CASADI_MINOR_VERSION}
@@ -40,4 +40,4 @@
 #define CASADI_PLUGINS "${CASADI_PLUGINS}"  // NOLINT(whitespace/line_length)
 #define CASADI_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"  // NOLINT(whitespace/line_length)
 
-#endif  // BUILD_CASADI_CONFIG_H_
+#endif  // CASADI_CONFIG_H // NOLINT(build/header_guard)

@@ -114,7 +114,9 @@ namespace casadi {
                                    const std::vector<std::string>& s_out,
                                    const Function::AuxOut& aux) {
     // Print progress
-    if (verbose_) userOut() << "Creating \"" << fname << "\"... " << flush;
+    if (verbose_) {
+      casadi_message(name_ + "::create_function " + fname + ":" + str(s_in) + "->" + str(s_out));
+    }
 
     // Retrieve specific set of options if available
     Dict specific_options;
@@ -127,9 +129,6 @@ namespace casadi {
     // Generate the function
     Function ret = oracle_.factory(fname, s_in, s_out, aux, opt);
     set_function(ret, fname, true);
-
-    // Print progress
-    if (verbose_) userOut() << "done" << endl;
 
     return ret;
   }
@@ -146,17 +145,17 @@ namespace casadi {
   int OracleFunction::
   calc_function(OracleMemory* m, const std::string& fcn,
                 const double* const* arg) const {
+    // Is the function monitored?
+    bool monitored = this->monitored(fcn);
+
     // Print progress
-    if (verbose_) userOut() << "Calling \"" << fcn << "\"... " << flush;
+    if (monitored) casadi_message("Calling \"" + fcn + "\"");
 
     // Respond to a possible Crl+C signals
     InterruptHandler::check();
 
     // Get function
     const Function& f = get_function(fcn);
-
-    // Is the function monitored?
-    bool monitored = this->monitored(fcn);
 
     // Get statistics structure
     FStats& fstats = m->fstats.at(fcn);
@@ -175,22 +174,24 @@ namespace casadi {
 
     // Print inputs nonzeros
     if (monitored) {
-      userOut() << fcn << " input nonzeros: " << endl;
+      std::stringstream s;
+      s << fcn << " input nonzeros:\n";
       for (int i=0; i<n_in; ++i) {
-        userOut() << " " << i << " (" << f.name_in(i) << "): ";
+        s << " " << i << " (" << f.name_in(i) << "): ";
         if (m->arg[i]) {
           // Print nonzeros
-          userOut() << "[";
+          s << "[";
           for (int k=0; k<f.nnz_in(i); ++k) {
-            if (k!=0) userOut() << ", ";
-            userOut() << m->arg[i][k];
+            if (k!=0) s << ", ";
+            s << m->arg[i][k];
           }
-          userOut() << "]" << endl;
+          s << "]\n";
         } else {
           // All zero input
-          userOut() << "0" << endl;
+          s << "0\n";
         }
       }
+      casadi_message(s.str());
     }
 
     // Evaluate memory-less
@@ -198,29 +199,30 @@ namespace casadi {
       f(m->arg, m->res, m->iw, m->w, 0);
     } catch(exception& ex) {
       // Fatal error
-      userOut<true, PL_WARN>()
-        << name() << ":" << fcn << " failed:" << ex.what() << endl;
+      casadi_warning(name() + ":" + fcn + " failed:" + std::string(ex.what()));
       return 1;
     }
 
     // Print output nonzeros
     if (monitored) {
-      userOut() << fcn << " output nonzeros: " << endl;
+      std::stringstream s;
+      s << fcn << " output nonzeros:\n";
       for (int i=0; i<n_out; ++i) {
-        userOut() << " " << i << " (" << f.name_out(i) << "): ";
+        s << " " << i << " (" << f.name_out(i) << "): ";
         if (m->res[i]) {
           // Print nonzeros
-          userOut() << "[";
+          s << "[";
           for (int k=0; k<f.nnz_out(i); ++k) {
-            if (k!=0) userOut() << ", ";
-            userOut() << m->res[i][k];
+            if (k!=0) s << ", ";
+            s << m->res[i][k];
           }
-          userOut() << "]" << endl;
+          s << "]\n";
         } else {
           // Ignored output
-          userOut() << " N/A" << endl;
+          s << " N/A\n";
         }
       }
+      casadi_message(s.str());
     }
 
     // Make sure not NaN or Inf
@@ -238,18 +240,14 @@ namespace casadi {
         if (regularity_check_) {
           casadi_error(ss.str());
         } else {
-          userOut<true, PL_WARN>() << ss.str() << endl;
+          casadi_warning(ss.str());
         }
-
         return -1;
       }
     }
 
     // Update stats
     fstats.toc();
-
-    // Print progress
-    if (verbose_) userOut() << "done" << endl;
 
     // Success
     return 0;
@@ -266,17 +264,16 @@ namespace casadi {
   }
 
   void OracleFunction::jit_dependencies(const std::string& fname) {
-    if (verbose())
-      log("OracleFunction::jit_dependencies", "compiling to "+ fname+"'.");
+    if (verbose_)
+      if (verbose_) casadi_message("compiling to "+ fname+"'.");
     // JIT dependent functions
     compiler_ = Importer(generate_dependencies(fname, Dict()),
                          compilerplugin_, jit_options_);
 
     // Replace the Oracle functions with generated functions
     for (auto&& e : all_functions_) {
-      if (verbose())
-        log("OracleFunction::jit_dependencies",
-            "loading '" + e.second.f.name() + "' from '" + fname + "'.");
+      if (verbose_)
+        if (verbose_) casadi_message("loading '" + e.second.f.name() + "' from '" + fname + "'.");
       if (e.second.jit) e.second.f = external(e.second.f.name(), compiler_);
     }
   }
@@ -309,12 +306,11 @@ namespace casadi {
     // Print header
     std::stringstream s;
     std::string blankName(maxNameLen, ' ');
-    s
-      << blankName
+    s << blankName
       << "      proc           wall      num           mean             mean"
       << endl << blankName
       << "      time           time     evals       proc time        wall time";
-    userOut() << s.str() << endl;
+    userOut() << s.str();
 
     // Sort the keys according to order
     std::vector<std::string> keys_order0;
@@ -384,13 +380,15 @@ namespace casadi {
     return stats;
   }
 
-  void OracleFunction::init_memory(void* mem) const {
+  int OracleFunction::init_mem(void* mem) const {
+    if (!mem) return 1;
     auto m = static_cast<OracleMemory*>(mem);
 
     // Create statistics
     for (auto&& e : all_functions_) {
       m->fstats[e.first] = FStats();
     }
+    return 0;
   }
 
   void OracleFunction::set_temp(void* mem, const double** arg, double** res,

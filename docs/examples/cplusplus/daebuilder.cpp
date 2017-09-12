@@ -66,7 +66,7 @@ int main(){
   dae.set_unit("m","kg");
 
   // Print DAE
-  cout << str(dae);
+  dae.disp(cout, true);
 
   return 0;
 }

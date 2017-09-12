@@ -127,13 +127,13 @@ namespace casadi {
     void jit_dependencies(const std::string& fname) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new OracleMemory();}
-
-    /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<OracleMemory*>(mem);}
+    void* alloc_mem() const override { return new OracleMemory();}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<OracleMemory*>(mem);}
 
     /** \brief Set the work vectors */
     void set_temp(void* mem, const double** arg, double** res,

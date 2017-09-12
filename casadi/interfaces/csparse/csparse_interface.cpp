@@ -50,7 +50,7 @@ namespace casadi {
   }
 
   CsparseInterface::~CsparseInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   CsparseMemory::~CsparseMemory() {
@@ -63,8 +63,8 @@ namespace casadi {
     LinsolInternal::init(opts);
   }
 
-  void CsparseInterface::init_memory(void* mem) const {
-    LinsolInternal::init_memory(mem);
+  int CsparseInterface::init_mem(void* mem) const {
+    return LinsolInternal::init_mem(mem);
   }
 
   void CsparseInterface::reset(void* mem, const int* sp) const {
@@ -107,15 +107,17 @@ namespace casadi {
 
     // Make sure that all entries of the linear system are valid
     for (int k=0; k<m->nnz(); ++k) {
-      casadi_assert_message(!isnan(A[k]), "Nonzero " << k << " is not-a-number");
-      casadi_assert_message(!isinf(A[k]), "Nonzero " << k << " is infinite");
+      casadi_assert_message(!isnan(A[k]),
+        "Nonzero " + str(k) + " is not-a-number");
+      casadi_assert_message(!isinf(A[k]),
+        "Nonzero " + str(k) + " is infinite");
     }
 
-    if (verbose()) {
+    if (verbose_) {
       userOut() << "CsparseInterface::prepare: numeric factorization" << endl;
       userOut() << "linear system to be factorized = " << endl;
       Sparsity sp = Sparsity::compressed(m->sparsity);
-      DM(sp, vector<double>(A, A+m->nnz())).print_sparse();
+      DM(sp, vector<double>(A, A+m->nnz())).print_sparse(userOut());
     }
 
     double tol = 1e-8;
@@ -133,18 +135,18 @@ namespace casadi {
             "structurally non-zero. Promoting these zeros to be structural "
             "zeros, the matrix was found to be structurally rank deficient."
             " sprank: " << sprank(temp.sparsity()) << " <-> " << temp.size2() << endl;
-        if (verbose()) {
+        if (verbose_) {
           ss << "Sparsity of the linear system: " << endl;
-          sp.print_long(ss); // print detailed
+          sp.disp(ss, true); // print detailed
         }
         throw CasadiException(ss.str());
       } else {
         stringstream ss;
         ss << "CsparseInterface::prepare: factorization failed, check if Jacobian is singular"
            << endl;
-        if (verbose()) {
+        if (verbose_) {
           ss << "Sparsity of the linear system: " << endl;
-          sp.print_long(ss); // print detailed
+          sp.disp(ss, true); // print detailed
         }
         throw CasadiException(ss.str());
       }

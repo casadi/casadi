@@ -75,7 +75,7 @@ namespace casadi {
     ~OutputNode() override;
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Check if evaluation output */
     bool is_output() const override {return true;}
