@@ -107,6 +107,15 @@ namespace casadi {
     // Number of directional derivatives
     int n_;
 
+    // Maximum allowed precision
+    double h_max_;
+
+    // Minumum relative precision: scale by abs(x[j])
+    double eps_;
+
+    // Minumum absolute precision: scale by h_max
+    double eps1_;
+
     // Dimensions
     int n_z_, n_r_;
 

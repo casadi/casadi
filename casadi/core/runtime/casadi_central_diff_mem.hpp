@@ -5,6 +5,8 @@ struct casadi_central_diff_mem {
   int n_x, n_r;
   // Perturbation sizes
   T1 *h;
+  // Perturbation size range
+  T1 h_max, eps, eps1;
   // (Current) differentiable inputs
   T1 *x, *x0;
   // (Current) differentiable outputs

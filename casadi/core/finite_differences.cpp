@@ -50,7 +50,16 @@ namespace casadi {
         "Second order perturbation size [default: 1e-3]"}},
       {"scheme",
        {OT_STRING,
-        "Differencing scheme [default: 'central']"}}
+        "Differencing scheme [default: 'central']"}},
+      {"h_max",
+       {OT_DOUBLE,
+        "Maximum step size [default 1.0]"}},
+      {"eps",
+       {OT_DOUBLE,
+        "Minimium relative perturbation size [default: machine precision]"}},
+      {"eps1",
+        {OT_DOUBLE,
+        "Minimium absolute perturbation size [default: machine precision]"}}
      }
   };
 
@@ -61,6 +70,8 @@ namespace casadi {
     // Default options
     h_ = 1e-8;
     h2_ = 1e-3;
+    h_max_ = 1.0;
+    eps_ = eps1_ = numeric_limits<double>::epsilon();
 
     // Read options
     for (auto&& op : opts) {
@@ -70,6 +81,12 @@ namespace casadi {
         h2_ = op.second;
       } else if (op.first=="scheme") {
         casadi_warning("Option 'scheme' currently ignored");
+      } else if (op.first=="h_max") {
+        h_max_ = op.second;
+      } else if (op.first=="eps") {
+        eps_ = op.second;
+      } else if (op.first=="eps1") {
+        eps1_ = op.second;
       }
     }
 
@@ -171,6 +188,9 @@ namespace casadi {
     m->r = r;
     m->x = w; w += n_;
     m->h = w; w += n_;
+    m->h_max = h_max_;
+    m->eps = eps_;
+    m->eps1 = eps1_;
     m->J = w; w += n_r_*n_;
     m->x0 = w; w += n_;
     m->r0 = w; w += n_r_;
@@ -253,6 +273,9 @@ namespace casadi {
       << "m->r = r;\n"
       << "m->x = w; w += " << n_ << ";\n"
       << "m->h = w; w += " << n_ << ";\n"
+      << "m->h_max = " << h_ << ";\n"
+      << "m->eps = " << eps_ << ";\n"
+      << "m->eps1 = " << eps1_ << ";\n"
       << "m->J = w; w += " << n_r_*n_ << ";\n"
       << "m->x0 = w; w += " << n_ << ";\n"
       << "m->r0 = w; w += " << n_r_ << ";\n"
