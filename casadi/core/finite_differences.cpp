@@ -76,7 +76,7 @@ namespace casadi {
     // Allocate work vector for (perturbed) inputs and outputs
     n_z_ = derivative_of_.nnz_in();
     n_r_ = derivative_of_.nnz_out();
-    alloc_w(2 * n_, true); // m->x, m->x0
+    alloc_w(3 * n_, true); // m->x, m->x0, m->h
     alloc_w(2 * n_r_, true); // m->r, m->r0
     alloc_w(n_*n_r_, true); // m->J
     alloc_w(n_z_, true); // z
@@ -168,9 +168,9 @@ namespace casadi {
     casadi_central_diff_mem<double> m_tmp, *m = &m_tmp;
     m->n_x = n_;
     m->n_r = n_r_;
-    m->h = h_;
     m->r = r;
     m->x = w; w += n_;
+    m->h = w; w += n_;
     m->J = w; w += n_r_*n_;
     m->x0 = w; w += n_;
     m->r0 = w; w += n_r_;
@@ -178,6 +178,9 @@ namespace casadi {
 
     // central_diff only sees a function with n_ inputs, initialized at 0
     casadi_fill(m->x, n_, 0.);
+
+    // Initial perturbation size
+    casadi_fill(m->h, n_, h_);
 
     // Setup arg, res for calling function
     double* z = w;
@@ -247,14 +250,15 @@ namespace casadi {
     g << "m = &m_tmp;\n"
       << "m->n_x = " << n_ << ";\n"
       << "m->n_r = " << n_r_ << ";\n"
-      << "m->h = " << h_ << ";\n"
       << "m->r = r;\n"
       << "m->x = w; w += " << n_ << ";\n"
+      << "m->h = w; w += " << n_ << ";\n"
       << "m->J = w; w += " << n_r_*n_ << ";\n"
       << "m->x0 = w; w += " << n_ << ";\n"
       << "m->r0 = w; w += " << n_r_ << ";\n"
       << "m->status = 0;\n";
     g << g.fill("m->x", n_, "0.") << "\n";
+    g << g.fill("m->h", n_, str(h_)) << "\n";
 
     g.comment("Setup buffers for calling function");
     g.local("z", "casadi_real", "*");
