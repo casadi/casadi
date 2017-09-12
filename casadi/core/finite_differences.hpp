@@ -33,8 +33,9 @@
 namespace casadi {
 
   /** Calculate derivative using central differences
-      \author Joel Andersson
-      \date 2017
+    * The algorithm is based on the package specification for TD12 in the HSL archive
+    * \author Joel Andersson
+    * \date 2017
   */
   class CASADI_EXPORT CentralDiff : public FunctionInternal {
   public:
@@ -104,6 +105,9 @@ namespace casadi {
     // Constructor (protected, use create function)
     CentralDiff(const std::string& name, int n);
 
+    // Dimensions
+    int n_z_, n_r_;
+
     // Number of directional derivatives
     int n_;
 
@@ -116,8 +120,8 @@ namespace casadi {
     // Minumum absolute precision: scale by h_max
     double eps1_;
 
-    // Dimensions
-    int n_z_, n_r_;
+    // Ratio of roundoff error to truncation error
+    double u_min_, u_aim_, u_max_;
 
     // Perturbation
     double h_, h2_;

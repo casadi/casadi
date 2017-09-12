@@ -7,6 +7,8 @@ struct casadi_central_diff_mem {
   T1 *h;
   // Perturbation size range
   T1 h_max, eps, eps1;
+  // Ratio of roundoff error to truncation error
+  T1 u_min, u_aim, u_max;
   // (Current) differentiable inputs
   T1 *x, *x0;
   // (Current) differentiable outputs
