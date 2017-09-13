@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "bilin"
 template<typename T1>
 T1 casadi_bilin(const T1* A, const int* sp_A, const T1* x, const T1* y) {
   // Get sparsities

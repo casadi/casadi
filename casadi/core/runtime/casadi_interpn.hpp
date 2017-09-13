@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "interpn"
 template<typename T1>
 T1 casadi_interpn(int ndim, const T1* grid, const int* offset, const T1* values, const T1* x, const int* lookup_mode, int* iw, T1* w) { // NOLINT(whitespace/line_length)
   // Work vectors

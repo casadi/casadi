@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "densify"
 template<typename T1, typename T2>
 void casadi_densify(const T1* x, const int* sp_x, T2* y, int tr) {
   // Quick return - output ignored

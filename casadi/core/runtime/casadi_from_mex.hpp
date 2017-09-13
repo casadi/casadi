@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "from_mex"
 template<typename T1>
 T1* casadi_from_mex(const mxArray* p, T1* y, const int* sp, T1* w) {
   if (!mxIsDouble(p) || mxGetNumberOfDimensions(p)!=2)

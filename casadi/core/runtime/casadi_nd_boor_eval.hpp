@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "nd_boor_eval"
 template<typename T1>
 void casadi_nd_boor_eval(T1* ret, int n_dims, const T1* all_knots, const int* offset, const int* all_degree, const int* strides, const T1* c, int m, const T1* all_x, const int* lookup_mode, int reverse, int* iw, T1* w) { // NOLINT(whitespace/line_length)
   int* boor_offset = iw; iw+=n_dims+1;

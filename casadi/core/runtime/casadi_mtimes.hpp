@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "mtimes"
 template<typename T1>
 void casadi_mtimes(const T1* x, const int* sp_x, const T1* y, const int* sp_y, T1* z, const int* sp_z, T1* w, int tr) { // NOLINT(whitespace/line_length)
   // Get sparsities

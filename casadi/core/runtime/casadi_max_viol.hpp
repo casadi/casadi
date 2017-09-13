@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "max_viol"
 template<typename T1>
 T1 casadi_max_viol(int n, const T1* x, const T1* lb, const T1* ub) {
   T1 r = 0;

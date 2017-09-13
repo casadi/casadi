@@ -579,28 +579,28 @@ namespace casadi {
     // Add the appropriate function
     switch (f) {
     case AUX_COPY:
-      this->auxiliaries << sanitize_source("copy", casadi_copy_str, inst);
+      this->auxiliaries << sanitize_source(casadi_copy_str, inst);
       break;
     case AUX_SWAP:
-      this->auxiliaries << sanitize_source("swap", casadi_swap_str, inst);
+      this->auxiliaries << sanitize_source(casadi_swap_str, inst);
       break;
     case AUX_SCAL:
-      this->auxiliaries << sanitize_source("scal", casadi_scal_str, inst);
+      this->auxiliaries << sanitize_source(casadi_scal_str, inst);
       break;
     case AUX_AXPY:
-      this->auxiliaries << sanitize_source("axpy", casadi_axpy_str, inst);
+      this->auxiliaries << sanitize_source(casadi_axpy_str, inst);
       break;
     case AUX_DOT:
-      this->auxiliaries << sanitize_source("dot", casadi_dot_str, inst);
+      this->auxiliaries << sanitize_source(casadi_dot_str, inst);
       break;
     case AUX_BILIN:
-      this->auxiliaries << sanitize_source("bilin", casadi_bilin_str, inst);
+      this->auxiliaries << sanitize_source(casadi_bilin_str, inst);
       break;
     case AUX_RANK1:
-      this->auxiliaries << sanitize_source("rank1", casadi_rank1_str, inst);
+      this->auxiliaries << sanitize_source(casadi_rank1_str, inst);
       break;
     case AUX_IAMAX:
-      this->auxiliaries << sanitize_source("iamax", casadi_iamax_str, inst);
+      this->auxiliaries << sanitize_source(casadi_iamax_str, inst);
       break;
     case AUX_INTERPN:
       add_auxiliary(AUX_INTERPN_WEIGHTS);
@@ -608,80 +608,79 @@ namespace casadi {
       add_auxiliary(AUX_FLIP, {});
       add_auxiliary(AUX_FILL);
       add_auxiliary(AUX_FILL, {"int"});
-      this->auxiliaries << sanitize_source("interpn", casadi_interpn_str, inst);
+      this->auxiliaries << sanitize_source(casadi_interpn_str, inst);
       break;
     case AUX_INTERPN_GRAD:
       add_auxiliary(AUX_INTERPN);
-      this->auxiliaries << sanitize_source("interpn_grad", casadi_interpn_grad_str, inst);
+      this->auxiliaries << sanitize_source(casadi_interpn_grad_str, inst);
       break;
     case AUX_DE_BOOR:
-      this->auxiliaries << sanitize_source("de_boor", casadi_de_boor_str, inst);
+      this->auxiliaries << sanitize_source(casadi_de_boor_str, inst);
       break;
     case AUX_ND_BOOR_EVAL:
       add_auxiliary(AUX_DE_BOOR);
       add_auxiliary(AUX_FILL);
       add_auxiliary(AUX_FILL, {"int"});
       add_auxiliary(AUX_LOW);
-      this->auxiliaries << sanitize_source("nd_boor_eval", casadi_nd_boor_eval_str, inst);
+      this->auxiliaries << sanitize_source(casadi_nd_boor_eval_str, inst);
       break;
     case AUX_FLIP:
-      this->auxiliaries << sanitize_source("flip", casadi_flip_str, inst);
+      this->auxiliaries << sanitize_source(casadi_flip_str, inst);
       break;
     case AUX_LOW:
-      this->auxiliaries << sanitize_source("low", casadi_low_str, inst);
+      this->auxiliaries << sanitize_source(casadi_low_str, inst);
       break;
     case AUX_INTERPN_WEIGHTS:
       add_auxiliary(AUX_LOW);
-      this->auxiliaries << sanitize_source("interpn_weights", casadi_interpn_weights_str, inst);
+      this->auxiliaries << sanitize_source(casadi_interpn_weights_str, inst);
       break;
     case AUX_INTERPN_INTERPOLATE:
-      this->auxiliaries << sanitize_source("interpn_interpolate",
-                                           casadi_interpn_interpolate_str, inst);
+      this->auxiliaries << sanitize_source(casadi_interpn_interpolate_str, inst);
       break;
     case AUX_NORM_1:
-      this->auxiliaries << sanitize_source("norm_1", casadi_norm_1_str, inst);
+      this->auxiliaries << sanitize_source(casadi_norm_1_str, inst);
       break;
     case AUX_NORM_2:
-      this->auxiliaries << sanitize_source("norm_2", casadi_norm_2_str, inst);
+      this->auxiliaries << sanitize_source(casadi_norm_2_str, inst);
       break;
     case AUX_NORM_INF:
-      this->auxiliaries << sanitize_source("norm_inf", casadi_norm_inf_str, inst);
+      this->auxiliaries << sanitize_source(casadi_norm_inf_str, inst);
       break;
     case AUX_FILL:
-      this->auxiliaries << sanitize_source("fill", casadi_fill_str, inst);
+      this->auxiliaries << sanitize_source(casadi_fill_str, inst);
       break;
     case AUX_MV:
-      this->auxiliaries << sanitize_source("mv", casadi_mv_str, inst);
+      this->auxiliaries << sanitize_source(casadi_mv_str, inst);
       break;
     case AUX_MV_DENSE:
-      this->auxiliaries << sanitize_source("mv_dense", casadi_mv_dense_str, inst);
+      this->auxiliaries << sanitize_source(casadi_mv_dense_str, inst);
       break;
     case AUX_MTIMES:
-      this->auxiliaries << sanitize_source("mtimes", casadi_mtimes_str, inst);
+      this->auxiliaries << sanitize_source(casadi_mtimes_str, inst);
       break;
     case AUX_PROJECT:
-      this->auxiliaries << sanitize_source("project", casadi_project_str, inst);
+      this->auxiliaries << sanitize_source(casadi_project_str, inst);
       break;
     case AUX_DENSIFY:
       add_auxiliary(AUX_FILL);
       {
         std::vector<std::string> inst2 = inst;
         if (inst.size()==1) inst2.push_back(inst[0]);
-        this->auxiliaries << sanitize_source("densify", casadi_densify_str, inst2);
+        this->auxiliaries << sanitize_source(casadi_densify_str, inst2);
       }
       break;
     case AUX_TRANS:
-      this->auxiliaries << sanitize_source("trans", casadi_trans_str, inst);
+      this->auxiliaries << sanitize_source(casadi_trans_str, inst);
       break;
     case AUX_TO_MEX:
       this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
-                        << sanitize_source("to_mex", casadi_to_mex_str, inst)
+                        << sanitize_source(casadi_to_mex_str, inst)
                         << "#endif\n\n";
       break;
     case AUX_FROM_MEX:
       add_auxiliary(AUX_FILL);
       this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
-                        << sanitize_source("from_mex", casadi_from_mex_str, inst)
+                        << sanitize_source(casadi_from_mex_str, inst)
                         << "#endif\n\n";
       break;
     case AUX_CENTRAL_DIFF:
@@ -689,7 +688,7 @@ namespace casadi {
       add_auxiliary(AUX_AXPY);
       add_auxiliary(AUX_SCAL);
       add_auxiliary(AUX_MV_DENSE);
-      this->auxiliaries << sanitize_source("central_diff", casadi_central_diff_str, inst);
+      this->auxiliaries << sanitize_source(casadi_central_diff_str, inst);
       break;
     }
   }
@@ -994,7 +993,7 @@ namespace casadi {
   }
 
   string CodeGenerator::
-  sanitize_source(const std::string& symbol, const std::string& src,
+  sanitize_source(const std::string& src,
                   const vector<string>& inst, bool add_shorthand) {
     // Create suffix if templates type are not all "casadi_real"
     string suffix;
@@ -1005,16 +1004,10 @@ namespace casadi {
       }
     }
 
-    // Add shorthand
-    if (add_shorthand) shorthand(symbol + suffix);
-
     // Construct map of name replacements
     std::vector<std::pair<std::string, std::string> > rep;
     for (int i=0; i<inst.size(); ++i) {
       rep.push_back(make_pair("T" + str(i+1), inst[i]));
-    }
-    if (!suffix.empty()) {
-      rep.push_back(make_pair(symbol, symbol + suffix));
     }
 
     // Return object

@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "low"
 template<typename T1>
 int casadi_low(T1 x, const double* grid, int ng, int lookup_mode) {
   if (lookup_mode) {

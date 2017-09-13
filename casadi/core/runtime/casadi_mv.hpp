@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "mv"
 template<typename T1>
 void casadi_mv(const T1* x, const int* sp_x, const T1* y, T1* z, int tr) {
   if (!x || !y || !z) return;

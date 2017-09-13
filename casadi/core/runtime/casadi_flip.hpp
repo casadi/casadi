@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "flip"
 inline
 int casadi_flip(int* corner, int ndim) {
   int i;

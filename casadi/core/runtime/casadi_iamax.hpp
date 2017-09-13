@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "iamax"
 template<typename T1>
 int casadi_iamax(int n, const T1* x, int inc_x) {
   T1 t;

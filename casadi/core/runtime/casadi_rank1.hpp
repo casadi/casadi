@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "rank1"
 template<typename T1>
 void casadi_rank1(T1* A, const int* sp_A, T1 alpha, const T1* x, const T1* y) {
   // Get sparsities

@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "copy"
 template<typename T1>
 void casadi_copy(const T1* x, int n, T1* y) {
   int i;

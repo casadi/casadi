@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "to_mex"
 template<typename T1>
 mxArray* casadi_to_mex(const int* sp, const T1* x) {
   int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];

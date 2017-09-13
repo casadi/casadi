@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "de_boor"
 template<typename T1>
 void casadi_de_boor(T1 x, const T1* knots, int n_knots, int degree, T1* boor) {
   // length boor: n_knots-1

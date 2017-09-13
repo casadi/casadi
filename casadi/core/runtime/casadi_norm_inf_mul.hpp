@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "norm_inf_mul"
 template<typename T1>
 T1 casadi_norm_inf_mul(const T1* x, const int* sp_x, const T1* y, const int* sp_y, T1* dwork, int* iwork) { // NOLINT(whitespace/line_length)
   T1 res = 0;

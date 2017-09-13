@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "getu"
 template<typename T1>
 void casadi_getu(const T1* x, const int* sp_x, T1* v) {
   // Get sparsities

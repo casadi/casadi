@@ -21,6 +21,7 @@ struct casadi_central_diff_mem {
 };
 
 // C-REPLACE "casadi_central_diff_mem<T1>" "struct casadi_central_diff_mem"
+// SYMBOL "central_diff"
 template<typename T1>
 int casadi_central_diff(casadi_central_diff_mem<T1>* m) {
   // Control loop

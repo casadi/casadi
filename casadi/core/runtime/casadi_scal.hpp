@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "scal"
 template<typename T1>
 void casadi_scal(int n, T1 alpha, T1* x) {
   if (!x) return;

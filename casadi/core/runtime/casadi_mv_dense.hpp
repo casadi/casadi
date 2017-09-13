@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "mv_dense"
 template<typename T1>
 void casadi_mv_dense(const T1* x, int nrow_x, int ncol_x, const T1* y, T1* z, int tr) {
   if (!x || !y || !z) return;

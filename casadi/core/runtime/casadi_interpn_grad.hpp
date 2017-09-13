@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "interpn_grad"
 template<typename T1>
 void casadi_interpn_grad(T1* grad, int ndim, const T1* grid, const int* offset, const T1* values, const T1* x, const int* lookup_mode, int* iw, T1* w) { // NOLINT(whitespace/line_length)
   // Quick return

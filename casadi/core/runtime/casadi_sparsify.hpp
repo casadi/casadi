@@ -1,4 +1,5 @@
 // NOLINT(legal/copyright)
+// SYMBOL "sparsify"
 template<typename T1, typename T2>
 void casadi_sparsify(const T1* x, T2* y, const int* sp_y, int tr) {
   int nrow_y = sp_y[0], ncol_y = sp_y[1];
