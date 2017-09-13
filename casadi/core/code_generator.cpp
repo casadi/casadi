@@ -684,25 +684,12 @@ namespace casadi {
                         << sanitize_source("from_mex", casadi_from_mex_str, inst)
                         << "#endif\n\n";
       break;
-    case AUX_CENTRAL_DIFF_MEM:
-      this->auxiliaries << sanitize_source("central_diff_mem", casadi_central_diff_mem_str, inst);
-      break;
     case AUX_CENTRAL_DIFF:
       add_auxiliary(AUX_COPY);
       add_auxiliary(AUX_AXPY);
       add_auxiliary(AUX_SCAL);
       add_auxiliary(AUX_MV_DENSE);
-      add_auxiliary(AUX_CENTRAL_DIFF_MEM);
-      {
-        string s = sanitize_source("central_diff", casadi_central_diff_str, inst);
-        string::size_type n = 0;
-        string r1 = "casadi_central_diff_mem", r2 = "struct casadi_central_diff_mem";
-        while ((n = s.find(r1, n)) != string::npos) {
-          s.replace(n, r1.size(), r2);
-          n += r2.size();
-        }
-        this->auxiliaries << s;
-      }
+      this->auxiliaries << sanitize_source("central_diff", casadi_central_diff_str, inst);
       break;
     }
   }
@@ -1022,25 +1009,24 @@ namespace casadi {
     if (add_shorthand) shorthand(symbol + suffix);
 
     // Construct map of name replacements
-    std::map<std::string, std::string> rep;
-    for (int i=0; i<inst.size(); ++i) rep["T" + str(i+1)] = inst[i];
-    if (!suffix.empty()) rep[symbol] = symbol + suffix;
+    std::vector<std::pair<std::string, std::string> > rep;
+    for (int i=0; i<inst.size(); ++i) {
+      rep.push_back(make_pair("T" + str(i+1), inst[i]));
+    }
+    if (!suffix.empty()) {
+      rep.push_back(make_pair(symbol, symbol + suffix));
+    }
 
     // Return object
     stringstream ret;
-    // Number of template parameters
-    size_t npar = 0;
     // Process C++ source
     string line;
     istringstream stream(src);
     while (std::getline(stream, line)) {
-      size_t n1;
+      size_t n1, n2;
 
-      // C++ template declaration
-      if (line.find("template")==0) {
-        npar = count(line.begin(), line.end(), ',') + 1;
-        continue;
-      }
+      // C++ template declarations are ignored
+      if (line.find("template")==0) continue;
 
       // Macro definitions are ignored
       if (line.find("#define")==0) continue;
@@ -1049,7 +1035,35 @@ namespace casadi {
       // Inline declaration
       if (line == "inline") continue;
 
-      // Ignore C++ style comment
+      // If line starts with "// SYMBOL", add shorthand
+      // If line starts with "// C-REPLACE", add to list of replacements
+      if (line.find("// SYMBOL")==0) {
+        n1 = line.find("\"");
+        n2 = line.find("\"", n1+1);
+        string sym = line.substr(n1+1, n2-n1-1);
+        if (add_shorthand) shorthand(sym + suffix);
+        if (!suffix.empty()) {
+          rep.push_back(make_pair(sym, sym + suffix));
+        }
+        continue;
+      }
+
+      // If line starts with "// C-REPLACE", add to list of replacements
+      if (line.find("// C-REPLACE")==0) {
+        // Get C++ string
+        n1 = line.find("\"");
+        n2 = line.find("\"", n1+1);
+        string key = line.substr(n1+1, n2-n1-1);
+        // Get C string
+        n1 = line.find("\"", n2+1);
+        n2 = line.find("\"", n1+1);
+        string sub = line.substr(n1+1, n2-n1-1);
+        // Add to replacements
+        rep.push_back(make_pair(key, sub));
+        continue;
+      }
+
+      // Ignore other C++ style comment
       if ((n1 = line.find("//")) != string::npos) line.erase(n1);
 
       // Remove trailing spaces
@@ -1060,21 +1074,17 @@ namespace casadi {
       }
 
       // Perform string replacements
-      for (auto&& r : rep) {
+      for (auto&& it = rep.rbegin(); it!=rep.rend(); ++it) {
         string::size_type n = 0;
-        while ((n = line.find(r.first, n)) != string::npos) {
-          line.replace(n, r.first.size(), r.second);
-          n += r.second.size();
+        while ((n = line.find(it->first, n)) != string::npos) {
+          line.replace(n, it->first.size(), it->second);
+          n += it->second.size();
         }
       }
 
       // Append to return
       ret << line << "\n";
     }
-
-    // Assert number of template parameters
-    casadi_assert_message(npar==inst.size(),
-      "Mismatching number of template parameters for " + symbol);
 
     // Trailing newline
     ret << "\n";

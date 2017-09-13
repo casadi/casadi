@@ -230,7 +230,6 @@ namespace casadi {
       AUX_INTERPN_INTERPOLATE,
       AUX_DE_BOOR,
       AUX_ND_BOOR_EVAL,
-      AUX_CENTRAL_DIFF_MEM,
       AUX_CENTRAL_DIFF
     };
 

@@ -1,7 +1,28 @@
 // NOLINT(legal/copyright)
-#define casadi_central_diff_mem casadi_central_diff_mem<T1>
+// SYMBOL "central_diff_mem"
 template<typename T1>
-int casadi_central_diff(casadi_central_diff_mem* m) {
+struct casadi_central_diff_mem {
+  // Dimensions
+  int n_x, n_r;
+  // Perturbation sizes
+  T1 *h;
+  // Perturbation size range
+  T1 h_max, eps, eps1;
+  // Ratio of roundoff error to truncation error
+  T1 u_min, u_aim, u_max;
+  // (Current) differentiable inputs
+  T1 *x, *x0;
+  // (Current) differentiable outputs
+  T1 *r, *r0;
+  // Jacobian
+  T1* J;
+  // Control
+  int status, i;
+};
+
+// C-REPLACE "casadi_central_diff_mem<T1>" "struct casadi_central_diff_mem"
+template<typename T1>
+int casadi_central_diff(casadi_central_diff_mem<T1>* m) {
   // Control loop
   const int wait_for_pos_pert=1, wait_for_neg_pert=2;
   switch (m->status) {
@@ -36,4 +57,3 @@ int casadi_central_diff(casadi_central_diff_mem* m) {
   m->status = 0;
   return 0;
 }
-#undef casadi_central_diff_mem
