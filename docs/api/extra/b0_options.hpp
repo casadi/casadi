@@ -465,8 +465,11 @@
 <tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>eps</td><td>OT_DOUBLE</td><td>Minimium relative perturbation size [default: machine precision]</td><td>casadi::CentralDiff</td></tr>
+<tr><td>eps1</td><td>OT_DOUBLE</td><td>Minimium absolute perturbation size [default: machine precision]</td><td>casadi::CentralDiff</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Perturbation size for finite differencing [default: 1e-8]]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>h_max</td><td>OT_DOUBLE</td><td>Maximum step size [default 1.0]</td><td>casadi::CentralDiff</td></tr>
 <tr><td>input_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOL</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jac_penalty</td><td>OT_DOUBLE</td><td>When requested for a number of forward/reverse directions,   it may be cheaper to compute first the full jacobian and then multiply with seeds, rather than obtain the requested directions in a straightforward manner. Casadi uses a heuristic to decide which is cheaper. A high value of 'jac_penalty' makes it less likely for the heurstic to chose the full Jacobian strategy. The special value -1 indicates never to use the full Jacobian strategy</td><td>casadi::FunctionInternal</td></tr>
@@ -479,6 +482,9 @@
 <tr><td>scheme</td><td>OT_STRING</td><td>Differencing scheme [default: 'central']</td><td>casadi::CentralDiff</td></tr>
 <tr><td>second_order_stepsize</td><td>OT_DOUBLE</td><td>Second order perturbation size [default: 1e-3]</td><td>casadi::CentralDiff</td></tr>
 <tr><td>stepsize</td><td>OT_DOUBLE</td><td>Perturbation size [default: 1e-8]</td><td>casadi::CentralDiff</td></tr>
+<tr><td>u_aim</td><td>OT_DOUBLE</td><td>Target ratio of roundoff error to truncation error [default: 100.]</td><td>casadi::CentralDiff</td></tr>
+<tr><td>u_max</td><td>OT_DOUBLE</td><td>Minimium ratio of roundoff error to truncation error [default: 1000.]</td><td>casadi::CentralDiff</td></tr>
+<tr><td>u_min</td><td>OT_DOUBLE</td><td>Minimium ratio of roundoff error to truncation error [default: 10.]</td><td>casadi::CentralDiff</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>

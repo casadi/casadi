@@ -6817,7 +6817,8 @@ output scheme index by name.
 ";
 
 %feature("docstring") casadi::CentralDiff "[INTERNAL]  Calculate derivative
-using central differences Joel Andersson
+using central differences The algorithm is based on the package
+specification for TD12 in the HSL archive Joel Andersson
 
 >List of available options
 
@@ -6940,6 +6941,20 @@ using central differences Joel Andersson
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
+| eps              | OT_DOUBLE       | Minimium         | casadi::CentralD |
+|                  |                 | relative         | iff              |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
++------------------+-----------------+------------------+------------------+
+| eps1             | OT_DOUBLE       | Minimium         | casadi::CentralD |
+|                  |                 | absolute         | iff              |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
++------------------+-----------------+------------------+------------------+
 | fd_options       | OT_DICT         | Perturbation     | casadi::Function |
 |                  |                 | size for finite  | Internal         |
 |                  |                 | differencing     |                  |
@@ -6951,6 +6966,10 @@ using central differences Joel Andersson
 |                  |                 | Statistics are   |                  |
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| h_max            | OT_DOUBLE       | Maximum step     | casadi::CentralD |
+|                  |                 | size [default    | iff              |
+|                  |                 | 1.0]             |                  |
 +------------------+-----------------+------------------+------------------+
 | input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -7037,6 +7056,24 @@ using central differences Joel Andersson
 | stepsize         | OT_DOUBLE       | Perturbation     | casadi::CentralD |
 |                  |                 | size [default:   | iff              |
 |                  |                 | 1e-8]            |                  |
++------------------+-----------------+------------------+------------------+
+| u_aim            | OT_DOUBLE       | Target ratio of  | casadi::CentralD |
+|                  |                 | roundoff error   | iff              |
+|                  |                 | to truncation    |                  |
+|                  |                 | error [default:  |                  |
+|                  |                 | 100.]            |                  |
++------------------+-----------------+------------------+------------------+
+| u_max            | OT_DOUBLE       | Minimium ratio   | casadi::CentralD |
+|                  |                 | of roundoff      | iff              |
+|                  |                 | error to         |                  |
+|                  |                 | truncation error |                  |
+|                  |                 | [default: 1000.] |                  |
++------------------+-----------------+------------------+------------------+
+| u_min            | OT_DOUBLE       | Minimium ratio   | casadi::CentralD |
+|                  |                 | of roundoff      | iff              |
+|                  |                 | error to         |                  |
+|                  |                 | truncation error |                  |
+|                  |                 | [default: 10.]   |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
