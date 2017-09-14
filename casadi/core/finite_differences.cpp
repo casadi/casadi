@@ -99,7 +99,6 @@ namespace casadi {
     // Allocate work vector for (perturbed) inputs and outputs
     n_z_ = derivative_of_.nnz_in();
     n_r_ = derivative_of_.nnz_out();
-    alloc_w(3, true); // m->x, m->x0, m->h
     alloc_w(2 * n_r_, true); // m->r, m->r0
     alloc_w(n_r_, true); // m->J
     alloc_w(n_z_, true); // z
@@ -195,25 +194,21 @@ namespace casadi {
 
     // Memory structure
     casadi_central_diff_mem<double> m_tmp, *m = &m_tmp;
-    m->n_x = 1;
     m->n_r = n_r_;
     m->r = r;
-    m->x = w; w += 1;
-    m->h = w; w += 1;
     m->h_max = h_max_;
     m->eps = eps_;
     m->eps1 = eps1_;
     m->u_aim = u_aim_;
     m->J = w; w += n_r_;
-    m->x0 = w; w += 1;
     m->r0 = w; w += n_r_;
     m->status = 0;
 
     // central_diff only sees a function with 1 inputs, initialized at 0
-    casadi_fill(m->x, 1, 0.);
+    m->x = 0;
 
     // Initial perturbation size
-    casadi_fill(m->h, 1, h_);
+    m->h = h_;
 
     // Setup arg, res for calling function
     double* z = w;
@@ -234,7 +229,7 @@ namespace casadi {
         for (int j=0; j<n_in; ++j) {
           int nnz = derivative_of_.nnz_in(j);
           casadi_copy(r0[j], nnz, z1);
-          if (seed[j]) casadi_axpy(nnz, *m->x, seed[j] + i*nnz, z1);
+          if (seed[j]) casadi_axpy(nnz, m->x, seed[j] + i*nnz, z1);
           z1 += nnz;
         }
         if (derivative_of_(arg, res, iw, w, 0)) return 1;
@@ -283,21 +278,17 @@ namespace casadi {
     g.local("m_tmp", "struct casadi_central_diff_mem");
     g.local("m", "struct casadi_central_diff_mem", "*");
     g << "m = &m_tmp;\n"
-      << "m->n_x = " << 1 << ";\n"
       << "m->n_r = " << n_r_ << ";\n"
       << "m->r = r;\n"
-      << "m->x = w; w += " << 1 << ";\n"
-      << "m->h = w; w += " << 1 << ";\n"
       << "m->h_max = " << h_ << ";\n"
       << "m->eps = " << eps_ << ";\n"
       << "m->eps1 = " << eps1_ << ";\n"
       << "m->u_aim = " << u_aim_ << ";\n"
       << "m->J = w; w += " << n_r_ << ";\n"
-      << "m->x0 = w; w += " << 1 << ";\n"
       << "m->r0 = w; w += " << n_r_ << ";\n"
-      << "m->status = 0;\n";
-    g << g.fill("m->x", n_, "0.") << "\n";
-    g << g.fill("m->h", n_, str(h_)) << "\n";
+      << "m->status = 0;\n"
+      << "m->x = 0;\n"
+      << "m->h = " << str(h_) << ";\n";
 
     g.comment("Setup buffers for calling function");
     g.local("z", "casadi_real", "*");
@@ -323,7 +314,7 @@ namespace casadi {
       int nnz = derivative_of_.nnz_in(j);
       string s = "seed[" + str(j) + "]";
       g << g.copy("r0[" + str(j) + "]", nnz, "z1") << "\n"
-        << "if ("+s+") " << g.axpy(nnz, "*m->x", s+"+i*"+str(nnz), "z1") << "\n"
+        << "if ("+s+") " << g.axpy(nnz, "m->x", s+"+i*"+str(nnz), "z1") << "\n"
         << "z1 += " << nnz << ";\n";
     }
     if (derivative_of_->simplified_call()) {
