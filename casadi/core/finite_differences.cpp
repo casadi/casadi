@@ -99,9 +99,9 @@ namespace casadi {
     // Allocate work vector for (perturbed) inputs and outputs
     n_z_ = derivative_of_.nnz_in();
     n_r_ = derivative_of_.nnz_out();
-    alloc_w(3 * n_, true); // m->x, m->x0, m->h
+    alloc_w(3, true); // m->x, m->x0, m->h
     alloc_w(2 * n_r_, true); // m->r, m->r0
-    alloc_w(n_*n_r_, true); // m->J
+    alloc_w(n_r_, true); // m->J
     alloc_w(n_z_, true); // z
 
     // Dimensions
@@ -195,25 +195,25 @@ namespace casadi {
 
     // Memory structure
     casadi_central_diff_mem<double> m_tmp, *m = &m_tmp;
-    m->n_x = n_;
+    m->n_x = 1;
     m->n_r = n_r_;
     m->r = r;
-    m->x = w; w += n_;
-    m->h = w; w += n_;
+    m->x = w; w += 1;
+    m->h = w; w += 1;
     m->h_max = h_max_;
     m->eps = eps_;
     m->eps1 = eps1_;
     m->u_aim = u_aim_;
-    m->J = w; w += n_r_*n_;
-    m->x0 = w; w += n_;
+    m->J = w; w += n_r_;
+    m->x0 = w; w += 1;
     m->r0 = w; w += n_r_;
     m->status = 0;
 
-    // central_diff only sees a function with n_ inputs, initialized at 0
-    casadi_fill(m->x, n_, 0.);
+    // central_diff only sees a function with 1 inputs, initialized at 0
+    casadi_fill(m->x, 1, 0.);
 
     // Initial perturbation size
-    casadi_fill(m->h, n_, h_);
+    casadi_fill(m->h, 1, h_);
 
     // Setup arg, res for calling function
     double* z = w;
@@ -226,24 +226,26 @@ namespace casadi {
       r += derivative_of_.nnz_out(j);
     }
 
-    // Call reverse communication algorithm
-    while (casadi_central_diff(m)) {
-      double* z1 = z;
-      for (int j=0; j<n_in; ++j) {
-        int nnz = derivative_of_.nnz_in(j);
-        casadi_copy(r0[j], nnz, z1);
-        casadi_mv_dense(seed[j], nnz, n_, m->x, z1, false);
-        z1 += nnz;
-      }
-      if (derivative_of_(arg, res, iw, w, 0)) return 1;
-    }
-
-    // Gather sensitivities
+    // For all sensitivity directions
     for (int i=0; i<n_; ++i) {
+      // Call reverse communication algorithm
+      while (casadi_central_diff(m)) {
+        double* z1 = z;
+        for (int j=0; j<n_in; ++j) {
+          int nnz = derivative_of_.nnz_in(j);
+          casadi_copy(r0[j], nnz, z1);
+          if (seed[j]) casadi_axpy(nnz, *m->x, seed[j] + i*nnz, z1);
+          z1 += nnz;
+        }
+        if (derivative_of_(arg, res, iw, w, 0)) return 1;
+      }
+
+      // Gather sensitivities
+      double* J = m->J;
       for (int j=0; j<n_out; ++j) {
         int nnz = derivative_of_.nnz_out(j);
-        if (sens[j]) casadi_copy(m->J, nnz, sens[j] + i*nnz);
-        m->J += nnz;
+        if (sens[j]) casadi_copy(J, nnz, sens[j] + i*nnz);
+        J += nnz;
       }
     }
     return 0;
@@ -281,17 +283,17 @@ namespace casadi {
     g.local("m_tmp", "struct casadi_central_diff_mem");
     g.local("m", "struct casadi_central_diff_mem", "*");
     g << "m = &m_tmp;\n"
-      << "m->n_x = " << n_ << ";\n"
+      << "m->n_x = " << 1 << ";\n"
       << "m->n_r = " << n_r_ << ";\n"
       << "m->r = r;\n"
-      << "m->x = w; w += " << n_ << ";\n"
-      << "m->h = w; w += " << n_ << ";\n"
+      << "m->x = w; w += " << 1 << ";\n"
+      << "m->h = w; w += " << 1 << ";\n"
       << "m->h_max = " << h_ << ";\n"
       << "m->eps = " << eps_ << ";\n"
       << "m->eps1 = " << eps1_ << ";\n"
       << "m->u_aim = " << u_aim_ << ";\n"
-      << "m->J = w; w += " << n_r_*n_ << ";\n"
-      << "m->x0 = w; w += " << n_ << ";\n"
+      << "m->J = w; w += " << n_r_ << ";\n"
+      << "m->x0 = w; w += " << 1 << ";\n"
       << "m->r0 = w; w += " << n_r_ << ";\n"
       << "m->status = 0;\n";
     g << g.fill("m->x", n_, "0.") << "\n";
@@ -309,14 +311,19 @@ namespace casadi {
       }
     }
 
+    g.comment("For all sensitivity directions");
+    g.local("i", "int");
+    g << "for (i=0; i<" << n_ << "; ++i) {" << "\n";
+
     g.comment("Invoke reverse communication algorithm");
     g << "while (" << g.central_diff("m") << ") {\n";
     g.local("z1", "casadi_real", "*");
     g << "z1 = z;\n";
     for (int j=0; j<n_in; ++j) {
       int nnz = derivative_of_.nnz_in(j);
+      string s = "seed[" + str(j) + "]";
       g << g.copy("r0[" + str(j) + "]", nnz, "z1") << "\n"
-        << g.mv("seed[" + str(j) + "]", nnz, n_, "m->x", "z1", false) << "\n"
+        << "if ("+s+") " << g.axpy(nnz, "*m->x", s+"+i*"+str(nnz), "z1") << "\n"
         << "z1 += " << nnz << ";\n";
     }
     if (derivative_of_->simplified_call()) {
@@ -327,14 +334,15 @@ namespace casadi {
     g << "}\n"; // while (...)
 
     g.comment("Gather sensitivities");
-    g.local("i", "int");
-    g << "for (i=0; i<" << n_ << "; ++i) {" << "\n";
+    g.local("J", "casadi_real", "*");
+    g << "J = m->J;\n";
     for (int j=0; j<n_out; ++j) {
       int nnz = derivative_of_.nnz_out(j);
       string s = "sens[" + str(j) + "]";
-      g << "if (" << s << ") " << g.copy("m->J", nnz, s + "+i*" + str(nnz)) << "\n"
-        << "m->J += " << nnz << ";\n";
+      g << "if (" << s << ") " << g.copy("J", nnz, s + "+i*" + str(nnz)) << "\n"
+        << "J += " << nnz << ";\n";
     }
+
     g << "}\n"; // for (i=0, ...)
   }
 

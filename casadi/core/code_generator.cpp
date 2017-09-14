@@ -898,6 +898,12 @@ namespace casadi {
     return printf(str, arg);
   }
 
+  std::string CodeGenerator::axpy(int n, const std::string& a,
+                                  const std::string& x, const std::string& y) {
+    add_auxiliary(AUX_AXPY);
+    return "casadi_axpy(" + str(n) + ", " + a + ", " + x + ", " + y + ");";
+  }
+
   std::string CodeGenerator::mv(const std::string& x, const Sparsity& sp_x,
                                 const std::string& y, const std::string& z, bool tr) {
     add_auxiliary(AUX_MV);
