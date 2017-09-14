@@ -9604,18 +9604,6 @@ Andersson
 |                  |                 | error [default:  |                  |
 |                  |                 | 100.]            |                  |
 +------------------+-----------------+------------------+------------------+
-| u_max            | OT_DOUBLE       | Minimium ratio   | casadi::CentralD |
-|                  |                 | of roundoff      | iff              |
-|                  |                 | error to         |                  |
-|                  |                 | truncation error |                  |
-|                  |                 | [default: 1000.] |                  |
-+------------------+-----------------+------------------+------------------+
-| u_min            | OT_DOUBLE       | Minimium ratio   | casadi::CentralD |
-|                  |                 | of roundoff      | iff              |
-|                  |                 | error to         |                  |
-|                  |                 | truncation error |                  |
-|                  |                 | [default: 10.]   |                  |
-+------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
 |                  |                 | be used to       |                  |

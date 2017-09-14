@@ -483,8 +483,6 @@
 <tr><td>second_order_stepsize</td><td>OT_DOUBLE</td><td>Second order perturbation size [default: 1e-3]</td><td>casadi::CentralDiff</td></tr>
 <tr><td>stepsize</td><td>OT_DOUBLE</td><td>Perturbation size [default: 1e-8]</td><td>casadi::CentralDiff</td></tr>
 <tr><td>u_aim</td><td>OT_DOUBLE</td><td>Target ratio of roundoff error to truncation error [default: 100.]</td><td>casadi::CentralDiff</td></tr>
-<tr><td>u_max</td><td>OT_DOUBLE</td><td>Minimium ratio of roundoff error to truncation error [default: 1000.]</td><td>casadi::CentralDiff</td></tr>
-<tr><td>u_min</td><td>OT_DOUBLE</td><td>Minimium ratio of roundoff error to truncation error [default: 10.]</td><td>casadi::CentralDiff</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
 </table>
