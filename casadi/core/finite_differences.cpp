@@ -98,14 +98,15 @@ namespace casadi {
 
     // Allocate work vector for (perturbed) inputs and outputs
     n_z_ = derivative_of_.nnz_in();
-    n_r_ = derivative_of_.nnz_out();
-    alloc_w(2 * n_r_, true); // m->r, m->r0
-    alloc_w(n_r_, true); // m->J
+    n_y_ = derivative_of_.nnz_out();
+    alloc_w(2 * n_y_, true); // m->r, m->r0
+    alloc_w(2 * n_y_, true); // y_pos, y_neg
+    alloc_w(n_y_, true); // m->J
     alloc_w(n_z_, true); // z
 
     // Dimensions
     if (verbose_) {
-      casadi_message("Central differences with " + str(n_z_) + " inputs, " + str(n_r_)
+      casadi_message("Central differences with " + str(n_z_) + " inputs, " + str(n_y_)
                      + " outputs and " + str(n_) + " directional derivatives.");
     }
 
@@ -176,10 +177,10 @@ namespace casadi {
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
 
     // Non-differentiated input
-    const double** r0 = arg; arg += n_in;
+    const double** x0 = arg; arg += n_in;
 
     // Non-differentiated output
-    double* r = w;
+    double* y0 = w;
     for (int j=0; j<n_out; ++j) {
       const int nnz = derivative_of_.nnz_out(j);
       casadi_copy(*arg++, nnz, w);
@@ -192,55 +193,58 @@ namespace casadi {
     // Forward sensitivities
     double** sens = res; res += n_out;
 
-    // Memory structure
-    casadi_central_diff_mem<double> m_tmp, *m = &m_tmp;
-    m->n_r = n_r_;
-    m->r = r;
-    m->h_max = h_max_;
-    m->eps = eps_;
-    m->eps1 = eps1_;
-    m->u_aim = u_aim_;
-    m->J = w; w += n_r_;
-    m->r0 = w; w += n_r_;
-    m->status = 0;
+    // Finite difference approximation
+    double* J = w; w += n_y_;
 
-    // central_diff only sees a function with 1 inputs, initialized at 0
-    m->x = 0;
+    // Positively perturbed function value
+    double* y_pos = w; w += n_y_;
 
-    // Initial perturbation size
-    m->h = h_;
+    // Negatively perturned function value
+    double* y_neg = w; w += n_y_;
 
-    // Setup arg, res for calling function
-    double* z = w;
+    // Setup arg and z for evaluation
+    double *z = w;
     for (int j=0; j<n_in; ++j) {
       arg[j] = w;
       w += derivative_of_.nnz_in(j);
     }
+
+    // Setup res and y for evaluation
+    double *y = w;
     for (int j=0; j<n_out; ++j) {
-      res[j] = r;
-      r += derivative_of_.nnz_out(j);
+      res[j] = w;
+      w += derivative_of_.nnz_out(j);
     }
 
     // For all sensitivity directions
     for (int i=0; i<n_; ++i) {
-      // Call reverse communication algorithm
-      while (casadi_central_diff(m)) {
-        double* z1 = z;
+      // Calculate perturbed function values
+      for (int k=0; k<2; ++k) {
+        // Perturb inputs
+        int off = 0;
         for (int j=0; j<n_in; ++j) {
           int nnz = derivative_of_.nnz_in(j);
-          casadi_copy(r0[j], nnz, z1);
-          if (seed[j]) casadi_axpy(nnz, m->x, seed[j] + i*nnz, z1);
-          z1 += nnz;
+          casadi_copy(x0[j], nnz, z + off);
+          if (seed[j]) casadi_axpy(nnz, k ? h_ : -h_, seed[j] + i*nnz, z + off);
+          off += nnz;
         }
-        if (derivative_of_(arg, res, iw, w, 0)) return 1;
+        // Evaluate
+        if (derivative_of_(arg, res, iw, w)) return 1;
+        // Save outputs
+        casadi_copy(y, n_y_, k ? y_pos : y_neg);
       }
 
+      // Finite difference calculation
+      casadi_copy(y_pos, n_y_, J);
+      casadi_axpy(n_y_, -1., y_neg, J);
+      casadi_scal(n_y_, 0.5/h_, J);
+
       // Gather sensitivities
-      double* J = m->J;
+      int off = 0;
       for (int j=0; j<n_out; ++j) {
         int nnz = derivative_of_.nnz_out(j);
-        if (sens[j]) casadi_copy(J, nnz, sens[j] + i*nnz);
-        J += nnz;
+        if (sens[j]) casadi_copy(J + off, nnz, sens[j] + i*nnz);
+        off += nnz;
       }
     }
     return 0;
@@ -255,12 +259,12 @@ namespace casadi {
     int n_in = derivative_of_.n_in(), n_out = derivative_of_.n_out();
 
     g.comment("Non-differentiated input");
-    g.local("r0", "const casadi_real", "**");
-    g << "r0 = arg; arg += " << n_in << ";\n";
+    g.local("x0", "const casadi_real", "**");
+    g << "x0 = arg; arg += " << n_in << ";\n";
 
     g.comment("Non-differentiated output");
-    g.local("r", "casadi_real", "*");
-    g << "r = w;\n";
+    g.local("y0", "casadi_real", "*");
+    g << "y0 = w;\n";
     for (int j=0; j<n_out; ++j) {
       const int nnz = derivative_of_.nnz_out(j);
       g << g.copy("*arg++", nnz, "w") << " w += " << nnz << ";\n";
@@ -274,66 +278,76 @@ namespace casadi {
     g.local("sens", "casadi_real", "**");
     g << "sens = res; res += " << n_out << ";\n";
 
-    g.comment("Memory structure");
-    g.local("m_tmp", "struct casadi_central_diff_mem");
-    g.local("m", "struct casadi_central_diff_mem", "*");
-    g << "m = &m_tmp;\n"
-      << "m->n_r = " << n_r_ << ";\n"
-      << "m->r = r;\n"
-      << "m->h_max = " << h_ << ";\n"
-      << "m->eps = " << eps_ << ";\n"
-      << "m->eps1 = " << eps1_ << ";\n"
-      << "m->u_aim = " << u_aim_ << ";\n"
-      << "m->J = w; w += " << n_r_ << ";\n"
-      << "m->r0 = w; w += " << n_r_ << ";\n"
-      << "m->status = 0;\n"
-      << "m->x = 0;\n"
-      << "m->h = " << str(h_) << ";\n";
+    g.comment("Finite difference approximation");
+    g.local("J", "casadi_real", "*");
+    g << "J = w; w += " << n_y_ << ";\n";
 
-    g.comment("Setup buffers for calling function");
+    g.comment("Positively perturbed function value");
+    g.local("y_pos", "casadi_real", "*");
+    g << "y_pos = w; w += " << n_y_ << ";\n";
+
+    g.comment("Negatively perturned function value");
+    g.local("y_neg", "casadi_real", "*");
+    g << "y_neg = w; w += " << n_y_ << ";\n";
+
+    g.comment("Setup arg and z for evaluation");
     g.local("z", "casadi_real", "*");
     g << "z = w;\n";
-    if (!derivative_of_->simplified_call()) {
-      for (int j=0; j<n_in; ++j) {
-        g << "arg[" << j << "] = w; w += " << derivative_of_.nnz_in(j) << ";\n";
-      }
-      for (int j=0; j<n_out; ++j) {
-        g << "res[" << j << "] = r; r += " << derivative_of_.nnz_out(j) << ";\n";
-      }
+    for (int j=0; j<n_in; ++j) {
+      g << "arg[" << j << "] = w; w += " << derivative_of_.nnz_in(j) << ";\n";
+    }
+
+    g.comment("Setup res and y for evaluation");
+    g.local("y", "casadi_real", "*");
+    g << "y = w;\n";
+    for (int j=0; j<n_out; ++j) {
+      g << "res[" << j << "] = w; w += " << derivative_of_.nnz_out(j) << ";\n";
     }
 
     g.comment("For all sensitivity directions");
     g.local("i", "int");
-    g << "for (i=0; i<" << n_ << "; ++i) {" << "\n";
+    g << "for (i=0; i<" << n_ << "; ++i) {\n";
 
-    g.comment("Invoke reverse communication algorithm");
-    g << "while (" << g.central_diff("m") << ") {\n";
-    g.local("z1", "casadi_real", "*");
-    g << "z1 = z;\n";
+    g.comment("Calculate perturbed function values");
+    g.local("k", "int");
+    g << "for (k=0; k<2; ++k) {\n";
+
+    g.comment("Perturb inputs");
+    int off=0;
     for (int j=0; j<n_in; ++j) {
       int nnz = derivative_of_.nnz_in(j);
       string s = "seed[" + str(j) + "]";
-      g << g.copy("r0[" + str(j) + "]", nnz, "z1") << "\n"
-        << "if ("+s+") " << g.axpy(nnz, "m->x", s+"+i*"+str(nnz), "z1") << "\n"
-        << "z1 += " << nnz << ";\n";
+      string h = "k?" + str(h_) + ":" + str(-h_);
+      g << g.copy("x0[" + str(j) + "]", nnz, "z+" + str(off)) << "\n"
+        << "if ("+s+") " << g.axpy(nnz, h , s+"+i*"+str(nnz), "z+" + str(off)) << "\n";
+      off += nnz;
     }
+
+    g.comment("Evaluate");
     if (derivative_of_->simplified_call()) {
-      g << g(derivative_of_, "z", "w") << ";\n";
+      g << g(derivative_of_, "z", "y") << ";\n";
     } else {
       g << "if (" << g(derivative_of_, "arg", "res", "iw", "w") << ") return 1;\n";
     }
-    g << "}\n"; // while (...)
+
+    g.comment("Save outputs");
+    g << g.copy("y", n_y_, "k ? y_pos : y_neg") << "\n";
+
+    g << "}\n"; // for (k=0, ...)
+
+    g.comment("Finite difference calculation");
+    g << g.copy("y_pos", n_y_, "J") << "\n";
+    g << g.axpy(n_y_, "-1.", "y_neg", "J") << "\n";
+    g << g.scal(n_y_, str(0.5/h_), "J") << "\n";
 
     g.comment("Gather sensitivities");
-    g.local("J", "casadi_real", "*");
-    g << "J = m->J;\n";
+    off = 0;
     for (int j=0; j<n_out; ++j) {
       int nnz = derivative_of_.nnz_out(j);
       string s = "sens[" + str(j) + "]";
-      g << "if (" << s << ") " << g.copy("J", nnz, s + "+i*" + str(nnz)) << "\n"
-        << "J += " << nnz << ";\n";
+      g << "if (" << s << ") " << g.copy("J+" + str(off), nnz, s + "+i*" + str(nnz)) << "\n";
+      off += nnz;
     }
-
     g << "}\n"; // for (i=0, ...)
   }
 

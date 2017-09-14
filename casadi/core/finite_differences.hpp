@@ -106,7 +106,7 @@ namespace casadi {
     CentralDiff(const std::string& name, int n);
 
     // Dimensions
-    int n_z_, n_r_;
+    int n_z_, n_y_;
 
     // Number of directional derivatives
     int n_;

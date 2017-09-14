@@ -904,6 +904,11 @@ namespace casadi {
     return "casadi_axpy(" + str(n) + ", " + a + ", " + x + ", " + y + ");";
   }
 
+  std::string CodeGenerator::scal(int n, const std::string& alpha, const std::string& x) {
+    add_auxiliary(AUX_SCAL);
+    return "casadi_scal(" + str(n) + ", " + alpha + ", " + x + ");";
+  }
+
   std::string CodeGenerator::mv(const std::string& x, const Sparsity& sp_x,
                                 const std::string& y, const std::string& z, bool tr) {
     add_auxiliary(AUX_MV);

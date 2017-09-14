@@ -162,6 +162,9 @@ namespace casadi {
     std::string axpy(int n, const std::string& a,
                      const std::string& x, const std::string& y);
 
+    /** \brief Codegen axpy: x *= alpha */
+    std::string scal(int n, const std::string& alpha, const std::string& x);
+
     /** \brief Codegen sparse matrix-matrix multiplication */
     std::string mtimes(const std::string& x, const Sparsity& sp_x,
                        const std::string& y, const Sparsity& sp_y,
