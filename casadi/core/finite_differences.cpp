@@ -152,6 +152,13 @@ namespace casadi {
     return "fwd_" + derivative_of_.name_out(i);
   }
 
+  Function ForwardDiff::get_forward(int nfwd, const std::string& name,
+                                   const std::vector<std::string>& inames,
+                                   const std::vector<std::string>& onames,
+                                   const Dict& opts) const {
+    return Function::create(new ForwardDiff(name, nfwd, -h_), opts);
+  }
+
   Function CentralDiff::get_forward(int nfwd, const std::string& name,
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,
@@ -227,7 +234,7 @@ namespace casadi {
       }
 
       // Finite difference calculation
-      calc_fd(yk, J);
+      calc_fd(yk, y0, J);
 
       // Gather sensitivities
       int off = 0;
@@ -240,18 +247,32 @@ namespace casadi {
     return 0;
   }
 
-  void CentralDiff::calc_fd(double** yk, double* J) const {
+  void ForwardDiff::calc_fd(double** yk, double* y0, double* J) const {
+    casadi_copy(*yk, n_y_, J);
+    casadi_axpy(n_y_, -1., y0, J);
+    casadi_scal(n_y_, 1./h_, J);
+  }
+
+  void ForwardDiff::calc_fd(CodeGenerator& g, const std::string& yk,
+                           const std::string& y0, const std::string& J) const {
+    g << g.copy("*"+yk, n_y_, J) << "\n";
+    g << g.axpy(n_y_, "-1.", y0, J) << "\n";
+    g << g.scal(n_y_, str(1./h_), J) << "\n";
+  }
+
+  void CentralDiff::calc_fd(double** yk, double* y0, double* J) const {
     casadi_copy(yk[1], n_y_, J);
     casadi_axpy(n_y_, -1., yk[0], J);
     casadi_scal(n_y_, 0.5/h_, J);
   }
 
-  void CentralDiff::calc_fd(CodeGenerator& g,
-                           const std::string& yk, const std::string& J) const {
+  void CentralDiff::calc_fd(CodeGenerator& g, const std::string& yk,
+                           const std::string& y0, const std::string& J) const {
     g << g.copy(yk+"[1]", n_y_, J) << "\n";
     g << g.axpy(n_y_, "-1.", yk+"[0]", J) << "\n";
     g << g.scal(n_y_, str(0.5/h_), J) << "\n";
   }
+
 
   void FiniteDiff::codegen_declarations(CodeGenerator& g) const {
     derivative_of_->add_dependency(g);
@@ -337,7 +358,7 @@ namespace casadi {
     g << "}\n"; // for (k=0, ...)
 
     g.comment("Finite difference calculation");
-    calc_fd(g, "yk", "J");
+    calc_fd(g, "yk", "y0", "J");
 
     g.comment("Gather sensitivities");
     off = 0;

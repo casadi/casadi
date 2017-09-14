@@ -1419,6 +1419,8 @@ namespace casadi {
       // Get FD method
       if (fd_method_.empty() || fd_method_=="central") {
         ret = Function::create(new CentralDiff(name, nfwd, fd_step_), opts);
+      } else if (fd_method_=="forward") {
+        ret = Function::create(new ForwardDiff(name, nfwd, fd_step_), opts);
       } else {
         casadi_error("Unknown 'fd_method': " + fd_method_);
       }

@@ -100,11 +100,11 @@ namespace casadi {
     virtual double pert(int k) const = 0;
 
     // Calculate finite difference approximation
-    virtual void calc_fd(double** yk, double* J) const = 0;
+    virtual void calc_fd(double** yk, double* y0, double* J) const = 0;
 
     // Codegen finite difference approximation
-    virtual void calc_fd(CodeGenerator& g,
-                         const std::string& yk, const std::string& J) const = 0;
+    virtual void calc_fd(CodeGenerator& g, const std::string& yk,
+                         const std::string& y0, const std::string& J) const = 0;
 
     // Number of directional derivatives
     int n_;
@@ -126,6 +126,51 @@ namespace casadi {
 
     // Ratio of roundoff error to truncation error
     double u_aim_;
+  };
+
+  /** Calculate derivative using forward differences
+    * \author Joel Andersson
+    * \date 2017
+  */
+  class CASADI_EXPORT ForwardDiff : public FiniteDiff {
+  public:
+    // Constructor
+    ForwardDiff(const std::string& name, int n, double h) : FiniteDiff(name, n, h) {}
+
+    /** \brief Destructor */
+    ~ForwardDiff() override {}
+
+    /** \brief Get type name */
+    std::string class_name() const override {return "ForwardDiff";}
+
+    // Number of function evaluations needed
+    int n_pert() const override {return 1;};
+
+    // Get perturbation expression
+    std::string pert(const std::string& k) const override {
+      return str(h_);
+    }
+
+    // Get perturbation expression
+    double pert(int k) const override {
+      return h_;
+    }
+
+    // Calculate finite difference approximation
+    void calc_fd(double** yk, double* y0, double* J) const override;
+
+    // Codegen finite difference approximation
+    void calc_fd(CodeGenerator& g, const std::string& yk,
+                 const std::string& y0, const std::string& J) const override;
+
+    ///@{
+    /** \brief Second order derivatives */
+    bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
   };
 
   /** Calculate derivative using central differences
@@ -157,11 +202,11 @@ namespace casadi {
     }
 
     // Calculate finite difference approximation
-    void calc_fd(double** yk, double* J) const override;
+    void calc_fd(double** yk, double* y0, double* J) const override;
 
     // Codegen finite difference approximation
-    void calc_fd(CodeGenerator& g,
-                 const std::string& yk, const std::string& J) const override;
+    void calc_fd(CodeGenerator& g, const std::string& yk,
+                 const std::string& y0, const std::string& J) const override;
 
     ///@{
     /** \brief Second order derivatives */
