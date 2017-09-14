@@ -116,6 +116,12 @@ namespace casadi {
     alloc_w(n_*n_r_, true); // m->J
     alloc_w(n_z_, true); // z
 
+    // Dimensions
+    if (verbose_) {
+      casadi_message("Central differences with " + str(n_z_) + " inputs, " + str(n_r_)
+                     + " outputs and " + str(n_) + " directional derivatives.");
+    }
+
     // Allocate sufficient temporary memory for function evaluation
     alloc(derivative_of_);
   }
