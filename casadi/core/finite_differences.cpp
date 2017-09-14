@@ -29,8 +29,8 @@ using namespace std;
 
 namespace casadi {
 
-  FiniteDiff::FiniteDiff(const std::string& name, int n)
-    : FunctionInternal(name), n_(n) {
+  FiniteDiff::FiniteDiff(const std::string& name, int n, double h)
+    : FunctionInternal(name), n_(n), h_(h) {
   }
 
   FiniteDiff::~FiniteDiff() {
@@ -38,10 +38,7 @@ namespace casadi {
 
   Options FiniteDiff::options_
   = {{&FunctionInternal::options_},
-     {{"stepsize",
-       {OT_DOUBLE,
-        "Perturbation size [default: 1e-8]"}},
-      {"second_order_stepsize",
+     {{"second_order_stepsize",
        {OT_DOUBLE,
         "Second order perturbation size [default: 1e-3]"}},
       {"scheme",
@@ -67,7 +64,6 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     // Default options
-    h_ = 1e-8;
     h2_ = 1e-3;
     h_max_ = 1.0;
     eps_in_ = eps_out_ = numeric_limits<double>::epsilon();
@@ -75,9 +71,7 @@ namespace casadi {
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="stepsize") {
-        h_ = op.second;
-      } else if (op.first=="second_order_stepsize") {
+      if (op.first=="second_order_stepsize") {
         h2_ = op.second;
       } else if (op.first=="scheme") {
         casadi_warning("Option 'scheme' currently ignored");
@@ -162,9 +156,7 @@ namespace casadi {
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,
                                    const Dict& opts) const {
-    Dict opts_mod = opts;
-    opts_mod["stepsize"] = h2_;
-    return Function::create(new CentralDiff(name, nfwd), opts_mod);
+    return Function::create(new CentralDiff(name, nfwd, h2_), opts);
   }
 
   int FiniteDiff::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {

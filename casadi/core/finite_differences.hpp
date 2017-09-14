@@ -38,6 +38,9 @@ namespace casadi {
   */
   class CASADI_EXPORT FiniteDiff : public FunctionInternal {
   public:
+    // Constructor (protected, use create function)
+    FiniteDiff(const std::string& name, int n, double h);
+
     /** \brief Destructor */
     ~FiniteDiff() override;
 
@@ -103,14 +106,14 @@ namespace casadi {
     virtual void calc_fd(CodeGenerator& g,
                          const std::string& yk, const std::string& J) const = 0;
 
-    // Constructor (protected, use create function)
-    FiniteDiff(const std::string& name, int n);
+    // Number of directional derivatives
+    int n_;
+
+    // Perturbation
+    double h_, h2_;
 
     // Dimensions
     int n_z_, n_y_;
-
-    // Number of directional derivatives
-    int n_;
 
     // Maximum allowed precision
     double h_max_;
@@ -123,9 +126,6 @@ namespace casadi {
 
     // Ratio of roundoff error to truncation error
     double u_aim_;
-
-    // Perturbation
-    double h_, h2_;
   };
 
   /** Calculate derivative using central differences
@@ -135,7 +135,7 @@ namespace casadi {
   class CASADI_EXPORT CentralDiff : public FiniteDiff {
   public:
     // Constructor
-    CentralDiff(const std::string& name, int n) : FiniteDiff(name, n) {}
+    CentralDiff(const std::string& name, int n, double h) : FiniteDiff(name, n, h) {}
 
     /** \brief Destructor */
     ~CentralDiff() override {}

@@ -708,9 +708,12 @@ namespace casadi {
     // Finite difference step
     Dict fd_options_;
 
+    // Finite difference step size
+    double fd_step_;
+
     // Finite difference method
     std::string fd_method_;
-    
+
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;
 
