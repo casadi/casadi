@@ -32,20 +32,20 @@ int casadi_central_diff(casadi_central_diff_mem<T1>* m) {
     m->x0 = m->x;
     casadi_copy(m->r, m->n_r, m->r0);
     // Perturb x in positive direction and call function
-    m->x += m->h/2;
+    m->x += m->h;
     m->status = wait_for_pos_pert;
     return 1;
   case wait_for_pos_pert:
     casadi_copy(m->r, m->n_r, m->J);
     // Perturb x in negative direction and call function
-    m->x = m->x0 - m->h/2;
+    m->x = m->x0 - m->h;
     m->status = wait_for_neg_pert;
     return 1;
   case wait_for_neg_pert:
     m->x = m->x0;
     // Calculate finite difference approximation
     casadi_axpy(m->n_r, -1., m->r, m->J);
-    casadi_scal(m->n_r, 1/m->h, m->J);
+    casadi_scal(m->n_r, 0.5/m->h, m->J);
     // Successful return, restore r
     casadi_copy(m->r0, m->n_r, m->r);
     m->status = 0;
