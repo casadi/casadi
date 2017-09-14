@@ -54,12 +54,12 @@ namespace casadi {
       {"h_max",
        {OT_DOUBLE,
         "Maximum step size [default 1.0]"}},
-      {"eps",
+      {"eps_in",
        {OT_DOUBLE,
-        "Minimium relative perturbation size [default: machine precision]"}},
-      {"eps1",
+        "Accuracy of function inputs [default: machine precision]"}},
+      {"eps_out",
         {OT_DOUBLE,
-        "Minimium absolute perturbation size [default: machine precision]"}},
+        "Accuracy of function outputs [default: machine precision]"}},
       {"u_aim",
         {OT_DOUBLE,
         "Target ratio of roundoff error to truncation error [default: 100.]"}}
@@ -74,7 +74,7 @@ namespace casadi {
     h_ = 1e-8;
     h2_ = 1e-3;
     h_max_ = 1.0;
-    eps_ = eps1_ = numeric_limits<double>::epsilon();
+    eps_in_ = eps_out_ = numeric_limits<double>::epsilon();
     u_aim_ = 100;
 
     // Read options
@@ -87,10 +87,10 @@ namespace casadi {
         casadi_warning("Option 'scheme' currently ignored");
       } else if (op.first=="h_max") {
         h_max_ = op.second;
-      } else if (op.first=="eps") {
-        eps_ = op.second;
-      } else if (op.first=="eps1") {
-        eps1_ = op.second;
+      } else if (op.first=="eps_in") {
+        eps_in_ = op.second;
+      } else if (op.first=="eps_out") {
+        eps_out_ = op.second;
       } else if (op.first=="u_aim") {
         u_aim_ = op.second;
       }
@@ -99,9 +99,7 @@ namespace casadi {
     // Allocate work vector for (perturbed) inputs and outputs
     n_z_ = derivative_of_.nnz_in();
     n_y_ = derivative_of_.nnz_out();
-    alloc_w(2 * n_y_, true); // m->r, m->r0
-    alloc_w(2 * n_y_, true); // y_pos, y_neg
-    alloc_w(n_y_, true); // m->J
+    alloc_w(5 * n_y_, true); // y_pos, y_neg, y0, y, J
     alloc_w(n_z_, true); // z
 
     // Dimensions

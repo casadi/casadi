@@ -114,11 +114,11 @@ namespace casadi {
     // Maximum allowed precision
     double h_max_;
 
-    // Minumum relative precision: scale by abs(x[j])
-    double eps_;
+    // Input precision
+    double eps_in_;
 
-    // Minumum absolute precision: scale by h_max
-    double eps1_;
+    // Output precision
+    double eps_out_;
 
     // Ratio of roundoff error to truncation error
     double u_aim_;
