@@ -121,7 +121,7 @@ namespace casadi {
     double eps1_;
 
     // Ratio of roundoff error to truncation error
-    double u_min_, u_aim_, u_max_;
+    double u_aim_;
 
     // Perturbation
     double h_, h2_;

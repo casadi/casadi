@@ -60,15 +60,9 @@ namespace casadi {
       {"eps1",
         {OT_DOUBLE,
         "Minimium absolute perturbation size [default: machine precision]"}},
-      {"u_min",
-        {OT_DOUBLE,
-        "Minimium ratio of roundoff error to truncation error [default: 10.]"}},
       {"u_aim",
         {OT_DOUBLE,
-        "Target ratio of roundoff error to truncation error [default: 100.]"}},
-      {"u_max",
-        {OT_DOUBLE,
-        "Minimium ratio of roundoff error to truncation error [default: 1000.]"}},
+        "Target ratio of roundoff error to truncation error [default: 100.]"}}
      }
   };
 
@@ -81,9 +75,7 @@ namespace casadi {
     h2_ = 1e-3;
     h_max_ = 1.0;
     eps_ = eps1_ = numeric_limits<double>::epsilon();
-    u_min_ = 10;
     u_aim_ = 100;
-    u_max_ = 1000;
 
     // Read options
     for (auto&& op : opts) {
@@ -99,12 +91,8 @@ namespace casadi {
         eps_ = op.second;
       } else if (op.first=="eps1") {
         eps1_ = op.second;
-      } else if (op.first=="u_min") {
-        u_min_ = op.second;
       } else if (op.first=="u_aim") {
         u_aim_ = op.second;
-      } else if (op.first=="u_max") {
-        u_max_ = op.second;
       }
     }
 
@@ -215,9 +203,7 @@ namespace casadi {
     m->h_max = h_max_;
     m->eps = eps_;
     m->eps1 = eps1_;
-    m->u_min = u_min_;
     m->u_aim = u_aim_;
-    m->u_max = u_max_;
     m->J = w; w += n_r_*n_;
     m->x0 = w; w += n_;
     m->r0 = w; w += n_r_;
@@ -303,9 +289,7 @@ namespace casadi {
       << "m->h_max = " << h_ << ";\n"
       << "m->eps = " << eps_ << ";\n"
       << "m->eps1 = " << eps1_ << ";\n"
-      << "m->u_min = " << u_min_ << ";\n"
       << "m->u_aim = " << u_aim_ << ";\n"
-      << "m->u_max = " << u_max_ << ";\n"
       << "m->J = w; w += " << n_r_*n_ << ";\n"
       << "m->x0 = w; w += " << n_ << ";\n"
       << "m->r0 = w; w += " << n_r_ << ";\n"
