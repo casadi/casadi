@@ -95,7 +95,8 @@ namespace casadi {
 
     // Dimensions
     if (verbose_) {
-      casadi_message("Central differences with " + str(n_z_) + " inputs, " + str(n_y_)
+      casadi_message("Finite differences (" + class_name() + ") with "
+                     + str(n_z_) + " inputs, " + str(n_y_)
                      + " outputs and " + str(n_) + " directional derivatives.");
     }
 
@@ -152,17 +153,22 @@ namespace casadi {
     return "fwd_" + derivative_of_.name_out(i);
   }
 
-  Function ForwardDiff::get_forward(int nfwd, const std::string& name,
-                                   const std::vector<std::string>& inames,
-                                   const std::vector<std::string>& onames,
-                                   const Dict& opts) const {
-    return Function::create(new ForwardDiff(name, nfwd, -h_), opts);
-  }
-
   Function CentralDiff::get_forward(int nfwd, const std::string& name,
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,
                                    const Dict& opts) const {
+    // Commented out, does not work well
+#if 0
+    // The second order derivative is calculated as the backwards derivative
+    // of the forward derivative, which is equivalent to central differences
+    // of second order
+    string f_name = "fd_" + name;
+    Dict f_opts = {{"derivative_of", derivative_of_}};
+    Function f = Function::create(new ForwardDiff(f_name, n_, h_), f_opts);
+    // Calculate backwards derivative of f
+    f_opts["derivative_of"] = f;
+    return Function::create(new ForwardDiff(name, nfwd, -h_), f_opts);
+#endif
     return Function::create(new CentralDiff(name, nfwd, h2_), opts);
   }
 
