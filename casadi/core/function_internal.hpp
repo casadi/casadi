@@ -275,12 +275,6 @@ namespace casadi {
                                  const Dict& opts) const;
     ///@}
 
-    /// \brief Get directional derivatives using finite differencing
-    virtual Function get_fd(int nfwd, const std::string& name,
-                            const std::vector<std::string>& inames,
-                            const std::vector<std::string>& onames,
-                            const Dict& opts) const;
-
     ///@{
     /** \brief Return function that calculates adjoint derivatives
      *    reverse(nadj) returns a cached instance if available,
@@ -714,6 +708,9 @@ namespace casadi {
     // Finite difference step
     Dict fd_options_;
 
+    // Finite difference method
+    std::string fd_method_;
+    
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;
 

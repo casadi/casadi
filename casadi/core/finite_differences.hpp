@@ -32,21 +32,14 @@
 
 namespace casadi {
 
-  /** Calculate derivative using central differences
-    * The algorithm is based on the package specification for TD12 in the HSL archive
+  /** Calculate derivative using finite differences
     * \author Joel Andersson
     * \date 2017
   */
-  class CASADI_EXPORT CentralDiff : public FunctionInternal {
+  class CASADI_EXPORT FiniteDiff : public FunctionInternal {
   public:
-    // Create function (use instead of constructor)
-    static Function create(const std::string& name, int n, const Dict& opts);
-
     /** \brief Destructor */
-    ~CentralDiff() override;
-
-    /** \brief Get type name */
-    std::string class_name() const override {return "CentralDiff";}
+    ~FiniteDiff() override;
 
     ///@{
     /** \brief Options */
@@ -93,17 +86,25 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override;
 
-    ///@{
-    /** \brief Second order derivatives */
-    bool has_forward(int nfwd) const override { return true;}
-    Function get_forward(int nfwd, const std::string& name,
-                         const std::vector<std::string>& inames,
-                         const std::vector<std::string>& onames,
-                         const Dict& opts) const override;
-
   protected:
+    // Number of function evaluations needed
+    virtual int n_pert() const = 0;
+
+    // Get perturbation expression
+    virtual std::string pert(const std::string& k) const = 0;
+
+    // Get perturbation expression
+    virtual double pert(int k) const = 0;
+
+    // Calculate finite difference approximation
+    virtual void calc_fd(double** yk, double* J) const = 0;
+
+    // Codegen finite difference approximation
+    virtual void calc_fd(CodeGenerator& g,
+                         const std::string& yk, const std::string& J) const = 0;
+
     // Constructor (protected, use create function)
-    CentralDiff(const std::string& name, int n);
+    FiniteDiff(const std::string& name, int n);
 
     // Dimensions
     int n_z_, n_y_;
@@ -125,6 +126,51 @@ namespace casadi {
 
     // Perturbation
     double h_, h2_;
+  };
+
+  /** Calculate derivative using central differences
+    * \author Joel Andersson
+    * \date 2017
+  */
+  class CASADI_EXPORT CentralDiff : public FiniteDiff {
+  public:
+    // Constructor
+    CentralDiff(const std::string& name, int n) : FiniteDiff(name, n) {}
+
+    /** \brief Destructor */
+    ~CentralDiff() override {}
+
+    /** \brief Get type name */
+    std::string class_name() const override {return "CentralDiff";}
+
+    // Number of function evaluations needed
+    int n_pert() const override {return 2;};
+
+    // Get perturbation expression
+    std::string pert(const std::string& k) const override {
+      return "(2*" + k + "-1)*" + str(h_);
+    }
+
+    // Get perturbation expression
+    double pert(int k) const override {
+      return (2*k-1)*h_;
+    }
+
+    // Calculate finite difference approximation
+    void calc_fd(double** yk, double* J) const override;
+
+    // Codegen finite difference approximation
+    void calc_fd(CodeGenerator& g,
+                 const std::string& yk, const std::string& J) const override;
+
+    ///@{
+    /** \brief Second order derivatives */
+    bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
   };
 
 } // namespace casadi

@@ -217,7 +217,11 @@ namespace casadi {
         "Enable derivative calculation by finite differencing. [default: false]]"}},
       {"fd_options",
        {OT_DICT,
-        "Perturbation size for finite differencing [default: 1e-8]]"}}
+        "Options to be passed to the finite difference instance"}},
+      {"fd_method",
+       {OT_STRING,
+        "Method for finite differencing [default 'central']"}}
+
      }
   };
 
@@ -266,6 +270,8 @@ namespace casadi {
         enable_fd_ = op.second;
       } else if (op.first=="fd_options") {
         fd_options_ = op.second;
+      } else if (op.first=="fd_method") {
+        fd_method_ = op.second.to_string();
       }
     }
 
@@ -1402,7 +1408,12 @@ namespace casadi {
     if (enable_forward_) {
       ret = get_forward(nfwd, name, inames, onames, opts);
     } else {
-      ret = CentralDiff::create(name, nfwd, opts);
+      // Get FD method
+      if (fd_method_.empty() || fd_method_=="central") {
+        ret = Function::create(new CentralDiff(name, nfwd), opts);
+      } else {
+        casadi_error("Unknown 'fd_method': " + fd_method_);
+      }
     }
 
     // Consistency check for inputs
@@ -1502,64 +1513,6 @@ namespace casadi {
               const std::vector<std::string>& onames,
               const Dict& opts) const {
     casadi_error("'get_reverse' not defined for " + class_name());
-  }
-
-  Function FunctionInternal::
-  get_fd(int nfwd, const std::string& name,
-         const std::vector<std::string>& inames,
-         const std::vector<std::string>& onames,
-         const Dict& opts) const {
-    // Get the number of inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
-    // Nondifferentiated inputs and outputs
-    vector<MX> f_in = mx_in(), f_out = mx_out();
-    vector<vector<MX>> fseed = fwd_seed<MX>(nfwd);
-    vector<vector<MX>> fsens(nfwd, f_out);
-
-    // Read options
-    string scheme = "forward";
-    double stepsize = 1e-8;
-    for (auto&& op : fd_options_) {
-      if (op.first=="scheme") {
-        scheme = op.second.to_string();
-      } else if (op.first=="stepsize") {
-        stepsize = op.second;
-      }
-    }
-    casadi_assert(scheme=="forward");
-
-    // Get the step sizes
-    MX fd_step = stepsize;
-
-    // For each direction, call perturbed
-    for (int d=0; d<nfwd; ++d) {
-      // Perturbed input
-      vector<MX> p_in = f_in;
-      for (int i=0; i<n_in; ++i) p_in[i] += fd_step*fseed[d][i];
-      // Perturbed output
-      vector<MX> p_out;
-      call(p_in, p_out, false, true);
-      for (int i=0; i<n_out; ++i) fsens.at(d).at(i) = (p_out[i]-f_out[i])/fd_step;
-    }
-
-    // Collect inputs
-    vector<MX> ret_in(f_in);
-    ret_in.insert(ret_in.end(), f_out.begin(), f_out.end());
-    vector<MX> v(nfwd);
-    for (int i=0; i<n_in; ++i) {
-      for (int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
-      ret_in.push_back(horzcat(v));
-    }
-    // Collect outputs
-    vector<MX> ret_out;
-    for (int i=0; i<n_out; ++i) {
-      for (int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
-      ret_out.push_back(horzcat(v));
-    }
-    // Assemble and return
-    return Function(name, ret_in, ret_out, inames, onames, opts);
   }
 
   int FunctionInternal::nnz_in() const {
