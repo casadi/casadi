@@ -108,6 +108,135 @@ void OptiStack::callback_class() {
   callbacks_ = {};
 }
 
+std::string OptiStack::format_stacktrace(const Dict& stacktrace, int indent) {
+  std::string s_indent;
+  for (int i=0;i<indent;++i) {
+    s_indent+= "  ";
+  }
+  std::string description;
+  std::string filename = stacktrace.at("file").as_string();
+  int line = stacktrace.at("line").as_int();
+  description += "defined at " + filename +":"+str(line);
+  std::string name = stacktrace.at("name").as_string();
+  if (name!="Unknown" && name!= "<module>")
+    description += " in " + stacktrace.at("name").as_string();
+  try {
+    ifstream file(filename);
+    for (int i=0; i<line-1; ++i) {
+      file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    std::string contents; std::getline(file, contents);
+    userOut()<< contents << std::endl;
+    auto it = contents.find_first_not_of(" \n");
+    if (it!=std::string::npos) {
+      description += "\n" + s_indent + contents.substr(it);
+    }
+  } catch(...) {
+    // pass
+  }
+  return description;
+}
+
+std::string OptiStack::describe(const MX& expr, int indent) const {
+  if (problem_dirty()) return baked().describe(expr, indent);
+  std::string s_indent;
+  for (int i=0;i<indent;++i) {
+    s_indent+= "  ";
+  }
+  std::string description = s_indent;
+  if (expr.is_symbolic()) {
+    if (has(expr)) {
+      description += "Opti " + variable_type_to_string(meta(expr).type) + " '" + expr.name() +
+        "' of shape " + expr.dim();
+      const Dict& extra = meta(expr).extra;
+      auto it = extra.find("stacktrace");
+      if (it!=extra.end()) {
+        const Dict& stacktrace = it->second.as_dict();
+        description += ", " + format_stacktrace(stacktrace, indent+1);
+      }
+    } else {
+      VariableType vt;
+      if (parse_opti_name(expr.name(), vt)) {
+        description += "Opti " + variable_type_to_string(vt) + " '" + expr.name() +
+          "' of shape " + expr.dim()+
+          ", belonging to a different instance of Opti.";
+      } else {
+        description += "MX symbol '" + expr.name() + "' of shape " + expr.dim();
+        description += ", declared outside of Opti.";
+      }
+    }
+  } else {
+    if (has_con(expr)) {
+      std::string description = "Opti constraint of shape " + expr.dim();
+      const Dict& extra = meta(expr).extra;
+      auto it = extra.find("stacktrace");
+      if (it!=extra.end()) {
+        const Dict& stacktrace = it->second.as_dict();
+        description += ", " + format_stacktrace(stacktrace, indent+1);
+      }
+    } else {
+      std::vector<MX> s = symvar(expr);
+      if (s.size()==0) {
+        description+= "Constant epxression.";
+      } else {
+        description+= "General expression, dependent on " + str(s.size()) + " symbols:";
+        for (int i=0;i<s.size();++i) {
+          description+= "\n"+describe(s[i], indent+1);
+          if (i>5) {
+            description+= "\n...";
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  return description;
+}
+
+std::string OptiStack::g_describe(int i) const {
+  if (problem_dirty()) return baked().g_describe(i);
+  MX expr = g_lookup(i);
+  int local_i = i-meta_con(expr).start;
+  std::string description = describe(expr);
+  description += "\nAt nonzero " + str(local_i) + ".";
+  return description;
+}
+
+std::string OptiStack::x_describe(int i) const {
+  if (problem_dirty()) return baked().x_describe(i);
+  MX symbol = x_lookup(i);
+  int local_i = i-meta(symbol).start;
+  std::string description = describe(symbol);
+  description += "\nAt nonzero " + str(local_i) + ".";
+  return description;
+}
+
+MX OptiStack::x_lookup(int i) const {
+  if (problem_dirty()) return baked().x_lookup(i);
+  casadi_assert(i>=0);
+  casadi_assert(i<nx());
+  std::vector<MX> x = active_symvar(OPTI_VAR);
+  for (const auto& e : x) {
+    const MetaVar& m = meta(e);
+    if (i>=m.start && i<m.stop) return e;
+  }
+  casadi_error("Internal error");
+  return MX();
+}
+
+MX OptiStack::g_lookup(int i) const {
+  if (problem_dirty()) return baked().g_lookup(i);
+  casadi_assert(i>=0);
+  casadi_assert(i<ng());
+  for (const auto& e : g_) {
+    const MetaCon& m = meta_con(e);
+    if (i>=m.start && i<m.stop) return e;
+  }
+  casadi_error("Internal error");
+  return MX();
+}
+
 OptiStack::OptiStack() : count_(0), count_var_(0), count_par_(0) {
   solver_has_callback_ = false;
   internal_callback_ = 0;
@@ -117,6 +246,15 @@ OptiStack::OptiStack() : count_(0), count_var_(0), count_par_(0) {
 }
 
 MX OptiStack::variable(int n, int m, const std::string& attribute) {
+  return variable(Dict(), n, m, attribute);
+}
+
+MX OptiStack::parameter(int n, int m, const std::string& attribute) {
+  return parameter(Dict(), n, m, attribute);
+}
+
+
+MX OptiStack::variable(const Dict& my_meta_data, int n, int m, const std::string& attribute) {
 
   // Prepare metadata
   MetaVar meta_data;
@@ -126,6 +264,7 @@ MX OptiStack::variable(int n, int m, const std::string& attribute) {
   meta_data.type = OPTI_VAR;
   meta_data.count = count_++;
   meta_data.i = count_var_++;
+  meta_data.extra = my_meta_data;
 
   MX symbol, ret;
 
@@ -207,7 +346,7 @@ void OptiStack::register_dual(MetaCon& c) {
   set_meta(symbol, meta_data);
 }
 
-MX OptiStack::parameter(int n, int m, const std::string& attribute) {
+MX OptiStack::parameter(const Dict& my_meta_data, int n, int m, const std::string& attribute) {
   casadi_assert(attribute=="full");
 
   // Prepare metadata
@@ -218,6 +357,7 @@ MX OptiStack::parameter(int n, int m, const std::string& attribute) {
   meta_data.type = OPTI_PAR;
   meta_data.count = count_++;
   meta_data.i = count_par_++;
+  meta_data.extra = my_meta_data;
 
   MX symbol = MX::sym(name_prefix() + "p_" + str(count_par_), n, m);
   symbols_.push_back(symbol);
@@ -304,12 +444,10 @@ void OptiStack::assert_has(const MX& m) const {
   if (!has(m)) {
     VariableType vt;
     if (parse_opti_name(m.name(), vt)) {
-      casadi_error("Symbol '" + m.name() + "' (a " + variable_type_to_string(vt) + ") "
-        "belongs to a different instance of Opti"
-        "(this instance is #" + str(instance_count_) + ").");
+      casadi_error("Unknown: " + describe(m));
     } else {
-      casadi_error("MX symbol '" + m.name() + "' not declared with opti.variable/opti.parameter.\n"
-        "Note: you cannot use a raw MX.sym in your Opti problem, "
+      casadi_error("Unknown: " + describe(m) + "\n"
+        "Note: you cannot use a raw MX.sym in your Opti problem,"
         " only if you package it in a CasADi Function.");
     }
   }
@@ -650,19 +788,28 @@ void OptiStack::minimize(const MX& f) {
   f_ = f;
 }
 
+void OptiStack::subject_to(const Dict& meta_data, const std::vector<MX>& g) {
+  for (const auto& gs : g) subject_to(meta_data, gs);
+}
+
 void OptiStack::subject_to(const std::vector<MX>& g) {
-  for (const auto& gs : g) subject_to(gs);
+  subject_to(Dict(), g);
 }
 
 void OptiStack::subject_to(const MX& g) {
+  subject_to(Dict(), g);
+}
+
+void OptiStack::subject_to(const Dict& meta_data, const MX& g) {
   assert_only_opti_nondual(g);
   mark_problem_dirty();
   g_.push_back(g);
 
   // Store the meta-data
   set_meta_con(g, canon_expr(g));
-
+  meta_con(g).extra = meta_data;
   register_dual(meta_con(g));
+  meta(meta_con(g).dual_canon).extra = meta_data;
 }
 
 void OptiStack::subject_to() {
@@ -776,9 +923,15 @@ void OptiStack::solve_prepare() {
   arg_["x0"]     = veccat(active_values(OptiStack::OPTI_VAR));
   arg_["p"]      = veccat(active_values(OptiStack::OPTI_PAR));
   arg_["lam_g0"] = veccat(active_values(OptiStack::OPTI_DUAL_G));
-  casadi_assert_message(arg_["p"].is_regular(),
-    "You have forgotten to assign a value to a parameter ('set_value'), "
-    "or have set it to NaN/Inf.");
+  if (!arg_["p"].is_regular()) {
+    std::vector<MX> s = active_symvar(OptiStack::OPTI_PAR);
+    std::vector<DM> v = active_values(OptiStack::OPTI_PAR);
+    for (int i=0;i<s.size();++i) {
+      casadi_assert_message(v[i].is_regular(),
+        "You have forgotten to assign a value to a parameter ('set_value'), "
+        "or have set it to NaN/Inf:\n" + describe(s[i], 1));
+    }
+  }
 
   // Evaluate bounds for given parameter values
   DMDict arg;
@@ -834,7 +987,8 @@ DM OptiStack::value(const MX& expr, const std::vector<MX>& values) const {
     assert_solved();
     for (const auto& e : x)
       casadi_assert_message(symbol_active_[meta(e).count],
-        "This expression has symbols that do not appear in the constraints and objective.");
+        "This expression has symbols that do not appear in the constraints and objective:\n" +
+        describe(e, 1));
   }
 
   std::vector<DM> p_num;
@@ -847,7 +1001,8 @@ DM OptiStack::value(const MX& expr, const std::vector<MX>& values) const {
     assert_solved();
     for (const auto& e : lam) {
       casadi_assert_message(symbol_active_[meta(e).count],
-        "This expression has a dual for a constraint that is not given to Opti.");
+        "This expression has a dual for a constraint that is not given to Opti:\n" +
+        describe(e, 1));
       lam_num.push_back(latest_duals_[meta(e).i]);
     }
   }
@@ -860,7 +1015,7 @@ void OptiStack::assert_active_symbol(const MX& m) const {
   assert_has(m);
   assert_baked();
   casadi_assert_message(symbol_active_[meta(m).count], "Opti symbol is not used in Solver."
-    " It does not make sense to assign a value to it.");
+    " It does not make sense to assign a value to it:\n" + describe(m, 1));
 }
 
 void OptiStack::set_initial(const std::vector<MX>& assignments) {

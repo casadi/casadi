@@ -14,6 +14,8 @@ x = opti.variable();
 y = opti.variable();
 z = opti.variable();
 
+assert(~isempty(strfind(opti.debug.describe(x),'optistack.m')))
+
 opti.minimize((x-1)^2+(y-2)^2+(z-3)^2)
 opti.solver('ipopt')
 sol = opti.solve();

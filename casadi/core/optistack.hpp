@@ -92,6 +92,7 @@ public:
     bool flipped;
     MX dual_canon;
     MX dual;
+    Dict extra;
   };
   struct MetaVar : IndexAbstraction {
     std::string attribute;
@@ -118,6 +119,7 @@ public:
   * \param[in] attribute: 'full' (default) or 'symmetric'
   */
   MX variable(int n=1, int m=1, const std::string& attribute="full");
+  MX variable(const Dict& meta_data, int n=1, int m=1, const std::string& attribute="full");
   /** \brief Create a parameter (symbol); fixed during optimization
   *
   * The order of creation does not matter.
@@ -129,6 +131,7 @@ public:
   * \param[in] attribute: 'full' (default) or 'symmetric'
   */
   MX parameter(int n=1, int m=1, const std::string& attribute="full");
+  MX parameter(const Dict&, int n=1, int m=1, const std::string& attribute="full");
 
   /** \brief Set objective
   *
@@ -159,6 +162,8 @@ public:
   */
   void subject_to(const MX& g);
   void subject_to(const std::vector<MX>& g);
+  void subject_to(const Dict& meta_data, const MX& g);
+  void subject_to(const Dict& meta_data, const std::vector<MX>& g);
   /// @}
 
   /// Clear constraints
@@ -283,6 +288,12 @@ public:
   std::vector<MX> active_symvar(OptiStack::VariableType type) const;
   std::vector<DM> active_values(OptiStack::VariableType type) const;
 
+  MX x_lookup(int i) const;
+  MX g_lookup(int i) const;
+
+  std::string x_describe(int i) const;
+  std::string g_describe(int i) const;
+  std::string describe(const MX& x, int indent=0) const;
 
   void solve_prepare();
   DMDict solve_actual(const DMDict& args);
@@ -292,46 +303,49 @@ public:
   std::vector<MX> constraints() const { return g_; }
   MX objective() const { return f_; }
 
+  OptiStack baked() const {
+    OptiStack s = copy();
+    if (s.problem_dirty()) s.internal_bake();
+    return s;
+  }
+
+  OptiStack& baked() {
+    return *this;
+  }
+
   /// Number of (scalarised) decision variables
-  int nx() {
-    if (problem_dirty()) internal_bake();
-    return nlp_.at("x").size1();
+  int nx() const {
+    return baked().nlp_.at("x").size1();
   }
 
   /// Number of (scalarised) parameters
-  int np() {
-    if (problem_dirty()) internal_bake();
-    return nlp_.at("p").size1();
+  int np() const {
+    return baked().nlp_.at("p").size1();
   }
 
   /// Number of (scalarised) constraints
-  int ng() {
-    if (problem_dirty()) internal_bake();
-    return nlp_.at("g").size1();
+  int ng() const {
+    return baked().nlp_.at("g").size1();
   }
 
   /// Get all (scalarised) decision variables as a symbolic column vector
-  MX x() {
-    if (problem_dirty()) internal_bake();
-    return nlp_.at("x");
+  MX x() const {
+    return baked().nlp_.at("x");
   }
 
   /// Get all (scalarised) parameters as a symbolic column vector
-  MX p() {
-    if (problem_dirty()) internal_bake();
-    return nlp_.at("p");
+  MX p() const {
+    return baked().nlp_.at("p");
   }
 
   /// Get all (scalarised) constraint expressions as a column vector
-  MX g() {
-    if (problem_dirty()) internal_bake();
-    return nlp_.at("g");
+  MX g() const {
+    return baked().nlp_.at("g");
   }
 
   /// Get objective expression
-  MX f() {
-    if (problem_dirty()) internal_bake();
-    return nlp_.at("f");
+  MX f() const {
+    return baked().nlp_.at("f");
   }
 
   /** \brief Get all (scalarised) dual variables as a symbolic column vector
@@ -342,9 +356,8 @@ public:
   * sol.value(hessian(opti.f+dot(opti.lam_g,opti.g),opti.x)[0]) # Python
   * \endverbatim
   */
-  MX lam_g() {
-    if (problem_dirty()) internal_bake();
-    return lam_;
+  MX lam_g() const {
+    return baked().lam_;
   }
   void assert_empty() const;
 
@@ -466,6 +479,8 @@ private:
   int instance_number_;
 
   std::string name_prefix() const;
+
+  static std::string format_stacktrace(const Dict& stacktrace, int indent);
 public:
 
 
@@ -490,6 +505,46 @@ public:
 
       This class offers a view with model description facilities
       The API is guaranteed to be stable.
+
+
+      Example NLP:
+      \verbatim
+      opti = casadi.Opti();
+
+      x = opti.variable();
+      y = opti.variable();
+
+      opti.minimize(  (y-x^2)^2   );
+      opti.subject_to( x^2+y^2==1 );
+      opti.subject_to(     x+y>=1 );
+
+      opti.solver('ipopt');
+      sol = opti.solve();
+
+      sol.value(x)
+      sol.value(y)
+      \endverbatim
+
+      Example parametric NLP:
+      \verbatim
+      opti = casadi.Opti();
+
+      x = opti.variable(2,1);
+      p = opti.parameter();
+
+      opti.minimize(  (p*x(2)-x(1)^2)^2   );
+      opti.subject_to( 1<=sum(x)<=2 );
+
+      opti.solver('ipopt');
+
+      opti.set_value(p, 3);
+      sol = opti.solve();
+      sol.value(x)
+
+      opti.set_value(p, 5);
+      sol = opti.solve();
+      sol.value(x)
+      \endverbatim
 
       \date 2017
       \author Joris Gillis, Erik Lambrechts
@@ -542,44 +597,6 @@ class CASADI_EXPORT Opti : private OptiStack {
       This class offers a view with solution retrieval facilities
       The API is guaranteed to be stable.
 
-      Example NLP:
-      \verbatim
-      opti = casadi.Opti();
-
-      x = opti.variable();
-      y = opti.variable();
-
-      opti.minimize(  (y-x^2)^2   );
-      opti.subject_to( x^2+y^2==1 );
-      opti.subject_to(     x+y>=1 );
-
-      opti.solver('ipopt');
-      sol = opti.solve();
-
-      sol.value(x)
-      sol.value(y)
-      \endverbatim
-
-      Example parametric NLP:
-      \verbatim
-      opti = casadi.Opti();
-
-      x = opti.variable(2,1);
-      p = opti.parameter();
-
-      opti.minimize(  (p*x(2)-x(1)^2)^2   );
-      opti.subject_to( 1<=sum(x)<=2 );
-
-      opti.solver('ipopt');
-
-      opti.set_value(p, 3);
-      sol = opti.solve();
-      sol.value(x)
-
-      opti.set_value(p, 5);
-      sol = opti.solve();
-      sol.value(x)
-      \endverbatim
 
       \date 2017
       \author Joris Gillis, Erik Lambrechts

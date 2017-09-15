@@ -47,6 +47,25 @@ if has_nlpsol("ipopt"):
 
 class OptiStacktests(inherit_from):
 
+    def test_lookup(self):
+      opti = Opti()
+      x = opti.variable(2)
+      y = opti.variable(2)
+      opti.subject_to(x>=y)
+
+      str0 = str(opti.debug.x_lookup(0))
+      str1 = str(opti.debug.x_lookup(1))
+      str2 = str(opti.debug.x_lookup(2))
+      str3 = str(opti.debug.x_lookup(3))
+      
+      self.assertEqual(str0,str1)
+      self.assertEqual(str2,str3)
+      
+      self.assertFalse(str1==str2)
+      
+      print "foo",str(opti.debug.x_describe(0))
+      
+      
     def test_n(self):
       opti = Opti()
       x = opti.variable()
@@ -353,21 +372,27 @@ class OptiStacktests(inherit_from):
       
       with self.assertInException("do not appear in the constraints and objective"):
         sol.value(y)
-        
-      with self.assertInException("MX symbol 'w' not declared with opti.variable/opti.parameter."):
+      with self.assertInException("decision variable"):
+        sol.value(y)
+      with self.assertInException("optistack.py"):
+        sol.value(y) 
+      with self.assertInException("MX symbol 'w' of shape 1x1, declared outside of Opti."):
         sol.value(w)
         
-      with self.assertInException("MX symbol 'w' not declared with opti.variable/opti.parameter."):
+      with self.assertInException("MX symbol 'w' of shape 1x1, declared outside of Opti."):
         opti.subject_to(w<=2)
 
-      with self.assertInException("MX symbol 'w' not declared with opti.variable/opti.parameter."):
+      with self.assertInException("MX symbol 'w' of shape 1x1, declared outside of Opti."):
         opti.minimize(w)
         
       opti.minimize((x-p)**2)
 
       with self.assertInException("You have forgotten to assign a value to a parameter"):
         sol = opti.solve()
-        
+      with self.assertInException("Opti parameter"):
+        sol = opti.solve()
+      with self.assertInException("optistack.py"):
+        sol = opti.solve()
       opti.set_value(p, 5)
       opti.solve()
       opti.debug.value(x);
@@ -395,22 +420,22 @@ class OptiStacktests(inherit_from):
       y = opti.variable()
       
       P = opti.parameter()
-      with self.assertInException("belongs to a different instance of Opti"):
+      with self.assertInException("belonging to a different instance of Opti"):
         opti.subject_to(x<=2)
 
-      with self.assertInException("(a decision variable)"):
+      with self.assertInException("decision variable"):
         opti.subject_to(x<=2)
 
-      with self.assertInException("belongs to a different instance of Opti"):
+      with self.assertInException("belonging to a different instance of Opti"):
         opti.subject_to(p<=2)
 
-      with self.assertInException("(a parameter)"):
+      with self.assertInException("parameter"):
         opti.subject_to(p<=2)
      
-      with self.assertInException("belongs to a different instance of Opti"):
+      with self.assertInException("belonging to a different instance of Opti"):
         opti.subject_to(opti0.dual(con)<=2)
 
-      with self.assertInException("(a dual variable)"):
+      with self.assertInException("dual variable"):
         opti.subject_to(opti0.dual(con)<=2)
         
       con = X>=0
@@ -430,8 +455,8 @@ class OptiStacktests(inherit_from):
       
       with self.assertInException("This expression has a dual for a constraint that is not given to Opti"):
         sol.value(dual)
-      
-      
+      with self.assertInException("optistack.py"):
+        sol.value(dual)
       
         
         

@@ -4010,9 +4010,88 @@ make_property_opti(np)
 make_property_opti(ng)
 
 make_property(casadi::OptiStack, casadi_solver);
+%define optistack_metadata_modifiers(class)
+  %rename(_variable) class ## :: variable;
+  %rename(_parameter) class ## :: parameter;
+  %rename(_subject_to) class ## :: subject_to;
+  %extend class {  
+    %pythoncode %{
+      def parameter(self,*args):
+        import sys
+        import os
+        frame = sys._getframe(1)
+        meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        return self._parameter(meta,*args)
 
+      def variable(self,*args):
+        import sys
+        import os
+        frame = sys._getframe(1)
+        meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        return self._variable(meta,*args)
+
+      def subject_to(self,*args):
+        if len(args)==0:
+          return self._subject_to()
+        import sys
+        import os
+        frame = sys._getframe(1)
+        meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        return self._subject_to(meta,*args)
+    %}
+  }
+%enddef
+
+optistack_metadata_modifiers(casadi::Opti);
+optistack_metadata_modifiers(casadi::OptiStack);
 #endif
 
+
+#ifdef SWIGMATLAB
+%define optistack_metadata_modifiers(class)
+  %rename(internal_variable) class ## ::variable;
+  %rename(internal_parameter) class ## ::parameter;
+  %rename(internal_subject_to) class ## ::subject_to;
+  %extend class {  
+    %matlabcode %{
+      function out = variable(self, varargin)
+        st = dbstack('-completenames',1);
+        if length(st)>0
+          meta = struct('stacktrace', st(1));
+        else
+          meta = struct;
+        end
+        out = self.internal_variable(meta,varargin{:});
+      end
+      function out = parameter(self, varargin)
+        st = dbstack('-completenames',1);
+        if length(st)>0
+          meta = struct('stacktrace', st(1));
+        else
+          meta = struct;
+        end
+        out = self.internal_parameter(meta,varargin{:});
+      end
+      function [] = subject_to(self, varargin)
+        if length(varargin)==0
+          self.internal_subject_to();
+          return;
+        end
+        st = dbstack('-completenames',1);
+        if length(st)>0
+          meta = struct('stacktrace', st(1));
+        else
+          meta = struct;
+        end
+        self.internal_subject_to(meta,varargin{:});
+      end    
+    %}
+  }
+%enddef
+
+optistack_metadata_modifiers(casadi::Opti)
+optistack_metadata_modifiers(casadi::OptiStack)
+#endif
 %include <casadi/core/optistack.hpp>
 
 
