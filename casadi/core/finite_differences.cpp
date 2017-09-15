@@ -437,6 +437,13 @@ namespace casadi {
     //g << g.scal(n_y_, str(0.5/h_), J) << "\n";
   }
 
+  Function ForwardDiff::get_forward(int nfwd, const std::string& name,
+                                   const std::vector<std::string>& inames,
+                                   const std::vector<std::string>& onames,
+                                   const Dict& opts) const {
+    return Function::create(new ForwardDiff(name, nfwd, h2_), opts);
+  }
+
   Function Smoothing::get_forward(int nfwd, const std::string& name,
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,

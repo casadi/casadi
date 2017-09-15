@@ -162,6 +162,15 @@ namespace casadi {
     // Codegen finite difference approximation
     void calc_fd(CodeGenerator& g, const std::string& yk,
                  const std::string& y0, const std::string& J) const override;
+
+    ///@{
+    /** \brief Second order derivatives */
+    bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
   };
 
   /** Calculate derivative using central differences
