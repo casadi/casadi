@@ -309,7 +309,8 @@ namespace casadi {
     s << blankName
       << "      proc           wall      num           mean             mean"
       << endl << blankName
-      << "      time           time     evals       proc time        wall time";
+      << "      time           time     evals       proc time        wall time"
+      << endl;
     userOut() << s.str();
 
     // Sort the keys according to order
