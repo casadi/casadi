@@ -400,7 +400,7 @@ namespace casadi {
       // Forward shifted central differences
       // 7.10 in Conte & Carl de Boor: Elementary Numerical Analysis (1972)
       // and 25.3.4 in Abramowitz and Stegun, Handbook of Mathematical Functions (1964)
-      sm = y_f2[i] - 2*y_f1[i] + y0[i];
+      sm = (y_f2[i] - 2*y_f1[i] + y0[i])/(h_*h_);
       if (!isnan(sm)) {
         sum_weights += w = 1./(sm*sm + eps_);
         //J[i] += w*(y_f2[i]-y0[i]);
@@ -411,13 +411,13 @@ namespace casadi {
       // this would amount to a five point formula for the derivative
       // (y_b2[i] - 8*y_b1[i] + 8*y_f1[i] - y_f2[i])/(12*h)
       // cf. 25.3.6 in Abramowitz and Stegun, Handbook of Mathematical Functions (1964)
-      sm = y_f1[i] - 2*y0[i] + y_b1[i];
+      sm = (y_f1[i] - 2*y0[i] + y_b1[i])/(h_*h_);
       if (!isnan(sm)) {
         sum_weights += w = 4./(sm*sm + eps_);
         J[i] += w*(y_f1[i]-y_b1[i]);
       }
       // Backwards shifted central differences: Same as forward above
-      sm = y0[i] - 2*y_b1[i] + y_b2[i];
+      sm = (y0[i] - 2*y_b1[i] + y_b2[i])/(h_*h_);
       if (!isnan(sm)) {
         sum_weights += w = 1./(sm*sm + eps_);
         //J[i] += w*(y0[i]-y_b2[i]);
