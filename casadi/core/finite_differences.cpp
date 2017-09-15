@@ -406,7 +406,9 @@ namespace casadi {
       sm = y_f2[i] - 2*y_f1[i] + y0[i];
       if (!isnan(sm)) {
         sum_weights += w = 1./(sm*sm + eps);
-        J[i] += w*(y_f2[i]-y0[i]);
+        //J[i] += w*(y_f2[i]-y0[i]);
+        // 7.10 in Conte & Carl de Boor: Elementary Numerical Analysis (1972)
+        J[i] += w*(-3*y0[i] + 4*y_f1[i] - y_f2[i]);
       }
       // Central differences
       sm = y_f1[i] - 2*y0[i] + y_b1[i];
@@ -418,7 +420,9 @@ namespace casadi {
       sm = y0[i] - 2*y_b1[i] + y_b2[i];
       if (!isnan(sm)) {
         sum_weights += w = 1./(sm*sm + eps);
-        J[i] += w*(y0[i]-y_b2[i]);
+        //J[i] += w*(y0[i]-y_b2[i]);
+        // See above
+        J[i] += w*(3*y0[i] - 4*y_b1[i] + y_b2[i]);
       }
       // Finalize derivative approximation
       J[i] /= sum_weights*2*h_;
