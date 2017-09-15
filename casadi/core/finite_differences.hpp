@@ -126,6 +126,11 @@ namespace casadi {
 
     // Ratio of roundoff error to truncation error
     double u_aim_;
+
+    // Smoothness parameter
+    // Smaller epsilon: More discontinuity rejecting
+    // Larger epsilon: More accurate (higher order) if smooth
+    double eps_;
   };
 
   /** Calculate derivative using forward differences

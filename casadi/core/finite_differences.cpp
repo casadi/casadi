@@ -41,9 +41,6 @@ namespace casadi {
      {{"second_order_stepsize",
        {OT_DOUBLE,
         "Second order perturbation size [default: 1e-3]"}},
-      {"scheme",
-       {OT_STRING,
-        "Differencing scheme [default: 'central']"}},
       {"h_max",
        {OT_DOUBLE,
         "Maximum step size [default 1.0]"}},
@@ -68,19 +65,20 @@ namespace casadi {
     h_max_ = 1.0;
     eps_in_ = eps_out_ = numeric_limits<double>::epsilon();
     u_aim_ = 100;
+    eps_ = 1e-14;
 
     // Read options
     for (auto&& op : opts) {
       if (op.first=="second_order_stepsize") {
         h2_ = op.second;
-      } else if (op.first=="scheme") {
-        casadi_warning("Option 'scheme' currently ignored");
       } else if (op.first=="h_max") {
         h_max_ = op.second;
       } else if (op.first=="eps_in") {
         eps_in_ = op.second;
       } else if (op.first=="eps_out") {
         eps_out_ = op.second;
+      } else if (op.first=="eps") {
+        eps_ = op.second;
       } else if (op.first=="u_aim") {
         u_aim_ = op.second;
       }
@@ -389,9 +387,6 @@ namespace casadi {
   }
 
   void Smoothing::calc_fd(double** yk, double* y0, double* J) const {
-    // Epsilon to avoid division by zero
-    double eps = 1e-14;
-
     // Split up yk
     double* y_b1 = yk[0]; // one steps back
     double* y_b2 = yk[1]; // two step back
@@ -403,25 +398,29 @@ namespace casadi {
       double sum_weights=0, fd, sm, w;
       J[i] = 0;
       // Forward shifted central differences
+      // 7.10 in Conte & Carl de Boor: Elementary Numerical Analysis (1972)
+      // and 25.3.4 in Abramowitz and Stegun, Handbook of Mathematical Functions (1964)
       sm = y_f2[i] - 2*y_f1[i] + y0[i];
       if (!isnan(sm)) {
-        sum_weights += w = 1./(sm*sm + eps);
+        sum_weights += w = 1./(sm*sm + eps_);
         //J[i] += w*(y_f2[i]-y0[i]);
-        // 7.10 in Conte & Carl de Boor: Elementary Numerical Analysis (1972)
         J[i] += w*(-3*y0[i] + 4*y_f1[i] - y_f2[i]);
       }
       // Central differences
+      // We give this the "nomimal weight" 4 since if all weights are equal,
+      // this would amount to a five point formula for the derivative
+      // (y_b2[i] - 8*y_b1[i] + 8*y_f1[i] - y_f2[i])/(12*h)
+      // cf. 25.3.6 in Abramowitz and Stegun, Handbook of Mathematical Functions (1964)
       sm = y_f1[i] - 2*y0[i] + y_b1[i];
       if (!isnan(sm)) {
-        sum_weights += w = 2./(sm*sm + eps);
+        sum_weights += w = 4./(sm*sm + eps_);
         J[i] += w*(y_f1[i]-y_b1[i]);
       }
-      // Backwards shifted central differences
+      // Backwards shifted central differences: Same as forward above
       sm = y0[i] - 2*y_b1[i] + y_b2[i];
       if (!isnan(sm)) {
-        sum_weights += w = 1./(sm*sm + eps);
+        sum_weights += w = 1./(sm*sm + eps_);
         //J[i] += w*(y0[i]-y_b2[i]);
-        // See above
         J[i] += w*(3*y0[i] - 4*y_b1[i] + y_b2[i]);
       }
       // Finalize derivative approximation
