@@ -209,6 +209,48 @@ namespace casadi {
     ///@}
   };
 
+  /** Calculate derivative using 3th order smoothing scheme
+    * \author Joel Andersson
+    * \date 2017
+  */
+  class CASADI_EXPORT Smoothing : public FiniteDiff {
+  public:
+    // Constructor
+    Smoothing(const std::string& name, int n, double h) : FiniteDiff(name, n, h) {}
+
+    /** \brief Destructor */
+    ~Smoothing() override {}
+
+    /** \brief Get type name */
+    std::string class_name() const override {return "Smoothing";}
+
+    // Number of function evaluations needed
+    int n_pert() const override {return 4;};
+
+    // Get perturbation expression
+    std::string pert(const std::string& k) const override;
+
+    // Get perturbation expression
+    double pert(int k) const override;
+
+    // Calculate finite difference approximation
+    void calc_fd(double** yk, double* y0, double* J) const override;
+
+    // Codegen finite difference approximation
+    void calc_fd(CodeGenerator& g, const std::string& yk,
+                 const std::string& y0, const std::string& J) const override;
+
+    ///@{
+    /** \brief Second order derivatives */
+    bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
+  };
+
+
 } // namespace casadi
 /// \endcond
 

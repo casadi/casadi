@@ -279,7 +279,6 @@ namespace casadi {
     g << g.scal(n_y_, str(0.5/h_), J) << "\n";
   }
 
-
   void FiniteDiff::codegen_declarations(CodeGenerator& g) const {
     derivative_of_->add_dependency(g);
   }
@@ -377,5 +376,68 @@ namespace casadi {
     g << "}\n"; // for (i=0, ...)
   }
 
+  std::string Smoothing::pert(const std::string& k) const {
+    string sign = "(2*(" + k + "/2)-1)";
+    string len = "(" + k + "%%2+1)";
+    return len + "*" + sign + "*" + str(h_);
+  }
+
+  double Smoothing::pert(int k) const {
+    int sign = 2*(k/2)-1;
+    int len = k%2+1;
+    return len*sign*h_;
+  }
+
+  void Smoothing::calc_fd(double** yk, double* y0, double* J) const {
+    // Epsilon to avoid division by zero
+    double eps = 1e-14;
+
+    // Split up yk
+    double* y_b1 = yk[0]; // one steps back
+    double* y_b2 = yk[1]; // two step back
+    double* y_f1 = yk[2]; // one steps forward
+    double* y_f2 = yk[3]; // two step forward
+    // For all components
+    for (int i=0; i<n_y_; ++i) {
+      // Sum of all non-nan weights
+      double sum_weights=0, fd, sm, w;
+      J[i] = 0;
+      // Forward shifted central differences
+      sm = y_f2[i] - 2*y_f1[i] + y0[i];
+      if (!isnan(sm)) {
+        sum_weights += w = 1./(sm*sm + eps);
+        J[i] += w*(y_f2[i]-y0[i]);
+      }
+      // Central differences
+      sm = y_f1[i] - 2*y0[i] + y_b1[i];
+      if (!isnan(sm)) {
+        sum_weights += w = 2./(sm*sm + eps);
+        J[i] += w*(y_f1[i]-y_b1[i]);
+      }
+      // Backwards shifted central differences
+      sm = y0[i] - 2*y_b1[i] + y_b2[i];
+      if (!isnan(sm)) {
+        sum_weights += w = 1./(sm*sm + eps);
+        J[i] += w*(y0[i]-y_b2[i]);
+      }
+      // Finalize derivative approximation
+      J[i] /= sum_weights*2*h_;
+    }
+  }
+
+  void Smoothing::calc_fd(CodeGenerator& g, const std::string& yk,
+                           const std::string& y0, const std::string& J) const {
+      casadi_error("not implemented");
+//    g << g.copy(yk+"[1]", n_y_, J) << "\n";
+  //  g << g.axpy(n_y_, "-1.", yk+"[0]", J) << "\n";
+    //g << g.scal(n_y_, str(0.5/h_), J) << "\n";
+  }
+
+  Function Smoothing::get_forward(int nfwd, const std::string& name,
+                                   const std::vector<std::string>& inames,
+                                   const std::vector<std::string>& onames,
+                                   const Dict& opts) const {
+    return Function::create(new Smoothing(name, nfwd, h2_), opts);
+  }
 
 } // namespace casadi

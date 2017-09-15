@@ -1421,6 +1421,10 @@ namespace casadi {
         ret = Function::create(new CentralDiff(name, nfwd, fd_step_), opts);
       } else if (fd_method_=="forward") {
         ret = Function::create(new ForwardDiff(name, nfwd, fd_step_), opts);
+      } else if (fd_method_=="backward") {
+        ret = Function::create(new ForwardDiff(name, nfwd, -fd_step_), opts);
+      } else if (fd_method_=="smoothing") {
+        ret = Function::create(new Smoothing(name, nfwd, fd_step_), opts);
       } else {
         casadi_error("Unknown 'fd_method': " + fd_method_);
       }
