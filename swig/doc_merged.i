@@ -7520,10 +7520,6 @@ using central differences Joel Andersson
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
-| scheme           | OT_STRING       | Differencing     | casadi::CentralD |
-|                  |                 | scheme [default: | iff              |
-|                  |                 | 'central']       |                  |
-+------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::CentralD |
 | psize            |                 | perturbation     | iff              |
 |                  |                 | size [default:   |                  |
@@ -13828,10 +13824,6 @@ using finite differences Joel Andersson
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
-| scheme           | OT_STRING       | Differencing     | casadi::FiniteDi |
-|                  |                 | scheme [default: | ff               |
-|                  |                 | 'central']       |                  |
-+------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::FiniteDi |
 | psize            |                 | perturbation     | ff               |
 |                  |                 | size [default:   |                  |
@@ -15657,10 +15649,8 @@ Codegen decref for dependencies.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::get_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+%feature("docstring") casadi::ForwardDiff::get_forward "[INTERNAL]  Second
+order derivatives.
 
 ";
 
@@ -16095,10 +16085,6 @@ using forward differences Joel Andersson
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
-| scheme           | OT_STRING       | Differencing     | casadi::ForwardD |
-|                  |                 | scheme [default: | iff              |
-|                  |                 | 'central']       |                  |
-+------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::ForwardD |
 | psize            |                 | perturbation     | iff              |
 |                  |                 | size [default:   |                  |
@@ -16409,10 +16395,8 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::has_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+%feature("docstring") casadi::ForwardDiff::has_forward "[INTERNAL]  Second
+order derivatives.
 
 ";
 
@@ -44451,10 +44435,6 @@ using 3th order smoothing scheme Joel Andersson
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
-+------------------+-----------------+------------------+------------------+
-| scheme           | OT_STRING       | Differencing     | casadi::Smoothin |
-|                  |                 | scheme [default: | g                |
-|                  |                 | 'central']       |                  |
 +------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::Smoothin |
 | psize            |                 | perturbation     | g                |

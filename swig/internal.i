@@ -388,6 +388,12 @@
 %exception  casadi::ForwardDiff::class_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::ForwardDiff::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ForwardDiff::has_forward(int nfwd) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::ForwardDiff::n_pert() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

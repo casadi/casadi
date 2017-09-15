@@ -10264,10 +10264,6 @@ const  "
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
-| scheme           | OT_STRING       | Differencing     | casadi::CentralD |
-|                  |                 | scheme [default: | iff              |
-|                  |                 | 'central']       |                  |
-+------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::CentralD |
 | psize            |                 | perturbation     | iff              |
 |                  |                 | size [default:   |                  |
@@ -18639,10 +18635,6 @@ bool persistent=false) "
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
-| scheme           | OT_STRING       | Differencing     | casadi::FiniteDi |
-|                  |                 | scheme [default: | ff               |
-|                  |                 | 'central']       |                  |
-+------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::FiniteDi |
 | psize            |                 | perturbation     | ff               |
 |                  |                 | size [default:   |                  |
@@ -21308,13 +21300,11 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_forward(int nfwd, const
+%feature("docstring")  casadi::ForwardDiff::get_forward(int nfwd, const
 std::string &name, const std::vector< std::string > &inames, const
-std::vector< std::string > &onames, const Dict &opts) const  "
+std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(int nfwd) if no cached version is available.
+[INTERNAL]  Second order derivatives.
 
 ";
 
@@ -21825,10 +21815,6 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
-| scheme           | OT_STRING       | Differencing     | casadi::ForwardD |
-|                  |                 | scheme [default: | iff              |
-|                  |                 | 'central']       |                  |
-+------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::ForwardD |
 | psize            |                 | perturbation     | iff              |
 |                  |                 | size [default:   |                  |
@@ -22284,12 +22270,10 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_forward(int nfwd) const
-"
+%feature("docstring")  casadi::ForwardDiff::has_forward(int nfwd) const
+override "
 
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(int nfwd) if no cached version is available.
+[INTERNAL]  Second order derivatives.
 
 ";
 
@@ -61100,10 +61084,6 @@ Andersson
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
-+------------------+-----------------+------------------+------------------+
-| scheme           | OT_STRING       | Differencing     | casadi::Smoothin |
-|                  |                 | scheme [default: | g                |
-|                  |                 | 'central']       |                  |
 +------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::Smoothin |
 | psize            |                 | perturbation     | g                |

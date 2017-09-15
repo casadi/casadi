@@ -487,7 +487,6 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>scheme</td><td>OT_STRING</td><td>Differencing scheme [default: 'central']</td><td>casadi::CentralDiff</td></tr>
 <tr><td>second_order_stepsize</td><td>OT_DOUBLE</td><td>Second order perturbation size [default: 1e-3]</td><td>casadi::CentralDiff</td></tr>
 <tr><td>u_aim</td><td>OT_DOUBLE</td><td>Target ratio of roundoff error to truncation error [default: 100.]</td><td>casadi::CentralDiff</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -990,7 +989,6 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>scheme</td><td>OT_STRING</td><td>Differencing scheme [default: 'central']</td><td>casadi::FiniteDiff</td></tr>
 <tr><td>second_order_stepsize</td><td>OT_DOUBLE</td><td>Second order perturbation size [default: 1e-3]</td><td>casadi::FiniteDiff</td></tr>
 <tr><td>u_aim</td><td>OT_DOUBLE</td><td>Target ratio of roundoff error to truncation error [default: 100.]</td><td>casadi::FiniteDiff</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -1073,7 +1071,6 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>scheme</td><td>OT_STRING</td><td>Differencing scheme [default: 'central']</td><td>casadi::ForwardDiff</td></tr>
 <tr><td>second_order_stepsize</td><td>OT_DOUBLE</td><td>Second order perturbation size [default: 1e-3]</td><td>casadi::ForwardDiff</td></tr>
 <tr><td>u_aim</td><td>OT_DOUBLE</td><td>Target ratio of roundoff error to truncation error [default: 100.]</td><td>casadi::ForwardDiff</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -2695,7 +2692,6 @@
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>scheme</td><td>OT_STRING</td><td>Differencing scheme [default: 'central']</td><td>casadi::Smoothing</td></tr>
 <tr><td>second_order_stepsize</td><td>OT_DOUBLE</td><td>Second order perturbation size [default: 1e-3]</td><td>casadi::Smoothing</td></tr>
 <tr><td>u_aim</td><td>OT_DOUBLE</td><td>Target ratio of roundoff error to truncation error [default: 100.]</td><td>casadi::Smoothing</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
