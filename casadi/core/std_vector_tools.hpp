@@ -85,6 +85,11 @@ namespace casadi {
   template<typename T>
   std::vector<T> reverse(const std::vector<T> &v);
 
+  /** \brief Join two lists
+  */
+  template<typename T>
+  std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b);
+
   #endif // SWIG
 
   /// Check if for each element of v holds: v_i < upper
@@ -339,6 +344,13 @@ namespace casadi {
   std::vector<T> reverse(const std::vector<T> &v) {
     std::vector<T> ret(v.size());
     std::reverse_copy(v.begin(), v.end(), ret.begin());
+    return ret;
+  }
+
+  template<typename T>
+  std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b) {
+    std::vector<T> ret = a;
+    ret.insert(ret.end(), b.begin(), b.end());
     return ret;
   }
 
