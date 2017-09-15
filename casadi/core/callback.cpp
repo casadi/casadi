@@ -54,12 +54,12 @@ namespace casadi {
     return ret;
   }
 
-  std::vector<DM> Callback::eval(const std::vector<DM>& arg) {
+  std::vector<DM> Callback::eval(const std::vector<DM>& arg) const {
     casadi_error("Callback::eval has not been implemented");
     return std::vector<DM>();
   }
 
-  int Callback::eval(const double** arg, double** res, int* iw, double* w, void* mem) {
+  int Callback::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Allocate input matrices
     int n_in = this->n_in();
     std::vector<DM> argv(n_in);

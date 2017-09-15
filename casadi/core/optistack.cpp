@@ -43,13 +43,13 @@ class InternalOptiCallback : public Callback {
   Sparsity get_sparsity_in(int i) override;
 
   // Evaluate numerically
-  std::vector<DM> eval(const std::vector<DM>& arg) override;
+  std::vector<DM> eval(const std::vector<DM>& arg) const override;
 
   void set_sol(OptiStack* sol) { i=0; sol_= sol;}
 
   private:
     OptiStack* sol_;
-    int i;
+    mutable int i;
 };
 
 
@@ -84,7 +84,7 @@ Sparsity InternalOptiCallback::get_sparsity_in(int i) {
 }
 
 // Evaluate numerically
-std::vector<DM> InternalOptiCallback::eval(const std::vector<DM>& arg) {
+std::vector<DM> InternalOptiCallback::eval(const std::vector<DM>& arg) const {
   DMDict r;
 
   for (int i=0;i<nlpsol_n_out();++i) {
