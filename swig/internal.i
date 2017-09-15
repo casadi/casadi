@@ -49,52 +49,25 @@
 %exception  casadi::BonminUserClass::sosConstraints() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CentralDiff::calc_fd(CodeGenerator &g, const std::string &yk, const std::string &y0, const std::string &J) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CentralDiff::class_name() const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::CentralDiff::codegen_body(CodeGenerator &g) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::CentralDiff::codegen_declarations(CodeGenerator &g) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::CentralDiff::default_in(int ind) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CentralDiff::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::CentralDiff::get_n_in() override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::CentralDiff::get_n_out() override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::CentralDiff::get_name_in(int i) override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::CentralDiff::get_name_out(int i) override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::CentralDiff::get_options() const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::CentralDiff::get_sparsity_in(int i) override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::CentralDiff::get_sparsity_out(int i) override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::CentralDiff::has_codegen() const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::CentralDiff::has_forward(int nfwd) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::CentralDiff::init(const Dict &opts) override {
+%exception  casadi::CentralDiff::n_pert() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::CentralDiff::uses_output() const override {
+%exception  casadi::CentralDiff::pert(const std::string &k) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CentralDiff::pert(int k) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ClangCompiler::class_name() const override {
@@ -352,6 +325,45 @@
 %exception  casadi::Factory< MatType >::request_output(const std::string &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FiniteDiff::codegen_body(CodeGenerator &g) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FiniteDiff::codegen_declarations(CodeGenerator &g) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FiniteDiff::default_in(int ind) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FiniteDiff::get_n_in() override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FiniteDiff::get_n_out() override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FiniteDiff::get_name_in(int i) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FiniteDiff::get_name_out(int i) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FiniteDiff::get_options() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FiniteDiff::get_sparsity_in(int i) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FiniteDiff::get_sparsity_out(int i) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FiniteDiff::has_codegen() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FiniteDiff::init(const Dict &opts) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FiniteDiff::uses_output() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FixedStepIntegrator::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -368,6 +380,21 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FixedStepIntegrator::setupFG() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ForwardDiff::calc_fd(CodeGenerator &g, const std::string &yk, const std::string &y0, const std::string &J) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ForwardDiff::class_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ForwardDiff::n_pert() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ForwardDiff::pert(const std::string &k) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ForwardDiff::pert(int k) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::conic_debug(const std::string &filename) const  {
@@ -551,9 +578,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::getWorkSize() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::get_fd(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
@@ -1534,6 +1558,27 @@
 %exception  casadi::SlicotExpm::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Smoothing::calc_fd(CodeGenerator &g, const std::string &yk, const std::string &y0, const std::string &J) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Smoothing::class_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Smoothing::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Smoothing::has_forward(int nfwd) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Smoothing::n_pert() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Smoothing::pert(const std::string &k) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Smoothing::pert(int k) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SparseStorage< DataType >::clear() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1666,6 +1711,9 @@
 %exception casadi::Blocksqp::Blocksqp(const std::string &name, const Function &nlp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::CentralDiff::CentralDiff(const std::string &name, int n, double h) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::ClangCompiler::ClangCompiler(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1693,7 +1741,13 @@
 %exception casadi::Factory< MatType >::Factory(const Function::AuxOut &aux) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::FiniteDiff::FiniteDiff(const std::string &name, int n, double h) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::FixedStepIntegrator::FixedStepIntegrator(const std::string &name, const Function &dae) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::ForwardDiff::ForwardDiff(const std::string &name, int n, double h) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::GenericExternal::GenericExternal(const std::string &name, const Importer &li) {
@@ -1766,6 +1820,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::SlicotExpm::SlicotExpm(const std::string &name, const Sparsity &A) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::Smoothing::Smoothing(const std::string &name, int n, double h) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::SparseStorage< DataType >::SparseStorage() {

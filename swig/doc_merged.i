@@ -1004,11 +1004,6 @@ required length of iw field.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::Blocksqp::set_work "[INTERNAL]  Set the
 (persistent) work vectors.
 
@@ -2194,11 +2189,6 @@ templated.
 
 ";
 
-%feature("docstring") casadi::BSpline::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::BSpline::has_derivative "[INTERNAL]  Can
 derivatives be calculated in any way?
 
@@ -2472,10 +2462,23 @@ structure recognition.
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -2917,10 +2920,23 @@ Base class for BSpline evaluators
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -3111,11 +3127,6 @@ Print all information there is to know about a certain option.
 
 %feature("docstring") casadi::BSplineCommon::size2_out "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::BSplineCommon::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
 
 ";
 
@@ -3977,8 +3988,8 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
+%feature("docstring") casadi::BSplineDual::getAtomicInput "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -4265,10 +4276,23 @@ Generate a function that calculates nfwd forward derivatives.
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -4739,11 +4763,6 @@ Obtain solver name from Adaptor.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::setup "[INTERNAL]  Set the
-(persistent and temporary) work vectors.
-
-";
-
 %feature("docstring") casadi::BSplineDual::get_n_out "
 
 Number of function inputs and outputs.
@@ -4787,8 +4806,8 @@ Generate a function that calculates nfwd forward derivatives.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
+%feature("docstring") casadi::BSplineDual::setup "[INTERNAL]  Set the
+(persistent and temporary) work vectors.
 
 ";
 
@@ -4982,11 +5001,6 @@ Get the length of the work vector.
 
 %feature("docstring") casadi::BSplineInterpolant::free_sx "[INTERNAL]  Get
 free variables (SX)
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
 
 ";
 
@@ -6816,272 +6830,10 @@ output scheme index by name.
 
 ";
 
-%feature("docstring") casadi::CentralDiff "[INTERNAL]  Calculate derivative
-using central differences The algorithm is based on the package
-specification for TD12 in the HSL archive Joel Andersson
+%feature("docstring") casadi::CentralDiff::replace_arg "[INTERNAL]  Replace
+0-by-0 inputs.
 
->List of available options
-
-+------------------+-----------------+------------------+------------------+
-|        Id        |      Type       |   Description    |     Used in      |
-+==================+=================+==================+==================+
-| ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
-|                  |                 | for derivative   | Internal         |
-|                  |                 | calculation.When |                  |
-|                  |                 | there is an      |                  |
-|                  |                 | option of either |                  |
-|                  |                 | using forward or |                  |
-|                  |                 | reverse mode     |                  |
-|                  |                 | directional      |                  |
-|                  |                 | derivatives, the |                  |
-|                  |                 | condition ad_wei |                  |
-|                  |                 | ght*nf<=(1-ad_we |                  |
-|                  |                 | ight)*na is used |                  |
-|                  |                 | where nf and na  |                  |
-|                  |                 | are estimates of |                  |
-|                  |                 | the number of    |                  |
-|                  |                 | forward/reverse  |                  |
-|                  |                 | mode directional |                  |
-|                  |                 | derivatives      |                  |
-|                  |                 | needed. By       |                  |
-|                  |                 | default,         |                  |
-|                  |                 | ad_weight is     |                  |
-|                  |                 | calculated       |                  |
-|                  |                 | automatically,   |                  |
-|                  |                 | but this can be  |                  |
-|                  |                 | overridden by    |                  |
-|                  |                 | setting this     |                  |
-|                  |                 | option. In       |                  |
-|                  |                 | particular, 0    |                  |
-|                  |                 | means forcing    |                  |
-|                  |                 | forward mode and |                  |
-|                  |                 | 1 forcing        |                  |
-|                  |                 | reverse mode.    |                  |
-|                  |                 | Leave unset for  |                  |
-|                  |                 | (class specific) |                  |
-|                  |                 | heuristics.      |                  |
-+------------------+-----------------+------------------+------------------+
-| ad_weight_sp     | OT_DOUBLE       | Weighting factor | casadi::Function |
-|                  |                 | for sparsity     | Internal         |
-|                  |                 | pattern          |                  |
-|                  |                 | calculation calc |                  |
-|                  |                 | ulation.Override |                  |
-|                  |                 | s default        |                  |
-|                  |                 | behavior. Set to |                  |
-|                  |                 | 0 and 1 to force |                  |
-|                  |                 | forward and      |                  |
-|                  |                 | reverse mode     |                  |
-|                  |                 | respectively.    |                  |
-|                  |                 | Cf. option       |                  |
-|                  |                 | \"ad_weight\".     |                  |
-+------------------+-----------------+------------------+------------------+
-| compiler         | OT_STRING       | Just-in-time     | casadi::Function |
-|                  |                 | compiler plugin  | Internal         |
-|                  |                 | to be used.      |                  |
-+------------------+-----------------+------------------+------------------+
-| derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
-|                  |                 | a derivative of  | Internal         |
-|                  |                 | another          |                  |
-|                  |                 | function. The    |                  |
-|                  |                 | type of          |                  |
-|                  |                 | derivative       |                  |
-|                  |                 | (directional     |                  |
-|                  |                 | derivative,      |                  |
-|                  |                 | Jacobian) is     |                  |
-|                  |                 | inferred from    |                  |
-|                  |                 | the function     |                  |
-|                  |                 | name.            |                  |
-+------------------+-----------------+------------------+------------------+
-| enable_fd        | OT_BOOL         | Enable           | casadi::Function |
-|                  |                 | derivative       | Internal         |
-|                  |                 | calculation by   |                  |
-|                  |                 | finite           |                  |
-|                  |                 | differencing.    |                  |
-|                  |                 | [default:        |                  |
-|                  |                 | false]]          |                  |
-+------------------+-----------------+------------------+------------------+
-| enable_forward   | OT_BOOL         | Enable           | casadi::Function |
-|                  |                 | derivative       | Internal         |
-|                  |                 | calculation      |                  |
-|                  |                 | using generated  |                  |
-|                  |                 | functions for    |                  |
-|                  |                 | Jacobian-times-  |                  |
-|                  |                 | vector products  |                  |
-|                  |                 | - typically      |                  |
-|                  |                 | using forward    |                  |
-|                  |                 | mode AD - if     |                  |
-|                  |                 | available.       |                  |
-|                  |                 | [default: true]  |                  |
-+------------------+-----------------+------------------+------------------+
-| enable_jacobian  | OT_BOOL         | Enable           | casadi::Function |
-|                  |                 | derivative       | Internal         |
-|                  |                 | calculation      |                  |
-|                  |                 | using generated  |                  |
-|                  |                 | functions for    |                  |
-|                  |                 | Jacobians of all |                  |
-|                  |                 | differentiable   |                  |
-|                  |                 | outputs with     |                  |
-|                  |                 | respect to all   |                  |
-|                  |                 | differentiable   |                  |
-|                  |                 | inputs - if      |                  |
-|                  |                 | available.       |                  |
-|                  |                 | [default: true]  |                  |
-+------------------+-----------------+------------------+------------------+
-| enable_reverse   | OT_BOOL         | Enable           | casadi::Function |
-|                  |                 | derivative       | Internal         |
-|                  |                 | calculation      |                  |
-|                  |                 | using generated  |                  |
-|                  |                 | functions for    |                  |
-|                  |                 | transposed       |                  |
-|                  |                 | Jacobian-times-  |                  |
-|                  |                 | vector products  |                  |
-|                  |                 | - typically      |                  |
-|                  |                 | using reverse    |                  |
-|                  |                 | mode AD - if     |                  |
-|                  |                 | available.       |                  |
-|                  |                 | [default: true]  |                  |
-+------------------+-----------------+------------------+------------------+
-| eps              | OT_DOUBLE       | Minimium         | casadi::CentralD |
-|                  |                 | relative         | iff              |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | machine          |                  |
-|                  |                 | precision]       |                  |
-+------------------+-----------------+------------------+------------------+
-| eps1             | OT_DOUBLE       | Minimium         | casadi::CentralD |
-|                  |                 | absolute         | iff              |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | machine          |                  |
-|                  |                 | precision]       |                  |
-+------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
-|                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
-+------------------+-----------------+------------------+------------------+
-| gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
-|                  |                 | option           | Internal         |
-|                  |                 | (ignored):       |                  |
-|                  |                 | Statistics are   |                  |
-|                  |                 | now always       |                  |
-|                  |                 | collected.       |                  |
-+------------------+-----------------+------------------+------------------+
-| h_max            | OT_DOUBLE       | Maximum step     | casadi::CentralD |
-|                  |                 | size [default    | iff              |
-|                  |                 | 1.0]             |                  |
-+------------------+-----------------+------------------+------------------+
-| input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
-|                  |                 | option (ignored) | Internal         |
-+------------------+-----------------+------------------+------------------+
-| inputs_check     | OT_BOOL         | Throw exceptions | casadi::Function |
-|                  |                 | when the         | Internal         |
-|                  |                 | numerical values |                  |
-|                  |                 | of the inputs    |                  |
-|                  |                 | don't make sense |                  |
-+------------------+-----------------+------------------+------------------+
-| jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
-|                  |                 | for a number of  | Internal         |
-|                  |                 | forward/reverse  |                  |
-|                  |                 | directions, it   |                  |
-|                  |                 | may be cheaper   |                  |
-|                  |                 | to compute first |                  |
-|                  |                 | the full         |                  |
-|                  |                 | jacobian and     |                  |
-|                  |                 | then multiply    |                  |
-|                  |                 | with seeds,      |                  |
-|                  |                 | rather than      |                  |
-|                  |                 | obtain the       |                  |
-|                  |                 | requested        |                  |
-|                  |                 | directions in a  |                  |
-|                  |                 | straightforward  |                  |
-|                  |                 | manner. Casadi   |                  |
-|                  |                 | uses a heuristic |                  |
-|                  |                 | to decide which  |                  |
-|                  |                 | is cheaper. A    |                  |
-|                  |                 | high value of    |                  |
-|                  |                 | 'jac_penalty'    |                  |
-|                  |                 | makes it less    |                  |
-|                  |                 | likely for the   |                  |
-|                  |                 | heurstic to      |                  |
-|                  |                 | chose the full   |                  |
-|                  |                 | Jacobian         |                  |
-|                  |                 | strategy. The    |                  |
-|                  |                 | special value -1 |                  |
-|                  |                 | indicates never  |                  |
-|                  |                 | to use the full  |                  |
-|                  |                 | Jacobian         |                  |
-|                  |                 | strategy         |                  |
-+------------------+-----------------+------------------+------------------+
-| jit              | OT_BOOL         | Use just-in-time | casadi::Function |
-|                  |                 | compiler to      | Internal         |
-|                  |                 | speed up the     |                  |
-|                  |                 | evaluation       |                  |
-+------------------+-----------------+------------------+------------------+
-| jit_options      | OT_DICT         | Options to be    | casadi::Function |
-|                  |                 | passed to the    | Internal         |
-|                  |                 | jit compiler.    |                  |
-+------------------+-----------------+------------------+------------------+
-| max_num_dir      | OT_INT          | Specify the      | casadi::Function |
-|                  |                 | maximum number   | Internal         |
-|                  |                 | of directions    |                  |
-|                  |                 | for derivative   |                  |
-|                  |                 | functions.       |                  |
-|                  |                 | Overrules the    |                  |
-|                  |                 | builtin optimize |                  |
-|                  |                 | d_num_dir.       |                  |
-+------------------+-----------------+------------------+------------------+
-| output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
-|                  |                 | option (ignored) | Internal         |
-+------------------+-----------------+------------------+------------------+
-| print_time       | OT_BOOL         | print            | casadi::Function |
-|                  |                 | information      | Internal         |
-|                  |                 | about execution  |                  |
-|                  |                 | time             |                  |
-+------------------+-----------------+------------------+------------------+
-| regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
-|                  |                 | when NaN or Inf  | Internal         |
-|                  |                 | appears during   |                  |
-|                  |                 | evaluation       |                  |
-+------------------+-----------------+------------------+------------------+
-| scheme           | OT_STRING       | Differencing     | casadi::CentralD |
-|                  |                 | scheme [default: | iff              |
-|                  |                 | 'central']       |                  |
-+------------------+-----------------+------------------+------------------+
-| second_order_ste | OT_DOUBLE       | Second order     | casadi::CentralD |
-| psize            |                 | perturbation     | iff              |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-3]            |                  |
-+------------------+-----------------+------------------+------------------+
-| stepsize         | OT_DOUBLE       | Perturbation     | casadi::CentralD |
-|                  |                 | size [default:   | iff              |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
-| u_aim            | OT_DOUBLE       | Target ratio of  | casadi::CentralD |
-|                  |                 | roundoff error   | iff              |
-|                  |                 | to truncation    |                  |
-|                  |                 | error [default:  |                  |
-|                  |                 | 100.]            |                  |
-+------------------+-----------------+------------------+------------------+
-| user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
-|                  |                 | field that can   | Internal         |
-|                  |                 | be used to       |                  |
-|                  |                 | identify the     |                  |
-|                  |                 | function or pass |                  |
-|                  |                 | additional       |                  |
-|                  |                 | information      |                  |
-+------------------+-----------------+------------------+------------------+
-| verbose          | OT_BOOL         | Verbose          | casadi::Function |
-|                  |                 | evaluation  for  | Internal         |
-|                  |                 | debugging        |                  |
-+------------------+-----------------+------------------+------------------+
-
-Diagrams
---------
-
-
-
-C++ includes: finite_differences.hpp ";
+";
 
 %feature("docstring") casadi::CentralDiff::disp_more "[INTERNAL]  Print
 more.
@@ -7103,13 +6855,10 @@ required length of w field.
 
 ";
 
+%feature("docstring") casadi::CentralDiff::pert "[INTERNAL] ";
+
 %feature("docstring") casadi::CentralDiff::sz_arg "[INTERNAL]  Get required
 length of arg field.
-
-";
-
-%feature("docstring") casadi::CentralDiff::codegen_incref "[INTERNAL]
-Codegen incref for dependencies.
 
 ";
 
@@ -7154,6 +6903,8 @@ cached version is available.
 
 ";
 
+%feature("docstring") casadi::CentralDiff::CentralDiff "[INTERNAL] ";
+
 %feature("docstring") casadi::CentralDiff::simplified_call "[INTERNAL]  Use
 simplified signature.
 
@@ -7174,6 +6925,8 @@ reverse order is run after init() has been completed.
 function inputs and outputs.
 
 ";
+
+%feature("docstring") casadi::CentralDiff::calc_fd "[INTERNAL] ";
 
 %feature("docstring") casadi::CentralDiff::free_mem "[INTERNAL]  Free
 memory block.
@@ -7281,8 +7034,8 @@ codegen supported?
 
 ";
 
-%feature("docstring") casadi::CentralDiff::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
+%feature("docstring") casadi::CentralDiff::codegen_incref "[INTERNAL]
+Codegen incref for dependencies.
 
 ";
 
@@ -7431,6 +7184,8 @@ Input/output dimensions.
 
 ";
 
+%feature("docstring") casadi::CentralDiff::n_pert "[INTERNAL] ";
+
 %feature("docstring") casadi::CentralDiff::all_scalar "[INTERNAL]  Are all
 inputs and outputs scalar.
 
@@ -7527,10 +7282,278 @@ Obtain solver name from Adaptor.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::replace_arg "[INTERNAL]  Replace
-0-by-0 inputs.
+%feature("docstring") casadi::CentralDiff "[INTERNAL]  Calculate derivative
+using central differences Joel Andersson
 
-";
+>List of available options
+
++------------------+-----------------+------------------+------------------+
+|        Id        |      Type       |   Description    |     Used in      |
++==================+=================+==================+==================+
+| ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
+|                  |                 | for derivative   | Internal         |
+|                  |                 | calculation.When |                  |
+|                  |                 | there is an      |                  |
+|                  |                 | option of either |                  |
+|                  |                 | using forward or |                  |
+|                  |                 | reverse mode     |                  |
+|                  |                 | directional      |                  |
+|                  |                 | derivatives, the |                  |
+|                  |                 | condition ad_wei |                  |
+|                  |                 | ght*nf<=(1-ad_we |                  |
+|                  |                 | ight)*na is used |                  |
+|                  |                 | where nf and na  |                  |
+|                  |                 | are estimates of |                  |
+|                  |                 | the number of    |                  |
+|                  |                 | forward/reverse  |                  |
+|                  |                 | mode directional |                  |
+|                  |                 | derivatives      |                  |
+|                  |                 | needed. By       |                  |
+|                  |                 | default,         |                  |
+|                  |                 | ad_weight is     |                  |
+|                  |                 | calculated       |                  |
+|                  |                 | automatically,   |                  |
+|                  |                 | but this can be  |                  |
+|                  |                 | overridden by    |                  |
+|                  |                 | setting this     |                  |
+|                  |                 | option. In       |                  |
+|                  |                 | particular, 0    |                  |
+|                  |                 | means forcing    |                  |
+|                  |                 | forward mode and |                  |
+|                  |                 | 1 forcing        |                  |
+|                  |                 | reverse mode.    |                  |
+|                  |                 | Leave unset for  |                  |
+|                  |                 | (class specific) |                  |
+|                  |                 | heuristics.      |                  |
++------------------+-----------------+------------------+------------------+
+| ad_weight_sp     | OT_DOUBLE       | Weighting factor | casadi::Function |
+|                  |                 | for sparsity     | Internal         |
+|                  |                 | pattern          |                  |
+|                  |                 | calculation calc |                  |
+|                  |                 | ulation.Override |                  |
+|                  |                 | s default        |                  |
+|                  |                 | behavior. Set to |                  |
+|                  |                 | 0 and 1 to force |                  |
+|                  |                 | forward and      |                  |
+|                  |                 | reverse mode     |                  |
+|                  |                 | respectively.    |                  |
+|                  |                 | Cf. option       |                  |
+|                  |                 | \"ad_weight\".     |                  |
++------------------+-----------------+------------------+------------------+
+| compiler         | OT_STRING       | Just-in-time     | casadi::Function |
+|                  |                 | compiler plugin  | Internal         |
+|                  |                 | to be used.      |                  |
++------------------+-----------------+------------------+------------------+
+| derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
+|                  |                 | a derivative of  | Internal         |
+|                  |                 | another          |                  |
+|                  |                 | function. The    |                  |
+|                  |                 | type of          |                  |
+|                  |                 | derivative       |                  |
+|                  |                 | (directional     |                  |
+|                  |                 | derivative,      |                  |
+|                  |                 | Jacobian) is     |                  |
+|                  |                 | inferred from    |                  |
+|                  |                 | the function     |                  |
+|                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| enable_fd        | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation by   |                  |
+|                  |                 | finite           |                  |
+|                  |                 | differencing.    |                  |
+|                  |                 | [default:        |                  |
+|                  |                 | false]]          |                  |
++------------------+-----------------+------------------+------------------+
+| enable_forward   | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | Jacobian-times-  |                  |
+|                  |                 | vector products  |                  |
+|                  |                 | - typically      |                  |
+|                  |                 | using forward    |                  |
+|                  |                 | mode AD - if     |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| enable_jacobian  | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | Jacobians of all |                  |
+|                  |                 | differentiable   |                  |
+|                  |                 | outputs with     |                  |
+|                  |                 | respect to all   |                  |
+|                  |                 | differentiable   |                  |
+|                  |                 | inputs - if      |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| enable_reverse   | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | transposed       |                  |
+|                  |                 | Jacobian-times-  |                  |
+|                  |                 | vector products  |                  |
+|                  |                 | - typically      |                  |
+|                  |                 | using reverse    |                  |
+|                  |                 | mode AD - if     |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| eps_in           | OT_DOUBLE       | Accuracy of      | casadi::CentralD |
+|                  |                 | function inputs  | iff              |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
++------------------+-----------------+------------------+------------------+
+| eps_out          | OT_DOUBLE       | Accuracy of      | casadi::CentralD |
+|                  |                 | function outputs | iff              |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
+|                  |                 | differencing     |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
++------------------+-----------------+------------------+------------------+
+| gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
+|                  |                 | option           | Internal         |
+|                  |                 | (ignored):       |                  |
+|                  |                 | Statistics are   |                  |
+|                  |                 | now always       |                  |
+|                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| h_max            | OT_DOUBLE       | Maximum step     | casadi::CentralD |
+|                  |                 | size [default    | iff              |
+|                  |                 | 1.0]             |                  |
++------------------+-----------------+------------------+------------------+
+| input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
+|                  |                 | option (ignored) | Internal         |
++------------------+-----------------+------------------+------------------+
+| inputs_check     | OT_BOOL         | Throw exceptions | casadi::Function |
+|                  |                 | when the         | Internal         |
+|                  |                 | numerical values |                  |
+|                  |                 | of the inputs    |                  |
+|                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
+|                  |                 | for a number of  | Internal         |
+|                  |                 | forward/reverse  |                  |
+|                  |                 | directions, it   |                  |
+|                  |                 | may be cheaper   |                  |
+|                  |                 | to compute first |                  |
+|                  |                 | the full         |                  |
+|                  |                 | jacobian and     |                  |
+|                  |                 | then multiply    |                  |
+|                  |                 | with seeds,      |                  |
+|                  |                 | rather than      |                  |
+|                  |                 | obtain the       |                  |
+|                  |                 | requested        |                  |
+|                  |                 | directions in a  |                  |
+|                  |                 | straightforward  |                  |
+|                  |                 | manner. Casadi   |                  |
+|                  |                 | uses a heuristic |                  |
+|                  |                 | to decide which  |                  |
+|                  |                 | is cheaper. A    |                  |
+|                  |                 | high value of    |                  |
+|                  |                 | 'jac_penalty'    |                  |
+|                  |                 | makes it less    |                  |
+|                  |                 | likely for the   |                  |
+|                  |                 | heurstic to      |                  |
+|                  |                 | chose the full   |                  |
+|                  |                 | Jacobian         |                  |
+|                  |                 | strategy. The    |                  |
+|                  |                 | special value -1 |                  |
+|                  |                 | indicates never  |                  |
+|                  |                 | to use the full  |                  |
+|                  |                 | Jacobian         |                  |
+|                  |                 | strategy         |                  |
++------------------+-----------------+------------------+------------------+
+| jit              | OT_BOOL         | Use just-in-time | casadi::Function |
+|                  |                 | compiler to      | Internal         |
+|                  |                 | speed up the     |                  |
+|                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_options      | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| max_num_dir      | OT_INT          | Specify the      | casadi::Function |
+|                  |                 | maximum number   | Internal         |
+|                  |                 | of directions    |                  |
+|                  |                 | for derivative   |                  |
+|                  |                 | functions.       |                  |
+|                  |                 | Overrules the    |                  |
+|                  |                 | builtin optimize |                  |
+|                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
+|                  |                 | option (ignored) | Internal         |
++------------------+-----------------+------------------+------------------+
+| print_time       | OT_BOOL         | print            | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time             |                  |
++------------------+-----------------+------------------+------------------+
+| regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
+|                  |                 | when NaN or Inf  | Internal         |
+|                  |                 | appears during   |                  |
+|                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| scheme           | OT_STRING       | Differencing     | casadi::CentralD |
+|                  |                 | scheme [default: | iff              |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| second_order_ste | OT_DOUBLE       | Second order     | casadi::CentralD |
+| psize            |                 | perturbation     | iff              |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-3]            |                  |
++------------------+-----------------+------------------+------------------+
+| u_aim            | OT_DOUBLE       | Target ratio of  | casadi::CentralD |
+|                  |                 | roundoff error   | iff              |
+|                  |                 | to truncation    |                  |
+|                  |                 | error [default:  |                  |
+|                  |                 | 100.]            |                  |
++------------------+-----------------+------------------+------------------+
+| user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
+|                  |                 | field that can   | Internal         |
+|                  |                 | be used to       |                  |
+|                  |                 | identify the     |                  |
+|                  |                 | function or pass |                  |
+|                  |                 | additional       |                  |
+|                  |                 | information      |                  |
++------------------+-----------------+------------------+------------------+
+| verbose          | OT_BOOL         | Verbose          | casadi::Function |
+|                  |                 | evaluation  for  | Internal         |
+|                  |                 | debugging        |                  |
++------------------+-----------------+------------------+------------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: finite_differences.hpp ";
 
 %feature("docstring") casadi::CentralDiff::call_gen "[INTERNAL]   Call a
 function, overloaded.
@@ -8267,11 +8290,6 @@ Get sparsity of a given input.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring") casadi::Collocation::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
 
 ";
 
@@ -9095,11 +9113,6 @@ arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::Conic::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::Conic::free_mx "[INTERNAL]  Get free
 variables ( MX)
 
@@ -9711,10 +9724,23 @@ Internal class.
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -10872,10 +10898,23 @@ Internal class.
 |                  |                 | greater than     |                  |
 |                  |                 | 1-eps_unstable   |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -11022,11 +11061,6 @@ Generate code for the declarations of the C function.
 
 %feature("docstring") casadi::Dple::size1_out "[INTERNAL]  Input/output
 dimensions.
-
-";
-
-%feature("docstring") casadi::Dple::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
 
 ";
 
@@ -12028,8 +12062,8 @@ and temporary) work vectors.
 
 ";
 
-%feature("docstring") casadi::Expm::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
+%feature("docstring") casadi::Expm::has_codegen "[INTERNAL]  Is codegen
+supported?
 
 ";
 
@@ -12133,11 +12167,6 @@ input value.
 
 %feature("docstring") casadi::Expm::matching_res "[INTERNAL]  Check if
 output arguments that needs to be replaced.
-
-";
-
-%feature("docstring") casadi::Expm::has_codegen "[INTERNAL]  Is codegen
-supported?
 
 ";
 
@@ -12376,10 +12405,23 @@ Internal class.
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -13275,11 +13317,6 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::External::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::External::has_jacobian "[INTERNAL]  Full
 Jacobian.
 
@@ -13528,6 +13565,1069 @@ Export / Generate C code for the dependency function.
 
 
 // File: classcasadi_1_1Find.xml
+
+
+// File: classcasadi_1_1FiniteDiff.xml
+%feature("docstring") casadi::FiniteDiff::factory "[INTERNAL] ";
+
+%feature("docstring") casadi::FiniteDiff::alloc "[INTERNAL]  Ensure work
+vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::getWorkSize "[INTERNAL]  Get the
+length of the work vector.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::name_out "[INTERNAL]  Get output
+scheme name by index.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
+%feature("docstring") casadi::FiniteDiff "[INTERNAL]  Calculate derivative
+using finite differences Joel Andersson
+
+>List of available options
+
++------------------+-----------------+------------------+------------------+
+|        Id        |      Type       |   Description    |     Used in      |
++==================+=================+==================+==================+
+| ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
+|                  |                 | for derivative   | Internal         |
+|                  |                 | calculation.When |                  |
+|                  |                 | there is an      |                  |
+|                  |                 | option of either |                  |
+|                  |                 | using forward or |                  |
+|                  |                 | reverse mode     |                  |
+|                  |                 | directional      |                  |
+|                  |                 | derivatives, the |                  |
+|                  |                 | condition ad_wei |                  |
+|                  |                 | ght*nf<=(1-ad_we |                  |
+|                  |                 | ight)*na is used |                  |
+|                  |                 | where nf and na  |                  |
+|                  |                 | are estimates of |                  |
+|                  |                 | the number of    |                  |
+|                  |                 | forward/reverse  |                  |
+|                  |                 | mode directional |                  |
+|                  |                 | derivatives      |                  |
+|                  |                 | needed. By       |                  |
+|                  |                 | default,         |                  |
+|                  |                 | ad_weight is     |                  |
+|                  |                 | calculated       |                  |
+|                  |                 | automatically,   |                  |
+|                  |                 | but this can be  |                  |
+|                  |                 | overridden by    |                  |
+|                  |                 | setting this     |                  |
+|                  |                 | option. In       |                  |
+|                  |                 | particular, 0    |                  |
+|                  |                 | means forcing    |                  |
+|                  |                 | forward mode and |                  |
+|                  |                 | 1 forcing        |                  |
+|                  |                 | reverse mode.    |                  |
+|                  |                 | Leave unset for  |                  |
+|                  |                 | (class specific) |                  |
+|                  |                 | heuristics.      |                  |
++------------------+-----------------+------------------+------------------+
+| ad_weight_sp     | OT_DOUBLE       | Weighting factor | casadi::Function |
+|                  |                 | for sparsity     | Internal         |
+|                  |                 | pattern          |                  |
+|                  |                 | calculation calc |                  |
+|                  |                 | ulation.Override |                  |
+|                  |                 | s default        |                  |
+|                  |                 | behavior. Set to |                  |
+|                  |                 | 0 and 1 to force |                  |
+|                  |                 | forward and      |                  |
+|                  |                 | reverse mode     |                  |
+|                  |                 | respectively.    |                  |
+|                  |                 | Cf. option       |                  |
+|                  |                 | \"ad_weight\".     |                  |
++------------------+-----------------+------------------+------------------+
+| compiler         | OT_STRING       | Just-in-time     | casadi::Function |
+|                  |                 | compiler plugin  | Internal         |
+|                  |                 | to be used.      |                  |
++------------------+-----------------+------------------+------------------+
+| derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
+|                  |                 | a derivative of  | Internal         |
+|                  |                 | another          |                  |
+|                  |                 | function. The    |                  |
+|                  |                 | type of          |                  |
+|                  |                 | derivative       |                  |
+|                  |                 | (directional     |                  |
+|                  |                 | derivative,      |                  |
+|                  |                 | Jacobian) is     |                  |
+|                  |                 | inferred from    |                  |
+|                  |                 | the function     |                  |
+|                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| enable_fd        | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation by   |                  |
+|                  |                 | finite           |                  |
+|                  |                 | differencing.    |                  |
+|                  |                 | [default:        |                  |
+|                  |                 | false]]          |                  |
++------------------+-----------------+------------------+------------------+
+| enable_forward   | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | Jacobian-times-  |                  |
+|                  |                 | vector products  |                  |
+|                  |                 | - typically      |                  |
+|                  |                 | using forward    |                  |
+|                  |                 | mode AD - if     |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| enable_jacobian  | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | Jacobians of all |                  |
+|                  |                 | differentiable   |                  |
+|                  |                 | outputs with     |                  |
+|                  |                 | respect to all   |                  |
+|                  |                 | differentiable   |                  |
+|                  |                 | inputs - if      |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| enable_reverse   | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | transposed       |                  |
+|                  |                 | Jacobian-times-  |                  |
+|                  |                 | vector products  |                  |
+|                  |                 | - typically      |                  |
+|                  |                 | using reverse    |                  |
+|                  |                 | mode AD - if     |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| eps_in           | OT_DOUBLE       | Accuracy of      | casadi::FiniteDi |
+|                  |                 | function inputs  | ff               |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
++------------------+-----------------+------------------+------------------+
+| eps_out          | OT_DOUBLE       | Accuracy of      | casadi::FiniteDi |
+|                  |                 | function outputs | ff               |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
+|                  |                 | differencing     |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
++------------------+-----------------+------------------+------------------+
+| gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
+|                  |                 | option           | Internal         |
+|                  |                 | (ignored):       |                  |
+|                  |                 | Statistics are   |                  |
+|                  |                 | now always       |                  |
+|                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| h_max            | OT_DOUBLE       | Maximum step     | casadi::FiniteDi |
+|                  |                 | size [default    | ff               |
+|                  |                 | 1.0]             |                  |
++------------------+-----------------+------------------+------------------+
+| input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
+|                  |                 | option (ignored) | Internal         |
++------------------+-----------------+------------------+------------------+
+| inputs_check     | OT_BOOL         | Throw exceptions | casadi::Function |
+|                  |                 | when the         | Internal         |
+|                  |                 | numerical values |                  |
+|                  |                 | of the inputs    |                  |
+|                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
+|                  |                 | for a number of  | Internal         |
+|                  |                 | forward/reverse  |                  |
+|                  |                 | directions, it   |                  |
+|                  |                 | may be cheaper   |                  |
+|                  |                 | to compute first |                  |
+|                  |                 | the full         |                  |
+|                  |                 | jacobian and     |                  |
+|                  |                 | then multiply    |                  |
+|                  |                 | with seeds,      |                  |
+|                  |                 | rather than      |                  |
+|                  |                 | obtain the       |                  |
+|                  |                 | requested        |                  |
+|                  |                 | directions in a  |                  |
+|                  |                 | straightforward  |                  |
+|                  |                 | manner. Casadi   |                  |
+|                  |                 | uses a heuristic |                  |
+|                  |                 | to decide which  |                  |
+|                  |                 | is cheaper. A    |                  |
+|                  |                 | high value of    |                  |
+|                  |                 | 'jac_penalty'    |                  |
+|                  |                 | makes it less    |                  |
+|                  |                 | likely for the   |                  |
+|                  |                 | heurstic to      |                  |
+|                  |                 | chose the full   |                  |
+|                  |                 | Jacobian         |                  |
+|                  |                 | strategy. The    |                  |
+|                  |                 | special value -1 |                  |
+|                  |                 | indicates never  |                  |
+|                  |                 | to use the full  |                  |
+|                  |                 | Jacobian         |                  |
+|                  |                 | strategy         |                  |
++------------------+-----------------+------------------+------------------+
+| jit              | OT_BOOL         | Use just-in-time | casadi::Function |
+|                  |                 | compiler to      | Internal         |
+|                  |                 | speed up the     |                  |
+|                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_options      | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| max_num_dir      | OT_INT          | Specify the      | casadi::Function |
+|                  |                 | maximum number   | Internal         |
+|                  |                 | of directions    |                  |
+|                  |                 | for derivative   |                  |
+|                  |                 | functions.       |                  |
+|                  |                 | Overrules the    |                  |
+|                  |                 | builtin optimize |                  |
+|                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
+|                  |                 | option (ignored) | Internal         |
++------------------+-----------------+------------------+------------------+
+| print_time       | OT_BOOL         | print            | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time             |                  |
++------------------+-----------------+------------------+------------------+
+| regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
+|                  |                 | when NaN or Inf  | Internal         |
+|                  |                 | appears during   |                  |
+|                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| scheme           | OT_STRING       | Differencing     | casadi::FiniteDi |
+|                  |                 | scheme [default: | ff               |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| second_order_ste | OT_DOUBLE       | Second order     | casadi::FiniteDi |
+| psize            |                 | perturbation     | ff               |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-3]            |                  |
++------------------+-----------------+------------------+------------------+
+| u_aim            | OT_DOUBLE       | Target ratio of  | casadi::FiniteDi |
+|                  |                 | roundoff error   | ff               |
+|                  |                 | to truncation    |                  |
+|                  |                 | error [default:  |                  |
+|                  |                 | 100.]            |                  |
++------------------+-----------------+------------------+------------------+
+| user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
+|                  |                 | field that can   | Internal         |
+|                  |                 | be used to       |                  |
+|                  |                 | identify the     |                  |
+|                  |                 | function or pass |                  |
+|                  |                 | additional       |                  |
+|                  |                 | information      |                  |
++------------------+-----------------+------------------+------------------+
+| verbose          | OT_BOOL         | Verbose          | casadi::Function |
+|                  |                 | evaluation  for  | Internal         |
+|                  |                 | debugging        |                  |
++------------------+-----------------+------------------+------------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: finite_differences.hpp ";
+
+%feature("docstring") casadi::FiniteDiff::simplified_call "[INTERNAL]  Use
+simplified signature.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::getAdaptorSolverName "[INTERNAL]
+Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::name "[INTERNAL]  Name of the
+function.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::generate_lifted "[INTERNAL]
+Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::has_jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::eval "[INTERNAL]  Evaluate
+numerically.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::sz_w "[INTERNAL]  Get required
+length of w field.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::weak "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::print_option "[INTERNAL]  Print
+all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::alloc_arg "[INTERNAL]  Ensure
+required length of arg field.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::getAtomicInputReal "[INTERNAL]
+Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::adjViaJac "[INTERNAL]  Calculate
+derivatives by multiplying the full Jacobian and multiplying.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::type_name "[INTERNAL]  Get type
+name.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::FiniteDiff::init_mem "[INTERNAL]  Initalize
+memory block.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::init "[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::sz_iw "[INTERNAL]  Get required
+length of iw field.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::has_function "[INTERNAL] ";
+
+%feature("docstring") casadi::FiniteDiff::has_free "[INTERNAL]  Does the
+function have free variables.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::sx_out "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::FiniteDiff::is_a "[INTERNAL]  Check if the
+function is of a particular type.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::matching_res "[INTERNAL]  Check
+if output arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::call "[INTERNAL]   Call a
+function, templated.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::FiniteDiff "[INTERNAL] ";
+
+%feature("docstring") casadi::FiniteDiff::default_in "[INTERNAL]  Get
+default input value.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::eval_gen "
+
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate numerically.
+
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate a function, overloaded.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::size2_out "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::getJacSparsityHierarchicalSymm "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring") casadi::FiniteDiff::forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::call_reverse "[INTERNAL]  Reverse
+mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::codegen_declarations "[INTERNAL]
+Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::setup "[INTERNAL]  Set the
+(persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::alloc_w "[INTERNAL]  Ensure
+required length of w field.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::getAtomicOperation "[INTERNAL]
+Get an atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::jit_dependencies "[INTERNAL]
+Jit dependencies.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::alloc_mem "[INTERNAL]  Create
+memory block.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::mx_in "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::FiniteDiff::sparsity_out "[INTERNAL]  Get
+sparsity of a given output.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::all_scalar "[INTERNAL]  Are all
+inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::finalize "[INTERNAL]  Finalize
+the object creation This function, which visits the class hierarchy in
+reverse order is run after init() has been completed.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::add_dependency "[INTERNAL]  Add a
+dependent function.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::size2_in "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::print_options "[INTERNAL]  Print
+list of options.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::class_name "[INTERNAL]  Readable
+name of the internal class.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::print_free "[INTERNAL]  Print
+free variables.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::n_nodes "[INTERNAL]  Number of
+nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::getJacSparsityGen "[INTERNAL]
+Get the sparsity pattern, forward mode.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_sparsity_in "[INTERNAL]
+Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::sx_in "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::sp_weight "[INTERNAL]  Weighting
+factor for chosing forward/reverse mode, sparsity propagation.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::free_mem "[INTERNAL]  Free memory
+block.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::disp "[INTERNAL]  Print.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::numel_out "[INTERNAL]  Number of
+input/output elements.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::nnz_out "[INTERNAL]  Number of
+input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::codegen "[INTERNAL]  Generate
+code the function.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::matching_arg "[INTERNAL]  Check
+if input arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::print_dimensions "[INTERNAL]
+Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::nnz_in "[INTERNAL]  Number of
+input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_n_in "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::numel_in "[INTERNAL]  Number of
+input/output elements.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::self "[INTERNAL]  Get a public
+class instance.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::index_in "[INTERNAL]  Get input
+scheme index by name.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::replace_aseed "[INTERNAL]
+Replace 0-by-0 reverse seeds.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::n_out "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::wrap "[INTERNAL]  Wrap in an
+Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::codegen_name "[INTERNAL]  Get
+name in codegen.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::slice "[INTERNAL]  returns a new
+function with a selection of inputs/outputs of the original
+
+";
+
+%feature("docstring") casadi::FiniteDiff::getJacSparsity "[INTERNAL]
+Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::mx_out "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::FiniteDiff::check_arg "[INTERNAL]  Check if
+input arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_n_out "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::size1_in "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::symbolic_output "[INTERNAL]  Get
+a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::signature "[INTERNAL]  Code
+generate the function.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::generate_dependencies "[INTERNAL]
+Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::uses_output "[INTERNAL]  Is the
+scheme using the (nondifferentiated) output?
+
+";
+
+%feature("docstring") casadi::FiniteDiff::name_in "[INTERNAL]  Get input
+scheme name by index.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_options "[INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::call_gen "[INTERNAL]   Call a
+function, overloaded.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::sparsity_in "
+
+>  const Sparsity& casadi::FunctionInternal::sparsity_in(int ind) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Get sparsity of a given input.
+
+>  const Sparsity& casadi::FunctionInternal::sparsity_in(const std::string &iname) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::replace_fseed "[INTERNAL]
+Replace 0-by-0 forward seeds.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::fwdViaJac "[INTERNAL]  Calculate
+derivatives by multiplying the full Jacobian and multiplying.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::alloc_iw "[INTERNAL]  Ensure
+required length of iw field.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::min_in "[INTERNAL]  Get smallest
+input value.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::has_sprev "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::FiniteDiff::replace_arg "[INTERNAL]  Replace
+0-by-0 inputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::eval_mx "[INTERNAL]  Evaluate
+with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::eval_name "[INTERNAL]  Get name
+of the evaluation function.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::simple "[INTERNAL]  Evaluate
+numerically, simplied syntax.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::disp_more "[INTERNAL]  Print
+more.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::codegen_body "[INTERNAL]
+Generate code for the body of the C function.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::sz_arg "[INTERNAL]  Get required
+length of arg field.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::size_in "[INTERNAL]  Input/output
+dimensions.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_stats "[INTERNAL]  Get all
+statistics.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::call_forward "[INTERNAL]  Forward
+mode AD, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::has_codegen "[INTERNAL]  Is
+codegen supported?
+
+";
+
+%feature("docstring") casadi::FiniteDiff::construct "[INTERNAL]  Construct
+Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
+%feature("docstring") casadi::FiniteDiff::getAlgorithmSize "[INTERNAL]  Get
+the number of atomic operations.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::replace_res "[INTERNAL]  Replace
+0-by-0 outputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_name_out "[INTERNAL]  Names
+of function input and outputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::set_work "[INTERNAL]  Set the
+(persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::which_depends "[INTERNAL]  Which
+variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::FiniteDiff::size_out "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::codegen_decref "[INTERNAL]
+Codegen decref for dependencies.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::clear_mem "[INTERNAL]  Clear all
+memory (called from destructor)
+
+";
+
+%feature("docstring") casadi::FiniteDiff::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::sz_work "[INTERNAL]  Get number
+of temporary variables needed.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::size1_out "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::codegen_meta "[INTERNAL]
+Generate meta-information allowing a user to evaluate a generated function.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::getAtomicInput "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::mapsum_mx "[INTERNAL]  Parallel
+evaluation.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::getAtomicOutput "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::has_spfwd "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::FiniteDiff::getCount "[INTERNAL]  Get the
+reference count.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::n_in "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::free_mx "[INTERNAL]  Get free
+variables ( MX)
+
+";
+
+%feature("docstring") casadi::FiniteDiff::checkout "[INTERNAL]  Checkout a
+memory object.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::max_in "[INTERNAL]  Get largest
+input value.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::alloc_res "[INTERNAL]  Ensure
+required length of res field.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::sz_res "[INTERNAL]  Get required
+length of res field.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::free_sx "[INTERNAL]  Get free
+variables (SX)
+
+";
+
+%feature("docstring") casadi::FiniteDiff::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::memory "[INTERNAL]  Memory
+objects.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::~FiniteDiff "[INTERNAL]
+Destructor.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::symbolicAdjSeed "[INTERNAL]
+Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::oracle "[INTERNAL]  Get oracle.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_sparsity_out "[INTERNAL]
+Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::index_out "[INTERNAL]  Get output
+scheme index by name.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::codegen_incref "[INTERNAL]
+Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::fwd_seed "[INTERNAL]  Symbolic
+expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::set_temp "[INTERNAL]  Set the
+(temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::check_res "[INTERNAL]  Check if
+output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_name_in "[INTERNAL]  Names of
+function input and outputs.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::ad_weight "[INTERNAL]  Weighting
+factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_function "[INTERNAL] ";
+
+%feature("docstring") casadi::FiniteDiff::sparsity_jac "[INTERNAL]  Get, if
+necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::eval_sx "[INTERNAL]  Evaluate
+with symbolic scalars.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::get_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::release "[INTERNAL]  Release a
+memory object.
+
+";
 
 
 // File: classcasadi_1_1FixedStepIntegrator.xml
@@ -13927,8 +15027,8 @@ of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
+%feature("docstring") casadi::FixedStepIntegrator::sp_weight "[INTERNAL]
+Weighting factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
@@ -13950,11 +15050,6 @@ no cached version is available.
 
 %feature("docstring") casadi::FixedStepIntegrator::has_codegen "[INTERNAL]
 Is codegen supported?
-
-";
-
-%feature("docstring") casadi::FixedStepIntegrator::sp_weight "[INTERNAL]
-Weighting factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
@@ -14480,6 +15575,1075 @@ smallest input value.
 %feature("docstring") casadi::FixedStepIntegrator::rq "[INTERNAL] ";
 
 %feature("docstring") casadi::FixedStepIntegrator::rp "[INTERNAL] ";
+
+
+// File: classcasadi_1_1ForwardDiff.xml
+%feature("docstring") casadi::ForwardDiff::fwdViaJac "[INTERNAL]  Calculate
+derivatives by multiplying the full Jacobian and multiplying.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::alloc_iw "[INTERNAL]  Ensure
+required length of iw field.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_sparsity_out "[INTERNAL]
+Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::oracle "[INTERNAL]  Get oracle.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::fwd_seed "[INTERNAL]  Symbolic
+expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::alloc_w "[INTERNAL]  Ensure
+required length of w field.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sparsity_out "[INTERNAL]  Get
+sparsity of a given output.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::numel_out "[INTERNAL]  Number of
+input/output elements.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::call "[INTERNAL]   Call a
+function, templated.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::memory "[INTERNAL]  Memory
+objects.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::codegen "[INTERNAL]  Generate
+code the function.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::size_in "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sz_w "[INTERNAL]  Get required
+length of w field.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::all_scalar "[INTERNAL]  Are all
+inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::has_spfwd "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::ForwardDiff::codegen_decref "[INTERNAL]
+Codegen decref for dependencies.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_n_out "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
+%feature("docstring") casadi::ForwardDiff::check_res "[INTERNAL]  Check if
+output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::matching_arg "[INTERNAL]  Check
+if input arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::name "[INTERNAL]  Name of the
+function.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::nnz_out "[INTERNAL]  Number of
+input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::replace_fseed "[INTERNAL]
+Replace 0-by-0 forward seeds.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::n_nodes "[INTERNAL]  Number of
+nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::getAlgorithmSize "[INTERNAL]
+Get the number of atomic operations.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::simple "[INTERNAL]  Evaluate
+numerically, simplied syntax.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::print_options "[INTERNAL]  Print
+list of options.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::size1_out "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::size2_out "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sz_res "[INTERNAL]  Get required
+length of res field.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_stats "[INTERNAL]  Get all
+statistics.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::is_a "[INTERNAL]  Check if the
+function is of a particular type.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::codegen_name "[INTERNAL]  Get
+name in codegen.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::init_mem "[INTERNAL]  Initalize
+memory block.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sparsity_in "
+
+>  const Sparsity& casadi::FunctionInternal::sparsity_in(int ind) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Get sparsity of a given input.
+
+>  const Sparsity& casadi::FunctionInternal::sparsity_in(const std::string &iname) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::has_function "[INTERNAL] ";
+
+%feature("docstring") casadi::ForwardDiff::call_gen "[INTERNAL]   Call a
+function, overloaded.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::replace_res "[INTERNAL]  Replace
+0-by-0 outputs.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::eval_gen "
+
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate numerically.
+
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate a function, overloaded.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_partition "[INTERNAL]  Get
+the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::free_sx "[INTERNAL]  Get free
+variables (SX)
+
+";
+
+%feature("docstring") casadi::ForwardDiff::getJacSparsityHierarchicalSymm "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring") casadi::ForwardDiff::construct "[INTERNAL]  Construct
+Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::weak "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::class_name "[INTERNAL]  Get type
+name.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::index_in "[INTERNAL]  Get input
+scheme index by name.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::ForwardDiff::add_dependency "[INTERNAL]  Add
+a dependent function.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::init "[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::min_in "[INTERNAL]  Get smallest
+input value.
+
+";
+
+%feature("docstring") casadi::ForwardDiff "[INTERNAL]  Calculate derivative
+using forward differences Joel Andersson
+
+>List of available options
+
++------------------+-----------------+------------------+------------------+
+|        Id        |      Type       |   Description    |     Used in      |
++==================+=================+==================+==================+
+| ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
+|                  |                 | for derivative   | Internal         |
+|                  |                 | calculation.When |                  |
+|                  |                 | there is an      |                  |
+|                  |                 | option of either |                  |
+|                  |                 | using forward or |                  |
+|                  |                 | reverse mode     |                  |
+|                  |                 | directional      |                  |
+|                  |                 | derivatives, the |                  |
+|                  |                 | condition ad_wei |                  |
+|                  |                 | ght*nf<=(1-ad_we |                  |
+|                  |                 | ight)*na is used |                  |
+|                  |                 | where nf and na  |                  |
+|                  |                 | are estimates of |                  |
+|                  |                 | the number of    |                  |
+|                  |                 | forward/reverse  |                  |
+|                  |                 | mode directional |                  |
+|                  |                 | derivatives      |                  |
+|                  |                 | needed. By       |                  |
+|                  |                 | default,         |                  |
+|                  |                 | ad_weight is     |                  |
+|                  |                 | calculated       |                  |
+|                  |                 | automatically,   |                  |
+|                  |                 | but this can be  |                  |
+|                  |                 | overridden by    |                  |
+|                  |                 | setting this     |                  |
+|                  |                 | option. In       |                  |
+|                  |                 | particular, 0    |                  |
+|                  |                 | means forcing    |                  |
+|                  |                 | forward mode and |                  |
+|                  |                 | 1 forcing        |                  |
+|                  |                 | reverse mode.    |                  |
+|                  |                 | Leave unset for  |                  |
+|                  |                 | (class specific) |                  |
+|                  |                 | heuristics.      |                  |
++------------------+-----------------+------------------+------------------+
+| ad_weight_sp     | OT_DOUBLE       | Weighting factor | casadi::Function |
+|                  |                 | for sparsity     | Internal         |
+|                  |                 | pattern          |                  |
+|                  |                 | calculation calc |                  |
+|                  |                 | ulation.Override |                  |
+|                  |                 | s default        |                  |
+|                  |                 | behavior. Set to |                  |
+|                  |                 | 0 and 1 to force |                  |
+|                  |                 | forward and      |                  |
+|                  |                 | reverse mode     |                  |
+|                  |                 | respectively.    |                  |
+|                  |                 | Cf. option       |                  |
+|                  |                 | \"ad_weight\".     |                  |
++------------------+-----------------+------------------+------------------+
+| compiler         | OT_STRING       | Just-in-time     | casadi::Function |
+|                  |                 | compiler plugin  | Internal         |
+|                  |                 | to be used.      |                  |
++------------------+-----------------+------------------+------------------+
+| derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
+|                  |                 | a derivative of  | Internal         |
+|                  |                 | another          |                  |
+|                  |                 | function. The    |                  |
+|                  |                 | type of          |                  |
+|                  |                 | derivative       |                  |
+|                  |                 | (directional     |                  |
+|                  |                 | derivative,      |                  |
+|                  |                 | Jacobian) is     |                  |
+|                  |                 | inferred from    |                  |
+|                  |                 | the function     |                  |
+|                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| enable_fd        | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation by   |                  |
+|                  |                 | finite           |                  |
+|                  |                 | differencing.    |                  |
+|                  |                 | [default:        |                  |
+|                  |                 | false]]          |                  |
++------------------+-----------------+------------------+------------------+
+| enable_forward   | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | Jacobian-times-  |                  |
+|                  |                 | vector products  |                  |
+|                  |                 | - typically      |                  |
+|                  |                 | using forward    |                  |
+|                  |                 | mode AD - if     |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| enable_jacobian  | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | Jacobians of all |                  |
+|                  |                 | differentiable   |                  |
+|                  |                 | outputs with     |                  |
+|                  |                 | respect to all   |                  |
+|                  |                 | differentiable   |                  |
+|                  |                 | inputs - if      |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| enable_reverse   | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | transposed       |                  |
+|                  |                 | Jacobian-times-  |                  |
+|                  |                 | vector products  |                  |
+|                  |                 | - typically      |                  |
+|                  |                 | using reverse    |                  |
+|                  |                 | mode AD - if     |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| eps_in           | OT_DOUBLE       | Accuracy of      | casadi::ForwardD |
+|                  |                 | function inputs  | iff              |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
++------------------+-----------------+------------------+------------------+
+| eps_out          | OT_DOUBLE       | Accuracy of      | casadi::ForwardD |
+|                  |                 | function outputs | iff              |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
+|                  |                 | differencing     |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
++------------------+-----------------+------------------+------------------+
+| gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
+|                  |                 | option           | Internal         |
+|                  |                 | (ignored):       |                  |
+|                  |                 | Statistics are   |                  |
+|                  |                 | now always       |                  |
+|                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| h_max            | OT_DOUBLE       | Maximum step     | casadi::ForwardD |
+|                  |                 | size [default    | iff              |
+|                  |                 | 1.0]             |                  |
++------------------+-----------------+------------------+------------------+
+| input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
+|                  |                 | option (ignored) | Internal         |
++------------------+-----------------+------------------+------------------+
+| inputs_check     | OT_BOOL         | Throw exceptions | casadi::Function |
+|                  |                 | when the         | Internal         |
+|                  |                 | numerical values |                  |
+|                  |                 | of the inputs    |                  |
+|                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
+|                  |                 | for a number of  | Internal         |
+|                  |                 | forward/reverse  |                  |
+|                  |                 | directions, it   |                  |
+|                  |                 | may be cheaper   |                  |
+|                  |                 | to compute first |                  |
+|                  |                 | the full         |                  |
+|                  |                 | jacobian and     |                  |
+|                  |                 | then multiply    |                  |
+|                  |                 | with seeds,      |                  |
+|                  |                 | rather than      |                  |
+|                  |                 | obtain the       |                  |
+|                  |                 | requested        |                  |
+|                  |                 | directions in a  |                  |
+|                  |                 | straightforward  |                  |
+|                  |                 | manner. Casadi   |                  |
+|                  |                 | uses a heuristic |                  |
+|                  |                 | to decide which  |                  |
+|                  |                 | is cheaper. A    |                  |
+|                  |                 | high value of    |                  |
+|                  |                 | 'jac_penalty'    |                  |
+|                  |                 | makes it less    |                  |
+|                  |                 | likely for the   |                  |
+|                  |                 | heurstic to      |                  |
+|                  |                 | chose the full   |                  |
+|                  |                 | Jacobian         |                  |
+|                  |                 | strategy. The    |                  |
+|                  |                 | special value -1 |                  |
+|                  |                 | indicates never  |                  |
+|                  |                 | to use the full  |                  |
+|                  |                 | Jacobian         |                  |
+|                  |                 | strategy         |                  |
++------------------+-----------------+------------------+------------------+
+| jit              | OT_BOOL         | Use just-in-time | casadi::Function |
+|                  |                 | compiler to      | Internal         |
+|                  |                 | speed up the     |                  |
+|                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_options      | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| max_num_dir      | OT_INT          | Specify the      | casadi::Function |
+|                  |                 | maximum number   | Internal         |
+|                  |                 | of directions    |                  |
+|                  |                 | for derivative   |                  |
+|                  |                 | functions.       |                  |
+|                  |                 | Overrules the    |                  |
+|                  |                 | builtin optimize |                  |
+|                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
+|                  |                 | option (ignored) | Internal         |
++------------------+-----------------+------------------+------------------+
+| print_time       | OT_BOOL         | print            | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time             |                  |
++------------------+-----------------+------------------+------------------+
+| regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
+|                  |                 | when NaN or Inf  | Internal         |
+|                  |                 | appears during   |                  |
+|                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| scheme           | OT_STRING       | Differencing     | casadi::ForwardD |
+|                  |                 | scheme [default: | iff              |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| second_order_ste | OT_DOUBLE       | Second order     | casadi::ForwardD |
+| psize            |                 | perturbation     | iff              |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-3]            |                  |
++------------------+-----------------+------------------+------------------+
+| u_aim            | OT_DOUBLE       | Target ratio of  | casadi::ForwardD |
+|                  |                 | roundoff error   | iff              |
+|                  |                 | to truncation    |                  |
+|                  |                 | error [default:  |                  |
+|                  |                 | 100.]            |                  |
++------------------+-----------------+------------------+------------------+
+| user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
+|                  |                 | field that can   | Internal         |
+|                  |                 | be used to       |                  |
+|                  |                 | identify the     |                  |
+|                  |                 | function or pass |                  |
+|                  |                 | additional       |                  |
+|                  |                 | information      |                  |
++------------------+-----------------+------------------+------------------+
+| verbose          | OT_BOOL         | Verbose          | casadi::Function |
+|                  |                 | evaluation  for  | Internal         |
+|                  |                 | debugging        |                  |
++------------------+-----------------+------------------+------------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: finite_differences.hpp ";
+
+%feature("docstring") casadi::ForwardDiff::slice "[INTERNAL]  returns a new
+function with a selection of inputs/outputs of the original
+
+";
+
+%feature("docstring") casadi::ForwardDiff::getAtomicInput "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::checkout "[INTERNAL]  Checkout a
+memory object.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::free_mx "[INTERNAL]  Get free
+variables ( MX)
+
+";
+
+%feature("docstring") casadi::ForwardDiff::codegen_incref "[INTERNAL]
+Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::calc_fd "[INTERNAL] ";
+
+%feature("docstring") casadi::ForwardDiff::which_depends "[INTERNAL]  Which
+variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::ForwardDiff::symbolicAdjSeed "[INTERNAL]
+Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::getAtomicOperation "[INTERNAL]
+Get an atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::size2_in "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::has_jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::eval_name "[INTERNAL]  Get name
+of the evaluation function.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::wrap "[INTERNAL]  Wrap in an
+Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::getAtomicOutput "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_function "[INTERNAL] ";
+
+%feature("docstring") casadi::ForwardDiff::check_arg "[INTERNAL]  Check if
+input arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::print_dimensions "[INTERNAL]
+Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::has_codegen "[INTERNAL]  Is
+codegen supported?
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_name_in "[INTERNAL]  Names
+of function input and outputs.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::alloc_res "[INTERNAL]  Ensure
+required length of res field.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::getAdaptorSolverName "[INTERNAL]
+Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::getWorkSize "[INTERNAL]  Get the
+length of the work vector.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::n_in "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sz_iw "[INTERNAL]  Get required
+length of iw field.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::symbolic_output "[INTERNAL]  Get
+a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::mapsum_mx "[INTERNAL]  Parallel
+evaluation.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::disp_more "[INTERNAL]  Print
+more.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::~ForwardDiff "[INTERNAL]
+Destructor.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::ad_weight "[INTERNAL]  Weighting
+factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::mx_out "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::free_mem "[INTERNAL]  Free
+memory block.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::pert "[INTERNAL] ";
+
+%feature("docstring") casadi::ForwardDiff::eval "[INTERNAL]  Evaluate
+numerically.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::getAtomicInputReal "[INTERNAL]
+Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::ForwardDiff "[INTERNAL] ";
+
+%feature("docstring") casadi::ForwardDiff::setup "[INTERNAL]  Set the
+(persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::getCount "[INTERNAL]  Get the
+reference count.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_sparsity_in "[INTERNAL]
+Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::replace_arg "[INTERNAL]  Replace
+0-by-0 inputs.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::finalize "[INTERNAL]  Finalize
+the object creation This function, which visits the class hierarchy in
+reverse order is run after init() has been completed.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::jit_dependencies "[INTERNAL]
+Jit dependencies.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sp_forward "[INTERNAL]
+Propagate sparsity forward.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::alloc_arg "[INTERNAL]  Ensure
+required length of arg field.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::call_reverse "[INTERNAL]
+Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::alloc "[INTERNAL]  Ensure work
+vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::n_out "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::size1_in "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::generate_lifted "[INTERNAL]
+Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::call_forward "[INTERNAL]
+Forward mode AD, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::set_work "[INTERNAL]  Set the
+(persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::default_in "[INTERNAL]  Get
+default input value.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sz_arg "[INTERNAL]  Get required
+length of arg field.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::has_forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::codegen_declarations "[INTERNAL]
+Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::matching_res "[INTERNAL]  Check
+if output arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sx_in "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ForwardDiff::disp "[INTERNAL]  Print.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::uses_output "[INTERNAL]  Is the
+scheme using the (nondifferentiated) output?
+
+";
+
+%feature("docstring") casadi::ForwardDiff::self "[INTERNAL]  Get a public
+class instance.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::eval_sx "[INTERNAL]  Evaluate
+with symbolic scalars.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::nnz_in "[INTERNAL]  Number of
+input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::generate_dependencies "[INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::name_out "[INTERNAL]  Get output
+scheme name by index.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::factory "[INTERNAL] ";
+
+%feature("docstring") casadi::ForwardDiff::sparsity_jac "[INTERNAL]  Get,
+if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::index_out "[INTERNAL]  Get
+output scheme index by name.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::print_option "[INTERNAL]  Print
+all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::name_in "[INTERNAL]  Get input
+scheme name by index.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::simplified_call "[INTERNAL]  Use
+simplified signature.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::numel_in "[INTERNAL]  Number of
+input/output elements.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_n_in "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::getJacSparsity "[INTERNAL]
+Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::getJacSparsityGen "[INTERNAL]
+Get the sparsity pattern, forward mode.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::clear_mem "[INTERNAL]  Clear all
+memory (called from destructor)
+
+";
+
+%feature("docstring") casadi::ForwardDiff::alloc_mem "[INTERNAL]  Create
+memory block.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::type_name "[INTERNAL]  Get type
+name.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::codegen_body "[INTERNAL]
+Generate code for the body of the C function.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_name_out "[INTERNAL]  Names
+of function input and outputs.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::get_options "[INTERNAL]
+Options.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::set_temp "[INTERNAL]  Set the
+(temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::print_free "[INTERNAL]  Print
+free variables.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::eval_mx "[INTERNAL]  Evaluate
+with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::has_sprev "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::ForwardDiff::codegen_meta "[INTERNAL]
+Generate meta-information allowing a user to evaluate a generated function.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::max_in "[INTERNAL]  Get largest
+input value.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::release "[INTERNAL]  Release a
+memory object.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::size_out "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::signature "[INTERNAL]  Code
+generate the function.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sp_weight "[INTERNAL]  Weighting
+factor for chosing forward/reverse mode, sparsity propagation.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sz_work "[INTERNAL]  Get number
+of temporary variables needed.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::has_free "[INTERNAL]  Does the
+function have free variables.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::adjViaJac "[INTERNAL]  Calculate
+derivatives by multiplying the full Jacobian and multiplying.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::sx_out "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ForwardDiff::jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::n_pert "[INTERNAL] ";
+
+%feature("docstring") casadi::ForwardDiff::mx_in "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ForwardDiff::replace_aseed "[INTERNAL]
+Replace 0-by-0 reverse seeds.
+
+";
 
 
 // File: classcasadi_1_1FStats.xml
@@ -15174,10 +17338,23 @@ member functions. Joel Andersson >List of available options
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -16536,11 +18713,6 @@ work vectors long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::GenericExternal::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
 instance if available, and calls  Function get_reverse(int nadj) if no
@@ -17731,10 +19903,6 @@ Number of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::alloc_w "[INTERNAL]  Ensure required length of w field.
-
-";
-
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::setStopTime "[INTERNAL]  Set stop time for the integration.
 
 ";
@@ -18023,7 +20191,7 @@ Get required length of w field.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::get_fd "[INTERNAL]  Get directional derivatives using finite differencing.
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::alloc_w "[INTERNAL]  Ensure required length of w field.
 
 ";
 
@@ -18715,11 +20883,6 @@ Propagate sparsity forward.
 
 %feature("docstring") casadi::ImplicitToNlp::max_in "[INTERNAL]  Get
 largest input value.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
 
 ";
 
@@ -20179,11 +22342,6 @@ nodes in the algorithm.
 
 ";
 
-%feature("docstring") casadi::Integrator::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::Integrator::get_name_in "[INTERNAL]  Names of
 function input and outputs.
 
@@ -21082,11 +23240,6 @@ input arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::Interpolant::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::Interpolant::min_in "[INTERNAL]  Get smallest
 input value.
 
@@ -21724,11 +23877,6 @@ count.
 
 ";
 
-%feature("docstring") casadi::Jit::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::Jit::codegen_body "
 
 Generate code for the function body.
@@ -22344,10 +24492,23 @@ value.
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -23467,10 +25628,23 @@ A: A = L.U, with L lower and U upper triangular
 | equilibration    | OT_BOOL         | Equilibrate the  | casadi::LapackLu |
 |                  |                 | matrix           |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -23599,11 +25773,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::LapackLu::eval_sx "[INTERNAL]  Evaluate with
 symbolic scalars.
-
-";
-
-%feature("docstring") casadi::LapackLu::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
 
 ";
 
@@ -23845,10 +26014,23 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -24100,11 +26282,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::LapackQr::sz_iw "[INTERNAL]  Get required
 length of iw field.
-
-";
-
-%feature("docstring") casadi::LapackQr::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
 
 ";
 
@@ -24977,10 +27154,6 @@ Evaluate with symbolic matrices.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::getAtomicInputReal "[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::eval_gen "
 
 >  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
@@ -25468,8 +27641,7 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
+%feature("docstring") casadi::LinearInterpolant::getAtomicInputReal "[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -25903,8 +28075,8 @@ classes.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
+%feature("docstring") casadi::LinearInterpolantJac::n_nodes "[INTERNAL]
+Number of nodes in the algorithm.
 
 ";
 
@@ -25986,11 +28158,6 @@ the (persistent and temporary) work vectors.
 
 %feature("docstring") casadi::LinearInterpolantJac::n_out "[INTERNAL]
 Number of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::LinearInterpolantJac::n_nodes "[INTERNAL]
-Number of nodes in the algorithm.
 
 ";
 
@@ -26678,11 +28845,6 @@ statistics.
 
 ";
 
-%feature("docstring") casadi::Lsqr::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::Lsqr::print_options "[INTERNAL]  Print list
 of options.
 
@@ -27353,10 +29515,23 @@ Joel Andersson
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -27880,11 +30055,6 @@ function with a selection of inputs/outputs of the original
 
 %feature("docstring") casadi::Map::check_arg "[INTERNAL]  Check if input
 arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::Map::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
 
 ";
 
@@ -28735,11 +30905,6 @@ vectors long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::MapOmp::sz_arg "[INTERNAL]  Get required
-length of arg field.
-
-";
-
 %feature("docstring") casadi::MapOmp::replace_aseed "[INTERNAL]  Replace
 0-by-0 reverse seeds.
 
@@ -28850,8 +31015,8 @@ unidirectional or bidirectional partition.
 
 ";
 
-%feature("docstring") casadi::MapOmp::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
+%feature("docstring") casadi::MapOmp::sz_arg "[INTERNAL]  Get required
+length of arg field.
 
 ";
 
@@ -32414,11 +34579,6 @@ derivatives be calculated in any way?
 
 ";
 
-%feature("docstring") casadi::Newton::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::Newton::call_reverse "[INTERNAL]  Reverse
 mode, virtual functions overloaded in derived classes.
 
@@ -33200,11 +35360,6 @@ arguments have correct length and dimensions.
 
 %feature("docstring") casadi::Nlpsol::min_in "[INTERNAL]  Get smallest
 input value.
-
-";
-
-%feature("docstring") casadi::Nlpsol::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
 
 ";
 
@@ -34178,11 +36333,6 @@ Construct Prepares the function for evaluation.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::OracleFunction::index_in "[INTERNAL]  Get
 input scheme index by name.
 
@@ -34830,10 +36980,23 @@ Joel Andersson
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -36043,11 +38206,6 @@ factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::QpToNlp::get_options "[INTERNAL]  Options.
 
 ";
@@ -36346,11 +38504,6 @@ function have free variables.
 
 %feature("docstring") casadi::Rootfinder::getCount "[INTERNAL]  Get the
 reference count.
-
-";
-
-%feature("docstring") casadi::Rootfinder::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
 
 ";
 
@@ -37525,11 +39678,6 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::RungeKutta::adjViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
 
@@ -38533,11 +40681,6 @@ cached version is available.
 
 %feature("docstring") casadi::Scpgen::weak "[INTERNAL]  Get a weak
 reference to the object.
-
-";
-
-%feature("docstring") casadi::Scpgen::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
 
 ";
 
@@ -39830,11 +41973,6 @@ smallest input value.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::name_in "[INTERNAL]  Get
 input scheme name by index.
 
@@ -40429,8 +42567,8 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
+%feature("docstring") casadi::SlicotDple::getAtomicInput "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -40870,11 +43008,6 @@ the (integer) output argument of an atomic operation.
 
 %feature("docstring") casadi::SlicotDple::~SlicotDple "[INTERNAL]
 Destructor.
-
-";
-
-%feature("docstring") casadi::SlicotDple::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -41477,8 +43610,8 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
+%feature("docstring") casadi::SlicotExpm::alloc_res "[INTERNAL]  Ensure
+required length of res field.
 
 ";
 
@@ -41956,11 +44089,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::alloc_res "[INTERNAL]  Ensure
-required length of res field.
-
-";
-
 %feature("docstring") casadi::SlicotExpm::signature "[INTERNAL]  Code
 generate the function.
 
@@ -42081,6 +44209,1070 @@ default input value.
 
 %feature("docstring") casadi::SlicotExpm::has_spfwd "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
+
+";
+
+
+// File: classcasadi_1_1Smoothing.xml
+%feature("docstring") casadi::Smoothing "[INTERNAL]  Calculate derivative
+using 3th order smoothing scheme Joel Andersson
+
+>List of available options
+
++------------------+-----------------+------------------+------------------+
+|        Id        |      Type       |   Description    |     Used in      |
++==================+=================+==================+==================+
+| ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
+|                  |                 | for derivative   | Internal         |
+|                  |                 | calculation.When |                  |
+|                  |                 | there is an      |                  |
+|                  |                 | option of either |                  |
+|                  |                 | using forward or |                  |
+|                  |                 | reverse mode     |                  |
+|                  |                 | directional      |                  |
+|                  |                 | derivatives, the |                  |
+|                  |                 | condition ad_wei |                  |
+|                  |                 | ght*nf<=(1-ad_we |                  |
+|                  |                 | ight)*na is used |                  |
+|                  |                 | where nf and na  |                  |
+|                  |                 | are estimates of |                  |
+|                  |                 | the number of    |                  |
+|                  |                 | forward/reverse  |                  |
+|                  |                 | mode directional |                  |
+|                  |                 | derivatives      |                  |
+|                  |                 | needed. By       |                  |
+|                  |                 | default,         |                  |
+|                  |                 | ad_weight is     |                  |
+|                  |                 | calculated       |                  |
+|                  |                 | automatically,   |                  |
+|                  |                 | but this can be  |                  |
+|                  |                 | overridden by    |                  |
+|                  |                 | setting this     |                  |
+|                  |                 | option. In       |                  |
+|                  |                 | particular, 0    |                  |
+|                  |                 | means forcing    |                  |
+|                  |                 | forward mode and |                  |
+|                  |                 | 1 forcing        |                  |
+|                  |                 | reverse mode.    |                  |
+|                  |                 | Leave unset for  |                  |
+|                  |                 | (class specific) |                  |
+|                  |                 | heuristics.      |                  |
++------------------+-----------------+------------------+------------------+
+| ad_weight_sp     | OT_DOUBLE       | Weighting factor | casadi::Function |
+|                  |                 | for sparsity     | Internal         |
+|                  |                 | pattern          |                  |
+|                  |                 | calculation calc |                  |
+|                  |                 | ulation.Override |                  |
+|                  |                 | s default        |                  |
+|                  |                 | behavior. Set to |                  |
+|                  |                 | 0 and 1 to force |                  |
+|                  |                 | forward and      |                  |
+|                  |                 | reverse mode     |                  |
+|                  |                 | respectively.    |                  |
+|                  |                 | Cf. option       |                  |
+|                  |                 | \"ad_weight\".     |                  |
++------------------+-----------------+------------------+------------------+
+| compiler         | OT_STRING       | Just-in-time     | casadi::Function |
+|                  |                 | compiler plugin  | Internal         |
+|                  |                 | to be used.      |                  |
++------------------+-----------------+------------------+------------------+
+| derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
+|                  |                 | a derivative of  | Internal         |
+|                  |                 | another          |                  |
+|                  |                 | function. The    |                  |
+|                  |                 | type of          |                  |
+|                  |                 | derivative       |                  |
+|                  |                 | (directional     |                  |
+|                  |                 | derivative,      |                  |
+|                  |                 | Jacobian) is     |                  |
+|                  |                 | inferred from    |                  |
+|                  |                 | the function     |                  |
+|                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| enable_fd        | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation by   |                  |
+|                  |                 | finite           |                  |
+|                  |                 | differencing.    |                  |
+|                  |                 | [default:        |                  |
+|                  |                 | false]]          |                  |
++------------------+-----------------+------------------+------------------+
+| enable_forward   | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | Jacobian-times-  |                  |
+|                  |                 | vector products  |                  |
+|                  |                 | - typically      |                  |
+|                  |                 | using forward    |                  |
+|                  |                 | mode AD - if     |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| enable_jacobian  | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | Jacobians of all |                  |
+|                  |                 | differentiable   |                  |
+|                  |                 | outputs with     |                  |
+|                  |                 | respect to all   |                  |
+|                  |                 | differentiable   |                  |
+|                  |                 | inputs - if      |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| enable_reverse   | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | transposed       |                  |
+|                  |                 | Jacobian-times-  |                  |
+|                  |                 | vector products  |                  |
+|                  |                 | - typically      |                  |
+|                  |                 | using reverse    |                  |
+|                  |                 | mode AD - if     |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| eps_in           | OT_DOUBLE       | Accuracy of      | casadi::Smoothin |
+|                  |                 | function inputs  | g                |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
++------------------+-----------------+------------------+------------------+
+| eps_out          | OT_DOUBLE       | Accuracy of      | casadi::Smoothin |
+|                  |                 | function outputs | g                |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
+|                  |                 | differencing     |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
++------------------+-----------------+------------------+------------------+
+| gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
+|                  |                 | option           | Internal         |
+|                  |                 | (ignored):       |                  |
+|                  |                 | Statistics are   |                  |
+|                  |                 | now always       |                  |
+|                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| h_max            | OT_DOUBLE       | Maximum step     | casadi::Smoothin |
+|                  |                 | size [default    | g                |
+|                  |                 | 1.0]             |                  |
++------------------+-----------------+------------------+------------------+
+| input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
+|                  |                 | option (ignored) | Internal         |
++------------------+-----------------+------------------+------------------+
+| inputs_check     | OT_BOOL         | Throw exceptions | casadi::Function |
+|                  |                 | when the         | Internal         |
+|                  |                 | numerical values |                  |
+|                  |                 | of the inputs    |                  |
+|                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
+|                  |                 | for a number of  | Internal         |
+|                  |                 | forward/reverse  |                  |
+|                  |                 | directions, it   |                  |
+|                  |                 | may be cheaper   |                  |
+|                  |                 | to compute first |                  |
+|                  |                 | the full         |                  |
+|                  |                 | jacobian and     |                  |
+|                  |                 | then multiply    |                  |
+|                  |                 | with seeds,      |                  |
+|                  |                 | rather than      |                  |
+|                  |                 | obtain the       |                  |
+|                  |                 | requested        |                  |
+|                  |                 | directions in a  |                  |
+|                  |                 | straightforward  |                  |
+|                  |                 | manner. Casadi   |                  |
+|                  |                 | uses a heuristic |                  |
+|                  |                 | to decide which  |                  |
+|                  |                 | is cheaper. A    |                  |
+|                  |                 | high value of    |                  |
+|                  |                 | 'jac_penalty'    |                  |
+|                  |                 | makes it less    |                  |
+|                  |                 | likely for the   |                  |
+|                  |                 | heurstic to      |                  |
+|                  |                 | chose the full   |                  |
+|                  |                 | Jacobian         |                  |
+|                  |                 | strategy. The    |                  |
+|                  |                 | special value -1 |                  |
+|                  |                 | indicates never  |                  |
+|                  |                 | to use the full  |                  |
+|                  |                 | Jacobian         |                  |
+|                  |                 | strategy         |                  |
++------------------+-----------------+------------------+------------------+
+| jit              | OT_BOOL         | Use just-in-time | casadi::Function |
+|                  |                 | compiler to      | Internal         |
+|                  |                 | speed up the     |                  |
+|                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_options      | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| max_num_dir      | OT_INT          | Specify the      | casadi::Function |
+|                  |                 | maximum number   | Internal         |
+|                  |                 | of directions    |                  |
+|                  |                 | for derivative   |                  |
+|                  |                 | functions.       |                  |
+|                  |                 | Overrules the    |                  |
+|                  |                 | builtin optimize |                  |
+|                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
+|                  |                 | option (ignored) | Internal         |
++------------------+-----------------+------------------+------------------+
+| print_time       | OT_BOOL         | print            | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time             |                  |
++------------------+-----------------+------------------+------------------+
+| regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
+|                  |                 | when NaN or Inf  | Internal         |
+|                  |                 | appears during   |                  |
+|                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| scheme           | OT_STRING       | Differencing     | casadi::Smoothin |
+|                  |                 | scheme [default: | g                |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| second_order_ste | OT_DOUBLE       | Second order     | casadi::Smoothin |
+| psize            |                 | perturbation     | g                |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-3]            |                  |
++------------------+-----------------+------------------+------------------+
+| u_aim            | OT_DOUBLE       | Target ratio of  | casadi::Smoothin |
+|                  |                 | roundoff error   | g                |
+|                  |                 | to truncation    |                  |
+|                  |                 | error [default:  |                  |
+|                  |                 | 100.]            |                  |
++------------------+-----------------+------------------+------------------+
+| user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
+|                  |                 | field that can   | Internal         |
+|                  |                 | be used to       |                  |
+|                  |                 | identify the     |                  |
+|                  |                 | function or pass |                  |
+|                  |                 | additional       |                  |
+|                  |                 | information      |                  |
++------------------+-----------------+------------------+------------------+
+| verbose          | OT_BOOL         | Verbose          | casadi::Function |
+|                  |                 | evaluation  for  | Internal         |
+|                  |                 | debugging        |                  |
++------------------+-----------------+------------------+------------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: finite_differences.hpp ";
+
+%feature("docstring") casadi::Smoothing::call_gen "[INTERNAL]   Call a
+function, overloaded.
+
+";
+
+%feature("docstring") casadi::Smoothing::get_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::Smoothing::replace_fseed "[INTERNAL]  Replace
+0-by-0 forward seeds.
+
+";
+
+%feature("docstring") casadi::Smoothing::max_in "[INTERNAL]  Get largest
+input value.
+
+";
+
+%feature("docstring") casadi::Smoothing::size1_out "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Smoothing::size2_out "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Smoothing::calc_fd "[INTERNAL] ";
+
+%feature("docstring") casadi::Smoothing::reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::Smoothing::fwd_seed "[INTERNAL]  Symbolic
+expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::Smoothing::sparsity_out "[INTERNAL]  Get
+sparsity of a given output.
+
+";
+
+%feature("docstring") casadi::Smoothing::all_scalar "[INTERNAL]  Are all
+inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::Smoothing::size1_in "[INTERNAL]  Input/output
+dimensions.
+
+";
+
+%feature("docstring") casadi::Smoothing::get_options "[INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::Smoothing::get_n_out "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::getWorkSize "[INTERNAL]  Get the
+length of the work vector.
+
+";
+
+%feature("docstring") casadi::Smoothing::which_depends "[INTERNAL]  Which
+variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::Smoothing::numel_in "[INTERNAL]  Number of
+input/output elements.
+
+";
+
+%feature("docstring") casadi::Smoothing::is_a "[INTERNAL]  Check if the
+function is of a particular type.
+
+";
+
+%feature("docstring") casadi::Smoothing::alloc_res "[INTERNAL]  Ensure
+required length of res field.
+
+";
+
+%feature("docstring") casadi::Smoothing::forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(int nfwd) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::Smoothing::has_spfwd "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::Smoothing::sz_iw "[INTERNAL]  Get required
+length of iw field.
+
+";
+
+%feature("docstring") casadi::Smoothing::alloc "[INTERNAL]  Ensure work
+vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::Smoothing::adjViaJac "[INTERNAL]  Calculate
+derivatives by multiplying the full Jacobian and multiplying.
+
+";
+
+%feature("docstring") casadi::Smoothing::codegen_incref "[INTERNAL]
+Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::Smoothing::release "[INTERNAL]  Release a
+memory object.
+
+";
+
+%feature("docstring") casadi::Smoothing::checkout "[INTERNAL]  Checkout a
+memory object.
+
+";
+
+%feature("docstring") casadi::Smoothing::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::Smoothing::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
+%feature("docstring") casadi::Smoothing::has_free "[INTERNAL]  Does the
+function have free variables.
+
+";
+
+%feature("docstring") casadi::Smoothing::symbolic_output "[INTERNAL]  Get a
+vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::simple "[INTERNAL]  Evaluate
+numerically, simplied syntax.
+
+";
+
+%feature("docstring") casadi::Smoothing::add_dependency "[INTERNAL]  Add a
+dependent function.
+
+";
+
+%feature("docstring") casadi::Smoothing::check_res "[INTERNAL]  Check if
+output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::Smoothing::n_nodes "[INTERNAL]  Number of
+nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::Smoothing::free_mx "[INTERNAL]  Get free
+variables ( MX)
+
+";
+
+%feature("docstring") casadi::Smoothing::get_function "[INTERNAL] ";
+
+%feature("docstring") casadi::Smoothing::sx_in "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Smoothing::sparsity_jac "[INTERNAL]  Get, if
+necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::Smoothing::jit_dependencies "[INTERNAL]   Jit
+dependencies.
+
+";
+
+%feature("docstring") casadi::Smoothing::self "[INTERNAL]  Get a public
+class instance.
+
+";
+
+%feature("docstring") casadi::Smoothing::set_work "[INTERNAL]  Set the
+(persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::Smoothing::name "[INTERNAL]  Name of the
+function.
+
+";
+
+%feature("docstring") casadi::Smoothing::size_out "[INTERNAL]  Input/output
+dimensions.
+
+";
+
+%feature("docstring") casadi::Smoothing::print_option "[INTERNAL]  Print
+all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::Smoothing::getJacSparsityHierarchicalSymm "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring") casadi::Smoothing::call_forward "[INTERNAL]  Forward
+mode AD, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::Smoothing::check_arg "[INTERNAL]  Check if
+input arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::Smoothing::eval_mx "[INTERNAL]  Evaluate with
+symbolic matrices.
+
+";
+
+%feature("docstring") casadi::Smoothing::has_function "[INTERNAL] ";
+
+%feature("docstring") casadi::Smoothing::size_in "[INTERNAL]  Input/output
+dimensions.
+
+";
+
+%feature("docstring") casadi::Smoothing::sz_work "[INTERNAL]  Get number of
+temporary variables needed.
+
+";
+
+%feature("docstring") casadi::Smoothing::disp "[INTERNAL]  Print.
+
+";
+
+%feature("docstring") casadi::Smoothing::has_jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::Smoothing::getAtomicInput "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Smoothing::alloc_mem "[INTERNAL]  Create
+memory block.
+
+";
+
+%feature("docstring") casadi::Smoothing::free_sx "[INTERNAL]  Get free
+variables (SX)
+
+";
+
+%feature("docstring") casadi::Smoothing::init "[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::Smoothing::has_codegen "[INTERNAL]  Is
+codegen supported?
+
+";
+
+%feature("docstring") casadi::Smoothing::index_out "[INTERNAL]  Get output
+scheme index by name.
+
+";
+
+%feature("docstring") casadi::Smoothing::getCount "[INTERNAL]  Get the
+reference count.
+
+";
+
+%feature("docstring") casadi::Smoothing::pert "[INTERNAL] ";
+
+%feature("docstring") casadi::Smoothing::setup "[INTERNAL]  Set the
+(persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::Smoothing::name_out "[INTERNAL]  Get output
+scheme name by index.
+
+";
+
+%feature("docstring") casadi::Smoothing::codegen_meta "[INTERNAL]  Generate
+meta-information allowing a user to evaluate a generated function.
+
+";
+
+%feature("docstring") casadi::Smoothing::get_name_out "[INTERNAL]  Names of
+function input and outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::init_mem "[INTERNAL]  Initalize
+memory block.
+
+";
+
+%feature("docstring") casadi::Smoothing::index_in "[INTERNAL]  Get input
+scheme index by name.
+
+";
+
+%feature("docstring") casadi::Smoothing::jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::Smoothing::getAtomicOperation "[INTERNAL]
+Get an atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::Smoothing::signature "[INTERNAL]  Code
+generate the function.
+
+";
+
+%feature("docstring") casadi::Smoothing::replace_aseed "[INTERNAL]  Replace
+0-by-0 reverse seeds.
+
+";
+
+%feature("docstring") casadi::Smoothing::replace_res "[INTERNAL]  Replace
+0-by-0 outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::alloc_iw "[INTERNAL]  Ensure
+required length of iw field.
+
+";
+
+%feature("docstring") casadi::Smoothing::Smoothing "[INTERNAL] ";
+
+%feature("docstring") casadi::Smoothing::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
+%feature("docstring") casadi::Smoothing::factory "[INTERNAL] ";
+
+%feature("docstring") casadi::Smoothing::finalize "[INTERNAL]  Finalize the
+object creation This function, which visits the class hierarchy in reverse
+order is run after init() has been completed.
+
+";
+
+%feature("docstring") casadi::Smoothing::get_jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::Smoothing::disp_more "[INTERNAL]  Print more.
+
+";
+
+%feature("docstring") casadi::Smoothing::n_out "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::nnz_out "[INTERNAL]  Number of
+input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::Smoothing::sz_arg "[INTERNAL]  Get required
+length of arg field.
+
+";
+
+%feature("docstring") casadi::Smoothing::getAtomicOutput "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Smoothing::codegen_body "[INTERNAL]  Generate
+code for the body of the C function.
+
+";
+
+%feature("docstring") casadi::Smoothing::size2_in "[INTERNAL]  Input/output
+dimensions.
+
+";
+
+%feature("docstring") casadi::Smoothing::free_mem "[INTERNAL]  Free memory
+block.
+
+";
+
+%feature("docstring") casadi::Smoothing::nnz_in "[INTERNAL]  Number of
+input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::Smoothing::class_name "[INTERNAL]  Get type
+name.
+
+";
+
+%feature("docstring") casadi::Smoothing::print_dimensions "[INTERNAL]
+Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::construct "[INTERNAL]  Construct
+Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::Smoothing::getJacSparsity "[INTERNAL]
+Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::Smoothing::sz_res "[INTERNAL]  Get required
+length of res field.
+
+";
+
+%feature("docstring") casadi::Smoothing::min_in "[INTERNAL]  Get smallest
+input value.
+
+";
+
+%feature("docstring") casadi::Smoothing::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::Smoothing::replace_arg "[INTERNAL]  Replace
+0-by-0 inputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::generate_lifted "[INTERNAL]
+Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring") casadi::Smoothing::weak "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring") casadi::Smoothing::get_stats "[INTERNAL]  Get all
+statistics.
+
+";
+
+%feature("docstring") casadi::Smoothing::mapsum_mx "[INTERNAL]  Parallel
+evaluation.
+
+";
+
+%feature("docstring") casadi::Smoothing::get_forward "[INTERNAL]  Second
+order derivatives.
+
+";
+
+%feature("docstring") casadi::Smoothing::default_in "[INTERNAL]  Get
+default input value.
+
+";
+
+%feature("docstring") casadi::Smoothing::symbolicAdjSeed "[INTERNAL]
+Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring") casadi::Smoothing::call "[INTERNAL]   Call a
+function, templated.
+
+";
+
+%feature("docstring") casadi::Smoothing::call_reverse "[INTERNAL]  Reverse
+mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::Smoothing::memory "[INTERNAL]  Memory
+objects.
+
+";
+
+%feature("docstring") casadi::Smoothing::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
+
+";
+
+%feature("docstring") casadi::Smoothing::eval_gen "
+
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate numerically.
+
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate a function, overloaded.
+
+";
+
+%feature("docstring") casadi::Smoothing::get_sparsity_out "[INTERNAL]
+Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::has_sprev "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::Smoothing::get_sparsity_in "[INTERNAL]
+Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::getAlgorithmSize "[INTERNAL]  Get
+the number of atomic operations.
+
+";
+
+%feature("docstring") casadi::Smoothing::set_temp "[INTERNAL]  Set the
+(temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::Smoothing::uses_output "[INTERNAL]  Is the
+scheme using the (nondifferentiated) output?
+
+";
+
+%feature("docstring") casadi::Smoothing::sparsity_in "
+
+>  const Sparsity& casadi::FunctionInternal::sparsity_in(int ind) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Get sparsity of a given input.
+
+>  const Sparsity& casadi::FunctionInternal::sparsity_in(const std::string &iname) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::Smoothing::ad_weight "[INTERNAL]  Weighting
+factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring") casadi::Smoothing::mx_out "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Smoothing::codegen_declarations "[INTERNAL]
+Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::Smoothing::eval_sx "[INTERNAL]  Evaluate with
+symbolic scalars.
+
+";
+
+%feature("docstring") casadi::Smoothing::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
+%feature("docstring") casadi::Smoothing::sx_out "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Smoothing::matching_arg "[INTERNAL]  Check if
+input arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::Smoothing::codegen "[INTERNAL]  Generate code
+the function.
+
+";
+
+%feature("docstring") casadi::Smoothing::generate_dependencies "[INTERNAL]
+Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring") casadi::Smoothing::print_options "[INTERNAL]  Print
+list of options.
+
+";
+
+%feature("docstring") casadi::Smoothing::has_reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
+
+";
+
+%feature("docstring") casadi::Smoothing::getAtomicInputReal "[INTERNAL]
+Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Smoothing::fwdViaJac "[INTERNAL]  Calculate
+derivatives by multiplying the full Jacobian and multiplying.
+
+";
+
+%feature("docstring") casadi::Smoothing::get_n_in "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::eval_name "[INTERNAL]  Get name of
+the evaluation function.
+
+";
+
+%feature("docstring") casadi::Smoothing::wrap "[INTERNAL]  Wrap in an
+Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::Smoothing::type_name "[INTERNAL]  Get type
+name.
+
+";
+
+%feature("docstring") casadi::Smoothing::matching_res "[INTERNAL]  Check if
+output arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::Smoothing::eval "[INTERNAL]  Evaluate
+numerically.
+
+";
+
+%feature("docstring") casadi::Smoothing::print_free "[INTERNAL]  Print free
+variables.
+
+";
+
+%feature("docstring") casadi::Smoothing::name_in "[INTERNAL]  Get input
+scheme name by index.
+
+";
+
+%feature("docstring") casadi::Smoothing::numel_out "[INTERNAL]  Number of
+input/output elements.
+
+";
+
+%feature("docstring") casadi::Smoothing::n_pert "[INTERNAL] ";
+
+%feature("docstring") casadi::Smoothing::n_in "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::mx_in "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Smoothing::slice "[INTERNAL]  returns a new
+function with a selection of inputs/outputs of the original
+
+";
+
+%feature("docstring") casadi::Smoothing::~Smoothing "[INTERNAL]
+Destructor.
+
+";
+
+%feature("docstring") casadi::Smoothing::has_forward "[INTERNAL]  Second
+order derivatives.
+
+";
+
+%feature("docstring") casadi::Smoothing::alloc_arg "[INTERNAL]  Ensure
+required length of arg field.
+
+";
+
+%feature("docstring") casadi::Smoothing::get_name_in "[INTERNAL]  Names of
+function input and outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::alloc_w "[INTERNAL]  Ensure
+required length of w field.
+
+";
+
+%feature("docstring") casadi::Smoothing::codegen_name "[INTERNAL]  Get name
+in codegen.
+
+";
+
+%feature("docstring") casadi::Smoothing::sz_w "[INTERNAL]  Get required
+length of w field.
+
+";
+
+%feature("docstring") casadi::Smoothing::oracle "[INTERNAL]  Get oracle.
+
+";
+
+%feature("docstring") casadi::Smoothing::sp_weight "[INTERNAL]  Weighting
+factor for chosing forward/reverse mode, sparsity propagation.
+
+";
+
+%feature("docstring") casadi::Smoothing::getJacSparsityGen "[INTERNAL]  Get
+the sparsity pattern, forward mode.
+
+";
+
+%feature("docstring") casadi::Smoothing::getAdaptorSolverName "[INTERNAL]
+Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring") casadi::Smoothing::simplified_call "[INTERNAL]  Use
+simplified signature.
+
+";
+
+%feature("docstring") casadi::Smoothing::clear_mem "[INTERNAL]  Clear all
+memory (called from destructor)
+
+";
+
+%feature("docstring") casadi::Smoothing::codegen_decref "[INTERNAL]
+Codegen decref for dependencies.
 
 ";
 
@@ -43943,11 +47135,6 @@ numerically, simplied syntax.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::size1_in "[INTERNAL]  Input/output
 dimensions.
 
@@ -44453,11 +47640,6 @@ expressions for the adjoint seeds.
 
 %feature("docstring") casadi::Switch::check_res "[INTERNAL]  Check if
 output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::Switch::get_fd "[INTERNAL]  Get directional
-derivatives using finite differencing.
 
 ";
 
@@ -45627,11 +48809,6 @@ scheme name by index.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::get_fd "[INTERNAL]  Get
-directional derivatives using finite differencing.
-
-";
-
 %feature("docstring") casadi::SymbolicQr::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
 instance if available, and calls  Function get_reverse(int nadj) if no
@@ -46045,10 +49222,23 @@ Joel Andersson
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -46689,10 +49879,23 @@ General information
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -47993,10 +51196,23 @@ General information
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -49031,10 +52247,23 @@ General information
 |                  |                 | greater than     |                  |
 |                  |                 | 1-eps_unstable   |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Perturbation     | casadi::Function |
-|                  |                 | size for finite  | Internal         |
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
-|                  |                 | [default: 1e-8]] |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
+|                  |                 | difference       | Internal         |
+|                  |                 | perturbation     |                  |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
