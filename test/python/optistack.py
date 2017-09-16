@@ -62,8 +62,7 @@ class OptiStacktests(inherit_from):
       self.assertEqual(str2,str3)
       
       self.assertFalse(str1==str2)
-      
-      print "foo",str(opti.debug.x_describe(0))
+     
       
       
     def test_n(self):
