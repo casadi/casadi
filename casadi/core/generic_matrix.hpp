@@ -952,7 +952,7 @@ namespace casadi {
      // Construct sparsity for composed matrix
      Sparsity sp(x.size(), xq.size() , colind, row);
 
-     return mtimes(MatType(sp, val).T(), v);
+     return MatType::mtimes(MatType(sp, val).T(), v);
 
   }
 
