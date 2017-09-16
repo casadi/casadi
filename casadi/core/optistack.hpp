@@ -119,7 +119,7 @@ public:
   * \param[in] attribute: 'full' (default) or 'symmetric'
   */
   MX variable(int n=1, int m=1, const std::string& attribute="full");
-  MX variable(const Dict& meta_data, int n=1, int m=1, const std::string& attribute="full");
+
   /** \brief Create a parameter (symbol); fixed during optimization
   *
   * The order of creation does not matter.
@@ -131,7 +131,11 @@ public:
   * \param[in] attribute: 'full' (default) or 'symmetric'
   */
   MX parameter(int n=1, int m=1, const std::string& attribute="full");
-  MX parameter(const Dict&, int n=1, int m=1, const std::string& attribute="full");
+
+  /** \brief internal variants of parameter/variable. Do not use yourself
+  */
+  MX variable(const Dict& meta_data, int n=1, int m=1, const std::string& attribute="full");
+  MX parameter(const Dict& meta_data, int n=1, int m=1, const std::string& attribute="full");
 
   /** \brief Set objective
   *
