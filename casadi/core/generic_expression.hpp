@@ -35,6 +35,7 @@ namespace casadi {
    */
   struct CASADI_EXPORT GenericExpressionCommon {};
 
+#ifndef SWIG
   /** \brief Expression interface
   *
   This is a common base class for SX, MX and Matrix<>, introducing a uniform syntax and implementing
@@ -45,15 +46,12 @@ namespace casadi {
 */
 template<typename ExType>
 class GenericExpression : public GenericExpressionCommon {
-#ifndef SWIG
   protected:
     // Helper functions
     inline const ExType& self() const { return static_cast<const ExType&>(*this); }
     inline ExType& self() { return static_cast<ExType&>(*this); }
-#endif // SWIG
   public:
 
-#if !defined(SWIG) || defined(DOXYGEN)
 /**
 \ingroup expression_tools
 @{
@@ -587,9 +585,8 @@ class GenericExpression : public GenericExpressionCommon {
      ///@}
 
 /** @} */
-#endif // SWIG
-
 };
+#endif // SWIG
 
 } // namespace casadi
 

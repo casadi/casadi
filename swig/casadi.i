@@ -2666,11 +2666,6 @@ namespace casadi{
 
 %include <casadi/core/generic_expression.hpp>
 
-%template(ExpIM)        casadi::GenericExpression<casadi::Matrix<int> >;
-%template(ExpDM)        casadi::GenericExpression<casadi::Matrix<double> >;
-%template(ExpSX)             casadi::GenericExpression<casadi::Matrix<casadi::SXElem> >;
-%template(ExpMX)             casadi::GenericExpression<casadi::MX>;
-
 // Flags to allow differentiating the wrapping by type
 #define IS_GLOBAL   0x1
 #define IS_MEMBER   0x10
