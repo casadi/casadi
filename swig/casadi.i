@@ -167,10 +167,6 @@
 %ignore *::operator->;
 
 %rename(str) get_str;
-%rename(repr) get_repr;
-#ifdef SWIGPYTHON
-%rename(__str__) python_str;
-#endif // WITH_SWIGPYTHON
 
 %begin %{
 #define SWIG_PYTHON_OUTPUT_TUPLE
@@ -2612,6 +2608,25 @@ class NZproxy:
 #endif
 
 %include <casadi/core/printable_object.hpp>
+
+namespace casadi{
+%extend PrintableObjectCommon {
+#ifdef SWIGPYTHON
+  %pythoncode %{
+    def __str__(self): return self.str()
+    def repr(self): return self.type_name() + '(' + self.str() + ')'
+  %}
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+  %matlabcode %{
+    function s = repr(self)
+      s = [s.type_name() '(' self.str() ')'];
+    end
+  %}
+#endif // SWIGMATLAB
+}
+} // namespace casadi
+
 %template(PrintSharedObject) casadi::PrintableObject<casadi::SharedObject>;
 %template(PrintSlice)        casadi::PrintableObject<casadi::Slice>;
 %template(PrintIM)      casadi::PrintableObject<casadi::Matrix<int> >;

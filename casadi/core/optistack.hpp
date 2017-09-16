@@ -562,8 +562,6 @@ public:
 */
 class CASADI_EXPORT Opti : private OptiStack {
   public:
-    using OptiStack::python_str;
-    using OptiStack::get_repr;
     using OptiStack::get_str;
     using OptiStack::disp;
     using OptiStack::variable;
@@ -615,8 +613,6 @@ class CASADI_EXPORT Opti : private OptiStack {
 class CASADI_EXPORT OptiSol : private OptiStack {
   public:
     OptiSol(const OptiStack& opti) : OptiStack(opti) {}
-    using OptiStack::python_str;
-    using OptiStack::get_repr;
     using OptiStack::get_str;
     using OptiStack::disp;
     using OptiStack::value;

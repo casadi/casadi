@@ -36,35 +36,29 @@
 
 namespace casadi {
 
+  /** \brief Empty Base
+      This class is extended in SWIG.
+   */
+  struct CASADI_EXPORT PrintableObjectCommon {};
+
   /** \brief Base class for objects that have a natural string representation
       \author Joel Andersson
       \date 2010-2014
   */
   template<class Derived>
-  class CASADI_EXPORT PrintableObject {
+  class CASADI_EXPORT PrintableObject : public PrintableObjectCommon {
   public:
-    /// Python __str__
-    std::string python_str() const {
-      return static_cast<const Derived*>(this)->get_str();
-    }
-
-    /// Get string representation with type information
-    std::string get_repr() const {
-      return static_cast<const Derived*>(this)->type_name() + "("
-            + static_cast<const Derived*>(this)->get_str() + ")";
-    }
-
 #ifndef SWIG
     /// Print a string representation of the object to a stream
     inline friend
       std::ostream& operator<<(std::ostream &stream, const Derived& obj) {
-      obj.disp(stream, false);
+      obj.disp(stream);
       return stream;
     }
 
     /// Get string representation with type information
     inline friend std::string repr(const Derived& obj) {
-      return obj.get_repr();
+      return obj.type_name() + "(" + obj.get_str() + ")";
     }
 #endif // SWIG
   };
