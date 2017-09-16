@@ -8481,7 +8481,7 @@ Python str
 ";
 
 %feature("docstring")  casadi::Callback::eval(const std::vector< DM > &arg)
-"
+const  "
 
 Evaluate numerically, temporary matrices and work vectors.
 
@@ -48826,6 +48826,62 @@ Examples:
 
 ";
 
+%feature("docstring")  casadi::OptiStack::subject_to(const Dict &meta_data,
+const MX &g) "
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+";
+
+%feature("docstring")  casadi::OptiStack::subject_to(const Dict &meta_data,
+const std::vector< MX > &g) "
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+";
+
 %feature("docstring")  casadi::OptiStack::set_initial(const MX &x, const DM
 &v) "
 
@@ -48862,6 +48918,51 @@ A simplified interface for NLP modeling/solving.
 
 This class offers a view with model description facilities The API is
 guaranteed to be stable.
+
+Example NLP:
+
+::
+
+    opti = casadi.Opti();
+  
+    x = opti.variable();
+    y = opti.variable();
+  
+    opti.minimize(  (y-x^2)^2   );
+    opti.subject_to( x^2+y^2==1 );
+    opti.subject_to(     x+y>=1 );
+  
+    opti.solver('ipopt');
+    sol = opti.solve();
+  
+    sol.value(x)
+    sol.value(y)
+
+
+
+Example parametric NLP:
+
+::
+
+    opti = casadi.Opti();
+  
+    x = opti.variable(2,1);
+    p = opti.parameter();
+  
+    opti.minimize(  (p*x(2)-x(1)^2)^2   );
+    opti.subject_to( 1<=sum(x)<=2 );
+  
+    opti.solver('ipopt');
+  
+    opti.set_value(p, 3);
+    sol = opti.solve();
+    sol.value(x)
+  
+    opti.set_value(p, 5);
+    sol = opti.solve();
+    sol.value(x)
+
+
 
 Joris Gillis, Erik Lambrechts
 
@@ -49033,51 +49134,6 @@ A simplified interface for NLP modeling/solving.
 This class offers a view with solution retrieval facilities The API is
 guaranteed to be stable.
 
-Example NLP:
-
-::
-
-    opti = casadi.Opti();
-  
-    x = opti.variable();
-    y = opti.variable();
-  
-    opti.minimize(  (y-x^2)^2   );
-    opti.subject_to( x^2+y^2==1 );
-    opti.subject_to(     x+y>=1 );
-  
-    opti.solver('ipopt');
-    sol = opti.solve();
-  
-    sol.value(x)
-    sol.value(y)
-
-
-
-Example parametric NLP:
-
-::
-
-    opti = casadi.Opti();
-  
-    x = opti.variable(2,1);
-    p = opti.parameter();
-  
-    opti.minimize(  (p*x(2)-x(1)^2)^2   );
-    opti.subject_to( 1<=sum(x)<=2 );
-  
-    opti.solver('ipopt');
-  
-    opti.set_value(p, 3);
-    sol = opti.solve();
-    sol.value(x)
-  
-    opti.set_value(p, 5);
-    sol = opti.solve();
-    sol.value(x)
-
-
-
 Joris Gillis, Erik Lambrechts
 
 C++ includes: optistack.hpp ";
@@ -49241,6 +49297,62 @@ Examples:
 
 ";
 
+%feature("docstring")  casadi::OptiStack::subject_to(const Dict &meta_data,
+const MX &g) "
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+";
+
+%feature("docstring")  casadi::OptiStack::subject_to(const Dict &meta_data,
+const std::vector< MX > &g) "
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+";
+
 
 // File: classcasadi_1_1OptiStack.xml
 %feature("docstring")  casadi::OptiStack::casadi_solver() const  "
@@ -49350,6 +49462,62 @@ Examples:
 
 ";
 
+%feature("docstring")  casadi::OptiStack::subject_to(const Dict &meta_data,
+const MX &g) "
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+";
+
+%feature("docstring")  casadi::OptiStack::subject_to(const Dict &meta_data,
+const std::vector< MX > &g) "
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+";
+
 %feature("docstring")  casadi::OptiStack::subject_to() "
 
 Clear constraints.
@@ -49365,6 +49533,11 @@ guaranteed about this part of the API.
 
 %feature("docstring")
 casadi::OptiStack::active_values(OptiStack::VariableType type) const  "
+
+";
+
+%feature("docstring")  casadi::OptiStack::describe(const MX &x, int
+indent=0) const  "
 
 ";
 
@@ -49385,6 +49558,11 @@ n:  number of rows (default 1)
 m:  number of columnss (default 1)
 
 attribute:  'full' (default) or 'symmetric'
+
+";
+
+%feature("docstring")  casadi::OptiStack::parameter(const Dict &meta_data,
+int n=1, int m=1, const std::string &attribute="full") "
 
 ";
 
@@ -49473,13 +49651,21 @@ Interpret an expression (for internal use only)
 
 ";
 
-%feature("docstring")  casadi::OptiStack::p() "
+%feature("docstring")  casadi::OptiStack::baked() const  "
+
+";
+
+%feature("docstring")  casadi::OptiStack::baked() "
+
+";
+
+%feature("docstring")  casadi::OptiStack::p() const  "
 
 Get all (scalarised) parameters as a symbolic column vector.
 
 ";
 
-%feature("docstring")  casadi::OptiStack::np() "
+%feature("docstring")  casadi::OptiStack::np() const  "
 
 Number of (scalarised) parameters.
 
@@ -49498,7 +49684,7 @@ Number of (scalarised) parameters.
 
 ";
 
-%feature("docstring")  casadi::OptiStack::x() "
+%feature("docstring")  casadi::OptiStack::x() const  "
 
 Get all (scalarised) decision variables as a symbolic column vector.
 
@@ -49524,9 +49710,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::OptiStack::f() "
-
-Get objective expression.
+%feature("docstring")  casadi::OptiStack::g_describe(int i) const  "
 
 ";
 
@@ -49534,7 +49718,7 @@ Get objective expression.
 
 ";
 
-%feature("docstring")  casadi::OptiStack::lam_g() "
+%feature("docstring")  casadi::OptiStack::lam_g() const  "
 
 Get all (scalarised) dual variables as a symbolic column vector.
 
@@ -49550,7 +49734,13 @@ Useful for obtaining the Lagrange Hessian:
 
 ";
 
-%feature("docstring")  casadi::OptiStack::nx() "
+%feature("docstring")  casadi::OptiStack::f() const  "
+
+Get objective expression.
+
+";
+
+%feature("docstring")  casadi::OptiStack::nx() const  "
 
 Number of (scalarised) decision variables.
 
@@ -49575,6 +49765,10 @@ Each parameter must be given a value before 'solve' can be called
 Set value of parameter.
 
 Each parameter must be given a value before 'solve' can be called
+
+";
+
+%feature("docstring")  casadi::OptiStack::g_lookup(int i) const  "
 
 ";
 
@@ -49661,6 +49855,13 @@ attribute:  'full' (default) or 'symmetric'
 
 ";
 
+%feature("docstring")  casadi::OptiStack::variable(const Dict &meta_data,
+int n=1, int m=1, const std::string &attribute="full") "
+
+internal variants of parameter/variable. Do not use yourself
+
+";
+
 %feature("docstring")  casadi::OptiStack::solver(const std::string &solver,
 const Dict &options=Dict()) "
 
@@ -49678,6 +49879,10 @@ of the API
 ";
 
 %feature("docstring")  casadi::OptiStack::res(const DMDict &res) "
+
+";
+
+%feature("docstring")  casadi::OptiStack::x_describe(int i) const  "
 
 ";
 
@@ -49739,11 +49944,15 @@ Get string representation with type information.
 
 ";
 
+%feature("docstring")  casadi::OptiStack::x_lookup(int i) const  "
+
+";
+
 %feature("docstring")  casadi::OptiStack::value_parameters() const  "
 
 ";
 
-%feature("docstring")  casadi::OptiStack::g() "
+%feature("docstring")  casadi::OptiStack::g() const  "
 
 Get all (scalarised) constraint expressions as a column vector.
 
@@ -49782,7 +49991,7 @@ Create Opti Context.
 
 ";
 
-%feature("docstring")  casadi::OptiStack::ng() "
+%feature("docstring")  casadi::OptiStack::ng() const  "
 
 Number of (scalarised) constraints.
 

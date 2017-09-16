@@ -35717,6 +35717,51 @@ A simplified interface for NLP modeling/solving.
 This class offers a view with model description facilities The API is
 guaranteed to be stable.
 
+Example NLP:
+
+::
+
+    opti = casadi.Opti();
+  
+    x = opti.variable();
+    y = opti.variable();
+  
+    opti.minimize(  (y-x^2)^2   );
+    opti.subject_to( x^2+y^2==1 );
+    opti.subject_to(     x+y>=1 );
+  
+    opti.solver('ipopt');
+    sol = opti.solve();
+  
+    sol.value(x)
+    sol.value(y)
+
+
+
+Example parametric NLP:
+
+::
+
+    opti = casadi.Opti();
+  
+    x = opti.variable(2,1);
+    p = opti.parameter();
+  
+    opti.minimize(  (p*x(2)-x(1)^2)^2   );
+    opti.subject_to( 1<=sum(x)<=2 );
+  
+    opti.solver('ipopt');
+  
+    opti.set_value(p, 3);
+    sol = opti.solve();
+    sol.value(x)
+  
+    opti.set_value(p, 5);
+    sol = opti.solve();
+    sol.value(x)
+
+
+
 Joris Gillis, Erik Lambrechts
 
 C++ includes: optistack.hpp ";
@@ -35786,51 +35831,6 @@ A simplified interface for NLP modeling/solving.
 
 This class offers a view with solution retrieval facilities The API is
 guaranteed to be stable.
-
-Example NLP:
-
-::
-
-    opti = casadi.Opti();
-  
-    x = opti.variable();
-    y = opti.variable();
-  
-    opti.minimize(  (y-x^2)^2   );
-    opti.subject_to( x^2+y^2==1 );
-    opti.subject_to(     x+y>=1 );
-  
-    opti.solver('ipopt');
-    sol = opti.solve();
-  
-    sol.value(x)
-    sol.value(y)
-
-
-
-Example parametric NLP:
-
-::
-
-    opti = casadi.Opti();
-  
-    x = opti.variable(2,1);
-    p = opti.parameter();
-  
-    opti.minimize(  (p*x(2)-x(1)^2)^2   );
-    opti.subject_to( 1<=sum(x)<=2 );
-  
-    opti.solver('ipopt');
-  
-    opti.set_value(p, 3);
-    sol = opti.solve();
-    sol.value(x)
-  
-    opti.set_value(p, 5);
-    sol = opti.solve();
-    sol.value(x)
-
-
 
 Joris Gillis, Erik Lambrechts
 
@@ -35939,6 +35939,10 @@ part of the API
 >  void casadi::OptiStack::subject_to(const MX &g)
 
 >  void casadi::OptiStack::subject_to(const std::vector< MX > &g)
+
+>  void casadi::OptiStack::subject_to(const Dict &meta_data, const MX &g)
+
+>  void casadi::OptiStack::subject_to(const Dict &meta_data, const std::vector< MX > &g)
 ------------------------------------------------------------------------
 
 Add constraints.
@@ -35980,7 +35984,12 @@ guaranteed about this part of the API.
 
 %feature("docstring") casadi::OptiStack::active_values "";
 
+%feature("docstring") casadi::OptiStack::describe "";
+
 %feature("docstring") casadi::OptiStack::parameter "
+
+>  MX casadi::OptiStack::parameter(int n=1, int m=1, const std::string &attribute=\"full\")
+------------------------------------------------------------------------
 
 Create a parameter (symbol); fixed during optimization.
 
@@ -36058,6 +36067,8 @@ Interpret an expression (for internal use only)
 
 ";
 
+%feature("docstring") casadi::OptiStack::baked "";
+
 %feature("docstring") casadi::OptiStack::p "
 
 Get all (scalarised) parameters as a symbolic column vector.
@@ -36099,11 +36110,7 @@ multiple times, the last call takes effect
 
 %feature("docstring") casadi::OptiStack::assert_active_symbol "";
 
-%feature("docstring") casadi::OptiStack::f "
-
-Get objective expression.
-
-";
+%feature("docstring") casadi::OptiStack::g_describe "";
 
 %feature("docstring") casadi::OptiStack::solve_actual "";
 
@@ -36123,6 +36130,12 @@ Useful for obtaining the Lagrange Hessian:
 
 ";
 
+%feature("docstring") casadi::OptiStack::f "
+
+Get objective expression.
+
+";
+
 %feature("docstring") casadi::OptiStack::nx "
 
 Number of (scalarised) decision variables.
@@ -36138,6 +36151,8 @@ Set value of parameter.
 Each parameter must be given a value before 'solve' can be called
 
 ";
+
+%feature("docstring") casadi::OptiStack::g_lookup "";
 
 %feature("docstring") casadi::OptiStack::solve_prepare "";
 
@@ -36166,6 +36181,9 @@ Set meta-data of an expression.
 
 %feature("docstring") casadi::OptiStack::variable "
 
+>  MX casadi::OptiStack::variable(int n=1, int m=1, const std::string &attribute=\"full\")
+------------------------------------------------------------------------
+
 Create a decision variable (symbol)
 
 The order of creation matters. The order will be reflected in the
@@ -36180,6 +36198,11 @@ n:  number of rows (default 1)
 m:  number of columnss (default 1)
 
 attribute:  'full' (default) or 'symmetric'
+
+>  MX casadi::OptiStack::variable(const Dict &meta_data, int n=1, int m=1, const std::string &attribute=\"full\")
+------------------------------------------------------------------------
+
+internal variants of parameter/variable. Do not use yourself
 
 ";
 
@@ -36199,6 +36222,8 @@ of the API
 ";
 
 %feature("docstring") casadi::OptiStack::res "";
+
+%feature("docstring") casadi::OptiStack::x_describe "";
 
 %feature("docstring") casadi::OptiStack::mark_problem_dirty "";
 
@@ -36244,6 +36269,8 @@ Get string representation with type information.
 ";
 
 %feature("docstring") casadi::OptiStack::problem_dirty "";
+
+%feature("docstring") casadi::OptiStack::x_lookup "";
 
 %feature("docstring") casadi::OptiStack::value_parameters "";
 
