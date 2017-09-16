@@ -4086,6 +4086,50 @@ optistack_metadata_modifiers(casadi::OptiStack)
 #endif
 %include <casadi/core/optistack.hpp>
 
+// HACK! Opti is hiding PrintableObject
+namespace casadi{
+%extend Opti {
+#ifdef SWIGPYTHON
+  %pythoncode %{
+    def __str__(self): return self.str()
+    def repr(self): return self.type_name() + '(' + self.str() + ')'
+  %}
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+  %matlabcode %{
+    function s = repr(self)
+      s = [s.type_name() '(' self.str() ')'];
+    end
+  %}
+#endif // SWIGMATLAB
+}
+} // namespace casadi
+
+// HACK! OptiSol is hiding PrintableObject
+namespace casadi{
+%extend OptiSol {
+#ifdef SWIGPYTHON
+  %pythoncode %{
+    def __str__(self): return self.str()
+    def repr(self): return self.type_name() + '(' + self.str() + ')'
+  %}
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+  %matlabcode %{
+    function s = repr(self)
+      s = [s.type_name() '(' self.str() ')'];
+    end
+  %}
+#endif // SWIGMATLAB
+}
+} // namespace casadi
+
+
+
+
+
+
+
 
 #ifdef SWIGPYTHON
 %extend casadi::Opti {
