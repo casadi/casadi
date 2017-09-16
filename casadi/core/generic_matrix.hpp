@@ -71,7 +71,7 @@ namespace casadi {
   template<typename MatType>
   class GenericMatrix
     : public GenericMatrixCommon,
-      public SparsityInterface<MatType> {
+      public SWIG_IF_ELSE(SparsityInterfaceCommon, SparsityInterface<MatType>) {
     using SparsityInterface<MatType>::self;
   public:
 

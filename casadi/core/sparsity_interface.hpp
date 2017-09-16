@@ -34,6 +34,7 @@ namespace casadi {
    */
   struct CASADI_EXPORT SparsityInterfaceCommon {};
 
+#ifndef SWIG
   /** \brief Sparsity interface class
 
       This is a common base class for GenericMatrix (i.e. MX and Matrix<>) and Sparsity, introducing a
@@ -45,15 +46,12 @@ namespace casadi {
   */
   template<typename MatType>
   class SparsityInterface : public SparsityInterfaceCommon {
-#ifndef SWIG
   protected:
     // Helper functions
     inline const MatType& self() const { return static_cast<const MatType&>(*this); }
     inline MatType& self() { return static_cast<MatType&>(*this); }
-#endif // SWIG
   public:
 
-#ifndef SWIG
     /// \cond CLUTTER
     static std::vector< std::vector< MatType > >
       blocksplit(const MatType& x, const std::vector<int>& vert_offset,
@@ -75,9 +73,7 @@ namespace casadi {
       return MatType::repmat(A, rc.first, rc.second);
     }
     /// \endcond
-#endif
 
-#if !defined(SWIG) || defined(DOXYGEN)
 /** \defgroup expression_tools Expression tools
 * Functions for manipulating DM, SX, MX or Sparsity
 *
@@ -426,8 +422,8 @@ namespace casadi {
       return diagcat(std::vector<MatType>{x, y, z, w});
     }
 /** \@} */
-#endif // SWIG
   };
+#endif // SWIG
 
 #ifndef SWIG
   template<typename MatType>

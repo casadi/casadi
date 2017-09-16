@@ -73,8 +73,9 @@ namespace casadi {
    * \author Joel Andersson
    * \date 2010-2015
    */
-  class CASADI_EXPORT Sparsity : public SharedObject,
-                                 public SparsityInterface<Sparsity> {
+  class CASADI_EXPORT Sparsity
+    : public SharedObject,
+      public SWIG_IF_ELSE(SparsityInterfaceCommon, SparsityInterface<Sparsity>) {
   public:
 
     /// Default constructor

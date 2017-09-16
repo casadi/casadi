@@ -209,7 +209,7 @@ def DM_from_array(m, check_only=True):
     if check_only:
       return True
     else:
-      shape = m.shape + (1, 1) 
+      shape = m.shape + (1, 1)
       nrow, ncol = shape[0], shape[1]
       return (nrow,ncol,m.flat)
   return False
@@ -226,7 +226,7 @@ def IM_from_array(m, check_only=True):
     if check_only:
       return True
     else:
-      shape = m.shape + (1, 1) 
+      shape = m.shape + (1, 1)
       nrow, ncol = shape[0], shape[1]
       return (nrow,ncol,m.flat)
   return False
@@ -237,11 +237,11 @@ def SX_from_array(m):
     if len(m.shape)>2:
       return None
     if m.dtype!=np.object: return None
-    shape = m.shape + (1, 1) 
+    shape = m.shape + (1, 1)
     nrow, ncol = shape[0], shape[1]
     return (nrow,ncol,m.flat)
   return None
-  
+
 def DM_from_csc(m, check_only=True):
   if hasattr(m,"tocsc"):
     m = m.tocsc()
@@ -585,7 +585,7 @@ namespace std {
       PyObject *p = from_ptr(&m);
       PyObject *cr = PyObject_CallMethod(p, (char*) "toarray", 0);
       Py_DECREF(p);
-      if (cr) return cr;  
+      if (cr) return cr;
       return Py_None;
 #elif defined(SWIGMATLAB)
       mxArray *p  = mxCreateDoubleMatrix(m.size1(), m.size2(), mxREAL);
@@ -620,7 +620,7 @@ namespace std {
 
     }
 
-    
+
 
 
     GUESTOBJECT* full(const DM& m, bool simplify=false) {
@@ -630,7 +630,7 @@ namespace std {
       PyObject *cr = PyObject_CallMethodObjArgs(p, method_name, (simplify? Py_True: Py_False), 0);
       Py_DECREF(method_name);
       Py_DECREF(p);
-      if (cr) return cr;  
+      if (cr) return cr;
       return Py_None;
 #elif defined(SWIGMATLAB)
       mxArray *p  = mxCreateDoubleMatrix(m.size1(), m.size2(), mxREAL);
@@ -696,10 +696,10 @@ namespace std {
           **m = casadi::SX::zeros(nrow, ncol);
           casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
         }
-        return true;      
+        return true;
       }
     }
-    
+
     bool IM_from_array(GUESTOBJECT *p, casadi::IM** m) {
       PyObject* dm = get_Python_helper("IM_from_array");
       if (!dm) return false;
@@ -718,10 +718,10 @@ namespace std {
           **m = IM::zeros(nrow, ncol);
           casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
         }
-        return true;      
+        return true;
       }
     }
-    
+
     bool DM_from_array(GUESTOBJECT *p, casadi::DM** m) {
       PyObject* dm = get_Python_helper("DM_from_array");
       if (!dm) return false;
@@ -740,10 +740,10 @@ namespace std {
           **m = DM::zeros(nrow, ncol);
           casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
         }
-        return true;      
+        return true;
       }
     }
-    
+
     bool DM_from_csc(GUESTOBJECT *p, casadi::DM** m) {
       PyObject* dm = get_Python_helper("DM_from_csc");
       if (!dm) return false;
@@ -768,8 +768,8 @@ namespace std {
       }
     }
 #endif
-    
-    
+
+
   } // namespace CasADi
  }
 
@@ -910,7 +910,7 @@ namespace std {
           }
         }
       }
-      
+
 #ifdef SWIGPYTHON
       PyObject *cr = PyObject_CallMethod(p, (char*) "item", 0);
       if (cr) {
@@ -1138,7 +1138,7 @@ namespace std {
 
       // Dicts are iterable
       if (PyDict_Check(p)) return false;
-      
+
       // Make sure shape is 1D, if defined.
       if (PyObject_HasAttrString(p, "shape")) {
         PyObject * shape = PyObject_GetAttrString(p, "shape");
@@ -1831,9 +1831,9 @@ namespace std {
         Py_DECREF(cr);
         return result;
       }
-      
+
       if (DM_from_array(p, m)) return true;
-      
+
       if (DM_from_csc(p,m)) return true;
 
       {
@@ -2628,8 +2628,6 @@ class NZproxy:
 %include <casadi/core/generic_type.hpp>
 %include <casadi/core/calculus.hpp>
 %include <casadi/core/sparsity_interface.hpp>
-
-%template(SpSparsity) casadi::SparsityInterface<casadi::Sparsity>;
 %include <casadi/core/sparsity.hpp>
 
 // Logic for pickling
@@ -2658,10 +2656,6 @@ namespace casadi{
 %include <casadi/core/slice.hpp>
  //#endif
 
-%template(SpIM)        casadi::SparsityInterface<casadi::Matrix<int> >;
-%template(SpDM)        casadi::SparsityInterface<casadi::Matrix<double> >;
-%template(SpSX)             casadi::SparsityInterface<casadi::Matrix<casadi::SXElem> >;
-%template(SpMX)             casadi::SparsityInterface<casadi::MX>;
 
 %include <casadi/core/generic_matrix.hpp>
 
@@ -3452,7 +3446,7 @@ namespace casadi{
     def __abs__(self):
       return abs(int(self))
   %}
-  
+
   %pythoncode %{
     def tocsc(self):
       import numpy as np
@@ -4098,7 +4092,7 @@ optistack_metadata_modifiers(casadi::OptiStack)
 #ifdef SWIGPYTHON
 %extend casadi::Opti {
   %pythoncode %{
-  
+
     @staticmethod
     def _callback(self,fh=None):
       if fh is None:
@@ -4115,12 +4109,12 @@ optistack_metadata_modifiers(casadi::OptiStack)
       self._fh = fh
       self._cb = OptiCallbackHelper(fh);
       self.callback_class(self._cb);
-      
-  
+
+
     def callback(self,fh=None):
       self._callback(self,fh)
-      
-        
+
+
   %}
 
 }
