@@ -59,7 +59,8 @@ class OptiDebug;
       \date 2017
       \author Joris Gillis, Erik Lambrechts
 */
-class CASADI_EXPORT OptiStack : public PrintableObject<OptiStack> {
+class CASADI_EXPORT OptiStack
+  : public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<OptiStack>) {
   friend class InternalOptiCallback;
 public:
   enum ConstraintType {

@@ -79,7 +79,14 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_EXPORT SharedObject : public PrintableObject<SharedObject> {
+  class CASADI_EXPORT SharedObject :
+  #ifndef SWIG
+  public PrintableObject<SharedObject>
+  #else
+  public PrintableObjectCommon
+  #endif
+  {
+//    public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<SharedObject>) {
 #ifndef SWIG
     template<class B> friend B shared_cast(SharedObject& A);
     template<class B> friend const B shared_cast(const SharedObject& A);

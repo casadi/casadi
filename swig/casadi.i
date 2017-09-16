@@ -2627,16 +2627,6 @@ namespace casadi{
 }
 } // namespace casadi
 
-%template(PrintSharedObject) casadi::PrintableObject<casadi::SharedObject>;
-%template(PrintSlice)        casadi::PrintableObject<casadi::Slice>;
-%template(PrintIM)      casadi::PrintableObject<casadi::Matrix<int> >;
-%template(PrintDM)      casadi::PrintableObject<casadi::Matrix<double> >;
-//%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElem> >;
-%template(PrintNlpBuilder)     casadi::PrintableObject<casadi::NlpBuilder>;
-%template(PrintVariable)        casadi::PrintableObject<casadi::Variable>;
-%template(PrintDaeBuilder)     casadi::PrintableObject<casadi::DaeBuilder>;
-%template(PrintOptiStack)     casadi::PrintableObject<casadi::OptiStack>;
-
 %include <casadi/core/shared_object.hpp>
 %include <casadi/core/std_vector_tools.hpp>
 %include <casadi/core/casadi_types.hpp>
@@ -3323,8 +3313,6 @@ casadi_graph_substitute(const std::vector< M > &ex,
 %define MX_ALL(DECL, FLAG)
 MX_FUN(DECL, (FLAG | IS_MX), MX)
 %enddef
-
-%template(PrintSX)           casadi::PrintableObject<casadi::Matrix<casadi::SXElem> >;
 
 %include <casadi/core/matrix.hpp>
 

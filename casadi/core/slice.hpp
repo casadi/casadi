@@ -39,7 +39,8 @@ namespace casadi {
    * Note that Python or Octave do not need to use this class.
    * They can just use slicing utility from the host language ( M[0:6]  in Python, M(1:7) )
    */
-  class CASADI_EXPORT Slice : public PrintableObject<Slice> {
+  class CASADI_EXPORT Slice
+    : public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<Slice>) {
   public:
     /// start value: negative values will get added to length
     int start;

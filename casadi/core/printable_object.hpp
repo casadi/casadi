@@ -41,6 +41,7 @@ namespace casadi {
    */
   struct CASADI_EXPORT PrintableObjectCommon {};
 
+#ifndef SWIG
   /** \brief Base class for objects that have a natural string representation
       \author Joel Andersson
       \date 2010-2014
@@ -48,7 +49,6 @@ namespace casadi {
   template<class Derived>
   class CASADI_EXPORT PrintableObject : public PrintableObjectCommon {
   public:
-#ifndef SWIG
     /// Print a string representation of the object to a stream
     inline friend
       std::ostream& operator<<(std::ostream &stream, const Derived& obj) {
@@ -60,8 +60,9 @@ namespace casadi {
     inline friend std::string repr(const Derived& obj) {
       return obj.type_name() + "(" + obj.get_str() + ")";
     }
-#endif // SWIG
   };
+#endif // SWIG
+
 } // namespace casadi
 
 

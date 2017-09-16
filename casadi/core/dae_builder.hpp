@@ -73,7 +73,8 @@ namespace casadi {
       \date 2012-2015
       \author Joel Andersson
   */
-  class CASADI_EXPORT DaeBuilder : public PrintableObject<DaeBuilder> {
+  class CASADI_EXPORT DaeBuilder
+    : public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<DaeBuilder>) {
   public:
 
     /// Default constructor
