@@ -81,6 +81,13 @@ namespace casadi {
 
     /// Print a description of the object
     void disp(std::ostream& stream, bool more=false) const;
+
+    /// Get string representation
+    std::string get_str(bool more=false) const {
+      std::stringstream ss;
+      disp(ss, more);
+      return ss.str();
+    }
   };
 
   /// Construct from an index vector (requires is_slice(v) to be true)

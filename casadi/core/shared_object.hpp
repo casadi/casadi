@@ -132,6 +132,13 @@ namespace casadi {
     /// Print a description of the object
     void disp(std::ostream& stream, bool more=false) const;
 
+    /// Get string representation
+    std::string get_str(bool more=false) const {
+      std::stringstream ss;
+      disp(ss, more);
+      return ss.str();
+    }
+
     /// \cond INTERNAL
     /// Print the pointer to the internal class
     void print_ptr(std::ostream &stream=casadi::userOut()) const;

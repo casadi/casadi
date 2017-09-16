@@ -371,6 +371,13 @@ public:
   ///  Print representation
   void disp(std::ostream& stream, bool more=false) const;
 
+  /// Get string representation
+  std::string get_str(bool more=false) const {
+    std::stringstream ss;
+    disp(ss, more);
+    return ss.str();
+  }
+
   /// Fix the structure of the optimization problem
   void internal_bake();
 private:

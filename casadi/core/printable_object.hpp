@@ -43,23 +43,15 @@ namespace casadi {
   template<class Derived>
   class CASADI_EXPORT PrintableObject {
   public:
-    /// Get string representation
-    std::string get_str(bool more=false) const {
-      std::stringstream ss;
-      static_cast<const Derived*>(this)->disp(ss, more);
-      return ss.str();
-    }
-
     /// Python __str__
-    std::string python_str() const { return get_str();}
+    std::string python_str() const {
+      return static_cast<const Derived*>(this)->get_str();
+    }
 
     /// Get string representation with type information
     std::string get_repr() const {
-      std::stringstream ss;
-      ss << static_cast<const Derived*>(this)->type_name() << "(";
-      static_cast<const Derived*>(this)->disp(ss, false);
-      ss << ")";
-      return ss.str();
+      return static_cast<const Derived*>(this)->type_name() + "("
+            + static_cast<const Derived*>(this)->get_str() + ")";
     }
 
 #ifndef SWIG

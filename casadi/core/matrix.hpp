@@ -746,6 +746,13 @@ namespace casadi {
     /// Print a representation of the object
     void disp(std::ostream& stream, bool more=false) const;
 
+    /// Get string representation
+    std::string get_str(bool more=false) const {
+      std::stringstream ss;
+      disp(ss, more);
+      return ss.str();
+    }
+
     /// Print scalar
     void print_scalar(std::ostream &stream) const;
 
