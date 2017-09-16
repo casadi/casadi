@@ -47,16 +47,16 @@ using namespace casadi;
    }
 
    // Initialize the object
-   virtual void init() {
+   void init() override {
      std::cout << "initializing object" << std::endl;
    }
 
    // Number of inputs and outputs
-   virtual int get_n_in() { return 1;}
-   virtual int get_n_out() { return 1;}
+   int get_n_in() override { return 1;}
+   int get_n_out() override { return 1;}
 
    // Evaluate numerically
-   virtual std::vector<DM> eval(const std::vector<DM>& arg) {
+   std::vector<DM> eval(const std::vector<DM>& arg) const override {
      DM x = arg.at(0);
      DM f = sin(d*x);
      return {f};
