@@ -28,7 +28,7 @@
 
 #include "sx_elem.hpp"
 #include "mx.hpp"
-#include "printable_object.hpp"
+#include "printable.hpp"
 #include <exception>
 
 namespace casadi {
@@ -54,7 +54,7 @@ namespace casadi {
   */
   class CASADI_EXPORT Function :
     public SharedObject,
-    public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<Function>) {
+    public SWIG_IF_ELSE(PrintableCommon, Printable<Function>) {
   public:
     /** \brief Get type name */
     static std::string type_name() {return "Function";}

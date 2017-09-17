@@ -26,7 +26,7 @@
 #ifndef CASADI_POLYNOMIAL_HPP
 #define CASADI_POLYNOMIAL_HPP
 
-# include "printable_object.hpp"
+# include "printable.hpp"
 
 namespace casadi {
 
@@ -34,7 +34,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2014
   */
-  class CASADI_EXPORT Polynomial : public PrintableObject<Polynomial> {
+  class CASADI_EXPORT Polynomial : public Printable<Polynomial> {
   public:
     /// Floating point type
     typedef double casadi_real;

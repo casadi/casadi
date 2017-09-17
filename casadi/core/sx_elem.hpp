@@ -27,7 +27,7 @@
 #define CASADI_SX_ELEMENT_HPP
 
 // exception class
-#include "printable_object.hpp"
+#include "printable.hpp"
 #include "exception.hpp"
 #include "casadi_limits.hpp"
 #include "matrix.hpp"
@@ -56,7 +56,7 @@ namespace casadi {
       \date 2010-2014
   */
   class CASADI_EXPORT SXElem : public GenericExpression<SXElem>,
-                               public PrintableObject<SXElem> {
+                               public Printable<SXElem> {
     friend class SXNode;
     friend class BinarySXNode;
     friend class Matrix<SXElem>;

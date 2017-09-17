@@ -27,7 +27,7 @@
 #define CASADI_GENERIC_TYPE_HPP
 
 #include "shared_object.hpp"
-#include "printable_object.hpp"
+#include "printable.hpp"
 #include "casadi_types.hpp"
 #include <string>
 #include <vector>
@@ -59,7 +59,7 @@ namespace casadi {
       \date 2010
   */
   class CASADI_EXPORT GenericType
-    : public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<GenericType>)
+    : public SWIG_IF_ELSE(PrintableCommon, Printable<GenericType>)
 #if !(defined(SWIG) && !defined(SWIGXML))
     , public SharedObject
 #endif // SWIG

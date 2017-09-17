@@ -32,7 +32,7 @@
 #include "runtime/casadi_runtime.hpp"
 #include "generic_matrix.hpp"
 #include "generic_expression.hpp"
-#include "printable_object.hpp"
+#include "printable.hpp"
 
 #include <vector>
 #include <typeinfo>
@@ -83,7 +83,7 @@ namespace casadi {
     public MatrixCommon,
     public SWIG_IF_ELSE(GenericExpressionCommon, GenericExpression<Matrix<Scalar> >),
     public GenericMatrix<Matrix<Scalar> >,
-    public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<Matrix<Scalar> >) {
+    public SWIG_IF_ELSE(PrintableCommon, Printable<Matrix<Scalar> >) {
   public:
 
     /** \brief  constructors */

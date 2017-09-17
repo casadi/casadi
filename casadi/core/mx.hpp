@@ -29,7 +29,7 @@
 #include "matrix.hpp"
 #include "generic_expression.hpp"
 #include "generic_type.hpp"
-#include "printable_object.hpp"
+#include "printable.hpp"
 #include <vector>
 namespace casadi {
 
@@ -57,7 +57,7 @@ namespace casadi {
   */
   class CASADI_EXPORT MX :
     public SWIG_IF_ELSE(GenericExpressionCommon, GenericExpression<MX>),
-    public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<MX>),
+    public SWIG_IF_ELSE(PrintableCommon, Printable<MX>),
     public GenericMatrix<MX>,
     public SharedObject {
   public:

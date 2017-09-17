@@ -2607,10 +2607,10 @@ class NZproxy:
 %enddef
 #endif
 
-%include <casadi/core/printable_object.hpp>
+%include <casadi/core/printable.hpp>
 
 namespace casadi{
-%extend PrintableObjectCommon {
+%extend PrintableCommon {
 #ifdef SWIGPYTHON
   %pythoncode %{
     def __str__(self): return self.str()
@@ -4006,7 +4006,7 @@ make_property(casadi::OptiStack, casadi_solver);
   %rename(_variable) class ## :: variable;
   %rename(_parameter) class ## :: parameter;
   %rename(_subject_to) class ## :: subject_to;
-  %extend class {  
+  %extend class {
     %pythoncode %{
       def parameter(self,*args):
         import sys
@@ -4044,7 +4044,7 @@ optistack_metadata_modifiers(casadi::OptiStack);
   %rename(internal_variable) class ## ::variable;
   %rename(internal_parameter) class ## ::parameter;
   %rename(internal_subject_to) class ## ::subject_to;
-  %extend class {  
+  %extend class {
     %matlabcode %{
       function out = variable(self, varargin)
         st = dbstack('-completenames',1);
@@ -4076,7 +4076,7 @@ optistack_metadata_modifiers(casadi::OptiStack);
           meta = struct;
         end
         self.internal_subject_to(meta,varargin{:});
-      end    
+      end
     %}
   }
 %enddef
@@ -4086,7 +4086,7 @@ optistack_metadata_modifiers(casadi::OptiStack)
 #endif
 %include <casadi/core/optistack.hpp>
 
-// HACK! Opti is hiding PrintableObject
+// HACK! Opti is hiding Printable
 namespace casadi{
 %extend Opti {
 #ifdef SWIGPYTHON
@@ -4105,7 +4105,7 @@ namespace casadi{
 }
 } // namespace casadi
 
-// HACK! OptiSol is hiding PrintableObject
+// HACK! OptiSol is hiding Printable
 namespace casadi{
 %extend OptiSol {
 #ifdef SWIGPYTHON

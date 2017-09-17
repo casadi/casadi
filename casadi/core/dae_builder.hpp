@@ -74,7 +74,7 @@ namespace casadi {
       \author Joel Andersson
   */
   class CASADI_EXPORT DaeBuilder
-    : public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<DaeBuilder>) {
+    : public SWIG_IF_ELSE(PrintableCommon, Printable<DaeBuilder>) {
   public:
 
     /// Default constructor

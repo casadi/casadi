@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_PRINTABLE_OBJECT_HPP
-#define CASADI_PRINTABLE_OBJECT_HPP
+#ifndef CASADI_PRINTABLE_HPP
+#define CASADI_PRINTABLE_HPP
 
 #include <iostream>
 #include <string>
@@ -39,7 +39,7 @@ namespace casadi {
   /** \brief Empty Base
       This class is extended in SWIG.
    */
-  struct CASADI_EXPORT PrintableObjectCommon {};
+  struct CASADI_EXPORT PrintableCommon {};
 
 #ifndef SWIG
   /** \brief Base class for objects that have a natural string representation
@@ -47,7 +47,7 @@ namespace casadi {
       \date 2010-2014
   */
   template<class Derived>
-  class CASADI_EXPORT PrintableObject : public PrintableObjectCommon {
+  class CASADI_EXPORT Printable : public PrintableCommon {
   public:
     /// Print a string representation of the object to a stream
     inline friend
@@ -66,4 +66,4 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // CASADI_PRINTABLE_OBJECT_HPP
+#endif // CASADI_PRINTABLE_HPP

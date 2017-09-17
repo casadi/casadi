@@ -28,7 +28,7 @@
 
 #include <vector>
 #include "exception.hpp"
-#include "printable_object.hpp"
+#include "printable.hpp"
 #include <limits>
 #include <iostream>
 
@@ -40,7 +40,7 @@ namespace casadi {
    * They can just use slicing utility from the host language ( M[0:6]  in Python, M(1:7) )
    */
   class CASADI_EXPORT Slice
-    : public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<Slice>) {
+    : public SWIG_IF_ELSE(PrintableCommon, Printable<Slice>) {
   public:
     /// start value: negative values will get added to length
     int start;

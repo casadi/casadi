@@ -27,7 +27,7 @@
 #define CASADI_LINSOL_HPP
 
 #include "function.hpp"
-#include "printable_object.hpp"
+#include "printable.hpp"
 
 namespace casadi {
 
@@ -50,7 +50,7 @@ namespace casadi {
   */
   class CASADI_EXPORT Linsol
     : public SharedObject,
-      public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<Linsol>) {
+      public SWIG_IF_ELSE(PrintableCommon, Printable<Linsol>) {
   public:
     /** \brief Get type name */
     static std::string type_name() {return "Linsol";}
