@@ -856,9 +856,6 @@
 %exception  casadi::FunctionInternal::sz_work(size_t &sz_arg, size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::type_name() const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::uses_output() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -950,9 +947,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ImporterInternal::to_text(const std::string &cmd, int ind=-1) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::ImporterInternal::type_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::aug_adj(int nadj) const  {
@@ -1133,9 +1127,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinsolInternal::get_n_out() override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::LinsolInternal::type_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Lsqr::alloc_mem() const override {
@@ -1502,9 +1493,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObjectInternal::getCount() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SharedObjectInternal::type_name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObjectInternal::weak() {
