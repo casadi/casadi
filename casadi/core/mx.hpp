@@ -29,6 +29,7 @@
 #include "matrix.hpp"
 #include "generic_expression.hpp"
 #include "generic_type.hpp"
+#include "printable_object.hpp"
 #include <vector>
 namespace casadi {
 
@@ -56,9 +57,12 @@ namespace casadi {
   */
   class CASADI_EXPORT MX :
     public SWIG_IF_ELSE(GenericExpressionCommon, GenericExpression<MX>),
+    public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<MX>),
     public GenericMatrix<MX>,
     public SharedObject {
   public:
+    /** \brief Get type name */
+    static std::string type_name() {return "MX";}
 
     /** \brief  Default constructor */
     MX();

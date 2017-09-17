@@ -42,9 +42,6 @@ namespace casadi {
     // Destructor
     ~XmlFileInternal() override;
 
-    /// Readable name of the class
-    std::string type_name() const override {return "XmlFile";}
-
     /** \brief  Print a description */
     void disp(std::ostream& stream, bool more=false) const override;
 

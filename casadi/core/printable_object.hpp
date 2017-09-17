@@ -58,7 +58,7 @@ namespace casadi {
 
     /// Get string representation with type information
     inline friend std::string repr(const Derived& obj) {
-      return obj.type_name() + "(" + obj.get_str() + ")";
+      return Derived::type_name() + "(" + obj.get_str() + ")";
     }
   };
 #endif // SWIG

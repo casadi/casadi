@@ -418,9 +418,6 @@ namespace casadi {
     /// Hash the sparsity pattern
     std::size_t hash() const;
 
-    /// Readable name of the public class
-    std::string type_name() const override {return "Sparsity";}
-
     /// Readable name of the internal class
     std::string class_name() const override {return "SparsityInternal";}
 

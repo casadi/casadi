@@ -27,6 +27,7 @@
 #define CASADI_SPARSITY_HPP
 
 #include "shared_object.hpp"
+#include "printable_object.hpp"
 #include "casadi_types.hpp"
 #include "sparsity_interface.hpp"
 #include <vector>
@@ -75,7 +76,8 @@ namespace casadi {
    */
   class CASADI_EXPORT Sparsity
     : public SharedObject,
-      public SWIG_IF_ELSE(SparsityInterfaceCommon, SparsityInterface<Sparsity>) {
+      public SWIG_IF_ELSE(SparsityInterfaceCommon, SparsityInterface<Sparsity>),
+      public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<Sparsity>) {
   public:
 
     /// Default constructor
@@ -715,6 +717,9 @@ namespace casadi {
       disp(stream);
     }
 #endif // WITH_DEPRECATED_FEATURES
+
+    /// Readable name of the public class
+    static std::string type_name() {return "Sparsity";}
 
     // Hash the sparsity pattern
     std::size_t hash() const;

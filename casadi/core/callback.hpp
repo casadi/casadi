@@ -47,6 +47,9 @@ namespace casadi {
    */
   class CASADI_EXPORT Callback : public Function {
   public:
+    /** \brief Get type name */
+    static std::string type_name() {return "Callback";}
+
     /** \brief Default constructor */
     Callback();
 

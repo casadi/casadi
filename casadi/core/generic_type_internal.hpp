@@ -45,7 +45,6 @@ namespace casadi {
   public:
     explicit GenericTypeInternal(const T& d) : d_(d) {}
     ~GenericTypeInternal() override {}
-    std::string type_name() const override {return "GenericType";}
     std::string class_name() const override {return "GenericTypeInternal";}
     void disp(std::ostream& stream, bool more) const override { stream << d_; }
     TypeID getType() const override { return ID;}

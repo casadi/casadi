@@ -1100,10 +1100,6 @@ namespace casadi {
     return (*this)->mx_out();
   }
 
-  string Function::type_name() const {
-    return (*this)->type_name();
-  }
-
   bool Function::is_a(const string& type, bool recursive) const {
     return (*this)->is_a(type, recursive);
   }

@@ -52,9 +52,6 @@ namespace casadi {
     /// Get the reference count
     int getCount() const;
 
-    /// Readable name of the public class
-    virtual std::string type_name() const = 0;
-
     /// Readable name of the internal class
     virtual std::string class_name() const = 0;
 
@@ -99,9 +96,6 @@ namespace casadi {
 
     // Destructor
     ~WeakRefInternal() override;
-
-    /// Readable name of the class
-    std::string type_name() const override {return "WeakRef";}
 
     /// Readable name of the class
     std::string class_name() const override {return "WeakRefInternal";}

@@ -96,10 +96,6 @@ namespace casadi {
     return (*this)->class_name();
   }
 
-  std::string SharedObject::type_name() const {
-    return (*this)->type_name();
-  }
-
   void SharedObject::disp(std::ostream& stream, bool more) const {
     if (is_null()) {
       stream << "NULL";

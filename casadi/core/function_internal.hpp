@@ -464,9 +464,6 @@ namespace casadi {
     /** \brief Name of the function */
     const std::string& name() const { return name_;}
 
-    /** \brief Get type name */
-    std::string type_name() const override {return "Function";}
-
     /// Generate the sparsity of a Jacobian block
     virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric) const;
 

@@ -41,9 +41,6 @@ namespace casadi {
     ~CallbackInternal() override;
 
     /** \brief Get type name */
-    std::string type_name() const override {return "Callback";}
-
-    /** \brief Get type name */
     std::string class_name() const override {return "CallbackInternal";}
 
     ///@{

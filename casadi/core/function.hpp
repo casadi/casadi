@@ -28,7 +28,7 @@
 
 #include "sx_elem.hpp"
 #include "mx.hpp"
-
+#include "printable_object.hpp"
 #include <exception>
 
 namespace casadi {
@@ -52,8 +52,12 @@ namespace casadi {
       \author Joel Andersson
       \date 2010-2017
   */
-  class CASADI_EXPORT Function : public SharedObject {
+  class CASADI_EXPORT Function :
+    public SharedObject,
+    public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<Function>) {
   public:
+    /** \brief Get type name */
+    static std::string type_name() {return "Function";}
 
     /** \brief Default constructor, null pointer */
     Function();
@@ -745,9 +749,6 @@ namespace casadi {
 
     /** \brief Name of the function */
     std::string name() const;
-
-    /** \brief Get type name */
-    std::string type_name() const;
 
     /** \brief Check if the function is of a particular type
         Optionally check if name matches one of the base classes (default true)

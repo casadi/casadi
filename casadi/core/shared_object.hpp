@@ -26,7 +26,7 @@
 #ifndef CASADI_SHARED_OBJECT_HPP
 #define CASADI_SHARED_OBJECT_HPP
 
-#include "printable_object.hpp"
+#include "casadi_types.hpp"
 #include "exception.hpp"
 #include <map>
 #include <vector>
@@ -79,14 +79,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_EXPORT SharedObject :
-  #ifndef SWIG
-  public PrintableObject<SharedObject>
-  #else
-  public PrintableObjectCommon
-  #endif
-  {
-//    public SWIG_IF_ELSE(PrintableObjectCommon, PrintableObject<SharedObject>) {
+  class CASADI_EXPORT SharedObject {
 #ifndef SWIG
     template<class B> friend B shared_cast(SharedObject& A);
     template<class B> friend const B shared_cast(const SharedObject& A);
@@ -132,9 +125,6 @@ namespace casadi {
 
     /** \brief Get class name */
     std::string class_name() const;
-
-    /// Readable name of the class
-    std::string type_name() const;
 
     /// Print a description of the object
     void disp(std::ostream& stream, bool more=false) const;
