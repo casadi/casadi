@@ -41,7 +41,7 @@ NU = 101
 NX = 101
 
 # System dynamics, can be called with matricex
-def f(x1,x2,u): 
+def f(x1,x2,u):
   x1_dot = (1 - x2*x2)*x1 - x2 + u
   x2_dot = x1
   q_dot  = x1*x1 + x2*x2 + u*u
@@ -83,7 +83,7 @@ for u in U:
   I = X2_k  <  0; Q_k[I]=inf; X2_k[I]=0
   I = X1_k >= NX; Q_k[I]=inf; X1_k[I]=0
   I = X2_k >= NX; Q_k[I]=inf; X2_k[I]=0
-  
+
   # Save the stage cost and next state
   next_x1.append(X1_k)
   next_x2.append(X2_k)
@@ -103,7 +103,7 @@ for k in reversed(list(range(N))):
     better = J_prev_test<J_prev
     u_prev[better] = uind
     J_prev[better] = J_prev_test[better]
-  
+
   # Update cost-to-go and save optimal control
   J = J_prev
   U_opt.append(u_prev)
@@ -112,7 +112,7 @@ for k in reversed(list(range(N))):
 U_opt.reverse()
 
 # Find optimal control starting at x1=0, x2=1
-i1 = NX/2
+i1 = NX//2
 i2 = NX-1
 u_opt = []
 x1_opt = [x1[i1]]
@@ -131,7 +131,7 @@ for k in range(N):
 
 # Optimal cost
 print("Minimal cost: ", cost)
-assert abs(cost-J[NX-1,NX/2])<1e-8 # Consistency check
+assert abs(cost-J[NX-1,NX//2])<1e-8 # Consistency check
 
 # Plot
 figure(1)
