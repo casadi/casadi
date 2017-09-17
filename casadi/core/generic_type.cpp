@@ -177,15 +177,6 @@ namespace casadi {
   GenericType::GenericType() {
   }
 
-  ostream& operator<<(ostream &stream, const GenericType& ref) {
-    if (ref.is_null()) {
-      stream << "NULL";
-    } else {
-      ref->disp(stream, false);
-    }
-    return stream;
-  }
-
   GenericType::GenericType(bool b) {
     own(new BoolType(b));
   }

@@ -179,10 +179,6 @@ namespace casadi {
     //! \brief Equality
     bool operator==(const GenericType& op2) const;
     bool operator!=(const GenericType& op2) const;
-
-    //! \brief Print
-    CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream,
-                                                  const GenericType& ref);
 #endif // SWIG
   };
 
