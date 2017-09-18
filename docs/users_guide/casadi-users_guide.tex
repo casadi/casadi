@@ -3022,21 +3022,26 @@ Use \lstinline[language=Python]{subject_to()} to empty this set and start over.
 
 \paragraph{Solver}
 You must always declare the \texttt{solver} (numerical backend).
-An optional dictionary of CasADi plugin options can be given as second argument.\\
+An optional dictionary of CasADi plugin options can be given as second argument.
+An optional dictionary of \texttt{solver} options can be given as third argument.\\
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 # Python
 opti.solver("ipopt")
-opts = {"expand":True}
-opti.solver("ipopt",opts)
+p_opts = {"expand":True}
+s_opts = {"max_iter": 100}
+opti.solver("ipopt",p_opts,
+                    s_opts)
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
 % MATLAB
 opti.solver('ipopt');
-opts = struct('expand',true);
-opti.solver('ipopt',opts);
+p_opts = struct('expand',true);
+s_opts = struct('max_iter',100);
+opti.solver('ipopt',p_opts,
+                    s_opts);
 \end{lstlisting}
 \end{minipage}
 

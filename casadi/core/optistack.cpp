@@ -589,9 +589,11 @@ void OptiStack::internal_bake() {
   mark_problem_dirty(false);
 }
 
-void OptiStack::solver(const std::string& solver_name, const Dict& solver_options) {
+void OptiStack::solver(const std::string& solver_name, const Dict& plugin_options, const Dict& solver_options) {
   solver_name_ = solver_name;
-  solver_options_ = solver_options;
+  solver_options_ = plugin_options;
+  if (!solver_options.empty())
+    solver_options_[solver_name] = solver_options;
   mark_solver_dirty();
 }
 

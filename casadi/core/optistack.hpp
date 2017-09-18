@@ -178,10 +178,14 @@ public:
   *
   * \param[in] solver any of the nlpsol plugins can be used here
   *            In practice, not all nlpsol plugins may be supported yet
-  * \param[in] options passed on to nlpsol
+  * \param[in] options passed on to nlpsol plugin
+  *            No stability can be guaranteed about this part of the API
+  * \param[in] options to be passed to nlpsol solver
   *            No stability can be guaranteed about this part of the API
   */
-  void solver(const std::string& solver, const Dict& options=Dict());
+  void solver(const std::string& solver,
+              const Dict& plugin_options=Dict(),
+              const Dict& solver_options=Dict());
 
   /// @{
   /** Set initial guess for decision variables
