@@ -24,81 +24,69 @@
 
 #include "optistack.hpp"
 #include "nlpsol.hpp"
+#include "function_internal.hpp"
 
 using namespace std;
 namespace casadi {
 
-class InternalOptiCallback : public Callback {
+class InternalOptiCallback : public FunctionInternal {
   public:
-  InternalOptiCallback(OptiStack* sol);
 
-  ~InternalOptiCallback();
+  ~InternalOptiCallback() override {}
 
-  // Initialize the object
-  void init() override;
+  /** \brief Get type name */
+  std::string class_name() const override {return "InternalOptiCallback";}
 
   // Number of inputs and outputs
-  int get_n_in() override;
+  size_t get_n_in() override { return nlpsol_n_out();}
 
-  Sparsity get_sparsity_in(int i) override;
-
-  // Evaluate numerically
-  std::vector<DM> eval(const std::vector<DM>& arg) const override;
+  Sparsity get_sparsity_in(int i) override {
+    std::string n = nlpsol_out(i);
+    int size = 0;
+    if (n=="f") {
+      size = 1;
+    } else if (n=="lam_x" || n=="x") {
+      size = nx_;
+    } else if (n=="lam_g" || n=="g") {
+      size = ng_;
+    } else if (n=="p" || n=="lam_p") {
+      size = np_;
+      if (size==0) return Sparsity::dense(0, 0);
+    } else {
+      return Sparsity::dense(0, 0);
+    }
+    return Sparsity::dense(size, 1);
+  }
 
   void set_sol(OptiStack* sol) { i=0; sol_= sol;}
 
+  /// Evaluate the function numerically
+  std::vector<DM> eval_dm(const std::vector<DM>& arg) const override {
+    DMDict r;
+
+    for (int i=0;i<nlpsol_n_out();++i) {
+      r[nlpsol_out(i)] = arg[i];
+    }
+
+    sol_->res(r);
+
+
+    for (OptiCallback* cb : sol_->callbacks_)
+      cb->call(i);
+    i+=1;
+    return {0};
+  }
+
+  InternalOptiCallback(int nx, int ng, int np) :
+    FunctionInternal(class_name()), sol_(0), nx_(nx), ng_(ng), np_(np) {
+  }
   private:
     OptiStack* sol_;
     mutable int i;
+    int nx_;
+    int ng_;
+    int np_;
 };
-
-
-InternalOptiCallback::InternalOptiCallback(OptiStack* sol) : sol_(sol) {
-}
-
-InternalOptiCallback::~InternalOptiCallback() {  }
-
-// Initialize the object
-void InternalOptiCallback::init() {
-}
-
-// Number of inputs and outputs
-int InternalOptiCallback::get_n_in() { return nlpsol_n_out();}
-
-Sparsity InternalOptiCallback::get_sparsity_in(int i) {
-  std::string n = nlpsol_out(i);
-  int size = 0;
-  if (n=="f") {
-    size = 1;
-  } else if (n=="lam_x" || n=="x") {
-    size = sol_->nx();
-  } else if (n=="lam_g" || n=="g") {
-    size = sol_->ng();
-  } else if (n=="p" || n=="lam_p") {
-    size = sol_->np();
-    if (size==0) return Sparsity::dense(0, 0);
-  } else {
-    return Sparsity::dense(0, 0);
-  }
-  return Sparsity::dense(size, 1);
-}
-
-// Evaluate numerically
-std::vector<DM> InternalOptiCallback::eval(const std::vector<DM>& arg) const {
-  DMDict r;
-
-  for (int i=0;i<nlpsol_n_out();++i) {
-    r[nlpsol_out(i)] = arg[i];
-  }
-
-  sol_->res(r);
-
-
-  for (OptiCallback* cb : sol_->callbacks_)
-    cb->call(i);
-  i+=1;
-  return {0};
-}
 
 void OptiStack::callback_class(OptiCallback* callback) {
   callbacks_ = {callback};
@@ -239,10 +227,12 @@ MX OptiStack::g_lookup(int i) const {
 
 OptiStack::OptiStack() : count_(0), count_var_(0), count_par_(0) {
   solver_has_callback_ = false;
-  internal_callback_ = 0;
   f_ = 0;
   instance_number_ = instance_count_++;
   mark_problem_dirty();
+}
+
+OptiStack::~OptiStack() {
 }
 
 MX OptiStack::variable(int n, int m, const std::string& attribute) {
@@ -874,18 +864,8 @@ OptiSol OptiStack::solve() {
 
     // Handle callbacks
     if (need_callback) {
-      if (!internal_callback_) delete internal_callback_;
-      internal_callback_ = new InternalOptiCallback(this);
-      internal_callback_->construct("InternalOptiCallback", Dict());
-      callback_ = *internal_callback_;
-      internal_callback_->transfer_ownership();
-
-      //callback_ = InternalOptiCallback::create();
-
+      callback_ = Function::create(new InternalOptiCallback(nx(), ng(), np()), opts);
       opts["iteration_callback"] = callback_;
-    } else {
-      if (!internal_callback_) delete internal_callback_;
-      internal_callback_ = 0;
     }
     solver_has_callback_ = need_callback;
 
@@ -919,9 +899,10 @@ void OptiStack::solve_prepare() {
      casadi_error("Constraint type unknown. Use ==, >= or <= .");
   }
 
-  if (internal_callback_)
-    internal_callback_->set_sol(this);
-
+  if (solver_has_callback_) {
+    InternalOptiCallback* cb = static_cast<InternalOptiCallback*>(callback_.get());
+    cb->set_sol(this);
+  }
   // Get initial guess and parameter values
   arg_["x0"]     = veccat(active_values(OptiStack::OPTI_VAR));
   arg_["p"]      = veccat(active_values(OptiStack::OPTI_PAR));

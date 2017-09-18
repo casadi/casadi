@@ -108,9 +108,6 @@ namespace casadi {
 
     /** \brief Pointer to the public class */
     Callback* self_;
-
-    /** \brief Is the public class owned by the internal class? */
-    bool own_;
   };
 
 } // namespace casadi

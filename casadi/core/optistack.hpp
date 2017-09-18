@@ -30,8 +30,6 @@
 
 namespace casadi {
 
-class InternalOptiCallback;
-
 typedef DM native_DM;
 
 class OptiCallback {
@@ -108,6 +106,9 @@ public:
   /** \brief Create Opti Context
   */
   OptiStack();
+
+  /** \brief Destructor */
+  ~OptiStack();
 
   /** \brief Create a decision variable (symbol)
   *
@@ -479,9 +480,7 @@ private:
   MX f_;
 
   std::vector<OptiCallback*> callbacks_;
-  InternalOptiCallback* internal_callback_;
   Function callback_;
-
 
   std::string solver_name_;
   Dict solver_options_;

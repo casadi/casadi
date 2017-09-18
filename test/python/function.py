@@ -1150,6 +1150,7 @@ class Functiontests(casadiTestCase):
         def __init__(self):
           Callback.__init__(self)
           self.construct("Fun", {})
+
         def get_n_in(self): return 2
         def get_n_out(self): return 1
 
@@ -1162,13 +1163,12 @@ class Functiontests(casadiTestCase):
           z2 = sin(z1)
           return [z2]
 
-      f = Fun()
-      f.__disown__()
+      self.cb = Fun()
 
       if not indirect:
-        return f
+        return self.cb
 
-      f = Function("f", [x,y],[f(x,y)])
+      f = Function("f", [x,y],[self.cb(x,y)])
 
       return f
 
@@ -1299,9 +1299,9 @@ class Functiontests(casadiTestCase):
                   ret.append(dz2)
 
                 return ret
-            ffun = ForwardFun()
-            ffun.__disown__()
-            return ffun
+
+            self.cb_fwd = ForwardFun()
+            return self.cb_fwd
 
         if has_adj:
           def has_reverse(self,nadj): return nadj==1
@@ -1342,13 +1342,12 @@ class Functiontests(casadiTestCase):
                   ret.append(by)
                 return ret
 
-            bfun = BackwardFun()
-            bfun.__disown__()
-            return bfun
+            self.cb_rev = BackwardFun()
+            return self.cb_rev
 
       opts = {"verbose":True}
-      f = Fun(opts)
-      f.__disown__()
+      self.cb = Fun(opts)
+      f = self.cb
 
       if not indirect:
         return f

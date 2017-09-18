@@ -3,9 +3,8 @@ using namespace casadi;
 
 class MyCallback : public Callback {
 public:
-  // Creator function, creates an owning reference
-  static Function create(const std::string& name, const Dict& opts=Dict()) {
-    return Callback::create(name, new MyCallback(), opts);
+  MyCallback(const std::string& name, const Dict& opts=Dict()) {
+    construct(name, opts);
   }
 
   // Number of inputs and outputs
@@ -20,7 +19,7 @@ public:
 };
 
 int main() {
-  Function f = MyCallback::create("f");
+  MyCallback f("f");
   std::vector<DM> arg = {2};
   std::vector<DM> res = f(arg);
   std::cout << res << std::endl;

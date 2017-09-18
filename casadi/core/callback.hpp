@@ -56,9 +56,8 @@ namespace casadi {
     /** \brief Copy constructor (throws an error) */
     Callback(const Callback& obj);
 
-    /** \brief Create an owning reference, given a pointer to a derived object */
-    static Function create(const std::string& name, Callback* n,
-                           const Dict& opts=Dict());
+    /** \brief  Destructor */
+    virtual ~Callback();
 
     /** \brief Construct internal object
      * This is the step that actually construct the internal object, as the
@@ -66,20 +65,6 @@ namespace casadi {
      * It should be called from the user constructor.
      */
     void construct(const std::string& name, const Dict& opts=Dict());
-
-#ifndef SWIG
-    /** \brief Transfer ownership to the internal class
-     * With a call to this function, the public class will be owned by the
-     * internal class.
-     * For this to work, the object must have been created with "new" (and must
-     * not be deleted with "delete" as this is handled internally.
-     * There also has to be at least one owning reference to the class.
-     */
-    void transfer_ownership();
-#endif // SWIG
-
-    /** \brief  Destructor */
-    virtual ~Callback();
 
     /** \brief Initialize the object
      * This function is called after the object construction (for the whole class
@@ -181,15 +166,6 @@ namespace casadi {
     virtual void alloc_arg(size_t sz_arg, bool persist=false);
     virtual void alloc_res(size_t sz_res, bool persist=false);
     ///@}
-
-#ifndef SWIG
-    private:
-    /** \brief  Access functions of the node */
-    CallbackInternal* operator->();
-
-    /** \brief  Const access functions of the node */
-    const CallbackInternal* operator->() const;
-#endif // SWIG
   };
 
 } // namespace casadi

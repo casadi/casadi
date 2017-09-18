@@ -39,16 +39,10 @@ namespace casadi {
 
   CallbackInternal::
   CallbackInternal(const std::string& name, Callback *self)
-    : FunctionInternal(name), self_(self), own_(false) {
+    : FunctionInternal(name), self_(self) {
   }
 
   CallbackInternal::~CallbackInternal() {
-    if (own_) {
-      // Make self a null-pointer and then delete
-      // No ownership since reference counter was decreased in Callback::transfer_ownership
-      self_->assign(0);
-      delete self_;
-    }
   }
 
   size_t CallbackInternal::get_n_in() {

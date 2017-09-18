@@ -4,8 +4,8 @@ addpath('defs')
 x = MX.sym('x');
 
 foo = MyCallback('foo');
-
 y = foo(x);
+
 
 f = Function('f',{x},{y});
 

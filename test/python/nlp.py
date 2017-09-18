@@ -78,7 +78,7 @@ class NLPtests(casadiTestCase):
 
     for Solver, nlp_options in solvers:
       solver = nlpsol("mysolver", Solver, nlp, nlp_options)
-      
+
       for x in ["x","g"]:
         lb = "lb"+x
         ub = "ub"+x
@@ -91,7 +91,7 @@ class NLPtests(casadiTestCase):
           print(data)
           with self.assertInException("Ill-posed"):
             solver(**data)
-            
+
   def test_wrongdims(self):
     x=SX.sym("x",2)
     nlp={'x':x, 'f':-x[0],'g':diag(x)}
