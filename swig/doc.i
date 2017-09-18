@@ -48249,7 +48249,7 @@ internal variants of parameter/variable. Do not use yourself
 ";
 
 %feature("docstring")  casadi::OptiStack::solver(const std::string &solver,
-const Dict &options=Dict()) "
+const Dict &plugin_options=Dict(), const Dict &solver_options=Dict()) "
 
 Set a solver.
 
@@ -48259,8 +48259,11 @@ Parameters:
 solver:  any of the nlpsol plugins can be used here In practice, not all
 nlpsol plugins may be supported yet
 
-options:  passed on to nlpsol No stability can be guaranteed about this part
-of the API
+options:  passed on to nlpsol plugin No stability can be guaranteed about
+this part of the API
+
+options:  to be passed to nlpsol solver No stability can be guaranteed about
+this part of the API
 
 ";
 

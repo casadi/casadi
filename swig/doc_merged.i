@@ -34807,8 +34807,11 @@ Parameters:
 solver:  any of the nlpsol plugins can be used here In practice, not all
 nlpsol plugins may be supported yet
 
-options:  passed on to nlpsol No stability can be guaranteed about this part
-of the API
+options:  passed on to nlpsol plugin No stability can be guaranteed about
+this part of the API
+
+options:  to be passed to nlpsol solver No stability can be guaranteed about
+this part of the API
 
 ";
 
