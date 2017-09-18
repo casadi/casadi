@@ -15,7 +15,12 @@ y = opti.variable();
 z = opti.variable();
 
 disp(opti.debug.describe(x))
-assert(~isempty(strfind(opti.debug.describe(x),'optistack.m')))
+
+% Test doesn't work if you supply the contents of this file in the terminal,
+% as opposed to supplying the name of this file in the terminal
+if ~is_octave && ispc
+  assert(~isempty(strfind(opti.debug.describe(x),'optistack.m')))
+end
 
 opti.minimize((x-1)^2+(y-2)^2+(z-3)^2)
 opti.solver('ipopt')
