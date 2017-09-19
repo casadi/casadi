@@ -2202,10 +2202,10 @@ namespace std {
 %casadi_template(LABEL, SWIG_TYPECHECK_INTEGER, std::pair<int,int>)
 #undef LABEL
 %casadi_template("[" L_INT "]", PREC_IVector, std::vector<int>)
-%casadi_template("[[" L_INT "]]", PREC_IVectorVector, std::vector<std::vector<int> >)
+%casadi_template(LL "[" L_INT "]" LR, PREC_IVectorVector, std::vector<std::vector<int> >)
 %casadi_typemaps(L_DOUBLE, SWIG_TYPECHECK_DOUBLE, double)
 %casadi_template("[" L_DOUBLE "]", SWIG_TYPECHECK_DOUBLE, std::vector<double>)
-%casadi_template("[[" L_DOUBLE "]]", SWIG_TYPECHECK_DOUBLE, std::vector<std::vector<double> >)
+%casadi_template(LL "[" L_DOUBLE "]" LR, SWIG_TYPECHECK_DOUBLE, std::vector<std::vector<double> >)
 %casadi_typemaps("SXElem", PREC_SX, casadi::SXElem)
 %casadi_template(LL "SXElem" LR, PREC_SXVector, std::vector<casadi::SXElem>)
 %casadi_typemaps("SX", PREC_SX, casadi::Matrix<casadi::SXElem>)

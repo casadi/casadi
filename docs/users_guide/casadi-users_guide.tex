@@ -2434,6 +2434,97 @@ For reverse mode directional derivatives, replace \verb|fwd| with \verb|adj|.
 
 This is an experimental feature.
 
+
+\section{Using lookup-tables} \label{sec:lookup}
+
+Lookup-tables are supported in \CasADi for rectangular grids, through the \lstinline[language=Python]{interpolant} function:\\
+\verb|interpolant(name,plugin,grid,values,options)|,
+with \verb|name| an arbitrary label, \verb|plugin| the name of the desired plugin,
+\verb|grid| the collection of 1D grids whose outer product defines the full N-D rectangular grid, and \verb|values| the data corresponding to the grid, in a flattened way. Both the \verb|grid| and the \verb|values| must be numerical in nature.
+
+The result of an \lstinline[language=Python]{interpolant} call is a \CasADi Function object that is differentiable, and can be embedded into \CasADi computational graphs by calling with MX arguments. Furthermore, code-generation is fully supported for such graphs.
+
+Currently two plugins exist for \lstinline[language=Python]{interpolant}: \verb|linear| and \verb|bspline|.
+The \verb|bspline| variant mimics that of Matlab's \verb|spline|: not-a-knot end conditions.
+
+In the case of \verb|bspline|, coefficients will be sought at construction time that fit the provided data.
+Alternatively, you may also use the more low-level \verb|Function.bspline| to supply the coefficients yourself.
+The default degree of the bspline is 3 in each dimension. You may deviate from this default by passing a \verb|degree| option.
+
+We will walk through the syntax of \verb|interpolant| for the 1D and 2D versions, but the syntax in fact generalizes to an arbitrary number of dimensions.
+
+\subsection{1D lookup tables}
+
+For reference, we give the Python/Matlab syntax for a spline fit next to the CasADi syntax.
+
+\begin{lstlisting}[language=Python]
+# Python
+xgrid = np.linspace(1,6,6)
+V = [-1,-1,-2,-3,0,2]
+
+# Using Scipy
+import scipy.interpolate
+interp = scipy.interpolate.InterpolatedUnivariateSpline(xgrid, V)
+print(interp(2.5))
+
+# Using CasADi
+LUT = casadi.interpolant("LUT","bspline",[xgrid],V)
+print(LUT(2.5))
+\end{lstlisting}
+
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+xgrid = 1:6;
+V = [-1 -1 -2 -3 0 2];
+
+% Using Matlab builtin
+interpn(xgrid,V,2.5,'spline')
+
+% Using CasADi
+LUT = casadi.interpolant('LUT','bspline',{xgrid},V);
+LUT(2.5)
+\end{lstlisting}
+
+\subsection{2D lookup tables}
+
+\begin{lstlisting}[language=Python]
+# Python
+xgrid = np.linspace(-5,5,11)
+ygrid = np.linspace(-4,4,9)
+
+X,Y = np.meshgrid(xgrid,ygrid,indexing='ij')
+
+R = np.sqrt(5*X**2 + Y**2)+ 1
+data = np.sin(R)/R
+
+# Using Scipy
+interp = scipy.interpolate.RectBivariateSpline(xgrid, ygrid, data)
+print(interp.ev(0.5,1))
+
+# Using CasADi
+data_flat = data.ravel(order='F')
+
+LUT = casadi.interpolant('name','bspline',[xgrid,ygrid],data_flat)
+print(LUT([0.5,1]))
+\end{lstlisting}
+
+\begin{lstlisting}[language=Matlab]
+% MATLAB
+xgrid = -5:1:5;
+ygrid = -4:1:4;
+
+[X,Y] = ndgrid(xgrid, ygrid);
+R = sqrt(5*X.^2 + Y.^2)+ 1;
+V = sin(R)./R;
+
+% Using Matlab builtin
+interpn(X,Y,V,0.5,1,'spline')
+
+# Using CasADi
+LUT = interpolant('LUT','bspline',{xgrid, ygrid},V(:));
+LUT([0.5 1])
+\end{lstlisting}
+
 %%%%%%%%%%%%%
 \chapter{The \texttt{DaeBuilder} class} \label{ch:daebuilder}
 The \texttt{DaeBuilder} class in \CasADi is an auxiliary class intended to
