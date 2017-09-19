@@ -149,11 +149,12 @@ namespace casadi {
     /** \brief  Evaluate with symbolic scalars */
     virtual int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const;
 
-    ///@{
     /** \brief  Evaluate with symbolic matrices */
     virtual void eval_mx(const MXVector& arg, MXVector& res,
                          bool always_inline, bool never_inline) const;
-    ///@}
+
+    /** \brief Evaluate with DM matrices */
+    virtual std::vector<DM> eval_dm(const std::vector<DM>& arg) const;
 
     ///@{
     /** \brief Evaluate a function, overloaded */

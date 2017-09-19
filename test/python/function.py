@@ -1221,7 +1221,7 @@ class Functiontests(casadiTestCase):
         f(2,3)
       except Exception as e:
         s = str(e)
-      self.assertTrue("Callback::eval" in s)
+      self.assertTrue("Expected 1 output" in s)
       s = ""
       class Fun(Callback):
         def __init__(self):
@@ -1237,7 +1237,7 @@ class Functiontests(casadiTestCase):
         f(2,3)
       except Exception as e:
         s = str(e)
-      self.assertTrue("Callback::eval" in s)
+      self.assertTrue("Shape mismatch" in s)
 
   def test_Callback_sens(self):
     x = MX.sym("x")

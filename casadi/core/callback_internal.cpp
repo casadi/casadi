@@ -103,6 +103,10 @@ namespace casadi {
     TRY_CALL(eval_sx, self_, arg, res, iw, w, mem);
   }
 
+  std::vector<DM> CallbackInternal::eval_dm(const std::vector<DM>& arg) const {
+    TRY_CALL(eval, self_, arg);
+  }
+
   bool CallbackInternal::uses_output() const {
     TRY_CALL(uses_output, self_);
   }

@@ -73,6 +73,9 @@ namespace casadi {
     /** \brief  Evaluate symbolically, work vectors given */
     int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const override;
 
+    /** \brief Evaluate with DM matrices */
+    std::vector<DM> eval_dm(const std::vector<DM>& arg) const override;
+
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const override;
 
