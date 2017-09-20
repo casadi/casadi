@@ -286,6 +286,12 @@ class OptiStacktests(inherit_from):
           opti.callback(lambda i: ret.setdefault('b',opti.debug.value(p)))
           sol = opti.solve()
           self.assertTrue(ret['b']==3)
+          
+          
+          opti = opti.copy()
+          ret = {}
+          sol = opti.solve()
+          self.assertTrue(len(ret)==0)
 
     def test_debug_value(self):
       

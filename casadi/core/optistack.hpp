@@ -45,6 +45,21 @@ public:
   virtual ~OptiCallback() {}
 };
 
+#ifndef SWIG
+/// Pointer that gets set to null when copied
+template<class T>
+class null_ptr_on_copy {
+public:
+  null_ptr_on_copy<T>() : ptr_(0) {}
+  null_ptr_on_copy<T>(const null_ptr_on_copy<T>& rhs) : ptr_(0) {}
+  void operator=(T* ptr) { ptr_ = ptr; }
+  T* operator->() { return ptr_; }
+  operator bool() const { return ptr_; }
+private:
+  T* ptr_;
+};
+#endif
+
 class OptiSol;
 class OptiDebug;
 /** \brief A simplified interface for NLP modeling/solving
@@ -479,12 +494,13 @@ private:
   /// Objective verbatim as passed in with 'minimize'
   MX f_;
 
-  std::vector<OptiCallback*> callbacks_;
+  null_ptr_on_copy<OptiCallback> user_callback_;
   Function callback_;
+
+  bool old_callback() const;
 
   std::string solver_name_;
   Dict solver_options_;
-  bool solver_has_callback_;
 
   void assert_only_opti_symbols(const MX& e) const;
   void assert_only_opti_nondual(const MX& e) const;

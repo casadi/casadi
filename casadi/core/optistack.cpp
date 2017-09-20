@@ -32,6 +32,8 @@ namespace casadi {
 class InternalOptiCallback : public FunctionInternal {
   public:
 
+  InternalOptiCallback(OptiStack& sol) : FunctionInternal(class_name()), sol_(sol) {}
+
   ~InternalOptiCallback() override {}
 
   /** \brief Get type name */
@@ -46,11 +48,11 @@ class InternalOptiCallback : public FunctionInternal {
     if (n=="f") {
       size = 1;
     } else if (n=="lam_x" || n=="x") {
-      size = nx_;
+      size = sol_.nx();
     } else if (n=="lam_g" || n=="g") {
-      size = ng_;
+      size = sol_.ng();
     } else if (n=="p" || n=="lam_p") {
-      size = np_;
+      size = sol_.np();
       if (size==0) return Sparsity::dense(0, 0);
     } else {
       return Sparsity::dense(0, 0);
@@ -58,7 +60,7 @@ class InternalOptiCallback : public FunctionInternal {
     return Sparsity::dense(size, 1);
   }
 
-  void set_sol(OptiStack* sol) { i=0; sol_= sol;}
+  void reset() { i=0; }
 
   /// Evaluate the function numerically
   std::vector<DM> eval_dm(const std::vector<DM>& arg) const override {
@@ -68,32 +70,27 @@ class InternalOptiCallback : public FunctionInternal {
       r[nlpsol_out(i)] = arg[i];
     }
 
-    sol_->res(r);
+    sol_.res(r);
 
+    if (sol_.user_callback_) sol_.user_callback_->call(i);
 
-    for (OptiCallback* cb : sol_->callbacks_)
-      cb->call(i);
     i+=1;
     return {0};
   }
 
-  InternalOptiCallback(int nx, int ng, int np) :
-    FunctionInternal(class_name()), sol_(0), nx_(nx), ng_(ng), np_(np) {
-  }
+  bool associated_with(const OptiStack* o) { return &sol_==o; }
+
   private:
-    OptiStack* sol_;
+    OptiStack& sol_;
     mutable int i;
-    int nx_;
-    int ng_;
-    int np_;
 };
 
 void OptiStack::callback_class(OptiCallback* callback) {
-  callbacks_ = {callback};
+  user_callback_ = callback;
 }
 
 void OptiStack::callback_class() {
-  callbacks_ = {};
+  user_callback_ = 0;
 }
 
 std::string OptiStack::format_stacktrace(const Dict& stacktrace, int indent) {
@@ -226,7 +223,6 @@ MX OptiStack::g_lookup(int i) const {
 }
 
 OptiStack::OptiStack() : count_(0), count_var_(0), count_par_(0) {
-  solver_has_callback_ = false;
   f_ = 0;
   instance_number_ = instance_count_++;
   mark_problem_dirty();
@@ -841,6 +837,11 @@ void OptiStack::res(const DMDict& res) {
   mark_solved();
 }
 
+bool OptiStack::old_callback() const {
+  if (callback_.is_null()) return false;
+  InternalOptiCallback* cb = static_cast<InternalOptiCallback*>(callback_.get());
+  return !cb->associated_with(this);
+}
 // Solve the problem
 OptiSol OptiStack::solve() {
 
@@ -855,22 +856,20 @@ OptiSol OptiStack::solve() {
       "In that case, make sure that the matrix is flattened (e.g. mat(:)).");
   }
 
-  bool need_callback = !callbacks_.empty();
-
-  bool solver_update =  solver_dirty() ||  need_callback!=  solver_has_callback_;
+  bool solver_update =  solver_dirty() || old_callback() || (user_callback_ && callback_.is_null());
 
   if (solver_update) {
     Dict opts = solver_options_;
 
     // Handle callbacks
-    if (need_callback) {
-      callback_ = Function::create(new InternalOptiCallback(nx(), ng(), np()), opts);
+    if (user_callback_) {
+      callback_ = Function::create(new InternalOptiCallback(*this), Dict());
       opts["iteration_callback"] = callback_;
     }
-    solver_has_callback_ = need_callback;
 
     casadi_assert_message(solver_name_!="",
       "You must call 'solver' on the Opti stack to select a solver.");
+
     solver_ = nlpsol("solver", solver_name_, nlp_, opts);
     mark_solver_dirty(false);
   }
@@ -899,10 +898,11 @@ void OptiStack::solve_prepare() {
      casadi_error("Constraint type unknown. Use ==, >= or <= .");
   }
 
-  if (solver_has_callback_) {
+  if (user_callback_) {
     InternalOptiCallback* cb = static_cast<InternalOptiCallback*>(callback_.get());
-    cb->set_sol(this);
+    cb->reset();
   }
+
   // Get initial guess and parameter values
   arg_["x0"]     = veccat(active_values(OptiStack::OPTI_VAR));
   arg_["p"]      = veccat(active_values(OptiStack::OPTI_PAR));
