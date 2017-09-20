@@ -1021,11 +1021,11 @@ void OptiStack::set_value(const std::vector<MX>& assignments) {
 }
 
 void OptiStack::set_value_internal(const MX& x, const DM& v, std::vector<DM>& store) {
+  mark_solved(false);
   casadi_assert(v.is_regular());
   if (x.is_symbolic()) {
     DM& target = store[meta(x).i];
     Slice all;
-    mark_solver_dirty();
     target.set(v, false, all, all);
     return;
   }
