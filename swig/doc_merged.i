@@ -14,13 +14,6 @@
 
 
 // File: classcasadi_1_1Blocksqp.xml
-%feature("docstring") casadi::Blocksqp::reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
-
-";
-
 %feature("docstring") casadi::Blocksqp::sz_work "[INTERNAL]  Get number of
 temporary variables needed.
 
@@ -190,6 +183,11 @@ globalization strategy.
 function that calculates adjoint derivatives reverse(nadj) returns a cached
 instance if available, and calls  Function get_reverse(int nadj) if no
 cached version is available.
+
+";
+
+%feature("docstring") casadi::Blocksqp::eval_mx "[INTERNAL]  Evaluate with
+symbolic matrices.
 
 ";
 
@@ -924,8 +922,10 @@ length of iw field.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::eval_mx "[INTERNAL]  Evaluate with
-symbolic matrices.
+%feature("docstring") casadi::Blocksqp::reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(int nadj) if no
+cached version is available.
 
 ";
 
@@ -1184,6 +1184,11 @@ input value.
 
 %feature("docstring") casadi::Blocksqp::symbolic_output "[INTERNAL]  Get a
 vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::Blocksqp::eval_dm "[INTERNAL]  Evaluate with
+DM matrices.
 
 ";
 
@@ -1965,6 +1970,11 @@ the number of atomic operations.
 
 ";
 
+%feature("docstring") casadi::BSpline::free_sx "[INTERNAL]  Get free
+variables (SX)
+
+";
+
 %feature("docstring") casadi::BSpline::simple "[INTERNAL]  Evaluate
 numerically, simplied syntax.
 
@@ -2594,8 +2604,8 @@ required length of res field.
 
 ";
 
-%feature("docstring") casadi::BSpline::free_sx "[INTERNAL]  Get free
-variables (SX)
+%feature("docstring") casadi::BSpline::eval_dm "[INTERNAL]  Evaluate with
+DM matrices.
 
 ";
 
@@ -3176,8 +3186,8 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::checkout "[INTERNAL]  Checkout
-a memory object.
+%feature("docstring") casadi::BSplineCommon::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
 
 ";
 
@@ -3586,6 +3596,11 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::checkout "[INTERNAL]  Checkout
+a memory object.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::name_in "[INTERNAL]  Get input
 scheme name by index.
 
@@ -3873,6 +3888,11 @@ with symbolic scalars.
 
 %feature("docstring") casadi::BSplineDual::alloc "[INTERNAL]  Ensure work
 vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::BSplineDual::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
 
 ";
 
@@ -5122,6 +5142,11 @@ Number of input/output elements.
 
 %feature("docstring") casadi::BSplineInterpolant::getCount "[INTERNAL]  Get
 the reference count.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::eval_dm "[INTERNAL]
+Evaluate with DM matrices.
 
 ";
 
@@ -7202,6 +7227,11 @@ Generate meta-information allowing a user to evaluate a generated function.
 
 ";
 
+%feature("docstring") casadi::CentralDiff::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
+
+";
+
 %feature("docstring") casadi::CentralDiff::set_work "[INTERNAL]  Set the
 (persistent) work vectors.
 
@@ -8065,6 +8095,11 @@ required length of res field.
 
 %feature("docstring") casadi::Collocation::expand "[INTERNAL] ";
 
+%feature("docstring") casadi::Collocation::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
+
+";
+
 %feature("docstring") casadi::Collocation::getCount "[INTERNAL]  Get the
 reference count.
 
@@ -8782,6 +8817,11 @@ AD, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::Conic::call "[INTERNAL]   Call a function,
 templated.
+
+";
+
+%feature("docstring") casadi::Conic::eval_dm "[INTERNAL]  Evaluate with DM
+matrices.
 
 ";
 
@@ -10991,6 +11031,11 @@ name by index.
 
 ";
 
+%feature("docstring") casadi::Dple::eval_dm "[INTERNAL]  Evaluate with DM
+matrices.
+
+";
+
 %feature("docstring") casadi::Dple::sparsity_in "
 
 >  const Sparsity& casadi::FunctionInternal::sparsity_in(int ind) const 
@@ -11263,10 +11308,8 @@ able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::Dple::reverse "[INTERNAL]  Return function
-that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(int nadj) if no cached version
-is available.
+%feature("docstring") casadi::Dple::eval_mx "[INTERNAL]  Evaluate with
+symbolic matrices.
 
 ";
 
@@ -11416,8 +11459,10 @@ input/output elements.
 
 ";
 
-%feature("docstring") casadi::Dple::eval_mx "[INTERNAL]  Evaluate with
-symbolic matrices.
+%feature("docstring") casadi::Dple::reverse "[INTERNAL]  Return function
+that calculates adjoint derivatives reverse(nadj) returns a cached instance
+if available, and calls  Function get_reverse(int nadj) if no cached version
+is available.
 
 ";
 
@@ -11700,8 +11745,8 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::Expm::has_jacobian "[INTERNAL]  Return
-Jacobian of all input elements with respect to all output elements.
+%feature("docstring") casadi::Expm::replace_arg "[INTERNAL]  Replace 0-by-0
+inputs.
 
 ";
 
@@ -11762,7 +11807,8 @@ dependencies.
 
 %feature("docstring") casadi::Expm::Expm "[INTERNAL] ";
 
-%feature("docstring") casadi::Expm::oracle "[INTERNAL]  Get oracle.
+%feature("docstring") casadi::Expm::has_jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -11811,11 +11857,6 @@ for chosing forward/reverse mode, sparsity propagation.
 
 %feature("docstring") casadi::Expm::name_out "[INTERNAL]  Get output scheme
 name by index.
-
-";
-
-%feature("docstring") casadi::Expm::replace_arg "[INTERNAL]  Replace 0-by-0
-inputs.
 
 ";
 
@@ -11894,6 +11935,11 @@ dependent function.
 
 %feature("docstring") casadi::Expm::jacobian "[INTERNAL]  Return Jacobian
 of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::Expm::eval_dm "[INTERNAL]  Evaluate with DM
+matrices.
 
 ";
 
@@ -12545,6 +12591,10 @@ is of a particular type.
 
 %feature("docstring") casadi::Expm::eval_name "[INTERNAL]  Get name of the
 evaluation function.
+
+";
+
+%feature("docstring") casadi::Expm::oracle "[INTERNAL]  Get oracle.
 
 ";
 
@@ -13362,6 +13412,11 @@ output arguments have correct length and dimensions.
 
 ";
 
+%feature("docstring") casadi::External::eval_dm "[INTERNAL]  Evaluate with
+DM matrices.
+
+";
+
 %feature("docstring") casadi::External::matching_arg "[INTERNAL]  Check if
 input arguments that needs to be replaced.
 
@@ -13916,6 +13971,11 @@ mode, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::FiniteDiff::codegen_declarations "[INTERNAL]
 Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
 
 ";
 
@@ -14752,6 +14812,11 @@ function input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::eval_dm "[INTERNAL]
+Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::resetB "[INTERNAL]
 Reset the backward problem and take time to tf.
 
@@ -14826,8 +14891,8 @@ Names of function input and outputs.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::self "[INTERNAL]  Get a
-public class instance.
+%feature("docstring") casadi::FixedStepIntegrator::sp_weight "[INTERNAL]
+Weighting factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
@@ -14847,8 +14912,8 @@ Does the function have free variables.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::eval_mx "[INTERNAL]
-Evaluate with symbolic matrices.
+%feature("docstring") casadi::FixedStepIntegrator::self "[INTERNAL]  Get a
+public class instance.
 
 ";
 
@@ -14914,11 +14979,6 @@ of function inputs and outputs.
 ";
 
 %feature("docstring") casadi::FixedStepIntegrator::generate_lifted "[INTERNAL]  Extract the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring") casadi::FixedStepIntegrator::sp_weight "[INTERNAL]
-Weighting factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
@@ -15144,6 +15204,11 @@ Input/output dimensions.
 
 %feature("docstring") casadi::FixedStepIntegrator::n_nodes "[INTERNAL]
 Number of nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::eval_mx "[INTERNAL]
+Evaluate with symbolic matrices.
 
 ";
 
@@ -16154,6 +16219,11 @@ more.
 
 ";
 
+%feature("docstring") casadi::ForwardDiff::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
+
+";
+
 %feature("docstring") casadi::ForwardDiff::~ForwardDiff "[INTERNAL]
 Destructor.
 
@@ -16215,8 +16285,9 @@ Sparsities of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::matching_res "[INTERNAL]  Check
-if output arguments that needs to be replaced.
+%feature("docstring") casadi::ForwardDiff::finalize "[INTERNAL]  Finalize
+the object creation This function, which visits the class hierarchy in
+reverse order is run after init() has been completed.
 
 ";
 
@@ -16302,9 +16373,8 @@ Generate code for the declarations of the C function.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::finalize "[INTERNAL]  Finalize
-the object creation This function, which visits the class hierarchy in
-reverse order is run after init() has been completed.
+%feature("docstring") casadi::ForwardDiff::matching_res "[INTERNAL]  Check
+if output arguments that needs to be replaced.
 
 ";
 
@@ -17881,6 +17951,11 @@ Propagate sparsity backwards.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::eval_dm "[INTERNAL]
+Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::GenericExternal::get_jacobian "[INTERNAL]
 Full Jacobian.
 
@@ -19235,6 +19310,10 @@ elements.
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::eval_mx "[INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::print_fstats "[INTERNAL]  Print statistics.
 
 ";
@@ -19560,10 +19639,6 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::init_mem "[INTERNAL]  Initalize memory block.
-
-";
-
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::getWorkSize "[INTERNAL]  Get the length of the work vector.
 
 ";
@@ -19795,7 +19870,7 @@ Obtain solver name from Adaptor.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::eval_mx "[INTERNAL]  Evaluate with symbolic matrices.
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::init_mem "[INTERNAL]  Initalize memory block.
 
 ";
 
@@ -19931,6 +20006,10 @@ problem)
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::has_spfwd "[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::eval_dm "[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -20536,6 +20615,11 @@ Get the floating point output argument of an atomic operation.
 
 %feature("docstring") casadi::ImplicitToNlp::eval "[INTERNAL]  Evaluate
 numerically.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
 
 ";
 
@@ -21291,6 +21375,11 @@ sparsity backwards.
 
 %feature("docstring") casadi::Integrator::codegen_name "[INTERNAL]  Get
 name in codegen.
+
+";
+
+%feature("docstring") casadi::Integrator::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
 
 ";
 
@@ -22360,6 +22449,11 @@ code the function.
 
 ";
 
+%feature("docstring") casadi::Interpolant::getWorkSize "[INTERNAL]  Get the
+length of the work vector.
+
+";
+
 %feature("docstring") casadi::Interpolant::set_work "[INTERNAL]  Set the
 (persistent) work vectors.
 
@@ -22571,8 +22665,8 @@ list of options.
 
 ";
 
-%feature("docstring") casadi::Interpolant::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
+%feature("docstring") casadi::Interpolant::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
 
 ";
 
@@ -23534,13 +23628,18 @@ length of res field.
 
 ";
 
-%feature("docstring") casadi::Jit::n_nodes "[INTERNAL]  Number of nodes in
-the algorithm.
+%feature("docstring") casadi::Jit::eval_dm "[INTERNAL]  Evaluate with DM
+matrices.
 
 ";
 
 %feature("docstring") casadi::Jit::replace_aseed "[INTERNAL]  Replace
 0-by-0 reverse seeds.
+
+";
+
+%feature("docstring") casadi::Jit::n_nodes "[INTERNAL]  Number of nodes in
+the algorithm.
 
 ";
 
@@ -24068,6 +24167,11 @@ all inputs and outputs scalar.
 
 %feature("docstring") casadi::LapackLu::weak "[INTERNAL]  Get a weak
 reference to the object.
+
+";
+
+%feature("docstring") casadi::LapackLu::eval_dm "[INTERNAL]  Evaluate with
+DM matrices.
 
 ";
 
@@ -25579,10 +25683,7 @@ Evaluate SX, possibly transposed.
 
 ";
 
-%feature("docstring") casadi::LapackQr::eval_mx "[INTERNAL]  Evaluate with
-symbolic matrices.
-
-";
+%feature("docstring") casadi::LapackQr::LapackQr "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackQr::set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
@@ -25594,7 +25695,10 @@ variables ( MX)
 
 ";
 
-%feature("docstring") casadi::LapackQr::LapackQr "[INTERNAL] ";
+%feature("docstring") casadi::LapackQr::codegen_decref "[INTERNAL]  Codegen
+decref for dependencies.
+
+";
 
 %feature("docstring") casadi::LapackQr::self "[INTERNAL]  Get a public
 class instance.
@@ -25723,11 +25827,6 @@ order is run after init() has been completed.
 
 ";
 
-%feature("docstring") casadi::LapackQr::codegen_decref "[INTERNAL]  Codegen
-decref for dependencies.
-
-";
-
 %feature("docstring") casadi::LapackQr::index_out "[INTERNAL]  Get output
 scheme index by name.
 
@@ -25827,6 +25926,11 @@ the evaluation function.
 
 ";
 
+%feature("docstring") casadi::LapackQr::eval_mx "[INTERNAL]  Evaluate with
+symbolic matrices.
+
+";
+
 %feature("docstring") casadi::LapackQr::matching_arg "[INTERNAL]  Check if
 input arguments that needs to be replaced.
 
@@ -25868,6 +25972,11 @@ input/output nonzeros.
 
 %feature("docstring") casadi::LapackQr::linsol_cholesky "[INTERNAL]  Get
 Cholesky factor.
+
+";
+
+%feature("docstring") casadi::LapackQr::eval_dm "[INTERNAL]  Evaluate with
+DM matrices.
 
 ";
 
@@ -26299,11 +26408,8 @@ Print list of options.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::init "[INTERNAL]
-Initialize Initialize and make the object ready for setting arguments and
-evaluation. This method is typically called after setting options but before
-evaluating. If passed to another class (in the constructor), this class
-should invoke this function when initialized.
+%feature("docstring") casadi::LinearInterpolant::sx_out "[INTERNAL]  Get
+function input(s) and output(s)
 
 ";
 
@@ -26435,8 +26541,11 @@ the class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::sx_out "[INTERNAL]  Get
-function input(s) and output(s)
+%feature("docstring") casadi::LinearInterpolant::init "[INTERNAL]
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized.
 
 ";
 
@@ -26490,8 +26599,8 @@ Get function signature: name:(inputs)->(outputs)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::replace_aseed "[INTERNAL]
-Replace 0-by-0 reverse seeds.
+%feature("docstring") casadi::LinearInterpolant::replace_arg "[INTERNAL]
+Replace 0-by-0 inputs.
 
 ";
 
@@ -26690,6 +26799,11 @@ the function is of a particular type.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::eval_dm "[INTERNAL]
+Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::codegen_decref "[INTERNAL]
 Codegen decref for dependencies.
 
@@ -26821,8 +26935,8 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::replace_arg "[INTERNAL]
-Replace 0-by-0 inputs.
+%feature("docstring") casadi::LinearInterpolant::replace_aseed "[INTERNAL]
+Replace 0-by-0 reverse seeds.
 
 ";
 
@@ -27387,6 +27501,11 @@ required length of res field.
 
 %feature("docstring") casadi::LinearInterpolantJac::sx_out "[INTERNAL]  Get
 function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::eval_dm "[INTERNAL]
+Evaluate with DM matrices.
 
 ";
 
@@ -28204,6 +28323,11 @@ input(s) and output(s)
 
 %feature("docstring") casadi::Lsqr::getCount "[INTERNAL]  Get the reference
 count.
+
+";
+
+%feature("docstring") casadi::Lsqr::eval_dm "[INTERNAL]  Evaluate with DM
+matrices.
 
 ";
 
@@ -29287,6 +29411,11 @@ inputs and outputs.
 
 %feature("docstring") casadi::Map::simple "[INTERNAL]  Evaluate
 numerically, simplied syntax.
+
+";
+
+%feature("docstring") casadi::Map::eval_dm "[INTERNAL]  Evaluate with DM
+matrices.
 
 ";
 
@@ -30555,6 +30684,11 @@ name by index.
 
 %feature("docstring") casadi::MapOmp::get_reverse "[INTERNAL]  Generate a
 function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring") casadi::MapOmp::eval_dm "[INTERNAL]  Evaluate with DM
+matrices.
 
 ";
 
@@ -33180,6 +33314,11 @@ memory block.
 
 ";
 
+%feature("docstring") casadi::Newton::eval_dm "[INTERNAL]  Evaluate with DM
+matrices.
+
+";
+
 %feature("docstring") casadi::Newton::sz_work "[INTERNAL]  Get number of
 temporary variables needed.
 
@@ -33688,8 +33827,8 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::size2_in "[INTERNAL]  Input/output
-dimensions.
+%feature("docstring") casadi::Nlpsol::numel_in "[INTERNAL]  Number of
+input/output elements.
 
 ";
 
@@ -33964,6 +34103,11 @@ the inputs correspond to a well-posed problem.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::eval_dm "[INTERNAL]  Evaluate with DM
+matrices.
+
+";
+
 %feature("docstring") casadi::Nlpsol::sp_weight "[INTERNAL]  Weighting
 factor for chosing forward/reverse mode, sparsity propagation.
 
@@ -34127,8 +34271,8 @@ Export / Generate C code for the generated functions.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::numel_in "[INTERNAL]  Number of
-input/output elements.
+%feature("docstring") casadi::Nlpsol::size2_in "[INTERNAL]  Input/output
+dimensions.
 
 ";
 
@@ -34515,6 +34659,12 @@ calls used to create the variables
 ";
 
 %feature("docstring") casadi::OptiStack::constraints "";
+
+%feature("docstring") casadi::OptiStack::~OptiStack "
+
+Destructor.
+
+";
 
 %feature("docstring") casadi::OptiStack::stats "
 
@@ -35862,6 +36012,11 @@ input/output nonzeros.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
+
+";
+
 %feature("docstring") casadi::OracleFunction::get_n_out "[INTERNAL]  Number
 of function inputs and outputs.
 
@@ -36996,6 +37151,11 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::eval_dm "[INTERNAL]  Evaluate with
+DM matrices.
+
+";
+
 
 // File: classcasadi_1_1Rank1.xml
 
@@ -37578,6 +37738,11 @@ the (integer) input arguments of an atomic operation.
 
 %feature("docstring") casadi::Rootfinder::sp_reverse "[INTERNAL]  Propagate
 sparsity backwards.
+
+";
+
+%feature("docstring") casadi::Rootfinder::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
 
 ";
 
@@ -38291,6 +38456,11 @@ cached version is available.
 
 %feature("docstring") casadi::RungeKutta::free_mx "[INTERNAL]  Get free
 variables ( MX)
+
+";
+
+%feature("docstring") casadi::RungeKutta::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
 
 ";
 
@@ -39411,6 +39581,11 @@ Export / Generate C code for the generated functions.
 
 %feature("docstring") casadi::Scpgen::monitored "[INTERNAL] ";
 
+%feature("docstring") casadi::Scpgen::eval_dm "[INTERNAL]  Evaluate with DM
+matrices.
+
+";
+
 %feature("docstring") casadi::Scpgen::get_function "[INTERNAL] ";
 
 %feature("docstring") casadi::Scpgen::print_fstats "[INTERNAL]  Print
@@ -40415,6 +40590,11 @@ Generate code for the function body.
 
 ";
 
+%feature("docstring") casadi::SimplifiedExternal::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
+
+";
+
 %feature("docstring") casadi::SimplifiedExternal::disp_more "[INTERNAL]
 Print more.
 
@@ -40709,8 +40889,8 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::sp_reverse "[INTERNAL]
-Propagate sparsity backwards.
+%feature("docstring") casadi::SimplifiedExternal::eval_dm "[INTERNAL]
+Evaluate with DM matrices.
 
 ";
 
@@ -41027,6 +41207,11 @@ Extract the functions needed for the Lifted Newton method.
 
 %feature("docstring") casadi::SlicotDple::adjViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
+
+";
+
+%feature("docstring") casadi::SlicotDple::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
 
 ";
 
@@ -42390,8 +42575,8 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::set_temp "[INTERNAL]  Set the
-(temporary) work vectors.
+%feature("docstring") casadi::SlicotExpm::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
 
 ";
 
@@ -42662,6 +42847,11 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::SlicotExpm::set_temp "[INTERNAL]  Set the
+(temporary) work vectors.
 
 ";
 
@@ -43300,6 +43490,11 @@ scheme index by name.
 
 %feature("docstring") casadi::Smoothing::jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::Smoothing::eval_dm "[INTERNAL]  Evaluate with
+DM matrices.
 
 ";
 
@@ -44977,6 +45172,11 @@ Diagrams
 
 C++ includes: sqpmethod.hpp ";
 
+%feature("docstring") casadi::Sqpmethod::eval_dm "[INTERNAL]  Evaluate with
+DM matrices.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::index_out "[INTERNAL]  Get output
 scheme index by name.
 
@@ -46280,6 +46480,11 @@ function that calculates nadj adjoint derivatives.
 
 ";
 
+%feature("docstring") casadi::Switch::eval_dm "[INTERNAL]  Evaluate with DM
+matrices.
+
+";
+
 %feature("docstring") casadi::Switch "[INTERNAL]   Switch statement Joel
 Andersson
 
@@ -47406,6 +47611,11 @@ inputs and outputs scalar.
 
 %feature("docstring") casadi::SymbolicQr::release "[INTERNAL]  Release a
 memory object.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
 
 ";
 

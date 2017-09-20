@@ -520,6 +520,9 @@
 %exception  casadi::FunctionInternal::disp_more(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::eval_dm(const std::vector< DM > &arg) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::eval_mx(const MXVector &arg, MXVector &res, bool always_inline, bool never_inline) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
