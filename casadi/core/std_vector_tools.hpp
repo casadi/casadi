@@ -180,9 +180,13 @@ namespace casadi {
   bool has_negative(const std::vector<T> &v);
 
 #ifndef SWIG
-  /// String representation
+  /// String representation, any type
   template<typename T>
-  std::string str(const T& v, bool more=false);
+  std::string str(const T& v);
+
+  /// String representation, CasADi type
+  template<typename T>
+  std::string str(const T& v, bool more);
 
   /// String representation of vector
   template<typename T>
@@ -451,10 +455,15 @@ namespace casadi {
   }
 
   template<typename T>
-  std::string str(const T& v, bool more) {
+  std::string str(const T& v) {
     std::stringstream ss;
     ss << v;
     return ss.str();
+  }
+
+  template<typename T>
+  std::string str(const T& v, bool more) {
+    return v.get_str(more);
   }
 
   template<typename T>
