@@ -182,29 +182,9 @@ namespace casadi {
 
     /// Convert dictionary to Problem
     template<typename XType>
-      static Function map2problem(const std::map<std::string, XType>& d);
+      static Function create_oracle(const std::map<std::string, XType>& d,
+                                    const Dict& opts);
   };
-
-  template<typename XType>
-  Function Nlpsol::map2problem(const std::map<std::string, XType>& d) {
-    std::vector<XType> nl_in(NL_NUM_IN), nl_out(NL_NUM_OUT);
-    for (auto&& i : d) {
-      if (i.first=="x") {
-        nl_in[NL_X]=i.second;
-      } else if (i.first=="p") {
-        nl_in[NL_P]=i.second;
-      } else if (i.first=="f") {
-        nl_out[NL_F]=i.second;
-      } else if (i.first=="g") {
-        nl_out[NL_G]=i.second;
-      } else {
-        casadi_error("No such field: " + i.first);
-      }
-    }
-    if (nl_out[NL_F].is_empty()) nl_out[NL_F] = 0;
-    if (nl_out[NL_G].is_empty()) nl_out[NL_G] = XType(0, 1);
-    return Function("nlp", nl_in, nl_out, NL_INPUTS, NL_OUTPUTS);
-  }
 
 } // namespace casadi
 /// \endcond

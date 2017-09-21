@@ -45,12 +45,46 @@ namespace casadi {
 
   Function nlpsol(const string& name, const string& solver,
                   const SXDict& nlp, const Dict& opts) {
-    return nlpsol(name, solver, Nlpsol::map2problem(nlp), opts);
+    return nlpsol(name, solver, Nlpsol::create_oracle(nlp, opts), opts);
   }
 
   Function nlpsol(const string& name, const string& solver,
                   const MXDict& nlp, const Dict& opts) {
-    return nlpsol(name, solver, Nlpsol::map2problem(nlp), opts);
+    return nlpsol(name, solver, Nlpsol::create_oracle(nlp, opts), opts);
+  }
+
+  template<typename XType>
+  Function Nlpsol::create_oracle(const std::map<std::string, XType>& d,
+                                 const Dict& opts) {
+    std::vector<XType> nl_in(NL_NUM_IN), nl_out(NL_NUM_OUT);
+    for (auto&& i : d) {
+      if (i.first=="x") {
+        nl_in[NL_X]=i.second;
+      } else if (i.first=="p") {
+        nl_in[NL_P]=i.second;
+      } else if (i.first=="f") {
+        nl_out[NL_F]=i.second;
+      } else if (i.first=="g") {
+        nl_out[NL_G]=i.second;
+      } else {
+        casadi_error("No such field: " + i.first);
+      }
+    }
+    if (nl_out[NL_F].is_empty()) nl_out[NL_F] = 0;
+    if (nl_out[NL_G].is_empty()) nl_out[NL_G] = XType(0, 1);
+
+    // Options for the oracle
+    Dict oracle_options;
+    Dict::const_iterator it = opts.find("oracle_options");
+    if (it!=opts.end()) {
+      // "oracle_options" has been set
+      oracle_options = it->second;
+    } else if ((it=opts.find("verbose")) != opts.end()) {
+      // "oracle_options" has not been set, but "verbose" has
+      oracle_options["verbose"] = it->second;
+    }
+
+    return Function("nlp", nl_in, nl_out, NL_INPUTS, NL_OUTPUTS, oracle_options);
   }
 
   Function nlpsol(const std::string& name, const std::string& solver,
@@ -235,7 +269,10 @@ namespace casadi {
         "Indicates which of the variables are discrete, i.e. integer-valued"}},
       {"calc_multipliers",
       {OT_BOOL,
-       "Calculate Lagrange multipliers in the Nlpsol base class"}}
+       "Calculate Lagrange multipliers in the Nlpsol base class"}},
+      {"oracle_options",
+      {OT_DICT,
+       "Options to be passed to the oracle function"}}
      }
   };
 
