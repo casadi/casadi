@@ -84,7 +84,19 @@ namespace casadi {
       oracle_options["verbose"] = it->second;
     }
 
-    return Function("nlp", nl_in, nl_out, NL_INPUTS, NL_OUTPUTS, oracle_options);
+    // Create oracle
+    Function oracle("nlp", nl_in, nl_out, NL_INPUTS, NL_OUTPUTS, oracle_options);
+
+    // Make sure that it's sound
+    if (oracle.has_free()) {
+      stringstream s;
+      s << "Cannot create NLP oracle since ";
+      oracle.print_free(s);
+      s << " are free.";
+      casadi_error(s.str());
+    }
+
+    return oracle;
   }
 
   Function nlpsol(const std::string& name, const std::string& solver,

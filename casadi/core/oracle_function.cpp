@@ -128,8 +128,18 @@ namespace casadi {
 
     // Generate the function
     Function ret = oracle_.factory(fname, s_in, s_out, aux, opt);
-    set_function(ret, fname, true);
 
+    // Make sure that it's sound
+    if (ret.has_free()) {
+      stringstream s;
+      s << "Cannot create '" << fname << "' since ";
+      ret.print_free(s);
+      s << " are free.";
+      casadi_error(s.str());
+    }
+
+    // Save and return
+    set_function(ret, fname, true);
     return ret;
   }
 
