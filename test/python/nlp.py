@@ -39,14 +39,14 @@ if has_nlpsol("worhp")  and not args.ignore_memory_heavy:
   pass
 
 if has_nlpsol("ipopt"):
-  solvers.append(("ipopt",{"ipopt": {"tol": 1e-10, "derivative_test":"second-order"}}))
-  solvers.append(("ipopt",{"ipopt": {"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory"}}))
+  solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"second-order","print_level":0}}))
+  solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory","print_level":0}}))
 
 #if has_nlpsol("snopt"):
 #  solvers.append(("snopt",{"snopt.Verify_level": 3,"detect_linear": True,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12}))
 
 if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
-  qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.fixed_variable_treatment":"make_constraint"} }
+  qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.fixed_variable_treatment":"make_constraint","ipopt.print_level":0,"print_time":False} }
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options}))
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
 
