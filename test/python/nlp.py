@@ -75,7 +75,6 @@ class NLPtests(casadiTestCase):
    for Solver, solver_options in solvers:
       if Solver not in ["ipopt","sqpmethod"]: continue
       
-      print Solver
       opti = Opti()
 
       x = opti.variable()

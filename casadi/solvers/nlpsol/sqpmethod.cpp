@@ -442,7 +442,7 @@ namespace casadi {
 
         // Callback outputs
         fill_n(m->res, fcallback_.n_out(), nullptr);
-        double ret;
+        double ret = 0;
         m->arg[0] = &ret;
 
         m->fstats.at("callback_prep").toc();
