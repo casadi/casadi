@@ -96,6 +96,15 @@ class ImplicitFunctiontests(casadiTestCase):
           refsol = Function("refsol", [x,A,b],[solve(A,b),mtimes(C_,solve(A,b))])
           self.checkfunction(solver,refsol,inputs=solver_in,digits=10)
 
+  def test_missing_symbols(self):
+    for Solver, options in solvers:
+      self.message(Solver)
+      x=SX.sym("x")
+      p=SX.sym("p")
+      f=Function("f", [x], [sin(x+p)])
+      with self.assertInException("[p] are free"):
+        rootfinder("solver", Solver, f, options)
+
   def test_scalar1(self):
     self.message("Scalar implicit problem, n=0")
     for Solver, options in solvers:

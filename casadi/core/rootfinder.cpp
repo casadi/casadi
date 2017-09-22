@@ -47,6 +47,14 @@ namespace casadi {
 
   Function rootfinder(const std::string& name, const std::string& solver,
                    const Function& f, const Dict& opts) {
+    // Make sure that nlp is sound
+    if (f.has_free()) {
+      stringstream s;
+      s << "Cannot create " << name << " since ";
+      f.print_free(s);
+      s << " are free.";
+      casadi_error(s.str());
+    }
     return Function::create(Rootfinder::instantiate(name, solver, f), opts);
   }
 

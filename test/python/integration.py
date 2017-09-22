@@ -928,7 +928,11 @@ class Integrationtests(casadiTestCase):
     print(array(H_out[0]))
     print(Hr)
 
-
+  def test_missing_symbols(self):
+    x = SX.sym('x'); z = SX.sym('z'); p = SX.sym('p')
+    dae = {'x':x, 'z':z, 'ode':z+p, 'alg':z*cos(z)-x} # p forgotten here
+    with self.assertInException("[p] are free"):
+      integrator('F', 'idas', dae)
   def test_hessian2D(self):
     self.message("hessian")
     N=2

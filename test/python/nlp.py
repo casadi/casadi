@@ -982,6 +982,14 @@ class NLPtests(casadiTestCase):
       if "worhp" in Solver: continue
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
+      
+  def test_missing_symbols(self):
+    x = MX.sym("x")
+    p = MX.sym("p")
+
+    for Solver, solver_options in solvers:
+      with self.assertInException("[p] are free"):
+        solver = nlpsol("solver",Solver,{"x":x,"f":(x-p)**2}, solver_options)
 
   @requires_nlpsol("ipopt")
   def test_iteration_Callback(self):

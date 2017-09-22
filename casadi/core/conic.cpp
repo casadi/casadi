@@ -170,6 +170,15 @@ namespace casadi {
     // Create a function for calculating the required matrices vectors
     Function prob(name + "_qp", {x, p}, {H, c, A, b});
 
+    // Make sure that the problem is sound
+    if (prob.has_free()) {
+      stringstream s;
+      s << "Cannot create '" << prob.name() << "' since ";
+      prob.print_free(s);
+      s << " are free.";
+      casadi_error(s.str());
+    }
+
     // Create the QP solver
     Function conic_f = conic(name + "_qpsol", solver,
                              {{"h", H.sparsity()}, {"a", A.sparsity()}}, opts);

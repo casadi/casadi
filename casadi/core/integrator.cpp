@@ -53,6 +53,14 @@ namespace casadi {
 
   Function integrator(const string& name, const string& solver,
                       const Function& dae, const Dict& opts) {
+    // Make sure that dae is sound
+    if (dae.has_free()) {
+      stringstream s;
+      s << "Cannot create '" << name << "' since ";
+      dae.print_free(s);
+      s << " are free.";
+      casadi_error(s.str());
+    }
     return Function::create(Integrator::getPlugin(solver).creator(name, dae), opts);
   }
 
