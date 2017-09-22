@@ -33096,6 +33096,32 @@ std::vector< M > &res) const  "
 ";
 
 
+// File: classcasadi_1_1KeyboardInterruptException.xml
+%feature("docstring")  casadi::CasadiException::what() const override "
+
+throw () Display error.
+
+";
+
+%feature("docstring")
+casadi::KeyboardInterruptException::~KeyboardInterruptException "
+
+throw () Destructor.
+
+";
+
+%feature("docstring")
+casadi::KeyboardInterruptException::KeyboardInterruptException() "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::KeyboardInterruptException "
+
+C++ includes: exception.hpp ";
+
+
 // File: classcasadi_1_1LapackLu.xml
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
@@ -47623,6 +47649,12 @@ Each parameter must be given a value before 'solve' can be called
 
 ";
 
+%feature("docstring")  casadi::Opti::type_name() const  "
+
+Readable name of the class.
+
+";
+
 %feature("docstring")  casadi::OptiStack::value(const MX &x, const
 std::vector< MX > &values=std::vector< MX >()) const  "
 
@@ -47725,6 +47757,12 @@ calls used to create the variables
 ";
 
 %feature("docstring")  casadi::OptiSol::opti() "
+
+";
+
+%feature("docstring")  casadi::OptiSol::type_name() const  "
+
+Readable name of the class.
 
 ";
 
@@ -62958,7 +62996,7 @@ override "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::get_stats(void *mem) const
+%feature("docstring")  casadi::Sqpmethod::get_stats(void *mem) const
 override "
 
 [INTERNAL]  Get all statistics.

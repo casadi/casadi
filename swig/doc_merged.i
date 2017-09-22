@@ -24049,6 +24049,29 @@ arguments have correct length and dimensions.
 ";
 
 
+// File: classcasadi_1_1KeyboardInterruptException.xml
+%feature("docstring") casadi::KeyboardInterruptException::what "throw ()
+Display error.
+
+";
+
+%feature("docstring")
+casadi::KeyboardInterruptException::~KeyboardInterruptException "throw ()
+Destructor.
+
+";
+
+%feature("docstring")
+casadi::KeyboardInterruptException::KeyboardInterruptException "
+
+Default constructor.
+
+";
+
+%feature("docstring") casadi::KeyboardInterruptException "C++ includes:
+exception.hpp ";
+
+
 // File: classcasadi_1_1LapackLu.xml
 %feature("docstring") casadi::LapackLu::free_sx "[INTERNAL]  Get free
 variables (SX)
@@ -34534,6 +34557,12 @@ Each parameter must be given a value before 'solve' can be called
 
 %feature("docstring") casadi::Opti::copy "";
 
+%feature("docstring") casadi::Opti::type_name "
+
+Readable name of the class.
+
+";
+
 %feature("docstring") casadi::Opti::value "
 
 Obtain value of expression at the current value
@@ -34571,6 +34600,12 @@ calls used to create the variables
 ";
 
 %feature("docstring") casadi::OptiSol::opti "";
+
+%feature("docstring") casadi::OptiSol::type_name "
+
+Readable name of the class.
+
+";
 
 %feature("docstring") casadi::OptiSol "
 
