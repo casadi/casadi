@@ -799,4 +799,10 @@ namespace casadi {
                 casadi_max_viol(ng_, g, lbg, ubg));
   }
 
+  Dict Sqpmethod::get_stats(void* mem) const {
+    Dict stats = Nlpsol::get_stats(mem);
+    auto m = static_cast<SqpmethodMemory*>(mem);
+    stats["return_status"] = m->return_status;
+    return stats;
+  }
 } // namespace casadi
