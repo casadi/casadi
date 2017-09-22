@@ -87,6 +87,14 @@ class CasadiException : public std::exception {
   std::string msg_;
 };
 
+class KeyboardInterruptException : public CasadiException {
+  public:
+  //! \brief Default constructor
+  KeyboardInterruptException() : CasadiException("KeyboardInterrupt") {}
+  //! \brief Destructor
+  ~KeyboardInterruptException() throw() {}
+};
+
 // Strip path prefix
 inline std::string trim_path(const std::string& full_path) {
   size_t found = full_path.rfind("/casadi/");

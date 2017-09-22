@@ -60,7 +60,7 @@ namespace casadi {
 
     /// Raises an error if an interrupt was captured.
     static void check() {
-      casadi_assert_message(!checkInterrupted(), "Interrupted by user.");
+      if (checkInterrupted()) throw KeyboardInterruptException();
     }
   };
 

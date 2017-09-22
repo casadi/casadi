@@ -2789,6 +2789,8 @@ namespace casadi {
         }
         if (res[i]) casadi_copy(resv[i].ptr(), resv[i].nnz(), res[i]);
       }
+    } catch (KeyboardInterruptException&) {
+      throw;
     } catch (exception& e) {
       casadi_error("Failed to evaluate 'eval_dm' for " + name_ + ":\n" + e.what());
       return 1;

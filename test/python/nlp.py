@@ -71,7 +71,49 @@ except:
 """
 
 class NLPtests(casadiTestCase):
+  def test_iteration_interrupt(self):
+   for Solver, solver_options in solvers:
+      if Solver not in ["ipopt","sqpmethod"]: continue
+      
+      print Solver
+      opti = Opti()
 
+      x = opti.variable()
+
+      def interrupt(i):
+        raise KeyboardInterrupt()
+
+      opti.minimize((x-1)**4)
+      
+      
+      opts = dict(solver_options)
+      if Solver=="bonmin":
+        opts["discrete"] = [1]
+
+      opti.solver(Solver, opts)
+      sol = opti.solve()
+      opti.callback(interrupt)
+      with self.assertRaises(Exception):
+        sol = opti.solve()
+
+      def interrupt(i):
+        raise Exception()
+      opti.callback(interrupt)
+      opts["iteration_callback_ignore_errors"] = False
+      opti.solver(Solver, opts)
+      with self.assertRaises(Exception):
+        sol = opti.solve()
+
+      opts["iteration_callback_ignore_errors"] = True
+      opti.solver(Solver, opts)
+      sol = opti.solve()
+
+      def interrupt(i):
+        raise KeyboardInterrupt()
+      opti.callback(interrupt)
+      with self.assertRaises(Exception):
+        sol = opti.solve()
+        
   def test_nan(self):
     x=SX.sym("x")
     nlp={'x':x, 'f':-x,'g':x}

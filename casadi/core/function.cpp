@@ -1039,6 +1039,8 @@ namespace casadi {
   int Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
     try {
       return (*this)->eval_gen(arg, res, iw, w, memory(mem));
+    } catch (KeyboardInterruptException& e) {
+      throw;
     } catch (exception& e) {
       THROW_ERROR("operator()", e.what());
     }

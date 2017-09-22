@@ -582,6 +582,8 @@ public:
 */
 class CASADI_EXPORT Opti : private OptiStack {
   public:
+    /// Readable name of the class
+    std::string type_name() const {return "Opti";}
     using OptiStack::get_str;
     using OptiStack::disp;
     using OptiStack::variable;
@@ -632,6 +634,8 @@ class CASADI_EXPORT Opti : private OptiStack {
 */
 class CASADI_EXPORT OptiSol : private OptiStack {
   public:
+    /// Readable name of the class
+    std::string type_name() const {return "OptiSol";}
     OptiSol(const OptiStack& opti) : OptiStack(opti) {}
     using OptiStack::get_str;
     using OptiStack::disp;

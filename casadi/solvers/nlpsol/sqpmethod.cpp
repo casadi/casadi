@@ -447,10 +447,17 @@ namespace casadi {
 
         m->fstats.at("callback_prep").toc();
         m->fstats.at("callback_fun").tic();
-        // Evaluate
-        fcallback_(m->arg, m->res, m->iw, m->w, 0);
 
-        m->fstats.at("callback_fun").toc();
+
+        try {
+          // Evaluate
+          fcallback_(m->arg, m->res, m->iw, m->w, 0);
+        } catch(KeyboardInterruptException& ex) {
+          throw;
+        } catch(exception& ex) {
+          userOut<true, PL_WARN>() << "intermediate_callback: " << ex.what() << endl;
+          if (!iteration_callback_ignore_errors_) ret=1;
+        }
 
         if (static_cast<int>(ret)) {
           userOut() << endl;
@@ -458,6 +465,8 @@ namespace casadi {
           m->return_status = "User_Requested_Stop";
           break;
         }
+
+        m->fstats.at("callback_fun").toc();
       }
 
       // Checking convergence criteria

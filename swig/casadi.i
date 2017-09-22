@@ -431,6 +431,10 @@ namespace std {
 	if ($error != NULL) {
 	  std::string msg;
     SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+    if (PyErr_ExceptionMatches(PyExc_KeyboardInterrupt)) {
+      SWIG_PYTHON_THREAD_END_BLOCK;
+      throw casadi::KeyboardInterruptException();
+    }
     PyObject *ptype, *pvalue, *ptraceback;
     PyErr_Fetch(&ptype, &pvalue, &ptraceback);
     PyObject* msg_py = PyObject_Str(pvalue);

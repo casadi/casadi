@@ -868,7 +868,8 @@ OptiSol OptiStack::solve() {
     }
 
     casadi_assert_message(solver_name_!="",
-      "You must call 'solver' on the Opti stack to select a solver.");
+      "You must call 'solver' on the Opti stack to select a solver. "
+      "Suggestion: opti.solver('ipopt')");
 
     solver_ = nlpsol("solver", solver_name_, nlp_, opts);
     mark_solver_dirty(false);
@@ -879,7 +880,7 @@ OptiSol OptiStack::solve() {
 
   std::string ret = return_status();
 
-  bool success = ret=="Solve_Succeeded" || ret=="Solved_To_Acceptable_Level";
+  bool success = ret=="Solve_Succeeded" || ret=="Solved_To_Acceptable_Level" || ret=="SUCCESS";
 
   casadi_assert_message(success,
     "Solver failed. You may use opti.debug.value to investigate the latest values of variables."

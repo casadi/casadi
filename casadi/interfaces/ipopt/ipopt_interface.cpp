@@ -440,10 +440,13 @@ namespace casadi {
       } else {
         return 1;
       }
+
+    } catch(KeyboardInterruptException& ex) {
+      return 0;
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "intermediate_callback: " << ex.what() << endl;
-      if (iteration_callback_ignore_errors_) return 0;
-      return 1;
+      if (iteration_callback_ignore_errors_) return 1;
+      return 0;
     }
   }
 
