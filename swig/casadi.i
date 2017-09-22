@@ -432,6 +432,7 @@ namespace std {
 	  std::string msg;
     SWIG_PYTHON_THREAD_BEGIN_BLOCK;
     if (PyErr_ExceptionMatches(PyExc_KeyboardInterrupt)) {
+      PyErr_Clear();
       SWIG_PYTHON_THREAD_END_BLOCK;
       throw casadi::KeyboardInterruptException();
     }
