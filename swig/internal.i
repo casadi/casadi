@@ -574,6 +574,9 @@
 %exception  casadi::FunctionInternal::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::get_free() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::get_function() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -746,9 +749,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::print_free(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::print_option(const std::string &name, std::ostream &stream) const  {

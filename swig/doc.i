@@ -1353,10 +1353,9 @@ double *gamma, const double *delta, int b) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
 
-[INTERNAL]  Print free variables.
+[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -1466,6 +1465,12 @@ int warmStart=0) const  "
 %feature("docstring")  casadi::FunctionInternal::nnz_in(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -1713,12 +1718,6 @@ double *alpha) const  "
 const  "
 
 [INTERNAL]  Convert *hess to column compressed sparse format.
-
-";
-
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
-
-[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -2455,13 +2454,6 @@ Generate a function that calculates nfwd forward derivatives.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
-
-[INTERNAL]  Check if the function is of a particular type.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
 "
 
@@ -2620,10 +2612,10 @@ std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
+&type, bool recursive) const  "
 
-[INTERNAL]  Print free variables.
+[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -2741,6 +2733,12 @@ Generate a function that calculates nadj adjoint derivatives.
 double **arg, double **res, int *iw, double *w) const  "
 
 [INTERNAL]  Set the (temporary) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -3657,6 +3655,12 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::set_temp(void *mem, const
 double **arg, double **res, int *iw, double *w) const  "
 
@@ -4407,13 +4411,6 @@ multiplying.
 &name) const  "
 
 [INTERNAL]  Get input scheme index by name.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
 
 ";
 
@@ -5423,13 +5420,6 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
@@ -5824,6 +5814,12 @@ Diagrams
 
 
 C++ includes: bspline.hpp ";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
 std::string &fname, const Dict &opts) const  "
@@ -6579,6 +6575,12 @@ std::string &iname) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::check_res(const
 std::vector< M > &res) const  "
 
@@ -7324,13 +7326,6 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_sprev() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -7837,7 +7832,7 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 %feature("docstring")  casadi::Function::print_free(std::ostream
 &stream=casadi::userOut()) const  "
 
-Print free variables.
+[DEPRECATED] Use get_free instead
 
 ";
 
@@ -8123,6 +8118,12 @@ Parameters:
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring")  casadi::Function::get_free() const  "
+
+Get free variables as a string.
 
 ";
 
@@ -9242,13 +9243,6 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -9685,6 +9679,12 @@ always_inline, bool never_inline) const  "
 bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Propagate sparsity backwards.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -10828,13 +10828,6 @@ original
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
 
 [INTERNAL]  Get largest input value.
@@ -10924,6 +10917,12 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::Collocation::setupFG() override "
 
 [INTERNAL]  Setup F and G.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -12099,6 +12098,12 @@ std::string &fname) const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sx_out(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -12773,13 +12778,6 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::mx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
 
 ";
 
@@ -14780,9 +14778,9 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
 
-[INTERNAL]  Release a memory object.
+[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -15073,6 +15071,12 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
@@ -15340,10 +15344,9 @@ std::vector< std::vector< M > > &aseed) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
-[INTERNAL]  Print free variables.
+[INTERNAL]  Release a memory object.
 
 ";
 
@@ -15402,12 +15405,6 @@ get_reverse(int nadj) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::mx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
-
-[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -16831,13 +16828,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
 CodeGenerator &g) const  "
 
@@ -16927,6 +16917,12 @@ symmetric) const override "
 std::string > &onames, const Dict &opts) const override "
 
 [INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -17323,6 +17319,12 @@ bool persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -17946,13 +17948,6 @@ structure recognition.
 std::vector< std::vector< M > > &aseed) const  "
 
 [INTERNAL]  Replace 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
 
 ";
 
@@ -18928,10 +18923,9 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
-[INTERNAL]  Print free variables.
+[INTERNAL]  Release a memory object.
 
 ";
 
@@ -19239,10 +19233,9 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
-persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
-[INTERNAL]  Ensure required length of iw field.
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -19454,6 +19447,13 @@ get_forward(int nfwd) if no cached version is available.
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 [INTERNAL]  Get number of temporary variables needed.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
+persistent=false) "
+
+[INTERNAL]  Ensure required length of iw field.
 
 ";
 
@@ -19691,12 +19691,6 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
-
-[INTERNAL]  Release a memory object.
-
-";
-
 
 // File: classcasadi_1_1FixedStepIntegrator.xml
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
@@ -19789,13 +19783,6 @@ const override "
 %feature("docstring")  casadi::Integrator::t() const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
 const  "
@@ -19907,6 +19894,12 @@ int oind, bool symmetric) const  "
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -21304,6 +21297,12 @@ double *res) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size2_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -22401,13 +22400,6 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -22707,6 +22699,12 @@ Print dimensions of inputs and outputs.
 "
 
 Get string representation.
+
+";
+
+%feature("docstring")  casadi::Function::get_free() const  "
+
+Get free variables as a string.
 
 ";
 
@@ -23660,7 +23658,7 @@ C++ includes: function.hpp ";
 %feature("docstring")  casadi::Function::print_free(std::ostream
 &stream=casadi::userOut()) const  "
 
-Print free variables.
+[DEPRECATED] Use get_free instead
 
 ";
 
@@ -24129,13 +24127,6 @@ std::vector< MX > &arg) const  "
 &vdef_fcn, Function &vinit_fcn) const  "
 
 [INTERNAL]  Extract the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
 
 ";
 
@@ -25069,6 +25060,12 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 &type, bool recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -26359,6 +26356,12 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -27013,13 +27016,6 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 std::vector< std::vector< M > > &aseed) const  "
 
 [INTERNAL]  Replace 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
 
 ";
 
@@ -27911,6 +27907,12 @@ std::string &fname) override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sparsity_jac(int iind, int
 oind, bool compact, bool symmetric) const  "
 
@@ -27947,13 +27949,6 @@ override "
 std::vector< M > &arg) const  "
 
 [INTERNAL]  Replace 0-by-0 inputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
 
 ";
 
@@ -29397,13 +29392,6 @@ double t, double *x, double *z, double *q) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_jacobian(const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
@@ -30157,6 +30145,12 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::Integrator::get_forward(int nfwd, const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
@@ -30784,13 +30778,6 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
 "
 
@@ -31354,6 +31341,12 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
 "
 
@@ -31731,6 +31724,12 @@ allow_forward, bool allow_reverse) const  "
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Propagate sparsity forward.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -32942,13 +32941,6 @@ Number of function inputs and outputs.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::Jit::init(const Dict &opts) override "
 
 Initialize.
@@ -33074,6 +33066,12 @@ C++ includes: exception.hpp ";
 %feature("docstring")  casadi::FunctionInternal::size_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -33746,13 +33744,6 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::eval_name() const  "
 
 [INTERNAL]  Get name of the evaluation function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
 
 ";
 
@@ -35108,6 +35099,12 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
 "
 
@@ -35937,13 +35934,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sparsity_in(int ind) const
 "
 
@@ -36606,6 +36596,12 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::reverse(int nadj) const  "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
@@ -37089,13 +37085,6 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
 
 [INTERNAL]  Symbolic expressions for the forward seeds.
@@ -37373,13 +37362,6 @@ std::string &fname) const  "
 %feature("docstring")  casadi::FunctionInternal::sx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
 
 ";
 
@@ -37754,6 +37736,12 @@ classes.
 %feature("docstring")  casadi::FunctionInternal::get_sparsity_out(int i) "
 
 [INTERNAL]  Get sparsity of a given output.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -39154,6 +39142,12 @@ original
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
@@ -39243,13 +39237,6 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
 
 ";
 
@@ -40617,6 +40604,12 @@ derivatives
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
@@ -41185,13 +41178,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::Map::default_in(int ind) const override "
 
 [INTERNAL]  Get default input value.
@@ -41533,8 +41519,7 @@ int *iw, bvec_t *w, void *mem) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
 
@@ -44696,10 +44681,9 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
-persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
-[INTERNAL]  Ensure required length of iw field.
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -44846,6 +44830,13 @@ std::string &fname) const override "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(int nadj) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
+persistent=false) "
+
+[INTERNAL]  Ensure required length of iw field.
 
 ";
 
@@ -45859,13 +45850,6 @@ bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::Newton::solve(void *mem) const override "
 
 [INTERNAL]   Solve the system of equations and calculate derivatives.
@@ -46261,13 +46245,6 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
-
-[INTERNAL]  Check if the function is of a particular type.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::nnz_in() const  "
 
 [INTERNAL]  Number of input/output nonzeros.
@@ -46409,10 +46386,10 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
+&type, bool recursive) const  "
 
-[INTERNAL]  Print free variables.
+[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -47048,6 +47025,12 @@ std::string &fname) override "
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 [INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -48910,13 +48893,6 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -49594,6 +49570,12 @@ C++ includes: oracle_function.hpp ";
 &fcn) "
 
 [INTERNAL]  Register the function for evaluation and statistics gathering
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -50526,13 +50508,6 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
 double **arg, double **res, int *iw, double *w) const  "
 
@@ -50544,6 +50519,12 @@ double **arg, double **res, int *iw, double *w) const  "
 "
 
 [INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -51887,6 +51868,12 @@ always_inline, bool never_inline) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
 
 [INTERNAL]  Get smallest input value.
@@ -52381,13 +52368,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
@@ -52737,13 +52717,6 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sparsity_out(int ind) const
 "
 
@@ -53065,6 +53038,12 @@ bool persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -54259,13 +54238,6 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
@@ -54391,6 +54363,12 @@ get_reverse(int nadj) if no cached version is available.
 **&arg, double **&res, int *&iw, double *&w) const override "
 
 [INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -55922,6 +55900,12 @@ std::string > &onames, const Dict &opts) const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_gen(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -56102,12 +56086,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
-
-[INTERNAL]  Get required length of arg field.
-
-";
-
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -56281,10 +56259,9 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
-[INTERNAL]  Print free variables.
+[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -57240,13 +57217,6 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")
 casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
@@ -57518,6 +57488,12 @@ C++ includes: slicot_dple.hpp ";
 %feature("docstring")  casadi::FunctionInternal::sx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -58657,6 +58633,12 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::SlicotExpm::class_name() const override "
 
 [INTERNAL]  Readable name of the internal class.
@@ -58685,13 +58667,6 @@ override "
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
 
 ";
 
@@ -60479,6 +60454,12 @@ const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call(const std::vector< M >
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
@@ -60714,10 +60695,9 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::clear_mem() "
 
-[INTERNAL]  Print free variables.
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -60853,12 +60833,6 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::simplified_call() const  "
 
 [INTERNAL]  Use simplified signature.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::clear_mem() "
-
-[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -61776,13 +61750,6 @@ elements (i, j) with j>=i.
 
 
 // File: classcasadi_1_1Sqpmethod.xml
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::name_out(int ind) const  "
 
 [INTERNAL]  Get output scheme name by index.
@@ -62301,9 +62268,9 @@ Diagrams
 
 C++ includes: sqpmethod.hpp ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
-[INTERNAL]  Get required length of arg field.
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -62311,6 +62278,12 @@ C++ includes: sqpmethod.hpp ";
 DM > &arg) const  "
 
 [INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+
+[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -63801,13 +63774,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
@@ -64042,6 +64008,12 @@ bool more) const override "
 %feature("docstring")  casadi::FunctionInternal::has_sprev() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -64343,10 +64315,10 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
-[INTERNAL]  Print free variables.
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -64670,6 +64642,12 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::name() const  "
 
 [INTERNAL]  Name of the function.
@@ -64960,13 +64938,6 @@ override "
 bool tr) const  "
 
 [INTERNAL]  Get Cholesky factor.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
 
 ";
 

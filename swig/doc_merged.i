@@ -1040,8 +1040,8 @@ length of arg field.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::print_free "[INTERNAL]  Print free
-variables.
+%feature("docstring") casadi::Blocksqp::weak "[INTERNAL]  Get a weak
+reference to the object.
 
 ";
 
@@ -1112,6 +1112,11 @@ method.
 
 %feature("docstring") casadi::Blocksqp::nnz_in "[INTERNAL]  Number of
 input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::Blocksqp::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -1273,11 +1278,6 @@ dimensions.
 
 %feature("docstring") casadi::Blocksqp::convertHessian "[INTERNAL]  Convert
 *hess to column compressed sparse format.
-
-";
-
-%feature("docstring") casadi::Blocksqp::weak "[INTERNAL]  Get a weak
-reference to the object.
 
 ";
 
@@ -1826,11 +1826,6 @@ Generate a function that calculates nfwd forward derivatives.
 
 ";
 
-%feature("docstring") casadi::BSpline::is_a "[INTERNAL]  Check if the
-function is of a particular type.
-
-";
-
 %feature("docstring") casadi::BSpline::adjViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
 
@@ -1948,8 +1943,8 @@ length of iw field.
 
 ";
 
-%feature("docstring") casadi::BSpline::print_free "[INTERNAL]  Print free
-variables.
+%feature("docstring") casadi::BSpline::is_a "[INTERNAL]  Check if the
+function is of a particular type.
 
 ";
 
@@ -2034,6 +2029,11 @@ Generate a function that calculates nadj adjoint derivatives.
 
 %feature("docstring") casadi::BSpline::set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::BSpline::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -2749,6 +2749,11 @@ no cached version is available.
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::get_free "[INTERNAL]  Print
+free variables.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
 
@@ -3354,11 +3359,6 @@ reference to the object.
 
 %feature("docstring") casadi::BSplineCommon::index_in "[INTERNAL]  Get
 input scheme index by name.
-
-";
-
-%feature("docstring") casadi::BSplineCommon::print_free "[INTERNAL]  Print
-free variables.
 
 ";
 
@@ -4042,11 +4042,6 @@ a dependent function.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::print_free "[INTERNAL]  Print
-free variables.
-
-";
-
 %feature("docstring") casadi::BSplineDual::codegen_incref "[INTERNAL]
 Codegen incref for dependencies.
 
@@ -4399,6 +4394,11 @@ Diagrams
 
 
 C++ includes: bspline.hpp ";
+
+%feature("docstring") casadi::BSplineDual::get_free "[INTERNAL]  Print free
+variables.
+
+";
 
 %feature("docstring") casadi::BSplineDual::generate_dependencies "[INTERNAL]  Export / Generate C code for the dependency function.
 
@@ -4930,6 +4930,11 @@ function input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::get_free "[INTERNAL]
+Print free variables.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::check_res "[INTERNAL]
 Check if output arguments have correct length and dimensions.
 
@@ -5447,11 +5452,6 @@ Weighting factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::print_free "[INTERNAL]
-Print free variables.
-
-";
-
 %feature("docstring") casadi::BSplineInterpolant::has_sprev "[INTERNAL]  Is
 the class able to propagate seeds through the algorithm?
 
@@ -5772,7 +5772,7 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 
 %feature("docstring") casadi::Callback::print_free "
 
-Print free variables.
+[DEPRECATED] Use get_free instead
 
 ";
 
@@ -5989,6 +5989,12 @@ Parameters:
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::Callback::get_free "
+
+Get free variables as a string.
 
 ";
 
@@ -6763,11 +6769,6 @@ factor for chosing forward/reverse mode.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::print_free "[INTERNAL]  Print
-free variables.
-
-";
-
 %feature("docstring") casadi::CentralDiff::numel_out "[INTERNAL]  Number of
 input/output elements.
 
@@ -7055,6 +7056,11 @@ Sparsities of function inputs and outputs.
 
 %feature("docstring") casadi::CentralDiff::sp_reverse "[INTERNAL]
 Propagate sparsity backwards.
+
+";
+
+%feature("docstring") casadi::CentralDiff::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -7950,11 +7956,6 @@ memory object.
 
 ";
 
-%feature("docstring") casadi::Collocation::print_free "[INTERNAL]  Print
-free variables.
-
-";
-
 %feature("docstring") casadi::Collocation::max_in "[INTERNAL]  Get largest
 input value.
 
@@ -8018,6 +8019,11 @@ explicit dynamics (backward problem)
 
 %feature("docstring") casadi::Collocation::setupFG "[INTERNAL]  Setup F and
 G.
+
+";
+
+%feature("docstring") casadi::Collocation::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -8839,6 +8845,11 @@ instance.
 
 %feature("docstring") casadi::Conic::has_function "[INTERNAL] ";
 
+%feature("docstring") casadi::Conic::get_free "[INTERNAL]  Print free
+variables.
+
+";
+
 %feature("docstring") casadi::Conic::sx_out "[INTERNAL]  Get function
 input(s) and output(s)
 
@@ -9297,11 +9308,6 @@ dependent function.
 
 %feature("docstring") casadi::Conic::mx_in "[INTERNAL]  Get function
 input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::Conic::print_free "[INTERNAL]  Print free
-variables.
 
 ";
 
@@ -11042,8 +11048,8 @@ Are all inputs and outputs scalar.
 
 ";
 
-%feature("docstring") casadi::Dple::release "[INTERNAL]  Release a memory
-object.
+%feature("docstring") casadi::Dple::weak "[INTERNAL]  Get a weak reference
+to the object.
 
 ";
 
@@ -11246,6 +11252,11 @@ input/output nonzeros.
 
 ";
 
+%feature("docstring") casadi::Dple::get_free "[INTERNAL]  Print free
+variables.
+
+";
+
 %feature("docstring") casadi::Dple::sp_forward "[INTERNAL]  Propagate
 sparsity forward.
 
@@ -11427,8 +11438,8 @@ block.
 
 ";
 
-%feature("docstring") casadi::Dple::print_free "[INTERNAL]  Print free
-variables.
+%feature("docstring") casadi::Dple::release "[INTERNAL]  Release a memory
+object.
 
 ";
 
@@ -11465,11 +11476,6 @@ is available.
 
 %feature("docstring") casadi::Dple::mx_out "[INTERNAL]  Get function
 input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::Dple::weak "[INTERNAL]  Get a weak reference
-to the object.
 
 ";
 
@@ -12517,11 +12523,6 @@ the algorithm.
 
 ";
 
-%feature("docstring") casadi::Expm::print_free "[INTERNAL]  Print free
-variables.
-
-";
-
 %feature("docstring") casadi::Expm::codegen_name "[INTERNAL]  Get name in
 codegen.
 
@@ -12587,6 +12588,11 @@ evaluation function.
 
 %feature("docstring") casadi::Expm::get_reverse "[INTERNAL]  Generate a
 function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring") casadi::Expm::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -12848,6 +12854,11 @@ dimensions.
 
 %feature("docstring") casadi::External::has_derivative "[INTERNAL]  Can
 derivatives be calculated in any way?
+
+";
+
+%feature("docstring") casadi::External::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -13291,11 +13302,6 @@ code for the function body.
 
 %feature("docstring") casadi::External::replace_aseed "[INTERNAL]  Replace
 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring") casadi::External::print_free "[INTERNAL]  Print free
-variables.
 
 ";
 
@@ -14027,8 +14033,8 @@ name of the internal class.
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::print_free "[INTERNAL]  Print
-free variables.
+%feature("docstring") casadi::FiniteDiff::release "[INTERNAL]  Release a
+memory object.
 
 ";
 
@@ -14229,8 +14235,8 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::alloc_iw "[INTERNAL]  Ensure
-required length of iw field.
+%feature("docstring") casadi::FiniteDiff::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -14381,6 +14387,11 @@ cached version is available.
 
 %feature("docstring") casadi::FiniteDiff::sz_work "[INTERNAL]  Get number
 of temporary variables needed.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::alloc_iw "[INTERNAL]  Ensure
+required length of iw field.
 
 ";
 
@@ -14556,11 +14567,6 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::release "[INTERNAL]  Release a
-memory object.
-
-";
-
 
 // File: classcasadi_1_1FixedStepIntegrator.xml
 %feature("docstring") casadi::FixedStepIntegrator::getCount "[INTERNAL]
@@ -14623,11 +14629,6 @@ Initalize memory block.
 ";
 
 %feature("docstring") casadi::FixedStepIntegrator::t "[INTERNAL] ";
-
-%feature("docstring") casadi::FixedStepIntegrator::print_free "[INTERNAL]
-Print free variables.
-
-";
 
 %feature("docstring") casadi::FixedStepIntegrator::instruction_constant "[INTERNAL]  Get the floating point output argument of an atomic operation.
 
@@ -14699,6 +14700,11 @@ Get default input value.
 
 %feature("docstring") casadi::FixedStepIntegrator::uses_output "[INTERNAL]
 Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::get_free "[INTERNAL]
+Print free variables.
 
 ";
 
@@ -15649,6 +15655,11 @@ Input/output dimensions.
 
 ";
 
+%feature("docstring") casadi::ForwardDiff::get_free "[INTERNAL]  Print free
+variables.
+
+";
+
 %feature("docstring") casadi::ForwardDiff::size2_out "[INTERNAL]
 Input/output dimensions.
 
@@ -16477,11 +16488,6 @@ Options.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::print_free "[INTERNAL]  Print
-free variables.
-
-";
-
 %feature("docstring") casadi::ForwardDiff::eval_mx "[INTERNAL]  Evaluate
 with symbolic matrices.
 
@@ -16690,6 +16696,12 @@ Print dimensions of inputs and outputs.
 %feature("docstring") casadi::Function::get_str "
 
 Get string representation.
+
+";
+
+%feature("docstring") casadi::Function::get_free "
+
+Get free variables as a string.
 
 ";
 
@@ -17379,7 +17391,7 @@ C++ includes: function.hpp ";
 
 %feature("docstring") casadi::Function::print_free "
 
-Print free variables.
+[DEPRECATED] Use get_free instead
 
 ";
 
@@ -17662,11 +17674,6 @@ Can derivatives be calculated in any way?
 
 %feature("docstring") casadi::GenericExternal::generate_lifted "[INTERNAL]
 Extract the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring") casadi::GenericExternal::print_free "[INTERNAL]
-Print free variables.
 
 ";
 
@@ -18308,6 +18315,11 @@ function input(s) and output(s)
 
 %feature("docstring") casadi::GenericExternal::is_a "[INTERNAL]  Check if
 the function is of a particular type.
+
+";
+
+%feature("docstring") casadi::GenericExternal::get_free "[INTERNAL]  Print
+free variables.
 
 ";
 
@@ -19346,6 +19358,10 @@ Call a function, templated.
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::get_free "[INTERNAL]  Print free variables.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::size1_in "[INTERNAL]  Input/output dimensions.
 
 ";
@@ -19776,10 +19792,6 @@ Export / Generate C code for the generated functions.
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::factory "[INTERNAL] ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::replace_aseed "[INTERNAL]  Replace 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::print_free "[INTERNAL]  Print free variables.
 
 ";
 
@@ -20331,6 +20343,11 @@ JIT for dependencies.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::get_free "[INTERNAL]  Print
+free variables.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::sparsity_jac "[INTERNAL]  Get,
 if necessary generate, the sparsity of a Jacobian block.
 
@@ -20358,11 +20375,6 @@ required length of res field.
 
 %feature("docstring") casadi::ImplicitToNlp::replace_arg "[INTERNAL]
 Replace 0-by-0 inputs.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::print_free "[INTERNAL]  Print
-free variables.
 
 ";
 
@@ -21404,11 +21416,6 @@ Generate code for the function body.
 
 ";
 
-%feature("docstring") casadi::Integrator::print_free "[INTERNAL]  Print
-free variables.
-
-";
-
 %feature("docstring") casadi::Integrator::get_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
 
@@ -21947,6 +21954,11 @@ input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::Integrator::get_free "[INTERNAL]  Print free
+variables.
+
+";
+
 %feature("docstring") casadi::Integrator::get_forward "[INTERNAL]  Generate
 a function that calculates nfwd forward derivatives.
 
@@ -22358,11 +22370,6 @@ all information there is to know about a certain option.
 
 ";
 
-%feature("docstring") casadi::Interpolant::print_free "[INTERNAL]  Print
-free variables.
-
-";
-
 %feature("docstring") casadi::Interpolant::default_in "[INTERNAL]  Get
 default input value.
 
@@ -22764,6 +22771,11 @@ with symbolic scalars.
 
 ";
 
+%feature("docstring") casadi::Interpolant::get_free "[INTERNAL]  Print free
+variables.
+
+";
+
 %feature("docstring") casadi::Interpolant::instruction_id "[INTERNAL]  Get
 an atomic operation operator index.
 
@@ -23023,6 +23035,11 @@ atomic operation operator index.
 
 %feature("docstring") casadi::Jit::sp_forward "[INTERNAL]  Propagate
 sparsity forward.
+
+";
+
+%feature("docstring") casadi::Jit::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -23936,11 +23953,6 @@ Number of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Jit::print_free "[INTERNAL]  Print free
-variables.
-
-";
-
 %feature("docstring") casadi::Jit::init "
 
 Initialize.
@@ -24038,6 +24050,11 @@ variables (SX)
 
 %feature("docstring") casadi::LapackLu::size_in "[INTERNAL]  Input/output
 dimensions.
+
+";
+
+%feature("docstring") casadi::LapackLu::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -24496,11 +24513,6 @@ dimensions.
 
 %feature("docstring") casadi::LapackLu::eval_name "[INTERNAL]  Get name of
 the evaluation function.
-
-";
-
-%feature("docstring") casadi::LapackLu::print_free "[INTERNAL]  Print free
-variables.
 
 ";
 
@@ -25598,6 +25610,11 @@ sparsity backwards.
 
 ";
 
+%feature("docstring") casadi::LapackQr::get_free "[INTERNAL]  Print free
+variables.
+
+";
+
 %feature("docstring") casadi::LapackQr::instruction_id "[INTERNAL]  Get an
 atomic operation operator index.
 
@@ -26155,11 +26172,6 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::LapackQr::print_free "[INTERNAL]  Print free
-variables.
-
-";
-
 %feature("docstring") casadi::LapackQr::sparsity_in "
 
 >  const Sparsity& casadi::FunctionInternal::sparsity_in(int ind) const 
@@ -26616,6 +26628,11 @@ Release a memory object.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::get_free "[INTERNAL]
+Print free variables.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
 cached instance if available, and calls  Function get_reverse(int nadj) if
@@ -26943,11 +26960,6 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::print_free "[INTERNAL]
-Print free variables.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::fwd_seed "[INTERNAL]
 Symbolic expressions for the forward seeds.
 
@@ -27130,11 +27142,6 @@ Get type name.
 
 %feature("docstring") casadi::LinearInterpolantJac::sx_in "[INTERNAL]  Get
 function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::LinearInterpolantJac::print_free "[INTERNAL]
-Print free variables.
 
 ";
 
@@ -27384,6 +27391,11 @@ Number of nodes in the algorithm.
 ";
 
 %feature("docstring") casadi::LinearInterpolantJac::get_sparsity_out "[INTERNAL]  Get sparsity of a given output.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::get_free "[INTERNAL]
+Print free variables.
 
 ";
 
@@ -28419,6 +28431,11 @@ input/output elements.
 
 ";
 
+%feature("docstring") casadi::Lsqr::get_free "[INTERNAL]  Print free
+variables.
+
+";
+
 %feature("docstring") casadi::Lsqr::print_dimensions "[INTERNAL]  Print
 dimensions of inputs and outputs.
 
@@ -28482,11 +28499,6 @@ output arguments that needs to be replaced.
 
 %feature("docstring") casadi::Lsqr::n_nodes "[INTERNAL]  Number of nodes in
 the algorithm.
-
-";
-
-%feature("docstring") casadi::Lsqr::print_free "[INTERNAL]  Print free
-variables.
 
 ";
 
@@ -29512,6 +29524,11 @@ symbolically while also propagating directional derivatives
 
 ";
 
+%feature("docstring") casadi::Map::get_free "[INTERNAL]  Print free
+variables.
+
+";
+
 %feature("docstring") casadi::Map::free_mx "[INTERNAL]  Get free variables
 ( MX)
 
@@ -29893,11 +29910,6 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::Map::print_free "[INTERNAL]  Print free
-variables.
-
-";
-
 %feature("docstring") casadi::Map::default_in "[INTERNAL]  Get default
 input value.
 
@@ -30138,7 +30150,7 @@ variables (SX)
 
 ";
 
-%feature("docstring") casadi::MapOmp::print_free "[INTERNAL]  Print free
+%feature("docstring") casadi::MapOmp::get_free "[INTERNAL]  Print free
 variables.
 
 ";
@@ -32520,8 +32532,8 @@ of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Newton::alloc_iw "[INTERNAL]  Ensure required
-length of iw field.
+%feature("docstring") casadi::Newton::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -32629,6 +32641,11 @@ tr:  Flip the relationship. Return which expressions contain the variables
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
 if available, and calls  Function get_reverse(int nadj) if no cached version
 is available.
+
+";
+
+%feature("docstring") casadi::Newton::alloc_iw "[INTERNAL]  Ensure required
+length of iw field.
 
 ";
 
@@ -33326,11 +33343,6 @@ variables ( MX)
 
 ";
 
-%feature("docstring") casadi::Newton::print_free "[INTERNAL]  Print free
-variables.
-
-";
-
 %feature("docstring") casadi::Newton::solve "[INTERNAL]   Solve the system
 of equations and calculate derivatives.
 
@@ -33601,11 +33613,6 @@ number of atomic operations.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::is_a "[INTERNAL]  Check if the
-function is of a particular type.
-
-";
-
 %feature("docstring") casadi::Nlpsol::nnz_in "[INTERNAL]  Number of
 input/output nonzeros.
 
@@ -33698,8 +33705,8 @@ input value.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::print_free "[INTERNAL]  Print free
-variables.
+%feature("docstring") casadi::Nlpsol::is_a "[INTERNAL]  Check if the
+function is of a particular type.
 
 ";
 
@@ -34167,6 +34174,11 @@ code for the function body.
 
 %feature("docstring") casadi::Nlpsol::print_dimensions "[INTERNAL]  Print
 dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Nlpsol::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -35275,11 +35287,6 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::OracleFunction::print_free "[INTERNAL]  Print
-free variables.
-
-";
-
 %feature("docstring") casadi::OracleFunction::size_out "[INTERNAL]
 Input/output dimensions.
 
@@ -35819,6 +35826,11 @@ smallest input value.
 
 %feature("docstring") casadi::OracleFunction::set_function "[INTERNAL]
 Register the function for evaluation and statistics gathering
+
+";
+
+%feature("docstring") casadi::OracleFunction::get_free "[INTERNAL]  Print
+free variables.
 
 ";
 
@@ -36484,11 +36496,6 @@ the sparsity pattern, forward mode.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::print_free "[INTERNAL]  Print free
-variables.
-
-";
-
 %feature("docstring") casadi::QpToNlp::setup "[INTERNAL]  Set the
 (persistent and temporary) work vectors.
 
@@ -36496,6 +36503,11 @@ variables.
 
 %feature("docstring") casadi::QpToNlp::get_stats "[INTERNAL]  Get all
 statistics.
+
+";
+
+%feature("docstring") casadi::QpToNlp::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -37455,6 +37467,11 @@ mode, virtual functions overloaded in derived classes.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::get_free "[INTERNAL]  Print free
+variables.
+
+";
+
 %feature("docstring") casadi::Rootfinder::min_in "[INTERNAL]  Get smallest
 input value.
 
@@ -37806,11 +37823,6 @@ input arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::print_free "[INTERNAL]  Print
-free variables.
-
-";
-
 %feature("docstring") casadi::Rootfinder::checkout "[INTERNAL]  Checkout a
 memory object.
 
@@ -38049,11 +38061,6 @@ augmented DAE system with nfwd forward sensitivities.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::print_free "[INTERNAL]  Print
-free variables.
-
-";
-
 %feature("docstring") casadi::RungeKutta::sparsity_out "[INTERNAL]  Get
 sparsity of a given output.
 
@@ -38258,6 +38265,11 @@ Function instance consisting of only one MX call.
 
 %feature("docstring") casadi::RungeKutta::size1_out "[INTERNAL]
 Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::RungeKutta::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -39083,11 +39095,6 @@ input/output elements.
 
 ";
 
-%feature("docstring") casadi::Scpgen::print_free "[INTERNAL]  Print free
-variables.
-
-";
-
 %feature("docstring") casadi::Scpgen::memory "[INTERNAL]  Memory objects.
 
 ";
@@ -39178,6 +39185,11 @@ is available.
 
 %feature("docstring") casadi::Scpgen::set_work "[INTERNAL]  Set the
 (persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::Scpgen::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -40336,6 +40348,11 @@ Input/output dimensions.
 
 ";
 
+%feature("docstring") casadi::SimplifiedExternal::get_free "[INTERNAL]
+Print free variables.
+
+";
+
 %feature("docstring") casadi::SimplifiedExternal::call_gen "[INTERNAL]
 Call a function, overloaded.
 
@@ -40442,11 +40459,6 @@ the class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::SimplifiedExternal::check_arg "[INTERNAL]
 Check if input arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sz_arg "[INTERNAL]  Get
-required length of arg field.
 
 ";
 
@@ -40574,8 +40586,8 @@ Ensure required length of res field.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::print_free "[INTERNAL]
-Print free variables.
+%feature("docstring") casadi::SimplifiedExternal::sz_arg "[INTERNAL]  Get
+required length of arg field.
 
 ";
 
@@ -41237,11 +41249,6 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::SlicotDple::print_free "[INTERNAL]  Print
-free variables.
-
-";
-
 %feature("docstring") casadi::SlicotDple::add_dependency "[INTERNAL]  Add a
 dependent function.
 
@@ -41471,6 +41478,11 @@ C++ includes: slicot_dple.hpp ";
 
 %feature("docstring") casadi::SlicotDple::sx_in "[INTERNAL]  Get function
 input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::SlicotDple::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -42253,6 +42265,11 @@ Codegen decref for dependencies.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::get_free "[INTERNAL]  Print free
+variables.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::class_name "[INTERNAL]  Readable
 name of the internal class.
 
@@ -42275,11 +42292,6 @@ nodes in the algorithm.
 
 %feature("docstring") casadi::SlicotExpm::uses_output "[INTERNAL]  Do the
 derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring") casadi::SlicotExpm::print_free "[INTERNAL]  Print
-free variables.
 
 ";
 
@@ -43587,6 +43599,11 @@ Symbolic expressions for the adjoint seeds.
 
 ";
 
+%feature("docstring") casadi::Smoothing::get_free "[INTERNAL]  Print free
+variables.
+
+";
+
 %feature("docstring") casadi::Smoothing::call "[INTERNAL]   Call a
 function, templated.
 
@@ -43749,8 +43766,8 @@ numerically.
 
 ";
 
-%feature("docstring") casadi::Smoothing::print_free "[INTERNAL]  Print free
-variables.
+%feature("docstring") casadi::Smoothing::clear_mem "[INTERNAL]  Clear all
+memory (called from destructor)
 
 ";
 
@@ -43842,11 +43859,6 @@ Obtain solver name from Adaptor.
 
 %feature("docstring") casadi::Smoothing::simplified_call "[INTERNAL]  Use
 simplified signature.
-
-";
-
-%feature("docstring") casadi::Smoothing::clear_mem "[INTERNAL]  Clear all
-memory (called from destructor)
 
 ";
 
@@ -44671,11 +44683,6 @@ elements (i, j) with j>=i.
 
 
 // File: classcasadi_1_1Sqpmethod.xml
-%feature("docstring") casadi::Sqpmethod::print_free "[INTERNAL]  Print free
-variables.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::name_out "[INTERNAL]  Get output
 scheme name by index.
 
@@ -45096,13 +45103,18 @@ Diagrams
 
 C++ includes: sqpmethod.hpp ";
 
-%feature("docstring") casadi::Sqpmethod::sz_arg "[INTERNAL]  Get required
-length of arg field.
+%feature("docstring") casadi::Sqpmethod::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
 %feature("docstring") casadi::Sqpmethod::eval_dm "[INTERNAL]  Evaluate with
 DM matrices.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::sz_arg "[INTERNAL]  Get required
+length of arg field.
 
 ";
 
@@ -46130,11 +46142,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::Switch::sp_reverse "[INTERNAL]  Propagate
-sparsity backwards.
-
-";
-
 %feature("docstring") casadi::Switch::sp_forward "[INTERNAL]  Propagate
 sparsity forward.
 
@@ -46287,6 +46294,11 @@ dependent function.
 
 %feature("docstring") casadi::Switch::has_sprev "[INTERNAL]  Is the class
 able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::Switch::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -46498,8 +46510,8 @@ input value.
 
 ";
 
-%feature("docstring") casadi::Switch::print_free "[INTERNAL]  Print free
-variables.
+%feature("docstring") casadi::Switch::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
 
 ";
 
@@ -46708,6 +46720,11 @@ Get the (integer) output argument of an atomic operation.
 
 %feature("docstring") casadi::SymbolicQr::sz_work "[INTERNAL]  Get number
 of temporary variables needed.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::get_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -46922,11 +46939,6 @@ Function instance consisting of only one MX call.
 
 %feature("docstring") casadi::SymbolicQr::linsol_cholesky "[INTERNAL]  Get
 Cholesky factor.
-
-";
-
-%feature("docstring") casadi::SymbolicQr::print_free "[INTERNAL]  Print
-free variables.
 
 ";
 
