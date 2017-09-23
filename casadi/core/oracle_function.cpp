@@ -131,11 +131,7 @@ namespace casadi {
 
     // Make sure that it's sound
     if (ret.has_free()) {
-      stringstream s;
-      s << "Cannot create '" << fname << "' since ";
-      ret.print_free(s);
-      s << " are free.";
-      casadi_error(s.str());
+      casadi_error("Cannot create '" + fname + "' since " + str(ret.get_free()) + " are free.");
     }
 
     // Save and return

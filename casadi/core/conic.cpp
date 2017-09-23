@@ -171,13 +171,8 @@ namespace casadi {
     Function prob(name + "_qp", {x, p}, {H, c, A, b});
 
     // Make sure that the problem is sound
-    if (prob.has_free()) {
-      stringstream s;
-      s << "Cannot create '" << prob.name() << "' since ";
-      prob.print_free(s);
-      s << " are free.";
-      casadi_error(s.str());
-    }
+    casadi_assert_message(!prob.has_free(), "Cannot create '" + prob.name() + "' "
+                          "since " + str(prob.get_free()) + " are free.");
 
     // Create the QP solver
     Function conic_f = conic(name + "_qpsol", solver,

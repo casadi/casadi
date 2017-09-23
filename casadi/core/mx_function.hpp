@@ -169,8 +169,10 @@ namespace casadi {
     bool has_free() const override { return !free_vars_.empty();}
 
     /** \brief Print free variables */
-    void print_free(std::ostream &stream) const override {
-      stream << free_vars_;
+    std::vector<std::string> get_free() const override {
+      std::vector<std::string> ret;
+      for (auto&& e : free_vars_) ret.push_back(e.name());
+      return ret;
     }
 
     /** \brief Number of nodes in the algorithm */

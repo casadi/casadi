@@ -305,9 +305,6 @@ namespace casadi {
     /** \brief Print all information there is to know about a certain option */
     void print_option(const std::string &name, std::ostream &stream = casadi::userOut()) const;
 
-    /** \brief Print free variables */
-    void print_free(std::ostream &stream=casadi::userOut()) const;
-
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const;
 
@@ -668,14 +665,24 @@ namespace casadi {
     const std::vector<MX> mx_out() const;
     ///@}
 
+    /** \brief Does the function have free variables */
+    bool has_free() const;
+
+    /** \brief Get free variables as a string */
+    std::vector<std::string> get_free() const;
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Use get_free instead */
+    void print_free(std::ostream &stream=casadi::userOut()) const {
+      stream << get_free();
+    }
+#endif // WITH_DEPRECATED_FEATURES
+
     /** \brief Get all the free variables of the function */
     std::vector<SX> free_sx() const;
 
     /** \brief Get all the free variables of the function */
     std::vector<MX> free_mx() const;
-
-    /** \brief Does the function have free variables */
-    bool has_free() const;
 
     /** \brief Extract the functions needed for the Lifted Newton method */
     void generate_lifted(Function& SWIG_OUTPUT(vdef_fcn),

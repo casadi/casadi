@@ -414,7 +414,7 @@ namespace casadi {
     void print_option(const std::string &name, std::ostream &stream) const;
 
     /** \brief Print free variables */
-    virtual void print_free(std::ostream &stream) const;
+    virtual std::vector<std::string> get_free() const;
 
     /** \brief Get the unidirectional or bidirectional partition */
     void get_partition(int iind, int oind, Sparsity& D1, Sparsity& D2,

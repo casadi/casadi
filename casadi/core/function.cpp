@@ -859,8 +859,8 @@ namespace casadi {
     (*this)->print_option(name, stream);
   }
 
-  void Function::print_free(std::ostream &stream) const {
-    (*this)->print_free(stream);
+  std::vector<std::string> Function::get_free() const {
+    return (*this)->get_free();
   }
 
   std::string Function::generate(const Dict& opts) const {

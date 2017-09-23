@@ -424,8 +424,9 @@ namespace casadi {
     get_options().print_one(name, stream);
   }
 
-  void FunctionInternal::print_free(std::ostream &stream) const {
-    stream << "[]";
+  std::vector<std::string> FunctionInternal::get_free() const {
+    casadi_assert(!has_free());
+    return std::vector<std::string>();
   }
 
   std::string FunctionInternal::definition() const {
