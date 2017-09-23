@@ -3119,7 +3119,7 @@ namespace casadi {
     // Get references to the internal data structures
     SXFunction *ff = f.get<SXFunction>();
     const vector<ScalarAtomic>& algorithm = ff->algorithm_;
-    vector<SXElem> work(f.getWorkSize());
+    vector<SXElem> work(f.sz_w());
 
     // Iterator to the binary operations
     vector<SXElem>::const_iterator b_it=ff->operations_.begin();
@@ -3352,7 +3352,7 @@ namespace casadi {
 
     // Get references to the internal data structures
     const vector<ScalarAtomic>& algorithm = ff->algorithm_;
-    vector<SXElem> work(f.getWorkSize());
+    vector<SXElem> work(f.sz_w());
     vector<SXElem> work2 = work;
 
     // Iterator to the binary operations

@@ -1,4 +1,3 @@
-
 /*
  *    This file is part of CasADi.
  *
@@ -682,26 +681,43 @@ namespace casadi {
     void generate_lifted(Function& SWIG_OUTPUT(vdef_fcn),
                          Function& SWIG_OUTPUT(vinit_fcn)) const;
 
-    /** \brief Get the number of atomic operations */
-    int getAlgorithmSize() const;
-
-    /** \brief Get the length of the work vector */
-    int getWorkSize() const;
-
-    /** \brief Get an atomic operation operator index */
-    int getAtomicOperation(int k) const;
-
-    /** \brief Get the (integer) input arguments of an atomic operation */
-    std::pair<int, int> getAtomicInput(int k) const;
-
-    /** \brief Get the floating point output argument of an atomic operation */
-    double getAtomicInputReal(int k) const;
-
-    /** \brief Get the (integer) output argument of an atomic operation */
-    int getAtomicOutput(int k) const;
-
     /** \brief Number of nodes in the algorithm */
     int n_nodes() const;
+
+    /** \brief Number of instruction in the algorithm (SXFunction) */
+    int n_instructions() const;
+
+    /** \brief Identifier index of the instruction (SXFunction) */
+    int instruction_id(int k) const;
+
+    /** \brief Locations in the work vector for the inputs of the instruction (SXFunction) */
+    std::pair<int, int> instruction_input(int k) const;
+
+    /** \brief Get the floating point output argument of an instruction (SXFunction) */
+    double instruction_constant(int k) const;
+
+    /** \brief Location in the work vector for the output of the instruction (SXFunction) */
+    int instruction_output(int k) const;
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Renamed n_instructions */
+    int getAlgorithmSize() const {return n_instructions();}
+
+    /** \brief [DEPRECATED] Use sz_w instead */
+    int getWorkSize() const {return sz_w();}
+
+    /** \brief [DEPRECATED] Renamed instruction_id */
+    int getAtomicOperation(int k) const {return instruction_id(k);}
+
+    /** \brief [DEPRECATED] Renamed instruction_index */
+    std::pair<int, int> getAtomicInput(int k) const { return instruction_input(k);}
+
+    /** \brief [DEPRECATED] Renamed instruction_constant */
+    double getAtomicInputReal(int k) const { return instruction_constant(k);}
+
+    /** \brief [DEPRECATED] Renamed instruction_output */
+    int getAtomicOutput(int k) const { return instruction_output(k);}
+#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm? */

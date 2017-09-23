@@ -115,27 +115,24 @@ class CASADI_EXPORT SXFunction :
   SX hess(int iind=0, int oind=0);
 
   /** \brief Get the number of atomic operations */
-  int getAlgorithmSize() const override { return algorithm_.size();}
-
-  /** \brief Get the length of the work vector */
-  int getWorkSize() const override { return sz_w();}
+  int n_instructions() const override { return algorithm_.size();}
 
   /** \brief Get an atomic operation operator index */
-  int getAtomicOperation(int k) const override { return algorithm_.at(k).op;}
+  int instruction_id(int k) const override { return algorithm_.at(k).op;}
 
   /** \brief Get the (integer) input arguments of an atomic operation */
-  std::pair<int, int> getAtomicInput(int k) const override {
-    const ScalarAtomic& atomic = algorithm_.at(k);
-    return std::pair<int, int>(atomic.i1, atomic.i2);
+  std::pair<int, int> instruction_input(int k) const override {
+    auto e = algorithm_.at(k);
+    return std::pair<int, int>(e.i1, e.i2);
   }
 
   /** \brief Get the floating point output argument of an atomic operation */
-  double getAtomicInputReal(int k) const override {
+  double instruction_constant(int k) const override {
     return algorithm_.at(k).d;
   }
 
   /** \brief Get the (integer) output argument of an atomic operation */
-  int getAtomicOutput(int k) const override { return algorithm_.at(k).i0;}
+  int instruction_output(int k) const override { return algorithm_.at(k).i0;}
 
   /** \brief Number of nodes in the algorithm */
   int n_nodes() const override { return algorithm_.size() - nnz_out();}

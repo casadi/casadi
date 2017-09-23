@@ -2447,28 +2447,24 @@ namespace casadi {
     casadi_error("'generate_lifted' only defined for 'MXFunction'");
   }
 
-  int FunctionInternal::getAlgorithmSize() const {
-    casadi_error("'getAlgorithmSize' not defined for " + class_name());
+  int FunctionInternal::n_instructions() const {
+    casadi_error("'n_instructions' not defined for " + class_name());
   }
 
-  int FunctionInternal::getWorkSize() const {
-    casadi_error("'getWorkSize' not defined for " + class_name());
+  int FunctionInternal::instruction_id(int k) const {
+    casadi_error("'instruction_id' not defined for " + class_name());
   }
 
-  int FunctionInternal::getAtomicOperation(int k) const {
-    casadi_error("'getAtomicOperation' not defined for " + class_name());
+  std::pair<int, int> FunctionInternal::instruction_input(int k) const {
+    casadi_error("'instruction_input' not defined for " + class_name());
   }
 
-  std::pair<int, int> FunctionInternal::getAtomicInput(int k) const {
-    casadi_error("'getAtomicInput' not defined for " + class_name());
+  double FunctionInternal::instruction_constant(int k) const {
+    casadi_error("'instruction_constant' not defined for " + class_name());
   }
 
-  double FunctionInternal::getAtomicInputReal(int k) const {
-    casadi_error("'getAtomicInputReal' not defined for " + class_name());
-  }
-
-  int FunctionInternal::getAtomicOutput(int k) const {
-    casadi_error("'getAtomicOutput' not defined for " + class_name());
+  int FunctionInternal::instruction_output(int k) const {
+    casadi_error("'instruction_output' not defined for " + class_name());
   }
 
   int FunctionInternal::n_nodes() const {

@@ -332,22 +332,19 @@ namespace casadi {
     virtual void generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const;
 
     /** \brief Get the number of atomic operations */
-    virtual int getAlgorithmSize() const;
-
-    /** \brief Get the length of the work vector */
-    virtual int getWorkSize() const;
+    virtual int n_instructions() const;
 
     /** \brief Get an atomic operation operator index */
-    virtual int getAtomicOperation(int k) const;
+    virtual int instruction_id(int k) const;
 
     /** \brief Get the (integer) input arguments of an atomic operation */
-    virtual std::pair<int, int> getAtomicInput(int k) const;
+    virtual std::pair<int, int> instruction_input(int k) const;
 
     /** \brief Get the floating point output argument of an atomic operation */
-    virtual double getAtomicInputReal(int k) const;
+    virtual double instruction_constant(int k) const;
 
     /** \brief Get the (integer) output argument of an atomic operation */
-    virtual int getAtomicOutput(int k) const;
+    virtual int instruction_output(int k) const;
 
     /** \brief Number of nodes in the algorithm */
     virtual int n_nodes() const;

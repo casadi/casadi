@@ -1142,28 +1142,44 @@ namespace casadi {
     }
   }
 
-  int Function::getAlgorithmSize() const {
-    return (*this)->getAlgorithmSize();
+  int Function::n_instructions() const {
+    try {
+      return (*this)->n_instructions();
+    } catch (exception& e) {
+      THROW_ERROR("n_instructions", e.what());
+    }
   }
 
-  int Function::getWorkSize() const {
-    return (*this)->getWorkSize();
+  int Function::instruction_id(int k) const {
+    try {
+      return (*this)->instruction_id(k);
+    } catch (exception& e) {
+      THROW_ERROR("instruction_id", e.what());
+    }
   }
 
-  int Function::getAtomicOperation(int k) const {
-    return (*this)->getAtomicOperation(k);
+  pair<int, int> Function::instruction_input(int k) const {
+    try {
+      return (*this)->instruction_input(k);
+    } catch (exception& e) {
+      THROW_ERROR("instruction_input", e.what());
+    }
   }
 
-  pair<int, int> Function::getAtomicInput(int k) const {
-    return (*this)->getAtomicInput(k);
+  double Function::instruction_constant(int k) const {
+    try {
+      return (*this)->instruction_constant(k);
+    } catch (exception& e) {
+      THROW_ERROR("instruction_constant", e.what());
+    }
   }
 
-  double Function::getAtomicInputReal(int k) const {
-    return (*this)->getAtomicInputReal(k);
-  }
-
-  int Function::getAtomicOutput(int k) const {
-    return (*this)->getAtomicOutput(k);
+  int Function::instruction_output(int k) const {
+    try {
+      return (*this)->instruction_output(k);
+    } catch (exception& e) {
+      THROW_ERROR("instruction_output", e.what());
+    }
   }
 
   int Function::n_nodes() const {
