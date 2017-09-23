@@ -57,7 +57,26 @@
       return PyErr_CheckSignals();
     }
 
-
+    void handle_director_exception() {
+	    std::string msg = "Exception in SWIG director ";
+      SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+      if (PyErr_ExceptionMatches(PyExc_KeyboardInterrupt)) {
+        PyErr_Clear();
+        SWIG_PYTHON_THREAD_END_BLOCK;
+        throw casadi::KeyboardInterruptException();
+      }
+      PyObject *ptype, *pvalue, *ptraceback;
+      PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+      PyObject* msg_py = PyObject_Str(pvalue);
+      char *msg_char = SWIG_Python_str_AsChar(msg_py);
+      msg = msg_char;
+      SWIG_Python_str_DelForPy3(msg_char);
+      Py_DECREF(msg_py);
+      PyErr_Restore(ptype, pvalue, ptraceback);
+      PyErr_Print();
+      SWIG_PYTHON_THREAD_END_BLOCK;
+      casadi_error(msg.c_str());
+	  }
   }
 
 %}
@@ -428,27 +447,7 @@ namespace std {
 
 #ifdef SWIGPYTHON
 %feature("director:except") {
-	if ($error != NULL) {
-	  std::string msg;
-    SWIG_PYTHON_THREAD_BEGIN_BLOCK;
-    if (PyErr_ExceptionMatches(PyExc_KeyboardInterrupt)) {
-      PyErr_Clear();
-      SWIG_PYTHON_THREAD_END_BLOCK;
-      throw casadi::KeyboardInterruptException();
-    }
-    PyObject *ptype, *pvalue, *ptraceback;
-    PyErr_Fetch(&ptype, &pvalue, &ptraceback);
-    PyObject* msg_py = PyObject_Str(pvalue);
-    char *msg_char = SWIG_Python_str_AsChar(msg_py);
-    msg = msg_char;
-    SWIG_Python_str_DelForPy3(msg_char);
-    Py_DECREF(msg_py);
-    PyErr_Restore(ptype, pvalue, ptraceback);
-    PyErr_Print();
-    SWIG_PYTHON_THREAD_END_BLOCK;
-
-		Swig::DirectorMethodException::raise(msg.c_str());
-	}
+	if ($error != NULL) casadi::handle_director_exception();
 }
 #endif //SWIGPYTHON
 
