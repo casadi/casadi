@@ -924,6 +924,12 @@ namespace std {
       }
 #endif // SWIGPYTHON
 
+      bool tmp;
+      if (to_val(p, m? &tmp : 0)) {
+        if (m) **m = tmp;
+        return true;
+      }
+
       // No match
       return false;
     }
@@ -961,6 +967,12 @@ namespace std {
         return false;
       }
 #endif // SWIGPYTHON
+
+      int tmp;
+      if (to_val(p, m? &tmp: 0)) {
+        if (m) **m = tmp;
+        return true;
+      }
 
       // No match
       return false;
@@ -1244,7 +1256,7 @@ namespace std {
       // Treat Null
       if (is_null(p)) return false;
 
-      // GenericType already?
+      // Function already?
       if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(m),
                                     $descriptor(casadi::Function*), 0))) {
         return true;
@@ -1585,61 +1597,11 @@ namespace std {
         return true;
       }
 
-      // Object is an DM
-      {
-        // Pointer to object
-        DM *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                      $descriptor(casadi::Matrix<double>*), 0))) {
-          if (m) **m=*m2;
-          return true;
-        }
-      }
-
-      // Object is an IM
-      {
-        // Pointer to object
-        IM *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                      $descriptor(casadi::Matrix<int>*), 0))) {
-          if (m) **m=*m2;
-          return true;
-        }
-      }
-
-      // Object is a sparsity pattern
-      {
-        Sparsity *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                      $descriptor(casadi::Sparsity*), 0))) {
-          if (m) **m=SX::ones(*m2);
-          return true;
-        }
-      }
-
-      // Double scalar
-      {
-        double tmp;
-        if (to_val(p, &tmp)) {
-          if (m) **m=tmp;
-          return true;
-        }
-      }
-
-      // Integer scalar
-      {
-        int tmp;
-        if (to_val(p, &tmp)) {
-          if (m) **m=tmp;
-          return true;
-        }
-      }
-
       // Try first converting to a temporary DM
       {
-        DM tmp, *mt=&tmp;
-        if(casadi::to_ptr(p, m ? &mt : 0)) {
-          if (m) **m = *mt;
+        DM tmp;
+        if(to_val(p, m? &tmp: 0)) {
+          if (m) **m = tmp;
           return true;
         }
       }
@@ -1705,32 +1667,11 @@ namespace std {
         return true;
       }
 
-      // Object is an DM
-      {
-        // Pointer to object
-        DM *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                      $descriptor(casadi::Matrix<double>*), 0))) {
-          if (m) **m=*m2;
-          return true;
-        }
-      }
-
-      // Object is a sparsity pattern
-      {
-        Sparsity *m2;
-        if (SWIG_IsOK(SWIG_ConvertPtr(p, reinterpret_cast<void**>(&m2),
-                                      $descriptor(casadi::Sparsity*), 0))) {
-          if (m) **m=MX::ones(*m2);
-          return true;
-        }
-      }
-
       // Try first converting to a temporary DM
       {
-        DM tmp, *mt=&tmp;
-        if(casadi::to_ptr(p, m ? &mt : 0)) {
-          if (m) **m = *mt;
+        DM tmp;
+        if(to_val(p, m ? &tmp : 0)) {
+          if (m) **m = tmp;
           return true;
         }
       }
@@ -1806,16 +1747,7 @@ namespace std {
       // Double scalar
       {
         double tmp;
-        if (to_val(p, &tmp)) {
-          if (m) **m=tmp;
-          return true;
-        }
-      }
-
-      // Integer scalar
-      {
-        int tmp;
-        if (to_val(p, &tmp)) {
+        if (to_val(p, m? &tmp: 0)) {
           if (m) **m=tmp;
           return true;
         }
@@ -1925,7 +1857,7 @@ namespace std {
       // First convert to integer
       {
         int tmp;
-        if (to_val(p, &tmp)) {
+        if (to_val(p, m? &tmp: 0)) {
           if (m) **m=tmp;
           return true;
         }

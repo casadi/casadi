@@ -11,7 +11,8 @@ f = cos(x*y)
 y = SX.sym('y',2,1);
 z = MX.sym('z',3);
 
-
+DM(true)
+SX(true)
 
 
 f = Function('f',{x},{cos(x)})
