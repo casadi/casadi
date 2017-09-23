@@ -49,8 +49,8 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::codegen "[INTERNAL]  Generate code
-the function.
+%feature("docstring") casadi::Blocksqp::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -98,6 +98,11 @@ one line of output to stdout about the current iteration.
 
 %feature("docstring") casadi::Blocksqp::wrap "[INTERNAL]  Wrap in an
 Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::Blocksqp::codegen "[INTERNAL]  Generate code
+the function.
 
 ";
 
@@ -294,11 +299,6 @@ necessary generate, the sparsity of a Jacobian block.
 %feature("docstring") casadi::Blocksqp::Blocksqp "[INTERNAL] ";
 
 %feature("docstring") casadi::Blocksqp::computeNextHessian "[INTERNAL] ";
-
-%feature("docstring") casadi::Blocksqp::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
-
-";
 
 %feature("docstring") casadi::Blocksqp::sz_res "[INTERNAL]  Get required
 length of res field.
@@ -772,11 +772,6 @@ Diagrams
 
 C++ includes: blocksqp.hpp ";
 
-%feature("docstring") casadi::Blocksqp::codegen_declarations "[INTERNAL]
-Generate code for the declarations of the C function.
-
-";
-
 %feature("docstring") casadi::Blocksqp::alloc_arg "[INTERNAL]  Ensure
 required length of arg field.
 
@@ -788,11 +783,6 @@ required length of arg field.
 %feature("docstring") casadi::Blocksqp::solve "[INTERNAL] ";
 
 %feature("docstring") casadi::Blocksqp::kktErrorReduction "[INTERNAL] ";
-
-%feature("docstring") casadi::Blocksqp::getAtomicOperation "[INTERNAL]  Get
-an atomic operation operator index.
-
-";
 
 %feature("docstring") casadi::Blocksqp::codegen_body "[INTERNAL]  Generate
 code for the function body.
@@ -814,6 +804,11 @@ Read options from parameter xml.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Blocksqp::class_name "[INTERNAL]  Readable
 name of the internal class.
 
@@ -828,8 +823,8 @@ factor for chosing forward/reverse mode.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
+%feature("docstring") casadi::Blocksqp::codegen_declarations "[INTERNAL]
+Generate code for the declarations of the C function.
 
 ";
 
@@ -906,6 +901,11 @@ factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::Blocksqp::symbolicAdjSeed "[INTERNAL]
 Symbolic expressions for the adjoint seeds.
 
@@ -913,11 +913,6 @@ Symbolic expressions for the adjoint seeds.
 
 %feature("docstring") casadi::Blocksqp::n_in "[INTERNAL]  Number of
 function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::Blocksqp::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
 
 ";
 
@@ -1018,6 +1013,11 @@ function inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
+
+";
+
 %feature("docstring") casadi::Blocksqp::check_res "[INTERNAL]  Check if
 output arguments have correct length and dimensions.
 
@@ -1055,8 +1055,8 @@ function with a selection of inputs/outputs of the original
 
 ";
 
-%feature("docstring") casadi::Blocksqp::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::Blocksqp::print_option "[INTERNAL]  Print all
+information there is to know about a certain option.
 
 ";
 
@@ -1137,6 +1137,11 @@ scheme index by name.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Blocksqp::oracle "[INTERNAL]  Get oracle.
 
 ";
@@ -1158,11 +1163,6 @@ statistics.
 
 %feature("docstring") casadi::Blocksqp::size_out "[INTERNAL]  Input/output
 dimensions.
-
-";
-
-%feature("docstring") casadi::Blocksqp::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
 
 ";
 
@@ -1365,11 +1365,6 @@ variables (SX)
 ";
 
 %feature("docstring") casadi::Blocksqp::feasibilityRestorationHeuristic "[INTERNAL] ";
-
-%feature("docstring") casadi::Blocksqp::print_option "[INTERNAL]  Print all
-information there is to know about a certain option.
-
-";
 
 %feature("docstring") casadi::Blocksqp::get_sparsity_out "[INTERNAL]
 Sparsities of function inputs and outputs.
@@ -1733,11 +1728,6 @@ necessary generate, the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::BSpline::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::BSpline::self "[INTERNAL]  Get a public class
 instance.
 
@@ -1775,8 +1765,8 @@ order is run after init() has been completed.
 
 ";
 
-%feature("docstring") casadi::BSpline::print_free "[INTERNAL]  Print free
-variables.
+%feature("docstring") casadi::BSpline::free_mem "[INTERNAL]  Free memory
+block.
 
 ";
 
@@ -1797,11 +1787,6 @@ variables ( MX)
 
 %feature("docstring") casadi::BSpline::getJacSparsityGen "[INTERNAL]  Get
 the sparsity pattern, forward mode.
-
-";
-
-%feature("docstring") casadi::BSpline::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
 
 ";
 
@@ -1909,8 +1894,8 @@ sparsity backwards.
 
 ";
 
-%feature("docstring") casadi::BSpline::set_work "[INTERNAL]  Set the
-(persistent) work vectors.
+%feature("docstring") casadi::BSpline::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
 
 ";
 
@@ -1922,11 +1907,6 @@ Is codegen supported?
 
 %feature("docstring") casadi::BSpline::alloc_iw "[INTERNAL]  Ensure
 required length of iw field.
-
-";
-
-%feature("docstring") casadi::BSpline::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
 
 ";
 
@@ -1968,8 +1948,8 @@ length of iw field.
 
 ";
 
-%feature("docstring") casadi::BSpline::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
+%feature("docstring") casadi::BSpline::print_free "[INTERNAL]  Print free
+variables.
 
 ";
 
@@ -2013,6 +1993,11 @@ scheme name by index.
 %feature("docstring") casadi::BSpline::get_n_out "
 
 Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::BSpline::set_work "[INTERNAL]  Set the
+(persistent) work vectors.
 
 ";
 
@@ -2089,11 +2074,6 @@ the functions needed for the Lifted Newton method.
 
 %feature("docstring") casadi::BSpline::alloc_arg "[INTERNAL]  Ensure
 required length of arg field.
-
-";
-
-%feature("docstring") casadi::BSpline::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
 
 ";
 
@@ -2307,8 +2287,23 @@ the function.
 
 ";
 
+%feature("docstring") casadi::BSpline::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::BSpline::name "[INTERNAL]  Name of the
 function.
+
+";
+
+%feature("docstring") casadi::BSpline::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::BSpline::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
 
 ";
 
@@ -2317,8 +2312,8 @@ the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::BSpline::getAtomicOperation "[INTERNAL]  Get
-an atomic operation operator index.
+%feature("docstring") casadi::BSpline::release "[INTERNAL]  Release a
+memory object.
 
 ";
 
@@ -2602,11 +2597,6 @@ Diagrams
 
 C++ includes: bspline.hpp ";
 
-%feature("docstring") casadi::BSpline::free_mem "[INTERNAL]  Free memory
-block.
-
-";
-
 %feature("docstring") casadi::BSpline::alloc_res "[INTERNAL]  Ensure
 required length of res field.
 
@@ -2677,8 +2667,8 @@ dependent function.
 
 ";
 
-%feature("docstring") casadi::BSpline::release "[INTERNAL]  Release a
-memory object.
+%feature("docstring") casadi::BSpline::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -2729,6 +2719,11 @@ Evaluate numerically.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
+
+";
+
+%feature("docstring") casadi::BSplineCommon::instruction_id "[INTERNAL]
+Get an atomic operation operator index.
 
 ";
 
@@ -2796,6 +2791,11 @@ the derivative functions need nondifferentiated outputs?
 
 %feature("docstring") casadi::BSplineCommon::has_sprev "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::BSplineCommon::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -3060,8 +3060,8 @@ Diagrams
 
 C++ includes: bspline.hpp ";
 
-%feature("docstring") casadi::BSplineCommon::getAlgorithmSize "[INTERNAL]
-Get the number of atomic operations.
+%feature("docstring") casadi::BSplineCommon::clear_mem "[INTERNAL]  Clear
+all memory (called from destructor)
 
 ";
 
@@ -3226,13 +3226,13 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::call_forward "[INTERNAL]
-Forward mode AD, virtual functions overloaded in derived classes.
+%feature("docstring") casadi::BSplineCommon::n_instructions "[INTERNAL]
+Get the number of atomic operations.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::getWorkSize "[INTERNAL]  Get
-the length of the work vector.
+%feature("docstring") casadi::BSplineCommon::call_forward "[INTERNAL]
+Forward mode AD, virtual functions overloaded in derived classes.
 
 ";
 
@@ -3322,6 +3322,10 @@ Input/output dimensions.
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::instruction_constant "[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::getJacSparsityHierarchicalSymm
 "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition for symmetric Jacobians
@@ -3370,11 +3374,6 @@ function, templated.
 
 %feature("docstring") casadi::BSplineCommon::name "[INTERNAL]  Name of the
 function.
-
-";
-
-%feature("docstring") casadi::BSplineCommon::getAtomicOutput "[INTERNAL]
-Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -3527,11 +3526,6 @@ reference count.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::clear_mem "[INTERNAL]  Clear
-all memory (called from destructor)
-
-";
-
 %feature("docstring") casadi::BSplineCommon::wrap "[INTERNAL]  Wrap in an
 Function instance consisting of only one MX call.
 
@@ -3554,11 +3548,6 @@ memory block.
 
 %feature("docstring") casadi::BSplineCommon::getJacSparsityGen "[INTERNAL]
 Get the sparsity pattern, forward mode.
-
-";
-
-%feature("docstring") casadi::BSplineCommon::getAtomicInput "[INTERNAL]
-Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -3660,11 +3649,6 @@ Replace 0-by-0 reverse seeds.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::BSplineCommon::call_gen "[INTERNAL]   Call a
 function, overloaded.
 
@@ -3691,6 +3675,11 @@ required length of iw field.
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::has_function "[INTERNAL] ";
 
 %feature("docstring") casadi::BSplineCommon::is_a "[INTERNAL]  Check if the
@@ -3710,11 +3699,6 @@ function input(s) and output(s)
 
 %feature("docstring") casadi::BSplineCommon::all_scalar "[INTERNAL]  Are
 all inputs and outputs scalar.
-
-";
-
-%feature("docstring") casadi::BSplineCommon::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
 
 ";
 
@@ -3812,11 +3796,6 @@ Generate code for the declarations of the C function.
 
 %feature("docstring") casadi::BSplineDual::sz_w "[INTERNAL]  Get required
 length of w field.
-
-";
-
-%feature("docstring") casadi::BSplineDual::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -3918,8 +3897,13 @@ Replace 0-by-0 reverse seeds.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::BSplineDual::instruction_id "[INTERNAL]  Get
+an atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::BSplineDual::n_nodes "[INTERNAL]  Number of
+nodes in the algorithm.
 
 ";
 
@@ -3930,11 +3914,6 @@ input/output elements.
 
 %feature("docstring") casadi::BSplineDual::index_in "[INTERNAL]  Get input
 scheme index by name.
-
-";
-
-%feature("docstring") casadi::BSplineDual::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
 
 ";
 
@@ -4001,11 +3980,6 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::BSplineDual::size1_out "[INTERNAL]
 Input/output dimensions.
 
@@ -4039,6 +4013,11 @@ Destructor.
 
 %feature("docstring") casadi::BSplineDual::eval_name "[INTERNAL]  Get name
 of the evaluation function.
+
+";
+
+%feature("docstring") casadi::BSplineDual::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -4441,15 +4420,15 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::BSplineDual::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::BSplineDual::has_function "[INTERNAL] ";
 
 %feature("docstring") casadi::BSplineDual::size1_in "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::BSplineDual::n_nodes "[INTERNAL]  Number of
-nodes in the algorithm.
 
 ";
 
@@ -4499,11 +4478,6 @@ if input arguments that needs to be replaced.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::BSplineDual::getJacSparsityGen "[INTERNAL]
 Get the sparsity pattern, forward mode.
 
@@ -4511,6 +4485,11 @@ Get the sparsity pattern, forward mode.
 
 %feature("docstring") casadi::BSplineDual::adjViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
+
+";
+
+%feature("docstring") casadi::BSplineDual::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
 
 ";
 
@@ -4569,11 +4548,6 @@ list of options.
 
 %feature("docstring") casadi::BSplineDual::simplified_call "[INTERNAL]  Use
 simplified signature.
-
-";
-
-%feature("docstring") casadi::BSplineDual::getAlgorithmSize "[INTERNAL]
-Get the number of atomic operations.
 
 ";
 
@@ -4645,6 +4619,11 @@ Extract the functions needed for the Lifted Newton method.
 
 %feature("docstring") casadi::BSplineDual::name_out "[INTERNAL]  Get output
 scheme name by index.
+
+";
+
+%feature("docstring") casadi::BSplineDual::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -4873,6 +4852,10 @@ output scheme name by index.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::instruction_input "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::jacobian "[INTERNAL]
 Return Jacobian of all input elements with respect to all output elements.
 
@@ -4898,6 +4881,10 @@ largest input value.
 
 %feature("docstring") casadi::BSplineInterpolant::is_a "[INTERNAL]  Check
 if the function is of a particular type.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::instruction_constant "[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -4934,6 +4921,10 @@ Are all inputs and outputs scalar.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::instruction_id "[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::mx_out "[INTERNAL]  Get
 function input(s) and output(s)
 
@@ -4941,11 +4932,6 @@ function input(s) and output(s)
 
 %feature("docstring") casadi::BSplineInterpolant::check_res "[INTERNAL]
 Check if output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::sz_iw "[INTERNAL]  Get
-required length of iw field.
 
 ";
 
@@ -4999,11 +4985,6 @@ Replace 0-by-0 forward seeds.
 
 %feature("docstring") casadi::BSplineInterpolant::index_out "[INTERNAL]
 Get output scheme index by name.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::getWorkSize "[INTERNAL]
-Get the length of the work vector.
 
 ";
 
@@ -5128,6 +5109,10 @@ Ensure required length of res field.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::n_instructions "[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::get_partition "[INTERNAL]
 Get the unidirectional or bidirectional partition.
 
@@ -5155,10 +5140,6 @@ the reference count.
 
 %feature("docstring") casadi::BSplineInterpolant::eval_dm "[INTERNAL]
 Evaluate with DM matrices.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::getAtomicInputReal "[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -5280,14 +5261,6 @@ an Function instance consisting of only one MX call.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::getAtomicInput "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::getAlgorithmSize "[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::BSplineInterpolant::sz_w "[INTERNAL]  Get
 required length of w field.
 
@@ -5304,6 +5277,10 @@ Number of input/output nonzeros.
 
 %feature("docstring") casadi::BSplineInterpolant::size_out "[INTERNAL]
 Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::instruction_output "[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -5354,10 +5331,6 @@ Replace 0-by-0 reverse seeds.
 
 %feature("docstring") casadi::BSplineInterpolant::get_name_out "[INTERNAL]
 Names of function input and outputs.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::getAtomicOperation "[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -5418,7 +5391,8 @@ input scheme name by index.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::getAtomicOutput "[INTERNAL]  Get the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::BSplineInterpolant::sz_iw "[INTERNAL]  Get
+required length of iw field.
 
 ";
 
@@ -5739,7 +5713,13 @@ Get the sparsity of an input This function is called during construction.
 
 %feature("docstring") casadi::Callback::getWorkSize "
 
-Get the length of the work vector.
+[DEPRECATED] Use sz_w instead
+
+";
+
+%feature("docstring") casadi::Callback::instruction_id "
+
+Identifier index of the instruction ( SXFunction)
 
 ";
 
@@ -5878,13 +5858,19 @@ Export / Generate C code for the function.
 
 %feature("docstring") casadi::Callback::getAtomicInput "
 
-Get the (integer) input arguments of an atomic operation.
+[DEPRECATED] Renamed instruction_index
+
+";
+
+%feature("docstring") casadi::Callback::instruction_input "
+
+Locations in the work vector for the inputs of the instruction ( SXFunction)
 
 ";
 
 %feature("docstring") casadi::Callback::getAtomicInputReal "
 
-Get the floating point output argument of an atomic operation.
+[DEPRECATED] Renamed instruction_constant
 
 ";
 
@@ -5966,7 +5952,13 @@ Destructor.
 
 %feature("docstring") casadi::Callback::getAtomicOutput "
 
-Get the (integer) output argument of an atomic operation.
+[DEPRECATED] Renamed instruction_output
+
+";
+
+%feature("docstring") casadi::Callback::instruction_output "
+
+Location in the work vector for the output of the instruction ( SXFunction)
 
 ";
 
@@ -6057,6 +6049,12 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
+%feature("docstring") casadi::Callback::class_name "
+
+Get class name.
+
+";
+
 %feature("docstring") casadi::Callback::get_str "
 
 Get string representation.
@@ -6081,9 +6079,15 @@ Get output dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::class_name "
+%feature("docstring") casadi::Callback::n_instructions "
 
-Get class name.
+Number of instruction in the algorithm ( SXFunction)
+
+";
+
+%feature("docstring") casadi::Callback::instruction_constant "
+
+Get the floating point output argument of an instruction ( SXFunction)
 
 ";
 
@@ -6204,7 +6208,7 @@ length of w field.
 
 %feature("docstring") casadi::Callback::getAlgorithmSize "
 
-Get the number of atomic operations.
+[DEPRECATED] Renamed n_instructions
 
 ";
 
@@ -6258,7 +6262,7 @@ For a particular input or for all of the inputs
 
 %feature("docstring") casadi::Callback::getAtomicOperation "
 
-Get an atomic operation operator index.
+[DEPRECATED] Renamed instruction_id
 
 ";
 
@@ -6707,11 +6711,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::CentralDiff::has_function "[INTERNAL] ";
 
 %feature("docstring") casadi::CentralDiff::eval_name "[INTERNAL]  Get name
@@ -6847,6 +6846,16 @@ length of arg field.
 
 ";
 
+%feature("docstring") casadi::CentralDiff::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::CentralDiff::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::CentralDiff::get_name_out "[INTERNAL]  Names
 of function input and outputs.
 
@@ -6858,11 +6867,6 @@ of function input and outputs.
 
 %feature("docstring") casadi::CentralDiff::get_name_in "[INTERNAL]  Names
 of function input and outputs.
-
-";
-
-%feature("docstring") casadi::CentralDiff::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
 
 ";
 
@@ -6968,11 +6972,6 @@ memory object.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::CentralDiff::which_depends "[INTERNAL]  Which
 variables enter with some order.
 
@@ -6986,6 +6985,11 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::CentralDiff::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
 
 ";
 
@@ -7044,11 +7048,6 @@ Reverse mode, virtual functions overloaded in derived classes.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::getAlgorithmSize "[INTERNAL]
-Get the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::CentralDiff::get_sparsity_in "[INTERNAL]
 Sparsities of function inputs and outputs.
 
@@ -7071,11 +7070,6 @@ input(s) and output(s)
 
 %feature("docstring") casadi::CentralDiff::has_free "[INTERNAL]  Does the
 function have free variables.
-
-";
-
-%feature("docstring") casadi::CentralDiff::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -7188,6 +7182,11 @@ output arguments have correct length and dimensions.
 
 %feature("docstring") casadi::CentralDiff::sz_work "[INTERNAL]  Get number
 of temporary variables needed.
+
+";
+
+%feature("docstring") casadi::CentralDiff::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -7568,8 +7567,8 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
+%feature("docstring") casadi::CentralDiff::instruction_id "[INTERNAL]  Get
+an atomic operation operator index.
 
 ";
 
@@ -7861,6 +7860,11 @@ Codegen decref for dependencies.
 
 ";
 
+%feature("docstring") casadi::Collocation::instruction_id "[INTERNAL]  Get
+an atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::Collocation::uses_output "[INTERNAL]  Do the
 derivative functions need nondifferentiated outputs?
 
@@ -7951,11 +7955,6 @@ free variables.
 
 ";
 
-%feature("docstring") casadi::Collocation::codegen_meta "[INTERNAL]
-Generate meta-information allowing a user to evaluate a generated function.
-
-";
-
 %feature("docstring") casadi::Collocation::max_in "[INTERNAL]  Get largest
 input value.
 
@@ -8027,11 +8026,6 @@ the unidirectional or bidirectional partition.
 
 ";
 
-%feature("docstring") casadi::Collocation::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Collocation::print_stats "[INTERNAL]  Print
 solver statistics.
 
@@ -8050,6 +8044,11 @@ of function input and outputs.
 
 %feature("docstring") casadi::Collocation::get_n_in "[INTERNAL]  Number of
 function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Collocation::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -8203,6 +8202,11 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
+%feature("docstring") casadi::Collocation::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
+
+";
+
 %feature("docstring") casadi::Collocation::calc_function "[INTERNAL] ";
 
 %feature("docstring") casadi::Collocation::signature "[INTERNAL]  Code
@@ -8232,11 +8236,6 @@ inputs and outputs scalar.
 
 %feature("docstring") casadi::Collocation::generate_lifted "[INTERNAL]
 Extract the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring") casadi::Collocation::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -8312,6 +8311,11 @@ scheme name by index.
 
 %feature("docstring") casadi::Collocation::q "[INTERNAL] ";
 
+%feature("docstring") casadi::Collocation::eval_name "[INTERNAL]  Get name
+of the evaluation function.
+
+";
+
 %feature("docstring") casadi::Collocation::t "[INTERNAL] ";
 
 %feature("docstring") casadi::Collocation::has_free "[INTERNAL]  Does the
@@ -8374,11 +8378,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::Collocation::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
-
-";
-
 %feature("docstring") casadi::Collocation::rx "[INTERNAL] ";
 
 %feature("docstring") casadi::Collocation::rz "[INTERNAL] ";
@@ -8422,8 +8421,8 @@ Create an oracle function
 
 ";
 
-%feature("docstring") casadi::Collocation::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
+%feature("docstring") casadi::Collocation::codegen_meta "[INTERNAL]
+Generate meta-information allowing a user to evaluate a generated function.
 
 ";
 
@@ -8464,8 +8463,8 @@ output arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::Collocation::eval_name "[INTERNAL]  Get name
-of the evaluation function.
+%feature("docstring") casadi::Collocation::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -8520,6 +8519,11 @@ JIT for dependencies.
 
 ";
 
+%feature("docstring") casadi::Collocation::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Collocation::finalize "[INTERNAL]  Finalize
 initialization.
 
@@ -8546,11 +8550,6 @@ Jacobian of all input elements with respect to all output elements.
 ";
 
 %feature("docstring") casadi::Collocation::monitored "[INTERNAL] ";
-
-%feature("docstring") casadi::Collocation::getAlgorithmSize "[INTERNAL]
-Get the number of atomic operations.
-
-";
 
 %feature("docstring") casadi::Collocation "
 
@@ -8683,11 +8682,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Collocation::aug_fwd "[INTERNAL]  Generate a
 augmented DAE system with nfwd forward sensitivities.
-
-";
-
-%feature("docstring") casadi::Collocation::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -8881,6 +8875,11 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::Conic::class_name "[INTERNAL]  Readable name
+of the internal class.
+
+";
+
 %feature("docstring") casadi::Conic::has_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
 
@@ -8906,8 +8905,8 @@ decref for dependencies.
 
 ";
 
-%feature("docstring") casadi::Conic::class_name "[INTERNAL]  Readable name
-of the internal class.
+%feature("docstring") casadi::Conic::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
 
 ";
 
@@ -9104,11 +9103,6 @@ variables ( MX)
 
 ";
 
-%feature("docstring") casadi::Conic::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Conic::weak "[INTERNAL]  Get a weak reference
 to the object.
 
@@ -9197,11 +9191,6 @@ arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::Conic::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::Conic::max_in "[INTERNAL]  Get largest input
 value.
 
@@ -9286,6 +9275,11 @@ input value.
 
 ";
 
+%feature("docstring") casadi::Conic::instruction_input "[INTERNAL]  Get the
+(integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Conic::n_out "[INTERNAL]  Number of function
 inputs and outputs.
 
@@ -9353,6 +9347,11 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Conic::instruction_constant "[INTERNAL]  Get
+the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Conic::numel_out "[INTERNAL]  Number of
 input/output elements.
 
@@ -9365,6 +9364,11 @@ the functions needed for the Lifted Newton method.
 
 %feature("docstring") casadi::Conic::numel_in "[INTERNAL]  Number of
 input/output elements.
+
+";
+
+%feature("docstring") casadi::Conic::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
 
 ";
 
@@ -9397,8 +9401,8 @@ object.
 
 ";
 
-%feature("docstring") casadi::Conic::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
+%feature("docstring") casadi::Conic::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
 
 ";
 
@@ -9442,11 +9446,6 @@ incref for dependencies.
 ";
 
 %feature("docstring") casadi::Conic::factory "[INTERNAL] ";
-
-%feature("docstring") casadi::Conic::getAlgorithmSize "[INTERNAL]  Get the
-number of atomic operations.
-
-";
 
 %feature("docstring") casadi::Conic::get_stats "[INTERNAL]  Get all
 statistics.
@@ -9833,11 +9832,6 @@ block.
 
 ";
 
-%feature("docstring") casadi::Conic::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Conic::wrap "[INTERNAL]  Wrap in an Function
 instance consisting of only one MX call.
 
@@ -9864,11 +9858,6 @@ cached version is available.
 
 %feature("docstring") casadi::Conic::sp_forward "[INTERNAL]  Propagate
 sparsity forward.
-
-";
-
-%feature("docstring") casadi::Conic::getAtomicOperation "[INTERNAL]  Get an
-atomic operation operator index.
 
 ";
 
@@ -10684,16 +10673,6 @@ necessary generate, the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::Dple::getWorkSize "[INTERNAL]  Get the length
-of the work vector.
-
-";
-
-%feature("docstring") casadi::Dple::getAlgorithmSize "[INTERNAL]  Get the
-number of atomic operations.
-
-";
-
 %feature("docstring") casadi::Dple::forward "[INTERNAL]  Return function
 that calculates forward derivatives forward(nfwd) returns a cached instance
 if available, and calls  Function get_forward(int nfwd) if no cached version
@@ -11029,6 +11008,11 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Dple::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::Dple::nnz_out "[INTERNAL]  Number of
 input/output nonzeros.
 
@@ -11316,6 +11300,11 @@ able to propagate seeds through the algorithm?
 
 ";
 
+%feature("docstring") casadi::Dple::instruction_output "[INTERNAL]  Get the
+(integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Dple::eval_mx "[INTERNAL]  Evaluate with
 symbolic matrices.
 
@@ -11351,6 +11340,11 @@ function that calculates nfwd forward derivatives.
 
 ";
 
+%feature("docstring") casadi::Dple::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
+
+";
+
 %feature("docstring") casadi::Dple::codegen_incref "[INTERNAL]  Codegen
 incref for dependencies.
 
@@ -11371,12 +11365,8 @@ outputs.
 
 ";
 
-%feature("docstring") casadi::Dple::memory "[INTERNAL]  Memory objects.
-
-";
-
-%feature("docstring") casadi::Dple::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
+%feature("docstring") casadi::Dple::sz_iw "[INTERNAL]  Get required length
+of iw field.
 
 ";
 
@@ -11394,16 +11384,6 @@ for the function body.
 
 %feature("docstring") casadi::Dple::numel_in "[INTERNAL]  Number of
 input/output elements.
-
-";
-
-%feature("docstring") casadi::Dple::getAtomicInputReal "[INTERNAL]  Get the
-floating point output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::Dple::class_name "[INTERNAL]  Readable name
-of the internal class.
 
 ";
 
@@ -11467,6 +11447,15 @@ input/output elements.
 
 ";
 
+%feature("docstring") casadi::Dple::instruction_input "[INTERNAL]  Get the
+(integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Dple::memory "[INTERNAL]  Memory objects.
+
+";
+
 %feature("docstring") casadi::Dple::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
 if available, and calls  Function get_reverse(int nadj) if no cached version
@@ -11490,8 +11479,8 @@ recognition.
 
 ";
 
-%feature("docstring") casadi::Dple::sz_iw "[INTERNAL]  Get required length
-of iw field.
+%feature("docstring") casadi::Dple::instruction_constant "[INTERNAL]  Get
+the floating point output argument of an atomic operation.
 
 ";
 
@@ -11507,11 +11496,6 @@ function input and outputs.
 
 %feature("docstring") casadi::Dple::codegen "[INTERNAL]  Generate code the
 function.
-
-";
-
-%feature("docstring") casadi::Dple::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
 
 ";
 
@@ -11603,8 +11587,8 @@ able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::Dple::getAtomicOperation "[INTERNAL]  Get an
-atomic operation operator index.
+%feature("docstring") casadi::Dple::class_name "[INTERNAL]  Readable name
+of the internal class.
 
 ";
 
@@ -11748,8 +11732,8 @@ length of w field.
 
 %feature("docstring") casadi::Expm::factory "[INTERNAL] ";
 
-%feature("docstring") casadi::Expm::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
+%feature("docstring") casadi::Expm::sz_res "[INTERNAL]  Get required length
+of res field.
 
 ";
 
@@ -11773,8 +11757,7 @@ long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::Expm::getAtomicInputReal "[INTERNAL]  Get the
-floating point output argument of an atomic operation.
+%feature("docstring") casadi::Expm::disp_more "[INTERNAL]  Print more.
 
 ";
 
@@ -11820,8 +11803,8 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Expm::class_name "[INTERNAL]  Readable name
-of the internal class.
+%feature("docstring") casadi::Expm::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
 
 ";
 
@@ -11865,11 +11848,6 @@ for chosing forward/reverse mode, sparsity propagation.
 
 %feature("docstring") casadi::Expm::name_out "[INTERNAL]  Get output scheme
 name by index.
-
-";
-
-%feature("docstring") casadi::Expm::getAlgorithmSize "[INTERNAL]  Get the
-number of atomic operations.
 
 ";
 
@@ -12014,8 +11992,8 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Expm::sz_res "[INTERNAL]  Get required length
-of res field.
+%feature("docstring") casadi::Expm::instruction_output "[INTERNAL]  Get the
+(integer) output argument of an atomic operation.
 
 ";
 
@@ -12102,11 +12080,6 @@ length of arg field.
 
 ";
 
-%feature("docstring") casadi::Expm::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Expm::fwd_seed "[INTERNAL]  Symbolic
 expressions for the forward seeds.
 
@@ -12124,6 +12097,11 @@ Sparsities of function inputs and outputs.
 
 %feature("docstring") casadi::Expm::default_in "[INTERNAL]  Get default
 input value.
+
+";
+
+%feature("docstring") casadi::Expm::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
 
 ";
 
@@ -12154,6 +12132,11 @@ able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::Expm::checkout "[INTERNAL]  Checkout a memory
 object.
+
+";
+
+%feature("docstring") casadi::Expm::instruction_constant "[INTERNAL]  Get
+the floating point output argument of an atomic operation.
 
 ";
 
@@ -12514,10 +12497,6 @@ overloaded.
 
 ";
 
-%feature("docstring") casadi::Expm::disp_more "[INTERNAL]  Print more.
-
-";
-
 %feature("docstring") casadi::Expm::generate_dependencies "[INTERNAL]
 Export / Generate C code for the dependency function.
 
@@ -12525,6 +12504,11 @@ Export / Generate C code for the dependency function.
 
 %feature("docstring") casadi::Expm::get_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::Expm::instruction_input "[INTERNAL]  Get the
+(integer) input arguments of an atomic operation.
 
 ";
 
@@ -12565,11 +12549,6 @@ arguments have correct length and dimensions.
 
 %feature("docstring") casadi::Expm::symbolicAdjSeed "[INTERNAL]  Symbolic
 expressions for the adjoint seeds.
-
-";
-
-%feature("docstring") casadi::Expm::getAtomicOperation "[INTERNAL]  Get an
-atomic operation operator index.
 
 ";
 
@@ -12703,17 +12682,17 @@ function with a selection of inputs/outputs of the original
 
 ";
 
+%feature("docstring") casadi::Expm::class_name "[INTERNAL]  Readable name
+of the internal class.
+
+";
+
 %feature("docstring") casadi::Expm::sparsity_jac "[INTERNAL]  Get, if
 necessary generate, the sparsity of a Jacobian block.
 
 ";
 
 %feature("docstring") casadi::Expm::memory "[INTERNAL]  Memory objects.
-
-";
-
-%feature("docstring") casadi::Expm::getWorkSize "[INTERNAL]  Get the length
-of the work vector.
 
 ";
 
@@ -12794,6 +12773,11 @@ templated.
 
 ";
 
+%feature("docstring") casadi::External::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::External::call_forward "[INTERNAL]  Forward
 mode AD, virtual functions overloaded in derived classes.
 
@@ -12808,8 +12792,13 @@ name.
 
 ";
 
-%feature("docstring") casadi::External::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
+%feature("docstring") casadi::External::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::External::signature "[INTERNAL]  Code
+generate the function.
 
 ";
 
@@ -12946,16 +12935,6 @@ function have free variables.
 
 ";
 
-%feature("docstring") casadi::External::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring") casadi::External::weak "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
 %feature("docstring") casadi::External::symbolicAdjSeed "[INTERNAL]
 Symbolic expressions for the adjoint seeds.
 
@@ -12966,8 +12945,8 @@ required length of w field.
 
 ";
 
-%feature("docstring") casadi::External::getAtomicOperation "[INTERNAL]  Get
-an atomic operation operator index.
+%feature("docstring") casadi::External::weak "[INTERNAL]  Get a weak
+reference to the object.
 
 ";
 
@@ -12982,11 +12961,6 @@ input(s) and output(s)
 ";
 
 %feature("docstring") casadi::External::External "[INTERNAL]  Constructor.
-
-";
-
-%feature("docstring") casadi::External::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
 
 ";
 
@@ -13034,8 +13008,8 @@ Generate code for the declarations of the C function.
 
 ";
 
-%feature("docstring") casadi::External::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
+%feature("docstring") casadi::External::has_codegen "[INTERNAL]  Is codegen
+supported?
 
 ";
 
@@ -13137,6 +13111,16 @@ necessary generate, the sparsity of a Jacobian block.
 
 %feature("docstring") casadi::External::n_nodes "[INTERNAL]  Number of
 nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::External::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::External::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
 
 ";
 
@@ -13259,11 +13243,6 @@ mode derivatives.
 
 ";
 
-%feature("docstring") casadi::External::has_codegen "[INTERNAL]  Is codegen
-supported?
-
-";
-
 %feature("docstring") casadi::External::mx_in "[INTERNAL]  Get function
 input(s) and output(s)
 
@@ -13337,11 +13316,6 @@ dependencies.
 
 %feature("docstring") casadi::External::nnz_out "[INTERNAL]  Number of
 input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::External::signature "[INTERNAL]  Code
-generate the function.
 
 ";
 
@@ -13471,8 +13445,8 @@ symbolic scalars.
 
 ";
 
-%feature("docstring") casadi::External::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::External::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
 
 ";
 
@@ -13539,11 +13513,6 @@ Export / Generate C code for the dependency function.
 
 %feature("docstring") casadi::FiniteDiff::alloc "[INTERNAL]  Ensure work
 vectors long enough to evaluate function.
-
-";
-
-%feature("docstring") casadi::FiniteDiff::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
 
 ";
 
@@ -13841,6 +13810,11 @@ function.
 
 ";
 
+%feature("docstring") casadi::FiniteDiff::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::FiniteDiff::generate_lifted "[INTERNAL]
 Extract the functions needed for the Lifted Newton method.
 
@@ -13876,8 +13850,8 @@ required length of arg field.
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
+%feature("docstring") casadi::FiniteDiff::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
 
 ";
 
@@ -13939,6 +13913,11 @@ default input value.
 
 ";
 
+%feature("docstring") casadi::FiniteDiff::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
 %feature("docstring") casadi::FiniteDiff::eval_gen "
 
 >  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
@@ -13994,11 +13973,6 @@ with DM matrices.
 
 %feature("docstring") casadi::FiniteDiff::alloc_w "[INTERNAL]  Ensure
 required length of w field.
-
-";
-
-%feature("docstring") casadi::FiniteDiff::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
 
 ";
 
@@ -14107,11 +14081,6 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::codegen "[INTERNAL]  Generate
-code the function.
-
-";
-
 %feature("docstring") casadi::FiniteDiff::matching_arg "[INTERNAL]  Check
 if input arguments that needs to be replaced.
 
@@ -14164,6 +14133,11 @@ Function instance consisting of only one MX call.
 
 %feature("docstring") casadi::FiniteDiff::codegen_name "[INTERNAL]  Get
 name in codegen.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::instruction_id "[INTERNAL]  Get
+an atomic operation operator index.
 
 ";
 
@@ -14302,8 +14276,8 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::disp_more "[INTERNAL]  Print
-more.
+%feature("docstring") casadi::FiniteDiff::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -14347,8 +14321,8 @@ derivatives be calculated in any way?
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
+%feature("docstring") casadi::FiniteDiff::codegen "[INTERNAL]  Generate
+code the function.
 
 ";
 
@@ -14420,18 +14394,8 @@ Generate meta-information allowing a user to evaluate a generated function.
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::FiniteDiff::mapsum_mx "[INTERNAL]  Parallel
 evaluation.
-
-";
-
-%feature("docstring") casadi::FiniteDiff::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
 
 ";
 
@@ -14492,8 +14456,13 @@ variables (SX)
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::sp_reverse "[INTERNAL]  Propagate
-sparsity backwards.
+%feature("docstring") casadi::FiniteDiff::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::disp_more "[INTERNAL]  Print
+more.
 
 ";
 
@@ -14660,6 +14629,10 @@ Print free variables.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::instruction_constant "[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::get_name_in "[INTERNAL]
 Names of function input and outputs.
 
@@ -14705,11 +14678,15 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::getAlgorithmSize "[INTERNAL]  Get the number of atomic operations.
+%feature("docstring") casadi::FixedStepIntegrator::get_partition "[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
 %feature("docstring") casadi::FixedStepIntegrator::expand "[INTERNAL] ";
+
+%feature("docstring") casadi::FixedStepIntegrator::n_instructions "[INTERNAL]  Get the number of atomic operations.
+
+";
 
 %feature("docstring") casadi::FixedStepIntegrator::default_in "[INTERNAL]
 Get default input value.
@@ -14793,10 +14770,6 @@ Calculate derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::getAtomicOutput "[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::call "[INTERNAL]   Call
 a function, templated.
 
@@ -14808,10 +14781,6 @@ Check if input arguments have correct length and dimensions.
 ";
 
 %feature("docstring") casadi::FixedStepIntegrator::add_dependency "[INTERNAL]  Add a dependent function.
-
-";
-
-%feature("docstring") casadi::FixedStepIntegrator::getAtomicOperation "[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -14863,7 +14832,7 @@ Ensure required length of w field.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::getAtomicInput "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+%feature("docstring") casadi::FixedStepIntegrator::instruction_input "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -15161,6 +15130,10 @@ Generate a augmented DAE system with nadj adjoint sensitivities.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::instruction_id "[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::free_mem "[INTERNAL]
 Free memory block.
 
@@ -15319,10 +15292,6 @@ Generate meta-information allowing a user to evaluate a generated function.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::get_partition "[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::codegen_body "[INTERNAL]
 Generate code for the function body.
 
@@ -15363,12 +15332,12 @@ Symbolic expressions for the forward seeds.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::clear_mem "[INTERNAL]
-Clear all memory (called from destructor)
+%feature("docstring") casadi::FixedStepIntegrator::instruction_output "[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::getAtomicInputReal "[INTERNAL]  Get the floating point output argument of an atomic operation.
+%feature("docstring") casadi::FixedStepIntegrator::clear_mem "[INTERNAL]
+Clear all memory (called from destructor)
 
 ";
 
@@ -15500,11 +15469,6 @@ Create memory block.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::getWorkSize "[INTERNAL]
-Get the length of the work vector.
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::max_in "[INTERNAL]  Get
 largest input value.
 
@@ -15605,6 +15569,11 @@ length of w field.
 
 ";
 
+%feature("docstring") casadi::ForwardDiff::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::ForwardDiff::all_scalar "[INTERNAL]  Are all
 inputs and outputs scalar.
 
@@ -15662,11 +15631,6 @@ Replace 0-by-0 forward seeds.
 
 %feature("docstring") casadi::ForwardDiff::n_nodes "[INTERNAL]  Number of
 nodes in the algorithm.
-
-";
-
-%feature("docstring") casadi::ForwardDiff::getAlgorithmSize "[INTERNAL]
-Get the number of atomic operations.
 
 ";
 
@@ -16092,11 +16056,6 @@ function with a selection of inputs/outputs of the original
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::ForwardDiff::checkout "[INTERNAL]  Checkout a
 memory object.
 
@@ -16135,11 +16094,6 @@ Symbolic expressions for the adjoint seeds.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
-
-";
-
 %feature("docstring") casadi::ForwardDiff::size2_in "[INTERNAL]
 Input/output dimensions.
 
@@ -16160,8 +16114,8 @@ Function instance consisting of only one MX call.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::ForwardDiff::sz_iw "[INTERNAL]  Get required
+length of iw field.
 
 ";
 
@@ -16197,18 +16151,13 @@ Obtain solver name from Adaptor.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::ForwardDiff::n_in "[INTERNAL]  Number of
 function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::sz_iw "[INTERNAL]  Get required
-length of iw field.
+%feature("docstring") casadi::ForwardDiff::instruction_id "[INTERNAL]  Get
+an atomic operation operator index.
 
 ";
 
@@ -16266,8 +16215,8 @@ numerically.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
+%feature("docstring") casadi::ForwardDiff::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -16326,6 +16275,10 @@ Reverse mode, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::ForwardDiff::alloc "[INTERNAL]  Ensure work
 vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::generate_dependencies "[INTERNAL]  Export / Generate C code for the dependency function.
 
 ";
 
@@ -16405,6 +16358,11 @@ class instance.
 
 ";
 
+%feature("docstring") casadi::ForwardDiff::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
+
+";
+
 %feature("docstring") casadi::ForwardDiff::eval_sx "[INTERNAL]  Evaluate
 with symbolic scalars.
 
@@ -16427,7 +16385,8 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::generate_dependencies "[INTERNAL]  Export / Generate C code for the dependency function.
+%feature("docstring") casadi::ForwardDiff::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -16627,6 +16586,12 @@ C++ includes: timing.hpp ";
 
 
 // File: classcasadi_1_1Function.xml
+%feature("docstring") casadi::Function::n_instructions "
+
+Number of instruction in the algorithm ( SXFunction)
+
+";
+
 %feature("docstring") casadi::Function::nnz_in "
 
 Get number of input nonzeros.
@@ -16672,6 +16637,18 @@ Get oracle.
 
 ";
 
+%feature("docstring") casadi::Function::instruction_id "
+
+Identifier index of the instruction ( SXFunction)
+
+";
+
+%feature("docstring") casadi::Function::instruction_output "
+
+Location in the work vector for the output of the instruction ( SXFunction)
+
+";
+
 %feature("docstring") casadi::Function::wrap "
 
 Wrap in an Function instance consisting of only one MX call.
@@ -16680,7 +16657,7 @@ Wrap in an Function instance consisting of only one MX call.
 
 %feature("docstring") casadi::Function::getAtomicOperation "
 
-Get an atomic operation operator index.
+[DEPRECATED] Renamed instruction_id
 
 ";
 
@@ -16692,7 +16669,7 @@ Get an atomic operation operator index.
 
 %feature("docstring") casadi::Function::getAlgorithmSize "
 
-Get the number of atomic operations.
+[DEPRECATED] Renamed n_instructions
 
 ";
 
@@ -16716,10 +16693,9 @@ Get string representation.
 
 ";
 
-%feature("docstring") casadi::Function::__hash__ "
+%feature("docstring") casadi::Function::disp "
 
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
+Print a description of the object.
 
 ";
 
@@ -16881,7 +16857,7 @@ Get the number of function outputs.
 
 %feature("docstring") casadi::Function::getAtomicInput "
 
-Get the (integer) input arguments of an atomic operation.
+[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -16916,9 +16892,10 @@ Destructor
 
 ";
 
-%feature("docstring") casadi::Function::disp "
+%feature("docstring") casadi::Function::__hash__ "
 
-Print a description of the object.
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -16947,6 +16924,12 @@ Get output dimension.
 %feature("docstring") casadi::Function::class_name "
 
 Get class name.
+
+";
+
+%feature("docstring") casadi::Function::instruction_input "
+
+Locations in the work vector for the inputs of the instruction ( SXFunction)
 
 ";
 
@@ -17089,9 +17072,9 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Function::n_nodes "
+%feature("docstring") casadi::Function::getAtomicOutput "
 
-Number of nodes in the algorithm.
+[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -17402,7 +17385,7 @@ Print free variables.
 
 %feature("docstring") casadi::Function::getAtomicInputReal "
 
-Get the floating point output argument of an atomic operation.
+[DEPRECATED] Renamed instruction_constant
 
 ";
 
@@ -17424,9 +17407,9 @@ Assert that an input dimension is equal so some given value.
 
 ";
 
-%feature("docstring") casadi::Function::getAtomicOutput "
+%feature("docstring") casadi::Function::n_nodes "
 
-Get the (integer) output argument of an atomic operation.
+Number of nodes in the algorithm.
 
 ";
 
@@ -17512,7 +17495,7 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::Function::getWorkSize "
 
-Get the length of the work vector.
+[DEPRECATED] Use sz_w instead
 
 ";
 
@@ -17551,6 +17534,12 @@ Get input dimension.
 %feature("docstring") casadi::Function::has_sprev "
 
 Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::Function::instruction_constant "
+
+Get the floating point output argument of an instruction ( SXFunction)
 
 ";
 
@@ -17720,7 +17709,7 @@ Forward mode derivatives.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::getAtomicOperation "[INTERNAL]  Get an atomic operation operator index.
+%feature("docstring") casadi::GenericExternal::disp "[INTERNAL]  Print.
 
 ";
 
@@ -17746,11 +17735,6 @@ oracle.
 
 %feature("docstring") casadi::GenericExternal::index_out "[INTERNAL]  Get
 output scheme index by name.
-
-";
-
-%feature("docstring") casadi::GenericExternal::sz_arg "[INTERNAL]  Get
-required length of arg field.
 
 ";
 
@@ -17807,11 +17791,6 @@ Forward mode AD, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::GenericExternal::numel_in "[INTERNAL]  Number
 of input/output elements.
-
-";
-
-%feature("docstring") casadi::GenericExternal::getAtomicOutput "[INTERNAL]
-Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -17919,18 +17898,8 @@ Add a dependent function.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::getWorkSize "[INTERNAL]  Get
-the length of the work vector.
-
-";
-
-%feature("docstring") casadi::GenericExternal::getAlgorithmSize "[INTERNAL]
-Get the number of atomic operations.
-
-";
-
-%feature("docstring") casadi::GenericExternal::alloc_iw "[INTERNAL]  Ensure
-required length of iw field.
+%feature("docstring") casadi::GenericExternal::instruction_id "[INTERNAL]
+Get an atomic operation operator index.
 
 ";
 
@@ -17981,10 +17950,6 @@ Replace 0-by-0 outputs.
 
 %feature("docstring") casadi::GenericExternal::size1_in "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::GenericExternal::getAtomicInputReal "[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -18057,8 +18022,7 @@ Get sparsity of a given output.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::weak "[INTERNAL]  Get a weak
-reference to the object.
+%feature("docstring") casadi::GenericExternal::instruction_input "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -18076,6 +18040,11 @@ cached version is available.
 
 %feature("docstring") casadi::GenericExternal::get_partition "[INTERNAL]
 Get the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::GenericExternal::n_instructions "[INTERNAL]
+Get the number of atomic operations.
 
 ";
 
@@ -18146,11 +18115,6 @@ public class instance.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::getAtomicInput "[INTERNAL]
-Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::GenericExternal::get_stats "[INTERNAL]  Get
 all statistics.
 
@@ -18198,6 +18162,11 @@ input scheme name by index.
 
 %feature("docstring") casadi::GenericExternal::size1_out "[INTERNAL]
 Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::GenericExternal::alloc_iw "[INTERNAL]  Ensure
+required length of iw field.
 
 ";
 
@@ -18280,6 +18249,11 @@ Get, if necessary generate, the sparsity of a Jacobian block.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::set_temp "[INTERNAL]  Set
+the (temporary) work vectors.
+
+";
+
 %feature("docstring") casadi::GenericExternal::sparsity_in "
 
 >  const Sparsity& casadi::FunctionInternal::sparsity_in(int ind) const 
@@ -18314,6 +18288,10 @@ Retreive sparsities.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::instruction_output "[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::GenericExternal::sp_forward "[INTERNAL]
 Propagate sparsity forward.
 
@@ -18343,13 +18321,17 @@ Check if input arguments that needs to be replaced.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::weak "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
 %feature("docstring") casadi::GenericExternal::size2_out "[INTERNAL]
 Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::set_temp "[INTERNAL]  Set
-the (temporary) work vectors.
+%feature("docstring") casadi::GenericExternal::instruction_constant "[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -18358,7 +18340,8 @@ Initialize.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::disp "[INTERNAL]  Print.
+%feature("docstring") casadi::GenericExternal::sz_arg "[INTERNAL]  Get
+required length of arg field.
 
 ";
 
@@ -19189,12 +19172,6 @@ C++ includes: global_options.hpp ";
 
 ";
 
-%feature("docstring")
-casadi::ImplicitFixedStepIntegrator::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::set_work "[INTERNAL]  Set the (persistent) work vectors.
 
 ";
@@ -19326,12 +19303,6 @@ elements.
 
 ";
 
-%feature("docstring")
-casadi::ImplicitFixedStepIntegrator::getAtomicOperation "[INTERNAL]  Get an
-atomic operation operator index.
-
-";
-
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::get_sparsity_in "[INTERNAL]  Sparsities of function inputs and outputs.
 
 ";
@@ -19375,11 +19346,13 @@ Call a function, templated.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::print_options "[INTERNAL]  Print list of options.
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::size1_in "[INTERNAL]  Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::size1_in "[INTERNAL]  Input/output dimensions.
+%feature("docstring")
+casadi::ImplicitFixedStepIntegrator::instruction_constant "[INTERNAL]  Get
+the floating point output argument of an atomic operation.
 
 ";
 
@@ -19561,8 +19534,9 @@ original
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::getAlgorithmSize
-"[INTERNAL]  Get the number of atomic operations.
+%feature("docstring")
+casadi::ImplicitFixedStepIntegrator::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
 
 ";
 
@@ -19638,6 +19612,10 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::n_instructions "[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::get_sparsity_out
 "[INTERNAL]  Sparsities of function inputs and outputs.
 
@@ -19647,7 +19625,7 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::getWorkSize "[INTERNAL]  Get the length of the work vector.
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::n_nodes "[INTERNAL]  Number of nodes in the algorithm.
 
 ";
 
@@ -19680,7 +19658,8 @@ Wrap in an Function instance consisting of only one MX call.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::getAtomicOutput "[INTERNAL]  Get the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::instruction_input
+"[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -19825,13 +19804,11 @@ Get a public class instance.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::n_nodes "[INTERNAL]  Number of nodes in the algorithm.
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::print_options "[INTERNAL]  Print list of options.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::getAtomicInput "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::plugin_name "[INTERNAL] ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::eval "[INTERNAL]
 evaluate
@@ -19951,12 +19928,14 @@ Name of the function.
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::rx "[INTERNAL]
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::instruction_id "[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::call_forward "[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
 classes.
 
 ";
-
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::plugin_name "[INTERNAL] ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::size_out "[INTERNAL]  Input/output dimensions.
 
@@ -20089,11 +20068,6 @@ Check if output arguments that needs to be replaced.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::getAlgorithmSize "[INTERNAL]
-Get the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::ImplicitToNlp::sx_in "[INTERNAL]  Get
 function input(s) and output(s)
 
@@ -20142,11 +20116,6 @@ class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::ImplicitToNlp::replace_fseed "[INTERNAL]
 Replace 0-by-0 forward seeds.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
 
 ";
 
@@ -20342,8 +20311,8 @@ Generate a function that calculates nadj adjoint derivatives.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::codegen_name "[INTERNAL]  Get
-name in codegen.
+%feature("docstring") casadi::ImplicitToNlp::codegen_body "[INTERNAL]
+Generate code for the function body.
 
 ";
 
@@ -20491,11 +20460,6 @@ Generate a function that calculates nfwd forward derivatives.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::getAtomicInput "[INTERNAL]
-Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::ImplicitToNlp::numel_out "[INTERNAL]  Number
 of input/output elements.
 
@@ -20611,13 +20575,13 @@ work vectors.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::codegen_body "[INTERNAL]
-Generate code for the function body.
+%feature("docstring") casadi::ImplicitToNlp::instruction_id "[INTERNAL]
+Get an atomic operation operator index.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
+%feature("docstring") casadi::ImplicitToNlp::codegen_name "[INTERNAL]  Get
+name in codegen.
 
 ";
 
@@ -20628,11 +20592,6 @@ numerically.
 
 %feature("docstring") casadi::ImplicitToNlp::eval_dm "[INTERNAL]  Evaluate
 with DM matrices.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::print_dimensions "[INTERNAL]
-Print dimensions of inputs and outputs.
 
 ";
 
@@ -20661,8 +20620,8 @@ Replace 0-by-0 reverse seeds.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::getAtomicOutput "[INTERNAL]
-Get the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::ImplicitToNlp::print_dimensions "[INTERNAL]
+Print dimensions of inputs and outputs.
 
 ";
 
@@ -20692,11 +20651,6 @@ if input arguments have correct length and dimensions.
 ";
 
 %feature("docstring") casadi::ImplicitToNlp::has_function "[INTERNAL] ";
-
-%feature("docstring") casadi::ImplicitToNlp::getWorkSize "[INTERNAL]  Get
-the length of the work vector.
-
-";
 
 %feature("docstring") casadi::ImplicitToNlp::clear_mem "[INTERNAL]  Clear
 all memory (called from destructor)
@@ -20759,6 +20713,11 @@ initialization.
 
 %feature("docstring") casadi::ImplicitToNlp::alloc_iw "[INTERNAL]  Ensure
 required length of iw field.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -20846,6 +20805,11 @@ Function instance consisting of only one MX call.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::n_instructions "[INTERNAL]
+Get the number of atomic operations.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::has_free "[INTERNAL]  Does the
 function have free variables.
 
@@ -20861,6 +20825,10 @@ Names of function input and outputs.
 ";
 
 %feature("docstring") casadi::ImplicitToNlp::expand "[INTERNAL] ";
+
+%feature("docstring") casadi::ImplicitToNlp::instruction_constant "[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
 
 %feature("docstring") casadi::ImplicitToNlp::get_stats "[INTERNAL]  Get all
 statistics.
@@ -20879,6 +20847,11 @@ of input/output elements.
 
 %feature("docstring") casadi::ImplicitToNlp::adjViaJac "[INTERNAL]
 Calculate derivatives by multiplying the full Jacobian and multiplying.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -21217,11 +21190,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Integrator::factory "[INTERNAL] ";
 
-%feature("docstring") casadi::Integrator::print_option "[INTERNAL]  Print
-all information there is to know about a certain option.
-
-";
-
 %feature("docstring") casadi::Integrator::size1_in "[INTERNAL]
 Input/output dimensions.
 
@@ -21289,6 +21257,11 @@ input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::Integrator::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
+
+";
+
 %feature("docstring") casadi::Integrator::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
 instance if available, and calls  Function get_reverse(int nadj) if no
@@ -21336,6 +21309,11 @@ function, templated.
 
 ";
 
+%feature("docstring") casadi::Integrator::alloc_w "[INTERNAL]  Ensure
+required length of w field.
+
+";
+
 %feature("docstring") casadi::Integrator::init_mem "[INTERNAL]  Initalize
 memory block.
 
@@ -21351,8 +21329,8 @@ input arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::Integrator::alloc_w "[INTERNAL]  Ensure
-required length of w field.
+%feature("docstring") casadi::Integrator::instruction_id "[INTERNAL]  Get
+an atomic operation operator index.
 
 ";
 
@@ -21436,8 +21414,8 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Integrator::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
+%feature("docstring") casadi::Integrator::codegen_incref "[INTERNAL]
+Codegen incref for dependencies.
 
 ";
 
@@ -21579,23 +21557,23 @@ statistics.
 
 ";
 
-%feature("docstring") casadi::Integrator::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
-
-";
-
 %feature("docstring") casadi::Integrator::getAdaptorSolverName "[INTERNAL]
 Obtain solver name from Adaptor.
 
 ";
 
-%feature("docstring") casadi::Integrator::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::Integrator::set_temp "[INTERNAL]  Set the
+work vectors.
 
 ";
 
-%feature("docstring") casadi::Integrator::set_temp "[INTERNAL]  Set the
-work vectors.
+%feature("docstring") casadi::Integrator::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Integrator::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -21705,11 +21683,6 @@ Print dimensions of inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Integrator::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::Integrator::fwd_seed "[INTERNAL]  Symbolic
 expressions for the forward seeds.
 
@@ -21722,11 +21695,6 @@ Prepares the function for evaluation.
 
 %feature("docstring") casadi::Integrator::memory "[INTERNAL]  Memory
 objects.
-
-";
-
-%feature("docstring") casadi::Integrator::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -21771,6 +21739,11 @@ generate the function.
 
 ";
 
+%feature("docstring") casadi::Integrator::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Integrator::replace_fseed "[INTERNAL]
 Replace 0-by-0 forward seeds.
 
@@ -21810,8 +21783,8 @@ Destructor.
 
 ";
 
-%feature("docstring") casadi::Integrator::codegen_incref "[INTERNAL]
-Codegen incref for dependencies.
+%feature("docstring") casadi::Integrator::print_option "[INTERNAL]  Print
+all information there is to know about a certain option.
 
 ";
 
@@ -21984,11 +21957,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::Integrator::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::Integrator::which_depends "[INTERNAL]  Which
 variables enter with some order.
 
@@ -22095,11 +22063,6 @@ sparsity forward.
 
 
 // File: classcasadi_1_1Interpolant.xml
-%feature("docstring") casadi::Interpolant::getAlgorithmSize "[INTERNAL]
-Get the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::Interpolant::fwdViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
 
@@ -22136,8 +22099,8 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::Interpolant::init_mem "[INTERNAL]  Initalize
-memory block.
+%feature("docstring") casadi::Interpolant::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -22222,11 +22185,6 @@ reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring") casadi::Interpolant::print_dimensions "[INTERNAL]
-Print dimensions of inputs and outputs.
-
-";
-
 %feature("docstring") casadi::Interpolant::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
 instance if available, and calls  Function get_reverse(int nadj) if no
@@ -22306,8 +22264,8 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::Interpolant::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
+%feature("docstring") casadi::Interpolant::weak "[INTERNAL]  Get a weak
+reference to the object.
 
 ";
 
@@ -22325,11 +22283,6 @@ cached version is available.
 
 %feature("docstring") casadi::Interpolant::nnz_in "[INTERNAL]  Number of
 input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::Interpolant::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -22390,6 +22343,11 @@ input/output nonzeros.
 
 ";
 
+%feature("docstring") casadi::Interpolant::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
+
+";
+
 %feature("docstring") casadi::Interpolant::sp_forward "[INTERNAL]
 Propagate sparsity forward.
 
@@ -22447,6 +22405,11 @@ Replace 0-by-0 forward seeds.
 
 ";
 
+%feature("docstring") casadi::Interpolant::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Interpolant::size2_in "[INTERNAL]
 Input/output dimensions.
 
@@ -22457,11 +22420,6 @@ code the function.
 
 ";
 
-%feature("docstring") casadi::Interpolant::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::Interpolant::set_work "[INTERNAL]  Set the
 (persistent) work vectors.
 
@@ -22469,11 +22427,6 @@ length of the work vector.
 
 %feature("docstring") casadi::Interpolant::n_in "[INTERNAL]  Number of
 function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::Interpolant::weak "[INTERNAL]  Get a weak
-reference to the object.
 
 ";
 
@@ -22499,8 +22452,18 @@ generate the function.
 
 ";
 
+%feature("docstring") casadi::Interpolant::alloc_w "[INTERNAL]  Ensure
+required length of w field.
+
+";
+
 %feature("docstring") casadi::Interpolant::sparsity_jac "[INTERNAL]  Get,
 if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::Interpolant::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -22546,8 +22509,8 @@ required length of iw field.
 
 ";
 
-%feature("docstring") casadi::Interpolant::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
+%feature("docstring") casadi::Interpolant::free_mem "[INTERNAL]  Free
+memory block.
 
 ";
 
@@ -22614,11 +22577,6 @@ Input/output dimensions.
 function that calculates forward derivatives forward(nfwd) returns a cached
 instance if available, and calls  Function get_forward(int nfwd) if no
 cached version is available.
-
-";
-
-%feature("docstring") casadi::Interpolant::free_mem "[INTERNAL]  Free
-memory block.
 
 ";
 
@@ -22757,6 +22715,11 @@ Symbolic expressions for the adjoint seeds.
 
 ";
 
+%feature("docstring") casadi::Interpolant::init_mem "[INTERNAL]  Initalize
+memory block.
+
+";
+
 %feature("docstring") casadi::Interpolant::definition "[INTERNAL]  Get
 function signature: name:(inputs)->(outputs)
 
@@ -22782,8 +22745,8 @@ statistics.
 
 ";
 
-%feature("docstring") casadi::Interpolant::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::Interpolant::print_dimensions "[INTERNAL]
+Print dimensions of inputs and outputs.
 
 ";
 
@@ -22801,8 +22764,8 @@ with symbolic scalars.
 
 ";
 
-%feature("docstring") casadi::Interpolant::alloc_w "[INTERNAL]  Ensure
-required length of w field.
+%feature("docstring") casadi::Interpolant::instruction_id "[INTERNAL]  Get
+an atomic operation operator index.
 
 ";
 
@@ -23053,13 +23016,13 @@ unidirectional or bidirectional partition.
 
 ";
 
-%feature("docstring") casadi::Jit::sp_forward "[INTERNAL]  Propagate
-sparsity forward.
+%feature("docstring") casadi::Jit::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
 
 ";
 
-%feature("docstring") casadi::Jit::getAlgorithmSize "[INTERNAL]  Get the
-number of atomic operations.
+%feature("docstring") casadi::Jit::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
 
 ";
 
@@ -23115,6 +23078,11 @@ to propagate seeds through the algorithm?
 
 ";
 
+%feature("docstring") casadi::Jit::instruction_constant "[INTERNAL]  Get
+the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Jit::size_in "[INTERNAL]  Input/output
 dimensions.
 
@@ -23164,12 +23132,22 @@ information allowing a user to evaluate a generated function.
 
 ";
 
+%feature("docstring") casadi::Jit::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
+
+";
+
 %feature("docstring") casadi::Jit::free_mem "[INTERNAL]  Free memory block.
 
 ";
 
 %feature("docstring") casadi::Jit::init_mem "[INTERNAL]  Initalize memory
 block.
+
+";
+
+%feature("docstring") casadi::Jit::instruction_input "[INTERNAL]  Get the
+(integer) input arguments of an atomic operation.
 
 ";
 
@@ -23240,29 +23218,18 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::Jit::getAtomicInputReal "[INTERNAL]  Get the
-floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Jit::sparsity_out "[INTERNAL]  Get sparsity
 of a given output.
 
 ";
 
-%feature("docstring") casadi::Jit::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
+%feature("docstring") casadi::Jit::memory "[INTERNAL]  Memory objects.
 
 ";
 
 %feature("docstring") casadi::Jit::get_n_in "
 
 Number of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::Jit::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
 
 ";
 
@@ -23323,10 +23290,6 @@ codegen.
 
 ";
 
-%feature("docstring") casadi::Jit::memory "[INTERNAL]  Memory objects.
-
-";
-
 %feature("docstring") casadi::Jit::replace_res "[INTERNAL]  Replace 0-by-0
 outputs.
 
@@ -23350,11 +23313,6 @@ derivatives be calculated in any way?
 
 %feature("docstring") casadi::Jit::fwd_seed "[INTERNAL]  Symbolic
 expressions for the forward seeds.
-
-";
-
-%feature("docstring") casadi::Jit::getAtomicOperation "[INTERNAL]  Get an
-atomic operation operator index.
 
 ";
 
@@ -23418,6 +23376,11 @@ Prepares the function for evaluation.
 
 %feature("docstring") casadi::Jit::generate_dependencies "[INTERNAL]
 Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring") casadi::Jit::instruction_output "[INTERNAL]  Get the
+(integer) output argument of an atomic operation.
 
 ";
 
@@ -23648,11 +23611,6 @@ matrices.
 
 %feature("docstring") casadi::Jit::n_nodes "[INTERNAL]  Number of nodes in
 the algorithm.
-
-";
-
-%feature("docstring") casadi::Jit::getWorkSize "[INTERNAL]  Get the length
-of the work vector.
 
 ";
 
@@ -24181,6 +24139,11 @@ input/output nonzeros.
 
 ";
 
+%feature("docstring") casadi::LapackLu::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::LapackLu::get_n_in "[INTERNAL]  Number of
 function inputs and outputs.
 
@@ -24208,11 +24171,6 @@ DM matrices.
 
 %feature("docstring") casadi::LapackLu::name_in "[INTERNAL]  Get input
 scheme name by index.
-
-";
-
-%feature("docstring") casadi::LapackLu::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
 
 ";
 
@@ -24403,11 +24361,6 @@ variables ( MX)
 
 ";
 
-%feature("docstring") casadi::LapackLu::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::LapackLu::alloc_res "[INTERNAL]  Ensure
 required length of res field.
 
@@ -24429,6 +24382,16 @@ Cholesky factor.
 
 %feature("docstring") casadi::LapackLu::set_work "[INTERNAL]  Set the
 (persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::LapackLu::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::LapackLu::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
 
 ";
 
@@ -24464,11 +24427,6 @@ length of res field.
 
 %feature("docstring") casadi::LapackLu::alloc_iw "[INTERNAL]  Ensure
 required length of iw field.
-
-";
-
-%feature("docstring") casadi::LapackLu::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
 
 ";
 
@@ -24526,6 +24484,11 @@ temporary variables needed.
 
 ";
 
+%feature("docstring") casadi::LapackLu::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::LapackLu::size1_out "[INTERNAL]  Input/output
 dimensions.
 
@@ -24547,11 +24510,6 @@ scheme index by name.
 ";
 
 %feature("docstring") casadi::LapackLu::disp "[INTERNAL]  Print.
-
-";
-
-%feature("docstring") casadi::LapackLu::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
 
 ";
 
@@ -24702,6 +24660,11 @@ able to propagate seeds through the algorithm?
 
 ";
 
+%feature("docstring") casadi::LapackLu::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::LapackLu::eval_gen "
 
 >  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
@@ -24791,11 +24754,6 @@ unidirectional or bidirectional partition.
 
 %feature("docstring") casadi::LapackLu::uses_output "[INTERNAL]  Do the
 derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring") casadi::LapackLu::getAtomicOperation "[INTERNAL]  Get
-an atomic operation operator index.
 
 ";
 
@@ -25123,11 +25081,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::LapackLu::get_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring") casadi::LapackLu::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
 
 ";
 
@@ -25499,8 +25452,8 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::LapackQr::symbolicAdjSeed "[INTERNAL]
-Symbolic expressions for the adjoint seeds.
+%feature("docstring") casadi::LapackQr::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -25566,11 +25519,6 @@ output arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::LapackQr::getAtomicOperation "[INTERNAL]  Get
-an atomic operation operator index.
-
-";
-
 %feature("docstring") casadi::LapackQr::default_in "[INTERNAL]  Get default
 input value.
 
@@ -25596,13 +25544,13 @@ scheme name by index.
 
 ";
 
-%feature("docstring") casadi::LapackQr::replace_fseed "[INTERNAL]  Replace
-0-by-0 forward seeds.
+%feature("docstring") casadi::LapackQr::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::LapackQr::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
+%feature("docstring") casadi::LapackQr::replace_fseed "[INTERNAL]  Replace
+0-by-0 forward seeds.
 
 ";
 
@@ -25650,8 +25598,8 @@ sparsity backwards.
 
 ";
 
-%feature("docstring") casadi::LapackQr::alloc_w "[INTERNAL]  Ensure
-required length of w field.
+%feature("docstring") casadi::LapackQr::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
 
 ";
 
@@ -25699,11 +25647,6 @@ function, overloaded.
 
 ";
 
-%feature("docstring") casadi::LapackQr::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::LapackQr::mx_in "[INTERNAL]  Get function
 input(s) and output(s)
 
@@ -25718,6 +25661,11 @@ Evaluate SX, possibly transposed.
 
 %feature("docstring") casadi::LapackQr::set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::LapackQr::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
 
 ";
 
@@ -25753,8 +25701,8 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::LapackQr::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
+%feature("docstring") casadi::LapackQr::jit_dependencies "[INTERNAL]   Jit
+dependencies.
 
 ";
 
@@ -25793,11 +25741,6 @@ code for the function body.
 ";
 
 %feature("docstring") casadi::LapackQr::linsol_cholesky_sparsity "[INTERNAL]   Sparsity pattern of the cholesky factors.
-
-";
-
-%feature("docstring") casadi::LapackQr::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
 
 ";
 
@@ -26025,16 +25968,6 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::LapackQr::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::LapackQr::jit_dependencies "[INTERNAL]   Jit
-dependencies.
-
-";
-
 %feature("docstring") casadi::LapackQr::is_a "[INTERNAL]  Check if the
 function is of a particular type.
 
@@ -26042,6 +25975,11 @@ function is of a particular type.
 
 %feature("docstring") casadi::LapackQr::slice "[INTERNAL]  returns a new
 function with a selection of inputs/outputs of the original
+
+";
+
+%feature("docstring") casadi::LapackQr::symbolicAdjSeed "[INTERNAL]
+Symbolic expressions for the adjoint seeds.
 
 ";
 
@@ -26136,6 +26074,11 @@ dimensions.
 
 %feature("docstring") casadi::LapackQr::add_dependency "[INTERNAL]  Add a
 dependent function.
+
+";
+
+%feature("docstring") casadi::LapackQr::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
 
 ";
 
@@ -26248,6 +26191,11 @@ the sparsity pattern, forward mode.
 
 ";
 
+%feature("docstring") casadi::LapackQr::alloc_w "[INTERNAL]  Ensure
+required length of w field.
+
+";
+
 
 // File: classcasadi_1_1LinearInterpolant.xml
 %feature("docstring") casadi::LinearInterpolant::get_sparsity_out "[INTERNAL]  Sparsities of function inputs and outputs.
@@ -26268,8 +26216,8 @@ a new function with a selection of inputs/outputs of the original
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::weak "[INTERNAL]  Get a
-weak reference to the object.
+%feature("docstring") casadi::LinearInterpolant::n_instructions "[INTERNAL]
+Get the number of atomic operations.
 
 ";
 
@@ -26295,10 +26243,6 @@ Ensure required length of iw field.
 
 %feature("docstring") casadi::LinearInterpolant::size1_in "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::LinearInterpolant::getAtomicOperation "[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -26341,6 +26285,11 @@ Replace 0-by-0 forward seeds.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::instruction_id "[INTERNAL]
+Get an atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::symbolic_output "[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
 
 ";
@@ -26355,17 +26304,22 @@ Input/output dimensions.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::weak "[INTERNAL]  Get a
+weak reference to the object.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::sx_in "[INTERNAL]  Get
 function input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::getAlgorithmSize "[INTERNAL]  Get the number of atomic operations.
+%feature("docstring") casadi::LinearInterpolant::alloc_mem "[INTERNAL]
+Create memory block.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::alloc_mem "[INTERNAL]
-Create memory block.
+%feature("docstring") casadi::LinearInterpolant::instruction_output "[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -26501,6 +26455,10 @@ Generate code the function.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::instruction_input "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::eval_mx "[INTERNAL]
 Evaluate with symbolic matrices.
 
@@ -26630,6 +26588,10 @@ Get function signature: name:(inputs)->(outputs)
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::instruction_constant "[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::replace_arg "[INTERNAL]
 Replace 0-by-0 inputs.
 
@@ -26676,11 +26638,6 @@ Get sparsity of a given output.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::sp_forward "[INTERNAL]
-Propagate sparsity forward.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::alloc_arg "[INTERNAL]
 Ensure required length of arg field.
 
@@ -26700,16 +26657,6 @@ no cached version is available.
 
 %feature("docstring") casadi::LinearInterpolant::clear_mem "[INTERNAL]
 Clear all memory (called from destructor)
-
-";
-
-%feature("docstring") casadi::LinearInterpolant::getAtomicInput "[INTERNAL]
-Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring") casadi::LinearInterpolant::getWorkSize "[INTERNAL]
-Get the length of the work vector.
 
 ";
 
@@ -26996,10 +26943,6 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::getAtomicInputReal "[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::print_free "[INTERNAL]
 Print free variables.
 
@@ -27041,7 +26984,8 @@ Evaluate numerically, simplied syntax.
 
 %feature("docstring") casadi::LinearInterpolant::~LinearInterpolant "[INTERNAL] ";
 
-%feature("docstring") casadi::LinearInterpolant::getAtomicOutput "[INTERNAL]  Get the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::LinearInterpolant::sp_forward "[INTERNAL]
+Propagate sparsity forward.
 
 ";
 
@@ -27156,12 +27100,12 @@ Do the derivative functions need nondifferentiated outputs?
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::call_gen "[INTERNAL]
-Call a function, overloaded.
+%feature("docstring") casadi::LinearInterpolantJac::instruction_output "[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::getAtomicInputReal "[INTERNAL]  Get the floating point output argument of an atomic operation.
+%feature("docstring") casadi::LinearInterpolantJac::call_gen "[INTERNAL]
+Call a function, overloaded.
 
 ";
 
@@ -27189,7 +27133,8 @@ function input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::getAtomicOperation "[INTERNAL]  Get an atomic operation operator index.
+%feature("docstring") casadi::LinearInterpolantJac::print_free "[INTERNAL]
+Print free variables.
 
 ";
 
@@ -27291,6 +27236,10 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::instruction_input "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::has_derivative "[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
@@ -27321,11 +27270,6 @@ no cached version is available.
 ";
 
 %feature("docstring") casadi::LinearInterpolantJac::get_sparsity_in "[INTERNAL]  Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring") casadi::LinearInterpolantJac::getWorkSize "[INTERNAL]
-Get the length of the work vector.
 
 ";
 
@@ -27425,6 +27369,10 @@ Get output scheme name by index.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::instruction_id "[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::call_forward "[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
 classes.
 
@@ -27439,11 +27387,6 @@ Number of nodes in the algorithm.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::set_work "[INTERNAL]
-Set the (persistent) work vectors.
-
-";
-
 %feature("docstring") casadi::LinearInterpolantJac::mx_in "[INTERNAL]  Get
 function input(s) and output(s)
 
@@ -27451,6 +27394,10 @@ function input(s) and output(s)
 
 %feature("docstring") casadi::LinearInterpolantJac::definition "[INTERNAL]
 Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::n_instructions "[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -27565,7 +27512,8 @@ Get number of temporary variables needed.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::getAtomicInput "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+%feature("docstring") casadi::LinearInterpolantJac::memory "[INTERNAL]
+Memory objects.
 
 ";
 
@@ -27637,6 +27585,10 @@ Check if output arguments have correct length and dimensions.
 
 %feature("docstring") casadi::LinearInterpolantJac::sz_arg "[INTERNAL]  Get
 required length of arg field.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::instruction_constant "[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -27767,10 +27719,6 @@ Symbolic expressions for the forward seeds.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::getAtomicOutput "[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::LinearInterpolantJac::alloc_w "[INTERNAL]
 Ensure required length of w field.
 
@@ -27778,16 +27726,6 @@ Ensure required length of w field.
 
 %feature("docstring") casadi::LinearInterpolantJac::alloc_arg "[INTERNAL]
 Ensure required length of arg field.
-
-";
-
-%feature("docstring") casadi::LinearInterpolantJac::print_free "[INTERNAL]
-Print free variables.
-
-";
-
-%feature("docstring") casadi::LinearInterpolantJac::memory "[INTERNAL]
-Memory objects.
 
 ";
 
@@ -27819,7 +27757,8 @@ Number of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::getAlgorithmSize "[INTERNAL]  Get the number of atomic operations.
+%feature("docstring") casadi::LinearInterpolantJac::set_work "[INTERNAL]
+Set the (persistent) work vectors.
 
 ";
 
@@ -28188,6 +28127,11 @@ of options.
 
 ";
 
+%feature("docstring") casadi::Lsqr::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
+
+";
+
 %feature("docstring") casadi::Lsqr::weak "[INTERNAL]  Get a weak reference
 to the object.
 
@@ -28225,11 +28169,6 @@ input arguments that needs to be replaced.
 
 %feature("docstring") casadi::Lsqr::nnz_out "[INTERNAL]  Number of
 input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::Lsqr::getWorkSize "[INTERNAL]  Get the length
-of the work vector.
 
 ";
 
@@ -28352,11 +28291,6 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::Lsqr::getCount "[INTERNAL]  Get the reference
-count.
-
-";
-
 %feature("docstring") casadi::Lsqr::eval_dm "[INTERNAL]  Evaluate with DM
 matrices.
 
@@ -28379,6 +28313,11 @@ expressions for the adjoint seeds.
 
 %feature("docstring") casadi::Lsqr::symbolic_output "[INTERNAL]  Get a
 vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::Lsqr::instruction_output "[INTERNAL]  Get the
+(integer) output argument of an atomic operation.
 
 ";
 
@@ -28448,6 +28387,11 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Lsqr::instruction_constant "[INTERNAL]  Get
+the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Lsqr::get_partition "[INTERNAL]  Get the
 unidirectional or bidirectional partition.
 
@@ -28472,11 +28416,6 @@ function with a selection of inputs/outputs of the original
 
 %feature("docstring") casadi::Lsqr::numel_in "[INTERNAL]  Number of
 input/output elements.
-
-";
-
-%feature("docstring") casadi::Lsqr::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
 
 ";
 
@@ -28511,11 +28450,6 @@ value.
 
 %feature("docstring") casadi::Lsqr::setup "[INTERNAL]  Set the (persistent
 and temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::Lsqr::getAtomicInputReal "[INTERNAL]  Get the
-floating point output argument of an atomic operation.
 
 ";
 
@@ -28580,11 +28514,6 @@ object.
 
 ";
 
-%feature("docstring") casadi::Lsqr::getAlgorithmSize "[INTERNAL]  Get the
-number of atomic operations.
-
-";
-
 %feature("docstring") casadi::Lsqr::codegen_name "[INTERNAL]  Get name in
 codegen.
 
@@ -28605,8 +28534,8 @@ function input and outputs.
 
 ";
 
-%feature("docstring") casadi::Lsqr::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
+%feature("docstring") casadi::Lsqr::getCount "[INTERNAL]  Get the reference
+count.
 
 ";
 
@@ -29029,11 +28958,6 @@ symbolic matrices.
 
 %feature("docstring") casadi::Lsqr::Lsqr "[INTERNAL] ";
 
-%feature("docstring") casadi::Lsqr::getAtomicOperation "[INTERNAL]  Get an
-atomic operation operator index.
-
-";
-
 %feature("docstring") casadi::Lsqr::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
 if available, and calls  Function get_reverse(int nadj) if no cached version
@@ -29074,6 +28998,11 @@ instance.
 
 %feature("docstring") casadi::Lsqr::sx_out "[INTERNAL]  Get function
 input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Lsqr::instruction_input "[INTERNAL]  Get the
+(integer) input arguments of an atomic operation.
 
 ";
 
@@ -29166,6 +29095,11 @@ necessary generate, the sparsity of a Jacobian block.
 
 ";
 
+%feature("docstring") casadi::Lsqr::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::Lsqr::linsol_cholesky "[INTERNAL]  Get
 Cholesky factor.
 
@@ -29228,11 +29162,6 @@ length of iw field.
 
 
 // File: classcasadi_1_1Map.xml
-%feature("docstring") casadi::Map::getAtomicInputReal "[INTERNAL]  Get the
-floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Map::n_in "[INTERNAL]  Number of function
 inputs and outputs.
 
@@ -29260,6 +29189,11 @@ all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Map::call "[INTERNAL]   Call a function,
 templated.
+
+";
+
+%feature("docstring") casadi::Map::instruction_constant "[INTERNAL]  Get
+the floating point output argument of an atomic operation.
 
 ";
 
@@ -29328,11 +29262,6 @@ count.
 
 %feature("docstring") casadi::Map::replace_res "[INTERNAL]  Replace 0-by-0
 outputs.
-
-";
-
-%feature("docstring") casadi::Map::getWorkSize "[INTERNAL]  Get the length
-of the work vector.
 
 ";
 
@@ -29554,11 +29483,6 @@ Are all inputs and outputs scalar.
 
 ";
 
-%feature("docstring") casadi::Map::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Map::class_name "[INTERNAL]  Get type name.
 
 ";
@@ -29687,6 +29611,11 @@ Generate code for the declarations of the C function.
 
 ";
 
+%feature("docstring") casadi::Map::instruction_input "[INTERNAL]  Get the
+(integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Map::get_sparsity_in "[INTERNAL]  Sparsities
 of function inputs and outputs.
 
@@ -29743,8 +29672,8 @@ and output(s)
 
 ";
 
-%feature("docstring") casadi::Map::getAlgorithmSize "[INTERNAL]  Get the
-number of atomic operations.
+%feature("docstring") casadi::Map::alloc_mem "[INTERNAL]  Create memory
+block.
 
 ";
 
@@ -29784,11 +29713,6 @@ instance consisting of only one MX call.
 
 %feature("docstring") casadi::Map::alloc "[INTERNAL]  Ensure work vectors
 long enough to evaluate function.
-
-";
-
-%feature("docstring") casadi::Map::alloc_mem "[INTERNAL]  Create memory
-block.
 
 ";
 
@@ -29880,6 +29804,11 @@ value.
 
 ";
 
+%feature("docstring") casadi::Map::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
+
+";
+
 %feature("docstring") casadi::Map::weak "[INTERNAL]  Get a weak reference
 to the object.
 
@@ -29909,13 +29838,13 @@ of res field.
 
 ";
 
-%feature("docstring") casadi::Map::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
+%feature("docstring") casadi::Map::adjViaJac "[INTERNAL]  Calculate
+derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::Map::adjViaJac "[INTERNAL]  Calculate
-derivatives by multiplying the full Jacobian and multiplying.
+%feature("docstring") casadi::Map::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
 
 ";
 
@@ -29939,11 +29868,6 @@ sparsity forward.
 
 ";
 
-%feature("docstring") casadi::Map::getAtomicOperation "[INTERNAL]  Get an
-atomic operation operator index.
-
-";
-
 %feature("docstring") casadi::Map::get_forward "[INTERNAL]  Generate a
 function that calculates nfwd forward derivatives.
 
@@ -29956,6 +29880,11 @@ is of a particular type.
 
 %feature("docstring") casadi::Map::replace_fseed "[INTERNAL]  Replace
 0-by-0 forward seeds.
+
+";
+
+%feature("docstring") casadi::Map::instruction_output "[INTERNAL]  Get the
+(integer) output argument of an atomic operation.
 
 ";
 
@@ -30091,11 +30020,6 @@ Are all inputs and outputs scalar.
 
 ";
 
-%feature("docstring") casadi::MapOmp::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::MapOmp::codegen_meta "[INTERNAL]  Generate
 meta-information allowing a user to evaluate a generated function.
 
@@ -30179,6 +30103,11 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::MapOmp::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::MapOmp::n_nodes "[INTERNAL]  Number of nodes
 in the algorithm.
 
@@ -30191,11 +30120,6 @@ reference to the object.
 
 %feature("docstring") casadi::MapOmp::replace_fseed "[INTERNAL]  Replace
 0-by-0 forward seeds.
-
-";
-
-%feature("docstring") casadi::MapOmp::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
 
 ";
 
@@ -30216,11 +30140,6 @@ variables (SX)
 
 %feature("docstring") casadi::MapOmp::print_free "[INTERNAL]  Print free
 variables.
-
-";
-
-%feature("docstring") casadi::MapOmp::getAtomicOperation "[INTERNAL]  Get
-an atomic operation operator index.
 
 ";
 
@@ -30249,11 +30168,6 @@ vectors long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::MapOmp::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::MapOmp::nnz_out "[INTERNAL]  Number of
 input/output nonzeros.
 
@@ -30276,11 +30190,6 @@ function inputs and outputs.
 
 %feature("docstring") casadi::MapOmp::nnz_in "[INTERNAL]  Number of
 input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::MapOmp::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
 
 ";
 
@@ -30335,6 +30244,11 @@ expressions for the adjoint seeds.
 
 ";
 
+%feature("docstring") casadi::MapOmp::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::MapOmp::codegen_name "[INTERNAL]  Get name in
 codegen.
 
@@ -30344,8 +30258,8 @@ codegen.
 
 ";
 
-%feature("docstring") casadi::MapOmp::jit_dependencies "[INTERNAL]   Jit
-dependencies.
+%feature("docstring") casadi::MapOmp::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
 
 ";
 
@@ -30382,6 +30296,11 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::MapOmp::jit_dependencies "[INTERNAL]   Jit
+dependencies.
 
 ";
 
@@ -30559,6 +30478,11 @@ statistics.
 
 ";
 
+%feature("docstring") casadi::MapOmp::instruction_constant "[INTERNAL]  Get
+the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::MapOmp::sz_res "[INTERNAL]  Get required
 length of res field.
 
@@ -30606,6 +30530,11 @@ factor for chosing forward/reverse mode.
 
 %feature("docstring") casadi::MapOmp::call_forward "[INTERNAL]  Forward
 mode AD, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::MapOmp::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
 
 ";
 
@@ -30729,11 +30658,6 @@ matrices.
 
 %feature("docstring") casadi::MapOmp::replace_arg "[INTERNAL]  Replace
 0-by-0 inputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::getAlgorithmSize "[INTERNAL]  Get the
-number of atomic operations.
 
 ";
 
@@ -32550,11 +32474,6 @@ simplified signature.
 
 ";
 
-%feature("docstring") casadi::Newton::getAlgorithmSize "[INTERNAL]  Get the
-number of atomic operations.
-
-";
-
 %feature("docstring") casadi::Newton::replace_fseed "[INTERNAL]  Replace
 0-by-0 forward seeds.
 
@@ -32598,16 +32517,6 @@ memory object.
 
 %feature("docstring") casadi::Newton::jacobian "[INTERNAL]  Return Jacobian
 of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring") casadi::Newton::getAtomicOperation "[INTERNAL]  Get
-an atomic operation operator index.
-
-";
-
-%feature("docstring") casadi::Newton::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
 
 ";
 
@@ -32728,6 +32637,11 @@ numerically, simplied syntax.
 
 ";
 
+%feature("docstring") casadi::Newton::instruction_constant "[INTERNAL]  Get
+the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Newton::fwd_seed "[INTERNAL]  Symbolic
 expressions for the forward seeds.
 
@@ -32826,6 +32740,11 @@ dimensions.
 
 %feature("docstring") casadi::Newton::sp_reverse "[INTERNAL]  Propagate
 sparsity backwards.
+
+";
+
+%feature("docstring") casadi::Newton::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
 
 ";
 
@@ -32960,11 +32879,6 @@ statistics.
 
 ";
 
-%feature("docstring") casadi::Newton::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::Newton::monitored "[INTERNAL] ";
 
 %feature("docstring") casadi::Newton::print_dimensions "[INTERNAL]  Print
@@ -32974,6 +32888,11 @@ dimensions of inputs and outputs.
 
 %feature("docstring") casadi::Newton::min_in "[INTERNAL]  Get smallest
 input value.
+
+";
+
+%feature("docstring") casadi::Newton::sz_arg "[INTERNAL]  Get required
+length of arg field.
 
 ";
 
@@ -32989,11 +32908,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Newton::symbolicAdjSeed "[INTERNAL]  Symbolic
 expressions for the adjoint seeds.
-
-";
-
-%feature("docstring") casadi::Newton::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
 
 ";
 
@@ -33065,8 +32979,8 @@ inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Newton::sz_arg "[INTERNAL]  Get required
-length of arg field.
+%feature("docstring") casadi::Newton::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
 
 ";
 
@@ -33116,6 +33030,11 @@ input/output nonzeros.
 
 %feature("docstring") casadi::Newton::check_res "[INTERNAL]  Check if
 output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::Newton::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -33276,6 +33195,11 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::Newton::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Newton::set_function "[INTERNAL]  Register
 the function for evaluation and statistics gathering
 
@@ -33407,11 +33331,6 @@ variables.
 
 ";
 
-%feature("docstring") casadi::Newton::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Newton::solve "[INTERNAL]   Solve the system
 of equations and calculate derivatives.
 
@@ -33469,11 +33388,6 @@ Print a description of the object.
 
 
 // File: classcasadi_1_1Nlpsol.xml
-%feature("docstring") casadi::Nlpsol::getAlgorithmSize "[INTERNAL]  Get the
-number of atomic operations.
-
-";
-
 %feature("docstring") casadi::Nlpsol::alloc "[INTERNAL]  Ensure work
 vectors long enough to evaluate function.
 
@@ -33546,6 +33460,11 @@ input(s) and output(s)
 
 %feature("docstring") casadi::Nlpsol::init_mem "[INTERNAL]  Initalize
 memory block.
+
+";
+
+%feature("docstring") casadi::Nlpsol::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -33677,8 +33596,8 @@ is available.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::getAtomicOperation "[INTERNAL]  Get
-an atomic operation operator index.
+%feature("docstring") casadi::Nlpsol::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
 
 ";
 
@@ -33719,11 +33638,6 @@ output arguments have correct length and dimensions.
 
 %feature("docstring") casadi::Nlpsol::sz_res "[INTERNAL]  Get required
 length of res field.
-
-";
-
-%feature("docstring") casadi::Nlpsol::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
 
 ";
 
@@ -33841,6 +33755,11 @@ dependent function.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Nlpsol::set_work "[INTERNAL]  Set the
 (persistent) work vectors.
 
@@ -33935,11 +33854,6 @@ block.
 
 %feature("docstring") casadi::Nlpsol::mx_out "[INTERNAL]  Get function
 input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::Nlpsol::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
 
 ";
 
@@ -34163,11 +34077,6 @@ sparsity backwards.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Nlpsol::name_in "[INTERNAL]  Get input scheme
 name by index.
 
@@ -34231,11 +34140,6 @@ signature: name:(inputs)->(outputs)
 
 ";
 
-%feature("docstring") casadi::Nlpsol::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Nlpsol::checkout "[INTERNAL]  Checkout a
 memory object.
 
@@ -34296,8 +34200,18 @@ scheme name by index.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::Nlpsol::numel_out "[INTERNAL]  Number of
 input/output elements.
+
+";
+
+%feature("docstring") casadi::Nlpsol::instruction_constant "[INTERNAL]  Get
+the floating point output argument of an atomic operation.
 
 ";
 
@@ -35102,10 +35016,6 @@ get assignment expressions for initial values
 
 
 // File: classcasadi_1_1OracleFunction.xml
-%feature("docstring") casadi::OracleFunction::getAtomicInputReal "[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::OracleFunction::get_reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
 cached instance if available, and calls  Function get_reverse(int nadj) if
@@ -35192,6 +35102,11 @@ sparsity of a given output.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::OracleFunction::has_jacobian "[INTERNAL]
 Return Jacobian of all input elements with respect to all output elements.
 
@@ -35212,6 +35127,10 @@ required length of arg field.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::instruction_output "[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::OracleFunction::class_name "[INTERNAL]
 Readable name of the internal class.
 
@@ -35222,13 +35141,13 @@ output scheme index by name.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::getWorkSize "[INTERNAL]  Get
-the length of the work vector.
+%feature("docstring") casadi::OracleFunction::sz_res "[INTERNAL]  Get
+required length of res field.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::sz_res "[INTERNAL]  Get
-required length of res field.
+%feature("docstring") casadi::OracleFunction::n_instructions "[INTERNAL]
+Get the number of atomic operations.
 
 ";
 
@@ -35401,11 +35320,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::getAtomicInput "[INTERNAL]
-Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::OracleFunction::sp_reverse "[INTERNAL]
 Propagate sparsity backwards.
 
@@ -35440,11 +35354,6 @@ function signature: name:(inputs)->(outputs)
 ";
 
 %feature("docstring") casadi::OracleFunction::get_function "[INTERNAL] ";
-
-%feature("docstring") casadi::OracleFunction::getAtomicOutput "[INTERNAL]
-Get the (integer) output argument of an atomic operation.
-
-";
 
 %feature("docstring") casadi::OracleFunction::n_out "[INTERNAL]  Number of
 function inputs and outputs.
@@ -35597,6 +35506,11 @@ Check if output arguments that needs to be replaced.
 
 %feature("docstring") casadi::OracleFunction::sparsity_jac "[INTERNAL]
 Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::OracleFunction::instruction_id "[INTERNAL]
+Get an atomic operation operator index.
 
 ";
 
@@ -36000,11 +35914,6 @@ function.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::getAlgorithmSize "[INTERNAL]
-Get the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::OracleFunction::matching_arg "[INTERNAL]
 Check if input arguments that needs to be replaced.
 
@@ -36084,10 +35993,6 @@ JIT for dependencies.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::getAtomicOperation "[INTERNAL]  Get an atomic operation operator index.
-
-";
-
 %feature("docstring") casadi::OracleFunction::get_name_in "[INTERNAL]
 Names of function input and outputs.
 
@@ -36130,6 +36035,10 @@ Replace 0-by-0 inputs.
 
 %feature("docstring") casadi::OracleFunction::init_mem "[INTERNAL]
 Initalize memory block.
+
+";
+
+%feature("docstring") casadi::OracleFunction::instruction_constant "[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -36421,8 +36330,8 @@ block.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
+%feature("docstring") casadi::QpToNlp::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -36496,11 +36405,6 @@ dependencies.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::QpToNlp::self "[INTERNAL]  Get a public class
 instance.
 
@@ -36565,6 +36469,11 @@ numerically.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::QpToNlp::generate_lifted "[INTERNAL]  Extract
 the functions needed for the Lifted Newton method.
 
@@ -36597,11 +36506,6 @@ signature: name:(inputs)->(outputs)
 
 %feature("docstring") casadi::QpToNlp::print_option "[INTERNAL]  Print all
 information there is to know about a certain option.
-
-";
-
-%feature("docstring") casadi::QpToNlp::getAtomicOperation "[INTERNAL]  Get
-an atomic operation operator index.
 
 ";
 
@@ -36759,23 +36663,23 @@ input value.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
+%feature("docstring") casadi::QpToNlp::codegen "[INTERNAL]  Generate code
+the function.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
+%feature("docstring") casadi::QpToNlp::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::QpToNlp::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
 
 ";
 
 %feature("docstring") casadi::QpToNlp::name_out "[INTERNAL]  Get output
 scheme name by index.
-
-";
-
-%feature("docstring") casadi::QpToNlp::codegen "[INTERNAL]  Generate code
-the function.
 
 ";
 
@@ -36819,11 +36723,6 @@ statistics.
 
 %feature("docstring") casadi::QpToNlp::all_scalar "[INTERNAL]  Are all
 inputs and outputs scalar.
-
-";
-
-%feature("docstring") casadi::QpToNlp::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
 
 ";
 
@@ -37193,6 +37092,11 @@ input arguments have correct length and dimensions.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::QpToNlp::adjViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
 
@@ -37384,11 +37288,6 @@ variables (SX)
 
 ";
 
-%feature("docstring") casadi::Rootfinder::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::Rootfinder::numel_in "[INTERNAL]  Number of
 input/output elements.
 
@@ -37541,6 +37440,11 @@ required length of res field.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::instruction_id "[INTERNAL]  Get
+an atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::Rootfinder::simple "[INTERNAL]  Evaluate
 numerically, simplied syntax.
 
@@ -37590,6 +37494,16 @@ memory object.
 
 %feature("docstring") casadi::Rootfinder::symbolic_output "[INTERNAL]  Get
 a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::Rootfinder::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Rootfinder::sz_arg "[INTERNAL]  Get required
+length of arg field.
 
 ";
 
@@ -37778,11 +37692,6 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Rootfinder::sp_reverse "[INTERNAL]  Propagate
 sparsity backwards.
 
@@ -37835,6 +37744,11 @@ input/output nonzeros.
 
 %feature("docstring") casadi::Rootfinder::ad_reverse "[INTERNAL]  Create
 call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring") casadi::Rootfinder::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
 
 ";
 
@@ -37897,11 +37811,6 @@ free variables.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Rootfinder::checkout "[INTERNAL]  Checkout a
 memory object.
 
@@ -37916,6 +37825,11 @@ with symbolic matrices.
 
 %feature("docstring") casadi::Rootfinder::mx_out "[INTERNAL]  Get function
 input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Rootfinder::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -37934,16 +37848,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::Rootfinder::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
-
-";
-
 %feature("docstring") casadi::Rootfinder::has_codegen "[INTERNAL]  Is
 codegen supported?
 
@@ -37954,8 +37858,8 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::sz_arg "[INTERNAL]  Get required
-length of arg field.
+%feature("docstring") casadi::Rootfinder::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -38095,11 +37999,6 @@ a function that calculates nadj adjoint derivatives.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::Rootfinder::free_mx "[INTERNAL]  Get free
 variables ( MX)
 
@@ -38172,11 +38071,6 @@ initialization.
 
 %feature("docstring") casadi::RungeKutta::numel_in "[INTERNAL]  Number of
 input/output elements.
-
-";
-
-%feature("docstring") casadi::RungeKutta::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
 
 ";
 
@@ -38291,11 +38185,6 @@ function input and outputs.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::RungeKutta::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
 instance if available, and calls  Function get_reverse(int nadj) if no
@@ -38392,6 +38281,11 @@ a function that calculates nfwd forward derivatives.
 
 ";
 
+%feature("docstring") casadi::RungeKutta::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::RungeKutta::generate_lifted "[INTERNAL]
 Extract the functions needed for the Lifted Newton method.
 
@@ -38399,11 +38293,6 @@ Extract the functions needed for the Lifted Newton method.
 
 %feature("docstring") casadi::RungeKutta::get_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring") casadi::RungeKutta::disp_more "[INTERNAL]  Print
-more.
 
 ";
 
@@ -38417,8 +38306,8 @@ required length of arg field.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
+%feature("docstring") casadi::RungeKutta::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -38439,11 +38328,6 @@ class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::RungeKutta::sz_iw "[INTERNAL]  Get required
 length of iw field.
-
-";
-
-%feature("docstring") casadi::RungeKutta::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
 
 ";
 
@@ -38561,11 +38445,6 @@ memory (called from destructor)
 
 ";
 
-%feature("docstring") casadi::RungeKutta::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::RungeKutta "[INTERNAL]  'rk' plugin for
 Integrator
 
@@ -38659,6 +38538,11 @@ factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
+%feature("docstring") casadi::RungeKutta::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::RungeKutta::sp_reverse "[INTERNAL]  Propagate
 sparsity backwards.
 
@@ -38696,6 +38580,11 @@ Sparsities of function inputs and outputs.
 
 %feature("docstring") casadi::RungeKutta::has_reverse "[INTERNAL]  Generate
 a function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring") casadi::RungeKutta::instruction_id "[INTERNAL]  Get
+an atomic operation operator index.
 
 ";
 
@@ -38893,8 +38782,13 @@ a function that calculates nadj adjoint derivatives.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
+%feature("docstring") casadi::RungeKutta::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
+
+";
+
+%feature("docstring") casadi::RungeKutta::disp_more "[INTERNAL]  Print
+more.
 
 ";
 
@@ -39019,13 +38913,13 @@ Generate code for the declarations of the C function.
 
 
 // File: classcasadi_1_1Scpgen.xml
-%feature("docstring") casadi::Scpgen::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
+%feature("docstring") casadi::Scpgen::replace_aseed "[INTERNAL]  Replace
+0-by-0 reverse seeds.
 
 ";
 
-%feature("docstring") casadi::Scpgen::replace_aseed "[INTERNAL]  Replace
-0-by-0 reverse seeds.
+%feature("docstring") casadi::Scpgen::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
 
 ";
 
@@ -39057,11 +38951,6 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring") casadi::Scpgen::getAtomicOperation "[INTERNAL]  Get
-an atomic operation operator index.
 
 ";
 
@@ -39215,6 +39104,11 @@ block.
 
 ";
 
+%feature("docstring") casadi::Scpgen::instruction_constant "[INTERNAL]  Get
+the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Scpgen::finalize "[INTERNAL]  Finalize
 initialization.
 
@@ -39232,6 +39126,11 @@ derivative functions need nondifferentiated outputs?
 
 %feature("docstring") casadi::Scpgen::check_res "[INTERNAL]  Check if
 output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::Scpgen::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -39326,8 +39225,8 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::Scpgen::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
+%feature("docstring") casadi::Scpgen::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
 
 ";
 
@@ -39692,11 +39591,6 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::Scpgen::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Scpgen::sp_forward "[INTERNAL]  Propagate
 sparsity forward.
 
@@ -39718,11 +39612,6 @@ the evaluation function.
 
 %feature("docstring") casadi::Scpgen::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition.
-
-";
-
-%feature("docstring") casadi::Scpgen::getAlgorithmSize "[INTERNAL]  Get the
-number of atomic operations.
 
 ";
 
@@ -39765,6 +39654,11 @@ statistics.
 
 %feature("docstring") casadi::Scpgen::calc_function "[INTERNAL] ";
 
+%feature("docstring") casadi::Scpgen::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
+
+";
+
 %feature("docstring") casadi::Scpgen::matching_arg "[INTERNAL]  Check if
 input arguments that needs to be replaced.
 
@@ -39791,11 +39685,6 @@ length of res field.
 ";
 
 %feature("docstring") casadi::Scpgen::plugin_name "[INTERNAL] ";
-
-%feature("docstring") casadi::Scpgen::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
-
-";
 
 %feature("docstring") casadi::Scpgen::nnz_in "[INTERNAL]  Number of
 input/output nonzeros.
@@ -40452,6 +40341,10 @@ Call a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::SimplifiedExternal::n_instructions "[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring") casadi::SimplifiedExternal::has_jacobian "[INTERNAL]
 Full Jacobian.
 
@@ -40475,10 +40368,6 @@ Replace 0-by-0 outputs.
 Return function that calculates adjoint derivatives reverse(nadj) returns a
 cached instance if available, and calls  Function get_reverse(int nadj) if
 no cached version is available.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::getAtomicInputReal "[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -40585,10 +40474,6 @@ Check if output arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::getAlgorithmSize "[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::size_in "[INTERNAL]
 Input/output dimensions.
 
@@ -40625,7 +40510,8 @@ Number of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::getAtomicInput "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+%feature("docstring") casadi::SimplifiedExternal::signature "[INTERNAL]
+Code generate the function.
 
 ";
 
@@ -40661,6 +40547,10 @@ if the function is of a particular type.
 
 ";
 
+%feature("docstring") casadi::SimplifiedExternal::instruction_input "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::SimplifiedExternal::definition "[INTERNAL]
 Get function signature: name:(inputs)->(outputs)
 
@@ -40684,18 +40574,8 @@ Ensure required length of res field.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::signature "[INTERNAL]
-Code generate the function.
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::print_free "[INTERNAL]
 Print free variables.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::getWorkSize "[INTERNAL]
-Get the length of the work vector.
 
 ";
 
@@ -40831,6 +40711,14 @@ Get name of the evaluation function.
 
 ";
 
+%feature("docstring") casadi::SimplifiedExternal::instruction_constant "[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::SimplifiedExternal::instruction_id "[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::SimplifiedExternal::getAdaptorSolverName "[INTERNAL]  Obtain solver name from Adaptor.
 
 ";
@@ -40870,10 +40758,6 @@ Get, if necessary generate, the sparsity of a Jacobian block.
 
 %feature("docstring") casadi::SimplifiedExternal::free_sx "[INTERNAL]  Get
 free variables (SX)
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::getAtomicOperation "[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -41032,10 +40916,6 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::SimplifiedExternal::getAtomicOutput "[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::SimplifiedExternal::alloc_iw "[INTERNAL]
 Ensure required length of iw field.
 
@@ -41048,6 +40928,10 @@ oracle.
 
 %feature("docstring") casadi::SimplifiedExternal::eval "[INTERNAL]
 Evaluate numerically.
+
+";
+
+%feature("docstring") casadi::SimplifiedExternal::instruction_output "[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -41286,11 +41170,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::SlicotDple::get_partition "[INTERNAL]  Get
 the unidirectional or bidirectional partition.
 
@@ -41330,6 +41209,11 @@ a function that calculates nfwd forward derivatives.
 
 %feature("docstring") casadi::SlicotDple::eval_mx "[INTERNAL]  Evaluate
 with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::SlicotDple::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -41445,11 +41329,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::SlicotDple::ad_weight "[INTERNAL]  Weighting
 factor for chosing forward/reverse mode.
-
-";
-
-%feature("docstring") casadi::SlicotDple::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
 
 ";
 
@@ -41600,13 +41479,13 @@ a vector of symbolic variables corresponding to the outputs.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition.
+%feature("docstring") casadi::SlicotDple::get_stats "[INTERNAL]  Get all
+statistics.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
+%feature("docstring") casadi::SlicotDple::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
 
 ";
 
@@ -41650,6 +41529,11 @@ memory object.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
+
+";
+
 %feature("docstring") casadi::SlicotDple::alloc_res "[INTERNAL]  Ensure
 required length of res field.
 
@@ -41685,11 +41569,6 @@ vectors long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::n_nodes "[INTERNAL]  Number of
-nodes in the algorithm.
-
-";
-
 %feature("docstring") casadi::SlicotDple::getJacSparsity "[INTERNAL]
 Generate the sparsity of a Jacobian block.
 
@@ -41705,6 +41584,11 @@ length of iw field.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::SlicotDple::codegen_decref "[INTERNAL]
 Codegen decref for dependencies.
 
@@ -41715,8 +41599,8 @@ sparsity of a given output.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::SlicotDple::n_nodes "[INTERNAL]  Number of
+nodes in the algorithm.
 
 ";
 
@@ -41752,6 +41636,11 @@ mode, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::SlicotDple::name_out "[INTERNAL]  Get output
 scheme name by index.
+
+";
+
+%feature("docstring") casadi::SlicotDple::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -41865,8 +41754,8 @@ Obtain solver name from Adaptor.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::get_stats "[INTERNAL]  Get all
-statistics.
+%feature("docstring") casadi::SlicotDple::instruction_id "[INTERNAL]  Get
+an atomic operation operator index.
 
 ";
 
@@ -41933,11 +41822,6 @@ Export / Generate C code for the dependency function.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::SlicotDple::codegen_declarations "[INTERNAL]
 Generate code for the declarations of the C function.
 
@@ -41961,8 +41845,8 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
+%feature("docstring") casadi::SlicotDple::symbolicAdjSeed "[INTERNAL]
+Symbolic expressions for the adjoint seeds.
 
 ";
 
@@ -42061,11 +41945,6 @@ sparsity forward.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::symbolicAdjSeed "[INTERNAL]
-Symbolic expressions for the adjoint seeds.
-
-";
-
 %feature("docstring") casadi::SlicotDple::print_options "[INTERNAL]  Print
 list of options.
 
@@ -42118,8 +41997,8 @@ required length of arg field.
 // File: classcasadi_1_1SlicotExpm.xml
 %feature("docstring") casadi::SlicotExpm::plugin_name "[INTERNAL] ";
 
-%feature("docstring") casadi::SlicotExpm::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
+%feature("docstring") casadi::SlicotExpm::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -42172,8 +42051,18 @@ input/output elements.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::instruction_id "[INTERNAL]  Get
+an atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::get_n_out "[INTERNAL]  Number of
 function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::SlicotExpm::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -42196,11 +42085,6 @@ name in codegen.
 
 %feature("docstring") casadi::SlicotExpm::codegen_body "[INTERNAL]
 Generate code for the function body.
-
-";
-
-%feature("docstring") casadi::SlicotExpm::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
 
 ";
 
@@ -42374,11 +42258,6 @@ name of the internal class.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::SlicotExpm::sz_res "[INTERNAL]  Get required
 length of res field.
 
@@ -42511,6 +42390,11 @@ statistics.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::alloc "[INTERNAL]  Ensure work
 vectors long enough to evaluate function.
 
@@ -42631,11 +42515,6 @@ with DM matrices.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::SlicotExpm::index_out "[INTERNAL]  Get output
 scheme index by name.
 
@@ -42672,11 +42551,6 @@ Are all inputs and outputs scalar.
 
 %feature("docstring") casadi::SlicotExpm::alloc_iw "[INTERNAL]  Ensure
 required length of iw field.
-
-";
-
-%feature("docstring") casadi::SlicotExpm::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
 
 ";
 
@@ -42828,11 +42702,6 @@ Jit dependencies.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::SlicotExpm::size1_out "[INTERNAL]
 Input/output dimensions.
 
@@ -42918,6 +42787,11 @@ function, templated.
 
 %feature("docstring") casadi::SlicotExpm::default_in "[INTERNAL]  Get
 default input value.
+
+";
+
+%feature("docstring") casadi::SlicotExpm::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
 
 ";
 
@@ -43267,11 +43141,6 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Smoothing::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
-
-";
-
 %feature("docstring") casadi::Smoothing::which_depends "[INTERNAL]  Which
 variables enter with some order.
 
@@ -43464,17 +43333,17 @@ temporary variables needed.
 
 ";
 
+%feature("docstring") casadi::Smoothing::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Smoothing::disp "[INTERNAL]  Print.
 
 ";
 
 %feature("docstring") casadi::Smoothing::has_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring") casadi::Smoothing::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -43539,6 +43408,11 @@ scheme index by name.
 
 ";
 
+%feature("docstring") casadi::Smoothing::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Smoothing::jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
 
@@ -43546,11 +43420,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Smoothing::eval_dm "[INTERNAL]  Evaluate with
 DM matrices.
-
-";
-
-%feature("docstring") casadi::Smoothing::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
 
 ";
 
@@ -43613,8 +43482,8 @@ length of arg field.
 
 ";
 
-%feature("docstring") casadi::Smoothing::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::Smoothing::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
 
 ";
 
@@ -43670,6 +43539,11 @@ input value.
 
 %feature("docstring") casadi::Smoothing::definition "[INTERNAL]  Get
 function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::Smoothing::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
 
 ";
 
@@ -43764,11 +43638,6 @@ Sparsities of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Smoothing::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
-
-";
-
 %feature("docstring") casadi::Smoothing::set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
 
@@ -43847,11 +43716,6 @@ list of options.
 function that calculates adjoint derivatives reverse(nadj) returns a cached
 instance if available, and calls  Function get_reverse(int nadj) if no
 cached version is available.
-
-";
-
-%feature("docstring") casadi::Smoothing::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -43949,6 +43813,11 @@ in codegen.
 
 %feature("docstring") casadi::Smoothing::sz_w "[INTERNAL]  Get required
 length of w field.
+
+";
+
+%feature("docstring") casadi::Smoothing::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -44865,8 +44734,8 @@ Function instance consisting of only one MX call.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
+%feature("docstring") casadi::Sqpmethod::eval_name "[INTERNAL]  Get name of
+the evaluation function.
 
 ";
 
@@ -45227,6 +45096,11 @@ Diagrams
 
 C++ includes: sqpmethod.hpp ";
 
+%feature("docstring") casadi::Sqpmethod::sz_arg "[INTERNAL]  Get required
+length of arg field.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::eval_dm "[INTERNAL]  Evaluate with
 DM matrices.
 
@@ -45244,11 +45118,6 @@ reference to the object.
 
 %feature("docstring") casadi::Sqpmethod::free_mx "[INTERNAL]  Get free
 variables ( MX)
-
-";
-
-%feature("docstring") casadi::Sqpmethod::eval_name "[INTERNAL]  Get name of
-the evaluation function.
 
 ";
 
@@ -45298,18 +45167,13 @@ symbolic matrices.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::Sqpmethod::codegen_meta "[INTERNAL]  Generate
+meta-information allowing a user to evaluate a generated function.
 
 ";
 
 %feature("docstring") casadi::Sqpmethod::mapsum_mx "[INTERNAL]  Parallel
 evaluation.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::checkout "[INTERNAL]  Checkout a
-memory object.
 
 ";
 
@@ -45322,6 +45186,11 @@ Sparsities of function inputs and outputs.
 
 %feature("docstring") casadi::Sqpmethod::mx_out "[INTERNAL]  Get function
 input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Sqpmethod::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -45497,6 +45366,11 @@ code for the function body.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::which_depends "[INTERNAL]  Which
 variables enter with some order.
 
@@ -45510,11 +45384,6 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring") casadi::Sqpmethod::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -45577,8 +45446,8 @@ description.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
+%feature("docstring") casadi::Sqpmethod::alloc_iw "[INTERNAL]  Ensure
+required length of iw field.
 
 ";
 
@@ -45630,8 +45499,8 @@ function input and outputs.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
+%feature("docstring") casadi::Sqpmethod::checkout "[INTERNAL]  Checkout a
+memory object.
 
 ";
 
@@ -45672,13 +45541,8 @@ derivative functions need nondifferentiated outputs?
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::getAlgorithmSize "[INTERNAL]  Get
+%feature("docstring") casadi::Sqpmethod::n_instructions "[INTERNAL]  Get
 the number of atomic operations.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::sz_arg "[INTERNAL]  Get required
-length of arg field.
 
 ";
 
@@ -45763,11 +45627,6 @@ Export / Generate C code for the generated functions.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::alloc_iw "[INTERNAL]  Ensure
-required length of iw field.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::codegen_incref "[INTERNAL]
 Codegen incref for dependencies.
 
@@ -45814,8 +45673,18 @@ objects.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::class_name "[INTERNAL]  Readable
 name of the internal class.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -45825,11 +45694,6 @@ input/output nonzeros.
 ";
 
 %feature("docstring") casadi::Sqpmethod::~Sqpmethod "[INTERNAL] ";
-
-%feature("docstring") casadi::Sqpmethod::codegen_meta "[INTERNAL]  Generate
-meta-information allowing a user to evaluate a generated function.
-
-";
 
 %feature("docstring") casadi::Sqpmethod::matching_res "[INTERNAL]  Check if
 output arguments that needs to be replaced.
@@ -46026,18 +45890,8 @@ function is of a particular type.
 
 ";
 
-%feature("docstring") casadi::Switch::getAlgorithmSize "[INTERNAL]  Get the
-number of atomic operations.
-
-";
-
 %feature("docstring") casadi::Switch::has_derivative "[INTERNAL]  Can
 derivatives be calculated in any way?
-
-";
-
-%feature("docstring") casadi::Switch::setup "[INTERNAL]  Set the
-(persistent and temporary) work vectors.
 
 ";
 
@@ -46127,6 +45981,11 @@ input arguments that needs to be replaced.
 
 ";
 
+%feature("docstring") casadi::Switch::instruction_output "[INTERNAL]  Get
+the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::Switch::print_option "[INTERNAL]  Print all
 information there is to know about a certain option.
 
@@ -46134,11 +45993,6 @@ information there is to know about a certain option.
 
 %feature("docstring") casadi::Switch::size1_in "[INTERNAL]  Input/output
 dimensions.
-
-";
-
-%feature("docstring") casadi::Switch::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
 
 ";
 
@@ -46172,6 +46026,11 @@ input(s) and output(s)
 
 %feature("docstring") casadi::Switch::codegen_body "[INTERNAL]  Generate
 code for the body of the C function.
+
+";
+
+%feature("docstring") casadi::Switch::n_instructions "[INTERNAL]  Get the
+number of atomic operations.
 
 ";
 
@@ -46271,11 +46130,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::Switch::getAtomicInputReal "[INTERNAL]  Get
-the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Switch::sp_reverse "[INTERNAL]  Propagate
 sparsity backwards.
 
@@ -46333,6 +46187,11 @@ reference count.
 
 %feature("docstring") casadi::Switch::generate_dependencies "[INTERNAL]
 Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring") casadi::Switch::instruction_constant "[INTERNAL]  Get
+the floating point output argument of an atomic operation.
 
 ";
 
@@ -46413,11 +46272,6 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::Switch::getAtomicInput "[INTERNAL]  Get the
-(integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Switch::get_options "[INTERNAL]  Options.
 
 ";
@@ -46446,11 +46300,6 @@ Sparsities of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Switch::getAtomicOutput "[INTERNAL]  Get the
-(integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::Switch::get_function "[INTERNAL] ";
 
 %feature("docstring") casadi::Switch::getAdaptorSolverName "[INTERNAL]
@@ -46475,6 +46324,11 @@ numerically, simplied syntax.
 
 %feature("docstring") casadi::Switch::has_free "[INTERNAL]  Does the
 function have free variables.
+
+";
+
+%feature("docstring") casadi::Switch::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
 
 ";
 
@@ -46585,8 +46439,8 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Switch::getAtomicOperation "[INTERNAL]  Get
-an atomic operation operator index.
+%feature("docstring") casadi::Switch::setup "[INTERNAL]  Set the
+(persistent and temporary) work vectors.
 
 ";
 
@@ -46687,6 +46541,11 @@ inputs and outputs scalar.
 
 ";
 
+%feature("docstring") casadi::Switch::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
+
+";
+
 
 // File: classcasadi_1_1SXFunction.xml
 
@@ -46697,11 +46556,6 @@ inputs and outputs scalar.
 // File: classcasadi_1_1SymbolicQr.xml
 %feature("docstring") casadi::SymbolicQr::has_derivative "[INTERNAL]  Can
 derivatives be calculated in any way?
-
-";
-
-%feature("docstring") casadi::SymbolicQr::set_temp "[INTERNAL]  Set the
-(temporary) work vectors.
 
 ";
 
@@ -46743,11 +46597,6 @@ sparsity of a given output.
 
 %feature("docstring") casadi::SymbolicQr::simplified_call "[INTERNAL]  Use
 simplified signature.
-
-";
-
-%feature("docstring") casadi::SymbolicQr::getWorkSize "[INTERNAL]  Get the
-length of the work vector.
 
 ";
 
@@ -46794,6 +46643,11 @@ input value.
 
 %feature("docstring") casadi::SymbolicQr::sparsity_jac "[INTERNAL]  Get, if
 necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::instruction_id "[INTERNAL]  Get
+an atomic operation operator index.
 
 ";
 
@@ -46847,6 +46701,11 @@ function, templated.
 
 ";
 
+%feature("docstring") casadi::SymbolicQr::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::SymbolicQr::sz_work "[INTERNAL]  Get number
 of temporary variables needed.
 
@@ -46896,11 +46755,6 @@ name of the internal class.
 
 %feature("docstring") casadi::SymbolicQr::SymbolicQr "[INTERNAL] ";
 
-%feature("docstring") casadi::SymbolicQr::getAtomicOperation "[INTERNAL]
-Get an atomic operation operator index.
-
-";
-
 %feature("docstring") casadi::SymbolicQr::checkout "[INTERNAL]  Checkout a
 memory object.
 
@@ -46935,6 +46789,11 @@ Symbolic expressions for the adjoint seeds.
 
 %feature("docstring") casadi::SymbolicQr::mx_in "[INTERNAL]  Get function
 input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::SymbolicQr::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
 
 ";
 
@@ -47128,6 +46987,11 @@ reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring") casadi::SymbolicQr::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring") casadi::SymbolicQr::alloc_res "[INTERNAL]  Ensure
 required length of res field.
 
@@ -47146,6 +47010,11 @@ output arguments have correct length and dimensions.
 ";
 
 %feature("docstring") casadi::SymbolicQr::solve "[INTERNAL] ";
+
+%feature("docstring") casadi::SymbolicQr::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
+
+";
 
 %feature("docstring") casadi::SymbolicQr::sz_arg "[INTERNAL]  Get required
 length of arg field.
@@ -47323,13 +47192,8 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::getAtomicInput "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring") casadi::SymbolicQr::getAtomicOutput "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::SymbolicQr::set_temp "[INTERNAL]  Set the
+(temporary) work vectors.
 
 ";
 
@@ -47686,11 +47550,6 @@ class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::getAtomicInputReal "[INTERNAL]
-Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring") casadi::SymbolicQr::definition "[INTERNAL]  Get
 function signature: name:(inputs)->(outputs)
 
@@ -47725,11 +47584,6 @@ function inputs and outputs.
 
 %feature("docstring") casadi::SymbolicQr::sp_weight "[INTERNAL]  Weighting
 factor for chosing forward/reverse mode, sparsity propagation.
-
-";
-
-%feature("docstring") casadi::SymbolicQr::getAlgorithmSize "[INTERNAL]  Get
-the number of atomic operations.
 
 ";
 

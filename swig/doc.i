@@ -65,10 +65,10 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
 
-[INTERNAL]  Generate code the function.
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -143,6 +143,13 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::wrap() const  "
 
 [INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
+const std::string &fname, bool decl_static) const  "
+
+[INTERNAL]  Generate code the function.
 
 ";
 
@@ -461,12 +468,6 @@ const Function &nlp) "
 *m, int idx, int maxQP) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
@@ -949,13 +950,6 @@ Diagrams
 
 C++ includes: blocksqp.hpp ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
-
-[INTERNAL]  Generate code for the declarations of the C function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
 
@@ -977,13 +971,6 @@ double cNormTrial, double dfTdeltaXi, bool swCond, int it) const  "
 *m) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
 &g) const  "
@@ -1012,6 +999,13 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::Blocksqp::class_name() const override "
 
 [INTERNAL]  Readable name of the internal class.
@@ -1034,10 +1028,10 @@ bool soc) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]  Generate code for the declarations of the C function.
 
 ";
 
@@ -1165,6 +1159,13 @@ propagation.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
 const std::vector< MatType > &v) const  "
 
@@ -1175,12 +1176,6 @@ const std::vector< MatType > &v) const  "
 %feature("docstring")  casadi::FunctionInternal::n_in() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -1320,6 +1315,12 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::check_res(const
 std::vector< M > &res) const  "
 
@@ -1375,10 +1376,10 @@ original
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::print_option(const
+std::string &name, std::ostream &stream) const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Print all information there is to know about a certain option.
 
 ";
 
@@ -1499,6 +1500,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::oracle() const override "
 
 [INTERNAL]  Get oracle.
@@ -1528,13 +1536,6 @@ OracleMemory *m) const  "
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -1841,13 +1842,6 @@ casadi::Blocksqp::feasibilityRestorationHeuristic(BlocksqpMemory *m) const
 "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::print_option(const
-std::string &name, std::ostream &stream) const  "
-
-[INTERNAL]  Print all information there is to know about a certain option.
-
-";
 
 %feature("docstring")  casadi::Nlpsol::get_sparsity_out(int i) override "
 
@@ -2317,13 +2311,6 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::self() const  "
 
 [INTERNAL]  Get a public class instance.
@@ -2377,10 +2364,10 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::free_mem(void *mem) const
+"
 
-[INTERNAL]  Print free variables.
+[INTERNAL]  Free memory block.
 
 ";
 
@@ -2407,13 +2394,6 @@ std::vector< MX > &arg, const std::string &parallelization) "
 int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 [INTERNAL]  Get the sparsity pattern, forward mode.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -2565,10 +2545,9 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
-double **&arg, double **&res, int *&iw, double *&w) const  "
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
-[INTERNAL]  Set the (persistent) work vectors.
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -2582,12 +2561,6 @@ Is codegen supported?
 persistent=false) "
 
 [INTERNAL]  Ensure required length of iw field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -2647,9 +2620,10 @@ std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
+%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
+&stream) const  "
 
-[INTERNAL]  Get the number of atomic operations.
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -2712,6 +2686,13 @@ std::string &name) const  "
 %feature("docstring")  casadi::BSplineCommon::get_n_out() override "
 
 Number of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
+double **&arg, double **&res, int *&iw, double *&w) const  "
+
+[INTERNAL]  Set the (persistent) work vectors.
 
 ";
 
@@ -2817,13 +2798,6 @@ const std::string &fname, bool decl_static) const  "
 bool persistent=false) "
 
 [INTERNAL]  Ensure required length of arg field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -3139,9 +3113,30 @@ Evaluate numerically, work vectors given.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::name() const  "
 
 [INTERNAL]  Name of the function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -3152,10 +3147,9 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
-[INTERNAL]  Get an atomic operation operator index.
+[INTERNAL]  Release a memory object.
 
 ";
 
@@ -3455,13 +3449,6 @@ Diagrams
 
 C++ includes: bspline.hpp ";
 
-%feature("docstring")  casadi::FunctionInternal::free_mem(void *mem) const
-"
-
-[INTERNAL]  Free memory block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -3550,9 +3537,10 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
 
-[INTERNAL]  Release a memory object.
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -3629,6 +3617,13 @@ bool never_inline) const  "
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Evaluate a function, overloaded.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -3718,6 +3713,13 @@ double **res, int *iw, double *w, void *mem) const  "
 %feature("docstring")  casadi::FunctionInternal::has_sprev() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -3985,9 +3987,9 @@ Diagrams
 
 C++ includes: bspline.hpp ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
+%feature("docstring")  casadi::FunctionInternal::clear_mem() "
 
-[INTERNAL]  Get the number of atomic operations.
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -4224,6 +4226,12 @@ int oind, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -4241,12 +4249,6 @@ always_inline, bool never_inline) const  "
 
 [INTERNAL]  Forward mode AD, virtual functions overloaded in derived
 classes.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -4358,6 +4360,13 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind)
 const  "
@@ -4425,13 +4434,6 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::name() const  "
 
 [INTERNAL]  Name of the function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -4669,12 +4671,6 @@ std::vector< MX > &arg, const std::string &parallelization) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::clear_mem() "
-
-[INTERNAL]  Clear all memory (called from destructor)
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::wrap() const  "
 
 [INTERNAL]  Wrap in an Function instance consisting of only one MX call.
@@ -4704,13 +4700,6 @@ persistent=false) "
 int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 [INTERNAL]  Get the sparsity pattern, forward mode.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -4859,13 +4848,6 @@ std::vector< std::vector< M > > &aseed) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_gen(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -4908,6 +4890,13 @@ Initialize.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_function(const
 std::string &fname) const  "
 
@@ -4941,13 +4930,6 @@ std::string &fname) const  "
 %feature("docstring")  casadi::FunctionInternal::all_scalar() const  "
 
 [INTERNAL]  Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -5081,13 +5063,6 @@ Generate code for the declarations of the C function.
 %feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
 [INTERNAL]  Get required length of w field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -5238,10 +5213,16 @@ std::vector< std::vector< M > > &aseed) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
+
+[INTERNAL]  Number of nodes in the algorithm.
 
 ";
 
@@ -5261,13 +5242,6 @@ const  "
 &name) const  "
 
 [INTERNAL]  Get input scheme index by name.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -5356,13 +5330,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -5418,6 +5385,13 @@ Destructor.
 %feature("docstring")  casadi::FunctionInternal::eval_name() const  "
 
 [INTERNAL]  Get name of the evaluation function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -5880,6 +5854,13 @@ structure recognition.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_function(const
 std::string &fname) const  "
 
@@ -5888,12 +5869,6 @@ std::string &fname) const  "
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
-
-[INTERNAL]  Number of nodes in the algorithm.
 
 ";
 
@@ -5956,12 +5931,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getJacSparsityGen(int iind,
 int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
@@ -5974,6 +5943,12 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -6049,12 +6024,6 @@ Generate code for the body of the C function.
 %feature("docstring")  casadi::FunctionInternal::simplified_call() const  "
 
 [INTERNAL]  Use simplified signature.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -6172,6 +6141,13 @@ std::vector< M > &res) const  "
 %feature("docstring")  casadi::FunctionInternal::name_out(int ind) const  "
 
 [INTERNAL]  Get output scheme name by index.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -6482,6 +6458,13 @@ constructor), this class should invoke this function when initialized.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -6521,6 +6504,13 @@ std::string &name) const  "
 &type, bool recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -6570,6 +6560,13 @@ std::string &iname) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::mx_out(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -6586,12 +6583,6 @@ std::string &iname) const  "
 std::vector< M > &res) const  "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
-
-[INTERNAL]  Get required length of iw field.
 
 ";
 
@@ -6673,12 +6664,6 @@ std::vector< std::vector< M > > &fseed) const  "
 &name) const  "
 
 [INTERNAL]  Get output scheme index by name.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -6834,6 +6819,12 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
 oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
 allow_forward, bool allow_reverse) const  "
@@ -6878,13 +6869,6 @@ std::vector< M > &arg) const  "
 DM > &arg) const  "
 
 [INTERNAL]  Evaluate with DM matrices.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -7071,19 +7055,6 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
 [INTERNAL]  Get required length of w field.
@@ -7111,6 +7082,13 @@ std::vector< M > &res) const  "
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -7180,13 +7158,6 @@ std::vector< std::vector< M > > &aseed) const  "
 %feature("docstring")  casadi::Interpolant::get_name_out(int i) override "
 
 [INTERNAL]  Names of function input and outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -7268,10 +7239,9 @@ casadi::BSplineInterpolant::codegen_body(CodeGenerator &g) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Get required length of iw field.
 
 ";
 
@@ -7782,7 +7752,13 @@ Get the sparsity of an input This function is called during construction.
 
 %feature("docstring")  casadi::Function::getWorkSize() const  "
 
-Get the length of the work vector.
+[DEPRECATED] Use sz_w instead
+
+";
+
+%feature("docstring")  casadi::Function::instruction_id(int k) const  "
+
+Identifier index of the instruction ( SXFunction)
 
 ";
 
@@ -7988,13 +7964,19 @@ Export / Generate C code for the function.
 
 %feature("docstring")  casadi::Function::getAtomicInput(int k) const  "
 
-Get the (integer) input arguments of an atomic operation.
+[DEPRECATED] Renamed instruction_index
+
+";
+
+%feature("docstring")  casadi::Function::instruction_input(int k) const  "
+
+Locations in the work vector for the inputs of the instruction ( SXFunction)
 
 ";
 
 %feature("docstring")  casadi::Function::getAtomicInputReal(int k) const  "
 
-Get the floating point output argument of an atomic operation.
+[DEPRECATED] Renamed instruction_constant
 
 ";
 
@@ -8093,7 +8075,13 @@ Destructor.
 
 %feature("docstring")  casadi::Function::getAtomicOutput(int k) const  "
 
-Get the (integer) output argument of an atomic operation.
+[DEPRECATED] Renamed instruction_output
+
+";
+
+%feature("docstring")  casadi::Function::instruction_output(int k) const  "
+
+Location in the work vector for the output of the instruction ( SXFunction)
 
 ";
 
@@ -8237,6 +8225,12 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
+%feature("docstring")  casadi::SharedObject::class_name() const  "
+
+Get class name.
+
+";
+
 %feature("docstring")  casadi::SharedObject::get_str(bool more=false) const
 "
 
@@ -8270,9 +8264,16 @@ Get output dimension.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::class_name() const  "
+%feature("docstring")  casadi::Function::n_instructions() const  "
 
-Get class name.
+Number of instruction in the algorithm ( SXFunction)
+
+";
+
+%feature("docstring")  casadi::Function::instruction_constant(int k) const
+"
+
+Get the floating point output argument of an instruction ( SXFunction)
 
 ";
 
@@ -8423,7 +8424,7 @@ const std::vector< std::string > &s_in, const std::vector< std::string >
 
 %feature("docstring")  casadi::Function::getAlgorithmSize() const  "
 
-Get the number of atomic operations.
+[DEPRECATED] Renamed n_instructions
 
 ";
 
@@ -8502,7 +8503,7 @@ For a particular input or for all of the inputs
 
 %feature("docstring")  casadi::Function::getAtomicOperation(int k) const  "
 
-Get an atomic operation operator index.
+[DEPRECATED] Renamed instruction_id
 
 ";
 
@@ -9158,13 +9159,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_function(const
 std::string &fname) const  "
 
@@ -9385,6 +9379,20 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FiniteDiff::get_name_out(int i) override "
 
 [INTERNAL]  Names of function input and outputs.
@@ -9400,13 +9408,6 @@ override "
 %feature("docstring")  casadi::FiniteDiff::get_name_in(int i) override "
 
 [INTERNAL]  Names of function input and outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -9560,13 +9561,6 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::which_depends(const
 std::string &s_in, const std::vector< std::string > &s_out, int order, bool
 tr=false) const  "
@@ -9583,6 +9577,12 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -9675,12 +9675,6 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FiniteDiff::get_sparsity_in(int i) override "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
@@ -9716,13 +9710,6 @@ std::vector< MX > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
 [INTERNAL]  Does the function have free variables.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -9891,6 +9878,13 @@ std::vector< M > &res) const  "
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 [INTERNAL]  Get number of temporary variables needed.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -10326,9 +10320,10 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
 
-[INTERNAL]  Get the length of the work vector.
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -10702,6 +10697,13 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
@@ -10833,14 +10835,6 @@ original
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
-
-[INTERNAL]  Generate meta-information allowing a user to evaluate a
-generated function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
 
 [INTERNAL]  Get largest input value.
@@ -10941,13 +10935,6 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::Integrator::print_stats(IntegratorMemory
 *mem, std::ostream &stream) const  "
 
@@ -10976,6 +10963,13 @@ std::string &fname) const override "
 %feature("docstring")  casadi::Integrator::get_n_in() override "
 
 [INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -11199,6 +11193,12 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
 *m, const std::string &fcn, const double *const *arg=0) const  "
 
@@ -11248,13 +11248,6 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 &vdef_fcn, Function &vinit_fcn) const  "
 
 [INTERNAL]  Extract the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -11355,6 +11348,12 @@ override "
 %feature("docstring")  casadi::Integrator::q() const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
+
+[INTERNAL]  Get name of the evaluation function.
+
+";
 
 %feature("docstring")  casadi::Integrator::t() const  "
 
@@ -11462,13 +11461,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
 %feature("docstring")  casadi::Integrator::rx() const  "
 
 [INTERNAL] ";
@@ -11535,9 +11527,11 @@ std::vector< std::string > &s_out, const Function::AuxOut
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
+%feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
+&g, const std::string &fname) const  "
 
-[INTERNAL]  Get the length of the work vector.
+[INTERNAL]  Generate meta-information allowing a user to evaluate a
+generated function.
 
 ";
 
@@ -11607,9 +11601,10 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
 
-[INTERNAL]  Get name of the evaluation function.
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -11688,6 +11683,13 @@ std::string &fname) override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)
 override "
 
@@ -11734,12 +11736,6 @@ elements.
 &name) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
 
 %feature("docstring") casadi::Collocation "
 
@@ -11876,13 +11872,6 @@ elements.
 %feature("docstring")  casadi::Integrator::aug_fwd(int nfwd) const  "
 
 [INTERNAL]  Generate a augmented DAE system with nfwd forward sensitivities.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -12168,6 +12157,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
+
+[INTERNAL]  Readable name of the internal class.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -12204,9 +12199,9 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -12494,13 +12489,6 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -12621,12 +12609,6 @@ std::map< std::string, Sparsity > &st) "
 std::vector< M > &arg) const  "
 
 [INTERNAL]  Check if input arguments have correct length and dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -12755,6 +12737,13 @@ std::vector< M > &res) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_out() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -12858,6 +12847,13 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -12886,6 +12882,13 @@ structure recognition for symmetric Jacobians
 %feature("docstring")  casadi::FunctionInternal::numel_in(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -12922,10 +12925,10 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -12993,12 +12996,6 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
 "
@@ -13427,13 +13424,6 @@ C++ includes: conic_impl.hpp ";
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::wrap() const  "
 
 [INTERNAL]  Wrap in an Function instance consisting of only one MX call.
@@ -13468,13 +13458,6 @@ get_forward(int nfwd) if no cached version is available.
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Propagate sparsity forward.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -14392,18 +14375,6 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::forward(int nfwd) const  "
 
 [INTERNAL]  Return function that calculates forward derivatives
@@ -14760,6 +14731,13 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -15170,6 +15148,13 @@ generated function.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -15225,6 +15210,12 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
@@ -15257,16 +15248,9 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
+%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
-[INTERNAL]  Memory objects.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Get required length of iw field.
 
 ";
 
@@ -15296,19 +15280,6 @@ std::vector< M > &res) const  "
 %feature("docstring")  casadi::FunctionInternal::numel_in(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
-
-[INTERNAL]  Readable name of the internal class.
 
 ";
 
@@ -15401,6 +15372,19 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
+
+[INTERNAL]  Memory objects.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::reverse(int nadj) const  "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
@@ -15436,9 +15420,10 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
 
-[INTERNAL]  Get required length of iw field.
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -15459,13 +15444,6 @@ std::vector< M > &arg) const  "
 const std::string &fname, bool decl_static) const  "
 
 [INTERNAL]  Generate code the function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -15588,10 +15566,9 @@ CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
+%feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
 
-[INTERNAL]  Get an atomic operation operator index.
+[INTERNAL]  Readable name of the internal class.
 
 ";
 
@@ -15805,10 +15782,9 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Get required length of res field.
 
 ";
 
@@ -15839,10 +15815,10 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]  Print more.
 
 ";
 
@@ -15912,9 +15888,9 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -15980,12 +15956,6 @@ propagation.
 %feature("docstring")  casadi::FunctionInternal::name_out(int ind) const  "
 
 [INTERNAL]  Get output scheme name by index.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -16212,9 +16182,10 @@ constructor), this class should invoke this function when initialized.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_res() const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
 
-[INTERNAL]  Get required length of res field.
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -16334,13 +16305,6 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
 
 [INTERNAL]  Symbolic expressions for the forward seeds.
@@ -16362,6 +16326,13 @@ bool persistent=false) "
 %feature("docstring")  casadi::Expm::default_in(int ind) const override "
 
 [INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -16401,6 +16372,13 @@ std::vector< std::vector< M > > &fseed) const  "
 %feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -16824,13 +16802,6 @@ bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print more.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
 std::string &fname, const Dict &opts) const  "
 
@@ -16844,6 +16815,13 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -16897,13 +16875,6 @@ std::vector< M > &arg) const  "
 const std::vector< MatType > &v) const  "
 
 [INTERNAL]  Symbolic expressions for the adjoint seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -17093,6 +17064,12 @@ original
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
+
+[INTERNAL]  Readable name of the internal class.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sparsity_jac(int iind, int
 oind, bool compact, bool symmetric) const  "
 
@@ -17103,12 +17080,6 @@ oind, bool compact, bool symmetric) const  "
 %feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -17241,6 +17212,13 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -17274,9 +17252,17 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
 
-[INTERNAL]  Get the length of the work vector.
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::signature(const std::string
+&fname) const  "
+
+[INTERNAL]  Code generate the function.
 
 ";
 
@@ -17458,19 +17444,6 @@ const std::vector< std::string > &s_in, const std::vector< std::string >
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
-
-[INTERNAL]  Get a weak reference to the object.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
 const std::vector< MatType > &v) const  "
 
@@ -17485,10 +17458,9 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
 
-[INTERNAL]  Get an atomic operation operator index.
+[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -17515,12 +17487,6 @@ const  "
 const Importer &li) "
 
 [INTERNAL]  Constructor.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -17587,10 +17553,9 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::has_codegen() const  "
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]  Is codegen supported?
 
 ";
 
@@ -17729,6 +17694,20 @@ oind, bool compact, bool symmetric) const  "
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -17896,12 +17875,6 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_codegen() const  "
-
-[INTERNAL]  Is codegen supported?
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::mx_in(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -18012,13 +17985,6 @@ std::string &fname) "
 %feature("docstring")  casadi::FunctionInternal::nnz_out(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::signature(const std::string
-&fname) const  "
-
-[INTERNAL]  Code generate the function.
 
 ";
 
@@ -18214,10 +18180,9 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -18333,12 +18298,6 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 bool persistent=false) "
 
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -18644,6 +18603,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generate_lifted(Function
 &vdef_fcn, Function &vinit_fcn) const  "
 
@@ -18691,10 +18657,9 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -18787,6 +18752,13 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_gen(const double
 **arg, double **res, int *iw, double *w, void *mem) const  "
 
@@ -18874,13 +18846,6 @@ double **arg, double **res, int *iw, double *w) const  "
 persistent=false) "
 
 [INTERNAL]  Ensure required length of w field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -19054,13 +19019,6 @@ bool more) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
-
-[INTERNAL]  Generate code the function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::matching_arg(const
 std::vector< M > &arg) const  "
 
@@ -19141,6 +19099,13 @@ std::vector< std::vector< M > > &aseed) const  "
 CodeGenerator &g) const  "
 
 [INTERNAL]  Get name in codegen.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -19339,10 +19304,10 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
 
-[INTERNAL]  Print more.
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -19411,9 +19376,10 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
+%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
+const std::string &fname, bool decl_static) const  "
 
-[INTERNAL]  Get the number of atomic operations.
+[INTERNAL]  Generate code the function.
 
 ";
 
@@ -19505,24 +19471,10 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::mapsum_mx(const
 std::vector< MX > &arg, const std::string &parallelization) "
 
 [INTERNAL]  Parallel evaluation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -19598,10 +19550,17 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
-bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
 
-[INTERNAL]  Propagate sparsity backwards.
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -19838,6 +19797,13 @@ const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::Integrator::get_name_in(int i) override "
 
 [INTERNAL]  Names of function input and outputs.
@@ -19906,15 +19872,23 @@ CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
 
-[INTERNAL]  Get the number of atomic operations.
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
 %feature("docstring")  casadi::OracleFunction::expand() "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
 "
@@ -20027,13 +20001,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call(const std::vector< M >
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
@@ -20052,13 +20019,6 @@ std::vector< M > &arg) const  "
 casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 [INTERNAL]  Add a dependent function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -20144,8 +20104,8 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
 
 [INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
@@ -20559,6 +20519,13 @@ C++ includes: integrator_impl.hpp ";
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FixedStepIntegrator::free_mem(void *mem)
 const override "
 
@@ -20806,14 +20773,6 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
-oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
-allow_forward, bool allow_reverse) const  "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
 &g) const  "
 
@@ -20868,16 +20827,16 @@ OracleMemory *m) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::clear_mem() "
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
 
-[INTERNAL]  Clear all memory (called from destructor)
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::clear_mem() "
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -21080,12 +21039,6 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
 
 [INTERNAL]  Get largest input value.
@@ -21240,6 +21193,13 @@ const std::string &fname, bool decl_static) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::all_scalar() const  "
 
 [INTERNAL]  Are all inputs and outputs scalar.
@@ -21321,12 +21281,6 @@ std::vector< std::vector< M > > &fseed) const  "
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -21814,13 +21768,6 @@ original
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
@@ -21877,13 +21824,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size2_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -21909,10 +21849,9 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Get required length of iw field.
 
 ";
 
@@ -21965,21 +21904,16 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::n_in() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
 
-[INTERNAL]  Get required length of iw field.
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -22068,10 +22002,10 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
 const  "
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -22166,6 +22100,13 @@ always_inline, bool never_inline) const  "
 bool persistent=false) "
 
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
+std::string &fname, const Dict &opts) const  "
+
+[INTERNAL]  Export / Generate C code for the dependency function.
 
 ";
 
@@ -22288,6 +22229,12 @@ bool more) const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_sx(const SXElem **arg,
 SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
@@ -22322,10 +22269,10 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
-std::string &fname, const Dict &opts) const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
 
-[INTERNAL]  Export / Generate C code for the dependency function.
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -22613,6 +22560,12 @@ C++ includes: timing.hpp ";
 
 
 // File: classcasadi_1_1Function.xml
+%feature("docstring")  casadi::Function::n_instructions() const  "
+
+Number of instruction in the algorithm ( SXFunction)
+
+";
+
 %feature("docstring")  casadi::Function::nnz_in() const  "
 
 Get number of input nonzeros.
@@ -22682,6 +22635,18 @@ Get oracle.
 
 ";
 
+%feature("docstring")  casadi::Function::instruction_id(int k) const  "
+
+Identifier index of the instruction ( SXFunction)
+
+";
+
+%feature("docstring")  casadi::Function::instruction_output(int k) const  "
+
+Location in the work vector for the output of the instruction ( SXFunction)
+
+";
+
 %feature("docstring")  casadi::Function::wrap() const  "
 
 Wrap in an Function instance consisting of only one MX call.
@@ -22690,7 +22655,7 @@ Wrap in an Function instance consisting of only one MX call.
 
 %feature("docstring")  casadi::Function::getAtomicOperation(int k) const  "
 
-Get an atomic operation operator index.
+[DEPRECATED] Renamed instruction_id
 
 ";
 
@@ -22702,7 +22667,7 @@ Get an atomic operation operator index.
 
 %feature("docstring")  casadi::Function::getAlgorithmSize() const  "
 
-Get the number of atomic operations.
+[DEPRECATED] Renamed n_instructions
 
 ";
 
@@ -22745,10 +22710,10 @@ Get string representation.
 
 ";
 
-%feature("docstring") casadi::Function::__hash__ "
+%feature("docstring")  casadi::SharedObject::disp(std::ostream &stream, bool
+more=false) const  "
 
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
+Print a description of the object.
 
 ";
 
@@ -23056,7 +23021,7 @@ Get the number of function outputs.
 
 %feature("docstring")  casadi::Function::getAtomicInput(int k) const  "
 
-Get the (integer) input arguments of an atomic operation.
+[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -23094,10 +23059,10 @@ Destructor
 
 ";
 
-%feature("docstring")  casadi::SharedObject::disp(std::ostream &stream, bool
-more=false) const  "
+%feature("docstring") casadi::Function::__hash__ "
 
-Print a description of the object.
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -23134,6 +23099,12 @@ Get output dimension.
 %feature("docstring")  casadi::SharedObject::class_name() const  "
 
 Get class name.
+
+";
+
+%feature("docstring")  casadi::Function::instruction_input(int k) const  "
+
+Locations in the work vector for the inputs of the instruction ( SXFunction)
 
 ";
 
@@ -23357,9 +23328,9 @@ Get input dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::n_nodes() const  "
+%feature("docstring")  casadi::Function::getAtomicOutput(int k) const  "
 
-Number of nodes in the algorithm.
+[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -23695,7 +23666,7 @@ Print free variables.
 
 %feature("docstring")  casadi::Function::getAtomicInputReal(int k) const  "
 
-Get the floating point output argument of an atomic operation.
+[DEPRECATED] Renamed instruction_constant
 
 ";
 
@@ -23726,9 +23697,9 @@ Assert that an input dimension is equal so some given value.
 
 ";
 
-%feature("docstring")  casadi::Function::getAtomicOutput(int k) const  "
+%feature("docstring")  casadi::Function::n_nodes() const  "
 
-Get the (integer) output argument of an atomic operation.
+Number of nodes in the algorithm.
 
 ";
 
@@ -23904,7 +23875,7 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring")  casadi::Function::getWorkSize() const  "
 
-Get the length of the work vector.
+[DEPRECATED] Use sz_w instead
 
 ";
 
@@ -23953,6 +23924,13 @@ Get input dimension.
 %feature("docstring")  casadi::Function::has_sprev() const  "
 
 Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring")  casadi::Function::instruction_constant(int k) const
+"
+
+Get the floating point output argument of an instruction ( SXFunction)
 
 ";
 
@@ -24214,10 +24192,10 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
 
-[INTERNAL]  Get an atomic operation operator index.
+[INTERNAL]  Print.
 
 ";
 
@@ -24254,12 +24232,6 @@ elements.
 &name) const  "
 
 [INTERNAL]  Get output scheme index by name.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
-
-[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -24351,13 +24323,6 @@ classes.
 %feature("docstring")  casadi::FunctionInternal::numel_in(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -24528,22 +24493,10 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
 
-[INTERNAL]  Get the length of the work vector.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
-persistent=false) "
-
-[INTERNAL]  Ensure required length of iw field.
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -24610,13 +24563,6 @@ std::vector< M > &res) const  "
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -24733,9 +24679,10 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
 
-[INTERNAL]  Get a weak reference to the object.
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -24759,6 +24706,12 @@ oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
 allow_forward, bool allow_reverse) const  "
 
 [INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -24853,13 +24806,6 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
 "
 
@@ -24928,6 +24874,13 @@ override "
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
+persistent=false) "
+
+[INTERNAL]  Ensure required length of iw field.
 
 ";
 
@@ -25031,6 +24984,13 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::set_temp(void *mem, const
+double **arg, double **res, int *iw, double *w) const  "
+
+[INTERNAL]  Set the (temporary) work vectors.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sparsity_in(int ind) const
 "
 
@@ -25069,6 +25029,13 @@ double **res, int *iw, double *w, void *mem) const  "
 override "
 
 [INTERNAL]  Retreive sparsities.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -25119,16 +25086,22 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size2_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_temp(void *mem, const
-double **arg, double **res, int *iw, double *w) const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
 
-[INTERNAL]  Set the (temporary) work vectors.
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -25139,10 +25112,9 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
-bool more) const override "
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
-[INTERNAL]  Print.
+[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -26103,13 +26075,6 @@ C++ includes: global_options.hpp ";
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
 double **&arg, double **&res, int *&iw, double *&w) const  "
 
@@ -26320,13 +26285,6 @@ OracleMemory *m) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
 %feature("docstring")  casadi::Integrator::get_sparsity_in(int i) override "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
@@ -26401,16 +26359,16 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print list of options.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -26673,9 +26631,10 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
 
-[INTERNAL]  Get the number of atomic operations.
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -26796,6 +26755,12 @@ const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::Integrator::get_sparsity_out(int i) override
 "
 
@@ -26810,9 +26775,9 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
+%feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
-[INTERNAL]  Get the length of the work vector.
+[INTERNAL]  Number of nodes in the algorithm.
 
 ";
 
@@ -26862,10 +26827,10 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
 const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -27096,18 +27061,17 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
+%feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
+&stream) const  "
 
-[INTERNAL]  Number of nodes in the algorithm.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Print list of options.
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Integrator  >::plugin_name()
+const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Integrator::eval(const double **arg, double
 **res, int *iw, double *w, void *mem) const override "
@@ -27316,6 +27280,13 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -27335,11 +27306,6 @@ always_inline, bool never_inline) const  "
 classes.
 
 ";
-
-%feature("docstring")  casadi::PluginInterface< Integrator  >::plugin_name()
-const  "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
@@ -27569,12 +27535,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sx_in(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -27640,13 +27600,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 std::vector< std::vector< M > > &fseed) const  "
 
 [INTERNAL]  Replace 0-by-0 forward seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -27931,10 +27884,10 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
+&g) const  "
 
-[INTERNAL]  Get name in codegen.
+[INTERNAL]  Generate code for the function body.
 
 ";
 
@@ -28128,13 +28081,6 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -28305,17 +28251,17 @@ double **arg, double **res, int *iw, double *w) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
-&g) const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
 
-[INTERNAL]  Generate code for the function body.
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::codegen_name(const
+CodeGenerator &g) const  "
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]  Get name in codegen.
 
 ";
 
@@ -28330,13 +28276,6 @@ const  "
 DM > &arg) const  "
 
 [INTERNAL]  Evaluate with DM matrices.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
-
-[INTERNAL]  Print dimensions of inputs and outputs.
 
 ";
 
@@ -28374,10 +28313,10 @@ std::vector< std::vector< M > > &aseed) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")
+casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Print dimensions of inputs and outputs.
 
 ";
 
@@ -28419,12 +28358,6 @@ std::vector< M > &arg) const  "
 std::string &fname) const override "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::clear_mem() "
 
@@ -28522,6 +28455,13 @@ override "
 persistent=false) "
 
 [INTERNAL]  Ensure required length of iw field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -28644,6 +28584,12 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
 [INTERNAL]  Does the function have free variables.
@@ -28666,6 +28612,13 @@ std::string &fname, const Dict &opts) const override "
 %feature("docstring")  casadi::OracleFunction::expand() "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_stats(void *mem) const
 override "
@@ -28697,6 +28650,13 @@ override "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -29114,13 +29074,6 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::print_option(const
-std::string &name, std::ostream &stream) const  "
-
-[INTERNAL]  Print all information there is to know about a certain option.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -29226,6 +29179,12 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::reverse(int nadj) const  "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
@@ -29297,6 +29256,13 @@ double t, const double *rx, const double *rz, const double *rp) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
+
+[INTERNAL]  Ensure required length of w field.
+
+";
+
 %feature("docstring")  casadi::Integrator::init_mem(void *mem) const
 override "
 
@@ -29317,10 +29283,10 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
-persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
 
-[INTERNAL]  Ensure required length of w field.
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -29447,10 +29413,10 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
+%feature("docstring")
+casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Codegen incref for dependencies.
 
 ";
 
@@ -29613,13 +29579,6 @@ OracleMemory *m) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
 const  "
 
@@ -29627,17 +29586,24 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
+%feature("docstring")  casadi::OracleFunction::set_temp(void *mem, const
+double **arg, double **res, int *iw, double *w) const override "
+
+[INTERNAL]  Set the work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
 const  "
 
 [INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::set_temp(void *mem, const
-double **arg, double **res, int *iw, double *w) const override "
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
 
-[INTERNAL]  Set the work vectors.
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -29789,12 +29755,6 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
 
 [INTERNAL]  Symbolic expressions for the forward seeds.
@@ -29811,13 +29771,6 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 %feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -29871,6 +29824,13 @@ std::vector< M > &res) const  "
 &fname) const  "
 
 [INTERNAL]  Code generate the function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -29928,10 +29888,10 @@ bool more) const override "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::print_option(const
+std::string &name, std::ostream &stream) const  "
 
-[INTERNAL]  Codegen incref for dependencies.
+[INTERNAL]  Print all information there is to know about a certain option.
 
 ";
 
@@ -30213,12 +30173,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::which_depends(const
 std::string &s_in, const std::vector< std::string > &s_out, int order, bool
 tr=false) const  "
@@ -30380,12 +30334,6 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const override "
 
 
 // File: classcasadi_1_1Interpolant.xml
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::fwdViaJac(int nfwd) const
 "
 
@@ -30450,10 +30398,10 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::init_mem(void *mem) const
-"
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
 
-[INTERNAL]  Initalize memory block.
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -30583,13 +30531,6 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
-
-[INTERNAL]  Print dimensions of inputs and outputs.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_reverse(int nadj, const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
@@ -30702,10 +30643,9 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
 
-[INTERNAL]  Get an atomic operation operator index.
+[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -30734,13 +30674,6 @@ get_forward(int nfwd) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::nnz_in(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -30831,6 +30764,12 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
@@ -30911,6 +30850,13 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size2_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -30924,12 +30870,6 @@ const std::string &fname, bool decl_static) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
 double **&arg, double **&res, int *&iw, double *&w) const  "
 
@@ -30940,12 +30880,6 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 %feature("docstring")  casadi::FunctionInternal::n_in() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
-
-[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -30977,10 +30911,24 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
+
+[INTERNAL]  Ensure required length of w field.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sparsity_jac(int iind, int
 oind, bool compact, bool symmetric) const  "
 
 [INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -31046,10 +30994,10 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::free_mem(void *mem) const
+"
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]  Free memory block.
 
 ";
 
@@ -31142,13 +31090,6 @@ original
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(int nfwd) if no cached version is available.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::free_mem(void *mem) const
-"
-
-[INTERNAL]  Free memory block.
 
 ";
 
@@ -31344,6 +31285,13 @@ const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::init_mem(void *mem) const
+"
+
+[INTERNAL]  Initalize memory block.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
@@ -31377,10 +31325,10 @@ std::string &fname) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")
+casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Print dimensions of inputs and outputs.
 
 ";
 
@@ -31406,10 +31354,10 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
-persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
 
-[INTERNAL]  Ensure required length of w field.
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -31772,16 +31720,17 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Propagate sparsity forward.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -31853,6 +31802,13 @@ Is codegen supported?
 %feature("docstring")  casadi::FunctionInternal::has_spfwd() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -31950,6 +31906,12 @@ generated function.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_mem(void *mem) const
 "
 
@@ -31961,6 +31923,13 @@ generated function.
 "
 
 [INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -32058,13 +32027,6 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sparsity_out(int ind) const
 "
 
@@ -32079,23 +32041,15 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
+%feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
 
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Memory objects.
 
 ";
 
 %feature("docstring")  casadi::Jit::get_n_in() override "
 
 Number of function inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -32186,12 +32140,6 @@ CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
-
-[INTERNAL]  Memory objects.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::replace_res(const
 std::vector< M > &res) const  "
 
@@ -32221,13 +32169,6 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 %feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
 
 [INTERNAL]  Symbolic expressions for the forward seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -32312,6 +32253,13 @@ std::vector< MX > &arg) const  "
 std::string &fname, const Dict &opts) const  "
 
 [INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -32646,12 +32594,6 @@ std::vector< std::vector< M > > &aseed) const  "
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -33286,6 +33228,13 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::LinsolInternal::get_n_in() override "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -33320,13 +33269,6 @@ DM > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::name_in(int ind) const  "
 
 [INTERNAL]  Get input scheme name by index.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -33599,12 +33541,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -33637,6 +33573,19 @@ bool tr) const  "
 double **&arg, double **&res, int *&iw, double *&w) const  "
 
 [INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -33685,13 +33634,6 @@ std::vector< M > &arg) const  "
 persistent=false) "
 
 [INTERNAL]  Ensure required length of iw field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -33788,6 +33730,13 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -33818,12 +33767,6 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 bool more) const override "
 
 [INTERNAL]  Print.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -34042,6 +33985,13 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_gen(const double
 **arg, double **res, int *iw, double *w, void *mem) const  "
 
@@ -34178,13 +34128,6 @@ allow_forward, bool allow_reverse) const  "
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -34539,13 +34482,6 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -34965,10 +34901,10 @@ C++ includes: lapack_qr.hpp ";
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
-const std::vector< MatType > &v) const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
 
-[INTERNAL]  Symbolic expressions for the adjoint seeds.
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -35068,13 +35004,6 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
 "
 
@@ -35107,16 +35036,17 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::replace_fseed(const
 std::vector< std::vector< M > > &fseed) const  "
 
 [INTERNAL]  Replace 0-by-0 forward seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -35178,10 +35108,10 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
-persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
 
-[INTERNAL]  Ensure required length of w field.
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -35260,12 +35190,6 @@ bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::mx_in(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -35294,6 +35218,13 @@ bool never_inline) const  "
 double **arg, double **res, int *iw, double *w) const  "
 
 [INTERNAL]  Set the (temporary) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -35343,10 +35274,10 @@ nrhs, bool tr) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::jit_dependencies(const
+std::string &fname) "
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]   Jit dependencies.
 
 ";
 
@@ -35399,13 +35330,6 @@ bool persistent=false) "
 *mem, bool tr) const  "
 
 [INTERNAL]   Sparsity pattern of the cholesky factors.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -35744,20 +35668,6 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::jit_dependencies(const
-std::string &fname) "
-
-[INTERNAL]   Jit dependencies.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
 
@@ -35771,6 +35681,13 @@ std::string &fname) "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
+const std::vector< MatType > &v) const  "
+
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
 
 ";
 
@@ -35920,6 +35837,12 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind)
 const  "
@@ -36066,6 +35989,13 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
+
+[INTERNAL]  Ensure required length of w field.
+
+";
+
 
 // File: classcasadi_1_1LinearInterpolant.xml
 %feature("docstring")  casadi::Interpolant::get_sparsity_out(int i) override
@@ -36098,9 +36028,9 @@ original
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
-[INTERNAL]  Get a weak reference to the object.
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -36134,13 +36064,6 @@ persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -36217,6 +36140,13 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::symbolic_output(const
 std::vector< MX > &arg) const  "
 
@@ -36237,6 +36167,12 @@ override "
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sx_in(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -36249,15 +36185,16 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_mem() const  "
 
 [INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -36449,6 +36386,13 @@ const std::string &fname, bool decl_static) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -36621,6 +36565,13 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::replace_arg(const
 std::vector< M > &arg) const  "
 
@@ -36689,13 +36640,6 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
-**arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
 
@@ -36727,19 +36671,6 @@ get_reverse(int nadj) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::clear_mem() "
 
 [INTERNAL]  Clear all memory (called from destructor)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -37158,13 +37089,6 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
 &stream) const  "
 
@@ -37216,10 +37140,10 @@ double *res) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -37385,6 +37309,13 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_gen(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -37397,13 +37328,6 @@ Matrix< D > > &arg, std::vector< Matrix< D > > &res, bool always_inline,
 bool never_inline) const  "
 
 [INTERNAL]   Call a function, overloaded.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -37452,10 +37376,10 @@ std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
+&stream) const  "
 
-[INTERNAL]  Get an atomic operation operator index.
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -37607,6 +37531,13 @@ generated function.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
@@ -37657,12 +37588,6 @@ get_forward(int nfwd) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::get_sparsity_in(int i) "
 
 [INTERNAL]  Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -37793,6 +37718,13 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -37825,13 +37757,6 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
-double **&arg, double **&res, int *&iw, double *&w) const  "
-
-[INTERNAL]  Set the (persistent) work vectors.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::mx_in(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -37847,6 +37772,12 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -38020,10 +37951,9 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
+%feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
 
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Memory objects.
 
 ";
 
@@ -38117,6 +38047,13 @@ std::string &name) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -38307,13 +38244,6 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
 persistent=false) "
 
@@ -38325,19 +38255,6 @@ persistent=false) "
 bool persistent=false) "
 
 [INTERNAL]  Ensure required length of arg field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
-
-[INTERNAL]  Memory objects.
 
 ";
 
@@ -38383,9 +38300,10 @@ std::vector< std::vector< M > > &aseed) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
+%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
+double **&arg, double **&res, int *&iw, double *&w) const  "
 
-[INTERNAL]  Get the number of atomic operations.
+[INTERNAL]  Set the (persistent) work vectors.
 
 ";
 
@@ -38806,6 +38724,12 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -38860,12 +38784,6 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::nnz_out(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -39045,12 +38963,6 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
-
-[INTERNAL]  Get the reference count.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::eval_dm(const std::vector<
 DM > &arg) const  "
 
@@ -39082,6 +38994,13 @@ const std::vector< MatType > &v) const  "
 std::vector< MX > &arg) const  "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -39183,6 +39102,13 @@ generated function.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
 oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
 allow_forward, bool allow_reverse) const  "
@@ -39225,13 +39151,6 @@ original
 %feature("docstring")  casadi::FunctionInternal::numel_in(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -39279,13 +39198,6 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 double **arg, double **res, int *iw, double *w) const  "
 
 [INTERNAL]  Set the (persistent and temporary) work vectors.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -39372,12 +39284,6 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
 CodeGenerator &g) const  "
 
@@ -39404,10 +39310,9 @@ CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -39884,13 +39789,6 @@ override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::reverse(int nadj) const  "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
@@ -39966,6 +39864,13 @@ std::string &fname) const  "
 %feature("docstring")  casadi::FunctionInternal::sx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -40117,6 +40022,13 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::LinsolInternal::linsol_cholesky(void *mem,
 bool tr) const  "
 
@@ -40201,13 +40113,6 @@ persistent=false) "
 
 
 // File: classcasadi_1_1Map.xml
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::n_in() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -40244,6 +40149,13 @@ elements.
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -40349,12 +40261,6 @@ bool more) const override "
 std::vector< M > &res) const  "
 
 [INTERNAL]  Replace 0-by-0 outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -40671,13 +40577,6 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::Map::class_name() const override "
 
 [INTERNAL]  Get type name.
@@ -40856,6 +40755,13 @@ const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::Map::get_sparsity_in(int i) override "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
@@ -40958,9 +40864,9 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
+%feature("docstring")  casadi::FunctionInternal::alloc_mem() const  "
 
-[INTERNAL]  Get the number of atomic operations.
+[INTERNAL]  Create memory block.
 
 ";
 
@@ -41027,12 +40933,6 @@ int oind, bool symmetric) const  "
 bool persistent=false) "
 
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::alloc_mem() const  "
-
-[INTERNAL]  Create memory block.
 
 ";
 
@@ -41152,6 +41052,12 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -41195,18 +41101,18 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
 "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -41244,13 +41150,6 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
 %feature("docstring")  casadi::Map::get_forward(int nfwd, const std::string
 &name, const std::vector< std::string > &inames, const std::vector<
 std::string > &onames, const Dict &opts) const override "
@@ -41270,6 +41169,13 @@ std::string > &onames, const Dict &opts) const override "
 std::vector< std::vector< M > > &fseed) const  "
 
 [INTERNAL]  Replace 0-by-0 forward seeds.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -41445,12 +41351,6 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
 &g, const std::string &fname) const  "
 
@@ -41587,6 +41487,13 @@ structure recognition.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
@@ -41603,13 +41510,6 @@ structure recognition.
 std::vector< std::vector< M > > &fseed) const  "
 
 [INTERNAL]  Replace 0-by-0 forward seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -41637,13 +41537,6 @@ int *iw, bvec_t *w, void *mem) const override "
 &stream) const  "
 
 [INTERNAL]  Print free variables.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -41678,13 +41571,6 @@ bool persistent=false) "
 std::vector< std::vector< M > > &aseed) const  "
 
 [INTERNAL]  Replace 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -41728,13 +41614,6 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::nnz_in(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -41820,6 +41699,13 @@ const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_name(const
 CodeGenerator &g) const  "
 
@@ -41834,10 +41720,10 @@ CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jit_dependencies(const
-std::string &fname) "
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
 
-[INTERNAL]   Jit dependencies.
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -41884,6 +41770,13 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::jit_dependencies(const
+std::string &fname) "
+
+[INTERNAL]   Jit dependencies.
 
 ";
 
@@ -42141,6 +42034,13 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
 [INTERNAL]  Get required length of res field.
@@ -42216,6 +42116,12 @@ always_inline, bool never_inline) const  "
 
 [INTERNAL]  Forward mode AD, virtual functions overloaded in derived
 classes.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -42393,12 +42299,6 @@ DM > &arg) const  "
 std::vector< M > &arg) const  "
 
 [INTERNAL]  Replace 0-by-0 inputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -44730,12 +44630,6 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::replace_fseed(const
 std::vector< std::vector< M > > &fseed) const  "
 
@@ -44799,20 +44693,6 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -44976,6 +44856,13 @@ double *res) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
 
 [INTERNAL]  Symbolic expressions for the forward seeds.
@@ -45133,6 +45020,13 @@ const  "
 **res, int *iw, bvec_t *w, void *mem) const override "
 
 [INTERNAL]  Propagate sparsity backwards.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -45297,12 +45191,6 @@ OracleMemory *m) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::OracleFunction::monitored(const std::string
 &name) const  "
 
@@ -45318,6 +45206,12 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 %feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
 
 [INTERNAL]  Get smallest input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+
+[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -45338,13 +45232,6 @@ elements.
 const std::vector< MatType > &v) const  "
 
 [INTERNAL]  Symbolic expressions for the adjoint seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -45436,9 +45323,9 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
-[INTERNAL]  Get required length of arg field.
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -45511,6 +45398,13 @@ multiplying.
 std::vector< M > &res) const  "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -45755,6 +45649,13 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::set_function(const Function
 &fcn, const std::string &fname, bool jit=false) "
 
@@ -45965,13 +45866,6 @@ bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::Newton::solve(void *mem) const override "
 
 [INTERNAL]   Solve the system of equations and calculate derivatives.
@@ -46036,12 +45930,6 @@ Print a description of the object.
 
 
 // File: classcasadi_1_1Nlpsol.xml
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
 bool persistent=false) "
 
@@ -46170,6 +46058,13 @@ std::string &name) const override "
 %feature("docstring")  casadi::Nlpsol::init_mem(void *mem) const override "
 
 [INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -46360,10 +46255,9 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
-[INTERNAL]  Get an atomic operation operator index.
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -46421,13 +46315,6 @@ std::vector< M > &res) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
 [INTERNAL]  Get required length of res field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -46603,6 +46490,13 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::Nlpsol::set_work(void *mem, const double
 **&arg, double **&res, int *&iw, double *&w) const override "
 
@@ -46749,12 +46643,6 @@ persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::mx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -47036,13 +46924,6 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::name_in(int ind) const  "
 
 [INTERNAL]  Get input scheme name by index.
@@ -47130,13 +47011,6 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
@@ -47216,6 +47090,13 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -47225,6 +47106,13 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 %feature("docstring")  casadi::FunctionInternal::numel_out() const  "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -48638,13 +48526,6 @@ get assignment expressions for initial values
 
 
 // File: classcasadi_1_1OracleFunction.xml
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_reverse(int nadj, const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
@@ -48768,6 +48649,13 @@ std::string &iname) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -48795,6 +48683,13 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
 
 [INTERNAL]  Readable name of the internal class.
@@ -48808,15 +48703,15 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
 [INTERNAL]  Get required length of res field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -49073,13 +48968,6 @@ const std::string &fname, bool decl_static) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
 bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
@@ -49130,13 +49018,6 @@ bool more) const override "
 std::string &name) const override "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::n_out() const  "
 
@@ -49367,6 +49248,13 @@ std::vector< M > &arg) const  "
 oind, bool compact, bool symmetric) const  "
 
 [INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -49839,12 +49727,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::matching_arg(const
 std::vector< M > &arg) const  "
 
@@ -49963,13 +49845,6 @@ std::string &fname) override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_name_in(int i) "
 
 [INTERNAL]  Names of function input and outputs.
@@ -50028,6 +49903,13 @@ std::vector< M > &arg) const  "
 override "
 
 [INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -50398,10 +50280,10 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
 const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -50517,12 +50399,6 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::self() const  "
 
 [INTERNAL]  Get a public class instance.
@@ -50629,6 +50505,13 @@ std::string &iname) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generate_lifted(Function
 &vdef_fcn, Function &vinit_fcn) const  "
 
@@ -50674,13 +50557,6 @@ double **arg, double **res, int *iw, double *w) const  "
 std::string &name, std::ostream &stream) const  "
 
 [INTERNAL]  Print all information there is to know about a certain option.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -50885,29 +50761,29 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
+%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
+const std::string &fname, bool decl_static) const  "
 
-[INTERNAL]  Get the length of the work vector.
+[INTERNAL]  Generate code the function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
 
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
 %feature("docstring")  casadi::FunctionInternal::name_out(int ind) const  "
 
 [INTERNAL]  Get output scheme name by index.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
-
-[INTERNAL]  Generate code the function.
 
 ";
 
@@ -50972,13 +50848,6 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::all_scalar() const  "
 
 [INTERNAL]  Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -51494,6 +51363,13 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
 "
 
@@ -51758,12 +51634,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::numel_in() const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -51985,6 +51855,13 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::simple(const double *arg,
 double *res) const  "
 
@@ -52065,6 +51942,19 @@ std::string &name, std::ostream &stream) const  "
 std::vector< MX > &arg) const  "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+
+[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -52308,13 +52198,6 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::Rootfinder::sp_reverse(bvec_t **arg, bvec_t
 **res, int *iw, bvec_t *w, void *mem) const override "
 
@@ -52402,6 +52285,12 @@ allow_forward, bool allow_reverse) const  "
 never_inline) const  "
 
 [INTERNAL]  Create call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -52499,13 +52388,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
@@ -52536,6 +52418,13 @@ std::string &fname) const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
@@ -52555,20 +52444,6 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_codegen() const  "
 
 [INTERNAL]  Is codegen supported?
@@ -52581,9 +52456,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
 
-[INTERNAL]  Get required length of arg field.
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -52786,12 +52662,6 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
@@ -52910,13 +52780,6 @@ override "
 %feature("docstring")  casadi::FunctionInternal::numel_in(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -53082,12 +52945,6 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::reverse(int nadj) const  "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
@@ -53241,6 +53098,13 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generate_lifted(Function
 &vdef_fcn, Function &vinit_fcn) const  "
 
@@ -53254,13 +53118,6 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print more.
 
 ";
 
@@ -53278,10 +53135,10 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
 const  "
 
-[INTERNAL]  Get an atomic operation operator index.
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -53309,12 +53166,6 @@ int oind, bool symmetric) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
 [INTERNAL]  Get required length of iw field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -53492,13 +53343,6 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::RungeKutta "
 
 [INTERNAL]  'rk' plugin for Integrator
@@ -53628,6 +53472,13 @@ propagation.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::Integrator::sp_reverse(bvec_t **arg, bvec_t
 **res, int *iw, bvec_t *w, void *mem) const override "
 
@@ -53689,6 +53540,13 @@ elements.
 override "
 
 [INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -53964,10 +53822,16 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
 
 ";
 
@@ -54148,16 +54012,17 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 
 // File: classcasadi_1_1Scpgen.xml
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::replace_aseed(const
 std::vector< std::vector< M > > &aseed) const  "
 
 [INTERNAL]  Replace 0-by-0 reverse seeds.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -54195,13 +54060,6 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -54432,6 +54290,13 @@ Function &nlp) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)
 override "
 
@@ -54455,6 +54320,13 @@ override "
 std::vector< M > &res) const  "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -54606,10 +54478,10 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
 
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -55152,13 +55024,6 @@ std::string &fname) override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
@@ -55194,12 +55059,6 @@ const  "
 
 [INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -55256,6 +55115,12 @@ oind, bool compact, bool symmetric) const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::matching_arg(const
 std::vector< M > &arg) const  "
 
@@ -55294,13 +55159,6 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 %feature("docstring")  casadi::Scpgen::plugin_name() const override "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::nnz_in() const  "
 
@@ -56079,6 +55937,12 @@ bool never_inline) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::External::has_jacobian() const override "
 
 [INTERNAL]  Full Jacobian.
@@ -56110,13 +55974,6 @@ std::vector< M > &res) const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(int nadj) if no cached version is available.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -56285,12 +56142,6 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -56335,10 +56186,10 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
+%feature("docstring")  casadi::FunctionInternal::signature(const std::string
+&fname) const  "
 
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Code generate the function.
 
 ";
 
@@ -56389,6 +56240,13 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
@@ -56423,23 +56281,10 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::signature(const std::string
-&fname) const  "
-
-[INTERNAL]  Code generate the function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::print_free(std::ostream
 &stream) const  "
 
 [INTERNAL]  Print free variables.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -56631,6 +56476,20 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
 const  "
 
@@ -56689,13 +56548,6 @@ oind, bool compact, bool symmetric) const  "
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -56932,13 +56784,6 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
 persistent=false) "
 
@@ -56956,6 +56801,13 @@ persistent=false) "
 double **res, int *iw, double *w, void *mem) const  "
 
 [INTERNAL]  Evaluate numerically.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -57278,13 +57130,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
 oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
 allow_forward, bool allow_reverse) const  "
@@ -57352,6 +57197,13 @@ std::string > &onames, const Dict &opts) const override "
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -57510,12 +57362,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -57682,19 +57528,19 @@ std::vector< MX > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
+"
+
+[INTERNAL]  Get all statistics.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchical(int iind, int oind)
 const  "
 
 [INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -57749,6 +57595,12 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -57798,12 +57650,6 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
-
-[INTERNAL]  Number of nodes in the algorithm.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getJacSparsity(int iind,
 int oind, bool symmetric) const  "
 
@@ -57821,6 +57667,13 @@ std::vector< std::vector< M > > &aseed) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
 [INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -57845,10 +57698,9 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Number of nodes in the algorithm.
 
 ";
 
@@ -57904,6 +57756,13 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::name_out(int ind) const  "
 
 [INTERNAL]  Get output scheme name by index.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -58084,10 +57943,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
 "
 
-[INTERNAL]  Get all statistics.
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -58178,12 +58037,6 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")
 casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
@@ -58213,10 +58066,10 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
+const std::vector< MatType > &v) const  "
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
 
 ";
 
@@ -58346,13 +58199,6 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
-const std::vector< MatType > &v) const  "
-
-[INTERNAL]  Symbolic expressions for the adjoint seeds.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
 &stream) const  "
 
@@ -58437,10 +58283,10 @@ bool persistent=false) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
 
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -58513,9 +58359,23 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::Expm::get_n_out() override "
 
 [INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -58551,13 +58411,6 @@ CodeGenerator &g) const  "
 &g) const  "
 
 [INTERNAL]  Generate code for the function body.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -58810,13 +58663,6 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
 [INTERNAL]  Get required length of res field.
@@ -58988,6 +58834,13 @@ std::string &fname, const Dict &opts) const  "
 "
 
 [INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -59192,12 +59045,6 @@ DM > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::index_out(const std::string
 &name) const  "
 
@@ -59244,13 +59091,6 @@ std::string &iname) const  "
 persistent=false) "
 
 [INTERNAL]  Ensure required length of iw field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -59465,12 +59305,6 @@ std::string &fname) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -59587,6 +59421,12 @@ double **arg, double **res, int *iw, double *w) const  "
 %feature("docstring")  casadi::Expm::default_in(int ind) const override "
 
 [INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -59982,12 +59822,6 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::which_depends(const
 std::string &s_in, const std::vector< std::string > &s_out, int order, bool
 tr=false) const  "
@@ -60276,6 +60110,13 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
 bool more) const override "
 
@@ -60287,13 +60128,6 @@ bool more) const override "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -60384,6 +60218,13 @@ generated function.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -60395,13 +60236,6 @@ elements.
 DM > &arg) const  "
 
 [INTERNAL]  Evaluate with DM matrices.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -60499,10 +60333,10 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -60580,6 +60414,12 @@ int oind, bool symmetric) const  "
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -60719,12 +60559,6 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::set_temp(void *mem, const
 double **arg, double **res, int *iw, double *w) const  "
 
@@ -60837,13 +60671,6 @@ std::string &fname, const Dict &opts) const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(int nadj) if no cached version is available.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -60986,6 +60813,13 @@ CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
 [INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -62045,10 +61879,9 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
 
-[INTERNAL]  Get the floating point output argument of an atomic operation.
+[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -62468,6 +62301,12 @@ Diagrams
 
 C++ includes: sqpmethod.hpp ";
 
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+
+[INTERNAL]  Get required length of arg field.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_dm(const std::vector<
 DM > &arg) const  "
 
@@ -62491,12 +62330,6 @@ DM > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -62562,10 +62395,11 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
+&g, const std::string &fname) const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Generate meta-information allowing a user to evaluate a
+generated function.
 
 ";
 
@@ -62573,12 +62407,6 @@ const  "
 std::vector< MX > &arg, const std::string &parallelization) "
 
 [INTERNAL]  Parallel evaluation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::checkout() const  "
-
-[INTERNAL]  Checkout a memory object.
 
 ";
 
@@ -62607,6 +62435,13 @@ std::string &name) const override "
 %feature("docstring")  casadi::FunctionInternal::mx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -62878,6 +62713,13 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::which_depends(const
 std::string &s_in, const std::vector< std::string > &s_out, int order, bool
 tr=false) const  "
@@ -62894,13 +62736,6 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -62990,9 +62825,10 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
+%feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
+persistent=false) "
 
-[INTERNAL]  Get the length of the work vector.
+[INTERNAL]  Ensure required length of iw field.
 
 ";
 
@@ -63069,10 +62905,9 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
-[INTERNAL]  Get an atomic operation operator index.
+[INTERNAL]  Checkout a memory object.
 
 ";
 
@@ -63122,15 +62957,9 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
-
-[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -63266,13 +63095,6 @@ std::string &fname, const Dict &opts) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
-persistent=false) "
-
-[INTERNAL]  Ensure required length of iw field.
-
-";
-
 %feature("docstring")
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
@@ -63339,9 +63161,23 @@ const Function &nlp) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::Sqpmethod::class_name() const override "
 
 [INTERNAL]  Readable name of the internal class.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -63360,14 +63196,6 @@ const Function &nlp) "
 %feature("docstring") casadi::Sqpmethod::~Sqpmethod "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
-
-[INTERNAL]  Generate meta-information allowing a user to evaluate a
-generated function.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::matching_res(const
 std::vector< M > &arg) const  "
@@ -63640,22 +63468,9 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
-double **arg, double **res, int *iw, double *w) const  "
-
-[INTERNAL]  Set the (persistent and temporary) work vectors.
 
 ";
 
@@ -63786,6 +63601,13 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::print_option(const
 std::string &name, std::ostream &stream) const  "
 
@@ -63796,12 +63618,6 @@ std::string &name, std::ostream &stream) const  "
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -63853,6 +63669,12 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 override "
 
 [INTERNAL]  Generate code for the body of the C function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -63979,13 +63801,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
 bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
@@ -64067,6 +63882,13 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 std::string &fname, const Dict &opts) const  "
 
 [INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
@@ -64197,13 +64019,6 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_options() const  "
 
 [INTERNAL]  Options.
@@ -64240,13 +64055,6 @@ bool persistent=false) "
 %feature("docstring")  casadi::Switch::get_sparsity_out(int i) override "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -64291,6 +64099,13 @@ double *res) const  "
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
 [INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
 
 ";
 
@@ -64451,10 +64266,10 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
+double **arg, double **res, int *iw, double *w) const  "
 
-[INTERNAL]  Get an atomic operation operator index.
+[INTERNAL]  Set the (persistent and temporary) work vectors.
 
 ";
 
@@ -64605,6 +64420,13 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
 
 // File: classcasadi_1_1SXFunction.xml
 
@@ -64616,13 +64438,6 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::set_temp(void *mem, const
-double **arg, double **res, int *iw, double *w) const  "
-
-[INTERNAL]  Set the (temporary) work vectors.
 
 ";
 
@@ -64681,12 +64496,6 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 %feature("docstring")  casadi::FunctionInternal::simplified_call() const  "
 
 [INTERNAL]  Use simplified signature.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getWorkSize() const  "
-
-[INTERNAL]  Get the length of the work vector.
 
 ";
 
@@ -64765,6 +64574,13 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sparsity_out(int ind) const
 "
 
@@ -64840,6 +64656,13 @@ std::string &fname) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_work(size_t &sz_arg,
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
@@ -64911,13 +64734,6 @@ double **arg, double **res, int *iw, double *w) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicOperation(int k)
-const  "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
@@ -64968,6 +64784,12 @@ const std::vector< MatType > &v) const  "
 %feature("docstring")  casadi::FunctionInternal::mx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
 
 ";
 
@@ -65230,6 +65052,13 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -65258,6 +65087,13 @@ std::vector< M > &res) const  "
 nrhs, bool tr) const override "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
@@ -65545,17 +65381,10 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInput(int k) const
-"
+%feature("docstring")  casadi::FunctionInternal::set_temp(void *mem, const
+double **arg, double **res, int *iw, double *w) const  "
 
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAtomicOutput(int k)
-const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Set the (temporary) work vectors.
 
 ";
 
@@ -65944,13 +65773,6 @@ const std::string &fname, bool decl_static) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAtomicInputReal(int k)
-const  "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
@@ -66002,12 +65824,6 @@ structure recognition.
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
 propagation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::getAlgorithmSize() const  "
-
-[INTERNAL]  Get the number of atomic operations.
 
 ";
 
