@@ -34,7 +34,13 @@ else()
 set(MINPYVERSION "")
 endif()
 find_package(PythonInterp ${MINPYVERSION} REQUIRED)
-find_package(PythonLibs ${MINPYVERSION} REQUIRED)
+
+# We don't really need the libs, but the headers.
+find_package(PythonLibs ${MINPYVERSION})
+
+if(NOT PYTHON_INCLUDE_PATH)
+  message(SEND_ERROR "Python include headers not found, but required." )
+endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${PYTHON_INCLUDE_PATH})
@@ -100,6 +106,9 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 if(WIN32) # dlls don't allow missing symbols
+  if(NOT PYTHON_LIBRARIES)
+    message(SEND_ERROR "Python libraries not found, but required." )
+  endif()
   target_link_libraries(_casadi ${PYTHON_LIBRARIES})
 endif()
 target_link_libraries(_casadi casadi)
