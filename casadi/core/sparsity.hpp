@@ -700,6 +700,16 @@ namespace casadi {
     /// Get the dimension as a string
     std::string dim(bool with_nz=false) const;
 
+    /** \brief Dimension string as a postfix to a name
+      Rules:
+      1. Dense and scalar: ""
+      2. 0-by-0: "[]"
+      3. Dense column vector: "[5]"
+      4. Dense matrix: "[5x10]"
+      5. Otherwise: "[5x10,3nz]"
+    */
+    std::string postfix_dim() const;
+
     /// Describe the nonzero location k as a string
     std::string repr_el(int k) const;
 

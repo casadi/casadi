@@ -546,6 +546,22 @@ namespace casadi {
     return (*this)->dim(with_nz);
   }
 
+  std::string Sparsity::postfix_dim() const {
+    if (is_dense()) {
+      if (is_scalar()) {
+        return "";
+      } else if (is_empty(true)) {
+        return "[]";
+      } else if (is_column()) {
+        return "[" + str(size1()) + "]";
+      } else {
+        return dim(false);
+      }
+    } else {
+      return dim(true);
+    }
+  }
+
   std::string Sparsity::repr_el(int k) const {
     return (*this)->repr_el(k);
   }

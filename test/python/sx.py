@@ -334,7 +334,7 @@ class SXtests(casadiTestCase):
       self.assertEqual(str(f),'[SX(((3-sin((x*x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong'+str(f))
     fcn = Function("fcn", [vertcat(*[x,y])],[vertcat(*f)])
 
-    self.assertEqual(repr(fcn),'Function(fcn:(i0[2x1])->(o0[2x1]) SXFunction)','SX representation is wrong')
+    self.assertEqual(repr(fcn),'Function(fcn:(i0[2])->(o0[2]) SXFunction)','SX representation is wrong')
 
     # Pass inputs
     L=[2,3]
