@@ -61654,6 +61654,22 @@ Print a textual representation of sparsity.
 
 ";
 
+%feature("docstring")  casadi::Sparsity::postfix_dim() const  "
+
+Dimension string as a postfix to a name Rules:
+
+Dense and scalar: \"\"
+
+0-by-0: \"[]\"
+
+Dense column vector: \"[5]\"
+
+Dense matrix: \"[5x10]\"
+
+Otherwise: \"[5x10,3nz]\"
+
+";
+
 %feature("docstring")  casadi::Sparsity::rows() const  "
 
 Get the number of rows, Octave-style syntax.
