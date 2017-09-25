@@ -59,15 +59,6 @@ namespace casadi {
     size_t get_n_out() override { return n_out_;}
     ///@}
 
-    /// @{
-    /** \brief All inputs and outputs are scalars */
-    Sparsity get_sparsity_in(int i) override { return Sparsity::scalar();}
-    Sparsity get_sparsity_out(int i) override { return Sparsity::scalar();}
-    /// @}
-
-    /** \brief Use simplified signature */
-    bool simplified_call() const override { return true;}
-
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
 
@@ -78,9 +69,9 @@ namespace casadi {
     /** \brief Jacobian of all outputs with respect to all inputs */
     bool has_jacobian() const override;
     Function get_jacobian(const std::string& name,
-                                     const std::vector<std::string>& inames,
-                                     const std::vector<std::string>& onames,
-                                     const Dict& opts) const override;
+                          const std::vector<std::string>& inames,
+                          const std::vector<std::string>& onames,
+                          const Dict& opts) const override;
     ///@}
 
   private:
