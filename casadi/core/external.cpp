@@ -234,30 +234,18 @@ namespace casadi {
     External::init(opts);
   }
 
-  void External::codegen(CodeGenerator& g, const std::string& fname,
-                         bool decl_static) const {
-    g << "/* " << name_ << " */\n";
-    g << "static " << signature(fname) << " {\n"
-      << li_.body(eval_name()) << "\n";
-  }
-
-  void External::add_dependency(CodeGenerator& g) const {
-    if (li_.inlined(eval_name())) {
-      FunctionInternal::add_dependency(g);
-    } else {
+  void External::codegen_declarations(CodeGenerator& g) const {
+    if (!li_.inlined(name_)) {
       g.add_external(signature(name_) + ";");
     }
-    if (has_refcount_) {
-      g.add_external("void " + name_ + "_incref(void);");
-      g.add_external("void " + name_ + "_decref(void);");
-    }
   }
 
-  std::string External::codegen_name(const CodeGenerator& g) const {
-    if (li_.inlined(eval_name())) {
-      return FunctionInternal::codegen_name(g);
+  void External::codegen_body(CodeGenerator& g) const {
+    if (li_.inlined(name_)) {
+      // Function body is inlined
+      g << li_.body(name_) << "\n";
     } else {
-      return name_;
+      g << "if (" << name_ << "(arg, res, iw, w, mem)) return 1;\n";
     }
   }
 

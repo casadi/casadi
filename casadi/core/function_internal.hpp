@@ -350,20 +350,17 @@ namespace casadi {
     Function wrap() const;
 
     /** \brief Generate code the function */
-    virtual void codegen(CodeGenerator& g, const std::string& fname,
-                                  bool decl_static) const;
+    void codegen(CodeGenerator& g, const std::string& fname,
+                 bool decl_static) const;
 
     /** \brief Generate meta-information allowing a user to evaluate a generated function */
     void codegen_meta(CodeGenerator& g, const std::string& fname) const;
-
-    /** \brief Get name of the evaluation function */
-    std::string eval_name() const;
 
     /** \brief Get name in codegen */
     virtual std::string codegen_name(const CodeGenerator& g) const;
 
     /** \brief Add a dependent function */
-    virtual void add_dependency(CodeGenerator& g) const;
+    void add_dependency(CodeGenerator& g) const;
 
     /** \brief Codegen incref for dependencies */
     virtual void codegen_incref(CodeGenerator& g) const {}

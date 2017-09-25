@@ -1865,10 +1865,6 @@ namespace casadi {
     return g.shorthand("f" + str(i));
   }
 
-  std::string FunctionInternal::eval_name() const {
-    return name_;
-  }
-
   void FunctionInternal::add_dependency(CodeGenerator& g) const {
     // Quick return if it already exists
     for (auto&& e : g.added_dependencies_) {

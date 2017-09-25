@@ -90,15 +90,11 @@ namespace casadi {
     /// Initialize
     void init(const Dict& opts) override;
 
-    /** \brief Add a dependent function */
-    void add_dependency(CodeGenerator& g) const override;
+    /** \brief Generate code for the declarations of the C function */
+    void codegen_declarations(CodeGenerator& g) const override;
 
-    /** \brief Generate code the function */
-    void codegen(CodeGenerator& g, const std::string& fname,
-                                  bool decl_static) const override;
-
-    /** \brief Get name in codegen */
-    std::string codegen_name(const CodeGenerator& g) const override;
+    /** \brief Generate code for the body of the C function */
+    void codegen_body(CodeGenerator& g) const override;
 
     ///@{
     /** \brief Number of function inputs and outputs */
