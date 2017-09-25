@@ -35,13 +35,7 @@ namespace casadi {
 
   Function external(const string& name, const Importer& li,
                     const Dict& opts) {
-    if (li.has_function(name + "_simple")) {
-      // Simplified, lower overhead external
-      return Function::create(new SimplifiedExternal(name, li), opts);
-    } else {
-      // Full information external
-      return Function::create(new GenericExternal(name, li), opts);
-    }
+    return Function::create(new GenericExternal(name, li), opts);
   }
 
   Function external(const string& name, const Dict& opts) {
@@ -73,13 +67,6 @@ namespace casadi {
 
     // Increase reference counter - external function memory initialized at this point
     if (incref_) incref_();
-  }
-
-  SimplifiedExternal::SimplifiedExternal(const std::string& name, const Importer& li)
-    : External(name, li) {
-
-    // Function for numerical evaluation
-    simple_ = (simple_t)li_.get_function(name_ + "_simple");
   }
 
   GenericExternal::GenericExternal(const std::string& name, const Importer& li)
@@ -240,14 +227,6 @@ namespace casadi {
     alloc_res(sz_res);
     alloc_iw(sz_iw);
     alloc_w(sz_w);
-  }
-
-  void SimplifiedExternal::init(const Dict& opts) {
-    // Call recursively
-    External::init(opts);
-
-    // Arrays for holding inputs and outputs
-    alloc_w(n_in() + n_out());
   }
 
   void GenericExternal::init(const Dict& opts) {

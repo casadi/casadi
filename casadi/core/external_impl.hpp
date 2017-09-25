@@ -140,27 +140,6 @@ namespace casadi {
     ///@}
   };
 
-  class CASADI_EXPORT SimplifiedExternal : public External {
-  public:
-    /** \brief Constructor */
-    SimplifiedExternal(const std::string& name, const Importer& li);
-
-    /** \brief  Destructor */
-    ~SimplifiedExternal() override { this->clear_mem();}
-
-    /// Initialize
-    void init(const Dict& opts) override;
-
-    /** \brief Use simplified signature */
-    bool simplified_call() const override { return true;}
-
-    /// @{
-    /** \brief Retreive sparsities */
-    Sparsity get_sparsity_in(int i) override { return Sparsity::scalar();}
-    Sparsity get_sparsity_out(int i) override { return Sparsity::scalar();}
-    /// @}
-  };
-
   class CASADI_EXPORT GenericExternal : public External {
     // Sparsities
     sparsity_t sparsity_in_, sparsity_out_;

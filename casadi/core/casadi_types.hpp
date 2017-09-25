@@ -136,7 +136,6 @@ namespace casadi {
   typedef void (*free_mem_t)(void* mem);
   typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
   typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, void* mem);
-  typedef void (*simple_t)(const double* arg, double* res);
   ///@}
 
   /// Inputs of the symbolic representation of the DAE

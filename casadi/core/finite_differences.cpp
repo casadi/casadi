@@ -349,11 +349,7 @@ namespace casadi {
     }
 
     g.comment("Evaluate");
-    if (derivative_of_->simplified_call()) {
-      g << g(derivative_of_, "z", "y") << ";\n";
-    } else {
-      g << "if (" << g(derivative_of_, "arg", "res", "iw", "w") << ") return 1;\n";
-    }
+    g << "if (" << g(derivative_of_, "arg", "res", "iw", "w") << ") return 1;\n";
 
     g.comment("Save outputs");
     g << g.copy("y", n_y_, "yk[k]") << "\n";

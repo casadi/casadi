@@ -77,7 +77,6 @@ namespace casadi {
     compilerplugin_ = "clang";
     print_time_ = true;
     eval_ = 0;
-    simple_ = 0;
     has_refcount_ = false;
     enable_forward_ = true;
     enable_reverse_ = true;
@@ -352,13 +351,9 @@ namespace casadi {
         if (verbose_) casadi_message("Compiling function '" + name() + "'..");
         compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
         if (verbose_) casadi_message("Compiling function '" + name() + "' done.");
-        // Try to load with simplified syntax
-        simple_ = (simple_t)compiler_.get_function(name() + "_simple");
-        // If not succesful, try generic syntax
-        if (simple_==0) {
-          eval_ = (eval_t)compiler_.get_function(name());
-          casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
-        }
+        // Try to load
+        eval_ = (eval_t)compiler_.get_function(name());
+        casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
       } else {
         // Just jit dependencies
         jit_dependencies(jit_name);
@@ -372,34 +367,10 @@ namespace casadi {
 
   int FunctionInternal::
   eval_gen(const double** arg, double** res, int* iw, double* w, void* mem) const {
-    if (simplified_call()) {
-      // Copy arguments to input buffers
-      const double* arg1=w;
-      for (int i=0; i<this->n_in(); ++i) {
-        *w++ = arg[i] ? *arg[i] : 0;
-      }
-
-      // Evaluate
-      if (simple_) {
-        simple_(arg1, w);
-      } else {
-        simple(arg1, w);
-      }
-
-      // Get outputs
-      for (int i=0; i<this->n_out(); ++i) {
-        if (res[i]) *res[i] = *w;
-        ++w;
-      }
-
-      // Successful return
-      return 0;
+    if (eval_) {
+      return eval_(arg, res, iw, w, mem);
     } else {
-      if (eval_) {
-        return eval_(arg, res, iw, w, mem);
-      } else {
-        return eval(arg, res, iw, w, mem);
-      }
+      return eval(arg, res, iw, w, mem);
     }
   }
 
@@ -1357,10 +1328,6 @@ namespace casadi {
     casadi_error("'eval', 'eval_dm' not defined for " + class_name());
   }
 
-  void FunctionInternal::simple(const double* arg, double* res) const {
-    casadi_error("'simple' not defined for " + class_name());
-  }
-
   int FunctionInternal::
   eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
     casadi_error("'eval_sx' not defined for " + class_name());
@@ -1660,7 +1627,7 @@ namespace casadi {
     }
 
     // Finalize the function
-    if (!simplified_call()) g << "return 0;\n";
+    g << "return 0;\n";
     g << "}\n\n";
 
     // Flush to function body
@@ -1668,12 +1635,8 @@ namespace casadi {
   }
 
   std::string FunctionInternal::signature(const std::string& fname) const {
-    if (simplified_call()) {
-      return "void " + fname + "(const casadi_real* arg, casadi_real* res)";
-    } else {
-      return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
-                              "int* iw, casadi_real* w, void* mem)";
-    }
+    return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
+                            "int* iw, casadi_real* w, void* mem)";
   }
 
   void FunctionInternal::codegen_meta(CodeGenerator& g, const std::string& fname) const {
@@ -1714,9 +1677,6 @@ namespace casadi {
     }
     g << "default: return 0;\n}\n"
       << "}\n\n";
-
-    // Quick return if simplified syntax
-    if (simplified_call()) return;
 
     // Input sparsities
     g << g.declare(prefix + "const int* " + fname + "_sparsity_in(int i)") << " {\n"
@@ -1906,11 +1866,7 @@ namespace casadi {
   }
 
   std::string FunctionInternal::eval_name() const {
-    if (simplified_call()) {
-      return name_ + "_simple";
-    } else {
-      return name_;
-    }
+    return name_;
   }
 
   void FunctionInternal::add_dependency(CodeGenerator& g) const {

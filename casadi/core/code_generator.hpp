@@ -95,16 +95,10 @@ namespace casadi {
     /** \brief Represent an array constant; adding it when new */
     std::string constant(const std::vector<double>& v);
 
-    /** \brief Use simplified signature */
-    static bool simplified_call(const Function& f);
-
     /** \brief Generate a call to a function (generic signature) */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
                            const std::string& w, const std::string& mem="0") const;
-
-    /** \brief Generate a call to a function (simplified signature) */
-    std::string operator()(const Function& f, const std::string& arg, const std::string& res) const;
 
     /** \brief Print a string to buffer  */
     CodeGenerator& operator<<(const std::string& s);

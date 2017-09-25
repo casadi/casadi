@@ -143,9 +143,6 @@ namespace casadi {
     virtual int eval(const double** arg, double** res, int* iw, double* w, void* mem) const;
     ///@}
 
-    /** \brief  Evaluate numerically, simplied syntax */
-    virtual void simple(const double* arg, double* res) const;
-
     /** \brief  Evaluate with symbolic scalars */
     virtual int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const;
 
@@ -358,9 +355,6 @@ namespace casadi {
 
     /** \brief Generate meta-information allowing a user to evaluate a generated function */
     void codegen_meta(CodeGenerator& g, const std::string& fname) const;
-
-    /** \brief Use simplified signature */
-    virtual bool simplified_call() const { return false;}
 
     /** \brief Get name of the evaluation function */
     std::string eval_name() const;
@@ -645,7 +639,6 @@ namespace casadi {
 
     /** \brief Numerical evaluation redirected to a C function */
     eval_t eval_;
-    simple_t simple_;
 
     /** \brief Dict of statistics (resulting from evaluate) */
     Dict stats_;

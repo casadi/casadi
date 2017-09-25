@@ -448,21 +448,12 @@ namespace casadi {
     if (!use_ifdef.empty()) this->includes << "#endif\n";
   }
 
-  bool CodeGenerator::simplified_call(const Function& f) {
-    return f->simplified_call();
-  }
-
   std::string CodeGenerator::
   operator()(const Function& f, const std::string& arg,
              const std::string& res, const std::string& iw,
              const std::string& w, const std::string& mem) const {
     return f->codegen_name(*this) + "(" + arg + ", " + res + ", "
       + iw + ", " + w + ", " + mem + ")";
-  }
-
-  std::string CodeGenerator::operator()(const Function& f,
-                                        const std::string& arg, const std::string& res) const {
-    return f->codegen_name(*this) + "(" + arg + ", " + res + ")";
   }
 
   void CodeGenerator::add_external(const std::string& new_external) {

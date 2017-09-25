@@ -153,38 +153,20 @@ namespace casadi {
 
   void Call::generate(CodeGenerator& g,
                       const vector<int>& arg, const vector<int>& res) const {
-    if (fcn_->simplified_call()) {
-
-      // Collect input arguments
-      for (int i=0; i<arg.size(); ++i) {
-        g << "w[" << i << "]=" << g.workel(arg[i]) << ";\n";
-      }
-
-      // Call function
-      g << g(fcn_, "w", "w+"+str(arg.size())) << ";\n";
-
-      // Collect output arguments
-      for (int i=0; i<res.size(); ++i) {
-        if (res[i]>=0) {
-          g << g.workel(res[i]) << "=w[" << (arg.size()+i) << "];\n";
-        }
-      }
-    } else {
-      // Collect input arguments
-      g.local("arg1", "const casadi_real", "**");
-      for (int i=0; i<arg.size(); ++i) {
-        g << "arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";\n";
-      }
-
-      // Collect output arguments
-      g.local("res1", "casadi_real", "**");
-      for (int i=0; i<res.size(); ++i) {
-        g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";\n";
-      }
-
-      // Call function
-      g << "if (" << g(fcn_, "arg1", "res1", "iw", "w") << ") return 1;\n";
+    // Collect input arguments
+    g.local("arg1", "const casadi_real", "**");
+    for (int i=0; i<arg.size(); ++i) {
+      g << "arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";\n";
     }
+
+    // Collect output arguments
+    g.local("res1", "casadi_real", "**");
+    for (int i=0; i<res.size(); ++i) {
+      g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";\n";
+    }
+
+    // Call function
+    g << "if (" << g(fcn_, "arg1", "res1", "iw", "w") << ") return 1;\n";
   }
 
   void Call::codegen_incref(CodeGenerator& g, std::set<void*>& added) const {
