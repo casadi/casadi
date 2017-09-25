@@ -71,11 +71,6 @@ input value.
 
 %feature("docstring") casadi::Blocksqp::plugin_name "[INTERNAL] ";
 
-%feature("docstring") casadi::Blocksqp::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::Blocksqp::mx_out "[INTERNAL]  Get function
 input(s) and output(s)
 
@@ -302,11 +297,6 @@ necessary generate, the sparsity of a Jacobian block.
 
 %feature("docstring") casadi::Blocksqp::sz_res "[INTERNAL]  Get required
 length of res field.
-
-";
-
-%feature("docstring") casadi::Blocksqp::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -1775,11 +1765,6 @@ evaluation.
 
 ";
 
-%feature("docstring") casadi::BSpline::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::BSpline::free_mx "[INTERNAL]  Get free
 variables ( MX)
 
@@ -1955,11 +1940,6 @@ function is of a particular type.
 
 %feature("docstring") casadi::BSpline::free_sx "[INTERNAL]  Get free
 variables (SX)
-
-";
-
-%feature("docstring") casadi::BSpline::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -3383,11 +3363,6 @@ Number of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
-
-";
-
 %feature("docstring") casadi::BSplineCommon::codegen_body "[INTERNAL]
 Generate code for the function body.
 
@@ -3395,11 +3370,6 @@ Generate code for the function body.
 
 %feature("docstring") casadi::BSplineCommon::generate_lifted "[INTERNAL]
 Extract the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring") casadi::BSplineCommon::simplified_call "[INTERNAL]
-Use simplified signature.
 
 ";
 
@@ -3957,11 +3927,6 @@ Input/output dimensions.
 
 %feature("docstring") casadi::BSplineDual::get_name_in "[INTERNAL]  Names
 of function input and outputs.
-
-";
-
-%feature("docstring") casadi::BSplineDual::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -4543,11 +4508,6 @@ Generate code for the body of the C function.
 
 %feature("docstring") casadi::BSplineDual::print_options "[INTERNAL]  Print
 list of options.
-
-";
-
-%feature("docstring") casadi::BSplineDual::simplified_call "[INTERNAL]  Use
-simplified signature.
 
 ";
 
@@ -5209,11 +5169,6 @@ required length of res field.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::eval_name "[INTERNAL]
-Get name of the evaluation function.
-
-";
-
 %feature("docstring") casadi::BSplineInterpolant::has_function "[INTERNAL]
 ";
 
@@ -5236,8 +5191,8 @@ Reverse mode, virtual functions overloaded in derived classes.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::simple "[INTERNAL]
-Evaluate numerically, simplied syntax.
+%feature("docstring") casadi::BSplineInterpolant::has_spfwd "[INTERNAL]  Is
+the class able to propagate seeds through the algorithm?
 
 ";
 
@@ -5273,10 +5228,6 @@ required length of w field.
 
 %feature("docstring") casadi::BSplineInterpolant::nnz_in "[INTERNAL]
 Number of input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::BSplineInterpolant::simplified_call "[INTERNAL]  Use simplified signature.
 
 ";
 
@@ -5541,8 +5492,8 @@ Calculate derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::has_spfwd "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm?
+%feature("docstring") casadi::BSplineInterpolant::eval_name "[INTERNAL]
+Get name of the evaluation function.
 
 ";
 
@@ -6774,11 +6725,6 @@ input/output elements.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::alloc_iw "[INTERNAL]  Ensure
-required length of iw field.
-
-";
-
 %feature("docstring") casadi::CentralDiff::name_in "[INTERNAL]  Get input
 scheme name by index.
 
@@ -6842,11 +6788,6 @@ required length of w field.
 
 %feature("docstring") casadi::CentralDiff::pert "[INTERNAL] ";
 
-%feature("docstring") casadi::CentralDiff::sz_arg "[INTERNAL]  Get required
-length of arg field.
-
-";
-
 %feature("docstring") casadi::CentralDiff::instruction_input "[INTERNAL]
 Get the (integer) input arguments of an atomic operation.
 
@@ -6895,8 +6836,8 @@ cached version is available.
 
 %feature("docstring") casadi::CentralDiff::CentralDiff "[INTERNAL] ";
 
-%feature("docstring") casadi::CentralDiff::simplified_call "[INTERNAL]  Use
-simplified signature.
+%feature("docstring") casadi::CentralDiff::alloc_iw "[INTERNAL]  Ensure
+required length of iw field.
 
 ";
 
@@ -7196,8 +7137,8 @@ Get the floating point output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
+%feature("docstring") casadi::CentralDiff::sz_arg "[INTERNAL]  Get required
+length of arg field.
 
 ";
 
@@ -7926,18 +7867,8 @@ Register the function for evaluation and statistics gathering
 
 ";
 
-%feature("docstring") casadi::Collocation::disp_more "[INTERNAL]  Print
-more.
-
-";
-
 %feature("docstring") casadi::Collocation::size_out "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::Collocation::checkout "[INTERNAL]  Checkout a
-memory object.
 
 ";
 
@@ -8088,8 +8019,8 @@ required length of arg field.
 
 ";
 
-%feature("docstring") casadi::Collocation::simplified_call "[INTERNAL]  Use
-simplified signature.
+%feature("docstring") casadi::Collocation::checkout "[INTERNAL]  Checkout a
+memory object.
 
 ";
 
@@ -8339,8 +8270,8 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::Collocation::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
+%feature("docstring") casadi::Collocation::disp_more "[INTERNAL]  Print
+more.
 
 ";
 
@@ -8921,11 +8852,6 @@ number of atomic operations.
 
 ";
 
-%feature("docstring") casadi::Conic::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::Conic::size1_out "[INTERNAL]  Input/output
 dimensions.
 
@@ -9500,11 +9426,6 @@ sparsity pattern, forward mode.
 
 %feature("docstring") casadi::Conic::uses_output "[INTERNAL]  Do the
 derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring") casadi::Conic::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -11131,11 +11052,6 @@ length of iw field.
 
 %feature("docstring") casadi::Dple::Dple "[INTERNAL] ";
 
-%feature("docstring") casadi::Dple::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::Dple::size2_in "[INTERNAL]  Input/output
 dimensions.
 
@@ -11474,11 +11390,6 @@ is available.
 
 ";
 
-%feature("docstring") casadi::Dple::mx_out "[INTERNAL]  Get function
-input(s) and output(s)
-
-";
-
 %feature("docstring") casadi::Dple::getJacSparsityHierarchical "[INTERNAL]
 A flavor of getJacSparsity that does hierarchical block structure
 recognition.
@@ -11510,8 +11421,8 @@ long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::Dple::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
+%feature("docstring") casadi::Dple::mx_out "[INTERNAL]  Get function
+input(s) and output(s)
 
 ";
 
@@ -11743,8 +11654,8 @@ of res field.
 
 ";
 
-%feature("docstring") casadi::Expm::replace_arg "[INTERNAL]  Replace 0-by-0
-inputs.
+%feature("docstring") casadi::Expm::has_jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -11804,8 +11715,7 @@ dependencies.
 
 %feature("docstring") casadi::Expm::Expm "[INTERNAL] ";
 
-%feature("docstring") casadi::Expm::has_jacobian "[INTERNAL]  Return
-Jacobian of all input elements with respect to all output elements.
+%feature("docstring") casadi::Expm::oracle "[INTERNAL]  Get oracle.
 
 ";
 
@@ -11854,6 +11764,11 @@ for chosing forward/reverse mode, sparsity propagation.
 
 %feature("docstring") casadi::Expm::name_out "[INTERNAL]  Get output scheme
 name by index.
+
+";
+
+%feature("docstring") casadi::Expm::replace_arg "[INTERNAL]  Replace 0-by-0
+inputs.
 
 ";
 
@@ -11937,11 +11852,6 @@ matrices.
 
 %feature("docstring") casadi::Expm::index_in "[INTERNAL]  Get input scheme
 index by name.
-
-";
-
-%feature("docstring") casadi::Expm::simplified_call "[INTERNAL]  Use
-simplified signature.
 
 ";
 
@@ -12582,10 +12492,6 @@ evaluation function.
 
 ";
 
-%feature("docstring") casadi::Expm::oracle "[INTERNAL]  Get oracle.
-
-";
-
 %feature("docstring") casadi::Expm::get_reverse "[INTERNAL]  Generate a
 function that calculates nadj adjoint derivatives.
 
@@ -12653,11 +12559,6 @@ for chosing forward/reverse mode.
 ";
 
 %feature("docstring") casadi::Expm::eval "[INTERNAL]  Evaluate numerically.
-
-";
-
-%feature("docstring") casadi::Expm::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -13041,11 +12942,6 @@ statistics.
 
 ";
 
-%feature("docstring") casadi::External::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
-
-";
-
 %feature("docstring") casadi::External::sp_forward "[INTERNAL]  Propagate
 sparsity forward.
 
@@ -13241,11 +13137,6 @@ dimensions.
 
 %feature("docstring") casadi::External::get_n_in "[INTERNAL]  Number of
 function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::External::simplified_call "[INTERNAL]  Use
-simplified signature.
 
 ";
 
@@ -13801,11 +13692,6 @@ Diagrams
 
 C++ includes: finite_differences.hpp ";
 
-%feature("docstring") casadi::FiniteDiff::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::FiniteDiff::getAdaptorSolverName "[INTERNAL]
 Obtain solver name from Adaptor.
 
@@ -14270,8 +14156,8 @@ of the evaluation function.
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
+%feature("docstring") casadi::FiniteDiff::alloc_iw "[INTERNAL]  Ensure
+required length of iw field.
 
 ";
 
@@ -14387,11 +14273,6 @@ cached version is available.
 
 %feature("docstring") casadi::FiniteDiff::sz_work "[INTERNAL]  Get number
 of temporary variables needed.
-
-";
-
-%feature("docstring") casadi::FiniteDiff::alloc_iw "[INTERNAL]  Ensure
-required length of iw field.
 
 ";
 
@@ -14904,11 +14785,6 @@ public class instance.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::simple "[INTERNAL]
-Evaluate numerically, simplied syntax.
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::retreat "[INTERNAL]
 Retreat solution in time.
 
@@ -15377,10 +15253,6 @@ Get, if necessary generate, the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::simplified_call "[INTERNAL]  Use simplified signature.
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::size2_in "[INTERNAL]
 Input/output dimensions.
 
@@ -15637,11 +15509,6 @@ Replace 0-by-0 forward seeds.
 
 %feature("docstring") casadi::ForwardDiff::n_nodes "[INTERNAL]  Number of
 nodes in the algorithm.
-
-";
-
-%feature("docstring") casadi::ForwardDiff::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -16253,9 +16120,8 @@ Sparsities of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::finalize "[INTERNAL]  Finalize
-the object creation This function, which visits the class hierarchy in
-reverse order is run after init() has been completed.
+%feature("docstring") casadi::ForwardDiff::matching_res "[INTERNAL]  Check
+if output arguments that needs to be replaced.
 
 ";
 
@@ -16345,8 +16211,9 @@ Generate code for the declarations of the C function.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::matching_res "[INTERNAL]  Check
-if output arguments that needs to be replaced.
+%feature("docstring") casadi::ForwardDiff::finalize "[INTERNAL]  Finalize
+the object creation This function, which visits the class hierarchy in
+reverse order is run after init() has been completed.
 
 ";
 
@@ -16425,11 +16292,6 @@ all information there is to know about a certain option.
 
 %feature("docstring") casadi::ForwardDiff::name_in "[INTERNAL]  Get input
 scheme name by index.
-
-";
-
-%feature("docstring") casadi::ForwardDiff::simplified_call "[INTERNAL]  Use
-simplified signature.
 
 ";
 
@@ -17885,11 +17747,6 @@ required length of iw field.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::simplified_call "[INTERNAL]
-Use simplified signature.
-
-";
-
 %feature("docstring") casadi::GenericExternal::getCount "[INTERNAL]  Get
 the reference count.
 
@@ -18277,11 +18134,6 @@ Are all inputs and outputs scalar.
 
 %feature("docstring") casadi::GenericExternal::get_n_in "[INTERNAL]  Number
 of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::GenericExternal::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -19745,10 +19597,6 @@ Generate code for the declarations of the C function.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::simplified_call "[INTERNAL]  Use simplified signature.
-
-";
-
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::which_depends "[INTERNAL]  Which variables enter with some order.
 
 Parameters:
@@ -19828,10 +19676,6 @@ evaluate
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::symbolic_output "[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::simple "[INTERNAL]  Evaluate numerically, simplied syntax.
 
 ";
 
@@ -20713,11 +20557,6 @@ Generate the sparsity of a Jacobian block.
 
 %feature("docstring") casadi::ImplicitToNlp::get_function "[INTERNAL] ";
 
-%feature("docstring") casadi::ImplicitToNlp::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
-
-";
-
 %feature("docstring") casadi::ImplicitToNlp::finalize "[INTERNAL]  Finalize
 initialization.
 
@@ -20844,11 +20683,6 @@ Names of function input and outputs.
 
 %feature("docstring") casadi::ImplicitToNlp::get_stats "[INTERNAL]  Get all
 statistics.
-
-";
-
-%feature("docstring") casadi::ImplicitToNlp::simplified_call "[INTERNAL]
-Use simplified signature.
 
 ";
 
@@ -21150,11 +20984,6 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::Integrator::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::Integrator::symbolic_output "[INTERNAL]  Get
 a vector of symbolic variables corresponding to the outputs.
 
@@ -21241,11 +21070,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 %feature("docstring") casadi::Integrator::codegen "[INTERNAL]  Generate
 code the function.
-
-";
-
-%feature("docstring") casadi::Integrator::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -22239,11 +22063,6 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::Interpolant::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::Interpolant::memory "[INTERNAL]  Memory
 objects.
 
@@ -22389,11 +22208,6 @@ function have free variables.
 
 %feature("docstring") casadi::Interpolant::n_out "[INTERNAL]  Number of
 function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::Interpolant::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -23063,14 +22877,8 @@ length of iw field.
 
 ";
 
-%feature("docstring") casadi::Jit::get_sparsity_in "
-
-All inputs and outputs are scalars.
-
-";
-
-%feature("docstring") casadi::Jit::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
+%feature("docstring") casadi::Jit::get_sparsity_in "[INTERNAL]  Are all
+inputs and outputs scalar.
 
 ";
 
@@ -23466,9 +23274,8 @@ overloaded.
 
 ";
 
-%feature("docstring") casadi::Jit::get_sparsity_out "
-
-All inputs and outputs are scalars.
+%feature("docstring") casadi::Jit::get_sparsity_out "[INTERNAL]  Get
+sparsity of a given output.
 
 ";
 
@@ -23578,12 +23385,6 @@ Constructor.
 %feature("docstring") casadi::Jit::get_function "[INTERNAL] ";
 
 %feature("docstring") casadi::Jit::name "[INTERNAL]  Name of the function.
-
-";
-
-%feature("docstring") casadi::Jit::simplified_call "
-
-Use simplified signature.
 
 ";
 
@@ -24593,11 +24394,6 @@ cached version is available.
 
 ";
 
-%feature("docstring") casadi::LapackLu::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
-
-";
-
 %feature("docstring") casadi::LapackLu::size2_in "[INTERNAL]  Input/output
 dimensions.
 
@@ -25101,11 +24897,6 @@ symbolic scalars.
 
 ";
 
-%feature("docstring") casadi::LapackLu::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::LapackLu::has_function "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackLu::fwdViaJac "[INTERNAL]  Calculate
@@ -25466,11 +25257,6 @@ memory block.
 
 %feature("docstring") casadi::LapackQr::instruction_constant "[INTERNAL]
 Get the floating point output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::LapackQr::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -26114,11 +25900,6 @@ variables (SX)
 
 ";
 
-%feature("docstring") casadi::LapackQr::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::LapackQr::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
 instance if available, and calls  Function get_forward(int nfwd) if no
@@ -26604,8 +26385,8 @@ Get function signature: name:(inputs)->(outputs)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::replace_arg "[INTERNAL]
-Replace 0-by-0 inputs.
+%feature("docstring") casadi::LinearInterpolant::replace_aseed "[INTERNAL]
+Replace 0-by-0 reverse seeds.
 
 ";
 
@@ -26862,10 +26643,6 @@ the function.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::simplified_call "[INTERNAL]  Use simplified signature.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::numel_out "[INTERNAL]
 Number of input/output elements.
 
@@ -26930,8 +26707,8 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::replace_aseed "[INTERNAL]
-Replace 0-by-0 reverse seeds.
+%feature("docstring") casadi::LinearInterpolant::replace_arg "[INTERNAL]
+Replace 0-by-0 inputs.
 
 ";
 
@@ -26986,11 +26763,6 @@ Get sparsity of a given input.
 ------------------------------------------------------------------------
 [INTERNAL] 
 Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring") casadi::LinearInterpolant::simple "[INTERNAL]
-Evaluate numerically, simplied syntax.
 
 ";
 
@@ -27238,11 +27010,6 @@ Are all inputs and outputs scalar.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::codegen_meta "[INTERNAL]  Generate meta-information allowing a user to evaluate a
-generated function.
-
-";
-
 %feature("docstring") casadi::LinearInterpolantJac::instruction_input "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
@@ -27358,10 +27125,6 @@ Get the reference count.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::simplified_call "[INTERNAL]  Use simplified signature.
-
-";
-
 %feature("docstring") casadi::LinearInterpolantJac::codegen_decref "[INTERNAL]  Codegen decref for dependencies.
 
 ";
@@ -27448,8 +27211,8 @@ Clear all memory (called from destructor)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::nnz_out "[INTERNAL]
-Number of input/output nonzeros.
+%feature("docstring") casadi::LinearInterpolantJac::codegen_meta "[INTERNAL]  Generate meta-information allowing a user to evaluate a
+generated function.
 
 ";
 
@@ -27630,8 +27393,8 @@ no cached version is available.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::simple "[INTERNAL]
-Evaluate numerically, simplied syntax.
+%feature("docstring") casadi::LinearInterpolantJac::nnz_out "[INTERNAL]
+Number of input/output nonzeros.
 
 ";
 
@@ -28357,11 +28120,6 @@ dependent function.
 
 ";
 
-%feature("docstring") casadi::Lsqr::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::Lsqr::get_function "[INTERNAL] ";
 
 %feature("docstring") casadi::Lsqr::construct "[INTERNAL]  Construct
@@ -28568,11 +28326,6 @@ outputs.
 
 %feature("docstring") casadi::Lsqr::check_res "[INTERNAL]  Check if output
 arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::Lsqr::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -29229,11 +28982,6 @@ input/output elements.
 
 ";
 
-%feature("docstring") casadi::Map::set_temp "[INTERNAL]  Set the
-(temporary) work vectors.
-
-";
-
 %feature("docstring") casadi::Map::has_reverse "[INTERNAL]  Generate a
 function that calculates nadj adjoint derivatives.
 
@@ -29378,11 +29126,6 @@ dimensions.
 
 %feature("docstring") casadi::Map::get_n_in "[INTERNAL]  Number of function
 inputs and outputs.
-
-";
-
-%feature("docstring") casadi::Map::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -29870,8 +29613,8 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::Map::simplified_call "[INTERNAL]  Use
-simplified signature.
+%feature("docstring") casadi::Map::set_temp "[INTERNAL]  Set the
+(temporary) work vectors.
 
 ";
 
@@ -29990,11 +29733,6 @@ of w field.
 
 %feature("docstring") casadi::MapOmp::index_in "[INTERNAL]  Get input
 scheme index by name.
-
-";
-
-%feature("docstring") casadi::MapOmp::simplified_call "[INTERNAL]  Use
-simplified signature.
 
 ";
 
@@ -30413,11 +30151,6 @@ inputs and outputs scalar.
 
 %feature("docstring") casadi::MapOmp::get_sparsity_out "[INTERNAL]
 Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -32481,11 +32214,6 @@ vector of symbolic variables corresponding to the outputs.
 
 ";
 
-%feature("docstring") casadi::Newton::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::Newton::replace_fseed "[INTERNAL]  Replace
 0-by-0 forward seeds.
 
@@ -32646,11 +32374,6 @@ is available.
 
 %feature("docstring") casadi::Newton::alloc_iw "[INTERNAL]  Ensure required
 length of iw field.
-
-";
-
-%feature("docstring") casadi::Newton::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -33987,11 +33710,6 @@ mode, virtual functions overloaded in derived classes.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
-
-";
-
 %feature("docstring") casadi::Nlpsol::slice "[INTERNAL]  returns a new
 function with a selection of inputs/outputs of the original
 
@@ -34162,8 +33880,8 @@ dependencies.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::simplified_call "[INTERNAL]  Use
-simplified signature.
+%feature("docstring") casadi::Nlpsol::sz_arg "[INTERNAL]  Get required
+length of arg field.
 
 ";
 
@@ -34284,11 +34002,6 @@ the functions needed for the Lifted Newton method.
 
 %feature("docstring") casadi::Nlpsol::construct "[INTERNAL]  Construct
 Prepares the function for evaluation.
-
-";
-
-%feature("docstring") casadi::Nlpsol::sz_arg "[INTERNAL]  Get required
-length of arg field.
 
 ";
 
@@ -35292,11 +35005,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::simplified_call "[INTERNAL]
-Use simplified signature.
-
-";
-
 %feature("docstring") casadi::OracleFunction::replace_res "[INTERNAL]
 Replace 0-by-0 outputs.
 
@@ -36017,11 +35725,6 @@ Add a dependent function.
 
 %feature("docstring") casadi::OracleFunction::alloc "[INTERNAL]  Ensure
 work vectors long enough to evaluate function.
-
-";
-
-%feature("docstring") casadi::OracleFunction::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -36836,11 +36539,6 @@ memory (called from destructor)
 
 ";
 
-%feature("docstring") casadi::QpToNlp::codegen_body "[INTERNAL]  Generate
-code for the function body.
-
-";
-
 %feature("docstring") casadi::QpToNlp::signature "[INTERNAL]  Code generate
 the function.
 
@@ -36946,8 +36644,8 @@ inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::simplified_call "[INTERNAL]  Use
-simplified signature.
+%feature("docstring") casadi::QpToNlp::codegen_body "[INTERNAL]  Generate
+code for the function body.
 
 ";
 
@@ -37025,11 +36723,6 @@ function inputs and outputs.
 function that calculates forward derivatives forward(nfwd) returns a cached
 instance if available, and calls  Function get_forward(int nfwd) if no
 cached version is available.
-
-";
-
-%feature("docstring") casadi::QpToNlp::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -37454,11 +37147,6 @@ required length of res field.
 
 %feature("docstring") casadi::Rootfinder::instruction_id "[INTERNAL]  Get
 an atomic operation operator index.
-
-";
-
-%feature("docstring") casadi::Rootfinder::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -37946,11 +37634,6 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::Rootfinder::set_temp "[INTERNAL]  Set the
 work vectors.
 
@@ -38112,11 +37795,6 @@ objects.
 ";
 
 %feature("docstring") casadi::RungeKutta::expand "[INTERNAL] ";
-
-%feature("docstring") casadi::RungeKutta::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
-
-";
 
 %feature("docstring") casadi::RungeKutta::disp "[INTERNAL]  Print.
 
@@ -38748,11 +38426,6 @@ backward problem and take time to tf.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::RungeKutta::replace_arg "[INTERNAL]  Replace
 0-by-0 inputs.
 
@@ -39163,11 +38836,6 @@ discrete variables be treated.
 
 %feature("docstring") casadi::Scpgen::size2_in "[INTERNAL]  Input/output
 dimensions.
-
-";
-
-%feature("docstring") casadi::Scpgen::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -39683,11 +39351,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Scpgen::codegen_declarations "[INTERNAL]
 Generate code for the declarations of the C function.
-
-";
-
-%feature("docstring") casadi::Scpgen::simplified_call "[INTERNAL]  Use
-simplified signature.
 
 ";
 
@@ -40276,773 +39939,6 @@ Constructor.
 ";
 
 
-// File: classcasadi_1_1SimplifiedExternal.xml
-%feature("docstring") casadi::SimplifiedExternal::clear_mem "[INTERNAL]
-Clear all memory (called from destructor)
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_sparsity_out "[INTERNAL]  Retreive sparsities.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_stats "[INTERNAL]
-Get all statistics.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::mx_in "[INTERNAL]  Get
-function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::symbolic_output "[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::memory "[INTERNAL]
-Memory objects.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sparsity_in "
-
->  const Sparsity& casadi::FunctionInternal::sparsity_in(int ind) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Get sparsity of a given input.
-
->  const Sparsity& casadi::FunctionInternal::sparsity_in(const std::string &iname) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::has_spfwd "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::has_free "[INTERNAL]
-Does the function have free variables.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::getCount "[INTERNAL]  Get
-the reference count.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::generate_dependencies "[INTERNAL]  Export / Generate C code for the dependency function.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_jacobian "[INTERNAL]
-Full Jacobian.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::size_out "[INTERNAL]
-Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_free "[INTERNAL]
-Print free variables.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::call_gen "[INTERNAL]
-Call a function, overloaded.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::n_instructions "[INTERNAL]  Get the number of atomic operations.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::has_jacobian "[INTERNAL]
-Full Jacobian.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::getJacSparsityGen "[INTERNAL]  Get the sparsity pattern, forward mode.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::size2_out "[INTERNAL]
-Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::replace_res "[INTERNAL]
-Replace 0-by-0 outputs.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::reverse "[INTERNAL]
-Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::alloc_arg "[INTERNAL]
-Ensure required length of arg field.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::self "[INTERNAL]  Get a
-public class instance.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_name_out "[INTERNAL]
-Names of function input and outputs.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::mx_out "[INTERNAL]  Get
-function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::add_dependency "[INTERNAL]  Add a dependent function.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_n_in "[INTERNAL]
-Number of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::adjViaJac "[INTERNAL]
-Calculate derivatives by multiplying the full Jacobian and multiplying.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::n_nodes "[INTERNAL]
-Number of nodes in the algorithm.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sp_forward "[INTERNAL]
-Propagate sparsity forward.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::numel_out "[INTERNAL]
-Number of input/output elements.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::replace_fseed "[INTERNAL]
-Replace 0-by-0 forward seeds.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::call_forward "[INTERNAL]
-Forward mode AD, virtual functions overloaded in derived classes.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::fwdViaJac "[INTERNAL]
-Calculate derivatives by multiplying the full Jacobian and multiplying.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::has_sprev "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::check_arg "[INTERNAL]
-Check if input arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::weak "[INTERNAL]  Get a
-weak reference to the object.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::alloc_mem "[INTERNAL]
-Create memory block.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::jit_dependencies "[INTERNAL]   Jit dependencies.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_forward "[INTERNAL]
-Forward mode derivatives.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::check_res "[INTERNAL]
-Check if output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::size_in "[INTERNAL]
-Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::which_depends "[INTERNAL]
-Which variables enter with some order.
-
-Parameters:
------------
-
-s_in:   Input name
-
-s_out:   Output name(s)
-
-order:  Only 1 (linear) and 2 (nonlinear) allowed
-
-tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::has_reverse "[INTERNAL]
-Reverse mode derivatives.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::all_scalar "[INTERNAL]
-Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_n_out "[INTERNAL]
-Number of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::signature "[INTERNAL]
-Code generate the function.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::has_function "[INTERNAL]
-";
-
-%feature("docstring") casadi::SimplifiedExternal::SimplifiedExternal "[INTERNAL]  Constructor.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::codegen_body "[INTERNAL]
-Generate code for the function body.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sp_reverse "[INTERNAL]
-Propagate sparsity backwards.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::disp_more "[INTERNAL]
-Print more.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::index_in "[INTERNAL]  Get
-input scheme index by name.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::is_a "[INTERNAL]  Check
-if the function is of a particular type.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::instruction_input "[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::definition "[INTERNAL]
-Get function signature: name:(inputs)->(outputs)
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::eval_sx "[INTERNAL]
-Evaluate with symbolic scalars.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::disp "[INTERNAL]  Print.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::codegen_incref "[INTERNAL]  Codegen incref for dependencies.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::alloc_res "[INTERNAL]
-Ensure required length of res field.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sz_arg "[INTERNAL]  Get
-required length of arg field.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::min_in "[INTERNAL]  Get
-smallest input value.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::name_in "[INTERNAL]  Get
-input scheme name by index.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::ad_weight "[INTERNAL]
-Weighting factor for chosing forward/reverse mode.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sz_iw "[INTERNAL]  Get
-required length of iw field.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::finalize "[INTERNAL]
-Finalize the object creation This function, which visits the class hierarchy
-in reverse order is run after init() has been completed.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::matching_res "[INTERNAL]
-Check if output arguments that needs to be replaced.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::print_option "[INTERNAL]
-Print all information there is to know about a certain option.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::codegen "[INTERNAL]
-Generate code the function.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::simplified_call "[INTERNAL]  Use simplified signature.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::n_in "[INTERNAL]  Number
-of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::release "[INTERNAL]
-Release a memory object.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::call_reverse "[INTERNAL]
-Reverse mode, virtual functions overloaded in derived classes.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::init "[INTERNAL]
-Initialize.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::codegen_decref "[INTERNAL]  Codegen decref for dependencies.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sz_w "[INTERNAL]  Get
-required length of w field.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::replace_aseed "[INTERNAL]
-Replace 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::alloc_w "[INTERNAL]
-Ensure required length of w field.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::replace_arg "[INTERNAL]
-Replace 0-by-0 inputs.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::call "[INTERNAL]   Call a
-function, templated.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::free_mx "[INTERNAL]  Get
-free variables ( MX)
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal "[INTERNAL] C++ includes:
-external_impl.hpp ";
-
-%feature("docstring") casadi::SimplifiedExternal::get_partition "[INTERNAL]
-Get the unidirectional or bidirectional partition.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::has_codegen "[INTERNAL]
-Is codegen supported?
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::index_out "[INTERNAL]
-Get output scheme index by name.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::eval_mx "[INTERNAL]
-Evaluate with symbolic matrices.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::uses_output "[INTERNAL]
-Do the derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::eval_name "[INTERNAL]
-Get name of the evaluation function.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::instruction_constant "[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::instruction_id "[INTERNAL]  Get an atomic operation operator index.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::getAdaptorSolverName "[INTERNAL]  Obtain solver name from Adaptor.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::has_forward "[INTERNAL]
-Forward mode derivatives.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::init_mem "[INTERNAL]
-Initalize memory block.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::simple "[INTERNAL]
-Evaluate numerically, simplied syntax.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::print_dimensions "[INTERNAL]  Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::generate_lifted "[INTERNAL]  Extract the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sz_res "[INTERNAL]  Get
-required length of res field.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sparsity_jac "[INTERNAL]
-Get, if necessary generate, the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::free_sx "[INTERNAL]  Get
-free variables (SX)
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::construct "[INTERNAL]
-Construct Prepares the function for evaluation.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_reverse "[INTERNAL]
-Reverse mode derivatives.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::jacobian "[INTERNAL]
-Return Jacobian of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::set_temp "[INTERNAL]  Set
-the (temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sz_work "[INTERNAL]  Get
-number of temporary variables needed.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::mapsum_mx "[INTERNAL]
-Parallel evaluation.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_name_in "[INTERNAL]
-Names of function input and outputs.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::wrap "[INTERNAL]  Wrap in
-an Function instance consisting of only one MX call.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::max_in "[INTERNAL]  Get
-largest input value.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::getJacSparsity "[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::matching_arg "[INTERNAL]
-Check if input arguments that needs to be replaced.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::size2_in "[INTERNAL]
-Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::has_derivative "[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::eval_dm "[INTERNAL]
-Evaluate with DM matrices.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::setup "[INTERNAL]  Set
-the (persistent and temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_sparsity_in "[INTERNAL]  Retreive sparsities.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::size1_out "[INTERNAL]
-Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::~SimplifiedExternal "[INTERNAL]  Destructor.
-
-";
-
-%feature("docstring")
-casadi::SimplifiedExternal::getJacSparsityHierarchicalSymm "[INTERNAL]  A
-flavor of getJacSparsity that does hierarchical block structure recognition
-for symmetric Jacobians
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::codegen_name "[INTERNAL]
-Get name in codegen.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::size1_in "[INTERNAL]
-Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::class_name "[INTERNAL]
-Get type name.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::nnz_in "[INTERNAL]
-Number of input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::factory "[INTERNAL] ";
-
-%feature("docstring") casadi::SimplifiedExternal::slice "[INTERNAL]
-returns a new function with a selection of inputs/outputs of the original
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::set_work "[INTERNAL]  Set
-the (persistent) work vectors.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sp_weight "[INTERNAL]
-Weighting factor for chosing forward/reverse mode, sparsity propagation.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::name_out "[INTERNAL]  Get
-output scheme name by index.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sx_in "[INTERNAL]  Get
-function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::nnz_out "[INTERNAL]
-Number of input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::codegen_meta "[INTERNAL]
-Generate meta-information allowing a user to evaluate a generated function.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::checkout "[INTERNAL]
-Checkout a memory object.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::alloc_iw "[INTERNAL]
-Ensure required length of iw field.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::oracle "[INTERNAL]  Get
-oracle.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::eval "[INTERNAL]
-Evaluate numerically.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::instruction_output "[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::eval_gen "
-
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Evaluate numerically.
-
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
-
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Evaluate a function, overloaded.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::fwd_seed "[INTERNAL]
-Symbolic expressions for the forward seeds.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::getJacSparsityHierarchical
-"[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sx_out "[INTERNAL]  Get
-function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_function "[INTERNAL]
-";
-
-%feature("docstring") casadi::SimplifiedExternal::name "[INTERNAL]  Name of
-the function.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::numel_in "[INTERNAL]
-Number of input/output elements.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::n_out "[INTERNAL]  Number
-of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::default_in "[INTERNAL]
-Get default input value.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::forward "[INTERNAL]
-Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::sparsity_out "[INTERNAL]
-Get sparsity of a given output.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::alloc "[INTERNAL]  Ensure
-work vectors long enough to evaluate function.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::codegen_declarations "[INTERNAL]  Generate code for the declarations of the C function.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::get_options "[INTERNAL]
-Options.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::symbolicAdjSeed "[INTERNAL]  Symbolic expressions for the adjoint seeds.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::free_mem "[INTERNAL]
-Free memory block.
-
-";
-
-%feature("docstring") casadi::SimplifiedExternal::print_options "[INTERNAL]
-Print list of options.
-
-";
-
-
 // File: classcasadi_1_1Slice.xml
 %feature("docstring") casadi::Slice::is_scalar "
 
@@ -41118,11 +40014,6 @@ Get string representation.
 
 
 // File: classcasadi_1_1SlicotDple.xml
-%feature("docstring") casadi::SlicotDple::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::SlicotDple::get_name_out "[INTERNAL]  Names
 of function input and outputs.
 
@@ -41139,11 +40030,6 @@ function inputs and outputs.
 
 %feature("docstring") casadi::SlicotDple::size2_in "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::SlicotDple::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -42073,11 +40959,6 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::instruction_input "[INTERNAL]
-Get the (integer) input arguments of an atomic operation.
-
-";
-
 %feature("docstring") casadi::SlicotExpm::codegen_incref "[INTERNAL]
 Codegen incref for dependencies.
 
@@ -42236,8 +41117,8 @@ sparsity forward.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
+%feature("docstring") casadi::SlicotExpm::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -42252,11 +41133,6 @@ C++ includes: slicot_expm.hpp ";
 
 %feature("docstring") casadi::SlicotExpm::size1_in "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::SlicotExpm::alloc_w "[INTERNAL]  Ensure
-required length of w field.
 
 ";
 
@@ -42432,8 +41308,8 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::simplified_call "[INTERNAL]  Use
-simplified signature.
+%feature("docstring") casadi::SlicotExpm::alloc_w "[INTERNAL]  Ensure
+required length of w field.
 
 ";
 
@@ -43246,11 +42122,6 @@ vector of symbolic variables corresponding to the outputs.
 
 ";
 
-%feature("docstring") casadi::Smoothing::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
-
-";
-
 %feature("docstring") casadi::Smoothing::add_dependency "[INTERNAL]  Add a
 dependent function.
 
@@ -43854,11 +42725,6 @@ the sparsity pattern, forward mode.
 
 %feature("docstring") casadi::Smoothing::getAdaptorSolverName "[INTERNAL]
 Obtain solver name from Adaptor.
-
-";
-
-%feature("docstring") casadi::Smoothing::simplified_call "[INTERNAL]  Use
-simplified signature.
 
 ";
 
@@ -44888,8 +43754,8 @@ class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::simplified_call "[INTERNAL]  Use
-simplified signature.
+%feature("docstring") casadi::Sqpmethod::alloc "[INTERNAL]  Ensure work
+vectors long enough to evaluate function.
 
 ";
 
@@ -45283,11 +44149,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::alloc "[INTERNAL]  Ensure work
-vectors long enough to evaluate function.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::check_arg "[INTERNAL]  Check if
 input arguments have correct length and dimensions.
 
@@ -45324,11 +44185,6 @@ input(s) and output(s)
 ";
 
 %feature("docstring") casadi::Sqpmethod::has_function "[INTERNAL] ";
-
-%feature("docstring") casadi::Sqpmethod::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
-
-";
 
 %feature("docstring") casadi::Sqpmethod::size1_in "[INTERNAL]  Input/output
 dimensions.
@@ -46183,11 +45039,6 @@ necessary generate, the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::Switch::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::Switch::get_sparsity_in "[INTERNAL]
 Sparsities of function inputs and outputs.
 
@@ -46342,11 +45193,6 @@ symbolically while also propagating directional derivatives
 
 %feature("docstring") casadi::Switch::replace_fseed "[INTERNAL]  Replace
 0-by-0 forward seeds.
-
-";
-
-%feature("docstring") casadi::Switch::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 
@@ -46623,11 +45469,6 @@ sparsity of a given output.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::simplified_call "[INTERNAL]  Use
-simplified signature.
-
-";
-
 %feature("docstring") casadi::SymbolicQr::eval "[INTERNAL]  Evaluate
 numerically.
 
@@ -46686,11 +45527,6 @@ sparsity of a given output.
 
 %feature("docstring") casadi::SymbolicQr::free_sx "[INTERNAL]  Get free
 variables (SX)
-
-";
-
-%feature("docstring") casadi::SymbolicQr::simple "[INTERNAL]  Evaluate
-numerically, simplied syntax.
 
 ";
 

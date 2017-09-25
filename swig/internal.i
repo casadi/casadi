@@ -781,9 +781,6 @@
 %exception  casadi::FunctionInternal::signature(const std::string &fname) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::simplified_call() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::size1_in(int ind) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1513,18 +1510,6 @@
 %exception  casadi::ShellCompiler::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SimplifiedExternal::get_sparsity_in(int i) override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SimplifiedExternal::get_sparsity_out(int i) override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SimplifiedExternal::init(const Dict &opts) override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::SimplifiedExternal::simplified_call() const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::SlicotDple::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1796,9 +1781,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::ShellCompiler::ShellCompiler(const std::string &name) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SimplifiedExternal::SimplifiedExternal(const std::string &name, const Importer &li) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::SlicotDple::SlicotDple() {
