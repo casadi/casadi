@@ -33,7 +33,6 @@
 #include "nlpsol.hpp"
 #include "conic.hpp"
 #include "jit.hpp"
-#include "casadi_file.hpp"
 
 #include <typeinfo>
 #include <fstream>
@@ -83,17 +82,7 @@ namespace casadi {
   }
 
   Function::Function(const std::string& fname) {
-    // Parse the file
-    ParsedFile file(fname);
-
-    // Create the corresponding class
-    string classname = file.to_string("CLASS");
-
-    if (classname=="Jit") {
-      *this = jit(file);
-    } else {
-      casadi_error("Unknown Function type: " + classname);
-    }
+    casadi_error("Not implemented");
   }
 
   Function::Function(const string& name,

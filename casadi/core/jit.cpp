@@ -24,7 +24,6 @@
 
 
 #include "jit_impl.hpp"
-#include "casadi_file.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -36,29 +35,6 @@ namespace casadi {
   Function jit(const std::string& name, int n_in, int n_out,
                const std::string& body, const Dict& opts) {
     return Function::create(new Jit(name, n_in, n_out, body, opts), opts);
-  }
-
-  Function jit(const ParsedFile& file) {
-    // Function name
-    string name = file.to_string("NAME");
-
-    // Number of inputs (default 1)
-    int n_in = file.has("N_IN") ? file.to_int("N_IN") : 1;
-
-    // Number of outputs (default 1)
-    int n_out = file.has("N_OUT") ? file.to_int("N_OUT") : 1;
-
-    // Function body
-    string body = file.to_text("BODY");
-
-    // Read options
-    Dict opts;
-    if (file.has("JAC_BODY")) opts["jac"] = file.to_text("JAC_BODY");
-    if (file.has("HESS_BODY")) opts["hess"] = file.to_text("HESS_BODY");
-    if (file.has("JIT")) opts["jit"] = file.to_int("JIT");
-
-    // Create function object
-    return jit(name, n_in, n_out, body, opts);
   }
 
   Jit::Jit(const std::string& name, int n_in, int n_out,

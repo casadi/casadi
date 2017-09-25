@@ -71,7 +71,6 @@ set(CASADI_PUBLIC
 set(CASADI_INTERNAL
   # MISC
   casadi_logger.cpp
-  casadi_file.hpp casadi_file.cpp
   casadi_interrupt.cpp
   global_options.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/../config.h
