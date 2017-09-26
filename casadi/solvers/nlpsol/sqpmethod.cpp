@@ -196,7 +196,7 @@ namespace casadi {
     if (!exact_hessian_) {
       // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
       SX Bk = SX::sym("Bk", Hsp_);
-      SX x = SX::sym("x", sparsity_in(NLPSOL_X0));
+      SX x = SX::sym("x", sparsity_in_.at(NLPSOL_X0));
       SX x_old = SX::sym("x", x.sparsity());
       SX gLag = SX::sym("gLag", x.sparsity());
       SX gLag_old = SX::sym("gLag_old", x.sparsity());

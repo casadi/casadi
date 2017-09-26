@@ -61,17 +61,16 @@ namespace casadi {
 
   template<typename T>
   int Map::eval_gen(const T** arg, T** res, int* iw, T* w) const {
-    int n_in = this->n_in(), n_out = this->n_out();
-    const T** arg1 = arg+n_in;
-    copy_n(arg, n_in, arg1);
-    T** res1 = res+n_out;
-    copy_n(res, n_out, res1);
+    const T** arg1 = arg+n_in_;
+    copy_n(arg, n_in_, arg1);
+    T** res1 = res+n_out_;
+    copy_n(res, n_out_, res1);
     for (int i=0; i<n_; ++i) {
       if (f_(arg1, res1, iw, w)) return 1;
-      for (int j=0; j<n_in; ++j) {
+      for (int j=0; j<n_in_; ++j) {
         if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }
-      for (int j=0; j<n_out; ++j) {
+      for (int j=0; j<n_out_; ++j) {
         if (res1[j]) res1[j] += f_.nnz_out(j);
       }
     }
@@ -87,17 +86,16 @@ namespace casadi {
   }
 
   int Map::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
-    int n_in = this->n_in(), n_out = this->n_out();
-    bvec_t** arg1 = arg+n_in;
-    copy_n(arg, n_in, arg1);
-    bvec_t** res1 = res+n_out;
-    copy_n(res, n_out, res1);
+    bvec_t** arg1 = arg+n_in_;
+    copy_n(arg, n_in_, arg1);
+    bvec_t** res1 = res+n_out_;
+    copy_n(res, n_out_, res1);
     for (int i=0; i<n_; ++i) {
       if (f_.rev(arg1, res1, iw, w)) return 1;
-      for (int j=0; j<n_in; ++j) {
+      for (int j=0; j<n_in_; ++j) {
         if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }
-      for (int j=0; j<n_out; ++j) {
+      for (int j=0; j<n_out_; ++j) {
         if (res1[j]) res1[j] += f_.nnz_out(j);
       }
     }
@@ -109,23 +107,22 @@ namespace casadi {
   }
 
   void Map::codegen_body(CodeGenerator& g) const {
-    int n_in = this->n_in(), n_out = this->n_out();
     g << "int i;\n";
     // Input buffer
-    g << "const casadi_real** arg1 = arg+" << n_in << ";\n"
-      << "for (i=0; i<" << n_in << "; ++i) arg1[i]=arg[i];\n";
+    g << "const casadi_real** arg1 = arg+" << n_in_ << ";\n"
+      << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
     // Output buffer
-    g << "casadi_real** res1 = res+" << n_out << ";\n"
-      << "for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n"
+    g << "casadi_real** res1 = res+" << n_out_ << ";\n"
+      << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n";
     // Evaluate
     g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
     // Update input buffers
-    for (int j=0; j<n_in; ++j) {
+    for (int j=0; j<n_in_; ++j) {
       g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
     }
     // Update output buffers
-    for (int j=0; j<n_out; ++j) {
+    for (int j=0; j<n_out_; ++j) {
       g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
     }
     g << "}\n";
@@ -136,9 +133,6 @@ namespace casadi {
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
-    // Shorthands
-    int n_in = this->n_in(), n_out = this->n_out();
-
     // Generate map of derivative
     Function df = f_.forward(nfwd);
     Function dm = df.map(n_, parallelization());
@@ -148,9 +142,9 @@ namespace casadi {
 
     // Need to reorder sensitivity inputs
     vector<MX> res = arg;
-    vector<MX>::iterator it=res.begin()+n_in+n_out;
+    vector<MX>::iterator it=res.begin()+n_in_+n_out_;
     vector<int> ind;
-    for (int i=0; i<n_in; ++i, ++it) {
+    for (int i=0; i<n_in_; ++i, ++it) {
       int sz = f_.size2_in(i);
       ind.clear();
       for (int k=0; k<n_; ++k) {
@@ -168,7 +162,7 @@ namespace casadi {
 
     // Reorder sensitivity outputs
     it = res.begin();
-    for (int i=0; i<n_out; ++i, ++it) {
+    for (int i=0; i<n_out_; ++i, ++it) {
       int sz = f_.size2_out(i);
       ind.clear();
       for (int d=0; d<nfwd; ++d) {
@@ -190,9 +184,6 @@ namespace casadi {
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
-    // Shorthands
-    int n_in = this->n_in(), n_out = this->n_out();
-
     // Generate map of derivative
     Function df = f_.reverse(nadj);
     Function dm = df.map(n_, parallelization());
@@ -202,9 +193,9 @@ namespace casadi {
 
     // Need to reorder sensitivity inputs
     vector<MX> res = arg;
-    vector<MX>::iterator it=res.begin()+n_in+n_out;
+    vector<MX>::iterator it=res.begin()+n_in_+n_out_;
     vector<int> ind;
-    for (int i=0; i<n_out; ++i, ++it) {
+    for (int i=0; i<n_out_; ++i, ++it) {
       int sz = f_.size2_out(i);
       ind.clear();
       for (int k=0; k<n_; ++k) {
@@ -222,7 +213,7 @@ namespace casadi {
 
     // Reorder sensitivity outputs
     it = res.begin();
-    for (int i=0; i<n_in; ++i, ++it) {
+    for (int i=0; i<n_in_; ++i, ++it) {
       int sz = f_.size2_in(i);
       ind.clear();
       for (int d=0; d<nadj; ++d) {
@@ -250,7 +241,6 @@ namespace casadi {
 #ifndef WITH_OPENMP
     return Map::eval(arg, res, iw, w, mem);
 #else // WITH_OPENMP
-    int n_in = this->n_in(), n_out = this->n_out();
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 
@@ -265,14 +255,14 @@ namespace casadi {
 #pragma omp parallel for reduction(||:flag)
     for (int i=0; i<n_; ++i) {
       // Input buffers
-      const double** arg1 = arg + n_in + i*sz_arg;
-      for (int j=0; j<n_in; ++j) {
+      const double** arg1 = arg + n_in_ + i*sz_arg;
+      for (int j=0; j<n_in_; ++j) {
         arg1[j] = arg[j] ? arg[j] + i*f_.nnz_in(j) : 0;
       }
 
       // Output buffers
-      double** res1 = res + n_out + i*sz_res;
-      for (int j=0; j<n_out; ++j) {
+      double** res1 = res + n_out_ + i*sz_res;
+      for (int j=0; j<n_out_; ++j) {
         res1[j] = res[j] ? res[j] + i*f_.nnz_out(j) : 0;
       }
 
@@ -287,7 +277,6 @@ namespace casadi {
   }
 
   void MapOmp::codegen_body(CodeGenerator& g) const {
-    int n_in = this->n_in(), n_out = this->n_out();
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
     g << "int i;\n"
@@ -296,13 +285,13 @@ namespace casadi {
       << "int flag = 0;\n"
       << "#pragma omp parallel for private(i,arg1,res1) reduction(||:flag)\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n"
-      << "arg1 = arg + " << n_in << "+i*" << sz_arg << ";\n";
-    for (int j=0; j<n_in; ++j) {
+      << "arg1 = arg + " << n_in_ << "+i*" << sz_arg << ";\n";
+    for (int j=0; j<n_in_; ++j) {
       g << "arg1[" << j << "] = arg[" << j << "] ? "
         << "arg[" << j << "]+i*" << f_.nnz_in(j) << ": 0;\n";
     }
-    g << "res1 = res + " <<  n_out << "+i*" <<  sz_res << ";\n";
-    for (int j=0; j<n_out; ++j) {
+    g << "res1 = res + " <<  n_out_ << "+i*" <<  sz_res << ";\n";
+    for (int j=0; j<n_out_; ++j) {
       g << "res1[" << j << "] = res[" << j << "] ?"
         << "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;\n";
     }

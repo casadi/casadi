@@ -231,9 +231,9 @@ namespace casadi {
 
     // Check/set default inputs
     if (default_in_.empty()) {
-      default_in_.resize(n_in(), 0);
+      default_in_.resize(n_in_, 0);
     } else {
-      casadi_assert_message(default_in_.size()==n_in(),
+      casadi_assert_message(default_in_.size()==n_in_,
                             "Option 'default_in' has incorrect length");
     }
 
@@ -530,10 +530,6 @@ namespace casadi {
     // Quick return if possible
     if (nfwd==0) return;
 
-    // Shorthands
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
     // Check if seeds need to have dimensions corrected
     for (auto&& r : fseed) {
       if (!matching_arg(r)) {
@@ -543,13 +539,13 @@ namespace casadi {
 
     // Make sure seeds have matching sparsity patterns
     for (auto it=fseed.begin(); it!=fseed.end(); ++it) {
-      casadi_assert(it->size()==n_in);
-      for (int i=0; i<n_in; ++i) {
-        if (it->at(i).sparsity()!=sparsity_in(i)) {
+      casadi_assert(it->size()==n_in_);
+      for (int i=0; i<n_in_; ++i) {
+        if (it->at(i).sparsity()!=sparsity_in_[i]) {
           // Correct sparsity
           vector<vector<SX> > fseed2(fseed);
           for (auto&& r : fseed2) {
-            for (int i=0; i<n_in; ++i) r[i] = project(r[i], sparsity_in(i));
+            for (int i=0; i<n_in_; ++i) r[i] = project(r[i], sparsity_in_[i]);
           }
           return ad_forward(fseed2, fsens);
         }
@@ -558,10 +554,10 @@ namespace casadi {
 
     // Allocate results
     for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(n_out);
+      fsens[d].resize(n_out_);
       for (int i=0; i<fsens[d].size(); ++i)
-        if (fsens[d][i].sparsity()!=sparsity_out(i))
-          fsens[d][i] = SX::zeros(sparsity_out(i));
+        if (fsens[d][i].sparsity()!=sparsity_out_[i])
+          fsens[d][i] = SX::zeros(sparsity_out_[i]);
     }
 
     // Iterator to the binary operations
@@ -627,10 +623,6 @@ namespace casadi {
     // Quick return if possible
     if (nadj==0) return;
 
-    // Shorthands
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
     // Check if seeds need to have dimensions corrected
     for (auto&& r : aseed) {
       if (!matching_res(r)) {
@@ -641,27 +633,27 @@ namespace casadi {
     // Make sure matching sparsity of fseed
     bool matching_sparsity = true;
     for (int d=0; d<nadj; ++d) {
-      casadi_assert(aseed[d].size()==n_out);
-      for (int i=0; matching_sparsity && i<n_out; ++i)
-        matching_sparsity = aseed[d][i].sparsity()==sparsity_out(i);
+      casadi_assert(aseed[d].size()==n_out_);
+      for (int i=0; matching_sparsity && i<n_out_; ++i)
+        matching_sparsity = aseed[d][i].sparsity()==sparsity_out_[i];
     }
 
     // Correct sparsity if needed
     if (!matching_sparsity) {
       vector<vector<SX> > aseed2(aseed);
       for (int d=0; d<nadj; ++d)
-        for (int i=0; i<n_out; ++i)
-          if (aseed2[d][i].sparsity()!=sparsity_out(i))
-            aseed2[d][i] = project(aseed2[d][i], sparsity_out(i));
+        for (int i=0; i<n_out_; ++i)
+          if (aseed2[d][i].sparsity()!=sparsity_out_[i])
+            aseed2[d][i] = project(aseed2[d][i], sparsity_out_[i]);
       return ad_reverse(aseed2, asens);
     }
 
     // Allocate results if needed
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(n_in);
+      asens[d].resize(n_in_);
       for (int i=0; i<asens[d].size(); ++i) {
-        if (asens[d][i].sparsity()!=sparsity_in(i)) {
-          asens[d][i] = SX::zeros(sparsity_in(i));
+        if (asens[d][i].sparsity()!=sparsity_in_[i]) {
+          asens[d][i] = SX::zeros(sparsity_in_[i]);
         } else {
           fill(asens[d][i]->begin(), asens[d][i]->end(), 0);
         }
@@ -795,15 +787,11 @@ namespace casadi {
     // Jacobian expression
     SX J = SX::jacobian(veccat(out_), veccat(in_));
 
-    // Number inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
     // All inputs of the return function
     std::vector<SX> ret_in(inames.size());
     copy(in_.begin(), in_.end(), ret_in.begin());
-    for (int i=0; i<n_out; ++i) {
-      ret_in.at(n_in+i) = SX::sym(inames[n_in+i], Sparsity(out_.at(i).size()));
+    for (int i=0; i<n_out_; ++i) {
+      ret_in.at(n_in_+i) = SX::sym(inames[n_in_+i], Sparsity(out_.at(i).size()));
     }
 
     // Assemble function and return

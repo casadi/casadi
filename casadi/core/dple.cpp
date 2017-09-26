@@ -243,12 +243,12 @@ namespace casadi {
                                const std::vector<std::string>& onames,
                                const Dict& opts) const {
     // Symbolic A
-    MX A = MX::sym("A", sparsity_in(DPLE_A));
+    MX A = MX::sym("A", A_);
     Function Vdotf;
     {
-      MX P = MX::sym("P", sparsity_in(DPLE_A));
-      MX Adot = MX::sym("P", sparsity_in(DPLE_A));
-      MX Vdot = MX::sym("P", sparsity_in(DPLE_A));
+      MX P = MX::sym("P", A_);
+      MX Adot = MX::sym("P", A_);
+      MX Vdot = MX::sym("P", A_);
 
       MX temp = mtimes(std::vector<MX>{Adot, P, A.T()}) +
                 mtimes(std::vector<MX>{A, P, Adot.T()}) + Vdot;
@@ -256,9 +256,9 @@ namespace casadi {
                 { (temp+temp.T())/2});
     }
 
-    MX P = MX::sym("P", sparsity_out(DPLE_P));
-    MX Adot = MX::sym("Adot", repmat(sparsity_in(DPLE_A), 1, nfwd));
-    MX Vdot = MX::sym("Vdot", repmat(sparsity_in(DPLE_V), 1, nfwd));
+    MX P = MX::sym("P", V_);
+    MX Adot = MX::sym("Adot", repmat(A_, 1, nfwd));
+    MX Vdot = MX::sym("Vdot", repmat(V_, 1, nfwd));
     MX Qdot = Vdotf.map("map", "serial", nrhs_, {0, 2}, std::vector<int>{})
          .map("map", "serial", nfwd, {0, 1}, std::vector<int>{})({A, P, Adot, Vdot})[0];
     MX Pdot = dplesol(A, Qdot, plugin_name(), opts);
@@ -273,11 +273,11 @@ namespace casadi {
                                const Dict& opts) const {
 
     // Symbolic A
-    MX A = MX::sym("A", sparsity_in(DPLE_A));
+    MX A = MX::sym("A", A_);
 
     // Helper function to reverse, reverse-tranpose,
     // and reverse-symmetrize one block-diagonal matrix
-    int n = sparsity_in(DPLE_A).size1()/K_;
+    int n = A_.size1()/K_;
     std::vector<MX> ret = diagsplit(A, n);
     std::reverse(ret.begin(), ret.end());
     std::vector<MX> retT;
@@ -291,19 +291,19 @@ namespace casadi {
     // Function to compute the formula for Abar
     Function Abarf;
     {
-      MX P = MX::sym("P", sparsity_in(DPLE_A));
-      MX Vbar_rev = MX::sym("Vbar", sparsity_in(DPLE_A));
-      MX A_rev = MX::sym("A", sparsity_in(DPLE_A));
+      MX P = MX::sym("P", A_);
+      MX Vbar_rev = MX::sym("Vbar", A_);
+      MX A_rev = MX::sym("A", A_);
 
       Abarf = Function("PAVbar", {P, A_rev, Vbar_rev},
                 {2*revT(mtimes(std::vector<MX>{rev(P)[0], A_rev, Vbar_rev}))[0]});
     }
 
     // original output
-    MX P = MX::sym("P", sparsity_out(DPLE_P));
+    MX P = MX::sym("P", V_);
 
     // Symbolic reverse seed for P
-    MX Pbar = MX::sym("Pbar", repmat(sparsity_out(DPLE_P), 1, nadj));
+    MX Pbar = MX::sym("Pbar", repmat(V_, 1, nadj));
     // Symmetrize the seed
     MX Pbar_rev = revS.map(nrhs_).map(nadj)(Pbar)[0];
 

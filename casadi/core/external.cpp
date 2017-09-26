@@ -277,7 +277,7 @@ namespace casadi {
     if (n!=nfwd || !has_forward(nfwd)) {
       // Inefficient code to be replaced later
       Function fwd1 = forward(1);
-      return fwd1.map(name, "serial", nfwd, range(n_in()+n_out()), std::vector<int>(), opts);
+      return fwd1.map(name, "serial", nfwd, range(n_in_+n_out_), std::vector<int>(), opts);
       //casadi_error("Internal error: Refactoring needed, cf. #1055");
     }
     return external(name, li_, opts);
@@ -298,7 +298,7 @@ namespace casadi {
     if (n!=nadj || !has_reverse(nadj)) {
       // Inefficient code to be replaced later
       Function adj1 = reverse(1);
-      return adj1.map(name, "serial", nadj, range(n_in()+n_out()), std::vector<int>(), opts);
+      return adj1.map(name, "serial", nadj, range(n_in_+n_out_), std::vector<int>(), opts);
       //casadi_error("Internal error: Refactoring needed, cf. #1055");
     }
     return external(name, li_, opts);

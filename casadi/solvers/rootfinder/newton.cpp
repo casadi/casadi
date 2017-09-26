@@ -136,10 +136,10 @@ namespace casadi {
       m->iter++;
 
       // Use x to evaluate J
-      copy_n(m->iarg, n_in(), m->arg);
+      copy_n(m->iarg, n_in_, m->arg);
       m->arg[iin_] = m->x;
       m->res[0] = m->jac;
-      copy_n(m->ires, n_out(), m->res+1);
+      copy_n(m->ires, n_out_, m->res+1);
       m->res[1+iout_] = m->f;
       calc_function(m, "jac_f_z");
 

@@ -106,9 +106,9 @@ namespace casadi {
       size_t sz_buf_k=0;
 
       // Add size for input buffers
-      for (int i=1; i<n_in(); ++i) {
+      for (int i=1; i<n_in_; ++i) {
         const Sparsity& s = fk.sparsity_in(i-1);
-        if (s!=sparsity_in(i)) {
+        if (s!=sparsity_in_[i]) {
           project_in_ = true;
           alloc_w(s.size1()); // for casadi_project
           sz_buf_k += s.nnz();
@@ -116,9 +116,9 @@ namespace casadi {
       }
 
       // Add size for output buffers
-      for (int i=0; i<n_out(); ++i) {
+      for (int i=0; i<n_out_; ++i) {
         const Sparsity& s = fk.sparsity_out(i);
-        if (s!=sparsity_out(i)) {
+        if (s!=sparsity_out_[i]) {
           project_out_ = true;
           alloc_w(s.size1()); // for casadi_project
           sz_buf_k += s.nnz();
@@ -134,9 +134,6 @@ namespace casadi {
   }
 
   int Switch::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
-    // Shorthands
-    int n_in=this->n_in()-1, n_out=this->n_out();
-
     // Get the function to be evaluated
     int k = arg[0] ? static_cast<int>(*arg[0]) : 0;
     const Function& fk = k>=0 && k<f_.size() ? f_[k] : f_def_;
@@ -145,10 +142,10 @@ namespace casadi {
     const double** arg1;
     if (project_in_) {
       // Project one or more argument
-      arg1 = arg + 1 + n_in;
-      for (int i=0; i<n_in; ++i) {
+      arg1 = arg + n_in_;
+      for (int i=0; i<n_in_-1; ++i) {
         const Sparsity& f_sp = fk.sparsity_in(i);
-        const Sparsity& sp = sparsity_in(i+1);
+        const Sparsity& sp = sparsity_in_[i+1];
         arg1[i] = arg[i+1];
         if (arg1[i] && f_sp!=sp) {
           casadi_project(arg1[i], sp, w, f_sp, w + f_sp.nnz());
@@ -164,10 +161,10 @@ namespace casadi {
     double** res1;
     if (project_out_) {
       // Project one or more results
-      res1 = res + n_out;
-      for (int i=0; i<n_out; ++i) {
+      res1 = res + n_out_;
+      for (int i=0; i<n_out_; ++i) {
         const Sparsity& f_sp = fk.sparsity_out(i);
-        const Sparsity& sp = sparsity_out(i);
+        const Sparsity& sp = sparsity_out_[i];
         res1[i] = res[i];
         if (res1[i] && f_sp!=sp) {
           res1[i] = w;
@@ -184,9 +181,9 @@ namespace casadi {
 
     // Project results with different sparsity
     if (project_out_) {
-      for (int i=0; i<n_out; ++i) {
+      for (int i=0; i<n_out_; ++i) {
         const Sparsity& f_sp = fk.sparsity_out(i);
-        const Sparsity& sp = sparsity_out(i);
+        const Sparsity& sp = sparsity_out_[i];
         if (res[i] && f_sp!=sp) {
           casadi_project(res1[i], f_sp, res[i], sp, w);
         }
@@ -218,7 +215,7 @@ namespace casadi {
     vector<MX> res = sw(arg);
 
     // Ignore seed for ind
-    arg.insert(arg.begin() + n_in() + n_out(), MX(1, nfwd));
+    arg.insert(arg.begin() + n_in_ + n_out_, MX(1, nfwd));
 
     // Create wrapper
     return Function(name, arg, res, inames, onames, opts);
@@ -277,17 +274,13 @@ namespace casadi {
   }
 
   int Switch::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
-
-    // Shorthands
-    int n_in=this->n_in()-1, n_out=this->n_out();
-
     // Input and output buffers
-    const SXElem** arg1 = arg + 1 + n_in;
-    SXElem** res1 = res + n_out;
+    const SXElem** arg1 = arg + n_in_;
+    SXElem** res1 = res + n_out_;
 
     // Extra memory needed for chaining if_else calls
     std::vector<SXElem> w_extra(nnz_out());
-    std::vector<SXElem*> res_tempv(n_out);
+    std::vector<SXElem*> res_tempv(n_out_);
     SXElem** res_temp = get_ptr(res_tempv);
 
     for (int k=0; k<f_.size()+1; ++k) {
@@ -300,25 +293,25 @@ namespace casadi {
 
       if (k==0) {
         // For the default case, redirect the temporary results to res
-        copy_n(res, n_out, res_temp);
+        copy_n(res, n_out_, res_temp);
       } else {
         // For the other cases, store the temporary results
-        for (int i=0; i<n_out; ++i) {
+        for (int i=0; i<n_out_; ++i) {
           res_temp[i] = wll;
           wll += nnz_out(i);
         }
       }
 
-      copy_n(arg+1, n_in, arg1);
-      copy_n(res_temp, n_out, res1);
+      copy_n(arg+1, n_in_-1, arg1);
+      copy_n(res_temp, n_out_, res1);
 
       const Function& fk = k==0 ? f_def_ : f_[k-1];
 
       // Project arguments with different sparsity
-      for (int i=0; i<n_in; ++i) {
+      for (int i=0; i<n_in_-1; ++i) {
         if (arg1[i]) {
           const Sparsity& f_sp = fk.sparsity_in(i);
-          const Sparsity& sp = sparsity_in(i+1);
+          const Sparsity& sp = sparsity_in_[i+1];
           if (f_sp!=sp) {
             SXElem *t = wl; wl += f_sp.nnz(); // t is non-const
             casadi_project(arg1[i], sp, t, f_sp, wl);
@@ -328,10 +321,10 @@ namespace casadi {
       }
 
       // Temporary memory for results with different sparsity
-      for (int i=0; i<n_out; ++i) {
+      for (int i=0; i<n_out_; ++i) {
         if (res1[i]) {
           const Sparsity& f_sp = fk.sparsity_out(i);
-          const Sparsity& sp = sparsity_out(i);
+          const Sparsity& sp = sparsity_out_[i];
           if (f_sp!=sp) { res1[i] = wl; wl += f_sp.nnz();}
         }
       }
@@ -340,17 +333,17 @@ namespace casadi {
       if (fk(arg1, res1, iw, wl, 0)) return 1;
 
       // Project results with different sparsity
-      for (int i=0; i<n_out; ++i) {
+      for (int i=0; i<n_out_; ++i) {
         if (res1[i]) {
           const Sparsity& f_sp = fk.sparsity_out(i);
-          const Sparsity& sp = sparsity_out(i);
+          const Sparsity& sp = sparsity_out_[i];
           if (f_sp!=sp) casadi_project(res1[i], f_sp, res_temp[i], sp, wl);
         }
       }
 
       if (k>0) { // output the temporary results via an if_else
         SXElem cond = k-1==arg[0][0];
-        for (int i=0; i<n_out; ++i) {
+        for (int i=0; i<n_out_; ++i) {
           if (res[i]) {
             for (int j=0; j<nnz_out(i); ++j) {
               res[i][j] = if_else(cond, res_temp[i][j], res[i][j], true);
@@ -364,23 +357,20 @@ namespace casadi {
   }
 
   void Switch::codegen_body(CodeGenerator& g) const {
-    // Shorthands
-    int n_in=this->n_in()-1, n_out=this->n_out();
-
     // Project arguments with different sparsity
     if (project_in_) {
       // Project one or more argument
       g.local("i", "int");
-      g << "const casadi_real** arg1 = arg + " << (1 + n_in) << ";\n"
-        << "for(i=0; i<" << n_in << "; ++i) arg1[i]=arg[i+1];\n";
+      g << "const casadi_real** arg1 = arg + " << n_in_ << ";\n"
+        << "for(i=0; i<" << n_in_-1 << "; ++i) arg1[i]=arg[i+1];\n";
     }
 
     // Temporary memory for results with different sparsity
     if (project_out_) {
       // Project one or more results
       g.local("i", "int");
-      g << "casadi_real** res1 = res + " << n_out << ";\n"
-        << "for (i=0; i<" << n_out << "; ++i) res1[i]=res[i];\n";
+      g << "casadi_real** res1 = res + " << n_out_ << ";\n"
+        << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n";
     }
 
     // Codegen condition
@@ -411,9 +401,9 @@ namespace casadi {
         g << "return 1;\n";
       } else {
         // Project arguments with different sparsity
-        for (int i=0; i<n_in; ++i) {
+        for (int i=0; i<n_in_-1; ++i) {
           const Sparsity& f_sp = fk.sparsity_in(i);
-          const Sparsity& sp = sparsity_in(i+1);
+          const Sparsity& sp = sparsity_in_[i+1];
           if (f_sp!=sp) {
             if (f_sp.nnz()==0) {
               g << "arg1[" << i << "]=0;\n";
@@ -427,9 +417,9 @@ namespace casadi {
         }
 
         // Temporary memory for results with different sparsity
-        for (int i=0; i<n_out; ++i) {
+        for (int i=0; i<n_out_; ++i) {
           const Sparsity& f_sp = fk.sparsity_out(i);
-          const Sparsity& sp = sparsity_out(i);
+          const Sparsity& sp = sparsity_out_[i];
           if (f_sp!=sp) {
             if (f_sp.nnz()==0) {
               g << "res1[" << i << "]=0;\n";
@@ -445,9 +435,9 @@ namespace casadi {
                          "iw", "w") << ") return 1;\n";
 
         // Project results with different sparsity
-        for (int i=0; i<n_out; ++i) {
+        for (int i=0; i<n_out_; ++i) {
           const Sparsity& f_sp = fk.sparsity_out(i);
-          const Sparsity& sp = sparsity_out(i);
+          const Sparsity& sp = sparsity_out_[i];
           if (f_sp!=sp) {
             g << g.project("res1[" + str(i) + "]", f_sp,
                            "res[" + str(i) + "]", sp, "w") << "\n";

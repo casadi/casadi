@@ -583,11 +583,11 @@ namespace casadi {
   }
 
   int Function::n_in() const {
-    return (*this)->n_in();
+    return (*this)->n_in_;
   }
 
   int Function::n_out() const {
-    return (*this)->n_out();
+    return (*this)->n_out_;
   }
 
   int Function::size1_in(int ind) const {
@@ -735,7 +735,7 @@ namespace casadi {
 
   const Sparsity& Function::sparsity_in(int ind) const {
     try {
-      return (*this)->sparsity_in(ind);
+      return (*this)->sparsity_in_.at(ind);
     } catch (exception& e) {
       THROW_ERROR("sparsity_in", e.what());
     }
@@ -743,7 +743,7 @@ namespace casadi {
 
   const Sparsity& Function::sparsity_in(const string &iname) const {
     try {
-      return (*this)->sparsity_in(iname);
+      return sparsity_in(index_in(iname));
     } catch (exception& e) {
       THROW_ERROR("sparsity_in", e.what());
     }
@@ -751,7 +751,7 @@ namespace casadi {
 
   const Sparsity& Function::sparsity_out(int ind) const {
     try {
-      return (*this)->sparsity_out(ind);
+      return (*this)->sparsity_out_.at(ind);
     } catch (exception& e) {
       THROW_ERROR("sparsity_out", e.what());
     }
@@ -759,7 +759,7 @@ namespace casadi {
 
   const Sparsity& Function::sparsity_out(const string &iname) const {
     try {
-      return (*this)->sparsity_out(iname);
+      return sparsity_out(index_out(iname));
     } catch (exception& e) {
       THROW_ERROR("sparsity_out", e.what());
     }

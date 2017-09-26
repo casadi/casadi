@@ -364,28 +364,24 @@ namespace casadi {
     // Return flag
     int flag;
 
-    // QP matrices sparsities
-    const Sparsity& hsp = sparsity_in(CONIC_H);
-    const Sparsity& asp = sparsity_in(CONIC_A);
-
     // Sparse or dense mode?
     if (sparse_) {
       // Get quadratic term
-      int* h_colind = const_cast<int*>(hsp.colind());
-      int* h_row = const_cast<int*>(hsp.row());
-      double* h=w; w += hsp.nnz();
-      casadi_copy(arg[CONIC_H], hsp.nnz(), h);
+      int* h_colind = const_cast<int*>(H_.colind());
+      int* h_row = const_cast<int*>(H_.row());
+      double* h=w; w += H_.nnz();
+      casadi_copy(arg[CONIC_H], H_.nnz(), h);
       if (m->h) delete m->h;
-      m->h = new qpOASES::SymSparseMat(hsp.size1(), hsp.size2(), h_row, h_colind, h);
+      m->h = new qpOASES::SymSparseMat(H_.size1(), H_.size2(), h_row, h_colind, h);
       m->h->createDiagInfo();
 
       // Get linear term
-      int* a_colind = const_cast<int*>(asp.colind());
-      int* a_row = const_cast<int*>(asp.row());
-      double* a=w; w += asp.nnz();
-      casadi_copy(arg[CONIC_A], asp.nnz(), a);
+      int* a_colind = const_cast<int*>(A_.colind());
+      int* a_row = const_cast<int*>(A_.row());
+      double* a=w; w += A_.nnz();
+      casadi_copy(arg[CONIC_A], A_.nnz(), a);
       if (m->a) delete m->a;
-      m->a = new qpOASES::SparseMatrix(asp.size1(), asp.size2(), a_row, a_colind, a);
+      m->a = new qpOASES::SparseMatrix(A_.size1(), A_.size2(), a_row, a_colind, a);
 
       m->fstats.at("preprocessing").toc();
       m->fstats.at("solver").tic();
@@ -401,11 +397,11 @@ namespace casadi {
     } else {
       // Get quadratic term
       double* h=w; w += nx_*nx_;
-      casadi_densify(arg[CONIC_H], hsp, h, false);
+      casadi_densify(arg[CONIC_H], H_, h, false);
 
       // Get linear term
       double* a = w; w += nx_*na_;
-      casadi_densify(arg[CONIC_A], asp, a, true);
+      casadi_densify(arg[CONIC_A], A_, a, true);
 
       m->fstats.at("preprocessing").toc();
       m->fstats.at("solver").tic();

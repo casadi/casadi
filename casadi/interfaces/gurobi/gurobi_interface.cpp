@@ -221,7 +221,7 @@ namespace casadi {
       casadi_assert_message(!flag, GRBgeterrormsg(m->env));
 
       // Add quadratic terms
-      const int *H_colind=sparsity_in(CONIC_H).colind(), *H_row=sparsity_in(CONIC_H).row();
+      const int *H_colind=H_.colind(), *H_row=H_.row();
       for (int i=0; i<nx_; ++i) {
 
         // Quadratic term nonzero indices
@@ -248,7 +248,7 @@ namespace casadi {
       }
 
       // Add constraints
-      const int *A_colind=sparsity_in(CONIC_A).colind(), *A_row=sparsity_in(CONIC_A).row();
+      const int *A_colind=A_.colind(), *A_row=A_.row();
       casadi_copy(A_colind, nx_, tr_ind);
       for (int i=0; i<na_; ++i) {
         // Get bounds

@@ -77,9 +77,9 @@ namespace casadi {
 
     // Check/set default inputs
     if (default_in_.empty()) {
-      default_in_.resize(n_in(), 0);
+      default_in_.resize(n_in_, 0);
     } else {
-      casadi_assert_message(default_in_.size()==n_in(),
+      casadi_assert_message(default_in_.size()==n_in_,
                             "Option 'default_in' has incorrect length");
     }
 
@@ -354,8 +354,8 @@ namespace casadi {
   int MXFunction::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     if (verbose_) casadi_message(name_ + "::eval");
     // Work vector and temporaries to hold pointers to operation input and outputs
-    const double** arg1 = arg+n_in();
-    double** res1 = res+n_out();
+    const double** arg1 = arg+n_in_;
+    double** res1 = res+n_out_;
 
     // Make sure that there are no free variables
     if (!free_vars_.empty()) {
@@ -455,8 +455,8 @@ namespace casadi {
   int MXFunction::
   sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     // Temporaries to hold pointers to operation input and outputs
-    const bvec_t** arg1=arg+n_in();
-    bvec_t** res1=res+n_out();
+    const bvec_t** arg1=arg+n_in_;
+    bvec_t** res1=res+n_out_;
 
     // Propagate sparsity forward
     for (auto&& e : algorithm_) {
@@ -496,8 +496,8 @@ namespace casadi {
 
   int MXFunction::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     // Temporaries to hold pointers to operation input and outputs
-    bvec_t** arg1=arg+n_in();
-    bvec_t** res1=res+n_out();
+    bvec_t** arg1=arg+n_in_;
+    bvec_t** res1=res+n_out_;
 
     fill_n(w, sz_w(), 0);
 
@@ -561,7 +561,7 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::eval_mx");
 
     // Resize the number of outputs
-    casadi_assert_message(arg.size()==n_in(), "Wrong number of input arguments");
+    casadi_assert_message(arg.size()==n_in_, "Wrong number of input arguments");
     res.resize(out_.size());
 
     // Trivial inline by default if output known
@@ -633,7 +633,7 @@ namespace casadi {
     int nfwd = fseed.size();
     fsens.resize(nfwd);
     for (int d=0; d<nfwd; ++d) {
-      fsens[d].resize(n_out());
+      fsens[d].resize(n_out_);
     }
 
     // Quick return if no directions
@@ -779,7 +779,7 @@ namespace casadi {
     int nadj = aseed.size();
     asens.resize(nadj);
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(n_in());
+      asens[d].resize(n_in_);
     }
 
     // Quick return if no directions
@@ -1075,8 +1075,8 @@ namespace casadi {
 
   void MXFunction::codegen_body(CodeGenerator& g) const {
     // Temporary variables and vectors
-    g.init_local("arg1", "arg+" + str(n_in()));
-    g.init_local("res1", "res+" + str(n_out()));
+    g.init_local("arg1", "arg+" + str(n_in_));
+    g.init_local("res1", "res+" + str(n_out_));
 
     // Declare scalar work vector elements as local variables
     bool first = true;

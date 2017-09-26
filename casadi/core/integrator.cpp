@@ -518,11 +518,11 @@ namespace casadi {
     bvec_t *tmp_rz = w; w += nrz_;
 
     // Propagate forward
-    const bvec_t** arg1 = arg+n_in();
+    const bvec_t** arg1 = arg+n_in_;
     fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
     arg1[DE_X] = arg[INTEGRATOR_X0];
     arg1[DE_P] = arg[INTEGRATOR_P];
-    bvec_t** res1 = res+n_out();
+    bvec_t** res1 = res+n_out_;
     fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
     res1[DE_ODE] = tmp_x;
     res1[DE_ALG] = tmp_z;
@@ -593,8 +593,8 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::sp_reverse");
 
     // Work vectors
-    bvec_t** arg1 = arg+n_in();
-    bvec_t** res1 = res+n_out();
+    bvec_t** arg1 = arg+n_in_;
+    bvec_t** res1 = res+n_out_;
     bvec_t *tmp_x = w; w += nx_;
     bvec_t *tmp_z = w; w += nz_;
 
@@ -807,20 +807,20 @@ namespace casadi {
 
     // Concatenate forward seeds
     vector<MX> v(nfwd);
-    auto r_it = ret_in.begin() + n_in() + n_out();
-    for (int i=0; i<n_in(); ++i) {
-      for (int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_in());
+    auto r_it = ret_in.begin() + n_in_ + n_out_;
+    for (int i=0; i<n_in_; ++i) {
+      for (int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_in_);
       *r_it++ = horzcat(v);
     }
-    ret_in.resize(n_in() + n_out() + n_in());
+    ret_in.resize(n_in_ + n_out_ + n_in_);
 
     // Concatenate forward sensitivites
     r_it = ret_out.begin();
-    for (int i=0; i<n_out(); ++i) {
-      for (int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_out());
+    for (int i=0; i<n_out_; ++i) {
+      for (int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_out_);
       *r_it++ = horzcat(v);
     }
-    ret_out.resize(n_out());
+    ret_out.resize(n_out_);
 
     // Create derivative function and return
     return Function(name, ret_in, ret_out, inames, onames, opts);
@@ -955,20 +955,20 @@ namespace casadi {
 
     // Concatenate forward seeds
     vector<MX> v(nadj);
-    auto r_it = ret_in.begin() + n_in() + n_out();
-    for (int i=0; i<n_out(); ++i) {
-      for (int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_out());
+    auto r_it = ret_in.begin() + n_in_ + n_out_;
+    for (int i=0; i<n_out_; ++i) {
+      for (int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_out_);
       *r_it++ = horzcat(v);
     }
-    ret_in.resize(n_in() + n_out() + n_out());
+    ret_in.resize(n_in_ + n_out_ + n_out_);
 
     // Concatenate forward sensitivites
     r_it = ret_out.begin();
-    for (int i=0; i<n_in(); ++i) {
-      for (int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_in());
+    for (int i=0; i<n_in_; ++i) {
+      for (int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_in_);
       *r_it++ = horzcat(v);
     }
-    ret_out.resize(n_in());
+    ret_out.resize(n_in_);
 
     // Create derivative function and return
     return Function(name, ret_in, ret_out, inames, onames, opts);

@@ -181,11 +181,11 @@ namespace casadi {
 
     // Get input pointers
     m->iarg = arg;
-    arg += n_in();
+    arg += n_in_;
 
     // Get output pointers
     m->ires = res;
-    res += n_out();
+    res += n_out_;
   }
 
   Function Rootfinder
@@ -203,12 +203,12 @@ namespace casadi {
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
     vector<MX> v(nfwd);
-    for (int i=0; i<n_in(); ++i) {
+    for (int i=0; i<n_in_; ++i) {
       for (int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
       arg.push_back(horzcat(v));
     }
     res.clear();
-    for (int i=0; i<n_out(); ++i) {
+    for (int i=0; i<n_out_; ++i) {
       for (int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
       res.push_back(horzcat(v));
     }
@@ -231,12 +231,12 @@ namespace casadi {
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
     vector<MX> v(nadj);
-    for (int i=0; i<n_out(); ++i) {
+    for (int i=0; i<n_out_; ++i) {
       for (int d=0; d<nadj; ++d) v[d] = aseed[d][i];
       arg.push_back(horzcat(v));
     }
     res.clear();
-    for (int i=0; i<n_in(); ++i) {
+    for (int i=0; i<n_in_; ++i) {
       for (int d=0; d<nadj; ++d) v[d] = asens[d][i];
       res.push_back(horzcat(v));
     }
@@ -245,17 +245,15 @@ namespace casadi {
 
   int Rootfinder::
   sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
-    int num_out = n_out();
-    int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
     bvec_t* tmp2 = w; w += n_;
 
     // Propagate dependencies through the function
-    const bvec_t** arg1 = arg+n_in();
-    copy(arg, arg+num_in, arg1);
+    const bvec_t** arg1 = arg+n_in_;
+    copy(arg, arg+n_in_, arg1);
     arg1[iin_] = 0;
-    bvec_t** res1 = res+n_out();
-    fill_n(res1, num_out, static_cast<bvec_t*>(0));
+    bvec_t** res1 = res+n_out_;
+    fill_n(res1, n_out_, static_cast<bvec_t*>(0));
     res1[iout_] = tmp1;
     oracle_(arg1, res1, iw, w, 0);
 
@@ -265,9 +263,9 @@ namespace casadi {
     if (res[iout_]) copy(tmp2, tmp2+n_, res[iout_]);
 
     // Propagate to auxiliary outputs
-    if (num_out>1) {
+    if (n_out_>1) {
       arg1[iin_] = tmp2;
-      copy(res, res+num_out, res1);
+      copy(res, res+n_out_, res1);
       res1[iout_] = 0;
       oracle_(arg1, res1, iw, w, 0);
     }
@@ -275,8 +273,6 @@ namespace casadi {
   }
 
   int Rootfinder::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
-    int num_out = n_out();
-    int num_in = n_in();
     bvec_t* tmp1 = w; w += n_;
     bvec_t* tmp2 = w; w += n_;
 
@@ -289,13 +285,13 @@ namespace casadi {
     }
 
     // Propagate dependencies from auxiliary outputs to z
-    bvec_t** res1 = res+num_out;
-    copy(res, res+num_out, res1);
+    bvec_t** res1 = res+n_out_;
+    copy(res, res+n_out_, res1);
     res1[iout_] = 0;
-    bvec_t** arg1 = arg+num_in;
-    copy(arg, arg+num_in, arg1);
+    bvec_t** arg1 = arg+n_in_;
+    copy(arg, arg+n_in_, arg1);
     arg1[iin_] = tmp1;
-    if (num_out>1) {
+    if (n_out_>1) {
       if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
     }
 
@@ -304,7 +300,7 @@ namespace casadi {
     sp_jac_.spsolve(tmp2, tmp1, true);
 
     // Propagate dependencies through the function
-    for (int i=0; i<num_out; ++i) res1[i] = 0;
+    for (int i=0; i<n_out_; ++i) res1[i] = 0;
     res1[iout_] = tmp2;
     arg1[iin_] = 0; // just a guess
     if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
@@ -350,8 +346,7 @@ namespace casadi {
     for (int d=0; d<nfwd; ++d) fsens[d][iout_] = reshape(rhs[d], size_in(iin_));
 
     // Propagate to auxiliary outputs
-    int num_out = n_out();
-    if (num_out>1) {
+    if (n_out_>1) {
       for (int d=0; d<nfwd; ++d) f_fseed[d][iin_] = fsens[d][iout_];
       oracle_->call_forward(f_arg, f_res, f_fseed, fsens,
                             always_inline, never_inline);
@@ -379,20 +374,18 @@ namespace casadi {
     MX J = jac(f_arg).front();
 
     // Get adjoint seeds for calling f
-    int num_out = n_out();
-    int num_in = n_in();
     vector<MX> f_res(res);
     f_res[iout_] = MX(size_in(iin_)); // zero residual
     vector<vector<MX> > f_aseed(nadj);
     for (int d=0; d<nadj; ++d) {
-      f_aseed[d].resize(num_out);
-      for (int i=0; i<num_out; ++i) f_aseed[d][i] = i==iout_ ? f_res[iout_] : aseed[d][i];
+      f_aseed[d].resize(n_out_);
+      for (int i=0; i<n_out_; ++i) f_aseed[d][i] = i==iout_ ? f_res[iout_] : aseed[d][i];
     }
 
     // Propagate dependencies from auxiliary outputs
     vector<MX> rhs(nadj);
     vector<vector<MX> > asens_aux;
-    if (num_out>1) {
+    if (n_out_>1) {
       oracle_->call_reverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
       for (int d=0; d<nadj; ++d) rhs[d] = vec(asens_aux[d][iin_] + aseed[d][iout_]);
     } else {
@@ -402,7 +395,7 @@ namespace casadi {
     // Solve for all the adjoint seeds at once
     rhs = horzsplit(J->get_solve(-horzcat(rhs), true, linsol_));
     for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<num_out; ++i) {
+      for (int i=0; i<n_out_; ++i) {
         if (i==iout_) {
           f_aseed[d][i] = reshape(rhs[d], size_out(i));
         } else {
@@ -415,7 +408,7 @@ namespace casadi {
     // No dependency on guess (1)
     vector<MX> tmp(nadj);
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(num_in);
+      asens[d].resize(n_in_);
       tmp[d] = asens[d][iin_].is_empty(true) ? MX(size_in(iin_)) : asens[d][iin_];
     }
 
@@ -428,9 +421,9 @@ namespace casadi {
     }
 
     // Add contribution from auxiliary outputs
-    if (num_out>1) {
+    if (n_out_>1) {
       for (int d=0; d<nadj; ++d) {
-        for (int i=0; i<num_in; ++i) if (i!=iin_) asens[d][i] += asens_aux[d][i];
+        for (int i=0; i<n_in_; ++i) if (i!=iin_) asens[d][i] += asens_aux[d][i];
       }
     }
   }

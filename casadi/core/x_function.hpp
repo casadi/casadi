@@ -206,7 +206,7 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::init");
 
     // Make sure that inputs are symbolic
-    for (int i=0; i<n_in(); ++i) {
+    for (int i=0; i<n_in_; ++i) {
       if (in_.at(i).nnz()>0 && !in_.at(i).is_valid_input()) {
         casadi_error("Xfunction input arguments must be purely symbolic. \n"
                      "Argument " + str(i) + "(" + name_in_[i] + ") is not symbolic.");
@@ -317,7 +317,7 @@ namespace casadi {
     }
 
     if (symmetric) {
-      casadi_assert(sparsity_out(oind).is_dense());
+      casadi_assert(sparsity_out_.at(oind).is_dense());
     }
 
     // Create return object
@@ -357,12 +357,12 @@ namespace casadi {
     const int* jsp_row = jsp.row();
 
     // Input sparsity
-    std::vector<int> input_col = sparsity_in(iind).get_col();
-    const int* input_row = sparsity_in(iind).row();
+    std::vector<int> input_col = sparsity_in_.at(iind).get_col();
+    const int* input_row = sparsity_in_.at(iind).row();
 
     // Output sparsity
-    std::vector<int> output_col = sparsity_out(oind).get_col();
-    const int* output_row = sparsity_out(oind).row();
+    std::vector<int> output_col = sparsity_out_.at(oind).get_col();
+    const int* output_row = sparsity_out_.at(oind).row();
 
     // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
     if (verbose_) casadi_message("jac transposes and mapping");
@@ -433,7 +433,7 @@ namespace casadi {
         }
 
         // initialize to zero
-        fseed[d].resize(n_in());
+        fseed[d].resize(n_in_);
         for (int ind=0; ind<fseed[d].size(); ++ind) {
           int nrow = size1_in(ind), ncol = size2_in(ind); // Input dimensions
           if (ind==iind) {
@@ -463,7 +463,7 @@ namespace casadi {
         }
 
         //initialize to zero
-        aseed[d].resize(n_out());
+        aseed[d].resize(n_out_);
         for (int ind=0; ind<aseed[d].size(); ++ind) {
           int nrow = size1_out(ind), ncol = size2_out(ind); // Output dimensions
           if (ind==oind) {
@@ -478,9 +478,9 @@ namespace casadi {
       fsens.resize(nfdir_batch);
       for (int d=0; d<nfdir_batch; ++d) {
         // initialize to zero
-        fsens[d].resize(n_out());
+        fsens[d].resize(n_out_);
         for (int oind=0; oind<fsens[d].size(); ++oind) {
-          fsens[d][oind] = MatType::zeros(sparsity_out(oind));
+          fsens[d][oind] = MatType::zeros(sparsity_out_.at(oind));
         }
       }
 
@@ -488,9 +488,9 @@ namespace casadi {
       asens.resize(nadir_batch);
       for (int d=0; d<nadir_batch; ++d) {
         // initialize to zero
-        asens[d].resize(n_in());
+        asens[d].resize(n_in_);
         for (int ind=0; ind<asens[d].size(); ++ind) {
-          asens[d][ind] = MatType::zeros(sparsity_in(ind));
+          asens[d][ind] = MatType::zeros(sparsity_in_.at(ind));
         }
       }
 
@@ -532,11 +532,11 @@ namespace casadi {
         }
 
         // Locate the nonzeros of the forward sensitivity matrix
-        sparsity_out(oind).find(nzmap);
+        sparsity_out_.at(oind).find(nzmap);
         fsens[d][oind].sparsity().get_nz(nzmap);
 
         if (symmetric) {
-          sparsity_in(iind).find(nzmap2);
+          sparsity_in_.at(iind).find(nzmap2);
           fsens[d][oind].sparsity().get_nz(nzmap2);
         }
 
@@ -624,7 +624,7 @@ namespace casadi {
         }
 
         // Locate the nonzeros of the adjoint sensitivity matrix
-        sparsity_in(iind).find(nzmap);
+        sparsity_in_.at(iind).find(nzmap);
         asens[d][iind].sparsity().get_nz(nzmap);
 
         // For all the output nonzeros treated in the sweep
@@ -671,25 +671,21 @@ namespace casadi {
     static_cast<const DerivedType*>(this)->ad_forward(fseed, fsens);
     casadi_assert(fsens.size()==fseed.size());
 
-    // Number inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
     // All inputs of the return function
     std::vector<MatType> ret_in(inames.size());
     copy(in_.begin(), in_.end(), ret_in.begin());
-    for (int i=0; i<n_out; ++i) {
-      ret_in.at(n_in+i) = MatType::sym(inames[n_in+i], Sparsity(out_.at(i).size()));
+    for (int i=0; i<n_out_; ++i) {
+      ret_in.at(n_in_+i) = MatType::sym(inames[n_in_+i], Sparsity(out_.at(i).size()));
     }
     std::vector<MatType> v(nfwd);
-    for (int i=0; i<n_in; ++i) {
+    for (int i=0; i<n_in_; ++i) {
       for (int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
-      ret_in.at(n_in + n_out + i) = horzcat(v);
+      ret_in.at(n_in_ + n_out_ + i) = horzcat(v);
     }
 
     // All outputs of the return function
     std::vector<MatType> ret_out(onames.size());
-    for (int i=0; i<n_out; ++i) {
+    for (int i=0; i<n_out_; ++i) {
       for (int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
       ret_out.at(i) = horzcat(v);
     }
@@ -710,25 +706,21 @@ namespace casadi {
     // Evaluate symbolically
     static_cast<const DerivedType*>(this)->ad_reverse(aseed, asens);
 
-    // Number inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
     // All inputs of the return function
     std::vector<MatType> ret_in(inames.size());
     copy(in_.begin(), in_.end(), ret_in.begin());
-    for (int i=0; i<n_out; ++i) {
-      ret_in.at(n_in + i) = MatType::sym(inames[n_in+i], Sparsity(out_.at(i).size()));
+    for (int i=0; i<n_out_; ++i) {
+      ret_in.at(n_in_ + i) = MatType::sym(inames[n_in_+i], Sparsity(out_.at(i).size()));
     }
     std::vector<MatType> v(nadj);
-    for (int i=0; i<n_out; ++i) {
+    for (int i=0; i<n_out_; ++i) {
       for (int d=0; d<nadj; ++d) v[d] = aseed[d][i];
-      ret_in.at(n_in + n_out + i)  = horzcat(v);
+      ret_in.at(n_in_ + n_out_ + i)  = horzcat(v);
     }
 
     // All outputs of the return function
     std::vector<MatType> ret_out(onames.size());
-    for (int i=0; i<n_in; ++i) {
+    for (int i=0; i<n_in_; ++i) {
       for (int d=0; d<nadj; ++d) v[d] = asens[d][i];
       ret_out.at(i) = horzcat(v);
     }
@@ -750,15 +742,11 @@ namespace casadi {
     // Jacobian expression
     MatType J = tmp.get<DerivedType>()->jac(0, 0, Dict());
 
-    // Number inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
     // All inputs of the return function
     std::vector<MatType> ret_in(inames.size());
     copy(in_.begin(), in_.end(), ret_in.begin());
-    for (int i=0; i<n_out; ++i) {
-      ret_in.at(n_in+i) = MatType::sym(inames[n_in+i], Sparsity(out_.at(i).size()));
+    for (int i=0; i<n_out_; ++i) {
+      ret_in.at(n_in_+i) = MatType::sym(inames[n_in_+i], Sparsity(out_.at(i).size()));
     }
 
     // Assemble function and return

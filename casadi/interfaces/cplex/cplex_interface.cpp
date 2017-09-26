@@ -248,15 +248,13 @@ namespace casadi {
     m->rstat.resize(na_);
 
     // Matrix A, count the number of elements per column
-    const Sparsity& A_sp = sparsity_in(CONIC_A);
-    m->matcnt.resize(A_sp.size2());
-    transform(A_sp.colind()+1, A_sp.colind() + A_sp.size2()+1, A_sp.colind(), m->matcnt.begin(),
+    m->matcnt.resize(A_.size2());
+    transform(A_.colind()+1, A_.colind() + A_.size2()+1, A_.colind(), m->matcnt.begin(),
               minus<int>());
 
     // Matrix H, count the number of elements per column
-    const Sparsity& H_sp = sparsity_in(CONIC_H);
-    m->qmatcnt.resize(H_sp.size2());
-    transform(H_sp.colind()+1, H_sp.colind() + H_sp.size2()+1, H_sp.colind(), m->qmatcnt.begin(),
+    m->qmatcnt.resize(H_.size2());
+    transform(H_.colind()+1, H_.colind() + H_.size2()+1, H_.colind(), m->qmatcnt.begin(),
               minus<int>());
 
     // Create problem object
@@ -337,9 +335,8 @@ namespace casadi {
     }
 
     // Copying objective, constraints, and bounds.
-    const Sparsity& A_sp = sparsity_in(CONIC_A);
-    const int* matbeg = A_sp.colind();
-    const int* matind = A_sp.row();
+    const int* matbeg = A_.colind();
+    const int* matind = A_.row();
     const double* matval = A;
     const double* obj = g;
     const double* lb = lbx;
@@ -350,9 +347,8 @@ namespace casadi {
     }
 
     // Preparing coefficient matrix Q
-    const Sparsity& H_sp = sparsity_in(CONIC_H);
-    const int* qmatbeg = H_sp.colind();
-    const int* qmatind = H_sp.row();
+    const int* qmatbeg = H_.colind();
+    const int* qmatind = H_.row();
     const double* qmatval = H;
     if (CPXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
     }

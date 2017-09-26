@@ -84,9 +84,9 @@ namespace casadi {
     SX X = SX::sym("X", nx_, 1);
 
     // Parameters to the problem
-    SX H = SX::sym("H", sparsity_in(CONIC_H));
-    SX G = SX::sym("G", sparsity_in(CONIC_G));
-    SX A = SX::sym("A", sparsity_in(CONIC_A));
+    SX H = SX::sym("H", H_);
+    SX G = SX::sym("G", nx_);
+    SX A = SX::sym("A", A_);
 
     // Put parameters in a vector
     std::vector<SX> par;
@@ -132,8 +132,8 @@ namespace casadi {
     lam_x_ = res[CONIC_LAM_X];
 
     // Buffers for calling the NLP solver
-    const double** arg1 = arg + n_in();
-    double** res1 = res + n_out();
+    const double** arg1 = arg + n_in_;
+    double** res1 = res + n_out_;
     fill_n(arg1, static_cast<int>(NLPSOL_NUM_IN), nullptr);
     fill_n(res1, static_cast<int>(NLPSOL_NUM_OUT), nullptr);
 

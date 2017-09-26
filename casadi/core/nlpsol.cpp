@@ -318,14 +318,16 @@ namespace casadi {
     ng_ = nnz_out(NLPSOL_G);
 
     // Dimension checks
-    casadi_assert_message(sparsity_out(NLPSOL_G).is_dense() && sparsity_out(NLPSOL_G).is_vector(),
-        "Expected a dense vector 'g', but got " + sparsity_out(NLPSOL_G).dim() + ".");
+    casadi_assert_message(sparsity_out_.at(NLPSOL_G).is_dense()
+                          && sparsity_out_.at(NLPSOL_G).is_vector(),
+        "Expected a dense vector 'g', but got " + sparsity_out_.at(NLPSOL_G).dim() + ".");
 
-    casadi_assert_message(sparsity_out(NLPSOL_F).is_dense(),
-        "Expected a dense 'f', but got " + sparsity_out(NLPSOL_F).dim() + ".");
+    casadi_assert_message(sparsity_out_.at(NLPSOL_F).is_dense(),
+        "Expected a dense 'f', but got " + sparsity_out_.at(NLPSOL_F).dim() + ".");
 
-    casadi_assert_message(sparsity_out(NLPSOL_X).is_dense() && sparsity_out(NLPSOL_X).is_vector(),
-      "Expected a dense vector 'x', but got " + sparsity_out(NLPSOL_X).dim() + ".");
+    casadi_assert_message(sparsity_out_.at(NLPSOL_X).is_dense()
+                          && sparsity_out_.at(NLPSOL_X).is_vector(),
+      "Expected a dense vector 'x', but got " + sparsity_out_.at(NLPSOL_X).dim() + ".");
 
     // Discrete marker
     mi_ = false;
@@ -343,19 +345,19 @@ namespace casadi {
       casadi_assert(!fcallback_.is_null());
       casadi_assert_message(fcallback_.n_out()==1 && fcallback_.numel_out()==1,
         "Callback function must return a scalar.");
-      casadi_assert_message(fcallback_.n_in()==n_out(),
+      casadi_assert_message(fcallback_.n_in()==n_out_,
         "Callback input signature must match the NLP solver output signature");
-      for (int i=0; i<n_out(); ++i) {
+      for (int i=0; i<n_out_; ++i) {
         casadi_assert_message(fcallback_.size_in(i)==size_out(i),
           "Callback function input size mismatch. For argument '" + nlpsol_out(i) + "', "
           "callback has shape " + fcallback_.sparsity_in(i).dim() + " while NLP has " +
-          sparsity_out(i).dim() + ".");
+          sparsity_out_.at(i).dim() + ".");
         // TODO(@jaeandersson): Wrap fcallback_ in a function with correct sparsity
-        casadi_assert_message(fcallback_.sparsity_in(i)==sparsity_out(i),
+        casadi_assert_message(fcallback_.sparsity_in(i)==sparsity_out_.at(i),
           "Callback function input size mismatch. "
           "For argument " + nlpsol_out(i) + "', callback has shape " +
           fcallback_.sparsity_in(i).dim() + " while NLP has " +
-          sparsity_out(i).dim() + ".");
+          sparsity_out_.at(i).dim() + ".");
       }
 
       // Allocate temporary memory

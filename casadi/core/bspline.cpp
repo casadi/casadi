@@ -343,9 +343,9 @@ namespace casadi {
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {
 
-      MX C = MX::sym("C", sparsity_in(0));
+      MX C = MX::sym("C", sparsity_in_.at(0));
       MX dummy = MX(size_out(0));
-      std::vector<MX> seed = MX::sym("seed", sparsity_in(0), nfwd);
+      std::vector<MX> seed = MX::sym("seed", sparsity_in_.at(0), nfwd);
       std::vector<MX> sens;
       Function self = shared_from_this<Function>();
       for (int i=0;i<nfwd;++i) {
@@ -361,9 +361,9 @@ namespace casadi {
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {
 
-      MX C = MX::sym("C", sparsity_in(0));
+      MX C = MX::sym("C", sparsity_in_.at(0));
       MX dummy = MX(size_out(0));
-      std::vector<MX> seed = MX::sym("seed", sparsity_out(0), nadj);
+      std::vector<MX> seed = MX::sym("seed", sparsity_out_.at(0), nadj);
       std::vector<MX> sens;
       Function rev = Function::create(new BSplineDual(name, knots_, offset_, x_,
                                                       degree_, m_, !reverse_), opts);

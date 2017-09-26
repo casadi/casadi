@@ -70,7 +70,7 @@ namespace casadi {
     }
 
     // Arrays for holding inputs and outputs
-    alloc_w(n_in() + n_out());
+    alloc_w(n_in_ + n_out_);
   }
 
   Jit::~Jit() {

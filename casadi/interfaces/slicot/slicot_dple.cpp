@@ -212,7 +212,7 @@ namespace casadi {
     setup(mem, arg, res, iw, w);
 
     // Transpose operation (after #554)
-    casadi_trans(arg[DPLE_A], sparsity_in(DPLE_A), m->X, sparsity_in(DPLE_A), m->iwruntime);
+    casadi_trans(arg[DPLE_A], A_, m->X, A_, m->iwruntime);
 
     slicot_periodic_schur(n_, K_, m->X, m->T, m->Z,
       m->dwork, m->eig_real, m->eig_imag, psd_num_zero_);

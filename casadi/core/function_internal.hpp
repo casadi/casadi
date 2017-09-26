@@ -124,13 +124,6 @@ namespace casadi {
                                            const std::vector<std::string>& s_out,
                                            int order, bool tr=false) const;
 
-
-    ///@{
-    /** \brief Names of function input and outputs */
-    virtual std::string get_name_in(int i);
-    virtual std::string get_name_out(int i);
-    ///@}
-
     ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool has_spfwd() const { return false;}
@@ -412,37 +405,29 @@ namespace casadi {
                       bool allow_forward, bool allow_reverse) const;
 
     ///@{
-    /** \brief Number of function inputs and outputs */
-    inline int n_in() const { return n_in_;}
-    virtual size_t get_n_in();
-    inline int n_out() const { return n_out_;}
-    virtual size_t get_n_out();
-    ///@}
-
-    ///@{
     /** \brief Number of input/output nonzeros */
     int nnz_in() const;
-    int nnz_in(int ind) const { return sparsity_in(ind).nnz(); }
+    int nnz_in(int ind) const { return sparsity_in_.at(ind).nnz(); }
     int nnz_out() const;
-    int nnz_out(int ind) const { return sparsity_out(ind).nnz(); }
+    int nnz_out(int ind) const { return sparsity_out_.at(ind).nnz(); }
     ///@}
 
     ///@{
     /** \brief Number of input/output elements */
     int numel_in() const;
-    int numel_in(int ind) const { return sparsity_in(ind).numel(); }
-    int numel_out(int ind) const { return sparsity_out(ind).numel(); }
+    int numel_in(int ind) const { return sparsity_in_.at(ind).numel(); }
+    int numel_out(int ind) const { return sparsity_out_.at(ind).numel(); }
     int numel_out() const;
     ///@}
 
     ///@{
     /** \brief Input/output dimensions */
-    int size1_in(int ind) const { return sparsity_in(ind).size1(); }
-    int size2_in(int ind) const { return sparsity_in(ind).size2(); }
-    int size1_out(int ind) const { return sparsity_out(ind).size1(); }
-    int size2_out(int ind) const { return sparsity_out(ind).size2(); }
-    std::pair<int, int> size_in(int ind) const { return sparsity_in(ind).size(); }
-    std::pair<int, int> size_out(int ind) const { return sparsity_out(ind).size(); }
+    int size1_in(int ind) const { return sparsity_in_.at(ind).size1(); }
+    int size2_in(int ind) const { return sparsity_in_.at(ind).size2(); }
+    int size1_out(int ind) const { return sparsity_out_.at(ind).size1(); }
+    int size2_out(int ind) const { return sparsity_out_.at(ind).size2(); }
+    std::pair<int, int> size_in(int ind) const { return sparsity_in_.at(ind).size(); }
+    std::pair<int, int> size_out(int ind) const { return sparsity_out_.at(ind).size(); }
     ///@}
 
     ///@{
@@ -473,25 +458,18 @@ namespace casadi {
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolic_output(const std::vector<MX>& arg) const;
 
-    /** \brief Get input scheme index by name */
-    virtual int index_in(const std::string &name) const {
-      for (int i=0; i<name_in_.size(); ++i) {
-        if (name_in_[i]==name) return i;
-      }
-      casadi_error("FunctionInternal::index_in: could not find entry \""
-                   + name + "\". Available names are: " + str(name_in_) + ".");
-      return -1;
-    }
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    virtual size_t get_n_in();
+    virtual size_t get_n_out();
+    ///@}
 
-    /** \brief Get output scheme index by name */
-    virtual int index_out(const std::string &name) const {
-      for (int i=0; i<name_out_.size(); ++i) {
-        if (name_out_[i]==name) return i;
-      }
-      casadi_error("FunctionInternal::index_out: could not find entry \""
-                   + name + "\". Available names are: " + str(name_out_) + ".");
-      return -1;
-    }
+
+    ///@{
+    /** \brief Names of function input and outputs */
+    virtual std::string get_name_in(int i);
+    virtual std::string get_name_out(int i);
+    ///@}
 
     /** \brief Get default input value */
     virtual double default_in(int ind) const {
@@ -509,26 +487,30 @@ namespace casadi {
     }
 
     /** \brief Get sparsity of a given input */
-    /// @{
-    inline const Sparsity& sparsity_in(int ind) const {
-      return sparsity_in_.at(ind);
-    }
-    inline const Sparsity& sparsity_in(const std::string& iname) const {
-      return sparsity_in(index_in(iname));
-    }
     virtual Sparsity get_sparsity_in(int i);
-    /// @}
 
     /** \brief Get sparsity of a given output */
-    /// @{
-    inline const Sparsity& sparsity_out(int ind) const {
-      return sparsity_out_.at(ind);
-    }
-    inline const Sparsity& sparsity_out(const std::string& iname) const {
-      return sparsity_out(index_out(iname));
-    }
     virtual Sparsity get_sparsity_out(int i);
-    /// @}
+
+    /** \brief Get input scheme index by name */
+    int index_in(const std::string &name) const {
+      for (int i=0; i<name_in_.size(); ++i) {
+        if (name_in_[i]==name) return i;
+      }
+      casadi_error("FunctionInternal::index_in: could not find entry \""
+                   + name + "\". Available names are: " + str(name_in_) + ".");
+      return -1;
+    }
+
+    /** \brief Get output scheme index by name */
+    int index_out(const std::string &name) const {
+      for (int i=0; i<name_out_.size(); ++i) {
+        if (name_out_[i]==name) return i;
+      }
+      casadi_error("FunctionInternal::index_out: could not find entry \""
+                   + name + "\". Available names are: " + str(name_out_) + ".");
+      return -1;
+    }
 
     /** \brief  Propagate sparsity forward */
     virtual int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const;
@@ -739,12 +721,11 @@ namespace casadi {
   FunctionInternal::
   fwd_seed(int nfwd) const {
     std::vector<std::vector<MatType>> fseed(nfwd);
-    int n_in = this->n_in();
     for (int dir=0; dir<nfwd; ++dir) {
-      fseed[dir].resize(n_in);
-      for (int iind=0; iind<n_in; ++iind) {
+      fseed[dir].resize(n_in_);
+      for (int iind=0; iind<n_in_; ++iind) {
         std::string n = "f" + str(dir) + "_" +  name_in_[iind];
-        fseed[dir][iind] = MatType::sym(n, sparsity_in(iind));
+        fseed[dir][iind] = MatType::sym(n, sparsity_in_.at(iind));
       }
     }
     return fseed;
@@ -800,7 +781,7 @@ namespace casadi {
       // ... then, call multiple times
       if (matrix_call) {
         // Start with zeros
-        res.resize(n_out());
+        res.resize(n_out_);
         M z = M::zeros(sz);
         for (auto&& a : res) a = z;
         // Call multiple times
@@ -836,31 +817,26 @@ namespace casadi {
   void FunctionInternal::call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
                                bool always_inline, bool never_inline) const {
     casadi_assert_message(!never_inline, "Call-nodes only possible in MX expressions");
-
-    // Get the number of inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
     // Check if matching input sparsity
     bool matching_sparsity = true;
-    casadi_assert(arg.size()==n_in);
-    for (int i=0; matching_sparsity && i<n_in; ++i)
-      matching_sparsity = arg[i].sparsity()==sparsity_in(i);
+    casadi_assert(arg.size()==n_in_);
+    for (int i=0; matching_sparsity && i<n_in_; ++i)
+      matching_sparsity = arg[i].sparsity()==sparsity_in_.at(i);
 
     // Correct input sparsity if needed
     if (!matching_sparsity) {
       std::vector<Matrix<D> > arg2(arg);
-      for (int i=0; i<n_in; ++i)
-        if (arg2[i].sparsity()!=sparsity_in(i))
-          arg2[i] = project(arg2[i], sparsity_in(i));
+      for (int i=0; i<n_in_; ++i)
+        if (arg2[i].sparsity()!=sparsity_in_.at(i))
+          arg2[i] = project(arg2[i], sparsity_in_.at(i));
       return call_gen(arg2, res, always_inline, never_inline);
     }
 
     // Allocate results
-    res.resize(n_out);
-    for (int i=0; i<n_out; ++i) {
-      if (res[i].sparsity()!=sparsity_out(i)) {
-        res[i] = Matrix<D>::zeros(sparsity_out(i));
+    res.resize(n_out_);
+    for (int i=0; i<n_out_; ++i) {
+      if (res[i].sparsity()!=sparsity_out_.at(i)) {
+        res[i] = Matrix<D>::zeros(sparsity_out_.at(i));
       }
     }
 
@@ -870,11 +846,11 @@ namespace casadi {
 
     // Get pointers to input arguments
     std::vector<const D*> argp(sz_arg());
-    for (int i=0; i<n_in; ++i) argp[i]=get_ptr(arg[i]);
+    for (int i=0; i<n_in_; ++i) argp[i]=get_ptr(arg[i]);
 
     // Get pointers to output arguments
     std::vector<D*> resp(sz_res());
-    for (int i=0; i<n_out; ++i) resp[i]=get_ptr(res[i]);
+    for (int i=0; i<n_out_; ++i) resp[i]=get_ptr(res[i]);
 
     // Call memory-less
     (void)eval_gen(get_ptr(argp), get_ptr(resp),
@@ -883,11 +859,10 @@ namespace casadi {
 
   template<typename M>
   void FunctionInternal::check_arg(const std::vector<M>& arg) const {
-    int n_in = this->n_in();
-    casadi_assert_message(arg.size()==n_in, "Incorrect number of inputs: Expected "
-                          + str(n_in) + ", got " + str(arg.size()));
-    for (int i=0; i<n_in; ++i) {
-      casadi_assert_message(check_mat(arg[i].sparsity(), sparsity_in(i)),
+    casadi_assert_message(arg.size()==n_in_, "Incorrect number of inputs: Expected "
+                          + str(n_in_) + ", got " + str(arg.size()));
+    for (int i=0; i<n_in_; ++i) {
+      casadi_assert_message(check_mat(arg[i].sparsity(), sparsity_in_.at(i)),
                             "Input " + str(i) + " (" + name_in_[i] + ") has mismatching shape. "
                             "Expected " + str(size_in(i)) + ", got " + str(arg[i].size()));
     }
@@ -895,11 +870,10 @@ namespace casadi {
 
   template<typename M>
   void FunctionInternal::check_res(const std::vector<M>& res) const {
-    int n_out = this->n_out();
-    casadi_assert_message(res.size()==n_out, "Incorrect number of outputs: Expected "
-                          + str(n_out) + ", got " + str(res.size()));
-    for (int i=0; i<n_out; ++i) {
-      casadi_assert_message(check_mat(res[i].sparsity(), sparsity_out(i)),
+    casadi_assert_message(res.size()==n_out_, "Incorrect number of outputs: Expected "
+                          + str(n_out_) + ", got " + str(res.size()));
+    for (int i=0; i<n_out_; ++i) {
+      casadi_assert_message(check_mat(res[i].sparsity(), sparsity_out_.at(i)),
                             "Output " + str(i) + " (" + name_out_[i] + ") has mismatching shape. "
                             "Expected " + str(size_out(i)) + ", got " + str(res[i].size()));
     }
@@ -908,8 +882,7 @@ namespace casadi {
   template<typename M>
   bool FunctionInternal::matching_arg(const std::vector<M>& arg) const {
     check_arg(arg);
-    int n_in = this->n_in();
-    for (int i=0; i<n_in; ++i) {
+    for (int i=0; i<n_in_; ++i) {
       if (arg.at(i).size()!=size_in(i)) return false;
     }
     return true;
@@ -918,8 +891,7 @@ namespace casadi {
   template<typename M>
   bool FunctionInternal::matching_res(const std::vector<M>& res) const {
     check_res(res);
-    int n_out = this->n_out();
-    for (int i=0; i<n_out; ++i) {
+    for (int i=0; i<n_out_; ++i) {
       if (res.at(i).size()!=size_out(i)) return false;
     }
     return true;
@@ -947,14 +919,14 @@ namespace casadi {
   template<typename M>
   std::vector<M> FunctionInternal::replace_arg(const std::vector<M>& arg) const {
     std::vector<M> r(arg.size());
-    for (int i=0; i<r.size(); ++i) r[i] = replace_mat(arg[i], sparsity_in(i));
+    for (int i=0; i<r.size(); ++i) r[i] = replace_mat(arg[i], sparsity_in_.at(i));
     return r;
   }
 
   template<typename M>
   std::vector<M> FunctionInternal::replace_res(const std::vector<M>& res) const {
     std::vector<M> r(res.size());
-    for (int i=0; i<r.size(); ++i) r[i] = replace_mat(res[i], sparsity_out(i));
+    for (int i=0; i<r.size(); ++i) r[i] = replace_mat(res[i], sparsity_out_.at(i));
     return r;
   }
 
