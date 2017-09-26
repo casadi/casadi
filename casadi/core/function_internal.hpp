@@ -353,7 +353,10 @@ namespace casadi {
     void codegen(CodeGenerator& g, const std::string& fname) const;
 
     /** \brief Generate meta-information allowing a user to evaluate a generated function */
-    void codegen_meta(CodeGenerator& g, const std::string& fname) const;
+    void codegen_meta(CodeGenerator& g) const;
+
+    /** \brief Codegen sparsities */
+    void codegen_sparsities(CodeGenerator& g) const;
 
     /** \brief Get name in codegen */
     virtual std::string codegen_name(const CodeGenerator& g) const;

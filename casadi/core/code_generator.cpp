@@ -87,6 +87,11 @@ namespace casadi {
       this->suffix = name.substr(dotpos);
     }
 
+    // Symbol prefix
+    if (this->with_export) {
+      dll_export = "CASADI_SYMBOL_EXPORT ";
+    }
+
     // Make sure that the base name is sane
     casadi_assert(Function::check_name(this->name));
 
@@ -119,7 +124,7 @@ namespace casadi {
     string fname = shorthand("f" + str(added_functions_.size()));
 
     // Add to list of functions
-    added_functions_.push_back({f, fname, false, false});
+    added_functions_.push_back({f, fname});
 
     // Generate declarations
     f->codegen_declarations(*this);
@@ -146,37 +151,29 @@ namespace casadi {
     return fname;
   }
 
-  void CodeGenerator::add(const Function& f) {
+  void CodeGenerator::add(const Function& f, bool with_jac_sparsity) {
     // Add if not already added
     std::string codegen_name = add_dependency(f);
 
-    // Mark exposed
-    for (auto&& e : added_functions_) {
-      if (e.f==f) {
-        e.exposed = true;
-        break;
-      }
-    }
-
-    // Add header
-    if (this->with_header) {
-      if (this->cpp) this->header << "extern \"C\" " ; // C linkage
-      this->header << f->signature(f.name()) << ";\n";
-    }
-
-    // C linkage
-    if (this->cpp) *this << "extern \"C\" ";
-
-    // Expose to DLL
-    if (this->with_export) *this << "CASADI_SYMBOL_EXPORT ";
-
     // Define function
-    *this << f->signature(f.name()) << "{\n"
+    *this << declare(f->signature(f.name())) << "{\n"
           << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
           << "}\n\n";
 
     // Generate meta information
-    f->codegen_meta(*this, f.name());
+    f->codegen_meta(*this);
+
+    // Generate Jacobian sparsity information
+    if (with_jac_sparsity) {
+      // Generate/get Jacobian sparsity
+      // NOTE: Inefficient
+      Function jac = f.jacobian();
+      // Code generate the sparsity pattern
+      jac->codegen_sparsities(*this);
+
+      // Flush buffers
+      flush(this->body);
+    }
 
     // Add to list of exposed symbols
     this->exposed_fname.push_back(f.name());
@@ -891,17 +888,16 @@ namespace casadi {
   }
 
   std::string CodeGenerator::declare(std::string s) {
-    // Add C linkage?
-    if (this->cpp) {
-      s = "extern \"C\" " + s;
-    }
+    // Add c linkage
+    string cpp_prefix = this->cpp ? "extern \"C\" " : "";
 
     // To header file
     if (this->with_header) {
-      this->header << s << ";\n";
+      this->header << cpp_prefix << s << ";\n";
     }
 
-    return s;
+    // Return name with declarations
+    return cpp_prefix + this->dll_export + s;
   }
 
   std::string

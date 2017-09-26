@@ -43,7 +43,7 @@ namespace casadi {
     CodeGenerator(const std::string& name, const Dict& opts = Dict());
 
     /// Add a function (name generated)
-    void add(const Function& f);
+    void add(const Function& f, bool with_jac_sparsity=false);
 
 #ifndef SWIG
     /// Generate the code to a stream
@@ -337,6 +337,9 @@ namespace casadi {
     // Have a flag for exporting symbols
     bool with_export;
 
+    // Prefix symbols in DLLs?
+    std::string dll_export;
+
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
@@ -354,6 +357,9 @@ namespace casadi {
     // Names of exposed functions
     std::vector<std::string> exposed_fname;
 
+    // Code generated sparsities
+    std::set<std::string> sparsity_meta;
+
     // Set of already included header files
     std::set<std::string> added_includes_;
     std::set<std::string> added_externals_;
@@ -370,10 +376,6 @@ namespace casadi {
       Function f;
       // Name in codegen
       std::string codegen_name;
-      // Entry points available?
-      bool exposed;
-      // Generate Jacobian sparsity pattern
-      bool jac_sparsity;
     };
     std::vector<FunctionMeta> added_functions_;
 
