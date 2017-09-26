@@ -555,10 +555,10 @@ namespace casadi {
       } else if (is_column()) {
         return "[" + str(size1()) + "]";
       } else {
-        return dim(false);
+        return "[" + dim(false) + "]";
       }
     } else {
-      return dim(true);
+      return "[" + dim(true) + "]";
     }
   }
 
