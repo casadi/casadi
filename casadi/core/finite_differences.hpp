@@ -100,11 +100,14 @@ namespace casadi {
     virtual double pert(int k) const = 0;
 
     // Calculate finite difference approximation
-    virtual void calc_fd(double** yk, double* y0, double* J) const = 0;
+    virtual void calc_fd(double** yk, double* y0, double* J, double* err) const = 0;
 
     // Codegen finite difference approximation
     virtual void calc_fd(CodeGenerator& g, const std::string& yk,
                          const std::string& y0, const std::string& J) const = 0;
+
+    // A central difference approximation, including error estimate
+    double central_diff(double yp, double y0, double ym, double* err) const;
 
     // Number of directional derivatives
     int n_;
@@ -162,7 +165,7 @@ namespace casadi {
     }
 
     // Calculate finite difference approximation
-    void calc_fd(double** yk, double* y0, double* J) const override;
+    void calc_fd(double** yk, double* y0, double* J, double* err) const override;
 
     // Codegen finite difference approximation
     void calc_fd(CodeGenerator& g, const std::string& yk,
@@ -207,7 +210,7 @@ namespace casadi {
     }
 
     // Calculate finite difference approximation
-    void calc_fd(double** yk, double* y0, double* J) const override;
+    void calc_fd(double** yk, double* y0, double* J, double* err) const override;
 
     // Codegen finite difference approximation
     void calc_fd(CodeGenerator& g, const std::string& yk,
@@ -248,7 +251,7 @@ namespace casadi {
     double pert(int k) const override;
 
     // Calculate finite difference approximation
-    void calc_fd(double** yk, double* y0, double* J) const override;
+    void calc_fd(double** yk, double* y0, double* J, double* err) const override;
 
     // Codegen finite difference approximation
     void calc_fd(CodeGenerator& g, const std::string& yk,
