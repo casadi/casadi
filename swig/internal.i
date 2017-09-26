@@ -1024,6 +1024,33 @@
 %exception  casadi::IpoptUserClass::get_var_con_metadata(Index n, StringMetaDataMapType &var_string_md, IntegerMetaDataMapType &var_integer_md, NumericMetaDataMapType &var_numeric_md, Index m, StringMetaDataMapType &con_string_md, IntegerMetaDataMapType &con_integer_md, NumericMetaDataMapType &con_numeric_md) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::JitFunction::class_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::JitFunction::codegen_body(CodeGenerator &g) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::JitFunction::get_jacobian(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::JitFunction::get_n_in() override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::JitFunction::get_n_out() override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::JitFunction::get_options() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::JitFunction::has_codegen() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::JitFunction::has_jacobian() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::JitFunction::init(const Dict &opts) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::LapackLu::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1706,6 +1733,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Interpolant::Interpolant(const std::string &name, const std::vector< double > &grid, const std::vector< int > &offset, const std::vector< double > &values) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::JitFunction::JitFunction(const std::string &name, const std::vector< std::string > &name_in, const std::vector< std::string > &name_out, const std::vector< Sparsity > &sparsity_in, const std::vector< Sparsity > &sparsity_out, const std::string &body) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::LapackLu::LapackLu(const std::string &name) {
