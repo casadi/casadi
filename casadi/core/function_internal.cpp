@@ -286,41 +286,55 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::init");
 
     // Get the number of inputs and outputs
-    isp_.resize(get_n_in());
-    osp_.resize(get_n_out());
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
-    // Get the input and output sparsities
-    for (int i=0; i<n_in; ++i) isp_[i] = get_sparsity_in(i);
-    for (int i=0; i<n_out; ++i) osp_[i] = get_sparsity_out(i);
-
-    // Allocate memory for function inputs and outputs
-    sz_arg_per_ += n_in;
-    sz_res_per_ += n_out;
+    n_in_ = get_n_in();
+    n_out_ = get_n_out();
 
     // Warn for functions with too many inputs or outputs
-    casadi_assert_warning(n_in<10000, "Function " << name_
+    casadi_assert_warning(n_in_<10000, "Function " << name_
                           << " has a large number of inputs (" << n_in << "). "
                           "Changing the problem formulation is strongly encouraged.");
-    casadi_assert_warning(n_out<10000, "Function " << name_
+    casadi_assert_warning(n_out_<10000, "Function " << name_
                           << " has a large number of outputs (" << n_out << "). "
                           "Changing the problem formulation is strongly encouraged.");
 
-    // Resize the matrix that holds the sparsity of the Jacobian blocks
-    jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out, n_in));
+    // Query input sparsities if not already provided
+    if (sparsity_in_.empty()) {
+      sparsity_in_.resize(n_in_);
+      for (int i=0; i<n_in_; ++i) sparsity_in_[i] = get_sparsity_in(i);
+    } else {
+      casadi_assert(sparsity_in_.size()==n_in_);
+    }
+
+    // Query output sparsities if not already provided
+    if (sparsity_out_.empty()) {
+      sparsity_out_.resize(n_out_);
+      for (int i=0; i<n_out_; ++i) sparsity_out_[i] = get_sparsity_out(i);
+    } else {
+      casadi_assert(sparsity_out_.size()==n_out_);
+    }
 
     // Query input names if not already provided
     if (name_in_.empty()) {
-      name_in_.resize(n_in);
-      for (int i=0; i<n_in; ++i) name_in_[i] = get_name_in(i);
+      name_in_.resize(n_in_);
+      for (int i=0; i<n_in_; ++i) name_in_[i] = get_name_in(i);
+    } else {
+      casadi_assert(name_in_.size()==n_in_);
     }
 
     // Query output names if not already provided
     if (name_out_.empty()) {
-      name_out_.resize(n_out);
-      for (int i=0; i<n_out; ++i) name_out_[i] = get_name_out(i);
+      name_out_.resize(n_out_);
+      for (int i=0; i<n_out_; ++i) name_out_[i] = get_name_out(i);
+    } else {
+      casadi_assert(name_out_.size()==n_out_);
     }
+
+    // Allocate memory for function inputs and outputs
+    sz_arg_per_ += n_in_;
+    sz_res_per_ += n_out_;
+
+    // Resize the matrix that holds the sparsity of the Jacobian blocks
+    jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
 
     // Type of derivative calculations enabled
     enable_forward_ = enable_forward_ && has_forward(1);

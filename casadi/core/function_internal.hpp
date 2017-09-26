@@ -413,9 +413,9 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    inline int n_in() const { return isp_.size();}
+    inline int n_in() const { return n_in_;}
     virtual size_t get_n_in();
-    inline int n_out() const { return osp_.size();}
+    inline int n_out() const { return n_out_;}
     virtual size_t get_n_out();
     ///@}
 
@@ -511,7 +511,7 @@ namespace casadi {
     /** \brief Get sparsity of a given input */
     /// @{
     inline const Sparsity& sparsity_in(int ind) const {
-      return isp_.at(ind);
+      return sparsity_in_.at(ind);
     }
     inline const Sparsity& sparsity_in(const std::string& iname) const {
       return sparsity_in(index_in(iname));
@@ -522,7 +522,7 @@ namespace casadi {
     /** \brief Get sparsity of a given output */
     /// @{
     inline const Sparsity& sparsity_out(int ind) const {
-      return osp_.at(ind);
+      return sparsity_out_.at(ind);
     }
     inline const Sparsity& sparsity_out(const std::string& iname) const {
       return sparsity_out(index_out(iname));
@@ -607,8 +607,11 @@ namespace casadi {
     /// Release a memory object
     void release(int mem) const;
 
+    /// Number of inputs and outputs
+    size_t n_in_, n_out_;
+
     /// Input and output sparsity
-    std::vector<Sparsity> isp_, osp_;
+    std::vector<Sparsity> sparsity_in_, sparsity_out_;
 
     /// Input and output scheme
     std::vector<std::string> name_in_, name_out_;
