@@ -141,7 +141,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -197,6 +197,13 @@ std::vector< std::vector< M > > &fseed) const  "
 %feature("docstring")  casadi::FunctionInternal::size_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -1234,12 +1241,6 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size2_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -1370,7 +1371,7 @@ std::string &name, std::ostream &stream) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -1733,13 +1734,6 @@ const  "
 
 [INTERNAL]  Overloaded function for convenience, uses current variables of
 SQPiterate vars.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -2621,7 +2615,7 @@ std::vector< std::vector< M > > &fseed) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -2741,7 +2735,7 @@ double **arg, double **res, int *iw, double *w) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -3143,12 +3137,6 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
@@ -3502,13 +3490,6 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
 const  "
 
@@ -3533,6 +3514,13 @@ const  "
 std::vector< M > &arg) const  "
 
 [INTERNAL]  Check if input arguments have correct length and dimensions.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -3646,12 +3634,6 @@ double **arg, double **res, int *iw, double *w) const  "
 std::vector< MX > &arg) const  "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -4081,6 +4063,13 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -4388,10 +4377,10 @@ multiplying.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
+"
 
-[INTERNAL]  Add a dependent function.
+[INTERNAL]  Get all statistics.
 
 ";
 
@@ -4550,7 +4539,7 @@ get_reverse(int nadj) if no cached version is available.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -4576,7 +4565,7 @@ generated function.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -4789,13 +4778,6 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 [INTERNAL]  Finalize the object creation This function, which visits the
 class hierarchy in reverse order is run after init() has been completed.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
-
-[INTERNAL]  Get all statistics.
 
 ";
 
@@ -5333,12 +5315,6 @@ Destructor.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
 const  "
 
@@ -5364,13 +5340,6 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -6116,7 +6085,7 @@ std::string &fname) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -6223,6 +6192,13 @@ Propagate sparsity forward.
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sparsity_in(int ind) const
 "
 
@@ -6308,7 +6284,7 @@ tr:  Flip the relationship. Return which expressions contain the variables
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -6373,9 +6349,16 @@ double **arg, double **res, int *iw, double *w) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -6957,13 +6940,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::factory(const std::string
 &name, const std::vector< std::string > &s_in, const std::vector<
 std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
@@ -7346,7 +7322,7 @@ std::string &fname) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -7400,12 +7376,6 @@ classes.
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -9100,12 +9070,6 @@ std::string &fname) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::matching_res(const
 std::vector< M > &arg) const  "
 
@@ -9294,6 +9258,12 @@ override "
 %feature("docstring")  casadi::CentralDiff::pert(int k) const override "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+
+[INTERNAL]  Get required length of arg field.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
 const  "
@@ -9636,10 +9606,10 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
-[INTERNAL]  Add a dependent function.
+[INTERNAL]  Propagate sparsity forward.
 
 ";
 
@@ -9682,7 +9652,7 @@ std::string &iname) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -9811,9 +9781,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
-[INTERNAL]  Get required length of arg field.
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -9867,7 +9838,7 @@ CodeGenerator &g) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -10262,13 +10233,6 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
-**arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
 
 [INTERNAL]  Get smallest input value.
@@ -10499,7 +10463,8 @@ Generate a file, return code as string.
 
 ";
 
-%feature("docstring")  casadi::CodeGenerator::add(const Function &f) "
+%feature("docstring")  casadi::CodeGenerator::add(const Function &f, bool
+with_jac_sparsity=false) "
 
 Add a function (name generated)
 
@@ -10743,13 +10708,6 @@ original
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::OracleFunction::oracle() const override "
 
 [INTERNAL]  Get oracle.
@@ -10924,6 +10882,13 @@ classes.
 &type, bool recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -11257,12 +11222,6 @@ override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::Integrator::t() const  "
 
 [INTERNAL] ";
@@ -11436,7 +11395,7 @@ std::vector< std::string > &s_out, const Function::AuxOut
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -11864,7 +11823,7 @@ std::string &iname) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -12092,7 +12051,7 @@ bool persistent=false) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -12626,12 +12585,6 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
 
@@ -12665,13 +12618,6 @@ double *ubx, const double *lba, const double *uba) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::mx_in(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -12681,6 +12627,13 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::mx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -12841,7 +12794,7 @@ bool persistent=false) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -14898,13 +14851,6 @@ elements.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_codegen() const  "
 
 [INTERNAL]  Is codegen supported?
@@ -15023,7 +14969,7 @@ original
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -15081,13 +15027,6 @@ propagation.
 std::string &iname) const  "
 
 [INTERNAL]  Get sparsity of a given output.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
-persistent=false) "
-
-[INTERNAL]  Ensure required length of w field.
 
 ";
 
@@ -15316,7 +15255,7 @@ std::vector< M > &arg) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -15378,9 +15317,10 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
 
-[INTERNAL]  Get name of the evaluation function.
+[INTERNAL]  Ensure required length of w field.
 
 ";
 
@@ -15410,6 +15350,13 @@ const std::vector< MatType > &v) const  "
 bool more) const override "
 
 [INTERNAL]  Print.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -15773,6 +15720,13 @@ Sparsity &A) "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::Expm::get_n_in() override "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -15955,13 +15909,6 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -16115,7 +16062,7 @@ allow_forward, bool allow_reverse) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -16263,7 +16210,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -16783,9 +16730,10 @@ symmetric) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
+%feature("docstring")  casadi::FunctionInternal::print_option(const
+std::string &name, std::ostream &stream) const  "
 
-[INTERNAL]  Get name of the evaluation function.
+[INTERNAL]  Print all information there is to know about a certain option.
 
 ";
 
@@ -16818,13 +16766,6 @@ std::string > &onames, const Dict &opts) const override "
 %feature("docstring")  casadi::Expm::has_forward(int nfwd) const override "
 
 [INTERNAL]  Generate a function that calculates nfwd forward derivatives.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::print_option(const
-std::string &name, std::ostream &stream) const  "
-
-[INTERNAL]  Print all information there is to know about a certain option.
 
 ";
 
@@ -17153,10 +17094,15 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::External::codegen(CodeGenerator &g, const
-std::string &fname, bool decl_static) const override "
+%feature("docstring")  casadi::FunctionInternal::sx_in(int ind) const  "
 
-[INTERNAL]  Generate code the function.
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sx_in() const  "
+
+[INTERNAL]  Get function input(s) and output(s)
 
 ";
 
@@ -17218,8 +17164,8 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::External::codegen_name(const CodeGenerator
-&g) const override "
+%feature("docstring")  casadi::FunctionInternal::codegen_name(const
+CodeGenerator &g) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -17309,6 +17255,13 @@ const std::vector< std::string > &s_in, const std::vector< std::string >
 %feature("docstring") casadi::External "
 
 [INTERNAL] C++ includes: external_impl.hpp ";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
@@ -17418,8 +17371,8 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
+%feature("docstring")  casadi::External::codegen_declarations(CodeGenerator
+&g) const override "
 
 [INTERNAL]  Generate code for the declarations of the C function.
 
@@ -17459,12 +17412,6 @@ std::string &fname) const  "
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Propagate sparsity forward.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -17524,13 +17471,6 @@ get_forward(int nfwd) if no cached version is available.
 %feature("docstring")  casadi::External::get_n_out() override "
 
 [INTERNAL]  Number of function inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::External::add_dependency(CodeGenerator &g)
-const override "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -17794,10 +17734,10 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
-&g) const  "
+%feature("docstring")  casadi::External::codegen_body(CodeGenerator &g)
+const override "
 
-[INTERNAL]  Generate code for the function body.
+[INTERNAL]  Generate code for the body of the C function.
 
 ";
 
@@ -17980,7 +17920,7 @@ structure recognition for symmetric Jacobians
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -18006,15 +17946,10 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sx_in(int ind) const  "
+%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
+const std::string &fname) const  "
 
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sx_in() const  "
-
-[INTERNAL]  Get function input(s) and output(s)
+[INTERNAL]  Generate code the function.
 
 ";
 
@@ -18748,13 +18683,6 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size2_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -19125,12 +19053,6 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
 persistent=false) "
 
@@ -19221,7 +19143,7 @@ classes.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -19308,7 +19230,7 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -19319,6 +19241,13 @@ generated function.
 std::vector< MX > &arg, const std::string &parallelization) "
 
 [INTERNAL]  Parallel evaluation.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -19575,7 +19504,7 @@ std::string &fname) override "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -19852,13 +19781,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sx_out(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -20049,12 +19971,6 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 *mem, double t, double *rx, double *rz, double *rq) const override "
 
 [INTERNAL]  Retreat solution in time.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -20356,6 +20272,13 @@ C++ includes: integrator_impl.hpp ";
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::FixedStepIntegrator::free_mem(void *mem)
 const override "
 
@@ -20596,7 +20519,7 @@ std::vector< MX > &arg) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -20999,7 +20922,7 @@ std::string &iname) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -21290,13 +21213,6 @@ structure recognition for symmetric Jacobians
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -21657,12 +21573,6 @@ const std::vector< MatType > &v) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -22152,6 +22062,13 @@ std::string &name, std::ostream &stream) const  "
 ";
 
 %feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
+%feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchical(int iind, int oind)
 const  "
 
@@ -22232,7 +22149,7 @@ double **arg, double **res, int *iw, double *w) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -23865,8 +23782,8 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
+%feature("docstring")  casadi::External::codegen_declarations(CodeGenerator
+&g) const override "
 
 [INTERNAL]  Generate code for the declarations of the C function.
 
@@ -24258,7 +24175,7 @@ std::string &name, std::ostream &stream) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -24286,13 +24203,6 @@ generated function.
 %feature("docstring")  casadi::FunctionInternal::sx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::External::add_dependency(CodeGenerator &g)
-const override "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -24569,10 +24479,10 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
-&g) const  "
+%feature("docstring")  casadi::External::codegen_body(CodeGenerator &g)
+const override "
 
-[INTERNAL]  Generate code for the function body.
+[INTERNAL]  Generate code for the body of the C function.
 
 ";
 
@@ -24628,8 +24538,8 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::External::codegen_name(const CodeGenerator
-&g) const override "
+%feature("docstring")  casadi::FunctionInternal::codegen_name(const
+CodeGenerator &g) const  "
 
 [INTERNAL]  Get name in codegen.
 
@@ -24674,6 +24584,13 @@ override "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -24690,12 +24607,6 @@ persistent=false) "
 %feature("docstring")  casadi::External::get_n_out() override "
 
 [INTERNAL]  Number of function inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -24718,8 +24629,8 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::External::codegen(CodeGenerator &g, const
-std::string &fname, bool decl_static) const override "
+%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -25954,12 +25865,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::n_out() const  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -25986,7 +25891,7 @@ multiplying.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -26117,13 +26022,6 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const override "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(int nfwd) if no cached version is available.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -26318,7 +26216,7 @@ Diagrams
 C++ includes: integrator_impl.hpp ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -26573,6 +26471,13 @@ const override "
 "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -27354,12 +27259,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
@@ -27427,13 +27326,6 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -27696,6 +27588,13 @@ override "
 std::string &fname) override "
 
 [INTERNAL]  JIT for dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::print_option(const
+std::string &name, std::ostream &stream) const  "
+
+[INTERNAL]  Print all information there is to know about a certain option.
 
 ";
 
@@ -28187,7 +28086,7 @@ elements.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -28267,10 +28166,10 @@ never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_option(const
-std::string &name, std::ostream &stream) const  "
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
-[INTERNAL]  Print all information there is to know about a certain option.
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -28318,7 +28217,7 @@ allow_forward, bool allow_reverse) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -28758,12 +28657,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -28901,7 +28794,7 @@ multiplying.
 [INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -28965,6 +28858,13 @@ oind, bool compact, bool symmetric) const  "
 std::vector< MX > &arg, const std::string &parallelization) "
 
 [INTERNAL]  Parallel evaluation.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -29064,10 +28964,9 @@ std::vector< std::vector< M > > &aseed) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
-[INTERNAL]  Add a dependent function.
+[INTERNAL]  Print free variables.
 
 ";
 
@@ -29455,7 +29354,7 @@ problem)
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -29911,12 +29810,6 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_free() const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
 %feature("docstring")  casadi::Integrator::get_forward(int nfwd, const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
@@ -30178,13 +30071,6 @@ const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -30206,7 +30092,7 @@ classes.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -30267,6 +30153,13 @@ bool persistent=false) "
 std::vector< MX > &arg) const  "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -30604,7 +30497,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -30996,12 +30889,6 @@ bool never_inline) const  "
 %feature("docstring") casadi::Interpolant::~Interpolant "
 
 [INTERNAL]  Destructor.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -31644,7 +31531,7 @@ std::vector< M > &arg) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -31931,12 +31818,6 @@ Jacobian of all outputs with respect to all inputs.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::forward(int nfwd) const  "
 
 [INTERNAL]  Return function that calculates forward derivatives
@@ -31952,7 +31833,7 @@ get_forward(int nfwd) if no cached version is available.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -32172,6 +32053,13 @@ std::vector< M > &arg) const  "
 bool persistent=false) "
 
 [INTERNAL]  Ensure required length of arg field.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -32649,13 +32537,6 @@ C++ includes: jit_impl.hpp ";
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -33063,7 +32944,7 @@ std::vector< std::vector< M > > &aseed) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -33416,6 +33297,13 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::LinsolInternal::pivoting(void *mem, const
 double *A) const  "
 
@@ -33478,12 +33366,6 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -33565,13 +33447,6 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
-&stream) const  "
-
-[INTERNAL]  Print more.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
@@ -33607,10 +33482,10 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
 
-[INTERNAL]  Add a dependent function.
+[INTERNAL]  Print more.
 
 ";
 
@@ -33809,7 +33684,7 @@ std::vector< M > &arg) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -34864,7 +34739,7 @@ oind, bool compact, bool symmetric) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -35106,7 +34981,7 @@ std::vector< std::vector< M > > &aseed) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -35280,12 +35155,6 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -35303,6 +35172,13 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::name() const  "
 
 [INTERNAL]  Name of the function.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -35547,13 +35423,6 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -35751,13 +35620,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
 persistent=false) "
 
@@ -35800,6 +35662,13 @@ always_inline, bool never_inline) const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
 propagation.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -36084,7 +35953,7 @@ const std::vector< MatType > &v) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -36457,9 +36326,10 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
+%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
+&type, bool recursive) const  "
 
-[INTERNAL]  Get name of the evaluation function.
+[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -36541,13 +36411,6 @@ C++ includes: linear_interpolant.hpp ";
 bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Propagate sparsity backwards.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
-
-[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -36724,7 +36587,7 @@ double **res, int *iw, double *w, void *mem) const override "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -36918,7 +36781,7 @@ constructor), this class should invoke this function when initialized.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -37025,13 +36888,6 @@ bool never_inline) const  "
 override "
 
 [INTERNAL]  Get type name.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -37263,6 +37119,13 @@ get_forward(int nfwd) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::get_sparsity_in(int i) "
 
 [INTERNAL]  Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -37511,7 +37374,7 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -37820,12 +37683,6 @@ structure recognition for symmetric Jacobians
 std::vector< MX > &arg) const  "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -38330,7 +38187,7 @@ elements.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -38339,13 +38196,6 @@ const std::string &fname, bool decl_static) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
 [INTERNAL]  Get required length of w field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
-bool persistent=false) "
-
-[INTERNAL]  Ensure required length of arg field.
 
 ";
 
@@ -38707,10 +38557,17 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
+bool persistent=false) "
 
-[INTERNAL]  Add a dependent function.
+[INTERNAL]  Ensure required length of arg field.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -38759,7 +38616,7 @@ structure recognition for symmetric Jacobians
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -39536,12 +39393,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sparsity_out(int ind) const
 "
 
@@ -40043,7 +39894,7 @@ get_forward(int nfwd) if no cached version is available.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -40202,12 +40053,6 @@ double **arg, double **res, int *iw, double *w) const  "
 persistent=false) "
 
 [INTERNAL]  Ensure required length of w field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -40419,13 +40264,6 @@ const  "
 %feature("docstring")  casadi::Map::get_sparsity_in(int i) override "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -40657,6 +40495,13 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -40878,7 +40723,7 @@ std::string &fname) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -40994,7 +40839,7 @@ std::string &iname) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -41271,13 +41116,6 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
-double **arg, double **res, int *iw, double *w) const  "
-
-[INTERNAL]  Set the (persistent and temporary) work vectors.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_gen(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -41446,6 +41284,13 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
 "
 
@@ -41473,14 +41318,8 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -41765,10 +41604,10 @@ classes.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
+double **arg, double **res, int *iw, double *w) const  "
 
-[INTERNAL]  Add a dependent function.
+[INTERNAL]  Set the (persistent and temporary) work vectors.
 
 ";
 
@@ -44343,6 +44182,13 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
 oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
 allow_forward, bool allow_reverse) const  "
@@ -44804,7 +44650,7 @@ std::string &iname) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -44909,13 +44755,6 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -45181,7 +45020,7 @@ override "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -45452,12 +45291,6 @@ Matrix< D > > &arg, std::vector< Matrix< D > > &res, bool always_inline,
 bool never_inline) const  "
 
 [INTERNAL]   Call a function, overloaded.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -45751,6 +45584,13 @@ std::vector< std::string > &s_out, const Function::AuxOut
 &aux=Function::AuxOut()) "
 
 [INTERNAL]  Create an oracle function
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -46083,7 +45923,7 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -46093,13 +45933,6 @@ const std::string &fname, bool decl_static) const  "
 bool persistent=false) "
 
 [INTERNAL]  Ensure required length of res field.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -46462,7 +46295,7 @@ std::vector< M > &arg) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -46775,12 +46608,6 @@ CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
 
 [INTERNAL]  Symbolic expressions for the forward seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -48335,6 +48162,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_reverse(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens, bool
@@ -48402,12 +48236,6 @@ oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
 allow_forward, bool allow_reverse) const  "
 
 [INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -48543,7 +48371,7 @@ double **res, int *iw, double *w, void *mem) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -48675,7 +48503,7 @@ get_forward(int nfwd) if no cached version is available.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -49450,13 +49278,6 @@ std::string &fname) override "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
 bool persistent=false) "
 
@@ -49572,105 +49393,6 @@ bool never_inline) const  "
 
 
 // File: classcasadi_1_1Output.xml
-
-
-// File: classcasadi_1_1ParsedFile.xml
-%feature("docstring") casadi::ParsedFile::ParsedFile() "
-
-Default constructor (no commands)
-
-";
-
-%feature("docstring") casadi::ParsedFile::ParsedFile(const std::string
-&fname) "
-
-Construct from a file.
-
-";
-
-%feature("docstring") casadi::ParsedFile::ParsedFile(const std::vector<
-std::string > &lines, int offset=0) "
-
-Construct from a file.
-
-";
-
-%feature("docstring")  casadi::ParsedFile::to_string(const std::string &cmd,
-int ind=-1) const  "
-
-Get entry as a string.
-
-";
-
-%feature("docstring")  casadi::ParsedFile::to(const std::string &cmd, int
-ind=-1) const  "
-
-Convert to a type.
-
-";
-
-%feature("docstring")  casadi::ParsedFile::to_set(const std::string &cmd,
-int ind=-1) const  "
-
-Get entry as a set.
-
-";
-
-%feature("docstring")  casadi::ParsedFile::parse(const std::string &fname) "
-
-Parse a file.
-
-";
-
-%feature("docstring")  casadi::ParsedFile::parse(const std::vector<
-std::string > &lines, int offset) "
-
-Parse a list of strings.
-
-";
-
-%feature("docstring")  casadi::ParsedFile::has(const std::string &cmd, int
-ind=-1) const  "
-
-Does an entry exist?
-
-";
-
-%feature("docstring")  casadi::ParsedFile::to_int(const std::string &cmd,
-int ind=-1) const  "
-
-Get entry as an integer.
-
-";
-
-%feature("docstring")  casadi::ParsedFile::to_vector(const std::string &cmd,
-int ind=-1) const  "
-
-Get entry as a vector.
-
-";
-
-%feature("docstring")  casadi::ParsedFile::to_text(const std::string &cmd,
-int ind=-1) const  "
-
-Get entry as a text.
-
-";
-
-%feature("docstring")  casadi::ParsedFile::disp(std::ostream
-&stream=casadi::userOut()) const  "
-
-Print parsed file.
-
-";
-
-%feature("docstring") casadi::ParsedFile "
-
-A parsed file.
-
-Joel Andersson
-
-C++ includes: casadi_file.hpp ";
 
 
 // File: classcasadi_1_1Polynomial.xml
@@ -49823,10 +49545,10 @@ multiplying.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
+"
 
-[INTERNAL]  Add a dependent function.
+[INTERNAL]  Get all statistics.
 
 ";
 
@@ -50021,9 +49743,9 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
+%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
-[INTERNAL]  Get name of the evaluation function.
+[INTERNAL]  Get required length of iw field.
 
 ";
 
@@ -50122,13 +49844,6 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 double **arg, double **res, int *iw, double *w) const  "
 
 [INTERNAL]  Set the (persistent and temporary) work vectors.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
-
-[INTERNAL]  Get all statistics.
 
 ";
 
@@ -50339,7 +50054,7 @@ original
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -50353,7 +50068,7 @@ generated function.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -50618,12 +50333,6 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
-
-[INTERNAL]  Get required length of iw field.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_work(size_t &sz_arg,
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
@@ -50834,6 +50543,13 @@ CodeGenerator &g) const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -51093,13 +50809,6 @@ structure recognition.
 %feature("docstring")  casadi::FunctionInternal::self() const  "
 
 [INTERNAL]  Get a public class instance.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -51659,7 +51368,7 @@ std::vector< MX > &arg, const std::string &parallelization) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -51772,6 +51481,13 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -52191,14 +51907,8 @@ std::string &iname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -52344,13 +52054,6 @@ override "
 &name) const  "
 
 [INTERNAL]  Get output scheme index by name.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -52879,7 +52582,7 @@ override "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -52911,6 +52614,13 @@ The method is still under development
 Joel Andersson
 
 C++ includes: runge_kutta.hpp ";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::sx_out(int ind) const  "
 
@@ -53349,12 +53059,6 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind)
 const  "
@@ -53522,7 +53226,7 @@ const override "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -54041,13 +53745,6 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
-bool persistent=false) "
-
-[INTERNAL]  Ensure required length of arg field.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_gen(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -54063,10 +53760,10 @@ bool never_inline) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
+bool persistent=false) "
 
-[INTERNAL]  Add a dependent function.
+[INTERNAL]  Ensure required length of arg field.
 
 ";
 
@@ -54302,7 +53999,7 @@ double **arg, double **res, int *iw, double *w) const override "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -54541,7 +54238,7 @@ persistent=false) "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -54583,12 +54280,6 @@ CodeGenerator &g) const  "
 %feature("docstring")  casadi::Scpgen::solve(void *mem) const override "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
 
 %feature("docstring")  casadi::Scpgen::line_search(ScpgenMemory *m, int
 &ls_iter, bool &ls_success) const  "
@@ -54994,6 +54685,13 @@ C++ includes: scpgen.hpp ";
 std::vector< M > &res) const  "
 
 [INTERNAL]  Replace 0-by-0 outputs.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -55529,7 +55227,7 @@ std::vector< std::vector< M > > &fseed) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -55620,13 +55318,6 @@ elements.
 %feature("docstring")  casadi::FunctionInternal::mx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -56256,12 +55947,6 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_function() const  "
 
 [INTERNAL] ";
@@ -56286,6 +55971,13 @@ std::string &name) const  "
 %feature("docstring")  casadi::FunctionInternal::has_codegen() const  "
 
 [INTERNAL]  Is codegen supported?
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -56345,7 +56037,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -56711,6 +56403,13 @@ const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
@@ -56880,13 +56579,6 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
 [INTERNAL]  Get the reference count.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -57568,7 +57260,7 @@ elements.
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -57600,12 +57292,6 @@ std::string &name) const  "
 "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -57715,7 +57401,7 @@ allow_forward, bool allow_reverse) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -58317,13 +58003,6 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::check_res(const
 std::vector< M > &res) const  "
 
@@ -58552,7 +58231,7 @@ double **arg, double **res, int *iw, double *w) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -59012,7 +58691,7 @@ std::vector< M > &arg) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -59052,12 +58731,6 @@ multiplying.
 %feature("docstring")  casadi::FiniteDiff::get_n_in() override "
 
 [INTERNAL]  Number of function inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
 
 ";
 
@@ -59133,6 +58806,13 @@ std::vector< M > &arg) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -60242,12 +59922,6 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
@@ -60338,7 +60012,7 @@ std::vector< M > &res) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -60751,13 +60425,6 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -60766,7 +60433,7 @@ casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -61049,6 +60716,13 @@ bool persistent=false) "
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 [INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
 
 ";
 
@@ -61830,6 +61504,13 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call(const std::vector< M >
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
@@ -62093,7 +61774,7 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -62242,7 +61923,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
@@ -62325,12 +62006,6 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::signature(const std::string
 &fname) const  "
 
@@ -62365,13 +62040,6 @@ propagation.
 %feature("docstring")  casadi::FunctionInternal::get_options() const  "
 
 [INTERNAL]  Options.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
-
-[INTERNAL]  Add a dependent function.
 
 ";
 
@@ -63017,6 +62685,13 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_forward(int nfwd) const
 "
 
@@ -63128,12 +62803,6 @@ const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_name() const  "
-
-[INTERNAL]  Get name of the evaluation function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -63230,10 +62899,10 @@ persistent=false) "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::add_dependency(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
+bool persistent=false) "
 
-[INTERNAL]  Add a dependent function.
+[INTERNAL]  Ensure required length of res field.
 
 ";
 
@@ -63387,10 +63056,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
-bool persistent=false) "
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
-[INTERNAL]  Ensure required length of res field.
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -64052,12 +63720,6 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
-
-[INTERNAL]  Get the reference count.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::signature(const std::string
 &fname) const  "
 
@@ -64085,7 +63747,7 @@ DM > &arg) const  "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname, bool decl_static) const  "
+const std::string &fname) const  "
 
 [INTERNAL]  Generate code the function.
 
@@ -64163,7 +63825,7 @@ override "
 ";
 
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g, const std::string &fname) const  "
+&g) const  "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
