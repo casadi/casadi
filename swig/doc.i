@@ -329,12 +329,6 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_gen(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -1319,12 +1313,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
@@ -1353,10 +1341,10 @@ original
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print_option(const
-std::string &name, std::ostream &stream) const  "
+%feature("docstring")  casadi::Nlpsol::get_default_in(int ind) const
+override "
 
-[INTERNAL]  Print all information there is to know about a certain option.
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -1442,6 +1430,13 @@ structure recognition for symmetric Jacobians
 %feature("docstring")  casadi::FunctionInternal::nnz_in(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -1764,6 +1759,13 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::set_temp(void *mem, const
 double **arg, double **res, int *iw, double *w) const override "
 
@@ -1782,6 +1784,13 @@ casadi::Blocksqp::feasibilityRestorationHeuristic(BlocksqpMemory *m) const
 "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::print_option(const
+std::string &name, std::ostream &stream) const  "
+
+[INTERNAL]  Print all information there is to know about a certain option.
+
+";
 
 %feature("docstring")  casadi::Nlpsol::get_sparsity_out(int i) override "
 
@@ -1807,12 +1816,6 @@ std::vector< std::string > &s_out, const Function::AuxOut
 &name) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::Nlpsol::default_in(int ind) const override "
-
-[INTERNAL]  Get default input value.
-
-";
 
 %feature("docstring")  casadi::Blocksqp::convertHessian(BlocksqpMemory *m)
 const  "
@@ -2185,6 +2188,13 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sx_in(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -2341,16 +2351,17 @@ Options.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
 &stream) const  "
 
 [INTERNAL]  Print list of options.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -2773,6 +2784,13 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
 oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
 allow_forward, bool allow_reverse) const  "
@@ -2900,12 +2918,6 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::check_res(const
 std::vector< M > &res) const  "
 
@@ -2930,13 +2942,6 @@ get_forward(int nfwd) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -3546,6 +3551,13 @@ std::vector< MX > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::init_mem(void *mem) const
 "
 
@@ -4132,12 +4144,6 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_name_out(int i) "
 
 [INTERNAL]  Names of function input and outputs.
@@ -4294,12 +4300,6 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::matching_res(const
 std::vector< M > &arg) const  "
 
@@ -4435,13 +4435,6 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::mapsum_mx(const
 std::vector< MX > &arg, const std::string &parallelization) "
 
@@ -4529,6 +4522,13 @@ bool persistent=false) "
 %feature("docstring") casadi::BSplineCommon::BSplineCommon(const std::string
 &name, const std::vector< double > &knots, const std::vector< int > &offset,
 const std::vector< int > &degree, int m) "
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -4744,6 +4744,13 @@ Options.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
@@ -4788,6 +4795,13 @@ propagation.
 CodeGenerator &g) const  "
 
 [INTERNAL]  Get name in codegen.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -4856,13 +4870,6 @@ class hierarchy in reverse order is run after init() has been completed.
 double **&arg, double **&res, int *&iw, double *&w) const  "
 
 [INTERNAL]  Set the (persistent) work vectors.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -5173,9 +5180,10 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
+%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
+const std::vector< MatType > &v) const  "
 
-[INTERNAL]  Get a weak reference to the object.
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
 
 ";
 
@@ -5556,6 +5564,12 @@ C++ includes: bspline.hpp ";
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
 std::string &fname, const Dict &opts) const  "
 
@@ -5623,10 +5637,10 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
-const std::vector< MatType > &v) const  "
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
 
-[INTERNAL]  Symbolic expressions for the adjoint seeds.
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -5752,16 +5766,17 @@ Generate code for the body of the C function.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getJacSparsity(int iind,
 int oind, bool symmetric) const  "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 
@@ -6003,12 +6018,6 @@ DM > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::free_mem(void *mem) const
 "
 
@@ -6206,12 +6215,6 @@ bool persistent=false) "
 std::string &name) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
@@ -6606,13 +6609,6 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
@@ -6654,6 +6650,13 @@ override "
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
 [INTERNAL]  Get required length of res field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -6831,6 +6834,13 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 std::vector< std::vector< M > > &aseed) const  "
 
 [INTERNAL]  Replace 0-by-0 reverse seeds.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -7032,12 +7042,6 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::mx_out(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -7103,6 +7107,13 @@ std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
 
 [INTERNAL]  Full Jacobian.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -8617,13 +8628,6 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FiniteDiff::default_in(int ind) const
-override "
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
 const std::vector< MatType > &v) const  "
 
@@ -9475,6 +9479,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::wrap() const  "
 
 [INTERNAL]  Wrap in an Function instance consisting of only one MX call.
@@ -9838,6 +9849,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
@@ -9879,12 +9897,6 @@ bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
 "
 
@@ -9921,9 +9933,10 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
+%feature("docstring")  casadi::FiniteDiff::get_default_in(int ind) const
+override "
 
-[INTERNAL]  Get smallest input value.
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -10242,6 +10255,13 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -10373,12 +10393,6 @@ override "
 %feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 
@@ -10654,6 +10668,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
@@ -10741,6 +10762,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
 *m, const std::string &fcn, const double *const *arg=0) const  "
 
@@ -10793,13 +10821,6 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::matching_arg(const
 std::vector< M > &arg) const  "
 
@@ -10823,12 +10844,6 @@ problem)
 %feature("docstring")  casadi::FunctionInternal::clear_mem() "
 
 [INTERNAL]  Clear all memory (called from destructor)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -11652,12 +11667,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
-
-[INTERNAL]  Readable name of the internal class.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -11886,6 +11895,13 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
 [INTERNAL]  Get required length of w field.
@@ -11901,6 +11917,13 @@ get_forward(int nfwd) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring")  casadi::Conic::get_default_in(int ind) const override
+"
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -12095,12 +12118,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::fwdViaJac(int nfwd) const
 "
 
@@ -12202,9 +12219,9 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::Conic::default_in(int ind) const override "
+%feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Readable name of the internal class.
 
 ";
 
@@ -12357,12 +12374,6 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
@@ -12493,6 +12504,13 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -14251,6 +14269,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_mem() const  "
 
 [INTERNAL]  Create memory block.
@@ -14447,6 +14472,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::print_option(const
 std::string &name, std::ostream &stream) const  "
 
@@ -14504,6 +14536,13 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::index_in(const std::string
 &name) const  "
 
@@ -14528,12 +14567,6 @@ double **arg, double **res, int *iw, double *w) const  "
 bool persistent=false) "
 
 [INTERNAL]  Ensure required length of res field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 
@@ -14743,12 +14776,6 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::Dple::default_in(int ind) const override "
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -14842,12 +14869,6 @@ bool persistent=false) "
 
 [INTERNAL]  Finalize the object creation This function, which visits the
 class hierarchy in reverse order is run after init() has been completed.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -15061,6 +15082,13 @@ bool never_inline) const  "
 
 
 // File: classcasadi_1_1Expm.xml
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_mem(void *mem) const
 "
 
@@ -15084,12 +15112,6 @@ bool never_inline) const  "
 std::vector< MX > &arg) const  "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -15628,12 +15650,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
 
@@ -15656,12 +15672,6 @@ bool persistent=false) "
 %feature("docstring")  casadi::Expm::get_sparsity_out(int i) override "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::Expm::default_in(int ind) const override "
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -15818,6 +15828,13 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 double **&arg, double **&res, int *&iw, double *&w) const  "
 
 [INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -16335,6 +16352,13 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
 const  "
 
@@ -16404,6 +16428,13 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -16414,13 +16445,6 @@ bool persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -16971,12 +16995,6 @@ bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_spfwd() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -17067,12 +17085,6 @@ std::string &name, std::ostream &stream) const  "
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -17176,6 +17188,13 @@ std::vector< std::vector< M > > &aseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
@@ -17186,6 +17205,13 @@ std::vector< std::vector< M > > &aseed) const  "
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 [INTERNAL]  Get number of temporary variables needed.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -17516,6 +17542,20 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
@@ -17523,9 +17563,10 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
+%feature("docstring")  casadi::FiniteDiff::get_default_in(int ind) const
+override "
 
-[INTERNAL]  Get largest input value.
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -17683,13 +17724,6 @@ std::vector< M > &arg) const  "
 &name, int n, double h) "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FiniteDiff::default_in(int ind) const
-override "
-
-[INTERNAL]  Get default input value.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
 bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
@@ -17853,9 +17887,9 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
+%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
-[INTERNAL]  Get smallest input value.
+[INTERNAL]  Release a memory object.
 
 ";
 
@@ -18834,12 +18868,6 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
-
-[INTERNAL]  Release a memory object.
-
-";
-
 
 // File: classcasadi_1_1FixedStepIntegrator.xml
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
@@ -18927,6 +18955,13 @@ const override "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::Integrator::get_name_in(int i) override "
 
 [INTERNAL]  Names of function input and outputs.
@@ -19003,13 +19038,6 @@ allow_forward, bool allow_reverse) const  "
 %feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -19771,6 +19799,13 @@ problem)
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::index_in(const std::string
 &name) const  "
 
@@ -19878,6 +19913,13 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FixedStepIntegrator::reset(IntegratorMemory
 *mem, double t, const double *x, const double *z, const double *p) const
 override "
@@ -19896,12 +19938,6 @@ override "
 OracleMemory *m) const  "
 
 [INTERNAL]  Print statistics.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
-
-[INTERNAL]  Release a memory object.
 
 ";
 
@@ -20052,12 +20088,6 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
 
@@ -20109,9 +20139,9 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
+%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
-[INTERNAL]  Get largest input value.
+[INTERNAL]  Release a memory object.
 
 ";
 
@@ -20221,6 +20251,13 @@ persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -20501,12 +20538,6 @@ structure recognition for symmetric Jacobians
 %feature("docstring")  casadi::FunctionInternal::mx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -21165,13 +21196,6 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::factory(const std::string
-&name, const std::vector< std::string > &s_in, const std::vector<
-std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
-"
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
@@ -21286,12 +21310,12 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FiniteDiff::default_in(int ind) const
-override "
+%feature("docstring")  casadi::FunctionInternal::factory(const std::string
+&name, const std::vector< std::string > &s_in, const std::vector<
+std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
+"
 
-[INTERNAL]  Get default input value.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::sparsity_jac(int iind, int
 oind, bool compact, bool symmetric) const  "
@@ -21434,12 +21458,6 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
@@ -21479,6 +21497,13 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
 "
 
@@ -21509,6 +21534,13 @@ elements.
 %feature("docstring")  casadi::ForwardDiff::n_pert() const override "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FiniteDiff::get_default_in(int ind) const
+override "
+
+[INTERNAL]  Get default input value.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
@@ -23028,12 +23060,6 @@ bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::GenericExternal::get_sparsity_out(int i)
 override "
 
@@ -23274,9 +23300,23 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -23585,10 +23625,10 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
 "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -23752,12 +23792,6 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 [INTERNAL]  Evaluate with symbolic scalars.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -25112,12 +25146,6 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::replace_fseed(const
 std::vector< std::vector< M > > &fseed) const  "
 
@@ -25415,12 +25443,6 @@ Diagrams
 
 
 C++ includes: integrator_impl.hpp ";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
 bool persistent=false) "
@@ -25857,6 +25879,13 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
 "
 
@@ -25946,6 +25975,13 @@ const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::Integrator::eval(const double **arg, double
 **res, int *iw, double *w, void *mem) const override "
 
@@ -26000,6 +26036,13 @@ always_inline, bool never_inline) const  "
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -26310,13 +26353,6 @@ std::vector< std::string > &s_out, const Function::AuxOut
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
 
@@ -26432,6 +26468,13 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::Rootfinder::has_spfwd() const override "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -26488,12 +26531,6 @@ Matrix< D > > &arg, std::vector< Matrix< D > > &res, bool always_inline,
 bool never_inline) const  "
 
 [INTERNAL]   Call a function, overloaded.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -26574,12 +26611,6 @@ classes.
 bvec_t **res, int *iw, bvec_t *w, void *mem) const override "
 
 [INTERNAL]  Propagate sparsity forward.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 
@@ -26723,13 +26754,6 @@ override "
 std::string &fname) override "
 
 [INTERNAL]  JIT for dependencies.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -27090,6 +27114,13 @@ original
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::all_scalar() const  "
 
 [INTERNAL]  Are all inputs and outputs scalar.
@@ -27273,6 +27304,13 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 never_inline) const  "
 
 [INTERNAL]  Create call to (cached) derivative function, reverse mode.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -27820,12 +27858,6 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
 [INTERNAL]  Does the function have free variables.
@@ -28068,12 +28100,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
@@ -28208,6 +28234,13 @@ std::vector< M > &arg) const  "
 double **&arg, double **&res, int *&iw, double *&w) const  "
 
 [INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -28413,13 +28446,6 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind)
 const  "
@@ -28445,6 +28471,13 @@ problem)
 %feature("docstring")  casadi::FunctionInternal::numel_out() const  "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -29023,6 +29056,13 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::Integrator::init(const Dict &opts) override "
 
 [INTERNAL]  Initialize.
@@ -29219,6 +29259,13 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -29310,12 +29357,6 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -29380,13 +29421,6 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
 "
 
@@ -29428,6 +29462,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::nnz_out() const  "
 
@@ -29471,6 +29512,13 @@ std::string &name, std::ostream &stream) const  "
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -29689,12 +29737,6 @@ double **res, int *iw, double *w, void *mem) const  "
 std::vector< M > &arg) const  "
 
 [INTERNAL]  Check if input arguments have correct length and dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -30605,13 +30647,6 @@ Generate code for the function body.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
@@ -30671,6 +30706,13 @@ Number of function inputs and outputs.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -30700,12 +30742,6 @@ std::vector< std::vector< M > > &fseed) const  "
 %feature("docstring")  casadi::Jit::has_jacobian() const override "
 
 Jacobian of all outputs with respect to all inputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 
@@ -30784,6 +30820,13 @@ const std::vector< std::string > &inames, const std::vector< std::string >
 &onames, const Dict &opts) const override "
 
 Jacobian of all outputs with respect to all inputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -31156,6 +31199,13 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
 double **arg, double **res, int *iw, double *w) const  "
 
@@ -31233,12 +31283,6 @@ std::string &fname) "
 %feature("docstring")  casadi::FunctionInternal::all_scalar() const  "
 
 [INTERNAL]  Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -31762,6 +31806,13 @@ propagation.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring") casadi::LapackLu::LapackLu(const std::string &name) "
 
 [INTERNAL] ";
@@ -31828,12 +31879,6 @@ DM > &arg) const  "
 %feature("docstring")  casadi::LapackLu::get_options() const override "
 
 [INTERNAL]  Options.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -31927,12 +31972,6 @@ bool persistent=false) "
 double **res, int *iw, double *w, void *mem) const  "
 
 [INTERNAL]  Evaluate numerically.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 
@@ -32045,6 +32084,13 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -32169,6 +32215,13 @@ std::vector< M > &arg) const  "
 persistent=false) "
 
 [INTERNAL]  Ensure required length of iw field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -32335,13 +32388,6 @@ structure recognition.
 %feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -33102,12 +33148,6 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
 const  "
 
@@ -33507,13 +33547,6 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_sparsity_in(int i) "
 
 [INTERNAL]  Get sparsity of a given input.
@@ -33884,12 +33917,6 @@ const std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
 "
 
@@ -34175,6 +34202,20 @@ const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
@@ -34378,6 +34419,13 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
 [INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -34589,6 +34637,13 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -34640,13 +34695,6 @@ get_forward(int nfwd) if no cached version is available.
 &name) const  "
 
 [INTERNAL]  Get output scheme index by name.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -34876,12 +34924,6 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::matching_arg(const
 std::vector< M > &arg) const  "
 
@@ -34947,6 +34989,13 @@ std::string &fname) "
 %feature("docstring")  casadi::Interpolant::get_name_out(int i) override "
 
 [INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -35108,16 +35157,17 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::index_in(const std::string
 &name) const  "
 
 [INTERNAL]  Get input scheme index by name.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 
@@ -35726,6 +35776,13 @@ std::string &fname) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
@@ -36002,9 +36059,10 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
+%feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
+bool persistent=false) "
 
-[INTERNAL]  Get largest input value.
+[INTERNAL]  Ensure work vectors long enough to evaluate function.
 
 ";
 
@@ -36196,13 +36254,6 @@ oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
-bool persistent=false) "
-
-[INTERNAL]  Ensure work vectors long enough to evaluate function.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
 [INTERNAL]  Get required length of res field.
@@ -36280,13 +36331,6 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -36382,6 +36426,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
+
+[INTERNAL]  Get required length of w field.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::mapsum_mx(const
 std::vector< MX > &arg, const std::string &parallelization) "
 
@@ -36455,6 +36505,13 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind)
 const  "
@@ -36517,12 +36574,6 @@ std::vector< MX > &arg) const  "
 &vdef_fcn, Function &vinit_fcn) const  "
 
 [INTERNAL]  Extract the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -36608,9 +36659,10 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
 
-[INTERNAL]  Get required length of w field.
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -36938,6 +36990,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
 const std::string &fname) const  "
 
@@ -36966,6 +37025,13 @@ const std::string &fname) const  "
 %feature("docstring")  casadi::FunctionInternal::get_sparsity_out(int i) "
 
 [INTERNAL]  Get sparsity of a given output.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -37277,13 +37343,6 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
@@ -37456,12 +37515,6 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
@@ -37597,6 +37650,13 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -37621,12 +37681,6 @@ classes.
 std::vector< M > &res) const  "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 
@@ -38444,6 +38498,13 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
 [INTERNAL]  Get the reference count.
@@ -38558,12 +38619,6 @@ original
 std::vector< M > &arg) const  "
 
 [INTERNAL]  Check if input arguments have correct length and dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -38764,6 +38819,12 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::Map::get_default_in(int ind) const override "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::Map::eval_sx(const SXElem **arg, SXElem
 **res, int *iw, SXElem *w, void *mem) const override "
 
@@ -38775,12 +38836,6 @@ derivatives
 %feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::free_mx() const  "
-
-[INTERNAL]  Get free variables ( MX)
 
 ";
 
@@ -39192,12 +39247,6 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -39305,6 +39354,13 @@ std::string > &onames, const Dict &opts) const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
 
@@ -39332,9 +39388,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Map::default_in(int ind) const override "
+%feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Get free variables ( MX)
 
 ";
 
@@ -39766,6 +39822,12 @@ propagation.
 
 ";
 
+%feature("docstring")  casadi::Map::get_default_in(int ind) const override "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::mx_in(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -39842,12 +39904,6 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::Map::default_in(int ind) const override "
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::check_res(const
 std::vector< M > &res) const  "
 
@@ -39878,6 +39934,13 @@ tr:  Flip the relationship. Return which expressions contain the variables
 std::string &fname) "
 
 [INTERNAL]   Jit dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -40108,6 +40171,13 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
 "
 
@@ -40290,12 +40360,6 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_function() const  "
 
 [INTERNAL] ";
@@ -40421,12 +40485,6 @@ derivatives
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]   Call a function, templated.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 
@@ -42660,10 +42718,10 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 
 // File: classcasadi_1_1Newton.xml
-%feature("docstring")  casadi::FunctionInternal::index_out(const std::string
-&name) const  "
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
 
-[INTERNAL]  Get output scheme index by name.
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -42737,6 +42795,13 @@ std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
 
 [INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -42984,12 +43049,6 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 bool persistent=false) "
 
 [INTERNAL]  Ensure required length of arg field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 
@@ -43295,6 +43354,13 @@ const std::vector< MatType > &v) const  "
 %feature("docstring")  casadi::Newton::free_mem(void *mem) const override "
 
 [INTERNAL]  Free memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::index_out(const std::string
+&name) const  "
+
+[INTERNAL]  Get output scheme index by name.
 
 ";
 
@@ -43713,7 +43779,8 @@ bool more) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
 
 [INTERNAL]  Get smallest input value.
 
@@ -43730,13 +43797,6 @@ std::vector< M > &arg) const  "
 std::vector< M > &res) const  "
 
 [INTERNAL]  Replace 0-by-0 outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -44052,10 +44112,10 @@ std::string &name) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
-const  "
+%feature("docstring")  casadi::FunctionInternal::replace_arg(const
+std::vector< M > &arg) const  "
 
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+[INTERNAL]  Replace 0-by-0 inputs.
 
 ";
 
@@ -44130,6 +44190,13 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
@@ -44148,10 +44215,12 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::replace_arg(const
-std::vector< M > &arg) const  "
+%feature("docstring")  casadi::FunctionInternal::get_jacobian(const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const  "
 
-[INTERNAL]  Replace 0-by-0 inputs.
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
 
 ";
 
@@ -44389,16 +44458,17 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::default_in(int ind) const override "
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -44438,12 +44508,6 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 std::string &fname) const override "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::getJacSparsityGen(int iind,
 int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
@@ -44518,18 +44582,16 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_jacobian(const
-std::string &name, const std::vector< std::string > &inames, const
-std::vector< std::string > &onames, const Dict &opts) const  "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::self() const  "
 
 [INTERNAL]  Get a public class instance.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_lifted(Function
+&vdef_fcn, Function &vinit_fcn) const  "
+
+[INTERNAL]  Extract the functions needed for the Lifted Newton method.
 
 ";
 
@@ -44543,6 +44605,13 @@ elements.
 %feature("docstring")  casadi::Nlpsol::solve(void *mem) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::jacobian() const  "
 
@@ -44613,6 +44682,13 @@ persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::mx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::Nlpsol::get_default_in(int ind) const
+override "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -44809,12 +44885,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 std::vector< M > &arg) const  "
 
 [INTERNAL]  Check if input arguments have correct length and dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -45107,13 +45177,6 @@ CodeGenerator &g) const  "
 const  "
 
 [INTERNAL]  Obtain solver name from Adaptor.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::generate_lifted(Function
-&vdef_fcn, Function &vinit_fcn) const  "
-
-[INTERNAL]  Extract the functions needed for the Lifted Newton method.
 
 ";
 
@@ -46717,12 +46780,6 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
 double **arg, double **res, int *iw, double *w) const  "
 
@@ -46940,13 +46997,6 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
 &g) const  "
 
@@ -46996,9 +47046,23 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -47054,6 +47118,13 @@ double **arg, double **res, int *iw, double *w) const override "
 *m, const std::string &fcn, const double *const *arg=0) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::mx_in(int ind) const  "
 
@@ -47432,12 +47503,6 @@ Diagrams
 
 
 C++ includes: oracle_function.hpp ";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
 
 %feature("docstring")  casadi::OracleFunction::set_function(const Function
 &fcn, const std::string &fname, bool jit=false) "
@@ -48311,7 +48376,15 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::Conic::default_in(int ind) const override "
+%feature("docstring")  casadi::FunctionInternal::replace_aseed(const
+std::vector< std::vector< M > > &aseed) const  "
+
+[INTERNAL]  Replace 0-by-0 reverse seeds.
+
+";
+
+%feature("docstring")  casadi::Conic::get_default_in(int ind) const override
+"
 
 [INTERNAL]  Get default input value.
 
@@ -48354,13 +48427,6 @@ get_reverse(int nadj) if no cached version is available.
 bool persistent=false) "
 
 [INTERNAL]  Ensure required length of res field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::replace_aseed(const
-std::vector< std::vector< M > > &aseed) const  "
-
-[INTERNAL]  Replace 0-by-0 reverse seeds.
 
 ";
 
@@ -48464,12 +48530,6 @@ original
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -48786,18 +48846,19 @@ const std::map< std::string, Sparsity > &st) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind)
 const  "
 
 [INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition for symmetric Jacobians
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 
@@ -48975,6 +49036,13 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::nnz_out() const  "
 
 [INTERNAL]  Number of input/output nonzeros.
@@ -49129,6 +49197,13 @@ std::vector< M > &res) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::matching_arg(const
 std::vector< M > &arg) const  "
 
@@ -49201,6 +49276,13 @@ bool persistent=false) "
 "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -49434,13 +49516,6 @@ std::string &name) const override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::Rootfinder::has_forward(int nfwd) const
 override "
 
@@ -49516,12 +49591,6 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -49557,12 +49626,6 @@ always_inline, bool never_inline) const  "
 %feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -50236,6 +50299,13 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::Rootfinder::eval(const double **arg, double
 **res, int *iw, double *w, void *mem) const override "
 
@@ -50603,12 +50673,6 @@ std::string &name) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
-
-[INTERNAL]  Release a memory object.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -50651,12 +50715,6 @@ bool persistent=false) "
 %feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -50918,9 +50976,9 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
+%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
 
-[INTERNAL]  Get largest input value.
+[INTERNAL]  Release a memory object.
 
 ";
 
@@ -51261,6 +51319,20 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FixedStepIntegrator::get_options() const
 override "
 
@@ -51280,6 +51352,13 @@ std::vector< std::vector< M > > &fseed) const  "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -51467,13 +51546,6 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::construct(const Dict &opts)
 "
 
@@ -51591,13 +51663,6 @@ std::vector< std::string > &s_out, const Function::AuxOut
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
-persistent=false) "
-
-[INTERNAL]  Ensure required length of w field.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -51661,9 +51726,10 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
 
-[INTERNAL]  Get largest input value.
+[INTERNAL]  Ensure required length of w field.
 
 ";
 
@@ -51785,6 +51851,13 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
@@ -51882,6 +51955,13 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::size2_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -52045,9 +52125,9 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::default_in(int ind) const override "
+%feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Get free variables (SX)
 
 ";
 
@@ -52186,12 +52266,6 @@ original
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::free_sx() const  "
-
-[INTERNAL]  Get free variables (SX)
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::print_option(const
 std::string &name, std::ostream &stream) const  "
 
@@ -52213,6 +52287,13 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring")  casadi::Nlpsol::get_default_in(int ind) const
+override "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -52941,12 +53022,6 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 [INTERNAL]  Get the sparsity pattern, forward mode.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -53845,6 +53920,13 @@ structure recognition.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")  casadi::SlicotDple::init_mem(void *mem) const
 override "
 
@@ -53933,6 +54015,13 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getJacSparsity(int iind,
 int oind, bool symmetric) const  "
 
@@ -53976,12 +54065,6 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 %feature("docstring") casadi::SlicotDple::~SlicotDple "
 
 [INTERNAL]  Destructor.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -54216,12 +54299,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::clear_mem() "
 
 [INTERNAL]  Clear all memory (called from destructor)
@@ -54254,6 +54331,13 @@ get_reverse(int nadj) if no cached version is available.
 persistent=false) "
 
 [INTERNAL]  Ensure required length of iw field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -54337,12 +54421,6 @@ const std::vector< MatType > &v) const  "
 &type, bool recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
-
-";
-
-%feature("docstring")  casadi::Dple::default_in(int ind) const override "
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -54646,6 +54724,13 @@ CodeGenerator &g) const  "
 &g) const  "
 
 [INTERNAL]  Generate code for the function body.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -55273,6 +55358,13 @@ original
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
 persistent=false) "
 
@@ -55373,7 +55465,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
 
 [INTERNAL]  Get smallest input value.
 
@@ -55408,12 +55501,6 @@ generated function.
 std::string &name) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::size2_out(int ind) const  "
 
@@ -55491,12 +55578,6 @@ std::string &fname) "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(int nadj) if no cached version is available.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::get_name_in(int i) "
-
-[INTERNAL]  Names of function input and outputs.
 
 ";
 
@@ -55599,9 +55680,9 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::Expm::default_in(int ind) const override "
+%feature("docstring")  casadi::FunctionInternal::get_name_in(int i) "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Names of function input and outputs.
 
 ";
 
@@ -55923,12 +56004,6 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -55990,6 +56065,13 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FiniteDiff::get_default_in(int ind) const
+override "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::which_depends(const
 std::string &s_in, const std::vector< std::string > &s_out, int order, bool
 tr=false) const  "
@@ -56046,6 +56128,13 @@ get_forward(int nfwd) if no cached version is available.
 %feature("docstring")  casadi::FunctionInternal::has_spfwd() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -56541,12 +56630,6 @@ int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
@@ -56598,13 +56681,6 @@ std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
 
 [INTERNAL]  Second order derivatives.
-
-";
-
-%feature("docstring")  casadi::FiniteDiff::default_in(int ind) const
-override "
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -56969,6 +57045,13 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 const  "
 
 [INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -58762,12 +58845,6 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::default_in(int ind) const override "
-
-[INTERNAL]  Get default input value.
-
-";
-
 %feature("docstring")
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
@@ -58845,9 +58922,12 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::getReducedHessian() "
+%feature("docstring")  casadi::Nlpsol::get_default_in(int ind) const
+override "
 
-[INTERNAL] ";
+[INTERNAL]  Get default input value.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::clear_mem() "
 
@@ -58882,6 +58962,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::create_function(const
 std::string &fname, const std::vector< std::string > &s_in, const
 std::vector< std::string > &s_out, const Function::AuxOut
@@ -58897,6 +58984,10 @@ bool persistent=false) "
 [INTERNAL]  Ensure required length of arg field.
 
 ";
+
+%feature("docstring")  casadi::Nlpsol::getReducedHessian() "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Nlpsol::disp_more(std::ostream &stream) const
 override "
@@ -58932,6 +59023,13 @@ override "
 %feature("docstring")  casadi::Nlpsol::integer_support() const  "
 
 [INTERNAL]  Can discrete variables be treated.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -59087,22 +59185,10 @@ OracleMemory *m) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
-
-";
-
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
 *m, const std::string &fcn, const double *const *arg=0) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
 
 %feature("docstring")  casadi::Sqpmethod::plugin_name() const override "
 
@@ -59508,6 +59594,13 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
@@ -59614,6 +59707,13 @@ multiplying.
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -59806,6 +59906,13 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::which_depends(const
 std::string &s_in, const std::vector< std::string > &s_out, int order, bool
 tr=false) const  "
@@ -59829,12 +59936,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Propagate sparsity forward.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 
@@ -60227,12 +60328,6 @@ bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchical(int iind, int oind)
 const  "
@@ -60315,13 +60410,6 @@ std::vector< M > &res) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -60525,6 +60613,13 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
+bool persistent=false) "
+
+[INTERNAL]  Ensure required length of arg field.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::nnz_out() const  "
 
 [INTERNAL]  Number of input/output nonzeros.
@@ -60534,12 +60629,6 @@ multiplying.
 %feature("docstring")  casadi::FunctionInternal::nnz_out(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::min_in(int ind) const  "
-
-[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -60608,6 +60697,13 @@ std::string &fname) "
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -60906,17 +61002,17 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_default_in(int ind)
+const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::LinsolInternal::linsol_cholesky(void *mem,
 bool tr) const  "
 
 [INTERNAL]  Get Cholesky factor.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::default_in(int ind) const
-"
-
-[INTERNAL]  Get default input value.
 
 ";
 
@@ -60931,10 +61027,10 @@ double *A) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
-bool persistent=false) "
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
 
-[INTERNAL]  Ensure required length of arg field.
+[INTERNAL]  Get smallest input value.
 
 ";
 
@@ -61797,12 +61893,6 @@ oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
 allow_forward, bool allow_reverse) const  "
 
 [INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::max_in(int ind) const  "
-
-[INTERNAL]  Get largest input value.
 
 ";
 

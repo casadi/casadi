@@ -100,10 +100,10 @@
 %exception  casadi::Collocation::setupFG() override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Conic::default_in(int ind) const override {
+%exception  casadi::Conic::generateNativeCode(std::ostream &file) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Conic::generateNativeCode(std::ostream &file) const  {
+%exception  casadi::Conic::get_default_in(int ind) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Conic::get_n_in() override {
@@ -160,9 +160,6 @@
 %exception  casadi::DllLibrary::get_function(const std::string &symname) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Dple::default_in(int ind) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Dple::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -197,9 +194,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Dple::init(const Dict &opts) override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Expm::default_in(int ind) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Expm::getJacSparsity(int iind, int oind, bool symmetric) const override {
@@ -328,7 +322,7 @@
 %exception  casadi::FiniteDiff::codegen_declarations(CodeGenerator &g) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FiniteDiff::default_in(int ind) const override {
+%exception  casadi::FiniteDiff::get_default_in(int ind) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FiniteDiff::get_n_in() override {
@@ -505,9 +499,6 @@
 %exception  casadi::FunctionInternal::construct(const Dict &opts) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::default_in(int ind) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::definition() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -565,6 +556,9 @@
 %exception  casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::get_default_in(int ind) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -578,6 +572,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::get_jacobian(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::get_max_in(int ind) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::get_min_in(int ind) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::get_n_in() {
@@ -673,13 +673,7 @@
 %exception  casadi::FunctionInternal::matching_res(const std::vector< M > &arg) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::max_in(int ind) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::memory(int ind) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::min_in(int ind) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::mx_in() const  {
@@ -1132,7 +1126,7 @@
 %exception  casadi::Map::codegen_declarations(CodeGenerator &g) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Map::default_in(int ind) const override {
+%exception  casadi::Map::get_default_in(int ind) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Map::get_forward(int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
@@ -1213,13 +1207,13 @@
 %exception  casadi::Nlpsol::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Nlpsol::default_in(int ind) const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Nlpsol::disp_more(std::ostream &stream) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Nlpsol::getReducedHessian() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Nlpsol::get_default_in(int ind) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Nlpsol::get_n_in() override {
