@@ -16787,6 +16787,10 @@ const std::vector< std::string > &s_in, const std::vector< std::string >
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| buffered         | OT_BOOL         | Buffer the       | casadi::External |
+|                  |                 | calls, user does |                  |
+|                  |                 | not need to      |                  |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -24254,6 +24258,10 @@ override "
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| buffered         | OT_BOOL         | Buffer the       | casadi::GenericE |
+|                  |                 | calls, user does | xternal          |
+|                  |                 | not need to      |                  |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -31010,6 +31018,10 @@ double **res, int *iw, double *w, void *mem) const  "
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
++------------------+-----------------+------------------+------------------+
+| buffered         | OT_BOOL         | Buffer the       | casadi::JitFunct |
+|                  |                 | calls, user does | ion              |
+|                  |                 | not need to      |                  |
 +------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |

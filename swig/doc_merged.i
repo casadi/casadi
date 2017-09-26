@@ -12436,6 +12436,10 @@ block.
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| buffered         | OT_BOOL         | Buffer the       | casadi::External |
+|                  |                 | calls, user does |                  |
+|                  |                 | not need to      |                  |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -17752,6 +17756,10 @@ the class able to propagate seeds through the algorithm?
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
 +------------------+-----------------+------------------+------------------+
+| buffered         | OT_BOOL         | Buffer the       | casadi::GenericE |
+|                  |                 | calls, user does | xternal          |
+|                  |                 | not need to      |                  |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -22590,6 +22598,10 @@ nodes in the algorithm.
 |                  |                 | respectively.    |                  |
 |                  |                 | Cf. option       |                  |
 |                  |                 | \"ad_weight\".     |                  |
++------------------+-----------------+------------------+------------------+
+| buffered         | OT_BOOL         | Buffer the       | casadi::JitFunct |
+|                  |                 | calls, user does | ion              |
+|                  |                 | not need to      |                  |
 +------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
