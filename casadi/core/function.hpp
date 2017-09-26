@@ -352,6 +352,9 @@ namespace casadi {
     ///@}
 
 #ifndef SWIG
+    /// Check if same as another function
+    bool operator==(const Function& f) const;
+
     ///@{
     /// Functor shorthand for evaluation
     std::vector<DM> operator()(const std::vector<DM>& arg) const;

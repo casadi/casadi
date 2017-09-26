@@ -91,6 +91,7 @@ namespace casadi {
     casadi_assert(Function::check_name(this->name));
 
     // Includes needed
+    add_include("math.h");
     if (this->main) add_include("stdio.h");
 
     // Mex and main need string.h
@@ -110,13 +111,74 @@ namespace casadi {
     }
   }
 
+  std::string CodeGenerator::add_dependency(const Function& f) {
+    // Quick return if it already exists
+    for (auto&& e : added_functions_) if (e.f==f) return e.codegen_name;
+
+    // Give it a name
+    string fname = shorthand("f" + str(added_functions_.size()));
+
+    // Add to list of functions
+    added_functions_.push_back({f, fname, false, false});
+
+    // Generate declarations
+    f->codegen_declarations(*this);
+
+    // Print to file
+    f->codegen(*this, fname);
+
+    // Codegen reference count functions, if needed
+    if (f->has_refcount_) {
+      // Increase reference counter
+      *this << "void " << fname << "_incref(void) {\n";
+      f->codegen_incref(*this);
+      *this << "}\n\n";
+
+      // Decrease reference counter
+      *this << "void " << fname << "_decref(void) {\n";
+      f->codegen_decref(*this);
+      *this << "}\n\n";
+    }
+
+    // Flush to body
+    flush(this->body);
+
+    return fname;
+  }
+
   void CodeGenerator::add(const Function& f) {
-    f->codegen(*this, f.name(), false);
+    // Add if not already added
+    std::string codegen_name = add_dependency(f);
+
+    // Mark exposed
+    for (auto&& e : added_functions_) {
+      if (e.f==f) {
+        e.exposed = true;
+        break;
+      }
+    }
+
+    // Add header
     if (this->with_header) {
       if (this->cpp) this->header << "extern \"C\" " ; // C linkage
       this->header << f->signature(f.name()) << ";\n";
     }
+
+    // C linkage
+    if (this->cpp) *this << "extern \"C\" ";
+
+    // Expose to DLL
+    if (this->with_export) *this << "CASADI_SYMBOL_EXPORT ";
+
+    // Define function
+    *this << f->signature(f.name()) << "{\n"
+          << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
+          << "}\n\n";
+
+    // Generate meta information
     f->codegen_meta(*this, f.name());
+
+    // Add to list of exposed symbols
     this->exposed_fname.push_back(f.name());
   }
 
@@ -172,7 +234,7 @@ namespace casadi {
     string fullname = prefix + this->name + this->suffix;
     file_open(s, fullname);
 
-    // Generate the actual function
+    // Dump code to file
     dump(s);
 
     // Mex entry point

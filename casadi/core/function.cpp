@@ -1261,4 +1261,14 @@ namespace casadi {
     return (*this)->wrap();
   }
 
+  bool Function::operator==(const Function& f) const {
+    try {
+      casadi_assert_message(!is_null(), "lhs is null");
+      casadi_assert_message(!f.is_null(), "rhs is null");
+      return get()==f.get();
+    } catch (exception& e) {
+      THROW_ERROR("operator==", e.what());
+    }
+  }
+
 } // namespace casadi

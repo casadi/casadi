@@ -65,6 +65,9 @@ namespace casadi {
                     const std::string& use_ifdef=std::string());
 
 #ifndef SWIG
+    /// Add a function dependency
+    std::string add_dependency(const Function& f);
+
     /// Add an external function declaration
     void add_external(const std::string& new_external);
 
@@ -356,11 +359,23 @@ namespace casadi {
     std::set<std::string> added_externals_;
     std::set<std::string> added_shorthands_;
     std::multimap<Auxiliary, std::vector<std::string>> added_auxiliaries_;
-    std::vector<Function> added_dependencies_;
     std::multimap<size_t, size_t> added_double_constants_;
     std::multimap<size_t, size_t> added_integer_constants_;
     std::map<std::string, std::pair<std::string, std::string> > local_variables_;
     std::map<std::string, std::string> local_default_;
+
+    // Added functions
+    struct FunctionMeta {
+      // The function object
+      Function f;
+      // Name in codegen
+      std::string codegen_name;
+      // Entry points available?
+      bool exposed;
+      // Generate Jacobian sparsity pattern
+      bool jac_sparsity;
+    };
+    std::vector<FunctionMeta> added_functions_;
 
     // Constants
     std::vector<std::vector<double> > double_constants_;

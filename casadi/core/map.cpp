@@ -105,7 +105,7 @@ namespace casadi {
   }
 
   void Map::codegen_declarations(CodeGenerator& g) const {
-    f_->add_dependency(g);
+    g.add_dependency(f_);
   }
 
   void Map::codegen_body(CodeGenerator& g) const {

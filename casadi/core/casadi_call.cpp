@@ -144,7 +144,7 @@ namespace casadi {
   }
 
   void Call::add_dependency(CodeGenerator& g) const {
-    fcn_->add_dependency(g);
+    g.add_dependency(fcn_);
   }
 
   bool Call::has_refcount() const {

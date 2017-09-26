@@ -1586,35 +1586,26 @@ namespace casadi {
     casadi_error("'get_jacobian' not defined for " + class_name());
   }
 
-  void FunctionInternal::codegen(CodeGenerator& g,
-                                 const std::string& fname, bool decl_static) const {
-    // Add standard math
-    g.add_include("math.h");
-
-    // Generate declarations
-    codegen_declarations(g);
-
+  void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname) const {
     // Define function
-    g << "/* " << name_ << " */\n";
-    if (decl_static) {
-      g << "static ";
-    } else if (g.cpp) {
-      g << "extern \"C\" ";
-    }
-    if (!decl_static && g.with_export) g << "CASADI_SYMBOL_EXPORT ";
-    g << signature(fname) << " {\n";
+    g << "/* " << definition() << " */\n";
+    g << "static " << signature(fname) << " {\n";
+
+    // Reset local variables, flush buffer
     g.flush(g.body);
     g.local_variables_.clear();
     g.local_default_.clear();
 
-    // Generate function body
+    // Generate function body (to buffer)
     codegen_body(g);
 
-    // Collect local variables
+    // Order local variables
     std::map<string, set<pair<string, string>>> local_variables_by_type;
     for (auto&& e : g.local_variables_) {
       local_variables_by_type[e.second.first].insert(make_pair(e.first, e.second.second));
     }
+
+    // Codegen local variables
     for (auto&& e : local_variables_by_type) {
       g.body << "  " << e.first;
       for (auto it=e.second.begin(); it!=e.second.end(); ++it) {
@@ -1644,6 +1635,7 @@ namespace casadi {
     int n_in = this->n_in();
     int n_out = this->n_out();
 
+    // Prefix symbols in DLLs?
     std::string prefix = g.with_export ? "CASADI_SYMBOL_EXPORT " : "";
 
     // Reference counter routines
@@ -1856,43 +1848,10 @@ namespace casadi {
 
   std::string FunctionInternal::codegen_name(const CodeGenerator& g) const {
     // Get the index of the function
-    int i=0;
-    for (auto&& e : g.added_dependencies_) {
-      if (e.get()==this) break;
-      i++;
+    for (auto&& e : g.added_functions_) {
+      if (e.f.get()==this) return e.codegen_name;
     }
-    casadi_assert(i<g.added_dependencies_.size());
-    return g.shorthand("f" + str(i));
-  }
-
-  void FunctionInternal::add_dependency(CodeGenerator& g) const {
-    // Quick return if it already exists
-    for (auto&& e : g.added_dependencies_) {
-      if (e.get()==this) return;
-    }
-
-    // Add to list of patterns
-    int ind = g.added_dependencies_.size();
-    g.added_dependencies_.push_back(self());
-
-    // Give it a name
-    string name = "f" + str(ind);
-
-    // Print to file
-    codegen(g, g.shorthand(name), true);
-
-    // Codegen reference count functions, if needed
-    if (has_refcount_) {
-      // Increase reference counter
-      g << "void " << g.shorthand(name) << "_incref(void) {\n";
-      codegen_incref(g);
-      g << "}\n\n";
-
-      // Decrease reference counter
-      g << "void " << g.shorthand(name) << "_decref(void) {\n";
-      codegen_decref(g);
-      g << "}\n\n";
-    }
+    casadi_error("Function '" + name() + "' not found");
   }
 
   void FunctionInternal::codegen_declarations(CodeGenerator& g) const {

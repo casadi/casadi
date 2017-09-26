@@ -278,7 +278,7 @@ namespace casadi {
   }
 
   void FiniteDiff::codegen_declarations(CodeGenerator& g) const {
-    derivative_of_->add_dependency(g);
+    g.add_dependency(derivative_of_);
   }
 
   void FiniteDiff::codegen_body(CodeGenerator& g) const {
