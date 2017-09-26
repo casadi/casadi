@@ -171,6 +171,63 @@ namespace casadi {
     void free_mem(void *mem) const override;
   };
 
+  class CASADI_EXPORT JitFunction : public FunctionInternal {
+  public:
+    /** \brief Constructor */
+    JitFunction(const std::string& name,
+              const std::vector<std::string>& name_in,
+              const std::vector<std::string>& name_out,
+              const std::vector<Sparsity>& sparsity_in,
+              const std::vector<Sparsity>& sparsity_out,
+              const std::string& body);
+
+    /** \brief Get type name */
+    std::string class_name() const override { return "JitFunction";}
+
+    /** \brief Destructor */
+    ~JitFunction() override;
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
+
+    /** \brief Initialize */
+    void init(const Dict& opts) override;
+
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    size_t get_n_in() override { return name_in_.size();}
+    size_t get_n_out() override { return name_out_.size();}
+    ///@}
+
+    /** \brief Is codegen supported? */
+    bool has_codegen() const override { return true;}
+
+    /** \brief Generate code for the function body */
+    void codegen_body(CodeGenerator& g) const override;
+
+    ///@{
+    /** \brief Jacobian of all outputs with respect to all inputs */
+    bool has_jacobian() const override;
+    Function get_jacobian(const std::string& name,
+                          const std::vector<std::string>& inames,
+                          const std::vector<std::string>& onames,
+                          const Dict& opts) const override;
+    ///@}
+
+  private:
+    // Function body
+    std::string body_;
+
+    // Jacobian function body
+    std::string jac_body_;
+
+    // Hessian function body
+    std::string hess_body_;
+  };
+
 
 } // namespace casadi
 /// \endcond

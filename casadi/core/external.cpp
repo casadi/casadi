@@ -348,4 +348,101 @@ namespace casadi {
     return ret;
   }
 
+  Function jit_function(const std::string& name,
+                    const std::vector<std::string>& name_in,
+                    const std::vector<std::string>& name_out,
+                    const std::string& body, const Dict& opts) {
+    // Pass empty vectors -> default values
+    std::vector<Sparsity> sparsity_in, sparsity_out;
+    return jit_function(name, name_in, name_out, sparsity_in, sparsity_out, body, opts);
+  }
+
+  Function jit_function(const std::string& name,
+                     const std::vector<std::string>& name_in,
+                     const std::vector<std::string>& name_out,
+                     const std::vector<Sparsity>& sparsity_in,
+                     const std::vector<Sparsity>& sparsity_out,
+                     const std::string& body, const Dict& opts) {
+    return Function::create(new JitFunction(name, name_in, name_out, sparsity_in,
+                                          sparsity_out, body), opts);
+  }
+
+  JitFunction::JitFunction(const std::string& name,
+                      const std::vector<std::string>& name_in,
+                      const std::vector<std::string>& name_out,
+                      const std::vector<Sparsity>& sparsity_in,
+                      const std::vector<Sparsity>& sparsity_out,
+                      const std::string& body) : FunctionInternal(name), body_(body) {
+    // Set sparsity
+    sparsity_in_ = sparsity_in;
+    sparsity_out_ = sparsity_out;
+    name_in_ = name_in;
+    name_out_ = name_out;
+
+    // Default options
+    jit_ = true; // override default
+  }
+
+  Options JitFunction::options_
+  = {{&FunctionInternal::options_},
+     {{"jac",
+       {OT_STRING,
+        "Function body for Jacobian"}},
+      {"hess",
+       {OT_STRING,
+        "Function body for Hessian"}}
+     }
+  };
+
+  void JitFunction::init(const Dict& opts) {
+    // Call the initialization method of the base class
+    FunctionInternal::init(opts);
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="jac") {
+        jac_body_ = op.second.to_string();
+      } else if (op.first=="hess") {
+        hess_body_ = op.second.to_string();
+      }
+    }
+
+    // Arrays for holding inputs and outputs
+    alloc_w(n_in_ + n_out_);
+  }
+
+  JitFunction::~JitFunction() {
+  }
+
+  void JitFunction::codegen_body(CodeGenerator& g) const {
+    // Add all input arguments as local variables
+    for (const string& n : name_in_) {
+      g.local(n, "const casadi_real", "*");
+      g << n << " = *arg++;\n";
+    }
+
+    // Add all output arguments as local variables
+    for (const string& n : name_out_) {
+      g.local(n, "casadi_real", "*");
+      g << n << " = *res++;\n";
+    }
+
+    // Codegen function body
+    g << body_;
+  }
+
+  bool JitFunction::has_jacobian() const {
+    return !jac_body_.empty();
+  }
+
+  Function JitFunction::get_jacobian(const std::string& name,
+                                   const std::vector<std::string>& inames,
+                                   const std::vector<std::string>& onames,
+                                   const Dict& opts) const {
+    // Create a JIT-function for the Jacobian
+    Dict jac_opts;
+    if (!hess_body_.empty()) jac_opts["jac"] = hess_body_;
+    return jit_function(name, inames, onames, jac_body_, jac_opts);
+  }
+
 } // namespace casadi
