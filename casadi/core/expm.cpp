@@ -175,8 +175,4 @@ namespace casadi {
 
   const std::string Expm::infix_ = "expm";
 
-  double Expm::default_in(int ind) const {
-    return 0;
-  }
-
 } // namespace casadi

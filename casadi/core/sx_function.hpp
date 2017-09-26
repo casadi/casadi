@@ -196,7 +196,7 @@ class CASADI_EXPORT SXFunction :
                                    const Dict& opts) const override;
 
   /** \brief Get default input value */
-  double default_in(int ind) const override { return default_in_.at(ind);}
+  double get_default_in(int ind) const override { return default_in_.at(ind);}
 
   /// With just-in-time compilation using OpenCL
   bool just_in_time_opencl_;

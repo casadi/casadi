@@ -472,17 +472,17 @@ namespace casadi {
     ///@}
 
     /** \brief Get default input value */
-    virtual double default_in(int ind) const {
+    virtual double get_default_in(int ind) const {
       return 0;
     }
 
     /** \brief Get largest input value */
-    virtual double max_in(int ind) const {
+    virtual double get_max_in(int ind) const {
       return inf;
     }
 
     /** \brief Get smallest input value */
-    virtual double min_in(int ind) const {
+    virtual double get_min_in(int ind) const {
       return -inf;
     }
 

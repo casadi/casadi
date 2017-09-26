@@ -120,7 +120,7 @@ namespace casadi {
     return repmat(derivative_of_.sparsity_out(i), 1, n_);
   }
 
-  double FiniteDiff::default_in(int ind) const {
+  double FiniteDiff::get_default_in(int ind) const {
     if (ind<derivative_of_.n_in()) {
       return derivative_of_.default_in(ind);
     } else {

@@ -1014,15 +1014,15 @@ namespace casadi {
   }
 
   double Function::default_in(int ind) const {
-    return (*this)->default_in(ind);
+    return (*this)->get_default_in(ind);
   }
 
   double Function::max_in(int ind) const {
-    return (*this)->max_in(ind);
+    return (*this)->get_max_in(ind);
   }
 
   double Function::min_in(int ind) const {
-    return (*this)->min_in(ind);
+    return (*this)->get_min_in(ind);
   }
 
   int Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {

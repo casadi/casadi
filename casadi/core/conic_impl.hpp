@@ -100,7 +100,7 @@ namespace casadi {
     static std::string shortname() { return "conic";}
 
     /** \brief Get default input value */
-    double default_in(int ind) const override;
+    double get_default_in(int ind) const override;
 
     /// Can discrete variables be treated
     virtual bool integer_support() const { return false;}

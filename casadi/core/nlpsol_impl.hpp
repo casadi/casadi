@@ -137,7 +137,7 @@ namespace casadi {
     virtual void check_inputs(void* mem) const;
 
     /** \brief Get default input value */
-    double default_in(int ind) const override { return nlpsol_default_in(ind);}
+    double get_default_in(int ind) const override { return nlpsol_default_in(ind);}
 
     /// Can discrete variables be treated
     virtual bool integer_support() const { return false;}

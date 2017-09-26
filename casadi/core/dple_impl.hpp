@@ -103,9 +103,6 @@ namespace casadi {
     /// Short name
     static std::string shortname() { return "dple";}
 
-    /** \brief Get default input value */
-    double default_in(int ind) const override;
-
   protected:
 
     /// List of sparsities of A_i

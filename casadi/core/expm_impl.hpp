@@ -97,9 +97,6 @@ namespace casadi {
     /// Short name
     static std::string shortname() { return "expm";}
 
-    /** \brief Get default input value */
-    double default_in(int ind) const override;
-
   protected:
     Sparsity A_;
     bool const_A_;

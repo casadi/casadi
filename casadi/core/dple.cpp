@@ -330,8 +330,4 @@ namespace casadi {
 
   const std::string Dple::infix_ = "dple";
 
-  double Dple::default_in(int ind) const {
-    return 0;
-  }
-
 } // namespace casadi

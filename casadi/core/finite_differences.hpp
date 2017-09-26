@@ -57,7 +57,7 @@ namespace casadi {
     /// @}
 
     /** \brief Get default input value */
-    double default_in(int ind) const override;
+    double get_default_in(int ind) const override;
 
     ///@{
     /** \brief Number of function inputs and outputs */

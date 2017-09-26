@@ -367,7 +367,7 @@ namespace casadi {
 
   const std::string Conic::infix_ = "conic";
 
-  double Conic::default_in(int ind) const {
+  double Conic::get_default_in(int ind) const {
     switch (ind) {
     case CONIC_LBX:
     case CONIC_LBA:
