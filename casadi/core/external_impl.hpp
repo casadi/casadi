@@ -55,10 +55,10 @@ namespace casadi {
     signal_t incref_, decref_;
 
     /** \brief Number of inputs and outputs */
-    getint_t n_in_, n_out_;
+    getint_t get_n_in_, get_n_out_;
 
     /** \brief Names of inputs and outputs */
-    name_t name_in_, name_out_;
+    name_t get_name_in_, get_name_out_;
 
     /** \brief Work vector sizes */
     work_t work_;
@@ -138,7 +138,7 @@ namespace casadi {
 
   class CASADI_EXPORT GenericExternal : public External {
     // Sparsities
-    sparsity_t sparsity_in_, sparsity_out_;
+    sparsity_t get_sparsity_in_, get_sparsity_out_;
 
     // Memory allocation
     alloc_mem_t alloc_mem_;

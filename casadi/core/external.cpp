@@ -55,12 +55,12 @@ namespace casadi {
     decref_ = (signal_t)li_.get_function(name_ + "_decref");
 
     // Getting number of inputs and outputs
-    n_in_ = (getint_t)li_.get_function(name + "_n_in");
-    n_out_ = (getint_t)li_.get_function(name + "_n_out");
+    get_n_in_ = (getint_t)li_.get_function(name + "_n_in");
+    get_n_out_ = (getint_t)li_.get_function(name + "_n_out");
 
     // Getting names of inputs and outputs
-    name_in_ = (name_t)li_.get_function(name + "_name_in");
-    name_out_ = (name_t)li_.get_function(name + "_name_out");
+    get_name_in_ = (name_t)li_.get_function(name + "_name_in");
+    get_name_out_ = (name_t)li_.get_function(name + "_name_out");
 
     // Work vector sizes
     work_ = (work_t)li_.get_function(name_ + "_work");
@@ -73,8 +73,8 @@ namespace casadi {
     : External(name, li) {
 
     // Functions for retrieving sparsities of inputs and outputs
-    sparsity_in_ = (sparsity_t)li_.get_function(name + "_sparsity_in");
-    sparsity_out_ = (sparsity_t)li_.get_function(name + "_sparsity_out");
+    get_sparsity_in_ = (sparsity_t)li_.get_function(name + "_sparsity_in");
+    get_sparsity_out_ = (sparsity_t)li_.get_function(name + "_sparsity_out");
 
     // Memory allocation functions
     alloc_mem_ = (alloc_mem_t)li_.get_function(name_ + "_alloc_mem");
@@ -91,8 +91,8 @@ namespace casadi {
   }
 
   size_t External::get_n_in() {
-    if (n_in_) {
-      return n_in_();
+    if (get_n_in_) {
+      return get_n_in_();
     } else if (li_.has_meta(name_ + "_N_IN")) {
       return li_.meta_int(name_ + "_N_IN");
     } else {
@@ -102,8 +102,8 @@ namespace casadi {
   }
 
   size_t External::get_n_out() {
-    if (n_out_) {
-      return n_out_();
+    if (get_n_out_) {
+      return get_n_out_();
     } else if (li_.has_meta(name_ + "_N_OUT")) {
       return li_.meta_int(name_ + "_N_OUT");
     } else {
@@ -113,9 +113,9 @@ namespace casadi {
   }
 
   string External::get_name_in(int i) {
-    if (name_in_) {
+    if (get_name_in_) {
       // Use function pointer
-      const char* n = name_in_(i);
+      const char* n = get_name_in_(i);
       casadi_assert_message(n!=0, "Error querying input name");
       return n;
     } else if (li_.has_meta(name_ + "_NAME_IN", i)) {
@@ -128,9 +128,9 @@ namespace casadi {
   }
 
   string External::get_name_out(int i) {
-    if (name_out_) {
+    if (get_name_out_) {
       // Use function pointer
-      const char* n = name_out_(i);
+      const char* n = get_name_out_(i);
       casadi_assert_message(n!=0, "Error querying output name");
       return n;
     } else if (li_.has_meta(name_ + "_NAME_OUT", i)) {
@@ -144,8 +144,8 @@ namespace casadi {
 
   Sparsity GenericExternal::get_sparsity_in(int i) {
     // Use sparsity retrieval function, if present
-    if (sparsity_in_) {
-      return Sparsity::compressed(sparsity_in_(i));
+    if (get_sparsity_in_) {
+      return Sparsity::compressed(get_sparsity_in_(i));
     } else if (li_.has_meta(name_ + "_SPARSITY_IN", i)) {
       return Sparsity::compressed(li_.meta_vector<int>(name_ + "_SPARSITY_IN", i));
     } else {
@@ -156,8 +156,8 @@ namespace casadi {
 
   Sparsity GenericExternal::get_sparsity_out(int i) {
     // Use sparsity retrieval function, if present
-    if (sparsity_out_) {
-      return Sparsity::compressed(sparsity_out_(i));
+    if (get_sparsity_out_) {
+      return Sparsity::compressed(get_sparsity_out_(i));
     } else if (li_.has_meta(name_ + "_SPARSITY_OUT", i)) {
       return Sparsity::compressed(li_.meta_vector<int>(name_ + "_SPARSITY_OUT", i));
     } else {
