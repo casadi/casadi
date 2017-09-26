@@ -161,10 +161,10 @@ namespace casadi {
 
     ///@{
     /** \brief Allocate work vectors */
-    virtual void alloc_w(size_t sz_w, bool persist=false);
-    virtual void alloc_iw(size_t sz_iw, bool persist=false);
-    virtual void alloc_arg(size_t sz_arg, bool persist=false);
-    virtual void alloc_res(size_t sz_res, bool persist=false);
+    void alloc_w(size_t sz_w, bool persist=false);
+    void alloc_iw(size_t sz_iw, bool persist=false);
+    void alloc_arg(size_t sz_arg, bool persist=false);
+    void alloc_res(size_t sz_res, bool persist=false);
     ///@}
   };
 
