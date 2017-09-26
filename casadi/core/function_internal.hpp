@@ -475,36 +475,22 @@ namespace casadi {
 
     /** \brief Get input scheme index by name */
     virtual int index_in(const std::string &name) const {
-      const std::vector<std::string>& v=ischeme_;
-      for (std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i) {
-        size_t col = i->find(':');
-        if (i->compare(0, col, name)==0) return i-v.begin();
+      for (int i=0; i<name_in_.size(); ++i) {
+        if (name_in_[i]==name) return i;
       }
       casadi_error("FunctionInternal::index_in: could not find entry \""
-                   + name + "\". Available names are: " + str(v) + ".");
+                   + name + "\". Available names are: " + str(name_in_) + ".");
       return -1;
     }
 
     /** \brief Get output scheme index by name */
     virtual int index_out(const std::string &name) const {
-      const std::vector<std::string>& v=oscheme_;
-      for (std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i) {
-        size_t col = i->find(':');
-        if (i->compare(0, col, name)==0) return i-v.begin();
+      for (int i=0; i<name_out_.size(); ++i) {
+        if (name_out_[i]==name) return i;
       }
       casadi_error("FunctionInternal::index_out: could not find entry \""
-                   + name + "\". Available names are: " + str(v) + ".");
+                   + name + "\". Available names are: " + str(name_out_) + ".");
       return -1;
-    }
-
-    /** \brief Get input scheme name by index */
-    virtual std::string name_in(int ind) const {
-      return ischeme_.at(ind);
-    }
-
-    /** \brief Get output scheme name by index */
-    virtual std::string name_out(int ind) const {
-      return oscheme_.at(ind);
     }
 
     /** \brief Get default input value */
@@ -625,7 +611,7 @@ namespace casadi {
     std::vector<Sparsity> isp_, osp_;
 
     /// Input and output scheme
-    std::vector<std::string> ischeme_, oscheme_;
+    std::vector<std::string> name_in_, name_out_;
 
     /** \brief  Verbose -- for debugging purposes */
     bool verbose_;
@@ -754,7 +740,7 @@ namespace casadi {
     for (int dir=0; dir<nfwd; ++dir) {
       fseed[dir].resize(n_in);
       for (int iind=0; iind<n_in; ++iind) {
-        std::string n = "f" + str(dir) + "_" +  name_in(iind);
+        std::string n = "f" + str(dir) + "_" +  name_in_[iind];
         fseed[dir][iind] = MatType::sym(n, sparsity_in(iind));
       }
     }
@@ -899,7 +885,7 @@ namespace casadi {
                           + str(n_in) + ", got " + str(arg.size()));
     for (int i=0; i<n_in; ++i) {
       casadi_assert_message(check_mat(arg[i].sparsity(), sparsity_in(i)),
-                            "Input " + str(i) + " (" + name_in(i) + ") has mismatching shape. "
+                            "Input " + str(i) + " (" + name_in_[i] + ") has mismatching shape. "
                             "Expected " + str(size_in(i)) + ", got " + str(arg[i].size()));
     }
   }
@@ -911,7 +897,7 @@ namespace casadi {
                           + str(n_out) + ", got " + str(res.size()));
     for (int i=0; i<n_out; ++i) {
       casadi_assert_message(check_mat(res[i].sparsity(), sparsity_out(i)),
-                            "Output " + str(i) + " (" + name_out(i) + ") has mismatching shape. "
+                            "Output " + str(i) + " (" + name_out_[i] + ") has mismatching shape. "
                             "Expected " + str(size_out(i)) + ", got " + str(res[i].size()));
     }
   }

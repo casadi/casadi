@@ -310,16 +310,16 @@ namespace casadi {
     // Resize the matrix that holds the sparsity of the Jacobian blocks
     jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out, n_in));
 
-    // If input scheme empty, provide default names
-    if (ischeme_.empty()) {
-      ischeme_.resize(n_in);
-      for (int i=0; i<n_in; ++i) ischeme_[i] = get_name_in(i);
+    // Query input names if not already provided
+    if (name_in_.empty()) {
+      name_in_.resize(n_in);
+      for (int i=0; i<n_in; ++i) name_in_[i] = get_name_in(i);
     }
 
-    // If output scheme empty, provide default names
-    if (oscheme_.empty()) {
-      oscheme_.resize(n_out);
-      for (int i=0; i<n_out; ++i) oscheme_[i] = get_name_out(i);
+    // Query output names if not already provided
+    if (name_out_.empty()) {
+      name_out_.resize(n_out);
+      for (int i=0; i<n_out; ++i) name_out_[i] = get_name_out(i);
     }
 
     // Type of derivative calculations enabled
@@ -377,12 +377,12 @@ namespace casadi {
   void FunctionInternal::print_dimensions(ostream &stream) const {
     stream << " Number of inputs: " << n_in() << endl;
     for (int i=0; i<n_in(); ++i) {
-      stream << "  Input " << i  << " (\"" << name_in(i) << "\"): "
+      stream << "  Input " << i  << " (\"" << name_in_[i] << "\"): "
              << sparsity_in(i).dim() << endl;
     }
     stream << " Number of outputs: " << n_out() << endl;
     for (int i=0; i<n_out(); ++i) {
-      stream << "  Output " << i  << " (\"" << name_out(i) << "\"): "
+      stream << "  Output " << i  << " (\"" << name_out_[i] << "\"): "
              << sparsity_out(i).dim() << endl;
     }
   }
@@ -407,12 +407,12 @@ namespace casadi {
     s << name_ << ":";
     // Print input arguments
     for (int i=0; i<n_in(); ++i) {
-      s << (i==0 ? "(" : ",") << name_in(i) << sparsity_in(i).postfix_dim();
+      s << (i==0 ? "(" : ",") << name_in_[i] << sparsity_in(i).postfix_dim();
     }
     s << ")->";
     // Print output arguments
     for (int i=0; i<n_out(); ++i) {
-      s << (i==0 ? "(" : ",") << name_out(i) << sparsity_out(i).postfix_dim();
+      s << (i==0 ? "(" : ",") << name_out_[i] << sparsity_out(i).postfix_dim();
     }
     s << ")";
 
@@ -444,7 +444,7 @@ namespace casadi {
       // Wrap the function
       vector<MX> arg = mx_in();
       vector<MX> res = self()(arg);
-      Function ret(name_ + "_wrap", arg, res, ischeme_, oscheme_, opts);
+      Function ret(name_ + "_wrap", arg, res, name_in_, name_out_, opts);
 
       // Cache it for reuse and return
       wrap_ = ret;
@@ -1363,13 +1363,13 @@ namespace casadi {
 
     // Names of inputs
     std::vector<std::string> inames;
-    for (int i=0; i<n_in; ++i) inames.push_back(name_in(i));
-    for (int i=0; i<n_out; ++i) inames.push_back("out_" + name_out(i));
-    for (int i=0; i<n_in; ++i) inames.push_back("fwd_" + name_in(i));
+    for (int i=0; i<n_in; ++i) inames.push_back(name_in_[i]);
+    for (int i=0; i<n_out; ++i) inames.push_back("out_" + name_out_[i]);
+    for (int i=0; i<n_in; ++i) inames.push_back("fwd_" + name_in_[i]);
 
     // Names of outputs
     std::vector<std::string> onames;
-    for (int i=0; i<n_out; ++i) onames.push_back("fwd_" + name_out(i));
+    for (int i=0; i<n_out; ++i) onames.push_back("fwd_" + name_out_[i]);
 
     // Options
     Dict opts;
@@ -1445,13 +1445,13 @@ namespace casadi {
 
     // Names of inputs
     std::vector<std::string> inames;
-    for (int i=0; i<n_in; ++i) inames.push_back(name_in(i));
-    for (int i=0; i<n_out; ++i) inames.push_back("out_" + name_out(i));
-    for (int i=0; i<n_out; ++i) inames.push_back("adj_" + name_out(i));
+    for (int i=0; i<n_in; ++i) inames.push_back(name_in_[i]);
+    for (int i=0; i<n_out; ++i) inames.push_back("out_" + name_out_[i]);
+    for (int i=0; i<n_out; ++i) inames.push_back("adj_" + name_out_[i]);
 
     // Names of outputs
     std::vector<std::string> onames;
-    for (int i=0; i<n_in; ++i) onames.push_back("adj_" + name_in(i));
+    for (int i=0; i<n_in; ++i) onames.push_back("adj_" + name_in_[i]);
 
     // Options
     Dict opts;
@@ -1555,8 +1555,8 @@ namespace casadi {
 
     // Names of inputs
     std::vector<std::string> inames;
-    for (int i=0; i<n_in; ++i) inames.push_back(name_in(i));
-    for (int i=0; i<n_out; ++i) inames.push_back("out_" + name_out(i));
+    for (int i=0; i<n_in; ++i) inames.push_back(name_in_[i]);
+    for (int i=0; i<n_out; ++i) inames.push_back("out_" + name_out_[i]);
 
     // Names of outputs
     std::vector<std::string> onames = {"jac"};
@@ -1677,7 +1677,7 @@ namespace casadi {
     g << g.declare("const char* " + name_ + "_name_in(int i)") << "{\n"
       << "switch (i) {\n";
     for (int i=0; i<n_in; ++i) {
-      g << "case " << i << ": return \"" << name_in(i) << "\";\n";
+      g << "case " << i << ": return \"" << name_in_[i] << "\";\n";
     }
     g << "default: return 0;\n}\n"
       << "}\n\n";
@@ -1686,7 +1686,7 @@ namespace casadi {
     g << g.declare("const char* " + name_ + "_name_out(int i)") << "{\n"
       << "switch (i) {\n";
     for (int i=0; i<n_out; ++i) {
-      g << "case " << i << ": return \"" << name_out(i) << "\";\n";
+      g << "case " << i << ": return \"" << name_out_[i] << "\";\n";
     }
     g << "default: return 0;\n}\n"
       << "}\n\n";

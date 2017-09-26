@@ -693,12 +693,12 @@ namespace casadi {
     }
   }
 
-  vector<string> Function::name_in() const {
-    return (*this)->ischeme_;
+  const vector<string>& Function::name_in() const {
+    return (*this)->name_in_;
   }
 
-  vector<string> Function::name_out() const {
-    return (*this)->oscheme_;
+  const vector<string>& Function::name_out() const {
+    return (*this)->name_out_;
   }
 
   int Function::index_in(const string &name) const {
@@ -717,17 +717,17 @@ namespace casadi {
     }
   }
 
-  string Function::name_in(int ind) const {
+  const string& Function::name_in(int ind) const {
     try {
-      return (*this)->name_in(ind);
+      return (*this)->name_in_.at(ind);
     } catch (exception& e) {
       THROW_ERROR("name_in", e.what());
     }
   }
 
-  string Function::name_out(int ind) const {
+  const string& Function::name_out(int ind) const {
     try {
-      return (*this)->name_out(ind);
+      return (*this)->name_out_.at(ind);
     } catch (exception& e) {
       THROW_ERROR("name_out", e.what());
     }

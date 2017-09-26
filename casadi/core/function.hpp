@@ -225,16 +225,16 @@ namespace casadi {
     ///@}
 
     /** \brief Get input scheme */
-    std::vector<std::string> name_in() const;
+    const std::vector<std::string>& name_in() const;
 
     /** \brief Get output scheme */
-    std::vector<std::string> name_out() const;
+    const std::vector<std::string>& name_out() const;
 
     /** \brief Get input scheme name by index */
-    std::string name_in(int ind) const;
+    const std::string& name_in(int ind) const;
 
     /** \brief Get output scheme name by index */
-    std::string name_out(int ind) const;
+    const std::string& name_out(int ind) const;
 
     /** \brief Find the index for a string describing a particular entry of an input scheme
      *

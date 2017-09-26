@@ -189,13 +189,13 @@ namespace casadi {
     if (!name_in.empty()) {
       casadi_assert_message(ex_in.size()==name_in.size(),
       "Mismatching number of input names");
-      ischeme_ = name_in;
+      name_in_ = name_in;
     }
     // Names of outputs
     if (!name_out.empty()) {
       casadi_assert_message(ex_out.size()==name_out.size(),
       "Mismatching number of output names");
-      oscheme_ = name_out;
+      name_out_ = name_out;
     }
   }
 
@@ -209,7 +209,7 @@ namespace casadi {
     for (int i=0; i<n_in(); ++i) {
       if (in_.at(i).nnz()>0 && !in_.at(i).is_valid_input()) {
         casadi_error("Xfunction input arguments must be purely symbolic. \n"
-                     "Argument " + str(i) + "(" + name_in(i) + ") is not symbolic.");
+                     "Argument " + str(i) + "(" + name_in_[i] + ") is not symbolic.");
       }
     }
 
@@ -777,13 +777,13 @@ namespace casadi {
     // Reorder inputs
     for (int k : order_in) {
       ret_in.push_back(in_.at(k));
-      ret_in_name.push_back(name_in(k));
+      ret_in_name.push_back(name_in_.at(k));
     }
 
     // Reorder outputs
     for (int k : order_out) {
       ret_out.push_back(out_.at(k));
-      ret_out_name.push_back(name_out(k));
+      ret_out_name.push_back(name_out_.at(k));
     }
 
     // Assembe function
@@ -878,8 +878,8 @@ namespace casadi {
 
     // Create an expression factory
     Factory<MatType> f(aux);
-    for (int i=0; i<in_.size(); ++i) f.add_input(ischeme_[i], in_[i]);
-    for (int i=0; i<out_.size(); ++i) f.add_output(oscheme_[i], out_[i]);
+    for (int i=0; i<in_.size(); ++i) f.add_input(name_in_[i], in_[i]);
+    for (int i=0; i<out_.size(); ++i) f.add_output(name_out_[i], out_[i]);
 
     // Specify input expressions to be calculated
     vector<string> ret_iname;
@@ -935,16 +935,16 @@ namespace casadi {
     using namespace std;
 
     // Input arguments
-    auto it = find(ischeme_.begin(), ischeme_.end(), s_in);
-    casadi_assert(it!=ischeme_.end());
-    MatType arg = in_.at(it-ischeme_.begin());
+    auto it = find(name_in_.begin(), name_in_.end(), s_in);
+    casadi_assert(it!=name_in_.end());
+    MatType arg = in_.at(it-name_in_.begin());
 
     // Output arguments
     vector<MatType> res;
     for (auto&& s : s_out) {
-      it = find(oscheme_.begin(), oscheme_.end(), s);
-      casadi_assert(it!=oscheme_.end());
-      res.push_back(out_.at(it-oscheme_.begin()));
+      it = find(name_out_.begin(), name_out_.end(), s);
+      casadi_assert(it!=name_out_.end());
+      res.push_back(out_.at(it-name_out_.begin()));
     }
 
     // Extract variables entering nonlinearly

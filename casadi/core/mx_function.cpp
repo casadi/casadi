@@ -1042,7 +1042,7 @@ namespace casadi {
     call(arg, res, true, false);
 
     // Create function
-    return Function("expand_" + name_, arg, res, ischeme_, oscheme_);
+    return Function("expand_" + name_, arg, res, name_in_, name_out_);
   }
 
   void MXFunction::codegen_declarations(CodeGenerator& g) const {
