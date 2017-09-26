@@ -217,7 +217,9 @@ namespace casadi {
                           const Dict& opts) const override;
     ///@}
 
-  private:
+    // Buffer the function calls
+    bool buffered_;
+
     // Function body
     std::string body_;
 

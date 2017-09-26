@@ -381,12 +381,16 @@ namespace casadi {
 
     // Default options
     jit_ = true; // override default
+    buffered_ = true;
   }
 
   Options JitFunction::options_
   = {{&FunctionInternal::options_},
-     {{"jac",
-       {OT_STRING,
+     {{"buffered",
+      {OT_BOOL,
+        "Buffer the calls, user does not need to "}},
+       {"jac",
+      {OT_STRING,
         "Function body for Jacobian"}},
       {"hess",
        {OT_STRING,
@@ -400,7 +404,9 @@ namespace casadi {
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="jac") {
+      if (op.first=="buffered") {
+        buffered_ = op.second;
+      } else if (op.first=="jac") {
         jac_body_ = op.second.to_string();
       } else if (op.first=="hess") {
         hess_body_ = op.second.to_string();
@@ -408,7 +414,9 @@ namespace casadi {
     }
 
     // Arrays for holding inputs and outputs
-    alloc_w(n_in_ + n_out_);
+    if (buffered_) {
+      alloc_w(nnz_in() + nnz_out());
+    }
   }
 
   JitFunction::~JitFunction() {
@@ -416,19 +424,35 @@ namespace casadi {
 
   void JitFunction::codegen_body(CodeGenerator& g) const {
     // Add all input arguments as local variables
-    for (const string& n : name_in_) {
-      g.local(n, "const casadi_real", "*");
-      g << n << " = *arg++;\n";
+    for (int i=0; i<n_in_; ++i) {
+      g.local(name_in_[i], "const casadi_real", "*");
+      if (buffered_) {
+        g << g.copy("*arg++", nnz_in(i), "w") << "\n"
+          << name_in_[i] << " = w; w += " << nnz_in(i) << ";\n";
+      } else {
+        g << name_in_[i] << " = *arg++;\n";
+      }
     }
 
     // Add all output arguments as local variables
-    for (const string& n : name_out_) {
-      g.local(n, "casadi_real", "*");
-      g << n << " = *res++;\n";
+    for (int i=0; i<n_out_; ++i) {
+      g.local(name_out_[i], "casadi_real", "*");
+      if (buffered_) {
+        g << name_out_[i] << " = w; w += " << nnz_out(i) << ";\n";
+      } else {
+        g << name_out_[i] << " = *res++;\n";
+      }
     }
 
     // Codegen function body
     g << body_;
+
+    // Get results
+    for (int i=0; i<n_out_; ++i) {
+      if (buffered_) {
+        g << g.copy(name_out_[i], nnz_out(i), "*res++") << "\n";
+      }
+    }
   }
 
   bool JitFunction::has_jacobian() const {
