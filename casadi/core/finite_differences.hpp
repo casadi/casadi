@@ -97,20 +97,23 @@ namespace casadi {
     virtual std::string pert(const std::string& k) const = 0;
 
     // Get perturbation expression
-    virtual double pert(int k) const = 0;
+    virtual double pert(int k, double h) const = 0;
 
     // Calculate finite difference approximation
-    virtual void calc_fd(double** yk, double* y0, double* J, double* err) const = 0;
+    virtual double calc_fd(double** yk, double* y0, double* J, double h) const = 0;
 
     // Codegen finite difference approximation
     virtual void calc_fd(CodeGenerator& g, const std::string& yk,
                          const std::string& y0, const std::string& J) const = 0;
 
-    // A central difference approximation, including error estimate
-    double central_diff(double yp, double y0, double ym, double* err) const;
+    // Is an error estimate available?
+    virtual int has_err() const = 0;
 
     // Number of directional derivatives
     int n_;
+
+    // Iterations to improve h
+    int h_iter_;
 
     // Perturbation
     double h_, h2_;
@@ -118,8 +121,8 @@ namespace casadi {
     // Dimensions
     int n_z_, n_y_;
 
-    // Maximum allowed precision
-    double h_max_;
+    // Allowed step size range
+    double h_min_, h_max_;
 
     // Input precision
     double eps_in_;
@@ -160,16 +163,19 @@ namespace casadi {
     }
 
     // Get perturbation expression
-    double pert(int k) const override {
-      return h_;
+    double pert(int k, double h) const override {
+      return h;
     }
 
     // Calculate finite difference approximation
-    void calc_fd(double** yk, double* y0, double* J, double* err) const override;
+    double calc_fd(double** yk, double* y0, double* J, double h) const override;
 
     // Codegen finite difference approximation
     void calc_fd(CodeGenerator& g, const std::string& yk,
                  const std::string& y0, const std::string& J) const override;
+
+    // Is an error estimate available?
+    int has_err() const override {return false;}
 
     ///@{
     /** \brief Second order derivatives */
@@ -205,16 +211,19 @@ namespace casadi {
     }
 
     // Get perturbation expression
-    double pert(int k) const override {
-      return (2*k-1)*h_;
+    double pert(int k, double h) const override {
+      return (2*k-1)*h;
     }
 
     // Calculate finite difference approximation
-    void calc_fd(double** yk, double* y0, double* J, double* err) const override;
+    double calc_fd(double** yk, double* y0, double* J, double h) const override;
 
     // Codegen finite difference approximation
     void calc_fd(CodeGenerator& g, const std::string& yk,
                  const std::string& y0, const std::string& J) const override;
+
+    // Is an error estimate available?
+    int has_err() const override {return true;}
 
     ///@{
     /** \brief Second order derivatives */
@@ -248,14 +257,17 @@ namespace casadi {
     std::string pert(const std::string& k) const override;
 
     // Get perturbation expression
-    double pert(int k) const override;
+    double pert(int k, double h) const override;
 
     // Calculate finite difference approximation
-    void calc_fd(double** yk, double* y0, double* J, double* err) const override;
+    double calc_fd(double** yk, double* y0, double* J, double h) const override;
 
     // Codegen finite difference approximation
     void calc_fd(CodeGenerator& g, const std::string& yk,
                  const std::string& y0, const std::string& J) const override;
+
+    // Is an error estimate available?
+    int has_err() const override {return true;}
 
     ///@{
     /** \brief Second order derivatives */

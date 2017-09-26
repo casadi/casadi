@@ -43,7 +43,13 @@ namespace casadi {
         "Second order perturbation size [default: 1e-3]"}},
       {"h_max",
        {OT_DOUBLE,
-        "Maximum step size [default 1.0]"}},
+        "Maximum step size [default 0]"}},
+      {"h_min",
+       {OT_DOUBLE,
+        "Minimum step size [default inf]"}},
+      {"eps",
+       {OT_DOUBLE,
+        "Smoothing regularization [default: machine precision]"}},
       {"eps_in",
        {OT_DOUBLE,
         "Accuracy of function inputs [default: machine precision]"}},
@@ -52,7 +58,11 @@ namespace casadi {
         "Accuracy of function outputs [default: machine precision]"}},
       {"u_aim",
         {OT_DOUBLE,
-        "Target ratio of roundoff error to truncation error [default: 100.]"}}
+        "Target ratio of roundoff error to truncation error [default: 100.]"}},
+      {"h_iter",
+        {OT_INT,
+        "Number of iterations to improve on the step-size "
+        "[default: 1 if error estimate available, otherwise 0]"}},
      }
   };
 
@@ -62,15 +72,18 @@ namespace casadi {
 
     // Default options
     h2_ = 1e-3;
-    h_max_ = 1.0;
-    eps_in_ = eps_out_ = numeric_limits<double>::epsilon();
+    h_min_ = 0;
+    h_max_ = inf;
+    eps_ = eps_in_ = eps_out_ = numeric_limits<double>::epsilon();
     u_aim_ = 100;
-    eps_ = 1e-14;
+    h_iter_ = has_err() ? 1 : 0;
 
     // Read options
     for (auto&& op : opts) {
       if (op.first=="second_order_stepsize") {
         h2_ = op.second;
+      } else if (op.first=="h_min") {
+        h_min_ = op.second;
       } else if (op.first=="h_max") {
         h_max_ = op.second;
       } else if (op.first=="eps_in") {
@@ -81,7 +94,16 @@ namespace casadi {
         eps_ = op.second;
       } else if (op.first=="u_aim") {
         u_aim_ = op.second;
+      } else if (op.first=="h_iter") {
+        h_iter_ = op.second;
       }
+    }
+
+    // Check h_iter for consistency
+    if (h_iter_!=0 && !has_err()) {
+      casadi_error("Perturbation size refinement requires an error estimate, "
+      "which is not available for the class '" + class_name() + "'. "
+      "Choose a different differencing scheme.");
     }
 
     // Allocate work vector for (perturbed) inputs and outputs
@@ -221,25 +243,41 @@ namespace casadi {
 
     // For all sensitivity directions
     for (int i=0; i<n_; ++i) {
-      // Calculate perturbed function values
-      for (int k=0; k<n_pert; ++k) {
-        // Perturb inputs
-        int off = 0;
-        for (int j=0; j<n_in; ++j) {
-          int nnz = derivative_of_.nnz_in(j);
-          casadi_copy(x0[j], nnz, z + off);
-          if (seed[j]) casadi_axpy(nnz, pert(k), seed[j] + i*nnz, z + off);
-          off += nnz;
+      // Initial stepsize
+      double h = h_;
+      // Perform finite difference algorithm with different step sizes
+      for (int iter=0; iter<1+h_iter_; ++iter) {
+        // Calculate perturbed function values
+        for (int k=0; k<n_pert; ++k) {
+          // Perturb inputs
+          int off = 0;
+          for (int j=0; j<n_in; ++j) {
+            int nnz = derivative_of_.nnz_in(j);
+            casadi_copy(x0[j], nnz, z + off);
+            //cout << "k = " << k << ": pert(k, h) = " << pert(k, h) << endl;
+            if (seed[j]) casadi_axpy(nnz, pert(k, h), seed[j] + i*nnz, z + off);
+            off += nnz;
+          }
+          // Evaluate
+          if (derivative_of_(arg, res, iw, w)) return 1;
+          // Save outputs
+          casadi_copy(y, n_y_, yk[k]);
         }
-        // Evaluate
-        if (derivative_of_(arg, res, iw, w)) return 1;
-        // Save outputs
-        casadi_copy(y, n_y_, yk[k]);
-      }
+        // Finite difference calculation with error estimate
+        double u = calc_fd(yk, y0, J, h);
+        if (iter==h_iter_) break;
 
-      // Finite difference calculation
-      double err = nan;
-      calc_fd(yk, y0, J, &err);
+        // Update step size
+        if (u < 0) {
+          // Perturbation failed, try a smaller step size
+          h /= u_aim_;
+        } else {
+          // Update h to get u near the target ratio
+          h *= sqrt(u_aim_ / fmax(1., u));
+        }
+        // Make sure h stays in the range [h_min_,h_max_]
+        h = fmin(fmax(h, h_min_), h_max_);
+      }
 
       // Gather sensitivities
       int off = 0;
@@ -252,10 +290,11 @@ namespace casadi {
     return 0;
   }
 
-  void ForwardDiff::calc_fd(double** yk, double* y0, double* J, double* err) const {
+  double ForwardDiff::calc_fd(double** yk, double* y0, double* J, double h) const {
     casadi_copy(*yk, n_y_, J);
     casadi_axpy(n_y_, -1., y0, J);
-    casadi_scal(n_y_, 1./h_, J);
+    casadi_scal(n_y_, 1./h, J);
+    return -1;
   }
 
   void ForwardDiff::calc_fd(CodeGenerator& g, const std::string& yk,
@@ -265,32 +304,23 @@ namespace casadi {
     g << g.scal(n_y_, str(1./h_), J) << "\n";
   }
 
-  double FiniteDiff::central_diff(double yp, double y0, double ym, double* err) const {
-    // Return nan if not finite
-    if (!isfinite(yp) || !isfinite(y0) || !isfinite(ym)) {
-      if (err) *err = nan;
-      return nan;
-    }
-    // Update error estimate
-    if (err) {
-
-      // Truncation error
-      double err_trunc = fabs(yp - 2*y0 + ym);
-      // Roundoff error
-      double err_round = eps_in_/h_*fmax(fabs(yp-y0), fabs(y0-ym)) + eps_out_;
-      // Update error estimate
-      *err = fmax(*err, err_trunc/err_round);
-    }
-
-    // Return central difference approximation
-    return (yp - ym)/(2*h_);
-  }
-
-  void CentralDiff::calc_fd(double** yk, double* y0, double* J, double* err) const {
-    if (err) *err = 0;
+  double CentralDiff::calc_fd(double** yk, double* y0, double* J, double h) const {
+    double yf, yc, yb, u=0;
     for (int i=0; i<n_y_; ++i) {
-      J[i] = central_diff(yk[1][i], y0[i], yk[0][i], err);
+      // Copy to local variables, return -1 if invalid entry
+      if (!isfinite((yf=yk[1][i]))) return -1;
+      if (!isfinite((yc=y0[i]))) return -1;
+      if (!isfinite((yb=yk[0][i]))) return -1;
+      // Central difference approximation
+      J[i] = (yf - yb)/(2*h);
+      // Truncation error
+      double err_trunc = yf - 2*yc + yb;
+      // Roundoff error
+      double err_round = eps_in_/h*fmax(fabs(yf-yc), fabs(yc-yb)) + eps_out_;
+      // Update error estimate
+      u = fmax(u, fabs(err_trunc/err_round));
     }
+    return u;
   }
 
   void CentralDiff::calc_fd(CodeGenerator& g, const std::string& yk,
@@ -399,56 +429,78 @@ namespace casadi {
     return len + "*" + sign + "*" + str(h_);
   }
 
-  double Smoothing::pert(int k) const {
+  double Smoothing::pert(int k, double h) const {
     int sign = 2*(k/2)-1;
     int len = k%2+1;
-    return len*sign*h_;
+    return len*sign*h;
   }
 
-  void Smoothing::calc_fd(double** yk, double* y0, double* J, double *err) const {
-    // Split up yk
-    double* y_b1 = yk[0]; // one steps back
-    double* y_b2 = yk[1]; // two step back
-    double* y_f1 = yk[2]; // one steps forward
-    double* y_f2 = yk[3]; // two step forward
-    // Reset error estimate
-    if (err) *err = 0;
-    // For all components
+  double Smoothing::calc_fd(double** yk, double* y0, double* J, double h) const {
+    double err_trunc, err_round, u=0;
     for (int i=0; i<n_y_; ++i) {
-      // Sum of all non-nan weights
-      double sum_weights=0, fd, sm, w, e, wi=0;
+      // Reset derivative estimate, sum of weights, error estimate
+      double sw=0, ui=0;
       J[i] = 0;
-      // Forward shifted central differences
-      // 7.10 in Conte & Carl de Boor: Elementary Numerical Analysis (1972)
-      // and 25.3.4 in Abramowitz and Stegun, Handbook of Mathematical Functions (1964)
-      sm = central_diff(y_f2[i], y_f1[i], y0[i], &e)/(h_*h_);
-      if (!isnan(sm)) {
-        sum_weights += w = 1./(sm*sm + eps_);
-        J[i] += w*(-3*y0[i] + 4*y_f1[i] - y_f2[i]);
-        wi += w*e;
+      // Stencil
+      double yb, yc, yf;
+      // For backward shifted, central and forward shifted
+      for (int k=0; k<3; ++k) {
+        // Derivative candidate, weight
+        double Jk, wk;
+        // Calculate shifted finite difference approximation
+        if (k==0) {
+          // Backward shifted
+          // 7.10 in Conte & Carl de Boor: Elementary Numerical Analysis (1972)
+          // and 25.3.4 in Abramowitz and Stegun, Handbook of Mathematical Functions (1964)
+          if (!isfinite((yc=yk[0][i]))) continue;
+          if (!isfinite((yb=yk[1][i]))) continue;
+          yf = y0[i];
+          Jk = 3*yf - 4*yc + yb;
+          wk = 1;
+        } else if (k==1) {
+          // Central
+          // We give this the "nominal weight" 4 since if all weights are equal,
+          // this would amount to a five point formula for the derivative
+          // (yb2 - 8*yb + 8*yf - y_f2)/(12*h)
+          // cf. 25.3.6 in Abramowitz and Stegun, Handbook of Mathematical Functions (1964)
+          if (!isfinite((yf=yk[2][i]))) continue;
+          if (!isfinite((yb=yc))) continue;
+          yc = y0[i];
+          Jk = yf-yb;
+          wk = 4;
+        } else {
+          // Forward shifted
+          if (!isfinite((yc=yf))) continue;
+          if (!isfinite((yf=yk[3][i]))) continue;
+          yb = y0[i];
+          Jk = -3*yb + 4*yc - yf;
+          wk = 1;
+        }
+        // Truncation error
+        double err_trunc = yf - 2*yc + yb;
+        // Roundoff error
+        double err_round = eps_in_/h*fmax(fabs(yf-yc), fabs(yc-yb)) + eps_out_;
+        // We use the second order derivative as a smoothness measure
+        double sm = err_trunc/(h*h);
+        // Modify the weight according to smoothness
+        wk /= sm*sm + eps_;
+        sw += wk;
+        // Added weighted contribution to weight and error
+        J[i] += wk * Jk;
+        ui += wk * fabs(err_trunc/err_round);
       }
-      // Central differences
-      // We give this the "nomimal weight" 4 since if all weights are equal,
-      // this would amount to a five point formula for the derivative
-      // (y_b2[i] - 8*y_b1[i] + 8*y_f1[i] - y_f2[i])/(12*h)
-      // cf. 25.3.6 in Abramowitz and Stegun, Handbook of Mathematical Functions (1964)
-      sm = central_diff(y_f1[i], y0[i], y_b1[i], &e)/(h_*h_);
-      if (!isnan(sm)) {
-        sum_weights += w = 4./(sm*sm + eps_);
-        J[i] += w*(y_f1[i]-y_b1[i]);
-        wi += w*e;
+      // If sw is 0, no stencil worked
+      if (sw==0) {
+        // Return NaN, ignore weight
+        J[i] = nan;
+      } else {
+        // Finalize estimate using the sum of weights and the step length
+        J[i] /= 2*h*sw;
+        u = fmax(u, ui/sw);
       }
-      // Backwards shifted central differences: Same as forward above
-      sm = central_diff(y0[i], y_b1[i], y_b2[i], &e)/(h_*h_);
-      if (!isnan(sm)) {
-        sum_weights += w = 1./(sm*sm + eps_);
-        J[i] += w*(3*y0[i] - 4*y_b1[i] + y_b2[i]);
-        wi += w*e;
-      }
-      // Finalize derivative approximation
-      J[i] /= sum_weights*2*h_;
-      if (err) *err = fmax(*err, wi/sum_weights);
     }
+
+    return u;
   }
 
   void Smoothing::calc_fd(CodeGenerator& g, const std::string& yk,
