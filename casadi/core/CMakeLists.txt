@@ -43,7 +43,6 @@ set(CASADI_PUBLIC
   function.hpp
   callback.hpp
   external.hpp
-  jit.hpp
   linsol.hpp
   rootfinder.hpp
   integrator.hpp
@@ -144,7 +143,6 @@ set(CASADI_INTERNAL
   sx_function.hpp         sx_function.cpp
   mx_function.hpp         mx_function.cpp
   external.cpp
-  jit.cpp
   linsol.cpp              linsol_internal.hpp  linsol_internal.cpp
   rootfinder_impl.hpp     rootfinder.cpp
   integrator_impl.hpp     integrator.cpp

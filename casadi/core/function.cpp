@@ -32,7 +32,6 @@
 #include "bspline.hpp"
 #include "nlpsol.hpp"
 #include "conic.hpp"
-#include "jit.hpp"
 
 #include <typeinfo>
 #include <fstream>

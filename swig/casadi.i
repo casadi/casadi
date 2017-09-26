@@ -3719,7 +3719,6 @@ namespace casadi{
 }
 #endif // SWIGMATLAB
 %include <casadi/core/external.hpp>
-%include <casadi/core/jit.hpp>
 %include <casadi/core/integrator.hpp>
 %include <casadi/core/conic.hpp>
 %include <casadi/core/nlpsol.hpp>

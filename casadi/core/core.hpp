@@ -53,7 +53,6 @@
 #include "dple.hpp"
 #include "expm.hpp"
 #include "interpolant.hpp"
-#include "jit.hpp"
 #include "external.hpp"
 
 // Misc
