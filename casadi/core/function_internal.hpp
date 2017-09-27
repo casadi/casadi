@@ -486,6 +486,16 @@ namespace casadi {
       return -inf;
     }
 
+    /** \brief Get relative tolerance */
+    virtual double get_reltol() const {
+      return eps;
+    }
+
+    /** \brief Get absolute tolerance */
+    virtual double get_abstol() const {
+      return eps;
+    }
+
     /** \brief Get sparsity of a given input */
     virtual Sparsity get_sparsity_in(int i);
 

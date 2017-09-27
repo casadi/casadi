@@ -52,10 +52,10 @@ namespace casadi {
         "Smoothing regularization [default: machine precision]"}},
       {"reltol",
        {OT_DOUBLE,
-        "Accuracy of function inputs [default: machine precision]"}},
+        "Accuracy of function inputs [default: query object]"}},
       {"abstol",
         {OT_DOUBLE,
-        "Accuracy of function outputs [default: machine precision]"}},
+        "Accuracy of function outputs [default: query object]"}},
       {"u_aim",
         {OT_DOUBLE,
         "Target ratio of roundoff error to truncation error [default: 100.]"}},
@@ -74,7 +74,9 @@ namespace casadi {
     h2_ = 1e-3;
     h_min_ = 0;
     h_max_ = inf;
-    smoothing_ = reltol_ = abstol_ = numeric_limits<double>::epsilon();
+    smoothing_ = eps;
+    reltol_ = derivative_of_->get_reltol();
+    abstol_ = derivative_of_->get_abstol();
     u_aim_ = 100;
     h_iter_ = has_err() ? 1 : 0;
 
