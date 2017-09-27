@@ -165,7 +165,7 @@ set(CASADI_INTERNAL
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
   variable.cpp
   dae_builder.cpp
-  optistack.cpp
+  optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp

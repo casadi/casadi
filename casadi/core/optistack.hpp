@@ -32,98 +32,67 @@ namespace casadi {
 
 typedef DM native_DM;
 
-class OptiCallback {
-public:
-  OptiCallback() {
-  }
-  OptiCallback(const OptiCallback& obj) {
-    casadi_error("Callback objects cannot be copied");
-  }
-  virtual void call(int i) {
-    userOut() << "This is a simple callback at iteration" << i << std::endl;
-  }
-  virtual ~OptiCallback() {}
-};
-
-#ifndef SWIG
-/// Pointer that gets set to null when copied
-template<class T>
-class null_ptr_on_copy {
-public:
-  null_ptr_on_copy<T>() : ptr_(0) {}
-  null_ptr_on_copy<T>(const null_ptr_on_copy<T>& rhs) : ptr_(0) {}
-  void operator=(T* ptr) { ptr_ = ptr; }
-  T* operator->() { return ptr_; }
-  operator bool() const { return ptr_; }
-private:
-  T* ptr_;
-};
-#endif
-
+class OptiNode;
 class OptiSol;
-class OptiDebug;
+class OptiAdvanced;
+class OptiCallback;
 /** \brief A simplified interface for NLP modeling/solving
 
-      This is the low-level base class.
-      Direct usage of this class is not recommended unless for debugging.
-      There are no guaranties API stability
+      This class offers a view with model description facilities
+      The API is guaranteed to be stable.
 
+
+      Example NLP:
+      \verbatim
+      opti = casadi.Opti();
+
+      x = opti.variable();
+      y = opti.variable();
+
+      opti.minimize(  (y-x^2)^2   );
+      opti.subject_to( x^2+y^2==1 );
+      opti.subject_to(     x+y>=1 );
+
+      opti.solver('ipopt');
+      sol = opti.solve();
+
+      sol.value(x)
+      sol.value(y)
+      \endverbatim
+
+      Example parametric NLP:
+      \verbatim
+      opti = casadi.Opti();
+
+      x = opti.variable(2,1);
+      p = opti.parameter();
+
+      opti.minimize(  (p*x(2)-x(1)^2)^2   );
+      opti.subject_to( 1<=sum(x)<=2 );
+
+      opti.solver('ipopt');
+
+      opti.set_value(p, 3);
+      sol = opti.solve();
+      sol.value(x)
+
+      opti.set_value(p, 5);
+      sol = opti.solve();
+      sol.value(x)
+      \endverbatim
 
       \date 2017
-      \author Joris Gillis, Erik Lambrechts
+      \author Joris Gillis, Erik Lambrechts, Joel Andersson
 */
-class CASADI_EXPORT OptiStack
-  : public SWIG_IF_ELSE(PrintableCommon, Printable<OptiStack>) {
+class CASADI_EXPORT Opti
+  : public SWIG_IF_ELSE(PrintableCommon, Printable<Opti>),
+  public SharedObject {
   friend class InternalOptiCallback;
 public:
-  enum ConstraintType {
-    OPTI_GENERIC_EQUALITY,  // g1(x,p) == g2(x,p)
-    OPTI_GENERIC_INEQUALITY,  // g1(x,p) <= g2(x,p)
-    OPTI_EQUALITY, // g(x,p) == bound(p)
-    OPTI_INEQUALITY,  // g(x,p) <= bound(p)
-    OPTI_DOUBLE_INEQUALITY,  // lb(p) <= g(x,p) <= ub(p)
-    OPTI_PSD, // A(x,p) >= b(p)
-    OPTI_UNKNOWN};
-  enum VariableType {
-    OPTI_VAR, // variable
-    OPTI_PAR,  // parameter
-    OPTI_DUAL_G // dual
-  };
-
-  struct IndexAbstraction {
-    IndexAbstraction() : start(0), stop(0) {}
-    int start;
-    int stop;
-  };
-  struct MetaCon : IndexAbstraction {
-    MetaCon() :  n(1), flipped(false) {}
-    MX original;  // original expression
-    MX canon; // Canonical expression
-    ConstraintType type;
-    MX lb;
-    MX ub;
-    int n;
-    bool flipped;
-    MX dual_canon;
-    MX dual;
-    Dict extra;
-  };
-  struct MetaVar : IndexAbstraction {
-    std::string attribute;
-    int n;
-    int m;
-    VariableType type;
-    int count;
-    int i;
-    Dict extra;
-  };
 
   /** \brief Create Opti Context
   */
-  OptiStack();
-
-  /** \brief Destructor */
-  ~OptiStack();
+  Opti();
 
   /** \brief Create a decision variable (symbol)
   *
@@ -148,11 +117,6 @@ public:
   * \param[in] attribute: 'full' (default) or 'symmetric'
   */
   MX parameter(int n=1, int m=1, const std::string& attribute="full");
-
-  /** \brief internal variants of parameter/variable. Do not use yourself
-  */
-  MX variable(const Dict& meta_data, int n=1, int m=1, const std::string& attribute="full");
-  MX parameter(const Dict& meta_data, int n=1, int m=1, const std::string& attribute="full");
 
   /** \brief Set objective
   *
@@ -183,8 +147,6 @@ public:
   */
   void subject_to(const MX& g);
   void subject_to(const std::vector<MX>& g);
-  void subject_to(const Dict& meta_data, const MX& g);
-  void subject_to(const Dict& meta_data, const std::vector<MX>& g);
   /// @}
 
   /// Clear constraints
@@ -236,14 +198,9 @@ public:
   *            to overrule the current value
   */
   native_DM value(const MX& x, const std::vector<MX>& values=std::vector<MX>()) const;
-  native_DM value(const DM& x, const std::vector<MX>& values=std::vector<MX>()) const { return x; }
-  native_DM value(const SX& x, const std::vector<MX>& values=std::vector<MX>()) const {
-    return DM::nan(x.sparsity());
-  }
+  native_DM value(const DM& x, const std::vector<MX>& values=std::vector<MX>()) const;
+  native_DM value(const SX& x, const std::vector<MX>& values=std::vector<MX>()) const;
   /// @}
-
-  /// Copy
-  OptiStack copy() const { return *this; }
 
   /** \brief Get statistics
   *
@@ -258,9 +215,6 @@ public:
   */
   std::string return_status() const;
 
-  /// Get the underlying CasADi solver of the Opti stack
-  Function casadi_solver() const;
-
   /// get assignment expressions for initial values
   std::vector<MX> initial() const;
 
@@ -268,8 +222,197 @@ public:
   std::vector<MX> value_variables() const;
   std::vector<MX> value_parameters() const;
 
+  /** \brief get the dual variable
+  *
+  * m must be a constraint expression.
+  * The returned value is still a symbolic expression.
+  * Use `value` on it to obtain the numerical value.
+  */
+  MX dual(const MX& m) const;
+
+  /// Number of (scalarised) decision variables
+  int nx() const;
+
+  /// Number of (scalarised) parameters
+  int np() const;
+
+  /// Number of (scalarised) constraints
+  int ng() const;
+
+  /// Get all (scalarised) decision variables as a symbolic column vector
+  MX x() const;
+
+  /// Get all (scalarised) parameters as a symbolic column vector
+  MX p() const;
+
+  /// Get all (scalarised) constraint expressions as a column vector
+  MX g() const;
+
+  /// Get objective expression
+  MX f() const;
+
+  /** \brief Get all (scalarised) dual variables as a symbolic column vector
+  *
+  * Useful for obtaining the Lagrange Hessian:
+  * \verbatim
+  * sol.value(hessian(opti.f+opti.lam_g'*opti.g,opti.x)) % MATLAB
+  * sol.value(hessian(opti.f+dot(opti.lam_g,opti.g),opti.x)[0]) # Python
+  * \endverbatim
+  */
+  MX lam_g() const;
+
+  #ifndef SWIGMATLAB
+  /** \brief Construct a double inequality
+  *
+  * Constructs:  lb(p) <= g(x,p) <= ub(p)
+  *
+  * Python prohibits such syntax directly
+  */
+  static MX bounded(const MX& lb, const MX& expr, const MX& ub) { return (lb<=expr)<= ub; }
+  #endif
+
+  /** \brief Get a copy with advanced functionality
+   * 
+   * You get access to more methods, but you have no guarantees about API stability
+   * 
+   * The copy is effectively a deep copy:
+   * Updating the state of the copy does not update the original.
+   * */
+  OptiAdvanced debug() const;
+
+  /** \brief Get a copy with advanced functionality
+   * 
+   * You get access to more methods, but you have no guarantees about API stability
+   * 
+   * The copy is effectively a deep copy:
+   * Updating the state of the copy does not update the original.
+   * */
+  OptiAdvanced advanced() const;
+
+  /** \brief Get a copy of the
+   * 
+   * The copy is effectively a deep copy:
+   * Updating the state of the copy does not update the original.
+   * */
+  Opti copy() const;
+
+  /** \brief add user data
+  * Add arbitrary data in the form of a dictionary to symbols
+  * or constraints
+  */
+  void update_user_dict(const MX& m, const Dict& meta);
+  void update_user_dict(const std::vector<MX>& m, const Dict& meta);
+  /// Get user data
+  Dict user_dict(const MX& m) const;
+
+  /// Readable name of the class
+  std::string type_name() const { return "Opti"; }
+
+  ///  Print representation
+  void disp(std::ostream& stream, bool more=false) const;
+
+  /// Get string representation
+  std::string get_str(bool more=false) const;
+
+  ///@{
+  /** \brief Helper methods for callback()
+   * 
+   * Do not use directly.
+   */
   void callback_class(OptiCallback* callback);
   void callback_class();
+  ///@}
+
+#ifndef SWIG
+  Opti(const Opti& x);
+
+  /** \brief Destructor */
+  ~Opti() {}
+
+  static Opti create(OptiNode* node);
+  /// \cond INTERNAL
+  ///@{
+  /** \brief  Access a member of the node */
+  OptiNode* operator->();
+
+  /** \brief  Const access a member of the node */
+  const OptiNode* operator->() const;
+  ///@}
+  /// \endcond
+
+  Opti(OptiNode* node);
+#endif // SWIG
+
+};
+
+  enum ConstraintType {
+    OPTI_GENERIC_EQUALITY,  // g1(x,p) == g2(x,p)
+    OPTI_GENERIC_INEQUALITY,  // g1(x,p) <= g2(x,p)
+    OPTI_EQUALITY, // g(x,p) == bound(p)
+    OPTI_INEQUALITY,  // g(x,p) <= bound(p)
+    OPTI_DOUBLE_INEQUALITY,  // lb(p) <= g(x,p) <= ub(p)
+    OPTI_PSD, // A(x,p) >= b(p)
+    OPTI_UNKNOWN};
+  enum VariableType {
+    OPTI_VAR, // variable
+    OPTI_PAR,  // parameter
+    OPTI_DUAL_G // dual
+  };
+
+  struct IndexAbstraction {
+    IndexAbstraction() : start(0), stop(0) {}
+    int start;
+    int stop;
+  };
+  struct MetaCon : IndexAbstraction {
+    MetaCon() :  n(1), flipped(false) {}
+    MX original;  // original expression
+    MX canon; // Canonical expression
+    ConstraintType type;
+    MX lb;
+    MX ub;
+    int n;
+    bool flipped;
+    MX dual_canon;
+    MX dual;
+    Dict extra;
+  };
+  struct MetaVar : IndexAbstraction {
+    std::string attribute;
+    int n;
+    int m;
+    VariableType type;
+    int count;
+    int i;
+    Dict extra;
+  };
+
+
+class OptiCallback {
+public:
+  OptiCallback() {
+  }
+  OptiCallback(const OptiCallback& obj) {
+    casadi_error("Callback objects cannot be copied");
+  }
+  virtual void call(int i) {
+    userOut() << "This is a simple callback at iteration" << i << std::endl;
+  }
+  virtual ~OptiCallback() {}
+};
+
+class CASADI_EXPORT OptiAdvanced : public Opti {
+  friend class InternalOptiCallback;
+public:
+
+  OptiAdvanced(const Opti& x);
+
+  /** \brief Destructor */
+  ~OptiAdvanced() {}
+
+
+  /// Get the underlying CasADi solver of the Opti stack
+  Function casadi_solver() const;
 
   /// return true if expression is only dependant on Opti parameters, not variables
   bool is_parametric(const MX& expr) const;
@@ -286,7 +429,7 @@ public:
   /// @}
 
   /// Interpret an expression (for internal use only)
-  OptiStack::MetaCon canon_expr(const MX& expr) const;
+  MetaCon canon_expr(const MX& expr) const;
 
   /// Get meta-data of symbol (for internal use only)
   MetaVar get_meta(const MX& m) const;
@@ -300,18 +443,10 @@ public:
   /// Set meta-data of an expression
   void set_meta_con(const MX& m, const MetaCon& meta);
 
-  /** \brief get the dual variable
-  *
-  * m must be a constraint expression.
-  * The returned value is still a symbolic expression.
-  * Use `value` on it to obtain the numerical value.
-  */
-  MX dual(const MX& m) const;
-
   void assert_active_symbol(const MX& m) const;
 
-  std::vector<MX> active_symvar(OptiStack::VariableType type) const;
-  std::vector<DM> active_values(OptiStack::VariableType type) const;
+  std::vector<MX> active_symvar(VariableType type) const;
+  std::vector<DM> active_values(VariableType type) const;
 
   MX x_lookup(int i) const;
   MX g_lookup(int i) const;
@@ -323,303 +458,35 @@ public:
   void solve_prepare();
   DMDict solve_actual(const DMDict& args);
 
-  DMDict arg() const { return arg_; }
+  DMDict arg() const;
   void res(const DMDict& res);
-  std::vector<MX> constraints() const { return g_; }
-  MX objective() const { return f_; }
+  std::vector<MX> constraints() const;
+  MX objective() const;
 
-  OptiStack baked() const {
-    OptiStack s = copy();
-    if (s.problem_dirty()) s.internal_bake();
-    return s;
-  }
+  OptiAdvanced baked_copy() const;
 
-  OptiStack& baked() {
-    return *this;
-  }
-
-  /// Number of (scalarised) decision variables
-  int nx() const {
-    return baked().nlp_.at("x").size1();
-  }
-
-  /// Number of (scalarised) parameters
-  int np() const {
-    return baked().nlp_.at("p").size1();
-  }
-
-  /// Number of (scalarised) constraints
-  int ng() const {
-    return baked().nlp_.at("g").size1();
-  }
-
-  /// Get all (scalarised) decision variables as a symbolic column vector
-  MX x() const {
-    return baked().nlp_.at("x");
-  }
-
-  /// Get all (scalarised) parameters as a symbolic column vector
-  MX p() const {
-    return baked().nlp_.at("p");
-  }
-
-  /// Get all (scalarised) constraint expressions as a column vector
-  MX g() const {
-    return baked().nlp_.at("g");
-  }
-
-  /// Get objective expression
-  MX f() const {
-    return baked().nlp_.at("f");
-  }
-
-  /** \brief Get all (scalarised) dual variables as a symbolic column vector
-  *
-  * Useful for obtaining the Lagrange Hessian:
-  * \verbatim
-  * sol.value(hessian(opti.f+opti.lam_g'*opti.g,opti.x)) % MATLAB
-  * sol.value(hessian(opti.f+dot(opti.lam_g,opti.g),opti.x)[0]) # Python
-  * \endverbatim
-  */
-  MX lam_g() const {
-    return baked().lam_;
-  }
   void assert_empty() const;
 
-  /// Readable name of the class
-  std::string type_name() const {return "OptiStack";}
-
-  ///  Print representation
-  void disp(std::ostream& stream, bool more=false) const;
-
-  /// Get string representation
-  std::string get_str(bool more=false) const {
-    std::stringstream ss;
-    disp(ss, more);
-    return ss.str();
-  }
 
   /// Fix the structure of the optimization problem
-  void internal_bake();
-private:
-
-  static std::map<VariableType, std::string> VariableType2String_;
-  std::string variable_type_to_string(VariableType vt) const;
-
-  bool parse_opti_name(const std::string&name, VariableType& vt) const;
-  void register_dual(MetaCon& meta);
-
-  /// Set value of symbol
-  void set_value_internal(const MX& x, const DM& v, std::vector<DM>& store);
-
-  /** \brief decompose a chain of inequalities
-  *
-  * a<=b -> [a,b]
-  * a<=b<=c [a,b,c]
-  *
-  * When flipped is set, [a,b,c] corresponds to c>=b>=a
-  */
-  static std::vector<MX> ineq_unchain(const MX& a, bool& SWIG_OUTPUT(flipped));
-
-  /// Get meta-dat by const-ref
-  const MetaVar& meta(const MX& m) const;
-  /// Get meta-dat by ref
-  MetaVar& meta(const MX& m);
-
-  /// Get meta-dat by const-ref
-  const MetaCon& meta_con(const MX& m) const;
-  /// Get meta-dat by ref
-  MetaCon& meta_con(const MX& m);
-
-  /// Sort symbols according to Opti order
-  std::vector<MX> sort(const std::vector<MX>& v) const;
-
-  /// Throw an error
-  void assert_has(const MX& m) const;
-
-  bool has(const MX& m) const;
-
-  /// Throw an error
-  void assert_has_con(const MX& m) const;
-
-  bool has_con(const MX& m) const;
-
-  // Data members
-
-  /// Map symbols to metadata
-  std::map<MXNode*, MetaVar> meta_;
-  /// map constraints to metadata
-  std::map<MXNode*, MetaCon> meta_con_;
-
-  /// Store references to all symbols
-  std::vector<MX> symbols_;
-
-  /// Symbol counter
-  int count_;
-
-  int count_var_;
-  int count_par_;
-  int count_dual_;
-
-  /// Storing latest values for all parameters (including inactive)
-  std::vector<DM> values_;
-  /// Storing initial values for all variables (including inactive)
-  std::vector<DM> initial_;
-  /// Storing latest values for all variables (including inactive)
-  std::vector<DM> latest_;
-
-  /// Storing initial values for all duals (including inactive)
-  std::vector<DM> initial_duals_;
-  /// Storing latest values for all duals (including inactive)
-  std::vector<DM> latest_duals_;
-
-  /// Is symbol present in problem?
-  std::vector<bool> symbol_active_;
-
-  /// Solver
-  Function solver_;
-
-  /// Result of solver
-  DMDict res_;
-  DMDict arg_;
-  MXDict nlp_;
-  MX lam_;
-
-  /// Bounds helper function: p -> lbg, ubg
-  Function bounds_;
-
-  /// Constraints verbatim as passed in with 'subject_to'
-  std::vector<MX> g_;
-
-  /// Objective verbatim as passed in with 'minimize'
-  MX f_;
-
-  null_ptr_on_copy<OptiCallback> user_callback_;
-  Function callback_;
-
-  bool old_callback() const;
-
-  std::string solver_name_;
-  Dict solver_options_;
-
-  void assert_only_opti_symbols(const MX& e) const;
-  void assert_only_opti_nondual(const MX& e) const;
-
-
-  static int instance_count_;
-  int instance_number_;
-
-  std::string name_prefix() const;
-
-  static std::string format_stacktrace(const Dict& stacktrace, int indent);
-public:
-
-
+  void bake();
 
   bool problem_dirty_;
-  void mark_problem_dirty(bool flag=true) { problem_dirty_=flag; mark_solver_dirty(); }
-  bool problem_dirty() const { return problem_dirty_; }
+  void mark_problem_dirty(bool flag=true);
+  bool problem_dirty() const;
 
   bool solver_dirty_;
-  void mark_solver_dirty(bool flag=true) { solver_dirty_=flag; mark_solved(false); }
-  bool solver_dirty() const { return solver_dirty_; }
+  void mark_solver_dirty(bool flag=true);
+  bool solver_dirty() const;
 
   bool solved_;
-  void mark_solved(bool flag=true) { solved_ = flag;}
-  bool solved() const { return solved_; }
+  void mark_solved(bool flag=true);
+  bool solved() const;
 
   void assert_solved() const;
   void assert_baked() const;
-};
 
-/** \brief A simplified interface for NLP modeling/solving
-
-      This class offers a view with model description facilities
-      The API is guaranteed to be stable.
-
-
-      Example NLP:
-      \verbatim
-      opti = casadi.Opti();
-
-      x = opti.variable();
-      y = opti.variable();
-
-      opti.minimize(  (y-x^2)^2   );
-      opti.subject_to( x^2+y^2==1 );
-      opti.subject_to(     x+y>=1 );
-
-      opti.solver('ipopt');
-      sol = opti.solve();
-
-      sol.value(x)
-      sol.value(y)
-      \endverbatim
-
-      Example parametric NLP:
-      \verbatim
-      opti = casadi.Opti();
-
-      x = opti.variable(2,1);
-      p = opti.parameter();
-
-      opti.minimize(  (p*x(2)-x(1)^2)^2   );
-      opti.subject_to( 1<=sum(x)<=2 );
-
-      opti.solver('ipopt');
-
-      opti.set_value(p, 3);
-      sol = opti.solve();
-      sol.value(x)
-
-      opti.set_value(p, 5);
-      sol = opti.solve();
-      sol.value(x)
-      \endverbatim
-
-      \date 2017
-      \author Joris Gillis, Erik Lambrechts
-*/
-class CASADI_EXPORT Opti : private OptiStack {
-  public:
-    /// Readable name of the class
-    std::string type_name() const {return "Opti";}
-    using OptiStack::get_str;
-    using OptiStack::disp;
-    using OptiStack::variable;
-    using OptiStack::parameter;
-    using OptiStack::minimize;
-    using OptiStack::subject_to;
-    using OptiStack::solver;
-    using OptiStack::solve;
-    OptiStack debug() { return *this; }
-    Opti copy() { return *this; }
-    using OptiStack::set_initial;
-    using OptiStack::set_value;
-    using OptiStack::initial;
-    using OptiStack::constraints;
-    using OptiStack::objective;
-    using OptiStack::callback_class;
-    using OptiStack::dual;
-
-    using OptiStack::nx;
-    using OptiStack::ng;
-    using OptiStack::np;
-    using OptiStack::x;
-    using OptiStack::p;
-    using OptiStack::f;
-    using OptiStack::g;
-    using OptiStack::lam_g;
-
-    #ifndef SWIGMATLAB
-    /** \brief Construct a double inequality
-    *
-    * Constructs:  lb(p) <= g(x,p) <= ub(p)
-    *
-    * Python prohibits such syntax directly
-    */
-    static MX bounded(const MX& lb, const MX& expr, const MX& ub) { return (lb<=expr)<= ub; }
-    #endif
+  int instance_number() const;
 
 };
 
@@ -632,24 +499,44 @@ class CASADI_EXPORT Opti : private OptiStack {
       \date 2017
       \author Joris Gillis, Erik Lambrechts
 */
-class CASADI_EXPORT OptiSol : private OptiStack {
+class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<OptiAdvanced>) {
+  friend class OptiNode;
   public:
-    /// Readable name of the class
     std::string type_name() const {return "OptiSol";}
-    OptiSol(const OptiStack& opti) : OptiStack(opti) {}
-    using OptiStack::get_str;
-    using OptiStack::disp;
-    using OptiStack::value;
-    using OptiStack::value_variables;
-    using OptiStack::value_parameters;
-    using OptiStack::stats;
-    OptiStack debug() { return *this; }
-    Opti opti() { return *reinterpret_cast<Opti*>(this); }
+    void disp(std::ostream& stream, bool more=false) const;
+    std::string get_str(bool more=false) const;
+    /// @{
+    /** Obtain value of expression at the current value
+    *
+    * In regular mode, teh current value is the converged solution
+    * In debug mode, the value can be non-converged
+    *
+    * \param[in] values Optional assignment expressions (e.g. x==3)
+    *            to overrule the current value
+    */
+    native_DM value(const MX& x, const std::vector<MX>& values=std::vector<MX>()) const;
+    native_DM value(const DM& x, const std::vector<MX>& values=std::vector<MX>()) const;
+    native_DM value(const SX& x, const std::vector<MX>& values=std::vector<MX>()) const;
+    /// @}
+
+    /// get assignment expressions for the optimal solution
+    std::vector<MX> value_variables() const;
+    std::vector<MX> value_parameters() const;
+
+    /** \brief Get statistics
+    *
+    * nlpsol stats are passed as-is.
+    * No stability can be guaranteed about this part of the API
+    */
+    Dict stats() const;
+
+    OptiAdvanced debug() { return optistack_.debug(); }
+    Opti opti() { return optistack_; }
+  private:
+    OptiSol(const Opti& opti);
+    OptiAdvanced optistack_;
 };
 
-//check if we can make splines work
-// value_parameters -> parameters
-// inline doxygen
 
 } // namespace casadi
 

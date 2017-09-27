@@ -1001,7 +1001,7 @@ namespace std {
       // Cell arrays (only row vectors)
       if (mxGetClassID(p)==mxCELL_CLASS) {
         int nrow = mxGetM(p), ncol = mxGetN(p);
-        if (nrow==1 || (nrow==0 && ncol==0)) {
+        if (nrow==1 || (nrow==0 && ncol==0) || ncol==1) {
           // Allocate elements
           if (m) {
             (**m).clear();
@@ -3881,9 +3881,6 @@ namespace casadi {
 %include <casadi/core/dae_builder.hpp>
 %include <casadi/core/xml_file.hpp>
 
-%feature("flatnested") casadi::OptiStack::MetaCon;
-%feature("flatnested") casadi::OptiStack::MetaVar;
-%feature("flatnested") casadi::OptiStack::IndexAbstraction;
 %feature("director") casadi::OptiCallback;
 
 // Return-by-value
@@ -3923,7 +3920,6 @@ make_property(casadi::OptiSol, opti);
 
 %define make_property_opti(name)
   make_property(casadi::Opti, name);
-  make_property(casadi::OptiStack, name);
 %enddef
 
 make_property(casadi::OptiSol, debug);
@@ -3936,8 +3932,8 @@ make_property_opti(nx)
 make_property_opti(np)
 make_property_opti(ng)
 
-make_property(casadi::OptiStack, casadi_solver);
-%define optistack_metadata_modifiers(class)
+make_property(casadi::Opti, casadi_solver);
+%define opti_metadata_modifiers(class)
   %rename(_variable) class ## :: variable;
   %rename(_parameter) class ## :: parameter;
   %rename(_subject_to) class ## :: subject_to;
@@ -3948,14 +3944,18 @@ make_property(casadi::OptiStack, casadi_solver);
         import os
         frame = sys._getframe(1)
         meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
-        return self._parameter(meta,*args)
+        ret = self._parameter(*args)
+        self.update_user_dict(ret, meta)
+        return ret
 
       def variable(self,*args):
         import sys
         import os
         frame = sys._getframe(1)
         meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
-        return self._variable(meta,*args)
+        ret = self._variable(*args)
+        self.update_user_dict(ret, meta)
+        return ret
 
       def subject_to(self,*args):
         if len(args)==0:
@@ -3964,18 +3964,20 @@ make_property(casadi::OptiStack, casadi_solver);
         import os
         frame = sys._getframe(1)
         meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
-        return self._subject_to(meta,*args)
+        ret = self._subject_to(*args)
+        self.update_user_dict(args, meta)
+        return ret
     %}
   }
 %enddef
 
-optistack_metadata_modifiers(casadi::Opti);
-optistack_metadata_modifiers(casadi::OptiStack);
+opti_metadata_modifiers(casadi::Opti);
+
 #endif
 
 
 #ifdef SWIGMATLAB
-%define optistack_metadata_modifiers(class)
+%define opti_metadata_modifiers(class)
   %rename(internal_variable) class ## ::variable;
   %rename(internal_parameter) class ## ::parameter;
   %rename(internal_subject_to) class ## ::subject_to;
@@ -3988,7 +3990,8 @@ optistack_metadata_modifiers(casadi::OptiStack);
         else
           meta = struct;
         end
-        out = self.internal_variable(meta,varargin{:});
+        out = self.internal_variable(varargin{:});
+        self.update_user_dict(out, meta);
       end
       function out = parameter(self, varargin)
         st = dbstack('-completenames',1);
@@ -3997,7 +4000,8 @@ optistack_metadata_modifiers(casadi::OptiStack);
         else
           meta = struct;
         end
-        out = self.internal_parameter(meta,varargin{:});
+        out = self.internal_parameter(varargin{:});
+        self.update_user_dict(out, meta);
       end
       function [] = subject_to(self, varargin)
         if length(varargin)==0
@@ -4010,60 +4014,16 @@ optistack_metadata_modifiers(casadi::OptiStack);
         else
           meta = struct;
         end
-        self.internal_subject_to(meta,varargin{:});
+        self.internal_subject_to(varargin{:});
+        self.update_user_dict(varargin{1}, meta);
       end
     %}
   }
 %enddef
 
-optistack_metadata_modifiers(casadi::Opti)
-optistack_metadata_modifiers(casadi::OptiStack)
+opti_metadata_modifiers(casadi::Opti)
 #endif
 %include <casadi/core/optistack.hpp>
-
-// HACK! Opti is hiding Printable
-namespace casadi{
-%extend Opti {
-#ifdef SWIGPYTHON
-  %pythoncode %{
-    def __str__(self): return self.str()
-    def repr(self): return self.type_name() + '(' + self.str() + ')'
-  %}
-#endif // SWIGPYTHON
-#ifdef SWIGMATLAB
-  %matlabcode %{
-    function s = repr(self)
-      s = [s.type_name() '(' self.str() ')'];
-    end
-  %}
-#endif // SWIGMATLAB
-}
-} // namespace casadi
-
-// HACK! OptiSol is hiding Printable
-namespace casadi{
-%extend OptiSol {
-#ifdef SWIGPYTHON
-  %pythoncode %{
-    def __str__(self): return self.str()
-    def repr(self): return self.type_name() + '(' + self.str() + ')'
-  %}
-#endif // SWIGPYTHON
-#ifdef SWIGMATLAB
-  %matlabcode %{
-    function s = repr(self)
-      s = [s.type_name() '(' self.str() ')'];
-    end
-  %}
-#endif // SWIGMATLAB
-}
-} // namespace casadi
-
-
-
-
-
-
 
 
 #ifdef SWIGPYTHON
