@@ -43,6 +43,8 @@ int main(){
   // ----------------------
   // An optimal control problem (OCP),
   // solved with direct multiple-shooting.
+  //
+  // For more information see: http://labs.casadi.org/OCP
 
   int N = 100; // number of control intervals
 

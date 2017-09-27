@@ -2,6 +2,8 @@
 % ----------------------
 % An optimal control problem (OCP),
 % solved with direct multiple-shooting.
+%
+% For more information see: http://labs.casadi.org/OCP
 
 N = 100; % number of control intervals
 
