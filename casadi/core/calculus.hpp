@@ -54,7 +54,7 @@ namespace casadi {
   const double nan = std::numeric_limits<double>::quiet_NaN();
 
   /// Machine epsilon
-  const double eps = numeric_limits<double>::epsilon();
+  const double eps = std::numeric_limits<double>::epsilon();
 #endif // SWIG
 
   /// Enum for quick access to any node

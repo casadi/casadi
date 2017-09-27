@@ -217,13 +217,9 @@ namespace casadi {
       {"fd_options",
        {OT_DICT,
         "Options to be passed to the finite difference instance"}},
-      {"fd_step",
-       {OT_DOUBLE,
-        "Finite difference perturbation size [default: 1e-8]"}},
       {"fd_method",
        {OT_STRING,
         "Method for finite differencing [default 'central']"}}
-
      }
   };
 
@@ -275,8 +271,6 @@ namespace casadi {
         enable_fd_ = op.second;
       } else if (op.first=="fd_options") {
         fd_options_ = op.second;
-      } else if (op.first=="fd_step") {
-        fd_step_ = op.second;
       } else if (op.first=="fd_method") {
         fd_method_ = op.second.to_string();
       }
@@ -1395,13 +1389,13 @@ namespace casadi {
     } else {
       // Get FD method
       if (fd_method_.empty() || fd_method_=="central") {
-        ret = Function::create(new CentralDiff(name, nfwd, fd_step_), opts);
+        ret = Function::create(new CentralDiff(name, nfwd), opts);
       } else if (fd_method_=="forward") {
-        ret = Function::create(new ForwardDiff(name, nfwd, fd_step_), opts);
+        ret = Function::create(new ForwardDiff(name, nfwd), opts);
       } else if (fd_method_=="backward") {
-        ret = Function::create(new ForwardDiff(name, nfwd, -fd_step_), opts);
+        ret = Function::create(new BackwardDiff(name, nfwd), opts);
       } else if (fd_method_=="smoothing") {
-        ret = Function::create(new Smoothing(name, nfwd, fd_step_), opts);
+        ret = Function::create(new Smoothing(name, nfwd), opts);
       } else {
         casadi_error("Unknown 'fd_method': " + fd_method_);
       }

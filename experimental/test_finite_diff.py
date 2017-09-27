@@ -71,7 +71,6 @@ for a in a_test:
             opts["enable_reverse"]=False # disable reverse mode AD
             opts["enable_jacobian"]=False # disable AD by calculating full Jacobian
             opts["fd_method"]=fd_method # specify FD scheme
-            opts["fd_step"] = 1e-6
             if fd_method in ['central','smoothing']: opts["fd_options"] = dict(h_iter=h_iter)
         f = Function('f', [x], [r], ['x'], ['r'], opts)
         fwd_f = f.forward(1)

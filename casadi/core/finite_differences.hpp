@@ -39,7 +39,7 @@ namespace casadi {
   class CASADI_EXPORT FiniteDiff : public FunctionInternal {
   public:
     // Constructor (protected, use create function)
-    FiniteDiff(const std::string& name, int n, double h);
+    FiniteDiff(const std::string& name, int n);
 
     /** \brief Destructor */
     ~FiniteDiff() override;
@@ -109,6 +109,9 @@ namespace casadi {
     // Is an error estimate available?
     virtual int has_err() const = 0;
 
+    // Calculate step size from absolute tolerance
+    virtual double calc_stepsize(double abstol) const = 0;
+
     // Number of directional derivatives
     int n_;
 
@@ -116,7 +119,7 @@ namespace casadi {
     int h_iter_;
 
     // Perturbation
-    double h_, h2_;
+    double h_;
 
     // Dimensions
     int n_z_, n_y_;
@@ -146,7 +149,7 @@ namespace casadi {
   class CASADI_EXPORT ForwardDiff : public FiniteDiff {
   public:
     // Constructor
-    ForwardDiff(const std::string& name, int n, double h) : FiniteDiff(name, n, h) {}
+    ForwardDiff(const std::string& name, int n) : FiniteDiff(name, n) {}
 
     /** \brief Destructor */
     ~ForwardDiff() override {}
@@ -177,6 +180,9 @@ namespace casadi {
     // Is an error estimate available?
     int has_err() const override {return false;}
 
+    // Calculate step size from absolute tolerance
+    double calc_stepsize(double abstol) const override { return sqrt(abstol);}
+
     ///@{
     /** \brief Second order derivatives */
     bool has_forward(int nfwd) const override { return true;}
@@ -187,6 +193,27 @@ namespace casadi {
     ///@}
   };
 
+  /** Calculate derivative using backward differences
+    * \author Joel Andersson
+    * \date 2017
+  */
+  class CASADI_EXPORT BackwardDiff : public ForwardDiff {
+  public:
+    // Constructor
+    BackwardDiff(const std::string& name, int n) : ForwardDiff(name, n) {}
+
+    /** \brief Destructor */
+    ~BackwardDiff() override {}
+
+    /** \brief Get type name */
+    std::string class_name() const override {return "BackwardDiff";}
+
+    // Calculate step size from absolute tolerance
+    double calc_stepsize(double abstol) const override {
+      return -ForwardDiff::calc_stepsize(abstol);
+    }
+  };
+
   /** Calculate derivative using central differences
     * \author Joel Andersson
     * \date 2017
@@ -194,7 +221,7 @@ namespace casadi {
   class CASADI_EXPORT CentralDiff : public FiniteDiff {
   public:
     // Constructor
-    CentralDiff(const std::string& name, int n, double h) : FiniteDiff(name, n, h) {}
+    CentralDiff(const std::string& name, int n) : FiniteDiff(name, n) {}
 
     /** \brief Destructor */
     ~CentralDiff() override {}
@@ -225,6 +252,9 @@ namespace casadi {
     // Is an error estimate available?
     int has_err() const override {return true;}
 
+    // Calculate step size from absolute tolerance
+    double calc_stepsize(double abstol) const override { return pow(abstol, 1./3);}
+
     ///@{
     /** \brief Second order derivatives */
     bool has_forward(int nfwd) const override { return true;}
@@ -242,7 +272,7 @@ namespace casadi {
   class CASADI_EXPORT Smoothing : public FiniteDiff {
   public:
     // Constructor
-    Smoothing(const std::string& name, int n, double h) : FiniteDiff(name, n, h) {}
+    Smoothing(const std::string& name, int n) : FiniteDiff(name, n) {}
 
     /** \brief Destructor */
     ~Smoothing() override {}
@@ -268,6 +298,9 @@ namespace casadi {
 
     // Is an error estimate available?
     int has_err() const override {return true;}
+
+    // Calculate step size from absolute tolerance
+    double calc_stepsize(double abstol) const override { return pow(abstol, 1./3);}
 
     ///@{
     /** \brief Second order derivatives */

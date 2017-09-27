@@ -29,8 +29,8 @@ using namespace std;
 
 namespace casadi {
 
-  FiniteDiff::FiniteDiff(const std::string& name, int n, double h)
-    : FunctionInternal(name), n_(n), h_(h) {
+  FiniteDiff::FiniteDiff(const std::string& name, int n)
+    : FunctionInternal(name), n_(n) {
   }
 
   FiniteDiff::~FiniteDiff() {
@@ -71,19 +71,19 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     // Default options
-    h2_ = 1e-3;
     h_min_ = 0;
     h_max_ = inf;
     smoothing_ = eps;
     reltol_ = derivative_of_->get_reltol();
     abstol_ = derivative_of_->get_abstol();
+    h_ = calc_stepsize(abstol_);
     u_aim_ = 100;
     h_iter_ = has_err() ? 1 : 0;
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="second_order_stepsize") {
-        h2_ = op.second;
+      if (op.first=="h") {
+        h_ = op.second;
       } else if (op.first=="h_min") {
         h_min_ = op.second;
       } else if (op.first=="h_max") {
@@ -191,7 +191,7 @@ namespace casadi {
     f_opts["derivative_of"] = f;
     return Function::create(new ForwardDiff(name, nfwd, -h_), f_opts);
 #endif
-    return Function::create(new CentralDiff(name, nfwd, h2_), opts);
+    return Function::create(new CentralDiff(name, nfwd), opts);
   }
 
   int FiniteDiff::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
@@ -517,14 +517,14 @@ namespace casadi {
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,
                                    const Dict& opts) const {
-    return Function::create(new ForwardDiff(name, nfwd, h2_), opts);
+    return Function::create(new ForwardDiff(name, nfwd), opts);
   }
 
   Function Smoothing::get_forward(int nfwd, const std::string& name,
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,
                                    const Dict& opts) const {
-    return Function::create(new Smoothing(name, nfwd, h2_), opts);
+    return Function::create(new Smoothing(name, nfwd), opts);
   }
 
 } // namespace casadi
