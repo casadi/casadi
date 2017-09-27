@@ -272,25 +272,25 @@ public:
   #endif
 
   /** \brief Get a copy with advanced functionality
-   * 
+   *
    * You get access to more methods, but you have no guarantees about API stability
-   * 
+   *
    * The copy is effectively a deep copy:
    * Updating the state of the copy does not update the original.
    * */
   OptiAdvanced debug() const;
 
   /** \brief Get a copy with advanced functionality
-   * 
+   *
    * You get access to more methods, but you have no guarantees about API stability
-   * 
+   *
    * The copy is effectively a deep copy:
    * Updating the state of the copy does not update the original.
    * */
   OptiAdvanced advanced() const;
 
   /** \brief Get a copy of the
-   * 
+   *
    * The copy is effectively a deep copy:
    * Updating the state of the copy does not update the original.
    * */
@@ -316,7 +316,7 @@ public:
 
   ///@{
   /** \brief Helper methods for callback()
-   * 
+   *
    * Do not use directly.
    */
   void callback_class(OptiCallback* callback);
