@@ -47,13 +47,13 @@ namespace casadi {
       {"h_min",
        {OT_DOUBLE,
         "Minimum step size [default inf]"}},
-      {"eps",
+      {"smoothing",
        {OT_DOUBLE,
         "Smoothing regularization [default: machine precision]"}},
-      {"eps_in",
+      {"reltol",
        {OT_DOUBLE,
         "Accuracy of function inputs [default: machine precision]"}},
-      {"eps_out",
+      {"abstol",
         {OT_DOUBLE,
         "Accuracy of function outputs [default: machine precision]"}},
       {"u_aim",
@@ -74,7 +74,7 @@ namespace casadi {
     h2_ = 1e-3;
     h_min_ = 0;
     h_max_ = inf;
-    eps_ = eps_in_ = eps_out_ = numeric_limits<double>::epsilon();
+    smoothing_ = reltol_ = abstol_ = numeric_limits<double>::epsilon();
     u_aim_ = 100;
     h_iter_ = has_err() ? 1 : 0;
 
@@ -86,12 +86,12 @@ namespace casadi {
         h_min_ = op.second;
       } else if (op.first=="h_max") {
         h_max_ = op.second;
-      } else if (op.first=="eps_in") {
-        eps_in_ = op.second;
-      } else if (op.first=="eps_out") {
-        eps_out_ = op.second;
-      } else if (op.first=="eps") {
-        eps_ = op.second;
+      } else if (op.first=="reltol") {
+        reltol_ = op.second;
+      } else if (op.first=="abstol") {
+        abstol_ = op.second;
+      } else if (op.first=="smoothing") {
+        smoothing_ = op.second;
       } else if (op.first=="u_aim") {
         u_aim_ = op.second;
       } else if (op.first=="h_iter") {
@@ -316,7 +316,7 @@ namespace casadi {
       // Truncation error
       double err_trunc = yf - 2*yc + yb;
       // Roundoff error
-      double err_round = eps_in_/h*fmax(fabs(yf-yc), fabs(yc-yb)) + eps_out_;
+      double err_round = reltol_/h*fmax(fabs(yf-yc), fabs(yc-yb)) + abstol_;
       // Update error estimate
       u = fmax(u, fabs(err_trunc/err_round));
     }
@@ -479,11 +479,11 @@ namespace casadi {
         // Truncation error
         double err_trunc = yf - 2*yc + yb;
         // Roundoff error
-        double err_round = eps_in_/h*fmax(fabs(yf-yc), fabs(yc-yb)) + eps_out_;
+        double err_round = reltol_/h*fmax(fabs(yf-yc), fabs(yc-yb)) + abstol_;
         // We use the second order derivative as a smoothness measure
         double sm = err_trunc/(h*h);
         // Modify the weight according to smoothness
-        wk /= sm*sm + eps_;
+        wk /= sm*sm + smoothing_;
         sw += wk;
         // Added weighted contribution to weight and error
         J[i] += wk * Jk;

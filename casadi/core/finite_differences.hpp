@@ -125,10 +125,10 @@ namespace casadi {
     double h_min_, h_max_;
 
     // Input precision
-    double eps_in_;
+    double reltol_;
 
     // Output precision
-    double eps_out_;
+    double abstol_;
 
     // Ratio of roundoff error to truncation error
     double u_aim_;
@@ -136,7 +136,7 @@ namespace casadi {
     // Smoothness parameter
     // Smaller epsilon: More discontinuity rejecting
     // Larger epsilon: More accurate (higher order) if smooth
-    double eps_;
+    double smoothing_;
   };
 
   /** Calculate derivative using forward differences
