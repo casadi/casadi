@@ -34,7 +34,7 @@ set(RUNTIME_SRC
   casadi_sum_viol.hpp
   casadi_swap.hpp
   casadi_trans.hpp
-  casadi_central_diff.hpp
+  casadi_finite_diff.hpp
 )
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 

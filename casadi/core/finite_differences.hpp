@@ -31,7 +31,6 @@
 /// \cond INTERNAL
 
 namespace casadi {
-
   /** Calculate derivative using finite differences
     * \author Joel Andersson
     * \date 2017
@@ -103,8 +102,7 @@ namespace casadi {
     virtual double calc_fd(double** yk, double* y0, double* J, double h) const = 0;
 
     // Codegen finite difference approximation
-    virtual void calc_fd(CodeGenerator& g, const std::string& yk,
-                         const std::string& y0, const std::string& J) const = 0;
+    virtual std::string calc_fd() const = 0;
 
     // Is an error estimate available?
     virtual int has_err() const = 0;
@@ -124,22 +122,14 @@ namespace casadi {
     // Dimensions
     int n_z_, n_y_;
 
+    // Target ratio of truncation error to roundoff error
+    double u_aim_;
+
     // Allowed step size range
     double h_min_, h_max_;
 
-    // Input precision
-    double reltol_;
-
-    // Output precision
-    double abstol_;
-
-    // Ratio of roundoff error to truncation error
-    double u_aim_;
-
-    // Smoothness parameter
-    // Smaller epsilon: More discontinuity rejecting
-    // Larger epsilon: More accurate (higher order) if smooth
-    double smoothing_;
+    // Memory object
+    casadi_finite_diff_mem<double> m_;
   };
 
   /** Calculate derivative using forward differences
@@ -174,8 +164,7 @@ namespace casadi {
     double calc_fd(double** yk, double* y0, double* J, double h) const override;
 
     // Codegen finite difference approximation
-    void calc_fd(CodeGenerator& g, const std::string& yk,
-                 const std::string& y0, const std::string& J) const override;
+    std::string calc_fd() const override {return "casadi_forward_diff";}
 
     // Is an error estimate available?
     int has_err() const override {return false;}
@@ -246,8 +235,7 @@ namespace casadi {
     double calc_fd(double** yk, double* y0, double* J, double h) const override;
 
     // Codegen finite difference approximation
-    void calc_fd(CodeGenerator& g, const std::string& yk,
-                 const std::string& y0, const std::string& J) const override;
+    std::string calc_fd() const override {return "casadi_central_diff";}
 
     // Is an error estimate available?
     int has_err() const override {return true;}
@@ -293,8 +281,7 @@ namespace casadi {
     double calc_fd(double** yk, double* y0, double* J, double h) const override;
 
     // Codegen finite difference approximation
-    void calc_fd(CodeGenerator& g, const std::string& yk,
-                 const std::string& y0, const std::string& J) const override;
+    std::string calc_fd() const override {return "casadi_smoothing_diff";}
 
     // Is an error estimate available?
     int has_err() const override {return true;}

@@ -151,7 +151,7 @@ namespace casadi {
     return fname;
   }
 
-  void CodeGenerator::add(const Function& f, bool with_jac_sparsity) {
+    void CodeGenerator::add(const Function& f, bool with_jac_sparsity) {
     // Add if not already added
     std::string codegen_name = add_dependency(f);
 
@@ -733,12 +733,8 @@ namespace casadi {
                         << sanitize_source(casadi_from_mex_str, inst)
                         << "#endif\n\n";
       break;
-    case AUX_CENTRAL_DIFF:
-      add_auxiliary(AUX_COPY);
-      add_auxiliary(AUX_AXPY);
-      add_auxiliary(AUX_SCAL);
-      add_auxiliary(AUX_MV_DENSE);
-      this->auxiliaries << sanitize_source(casadi_central_diff_str, inst);
+    case AUX_FINITE_DIFF:
+      this->auxiliaries << sanitize_source(casadi_finite_diff_str, inst);
       break;
     }
   }
@@ -872,11 +868,6 @@ namespace casadi {
     s << "casadi_interpn_grad(" << grad << ", " << ndim << ", " << grid << ", " << offset << ", "
       << values << ", " << x << ", " << lookup_mode << ", " << iw << ", " << w << ");";
     return s.str();
-  }
-
-  std::string CodeGenerator::central_diff(const std::string& m) {
-    add_auxiliary(AUX_CENTRAL_DIFF);
-    return "casadi_central_diff(" + m + ")";
   }
 
   std::string CodeGenerator::trans(const std::string& x, const Sparsity& sp_x,

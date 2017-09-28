@@ -190,9 +190,6 @@ namespace casadi {
       const std::string& lookup_mode,
       const std::string& iw, const std::string& w);
 
-    /** \brief Central differences */
-    std::string central_diff(const std::string& m);
-
     /** \brief Transpose */
     std::string trans(const std::string& x, const Sparsity& sp_x,
       const std::string& y, const Sparsity& sp_y, const std::string& iw);
@@ -233,7 +230,7 @@ namespace casadi {
       AUX_INTERPN_INTERPOLATE,
       AUX_DE_BOOR,
       AUX_ND_BOOR_EVAL,
-      AUX_CENTRAL_DIFF
+      AUX_FINITE_DIFF
     };
 
     /** \brief Add a built-in auxiliary function */
