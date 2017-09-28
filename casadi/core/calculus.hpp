@@ -29,7 +29,6 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-
 #include <limits>
 #include <algorithm>
 #include "casadi_types.hpp"
@@ -190,6 +189,7 @@ namespace casadi {
 
   ///@{
   /** \brief Enable using elementary numerical operations without std:: prefix */
+  using std::isfinite;
   using std::sqrt;
   using std::sin;
   using std::cos;

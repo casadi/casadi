@@ -26,7 +26,6 @@
 #ifndef CASADI_CASADI_RUNTIME_HPP
 #define CASADI_CASADI_RUNTIME_HPP
 
-#include <math.h>
 #include "../calculus.hpp"
 
 #define CASADI_PREFIX(ID) casadi_##ID
