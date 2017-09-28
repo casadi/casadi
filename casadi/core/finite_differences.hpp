@@ -172,6 +172,9 @@ namespace casadi {
     // Calculate step size from absolute tolerance
     double calc_stepsize(double abstol) const override { return sqrt(abstol);}
 
+    /** \brief Get absolute tolerance */
+    double get_abstol() const override { return h_;}
+
     ///@{
     /** \brief Second order derivatives */
     bool has_forward(int nfwd) const override { return true;}
@@ -243,6 +246,9 @@ namespace casadi {
     // Calculate step size from absolute tolerance
     double calc_stepsize(double abstol) const override { return pow(abstol, 1./3);}
 
+    /** \brief Get absolute tolerance */
+    double get_abstol() const override { return h_*h_;}
+
     ///@{
     /** \brief Second order derivatives */
     bool has_forward(int nfwd) const override { return true;}
@@ -288,6 +294,9 @@ namespace casadi {
 
     // Calculate step size from absolute tolerance
     double calc_stepsize(double abstol) const override { return pow(abstol, 1./3);}
+
+    /** \brief Get absolute tolerance */
+    double get_abstol() const override { return h_*h_;}
 
     ///@{
     /** \brief Second order derivatives */
