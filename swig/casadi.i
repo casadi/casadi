@@ -3915,7 +3915,7 @@ namespace casadi {
 
 
 make_property(casadi::Opti, debug);
-make_property(casadi::OptiSol, debug);
+make_property(casadi::Opti, advanced);
 make_property(casadi::OptiSol, opti);
 
 %define make_property_opti(name)

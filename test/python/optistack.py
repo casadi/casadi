@@ -144,11 +144,11 @@ class OptiStacktests(inherit_from):
       sol = opti.solve()
       
       jac_g = jacobian(opti.g,opti.x)
-      self.checkarray(sol.value(jac_g),sol.value(sol.debug.casadi_solver.get_function('nlp_jac_g')(opti.x,opti.p)[1]))
+      self.checkarray(sol.value(jac_g),sol.value(sol.opti.debug.casadi_solver.get_function('nlp_jac_g')(opti.x,opti.p)[1]))
       grad_f = gradient(opti.f,opti.x)
-      self.checkarray(sol.value(grad_f),sol.value(sol.debug.casadi_solver.get_function('nlp_grad_f')(opti.x,opti.p)[1]))
+      self.checkarray(sol.value(grad_f),sol.value(sol.opti.debug.casadi_solver.get_function('nlp_grad_f')(opti.x,opti.p)[1]))
       hess_lag = sol.value(hessian(opti.f+dot(opti.lam_g,opti.g),opti.x)[0])
-      self.checkarray(sol.value(hess_lag),sol.value(tril2symm(sol.debug.casadi_solver.get_function('nlp_hess_l')(opti.x,opti.p,1,opti.lam_g).T)))
+      self.checkarray(sol.value(hess_lag),sol.value(tril2symm(sol.opti.debug.casadi_solver.get_function('nlp_hess_l')(opti.x,opti.p,1,opti.lam_g).T)))
 
 
     def test_warmstart(self):

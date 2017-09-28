@@ -341,6 +341,7 @@ public:
   /// \endcond
 
   Opti(OptiNode* node);
+
 #endif // SWIG
 
 };
@@ -488,6 +489,8 @@ public:
 
   int instance_number() const;
 
+protected:
+  OptiAdvanced() {};
 };
 
 /** \brief A simplified interface for NLP modeling/solving
@@ -530,9 +533,9 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
     */
     Dict stats() const;
 
-    OptiAdvanced debug() { return optistack_.debug(); }
-    Opti opti() { return optistack_; }
-  private:
+    Opti opti() const { return optistack_; }
+
+  protected:
     OptiSol(const Opti& opti);
     OptiAdvanced optistack_;
 };
