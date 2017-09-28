@@ -382,6 +382,7 @@ namespace casadi {
     // Default options
     jit_ = true; // override default
     buffered_ = true;
+    enable_fd_ = true; // override default
   }
 
   Options JitFunction::options_
