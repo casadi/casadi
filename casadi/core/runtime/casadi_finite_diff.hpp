@@ -39,7 +39,7 @@ T1 casadi_central_diff(T1** yk, T1* y0, T1* J,
   for (i=0; i<n_y; ++i) {
     // Copy to local variables, return -1 if invalid entry
     if (!isfinite((yf=yk[1][i])) || !isfinite((yc=y0[i])) || !isfinite((yb=yk[0][i]))) {
-      J[i] = 0;
+      J[i] = 0./0.; // NaN
       u = -1;
       continue;
     }
@@ -116,7 +116,7 @@ T1 casadi_smoothing_diff(T1** yk, T1* y0, T1* J,
     // If sw is 0, no stencil worked
     if (sw==0) {
       // Set component to 0, return -1
-      J[i] = 0;
+      J[i] = 0./0.; // NaN;
       u = -1;
     } else {
       // Finalize estimate using the sum of weights and the step length
