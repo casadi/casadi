@@ -2479,90 +2479,82 @@ Both variants accept an optional 5th (or 7th) argument in the form of an
 options dictionary.
 
 \section{Using lookup-tables} \label{sec:lookup}
+Lookup-tables can be created using \CasADi's \texttt{interpolant} function. Different interpolating schemes are implemented as \emph{plugins}, similar to \texttt{nlpsol} or \texttt{integrator} objects. In addition to the identifier name and plugin, the \texttt{interpolant} function expects a set of grid points with the corresponding numerical values.
 
-Lookup-tables are supported in \CasADi for rectangular grids, through the \python{interpolant} function:\\
-\verb|interpolant(name,plugin,grid,values,options)|,
-with \verb|name| an arbitrary label, \verb|plugin| the name of the desired plugin,
-\verb|grid| the collection of 1D grids whose outer product defines the full N-D rectangular grid, and \verb|values| the data corresponding to the grid, in a flattened way. Both the \verb|grid| and the \verb|values| must be numerical in nature.
+The result of an \python{interpolant} call is a \CasADi Function object that is differentiable, and can be embedded into \CasADi computational graphs by calling with MX arguments. Furthermore, C code generation is fully supported for such graphs.
 
-The result of an \python{interpolant} call is a \CasADi Function object that is differentiable, and can be embedded into \CasADi computational graphs by calling with MX arguments. Furthermore, code-generation is fully supported for such graphs.
+Currently, two plugins exist for \python{interpolant}: \verb|'linear'| and \verb|'bspline'|. They are intended to behave simiarly to MATLAB/Octave's \texttt{interpn} with the method set to \verb|'linear'| or \verb|'spline'| -- corresponding to a multilinear interpolation and a (by default cubic) spline interpolation with
+not-a-knot boundary conditions.
 
-Currently two plugins exist for \python{interpolant}: \verb|linear| and \verb|bspline|.
-The \verb|bspline| variant mimics that of MATLAB's \verb|spline|: not-a-knot end conditions.
-
-In the case of \verb|bspline|, coefficients will be sought at construction time that fit the provided data.
-Alternatively, you may also use the more low-level \verb|Function.bspline| to supply the coefficients yourself.
-The default degree of the bspline is 3 in each dimension. You may deviate from this default by passing a \verb|degree| option.
+In the case of \verb|bspline|, coefficients will be sought at construction time that fit the provided data. Alternatively, you may also use the more low-level \verb|Function.bspline| to supply the coefficients yourself. The default degree of the bspline is 3 in each dimension. You may deviate from this default by passing a \verb|degree| option.
 
 We will walk through the syntax of \verb|interpolant| for the 1D and 2D versions, but the syntax in fact generalizes to an arbitrary number of dimensions.
 
 \subsection{1D lookup tables}
 A 1D spline fit can be done in \CasADi/Python as follows, compared with the corresponding method in SciPy:
+
 \begin{lstlisting}[language=Python]
 # Python
 import casadi as ca
 import numpy as np
 xgrid = np.linspace(1,6,6)
 V = [-1,-1,-2,-3,0,2]
-LUT = ca.interpolant('LUT','bspline',[xgrid],V)
-print(LUT(2.5))
+lut = ca.interpolant('LUT','bspline',[xgrid],V)
+print(lut(2.5))
 # Using SciPy
 import scipy.interpolate as ip
 interp = ip.InterpolatedUnivariateSpline(xgrid, V)
 print(interp(2.5))
 \end{lstlisting}
 
-In MATLAB/Octave we get:
+In MATLAB/Octave, the corresponding code reads:
 
 \begin{lstlisting}[language=Matlab]
 % MATLAB/Octave
 xgrid = 1:6;
 V = [-1 -1 -2 -3 0 2];
-LUT = casadi.interpolant('LUT','bspline',{xgrid},V);
-LUT(2.5)
+lut = casadi.interpolant('LUT','bspline',{xgrid},V);
+lut(2.5)
 % Using MATLAB/Octave builtin
 interpn(xgrid,V,2.5,'spline')
 \end{lstlisting}
 
+Note in particular that the \python{grid} and \python{values} arguments to \texttt{interpolant} must be numerical in nature.
+
 \subsection{2D lookup tables}
+In two dimensions, we get the following in Python, also compared to SciPy for reference:
 
 \begin{lstlisting}[language=Python]
 # Python
 xgrid = np.linspace(-5,5,11)
 ygrid = np.linspace(-4,4,9)
-
 X,Y = np.meshgrid(xgrid,ygrid,indexing='ij')
-
 R = np.sqrt(5*X**2 + Y**2)+ 1
 data = np.sin(R)/R
-
-# Using Scipy
-interp = scipy.interpolate.RectBivariateSpline(xgrid, ygrid, data)
-print(interp.ev(0.5,1))
-
-# Using CasADi
 data_flat = data.ravel(order='F')
-
-LUT = casadi.interpolant('name','bspline',[xgrid,ygrid],data_flat)
-print(LUT([0.5,1]))
+lut = ca.interpolant('name','bspline',[xgrid,ygrid],data_flat)
+print(lut([0.5,1]))
+# Using Scipy
+interp = ip.RectBivariateSpline(xgrid, ygrid, data)
+print(interp.ev(0.5,1))
 \end{lstlisting}
+
+or, in MATLAB/Octave compared to the built-in functions:
 
 \begin{lstlisting}[language=Matlab]
 % MATLAB/Octave
 xgrid = -5:1:5;
 ygrid = -4:1:4;
-
 [X,Y] = ndgrid(xgrid, ygrid);
 R = sqrt(5*X.^2 + Y.^2)+ 1;
 V = sin(R)./R;
-
+lut = interpolant('LUT','bspline',{xgrid, ygrid},V(:));
+lut([0.5 1])
 % Using Matlab builtin
 interpn(X,Y,V,0.5,1,'spline')
-
-# Using CasADi
-LUT = interpolant('LUT','bspline',{xgrid, ygrid},V(:));
-LUT([0.5 1])
 \end{lstlisting}
+
+In particular note how the \texttt{values} argument had to be flatten to a one-dimensional array.
 
 \section{Derivative calculation using finite differences} \label{sec:fd}
 CasADi 3.3 introduced support for finite difference calculation for all function
