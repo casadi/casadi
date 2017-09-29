@@ -173,9 +173,9 @@ The goal of this document is to make the reader familiar with the syntax of \Cas
 We will use Python and MATLAB syntax side-by-side in this guide, noting that the Python interface is more stable and better documented. Unless otherwise noted, the MATLAB syntax also applies to Octave. We try to point out the instances where has a diverging syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter~\ref{ch:syntax_differences}.
 
 \chapter{Obtaining and installing \CasADi}
-\CasADi is an open-source tool, available under LGPL license, which is a permissive license that allows the tool to be used royalty-free also in commercial closed-source applications. The main restricton of LGPL is that if you decide to modify \CasADi's source code as opposed to just using the tool for your application, these changes (a ``derivative-work'' of \CasADi) must be released under LGPL as well.
+\CasADi is an open-source tool, available under LGPL license, which is a permissive license that allows the tool to be used royalty-free also in commercial closed-source applications. The main restriction of LGPL is that if you decide to modify \CasADi's source code as opposed to just using the tool for your application, these changes (a ``derivative-work'' of \CasADi) must be released under LGPL as well.
 
-The source code is hosted on Github and has a core written in self-contained C++ code, relying on nothing but the C++ Standard Library. Its front-ends to Python and MATLAB are full-featured and auto-generated using the tool \htmladdnormallink{SWIG}{http://www.swig.org/}. These front-ends are unlikely to result in noticeable loss of efficiency. \CasADi can be used on Linux, OS X and Windows.
+The source code is hosted on GitHub and has a core written in self-contained C++ code, relying on nothing but the C++ Standard Library. Its front-ends to Python and MATLAB are full-featured and auto-generated using the tool \htmladdnormallink{SWIG}{http://www.swig.org/}. These front-ends are unlikely to result in noticeable loss of efficiency. \CasADi can be used on Linux, OS X and Windows.
 
 For up-to-date installation instructions, visit \CasADi's website: \htmladdnormallink{http://casadi.org}{http://casadi.org/}.
 
@@ -317,7 +317,7 @@ The following list summarizes the most commonly used ways of constructing new \t
   \item \lstinline[language=Python]{SX(matrix_type)}: Create a matrix given a numerical matrix given as a \emph{numpy} or \emph{scipy} matrix (in Python) or as a dense or sparse matrix (in MATLAB). In MATLAB e.g.
   \lstinline[language=Matlab]{SX([1,2,3,4])} for a row vector, \lstinline[language=Matlab]{SX([1;2;3;4])} for a column vector and \lstinline[language=Matlab]{SX([1,2;3,4])} for a 2-by-2 matrix. This method can be used explicitly or implicitly.
   \item \lstinline[language=Python]{repmat(v,n,m)}: Repeat expression $v$ $n$ times vertically and $m$ times horizontally. \lstinline[language=Python]{repmat(SX(3),2,1)} will create a 2-by-1 matrix with all elements 3.
-  \item (\emph{Python only}) \lstinline[language=Python]{SX(list)}: Create a column vector ($n$-by-1 matrix) with the elements in the list, e.g. \lstinline[language=Python]{SX([1,2,3,4])} (note the difference between Python lists and MATLAB horizontal concatination, which both uses square bracket syntax)
+  \item (\emph{Python only}) \lstinline[language=Python]{SX(list)}: Create a column vector ($n$-by-1 matrix) with the elements in the list, e.g. \lstinline[language=Python]{SX([1,2,3,4])} (note the difference between Python lists and MATLAB horizontal concatenation, which both uses square bracket syntax)
   \item (\emph{Python only}) \lstinline[language=Python]{SX(list of list)}: Create a dense matrix with the elements in the lists, e.g. \lstinline[language=Python]{SX([[1,2],[3,4]])} or a row vector (1-by-$n$ matrix) using \lstinline[language=Python]{SX([[1,2,3,4]])}.
 \end{itemize}
 
@@ -413,7 +413,7 @@ print(f)
 print(f.shape)
 \end{pytexoutput}
 
-As you can see, the output of this operation is a 2-by-2 matrix. Note how the multiplication and the addition were performed elementwise and new expressions (of type \texttt{SX}) were created for each entry of the result matrix.
+As you can see, the output of this operation is a 2-by-2 matrix. Note how the multiplication and the addition were performed element-wise and new expressions (of type \texttt{SX}) were created for each entry of the result matrix.
 
 We shall now introduce a second, more general \emph{matrix expression} type \texttt{MX}. The \texttt{MX} type allows, like \texttt{SX}, to build up expressions consisting of a sequence of elementary operations. But unlike \texttt{SX}, these elementary operations are not restricted to be scalar unary or binary operations ($\mathbb{R} \rightarrow \mathbb{R}$ or $\mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R}$. Instead, the elementary operations that are used to form \texttt{MX} expressions are allowed to be general \emph{multiple sparse-matrix valued} input, \emph{multiple sparse-matrix valued} output functions: $\mathbb{R}^{n_1 \times m_1} \times \ldots \times \mathbb{R}^{n_N \times m_N} \rightarrow \mathbb{R}^{p_1 \times q_1} \times \ldots \times \mathbb{R}^{p_M \times q_M}$.
 
@@ -513,7 +513,7 @@ Element access and assignment, of the type you have just seen, are examples of o
 You can \emph{not} multiply an \texttt{SX} object with an \texttt{MX} object, or perform any other operation to mix the two in the same expression graph. You can, however, in an \texttt{MX} graph include calls to a \emph{function} defined by \texttt{SX} expressions. This will be demonstrated in Chapter~\ref{ch:function}. Mixing \texttt{SX} and \texttt{MX} is often a good idea since functions defined by \texttt{SX} expressions have a much lower overhead per operation making it much faster for operations that are naturally written as a sequence of scalar operations. The \texttt{SX} expressions are thus intended to be used for low level operations (for example the DAE right hand side in Section~\ref{sec:integrator}), whereas the \texttt{MX} expressions act as a glue and enables the formulation of e.g. the constraint function of an NLP (which might contain calls to ODE/DAE integrators, or might simply be too large to expand as one big expression).
 
 \section{The \texttt{Sparsity} class} \label{sec:sparsity_class}
-As mentioned above, matrices in \CasADi are stored using the \emph{compressed column storage} (CCS) format. This is a standard format for sparse matrices that allows linear algebra operations such as elementwise operations, matrix multiplication and transposes to be performed efficiently. In the CCS format, the sparsity pattern is decoded using the dimensions -- the number of rows and number of columns -- and two vectors. The first vector contains the index of the first structurally nonzero element of each column and the second vector contains the row index for every nonzero element. For more details on the CCS format, see e.g. \htmladdnormallink{Templates for the Solution of Linear Systems}{http://netlib.org/linalg/html_templates/node92.html} on Netlib. Note that \CasADi uses the CCS format for sparse as well as dense matrices.
+As mentioned above, matrices in \CasADi are stored using the \emph{compressed column storage} (CCS) format. This is a standard format for sparse matrices that allows linear algebra operations such as element-wise operations, matrix multiplication and transposes to be performed efficiently. In the CCS format, the sparsity pattern is decoded using the dimensions -- the number of rows and number of columns -- and two vectors. The first vector contains the index of the first structurally nonzero element of each column and the second vector contains the row index for every nonzero element. For more details on the CCS format, see e.g. \htmladdnormallink{Templates for the Solution of Linear Systems}{http://netlib.org/linalg/html_templates/node92.html} on Netlib. Note that \CasADi uses the CCS format for sparse as well as dense matrices.
 
 Sparsity patterns in \CasADi are stored as instances of the \texttt{Sparsity} class, which is \emph{reference-counted}, meaning that multiple matrices can share the same sparsity pattern, including \texttt{MX} expression graphs and instances of \texttt{SX} and \texttt{DM}. The \texttt{Sparsity} class is also \emph{cached}, meaning that the creation of multiple instances of the same sparsity patterns is always avoided.
 
@@ -548,7 +548,7 @@ print(SX.sym('x',Sparsity.lower(3)))
 \subsection{Getting and setting elements in matrices}
 To get or set an element or a set of elements in \CasADi's matrix types (\texttt{SX}, \texttt{MX} and \texttt{DM}), we use square brackets in Python and round brackets in C++ and MATLAB. As is conventional in these languages, indexing starts from zero in C++ and Python but from one in MATLAB. In Python and C++, we allow negative indices to specify an index counted from the end. In MATLAB, use the \texttt{end} keyword for indexing from the end.
 
-Indexing can be done with one index or two indices. With two indices, you reference a particular row (or set or rows) and a particular column (or set of columns). With one index, you reference an element (or set of elements) starting from the upper left corner and columnwise to the lower right corner. All elements are counted regardless of whether they are structurally zero or not.
+Indexing can be done with one index or two indices. With two indices, you reference a particular row (or set or rows) and a particular column (or set of columns). With one index, you reference an element (or set of elements) starting from the upper left corner and column-wise to the lower right corner. All elements are counted regardless of whether they are structurally zero or not.
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -587,7 +587,7 @@ print(M)
 
 The getting and setting matrix elements is elaborated in the following. The discussion applies to all of \CasADi's matrix types.
 
-\paragraph{Single element access} is getting or setting by providing a row-column pair or its flattened index (columnwise starting in the upper left corner of the matrix):
+\paragraph{Single element access} is getting or setting by providing a row-column pair or its flattened index (column-wise starting in the upper left corner of the matrix):
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -729,7 +729,7 @@ y = SX.sym('y',2,2)
 print(sin(y)-x)
 \end{pytexoutput}
 
-In C++ and Python (but not in MATLAB), the standard multiplication operation (using \verb|*|) is reserved for elementwise multiplication (in MATLAB \verb|.*|). For \textbf{matrix multiplication}, use
+In C++ and Python (but not in MATLAB), the standard multiplication operation (using \verb|*|) is reserved for element-wise multiplication (in MATLAB \verb|.*|). For \textbf{matrix multiplication}, use
 \lstinline[language=Python]{mtimes(A,B)}:
 
 \begin{minipage}[t]{0.5\textwidth}
@@ -820,7 +820,7 @@ print(horzcat(x,y))
 print(horzcat(x,y))
 \end{pytexoutput}
 
-\textbf{Horizontal and vertical splitting} are the inverse operations of the above introduced horizontal and vertical concatenation. To split up an expression horizontally into $n$ smaller expressions, you need to provide, in addition to the expression being splitted, a vector \emph{offset} of length $n+1$. The first element of the \emph{offset} vector must be 0 and the last element must be the number of columns. Remaining elements must follow in a non-decreasing order. The output $i$ of the splitting operation then contains the columns $c$ with $\textit{offset}[i] \le c < \textit{offset}[i+1]$. The following demonstrates the syntax:
+\textbf{Horizontal and vertical split} are the inverse operations of the above introduced horizontal and vertical concatenation. To split up an expression horizontally into $n$ smaller expressions, you need to provide, in addition to the expression being split, a vector \emph{offset} of length $n+1$. The first element of the \emph{offset} vector must be 0 and the last element must be the number of columns. Remaining elements must follow in a non-decreasing order. The output $i$ of the split operation then contains the columns $c$ with $\textit{offset}[i] \le c < \textit{offset}[i+1]$. The following demonstrates the syntax:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -861,7 +861,7 @@ w = vertsplit(x,[0,3,5])
 print(w[0], w[1])
 \end{pytexoutput}
 
-Note that it is always possible to use slice element access instead of horizontal and vertical splitting, for the above vertical splitting:
+Note that it is always possible to use slice element access instead of horizontal and vertical split, for the above vertical split:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -880,7 +880,7 @@ w = [x[0:3,:], x[3:5,:]]
 print(w[0], w[1])
 \end{pytexoutput}
 
-For \texttt{SX} graphs, this alternative way is completely equivalent, but for \texttt{MX} graphs using \texttt{horzsplit}/\texttt{vertsplit} is \emph{significantly more efficient when all the splitted expressions are needed}.
+For \texttt{SX} graphs, this alternative way is completely equivalent, but for \texttt{MX} graphs using \texttt{horzsplit}/\texttt{vertsplit} is \emph{significantly more efficient when all the split expressions are needed}.
 
 \textbf{Inner product}, defined as $<A,B> := \trace{A \, B} = \sum_{i,j} \, A_{i,j} \, B_{i,j}$ are created as follows:
 
@@ -1299,7 +1299,7 @@ print('res:', res)
 \end{pytexoutput}
 
 \section{Converting \texttt{MX} to \texttt{SX}}
-A function object defined by an \texttt{MX} graph that only contains built-in operations (e.g. elementwise operations such as addition, square root, matrix multiplications and calls to \texttt{SX} functions, can be converted into a function defined purely by an \texttt{SX} graph using the syntax:
+A function object defined by an \texttt{MX} graph that only contains built-in operations (e.g. element-wise operations such as addition, square root, matrix multiplications and calls to \texttt{SX} functions, can be converted into a function defined purely by an \texttt{SX} graph using the syntax:
 
 \begin{lstlisting}[language=Python]
 sx_function = mx_function.expand()
@@ -1747,7 +1747,7 @@ the same code executed in \CasADi's virtual machines.
 All that is needed to compile the generated code is a C compiler.
 \item Debugging and profiling functions.
 The generated code is essentially a mirror of the evaluation that takes place in the virtual machines and
-if a particular operation is slow, this is likely to show up when analysing the generated code with a
+if a particular operation is slow, this is likely to show up when analyzing the generated code with a
 profiling tool such as \texttt{gprof}. By looking at the code, it is also possible to detect what is
 potentially done in a suboptimal way. If the code is very long and takes a long time to compile,
 it is an indication that some functions need to be broken up in smaller, but nested functions.
@@ -2384,7 +2384,7 @@ Sparsity patterns are in general assumed to be scalar by default, unless the
 function corresponds to a derivative of another function (see below), in which
 case they are assumed to be dense and of the correct dimension.
 
-Futhermore, work vectors are assumed not to be needed if \verb|fname_work| has
+Furthermore, work vectors are assumed not to be needed if \verb|fname_work| has
 not been implemented.
 
 \subsection*{Meta information as comments}
@@ -2428,7 +2428,7 @@ with \verb|name| an arbitrary label, \verb|plugin| the name of the desired plugi
 The result of an \lstinline[language=Python]{interpolant} call is a \CasADi Function object that is differentiable, and can be embedded into \CasADi computational graphs by calling with MX arguments. Furthermore, code-generation is fully supported for such graphs.
 
 Currently two plugins exist for \lstinline[language=Python]{interpolant}: \verb|linear| and \verb|bspline|.
-The \verb|bspline| variant mimics that of Matlab's \verb|spline|: not-a-knot end conditions.
+The \verb|bspline| variant mimics that of MATLAB's \verb|spline|: not-a-knot end conditions.
 
 In the case of \verb|bspline|, coefficients will be sought at construction time that fit the provided data.
 Alternatively, you may also use the more low-level \verb|Function.bspline| to supply the coefficients yourself.
@@ -2535,7 +2535,7 @@ and its intended usage.
 The \texttt{DaeBuilder} class uses a relatively rich problem formulation that
 consists of a set of input expressions and a set of output expressions, each
 defined by a string identifier. The choice of expressions was inspired by the
-\emph{functional mockup interface} (FMI) version 2.0
+\emph{functional mock-up interface} (FMI) version 2.0
 \footnote{FMI development group. Functional Mock-up Interface for Model Exchange and Co-Simulation. \url{https://www.fmi-standard.org/}, July 2014. Specification, FMI 2.0. Section 3.1, pp. 71–72}
 
 \subsection*{Input expressions}
@@ -2651,9 +2651,9 @@ list of functions, see the C++ API documentation for \texttt{DaeBuilder}.
 
 \section{Import of OCPs from Modelica} \label{sec:modelica}
 An alternative to model directly in \CasADi, as above, is to use an advanced
-physical modeling language such as Modelica to specity the model. For this,
+physical modeling language such as Modelica to specify the model. For this,
 \CasADi offers interoperability with the open-source \htmladdnormallink{JModelica.org}{http://www.jmodelica.org/} compiler, which
-is written specifically with optimal control in mind. Model inport from
+is written specifically with optimal control in mind. Model import from
 JModelica.org is possible in two different ways; using the JModelica.org's
 \texttt{CasadiInterface} or via \texttt{DaeBuilder}'s
 \lstinline[language=Python]{parse_fmi} command.
@@ -2723,7 +2723,7 @@ For a more detailed description of this class and its functionalities, we again
 refer to the API documentation.
 
 \section{Function factory}
-Once a \texttt{DaeBuilder} has been formulated and possibily reformulated to
+Once a \texttt{DaeBuilder} has been formulated and possibly reformulated to
 a satisfactory form, we can generate \CasADi functions corresponding to the
 input and output expressions outlined in Section~\ref{sec:daebuilder_io}.
 For example, to create a function for the ODE right-hand-side for the rocket
@@ -2836,7 +2836,7 @@ In the following, we will discuss three of the most important methods, namely
 
 \section{Direct single-shooting}
 
-In the direct single shooting method, the control trajectory is parametrized
+In the direct single shooting method, the control trajectory is parameterized
 using some piecewise smooth approximation, typically piecewise constant.
 
 Using an explicit expression for the controls, we can then eliminate the whole
@@ -2877,7 +2877,7 @@ compensated by the fact that it is also much sparser.
 
 \section{Direct collocation}
 Finally, the \verb|direct_collocation.py| and \verb|direct_collocation.m|
-codes implement the direct collocation method. In this case, a parametrization
+codes implement the direct collocation method. In this case, a parameterization
 of the entire state trajectory, as piecewise low-order polynomials, are included
 as decision variables in the NLP. This removes the need for the formulation
 of the discrete time dynamics completely.
@@ -3066,7 +3066,7 @@ opti.subject_to( 0<=x<=1 );
 
 When the bounds of the double inequalities are free of variables, the constraint will be passed on efficiently to solvers that support them (notably IPOPT).
 
-You may make elementwise (in)equalities with vectors:
+You may make element-wise (in)equalities with vectors:
 
 \begin{lstlisting}[language=Python]
 x = opti.variable(5,1)
@@ -3095,7 +3095,7 @@ Each \lstinline[language=Python]{subject_to} command adds to the set of constrai
 Use \lstinline[language=Python]{subject_to()} to empty this set and start over.
 
 \paragraph{Solver}
-You must always declare the \texttt{solver} (numerical backend).
+You must always declare the \texttt{solver} (numerical back-end).
 An optional dictionary of CasADi plugin options can be given as second argument.
 An optional dictionary of \texttt{solver} options can be given as third argument.\\
 \begin{minipage}[t]{0.5\textwidth}
@@ -3148,7 +3148,7 @@ sol = opti.solve()
 You may call \lstinline[language=Python]{solve} any number of times. You will always get an immutable copy of the problem specification and its solution.
 Consecutively calling \lstinline[language=Python]{solve} will not help the convergence of the problem.
 
-To warmstart a solver, you need to explicitly transfer the solution of one problem to the initial value of the next.
+To warm start a solver, you need to explicitly transfer the solution of one problem to the initial value of the next.
 \begin{lstlisting}[language=Python]
 sol1 = opti.solve()
 opti.set_initial(sol1.value_variables())
@@ -3193,7 +3193,7 @@ sol.value(x**2+y,sol.initial())
 
 \paragraph{Dual variables}
 
-In order to obtain dual variables (lagrange multipliers) of constraints, make sure you save the constraint expression first:\\
+In order to obtain dual variables (Lagrange multipliers) of constraints, make sure you save the constraint expression first:\\
 \begin{lstlisting}[language=Python]
 con = sin(x+y)>=1
 opti.subject_to(con)
