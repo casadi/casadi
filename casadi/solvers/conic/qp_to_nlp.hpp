@@ -31,7 +31,7 @@
 
 
 /** \defgroup plugin_Conic_nlpsol
- 
+
    Solve QPs using an Nlpsol
    Use the 'nlpsol' option to specify the NLP solver to use.
 */
@@ -67,6 +67,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "nlpsol";}
 
+    // Get name of the class
+    std::string class_name() const override { return "QpToNlp";}
+
     ///@{
     /** \brief Options */
     static Options options_;
@@ -76,7 +79,7 @@ namespace casadi {
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;

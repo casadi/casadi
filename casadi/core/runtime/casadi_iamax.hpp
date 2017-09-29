@@ -1,6 +1,7 @@
 // NOLINT(legal/copyright)
+// SYMBOL "iamax"
 template<typename T1>
-int CASADI_PREFIX(iamax)(int n, const T1* x, int inc_x) {
+int casadi_iamax(int n, const T1* x, int inc_x) {
   T1 t;
   T1 largest_value = -1.0;
   int largest_index = -1;

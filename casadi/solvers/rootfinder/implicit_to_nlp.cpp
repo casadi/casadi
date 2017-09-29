@@ -50,7 +50,7 @@ namespace casadi {
   }
 
   ImplicitToNlp::~ImplicitToNlp() {
-    clear_memory();
+    clear_mem();
   }
 
   Options ImplicitToNlp::options_
@@ -82,15 +82,15 @@ namespace casadi {
     }
 
     // Free variable in the NLP
-    MX u = MX::sym("u", sparsity_in(iin_));
+    MX u = MX::sym("u", sparsity_in_.at(iin_));
 
     // So that we can pass it on to createParent
     std::vector<MX> inputs;
-    for (int i=0; i<n_in(); ++i) {
+    for (int i=0; i<n_in_; ++i) {
       if (i!=iin_) {
         stringstream ss;
         ss << "p" << i;
-        inputs.push_back(MX::sym(ss.str(), sparsity_in(i)));
+        inputs.push_back(MX::sym(ss.str(), sparsity_in_[i]));
       }
     }
     MX p = veccat(inputs);
@@ -99,9 +99,9 @@ namespace casadi {
     MX nlp_f = 0;
 
     // NLP constraints
-    std::vector< MX > args_call(n_in());
+    std::vector< MX > args_call(n_in_);
     args_call[iin_] = u;
-    for (int i=0, i2=0; i<n_in(); ++i)
+    for (int i=0, i2=0; i<n_in_; ++i)
       if (i!=iin_) args_call[i] = inputs[i2++];
     MX nlp_g = oracle_(args_call).at(iout_);
 
@@ -161,7 +161,7 @@ namespace casadi {
     // NLP parameters
     m->arg[NLPSOL_P] = m->p;
     double* pi = m->p;
-    for (int i=0; i<n_in(); ++i) {
+    for (int i=0; i<n_in_; ++i) {
       if (i!=iin_) {
         int n = oracle_.nnz_in(i);
         casadi_copy(m->iarg[i], n, pi);
@@ -181,7 +181,7 @@ namespace casadi {
 
     // Check if any auxilary outputs to evaluate
     bool has_aux = false;
-    for (int i=0; i<n_out(); ++i) {
+    for (int i=0; i<n_out_; ++i) {
       if (i!=iout_ && m->ires[i]) {
         has_aux = true;
         break;
@@ -190,9 +190,9 @@ namespace casadi {
 
     // Evaluate auxilary outputs, if necessary
     if (has_aux) {
-      copy_n(m->iarg, n_in(), m->arg);
+      copy_n(m->iarg, n_in_, m->arg);
       m->arg[iin_] = m->x;
-      copy_n(m->ires, n_out(), m->res);
+      copy_n(m->ires, n_out_, m->res);
       m->res[iout_] = 0;
       oracle_(m->arg, m->res, m->iw, m->w, 0);
     }

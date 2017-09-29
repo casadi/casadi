@@ -78,7 +78,7 @@ int main(){
     cout << "forward mode" << endl;
 
     // Make sure that the class is able to support the dependency propagation
-    casadi_assert(f.spCanEvaluate(true));
+    casadi_assert(f.has_spfwd());
 
     // Pass seeds
     f_in[0] = bvec_t(1) << 0; // seed in direction 0
@@ -98,7 +98,7 @@ int main(){
     cout << "backward mode" << endl;
 
     // Make sure that the class is able to support the dependency propagation
-    casadi_assert(f.spCanEvaluate(false));
+    casadi_assert(f.has_sprev());
 
     // Pass seeds
     f_out[0] = (bvec_t(1) << 5) | (bvec_t(1) << 6); // seed in direction 5 and 6

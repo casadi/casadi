@@ -139,7 +139,8 @@ namespace casadi {
     alloc_w(na_, true); // lam_a
   }
 
-  void CplexInterface::init_memory(void* mem) const {
+  int CplexInterface::init_mem(void* mem) const {
+    if (!mem) return 1;
     auto m = static_cast<CplexMemory*>(mem);
 
     // Start CPLEX
@@ -223,7 +224,7 @@ namespace casadi {
                                  static_cast<CPXLONG>(static_cast<int>(op.second)));
         break;
         default:
-          casadi_error("Unknown CPLEX parameter type (" << paramtype << ") for " + op.first);
+          casadi_error("Unknown CPLEX parameter type (" + str(paramtype) + ") for " + op.first);
       }
       // Error handling
       if (status) {
@@ -247,29 +248,37 @@ namespace casadi {
     m->rstat.resize(na_);
 
     // Matrix A, count the number of elements per column
-    const Sparsity& A_sp = sparsity_in(CONIC_A);
-    m->matcnt.resize(A_sp.size2());
-    transform(A_sp.colind()+1, A_sp.colind() + A_sp.size2()+1, A_sp.colind(), m->matcnt.begin(),
+    m->matcnt.resize(A_.size2());
+    transform(A_.colind()+1, A_.colind() + A_.size2()+1, A_.colind(), m->matcnt.begin(),
               minus<int>());
 
     // Matrix H, count the number of elements per column
-    const Sparsity& H_sp = sparsity_in(CONIC_H);
-    m->qmatcnt.resize(H_sp.size2());
-    transform(H_sp.colind()+1, H_sp.colind() + H_sp.size2()+1, H_sp.colind(), m->qmatcnt.begin(),
+    m->qmatcnt.resize(H_.size2());
+    transform(H_.colind()+1, H_.colind() + H_.size2()+1, H_.colind(), m->qmatcnt.begin(),
               minus<int>());
 
     // Create problem object
     casadi_assert(m->lp==0);
     m->lp = CPXcreateprob(m->env, &status, "QP from CasADi");
     casadi_assert_message(m->lp!=0, "CPXcreateprob failed");
+
+    m->fstats["preprocessing"]  = FStats();
+    m->fstats["solver"]         = FStats();
+    m->fstats["postprocessing"] = FStats();
+    return 0;
   }
 
-  void CplexInterface::
-  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int CplexInterface::
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<CplexMemory*>(mem);
 
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
+
+    m->fstats.at("preprocessing").tic();
+
     if (inputs_check_) {
-      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
 
     // Get inputs
@@ -326,9 +335,8 @@ namespace casadi {
     }
 
     // Copying objective, constraints, and bounds.
-    const Sparsity& A_sp = sparsity_in(CONIC_A);
-    const int* matbeg = A_sp.colind();
-    const int* matind = A_sp.row();
+    const int* matbeg = A_.colind();
+    const int* matind = A_.row();
     const double* matval = A;
     const double* obj = g;
     const double* lb = lbx;
@@ -339,9 +347,8 @@ namespace casadi {
     }
 
     // Preparing coefficient matrix Q
-    const Sparsity& H_sp = sparsity_in(CONIC_H);
-    const int* qmatbeg = H_sp.colind();
-    const int* qmatind = H_sp.row();
+    const int* qmatbeg = H_.colind();
+    const int* qmatind = H_.row();
     const double* qmatval = H;
     if (CPXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
     }
@@ -374,10 +381,14 @@ namespace casadi {
         casadi_error("CPXcopyctype failed");
       }
 
+      m->fstats.at("preprocessing").toc();
+      m->fstats.at("solver").tic();
       // Optimize
       if (CPXmipopt(m->env, m->lp)) {
         casadi_error("CPXmipopt failed");
       }
+      m->fstats.at("solver").toc();
+      m->fstats.at("postprocessing").tic();
 
       // Get objective value
       if (CPXgetobjval(m->env, m->lp, &f)) {
@@ -401,14 +412,42 @@ namespace casadi {
       casadi_fill(lam_x, nx_, nan);
 
     } else {
+      m->fstats.at("preprocessing").toc();
+      m->fstats.at("solver").tic();
       // Optimize
       if (CPXqpopt(m->env, m->lp)) {
         casadi_error("CPXqpopt failed");
       }
+      m->fstats.at("solver").toc();
+      m->fstats.at("postprocessing").tic();
 
-      // Retrieving solution
-      if (CPXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x)) {
-        casadi_error("CPXsolution failed");
+      int problem_type = CPXgetprobtype(m->env, m->lp);
+
+      // The solver switched to a MIQP
+      if (problem_type == CPXPROB_MIQP){
+
+          // Get objective value
+          if (CPXgetobjval(m->env, m->lp, &f)) {
+            casadi_error("CPXgetobjval failed");
+          }
+
+          // Get primal solution
+          int cur_numcols = CPXgetnumcols(m->env, m->lp);
+          if (CPXgetx(m->env, m->lp, x, 0, cur_numcols-1)) {
+            casadi_error("CPXgetx failed");
+          }
+
+          // Not a number as dual variables (not calculated with MIQP algorithm)
+          casadi_fill(lam_a, na_, nan);
+          casadi_fill(lam_x, nx_, nan);
+          if (verbose_) casadi_message("CPLEX does not compute dual variables for nonconvex QPs");
+
+      } else {
+
+          // Retrieving solution
+          if (CPXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x)) {
+            casadi_error("CPXsolution failed");
+          }
       }
     }
 
@@ -424,7 +463,7 @@ namespace casadi {
     int solnstat = CPXgetstat(m->env, m->lp);
     stringstream errormsg;
     // NOTE: Why not print directly to userOut() and userOut<true, PL_WARN>()?
-    if (verbose()) {
+    if (verbose_) {
       if (solnstat == CPX_STAT_OPTIMAL) {
         errormsg << "CPLEX: solution status: Optimal solution found.\n";
       } else if (solnstat == CPX_STAT_UNBOUNDED) {
@@ -466,10 +505,16 @@ namespace casadi {
     casadi_copy(lam_a, na_, res[CONIC_LAM_A]);
     casadi_copy(lam_x, nx_, res[CONIC_LAM_X]);
     casadi_copy(x, nx_, res[CONIC_X]);
+
+    m->fstats.at("postprocessing").toc();
+
+    // Show statistics
+    if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
+    return 0;
   }
 
   CplexInterface::~CplexInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   CplexMemory::CplexMemory() {

@@ -24,6 +24,7 @@
 
 
 #include "xml_node.hpp"
+#include "std_vector_tools.hpp"
 
 using namespace std;
 namespace casadi {
@@ -41,9 +42,7 @@ namespace casadi {
 
   XmlNode& XmlNode::operator[](int i) {
     casadi_assert_message(i>=0 && i < size(),
-                          "XmlNode::operator[]: index out of bounds for element " << i
-                          << " of node " << name());
-
+      "index out of bounds for element " + str(i) + " of node " + name());
     return children_.at(i);
   }
 
@@ -62,7 +61,7 @@ namespace casadi {
 
     // check that the child was indeed found
     if (it == child_indices_.end()) {
-      throw CasadiException("Error in XmlNode::operator[]: could not find " + childname);
+      casadi_error("could not find " + childname);
     }
 
     // Return an index to the child

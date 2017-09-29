@@ -27,6 +27,7 @@
 #define CASADI_IMPORTER_HPP
 
 #include "function.hpp"
+#include "printable.hpp"
 
 namespace casadi {
 
@@ -73,8 +74,12 @@ namespace casadi {
       \author Joris Gillis
       \date 2015
   */
-  class CASADI_EXPORT Importer : public SharedObject {
+  class CASADI_EXPORT Importer
+    : public SharedObject,
+      public SWIG_IF_ELSE(PrintableCommon, Printable<Importer>) {
   public:
+    /** \brief Get type name */
+    static std::string type_name() {return "Importer";}
 
     /// Default constructor
     Importer();

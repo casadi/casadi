@@ -229,8 +229,8 @@ namespace casadi {
     }
   }
 
-  void SundialsInterface::init_memory(void* mem) const {
-    Integrator::init_memory(mem);
+  int SundialsInterface::init_mem(void* mem) const {
+    if (Integrator::init_mem(mem)) return 1;
     auto m = static_cast<SundialsMemory*>(mem);
 
     // Allocate n-vectors
@@ -244,6 +244,7 @@ namespace casadi {
     if (nrx_>0) {
       linsolB_.reset(get_function("jacB").sparsity_out(0));
     }
+    return 0;
   }
 
   void SundialsInterface::reset(IntegratorMemory* mem, double t, const double* x,

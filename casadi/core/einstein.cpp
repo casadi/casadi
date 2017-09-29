@@ -40,35 +40,35 @@ namespace casadi {
     const std::vector<int>& c, const std::vector<int>& a, const std::vector<int>& b):
       dim_c_(dim_c), dim_a_(dim_a), dim_b_(dim_b), c_(c), a_(a), b_(b) {
 
-    setDependencies(C, A, B);
-    setSparsity(C.sparsity());
+    set_dep(C, A, B);
+    set_sparsity(C.sparsity());
 
     n_iter_ = einstein_process(A, B, C, dim_a, dim_b, dim_c, a, b, c,
       iter_dims_, strides_a_, strides_b_, strides_c_);
 
   }
 
-  std::string Einstein::print(const std::vector<std::string>& arg) const {
+  std::string Einstein::disp(const std::vector<std::string>& arg) const {
     return "einstein(" + arg.at(0) + "," + arg.at(1) + "," + arg.at(2) + ")";
   }
 
-  void Einstein::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+  int Einstein::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void Einstein::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+  int Einstein::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Einstein::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int Einstein::eval_gen(const T** arg, T** res, int* iw, T* w) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
 
     einstein_eval(n_iter_, iter_dims_, strides_a_, strides_b_, strides_c_, arg[1], arg[2], res[0]);
-
+    return 0;
   }
 
-  void Einstein::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Einstein::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0]
@@ -77,7 +77,7 @@ namespace casadi {
     }
   }
 
-  void Einstein::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Einstein::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                                std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][1] += MX::einstein(aseed[d][0], dep(2), dim_c_, dim_b_, dim_a_, c_, b_, a_);
@@ -88,11 +88,11 @@ namespace casadi {
 
 
 
-  void Einstein::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    evalGen<bvec_t>(arg, res, iw, w, mem);
+  int Einstein::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+    return eval_gen<bvec_t>(arg, res, iw, w);
   }
 
-  void Einstein::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Einstein::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     //int* ind = iw;
     //int cumprod;
 
@@ -118,14 +118,15 @@ namespace casadi {
       Contraction<bvec_t>(*c, 0, *a);
       Contraction<bvec_t>(0, *c, *b);
     }
-    copyAdj(arg[0], res[0], nnz());
+    copy_rev(arg[0], res[0], nnz());
+    return 0;
   }
 
   void Einstein::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     res[0] = einstein(arg[1], arg[2], arg[0], dim_a_, dim_b_, dim_c_, a_, b_, c_);
   }
 
-  void Einstein::generate(CodeGenerator& g, const std::string& mem,
+  void Einstein::generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const {
 
     // Copy first argument if not inplace
@@ -138,9 +139,9 @@ namespace casadi {
     g << "for (i=0; i<" << n_iter_ << "; ++i) {\n";
 
     // Data pointers
-    g.local("cr", "const real_t", "*");
-    g.local("cs", "const real_t", "*");
-    g.local("rr", "real_t", "*");
+    g.local("cr", "const casadi_real", "*");
+    g.local("cs", "const casadi_real", "*");
+    g.local("rr", "casadi_real", "*");
     g << "cr = " << g.work(arg[1], dep(1).nnz()) << "+" << strides_a_[0] << ";\n";
     g << "cs = " << g.work(arg[2], dep(2).nnz()) << "+" << strides_b_[0] << ";\n";
     g << "rr = " << g.work(res[0], dep(0).nnz()) << "+" << strides_c_[0] << ";\n";

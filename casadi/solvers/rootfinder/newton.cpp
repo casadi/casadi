@@ -50,7 +50,7 @@ namespace casadi {
   }
 
   Newton::~Newton() {
-    clear_memory();
+    clear_mem();
   }
 
   Options Newton::options_
@@ -126,7 +126,7 @@ namespace casadi {
     while (true) {
       // Break if maximum number of iterations already reached
       if (m->iter >= max_iter_) {
-        log("eval", "Max. iterations reached.");
+        if (verbose_) casadi_message("Max iterations reached.");
         m->return_status = "max_iteration_reached";
         success = false;
         break;
@@ -136,10 +136,10 @@ namespace casadi {
       m->iter++;
 
       // Use x to evaluate J
-      copy_n(m->iarg, n_in(), m->arg);
+      copy_n(m->iarg, n_in_, m->arg);
       m->arg[iin_] = m->x;
       m->res[0] = m->jac;
-      copy_n(m->ires, n_out(), m->res+1);
+      copy_n(m->ires, n_out_, m->res+1);
       m->res[1+iout_] = m->f;
       calc_function(m, "jac_f_z");
 
@@ -150,7 +150,7 @@ namespace casadi {
           abstol = max(abstol, fabs(m->f[i]));
         }
         if (abstol <= abstol_) {
-          casadi_msg("Converged to acceptable tolerance - abstol: " << abstol_);
+          if (verbose_) casadi_message("Converged to acceptable tolerance: " + str(abstol_));
           break;
         }
       }
@@ -166,7 +166,7 @@ namespace casadi {
           abstolStep = max(abstolStep, fabs(m->f[i]));
         }
         if (abstolStep <= abstolStep_) {
-          casadi_msg("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
+          if (verbose_) casadi_message("Converged to acceptable tolerance: " + str(abstolStep_));
           break;
         }
       }
@@ -190,8 +190,7 @@ namespace casadi {
 
     // Store the iteration count
     if (success) m->return_status = "success";
-
-    casadi_msg("Newton::solveNonLinear():end after " << m->iter << " steps");
+    if (verbose_) casadi_message("Newton algorithm took " + str(m->iter) + " steps");
   }
 
   void Newton::printIteration(std::ostream &stream) const {
@@ -213,11 +212,12 @@ namespace casadi {
     stream.unsetf(std::ios::floatfield);
   }
 
-  void Newton::init_memory(void* mem) const {
-    Rootfinder::init_memory(mem);
+  int Newton::init_mem(void* mem) const {
+    if (Rootfinder::init_mem(mem)) return 1;
     auto m = static_cast<NewtonMemory*>(mem);
     m->return_status = 0;
     m->iter = 0;
+    return 0;
   }
 
 } // namespace casadi

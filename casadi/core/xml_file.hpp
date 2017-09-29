@@ -29,6 +29,7 @@
 #include "xml_file.hpp"
 #include "shared_object.hpp"
 #include "xml_node.hpp"
+#include "printable.hpp"
 
 namespace casadi {
 
@@ -41,8 +42,13 @@ namespace casadi {
       \author Joel Andersson
       \date 2014
    */
-  class CASADI_EXPORT XmlFile : public SharedObject {
+  class CASADI_EXPORT XmlFile
+    : public SharedObject,
+      public SWIG_IF_ELSE(PrintableCommon, Printable<XmlFile>) {
   public:
+    /** \brief Get type name */
+    static std::string type_name() {return "XmlFile";}
+
     // Default constructor
     XmlFile();
 

@@ -112,7 +112,7 @@ namespace casadi {
     bool is_transpose(const SparsityInternal& y) const;
 
     /// Check if the sparsity is a reshape of another
-    bool isReshape(const SparsityInternal& y) const;
+    bool is_reshape(const SparsityInternal& y) const;
 
     /// Breadth-first search for coarse decomposition: see cs_bfs in CSparse
     void breadthFirstSearch(int n, std::vector<int>& wi, std::vector<int>& wj,
@@ -321,7 +321,7 @@ namespace casadi {
     std::vector<int> get_upper() const;
 
     /// Get the dimension as a string
-    std::string dim() const;
+    std::string dim(bool with_nz=false) const;
 
     /// Describe the nonzero location k as a string
     std::string repr_el(int k) const;
@@ -418,11 +418,11 @@ namespace casadi {
     /// Hash the sparsity pattern
     std::size_t hash() const;
 
-    /// Print representation
-    void repr(std::ostream &stream) const override;
+    /// Readable name of the internal class
+    std::string class_name() const override {return "SparsityInternal";}
 
     /// Print description
-    void print(std::ostream &stream) const override;
+    void disp(std::ostream& stream, bool more) const override;
 
     /** \brief Perform a unidirectional coloring
      *
@@ -450,9 +450,6 @@ namespace casadi {
 
     /** \brief Print a textual representation of sparsity */
     void spy(std::ostream &stream) const;
-
-    /** \brief Print a compact description of the sparsity pattern */
-    void print_compact(std::ostream &stream) const;
 
     /// Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
     void spy_matlab(const std::string& mfile) const;

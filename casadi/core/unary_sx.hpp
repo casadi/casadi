@@ -62,9 +62,12 @@ class UnarySX : public SXNode {
     /** \brief Destructor */
     ~UnarySX() override {}
 
+    // Class name
+    std::string class_name() const override {return "UnarySX";}
+
     bool is_smooth() const override { return operation_checker<SmoothChecker>(op_);}
 
-    bool hasDep() const override { return true; }
+    bool is_op(int op) const override { return op_==op; }
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const SXNode* node, int depth) const override {
@@ -73,7 +76,7 @@ class UnarySX : public SXNode {
     }
 
     /** \brief  Number of dependencies */
-    int ndep() const override { return 1;}
+    int n_dep() const override { return 1;}
 
     /** \brief  get the reference of a dependency */
     const SXElem& dep(int i) const override { return dep_; }

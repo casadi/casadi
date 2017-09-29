@@ -34,73 +34,59 @@ if len(sys.argv)>1 and sys.arg[0]=='nc':
   compileme = False
 else:
   print("Info: Use 'python c_code_generation.py nc' to omit compiling")
-  
-x = SX.sym("x",7,7)
-f = det(x)
-x = vec(x)
-x0 = [random.rand() for xi in range(x.nnz())]
 
-fcn = Function('fcn', [x], [f])
+# Form an expression for the gradient of the determinant
+x = SX.sym('x', 7, 7)
+gd = casadi.gradient(det(x), x)
 
-# adjoint
-gf = casadi.gradient(f, x)
+# Random point to evaluate it
+x0 = DM.rand(7, 7)
 
-gfcn = Function('gfcn', [x],[gf])
+# Form a function and generate C code
+name = 'grad_det'
+grad_det = Function(name, [x], [gd], ['x'], ['gd'])
+cname = grad_det.generate()
 
-name = "grad_det"
-gfcn.generate(name)
-
-objname_no_opt = "grad_det_no_opt.so"
-print("Compiling without optimization: ", objname_no_opt)
+oname_no_opt = name + '_no_opt.so'
+print('Compiling without optimization: ', oname_no_opt)
 t1 = time.time()
 if compileme:
-  system("gcc -fPIC -shared " + name + ".c -o " + objname_no_opt)
+  system('gcc -fPIC -shared ' + cname + ' -o ' + oname_no_opt)
 t2 = time.time()
-print("time = ", (t2-t1)*1e3, " ms")
+print('time = ', (t2-t1)*1e3, ' ms')
 
-objname_O3_opt = "grad_det_O3_opt.so"
-print("Compiling with O3 optimization: ", objname_O3_opt)
+oname_O3 = name + '_O3.so'
+print('Compiling with O3 optimization: ', oname_O3)
 t1 = time.time()
 if compileme:
-  system("gcc -fPIC -shared -O3 " + name + ".c -o " + objname_O3_opt)
+  system('gcc -fPIC -shared -O3 ' + cname + ' -o ' + oname_O3)
 t2 = time.time()
-print("time = ", (t2-t1)*1e3, " ms")
+print('time = ', (t2-t1)*1e3, ' ms')
 
-objname_Os_opt = "grad_det_Os_opt.so"
-print("Compiling with Os optimization: ", objname_Os_opt)
+oname_Os = name + '_Os.so'
+print('Compiling with Os optimization: ', oname_Os)
 t1 = time.time()
 if compileme:
-  system("gcc -fPIC -shared -Os " + name + ".c -o " + objname_Os_opt)
+  system('gcc -fPIC -shared -Os ' + cname + ' -o ' + oname_Os)
 t2 = time.time()
-print("time = ", (t2-t1)*1e3, " ms")
+print('time = ', (t2-t1)*1e3, ' ms')
 
 # Read function
-efcn_no_opt = external(name, "./"+objname_no_opt)
-efcn_O3_opt = external(name, "./"+objname_O3_opt)
-efcn_Os_opt = external(name, "./"+objname_O3_opt)
-f_test = [gfcn,efcn_no_opt,efcn_O3_opt,efcn_Os_opt]
-
-# Just-in-time compilation with OpenCL
-if False:
-  print("Just-in-time compilation with OpenCL")
-  t1 = time.time()
-  gfcn_opencl = Function('gfcn_opencl', [x], [gf], {"just_in_time_opencl":True})
-  t2 = time.time()
-  print("time = ", (t2-t1)*1e3, " ms")
-  f_test.append(gfcn_opencl)
+grad_det_no_opt = external(name, './'+oname_no_opt)
+grad_det_O3 = external(name, './'+oname_O3)
+grad_det_Os = external(name, './'+oname_O3)
+f_test = [grad_det, grad_det_no_opt, grad_det_O3, grad_det_Os]
 
 for f in f_test:
   t1 = time.time()
   nrep = 10000
   for r in range(nrep):
-    [r] = f([x0])
+    r = f(x0)
   t2 = time.time()
-  print("result = ", r.nonzeros())
+  print('result = ', r.nonzeros())
   dt = (t2-t1)/nrep
-  print("time = ", dt*1e3, " ms")
-  
-  num_op = gfcn.getAlgorithmSize()
-  print("number of elementary operations: ", num_op)
-  print("time per elementary operations: ", dt/num_op*1e9, " ns")
-  
-  
+  print('time = ', dt*1e3, ' ms')
+
+  num_op = grad_det.n_nodes()
+  print('number of elementary operations: ', num_op)
+  print('time per elementary operations: ', dt/num_op*1e9, ' ns')

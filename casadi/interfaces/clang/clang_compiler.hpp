@@ -43,7 +43,7 @@
 
 #include <llvm/ADT/SmallString.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
-#if LLVM_VERSION_MAJOR>=3 && LLVM_VERSION_MINOR>=5
+#if (LLVM_VERSION_MAJOR>=4) || (LLVM_VERSION_MAJOR==3 && LLVM_VERSION_MINOR>=5)
 #include <llvm/ExecutionEngine/MCJIT.h>
 #else
 #include "llvm/ExecutionEngine/JIT.h"
@@ -106,8 +106,11 @@ namespace casadi {
     /// Get name of plugin
     const char* plugin_name() const override { return "clang";}
 
+    // Get name of the class
+    std::string class_name() const override { return "ClangCompiler";}
+
     /// Get a function pointer for numerical evaluation
-    virtual signal_t get_function(const std::string& symname);
+    signal_t get_function(const std::string& symname) override;
 
     // Helper function for reading includes
     static std::vector<std::pair<std::string, bool> >

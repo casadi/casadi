@@ -55,10 +55,10 @@ namespace casadi {
     signal_t incref_, decref_;
 
     /** \brief Number of inputs and outputs */
-    getint_t n_in_, n_out_;
+    getint_t get_n_in_, get_n_out_;
 
     /** \brief Names of inputs and outputs */
-    name_t name_in_, name_out_;
+    name_t get_name_in_, get_name_out_;
 
     /** \brief Work vector sizes */
     work_t work_;
@@ -85,20 +85,16 @@ namespace casadi {
                              const Dict& opts) const override;
 
     /** \brief Get type name */
-    std::string type_name() const override { return "external";}
+    std::string class_name() const override { return "External";}
 
     /// Initialize
     void init(const Dict& opts) override;
 
-    /** \brief Add a dependent function */
-    void addDependency(CodeGenerator& g) const override;
+    /** \brief Generate code for the declarations of the C function */
+    void codegen_declarations(CodeGenerator& g) const override;
 
-    /** \brief Generate code the function */
-    void generateFunction(CodeGenerator& g, const std::string& fname,
-                                  bool decl_static) const override;
-
-    /** \brief Get name in codegen */
-    std::string codegen_name(const CodeGenerator& g) const override;
+    /** \brief Generate code for the body of the C function */
+    void codegen_body(CodeGenerator& g) const override;
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -114,66 +110,47 @@ namespace casadi {
 
     ///@{
     /** \brief Forward mode derivatives */
-    Function get_forward(const std::string& name, int nfwd,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
+    Function get_forward(int nfwd, const std::string& name,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
                                  const Dict& opts) const override;
-    int get_n_forward() const override;
+    bool has_forward(int nfwd) const override;
     ///@}
 
     ///@{
     /** \brief Reverse mode derivatives */
-    Function get_reverse(const std::string& name, int nadj,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
+    Function get_reverse(int nadj, const std::string& name,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
                                  const Dict& opts) const override;
-    int get_n_reverse() const override;
+    bool has_reverse(int nadj) const override;
     ///@}
 
     ///@{
     /** \brief Full Jacobian */
-    bool hasFullJacobian() const override;
-    Function getFullJacobian(const std::string& name,
-                                     const std::vector<std::string>& i_names,
-                                     const std::vector<std::string>& o_names,
-                                     const Dict& opts) override;
+    bool has_jacobian() const override;
+    Function get_jacobian(const std::string& name,
+                                     const std::vector<std::string>& inames,
+                                     const std::vector<std::string>& onames,
+                                     const Dict& opts) const override;
     ///@}
-  };
-
-  class CASADI_EXPORT SimplifiedExternal : public External {
-  public:
-    /** \brief Constructor */
-    SimplifiedExternal(const std::string& name, const Importer& li);
-
-    /** \brief  Destructor */
-    ~SimplifiedExternal() override { this->clear_memory();}
-
-    /// Initialize
-    void init(const Dict& opts) override;
-
-    /** \brief Use simplified signature */
-    bool simplifiedCall() const override { return true;}
-
-    /// @{
-    /** \brief Retreive sparsities */
-    Sparsity get_sparsity_in(int i) override { return Sparsity::scalar();}
-    Sparsity get_sparsity_out(int i) override { return Sparsity::scalar();}
-    /// @}
   };
 
   class CASADI_EXPORT GenericExternal : public External {
     // Sparsities
-    sparsity_t sparsity_in_, sparsity_out_;
+    sparsity_t get_sparsity_in_, get_sparsity_out_;
 
-    // Maximum number of memory objects
-    int n_mem_;
+    // Memory allocation
+    alloc_mem_t alloc_mem_;
+    init_mem_t init_mem_;
+    free_mem_t free_mem_;
 
   public:
     /** \brief Constructor */
     GenericExternal(const std::string& name, const Importer& li);
 
     /** \brief  Destructor */
-    ~GenericExternal() override { this->clear_memory();}
+    ~GenericExternal() override { this->clear_mem();}
 
     /// Initialize
     void init(const Dict& opts) override;
@@ -184,8 +161,73 @@ namespace casadi {
     Sparsity get_sparsity_out(int i) override;
     /// @}
 
-    /** \brief Maximum number of memory objects */
-    int n_mem() const override { return n_mem_;}
+    /** \brief Create memory block */
+    void* alloc_mem() const override;
+
+    /** \brief Initalize memory block */
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override;
+  };
+
+  class CASADI_EXPORT JitFunction : public FunctionInternal {
+  public:
+    /** \brief Constructor */
+    JitFunction(const std::string& name,
+              const std::vector<std::string>& name_in,
+              const std::vector<std::string>& name_out,
+              const std::vector<Sparsity>& sparsity_in,
+              const std::vector<Sparsity>& sparsity_out,
+              const std::string& body);
+
+    /** \brief Get type name */
+    std::string class_name() const override { return "JitFunction";}
+
+    /** \brief Destructor */
+    ~JitFunction() override;
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
+
+    /** \brief Initialize */
+    void init(const Dict& opts) override;
+
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    size_t get_n_in() override { return name_in_.size();}
+    size_t get_n_out() override { return name_out_.size();}
+    ///@}
+
+    /** \brief Is codegen supported? */
+    bool has_codegen() const override { return true;}
+
+    /** \brief Generate code for the function body */
+    void codegen_body(CodeGenerator& g) const override;
+
+    ///@{
+    /** \brief Jacobian of all outputs with respect to all inputs */
+    bool has_jacobian() const override;
+    Function get_jacobian(const std::string& name,
+                          const std::vector<std::string>& inames,
+                          const std::vector<std::string>& onames,
+                          const Dict& opts) const override;
+    ///@}
+
+    // Buffer the function calls
+    bool buffered_;
+
+    // Function body
+    std::string body_;
+
+    // Jacobian function body
+    std::string jac_body_;
+
+    // Hessian function body
+    std::string hess_body_;
   };
 
 

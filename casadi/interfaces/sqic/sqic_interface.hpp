@@ -65,6 +65,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "sqic";}
 
+    // Get name of the class
+    std::string class_name() const override { return "SqicInterface";}
+
     /** \brief  Initialize */
     virtual void init();
 

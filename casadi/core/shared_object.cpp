@@ -45,13 +45,13 @@ namespace casadi {
     count_down();
   }
 
-  void SharedObject::assignNode(SharedObjectInternal* node_) {
+  void SharedObject::own(SharedObjectInternal* node_) {
     count_down();
     node = node_;
     count_up();
   }
 
-  void SharedObject::assignNodeNoCount(SharedObjectInternal* node_) {
+  void SharedObject::assign(SharedObjectInternal* node_) {
     node = node_;
   }
 
@@ -92,25 +92,19 @@ namespace casadi {
     return node;
   }
 
-  void SharedObject::repr(std::ostream &stream, bool trailing_newline) const {
-    if (is_null()) {
-      stream << 0;
-    } else {
-      (*this)->repr(stream);
-    }
-    if (trailing_newline) stream << std::endl;
+  std::string SharedObject::class_name() const {
+    return (*this)->class_name();
   }
 
-  void SharedObject::print(std::ostream &stream, bool trailing_newline) const {
+  void SharedObject::disp(std::ostream& stream, bool more) const {
     if (is_null()) {
-      stream << "Null pointer of class \"" << typeid(this).name() << "\"";
+      stream << "NULL";
     } else {
-      (*this)->print(stream);
+      (*this)->disp(stream, more);
     }
-    if (trailing_newline) stream << std::endl;
   }
 
-  void SharedObject::printPtr(std::ostream &stream) const {
+  void SharedObject::print_ptr(std::ostream &stream) const {
     stream << node;
   }
 
@@ -143,7 +137,7 @@ namespace casadi {
   SharedObject WeakRef::shared() {
     SharedObject ret;
     if (alive()) {
-      ret.assignNode((*this)->raw_);
+      ret.own((*this)->raw_);
     }
     return ret;
   }
@@ -157,11 +151,11 @@ namespace casadi {
   }
 
   WeakRef::WeakRef(SharedObject shared) {
-    assignNode(shared.weak()->get());
+    own(shared.weak()->get());
   }
 
   WeakRef::WeakRef(SharedObjectInternal* raw) {
-    assignNode(new WeakRefInternal(raw));
+    own(new WeakRefInternal(raw));
   }
 
   void WeakRef::kill() {

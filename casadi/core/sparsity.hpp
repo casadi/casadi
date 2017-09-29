@@ -27,6 +27,7 @@
 #define CASADI_SPARSITY_HPP
 
 #include "shared_object.hpp"
+#include "printable.hpp"
 #include "casadi_types.hpp"
 #include "sparsity_interface.hpp"
 #include <vector>
@@ -73,8 +74,10 @@ namespace casadi {
    * \author Joel Andersson
    * \date 2010-2015
    */
-  class CASADI_EXPORT Sparsity : public SharedObject,
-                                 public SparsityInterface<Sparsity> {
+  class CASADI_EXPORT Sparsity
+    : public SharedObject,
+      public SWIG_IF_ELSE(SparsityInterfaceCommon, SparsityInterface<Sparsity>),
+      public SWIG_IF_ELSE(PrintableCommon, Printable<Sparsity>) {
   public:
 
     /// Default constructor
@@ -228,6 +231,9 @@ namespace casadi {
         This enables using the C runtime functions using a natural syntax.
     */
     operator const int*() const;
+
+    /** \brief Implicit or explicit type conversion to compact representation */
+    operator const std::vector<int>&() const;
 #endif // SWIG
 
     /// \name Size and element counting
@@ -236,8 +242,14 @@ namespace casadi {
     /// Get the number of rows
     int size1() const;
 
+    /// Get the number of rows, Octave-style syntax
+    int rows() const {return size1();}
+
     /// Get the number of columns
     int size2() const;
+
+    /// Get the number of columns, Octave-style syntax
+    int columns() const {return size2();}
 
     /** \brief The total number of elements, including structural zeros, i.e. size2()*size1()
         \see nnz()  */
@@ -383,7 +395,7 @@ namespace casadi {
     bool is_transpose(const Sparsity& y) const;
 
     /// Check if the sparsity is a reshape of another
-    bool isReshape(const Sparsity& y) const;
+    bool is_reshape(const Sparsity& y) const;
 
     /// @{
     /** \brief Combine two sparsity patterns
@@ -686,7 +698,17 @@ namespace casadi {
                    bool invert_permutation=false) const;
 
     /// Get the dimension as a string
-    std::string dim() const;
+    std::string dim(bool with_nz=false) const;
+
+    /** \brief Dimension string as a postfix to a name
+      Rules:
+      1. Dense and scalar: ""
+      2. 0-by-0: "[]"
+      3. Dense column vector: "[5]"
+      4. Dense matrix: "[5x10]"
+      5. Otherwise: "[5x10,3nz]"
+    */
+    std::string postfix_dim() const;
 
     /// Describe the nonzero location k as a string
     std::string repr_el(int k) const;
@@ -699,8 +721,15 @@ namespace casadi {
      * the sparsity using the spy command  */
     void spy_matlab(const std::string& mfile) const;
 
-    /** \brief Print a compact description of the sparsity pattern */
-    void print_compact(std::ostream &stream=casadi::userOut()) const;
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Alias for disp */
+    void print_compact(std::ostream &stream=casadi::userOut()) const {
+      disp(stream);
+    }
+#endif // WITH_DEPRECATED_FEATURES
+
+    /// Readable name of the public class
+    static std::string type_name() {return "Sparsity";}
 
     // Hash the sparsity pattern
     std::size_t hash() const;
@@ -853,8 +882,8 @@ namespace casadi {
       }
     } else {
       // Make sure that dimension matches
-      casadi_error("Sparsity::set<DataType>: shape mismatch. lhs is matrix of shape "
-                   << dim() << ", while rhs is shape " << val_sp.dim() << ".");
+      casadi_error("Sparsity::set<DataType>: shape mismatch. lhs is "
+                   + dim() + ", while rhs is " + val_sp.dim() + ".");
     }
   }
 
@@ -895,9 +924,8 @@ namespace casadi {
 
       // Make sure that dimension matches
       casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
-                            "Sparsity::add<DataType>: shape mismatch. lhs is matrix of shape "
-                            << dim() << ", while rhs is shape "
-                            << val_sp.dim() << ".");
+                            "Sparsity::add<DataType>: shape mismatch. lhs is "
+                            + dim() + ", while rhs is " + val_sp.dim() + ".");
 
       // Sparsity
       const int* c = row();
@@ -976,8 +1004,8 @@ namespace casadi {
 
       // Make sure that dimension matches
       casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
-                            "Sparsity::add<DataType>: shape mismatch. lhs is matrix of shape "
-                            << dim() << ", while rhs is shape " << val_sp.dim() << ".");
+                            "Sparsity::add<DataType>: shape mismatch. lhs is "
+                            + dim() + ", while rhs is " + val_sp.dim() + ".");
 
       // Sparsity
       const int* c = row();

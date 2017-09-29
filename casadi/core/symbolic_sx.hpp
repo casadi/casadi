@@ -52,7 +52,8 @@ public:
   /** \brief  Name */
   std::string name_;
 
-protected:
+  // Class name
+  std::string class_name() const override {return "SymbolicSX";}
 
   /** \brief  Print expression */
   std::string print(const std::string& arg1, const std::string& arg2) const override {

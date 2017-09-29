@@ -46,25 +46,6 @@
     \date 2010-2011
 */
 
-namespace std {
-
-#ifndef SWIG
-  /// Enables flushing an std::vector to a stream (prints representation)
-  template<typename T>
-  ostream& operator<<(ostream &stream, const vector<T> &v);
-
-  /// Enables flushing an std::pair to a stream (prints representation)
-  template<typename T1, typename T2>
-  ostream& operator<<(ostream &stream, const pair<T1, T2> &p);
-
-  /// Enables flushing an std::map to a stream (prints representation)
-  template<typename T1, typename T2>
-  ostream& operator<<(ostream &stream, const std::map<T1, T2> &p);
-
-#endif //SWIG
-
-} // namespace std
-
 namespace casadi {
 
 #ifndef SWIG
@@ -90,7 +71,7 @@ namespace casadi {
   */
   CASADI_EXPORT std::vector<int> range(int stop);
 
-  CASADI_EXPORT bool isEquallySpaced(const std::vector<double> &v);
+  CASADI_EXPORT bool is_equally_spaced(const std::vector<double> &v);
 
   /**  \brief Slicing vector
   *  \param v Vector to slice
@@ -104,32 +85,36 @@ namespace casadi {
   template<typename T>
   std::vector<T> reverse(const std::vector<T> &v);
 
-  /// Print representation
+  /** \brief Join two lists
+  */
   template<typename T>
-  void repr(const std::vector<T> &v, std::ostream &stream=casadi::userOut());
+  std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b);
 
-  /// Print description
-  template<typename T>
-  void print(const std::vector<T> &v, std::ostream &stream=casadi::userOut());
   #endif // SWIG
 
   /// Check if for each element of v holds: v_i < upper
   template<typename T>
-  bool inBounds(const std::vector<T> &v, int upper);
+  bool in_range(const std::vector<T> &v, int upper);
 
   /// Check if for each element of v holds: lower <= v_i < upper
   template<typename T>
-  bool inBounds(const std::vector<T> &v, int lower, int upper);
+  bool in_range(const std::vector<T> &v, int lower, int upper);
 
-  /** \brief swap inner and outer indices of list of lists
-  *
-  * \verbatim
-  * [[apple0,apple1,...],[pear0,pear1,...]] ->
-  *   [[apple0,pear0],[apple1,pear1],...]
-  * \endverbatim
-  */
-  template<typename T>
-  std::vector< std::vector<T> > swapIndices(const std::vector< std::vector<T> > &m);
+  // Assert that a indices are in a range
+  #define casadi_assert_in_range(v, lower, upper) \
+   casadi_assert_message(in_range(v, lower, upper), \
+    "Out of bounds error. Got elements in range [" \
+    + str(*std::min_element(v.begin(), v.end())) + ","\
+    + str(*std::max_element(v.begin(), v.end())) + "], which is outside the range ["\
+    + str(lower) + "," + str(upper) + ").")
+
+    // Assert that a indices are bounded
+    #define casadi_assert_bounded(v, upper) \
+     casadi_assert_message(in_range(v, upper), \
+      "Out of bounds error. Got elements in range [" \
+      + str(*std::min_element(v.begin(), v.end())) + ","\
+      + str(*std::max_element(v.begin(), v.end())) + "], which exceeds the upper bound "\
+      + str(upper) + ".")
 
   /** \brief Returns the list of all i in [0, size[ not found in supplied list
   *
@@ -168,40 +153,56 @@ namespace casadi {
 
   /// Check if the vector is strictly increasing
   template<typename T>
-  bool isIncreasing(const std::vector<T> &v);
+  bool is_increasing(const std::vector<T> &v);
 
   /// Check if the vector is strictly decreasing
   template<typename T>
-  bool isDecreasing(const std::vector<T> &v);
+  bool is_decreasing(const std::vector<T> &v);
 
   /// Check if the vector is non-increasing
   template<typename T>
-  bool isNon_increasing(const std::vector<T> &v);
+  bool is_nonincreasing(const std::vector<T> &v);
 
   /// Check if the vector is non-decreasing
   template<typename T>
-  bool isNonDecreasing(const std::vector<T> &v);
+  bool is_nondecreasing(const std::vector<T> &v);
 
   /// Check if the vector is monotone
   template<typename T>
-  bool isMonotone(const std::vector<T> &v);
+  bool is_monotone(const std::vector<T> &v);
 
   /// Check if the vector is strictly monotone
   template<typename T>
-  bool isStrictlyMonotone(const std::vector<T> &v);
+  bool is_strictly_monotone(const std::vector<T> &v);
 
   /// Check if the vector has negative entries
   template<typename T>
-  bool hasNegative(const std::vector<T> &v);
+  bool has_negative(const std::vector<T> &v);
 
 #ifndef SWIG
-  /// Print representation to string
+  /// String representation, any type
   template<typename T>
-  std::string getRepresentation(const std::vector<T> &v);
+  std::string str(const T& v);
 
-  /// Print description to string
+  /// String representation, CasADi type
   template<typename T>
-  std::string getDescription(const std::vector<T> &v);
+  std::string str(const T& v, bool more);
+
+  /// String representation of vector
+  template<typename T>
+  std::string str(const std::vector<T>& v, bool more=false);
+
+  /// String representation of pair
+  template<typename T1, typename T2>
+  std::string str(const std::pair<T1, T2>& p, bool more=false);
+
+  /// String representation of a map
+  template<typename T1, typename T2>
+  std::string str(const std::map<T1, T2> &p, bool more=false);
+
+  /// String representation of a dictionary
+  template<typename T2>
+  std::string str(const std::map<std::string, T2> &p, bool more=false);
 #endif //SWIG
 
   /// Print vector, matlab style
@@ -292,52 +293,38 @@ namespace casadi {
 
 } // namespace casadi
 
-// Implementations
 #ifndef SWIG
-//#ifdef casadi_EXPORTS
+// In std namespace
 namespace std {
 
   /// Enables flushing an std::vector to a stream (prints representation)
   template<typename T>
-  ostream& operator<<(ostream &stream, const vector<T> &v) {
-    casadi::repr(v, stream);
+  ostream& operator<<(ostream& stream, const vector<T>& v) {
+    stream << casadi::str(v);
     return stream;
   }
 
   template<typename T1, typename T2>
-  ostream& operator<<(ostream &stream, const pair<T1, T2> &p) {
-    stream << "(" << p.first << ", " << p.second << ")";
+  ostream& operator<<(ostream& stream, const pair<T1, T2>& p) {
+    stream << casadi::str(p);
     return stream;
   }
 
   template<typename T1, typename T2>
-  ostream& operator<<(ostream &stream, const std::map<T1, T2> &p) {
-    stream << "{";
-    typedef typename std::map<T1, T2>::const_iterator it_type;
-    int count = 0;
-    for (it_type it = p.begin();it!=p.end();++it) {
-      stream << it->first << ": " << it->second;
-      if (count++ < p.size()-1) stream << ", ";
-    }
-    stream << "}";
+  ostream& operator<<(ostream& stream, const std::map<T1, T2>& p) {
+    stream << casadi::str(p);
     return stream;
   }
 
   template<typename T2>
-  ostream& operator<<(ostream &stream, const std::map<std::string, T2> &p) {
-    stream << "{";
-    typedef typename std::map<std::string, T2>::const_iterator it_type;
-    int count = 0;
-    for (it_type it = p.begin();it!=p.end();++it) {
-      stream << '"' << it->first << '"' << ": " << it->second;
-      if (count++ < p.size()-1) stream << ", ";
-    }
-    stream << "}";
+  ostream& operator<<(ostream& stream, const std::map<std::string, T2>& p) {
+    stream << casadi::str(p);
     return stream;
   }
 
 } // namespace std
 
+// Implementations
 namespace casadi {
 
   template<typename T>
@@ -348,10 +335,10 @@ namespace casadi {
        int j = i[k];
        casadi_assert_message(j>=0,
          "vector_slice: Indices should be larger than zero."
-         << "You have " << j << " at location " << k << ".");
+         "You have " + str(j) + " at location " + str(k) + ".");
        casadi_assert_message(j<v.size(),
          "vector_slice: Indices should be larger than zero."
-         << "You have " << j << " at location " << k << ".");
+         "You have " + str(j) + " at location " + str(k) + ".");
        ret.push_back(v[j]);
     }
     return ret;
@@ -365,34 +352,10 @@ namespace casadi {
   }
 
   template<typename T>
-  void repr(const std::vector<T> &v, std::ostream &stream) {
-    if (v.empty()) {
-      stream << "[]";
-    } else {
-      // Print elements, python style
-      stream << "[";
-      stream << v.front();
-      for (unsigned int i=1; i<v.size(); ++i)
-        stream << ", " << v[i];
-      stream << "]";
-    }
-  }
-
-  template<typename T>
-  void print(const std::vector<T> &v, std::ostream &stream) {
-    // print vector style
-    stream << "[" << v.size() << "]"; // Print dimension
-
-    if (v.empty()) {
-      stream << "()";
-    } else {
-      // Print elements, ublas stype
-      stream << "(";
-      for (unsigned int i=0; i<v.size()-1; ++i)
-        stream << v[i] << ", ";
-      if (!v.empty()) stream << v.back();
-      stream << ")";
-    }
+  std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b) {
+    std::vector<T> ret = a;
+    ret.insert(ret.end(), b.begin(), b.end());
+    return ret;
   }
 
 #ifndef SWIG
@@ -410,12 +373,12 @@ namespace casadi {
 #endif //SWIG
 
   template<typename T>
-  bool inBounds(const std::vector<T> &v, int upper) {
-    return inBounds(v, 0, upper);
+  bool in_range(const std::vector<T> &v, int upper) {
+    return in_range(v, 0, upper);
   }
 
   template<typename T>
-  bool inBounds(const std::vector<T> &v, int lower, int upper) {
+  bool in_range(const std::vector<T> &v, int lower, int upper) {
     if (v.size()==0) return true;
     int max = *std::max_element(v.begin(), v.end());
     if (max >= upper) return false;
@@ -430,7 +393,7 @@ namespace casadi {
   }
 
   template<typename T>
-  bool isIncreasing(const std::vector<T> &v) {
+  bool is_increasing(const std::vector<T> &v) {
     if (v.size()==0) return true;
     T el = v[0];
     for (int i=1;i<v.size();++i) {
@@ -441,7 +404,7 @@ namespace casadi {
   }
 
   template<typename T>
-  bool isDecreasing(const std::vector<T> &v) {
+  bool is_decreasing(const std::vector<T> &v) {
     if (v.size()==0) return true;
     T el = v[0];
     for (int i=1;i<v.size();++i) {
@@ -452,7 +415,7 @@ namespace casadi {
   }
 
   template<typename T>
-  bool isNon_increasing(const std::vector<T> &v) {
+  bool is_nonincreasing(const std::vector<T> &v) {
     if (v.size()==0) return true;
     T el = v[0];
     for (int i=1;i<v.size();++i) {
@@ -463,7 +426,7 @@ namespace casadi {
   }
 
   template<typename T>
-  bool isNonDecreasing(const std::vector<T> &v) {
+  bool is_nondecreasing(const std::vector<T> &v) {
     if (v.size()==0) return true;
     T el = v[0];
     for (int i=1;i<v.size();++i) {
@@ -474,17 +437,17 @@ namespace casadi {
   }
 
   template<typename T>
-  bool isMonotone(const std::vector<T> &v) {
-    return isNonDecreasing(v) || isNon_increasing(v);
+  bool is_monotone(const std::vector<T> &v) {
+    return is_nondecreasing(v) || is_nonincreasing(v);
   }
 
   template<typename T>
-  bool isStrictlyMonotone(const std::vector<T> &v) {
-    return isDecreasing(v) || isIncreasing(v);
+  bool is_strictly_monotone(const std::vector<T> &v) {
+    return is_decreasing(v) || is_increasing(v);
   }
 
   template<typename T>
-  bool hasNegative(const std::vector<T> &v) {
+  bool has_negative(const std::vector<T> &v) {
     for (std::size_t i=0; i<v.size(); ++i) {
       if (v[i]<0) return true;
     }
@@ -492,16 +455,59 @@ namespace casadi {
   }
 
   template<typename T>
-  std::string getRepresentation(const std::vector<T> &v) {
+  std::string str(const T& v) {
     std::stringstream ss;
-    repr(v, ss);
+    ss << v;
     return ss.str();
   }
 
   template<typename T>
-  std::string getDescription(const std::vector<T> &v) {
+  std::string str(const T& v, bool more) {
+    return v.get_str(more);
+  }
+
+  template<typename T>
+  std::string str(const std::vector<T>& v, bool more) {
     std::stringstream ss;
-    print(v, ss);
+    ss << "[";
+    for (int i=0; i<v.size(); ++i) {
+      if (i!=0) ss << ", ";
+      ss << v[i];
+    }
+    ss << "]";
+    return ss.str();
+  }
+
+  template<typename T1, typename T2>
+  std::string str(const std::pair<T1, T2>& p, bool more) {
+    std::stringstream ss;
+    ss << "[" << p.first << "," << p.second << "]";
+    return ss.str();
+  }
+
+  template<typename T1, typename T2>
+  std::string str(const std::map<T1, T2>& p, bool more) {
+    std::stringstream ss;
+    ss << "{";
+    int count = 0;
+    for (auto& e : p) {
+      ss << e.first << ": " << e.second;
+      if (++count < p.size()) ss << ", ";
+    }
+    ss << "}";
+    return ss.str();
+  }
+
+  template<typename T2>
+  std::string str(const std::map<std::string, T2>& p, bool more) {
+    std::stringstream ss;
+    ss << "{";
+    int count = 0;
+    for (auto& e : p) {
+      ss << "\"" << e.first << "\": " << e.second;
+      if (++count < p.size()) ss << ", ";
+    }
+    ss << "}";
     return ss.str();
   }
 
@@ -660,53 +666,6 @@ namespace casadi {
   }
 
   template<typename T>
-  std::vector<T> makeVector(int size,
-                            int ind0, const T& val0,
-                            int ind1, const T& val1,
-                            int ind2, const T& val2,
-                            int ind3, const T& val3,
-                            int ind4, const T& val4,
-                            int ind5, const T& val5,
-                            int ind6, const T& val6,
-                            int ind7, const T& val7,
-                            int ind8, const T& val8,
-                            int ind9, const T& val9,
-                            int ind10, const T& val10,
-                            int ind11, const T& val11,
-                            int ind12, const T& val12,
-                            int ind13, const T& val13,
-                            int ind14, const T& val14,
-                            int ind15, const T& val15,
-                            int ind16, const T& val16,
-                            int ind17, const T& val17,
-                            int ind18, const T& val18,
-                            int ind19, const T& val19) {
-
-    // Maximum size supported
-    const int max_size = 20;
-
-    // Collect all arguments
-    int ind[max_size] = {ind0, ind1, ind2, ind3, ind4, ind5, ind6, ind7, ind8, ind9,
-                         ind10, ind11, ind12, ind13, ind14, ind15, ind16, ind17, ind18, ind19};
-    T val[max_size] = {val0, val1, val2, val3, val4, val5, val6, val7, val8, val9,
-                       val10, val11, val12, val13, val14, val15, val16, val17, val18, val19};
-
-    // Return value
-    std::vector<T> ret(size);
-
-    // Assign all values
-    for (int i=0; i<max_size; ++i) {
-      // Break if not assigned
-      if (ind[i]<0) break;
-
-      // Assign value
-      ret.at(ind[i]) = val[i];
-    }
-
-    return ret;
-  }
-
-  template<typename T>
   T dot(const std::vector<T>& a, const std::vector<T>& b) {
     T ret = 0;
     for (int k=0; k<a.size(); ++k) {
@@ -743,28 +702,6 @@ namespace casadi {
   }
 
   template<typename T>
-  std::vector<T> toVector(const T& v0) {
-    return std::vector<T>(1, v0);
-  }
-
-  template<typename T>
-  std::vector<T> toVector(const T& v0, const T& v1) {
-    std::vector<T> ret(2);
-    ret[0] = v0;
-    ret[1] = v1;
-    return ret;
-  }
-
-  template<typename T>
-  std::vector<T> toVector(const T& v0, const T& v1, const T& v2) {
-    std::vector<T> ret(3);
-    ret[0] = v0;
-    ret[1] = v1;
-    ret[2] = v2;
-    return ret;
-  }
-
-  template<typename T>
   bvec_t* get_bvec_t(std::vector<T>& v) {
     casadi_assert_message(0, "get_bvec_t only supported for double");
   }
@@ -772,33 +709,6 @@ namespace casadi {
   template<typename T>
   const bvec_t* get_bvec_t(const std::vector<T>& v) {
     casadi_assert_message(0, "get_bvec_t only supported for double");
-  }
-
-  template<typename T>
-  std::vector< std::vector<T> > swapIndices(const std::vector< std::vector<T> > &mat) {
-
-    // Get the matrix dimensions
-    int n = mat.size();
-    int m = -1;
-    for (int i=0;i<n;++i) {
-      casadi_assert_message(m==-1 || m==mat[i].size(),
-        "swapIndices(vector<vector>) dimension mismatch.");
-      if (m==-1) m = mat[i].size();
-    }
-
-    // Allocate the result
-    std::vector< std::vector<T> > ret(m);
-    for (int i=0;i<m;++i) {
-      ret[i].resize(n);
-    }
-
-    // Assign the result
-    for (int i=0;i<n;++i) {
-      for (int j=0;j<mat[i].size();++j) {
-        ret[j][i] = mat[i][j];
-      }
-    }
-    return ret;
   }
 
   ///@{

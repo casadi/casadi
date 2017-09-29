@@ -47,6 +47,9 @@ public:
 // Destructor
 ~ConstantSX() override {}
 
+// Class name
+std::string class_name() const override {return "ConstantSX";}
+
 /** \brief  Get the value must be defined */
 double to_double() const override = 0;
 
@@ -119,7 +122,7 @@ class RealtypeSX : public ConstantSX {
     int to_int() const override { return static_cast<int>(value);}
     ///@}
 
-    bool isAlmostZero(double tol) const override { return fabs(value)<=tol; }
+    bool is_almost_zero(double tol) const override { return fabs(value)<=tol; }
 
   protected:
     /** \brief Hash map of all constants currently allocated
@@ -208,7 +211,7 @@ public:
   /** \brief  Properties */
   bool is_integer() const override { return true; }
   bool is_zero() const override { return true; }
-  bool isAlmostZero(double tol) const override { return true; }
+  bool is_almost_zero(double tol) const override { return true; }
   ///@}
 };
 
@@ -273,7 +276,7 @@ public:
   double to_double() const override { return std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties */
-  bool isInf() const override { return true; }
+  bool is_inf() const override { return true; }
 
 };
 
@@ -292,7 +295,7 @@ public:
   double to_double() const override { return -std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties */
-  bool isMinusInf() const override { return true; }
+  bool is_minus_inf() const override { return true; }
 
 };
 
@@ -311,7 +314,7 @@ public:
   double to_double() const override { return std::numeric_limits<double>::quiet_NaN();}
 
   /** \brief  Properties */
-  bool isNan() const override { return true; }
+  bool is_nan() const override { return true; }
 
 };
 

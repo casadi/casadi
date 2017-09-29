@@ -97,10 +97,10 @@ namespace casadi {
     }
 
     // Allocate memory for problem
-    nQ_ = sparsity_in(CONIC_H).nnz_upper();
+    nQ_ = H_.nnz_upper();
     nA_ = nnz_in(CONIC_A);
     nH_ = nnz_in(CONIC_H);
-    spAT_ = sparsity_in(CONIC_A).T();
+    spAT_ = A_.T();
 
     // Allocate work vectors
     alloc_w(nx_, true); // g
@@ -143,10 +143,10 @@ namespace casadi {
     alloc_iw(na_); // casadi_trans
   }
 
-  void OoqpInterface::
-  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int OoqpInterface::
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     if (inputs_check_) {
-      checkInputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
 
     // Get problem data
@@ -235,8 +235,8 @@ namespace casadi {
     }
 
     // Get quadratic term
-    const int* H_colind = sparsity_in(CONIC_H).colind();
-    const int* H_row = sparsity_in(CONIC_H).row();
+    const int* H_colind = H_.colind();
+    const int* H_row = H_.row();
     int nnzQ = 0;
     // Loop over the columns of the quadratic term
     for (int cc=0; cc<nx_; ++cc) {
@@ -275,11 +275,11 @@ namespace casadi {
     }
 
     // Get the transpose of the sparsity pattern to be able to loop over the constraints
-    casadi_trans(A, sparsity_in(CONIC_A), AT, spAT_, iw);
+    casadi_trans(A, A_, AT, spAT_, iw);
 
     // Loop over constraints
-    const int* A_colind = sparsity_in(CONIC_A).colind();
-    const int* A_row = sparsity_in(CONIC_A).row();
+    const int* A_colind = A_.colind();
+    const int* A_row = A_.row();
     const int* AT_colind = spAT_.colind();
     const int* AT_row = spAT_.row();
     int nA=0, nC=0, /*mz=0, */ nnzA=0, nnzC=0;
@@ -409,9 +409,9 @@ namespace casadi {
     }
 
     if (ierr>0) {
-      casadi_warning("Unable to solve problem: " << errFlag(ierr));
+      casadi_warning("Unable to solve problem: " + str(errFlag(ierr)));
     } else if (ierr<0) {
-      casadi_error("Fatal error: " << errFlag(ierr));
+      casadi_error("Fatal error: " + str(errFlag(ierr)));
     }
 
     // Retrieve eliminated decision variables
@@ -466,6 +466,7 @@ namespace casadi {
 
     // Save dual solution (simple bounds)
     casadi_copy(gamma_, nx_, res[CONIC_LAM_X]);
+    return 0;
   }
 
   const char* OoqpInterface::errFlag(int flag) {

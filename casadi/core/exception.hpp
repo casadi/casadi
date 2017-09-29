@@ -87,109 +87,64 @@ class CasadiException : public std::exception {
   std::string msg_;
 };
 
-// Assertion similar to the standard C assert statement, with the difference
-// that it throws an exception with the same information
-#ifdef CASADI_NDEBUG
-// Release mode
-#define casadi_assert(x)
-#define casadi_assert_message(x, msg)
-#define casadi_assert_warning(x, msg)
-#define casadi_warning(msg)
-#define casadi_error(msg)
+class KeyboardInterruptException : public CasadiException {
+  public:
+  //! \brief Default constructor
+  KeyboardInterruptException() : CasadiException("KeyboardInterrupt") {}
+  //! \brief Destructor
+  ~KeyboardInterruptException() throw() {}
+};
 
-#else // CASADI_NDEBUG
-// Debug mode
+// Strip path prefix
+inline std::string trim_path(const std::string& full_path) {
+  size_t found = full_path.rfind("/casadi/");
+  if (found == std::string::npos) {
+    return full_path;
+  } else {
+    std::string ret = full_path;
+    ret.replace(0, found, "...");
+    return ret;
+  }
+}
+
 // Convert to string
-#define CASADI_ASSERT_STR1(x) #x
-#define CASADI_ASSERT_STR(x) CASADI_ASSERT_STR1(x)
+#define CASADI_STR1(x) #x
+#define CASADI_STR(x) CASADI_STR1(x)
 
 // String denoting where the assertion is situated
-#define CASADI_ASSERT_WHERE " on line " CASADI_ASSERT_STR(__LINE__) \
-    " of file " CASADI_ASSERT_STR(__FILE__)
+#define CASADI_WHERE casadi::trim_path(__FILE__ ":" CASADI_STR(__LINE__))
 
-  // Should be removed, cf. #890
-#define casadi_msg(msg)                                                 \
-  if (verbose()) {                                                      \
-    std::stringstream ss;                                               \
-    ss << msg;                                                          \
-    log(ss.str());                                                      \
-  }
+// Throw an exception with information about source code location
+#define casadi_error(msg) \
+  throw casadi::CasadiException(CASADI_WHERE + ": " + std::string(msg));
 
-#define casadi_error(msg)                                               \
-  {                                                                     \
-    std::stringstream ss_internal_;                                     \
-    ss_internal_ << CASADI_ASSERT_WHERE << std::endl << msg  <<  std::endl; \
-    throw casadi::CasadiException(ss_internal_.str());                  \
-  }
-
-// This assertion checks for illegal user inputs. It will not be checked if CASADI_NDEBUG is defined
+// This assertion checks for illegal user inputs
 #define casadi_assert_message(x, msg) \
-{ \
-  bool is_ok; \
-  try { \
-    is_ok = x; \
-  } catch(std::exception& ex) { \
-      throw casadi::CasadiException(std::string("When trying to check the assertion \"" \
-        CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE ", caught: \n")+ex.what()); \
-  } \
- if (!is_ok) { \
-  std::stringstream ss_internal_; \
-  ss_internal_ << "The assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE \
-      " failed. " << std::endl << msg  <<  std::endl;   \
-  throw casadi::CasadiException(ss_internal_.str()); \
- }\
-} \
+  if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n" + std::string(msg));
 
 // This assertion if for errors caused by bugs in CasADi, use it instead of C:s assert(),
 // but never in destructors
 #if NDEBUG
 #define casadi_assert(x) casadi_assert_message(x, "Please notify the CasADi developers.")
 #else
-#define casadi_assert(x) casadi_assert_message(x, \
-    "(Hint for developers: GlobalOptions.setCatchErrorsSwig(False)" \
-    " to obtain gdb stacktrace in python.)" \
-    << std::endl << "Please notify the CasADi developers.")
+#define casadi_assert(x) casadi_assert_message(x, "Please notify the CasADi developers.\n"\
+    "Hint for developers: GlobalOptions.setCatchErrorsSwig(False)" \
+    " to obtain gdb stacktrace in python.")
 #endif
 
-// This is for warnings to be issued when casadi is not in release mode and an assertion fails
-#define casadi_assert_warning(x, msg)                                   \
-  if ((x)==false) {                                                     \
-    casadi::userOut<true, casadi::PL_WARN>() << "CasADi warning: \"" << msg << "\" (assertion \"" \
-      CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl; \
-  }
+// Issue a warning, including location in the source code
+#define casadi_warning(msg) \
+  casadi::userOut<true, casadi::PL_WARN>() \
+    << "CasADi warning at " << CASADI_WHERE << ": " << msg << "\n";
 
-// Formatted message
-#define casadi_assert_message1(x, msg, ...) \
-{ \
-  bool is_ok; \
-  try { \
-    is_ok = x; \
-  } catch(std::exception& ex) { \
-      throw casadi::CasadiException(std::string("When trying to check the assertion \"" \
-        CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE ", caught: \n")+ex.what()); \
-  } \
- if (!is_ok) { \
-   std::string m = "The assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed. %s";\
-   int sz = snprintf(0, 0, msg, __VA_ARGS__);\
-   char* buf = new char[sz+1];\
-   (void)snprintf(buf, sz+1, msg, __VA_ARGS__);\
-   m += buf;\
-   delete[] buf;\
-   throw casadi::CasadiException(m); \
- }\
-}
+// Issue a warning if an assertion fails
+#define casadi_assert_warning(x, msg) \
+  if (!(x)) casadi_warning("Assertion \"" CASADI_STR(x) "\" failed.");
 
-// This is for warnings to be issued when casadi is not in release mode
-#define casadi_warning(msg)                                                       \
-  casadi::userOut<true, casadi::PL_WARN>() << "CasADi warning: \"" << msg << "\" issued " \
-  CASADI_ASSERT_WHERE ". " << std::endl;
-
-// http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
-#define STRING(ITEMS) \
-  ((dynamic_cast<std::ostringstream &>(std::ostringstream() \
-   . seekp(0, std::ios_base::cur) << ITEMS)) . str())
-
-#endif // CASADI_NDEBUG
+// Issue a message, including location in the source code
+#define casadi_message(msg) \
+  casadi::userOut() \
+    << "CasADi message at " << CASADI_WHERE << ": " << msg << "\n";
 
 } // namespace casadi
 

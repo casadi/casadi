@@ -46,7 +46,7 @@ namespace casadi {
     ~Map() override;
 
     /** \brief Get type name */
-    std::string type_name() const override {return "map";}
+    std::string class_name() const override {return "Map";}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
@@ -59,7 +59,7 @@ namespace casadi {
     /// @}
 
     /** \brief Get default input value */
-    double default_in(int ind) const override { return f_.default_in(ind);}
+    double get_default_in(int ind) const override { return f_.default_in(ind);}
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -75,22 +75,22 @@ namespace casadi {
 
     /** \brief  Evaluate or propagate sparsities */
     template<typename T>
-    void evalGen(const T** arg, T** res, int* iw, T* w) const;
+    int eval_gen(const T** arg, T** res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /// Type of parallellization
     virtual std::string parallelization() const { return "serial"; }
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
-    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const override;
 
     /** \brief  Propagate sparsity forward */
-    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?
@@ -98,34 +98,34 @@ namespace casadi {
     bool has_sprev() const override { return true;}
     ///@}
 
-    /** \brief Generate code for the declarations of the C function */
-    void generateDeclarations(CodeGenerator& g) const override;
-
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
 
+    /** \brief Generate code for the declarations of the C function */
+    void codegen_declarations(CodeGenerator& g) const override;
+
     /** \brief Generate code for the body of the C function */
-    void generateBody(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g) const override;
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    Function get_forward(const std::string& name, int nfwd,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts) const override;
-    int get_n_forward() const override { return 64;}
+    bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    Function get_reverse(const std::string& name, int nadj,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts) const override;
-    int get_n_reverse() const override { return 64;}
+    bool has_reverse(int nadj) const override { return true;}
+    Function get_reverse(int nadj, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     ///@}
 
   protected:
@@ -155,8 +155,11 @@ namespace casadi {
     /** \brief  Destructor */
     ~MapOmp() override;
 
+    /** \brief Get type name */
+    std::string class_name() const override {return "MapOmp";}
+
     /// Evaluate the function numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;
@@ -165,7 +168,7 @@ namespace casadi {
     std::string parallelization() const override { return "openmp"; }
 
     /** \brief Generate code for the body of the C function */
-    void generateBody(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g) const override;
   };
 
 } // namespace casadi

@@ -62,21 +62,6 @@ namespace casadi {
     return size1()*size2();
   }
 
-  void SparsityInternal::repr(ostream &stream) const {
-    stream << "Compressed Column Storage: ";
-    print_compact(stream);
-  }
-
-  void SparsityInternal::print_compact(std::ostream &stream) const {
-    // Print dimensions
-    stream << size1() << "x" << size2();
-
-    // Print shape unless dense
-    if (!is_dense()) {
-      stream << "," << nnz() << "nz";
-    }
-  }
-
   void SparsityInternal::sanity_check(bool complete) const {
     int nrow = size1();
     int ncol = size2();
@@ -84,42 +69,39 @@ namespace casadi {
     const int* row = this->row();
     int nnz = this->nnz();
     casadi_assert_message(nrow >=0,
-                          "SparsityInternal: number of rows must be positive, but got "
-                          << nrow << ".");
+                          "number of rows must be positive, but got " + str(nrow) + ".");
     casadi_assert_message(ncol>=0 ,
-                          "SparsityInternal: number of columns must be positive, but got "
-                          << ncol << ".");
+                          "number of columns must be positive, but got " + str(ncol) + ".");
     if (complete) {
 
       for (int k=0; k<ncol; k++) {
         casadi_assert_message(colind[k+1]>=colind[k],
-                              "SparsityInternal:Compressed Column Storage is not sane. "
+                              "Compressed Column Storage is not sane. "
                               "colind must be monotone.");
       }
 
       casadi_assert_message(colind[0]==0,
-                            "SparsityInternal:Compressed Column Storage is not sane. "
+                            "Compressed Column Storage is not sane. "
                             "First element of colind must be zero.");
 
       for (int k=0; k<nnz; k++) {
         if (row[k]>=nrow || row[k] < 0) {
-          std::stringstream s;
-          s << "SparsityInternal:Compressed Column Storage is not sane. The following must hold:"
-            << std::endl;
-          s << "  0 <= row[i] < nrow for each i, but got   row[i] = " << row[k]
-            << "   and   nrow = "  << nrow << std::endl;
-          casadi_error(s.str());
+          casadi_error("Compressed Column Storage is not sane.\n"
+            "The following must hold: 0 <= row[i] < nrow for each i, "
+            "but got row[" + str(k) + "] = " + str(row[k])
+            + " and nrow = " + str(nrow));
         }
       }
     }
   }
 
-
-  void SparsityInternal::print(ostream &stream) const {
-    repr(stream);
-    stream << endl;
-    stream << "colind: " << get_colind() << endl;
-    stream << "row:    " << get_row() << endl;
+  void SparsityInternal::disp(ostream &stream, bool more) const {
+    stream << dim(!is_dense());
+    if (more) {
+      stream << endl;
+      stream << "colind: " << get_colind() << endl;
+      stream << "row:    " << get_row() << endl;
+    }
   }
 
   vector<int> SparsityInternal::get_col() const {
@@ -1860,28 +1842,10 @@ namespace casadi {
     // Mapping
     mapping.clear();
 
-    if (nrow==ncol) {
+    if (is_vector()) {
       // Sparsity pattern
-      vector<int> ret_colind(2, 0), ret_row;
-
-      // Loop over diagonal entries
-      for (int cc=0; cc<ncol; ++cc) {
-        for (int el = colind[cc]; el<colind[cc+1]; ++el) {
-          if (row[el]==cc) {
-            ret_row.push_back(row[el]);
-            mapping.push_back(el);
-          }
-        }
-      }
-      ret_colind[1] = ret_row.size();
-
-      // Construct sparsity pattern
-      return Sparsity(ncol, 1, ret_colind, ret_row);
-
-    } else if (nrow==1 || ncol==1) {
-      // Sparsity pattern
-      int ret_nrow = std::max(nrow, ncol);
-      vector<int> ret_colind(ret_nrow+1, 0), ret_row;
+      int n = nrow * ncol;
+      vector<int> ret_colind(n+1, 0), ret_row;
 
       // Loop over all entries
       int ret_i=0;
@@ -1894,24 +1858,36 @@ namespace casadi {
           mapping.push_back(k);
         }
       }
-      while (ret_i<=ret_nrow) ret_colind[ret_i++]=ret_row.size();
+      while (ret_i<=n) ret_colind[ret_i++]=ret_row.size();
 
       // Construct sparsity pattern
-      return Sparsity(ret_nrow, ret_nrow, ret_colind, ret_row);
+      return Sparsity(n, n, ret_colind, ret_row);
+
     } else {
-      casadi_error("diag: wrong argument shape. Expecting square matrix or vector-like, but got "
-                   << dim() << " instead.");
+      // Sparsity pattern
+      int n = std::min(nrow, ncol);
+      vector<int> ret_row, ret_colind(2, 0);
+
+      // Loop over diagonal nonzeros
+      for (int cc=0; cc<n; ++cc) {
+        for (int el = colind[cc]; el<colind[cc+1]; ++el) {
+          if (row[el]==cc) {
+            ret_row.push_back(row[el]);
+            ret_colind[1]++;
+            mapping.push_back(el);
+          }
+        }
+      }
+
+      // Construct sparsity pattern
+      return Sparsity(n, 1, ret_colind, ret_row);
     }
   }
 
-  std::string SparsityInternal::dim() const {
-    std::stringstream ss;
-    if (numel()==nnz()) {
-      ss << size1() << "-by-" << size2() << " (dense)";
-    } else {
-      ss << size1() << "-by-" << size2() << " (" << nnz() << "/" << numel() << " nz)";
-    }
-    return ss.str();
+  std::string SparsityInternal::dim(bool with_nz) const {
+    std::string ret = str(size1()) + "x" + str(size2());
+    if (with_nz) ret += "," + str(nnz()) + "nz";
+    return ret;
   }
 
   std::string SparsityInternal::repr_el(int k) const {
@@ -2016,7 +1992,7 @@ namespace casadi {
     // Check if matrix is square
     if (size2() != size1()) return false;
 
-    // Check if correct number of non-zeros (one per col)
+    // Check if correct number of non-zeros (one per column)
     if (nnz() != size2()) return false;
 
     // Check that the row indices are correct
@@ -2090,17 +2066,10 @@ namespace casadi {
       mapping = range(nnz());
       return shared_from_this<Sparsity>();
     }
-
-    if (!inBounds(rr, -numel()+ind1, numel()+ind1)) {
-      casadi_error("Slicing [rr] out of bounds. Your rr contains " <<
-                   *std::min_element(rr.begin(), rr.end()) << " up to " <<
-                   *std::max_element(rr.begin(), rr.end()) <<
-                   ", which is outside the range [" << -numel()+ind1 << ","<<
-                   numel()+ind1 <<  ").");
-    }
+    casadi_assert_in_range(rr, -numel()+ind1, numel()+ind1);
 
     // Handle index-1, negative indices
-    if (ind1 || hasNegative(rr)) {
+    if (ind1 || has_negative(rr)) {
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         if (ind1) (*i)--;
@@ -2110,7 +2079,7 @@ namespace casadi {
     }
 
     // Sort rr in non-deceasing order, if needed
-    if (!isNonDecreasing(rr)) {
+    if (!is_nondecreasing(rr)) {
       std::vector<int> rr_sorted = rr;
       std::sort(rr_sorted.begin(), rr_sorted.end());
       return _erase(rr_sorted, false, mapping);
@@ -2179,24 +2148,12 @@ namespace casadi {
 
   Sparsity SparsityInternal::_erase(const vector<int>& rr, const vector<int>& cc,
                                       bool ind1, std::vector<int>& mapping) const {
-    if (!inBounds(rr, -size1()+ind1, size1()+ind1)) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your rr contains " <<
-                   *std::min_element(rr.begin(), rr.end()) << " up to " <<
-                   *std::max_element(rr.begin(), rr.end()) <<
-                   ", which is outside the range [" << -size1()+ind1 << ","<<
-                   size1()+ind1 <<  ").");
-    }
-    if (!inBounds(cc, -size2()+ind1, size2()+ind1)) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside the range [" << -size2()+ind1 << ","
-                   << size2()+ind1 <<  ").");
-    }
+    casadi_assert_in_range(rr, -size1()+ind1, size1()+ind1);
+    casadi_assert_in_range(cc, -size2()+ind1, size2()+ind1);
 
     // Handle index-1, negative indices, non-monotone rr and cc
-    if (ind1 || hasNegative(rr) || hasNegative(cc)
-        || !isNonDecreasing(rr) || !isNonDecreasing(cc)) {
+    if (ind1 || has_negative(rr) || has_negative(cc)
+        || !is_nondecreasing(rr) || !is_nondecreasing(cc)) {
       // Create substitute rr
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
@@ -2297,18 +2254,8 @@ namespace casadi {
   }
 
   vector<int> SparsityInternal::get_nz(const vector<int>& rr, const vector<int>& cc) const {
-    if (!inBounds(rr, size1())) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
-                   << ", which is outside of the matrix shape " << dim() << ".");
-    }
-    if (!inBounds(cc, size2())) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside of the matrix shape " << dim() << ".");
-    }
+    casadi_assert_bounded(rr, size1());
+    casadi_assert_bounded(cc, size2());
 
     std::vector<int> rr_sorted;
     std::vector<int> rr_sorted_index;
@@ -2344,22 +2291,16 @@ namespace casadi {
     casadi_assert(rr.size()==sp.nnz());
 
     // Check bounds
-    if (!inBounds(rr, -numel()+ind1, numel()+ind1)) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
-                   << ", which is outside the range [" << -numel()+ind1
-                   << ","<< numel()+ind1 <<  ").");
-    }
+    casadi_assert_in_range(rr, -numel()+ind1, numel()+ind1);
 
     // Handle index-1, negative indices
-    if (ind1 || hasNegative(rr)) {
+    if (ind1 || has_negative(rr)) {
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
-        casadi_assert_message(!(ind1 && (*i)<=0), "Matlab is 1-based, but requested index " <<
-                                                (*i) <<  ". Note that negative slices are" <<
-                                                " disabled in the Matlab interface. " <<
-                                                "Possibly you may want to use 'end'.");
+        casadi_assert_message(!(ind1 && (*i)<=0),
+          "Matlab is 1-based, but requested index " + str(*i) +  ". "
+          "Note that negative slices are disabled in the Matlab interface. "
+          "Possibly you may want to use 'end'.");
         if (ind1) (*i)--;
         if (*i<0) *i += numel();
       }
@@ -2391,20 +2332,8 @@ namespace casadi {
 
   Sparsity SparsityInternal::sub(const vector<int>& rr, const vector<int>& cc,
                                  vector<int>& mapping, bool ind1) const {
-    if (!inBounds(rr, -size1()+ind1, size1()+ind1)) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your rr contains "
-                   << *std::min_element(rr.begin(), rr.end()) << " up to "
-                   << *std::max_element(rr.begin(), rr.end())
-                   << ", which is outside the range [" << -size1()+ind1 << ","
-                   << size1()+ind1 <<  ").");
-    }
-    if (!inBounds(cc, -size2()+ind1, size2()+ind1)) {
-      casadi_error("Slicing [rr, cc] out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside the range [" << -size2()+ind1 << ","
-                   << size2()+ind1 <<  ").");
-    }
+    casadi_assert_in_range(rr, -size1()+ind1, size1()+ind1);
+    casadi_assert_in_range(cc, -size2()+ind1, size2()+ind1);
 
     // Handle index-1, negative indices in rr
     std::vector<int> tmp = rr;
@@ -2714,8 +2643,8 @@ namespace casadi {
 
   Sparsity SparsityInternal::_appendVector(const SparsityInternal& sp) const {
     casadi_assert_message(size2() == 1 && sp.size2() == 1,
-      "SparsityInternal::_appendVector(sp): Both arguments must be vectors but got "
-       << size2() << " columns for lhs, and " << sp.size2() << " columns for rhs.");
+      "_appendVector(sp): Both arguments must be vectors but got "
+       + str(size2()) + " columns for lhs, and " + str(sp.size2()) + " columns for rhs.");
 
     // Get current number of non-zeros
     int sz = nnz();
@@ -2735,8 +2664,8 @@ namespace casadi {
 
   Sparsity SparsityInternal::_appendColumns(const SparsityInternal& sp) const {
     casadi_assert_message(size1()== sp.size1(),
-      "SparsityInternal::_appendColumns(sp): row sizes must match but got " << size1()
-                          << " for lhs, and " << sp.size1() << " for rhs.");
+      "_appendColumns(sp): row sizes must match but got " + str(size1())
+                          + " for lhs, and " + str(sp.size1()) + " for rhs.");
 
     // Append rows
     vector<int> new_row = get_row();
@@ -2755,15 +2684,10 @@ namespace casadi {
 
   Sparsity SparsityInternal::_enlargeColumns(int ncol, const std::vector<int>& cc,
                                                bool ind1) const {
-    if (!inBounds(cc, -ncol+ind1, ncol+ind1)) {
-      casadi_error("enlargeColumns: out of bounds. Your cc contains "
-                   << *std::min_element(cc.begin(), cc.end()) << " up to "
-                   << *std::max_element(cc.begin(), cc.end())
-                   << ", which is outside the range [" << -ncol+ind1 << ","<< ncol+ind1 <<  ").");
-    }
+    casadi_assert_in_range(cc, -ncol+ind1, ncol+ind1);
 
     // Handle index-1, negative indices
-    if (ind1 || hasNegative(cc)) {
+    if (ind1 || has_negative(cc)) {
       std::vector<int> cc_mod = cc;
       for (vector<int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
         if (ind1) (*i)--;
@@ -2799,15 +2723,10 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::_enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) const {
-    if (!inBounds(rr, -nrow+ind1, nrow+ind1)) {
-      casadi_error("enlargeRows: out of bounds. Your rr contains " <<
-                   *std::min_element(rr.begin(), rr.end()) << " up to " <<
-                   *std::max_element(rr.begin(), rr.end()) <<
-                   ", which is outside the range [" << -nrow+ind1 << ","<< nrow+ind1 <<  ").");
-    }
+    casadi_assert_in_range(rr, -nrow+ind1, nrow+ind1);
 
     // Handle index-1, negative indices
-    if (ind1 || hasNegative(rr)) {
+    if (ind1 || has_negative(rr)) {
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         if (ind1) (*i)--;
@@ -2849,10 +2768,10 @@ namespace casadi {
     const int* row = this->row();
 
     // Check consistency
-    casadi_assert_message(rr>=0 && rr<size1(), "Row index " << rr
-                          << " out of bounds [0, " << size1() << ")");
-    casadi_assert_message(cc>=0 && cc<size2(), "Column index " << cc
-                          << " out of bounds [0, " << size2() << ")");
+    casadi_assert_message(rr>=0 && rr<size1(), "Row index " + str(rr)
+                          + " out of bounds [0, " + str(size1()) + ")");
+    casadi_assert_message(cc>=0 && cc<size2(), "Column index " + str(cc)
+                          + " out of bounds [0, " + str(size2()) + ")");
 
     // Quick return if matrix is dense
     if (is_dense()) return rr+cc*size1();
@@ -2881,8 +2800,8 @@ namespace casadi {
 
     casadi_assert_message(numel() == nrow*ncol,
                           "reshape: number of elements must remain the same. Old shape is "
-                          << dim() << ". New shape is " << nrow << "x" << ncol
-                          << "=" << nrow*ncol << ".");
+                          + dim() + ". New shape is " + str(nrow) + "x" + str(ncol)
+                          + "=" + str(nrow*ncol) + ".");
     std::vector<int> ret_col(nnz());
     std::vector<int> ret_row(nnz());
     const int* colind = this->colind();
@@ -3693,7 +3612,7 @@ namespace casadi {
     return true;
   }
 
-  bool SparsityInternal::isReshape(const SparsityInternal& y) const {
+  bool SparsityInternal::is_reshape(const SparsityInternal& y) const {
     // Quick return if the objects are the same
     if (this==&y) return true;
 

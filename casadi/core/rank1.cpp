@@ -28,11 +28,11 @@ using namespace std;
 namespace casadi {
 
   Rank1::Rank1(const MX& A, const MX& alpha, const MX& x, const MX& y) {
-    setDependencies({A, alpha, x, y});
-    setSparsity(A.sparsity());
+    set_dep({A, alpha, x, y});
+    set_sparsity(A.sparsity());
   }
 
-  std::string Rank1::print(const std::vector<std::string>& arg) const {
+  std::string Rank1::disp(const std::vector<std::string>& arg) const {
     return "rank1(" + arg.at(0) + ", " + arg.at(1)
       + ", " + arg.at(2) + ", " + arg.at(3) + ")";
   }
@@ -41,7 +41,7 @@ namespace casadi {
     res[0] = rank1(arg[0], arg[1], arg[2], arg[3]);
   }
 
-  void Rank1::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Rank1::ad_forward(const std::vector<std::vector<MX> >& fseed,
                       std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
       MX v = project(fseed[d][0], sparsity());
@@ -52,7 +52,7 @@ namespace casadi {
     }
   }
 
-  void Rank1::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Rank1::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                       std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][1] += bilin(aseed[d][0], dep(2), dep(3));
@@ -62,21 +62,22 @@ namespace casadi {
     }
   }
 
-  void Rank1::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+  int Rank1::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void Rank1::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+  int Rank1::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Rank1::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int Rank1::eval_gen(const T** arg, T** res, int* iw, T* w) const {
     if (arg[0]!=res[0]) casadi_copy(arg[0], dep(0).nnz(), res[0]);
     casadi_rank1(res[0], sparsity(), *arg[1], arg[2], arg[3]);
+    return 0;
   }
 
-  void Rank1::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Rank1::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     /* If not inline, copy to result */
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
 
@@ -96,9 +97,10 @@ namespace casadi {
         res[0][el] |= *arg[1] | arg[2][rr] | arg[3][cc];
       }
     }
+    return 0;
   }
 
-  void Rank1::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Rank1::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     /* Get sparsities */
     int ncol_A = sparsity().size2();
     const int *colind_A = sparsity().colind(), *row_A = sparsity().row();
@@ -119,10 +121,11 @@ namespace casadi {
     }
 
     // Clear seeds
-    copyAdj(arg[0], res[0], nnz());
+    copy_rev(arg[0], res[0], nnz());
+    return 0;
   }
 
-  void Rank1::generate(CodeGenerator& g, const std::string& mem,
+  void Rank1::generate(CodeGenerator& g,
                        const std::vector<int>& arg, const std::vector<int>& res) const {
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {

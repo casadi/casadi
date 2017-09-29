@@ -75,7 +75,7 @@ class BinarySX : public SXNode {
         if (n1->count==0) {
 
           // Check if binary
-          if (!n1->hasDep()) { // n1 is not binary
+          if (!n1->n_dep()) { // n1 is not binary
 
             delete n1; // Delete straight away
 
@@ -95,7 +95,7 @@ class BinarySX : public SXNode {
 
               // Check if the top element has dependencies with dependencies
               bool added_to_stack = false;
-              for (int c2=0; c2<t->ndep(); ++c2) { // for all dependencies of the dependency
+              for (int c2=0; c2<t->n_dep(); ++c2) { // for all dependencies of the dependency
 
                 // Get the node of the dependency of the top element
                 // and remove it from the smart pointer
@@ -105,7 +105,7 @@ class BinarySX : public SXNode {
                 if (n2->count == 0) {
 
                   // Check if binary
-                  if (!n2->hasDep()) {
+                  if (!n2->n_dep()) {
 
                     // Delete straight away if not binary
                     delete n2;
@@ -130,9 +130,12 @@ class BinarySX : public SXNode {
       }
     }
 
+    // Class name
+    std::string class_name() const override {return "BinarySX";}
+
     bool is_smooth() const override { return operation_checker<SmoothChecker>(op_);}
 
-    bool hasDep() const override { return true; }
+    bool is_op(int op) const override { return op_==op; }
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const SXNode* node, int depth) const override {
@@ -148,7 +151,7 @@ class BinarySX : public SXNode {
     }
 
     /** \brief  Number of dependencies */
-    int ndep() const override { return 2;}
+    int n_dep() const override { return 2;}
 
     /** \brief  get the reference of a dependency */
     const SXElem& dep(int i) const override { return i==0 ? dep0_ : dep1_;}

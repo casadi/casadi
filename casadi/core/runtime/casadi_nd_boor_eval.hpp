@@ -1,6 +1,7 @@
 // NOLINT(legal/copyright)
+// SYMBOL "nd_boor_eval"
 template<typename T1>
-void CASADI_PREFIX(nd_boor_eval)(T1* ret, int n_dims, const T1* all_knots, const int* offset, const int* all_degree, const int* strides, const T1* c, int m, const T1* all_x, const int* lookup_mode, int reverse, int* iw, T1* w) { // NOLINT(whitespace/line_length)
+void casadi_nd_boor_eval(T1* ret, int n_dims, const T1* all_knots, const int* offset, const int* all_degree, const int* strides, const T1* c, int m, const T1* all_x, const int* lookup_mode, int reverse, int* iw, T1* w) { // NOLINT(whitespace/line_length)
   int* boor_offset = iw; iw+=n_dims+1;
   int* starts = iw; iw+=n_dims;
   int* index = iw; iw+=n_dims;
@@ -23,17 +24,17 @@ void CASADI_PREFIX(nd_boor_eval)(T1* ret, int n_dims, const T1* all_knots, const
     int n_b = n_knots-degree-1;
 
     T1 x = all_x[k];
-    int L = CASADI_PREFIX(low)(x, knots+degree, n_knots-2*degree, lookup_mode[k]);
+    int L = casadi_low(x, knots+degree, n_knots-2*degree, lookup_mode[k]);
 
     int start = L;
     if (start>n_b-degree-1) start = n_b-degree-1;
 
     starts[k] = start;
 
-    CASADI_PREFIX(fill)(boor, 2*degree+1, 0.0);
+    casadi_fill(boor, 2*degree+1, 0.0);
     if (x>=knots[0] && x<=knots[n_knots-1]) {
       if (x==knots[1]) {
-        CASADI_PREFIX(fill)(boor, degree+1, 1.0);
+        casadi_fill(boor, degree+1, 1.0);
       } else if (x==knots[n_knots-1]) {
         boor[degree] = 1;
       } else if (knots[L+degree]==x) {
@@ -42,13 +43,13 @@ void CASADI_PREFIX(nd_boor_eval)(T1* ret, int n_dims, const T1* all_knots, const
         boor[degree] = 1;
       }
     }
-    CASADI_PREFIX(de_boor)(x, knots+start, 2*degree+2, degree, boor);
+    casadi_de_boor(x, knots+start, 2*degree+2, degree, boor);
     boor+= degree+1;
     n_iter*= degree+1;
     boor_offset[k+1] = boor_offset[k] + degree+1;
   }
 
-  CASADI_PREFIX(fill_int)(index, n_dims, 0);
+  casadi_fill_int(index, n_dims, 0);
 
   // Prepare cumulative product
   for (int pivot=n_dims-1;pivot>=0;--pivot) {

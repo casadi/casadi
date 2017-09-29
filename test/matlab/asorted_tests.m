@@ -11,7 +11,8 @@ f = cos(x*y)
 y = SX.sym('y',2,1);
 z = MX.sym('z',3);
 
-
+DM(true)
+SX(true)
 
 
 f = Function('f',{x},{cos(x)})
@@ -130,8 +131,8 @@ catch err
 end
 
 % See issue #1483
-%assert(~isempty(strfind(msg,'  Function(char,{SX} ,{SX} ,Dict)')))
-%assert(~isempty(strfind(msg,'You have: char, SX')))
+assert(~isempty(strfind(msg,'  FUNCTION(char,{SX},{SX},struct)')))
+assert(~isempty(strfind(msg,'You have: char, SX')))
 
 % Check mixing DM and MX
 res = (DM(1)+MX(1)) - (MX(1)+DM(1))
@@ -158,9 +159,7 @@ x = SX.sym('x');
 p = SX.sym('p');
 f = x^2;
 g = log(x)-p;
-opts = struct('input_scheme', char('x','p'),...
-              'output_scheme', char('f','g'));
-nlp = Function('nlp', {x,p}, {f,g}, opts);
+nlp = Function('nlp', {x,p}, {f,g}, char('x','p'), char('f','g'));
 
 % Evaluate with numbered inputs and outputs
 [res_vec{1:2}] = nlp(1.1, 3.3);
@@ -263,7 +262,7 @@ if has_nlpsol('bonmin')
   sol = solver('x0',[1 1]);
 
   assert(all(full(sol.x)==[3;4]))
-  
+
   options = struct;
   options.discrete = {true,true};
   solver = nlpsol('solver', 'bonmin', nlp,options);
@@ -307,7 +306,8 @@ y = SX.sym('y',2)
 z = SX.sym('z',2,2)
 a = SX.sym('a',Sparsity.upper(2))
 
-if ~(is_octave & ismac)
+%if ~(is_octave & ismac)
+if false
   f = Function('f',{x,y,z,a},{x,y,z,a})
   F = returntypes('full',f);
 
@@ -353,5 +353,85 @@ assert(numel(xnz)==6);
 
 
 
+if ~is_octave
+  x=SX.sym('x');
+  y = 4;
 
+  warning('dummy')
+  save('test.mat','x','y');
+  assert(~isempty(strfind(lastwarn,'not supported')))
 
+  warning('dummy')
+  data = load('test.mat');
+  assert(~isempty(strfind(lastwarn,'not supported')))
+  assert(data.y==4)
+  assert(data.x.isnull)
+end
+
+x=SX.sym('x');
+f=Function('f',{x},{2*x,DM.eye(2)*x});
+f.generate('fmex',struct('mex',true));
+clear fmex
+if is_octave
+mex -DMATLAB_MEX_FILE fmex.c
+else
+mex -largeArrayDims fmex.c
+end
+[a,b] = fmex('f',3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+assert(~issparse(a));
+assert(issparse(b));
+clear fmex
+if is_octave
+mex -DCASADI_MEX_NO_SPARSE -DMATLAB_MEX_FILE fmex.c
+else
+mex -DCASADI_MEX_NO_SPARSE -largeArrayDims fmex.c
+end
+[a,b] = fmex('f',3);
+assert(norm(a-6,1)==0);
+assert(norm(b-3*eye(2),1)==0);
+assert(~issparse(a));
+assert(~issparse(b));
+
+Xs = {SX, MX};
+for j=1:2;
+  X = Xs{j};
+
+  for sA=[1,3]
+     for sy=[3]
+
+        A = X.sym('A',sA,sA);
+        y = X.sym('y',sy);
+
+        yv = [7;2;4];
+        Av = [13 0.2 1;1 9 2;0.1 1 3];
+        yv = yv(1:sy);
+        Av = Av(1:sA,1:sA);
+        F = Function('f',{A,y},{A\y, A\yv, Av\y, A\DM(yv), DM(Av)\y, DM(Av)\DM(yv)});
+        out = F.call({Av,yv});
+        for i=1:numel(out)
+          assert(norm(Av\yv-full(out{i}),1)<=1e-12);
+        end
+
+        yv = yv';
+        y = y';
+        F = Function('f',{A,y},{y/A, yv/A, y/Av, DM(yv)/A, y/DM(Av), DM(yv)/DM(Av)});
+        out = F.call({Av,yv});
+        for i=1:numel(out)
+          assert(norm(yv/Av-full(out{i}),1)<=1e-12);
+        end
+    end
+  end
+
+  A = X.sym('A',3,3);
+  Av = [13 0.2 1;1 9 2;0.1 1 3];
+  for N=[-4,-3,-2,-1,0,1,2,3,4]
+    F = Function('f',{A},{A^N,DM(Av)^N});
+    out = F.call({Av});
+    for i=1:numel(out)
+      assert(norm(Av^N-full(out{i}),1)<=1e-12);
+    end
+  end
+
+end

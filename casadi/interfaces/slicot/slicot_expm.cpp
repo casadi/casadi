@@ -59,7 +59,7 @@ namespace casadi {
   }
 
   SlicotExpm::~SlicotExpm() {
-    clear_memory();
+    clear_mem();
   }
 
   void SlicotExpm::init(const Dict& opts) {
@@ -90,13 +90,11 @@ namespace casadi {
 
 
   /** \brief Initalize memory block */
-  void SlicotExpm::init_memory(void* mem) const {
-    Expm::init_memory(mem);
-    auto m = static_cast<SlicotExpmMemory*>(mem);
-
+  int SlicotExpm::init_mem(void* mem) const {
+    return Expm::init_mem(mem);
   }
 
-  void SlicotExpm::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int SlicotExpm::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<SlicotExpmMemory*>(mem);
 
     setup(mem, arg, res, iw, w);
@@ -106,7 +104,7 @@ namespace casadi {
       tol, m->iwork, m->dwork, 2*n_*n_);
 
     if (res[0]) std::copy(m->A, m->A+n_*n_, res[0]);
-
+    return 0;
   }
 
 

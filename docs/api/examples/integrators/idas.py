@@ -91,7 +91,7 @@ try:
   I(p=P_, x0=X_, z0=Z_)
 except Exception as e:
   print(e)
-  
+
 #! We construct a reworked version od the DAE (index reduced), now it is DAE-index 1
 ode = vertcat(u,lambd*x)
 alg = vertcat(x**2+y**2-L**2, u*x+v*y,u**2-g*y+v**2+L**2*lambd)
@@ -112,9 +112,9 @@ print(res['ode']) # This should be the same as XDOT_
 print(res['alg']) # This should be all zeros
 
 #! Let's check our jacobian:
-J = f.jacobian('z', 'alg')
+J = f.factory('J', f.name_in(), ['jac:alg:z'])
 res = J(p=P_, x=X_, z=Z_)
-print(array(res["dalg_dz"]))
+print(array(res["jac_alg_z"]))
 #! $\frac{dg}{dy}$ is invertible this time.
 
 #! We create a DAE system solver
@@ -133,10 +133,7 @@ X_ = [5,0]  # states
 try:
   I(p=P_, x0=X_, z0=Z_)
 except Exception as e:
-  print(e) 
+  print(e)
 
 #! Although this initialisation is consistent,
 #! it coincides with a singular point.
-
-
- 

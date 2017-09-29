@@ -30,11 +30,11 @@ using namespace std;
 namespace casadi {
 
   Determinant::Determinant(const MX& x) {
-    setDependencies(x);
-    setSparsity(Sparsity::dense(1, 1));
+    set_dep(x);
+    set_sparsity(Sparsity::dense(1, 1));
   }
 
-  std::string Determinant::print(const std::vector<std::string>& arg) const {
+  std::string Determinant::disp(const std::vector<std::string>& arg) const {
     return "det(" + arg.at(0) + ")";
   }
 
@@ -42,7 +42,7 @@ namespace casadi {
     res[0] = det(arg[0]);
   }
 
-  void Determinant::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Determinant::ad_forward(const std::vector<std::vector<MX> >& fseed,
                             std::vector<std::vector<MX> >& fsens) const {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();
@@ -52,7 +52,7 @@ namespace casadi {
     }
   }
 
-  void Determinant::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Determinant::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                             std::vector<std::vector<MX> >& asens) const {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();

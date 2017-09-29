@@ -56,8 +56,8 @@ namespace casadi {
   CASADI_EXPORT MXVector dplesol(const MXVector& A, const MXVector& V, const std::string& solver,
     const Dict& opts) {
       casadi_assert_message(A.size()==V.size(),
-        "dplesol: sizes of A vector (" << A.size() <<
-        ") and V vector (" << V.size() << ") must match.");
+        "dplesol: sizes of A vector (" + str(A.size()) + ") and V vector "
+        "(" + str(V.size()) + ") must match.");
       std::vector<MX> Adense, Vdense;
 
       for (int i=0;i<A.size();++i) {
@@ -72,8 +72,8 @@ namespace casadi {
   CASADI_EXPORT DMVector dplesol(const DMVector& A, const DMVector& V, const std::string& solver,
     const Dict& opts) {
       casadi_assert_message(A.size()==V.size(),
-        "dplesol: sizes of A vector (" << A.size() <<
-        ") and V vector (" << V.size() << ") must match.");
+        "dplesol: sizes of A vector (" + str(A.size()) + ") and V vector "
+        "(" + str(V.size()) + ") must match.");
       std::vector<DM> Adense, Vdense;
 
       for (int i=0;i<A.size();++i) {
@@ -97,10 +97,7 @@ namespace casadi {
 
   Function dplesol(const string& name, const string& solver,
                 const SpDict& st, const Dict& opts) {
-    Function ret;
-    ret.assignNode(Dple::instantiatePlugin(name, solver, st));
-    ret->construct(opts);
-    return ret;
+    return Function::create(Dple::instantiate(name, solver, st), opts);
   }
 
   vector<string> dple_in() {
@@ -149,7 +146,7 @@ namespace casadi {
       } else if (i->first=="v") {
         V_ = i->second;
       } else {
-        casadi_error("Unrecognized field in Dple structure: " << i->first);
+        casadi_error("Unrecognized field in Dple structure: " + str(i->first));
       }
     }
 
@@ -222,7 +219,8 @@ namespace casadi {
 
     std::vector<Sparsity> Vs = horzsplit(V_, V_.size1());
     Sparsity Vref = Vs[0];
-    casadi_assert_message(Vref.is_symmetric(), "V must be symmetric but got " << Vref.dim() << ".");
+    casadi_assert_message(Vref.is_symmetric(),
+      "V must be symmetric but got " + Vref.dim() + ".");
 
     for (auto&& s : Vs)
       casadi_assert(s==Vref);
@@ -240,17 +238,17 @@ namespace casadi {
 
   }
 
-  Function Dple::get_forward(const std::string& name, int nfwd,
-                               const std::vector<std::string>& i_names,
-                               const std::vector<std::string>& o_names,
+  Function Dple::get_forward(int nfwd, const std::string& name,
+                               const std::vector<std::string>& inames,
+                               const std::vector<std::string>& onames,
                                const Dict& opts) const {
     // Symbolic A
-    MX A = MX::sym("A", sparsity_in(DPLE_A));
+    MX A = MX::sym("A", A_);
     Function Vdotf;
     {
-      MX P = MX::sym("P", sparsity_in(DPLE_A));
-      MX Adot = MX::sym("P", sparsity_in(DPLE_A));
-      MX Vdot = MX::sym("P", sparsity_in(DPLE_A));
+      MX P = MX::sym("P", A_);
+      MX Adot = MX::sym("P", A_);
+      MX Vdot = MX::sym("P", A_);
 
       MX temp = mtimes(std::vector<MX>{Adot, P, A.T()}) +
                 mtimes(std::vector<MX>{A, P, Adot.T()}) + Vdot;
@@ -258,28 +256,28 @@ namespace casadi {
                 { (temp+temp.T())/2});
     }
 
-    MX P = MX::sym("P", sparsity_out(DPLE_P));
-    MX Adot = MX::sym("Adot", repmat(sparsity_in(DPLE_A), 1, nfwd));
-    MX Vdot = MX::sym("Vdot", repmat(sparsity_in(DPLE_V), 1, nfwd));
+    MX P = MX::sym("P", V_);
+    MX Adot = MX::sym("Adot", repmat(A_, 1, nfwd));
+    MX Vdot = MX::sym("Vdot", repmat(V_, 1, nfwd));
     MX Qdot = Vdotf.map("map", "serial", nrhs_, {0, 2}, std::vector<int>{})
          .map("map", "serial", nfwd, {0, 1}, std::vector<int>{})({A, P, Adot, Vdot})[0];
     MX Pdot = dplesol(A, Qdot, plugin_name(), opts);
     MX V = MX::sym("V", Sparsity(size_in(DPLE_V))); // We dont need V
-    return Function(name, {A, V, P, Adot, Vdot}, {Pdot}, i_names, o_names);
+    return Function(name, {A, V, P, Adot, Vdot}, {Pdot}, inames, onames);
 
   }
 
-  Function Dple::get_reverse(const std::string& name, int nadj,
-                               const std::vector<std::string>& i_names,
-                               const std::vector<std::string>& o_names,
+  Function Dple::get_reverse(int nadj, const std::string& name,
+                               const std::vector<std::string>& inames,
+                               const std::vector<std::string>& onames,
                                const Dict& opts) const {
 
     // Symbolic A
-    MX A = MX::sym("A", sparsity_in(DPLE_A));
+    MX A = MX::sym("A", A_);
 
     // Helper function to reverse, reverse-tranpose,
     // and reverse-symmetrize one block-diagonal matrix
-    int n = sparsity_in(DPLE_A).size1()/K_;
+    int n = A_.size1()/K_;
     std::vector<MX> ret = diagsplit(A, n);
     std::reverse(ret.begin(), ret.end());
     std::vector<MX> retT;
@@ -293,19 +291,19 @@ namespace casadi {
     // Function to compute the formula for Abar
     Function Abarf;
     {
-      MX P = MX::sym("P", sparsity_in(DPLE_A));
-      MX Vbar_rev = MX::sym("Vbar", sparsity_in(DPLE_A));
-      MX A_rev = MX::sym("A", sparsity_in(DPLE_A));
+      MX P = MX::sym("P", A_);
+      MX Vbar_rev = MX::sym("Vbar", A_);
+      MX A_rev = MX::sym("A", A_);
 
       Abarf = Function("PAVbar", {P, A_rev, Vbar_rev},
                 {2*revT(mtimes(std::vector<MX>{rev(P)[0], A_rev, Vbar_rev}))[0]});
     }
 
     // original output
-    MX P = MX::sym("P", sparsity_out(DPLE_P));
+    MX P = MX::sym("P", V_);
 
     // Symbolic reverse seed for P
-    MX Pbar = MX::sym("Pbar", repmat(sparsity_out(DPLE_P), 1, nadj));
+    MX Pbar = MX::sym("Pbar", repmat(V_, 1, nadj));
     // Symmetrize the seed
     MX Pbar_rev = revS.map(nrhs_).map(nadj)(Pbar)[0];
 
@@ -322,7 +320,7 @@ namespace casadi {
                     map("map", "serial", nadj, {0, 1}, std::vector<int>{})({P, A_rev, Vbar_rev})[0];
 
     MX V = MX::sym("V", Sparsity(size_in(DPLE_V))); // We dont need V
-    return Function(name, {A, V, P, Pbar}, {Abar, Vbar}, i_names, o_names);
+    return Function(name, {A, V, P, Pbar}, {Abar, Vbar}, inames, onames);
   }
 
   Dple::~Dple() {
@@ -331,9 +329,5 @@ namespace casadi {
   std::map<std::string, Dple::Plugin> Dple::solvers_;
 
   const std::string Dple::infix_ = "dple";
-
-  double Dple::default_in(int ind) const {
-    return 0;
-  }
 
 } // namespace casadi

@@ -26,7 +26,7 @@
 #ifndef CASADI_SHARED_OBJECT_HPP
 #define CASADI_SHARED_OBJECT_HPP
 
-#include "printable_object.hpp"
+#include "casadi_types.hpp"
 #include "exception.hpp"
 #include <map>
 #include <vector>
@@ -79,7 +79,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_EXPORT SharedObject : public PrintableObject<SharedObject> {
+  class CASADI_EXPORT SharedObject {
 #ifndef SWIG
     template<class B> friend B shared_cast(SharedObject& A);
     template<class B> friend const B shared_cast(const SharedObject& A);
@@ -101,13 +101,13 @@ namespace casadi {
 
     /// \cond INTERNAL
     /// Assign the node to a node class pointer (or null)
-    void assignNode(SharedObjectInternal* node);
+    void own(SharedObjectInternal* node);
 
     /** \brief Assign the node to a node class pointer without reference counting
      *
      * improper use will cause memory leaks!
      */
-    void assignNodeNoCount(SharedObjectInternal* node);
+    void assign(SharedObjectInternal* node);
 
     /// Get a const pointer to the node
     SharedObjectInternal* get() const;
@@ -123,15 +123,22 @@ namespace casadi {
     /// \endcond
 #endif // SWIG
 
-    /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    /** \brief Get class name */
+    std::string class_name() const;
 
     /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void disp(std::ostream& stream, bool more=false) const;
+
+    /// Get string representation
+    std::string get_str(bool more=false) const {
+      std::stringstream ss;
+      disp(ss, more);
+      return ss.str();
+    }
 
     /// \cond INTERNAL
     /// Print the pointer to the internal class
-    void printPtr(std::ostream &stream=casadi::userOut()) const;
+    void print_ptr(std::ostream &stream=casadi::userOut()) const;
     /// \endcond
 
     /// Is a null pointer?
@@ -210,7 +217,7 @@ namespace casadi {
     if (!B::test_cast(ptr)) return ret;
 
     /// Assign node of B and return
-    ret.assignNode(ptr);
+    ret.own(ptr);
     return ret;
   }
 

@@ -50,7 +50,7 @@ namespace casadi {
   }
 
   HpmpcInterface::~HpmpcInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options HpmpcInterface::options_
@@ -152,7 +152,7 @@ namespace casadi {
       // Find the right-most column for each row in A -> A_skyline
       // Find the second-to-right-most column -> A_skyline2
       // Find the left-most column -> A_bottomline
-      Sparsity AT = sparsity_in(CONIC_A).T();
+      Sparsity AT = A_.T();
       std::vector<int> A_skyline;
       std::vector<int> A_skyline2;
       std::vector<int> A_bottomline;
@@ -218,15 +218,11 @@ namespace casadi {
       ngs_.push_back(cN);
 
       N_ = nus_.size();
-      if (verbose()) {
-        std::stringstream ss;
-        ss << "HPMPC detected structure:" <<
-        " N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".";
-        log(ss.str());
+      if (verbose_) {
+        casadi_message("Detected structure: N " + str(N_) + ", nx " + str(nx) + ", "
+          "nu " + str(nu) + ", ng " + str(ng) + ".");
       }
     }
-
-
 
     casadi_assert(nx.size()==N_+1);
     casadi_assert(nu.size()==N_);
@@ -234,12 +230,14 @@ namespace casadi {
 
     casadi_assert_message(nx_ == std::accumulate(nx.begin(), nx.end(), 0) +
       std::accumulate(nu.begin(), nu.end(), 0),
-      "sum(nx)+sum(nu) = must equal total size of variables (" << nx_ << "). "
-      "Structure is: N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".");
+      "sum(nx)+sum(nu) = must equal total size of variables (" + str(nx_) + "). "
+      "Structure is: N " + str(N_) + ", nx " + str(nx) + ", "
+      "nu " + str(nu) + ", ng " + str(ng) + ".");
     casadi_assert_message(na_ == std::accumulate(nx.begin()+1, nx.end(), 0) +
       std::accumulate(ng.begin(), ng.end(), 0),
-      "sum(nx+1)+sum(ng) = must equal total size of constraints (" << na_ << "). "
-      "Structure is: N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".");
+      "sum(nx+1)+sum(ng) = must equal total size of constraints (" + str(na_) + "). "
+      "Structure is: N " + str(N_) + ", nx " + str(nx) + ", "
+      "nu " + str(nu) + ", ng " + str(ng) + ".");
     // Load library HPMPC when applicable
     std::string searchpath;
 
@@ -311,9 +309,10 @@ namespace casadi {
     Isp_ = blocksparsity(na_, nx_, I_blocks, true);
 
     Sparsity total = Asp_ + Bsp_ + Csp_ + Dsp_ + Isp_;
-    casadi_assert_message((sparsity_in(CONIC_A) + total).nnz() == total.nnz(),
+    casadi_assert_message((A_ + total).nnz() == total.nnz(),
       "HPMPC: specified structure of A does not correspond to what the interface can handle. "
-      "Structure is: N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".");
+      "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
+      "ng " + str(ng) + ".");
     casadi_assert(total.nnz() == Asp_.nnz() + Bsp_.nnz() + Csp_.nnz() + Dsp_.nnz() + Isp_.nnz());
 
     /* Disassemble H input into:
@@ -338,9 +337,10 @@ namespace casadi {
     Qsp_ = blocksparsity(nx_, nx_, Q_blocks);
 
     total = Rsp_ + Ssp_ + Qsp_ + Ssp_.T();
-    casadi_assert_message((sparsity_in(CONIC_H) + total).nnz() == total.nnz(),
+    casadi_assert_message((H_ + total).nnz() == total.nnz(),
       "HPMPC: specified structure of H does not correspond to what the interface can handle. "
-      "Structure is: N " << N_ << ", nx " << nx << ", nu " << nu << ", ng " << ng << ".");
+      "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
+      "ng " + str(ng) + ".");
     casadi_assert(total.nnz() == Rsp_.nnz() + 2*Ssp_.nnz() + Qsp_.nnz());
 
     /* Disassemble LBA/UBA input into:
@@ -443,8 +443,8 @@ namespace casadi {
   }
 
 
-  void HpmpcInterface::init_memory(void* mem) const {
-    Conic::init_memory(mem);
+  int HpmpcInterface::init_mem(void* mem) const {
+    if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<HpmpcMemory*>(mem);
 
     m->nx = nxs_;
@@ -548,6 +548,7 @@ namespace casadi {
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
     m->fstats["postprocessing"] = FStats();
+    return 0;
   }
 
   void HpmpcInterface::mproject(double factor, const double* x, const int* sp_x,
@@ -571,8 +572,12 @@ namespace casadi {
     }
   }
 
-  void HpmpcInterface::
-  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int HpmpcInterface::
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+    if (inputs_check_) {
+      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+    }
+
     auto m = static_cast<HpmpcMemory*>(mem);
     // Statistics
     for (auto&& s : m->fstats) s.second.reset();
@@ -581,23 +586,23 @@ namespace casadi {
     double* pv =  get_ptr(m->pv);
 
     // Dissect A matrix
-    casadi_project(arg[CONIC_A], sparsity_in(CONIC_A), get_ptr(m->A), Asp_, pv);
-    casadi_project(arg[CONIC_A], sparsity_in(CONIC_A), get_ptr(m->B), Bsp_, pv);
-    casadi_project(arg[CONIC_A], sparsity_in(CONIC_A), get_ptr(m->C), Csp_, pv);
-    casadi_project(arg[CONIC_A], sparsity_in(CONIC_A), get_ptr(m->D), Dsp_, pv);
-    casadi_project(arg[CONIC_A], sparsity_in(CONIC_A), get_ptr(m->I), Isp_, pv);
+    casadi_project(arg[CONIC_A], A_, get_ptr(m->A), Asp_, pv);
+    casadi_project(arg[CONIC_A], A_, get_ptr(m->B), Bsp_, pv);
+    casadi_project(arg[CONIC_A], A_, get_ptr(m->C), Csp_, pv);
+    casadi_project(arg[CONIC_A], A_, get_ptr(m->D), Dsp_, pv);
+    casadi_project(arg[CONIC_A], A_, get_ptr(m->I), Isp_, pv);
 
     // Dissect H matrix; definition of HPMPC lacks a factor 2
-    mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->R), Rsp_, pv);
-    mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->S), Ssp_, pv);
-    mproject(0.5, arg[CONIC_H], sparsity_in(CONIC_H), get_ptr(m->Q), Qsp_, pv);
+    mproject(0.5, arg[CONIC_H], H_, get_ptr(m->R), Rsp_, pv);
+    mproject(0.5, arg[CONIC_H], H_, get_ptr(m->S), Ssp_, pv);
+    mproject(0.5, arg[CONIC_H], H_, get_ptr(m->Q), Qsp_, pv);
 
     // Dissect LBA/UBA
-    mproject(-1.0, arg[CONIC_LBA], sparsity_in(CONIC_LBA), get_ptr(m->b), bsp_, pv);
-    mproject(-1.0, arg[CONIC_UBA], sparsity_in(CONIC_UBA), get_ptr(m->b2), bsp_, pv);
+    mproject(-1.0, arg[CONIC_LBA], sparsity_in_.at(CONIC_LBA), get_ptr(m->b), bsp_, pv);
+    mproject(-1.0, arg[CONIC_UBA], sparsity_in_.at(CONIC_UBA), get_ptr(m->b2), bsp_, pv);
     casadi_assert(std::equal(m->b.begin(), m->b.end(), m->b2.begin()));
-    casadi_project(arg[CONIC_LBA], sparsity_in(CONIC_LBA), get_ptr(m->lg), lugsp_, pv);
-    casadi_project(arg[CONIC_UBA], sparsity_in(CONIC_UBA), get_ptr(m->ug), lugsp_, pv);
+    casadi_project(arg[CONIC_LBA], sparsity_in_.at(CONIC_LBA), get_ptr(m->lg), lugsp_, pv);
+    casadi_project(arg[CONIC_UBA], sparsity_in_.at(CONIC_UBA), get_ptr(m->ug), lugsp_, pv);
 
     // Dissect LBX/UBX input
     std::fill(m->lb.begin(), m->lb.end(), 0);
@@ -609,12 +614,12 @@ namespace casadi {
     dense_transfer(1.0, arg[CONIC_UBX], usp_, get_ptr(m->ub), theirs_usp_, pv);
 
     // Dissect G
-    mproject(0.5, arg[CONIC_G], sparsity_in(CONIC_G), get_ptr(m->r), usp_, pv);
-    mproject(0.5, arg[CONIC_G], sparsity_in(CONIC_G), get_ptr(m->q), xsp_, pv);
+    mproject(0.5, arg[CONIC_G], sparsity_in_.at(CONIC_G), get_ptr(m->r), usp_, pv);
+    mproject(0.5, arg[CONIC_G], sparsity_in_.at(CONIC_G), get_ptr(m->q), xsp_, pv);
 
     // Dissect X0
-    casadi_project(arg[CONIC_X0], sparsity_in(CONIC_X0), get_ptr(m->u), usp_, pv);
-    casadi_project(arg[CONIC_X0], sparsity_in(CONIC_X0), get_ptr(m->x), xsp_, pv);
+    casadi_project(arg[CONIC_X0], sparsity_in_.at(CONIC_X0), get_ptr(m->u), usp_, pv);
+    casadi_project(arg[CONIC_X0], sparsity_in_.at(CONIC_X0), get_ptr(m->x), xsp_, pv);
 
     m->iter_count = -1;
 
@@ -713,7 +718,7 @@ namespace casadi {
 
     // Construct f
     double f = casadi_dot(nx_, arg[CONIC_G], res[CONIC_X]);
-    f += 0.5*casadi_bilin(arg[CONIC_H], sparsity_in(CONIC_H), res[CONIC_X], res[CONIC_X]);
+    f += 0.5*casadi_bilin(arg[CONIC_H], H_, res[CONIC_X], res[CONIC_X]);
 
     if (res[CONIC_COST]) res[CONIC_COST][0] = f;
 
@@ -721,6 +726,7 @@ namespace casadi {
 
     // Show statistics
     if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
+    return 0;
   }
 
   Dict HpmpcInterface::get_stats(void* mem) const {

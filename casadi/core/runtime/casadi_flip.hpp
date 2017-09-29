@@ -1,6 +1,7 @@
 // NOLINT(legal/copyright)
+// SYMBOL "flip"
 inline
-int CASADI_PREFIX(flip)(int* corner, int ndim) {
+int casadi_flip(int* corner, int ndim) {
   int i;
   for (i=0; i<ndim; ++i) {
     if (corner[i]) {

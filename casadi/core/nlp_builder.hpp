@@ -34,7 +34,8 @@ namespace casadi {
   \date 2012-2015
   \author Joel Andersson
   */
-  class CASADI_EXPORT NlpBuilder : public PrintableObject<NlpBuilder> {
+  class CASADI_EXPORT NlpBuilder
+    : public SWIG_IF_ELSE(PrintableCommon, Printable<NlpBuilder>) {
   public:
 
     /** @name Symbolic representation of the NLP
@@ -63,16 +64,25 @@ namespace casadi {
     /// Dual initial guess
     std::vector<double> lambda_init;
 
+    /// Discrete variables
+    std::vector<bool> discrete;
     ///@}
 
     /// Import an .nl file
     void import_nl(const std::string& filename, const Dict& opts = Dict());
 
-    /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    /// Readable name of the class
+    std::string type_name() const {return "NlpBuilder";}
 
-    /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    /// Print a description of the object
+    void disp(std::ostream& stream, bool more=false) const;
+
+    /// Get string representation
+    std::string get_str(bool more=false) const {
+      std::stringstream ss;
+      disp(ss, more);
+      return ss.str();
+    }
   };
 
 #ifndef SWIG
@@ -98,6 +108,13 @@ namespace casadi {
     std::vector<MX> v_;
     // Number of objectives and constraints
     int n_var_, n_con_, n_obj_, n_eq_, n_lcon_;
+    // nonlinear vars in constraints, objectives, both
+    // see JuliaOpt/AmplNLWriter.jl/src/nl_write.jl
+    int nlvc_, nlvo_, nlvb_;
+    // Number of discrete variables // see JuliaOpt/AmplNLWriter.jl/src/nl_write.jl
+    int nbv_, niv_, nlvbi_, nlvci_, nlvoi_;
+    // objective sign
+    MX sign_;
     // Parse the file
     void parse();
     // Imported function description

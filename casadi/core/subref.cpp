@@ -30,31 +30,34 @@ using namespace std;
 namespace casadi {
 
   SubRef::SubRef(const MX& x, const Slice& i, const Slice& j) : i_(i), j_(j) {
-    setDependencies(x);
+    set_dep(x);
   }
 
-  void SubRef::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w);
+  int SubRef::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void SubRef::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w);
+  int SubRef::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  void SubRef::evalGen(const T* const* arg, T* const* res, int* iw, T* w) const {
+  int SubRef::eval_gen(const T* const* arg, T* const* res, int* iw, T* w) const {
     casadi_error("not ready");
+    return 1;
   }
 
-  void SubRef::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SubRef::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     casadi_error("not ready");
+    return 1;
   }
 
-  void SubRef::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SubRef::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     casadi_error("not ready");
+    return 1;
   }
 
-  std::string SubRef::print(const std::vector<std::string>& arg) const {
+  std::string SubRef::disp(const std::vector<std::string>& arg) const {
     stringstream ss;
     ss << arg.at(0) << "[" << i_ << ", " << j_ << "]";
     return ss.str();
@@ -64,17 +67,17 @@ namespace casadi {
     casadi_error("not ready");
   }
 
-  void SubRef::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void SubRef::ad_forward(const std::vector<std::vector<MX> >& fseed,
                        std::vector<std::vector<MX> >& fsens) const {
     casadi_error("not ready");
   }
 
-  void SubRef::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void SubRef::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                        std::vector<std::vector<MX> >& asens) const {
     casadi_error("not ready");
   }
 
-  void SubRef::generate(CodeGenerator& g, const std::string& mem,
+  void SubRef::generate(CodeGenerator& g,
                         const std::vector<int>& arg, const std::vector<int>& res) const {
     casadi_error("not ready");
   }

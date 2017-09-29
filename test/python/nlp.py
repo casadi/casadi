@@ -39,14 +39,14 @@ if has_nlpsol("worhp")  and not args.ignore_memory_heavy:
   pass
 
 if has_nlpsol("ipopt"):
-  solvers.append(("ipopt",{"ipopt": {"tol": 1e-10, "derivative_test":"second-order"}}))
-  solvers.append(("ipopt",{"ipopt": {"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory"}}))
+  solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"second-order","print_level":0}}))
+  solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory","print_level":0}}))
 
 #if has_nlpsol("snopt"):
 #  solvers.append(("snopt",{"snopt.Verify_level": 3,"detect_linear": True,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12}))
 
 if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
-  qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.fixed_variable_treatment":"make_constraint"} }
+  qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.fixed_variable_treatment":"make_constraint","ipopt.print_level":0,"print_time":False} }
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options}))
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10}))
 
@@ -71,6 +71,67 @@ except:
 """
 
 class NLPtests(casadiTestCase):
+  def test_iteration_interrupt(self):
+   for Solver, solver_options in solvers:
+      if Solver not in ["ipopt","sqpmethod"]: continue
+      
+      opti = Opti()
+
+      x = opti.variable()
+
+      def interrupt(i):
+        raise KeyboardInterrupt()
+
+      opti.minimize((x-1)**4)
+      
+      
+      opts = dict(solver_options)
+      if Solver=="bonmin":
+        opts["discrete"] = [1]
+
+      opti.solver(Solver, opts)
+      sol = opti.solve()
+      opti.callback(interrupt)
+      with self.assertRaises(Exception):
+        sol = opti.solve()
+
+      def interrupt(i):
+        raise Exception()
+      opti.callback(interrupt)
+      opts["iteration_callback_ignore_errors"] = False
+      opti.solver(Solver, opts)
+      with self.assertRaises(Exception):
+        sol = opti.solve()
+
+      opts["iteration_callback_ignore_errors"] = True
+      opti.solver(Solver, opts)
+      sol = opti.solve()
+
+      def interrupt(i):
+        raise KeyboardInterrupt()
+      opti.callback(interrupt)
+      with self.assertRaises(Exception):
+        sol = opti.solve()
+        
+  def test_nan(self):
+    x=SX.sym("x")
+    nlp={'x':x, 'f':-x,'g':x}
+
+    for Solver, nlp_options in solvers:
+      solver = nlpsol("mysolver", Solver, nlp, nlp_options)
+
+      for x in ["x","g"]:
+        lb = "lb"+x
+        ub = "ub"+x
+        for data in [{lb:3,ub:-3},
+                     {lb:np.inf,ub:np.inf},
+                     {lb:-np.inf,ub:-np.inf},
+                     {lb:np.nan},
+                     {ub:np.nan},
+                     ]:
+          print(data)
+          with self.assertInException("Ill-posed"):
+            solver(**data)
 
   def test_wrongdims(self):
     x=SX.sym("x",2)
@@ -88,7 +149,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':x, 'f':SX(1,1),'g':x}
 
     for Solver, solver_options in solvers:
-      with self.assertInException("dense scalar"):
+      with self.assertInException("dense"):
         solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
     nlp={'x':x, 'f':SX.zeros(0,0),'g':x}
@@ -100,12 +161,6 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options in solvers:
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
-    nlp={'x':x, 'f':SX.zeros(2,1),'g':x}
-
-    for Solver, solver_options in solvers:
-      with self.assertInException("dense scalar"):
-        solver = nlpsol("mysolver", Solver, nlp, solver_options)
-        
     x = vec(diag(SX.sym("x",2)))
     nlp={'x':x, 'f':mtimes(x.T,x),'g':x[0]}
     for Solver, solver_options in solvers:
@@ -968,6 +1023,14 @@ class NLPtests(casadiTestCase):
       if "worhp" in Solver: continue
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
+      
+  def test_missing_symbols(self):
+    x = MX.sym("x")
+    p = MX.sym("p")
+
+    for Solver, solver_options in solvers:
+      with self.assertInException("[p] are free"):
+        solver = nlpsol("solver",Solver,{"x":x,"f":(x-p)**2}, solver_options)
 
   @requires_nlpsol("ipopt")
   def test_iteration_Callback(self):

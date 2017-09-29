@@ -33,34 +33,11 @@
 
 namespace casadi {
 
-  /** Base class for nodes involving function calls
-      \author Joel Andersson
-      \date 2015
-  */
-  class CASADI_EXPORT GenericCall : public MultipleOutput {
-  public:
-
-    /** \brief Constructor */
-    GenericCall() {}
-
-    /** \brief Destructor */
-    ~GenericCall() override {}
-
-    /** \brief  Number of functions */
-    int numFunctions() const override = 0;
-
-    /** \brief  Get function reference */
-    const Function& getFunction(int i) const override = 0;
-
-    /** \brief Project a function input to a particular sparsity */
-    static MX projectArg(const MX& x, const Sparsity& sp, int i);
-  };
-
   /** Embeds a function call in an expression graph
       \author Joel Andersson
       \date 2010-2015
   */
-  class CASADI_EXPORT Call : public GenericCall {
+  class CASADI_EXPORT Call : public MultipleOutput {
   public:
     /** \brief  Create function call node */
     static std::vector<MX> create(const Function& fcn, const std::vector<MX>& arg);
@@ -68,11 +45,14 @@ namespace casadi {
     /** \brief  Destructor */
     ~Call() override {}
 
+    /** \brief Project a function input to a particular sparsity */
+    static MX projectArg(const MX& x, const Sparsity& sp, int i);
+
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Add a dependent function */
-    void addDependency(CodeGenerator& g) const override;
+    void add_dependency(CodeGenerator& g) const override;
 
     /** \brief Is reference counting needed in codegen? */
     bool has_refcount() const override;
@@ -84,43 +64,37 @@ namespace casadi {
     void codegen_decref(CodeGenerator& g, std::set<void*>& added) const override;
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /// Evaluate the function numerically
-    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    void eval_forward(const std::vector<std::vector<MX> >& fseed,
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    void eval_reverse(const std::vector<std::vector<MX> >& aseed,
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward */
-    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
-    /** \brief  Number of functions */
-    int numFunctions() const override {return 1;}
-
-    /** \brief  Get function reference */
-    const Function& getFunction(int i) const override { return fcn_;}
-
-    /** \brief  Get function input */
-    int getFunction_input() const override { return -1;}
+    /** \brief  Get called function */
+    const Function& which_function() const override { return fcn_;}
 
     /** \brief  Get function output */
-    int getFunctionOutput() const override { return -1;}
+    int which_output() const override { return -1;}
 
     /** \brief  Number of outputs */
     int nout() const override;

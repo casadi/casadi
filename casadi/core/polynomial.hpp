@@ -26,7 +26,7 @@
 #ifndef CASADI_POLYNOMIAL_HPP
 #define CASADI_POLYNOMIAL_HPP
 
-# include "printable_object.hpp"
+# include "printable.hpp"
 
 namespace casadi {
 
@@ -34,22 +34,22 @@ namespace casadi {
       \author Joel Andersson
       \date 2014
   */
-  class CASADI_EXPORT Polynomial : public PrintableObject<Polynomial> {
+  class CASADI_EXPORT Polynomial : public Printable<Polynomial> {
   public:
     /// Floating point type
-    typedef double real_t;
+    typedef double casadi_real;
 
     /// Construct a constant polynomial
-    Polynomial(real_t scalar=1);
+    Polynomial(casadi_real scalar=1);
 
     /// Construct a linear polynomial
-    Polynomial(real_t p0, real_t p1);
+    Polynomial(casadi_real p0, casadi_real p1);
 
     /// Construct a quadratic polynomial
-    Polynomial(real_t p0, real_t p1, real_t p2);
+    Polynomial(casadi_real p0, casadi_real p1, casadi_real p2);
 
     /// Construct a cubic polynomial
-    Polynomial(real_t p0, real_t p1, real_t p2, real_t p3);
+    Polynomial(casadi_real p0, casadi_real p1, casadi_real p2, casadi_real p3);
 
     /// Construct from a vector of polynomial coefficients
     template<typename T>
@@ -71,7 +71,7 @@ namespace casadi {
     int degree() const;
 
     /// Get scalar value (error if degree()!=0)
-    real_t scalar() const;
+    casadi_real scalar() const;
 
     /// Create a new polynomial for the derivative
     Polynomial derivative() const;
@@ -82,11 +82,11 @@ namespace casadi {
     /// Remove excess zeros
     void trim();
 
-    /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    /// Readable name of the class
+    std::string type_name() const {return "Polynomial";}
 
-    /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    /// Print a description of the object
+    void disp(std::ostream& stream, bool more=false) const;
 
     // Add
     Polynomial operator+(const Polynomial& b) const;
@@ -107,18 +107,17 @@ namespace casadi {
     Polynomial& operator*=(const Polynomial& b);
 
     // Divide by constant
-    Polynomial operator/(real_t b) const;
+    Polynomial operator/(casadi_real b) const;
 
     // Divide by constant (in-place)
-    Polynomial& operator/=(real_t b);
+    Polynomial& operator/=(casadi_real b);
 
 
   protected:
-    std::vector<real_t> p_;
+    std::vector<casadi_real> p_;
   };
 
 } // namespace casadi
 
 
 #endif // CASADI_POLYNOMIAL_HPP
-

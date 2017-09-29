@@ -57,6 +57,34 @@ print(conics)
 
 class ConicTests(casadiTestCase):
 
+  def test_nan(self):
+    x=SX.sym("x")
+    qp={'x':x, 'f':-x,'g':x}
+
+    for conic, qp_options, aux_options in conics:
+      solver = qpsol("mysolver", conic, qp, qp_options)
+      
+      for x in ["x","g"]:
+        lb = "lb"+x
+        ub = "ub"+x
+        for data in [{lb:3,ub:-3},
+                     {lb:np.inf,ub:np.inf},
+                     {lb:-np.inf,ub:-np.inf},
+                     {lb:np.nan},
+                     {ub:np.nan},
+                     ]:
+          print(data)
+          with self.assertInException("Ill-posed"):
+            solver(**data)
+   
+  def test_missing_symbols(self):
+    x = MX.sym("x")
+    p = MX.sym("p")
+
+    for conic, qp_options, aux_options in conics:
+      with self.assertInException("[p] are free"):
+        solver = qpsol("solver",conic,{"x":x,"f":(x-p)**2}, qp_options)
+
   def test_wrongdims(self):
     x=SX.sym("x",2)
     qp={'x':x, 'f':-x[0],'g':diag(x)}

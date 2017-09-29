@@ -36,11 +36,11 @@ namespace casadi {
                            const std::string& compiler,
                            const Dict& opts) {
     if (compiler=="none") {
-      assignNode(new ImporterInternal(name));
+      own(new ImporterInternal(name));
     } else if (compiler=="dll") {
-      assignNode(new DllLibrary(name));
+      own(new DllLibrary(name));
     } else {
-      assignNode(ImporterInternal::getPlugin(compiler).creator(name));
+      own(ImporterInternal::getPlugin(compiler).creator(name));
     }
     (*this)->construct(opts);
   }

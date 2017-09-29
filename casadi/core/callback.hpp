@@ -47,15 +47,17 @@ namespace casadi {
    */
   class CASADI_EXPORT Callback : public Function {
   public:
+    /** \brief Get type name */
+    static std::string type_name() {return "Callback";}
+
     /** \brief Default constructor */
     Callback();
 
     /** \brief Copy constructor (throws an error) */
     Callback(const Callback& obj);
 
-    /** \brief Create an owning reference, given a pointer to a derived object */
-    static Function create(const std::string& name, Callback* n,
-                           const Dict& opts=Dict());
+    /** \brief  Destructor */
+    virtual ~Callback();
 
     /** \brief Construct internal object
      * This is the step that actually construct the internal object, as the
@@ -63,20 +65,6 @@ namespace casadi {
      * It should be called from the user constructor.
      */
     void construct(const std::string& name, const Dict& opts=Dict());
-
-#ifndef SWIG
-    /** \brief Transfer ownership to the internal class
-     * With a call to this function, the public class will be owned by the
-     * internal class.
-     * For this to work, the object must have been created with "new" (and must
-     * not be deleted with "delete" as this is handled internally.
-     * There also has to be at least one owning reference to the class.
-     */
-    void transfer_ownership();
-#endif // SWIG
-
-    /** \brief  Destructor */
-    virtual ~Callback();
 
     /** \brief Initialize the object
      * This function is called after the object construction (for the whole class
@@ -95,12 +83,12 @@ namespace casadi {
     virtual void finalize() {}
 
     /** \brief Evaluate numerically, temporary matrices and work vectors */
-    virtual std::vector<DM> eval(const std::vector<DM>& arg);
+    virtual std::vector<DM> eval(const std::vector<DM>& arg) const;
 
 #ifndef SWIG
     /** \brief Evaluate numerically, work vectors given */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem);
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    virtual int eval(const double** arg, double** res, int* iw, double* w, void* mem) const;
+    virtual int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const;
 #endif // SWIG
 
    /** \brief Get the number of inputs
@@ -133,10 +121,16 @@ namespace casadi {
      */
     virtual std::string get_name_out(int i);
 
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    virtual bool uses_output() const;
+
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     virtual bool has_jacobian() const;
-    virtual Function get_jacobian(const std::string& name, const Dict& opts);
+    virtual Function get_jacobian(const std::string& name,
+                                  const std::vector<std::string>& inames,
+                                  const std::vector<std::string>& onames,
+                                  const Dict& opts) const;
     ///@}
 
     ///@{
@@ -145,11 +139,11 @@ namespace casadi {
      *    and calls <tt>Function get_forward(int nfwd)</tt>
      *    if no cached version is available.
      */
-    virtual Function get_forward(const std::string& name, int nfwd,
-                                     const std::vector<std::string>& i_names,
-                                     const std::vector<std::string>& o_names,
-                                     const Dict& opts) const;
-    virtual int get_n_forward() const;
+    virtual bool has_forward(int nfwd) const;
+    virtual Function get_forward(int nfwd, const std::string& name,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
+                                 const Dict& opts) const;
     ///@}
 
     ///@{
@@ -158,29 +152,20 @@ namespace casadi {
      *    and calls <tt>Function get_reverse(int nadj)</tt>
      *    if no cached version is available.
      */
-    virtual Function get_reverse(const std::string& name, int nadj,
-                                     const std::vector<std::string>& i_names,
-                                     const std::vector<std::string>& o_names,
-                                     const Dict& opts) const;
-    virtual int get_n_reverse() const;
+    virtual bool has_reverse(int nadj) const;
+    virtual Function get_reverse(int nadj, const std::string& name,
+                                 const std::vector<std::string>& inames,
+                                 const std::vector<std::string>& onames,
+                                 const Dict& opts) const;
     ///@}
 
     ///@{
     /** \brief Allocate work vectors */
-    virtual void alloc_w(size_t sz_w, bool persist=false);
-    virtual void alloc_iw(size_t sz_iw, bool persist=false);
-    virtual void alloc_arg(size_t sz_arg, bool persist=false);
-    virtual void alloc_res(size_t sz_res, bool persist=false);
+    void alloc_w(size_t sz_w, bool persist=false);
+    void alloc_iw(size_t sz_iw, bool persist=false);
+    void alloc_arg(size_t sz_arg, bool persist=false);
+    void alloc_res(size_t sz_res, bool persist=false);
     ///@}
-
-#ifndef SWIG
-    private:
-    /** \brief  Access functions of the node */
-    CallbackInternal* operator->();
-
-    /** \brief  Const access functions of the node */
-    const CallbackInternal* operator->() const;
-#endif // SWIG
   };
 
 } // namespace casadi

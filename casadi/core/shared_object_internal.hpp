@@ -52,11 +52,11 @@ namespace casadi {
     /// Get the reference count
     int getCount() const;
 
-    /// Print a representation of the object
-    virtual void repr(std::ostream &stream) const;
+    /// Readable name of the internal class
+    virtual std::string class_name() const = 0;
 
     /// Print a description of the object
-    virtual void print(std::ostream &stream) const;
+    virtual void disp(std::ostream& stream, bool more) const = 0;
 
     /** \brief Get a weak reference to the object */
     WeakRef* weak();
@@ -95,7 +95,13 @@ namespace casadi {
     WeakRefInternal(SharedObjectInternal* raw);
 
     // Destructor
-    ~WeakRefInternal();
+    ~WeakRefInternal() override;
+
+    /// Readable name of the class
+    std::string class_name() const override {return "WeakRefInternal";}
+
+    /// Print a description of the object
+    void disp(std::ostream& stream, bool more) const override;
 
     // Raw pointer to the cached object
     SharedObjectInternal* raw_;
@@ -109,7 +115,7 @@ namespace casadi {
       std::map<SharedObjectInternal*, SharedObject>::iterator it =
           already_copied.find(const_cast<SharedObjectInternal*>(a.get()));
       if (it!=already_copied.end()) {
-        ret.assignNode(it->second.get());
+        ret.own(it->second.get());
       }
     }
     return ret;
@@ -120,7 +126,7 @@ namespace casadi {
   B SharedObjectInternal::shared_from_this() {
     casadi_assert(B::test_cast(this));
     B ret;
-    ret.assignNode(this);
+    ret.own(this);
     return ret;
   }
 
@@ -128,7 +134,7 @@ namespace casadi {
   const B SharedObjectInternal::shared_from_this() const {
     casadi_assert(B::test_cast(this));
     B ret;
-    ret.assignNode(const_cast<SharedObjectInternal*>(this));
+    ret.own(const_cast<SharedObjectInternal*>(this));
     return ret;
   }
 

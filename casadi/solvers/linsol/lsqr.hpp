@@ -69,6 +69,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "symbolicqr";}
 
+    // Name of the class
+    std::string class_name() const override { return "Lsqr";}
+
     /** \brief  Create a new Linsol */
     static LinsolInternal* creator(const std::string& name) {
       return new Lsqr(name);
@@ -84,13 +87,13 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new LsqrMemory();}
-
-    /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<LsqrMemory*>(mem);}
+    void* alloc_mem() const override { return new LsqrMemory();}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<LsqrMemory*>(mem);}
 
     // Set sparsity pattern
     void reset(void* mem, const int* sp) const override;

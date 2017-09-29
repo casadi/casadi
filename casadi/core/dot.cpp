@@ -29,27 +29,27 @@ namespace casadi {
 
   Dot::Dot(const MX& x, const MX& y) {
     casadi_assert(x.sparsity()==y.sparsity());
-    setDependencies(x, y);
-    setSparsity(Sparsity::scalar());
+    set_dep(x, y);
+    set_sparsity(Sparsity::scalar());
   }
 
-  std::string Dot::print(const std::vector<std::string>& arg) const {
+  std::string Dot::disp(const std::vector<std::string>& arg) const {
     return "dot(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 
   void Dot::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    res[0] = arg[0]->getDot(arg[1]);
+    res[0] = arg[0]->get_dot(arg[1]);
   }
 
-  void Dot::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Dot::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     for (int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = dep(0)->getDot(fseed[d][1])
-        + fseed[d][0]->getDot(dep(1));
+      fsens[d][0] = dep(0)->get_dot(fseed[d][1])
+        + fseed[d][0]->get_dot(dep(1));
     }
   }
 
-  void Dot::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Dot::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] += aseed[d][0] * dep(1);
@@ -57,20 +57,21 @@ namespace casadi {
     }
   }
 
-  void Dot::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+  int Dot::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void Dot::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+  int Dot::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Dot::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int Dot::eval_gen(const T** arg, T** res, int* iw, T* w) const {
     *res[0] = casadi_dot(dep(0).nnz(), arg[0], arg[1]);
+    return 0;
   }
 
-  void Dot::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Dot::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t* r = res[0];
     const int n = dep(0).nnz();
@@ -78,9 +79,10 @@ namespace casadi {
     for (int i=0; i<n; ++i) {
       *r |= *a0++ | *a1++;
     }
+    return 0;
   }
 
-  void Dot::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Dot::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     bvec_t *a0=arg[0], *a1=arg[1], *r=res[0];
     const int n = dep(0).nnz();
     for (int i=0; i<n; ++i) {
@@ -88,9 +90,10 @@ namespace casadi {
       *a1++ |= *r;
     }
     *r = 0;
+    return 0;
   }
 
-  void Dot::generate(CodeGenerator& g, const std::string& mem,
+  void Dot::generate(CodeGenerator& g,
                            const std::vector<int>& arg, const std::vector<int>& res) const {
     g << g.workel(res[0]) << " = "
       << g.dot(dep().nnz(), g.work(arg[0], dep(0).nnz()), g.work(arg[1], dep(1).nnz()))

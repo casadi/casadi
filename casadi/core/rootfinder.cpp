@@ -47,10 +47,11 @@ namespace casadi {
 
   Function rootfinder(const std::string& name, const std::string& solver,
                    const Function& f, const Dict& opts) {
-    Function ret;
-    ret.assignNode(Rootfinder::instantiatePlugin(name, solver, f));
-    ret->construct(opts);
-    return ret;
+    // Make sure that nlp is sound
+    if (f.has_free()) {
+      casadi_error("Cannot create '" + name + "' since " + str(f.get_free()) + " are free.");
+    }
+    return Function::create(Rootfinder::instantiate(name, solver, f), opts);
   }
 
   Rootfinder::Rootfinder(const std::string& name, const Function& oracle)
@@ -125,10 +126,8 @@ namespace casadi {
                           "Unknown must be a dense vector");
     n_ = oracle_.nnz_out(iout_);
     casadi_assert_message(n_ == oracle_.nnz_in(iin_),
-                          "Dimension mismatch. Input size is "
-                          << oracle_.nnz_in(iin_)
-                          << ", while output size is "
-                          << oracle_.nnz_out(iout_));
+      "Dimension mismatch. Input size is " + str(oracle_.nnz_in(iin_)) + ", "
+      "while output size is " + str(oracle_.nnz_out(iout_)));
 
     // Call the base class initializer
     OracleFunction::init(opts);
@@ -141,15 +140,15 @@ namespace casadi {
     // Check for structural singularity in the Jacobian
     casadi_assert_message(!sp_jac_.is_singular(),
       "Rootfinder::init: singularity - the jacobian is structurally rank-deficient. "
-      "sprank(J)=" << sprank(sp_jac_) << " (instead of "<< sp_jac_.size1() << ")");
+      "sprank(J)=" + str(sprank(sp_jac_)) + " (instead of " + str(sp_jac_.size1()) + ")");
 
     // Get the linear solver creator function
     linsol_ = Linsol("linsol", linear_solver, linear_solver_options);
 
     // Constraints
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),
-                          "Constraint vector if supplied, must be of length n, but got "
-                          << u_c_.size() << " and n = " << n_);
+      "Constraint vector if supplied, must be of length n, but got "
+      + str(u_c_.size()) + " and n = " + str(n_));
 
     // Allocate sufficiently large work vectors
     alloc(oracle_);
@@ -160,18 +159,20 @@ namespace casadi {
     alloc_w(sz_w + 2*static_cast<size_t>(n_));
   }
 
-  void Rootfinder::init_memory(void* mem) const {
-    OracleFunction::init_memory(mem);
+  int Rootfinder::init_mem(void* mem) const {
+    if (OracleFunction::init_mem(mem)) return 1;
     //auto m = static_cast<RootfinderMemory*>(mem);
     linsol_.reset(sp_jac_);
+    return 0;
   }
 
-  void Rootfinder::eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int Rootfinder::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     // Reset the solver, prepare for solution
     setup(mem, arg, res, iw, w);
 
     // Solve the NLP
     solve(mem);
+    return 0;
   }
 
   void Rootfinder::set_work(void* mem, const double**& arg, double**& res,
@@ -180,45 +181,44 @@ namespace casadi {
 
     // Get input pointers
     m->iarg = arg;
-    arg += n_in();
+    arg += n_in_;
 
     // Get output pointers
     m->ires = res;
-    res += n_out();
+    res += n_out_;
   }
 
   Function Rootfinder
-  ::get_forward(const std::string& name, int nfwd,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+  ::get_forward(int nfwd, const std::string& name,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Symbolic expression for the input
-    vector<MX> arg = mx_in();
-    arg[iin_] = MX::sym(arg[iin_].name() + "_guess",
-                        Sparsity(arg[iin_].size()));
-    vector<MX> res = mx_out();
-    vector<vector<MX> > fseed = symbolicFwdSeed(nfwd, arg), fsens;
-    eval_forward(arg, res, fseed, fsens, false, false);
+    vector<MX> arg = mx_in(), res = mx_out();
+    vector<vector<MX>> fseed = fwd_seed<MX>(nfwd), fsens;
+    arg[iin_] = MX::sym(arg[iin_].name(), Sparsity(arg[iin_].size()));
+    for (auto&& e : fseed) e[iin_] = MX::sym(e[iin_].name(), e[iin_].size());
+    ad_forward(arg, res, fseed, fsens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
     vector<MX> v(nfwd);
-    for (int i=0; i<n_in(); ++i) {
+    for (int i=0; i<n_in_; ++i) {
       for (int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
       arg.push_back(horzcat(v));
     }
     res.clear();
-    for (int i=0; i<n_out(); ++i) {
+    for (int i=0; i<n_out_; ++i) {
       for (int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
       res.push_back(horzcat(v));
     }
-    return Function(name, arg, res, i_names, o_names, opts);
+    return Function(name, arg, res, inames, onames, opts);
   }
 
   Function Rootfinder
-  ::get_reverse(const std::string& name, int nadj,
-                const std::vector<std::string>& i_names,
-                const std::vector<std::string>& o_names,
+  ::get_reverse(int nadj, const std::string& name,
+                const std::vector<std::string>& inames,
+                const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Symbolic expression for the input
     vector<MX> arg = mx_in();
@@ -226,35 +226,34 @@ namespace casadi {
                         Sparsity(arg[iin_].size()));
     vector<MX> res = mx_out();
     vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
-    eval_reverse(arg, res, aseed, asens, false, false);
+    ad_reverse(arg, res, aseed, asens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
     vector<MX> v(nadj);
-    for (int i=0; i<n_out(); ++i) {
+    for (int i=0; i<n_out_; ++i) {
       for (int d=0; d<nadj; ++d) v[d] = aseed[d][i];
       arg.push_back(horzcat(v));
     }
     res.clear();
-    for (int i=0; i<n_in(); ++i) {
+    for (int i=0; i<n_in_; ++i) {
       for (int d=0; d<nadj; ++d) v[d] = asens[d][i];
       res.push_back(horzcat(v));
     }
-    return Function(name, arg, res, i_names, o_names, opts);
+    return Function(name, arg, res, inames, onames, opts);
   }
 
-  void Rootfinder::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    int num_out = n_out();
-    int num_in = n_in();
+  int Rootfinder::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     bvec_t* tmp1 = w; w += n_;
     bvec_t* tmp2 = w; w += n_;
 
     // Propagate dependencies through the function
-    const bvec_t** arg1 = arg+n_in();
-    copy(arg, arg+num_in, arg1);
+    const bvec_t** arg1 = arg+n_in_;
+    copy(arg, arg+n_in_, arg1);
     arg1[iin_] = 0;
-    bvec_t** res1 = res+n_out();
-    fill_n(res1, num_out, static_cast<bvec_t*>(0));
+    bvec_t** res1 = res+n_out_;
+    fill_n(res1, n_out_, static_cast<bvec_t*>(0));
     res1[iout_] = tmp1;
     oracle_(arg1, res1, iw, w, 0);
 
@@ -264,17 +263,16 @@ namespace casadi {
     if (res[iout_]) copy(tmp2, tmp2+n_, res[iout_]);
 
     // Propagate to auxiliary outputs
-    if (num_out>1) {
+    if (n_out_>1) {
       arg1[iin_] = tmp2;
-      copy(res, res+num_out, res1);
+      copy(res, res+n_out_, res1);
       res1[iout_] = 0;
       oracle_(arg1, res1, iw, w, 0);
     }
+    return 0;
   }
 
-  void Rootfinder::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    int num_out = n_out();
-    int num_in = n_in();
+  int Rootfinder::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     bvec_t* tmp1 = w; w += n_;
     bvec_t* tmp2 = w; w += n_;
 
@@ -287,14 +285,14 @@ namespace casadi {
     }
 
     // Propagate dependencies from auxiliary outputs to z
-    bvec_t** res1 = res+num_out;
-    copy(res, res+num_out, res1);
+    bvec_t** res1 = res+n_out_;
+    copy(res, res+n_out_, res1);
     res1[iout_] = 0;
-    bvec_t** arg1 = arg+num_in;
-    copy(arg, arg+num_in, arg1);
+    bvec_t** arg1 = arg+n_in_;
+    copy(arg, arg+n_in_, arg1);
     arg1[iin_] = tmp1;
-    if (num_out>1) {
-      oracle_.rev(arg1, res1, iw, w, 0);
+    if (n_out_>1) {
+      if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
     }
 
     // "Solve" in order to get seed
@@ -302,10 +300,11 @@ namespace casadi {
     sp_jac_.spsolve(tmp2, tmp1, true);
 
     // Propagate dependencies through the function
-    for (int i=0; i<num_out; ++i) res1[i] = 0;
+    for (int i=0; i<n_out_; ++i) res1[i] = 0;
     res1[iout_] = tmp2;
     arg1[iin_] = 0; // just a guess
-    oracle_.rev(arg1, res1, iw, w, 0);
+    if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
+    return 0;
   }
 
   std::map<std::string, Rootfinder::Plugin> Rootfinder::solvers_;
@@ -313,7 +312,7 @@ namespace casadi {
   const std::string Rootfinder::infix_ = "rootfinder";
 
   void Rootfinder::
-  eval_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+  ad_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& fseed,
           std::vector<std::vector<MX> >& fsens,
           bool always_inline, bool never_inline) const {
@@ -343,12 +342,11 @@ namespace casadi {
     // Solve for all the forward derivatives at once
     vector<MX> rhs(nfwd);
     for (int d=0; d<nfwd; ++d) rhs[d] = vec(fsens[d][iout_]);
-    rhs = horzsplit(J->getSolve(-horzcat(rhs), false, linsol_));
+    rhs = horzsplit(J->get_solve(-horzcat(rhs), false, linsol_));
     for (int d=0; d<nfwd; ++d) fsens[d][iout_] = reshape(rhs[d], size_in(iin_));
 
     // Propagate to auxiliary outputs
-    int num_out = n_out();
-    if (num_out>1) {
+    if (n_out_>1) {
       for (int d=0; d<nfwd; ++d) f_fseed[d][iin_] = fsens[d][iout_];
       oracle_->call_forward(f_arg, f_res, f_fseed, fsens,
                             always_inline, never_inline);
@@ -357,7 +355,7 @@ namespace casadi {
   }
 
   void Rootfinder::
-  eval_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+  ad_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
           const std::vector<std::vector<MX> >& aseed,
           std::vector<std::vector<MX> >& asens,
           bool always_inline, bool never_inline) const {
@@ -376,20 +374,18 @@ namespace casadi {
     MX J = jac(f_arg).front();
 
     // Get adjoint seeds for calling f
-    int num_out = n_out();
-    int num_in = n_in();
     vector<MX> f_res(res);
     f_res[iout_] = MX(size_in(iin_)); // zero residual
     vector<vector<MX> > f_aseed(nadj);
     for (int d=0; d<nadj; ++d) {
-      f_aseed[d].resize(num_out);
-      for (int i=0; i<num_out; ++i) f_aseed[d][i] = i==iout_ ? f_res[iout_] : aseed[d][i];
+      f_aseed[d].resize(n_out_);
+      for (int i=0; i<n_out_; ++i) f_aseed[d][i] = i==iout_ ? f_res[iout_] : aseed[d][i];
     }
 
     // Propagate dependencies from auxiliary outputs
     vector<MX> rhs(nadj);
     vector<vector<MX> > asens_aux;
-    if (num_out>1) {
+    if (n_out_>1) {
       oracle_->call_reverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
       for (int d=0; d<nadj; ++d) rhs[d] = vec(asens_aux[d][iin_] + aseed[d][iout_]);
     } else {
@@ -397,9 +393,9 @@ namespace casadi {
     }
 
     // Solve for all the adjoint seeds at once
-    rhs = horzsplit(J->getSolve(-horzcat(rhs), true, linsol_));
+    rhs = horzsplit(J->get_solve(-horzcat(rhs), true, linsol_));
     for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<num_out; ++i) {
+      for (int i=0; i<n_out_; ++i) {
         if (i==iout_) {
           f_aseed[d][i] = reshape(rhs[d], size_out(i));
         } else {
@@ -412,7 +408,7 @@ namespace casadi {
     // No dependency on guess (1)
     vector<MX> tmp(nadj);
     for (int d=0; d<nadj; ++d) {
-      asens[d].resize(num_in);
+      asens[d].resize(n_in_);
       tmp[d] = asens[d][iin_].is_empty(true) ? MX(size_in(iin_)) : asens[d][iin_];
     }
 
@@ -425,9 +421,9 @@ namespace casadi {
     }
 
     // Add contribution from auxiliary outputs
-    if (num_out>1) {
+    if (n_out_>1) {
       for (int d=0; d<nadj; ++d) {
-        for (int i=0; i<num_in; ++i) if (i!=iin_) asens[d][i] += asens_aux[d][i];
+        for (int i=0; i<n_in_; ++i) if (i!=iin_) asens[d][i] += asens_aux[d][i];
       }
     }
   }

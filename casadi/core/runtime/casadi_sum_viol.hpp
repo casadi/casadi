@@ -1,6 +1,7 @@
 // NOLINT(legal/copyright)
+// SYMBOL "sum_viol"
 template<typename T1>
-T1 CASADI_PREFIX(sum_viol)(int n, const T1* x, const T1* lb, const T1* ub) {
+T1 casadi_sum_viol(int n, const T1* x, const T1* lb, const T1* ub) {
   T1 r = 0;
   const T1 zero = 0;
   int i;

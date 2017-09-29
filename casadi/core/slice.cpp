@@ -34,9 +34,9 @@ namespace casadi {
 
   Slice::Slice(int i, bool ind1) : start(i-ind1), stop(i-ind1+1), step(1) {
     casadi_assert_message(!(ind1 && i<=0),
-                          "Matlab is 1-based, but requested index " <<
-                          i <<  ". Note that negative slices are" <<
-                          " disabled in the Matlab interface. " <<
+                          "Matlab is 1-based, but requested index " +
+                          str(i) +  ". Note that negative slices are"
+                          " disabled in the Matlab interface. "
                           "Possibly you may want to use 'end'.");
     if (i==-1) stop = std::numeric_limits<int>::max();
   }
@@ -59,21 +59,17 @@ namespace casadi {
     }
 
     casadi_assert_message(stop<=len,
-                          "Slice (start=" << start << ", stop=" << stop << ", step=" << step
-                          << ") out of bounds with supplied length of " << len);
+      "Slice (start=" + str(start) + ", stop=" + str(stop) + ", step=" + str(step)
+      + ") out of bounds with supplied length of " + str(len));
     casadi_assert_message(start>=0,
-                          "Slice (start=" << start << ", stop=" << stop << ", step=" << step
-                          << ") out of bounds with start<0.");
+      "Slice (start=" + str(start) + ", stop=" + str(stop) + ", step=" + str(step)
+      + ") out of bounds with start<0.");
     if ((stop>=start && step<0) || (stop<=start && step>0)) return std::vector<int>();
 
     return range(start+ind1, stop+ind1, step, len+ind1);
   }
 
-  void Slice::repr(std::ostream& stream, bool trailing_newline) const {
-    print(stream, trailing_newline);
-  }
-
-  void Slice::print(std::ostream& stream, bool trailing_newline) const {
+  void Slice::disp(std::ostream& stream, bool more) const {
     bool from_beginning = start == 0;
     bool till_end = stop == std::numeric_limits<int>::max();
     bool skip_none = step==1;
@@ -85,7 +81,6 @@ namespace casadi {
       if (!till_end) stream << stop;
       if (!skip_none) stream << ":" << step;
     }
-    if (trailing_newline) stream << std::endl;
   }
 
   std::vector<int> Slice::all(const Slice& outer, int len) const {
@@ -133,10 +128,10 @@ namespace casadi {
     // Always false if negative numbers or non-increasing
     int last_v = -1;
     for (int i=0; i<v.size(); ++i) {
-      casadi_assert_message(!(ind1 && v[i]<=0), "Matlab is 1-based, but requested index " <<
-                                                v[i] <<  ". Note that negative slices are" <<
-                                                " disabled in the Matlab interface. " <<
-                                                "Possibly you may want to use 'end'.");
+      casadi_assert_message(!(ind1 && v[i]<=0),
+        "Matlab is 1-based, but requested index " + str(v[i]) + ". "
+        "Note that negative slices are disabled in the Matlab interface. "
+        "Possibly you may want to use 'end'.");
       if (v[i]-ind1<=last_v) return false;
       last_v = v[i]-ind1;
     }
@@ -251,4 +246,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-

@@ -61,7 +61,7 @@ namespace casadi {
   }
 
   IpoptInterface::~IpoptInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options IpoptInterface::options_
@@ -194,8 +194,8 @@ namespace casadi {
     }
   }
 
-  void IpoptInterface::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
+  int IpoptInterface::init_mem(void* mem) const {
+    if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<IpoptMemory*>(mem);
 
     // Start an IPOPT application
@@ -267,6 +267,7 @@ namespace casadi {
     // Intialize the IpoptApplication and process the options
     Ipopt::ApplicationReturnStatus status = (*app)->Initialize();
     casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
+    return 0;
   }
 
   void IpoptInterface::set_work(void* mem, const double**& arg, double**& res,
@@ -336,7 +337,7 @@ namespace casadi {
     auto m = static_cast<IpoptMemory*>(mem);
 
     // Check the provided inputs
-    checkInputs(mem);
+    check_inputs(mem);
 
     // Reset statistics
     m->inf_pr.clear();
@@ -385,7 +386,6 @@ namespace casadi {
                         int ls_trials, bool full_callback) const {
     m->n_iter += 1;
     try {
-      log("intermediate_callback started");
       m->inf_pr.push_back(inf_pr);
       m->inf_du.push_back(inf_du);
       m->mu.push_back(mu);
@@ -440,10 +440,13 @@ namespace casadi {
       } else {
         return 1;
       }
+
+    } catch(KeyboardInterruptException& ex) {
+      return 0;
     } catch(exception& ex) {
       userOut<true, PL_WARN>() << "intermediate_callback: " << ex.what() << endl;
-      if (iteration_callback_ignore_errors_) return 0;
-      return 1;
+      if (iteration_callback_ignore_errors_) return 1;
+      return 0;
     }
   }
 
@@ -618,6 +621,18 @@ namespace casadi {
     auto m = static_cast<IpoptMemory*>(mem);
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter_count;
+    if (m->inf_pr.size()>0) {
+      Dict iterations;
+      iterations["inf_pr"] = m->inf_pr;
+      iterations["inf_du"] = m->inf_du;
+      iterations["mu"] = m->mu;
+      iterations["d_norm"] = m->d_norm;
+      iterations["regularization_size"] = m->regularization_size;
+      iterations["obj"] = m->obj;
+      iterations["alpha_pr"] = m->alpha_pr;
+      iterations["alpha_du"] = m->alpha_du;
+      stats["iterations"] = iterations;
+    }
     return stats;
   }
 

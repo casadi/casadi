@@ -53,10 +53,11 @@ namespace casadi {
 
   Function integrator(const string& name, const string& solver,
                       const Function& dae, const Dict& opts) {
-    Function ret;
-    ret.assignNode(Integrator::getPlugin(solver).creator(name, dae));
-    ret->construct(opts);
-    return ret;
+    // Make sure that dae is sound
+    if (dae.has_free()) {
+      casadi_error("Cannot create '" + name + "' since " + str(dae.get_free()) + " are free.");
+    }
+    return Function::create(Integrator::getPlugin(solver).creator(name, dae), opts);
   }
 
   vector<string> integrator_in() {
@@ -146,8 +147,8 @@ namespace casadi {
     return Sparsity();
   }
 
-  void Integrator::
-  eval(void* mem, const double** arg, double** res, int* iw, double* w) const {
+  int Integrator::
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<IntegratorMemory*>(mem);
 
     // Statistics
@@ -207,6 +208,7 @@ namespace casadi {
 
     // Show statistics
     if (print_time_)  print_fstats(static_cast<OracleMemory*>(mem));
+    return 0;
   }
 
   Options Integrator::options_
@@ -314,14 +316,14 @@ namespace casadi {
     sp_jac_dae_ = sp_jac_dae();
     casadi_assert_message(!sp_jac_dae_.is_singular(),
                           "Jacobian of the forward problem is structurally rank-deficient. "
-                          "sprank(J)=" + to_string(sprank(sp_jac_dae_)) + "<"
-                          + to_string(nx_+nz_));
+                          "sprank(J)=" + str(sprank(sp_jac_dae_)) + "<"
+                          + str(nx_+nz_));
     if (nrx_>0) {
       sp_jac_rdae_ = sp_jac_rdae();
       casadi_assert_message(!sp_jac_rdae_.is_singular(),
                             "Jacobian of the backward problem is structurally rank-deficient. "
-                            "sprank(J)=" + to_string(sprank(sp_jac_rdae_)) + "<"
-                            + to_string(nrx_+nrz_));
+                            "sprank(J)=" + str(sprank(sp_jac_rdae_)) + "<"
+                            + str(nrx_+nrz_));
     }
 
     // Consistency check
@@ -332,16 +334,17 @@ namespace casadi {
     alloc_w(nx_ + nz_ + nrx_ + nrz_, true);
   }
 
-  void Integrator::init_memory(void* mem) const {
-    OracleFunction::init_memory(mem);
+  int Integrator::init_mem(void* mem) const {
+    if (OracleFunction::init_mem(mem)) return 1;
 
     auto m = static_cast<IntegratorMemory*>(mem);
     m->fstats["mainloop"] = FStats();
+    return 0;
   }
 
   template<typename MatType>
   map<string, MatType> Integrator::aug_fwd(int nfwd) const {
-    log("Integrator::aug_fwd", "call");
+    if (verbose_) casadi_message(name_ + "::aug_fwd");
 
     // Get input expressions
     vector<MatType> arg = MatType::get_input(oracle_);
@@ -371,7 +374,7 @@ namespace casadi {
     vector<vector<MatType>> seed(nfwd, vector<MatType>(DE_NUM_IN));
     for (int d=0; d<nfwd; ++d) {
       seed[d][DE_T] = zero_t;
-      string pref = "aug" + to_string(d) + "_";
+      string pref = "aug" + str(d) + "_";
       aug_x.push_back(vec(seed[d][DE_X] = MatType::sym(pref + "x", x())));
       aug_z.push_back(vec(seed[d][DE_Z] = MatType::sym(pref + "z", z())));
       aug_p.push_back(vec(seed[d][DE_P] = MatType::sym(pref + "p", p())));
@@ -416,7 +419,8 @@ namespace casadi {
 
   template<typename MatType>
   map<string, MatType> Integrator::aug_adj(int nadj) const {
-    log("Integrator::aug_adj", "call");
+    if (verbose_) casadi_message(name_ + "::aug_adj");
+
     // Get input expressions
     vector<MatType> arg = MatType::get_input(oracle_);
     vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
@@ -444,7 +448,7 @@ namespace casadi {
     // Reverse mode directional derivatives
     vector<vector<MatType>> seed(nadj, vector<MatType>(DE_NUM_OUT));
     for (int d=0; d<nadj; ++d) {
-      string pref = "aug" + to_string(d) + "_";
+      string pref = "aug" + str(d) + "_";
       aug_rx.push_back(vec(seed[d][DE_ODE] = MatType::sym(pref + "ode", x())));
       aug_rz.push_back(vec(seed[d][DE_ALG] = MatType::sym(pref + "alg", z())));
       aug_rp.push_back(vec(seed[d][DE_QUAD] = MatType::sym(pref + "quad", q())));
@@ -503,8 +507,9 @@ namespace casadi {
     return ret;
   }
 
-  void Integrator::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    log("Integrator::sp_fwd", "begin");
+  int Integrator::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
+    if (verbose_) casadi_message(name_ + "::sp_forward");
 
     // Work vectors
     bvec_t *tmp_x = w; w += nx_;
@@ -513,11 +518,11 @@ namespace casadi {
     bvec_t *tmp_rz = w; w += nrz_;
 
     // Propagate forward
-    const bvec_t** arg1 = arg+n_in();
+    const bvec_t** arg1 = arg+n_in_;
     fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
     arg1[DE_X] = arg[INTEGRATOR_X0];
     arg1[DE_P] = arg[INTEGRATOR_P];
-    bvec_t** res1 = res+n_out();
+    bvec_t** res1 = res+n_out_;
     fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
     res1[DE_ODE] = tmp_x;
     res1[DE_ALG] = tmp_z;
@@ -542,7 +547,7 @@ namespace casadi {
       arg1[DE_Z] = tmp_z;
       res1[DE_ODE] = res1[DE_ALG] = 0;
       res1[DE_QUAD] = res[INTEGRATOR_QF];
-      oracle_(arg1, res1, iw, w, 0);
+      if (oracle_(arg1, res1, iw, w, 0)) return 1;
     }
 
     if (nrx_>0) {
@@ -578,18 +583,18 @@ namespace casadi {
         arg1[DE_RZ] = tmp_rz;
         res1[DE_RODE] = res1[DE_RALG] = 0;
         res1[DE_RQUAD] = res[INTEGRATOR_RQF];
-        oracle_(arg1, res1, iw, w, 0);
+        if (oracle_(arg1, res1, iw, w, 0)) return 1;
       }
     }
-    log("Integrator::sp_fwd", "end");
+    return 0;
   }
 
-  void Integrator::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    log("Integrator::sp_rev", "begin");
+  int Integrator::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
+    if (verbose_) casadi_message(name_ + "::sp_reverse");
 
     // Work vectors
-    bvec_t** arg1 = arg+n_in();
-    bvec_t** res1 = res+n_out();
+    bvec_t** arg1 = arg+n_in_;
+    bvec_t** res1 = res+n_out_;
     bvec_t *tmp_x = w; w += nx_;
     bvec_t *tmp_z = w; w += nz_;
 
@@ -650,7 +655,7 @@ namespace casadi {
       arg1[DE_RX] = tmp_rx;
       arg1[DE_RZ] = tmp_rz;
       arg1[DE_RP] = rp;
-      oracle_.rev(arg1, res1, iw, w, 0);
+      if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
 
       // Propagate interdependencies
       fill_n(w, nrx_+nrz_, 0);
@@ -666,7 +671,7 @@ namespace casadi {
       res1[DE_RQUAD] = 0;
       arg1[DE_RX] = rx0;
       arg1[DE_RZ] = 0; // arg[INTEGRATOR_RZ0] is a guess, no dependency
-      oracle_.rev(arg1, res1, iw, w, 0);
+      if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
     }
 
     // Get dependencies from forward quadratures
@@ -676,7 +681,9 @@ namespace casadi {
     arg1[DE_X] = tmp_x;
     arg1[DE_Z] = tmp_z;
     arg1[DE_P] = p;
-    if (qf && nq_>0) oracle_.rev(arg1, res1, iw, w, 0);
+    if (qf && nq_>0) {
+      if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
+    }
 
     // Propagate interdependencies
     fill_n(w, nx_+nz_, 0);
@@ -692,17 +699,16 @@ namespace casadi {
     res1[DE_QUAD] = 0;
     arg1[DE_X] = x0;
     arg1[DE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
-    oracle_.rev(arg1, res1, iw, w, 0);
-
-    log("Integrator::sp_rev", "end");
+    if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
+    return 0;
   }
 
   Function Integrator::
-  get_forward(const std::string& name, int nfwd,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names,
+  get_forward(int nfwd, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
               const Dict& opts) const {
-    log("Integrator::get_forward", "begin");
+    if (verbose_) casadi_message(name_ + "::get_forward");
 
     // Integrator options
     Dict aug_opts = getDerivativeOptions(true);
@@ -712,10 +718,10 @@ namespace casadi {
 
     // Create integrator for augmented DAE
     Function aug_dae;
-    string aug_prefix = "fsens" + to_string(nfwd) + "_";
+    string aug_prefix = "fsens" + str(nfwd) + "_";
     string dae_name = aug_prefix + oracle_.name();
     Dict dae_opts = {{"derivative_of", oracle_}};
-    if (oracle_.is_a("sxfunction")) {
+    if (oracle_.is_a("SXFunction")) {
       aug_dae = map2oracle(dae_name, aug_fwd<SX>(nfwd));
     } else {
       aug_dae = map2oracle(dae_name, aug_fwd<MX>(nfwd));
@@ -735,7 +741,7 @@ namespace casadi {
     for (int dir=-1; dir<nfwd; ++dir) {
       // Suffix
       string suff;
-      if (dir>=0) suff = "_" + to_string(dir);
+      if (dir>=0) suff = "_" + str(dir);
 
       // Augmented problem
       vector<MX> din(INTEGRATOR_NUM_IN);
@@ -801,33 +807,31 @@ namespace casadi {
 
     // Concatenate forward seeds
     vector<MX> v(nfwd);
-    auto r_it = ret_in.begin() + n_in() + n_out();
-    for (int i=0; i<n_in(); ++i) {
-      for (int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_in());
+    auto r_it = ret_in.begin() + n_in_ + n_out_;
+    for (int i=0; i<n_in_; ++i) {
+      for (int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_in_);
       *r_it++ = horzcat(v);
     }
-    ret_in.resize(n_in() + n_out() + n_in());
+    ret_in.resize(n_in_ + n_out_ + n_in_);
 
     // Concatenate forward sensitivites
     r_it = ret_out.begin();
-    for (int i=0; i<n_out(); ++i) {
-      for (int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_out());
+    for (int i=0; i<n_out_; ++i) {
+      for (int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_out_);
       *r_it++ = horzcat(v);
     }
-    ret_out.resize(n_out());
-
-    log("Integrator::get_forward", "end");
+    ret_out.resize(n_out_);
 
     // Create derivative function and return
-    return Function(name, ret_in, ret_out, i_names, o_names, opts);
+    return Function(name, ret_in, ret_out, inames, onames, opts);
   }
 
   Function Integrator::
-  get_reverse(const std::string& name, int nadj,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names,
+  get_reverse(int nadj, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
               const Dict& opts) const {
-    log("Integrator::get_reverse", "begin");
+    if (verbose_) casadi_message(name_ + "::get_reverse");
 
     // Integrator options
     Dict aug_opts = getDerivativeOptions(false);
@@ -837,9 +841,9 @@ namespace casadi {
 
     // Create integrator for augmented DAE
     Function aug_dae;
-    string aug_prefix = "asens" + to_string(nadj) + "_";
+    string aug_prefix = "asens" + str(nadj) + "_";
     string dae_name = aug_prefix + oracle_.name();
-    if (oracle_.is_a("sxfunction")) {
+    if (oracle_.is_a("SXFunction")) {
       aug_dae = map2oracle(dae_name, aug_adj<SX>(nadj));
     } else {
       aug_dae = map2oracle(dae_name, aug_adj<MX>(nadj));
@@ -882,7 +886,7 @@ namespace casadi {
     for (int dir=0; dir<nadj; ++dir) {
       // Suffix
       string suff;
-      if (dir>=0) suff = "_" + to_string(dir);
+      if (dir>=0) suff = "_" + str(dir);
 
       // Augmented problem
       rx0_aug.push_back(vec(dd[INTEGRATOR_XF] = MX::sym("xf" + suff, x())));
@@ -951,25 +955,23 @@ namespace casadi {
 
     // Concatenate forward seeds
     vector<MX> v(nadj);
-    auto r_it = ret_in.begin() + n_in() + n_out();
-    for (int i=0; i<n_out(); ++i) {
-      for (int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_out());
+    auto r_it = ret_in.begin() + n_in_ + n_out_;
+    for (int i=0; i<n_out_; ++i) {
+      for (int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_out_);
       *r_it++ = horzcat(v);
     }
-    ret_in.resize(n_in() + n_out() + n_out());
+    ret_in.resize(n_in_ + n_out_ + n_out_);
 
     // Concatenate forward sensitivites
     r_it = ret_out.begin();
-    for (int i=0; i<n_in(); ++i) {
-      for (int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_in());
+    for (int i=0; i<n_in_; ++i) {
+      for (int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_in_);
       *r_it++ = horzcat(v);
     }
-    ret_out.resize(n_in());
-
-    log("Integrator::getDerivative", "end");
+    ret_out.resize(n_in_);
 
     // Create derivative function and return
-    return Function(name, ret_in, ret_out, i_names, o_names, opts);
+    return Function(name, ret_in, ret_out, inames, onames, opts);
   }
 
   Dict Integrator::getDerivativeOptions(bool fwd) const {
@@ -1018,8 +1020,7 @@ namespace casadi {
   const std::string Integrator::infix_ = "integrator";
 
   void Integrator::setStopTime(IntegratorMemory* mem, double tf) const {
-    casadi_error("Integrator::setStopTime not defined for class "
-                 << typeid(*this).name());
+    casadi_error("setStopTime not defined for class " + class_name());
   }
 
   FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const Function& dae)
@@ -1030,7 +1031,7 @@ namespace casadi {
   }
 
   FixedStepIntegrator::~FixedStepIntegrator() {
-    clear_memory();
+    clear_mem();
   }
 
   Options FixedStepIntegrator::options_
@@ -1064,8 +1065,8 @@ namespace casadi {
     nRZ_ =  G_.is_null() ? 0 : G_.nnz_in(RDAE_RZ);
   }
 
-  void FixedStepIntegrator::init_memory(void* mem) const {
-    Integrator::init_memory(mem);
+  int FixedStepIntegrator::init_mem(void* mem) const {
+    if (Integrator::init_mem(mem)) return 1;
     auto m = static_cast<FixedStepMemory*>(mem);
 
     // Discrete time algebraic variable
@@ -1093,6 +1094,7 @@ namespace casadi {
     m->rx_prev.resize(nrx_);
     m->RZ_prev.resize(nRZ_);
     m->rq_prev.resize(nrq_);
+    return 0;
   }
 
   void FixedStepIntegrator::advance(IntegratorMemory* mem, double t,

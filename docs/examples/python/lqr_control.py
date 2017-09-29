@@ -97,7 +97,7 @@ p = SX.sym('p')
 # sim.setInput(u_,'u')
 # sim.evaluate()
 
-# tf = sim.getMinorT()
+# tf = sim.minorT()
 
 # figure(1)
 # plot(tf,sim.getOutput().T)
@@ -114,7 +114,7 @@ p = SX.sym('p')
 # sim.setInput(u_,'u')
 # sim.evaluate()
 
-# tf = list(sim.getMinorT())
+# tf = list(sim.minorT())
 
 # figure(2)
 # title('Deviation from reference simulation, with perturbed initial condition')
@@ -266,7 +266,7 @@ p = SX.sym('p')
 # e = sim.getOutput()[states.i['y'],-1] - xref_e
 # assert(max(fabs(e))/max(fabs(xref_e))<1e-6)
 
-# tf = sim.getMinorT()
+# tf = sim.minorT()
 # # This will be our reference trajectory for tracking
 
 # figure(4)
@@ -398,7 +398,7 @@ p = SX.sym('p')
 #   #sim.setInput(yref_,'u')
 #   sim.evaluate()
 
-#   tf = sim.getMinorT()
+#   tf = sim.minorT()
 
 #   subplot(3,3,1+k*3)
 #   plot(tf,sim.getOutput(0).T)
@@ -472,7 +472,7 @@ p = SX.sym('p')
 #   sim.evaluate()
 #   sim.getOutput()
 
-#   tf = sim.getMinorT()
+#   tf = sim.minorT()
 
 #   subplot(2,2,2*k+1)
 #   title('states (%s)' % caption)
@@ -542,7 +542,7 @@ p = SX.sym('p')
 # sim.setInput(u_,'u')
 # sim.evaluate()
 
-# tf = sim.getMinorT()
+# tf = sim.minorT()
 
 # figure(8)
 # subplot(2,1,1)
@@ -597,7 +597,7 @@ p = SX.sym('p')
 # sim.setInput(u_,'u')
 # sim.evaluate()
 
-# tf = sim.getMinorT()
+# tf = sim.minorT()
 
 # figure(9)
 # subplot(2,1,1)

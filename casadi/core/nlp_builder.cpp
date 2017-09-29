@@ -35,17 +35,14 @@ namespace casadi {
     NlImporter(*this, filename, opts);
   }
 
-  void NlpBuilder::print(std::ostream &stream, bool trailing_newline) const {
-    stream << "NLP:" << endl;
-    stream << "x = " << this->x << endl;
-    stream << "f = " << this->f << endl;
-    stream << "g = " << this->g << endl;
-    if (trailing_newline) stream << endl;
-  }
-
-  void NlpBuilder::repr(std::ostream &stream, bool trailing_newline) const {
-    stream << "NLP(#x=" << this->x.size() << ", #g=" << this->g.size() << ")";
-    if (trailing_newline) stream << endl;
+  void NlpBuilder::disp(std::ostream& stream, bool more) const {
+    stream << "#x=" << this->x.size() << ", #g=" << this->g.size();
+    if (more) {
+      stream << endl;
+      stream << "x = " << this->x << endl;
+      stream << "f = " << this->f << endl;
+      stream << "g = " << this->g << endl;
+    }
   }
 
   NlImporter::NlImporter(NlpBuilder& nlp, const std::string& filename, const Dict& opts)
@@ -65,7 +62,7 @@ namespace casadi {
     }
     // Open file for reading
     s_.open(filename.c_str());
-    if (verbose_) userOut() << "Reading file \"" << filename << "\"" << endl;
+    if (verbose_) casadi_message("Reading file \"" + filename + "\"");
 
     // Read the header of the NL-file (first 10 lines)
     const int header_sz = 10;
@@ -83,8 +80,25 @@ namespace casadi {
     stringstream ss(header[1]);
     ss >> n_var_ >> n_con_ >> n_obj_ >> n_eq_ >> n_lcon_;
     if (verbose_) {
-      userOut() << "n_var = " << n_var_ << ", n_con  = " << n_con_ << ", n_obj = " << n_obj_
-      << ", n_eq = " << n_eq_ << ", n_lcon = " << n_lcon_ << endl;
+      casadi_message("n_var=" + str(n_var_) + ", n_con =" + str(n_con_) + ", "
+                     "n_obj=" + str(n_obj_) + ", n_eq=" + str(n_eq_) + ", "
+                     "n_lcon=" + str(n_lcon_));
+    }
+
+    // Get the number of nonlinear vars in constraints, objectives, both
+    stringstream ss4(header[4]);
+    ss4 >> nlvc_ >> nlvo_ >> nlvb_;
+    if (verbose_) {
+      casadi_message("nlvc=" + str(nlvc_) + ", nlvo=" + str(nlvo_) + ", nlvb=" + str(nlvb_));
+    }
+
+    // Get the number of discrete variables
+    stringstream ss6(header[6]);
+    ss6 >> nbv_ >> niv_ >> nlvbi_ >> nlvci_ >> nlvoi_;
+    if (verbose_) {
+      casadi_message("nbv=" + str(nbv_) + ", niv =" + str(niv_) + ", "
+                     "nlvbi=" + str(nlvbi_) + ", nlvci=" + str(nlvci_) + ", "
+                     "nlvoi=" + str(nlvoi_));
     }
 
     // Allocate variables
@@ -104,11 +118,49 @@ namespace casadi {
     nlp_.g_ub.resize(n_con_,  inf);
     nlp_.lambda_init.resize(n_con_, 0);
 
+    // Allocate binary variables vector
+    nlp_.discrete.clear();
+
+    //D. M. Gay and M. Hill, 'Hooking Your Solver to AMPL' October, 1997.
+    // continuous in an objective and in a constraint
+    for (int j=0; j<nlvb_-nlvbi_; ++j) nlp_.discrete.push_back(false);
+
+    // integer in an objective and in a constraint
+    for (int j=0; j<nlvbi_; ++j) nlp_.discrete.push_back(true);
+
+    // continuous just in constraints
+    for (int j=0; j<nlvc_ - (nlvb_ + nlvci_); ++j) nlp_.discrete.push_back(false);
+
+    // integer just in constraints
+    for (int j=0; j<nlvci_; ++j) nlp_.discrete.push_back(true);
+
+    // continuous just in objectives
+    for (int j=0; j<nlvo_ - (nlvc_ + nlvoi_); ++j) nlp_.discrete.push_back(false);
+
+    // integer just in objectives
+    for (int j=0; j < nlvoi_; ++j) nlp_.discrete.push_back(true);
+
+    // linear
+    int max_nlvc_nlvo = (nlvc_ < nlvo_) ? nlvo_ : nlvc_;
+    for (int j=0; j<n_var_-(max_nlvc_nlvo+niv_+nbv_); ++j) nlp_.discrete.push_back(false);
+
+    // binary
+    for (int j = 0; j<nbv_; ++j) nlp_.discrete.push_back(true);
+
+    // other integer
+    for (int j = 0; j<niv_; ++j) nlp_.discrete.push_back(true);
+
+    casadi_assert_message(nlp_.discrete.size()==n_var_,
+      "Number of variables in the header don't match");
+
     // All variables, including dependent
     v_ = nlp_.x;
 
     // Read segments
     parse();
+
+    // multiple the objective sign
+    nlp_.f = sign_*nlp_.f;
   }
 
   NlImporter::~NlImporter() {
@@ -217,7 +269,7 @@ namespace casadi {
             case 53:  return acos(x);
 
             default:
-            msg << "Unknown unary operation: \"" << i << "\"";
+            casadi_error("Unknown unary operation: " + str(i));
           }
           break;
         }
@@ -257,7 +309,7 @@ namespace casadi {
             // case 73:  return iff(x, y); // FIXME
 
             default:
-            msg << "Unknown binary operation: \"" << i << "\"";
+            casadi_error("Unknown binary operation: " + str(i));
           }
           break;
         }
@@ -295,32 +347,32 @@ namespace casadi {
             }
 
             default:
-            msg << "Unknown n-ary operation: \"" << i << "\"";
+            casadi_error("Unknown n-ary operation: " + str(i));
           }
           break;
         }
 
         // Piecewise linear terms, class 4 in Gay2005
         case 64:
-        msg << "Piecewise linear terms not supported";
+        casadi_error("Piecewise linear terms not supported");
         break;
 
         // If-then-else expressions, class 5 in Gay2005
         case 35: case 65: case 72:
-        msg << "If-then-else expressions not supported";
+        casadi_error("If-then-else expressions not supported");
         break;
 
         default:
-        msg << "Unknown operatio: \"" << i << "\"";
+        casadi_error("Unknown operatio: " + str(i));
       }
       break;
 
       default:
-      msg << "Unknown instruction: \"" << inst << "\"";
+      casadi_error("Unknown instruction: " + str(inst));
     }
 
     // Throw error message
-    throw CasadiException("Error in NlpBuilder::expr: " + msg.str());
+    casadi_error("Unknown error");
   }
 
   void NlImporter::F_segment() {
@@ -381,10 +433,10 @@ namespace casadi {
     // Should the objective be maximized
     int sigma;
     s_ >> sigma;
-    MX sign = sigma!=0 ? -1 : 1;
+    sign_ = sigma!=0 ? -1 : 1;
 
     // Parse and save expression
-    nlp_.f += sign*expr();
+    nlp_.f += expr();
   }
 
   void NlImporter::d_segment() {

@@ -28,6 +28,7 @@
 #include "std_vector_tools.hpp"
 #include "global_options.hpp"
 #include "external.hpp"
+#include "finite_differences.hpp"
 
 #include <typeinfo>
 #include <cctype>
@@ -76,10 +77,11 @@ namespace casadi {
     compilerplugin_ = "clang";
     print_time_ = true;
     eval_ = 0;
-    simple_ = 0;
-
     has_refcount_ = false;
-
+    enable_forward_ = true;
+    enable_reverse_ = true;
+    enable_jacobian_ = true;
+    enable_fd_ = false;
     sz_arg_tmp_ = 0;
     sz_res_tmp_ = 0;
     sz_iw_tmp_ = 0;
@@ -108,10 +110,20 @@ namespace casadi {
     get_options().check(opts);
 
     // Initialize the class hierarchy
-    init(opts);
+    try {
+      init(opts);
+    } catch (exception& e) {
+      casadi_error("Error calling " + class_name() + "::init for '" + name() + "':\n"
+        + string(e.what()));
+    }
 
     // Revisit class hierarchy in reverse order
-    finalize(opts);
+    try {
+      finalize(opts);
+    } catch (exception& e) {
+      casadi_error("Error calling " + class_name() + "::finalize for '" + name() + "':\n"
+        + string(e.what()));
+    }
   }
 
   Options FunctionInternal::options_
@@ -159,10 +171,10 @@ namespace casadi {
         "Deprecated option (ignored): Statistics are now always collected."}},
       {"input_scheme",
        {OT_STRINGVECTOR,
-        "Custom input scheme"}},
+        "Deprecated option (ignored)"}},
       {"output_scheme",
        {OT_STRINGVECTOR,
-        "Custom output scheme"}},
+        "Deprecated option (ignored)"}},
       {"jit",
        {OT_BOOL,
         "Use just-in-time compiler to speed up the evaluation"}},
@@ -183,11 +195,37 @@ namespace casadi {
         " Overrules the builtin optimized_num_dir."}},
       {"print_time",
        {OT_BOOL,
-        "print information about execution time"}}
+        "print information about execution time"}},
+      {"enable_forward",
+       {OT_BOOL,
+        "Enable derivative calculation using generated functions for"
+        " Jacobian-times-vector products - typically using forward mode AD"
+        " - if available. [default: true]"}},
+      {"enable_reverse",
+        {OT_BOOL,
+        "Enable derivative calculation using generated functions for"
+        " transposed Jacobian-times-vector products - typically using reverse mode AD"
+        " - if available. [default: true]"}},
+      {"enable_jacobian",
+        {OT_BOOL,
+        "Enable derivative calculation using generated functions for"
+        " Jacobians of all differentiable outputs with respect to all differentiable inputs"
+        " - if available. [default: true]"}},
+      {"enable_fd",
+       {OT_BOOL,
+        "Enable derivative calculation by finite differencing. [default: false]]"}},
+      {"fd_options",
+       {OT_DICT,
+        "Options to be passed to the finite difference instance"}},
+      {"fd_method",
+       {OT_STRING,
+        "Method for finite differencing [default 'central']"}}
      }
   };
 
   void FunctionInternal::init(const Dict& opts) {
+    // Default options
+    fd_step_ = 1e-8;
 
     // Read options
     for (auto&& op : opts) {
@@ -204,9 +242,9 @@ namespace casadi {
       } else if (op.first=="gather_stats") {
         casadi_warning("Deprecated option \"gather_stats\": Always enabled");
       } else if (op.first=="input_scheme") {
-        ischeme_ = op.second;
+        casadi_warning("Deprecated option: \"input_scheme\" set via constructor");
       } else if (op.first=="output_scheme") {
-        oscheme_ = op.second;
+        casadi_warning("Deprecated option: \"output_scheme\" set via constructor");
       } else if (op.first=="jit") {
         jit_ = op.second;
       } else if (op.first=="compiler") {
@@ -223,81 +261,107 @@ namespace casadi {
         max_num_dir_ = op.second;
       } else if (op.first=="print_time") {
         print_time_ = op.second;
+      } else if (op.first=="enable_forward") {
+        enable_forward_ = op.second;
+      } else if (op.first=="enable_reverse") {
+        enable_reverse_ = op.second;
+      } else if (op.first=="enable_jacobian") {
+        enable_jacobian_ = op.second;
+      } else if (op.first=="enable_fd") {
+        enable_fd_ = op.second;
+      } else if (op.first=="fd_options") {
+        fd_options_ = op.second;
+      } else if (op.first=="fd_method") {
+        fd_method_ = op.second.to_string();
       }
     }
 
-    // Get the number of inputs and outputs
-    isp_.resize(get_n_in());
-    osp_.resize(get_n_out());
-    int n_in = this->n_in();
-    int n_out = this->n_out();
+    // Verbose?
+    if (verbose_) casadi_message(name_ + "::init");
 
-    // Get the input and output sparsities
-    for (int i=0; i<n_in; ++i) isp_[i] = get_sparsity_in(i);
-    for (int i=0; i<n_out; ++i) osp_[i] = get_sparsity_out(i);
-
-    // Allocate memory for function inputs and outputs
-    sz_arg_per_ += n_in;
-    sz_res_per_ += n_out;
-
-    // Warn for functions with too many inputs or outputs
-    casadi_assert_warning(n_in<10000, "Function " << name_
+    // Get the number of inputs
+    n_in_ = get_n_in();
+    casadi_assert_warning(n_in_<10000, "Function " << name_
                           << " has a large number of inputs (" << n_in << "). "
                           "Changing the problem formulation is strongly encouraged.");
-    casadi_assert_warning(n_out<10000, "Function " << name_
+
+    // Get the number of outputs
+    n_out_ = get_n_out();
+    casadi_assert_warning(n_out_<10000, "Function " << name_
                           << " has a large number of outputs (" << n_out << "). "
                           "Changing the problem formulation is strongly encouraged.");
 
+    // Query input sparsities if not already provided
+    if (sparsity_in_.empty()) {
+      sparsity_in_.resize(n_in_);
+      for (int i=0; i<n_in_; ++i) sparsity_in_[i] = get_sparsity_in(i);
+    } else {
+      casadi_assert(sparsity_in_.size()==n_in_);
+    }
+
+    // Query output sparsities if not already provided
+    if (sparsity_out_.empty()) {
+      sparsity_out_.resize(n_out_);
+      for (int i=0; i<n_out_; ++i) sparsity_out_[i] = get_sparsity_out(i);
+    } else {
+      casadi_assert(sparsity_out_.size()==n_out_);
+    }
+
+    // Query input names if not already provided
+    if (name_in_.empty()) {
+      name_in_.resize(n_in_);
+      for (int i=0; i<n_in_; ++i) name_in_[i] = get_name_in(i);
+    } else {
+      casadi_assert(name_in_.size()==n_in_);
+    }
+
+    // Query output names if not already provided
+    if (name_out_.empty()) {
+      name_out_.resize(n_out_);
+      for (int i=0; i<n_out_; ++i) name_out_[i] = get_name_out(i);
+    } else {
+      casadi_assert(name_out_.size()==n_out_);
+    }
+
+    // Allocate memory for function inputs and outputs
+    sz_arg_per_ += n_in_;
+    sz_res_per_ += n_out_;
+
     // Resize the matrix that holds the sparsity of the Jacobian blocks
-    jac_sparsity_ = jac_sparsity_compact_ =
-        SparseStorage<Sparsity>(Sparsity(n_out, n_in));
-    jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity(n_out, n_in));
+    jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
 
-    // If input scheme empty, provide default names
-    if (ischeme_.empty()) {
-      ischeme_.resize(n_in);
-      for (int i=0; i<n_in; ++i) ischeme_[i] = get_name_in(i);
-    }
-
-    // If output scheme empty, provide default names
-    if (oscheme_.empty()) {
-      oscheme_.resize(n_out);
-      for (int i=0; i<n_out; ++i) oscheme_[i] = get_name_out(i);
-    }
+    // Type of derivative calculations enabled
+    enable_forward_ = enable_forward_ && has_forward(1);
+    enable_reverse_ = enable_reverse_ && has_reverse(1);
+    enable_jacobian_ = enable_jacobian_ && has_jacobian();
+    enable_fd_ = enable_fd_ && !enable_forward_;
 
     alloc_arg(0);
     alloc_res(0);
   }
 
   std::string FunctionInternal::get_name_in(int i) {
-    return "i" + CodeGenerator::to_string(i);
+    return "i" + str(i);
   }
 
   std::string FunctionInternal::get_name_out(int i) {
-    return "o" + CodeGenerator::to_string(i);
+    return "o" + str(i);
   }
 
   void FunctionInternal::finalize(const Dict& opts) {
     if (jit_) {
       string jit_name = "jit_tmp";
       if (has_codegen()) {
-        if (verbose())
-          log("FunctionInternal::finalize", "Codegenerating function '" + name() + "'.");
+        if (verbose_) casadi_message("Codegenerating function '" + name() + "'.");
         // JIT everything
         CodeGenerator gen(jit_name);
         gen.add(self());
-        if (verbose())
-          log("FunctionInternal::finalize", "Compiling function '" + name() + "'..");
+        if (verbose_) casadi_message("Compiling function '" + name() + "'..");
         compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
-        if (verbose())
-          log("FunctionInternal::finalize", "Compiling function '" + name() + "' done.");
-        // Try to load with simplified syntax
-        simple_ = (simple_t)compiler_.get_function(name() + "_simple");
-        // If not succesful, try generic syntax
-        if (simple_==0) {
-          eval_ = (eval_t)compiler_.get_function(name());
-          casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
-        }
+        if (verbose_) casadi_message("Compiling function '" + name() + "' done.");
+        // Try to load
+        eval_ = (eval_t)compiler_.get_function(name());
+        casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
       } else {
         // Just jit dependencies
         jit_dependencies(jit_name);
@@ -309,56 +373,25 @@ namespace casadi {
     casadi_assert(mem==0);
   }
 
-  void FunctionInternal::
-  _eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    if (simplifiedCall()) {
-      // Copy arguments to input buffers
-      const double* arg1=w;
-      for (int i=0; i<this->n_in(); ++i) {
-        *w++ = arg[i] ? *arg[i] : 0;
-      }
-
-      // Evaluate
-      if (simple_) {
-        simple_(arg1, w);
-      } else {
-        simple(arg1, w);
-      }
-
-      // Get outputs
-      for (int i=0; i<this->n_out(); ++i) {
-        if (res[i]) *res[i] = *w;
-        ++w;
-      }
+  int FunctionInternal::
+  eval_gen(const double** arg, double** res, int* iw, double* w, void* mem) const {
+    if (eval_) {
+      return eval_(arg, res, iw, w, mem);
     } else {
-      if (eval_) {
-        eval_(arg, res, iw, w, mem);
-      } else {
-        eval(memory(mem), arg, res, iw, w);
-      }
+      return eval(arg, res, iw, w, mem);
     }
-  }
-
-  void FunctionInternal::
-  _eval(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    eval_sx(arg, res, iw, w, mem);
-  }
-
-  void FunctionInternal::
-  _eval(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    sp_fwd(arg, res, iw, w, mem);
   }
 
   void FunctionInternal::print_dimensions(ostream &stream) const {
-    stream << " Number of inputs: " << n_in() << endl;
-    for (int i=0; i<n_in(); ++i) {
-      stream << "  Input " << i  << " (\"" << name_in(i) << "\"): "
-             << sparsity_in(i).dim() << endl;
+    stream << " Number of inputs: " << n_in_ << endl;
+    for (int i=0; i<n_in_; ++i) {
+      stream << "  Input " << i  << " (\"" << name_in_[i] << "\"): "
+             << sparsity_in_[i].dim() << endl;
     }
-    stream << " Number of outputs: " << n_out() << endl;
-    for (int i=0; i<n_out(); ++i) {
-      stream << "  Output " << i  << " (\"" << name_out(i) << "\"): "
-             << sparsity_out(i).dim() << endl;
+    stream << " Number of outputs: " << n_out_ << endl;
+    for (int i=0; i<n_out_; ++i) {
+      stream << "  Output " << i  << " (\"" << name_out_[i] << "\"): "
+             << sparsity_out_[i].dim() << endl;
     }
   }
 
@@ -370,138 +403,64 @@ namespace casadi {
     get_options().print_one(name, stream);
   }
 
-  void FunctionInternal::print_free(std::ostream &stream) const {
-    stream << "[]";
+  std::vector<std::string> FunctionInternal::get_free() const {
+    casadi_assert(!has_free());
+    return std::vector<std::string>();
   }
 
-  void FunctionInternal::print(ostream &stream) const {
-    print_dimensions(stream);
-  }
+  std::string FunctionInternal::definition() const {
+    stringstream s;
 
-  void FunctionInternal::repr(ostream &stream) const {
-    stream << name_;
-  }
-
-  Function FunctionInternal::gradient(int iind, int oind) {
-    // Assert scalar
-    casadi_assert_message(sparsity_out(oind).is_scalar(),
-                          "Only gradients of scalar functions allowed. Use jacobian instead.");
-
-    // Give it a suitable name
-    stringstream ss;
-    ss << "gradient_" << name_ << "_" << iind << "_" << oind;
-
-    // Output names
-    std::vector<std::string> ionames;
-    ionames.reserve(1 + n_out());
-    ionames.push_back("grad");
-    for (int i=0; i<n_out(); ++i) {
-      ionames.push_back(oscheme_.at(i));
+    // Print name
+    s << name_ << ":";
+    // Print input arguments
+    for (int i=0; i<n_in_; ++i) {
+      s << (i==0 ? "(" : ",") << name_in_[i] << sparsity_in_[i].postfix_dim();
     }
-
-    // Generate gradient function
-    Dict opts;
-    opts["input_scheme"] = ischeme_;
-    opts["output_scheme"] = ionames;
-    opts["max_num_dir"] = max_num_dir_;
-    opts["derivative_of"] = self();
-    return getGradient(ss.str(), iind, oind, opts);
-  }
-
-  Function FunctionInternal::tangent(int iind, int oind) {
-    // Assert scalar
-    casadi_assert_message(sparsity_in(iind).is_scalar(),
-                          "Only tangent of scalar input functions allowed. Use jacobian instead.");
-
-    // Give it a suitable name
-    stringstream ss;
-    ss << "tangent_" << name_ << "_" << iind << "_" << oind;
-
-    // Output names
-    std::vector<std::string> ionames;
-    ionames.reserve(1 + n_out());
-    ionames.push_back("tangent");
-    for (int i=0; i<n_out(); ++i) {
-      ionames.push_back(oscheme_.at(i));
+    s << ")->";
+    // Print output arguments
+    for (int i=0; i<n_out_; ++i) {
+      s << (i==0 ? "(" : ",") << name_out_[i] << sparsity_out_[i].postfix_dim();
     }
+    s << ")";
 
-    // Generate gradient function
-    Dict opts;
-    opts["input_scheme"] = ischeme_;
-    opts["output_scheme"] = ionames;
-    opts["max_num_dir"] = max_num_dir_;
-    opts["derivative_of"] = self();
-    return getTangent(ss.str(), iind, oind, opts);
+    return s.str();
   }
 
-  Function FunctionInternal::hessian(int iind, int oind) {
-    log("FunctionInternal::hessian");
-
-    // Assert scalar
-    casadi_assert_message(sparsity_out(oind).is_scalar(),
-                          "Only hessians of scalar functions allowed.");
-
-    // Generate gradient function
-    return getHessian(iind, oind);
-  }
-
-  Function FunctionInternal::getGradient(const std::string& name, int iind, int oind,
-                                         const Dict& opts) {
-    return wrap()->gradient(iind, oind);
-  }
-
-  Function FunctionInternal::getTangent(const std::string& name, int iind, int oind,
-                                        const Dict& opts) {
-    return wrap()->tangent(iind, oind);
+  void FunctionInternal::disp(ostream &stream, bool more) const {
+    stream << definition() << " " << class_name();
+    if (more) {
+      stream << endl;
+      disp_more(stream);
+    }
   }
 
   Function FunctionInternal::wrap() const {
-    // Construct options of the wrapping MXFunction
-    Dict opts;
+    if (wrap_.alive()) {
+      // Return cached Jacobian
+      return shared_cast<Function>(wrap_.shared());
+    } else {
+      // Options
+      Dict opts;
+      opts["derivative_of"] = derivative_of_;
 
-    // Propagate AD parameters
-    opts["ad_weight"] = ad_weight();
-    opts["ad_weight_sp"] = sp_weight();
-    opts["max_num_dir"] = max_num_dir_;
+      // Propagate AD parameters
+      opts["ad_weight"] = ad_weight();
+      opts["ad_weight_sp"] = sp_weight();
+      opts["max_num_dir"] = max_num_dir_;
 
-    // Propagate information about AD
-    opts["derivative_of"] = derivative_of_;
+      // Wrap the function
+      vector<MX> arg = mx_in();
+      vector<MX> res = self()(arg);
+      Function ret(name_ + "_wrap", arg, res, name_in_, name_out_, opts);
 
-    // Wrap the function
-    vector<MX> arg = mx_in();
-    vector<MX> res = self()(arg);
-    return Function("wrap_" + name_, arg, res, ischeme_, oscheme_, opts);
-  }
-
-  Function FunctionInternal::getHessian(int iind, int oind) {
-    log("FunctionInternal::getHessian");
-
-    // Create gradient function
-    log("FunctionInternal::getHessian generating gradient");
-    Function g = gradient(iind, oind);
-
-    // Return the Jacobian of the gradient, exploiting symmetry (the gradient has output index 0)
-    log("FunctionInternal::getHessian generating Jacobian of gradient");
-    return g.jacobian_old(iind, 0, false, true);
-  }
-
-  void FunctionInternal::log(const string& msg) const {
-    if (verbose()) {
-      userOut() << "CasADi log message: " << msg << endl;
+      // Cache it for reuse and return
+      wrap_ = ret;
+      return ret;
     }
   }
 
-  void FunctionInternal::log(const string& fcn, const string& msg) const {
-    if (verbose()) {
-      userOut() << "CasADi log message: In \"" << fcn << "\" --- " << msg << endl;
-    }
-  }
-
-  bool FunctionInternal::verbose() const {
-    return verbose_;
-  }
-
-  std::vector<MX> FunctionInternal::symbolicOutput(const std::vector<MX>& arg) {
+  std::vector<MX> FunctionInternal::symbolic_output(const std::vector<MX>& arg) const {
     return self()(arg);
   }
 
@@ -532,16 +491,16 @@ namespace casadi {
     typedef const bvec_t* arg_t;
     static inline void sp(const FunctionInternal *f,
                           const bvec_t** arg, bvec_t** res,
-                          int* iw, bvec_t* w, int mem) {
-      f->sp_fwd(arg, res, iw, w, mem);
+                          int* iw, bvec_t* w, void* mem) {
+      f->sp_forward(arg, res, iw, w, mem);
     }
   };
   template<> struct JacSparsityTraits<false> {
     typedef bvec_t* arg_t;
     static inline void sp(const FunctionInternal *f,
                           bvec_t** arg, bvec_t** res,
-                          int* iw, bvec_t* w, int mem) {
-      f->sp_rev(arg, res, iw, w, mem);
+                          int* iw, bvec_t* w, void* mem) {
+      f->sp_reverse(arg, res, iw, w, mem);
     }
   };
 
@@ -570,9 +529,9 @@ namespace casadi {
     if (seed.size() % bvec_size) nsweep++;
 
     // Print
-    if (verbose()) {
-      userOut() << "FunctionInternal::getJacSparsityGen<" << fwd << ">: "
-                << nsweep << " sweeps needed for " << seed.size() << " directions" << endl;
+    if (verbose_) {
+      casadi_message(str(nsweep) + string(fwd ? "forward" : "reverse") + " sweeps "
+                     "needed for " + str(seed.size()) + " directions");
     }
 
     // Progress
@@ -585,12 +544,12 @@ namespace casadi {
     for (int s=0; s<nsweep; ++s) {
 
       // Print progress
-      if (verbose()) {
+      if (verbose_) {
         int progress_new = (s*100)/nsweep;
         // Print when entering a new decade
         if (progress_new / 10 > progress / 10) {
           progress = progress_new;
-          userOut() << progress << " %"  << endl;
+          casadi_message(str(progress) + " %");
         }
       }
 
@@ -606,7 +565,8 @@ namespace casadi {
       }
 
       // Propagate the dependencies
-      JacSparsityTraits<fwd>::sp(this, get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+      JacSparsityTraits<fwd>::sp(this, get_ptr(arg), get_ptr(res),
+                                  get_ptr(iw), get_ptr(w), memory(0));
 
       // Loop over the nonzeros of the output
       for (int el=0; el<sens.size(); ++el) {
@@ -644,9 +604,10 @@ namespace casadi {
     // Construct sparsity pattern and return
     if (!fwd) swap(jrow, jcol);
     Sparsity ret = Sparsity::triplet(nz_out, nz_in, jcol, jrow);
-    casadi_msg("Formed Jacobian sparsity pattern (dimension " << ret.size() << ", "
-               << ret.nnz() << " nonzeros, " << (100.0*ret.nnz())/ret.numel() << " % nonzeros).");
-    casadi_msg("FunctionInternal::getJacSparsity end ");
+    if (verbose_) {
+      casadi_message("Formed Jacobian sparsity pattern (dimension " + str(ret.size()) + ", "
+          + str(ret.nnz()) + " nonzeros, " + str((100.0*ret.nnz())/ret.numel()) + " % nonzeros).");
+    }
     return ret;
   }
 
@@ -694,7 +655,7 @@ namespace casadi {
     bool hasrun = false;
 
     while (!hasrun || coarse.size()!=nz+1) {
-      casadi_msg("Block size: " << granularity);
+      if (verbose_) casadi_message("Block size: " + str(granularity));
 
       // Clear the sparsity triplet acccumulator
       jcol.clear();
@@ -705,7 +666,10 @@ namespace casadi {
 
       Sparsity D = r.star_coloring();
 
-      casadi_msg("Star coloring on " << r.dim() << ": " << D.size2() << " <-> " << D.size1());
+      if (verbose_) {
+        casadi_message("Star coloring on " + str(r.dim()) + ": "
+          + str(D.size2()) + " <-> " + str(D.size1()));
+      }
 
       // Clear the seeds
       fill(seed.begin(), seed.end(), 0);
@@ -804,7 +768,7 @@ namespace casadi {
             lookup(duplicates.sparsity()) = -bvec_size;
 
             // Propagate the dependencies
-            sp_fwd(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+            sp_forward(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
 
             // Temporary bit work vector
             bvec_t spsens;
@@ -866,10 +830,11 @@ namespace casadi {
       coarse = fine;
       hasrun = true;
     }
-
-    casadi_msg("Number of sweeps: " << nsweeps);
-    casadi_msg("Formed Jacobian sparsity pattern (dimension " << r.size() <<
-               ", " << r.nnz() << " nonzeros, " << (100.0*r.nnz())/r.numel() << " % nonzeros).");
+    if (verbose_) {
+      casadi_message("Number of sweeps: " + str(nsweeps));
+      casadi_message("Formed Jacobian sparsity pattern (dimension " + str(r.size()) +
+          ", " + str(r.nnz()) + " nonzeros, " + str((100.0*r.nnz())/r.numel()) + " % nonzeros).");
+    }
 
     return r.T();
   }
@@ -935,7 +900,9 @@ namespace casadi {
     }
 
     while (!hasrun || coarse_col.size()!=nz_out+1 || coarse_row.size()!=nz_in+1) {
-      casadi_msg("Block size: " << granularity_col << " x " << granularity_row);
+      if (verbose_) {
+        casadi_message("Block size: " + str(granularity_col) + " x " + str(granularity_row));
+      }
 
       // Clear the sparsity triplet acccumulator
       jcol.clear();
@@ -954,23 +921,18 @@ namespace casadi {
       Sparsity D1 = rT.uni_coloring(r);
       // Adjoint mode
       Sparsity D2 = r.uni_coloring(rT);
-
-      casadi_msg("Coloring on " << r.dim() << " (fwd seeps: " << D1.size2() <<
-                 " , adj sweeps: " << D2.size1() << ")");
-
-      // Use forward mode?
-      int fwd_cost = use_fwd ? granularity_row: granularity_col;
-      int adj_cost = use_fwd ? granularity_col: granularity_row;
+      if (verbose_) {
+        casadi_message("Coloring on " + str(r.dim()) + " (fwd seeps: " + str(D1.size2()) +
+                 " , adj sweeps: " + str(D2.size1()) + ")");
+      }
 
       // Use whatever required less colors if we tried both (with preference to forward mode)
-      if ((sp_w*D1.size2()*fwd_cost <= (1-sp_w)*D2.size2()*adj_cost)) {
-        use_fwd = true;
-        casadi_msg("Forward mode chosen (fwd cost: " << sp_w*D1.size2()*fwd_cost << ", adj cost: "
-                   << (1-sp_w)*D2.size2()*adj_cost << ")");
-      } else {
-        use_fwd = false;
-        casadi_msg("Adjoint mode chosen (adj cost: " << sp_w*D1.size2()*fwd_cost << ", adj cost: "
-                   << (1-sp_w)*D2.size2()*adj_cost << ")");
+      double fwd_cost = (use_fwd ? granularity_row : granularity_col) * sp_w*D1.size2();
+      double adj_cost = (use_fwd ? granularity_col : granularity_row) * (1-sp_w)*D2.size2();
+      use_fwd = fwd_cost <= adj_cost;
+      if (verbose_) {
+        casadi_message(string(use_fwd ? "Forward" : "Reverse") + " mode chosen "
+            "(fwd cost: " + str(fwd_cost) + ", adj cost: " + str(adj_cost) + ")");
       }
 
       // Get seeds and sensitivities
@@ -1090,10 +1052,10 @@ namespace casadi {
 
             // Propagate the dependencies
             if (use_fwd) {
-              sp_fwd(get_ptr(arg_fwd), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+              sp_forward(get_ptr(arg_fwd), get_ptr(res), get_ptr(iw), get_ptr(w), memory(0));
             } else {
               fill(w.begin(), w.end(), 0);
-              sp_rev(get_ptr(arg_adj), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+              sp_reverse(get_ptr(arg_adj), get_ptr(res), get_ptr(iw), get_ptr(w), memory(0));
             }
 
             // Temporary bit work vector
@@ -1162,9 +1124,11 @@ namespace casadi {
       }
       hasrun = true;
     }
-    casadi_msg("Number of sweeps: " << nsweeps);
-    casadi_msg("Formed Jacobian sparsity pattern (dimension " << r.size() <<
-               ", " << r.nnz() << " nonzeros, " << (100.0*r.nnz())/r.numel() << " % nonzeros).");
+    if (verbose_) {
+      casadi_message("Number of sweeps: " + str(nsweeps));
+      casadi_message("Formed Jacobian sparsity pattern (dimension " + str(r.size()) + ", " +
+          str(r.nnz()) + " nonzeros, " + str((100.0*r.nnz())/r.numel()) + " % nonzeros).");
+    }
 
     return r.T();
   }
@@ -1215,14 +1179,6 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::set_jac_sparsity(const Sparsity& sp, int iind, int oind, bool compact) {
-    if (compact) {
-      jac_sparsity_compact_.elem(oind, iind) = sp;
-    } else {
-      jac_sparsity_.elem(oind, iind) = sp;
-    }
-  }
-
   Sparsity& FunctionInternal::
   sparsity_jac(int iind, int oind, bool compact, bool symmetric) const {
     // Get an owning reference to the block
@@ -1246,7 +1202,7 @@ namespace casadi {
           casadi_assert(sp.size1()==nnz_out(oind));
 
           // New row for each old row
-          vector<int> row_map = sparsity_out(oind).find();
+          vector<int> row_map = sparsity_out_.at(oind).find();
 
           // Insert rows
           sp.enlargeRows(numel_out(oind), row_map);
@@ -1257,7 +1213,7 @@ namespace casadi {
           casadi_assert(sp.size2()==nnz_in(iind));
 
           // New column for each old column
-          vector<int> col_map = sparsity_in(iind).find();
+          vector<int> col_map = sparsity_in_.at(iind).find();
 
           // Insert columns
           sp.enlargeColumns(numel_in(iind), col_map);
@@ -1280,10 +1236,10 @@ namespace casadi {
     return jsp_ref;
   }
 
-  void FunctionInternal::getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2,
-                                      bool compact, bool symmetric,
-                                      bool allow_forward, bool allow_reverse) {
-    log("FunctionInternal::getPartition begin");
+  void FunctionInternal::get_partition(int iind, int oind, Sparsity& D1, Sparsity& D2,
+                                       bool compact, bool symmetric,
+                                       bool allow_forward, bool allow_reverse) const {
+    if (verbose_) casadi_message(name_ + "::get_partition");
     casadi_assert_message(allow_forward || allow_reverse, "Inconsistent options");
 
     // Sparsity pattern with transpose
@@ -1292,17 +1248,20 @@ namespace casadi {
 
     // Get seed matrices by graph coloring
     if (symmetric) {
-      casadi_assert(get_n_forward()>0);
+      casadi_assert(enable_forward_ || enable_fd_);
       casadi_assert(allow_forward);
 
       // Star coloring if symmetric
-      log("FunctionInternal::getPartition star_coloring");
+      if (verbose_) casadi_message("FunctionInternal::getPartition star_coloring");
       D1 = A.star_coloring();
-      casadi_msg("Star coloring completed: " << D1.size2() << " directional derivatives needed ("
-                 << A.size1() << " without coloring).");
+      if (verbose_) {
+        casadi_message("Star coloring completed: " + str(D1.size2())
+          + " directional derivatives needed ("
+                 + str(A.size1()) + " without coloring).");
+      }
 
     } else {
-      casadi_assert(get_n_forward()>0 || get_n_reverse()>0);
+      casadi_assert(enable_forward_ || enable_fd_ || enable_reverse_);
       // Get weighting factor
       double w = ad_weight();
 
@@ -1329,33 +1288,41 @@ namespace casadi {
 
         // Perform the coloring
         if (fwd) {
-          log("FunctionInternal::getPartition unidirectional coloring (forward mode)");
+          if (verbose_) casadi_message("Unidirectional coloring (forward mode)");
           int max_colorings_to_test = best_coloring>=w*A.size1() ? A.size1() :
             floor(best_coloring/w);
           D1 = AT.uni_coloring(A, max_colorings_to_test);
           if (D1.is_null()) {
-            if (verbose()) userOut() << "Forward mode coloring interrupted (more than "
-                               << max_colorings_to_test << " needed)." << endl;
+            if (verbose_) {
+              casadi_message("Forward mode coloring interrupted (more than "
+                             + str(max_colorings_to_test) + " needed).");
+            }
           } else {
-            if (verbose()) userOut() << "Forward mode coloring completed: "
-                               << D1.size2() << " directional derivatives needed ("
-                               << A.size1() << " without coloring)." << endl;
+            if (verbose_) {
+              casadi_message("Forward mode coloring completed: "
+                             + str(D1.size2()) + " directional derivatives needed ("
+                             + str(A.size1()) + " without coloring).");
+            }
             D2 = Sparsity();
             best_coloring = w*D1.size2();
           }
         } else {
-          log("FunctionInternal::getPartition unidirectional coloring (adjoint mode)");
+          if (verbose_) casadi_message("Unidirectional coloring (adjoint mode)");
           int max_colorings_to_test = best_coloring>=(1-w)*A.size2() ? A.size2() :
             floor(best_coloring/(1-w));
 
           D2 = A.uni_coloring(AT, max_colorings_to_test);
           if (D2.is_null()) {
-            if (verbose()) userOut() << "Adjoint mode coloring interrupted (more than "
-                               << max_colorings_to_test << " needed)." << endl;
+            if (verbose_) {
+              casadi_message("Adjoint mode coloring interrupted (more than "
+                            + str(max_colorings_to_test) + " needed).");
+            }
           } else {
-            if (verbose()) userOut() << "Adjoint mode coloring completed: "
-                               << D2.size2() << " directional derivatives needed ("
-                               << A.size2() << " without coloring)." << endl;
+            if (verbose_) {
+              casadi_message("Adjoint mode coloring completed: "
+                             + str(D2.size2()) + " directional derivatives needed ("
+                             + str(A.size2()) + " without coloring).");
+            }
             D1 = Sparsity();
             best_coloring = (1-w)*D2.size2();
           }
@@ -1363,124 +1330,87 @@ namespace casadi {
       }
 
     }
-    log("FunctionInternal::getPartition end");
   }
 
-  void FunctionInternal::eval(void* mem,
-                              const double** arg, double** res, int* iw, double* w) const {
-    casadi_error("'eval' not defined for " + type_name());
+  std::vector<DM> FunctionInternal::eval_dm(const std::vector<DM>& arg) const {
+    casadi_error("'eval', 'eval_dm' not defined for " + class_name());
   }
 
-  void FunctionInternal::simple(const double* arg, double* res) const {
-    casadi_error("'simple' not defined for " + type_name());
-  }
-
-  void FunctionInternal::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    casadi_error("'eval_sx' not defined for " + type_name());
-  }
-
-  Function FunctionInternal::jacobian(int iind, int oind, bool compact, bool symmetric) {
-
-    // Return value
-    WeakRef cached = compact ? jac_compact_.elem(oind, iind) : jac_.elem(oind, iind);
-
-    // Check if cached
-    if (cached.alive()) {
-      // Return an owning reference
-      return shared_cast<Function>(cached.shared());
-
-    } else {
-      // Give it a suitable name
-      stringstream ss;
-      ss << "jacobian_" << name_ << "_" << iind << "_" << oind;
-
-      // Output names
-      std::vector<std::string> ionames;
-      ionames.reserve(1 + n_out());
-      ionames.push_back("d" + name_out(oind) + "_d" + name_in(iind));
-      for (int i=0; i<n_out(); ++i) {
-        ionames.push_back(oscheme_.at(i));
-      }
-
-      // Generate a Jacobian
-      Dict opts;
-      opts["verbose"] = verbose_;
-      opts["input_scheme"] = ischeme_;
-      opts["output_scheme"] = ionames;
-      opts["max_num_dir"] = max_num_dir_;
-      opts["derivative_of"] = self();
-      Function ret = getJacobian(ss.str(), iind, oind, compact, symmetric, opts);
-
-      // Save in cache
-      compact ? jac_compact_.elem(oind, iind) : jac_.elem(oind, iind) = ret;
-      return ret;
-    }
-  }
-
-  void FunctionInternal::setJacobian(const Function& jac, int iind, int oind, bool compact) {
-    if (compact) {
-      jac_compact_.elem(oind, iind) = jac;
-    } else {
-      jac_.elem(oind, iind) = jac;
-    }
-  }
-
-  Function FunctionInternal::
-  getJacobian(const std::string& name, int iind, int oind, bool compact, bool symmetric,
-              const Dict& opts) {
-    return wrap().jacobian_old(iind, oind, compact, symmetric);
+  int FunctionInternal::
+  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
+    casadi_error("'eval_sx' not defined for " + class_name());
   }
 
   Function FunctionInternal::forward(int nfwd) const {
     casadi_assert(nfwd>=0);
+
+    // Used wrapped function if forward not available
+    if (!enable_forward_ && !enable_fd_) {
+      // Derivative information must be available
+      casadi_assert_message(has_derivative(),
+                            "Derivatives cannot be calculated for " + name_);
+      return wrap().forward(nfwd);
+    }
 
     // Check if there are enough forward directions allocated
     if (nfwd>=forward_.size()) {
       forward_.resize(nfwd+1);
     }
 
-    // Quick return if already cached
+    // Quick return if cached
     if (forward_[nfwd].alive()) {
       return shared_cast<Function>(forward_[nfwd].shared());
     }
 
-    // Get the number of inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
     // Give it a suitable name
-    string name = "fwd" + to_string(nfwd) + "_" + name_;
+    string name = "fwd" + str(nfwd) + "_" + name_;
 
     // Names of inputs
-    std::vector<std::string> i_names;
-    for (int i=0; i<n_in; ++i) i_names.push_back("der_" + name_in(i));
-    for (int i=0; i<n_out; ++i) i_names.push_back("der_" + name_out(i));
-    for (int i=0; i<n_in; ++i) i_names.push_back("fwd_" + name_in(i));
+    std::vector<std::string> inames;
+    for (int i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
+    for (int i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
+    for (int i=0; i<n_in_; ++i) inames.push_back("fwd_" + name_in_[i]);
 
     // Names of outputs
-    std::vector<std::string> o_names;
-    for (int i=0; i<n_out; ++i) o_names.push_back("fwd_" + name_out(i));
+    std::vector<std::string> onames;
+    for (int i=0; i<n_out_; ++i) onames.push_back("fwd_" + name_out_[i]);
 
     // Options
-    Dict opts;;
+    Dict opts;
+    if (!enable_forward_) opts = fd_options_;
     opts["max_num_dir"] = max_num_dir_;
     opts["derivative_of"] = self();
 
-    // Return value
-    casadi_assert(get_n_forward()>0);
-    Function ret = get_forward(name, nfwd, i_names, o_names, opts);
+    // Generate derivative function
+    casadi_assert(enable_forward_ || enable_fd_);
+    Function ret;
+    if (enable_forward_) {
+      ret = get_forward(nfwd, name, inames, onames, opts);
+    } else {
+      // Get FD method
+      if (fd_method_.empty() || fd_method_=="central") {
+        ret = Function::create(new CentralDiff(name, nfwd), opts);
+      } else if (fd_method_=="forward") {
+        ret = Function::create(new ForwardDiff(name, nfwd), opts);
+      } else if (fd_method_=="backward") {
+        ret = Function::create(new BackwardDiff(name, nfwd), opts);
+      } else if (fd_method_=="smoothing") {
+        ret = Function::create(new Smoothing(name, nfwd), opts);
+      } else {
+        casadi_error("Unknown 'fd_method': " + fd_method_);
+      }
+    }
 
     // Consistency check for inputs
-    casadi_assert(ret.n_in()==n_in + n_out + n_in);
+    casadi_assert(ret.n_in()==n_in_ + n_out_ + n_in_);
     int ind=0;
-    for (int i=0; i<n_in; ++i) ret.assert_size_in(ind++, size1_in(i), size2_in(i));
-    for (int i=0; i<n_out; ++i) ret.assert_size_in(ind++, size1_out(i), size2_out(i));
-    for (int i=0; i<n_in; ++i) ret.assert_size_in(ind++, size1_in(i), nfwd*size2_in(i));
+    for (int i=0; i<n_in_; ++i) ret.assert_size_in(ind++, size1_in(i), size2_in(i));
+    for (int i=0; i<n_out_; ++i) ret.assert_size_in(ind++, size1_out(i), size2_out(i));
+    for (int i=0; i<n_in_; ++i) ret.assert_size_in(ind++, size1_in(i), nfwd*size2_in(i));
 
     // Consistency check for outputs
-    casadi_assert(ret.n_out()==n_out);
-    for (int i=0; i<n_out; ++i) ret.assert_size_out(i, size1_out(i), nfwd*size2_out(i));
+    casadi_assert(ret.n_out()==n_out_);
+    for (int i=0; i<n_out_; ++i) ret.assert_size_out(i, size1_out(i), nfwd*size2_out(i));
 
     // Save to cache
     forward_[nfwd] = ret;
@@ -1492,52 +1422,56 @@ namespace casadi {
   Function FunctionInternal::reverse(int nadj) const {
     casadi_assert(nadj>=0);
 
+    // Used wrapped function if reverse not available
+    if (!enable_reverse_) {
+      // Derivative information must be available
+      casadi_assert_message(has_derivative(),
+                            "Derivatives cannot be calculated for " + name_);
+      return wrap().reverse(nadj);
+    }
+
     // Check if there are enough adjoint directions allocated
     if (nadj>=reverse_.size()) {
       reverse_.resize(nadj+1);
     }
 
-    // Quick return if already cached
+    // Quick return if cached
     if (reverse_[nadj].alive()) {
       return shared_cast<Function>(reverse_[nadj].shared());
     }
 
-    // Get the number of inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
     // Give it a suitable name
-    string name = "adj" + to_string(nadj) + "_" + name_;
+    string name = "adj" + str(nadj) + "_" + name_;
 
     // Names of inputs
-    std::vector<std::string> i_names;
-    for (int i=0; i<n_in; ++i) i_names.push_back("der_" + name_in(i));
-    for (int i=0; i<n_out; ++i) i_names.push_back("der_" + name_out(i));
-    for (int i=0; i<n_out; ++i) i_names.push_back("adj_" + name_out(i));
+    std::vector<std::string> inames;
+    for (int i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
+    for (int i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
+    for (int i=0; i<n_out_; ++i) inames.push_back("adj_" + name_out_[i]);
 
     // Names of outputs
-    std::vector<std::string> o_names;
-    for (int i=0; i<n_in; ++i) o_names.push_back("adj_" + name_in(i));
+    std::vector<std::string> onames;
+    for (int i=0; i<n_in_; ++i) onames.push_back("adj_" + name_in_[i]);
 
     // Options
     Dict opts;
     opts["max_num_dir"] = max_num_dir_;
     opts["derivative_of"] = self();
 
-    // Return value
-    casadi_assert(get_n_reverse()>0);
-    Function ret = get_reverse(name, nadj, i_names, o_names, opts);
+    // Generate derivative function
+    casadi_assert(enable_reverse_);
+    Function ret = get_reverse(nadj, name, inames, onames, opts);
 
     // Consistency check for inputs
-    casadi_assert(ret.n_in()==n_in + n_out + n_out);
+    casadi_assert(ret.n_in()==n_in_ + n_out_ + n_out_);
     int ind=0;
-    for (int i=0; i<n_in; ++i) ret.assert_size_in(ind++, size1_in(i), size2_in(i));
-    for (int i=0; i<n_out; ++i) ret.assert_size_in(ind++, size1_out(i), size2_out(i));
-    for (int i=0; i<n_out; ++i) ret.assert_size_in(ind++, size1_out(i), nadj*size2_out(i));
+    for (int i=0; i<n_in_; ++i) ret.assert_size_in(ind++, size1_in(i), size2_in(i));
+    for (int i=0; i<n_out_; ++i) ret.assert_size_in(ind++, size1_out(i), size2_out(i));
+    for (int i=0; i<n_out_; ++i) ret.assert_size_in(ind++, size1_out(i), nadj*size2_out(i));
 
     // Consistency check for outputs
-    casadi_assert(ret.n_out()==n_in);
-    for (int i=0; i<n_in; ++i) ret.assert_size_out(i, size1_in(i), nadj*size2_in(i));
+    casadi_assert(ret.n_out()==n_in_);
+    for (int i=0; i<n_in_; ++i) ret.assert_size_out(i, size1_in(i), nadj*size2_in(i));
 
     // Save to cache
     reverse_[nadj] = ret;
@@ -1547,42 +1481,42 @@ namespace casadi {
   }
 
   Function FunctionInternal::
-  get_forward(const std::string& name, int nfwd,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names,
+  get_forward(int nfwd, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
               const Dict& opts) const {
-    casadi_error("'get_forward' not defined for " + type_name());
+    casadi_error("'get_forward' not defined for " + class_name());
   }
 
   Function FunctionInternal::
-  get_reverse(const std::string& name, int nadj,
-              const std::vector<std::string>& i_names,
-              const std::vector<std::string>& o_names,
+  get_reverse(int nadj, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
               const Dict& opts) const {
-    casadi_error("'get_reverse' not defined for " + type_name());
+    casadi_error("'get_reverse' not defined for " + class_name());
   }
 
   int FunctionInternal::nnz_in() const {
     int ret=0;
-    for (int iind=0; iind<n_in(); ++iind) ret += nnz_in(iind);
+    for (int iind=0; iind<n_in_; ++iind) ret += nnz_in(iind);
     return ret;
   }
 
   int FunctionInternal::nnz_out() const {
     int ret=0;
-    for (int oind=0; oind<n_out(); ++oind) ret += nnz_out(oind);
+    for (int oind=0; oind<n_out_; ++oind) ret += nnz_out(oind);
     return ret;
   }
 
   int FunctionInternal::numel_in() const {
     int ret=0;
-    for (int iind=0; iind<n_in(); ++iind) ret += numel_in(iind);
+    for (int iind=0; iind<n_in_; ++iind) ret += numel_in(iind);
     return ret;
   }
 
   int FunctionInternal::numel_out() const {
     int ret=0;
-    for (int oind=0; oind<n_out(); ++oind) ret += numel_out(oind);
+    for (int oind=0; oind<n_out_; ++oind) ret += numel_out(oind);
     return ret;
   }
 
@@ -1598,122 +1532,76 @@ namespace casadi {
     res = Call::create(self(), arg);
   }
 
-  Function FunctionInternal::fullJacobian() {
-    if (full_jacobian_.alive()) {
-      // Return cached Jacobian
-      return shared_cast<Function>(full_jacobian_.shared());
-    } else {
-      // Options
-      Dict opts;
-      opts["derivative_of"] = self();
-      Function ret = getFullJacobian(name_ + "_jac", ischeme_, {"jac"}, opts);
-
-      // Consistency check
-      casadi_assert(ret.n_in()==n_in());
-      casadi_assert(ret.n_out()==1);
-
-      // Cache it for reuse and return
-      full_jacobian_ = ret;
-      return ret;
+  Function FunctionInternal::jacobian() const {
+    // Used wrapped function if jacobian not available
+    if (!has_jacobian()) {
+      // Derivative information must be available
+      casadi_assert_message(has_derivative(),
+                            "Derivatives cannot be calculated for " + name_);
+      return wrap().jacobian();
     }
+
+    // Quick return if cached
+    if (jacobian_.alive()) {
+      return shared_cast<Function>(jacobian_.shared());
+    }
+
+    // Give it a suitable name
+    string name = "jac_" + name_;
+
+    // Names of inputs
+    std::vector<std::string> inames;
+    for (int i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
+    for (int i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
+
+    // Names of outputs
+    std::vector<std::string> onames = {"jac"};
+
+    // Options
+    Dict opts;
+    opts["derivative_of"] = self();
+
+    // Generate derivative function
+    casadi_assert(enable_jacobian_);
+    Function ret = get_jacobian(name, inames, onames, opts);
+
+    // Consistency check
+    casadi_assert(ret.n_in()==n_in_ + n_out_);
+    casadi_assert(ret.n_out()==1);
+
+    // Cache it for reuse and return
+    jacobian_ = ret;
+    return ret;
   }
 
   Function FunctionInternal::
-  getFullJacobian(const std::string& name,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
-                  const Dict& opts) {
-    casadi_assert(get_n_forward()>0 || get_n_reverse()>0);
-    // Number inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
-    // Symbolic inputs of the full Jacobian function under construction
-    vector<MX> ret_argv = mx_in(), argv, resv;
-
-    // Symbolic input of the SISO function formed for generating the Jacobian
-    MX arg;
-
-    // Reuse the same symbolic primitives, if single input
-    if (n_in==1) {
-      argv = ret_argv;
-      arg = argv.front();
-      resv = symbolicOutput(argv);
-    } else {
-      // Collect Sparsity patterns of inputs
-      vector<Sparsity> sp_argv(n_in);
-      vector<int> row_offset(n_in+1, 0);
-      for (int i=0; i<n_in; ++i) {
-        sp_argv[i] = vec(sparsity_in(i));
-        row_offset[i+1] = row_offset[i]+sp_argv[i].numel();
-      }
-      Sparsity sp_arg = vertcat(sp_argv);
-
-      // Create symbolic primitive
-      arg = MX::sym("x", sp_arg);
-
-      // Split up and reshape to correct shape
-      argv = vertsplit(arg, row_offset);
-      for (int i=0; i<n_in; ++i) {
-        argv[i] = reshape(argv[i], sparsity_in(i));
-      }
-
-      // Evaluate symbolically
-      resv = self()(argv);
-    }
-
-    // Reuse the same output, if possible
-    MX res = n_out==1 ? resv.front() : veccat(resv);
-
-    // Form Jacobian
-    MX J;
-    {
-      Function tmp("tmp", {arg}, {res}, {{"ad_weight", ad_weight()},
-                                         {"ad_weight_sp", sp_weight()}});
-      J = tmp->jac_mx(0, 0);
-    }
-
-    // Make sure argv is the input of J
-    if (n_in!=1) {
-      J = substitute(J, arg, veccat(ret_argv));
-    }
-
-    // Form an expression for the full Jacobian
-    return Function(name, ret_argv, {J}, i_names, o_names, opts);
+  get_jacobian(const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
+                  const Dict& opts) const {
+    casadi_error("'get_jacobian' not defined for " + class_name());
   }
 
-  void FunctionInternal::generateFunction(CodeGenerator& g,
-                                          const std::string& fname, bool decl_static) const {
-    // Add standard math
-    g.addInclude("math.h");
-
-    // Add auxiliaries. TODO: Only add the auxiliaries that are actually used
-    g.addAuxiliary(CodeGenerator::AUX_SQ);
-    g.addAuxiliary(CodeGenerator::AUX_SIGN);
-
-    // Generate declarations
-    generateDeclarations(g);
-
+  void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname) const {
     // Define function
-    g << "/* " << name_ << " */\n";
-    if (decl_static) {
-      g << "static ";
-    } else if (g.cpp) {
-      g << "extern \"C\" ";
-    }
-    g << signature(fname) << " {\n";
+    g << "/* " << definition() << " */\n";
+    g << "static " << signature(fname) << " {\n";
+
+    // Reset local variables, flush buffer
     g.flush(g.body);
     g.local_variables_.clear();
     g.local_default_.clear();
 
-    // Generate function body
-    generateBody(g);
+    // Generate function body (to buffer)
+    codegen_body(g);
 
-    // Collect local variables
+    // Order local variables
     std::map<string, set<pair<string, string>>> local_variables_by_type;
     for (auto&& e : g.local_variables_) {
       local_variables_by_type[e.second.first].insert(make_pair(e.first, e.second.second));
     }
+
+    // Codegen local variables
     for (auto&& e : local_variables_by_type) {
       g.body << "  " << e.first;
       for (auto it=e.second.begin(); it!=e.second.end(); ++it) {
@@ -1726,7 +1614,7 @@ namespace casadi {
     }
 
     // Finalize the function
-    if (!simplifiedCall()) g << "return 0;\n";
+    g << "return 0;\n";
     g << "}\n\n";
 
     // Flush to function body
@@ -1734,73 +1622,72 @@ namespace casadi {
   }
 
   std::string FunctionInternal::signature(const std::string& fname) const {
-    if (simplifiedCall()) {
-      return "void " + fname + "(const real_t* arg, real_t* res)";
-    } else {
-      return "int " + fname + "(const real_t** arg, real_t** res, int* iw, real_t* w, int mem)";
-    }
+    return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
+                            "int* iw, casadi_real* w, void* mem)";
   }
 
-  void FunctionInternal::generateMeta(CodeGenerator& g, const std::string& fname) const {
-    // Short-hands
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
-    // Reference counter routines
-    g << g.declare("void " + fname + "_incref(void)") << " {\n";
-    codegen_incref(g);
-    g << "}\n\n"
-      << g.declare("void " + fname + "_decref(void)") << " {\n";
-    codegen_decref(g);
-    g << "}\n\n";
-
-    // Number of inputs and outptus
-    g << g.declare("int " + fname + "_n_in(void)")
-      << " { return " << n_in << ";}\n\n"
-      << g.declare("int " + fname + "_n_out(void)")
-      << " { return " << n_out << ";}\n\n";
-
-    // Input names
-    g << g.declare("const char* " + fname + "_name_in(int i)") << "{\n"
-      << "switch (i) {\n";
-    for (int i=0; i<n_in; ++i) {
-      g << "case " << i << ": return \"" << name_in(i) << "\";\n";
-    }
-    g << "default: return 0;\n}\n"
-      << "}\n\n";
-
-    // Output names
-    g << g.declare("const char* " + fname + "_name_out(int i)") << "{\n"
-      << "switch (i) {\n";
-    for (int i=0; i<n_out; ++i) {
-      g << "case " << i << ": return \"" << name_out(i) << "\";\n";
-    }
-    g << "default: return 0;\n}\n"
-      << "}\n\n";
-
-    // Quick return if simplified syntax
-    if (simplifiedCall()) return;
+  void FunctionInternal::codegen_sparsities(CodeGenerator& g) const {
+    // Insert element, quick return if it already exists
+    if (!g.sparsity_meta.insert(name_).second) return;
 
     // Input sparsities
-    g << g.declare("const int* " + fname + "_sparsity_in(int i)") << " {\n"
+    g << g.declare("const int* " + name_ + "_sparsity_in(int i)") << " {\n"
       << "switch (i) {\n";
-    for (int i=0; i<n_in; ++i) {
-      g << "case " << i << ": return s" << g.addSparsity(sparsity_in(i)) << ";\n";
+    for (int i=0; i<n_in_; ++i) {
+      g << "case " << i << ": return " << g.sparsity(sparsity_in_[i]) << ";\n";
     }
     g << "default: return 0;\n}\n"
       << "}\n\n";
 
     // Output sparsities
-    g << g.declare("const int* " + fname + "_sparsity_out(int i)") << " {\n"
+    g << g.declare("const int* " + name_ + "_sparsity_out(int i)") << " {\n"
       << "switch (i) {\n";
-    for (int i=0; i<n_out; ++i) {
-      g << "case " << i << ": return s" << g.addSparsity(sparsity_out(i)) << ";\n";
+    for (int i=0; i<n_out_; ++i) {
+      g << "case " << i << ": return " << g.sparsity(sparsity_out_[i]) << ";\n";
+    }
+    g << "default: return 0;\n}\n"
+      << "}\n\n";
+  }
+
+  void FunctionInternal::codegen_meta(CodeGenerator& g) const {
+    // Reference counter routines
+    g << g.declare("void " + name_ + "_incref(void)") << " {\n";
+    codegen_incref(g);
+    g << "}\n\n"
+      << g.declare("void " + name_ + "_decref(void)") << " {\n";
+    codegen_decref(g);
+    g << "}\n\n";
+
+    // Number of inputs and outptus
+    g << g.declare("int " + name_ + "_n_in(void)")
+      << " { return " << n_in_ << ";}\n\n"
+      << g.declare("int " + name_ + "_n_out(void)")
+      << " { return " << n_out_ << ";}\n\n";
+
+    // Input names
+    g << g.declare("const char* " + name_ + "_name_in(int i)") << "{\n"
+      << "switch (i) {\n";
+    for (int i=0; i<n_in_; ++i) {
+      g << "case " << i << ": return \"" << name_in_[i] << "\";\n";
     }
     g << "default: return 0;\n}\n"
       << "}\n\n";
 
+    // Output names
+    g << g.declare("const char* " + name_ + "_name_out(int i)") << "{\n"
+      << "switch (i) {\n";
+    for (int i=0; i<n_out_; ++i) {
+      g << "case " << i << ": return \"" << name_out_[i] << "\";\n";
+    }
+    g << "default: return 0;\n}\n"
+      << "}\n\n";
+
+    // Codegen sparsities
+    codegen_sparsities(g);
+
     // Function that returns work vector lengths
-    g << g.declare("int " + fname + "_work(int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)")
+    g << g.declare(
+        "int " + name_ + "_work(int *sz_arg, int* sz_res, int *sz_iw, int *sz_w)")
       << " {\n"
       << "if (sz_arg) *sz_arg = " << sz_arg() << ";\n"
       << "if (sz_res) *sz_res = " << sz_res() << ";\n"
@@ -1815,45 +1702,45 @@ namespace casadi {
       g << "#ifdef MATLAB_MEX_FILE\n";
 
       // Declare wrapper
-      g << "void mex_" << fname
+      g << "void mex_" << name_
         << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {\n"
         << "int i, j;\n";
 
       // Check arguments
-      g << "if (argc>" << n_in << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
-        << "\"Evaluation of \\\"" << fname << "\\\" failed. Too many input arguments "
-        << "(%d, max " << n_in << ")\", argc);\n";
+      g << "if (argc>" << n_in_ << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
+        << "\"Evaluation of \\\"" << name_ << "\\\" failed. Too many input arguments "
+        << "(%d, max " << n_in_ << ")\", argc);\n";
 
-      g << "if (resc>" << n_out << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
-        << "\"Evaluation of \\\"" << fname << "\\\" failed. "
-        << "Too many output arguments (%d, max " << n_out << ")\", resc);\n";
+      g << "if (resc>" << n_out_ << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
+        << "\"Evaluation of \\\"" << name_ << "\\\" failed. "
+        << "Too many output arguments (%d, max " << n_out_ << ")\", resc);\n";
 
       // Work vectors, including input and output buffers
       int i_nnz = nnz_in(), o_nnz = nnz_out();
       size_t sz_w = this->sz_w();
-      for (int i=0; i<n_in; ++i) {
-        const Sparsity& s = sparsity_in(i);
+      for (int i=0; i<n_in_; ++i) {
+        const Sparsity& s = sparsity_in_[i];
         sz_w = max(sz_w, static_cast<size_t>(s.size1())); // To be able to copy a column
         sz_w = max(sz_w, static_cast<size_t>(s.size2())); // To be able to copy a row
       }
       sz_w += i_nnz + o_nnz;
       g << g.array("int", "iw", sz_iw());
-      g << g.array("real_t", "w", sz_w);
-      string fw = "w+" + g.to_string(i_nnz + o_nnz);
+      g << g.array("casadi_real", "w", sz_w);
+      string fw = "w+" + str(i_nnz + o_nnz);
 
       // Copy inputs to buffers
       int offset=0;
-      g << g.array("const real_t*", "arg", n_in, "{0}");
-      for (int i=0; i<n_in; ++i) {
-        std::string p = "argv[" + g.to_string(i) + "]";
+      g << g.array("const casadi_real*", "arg", n_in_, "{0}");
+      for (int i=0; i<n_in_; ++i) {
+        std::string p = "argv[" + str(i) + "]";
         g << "if (--argc>=0) arg[" << i << "] = "
-          << g.from_mex(p, "w", offset, sparsity_in(i), fw) << "\n";
+          << g.from_mex(p, "w", offset, sparsity_in_[i], fw) << "\n";
         offset += nnz_in(i);
       }
 
       // Allocate output buffers
-      g << "real_t* res[" << n_out << "] = {0};\n";
-      for (int i=0; i<n_out; ++i) {
+      g << "casadi_real* res[" << n_out_ << "] = {0};\n";
+      for (int i=0; i<n_out_; ++i) {
         if (i==0) {
           // if i==0, always store output (possibly ans output)
           g << "--resc;\n";
@@ -1862,20 +1749,20 @@ namespace casadi {
           g << "if (--resc>=0) ";
         }
         // Create and get pointer
-        g << "res[" << i << "] = w+" << g.to_string(offset) << ";\n";
+        g << "res[" << i << "] = w+" << str(offset) << ";\n";
         offset += nnz_out(i);
       }
 
       // Call the function
-      g << "i = " << fname << "(arg, res, iw, " << fw << ", 0);\n"
-        << "if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << fname
+      g << "i = " << name_ << "(arg, res, iw, " << fw << ", 0);\n"
+        << "if (i) mexErrMsgIdAndTxt(\"Casadi:RuntimeError\",\"Evaluation of \\\"" << name_
         << "\\\" failed.\");\n";
 
       // Save results
-      for (int i=0; i<n_out; ++i) {
-        string res_i = "res[" + g.to_string(i) + "]";
+      for (int i=0; i<n_out_; ++i) {
+        string res_i = "res[" + str(i) + "]";
         g << "if (" << res_i << ") resv[" << i << "] = "
-          << g.to_mex(sparsity_out(i), res_i) << "\n";
+          << g.to_mex(sparsity_out_[i], res_i) << "\n";
       }
 
       // End conditional compilation and function
@@ -1885,17 +1772,17 @@ namespace casadi {
 
     if (g.main) {
       // Declare wrapper
-      g << "int main_" << fname << "(int argc, char* argv[]) {\n";
+      g << "int main_" << name_ << "(int argc, char* argv[]) {\n";
 
       // Work vectors and input and output buffers
       size_t nr = sz_w() + nnz_in() + nnz_out();
       g << g.array("int", "iw", sz_iw())
-        << g.array("real_t", "w", nr);
+        << g.array("casadi_real", "w", nr);
 
       // Input buffers
-      g << "const real_t* arg[" << sz_arg() << "] = {";
+      g << "const casadi_real* arg[" << sz_arg() << "] = {";
       int off=0;
-      for (int i=0; i<n_in; ++i) {
+      for (int i=0; i<n_in_; ++i) {
         if (i!=0) g << ", ";
         g << "w+" << off;
         off += nnz_in(i);
@@ -1903,8 +1790,8 @@ namespace casadi {
       g << "};\n";
 
       // Output buffers
-      g << "real_t* res[" << sz_res() << "] = {";
-      for (int i=0; i<n_out; ++i) {
+      g << "casadi_real* res[" << sz_res() << "] = {";
+      for (int i=0; i<n_out_; ++i) {
         if (i!=0) g << ", ";
         g << "w+" << off;
         off += nnz_out(i);
@@ -1913,16 +1800,16 @@ namespace casadi {
 
       // TODO(@jaeandersson): Read inputs from file. For now; read from stdin
       g << "int j;\n"
-        << "real_t* a = w;\n"
+        << "casadi_real* a = w;\n"
         << "for (j=0; j<" << nnz_in() << "; ++j) "
         << "scanf(\"%lf\", a++);\n";
 
       // Call the function
-      g << "int flag = " << fname << "(arg, res, iw, w+" << off << ", 0);\n"
+      g << "int flag = " << name_ << "(arg, res, iw, w+" << off << ", 0);\n"
         << "if (flag) return flag;\n";
 
       // TODO(@jaeandersson): Write outputs to file. For now: print to stdout
-      g << "const real_t* r = w+" << nnz_in() << ";\n"
+      g << "const casadi_real* r = w+" << nnz_in() << ";\n"
         << "for (j=0; j<" << nnz_out() << "; ++j) "
         << g.printf("%g ", "*r++") << "\n";
 
@@ -1936,18 +1823,18 @@ namespace casadi {
 
     if (g.with_mem) {
       // Allocate memory
-      g << g.declare("casadi_functions* " + fname + "_functions(void)") << " {\n"
+      g << g.declare("casadi_functions* " + name_ + "_functions(void)") << " {\n"
         << "static casadi_functions fun = {\n"
-        << fname << "_incref,\n"
-        << fname << "_decref,\n"
-        << fname << "_n_in,\n"
-        << fname << "_n_out,\n"
-        << fname << "_name_in,\n"
-        << fname << "_name_out,\n"
-        << fname << "_sparsity_in,\n"
-        << fname << "_sparsity_out,\n"
-        << fname << "_work,\n"
-        << fname << "\n"
+        << name_ << "_incref,\n"
+        << name_ << "_decref,\n"
+        << name_ << "_n_in,\n"
+        << name_ << "_n_out,\n"
+        << name_ << "_name_in,\n"
+        << name_ << "_name_out,\n"
+        << name_ << "_sparsity_in,\n"
+        << name_ << "_sparsity_out,\n"
+        << name_ << "_work,\n"
+        << name_ << "\n"
         << "};\n"
         << "return &fun;\n"
         << "}\n";
@@ -1958,98 +1845,32 @@ namespace casadi {
 
   std::string FunctionInternal::codegen_name(const CodeGenerator& g) const {
     // Get the index of the function
-    auto it=g.added_dependencies_.find(this);
-    casadi_assert(it!=g.added_dependencies_.end());
-    int f = it->second;
-
-    // Construct the name
-    stringstream ss;
-    ss << "f" << f;
-    return ss.str();
-  }
-
-  void FunctionInternal::addShorthand(CodeGenerator& g, const string& name) const {
-    if (simplifiedCall()) {
-      g << "#define " << name << "(arg, res) "
-        << "CASADI_PREFIX(" << name << ")(arg, res)\n\n";
-    } else {
-      g << "#define " << name << "(arg, res, iw, w, mem) "
-        << "CASADI_PREFIX(" << name << ")(arg, res, iw, w, mem)\n\n";
+    for (auto&& e : g.added_functions_) {
+      if (e.f.get()==this) return e.codegen_name;
     }
+    casadi_error("Function '" + name() + "' not found");
   }
 
-  std::string FunctionInternal::eval_name() const {
-    if (simplifiedCall()) {
-      return name_ + "_simple";
-    } else {
-      return name_;
-    }
-  }
-
-  void FunctionInternal::addDependency(CodeGenerator& g) const {
-    // Get the current number of functions before looking for it
-    size_t num_f_before = g.added_dependencies_.size();
-
-    // Get index of the pattern
-    int& ind = g.added_dependencies_[this];
-
-    // Generate it if it does not exist
-    if (g.added_dependencies_.size() > num_f_before) {
-      // Add at the end
-      ind = num_f_before;
-
-      // Give it a name
-      string name = "f" + CodeGenerator::to_string(ind);
-
-      // Print to file
-      generateFunction(g, "CASADI_PREFIX(" + name + ")", true);
-
-      // Shorthand
-      addShorthand(g, name);
-
-      // Codegen reference count functions, if needed
-      if (has_refcount_) {
-        // Increase reference counter
-        g << "void CASADI_PREFIX(" << name << "_incref)(void) {\n";
-        codegen_incref(g);
-        g << "}\n"
-          << "#define " << name << "_incref() "
-          << "CASADI_PREFIX(" << name << "_incref)()\n\n";
-
-        // Decrease reference counter
-        g << "void CASADI_PREFIX(" << name << "_decref)(void) {\n";
-        codegen_decref(g);
-        g << "}\n"
-          << "#define " << name << "_decref() "
-          << "CASADI_PREFIX(" << name << "_decref)()\n\n";
-      }
-    }
-  }
-
-  void FunctionInternal::generateDeclarations(CodeGenerator& g) const {
+  void FunctionInternal::codegen_declarations(CodeGenerator& g) const {
     // Nothing to declare
   }
 
-  void FunctionInternal::generateBody(CodeGenerator& g) const {
+  void FunctionInternal::codegen_body(CodeGenerator& g) const {
     casadi_warning("The function \"" + name() + "\", which is of type \""
-                   + type_name() + "\" cannot be code generated. The generation "
+                   + class_name() + "\" cannot be code generated. The generation "
                    "will proceed, but compilation of the code will not be possible.");
-    g << "#error Code generation not supported for " << type_name() << "\n";
+    g << "#error Code generation not supported for " << class_name() << "\n";
   }
 
   std::string FunctionInternal::
   generate_dependencies(const std::string& fname, const Dict& opts) const {
-    casadi_error("'generate_dependencies' not defined for " + type_name());
+    casadi_error("'generate_dependencies' not defined for " + class_name());
   }
 
-  void FunctionInternal::
-  sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    // Get the number of inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
+  int FunctionInternal::
+  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     // Loop over outputs
-    for (int oind=0; oind<n_out; ++oind) {
+    for (int oind=0; oind<n_out_; ++oind) {
       // Skip if nothing to assign
       if (res[oind]==0 || nnz_out(oind)==0) continue;
 
@@ -2057,13 +1878,12 @@ namespace casadi {
       casadi_fill(res[oind], nnz_out(oind), bvec_t(0));
 
       // Loop over inputs
-      for (int iind=0; iind<n_in; ++iind) {
+      for (int iind=0; iind<n_in_; ++iind) {
         // Skip if no seeds
         if (arg[iind]==0 || nnz_in(iind)==0) continue;
 
         // Get the sparsity of the Jacobian block
-        Sparsity sp = const_cast<FunctionInternal*>(this)->
-                      sparsity_jac(iind, oind, true, false);
+        Sparsity sp = sparsity_jac(iind, oind, true, false);
         if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
 
         // Carry out the sparse matrix-vector multiplication
@@ -2076,27 +1896,23 @@ namespace casadi {
         }
       }
     }
+    return 0;
   }
 
-  void FunctionInternal::
-  sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    // Get the number of inputs and outputs
-    int n_in = this->n_in();
-    int n_out = this->n_out();
-
+  int FunctionInternal::
+  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
     // Loop over outputs
-    for (int oind=0; oind<n_out; ++oind) {
+    for (int oind=0; oind<n_out_; ++oind) {
       // Skip if nothing to assign
       if (res[oind]==0 || nnz_out(oind)==0) continue;
 
       // Loop over inputs
-      for (int iind=0; iind<n_in; ++iind) {
+      for (int iind=0; iind<n_in_; ++iind) {
         // Skip if no seeds
         if (arg[iind]==0 || nnz_in(iind)==0) continue;
 
         // Get the sparsity of the Jacobian block
-        Sparsity sp = const_cast<FunctionInternal*>(this)->
-                      sparsity_jac(iind, oind, true, false);
+        Sparsity sp = sparsity_jac(iind, oind, true, false);
         if (sp.is_null() || sp.nnz() == 0) continue; // Skip if zero
 
         // Carry out the sparse matrix-vector multiplication
@@ -2112,6 +1928,7 @@ namespace casadi {
       // Clear seeds
       casadi_fill(res[oind], nnz_out(oind), bvec_t(0));
     }
+    return 0;
   }
 
   void FunctionInternal::sz_work(size_t& sz_arg, size_t& sz_res,
@@ -2164,16 +1981,12 @@ namespace casadi {
     alloc_w(sz_w, persistent);
   }
 
-  bool FunctionInternal::hasFullJacobian() const {
-    return full_jacobian_.alive();
-  }
-
-  bool FunctionInternal::hasDerivative() const {
-    return get_n_forward()>0 || get_n_reverse()>0 || hasFullJacobian();
+  bool FunctionInternal::has_derivative() const {
+    return enable_forward_ || enable_reverse_ || enable_jacobian_ || enable_fd_;
   }
 
   bool FunctionInternal::fwdViaJac(int nfwd) const {
-    if (get_n_forward()==0) return true;
+    if (!enable_forward_ && !enable_fd_) return true;
     if (jac_penalty_==-1) return false;
 
     // Heuristic 1: Jac calculated via forward mode likely cheaper
@@ -2181,14 +1994,14 @@ namespace casadi {
 
     // Heuristic 2: Jac calculated via reverse mode likely cheaper
     double w = ad_weight();
-    if (get_n_reverse()>0 && jac_penalty_*(1-w)*nnz_out()<w*nfwd)
+    if (enable_reverse_ && jac_penalty_*(1-w)*nnz_out()<w*nfwd)
       return true;
 
     return false;
   }
 
   bool FunctionInternal::adjViaJac(int nadj) const {
-    if (get_n_reverse()==0) return true;
+    if (!enable_reverse_) return true;
     if (jac_penalty_==-1) return false;
 
     // Heuristic 1: Jac calculated via reverse mode likely cheaper
@@ -2196,7 +2009,7 @@ namespace casadi {
 
     // Heuristic 2: Jac calculated via forward mode likely cheaper
     double w = ad_weight();
-    if (get_n_forward()>0 && jac_penalty_*w*nnz_in()<(1-w)*nadj)
+    if ((enable_forward_ || enable_fd_) && jac_penalty_*w*nnz_in()<(1-w)*nadj)
       return true;
 
     return false;
@@ -2208,11 +2021,11 @@ namespace casadi {
              std::vector<std::vector<MX> >& fsens,
              bool always_inline, bool never_inline) const {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    casadi_assert_message(!always_inline, "Class " + type_name() +
+    casadi_assert_message(!always_inline, "Class " + class_name() +
                           " cannot be inlined in an MX expression");
 
     // Derivative information must be available
-    casadi_assert_message(hasDerivative(),
+    casadi_assert_message(has_derivative(),
                           "Derivatives cannot be calculated for " + name_);
 
     // Number of directional derivatives
@@ -2224,15 +2037,11 @@ namespace casadi {
 
     // Check if seeds need to have dimensions corrected
     for (auto&& r : fseed) {
-      if (!matchingArg(r)) {
-        return FunctionInternal::call_forward(arg, res, replaceFwdSeed(fseed),
+      if (!matching_arg(r)) {
+        return FunctionInternal::call_forward(arg, res, replace_fseed(fseed),
                                             fsens, always_inline, never_inline);
       }
     }
-
-    // Shorthands
-    int n_in = this->n_in();
-    int n_out = this->n_out();
 
     // Calculating full Jacobian and then multiplying
     if (fwdViaJac(nfwd)) {
@@ -2243,38 +2052,44 @@ namespace casadi {
       }
 
       // Multiply the Jacobian from the right
-      MX J = const_cast<FunctionInternal*>(this)->fullJacobian()(arg).at(0);
+      vector<MX> darg = arg;
+      darg.insert(darg.end(), res.begin(), res.end());
+      MX J = jacobian()(darg).at(0);
       v = horzsplit(mtimes(J, horzcat(v)));
 
       // Vertical offsets
-      vector<int> offset(n_out+1, 0);
-      for (int i=0; i<n_out; ++i) {
+      vector<int> offset(n_out_+1, 0);
+      for (int i=0; i<n_out_; ++i) {
         offset[i+1] = offset[i]+numel_out(i);
       }
 
       // Collect forward sensitivities
       for (int d=0; d<nfwd; ++d) {
         fsens[d] = vertsplit(v[d], offset);
-        for (int i=0; i<n_out; ++i) {
+        for (int i=0; i<n_out_; ++i) {
           fsens[d][i] = reshape(fsens[d][i], size_out(i));
         }
       }
 
     } else {
       // Evaluate in batches
+      casadi_assert(enable_forward_ || enable_fd_);
+      int max_nfwd = 64;
+      if (!enable_fd_) {
+        while (!has_forward(max_nfwd)) max_nfwd/=2;
+      }
       int offset = 0;
-      int max_nfwd = get_n_forward();
       while (offset<nfwd) {
         // Number of derivatives, in this batch
         int nfwd_batch = min(nfwd-offset, max_nfwd);
 
         // All inputs and seeds
         vector<MX> darg;
-        darg.reserve(n_in + n_out + n_in);
+        darg.reserve(n_in_ + n_out_ + n_in_);
         darg.insert(darg.end(), arg.begin(), arg.end());
         darg.insert(darg.end(), res.begin(), res.end());
         vector<MX> v(nfwd_batch);
-        for (int i=0; i<n_in; ++i) {
+        for (int i=0; i<n_in_; ++i) {
           for (int d=0; d<nfwd_batch; ++d) v[d] = fseed[offset+d][i];
           darg.push_back(horzcat(v));
         }
@@ -2283,11 +2098,11 @@ namespace casadi {
         Function dfcn = forward(nfwd_batch);
         vector<MX> x = Call::create(dfcn, darg);
 
-        casadi_assert(x.size()==n_out);
+        casadi_assert(x.size()==n_out_);
 
         // Retrieve sensitivities
-        for (int d=0; d<nfwd_batch; ++d) fsens[offset+d].resize(n_out);
-        for (int i=0; i<n_out; ++i) {
+        for (int d=0; d<nfwd_batch; ++d) fsens[offset+d].resize(n_out_);
+        for (int i=0; i<n_out_; ++i) {
           if (size2_out(i)>0) {
             v = horzsplit(x[i], size2_out(i));
             casadi_assert(v.size()==nfwd_batch);
@@ -2309,11 +2124,11 @@ namespace casadi {
              std::vector<std::vector<MX> >& asens,
              bool always_inline, bool never_inline) const {
     casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    casadi_assert_message(!always_inline, "Class " + type_name() +
+    casadi_assert_message(!always_inline, "Class " + class_name() +
                           " cannot be inlined in an MX expression");
 
     // Derivative information must be available
-    casadi_assert_message(hasDerivative(),
+    casadi_assert_message(has_derivative(),
                           "Derivatives cannot be calculated for " + name_);
 
     // Number of directional derivatives
@@ -2325,15 +2140,11 @@ namespace casadi {
 
     // Check if seeds need to have dimensions corrected
     for (auto&& r : aseed) {
-      if (!matchingRes(r)) {
-        return FunctionInternal::call_reverse(arg, res, replaceAdjSeed(aseed),
+      if (!matching_res(r)) {
+        return FunctionInternal::call_reverse(arg, res, replace_aseed(aseed),
                                             asens, always_inline, never_inline);
       }
     }
-
-    // Shorthands
-    int n_in = this->n_in();
-    int n_out = this->n_out();
 
     // Calculating full Jacobian and then multiplying likely cheaper
     if (adjViaJac(nadj)) {
@@ -2344,20 +2155,22 @@ namespace casadi {
       }
 
       // Multiply the transposed Jacobian from the right
-      MX J = const_cast<FunctionInternal*>(this)->fullJacobian()(arg).at(0);
+      vector<MX> darg = arg;
+      darg.insert(darg.end(), res.begin(), res.end());
+      MX J = jacobian()(darg).at(0);
       v = horzsplit(mtimes(J.T(), horzcat(v)));
 
       // Vertical offsets
-      vector<int> offset(n_in+1, 0);
-      for (int i=0; i<n_in; ++i) {
+      vector<int> offset(n_in_+1, 0);
+      for (int i=0; i<n_in_; ++i) {
         offset[i+1] = offset[i]+numel_in(i);
       }
 
       // Collect adjoint sensitivities
       for (int d=0; d<nadj; ++d) {
-        asens[d].resize(n_in);
+        asens[d].resize(n_in_);
         vector<MX> a = vertsplit(v[d], offset);
-        for (int i=0; i<n_in; ++i) {
+        for (int i=0; i<n_in_; ++i) {
           if (asens[d][i].is_empty(true)) {
             asens[d][i] = reshape(a[i], size_in(i));
           } else {
@@ -2367,19 +2180,21 @@ namespace casadi {
       }
     } else {
       // Evaluate in batches
+      casadi_assert(enable_reverse_);
+      int max_nadj = 64;
+      while (!has_reverse(max_nadj)) max_nadj/=2;
       int offset = 0;
-      int max_nadj = get_n_reverse();
       while (offset<nadj) {
         // Number of derivatives, in this batch
         int nadj_batch = min(nadj-offset, max_nadj);
 
         // All inputs and seeds
         vector<MX> darg;
-        darg.reserve(n_in + n_out + n_out);
+        darg.reserve(n_in_ + n_out_ + n_out_);
         darg.insert(darg.end(), arg.begin(), arg.end());
         darg.insert(darg.end(), res.begin(), res.end());
         vector<MX> v(nadj_batch);
-        for (int i=0; i<n_out; ++i) {
+        for (int i=0; i<n_out_; ++i) {
           for (int d=0; d<nadj_batch; ++d) v[d] = aseed[offset+d][i];
           darg.push_back(horzcat(v));
         }
@@ -2387,11 +2202,11 @@ namespace casadi {
         // Create the evaluation node
         Function dfcn = reverse(nadj_batch);
         vector<MX> x = Call::create(dfcn, darg);
-        casadi_assert(x.size()==n_in);
+        casadi_assert(x.size()==n_in_);
 
         // Retrieve sensitivities
-        for (int d=0; d<nadj_batch; ++d) asens[offset+d].resize(n_in);
-        for (int i=0; i<n_in; ++i) {
+        for (int d=0; d<nadj_batch; ++d) asens[offset+d].resize(n_in_);
+        for (int i=0; i<n_in_; ++i) {
           if (size2_in(i)>0) {
             v = horzsplit(x[i], size2_in(i));
             casadi_assert(v.size()==nadj_batch);
@@ -2422,7 +2237,7 @@ namespace casadi {
       fsens.clear();
       return;
     }
-    casadi_error("'forward' (SX) not defined for " + type_name());
+    casadi_error("'forward' (SX) not defined for " + class_name());
   }
 
   void FunctionInternal::
@@ -2435,15 +2250,15 @@ namespace casadi {
       asens.clear();
       return;
     }
-    casadi_error("'reverse' (SX) not defined for " + type_name());
+    casadi_error("'reverse' (SX) not defined for " + class_name());
   }
 
   double FunctionInternal::ad_weight() const {
     // If reverse mode derivatives unavailable, use forward
-    if (get_n_reverse()==0) return 0;
+    if (!enable_reverse_) return 0;
 
     // If forward mode derivatives unavailable, use reverse
-    if (get_n_forward()==0) return 1;
+    if (!enable_forward_ && !enable_fd_) return 1;
 
     // Use the (potentially user set) option
     return ad_weight_;
@@ -2460,44 +2275,16 @@ namespace casadi {
     return ad_weight_sp_;
   }
 
-  MX FunctionInternal::grad_mx(int iind, int oind) {
-    casadi_error("'grad_mx' not defined for " + type_name());
-  }
-
-  MX FunctionInternal::tang_mx(int iind, int oind) {
-    casadi_error("'tang_mx' not defined for " + type_name());
-  }
-
-  MX FunctionInternal::jac_mx(int iind, int oind, const Dict& opts) {
-    casadi_error("'jac_mx' not defined for " + type_name());
-  }
-
-  SX FunctionInternal::grad_sx(int iind, int oind) {
-    casadi_error("'grad_sx' not defined for " + type_name());
-  }
-
-  SX FunctionInternal::tang_sx(int iind, int oind) {
-    casadi_error("'tang_sx' not defined for " + type_name());
-  }
-
-  SX FunctionInternal::jac_sx(int iind, int oind, const Dict& opts) {
-    casadi_error("'jac_sx' not defined for " + type_name());
-  }
-
-  SX FunctionInternal::hess_sx(int iind, int oind) {
-    casadi_error("'hess_sx' not defined for " + type_name());
-  }
-
   const SX FunctionInternal::sx_in(int ind) const {
-    return SX::sym("x_" + CodeGenerator::to_string(ind), sparsity_in(ind));
+    return SX::sym("x_" + str(ind), sparsity_in_.at(ind));
   }
 
   const SX FunctionInternal::sx_out(int ind) const {
-    return SX::sym("r_" + CodeGenerator::to_string(ind), sparsity_out(ind));
+    return SX::sym("r_" + str(ind), sparsity_out_.at(ind));
   }
 
   const std::vector<SX> FunctionInternal::sx_in() const {
-    vector<SX> ret(n_in());
+    vector<SX> ret(n_in_);
     for (int i=0; i<ret.size(); ++i) {
       ret[i] = sx_in(i);
     }
@@ -2505,7 +2292,7 @@ namespace casadi {
   }
 
   const std::vector<SX> FunctionInternal::sx_out() const {
-    vector<SX> ret(n_out());
+    vector<SX> ret(n_out_);
     for (int i=0; i<ret.size(); ++i) {
       ret[i] = sx_out(i);
     }
@@ -2513,15 +2300,15 @@ namespace casadi {
   }
 
   const MX FunctionInternal::mx_in(int ind) const {
-    return MX::sym("x_" + CodeGenerator::to_string(ind), sparsity_in(ind));
+    return MX::sym("x_" + str(ind), sparsity_in_.at(ind));
   }
 
   const MX FunctionInternal::mx_out(int ind) const {
-    return MX::sym("r_" + CodeGenerator::to_string(ind), sparsity_out(ind));
+    return MX::sym("r_" + str(ind), sparsity_out_.at(ind));
   }
 
   const std::vector<MX> FunctionInternal::mx_in() const {
-    vector<MX> ret(n_in());
+    vector<MX> ret(n_in_);
     for (int i=0; i<ret.size(); ++i) {
       ret[i] = mx_in(i);
     }
@@ -2529,7 +2316,7 @@ namespace casadi {
   }
 
   const std::vector<MX> FunctionInternal::mx_out() const {
-    vector<MX> ret(n_out());
+    vector<MX> ret(n_out_);
     for (int i=0; i<ret.size(); ++i) {
       ret[i] = mx_out(i);
     }
@@ -2537,118 +2324,44 @@ namespace casadi {
   }
 
   bool FunctionInternal::is_a(const std::string& type, bool recursive) const {
-    return type == "function";
+    return type == "FunctionInternal";
   }
 
   std::vector<MX> FunctionInternal::free_mx() const {
-    casadi_error("'free_mx' only defined for 'mxfunction'");
+    casadi_error("'free_mx' only defined for 'MXFunction'");
   }
 
   std::vector<SX> FunctionInternal::free_sx() const {
-    casadi_error("'free_sx' only defined for 'sxfunction'");
+    casadi_error("'free_sx' only defined for 'SXFunction'");
   }
 
   void FunctionInternal::generate_lifted(Function& vdef_fcn,
                                          Function& vinit_fcn) const {
-    casadi_error("'generate_lifted' only defined for 'mxfunction'");
+    casadi_error("'generate_lifted' only defined for 'MXFunction'");
   }
 
-  int FunctionInternal::getAlgorithmSize() const {
-    casadi_error("'getAlgorithmSize' not defined for " + type_name());
+  int FunctionInternal::n_instructions() const {
+    casadi_error("'n_instructions' not defined for " + class_name());
   }
 
-  int FunctionInternal::getWorkSize() const {
-    casadi_error("'getWorkSize' not defined for " + type_name());
+  int FunctionInternal::instruction_id(int k) const {
+    casadi_error("'instruction_id' not defined for " + class_name());
   }
 
-  int FunctionInternal::getAtomicOperation(int k) const {
-    casadi_error("'getAtomicOperation' not defined for " + type_name());
+  std::pair<int, int> FunctionInternal::instruction_input(int k) const {
+    casadi_error("'instruction_input' not defined for " + class_name());
   }
 
-  std::pair<int, int> FunctionInternal::getAtomicInput(int k) const {
-    casadi_error("'getAtomicInput' not defined for " + type_name());
+  double FunctionInternal::instruction_constant(int k) const {
+    casadi_error("'instruction_constant' not defined for " + class_name());
   }
 
-  double FunctionInternal::getAtomicInputReal(int k) const {
-    casadi_error("'getAtomicInputReal' not defined for " + type_name());
-  }
-
-  int FunctionInternal::getAtomicOutput(int k) const {
-    casadi_error("'getAtomicOutput' not defined for " + type_name());
+  int FunctionInternal::instruction_output(int k) const {
+    casadi_error("'instruction_output' not defined for " + class_name());
   }
 
   int FunctionInternal::n_nodes() const {
-    casadi_error("'n_nodes' not defined for " + type_name());
-  }
-
-  std::vector<std::vector<MX> >
-  FunctionInternal::map_mx(const std::vector<std::vector<MX> > &x,
-                           const std::string& parallelization) {
-    if (x.empty()) return x;
-
-    // Check if arguments match
-    int n = x.size();
-    bool matching=true;
-    for (int i=0; i<n; ++i) {
-      matching = matchingArg(x[i]) && matching; // non-short circuiting
-    }
-
-    // Replace arguments if needed
-    if (!matching) {
-      vector<vector<MX> > x_new(n);
-      for (int i=0; i<n; ++i) x_new[i] = replaceArg(x[i]);
-      return map_mx(x_new, parallelization);
-    }
-
-    vector< vector<MX> > trans = swapIndices(x);
-    vector< MX > x_cat(trans.size());
-    for (int i=0;i<trans.size();++i) {
-      x_cat[i] = horzcat(trans[i]);
-    }
-
-    // Call the internal function
-    vector< MX > ret_cat = map_mx(x_cat, parallelization);
-    vector< vector<MX> > ret;
-
-    for (int i=0;i<ret_cat.size();++i) {
-      ret.push_back(horzsplit(ret_cat[i], size2_out(i)));
-    }
-    return swapIndices(ret);
-  }
-
-  std::vector<MX>
-  FunctionInternal::map_mx(const std::vector<MX > &x,
-                           const std::string& parallelization) {
-    if (x.empty()) return x;
-
-    // Replace arguments if needed
-    if (!matchingArg(x, true)) {
-      vector< MX > x_new = replaceArg(x, true);
-      return map_mx(x_new, parallelization);
-    }
-
-    int n = 1;
-    for (int i=0;i<x.size();++i) {
-      n = max(x[i].size2()/size2_in(i), n);
-    }
-
-    vector<int> reduce_in;
-    for (int i=0;i<x.size();++i) {
-      if (x[i].size2()/size2_in(i)!=n) {
-        reduce_in.push_back(i);
-      }
-    }
-
-    // Call the internal function
-    Function ms;
-    if (reduce_in.size()>0) {
-      ms = self().
-        map("mapsum", parallelization, n, reduce_in, std::vector<int>());
-    } else {
-      ms = self().map(n, parallelization);
-    }
-    // Call the internal function
-    return ms(x);
+    casadi_error("'n_nodes' not defined for " + class_name());
   }
 
   std::vector<MX>
@@ -2656,35 +2369,54 @@ namespace casadi {
                               const std::string& parallelization) {
     if (x.empty()) return x;
 
-    // Replace arguments if needed
-    if (!matchingArg(x, true)) {
-      vector< MX > x_new = replaceArg(x, true);
-      return mapsum_mx(x_new, parallelization);
+    // Check number of arguments
+    casadi_assert_message(x.size()==n_in_, "mapsum_mx: Wrong number of arguments");
+
+    // Check/replace arguments
+    std::vector<MX> x_mod(x.size());
+    for (int i=0; i<n_in_; ++i) {
+      if (check_mat(x[i].sparsity(), sparsity_in_[i])) {
+        // Matching arguments according to normal function call rules
+        x_mod[i] = replace_mat(x[i], sparsity_in_[i]);
+      } else if (x[i].size1()==size1_in(i) && x[i].size2() % size2_in(i)==0) {
+        // Matching horzcat dimensions
+        x_mod[i] = x[i];
+      } else {
+        // Mismatching sparsity: The following will throw an error message
+        check_arg(x);
+      }
     }
 
     int n = 1;
-    for (int i=0;i<x.size();++i) {
-      n = max(x[i].size2()/size2_in(i), n);
+    for (int i=0; i<x_mod.size(); ++i) {
+      n = max(x_mod[i].size2()/size2_in(i), n);
     }
 
     vector<int> reduce_in;
-    for (int i=0;i<x.size();++i) {
-      if (x[i].size2()/size2_in(i)!=n) {
+    for (int i=0; i<x_mod.size(); ++i) {
+      if (x_mod[i].size2()/size2_in(i)!=n) {
         reduce_in.push_back(i);
       }
     }
 
-    Function ms = self().map("mapsum", parallelization, n, reduce_in, range(n_out()));
+    Function ms = self().map("mapsum", parallelization, n, reduce_in, range(n_out_));
 
     // Call the internal function
-    return ms(x);
+    return ms(x_mod);
   }
 
-  bool FunctionInternal::checkMat(const Sparsity& arg, const Sparsity& inp, bool hcat) {
-    return arg.size()==inp.size() || arg.is_empty() || arg.is_scalar() ||
-      (inp.size2()==arg.size1() && inp.size1()==arg.size2()
-       && (arg.is_column() || inp.is_column())) ||
-      (hcat && arg.size1()==inp.size1() && arg.size2() % inp.size2()==0);
+  bool FunctionInternal::check_mat(const Sparsity& arg, const Sparsity& inp) {
+    // Matching dimensions
+    if (arg.size()==inp.size()) return true;
+    // Calling with empty matrix - set all to zero
+    if (arg.is_empty()) return true;
+    // Calling with a scalar - set all
+    if (arg.is_scalar()) return true;
+    // Vectors that are transposes of each other
+    if (inp.size2()==arg.size1() && inp.size1()==arg.size2()
+        && (arg.is_column() || inp.is_column())) return true;
+    // No match
+    return false;
   }
 
   void FunctionInternal::setup(void* mem, const double** arg, double** res,
@@ -2693,13 +2425,13 @@ namespace casadi {
     set_temp(mem, arg, res, iw, w);
   }
 
-  void FunctionInternal::free_memory(void *mem) const {
-    casadi_warning("'free_memory' not defined for " + type_name());
+  void FunctionInternal::free_mem(void *mem) const {
+    casadi_warning("'free_mem' not defined for " + class_name());
   }
 
-  void FunctionInternal::clear_memory() {
+  void FunctionInternal::clear_mem() {
     for (auto&& i : mem_) {
-      if (i!=0) free_memory(i);
+      if (i!=0) free_mem(i);
     }
     mem_.clear();
   }
@@ -2707,8 +2439,8 @@ namespace casadi {
   size_t FunctionInternal::get_n_in() {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
-      if (name_ == n + "_jac") {
-        return derivative_of_.n_in();
+      if (name_ == "jac_" + n) {
+        return derivative_of_.n_in() + derivative_of_.n_out();
       }
     }
     // One by default
@@ -2718,7 +2450,7 @@ namespace casadi {
   size_t FunctionInternal::get_n_out() {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
-      if (name_ == n + "_jac") {
+      if (name_ == "jac_" + n) {
         return 1;
       }
     }
@@ -2729,9 +2461,14 @@ namespace casadi {
   Sparsity FunctionInternal::get_sparsity_in(int i) {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
-      if (name_ == n + "_jac") {
-        // Same as nondifferentiated function
-        return derivative_of_.sparsity_in(i);
+      if (name_ == "jac_" + n) {
+        if (i < derivative_of_.n_in()) {
+          // Same as nondifferentiated function
+          return derivative_of_.sparsity_in(i);
+        } else {
+          // Dummy output
+          return Sparsity(derivative_of_.size_out(i-derivative_of_.n_in()));
+        }
       }
     }
     // Scalar by default
@@ -2741,7 +2478,7 @@ namespace casadi {
   Sparsity FunctionInternal::get_sparsity_out(int i) {
     if (!derivative_of_.is_null()) {
       string n = derivative_of_.name();
-      if (name_ == n + "_jac") {
+      if (name_ == "jac_" + n) {
         // Dense Jacobian by default
         return Sparsity::dense(derivative_of_.nnz_out(), derivative_of_.nnz_in());
       }
@@ -2757,12 +2494,11 @@ namespace casadi {
   int FunctionInternal::checkout() const {
     if (unused_.empty()) {
       // Allocate a new memory object
-      int n_mem = this->n_mem();
-      casadi_assert_message(n_mem==0 || mem_.size()<n_mem,
-                            "Too many memory objects");
-      void* m = alloc_memory();
+      void* m = alloc_mem();
       mem_.push_back(m);
-      if (m) init_memory(m);
+      if (init_mem(m)) {
+        casadi_error("Failed to create or initialize memory object");
+      }
       return mem_.size()-1;
     } else {
       // Use an unused memory object
@@ -2791,19 +2527,19 @@ namespace casadi {
   }
 
   const Function& FunctionInternal::get_function(const std::string &name) const {
-    casadi_error("'get_function' not defined for " + type_name());
+    casadi_error("'get_function' not defined for " + class_name());
     static Function singleton;
     return singleton;
   }
 
   vector<bool> FunctionInternal::
   which_depends(const string& s_in, const vector<string>& s_out, int order, bool tr) const {
-    casadi_error("'which_depends' not defined for " + type_name());
+    casadi_error("'which_depends' not defined for " + class_name());
     return vector<bool>();
   }
 
   const Function& FunctionInternal::oracle() const {
-    casadi_error("'oracle' not defined for " + type_name());
+    casadi_error("'oracle' not defined for " + class_name());
     static Function singleton;
     return singleton;
   }
@@ -2826,8 +2562,8 @@ namespace casadi {
       if (ret1.length() != totalWidth)
         casadi_error(
           "ipopt timing formatting fallback is bugged, sorry about that."
-          << "expected " << totalWidth <<  " digits, but got " << ret1.length()
-          << ", string: \"" << ret1 << "\", number: " << x);
+          "expected " + str(totalWidth) +  " digits, but got " + str(ret1.length())
+          + ", string: \"" + str(ret1) + "\", number: " + str(x));
       return ret1;
     } else {
       casadi_error("ipopt timing formatting is bugged, sorry about that.");
@@ -2840,7 +2576,6 @@ namespace casadi {
     if (n_call == 0) return;
 
     std::stringstream s;
-
     s
       << setw(maxNameLen) << label << " "
       << formatFloat(t_proc, 9, 3, 3) << " [s]  "
@@ -2849,18 +2584,14 @@ namespace casadi {
       // things like main loop don't have # evals
       s << endl;
     } else {
-      s
-        << " "
-        << setw(5) << n_call;
+      s << " " << setw(5) << n_call;
       if (n_call < 2) {
-        s << endl;
+        s << "\n";
       } else {
         // only print averages if there is more than 1 eval
-        s
-          << " "
+        s << " "
           << formatFloat(1000.0*t_proc/n_call, 10, 2, 3) << " [ms]  "
-          << formatFloat(1000.0*t_wall/n_call, 10, 2, 3) << " [ms]"
-          << endl;
+          << formatFloat(1000.0*t_wall/n_call, 10, 2, 3) << " [ms]\n";
       }
     }
     userOut() << s.str();
@@ -2870,6 +2601,84 @@ namespace casadi {
         const std::vector<int>& order_in,
         const std::vector<int>& order_out, const Dict& opts) const {
     return wrap().slice(name, order_in, order_out, opts);
+  }
+
+  bool FunctionInternal::all_scalar() const {
+    // Check inputs
+    for (int i=0; i<n_in_; ++i) {
+      if (!sparsity_in_[i].is_scalar()) return false;
+    }
+    // Check outputs
+    for (int i=0; i<n_out_; ++i) {
+      if (!sparsity_out_[i].is_scalar()) return false;
+    }
+    // All are scalar
+    return true;
+  }
+
+  void FunctionInternal::set_jac_sparsity(const Sparsity& sp) {
+    // Make sure that it's of the right size
+    casadi_assert(sp.size1()==numel_out());
+    casadi_assert(sp.size2()==numel_in());
+    // Split up into the individual patterns
+    std::vector<int> v_offset(n_out_+1, 0);
+    for (int i=0; i<n_out_; ++i) v_offset[i+1] = v_offset[i] + numel_out(i);
+    std::vector<int> h_offset(n_in_+1, 0);
+    for (int i=0; i<n_in_; ++i) h_offset[i+1] = h_offset[i] + numel_in(i);
+    vector<vector<Sparsity>> blocks = blocksplit(sp, v_offset, h_offset);
+    // Save to jac_sparsity_ and jac_sparsity_compact_
+    for (int oind=0; oind<n_out_; ++oind) {
+      vector<int> row_nz = sparsity_out_.at(oind).find();
+      for (int iind=0; iind<n_in_; ++iind) {
+        vector<int> col_nz = sparsity_in_.at(iind).find();
+        const Sparsity& sp = blocks.at(oind).at(iind);
+        jac_sparsity_.elem(oind, iind) = sp;
+        vector<int> mapping;
+        jac_sparsity_compact_.elem(oind, iind) = sp.sub(row_nz, col_nz, mapping);
+      }
+    }
+  }
+
+  int FunctionInternal::
+  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+    // As a fallback, redirect to (the less efficient) eval_dm
+
+    // Allocate input matrices
+    std::vector<DM> argv(n_in_);
+    for (int i=0; i<n_in_; ++i) {
+      argv[i] = DM(sparsity_in_[i]);
+      casadi_copy(arg[i], argv[i].nnz(), argv[i].ptr());
+    }
+
+    // Try to evaluate using eval_dm
+    try {
+      std::vector<DM> resv = eval_dm(argv);
+
+      // Check number of outputs
+      casadi_assert_message(resv.size()==n_out_,
+        "Expected " + str(n_out_) + " outputs, got " + str(resv.size()) + ".");
+
+      // Get outputs
+      for (int i=0; i<n_out_; ++i) {
+        if (resv[i].sparsity()!=sparsity_out_[i]) {
+          if (resv[i].size()==size_out(i)) {
+            resv[i] = project(resv[i], sparsity_out_[i]);
+          } else {
+            casadi_error("Shape mismatch for output " + str(i) + ": got " + resv[i].dim() + ", "
+                         "expected " + sparsity_out_[i].dim() + ".");
+          }
+        }
+        if (res[i]) casadi_copy(resv[i].ptr(), resv[i].nnz(), res[i]);
+      }
+    } catch (KeyboardInterruptException&) {
+      throw;
+    } catch (exception& e) {
+      casadi_error("Failed to evaluate 'eval_dm' for " + name_ + ":\n" + e.what());
+      return 1;
+    }
+
+    // Successful return
+    return 0;
   }
 
 } // namespace casadi

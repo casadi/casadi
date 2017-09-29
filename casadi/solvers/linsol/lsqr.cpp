@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   Lsqr::~Lsqr() {
-    clear_memory();
+    clear_mem();
   }
 
   Options Lsqr::options_
@@ -90,8 +90,8 @@ namespace casadi {
     }
   }
 
-  void Lsqr::init_memory(void* mem) const {
-    LinsolInternal::init_memory(mem);
+  int Lsqr::init_mem(void* mem) const {
+    return LinsolInternal::init_mem(mem);
   }
 
   void Lsqr::reset(void* mem, const int* sp) const {

@@ -1,6 +1,7 @@
 // NOLINT(legal/copyright)
+// SYMBOL "getu"
 template<typename T1>
-void CASADI_PREFIX(getu)(const T1* x, const int* sp_x, T1* v) {
+void casadi_getu(const T1* x, const int* sp_x, T1* v) {
   // Get sparsities
   int ncol_x = sp_x[1];
   const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;

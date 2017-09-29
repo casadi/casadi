@@ -73,7 +73,8 @@ namespace casadi {
       \date 2012-2015
       \author Joel Andersson
   */
-  class CASADI_EXPORT DaeBuilder : public PrintableObject<DaeBuilder> {
+  class CASADI_EXPORT DaeBuilder
+    : public SWIG_IF_ELSE(PrintableCommon, Printable<DaeBuilder>) {
   public:
 
     /// Default constructor
@@ -136,6 +137,9 @@ namespace casadi {
     std::vector<MX> d, ddef, lam_ddef;
     ///@}
 
+    /** \brief Auxiliary variables: Used e.g. to define functions */
+    std::vector<MX> aux;
+
     /** \brief Initial conditions
      * At <tt>t==0</tt>, <tt>0 == init(sdot, s, ...)</tt> holds in addition to
      * the ode and/or dae.
@@ -166,22 +170,25 @@ namespace casadi {
     MX add_q(const std::string& name=std::string(), int n=1);
 
     /// Add a new dependent parameter
-    MX add_d(const MX& new_ddef, const std::string& name=std::string());
+    MX add_d(const std::string& name, const MX& new_ddef);
 
     /// Add a new output
-    MX add_y(const MX& new_ydef, const std::string& name=std::string());
+    MX add_y(const std::string& name, const MX& new_ydef);
 
     /// Add an ordinary differential equation
-    void add_ode(const MX& new_ode, const std::string& name=std::string());
+    void add_ode(const std::string& name, const MX& new_ode);
 
     /// Add a differential-algebraic equation
-    void add_dae(const MX& new_dae, const std::string& name=std::string());
+    void add_dae(const std::string& name, const MX& new_dae);
 
     /// Add an algebraic equation
-    void add_alg(const MX& new_alg, const std::string& name=std::string());
+    void add_alg(const std::string& name, const MX& new_alg);
 
     /// Add a quadrature equation
-    void add_quad(const MX& new_quad, const std::string& name=std::string());
+    void add_quad(const std::string& name, const MX& new_quad);
+
+    /// Add an auxiliary variable
+    MX add_aux(const std::string& name=std::string(), int n=1);
 
     /// Check if dimensions match
     void sanity_check() const;
@@ -228,6 +235,30 @@ namespace casadi {
     /// Scale the implicit equations
     void scale_equations();
     ///@}
+
+    /** @name Functions
+     *  Add or load auxiliary functions
+     */
+    ///@{
+
+    /// Add a function from loaded expressions
+    Function add_fun(const std::string& name,
+                     const std::vector<std::string>& arg,
+                     const std::vector<std::string>& res, const Dict& opts=Dict());
+
+    /// Add an already existing function
+    Function add_fun(const Function& f);
+
+    /// Add an external function
+    Function add_fun(const std::string& name, const Importer& compiler,
+                     const Dict& opts=Dict());
+
+    /// Does a particular function already exist?
+    bool has_fun(const std::string& name) const;
+
+    /// Get function by name
+    Function fun(const std::string& name) const;
+  ///@}
 
     /** @name Import and export
      */
@@ -307,7 +338,7 @@ namespace casadi {
 
     /// Add a named linear combination of output expressions
     MX add_lc(const std::string& name,
-                            const std::vector<std::string>& f_out);
+              const std::vector<std::string>& f_out);
 
     /// Construct a function object
     Function create(const std::string& fname,
@@ -316,7 +347,10 @@ namespace casadi {
     ///@}
 
     /// Get variable expression by name
-    MX operator()(const std::string& name) const;
+    MX var(const std::string& name) const;
+
+    /// Get variable expression by name
+    MX operator()(const std::string& name) const {return var(name);}
 
     /// Get a derivative expression by name
     MX der(const std::string& name) const;
@@ -405,11 +439,18 @@ namespace casadi {
     /// Set the unit for a component
     void set_unit(const std::string& name, const std::string& val);
 
-    ///  Print representation
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    /// Readable name of the class
+    std::string type_name() const {return "DaeBuilder";}
 
-    /// Print description
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    ///  Print representation
+    void disp(std::ostream& stream, bool more=false) const;
+
+    /// Get string representation
+    std::string get_str(bool more=false) const {
+      std::stringstream ss;
+      disp(ss, more);
+      return ss.str();
+    }
 
     /// Add a variable
     void add_variable(const std::string& name, const Variable& var);
@@ -426,6 +467,26 @@ namespace casadi {
     const Variable& variable(const std::string& name) const;
     ///@}
 
+#ifdef WITH_DEPRECATED_FEATURES
+    /// Add a new dependent parameter. Old syntax: Swap arguments
+    MX add_d(const MX& new_ddef, const std::string& name=std::string());
+
+    /// Add a new output. Old syntax: Swap arguments
+    MX add_y(const MX& new_ydef, const std::string& name=std::string());
+
+    /// Add an ordinary differential equation. Old syntax: Swap arguments
+    void add_ode(const MX& new_ode, const std::string& name=std::string());
+
+    /// Add a differential-algebraic equation. Old syntax: Swap arguments
+    void add_dae(const MX& new_dae, const std::string& name=std::string());
+
+    /// Add an algebraic equation. Old syntax: Swap arguments
+    void add_alg(const MX& new_alg, const std::string& name=std::string());
+
+    /// Add a quadrature equation. Old syntax: Swap arguments
+    void add_quad(const MX& new_quad, const std::string& name=std::string());
+#endif // WITH_DEPRECATED_FEATURES
+
 #ifndef SWIG
     // Internal methods
   protected:
@@ -439,6 +500,9 @@ namespace casadi {
 
     /// Linear combinations of output expressions
     std::map<std::string, MX> lin_comb_;
+
+    /** \brief Functions */
+    std::vector<Function> fun_;
 
     /// Read an equation
     MX read_expr(const XmlNode& odenode);

@@ -41,7 +41,7 @@ namespace casadi {
   public:
     EmptySparsity() {
       const int colind[1] = {0};
-      assignNode(new SparsityInternal(0, 0, colind, 0));
+      own(new SparsityInternal(0, 0, colind, 0));
     }
   };
 
@@ -50,7 +50,7 @@ namespace casadi {
     ScalarSparsity() {
       const int colind[2] = {0, 1};
       const int row[1] = {0};
-      assignNode(new SparsityInternal(1, 1, colind, row));
+      own(new SparsityInternal(1, 1, colind, row));
     }
   };
 
@@ -59,7 +59,7 @@ namespace casadi {
     ScalarSparseSparsity() {
       const int colind[2] = {0, 0};
       const int row[1] = {0};
-      assignNode(new SparsityInternal(1, 1, colind, row));
+      own(new SparsityInternal(1, 1, colind, row));
     }
   };
   /// \endcond
@@ -70,7 +70,7 @@ namespace casadi {
 
   Sparsity Sparsity::create(SparsityInternal *node) {
     Sparsity ret;
-    ret.assignNode(node);
+    ret.own(node);
     return ret;
   }
 
@@ -165,18 +165,16 @@ namespace casadi {
 
   int Sparsity::row(int el) const {
     if (el<0 || el>=nnz()) {
-      std::stringstream ss;
-      ss <<  "Sparsity::row: Index " << el << " out of range [0," << nnz() << ")";
-      throw std::out_of_range(ss.str());
+      throw std::out_of_range("Sparsity::row: Index " + str(el)
+        + " out of range [0," + str(nnz()) + ")");
     }
     return row()[el];
   }
 
   int Sparsity::colind(int cc) const {
     if (cc<0 || cc>size2()) {
-      std::stringstream ss;
-      ss << "Sparsity::colind: Index " << cc << " out of range [0," << size2() << "]";
-      throw std::out_of_range(ss.str());
+      throw std::out_of_range("Sparsity::colind: Index "
+        + str(cc) + " out of range [0," + str(size2()) + "]");
     }
     return colind()[cc];
   }
@@ -248,7 +246,7 @@ namespace casadi {
   }
 
   Sparsity Sparsity::reshape(const Sparsity& x, const Sparsity& sp) {
-    casadi_assert(x.isReshape(sp));
+    casadi_assert(x.is_reshape(sp));
     return sp;
   }
 
@@ -437,9 +435,9 @@ namespace casadi {
     } else {
       casadi_assert_message(size2()==sp.size2(),
                             "Sparsity::append: Dimension mismatch. "
-                            "You attempt to append a shape " << sp.dim()
-                            << " to a shape " << dim()
-                            << ". The number of columns must match.");
+                            "You attempt to append a shape " + sp.dim()
+                            + " to a shape " + dim()
+                            + ". The number of columns must match.");
       if (sp.size1()==0) {
         // No rows to add
         return;
@@ -466,8 +464,8 @@ namespace casadi {
     } else {
       casadi_assert_message(size1()==sp.size1(),
                             "Sparsity::appendColumns: Dimension mismatch. You attempt to "
-                            "append a shape " << sp.dim() << " to a shape "
-                            << dim() << ". The number of rows must match.");
+                            "append a shape " + sp.dim() + " to a shape "
+                            + dim() + ". The number of rows must match.");
       if (sp.size2()==0) {
         // No columns to add
         return;
@@ -544,8 +542,24 @@ namespace casadi {
     return (*this)->makeDense(mapping);
   }
 
-  std::string Sparsity::dim() const {
-    return (*this)->dim();
+  std::string Sparsity::dim(bool with_nz) const {
+    return (*this)->dim(with_nz);
+  }
+
+  std::string Sparsity::postfix_dim() const {
+    if (is_dense()) {
+      if (is_scalar()) {
+        return "";
+      } else if (is_empty(true)) {
+        return "[]";
+      } else if (is_column()) {
+        return "[" + str(size1()) + "]";
+      } else {
+        return "[" + dim(false) + "]";
+      }
+    } else {
+      return "[" + dim(true) + "]";
+    }
   }
 
   std::string Sparsity::repr_el(int k) const {
@@ -641,8 +655,8 @@ namespace casadi {
     return (*this)->is_transpose(*y);
   }
 
-  bool Sparsity::isReshape(const Sparsity& y) const {
-    return (*this)->isReshape(*y);
+  bool Sparsity::is_reshape(const Sparsity& y) const {
+    return (*this)->is_reshape(*y);
   }
 
   std::size_t Sparsity::hash() const {
@@ -705,7 +719,7 @@ namespace casadi {
           if (ref.is_equal(nrow, ncol, colind, row)) {
 
             // Found match!
-            assignNode(ref.get());
+            own(ref.get());
             return;
 
           } else { // There is a hash rowision (unlikely, but possible)
@@ -725,14 +739,14 @@ namespace casadi {
 
               // Match found if sparsity matches
               if (ref.is_equal(nrow, ncol, colind, row)) {
-                assignNode(ref.get());
+                own(ref.get());
                 return;
               }
             }
           }
 
           // The cached entry has been deleted, create a new one
-          assignNode(new SparsityInternal(nrow, ncol, colind, row));
+          own(new SparsityInternal(nrow, ncol, colind, row));
 
           // Cache this pattern
           wref = *this;
@@ -744,7 +758,7 @@ namespace casadi {
     }
 
     // No matching sparsity pattern could be found, create a new one
-    assignNode(new SparsityInternal(nrow, ncol, colind, row));
+    own(new SparsityInternal(nrow, ncol, colind, row));
 
     // Cache this pattern
     cache.insert(std::pair<std::size_t, WeakRef>(h, *this));
@@ -1068,12 +1082,16 @@ namespace casadi {
   }
 
   bool Sparsity::is_singular() const {
-    casadi_assert_message(is_square(), "is_singular: only defined for square matrices, but got "
-                          << dim());
+    casadi_assert_message(is_square(),
+      "is_singular: only defined for square matrices, but got " + dim());
     return sprank(*this)!=size2();
   }
 
   std::vector<int> Sparsity::compress() const {
+    return (*this)->sp();
+  }
+
+  Sparsity::operator const std::vector<int>&() const {
     return (*this)->sp();
   }
 
@@ -1099,6 +1117,10 @@ namespace casadi {
     int nrow = v[0];
     int ncol = v[1];
     const int *colind = v+2;
+    if (colind[0]==1) {
+      // Dense matrix
+      return Sparsity::dense(nrow, ncol);
+    }
     int nnz = colind[ncol];
     if (nrow*ncol == nnz) {
       // Dense matrix
@@ -1110,10 +1132,6 @@ namespace casadi {
                       vector<int>(colind, colind+ncol+1),
                       vector<int>(row, row+nnz));
     }
-  }
-
-  void Sparsity::print_compact(std::ostream &stream) const {
-    (*this)->print_compact(stream);
   }
 
   int Sparsity::bw_upper() const {
@@ -1285,9 +1303,9 @@ namespace casadi {
     casadi_assert(offset.front()==0);
     casadi_assert_message(offset.back()==x.size2(),
                           "horzsplit(Sparsity, std::vector<int>): Last elements of offset "
-                          "(" << offset.back() << ") must equal the number of columns "
-                          "(" << x.size2() << ")");
-    casadi_assert(isMonotone(offset));
+                          "(" + str(offset.back()) + ") must equal the number of columns "
+                          "(" + str(x.size2()) + ")");
+    casadi_assert(is_monotone(offset));
 
     // Number of outputs
     int n = offset.size()-1;
@@ -1348,14 +1366,14 @@ namespace casadi {
     casadi_assert(offset1.front()==0);
     casadi_assert_message(offset1.back()==x.size1(),
                           "diagsplit(Sparsity, offset1, offset2): Last elements of offset1 "
-                          "(" << offset1.back() << ") must equal the number of rows "
-                          "(" << x.size1() << ")");
+                          "(" + str(offset1.back()) + ") must equal the number of rows "
+                          "(" + str(x.size1()) + ")");
     casadi_assert_message(offset2.back()==x.size2(),
                           "diagsplit(Sparsity, offset1, offset2): Last elements of offset2 "
-                          "(" << offset2.back() << ") must equal the number of rows "
-                          "(" << x.size2() << ")");
-    casadi_assert(isMonotone(offset1));
-    casadi_assert(isMonotone(offset2));
+                          "(" + str(offset2.back()) + ") must equal the number of rows "
+                          "(" + str(x.size2()) + ")");
+    casadi_assert(is_monotone(offset1));
+    casadi_assert(is_monotone(offset2));
     casadi_assert(offset1.size()==offset2.size());
 
     // Number of outputs
@@ -1387,8 +1405,8 @@ namespace casadi {
 
   int Sparsity::norm_0_mul(const Sparsity& x, const Sparsity& A) {
     // Implementation borrowed from Scipy's sparsetools/csr.h
-    casadi_assert_message(A.size1()==x.size2(), "Dimension error. Got " << x.dim()
-                          << " times " << A.dim() << ".");
+    casadi_assert_message(A.size1()==x.size2(), "Dimension error. Got " + x.dim()
+                          + " times " + A.dim() + ".");
 
     int n_row = A.size2();
     int n_col = x.size1();
@@ -1474,9 +1492,8 @@ namespace casadi {
     // Assert dimensions
     casadi_assert_message(z_sp.size1()==x_sp.size1() && x_sp.size2()==y_sp.size1()
                           && y_sp.size2()==z_sp.size2(),
-                          "Dimension error. Got x=" << x_sp.dim()
-                          << ", y=" << y_sp.dim()
-                          << " and z=" << z_sp.dim() << ".");
+                          "Dimension error. Got x=" + x_sp.dim() + ", y=" + y_sp.dim()
+                          + " and z=" + z_sp.dim() + ".");
 
     // Direct access to the arrays
     const int* y_colind = y_sp.colind();
@@ -1519,9 +1536,8 @@ namespace casadi {
     // Assert dimensions
     casadi_assert_message(z_sp.size1()==x_sp.size1() && x_sp.size2()==y_sp.size1()
                           && y_sp.size2()==z_sp.size2(),
-                          "Dimension error. Got x=" << x_sp.dim()
-                          << ", y=" << y_sp.dim()
-                          << " and z=" << z_sp.dim() << ".");
+                          "Dimension error. Got x=" + x_sp.dim() + ", y=" + y_sp.dim()
+                          + " and z=" + z_sp.dim() + ".");
 
     // Direct access to the arrays
     const int* y_colind = y_sp.colind();

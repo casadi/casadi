@@ -31,31 +31,33 @@ using namespace std;
 namespace casadi {
 
   SymbolicMX::SymbolicMX(const std::string& name, int nrow, int ncol) : name_(name) {
-    setSparsity(Sparsity::dense(nrow, ncol));
+    set_sparsity(Sparsity::dense(nrow, ncol));
   }
 
   SymbolicMX::SymbolicMX(const std::string& name, const Sparsity & sp) : name_(name) {
-    setSparsity(sp);
+    set_sparsity(sp);
   }
 
-  std::string SymbolicMX::print(const std::vector<std::string>& arg) const {
+  std::string SymbolicMX::disp(const std::vector<std::string>& arg) const {
     return name_;
   }
 
-  void SymbolicMX::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
+  int SymbolicMX::eval(const double** arg, double** res, int* iw, double* w) const {
+    return 0;
   }
 
-  void SymbolicMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int SymbolicMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return 0;
   }
 
   void SymbolicMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
   }
 
-  void SymbolicMX::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void SymbolicMX::ad_forward(const std::vector<std::vector<MX> >& fseed,
                            std::vector<std::vector<MX> >& fsens) const {
   }
 
-  void SymbolicMX::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void SymbolicMX::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                            std::vector<std::vector<MX> >& asens) const {
   }
 
@@ -63,35 +65,19 @@ namespace casadi {
     return name_;
   }
 
-  void SymbolicMX::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SymbolicMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     fill_n(res[0], nnz(), 0);
+    return 0;
   }
 
-  void SymbolicMX::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int SymbolicMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     fill_n(res[0], nnz(), 0);
-  }
-
-  void SymbolicMX::primitives(std::vector<MX>::iterator& it) const {
-    *it++ = shared_from_this<MX>();
-  }
-
-  void SymbolicMX::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
-    *it++ = x;
-  }
-
-  MX SymbolicMX::join_primitives(std::vector<MX>::const_iterator& it) const {
-    MX ret = *it++;
-    if (ret.size()==size()) {
-      return ret;
-    } else {
-      casadi_assert(ret.is_empty(true));
-      return MX(size());
-    }
+    return 0;
   }
 
   bool SymbolicMX::has_duplicates() const {
     if (this->temp!=0) {
-      userOut<true, PL_WARN>() << "Duplicate expression: " << name() << endl;
+      casadi_warning("Duplicate expression: " + name());
       return true;
     } else {
       this->temp = 1;

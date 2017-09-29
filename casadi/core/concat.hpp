@@ -48,26 +48,26 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    void evalGen(const T* const* arg, T* const* res, int* iw, T* w) const;
+    int eval_gen(const T* const* arg, T* const* res, int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    void eval(const double** arg, double** res, int* iw, double* w, int mem) const override;
+    int eval(const double** arg, double** res, int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
 
     /** \brief  Propagate sparsity forward */
-    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
 
     /** \brief Generate code for the operation */
-    void generate(CodeGenerator& g, const std::string& mem,
+    void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /// Get the nonzeros of matrix
-    MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const override;
+    MX get_nzref(const Sparsity& sp, const std::vector<int>& nz) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, int depth) const override {
@@ -105,17 +105,17 @@ namespace casadi {
     ~Horzcat() override {}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    void eval_forward(const std::vector<std::vector<MX> >& fseed,
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    void eval_reverse(const std::vector<std::vector<MX> >& aseed,
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
@@ -128,7 +128,7 @@ namespace casadi {
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
 
     /** \brief Get offsets for split */
-    std::vector<int> offset() const;
+    std::vector<int> off() const;
   };
 
   /** \brief Vertical concatenation of vectors
@@ -145,17 +145,17 @@ namespace casadi {
     ~Vertcat() override {}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    void eval_forward(const std::vector<std::vector<MX> >& fseed,
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    void eval_reverse(const std::vector<std::vector<MX> >& aseed,
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
@@ -168,7 +168,7 @@ namespace casadi {
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
 
     /** \brief Get offsets for split */
-    std::vector<int> offset() const;
+    std::vector<int> off() const;
   };
 
   /** \brief Diagonal concatenation of matrices
@@ -185,17 +185,17 @@ namespace casadi {
     ~Diagcat() override {}
 
     /** \brief  Print expression */
-    std::string print(const std::vector<std::string>& arg) const override;
+    std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief Calculate forward mode directional derivatives */
-    void eval_forward(const std::vector<std::vector<MX> >& fseed,
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
     /** \brief Calculate reverse mode directional derivatives */
-    void eval_reverse(const std::vector<std::vector<MX> >& aseed,
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
@@ -208,7 +208,7 @@ namespace casadi {
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
 
     /** \brief Get offsets for split */
-    std::pair<std::vector<int>, std::vector<int> > offset() const;
+    std::pair<std::vector<int>, std::vector<int> > off() const;
   };
 
 } // namespace casadi

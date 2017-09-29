@@ -169,21 +169,21 @@ namespace casadi {
 
   }
 
-  void BSplineInterpolant::eval(void* mem, const double** arg, double** res,
-                               int* iw, double* w) const {
-    S_->eval(mem, arg, res, iw, w);
+  int BSplineInterpolant::eval(const double** arg, double** res,
+                                int* iw, double* w, void* mem) const {
+    return S_->eval(arg, res, iw, w, mem);
   }
 
-  void BSplineInterpolant::generateBody(CodeGenerator& g) const {
-    S_->generateBody(g);
+  void BSplineInterpolant::codegen_body(CodeGenerator& g) const {
+    S_->codegen_body(g);
   }
 
   Function BSplineInterpolant::
-  getFullJacobian(const std::string& name,
-                  const std::vector<std::string>& i_names,
-                  const std::vector<std::string>& o_names,
-                  const Dict& opts) {
-    return S_->getFullJacobian(name, i_names, o_names, opts);
+  get_jacobian(const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
+                  const Dict& opts) const {
+    return S_->get_jacobian(name, inames, onames, opts);
   }
 
 } // namespace casadi

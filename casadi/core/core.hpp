@@ -53,7 +53,6 @@
 #include "dple.hpp"
 #include "expm.hpp"
 #include "interpolant.hpp"
-#include "jit.hpp"
 #include "external.hpp"
 
 // Misc
@@ -62,5 +61,6 @@
 #include "variable.hpp"
 #include "dae_builder.hpp"
 #include "xml_file.hpp"
+#include "optistack.hpp"
 
 #endif // CASADI_CORE_HPP

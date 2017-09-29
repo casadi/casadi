@@ -28,7 +28,7 @@
 
 #include <vector>
 #include "exception.hpp"
-#include "printable_object.hpp"
+#include "printable.hpp"
 #include <limits>
 #include <iostream>
 
@@ -39,7 +39,8 @@ namespace casadi {
    * Note that Python or Octave do not need to use this class.
    * They can just use slicing utility from the host language ( M[0:6]  in Python, M(1:7) )
    */
-  class CASADI_EXPORT Slice : public PrintableObject<Slice> {
+  class CASADI_EXPORT Slice
+    : public SWIG_IF_ELSE(PrintableCommon, Printable<Slice>) {
   public:
     /// start value: negative values will get added to length
     int start;
@@ -76,11 +77,18 @@ namespace casadi {
     /// Check inequality
     bool operator!=(const Slice& other) const { return !(*this == other);}
 
-    /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    /// Get name of the class
+    std::string type_name() const {return "Slice";}
 
     /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void disp(std::ostream& stream, bool more=false) const;
+
+    /// Get string representation
+    std::string get_str(bool more=false) const {
+      std::stringstream ss;
+      disp(ss, more);
+      return ss.str();
+    }
   };
 
   /// Construct from an index vector (requires is_slice(v) to be true)

@@ -33,6 +33,7 @@
 #include "casadi_logger.hpp"
 
 #ifdef SWIG
+#define SWIG_IF_ELSE(is_swig, not_swig) is_swig
 #define SWIG_OUTPUT(arg) OUTPUT
 #define SWIG_INOUT(arg) INOUT
 #define SWIG_CONSTREF(arg) const arg
@@ -42,6 +43,7 @@
 #define SWIG_IND1 false
 #endif // SWIGMATLAB
 #else // SWIG
+#define SWIG_IF_ELSE(is_swig, not_swig) not_swig
 #define SWIG_OUTPUT(arg) arg
 #define SWIG_INOUT(arg) arg
 #define SWIG_CONSTREF(arg) const arg &
@@ -62,7 +64,6 @@ namespace casadi {
   class DaeBuilder;
   class XmlFile;
   class Importer;
-  class ParsedFile;
 
 #ifndef SWIG
 // Get GCC version if GCC is used
@@ -100,17 +101,9 @@ namespace casadi {
 
 #endif // _MSC_VER
 
-  // Workarond for MinGW bug
-#if defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER)
-  template<typename T>
-  std::string to_string(const T& n) {
-    std::stringstream s;
-    s << n;
-    return s.str();
-  }
-#else
-  using std::to_string;
-#endif
+  // Macro "minor" is sometimes defined, cf.
+  // https://stackoverflow.com/questions/22240973/major-and-minor-macros-defined-in-sys-sysmacros-h-pulled-in-by-iterator
+#undef minor
 
   // The number of derivative directions for which the tool has been optimized
   const int optimized_num_dir = 64;
@@ -137,9 +130,11 @@ namespace casadi {
   typedef int (*getint_t)(void);
   typedef const char* (*name_t)(int i);
   typedef const int* (*sparsity_t)(int i);
+  typedef void* (*alloc_mem_t)(void);
+  typedef int (*init_mem_t)(void* mem);
+  typedef void (*free_mem_t)(void* mem);
   typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
-  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, int mem);
-  typedef void (*simple_t)(const double* arg, double* res);
+  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, void* mem);
   ///@}
 
   /// Inputs of the symbolic representation of the DAE

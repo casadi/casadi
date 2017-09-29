@@ -65,6 +65,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "ooqp";}
 
+    // Get name of the class
+    std::string class_name() const override { return "OoqpInterface";}
+
     ///@{
     /** \brief Options */
     static Options options_;
@@ -75,7 +78,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// Solve the QP
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /// Throw error
     static const char* errFlag(int flag);
@@ -111,4 +114,3 @@ namespace casadi {
 
 /// \endcond
 #endif // CASADI_OOQP_INTERFACE_HPP
-

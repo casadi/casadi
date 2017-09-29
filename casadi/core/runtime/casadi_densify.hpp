@@ -1,12 +1,13 @@
 // NOLINT(legal/copyright)
+// SYMBOL "densify"
 template<typename T1, typename T2>
-void CASADI_PREFIX(densify)(const T1* x, const int* sp_x, T2* y, int tr) {
+void casadi_densify(const T1* x, const int* sp_x, T2* y, int tr) {
   // Quick return - output ignored
   if (!y) return;
   int nrow_x = sp_x[0], ncol_x = sp_x[1];
   const int *colind_x = sp_x+2, *row_x = sp_x+ncol_x+3;
   // Zero out return value
-  CASADI_PREFIX(fill)(y, nrow_x*ncol_x, CASADI_CAST(T2, 0));
+  casadi_fill(y, nrow_x*ncol_x, CASADI_CAST(T2, 0));
   // Quick return - input is zero
   if (!x) return;
   // Copy nonzeros

@@ -2271,6 +2271,10 @@ class MXtests(casadiTestCase):
 
       x2 = vertcat(*[c.zeros(0,0)] + x1s + [c.zeros(0,0)])
       self.checkarray(x2.shape,(10,0))
+      
+      x0 = c.zeros(0,1)
+      x2 = vertcat(x0,c.zeros(0,0),x0)
+      self.checkarray(x2.shape,(0,1))
 
     for c in [MX,SX,DM]:
       x0 = c.zeros(0,10)
@@ -2285,6 +2289,10 @@ class MXtests(casadiTestCase):
 
       x2 = horzcat(*[c.zeros(0,0)] + x1s + [c.zeros(0,0)])
       self.checkarray(x2.shape,(0,10))
+
+      x0 = c.zeros(1,0)
+      x2 = horzcat(x0,c.zeros(0,0),x0)
+      self.checkarray(x2.shape,(1,0))
 
     for c in [MX,SX,DM]:
       x0 = c.zeros(10,0)
@@ -2311,15 +2319,6 @@ class MXtests(casadiTestCase):
 
       x2 = diagcat(*[c.zeros(0,0)] + x1s+x1st + [c.zeros(0,0)])
       self.checkarray(x2.shape,(10,10))
-  def test_empty_symm_jac(self):
-
-    x = MX.sym("x",2)
-
-    g = Function("g", [x],[MX(1,1)])
-
-    h = g.jacobian_old(0,0,False,True)
-
-    x = MX.sym("x",2)
 
   def test_exprjac(self):
 
@@ -2494,6 +2493,44 @@ class MXtests(casadiTestCase):
     x = MX.sym("x",Sparsity.lower(5))
     self.assertEqual((x>0).nnz(),5*6/2)
     self.assertEqual((x>=0).nnz(),5*5)
+  def test_inv(self):
+   np.random.seed(0)
+
+   for X in [SX, MX]:
+     A  = X.sym("x",3,3)
+     Av = np.random.random((3,3))
+     f = Function('f',[A],[inv(A),inv(DM(Av)),A.__mpower__(-1), DM(Av).__mpower__(-1)])
+     out = f(Av)
+     for o in out:
+       self.checkarray(o, np.linalg.inv(np.array(Av)))
+    
+
+  def test_interp1d(self):
+    v = [7,3,4,-3]
+    vs = MX.sym("x",4,1)
+
+    xq = [10,0,1,2,4,8,7,5,1.5]
+    x = [1,2,4,8]
+    F = Function("f",[vs],[interp1d(x,vs,xq)])
+
+    self.checkarray(F(v),np.interp(xq,x,v))
+
+    F = Function("f",[vs],[interp1d(x,vs,xq,"floor")])
+
+    self.checkarray(F(v),DM([-3,7,7,3,4,-3,4,4,7]))
+
+    F = Function("f",[vs],[interp1d(x,vs,xq,"ceil")])
+
+    self.checkarray(F(v),DM([-3,7,7,3,4,-3,-3,-3,3]))
+
+    v = [7,3,4,-3]
+    vs = MX.sym("x",4,1)
+
+    xq = [10,0,1,2,3,4,3.5,3.25,1.5]
+    x = [1,2,3,4]
+    F = Function("f",[vs],[interp1d(x,vs,xq,"linear",True)])
+
+    self.checkarray(F(v),np.interp(xq,x,v))
 
 if __name__ == '__main__':
     unittest.main()

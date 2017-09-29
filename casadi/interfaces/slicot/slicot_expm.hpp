@@ -89,24 +89,27 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "slicot";}
 
+    // Get name of the class
+    std::string class_name() const override { return "SlicotExpm";}
+
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new SlicotExpmMemory();}
+    void* alloc_mem() const override { return new SlicotExpmMemory();}
+
+    /** \brief Initalize memory block */
+    int init_mem(void* mem) const override;
 
     /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<SlicotExpmMemory*>(mem);}
+    void free_mem(void *mem) const override { delete static_cast<SlicotExpmMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const override;
 
-    /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
-
     /** \brief  Evaluate numerically */
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;

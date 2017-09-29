@@ -33,11 +33,11 @@ using namespace std;
 namespace casadi {
 
   Project::Project(const MX& x, const Sparsity& sp) {
-    setDependencies(x);
-    setSparsity(Sparsity(sp));
+    set_dep(x);
+    set_sparsity(Sparsity(sp));
   }
 
-  std::string Project::print(const std::vector<std::string>& arg) const {
+  std::string Project::disp(const std::vector<std::string>& arg) const {
     if (sparsity().is_dense()) {
       return "dense(" + arg.at(0) + ")";
     } else {
@@ -46,23 +46,24 @@ namespace casadi {
   }
 
   template<typename T>
-  void Project::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int Project::eval_gen(const T** arg, T** res, int* iw, T* w) const {
     casadi_project(arg[0], dep().sparsity(), res[0], sparsity(), w);
+    return 0;
   }
 
-  void Project::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+  int Project::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void Project::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+  int Project::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   void Project::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     res[0] = project(arg[0], sparsity());
   }
 
-  void Project::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Project::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     int nfwd = fsens.size();
     for (int d=0; d<nfwd; ++d) {
@@ -70,7 +71,7 @@ namespace casadi {
     }
   }
 
-  void Project::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Project::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     int nadj = aseed.size();
     for (int d=0; d<nadj; ++d) {
@@ -78,16 +79,18 @@ namespace casadi {
     }
   }
 
-  void Project::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Project::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     sparsity().set(res[0], arg[0], dep().sparsity());
+    return 0;
   }
 
-  void Project::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Project::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     dep().sparsity().bor(arg[0], res[0], sparsity());
     fill(res[0], res[0]+nnz(), 0);
+    return 0;
   }
 
-  void Project::generate(CodeGenerator& g, const std::string& mem,
+  void Project::generate(CodeGenerator& g,
                          const std::vector<int>& arg, const std::vector<int>& res) const {
     g << g.project(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
                            g.work(res.front(), nnz()), sparsity(), "w") << "\n";

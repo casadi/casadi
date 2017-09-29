@@ -33,7 +33,8 @@ set(CLANG_DEFINITIONS)
 set(CLANG_CXX_FLAGS)
 
 # most recent versions come first: http://llvm.org/apt/
-set(CLANG_KNOWN_LLVM_VERSIONS 3.7.0 3.7
+set(CLANG_KNOWN_LLVM_VERSIONS 4.0.1 4.0.0
+  3.7.0 3.7
   3.6.2 3.6.1 3.6.0 3.6
   3.5.2 3.5.1 3.5.0 3.5
   3.4.2 3.4.1 3.4
@@ -155,4 +156,3 @@ endif()
 
 
 set(CLANG_FOUND TRUE)
-

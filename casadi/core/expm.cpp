@@ -45,10 +45,7 @@ namespace casadi {
 
   Function expmsol(const string& name, const string& solver,
                 const Sparsity& A, const Dict& opts) {
-    Function ret;
-    ret.assignNode(Expm::instantiatePlugin(name, solver, A));
-    ret->construct(opts);
-    return ret;
+    return Function::create(Expm::instantiate(name, solver, A), opts);
   }
 
   int expm_n_in() {
@@ -110,9 +107,9 @@ namespace casadi {
 
   }
 
-  Function Expm::get_forward(const std::string& name, int nfwd,
-                               const std::vector<std::string>& i_names,
-                               const std::vector<std::string>& o_names,
+  Function Expm::get_forward(int nfwd, const std::string& name,
+                               const std::vector<std::string>& inames,
+                               const std::vector<std::string>& onames,
                                const Dict& opts) const {
     MX A = MX::sym("A", A_);
     MX t = MX::sym("t");
@@ -137,9 +134,9 @@ namespace casadi {
 
   }
 
-  Function Expm::get_reverse(const std::string& name, int nadj,
-                               const std::vector<std::string>& i_names,
-                               const std::vector<std::string>& o_names,
+  Function Expm::get_reverse(int nadj, const std::string& name,
+                               const std::vector<std::string>& inames,
+                               const std::vector<std::string>& onames,
                                const Dict& opts) const {
     MX A = MX::sym("A", A_);
     MX t = MX::sym("t");
@@ -177,9 +174,5 @@ namespace casadi {
   std::map<std::string, Expm::Plugin> Expm::solvers_;
 
   const std::string Expm::infix_ = "expm";
-
-  double Expm::default_in(int ind) const {
-    return 0;
-  }
 
 } // namespace casadi

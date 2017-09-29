@@ -29,6 +29,12 @@ if(WITH_IPOPT)
   target_link_libraries(rocket_ipopt casadi)
 endif()
 
+# Race car using Ipopt
+if(WITH_IPOPT)
+  add_executable(race_car race_car.cpp)
+  target_link_libraries(race_car casadi)
+endif()
+
 # basic snopt example
 if(WITH_SNOPT)
   add_executable(snopt_nl snopt_nl.cpp)
@@ -132,3 +138,7 @@ if(WITH_BLOCKSQP)
   add_executable(test_blocksqp test_blocksqp.cpp)
   target_link_libraries(test_blocksqp casadi)
 endif()
+
+# DaeBuilder
+add_executable(daebuilder daebuilder.cpp)
+target_link_libraries(daebuilder casadi)

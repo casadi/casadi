@@ -30,196 +30,191 @@
 
 namespace casadi {
 
+  /** Base class for BSpline evaluators
+  *
+  *
+  *
+  */
+  class BSplineCommon : public FunctionInternal {
+  public:
+    BSplineCommon(const std::string &name, const std::vector<double>& knots,
+      const std::vector<int>& offset, const std::vector<int>& degree, int m);
 
-    /** Base class for BSpline evaluators
-    *
-    *
-    *
-    */
-    class BSplineCommon : public FunctionInternal {
-      public:
+    /** \brief  Initialize */
+    void init(const Dict& opts) override;
 
-        BSplineCommon(const std::string &name, const std::vector<double>& knots,
-          const std::vector<int>& offset, const std::vector<int>& degree, int m);
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    size_t get_n_in() override { return 1; }
+    size_t get_n_out() override { return 1; }
+    ///@}
 
-        /** \brief  Initialize */
-        void init(const Dict& opts) override;
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
 
-        ///@{
-        /** \brief Number of function inputs and outputs */
-        size_t get_n_in() override { return 1; }
-        size_t get_n_out() override { return 1; }
-        ///@}
+    static void from_knots(const std::vector< std::vector<double> >& knots,
+      std::vector<int>& offset, std::vector<double>& stacked);
 
-        ///@{
-        /** \brief Options */
-        static Options options_;
-        const Options& get_options() const override { return options_;}
-        ///@}
+    std::vector<int> lookup_mode_;
+    std::vector<double> knots_;
+    std::vector<int> offset_;
+    std::vector<int> degree_;
+    std::vector<int> strides_;
 
-        static void from_knots(const std::vector< std::vector<double> >& knots,
-          std::vector<int>& offset, std::vector<double>& stacked);
+    std::vector<int> coeffs_dims_;
+    int coeffs_size_;
+    int m_;
+  };
 
-        std::vector<int> lookup_mode_;
-        std::vector<double> knots_;
-        std::vector<int> offset_;
-        std::vector<int> degree_;
-        std::vector<int> strides_;
+  class BSpline : public BSplineCommon {
+  public:
+    static Function create(const std::string &name,
+      const std::vector< std::vector<double> >& knots,
+      const std::vector<double>& coeffs, const std::vector<int>& degree, int m=1,
+      const Dict& opts=Dict());
 
-        std::vector<int> coeffs_dims_;
-        int coeffs_size_;
-        int m_;
-    };
+    BSpline(const std::string &name, const std::vector<double>& knots,
+      const std::vector<int>& offset, const std::vector<double>& coeffs,
+      const std::vector<int>& degree, int m);
 
-    class BSpline : public BSplineCommon {
-    public:
-      static Function create(const std::string &name,
-        const std::vector< std::vector<double> >& knots,
-        const std::vector<double>& coeffs, const std::vector<int>& degree, int m=1,
-        const Dict& opts=Dict());
+    /** \brief  Destructor */
+    ~BSpline() override {}
 
-      BSpline(const std::string &name, const std::vector<double>& knots,
-        const std::vector<int>& offset, const std::vector<double>& coeffs,
-        const std::vector<int>& degree, int m);
+    /// @{
+    /** \brief Sparsities of function inputs and outputs */
+    Sparsity get_sparsity_in(int i) override { return Sparsity::dense(offset_.size()-1); }
+    Sparsity get_sparsity_out(int i) override { return Sparsity::dense(m_, 1); }
+    /// @}
 
-      /** \brief  Destructor */
-      ~BSpline() override {}
+    /** \brief  Initialize */
+    void init(const Dict& opts) override;
 
-      /// @{
-      /** \brief Sparsities of function inputs and outputs */
-      Sparsity get_sparsity_in(int i) override { return Sparsity::dense(offset_.size()-1); }
-      Sparsity get_sparsity_out(int i) override { return Sparsity::dense(m_, 1); }
-      /// @}
+    /** \brief  Evaluate numerically, work vectors given */
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
-      /** \brief  Initialize */
-      void init(const Dict& opts) override;
+    ///@{
+    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
 
-      /** \brief  Evaluate numerically, work vectors given */
-      void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    ///@{
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    bool has_reverse(int nadj) const override { return true;}
+    Function get_reverse(int nadj, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
 
-      ///@{
-      /** \brief Generate a function that calculates \a nfwd forward derivatives */
-      Function get_forward(const std::string& name, int nfwd,
-                                   const std::vector<std::string>& i_names,
-                                   const std::vector<std::string>& o_names,
-                                   const Dict& opts) const override;
-      int get_n_forward() const override { return 64;}
-      ///@}
+    ///@{
+    /** \brief Return Jacobian of all input elements with respect to all output elements */
+    bool has_jacobian() const override { return true;}
+    Function get_jacobian(const std::string& name,
+                          const std::vector<std::string>& inames,
+                          const std::vector<std::string>& onames,
+                          const Dict& opts) const override;
+    ///@}
 
-      ///@{
-      /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-      Function get_reverse(const std::string& name, int nadj,
-                                   const std::vector<std::string>& i_names,
-                                   const std::vector<std::string>& o_names,
-                                   const Dict& opts) const override;
-      int get_n_reverse() const override { return 64;}
-      ///@}
+    /** \brief Is codegen supported? */
+    bool has_codegen() const override { return true;}
 
-      bool hasFullJacobian() const override { return true;}
-      Function getFullJacobian(const std::string& name,
-            const std::vector<std::string>& i_names,
-            const std::vector<std::string>& o_names, const Dict& opts) override;
+    /** \brief Generate code for the body of the C function */
+    void codegen_body(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g) const override {};
 
-      /** \brief  Print description */
-      void print(std::ostream &stream) const override { stream << "BSpline"; }
+    std::string class_name() const override { return "BSpline"; }
 
-      /** \brief Is codegen supported? */
-      bool has_codegen() const override { return true;}
+    std::vector<double> coeffs_;
 
-      /** \brief Generate code for the body of the C function */
-      void generateBody(CodeGenerator& g) const override;
-      void generateDeclarations(CodeGenerator& g) const override {};
-
-      std::string type_name() const override { return "BSpline"; }
-
-      std::vector<double> coeffs_;
-
-    private:
-      std::vector<double> derivative_coeff(int i) const;
-      MX jac(const MX& x) const;
-    };
-
-
-    class BSplineDual : public BSplineCommon {
-    public:
-      static Function create(const std::string &name,
-        const std::vector< std::vector<double> >& knots,
-        const std::vector<double>& x, const std::vector<int>& degree, int m=1, bool reverse=false,
-        const Dict& opts=Dict());
-
-      BSplineDual(const std::string &name, const std::vector<double>& knots,
-        const std::vector<int>& offset, const std::vector<double>& x,
-        const std::vector<int>& degree, int m, bool reverse);
-
-      /** \brief  Destructor */
-      ~BSplineDual() override {}
-
-      ///@{
-      /** \brief Number of function inputs and outputs */
-      size_t get_n_in() override { return 1; }
-      size_t get_n_out() override { return 1; }
-      ///@}
-
-      /// @{
-      /** \brief Sparsities of function inputs and outputs */
-      Sparsity get_sparsity_in(int i) override;
-      Sparsity get_sparsity_out(int i) override;
-      /// @}
-
-      /** \brief  Initialize */
-      void init(const Dict& opts) override;
-
-      /** \brief  Evaluate numerically, work vectors given */
-      void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
-
-      ///@{
-      /** \brief Generate a function that calculates \a nfwd forward derivatives */
-      Function get_forward(const std::string& name, int nfwd,
-                             const std::vector<std::string>& i_names,
-                             const std::vector<std::string>& o_names,
-                             const Dict& opts) const override;
-      int get_n_forward() const override { return 64;}
-      ///@}
-
-      ///@{
-      /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-      Function get_reverse(const std::string& name, int nadj,
-                                   const std::vector<std::string>& i_names,
-                                   const std::vector<std::string>& o_names,
-                                   const Dict& opts) const override;
-      int get_n_reverse() const override { return 64;}
-      ///@}
+  private:
+    std::vector<double> derivative_coeff(int i) const;
+    MX jac(const MX& x) const;
+  };
 
 
-      /** \brief  Propagate sparsity forward */
-      void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+  class BSplineDual : public BSplineCommon {
+  public:
+    static Function create(const std::string &name,
+      const std::vector< std::vector<double> >& knots,
+      const std::vector<double>& x, const std::vector<int>& degree, int m=1, bool reverse=false,
+      const Dict& opts=Dict());
 
-      /** \brief  Propagate sparsity backwards */
-      void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    BSplineDual(const std::string &name, const std::vector<double>& knots,
+      const std::vector<int>& offset, const std::vector<double>& x,
+      const std::vector<int>& degree, int m, bool reverse);
 
-      ///@{
-      /// Is the class able to propagate seeds through the algorithm?
-      bool has_spfwd() const override { return true;}
-      bool has_sprev() const override { return true;}
-      ///@}
+    /** \brief  Destructor */
+    ~BSplineDual() override {}
 
-      /** \brief  Print description */
-      void print(std::ostream &stream) const override { stream << "BSplineDual"; }
+    ///@{
+    /** \brief Number of function inputs and outputs */
+    size_t get_n_in() override { return 1; }
+    size_t get_n_out() override { return 1; }
+    ///@}
 
-      /** \brief Is codegen supported? */
-      bool has_codegen() const override { return true;}
+    /// @{
+    /** \brief Sparsities of function inputs and outputs */
+    Sparsity get_sparsity_in(int i) override;
+    Sparsity get_sparsity_out(int i) override;
+    /// @}
 
-      /** \brief Generate code for the body of the C function */
-      void generateBody(CodeGenerator& g) const override;
-      void generateDeclarations(CodeGenerator& g) const override {};
+    /** \brief  Initialize */
+    void init(const Dict& opts) override;
 
-      std::string type_name() const override { return "BSplineDual"; }
+    /** \brief  Evaluate numerically, work vectors given */
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
-      std::vector<double> x_;
-      bool reverse_;
-      int N_;
-    };
+    ///@{
+    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
 
+    ///@{
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    bool has_reverse(int nadj) const override { return true;}
+    Function get_reverse(int nadj, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
+
+
+    /** \brief  Propagate sparsity forward */
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
+
+    /** \brief  Propagate sparsity backwards */
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
+
+    ///@{
+    /// Is the class able to propagate seeds through the algorithm?
+    bool has_spfwd() const override { return true;}
+    bool has_sprev() const override { return true;}
+    ///@}
+
+    /** \brief Is codegen supported? */
+    bool has_codegen() const override { return true;}
+
+    /** \brief Generate code for the body of the C function */
+    void codegen_body(CodeGenerator& g) const override;
+    void codegen_declarations(CodeGenerator& g) const override {};
+
+    std::string class_name() const override { return "BSplineDual"; }
+
+    std::vector<double> x_;
+    bool reverse_;
+    int N_;
+  };
 
 } // namespace casadi
 

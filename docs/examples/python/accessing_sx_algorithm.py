@@ -48,20 +48,20 @@ output_val = [numpy.zeros(2)]
 f = Function("f", input_ex,output_ex)
 
 # Work vector
-work = numpy.zeros(f.getWorkSize())
+work = numpy.zeros(f.sz_w())
 
 # Loop over the algorithm
-for i in range(f.getAlgorithmSize()):
-  
+for i in range(f.n_instructions()):
+
   # Get the atomic operation
-  op = f.getAtomicOperation(i)
-  
+  op = f.instruction_id(i)
+
   if(op==OP_CONST):
-    work[f.getAtomicOutput(i)] = f.getAtomicInputReal(i)
-    print('work[', f.getAtomicOutput(i), '] = ', f.getAtomicInputReal(i))
+    work[f.instruction_output(i)] = f.instruction_constant(i)
+    print('work[', f.instruction_output(i), '] = ', f.instruction_constant(i))
   else:
-    i1 = f.getAtomicOutput(i)
-    i2,i3 = f.getAtomicInput(i)
+    i1 = f.instruction_output(i)
+    i2,i3 = f.instruction_input(i)
     if op==OP_INPUT:
       work[i1] = input_val[i2][i3]
       print('work[', i1, '] = input[', i2, '][', i3,  ']', '                ---> ' , work[i1])
@@ -81,4 +81,3 @@ print('------')
 print("Evaluated function: ")
 print(output_ex, ' = ', output_val)
 print('where ', input_ex, ' = ', input_val)
-      

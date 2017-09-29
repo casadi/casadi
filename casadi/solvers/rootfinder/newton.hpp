@@ -72,6 +72,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "newton";}
 
+    // Name of the class
+    std::string class_name() const override { return "Newton";}
+
     /** \brief  Create a new Rootfinder */
     static Rootfinder* creator(const std::string& name, const Function& f) {
       return new Newton(name, f);
@@ -87,13 +90,13 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new NewtonMemory();}
+    void* alloc_mem() const override { return new NewtonMemory();}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
 
     /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<NewtonMemory*>(mem);}
+    void free_mem(void *mem) const override { delete static_cast<NewtonMemory*>(mem);}
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,

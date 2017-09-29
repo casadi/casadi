@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   WorhpInterface::~WorhpInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options WorhpInterface::options_
@@ -83,6 +83,11 @@ namespace casadi {
     // Sort Worhp options
     int nopts = WorhpGetParamCount();
     for (auto&& op : worhp_opts) {
+      if (op.first.compare("qp")==0) {
+        qp_opts_ = op.second;
+        continue;
+      }
+
       // Get corresponding index using a linear search
       int ind;
       for (ind=1; ind<=nopts; ++ind) {
@@ -105,7 +110,7 @@ namespace casadi {
         int_opts_[op.first] = op.second;
         break;
       default:
-        casadi_error("Cannot handle WORHP option \"" + op.first + "\": Unknown type");
+        casadi_error("Cannot handle WORHP option \"" + op.first + "\": Unknown type " + str(WorhpGetParamType(ind)) + ".");
         break;
       }
     }
@@ -125,7 +130,7 @@ namespace casadi {
     alloc_w(nx_); // for fetching diagonal entries form Hessian
   }
 
-  void worhp_print(int mode, const char message[]) {
+  void worhp_disp(int mode, const char message[]) {
     if (mode & WORHP_PRINT_MESSAGE) {
       userOut() << message << std::endl;
     }
@@ -137,8 +142,8 @@ namespace casadi {
     }
   }
 
-  void WorhpInterface::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
+  int WorhpInterface::init_mem(void* mem) const {
+    if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<WorhpMemory*>(mem);
 
     SetWorhpPrint(&worhp_print);
@@ -164,9 +169,75 @@ namespace casadi {
       WorhpSetIntParam(&m->worhp_p, op.first.c_str(), op.second);
     }
 
+    // Pass qp parameters
+    for (auto&& op : qp_opts_) {
+      if (op.first=="ipBarrier") {
+        m->worhp_p.qp.ipBarrier = op.second;
+      } else if (op.first=="ipComTol") {
+        m->worhp_p.qp.ipComTol = op.second;
+      } else if (op.first=="ipFracBound") {
+        m->worhp_p.qp.ipFracBound = op.second;
+      } else if (op.first=="ipMinAlpha") {
+        m->worhp_p.qp.ipMinAlpha = op.second;
+      } else if (op.first=="ipRelaxDiv") {
+        m->worhp_p.qp.ipRelaxDiv = op.second;
+      } else if (op.first=="ipRelaxMax") {
+        m->worhp_p.qp.ipRelaxMax = op.second;
+      } else if (op.first=="ipRelaxMin") {
+        m->worhp_p.qp.ipRelaxMin = op.second;
+      } else if (op.first=="ipRelaxMult") {
+        m->worhp_p.qp.ipRelaxMult = op.second;
+      } else if (op.first=="ipResTol") {
+        m->worhp_p.qp.ipResTol = op.second;
+      } else if (op.first=="lsTol") {
+        m->worhp_p.qp.lsTol = op.second;
+      } else if (op.first=="nsnBeta") {
+        m->worhp_p.qp.nsnBeta = op.second;
+      } else if (op.first=="nsnKKT") {
+        m->worhp_p.qp.nsnKKT = op.second;
+      } else if (op.first=="nsnMinAlpha") {
+        m->worhp_p.qp.nsnMinAlpha = op.second;
+      } else if (op.first=="nsnSigma") {
+        m->worhp_p.qp.nsnSigma = op.second;
+      } else if (op.first=="ipLsMethod") {
+        m->worhp_p.qp.ipLsMethod = op.second;
+      } else if (op.first=="lsItMaxIter") {
+        m->worhp_p.qp.lsItMaxIter = op.second;
+      } else if (op.first=="lsItMethod") {
+        m->worhp_p.qp.lsItMethod = op.second;
+      } else if (op.first=="lsItPrecondMethod") {
+        m->worhp_p.qp.lsItPrecondMethod = op.second;
+      } else if (op.first=="lsRefineMaxIter") {
+        m->worhp_p.qp.lsRefineMaxIter = op.second;
+      } else if (op.first=="maxIter") {
+        m->worhp_p.qp.maxIter = op.second;
+      } else if (op.first=="method") {
+        m->worhp_p.qp.method = op.second;
+      } else if (op.first=="nsnLsMethod") {
+        m->worhp_p.qp.nsnLsMethod = op.second;
+      } else if (op.first=="printLevel") {
+        m->worhp_p.qp.printLevel = op.second;
+      } else if (op.first=="ipTryRelax") {
+        m->worhp_p.qp.ipTryRelax = op.second;
+      } else if (op.first=="lsScale") {
+        m->worhp_p.qp.lsScale = op.second;
+      } else if (op.first=="lsTrySimple") {
+        m->worhp_p.qp.lsTrySimple = op.second;
+      } else if (op.first=="nsnGradStep") {
+        m->worhp_p.qp.nsnGradStep = op.second;
+      } else if (op.first=="scaleIntern") {
+        m->worhp_p.qp.scaleIntern = op.second;
+      } else if (op.first=="strict") {
+        m->worhp_p.qp.strict = op.second;
+      } else {
+        casadi_error("No such Worhp option: qp." + op.first);
+      }
+    }
+
 
     // Mark the parameters as set
     m->worhp_p.initialised = true;
+    return 0;
   }
 
   void WorhpInterface::set_work(void* mem, const double**& arg, double**& res,
@@ -269,30 +340,7 @@ namespace casadi {
     for (auto&& s : m->fstats) s.second.reset();
 
     // Check the provided inputs
-    checkInputs(mem);
-
-    double inf = numeric_limits<double>::infinity();
-
-    if (m->lbx && m->ubx) {
-      for (int i=0; i<nx_;++i) {
-        casadi_assert_message(m->lbx[i]!=m->ubx[i],
-                              "WorhpInterface::evaluate: Worhp cannot handle the case when "
-                              "LBX == UBX."
-                              "You have that case at non-zero " << i << " , which has value " <<
-                              m->ubx[i] << ". Reformulate your problem by using a parameter "
-                              "for the corresponding variable.");
-      }
-    }
-
-    if (m->lbg && m->ubg) {
-      for (int i=0; i<ng_; ++i) {
-        casadi_assert_message(!(m->lbg[i]==-inf && m->ubg[i] == inf),
-                              "WorhpInterface::evaluate: Worhp cannot handle the case when both "
-                              "LBG and UBG are infinite."
-                              "You have that case at non-zero " << i << "."
-                              "Reformulate your problem eliminating the corresponding constraint.");
-      }
-    }
+    check_inputs(mem);
 
     m->fstats.at("mainloop").tic();
 
@@ -308,12 +356,13 @@ namespace casadi {
     }
 
     // Replace infinite bounds with m->worhp_p.Infty
+    double inf = numeric_limits<double>::infinity();
     for (int i=0; i<nx_; ++i) if (m->worhp_o.XL[i]==-inf) m->worhp_o.XL[i] = -m->worhp_p.Infty;
     for (int i=0; i<nx_; ++i) if (m->worhp_o.XU[i]== inf) m->worhp_o.XU[i] =  m->worhp_p.Infty;
     for (int i=0; i<ng_; ++i) if (m->worhp_o.GL[i]==-inf) m->worhp_o.GL[i] = -m->worhp_p.Infty;
     for (int i=0; i<ng_; ++i) if (m->worhp_o.GU[i]== inf) m->worhp_o.GU[i] =  m->worhp_p.Infty;
 
-    log("WorhpInterface::starting iteration");
+    if (verbose_) casadi_message("WorhpInterface::starting iteration");
 
     bool firstIteration = true;
 

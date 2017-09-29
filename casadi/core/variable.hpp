@@ -67,7 +67,8 @@ namespace casadi {
       \date 2012-2014
       \author Joel Andersson
    */
-  struct CASADI_EXPORT Variable : public PrintableObject<Variable> {
+  struct CASADI_EXPORT Variable :
+    public SWIG_IF_ELSE(PrintableCommon, Printable<Variable>) {
     /// Default constructor
     Variable() {}
 
@@ -128,11 +129,18 @@ namespace casadi {
     /// Free attribute
     bool free;
 
-    /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    /// Readable name of the class
+    std::string type_name() const {return "Variable";}
 
-    /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    /// Print a description of the object
+    void disp(std::ostream& stream, bool more=false) const;
+
+    /// Get string representation
+    std::string get_str(bool more=false) const {
+      std::stringstream ss;
+      disp(ss, more);
+      return ss.str();
+    }
   };
 } // namespace casadi
 

@@ -164,6 +164,6 @@ for Integrators in (ODE_integrators,DAE_integrators):
     # Adjoint over adjoint to get the second order sensitivities
     I_aoa = I_adj.factory('I_aoa', ['x0', 'z0', 'p', 'adj_qf', 'adj:adj_p'], ['adj:x0', 'adj:p'])
     res = I_aoa(x0=x0, p=u0, adj_qf=1, adj_adj_p=1)
-    adj_adj_x0 = res['adj_x0']
-    adj_adj_p = res['adj_x0']
-    print('%50s' % 'Adjoint over adjoint sensitivities:', 'd2(qf)/d(x0)d(p) = ', adj_adj_x0, ', d2(qf)/d(p)d(p) = ', adj_adj_p)
+    adj_x0 = res['adj_x0']
+    adj_p = res['adj_p']
+    print('%50s' % 'Adjoint over adjoint sensitivities:', 'd2(qf)/d(x0)d(p) = ', adj_x0, ', d2(qf)/d(p)d(p) = ', adj_p)

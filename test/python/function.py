@@ -86,7 +86,10 @@ class Functiontests(casadiTestCase):
 
     self.checkarray(sin(n1)+N1,out[0],"output")
     self.checkarray(sin(n2)+N2,out[1],"output")
-
+  def test_segfault(self):
+    f = Function()
+    with self.assertRaises(Exception):
+      f.stats()
   def test_issue304(self):
     self.message("regression test for #304") # this code used to segfault
     x = SX.sym("x")
@@ -592,39 +595,6 @@ class Functiontests(casadiTestCase):
             for f in [F,toSX_fun(F)]:
               self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
 
-  def test_issue1522(self):
-    V = MX.sym("X",2)
-    P = MX.sym("X",0)
-
-    x =  V[0]
-    y =  V[1]
-
-    obj = (x-(x+y))**2
-
-    nlp = Function("nlp", [V, P], [obj, MX()], ['x', 'p'], ['f', 'g'])
-
-    self.assertTrue(nlp.hessian_old(0,0).sparsity_out(0).is_symmetric())
-
-    V = MX.sym("X",6)
-
-    xs =      [ V[0:2], V[2:4] ]
-    travels = [ V[4],   V[5]   ]
-
-    dist = 0
-
-    for j in range(2):
-      dist+=sum1((xs[0]-(xs[j]+travels[j]))**2)
-
-    nlp = Function("nlp", [V, P], [-dist, MX()], ['x', 'p'], ['f', 'g'])
-
-    hs = []
-    for n in [nlp, nlp.expand('nlp_expanded')]:
-        H = n.reverse(1).jacobian_old(0,0,False,True)
-
-        h = H(der_x=1,adj_f=1)[H.name_out(0)]
-        hs.append(h)
-    self.checkarray(*hs)
-
   def test_repmatnode(self):
     x = MX.sym("x",2)
 
@@ -927,7 +897,7 @@ class Functiontests(casadiTestCase):
 
     X = MX.sym("x",2)
 
-    J = Function("F",[X],[jacobian(F(X),X)])
+    J = Function("J",[X],[jacobian(F(X),X)])
 
     jx0 = (12+11)/3.0
     jx1 = (-42-31)/3.0
@@ -1117,15 +1087,16 @@ class Functiontests(casadiTestCase):
           z2 = sin(z1)
           return [z2]
 
-        def get_n_forward(self): return 0
-        def get_n_reverse(self): return 0
+        def has_forward(self,nfwd): return False
+        def has_reverse(self,nadj): return False
 
         def has_jacobian(self): return True
 
-        def get_jacobian(self, name, opts):
+        def get_jacobian(self, name, inames, onames, opts):
           x = SX.sym("x")
           y = SX.sym("y")
-          J = Function(name, [x,y],[horzcat(cos(x+3*y),3*cos(x+3*y))], opts)
+          out_g = SX.sym('out_g', Sparsity(1,1))
+          J = Function(name, [x,y,out_g],[horzcat(cos(x+3*y),3*cos(x+3*y))], inames, onames, opts)
           return J
 
     f = Fun()
@@ -1179,6 +1150,7 @@ class Functiontests(casadiTestCase):
         def __init__(self):
           Callback.__init__(self)
           self.construct("Fun", {})
+
         def get_n_in(self): return 2
         def get_n_out(self): return 1
 
@@ -1191,13 +1163,12 @@ class Functiontests(casadiTestCase):
           z2 = sin(z1)
           return [z2]
 
-      f = Fun()
-      f.__disown__()
+      self.cb = Fun()
 
       if not indirect:
-        return f
+        return self.cb
 
-      f = Function("f", [x,y],[f(x,y)])
+      f = Function("f", [x,y],[self.cb(x,y)])
 
       return f
 
@@ -1250,7 +1221,7 @@ class Functiontests(casadiTestCase):
         f(2,3)
       except Exception as e:
         s = str(e)
-      self.assertTrue("Callback::eval" in s)
+      self.assertTrue("Expected 1 output" in s)
       s = ""
       class Fun(Callback):
         def __init__(self):
@@ -1266,7 +1237,7 @@ class Functiontests(casadiTestCase):
         f(2,3)
       except Exception as e:
         s = str(e)
-      self.assertTrue("Callback::eval" in s)
+      self.assertTrue("Shape mismatch" in s)
 
   def test_Callback_sens(self):
     x = MX.sym("x")
@@ -1296,8 +1267,8 @@ class Functiontests(casadiTestCase):
           return [z2]
 
         if has_fwd:
-          def get_n_forward(self): return 1
-          def get_forward(self,name,nfwd,inames,onames,opts):
+          def has_forward(self,nfwd): return nfwd==1
+          def get_forward(self,nfwd,name,inames,onames,opts):
             assert(nfwd==1)
             class ForwardFun(Callback):
               # sin(x+3*y)
@@ -1328,13 +1299,13 @@ class Functiontests(casadiTestCase):
                   ret.append(dz2)
 
                 return ret
-            ffun = ForwardFun()
-            ffun.__disown__()
-            return ffun
+
+            self.cb_fwd = ForwardFun()
+            return self.cb_fwd
 
         if has_adj:
-          def get_n_reverse(self): return 1
-          def get_reverse(self,name,nadj,inames,onames,opts):
+          def has_reverse(self,nadj): return nadj==1
+          def get_reverse(self,nadj,name,inames,onames,opts):
             assert(nadj==1)
             class BackwardFun(Callback):
               # sin(x+3*y)
@@ -1371,13 +1342,12 @@ class Functiontests(casadiTestCase):
                   ret.append(by)
                 return ret
 
-            bfun = BackwardFun()
-            bfun.__disown__()
-            return bfun
+            self.cb_rev = BackwardFun()
+            return self.cb_rev
 
       opts = {"verbose":True}
-      f = Fun(opts)
-      f.__disown__()
+      self.cb = Fun(opts)
+      f = self.cb
 
       if not indirect:
         return f

@@ -46,7 +46,7 @@ namespace casadi {
       std::string description;
 
       // Print entry
-      void print(const std::string& name, std::ostream &stream) const;
+      void disp(const std::string& name, std::ostream &stream) const;
     };
 
     // Lookup for options
@@ -65,7 +65,7 @@ namespace casadi {
     std::string info(const std::string& name) const;
 
     // Print all entries
-    void print(std::ostream &stream) const;
+    void disp(std::ostream& stream) const;
 
     /** \brief A distance metric between two words */
     static double word_distance(const std::string &a, const std::string &b);

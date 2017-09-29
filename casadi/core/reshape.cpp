@@ -32,32 +32,35 @@ namespace casadi {
 
   Reshape::Reshape(const MX& x, Sparsity sp) {
     casadi_assert(x.nnz()==sp.nnz());
-    setDependencies(x);
-    setSparsity(sp);
+    set_dep(x);
+    set_sparsity(sp);
   }
 
-  void Reshape::eval(const double** arg, double** res, int* iw, double* w, int mem) const {
-    evalGen<double>(arg, res, iw, w, mem);
+  int Reshape::eval(const double** arg, double** res, int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
   }
 
-  void Reshape::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
-    evalGen<SXElem>(arg, res, iw, w, mem);
+  int Reshape::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+    return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  void Reshape::evalGen(const T** arg, T** res, int* iw, T* w, int mem) const {
+  int Reshape::eval_gen(const T** arg, T** res, int* iw, T* w) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
+    return 0;
   }
 
-  void Reshape::sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    copyFwd(arg[0], res[0], nnz());
+  int Reshape::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+    copy_fwd(arg[0], res[0], nnz());
+    return 0;
   }
 
-  void Reshape::sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
-    copyAdj(arg[0], res[0], nnz());
+  int Reshape::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+    copy_rev(arg[0], res[0], nnz());
+    return 0;
   }
 
-  std::string Reshape::print(const std::vector<std::string>& arg) const {
+  std::string Reshape::disp(const std::vector<std::string>& arg) const {
     // For vectors, reshape is also a transpose
     if (dep().is_vector() && sparsity().is_vector()) {
       // Print as transpose: X'
@@ -76,36 +79,36 @@ namespace casadi {
     res[0] = reshape(arg[0], size());
   }
 
-  void Reshape::eval_forward(const std::vector<std::vector<MX> >& fseed,
+  void Reshape::ad_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) const {
     for (int d = 0; d<fsens.size(); ++d) {
       fsens[d][0] = reshape(fseed[d][0], size());
     }
   }
 
-  void Reshape::eval_reverse(const std::vector<std::vector<MX> >& aseed,
+  void Reshape::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
       asens[d][0] += reshape(aseed[d][0], dep().size());
     }
   }
 
-  void Reshape::generate(CodeGenerator& g, const std::string& mem,
+  void Reshape::generate(CodeGenerator& g,
                          const std::vector<int>& arg, const std::vector<int>& res) const {
     if (arg[0]==res[0]) return;
     g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << "\n";
   }
 
-  MX Reshape::getReshape(const Sparsity& sp) const {
+  MX Reshape::get_reshape(const Sparsity& sp) const {
     return reshape(dep(0), sp);
   }
 
-  MX Reshape::getTranspose() const {
+  MX Reshape::get_transpose() const {
     // For vectors, reshape is also a transpose
     if (dep().is_vector() && sparsity().is_vector()) {
       return dep();
     } else {
-      return MXNode::getTranspose();
+      return MXNode::get_transpose();
     }
   }
 

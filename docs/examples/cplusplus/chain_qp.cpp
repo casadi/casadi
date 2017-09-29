@@ -89,8 +89,8 @@ int main(){
     }
 
     // Create variables for the (y_i, z_i) coordinates
-    y_i = SX::sym("y_" + casadi::to_string(i));
-    z_i = SX::sym("z_" + casadi::to_string(i));
+    y_i = SX::sym("y_" + str(i));
+    z_i = SX::sym("z_" + str(i));
 
     // Add to the list of variables
     x.push_back(y_i);
@@ -158,10 +158,10 @@ int main(){
   file << "% Generated " __DATE__ " at " __TIME__ << endl;
   file << endl;
   file << "t = linspace(-2,2," << N << ");"<< endl;
-  file << "f_opt = " << double(f_opt) << ";" << endl;
-  file << "x_opt = " << vector<double>(x_opt) << ";" << endl;
-  file << "y_opt = " << vector<double>(y_opt) << ";" << endl;
-  file << "z_opt = " << vector<double>(z_opt) << ";" << endl;
+  file << "f_opt = " << f_opt << ";" << endl;
+  file << "x_opt = " << x_opt << ";" << endl;
+  file << "y_opt = " << y_opt << ";" << endl;
+  file << "z_opt = " << z_opt << ";" << endl;
 
   // Finalize the results file
   file << endl;

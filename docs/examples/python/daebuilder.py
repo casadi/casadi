@@ -21,21 +21,43 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
+# -*- coding: utf-8 -*-
 from casadi import *
 
-x = MX.sym("x",5)
-y = MX.sym("y")
-x2 = SX.sym("x",5)
-y2 = SX.sym("y")
+# Example on how to use the DaeBuilder class
+# Joel Andersson, UW Madison 2017
 
-fcn = Function('fcn', [x,y],[4*vertcat(*(x[2:5],x[0:2])) + y*x])
-js = IM.ones(fcn.sparsity_jac(0, 0))
-js.print_dense()
+# Start with an empty DaeBuilder instance
+dae = DaeBuilder()
 
-fcn2 = Function('fcn2', [x2,y2],[4*vertcat(*(x2[2:5],x2[0:2])) + y2*x2])
-js2 = IM.ones(fcn2.sparsity_jac(0, 0))
-js2.print_dense()
+# Add input expressions
+a = dae.add_p('a')
+b = dae.add_p('b')
+u = dae.add_u('u')
+h = dae.add_x('h')
+v = dae.add_x('v')
+m = dae.add_x('m')
 
-fcn3 = Function('fcn3', [x,y],[fcn2(x,y)])
-js3 = IM.ones(fcn3.sparsity_jac(0, 0))
-js3.print_dense()
+# Constants
+g = 9.81 # gravity
+
+# Add output expressions
+hdot = v
+vdot = (u-a*v**2)/m-g
+mdot = -b*u**2
+dae.add_ode('hdot', hdot)
+dae.add_ode('vdot', vdot)
+dae.add_ode('mdot', mdot)
+
+# Specify initial conditions
+dae.set_start('h', 0)
+dae.set_start('v', 0)
+dae.set_start('m', 1)
+
+# Add meta information
+dae.set_unit('h','m')
+dae.set_unit('v','m/s')
+dae.set_unit('m','kg')
+
+# Print DAE
+dae.disp(True)

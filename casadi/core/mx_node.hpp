@@ -36,42 +36,6 @@
 #include <stack>
 
 namespace casadi {
-  /// \cond INTERNAL
-  ///@{
-  /** \brief Convenience function, convert vectors to vectors of pointers */
-  template<class T>
-  std::vector<T*> ptrVec(std::vector<T>& v) {
-    std::vector<T*> ret(v.size());
-    for (int i=0; i<v.size(); ++i)
-      ret[i] = &v[i];
-    return ret;
-  }
-
-  template<class T>
-  const std::vector<T*> ptrVec(const std::vector<T>& v) {
-    std::vector<T*> ret(v.size());
-    for (int i=0; i<v.size(); ++i)
-      ret[i] = const_cast<T*>(&v[i]);
-    return ret;
-  }
-
-  template<class T>
-  std::vector<std::vector<T*> > ptrVec(std::vector<std::vector<T> >& v) {
-    std::vector<std::vector<T*> > ret(v.size());
-    for (int i=0; i<v.size(); ++i)
-      ret[i] = ptrVec(v[i]);
-    return ret;
-  }
-
-  template<class T>
-  const std::vector<std::vector<T*> > ptrVec(const std::vector<std::vector<T> >& v) {
-    std::vector<std::vector<T*> > ret(v.size());
-    for (int i=0; i<v.size(); ++i)
-      ret[i] = ptrVec(v[i]);
-    return ret;
-  }
-  ///@}
-
   /** \brief Node class for MX objects
       \author Joel Andersson
       \date 2010
@@ -101,22 +65,16 @@ namespace casadi {
     virtual bool is_minus_one() const { return false;}
 
     /** \brief Check if a certain value */
-    virtual bool isValue(double val) const { return false;}
+    virtual bool is_value(double val) const { return false;}
 
     /** \brief Check if identity matrix */
-    virtual bool is_identity() const { return false;}
+    virtual bool is_eye() const { return false;}
 
     /** \brief Check if unary operation */
-    virtual bool is_unaryOp() const { return false;}
+    virtual bool is_unary() const { return false;}
 
     /** \brief Check if binary operation */
-    virtual bool is_binaryOp() const { return false;}
-
-    /** \brief  Print a representation */
-    void repr(std::ostream &stream) const override;
-
-    /** \brief  Print a description */
-    void print(std::ostream &stream) const override;
+    virtual bool is_binary() const { return false;}
 
     /** \brief Find out which nodes can be inlined */
     void can_inline(std::map<const MXNode*, int>& nodeind) const;
@@ -126,10 +84,10 @@ namespace casadi {
                              std::vector<std::string>& intermed) const;
 
     /** \brief  Print expression */
-    virtual std::string print(const std::vector<std::string>& arg) const = 0;
+    virtual std::string disp(const std::vector<std::string>& arg) const = 0;
 
     /** \brief Add a dependent function */
-    virtual void addDependency(CodeGenerator& g) const {}
+    virtual void add_dependency(CodeGenerator& g) const {}
 
     /** \brief Is reference counting needed in codegen? */
     virtual bool has_refcount() const { return false;}
@@ -141,37 +99,40 @@ namespace casadi {
     virtual void codegen_decref(CodeGenerator& g, std::set<void*>& added) const {}
 
     /** \brief Generate code for the operation */
-    virtual void generate(CodeGenerator& g, const std::string& mem,
+    virtual void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const;
 
     /** \brief  Evaluate numerically */
-    virtual void eval(const double** arg, double** res, int* iw, double* w, int mem) const;
+    virtual int eval(const double** arg, double** res, int* iw, double* w) const;
 
     /** \brief  Evaluate symbolically (SX) */
-    virtual void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const;
+    virtual int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const;
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
 
     /** \brief Calculate forward mode directional derivatives */
-    virtual void eval_forward(const std::vector<std::vector<MX> >& fseed,
+    virtual void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const;
 
     /** \brief Calculate reverse mode directional derivatives */
-    virtual void eval_reverse(const std::vector<std::vector<MX> >& aseed,
+    virtual void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const;
 
     /** \brief  Propagate sparsity forward */
-    virtual void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    virtual int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const;
 
     /** \brief  Propagate sparsity backwards */
-    virtual void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const;
+    virtual int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const;
 
     /** \brief  Get the name */
     virtual const std::string& name() const;
 
-    /** \brief Get type name */
-    virtual std::string type_name() const;
+    /** \brief Get name of public class */
+    virtual std::string class_name() const override;
+
+    /** \brief  Print a description */
+    void disp(std::ostream& stream, bool more) const override;
 
     /** \brief  Check if valid function input */
     virtual bool is_valid_input() const { return false;}
@@ -195,22 +156,16 @@ namespace casadi {
     virtual void reset_input() const;
 
     /** \brief  Check if evaluation output */
-    virtual bool isOutputNode() const {return false;}
+    virtual bool is_output() const {return false;}
 
     /** \brief  Check if a multiple output node */
-    virtual bool isMultipleOutput() const {return false;}
-
-    /** \brief  Number of functions */
-    virtual int numFunctions() const {return 0;}
-
-    /** \brief  Get function reference */
-    virtual const Function& getFunction(int i) const;
-
-    /** \brief  Get function input */
-    virtual int getFunction_input() const;
+    virtual bool has_output() const {return false;}
 
     /** \brief  Get function output */
-    virtual int getFunctionOutput() const;
+    virtual int which_output() const;
+
+    /** \brief  Get called function */
+    virtual const Function& which_function() const;
 
     /** \brief Get the operation */
     virtual int op() const = 0;
@@ -230,16 +185,13 @@ namespace casadi {
     const MX& dep(int ind=0) const { return dep_.at(ind);}
 
     /** \brief  Number of dependencies */
-    int ndep() const;
-
-    /** \brief  Does the node depend on other nodes*/
-    virtual bool hasDep() const {return ndep()>0; }
+    int n_dep() const;
 
     /** \brief  Number of outputs */
     virtual int nout() const { return 1;}
 
     /** \brief  Get an output */
-    virtual MX getOutput(int oind) const;
+    virtual MX get_output(int oind) const;
 
     /// Get the sparsity
     const Sparsity& sparsity() const { return sparsity_;}
@@ -254,14 +206,20 @@ namespace casadi {
     int size2() const { return sparsity().size2(); }
     std::pair<int, int> size() const { return sparsity().size();}
 
-    /** \brief Is the node nonlinear */
-    virtual bool isNonLinear() {return false;}
+    // Get IO index
+    virtual int ind() const;
+
+    // Get IO segment
+    virtual int segment() const;
+
+    // Get IO offset
+    virtual int offset() const;
 
     /// Set the sparsity
-    void setSparsity(const Sparsity& sparsity);
+    void set_sparsity(const Sparsity& sparsity);
 
     /** \brief Get required length of arg field */
-    virtual size_t sz_arg() const { return ndep();}
+    virtual size_t sz_arg() const { return n_dep();}
 
     /** \brief Get required length of res field */
     virtual size_t sz_res() const { return nout();}
@@ -273,29 +231,19 @@ namespace casadi {
     virtual size_t sz_w() const { return 0;}
 
     /// Set unary dependency
-    void setDependencies(const MX& dep);
+    void set_dep(const MX& dep);
 
     /// Set binary dependencies
-    void setDependencies(const MX& dep1, const MX& dep2);
+    void set_dep(const MX& dep1, const MX& dep2);
 
     /// Set ternary dependencies
-    void setDependencies(const MX& dep1, const MX& dep2, const MX& dep3);
+    void set_dep(const MX& dep1, const MX& dep2, const MX& dep3);
 
     /// Set multiple dependencies
-    void setDependencies(const std::vector<MX>& dep);
-
-    /// Add a dependency
-    int addDependency(const MX& dep);
-
-    /// Assign nonzeros (mapping matrix)
-    virtual void assign(const MX& d, const std::vector<int>& inz,
-                        const std::vector<int>& onz, bool add=false);
-
-    /// Assign nonzeros (mapping matrix), output indices sequential
-    virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);
+    void set_dep(const std::vector<MX>& dep);
 
     /// Convert scalar to matrix
-    inline static MX toMatrix(const MX& x, const Sparsity& sp) {
+    inline static MX to_matrix(const MX& x, const Sparsity& sp) {
       if (x.size()==sp.size()) {
         return x;
       } else {
@@ -307,34 +255,31 @@ namespace casadi {
     virtual double to_double() const;
 
     /// Get the value (only for constant nodes)
-    virtual Matrix<double> getMatrixValue() const;
+    virtual DM get_DM() const;
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual int numInplace() const { return 0;}
-
-    /// Simplify the expression (ex is a reference to the node)
-    virtual void simplifyMe(MX& ex) {}
+    virtual int n_inplace() const { return 0;}
 
     /// Get an IM representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
 
     /// Create a horizontal concatenation node
-    virtual MX getHorzcat(const std::vector<MX>& x) const;
+    virtual MX get_horzcat(const std::vector<MX>& x) const;
 
     /// Create a horizontal split node
-    virtual std::vector<MX> getHorzsplit(const std::vector<int>& output_offset) const;
+    virtual std::vector<MX> get_horzsplit(const std::vector<int>& output_offset) const;
 
     /// Create a repeated matrix node
-    virtual MX getRepmat(int m, int n) const;
+    virtual MX get_repmat(int m, int n) const;
 
     /// Create a repeated sum node
-    virtual MX getRepsum(int m, int n) const;
+    virtual MX get_repsum(int m, int n) const;
 
     /// Create a vertical concatenation node (vectors only)
-    virtual MX getVertcat(const std::vector<MX>& x) const;
+    virtual MX get_vertcat(const std::vector<MX>& x) const;
 
     /// Create a vertical split node (vectors only)
-    virtual std::vector<MX> getVertsplit(const std::vector<int>& output_offset) const;
+    virtual std::vector<MX> get_vertsplit(const std::vector<int>& output_offset) const;
 
     /// Create a diagonal concatenation node
     virtual MX get_diagcat(const std::vector<MX>& x) const;
@@ -344,90 +289,90 @@ namespace casadi {
                                          const std::vector<int>& offset2) const;
 
     /// Transpose
-    virtual MX getTranspose() const;
+    virtual MX get_transpose() const;
 
     /// Reshape
-    virtual MX getReshape(const Sparsity& sp) const;
+    virtual MX get_reshape(const Sparsity& sp) const;
 
     /** \brief Matrix multiplication and addition */
-    virtual MX getMultiplication(const MX& y, const MX& z) const;
+    virtual MX get_mac(const MX& y, const MX& z) const;
 
     /** \brief Einstein product and addition */
-    virtual MX getEinstein(const MX& A, const MX& B,
+    virtual MX get_einstein(const MX& A, const MX& B,
       const std::vector<int>& dim_c, const std::vector<int>& dim_a, const std::vector<int>& dim_b,
       const std::vector<int>& c, const std::vector<int>& a, const std::vector<int>& b) const;
 
     /** \brief Bilinear form */
-    virtual MX getBilin(const MX& x, const MX& y) const;
+    virtual MX get_bilin(const MX& x, const MX& y) const;
 
     /** \brief Bilinear form */
-    virtual MX getRank1(const MX& alpha, const MX& x, const MX& y) const;
+    virtual MX get_rank1(const MX& alpha, const MX& x, const MX& y) const;
 
     /** \brief Solve a system of linear equations
     *
     *      For system Ax = b:
     *
-    *      A->getSolve(b)
+    *      A->get_solve(b)
     *
     */
-    virtual MX getSolve(const MX& r, bool tr, const Linsol& linear_solver) const;
+    virtual MX get_solve(const MX& r, bool tr, const Linsol& linear_solver) const;
 
     /// Get the nonzeros of matrix
-    virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
+    virtual MX get_nzref(const Sparsity& sp, const std::vector<int>& nz) const;
 
     /// Assign the nonzeros of a matrix to another matrix
-    virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
+    virtual MX get_nzassign(const MX& y, const std::vector<int>& nz) const;
 
     /// Add the nonzeros of a matrix to another matrix
-    virtual MX getAddNonzeros(const MX& y, const std::vector<int>& nz) const;
+    virtual MX get_nzadd(const MX& y, const std::vector<int>& nz) const;
 
     /// Get submatrix reference
-    virtual MX getRef(const Slice& i, const Slice& j) const;
+    virtual MX get_subref(const Slice& i, const Slice& j) const;
 
     /// Get submatrix assignment
-    virtual MX getAssign(const MX& y, const Slice& i, const Slice& j) const;
+    virtual MX get_subassign(const MX& y, const Slice& i, const Slice& j) const;
 
     /// Create set sparse
-    virtual MX getProject(const Sparsity& sp) const;
+    virtual MX get_project(const Sparsity& sp) const;
 
     /// Get a unary operation
-    virtual MX getUnary(int op) const;
+    virtual MX get_unary(int op) const;
 
     /// Get a binary operation operation
-    MX getBinarySwitch(int op, const MX& y) const;
+    MX get_binary(int op, const MX& y) const;
 
     /// Get a binary operation operation (matrix-matrix)
-    virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
+    virtual MX _get_binary(int op, const MX& y, bool scX, bool scY) const;
 
     /// Determinant
-    virtual MX getDeterminant() const;
+    virtual MX get_det() const;
 
     /// Inverse
-    virtual MX getInverse() const;
+    virtual MX get_inv() const;
 
     /// Inner product
-    virtual MX getDot(const MX& y) const;
+    virtual MX get_dot(const MX& y) const;
 
     /// Frobenius norm
-    virtual MX getNormF() const;
+    virtual MX get_norm_fro() const;
 
     /// Spectral norm
-    virtual MX getNorm2() const;
+    virtual MX get_norm_2() const;
 
     /// Infinity norm
-    virtual MX getNormInf() const;
+    virtual MX get_norm_inf() const;
 
     /// 1-norm
-    virtual MX getNorm1() const;
+    virtual MX get_norm_1() const;
 
     /// Assertion
-    MX getAssertion(const MX& y, const std::string& fail_message) const;
+    MX get_assert(const MX& y, const std::string& fail_message) const;
 
     /// Monitor
-    MX getMonitor(const std::string& comment) const;
+    MX get_monitor(const std::string& comment) const;
 
     /// Find
-    MX getFind() const;
+    MX get_find() const;
 
     /** Temporary variables to be used in user algorithms like sorting,
         the user is responsible of making sure that use is thread-safe
@@ -442,10 +387,10 @@ namespace casadi {
     Sparsity sparsity_;
 
     /** \brief Propagate sparsities forward through a copy operation */
-    static void copyFwd(const bvec_t* arg, bvec_t* res, int len);
+    static void copy_fwd(const bvec_t* arg, bvec_t* res, int len);
 
     /** \brief Propagate sparsities backwards through a copy operation */
-    static void copyAdj(bvec_t* arg, bvec_t* res, int len);
+    static void copy_rev(bvec_t* arg, bvec_t* res, int len);
   };
 
   /// \endcond

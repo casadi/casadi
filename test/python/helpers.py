@@ -158,7 +158,7 @@ class casadiTestCase(unittest.TestCase):
     except Exception as err:
       e = str(err)
     self.assertFalse(e is None)
-    self.assertTrue(s in e)
+    self.assertTrue(s in e,msg=e + "<->" + s)
 
   def tearDown(self):
     t = time.time() - self.startTime

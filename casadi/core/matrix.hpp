@@ -26,15 +26,17 @@
 #ifndef CASADI_MATRIX_HPP
 #define CASADI_MATRIX_HPP
 
-#include <vector>
-#include <typeinfo>
 #include "exception.hpp"
-#include "printable_object.hpp"
 #include "casadi_limits.hpp"
 #include "std_vector_tools.hpp"
 #include "runtime/casadi_runtime.hpp"
 #include "generic_matrix.hpp"
 #include "generic_expression.hpp"
+#include "printable.hpp"
+
+#include <vector>
+#include <typeinfo>
+#include <random>
 
 namespace casadi {
 
@@ -79,9 +81,9 @@ namespace casadi {
   template<typename Scalar>
   class CASADI_EXPORT Matrix :
     public MatrixCommon,
-    public GenericExpression<Matrix<Scalar> >,
+    public SWIG_IF_ELSE(GenericExpressionCommon, GenericExpression<Matrix<Scalar> >),
     public GenericMatrix<Matrix<Scalar> >,
-    public PrintableObject<Matrix<Scalar> > {
+    public SWIG_IF_ELSE(PrintableCommon, Printable<Matrix<Scalar> >) {
   public:
 
     /** \brief  constructors */
@@ -266,6 +268,8 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericExpression
     static bool is_equal(const Matrix<Scalar> &x, const Matrix<Scalar> &y, int depth=0);
+    static Matrix<Scalar> mmin(const Matrix<Scalar> &x);
+    static Matrix<Scalar> mmax(const Matrix<Scalar> &x);
     ///@}
 
     ///@{
@@ -273,8 +277,6 @@ namespace casadi {
     static Matrix<Scalar> simplify(const Matrix<Scalar> &x);
     static Matrix<Scalar> jacobian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
                                    const Dict& opts = Dict());
-    static Matrix<Scalar> gradient(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
-    static Matrix<Scalar> tangent(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
     static Matrix<Scalar> hessian(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
     static Matrix<Scalar> hessian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
                                     Matrix<Scalar>& g);
@@ -298,6 +300,10 @@ namespace casadi {
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b);
     static Matrix<Scalar> solve(const Matrix<Scalar> &A, const Matrix<Scalar>& b,
                                   const std::string& lsolver, const Dict& opts);
+    static Matrix<Scalar> inv(const Matrix<Scalar> &A);
+    static Matrix<Scalar> inv(const Matrix<Scalar> &A,
+                                  const std::string& lsolver, const Dict& opts);
+
     static int n_nodes(const Matrix<Scalar> &x);
     static std::string print_operator(const Matrix<Scalar> &x,
                                       const std::vector<std::string>& args);
@@ -322,12 +328,11 @@ namespace casadi {
                                         const Matrix<Scalar> &x_default,
                                         bool short_circuit=false);
     static bool depends_on(const Matrix<Scalar> &x, const Matrix<Scalar> &arg);
-    static Matrix<Scalar> mpower(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mrdivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mldivide(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static std::vector<Matrix<Scalar> > symvar(const Matrix<Scalar> &x);
     static Matrix<Scalar> det(const Matrix<Scalar> &x);
-    static Matrix<Scalar> inv(const Matrix<Scalar> &x);
+    static Matrix<Scalar> inv_minor(const Matrix<Scalar> &x);
     static Matrix<Scalar> trace(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_1(const Matrix<Scalar> &x);
     static Matrix<Scalar> norm_2(const Matrix<Scalar> &x);
@@ -425,7 +430,7 @@ namespace casadi {
     static Matrix<Scalar> all(const Matrix<Scalar>& x);
     static Matrix<Scalar> any(const Matrix<Scalar>& x);
     static Matrix<Scalar> adj(const Matrix<Scalar>& x);
-    static Matrix<Scalar> getMinor(const Matrix<Scalar>& x, int i, int j);
+    static Matrix<Scalar> minor(const Matrix<Scalar>& x, int i, int j);
     static Matrix<Scalar> cofactor(const Matrix<Scalar>& A, int i, int j);
     static Matrix<Scalar> chol(const Matrix<Scalar>& A);
     static Matrix<Scalar> norm_inf_mul(const Matrix<Scalar>& x, const Matrix<Scalar> &y);
@@ -452,8 +457,8 @@ namespace casadi {
 
     /** \brief Get the (i,j) minor matrix
      */
-    friend inline Matrix<Scalar> getMinor(const Matrix<Scalar> &x, int i, int j) {
-      return Matrix<Scalar>::getMinor(x, i, j);
+    friend inline Matrix<Scalar> minor(const Matrix<Scalar> &x, int i, int j) {
+      return Matrix<Scalar>::minor(x, i, j);
     }
 
     /** \brief Get the (i,j) cofactor matrix
@@ -726,18 +731,6 @@ namespace casadi {
     /** \brief Get the depth to which equalities are being checked for simplifications */
     static int get_max_depth();
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Renamed set_max_depth */
-    static void setEqualityCheckingDepth(int eq_depth=1) {
-      set_max_depth(eq_depth);
-    }
-
-    /** \brief [DEPRECATED] Renamed get_max_depth */
-    static int getEqualityCheckingDepth() {
-      return get_max_depth();
-    }
-#endif // WITH_DEPRECATED_FEATURES
-
     /** \brief Get function input */
     static std::vector<Matrix<Scalar> > get_input(const Function& f);
 
@@ -747,27 +740,31 @@ namespace casadi {
     /// Get name of the class
     static std::string type_name();
 
-    /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
-
     /// Get strings corresponding to the nonzeros and the interdependencies
     void print_split(std::vector<std::string>& SWIG_OUTPUT(nz),
                     std::vector<std::string>& SWIG_OUTPUT(inter)) const;
 
     /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void disp(std::ostream& stream, bool more=false) const;
+
+    /// Get string representation
+    std::string get_str(bool more=false) const {
+      std::stringstream ss;
+      disp(ss, more);
+      return ss.str();
+    }
 
     /// Print scalar
-    void print_scalar(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_scalar(std::ostream &stream) const;
 
     /// Print vector-style
-    void print_vector(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_vector(std::ostream &stream, bool truncate=true) const;
 
     /// Print dense matrix-stype
-    void print_dense(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_dense(std::ostream &stream, bool truncate=true) const;
 
     /// Print sparse matrix style
-    void print_sparse(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void print_sparse(std::ostream &stream, bool truncate=true) const;
 
     void clear();
     void resize(int nrow, int ncol);
@@ -881,7 +878,7 @@ namespace casadi {
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
         If there are symbolic primitives appearing more than once, the function will return
-        true and the names of the duplicate expressions will be printed to userOut<true, PL_WARN>().
+        true and the names of the duplicate expressions will be passed to casadi_warning.
         Note: Will mark the node using SXElem::set_temp.
         Make sure to call reset_input() after usage.
     */
@@ -909,13 +906,16 @@ namespace casadi {
 
     /** \brief  check if the matrix is an identity matrix (note that false negative answers
      * are possible)*/
-    bool is_identity() const;
+    bool is_eye() const;
 
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool has_zeros() const;
 
     /** \brief Get all nonzeros */
     std::vector<Scalar> get_nonzeros() const { return nonzeros_;}
+
+    /** \brief Get all elements */
+    std::vector<Scalar> get_elements() const { return static_cast< std::vector<Scalar> >(*this);}
 
 #ifndef SWIG
     /** \brief Get all nonzeros */
@@ -956,6 +956,20 @@ namespace casadi {
     static void set_scientific(bool scientific);
     // @}
 
+    /// Seed the random number generator
+    static void rng(int seed);
+
+    ///@{
+    /** \brief Create a matrix with uniformly distributed random numbers */
+    static Matrix<Scalar> rand(int nrow=1, int ncol=1) { // NOLINT(runtime/threadsafe_fn)
+      return rand(Sparsity::dense(nrow, ncol)); // NOLINT(runtime/threadsafe_fn)
+    }
+    static Matrix<Scalar> rand(const Sparsity& sp); // NOLINT(runtime/threadsafe_fn)
+    static Matrix<Scalar> rand(const std::pair<int, int>& rc) { // NOLINT(runtime/threadsafe_fn)
+      return rand(rc.first, rc.second); // NOLINT(runtime/threadsafe_fn)
+    }
+    ///@}
+
 #ifndef SWIG
     /// Sparse matrix with a given sparsity with all values same
     Matrix(const Sparsity& sp, const Scalar& val, bool dummy);
@@ -978,6 +992,10 @@ namespace casadi {
     static int stream_precision_;
     static int stream_width_;
     static bool stream_scientific_;
+
+    /// Random number generator
+    static std::default_random_engine rng_;
+
 #endif // SWIG
   };
 

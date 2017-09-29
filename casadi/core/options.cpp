@@ -47,7 +47,7 @@ namespace casadi {
     }
   }
 
-  void Options::Entry::print(const std::string& name, std::ostream &stream) const {
+  void Options::Entry::disp(const std::string& name, std::ostream &stream) const {
     stream << "> \"" << name << "\"          ["
            << GenericType::get_type_description(this->type)
            << "] ";
@@ -56,15 +56,15 @@ namespace casadi {
     stream << "     \"" << this->description << "\""<< std::endl;
   }
 
-  void Options::print(std::ostream &stream) const {
+  void Options::disp(std::ostream& stream) const {
     // Print bases
     for (auto&& b : bases) {
-      b->print(stream);
+      b->disp(stream);
     }
 
     // Print all entries
     for (auto&& e : entries) {
-      e.second.print(e.first, stream);
+      e.second.disp(e.first, stream);
     }
   }
 
@@ -258,14 +258,14 @@ namespace casadi {
 
   void Options::print_all(std::ostream &stream) const {
     stream << "\"Option name\" [type] = value" << endl;
-    print(stream);
+    disp(stream);
     stream << endl;
   }
 
   void Options::print_one(const std::string &name, std::ostream &stream) const {
     const Options::Entry* entry = find(name);
     if (entry!=0) {
-      entry->print(name, stream);
+      entry->disp(name, stream);
     } else {
       stream << "  \"" << name << "\" does not exist.";
     }

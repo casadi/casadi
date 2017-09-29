@@ -1,60 +1,30 @@
-%exception  casadi::Function::gradient(const std::string &iind, const std::string &oind) {
+%exception  casadi::Function::fullJacobian() const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
-%exception  casadi::Function::gradient(const std::string &iind, int oind=0) {
+%exception  casadi::Function::getAlgorithmSize() const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
-%exception  casadi::Function::gradient(int iind, const std::string &oind) {
+%exception  casadi::Function::getAtomicInput(int k) const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
-%exception  casadi::Function::gradient(int iind=0, int oind=0) {
+%exception  casadi::Function::getAtomicInputReal(int k) const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
-%exception  casadi::Function::hessian(const std::string &iind, const std::string &oind) {
+%exception  casadi::Function::getAtomicOperation(int k) const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
-%exception  casadi::Function::hessian(const std::string &iind, int oind=0) {
+%exception  casadi::Function::getAtomicOutput(int k) const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
-%exception  casadi::Function::hessian(int iind, const std::string &oind) {
+%exception  casadi::Function::getWorkSize() const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
-%exception  casadi::Function::hessian(int iind=0, int oind=0) {
+%exception  casadi::Function::print_free(std::ostream &stream=casadi::userOut()) const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
-%exception  casadi::Function::jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false) {
+%exception  casadi::Function::spCanEvaluate(bool fwd) const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
-%exception  casadi::Function::rootfinder_fun() const  {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
-%exception  casadi::Function::setFullJacobian(const Function &jac) {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
-%exception  casadi::Function::setJacobian(const Function &jac, int iind=0, int oind=0, bool compact=false) {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
-%exception  casadi::Function::set_jac_sparsity(const Sparsity &sp, const std::string &iind, const std::string &oind, bool compact=false) {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
-%exception  casadi::Function::set_jac_sparsity(const Sparsity &sp, const std::string &iind, int oind, bool compact=false) {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
-%exception  casadi::Function::set_jac_sparsity(const Sparsity &sp, int iind, const std::string &oind, bool compact=false) {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
-%exception  casadi::Function::set_jac_sparsity(const Sparsity &sp, int iind, int oind, bool compact=false) {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
-%exception  casadi::Function::tangent(const std::string &iind, const std::string &oind) {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
-%exception  casadi::Function::tangent(const std::string &iind, int oind=0) {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
-%exception  casadi::Function::tangent(int iind, const std::string &oind) {
- CATCH_OR_NOT(DEPRECATED_MSG("") $action)
-}
-%exception  casadi::Function::tangent(int iind=0, int oind=0) {
+%exception  casadi::Sparsity::print_compact(std::ostream &stream=casadi::userOut()) const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }

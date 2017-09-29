@@ -39,7 +39,7 @@ print(z0)
 
 #! For some mysterious reason we get NaN here
 
-#! Next, we add an assertion: 
+#! Next, we add an assertion:
 y = y.attachAssert(y>0, "bummer") # Add assertion here
 z = sqrt(y)
 

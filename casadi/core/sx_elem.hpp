@@ -27,7 +27,7 @@
 #define CASADI_SX_ELEMENT_HPP
 
 // exception class
-#include "printable_object.hpp"
+#include "printable.hpp"
 #include "exception.hpp"
 #include "casadi_limits.hpp"
 #include "matrix.hpp"
@@ -56,7 +56,7 @@ namespace casadi {
       \date 2010-2014
   */
   class CASADI_EXPORT SXElem : public GenericExpression<SXElem>,
-                               public PrintableObject<SXElem> {
+                               public Printable<SXElem> {
     friend class SXNode;
     friend class BinarySXNode;
     friend class Matrix<SXElem>;
@@ -77,7 +77,7 @@ namespace casadi {
     /** \brief Create a symbolic primitive
          \param name Name of the symbolic primitive
 
-        This is the name that will be used by the "operator<<" and "to_string" methods.
+        This is the name that will be used by the "operator<<" and "str" methods.
         The name is not used as identifier; you may construct distinct
         SXElem objects with non-unique names.
     */
@@ -107,11 +107,11 @@ namespace casadi {
     /// Convert to a 1-by-1 Matrix
     operator Matrix<SXElem>() const;
 
-    /// Print a representation of the object
-    void repr(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    /// Type name
+    static std::string type_name() {return "SXElem";}
 
     /// Print a description of the object
-    void print(std::ostream &stream=casadi::userOut(), bool trailing_newline=true) const;
+    void disp(std::ostream& stream, bool more=false) const;
 
     /// \cond INTERNAL
     /** \brief  Get a pointer to the node */
@@ -140,16 +140,15 @@ namespace casadi {
     bool is_constant() const;
     bool is_integer() const;
     bool is_symbolic() const;
-    bool hasDep() const;
     /** \brief Check whether a binary SXElem is commutative*/
     bool is_commutative() const;
     bool is_zero() const;
-    bool isAlmostZero(double tol) const;
+    bool is_almost_zero(double tol) const;
     bool is_one() const;
     bool is_minus_one() const;
-    bool isNan() const;
-    bool isInf() const;
-    bool isMinusInf() const;
+    bool is_nan() const;
+    bool is_inf() const;
+    bool is_minus_inf() const;
     const std::string& name() const;
     int op() const;
     bool is_op(int op) const;
@@ -158,7 +157,7 @@ namespace casadi {
     bool is_regular() const;
 
     /** \brief Check if a value is always nonnegative (false negatives are allowed) */
-    bool isNonNegative() const;
+    bool is_nonnegative() const;
     SXElem dep(int ch=0) const;
 
     /// Type conversion to double
@@ -232,14 +231,14 @@ namespace casadi {
   public:
     static bool is_zero(const SXElem& val);
     static bool is_equal(const SXElem& x, const SXElem& y, int depth);
-    static bool isAlmostZero(const SXElem& val, double tol);
+    static bool is_almost_zero(const SXElem& val, double tol);
     static bool is_one(const SXElem& val);
     static bool is_minus_one(const SXElem& val);
     static bool is_constant(const SXElem& val);
     static bool is_integer(const SXElem& val);
-    static bool isInf(const SXElem& val);
-    static bool isMinusInf(const SXElem& val);
-    static bool isNaN(const SXElem& val);
+    static bool is_inf(const SXElem& val);
+    static bool is_minus_inf(const SXElem& val);
+    static bool is_nan(const SXElem& val);
 
     static const SXElem zero;
     static const SXElem one;

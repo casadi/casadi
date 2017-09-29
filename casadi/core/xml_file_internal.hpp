@@ -42,11 +42,8 @@ namespace casadi {
     // Destructor
     ~XmlFileInternal() override;
 
-    /** \brief  Print */
-    void print(std::ostream &stream) const override;
-
-    /** \brief  Print representation */
-    void repr(std::ostream &stream) const override;
+    /** \brief  Print a description */
+    void disp(std::ostream& stream, bool more=false) const override;
 
     // Parse an XML file
     virtual XmlNode parse(const std::string& filename);

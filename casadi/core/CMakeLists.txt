@@ -14,7 +14,7 @@ set(CASADI_PUBLIC
   calculus.hpp
   global_options.hpp
   casadi_meta.hpp
-  printable_object.hpp        # Interface class enabling printing a Python-style "description" as well as a shorter "representation" of a class
+  printable.hpp               # Interface class for printing to screen
   shared_object.hpp           # This base class implements the reference counting (garbage collection) framework used in CasADi
   generic_type.hpp            # Generic type used for options and for compatibility with dynamically typed languages like Python
   options.hpp                 # Functionality for passing options to a class
@@ -43,7 +43,6 @@ set(CASADI_PUBLIC
   function.hpp
   callback.hpp
   external.hpp
-  jit.hpp
   linsol.hpp
   rootfinder.hpp
   integrator.hpp
@@ -62,6 +61,7 @@ set(CASADI_PUBLIC
   xml_file.hpp
   variable.hpp
   dae_builder.hpp
+  optistack.hpp
 
   # User include class with the most essential includes
   core.hpp
@@ -70,7 +70,6 @@ set(CASADI_PUBLIC
 set(CASADI_INTERNAL
   # MISC
   casadi_logger.cpp
-  casadi_file.hpp casadi_file.cpp
   casadi_interrupt.cpp
   global_options.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/../config.h
@@ -88,7 +87,7 @@ set(CASADI_INTERNAL
 
   sparse_storage.hpp   sparse_storage_impl.hpp
   sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp
-  slice.cpp
+  slice.cpp generic_matrix.cpp
 
   # Directed, acyclic graph representation with scalar expressions
   sx_elem.cpp             # Symbolic expression class (scalar-valued atomics)
@@ -101,6 +100,7 @@ set(CASADI_INTERNAL
   # More general graph representation with sparse matrix expressions and function evaluations
   mx.cpp                  # Symbolic expression class (matrix-valued atomics)
   mx_node.hpp             mx_node.cpp             # Base class for all the MX nodes
+  io_instruction.hpp      io_instruction.cpp      # Input and output MX instructions
   constant_mx.hpp         constant_mx.cpp         # A constant MX node
   symbolic_mx.hpp         symbolic_mx.cpp         # A symbolic MX variable
   unary_mx.hpp            unary_mx.cpp            # Unary operation
@@ -119,6 +119,7 @@ set(CASADI_INTERNAL
   subassign.hpp           subassign.cpp           # Submatrix assignment
   getnonzeros.hpp         getnonzeros.cpp         # Get the nonzeros of matrix
   setnonzeros.hpp         setnonzeros_impl.hpp    # Assign the nonzeros of a matrix to another matrix
+  get_elements.hpp        get_elements.cpp        # Get elements of matrix by a symbolic slice
   project.hpp             project.cpp             # Sparse copy to another sparsity pattern
   determinant.hpp         determinant.cpp         # Determinant
   inverse.hpp             inverse.cpp             # Matrix inverse
@@ -142,7 +143,6 @@ set(CASADI_INTERNAL
   sx_function.hpp         sx_function.cpp
   mx_function.hpp         mx_function.cpp
   external.cpp
-  jit.cpp
   linsol.cpp              linsol_internal.hpp  linsol_internal.cpp
   rootfinder_impl.hpp     rootfinder.cpp
   integrator_impl.hpp     integrator.cpp
@@ -155,6 +155,7 @@ set(CASADI_INTERNAL
   switch.hpp              switch.cpp
   bspline.hpp             bspline.cpp
   map.hpp                 map.cpp
+  finite_differences.hpp  finite_differences.cpp
   importer.cpp            importer_internal.hpp importer_internal.cpp
 
   # MISC useful stuff
@@ -164,6 +165,7 @@ set(CASADI_INTERNAL
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
   variable.cpp
   dae_builder.cpp
+  optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp

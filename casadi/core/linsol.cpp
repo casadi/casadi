@@ -34,7 +34,7 @@ namespace casadi {
 
   Linsol::Linsol(const std::string& name, const std::string& solver,
                  const Dict& opts) {
-    assignNode(LinsolInternal::getPlugin(solver).creator(name));
+    own(LinsolInternal::getPlugin(solver).creator(name));
     (*this)->construct(opts);
   }
 
@@ -68,8 +68,8 @@ namespace casadi {
 
   DM Linsol::solve(const DM& A, const DM& B, bool tr) const {
     casadi_assert_message(A.size1()==B.size1(),
-      "Linsol::solve: Dimension mismatch. A and b must have matching row count." <<
-      " Got " << A.dim() << " and " << B.dim() << ".");
+      "Linsol::solve: Dimension mismatch. A and b must have matching row count. "
+      "Got " + A.dim() + " and " + B.dim() + ".");
 
     // Set sparsity
     reset(A.sparsity());
@@ -87,7 +87,7 @@ namespace casadi {
   }
 
   MX Linsol::solve(const MX& A, const MX& B, bool tr) const {
-    return A->getSolve(B, tr, *this);
+    return A->get_solve(B, tr, *this);
   }
 
   void Linsol::solve_cholesky(double* x, int nrhs, bool tr) const {

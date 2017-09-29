@@ -27,6 +27,7 @@
 #define CASADI_LINSOL_HPP
 
 #include "function.hpp"
+#include "printable.hpp"
 
 namespace casadi {
 
@@ -47,8 +48,12 @@ namespace casadi {
       \author Joel Andersson
       \date 2011-2016
   */
-  class CASADI_EXPORT Linsol : public SharedObject {
+  class CASADI_EXPORT Linsol
+    : public SharedObject,
+      public SWIG_IF_ELSE(PrintableCommon, Printable<Linsol>) {
   public:
+    /** \brief Get type name */
+    static std::string type_name() {return "Linsol";}
 
     /// Default constructor
     Linsol();

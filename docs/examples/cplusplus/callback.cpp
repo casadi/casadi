@@ -32,67 +32,66 @@ using namespace casadi;
  */
 
  class MyCallback : public Callback {
- private:
-   // Data members
-   double d;
-   // Private constructor
-   MyCallback(double d) : d(d) {}
-   
-   ~MyCallback() { std::cout << "MyCallback is destroyed here." << std::endl; };
  public:
-   // Creator function, creates an owning reference
-   static Function create(const std::string& name, double d,
-                          const Dict& opts=Dict()) {
-     return Callback::create(name, new MyCallback(d), opts);
+   // Constructor
+   MyCallback(double d) : d(d) {
+     construct("f");
    }
 
+   // Destructor
+   ~MyCallback() override { std::cout << "MyCallback is destroyed here." << std::endl; };
+
    // Initialize the object
-   virtual void init() {
+   void init() override {
      std::cout << "initializing object" << std::endl;
    }
 
    // Number of inputs and outputs
-   virtual int get_n_in() { return 1;}
-   virtual int get_n_out() { return 1;}
+   int get_n_in() override { return 1;}
+   int get_n_out() override { return 1;}
 
    // Evaluate numerically
-   virtual std::vector<DM> eval(const std::vector<DM>& arg) {
+   std::vector<DM> eval(const std::vector<DM>& arg) const override {
      DM x = arg.at(0);
      DM f = sin(d*x);
      return {f};
    }
+
+ private:
+   // Data members
+   double d;
  };
 
  int main() {
-   Function f = MyCallback::create("f", 0.5);
+   // Create a callvack
+   MyCallback cb(0.5);
+   // Create a function object
+   Function f = cb;
    std::vector<DM> arg = {2};
    std::vector<DM> res = f(arg);
    std::cout << res << std::endl;
-   
-   // The callback instance is destroyed when
-   // there are no references left to it
-   
+
    // Single reference
    std::cout << "Let's overwrite f here." << std::endl;
    f = Function();
    std::cout << "Done." << std::endl;
-   
+
    // Function reference
-   f = MyCallback::create("f", 0.5);
+   f = cb;
    Function g = f;
    f = Function();
    std::cout << "Let's overwrite g here." << std::endl;
    g = Function();
    std::cout << "Done." << std::endl;
-   
+
    // Embedding in a graph
-   f = MyCallback::create("f", 0.5);
+   f = cb;
    MX x = MX::sym("x");
-   g = Function("g",{x},{f(x)}); 
+   g = Function("g",{x},{f(x)});
    f = Function();
    std::cout << "Let's overwrite g here." << std::endl;
    g = Function();
    std::cout << "Done." << std::endl;
-   
+
    return 0;
  }

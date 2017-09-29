@@ -79,6 +79,9 @@ namespace casadi {
     // Ignore errors in the iteration callbacks
     bool iteration_callback_ignore_errors_;
 
+    // Calculate multipliers in the base class
+    bool calc_multipliers_;
+
     /// Which variables are discrete?
     std::vector<bool> discrete_;
 
@@ -90,11 +93,6 @@ namespace casadi {
 
     /// Destructor
     ~Nlpsol() override = 0;
-
-    /** \brief Get type name */
-    std::string type_name() const override {
-      return std::string("nlpsol_") + plugin_name();
-    }
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -120,23 +118,26 @@ namespace casadi {
     const Options& get_options() const override { return options_;}
     ///@}
 
+    /** \brief  Print description */
+    void disp_more(std::ostream& stream) const override;
+
     /// Initialize
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_memory() const override { return new NlpsolMemory();}
-
-    /** \brief Free memory block */
-    void free_memory(void *mem) const override { delete static_cast<NlpsolMemory*>(mem);}
+    void* alloc_mem() const override { return new NlpsolMemory();}
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<NlpsolMemory*>(mem);}
 
     /** \brief Check if the inputs correspond to a well-posed problem */
-    virtual void checkInputs(void* mem) const;
+    virtual void check_inputs(void* mem) const;
 
     /** \brief Get default input value */
-    double default_in(int ind) const override { return nlpsol_default_in(ind);}
+    double get_default_in(int ind) const override { return nlpsol_default_in(ind);}
 
     /// Can discrete variables be treated
     virtual bool integer_support() const { return false;}
@@ -146,7 +147,7 @@ namespace casadi {
                           int*& iw, double*& w) const override;
 
     // Evaluate numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     // Solve the NLP
     virtual void solve(void* mem) const = 0;
@@ -181,29 +182,9 @@ namespace casadi {
 
     /// Convert dictionary to Problem
     template<typename XType>
-      static Function map2problem(const std::map<std::string, XType>& d);
+      static Function create_oracle(const std::map<std::string, XType>& d,
+                                    const Dict& opts);
   };
-
-  template<typename XType>
-  Function Nlpsol::map2problem(const std::map<std::string, XType>& d) {
-    std::vector<XType> nl_in(NL_NUM_IN), nl_out(NL_NUM_OUT);
-    for (auto&& i : d) {
-      if (i.first=="x") {
-        nl_in[NL_X]=i.second;
-      } else if (i.first=="p") {
-        nl_in[NL_P]=i.second;
-      } else if (i.first=="f") {
-        nl_out[NL_F]=i.second;
-      } else if (i.first=="g") {
-        nl_out[NL_G]=i.second;
-      } else {
-        casadi_error("No such field: " + i.first);
-      }
-    }
-    if (nl_out[NL_F].is_empty()) nl_out[NL_F] = 0;
-    if (nl_out[NL_G].is_empty()) nl_out[NL_G] = XType(0, 1);
-    return Function("nlp", nl_in, nl_out, NL_INPUTS, NL_OUTPUTS);
-  }
 
 } // namespace casadi
 /// \endcond

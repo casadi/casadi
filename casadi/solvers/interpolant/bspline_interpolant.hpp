@@ -63,6 +63,9 @@ namespace casadi {
     // Get name of the plugin
     const char* plugin_name() const override { return "bspline";}
 
+    // Get name of the class
+    std::string class_name() const override { return "BSplineInterpolant";}
+
     /** \brief  Create a new Interpolant */
     static Interpolant* creator(const std::string& name,
                                 const std::vector<double>& grid,
@@ -75,22 +78,22 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// Evaluate numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     ///@{
     /** \brief Full Jacobian */
-    bool hasFullJacobian() const override { return true;}
-    Function getFullJacobian(const std::string& name,
-                                      const std::vector<std::string>& i_names,
-                                      const std::vector<std::string>& o_names,
-                                      const Dict& opts) override;
+    bool has_jacobian() const override { return true;}
+    Function get_jacobian(const std::string& name,
+                                      const std::vector<std::string>& inames,
+                                      const std::vector<std::string>& onames,
+                                      const Dict& opts) const override;
     ///@}
 
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
 
     /** \brief Generate code for the body of the C function */
-    void generateBody(CodeGenerator& g) const override;
+    void codegen_body(CodeGenerator& g) const override;
 
     /// A documentation string
     static const std::string meta_doc;

@@ -32,7 +32,7 @@ namespace casadi {
   }
 
   XmlFile::XmlFile(const std::string& name) {
-    assignNode(XmlFileInternal::getPlugin(name).creator());
+    own(XmlFileInternal::getPlugin(name).creator());
   }
 
   XmlFile::~XmlFile() {

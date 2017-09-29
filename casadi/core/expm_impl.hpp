@@ -63,20 +63,20 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    Function get_forward(const std::string& name, int nfwd,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts) const override;
-    int get_n_forward() const override { return 64;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    bool has_forward(int nfwd) const override { return true;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    Function get_reverse(const std::string& name, int nadj,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts) const override;
-    int get_n_reverse() const override { return 64;}
+    Function get_reverse(int nadj, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    bool has_reverse(int nadj) const override { return true;}
     ///@}
 
     /// Generate the sparsity of a Jacobian block
@@ -96,14 +96,6 @@ namespace casadi {
 
     /// Short name
     static std::string shortname() { return "expm";}
-
-    /** \brief Get type name */
-    std::string type_name() const override {
-      return std::string("expm_") + plugin_name();
-    }
-
-    /** \brief Get default input value */
-    double default_in(int ind) const override;
 
   protected:
     Sparsity A_;

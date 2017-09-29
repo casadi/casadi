@@ -20,6 +20,7 @@ set(RUNTIME_SRC
   casadi_max_viol.hpp
   casadi_mtimes.hpp
   casadi_mv.hpp
+  casadi_mv_dense.hpp
   casadi_nd_boor_eval.hpp
   casadi_norm_1.hpp
   casadi_norm_2.hpp
@@ -33,6 +34,7 @@ set(RUNTIME_SRC
   casadi_sum_viol.hpp
   casadi_swap.hpp
   casadi_trans.hpp
+  casadi_finite_diff.hpp
 )
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 

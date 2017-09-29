@@ -51,7 +51,7 @@ namespace casadi {
   }
 
   CSparseCholeskyInterface::~CSparseCholeskyInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   CsparseCholMemory::~CsparseCholMemory() {
@@ -64,8 +64,8 @@ namespace casadi {
     LinsolInternal::init(opts);
   }
 
-  void CSparseCholeskyInterface::init_memory(void* mem) const {
-    LinsolInternal::init_memory(mem);
+  int CSparseCholeskyInterface::init_mem(void* mem) const {
+    return LinsolInternal::init_mem(mem);
   }
 
   void CSparseCholeskyInterface::reset(void* mem, const int* sp) const {
@@ -108,8 +108,10 @@ namespace casadi {
     // Make sure that all entries of the linear system are valid
     int nnz = m->nnz();
     for (int k=0; k<nnz; ++k) {
-      casadi_assert_message(!isnan(A[k]), "Nonzero " << k << " is not-a-number");
-      casadi_assert_message(!isinf(A[k]), "Nonzero " << k << " is infinite");
+      casadi_assert_message(!isnan(A[k]),
+        "Nonzero " + str(k) + " is not-a-number");
+      casadi_assert_message(!isinf(A[k]),
+        "Nonzero " + str(k) + " is infinite");
     }
 
     if (m->L) cs_nfree(m->L);

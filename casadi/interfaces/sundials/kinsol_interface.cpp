@@ -83,7 +83,7 @@ namespace casadi {
   KinsolInterface::~KinsolInterface() {
     if (u_scale_) N_VDestroy_Serial(u_scale_);
     if (f_scale_) N_VDestroy_Serial(f_scale_);
-    clear_memory();
+    clear_mem();
   }
 
   Options KinsolInterface::options_
@@ -273,7 +273,7 @@ namespace casadi {
     if (flag<KIN_SUCCESS) kinsol_error("KINSol", flag);
 
     // Warn if not successful return
-    if (verbose()) {
+    if (verbose_) {
       if (flag!=KIN_SUCCESS) kinsol_error("KINSol", flag, false);
     }
 
@@ -281,11 +281,11 @@ namespace casadi {
     casadi_copy(NV_DATA_S(m->u), nnz_out(iout_), m->ires[iout_]);
 
     // Evaluate auxiliary outputs
-    if (n_out()>0) {
+    if (n_out_>0) {
       // Evaluate f_
-      copy_n(m->iarg, n_in(), m->arg);
+      copy_n(m->iarg, n_in_, m->arg);
       m->arg[iin_] = NV_DATA_S(m->u);
-      copy_n(m->ires, n_out(), m->res);
+      copy_n(m->ires, n_out_, m->res);
       m->res[iout_] = 0;
       oracle_(m->arg, m->res, m->iw, m->w, 0);
     }
@@ -293,9 +293,9 @@ namespace casadi {
 
   void KinsolInterface::func(KinsolMemory& m, N_Vector u, N_Vector fval) const {
     // Evaluate f_
-    copy_n(m.iarg, n_in(), m.arg);
+    copy_n(m.iarg, n_in_, m.arg);
     m.arg[iin_] = NV_DATA_S(u);
-    fill_n(m.res, n_out(), nullptr);
+    fill_n(m.res, n_out_, nullptr);
     m.res[iout_] = NV_DATA_S(fval);
     oracle_(m.arg, m.res, m.iw, m.w, 0);
 
@@ -303,12 +303,14 @@ namespace casadi {
     double *fdata = NV_DATA_S(fval);
     for (int k=0; k<n_; ++k) {
       try {
-        casadi_assert_message(!isnan(fdata[k]), "Nonzero " << k << " is not-a-number");
-        casadi_assert_message(!isinf(fdata[k]), "Nonzero " << k << " is infinite");
+        casadi_assert_message(!isnan(fdata[k]),
+          "Nonzero " + str(k) + " is not-a-number");
+        casadi_assert_message(!isinf(fdata[k]),
+          "Nonzero " + str(k) + " is infinite");
       } catch(exception& ex) {
         stringstream ss;
         ss << ex.what() << endl;
-        if (verbose()) {
+        if (verbose_) {
           userOut() << "u = ";
           N_VPrint_Serial(u);
         }
@@ -346,9 +348,9 @@ namespace casadi {
   void KinsolInterface::djac(KinsolMemory& m, long N, N_Vector u, N_Vector fu, DlsMat J,
                           N_Vector tmp1, N_Vector tmp2) const {
     // Evaluate jac_
-    copy_n(m.iarg, n_in(), m.arg);
+    copy_n(m.iarg, n_in_, m.arg);
     m.arg[iin_] = NV_DATA_S(u);
-    fill_n(m.res, n_out()+1, nullptr);
+    fill_n(m.res, n_out_+1, nullptr);
     m.res[0] = m.jac;
     calc_function(&m, "jac_f_z");
 
@@ -387,9 +389,9 @@ namespace casadi {
   void KinsolInterface::bjac(KinsolMemory& m, long N, long mupper, long mlower, N_Vector u,
                           N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2) const {
     // Evaluate jac_
-    copy_n(m.iarg, n_in(), m.arg);
+    copy_n(m.iarg, n_in_, m.arg);
     m.arg[iin_] = NV_DATA_S(u);
-    fill_n(m.res, n_out()+1, nullptr);
+    fill_n(m.res, n_out_+1, nullptr);
     m.res[0] = m.jac;
     calc_function(&m, "jac_f_z");
 
@@ -429,9 +431,9 @@ namespace casadi {
   void KinsolInterface::jtimes(KinsolMemory& m, N_Vector v, N_Vector Jv,
                             N_Vector u, int* new_u) const {
     // Evaluate f_fwd_
-    copy_n(m.iarg, n_in(), m.arg);
+    copy_n(m.iarg, n_in_, m.arg);
     m.arg[iin_] = NV_DATA_S(u);
-    m.arg[n_in()] = NV_DATA_S(v);
+    m.arg[n_in_] = NV_DATA_S(v);
     m.res[0] = NV_DATA_S(Jv);
     jtimes_(m.arg, m.res, m.iw, m.w, 0);
   }
@@ -454,9 +456,9 @@ namespace casadi {
   psetup(KinsolMemory& m, N_Vector u, N_Vector uscale, N_Vector fval,
          N_Vector fscale, N_Vector tmp1, N_Vector tmp2) const {
     // Evaluate jac_
-    copy_n(m.iarg, n_in(), m.arg);
+    copy_n(m.iarg, n_in_, m.arg);
     m.arg[iin_] = NV_DATA_S(u);
-    fill_n(m.res, n_out()+1, nullptr);
+    fill_n(m.res, n_out_+1, nullptr);
     m.res[0] = m.jac;
     calc_function(&m, "jac_f_z");
 
@@ -684,8 +686,8 @@ namespace casadi {
     if (this->mem) KINFree(&this->mem);
   }
 
-  void KinsolInterface::init_memory(void* mem) const {
-    Rootfinder::init_memory(mem);
+  int KinsolInterface::init_mem(void* mem) const {
+    if (Rootfinder::init_mem(mem)) return 1;
     auto m = static_cast<KinsolMemory*>(mem);
 
     // Current solution
@@ -790,6 +792,7 @@ namespace casadi {
     // Set stop criterion
     flag = KINSetFuncNormTol(m->mem, abstol_);
     casadi_assert(flag==KIN_SUCCESS);
+    return 0;
   }
 
 } // namespace casadi

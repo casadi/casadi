@@ -1,4 +1,3 @@
-
 /*
  *    This file is part of CasADi.
  *
@@ -24,37 +23,45 @@
  */
 
 
-#ifndef CASADI_JIT_HPP
-#define CASADI_JIT_HPP
+#include "get_elements.hpp"
+#include "std_vector_tools.hpp"
 
-#include "function.hpp"
+using namespace std;
 
 namespace casadi {
 
-  /** \brief Create a just-in-time compiled function from a C/C++ language string
-   * The function can an arbitrary number of inputs and outputs that must all be
-   * scalar-valued.
-   * Only specify the function body, assuming that the inputs are stored in an array
-   * named 'arg' and the outputs stored in an array named 'res'. The data type
-   * used must be 'real_t', which is typically equal to 'double` or another data
-   * type with the same API as 'double'.
-   *
-   * The final generated function will have a structure similar to:
-   *
-   * void fname(const real_t* arg, real_t* res) {
-   *   <FUNCTION_BODY>
-   * }
-   *
-   */
-  CASADI_EXPORT Function jit(const std::string& name, int n_in, int n_out,
-                             const std::string& body, const Dict& opts=Dict());
+  MX GetElements::create(const MX& ind, const MX& x) {
+    return MX::create(new GetElements(ind, x));
+  }
 
-#ifndef SWIG
-  /** \brief Create a just-in-time compiled function from a .casadi file
-   */
-  CASADI_EXPORT Function jit(const ParsedFile& file);
-#endif // SWIG
+  GetElements::GetElements(const MX& ind, const MX& x) {
+    set_sparsity(ind.sparsity());
+    set_dep(ind, x);
+  }
+
+  int GetElements::
+  eval(const double** arg, double** res, int* iw, double* w) const {
+    // Get input and output arguments
+    const double* ind = arg[0];
+    const double* x = arg[1];
+    double* ret = res[0];
+    // Dimensions
+    int nnz = dep(0).nnz();
+    int max_ind = dep(1).nnz();
+    // If not in-place, copy
+    if (ind != ret) casadi_copy(ind, nnz, ret);
+    // Get elements
+    for (int i=0; i<nnz; ++i) {
+      // Get index
+      int index = static_cast<int>(*ret);
+      // Make assignment if in bounds, else NaN
+      *ret++ = index>=0 && index<max_ind ? x[index] : nan;
+    }
+    return 0;
+  }
+
+  std::string GetElements::disp(const std::vector<std::string>& arg) const {
+    return arg.at(1) + "(" + arg.at(0) + ")";
+  }
 
 } // namespace casadi
-
-#endif // CASADI_JIT_HPP

@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_PRINTABLE_OBJECT_HPP
-#define CASADI_PRINTABLE_OBJECT_HPP
+#ifndef CASADI_PRINTABLE_HPP
+#define CASADI_PRINTABLE_HPP
 
 #include <iostream>
 #include <string>
@@ -36,56 +36,34 @@
 
 namespace casadi {
 
+  /** \brief Empty Base
+      This class is extended in SWIG.
+   */
+  struct CASADI_EXPORT PrintableCommon {};
+
+#ifndef SWIG
   /** \brief Base class for objects that have a natural string representation
       \author Joel Andersson
       \date 2010-2014
   */
   template<class Derived>
-  class CASADI_EXPORT PrintableObject {
+  class CASADI_EXPORT Printable : public PrintableCommon {
   public:
-
-    /// Return a string with a description (for SWIG)
-    std::string getDescription() const {
-      std::stringstream ss;
-      static_cast<const Derived*>(this)->print(ss, false);
-      return ss.str();
-    }
-
-    /// Return a string with a representation (for SWIG)
-    std::string getRepresentation() const {
-      std::stringstream ss;
-      static_cast<const Derived*>(this)->repr(ss, false);
-      return ss.str();
-    }
-
-#ifndef SWIG
-    /// Print a representation of the object to a stream (shorthand)
+    /// Print a string representation of the object to a stream
     inline friend
-      std::ostream& operator<<(std::ostream &stream, const PrintableObject<Derived>& obj) {
-      static_cast<const Derived&>(obj).repr(stream, false);
+      std::ostream& operator<<(std::ostream &stream, const Derived& obj) {
+      obj.disp(stream);
       return stream;
     }
-#endif // SWIG
-/**
-\ingroup expression_tools
-@{
-*/
 
-#if !defined(SWIG) || defined(DOXYGEN)
-    /// Return a string with a description of the object, cf. str(Object) in Python
-    inline friend std::string str(const PrintableObject<Derived>& obj) {
-      return obj.getDescription();
+    /// Get string representation with type information
+    inline friend std::string repr(const Derived& obj) {
+      return Derived::type_name() + "(" + obj.get_str() + ")";
     }
-
-    /// Return a string with a representation of the object, cf. repr(Object) in Python
-    inline friend std::string repr(const PrintableObject<Derived>& obj) {
-      return obj.getRepresentation();
-    }
-/** @} */
-#endif //
-
   };
+#endif // SWIG
+
 } // namespace casadi
 
 
-#endif // CASADI_PRINTABLE_OBJECT_HPP
+#endif // CASADI_PRINTABLE_HPP

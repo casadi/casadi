@@ -92,6 +92,9 @@ namespace casadi {
         " custom flags."}},
       {"compiler_flags",
        {OT_STRINGVECTOR,
+        "Alias for 'compiler_flags'"}},
+      {"flags",
+        {OT_STRINGVECTOR,
         "Compile flags for the JIT compiler. Default: None"}},
       {"linker_flags",
        {OT_STRINGVECTOR,
@@ -129,7 +132,7 @@ namespace casadi {
         cleanup_ = op.second;
       } else if (op.first=="linker_setup") {
         linker_setup = op.second.to_string();
-      } else if (op.first=="compiler_flags") {
+      } else if (op.first=="compiler_flags" || op.first=="flags") {
         compiler_flags = op.second;
       } else if (op.first=="linker_flags") {
         linker_flags = op.second;
@@ -143,7 +146,7 @@ namespace casadi {
     if (mkstemps(obj_name, 2) == -1) {
       casadi_error("Failed to create a temporary object file name");
     }
-    std::string obj_name_ = obj_name;
+    obj_name_ = obj_name;
 
     char bin_name[] = "tmp_casadi_compiler_shell_XXXXXX.so";
     if (mkstemps(bin_name, 3) == -1) {
@@ -155,6 +158,11 @@ namespace casadi {
     char* bin_name = tempnam(0, "ca.so");
     bin_name_ = bin_name;
     free(bin_name);
+
+    // Fallback, may result in deprecation warnings
+    char* obj_name = tempnam(0, "ca.o");
+    obj_name_ = obj_name;
+    free(obj_name);
 #endif
 
     // Have relative paths start with ./
@@ -205,8 +213,9 @@ namespace casadi {
 
     // Load shared library
     handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
-    casadi_assert_message(handle_!=0, "CommonExternal: Cannot open function: "
-                          << bin_name_ << ". error code: "<< dlerror());
+    casadi_assert_message(handle_!=0,
+      "CommonExternal: Cannot open function: " + bin_name_ + ". error code: " +
+      str(dlerror()));
     // reset error
     dlerror();
   }

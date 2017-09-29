@@ -55,11 +55,6 @@ namespace casadi {
     /// Destructor
     ~Rootfinder() override = 0;
 
-    /** \brief Get type name */
-    std::string type_name() const override {
-      return std::string("rootfinder_") + plugin_name();
-    }
-
     ///@{
     /** \brief Number of function inputs and outputs */
     size_t get_n_in() override { return oracle_.n_in();}
@@ -88,23 +83,23 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const override;
 
     // Evaluate numerically
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     // Solve the NLP
     virtual void solve(void* mem) const = 0;
 
     /** \brief  Propagate sparsity forward */
-    void sp_fwd(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    void sp_rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?
@@ -112,32 +107,35 @@ namespace casadi {
     bool has_sprev() const override { return true;}
     ///@}
 
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    bool uses_output() const override {return true;}
+
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    Function get_forward(const std::string& name, int nfwd,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts) const override;
-    int get_n_forward() const override { return 64;}
+    bool has_forward(int nfwd) const override { return true;}
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    Function get_reverse(const std::string& name, int nadj,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts) const override;
-    int get_n_reverse() const override { return 64;}
+    bool has_reverse(int nadj) const override { return true;}
+    Function get_reverse(int nadj, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     ///@}
 
     /** \brief Create call to (cached) derivative function, forward mode  */
-    virtual void eval_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void ad_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens,
                          bool always_inline, bool never_inline) const;
 
     /** \brief Create call to (cached) derivative function, reverse mode  */
-    virtual void eval_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
+    virtual void ad_reverse(const std::vector<MX>& arg, const std::vector<MX>& res,
                          const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens,
                          bool always_inline, bool never_inline) const;

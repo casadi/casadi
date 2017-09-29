@@ -41,7 +41,7 @@ namespace casadi {
     ~CallbackInternal() override;
 
     /** \brief Get type name */
-    std::string type_name() const override {return "callback";}
+    std::string class_name() const override {return "CallbackInternal";}
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -68,43 +68,46 @@ namespace casadi {
     void finalize(const Dict& opts) override;
 
     /** \brief  Evaluate numerically, work vectors given */
-    void eval(void* mem, const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief  Evaluate symbolically, work vectors given */
-    void eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const override;
+
+    /** \brief Evaluate with DM matrices */
+    std::vector<DM> eval_dm(const std::vector<DM>& arg) const override;
+
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    bool uses_output() const override;
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
-    bool hasFullJacobian() const override;
-    Function getFullJacobian(const std::string& name,
-                                     const std::vector<std::string>& i_names,
-                                     const std::vector<std::string>& o_names,
-                                     const Dict& opts) override;
+    bool has_jacobian() const override;
+    Function get_jacobian(const std::string& name,
+                          const std::vector<std::string>& inames,
+                          const std::vector<std::string>& onames,
+                          const Dict& opts) const override;
     ///@}
 
     ///@{
     /** \brief Return function that calculates forward derivatives */
-    Function get_forward(const std::string& name, int nfwd,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts) const override;
-    int get_n_forward() const override;
+    bool has_forward(int nfwd) const override;
+    Function get_forward(int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     ///@}
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives */
-    Function get_reverse(const std::string& name, int nadj,
-                                 const std::vector<std::string>& i_names,
-                                 const std::vector<std::string>& o_names,
-                                 const Dict& opts) const override;
-    int get_n_reverse() const override;
+    bool has_reverse(int nadj) const override;
+    Function get_reverse(int nadj, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
     ///@}
 
     /** \brief Pointer to the public class */
     Callback* self_;
-
-    /** \brief Is the public class owned by the internal class? */
-    bool own_;
   };
 
 } // namespace casadi

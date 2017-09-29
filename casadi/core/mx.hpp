@@ -29,6 +29,7 @@
 #include "matrix.hpp"
 #include "generic_expression.hpp"
 #include "generic_type.hpp"
+#include "printable.hpp"
 #include <vector>
 namespace casadi {
 
@@ -44,7 +45,7 @@ namespace casadi {
       in particular matrix valued operations and calls to arbitrary differentiable functions.
 
       The MX class is designed to have identical syntax with the Matrix<> template class,
-      and uses Matrix<double> as its internal representation of the values at a node. By keeping
+      and uses DM (i.e. Matrix<double>) as its internal representation of the values at a node. By keeping
       the syntaxes identical, it is possible to switch from one class to the other,
       as well as inlining MX functions to SXElem functions.
 
@@ -55,10 +56,13 @@ namespace casadi {
       \date 2010-2011
   */
   class CASADI_EXPORT MX :
-    public GenericExpression<MX>,
+    public SWIG_IF_ELSE(GenericExpressionCommon, GenericExpression<MX>),
+    public SWIG_IF_ELSE(PrintableCommon, Printable<MX>),
     public GenericMatrix<MX>,
     public SharedObject {
   public:
+    /** \brief Get type name */
+    static std::string type_name() {return "MX";}
 
     /** \brief  Default constructor */
     MX();
@@ -164,7 +168,7 @@ namespace casadi {
     int n_out() const;
 
     /** \brief  Get an output */
-    MX getOutput(int oind=0) const;
+    MX get_output(int oind) const;
 
     /** \brief Get the number of dependencies of a binary SXElem */
     int n_dep() const;
@@ -187,11 +191,14 @@ namespace casadi {
     /// Check if evaluation
     bool is_call() const;
 
+    /// Get function - only valid when is_call() is true
+    Function which_function() const;
+
     /// Check if evaluation output
     bool is_output() const;
 
-    /// Get the index of evaluation output - only valid when is_calloutput() is true
-    int get_output() const;
+    /// Get the index of evaluation output - only valid when is_output() is true
+    int which_output() const;
 
     /// Is it a certain operation
     bool is_op(int op) const;
@@ -210,12 +217,11 @@ namespace casadi {
     */
     bool is_valid_input() const;
 
-    /** \brief Get the number of symbolic primitive
-        Assumes is_valid_input() returns true.
+    /** \brief Get the number of primitives for MXFunction inputs/outputs
     */
     int n_primitives() const;
 
-    /** \brief Get symbolic primitives */
+    /** \brief Get primitives */
     std::vector<MX> primitives() const;
 
     /** \brief Split up an expression along symbolic primitives */
@@ -227,7 +233,7 @@ namespace casadi {
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
         If there are symbolic primitives appearing more than once, the function will return
-        true and the names of the duplicate expressions will be printed to userOut<true, PL_WARN>().
+        true and the names of the duplicate expressions will be passed to casadi_warning.
         Note: Will mark the node using MX::set_temp.
         Make sure to call reset_input() after usage.
     */
@@ -238,7 +244,7 @@ namespace casadi {
   /// \endcond
 
     /** \brief  check if identity */
-    bool is_identity() const;
+    bool is_eye() const;
 
     /** \brief  check if zero (note that false negative answers are possible) */
     bool is_zero() const;
@@ -254,12 +260,6 @@ namespace casadi {
 
     /// Checks if expression does not contain NaN or Inf
     bool is_regular() const;
-
-    /** \brief  Number of functions */
-    int numFunctions() const;
-
-    /// Get function
-    Function getFunction(int i=0);
 
     /// Is binary operation
     bool is_binary() const;
@@ -378,6 +378,8 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericExpression
     static bool is_equal(const MX& x, const MX& y, int depth=0);
+    static MX mmin(const MX &x);
+    static MX mmax(const MX &x);
     ///@}
 
     ///@{
@@ -401,8 +403,6 @@ namespace casadi {
     ///@{
     /// Functions called by friend functions defined for GenericMatrix
     static MX jacobian(const MX& f, const MX& x, const Dict& opts = Dict());
-    static MX gradient(const MX& f, const MX& x);
-    static MX tangent(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x);
     static MX hessian(const MX& f, const MX& x, MX& g);
     static std::vector<std::vector<MX> >
@@ -424,9 +424,12 @@ namespace casadi {
     static void substitute_inplace(const std::vector<MX>& v,
                                   std::vector<MX>& vdef,
                                   std::vector<MX>& ex, bool reverse);
-    static MX solve(const MX& A, const MX& b, const std::string& lsolver="symbolicqr",
+    static MX solve(const MX& A, const MX& b, const std::string& lsolver="csparse",
                     const Dict& dict = Dict());
-    static MX pinv(const MX& A, const std::string& lsolver="symbolicqr",
+    static MX inv_minor(const MX& A);
+    static MX inv_node(const MX& A);
+    static MX inv(const MX& A, const std::string& lsolver="csparse", const Dict& dict = Dict());
+    static MX pinv(const MX& A, const std::string& lsolver="csparse",
                const Dict& dict = Dict());
     static MX expm_const(const MX& A, const MX& t);
     static MX expm(const MX& A);
@@ -440,9 +443,7 @@ namespace casadi {
     static MX conditional(const MX& ind, const std::vector<MX> &x, const MX& x_default,
                           bool short_circuit=false);
     static bool depends_on(const MX& x, const MX& arg);
-    static MX logic_not(const MX& x);
     static MX simplify(const MX& x);
-    static MX mpower(const MX& a, const MX& b);
     static MX dot(const MX& x, const MX& y);
     static MX mrdivide(const MX& a, const MX& b);
     static MX mldivide(const MX& a, const MX& b);
@@ -457,7 +458,6 @@ namespace casadi {
     static MX sum1(const MX& x);
     static MX polyval(const MX& p, const MX& x);
     static MX det(const MX& x);
-    static MX inv(const MX& x);
     static std::vector<MX> symvar(const MX& x);
     static MX nullspace(const MX& A);
     static MX repsum(const MX& x, int n, int m=1);
@@ -551,6 +551,14 @@ namespace casadi {
     inline friend MX lift(const MX& x, const MX& x_guess) {
       return MX::lift(x, x_guess);
     }
+
+    /** \brief Inverse node
+     *
+     */
+    inline friend MX inv_node(const MX& x) {
+      return MX::inv_node(x);
+    }
+
 /** @} */
 #endif // SWIG
 
@@ -577,18 +585,6 @@ namespace casadi {
     /** \brief Get the depth to which equalities are being checked for simplifications */
     static int get_max_depth();
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Renamed set_max_depth */
-    static void setEqualityCheckingDepth(int eq_depth=1) {
-      set_max_depth(eq_depth);
-    }
-
-    /** \brief [DEPRECATED] Renamed get_max_depth */
-    static int getEqualityCheckingDepth() {
-      return get_max_depth();
-    }
-#endif // WITH_DEPRECATED_FEATURES
-
     /// Check if a particular cast is allowed
     static bool test_cast(const SharedObjectInternal* ptr);
 
@@ -598,13 +594,8 @@ namespace casadi {
     /** \brief Get free variables */
     static std::vector<MX> get_free(const Function& f);
 
-    /// Get name of the class
-    static std::string type_name();
-
-    ///@{
-    /// Readability typedefs
+    /// Readability typedef
     typedef std::map<std::string, MX> MXDict;
-    ///@}
 
 #ifndef SWIG
     /// Construct constant matrix with a given sparsity and values

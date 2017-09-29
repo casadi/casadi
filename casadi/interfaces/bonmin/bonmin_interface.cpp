@@ -60,7 +60,7 @@ namespace casadi {
   }
 
   BonminInterface::~BonminInterface() {
-    clear_memory();
+    clear_mem();
   }
 
   Options BonminInterface::options_
@@ -209,9 +209,8 @@ namespace casadi {
     }
   }
 
-  void BonminInterface::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
-    //auto m = static_cast<BonminMemory*>(mem);
+  int BonminInterface::init_mem(void* mem) const {
+    return Nlpsol::init_mem(mem);
   }
 
   void BonminInterface::set_work(void* mem, const double**& arg, double**& res,
@@ -251,6 +250,19 @@ namespace casadi {
     return "Unknown";
   }
 
+  inline std::string to_str(const CoinError& e) {
+    std::stringstream ss;
+    if (e.lineNumber()<0) {
+      ss << e.message()<< " in "<< e.className()<< "::" << e.methodName();
+    } else {
+      ss << e.fileName() << ":" << e.lineNumber() << " method " << e.methodName()
+         << " : assertion \'" << e.message() <<"\' failed.";
+      if (e.className()!="")
+        ss <<"Possible reason: "<< e.className();
+    }
+    return ss.str();
+  }
+
 
   /** \brief Helper class to direct messages to userOut()
   *
@@ -281,7 +293,7 @@ namespace casadi {
     auto m = static_cast<BonminMemory*>(mem);
 
     // Check the provided inputs
-    checkInputs(mem);
+    check_inputs(mem);
 
     // Reset statistics
     m->inf_pr.clear();
@@ -366,8 +378,12 @@ namespace casadi {
 
     if (true) {
       // Branch-and-bound
-      Bab bb;
-      bb(bonmin);
+      try {
+        Bab bb;
+        bb(bonmin);
+      } catch (CoinError& e) {
+        casadi_error("CoinError occured: " + to_str(e));
+      }
     }
 
     m->fstats.at("mainloop").toc();
@@ -389,7 +405,7 @@ namespace casadi {
                         int ls_trials, bool full_callback) const {
     m->n_iter += 1;
     try {
-      log("intermediate_callback started");
+      if (verbose_) casadi_message("intermediate_callback started");
       m->inf_pr.push_back(inf_pr);
       m->inf_du.push_back(inf_du);
       m->mu.push_back(mu);
@@ -444,13 +460,14 @@ namespace casadi {
       } else {
         return 1;
       }
+    } catch(KeyboardInterruptException& ex) {
+      return 0;
     } catch(exception& ex) {
       if (iteration_callback_ignore_errors_) {
         userOut<true, PL_WARN>() << "intermediate_callback: " << ex.what() << endl;
-      } else {
-        throw ex;
+        return 1;
       }
-      return 1;
+      return 0;
     }
   }
 

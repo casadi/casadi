@@ -29,7 +29,6 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-
 #include <limits>
 #include <algorithm>
 #include "casadi_types.hpp"
@@ -52,6 +51,9 @@ namespace casadi {
 
   /// Not a number
   const double nan = std::numeric_limits<double>::quiet_NaN();
+
+  /// Machine epsilon
+  const double eps = std::numeric_limits<double>::epsilon();
 #endif // SWIG
 
   /// Enum for quick access to any node
@@ -151,6 +153,12 @@ namespace casadi {
     // Nonzero assignment
     OP_SETNONZEROS,
 
+    // Symbolic reference
+    OP_GET_ELEMENTS,
+
+    // Symbolic addition
+    OP_ADD_ELEMENTS,
+
     // Set sparse
     OP_PROJECT,
 
@@ -181,6 +189,7 @@ namespace casadi {
 
   ///@{
   /** \brief Enable using elementary numerical operations without std:: prefix */
+  using std::isfinite;
   using std::sqrt;
   using std::sin;
   using std::cos;
@@ -1016,6 +1025,8 @@ namespace casadi {
     case OP_GETNONZEROS:   return F<OP_GETNONZEROS>::check;
     case OP_ADDNONZEROS:   return F<OP_ADDNONZEROS>::check;
     case OP_SETNONZEROS:   return F<OP_SETNONZEROS>::check;
+    case OP_GET_ELEMENTS:  return F<OP_GET_ELEMENTS>::check;
+    case OP_ADD_ELEMENTS:  return F<OP_ADD_ELEMENTS>::check;
     case OP_PROJECT:       return F<OP_PROJECT>::check;
     case OP_ASSERTION:     return F<OP_ASSERTION>::check;
     case OP_MONITOR:       return F<OP_MONITOR>::check;
@@ -1458,7 +1469,7 @@ namespace casadi {
     case OP_OUTPUT:         return "output";
     case OP_PARAMETER:      return "parameter";
     case OP_CALL:           return "call";
-    case OP_MTIMES:         return "matmul";
+    case OP_MTIMES:         return "mtimes";
     case OP_SOLVE:          return "solve";
     case OP_TRANSPOSE:      return "transpose";
     case OP_DETERMINANT:    return "determinant";
@@ -1476,6 +1487,8 @@ namespace casadi {
     case OP_GETNONZEROS:    return "getnonzeros";
     case OP_ADDNONZEROS:    return "addnonzeros";
     case OP_SETNONZEROS:    return "setnonzeros";
+    case OP_GET_ELEMENTS:   return "get_elements";
+    case OP_ADD_ELEMENTS:   return "add_elements";
     case OP_PROJECT:        return "project";
     case OP_ASSERTION:      return "assertion";
     case OP_NORM2:          return "norm2";

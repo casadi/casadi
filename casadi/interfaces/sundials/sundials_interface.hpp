@@ -101,7 +101,13 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Initalize memory block */
-    void init_memory(void* mem) const override;
+    int init_mem(void* mem) const override;
+
+    /** \brief Get relative tolerance */
+    double get_reltol() const override { return reltol_;}
+
+    /** \brief Get absolute tolerance */
+    double get_abstol() const override { return abstol_;}
 
     // Get system Jacobian
     virtual Function getJ(bool backward) const = 0;

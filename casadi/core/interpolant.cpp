@@ -80,12 +80,8 @@ namespace casadi {
     vector<double> stacked;
     stacked.reserve(offset.back());
     for (auto&& g : grid) stacked.insert(stacked.end(), g.begin(), g.end());
-
-
-    Function ret;
-    ret.assignNode(Interpolant::getPlugin(solver).creator(name, stacked, offset, values));
-    ret->construct(opts);
-    return ret;
+    return Function::create(Interpolant::getPlugin(solver)
+                            .creator(name, stacked, offset, values), opts);
   }
 
   Interpolant::

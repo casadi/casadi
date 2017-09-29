@@ -36,9 +36,9 @@ extern "C" {
 #include <assert.h>
 
 /* Floating point type */
-#ifndef casadi_real_t
-#define casadi_real_t double
-#endif /* casadi_real_t */
+#ifndef casadi_real
+#define casadi_real double
+#endif
 
 /* Function types corresponding to entry points in CasADi's C API */
 typedef void (*casadi_signal_t)(void);
@@ -46,8 +46,8 @@ typedef int (*casadi_getint_t)(void);
 typedef const int* (*casadi_sparsity_t)(int i);
 typedef const char* (*casadi_name_t)(int i);
 typedef int (*casadi_work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
-typedef int (*casadi_eval_t)(const casadi_real_t** arg, casadi_real_t** res,
-                             int* iw, casadi_real_t* w, int mem);
+typedef int (*casadi_eval_t)(const casadi_real** arg, casadi_real** res,
+                             int* iw, casadi_real* w, void* mem);
 
 /* Structure to hold meta information about an input or output */
 typedef struct {
@@ -103,10 +103,10 @@ typedef struct {
 
   /* Work arrays */
   int sz_arg, sz_res, sz_iw, sz_w;
-  const casadi_real_t** arg;
-  casadi_real_t** res;
+  const casadi_real** arg;
+  casadi_real** res;
   int* iw;
-  casadi_real_t* w;
+  casadi_real* w;
   int mem;
 
   /* Meta information */
@@ -201,13 +201,13 @@ inline int casadi_alloc_arrays(casadi_mem* mem) {
   if (mem->n_out!=0 && mem->out==0) return 1;
 
   /* Allocate work vectors */
-  mem->arg = (const casadi_real_t**)malloc(mem->sz_arg*sizeof(const casadi_real_t*));
+  mem->arg = (const casadi_real**)malloc(mem->sz_arg*sizeof(const casadi_real*));
   if (mem->sz_arg!=0 && mem->arg==0) return 1;
-  mem->res = (casadi_real_t**)malloc(mem->sz_res*sizeof(casadi_real_t*));
+  mem->res = (casadi_real**)malloc(mem->sz_res*sizeof(casadi_real*));
   if (mem->sz_res!=0 && mem->res==0) return 1;
   mem->iw = (int*)malloc(mem->sz_iw*sizeof(int));
   if (mem->sz_iw!=0 && mem->iw==0) return 1;
-  mem->w = (casadi_real_t*)malloc(mem->sz_w*sizeof(casadi_real_t));
+  mem->w = (casadi_real*)malloc(mem->sz_w*sizeof(casadi_real));
   if (mem->sz_w!=0 && mem->w==0) return 1;
 
   return 0;

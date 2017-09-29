@@ -1,6 +1,7 @@
 // NOLINT(legal/copyright)
+// SYMBOL "bilin"
 template<typename T1>
-T1 CASADI_PREFIX(bilin)(const T1* A, const int* sp_A, const T1* x, const T1* y) {
+T1 casadi_bilin(const T1* A, const int* sp_A, const T1* x, const T1* y) {
   // Get sparsities
   int ncol_A = sp_A[1];
   const int *colind_A = sp_A+2, *row_A = sp_A + 2 + ncol_A+1;

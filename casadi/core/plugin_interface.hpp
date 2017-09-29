@@ -60,6 +60,11 @@
     #define DL_HANDLE_TYPE void *
 #endif
 
+// http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
+#define STRING(ITEMS) \
+  ((dynamic_cast<std::ostringstream &>(std::ostringstream() \
+    . seekp(0, std::ios_base::cur) << ITEMS)) . str())
+
 #endif // WITH_DL
 
 namespace casadi {
@@ -120,7 +125,7 @@ namespace casadi {
 
     // Create solver instance
     template<class Problem>
-      static Derived* instantiatePlugin(const std::string& fname,
+      static Derived* instantiate(const std::string& fname,
                                         const std::string& pname, Problem problem);
     // Get name of the plugin
     virtual const char* plugin_name() const = 0;
@@ -349,7 +354,7 @@ namespace casadi {
     // Check if the solver name is in use
     typename std::map<std::string, Plugin>::iterator it=Derived::solvers_.find(plugin.name);
     casadi_assert_message(it==Derived::solvers_.end(),
-                          "Solver " << plugin.name << " is already in use");
+      "Solver " + str(plugin.name) + " is already in use");
 
     // Add to list of solvers
     Derived::solvers_[plugin.name] = plugin;
@@ -374,12 +379,12 @@ namespace casadi {
   template<class Derived>
   template<class Problem>
   Derived* PluginInterface<Derived>::
-  instantiatePlugin(const std::string& fname,
-                    const std::string& pname, Problem problem) {
+  instantiate(const std::string& fname,
+              const std::string& pname, Problem problem) {
 
     // Assert the plugin exists (needed for adaptors)
     if (!has_plugin(pname, true)) {
-      casadi_error("Plugin '" << pname << "' is not found.");
+      casadi_error("Plugin '" + pname + "' is not found.");
     }
     return getPlugin(pname).creator(fname, problem);
   }

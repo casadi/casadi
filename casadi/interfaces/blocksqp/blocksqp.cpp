@@ -52,7 +52,7 @@ namespace casadi {
 
 
   Blocksqp::~Blocksqp() {
-    clear_memory();
+    clear_mem();
   }
 
   Options Blocksqp::options_
@@ -454,8 +454,7 @@ namespace casadi {
       nnz_H_ += dim_[i]*dim_[i];
     }
 
-    log(std::string("BlockSqp::init: working with ") + to_string(nblocks_) +
-          " blocks of max size " + to_string(max_size) + ".");
+    if (verbose_) casadi_message(str(nblocks_) + " blocks of max size " + str(max_size) + ".");
 
     // Allocate a QP solver
     //casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
@@ -501,14 +500,15 @@ namespace casadi {
     alloc_iw(nnz_H_ + (nx_+1) + nx_, true); // hessIndRow
   }
 
-  void Blocksqp::init_memory(void* mem) const {
-    Nlpsol::init_memory(mem);
+  int Blocksqp::init_mem(void* mem) const {
+    if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<BlocksqpMemory*>(mem);
 
     // Create qpOASES memory
     if (schur_) {
       m->qpoases_mem = new QpoasesMemory(linsol_);
     }
+    return 0;
   }
 
   void Blocksqp::set_work(void* mem, const double**& arg, double**& res,
@@ -564,6 +564,9 @@ namespace casadi {
 
   void Blocksqp::solve(void* mem) const {
     auto m = static_cast<BlocksqpMemory*>(mem);
+
+    // Check the provided inputs
+    check_inputs(mem);
 
     int ret = 0;
 

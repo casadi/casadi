@@ -104,18 +104,18 @@ namespace casadi {
   template<typename RealT>
   std::vector<RealT> collocation_pointsGen(int order, const std::string& scheme) {
     if (scheme=="radau") {
-      casadi_assert_message(order>0 && order<10, "Error in collocationPoints(order, scheme): "
-                            "only order up to 9 supported for scheme 'radau', but got "
-                            << order << ".");
+      casadi_assert_message(order>0 && order<10,
+        "Error in collocationPoints(order, scheme): "
+        "only order up to 9 supported for scheme 'radau', but got " + str(order) + ".");
       return std::vector<RealT>(radau_points[order], radau_points[order]+order);
     } else if (scheme=="legendre") {
-      casadi_assert_message(order>0 && order<10, "Error in collocationPoints(order, scheme): "
-                            "only order up to 9 supported for scheme 'legendre', but got "
-                            << order << ".");
+      casadi_assert_message(order>0 && order<10,
+        "Error in collocationPoints(order, scheme): "
+        "only order up to 9 supported for scheme 'legendre', but got " + str(order) + ".");
       return std::vector<RealT>(legendre_points[order], legendre_points[order]+order);
     } else {
       casadi_error("Error in collocationPoints(order, scheme): unknown scheme '"
-                   << scheme << "'. Select one of 'radau', 'legendre'.");
+                   + scheme + "'. Select one of 'radau', 'legendre'.");
     }
   }
 
@@ -129,8 +129,8 @@ namespace casadi {
 
   Function simpleRK(Function f, int N, int order) {
     // Consistency check
-    casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
-                          << N << ".");
+    casadi_assert_message(N>=1,
+      "Parameter N (number of steps) must be at least 1, but got " + str(N) + ".");
     casadi_assert_message(order==4, "Only RK order 4 is supported now.");
     casadi_assert_message(f.n_in()==2, "Function must have two inputs: x and p");
     casadi_assert_message(f.n_out()==1, "Function must have one outputs: dot(x)");
@@ -236,8 +236,8 @@ namespace casadi {
                        const std::string& solver,
                        const Dict& solver_options) {
     // Consistency check
-    casadi_assert_message(N>=1, "Parameter N (number of steps) must be at least 1, but got "
-                          << N << ".");
+    casadi_assert_message(N>=1,
+      "Parameter N (number of steps) must be at least 1, but got " + str(N) + ".");
     casadi_assert_message(f.n_in()==2, "Function must have two inputs: x and p");
     casadi_assert_message(f.n_out()==1, "Function must have one outputs: dot(x)");
 
