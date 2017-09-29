@@ -674,6 +674,7 @@ namespace std {
     }
 #ifdef SWIGPYTHON
 
+
     PyObject* get_Python_helper(const std::string& name) {
       PyObject* module = PyImport_AddModule("casadi");
       PyObject* dict = PyModule_GetDict(module);
@@ -767,6 +768,24 @@ namespace std {
         return true;
       }
     }
+    
+    bool is_scalar_np_array(GUESTOBJECT *p) {
+      if (PyObject_HasAttrString(p, "__array__")) {
+        PyObject *cr = PyObject_GetAttrString(p, (char*) "size");
+        if (cr) {
+          int size;
+          int res = to_val(cr, &size);
+          Py_DECREF(cr);
+          if (!res) return false;
+          return size==1;
+        } else {
+          PyErr_Clear();
+          return false;
+        }
+      }
+      return false;
+   }
+      
 #endif
 
 
@@ -912,15 +931,17 @@ namespace std {
       }
 
 #ifdef SWIGPYTHON
-      PyObject *cr = PyObject_CallMethod(p, (char*) "item", 0);
-      if (cr) {
-        int res = to_ptr(cr, m);
-        Py_DECREF(cr);
-        if (!res) return false;
-        return true;
-      } else {
-        PyErr_Clear();
-        return false;
+      if (is_scalar_np_array(p)) {
+        PyObject *cr = PyObject_CallMethod(p, (char*) "item", 0);
+        if (cr) {
+          int res = to_ptr(cr, m);
+          Py_DECREF(cr);
+          if (!res) return false;
+          return true;
+        } else {
+          PyErr_Clear();
+          return false;
+        }
       }
 #endif // SWIGPYTHON
 
@@ -956,15 +977,17 @@ namespace std {
       if (SWIG_IsOK(SWIG_AsVal(double)(p, m ? *m : 0))) return true;
 
 #ifdef SWIGPYTHON
-      PyObject *cr = PyObject_CallMethod(p, (char*) "item", 0);
-      if (cr) {
-        int res = to_ptr(cr, m);
-        Py_DECREF(cr);
-        if (!res) return false;
-        return true;
-      } else {
-        PyErr_Clear();
-        return false;
+      if (is_scalar_np_array(p)) {
+        PyObject *cr = PyObject_CallMethod(p, (char*) "item", 0);
+        if (cr) {
+          int res = to_ptr(cr, m);
+          Py_DECREF(cr);
+          if (!res) return false;
+          return true;
+        } else {
+          PyErr_Clear();
+          return false;
+        }
       }
 #endif // SWIGPYTHON
 
