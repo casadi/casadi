@@ -4,6 +4,1398 @@
 // File: classcasadi_1_1Assertion.xml
 
 
+// File: classcasadi_1_1BackwardDiff.xml
+%feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
+const  "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::index_out(const std::string
+&name) const  "
+
+[INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::clear_mem() "
+
+[INTERNAL]  Clear all memory (called from destructor)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::call_forward(const
+std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
+std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
+always_inline, bool never_inline) const  "
+
+[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
+classes.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::call_forward(const
+std::vector< SX > &arg, const std::vector< SX > &res, const std::vector<
+std::vector< SX > > &fseed, std::vector< std::vector< SX > > &fsens, bool
+always_inline, bool never_inline) const  "
+
+[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
+classes.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print more.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
+bool persistent=false) "
+
+[INTERNAL]  Ensure work vectors long enough to evaluate function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::checkout() const  "
+
+[INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::replace_res(const
+std::vector< M > &res) const  "
+
+[INTERNAL]  Replace 0-by-0 outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::slice(const std::string
+&name, const std::vector< int > &order_in, const std::vector< int >
+&order_out, const Dict &opts) const  "
+
+[INTERNAL]  returns a new function with a selection of inputs/outputs of the
+original
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::wrap() const  "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::getJacSparsity(int iind,
+int oind, bool symmetric) const  "
+
+[INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
+
+[INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::eval_dm(const std::vector<
+DM > &arg) const  "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::get_sparsity_out(int i) override
+"
+
+[INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reverse(int nadj, const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const  "
+
+[INTERNAL]  Return function that calculates adjoint derivatives
+reverse(nadj) returns a cached instance if available, and calls  Function
+get_reverse(int nadj) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::uses_output() const override "
+
+[INTERNAL]  Is the scheme using the (nondifferentiated) output?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_sprev() const  "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring")  casadi::BackwardDiff::class_name() const override "
+
+[INTERNAL]  Get type name.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::all_scalar() const  "
+
+[INTERNAL]  Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::eval_sx(const SXElem **arg,
+SXElem **res, int *iw, SXElem *w, void *mem) const  "
+
+[INTERNAL]  Evaluate with symbolic scalars.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_mem() const  "
+
+[INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
+std::vector< MX > &arg) const  "
+
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Print.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::mx_in(int ind) const  "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::mx_in() const  "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::jit_dependencies(const
+std::string &fname) "
+
+[INTERNAL]  Jit dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::init_mem(void *mem) const
+"
+
+[INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_jacobian(const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const  "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::release(int mem) const  "
+
+[INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+
+[INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::get_name_out(int i) override "
+
+[INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::check_res(const
+std::vector< M > &res) const  "
+
+[INTERNAL]  Check if output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::free_sx() const  "
+
+[INTERNAL]  Get free variables (SX)
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::has_codegen() const override "
+
+[INTERNAL]  Is codegen supported?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_output(int k)
+const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::size_out(int ind) const  "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::get_sparsity_in(int i) override "
+
+[INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::getJacSparsityHierarchicalSymm(int iind, int oind)
+const  "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_function(const
+std::string &fname) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
+
+[INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::replace_arg(const
+std::vector< M > &arg) const  "
+
+[INTERNAL]  Replace 0-by-0 inputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::mapsum_mx(const
+std::vector< MX > &arg, const std::string &parallelization) "
+
+[INTERNAL]  Parallel evaluation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
+const std::string &fname) const  "
+
+[INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::size2_out(int ind) const  "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::getJacSparsityGen(int iind,
+int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
+
+[INTERNAL]  Get the sparsity pattern, forward mode.
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::get_name_in(int i) override "
+
+[INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::replace_fseed(const
+std::vector< std::vector< M > > &fseed) const  "
+
+[INTERNAL]  Replace 0-by-0 forward seeds.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::factory(const std::string
+&name, const std::vector< std::string > &s_in, const std::vector<
+std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
+"
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::name() const  "
+
+[INTERNAL]  Name of the function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
+double **&arg, double **&res, int *&iw, double *&w) const  "
+
+[INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::eval_gen(const double
+**arg, double **res, int *iw, double *w, void *mem) const  "
+
+[INTERNAL]  Evaluate numerically.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::eval_gen(const SXElem
+**arg, SXElem **res, int *iw, SXElem *w, void *mem) const  "
+
+[INTERNAL]  Evaluate a function, overloaded.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::eval_gen(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
+
+[INTERNAL]  Evaluate a function, overloaded.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::jacobian() const  "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::codegen_body(CodeGenerator &g)
+const override "
+
+[INTERNAL]  Generate code for the body of the C function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_work(size_t &sz_arg,
+size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
+
+[INTERNAL]  Get number of temporary variables needed.
+
+";
+
+%feature("docstring") casadi::BackwardDiff::BackwardDiff(const std::string
+&name, int n) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ForwardDiff::has_err() const override "
+
+[INTERNAL] ";
+
+%feature("docstring")
+casadi::FunctionInternal::getJacSparsityHierarchical(int iind, int oind)
+const  "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::oracle() const  "
+
+[INTERNAL]  Get oracle.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sparsity_jac(int iind, int
+oind, bool compact, bool symmetric) const  "
+
+[INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_reverse(int nadj) const
+"
+
+[INTERNAL]  Return function that calculates adjoint derivatives
+reverse(nadj) returns a cached instance if available, and calls  Function
+get_reverse(int nadj) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
+
+[INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
+&arg, MXVector &res, bool always_inline, bool never_inline) const  "
+
+[INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::check_arg(const
+std::vector< M > &arg) const  "
+
+[INTERNAL]  Check if input arguments have correct length and dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
+const std::vector< MatType > &v) const  "
+
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::matching_arg(const
+std::vector< M > &arg) const  "
+
+[INTERNAL]  Check if input arguments that needs to be replaced.
+
+";
+
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring")  casadi::ForwardDiff::get_abstol() const override "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::fwd_seed(int nfwd) const  "
+
+[INTERNAL]  Symbolic expressions for the forward seeds.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::nnz_out() const  "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::nnz_out(int ind) const  "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring")  casadi::ForwardDiff::calc_fd(double **yk, double *y0,
+double *J, double h) const override "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ForwardDiff::calc_fd() const override "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::free_mx() const  "
+
+[INTERNAL]  Get free variables ( MX)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_function() const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::get_function(const
+std::string &name) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::size1_in(int ind) const  "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::matching_res(const
+std::vector< M > &arg) const  "
+
+[INTERNAL]  Check if output arguments that needs to be replaced.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::definition() const  "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
+"
+
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
+&name) const  "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_id(int k) const
+"
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
+bool persistent=false) "
+
+[INTERNAL]  Ensure required length of arg field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::get_default_in(int ind) const
+override "
+
+[INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::numel_in() const  "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::numel_in(int ind) const  "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::BackwardDiff "
+
+[INTERNAL]  Calculate derivative using backward differences Joel Andersson
+
+>List of available options
+
++------------------+-----------------+------------------+------------------+
+|        Id        |      Type       |   Description    |     Used in      |
++==================+=================+==================+==================+
+| abstol           | OT_DOUBLE       | Accuracy of      | casadi::Backward |
+|                  |                 | function outputs | Diff             |
+|                  |                 | [default: query  |                  |
+|                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
+| ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
+|                  |                 | for derivative   | Internal         |
+|                  |                 | calculation.When |                  |
+|                  |                 | there is an      |                  |
+|                  |                 | option of either |                  |
+|                  |                 | using forward or |                  |
+|                  |                 | reverse mode     |                  |
+|                  |                 | directional      |                  |
+|                  |                 | derivatives, the |                  |
+|                  |                 | condition ad_wei |                  |
+|                  |                 | ght*nf<=(1-ad_we |                  |
+|                  |                 | ight)*na is used |                  |
+|                  |                 | where nf and na  |                  |
+|                  |                 | are estimates of |                  |
+|                  |                 | the number of    |                  |
+|                  |                 | forward/reverse  |                  |
+|                  |                 | mode directional |                  |
+|                  |                 | derivatives      |                  |
+|                  |                 | needed. By       |                  |
+|                  |                 | default,         |                  |
+|                  |                 | ad_weight is     |                  |
+|                  |                 | calculated       |                  |
+|                  |                 | automatically,   |                  |
+|                  |                 | but this can be  |                  |
+|                  |                 | overridden by    |                  |
+|                  |                 | setting this     |                  |
+|                  |                 | option. In       |                  |
+|                  |                 | particular, 0    |                  |
+|                  |                 | means forcing    |                  |
+|                  |                 | forward mode and |                  |
+|                  |                 | 1 forcing        |                  |
+|                  |                 | reverse mode.    |                  |
+|                  |                 | Leave unset for  |                  |
+|                  |                 | (class specific) |                  |
+|                  |                 | heuristics.      |                  |
++------------------+-----------------+------------------+------------------+
+| ad_weight_sp     | OT_DOUBLE       | Weighting factor | casadi::Function |
+|                  |                 | for sparsity     | Internal         |
+|                  |                 | pattern          |                  |
+|                  |                 | calculation calc |                  |
+|                  |                 | ulation.Override |                  |
+|                  |                 | s default        |                  |
+|                  |                 | behavior. Set to |                  |
+|                  |                 | 0 and 1 to force |                  |
+|                  |                 | forward and      |                  |
+|                  |                 | reverse mode     |                  |
+|                  |                 | respectively.    |                  |
+|                  |                 | Cf. option       |                  |
+|                  |                 | \"ad_weight\".     |                  |
++------------------+-----------------+------------------+------------------+
+| compiler         | OT_STRING       | Just-in-time     | casadi::Function |
+|                  |                 | compiler plugin  | Internal         |
+|                  |                 | to be used.      |                  |
++------------------+-----------------+------------------+------------------+
+| derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
+|                  |                 | a derivative of  | Internal         |
+|                  |                 | another          |                  |
+|                  |                 | function. The    |                  |
+|                  |                 | type of          |                  |
+|                  |                 | derivative       |                  |
+|                  |                 | (directional     |                  |
+|                  |                 | derivative,      |                  |
+|                  |                 | Jacobian) is     |                  |
+|                  |                 | inferred from    |                  |
+|                  |                 | the function     |                  |
+|                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| enable_fd        | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation by   |                  |
+|                  |                 | finite           |                  |
+|                  |                 | differencing.    |                  |
+|                  |                 | [default:        |                  |
+|                  |                 | false]]          |                  |
++------------------+-----------------+------------------+------------------+
+| enable_forward   | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | Jacobian-times-  |                  |
+|                  |                 | vector products  |                  |
+|                  |                 | - typically      |                  |
+|                  |                 | using forward    |                  |
+|                  |                 | mode AD - if     |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| enable_jacobian  | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | Jacobians of all |                  |
+|                  |                 | differentiable   |                  |
+|                  |                 | outputs with     |                  |
+|                  |                 | respect to all   |                  |
+|                  |                 | differentiable   |                  |
+|                  |                 | inputs - if      |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| enable_reverse   | OT_BOOL         | Enable           | casadi::Function |
+|                  |                 | derivative       | Internal         |
+|                  |                 | calculation      |                  |
+|                  |                 | using generated  |                  |
+|                  |                 | functions for    |                  |
+|                  |                 | transposed       |                  |
+|                  |                 | Jacobian-times-  |                  |
+|                  |                 | vector products  |                  |
+|                  |                 | - typically      |                  |
+|                  |                 | using reverse    |                  |
+|                  |                 | mode AD - if     |                  |
+|                  |                 | available.       |                  |
+|                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| fd_method        | OT_STRING       | Method for       | casadi::Function |
+|                  |                 | finite           | Internal         |
+|                  |                 | differencing     |                  |
+|                  |                 | [default         |                  |
+|                  |                 | 'central']       |                  |
++------------------+-----------------+------------------+------------------+
+| fd_options       | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | finite           |                  |
+|                  |                 | difference       |                  |
+|                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
+|                  |                 | option           | Internal         |
+|                  |                 | (ignored):       |                  |
+|                  |                 | Statistics are   |                  |
+|                  |                 | now always       |                  |
+|                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| h_iter           | OT_INT          | Number of        | casadi::Backward |
+|                  |                 | iterations to    | Diff             |
+|                  |                 | improve on the   |                  |
+|                  |                 | step-size        |                  |
+|                  |                 | [default: 1 if   |                  |
+|                  |                 | error estimate   |                  |
+|                  |                 | available,       |                  |
+|                  |                 | otherwise 0]     |                  |
++------------------+-----------------+------------------+------------------+
+| h_max            | OT_DOUBLE       | Maximum step     | casadi::Backward |
+|                  |                 | size [default 0] | Diff             |
++------------------+-----------------+------------------+------------------+
+| h_min            | OT_DOUBLE       | Minimum step     | casadi::Backward |
+|                  |                 | size [default    | Diff             |
+|                  |                 | inf]             |                  |
++------------------+-----------------+------------------+------------------+
+| input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
+|                  |                 | option (ignored) | Internal         |
++------------------+-----------------+------------------+------------------+
+| inputs_check     | OT_BOOL         | Throw exceptions | casadi::Function |
+|                  |                 | when the         | Internal         |
+|                  |                 | numerical values |                  |
+|                  |                 | of the inputs    |                  |
+|                  |                 | don't make sense |                  |
++------------------+-----------------+------------------+------------------+
+| jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
+|                  |                 | for a number of  | Internal         |
+|                  |                 | forward/reverse  |                  |
+|                  |                 | directions, it   |                  |
+|                  |                 | may be cheaper   |                  |
+|                  |                 | to compute first |                  |
+|                  |                 | the full         |                  |
+|                  |                 | jacobian and     |                  |
+|                  |                 | then multiply    |                  |
+|                  |                 | with seeds,      |                  |
+|                  |                 | rather than      |                  |
+|                  |                 | obtain the       |                  |
+|                  |                 | requested        |                  |
+|                  |                 | directions in a  |                  |
+|                  |                 | straightforward  |                  |
+|                  |                 | manner. Casadi   |                  |
+|                  |                 | uses a heuristic |                  |
+|                  |                 | to decide which  |                  |
+|                  |                 | is cheaper. A    |                  |
+|                  |                 | high value of    |                  |
+|                  |                 | 'jac_penalty'    |                  |
+|                  |                 | makes it less    |                  |
+|                  |                 | likely for the   |                  |
+|                  |                 | heurstic to      |                  |
+|                  |                 | chose the full   |                  |
+|                  |                 | Jacobian         |                  |
+|                  |                 | strategy. The    |                  |
+|                  |                 | special value -1 |                  |
+|                  |                 | indicates never  |                  |
+|                  |                 | to use the full  |                  |
+|                  |                 | Jacobian         |                  |
+|                  |                 | strategy         |                  |
++------------------+-----------------+------------------+------------------+
+| jit              | OT_BOOL         | Use just-in-time | casadi::Function |
+|                  |                 | compiler to      | Internal         |
+|                  |                 | speed up the     |                  |
+|                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_options      | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to the    | Internal         |
+|                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| max_num_dir      | OT_INT          | Specify the      | casadi::Function |
+|                  |                 | maximum number   | Internal         |
+|                  |                 | of directions    |                  |
+|                  |                 | for derivative   |                  |
+|                  |                 | functions.       |                  |
+|                  |                 | Overrules the    |                  |
+|                  |                 | builtin optimize |                  |
+|                  |                 | d_num_dir.       |                  |
++------------------+-----------------+------------------+------------------+
+| output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
+|                  |                 | option (ignored) | Internal         |
++------------------+-----------------+------------------+------------------+
+| print_time       | OT_BOOL         | print            | casadi::Function |
+|                  |                 | information      | Internal         |
+|                  |                 | about execution  |                  |
+|                  |                 | time             |                  |
++------------------+-----------------+------------------+------------------+
+| regularity_check | OT_BOOL         | Throw exceptions | casadi::Function |
+|                  |                 | when NaN or Inf  | Internal         |
+|                  |                 | appears during   |                  |
+|                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reltol           | OT_DOUBLE       | Accuracy of      | casadi::Backward |
+|                  |                 | function inputs  | Diff             |
+|                  |                 | [default: query  |                  |
+|                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
+| second_order_ste | OT_DOUBLE       | Second order     | casadi::Backward |
+| psize            |                 | perturbation     | Diff             |
+|                  |                 | size [default:   |                  |
+|                  |                 | 1e-3]            |                  |
++------------------+-----------------+------------------+------------------+
+| smoothing        | OT_DOUBLE       | Smoothing        | casadi::Backward |
+|                  |                 | regularization   | Diff             |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
++------------------+-----------------+------------------+------------------+
+| u_aim            | OT_DOUBLE       | Target ratio of  | casadi::Backward |
+|                  |                 | roundoff error   | Diff             |
+|                  |                 | to truncation    |                  |
+|                  |                 | error [default:  |                  |
+|                  |                 | 100.]            |                  |
++------------------+-----------------+------------------+------------------+
+| user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
+|                  |                 | field that can   | Internal         |
+|                  |                 | be used to       |                  |
+|                  |                 | identify the     |                  |
+|                  |                 | function or pass |                  |
+|                  |                 | additional       |                  |
+|                  |                 | information      |                  |
++------------------+-----------------+------------------+------------------+
+| verbose          | OT_BOOL         | Verbose          | casadi::Function |
+|                  |                 | evaluation  for  | Internal         |
+|                  |                 | debugging        |                  |
++------------------+-----------------+------------------+------------------+
+
+Diagrams
+--------
+
+
+
+C++ includes: finite_differences.hpp ";
+
+%feature("docstring")  casadi::FunctionInternal::call_reverse(const
+std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
+std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens, bool
+always_inline, bool never_inline) const  "
+
+[INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::call_reverse(const
+std::vector< SX > &arg, const std::vector< SX > &res, const std::vector<
+std::vector< SX > > &aseed, std::vector< std::vector< SX > > &asens, bool
+always_inline, bool never_inline) const  "
+
+[INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::call(const std::vector< M >
+&arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
+
+[INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::call_gen(const MXVector
+&arg, MXVector &res, bool always_inline, bool never_inline) const  "
+
+[INTERNAL]   Call a function, overloaded.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::call_gen(const std::vector<
+Matrix< D > > &arg, std::vector< Matrix< D > > &res, bool always_inline,
+bool never_inline) const  "
+
+[INTERNAL]   Call a function, overloaded.
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::init(const Dict &opts) override "
+
+[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::which_depends(const
+std::string &s_in, const std::vector< std::string > &s_out, int order, bool
+tr=false) const  "
+
+[INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::size2_in(int ind) const  "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::construct(const Dict &opts)
+"
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring")
+casadi::FiniteDiff::codegen_declarations(CodeGenerator &g) const override "
+
+[INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::eval(const double **arg, double
+**res, int *iw, double *w, void *mem) const override "
+
+[INTERNAL]  Evaluate numerically.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_free() const  "
+
+[INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::set_temp(void *mem, const
+double **arg, double **res, int *iw, double *w) const  "
+
+[INTERNAL]  Set the (temporary) work vectors.
+
+";
+
+%feature("docstring")  casadi::ForwardDiff::has_forward(int nfwd) const
+override "
+
+[INTERNAL]  Second order derivatives.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
+&stream) const  "
+
+[INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::get_n_in() override "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
+std::string &fname, const Dict &opts) const  "
+
+[INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::free_mem(void *mem) const
+"
+
+[INTERNAL]  Free memory block.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
+
+[INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::ForwardDiff::n_pert() const override "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
+bool persistent=false) "
+
+[INTERNAL]  Ensure required length of res field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
+"
+
+[INTERNAL]  Finalize the object creation This function, which visits the
+class hierarchy in reverse order is run after init() has been completed.
+
+";
+
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::get_options() const override "
+
+[INTERNAL]  Options.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(int ind) const
+"
+
+[INTERNAL]  Get largest input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::print_option(const
+std::string &name, std::ostream &stream) const  "
+
+[INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::reverse(int nadj) const  "
+
+[INTERNAL]  Return function that calculates adjoint derivatives
+reverse(nadj) returns a cached instance if available, and calls  Function
+get_reverse(int nadj) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
+&type, bool recursive) const  "
+
+[INTERNAL]  Check if the function is of a particular type.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
+
+[INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::mx_out(int ind) const  "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::mx_out() const  "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::ForwardDiff::pert(const std::string &k) const
+override "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ForwardDiff::pert(int k, double h) const
+override "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::size_in(int ind) const  "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::nnz_in() const  "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::nnz_in(int ind) const  "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::forward(int nfwd) const  "
+
+[INTERNAL]  Return function that calculates forward derivatives
+forward(nfwd) returns a cached instance if available, and calls  Function
+get_forward(int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::numel_out() const  "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
+const  "
+
+[INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring")  casadi::BackwardDiff::calc_stepsize(double abstol)
+const override "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ForwardDiff::get_forward(int nfwd, const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const override "
+
+[INTERNAL]  Second order derivatives.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool
+persistent=false) "
+
+[INTERNAL]  Ensure required length of iw field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sx_out(int ind) const  "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sx_out() const  "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
+
+[INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
+
+[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
+propagation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sx_in(int ind) const  "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sx_in() const  "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
+"
+
+[INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_input(int k)
+const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_spfwd() const  "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::fwdViaJac(int nfwd) const
+"
+
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_name(const
+CodeGenerator &g) const  "
+
+[INTERNAL]  Get name in codegen.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_lifted(Function
+&vdef_fcn, Function &vinit_fcn) const  "
+
+[INTERNAL]  Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_res() const  "
+
+[INTERNAL]  Get required length of res field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::signature(const std::string
+&fname) const  "
+
+[INTERNAL]  Code generate the function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
+
+[INTERNAL]  Weighting factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::replace_aseed(const
+std::vector< std::vector< M > > &aseed) const  "
+
+[INTERNAL]  Replace 0-by-0 reverse seeds.
+
+";
+
+%feature("docstring") casadi::BackwardDiff::~BackwardDiff "
+
+[INTERNAL]  Destructor.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
+**arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(int iind, int
+oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool
+allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring")  casadi::FiniteDiff::get_n_out() override "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_min_in(int ind) const
+"
+
+[INTERNAL]  Get smallest input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
+&g) const  "
+
+[INTERNAL]  Generate meta-information allowing a user to evaluate a
+generated function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::self() const  "
+
+[INTERNAL]  Get a public class instance.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
+double **arg, double **res, int *iw, double *w) const  "
+
+[INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+
 // File: classcasadi_1_1Bilin.xml
 
 
@@ -1073,6 +2465,12 @@ std::vector< std::vector< M > > &aseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call(const std::vector< M >
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
@@ -1713,6 +3111,12 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::Blocksqp::init_mem(void *mem) const override
 "
 
@@ -2141,6 +3545,12 @@ Ipopt::TNLP::LinearityType *var_types) override "
 
 
 // File: classcasadi_1_1BSpline.xml
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::replace_aseed(const
 std::vector< std::vector< M > > &aseed) const  "
 
@@ -2864,6 +4274,12 @@ propagation.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
 [INTERNAL]  Can derivatives be calculated in any way?
@@ -3211,12 +4627,6 @@ structure recognition.
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
-+------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -3735,12 +5145,6 @@ Base class for BSpline evaluators
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -4141,6 +5545,13 @@ get_reverse(int nadj) if no cached version is available.
 oind, bool compact, bool symmetric) const  "
 
 [INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::index_out(const std::string
+&name) const  "
+
+[INTERNAL]  Get output scheme index by name.
 
 ";
 
@@ -4609,10 +6020,9 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::index_out(const std::string
-&name) const  "
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
 
-[INTERNAL]  Get output scheme index by name.
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -4729,6 +6139,12 @@ std::string &name) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -4852,9 +6268,9 @@ Generate code for the declarations of the C function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
 
-[INTERNAL]  Get required length of w field.
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -5019,6 +6435,12 @@ std::vector< std::vector< M > > &aseed) const  "
 &name) const  "
 
 [INTERNAL]  Get input scheme index by name.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
+
+[INTERNAL]  Get required length of w field.
 
 ";
 
@@ -5438,12 +6860,6 @@ get_reverse(int nadj) if no cached version is available.
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -5721,6 +7137,12 @@ persistent=false) "
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -7028,6 +8450,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -7134,6 +8562,12 @@ always_inline, bool never_inline) const  "
 
 [INTERNAL]  Forward mode AD, virtual functions overloaded in derived
 classes.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -8872,6 +10306,10 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::CentralDiff::has_err() const override "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -8919,6 +10357,12 @@ std::string &name) const  "
 
 ";
 
+%feature("docstring")  casadi::CentralDiff::get_abstol() const override "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::replace_res(const
 std::vector< M > &res) const  "
 
@@ -8948,6 +10392,11 @@ std::vector< M > &res) const  "
 +------------------+-----------------+------------------+------------------+
 |        Id        |      Type       |   Description    |     Used in      |
 +==================+=================+==================+==================+
+| abstol           | OT_DOUBLE       | Accuracy of      | casadi::CentralD |
+|                  |                 | function outputs | iff              |
+|                  |                 | [default: query  |                  |
+|                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
 | ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
 |                  |                 | for derivative   | Internal         |
 |                  |                 | calculation.When |                  |
@@ -9064,18 +10513,6 @@ std::vector< M > &res) const  "
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| eps_in           | OT_DOUBLE       | Accuracy of      | casadi::CentralD |
-|                  |                 | function inputs  | iff              |
-|                  |                 | [default:        |                  |
-|                  |                 | machine          |                  |
-|                  |                 | precision]       |                  |
-+------------------+-----------------+------------------+------------------+
-| eps_out          | OT_DOUBLE       | Accuracy of      | casadi::CentralD |
-|                  |                 | function outputs | iff              |
-|                  |                 | [default:        |                  |
-|                  |                 | machine          |                  |
-|                  |                 | precision]       |                  |
-+------------------+-----------------+------------------+------------------+
 | fd_method        | OT_STRING       | Method for       | casadi::Function |
 |                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
@@ -9088,12 +10525,6 @@ std::vector< M > &res) const  "
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -9101,9 +10532,21 @@ std::vector< M > &res) const  "
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
 +------------------+-----------------+------------------+------------------+
+| h_iter           | OT_INT          | Number of        | casadi::CentralD |
+|                  |                 | iterations to    | iff              |
+|                  |                 | improve on the   |                  |
+|                  |                 | step-size        |                  |
+|                  |                 | [default: 1 if   |                  |
+|                  |                 | error estimate   |                  |
+|                  |                 | available,       |                  |
+|                  |                 | otherwise 0]     |                  |
++------------------+-----------------+------------------+------------------+
 | h_max            | OT_DOUBLE       | Maximum step     | casadi::CentralD |
+|                  |                 | size [default 0] | iff              |
++------------------+-----------------+------------------+------------------+
+| h_min            | OT_DOUBLE       | Minimum step     | casadi::CentralD |
 |                  |                 | size [default    | iff              |
-|                  |                 | 1.0]             |                  |
+|                  |                 | inf]             |                  |
 +------------------+-----------------+------------------+------------------+
 | input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -9178,10 +10621,21 @@ std::vector< M > &res) const  "
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| reltol           | OT_DOUBLE       | Accuracy of      | casadi::CentralD |
+|                  |                 | function inputs  | iff              |
+|                  |                 | [default: query  |                  |
+|                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::CentralD |
 | psize            |                 | perturbation     | iff              |
 |                  |                 | size [default:   |                  |
 |                  |                 | 1e-3]            |                  |
++------------------+-----------------+------------------+------------------+
+| smoothing        | OT_DOUBLE       | Smoothing        | casadi::CentralD |
+|                  |                 | regularization   | iff              |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
 +------------------+-----------------+------------------+------------------+
 | u_aim            | OT_DOUBLE       | Target ratio of  | casadi::CentralD |
 |                  |                 | roundoff error   | iff              |
@@ -9208,6 +10662,11 @@ Diagrams
 
 
 C++ includes: finite_differences.hpp ";
+
+%feature("docstring")  casadi::CentralDiff::calc_stepsize(double abstol)
+const override "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
 &stream) const  "
@@ -9242,7 +10701,8 @@ override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::CentralDiff::pert(int k) const override "
+%feature("docstring")  casadi::CentralDiff::pert(int k, double h) const
+override "
 
 [INTERNAL] ";
 
@@ -9305,7 +10765,7 @@ elements.
 ";
 
 %feature("docstring") casadi::CentralDiff::CentralDiff(const std::string
-&name, int n, double h) "
+&name, int n) "
 
 [INTERNAL] ";
 
@@ -9332,13 +10792,11 @@ class hierarchy in reverse order is run after init() has been completed.
 ";
 
 %feature("docstring")  casadi::CentralDiff::calc_fd(double **yk, double *y0,
-double *J) const override "
+double *J, double h) const override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::CentralDiff::calc_fd(CodeGenerator &g, const
-std::string &yk, const std::string &y0, const std::string &J) const override
-"
+%feature("docstring")  casadi::CentralDiff::calc_fd() const override "
 
 [INTERNAL] ";
 
@@ -9700,6 +11158,12 @@ propagation.
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 [INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -10279,6 +11743,12 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const override "
 casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen decref for dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -11080,6 +12550,12 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
@@ -11745,6 +13221,12 @@ always_inline, bool never_inline) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval(const double **arg,
 double **res, int *iw, double *w, void *mem) const  "
 
@@ -11767,6 +13249,12 @@ get_reverse(int nadj) if no cached version is available.
 
 [INTERNAL]  Finalize the object creation This function, which visits the
 class hierarchy in reverse order is run after init() has been completed.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -12756,12 +14244,6 @@ Internal class.
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
-+------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -14013,12 +15495,6 @@ Internal class.
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -14706,6 +16182,18 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::check_arg(const
 std::vector< M > &arg) const  "
 
@@ -15142,6 +16630,12 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::replace_res(const
 std::vector< M > &res) const  "
 
@@ -15392,6 +16886,12 @@ always_inline, bool never_inline) const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -16011,12 +17511,6 @@ Internal class.
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
-+------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -16869,12 +18363,6 @@ const std::vector< std::string > &s_in, const std::vector< std::string >
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -16994,10 +18482,9 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
-const std::vector< MatType > &v) const  "
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
 
-[INTERNAL]  Symbolic expressions for the adjoint seeds.
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -17649,6 +19136,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
 const std::string &fname) const  "
 
@@ -17699,6 +19192,13 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(int nadj,
+const std::vector< MatType > &v) const  "
+
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
 
 ";
 
@@ -17879,6 +19379,12 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
 
@@ -17970,7 +19476,7 @@ std::vector< M > &arg) const  "
 ";
 
 %feature("docstring") casadi::FiniteDiff::FiniteDiff(const std::string
-&name, int n, double h) "
+&name, int n) "
 
 [INTERNAL] ";
 
@@ -18489,6 +19995,12 @@ const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -18685,6 +20197,11 @@ structure recognition.
 +------------------+-----------------+------------------+------------------+
 |        Id        |      Type       |   Description    |     Used in      |
 +==================+=================+==================+==================+
+| abstol           | OT_DOUBLE       | Accuracy of      | casadi::FiniteDi |
+|                  |                 | function outputs | ff               |
+|                  |                 | [default: query  |                  |
+|                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
 | ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
 |                  |                 | for derivative   | Internal         |
 |                  |                 | calculation.When |                  |
@@ -18801,18 +20318,6 @@ structure recognition.
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| eps_in           | OT_DOUBLE       | Accuracy of      | casadi::FiniteDi |
-|                  |                 | function inputs  | ff               |
-|                  |                 | [default:        |                  |
-|                  |                 | machine          |                  |
-|                  |                 | precision]       |                  |
-+------------------+-----------------+------------------+------------------+
-| eps_out          | OT_DOUBLE       | Accuracy of      | casadi::FiniteDi |
-|                  |                 | function outputs | ff               |
-|                  |                 | [default:        |                  |
-|                  |                 | machine          |                  |
-|                  |                 | precision]       |                  |
-+------------------+-----------------+------------------+------------------+
 | fd_method        | OT_STRING       | Method for       | casadi::Function |
 |                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
@@ -18825,12 +20330,6 @@ structure recognition.
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -18838,9 +20337,21 @@ structure recognition.
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
 +------------------+-----------------+------------------+------------------+
+| h_iter           | OT_INT          | Number of        | casadi::FiniteDi |
+|                  |                 | iterations to    | ff               |
+|                  |                 | improve on the   |                  |
+|                  |                 | step-size        |                  |
+|                  |                 | [default: 1 if   |                  |
+|                  |                 | error estimate   |                  |
+|                  |                 | available,       |                  |
+|                  |                 | otherwise 0]     |                  |
++------------------+-----------------+------------------+------------------+
 | h_max            | OT_DOUBLE       | Maximum step     | casadi::FiniteDi |
+|                  |                 | size [default 0] | ff               |
++------------------+-----------------+------------------+------------------+
+| h_min            | OT_DOUBLE       | Minimum step     | casadi::FiniteDi |
 |                  |                 | size [default    | ff               |
-|                  |                 | 1.0]             |                  |
+|                  |                 | inf]             |                  |
 +------------------+-----------------+------------------+------------------+
 | input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -18915,10 +20426,21 @@ structure recognition.
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| reltol           | OT_DOUBLE       | Accuracy of      | casadi::FiniteDi |
+|                  |                 | function inputs  | ff               |
+|                  |                 | [default: query  |                  |
+|                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::FiniteDi |
 | psize            |                 | perturbation     | ff               |
 |                  |                 | size [default:   |                  |
 |                  |                 | 1e-3]            |                  |
++------------------+-----------------+------------------+------------------+
+| smoothing        | OT_DOUBLE       | Smoothing        | casadi::FiniteDi |
+|                  |                 | regularization   | ff               |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
 +------------------+-----------------+------------------+------------------+
 | u_aim            | OT_DOUBLE       | Target ratio of  | casadi::FiniteDi |
 |                  |                 | roundoff error   | ff               |
@@ -19963,6 +21485,12 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -20368,6 +21896,12 @@ std::string &fname) const override "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
 
@@ -20471,12 +22005,10 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
-persistent=false) "
+%feature("docstring")  casadi::ForwardDiff::calc_stepsize(double abstol)
+const override "
 
-[INTERNAL]  Ensure required length of w field.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
@@ -20523,9 +22055,9 @@ const std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
 
-[INTERNAL]  Get required length of w field.
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -20633,6 +22165,12 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
+
+[INTERNAL]  Get required length of w field.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
@@ -20676,6 +22214,13 @@ CodeGenerator &g) const  "
 "
 
 [INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
+
+[INTERNAL]  Ensure required length of w field.
 
 ";
 
@@ -20799,6 +22344,11 @@ structure recognition for symmetric Jacobians
 +------------------+-----------------+------------------+------------------+
 |        Id        |      Type       |   Description    |     Used in      |
 +==================+=================+==================+==================+
+| abstol           | OT_DOUBLE       | Accuracy of      | casadi::ForwardD |
+|                  |                 | function outputs | iff              |
+|                  |                 | [default: query  |                  |
+|                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
 | ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
 |                  |                 | for derivative   | Internal         |
 |                  |                 | calculation.When |                  |
@@ -20915,18 +22465,6 @@ structure recognition for symmetric Jacobians
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| eps_in           | OT_DOUBLE       | Accuracy of      | casadi::ForwardD |
-|                  |                 | function inputs  | iff              |
-|                  |                 | [default:        |                  |
-|                  |                 | machine          |                  |
-|                  |                 | precision]       |                  |
-+------------------+-----------------+------------------+------------------+
-| eps_out          | OT_DOUBLE       | Accuracy of      | casadi::ForwardD |
-|                  |                 | function outputs | iff              |
-|                  |                 | [default:        |                  |
-|                  |                 | machine          |                  |
-|                  |                 | precision]       |                  |
-+------------------+-----------------+------------------+------------------+
 | fd_method        | OT_STRING       | Method for       | casadi::Function |
 |                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
@@ -20939,12 +22477,6 @@ structure recognition for symmetric Jacobians
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -20952,9 +22484,21 @@ structure recognition for symmetric Jacobians
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
 +------------------+-----------------+------------------+------------------+
+| h_iter           | OT_INT          | Number of        | casadi::ForwardD |
+|                  |                 | iterations to    | iff              |
+|                  |                 | improve on the   |                  |
+|                  |                 | step-size        |                  |
+|                  |                 | [default: 1 if   |                  |
+|                  |                 | error estimate   |                  |
+|                  |                 | available,       |                  |
+|                  |                 | otherwise 0]     |                  |
++------------------+-----------------+------------------+------------------+
 | h_max            | OT_DOUBLE       | Maximum step     | casadi::ForwardD |
+|                  |                 | size [default 0] | iff              |
++------------------+-----------------+------------------+------------------+
+| h_min            | OT_DOUBLE       | Minimum step     | casadi::ForwardD |
 |                  |                 | size [default    | iff              |
-|                  |                 | 1.0]             |                  |
+|                  |                 | inf]             |                  |
 +------------------+-----------------+------------------+------------------+
 | input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -21029,10 +22573,21 @@ structure recognition for symmetric Jacobians
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| reltol           | OT_DOUBLE       | Accuracy of      | casadi::ForwardD |
+|                  |                 | function inputs  | iff              |
+|                  |                 | [default: query  |                  |
+|                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::ForwardD |
 | psize            |                 | perturbation     | iff              |
 |                  |                 | size [default:   |                  |
 |                  |                 | 1e-3]            |                  |
++------------------+-----------------+------------------+------------------+
+| smoothing        | OT_DOUBLE       | Smoothing        | casadi::ForwardD |
+|                  |                 | regularization   | iff              |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
 +------------------+-----------------+------------------+------------------+
 | u_aim            | OT_DOUBLE       | Target ratio of  | casadi::ForwardD |
 |                  |                 | roundoff error   | iff              |
@@ -21089,13 +22644,11 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 ";
 
 %feature("docstring")  casadi::ForwardDiff::calc_fd(double **yk, double *y0,
-double *J) const override "
+double *J, double h) const override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ForwardDiff::calc_fd(CodeGenerator &g, const
-std::string &yk, const std::string &y0, const std::string &J) const override
-"
+%feature("docstring")  casadi::ForwardDiff::calc_fd() const override "
 
 [INTERNAL] ";
 
@@ -21135,6 +22688,12 @@ const std::vector< MatType > &v) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring")  casadi::ForwardDiff::get_abstol() const override "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -21280,7 +22839,8 @@ override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ForwardDiff::pert(int k) const override "
+%feature("docstring")  casadi::ForwardDiff::pert(int k, double h) const
+override "
 
 [INTERNAL] ";
 
@@ -21299,7 +22859,7 @@ const  "
 ";
 
 %feature("docstring") casadi::ForwardDiff::ForwardDiff(const std::string
-&name, int n, double h) "
+&name, int n) "
 
 [INTERNAL] ";
 
@@ -21444,6 +23004,10 @@ double **&arg, double **&res, int *&iw, double *&w) const  "
 [INTERNAL]  Set the (persistent) work vectors.
 
 ";
+
+%feature("docstring")  casadi::ForwardDiff::has_err() const override "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
@@ -22842,12 +24406,6 @@ member functions. Joel Andersson >List of available options
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -23313,6 +24871,12 @@ bool never_inline) const  "
 override "
 
 [INTERNAL]  Retreive sparsities.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -23952,6 +25516,12 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -24339,12 +25909,6 @@ override "
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
-+------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -25962,6 +27526,12 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::Integrator::q() const  "
 
 [INTERNAL] ";
@@ -26512,6 +28082,12 @@ const  "
 std::string &fname) const override "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::call_reverse(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
@@ -27241,6 +28817,12 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::ImplicitToNlp::solve(void *mem) const
 override "
 
@@ -27500,6 +29082,12 @@ double **&arg, double **&res, int *&iw, double *&w) const override "
 &name) const  "
 
 [INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -28598,6 +30186,12 @@ std::vector< M > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
@@ -29349,6 +30943,12 @@ override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
 bool persistent=false) "
 
@@ -29605,6 +31205,12 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::size1_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -30484,6 +32090,12 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jit_dependencies(const
 std::string &fname) "
 
@@ -31101,12 +32713,6 @@ double **res, int *iw, double *w, void *mem) const  "
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -31247,6 +32853,12 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -31990,6 +33602,12 @@ propagation.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
@@ -32625,6 +34243,12 @@ const std::vector< MatType > &v) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -33213,6 +34837,12 @@ allow_forward, bool allow_reverse) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
@@ -33407,12 +35037,6 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
-+------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -33831,12 +35455,6 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -34049,6 +35667,12 @@ classes.
 %feature("docstring")  casadi::FunctionInternal::nnz_in(int ind) const  "
 
 [INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -34650,6 +36274,12 @@ bool tr) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_dm(const std::vector<
 DM > &arg) const  "
 
@@ -35026,6 +36656,12 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
 [INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -36071,6 +37707,12 @@ double **arg, double **res, int *iw, double *w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
 persistent=false) "
 
@@ -36347,6 +37989,12 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::reverse(int nadj) const  "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
@@ -36438,6 +38086,12 @@ bool more) const override "
 int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 
 [INTERNAL]  Get the sparsity pattern, forward mode.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -37965,6 +39619,12 @@ get_reverse(int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::slice(const std::string
 &name, const std::vector< int > &order_in, const std::vector< int >
 &order_out, const Dict &opts) const  "
@@ -38449,12 +40109,6 @@ Joel Andersson
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -38799,6 +40453,12 @@ class hierarchy in reverse order is run after init() has been completed.
 &vdef_fcn, Function &vinit_fcn) const  "
 
 [INTERNAL]  Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -39457,6 +41117,12 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
@@ -39749,6 +41415,12 @@ structure recognition.
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(int nadj) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -40296,6 +41968,12 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 std::string &fname, const Dict &opts) const  "
 
 [INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -40990,6 +42668,12 @@ derivatives
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -43376,6 +45060,12 @@ int oind, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::matching_res(const
 std::vector< M > &arg) const  "
 
@@ -43833,6 +45523,12 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -44522,6 +46218,12 @@ std::vector< MX > &arg, const std::string &parallelization) "
 %feature("docstring")  casadi::FunctionInternal::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -45609,6 +47311,12 @@ SXElem **res, int *iw, SXElem *w, void *mem) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::numel_out(int ind) const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -45779,119 +47487,136 @@ C++ includes: nonzeros.hpp ";
 
 
 // File: classcasadi_1_1Opti.xml
-%feature("docstring")  casadi::OptiStack::subject_to(const MX &g) "
+%feature("docstring")  casadi::Opti::stats() const  "
 
-Add constraints.
+Get statistics.
 
-Examples:
+nlpsol stats are passed as-is. No stability can be guaranteed about this
+part of the API
+
+";
+
+%feature("docstring")  casadi::Opti::f() const  "
+
+Get objective expression.
+
+";
+
+%feature("docstring")  casadi::Opti::g() const  "
+
+Get all (scalarised) constraint expressions as a column vector.
+
+";
+
+%feature("docstring")  casadi::Opti::debug() const  "
+
+Get a copy with advanced functionality.
+
+You get access to more methods, but you have no guarantees about API
+stability
+
+The copy is effectively a deep copy: Updating the state of the copy does not
+update the original.
+
+";
+
+%feature("docstring") casadi::Opti::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring")  casadi::Opti::parameter(int n=1, int m=1, const
+std::string &attribute="full") "
+
+Create a parameter (symbol); fixed during optimization.
+
+The order of creation does not matter. It is not required for parameter to
+actualy appear in the optimization problem. Parameters that do appear, must
+be given a value before the problem can be solved.
+
+Parameters:
+-----------
+
+n:  number of rows (default 1)
+
+m:  number of columnss (default 1)
+
+attribute:  'full' (default) or 'symmetric'
+
+";
+
+%feature("docstring")  casadi::Opti::p() const  "
+
+Get all (scalarised) parameters as a symbolic column vector.
+
+";
+
+%feature("docstring")  casadi::Opti::set_value(const MX &x, const DM &v) "
+
+Set value of parameter.
+
+Each parameter must be given a value before 'solve' can be called
+
+";
+
+%feature("docstring")  casadi::Opti::set_value(const std::vector< MX >
+&assignments) "
+
+Set value of parameter.
+
+Each parameter must be given a value before 'solve' can be called
+
+";
+
+%feature("docstring")  casadi::Opti::lam_g() const  "
+
+Get all (scalarised) dual variables as a symbolic column vector.
+
+Useful for obtaining the Lagrange Hessian:
 
 ::
 
-  * \\\\begin{itemize}
-  * opti.subject_to( sqrt(x+y) >= 1);
-  * opti.subject_to( sqrt(x+y) > 1)}: same as above
-  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  * opti.subject_to( 5*x+y==1 )}: equality
-  *
-  * Python
-  * opti.subject_to([x*y>=1,x==3])
-  * opti.subject_to(opti.bounded(0,x,1))
-  *
-  * MATLAB
-  * opti.subject_to({x*y>=1,x==3})
-  * opti.subject_to( 0<=x<=1 )
+  * sol.value(hessian(opti.f+opti.lam_g'*opti.g,opti.x)) % MATLAB
+  * sol.value(hessian(opti.f+dot(opti.lam_g,opti.g),opti.x)[0]) # Python
   * 
 
 
 
 ";
 
-%feature("docstring")  casadi::OptiStack::subject_to(const std::vector< MX >
-&g) "
+%feature("docstring")  casadi::Opti::solve() "
 
-Add constraints.
-
-Examples:
-
-::
-
-  * \\\\begin{itemize}
-  * opti.subject_to( sqrt(x+y) >= 1);
-  * opti.subject_to( sqrt(x+y) > 1)}: same as above
-  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  * opti.subject_to( 5*x+y==1 )}: equality
-  *
-  * Python
-  * opti.subject_to([x*y>=1,x==3])
-  * opti.subject_to(opti.bounded(0,x,1))
-  *
-  * MATLAB
-  * opti.subject_to({x*y>=1,x==3})
-  * opti.subject_to( 0<=x<=1 )
-  * 
-
-
+Crunch the numbers; solve the problem.
 
 ";
 
-%feature("docstring")  casadi::OptiStack::subject_to(const Dict &meta_data,
-const MX &g) "
+%feature("docstring")  casadi::Opti::x() const  "
 
-Add constraints.
-
-Examples:
-
-::
-
-  * \\\\begin{itemize}
-  * opti.subject_to( sqrt(x+y) >= 1);
-  * opti.subject_to( sqrt(x+y) > 1)}: same as above
-  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  * opti.subject_to( 5*x+y==1 )}: equality
-  *
-  * Python
-  * opti.subject_to([x*y>=1,x==3])
-  * opti.subject_to(opti.bounded(0,x,1))
-  *
-  * MATLAB
-  * opti.subject_to({x*y>=1,x==3})
-  * opti.subject_to( 0<=x<=1 )
-  * 
-
-
+Get all (scalarised) decision variables as a symbolic column vector.
 
 ";
 
-%feature("docstring")  casadi::OptiStack::subject_to(const Dict &meta_data,
-const std::vector< MX > &g) "
+%feature("docstring")  casadi::Opti::initial() const  "
 
-Add constraints.
-
-Examples:
-
-::
-
-  * \\\\begin{itemize}
-  * opti.subject_to( sqrt(x+y) >= 1);
-  * opti.subject_to( sqrt(x+y) > 1)}: same as above
-  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  * opti.subject_to( 5*x+y==1 )}: equality
-  *
-  * Python
-  * opti.subject_to([x*y>=1,x==3])
-  * opti.subject_to(opti.bounded(0,x,1))
-  *
-  * MATLAB
-  * opti.subject_to({x*y>=1,x==3})
-  * opti.subject_to( 0<=x<=1 )
-  * 
-
-
+get assignment expressions for initial values
 
 ";
 
-%feature("docstring")  casadi::OptiStack::set_initial(const MX &x, const DM
-&v) "
+%feature("docstring")  casadi::Opti::get_str(bool more=false) const  "
+
+Get string representation.
+
+";
+
+%feature("docstring")  casadi::Opti::np() const  "
+
+Number of (scalarised) parameters.
+
+";
+
+%feature("docstring")  casadi::Opti::set_initial(const MX &x, const DM &v) "
 
 Set initial guess for decision variables
 
@@ -45905,8 +47630,8 @@ Set initial guess for decision variables
 
 ";
 
-%feature("docstring")  casadi::OptiStack::set_initial(const std::vector< MX
-> &assignments) "
+%feature("docstring")  casadi::Opti::set_initial(const std::vector< MX >
+&assignments) "
 
 Set initial guess for decision variables
 
@@ -45917,6 +47642,125 @@ Set initial guess for decision variables
   * 
 
 
+
+";
+
+%feature("docstring")  casadi::Opti::callback_class(OptiCallback *callback)
+"
+
+Helper methods for callback()
+
+Do not use directly.
+
+";
+
+%feature("docstring")  casadi::Opti::callback_class() "
+
+Helper methods for callback()
+
+Do not use directly.
+
+";
+
+%feature("docstring")  casadi::Opti::nx() const  "
+
+Number of (scalarised) decision variables.
+
+";
+
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::Opti::ng() const  "
+
+Number of (scalarised) constraints.
+
+";
+
+%feature("docstring") casadi::Opti::Opti() "
+
+Create Opti Context.
+
+";
+
+%feature("docstring")  casadi::Opti::value_parameters() const  "
+
+";
+
+%feature("docstring")  casadi::Opti::type_name() const  "
+
+Readable name of the class.
+
+";
+
+%feature("docstring")  casadi::Opti::value(const MX &x, const std::vector<
+MX > &values=std::vector< MX >()) const  "
+
+Obtain value of expression at the current value
+
+In regular mode, teh current value is the converged solution In debug mode,
+the value can be non-converged
+
+Parameters:
+-----------
+
+values:  Optional assignment expressions (e.g. x==3) to overrule the current
+value
+
+";
+
+%feature("docstring")  casadi::Opti::value(const DM &x, const std::vector<
+MX > &values=std::vector< MX >()) const  "
+
+Obtain value of expression at the current value
+
+In regular mode, teh current value is the converged solution In debug mode,
+the value can be non-converged
+
+Parameters:
+-----------
+
+values:  Optional assignment expressions (e.g. x==3) to overrule the current
+value
+
+";
+
+%feature("docstring")  casadi::Opti::value(const SX &x, const std::vector<
+MX > &values=std::vector< MX >()) const  "
+
+Obtain value of expression at the current value
+
+In regular mode, teh current value is the converged solution In debug mode,
+the value can be non-converged
+
+Parameters:
+-----------
+
+values:  Optional assignment expressions (e.g. x==3) to overrule the current
+value
+
+";
+
+%feature("docstring")  casadi::Opti::variable(int n=1, int m=1, const
+std::string &attribute="full") "
+
+Create a decision variable (symbol)
+
+The order of creation matters. The order will be reflected in the
+optimization problem. It is not required for decision variables to actualy
+appear in the optimization problem.
+
+Parameters:
+-----------
+
+n:  number of rows (default 1)
+
+m:  number of columnss (default 1)
+
+attribute:  'full' (default) or 'symmetric'
 
 ";
 
@@ -45972,61 +47816,592 @@ Example parametric NLP:
 
 
 
-Joris Gillis, Erik Lambrechts
+Joris Gillis, Erik Lambrechts, Joel Andersson
 
 C++ includes: optistack.hpp ";
 
-%feature("docstring")  casadi::OptiStack::symvar() const  "
+%feature("docstring")  casadi::Opti::return_status() const  "
 
-Get symbols present in expression.
-
-Returned vector is ordered according to the order of variable()/parameter()
-calls used to create the variables
+Get return status of solver passed as-is from nlpsol No stability can be
+guaranteed about this part of the API.
 
 ";
 
-%feature("docstring")  casadi::OptiStack::symvar(const MX &expr) const  "
+%feature("docstring")  casadi::Opti::copy() const  "
 
-Get symbols present in expression.
+Get a copy of the.
 
-Returned vector is ordered according to the order of variable()/parameter()
-calls used to create the variables
-
-";
-
-%feature("docstring")  casadi::OptiStack::symvar(const MX &expr,
-VariableType type) const  "
-
-Get symbols present in expression.
-
-Returned vector is ordered according to the order of variable()/parameter()
-calls used to create the variables
+The copy is effectively a deep copy: Updating the state of the copy does not
+update the original.
 
 ";
 
-%feature("docstring")  casadi::OptiStack::set_value(const MX &x, const DM
-&v) "
+%feature("docstring")  casadi::SharedObject::class_name() const  "
 
-Set value of parameter.
-
-Each parameter must be given a value before 'solve' can be called
+Get class name.
 
 ";
 
-%feature("docstring")  casadi::OptiStack::set_value(const std::vector< MX >
+%feature("docstring")  casadi::Opti::subject_to(const MX &g) "
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+";
+
+%feature("docstring")  casadi::Opti::subject_to(const std::vector< MX > &g)
+"
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+";
+
+%feature("docstring")  casadi::Opti::subject_to() "
+
+Clear constraints.
+
+";
+
+%feature("docstring")  casadi::Opti::minimize(const MX &f) "
+
+Set objective.
+
+Objective must be a scalar. Default objective: 0 When method is called
+multiple times, the last call takes effect
+
+";
+
+%feature("docstring")  casadi::Opti::value_variables() const  "
+
+get assignment expressions for latest values
+
+";
+
+%feature("docstring")  casadi::Opti::user_dict(const MX &m) const  "
+
+Get user data.
+
+";
+
+%feature("docstring")  casadi::Opti::advanced() const  "
+
+Get a copy with advanced functionality.
+
+You get access to more methods, but you have no guarantees about API
+stability
+
+The copy is effectively a deep copy: Updating the state of the copy does not
+update the original.
+
+";
+
+%feature("docstring")  casadi::Opti::solver(const std::string &solver, const
+Dict &plugin_options=Dict(), const Dict &solver_options=Dict()) "
+
+Set a solver.
+
+Parameters:
+-----------
+
+solver:  any of the nlpsol plugins can be used here In practice, not all
+nlpsol plugins may be supported yet
+
+options:  passed on to nlpsol plugin No stability can be guaranteed about
+this part of the API
+
+options:  to be passed to nlpsol solver No stability can be guaranteed about
+this part of the API
+
+";
+
+%feature("docstring")  casadi::Opti::dual(const MX &m) const  "
+
+get the dual variable
+
+m must be a constraint expression. The returned value is still a symbolic
+expression. Use value on it to obtain the numerical value.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
+&stream=casadi::userOut()) const  "
+
+[INTERNAL]  Print the pointer to the internal class
+
+";
+
+%feature("docstring")  casadi::Opti::disp(std::ostream &stream, bool
+more=false) const  "
+
+Print representation.
+
+";
+
+%feature("docstring")  casadi::Opti::update_user_dict(const MX &m, const
+Dict &meta) "
+
+add user data Add arbitrary data in the form of a dictionary to symbols or
+constraints
+
+";
+
+%feature("docstring")  casadi::Opti::update_user_dict(const std::vector< MX
+> &m, const Dict &meta) "
+
+";
+
+
+// File: classcasadi_1_1OptiAdvanced.xml
+%feature("docstring")  casadi::OptiAdvanced::assert_empty() const  "
+
+";
+
+%feature("docstring")  casadi::Opti::dual(const MX &m) const  "
+
+get the dual variable
+
+m must be a constraint expression. The returned value is still a symbolic
+expression. Use value on it to obtain the numerical value.
+
+";
+
+%feature("docstring")  casadi::Opti::parameter(int n=1, int m=1, const
+std::string &attribute="full") "
+
+Create a parameter (symbol); fixed during optimization.
+
+The order of creation does not matter. It is not required for parameter to
+actualy appear in the optimization problem. Parameters that do appear, must
+be given a value before the problem can be solved.
+
+Parameters:
+-----------
+
+n:  number of rows (default 1)
+
+m:  number of columnss (default 1)
+
+attribute:  'full' (default) or 'symmetric'
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::mark_problem_dirty(bool
+flag=true) "
+
+";
+
+%feature("docstring")  casadi::Opti::lam_g() const  "
+
+Get all (scalarised) dual variables as a symbolic column vector.
+
+Useful for obtaining the Lagrange Hessian:
+
+::
+
+  * sol.value(hessian(opti.f+opti.lam_g'*opti.g,opti.x)) % MATLAB
+  * sol.value(hessian(opti.f+dot(opti.lam_g,opti.g),opti.x)[0]) # Python
+  * 
+
+
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::assert_solved() const  "
+
+";
+
+%feature("docstring")  casadi::SharedObject::class_name() const  "
+
+Get class name.
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::canon_expr(const MX &expr)
+const  "
+
+Interpret an expression (for internal use only)
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::get_meta_con(const MX &m) const
+"
+
+Get meta-data of symbol (for internal use only)
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::set_meta(const MX &m, const
+MetaVar &meta) "
+
+Set meta-data of an expression.
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::instance_number() const  "
+
+";
+
+%feature("docstring")  casadi::Opti::user_dict(const MX &m) const  "
+
+Get user data.
+
+";
+
+%feature("docstring") casadi::OptiAdvanced::__hash__ "
+
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::x_lookup(int i) const  "
+
+";
+
+%feature("docstring")  casadi::Opti::disp(std::ostream &stream, bool
+more=false) const  "
+
+Print representation.
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::describe(const MX &x, int
+indent=0) const  "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::solve_actual(const DMDict
+&args) "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::set_meta_con(const MX &m, const
+MetaCon &meta) "
+
+Set meta-data of an expression.
+
+";
+
+%feature("docstring")  casadi::Opti::variable(int n=1, int m=1, const
+std::string &attribute="full") "
+
+Create a decision variable (symbol)
+
+The order of creation matters. The order will be reflected in the
+optimization problem. It is not required for decision variables to actualy
+appear in the optimization problem.
+
+Parameters:
+-----------
+
+n:  number of rows (default 1)
+
+m:  number of columnss (default 1)
+
+attribute:  'full' (default) or 'symmetric'
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::g_describe(int i) const  "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::problem_dirty() const  "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::arg() const  "
+
+";
+
+%feature("docstring")  casadi::Opti::value_variables() const  "
+
+get assignment expressions for latest values
+
+";
+
+%feature("docstring")  casadi::Opti::solve() "
+
+Crunch the numbers; solve the problem.
+
+";
+
+%feature("docstring")  casadi::Opti::copy() const  "
+
+Get a copy of the.
+
+The copy is effectively a deep copy: Updating the state of the copy does not
+update the original.
+
+";
+
+%feature("docstring") casadi::OptiAdvanced "
+
+C++ includes: optistack.hpp ";
+
+%feature("docstring")  casadi::OptiAdvanced::solved() const  "
+
+";
+
+%feature("docstring")  casadi::Opti::value(const MX &x, const std::vector<
+MX > &values=std::vector< MX >()) const  "
+
+Obtain value of expression at the current value
+
+In regular mode, teh current value is the converged solution In debug mode,
+the value can be non-converged
+
+Parameters:
+-----------
+
+values:  Optional assignment expressions (e.g. x==3) to overrule the current
+value
+
+";
+
+%feature("docstring")  casadi::Opti::value(const DM &x, const std::vector<
+MX > &values=std::vector< MX >()) const  "
+
+Obtain value of expression at the current value
+
+In regular mode, teh current value is the converged solution In debug mode,
+the value can be non-converged
+
+Parameters:
+-----------
+
+values:  Optional assignment expressions (e.g. x==3) to overrule the current
+value
+
+";
+
+%feature("docstring")  casadi::Opti::value(const SX &x, const std::vector<
+MX > &values=std::vector< MX >()) const  "
+
+Obtain value of expression at the current value
+
+In regular mode, teh current value is the converged solution In debug mode,
+the value can be non-converged
+
+Parameters:
+-----------
+
+values:  Optional assignment expressions (e.g. x==3) to overrule the current
+value
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::casadi_solver() const  "
+
+Get the underlying CasADi solver of the Opti stack.
+
+";
+
+%feature("docstring")  casadi::Opti::set_initial(const MX &x, const DM &v) "
+
+Set initial guess for decision variables
+
+::
+
+  * opti.set_initial(x, 2)
+  * opti.set_initial(10*x(1), 2)
+  * 
+
+
+
+";
+
+%feature("docstring")  casadi::Opti::set_initial(const std::vector< MX >
 &assignments) "
 
-Set value of parameter.
+Set initial guess for decision variables
 
-Each parameter must be given a value before 'solve' can be called
+::
+
+  * opti.set_initial(x, 2)
+  * opti.set_initial(10*x(1), 2)
+  * 
+
+
 
 ";
 
-%feature("docstring")  casadi::Opti::debug() "
+%feature("docstring") casadi::OptiAdvanced::~OptiAdvanced "
+
+Destructor.
 
 ";
 
-%feature("docstring")  casadi::Opti::copy() "
+%feature("docstring")  casadi::Opti::callback_class(OptiCallback *callback)
+"
+
+Helper methods for callback()
+
+Do not use directly.
+
+";
+
+%feature("docstring")  casadi::Opti::callback_class() "
+
+Helper methods for callback()
+
+Do not use directly.
+
+";
+
+%feature("docstring")  casadi::Opti::get_str(bool more=false) const  "
+
+Get string representation.
+
+";
+
+%feature("docstring")  casadi::Opti::value_parameters() const  "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::solver_dirty() const  "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::mark_solver_dirty(bool
+flag=true) "
+
+";
+
+%feature("docstring")  casadi::Opti::update_user_dict(const MX &m, const
+Dict &meta) "
+
+add user data Add arbitrary data in the form of a dictionary to symbols or
+constraints
+
+";
+
+%feature("docstring")  casadi::Opti::update_user_dict(const std::vector< MX
+> &m, const Dict &meta) "
+
+";
+
+%feature("docstring")  casadi::Opti::ng() const  "
+
+Number of (scalarised) constraints.
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::objective() const  "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::get_meta(const MX &m) const  "
+
+Get meta-data of symbol (for internal use only)
+
+";
+
+%feature("docstring")  casadi::Opti::subject_to(const MX &g) "
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+";
+
+%feature("docstring")  casadi::Opti::subject_to(const std::vector< MX > &g)
+"
+
+Add constraints.
+
+Examples:
+
+::
+
+  * \\\\begin{itemize}
+  * opti.subject_to( sqrt(x+y) >= 1);
+  * opti.subject_to( sqrt(x+y) > 1)}: same as above
+  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  * opti.subject_to( 5*x+y==1 )}: equality
+  *
+  * Python
+  * opti.subject_to([x*y>=1,x==3])
+  * opti.subject_to(opti.bounded(0,x,1))
+  *
+  * MATLAB
+  * opti.subject_to({x*y>=1,x==3})
+  * opti.subject_to( 0<=x<=1 )
+  * 
+
+
+
+";
+
+%feature("docstring")  casadi::Opti::subject_to() "
+
+Clear constraints.
+
+";
+
+%feature("docstring")  casadi::Opti::initial() const  "
+
+get assignment expressions for initial values
 
 ";
 
@@ -46036,51 +48411,230 @@ Readable name of the class.
 
 ";
 
-%feature("docstring")  casadi::OptiStack::value(const MX &x, const
-std::vector< MX > &values=std::vector< MX >()) const  "
+%feature("docstring")  casadi::Opti::nx() const  "
 
-Obtain value of expression at the current value
-
-In regular mode, teh current value is the converged solution In debug mode,
-the value can be non-converged
-
-Parameters:
------------
-
-values:  Optional assignment expressions (e.g. x==3) to overrule the current
-value
+Number of (scalarised) decision variables.
 
 ";
 
-%feature("docstring")  casadi::OptiStack::value(const DM &x, const
-std::vector< MX > &values=std::vector< MX >()) const  "
-
-Obtain value of expression at the current value
-
-In regular mode, teh current value is the converged solution In debug mode,
-the value can be non-converged
-
-Parameters:
------------
-
-values:  Optional assignment expressions (e.g. x==3) to overrule the current
-value
+%feature("docstring") casadi::OptiAdvanced::OptiAdvanced(const Opti &x) "
 
 ";
 
-%feature("docstring")  casadi::OptiStack::value(const SX &x, const
-std::vector< MX > &values=std::vector< MX >()) const  "
+%feature("docstring")  casadi::Opti::set_value(const MX &x, const DM &v) "
 
-Obtain value of expression at the current value
+Set value of parameter.
 
-In regular mode, teh current value is the converged solution In debug mode,
-the value can be non-converged
+Each parameter must be given a value before 'solve' can be called
+
+";
+
+%feature("docstring")  casadi::Opti::set_value(const std::vector< MX >
+&assignments) "
+
+Set value of parameter.
+
+Each parameter must be given a value before 'solve' can be called
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::res(const DMDict &res) "
+
+";
+
+%feature("docstring")  casadi::Opti::debug() const  "
+
+Get a copy with advanced functionality.
+
+You get access to more methods, but you have no guarantees about API
+stability
+
+The copy is effectively a deep copy: Updating the state of the copy does not
+update the original.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
+&stream=casadi::userOut()) const  "
+
+[INTERNAL]  Print the pointer to the internal class
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::solve_prepare() "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::baked_copy() const  "
+
+";
+
+%feature("docstring")  casadi::Opti::np() const  "
+
+Number of (scalarised) parameters.
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::symvar() const  "
+
+Get symbols present in expression.
+
+Returned vector is ordered according to the order of variable()/parameter()
+calls used to create the variables
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::symvar(const MX &expr) const  "
+
+Get symbols present in expression.
+
+Returned vector is ordered according to the order of variable()/parameter()
+calls used to create the variables
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::symvar(const MX &expr,
+VariableType type) const  "
+
+Get symbols present in expression.
+
+Returned vector is ordered according to the order of variable()/parameter()
+calls used to create the variables
+
+";
+
+%feature("docstring")  casadi::Opti::advanced() const  "
+
+Get a copy with advanced functionality.
+
+You get access to more methods, but you have no guarantees about API
+stability
+
+The copy is effectively a deep copy: Updating the state of the copy does not
+update the original.
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::active_values(VariableType
+type) const  "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::x_describe(int i) const  "
+
+";
+
+%feature("docstring")  casadi::Opti::f() const  "
+
+Get objective expression.
+
+";
+
+%feature("docstring")  casadi::Opti::g() const  "
+
+Get all (scalarised) constraint expressions as a column vector.
+
+";
+
+%feature("docstring")  casadi::Opti::stats() const  "
+
+Get statistics.
+
+nlpsol stats are passed as-is. No stability can be guaranteed about this
+part of the API
+
+";
+
+%feature("docstring")  casadi::SharedObject::is_null() const  "
+
+Is a null pointer?
+
+";
+
+%feature("docstring")  casadi::Opti::return_status() const  "
+
+Get return status of solver passed as-is from nlpsol No stability can be
+guaranteed about this part of the API.
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::constraints() const  "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::bake() "
+
+Fix the structure of the optimization problem.
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::assert_active_symbol(const MX
+&m) const  "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::mark_solved(bool flag=true) "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::assert_baked() const  "
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::is_parametric(const MX &expr)
+const  "
+
+return true if expression is only dependant on Opti parameters, not
+variables
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::g_lookup(int i) const  "
+
+";
+
+%feature("docstring")  casadi::Opti::p() const  "
+
+Get all (scalarised) parameters as a symbolic column vector.
+
+";
+
+%feature("docstring")  casadi::Opti::solver(const std::string &solver, const
+Dict &plugin_options=Dict(), const Dict &solver_options=Dict()) "
+
+Set a solver.
 
 Parameters:
 -----------
 
-values:  Optional assignment expressions (e.g. x==3) to overrule the current
-value
+solver:  any of the nlpsol plugins can be used here In practice, not all
+nlpsol plugins may be supported yet
+
+options:  passed on to nlpsol plugin No stability can be guaranteed about
+this part of the API
+
+options:  to be passed to nlpsol solver No stability can be guaranteed about
+this part of the API
+
+";
+
+%feature("docstring")  casadi::OptiAdvanced::active_symvar(VariableType
+type) const  "
+
+";
+
+%feature("docstring")  casadi::Opti::minimize(const MX &f) "
+
+Set objective.
+
+Objective must be a scalar. Default objective: 0 When method is called
+multiple times, the last call takes effect
+
+";
+
+%feature("docstring")  casadi::Opti::x() const  "
+
+Get all (scalarised) decision variables as a symbolic column vector.
 
 ";
 
@@ -46109,41 +48663,87 @@ C++ includes: optistack.hpp ";
 
 
 // File: classcasadi_1_1OptiSol.xml
-%feature("docstring")  casadi::OptiStack::symvar() const  "
+%feature("docstring")  casadi::OptiSol::value_variables() const  "
 
-Get symbols present in expression.
-
-Returned vector is ordered according to the order of variable()/parameter()
-calls used to create the variables
+get assignment expressions for the optimal solution
 
 ";
 
-%feature("docstring")  casadi::OptiStack::symvar(const MX &expr) const  "
-
-Get symbols present in expression.
-
-Returned vector is ordered according to the order of variable()/parameter()
-calls used to create the variables
+%feature("docstring")  casadi::OptiSol::get_str(bool more=false) const  "
 
 ";
 
-%feature("docstring")  casadi::OptiStack::symvar(const MX &expr,
-VariableType type) const  "
+%feature("docstring")  casadi::OptiSol::stats() const  "
 
-Get symbols present in expression.
+Get statistics.
 
-Returned vector is ordered according to the order of variable()/parameter()
-calls used to create the variables
-
-";
-
-%feature("docstring")  casadi::OptiSol::opti() "
+nlpsol stats are passed as-is. No stability can be guaranteed about this
+part of the API
 
 ";
 
 %feature("docstring")  casadi::OptiSol::type_name() const  "
 
-Readable name of the class.
+";
+
+%feature("docstring")  casadi::OptiSol::disp(std::ostream &stream, bool
+more=false) const  "
+
+";
+
+%feature("docstring")  casadi::OptiSol::value(const MX &x, const
+std::vector< MX > &values=std::vector< MX >()) const  "
+
+Obtain value of expression at the current value
+
+In regular mode, teh current value is the converged solution In debug mode,
+the value can be non-converged
+
+Parameters:
+-----------
+
+values:  Optional assignment expressions (e.g. x==3) to overrule the current
+value
+
+";
+
+%feature("docstring")  casadi::OptiSol::value(const DM &x, const
+std::vector< MX > &values=std::vector< MX >()) const  "
+
+Obtain value of expression at the current value
+
+In regular mode, teh current value is the converged solution In debug mode,
+the value can be non-converged
+
+Parameters:
+-----------
+
+values:  Optional assignment expressions (e.g. x==3) to overrule the current
+value
+
+";
+
+%feature("docstring")  casadi::OptiSol::value(const SX &x, const
+std::vector< MX > &values=std::vector< MX >()) const  "
+
+Obtain value of expression at the current value
+
+In regular mode, teh current value is the converged solution In debug mode,
+the value can be non-converged
+
+Parameters:
+-----------
+
+values:  Optional assignment expressions (e.g. x==3) to overrule the current
+value
+
+";
+
+%feature("docstring")  casadi::OptiSol::value_parameters() const  "
+
+";
+
+%feature("docstring")  casadi::OptiSol::opti() const  "
 
 ";
 
@@ -46157,865 +48757,6 @@ guaranteed to be stable.
 Joris Gillis, Erik Lambrechts
 
 C++ includes: optistack.hpp ";
-
-%feature("docstring") casadi::OptiSol::OptiSol(const OptiStack &opti) "
-
-";
-
-%feature("docstring")  casadi::OptiStack::value(const MX &x, const
-std::vector< MX > &values=std::vector< MX >()) const  "
-
-Obtain value of expression at the current value
-
-In regular mode, teh current value is the converged solution In debug mode,
-the value can be non-converged
-
-Parameters:
------------
-
-values:  Optional assignment expressions (e.g. x==3) to overrule the current
-value
-
-";
-
-%feature("docstring")  casadi::OptiStack::value(const DM &x, const
-std::vector< MX > &values=std::vector< MX >()) const  "
-
-Obtain value of expression at the current value
-
-In regular mode, teh current value is the converged solution In debug mode,
-the value can be non-converged
-
-Parameters:
------------
-
-values:  Optional assignment expressions (e.g. x==3) to overrule the current
-value
-
-";
-
-%feature("docstring")  casadi::OptiStack::value(const SX &x, const
-std::vector< MX > &values=std::vector< MX >()) const  "
-
-Obtain value of expression at the current value
-
-In regular mode, teh current value is the converged solution In debug mode,
-the value can be non-converged
-
-Parameters:
------------
-
-values:  Optional assignment expressions (e.g. x==3) to overrule the current
-value
-
-";
-
-%feature("docstring")  casadi::OptiSol::debug() "
-
-";
-
-%feature("docstring")  casadi::OptiStack::set_value(const MX &x, const DM
-&v) "
-
-Set value of parameter.
-
-Each parameter must be given a value before 'solve' can be called
-
-";
-
-%feature("docstring")  casadi::OptiStack::set_value(const std::vector< MX >
-&assignments) "
-
-Set value of parameter.
-
-Each parameter must be given a value before 'solve' can be called
-
-";
-
-%feature("docstring")  casadi::OptiStack::set_initial(const MX &x, const DM
-&v) "
-
-Set initial guess for decision variables
-
-::
-
-  * opti.set_initial(x, 2)
-  * opti.set_initial(10*x(1), 2)
-  * 
-
-
-
-";
-
-%feature("docstring")  casadi::OptiStack::set_initial(const std::vector< MX
-> &assignments) "
-
-Set initial guess for decision variables
-
-::
-
-  * opti.set_initial(x, 2)
-  * opti.set_initial(10*x(1), 2)
-  * 
-
-
-
-";
-
-%feature("docstring")  casadi::OptiStack::subject_to(const MX &g) "
-
-Add constraints.
-
-Examples:
-
-::
-
-  * \\\\begin{itemize}
-  * opti.subject_to( sqrt(x+y) >= 1);
-  * opti.subject_to( sqrt(x+y) > 1)}: same as above
-  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  * opti.subject_to( 5*x+y==1 )}: equality
-  *
-  * Python
-  * opti.subject_to([x*y>=1,x==3])
-  * opti.subject_to(opti.bounded(0,x,1))
-  *
-  * MATLAB
-  * opti.subject_to({x*y>=1,x==3})
-  * opti.subject_to( 0<=x<=1 )
-  * 
-
-
-
-";
-
-%feature("docstring")  casadi::OptiStack::subject_to(const std::vector< MX >
-&g) "
-
-Add constraints.
-
-Examples:
-
-::
-
-  * \\\\begin{itemize}
-  * opti.subject_to( sqrt(x+y) >= 1);
-  * opti.subject_to( sqrt(x+y) > 1)}: same as above
-  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  * opti.subject_to( 5*x+y==1 )}: equality
-  *
-  * Python
-  * opti.subject_to([x*y>=1,x==3])
-  * opti.subject_to(opti.bounded(0,x,1))
-  *
-  * MATLAB
-  * opti.subject_to({x*y>=1,x==3})
-  * opti.subject_to( 0<=x<=1 )
-  * 
-
-
-
-";
-
-%feature("docstring")  casadi::OptiStack::subject_to(const Dict &meta_data,
-const MX &g) "
-
-Add constraints.
-
-Examples:
-
-::
-
-  * \\\\begin{itemize}
-  * opti.subject_to( sqrt(x+y) >= 1);
-  * opti.subject_to( sqrt(x+y) > 1)}: same as above
-  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  * opti.subject_to( 5*x+y==1 )}: equality
-  *
-  * Python
-  * opti.subject_to([x*y>=1,x==3])
-  * opti.subject_to(opti.bounded(0,x,1))
-  *
-  * MATLAB
-  * opti.subject_to({x*y>=1,x==3})
-  * opti.subject_to( 0<=x<=1 )
-  * 
-
-
-
-";
-
-%feature("docstring")  casadi::OptiStack::subject_to(const Dict &meta_data,
-const std::vector< MX > &g) "
-
-Add constraints.
-
-Examples:
-
-::
-
-  * \\\\begin{itemize}
-  * opti.subject_to( sqrt(x+y) >= 1);
-  * opti.subject_to( sqrt(x+y) > 1)}: same as above
-  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  * opti.subject_to( 5*x+y==1 )}: equality
-  *
-  * Python
-  * opti.subject_to([x*y>=1,x==3])
-  * opti.subject_to(opti.bounded(0,x,1))
-  *
-  * MATLAB
-  * opti.subject_to({x*y>=1,x==3})
-  * opti.subject_to( 0<=x<=1 )
-  * 
-
-
-
-";
-
-
-// File: classcasadi_1_1OptiStack.xml
-%feature("docstring")  casadi::OptiStack::casadi_solver() const  "
-
-Get the underlying CasADi solver of the Opti stack.
-
-";
-
-%feature("docstring")
-casadi::OptiStack::active_symvar(OptiStack::VariableType type) const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::symvar() const  "
-
-Get symbols present in expression.
-
-Returned vector is ordered according to the order of variable()/parameter()
-calls used to create the variables
-
-";
-
-%feature("docstring")  casadi::OptiStack::symvar(const MX &expr) const  "
-
-Get symbols present in expression.
-
-Returned vector is ordered according to the order of variable()/parameter()
-calls used to create the variables
-
-";
-
-%feature("docstring")  casadi::OptiStack::symvar(const MX &expr,
-VariableType type) const  "
-
-Get symbols present in expression.
-
-Returned vector is ordered according to the order of variable()/parameter()
-calls used to create the variables
-
-";
-
-%feature("docstring")  casadi::OptiStack::constraints() const  "
-
-";
-
-%feature("docstring") casadi::OptiStack::~OptiStack "
-
-Destructor.
-
-";
-
-%feature("docstring")  casadi::OptiStack::stats() const  "
-
-Get statistics.
-
-nlpsol stats are passed as-is. No stability can be guaranteed about this
-part of the API
-
-";
-
-%feature("docstring")  casadi::OptiStack::subject_to(const MX &g) "
-
-Add constraints.
-
-Examples:
-
-::
-
-  * \\\\begin{itemize}
-  * opti.subject_to( sqrt(x+y) >= 1);
-  * opti.subject_to( sqrt(x+y) > 1)}: same as above
-  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  * opti.subject_to( 5*x+y==1 )}: equality
-  *
-  * Python
-  * opti.subject_to([x*y>=1,x==3])
-  * opti.subject_to(opti.bounded(0,x,1))
-  *
-  * MATLAB
-  * opti.subject_to({x*y>=1,x==3})
-  * opti.subject_to( 0<=x<=1 )
-  * 
-
-
-
-";
-
-%feature("docstring")  casadi::OptiStack::subject_to(const std::vector< MX >
-&g) "
-
-Add constraints.
-
-Examples:
-
-::
-
-  * \\\\begin{itemize}
-  * opti.subject_to( sqrt(x+y) >= 1);
-  * opti.subject_to( sqrt(x+y) > 1)}: same as above
-  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  * opti.subject_to( 5*x+y==1 )}: equality
-  *
-  * Python
-  * opti.subject_to([x*y>=1,x==3])
-  * opti.subject_to(opti.bounded(0,x,1))
-  *
-  * MATLAB
-  * opti.subject_to({x*y>=1,x==3})
-  * opti.subject_to( 0<=x<=1 )
-  * 
-
-
-
-";
-
-%feature("docstring")  casadi::OptiStack::subject_to(const Dict &meta_data,
-const MX &g) "
-
-Add constraints.
-
-Examples:
-
-::
-
-  * \\\\begin{itemize}
-  * opti.subject_to( sqrt(x+y) >= 1);
-  * opti.subject_to( sqrt(x+y) > 1)}: same as above
-  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  * opti.subject_to( 5*x+y==1 )}: equality
-  *
-  * Python
-  * opti.subject_to([x*y>=1,x==3])
-  * opti.subject_to(opti.bounded(0,x,1))
-  *
-  * MATLAB
-  * opti.subject_to({x*y>=1,x==3})
-  * opti.subject_to( 0<=x<=1 )
-  * 
-
-
-
-";
-
-%feature("docstring")  casadi::OptiStack::subject_to(const Dict &meta_data,
-const std::vector< MX > &g) "
-
-Add constraints.
-
-Examples:
-
-::
-
-  * \\\\begin{itemize}
-  * opti.subject_to( sqrt(x+y) >= 1);
-  * opti.subject_to( sqrt(x+y) > 1)}: same as above
-  * opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  * opti.subject_to( 5*x+y==1 )}: equality
-  *
-  * Python
-  * opti.subject_to([x*y>=1,x==3])
-  * opti.subject_to(opti.bounded(0,x,1))
-  *
-  * MATLAB
-  * opti.subject_to({x*y>=1,x==3})
-  * opti.subject_to( 0<=x<=1 )
-  * 
-
-
-
-";
-
-%feature("docstring")  casadi::OptiStack::subject_to() "
-
-Clear constraints.
-
-";
-
-%feature("docstring")  casadi::OptiStack::return_status() const  "
-
-Get return status of solver passed as-is from nlpsol No stability can be
-guaranteed about this part of the API.
-
-";
-
-%feature("docstring")
-casadi::OptiStack::active_values(OptiStack::VariableType type) const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::describe(const MX &x, int
-indent=0) const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::parameter(int n=1, int m=1, const
-std::string &attribute="full") "
-
-Create a parameter (symbol); fixed during optimization.
-
-The order of creation does not matter. It is not required for parameter to
-actualy appear in the optimization problem. Parameters that do appear, must
-be given a value before the problem can be solved.
-
-Parameters:
------------
-
-n:  number of rows (default 1)
-
-m:  number of columnss (default 1)
-
-attribute:  'full' (default) or 'symmetric'
-
-";
-
-%feature("docstring")  casadi::OptiStack::parameter(const Dict &meta_data,
-int n=1, int m=1, const std::string &attribute="full") "
-
-";
-
-%feature("docstring")  casadi::OptiStack::solve() "
-
-Crunch the numbers; solve the problem.
-
-";
-
-%feature("docstring")  casadi::OptiStack::disp(std::ostream &stream, bool
-more=false) const  "
-
-Print representation.
-
-";
-
-%feature("docstring")  casadi::OptiStack::set_initial(const MX &x, const DM
-&v) "
-
-Set initial guess for decision variables
-
-::
-
-  * opti.set_initial(x, 2)
-  * opti.set_initial(10*x(1), 2)
-  * 
-
-
-
-";
-
-%feature("docstring")  casadi::OptiStack::set_initial(const std::vector< MX
-> &assignments) "
-
-Set initial guess for decision variables
-
-::
-
-  * opti.set_initial(x, 2)
-  * opti.set_initial(10*x(1), 2)
-  * 
-
-
-
-";
-
-%feature("docstring")  casadi::OptiStack::get_meta_con(const MX &m) const  "
-
-Get meta-data of symbol (for internal use only)
-
-";
-
-%feature("docstring")  casadi::OptiStack::value_variables() const  "
-
-get assignment expressions for latest values
-
-";
-
-%feature("docstring")  casadi::OptiStack::type_name() const  "
-
-Readable name of the class.
-
-";
-
-%feature("docstring")  casadi::OptiStack::is_parametric(const MX &expr)
-const  "
-
-return true if expression is only dependant on Opti parameters, not
-variables
-
-";
-
-%feature("docstring")  casadi::OptiStack::callback_class(OptiCallback
-*callback) "
-
-";
-
-%feature("docstring")  casadi::OptiStack::callback_class() "
-
-";
-
-%feature("docstring")  casadi::OptiStack::canon_expr(const MX &expr) const
-"
-
-Interpret an expression (for internal use only)
-
-";
-
-%feature("docstring")  casadi::OptiStack::baked() const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::baked() "
-
-";
-
-%feature("docstring")  casadi::OptiStack::p() const  "
-
-Get all (scalarised) parameters as a symbolic column vector.
-
-";
-
-%feature("docstring")  casadi::OptiStack::np() const  "
-
-Number of (scalarised) parameters.
-
-";
-
-%feature("docstring")  casadi::OptiStack::solver_dirty() const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::mark_solver_dirty(bool flag=true)
-"
-
-";
-
-%feature("docstring")  casadi::OptiStack::assert_empty() const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::x() const  "
-
-Get all (scalarised) decision variables as a symbolic column vector.
-
-";
-
-%feature("docstring")  casadi::OptiStack::copy() const  "
-
-Copy.
-
-";
-
-%feature("docstring")  casadi::OptiStack::minimize(const MX &f) "
-
-Set objective.
-
-Objective must be a scalar. Default objective: 0 When method is called
-multiple times, the last call takes effect
-
-";
-
-%feature("docstring")  casadi::OptiStack::assert_active_symbol(const MX &m)
-const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::g_describe(int i) const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::solve_actual(const DMDict &args) "
-
-";
-
-%feature("docstring")  casadi::OptiStack::lam_g() const  "
-
-Get all (scalarised) dual variables as a symbolic column vector.
-
-Useful for obtaining the Lagrange Hessian:
-
-::
-
-  * sol.value(hessian(opti.f+opti.lam_g'*opti.g,opti.x)) % MATLAB
-  * sol.value(hessian(opti.f+dot(opti.lam_g,opti.g),opti.x)[0]) # Python
-  * 
-
-
-
-";
-
-%feature("docstring")  casadi::OptiStack::f() const  "
-
-Get objective expression.
-
-";
-
-%feature("docstring")  casadi::OptiStack::nx() const  "
-
-Number of (scalarised) decision variables.
-
-";
-
-%feature("docstring")  casadi::OptiStack::assert_baked() const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::set_value(const MX &x, const DM
-&v) "
-
-Set value of parameter.
-
-Each parameter must be given a value before 'solve' can be called
-
-";
-
-%feature("docstring")  casadi::OptiStack::set_value(const std::vector< MX >
-&assignments) "
-
-Set value of parameter.
-
-Each parameter must be given a value before 'solve' can be called
-
-";
-
-%feature("docstring")  casadi::OptiStack::g_lookup(int i) const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::solve_prepare() "
-
-";
-
-%feature("docstring")  casadi::OptiStack::value(const MX &x, const
-std::vector< MX > &values=std::vector< MX >()) const  "
-
-Obtain value of expression at the current value
-
-In regular mode, teh current value is the converged solution In debug mode,
-the value can be non-converged
-
-Parameters:
------------
-
-values:  Optional assignment expressions (e.g. x==3) to overrule the current
-value
-
-";
-
-%feature("docstring")  casadi::OptiStack::value(const DM &x, const
-std::vector< MX > &values=std::vector< MX >()) const  "
-
-Obtain value of expression at the current value
-
-In regular mode, teh current value is the converged solution In debug mode,
-the value can be non-converged
-
-Parameters:
------------
-
-values:  Optional assignment expressions (e.g. x==3) to overrule the current
-value
-
-";
-
-%feature("docstring")  casadi::OptiStack::value(const SX &x, const
-std::vector< MX > &values=std::vector< MX >()) const  "
-
-Obtain value of expression at the current value
-
-In regular mode, teh current value is the converged solution In debug mode,
-the value can be non-converged
-
-Parameters:
------------
-
-values:  Optional assignment expressions (e.g. x==3) to overrule the current
-value
-
-";
-
-%feature("docstring")  casadi::OptiStack::set_meta(const MX &m, const
-MetaVar &meta) "
-
-Set meta-data of an expression.
-
-";
-
-%feature("docstring")  casadi::OptiStack::arg() const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::variable(int n=1, int m=1, const
-std::string &attribute="full") "
-
-Create a decision variable (symbol)
-
-The order of creation matters. The order will be reflected in the
-optimization problem. It is not required for decision variables to actualy
-appear in the optimization problem.
-
-Parameters:
------------
-
-n:  number of rows (default 1)
-
-m:  number of columnss (default 1)
-
-attribute:  'full' (default) or 'symmetric'
-
-";
-
-%feature("docstring")  casadi::OptiStack::variable(const Dict &meta_data,
-int n=1, int m=1, const std::string &attribute="full") "
-
-internal variants of parameter/variable. Do not use yourself
-
-";
-
-%feature("docstring")  casadi::OptiStack::solver(const std::string &solver,
-const Dict &plugin_options=Dict(), const Dict &solver_options=Dict()) "
-
-Set a solver.
-
-Parameters:
------------
-
-solver:  any of the nlpsol plugins can be used here In practice, not all
-nlpsol plugins may be supported yet
-
-options:  passed on to nlpsol plugin No stability can be guaranteed about
-this part of the API
-
-options:  to be passed to nlpsol solver No stability can be guaranteed about
-this part of the API
-
-";
-
-%feature("docstring")  casadi::OptiStack::res(const DMDict &res) "
-
-";
-
-%feature("docstring")  casadi::OptiStack::x_describe(int i) const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::mark_problem_dirty(bool flag=true)
-"
-
-";
-
-%feature("docstring")  casadi::OptiStack::solved() const  "
-
-";
-
-%feature("docstring") casadi::OptiStack "
-
-A simplified interface for NLP modeling/solving.
-
-This is the low-level base class. Direct usage of this class is not
-recommended unless for debugging. There are no guaranties API stability
-
-Joris Gillis, Erik Lambrechts
-
-C++ includes: optistack.hpp ";
-
-%feature("docstring")  casadi::OptiStack::internal_bake() "
-
-Fix the structure of the optimization problem.
-
-";
-
-%feature("docstring")  casadi::OptiStack::mark_solved(bool flag=true) "
-
-";
-
-%feature("docstring")  casadi::OptiStack::assert_solved() const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::get_meta(const MX &m) const  "
-
-Get meta-data of symbol (for internal use only)
-
-";
-
-%feature("docstring")  casadi::OptiStack::get_str(bool more=false) const  "
-
-Get string representation.
-
-";
-
-%feature("docstring")  casadi::OptiStack::problem_dirty() const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::x_lookup(int i) const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::value_parameters() const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::g() const  "
-
-Get all (scalarised) constraint expressions as a column vector.
-
-";
-
-%feature("docstring")  casadi::OptiStack::set_meta_con(const MX &m, const
-MetaCon &meta) "
-
-Set meta-data of an expression.
-
-";
-
-%feature("docstring")  casadi::OptiStack::objective() const  "
-
-";
-
-%feature("docstring")  casadi::OptiStack::dual(const MX &m) const  "
-
-get the dual variable
-
-m must be a constraint expression. The returned value is still a symbolic
-expression. Use value on it to obtain the numerical value.
-
-";
-
-%feature("docstring") casadi::OptiStack::OptiStack() "
-
-Create Opti Context.
-
-";
-
-%feature("docstring")  casadi::OptiStack::ng() const  "
-
-Number of (scalarised) constraints.
-
-";
-
-%feature("docstring")  casadi::OptiStack::initial() const  "
-
-get assignment expressions for initial values
-
-";
 
 
 // File: classcasadi_1_1OracleFunction.xml
@@ -47275,6 +49016,12 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 %feature("docstring")  casadi::FunctionInternal::size2_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -47888,12 +49635,6 @@ Joel Andersson
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -48210,6 +49951,12 @@ std::vector< std::vector< M > > &fseed) const  "
 %feature("docstring")  casadi::FunctionInternal::mx_out() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -48555,6 +50302,12 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
 "
 
@@ -48834,6 +50587,12 @@ int oind, bool symmetric, int gr_i=1, int gr_o=1) const  "
 double **arg, double **res, int *iw, double *w) const  "
 
 [INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -49839,6 +51598,12 @@ get_forward(int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -50668,6 +52433,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::adjViaJac(int nadj) const
 "
 
@@ -51303,6 +53074,12 @@ multiplying.
 int oind, bool symmetric) const  "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -51942,6 +53719,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::Integrator::get_reverse(int nadj, const
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
@@ -52165,6 +53948,12 @@ std::vector< std::string > &s_out, const Function::AuxOut
 &aux=Function::AuxOut()) "
 
 [INTERNAL]  Create an oracle function
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -52721,6 +54510,12 @@ get_reverse(int nadj) if no cached version is available.
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -54492,6 +56287,12 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::set_temp(void *mem, const
 double **arg, double **res, int *iw, double *w) const  "
 
@@ -54893,6 +56694,12 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
 "
 
@@ -55119,6 +56926,12 @@ bool persistent=false) "
 %feature("docstring")  casadi::SlicotExpm::plugin_name() const override "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::instruction_constant(int k)
 const  "
@@ -55748,6 +57561,12 @@ std::string > &onames, const Dict &opts) const override "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::mx_in(int ind) const  "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -56216,6 +58035,11 @@ Andersson
 +------------------+-----------------+------------------+------------------+
 |        Id        |      Type       |   Description    |     Used in      |
 +==================+=================+==================+==================+
+| abstol           | OT_DOUBLE       | Accuracy of      | casadi::Smoothin |
+|                  |                 | function outputs | g                |
+|                  |                 | [default: query  |                  |
+|                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
 | ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
 |                  |                 | for derivative   | Internal         |
 |                  |                 | calculation.When |                  |
@@ -56332,18 +58156,6 @@ Andersson
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
-| eps_in           | OT_DOUBLE       | Accuracy of      | casadi::Smoothin |
-|                  |                 | function inputs  | g                |
-|                  |                 | [default:        |                  |
-|                  |                 | machine          |                  |
-|                  |                 | precision]       |                  |
-+------------------+-----------------+------------------+------------------+
-| eps_out          | OT_DOUBLE       | Accuracy of      | casadi::Smoothin |
-|                  |                 | function outputs | g                |
-|                  |                 | [default:        |                  |
-|                  |                 | machine          |                  |
-|                  |                 | precision]       |                  |
-+------------------+-----------------+------------------+------------------+
 | fd_method        | OT_STRING       | Method for       | casadi::Function |
 |                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
@@ -56356,12 +58168,6 @@ Andersson
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -56369,9 +58175,21 @@ Andersson
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
 +------------------+-----------------+------------------+------------------+
+| h_iter           | OT_INT          | Number of        | casadi::Smoothin |
+|                  |                 | iterations to    | g                |
+|                  |                 | improve on the   |                  |
+|                  |                 | step-size        |                  |
+|                  |                 | [default: 1 if   |                  |
+|                  |                 | error estimate   |                  |
+|                  |                 | available,       |                  |
+|                  |                 | otherwise 0]     |                  |
++------------------+-----------------+------------------+------------------+
 | h_max            | OT_DOUBLE       | Maximum step     | casadi::Smoothin |
+|                  |                 | size [default 0] | g                |
++------------------+-----------------+------------------+------------------+
+| h_min            | OT_DOUBLE       | Minimum step     | casadi::Smoothin |
 |                  |                 | size [default    | g                |
-|                  |                 | 1.0]             |                  |
+|                  |                 | inf]             |                  |
 +------------------+-----------------+------------------+------------------+
 | input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
@@ -56446,10 +58264,21 @@ Andersson
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| reltol           | OT_DOUBLE       | Accuracy of      | casadi::Smoothin |
+|                  |                 | function inputs  | g                |
+|                  |                 | [default: query  |                  |
+|                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::Smoothin |
 | psize            |                 | perturbation     | g                |
 |                  |                 | size [default:   |                  |
 |                  |                 | 1e-3]            |                  |
++------------------+-----------------+------------------+------------------+
+| smoothing        | OT_DOUBLE       | Smoothing        | casadi::Smoothin |
+|                  |                 | regularization   | g                |
+|                  |                 | [default:        |                  |
+|                  |                 | machine          |                  |
+|                  |                 | precision]       |                  |
 +------------------+-----------------+------------------+------------------+
 | u_aim            | OT_DOUBLE       | Target ratio of  | casadi::Smoothin |
 |                  |                 | roundoff error   | g                |
@@ -56515,6 +58344,11 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_function(const
+std::string &fname) const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::size2_out(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -56522,13 +58356,11 @@ std::vector< std::vector< M > > &fseed) const  "
 ";
 
 %feature("docstring")  casadi::Smoothing::calc_fd(double **yk, double *y0,
-double *J) const override "
+double *J, double h) const override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Smoothing::calc_fd(CodeGenerator &g, const
-std::string &yk, const std::string &y0, const std::string &J) const override
-"
+%feature("docstring")  casadi::Smoothing::calc_fd() const override "
 
 [INTERNAL] ";
 
@@ -56826,6 +58658,12 @@ classes.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::check_arg(const
 std::vector< M > &arg) const  "
 
@@ -56840,8 +58678,7 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_function(const
-std::string &fname) const  "
+%feature("docstring")  casadi::Smoothing::has_err() const override "
 
 [INTERNAL] ";
 
@@ -56915,7 +58752,8 @@ override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Smoothing::pert(int k) const override "
+%feature("docstring")  casadi::Smoothing::pert(int k, double h) const
+override "
 
 [INTERNAL] ";
 
@@ -57004,7 +58842,7 @@ persistent=false) "
 ";
 
 %feature("docstring") casadi::Smoothing::Smoothing(const std::string &name,
-int n, double h) "
+int n) "
 
 [INTERNAL] ";
 
@@ -57479,12 +59317,23 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::Smoothing::get_abstol() const override "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::Smoothing::has_forward(int nfwd) const
 override "
 
 [INTERNAL]  Second order derivatives.
 
 ";
+
+%feature("docstring")  casadi::Smoothing::calc_stepsize(double abstol) const
+override "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
@@ -58490,6 +60339,12 @@ elements (i, j) with j>=i.
 
 
 // File: classcasadi_1_1Sqpmethod.xml
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::wrap() const  "
 
 [INTERNAL]  Wrap in an Function instance consisting of only one MX call.
@@ -59661,6 +61516,12 @@ const  "
 &vdef_fcn, Function &vinit_fcn) const  "
 
 [INTERNAL]  Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
 
 ";
 
@@ -60887,6 +62748,12 @@ std::vector< M > &res) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
@@ -60992,6 +62859,12 @@ std::vector< std::string > &onames, const Dict &opts) const override "
 %feature("docstring")  casadi::FunctionInternal::all_scalar() const  "
 
 [INTERNAL]  Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -61643,6 +63516,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size2_in(int ind) const  "
 
 [INTERNAL]  Input/output dimensions.
@@ -62122,12 +64001,6 @@ Joel Andersson
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -62350,6 +64223,12 @@ override "
 
 [INTERNAL]  Generate meta-information allowing a user to evaluate a
 generated function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -62806,12 +64685,6 @@ General information
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -62987,6 +64860,11 @@ Load a just-in-time compiled external function File name given.
 Number of NLP solver outputs.
 
 ";
+
+%feature("docstring")  casadi::casadi_forward_diff(T1 **yk, T1 *y0, T1 *J,
+T1 h, int n_y, const casadi_finite_diff_mem< T1 > *m) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::to_slice2(const std::vector< int > &v) "
 
@@ -63529,8 +65407,8 @@ Check if a particular plugin is available.
 
 ";
 
-%feature("docstring")  casadi::casadi_central_diff(casadi_central_diff_mem<
-T1 > *m) "
+%feature("docstring")  casadi::casadi_central_diff(T1 **yk, T1 *y0, T1 *J,
+T1 h, int n_y, const casadi_finite_diff_mem< T1 > *m) "
 
 [INTERNAL] ";
 
@@ -64219,12 +66097,6 @@ General information
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
-+------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -65418,12 +67290,6 @@ General information
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
 +------------------+-----------------+------------------+------------------+
-| fd_step          | OT_DOUBLE       | Finite           | casadi::Function |
-|                  |                 | difference       | Internal         |
-|                  |                 | perturbation     |                  |
-|                  |                 | size [default:   |                  |
-|                  |                 | 1e-8]            |                  |
-+------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
 |                  |                 | (ignored):       |                  |
@@ -65708,6 +67574,12 @@ Check if a particular plugin is available.
 %feature("docstring")  casadi::load_conic(const std::string &name) "
 
 Explicitly load a plugin dynamically.
+
+";
+
+%feature("docstring")  casadi::is_monotone(const std::vector< T > &v) "
+
+Check if the vector is monotone.
 
 ";
 
@@ -66738,11 +68610,10 @@ std::string &solver, const NlpBuilder &nl, const Dict &opts=Dict()) "
 
 ";
 
-%feature("docstring")  casadi::is_monotone(const std::vector< T > &v) "
+%feature("docstring")  casadi::casadi_smoothing_diff(T1 **yk, T1 *y0, T1 *J,
+T1 h, int n_y, const casadi_finite_diff_mem< T1 > *m) "
 
-Check if the vector is monotone.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::userOut() "
 
