@@ -315,7 +315,7 @@ The following list summarizes the most commonly used ways of constructing new \t
   \item \python{SX.ones(n,m)}: Create an $n$-by-$m$ dense matrix with all ones
   \item \python{SX.eye(n)}: Create an $n$-by-$n$ diagonal matrix with ones on the diagonal and structural zeros elsewhere.
   \item \python{SX(scalar_type)}: Create a scalar (1-by-1 matrix) with value given by the argument. This method can be used explicitly, e.g. \python{SX(9)}, or implicitly, e.g. \python{9 * SX.ones(2,2)}.
-  \item \python{SX(matrix_type)}: Create a matrix given a numerical matrix given as a \emph{numpy} or \emph{scipy} matrix (in Python) or as a dense or sparse matrix (in MATLAB/Octave). In MATLAB/Octave e.g.
+  \item \python{SX(matrix_type)}: Create a matrix given a numerical matrix given as a NumPy or SciPy matrix (in Python) or as a dense or sparse matrix (in MATLAB/Octave). In MATLAB/Octave e.g.
   \matlab{SX([1,2,3,4])} for a row vector, \matlab{SX([1;2;3;4])} for a column vector and \matlab{SX([1,2;3,4])} for a 2-by-2 matrix. This method can be used explicitly or implicitly.
   \item \python{repmat(v,n,m)}: Repeat expression $v$ $n$ times vertically and $m$ times horizontally. \python{repmat(SX(3),2,1)} will create a 2-by-1 matrix with all elements 3.
   \item (\emph{Python only}) \python{SX(list)}: Create a column vector ($n$-by-1 matrix) with the elements in the list, e.g. \python{SX([1,2,3,4])} (note the difference between Python lists and MATLAB/Octave horizontal concatenation, which both uses square bracket syntax)
@@ -349,7 +349,7 @@ int main() {
 \section{\texttt{DM}}
 \texttt{DM} is very similar to \texttt{SX}, but with the difference that the nonzero elements are numerical values and not symbolic expressions. The syntax is also the same, except for functions such as \texttt{SX.sym}, which have no equivalents.
 
-\texttt{DM} is mainly used for storing matrices in \CasADi and as inputs and outputs of functions. It is \emph{not} intended to be used for computationally intensive calculations. For this purpose, use the builtin dense or sparse data types in MATLAB, \texttt{numpy} or \texttt{scipy} matrices in Python or an expression template based library such as \texttt{eigen}, \texttt{ublas} or \texttt{MTL} in C++. Conversion between the types is usually straightforward:
+\texttt{DM} is mainly used for storing matrices in \CasADi and as inputs and outputs of functions. It is \emph{not} intended to be used for computationally intensive calculations. For this purpose, use the builtin dense or sparse data types in MATLAB, NumPy or SciPy matrices in Python or an expression template based library such as \texttt{eigen}, \texttt{ublas} or \texttt{MTL} in C++. Conversion between the types is usually straightforward:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{pytex}
@@ -2497,35 +2497,31 @@ The default degree of the bspline is 3 in each dimension. You may deviate from t
 We will walk through the syntax of \verb|interpolant| for the 1D and 2D versions, but the syntax in fact generalizes to an arbitrary number of dimensions.
 
 \subsection{1D lookup tables}
-
-For reference, we give the Python/Matlab syntax for a spline fit next to the CasADi syntax.
-
+A 1D spline fit can be done in \CasADi/Python as follows, compared with the corresponding method in SciPy:
 \begin{lstlisting}[language=Python]
 # Python
+import casadi as ca
+import numpy as np
 xgrid = np.linspace(1,6,6)
 V = [-1,-1,-2,-3,0,2]
-
-# Using Scipy
-import scipy.interpolate
-interp = scipy.interpolate.InterpolatedUnivariateSpline(xgrid, V)
-print(interp(2.5))
-
-# Using CasADi
-LUT = casadi.interpolant("LUT","bspline",[xgrid],V)
+LUT = ca.interpolant('LUT','bspline',[xgrid],V)
 print(LUT(2.5))
+# Using SciPy
+import scipy.interpolate as ip
+interp = ip.InterpolatedUnivariateSpline(xgrid, V)
+print(interp(2.5))
 \end{lstlisting}
+
+In MATLAB/Octave we get:
 
 \begin{lstlisting}[language=Matlab]
 % MATLAB/Octave
 xgrid = 1:6;
 V = [-1 -1 -2 -3 0 2];
-
-% Using Matlab builtin
-interpn(xgrid,V,2.5,'spline')
-
-% Using CasADi
 LUT = casadi.interpolant('LUT','bspline',{xgrid},V);
 LUT(2.5)
+% Using MATLAB/Octave builtin
+interpn(xgrid,V,2.5,'spline')
 \end{lstlisting}
 
 \subsection{2D lookup tables}
