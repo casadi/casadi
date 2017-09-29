@@ -23,6 +23,7 @@
 \newcommand{\lb}{\text{lb}}
 \newcommand{\ub}{\text{ub}}
 \newcommand{\python}[1]{\lstinline[language=Python]{#1}}
+\newcommand{\matlab}[1]{\lstinline[language=Matlab]{#1}}
 \newcommand{\cxx}[1]{\lstinline[language=C++]{#1}}
 
 \begin{latexonly}
@@ -170,12 +171,12 @@ If you use \CasADi in published scientific work, please cite the following:
 \section{Reading this document}
 The goal of this document is to make the reader familiar with the syntax of \CasADi and provide easily available building blocks to build numerical optimization and dynamic optimization software. Our explanation is mostly program code driven and provides little mathematical background knowledge. We assume that the reader already has a fair knowledge of theory of optimization theory, solution of initial-value problems in differential equations and the programming language in question (C++, Python or MATLAB/Octave).
 
-We will use Python and MATLAB syntax side-by-side in this guide, noting that the Python interface is more stable and better documented. Unless otherwise noted, the MATLAB syntax also applies to Octave. We try to point out the instances where has a diverging syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter~\ref{ch:syntax_differences}.
+We will use Python and MATLAB/Octave syntax side-by-side in this guide, noting that the Python interface is more stable and better documented. Unless otherwise noted, the MATLAB/Octave syntax also applies to Octave. We try to point out the instances where has a diverging syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter~\ref{ch:syntax_differences}.
 
 \chapter{Obtaining and installing \CasADi}
 \CasADi is an open-source tool, available under LGPL license, which is a permissive license that allows the tool to be used royalty-free also in commercial closed-source applications. The main restriction of LGPL is that if you decide to modify \CasADi's source code as opposed to just using the tool for your application, these changes (a ``derivative-work'' of \CasADi) must be released under LGPL as well.
 
-The source code is hosted on GitHub and has a core written in self-contained C++ code, relying on nothing but the C++ Standard Library. Its front-ends to Python and MATLAB are full-featured and auto-generated using the tool \htmladdnormallink{SWIG}{http://www.swig.org/}. These front-ends are unlikely to result in noticeable loss of efficiency. \CasADi can be used on Linux, OS X and Windows.
+The source code is hosted on GitHub and has a core written in self-contained C++ code, relying on nothing but the C++ Standard Library. Its front-ends to Python and MATLAB/Octave are full-featured and auto-generated using the tool \htmladdnormallink{SWIG}{http://www.swig.org/}. These front-ends are unlikely to result in noticeable loss of efficiency. \CasADi can be used on Linux, OS X and Windows.
 
 For up-to-date installation instructions, visit \CasADi's website: \htmladdnormallink{http://casadi.org}{http://casadi.org/}.
 
@@ -195,7 +196,7 @@ from casadi import *
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 import casadi.*
 \end{lstlisting}
 \end{minipage}
@@ -214,7 +215,7 @@ x = MX.sym('x')
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 x = MX.sym('x');
 \end{lstlisting}
 \end{minipage}
@@ -224,7 +225,7 @@ x = MX.sym('x')
 \end{pytexoutput}
 
 This creates a 1-by-1 matrix, i.e. a scalar containing a symbolic primitive called ``x''. This is just the display name, not the identifier. Multiple variables can have the same name, but still be different. The identifier is the return value. You can also create vector- or matrix-valued symbolic variables by supplying additional arguments to
-\lstinline[language=Python]{SX.sym}:
+\python{SX.sym}:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -235,7 +236,7 @@ Z = SX.sym('Z',4,2)
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 y = SX.sym('y',5);
 Z = SX.sym('Z',4,2);
 \end{lstlisting}
@@ -248,7 +249,7 @@ Z = SX.sym('Z',4,2)
 
 which creates a 5-by-1 matrix, i.e. a vector, and a 4-by-2 matrix with symbolic primitives, respectively.
 
-\lstinline[language=Python]{SX.sym} is a (static) function which returns an \texttt{SX} instance. When variables have been declared, expressions can now be formed in an intuitive way:
+\python{SX.sym} is a (static) function which returns an \texttt{SX} instance. When variables have been declared, expressions can now be formed in an intuitive way:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -260,7 +261,7 @@ print('f:', f)
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 f = x^2 + 10;
 f = sqrt(f);
 display(f)
@@ -275,9 +276,9 @@ print('f:', f)
 
 You can also create constant \texttt{SX} instances \emph{without} any symbolic primitives:
 \begin{itemize}
-  \item[] \lstinline[language=Python]{B1 = SX.zeros(4,5)}: A dense 4-by-5 empty matrix with all zeros
-  \item[] \lstinline[language=Python]{B2 = SX(4,5)}: A sparse 4-by-5 empty matrix with all zeros
-  \item[] \lstinline[language=Python]{B4 = SX.eye(4)}: A sparse 4-by-4 matrix with ones on the diagonal
+  \item[] \python{B1 = SX.zeros(4,5)}: A dense 4-by-5 empty matrix with all zeros
+  \item[] \python{B2 = SX(4,5)}: A sparse 4-by-5 empty matrix with all zeros
+  \item[] \python{B4 = SX.eye(4)}: A sparse 4-by-4 matrix with ones on the diagonal
 \end{itemize}
 
 \begin{pytexoutput}
@@ -297,7 +298,7 @@ print( 'B4:', B4)
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 display(B4)
 \end{lstlisting}
 \end{minipage}
@@ -308,21 +309,21 @@ print('B4:', B4)
 
 The following list summarizes the most commonly used ways of constructing new \texttt{SX} expressions:
 \begin{itemize}
-  \item \lstinline[language=Python]{SX.sym(name,n,m)}: Create an $n$-by-$m$ symbolic primitive
-  \item \lstinline[language=Python]{SX.zeros(n,m)}: Create an $n$-by-$m$ dense matrix with all zeros
-  \item \lstinline[language=Python]{SX(n,m)}: Create an $n$-by-$m$ sparse matrix with all \emph{structural} zeros
-  \item \lstinline[language=Python]{SX.ones(n,m)}: Create an $n$-by-$m$ dense matrix with all ones
-  \item \lstinline[language=Python]{SX.eye(n)}: Create an $n$-by-$n$ diagonal matrix with ones on the diagonal and structural zeros elsewhere.
-  \item \lstinline[language=Python]{SX(scalar_type)}: Create a scalar (1-by-1 matrix) with value given by the argument. This method can be used explicitly, e.g. \lstinline[language=Python]{SX(9)}, or implicitly, e.g. \lstinline[language=Python]{9 * SX.ones(2,2)}.
-  \item \lstinline[language=Python]{SX(matrix_type)}: Create a matrix given a numerical matrix given as a \emph{numpy} or \emph{scipy} matrix (in Python) or as a dense or sparse matrix (in MATLAB). In MATLAB e.g.
-  \lstinline[language=Matlab]{SX([1,2,3,4])} for a row vector, \lstinline[language=Matlab]{SX([1;2;3;4])} for a column vector and \lstinline[language=Matlab]{SX([1,2;3,4])} for a 2-by-2 matrix. This method can be used explicitly or implicitly.
-  \item \lstinline[language=Python]{repmat(v,n,m)}: Repeat expression $v$ $n$ times vertically and $m$ times horizontally. \lstinline[language=Python]{repmat(SX(3),2,1)} will create a 2-by-1 matrix with all elements 3.
-  \item (\emph{Python only}) \lstinline[language=Python]{SX(list)}: Create a column vector ($n$-by-1 matrix) with the elements in the list, e.g. \lstinline[language=Python]{SX([1,2,3,4])} (note the difference between Python lists and MATLAB horizontal concatenation, which both uses square bracket syntax)
-  \item (\emph{Python only}) \lstinline[language=Python]{SX(list of list)}: Create a dense matrix with the elements in the lists, e.g. \lstinline[language=Python]{SX([[1,2],[3,4]])} or a row vector (1-by-$n$ matrix) using \lstinline[language=Python]{SX([[1,2,3,4]])}.
+  \item \python{SX.sym(name,n,m)}: Create an $n$-by-$m$ symbolic primitive
+  \item \python{SX.zeros(n,m)}: Create an $n$-by-$m$ dense matrix with all zeros
+  \item \python{SX(n,m)}: Create an $n$-by-$m$ sparse matrix with all \emph{structural} zeros
+  \item \python{SX.ones(n,m)}: Create an $n$-by-$m$ dense matrix with all ones
+  \item \python{SX.eye(n)}: Create an $n$-by-$n$ diagonal matrix with ones on the diagonal and structural zeros elsewhere.
+  \item \python{SX(scalar_type)}: Create a scalar (1-by-1 matrix) with value given by the argument. This method can be used explicitly, e.g. \python{SX(9)}, or implicitly, e.g. \python{9 * SX.ones(2,2)}.
+  \item \python{SX(matrix_type)}: Create a matrix given a numerical matrix given as a \emph{numpy} or \emph{scipy} matrix (in Python) or as a dense or sparse matrix (in MATLAB/Octave). In MATLAB/Octave e.g.
+  \matlab{SX([1,2,3,4])} for a row vector, \matlab{SX([1;2;3;4])} for a column vector and \matlab{SX([1,2;3,4])} for a 2-by-2 matrix. This method can be used explicitly or implicitly.
+  \item \python{repmat(v,n,m)}: Repeat expression $v$ $n$ times vertically and $m$ times horizontally. \python{repmat(SX(3),2,1)} will create a 2-by-1 matrix with all elements 3.
+  \item (\emph{Python only}) \python{SX(list)}: Create a column vector ($n$-by-1 matrix) with the elements in the list, e.g. \python{SX([1,2,3,4])} (note the difference between Python lists and MATLAB/Octave horizontal concatenation, which both uses square bracket syntax)
+  \item (\emph{Python only}) \python{SX(list of list)}: Create a dense matrix with the elements in the lists, e.g. \python{SX([[1,2],[3,4]])} or a row vector (1-by-$n$ matrix) using \python{SX([[1,2,3,4]])}.
 \end{itemize}
 
 \subsection*{Note for MATLAB/Octave users}
-In MATLAB, if the \texttt{import} command is omitted, you can still use CasADi by prefixing all the symbols with the package name, e.g. \lstinline[language=Matlab]{casadi.SX} instead of \lstinline[language=Matlab]{SX}, provided the \texttt{casadi} package is in the path. We will not do this in the following for typographical reasons, but note that it is often preferable in user code. In Python, this usage corresponds to issuing "\lstinline[language=Python]{import casadi}" instead of "\lstinline[language=Python]{from casadi import *}".
+In MATLAB, if the \texttt{import} command is omitted, you can still use CasADi by prefixing all the symbols with the package name, e.g. \matlab{casadi.SX} instead of \matlab{SX}, provided the \texttt{casadi} package is in the path. We will not do this in the following for typographical reasons, but note that it is often preferable in user code. In Python, this usage corresponds to issuing "\python{import casadi}" instead of "\python{from casadi import *}".
 
 Unfortunately, Octave (version 4.0.3) does not implement MATLAB's \texttt{import} command. To work around this issue, we provide a simple
 function \texttt{import.m} that can be placed in Octave's path enabling the compact syntax used in this guide.
@@ -519,11 +520,11 @@ Sparsity patterns in \CasADi are stored as instances of the \texttt{Sparsity} cl
 
 The following list summarizes the most commonly used ways of constructing new sparsity patterns:
 \begin{itemize}
-  \item \lstinline[language=Python]{Sparsity.dense(n,m)}: Create a dense $n$-by-$m$ sparsity pattern
-  \item \lstinline[language=Python]{Sparsity(n,m)}: Create a sparse $n$-by-$m$ sparsity pattern
-  \item \lstinline[language=Python]{Sparsity.diag(n)}: Create a diagonal $n$-by-$n$ sparsity pattern
-  \item \lstinline[language=Python]{Sparsity.upper(n)}: Create an upper triangular $n$-by-$n$ sparsity pattern
-  \item \lstinline[language=Python]{Sparsity.lower(n)}: Create a lower triangular $n$-by-$n$ sparsity pattern
+  \item \python{Sparsity.dense(n,m)}: Create a dense $n$-by-$m$ sparsity pattern
+  \item \python{Sparsity(n,m)}: Create a sparse $n$-by-$m$ sparsity pattern
+  \item \python{Sparsity.diag(n)}: Create a diagonal $n$-by-$n$ sparsity pattern
+  \item \python{Sparsity.upper(n)}: Create an upper triangular $n$-by-$n$ sparsity pattern
+  \item \python{Sparsity.lower(n)}: Create a lower triangular $n$-by-$n$ sparsity pattern
 \end{itemize}
 
 The \texttt{Sparsity} class can be used to create non-standard matrices, e.g.
@@ -730,7 +731,7 @@ print(sin(y)-x)
 \end{pytexoutput}
 
 In C++ and Python (but not in MATLAB), the standard multiplication operation (using \verb|*|) is reserved for element-wise multiplication (in MATLAB \verb|.*|). For \textbf{matrix multiplication}, use
-\lstinline[language=Python]{mtimes(A,B)}:
+\python{mtimes(A,B)}:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -748,8 +749,8 @@ print(y*y, mtimes(y,y))
 
 As is customary in MATLAB, multiplication using \verb|*| and \verb|.*| are equivalent when either of the arguments is a scalar.
 
-\textbf{Transposes} are formed using the syntax \lstinline[language=Python]{A.T} in Python, \lstinline[language=C++]{A.T()} in C++ and with
-\lstinline[language=Matlab]{A'} or \lstinline[language=Matlab]{A.'} in MATLAB:
+\textbf{Transposes} are formed using the syntax \python{A.T} in Python, \lstinline[language=C++]{A.T()} in C++ and with
+\matlab{A'} or \matlab{A.'} in MATLAB:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -923,7 +924,7 @@ y = SX.sym('y',10,1)
 print(y.shape)
 \end{pytexoutput}
 
-Note that in MATLAB, \lstinline[language=Matlab]{obj.myfcn(arg)} and \lstinline[language=Matlab]{myfcn(obj, arg)} are both valid ways of calling a member function \texttt{myfcn}. The latter variant is probably preferable from a style viewpoint.
+Note that in MATLAB, \matlab{obj.myfcn(arg)} and \matlab{myfcn(obj, arg)} are both valid ways of calling a member function \texttt{myfcn}. The latter variant is probably preferable from a style viewpoint.
 
 Some commonly used properties for a matrix \emph{A} are:
 \begin{description}
@@ -2174,43 +2175,45 @@ efficient, especially when derivative calculation is involved, since a lot more
 structure can typically be exploited.
 
 Depending on the circumstances, the user can implement custom \texttt{Function}
-objects in a number of different ways:
+objects in a number of different ways, which will be elaborated on in the following sections:
 
 \begin{itemize}
-\item Subclassing \texttt{FunctionInternal}
-\item Subclassing \texttt{Callback}
-\item Importing a function with \texttt{external}
+\item Subclassing \texttt{FunctionInternal}: \ref{sec:function_internal}
+\item Subclassing \texttt{Callback}: \ref{sec:callback}
+\item Importing a function with \texttt{external}: \ref{sec:external}
+\item Just-in-time compile a C language string: \ref{sec:jit_function}
+\item Replace the function call with a lookup table: \ref{sec:lookup}
 \end{itemize}
 
-We elaborate on this in the following.
-\section{Subclassing \texttt{FunctionInternal}}
+\section{Subclassing \texttt{FunctionInternal}} \label{sec:function_internal}
 All function objects presented in Chapter~\ref{ch:function} are implemented
 in \CasADi as C++ classes inheriting from the \texttt{FunctionInternal} abstract
-base class. In principle, a user with familiarity with C++ programming, should
-be able to implement a class inheriting from \texttt{FunctionInternal},
-implementing the virtual methods of this class. The best reference for doing so
+base class. In principle, a user with familiarity with C++ programming, can
+implement a class inheriting from \texttt{FunctionInternal},
+overloading the virtual methods of this class. The best reference for doing so
 is the C++ API documentation, choosing "switch to internal" to expose the internal
 API.
 
 Since \texttt{FunctionInternal} is not considered part of the stable, public API,
-we advice against this in general, unless the plan is to make a contribution to \CasADi.
+we advice against this in general, unless the plan is to contribution to \CasADi's
+source.
 
-\section{Subclassing \texttt{Callback}}
+\section{Subclassing \texttt{Callback}} \label{sec:callback}
 The \texttt{Callback} class provides a public API to \texttt{FunctionInternal}
 and inheriting from this class has the same effect as inheriting directly from
 \texttt{FunctionInternal}. Thanks to \emph{cross-language polymorphism}, it
 is possible to implement the exposed methods of \texttt{Callback} from either
-Python, MATLAB or C++.
+Python, MATLAB/Octave or C++.
 
 The derived class consists of the following parts:
 \begin{itemize}
   \item A constructor or a static function replacing the constructor
   \item A number of \emph{virtual} functions, all optional, that can be overloaded
-  (shadowed) in order to get the desired behavior. This includes the number of
+  in order to get the desired behavior. This includes the number of
   of inputs and outputs using \verb|get_n_in| and \verb|get_n_out|,
   their names using \verb|get_name_in| and \verb|get_name_out|
   and their sparsity patterns \verb|get_sparsity_in| and \verb|get_sparsity_out|.
-  \item An optional \verb|init| function called when the construction is complete.
+  \item An optional \verb|init| function called duing the object construction.
   \item A function for numerical evaluation.
   \item Optional functions for derivatives. You can choose to supply a full Jacobian (\verb|has_jacobian|, \verb|get_jacobian|), or choose to supply forward/reverse sensitivities (\verb|has_forward|, \verb|get_forward|,  \verb|has_reverse|, \verb|get_reverse|).
 \end{itemize}
@@ -2244,9 +2247,10 @@ class MyCallback(Callback):
     return [f]
 \end{lstlisting}
 
-The implementation should include a constructor, which should call the
-base class constructor using
-\lstinline[language=Python]{Callback.__init__(self)}.
+The implementation should include a constructor, which should begin with a call to
+the base class constructor using
+\python{Callback.__init__(self)} and end with a call to
+initialize object construction using \python{self.construct(name, opts)}.
 
 This function can be used as any built-in \CasADi function with the important
 caveat that when embedded in graphs, the ownership of the class will \emph{not}
@@ -2318,29 +2322,29 @@ In C++, the syntax is as follows:
 #include "casadi/casadi.hpp"
 using namespace casadi;
 class MyCallback : public Callback {
-private:
   // Data members
   double d;
-  // Private constructor
-  MyCallback(double d) : d(d) {}
 public:
-  // Creator function, creates an owning reference
-  static Function create(const std::string& name, double d,
-                         const Dict& opts=Dict()) {
-    return Callback::create(name, new MyCallback(d), opts);
+  // Constructor
+  MyCallback(const std::string& name, double d,
+             const Dict& opts=Dict()) : d(d) {
+    construct(name, opts);
   }
 
+  // Destructor
+  ~MyCallback() override {}
+
   // Number of inputs and outputs
-  virtual int get_n_in() { return 1;}
-  virtual int get_n_out() { return 1;}
+  int get_n_in() override { return 1;}
+  int get_n_out() override { return 1;}
 
   // Initialize the object
-  virtual void init() {
+  void init override() {
     std::cout << "initializing object" << std::endl;
   }
 
   // Evaluate numerically
-  virtual std::vector<DM> eval(const std::vector<DM>& arg) {
+  std::vector<DM> eval(const std::vector<DM>& arg) const override {
     DM x = arg.at(0);
     DM f = sin(d*x);
     return {f};
@@ -2348,18 +2352,13 @@ public:
 };
 \end{lstlisting}
 
-As seen in the example, the derived class should implement a private
-constructor that is not called directly, but instead via a static \texttt{create}
-function using the syntax above.
-This functions returns a \texttt{Function} instance which takes ownership of the
-created object.
-
 A class created this way can be used as any other \texttt{Function} instance,
-with the \texttt{create} function replacing a conventional constructor:
+but with the important difference that the user is responsible to managing
+the memory of this class.
 
 \begin{lstlisting}[language=C++]
 int main() {
-  Function f = MyCallback::create("f", 0.5);
+  MyCallback f("f", 0.5);
   std::vector<DM> arg = {2};
   std::vector<DM> res = f(arg);
   std::cout << res << std::endl;
@@ -2417,17 +2416,78 @@ For reverse mode directional derivatives, replace \verb|fwd| with \verb|adj|.
 
 This is an experimental feature.
 
+\section{Just-in-time compile a C language string} \label{sec:jit_function}
+In the previous section we showed how to specify a C file with functions for numerical
+evaluation and meta information. As was shown, this file can be just-in-time
+compiled by CasADi's interface to Clang. There exists a shorthand for this approach,
+where the user simply specifies the source code as a C language string.
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=C]
+# Python
+body =\
+'r[0] = x[0];\n'+\
+'while (r[0]<s[0]) {\n'+\
+' r[0] *= r[0];\n'+\
+'}\n'
+
+f = Function.jit('f',body,\
+      ['x','s'],['r'])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+body =[...
+'r[0] = x[0];\n',...
+'while (r[0]<s[0]) {\n',...
+' r[0] *= r[0];\n',...
+'}\n'];
+
+f = Function.jit('f',body,...
+      {'x','s'},{'r'});
+\end{lstlisting}
+\end{minipage}
+
+These four arguments of \python{Function.jit} are manditory:
+The function name, the C source as a string and the names of inputs and outputs.
+In the C source, the input/output names correspond to arrays of type \cxx{casadi_real_t}
+containing the nonzero elements of the function inputs and outputs. By default,
+all inputs and outputs are scalars (i.e. 1-by-1 and dense). To specify a different sparsity pattern, provide two additional function arguments containing vectors/lists
+of the sparsity patterns:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=C]
+# Equivalent to the above
+sp = Sparsity.scalar()
+f = Function.jit('f',body,\
+     ['x','s'], ['r'],\
+     [sp,sp], [sp])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% Equivalent to the above
+sp = Sparsity.scalar();
+f = Function.jit('f',body,...
+     {'x','s'}, {'r'});
+     {sp,sp}, {sp});
+\end{lstlisting}
+\end{minipage}
+
+Both variants accept an optional 5th (or 7th) argument in the form of an
+options dictionary.
 
 \section{Using lookup-tables} \label{sec:lookup}
 
-Lookup-tables are supported in \CasADi for rectangular grids, through the \lstinline[language=Python]{interpolant} function:\\
+Lookup-tables are supported in \CasADi for rectangular grids, through the \python{interpolant} function:\\
 \verb|interpolant(name,plugin,grid,values,options)|,
 with \verb|name| an arbitrary label, \verb|plugin| the name of the desired plugin,
 \verb|grid| the collection of 1D grids whose outer product defines the full N-D rectangular grid, and \verb|values| the data corresponding to the grid, in a flattened way. Both the \verb|grid| and the \verb|values| must be numerical in nature.
 
-The result of an \lstinline[language=Python]{interpolant} call is a \CasADi Function object that is differentiable, and can be embedded into \CasADi computational graphs by calling with MX arguments. Furthermore, code-generation is fully supported for such graphs.
+The result of an \python{interpolant} call is a \CasADi Function object that is differentiable, and can be embedded into \CasADi computational graphs by calling with MX arguments. Furthermore, code-generation is fully supported for such graphs.
 
-Currently two plugins exist for \lstinline[language=Python]{interpolant}: \verb|linear| and \verb|bspline|.
+Currently two plugins exist for \python{interpolant}: \verb|linear| and \verb|bspline|.
 The \verb|bspline| variant mimics that of MATLAB's \verb|spline|: not-a-knot end conditions.
 
 In the case of \verb|bspline|, coefficients will be sought at construction time that fit the provided data.
@@ -2456,7 +2516,7 @@ print(LUT(2.5))
 \end{lstlisting}
 
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 xgrid = 1:6;
 V = [-1 -1 -2 -3 0 2];
 
@@ -2492,7 +2552,7 @@ print(LUT([0.5,1]))
 \end{lstlisting}
 
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 xgrid = -5:1:5;
 ygrid = -4:1:4;
 
@@ -2619,7 +2679,7 @@ dae.set_unit('m','kg')
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 dae = DaeBuilder;
 % Add input expressions
 a = dae.add_p('a');
@@ -2656,14 +2716,14 @@ physical modeling language such as Modelica to specify the model. For this,
 is written specifically with optimal control in mind. Model import from
 JModelica.org is possible in two different ways; using the JModelica.org's
 \texttt{CasadiInterface} or via \texttt{DaeBuilder}'s
-\lstinline[language=Python]{parse_fmi} command.
+\python{parse_fmi} command.
 
 We recommend the former approach, since it is being actively maintained and
 refer to JModelica.org's user guide for details on how to extract \CasADi
 expressions.
 
 In the following, we will outline the legacy approach, using
-\lstinline[language=Python]{parse_fmi}.
+\python{parse_fmi}.
 
 \subsection*{Legacy import of a \texttt{modelDescription.xml} file}
 To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/tested/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} and \htmladdnormallink{cstr.cpp}{https://github.com/casadi/casadi/blob/tested/examples/cplusplus/cstr.cpp} in \CasADi's example collection.
@@ -2706,7 +2766,7 @@ ocp.make_explicit()
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 ocp.make_explicit();
 \end{lstlisting}
 \end{minipage}
@@ -2740,7 +2800,7 @@ f = dae.create('f',\
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 f = dae.create('f',...
      {'x','u','p'},{'ode'});
 \end{lstlisting}
@@ -2759,7 +2819,7 @@ f = dae.create('f',\
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 f = dae.create('f',...
      {'x','u','p'},
      {'jac_ode_x'});
@@ -2781,7 +2841,7 @@ hes = dae.create('hes',\
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 dae.add_lc('gamma',{'ode'});
 hes = dae.create('hes',...
   {'x','u','p','lam_ode'},...
@@ -2926,7 +2986,7 @@ sol.value(y)
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 opti = casadi.Opti();
 
 x = opti.variable();
@@ -2981,7 +3041,7 @@ The main characteristics of the Opti stack are:
 % \end{minipage}
 % \begin{minipage}[t]{0.5\textwidth}
 % \begin{lstlisting}[language=Matlab]
-% % MATLAB
+% % MATLAB/Octave
 % opti = casadi.Opti();
 %
 % x = opti.variable(2,1);
@@ -3008,10 +3068,10 @@ The main characteristics of the Opti stack are:
 
 \paragraph{Variables} Declare any amount of decision variables:\\
 \begin{itemize}
-  \item[] \lstinline[language=Python]{x = opti.variable()}: scalar
-  \item[] \lstinline[language=Python]{x = opti.variable(5)}: column vector
-  \item[] \lstinline[language=Python]{x = opti.variable(5,3)}: matrix
-  \item[] \lstinline[language=Python]{x = opti.variable(5,5,'symmetric')}: symmetric matrix
+  \item[] \python{x = opti.variable()}: scalar
+  \item[] \python{x = opti.variable(5)}: column vector
+  \item[] \python{x = opti.variable(5,3)}: matrix
+  \item[] \python{x = opti.variable(5,5,'symmetric')}: symmetric matrix
 \end{itemize}
 
 The order in which you declare the variables is respected by the solver.
@@ -3034,10 +3094,10 @@ opti.minimize(   sin(x*(y-p))   )
 Declare any amount of equality/inequality constraints:
 
 \begin{itemize}
-  \item[] \lstinline[language=Python]{opti.subject_to( sqrt(x+y) >= 1)}: inequality
-  \item[] \lstinline[language=Python]{opti.subject_to( sqrt(x+y) > 1)}: same as above
-  \item[] \lstinline[language=Python]{opti.subject_to( 1<= sqrt(x+y) )}: same as above
-  \item[] \lstinline[language=Python]{opti.subject_to( 5*x+y==1 )}: equality
+  \item[] \python{opti.subject_to( sqrt(x+y) >= 1)}: inequality
+  \item[] \python{opti.subject_to( sqrt(x+y) > 1)}: same as above
+  \item[] \python{opti.subject_to( 1<= sqrt(x+y) )}: same as above
+  \item[] \python{opti.subject_to( 5*x+y==1 )}: equality
 \end{itemize}
 
 You may also throw in several constraints at once:\\
@@ -3049,7 +3109,7 @@ opti.subject_to([x*y>=1,x==3])
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 opti.subject_to({x*y>=1,x==3});
 \end{lstlisting}
 \end{minipage}
@@ -3060,7 +3120,7 @@ You may declare double inequalities:\\
 opti.subject_to( opti.bounded(0,x,1) )
 \end{lstlisting}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 opti.subject_to( 0<=x<=1 );
 \end{lstlisting}
 
@@ -3085,14 +3145,14 @@ opti.subject_to( vec(A)<=3 )
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 A = opti.variable(5,5);
 opti.subject_to( A(:)<=3 );
 \end{lstlisting}
 \end{minipage}
 
-Each \lstinline[language=Python]{subject_to} command adds to the set of constraints in the problem specification.
-Use \lstinline[language=Python]{subject_to()} to empty this set and start over.
+Each \python{subject_to} command adds to the set of constraints in the problem specification.
+Use \python{subject_to()} to empty this set and start over.
 
 \paragraph{Solver}
 You must always declare the \texttt{solver} (numerical back-end).
@@ -3110,7 +3170,7 @@ opti.solver("ipopt",p_opts,
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 opti.solver('ipopt');
 p_opts = struct('expand',true);
 s_opts = struct('max_iter',100);
@@ -3130,7 +3190,7 @@ opti.set_initial(10*x[0], 2)
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 opti.set_initial(x, 2);
 opti.set_initial(10*x(1), 2)
 \end{lstlisting}
@@ -3140,13 +3200,13 @@ opti.set_initial(10*x(1), 2)
 
 \paragraph{Solving}
 
-After setting up the problem, you may call the solve method, which constructs a CasADi \lstinline[language=Python]{nlpsol} and calls it.
+After setting up the problem, you may call the solve method, which constructs a CasADi \python{nlpsol} and calls it.
 \begin{lstlisting}[language=Python]
 sol = opti.solve()
 \end{lstlisting}
 
-You may call \lstinline[language=Python]{solve} any number of times. You will always get an immutable copy of the problem specification and its solution.
-Consecutively calling \lstinline[language=Python]{solve} will not help the convergence of the problem.
+You may call \python{solve} any number of times. You will always get an immutable copy of the problem specification and its solution.
+Consecutively calling \python{solve} will not help the convergence of the problem.
 
 To warm start a solver, you need to explicitly transfer the solution of one problem to the initial value of the next.
 \begin{lstlisting}[language=Python]
@@ -3159,17 +3219,17 @@ sol2 = opti.solve()
 Afterwards, you may retrieve the numerical values of variables (or expressions of those variables) at the solution:
 
 \begin{itemize}
-  \item[] \lstinline[language=Python]{sol.value(x)}: value of a decision variable
-  \item[] \lstinline[language=Python]{sol.value(p)}: value of a parameter
-  \item[] \lstinline[language=Python]{sol.value(sin(x+p))}: value of an expression
-  \item[] \lstinline[language=Python]{sol.value(jacobian(opti.g,opti.x))}: value of constraint jacobian
+  \item[] \python{sol.value(x)}: value of a decision variable
+  \item[] \python{sol.value(p)}: value of a parameter
+  \item[] \python{sol.value(sin(x+p))}: value of an expression
+  \item[] \python{sol.value(jacobian(opti.g,opti.x))}: value of constraint jacobian
 \end{itemize}
 
-Note that the return type of \lstinline[language=Python]{value} is sparse when applicable.
+Note that the return type of \python{value} is sparse when applicable.
 
 \paragraph{Numerical value at other points}
 
-You may pass a list of overruling assignment expressions to \lstinline[language=Python]{value}.
+You may pass a list of overruling assignment expressions to \python{value}.
 In the following code, we are asking for the value of the objective,
 using all optimal values at the solution, except for \texttt{y}, which we set equal to 2.
 Note that such statement does not modify the actual optimal value of \texttt{y} in a permanent way.\\
@@ -3181,7 +3241,7 @@ sol.value(obj,[y==2])
 \end{minipage}
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 sol.value(obj,{y==2})
 \end{lstlisting}
 \end{minipage}
@@ -3217,7 +3277,7 @@ To plot the progress of the solver, you may access the non-converged solution th
 opti.callback(lambda i: plot(opti.debug.value(x)))
 \end{lstlisting}
 \begin{lstlisting}[language=Matlab]
-% MATLAB
+% MATLAB/Octave
 opti.callback(@(i) plot(opti.debug.value(x)))
 \end{lstlisting}
 The callback may be cleared from the Opti stack by calling the \texttt{callback} function without arguments.
