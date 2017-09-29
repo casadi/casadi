@@ -142,7 +142,8 @@ set(CASADI_INTERNAL
   x_function.hpp                                           # Base class for SXFunction and MXFunction
   sx_function.hpp         sx_function.cpp
   mx_function.hpp         mx_function.cpp
-  external.cpp
+  external_impl.hpp       external.cpp
+  jit_function.hpp        jit_function.cpp
   linsol.cpp              linsol_internal.hpp  linsol_internal.cpp
   rootfinder_impl.hpp     rootfinder.cpp
   integrator_impl.hpp     integrator.cpp

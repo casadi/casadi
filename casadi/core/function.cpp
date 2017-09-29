@@ -32,6 +32,7 @@
 #include "bspline.hpp"
 #include "nlpsol.hpp"
 #include "conic.hpp"
+#include "jit_function.hpp"
 
 #include <typeinfo>
 #include <fstream>
@@ -45,6 +46,12 @@ namespace casadi {
   throw CasadiException("Error in Function::" FNAME " for '" + this->name() + "' "\
     "[" + this->class_name() + "] at " + CASADI_WHERE + ":\n"\
     + string(WHAT));
+
+  // Throw informative error message from constructor
+  #define THROW_ERROR_NOOBJ(FNAME, WHAT, CLASS_NAME) \
+  throw CasadiException("Error in Function::" FNAME " for '" + name + "' "\
+      "[" CLASS_NAME "] at " + CASADI_WHERE + ":\n"\
+      + string(WHAT));
 
   Function::Function() {
   }
@@ -206,8 +213,12 @@ namespace casadi {
                            const vector<string>& name_in,
                            const vector<string>& name_out,
                            const Dict& opts) {
-    own(new SXFunction(name, ex_in, ex_out, name_in, name_out));
-    (*this)->construct(opts);
+    try {
+      own(new SXFunction(name, ex_in, ex_out, name_in, name_out));
+      (*this)->construct(opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("Function", e.what(), "SXFunction");
+    }
   }
 
   void Function::construct(const string& name,
@@ -215,8 +226,35 @@ namespace casadi {
                            const vector<string>& name_in,
                            const vector<string>& name_out,
                            const Dict& opts) {
-    own(new MXFunction(name, ex_in, ex_out, name_in, name_out));
-    (*this)->construct(opts);
+    try {
+      own(new MXFunction(name, ex_in, ex_out, name_in, name_out));
+      (*this)->construct(opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("Function", e.what(), "MXFunction");
+    }
+  }
+
+  Function Function::jit(const std::string& name, const std::string& body,
+                     const std::vector<std::string>& name_in,
+                     const std::vector<std::string>& name_out,
+                     const Dict& opts) {
+    // Pass empty vectors -> default values
+    std::vector<Sparsity> sparsity_in, sparsity_out;
+    return jit(name, body, name_in, name_out, sparsity_in, sparsity_out, opts);
+  }
+
+  Function Function::jit(const std::string& name, const std::string& body,
+                     const std::vector<std::string>& name_in,
+                     const std::vector<std::string>& name_out,
+                     const std::vector<Sparsity>& sparsity_in,
+                     const std::vector<Sparsity>& sparsity_out,
+                     const Dict& opts) {
+    try {
+      return create(new JitFunction(name, body, name_in, name_out,
+                                    sparsity_in, sparsity_out), opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("jit", e.what(), "JitFunction");
+    }
   }
 
   Function Function::expand() const {
@@ -561,24 +599,40 @@ namespace casadi {
 
   Function Function::conditional(const string& name, const vector<Function>& f,
                                  const Function& f_def, const Dict& opts) {
-    return create(new Switch(name, f, f_def), opts);
+    try {
+      return create(new Switch(name, f, f_def), opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("conditional", e.what(), "Switch");
+    }
   }
 
   Function Function::bspline(const std::string &name,
-    const std::vector< std::vector<double> >& knots, const vector<double>& coeffs,
-    const vector<int>& degree, int m, const Dict& opts) {
-    return BSpline::create(name, knots, coeffs, degree, m, opts);
+      const std::vector< std::vector<double> >& knots,
+      const vector<double>& coeffs, const vector<int>& degree, int m, const Dict& opts) {
+    try {
+      return BSpline::create(name, knots, coeffs, degree, m, opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("bspline", e.what(), "BSpline");
+    }
   }
 
   Function Function::bspline_dual(const std::string &name,
-    const std::vector< std::vector<double> >& knots, const vector<double>& x,
-    const vector<int>& degree, int m, bool reverse, const Dict& opts) {
-    return BSplineDual::create(name, knots, x, degree, m, reverse, opts);
+      const std::vector< std::vector<double> >& knots, const vector<double>& x,
+      const vector<int>& degree, int m, bool reverse, const Dict& opts) {
+    try {
+      return BSplineDual::create(name, knots, x, degree, m, reverse, opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("bspline_dual", e.what(), "BSplineDual");
+    }
   }
 
   Function Function::if_else(const string& name, const Function& f_true,
                              const Function& f_false, const Dict& opts) {
-    return create(new Switch(name, vector<Function>(1, f_false), f_true), opts);
+    try {
+      return create(new Switch(name, vector<Function>(1, f_false), f_true), opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("if_else", e.what(), "Switch");
+    }
   }
 
   int Function::n_in() const {
