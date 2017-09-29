@@ -490,7 +490,7 @@ public:
   int instance_number() const;
 
 protected:
-  OptiAdvanced() {};
+  OptiAdvanced() {}
 };
 
 /** \brief A simplified interface for NLP modeling/solving
