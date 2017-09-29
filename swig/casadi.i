@@ -1171,8 +1171,8 @@ namespace std {
       if (is_null(p)) return false;
 #ifdef SWIGPYTHON
 
-      // Dicts are iterable
-      if (PyDict_Check(p)) return false;
+      // Some built-in types are iterable
+      if (PyDict_Check(p) || PyString_Check(p) || PySet_Check(p) || PyUnicode_Check(p)) return false;
 
       // Make sure shape is 1D, if defined.
       if (PyObject_HasAttrString(p, "shape")) {
