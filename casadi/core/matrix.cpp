@@ -805,6 +805,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  std::string Matrix<Scalar>::get_str(bool more) const {
+    std::stringstream ss;
+    disp(ss, more);
+    return ss.str();
+  }
+
+  template<typename Scalar>
   void Matrix<Scalar>::reserve(int nnz) {
     reserve(nnz, size2());
   }
