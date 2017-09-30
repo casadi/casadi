@@ -748,7 +748,7 @@ namespace casadi {
     void disp(std::ostream& stream, bool more=false) const;
 
     /// Get string representation
-    std::string get_str(bool more=false) const {
+    inline std::string get_str(bool more=false) const {
       std::stringstream ss;
       disp(ss, more);
       return ss.str();
