@@ -1777,7 +1777,7 @@
 %exception casadi::Interpolant::Interpolant(const std::string &name, const std::vector< double > &grid, const std::vector< int > &offset, const std::vector< double > &values) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::JitFunction::JitFunction(const std::string &name, const std::vector< std::string > &name_in, const std::vector< std::string > &name_out, const std::vector< Sparsity > &sparsity_in, const std::vector< Sparsity > &sparsity_out, const std::string &body) {
+%exception casadi::JitFunction::JitFunction(const std::string &name, const std::string &body, const std::vector< std::string > &name_in, const std::vector< std::string > &name_out, const std::vector< Sparsity > &sparsity_in, const std::vector< Sparsity > &sparsity_out) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::LapackLu::LapackLu(const std::string &name) {
