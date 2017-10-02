@@ -1000,51 +1000,6 @@ namespace casadi {
     return 0;
   }
 
-  Function MXFunction::expand(const std::vector<SX>& inputvsx) {
-
-    // Create inputs with the same name and sparsity as the matrix valued symbolic inputs
-    vector<SX> arg(in_.size());
-    if (inputvsx.empty()) { // No symbolic input provided
-      for (int i=0; i<arg.size(); ++i) {
-        // Start with matrix with the correct sparsity
-        arg[i] = SX::zeros(in_[i].sparsity());
-
-        // Divide input into primitives and create corresponding SX
-        auto ait = arg[i]->begin();
-        vector<MX> prim = in_[i].primitives();
-        for (auto pit=prim.begin(); pit!=prim.end(); ++pit) {
-          SX t = SX::sym(pit->name(), pit->sparsity());
-          copy(t->begin(), t->end(), ait);
-          ait += t.nnz();
-        }
-        casadi_assert(ait==arg[i]->end());
-      }
-    } else { // Use provided symbolic input
-      // Make sure number of inputs matches
-      casadi_assert(inputvsx.size()==in_.size());
-
-      // Make sure that sparsity matches
-      for (int i=0; i<inputvsx.size(); ++i) {
-        casadi_assert(inputvsx[i].sparsity() == in_[i].sparsity());
-      }
-
-      // Copy to argument vector
-      copy(inputvsx.begin(), inputvsx.end(), arg.begin());
-    }
-
-    // Create output vector with correct sparsity
-    vector<SX> res(out_.size());
-    for (int i=0; i<res.size(); ++i) {
-      res[i] = SX::zeros(out_[i].sparsity());
-    }
-
-    // Evaluate symbolically
-    call(arg, res, true, false);
-
-    // Create function
-    return Function("expand_" + name_, arg, res, name_in_, name_out_);
-  }
-
   void MXFunction::codegen_declarations(CodeGenerator& g) const {
 
     // Make sure that there are no free variables

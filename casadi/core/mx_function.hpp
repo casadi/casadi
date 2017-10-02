@@ -141,9 +141,6 @@ namespace casadi {
     void ad_reverse(const std::vector<std::vector<MX> >& adjSeed,
                         std::vector<std::vector<MX> >& adjSens) const;
 
-    /** \brief Expand the matrix valued graph into a scalar valued graph */
-    Function expand(const std::vector<SX>& inputv);
-
     /// Get a vector of symbolic variables corresponding to the outputs
     std::vector<MX> symbolic_output(const std::vector<MX>& arg) const override;
 
