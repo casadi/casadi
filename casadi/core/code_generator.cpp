@@ -166,10 +166,9 @@ namespace casadi {
     // Generate Jacobian sparsity information
     if (with_jac_sparsity) {
       // Generate/get Jacobian sparsity
-      // NOTE: Inefficient
-      Function jac = f.jacobian();
+      Sparsity jac = f->get_jacobian_sparsity();
       // Code generate the sparsity pattern
-      jac->codegen_sparsities(*this);
+      add_io_sparsities("jac_" + f.name(), f->sparsity_in_, {jac});
 
       // Flush buffers
       flush(this->body);

@@ -1576,10 +1576,14 @@ namespace casadi {
 
   Function FunctionInternal::
   get_jacobian(const std::string& name,
-                  const std::vector<std::string>& inames,
-                  const std::vector<std::string>& onames,
-                  const Dict& opts) const {
+               const std::vector<std::string>& inames,
+               const std::vector<std::string>& onames,
+               const Dict& opts) const {
     casadi_error("'get_jacobian' not defined for " + class_name());
+  }
+
+  Sparsity FunctionInternal::get_jacobian_sparsity() const {
+    return wrap()->get_jacobian_sparsity();
   }
 
   void FunctionInternal::codegen(CodeGenerator& g, const std::string& fname) const {

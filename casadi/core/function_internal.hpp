@@ -297,6 +297,9 @@ namespace casadi {
         sparsity propagation */
     virtual double sp_weight() const;
 
+    /** \brief Get Jacobian sparsity */
+    virtual Sparsity get_jacobian_sparsity() const;
+
     ///@{
     /** \brief Get function input(s) and output(s)  */
     virtual const SX sx_in(int ind) const;
