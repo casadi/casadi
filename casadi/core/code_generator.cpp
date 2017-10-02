@@ -1141,5 +1141,30 @@ namespace casadi {
     }
   }
 
+  void CodeGenerator::
+  add_io_sparsities(const std::string& name,
+                    const std::vector<Sparsity>& sp_in,
+                    const std::vector<Sparsity>& sp_out) {
+    // Insert element, quick return if it already exists
+    if (!sparsity_meta.insert(name).second) return;
+
+    // Input sparsities
+    *this << declare("const int* " + name + "_sparsity_in(int i)") << " {\n"
+      << "switch (i) {\n";
+    for (int i=0; i<sp_in.size(); ++i) {
+      *this << "case " << i << ": return " << sparsity(sp_in[i]) << ";\n";
+    }
+    *this << "default: return 0;\n}\n"
+      << "}\n\n";
+
+    // Output sparsities
+    *this << declare("const int* " + name + "_sparsity_out(int i)") << " {\n"
+      << "switch (i) {\n";
+    for (int i=0; i<sp_out.size(); ++i) {
+      *this << "case " << i << ": return " << sparsity(sp_out[i]) << ";\n";
+    }
+    *this << "default: return 0;\n}\n"
+      << "}\n\n";
+  }
 
 } // namespace casadi

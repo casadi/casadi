@@ -1627,26 +1627,7 @@ namespace casadi {
   }
 
   void FunctionInternal::codegen_sparsities(CodeGenerator& g) const {
-    // Insert element, quick return if it already exists
-    if (!g.sparsity_meta.insert(name_).second) return;
-
-    // Input sparsities
-    g << g.declare("const int* " + name_ + "_sparsity_in(int i)") << " {\n"
-      << "switch (i) {\n";
-    for (int i=0; i<n_in_; ++i) {
-      g << "case " << i << ": return " << g.sparsity(sparsity_in_[i]) << ";\n";
-    }
-    g << "default: return 0;\n}\n"
-      << "}\n\n";
-
-    // Output sparsities
-    g << g.declare("const int* " + name_ + "_sparsity_out(int i)") << " {\n"
-      << "switch (i) {\n";
-    for (int i=0; i<n_out_; ++i) {
-      g << "case " << i << ": return " << g.sparsity(sparsity_out_[i]) << ";\n";
-    }
-    g << "default: return 0;\n}\n"
-      << "}\n\n";
+    g.add_io_sparsities(name_, sparsity_in_, sparsity_out_);
   }
 
   void FunctionInternal::codegen_meta(CodeGenerator& g) const {

@@ -236,6 +236,11 @@ namespace casadi {
     /** \brief Add a built-in auxiliary function */
     void add_auxiliary(Auxiliary f, const std::vector<std::string>& inst = {"casadi_real"});
 
+    /** \brief Add io sparsity patterns of a function */
+    void add_io_sparsities(const std::string& name,
+                           const std::vector<Sparsity>& sp_in,
+                           const std::vector<Sparsity>& sp_out);
+
     /** Get work vector name from index */
     std::string work(int n, int sz) const;
 
