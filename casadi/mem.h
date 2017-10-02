@@ -107,7 +107,7 @@ typedef struct {
   casadi_real** res;
   int* iw;
   casadi_real* w;
-  int mem;
+  void* mem;
 
   /* Meta information */
   int n_in, n_out;
