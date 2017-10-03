@@ -93,7 +93,7 @@ namespace casadi {
         casadi_warning("Ignoring monitor '" + fname + "'."
                        " Available functions: " + join(get_function()) + ".");
       } else {
-        casadi_assert_warning(!it->second.monitored, "Duplicate monitor " + fname);
+        if (it->second.monitored) casadi_warning("Duplicate monitor " + fname);
         it->second.monitored = true;
       }
     }

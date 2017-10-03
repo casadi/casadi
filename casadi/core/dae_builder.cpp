@@ -317,13 +317,15 @@ namespace casadi {
     }
 
     // Make sure that the dimensions are consistent at this point
-    casadi_assert_warning(this->s.size()==this->dae.size(),
-                          "The number of differential-algebraic equations does not match "
-                          "the number of implicitly defined states.");
-    casadi_assert_warning(this->z.size()==this->alg.size(),
-                          "The number of algebraic equations (equations not involving "
-                          "differentiated variables) does not match the number of "
-                          "algebraic variables.");
+    if (this->s.size()!=this->dae.size()) {
+      casadi_warning("The number of differential-algebraic equations does not match "
+                     "the number of implicitly defined states.");
+    }
+    if (this->z.size()!=this->alg.size()) {
+      casadi_warning("The number of algebraic equations (equations not involving "
+                    "differentiated variables) does not match the number of "
+                    "algebraic variables.");
+    }
   }
 
   Variable& DaeBuilder::read_variable(const XmlNode& node) {
@@ -1623,7 +1625,7 @@ namespace casadi {
 
     // Get a reference to the expression
     MX& ret = lin_comb_[name];
-    casadi_assert_warning(ret.is_empty(), "DaeBuilder::add_lc: Overwriting " << name);
+    if (!ret.is_empty()) casadi_warning("DaeBuilder::add_lc: Overwriting " << name);
     ret = 0;
 
     // Get indices of outputs

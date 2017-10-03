@@ -1151,7 +1151,8 @@ namespace casadi {
 
     // Make sure symmetric
     if (b!=c) {
-      casadi_assert_warning(fabs(b-c)<1e-10, "Hessian is not symmetric: " << b << " != " << c);
+      if (fabs(b-c)>=1e-10) casadi_warning("Hessian is not symmetric: "
+                                           + str(b) + " != " + str(c));
       m->qpH[1] = c = b;
     }
 

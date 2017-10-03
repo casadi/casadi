@@ -137,10 +137,6 @@ inline std::string trim_path(const std::string& full_path) {
   casadi::userOut<true, casadi::PL_WARN>() \
     << "CasADi warning at " << CASADI_WHERE << ": " << msg << "\n";
 
-// Issue a warning if an assertion fails
-#define casadi_assert_warning(x, msg) \
-  if (!(x)) casadi_warning("Assertion \"" CASADI_STR(x) "\" failed.");
-
 // Issue a message, including location in the source code
 #define casadi_message(msg) \
   casadi::userOut() \

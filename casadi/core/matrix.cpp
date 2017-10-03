@@ -3063,9 +3063,11 @@ namespace casadi {
   SX::substitute(const vector<SX>& ex, const vector<SX>& v, const vector<SX>& vdef) {
 
     // Assert consistent dimensions
-    casadi_assert_warning(v.size()==vdef.size(), "subtitute: number of symbols to replace ( "
-                          << v.size() << ") must match number of expressions (" << vdef.size()
-                          << ") to replace them with.");
+    if (v.size()!=vdef.size()) {
+      casadi_warning("subtitute: number of symbols to replace ( " + str(v.size()) + ") "
+                     "must match number of expressions (" + str(vdef.size()) + ") "
+                     "to replace them with.");
+    }
 
     // Quick return if all equal
     bool all_equal = true;

@@ -65,17 +65,10 @@ bool bad_test4(){
 }
 
 int main(){
-
   // Warning
   casadi_warning("This function will fail.");
 
-  // No warning here
-  casadi_assert_warning(0==0, "Not here.");
-
-  // Warning due to failed assert
-  casadi_assert_warning(1==0, "I am telling you, it WILL fail.");
-
-  // Recursive error
+  // Developer error
   casadi_assert(bad_test4());
 
   return 0;

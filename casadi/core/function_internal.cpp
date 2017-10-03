@@ -94,7 +94,7 @@ namespace casadi {
 
   FunctionInternal::~FunctionInternal() {
     for (void* m : mem_) {
-      casadi_assert_warning(m==0, "Memory object has not been properly freed");
+      if (m!=0) casadi_warning("Memory object has not been properly freed");
     }
     mem_.clear();
   }
@@ -281,15 +281,17 @@ namespace casadi {
 
     // Get the number of inputs
     n_in_ = get_n_in();
-    casadi_assert_warning(n_in_<10000, "Function " << name_
-                          << " has a large number of inputs (" << n_in << "). "
-                          "Changing the problem formulation is strongly encouraged.");
+    if (n_in_>=10000) {
+      casadi_warning("Function " + name_ + " has many inputs (" + str(n_in_) + "). "
+                     "Changing the problem formulation is strongly encouraged.");
+    }
 
     // Get the number of outputs
     n_out_ = get_n_out();
-    casadi_assert_warning(n_out_<10000, "Function " << name_
-                          << " has a large number of outputs (" << n_out << "). "
-                          "Changing the problem formulation is strongly encouraged.");
+    if (n_out_>=10000) {
+      casadi_warning("Function " + name_ + " has many outputs (" + str(n_out_) + "). "
+                     "Changing the problem formulation is strongly encouraged.");
+    }
 
     // Query input sparsities if not already provided
     if (sparsity_in_.empty()) {
