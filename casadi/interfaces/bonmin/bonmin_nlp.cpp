@@ -52,8 +52,8 @@ namespace casadi {
   // returns the variable bounds
   bool BonminUserClass::get_bounds_info(Index n, Number* x_l, Number* x_u,
                                        Index m, Number* g_l, Number* g_u) {
-    casadi_assert(n==solver_.nx_);
-    casadi_assert(m==solver_.ng_);
+    casadi_assert_dev(n==solver_.nx_);
+    casadi_assert_dev(m==solver_.ng_);
     return solver_.get_bounds_info(mem_, x_l, x_u, g_l, g_u);
   }
 
@@ -62,8 +62,8 @@ namespace casadi {
                                           bool init_z, Number* z_L, Number* z_U,
                                           Index m, bool init_lambda,
                                           Number* lambda) {
-    casadi_assert(n==solver_.nx_);
-    casadi_assert(m==solver_.ng_);
+    casadi_assert_dev(n==solver_.nx_);
+    casadi_assert_dev(m==solver_.ng_);
     return solver_.get_starting_point(mem_, init_x, x, init_z, z_L, z_U, init_lambda, lambda);
   }
 

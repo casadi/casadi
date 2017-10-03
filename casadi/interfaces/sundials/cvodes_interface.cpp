@@ -170,7 +170,7 @@ namespace casadi {
       // Iterative scheme
       int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
       switch (newton_scheme_) {
-      case SD_DIRECT: casadi_assert(0);
+      case SD_DIRECT: casadi_assert_dev(0);
       case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
       case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
       case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
@@ -206,7 +206,7 @@ namespace casadi {
 
   int CvodesInterface::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
       m->arg[0] = NV_DATA_S(x);
@@ -319,7 +319,7 @@ namespace casadi {
         // Iterative scheme
         int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
         switch (newton_scheme_) {
-        case SD_DIRECT: casadi_assert(0);
+        case SD_DIRECT: casadi_assert_dev(0);
         case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype, max_krylov_); break;
         case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype, max_krylov_); break;
         case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype, max_krylov_); break;
@@ -382,7 +382,7 @@ namespace casadi {
   void CvodesInterface::ehfun(int error_code, const char *module, const char *function,
                               char *msg, void *user_data) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
       if (!s.disable_internal_warnings_) {
@@ -414,7 +414,7 @@ namespace casadi {
   int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
                             void *user_data) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
       m->arg[0] = NV_DATA_S(rx);
@@ -440,7 +440,7 @@ namespace casadi {
   int CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx,
                              N_Vector rqdot, void *user_data) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
       m->arg[0] = NV_DATA_S(rx);

@@ -224,9 +224,9 @@ namespace casadi {
       }
     }
 
-    casadi_assert(nx.size()==N_+1);
-    casadi_assert(nu.size()==N_);
-    casadi_assert(ng.size()==N_+1);
+    casadi_assert_dev(nx.size()==N_+1);
+    casadi_assert_dev(nu.size()==N_);
+    casadi_assert_dev(ng.size()==N_+1);
 
     casadi_assert_message(nx_ == std::accumulate(nx.begin(), nx.end(), 0) +
       std::accumulate(nu.begin(), nu.end(), 0),
@@ -313,7 +313,7 @@ namespace casadi {
       "HPMPC: specified structure of A does not correspond to what the interface can handle. "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
       "ng " + str(ng) + ".");
-    casadi_assert(total.nnz() == Asp_.nnz() + Bsp_.nnz() + Csp_.nnz() + Dsp_.nnz() + Isp_.nnz());
+    casadi_assert_dev(total.nnz() == Asp_.nnz() + Bsp_.nnz() + Csp_.nnz() + Dsp_.nnz() + Isp_.nnz());
 
     /* Disassemble H input into:
        Q S'
@@ -341,7 +341,7 @@ namespace casadi {
       "HPMPC: specified structure of H does not correspond to what the interface can handle. "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
       "ng " + str(ng) + ".");
-    casadi_assert(total.nnz() == Rsp_.nnz() + 2*Ssp_.nnz() + Qsp_.nnz());
+    casadi_assert_dev(total.nnz() == Rsp_.nnz() + 2*Ssp_.nnz() + Qsp_.nnz());
 
     /* Disassemble LBA/UBA input into:
        b
@@ -361,8 +361,8 @@ namespace casadi {
     bsp_ = blocksparsity(na_, 1, b_blocks);
     lugsp_ = blocksparsity(na_, 1, lug_blocks);
     total = bsp_ + lugsp_;
-    casadi_assert(total.nnz() == bsp_.nnz() + lugsp_.nnz());
-    casadi_assert(total.nnz() == na_);
+    casadi_assert_dev(total.nnz() == bsp_.nnz() + lugsp_.nnz());
+    casadi_assert_dev(total.nnz() == na_);
 
     /* Disassemble G/X0 input into:
        r/u
@@ -382,8 +382,8 @@ namespace casadi {
     usp_ = blocksparsity(nx_, 1, u_blocks);
     xsp_ = blocksparsity(nx_, 1, x_blocks);
     total = usp_ + xsp_;
-    casadi_assert(total.nnz() == usp_.nnz() + xsp_.nnz());
-    casadi_assert(total.nnz() == nx_);
+    casadi_assert_dev(total.nnz() == usp_.nnz() + xsp_.nnz());
+    casadi_assert_dev(total.nnz() == nx_);
 
     std::vector< Block > theirs_u_blocks, theirs_x_blocks;
     offset = 0;
@@ -397,8 +397,8 @@ namespace casadi {
     theirs_usp_ = blocksparsity(nx_, 1, theirs_u_blocks);
     theirs_xsp_ = blocksparsity(nx_, 1, theirs_x_blocks);
     total = theirs_usp_ + theirs_xsp_;
-    casadi_assert(total.nnz() == theirs_usp_.nnz() + theirs_xsp_.nnz());
-    casadi_assert(total.nnz() == nx_);
+    casadi_assert_dev(total.nnz() == theirs_usp_.nnz() + theirs_xsp_.nnz());
+    casadi_assert_dev(total.nnz() == nx_);
 
     offset = 0;
     std::vector< Block > lamg_gap_blocks;
@@ -433,9 +433,9 @@ namespace casadi {
     pisp_ = Sparsity::dense(std::accumulate(nx.begin()+1, nx.end(), 0), 1);
 
     total = lam_ulsp_ + lam_uusp_ + lam_xlsp_ + lam_xusp_ + lam_clsp_ + lam_cusp_;
-    casadi_assert(total.nnz() == lam_ulsp_.nnz() + lam_uusp_.nnz() + lam_xlsp_.nnz() +
+    casadi_assert_dev(total.nnz() == lam_ulsp_.nnz() + lam_uusp_.nnz() + lam_xlsp_.nnz() +
       lam_xusp_.nnz() + lam_clsp_.nnz() + lam_cusp_.nnz());
-    casadi_assert(total.nnz() == offset);
+    casadi_assert_dev(total.nnz() == offset);
 
     theirs_Xsp_ = Sparsity::dense(std::accumulate(nx.begin(), nx.end(), 0), 1);
     theirs_Usp_ = Sparsity::dense(std::accumulate(nu.begin(), nu.end(), 0), 1);
@@ -600,7 +600,7 @@ namespace casadi {
     // Dissect LBA/UBA
     mproject(-1.0, arg[CONIC_LBA], sparsity_in_.at(CONIC_LBA), get_ptr(m->b), bsp_, pv);
     mproject(-1.0, arg[CONIC_UBA], sparsity_in_.at(CONIC_UBA), get_ptr(m->b2), bsp_, pv);
-    casadi_assert(std::equal(m->b.begin(), m->b.end(), m->b2.begin()));
+    casadi_assert_dev(std::equal(m->b.begin(), m->b.end(), m->b2.begin()));
     casadi_project(arg[CONIC_LBA], sparsity_in_.at(CONIC_LBA), get_ptr(m->lg), lugsp_, pv);
     casadi_project(arg[CONIC_UBA], sparsity_in_.at(CONIC_UBA), get_ptr(m->ug), lugsp_, pv);
 
@@ -752,7 +752,7 @@ namespace casadi {
       if (eye) {
         r(range(b.offset_r, b.offset_r+b.rows),
           range(b.offset_c, b.offset_c+b.cols)) = DM::eye(b.rows);
-        casadi_assert(b.rows==b.cols);
+        casadi_assert_dev(b.rows==b.cols);
       } else {
         r(range(b.offset_r, b.offset_r+b.rows),
         range(b.offset_c, b.offset_c+b.cols)) = DM::zeros(b.rows, b.cols);
@@ -768,7 +768,7 @@ namespace casadi {
     for (int k=0;k<N;++k) {
       vs[k] = get_ptr(v)+offset;
       if (eye) {
-        casadi_assert(blocks[k].rows==blocks[k].cols);
+        casadi_assert_dev(blocks[k].rows==blocks[k].cols);
         offset+=blocks[k].rows;
       } else {
         offset+=blocks[k].rows*blocks[k].cols;

@@ -662,7 +662,7 @@ namespace casadi {
     template<typename T>
     T* get() const {
       T* ret = dynamic_cast<T*>(get());
-      casadi_assert(ret!=0);
+      casadi_assert_dev(ret!=0);
       return ret;
     }
 

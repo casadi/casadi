@@ -28,7 +28,7 @@ using namespace std;
 namespace casadi {
 
   Dot::Dot(const MX& x, const MX& y) {
-    casadi_assert(x.sparsity()==y.sparsity());
+    casadi_assert_dev(x.sparsity()==y.sparsity());
     set_dep(x, y);
     set_sparsity(Sparsity::scalar());
   }

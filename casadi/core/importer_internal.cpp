@@ -90,7 +90,7 @@ namespace casadi {
           // Read name
           string sym;
           ss >> sym;
-          casadi_assert(ss.good());
+          casadi_assert_dev(ss.good());
           // Default attributes
           bool inlined = false;
 
@@ -99,11 +99,11 @@ namespace casadi {
           if (eqpos != string::npos) {
             string attr = "inline";
             if (line.compare(eqpos-attr.size(), attr.size(), attr)==0) {
-              casadi_assert(line.size()>eqpos+1);
+              casadi_assert_dev(line.size()>eqpos+1);
               if (line.at(eqpos+1)=='1') {
                 inlined=true;
               } else {
-                casadi_assert(line.at(eqpos+1)=='0');
+                casadi_assert_dev(line.at(eqpos+1)=='0');
               }
             }
           }
@@ -277,7 +277,7 @@ namespace casadi {
 
   std::string ImporterInternal::body(const std::string& symname) const {
     auto it = external_.find(symname);
-    casadi_assert(it!=external_.end() && it->second.first);
+    casadi_assert_dev(it!=external_.end() && it->second.first);
     return it->second.second;
   }
 

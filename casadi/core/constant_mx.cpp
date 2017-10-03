@@ -220,7 +220,7 @@ namespace casadi {
   }
 
   MX ZeroByZero::get_nzref(const Sparsity& sp, const std::vector<int>& nz) const {
-    casadi_assert(nz.empty());
+    casadi_assert_dev(nz.empty());
     return MX::zeros(sp);
   }
 
@@ -241,7 +241,7 @@ namespace casadi {
   }
 
   MX ZeroByZero::get_reshape(const Sparsity& sp) const {
-    casadi_assert(sp.is_empty());
+    casadi_assert_dev(sp.is_empty());
     return MX::zeros(sp);
   }
 

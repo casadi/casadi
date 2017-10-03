@@ -333,7 +333,7 @@ namespace casadi {
     } else {
       // Iterative scheme
       switch (newton_scheme_) {
-      case SD_DIRECT: casadi_assert(0);
+      case SD_DIRECT: casadi_assert_dev(0);
       case SD_GMRES: THROWING(IDASpgmr, m->mem, max_krylov_); break;
       case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
       case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
@@ -486,7 +486,7 @@ namespace casadi {
       } else {
         // Iterative scheme
         switch (newton_scheme_) {
-        case SD_DIRECT: casadi_assert(0);
+        case SD_DIRECT: casadi_assert_dev(0);
         case SD_GMRES: THROWING(IDASpgmrB, m->mem, m->whichB, max_krylov_); break;
         case SD_BCGSTAB: THROWING(IDASpbcgB, m->mem, m->whichB, max_krylov_); break;
         case SD_TFQMR: THROWING(IDASptfqmrB, m->mem, m->whichB, max_krylov_); break;

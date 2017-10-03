@@ -98,22 +98,22 @@ namespace casadi {
   }
 
   Sparsity Interpolant::get_sparsity_in(int i) {
-    casadi_assert(i==0);
+    casadi_assert_dev(i==0);
     return Sparsity::dense(ndim_);
   }
 
   Sparsity Interpolant::get_sparsity_out(int i) {
-    casadi_assert(i==0);
+    casadi_assert_dev(i==0);
     return Sparsity::scalar();
   }
 
   std::string Interpolant::get_name_in(int i) {
-    casadi_assert(i==0);
+    casadi_assert_dev(i==0);
     return "x";
   }
 
   std::string Interpolant::get_name_out(int i) {
-    casadi_assert(i==0);
+    casadi_assert_dev(i==0);
     return "f";
   }
 

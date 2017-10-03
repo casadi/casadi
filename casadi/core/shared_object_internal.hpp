@@ -64,7 +64,7 @@ namespace casadi {
   protected:
     /** Called in the constructor of singletons to avoid that the counter reaches zero */
     void initSingleton() {
-      casadi_assert(count==0);
+      casadi_assert_dev(count==0);
       count++;
     }
 
@@ -124,7 +124,7 @@ namespace casadi {
   /// Template function implementations
   template<class B>
   B SharedObjectInternal::shared_from_this() {
-    casadi_assert(B::test_cast(this));
+    casadi_assert_dev(B::test_cast(this));
     B ret;
     ret.own(this);
     return ret;
@@ -132,7 +132,7 @@ namespace casadi {
 
   template<class B>
   const B SharedObjectInternal::shared_from_this() const {
-    casadi_assert(B::test_cast(this));
+    casadi_assert_dev(B::test_cast(this));
     B ret;
     ret.own(const_cast<SharedObjectInternal*>(this));
     return ret;

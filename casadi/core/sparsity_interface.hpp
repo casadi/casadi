@@ -452,8 +452,8 @@ namespace casadi {
   template<typename MatType>
   std::vector< std::vector< MatType > >
   SparsityInterface<MatType>::blocksplit(const MatType& x, int vert_incr, int horz_incr) {
-    casadi_assert(horz_incr>=1);
-    casadi_assert(vert_incr>=1);
+    casadi_assert_dev(horz_incr>=1);
+    casadi_assert_dev(vert_incr>=1);
     int sz1 = x.size1();
     std::vector<int> offset1 = range(0, sz1, vert_incr);
     offset1.push_back(sz1);
@@ -495,7 +495,7 @@ namespace casadi {
   template<typename MatType>
   std::vector< MatType >
   SparsityInterface<MatType>::diagsplit(const MatType& x, int incr) {
-    casadi_assert(incr>=1);
+    casadi_assert_dev(incr>=1);
     casadi_assert_message(x.is_square(), "diagsplit(x,incr)::input must be square but got "
                           + x.dim()  + ".");
     std::vector<int> offset2 = range(0, x.size2(), incr);
@@ -506,8 +506,8 @@ namespace casadi {
   template<typename MatType>
   std::vector< MatType >
   SparsityInterface<MatType>::diagsplit(const MatType& x, int incr1, int incr2) {
-    casadi_assert(incr1>=1);
-    casadi_assert(incr2>=1);
+    casadi_assert_dev(incr1>=1);
+    casadi_assert_dev(incr2>=1);
     std::vector<int> offset1 = range(0, x.size1(), incr1);
     offset1.push_back(x.size1());
     std::vector<int> offset2 = range(0, x.size2(), incr2);
@@ -527,7 +527,7 @@ namespace casadi {
 
   template<typename MatType>
   std::vector<MatType > SparsityInterface<MatType>::horzsplit(const MatType& x, int incr) {
-    casadi_assert(incr>=1);
+    casadi_assert_dev(incr>=1);
     int sz2 = x.size2();
     std::vector<int> offset2 = range(0, sz2, incr);
     offset2.push_back(sz2);
@@ -536,7 +536,7 @@ namespace casadi {
 
   template<typename MatType>
   std::vector<MatType > SparsityInterface<MatType>::vertsplit(const MatType& x, int incr) {
-    casadi_assert(incr>=1);
+    casadi_assert_dev(incr>=1);
     int sz1 = x.size1();
     std::vector<int> offset1 = range(0, sz1, incr);
     offset1.push_back(sz1);

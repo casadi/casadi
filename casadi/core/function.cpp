@@ -280,7 +280,7 @@ namespace casadi {
   }
 
   FunctionInternal* Function::operator->() const {
-    casadi_assert(!is_null());
+    casadi_assert_dev(!is_null());
     return get();
   }
 
@@ -304,11 +304,11 @@ namespace casadi {
   }
 
   vector<const double*> Function::buf_in(Function::VecArg arg) const {
-    casadi_assert(arg.size()==n_in());
+    casadi_assert_dev(arg.size()==n_in());
     auto arg_it=arg.begin();
     vector<const double*> buf_arg(sz_arg());
     for (unsigned int i=0; i<arg.size(); ++i) {
-      casadi_assert(arg_it->size()==nnz_in(i));
+      casadi_assert_dev(arg_it->size()==nnz_in(i));
       buf_arg[i] = get_ptr(*arg_it++);
     }
     return buf_arg;
@@ -326,11 +326,11 @@ namespace casadi {
   }
 
   vector<double*> Function::buf_out(Function::VPrRes res) const {
-    casadi_assert(res.size()==n_out());
+    casadi_assert_dev(res.size()==n_out());
     auto res_it=res.begin();
     vector<double*> buf_res(sz_res());
     for (unsigned int i=0; i<res.size(); ++i) {
-      casadi_assert(*res_it!=0);
+      casadi_assert_dev(*res_it!=0);
       (*res_it)->resize(nnz_out(i));
       buf_res[i] = get_ptr(**res_it++);
     }
@@ -344,7 +344,7 @@ namespace casadi {
     // Read inputs
     for (auto i=arg.begin(); i!=arg.end(); ++i) {
       int ind = index_in(i->first);
-      casadi_assert(i->second.size()==nnz_in(ind));
+      casadi_assert_dev(i->second.size()==nnz_in(ind));
       ret[ind] = get_ptr(i->second);
     }
 
@@ -372,7 +372,7 @@ namespace casadi {
     // Read outputs
     for (auto i=res.begin(); i!=res.end(); ++i) {
       int ind = index_out(i->first);
-      casadi_assert(i->second!=0);
+      casadi_assert_dev(i->second!=0);
       i->second->resize(nnz_out(ind));
       ret[ind] = get_ptr(*i->second);
     }
@@ -383,11 +383,11 @@ namespace casadi {
   template<typename D>
   void Function::call_gen(vector<const D*> arg, vector<D*> res) const {
     // Input buffer
-    casadi_assert(arg.size()>=n_in());
+    casadi_assert_dev(arg.size()>=n_in());
     arg.resize(sz_arg());
 
     // Output buffer
-    casadi_assert(res.size()>=n_out());
+    casadi_assert_dev(res.size()>=n_out());
     res.resize(sz_res());
 
     // Work vectors
@@ -413,11 +413,11 @@ namespace casadi {
 
   int Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
     // Input buffer
-    casadi_assert(arg.size()>=n_in());
+    casadi_assert_dev(arg.size()>=n_in());
     arg.resize(sz_arg());
 
     // Output buffer
-    casadi_assert(res.size()>=n_out());
+    casadi_assert_dev(res.size()>=n_out());
     res.resize(sz_res());
 
     // Work vectors
@@ -479,9 +479,9 @@ namespace casadi {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
-    casadi_assert(in_range(accum_in, n_in) && isUnique(accum_in));
-    casadi_assert(in_range(accum_out, n_out) && isUnique(accum_out));
-    casadi_assert(accum_in.size()==accum_out.size());
+    casadi_assert_dev(in_range(accum_in, n_in) && isUnique(accum_in));
+    casadi_assert_dev(in_range(accum_out, n_out) && isUnique(accum_out));
+    casadi_assert_dev(accum_in.size()==accum_out.size());
     int n_accum=accum_in.size();
 
     // Quick return if no need to reorder

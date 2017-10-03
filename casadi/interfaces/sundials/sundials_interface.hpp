@@ -129,7 +129,7 @@ namespace casadi {
     /** \brief Cast to memory object */
     static SundialsMemory* to_mem(void *mem) {
       SundialsMemory* m = static_cast<SundialsMemory*>(mem);
-      casadi_assert(m);
+      casadi_assert_dev(m);
       return m;
     }
 

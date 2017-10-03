@@ -388,9 +388,9 @@ namespace casadi {
     oracle_->call_forward(arg, res, seed, sens, true, false);
 
     // Collect sensitivity equations
-    casadi_assert(sens.size()==nfwd);
+    casadi_assert_dev(sens.size()==nfwd);
     for (int d=0; d<nfwd; ++d) {
-      casadi_assert(sens[d].size()==DE_NUM_OUT);
+      casadi_assert_dev(sens[d].size()==DE_NUM_OUT);
       aug_ode.push_back(vec(project(sens[d][DE_ODE], x())));
       aug_alg.push_back(vec(project(sens[d][DE_ALG], z())));
       aug_quad.push_back(vec(project(sens[d][DE_QUAD], q())));
@@ -462,9 +462,9 @@ namespace casadi {
     oracle_->call_reverse(arg, res, seed, sens, true, false);
 
     // Collect sensitivity equations
-    casadi_assert(sens.size()==nadj);
+    casadi_assert_dev(sens.size()==nadj);
     for (int d=0; d<nadj; ++d) {
-      casadi_assert(sens[d].size()==DE_NUM_IN);
+      casadi_assert_dev(sens[d].size()==DE_NUM_IN);
       aug_rode.push_back(vec(project(sens[d][DE_X], x())));
       aug_ralg.push_back(vec(project(sens[d][DE_Z], z())));
       aug_rquad.push_back(vec(project(sens[d][DE_P], p())));
@@ -1054,7 +1054,7 @@ namespace casadi {
     }
 
     // Number of finite elements and time steps
-    casadi_assert(nk_>0);
+    casadi_assert_dev(nk_>0);
     h_ = (grid_.back() - grid_.front())/nk_;
 
     // Setup discrete time dynamics
@@ -1104,7 +1104,7 @@ namespace casadi {
     // Get discrete time sought
     int k_out = std::ceil((t - grid_.front())/h_);
     k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
-    casadi_assert(k_out>=0);
+    casadi_assert_dev(k_out>=0);
 
     // Explicit discrete time dynamics
     const Function& F = getExplicit();
@@ -1157,7 +1157,7 @@ namespace casadi {
     // Get discrete time sought
     int k_out = std::floor((t - grid_.front())/h_);
     k_out = std::max(k_out, 0); //  make sure that rounding errors does not result in k_out>nk_
-    casadi_assert(k_out<=nk_);
+    casadi_assert_dev(k_out<=nk_);
 
     // Explicit discrete time dynamics
     const Function& G = getExplicitB();

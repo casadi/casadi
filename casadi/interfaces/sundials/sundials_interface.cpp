@@ -206,7 +206,7 @@ namespace casadi {
         J = getJ(backward);
       } else {
         SundialsInterface* d = derivative_of_.get<SundialsInterface>();
-        casadi_assert(d!=0);
+        casadi_assert_dev(d!=0);
         if (d->ns_==0) {
           J = d->get_function(backward ? "jacB" : "jacF");
         } else {

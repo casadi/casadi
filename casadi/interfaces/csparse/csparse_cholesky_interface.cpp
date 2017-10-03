@@ -116,13 +116,13 @@ namespace casadi {
 
     if (m->L) cs_nfree(m->L);
     m->L = cs_chol(&m->A, m->S) ;                 // numeric Cholesky factorization
-    casadi_assert(m->L!=0);
+    casadi_assert_dev(m->L!=0);
   }
 
   Sparsity CSparseCholeskyInterface::linsol_cholesky_sparsity(void* mem, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
-    casadi_assert(m->S);
+    casadi_assert_dev(m->S);
     int n = m->A.n;
     int nzmax = m->S->cp[n];
     std::vector< int > row(n+1);
@@ -156,7 +156,7 @@ namespace casadi {
   DM CSparseCholeskyInterface::linsol_cholesky(void* mem, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
-    casadi_assert(m->L);
+    casadi_assert_dev(m->L);
     cs *L = m->L->L;
     int nz = L->nzmax;
     std::vector< int > colind(L->m+1);
@@ -173,7 +173,7 @@ namespace casadi {
   void CSparseCholeskyInterface::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
-    casadi_assert(m->L!=0);
+    casadi_assert_dev(m->L!=0);
 
     double *t = &m->temp.front();
     for (int k=0; k<nrhs; ++k) {
@@ -195,7 +195,7 @@ namespace casadi {
   void CSparseCholeskyInterface::solve_cholesky(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
-    casadi_assert(m->L!=0);
+    casadi_assert_dev(m->L!=0);
 
     double *t = get_ptr(m->temp);
 

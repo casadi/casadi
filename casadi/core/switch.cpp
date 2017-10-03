@@ -34,7 +34,7 @@ namespace casadi {
     : FunctionInternal(name), f_(f), f_def_(f_def) {
 
     // Consitency check
-    casadi_assert(!f_.empty());
+    casadi_assert_dev(!f_.empty());
   }
 
   Switch::~Switch() {
@@ -42,13 +42,13 @@ namespace casadi {
 
   size_t Switch::get_n_in() {
     for (auto&& i : f_) if (!i.is_null()) return 1+i.n_in();
-    casadi_assert(!f_def_.is_null());
+    casadi_assert_dev(!f_def_.is_null());
     return 1+f_def_.n_in();
   }
 
   size_t Switch::get_n_out() {
     for (auto&& i : f_) if (!i.is_null()) return i.n_out();
-    casadi_assert(!f_def_.is_null());
+    casadi_assert_dev(!f_def_.is_null());
     return f_def_.n_out();
   }
 
@@ -63,7 +63,7 @@ namespace casadi {
           ret = ret.is_null() ? s : ret.unite(s);
         }
       }
-      casadi_assert(!f_def_.is_null());
+      casadi_assert_dev(!f_def_.is_null());
       const Sparsity& s = f_def_.sparsity_in(i-1);
       ret = ret.is_null() ? s : ret.unite(s);
       return ret;
@@ -78,7 +78,7 @@ namespace casadi {
         ret = ret.is_null() ? s : ret.unite(s);
       }
     }
-    casadi_assert(!f_def_.is_null());
+    casadi_assert_dev(!f_def_.is_null());
     const Sparsity& s = f_def_.sparsity_out(i);
     ret = ret.is_null() ? s : ret.unite(s);
     return ret;

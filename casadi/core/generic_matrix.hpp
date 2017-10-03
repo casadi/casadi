@@ -904,7 +904,7 @@ namespace casadi {
     bool mode_floor = mode == "floor";
     bool mode_ceil = mode == "ceil";
 
-    casadi_assert(is_increasing(x));
+    casadi_assert_dev(is_increasing(x));
 
     casadi_assert_message(x.size()==v.size1(),
       "interp1d(x, v, xq): dimensions mismatch. v expected to have " + str(x.size()) + " rows,"
@@ -987,8 +987,8 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::repsum(const MatType& x, int n, int m) {
-    casadi_assert(x.size1() % n==0);
-    casadi_assert(x.size2() % m==0);
+    casadi_assert_dev(x.size1() % n==0);
+    casadi_assert_dev(x.size2() % m==0);
     std::vector< std::vector< MatType> > s =
       blocksplit(x, x.size1()/n, x.size2()/m);
     MatType sum = 0;
@@ -1013,12 +1013,12 @@ namespace casadi {
   MatType GenericMatrix<MatType>::bilin(const MatType& A, const MatType& x,
                                         const MatType& y) {
     // Check/correct x
-    casadi_assert(x.is_vector());
+    casadi_assert_dev(x.is_vector());
     if (!x.is_column()) return bilin(A, x.T(), y);
     if (!x.is_dense()) return bilin(A, densify(x), y);
 
     // Check/correct y
-    casadi_assert(y.is_vector());
+    casadi_assert_dev(y.is_vector());
     if (!y.is_column()) return bilin(A, x, y.T());
     if (!y.is_dense()) return bilin(A, x, densify(y));
 
@@ -1035,17 +1035,17 @@ namespace casadi {
   MatType GenericMatrix<MatType>::rank1(const MatType& A, const MatType& alpha,
                                         const MatType& x, const MatType& y) {
     // Check/correct x
-    casadi_assert(x.is_vector());
+    casadi_assert_dev(x.is_vector());
     if (!x.is_column()) return rank1(A, alpha, x.T(), y);
     if (!x.is_dense()) return rank1(A, alpha, densify(x), y);
 
     // Check/correct y
-    casadi_assert(y.is_vector());
+    casadi_assert_dev(y.is_vector());
     if (!y.is_column()) return rank1(A, alpha, x, y.T());
     if (!y.is_dense()) return rank1(A, alpha, x, densify(y));
 
     // Check alpha, quick return
-    casadi_assert(alpha.is_scalar());
+    casadi_assert_dev(alpha.is_scalar());
     if (!alpha.is_dense()) return A;
 
     // Assert dimensions
@@ -1063,7 +1063,7 @@ namespace casadi {
                                          const MatType &v, bool tr) {
     // Seeds as a vector of vectors
     int seed_dim = tr ? ex.size2() : arg.size2();
-    casadi_assert(v.size2() % seed_dim == 0);
+    casadi_assert_dev(v.size2() % seed_dim == 0);
     std::vector<MatType> w = horzsplit(v, seed_dim);
     std::vector<std::vector<MatType> > ww(w.size(), std::vector<MatType>(1));
     for (int i=0; i<w.size(); ++i) ww[i][0] = w[i];

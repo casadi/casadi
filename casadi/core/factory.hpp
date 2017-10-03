@@ -253,7 +253,7 @@ namespace casadi {
 
     // Forward mode directional derivatives
     if (!fwd_out_.empty()) {
-      casadi_assert(!fwd_in_.empty());
+      casadi_assert_dev(!fwd_in_.empty());
 
       vector<MatType> arg, res;
       vector<vector<MatType>> seed(1), sens(1);
@@ -283,7 +283,7 @@ namespace casadi {
 
     // Reverse mode directional derivatives
     if (!adj_out_.empty()) {
-      casadi_assert(!adj_in_.empty());
+      casadi_assert_dev(!adj_in_.empty());
       vector<MatType> arg, res;
       vector<vector<MatType>> seed(1), sens(1);
       // Inputs
@@ -405,7 +405,7 @@ namespace casadi {
   std::pair<std::string, std::string> Factory<MatType>::
   split_prefix(const std::string& s) {
     // Get prefix
-    casadi_assert(!s.empty());
+    casadi_assert_dev(!s.empty());
     size_t pos = s.find(':');
     casadi_assert_message(pos<s.size(), "Cannot process \"" + s + "\"");
     return make_pair(s.substr(0, pos), s.substr(pos+1, std::string::npos));

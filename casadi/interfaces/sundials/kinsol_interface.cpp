@@ -179,7 +179,7 @@ namespace casadi {
     if (strategy=="linesearch") {
       strategy_ = KIN_LINESEARCH;
     } else {
-      casadi_assert(strategy=="none");
+      casadi_assert_dev(strategy=="none");
       strategy_ = KIN_NONE;
     }
 
@@ -191,7 +191,7 @@ namespace casadi {
 
     // Set scaling factors on variables
     if (!u_scale.empty()) {
-      casadi_assert(u_scale.size()==NV_LENGTH_S(u_scale_));
+      casadi_assert_dev(u_scale.size()==NV_LENGTH_S(u_scale_));
       copy(u_scale.begin(), u_scale.end(), NV_DATA_S(u_scale_));
     } else {
       N_VConst(1.0, u_scale_);
@@ -199,7 +199,7 @@ namespace casadi {
 
     // Set scaling factors on equations
     if (!f_scale.empty()) {
-      casadi_assert(f_scale.size()==NV_LENGTH_S(f_scale_));
+      casadi_assert_dev(f_scale.size()==NV_LENGTH_S(f_scale_));
       copy(f_scale.begin(), f_scale.end(), NV_DATA_S(f_scale_));
     } else {
       N_VConst(1.0, f_scale_);
@@ -214,8 +214,8 @@ namespace casadi {
       }
     } else if (linear_solver_type=="banded") {
       linear_solver_type_ = BANDED;
-      casadi_assert(upper_bandwidth_>=0);
-      casadi_assert(lower_bandwidth_>=0);
+      casadi_assert_dev(upper_bandwidth_>=0);
+      casadi_assert_dev(lower_bandwidth_>=0);
       if (exact_jac_) {
         // For storing Jacobian nonzeros
         alloc_w(sp_jac_.nnz(), true);
@@ -322,7 +322,7 @@ namespace casadi {
 
   int KinsolInterface::func_wrapper(N_Vector u, N_Vector fval, void *user_data) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.func(*this_, u, fval);
       return 0;
@@ -335,7 +335,7 @@ namespace casadi {
   int KinsolInterface::djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J,
                                  void *user_data, N_Vector tmp1, N_Vector tmp2) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.djac(*this_, N, u, fu, J, tmp1, tmp2);
       return 0;
@@ -376,7 +376,7 @@ namespace casadi {
                                             N_Vector fu, DlsMat J, void *user_data,
                                             N_Vector tmp1, N_Vector tmp2) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.bjac(*this_, N, mupper, mlower, u, fu, J, tmp1, tmp2);
       return 0;
@@ -418,7 +418,7 @@ namespace casadi {
   int KinsolInterface::jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u,
                                    void *user_data) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.jtimes(*this_, v, Jv, u, new_u);
       return 0;
@@ -442,7 +442,7 @@ namespace casadi {
   psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
                  void* user_data, N_Vector tmp1, N_Vector tmp2) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.psetup(*this_, u, uscale, fval, fscale, tmp1, tmp2);
       return 0;
@@ -474,7 +474,7 @@ namespace casadi {
   int KinsolInterface::psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval,
                                      N_Vector fscale, N_Vector v, void* user_data, N_Vector tmp) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.psolve(*this_, u, uscale, fval, fscale, v, tmp);
       return 0;
@@ -710,11 +710,11 @@ namespace casadi {
 
     // Initialize KINSOL
     flag = KINInit(m->mem, func_wrapper, m->u);
-    casadi_assert(flag==KIN_SUCCESS);
+    casadi_assert_dev(flag==KIN_SUCCESS);
 
     // Setting maximum number of Newton iterations
     flag = KINSetMaxNewtonStep(m->mem, max_iter_);
-    casadi_assert(flag==KIN_SUCCESS);
+    casadi_assert_dev(flag==KIN_SUCCESS);
 
     // Set constraints
     if (!u_c_.empty()) {
@@ -723,7 +723,7 @@ namespace casadi {
 
       // Pass to KINSOL
       flag = KINSetConstraints(m->mem, domain);
-      casadi_assert(flag==KIN_SUCCESS);
+      casadi_assert_dev(flag==KIN_SUCCESS);
 
       // Free the temporary vector
       N_VDestroy_Serial(domain);
@@ -776,7 +776,7 @@ namespace casadi {
       // Add a preconditioner
       if (use_preconditioner_) {
         flag = KINSpilsSetPreconditioner(m->mem, psetup_wrapper, psolve_wrapper);
-        casadi_assert(flag==KIN_SUCCESS);
+        casadi_assert_dev(flag==KIN_SUCCESS);
       }
       break;
     case KinsolInterface::USER_DEFINED:
@@ -791,7 +791,7 @@ namespace casadi {
 
     // Set stop criterion
     flag = KINSetFuncNormTol(m->mem, abstol_);
-    casadi_assert(flag==KIN_SUCCESS);
+    casadi_assert_dev(flag==KIN_SUCCESS);
     return 0;
   }
 

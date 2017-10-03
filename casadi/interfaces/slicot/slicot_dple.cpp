@@ -252,7 +252,7 @@ namespace casadi {
         int n2 = p[l+1]-p[l];
         int np = n1*n2;
 
-        casadi_assert(n1-1+n2-1>=0);
+        casadi_assert_dev(n1-1+n2-1>=0);
 
         Linsol & solver = m->dpse_solvers[n1-1+n2-1][((l+1)*l)/2+r];
 

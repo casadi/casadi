@@ -105,7 +105,7 @@ namespace casadi {
           g << g.workel(res[i]) << " = ";
           if (dep(0).nnz()==1) {
             // rhs is also scalar
-            casadi_assert(nz_first==0);
+            casadi_assert_dev(nz_first==0);
             g << g.workel(arg[0]) << ";\n";
           } else {
             // rhs is an element in a vector

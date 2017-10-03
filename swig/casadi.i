@@ -2472,7 +2472,7 @@ class NZproxy:
   namespace casadi {
     /// Helper function: Convert ':' to Slice
     inline Slice char2Slice(char ch) {
-      casadi_assert(ch==':');
+      casadi_assert_dev(ch==':');
       return Slice();
     }
   } // namespace casadi
@@ -2481,7 +2481,7 @@ class NZproxy:
 %define %matrix_helpers(Type)
     // Get a submatrix (index-1)
     const Type paren(char rr) const {
-      casadi_assert(rr==':');
+      casadi_assert_dev(rr==':');
       return vec(*$self);
     }
     const Type paren(const Matrix<int>& rr) const {
@@ -2545,7 +2545,7 @@ class NZproxy:
 
     // Needed for brace syntax to access nonzeros
     int numel(char rr) const {
-      casadi_assert(rr==':');
+      casadi_assert_dev(rr==':');
       return 1;
     }
 

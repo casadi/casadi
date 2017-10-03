@@ -149,7 +149,7 @@ namespace casadi {
     if (ret.size()==size()) {
       return ret;
     } else {
-      casadi_assert(ret.is_empty(true));
+      casadi_assert_dev(ret.is_empty(true));
       return MX(size());
     }
   }
@@ -390,7 +390,7 @@ namespace casadi {
   }
 
   MX MXNode::get_reshape(const Sparsity& sp) const {
-    casadi_assert(sp.is_reshape(sparsity()));
+    casadi_assert_dev(sp.is_reshape(sparsity()));
     if (sp==sparsity()) {
       return shared_from_this<MX>();
     } else {
@@ -548,7 +548,7 @@ namespace casadi {
   }
 
   MX MXNode::_get_binary(int op, const MX& y, bool scX, bool scY) const {
-    casadi_assert(sparsity()==y.sparsity() || scX || scY);
+    casadi_assert_dev(sparsity()==y.sparsity() || scX || scY);
 
     if (GlobalOptions::simplification_on_the_fly) {
 

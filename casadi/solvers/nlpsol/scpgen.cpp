@@ -208,7 +208,7 @@ namespace casadi {
         name_x_[i] = ss.str();
       }
     } else {
-      casadi_assert(name_x_.size()==nx_);
+      casadi_assert_dev(name_x_.size()==nx_);
     }
 
     // Generate lifting functions
@@ -472,7 +472,7 @@ namespace casadi {
     n=0;
     vec_fcn_out.push_back(b_gf);                              vec_gf_ = n++;
     vec_fcn_out.push_back(b_g);                               vec_g_ = n++;
-    casadi_assert(n==vec_fcn_out.size());
+    casadi_assert_dev(n==vec_fcn_out.size());
 
     Function vec_fcn("vec_fcn", mfcn_in, vec_fcn_out);
     if (verbose_) {
@@ -1135,7 +1135,7 @@ namespace casadi {
   }
 
   void Scpgen::regularize(ScpgenMemory* m) const {
-    casadi_assert(nx_==2 && spH_.is_dense());
+    casadi_assert_dev(nx_==2 && spH_.is_dense());
 
     // Regularization
     m->reg = 0;
@@ -1147,7 +1147,7 @@ namespace casadi {
     double d = m->qpH[3];
 
     // Make sure no not a numbers
-    casadi_assert(a==a && b==b && c==c &&  d==d);
+    casadi_assert_dev(a==a && b==b && c==c &&  d==d);
 
     // Make sure symmetric
     if (b!=c) {

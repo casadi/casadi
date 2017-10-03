@@ -1822,8 +1822,8 @@ namespace casadi {
         S_unz += S_cp[k];
 
       // int overflow guard
-      casadi_assert(S_lnz >= 0);
-      casadi_assert(S_unz >= 0);
+      casadi_assert_dev(S_lnz >= 0);
+      casadi_assert_dev(S_unz >= 0);
     } else {
       // for LU factorization only
       S_unz = 4*(colind[n]) + n ;
@@ -2288,7 +2288,7 @@ namespace casadi {
 
   Sparsity SparsityInternal::sub(const vector<int>& rr, const SparsityInternal& sp,
                                  vector<int>& mapping, bool ind1) const {
-    casadi_assert(rr.size()==sp.nnz());
+    casadi_assert_dev(rr.size()==sp.nnz());
 
     // Check bounds
     casadi_assert_in_range(rr, -numel()+ind1, numel()+ind1);
@@ -2612,8 +2612,8 @@ namespace casadi {
 
   bool SparsityInternal::is_equal(int y_nrow, int y_ncol, const std::vector<int>& y_colind,
                                  const std::vector<int>& y_row) const {
-    casadi_assert(y_colind.size()==y_ncol+1);
-    casadi_assert(y_row.size()==y_colind.back());
+    casadi_assert_dev(y_colind.size()==y_ncol+1);
+    casadi_assert_dev(y_row.size()==y_colind.back());
     return is_equal(y_nrow, y_ncol, get_ptr(y_colind), get_ptr(y_row));
   }
 
@@ -2736,7 +2736,7 @@ namespace casadi {
     }
 
     // Assert dimensions
-    casadi_assert(rr.size() == size1());
+    casadi_assert_dev(rr.size() == size1());
 
     // Begin by sparsify the rows
     vector<int> new_row = get_row();
@@ -2874,7 +2874,7 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::_removeDuplicates(std::vector<int>& mapping) const {
-    casadi_assert(mapping.size()==nnz());
+    casadi_assert_dev(mapping.size()==nnz());
 
     // Return value (to be hashed)
     vector<int> ret_colind = get_colind(), ret_row = get_row();
@@ -3125,7 +3125,7 @@ namespace casadi {
     const int* colind = this->colind();
     const int* row = this->row();
     if (ordering!=0) {
-      casadi_assert(ordering==1);
+      casadi_assert_dev(ordering==1);
 
       // Ordering
       vector<int> ord = largest_first();
@@ -3375,7 +3375,7 @@ namespace casadi {
 
     // Reorder, if necessary
     if (ordering!=0) {
-      casadi_assert(ordering==1);
+      casadi_assert_dev(ordering==1);
 
       // Ordering
       vector<int> ord = largest_first();
@@ -3539,7 +3539,7 @@ namespace casadi {
     // Possibly permute columns
     if (permute_columns) {
       // Assert dimensions
-      casadi_assert(p.size()==size2());
+      casadi_assert_dev(p.size()==size2());
 
       // Permute
       for (int k=0; k<col.size(); ++k) {
@@ -3554,7 +3554,7 @@ namespace casadi {
     // Possibly permute rows
     if (permute_rows) {
       // Assert dimensions
-      casadi_assert(p.size()==size1());
+      casadi_assert_dev(p.size()==size1());
 
       // Permute
       for (int k=0; k<nnz(); ++k) {

@@ -207,7 +207,7 @@ namespace casadi {
       casadi_assert_message(flag==0, "External: \"work\" failed");
     } else if (li_.has_meta(name_ + "_WORK")) {
       vector<int> v = li_.meta_vector<int>(name_ + "_WORK");
-      casadi_assert(v.size()==4);
+      casadi_assert_dev(v.size()==4);
       sz_arg = v[0];
       sz_res = v[1];
       sz_iw = v[2];

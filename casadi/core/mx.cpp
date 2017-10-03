@@ -82,7 +82,7 @@ namespace casadi {
         own(ConstantMX::create(Sparsity(sp.size()), 0));
       }
     } else {
-      casadi_assert(val.is_column() && sp.nnz()==val.size1());
+      casadi_assert_dev(val.is_column() && sp.nnz()==val.size1());
       *this = densify(val)->get_nzref(sp, range(sp.nnz()));
     }
   }
@@ -108,7 +108,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::createMultipleOutput(MXNode* node) {
-    casadi_assert(dynamic_cast<MultipleOutput*>(node)!=0);
+    casadi_assert_dev(dynamic_cast<MultipleOutput*>(node)!=0);
     MX x =  MX::create(node);
     std::vector<MX> ret(x->nout());
     for (int i=0; i<ret.size(); ++i) {
@@ -611,7 +611,7 @@ namespace casadi {
   }
 
   MX MX::lift(const MX& x, const MX& x_guess) {
-    casadi_assert(x.sparsity()==x_guess.sparsity());
+    casadi_assert_dev(x.sparsity()==x_guess.sparsity());
     return x->_get_binary(OP_LIFT, x_guess, false, false);
   }
 
@@ -748,7 +748,7 @@ namespace casadi {
   }
 
   MX MX::densify(const MX& x, const MX& val) {
-    casadi_assert(val.is_scalar());
+    casadi_assert_dev(val.is_scalar());
     if (x.is_dense()) {
       return x; // Already ok
     } else if (val->is_zero()) {
@@ -790,7 +790,7 @@ namespace casadi {
     std::vector<MX> ret(n_primitives());
     std::vector<MX>::iterator it=ret.begin();
     (*this)->primitives(it);
-    casadi_assert(it==ret.end());
+    casadi_assert_dev(it==ret.end());
     return ret;
   }
 
@@ -798,7 +798,7 @@ namespace casadi {
     std::vector<MX> ret(n_primitives());
     std::vector<MX>::iterator it=ret.begin();
     (*this)->split_primitives(x, it);
-    casadi_assert(it==ret.end());
+    casadi_assert_dev(it==ret.end());
     return ret;
   }
 
@@ -806,7 +806,7 @@ namespace casadi {
     casadi_assert_message(v.size()==n_primitives(), "Wrong number of primitives supplied");
     std::vector<MX>::const_iterator it=v.begin();
     MX ret = (*this)->join_primitives(it);
-    casadi_assert(it==v.end());
+    casadi_assert_dev(it==v.end());
     return ret;
   }
 
@@ -898,7 +898,7 @@ namespace casadi {
         int nrow = 0;
         for (int i=0;i<ret.size();++i) {
           s+= ret[i].size2();
-          casadi_assert(nrow==0 || nrow==ret[i].size1())
+          casadi_assert_dev(nrow==0 || nrow==ret[i].size1())
           nrow = ret[i].size1();
         }
         return MX::zeros(nrow, s);
@@ -959,7 +959,7 @@ namespace casadi {
         int ncol = 0;
         for (int i=0;i<ret.size();++i) {
           s+= ret[i].size1();
-          casadi_assert(ncol==0 || ret[i].size2()==ncol);
+          casadi_assert_dev(ncol==0 || ret[i].size2()==ncol);
           ncol = ret[i].size2();
         }
         return MX::zeros(s, ncol);
@@ -978,10 +978,10 @@ namespace casadi {
 
   std::vector<MX> MX::horzsplit(const MX& x, const std::vector<int>& offset) {
     // Consistency check
-    casadi_assert(offset.size()>=1);
-    casadi_assert(offset.front()==0);
-    casadi_assert(offset.back()==x.size2());
-    casadi_assert(is_monotone(offset));
+    casadi_assert_dev(offset.size()>=1);
+    casadi_assert_dev(offset.front()==0);
+    casadi_assert_dev(offset.back()==x.size2());
+    casadi_assert_dev(is_monotone(offset));
 
     // Trivial return if possible
     if (offset.size()==1) {
@@ -996,16 +996,16 @@ namespace casadi {
   std::vector<MX> MX::diagsplit(const MX& x, const std::vector<int>& offset1,
                                 const std::vector<int>& offset2) {
     // Consistency check
-    casadi_assert(offset1.size()>=1);
-    casadi_assert(offset1.front()==0);
-    casadi_assert(offset1.back()==x.size1());
-    casadi_assert(is_monotone(offset1));
+    casadi_assert_dev(offset1.size()>=1);
+    casadi_assert_dev(offset1.front()==0);
+    casadi_assert_dev(offset1.back()==x.size1());
+    casadi_assert_dev(is_monotone(offset1));
 
     // Consistency check
-    casadi_assert(offset2.size()>=1);
-    casadi_assert(offset2.front()==0);
-    casadi_assert(offset2.back()==x.size2());
-    casadi_assert(is_monotone(offset2));
+    casadi_assert_dev(offset2.size()>=1);
+    casadi_assert_dev(offset2.front()==0);
+    casadi_assert_dev(offset2.back()==x.size2());
+    casadi_assert_dev(is_monotone(offset2));
 
     return x->get_diagsplit(offset1, offset2);
   }
@@ -1013,10 +1013,10 @@ namespace casadi {
   std::vector<MX> MX::vertsplit(const MX& x, const std::vector<int>& offset) {
     if (x.is_column()) {
       // Consistency check
-      casadi_assert(offset.size()>=1);
-      casadi_assert(offset.front()==0);
-      casadi_assert(offset.back()==x.size1());
-      casadi_assert(is_monotone(offset));
+      casadi_assert_dev(offset.size()>=1);
+      casadi_assert_dev(offset.front()==0);
+      casadi_assert_dev(offset.back()==x.size1());
+      casadi_assert_dev(is_monotone(offset));
 
       // Trivial return if possible
       if (offset.size()==1) {
@@ -1276,7 +1276,7 @@ namespace casadi {
   std::vector<MX> MX::substitute(const std::vector<MX> &ex, const std::vector<MX> &v,
                                  const std::vector<MX> &vdef) {
     // Assert consistent dimensions
-    casadi_assert(v.size()==vdef.size());
+    casadi_assert_dev(v.size()==vdef.size());
 
     // Quick return if all equal
     bool all_equal = true;

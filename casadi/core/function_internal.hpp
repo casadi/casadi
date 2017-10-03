@@ -47,7 +47,7 @@ namespace casadi {
   template<typename T>
   std::vector<std::pair<std::string, T>> zip(const std::vector<std::string>& id,
                                              const std::vector<T>& mat) {
-    casadi_assert(id.size()==mat.size());
+    casadi_assert_dev(id.size()==mat.size());
     std::vector<std::pair<std::string, T>> r(id.size());
     for (unsigned int i=0; i<r.size(); ++i) r[i] = make_pair(id[i], mat[i]);
     return r;
@@ -808,7 +808,7 @@ namespace casadi {
             // Call recursively with scalar arguments
             call(arg1, res1, always_inline, never_inline);
             // Get results
-            casadi_assert(res.size() == res1.size());
+            casadi_assert_dev(res.size() == res1.size());
             for (int i=0; i<res.size(); ++i) res[i](r, c) = res1[i];
           }
         }
@@ -832,7 +832,7 @@ namespace casadi {
     casadi_assert_message(!never_inline, "Call-nodes only possible in MX expressions");
     // Check if matching input sparsity
     bool matching_sparsity = true;
-    casadi_assert(arg.size()==n_in_);
+    casadi_assert_dev(arg.size()==n_in_);
     for (int i=0; matching_sparsity && i<n_in_; ++i)
       matching_sparsity = arg[i].sparsity()==sparsity_in_.at(i);
 
@@ -923,7 +923,7 @@ namespace casadi {
       return M(inp, arg);
     } else {
       // Assign vector with transposing
-      casadi_assert(arg.size1()==inp.size2() && arg.size2()==inp.size1()
+      casadi_assert_dev(arg.size1()==inp.size2() && arg.size2()==inp.size1()
                     && (arg.is_column() || inp.is_column()));
       return arg.T();
     }

@@ -1406,14 +1406,14 @@ namespace casadi {
   inline std::string
   casadi_math<T>::print(unsigned char op,
                         const std::string& x, const std::string& y) {
-    casadi_assert(ndeps(op)==2);
+    casadi_assert_dev(ndeps(op)==2);
     return pre(op) + x + sep(op) + y + post(op);
   }
 
   template<typename T>
   inline std::string
   casadi_math<T>::print(unsigned char op, const std::string& x) {
-    casadi_assert(ndeps(op)==1);
+    casadi_assert_dev(ndeps(op)==1);
     return pre(op) + x + post(op);
   }
 

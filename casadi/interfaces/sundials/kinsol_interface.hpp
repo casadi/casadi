@@ -171,7 +171,7 @@ namespace casadi {
     /** \brief Cast to memory object */
     static KinsolMemory* to_mem(void *mem) {
       KinsolMemory* m = static_cast<KinsolMemory*>(mem);
-      casadi_assert(m);
+      casadi_assert_dev(m);
       return m;
     }
 

@@ -30,7 +30,7 @@ using namespace std;
 namespace casadi {
 
   Monitor::Monitor(const MX& x, const std::string& comment) : comment_(comment) {
-    casadi_assert(x.nnz()>0);
+    casadi_assert_dev(x.nnz()>0);
     set_dep(x);
     set_sparsity(x.sparsity());
   }

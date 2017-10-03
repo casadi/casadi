@@ -586,7 +586,7 @@ namespace casadi {
     // Get the number of offsets
     int k;
     s_ >> k;
-    casadi_assert(k==n_var_-1);
+    casadi_assert_dev(k==n_var_-1);
 
     // Get the row offsets
     rowind[0]=0;

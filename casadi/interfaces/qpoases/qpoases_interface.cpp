@@ -821,7 +821,7 @@ namespace casadi {
 
   int QpoasesInterface::
   qpoases_init(void* mem, int dim, int nnz, const int* row, const int* col) {
-    casadi_assert(mem!=0);
+    casadi_assert_dev(mem!=0);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Get sparsity pattern in sparse triplet format
@@ -855,7 +855,7 @@ namespace casadi {
   }
 
   int QpoasesInterface::qpoases_sfact(void* mem, const double* vals) {
-    casadi_assert(mem!=0);
+    casadi_assert_dev(mem!=0);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Get nonzero elements (entire elements)
@@ -869,7 +869,7 @@ namespace casadi {
 
   int QpoasesInterface::
   qpoases_nfact(void* mem, const double* vals, int* neig, int* rank) {
-    casadi_assert(mem!=0);
+    casadi_assert_dev(mem!=0);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Get nonzero elements (entire elements)
@@ -888,7 +888,7 @@ namespace casadi {
   }
 
   int QpoasesInterface::qpoases_solve(void* mem, int nrhs, double* rhs) {
-    casadi_assert(mem!=0);
+    casadi_assert_dev(mem!=0);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Pass to linear solver

@@ -488,7 +488,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::densify(const Matrix<Scalar>& x,
                                              const Matrix<Scalar>& val) {
     // Check argument
-    casadi_assert(val.is_scalar());
+    casadi_assert_dev(val.is_scalar());
 
     // Quick return if possible
     if (x.is_dense()) return x;
@@ -893,7 +893,7 @@ namespace casadi {
     if (d.is_scalar()) {
       *this = Matrix<Scalar>(sp, d.scalar(), false);
     } else if (d.is_column() || d.size1()==1) {
-      casadi_assert(sp.nnz()==d.numel());
+      casadi_assert_dev(sp.nnz()==d.numel());
       if (d.is_dense()) {
         *this = Matrix<Scalar>(sp, d.nonzeros(), false);
       } else {
@@ -1705,7 +1705,7 @@ namespace casadi {
     if (sp==x.sparsity()) return x;
 
     // make sure that the patterns match
-    casadi_assert(sp.is_reshape(x.sparsity()));
+    casadi_assert_dev(sp.is_reshape(x.sparsity()));
 
     return Matrix<Scalar>(sp, x.nonzeros(), false);
   }
@@ -1771,7 +1771,7 @@ namespace casadi {
     }
 
     // Return the assembled matrix
-    casadi_assert(i==x.nonzeros().end());
+    casadi_assert_dev(i==x.nonzeros().end());
     return ret;
   }
 
@@ -1795,16 +1795,16 @@ namespace casadi {
   Matrix<Scalar>::diagsplit(const Matrix<Scalar>& x, const std::vector<int>& offset1,
                               const std::vector<int>& offset2) {
     // Consistency check
-    casadi_assert(offset1.size()>=1);
-    casadi_assert(offset1.front()==0);
-    casadi_assert(offset1.back()==x.size1());
-    casadi_assert(is_monotone(offset1));
+    casadi_assert_dev(offset1.size()>=1);
+    casadi_assert_dev(offset1.front()==0);
+    casadi_assert_dev(offset1.back()==x.size1());
+    casadi_assert_dev(is_monotone(offset1));
 
     // Consistency check
-    casadi_assert(offset2.size()>=1);
-    casadi_assert(offset2.front()==0);
-    casadi_assert(offset2.back()==x.size2());
-    casadi_assert(is_monotone(offset2));
+    casadi_assert_dev(offset2.size()>=1);
+    casadi_assert_dev(offset2.front()==0);
+    casadi_assert_dev(offset2.back()==x.size2());
+    casadi_assert_dev(is_monotone(offset2));
 
     // Number of outputs
     int n = offset1.size()-1;
@@ -2227,8 +2227,8 @@ namespace casadi {
       }
     }
 
-    casadi_assert(A.nnz()==elA);
-    casadi_assert(B.nnz()==elB);
+    casadi_assert_dev(A.nnz()==elA);
+    casadi_assert_dev(B.nnz()==elB);
 
     return ret;
   }
@@ -2558,13 +2558,13 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar>::operator double() const {
-    casadi_assert(is_scalar());
+    casadi_assert_dev(is_scalar());
     return static_cast<double>(scalar());
   }
 
   template<typename Scalar>
   Matrix<Scalar>::operator int() const {
-    casadi_assert(is_scalar());
+    casadi_assert_dev(is_scalar());
     return static_cast<int>(scalar());
   }
 
@@ -2821,7 +2821,7 @@ namespace casadi {
 
   template<>
   void SX::expand(const SX& ex2, SX& ww, SX& tt) {
-    casadi_assert(ex2.is_scalar());
+    casadi_assert_dev(ex2.is_scalar());
     SXElem ex = ex2.scalar();
 
     // Terms, weights and indices of the nodes that are already expanded
@@ -2855,7 +2855,7 @@ namespace casadi {
         f.push_back(to_be_expanded.top());
       } else { // unary or binary node
 
-        casadi_assert(to_be_expanded.top()->n_dep()); // make sure that the node is binary
+        casadi_assert_dev(to_be_expanded.top()->n_dep()); // make sure that the node is binary
 
         // Check if addition, subtracton or multiplication
         SXNode* node = to_be_expanded.top();
@@ -3104,7 +3104,7 @@ namespace casadi {
   void SX::substitute_inplace(const vector<SX >& v, vector<SX >& vdef,
                              vector<SX >& ex, bool reverse) {
     // Assert correctness
-    casadi_assert(v.size()==vdef.size());
+    casadi_assert_dev(v.size()==vdef.size());
     for (int i=0; i<v.size(); ++i) {
       casadi_assert_message(v[i].is_symbolic(), "the variable is not symbolic");
       casadi_assert_message(v[i].sparsity() == vdef[i].sparsity(), "the sparsity patterns of the "
@@ -3265,7 +3265,7 @@ namespace casadi {
   template<>
   SX SX::taylor(const SX& f, const SX& x,
                 const SX& a, int order) {
-    casadi_assert(x.is_scalar() && a.is_scalar());
+    casadi_assert_dev(x.is_scalar() && a.is_scalar());
     if (f.nnz()!=f.numel())
       throw CasadiException("taylor: not implemented for sparse matrices");
     SX ff = vec(f.T());
@@ -3474,9 +3474,9 @@ namespace casadi {
 
   template<>
   SX SX::poly_coeff(const SX& ex, const SX& x) {
-    casadi_assert(ex.is_scalar());
-    casadi_assert(x.is_scalar());
-    casadi_assert(x.is_symbolic());
+    casadi_assert_dev(ex.is_scalar());
+    casadi_assert_dev(x.is_scalar());
+    casadi_assert_dev(x.is_symbolic());
 
     vector<SXElem> r;
 
@@ -3505,7 +3505,7 @@ namespace casadi {
     casadi_assert_message(p.size2()==1,
                           "poly_root(): supplied parameter must be column vector but got "
                           + p.dim() + ".");
-    casadi_assert(p.is_dense());
+    casadi_assert_dev(p.is_dense());
     if (p.size1()==2) { // a*x + b
       SX a = p(0);
       SX b = p(1);

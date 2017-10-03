@@ -130,7 +130,7 @@ namespace casadi {
       }
     }
 
-    casadi_assert(degree_.size()==offset_.size()-1);
+    casadi_assert_dev(degree_.size()==offset_.size()-1);
 
     std::vector< std::vector<double> > knots;
     std::vector< std::vector<double> > grid;
@@ -154,7 +154,7 @@ namespace casadi {
     Function temp = Function("J", {C}, {Js});
     DM J = temp(std::vector<DM>{0})[0];
 
-    casadi_assert(J.size1()==J.size2());
+    casadi_assert_dev(J.size1()==J.size2());
 
     DM C_opt = solve(J, DM(values_), linear_solver_);
 

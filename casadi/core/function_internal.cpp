@@ -298,7 +298,7 @@ namespace casadi {
       sparsity_in_.resize(n_in_);
       for (int i=0; i<n_in_; ++i) sparsity_in_[i] = get_sparsity_in(i);
     } else {
-      casadi_assert(sparsity_in_.size()==n_in_);
+      casadi_assert_dev(sparsity_in_.size()==n_in_);
     }
 
     // Query output sparsities if not already provided
@@ -306,7 +306,7 @@ namespace casadi {
       sparsity_out_.resize(n_out_);
       for (int i=0; i<n_out_; ++i) sparsity_out_[i] = get_sparsity_out(i);
     } else {
-      casadi_assert(sparsity_out_.size()==n_out_);
+      casadi_assert_dev(sparsity_out_.size()==n_out_);
     }
 
     // Query input names if not already provided
@@ -314,7 +314,7 @@ namespace casadi {
       name_in_.resize(n_in_);
       for (int i=0; i<n_in_; ++i) name_in_[i] = get_name_in(i);
     } else {
-      casadi_assert(name_in_.size()==n_in_);
+      casadi_assert_dev(name_in_.size()==n_in_);
     }
 
     // Query output names if not already provided
@@ -322,7 +322,7 @@ namespace casadi {
       name_out_.resize(n_out_);
       for (int i=0; i<n_out_; ++i) name_out_[i] = get_name_out(i);
     } else {
-      casadi_assert(name_out_.size()==n_out_);
+      casadi_assert_dev(name_out_.size()==n_out_);
     }
 
     // Allocate memory for function inputs and outputs
@@ -372,7 +372,7 @@ namespace casadi {
 
     // Create memory object
     int mem = checkout();
-    casadi_assert(mem==0);
+    casadi_assert_dev(mem==0);
   }
 
   int FunctionInternal::
@@ -406,7 +406,7 @@ namespace casadi {
   }
 
   std::vector<std::string> FunctionInternal::get_free() const {
-    casadi_assert(!has_free());
+    casadi_assert_dev(!has_free());
     return std::vector<std::string>();
   }
 
@@ -615,11 +615,11 @@ namespace casadi {
 
   Sparsity FunctionInternal::
   getJacSparsityHierarchicalSymm(int iind, int oind) const {
-    casadi_assert(has_spfwd());
+    casadi_assert_dev(has_spfwd());
 
     // Number of nonzero inputs
     int nz = nnz_in(iind);
-    casadi_assert(nz==nnz_out(oind));
+    casadi_assert_dev(nz==nnz_out(oind));
 
     // Evaluation buffers
     vector<const bvec_t*> arg(sz_arg(), 0);
@@ -726,7 +726,7 @@ namespace casadi {
 
             int value = -bvec_i + fci_offset + fci_start;
 
-            //casadi_assert(value>=0);
+            //casadi_assert_dev(value>=0);
 
             // Loop over the rows of the fine block
             for (int fci = fci_offset;fci<min(fci_end-fci_start, fci_cap);++fci) {
@@ -1201,7 +1201,7 @@ namespace casadi {
 
         // Enlarge if sparse output
         if (numel_out(oind)!=sp.size1()) {
-          casadi_assert(sp.size1()==nnz_out(oind));
+          casadi_assert_dev(sp.size1()==nnz_out(oind));
 
           // New row for each old row
           vector<int> row_map = sparsity_out_.at(oind).find();
@@ -1212,7 +1212,7 @@ namespace casadi {
 
         // Enlarge if sparse input
         if (numel_in(iind)!=sp.size2()) {
-          casadi_assert(sp.size2()==nnz_in(iind));
+          casadi_assert_dev(sp.size2()==nnz_in(iind));
 
           // New column for each old column
           vector<int> col_map = sparsity_in_.at(iind).find();
@@ -1250,8 +1250,8 @@ namespace casadi {
 
     // Get seed matrices by graph coloring
     if (symmetric) {
-      casadi_assert(enable_forward_ || enable_fd_);
-      casadi_assert(allow_forward);
+      casadi_assert_dev(enable_forward_ || enable_fd_);
+      casadi_assert_dev(allow_forward);
 
       // Star coloring if symmetric
       if (verbose_) casadi_message("FunctionInternal::getPartition star_coloring");
@@ -1263,7 +1263,7 @@ namespace casadi {
       }
 
     } else {
-      casadi_assert(enable_forward_ || enable_fd_ || enable_reverse_);
+      casadi_assert_dev(enable_forward_ || enable_fd_ || enable_reverse_);
       // Get weighting factor
       double w = ad_weight();
 
@@ -1344,7 +1344,7 @@ namespace casadi {
   }
 
   Function FunctionInternal::forward(int nfwd) const {
-    casadi_assert(nfwd>=0);
+    casadi_assert_dev(nfwd>=0);
 
     // Used wrapped function if forward not available
     if (!enable_forward_ && !enable_fd_) {
@@ -1384,7 +1384,7 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Generate derivative function
-    casadi_assert(enable_forward_ || enable_fd_);
+    casadi_assert_dev(enable_forward_ || enable_fd_);
     Function ret;
     if (enable_forward_) {
       ret = get_forward(nfwd, name, inames, onames, opts);
@@ -1404,14 +1404,14 @@ namespace casadi {
     }
 
     // Consistency check for inputs
-    casadi_assert(ret.n_in()==n_in_ + n_out_ + n_in_);
+    casadi_assert_dev(ret.n_in()==n_in_ + n_out_ + n_in_);
     int ind=0;
     for (int i=0; i<n_in_; ++i) ret.assert_size_in(ind++, size1_in(i), size2_in(i));
     for (int i=0; i<n_out_; ++i) ret.assert_size_in(ind++, size1_out(i), size2_out(i));
     for (int i=0; i<n_in_; ++i) ret.assert_size_in(ind++, size1_in(i), nfwd*size2_in(i));
 
     // Consistency check for outputs
-    casadi_assert(ret.n_out()==n_out_);
+    casadi_assert_dev(ret.n_out()==n_out_);
     for (int i=0; i<n_out_; ++i) ret.assert_size_out(i, size1_out(i), nfwd*size2_out(i));
 
     // Save to cache
@@ -1422,7 +1422,7 @@ namespace casadi {
   }
 
   Function FunctionInternal::reverse(int nadj) const {
-    casadi_assert(nadj>=0);
+    casadi_assert_dev(nadj>=0);
 
     // Used wrapped function if reverse not available
     if (!enable_reverse_) {
@@ -1461,18 +1461,18 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Generate derivative function
-    casadi_assert(enable_reverse_);
+    casadi_assert_dev(enable_reverse_);
     Function ret = get_reverse(nadj, name, inames, onames, opts);
 
     // Consistency check for inputs
-    casadi_assert(ret.n_in()==n_in_ + n_out_ + n_out_);
+    casadi_assert_dev(ret.n_in()==n_in_ + n_out_ + n_out_);
     int ind=0;
     for (int i=0; i<n_in_; ++i) ret.assert_size_in(ind++, size1_in(i), size2_in(i));
     for (int i=0; i<n_out_; ++i) ret.assert_size_in(ind++, size1_out(i), size2_out(i));
     for (int i=0; i<n_out_; ++i) ret.assert_size_in(ind++, size1_out(i), nadj*size2_out(i));
 
     // Consistency check for outputs
-    casadi_assert(ret.n_out()==n_in_);
+    casadi_assert_dev(ret.n_out()==n_in_);
     for (int i=0; i<n_in_; ++i) ret.assert_size_out(i, size1_in(i), nadj*size2_in(i));
 
     // Save to cache
@@ -1564,12 +1564,12 @@ namespace casadi {
     opts["derivative_of"] = self();
 
     // Generate derivative function
-    casadi_assert(enable_jacobian_);
+    casadi_assert_dev(enable_jacobian_);
     Function ret = get_jacobian(name, inames, onames, opts);
 
     // Consistency check
-    casadi_assert(ret.n_in()==n_in_ + n_out_);
-    casadi_assert(ret.n_out()==1);
+    casadi_assert_dev(ret.n_in()==n_in_ + n_out_);
+    casadi_assert_dev(ret.n_out()==1);
 
     // Cache it for reuse and return
     jacobian_ = ret;
@@ -2060,7 +2060,7 @@ namespace casadi {
 
     } else {
       // Evaluate in batches
-      casadi_assert(enable_forward_ || enable_fd_);
+      casadi_assert_dev(enable_forward_ || enable_fd_);
       int max_nfwd = 64;
       if (!enable_fd_) {
         while (!has_forward(max_nfwd)) max_nfwd/=2;
@@ -2085,14 +2085,14 @@ namespace casadi {
         Function dfcn = forward(nfwd_batch);
         vector<MX> x = Call::create(dfcn, darg);
 
-        casadi_assert(x.size()==n_out_);
+        casadi_assert_dev(x.size()==n_out_);
 
         // Retrieve sensitivities
         for (int d=0; d<nfwd_batch; ++d) fsens[offset+d].resize(n_out_);
         for (int i=0; i<n_out_; ++i) {
           if (size2_out(i)>0) {
             v = horzsplit(x[i], size2_out(i));
-            casadi_assert(v.size()==nfwd_batch);
+            casadi_assert_dev(v.size()==nfwd_batch);
           } else {
             v = vector<MX>(nfwd_batch, MX(size_out(i)));
           }
@@ -2167,7 +2167,7 @@ namespace casadi {
       }
     } else {
       // Evaluate in batches
-      casadi_assert(enable_reverse_);
+      casadi_assert_dev(enable_reverse_);
       int max_nadj = 64;
       while (!has_reverse(max_nadj)) max_nadj/=2;
       int offset = 0;
@@ -2189,14 +2189,14 @@ namespace casadi {
         // Create the evaluation node
         Function dfcn = reverse(nadj_batch);
         vector<MX> x = Call::create(dfcn, darg);
-        casadi_assert(x.size()==n_in_);
+        casadi_assert_dev(x.size()==n_in_);
 
         // Retrieve sensitivities
         for (int d=0; d<nadj_batch; ++d) asens[offset+d].resize(n_in_);
         for (int i=0; i<n_in_; ++i) {
           if (size2_in(i)>0) {
             v = horzsplit(x[i], size2_in(i));
-            casadi_assert(v.size()==nadj_batch);
+            casadi_assert_dev(v.size()==nadj_batch);
           } else {
             v = vector<MX>(nadj_batch, MX(size_in(i)));
           }
@@ -2605,8 +2605,8 @@ namespace casadi {
 
   void FunctionInternal::set_jac_sparsity(const Sparsity& sp) {
     // Make sure that it's of the right size
-    casadi_assert(sp.size1()==numel_out());
-    casadi_assert(sp.size2()==numel_in());
+    casadi_assert_dev(sp.size1()==numel_out());
+    casadi_assert_dev(sp.size2()==numel_in());
     // Split up into the individual patterns
     std::vector<int> v_offset(n_out_+1, 0);
     for (int i=0; i<n_out_; ++i) v_offset[i+1] = v_offset[i] + numel_out(i);

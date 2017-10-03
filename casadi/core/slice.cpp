@@ -101,7 +101,7 @@ namespace casadi {
   }
 
   int Slice::scalar(int len) const {
-    casadi_assert(is_scalar(len));
+    casadi_assert_dev(is_scalar(len));
     casadi_assert_message(start >= -len && start < len, "Slice::getScalar: out of bounds");
     return start >= 0 ? start : start+len;
   }
@@ -181,7 +181,7 @@ namespace casadi {
         break;
       }
     }
-    casadi_assert(stop_inner>=0);
+    casadi_assert_dev(stop_inner>=0);
 
     // Get the end of the outer slice
     int stop_outer = v.back();

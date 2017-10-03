@@ -102,7 +102,7 @@ namespace casadi {
   }
 
   void SXElem::assignIfDuplicate(const SXElem& scalar, int depth) {
-    casadi_assert(depth>=1);
+    casadi_assert_dev(depth>=1);
     if (!is_equal(*this, scalar, 0) && is_equal(*this, scalar, depth)) {
       *this = scalar;
     }
@@ -505,7 +505,7 @@ namespace casadi {
   }
 
   SXElem SXElem::dep(int ch) const {
-    casadi_assert(ch==0 || ch==1)
+    casadi_assert_dev(ch==0 || ch==1)
     return node->dep(ch);
   }
 

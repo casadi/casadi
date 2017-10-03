@@ -139,7 +139,7 @@ namespace casadi {
     /** \brief Cast to memory object */
     static IdasMemory* to_mem(void *mem) {
       IdasMemory* m = static_cast<IdasMemory*>(mem);
-      casadi_assert(m);
+      casadi_assert_dev(m);
       return m;
     }
 

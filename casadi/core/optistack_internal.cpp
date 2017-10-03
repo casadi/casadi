@@ -207,8 +207,8 @@ std::string OptiNode::x_describe(int i) const {
 
 MX OptiNode::x_lookup(int i) const {
   if (problem_dirty()) return baked_copy().x_lookup(i);
-  casadi_assert(i>=0);
-  casadi_assert(i<nx());
+  casadi_assert_dev(i>=0);
+  casadi_assert_dev(i<nx());
   std::vector<MX> x = active_symvar(OPTI_VAR);
   for (const auto& e : x) {
     const MetaVar& m = meta(e);
@@ -220,8 +220,8 @@ MX OptiNode::x_lookup(int i) const {
 
 MX OptiNode::g_lookup(int i) const {
   if (problem_dirty()) return baked_copy().g_lookup(i);
-  casadi_assert(i>=0);
-  casadi_assert(i<ng());
+  casadi_assert_dev(i>=0);
+  casadi_assert_dev(i<ng());
   for (const auto& e : g_) {
     const MetaCon& m = meta_con(e);
     if (i>=m.start && i<m.stop) return e;
@@ -300,7 +300,7 @@ void OptiNode::register_dual(MetaCon& c) {
   } else {
     symbol = MX::sym(name_prefix()+"lam_g_"+str(count_dual_), c.canon.sparsity());
 
-    casadi_assert(c.canon.is_dense());
+    casadi_assert_dev(c.canon.is_dense());
 
     Sparsity ret_sp = repmat(c.original.sparsity(), 1, c.n);
 
@@ -336,7 +336,7 @@ void OptiNode::register_dual(MetaCon& c) {
 }
 
 MX OptiNode::parameter(int n, int m, const std::string& attribute) {
-  casadi_assert(attribute=="full");
+  casadi_assert_dev(attribute=="full");
 
   // Prepare metadata
   MetaVar meta_data;
@@ -644,12 +644,12 @@ std::vector<MX> OptiNode::symvar(const MX& expr) const {
 
 std::vector<MX> OptiNode::ineq_unchain(const MX& a, bool& flipped) {
   flipped = false;
-  casadi_assert(a.is_op(OP_LE) || a.is_op(OP_LT));
+  casadi_assert_dev(a.is_op(OP_LE) || a.is_op(OP_LT));
 
   // Is there inequalities in the left or right leaf?
   bool left  = a.dep(0).is_op(OP_LE) || a.dep(0).is_op(OP_LT);
   bool right = a.dep(1).is_op(OP_LE) || a.dep(1).is_op(OP_LT);
-  casadi_assert(!left || !right);
+  casadi_assert_dev(!left || !right);
 
   if (!left && !right)
     return {a.dep(0), a.dep(1)}; // Simple inequality
@@ -659,8 +659,8 @@ std::vector<MX> OptiNode::ineq_unchain(const MX& a, bool& flipped) {
   std::vector<MX> ret = {a.dep(!ineq)};
   MX e = a.dep(ineq);
   while (e.is_op(OP_LE) || e.is_op(OP_LT)) {
-    casadi_assert(!e.is_op(OP_EQ));
-    casadi_assert(!e.dep(!ineq).is_op(OP_LE) && !e.dep(!ineq).is_op(OP_LT));
+    casadi_assert_dev(!e.is_op(OP_EQ));
+    casadi_assert_dev(!e.dep(!ineq).is_op(OP_LE) && !e.dep(!ineq).is_op(OP_LT));
     ret.push_back(e.dep(!ineq));
     e = e.dep(ineq);
   }
@@ -705,7 +705,7 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
       // case: g(x,p) <= bound(p)
       MX e = args[0]-args[1];
       if (e.is_vector()) {
-        casadi_assert(!parametric[0] || !parametric[1]);
+        casadi_assert_dev(!parametric[0] || !parametric[1]);
         con.type = OPTI_INEQUALITY;
         if (parametric[0]) {
           con.lb = args[0]*DM::ones(e.sparsity());
@@ -736,7 +736,7 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
       if (e.is_vector()) {
         // g1(x,p) <= g2(x,p)
         ret.push_back(e);
-        casadi_assert(!type_known || con.type==OPTI_GENERIC_INEQUALITY);
+        casadi_assert_dev(!type_known || con.type==OPTI_GENERIC_INEQUALITY);
         type_known = true;
         con.type = OPTI_GENERIC_INEQUALITY;
         con.flipped = flipped;
@@ -747,7 +747,7 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
           "Matrix inequalities must be square. Did you mean element-wise inequality instead?");
 
         ret.push_back(e);
-        casadi_assert(!type_known || con.type==OPTI_PSD);
+        casadi_assert_dev(!type_known || con.type==OPTI_PSD);
         type_known = true;
         con.type = OPTI_PSD;
       }
@@ -802,8 +802,8 @@ void OptiNode::assert_baked() const {
 }
 
 void OptiNode::assert_empty() const {
-  casadi_assert(g_.empty());
-  casadi_assert(f_.is_empty());
+  casadi_assert_dev(g_.empty());
+  casadi_assert_dev(f_.is_empty());
 }
 
 void OptiNode::minimize(const MX& f) {
@@ -965,9 +965,9 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
 
   std::map<int, MX> temp;
   for (const auto& v : values) {
-    casadi_assert(v.is_op(OP_EQ));
+    casadi_assert_dev(v.is_op(OP_EQ));
     int i = meta(v.dep(1)).i;
-    casadi_assert(v.dep(0).is_constant());
+    casadi_assert_dev(v.dep(0).is_constant());
     temp[i] = v.dep(0);
   }
 
@@ -1026,8 +1026,8 @@ void OptiNode::assert_active_symbol(const MX& m) const {
 
 void OptiNode::set_initial(const std::vector<MX>& assignments) {
   for (const auto& v : assignments) {
-    casadi_assert(v.is_op(OP_EQ));
-    casadi_assert(v.dep(0).is_constant());
+    casadi_assert_dev(v.is_op(OP_EQ));
+    casadi_assert_dev(v.dep(0).is_constant());
     if (has(v.dep(1)))
       set_initial(v.dep(1), static_cast<DM>(v.dep(0)));
   }
@@ -1035,8 +1035,8 @@ void OptiNode::set_initial(const std::vector<MX>& assignments) {
 
 void OptiNode::set_value(const std::vector<MX>& assignments) {
   for (const auto& v : assignments) {
-    casadi_assert(v.is_op(OP_EQ));
-    casadi_assert(v.dep(0).is_constant());
+    casadi_assert_dev(v.is_op(OP_EQ));
+    casadi_assert_dev(v.dep(0).is_constant());
     if (has(v.dep(1)))
       set_value(v.dep(1), static_cast<DM>(v.dep(0)));
   }
@@ -1044,7 +1044,7 @@ void OptiNode::set_value(const std::vector<MX>& assignments) {
 
 void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& store) {
   mark_solved(false);
-  casadi_assert(v.is_regular());
+  casadi_assert_dev(v.is_regular());
   if (x.is_symbolic()) {
     DM& target = store[meta(x).i];
     Slice all;

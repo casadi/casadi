@@ -320,7 +320,7 @@ namespace casadi {
     }
 
     if (symmetric) {
-      casadi_assert(sparsity_out_.at(oind).is_dense());
+      casadi_assert_dev(sparsity_out_.at(oind).is_dense());
     }
 
     // Create return object
@@ -499,11 +499,11 @@ namespace casadi {
 
       // Evaluate symbolically
       if (fseed.size()>0) {
-        casadi_assert(aseed.size()==0);
+        casadi_assert_dev(aseed.size()==0);
         if (verbose_) casadi_message("Calling 'ad_forward'");
         static_cast<const DerivedType*>(this)->ad_forward(fseed, fsens);
       } else if (aseed.size()>0) {
-        casadi_assert(fseed.size()==0);
+        casadi_assert_dev(fseed.size()==0);
         if (verbose_) casadi_message("Calling 'ad_reverse'");
         static_cast<const DerivedType*>(this)->ad_reverse(aseed, asens);
       }
@@ -672,7 +672,7 @@ namespace casadi {
 
     // Evaluate symbolically
     static_cast<const DerivedType*>(this)->ad_forward(fseed, fsens);
-    casadi_assert(fsens.size()==fseed.size());
+    casadi_assert_dev(fsens.size()==fseed.size());
 
     // All inputs of the return function
     std::vector<MatType> ret_in(inames.size());
@@ -935,14 +935,14 @@ namespace casadi {
 
     // Input arguments
     auto it = find(name_in_.begin(), name_in_.end(), s_in);
-    casadi_assert(it!=name_in_.end());
+    casadi_assert_dev(it!=name_in_.end());
     MatType arg = in_.at(it-name_in_.begin());
 
     // Output arguments
     vector<MatType> res;
     for (auto&& s : s_out) {
       it = find(name_out_.begin(), name_out_.end(), s);
-      casadi_assert(it!=name_out_.end());
+      casadi_assert_dev(it!=name_out_.end());
       res.push_back(out_.at(it-name_out_.begin()));
     }
 

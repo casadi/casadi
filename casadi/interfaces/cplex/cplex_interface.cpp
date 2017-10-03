@@ -145,7 +145,7 @@ namespace casadi {
 
     // Start CPLEX
     int status;
-    casadi_assert(m->env==0);
+    casadi_assert_dev(m->env==0);
     m->env = CPXopenCPLEX(&status);
     if (m->env==0) {
       char errmsg[CPXMESSAGEBUFSIZE];
@@ -258,7 +258,7 @@ namespace casadi {
               minus<int>());
 
     // Create problem object
-    casadi_assert(m->lp==0);
+    casadi_assert_dev(m->lp==0);
     m->lp = CPXcreateprob(m->env, &status, "QP from CasADi");
     casadi_assert_message(m->lp!=0, "CPXcreateprob failed");
 

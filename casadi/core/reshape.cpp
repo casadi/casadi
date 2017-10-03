@@ -31,7 +31,7 @@ using namespace std;
 namespace casadi {
 
   Reshape::Reshape(const MX& x, Sparsity sp) {
-    casadi_assert(x.nnz()==sp.nnz());
+    casadi_assert_dev(x.nnz()==sp.nnz());
     set_dep(x);
     set_sparsity(sp);
   }

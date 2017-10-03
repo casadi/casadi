@@ -87,7 +87,7 @@ namespace casadi {
   }
 
   std::vector<int> lookupvector(const std::vector<int> &v) {
-    casadi_assert(!has_negative(v));
+    casadi_assert_dev(!has_negative(v));
     return lookupvector(v, (*std::max_element(v.begin(), v.end()))+1);
   }
 

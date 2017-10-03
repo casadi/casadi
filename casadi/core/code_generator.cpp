@@ -67,7 +67,7 @@ namespace casadi {
         this->with_export = e.second;
       } else if (e.first=="indent") {
         indent_ = e.second;
-        casadi_assert(indent_>=0);
+        casadi_assert_dev(indent_>=0);
       } else {
         casadi_error("Unrecongnized option: " + str(e.first));
       }
@@ -93,7 +93,7 @@ namespace casadi {
     }
 
     // Make sure that the base name is sane
-    casadi_assert(Function::check_name(this->name));
+    casadi_assert_dev(Function::check_name(this->name));
 
     // Includes needed
     add_include("math.h");
@@ -325,7 +325,7 @@ namespace casadi {
 
   void CodeGenerator::dump(std::ostream& s) const {
     // Consistency check
-    casadi_assert(current_indent_ == 0);
+    casadi_assert_dev(current_indent_ == 0);
 
     // Prefix internal symbols to avoid symbol collisions
     s << "/* How to prefix internal symbols */\n"
@@ -547,7 +547,7 @@ namespace casadi {
     // Calculate a hash value for the vector
     std::size_t seed=0;
     if (!v.empty()) {
-      casadi_assert(sizeof(double) % sizeof(size_t)==0);
+      casadi_assert_dev(sizeof(double) % sizeof(size_t)==0);
       const int int_len = v.size()*(sizeof(double)/sizeof(size_t));
       const size_t* int_v = reinterpret_cast<const size_t*>(&v.front());
       for (size_t i=0; i<int_len; ++i) {
@@ -978,7 +978,7 @@ namespace casadi {
     // If new line, add indentation
     if (newline_) {
       int shift = s.front()=='}' ? -1 : 0;
-      casadi_assert(current_indent_+shift>=0);
+      casadi_assert_dev(current_indent_+shift>=0);
       this->buffer << string(indent_*(current_indent_+shift), ' ');
       newline_ = false;
     }

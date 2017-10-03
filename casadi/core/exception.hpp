@@ -122,15 +122,8 @@ inline std::string trim_path(const std::string& full_path) {
 #define casadi_assert_message(x, msg) \
   if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n" + std::string(msg));
 
-// This assertion if for errors caused by bugs in CasADi, use it instead of C:s assert(),
-// but never in destructors
-#if NDEBUG
-#define casadi_assert(x) casadi_assert_message(x, "Please notify the CasADi developers.")
-#else
-#define casadi_assert(x) casadi_assert_message(x, "Please notify the CasADi developers.\n"\
-    "Hint for developers: GlobalOptions.setCatchErrorsSwig(False)" \
-    " to obtain gdb stacktrace in python.")
-#endif
+// This assertion if for internal errors caused by bugs in CasADi
+#define casadi_assert_dev(x) casadi_assert_message(x, "Notify the CasADi developers.")
 
 // Issue a warning, including location in the source code
 #define casadi_warning(msg) \

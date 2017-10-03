@@ -95,7 +95,7 @@ namespace casadi {
   }
 
   void Linsol::reset(const int* sp) const {
-    casadi_assert(sp!=0);
+    casadi_assert_dev(sp!=0);
     auto m = static_cast<LinsolMemory*>((*this)->memory(0));
 
     // Check if pattern has changed
@@ -120,7 +120,7 @@ namespace casadi {
   }
 
   void Linsol::pivoting(const double* A) const {
-    casadi_assert(A!=0);
+    casadi_assert_dev(A!=0);
     auto m = static_cast<LinsolMemory*>((*this)->memory(0));
     casadi_assert_message(!m->sparsity.empty(), "No sparsity pattern set");
 
@@ -135,7 +135,7 @@ namespace casadi {
   }
 
   void Linsol::factorize(const double* A) const {
-    casadi_assert(A!=0);
+    casadi_assert_dev(A!=0);
     auto m = static_cast<LinsolMemory*>((*this)->memory(0));
 
     // Perform pivoting, if required
@@ -148,13 +148,13 @@ namespace casadi {
 
   int Linsol::neig() const {
     auto m = static_cast<LinsolMemory*>((*this)->memory(0));
-    casadi_assert(m->is_factorized);
+    casadi_assert_dev(m->is_factorized);
     return (*this)->neig(m);
   }
 
   int Linsol::rank() const {
     auto m = static_cast<LinsolMemory*>((*this)->memory(0));
-    casadi_assert(m->is_factorized);
+    casadi_assert_dev(m->is_factorized);
     return (*this)->rank(m);
   }
 

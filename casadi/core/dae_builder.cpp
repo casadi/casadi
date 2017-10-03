@@ -537,7 +537,7 @@ namespace casadi {
     for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
       if (it->second.nominal!=1) {
         Variable& v=it->second;
-        casadi_assert(v.nominal!=0);
+        casadi_assert_dev(v.nominal!=0);
         v.min /= v.nominal;
         v.max /= v.nominal;
         v.start /= v.nominal;
@@ -575,7 +575,7 @@ namespace casadi {
     for (int i=0; i<this->d.size(); ++i) this->ddef[i] = *it++ / nominal(this->d[i]);
     for (int i=0; i<this->y.size(); ++i) this->ydef[i] = *it++ / nominal(this->y[i]);
     for (int i=0; i<this->init.size(); ++i) this->init[i] = *it++;
-    casadi_assert(it==ex.end());
+    casadi_assert_dev(it==ex.end());
 
     // Nominal value is 1 after scaling
     for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
@@ -590,7 +590,7 @@ namespace casadi {
     // Find out which intermediates depends on which other
     Function f("tmp", {vertcat(this->d)}, {vertcat(this->d) - vertcat(this->ddef)});
     Sparsity sp = f.sparsity_jac(0, 0);
-    casadi_assert(sp.is_square());
+    casadi_assert_dev(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -621,7 +621,7 @@ namespace casadi {
     substitute_inplace(this->d, this->ddef, ex);
 
     // Make sure that the interdependencies have been properly eliminated
-    casadi_assert(!depends_on(vertcat(this->ddef), vertcat(this->d)));
+    casadi_assert_dev(!depends_on(vertcat(this->ddef), vertcat(this->d)));
   }
 
   void DaeBuilder::eliminate_d() {
@@ -651,7 +651,7 @@ namespace casadi {
     for (int i=0; i<this->q.size(); ++i) this->quad[i] = *it++;
     for (int i=0; i<this->y.size(); ++i) this->ydef[i] = *it++;
     for (int i=0; i<this->init.size(); ++i) this->init[i] = *it++;
-    casadi_assert(it==ex.end());
+    casadi_assert_dev(it==ex.end());
   }
 
   void DaeBuilder::scale_equations() {
@@ -665,7 +665,7 @@ namespace casadi {
     // Find out which differential equation depends on which differential state
     Function f("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
     Sparsity sp = f.sparsity_jac(0, 0);
-    casadi_assert(sp.is_square());
+    casadi_assert_dev(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -693,7 +693,7 @@ namespace casadi {
     // Find out which algebraic equation depends on which algebraic state
     Function f("tmp", {vertcat(this->z)}, {vertcat(this->alg)});
     Sparsity sp = f.sparsity_jac(0, 0);
-    casadi_assert(sp.is_square());
+    casadi_assert_dev(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -728,7 +728,7 @@ namespace casadi {
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
     Sparsity sp = f.sparsity_jac(0, 0);
-    casadi_assert(sp.is_square());
+    casadi_assert_dev(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -809,7 +809,7 @@ namespace casadi {
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
     Sparsity sp = f.sparsity_jac(0, 0);
-    casadi_assert(sp.is_square());
+    casadi_assert_dev(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -1165,7 +1165,7 @@ namespace casadi {
   }
 
   MX DaeBuilder::der(const MX& var) const {
-    casadi_assert(var.is_column() && var.is_symbolic());
+    casadi_assert_dev(var.is_column() && var.is_symbolic());
     MX ret = MX::zeros(var.sparsity());
     for (int i=0; i<ret.nnz(); ++i) {
       ret.nz(i) = der(var.nz(i).name());
@@ -1185,7 +1185,7 @@ namespace casadi {
 
     // Number of s
     int ns = f.nnz_in(0);
-    casadi_assert(f.nnz_out(0)==ns);
+    casadi_assert_dev(f.nnz_out(0)==ns);
 
     // Input/output buffers
     vector<bvec_t> f_sdot(ns, 1);
@@ -1200,7 +1200,7 @@ namespace casadi {
       if (f_dae[i]==bvec_t(1)) {
         new_dae.push_back(this->dae[i]);
       } else {
-        casadi_assert(f_dae[i]==bvec_t(0));
+        casadi_assert_dev(f_dae[i]==bvec_t(0));
         new_alg.push_back(this->dae[i]);
       }
     }
@@ -1219,13 +1219,13 @@ namespace casadi {
         new_s.push_back(this->s[i]);
         new_sdot.push_back(this->sdot[i]);
       } else {
-        casadi_assert(f_sdot[i]==bvec_t(0));
+        casadi_assert_dev(f_sdot[i]==bvec_t(0));
         new_z.push_back(this->s[i]);
       }
     }
 
     // Make sure split was successful
-    casadi_assert(new_dae.size()==new_s.size());
+    casadi_assert_dev(new_dae.size()==new_s.size());
 
     // Divide up the s and dae
     this->dae = new_dae;
@@ -1273,7 +1273,7 @@ namespace casadi {
     std::vector<double> ret(var.nnz());
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
-      casadi_assert(prim[i].nnz()==1);
+      casadi_assert_dev(prim[i].nnz()==1);
       ret[i] = nominal(prim.at(i).name());
     }
     return ret;
@@ -1285,7 +1285,7 @@ namespace casadi {
     casadi_assert_message(var.nnz()==var.nnz(), "DaeBuilder::nominal: Dimension mismatch");
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
-      casadi_assert(prim[i].nnz()==1);
+      casadi_assert_dev(prim[i].nnz()==1);
       set_nominal(prim.at(i).name(), val.at(i));
     }
   }
@@ -1296,7 +1296,7 @@ namespace casadi {
     std::vector<double> ret(var.nnz());
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
-      casadi_assert(prim[i].nnz()==1);
+      casadi_assert_dev(prim[i].nnz()==1);
       ret[i] = (this->*f)(prim[i].name(), normalized);
     }
     return ret;
@@ -1308,7 +1308,7 @@ namespace casadi {
     MX ret = MX::zeros(var.sparsity());
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
-      casadi_assert(prim[i].nnz()==1);
+      casadi_assert_dev(prim[i].nnz()==1);
       ret.nz(i) = (this->*f)(prim[i].name());
     }
     return ret;
@@ -1321,7 +1321,7 @@ namespace casadi {
     casadi_assert_message(var.nnz()==val.size(), "DaeBuilder::set_attribute: Dimension mismatch");
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
-      casadi_assert(prim[i].nnz()==1);
+      casadi_assert_dev(prim[i].nnz()==1);
       (this->*f)(prim[i].name(), val[i], normalized);
     }
   }
@@ -1333,7 +1333,7 @@ namespace casadi {
                           "DaeBuilder::set_attribute: Sparsity mismatch");
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
-      casadi_assert(prim[i].nnz()==1);
+      casadi_assert_dev(prim[i].nnz()==1);
       (this->*f)(var.nz(i).name(), val.nz(i));
     }
   }

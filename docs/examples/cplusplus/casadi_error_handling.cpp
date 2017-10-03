@@ -37,31 +37,15 @@
 #include "casadi/casadi.hpp"
 
 bool bad_test(){
-  return false;
-}
+  try {
+    // This will fail
+    casadi_assert_message(false, "Failing assert");
 
-bool bad_test2(){
-  // This will fail
-  casadi_assert(bad_test());
-
-  // Returns true, but the code won't reach this place
-  return true;
-}
-
-bool bad_test3(){
-  // This will fail
-  casadi_assert(bad_test2());
-
-  // Returns true, but the code won't reach this place
-  return true;
-}
-
-bool bad_test4(){
-  // This will fail
-  casadi_assert(bad_test3());
-
-  // Returns true, but the code won't reach this place
-  return true;
+    // Returns true, but the code won't reach this place
+    return true;
+  } catch (std::exception& e) {
+    casadi_error("bad_test3 failed:\n" + std::string(e.what()));
+  }
 }
 
 int main(){
@@ -69,7 +53,7 @@ int main(){
   casadi_warning("This function will fail.");
 
   // Developer error
-  casadi_assert(bad_test4());
+  casadi_assert_message(bad_test(), "");
 
   return 0;
 }

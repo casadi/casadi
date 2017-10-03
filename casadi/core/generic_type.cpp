@@ -224,62 +224,62 @@ namespace casadi {
   }
 
   const bool& GenericType::as_bool() const {
-    casadi_assert(is_bool());
+    casadi_assert_dev(is_bool());
     return static_cast<const BoolType*>(get())->d_;
   }
 
   const int& GenericType::as_int() const {
-    casadi_assert(is_int());
+    casadi_assert_dev(is_int());
     return static_cast<const IntType*>(get())->d_;
   }
 
   const double& GenericType::as_double() const {
-    casadi_assert(is_double());
+    casadi_assert_dev(is_double());
     return static_cast<const DoubleType*>(get())->d_;
   }
 
   const std::string& GenericType::as_string() const {
-    casadi_assert(is_string());
+    casadi_assert_dev(is_string());
     return static_cast<const StringType*>(get())->d_;
   }
 
   const std::vector<int>& GenericType::as_int_vector() const {
-    casadi_assert(is_int_vector());
+    casadi_assert_dev(is_int_vector());
     return static_cast<const IntVectorType*>(get())->d_;
   }
 
   const std::vector<int>& GenericType::as_bool_vector() const {
-    casadi_assert(is_bool_vector());
+    casadi_assert_dev(is_bool_vector());
     return static_cast<const IntVectorType*>(get())->d_;
   }
 
   const std::vector<std::vector<int> >& GenericType::as_int_vector_vector() const {
-    casadi_assert(is_int_vector_vector());
+    casadi_assert_dev(is_int_vector_vector());
     return static_cast<const IntVectorVectorType*>(get())->d_;
   }
 
   const std::vector<double>& GenericType::as_double_vector() const {
-    casadi_assert(is_double_vector());
+    casadi_assert_dev(is_double_vector());
     return static_cast<const DoubleVectorType*>(get())->d_;
   }
 
   const std::vector<std::string>& GenericType::as_string_vector() const {
-    casadi_assert(is_string_vector());
+    casadi_assert_dev(is_string_vector());
     return static_cast<const StringVectorType*>(get())->d_;
   }
 
   const GenericType::Dict& GenericType::as_dict() const {
-    casadi_assert(is_dict());
+    casadi_assert_dev(is_dict());
     return static_cast<const DictType*>(get())->d_;
   }
 
   const Function& GenericType::as_function() const {
-    casadi_assert(is_function());
+    casadi_assert_dev(is_function());
     return static_cast<const FunctionType*>(get())->d_;
   }
 
   void* const & GenericType::as_void_pointer() const {
-    casadi_assert(is_void_pointer());
+    casadi_assert_dev(is_void_pointer());
     return static_cast<const VoidPointerType*>(get())->d_;
   }
 

@@ -156,7 +156,7 @@ namespace casadi {
     }
 
     // We don't need a dummy row if a linear objective row is present
-    casadi_assert(!(dummyrow_ && jacF_row_));
+    casadi_assert_dev(!(dummyrow_ && jacF_row_));
 
     // Allocate temporary memory
     alloc_w(nx_, true); // xk2_
@@ -246,10 +246,10 @@ namespace casadi {
     int nea = A_structure_.nnz();
     double ObjAdd = 0;
 
-    casadi_assert(m_ > 0);
-    casadi_assert(n > 0);
-    casadi_assert(nea > 0);
-    casadi_assert(A_structure_.nnz() == nea);
+    casadi_assert_dev(m_ > 0);
+    casadi_assert_dev(n > 0);
+    casadi_assert_dev(nea > 0);
+    casadi_assert_dev(A_structure_.nnz() == nea);
 
     // Pointer magic, courtesy of Greg
     casadi_assert_message(!jac_f_fcn_.is_null(), "blaasssshc");
@@ -302,7 +302,7 @@ namespace casadi {
 
       // Try integer
       if (op.second.can_cast_to(OT_INT)) {
-        casadi_assert(opname.size() <= 55);
+        casadi_assert_dev(opname.size() <= 55);
         int flag = setIntParameter(&prob, const_cast<char*>(opname.c_str()),
                                    op.second.to_int());
         if (flag==0) continue;
@@ -310,7 +310,7 @@ namespace casadi {
 
       // Try double
       if (op.second.can_cast_to(OT_DOUBLE)) {
-        casadi_assert(opname.size() <= 55);
+        casadi_assert_dev(opname.size() <= 55);
         int flag = setRealParameter(&prob, const_cast<char*>(opname.c_str()),
                                     op.second.to_double());
         if (flag==0) continue;
@@ -319,7 +319,7 @@ namespace casadi {
       // try string
       if (op.second.can_cast_to(OT_STRING)) {
         std::string buffer = opname + " " + op.second.to_string();
-        casadi_assert(buffer.size() <= 72);
+        casadi_assert_dev(buffer.size() <= 72);
         int flag = setParameter(&prob, const_cast<char*>(buffer.c_str()));
         if (flag==0) continue;
       }
@@ -419,7 +419,7 @@ namespace casadi {
           }
         }
 
-        casadi_assert(kk == 0 || kk == neJac);
+        casadi_assert_dev(kk == 0 || kk == neJac);
 
         // provide nonlinear part of objective to SNOPT
         for (int k = 0; k < nnCon; ++k) {

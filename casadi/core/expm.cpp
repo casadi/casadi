@@ -60,7 +60,7 @@ namespace casadi {
   Expm::Expm(const std::string& name, const Sparsity &A)
     : FunctionInternal(name), A_(Sparsity::dense(A.size1(), A.size2())) {
 
-    casadi_assert(A.is_square());
+    casadi_assert_dev(A.is_square());
 
   }
 

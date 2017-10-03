@@ -73,7 +73,7 @@ namespace casadi {
     // Intermediate variables (does not enter in F_, only in G_)
     MX v = MX::sym("v", x0.size1(), x0.size2()*3);
     vector<MX> x = horzsplit(v, x0.size2());
-    casadi_assert(x.size()==3);
+    casadi_assert_dev(x.size()==3);
 
     // Definitions of x
     vector<MX> x_def(3);

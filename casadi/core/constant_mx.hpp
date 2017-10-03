@@ -405,7 +405,7 @@ namespace casadi {
 
   template<typename Value>
   MX Constant<Value>::_get_binary(int op, const MX& y, bool ScX, bool ScY) const {
-    casadi_assert(sparsity()==y.sparsity() || ScX || ScY);
+    casadi_assert_dev(sparsity()==y.sparsity() || ScX || ScY);
 
     if (ScX && !operation_checker<FX0Checker>(op)) {
       double ret;

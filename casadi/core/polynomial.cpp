@@ -75,7 +75,7 @@ namespace casadi {
   }
 
   Polynomial::casadi_real Polynomial::scalar() const {
-    casadi_assert(degree()==0);
+    casadi_assert_dev(degree()==0);
     return p_.front();
   }
 

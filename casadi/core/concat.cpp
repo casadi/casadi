@@ -140,7 +140,7 @@ namespace casadi {
 
 
   Diagcat::Diagcat(const std::vector<MX>& x) : Concat(x) {
-    casadi_assert(x.size()>1);
+    casadi_assert_dev(x.size()>1);
     std::vector<Sparsity> sp(x.size());
     for (int i=0; i<x.size(); ++i) sp[i] = x[i].sparsity();
     set_sparsity(diagcat(sp));
@@ -192,7 +192,7 @@ namespace casadi {
   }
 
   Horzcat::Horzcat(const std::vector<MX>& x) : Concat(x) {
-    casadi_assert(x.size()>1);
+    casadi_assert_dev(x.size()>1);
     std::vector<Sparsity> sp(x.size());
     for (int i=0; i<x.size(); ++i)
       sp[i] = x[i].sparsity();
@@ -244,7 +244,7 @@ namespace casadi {
   }
 
   Vertcat::Vertcat(const std::vector<MX>& x) : Concat(x) {
-    casadi_assert(x.size()>1);
+    casadi_assert_dev(x.size()>1);
     std::vector<Sparsity> sp(x.size());
     for (int i=0; i<x.size(); ++i) sp[i] = x[i].sparsity();
     set_sparsity(vertcat(sp));

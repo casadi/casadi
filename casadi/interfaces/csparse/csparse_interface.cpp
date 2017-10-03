@@ -151,19 +151,19 @@ namespace casadi {
         throw CasadiException(ss.str());
       }
     }
-    casadi_assert(m->N!=0);
+    casadi_assert_dev(m->N!=0);
   }
 
   void CsparseInterface::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseMemory*>(mem);
-    casadi_assert(m->N!=0);
+    casadi_assert_dev(m->N!=0);
 
     double *t = &m->temp_.front();
 
     for (int k=0; k<nrhs; ++k) {
       if (tr) {
         cs_pvec(m->S->q, x, t, m->A.n) ;       // t = P2*b
-        casadi_assert(m->N->U!=0);
+        casadi_assert_dev(m->N->U!=0);
         cs_utsolve(m->N->U, t) ;              // t = U'\t
         cs_ltsolve(m->N->L, t) ;              // t = L'\t
         cs_pvec(m->N->pinv, t, x, m->A.n) ;    // x = P1*t

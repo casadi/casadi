@@ -48,7 +48,7 @@ namespace casadi {
                          const vector<std::string>& name_in,
                          const vector<std::string>& name_out)
     : XFunction<SXFunction, SX, SXNode>(name, inputv, outputv, name_in, name_out) {
-    casadi_assert(!out_.empty()); // NOTE: Remove?
+    casadi_assert_dev(!out_.empty()); // NOTE: Remove?
 
     // Default (persistent) options
     just_in_time_opencl_ = false;
@@ -539,7 +539,7 @@ namespace casadi {
 
     // Make sure seeds have matching sparsity patterns
     for (auto it=fseed.begin(); it!=fseed.end(); ++it) {
-      casadi_assert(it->size()==n_in_);
+      casadi_assert_dev(it->size()==n_in_);
       for (int i=0; i<n_in_; ++i) {
         if (it->at(i).sparsity()!=sparsity_in_[i]) {
           // Correct sparsity
@@ -633,7 +633,7 @@ namespace casadi {
     // Make sure matching sparsity of fseed
     bool matching_sparsity = true;
     for (int d=0; d<nadj; ++d) {
-      casadi_assert(aseed[d].size()==n_out_);
+      casadi_assert_dev(aseed[d].size()==n_out_);
       for (int i=0; matching_sparsity && i<n_out_; ++i)
         matching_sparsity = aseed[d][i].sparsity()==sparsity_out_[i];
     }

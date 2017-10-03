@@ -99,7 +99,7 @@ namespace casadi {
 
   void Ma27Interface::factorize(void* mem, const double* A) const {
     auto m = static_cast<Ma27Memory*>(mem);
-    casadi_assert(A!=0);
+    casadi_assert_dev(A!=0);
 
     // Get sparsity
     const int ncol = m->ncol();

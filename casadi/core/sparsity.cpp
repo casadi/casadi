@@ -65,7 +65,7 @@ namespace casadi {
   /// \endcond
 
   Sparsity::Sparsity(int dummy) {
-    casadi_assert(dummy==0);
+    casadi_assert_dev(dummy==0);
   }
 
   Sparsity Sparsity::create(SparsityInternal *node) {
@@ -75,16 +75,16 @@ namespace casadi {
   }
 
   Sparsity::Sparsity(int nrow, int ncol) {
-    casadi_assert(nrow>=0);
-    casadi_assert(ncol>=0);
+    casadi_assert_dev(nrow>=0);
+    casadi_assert_dev(ncol>=0);
     std::vector<int> row, colind(ncol+1, 0);
     assign_cached(nrow, ncol, colind, row);
     sanity_check(true);
   }
 
   Sparsity::Sparsity(const std::pair<int, int>& rc) {
-    casadi_assert(rc.first>=0);
-    casadi_assert(rc.second>=0);
+    casadi_assert_dev(rc.first>=0);
+    casadi_assert_dev(rc.second>=0);
     std::vector<int> row, colind(rc.second+1, 0);
     assign_cached(rc.first, rc.second, colind, row);
     sanity_check(true);
@@ -92,15 +92,15 @@ namespace casadi {
 
   Sparsity::Sparsity(int nrow, int ncol, const std::vector<int>& colind,
                      const std::vector<int>& row) {
-    casadi_assert(nrow>=0);
-    casadi_assert(ncol>=0);
+    casadi_assert_dev(nrow>=0);
+    casadi_assert_dev(ncol>=0);
     assign_cached(nrow, ncol, colind, row);
     sanity_check(true);
   }
 
   Sparsity::Sparsity(int nrow, int ncol, const int* colind, const int* row) {
-    casadi_assert(nrow>=0);
-    casadi_assert(ncol>=0);
+    casadi_assert_dev(nrow>=0);
+    casadi_assert_dev(ncol>=0);
     if (colind==0 || colind[ncol]==nrow*ncol) {
       *this = dense(nrow, ncol);
     } else {
@@ -246,7 +246,7 @@ namespace casadi {
   }
 
   Sparsity Sparsity::reshape(const Sparsity& x, const Sparsity& sp) {
-    casadi_assert(x.is_reshape(sp));
+    casadi_assert_dev(x.is_reshape(sp));
     return sp;
   }
 
@@ -506,7 +506,7 @@ namespace casadi {
   }
 
   void Sparsity::enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1) {
-    casadi_assert(cc.size() == size2());
+    casadi_assert_dev(cc.size() == size2());
     if (cc.empty()) {
       *this = Sparsity(size1(), ncol);
     } else {
@@ -515,7 +515,7 @@ namespace casadi {
   }
 
   void Sparsity::enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) {
-    casadi_assert(rr.size() == size1());
+    casadi_assert_dev(rr.size() == size1());
     if (rr.empty()) {
       *this = Sparsity(nrow, size2());
     } else {
@@ -665,8 +665,8 @@ namespace casadi {
 
   void Sparsity::assign_cached(int nrow, int ncol, const std::vector<int>& colind,
                               const std::vector<int>& row) {
-    casadi_assert(colind.size()==ncol+1);
-    casadi_assert(row.size()==colind.back());
+    casadi_assert_dev(colind.size()==ncol+1);
+    casadi_assert_dev(row.size()==colind.back());
     assign_cached(nrow, ncol, get_ptr(colind), get_ptr(row));
   }
 
@@ -812,8 +812,8 @@ namespace casadi {
   }
 
   Sparsity Sparsity::dense(int nrow, int ncol) {
-    casadi_assert(nrow>=0);
-    casadi_assert(ncol>=0);
+    casadi_assert_dev(nrow>=0);
+    casadi_assert_dev(ncol>=0);
     // Column offset
     std::vector<int> colind(ncol+1);
     for (int cc=0; cc<ncol+1; ++cc) colind[cc] = cc*nrow;
@@ -930,8 +930,8 @@ namespace casadi {
                              const std::vector<int>& col, std::vector<int>& mapping,
                              bool invert_mapping) {
     // Assert dimensions
-    casadi_assert(nrow>=0);
-    casadi_assert(ncol>=0);
+    casadi_assert_dev(nrow>=0);
+    casadi_assert_dev(ncol>=0);
     casadi_assert_message(col.size()==row.size(), "inconsistent lengths");
 
     // Create the return sparsity pattern and access vectors
@@ -1097,21 +1097,21 @@ namespace casadi {
 
   Sparsity Sparsity::compressed(const std::vector<int>& v) {
     // Check consistency
-    casadi_assert(v.size() >= 2);
+    casadi_assert_dev(v.size() >= 2);
     int nrow = v[0];
     int ncol = v[1];
-    casadi_assert(v.size() >= 2 + ncol+1);
+    casadi_assert_dev(v.size() >= 2 + ncol+1);
     int nnz = v[2 + ncol];
     bool dense = v.size() == 2 + ncol+1 && nrow*ncol==nnz;
     bool sparse = v.size() == 2 + ncol+1 + nnz;
-    casadi_assert(dense || sparse);
+    casadi_assert_dev(dense || sparse);
 
     // Call array version
     return compressed(&v.front());
   }
 
   Sparsity Sparsity::compressed(const int* v) {
-    casadi_assert(v!=0);
+    casadi_assert_dev(v!=0);
 
     // Get sparsity pattern
     int nrow = v[0];
@@ -1299,13 +1299,13 @@ namespace casadi {
 
   std::vector<Sparsity> Sparsity::horzsplit(const Sparsity& x, const std::vector<int>& offset) {
     // Consistency check
-    casadi_assert(offset.size()>=1);
-    casadi_assert(offset.front()==0);
+    casadi_assert_dev(offset.size()>=1);
+    casadi_assert_dev(offset.front()==0);
     casadi_assert_message(offset.back()==x.size2(),
                           "horzsplit(Sparsity, std::vector<int>): Last elements of offset "
                           "(" + str(offset.back()) + ") must equal the number of columns "
                           "(" + str(x.size2()) + ")");
-    casadi_assert(is_monotone(offset));
+    casadi_assert_dev(is_monotone(offset));
 
     // Number of outputs
     int n = offset.size()-1;
@@ -1362,8 +1362,8 @@ namespace casadi {
   std::vector<Sparsity> Sparsity::diagsplit(const Sparsity& x, const std::vector<int>& offset1,
                                             const std::vector<int>& offset2) {
     // Consistency check
-    casadi_assert(offset1.size()>=1);
-    casadi_assert(offset1.front()==0);
+    casadi_assert_dev(offset1.size()>=1);
+    casadi_assert_dev(offset1.front()==0);
     casadi_assert_message(offset1.back()==x.size1(),
                           "diagsplit(Sparsity, offset1, offset2): Last elements of offset1 "
                           "(" + str(offset1.back()) + ") must equal the number of rows "
@@ -1372,9 +1372,9 @@ namespace casadi {
                           "diagsplit(Sparsity, offset1, offset2): Last elements of offset2 "
                           "(" + str(offset2.back()) + ") must equal the number of rows "
                           "(" + str(x.size2()) + ")");
-    casadi_assert(is_monotone(offset1));
-    casadi_assert(is_monotone(offset2));
-    casadi_assert(offset1.size()==offset2.size());
+    casadi_assert_dev(is_monotone(offset1));
+    casadi_assert_dev(is_monotone(offset2));
+    casadi_assert_dev(offset1.size()==offset2.size());
 
     // Number of outputs
     int n = offset1.size()-1;

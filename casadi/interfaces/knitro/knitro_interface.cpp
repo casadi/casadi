@@ -85,7 +85,7 @@ namespace casadi {
     if (contype_.empty()) {
       contype_.resize(ng_, KTR_CONTYPE_GENERAL);
     } else {
-      casadi_assert(contype_.size()==ng_);
+      casadi_assert_dev(contype_.size()==ng_);
     }
 
     // Setup NLP functions
@@ -136,9 +136,9 @@ namespace casadi {
     check_inputs(mem);
 
     // Allocate KNITRO memory block (move back to init!)
-    casadi_assert(m->kc==0);
+    casadi_assert_dev(m->kc==0);
     m->kc = KTR_new();
-    casadi_assert(m->kc!=0);
+    casadi_assert_dev(m->kc!=0);
     int status;
 
     // Jacobian sparsity

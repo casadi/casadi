@@ -342,7 +342,7 @@ namespace casadi {
 
     if (!fcallback_.is_null()) {
       // Consistency checks
-      casadi_assert(!fcallback_.is_null());
+      casadi_assert_dev(!fcallback_.is_null());
       casadi_assert_message(fcallback_.n_out()==1 && fcallback_.numel_out()==1,
         "Callback function must return a scalar.");
       casadi_assert_message(fcallback_.n_in()==n_out_,

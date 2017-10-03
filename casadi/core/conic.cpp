@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   void conic_debug(const Function& f, std::ostream &file) {
-    casadi_assert(!f.is_null());
+    casadi_assert_dev(!f.is_null());
     const Conic* n = f.get<Conic>();
     return n->generateNativeCode(file);
   }

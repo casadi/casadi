@@ -166,7 +166,7 @@ namespace casadi {
 
     // Set the fields
     int flag = regfcn(&plugin);
-    casadi_assert(flag==0);
+    casadi_assert_dev(flag==0);
 
     return plugin;
   }
@@ -372,7 +372,7 @@ namespace casadi {
       load_plugin(pname);
       it=Derived::solvers_.find(pname);
     }
-    casadi_assert(it!=Derived::solvers_.end());
+    casadi_assert_dev(it!=Derived::solvers_.end());
     return it->second;
   }
 

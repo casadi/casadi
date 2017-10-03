@@ -213,9 +213,9 @@ namespace casadi {
       }
     }
 
-    casadi_assert(V_.size2() % V_.size1() == 0);
+    casadi_assert_dev(V_.size2() % V_.size1() == 0);
     nrhs_ = V_.size2() / V_.size1();
-    casadi_assert(nrhs_>=1);
+    casadi_assert_dev(nrhs_>=1);
 
     std::vector<Sparsity> Vs = horzsplit(V_, V_.size1());
     Sparsity Vref = Vs[0];
@@ -223,7 +223,7 @@ namespace casadi {
       "V must be symmetric but got " + Vref.dim() + ".");
 
     for (auto&& s : Vs)
-      casadi_assert(s==Vref);
+      casadi_assert_dev(s==Vref);
 
     casadi_assert_message(const_dim_, "Not implemented");
 

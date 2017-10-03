@@ -152,7 +152,7 @@ namespace casadi {
       x[d] = reshape(*vv_it++, size_in(INTEGRATOR_X0));
       z[d] = reshape(*vv_it++, size_in(INTEGRATOR_Z0));
     }
-    casadi_assert(vv_it==vv.end());
+    casadi_assert_dev(vv_it==vv.end());
 
     // Collocation time points
     vector<MX> tt(deg_+1);
@@ -238,7 +238,7 @@ namespace casadi {
         rx[d] = reshape(*rvv_it++, this->rx().size());
         rz[d] = reshape(*rvv_it++, this->rz().size());
       }
-      casadi_assert(rvv_it==rvv.end());
+      casadi_assert_dev(rvv_it==rvv.end());
 
       // Equations that implicitly define v
       eq.clear();

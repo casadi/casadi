@@ -81,7 +81,7 @@ namespace casadi {
     }
 
     if (!lookup_mode.empty()) {
-      casadi_assert(lookup_mode.size()==offset_.size()-1);
+      casadi_assert_dev(lookup_mode.size()==offset_.size()-1);
       for (int i=0;i<offset_.size()-1;++i) {
         if (lookup_mode[i]=="linear") {
           lookup_mode_[i] = 0;
@@ -90,7 +90,7 @@ namespace casadi {
           std::vector<double> grid(
               grid_.begin()+offset_[i],
               grid_.begin()+offset_[i+1]);
-          casadi_assert(is_increasing(grid) && is_equally_spaced(grid));
+          casadi_assert_dev(is_increasing(grid) && is_equally_spaced(grid));
         } else {
           casadi_error("Unknown lookup_mode option '" + lookup_mode[i] + ". "
                        "Allowed values: linear, exact.");
