@@ -110,7 +110,7 @@ namespace casadi {
     Integrator::init(opts);
 
     // If sensitivity equations, make sure derivative_of_ is available
-    casadi_assert_message(ns_==0 || !derivative_of_.is_null(),
+    casadi_assert(ns_==0 || !derivative_of_.is_null(),
       "Not implemented.");
 
     // Default options

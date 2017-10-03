@@ -66,7 +66,7 @@ int main(){
   } else {
     // Compile the c-code
     int flag = system("gcc -fPIC -shared -O3 nlp.c -o nlp.so");
-    casadi_assert_message(flag==0, "Compilation failed");
+    casadi_assert(flag==0, "Compilation failed");
 
     // Create a new NLP solver instance from the compiled code
     solver = nlpsol("solver", "ipopt", "nlp.so");

@@ -923,7 +923,7 @@ namespace casadi {
       if (nel==0 && val_nel==0) return;
 
       // Make sure that dimension matches
-      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
+      casadi_assert(sz2==val_sz2 && sz1==val_sz1,
                             "Sparsity::add<DataType>: shape mismatch. lhs is "
                             + dim() + ", while rhs is " + val_sp.dim() + ".");
 
@@ -1003,7 +1003,7 @@ namespace casadi {
       if (nel==0 && val_nel==0) return;
 
       // Make sure that dimension matches
-      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
+      casadi_assert(sz2==val_sz2 && sz1==val_sz1,
                             "Sparsity::add<DataType>: shape mismatch. lhs is "
                             + dim() + ", while rhs is " + val_sp.dim() + ".");
 

@@ -39,7 +39,7 @@
 bool bad_test(){
   try {
     // This will fail
-    casadi_assert_message(false, "Failing assert");
+    casadi_assert(false, "Failing assert");
 
     // Returns true, but the code won't reach this place
     return true;
@@ -53,7 +53,7 @@ int main(){
   casadi_warning("This function will fail.");
 
   // Developer error
-  casadi_assert_message(bad_test(), "");
+  casadi_assert(bad_test(), "");
 
   return 0;
 }

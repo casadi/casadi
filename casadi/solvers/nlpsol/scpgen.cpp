@@ -588,7 +588,7 @@ namespace casadi {
     spL_ = mat_fcn_.sparsity_out(mat_hes_);
     spH_ = mtimes(spL_.T(), spL_);
     spA_ = mat_fcn_.sparsity_out(mat_jac_);
-    casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
+    casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
     qpsol_ = conic("qpsol", qpsol_plugin, {{"h", spH_}, {"a", spA_}},
                    qpsol_options);
     if (verbose_) {

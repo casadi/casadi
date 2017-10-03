@@ -252,7 +252,7 @@ namespace casadi {
     casadi_assert_dev(A_structure_.nnz() == nea);
 
     // Pointer magic, courtesy of Greg
-    casadi_assert_message(!jac_f_fcn_.is_null(), "blaasssshc");
+    casadi_assert(!jac_f_fcn_.is_null(), "blaasssshc");
 
     // Outputs
     //double Obj = 0; // TODO(Greg): get this from snopt
@@ -332,7 +332,7 @@ namespace casadi {
 
     // Run SNOPT
     int info = solveC(&prob, Cold_, &m->fk);
-    casadi_assert_message(99 != info, "snopt problem set up improperly");
+    casadi_assert(99 != info, "snopt problem set up improperly");
 
     // Negate rc to match CasADi's definition
     casadi_scal(nx_ + ng_, -1., prob.rc);
@@ -361,9 +361,9 @@ namespace casadi {
           int lenru) const {
     try {
 
-      casadi_assert_message(nnCon_ == nnCon, "Con " + str(nnCon_) + " <-> " + str(nnCon));
-      casadi_assert_message(nnObj_ == nnObj, "Obj " + str(nnObj_) + " <-> " + str(nnObj));
-      casadi_assert_message(nnJac_ == nnJac, "Jac " + str(nnJac_) + " <-> " + str(nnJac));
+      casadi_assert(nnCon_ == nnCon, "Con " + str(nnCon_) + " <-> " + str(nnCon));
+      casadi_assert(nnObj_ == nnObj, "Obj " + str(nnObj_) + " <-> " + str(nnObj));
+      casadi_assert(nnJac_ == nnJac, "Jac " + str(nnJac_) + " <-> " + str(nnJac));
 
       // Get reduced decision variables
       casadi_fill(m->xk2, nx_, 0.);

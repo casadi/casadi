@@ -97,14 +97,14 @@ namespace casadi {
       }
     }
 
-    casadi_assert_message(!pos_def_,
+    casadi_assert(!pos_def_,
                           "pos_def option set to True: Solver only handles the indefinite case.");
-    casadi_assert_message(const_dim_,
+    casadi_assert(const_dim_,
                           "const_dim option set to False: Solver only handles the True case.");
 
     //for (int k=0;k<K_;k++) {
-    //  casadi_assert_message(A_[k].isdense(), "Solver requires arguments to be dense.");
-    //  casadi_assert_message(V_[k].isdense(), "Solver requires arguments to be dense.");
+    //  casadi_assert(A_[k].isdense(), "Solver requires arguments to be dense.");
+    //  casadi_assert(V_[k].isdense(), "Solver requires arguments to be dense.");
     //}
 
 
@@ -220,7 +220,7 @@ namespace casadi {
     if (error_unstable_) {
       for (int i=0;i<n_;++i) {
         double modulus = sqrt(m->eig_real[i]*m->eig_real[i]+m->eig_imag[i]*m->eig_imag[i]);
-        casadi_assert_message(modulus+eps_unstable_ <= 1,
+        casadi_assert(modulus+eps_unstable_ <= 1,
           "SlicotDple: system is unstable."
           "Found an eigenvalue " + str(m->eig_real[i]) + " + " +
           str(m->eig_imag[i]) + "j, with modulus " + str(modulus) +
@@ -413,11 +413,11 @@ namespace casadi {
     int ret;
 
     ret = slicot_mb03vd(n, K, 1, n, z, n, n, dwork+mem_base, n-1, dwork);
-    casadi_assert_message(ret==0, "mb03vd return code " + str(ret));
+    casadi_assert(ret==0, "mb03vd return code " + str(ret));
     std::copy(z, z+n*n*K, t);
 
     ret = slicot_mb03vy(n, K, 1, n, z, n, n, dwork+mem_base, n-1, dwork, mem_needed);
-    casadi_assert_message(ret==0, "mb03vy return code " + str(ret));
+    casadi_assert(ret==0, "mb03vy return code " + str(ret));
     // Set numerical zeros to zero
     if (num_zero>0) {
       for (int k = 0;k<n*n*K;++k) {
@@ -428,7 +428,7 @@ namespace casadi {
 
     ret = slicot_mb03wd('S', 'V', n, K, 1, n, 1, n, t, n, n, z, n, n,
                   eig_real, eig_imag, dwork, mem_needed);
-    casadi_assert_message(ret==0, "mb03wd return code " + str(ret));
+    casadi_assert(ret==0, "mb03wd return code " + str(ret));
   }
 
 } // namespace casadi

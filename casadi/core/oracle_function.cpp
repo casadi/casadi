@@ -66,7 +66,7 @@ namespace casadi {
       } else if (op.first=="specific_options") {
         specific_options_ = op.second;
         for (auto&& i : specific_options_) {
-          casadi_assert_message(i.second.is_dict(),
+          casadi_assert(i.second.is_dict(),
             "specific_option must be a nested dictionary."
             " Type mismatch for entry '" + i.first+ "': "
             " got type " + i.second.get_description() + ".");
@@ -141,7 +141,7 @@ namespace casadi {
 
   void OracleFunction::
   set_function(const Function& fcn, const std::string& fname, bool jit) {
-    casadi_assert_message(!has_function(fname), "Duplicate function " + fname);
+    casadi_assert(!has_function(fname), "Duplicate function " + fname);
     RegFun& r = all_functions_[fname];
     r.f = fcn;
     r.jit = jit;
@@ -418,7 +418,7 @@ namespace casadi {
 
   const Function& OracleFunction::get_function(const std::string &name) const {
     auto it = all_functions_.find(name);
-    casadi_assert_message(it!=all_functions_.end(),
+    casadi_assert(it!=all_functions_.end(),
       "No function \"" + name + "\" in " + this->name() + ". " +
       "Available functions: " + join(get_function()) + ".");
     return it->second.f;
@@ -426,7 +426,7 @@ namespace casadi {
 
   bool OracleFunction::monitored(const std::string &name) const {
     auto it = all_functions_.find(name);
-    casadi_assert_message(it!=all_functions_.end(),
+    casadi_assert(it!=all_functions_.end(),
       "No function \"" + name + "\" in " + this->name()+ ". " +
       "Available functions: " + join(get_function()) + ".");
     return it->second.monitored;

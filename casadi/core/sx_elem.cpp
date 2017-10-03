@@ -149,7 +149,7 @@ namespace casadi {
 
   bool SXElem::__nonzero__() const {
     if (is_constant()) return !is_zero();
-    casadi_error("Cannot compute the truth value of a CasADi SXElem symbolic expression.")
+    casadi_error("Cannot compute the truth value of a CasADi SXElem symbolic expression.");
   }
 
   bool SXElem::is_doubled() const {
@@ -419,7 +419,7 @@ namespace casadi {
   }
 
   bool SXElem::is_commutative() const {
-    casadi_assert_message(n_dep(), "SX::is_commutative: must be binary");
+    casadi_assert(n_dep(), "SX::is_commutative: must be binary");
     return operation_checker<CommChecker>(op());
   }
 
@@ -505,7 +505,7 @@ namespace casadi {
   }
 
   SXElem SXElem::dep(int ch) const {
-    casadi_assert_dev(ch==0 || ch==1)
+    casadi_assert_dev(ch==0 || ch==1);
     return node->dep(ch);
   }
 

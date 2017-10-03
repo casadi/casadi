@@ -102,7 +102,7 @@ namespace casadi {
 
   // Assert that a indices are in a range
   #define casadi_assert_in_range(v, lower, upper) \
-   casadi_assert_message(in_range(v, lower, upper), \
+   casadi_assert(in_range(v, lower, upper), \
     "Out of bounds error. Got elements in range [" \
     + str(*std::min_element(v.begin(), v.end())) + ","\
     + str(*std::max_element(v.begin(), v.end())) + "], which is outside the range ["\
@@ -110,7 +110,7 @@ namespace casadi {
 
     // Assert that a indices are bounded
     #define casadi_assert_bounded(v, upper) \
-     casadi_assert_message(in_range(v, upper), \
+     casadi_assert(in_range(v, upper), \
       "Out of bounds error. Got elements in range [" \
       + str(*std::min_element(v.begin(), v.end())) + ","\
       + str(*std::max_element(v.begin(), v.end())) + "], which exceeds the upper bound "\
@@ -333,10 +333,10 @@ namespace casadi {
     ret.reserve(i.size());
     for (int k=0;k<i.size();++k) {
        int j = i[k];
-       casadi_assert_message(j>=0,
+       casadi_assert(j>=0,
          "vector_slice: Indices should be larger than zero."
          "You have " + str(j) + " at location " + str(k) + ".");
-       casadi_assert_message(j<v.size(),
+       casadi_assert(j<v.size(),
          "vector_slice: Indices should be larger than zero."
          "You have " + str(j) + " at location " + str(k) + ".");
        ret.push_back(v[j]);
@@ -703,12 +703,12 @@ namespace casadi {
 
   template<typename T>
   bvec_t* get_bvec_t(std::vector<T>& v) {
-    casadi_assert_message(0, "get_bvec_t only supported for double");
+    casadi_assert(0, "get_bvec_t only supported for double");
   }
 
   template<typename T>
   const bvec_t* get_bvec_t(const std::vector<T>& v) {
-    casadi_assert_message(0, "get_bvec_t only supported for double");
+    casadi_assert(0, "get_bvec_t only supported for double");
   }
 
   ///@{

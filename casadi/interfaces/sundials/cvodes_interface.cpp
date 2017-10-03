@@ -96,7 +96,7 @@ namespace casadi {
     create_function("quadB", {"rx", "rp", "x", "p", "t"}, {"rquad"});
 
     // Algebraic variables not supported
-    casadi_assert_message(nz_==0 && nrz_==0,
+    casadi_assert(nz_==0 && nrz_==0,
       "CVODES does not support algebraic variables");
 
     if (linear_multistep_method=="adams") {
@@ -131,7 +131,7 @@ namespace casadi {
 
     // Create CVodes memory block
     m->mem = CVodeCreate(lmm_, iter_);
-    casadi_assert_message(m->mem!=0, "CVodeCreate: Creation failed");
+    casadi_assert(m->mem!=0, "CVodeCreate: Creation failed");
 
     // Set error handler function
     THROWING(CVodeSetErrHandlerFn, m->mem, ehfun, m);
@@ -253,10 +253,10 @@ namespace casadi {
                                 double* z, double* q) const {
     auto m = to_mem(mem);
 
-    casadi_assert_message(t>=grid_.front(),
+    casadi_assert(t>=grid_.front(),
       "CvodesInterface::integrate(" + str(t) + "): "
       "Cannot integrate to a time earlier than t0 (" + str(grid_.front()) + ")");
-    casadi_assert_message(t<=grid_.back() || !stop_at_end_,
+    casadi_assert(t<=grid_.back() || !stop_at_end_,
       "CvodesInterface::integrate(" + str(t) + "): "
       "Cannot integrate past a time later than tf (" + str(grid_.back()) + ") "
       "unless stop_at_end is set to False.");

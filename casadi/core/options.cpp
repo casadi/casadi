@@ -247,7 +247,7 @@ namespace casadi {
       }
 
       // Check type
-      casadi_assert_message(op.second.can_cast_to(entry->type),
+      casadi_assert(op.second.can_cast_to(entry->type),
                             "Illegal type for " + op.first + ": " +
                             op.second.get_description() +
                             " cannot be cast to " +
@@ -279,13 +279,13 @@ namespace casadi {
 
   std::string Options::type(const std::string& name) const {
     const Options::Entry* entry = find(name);
-    casadi_assert_message(entry!=0, "Option \"" + name + "\" does not exist");
+    casadi_assert(entry!=0, "Option \"" + name + "\" does not exist");
     return GenericType::get_type_description(entry->type);
   }
 
   std::string Options::info(const std::string& name) const {
     const Options::Entry* entry = find(name);
-    casadi_assert_message(entry!=0, "Option \"" + name + "\" does not exist");
+    casadi_assert(entry!=0, "Option \"" + name + "\" does not exist");
     return entry->description;
   }
 

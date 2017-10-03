@@ -72,7 +72,7 @@ namespace casadi {
     }
 
     // Assert that the file is not in binary form
-    casadi_assert_message(header.at(0).at(0)=='g',
+    casadi_assert(header.at(0).at(0)=='g',
     "File could not be read, or file is binary format "
     "(currently not supported)");
 
@@ -150,7 +150,7 @@ namespace casadi {
     // other integer
     for (int j = 0; j<niv_; ++j) nlp_.discrete.push_back(true);
 
-    casadi_assert_message(nlp_.discrete.size()==n_var_,
+    casadi_assert(nlp_.discrete.size()==n_var_,
       "Number of variables in the header don't match");
 
     // All variables, including dependent
@@ -404,7 +404,7 @@ namespace casadi {
       s_ >> pl >> cl;
 
       // Add to variable definition (assuming it has already been defined)
-      casadi_assert_message(!v_.at(pl).is_empty(), "Circular dependencies not supported");
+      casadi_assert(!v_.at(pl).is_empty(), "Circular dependencies not supported");
       v_.at(i) += cl*v_.at(pl);
     }
 

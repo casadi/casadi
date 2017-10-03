@@ -78,7 +78,7 @@ int main(){
     cout << "forward mode" << endl;
 
     // Make sure that the class is able to support the dependency propagation
-    casadi_assert_message(f.has_spfwd(), "Forward sparsity propagation not supported");
+    casadi_assert(f.has_spfwd(), "Forward sparsity propagation not supported");
 
     // Pass seeds
     f_in[0] = bvec_t(1) << 0; // seed in direction 0
@@ -98,7 +98,7 @@ int main(){
     cout << "backward mode" << endl;
 
     // Make sure that the class is able to support the dependency propagation
-    casadi_assert_message(f.has_sprev(), "Backward sparsity propagation not supported");
+    casadi_assert(f.has_sprev(), "Backward sparsity propagation not supported");
 
     // Pass seeds
     f_out[0] = (bvec_t(1) << 5) | (bvec_t(1) << 6); // seed in direction 5 and 6

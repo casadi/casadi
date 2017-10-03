@@ -212,7 +212,7 @@ namespace casadi {
   }
 
   const Sparsity& MXNode::sparsity(int oind) const {
-    casadi_assert_message(oind==0, "Index out of bounds");
+    casadi_assert(oind==0, "Index out of bounds");
     return sparsity_;
   }
 
@@ -357,7 +357,7 @@ namespace casadi {
   }
 
   MX MXNode::get_output(int oind) const {
-    casadi_assert_message(oind==0, "Output index out of bounds");
+    casadi_assert(oind==0, "Output index out of bounds");
     return shared_from_this<MX>();
   }
 
@@ -403,11 +403,11 @@ namespace casadi {
     // Get reference to transposed first argument
     MX x = shared_from_this<MX>();
 
-    casadi_assert_message(y.size2()==z.size2(),
+    casadi_assert(y.size2()==z.size2(),
       "Dimension error. Got y=" + str(y.size2()) + " and z=" + z.dim() + ".");
-    casadi_assert_message(x.size1()==z.size1(),
+    casadi_assert(x.size1()==z.size1(),
       "Dimension error. Got x=" + x.dim() + " and z=" + z.dim() + ".");
-    casadi_assert_message(y.size1()==x.size2(),
+    casadi_assert(y.size1()==x.size2(),
       "Dimension error. Got y=" + str(y.size1()) + " and x" + x.dim() + ".");
     if (x.is_dense() && y.is_dense() && z.is_dense()) {
       return MX::create(new DenseMultiplication(z, x, y));
@@ -507,7 +507,7 @@ namespace casadi {
 
   MX MXNode::get_binary(int op, const MX& y) const {
     // Make sure that dimensions match
-    casadi_assert_message(sparsity().is_scalar() || y.is_scalar() || sparsity().size()==y.size(),
+    casadi_assert(sparsity().is_scalar() || y.is_scalar() || sparsity().size()==y.size(),
       "Dimension mismatch for " + casadi_math<double>::print(op, "lhs", "rhs") +
       ", lhs is " + sparsity().dim() + ", while rhs is " + y.dim());
 
@@ -527,7 +527,7 @@ namespace casadi {
         return to_matrix(_get_binary(op, y, false, true), sparsity());
       }
     } else {
-      casadi_assert_message(sparsity().size() == y.sparsity().size(), "Dimension mismatch.");
+      casadi_assert(sparsity().size() == y.sparsity().size(), "Dimension mismatch.");
       if (sparsity()==y.sparsity()) {
         // Matching sparsities
         return _get_binary(op, y, false, false);
@@ -716,7 +716,7 @@ namespace casadi {
 
 
   MX MXNode::get_dot(const MX& y) const {
-    casadi_assert_message(
+    casadi_assert(
       size2()==y.size2() && size1()==y.size1(),
       "MXNode::dot: Dimension mismatch. dot requires its "
       "two arguments to have equal shapes, but got ("

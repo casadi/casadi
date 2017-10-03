@@ -94,9 +94,9 @@ namespace casadi {
       }
     }
 
-    casadi_assert_message(oracle_.n_in()>0,
+    casadi_assert(oracle_.n_in()>0,
                           "Newton: the supplied f must have at least one input.");
-    casadi_assert_message(!linsol_.is_null(),
+    casadi_assert(!linsol_.is_null(),
                           "Newton::init: linear_solver must be supplied");
 
     // Allocate memory

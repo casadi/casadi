@@ -282,12 +282,12 @@ namespace casadi {
     alloc(oracle_);
 
     // Error if sparse input
-    casadi_assert_message(x().is_dense(), "Sparse DAE not supported");
-    casadi_assert_message(z().is_dense(), "Sparse DAE not supported");
-    casadi_assert_message(p().is_dense(), "Sparse DAE not supported");
-    casadi_assert_message(rx().is_dense(), "Sparse DAE not supported");
-    casadi_assert_message(rz().is_dense(), "Sparse DAE not supported");
-    casadi_assert_message(rp().is_dense(), "Sparse DAE not supported");
+    casadi_assert(x().is_dense(), "Sparse DAE not supported");
+    casadi_assert(z().is_dense(), "Sparse DAE not supported");
+    casadi_assert(p().is_dense(), "Sparse DAE not supported");
+    casadi_assert(rx().is_dense(), "Sparse DAE not supported");
+    casadi_assert(rz().is_dense(), "Sparse DAE not supported");
+    casadi_assert(rp().is_dense(), "Sparse DAE not supported");
 
     // Get dimensions (excluding sensitivity equations)
     nx1_ = x().size1();
@@ -314,13 +314,13 @@ namespace casadi {
 
     // Get the sparsities of the forward and reverse DAE
     sp_jac_dae_ = sp_jac_dae();
-    casadi_assert_message(!sp_jac_dae_.is_singular(),
+    casadi_assert(!sp_jac_dae_.is_singular(),
                           "Jacobian of the forward problem is structurally rank-deficient. "
                           "sprank(J)=" + str(sprank(sp_jac_dae_)) + "<"
                           + str(nx_+nz_));
     if (nrx_>0) {
       sp_jac_rdae_ = sp_jac_rdae();
-      casadi_assert_message(!sp_jac_rdae_.is_singular(),
+      casadi_assert(!sp_jac_rdae_.is_singular(),
                             "Jacobian of the backward problem is structurally rank-deficient. "
                             "sprank(J)=" + str(sprank(sp_jac_rdae_)) + "<"
                             + str(nrx_+nrz_));
@@ -1354,7 +1354,7 @@ namespace casadi {
     }
 
     // Make sure x and ode exist
-    casadi_assert_message(!de_in[DE_X].is_empty(), "Ill-posed ODE - no state");
+    casadi_assert(!de_in[DE_X].is_empty(), "Ill-posed ODE - no state");
 
     // Number of right-hand-sides
     int nrhs = de_in[DE_X].size2();
@@ -1367,28 +1367,28 @@ namespace casadi {
         // Number of rows
         int nr = e.size1();
         // Make sure no change in number of elements
-        casadi_assert_message(e.numel()==nr*nrhs, "Inconsistent number of rhs");
+        casadi_assert(e.numel()==nr*nrhs, "Inconsistent number of rhs");
         e = reshape(e, nr, nrhs);
       }
     }
 
     // Consistent sparsity for x
-    casadi_assert_message(de_in[DE_X].size()==de_out[DE_ODE].size(),
+    casadi_assert(de_in[DE_X].size()==de_out[DE_ODE].size(),
       "Dimension mismatch for 'ode'");
     de_out[DE_ODE] = project(de_out[DE_ODE], de_in[DE_X].sparsity());
 
     // Consistent sparsity for z
-    casadi_assert_message(de_in[DE_Z].size()==de_out[DE_ALG].size(),
+    casadi_assert(de_in[DE_Z].size()==de_out[DE_ALG].size(),
       "Dimension mismatch for 'alg'");
     de_out[DE_ALG] = project(de_out[DE_ALG], de_in[DE_Z].sparsity());
 
     // Consistent sparsity for rx
-    casadi_assert_message(de_in[DE_RX].size()==de_out[DE_RODE].size(),
+    casadi_assert(de_in[DE_RX].size()==de_out[DE_RODE].size(),
       "Dimension mismatch for 'rode'");
     de_out[DE_RODE] = project(de_out[DE_RODE], de_in[DE_RX].sparsity());
 
     // Consistent sparsity for rz
-    casadi_assert_message(de_in[DE_RZ].size()==de_out[DE_RALG].size(),
+    casadi_assert(de_in[DE_RZ].size()==de_out[DE_RALG].size(),
       "Dimension mismatch for 'ralg'");
     de_out[DE_RALG] = project(de_out[DE_RALG], de_in[DE_RZ].sparsity());
 

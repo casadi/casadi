@@ -303,9 +303,9 @@ namespace casadi {
     double *fdata = NV_DATA_S(fval);
     for (int k=0; k<n_; ++k) {
       try {
-        casadi_assert_message(!isnan(fdata[k]),
+        casadi_assert(!isnan(fdata[k]),
           "Nonzero " + str(k) + " is not-a-number");
-        casadi_assert_message(!isinf(fdata[k]),
+        casadi_assert(!isinf(fdata[k]),
           "Nonzero " + str(k) + " is infinite");
       } catch(exception& ex) {
         stringstream ss;
@@ -670,7 +670,7 @@ namespace casadi {
     }
     ss << "Consult KINSOL documentation for more information.";
     if (fatal) {
-      casadi_error(ss.str())
+      casadi_error(ss.str());
         } else {
       casadi_warning(ss.str());
     }
@@ -702,11 +702,11 @@ namespace casadi {
 
     // Set optional inputs
     int flag = KINSetUserData(m->mem, m);
-    casadi_assert_message(flag==KIN_SUCCESS, "KINSetUserData");
+    casadi_assert(flag==KIN_SUCCESS, "KINSetUserData");
 
     // Set error handler function
     flag = KINSetErrHandlerFn(m->mem, ehfun, m);
-    casadi_assert_message(flag==KIN_SUCCESS, "KINSetErrHandlerFn");
+    casadi_assert(flag==KIN_SUCCESS, "KINSetErrHandlerFn");
 
     // Initialize KINSOL
     flag = KINInit(m->mem, func_wrapper, m->u);
@@ -733,21 +733,21 @@ namespace casadi {
     case KinsolInterface::DENSE:
       // Dense Jacobian
       flag = KINDense(m->mem, n_);
-      casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
+      casadi_assert(flag==KIN_SUCCESS, "KINDense");
 
       if (exact_jac_) {
         flag = KINDlsSetDenseJacFn(m->mem, djac_wrapper);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
+        casadi_assert(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
       }
       break;
     case KinsolInterface::BANDED:
       // Banded Jacobian
       flag = KINBand(m->mem, n_, upper_bandwidth_, lower_bandwidth_);
-      casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
+      casadi_assert(flag==KIN_SUCCESS, "KINBand");
 
       if (exact_jac_) {
         flag = KINDlsSetBandJacFn(m->mem, bjac_wrapper);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
+        casadi_assert(flag==KIN_SUCCESS, "KINDlsBandJacFn");
       }
       break;
     case KinsolInterface::ITERATIVE:
@@ -755,22 +755,22 @@ namespace casadi {
       switch (iterative_solver_) {
       case KinsolInterface::GMRES:
         flag = KINSpgmr(m->mem, maxl_);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINSpgmr");
+        casadi_assert(flag==KIN_SUCCESS, "KINSpgmr");
         break;
       case KinsolInterface::BCGSTAB:
         flag = KINSpbcg(m->mem, maxl_);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINSpbcg");
+        casadi_assert(flag==KIN_SUCCESS, "KINSpbcg");
         break;
       case KinsolInterface::TFQMR:
         flag = KINSptfqmr(m->mem, maxl_);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINSptfqmr");
+        casadi_assert(flag==KIN_SUCCESS, "KINSptfqmr");
         break;
       }
 
       // Attach functions for Jacobian information
       if (exact_jac_) {
         flag = KINSpilsSetJacTimesVecFn(m->mem, jtimes_wrapper);
-        casadi_assert_message(flag==KIN_SUCCESS, "KINSpilsSetJacTimesVecFn");
+        casadi_assert(flag==KIN_SUCCESS, "KINSpilsSetJacTimesVecFn");
       }
 
       // Add a preconditioner

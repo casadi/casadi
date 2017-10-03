@@ -190,13 +190,13 @@ namespace casadi {
     : FunctionInternal(name), in_(ex_in),  out_(ex_out) {
     // Names of inputs
     if (!name_in.empty()) {
-      casadi_assert_message(ex_in.size()==name_in.size(),
+      casadi_assert(ex_in.size()==name_in.size(),
       "Mismatching number of input names");
       name_in_ = name_in;
     }
     // Names of outputs
     if (!name_out.empty()) {
-      casadi_assert_message(ex_out.size()==name_out.size(),
+      casadi_assert(ex_out.size()==name_out.size(),
       "Mismatching number of output names");
       name_out_ = name_out;
     }
@@ -811,7 +811,7 @@ namespace casadi {
                const std::vector<std::vector<MatType> >& fseed,
                std::vector<std::vector<MatType> >& fsens,
                bool always_inline, bool never_inline) const {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    casadi_assert(!(always_inline && never_inline), "Inconsistent options");
     if (!should_inline(always_inline, never_inline)) {
       // The non-inlining version is implemented in the base class
       return FunctionInternal::call_forward(arg, res, fseed, fsens,
@@ -842,7 +842,7 @@ namespace casadi {
                const std::vector<std::vector<MatType> >& aseed,
                std::vector<std::vector<MatType> >& asens,
                bool always_inline, bool never_inline) const {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    casadi_assert(!(always_inline && never_inline), "Inconsistent options");
     if (!should_inline(always_inline, never_inline)) {
       // The non-inlining version is implemented in the base class
       return FunctionInternal::call_reverse(arg, res, aseed, asens,
@@ -955,7 +955,7 @@ namespace casadi {
     MatType e = expr;
 
     // Create a function for calculating a forward-mode derivative
-    casadi_assert_message(order==1 || order==2,
+    casadi_assert(order==1 || order==2,
       "which_depends: order argument must be 1 or 2, got " + str(order) + " instead.");
 
     MatType v = MatType::sym("v", var.sparsity());

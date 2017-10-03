@@ -433,8 +433,8 @@ namespace casadi {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
-    casadi_assert_message(n>0, "mapaccum: n must be positive");
-    casadi_assert_message(n_accum<=min(n_in, n_out), "mapaccum: too many accumulators");
+    casadi_assert(n>0, "mapaccum: n must be positive");
+    casadi_assert(n_accum<=min(n_in, n_out), "mapaccum: too many accumulators");
     // Quick return?
     if (n==1) return *this;
     // Get symbolic expressions for inputs and outputs
@@ -546,7 +546,7 @@ namespace casadi {
   Function
   Function::map(int n, const std::string& parallelization) const {
     // Make sure not degenerate
-    casadi_assert_message(n>0, "Degenerate map operation");
+    casadi_assert(n>0, "Degenerate map operation");
     // Quick return if possible
     if (n==1) return *this;
     // Unroll?
@@ -1245,7 +1245,7 @@ namespace casadi {
   }
 
   void Function::assert_size_in(int i, int nrow, int ncol) const {
-    casadi_assert_message(size1_in(i)==nrow && size2_in(i)==ncol,
+    casadi_assert(size1_in(i)==nrow && size2_in(i)==ncol,
       "Incorrect shape for " + str(*this) + " input " + str(i) + " \""
       + name_in(i) + "\". Expected " + str(nrow) + "-by-" + str(ncol)
       + " but got " + str(size1_in(i)) +  "-by-" + str(size2_in(i)));
@@ -1253,7 +1253,7 @@ namespace casadi {
   }
 
   void Function::assert_size_out(int i, int nrow, int ncol) const {
-    casadi_assert_message(size1_out(i)==nrow && size2_out(i)==ncol,
+    casadi_assert(size1_out(i)==nrow && size2_out(i)==ncol,
       "Incorrect shape for " + str(*this) + " output " + str(i) + " \""
       + name_out(i) + "\". Expected " + str(nrow) + "-by-" + str(ncol)
       + " but got " + str(size1_out(i)) +  "-by-" + str(size2_out(i)));
@@ -1316,8 +1316,8 @@ namespace casadi {
 
   bool Function::operator==(const Function& f) const {
     try {
-      casadi_assert_message(!is_null(), "lhs is null");
-      casadi_assert_message(!f.is_null(), "rhs is null");
+      casadi_assert(!is_null(), "lhs is null");
+      casadi_assert(!f.is_null(), "rhs is null");
       return get()==f.get();
     } catch (exception& e) {
       THROW_ERROR("operator==", e.what());

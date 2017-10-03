@@ -50,21 +50,21 @@ namespace casadi {
                        const Dict& opts) {
 
     // Dimension at least 1
-    casadi_assert_message(grid.size()>0, "At least one input required");
+    casadi_assert(grid.size()>0, "At least one input required");
 
     // Consistency check, number of elements
     unsigned int nel=1;
     for (auto&& g : grid) {
-      casadi_assert_message(g.size()>=2, "Need at least two grid points for every input")
+      casadi_assert(g.size()>=2, "Need at least two grid points for every input");
       nel *= g.size();
     }
-    casadi_assert_message(nel==values.size(), "Inconsistent number of elements");
+    casadi_assert(nel==values.size(), "Inconsistent number of elements");
 
     // Grid must be strictly increasing
     for (auto&& g : grid) {
       double last = -inf;
       for (auto&& e : g) {
-        casadi_assert_message(!isinf(e) && e>last,
+        casadi_assert(!isinf(e) && e>last,
           "Gridpoints must be finite and strictly increasing");
         last = e;
       }

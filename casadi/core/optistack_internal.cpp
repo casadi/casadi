@@ -254,7 +254,7 @@ MX OptiNode::variable(int n, int m, const std::string& attribute) {
   MX symbol, ret;
 
   if (attribute=="symmetric") {
-    casadi_assert_message(n==m, "You specified attribute 'symmetric', "
+    casadi_assert(n==m, "You specified attribute 'symmetric', "
       "while matrix is not even square, but " + str(n) + "-by-" + str(m) + ".");
     symbol = MX::sym(name_prefix() + "x_" + str(count_var_), n*(n+1)/2);
     ret = tril2symm(MX(Sparsity::lower(n), symbol));
@@ -461,7 +461,7 @@ bool OptiNode::has_con(const MX& m) const {
 void OptiNode::assert_has(const MX& m) const {
   if (!has(m)) {
     VariableType vt;
-    casadi_assert_message(m.is_symbolic(), "Symbol expected, got expression.");
+    casadi_assert(m.is_symbolic(), "Symbol expected, got expression.");
     if (parse_opti_name(m.name(), vt)) {
       casadi_error("Unknown: " + describe(m));
     } else {
@@ -473,7 +473,7 @@ void OptiNode::assert_has(const MX& m) const {
 }
 
 void OptiNode::assert_has_con(const MX& m) const {
-  casadi_assert_message(has_con(m), "Constraint not present in Opti stack.");
+  casadi_assert(has_con(m), "Constraint not present in Opti stack.");
 }
 
 int OptiNode::instance_count_ = 0;
@@ -540,7 +540,7 @@ std::vector<MX> OptiNode::value_parameters() const {
 }
 
 void OptiNode::bake() {
-  casadi_assert_message(!f_.is_empty() || !g_.empty(),
+  casadi_assert(!f_.is_empty() || !g_.empty(),
     "You need to specify at least an objective (y calling 'minimize'), "
     "or a constraint (by calling 'subject_to').");
 
@@ -680,7 +680,7 @@ void OptiNode::assert_only_opti_nondual(const MX& e) const {
   std::vector<MX> symbols = MX::symvar(e);
   for (const auto& s : symbols) {
     assert_has(s);
-    casadi_assert_message(meta(s).type!=OPTI_DUAL_G, "Dual variables forbidden in this context.")
+    casadi_assert(meta(s).type!=OPTI_DUAL_G, "Dual variables forbidden in this context.");
   }
 }
 
@@ -743,7 +743,7 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
       } else {
         // A(x,p) >= b(p)
         e = args[j+1]-args[j];
-        casadi_assert_message(e.size1()==e.size2(),
+        casadi_assert(e.size1()==e.size2(),
           "Matrix inequalities must be square. Did you mean element-wise inequality instead?");
 
         ret.push_back(e);
@@ -790,13 +790,13 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
 }
 
 void OptiNode::assert_solved() const {
-  casadi_assert_message(solved(),
+  casadi_assert(solved(),
     "This action is forbidden since you have not solved the Opti stack yet "
     "(with calling 'solve').");
 }
 
 void OptiNode::assert_baked() const {
-  casadi_assert_message(!problem_dirty(),
+  casadi_assert(!problem_dirty(),
     "This action is forbidden since you have not baked the Opti stack yet "
     "(with calling 'solve').");
 }
@@ -888,7 +888,7 @@ OptiSol OptiNode::solve() {
       opts["iteration_callback"] = callback_;
     }
 
-    casadi_assert_message(solver_name_!="",
+    casadi_assert(solver_name_!="",
       "You must call 'solver' on the Opti stack to select a solver. "
       "Suggestion: opti.solver('ipopt')");
 
@@ -903,7 +903,7 @@ OptiSol OptiNode::solve() {
 
   bool success = ret=="Solve_Succeeded" || ret=="Solved_To_Acceptable_Level" || ret=="SUCCESS";
 
-  casadi_assert_message(success,
+  casadi_assert(success,
     "Solver failed. You may use opti.debug.value to investigate the latest values of variables."
     " return_status is '" + ret + "'");
 
@@ -933,7 +933,7 @@ void OptiNode::solve_prepare() {
     std::vector<MX> s = active_symvar(OPTI_PAR);
     std::vector<DM> v = active_values(OPTI_PAR);
     for (int i=0;i<s.size();++i) {
-      casadi_assert_message(v[i].is_regular(),
+      casadi_assert(v[i].is_regular(),
         "You have forgotten to assign a value to a parameter ('set_value'), "
         "or have set it to NaN/Inf:\n" + describe(s[i], 1));
     }
@@ -992,7 +992,7 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
   if (undecided_vars) {
     assert_solved();
     for (const auto& e : x)
-      casadi_assert_message(symbol_active_[meta(e).count],
+      casadi_assert(symbol_active_[meta(e).count],
         "This expression has symbols that do not appear in the constraints and objective:\n" +
         describe(e, 1));
   }
@@ -1006,7 +1006,7 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
   if (lam.size()>0) {
     assert_solved();
     for (const auto& e : lam) {
-      casadi_assert_message(symbol_active_[meta(e).count],
+      casadi_assert(symbol_active_[meta(e).count],
         "This expression has a dual for a constraint that is not given to Opti:\n" +
         describe(e, 1));
       lam_num.push_back(latest_duals_[meta(e).i]);
@@ -1020,7 +1020,7 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
 void OptiNode::assert_active_symbol(const MX& m) const {
   assert_has(m);
   assert_baked();
-  casadi_assert_message(symbol_active_[meta(m).count], "Opti symbol is not used in Solver."
+  casadi_assert(symbol_active_[meta(m).count], "Opti symbol is not used in Solver."
     " It does not make sense to assign a value to it:\n" + describe(m, 1));
 }
 
@@ -1060,7 +1060,7 @@ void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& sto
     "Use symbols or simple mappings of symbols.";
 
   // Assert x is linear in its symbolic primitives
-  for (bool b : which_depends(x, symbols_cat, 2, false)) casadi_assert_message(!b, failmessage);
+  for (bool b : which_depends(x, symbols_cat, 2, false)) casadi_assert(!b, failmessage);
 
   // Evaluate jacobian of expr wrt symbols
   Dict opts = {{"compact", true}};
@@ -1091,11 +1091,11 @@ void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& sto
   for (int i=0;i<value.nnz();++i) {
     double v = data_original[i];
     int nz = sp_JT.colind()[i+1]-sp_JT.colind()[i];
-    casadi_assert_message(nz<=1, failmessage);
+    casadi_assert(nz<=1, failmessage);
     if (nz) {
       data.push_back(v);
     } else {
-      casadi_assert_message(v==e[i], "In initial/value assignment: "
+      casadi_assert(v==e[i], "In initial/value assignment: "
         "inconsistent numerical values. At nonzero " + str(i) + ", lhs has "
         + str(e[i]) + ", while rhs has " + str(v) + ".");
     }
@@ -1110,7 +1110,7 @@ void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& sto
       // Assign in the workspace
       lhs = rhs;
     } else {
-      casadi_assert_message(lhs==rhs, "Initial/value assignment with mapping is ambiguous.");
+      casadi_assert(lhs==rhs, "Initial/value assignment with mapping is ambiguous.");
     }
   }
 
@@ -1131,7 +1131,7 @@ void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& sto
 
 void OptiNode::set_initial(const MX& x, const DM& v) {
   for (const auto & s : MX::symvar(x)) {
-    casadi_assert_message(meta(s).type!=OPTI_PAR,
+    casadi_assert(meta(s).type!=OPTI_PAR,
       "You cannot set an initial value for a parameter. Did you mean 'set_value'?");
     set_value_internal(x, v, meta(s).type==OPTI_VAR ? initial_ : initial_duals_);
   }
@@ -1139,7 +1139,7 @@ void OptiNode::set_initial(const MX& x, const DM& v) {
 
 void OptiNode::set_value(const MX& x, const DM& v) {
   for (const auto & s : MX::symvar(x))
-    casadi_assert_message(meta(s).type!=OPTI_VAR,
+    casadi_assert(meta(s).type!=OPTI_VAR,
       "You cannot set a value for a variable. Did you mean 'set_initial'?");
   set_value_internal(x, v, values_);
 }

@@ -137,7 +137,7 @@ namespace casadi {
     }
 
     bool detect_structure = struct_cnt==0;
-    casadi_assert_message(struct_cnt==0 || struct_cnt==4,
+    casadi_assert(struct_cnt==0 || struct_cnt==4,
       "You must either set all of N, nx, nu, ng; "
       "or set none at all (automatic detection).");
 
@@ -228,12 +228,12 @@ namespace casadi {
     casadi_assert_dev(nu.size()==N_);
     casadi_assert_dev(ng.size()==N_+1);
 
-    casadi_assert_message(nx_ == std::accumulate(nx.begin(), nx.end(), 0) +
+    casadi_assert(nx_ == std::accumulate(nx.begin(), nx.end(), 0) +
       std::accumulate(nu.begin(), nu.end(), 0),
       "sum(nx)+sum(nu) = must equal total size of variables (" + str(nx_) + "). "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", "
       "nu " + str(nu) + ", ng " + str(ng) + ".");
-    casadi_assert_message(na_ == std::accumulate(nx.begin()+1, nx.end(), 0) +
+    casadi_assert(na_ == std::accumulate(nx.begin()+1, nx.end(), 0) +
       std::accumulate(ng.begin(), ng.end(), 0),
       "sum(nx+1)+sum(ng) = must equal total size of constraints (" + str(na_) + "). "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", "
@@ -259,7 +259,7 @@ namespace casadi {
     hpmpc_d_ip_ocp_hard_tv_work_space_size_bytes = (Work_size)dlsym(handle, work_size_name.c_str());
 #endif // _WIN32
 
-    casadi_assert_message(hpmpc_d_ip_ocp_hard_tv_work_space_size_bytes!=0,
+    casadi_assert(hpmpc_d_ip_ocp_hard_tv_work_space_size_bytes!=0,
       "HPMPC interface: symbol \"" + work_size_name + "\" found in " + searchpath + ".");
 
     std::string ocp_solve_name = "fortran_order_d_ip_ocp_hard_tv";
@@ -275,7 +275,7 @@ namespace casadi {
     fortran_order_d_ip_ocp_hard_tv = (Ocp_solve)dlsym(handle, ocp_solve_name.c_str());
 #endif // _WIN32
 
-    casadi_assert_message(fortran_order_d_ip_ocp_hard_tv!=0,
+    casadi_assert(fortran_order_d_ip_ocp_hard_tv!=0,
       "HPMPC interface: symbol \"" + ocp_solve_name + "\" found in " + searchpath + ".");
 #endif
 
@@ -309,7 +309,7 @@ namespace casadi {
     Isp_ = blocksparsity(na_, nx_, I_blocks, true);
 
     Sparsity total = Asp_ + Bsp_ + Csp_ + Dsp_ + Isp_;
-    casadi_assert_message((A_ + total).nnz() == total.nnz(),
+    casadi_assert((A_ + total).nnz() == total.nnz(),
       "HPMPC: specified structure of A does not correspond to what the interface can handle. "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
       "ng " + str(ng) + ".");
@@ -337,7 +337,7 @@ namespace casadi {
     Qsp_ = blocksparsity(nx_, nx_, Q_blocks);
 
     total = Rsp_ + Ssp_ + Qsp_ + Ssp_.T();
-    casadi_assert_message((H_ + total).nnz() == total.nnz(),
+    casadi_assert((H_ + total).nnz() == total.nnz(),
       "HPMPC: specified structure of H does not correspond to what the interface can handle. "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
       "ng " + str(ng) + ".");

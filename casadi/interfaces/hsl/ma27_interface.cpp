@@ -137,7 +137,7 @@ namespace casadi {
     int ierror = info[1];  // Error flag
     //int nrlnec = info[4];  // recommended value for la
     int nirnec = info[5];  // recommended value for liw
-    casadi_assert_message(iflag==0,
+    casadi_assert(iflag==0,
       "ma27ad_ returns iflag = " + str(iflag) + " with ierror = " + str(ierror));
 
     // Allocate more memory?

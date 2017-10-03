@@ -56,7 +56,7 @@ namespace casadi {
     FixedStepIntegrator::init(opts);
 
     // Algebraic variables not (yet?) supported
-    casadi_assert_message(nz_==0 && nrz_==0,
+    casadi_assert(nz_==0 && nrz_==0,
                           "Explicit Runge-Kutta integrators do not support algebraic variables");
   }
 

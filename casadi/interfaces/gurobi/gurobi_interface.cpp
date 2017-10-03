@@ -78,7 +78,7 @@ namespace casadi {
 
     // Variable types
     if (!vtype.empty()) {
-      casadi_assert_message(vtype.size()==nx_, "Option 'vtype' has wrong length");
+      casadi_assert(vtype.size()==nx_, "Option 'vtype' has wrong length");
       vtype_.resize(nx_);
       for (int i=0; i<nx_; ++i) {
         if (vtype[i]=="continuous") {
@@ -109,7 +109,7 @@ namespace casadi {
 
     // Load environment
     int flag = GRBloadenv(&m->env, 0); // no log file
-    casadi_assert_message(!flag && m->env, "Failed to create GUROBI environment");
+    casadi_assert(!flag && m->env, "Failed to create GUROBI environment");
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
@@ -191,7 +191,7 @@ namespace casadi {
     GRBmodel *model = 0;
     try {
       int flag = GRBnewmodel(m->env, &model, name_.c_str(), 0, 0, 0, 0, 0, 0);
-      casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
 
       // Add variables
       for (int i=0; i<nx_; ++i) {
@@ -215,10 +215,10 @@ namespace casadi {
 
         // Pass to model
         flag = GRBaddvar(model, 0, 0, 0, g ? g[i] : 0., lb, ub, vtype, 0);
-        casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+        casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
       flag = GRBupdatemodel(model);
-      casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
 
       // Add quadratic terms
       const int *H_colind=H_.colind(), *H_row=H_.row();
@@ -244,7 +244,7 @@ namespace casadi {
 
         // Pass to model
         flag = GRBaddqpterms(model, numqnz, ind, ind2, val);
-        casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+        casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
 
       // Add constraints
@@ -274,21 +274,21 @@ namespace casadi {
           } else {
             // Only upper bound
             flag = GRBaddconstr(model, numnz, ind, val, GRB_LESS_EQUAL, ub, 0);
-            casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+            casadi_assert(!flag, GRBgeterrormsg(m->env));
           }
         } else {
           if (isinf(ub)) {
             // Only lower bound
             flag = GRBaddconstr(model, numnz, ind, val, GRB_GREATER_EQUAL, lb, 0);
-            casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+            casadi_assert(!flag, GRBgeterrormsg(m->env));
           } else if (lb==ub) {
             // Upper and lower bounds equal
             flag = GRBaddconstr(model, numnz, ind, val, GRB_EQUAL, lb, 0);
-            casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+            casadi_assert(!flag, GRBgeterrormsg(m->env));
           } else {
             // Both upper and lower bounds
             flag = GRBaddrangeconstr(model, numnz, ind, val, lb, ub, 0);
-            casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+            casadi_assert(!flag, GRBgeterrormsg(m->env));
           }
         }
       }
@@ -298,14 +298,14 @@ namespace casadi {
 
       // Solve the optimization problem
       flag = GRBoptimize(model);
-      casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
 
       m->fstats.at("solver").toc();
       m->fstats.at("postprocessing").tic();
 
       int optimstatus;
       flag = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
-      casadi_assert_message(!flag, GRBgeterrormsg(m->env));
+      casadi_assert(!flag, GRBgeterrormsg(m->env));
 
       if (verbose_) userOut() << "return status: " << return_status_string(optimstatus) <<
         " (" << optimstatus <<")" << std::endl;

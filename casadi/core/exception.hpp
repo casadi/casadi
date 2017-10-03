@@ -116,24 +116,24 @@ inline std::string trim_path(const std::string& full_path) {
 
 // Throw an exception with information about source code location
 #define casadi_error(msg) \
-  throw casadi::CasadiException(CASADI_WHERE + ": " + std::string(msg));
+  throw casadi::CasadiException(CASADI_WHERE + ": " + std::string(msg))
 
 // This assertion checks for illegal user inputs
-#define casadi_assert_message(x, msg) \
-  if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n" + std::string(msg));
+#define casadi_assert(x, msg) \
+  if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n" + std::string(msg))
 
 // This assertion if for internal errors caused by bugs in CasADi
-#define casadi_assert_dev(x) casadi_assert_message(x, "Notify the CasADi developers.")
+#define casadi_assert_dev(x) casadi_assert(x, "Notify the CasADi developers.")
 
 // Issue a warning, including location in the source code
 #define casadi_warning(msg) \
   casadi::userOut<true, casadi::PL_WARN>() \
-    << "CasADi warning at " << CASADI_WHERE << ": " << msg << "\n";
+    << "CasADi warning at " << CASADI_WHERE << ": " << msg << "\n"
 
 // Issue a message, including location in the source code
 #define casadi_message(msg) \
   casadi::userOut() \
-    << "CasADi message at " << CASADI_WHERE << ": " << msg << "\n";
+    << "CasADi message at " << CASADI_WHERE << ": " << msg << "\n"
 
 } // namespace casadi
 

@@ -108,9 +108,9 @@ namespace casadi {
     }
 
     // Make sure dense vectors
-    casadi_assert_message(rr.is_dense() && rr.is_vector(),
+    casadi_assert(rr.is_dense() && rr.is_vector(),
                           "Marix::get: First index must be a dense vector");
-    casadi_assert_message(cc.is_dense() && cc.is_vector(),
+    casadi_assert(cc.is_dense() && cc.is_vector(),
                           "Marix::get: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
@@ -166,7 +166,7 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::get(Matrix<Scalar>& m, bool ind1, const Sparsity& sp) const {
-    casadi_assert_message(size()==sp.size(),
+    casadi_assert(size()==sp.size(),
                           "Shape mismatch. This matrix has shape "
                           + str(size()) + ", but supplied sparsity index has shape "
                           + str(sp.size()) + ".");
@@ -225,9 +225,9 @@ namespace casadi {
     }
 
     // Make sure rr and cc are dense vectors
-    casadi_assert_message(rr.is_dense() && rr.is_column(),
+    casadi_assert(rr.is_dense() && rr.is_column(),
                           "Matrix::set: First index not dense vector");
-    casadi_assert_message(cc.is_dense() && cc.is_column(),
+    casadi_assert(cc.is_dense() && cc.is_column(),
                           "Matrix::set: Second index not dense vector");
 
     // Assert dimensions of assigning matrix
@@ -369,7 +369,7 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::set(const Matrix<Scalar>& m, bool ind1, const Sparsity& sp) {
-    casadi_assert_message(size()==sp.size(),
+    casadi_assert(size()==sp.size(),
                           "set(Sparsity sp): shape mismatch. This matrix has shape "
                           + str(size()) + ", but supplied sparsity index has shape "
                           + str(sp.size()) + ".");
@@ -413,7 +413,7 @@ namespace casadi {
     // Copy nonzeros
     m = zeros(tr ? kk.sparsity().T() : kk.sparsity());
     for (int el=0; el<k.size(); ++el) {
-      casadi_assert_message(!(ind1 && k[el]<=0), "Matlab is 1-based, but requested index "
+      casadi_assert(!(ind1 && k[el]<=0), "Matlab is 1-based, but requested index "
                                                 + str(k[el]) + ". Note that negative slices are"
                                                 " disabled in the Matlab interface. "
                                                 "Possibly you may want to use 'end'.");
@@ -470,7 +470,7 @@ namespace casadi {
 
     // Set nonzeros, ignoring negative indices
     for (int el=0; el<k.size(); ++el) {
-      casadi_assert_message(!(ind1 && k[el]<=0),
+      casadi_assert(!(ind1 && k[el]<=0),
         "Matlab is 1-based, but requested index " + str(k[el])
         +  ". Note that negative slices are disabled in the Matlab interface. "
            "Possibly you may want to use 'end'.");
@@ -570,7 +570,7 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::print_scalar(std::ostream &stream) const {
-    casadi_assert_message(numel()==1, "Not a scalar");
+    casadi_assert(numel()==1, "Not a scalar");
 
     std::streamsize precision = stream.precision();
     std::streamsize width = stream.width();
@@ -597,7 +597,7 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::print_vector(std::ostream &stream, bool truncate) const {
-    casadi_assert_message(is_column(), "Not a vector");
+    casadi_assert(is_column(), "Not a vector");
 
     // Get components
     std::vector<std::string> nz, inter;
@@ -845,7 +845,7 @@ namespace casadi {
 
     // Assert consistency
     for (int rr=0; rr<nrow; ++rr) {
-      casadi_assert_message(ncol==d[rr].size(),
+      casadi_assert(ncol==d[rr].size(),
         "Shape mismatch.\n"
         "Attempting to construct a matrix from a nested list.\n"
         "I got convinced that the desired size is (" + str(nrow) + " x " + str(ncol)
@@ -883,7 +883,7 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar>::Matrix(const Sparsity& sp, const std::vector<Scalar>& d, bool dummy) :
       sparsity_(sp), nonzeros_(d) {
-    casadi_assert_message(sp.nnz()==d.size(), "Size mismatch.\n"
+    casadi_assert(sp.nnz()==d.size(), "Size mismatch.\n"
                           "You supplied a sparsity of " + sp.dim()
                           + ", but the supplied vector is of length " + str(d.size()));
   }
@@ -1041,15 +1041,15 @@ namespace casadi {
     }
 
     // Check matching dimensions
-    casadi_assert_message(x.size2()==y.size1(),
+    casadi_assert(x.size2()==y.size1(),
                           "Matrix product with incompatible dimensions. Lhs is "
                           + x.dim() + " and rhs is " + y.dim() + ".");
 
-    casadi_assert_message(y.size2()==z.size2(),
+    casadi_assert(y.size2()==z.size2(),
                           "Matrix addition with incompatible dimensions. Lhs is "
                           + mtimes(x, y).dim() + " and rhs is " + z.dim() + ".");
 
-    casadi_assert_message(x.size1()==z.size1(),
+    casadi_assert(x.size1()==z.size1(),
                           "Matrix addition with incompatible dimensions. Lhs is "
                           + mtimes(x, y).dim() + " and rhs is " + z.dim() + ".");
 
@@ -1108,7 +1108,7 @@ namespace casadi {
   template<typename Scalar>
   const Scalar Matrix<Scalar>::scalar() const {
     // Make sure that the matrix is 1-by-1
-    casadi_assert_message(is_scalar(), "Can only convert 1-by-1 matrices to scalars");
+    casadi_assert(is_scalar(), "Can only convert 1-by-1 matrices to scalars");
 
     // return zero or the nonzero element
     if (nnz()==1)
@@ -1205,7 +1205,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::matrix_matrix(int op,
                                                const Matrix<Scalar> &x,
                                                const Matrix<Scalar> &y) {
-    casadi_assert_message(x.size()==y.size(),
+    casadi_assert(x.size()==y.size(),
       "Dimension mismatch in element-wise operation " +
       casadi_math<Scalar>::print(op, "lhs", "rhs") + ".\n"
       "Left argument is " + x.dim() + ", right is " + y.dim() + ". "
@@ -1278,7 +1278,7 @@ namespace casadi {
                                              const std::vector<int>& col,
                                              const Matrix<Scalar>& d,
                                              int nrow, int ncol) {
-    casadi_assert_message(col.size()==row.size() && col.size()==d.nnz(),
+    casadi_assert(col.size()==row.size() && col.size()==d.nnz(),
                           "Argument error in Matrix<Scalar>::triplet(row, col, d): "
                           "supplied lists must all be of equal length, but got: "
                           + str(row.size()) + ", " + str(col.size()) + " and " + str(d.nnz()));
@@ -1294,7 +1294,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::inf(const Sparsity& sp) {
-    casadi_assert_message(std::numeric_limits<Scalar>::has_infinity,
+    casadi_assert(std::numeric_limits<Scalar>::has_infinity,
                           "Datatype cannot represent infinity");
     return Matrix<Scalar>(sp, std::numeric_limits<Scalar>::infinity(), false);
   }
@@ -1312,7 +1312,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::nan(const Sparsity& sp) {
-    casadi_assert_message(std::numeric_limits<Scalar>::has_quiet_NaN,
+    casadi_assert(std::numeric_limits<Scalar>::has_quiet_NaN,
                           "Datatype cannot represent not-a-number");
     return Matrix<Scalar>(sp, std::numeric_limits<Scalar>::quiet_NaN(), false);
   }
@@ -1434,7 +1434,7 @@ namespace casadi {
   template<typename Scalar>
   bool Matrix<Scalar>::is_equal(const Matrix<Scalar> &x, const Matrix<Scalar> &y, int depth) {
     // Assert matching dimensions
-    casadi_assert_message(x.size() == y.size(), "Dimension mismatch");
+    casadi_assert(x.size() == y.size(), "Dimension mismatch");
 
     // Project to union of patterns and call recursively if different sparsity
     if (x.sparsity() != y.sparsity()) {
@@ -1532,7 +1532,7 @@ namespace casadi {
     if (intersect) {
       return project(x, sp.intersect(x.sparsity()), false);
     } else {
-      casadi_assert_message(sp.size()==x.size(), "Dimension mismatch");
+      casadi_assert(sp.size()==x.size(), "Dimension mismatch");
       Matrix<Scalar> ret = Matrix<Scalar>::zeros(sp);
       std::vector<Scalar> w(x.size1());
       casadi_project(x.ptr(), x.sparsity(), ret.ptr(), sp, get_ptr(w));
@@ -1553,7 +1553,7 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::det(const Matrix<Scalar>& x) {
     int n = x.size2();
-    casadi_assert_message(n == x.size1(), "matrix must be square");
+    casadi_assert(n == x.size1(), "matrix must be square");
 
     // Trivial return if scalar
     if (x.is_scalar()) return x;
@@ -1632,7 +1632,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::minor(const Matrix<Scalar>& x,
                                               int i, int j) {
     int n = x.size2();
-    casadi_assert_message(n == x.size1(), "minor: matrix must be square");
+    casadi_assert(n == x.size1(), "minor: matrix must be square");
 
     // Trivial return if scalar
     if (n==1) return 1;
@@ -1671,7 +1671,7 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::adj(const Matrix<Scalar>& x) {
     int n = x.size2();
-    casadi_assert_message(n == x.size1(), "adj: matrix must be square");
+    casadi_assert(n == x.size1(), "adj: matrix must be square");
 
     // Temporary placeholder
     Matrix<Scalar> temp;
@@ -1712,7 +1712,7 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::trace(const Matrix<Scalar>& x) {
-    casadi_assert_message(x.is_square(), "trace: must be square");
+    casadi_assert(x.is_square(), "trace: must be square");
     Scalar res=0;
     const Scalar* d=x.ptr();
     int size2 = x.size2();
@@ -1823,7 +1823,7 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::dot(const Matrix<Scalar> &x,
                                      const Matrix<Scalar> &y) {
-    casadi_assert_message(x.size()==y.size(), "dot: Dimension mismatch");
+    casadi_assert(x.size()==y.size(), "dot: Dimension mismatch");
     if (x.sparsity()!=y.sparsity()) {
       Sparsity sp = x.sparsity() * y.sparsity();
       return dot(project(x, sp), project(y, sp));
@@ -1886,7 +1886,7 @@ namespace casadi {
                             Matrix<Scalar>& Q, Matrix<Scalar> &R) {
     // The following algorithm is taken from J. Demmel:
     // Applied Numerical Linear Algebra (algorithm 3.1.)
-    casadi_assert_message(A.size1()>=A.size2(), "qr: fewer rows than columns");
+    casadi_assert(A.size1()>=A.size2(), "qr: fewer rows than columns");
 
     // compute Q and R column by column
     Q = R = Matrix<Scalar>();
@@ -1926,7 +1926,7 @@ namespace casadi {
     Matrix<Scalar> X = A;
     int n = X.size1();
     int m = X.size2();
-    casadi_assert_message(m>=n, "nullspace(): expecting a flat matrix (more columns than rows), "
+    casadi_assert(m>=n, "nullspace(): expecting a flat matrix (more columns than rows), "
                           "but got " + str(X.dim()) + ".");
 
     Matrix<Scalar> seed = DM::eye(m)(Slice(0, m), Slice(n, m));
@@ -1969,7 +1969,7 @@ namespace casadi {
     // Naive, dense implementation O(n^3)
 
     // check dimensions
-    casadi_assert_message(A.size1() == A.size2(), "Cholesky decomposition requires square matrix."
+    casadi_assert(A.size1() == A.size2(), "Cholesky decomposition requires square matrix."
                                               "Got " + str(A.dim()) + " instead.");
 
     Matrix<Scalar> ret = Matrix<Scalar>(Sparsity::lower(A.size1()));
@@ -1998,9 +1998,9 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::solve(const Matrix<Scalar>& a, const Matrix<Scalar>& b) {
     // check dimensions
-    casadi_assert_message(a.size1() == b.size1(), "solve Ax=b: dimension mismatch: b has "
+    casadi_assert(a.size1() == b.size1(), "solve Ax=b: dimension mismatch: b has "
                           + str(b.size1()) + " rows while A has " + str(a.size1()) + ".");
-    casadi_assert_message(a.size1() == a.size2(), "solve: A not square but " + str(a.dim()));
+    casadi_assert(a.size1() == a.size2(), "solve: A not square but " + str(a.dim()));
 
     if (a.is_tril()) {
       // forward substitution if lower triangular
@@ -2235,8 +2235,8 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::polyval(const Matrix<Scalar>& p, const Matrix<Scalar>& x) {
-    casadi_assert_message(p.is_dense(), "polynomial coefficients vector must be dense");
-    casadi_assert_message(p.is_vector() && p.nnz()>0, "polynomial coefficients must be a vector");
+    casadi_assert(p.is_dense(), "polynomial coefficients vector must be dense");
+    casadi_assert(p.is_vector() && p.nnz()>0, "polynomial coefficients must be a vector");
     Matrix<Scalar> ret = x;
     for (auto&& e : ret.nonzeros()) {
       e = casadi_polyval(p.ptr(), p.numel()-1, e);
@@ -2247,7 +2247,7 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::norm_inf_mul(const Matrix<Scalar>& x,
                                                   const Matrix<Scalar>& y) {
-    casadi_assert_message(y.size1()==x.size2(), "Dimension error. Got " + x.dim()
+    casadi_assert(y.size1()==x.size2(), "Dimension error. Got " + x.dim()
                           + " times " + y.dim() + ".");
 
     // Allocate work vectors
@@ -2286,7 +2286,7 @@ namespace casadi {
                                              const Matrix<Scalar> &if_true,
                                              const Matrix<Scalar> &if_false,
                                              bool short_circuit) {
-    casadi_assert_message(!short_circuit,
+    casadi_assert(!short_circuit,
       "Short-circuiting 'if_else' not supported for " + type_name());
     return cond*if_true + !cond*if_false;
   }
@@ -2296,9 +2296,9 @@ namespace casadi {
                                                  const std::vector<Matrix<Scalar> >& x,
                                                  const Matrix<Scalar>& x_default,
                                                  bool short_circuit) {
-    casadi_assert_message(!short_circuit,
+    casadi_assert(!short_circuit,
       "Short-circuiting 'conditional' not supported for " + type_name());
-    casadi_assert_message(ind.is_scalar(true),
+    casadi_assert(ind.is_scalar(true),
       "conditional: first argument must be scalar. Got " + ind.dim()+ " instead.");
 
     Matrix<Scalar> ret = x_default;
@@ -2662,7 +2662,7 @@ namespace casadi {
 
   template<>
   bool Matrix<SXElem>::__nonzero__() const {
-    casadi_assert_message(numel()==1,
+    casadi_assert(numel()==1,
       "Only scalar Matrix could have a truth value, but you "
       "provided a shape" + dim());
     return nonzeros().at(0).__nonzero__();
@@ -2953,8 +2953,8 @@ namespace casadi {
     // number of intervals
     int n = val.numel();
 
-    casadi_assert_message(t.is_scalar(), "t must be a scalar");
-    casadi_assert_message(tval.numel() == n-1, "dimensions do not match");
+    casadi_assert(t.is_scalar(), "t must be a scalar");
+    casadi_assert(tval.numel() == n-1, "dimensions do not match");
 
     SX ret = val->at(0);
     for (int i=0; i<n-1; ++i) {
@@ -2968,7 +2968,7 @@ namespace casadi {
   SX SX::pw_lin(const SX& t, const SX& tval, const SX& val) {
     // Number of points
     int N = tval.numel();
-    casadi_assert_message(N>=2, "pw_lin: N>=2");
+    casadi_assert(N>=2, "pw_lin: N>=2");
 
     // Gradient for each line segment
     SX g = SX(1, N-1);
@@ -2996,8 +2996,8 @@ namespace casadi {
   template<>
   SX SX::gauss_quadrature(const SX& f, const SX& x, const SX& a, const SX& b, int order,
                           const SX& w) {
-    casadi_assert_message(order == 5, "gauss_quadrature: order must be 5");
-    casadi_assert_message(w.is_empty(), "gauss_quadrature: empty weights");
+    casadi_assert(order == 5, "gauss_quadrature: order must be 5");
+    casadi_assert(w.is_empty(), "gauss_quadrature: empty weights");
 
     // Change variables to [-1, 1]
     if (!is_equal(a.scalar(), -1) || !is_equal(b.scalar(), 1)) {
@@ -3106,8 +3106,8 @@ namespace casadi {
     // Assert correctness
     casadi_assert_dev(v.size()==vdef.size());
     for (int i=0; i<v.size(); ++i) {
-      casadi_assert_message(v[i].is_symbolic(), "the variable is not symbolic");
-      casadi_assert_message(v[i].sparsity() == vdef[i].sparsity(), "the sparsity patterns of the "
+      casadi_assert(v[i].is_symbolic(), "the variable is not symbolic");
+      casadi_assert(v[i].sparsity() == vdef[i].sparsity(), "the sparsity patterns of the "
                             "expression and its defining bexpression do not match");
     }
 
@@ -3309,10 +3309,10 @@ namespace casadi {
   template<>
   SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order,
                  const vector<int>& order_contributions) {
-    casadi_assert_message(f.nnz()==f.numel() && x.nnz()==x.numel(),
+    casadi_assert(f.nnz()==f.numel() && x.nnz()==x.numel(),
                           "mtaylor: not implemented for sparse matrices");
 
-    casadi_assert_message(x.nnz()==order_contributions.size(),
+    casadi_assert(x.nnz()==order_contributions.size(),
                           "mtaylor: number of non-zero elements in x (" + str(x.nnz())
                           + ") must match size of order_contributions ("
                           + str(order_contributions.size()) + ")");
@@ -3333,8 +3333,8 @@ namespace casadi {
   SX::print_operator(const SX& X, const vector<string>& args) {
     SXElem x = X.scalar();
     int ndeps = casadi_math<double>::ndeps(x.op());
-    casadi_assert_message(ndeps==1 || ndeps==2, "Not a unary or binary operator");
-    casadi_assert_message(args.size()==ndeps, "Wrong number of arguments");
+    casadi_assert(ndeps==1 || ndeps==2, "Not a unary or binary operator");
+    casadi_assert(args.size()==ndeps, "Wrong number of arguments");
     if (ndeps==1) {
       return casadi_math<double>::print(x.op(), args.at(0));
     } else {
@@ -3502,7 +3502,7 @@ namespace casadi {
 
   template<>
   SX SX::poly_roots(const SX& p) {
-    casadi_assert_message(p.size2()==1,
+    casadi_assert(p.size2()==1,
                           "poly_root(): supplied parameter must be column vector but got "
                           + p.dim() + ".");
     casadi_assert_dev(p.is_dense());
@@ -3583,7 +3583,7 @@ namespace casadi {
 
   template<>
   SX SX::eig_symbolic(const SX& m) {
-    casadi_assert_message(m.size1()==m.size2(), "eig(): supplied matrix must be square");
+    casadi_assert(m.size1()==m.size2(), "eig(): supplied matrix must be square");
 
     vector<SX> ret;
 

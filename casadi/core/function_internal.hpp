@@ -829,7 +829,7 @@ namespace casadi {
   template<typename D>
   void FunctionInternal::call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
                                bool always_inline, bool never_inline) const {
-    casadi_assert_message(!never_inline, "Call-nodes only possible in MX expressions");
+    casadi_assert(!never_inline, "Call-nodes only possible in MX expressions");
     // Check if matching input sparsity
     bool matching_sparsity = true;
     casadi_assert_dev(arg.size()==n_in_);
@@ -872,10 +872,10 @@ namespace casadi {
 
   template<typename M>
   void FunctionInternal::check_arg(const std::vector<M>& arg) const {
-    casadi_assert_message(arg.size()==n_in_, "Incorrect number of inputs: Expected "
+    casadi_assert(arg.size()==n_in_, "Incorrect number of inputs: Expected "
                           + str(n_in_) + ", got " + str(arg.size()));
     for (int i=0; i<n_in_; ++i) {
-      casadi_assert_message(check_mat(arg[i].sparsity(), sparsity_in_.at(i)),
+      casadi_assert(check_mat(arg[i].sparsity(), sparsity_in_.at(i)),
                             "Input " + str(i) + " (" + name_in_[i] + ") has mismatching shape. "
                             "Expected " + str(size_in(i)) + ", got " + str(arg[i].size()));
     }
@@ -883,10 +883,10 @@ namespace casadi {
 
   template<typename M>
   void FunctionInternal::check_res(const std::vector<M>& res) const {
-    casadi_assert_message(res.size()==n_out_, "Incorrect number of outputs: Expected "
+    casadi_assert(res.size()==n_out_, "Incorrect number of outputs: Expected "
                           + str(n_out_) + ", got " + str(res.size()));
     for (int i=0; i<n_out_; ++i) {
-      casadi_assert_message(check_mat(res[i].sparsity(), sparsity_out_.at(i)),
+      casadi_assert(check_mat(res[i].sparsity(), sparsity_out_.at(i)),
                             "Output " + str(i) + " (" + name_out_[i] + ") has mismatching shape. "
                             "Expected " + str(size_out(i)) + ", got " + str(res[i].size()));
     }

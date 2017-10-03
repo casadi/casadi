@@ -147,7 +147,7 @@ namespace casadi {
     // Factorize the matrix
     int info = -100;
     dgetrf_(&ncol, &ncol, get_ptr(m->mat), &ncol, get_ptr(m->ipiv), &info);
-    casadi_assert_message(info==0, "LapackLu::prepare: "
+    casadi_assert(info==0, "LapackLu::prepare: "
                           "dgetrf_ failed to factorize the Jacobian");
   }
 

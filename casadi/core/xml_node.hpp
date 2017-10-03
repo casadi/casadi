@@ -60,7 +60,7 @@ namespace casadi {
 
       // check if the attribute exists
       if (it == attributes_.end()) {
-        casadi_assert_message(!assert_existance,
+        casadi_assert(!assert_existance,
                               "Error in XmlNode::readAttribute: could not find " + attribute_name);
       } else {
         readString(it->second, val);

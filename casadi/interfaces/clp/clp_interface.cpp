@@ -54,7 +54,7 @@ namespace casadi {
     Conic::init(opts);
 
     // Default options
-    casadi_assert_message(H_.nnz()==0, "Not an LP");
+    casadi_assert(H_.nnz()==0, "Not an LP");
 
     // Read options
     //for (auto&& op : opts) {

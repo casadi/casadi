@@ -457,7 +457,7 @@ namespace casadi {
     if (verbose_) casadi_message(str(nblocks_) + " blocks of max size " + str(max_size) + ".");
 
     // Allocate a QP solver
-    //casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
+    //casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
     //qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
     //               qpsol_options);
     //alloc(qpsol_);

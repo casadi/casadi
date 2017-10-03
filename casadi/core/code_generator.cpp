@@ -221,7 +221,7 @@ namespace casadi {
   std::string CodeGenerator::generate(const std::string& prefix) const {
     // Throw an error if the prefix contains the filename, since since syntax
     // has changed
-    casadi_assert_message(prefix.find(this->name + this->suffix)==string::npos,
+    casadi_assert(prefix.find(this->name + this->suffix)==string::npos,
        "The signature of CodeGenerator::generate has changed. "
        "Instead of providing the filename, only provide the prefix.");
 
@@ -519,14 +519,14 @@ namespace casadi {
   }
 
   std::string CodeGenerator::shorthand(const std::string& name) const {
-    casadi_assert_message(added_shorthands_.count(name), "No such macro: " + name);
+    casadi_assert(added_shorthands_.count(name), "No such macro: " + name);
     return "casadi_" + name;
   }
 
   std::string CodeGenerator::shorthand(const std::string& name, bool allow_adding) {
     bool added = added_shorthands_.insert(name).second;
     if (!allow_adding) {
-      casadi_assert_message(added, "Duplicate macro: " + name);
+      casadi_assert(added, "Duplicate macro: " + name);
     }
     return "casadi_" + name;
   }
@@ -1032,14 +1032,14 @@ namespace casadi {
       local_variables_[name] = make_pair(type, ref);
     } else {
       // Consistency check
-      casadi_assert_message(it->second.first==type, "Type mismatch for " + name);
-      casadi_assert_message(it->second.second==ref, "Type mismatch for " + name);
+      casadi_assert(it->second.first==type, "Type mismatch for " + name);
+      casadi_assert(it->second.second==ref, "Type mismatch for " + name);
     }
   }
 
   void CodeGenerator::init_local(const string& name, const string& def) {
     bool inserted = local_default_.insert(make_pair(name, def)).second;
-    casadi_assert_message(inserted, name + " already defined");
+    casadi_assert(inserted, name + " already defined");
   }
 
   string CodeGenerator::

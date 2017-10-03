@@ -33,7 +33,7 @@ namespace casadi {
   }
 
   Slice::Slice(int i, bool ind1) : start(i-ind1), stop(i-ind1+1), step(1) {
-    casadi_assert_message(!(ind1 && i<=0),
+    casadi_assert(!(ind1 && i<=0),
                           "Matlab is 1-based, but requested index " +
                           str(i) +  ". Note that negative slices are"
                           " disabled in the Matlab interface. "
@@ -58,10 +58,10 @@ namespace casadi {
       stop+=len;
     }
 
-    casadi_assert_message(stop<=len,
+    casadi_assert(stop<=len,
       "Slice (start=" + str(start) + ", stop=" + str(stop) + ", step=" + str(step)
       + ") out of bounds with supplied length of " + str(len));
-    casadi_assert_message(start>=0,
+    casadi_assert(start>=0,
       "Slice (start=" + str(start) + ", stop=" + str(stop) + ", step=" + str(step)
       + ") out of bounds with start<0.");
     if ((stop>=start && step<0) || (stop<=start && step>0)) return std::vector<int>();
@@ -102,13 +102,13 @@ namespace casadi {
 
   int Slice::scalar(int len) const {
     casadi_assert_dev(is_scalar(len));
-    casadi_assert_message(start >= -len && start < len, "Slice::getScalar: out of bounds");
+    casadi_assert(start >= -len && start < len, "Slice::getScalar: out of bounds");
     return start >= 0 ? start : start+len;
   }
 
   Slice CASADI_EXPORT to_slice(const std::vector<int>& v, bool ind1) {
     Slice r;
-    casadi_assert_message(is_slice(v, ind1), "Cannot be represented as a Slice");
+    casadi_assert(is_slice(v, ind1), "Cannot be represented as a Slice");
     if (v.size()==0) {
       r.start=r.stop=0;
       r.step = 1;
@@ -128,7 +128,7 @@ namespace casadi {
     // Always false if negative numbers or non-increasing
     int last_v = -1;
     for (int i=0; i<v.size(); ++i) {
-      casadi_assert_message(!(ind1 && v[i]<=0),
+      casadi_assert(!(ind1 && v[i]<=0),
         "Matlab is 1-based, but requested index " + str(v[i]) + ". "
         "Note that negative slices are disabled in the Matlab interface. "
         "Possibly you may want to use 'end'.");
@@ -210,7 +210,7 @@ namespace casadi {
   }
 
   std::pair<Slice, Slice> CASADI_EXPORT to_slice2(const std::vector<int>& v) {
-    casadi_assert_message(is_slice2(v), "Cannot be represented as a nested Slice");
+    casadi_assert(is_slice2(v), "Cannot be represented as a nested Slice");
     Slice inner, outer;
 
     // If simple slice

@@ -363,7 +363,7 @@ namespace casadi {
         if (verbose_) casadi_message("Compiling function '" + name() + "' done.");
         // Try to load
         eval_ = (eval_t)compiler_.get_function(name());
-        casadi_assert_message(eval_!=0, "Cannot load JIT'ed function.");
+        casadi_assert(eval_!=0, "Cannot load JIT'ed function.");
       } else {
         // Just jit dependencies
         jit_dependencies(jit_name);
@@ -1242,7 +1242,7 @@ namespace casadi {
                                        bool compact, bool symmetric,
                                        bool allow_forward, bool allow_reverse) const {
     if (verbose_) casadi_message(name_ + "::get_partition");
-    casadi_assert_message(allow_forward || allow_reverse, "Inconsistent options");
+    casadi_assert(allow_forward || allow_reverse, "Inconsistent options");
 
     // Sparsity pattern with transpose
     Sparsity &AT = sparsity_jac(iind, oind, compact, symmetric);
@@ -1270,7 +1270,7 @@ namespace casadi {
       // Which AD mode?
       if (w==1) allow_forward = false;
       if (w==0) allow_reverse = false;
-      casadi_assert_message(allow_forward || allow_reverse, "Conflicting ad weights");
+      casadi_assert(allow_forward || allow_reverse, "Conflicting ad weights");
 
       // Best coloring encountered so far (relatively tight upper bound)
       double best_coloring = numeric_limits<double>::infinity();
@@ -1349,7 +1349,7 @@ namespace casadi {
     // Used wrapped function if forward not available
     if (!enable_forward_ && !enable_fd_) {
       // Derivative information must be available
-      casadi_assert_message(has_derivative(),
+      casadi_assert(has_derivative(),
                             "Derivatives cannot be calculated for " + name_);
       return wrap().forward(nfwd);
     }
@@ -1427,7 +1427,7 @@ namespace casadi {
     // Used wrapped function if reverse not available
     if (!enable_reverse_) {
       // Derivative information must be available
-      casadi_assert_message(has_derivative(),
+      casadi_assert(has_derivative(),
                             "Derivatives cannot be calculated for " + name_);
       return wrap().reverse(nadj);
     }
@@ -1526,7 +1526,7 @@ namespace casadi {
                                  bool always_inline, bool never_inline) const {
     // The code below creates a call node, to inline, wrap in an MXFunction
     if (always_inline) {
-      casadi_assert_message(!never_inline, "Inconsistent options");
+      casadi_assert(!never_inline, "Inconsistent options");
       return wrap().call(arg, res, true);
     }
 
@@ -1538,7 +1538,7 @@ namespace casadi {
     // Used wrapped function if jacobian not available
     if (!has_jacobian()) {
       // Derivative information must be available
-      casadi_assert_message(has_derivative(),
+      casadi_assert(has_derivative(),
                             "Derivatives cannot be calculated for " + name_);
       return wrap().jacobian();
     }
@@ -2007,12 +2007,12 @@ namespace casadi {
              const std::vector<std::vector<MX> >& fseed,
              std::vector<std::vector<MX> >& fsens,
              bool always_inline, bool never_inline) const {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    casadi_assert_message(!always_inline, "Class " + class_name() +
+    casadi_assert(!(always_inline && never_inline), "Inconsistent options");
+    casadi_assert(!always_inline, "Class " + class_name() +
                           " cannot be inlined in an MX expression");
 
     // Derivative information must be available
-    casadi_assert_message(has_derivative(),
+    casadi_assert(has_derivative(),
                           "Derivatives cannot be calculated for " + name_);
 
     // Number of directional derivatives
@@ -2110,12 +2110,12 @@ namespace casadi {
              const std::vector<std::vector<MX> >& aseed,
              std::vector<std::vector<MX> >& asens,
              bool always_inline, bool never_inline) const {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
-    casadi_assert_message(!always_inline, "Class " + class_name() +
+    casadi_assert(!(always_inline && never_inline), "Inconsistent options");
+    casadi_assert(!always_inline, "Class " + class_name() +
                           " cannot be inlined in an MX expression");
 
     // Derivative information must be available
-    casadi_assert_message(has_derivative(),
+    casadi_assert(has_derivative(),
                           "Derivatives cannot be calculated for " + name_);
 
     // Number of directional derivatives
@@ -2219,7 +2219,7 @@ namespace casadi {
              const std::vector<std::vector<SX> >& fseed,
              std::vector<std::vector<SX> >& fsens,
              bool always_inline, bool never_inline) const {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    casadi_assert(!(always_inline && never_inline), "Inconsistent options");
     if (fseed.empty()) { // Quick return if no seeds
       fsens.clear();
       return;
@@ -2232,7 +2232,7 @@ namespace casadi {
              const std::vector<std::vector<SX> >& aseed,
              std::vector<std::vector<SX> >& asens,
              bool always_inline, bool never_inline) const {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    casadi_assert(!(always_inline && never_inline), "Inconsistent options");
     if (aseed.empty()) { // Quick return if no seeds
       asens.clear();
       return;
@@ -2357,7 +2357,7 @@ namespace casadi {
     if (x.empty()) return x;
 
     // Check number of arguments
-    casadi_assert_message(x.size()==n_in_, "mapsum_mx: Wrong number of arguments");
+    casadi_assert(x.size()==n_in_, "mapsum_mx: Wrong number of arguments");
 
     // Check/replace arguments
     std::vector<MX> x_mod(x.size());
@@ -2642,7 +2642,7 @@ namespace casadi {
       std::vector<DM> resv = eval_dm(argv);
 
       // Check number of outputs
-      casadi_assert_message(resv.size()==n_out_,
+      casadi_assert(resv.size()==n_out_,
         "Expected " + str(n_out_) + " outputs, got " + str(resv.size()) + ".");
 
       // Get outputs

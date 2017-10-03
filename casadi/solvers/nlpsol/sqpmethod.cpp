@@ -187,7 +187,7 @@ namespace casadi {
     Asp_ = jac_g_fcn_.is_null() ? Sparsity(0, nx_) : jac_g_fcn_.sparsity_out(1);
 
     // Allocate a QP solver
-    casadi_assert_message(!qpsol_plugin.empty(), "'qpsol' option has not been set");
+    casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
     qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
     alloc(qpsol_);

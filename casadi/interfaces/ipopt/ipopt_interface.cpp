@@ -260,13 +260,13 @@ namespace casadi {
       char * default_solver = getenv("IPOPT_DEFAULT_LINEAR_SOLVER");
       if (default_solver) {
         bool ret = (*app)->Options()->SetStringValue("linear_solver", default_solver, false);
-        casadi_assert_message(ret, "Corrupted IPOPT_DEFAULT_LINEAR_SOLVER environmental variable");
+        casadi_assert(ret, "Corrupted IPOPT_DEFAULT_LINEAR_SOLVER environmental variable");
       }
     }
 
     // Intialize the IpoptApplication and process the options
     Ipopt::ApplicationReturnStatus status = (*app)->Initialize();
-    casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
+    casadi_assert(status == Solve_Succeeded, "Error during IPOPT initialization");
     return 0;
   }
 

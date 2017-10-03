@@ -36,7 +36,7 @@ namespace casadi {
   template<bool Tr>
   Solve<Tr>::Solve(const MX& r, const MX& A, const Linsol& linear_solver) :
       linsol_(linear_solver) {
-    casadi_assert_message(r.size1() == A.size2(), "Solve::Solve: dimension mismatch.");
+    casadi_assert(r.size1() == A.size2(), "Solve::Solve: dimension mismatch.");
     set_dep(r, A);
     set_sparsity(r.sparsity());
   }

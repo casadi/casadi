@@ -67,7 +67,7 @@ namespace casadi {
   }
 
   DM Linsol::solve(const DM& A, const DM& B, bool tr) const {
-    casadi_assert_message(A.size1()==B.size1(),
+    casadi_assert(A.size1()==B.size1(),
       "Linsol::solve: Dimension mismatch. A and b must have matching row count. "
       "Got " + A.dim() + " and " + B.dim() + ".");
 
@@ -122,7 +122,7 @@ namespace casadi {
   void Linsol::pivoting(const double* A) const {
     casadi_assert_dev(A!=0);
     auto m = static_cast<LinsolMemory*>((*this)->memory(0));
-    casadi_assert_message(!m->sparsity.empty(), "No sparsity pattern set");
+    casadi_assert(!m->sparsity.empty(), "No sparsity pattern set");
 
     // Factorization will be needed after this step
     m->is_pivoted = m->is_factorized = false;
@@ -160,7 +160,7 @@ namespace casadi {
 
   void Linsol::solve(double* x, int nrhs, bool tr) const {
     auto m = static_cast<LinsolMemory*>((*this)->memory(0));
-    casadi_assert_message(m->is_factorized, "Linear system has not been factorized");
+    casadi_assert(m->is_factorized, "Linear system has not been factorized");
 
     (*this)->solve(m, x, nrhs, tr);
   }

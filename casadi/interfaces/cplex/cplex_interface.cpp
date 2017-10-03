@@ -260,7 +260,7 @@ namespace casadi {
     // Create problem object
     casadi_assert_dev(m->lp==0);
     m->lp = CPXcreateprob(m->env, &status, "QP from CasADi");
-    casadi_assert_message(m->lp!=0, "CPXcreateprob failed");
+    casadi_assert(m->lp!=0, "CPXcreateprob failed");
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();

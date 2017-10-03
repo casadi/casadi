@@ -487,7 +487,7 @@ namespace casadi {
   template<typename MatType>
   std::vector< MatType >
   SparsityInterface<MatType>::diagsplit(const MatType& x, const std::vector<int>& output_offset) {
-    casadi_assert_message(x.is_square(), "diagsplit(x,incr)::input must be square but got "
+    casadi_assert(x.is_square(), "diagsplit(x,incr)::input must be square but got "
                           + x.dim()  + ".");
     return MatType::diagsplit(x, output_offset, output_offset);
   }
@@ -496,7 +496,7 @@ namespace casadi {
   std::vector< MatType >
   SparsityInterface<MatType>::diagsplit(const MatType& x, int incr) {
     casadi_assert_dev(incr>=1);
-    casadi_assert_message(x.is_square(), "diagsplit(x,incr)::input must be square but got "
+    casadi_assert(x.is_square(), "diagsplit(x,incr)::input must be square but got "
                           + x.dim()  + ".");
     std::vector<int> offset2 = range(0, x.size2(), incr);
     offset2.push_back(x.size2());
@@ -517,7 +517,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType SparsityInterface<MatType>::mtimes(const std::vector<MatType> &args) {
-    casadi_assert_message(args.size()>=1,
+    casadi_assert(args.size()>=1,
                           "mul(std::vector<MatType> &args): "
                           "supplied list must not be empty.");
     MatType ret = args[0];

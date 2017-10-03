@@ -289,7 +289,7 @@ namespace casadi {
     } else if (is_int()) {
       return static_cast<bool>(to_int());
     } else {
-      casadi_assert_message(is_bool(), "type mismatch");
+      casadi_assert(is_bool(), "type mismatch");
       return false;
     }
   }
@@ -300,7 +300,7 @@ namespace casadi {
     } else if (is_bool()) {
       return static_cast<int>(to_bool());
     } else {
-      casadi_assert_message(is_int(), "type mismatch");
+      casadi_assert(is_int(), "type mismatch");
       return as_int();
     }
   }
@@ -309,34 +309,34 @@ namespace casadi {
     if (is_int()) {
       return static_cast<double>(to_int());
     } else {
-      casadi_assert_message(is_double(), "type mismatch");
+      casadi_assert(is_double(), "type mismatch");
       return as_double();
     }
   }
 
   string GenericType::to_string() const {
-    casadi_assert_message(is_string(), "type mismatch");
+    casadi_assert(is_string(), "type mismatch");
     return as_string();
   }
 
   vector<int> GenericType::to_int_vector() const {
-    casadi_assert_message(is_int_vector(), "type mismatch");
+    casadi_assert(is_int_vector(), "type mismatch");
     return as_int_vector();
   }
 
   vector<bool> GenericType::to_bool_vector() const {
-    casadi_assert_message(is_int_vector(), "type mismatch");
+    casadi_assert(is_int_vector(), "type mismatch");
     vector<int> v = to_int_vector();
     vector<bool> ret(v.size());
     for (int i=0; i<v.size(); ++i) {
-      casadi_assert_message(v[i]==0 || v[i]==1, "Entries must be zero or one");
+      casadi_assert(v[i]==0 || v[i]==1, "Entries must be zero or one");
       ret[i] = v[i]==1;
     }
     return ret;
   }
 
   vector<vector<int> > GenericType::to_int_vector_vector() const {
-    casadi_assert_message(is_int_vector_vector(), "type mismatch");
+    casadi_assert(is_int_vector_vector(), "type mismatch");
     return as_int_vector_vector();
   }
 
@@ -345,7 +345,7 @@ namespace casadi {
       auto v = as_int_vector();
       return vector<double>(v.begin(), v.end());
     } else {
-      casadi_assert_message(is_double_vector(), "type mismatch");
+      casadi_assert(is_double_vector(), "type mismatch");
       return as_double_vector();
     }
   }
@@ -355,18 +355,18 @@ namespace casadi {
       std::string s = as_string();
       return vector<string>(1, s);
     } else {
-      casadi_assert_message(is_string_vector(), "type mismatch");
+      casadi_assert(is_string_vector(), "type mismatch");
       return as_string_vector();
     }
   }
 
   Dict GenericType::to_dict() const {
-    casadi_assert_message(is_dict(), "type mismatch");
+    casadi_assert(is_dict(), "type mismatch");
     return as_dict();
   }
 
   Function GenericType::to_function() const {
-    casadi_assert_message(is_function(), "type mismatch");
+    casadi_assert(is_function(), "type mismatch");
     return as_function();
   }
 
@@ -427,7 +427,7 @@ namespace casadi {
   }
 
   void* GenericType::to_void_pointer() const {
-    casadi_assert_message(getType()==OT_VOIDPTR, "type mismatch");
+    casadi_assert(getType()==OT_VOIDPTR, "type mismatch");
     return as_void_pointer();
   }
 

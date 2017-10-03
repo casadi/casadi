@@ -138,7 +138,7 @@ namespace casadi {
     if (init_xdot_.empty()) {
       init_xdot_.resize(nx_, 0);
     } else {
-      casadi_assert_message(
+      casadi_assert(
         init_xdot_.size()==nx_,
         "Option \"init_xdot\" has incorrect length. Expecting " + str(nx_) + ", "
         "but got " + str(init_xdot_.size()) + ". "
@@ -261,7 +261,7 @@ namespace casadi {
 
     // Create IDAS memory block
     m->mem = IDACreate();
-    casadi_assert_message(m->mem!=0, "IDACreate: Creation failed");
+    casadi_assert(m->mem!=0, "IDACreate: Creation failed");
 
     // Set error handler function
     THROWING(IDASetErrHandlerFn, m->mem, ehfun, m);
@@ -410,10 +410,10 @@ namespace casadi {
   advance(IntegratorMemory* mem, double t, double* x, double* z, double* q) const {
     auto m = to_mem(mem);
 
-    casadi_assert_message(t>=grid_.front(),
+    casadi_assert(t>=grid_.front(),
       "IdasInterface::integrate(" + str(t) + "): "
       "Cannot integrate to a time earlier than t0 (" + str(grid_.front()) + ")");
-    casadi_assert_message(t<=grid_.back() || !stop_at_end_,
+    casadi_assert(t<=grid_.back() || !stop_at_end_,
       "IdasInterface::integrate(" + str(t) + "): "
       "Cannot integrate past a time later than tf (" + str(grid_.back()) + ") "
       "unless stop_at_end is set to False.");

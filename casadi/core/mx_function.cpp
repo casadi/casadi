@@ -79,7 +79,7 @@ namespace casadi {
     if (default_in_.empty()) {
       default_in_.resize(n_in_, 0);
     } else {
-      casadi_assert_message(default_in_.size()==n_in_,
+      casadi_assert(default_in_.size()==n_in_,
                             "Option 'default_in' has incorrect length");
     }
 
@@ -561,7 +561,7 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::eval_mx");
 
     // Resize the number of outputs
-    casadi_assert_message(arg.size()==n_in_, "Wrong number of input arguments");
+    casadi_assert(arg.size()==n_in_, "Wrong number of input arguments");
     res.resize(out_.size());
 
     // Trivial inline by default if output known
@@ -1212,7 +1212,7 @@ namespace casadi {
     for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
       case OP_INPUT:
-        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        casadi_assert(it->data->segment()==0, "Not implemented");
         work.at(it->res.front()) = vdef.at(it->data->ind());
         break;
       case OP_PARAMETER:
@@ -1220,7 +1220,7 @@ namespace casadi {
         work.at(it->res.front()) = it->data;
         break;
       case OP_OUTPUT:
-        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        casadi_assert(it->data->segment()==0, "Not implemented");
         if (it->data->ind()<vdef.size()) {
           vdef.at(it->data->ind()) = work.at(it->arg.front());
         } else {
@@ -1252,9 +1252,9 @@ namespace casadi {
 
   bool MXFunction::should_inline(bool always_inline, bool never_inline) const {
     // If inlining has been specified
-    casadi_assert_message(!(always_inline && never_inline),
+    casadi_assert(!(always_inline && never_inline),
       "Inconsistent options for " + definition());
-    casadi_assert_message(!(never_inline && has_free()),
+    casadi_assert(!(never_inline && has_free()),
       "Must inline " + definition());
     if (always_inline) return true;
     if (never_inline) return false;

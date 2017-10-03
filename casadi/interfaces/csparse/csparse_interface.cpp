@@ -107,9 +107,9 @@ namespace casadi {
 
     // Make sure that all entries of the linear system are valid
     for (int k=0; k<m->nnz(); ++k) {
-      casadi_assert_message(!isnan(A[k]),
+      casadi_assert(!isnan(A[k]),
         "Nonzero " + str(k) + " is not-a-number");
-      casadi_assert_message(!isinf(A[k]),
+      casadi_assert(!isinf(A[k]),
         "Nonzero " + str(k) + " is infinite");
     }
 

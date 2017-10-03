@@ -102,7 +102,7 @@ namespace casadi {
     int lwork = m->work.size();
     dgeqrf_(&ncol, &ncol, get_ptr(m->mat), &ncol, get_ptr(m->tau),
             get_ptr(m->work), &lwork, &info);
-    casadi_assert_message(info == 0,
+    casadi_assert(info == 0,
       "LapackQr::prepare: dgeqrf_ failed to factorize the Jacobian. Info: " + str(info) + ".");
   }
 
@@ -148,7 +148,7 @@ namespace casadi {
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
               &ncol, get_ptr(m->work), &lwork, &info);
-      casadi_assert_message(info == 0,
+      casadi_assert(info == 0,
         "LapackQr::solve: dormqr_ A failed to solve the linear system. Info: " + str(info) + ".");
     } else {
 
@@ -156,7 +156,7 @@ namespace casadi {
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
               &ncol, get_ptr(m->work), &lwork, &info);
-      casadi_assert_message(info == 0,
+      casadi_assert(info == 0,
         "LapackQr::solve: dormqr_ B failed to solve the linear system. Info: " + str(info) + ".");
 
       // Solve for R

@@ -100,7 +100,7 @@ namespace casadi {
                   {"g", mtimes(A, X)}};
 
     // Create an Nlpsol instance
-    casadi_assert_message(!nlpsol_plugin.empty(), "'nlpsol' option has not been set");
+    casadi_assert(!nlpsol_plugin.empty(), "'nlpsol' option has not been set");
     solver_ = nlpsol("nlpsol", nlpsol_plugin, nlp, nlpsol_options);
     alloc(solver_);
 

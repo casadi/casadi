@@ -862,14 +862,14 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::cross(const MatType& a, const MatType& b, int dim) {
-    casadi_assert_message(a.size1()==b.size1() && a.size2()==b.size2(),
+    casadi_assert(a.size1()==b.size1() && a.size2()==b.size2(),
       "cross(a, b): Inconsistent dimensions. Dimension of a ("
       + a.dim() + " ) must equal that of b (" + b.dim() + ").");
 
-    casadi_assert_message(a.size1()==3 || a.size2()==3,
+    casadi_assert(a.size1()==3 || a.size2()==3,
       "cross(a, b): One of the dimensions of a should have length 3, but got "
         + a.dim() + ".");
-    casadi_assert_message(dim==-1 || dim==1 || dim==2,
+    casadi_assert(dim==-1 || dim==1 || dim==2,
       "cross(a, b, dim): Dim must be 1, 2 or -1 (automatic).");
 
     std::vector<MatType> ret(3);
@@ -906,12 +906,12 @@ namespace casadi {
 
     casadi_assert_dev(is_increasing(x));
 
-    casadi_assert_message(x.size()==v.size1(),
+    casadi_assert(x.size()==v.size1(),
       "interp1d(x, v, xq): dimensions mismatch. v expected to have " + str(x.size()) + " rows,"
       " but got " + str(v.size1()) + " instead.");
 
     // Need at least two elements
-    casadi_assert_message(x.size()>=2, "interp1d(x, v, xq): x must be at least length 2.");
+    casadi_assert(x.size()>=2, "interp1d(x, v, xq): x must be at least length 2.");
 
     // Vectors to compose a sparse matrix
     std::vector<double> val;
@@ -958,7 +958,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::skew(const MatType& a) {
-    casadi_assert_message(a.is_vector() && (a.size1()==3 || a.size2()==3),
+    casadi_assert(a.is_vector() && (a.size1()==3 || a.size2()==3),
       "skew(a): Expecting 3-vector, got " + a.dim() + ".");
 
     MatType x = a(0);
@@ -969,7 +969,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::inv_skew(const MatType& a) {
-    casadi_assert_message(a.size1()==3 && a.size2()==3,
+    casadi_assert(a.size1()==3 && a.size2()==3,
       "inv_skew(a): Expecting 3-by-3 matrix, got " + a.dim() + ".");
 
     return 0.5*vertcat(std::vector<MatType>({a(2, 1)-a(1, 2), a(0, 2)-a(2, 0), a(1, 0)-a(0, 1)}));
@@ -978,9 +978,9 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::tril2symm(const MatType& x) {
-    casadi_assert_message(x.is_square(),
+    casadi_assert(x.is_square(),
       "Shape error in tril2symm. Expecting square shape but got " + x.dim());
-    casadi_assert_message(x.nnz_upper()-x.nnz_diag()==0,
+    casadi_assert(x.nnz_upper()-x.nnz_diag()==0,
       "Sparsity error in tril2symm. Found above-diagonal entries in argument: " + x.dim());
     return x +  x.T() - diag(diag(x));
   }
@@ -1002,9 +1002,9 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::triu2symm(const MatType& x) {
-    casadi_assert_message(x.is_square(),
+    casadi_assert(x.is_square(),
       "Shape error in triu2symm. Expecting square shape but got " + x.dim());
-    casadi_assert_message(x.nnz_lower()-x.nnz_diag()==0,
+    casadi_assert(x.nnz_lower()-x.nnz_diag()==0,
       "Sparsity error in triu2symm. Found below-diagonal entries in argument: " + x.dim());
     return x + x.T() - diag(diag(x));
   }
@@ -1023,7 +1023,7 @@ namespace casadi {
     if (!y.is_dense()) return bilin(A, x, densify(y));
 
     // Assert dimensions
-    casadi_assert_message(x.size1()==A.size1() && y.size1()==A.size2(),
+    casadi_assert(x.size1()==A.size1() && y.size1()==A.size2(),
       "Dimension mismatch. Got x.size1() = " + str(x.size1())
       + " and y.size1() = " + str(y.size1()) + " but A.size() = " + str(A.size()));
 
@@ -1049,7 +1049,7 @@ namespace casadi {
     if (!alpha.is_dense()) return A;
 
     // Assert dimensions
-    casadi_assert_message(x.size1()==A.size1() && y.size1()==A.size2(),
+    casadi_assert(x.size1()==A.size1() && y.size1()==A.size2(),
       "Dimension mismatch. Got x.size1() = " + str(x.size1())
         + " and y.size1() = " + str(y.size1())
         + " but A.size() = " + str(A.size()));
@@ -1082,14 +1082,14 @@ namespace casadi {
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::gradient(const MatType &ex, const MatType &arg) {
-    casadi_assert_message(ex.is_scalar(),
+    casadi_assert(ex.is_scalar(),
                           "'gradient' only defined for scalar outputs: Use 'jacobian' instead.");
     return project(jtimes(ex, arg, MatType::ones(ex.sparsity()), true), arg.sparsity());
   }
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::tangent(const MatType &ex, const MatType &arg) {
-    casadi_assert_message(arg.is_scalar(),
+    casadi_assert(arg.is_scalar(),
                           "'tangent' only defined for scalar inputs: Use 'jacobian' instead.");
     return project(jtimes(ex, arg, MatType::ones(arg.sparsity()), false), ex.sparsity());
   }
@@ -1114,11 +1114,11 @@ namespace casadi {
   MatType GenericMatrix<MatType>::mpower(const MatType& a,
                                             const MatType& b) {
     if (a.is_scalar() && b.is_scalar()) return pow(a, b);
-    casadi_assert_message(a.is_square() && b.is_constant() && b.is_scalar(),
+    casadi_assert(a.is_square() && b.is_constant() && b.is_scalar(),
       "Not Implemented");
     double bv = static_cast<double>(b);
     int N = bv;
-    casadi_assert_message(bv==N, "Not Implemented");
+    casadi_assert(bv==N, "Not Implemented");
     if (N<0) return inv(mpower(a, -N));
     if (N==0) return MatType::eye(a.size1());
     if (N==1) return a;

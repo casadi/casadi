@@ -68,19 +68,19 @@ namespace casadi {
     const int* colind = this->colind();
     const int* row = this->row();
     int nnz = this->nnz();
-    casadi_assert_message(nrow >=0,
+    casadi_assert(nrow >=0,
                           "number of rows must be positive, but got " + str(nrow) + ".");
-    casadi_assert_message(ncol>=0 ,
+    casadi_assert(ncol>=0 ,
                           "number of columns must be positive, but got " + str(ncol) + ".");
     if (complete) {
 
       for (int k=0; k<ncol; k++) {
-        casadi_assert_message(colind[k+1]>=colind[k],
+        casadi_assert(colind[k+1]>=colind[k],
                               "Compressed Column Storage is not sane. "
                               "colind must be monotone.");
       }
 
-      casadi_assert_message(colind[0]==0,
+      casadi_assert(colind[0]==0,
                             "Compressed Column Storage is not sane. "
                             "First element of colind must be zero.");
 
@@ -1747,7 +1747,7 @@ namespace casadi {
 
   Sparsity SparsityInternal::multiply(const Sparsity& B) const {
     int nz = 0;
-    casadi_assert_message(size2() == B.size1(), "Dimension mismatch.");
+    casadi_assert(size2() == B.size1(), "Dimension mismatch.");
     int m = size1();
     int anz = nnz();
     int n = B.size2();
@@ -2297,7 +2297,7 @@ namespace casadi {
     if (ind1 || has_negative(rr)) {
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
-        casadi_assert_message(!(ind1 && (*i)<=0),
+        casadi_assert(!(ind1 && (*i)<=0),
           "Matlab is 1-based, but requested index " + str(*i) +  ". "
           "Note that negative slices are disabled in the Matlab interface. "
           "Possibly you may want to use 'end'.");
@@ -2497,7 +2497,7 @@ namespace casadi {
                                                vector<unsigned char>& mapping) const {
 
     // Assert dimensions
-    casadi_assert_message(size2()==y.size2() && size1()==y.size1(), "Dimension mismatch");
+    casadi_assert(size2()==y.size2() && size1()==y.size1(), "Dimension mismatch");
 
     // Sparsity pattern of the argument
     const int* y_colind = y.colind();
@@ -2642,7 +2642,7 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::_appendVector(const SparsityInternal& sp) const {
-    casadi_assert_message(size2() == 1 && sp.size2() == 1,
+    casadi_assert(size2() == 1 && sp.size2() == 1,
       "_appendVector(sp): Both arguments must be vectors but got "
        + str(size2()) + " columns for lhs, and " + str(sp.size2()) + " columns for rhs.");
 
@@ -2663,7 +2663,7 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::_appendColumns(const SparsityInternal& sp) const {
-    casadi_assert_message(size1()== sp.size1(),
+    casadi_assert(size1()== sp.size1(),
       "_appendColumns(sp): row sizes must match but got " + str(size1())
                           + " for lhs, and " + str(sp.size1()) + " for rhs.");
 
@@ -2768,9 +2768,9 @@ namespace casadi {
     const int* row = this->row();
 
     // Check consistency
-    casadi_assert_message(rr>=0 && rr<size1(), "Row index " + str(rr)
+    casadi_assert(rr>=0 && rr<size1(), "Row index " + str(rr)
                           + " out of bounds [0, " + str(size1()) + ")");
-    casadi_assert_message(cc>=0 && cc<size2(), "Column index " + str(cc)
+    casadi_assert(cc>=0 && cc<size2(), "Column index " + str(cc)
                           + " out of bounds [0, " + str(size2()) + ")");
 
     // Quick return if matrix is dense
@@ -2798,7 +2798,7 @@ namespace casadi {
       return _reshape(nrow, numel()/nrow);
     }
 
-    casadi_assert_message(numel() == nrow*ncol,
+    casadi_assert(numel() == nrow*ncol,
                           "reshape: number of elements must remain the same. Old shape is "
                           + dim() + ". New shape is " + str(nrow) + "x" + str(ncol)
                           + "=" + str(nrow*ncol) + ".");
@@ -2895,7 +2895,7 @@ namespace casadi {
       for (int k=ret_colind[i]; k<ret_colind[i+1]; ++k) {
 
         // Make sure that the rows appear sequentially
-        casadi_assert_message(ret_row[k] >= lastrow, "rows are not sequential");
+        casadi_assert(ret_row[k] >= lastrow, "rows are not sequential");
 
         // Skip if duplicate
         if (ret_row[k] == lastrow) continue;

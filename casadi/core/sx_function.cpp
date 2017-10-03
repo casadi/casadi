@@ -233,7 +233,7 @@ namespace casadi {
     if (default_in_.empty()) {
       default_in_.resize(n_in_, 0);
     } else {
-      casadi_assert_message(default_in_.size()==n_in_,
+      casadi_assert(default_in_.size()==n_in_,
                             "Option 'default_in' has incorrect length");
     }
 

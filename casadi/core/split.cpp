@@ -197,7 +197,7 @@ namespace casadi {
       offset_.push_back(offset_.back() + s.nnz());
     }
 
-    casadi_assert_message(offset_.back()==x.nnz(),
+    casadi_assert(offset_.back()==x.nnz(),
       "DiagSplit:: the presence of nonzeros outside the diagonal blocks in unsupported.");
   }
 

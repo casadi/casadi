@@ -144,7 +144,7 @@ namespace casadi {
     void BSpline::init(const Dict& opts) {
       casadi::BSplineCommon::init(opts);
 
-      casadi_assert_message(coeffs_size_==coeffs_.size(),
+      casadi_assert(coeffs_size_==coeffs_.size(),
         "Expected coefficient size " + str(coeffs_size_) + ", "
         "got " + str(coeffs_.size()) + " instead.");
     }

@@ -116,7 +116,7 @@ namespace casadi {
     if (get_name_in_) {
       // Use function pointer
       const char* n = get_name_in_(i);
-      casadi_assert_message(n!=0, "Error querying input name");
+      casadi_assert(n!=0, "Error querying input name");
       return n;
     } else if (li_.has_meta(name_ + "_NAME_IN", i)) {
       // Read meta
@@ -131,7 +131,7 @@ namespace casadi {
     if (get_name_out_) {
       // Use function pointer
       const char* n = get_name_out_(i);
-      casadi_assert_message(n!=0, "Error querying output name");
+      casadi_assert(n!=0, "Error querying output name");
       return n;
     } else if (li_.has_meta(name_ + "_NAME_OUT", i)) {
       // Read meta
@@ -196,7 +196,7 @@ namespace casadi {
 
     // Reference counting?
     has_refcount_ = li_.has_function(name_ + "_incref");
-    casadi_assert_message(has_refcount_==li_.has_function(name_ + "_decref"),
+    casadi_assert(has_refcount_==li_.has_function(name_ + "_decref"),
                           "External functions must provide functions for both increasing "
                           "and decreasing the reference count, or neither.");
 
@@ -204,7 +204,7 @@ namespace casadi {
     int sz_arg=0, sz_res=0, sz_iw=0, sz_w=0;
     if (work_) {
       int flag = work_(&sz_arg, &sz_res, &sz_iw, &sz_w);
-      casadi_assert_message(flag==0, "External: \"work\" failed");
+      casadi_assert(flag==0, "External: \"work\" failed");
     } else if (li_.has_meta(name_ + "_WORK")) {
       vector<int> v = li_.meta_vector<int>(name_ + "_WORK");
       casadi_assert_dev(v.size()==4);
@@ -322,25 +322,25 @@ namespace casadi {
     Function ret = external(name, li_, opts);
 
     // Inputs consistency checks
-    casadi_assert_message(s_in.size() == ret.n_in(),
+    casadi_assert(s_in.size() == ret.n_in(),
       "Inconsistent number of inputs. Expected " + str(s_in.size())+ "  "
       "(" + str(s_in) + "), got " + str(ret.n_in()) + ".");
     for (int i=0; i<s_in.size(); ++i) {
       string s = s_in[i];
       replace(s.begin(), s.end(), ':', '_');
-      casadi_assert_message(s == ret.name_in(i),
+      casadi_assert(s == ret.name_in(i),
         "Inconsistent input name. Expected: " + str(s_in) + ", "
         "got " + ret.name_in(i) + " for input " + str(i));
     }
 
     // Outputs consistency checks
-    casadi_assert_message(s_out.size() == ret.n_out(),
+    casadi_assert(s_out.size() == ret.n_out(),
       "Inconsistent number of outputs. Expected " + str(s_out.size()) + " "
       "(" + str(s_out) + "), got " + str(ret.n_out()) + ".");
     for (int i=0; i<s_out.size(); ++i) {
       string s = s_out[i];
       replace(s.begin(), s.end(), ':', '_');
-      casadi_assert_message(s == ret.name_out(i),
+      casadi_assert(s == ret.name_out(i),
         "Inconsistent output name. Expected: " + str(s_out) + ", "
         "got " + ret.name_out(i) + " for output " + str(i));
     }
