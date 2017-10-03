@@ -174,11 +174,11 @@ namespace casadi {
       if (print_iteration_) {
         // Only print iteration header once in a while
         if (m->iter % 10==0) {
-          printIteration(userOut());
+          printIteration(uout());
         }
 
         // Print iteration information
-        printIteration(userOut(), m->iter, abstol, abstolStep);
+        printIteration(uout(), m->iter, abstol, abstolStep);
       }
 
       // Update Xk+1 = Xk - J^(-1) F

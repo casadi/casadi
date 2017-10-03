@@ -128,11 +128,11 @@ namespace casadi {
         if (info<=ncol)  ss << (info-1) << "-th row (zero-based) is exactly zero";
         else             ss << (info-1-ncol) << "-th col (zero-based) is exactly zero";
 
-        userOut() << "Warning: " << ss.str() << endl;
+        uout() << "Warning: " << ss.str() << endl;
 
 
 
-        if (allow_equilibration_failure_)  userOut() << "Warning: " << ss.str() << endl;
+        if (allow_equilibration_failure_)  uout() << "Warning: " << ss.str() << endl;
         else                              casadi_error(ss.str());
       }
 

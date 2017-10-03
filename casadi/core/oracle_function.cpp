@@ -317,7 +317,7 @@ namespace casadi {
       << endl << blankName
       << "      time           time     evals       proc time        wall time"
       << endl;
-    userOut() << s.str();
+    uout() << s.str();
 
     // Sort the keys according to order
     std::vector<std::string> keys_order0;

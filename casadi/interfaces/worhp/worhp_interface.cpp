@@ -132,13 +132,13 @@ namespace casadi {
 
   void worhp_disp(int mode, const char message[]) {
     if (mode & WORHP_PRINT_MESSAGE) {
-      userOut() << message << std::endl;
+      uout() << message << std::endl;
     }
     if (mode & WORHP_PRINT_WARNING) {
-      userOut<true>() << message << std::endl;
+      uout<true>() << message << std::endl;
     }
     if (mode & WORHP_PRINT_ERROR) {
-      userOut<true>() << message << std::endl;
+      uout<true>() << message << std::endl;
     }
   }
 

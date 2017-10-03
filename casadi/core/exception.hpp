@@ -127,12 +127,12 @@ inline std::string trim_path(const std::string& full_path) {
 
 // Issue a warning, including location in the source code
 #define casadi_warning(msg) \
-  casadi::userOut<true>() \
+  casadi::uout<true>() \
     << "CasADi warning at " << CASADI_WHERE << ": " << msg << "\n"
 
 // Issue a message, including location in the source code
 #define casadi_message(msg) \
-  casadi::userOut() \
+  casadi::uout() \
     << "CasADi message at " << CASADI_WHERE << ": " << msg << "\n"
 
 } // namespace casadi

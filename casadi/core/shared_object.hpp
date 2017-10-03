@@ -138,7 +138,7 @@ namespace casadi {
 
     /// \cond INTERNAL
     /// Print the pointer to the internal class
-    void print_ptr(std::ostream &stream=casadi::userOut()) const;
+    void print_ptr(std::ostream &stream=casadi::uout()) const;
     /// \endcond
 
     /// Is a null pointer?

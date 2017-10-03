@@ -204,7 +204,7 @@ namespace casadi {
     m->fstats.at("mainloop").toc();
 
     // Print statistics
-    if (print_stats_) print_stats(m, userOut());
+    if (print_stats_) print_stats(m, uout());
 
     // Show statistics
     if (print_time_)  print_fstats(static_cast<OracleMemory*>(mem));

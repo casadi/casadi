@@ -2581,7 +2581,7 @@ namespace casadi {
           << formatFloat(1000.0*t_wall/n_call, 10, 2, 3) << " [ms]\n";
       }
     }
-    userOut() << s.str();
+    uout() << s.str();
   }
 
   Function FunctionInternal::slice(const std::string& name,

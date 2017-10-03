@@ -263,7 +263,7 @@ namespace casadi {
       g_lam = MX::sym("g_lam", ng_);
 
       if (verbose_) {
-        userOut() << "Allocated intermediate variables." << endl;
+        uout() << "Allocated intermediate variables." << endl;
       }
 
       // Adjoint sweep to get the definitions of the lifted dual variables
@@ -291,7 +291,7 @@ namespace casadi {
       }
 
       if (verbose_) {
-        userOut() << "Generated the gradient of the Lagrangian." << endl;
+        uout() << "Generated the gradient of the Lagrangian." << endl;
       }
     }
 
@@ -332,7 +332,7 @@ namespace casadi {
     // Generate function
     Function res_fcn("res_fcn", res_fcn_in, res_fcn_out);
     if (verbose_) {
-      userOut() << "Generated residual function ( " << res_fcn.n_nodes() << " nodes)." << endl;
+      uout() << "Generated residual function ( " << res_fcn.n_nodes() << " nodes)." << endl;
     }
 
     // Declare difference vector d and substitute out p and v
@@ -476,7 +476,7 @@ namespace casadi {
 
     Function vec_fcn("vec_fcn", mfcn_in, vec_fcn_out);
     if (verbose_) {
-      userOut() << "Generated linearization function ( " << vec_fcn.n_nodes()
+      uout() << "Generated linearization function ( " << vec_fcn.n_nodes()
            << " nodes)." << endl;
     }
 
@@ -524,7 +524,7 @@ namespace casadi {
     // Step expansion function
     Function exp_fcn("exp_fcn", mfcn_in, exp_fcn_out);
     if (verbose_) {
-      userOut() << "Generated step expansion function ( " << exp_fcn.n_nodes() << " nodes)."
+      uout() << "Generated step expansion function ( " << exp_fcn.n_nodes() << " nodes)."
            << endl;
     }
 
@@ -555,21 +555,21 @@ namespace casadi {
 
       // Generate code
       if (verbose_) {
-        userOut() << "Generating \"" << cname << "\""  << endl;
+        uout() << "Generating \"" << cname << "\""  << endl;
       }
       string name = cname.substr(0, cname.find_first_of('.'));
       gen.generate();
 
       // Complile and run
       if (verbose_) {
-        userOut() << "Starting compilation"  << endl;
+        uout() << "Starting compilation"  << endl;
       }
       time_t time1 = time(0);
       compiler_ = Importer(cname, compilerplugin_, jit_options_);
       time_t time2 = time(0);
       double comp_time = difftime(time2, time1);
       if (verbose_) {
-        userOut() << "Compilation completed after " << comp_time << " s."  << endl;
+        uout() << "Compilation completed after " << comp_time << " s."  << endl;
       }
 
       // Load the generated code
@@ -592,21 +592,21 @@ namespace casadi {
     qpsol_ = conic("qpsol", qpsol_plugin, {{"h", spH_}, {"a", spA_}},
                    qpsol_options);
     if (verbose_) {
-      userOut() << "Allocated QP solver." << endl;
+      uout() << "Allocated QP solver." << endl;
     }
 
     if (verbose_) {
-      userOut() << "NLP preparation completed" << endl;
+      uout() << "NLP preparation completed" << endl;
     }
 
     // Header
     if (print_header_) {
-      userOut() << "-------------------------------------------" << endl;
-      userOut() << "This is casadi::SCPgen." << endl;
+      uout() << "-------------------------------------------" << endl;
+      uout() << "This is casadi::SCPgen." << endl;
       if (gauss_newton_) {
-        userOut() << "Using Gauss-Newton Hessian" << endl;
+        uout() << "Using Gauss-Newton Hessian" << endl;
       } else {
-        userOut() << "Using exact Hessian" << endl;
+        uout() << "Using exact Hessian" << endl;
       }
 
       // Count the total number of variables
@@ -615,7 +615,7 @@ namespace casadi {
         n_lifted += i->n;
       }
 
-      userOut()
+      uout()
         << endl
         << "Number of reduced variables:               " << setw(9) << nx_ << endl
         << "Number of reduced constraints:             " << setw(9) << ng_ << endl
@@ -625,7 +625,7 @@ namespace casadi {
         << "Total number of constraints:               " << setw(9) << (ng_+n_lifted) << endl
         << endl;
 
-      userOut()
+      uout()
         << "Iteration options:" << endl
         << "{ \"max_iter\":" << max_iter_ << ", "
         << "\"max_iter_ls\":" << max_iter_ls_ << ", "
@@ -793,7 +793,7 @@ namespace casadi {
       vinit_fcn_(m->arg, m->res, m->iw, m->w, 0);
     }
     if (verbose_) {
-      userOut() << "Passed initial guess" << endl;
+      uout() << "Passed initial guess" << endl;
     }
 
     // Reset dual guess
@@ -861,30 +861,30 @@ namespace casadi {
       double du_inf = dualInfeasibility(m);
 
       // Print header occasionally
-      if (m->iter_count % 10 == 0) printIteration(m, userOut());
+      if (m->iter_count % 10 == 0) printIteration(m, uout());
 
       // Printing information about the actual iterate
-      printIteration(m, userOut(), m->iter_count, m->fk, pr_inf, du_inf, m->reg,
+      printIteration(m, uout(), m->iter_count, m->fk, pr_inf, du_inf, m->reg,
                      ls_iter, ls_success);
 
       // Checking convergence criteria
       bool converged = pr_inf <= tol_pr_ && m->pr_step <= tol_pr_step_ && m->reg <= tol_reg_;
       converged = converged && du_inf <= tol_du_;
       if (converged) {
-        userOut() << endl << "casadi::SCPgen: Convergence achieved after "
+        uout() << endl << "casadi::SCPgen: Convergence achieved after "
                   << m->iter_count << " iterations." << endl;
         break;
       }
 
       if (m->iter_count >= max_iter_) {
-        userOut() << endl;
-        userOut() << "casadi::SCPgen: Maximum number of iterations reached." << endl;
+        uout() << endl;
+        uout() << "casadi::SCPgen: Maximum number of iterations reached." << endl;
         break;
       }
 
       // Check if not-a-number
       if (m->fk!=m->fk || m->pr_step != m->pr_step || pr_inf != pr_inf) {
-        userOut() << "casadi::SCPgen: Aborted, nan detected" << endl;
+        uout() << "casadi::SCPgen: Aborted, nan detected" << endl;
         break;
       }
 
@@ -910,7 +910,7 @@ namespace casadi {
     m->t_mainloop = (time2-time1)/CLOCKS_PER_SEC;
 
     // Store optimal value
-    userOut() << "optimal cost = " << m->fk << endl;
+    uout() << "optimal cost = " << m->fk << endl;
 
     // Save results to outputs
     casadi_copy(&m->fk, 1, m->f);
@@ -921,16 +921,16 @@ namespace casadi {
 
     // Write timers
     if (print_time_) {
-      userOut() << endl;
-      userOut() << "time spent in eval_mat:    " << setw(9) << m->t_eval_mat << " s." << endl;
-      userOut() << "time spent in eval_res:    " << setw(9) << m->t_eval_res << " s." << endl;
-      userOut() << "time spent in eval_vec:    " << setw(9) << m->t_eval_vec << " s." << endl;
-      userOut() << "time spent in eval_exp:    " << setw(9) << m->t_eval_exp << " s." << endl;
-      userOut() << "time spent in solve_qp:    " << setw(9) << m->t_solve_qp << " s." << endl;
-      userOut() << "time spent in main loop:   " << setw(9) << m->t_mainloop << " s." << endl;
+      uout() << endl;
+      uout() << "time spent in eval_mat:    " << setw(9) << m->t_eval_mat << " s." << endl;
+      uout() << "time spent in eval_res:    " << setw(9) << m->t_eval_res << " s." << endl;
+      uout() << "time spent in eval_vec:    " << setw(9) << m->t_eval_vec << " s." << endl;
+      uout() << "time spent in eval_exp:    " << setw(9) << m->t_eval_exp << " s." << endl;
+      uout() << "time spent in solve_qp:    " << setw(9) << m->t_solve_qp << " s." << endl;
+      uout() << "time spent in main loop:   " << setw(9) << m->t_mainloop << " s." << endl;
     }
 
-    userOut() << endl;
+    uout() << endl;
   }
 
   double Scpgen::primalInfeasibility(ScpgenMemory* m) const {

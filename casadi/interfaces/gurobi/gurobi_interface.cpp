@@ -307,7 +307,7 @@ namespace casadi {
       flag = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
       casadi_assert(!flag, GRBgeterrormsg(m->env));
 
-      if (verbose_) userOut() << "return status: " << return_status_string(optimstatus) <<
+      if (verbose_) uout() << "return status: " << return_status_string(optimstatus) <<
         " (" << optimstatus <<")" << std::endl;
 
       // Get the objective value, if requested

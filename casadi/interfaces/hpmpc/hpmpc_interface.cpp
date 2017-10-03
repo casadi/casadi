@@ -686,9 +686,9 @@ namespace casadi {
     m->fstats.at("solver").toc();
     m->fstats.at("postprocessing").tic();
     if (print_level_>0) {
-      userOut() << "HPMPC finished after " << m->iter_count << " iterations." << std::endl;
-      userOut() << "return status: " << m->return_status << std::endl;
-      userOut() << "residuals: " << m->res << std::endl;
+      uout() << "HPMPC finished after " << m->iter_count << " iterations." << std::endl;
+      uout() << "return status: " << m->return_status << std::endl;
+      uout() << "residuals: " << m->res << std::endl;
     }
 
     std::fill(res[CONIC_X], res[CONIC_X]+nx_, 0);

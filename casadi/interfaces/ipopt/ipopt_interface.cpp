@@ -203,9 +203,9 @@ namespace casadi {
     m->app = static_cast<void*>(app);
     *app = new Ipopt::IpoptApplication(false);
 
-    // Direct output through casadi::userOut()
+    // Direct output through casadi::uout()
     StreamJournal* jrnl_raw = new StreamJournal("console", J_ITERSUMMARY);
-    jrnl_raw->SetOutputStream(&casadi::userOut());
+    jrnl_raw->SetOutputStream(&casadi::uout());
     jrnl_raw->SetPrintLevel(J_DBG, J_NONE);
     SmartPtr<Journal> jrnl = jrnl_raw;
     (*app)->Jnlst()->AddJournal(jrnl);
@@ -216,9 +216,9 @@ namespace casadi {
     *userclass = new IpoptUserClass(*this, m);
 
     if (verbose_) {
-      userOut() << "There are " << nx_ << " variables and " << ng_ << " constraints." << endl;
-      if (exact_hessian_) userOut() << "Using exact Hessian" << endl;
-      else             userOut() << "Using limited memory Hessian approximation" << endl;
+      uout() << "There are " << nx_ << " variables and " << ng_ << " constraints." << endl;
+      if (exact_hessian_) uout() << "Using exact Hessian" << endl;
+      else             uout() << "Using limited memory Hessian approximation" << endl;
     }
 
     // Get all options available in (s)IPOPT
@@ -406,7 +406,7 @@ namespace casadi {
           casadi_copy(g, ng_, m->gk);
         } else {
           if (iter==0) {
-            userOut<true>()
+            uout<true>()
               << "Warning: intermediate_callback is disfunctional in your installation. "
               "You will only be able to use stats(). "
               "See https://github.com/casadi/casadi/wiki/enableIpoptCallback to enable it."
@@ -444,7 +444,7 @@ namespace casadi {
     } catch(KeyboardInterruptException& ex) {
       return 0;
     } catch(exception& ex) {
-      userOut<true>() << "intermediate_callback: " << ex.what() << endl;
+      uout<true>() << "intermediate_callback: " << ex.what() << endl;
       if (iteration_callback_ignore_errors_) return 1;
       return 0;
     }
@@ -478,7 +478,7 @@ namespace casadi {
       m->iter_count = iter_count;
 
     } catch(exception& ex) {
-      userOut<true>() << "finalize_solution failed: " << ex.what() << endl;
+      uout<true>() << "finalize_solution failed: " << ex.what() << endl;
     }
   }
 
@@ -492,7 +492,7 @@ namespace casadi {
       casadi_copy(m->ubg, ng_, g_u);
       return true;
     } catch(exception& ex) {
-      userOut<true>() << "get_bounds_info failed: " << ex.what() << endl;
+      uout<true>() << "get_bounds_info failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -527,7 +527,7 @@ namespace casadi {
 
       return true;
     } catch(exception& ex) {
-      userOut<true>() << "get_starting_point failed: " << ex.what() << endl;
+      uout<true>() << "get_starting_point failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -548,7 +548,7 @@ namespace casadi {
       nnz_h_lag = exact_hessian_ ? hesslag_sp_.nnz() : 0;
 
     } catch(exception& ex) {
-      userOut<true>() << "get_nlp_info failed: " << ex.what() << endl;
+      uout<true>() << "get_nlp_info failed: " << ex.what() << endl;
     }
   }
 
@@ -564,7 +564,7 @@ namespace casadi {
         return nv;
       }
     } catch(exception& ex) {
-      userOut<true>() << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
+      uout<true>() << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
       return -1;
     }
   }
@@ -577,7 +577,7 @@ namespace casadi {
       }
       return true;
     } catch(exception& ex) {
-      userOut<true>() << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
+      uout<true>() << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
       return false;
     }
   }

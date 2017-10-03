@@ -119,7 +119,7 @@ namespace casadi {
 
   // Get an output stream
   template<bool Err=false>
-  std::ostream& userOut() {
+  std::ostream& uout() {
     // Singleton pattern
     static Logger::Stream<Err> instance;
     return instance;
@@ -131,7 +131,7 @@ namespace casadi {
     va_list args;
     va_start(args, fmt);
     vsnprintf(buf, 256, fmt, args);
-    userOut() << buf;
+    uout() << buf;
     va_end(args);
   }
 
@@ -141,7 +141,7 @@ namespace casadi {
     va_list args;
     va_start(args, fmt);
     vsnprintf(buf, 256, fmt, args);
-    userOut<true>() << buf;
+    uout<true>() << buf;
     va_end(args);
   }
 

@@ -231,15 +231,15 @@ namespace casadi {
 
     // Header
     if (print_header_) {
-      userOut()
+      uout()
         << "-------------------------------------------" << endl
         << "This is casadi::SQPMethod." << endl;
       if (exact_hessian_) {
-        userOut() << "Using exact Hessian" << endl;
+        uout() << "Using exact Hessian" << endl;
       } else {
-        userOut() << "Using limited memory BFGS Hessian approximation" << endl;
+        uout() << "Using limited memory BFGS Hessian approximation" << endl;
       }
-      userOut()
+      uout()
         << endl
         << "Number of variables:                       " << setw(9) << nx_ << endl
         << "Number of constraints:                     " << setw(9) << ng_ << endl
@@ -420,11 +420,11 @@ namespace casadi {
       double dx_norminf = casadi_norm_inf(nx_, m->dx);
 
       // Print header occasionally
-      if (print_iteration_ && iter % 10 == 0) printIteration(userOut());
+      if (print_iteration_ && iter % 10 == 0) printIteration(uout());
 
       // Printing information about the actual iterate
       if (print_iteration_) {
-        printIteration(userOut(), iter, m->fk, pr_inf, gLag_norminf, dx_norminf,
+        printIteration(uout(), iter, m->fk, pr_inf, gLag_norminf, dx_norminf,
                        m->reg, ls_iter, ls_success);
       }
 
@@ -455,13 +455,13 @@ namespace casadi {
         } catch(KeyboardInterruptException& ex) {
           throw;
         } catch(exception& ex) {
-          userOut<true>() << "intermediate_callback: " << ex.what() << endl;
+          uout<true>() << "intermediate_callback: " << ex.what() << endl;
           if (!iteration_callback_ignore_errors_) ret=1;
         }
 
         if (static_cast<int>(ret)) {
-          userOut() << endl;
-          userOut() << "casadi::SQPMethod: aborted by callback..." << endl;
+          uout() << endl;
+          uout() << "casadi::SQPMethod: aborted by callback..." << endl;
           m->return_status = "User_Requested_Stop";
           break;
         }
@@ -471,23 +471,23 @@ namespace casadi {
 
       // Checking convergence criteria
       if (pr_inf < tol_pr_ && gLag_norminf < tol_du_) {
-        userOut() << endl;
-        userOut() << "casadi::SQPMethod: Convergence achieved after "
+        uout() << endl;
+        uout() << "casadi::SQPMethod: Convergence achieved after "
                   << iter << " iterations." << endl;
         m->return_status = "Solve_Succeeded";
         break;
       }
 
       if (iter >= max_iter_) {
-        userOut() << endl;
-        userOut() << "casadi::SQPMethod: Maximum number of iterations reached." << endl;
+        uout() << endl;
+        uout() << "casadi::SQPMethod: Maximum number of iterations reached." << endl;
         m->return_status = "Maximum_Iterations_Exceeded";
         break;
       }
 
       if (iter > 0 && dx_norminf <= min_step_size_) {
-        userOut() << endl;
-        userOut() << "casadi::SQPMethod: Search direction becomes too small without "
+        uout() << endl;
+        uout() << "casadi::SQPMethod: Search direction becomes too small without "
             "convergence criteria being met." << endl;
         m->return_status = "Search_Direction_Becomes_Too_Small";
         break;

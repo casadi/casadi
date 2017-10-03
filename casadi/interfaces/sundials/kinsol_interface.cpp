@@ -311,7 +311,7 @@ namespace casadi {
         stringstream ss;
         ss << ex.what() << endl;
         if (verbose_) {
-          userOut() << "u = ";
+          uout() << "u = ";
           N_VPrint_Serial(u);
         }
 
@@ -327,7 +327,7 @@ namespace casadi {
       this_->self.func(*this_, u, fval);
       return 0;
     } catch(exception& e) {
-      userOut<true>() << "func failed: " << e.what() << endl;
+      uout<true>() << "func failed: " << e.what() << endl;
       return 1;
     }
   }
@@ -340,7 +340,7 @@ namespace casadi {
       this_->self.djac(*this_, N, u, fu, J, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
-      userOut<true>() << "djac failed: " << e.what() << endl;;
+      uout<true>() << "djac failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -381,7 +381,7 @@ namespace casadi {
       this_->self.bjac(*this_, N, mupper, mlower, u, fu, J, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
-      userOut<true>() << "bjac failed: " << e.what() << endl;;
+      uout<true>() << "bjac failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -423,7 +423,7 @@ namespace casadi {
       this_->self.jtimes(*this_, v, Jv, u, new_u);
       return 0;
     } catch(exception& e) {
-      userOut<true>() << "jtimes failed: " << e.what() << endl;;
+      uout<true>() << "jtimes failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -447,7 +447,7 @@ namespace casadi {
       this_->self.psetup(*this_, u, uscale, fval, fscale, tmp1, tmp2);
       return 0;
     } catch(exception& e) {
-      userOut<true>() << "psetup failed: " << e.what() << endl;;
+      uout<true>() << "psetup failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -479,7 +479,7 @@ namespace casadi {
       this_->self.psolve(*this_, u, uscale, fval, fscale, v, tmp);
       return 0;
     } catch(exception& e) {
-      userOut<true>() << "psolve failed: " << e.what() << endl;;
+      uout<true>() << "psolve failed: " << e.what() << endl;;
       return 1;
     }
   }
@@ -505,7 +505,7 @@ namespace casadi {
 
       return 0;
     } catch(exception& e) {
-      userOut<true>() << "lsetup failed: " << e.what() << endl;;
+      uout<true>() << "lsetup failed: " << e.what() << endl;;
       return -1;
     }
   }
@@ -538,7 +538,7 @@ namespace casadi {
 
       return 0;
     } catch(exception& e) {
-      userOut<true>() << "lsolve failed: " << e.what() << endl;;
+      uout<true>() << "lsolve failed: " << e.what() << endl;;
       return -1;
     }
   }
@@ -550,10 +550,10 @@ namespace casadi {
       auto m = to_mem(eh_data);
       auto& s = m->self;
       if (!s.disable_internal_warnings_) {
-        userOut<true>() << msg << endl;
+        uout<true>() << msg << endl;
       }
     } catch(exception& e) {
-      userOut<true>() << "ehfun failed: " << e.what() << endl;
+      uout<true>() << "ehfun failed: " << e.what() << endl;
     }
   }
 

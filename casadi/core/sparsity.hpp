@@ -715,7 +715,7 @@ namespace casadi {
 
     /** \brief Print a textual representation of sparsity
      */
-    void spy(std::ostream &stream=casadi::userOut()) const;
+    void spy(std::ostream &stream=casadi::uout()) const;
 
     /** \brief Generate a script for Matlab or Octave which visualizes
      * the sparsity using the spy command  */
@@ -723,7 +723,7 @@ namespace casadi {
 
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Alias for disp */
-    void print_compact(std::ostream &stream=casadi::userOut()) const {
+    void print_compact(std::ostream &stream=casadi::uout()) const {
       disp(stream);
     }
 #endif // WITH_DEPRECATED_FEATURES

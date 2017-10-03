@@ -338,13 +338,13 @@ namespace casadi {
                                     int order=1, bool tr=false) const;
 
     /** \brief Print dimensions of inputs and outputs */
-    void print_dimensions(std::ostream &stream=casadi::userOut()) const;
+    void print_dimensions(std::ostream &stream=casadi::uout()) const;
 
     /** \brief Print options to a stream */
-    void print_options(std::ostream &stream=casadi::userOut()) const;
+    void print_options(std::ostream &stream=casadi::uout()) const;
 
     /** \brief Print all information there is to know about a certain option */
-    void print_option(const std::string &name, std::ostream &stream = casadi::userOut()) const;
+    void print_option(const std::string &name, std::ostream &stream = casadi::uout()) const;
 
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const;
@@ -717,7 +717,7 @@ namespace casadi {
 
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Use get_free instead */
-    void print_free(std::ostream &stream=casadi::userOut()) const {
+    void print_free(std::ostream &stream=casadi::uout()) const {
       stream << get_free();
     }
 #endif // WITH_DEPRECATED_FEATURES

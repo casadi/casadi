@@ -399,7 +399,7 @@ namespace casadi {
       << "      proc           wall      num           mean             mean"
       << endl << blankName
       << "      time           time     evals       proc time        wall time";
-    userOut() << s.str() << endl;
+    uout() << s.str() << endl;
 
     std::sort(keys.begin(), keys.end());
     for (auto k : keys) {

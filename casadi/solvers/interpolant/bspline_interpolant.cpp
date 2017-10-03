@@ -160,7 +160,7 @@ namespace casadi {
 
     double fit = static_cast<double>(norm_1(mtimes(J, C_opt) - DM(values_)));
 
-    userOut() << "Lookup table fitting error: " << fit << std::endl;
+    uout() << "Lookup table fitting error: " << fit << std::endl;
 
     S_ = Function::bspline("spline", knots, C_opt.nonzeros(), degree_, 1);
 

@@ -2101,9 +2101,9 @@ namespace std {
 
 #ifndef SWIGXML
 
-// std::ostream & is redirected to casadi::userOut()
+// std::ostream & is redirected to casadi::uout()
 %typemap(in, noblock=1, numinputs=0) std::ostream &stream {
-  $1 = &casadi::userOut();
+  $1 = &casadi::uout();
 }
 
 // Add trailing newline in MATLAB and Octave

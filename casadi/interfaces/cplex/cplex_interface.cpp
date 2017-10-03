@@ -462,7 +462,7 @@ namespace casadi {
 
     int solnstat = CPXgetstat(m->env, m->lp);
     stringstream errormsg;
-    // NOTE: Why not print directly to userOut() and userOut<true>()?
+    // NOTE: Why not print directly to uout() and uout<true>()?
     if (verbose_) {
       if (solnstat == CPX_STAT_OPTIMAL) {
         errormsg << "CPLEX: solution status: Optimal solution found.\n";
@@ -484,12 +484,12 @@ namespace casadi {
       } else {
         errormsg << "CPLEX: solution status: " <<  solnstat << "\n";
       }
-      userOut() << errormsg.str();
+      uout() << errormsg.str();
 
       // Printing basis condition number
       //double cn;
       //status = CPXgetdblquality(m->env, m->lp, &cn, CPX_KAPPA);
-      //userOut() << "CPLEX: Basis condition number: " << cn << endl;
+      //uout() << "CPLEX: Basis condition number: " << cn << endl;
     }
     if (solnstat != CPX_STAT_OPTIMAL) {
       //    throw CasadiException(errormsg.c_str());
@@ -534,7 +534,7 @@ namespace casadi {
     if (this->lp!=0) {
       status = CPXfreeprob(this->env, &this->lp);
       if (status!=0) {
-        userOut<true>() << "CPXfreeprob failed, error code " << status << ".\n";
+        uout<true>() << "CPXfreeprob failed, error code " << status << ".\n";
       }
       this->lp = 0;
     }
@@ -543,7 +543,7 @@ namespace casadi {
     if (this->env!=0) {
       status = CPXcloseCPLEX(&this->env);
       if (status!=0) {
-        userOut<true>() << "CPXcloseCPLEX failed, error code " << status << ".\n";
+        uout<true>() << "CPXcloseCPLEX failed, error code " << status << ".\n";
       }
       this->env = 0;
     }

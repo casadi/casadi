@@ -201,14 +201,14 @@ namespace casadi {
     double arnorm = alpha * beta;
 
 
-  //  userOut() << "   Itn      x[0]       r1norm     r2norm "
+  //  uout() << "   Itn      x[0]       r1norm     r2norm "
   //               "Compatible    LS      Norm A   Cond A" << std::endl;
 
   //  double test1 = 1;
   //  double test2 = alpha / beta;
 
 
-  //  userOut() << itn << ":" << xx[0] << ":" << r1norm << ":" <<
+  //  uout() << itn << ":" << xx[0] << ":" << r1norm << ":" <<
   //r2norm << ":" << test1 << ":" << test2 << std::endl;
 
     while (itn<iter_lim) {

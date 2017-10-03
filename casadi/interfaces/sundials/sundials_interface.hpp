@@ -170,12 +170,12 @@ namespace casadi {
 
     // Print a variable
     static void printvar(const std::string& id, double v) {
-      userOut() << id << " = " << v << std::endl;
+      uout() << id << " = " << v << std::endl;
     }
     // Print an N_Vector
     static void printvar(const std::string& id, N_Vector v) {
       std::vector<double> tmp(NV_DATA_S(v), NV_DATA_S(v)+NV_LENGTH_S(v));
-      userOut() << id << " = " << tmp << std::endl;
+      uout() << id << " = " << tmp << std::endl;
     }
   };
 
