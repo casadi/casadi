@@ -25,7 +25,7 @@
 
 #include "collocation.hpp"
 #include "casadi/core/polynomial.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 
 using namespace std;
 namespace casadi {

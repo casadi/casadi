@@ -25,7 +25,7 @@
 
 #include "sparsity_internal.hpp"
 #include "matrix.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "sparse_storage_impl.hpp"
 #include <climits>
 

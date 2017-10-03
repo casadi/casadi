@@ -24,7 +24,7 @@
 
 
 #include "jit_function.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 
 #include <iostream>
 #include <fstream>

@@ -32,7 +32,7 @@
 #include <ctime>
 #include <cctype>
 
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "exception.hpp"
 #include "code_generator.hpp"
 #include "calculus.hpp"

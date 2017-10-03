@@ -24,7 +24,7 @@
 
 
 #include "clang_compiler.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/casadi_meta.hpp"
 #include <fstream>
 

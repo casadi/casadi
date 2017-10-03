@@ -26,7 +26,7 @@
 #include "sqic_interface.hpp"
 #include "casadi/core/conic.hpp"
 #include "casadi/core/mx_function.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 
 #include "wsqic.hpp"
 #include "casadi/interfaces/sqic/resource_sqic.hpp"

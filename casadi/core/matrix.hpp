@@ -28,7 +28,7 @@
 
 #include "exception.hpp"
 #include "casadi_limits.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "runtime/casadi_runtime.hpp"
 #include "generic_matrix.hpp"
 #include "generic_expression.hpp"

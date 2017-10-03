@@ -24,7 +24,7 @@
 
 
 #include "function_internal.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "sx_function.hpp"
 #include "mx_function.hpp"
 #include "map.hpp"

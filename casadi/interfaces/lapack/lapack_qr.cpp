@@ -24,7 +24,7 @@
 
 
 #include "lapack_qr.hpp"
-#include "../../core/std_vector_tools.hpp"
+#include "../../core/casadi_misc.hpp"
 
 using namespace std;
 namespace casadi {

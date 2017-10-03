@@ -25,7 +25,7 @@
 
 #include "mx.hpp"
 
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 
 namespace casadi {
   std::vector<int> range(int start, int stop, int step, int len) {

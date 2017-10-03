@@ -24,7 +24,7 @@
 
 
 #include "slice.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 
 using namespace std;
 namespace casadi {

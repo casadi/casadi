@@ -23,7 +23,7 @@
  */
 
 #include "casadi_runtime.hpp"
-#include "../std_vector_tools.hpp"
+#include "../casadi_misc.hpp"
 #include <vector>
 #include <map>
 

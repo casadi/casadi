@@ -27,7 +27,7 @@
 #include "slicot_layer.hpp"
 #include "slicot_la.hpp"
 
-#include "../../core/std_vector_tools.hpp"
+#include "../../core/casadi_misc.hpp"
 #include "../../core/mx_function.hpp"
 #include "../../core/sx_function.hpp"
 

@@ -24,7 +24,7 @@
 
 
 #include "cvodes_interface.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 
 #define THROWING(fcn, ...) \
 cvodes_error(CASADI_STR(fcn), fcn(__VA_ARGS__))

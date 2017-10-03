@@ -29,7 +29,7 @@
 #include "binary_mx.hpp"
 #include <vector>
 #include <sstream>
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "global_options.hpp"
 
 using namespace std;

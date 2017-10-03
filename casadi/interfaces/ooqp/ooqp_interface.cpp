@@ -24,7 +24,7 @@
 
 
 #include "ooqp_interface.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 
 // OOQP headers
 #include <cQpGenSparse.h>

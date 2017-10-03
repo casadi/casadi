@@ -26,7 +26,7 @@
 
 #include "bonmin_interface.hpp"
 #include "bonmin_nlp.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 #include "../../core/global_options.hpp"
 #include "../../core/casadi_interrupt.hpp"
 

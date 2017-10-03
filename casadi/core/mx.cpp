@@ -27,7 +27,7 @@
 #include "symbolic_mx.hpp"
 #include "constant_mx.hpp"
 #include "multiple_output.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "norm.hpp"
 #include "calculus.hpp"
 #include "mx_function.hpp"

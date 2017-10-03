@@ -18,7 +18,7 @@ set(CASADI_PUBLIC
   shared_object.hpp           # This base class implements the reference counting (garbage collection) framework used in CasADi
   generic_type.hpp            # Generic type used for options and for compatibility with dynamically typed languages like Python
   options.hpp                 # Functionality for passing options to a class
-  std_vector_tools.hpp        # Set of useful functions for the vector template class in STL
+  casadi_misc.hpp             # Set of useful functions
   timing.hpp
   polynomial.hpp              # Helper class for differentiating and integrating simple polynomials
 
@@ -78,7 +78,7 @@ set(CASADI_INTERNAL
   generic_type.cpp
   generic_type_internal.hpp
   options.cpp
-  std_vector_tools.cpp
+  casadi_misc.cpp
   timing.cpp
   polynomial.cpp
 

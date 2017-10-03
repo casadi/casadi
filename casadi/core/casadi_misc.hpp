@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_STD_VECTOR_TOOLS_HPP
-#define CASADI_STD_VECTOR_TOOLS_HPP
+#ifndef CASADI_MISC_HPP
+#define CASADI_MISC_HPP
 
 #include "exception.hpp"
 #include "casadi_types.hpp"
@@ -624,4 +624,4 @@ namespace casadi {
 } // namespace casadi
 #endif // SWIG
 
-#endif // CASADI_STD_VECTOR_TOOLS_HPP
+#endif // CASADI_MISC_HPP

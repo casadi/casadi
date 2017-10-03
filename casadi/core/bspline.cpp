@@ -25,7 +25,7 @@
 
 #include "bspline.hpp"
 #include "function_internal.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "mx_node.hpp"
 #include <typeinfo>
 

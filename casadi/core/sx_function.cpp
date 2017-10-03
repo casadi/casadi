@@ -30,7 +30,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "sx_node.hpp"
 #include "casadi_types.hpp"
 #include "sparsity_internal.hpp"
