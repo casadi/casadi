@@ -47060,12 +47060,6 @@ Get the number of integrator outputs.
 
 %feature("docstring") casadi::slicot_periodic_schur "[INTERNAL] ";
 
-%feature("docstring") casadi::has_negative "
-
-Check if the vector has negative entries.
-
-";
-
 %feature("docstring") casadi::external "
 
 >  Function casadi::external(const std::string &name, const Dict &opts=Dict())
@@ -47553,6 +47547,8 @@ Generate a hash value incrementally, array.
 
 %feature("docstring") casadi::trim_path "";
 
+%feature("docstring") casadi::uout "";
+
 %feature("docstring") casadi::has_integrator "
 
 Check if a particular plugin is available.
@@ -48029,9 +48025,9 @@ Get output scheme name by index.
 
 ";
 
-%feature("docstring") casadi::has_dple "
+%feature("docstring") casadi::load_rootfinder "
 
-Check if a particular plugin is available.
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -49581,9 +49577,9 @@ Get the number of QP solver outputs.
 
 %feature("docstring") casadi::casadi_low "[INTERNAL] ";
 
-%feature("docstring") casadi::load_rootfinder "
+%feature("docstring") casadi::has_dple "
 
-Explicitly load a plugin dynamically.
+Check if a particular plugin is available.
 
 ";
 
@@ -50555,7 +50551,11 @@ Joel Andersson
 
 %feature("docstring") casadi::casadi_smoothing_diff "[INTERNAL] ";
 
-%feature("docstring") casadi::userOut "";
+%feature("docstring") casadi::has_negative "
+
+Check if the vector has negative entries.
+
+";
 
 %feature("docstring") casadi::casadi_norm_inf_mul "[INTERNAL]  Inf-norm of
 a Matrix-matrix product,*

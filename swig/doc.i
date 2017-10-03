@@ -8962,7 +8962,7 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 ";
 
 %feature("docstring")  casadi::Function::print_free(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [DEPRECATED] Use get_free instead
 
@@ -9069,7 +9069,7 @@ For a particular output or for all of the outputs
 ";
 
 %feature("docstring")  casadi::Function::print_dimensions(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 Print dimensions of inputs and outputs.
 
@@ -9163,7 +9163,7 @@ guarantee that subsequent calls return unique answers.
 ";
 
 %feature("docstring")  casadi::Function::print_options(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 Print options to a stream.
 
@@ -9626,7 +9626,7 @@ const std::vector< std::string > &s_in, const std::vector< std::string >
 ";
 
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [INTERNAL]  Print the pointer to the internal class
 
@@ -9758,7 +9758,7 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 ";
 
 %feature("docstring")  casadi::Function::print_option(const std::string
-&name, std::ostream &stream=casadi::userOut()) const  "
+&name, std::ostream &stream=casadi::uout()) const  "
 
 Print all information there is to know about a certain option.
 
@@ -23461,7 +23461,7 @@ For a particular output or for all of the outputs
 ";
 
 %feature("docstring")  casadi::Function::print_dimensions(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 Print dimensions of inputs and outputs.
 
@@ -23802,7 +23802,7 @@ Do the derivative functions need nondifferentiated outputs?
 ";
 
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [INTERNAL]  Print the pointer to the internal class
 
@@ -23974,7 +23974,7 @@ Checkout a memory object.
 ";
 
 %feature("docstring")  casadi::Function::print_option(const std::string
-&name, std::ostream &stream=casadi::userOut()) const  "
+&name, std::ostream &stream=casadi::uout()) const  "
 
 Print all information there is to know about a certain option.
 
@@ -24420,7 +24420,7 @@ member functions. Joel Andersson >List of available options
 C++ includes: function.hpp ";
 
 %feature("docstring")  casadi::Function::print_free(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [DEPRECATED] Use get_free instead
 
@@ -24722,7 +24722,7 @@ pre-CasADi 3.2
 ";
 
 %feature("docstring")  casadi::Function::print_options(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 Print options to a stream.
 
@@ -29444,7 +29444,7 @@ Get class name.
 ";
 
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [INTERNAL]  Print the pointer to the internal class
 
@@ -38924,7 +38924,7 @@ Query plugin name.
 ";
 
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [INTERNAL]  Print the pointer to the internal class
 
@@ -43863,7 +43863,7 @@ Get primitives.
 ";
 
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [INTERNAL]  Print the pointer to the internal class
 
@@ -47803,7 +47803,7 @@ expression. Use value on it to obtain the numerical value.
 ";
 
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [INTERNAL]  Print the pointer to the internal class
 
@@ -48293,7 +48293,7 @@ update the original.
 ";
 
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [INTERNAL]  Print the pointer to the internal class
 
@@ -55241,7 +55241,7 @@ Is a null pointer?
 ";
 
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [INTERNAL]  Print the pointer to the internal class
 
@@ -59778,7 +59778,7 @@ Create diagonal sparsity pattern.
 ";
 
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [INTERNAL]  Print the pointer to the internal class
 
@@ -59969,7 +59969,7 @@ Check whether the sparsity-pattern indicates structural singularity.
 ";
 
 %feature("docstring")  casadi::Sparsity::print_compact(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [DEPRECATED] Alias for disp
 
@@ -60115,7 +60115,7 @@ Is upper triangular?
 ";
 
 %feature("docstring")  casadi::Sparsity::spy(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 Print a textual representation of sparsity.
 
@@ -61639,7 +61639,7 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 C++ includes: casadi_logger.hpp ";
 
-%feature("docstring") casadi::Logger::Stream< Err, PL >::Stream() "
+%feature("docstring") casadi::Logger::Stream< Err >::Stream() "
 
 ";
 
@@ -61649,7 +61649,7 @@ C++ includes: casadi_logger.hpp ";
 
 C++ includes: casadi_logger.hpp ";
 
-%feature("docstring") casadi::Logger::Streambuf< Err, PL >::Streambuf() "
+%feature("docstring") casadi::Logger::Streambuf< Err >::Streambuf() "
 
 ";
 
@@ -64252,7 +64252,7 @@ Is a null pointer?
 ";
 
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [INTERNAL]  Print the pointer to the internal class
 
@@ -64355,7 +64355,7 @@ Print a description of the object.
 ";
 
 %feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
-&stream=casadi::userOut()) const  "
+&stream=casadi::uout()) const  "
 
 [INTERNAL]  Print the pointer to the internal class
 
@@ -64742,12 +64742,6 @@ double *a, double *t, double *z, double *dwork, double *eig_real, double
 *eig_imag, double num_zero=0) "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::has_negative(const std::vector< T > &v) "
-
-Check if the vector has negative entries.
-
-";
 
 %feature("docstring")  casadi::external(const std::string &name, const Dict
 &opts=Dict()) "
@@ -65316,6 +65310,10 @@ Generate a hash value incrementally (function taken from boost)
 
 ";
 
+%feature("docstring")  casadi::uout() "
+
+";
+
 %feature("docstring")  casadi::has_integrator(const std::string &name) "
 
 Check if a particular plugin is available.
@@ -65796,9 +65794,9 @@ Get output scheme name by index.
 
 ";
 
-%feature("docstring")  casadi::has_dple(const std::string &name) "
+%feature("docstring")  casadi::load_rootfinder(const std::string &name) "
 
-Check if a particular plugin is available.
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -67462,9 +67460,9 @@ int lookup_mode) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::load_rootfinder(const std::string &name) "
+%feature("docstring")  casadi::has_dple(const std::string &name) "
 
-Explicitly load a plugin dynamically.
+Check if a particular plugin is available.
 
 ";
 
@@ -68476,7 +68474,9 @@ T1 h, int n_y, const casadi_finite_diff_mem< T1 > *m) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::userOut() "
+%feature("docstring")  casadi::has_negative(const std::vector< T > &v) "
+
+Check if the vector has negative entries.
 
 ";
 

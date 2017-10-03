@@ -1504,7 +1504,7 @@
 %exception  casadi::Scpgen::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SharedObject::print_ptr(std::ostream &stream=casadi::userOut()) const  {
+%exception  casadi::SharedObject::print_ptr(std::ostream &stream=casadi::uout()) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SharedObjectInternal::class_name() const  {
