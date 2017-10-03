@@ -28,7 +28,7 @@
 
 #include "shared_object.hpp"
 #include "printable.hpp"
-#include "casadi_types.hpp"
+#include "casadi_common.hpp"
 #include "sparsity_interface.hpp"
 #include <vector>
 #include <list>

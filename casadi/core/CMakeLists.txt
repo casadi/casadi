@@ -7,7 +7,7 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}/runtime")
 set(CASADI_PUBLIC
   # MISC
   casadi_limits.hpp
-  casadi_types.hpp
+  casadi_common.hpp
   casadi_logger.hpp
   casadi_interrupt.hpp
   exception.hpp

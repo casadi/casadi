@@ -23,8 +23,8 @@
  */
 
 
-#ifndef CASADI_CASADI_TYPES_HPP
-#define CASADI_CASADI_TYPES_HPP
+#ifndef CASADI_COMMON_HPP
+#define CASADI_COMMON_HPP
 
 #include <cmath>
 #include <climits>
@@ -288,4 +288,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // CASADI_CASADI_TYPES_HPP
+#endif // CASADI_COMMON_HPP

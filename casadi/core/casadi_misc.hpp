@@ -27,7 +27,7 @@
 #define CASADI_MISC_HPP
 
 #include "exception.hpp"
-#include "casadi_types.hpp"
+#include "casadi_common.hpp"
 
 /** \brief Convenience tools for C++ Standard Library vectors
     \author Joel Andersson

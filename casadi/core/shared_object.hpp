@@ -26,7 +26,7 @@
 #ifndef CASADI_SHARED_OBJECT_HPP
 #define CASADI_SHARED_OBJECT_HPP
 
-#include "casadi_types.hpp"
+#include "casadi_common.hpp"
 #include "exception.hpp"
 #include <map>
 #include <vector>

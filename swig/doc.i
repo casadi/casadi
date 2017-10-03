@@ -43172,7 +43172,7 @@ but numerically zero.  Matrix<Scalar> is polymorphic with a
 std::vector<Scalar> that contain all non-identical-zero elements. The
 sparsity can be accessed with Sparsity& sparsity() Joel Andersson
 
-C++ includes: casadi_types.hpp ";
+C++ includes: casadi_common.hpp ";
 
 %feature("docstring")  casadi::SX::dep(int ch=0) const  "
 

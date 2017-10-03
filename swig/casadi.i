@@ -2582,7 +2582,7 @@ namespace casadi{
 
 %include <casadi/core/shared_object.hpp>
 %include <casadi/core/casadi_misc.hpp>
-%include <casadi/core/casadi_types.hpp>
+%include <casadi/core/casadi_common.hpp>
 %include <casadi/core/generic_type.hpp>
 %include <casadi/core/calculus.hpp>
 %include <casadi/core/sparsity_interface.hpp>

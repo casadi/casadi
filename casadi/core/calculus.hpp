@@ -31,7 +31,7 @@
 #include <cmath>
 #include <limits>
 #include <algorithm>
-#include "casadi_types.hpp"
+#include "casadi_common.hpp"
 
 // Define pi if the compiler fails to do so
 

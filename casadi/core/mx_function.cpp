@@ -24,7 +24,7 @@
 
 #include "mx_function.hpp"
 #include "casadi_misc.hpp"
-#include "casadi_types.hpp"
+#include "casadi_common.hpp"
 #include "global_options.hpp"
 #include "casadi_interrupt.hpp"
 #include "io_instruction.hpp"

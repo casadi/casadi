@@ -32,7 +32,7 @@
 #include <iomanip>
 #include "casadi_misc.hpp"
 #include "sx_node.hpp"
-#include "casadi_types.hpp"
+#include "casadi_common.hpp"
 #include "sparsity_internal.hpp"
 #include "global_options.hpp"
 #include "casadi_interrupt.hpp"
