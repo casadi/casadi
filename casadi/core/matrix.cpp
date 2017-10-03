@@ -1206,10 +1206,10 @@ namespace casadi {
                                                const Matrix<Scalar> &x,
                                                const Matrix<Scalar> &y) {
     casadi_assert(x.size()==y.size(),
-      "Dimension mismatch in element-wise operation " +
-      casadi_math<Scalar>::print(op, "lhs", "rhs") + ".\n"
-      "Left argument is " + x.dim() + ", right is " + y.dim() + ". "
-      "Dimension should be equal.");
+      "Dimension mismatch in element-wise operation %s.\n"
+      "Left argument is %s, right is %s. "
+      "Dimensions should be equal.",
+      casadi_math<Scalar>::print(op, "lhs", "rhs"), x.dim(), y.dim());
 
     // Get the sparsity pattern of the result
     // (ignoring structural zeros giving rise to nonzero result)

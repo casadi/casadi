@@ -70,19 +70,6 @@ class CasadiException : public std::exception {
     return msg_.c_str();
   }
 
-  //! \brief Append a message
-  CasadiException& operator<<(const std::string& msg) {
-    msg_ += msg;
-    return *this;
-  }
-
-  //! \brief Append an exception
-  CasadiException& operator<<(const std::exception& ex) {
-    msg_ += " => ";
-    msg_ += ex.what();
-    return *this;
-  }
-
   protected:
   std::string msg_;
 };
@@ -115,12 +102,14 @@ inline std::string trim_path(const std::string& full_path) {
 #define CASADI_WHERE casadi::trim_path(__FILE__ ":" CASADI_STR(__LINE__))
 
 // Throw an exception with information about source code location
-#define casadi_error(msg) \
-  throw casadi::CasadiException(CASADI_WHERE + ": " + std::string(msg))
+#define casadi_error(msg, ...) \
+throw casadi::CasadiException(CASADI_WHERE + ": "\
+          + casadi::fmtstr(msg, casadi::strvec(__VA_ARGS__)))
 
 // This assertion checks for illegal user inputs
-#define casadi_assert(x, msg) \
-  if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n" + std::string(msg))
+#define casadi_assert(x, msg, ...) \
+if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n"\
+          + std::string(msg), __VA_ARGS__)
 
 // This assertion if for internal errors caused by bugs in CasADi
 #define casadi_assert_dev(x) casadi_assert(x, "Notify the CasADi developers.")

@@ -26,18 +26,6 @@
 #ifndef CASADI_STD_VECTOR_TOOLS_HPP
 #define CASADI_STD_VECTOR_TOOLS_HPP
 
-
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <fstream>
-#include <vector>
-#include <iterator>
-#include <limits>
-#include <algorithm>
-#include <map>
-#include <set>
-#include <cmath>
 #include "exception.hpp"
 #include "casadi_types.hpp"
 
@@ -178,32 +166,6 @@ namespace casadi {
   /// Check if the vector has negative entries
   template<typename T>
   bool has_negative(const std::vector<T> &v);
-
-#ifndef SWIG
-  /// String representation, any type
-  template<typename T>
-  std::string str(const T& v);
-
-  /// String representation, CasADi type
-  template<typename T>
-  std::string str(const T& v, bool more);
-
-  /// String representation of vector
-  template<typename T>
-  std::string str(const std::vector<T>& v, bool more=false);
-
-  /// String representation of pair
-  template<typename T1, typename T2>
-  std::string str(const std::pair<T1, T2>& p, bool more=false);
-
-  /// String representation of a map
-  template<typename T1, typename T2>
-  std::string str(const std::map<T1, T2> &p, bool more=false);
-
-  /// String representation of a dictionary
-  template<typename T2>
-  std::string str(const std::map<std::string, T2> &p, bool more=false);
-#endif //SWIG
 
   /// Print vector, matlab style
   template<typename T>
@@ -452,63 +414,6 @@ namespace casadi {
       if (v[i]<0) return true;
     }
     return false;
-  }
-
-  template<typename T>
-  std::string str(const T& v) {
-    std::stringstream ss;
-    ss << v;
-    return ss.str();
-  }
-
-  template<typename T>
-  std::string str(const T& v, bool more) {
-    return v.get_str(more);
-  }
-
-  template<typename T>
-  std::string str(const std::vector<T>& v, bool more) {
-    std::stringstream ss;
-    ss << "[";
-    for (int i=0; i<v.size(); ++i) {
-      if (i!=0) ss << ", ";
-      ss << v[i];
-    }
-    ss << "]";
-    return ss.str();
-  }
-
-  template<typename T1, typename T2>
-  std::string str(const std::pair<T1, T2>& p, bool more) {
-    std::stringstream ss;
-    ss << "[" << p.first << "," << p.second << "]";
-    return ss.str();
-  }
-
-  template<typename T1, typename T2>
-  std::string str(const std::map<T1, T2>& p, bool more) {
-    std::stringstream ss;
-    ss << "{";
-    int count = 0;
-    for (auto& e : p) {
-      ss << e.first << ": " << e.second;
-      if (++count < p.size()) ss << ", ";
-    }
-    ss << "}";
-    return ss.str();
-  }
-
-  template<typename T2>
-  std::string str(const std::map<std::string, T2>& p, bool more) {
-    std::stringstream ss;
-    ss << "{";
-    int count = 0;
-    for (auto& e : p) {
-      ss << "\"" << e.first << "\": " << e.second;
-      if (++count < p.size()) ss << ", ";
-    }
-    ss << "}";
-    return ss.str();
   }
 
   template<typename T>

@@ -26,9 +26,19 @@
 #ifndef CASADI_CASADI_TYPES_HPP
 #define CASADI_CASADI_TYPES_HPP
 
+#include <cmath>
 #include <climits>
+#include <limits>
 #include <vector>
+#include <set>
+#include <map>
 #include <utility>
+#include <sstream>
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <algorithm>
+#include <iterator>
 
 #include "casadi_logger.hpp"
 
@@ -137,6 +147,143 @@ namespace casadi {
   typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, void* mem);
   ///@}
 
+  /// String representation, any type
+  template<typename T>
+  std::string str(const T& v);
+
+  /// String representation, CasADi type
+  template<typename T>
+  std::string str(const T& v, bool more);
+
+  /// String representation of vector
+  template<typename T>
+  std::string str(const std::vector<T>& v, bool more=false);
+
+  /// String representation of pair
+  template<typename T1, typename T2>
+  std::string str(const std::pair<T1, T2>& p, bool more=false);
+
+  /// String representation of a map
+  template<typename T1, typename T2>
+  std::string str(const std::map<T1, T2> &p, bool more=false);
+
+  /// String representation of a dictionary
+  template<typename T2>
+  std::string str(const std::map<std::string, T2> &p, bool more=false);
+
+
+  //! \brief Create a list of strings from __VA_ARGS__, no argument
+  inline std::vector<std::string> strvec() {
+    return {};
+  }
+
+  //! \brief Create a list of strings from __VA_ARGS__, one argument
+  template<typename T1>
+  inline std::vector<std::string> strvec(const T1& t1) {
+    return {str(t1)};
+  }
+
+  //! \brief Create a list of strings from __VA_ARGS__, two arguments
+  template<typename T1, typename T2>
+  inline std::vector<std::string> strvec(const T1& t1, const T2& t2) {
+    return {str(t1), str(t2)};
+  }
+
+  //! \brief Create a list of strings from __VA_ARGS__, three arguments
+  template<typename T1, typename T2, typename T3>
+  inline std::vector<std::string> strvec(const T1& t1, const T2& t2, const T3& t3) {
+    return {str(t1), str(t2), str(t3)};
+  }
+
+  //! \brief Create a list of strings from __VA_ARGS__, four arguments
+  template<typename T1, typename T2, typename T3, typename T4>
+  inline std::vector<std::string> strvec(const T1& t1, const T2& t2, const T3& t3,
+                                         const T4& t4) {
+    return {str(t1), str(t2), str(t3), str(t4)};
+  }
+
+  //! \brief Create a list of strings from __VA_ARGS__, five arguments
+  template<typename T1, typename T2, typename T3, typename T4, typename T5>
+  inline std::vector<std::string> strvec(const T1& t1, const T2& t2, const T3& t3,
+                                         const T4& t4, const T5& t5) {
+    return {str(t1), str(t2), str(t3), str(t4), str(t5)};
+  }
+
+  //! \brief Create a list of strings from __VA_ARGS__, six arguments
+  template<typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+  inline std::vector<std::string> strvec(const T1& t1, const T2& t2, const T3& t3,
+                                         const T4& t4, const T5& t5, const T6& t6) {
+    return {str(t1), str(t2), str(t3), str(t4), str(t5), str(t6)};
+  }
+
+  //! \brief Create a string from a formated string
+  inline std::string fmtstr(const std::string& fmt, const std::vector<std::string>& args) {
+    std::string s = fmt;
+    for (auto&& e : args) {
+      std::string::size_type n = s.find("%s");
+      if (n==std::string::npos) return "** Ill-formated string ** " + fmt;
+      s.replace(n, 2, e);
+    }
+    return s;
+  }
+
+  // Implementations
+  template<typename T>
+  std::string str(const T& v) {
+    std::stringstream ss;
+    ss << v;
+    return ss.str();
+  }
+
+  template<typename T>
+  std::string str(const T& v, bool more) {
+    return v.get_str(more);
+  }
+
+  template<typename T>
+  std::string str(const std::vector<T>& v, bool more) {
+    std::stringstream ss;
+    ss << "[";
+    for (int i=0; i<v.size(); ++i) {
+      if (i!=0) ss << ", ";
+      ss << v[i];
+    }
+    ss << "]";
+    return ss.str();
+  }
+
+  template<typename T1, typename T2>
+  std::string str(const std::pair<T1, T2>& p, bool more) {
+    std::stringstream ss;
+    ss << "[" << p.first << "," << p.second << "]";
+    return ss.str();
+  }
+
+  template<typename T1, typename T2>
+  std::string str(const std::map<T1, T2>& p, bool more) {
+    std::stringstream ss;
+    ss << "{";
+    int count = 0;
+    for (auto& e : p) {
+      ss << e.first << ": " << e.second;
+      if (++count < p.size()) ss << ", ";
+    }
+    ss << "}";
+    return ss.str();
+  }
+
+  template<typename T2>
+  std::string str(const std::map<std::string, T2>& p, bool more) {
+    std::stringstream ss;
+    ss << "{";
+    int count = 0;
+    for (auto& e : p) {
+      ss << "\"" << e.first << "\": " << e.second;
+      if (++count < p.size()) ss << ", ";
+    }
+    ss << "}";
+    return ss.str();
+  }
 #endif // SWIG
 
 } // namespace casadi
