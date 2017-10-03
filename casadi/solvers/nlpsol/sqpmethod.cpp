@@ -455,7 +455,7 @@ namespace casadi {
         } catch(KeyboardInterruptException& ex) {
           throw;
         } catch(exception& ex) {
-          userOut<true, PL_WARN>() << "intermediate_callback: " << ex.what() << endl;
+          userOut<true>() << "intermediate_callback: " << ex.what() << endl;
           if (!iteration_callback_ignore_errors_) ret=1;
         }
 

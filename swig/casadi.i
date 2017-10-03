@@ -82,10 +82,7 @@
 %}
 %init %{
   // Set logger functions
-  casadi::Logger::writeWarn = casadi::pythonlogger;
-  casadi::Logger::writeProg = casadi::pythonlogger;
-  casadi::Logger::writeDebug = casadi::pythonlogger;
-  casadi::Logger::writeAll = casadi::pythonlogger;
+  casadi::Logger::writeFun = casadi::pythonlogger;
 
   // @jgillis: please document
   casadi::InterruptHandler::checkInterrupted = casadi::pythoncheckinterrupted;
@@ -155,10 +152,7 @@
 
 
   // Set logger functions
-  casadi::Logger::writeWarn = casadi::mexlogger;
-  casadi::Logger::writeProg = casadi::mexlogger;
-  casadi::Logger::writeDebug = casadi::mexlogger;
-  casadi::Logger::writeAll = casadi::mexlogger;
+  casadi::Logger::writeFun = casadi::mexlogger;
   casadi::Logger::flush = casadi::mexflush;
 
   // @jgillis: please document
@@ -768,7 +762,7 @@ namespace std {
         return true;
       }
     }
-    
+
     bool is_scalar_np_array(GUESTOBJECT *p) {
       if (PyObject_HasAttrString(p, "__array__")) {
         PyObject *cr = PyObject_GetAttrString(p, (char*) "size");
@@ -785,7 +779,7 @@ namespace std {
       }
       return false;
    }
-      
+
 #endif
 
 

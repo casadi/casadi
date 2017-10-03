@@ -33,22 +33,6 @@
 #include <cstdarg>
 
 namespace casadi {
-
-  /// Print levels
-  enum PrintLevel {
-    /// No printing at all
-    PL_NONE,
-    /// Only print warnings
-    PL_WARN,
-    /// Print evaluation progress
-    PL_PROG,
-    /// Print error messages useful for debugging
-    PL_DEBUG,
-    /// Print everything
-    PL_ALL,
-    PL_NUM_LEVELS
-  };
-
   /**
    * \brief Keeps track of logging output to screen and/or files.
    * All printout from CasADi routines should go through this files.
@@ -62,20 +46,8 @@ namespace casadi {
     Logger();
 
   public:
-    /// Print level, i.e. the highest level being printed
-    static PrintLevel level;
-
     /// Print warnings, can be redefined
-    static void (*writeWarn)(const char* s, std::streamsize num, bool error);
-
-    /// Print progress, can be redefined
-    static void (*writeProg)(const char* s, std::streamsize num, bool error);
-
-    /// Print debug information, can be redefined
-    static void (*writeDebug)(const char* s, std::streamsize num, bool error);
-
-    /// Print everything, can be redefined
-    static void (*writeAll)(const char* s, std::streamsize num, bool error);
+    static void (*writeFun)(const char* s, std::streamsize num, bool error);
 
     /// Flush buffers
     static void (*flush)(bool error);
@@ -103,50 +75,29 @@ namespace casadi {
     }
 
     /// Print output message
-    template<bool Err, PrintLevel PL> static void write(const char* s, std::streamsize num) {
-      switch (PL) {
-      case PL_NONE:
-        // No print
-        break;
-      case PL_WARN:
-        // Warnings
-        writeWarn(s, num, Err);
-        break;
-      case PL_PROG:
-        // Progress
-        writeProg(s, num, Err);
-        break;
-      case PL_DEBUG: break;
-        // Debug information
-        writeDebug(s, num, Err);
-        break;
-      case PL_ALL: break;
-        // All information
-        writeAll(s, num, Err);
-        break;
-      case PL_NUM_LEVELS:
-        break;
-      }
+    template<bool Err> static void write(const char* s, std::streamsize num) {
+      // All information
+      writeFun(s, num, Err);
     }
 
     /// Print log message, single character
-    template<bool Err, PrintLevel PL> static void writeCh(char ch) {
-      write<Err, PL>(&ch, 1);
+    template<bool Err> static void writeCh(char ch) {
+      write<Err>(&ch, 1);
     }
 
     // Stream buffer for std::cout like printing
-    template<bool Err, PrintLevel PL> class Streambuf : public std::streambuf {
+    template<bool Err> class Streambuf : public std::streambuf {
     public:
       Streambuf() {}
     protected:
       int_type overflow(int_type ch) override {
         if (ch != traits_type::eof()) {
-          writeCh<Err, PL>(static_cast<char>(ch));
+          writeCh<Err>(static_cast<char>(ch));
         }
         return ch;
       }
       std::streamsize xsputn(const char* s, std::streamsize num) override {
-        write<Err, PL>(s, num);
+        write<Err>(s, num);
         return num;
       }
       int sync() override {
@@ -156,9 +107,9 @@ namespace casadi {
     };
 
     // Output stream for std::cout like printing
-    template<bool Err, PrintLevel PL>  class Stream : public std::ostream {
+    template<bool Err>  class Stream : public std::ostream {
     protected:
-      Streambuf<Err, PL> buf;
+      Streambuf<Err> buf;
     public:
       Stream() : std::ostream(&buf) {}
     };
@@ -167,10 +118,10 @@ namespace casadi {
   };
 
   // Get an output stream
-  template<bool Err=false, PrintLevel PL=PL_PROG>
+  template<bool Err=false>
   std::ostream& userOut() {
     // Singleton pattern
-    static Logger::Stream<Err, PL> instance;
+    static Logger::Stream<Err> instance;
     return instance;
   }
 
@@ -190,7 +141,7 @@ namespace casadi {
     va_list args;
     va_start(args, fmt);
     vsnprintf(buf, 256, fmt, args);
-    userOut<true, PL_WARN>() << buf;
+    userOut<true>() << buf;
     va_end(args);
   }
 

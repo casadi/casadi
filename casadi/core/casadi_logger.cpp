@@ -27,21 +27,9 @@
 
 namespace casadi {
 
-  PrintLevel Logger::level = PL_ALL;
-
-  void (*Logger::writeWarn)(const char* s, std::streamsize num, bool error) =
+  void (*Logger::writeFun)(const char* s, std::streamsize num, bool error) =
     Logger::writeDefault;
 
-  void (*Logger::writeProg)(const char* s, std::streamsize num, bool error) =
-    Logger::writeDefault;
-
-  void (*Logger::writeDebug)(const char* s, std::streamsize num, bool error) =
-    Logger::writeDefault;
-
-  void (*Logger::writeAll)(const char* s, std::streamsize num, bool error) =
-    Logger::writeDefault;
-
-  void (*Logger::flush)(bool error) =
-    Logger::flushDefault;
+  void (*Logger::flush)(bool error) =Logger::flushDefault;
 
 } // namespace casadi

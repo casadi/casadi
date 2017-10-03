@@ -135,10 +135,10 @@ namespace casadi {
       userOut() << message << std::endl;
     }
     if (mode & WORHP_PRINT_WARNING) {
-      userOut<true, PL_WARN>() << message << std::endl;
+      userOut<true>() << message << std::endl;
     }
     if (mode & WORHP_PRINT_ERROR) {
-      userOut<true, PL_WARN>() << message << std::endl;
+      userOut<true>() << message << std::endl;
     }
   }
 

@@ -325,7 +325,7 @@ namespace casadi {
 
       return 0;
     } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "KnitroInterface::callback caugth exception: "
+      userOut<true>() << "KnitroInterface::callback caugth exception: "
                                << ex.what() << endl;
       return -1;
     }
