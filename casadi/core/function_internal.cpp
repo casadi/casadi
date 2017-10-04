@@ -2535,10 +2535,6 @@ namespace casadi {
     print("%9.3g [s]  %9.3g [s]", t_proc, t_wall);
     if (n_call != -1) {
       print(" %5g", n_call);
-      if (n_call >= 2) {
-        // only print averages if there is more than 1 eval
-        print(" %10.3g [ms]  %10.3g [ms]", 1000*t_proc/n_call, 1000*t_wall/n_call);
-      }
     }
     print("\n");
   }

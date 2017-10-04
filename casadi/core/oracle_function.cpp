@@ -310,14 +310,9 @@ namespace casadi {
     maxNameLen = max(std::string("solver").size(), maxNameLen);
 
     // Print header
-    std::stringstream s;
     std::string blankName(maxNameLen, ' ');
-    s << blankName
-      << "      proc           wall      num           mean             mean"
-      << endl << blankName
-      << "      time           time     evals       proc time        wall time"
-      << endl;
-    uout() << s.str();
+    uout() << blankName << "      proc           wall      num\n"
+           << blankName << "      time           time     evals\n";
 
     // Sort the keys according to order
     std::vector<std::string> keys_order0;

@@ -392,14 +392,9 @@ namespace casadi {
     }
 
     // Print header
-    std::stringstream s;
     std::string blankName(maxNameLen, ' ');
-    s
-      << blankName
-      << "      proc           wall      num           mean             mean"
-      << endl << blankName
-      << "      time           time     evals       proc time        wall time";
-    uout() << s.str() << endl;
+    uout() << blankName << "      proc           wall      num\n"
+           << blankName << "      time           time     evals\n";
 
     std::sort(keys.begin(), keys.end());
     for (auto k : keys) {
