@@ -231,21 +231,18 @@ namespace casadi {
 
     // Header
     if (print_header_) {
-      uout()
-        << "-------------------------------------------" << endl
-        << "This is casadi::SQPMethod." << endl;
+      print("-------------------------------------------\n");
+      print("This is casadi::Sqpmethod.\n");
       if (exact_hessian_) {
-        uout() << "Using exact Hessian" << endl;
+        print("Using exact Hessian\n");
       } else {
-        uout() << "Using limited memory BFGS Hessian approximation" << endl;
+        print("Using limited memory BFGS Hessian approximation\n");
       }
-      uout()
-        << endl
-        << "Number of variables:                       " << setw(9) << nx_ << endl
-        << "Number of constraints:                     " << setw(9) << ng_ << endl
-        << "Number of nonzeros in constraint Jacobian: " << setw(9) << Asp_.nnz() << endl
-        << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << Hsp_.nnz() << endl
-        << endl;
+      print("Number of variables:                       %9d\n", nx_);
+      print("Number of constraints:                     %9d\n", ng_);
+      print("Number of nonzeros in constraint Jacobian: %9d\n", Asp_.nnz());
+      print("Number of nonzeros in Lagrangian Hessian:  %9d\n", Hsp_.nnz());
+      print("\n");
     }
 
     // Lagrange multipliers of the NLP
@@ -420,11 +417,11 @@ namespace casadi {
       double dx_norminf = casadi_norm_inf(nx_, m->dx);
 
       // Print header occasionally
-      if (print_iteration_ && iter % 10 == 0) printIteration(uout());
+      if (print_iteration_ && iter % 10 == 0) print_iteration();
 
       // Printing information about the actual iterate
       if (print_iteration_) {
-        printIteration(uout(), iter, m->fk, pr_inf, gLag_norminf, dx_norminf,
+        print_iteration(iter, m->fk, pr_inf, gLag_norminf, dx_norminf,
                        m->reg, ls_iter, ls_success);
       }
 
@@ -455,13 +452,12 @@ namespace casadi {
         } catch(KeyboardInterruptException& ex) {
           throw;
         } catch(exception& ex) {
-          uout<true>() << "intermediate_callback: " << ex.what() << endl;
+          print("WARNING(sqpmethod): intermediate_callback error: %s\n", ex.what());
           if (!iteration_callback_ignore_errors_) ret=1;
         }
 
         if (static_cast<int>(ret)) {
-          uout() << endl;
-          uout() << "casadi::SQPMethod: aborted by callback..." << endl;
+          print("WARNING(sqpmethod): Aborted by callback...\n");
           m->return_status = "User_Requested_Stop";
           break;
         }
@@ -471,24 +467,20 @@ namespace casadi {
 
       // Checking convergence criteria
       if (pr_inf < tol_pr_ && gLag_norminf < tol_du_) {
-        uout() << endl;
-        uout() << "casadi::SQPMethod: Convergence achieved after "
-                  << iter << " iterations." << endl;
+        print("MESSAGE(sqpmethod): Convergence achieved after %d iterations\n", iter);
         m->return_status = "Solve_Succeeded";
         break;
       }
 
       if (iter >= max_iter_) {
-        uout() << endl;
-        uout() << "casadi::SQPMethod: Maximum number of iterations reached." << endl;
+        print("MESSAGE(sqpmethod): Maximum number of iterations reached.\n");
         m->return_status = "Maximum_Iterations_Exceeded";
         break;
       }
 
       if (iter > 0 && dx_norminf <= min_step_size_) {
-        uout() << endl;
-        uout() << "casadi::SQPMethod: Search direction becomes too small without "
-            "convergence criteria being met." << endl;
+        print("MESSAGE(sqpmethod): Search direction becomes too small without "
+              "convergence criteria being met.\n");
         m->return_status = "Search_Direction_Becomes_Too_Small";
         break;
       }
@@ -496,7 +488,7 @@ namespace casadi {
       // Start a new iteration
       iter++;
 
-      if (verbose_) casadi_message("Formulating QP");
+      if (verbose_) print("Formulating QP\n");
       // Formulate the QP
       transform(m->lbx, m->lbx + nx_, m->xk, m->qp_LBX, std::minus<double>());
       transform(m->ubx, m->ubx + nx_, m->xk, m->qp_UBX, std::minus<double>());
@@ -506,12 +498,12 @@ namespace casadi {
       // Solve the QP
       solve_QP(m, m->Bk, m->gf, m->qp_LBX, m->qp_UBX, m->Jk, m->qp_LBA,
                m->qp_UBA, m->dx, m->qp_DUAL_X, m->qp_DUAL_A);
-      if (verbose_) casadi_message("QP solved");
+      if (verbose_) print("QP solved\n");
 
       // Detecting indefiniteness
       double gain = casadi_bilin(m->Bk, Hsp_, m->dx, m->dx);
       if (gain < 0) {
-        casadi_warning("Indefinite Hessian detected...");
+        print("WARNING(sqpmethod): Indefinite Hessian detected\n");
       }
 
       // Calculate penalty parameter of merit function
@@ -542,7 +534,7 @@ namespace casadi {
       ls_success = true;
 
       // Line-search
-      if (verbose_) casadi_message("Starting line-search");
+      if (verbose_) print("Starting line-search\n");
       if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
 
         // Line-search loop
@@ -578,14 +570,14 @@ namespace casadi {
           double meritmax = *max_element(m->merit_mem.begin(), m->merit_mem.end());
           if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
             // Accepting candidate
-            if (verbose_) casadi_message("Line-search completed, candidate accepted");
+            if (verbose_) print("Line-search completed, candidate accepted\n");
             break;
           }
 
           // Line-search not successful, but we accept it.
           if (ls_iter == max_iter_ls_) {
             ls_success = false;
-            if (verbose_) casadi_message("Line-search completed, maximum number of iterations");
+            if (verbose_) print("Line-search completed, maximum number of iterations\n");
             break;
           }
 
@@ -619,7 +611,7 @@ namespace casadi {
       }
 
       // Evaluate the constraint Jacobian
-      if (verbose_) casadi_message("Evaluating jac_g");
+      if (verbose_) print("Evaluating jac_g\n");
       if (ng_) {
         m->arg[0] = m->xk;
         m->arg[1] = m->p;
@@ -629,7 +621,7 @@ namespace casadi {
       }
 
       // Evaluate the gradient of the objective function
-      if (verbose_) casadi_message("Evaluating grad_f");
+      if (verbose_) print("Evaluating grad_f\n");
       m->arg[0] = m->xk;
       m->arg[1] = m->p;
       m->res[0] = &m->fk;
@@ -645,7 +637,7 @@ namespace casadi {
 
       // Updating Lagrange Hessian
       if (!exact_hessian_) {
-        if (verbose_) casadi_message("Updating Hessian (BFGS)");
+        if (verbose_) print("Updating Hessian (BFGS)\n");
         // BFGS with careful updates and restarts
         if (iter % lbfgs_memory_ == 0) {
           // Reset Hessian approximation by dropping all off-diagonal entries
@@ -673,7 +665,7 @@ namespace casadi {
 
       } else {
         // Exact Hessian
-        if (verbose_) casadi_message("Evaluating hessian");
+        if (verbose_) print("Evaluating hessian\n");
         double sigma = 1.;
         m->arg[0] = m->xk;
         m->arg[1] = m->p;
@@ -701,36 +693,23 @@ namespace casadi {
 
   }
 
-  void Sqpmethod::printIteration(std::ostream &stream) const {
-    stream << setw(4)  << "iter";
-    stream << setw(15) << "objective";
-    stream << setw(10) << "inf_pr";
-    stream << setw(10) << "inf_du";
-    stream << setw(10) << "||d||";
-    stream << setw(7) << "lg(rg)";
-    stream << setw(3) << "ls";
-    stream << ' ';
-    stream << endl;
+  void Sqpmethod::print_iteration() const {
+    print("%4s %14s %9s %9s %9s %7s %2s\n", "iter", "objective", "inf_pr",
+          "inf_du", "||d||", "lg(rg)", "ls");
   }
 
-  void Sqpmethod::printIteration(std::ostream &stream, int iter, double obj,
-                                 double pr_inf, double du_inf,
-                                 double dx_norm, double rg, int ls_trials, bool ls_success) const {
-    stream << setw(4) << iter;
-    stream << scientific;
-    stream << setw(15) << setprecision(6) << obj;
-    stream << setw(10) << setprecision(2) << pr_inf;
-    stream << setw(10) << setprecision(2) << du_inf;
-    stream << setw(10) << setprecision(2) << dx_norm;
-    stream << fixed;
+  void Sqpmethod::print_iteration(int iter, double obj,
+                                  double pr_inf, double du_inf,
+                                  double dx_norm, double rg, int ls_trials, bool ls_success) const {
+    print("%4d %14.6e %9.2e %9.2e %9.2e ", iter, obj, pr_inf, du_inf, dx_norm);
     if (rg>0) {
-      stream << setw(7) << setprecision(2) << log10(rg);
+      print("%7.2d ", log10(rg));
     } else {
-      stream << setw(7) << "-";
+      print("%7s ", "-");
     }
-    stream << setw(3) << ls_trials;
-    stream << (ls_success ? ' ' : 'F');
-    stream << endl;
+    print("%2d", ls_trials);
+    if (!ls_success) print("F");
+    print("\n");
   }
 
   void Sqpmethod::reset_h(SqpmethodMemory* m) const {

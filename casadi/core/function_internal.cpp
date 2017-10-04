@@ -2061,7 +2061,7 @@ namespace casadi {
     } else {
       // Evaluate in batches
       casadi_assert_dev(enable_forward_ || enable_fd_);
-      int max_nfwd = 64;
+      int max_nfwd = 256;
       if (!enable_fd_) {
         while (!has_forward(max_nfwd)) max_nfwd/=2;
       }

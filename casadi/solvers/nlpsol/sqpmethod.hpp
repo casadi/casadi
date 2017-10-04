@@ -187,11 +187,11 @@ namespace casadi {
     const Function getConic() const { return qpsol_;}
 
     /// Print iteration header
-    void printIteration(std::ostream &stream) const;
+    void print_iteration() const;
 
     /// Print iteration
-    void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf,
-                        double dx_norm, double reg, int ls_trials, bool ls_success) const;
+    void print_iteration(int iter, double obj, double pr_inf, double du_inf,
+                         double dx_norm, double reg, int ls_trials, bool ls_success) const;
 
     // Reset the Hessian or Hessian approximation
     void reset_h(SqpmethodMemory* m) const;
