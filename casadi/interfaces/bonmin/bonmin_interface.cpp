@@ -426,7 +426,7 @@ namespace casadi {
           casadi_copy(g, ng_, m->gk);
         } else {
           if (iter==0) {
-            uout<true>()
+            uerr()
               << "Warning: intermediate_callback is disfunctional in your installation. "
               "You will only be able to use stats(). "
               "See https://github.com/casadi/casadi/wiki/enableBonminCallback to enable it."
@@ -464,7 +464,7 @@ namespace casadi {
       return 0;
     } catch(exception& ex) {
       if (iteration_callback_ignore_errors_) {
-        uout<true>() << "intermediate_callback: " << ex.what() << endl;
+        uerr() << "intermediate_callback: " << ex.what() << endl;
         return 1;
       }
       return 0;
@@ -501,7 +501,7 @@ namespace casadi {
       m->return_status = return_status_string(status);
 
     } catch(exception& ex) {
-      uout<true>() << "finalize_solution failed: " << ex.what() << endl;
+      uerr() << "finalize_solution failed: " << ex.what() << endl;
     }
   }
 
@@ -515,7 +515,7 @@ namespace casadi {
       casadi_copy(m->ubg, ng_, g_u);
       return true;
     } catch(exception& ex) {
-      uout<true>() << "get_bounds_info failed: " << ex.what() << endl;
+      uerr() << "get_bounds_info failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -550,7 +550,7 @@ namespace casadi {
 
       return true;
     } catch(exception& ex) {
-      uout<true>() << "get_starting_point failed: " << ex.what() << endl;
+      uerr() << "get_starting_point failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -571,7 +571,7 @@ namespace casadi {
       nnz_h_lag = exact_hessian_ ? hesslag_sp_.nnz() : 0;
 
     } catch(exception& ex) {
-      uout<true>() << "get_nlp_info failed: " << ex.what() << endl;
+      uerr() << "get_nlp_info failed: " << ex.what() << endl;
     }
   }
 
@@ -587,7 +587,7 @@ namespace casadi {
         return nv;
       }
     } catch(exception& ex) {
-      uout<true>() << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
+      uerr() << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
       return -1;
     }
   }
@@ -600,7 +600,7 @@ namespace casadi {
       }
       return true;
     } catch(exception& ex) {
-      uout<true>() << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
+      uerr() << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
       return false;
     }
   }

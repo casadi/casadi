@@ -116,12 +116,10 @@ namespace casadi {
   };
 
   // Get an output stream
-  template<bool Err=false>
-  std::ostream& uout() {
-    // Singleton pattern
-    static Logger::Stream<Err> instance;
-    return instance;
-  }
+  CASADI_EXPORT std::ostream& uout();
+
+  // Get an output stream
+  CASADI_EXPORT std::ostream& uerr();
 
 } // namespace casadi
 

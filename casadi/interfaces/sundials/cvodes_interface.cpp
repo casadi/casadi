@@ -218,7 +218,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "rhs failed: " << e.what() << endl;
+      uerr() << "rhs failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -386,10 +386,10 @@ namespace casadi {
       auto m = to_mem(user_data);
       auto& s = m->self;
       if (!s.disable_internal_warnings_) {
-        uout<true>() << msg << endl;
+        uerr() << msg << endl;
       }
     } catch(exception& e) {
-      uout<true>() << "ehfun failed: " << e.what() << endl;
+      uerr() << "ehfun failed: " << e.what() << endl;
     }
   }
 
@@ -406,7 +406,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "rhsQ failed: " << e.what() << endl;
+      uerr() << "rhsQ failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -432,7 +432,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "rhsB failed: " << e.what() << endl;
+      uerr() << "rhsB failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -458,7 +458,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "rhsQB failed: " << e.what() << endl;
+      uerr() << "rhsQB failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -478,7 +478,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "jtimes failed: " << e.what() << endl;
+      uerr() << "jtimes failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -501,7 +501,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "jtimes failed: " << e.what() << endl;
+      uerr() << "jtimes failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -556,7 +556,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "psolve failed: " << e.what() << endl;
+      uerr() << "psolve failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -607,7 +607,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "psolveB failed: " << e.what() << endl;
+      uerr() << "psolveB failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -638,7 +638,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "psetup failed: " << e.what() << endl;
+      uerr() << "psetup failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -671,7 +671,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "psetupB failed: " << e.what() << endl;
+      uerr() << "psetupB failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -697,7 +697,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "lsetup failed: " << e.what() << endl;
+      uerr() << "lsetup failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -733,7 +733,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "lsetupB failed: " << e.what() << endl;
+      uerr() << "lsetupB failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -764,7 +764,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "lsolve failed: " << e.what() << endl;
+      uerr() << "lsolve failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -807,7 +807,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uout<true>() << "lsolveB failed: " << e.what() << endl;
+      uerr() << "lsolveB failed: " << e.what() << endl;
       return -1;
     }
   }

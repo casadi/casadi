@@ -116,7 +116,7 @@ if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n"\
 
 // Issue a warning, including location in the source code
 #define casadi_warning(msg) \
-  casadi::uout<true>() \
+  casadi::uerr() \
     << "CasADi warning at " << CASADI_WHERE << ": " << msg << "\n"
 
 // Issue a message, including location in the source code

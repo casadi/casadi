@@ -428,7 +428,7 @@ namespace casadi {
       }
 
     } catch(std::exception& ex) {
-      uout<true>() << "eval_nlp failed: " << ex.what() << std::endl;
+      uerr() << "eval_nlp failed: " << ex.what() << std::endl;
       *mode = -1;  // Reduce step size - we've got problems
       return;
     }

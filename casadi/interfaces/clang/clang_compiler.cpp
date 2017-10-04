@@ -145,7 +145,7 @@ namespace casadi {
 
     // The compiler invocation needs a DiagnosticsEngine so it can report problems
     clang::DiagnosticOptions* diagOpts = new clang::DiagnosticOptions();
-    myerr_ = new llvm::raw_os_ostream(uout<true>());
+    myerr_ = new llvm::raw_os_ostream(uerr());
     clang::TextDiagnosticPrinter *diagClient = new clang::TextDiagnosticPrinter(*myerr_, diagOpts);
 
     clang::DiagnosticIDs* diagID = new clang::DiagnosticIDs();

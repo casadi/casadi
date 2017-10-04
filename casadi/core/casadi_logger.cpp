@@ -32,4 +32,16 @@ namespace casadi {
 
   void (*Logger::flush)(bool error) =Logger::flushDefault;
 
+  std::ostream& uout() {
+    // Singleton pattern
+    static Logger::Stream<false> instance;
+    return instance;
+  }
+
+  std::ostream& uerr() {
+    // Singleton pattern
+    static Logger::Stream<true> instance;
+    return instance;
+  }
+
 } // namespace casadi
