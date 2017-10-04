@@ -381,11 +381,14 @@ namespace casadi {
     /** \brief Jit dependencies */
     virtual void jit_dependencies(const std::string& fname) {}
 
-    /** \brief  Print */
+    /** \brief Display object */
     void disp(std::ostream& stream, bool more) const override;
 
     /** \brief  Print more */
     virtual void disp_more(std::ostream& stream) const {}
+
+    /** \brief C-style formatted printing during evaluation */
+    void print(const char* fmt, ...) const;
 
     /** \brief Get function signature: name:(inputs)->(outputs) */
     std::string definition() const;

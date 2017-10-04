@@ -2668,4 +2668,29 @@ namespace casadi {
     return 0;
   }
 
+  void FunctionInternal::print(const char* fmt, ...) const {
+    // Variable number of arguments
+    va_list args;
+    va_start(args, fmt);
+    // Static & dynamic buffers
+    char buf[64];
+    size_t buf_sz = sizeof(buf);
+    char* buf_dyn = 0;
+    // Try to print with a small buffer
+    int n = vsnprintf(buf, buf_sz, fmt, args);
+    // Need a larger buffer?
+    if (n>static_cast<int>(buf_sz)) {
+      buf_sz = static_cast<size_t>(n);
+      buf_dyn = new char[buf_sz];
+      n = vsnprintf(buf_dyn, buf_sz, fmt, args);
+    }
+    // Print buffer content
+    if (n>=0) uout() << (buf_dyn ? buf_dyn : buf);
+    // Cleanup
+    if (buf_dyn) delete[] buf_dyn;
+    va_end(args);
+    // Throw error if failure
+    casadi_assert(n>=0, "Print failure while processing '" + string(fmt) + "'");
+  }
+
 } // namespace casadi
