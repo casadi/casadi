@@ -341,7 +341,10 @@ namespace casadi {
         std::sort(keys->begin(), keys->end());
         for (auto k : *keys) {
           const FStats& fs = m->fstats.at(k);
-          if (fs.n_call!=0) print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
+          if (fs.n_call!=0) {
+            print(("%" + str(maxNameLen) + "s ").c_str(), k.c_str());
+            print_stats_line(fs.n_call, fs.t_proc, fs.t_wall);
+          }
         }
     }
 
@@ -353,13 +356,17 @@ namespace casadi {
       t_proc_all_previous += fs.t_proc;
       t_wall_all_previous += fs.t_wall;
     }
-    print_stats_line(maxNameLen, "all previous", -1, t_proc_all_previous, t_wall_all_previous);
+    print(("%" + str(maxNameLen) + "s ").c_str(), "all previous");
+    print_stats_line(-1, t_proc_all_previous, t_wall_all_previous);
 
     // Sort and show the remainder of keys
     std::sort(keys_other.begin(), keys_other.end());
     for (std::string k : keys_other) {
       const FStats& fs = m->fstats.at(k);
-      if (fs.n_call!=0) print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
+      if (fs.n_call!=0) {
+        print(("%" + str(maxNameLen) + "s ").c_str(), k.c_str());
+        print_stats_line(fs.n_call, fs.t_proc, fs.t_wall);
+      }
       t_proc_all_previous += fs.t_proc;
       t_wall_all_previous += fs.t_wall;
     }
@@ -367,11 +374,12 @@ namespace casadi {
     // Show the mainloop stats
     const FStats& fs_mainloop = m->fstats.at("mainloop");
     if (fs_mainloop.n_call>0) {
-      print_stats_line(maxNameLen, "solver", -1,
+      print(("%" + str(maxNameLen) + "s ").c_str(), "solver");
+      print_stats_line(-1,
         fs_mainloop.t_proc-t_proc_all_previous, fs_mainloop.t_wall-t_wall_all_previous);
-      print_stats_line(maxNameLen, "mainloop", -1, fs_mainloop.t_proc, fs_mainloop.t_wall);
+      print(("%" + str(maxNameLen) + "s ").c_str(), "mainloop");
+      print_stats_line(-1, fs_mainloop.t_proc, fs_mainloop.t_wall);
     }
-
   }
 
   Dict OracleFunction::get_stats(void *mem) const {
