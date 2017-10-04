@@ -116,7 +116,7 @@ namespace casadi {
     Dict get_stats(void* mem) const override;
 
     /** \brief  Print solver statistics */
-    void print_stats(IntegratorMemory* mem, std::ostream &stream) const override;
+    void print_stats(IntegratorMemory* mem) const override;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
     void reset(IntegratorMemory* mem, double t, const double* x,

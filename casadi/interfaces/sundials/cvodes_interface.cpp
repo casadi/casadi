@@ -288,7 +288,6 @@ namespace casadi {
     THROWING(CVodeGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
              &m->netfails, &m->qlast, &m->qcur, &m->hinused,
              &m->hlast, &m->hcur, &m->tcur);
-
     THROWING(CVodeGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
   }
 
@@ -366,6 +365,7 @@ namespace casadi {
     THROWING(CVodeGetIntegratorStats, cvB_mem->cv_mem, &m->nstepsB,
            &m->nfevalsB, &m->nlinsetupsB, &m->netfailsB, &m->qlastB,
            &m->qcurB, &m->hinusedB, &m->hlastB, &m->hcurB, &m->tcurB);
+    THROWING(CVodeGetNonlinSolvStats, cvB_mem->cv_mem, &m->nnitersB, &m->nncfailsB);
   }
 
   void CvodesInterface::cvodes_error(const char* module, int flag) {

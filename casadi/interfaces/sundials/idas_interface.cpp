@@ -444,7 +444,6 @@ namespace casadi {
     THROWING(IDAGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
              &m->netfails, &m->qlast, &m->qcur, &m->hinused,
              &m->hlast, &m->hcur, &m->tcur);
-
     THROWING(IDAGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
 
   }
@@ -547,6 +546,7 @@ namespace casadi {
     THROWING(IDAGetIntegratorStats, IDAB_mem->IDA_mem, &m->nstepsB, &m->nfevalsB,
              &m->nlinsetupsB, &m->netfailsB, &m->qlastB, &m->qcurB, &m->hinusedB,
              &m->hlastB, &m->hcurB, &m->tcurB);
+    THROWING(IDAGetNonlinSolvStats, IDAB_mem->IDA_mem, &m->nnitersB, &m->nncfailsB);
   }
 
   void IdasInterface::idas_error(const char* module, int flag) {

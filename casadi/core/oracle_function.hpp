@@ -42,6 +42,12 @@ namespace casadi {
 
     // Function specific statistics
     std::map<std::string, FStats> fstats;
+
+    // Add a statistic
+    void add_stat(const std::string& s) {
+      bool added = fstats.insert(std::make_pair(s, FStats())).second;
+      casadi_assert(added, "Duplicate stat: '" + s + "'");
+    }
   };
 
   /** \brief Base class for functions that perform calculation with an oracle

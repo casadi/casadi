@@ -202,7 +202,7 @@ namespace casadi {
 
     // Finalize/print statistics
     m->fstats.at(name_).toc();
-    if (print_stats_) print_stats(m, uout());
+    if (print_stats_) print_stats(m);
     if (print_time_)  print_fstats(m);
     return 0;
   }
@@ -334,7 +334,7 @@ namespace casadi {
     if (OracleFunction::init_mem(mem)) return 1;
 
     auto m = static_cast<IntegratorMemory*>(mem);
-    m->fstats[name_] = FStats();
+    m->add_stat(name_);
     return 0;
   }
 

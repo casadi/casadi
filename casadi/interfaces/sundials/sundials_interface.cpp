@@ -331,39 +331,37 @@ namespace casadi {
     return stats;
   }
 
-  void SundialsInterface::print_stats(IntegratorMemory* mem, ostream &stream) const {
+  void SundialsInterface::print_stats(IntegratorMemory* mem) const {
     auto m = to_mem(mem);
-    stream << "FORWARD INTEGRATION:" << endl;
-    stream << "Number of steps taken by SUNDIALS: " << m->nsteps << endl;
-    stream << "Number of calls to the user’s f function: " << m->nfevals << endl;
-    stream << "Number of calls made to the linear solver setup function: "
-           << m->nlinsetups << endl;
-    stream << "Number of error test failures: " << m->netfails << endl;
-    stream << "Method order used on the last internal step: "  << m->qlast << endl;
-    stream << "Method order to be used on the next internal step: " << m->qcur << endl;
-    stream << "Actual value of initial step size: " << m->hinused << endl;
-    stream << "Step size taken on the last internal step: " << m->hlast << endl;
-    stream << "Step size to be attempted on the next internal step: " << m->hcur << endl;
-    stream << "Current internal time reached: " << m->tcur << endl;
-    stream << "Number of nonlinear iterations performed: " << m->nniters << endl;
-    stream << "Number of nonlinear convergence failures: " << m->nncfails << endl;
+    print("FORWARD INTEGRATION:\n");
+    print("Number of steps taken by SUNDIALS: %ld\n", m->nsteps);
+    print("Number of calls to the user’s f function: %ld\n", m->nfevals);
+    print("Number of calls made to the linear solver setup function: %ld\n", m->nlinsetups);
+    print("Number of error test failures: %ld\n", m->netfails);
+    print("Method order used on the last internal step: %d\n", m->qlast);
+    print("Method order to be used on the next internal step: %d\n", m->qcur);
+    print("Actual value of initial step size: %g\n", m->hinused);
+    print("Step size taken on the last internal step: %g\n", m->hlast);
+    print("Step size to be attempted on the next internal step: %g\n", m->hcur);
+    print("Current internal time reached: %g\n");
+    print("Number of nonlinear iterations performed: %ld\n", m->nniters);
+    print("Number of nonlinear convergence failures: %ld\n", m->nncfails);
     if (nrx_>0) {
-      stream << "BACKWARD INTEGRATION:" << endl;
-      stream << "Number of steps taken by SUNDIALS: " << m->nstepsB << endl;
-      stream << "Number of calls to the user’s f function: " << m->nfevalsB << endl;
-      stream << "Number of calls made to the linear solver setup function: "
-             << m->nlinsetupsB << endl;
-      stream << "Number of error test failures: " << m->netfailsB << endl;
-      stream << "Method order used on the last internal step: "  << m->qlastB << endl;
-      stream << "Method order to be used on the next internal step: " << m->qcurB << endl;
-      stream << "Actual value of initial step size: " << m->hinusedB << endl;
-      stream << "Step size taken on the last internal step: " << m->hlastB << endl;
-      stream << "Step size to be attempted on the next internal step: " << m->hcurB << endl;
-      stream << "Current internal time reached: " << m->tcurB << endl;
-      stream << "Number of nonlinear iterations performed: " << m->nnitersB << endl;
-      stream << "Number of nonlinear convergence failures: " << m->nncfailsB << endl;
+      print("BACKWARD INTEGRATION:\n");
+      print("Number of steps taken by SUNDIALS: %ld\n", m->nstepsB);
+      print("Number of calls to the user’s f function: %ld\n", m->nfevalsB);
+      print("Number of calls made to the linear solver setup function: %ld\n", m->nlinsetupsB);
+      print("Number of error test failures: %ld\n", m->netfailsB);
+      print("Method order used on the last internal step: %d\n" , m->qlastB);
+      print("Method order to be used on the next internal step: %d\n", m->qcurB);
+      print("Actual value of initial step size: %g\n", m->hinusedB);
+      print("Step size taken on the last internal step: %g\n", m->hlastB);
+      print("Step size to be attempted on the next internal step: %g\n", m->hcurB);
+      print("Current internal time reached: %g\n", m->tcurB);
+      print("Number of nonlinear iterations performed: %ld\n", m->nnitersB);
+      print("Number of nonlinear convergence failures: %ld\n", m->nncfailsB);
     }
-    stream << endl;
+    print("\n");
   }
 
   void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,

@@ -103,7 +103,7 @@ namespace casadi {
     int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
 
     /** \brief  Print solver statistics */
-    virtual void print_stats(IntegratorMemory* mem, std::ostream &stream) const {}
+    virtual void print_stats(IntegratorMemory* mem) const {}
 
     /** \brief  Propagate sparsity forward */
     int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
