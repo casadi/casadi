@@ -382,7 +382,7 @@ namespace casadi {
 
   void Conic::print_fstats(const ConicMemory* m) const {
     // Length of the name being printed
-    size_t name_len=5; // "total"
+    size_t name_len=0;
     for (auto &&s : m->fstats) {
       name_len = max(s.first.size(), name_len);
     }
@@ -396,24 +396,14 @@ namespace casadi {
     print(namefmt, "");
     print("%12s %12s %9s\n", "t_proc [s]", "t_wall [s]", "n_eval");
 
-    // Sum the previously printed stats
-    double t_wall_all = 0;
-    double t_proc_all = 0;
-
     // Print keys
     for (auto &&s : m->fstats) {
       const FStats& fs = m->fstats.at(s.first);
       if (fs.n_call!=0) {
         print(namefmt, s.first.c_str());
         print("%12.3g %12.3g %9d\n", fs.t_proc, fs.t_wall, fs.n_call);
-        t_proc_all += fs.t_proc;
-        t_wall_all += fs.t_wall;
       }
     }
-
-    // Print total
-    print(namefmt, "total");
-    print("%12.3g %12.3g\n", t_proc_all, t_wall_all);
   }
 
   std::vector<std::string> conic_options(const std::string& name) {

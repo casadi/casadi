@@ -289,91 +289,28 @@ namespace casadi {
   }
 
   void OracleFunction::print_fstats(const OracleMemory* m) const {
-
-    size_t maxNameLen=0;
-
-    // Retrieve all nlp keys
-    std::vector<std::string> keys;
-    std::vector<std::string> keys_other;
+    // Length of the name being printed
+    size_t name_len=0;
     for (auto &&s : m->fstats) {
-      maxNameLen = max(s.first.size(), maxNameLen);
-      if (s.first.find("nlp")!=std::string::npos) {
-        keys.push_back(s.first);
-      } else if (s.first.find("mainloop")==std::string::npos) {
-        keys_other.push_back(s.first);
-      } else {
-        continue;
-      }
+      name_len = max(s.first.size(), name_len);
     }
 
-    maxNameLen = max(std::string("all previous").size(), maxNameLen);
-    maxNameLen = max(std::string("solver").size(), maxNameLen);
+    // Print name with a given length. Format: "%NNs "
+    char namefmt[10];
+    int n = snprintf(namefmt, sizeof(namefmt), "%%%ds ", static_cast<int>(name_len));
+    casadi_assert_dev(n>0);
 
     // Print header
-    std::string blankName(maxNameLen, ' ');
-    uout() << blankName << "      proc           wall      num\n"
-           << blankName << "      time           time     evals\n";
+    print(namefmt, "");
+    print("%12s %12s %9s\n", "t_proc [s]", "t_wall [s]", "n_eval");
 
-    // Sort the keys according to order
-    std::vector<std::string> keys_order0;
-    std::vector<std::string> keys_order1;
-    std::vector<std::string> keys_order2;
-    for (auto k : keys) {
-      if (k.find("hess")!=std::string::npos) {
-        keys_order2.push_back(k);
-        continue;
-      }
-      if (k.find("grad")!=std::string::npos ||
-          k.find("jac")!=std::string::npos) {
-        keys_order1.push_back(k);
-        continue;
-      }
-      keys_order0.push_back(k);
-    }
-
-    // Print all NLP stats
-    for (auto keys : {&keys_order0, &keys_order1, &keys_order2}) {
-        std::sort(keys->begin(), keys->end());
-        for (auto k : *keys) {
-          const FStats& fs = m->fstats.at(k);
-          if (fs.n_call!=0) {
-            print(("%" + str(maxNameLen) + "s ").c_str(), k.c_str());
-            print_stats_line(fs.n_call, fs.t_proc, fs.t_wall);
-          }
-        }
-    }
-
-    // Sum the previously printed stats
-    double t_wall_all_previous = 0;
-    double t_proc_all_previous = 0;
-    for (auto k : keys) {
-      const FStats& fs = m->fstats.at(k);
-      t_proc_all_previous += fs.t_proc;
-      t_wall_all_previous += fs.t_wall;
-    }
-    print(("%" + str(maxNameLen) + "s ").c_str(), "all previous");
-    print_stats_line(-1, t_proc_all_previous, t_wall_all_previous);
-
-    // Sort and show the remainder of keys
-    std::sort(keys_other.begin(), keys_other.end());
-    for (std::string k : keys_other) {
-      const FStats& fs = m->fstats.at(k);
+    // Print keys
+    for (auto &&s : m->fstats) {
+      const FStats& fs = m->fstats.at(s.first);
       if (fs.n_call!=0) {
-        print(("%" + str(maxNameLen) + "s ").c_str(), k.c_str());
-        print_stats_line(fs.n_call, fs.t_proc, fs.t_wall);
+        print(namefmt, s.first.c_str());
+        print("%12.3g %12.3g %9d\n", fs.t_proc, fs.t_wall, fs.n_call);
       }
-      t_proc_all_previous += fs.t_proc;
-      t_wall_all_previous += fs.t_wall;
-    }
-
-    // Show the mainloop stats
-    const FStats& fs_mainloop = m->fstats.at("mainloop");
-    if (fs_mainloop.n_call>0) {
-      print(("%" + str(maxNameLen) + "s ").c_str(), "solver");
-      print_stats_line(-1,
-        fs_mainloop.t_proc-t_proc_all_previous, fs_mainloop.t_wall-t_wall_all_previous);
-      print(("%" + str(maxNameLen) + "s ").c_str(), "mainloop");
-      print_stats_line(-1, fs_mainloop.t_proc, fs_mainloop.t_wall);
     }
   }
 

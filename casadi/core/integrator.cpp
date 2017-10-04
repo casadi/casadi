@@ -151,10 +151,9 @@ namespace casadi {
   eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<IntegratorMemory*>(mem);
 
-    // Statistics
+    // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
-
-    m->fstats.at("mainloop").tic();
+    m->fstats.at(name_).tic();
 
     // Read inputs
     const double* x0 = arg[INTEGRATOR_X0];
@@ -201,13 +200,10 @@ namespace casadi {
       retreat(m, grid_.front(), rx, rz, rq);
     }
 
-    m->fstats.at("mainloop").toc();
-
-    // Print statistics
+    // Finalize/print statistics
+    m->fstats.at(name_).toc();
     if (print_stats_) print_stats(m, uout());
-
-    // Show statistics
-    if (print_time_)  print_fstats(static_cast<OracleMemory*>(mem));
+    if (print_time_)  print_fstats(m);
     return 0;
   }
 
@@ -338,7 +334,7 @@ namespace casadi {
     if (OracleFunction::init_mem(mem)) return 1;
 
     auto m = static_cast<IntegratorMemory*>(mem);
-    m->fstats["mainloop"] = FStats();
+    m->fstats[name_] = FStats();
     return 0;
   }
 
