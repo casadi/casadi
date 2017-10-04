@@ -703,7 +703,7 @@ namespace casadi {
     symbolicAdjSeed(int nadj, const std::vector<MatType>& v) const;
 
   protected:
-    static void print_stats_line(double n_call, double t_proc, double t_wall);
+    void print_stats_line(double n_call, double t_proc, double t_wall) const;
 
     /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization */
     void set_jac_sparsity(const Sparsity& sp);

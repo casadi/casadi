@@ -2531,53 +2531,16 @@ namespace casadi {
     return singleton;
   }
 
-  // Convert a float to a string of an exact length.
-  // First it tries fixed precision, then falls back to exponential notation.
-  //
-  // todo(jaeandersson,jgillis): needs either review or unit tests
-  // because it throws exceptions if it fail.
-  std::string formatFloat(double x, int totalWidth, int maxPrecision, int fallbackPrecision) {
-    std::ostringstream out0;
-    out0 << fixed << setw(totalWidth) << setprecision(maxPrecision) << x;
-    std::string ret0 = out0.str();
-    if (ret0.length() == totalWidth) {
-      return ret0;
-    } else if (ret0.length() > totalWidth) {
-      std::ostringstream out1;
-      out1 << setw(totalWidth) << setprecision(fallbackPrecision) << x;
-      std::string ret1 = out1.str();
-      if (ret1.length() != totalWidth)
-        casadi_error(
-          "ipopt timing formatting fallback is bugged, sorry about that."
-          "expected " + str(totalWidth) +  " digits, but got " + str(ret1.length())
-          + ", string: \"" + str(ret1) + "\", number: " + str(x));
-      return ret1;
-    } else {
-      casadi_error("ipopt timing formatting is bugged, sorry about that.");
-    }
-  }
-
-  void FunctionInternal::print_stats_line(double n_call, double t_proc, double t_wall) {
-
-    std::stringstream s;
-    s
-      << formatFloat(t_proc, 9, 3, 3) << " [s]  "
-      << formatFloat(t_wall, 9, 3, 3) << " [s]";
-    if (n_call == -1) {
-      // things like main loop don't have # evals
-      s << endl;
-    } else {
-      s << " " << setw(5) << n_call;
-      if (n_call < 2) {
-        s << "\n";
-      } else {
+  void FunctionInternal::print_stats_line(double n_call, double t_proc, double t_wall) const {
+    print("%9.3g [s]  %9.3g [s]", t_proc, t_wall);
+    if (n_call != -1) {
+      print(" %5g", n_call);
+      if (n_call >= 2) {
         // only print averages if there is more than 1 eval
-        s << " "
-          << formatFloat(1000.0*t_proc/n_call, 10, 2, 3) << " [ms]  "
-          << formatFloat(1000.0*t_wall/n_call, 10, 2, 3) << " [ms]\n";
+        print(" %10.3g [ms]  %10.3g [ms]", 1000*t_proc/n_call, 1000*t_wall/n_call);
       }
     }
-    uout() << s.str();
+    print("\n");
   }
 
   Function FunctionInternal::slice(const std::string& name,
