@@ -422,8 +422,6 @@ namespace casadi {
 
       // Call callback function if present
       if (!fcallback_.is_null()) {
-        m->fstats.at("callback_prep").tic();
-
         // Callback inputs
         fill_n(m->arg, fcallback_.n_in(), nullptr);
         m->arg[NLPSOL_F] = &m->fk;
@@ -437,9 +435,7 @@ namespace casadi {
         double ret = 0;
         m->arg[0] = &ret;
 
-        m->fstats.at("callback_prep").toc();
         m->fstats.at("callback_fun").tic();
-
 
         try {
           // Evaluate

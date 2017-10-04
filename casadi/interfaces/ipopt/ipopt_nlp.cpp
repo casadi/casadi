@@ -199,7 +199,6 @@ namespace casadi {
     bool full_callback = false;
 
 #ifdef WITH_IPOPT_CALLBACK
-    mem_->fstats.at("callback_prep").tic();
     OrigIpoptNLP* orignlp = dynamic_cast<OrigIpoptNLP*>(GetRawPtr(ip_cq->GetIpoptNLP()));
     if (!orignlp) return true;
     TNLPAdapter* tnlp_adapter = dynamic_cast<TNLPAdapter*>(GetRawPtr(orignlp->nlp()));
@@ -251,7 +250,6 @@ namespace casadi {
         }
       }
     }
-    mem_->fstats.at("callback_prep").toc();
     full_callback = true;
 #endif // WITH_IPOPT_CALLBACK
 

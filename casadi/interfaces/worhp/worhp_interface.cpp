@@ -374,7 +374,6 @@ namespace casadi {
           firstIteration = true;
 
           if (!fcallback_.is_null()) {
-            m->fstats.at("callback_prep").tic();
             m->iter = m->worhp_w.MajorIter;
             m->iter_sqp = m->worhp_w.MinorIter;
             m->inf_pr = m->worhp_w.NormMax_CV;
@@ -395,7 +394,6 @@ namespace casadi {
             double ret_double;
             m->res[0] = &ret_double;
 
-            m->fstats.at("callback_prep").toc();
             m->fstats.at("callback_fun").tic();
             // Evaluate the callback function
             fcallback_(m->arg, m->res, m->iw, m->w, 0);

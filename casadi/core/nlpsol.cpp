@@ -376,7 +376,6 @@ namespace casadi {
     auto m = static_cast<NlpsolMemory*>(mem);
     m->add_stat(name_);
     m->add_stat("callback_fun");
-    m->add_stat("callback_prep");
     return 0;
   }
 
