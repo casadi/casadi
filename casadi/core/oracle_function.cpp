@@ -341,7 +341,7 @@ namespace casadi {
         std::sort(keys->begin(), keys->end());
         for (auto k : *keys) {
           const FStats& fs = m->fstats.at(k);
-          print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
+          if (fs.n_call!=0) print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
         }
     }
 
@@ -359,7 +359,7 @@ namespace casadi {
     std::sort(keys_other.begin(), keys_other.end());
     for (std::string k : keys_other) {
       const FStats& fs = m->fstats.at(k);
-      print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
+      if (fs.n_call!=0) print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
       t_proc_all_previous += fs.t_proc;
       t_wall_all_previous += fs.t_wall;
     }

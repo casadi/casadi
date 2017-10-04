@@ -2559,8 +2559,6 @@ namespace casadi {
 
   void FunctionInternal::print_stats_line(int maxNameLen, std::string label,
     double n_call, double t_proc, double t_wall) {
-    // Skip when not called
-    if (n_call == 0) return;
 
     std::stringstream s;
     s

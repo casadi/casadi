@@ -404,7 +404,7 @@ namespace casadi {
     std::sort(keys.begin(), keys.end());
     for (auto k : keys) {
       const FStats& fs = m->fstats.at(k);
-      print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
+      if (fs.n_call!=0) print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
     }
 
     // Sum the previously printed stats
@@ -415,8 +415,8 @@ namespace casadi {
       t_proc_all_previous += fs.t_proc;
       t_wall_all_previous += fs.t_wall;
     }
-    print_stats_line(maxNameLen, "all previous", -1, t_proc_all_previous, t_wall_all_previous);
-
+    print_stats_line(maxNameLen, "all previous", -1,
+                     t_proc_all_previous, t_wall_all_previous);
   }
 
   std::vector<std::string> conic_options(const std::string& name) {
