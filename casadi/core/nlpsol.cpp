@@ -366,7 +366,6 @@ namespace casadi {
 
     // Function to calculate multiplers
     if (calc_multipliers_) {
-      casadi_message("here");
       create_function("nlp_mult", {"x", "p", "lam:f", "lam:g"},
                       {"grad:gamma:x", "grad:gamma:p"}, {{"gamma", {"f", "g"}}});
     }
