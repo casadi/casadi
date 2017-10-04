@@ -46777,6 +46777,11 @@ Get DPLE output scheme name by index.
 
 ";
 
+%feature("docstring") casadi::casadi_norm_1 "[INTERNAL]  NORM_1: ||x||_1 ->
+return.
+
+";
+
 %feature("docstring") casadi::expmsol "
 
 Performs a matrix exponentiation expm(A)
@@ -47191,8 +47196,17 @@ Get documentation for a particular option.
 
 %feature("docstring") casadi::casadi_interpn "[INTERNAL] ";
 
-%feature("docstring") casadi::casadi_norm_1 "[INTERNAL]  NORM_1: ||x||_1 ->
-return.
+%feature("docstring") casadi::read_matlab "
+
+>  void casadi::read_matlab(std::istream &stream, std::vector< T > &v)
+------------------------------------------------------------------------
+
+Read vector, matlab style.
+
+>  void casadi::read_matlab(std::ifstream &file, std::vector< std::vector< T > > &v)
+------------------------------------------------------------------------
+
+Read matrix, matlab style.
 
 ";
 
@@ -47201,9 +47215,9 @@ corresponding to the entry with the largest absolute value.
 
 ";
 
-%feature("docstring") casadi::doc_interpolant "
+%feature("docstring") casadi::has_expm "
 
-Get the documentation string for a plugin.
+Check if a particular plugin is available.
 
 ";
 
@@ -48025,9 +48039,9 @@ Get output scheme name by index.
 
 ";
 
-%feature("docstring") casadi::load_rootfinder "
+%feature("docstring") casadi::has_dple "
 
-Explicitly load a plugin dynamically.
+Check if a particular plugin is available.
 
 ";
 
@@ -48819,7 +48833,10 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring") casadi::qpsol "";
+%feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
+dense.
+
+";
 
 %feature("docstring") casadi::zip "[INTERNAL] ";
 
@@ -48827,12 +48844,6 @@ Get the documentation string for a plugin.
 
 %feature("docstring") casadi::casadi_max_viol "[INTERNAL]  Largest bound
 violation.
-
-";
-
-%feature("docstring") casadi::is_strictly_monotone "
-
-Check if the vector is strictly monotone.
 
 ";
 
@@ -48922,20 +48933,6 @@ Get documentation for a particular option.
 
 ";
 
-%feature("docstring") casadi::read_matlab "
-
->  void casadi::read_matlab(std::istream &stream, std::vector< T > &v)
-------------------------------------------------------------------------
-
-Read vector, matlab style.
-
->  void casadi::read_matlab(std::ifstream &file, std::vector< std::vector< T > > &v)
-------------------------------------------------------------------------
-
-Read matrix, matlab style.
-
-";
-
 %feature("docstring") casadi::hash_value "
 
 Hash value of an integer.
@@ -48947,7 +48944,11 @@ polynomial.
 
 ";
 
-%feature("docstring") casadi::casadi_fill_int "[INTERNAL] ";
+%feature("docstring") casadi::has_negative "
+
+Check if the vector has negative entries.
+
+";
 
 %feature("docstring") casadi::dense_mul_nt "[INTERNAL] ";
 
@@ -49009,6 +49010,12 @@ Check if a particular plugin is available.
 %feature("docstring") casadi::conic_n_out "
 
 Get the number of QP solver outputs.
+
+";
+
+%feature("docstring") casadi::doc_interpolant "
+
+Get the documentation string for a plugin.
 
 ";
 
@@ -49558,11 +49565,7 @@ Explicitly load a plugin dynamically.
 
 ";
 
-%feature("docstring") casadi::is_monotone "
-
-Check if the vector is monotone.
-
-";
+%feature("docstring") casadi::casadi_smoothing_diff "[INTERNAL] ";
 
 %feature("docstring") casadi::combine "[INTERNAL]  Combine two
 dictionaries, giving priority to first one.
@@ -49577,9 +49580,9 @@ Get the number of QP solver outputs.
 
 %feature("docstring") casadi::casadi_low "[INTERNAL] ";
 
-%feature("docstring") casadi::has_dple "
+%feature("docstring") casadi::load_rootfinder "
 
-Check if a particular plugin is available.
+Explicitly load a plugin dynamically.
 
 ";
 
@@ -49671,9 +49674,9 @@ Get output scheme name by index.
 
 ";
 
-%feature("docstring") casadi::has_expm "
+%feature("docstring") casadi::is_strictly_monotone "
 
-Check if a particular plugin is available.
+Check if the vector is strictly monotone.
 
 ";
 
@@ -49699,6 +49702,8 @@ N:  Number of integrator steps
 order:  Order of interpolating polynomials
 
 ";
+
+%feature("docstring") casadi::casadi_fill_int "[INTERNAL] ";
 
 %feature("docstring") casadi::nlpsol_in "
 
@@ -49772,10 +49777,7 @@ Get the number of QP solver inputs.
 
 ";
 
-%feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
-dense.
-
-";
+%feature("docstring") casadi::qpsol "";
 
 %feature("docstring") casadi::doc_rootfinder "
 
@@ -50549,11 +50551,9 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::casadi_smoothing_diff "[INTERNAL] ";
+%feature("docstring") casadi::is_monotone "
 
-%feature("docstring") casadi::has_negative "
-
-Check if the vector has negative entries.
+Check if the vector is monotone.
 
 ";
 
