@@ -289,7 +289,7 @@ namespace casadi {
   }
 
   void OracleFunction::print_fstats(const OracleMemory* m) const {
-    print("starts here");
+
     size_t maxNameLen=0;
 
     // Retrieve all nlp keys
