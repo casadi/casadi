@@ -390,6 +390,9 @@ namespace casadi {
     /** \brief C-style formatted printing during evaluation */
     void print(const char* fmt, ...) const;
 
+    /** \brief C-style formatted printing to string */
+    void sprint(char* buf, size_t buf_sz, const char* fmt, ...) const;
+
     /** \brief Get function signature: name:(inputs)->(outputs) */
     std::string definition() const;
 
@@ -703,8 +706,6 @@ namespace casadi {
     symbolicAdjSeed(int nadj, const std::vector<MatType>& v) const;
 
   protected:
-    void print_stats_line(double n_call, double t_proc, double t_wall) const;
-
     /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization */
     void set_jac_sparsity(const Sparsity& sp);
 

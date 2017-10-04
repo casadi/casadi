@@ -297,8 +297,7 @@ namespace casadi {
 
     // Print name with a given length. Format: "%NNs "
     char namefmt[10];
-    int n = snprintf(namefmt, sizeof(namefmt), "%%%ds ", static_cast<int>(name_len));
-    casadi_assert_dev(n>0);
+    sprint(namefmt, sizeof(namefmt), "%%%ds ", static_cast<int>(name_len));
 
     // Print header
     print(namefmt, "");

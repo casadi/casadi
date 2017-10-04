@@ -2531,14 +2531,6 @@ namespace casadi {
     return singleton;
   }
 
-  void FunctionInternal::print_stats_line(double n_call, double t_proc, double t_wall) const {
-    print("%9.3g [s]  %9.3g [s]", t_proc, t_wall);
-    if (n_call != -1) {
-      print(" %5g", n_call);
-    }
-    print("\n");
-  }
-
   Function FunctionInternal::slice(const std::string& name,
         const std::vector<int>& order_in,
         const std::vector<int>& order_out, const Dict& opts) const {
@@ -2621,6 +2613,18 @@ namespace casadi {
 
     // Successful return
     return 0;
+  }
+
+  void FunctionInternal::sprint(char* buf, size_t buf_sz, const char* fmt, ...) const {
+    // Variable number of arguments
+    va_list args;
+    va_start(args, fmt);
+    // Print to buffer
+    int n = vsnprintf(buf, buf_sz, fmt, args);
+    // Cleanup
+    va_end(args);
+    // Throw error if failure
+    casadi_assert(n>=0 && n<buf_sz, "Print failure while processing '" + string(fmt) + "'");
   }
 
   void FunctionInternal::print(const char* fmt, ...) const {
