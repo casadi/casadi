@@ -107,14 +107,12 @@ namespace casadi {
     };
 
     // Output stream for std::cout like printing
-    template<bool Err>  class Stream : public std::ostream {
+    template<bool Err> class Stream : public std::ostream {
     protected:
       Streambuf<Err> buf;
     public:
       Stream() : std::ostream(&buf) {}
     };
-
-
   };
 
   // Get an output stream
@@ -123,26 +121,6 @@ namespace casadi {
     // Singleton pattern
     static Logger::Stream<Err> instance;
     return instance;
-  }
-
-  // C-style printing to std::cout
-  inline void casadi_printf(const char* fmt, ...) {
-    char buf[256];
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(buf, 256, fmt, args);
-    uout() << buf;
-    va_end(args);
-  }
-
-  // C-style printing to std::cerr
-  inline void casadi_eprintf(const char* fmt, ...) {
-    char buf[256];
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(buf, 256, fmt, args);
-    uout<true>() << buf;
-    va_end(args);
   }
 
 } // namespace casadi
