@@ -381,40 +381,39 @@ namespace casadi {
   }
 
   void Conic::print_fstats(const ConicMemory* m) const {
-
-    size_t maxNameLen=0;
-
-    // Retrieve all qp keys
-    std::vector<std::string> keys;
+    // Length of the name being printed
+    size_t name_len=5; // "total"
     for (auto &&s : m->fstats) {
-      maxNameLen = max(s.first.size(), maxNameLen);
-      keys.push_back(s.first);
+      name_len = max(s.first.size(), name_len);
     }
 
-    // Print header
-    std::string blankName(maxNameLen, ' ');
-    uout() << blankName << "      proc           wall      num\n"
-           << blankName << "      time           time     evals\n";
+    // Print name with a given length. Format: "%NNs "
+    char namefmt[10];
+    int n = snprintf(namefmt, sizeof(namefmt), "%%%ds ", static_cast<int>(name_len));
+    casadi_assert_dev(n>0);
 
-    std::sort(keys.begin(), keys.end());
-    for (auto k : keys) {
-      const FStats& fs = m->fstats.at(k);
+    // Print header
+    print(namefmt, "");
+    print("%12s %12s %9s\n", "t_proc [s]", "t_wall [s]", "n_eval");
+
+    // Sum the previously printed stats
+    double t_wall_all = 0;
+    double t_proc_all = 0;
+
+    // Print keys
+    for (auto &&s : m->fstats) {
+      const FStats& fs = m->fstats.at(s.first);
       if (fs.n_call!=0) {
-        print(("%" + str(maxNameLen) + "s ").c_str(), k.c_str());
-        print_stats_line(fs.n_call, fs.t_proc, fs.t_wall);
+        print(namefmt, s.first.c_str());
+        print("%12.3g %12.3g %9d\n", fs.t_proc, fs.t_wall, fs.n_call);
+        t_proc_all += fs.t_proc;
+        t_wall_all += fs.t_wall;
       }
     }
 
-    // Sum the previously printed stats
-    double t_wall_all_previous = 0;
-    double t_proc_all_previous = 0;
-    for (auto k : keys) {
-      const FStats& fs = m->fstats.at(k);
-      t_proc_all_previous += fs.t_proc;
-      t_wall_all_previous += fs.t_wall;
-    }
-    print(("%" + str(maxNameLen) + "s ").c_str(), "all previous");
-    print_stats_line(-1, t_proc_all_previous, t_wall_all_previous);
+    // Print total
+    print(namefmt, "total");
+    print("%12.3g %12.3g\n", t_proc_all, t_wall_all);
   }
 
   std::vector<std::string> conic_options(const std::string& name) {
