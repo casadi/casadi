@@ -336,13 +336,8 @@ namespace casadi {
   void WorhpInterface::solve(void* mem) const {
     auto m = static_cast<WorhpMemory*>(mem);
 
-    // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
-
     // Check the provided inputs
     check_inputs(mem);
-
-    m->fstats.at("mainloop").tic();
 
     // Pass inputs to WORHP data structures
     casadi_copy(m->x0, nx_, m->worhp_o.X);
@@ -487,8 +482,6 @@ namespace casadi {
         WorhpFidif(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
       }
     }
-
-    m->fstats.at("mainloop").toc();
 
     // Copy outputs
     casadi_copy(m->worhp_o.X, nx_, m->x);

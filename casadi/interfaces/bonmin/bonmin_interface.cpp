@@ -309,9 +309,6 @@ namespace casadi {
     // Reset number of iterations
     m->n_iter = 0;
 
-    // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
-
     // MINLP instance
     SmartPtr<BonminUserClass> tminlp = new BonminUserClass(*this, m);
 
@@ -374,8 +371,6 @@ namespace casadi {
     // Initialize
     bonmin.initialize(GetRawPtr(tminlp));
 
-    m->fstats.at("mainloop").tic();
-
     if (true) {
       // Branch-and-bound
       try {
@@ -385,8 +380,6 @@ namespace casadi {
         casadi_error("CoinError occured: " + to_str(e));
       }
     }
-
-    m->fstats.at("mainloop").toc();
 
     // Save results to outputs
     casadi_copy(&m->fk, 1, m->f);

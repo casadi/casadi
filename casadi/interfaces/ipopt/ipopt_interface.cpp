@@ -353,21 +353,15 @@ namespace casadi {
     // Reset number of iterations
     m->n_iter = 0;
 
-    // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
-
     // Get back the smart pointers
     Ipopt::SmartPtr<Ipopt::TNLP> *userclass =
       static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(m->userclass);
     Ipopt::SmartPtr<Ipopt::IpoptApplication> *app =
       static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(m->app);
 
-    m->fstats.at("mainloop").tic();
-
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
     m->return_status = return_status_string(status);
-    m->fstats.at("mainloop").toc();
 
     // Save results to outputs
     casadi_copy(&m->fk, 1, m->f);
@@ -375,7 +369,6 @@ namespace casadi {
     casadi_copy(m->lam_gk, ng_, m->lam_g);
     casadi_copy(m->lam_xk, nx_, m->lam_x);
     casadi_copy(m->gk, ng_, m->g);
-
   }
 
   bool IpoptInterface::

@@ -778,9 +778,6 @@ namespace casadi {
   void Scpgen::solve(void* mem) const {
     auto m = static_cast<ScpgenMemory*>(mem);
 
-    // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
-
     if (v_.size()>0) {
       // Initialize lifted variables using the generated function
       fill_n(m->arg, vinit_fcn_.n_in(), nullptr);

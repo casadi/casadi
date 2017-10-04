@@ -641,12 +641,9 @@ namespace casadi {
     casadi_copy(m->lam_xk, nx_, m->lam_qp);
     casadi_copy(m->lam_gk, ng_, m->lam_qp+nx_);
 
-    m->fstats.at("mainloop").tic();
     ret = run(m, max_iter_, warmstart_);
 
-    m->fstats.at("mainloop").toc();
-
-    if (ret==1) casadi_warning("Maximum number of iterations reached");
+    if (ret==1) print("***WARNING: Maximum number of iterations reached\n");
 
     // Get optimal cost
     if (m->f) *m->f = m->obj;

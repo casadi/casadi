@@ -210,8 +210,6 @@ namespace casadi {
     // Check the provided inputs
     check_inputs(mem);
 
-    m->fstats.at("mainloop").tic();
-
     // Memory object
     snProblem prob;
 
@@ -327,8 +325,6 @@ namespace casadi {
       // Error if reached this point
       casadi_error("SNOPT error setting option \"" + opname + "\"");
     }
-
-    m->fstats.at("mainloop").toc();
 
     // Run SNOPT
     int info = solveC(&prob, Cold_, &m->fk);

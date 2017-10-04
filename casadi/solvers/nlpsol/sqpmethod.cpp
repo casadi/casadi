@@ -334,11 +334,6 @@ namespace casadi {
     // Check the provided inputs
     check_inputs(mem);
 
-    // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
-
-    m->fstats.at("mainloop").tic();
-
     // Set linearization point to initial guess
     casadi_copy(m->x0, nx_, m->xk);
 
@@ -681,8 +676,6 @@ namespace casadi {
         }
       }
     }
-
-    m->fstats.at("mainloop").toc();
 
     // Save results to outputs
     if (m->f) *m->f = m->fk;

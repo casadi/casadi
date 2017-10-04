@@ -374,10 +374,9 @@ namespace casadi {
   int Nlpsol::init_mem(void* mem) const {
     if (OracleFunction::init_mem(mem)) return 1;
     auto m = static_cast<NlpsolMemory*>(mem);
-
-    m->fstats["mainloop"] = FStats();
-    m->fstats["callback_fun"] = FStats();
-    m->fstats["callback_prep"] = FStats();
+    m->add_stat(name_);
+    m->add_stat("callback_fun");
+    m->add_stat("callback_prep");
     return 0;
   }
 
@@ -444,6 +443,10 @@ namespace casadi {
   int Nlpsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<NlpsolMemory*>(mem);
 
+    // Reset statistics
+    for (auto&& s : m->fstats) s.second.reset();
+    m->fstats.at(name_).tic();
+
     // Reset the solver, prepare for solution
     setup(m, arg, res, iw, w);
 
@@ -487,7 +490,8 @@ namespace casadi {
       }
     }
 
-    // Show statistics
+    // Finalize/print statistics
+    m->fstats.at(name_).toc();
     if (print_time_)  print_fstats(m);
     return 0;
   }
