@@ -570,9 +570,9 @@ namespace casadi {
     return (*this)->get_diag(mapping);
   }
 
-  std::vector<int> Sparsity::etree(bool ata) const {
+  std::vector<int> Sparsity::etree(bool col) const {
     vector<int> p(size2()), w(size1() + size2());
-    casadi_etree(*this, get_ptr(p), get_ptr(w), !ata);
+    casadi_etree(*this, get_ptr(p), get_ptr(w), col);
     return p;
   }
 

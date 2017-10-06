@@ -1,11 +1,11 @@
 // NOLINT(legal/copyright)
 // SYMBOL "etree"
 // Calculate the elimination tree for a matrix
-// len[w] >= sym ? ncol : ncol + nrow
+// len[w] >= col ? ncol + nrow : ncol
 // len[parent] == ncol
 // Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
 inline
-void casadi_etree(const int* sp, int* parent, int *w, int sym) {
+void casadi_etree(const int* sp, int* parent, int *w, int col) {
   int r, c, k, rnext;
   // Extract sparsity
   int nrow = *sp++, ncol = *sp++;
@@ -14,7 +14,7 @@ void casadi_etree(const int* sp, int* parent, int *w, int sym) {
   int *ancestor=w;
   // Path for A'A
   int *prev;
-  if (!sym) {
+  if (col) {
     prev=w+ncol;
     for (r=0; r<nrow; ++r) prev[r] = -1;
   }
@@ -25,7 +25,7 @@ void casadi_etree(const int* sp, int* parent, int *w, int sym) {
     // Loop over nonzeros
     for (k=colind[c]; k<colind[c+1]; ++k) {
       r = row[k];
-      if (!sym) r = prev[r];
+      if (col) r = prev[r];
       // Traverse from r to c
       while (r!=-1 && r<c) {
         rnext = ancestor[r];
@@ -33,7 +33,7 @@ void casadi_etree(const int* sp, int* parent, int *w, int sym) {
         if (rnext==-1) parent[r] = c;
         r = rnext;
       }
-      if (!sym) prev[row[k]] = c;
+      if (col) prev[row[k]] = c;
     }
   }
 }
