@@ -30,6 +30,7 @@ set(RUNTIME_SRC
   casadi_project.hpp
   casadi_rank1.hpp
   casadi_scal.hpp
+  casadi_solve.hpp
   casadi_sparsify.hpp
   casadi_sum_viol.hpp
   casadi_swap.hpp

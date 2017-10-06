@@ -221,6 +221,7 @@ namespace casadi {
   #include "casadi_interpn_grad.hpp"
   #include "casadi_mv_dense.hpp"
   #include "casadi_finite_diff.hpp"
+  #include "casadi_solve.hpp"
 } // namespace casadi
 
 /// \endcond

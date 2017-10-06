@@ -131,57 +131,6 @@ namespace casadi {
     return Sparsity::triplet(size2(), size1(), trans_row, trans_col, mapping, invert_mapping);
   }
 
-  std::vector<int> SparsityInternal::etree(bool ata) const {
-    const int* colind = this->colind();
-    const int* row = this->row();
-
-    // Allocate result
-    vector<int> parent(size2());
-
-    // Allocate workspace
-    vector<int> ancestor(size2());
-    vector<int> prev(ata ? size1() : 0, -1);
-
-    // Loop over columns
-    for (int k=0; k<size2(); ++k) {
-      // Start with no parent or ancestor
-      parent[k] = -1;
-      ancestor[k] = -1;
-
-      // Loop over nonzeros
-      for (int p=colind[k]; p<colind[k+1]; ++p) {
-
-        // What is this?
-        int i=ata ? (prev[row[p]]) : (row[p]);
-
-        // Transverse from i to k
-        while (i!=-1 && i<k) {
-
-          // Next i is the ancestor of i
-          int inext = ancestor[i];
-
-          // Path compression
-          ancestor[i] = k;
-
-          // No ancestor, parent is k
-          if (inext==-1)
-            parent[i] = k;
-
-          // Update i
-          i=inext;
-        }
-
-        // What is this?
-        if (ata) {
-          prev[row[p]] = k;
-        }
-      }
-    }
-
-    return parent;
-
-  }
-
   int SparsityInternal::dfs(int j, int top, std::vector<int>& xi,
                                          std::vector<int>& pstack, const std::vector<int>& pinv,
                                          std::vector<bool>& marked) const {
@@ -1809,8 +1758,9 @@ namespace casadi {
       }
 
       // etree of C'*C, where C=A(:, q)
-      S_parent = C->etree(1);
-
+      S_parent.resize(C.size2());
+      vector<int> w(C.size1()+C.size2());
+      casadi_etree(C, get_ptr(S_parent), get_ptr(w), false);
       post = postorder(S_parent, n);
 
       // row counts chol(C'*C)

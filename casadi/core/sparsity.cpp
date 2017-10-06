@@ -571,7 +571,9 @@ namespace casadi {
   }
 
   std::vector<int> Sparsity::etree(bool ata) const {
-    return (*this)->etree(ata);
+    vector<int> p(size2()), w(size1() + size2());
+    casadi_etree(*this, get_ptr(p), get_ptr(w), !ata);
+    return p;
   }
 
   int Sparsity::dfs(int j, int top, std::vector<int>& xi,
