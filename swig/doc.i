@@ -60694,11 +60694,11 @@ Get the size along a particular dimensions.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::etree(bool ata=false) const  "
+%feature("docstring")  casadi::Sparsity::etree(bool col=false) const  "
 
 Calculate the elimination tree See Direct Methods for Sparse Linear Systems
-by Davis (2006). If the parameter ata is false, the algorithm is equivalent
-to MATLAB's etree(A), except that the indices are zero- based. If ata is
+by Davis (2006). If the parameter col is false, the algorithm is equivalent
+to MATLAB's etree(A), except that the indices are zero- based. If col is
 true, the algorithm is equivalent to MATLAB's etree(A, 'col').
 
 ";
@@ -67221,6 +67221,11 @@ ldwork=0) "
 
 ";
 
+%feature("docstring")  casadi::casadi_etree(const int *sp, int *parent, int
+*w, int col) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::collocation_interpolators(const std::vector<
 double > &tau_root, std::vector< std::vector< double > > &output_C,
 std::vector< double > &output_D) "
@@ -68255,6 +68260,16 @@ Get the documentation string for a plugin.
 
 ";
 
+%feature("docstring")  casadi::casadi_leaf(int i, int j, const int *first,
+int *maxfirst, int *prevleaf, int *ancestor, int *jleaf) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_postorder(const int *parent, int n,
+int *post, int *w) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::dple_in() "
 
 Get input scheme of DPLE solvers.
@@ -69048,6 +69063,11 @@ std::string &solver, const NlpBuilder &nl, const Dict &opts=Dict()) "
 Check if the vector is monotone.
 
 ";
+
+%feature("docstring")  casadi::casadi_postorder_dfs(int j, int k, int *head,
+int *next, int *post, int *stack) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_norm_inf_mul(const T1 *x, const int
 *sp_x, const T1 *y, const int *sp_y, T1 *dwork, int *iwork) "

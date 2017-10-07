@@ -44035,8 +44035,8 @@ Get the size along a particular dimensions.
 %feature("docstring") casadi::Sparsity::etree "
 
 Calculate the elimination tree See Direct Methods for Sparse Linear Systems
-by Davis (2006). If the parameter ata is false, the algorithm is equivalent
-to MATLAB's etree(A), except that the indices are zero- based. If ata is
+by Davis (2006). If the parameter col is false, the algorithm is equivalent
+to MATLAB's etree(A), except that the indices are zero- based. If col is
 true, the algorithm is equivalent to MATLAB's etree(A, 'col').
 
 ";
@@ -49273,6 +49273,8 @@ violation.
 
 ";
 
+%feature("docstring") casadi::casadi_etree "[INTERNAL] ";
+
 %feature("docstring") casadi::collocation_interpolators "
 
 Obtain collocation interpolating matrices.
@@ -50205,6 +50207,10 @@ Get the documentation string for a plugin.
 
 ";
 
+%feature("docstring") casadi::casadi_leaf "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_postorder "[INTERNAL] ";
+
 %feature("docstring") casadi::dple_in "
 
 >  std::vector<std::string> casadi::dple_in()
@@ -50976,6 +50982,8 @@ Joel Andersson
 Check if the vector is monotone.
 
 ";
+
+%feature("docstring") casadi::casadi_postorder_dfs "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_norm_inf_mul "[INTERNAL]  Inf-norm of
 a Matrix-matrix product,*
