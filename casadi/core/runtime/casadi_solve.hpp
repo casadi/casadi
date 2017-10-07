@@ -84,3 +84,32 @@ void casadi_postorder(const int* parent, int n, int* post, int* w) {
     }
   }
 }
+
+// SYMBOL "leaf"
+// Needed by casadi_symbfact
+// Ref: Section 4.4, Direct Methods for Sparse Linear Systems by Tim Davis
+inline
+int casadi_leaf(int i, int j, const int* first, int* maxfirst,
+                 int* prevleaf, int* ancestor, int* jleaf) {
+  int q, s, sparent, jprev;
+  *jleaf = 0;
+  // Quick return if j is not a leaf
+  if (i<=j || first[j]<=maxfirst[i]) return -1;
+  // Update max first[j] seen so far
+  maxfirst[i] = first[j];
+  // Previous leaf of ith subtree
+  jprev = prevleaf[i];
+  prevleaf[i] = j;
+  // j is first or subsequent leaf
+  *jleaf = (jprev == -1) ? 1 : 2;
+  // if first leaf, q is root of ith subtree
+  if (*jleaf==1) return i;
+  // Path compression
+  for (q=jprev; q!=ancestor[q]; q=ancestor[q]);
+  for (s=jprev; s!=q; s=sparent) {
+    sparent = ancestor[s];
+    ancestor[s] = q;
+  }
+  // Return least common ancestor
+  return q;
+}

@@ -185,10 +185,6 @@ namespace casadi {
                  std::vector<int>& colind_C,
                  std::vector<int>& row_C) const;
 
-    /// consider A(i, j), node j in ith col subtree and return lca(jprev, j): See cs_leaf in CSparse
-    static int leaf(int i, int j, const int *first, int *maxfirst,
-                     int *prevleaf, int *ancestor, int *jleaf);
-
     /** compute nnz(V) = S->lnz, S->pinv, S->leftmost, S->m2 from A and S->parent:
      * See cs_vcount in CSparse
      */
