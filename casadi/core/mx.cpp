@@ -505,6 +505,9 @@ namespace casadi {
   MX::MX(const MX& x) : SharedObject(x) {
   }
 
+  MX::MX(MX&& x) : SharedObject(std::move(x)) {
+  }
+
   const Sparsity& MX::sparsity() const {
     return (*this)->sparsity();
   }

@@ -70,27 +70,26 @@ namespace casadi {
     // Start destruction method if any of the dependencies has dependencies
     for (vector<MX>::iterator cc=dep_.begin(); cc!=dep_.end(); ++cc) {
       // Skip if constant
-      if (cc->is_constant()) continue;
+      if (cc->is_null() ||cc->is_constant()) continue;
 
       // Check if there are other "owners" of the node
       if (cc->getCount()!= 1) {
 
-        // Replace with a 0-by-0 matrix
-        *cc = MX();
+        // Replace with NULL; clears dependencies
+        cc->clear();
 
       } else {
         // Stack of expressions to be deleted
         std::stack<MX> deletion_stack;
 
         // Move the child to the deletion stack
-        deletion_stack.push(*cc);
-        *cc = MX();
+        deletion_stack.push(std::move(*cc));
 
         // Process stack
         while (!deletion_stack.empty()) {
 
           // Top element
-          MX t = deletion_stack.top();
+          MX& t = deletion_stack.top();
 
           // Check if the top element has dependencies with dependencies
           bool found_dep = false;
@@ -99,19 +98,18 @@ namespace casadi {
           for (vector<MX>::iterator ii=t->dep_.begin(); ii!=t->dep_.end(); ++ii) {
 
             // Skip if constant
-            if (ii->is_constant()) continue;
+            if (ii->is_null() || ii->is_constant()) continue;
 
             // Check if this is the only reference to the element
             if (ii->getCount()==1) {
 
               // Remove and add to stack
-              deletion_stack.push(*ii);
-              *ii = MX();
+              deletion_stack.push(std::move(*ii));
               found_dep = true;
               break;
             } else {
-              // Replace with an element without dependencies
-              *ii = MX();
+              // Replace with NULL; clears dependencies
+              ii->clear();
             }
           }
 

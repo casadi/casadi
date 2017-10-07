@@ -36,6 +36,12 @@ namespace casadi {
     node = 0;
   }
 
+  SharedObject::SharedObject(SharedObject&& arg) {
+    // Moving the node does not influence its counter
+    node = arg.node;
+    arg.node = 0;
+  }
+
   SharedObject::SharedObject(const SharedObject& ref) {
     node = ref.node;
     count_up();
@@ -53,6 +59,14 @@ namespace casadi {
 
   void SharedObject::assign(SharedObjectInternal* node_) {
     node = node_;
+  }
+
+  void SharedObject::clear() {
+    // decrease the counter and delete if this was the last pointer
+    count_down();
+
+    // save the new pointer
+    node = 0;
   }
 
   SharedObject& SharedObject::operator=(const SharedObject& ref) {

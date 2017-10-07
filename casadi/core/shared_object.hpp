@@ -93,6 +93,12 @@ namespace casadi {
     /// Copy constructor (shallow copy)
     SharedObject(const SharedObject& ref);
 
+    // Move constructor
+    SharedObject(SharedObject&& arg);
+
+    // Clear reference to current node
+    void clear();
+
     /// Destructor
     ~SharedObject();
 

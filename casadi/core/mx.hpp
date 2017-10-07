@@ -101,6 +101,12 @@ namespace casadi {
 /// \endcond
 
 #ifndef SWIG
+    // Move constructor
+    MX(MX&& x);
+
+    // Assignment operator (got deleted when move constructor got declared)
+    MX& operator=(const MX& other) = default;
+
 /// \cond INTERNAL
     /** \brief  Create from node */
     static MX create(MXNode* node);
