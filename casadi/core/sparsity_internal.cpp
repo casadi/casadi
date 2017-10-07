@@ -915,76 +915,6 @@ namespace casadi {
     return 1;
   }
 
-  std::vector<int> SparsityInternal::postorder(const std::vector<int>& parent, int n) {
-    int j, k = 0, *head, *next, *stack ;
-
-    // allocate result
-    vector<int> post(n);
-
-    // get workspace
-    vector<int> w(3*n);
-
-    head = &w.front() ;
-    next = &w.front() + n ;
-    stack = &w.front() + 2*n;
-
-    // empty linked lists
-    for (j=0; j<n; ++j)
-      head[j] = -1;
-
-    // traverse nodes in reverse order
-    for (j=n-1; j>=0; --j) {
-      // j is a root
-      if (parent[j] == -1) continue;
-
-      // add j to list of its parent
-      next[j] = head[parent[j]];
-      head[parent[j]] = j ;
-    }
-
-    for (j=0; j<n; ++j) {
-      // skip j if it is not a root
-      if (parent[j] != -1) continue;
-
-      k = dfs_postorder(j, k, head, next, &post.front(), stack);
-    }
-
-    // success; return post
-    return post;
-  }
-
-  int SparsityInternal::dfs_postorder(int j, int k, int *head,
-                                                     const int *next, int *post, int *stack) {
-    int i, p, top = 0;
-
-    // place j on the stack
-    stack[0] = j;
-
-    // while (stack is not empty)
-    while (top >= 0) {
-      // p = top of stack
-      p = stack[top];
-
-      // i = youngest child of p
-      i = head[p];
-      if (i == -1) {
-        // p has no unordered children left
-        top--;
-
-        // node p is the kth postordered node
-        post[k++] = p;
-      } else {
-        // remove i from children of p
-        head[p] = next[i];
-
-        // start dfs on child node i
-        stack[++top] = i;
-      }
-    }
-
-    return k;
-  }
-
   void SparsityInternal::init_ata(const int *post, int *w, int **head, int **next) const {
     int i, k, p, m = size2(), n = size1();
     const int *ATp = colind();
@@ -1667,8 +1597,9 @@ namespace casadi {
 
     // postorder the assembly tree
     for (k = 0, i = 0 ; i <= n ; i++) {
-      if (Cp[i] == -1)
-        k = dfs_postorder(i, k, head, next, &P.front(), w) ;
+      if (Cp[i] == -1) {
+        k = casadi_postorder_dfs(i, k, head, next, &P.front(), w) ;
+      }
     }
 
     return P;
@@ -1761,7 +1692,9 @@ namespace casadi {
       S_parent.resize(C.size2());
       vector<int> w(C.size1()+C.size2());
       casadi_etree(C, get_ptr(S_parent), get_ptr(w), false);
-      post = postorder(S_parent, n);
+      post.resize(n);
+      w.resize(3*n);
+      casadi_postorder(get_ptr(S_parent), n, get_ptr(post), get_ptr(w));
 
       // row counts chol(C'*C)
       S_cp = C->counts(&S_parent.front(), &post.front(), 1);

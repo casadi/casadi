@@ -195,13 +195,6 @@ namespace casadi {
     int vcount(std::vector<int>& pinv, std::vector<int>& parent, std::vector<int>& leftmost,
                int& S_m2, double& S_lnz) const;
 
-    /// post order a forest: See cs_post in CSparse
-    static std::vector<int> postorder(const std::vector<int>& parent, int n);
-
-    /// Depth-first search and postorder of a tree rooted at node j: See cs_tdfs in CSparse
-    static int dfs_postorder(int j, int k, int *head,
-                                            const int *next, int *post, int *stack);
-
     /// row counts of LL'=A or LL'=A'A, given parent & post ordering: see init_ata in CSparse
     void init_ata(const int *post, int *w, int **head, int **next) const;
 

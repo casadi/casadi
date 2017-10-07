@@ -3,7 +3,7 @@
 // Calculate the elimination tree for a matrix
 // len[w] >= col ? ncol + nrow : ncol
 // len[parent] == ncol
-// Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
+// Ref: Section 4.1, Direct Methods for Sparse Linear Systems by Tim Davis
 inline
 void casadi_etree(const int* sp, int* parent, int *w, int col) {
   int r, c, k, rnext;
@@ -34,6 +34,53 @@ void casadi_etree(const int* sp, int* parent, int *w, int col) {
         r = rnext;
       }
       if (col) prev[row[k]] = c;
+    }
+  }
+}
+
+// SYMBOL "postorder_dfs"
+// Traverse an elimination tree using depth first search
+// Ref: Section 4.3, Direct Methods for Sparse Linear Systems by Tim Davis
+inline
+int casadi_postorder_dfs(int j, int k, int* head, int* next,
+                         int* post, int* stack) {
+  int i, p, top=0;
+  stack[0] = j;
+  while (top>=0) {
+    p = stack[top];
+    i = head[p];
+    if (i==-1) {
+      // No children
+      top--;
+      post[k++] = p;
+    } else {
+      // Add to stack
+      head[p] = next[i];
+      stack[++top] = i;
+    }
+  }
+  return k;
+}
+
+// SYMBOL "postorder"
+// Calculate the postorder permuation
+// Ref: Section 4.3, Direct Methods for Sparse Linear Systems by Tim Davis
+// len[w] >= 3*n
+// len[post] == n
+inline
+void casadi_postorder(const int* parent, int n, int* post, int* w) {
+  int j, k=0;
+  int *head=w, *next=w+n, *stack=w+2*n;
+  for (j=0; j<n; ++j) head[j] = -1;
+  for (j=n-1; j>=0; --j) {
+    if (parent[j]!=-1) {
+      next[j] = head[parent[j]];
+      head[parent[j]] = j;
+    }
+  }
+  for (j=0; j<n; j++) {
+    if (parent[j]!=-1) {
+      k = casadi_postorder_dfs(j, k, head, next, post, stack);
     }
   }
 }
