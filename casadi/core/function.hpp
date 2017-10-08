@@ -508,9 +508,10 @@ namespace casadi {
 
         Mapaccum has the following benefits over writing an equivalent for-loop:
            - much faster at construction time
+           - potentially much faster compilation times (for codegen)
            - offers a trade-off between memory and evaluation time
 
-        The base (settable through the options dictionary, default 2),
+        The base (settable through the options dictionary, default 10),
         is used to create a tower of function calls,
         containing unrolled for-loops of length maximum base.
 
@@ -522,7 +523,8 @@ namespace casadi {
         Set base to -1 to unroll all the way; no gains in memory efficiency here.
 
     */
-    Function mapaccum(const std::string& name, int n, int n_accum=1,
+    Function mapaccum(const std::string& name, int n, const Dict& opts = Dict()) const;
+    Function mapaccum(const std::string& name, int n, int n_accum,
                       const Dict& opts = Dict()) const;
     Function mapaccum(const std::string& name, int n,
                       const std::vector<int>& accum_in,

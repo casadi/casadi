@@ -432,12 +432,15 @@ namespace casadi {
     return rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
+  Function Function::mapaccum(const string& name, int N, const Dict& opts) const {
+    return mapaccum(name, N, 1, opts);
+  }
   Function Function::mapaccum(const string& name, int N, int n_accum,
                               const Dict& opts) const {
     Dict options = opts;
 
     // Default base
-    int base = 2;
+    int base = 10;
     auto it = options.find("base");
     if (it!=options.end()) {
       options.erase(it);
@@ -457,7 +460,7 @@ namespace casadi {
       int r = N % base;
       chain.insert(chain.end(), r, c);
       N = (N-r)/base;
-      c = c.mapaccum(name, std::vector<Function>(base, c), n_accum, options);
+      c = c.mapaccum(c.name()+"_acc"+str(base), std::vector<Function>(base, c), n_accum, options);
     }
     return mapaccum(name, chain, n_accum, options);
   }
@@ -465,13 +468,13 @@ namespace casadi {
   Function Function::mapaccum(const std::string& name,
                       const std::vector<Function>& chain, int n_accum,
                       const Dict& opts) const {
-	  // Shorthands
-	  int n_in = this->n_in(), n_out = this->n_out();
+    // Shorthands
+    int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
     casadi_assert(!chain.empty(), "mapaccum: chain must be non-empty");
     casadi_assert(n_accum<=min(n_in, n_out), "mapaccum: too many accumulators");
-	  // Quick return?
-	  if (chain.size()==1) return chain[0];
+    // Quick return?
+    if (chain.size()==1) return chain[0];
     // Get symbolic expressions for inputs and outputs
     vector<MX> arg = mx_in();
     vector<MX> res;
@@ -483,8 +486,8 @@ namespace casadi {
 
       // Stacked input expressions
       for (int i=n_accum; i<n_in; ++i) {
-      	arg[i] = MX::sym(name_in(i) + "_" + str(i), f.sparsity_in(i));
-      	varg[i].push_back(arg[i]);
+        arg[i] = MX::sym(name_in(i) + "_" + str(i), f.sparsity_in(i));
+        varg[i].push_back(arg[i]);
       }
 
       // Call f
@@ -494,17 +497,17 @@ namespace casadi {
       // Copy function output to input
       copy_n(res.begin(), n_accum, arg.begin());
       for (int i=0; i<n_accum; ++i) {
-      	// Ony get last component (allows nested calls)
-      	int ncol_out=f.size2_out(i), ncol_in=size2_in(i);
-      	if (ncol_out>ncol_in) {
-    	    arg[i] = horzsplit(arg[i], {0, ncol_out-ncol_in, ncol_out}).back();
-	      }
+        // Ony get last component (allows nested calls)
+        int ncol_out=f.size2_out(i), ncol_in=size2_in(i);
+        if (ncol_out>ncol_in) {
+          arg[i] = horzsplit(arg[i], {0, ncol_out-ncol_in, ncol_out}).back();
+        }
       }
     }
     // Construct return
     for (int i=0; i<n_in; ++i) arg[i] = horzcat(varg[i]);
     for (int i=0; i<n_out; ++i) res[i] = horzcat(vres[i]);
-  	return Function(name, arg, res, name_in(), name_out(), opts);
+    return Function(name, arg, res, name_in(), name_out(), opts);
   }
 
   Function Function::mapaccum(const string& name, int n,

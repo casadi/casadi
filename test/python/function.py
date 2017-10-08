@@ -1521,6 +1521,17 @@ class Functiontests(casadiTestCase):
 
     self.assertTrue("fwd4_ffff" in code)
 
+  def test_max_num_dir(self):
+    x = MX.sym("x")
+
+    f = Function("ffff",[x],[sin(x)])
+    fm = f.mapaccum("mapaccum",100,1,{"base":4})
+   
+    c = CodeGenerator('me')
+    c.add(fm)
+    code= c.dump()
+
+    self.assertTrue("ffff_acc4_acc4_acc4" in code)
 
 if __name__ == '__main__':
     unittest.main()
