@@ -3289,6 +3289,11 @@ In such cases, you may still access the non-converged solution through debug mod
 opti.debug.value(x)
 \end{lstlisting}
 
+Related, you may inspect the value of an expression, at the initial guess that you supplied to the solver:\\
+\begin{lstlisting}[language=Python]
+opti.debug.value(x,opti.initial())
+\end{lstlisting}
+
 You may specify a callback function; it will be called at each iteration of the solver, with the current iteration number as argument.
 To plot the progress of the solver, you may access the non-converged solution through debug mode:\\
 \begin{lstlisting}[language=Python]
