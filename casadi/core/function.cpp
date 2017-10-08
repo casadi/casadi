@@ -443,8 +443,8 @@ namespace casadi {
     int base = 10;
     auto it = options.find("base");
     if (it!=options.end()) {
-      options.erase(it);
       base = it->second;
+      options.erase(it);
     }
 
     casadi_assert(N>0, "mapaccum: N must be positive");
