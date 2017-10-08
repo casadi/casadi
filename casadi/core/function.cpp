@@ -432,15 +432,46 @@ namespace casadi {
     return rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
-  Function Function::mapaccum(const string& name, int n, int n_accum,
+  Function Function::mapaccum(const string& name, int N, int n_accum,
                               const Dict& opts) const {
-    // Shorthands
-    int n_in = this->n_in(), n_out = this->n_out();
+    Dict options = opts;
+
+    // Default base
+    int base = 2;
+    auto it = options.find("base");
+    if (it!=options.end()) {
+      options.erase(it);
+      base = it->second;
+    }
+
+    casadi_assert(N>0, "mapaccum: N must be positive");
+
+    if (base==-1)
+      return mapaccum(name, std::vector<Function>(N, *this), n_accum, options);
+    casadi_assert(base>=2, "mapaccum: base must be positive");
+
+    // Decompose N into
+    std::vector<Function> chain;
+    Function c = *this;
+    while (N!=0) {
+      int r = N % base;
+      chain.insert(chain.end(), r, c);
+      N = (N-r)/base;
+      c = c.mapaccum(name, std::vector<Function>(base, c), n_accum, options);
+    }
+    return mapaccum(name, chain, n_accum, options);
+  }
+
+  Function Function::mapaccum(const std::string& name,
+                      const std::vector<Function>& chain, int n_accum,
+                      const Dict& opts) const {
+	  // Shorthands
+	  int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
-    casadi_assert(n>0, "mapaccum: n must be positive");
+    casadi_assert(!chain.empty(), "mapaccum: chain must be non-empty");
     casadi_assert(n_accum<=min(n_in, n_out), "mapaccum: too many accumulators");
-    // Quick return?
-    if (n==1) return *this;
+	  // Quick return?
+	  if (chain.size()==1) return chain[0];
     // Get symbolic expressions for inputs and outputs
     vector<MX> arg = mx_in();
     vector<MX> res;
@@ -448,32 +479,32 @@ namespace casadi {
     vector<vector<MX>> varg(n_in), vres(n_out);
     for (int i=0; i<n_accum; ++i) varg[i].push_back(arg[i]);
     // For each function call
-    for (int iter=0; iter<n; ++iter) {
+    for (const auto& f : chain) {
+
       // Stacked input expressions
       for (int i=n_accum; i<n_in; ++i) {
-        arg[i] = MX::sym(name_in(i) + "_" + str(i), sparsity_in(i));
-        varg[i].push_back(arg[i]);
+      	arg[i] = MX::sym(name_in(i) + "_" + str(i), f.sparsity_in(i));
+      	varg[i].push_back(arg[i]);
       }
+
       // Call f
-      res = (*this)(arg);
+      res = f(arg);
       // Save output expressions
       for (int i=0; i<n_out; ++i) vres[i].push_back(res[i]);
-      // Done?
-      if (iter==n-1) break;
       // Copy function output to input
       copy_n(res.begin(), n_accum, arg.begin());
       for (int i=0; i<n_accum; ++i) {
-        // Ony get last component (allows nested calls)
-        int nrow_out=size2_out(i), nrow_in=size2_in(i);
-        if (nrow_out>nrow_in) {
-          arg[i] = horzsplit(arg[i], {0, nrow_out-nrow_in, nrow_out}).back();
-        }
+      	// Ony get last component (allows nested calls)
+      	int ncol_out=f.size2_out(i), ncol_in=size2_in(i);
+      	if (ncol_out>ncol_in) {
+    	    arg[i] = horzsplit(arg[i], {0, ncol_out-ncol_in, ncol_out}).back();
+	      }
       }
     }
     // Construct return
     for (int i=0; i<n_in; ++i) arg[i] = horzcat(varg[i]);
     for (int i=0; i<n_out; ++i) res[i] = horzcat(vres[i]);
-    return Function(name, arg, res, name_in(), name_out(), opts);
+  	return Function(name, arg, res, name_in(), name_out(), opts);
   }
 
   Function Function::mapaccum(const string& name, int n,

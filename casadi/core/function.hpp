@@ -506,6 +506,20 @@ namespace casadi {
                 x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
         \endverbatim
 
+        Mapaccum has the following benefits over writing an equivalent for-loop:
+           - much faster at construction time
+           - offers a trade-off between memory and evaluation time
+
+        The base (settable through the options dictionary, default 2),
+        is used to create a tower of function calls,
+        containing unrolled for-loops of length maximum base.
+
+        This technique is much more scalable in terms of memory-usage,
+        but slightly slower at evaluation, than a plain for-loop.
+        The effect is similar to that of a for-loop with a check-pointing instruction
+        after each chunk of iterations with size base.
+
+        Set base to -1 to unroll all the way; no gains in memory efficiency here.
 
     */
     Function mapaccum(const std::string& name, int n, int n_accum=1,
@@ -897,6 +911,11 @@ namespace casadi {
 
     /// Helper function for parsing .casadi files
     static bool proceed_to(std::istream& file, const std::string& str);
+
+    /// Helper function for mapaccum
+    Function mapaccum(const std::string& name, const std::vector<Function>& chain, int n_accum=1,
+                      const Dict& opts = Dict()) const;
+
 #endif // SWIG
   };
 
