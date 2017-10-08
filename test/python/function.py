@@ -1490,6 +1490,37 @@ class Functiontests(casadiTestCase):
       self.checkfunction(F,Fsx,inputs = [i,A,B])
       self.check_codegen(F,inputs=[i,A,B])
 
+  def test_max_num_dir(self):
+    x = MX.sym("x",10)
+
+    f = Function("ffff",[x],[mtimes(DM.ones(10,10),x)],{"max_num_dir":4,"verbose":True})
+    f = f.expand()
+
+
+    y = f.call([sin(x)],False,True)[0]
+
+
+
+    acc = Function('acc',[x],[y])
+    acc = acc.mapaccum('accd',5)
+
+
+    cons = vec(acc(x))
+
+    os.system("callgrind_control -i on")
+
+    e = jacobian(cons,x)
+    os.system("callgrind_control -i off")
+
+    g = Function('g',[x],[e])
+
+
+    c = CodeGenerator('me')
+    c.add(g)
+    code= c.dump()
+
+    self.assertTrue("fwd4_ffff" in code)
+
 
 if __name__ == '__main__':
     unittest.main()

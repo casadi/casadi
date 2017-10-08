@@ -627,7 +627,7 @@ namespace casadi {
 
   void MXFunction::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                 std::vector<std::vector<MX> >& fsens) const {
-    if (verbose_) casadi_message(name_ + "::ad_forward");
+    if (verbose_) casadi_message(name_ + "::ad_forward(" + str(fseed.size())+ ")");
 
     // Allocate results
     int nfwd = fseed.size();
@@ -773,7 +773,7 @@ namespace casadi {
 
   void MXFunction::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                                 std::vector<std::vector<MX> >& asens) const {
-    if (verbose_) casadi_message(name_ + "::ad_reverse");
+    if (verbose_) casadi_message(name_ + "::ad_reverse(" + str(aseed.size())+ ")");
 
     // Allocate results
     int nadj = aseed.size();

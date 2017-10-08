@@ -258,7 +258,11 @@ namespace casadi {
   }
 
   Function Function::expand() const {
-    return expand(name());
+    Dict opts;
+    opts["ad_weight"] = (*this)->ad_weight();
+    opts["ad_weight_sp"] = (*this)->sp_weight();
+    opts["max_num_dir"] = (*this)->max_num_dir_;
+    return expand(name(), opts);
   }
 
   Function Function::expand(const string& name, const Dict& opts) const {

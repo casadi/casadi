@@ -2061,7 +2061,7 @@ namespace casadi {
     } else {
       // Evaluate in batches
       casadi_assert_dev(enable_forward_ || enable_fd_);
-      int max_nfwd = 256;
+      int max_nfwd = max_num_dir_;
       if (!enable_fd_) {
         while (!has_forward(max_nfwd)) max_nfwd/=2;
       }
@@ -2168,7 +2168,8 @@ namespace casadi {
     } else {
       // Evaluate in batches
       casadi_assert_dev(enable_reverse_);
-      int max_nadj = 64;
+      int max_nadj = max_num_dir_;
+
       while (!has_reverse(max_nadj)) max_nadj/=2;
       int offset = 0;
       while (offset<nadj) {
