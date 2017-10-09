@@ -570,10 +570,26 @@ namespace casadi {
     return (*this)->get_diag(mapping);
   }
 
-  std::vector<int> Sparsity::etree(bool col) const {
-    vector<int> p(size2()), w(size1() + size2());
-    casadi_etree(*this, get_ptr(p), get_ptr(w), col);
-    return p;
+  std::vector<int> Sparsity::etree(bool ata) const {
+    vector<int> parent(size2()), w(size1() + size2());
+    casadi_etree(*this, get_ptr(parent), get_ptr(w), ata);
+    return parent;
+  }
+
+  void Sparsity::symbfact(std::vector<int>& count, std::vector<int>& parent,
+                          std::vector<int>& post, bool ata) const {
+    // work vector
+    std::vector<int> w(5*size2()+size1()+1);
+    // Calculate elimination tree
+    parent.resize(size2());
+    casadi_etree(*this, get_ptr(parent), get_ptr(w), ata);
+    // Calculate postorder
+    post.resize(size2());
+    casadi_postorder(get_ptr(parent), size2(), get_ptr(post), get_ptr(w));
+    // Calculate column counts
+    count.resize(size2());
+    casadi_counts(T(), get_ptr(parent), get_ptr(post), get_ptr(count),
+                  get_ptr(w), ata);
   }
 
   int Sparsity::dfs(int j, int top, std::vector<int>& xi,

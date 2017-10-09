@@ -584,11 +584,19 @@ namespace casadi {
 
     /** \brief Calculate the elimination tree
         See Direct Methods for Sparse Linear Systems by Davis (2006).
-        If the parameter col is false, the algorithm is equivalent to MATLAB's etree(A), except that
-        the indices are zero-based. If col is true, the algorithm is equivalent to MATLAB's
+        If the parameter ata is false, the algorithm is equivalent to MATLAB's etree(A), except that
+        the indices are zero-based. If ata is true, the algorithm is equivalent to MATLAB's
         etree(A, 'col').
     */
-    std::vector<int> etree(bool col=false) const;
+    std::vector<int> etree(bool ata=false) const;
+
+    /** \brief Symbolic factorization analysis
+        See Direct Methods for Sparse Linear Systems by Davis (2006).
+    */
+    void symbfact(std::vector<int>& SWIG_OUTPUT(count),
+                  std::vector<int>& SWIG_OUTPUT(parent),
+                  std::vector<int>& SWIG_OUTPUT(post),
+                  bool ata=false) const;
 
     /** \brief Depth-first search on the adjacency graph of the sparsity
         See Direct Methods for Sparse Linear Systems by Davis (2006).

@@ -70,8 +70,14 @@ int casadi_postorder_dfs(int j, int k, int* head, int* next,
 inline
 void casadi_postorder(const int* parent, int n, int* post, int* w) {
   int j, k=0;
-  int *head=w, *next=w+n, *stack=w+2*n;
+  // Work vectors
+  int *head, *next, *stack;
+  head=w; w+=n;
+  next=w; w+=n;
+  stack=w; w+=n;
+  // Empty linked lists
   for (j=0; j<n; ++j) head[j] = -1;
+  // Traverse nodes in reverse order
   for (j=n-1; j>=0; --j) {
     if (parent[j]!=-1) {
       next[j] = head[parent[j]];
@@ -79,14 +85,14 @@ void casadi_postorder(const int* parent, int n, int* post, int* w) {
     }
   }
   for (j=0; j<n; j++) {
-    if (parent[j]!=-1) {
+    if (parent[j]==-1) {
       k = casadi_postorder_dfs(j, k, head, next, post, stack);
     }
   }
 }
 
 // SYMBOL "leaf"
-// Needed by casadi_colcounts
+// Needed by casadi_counts
 // Ref: Section 4.4, Direct Methods for Sparse Linear Systems by Tim Davis
 inline
 int casadi_leaf(int i, int j, const int* first, int* maxfirst,
@@ -114,48 +120,49 @@ int casadi_leaf(int i, int j, const int* first, int* maxfirst,
   return q;
 }
 
-// SYMBOL "casadi_colcounts"
+// SYMBOL "casadi_counts"
 // Ref: Section 4.5, Direct Methods for Sparse Linear Systems by Tim Davis
-// len[colcount] = ncol
+// len[count] = ncol
 // len[w] >= 4*ncol + (ata ? nrow+ncol+1 : 0)
 // C-REPLACE "std::min" "casadi_min"
 inline
-void casadi_colcounts(const int* tr_sp, const int* parent,
-                      const int* post, int* colcount, int* w, int ata) {
+void casadi_counts(const int* tr_sp, const int* parent,
+                   const int* post, int* count, int* w, int ata) {
   int ncol = *tr_sp++, nrow = *tr_sp++;
   const int *rowind=tr_sp, *col=tr_sp+nrow+1;
   int i, j, k, J, p, q, jleaf, *maxfirst, *prevleaf,
     *ancestor, *head=0, *next=0, *first;
-  int* delta = colcount;
   // Work vectors
   ancestor=w; w+=ncol;
   maxfirst=w; w+=ncol;
   prevleaf=w; w+=ncol;
   first=w; w+=ncol;
   if (ata) {
-    head=w; w+=ncol;
-    next=w; w+=ncol+1;
+    head=w; w+=ncol+1;
+    next=w; w+=nrow;
   }
   // Find first [j]
   for (k=0; k<ncol; ++k) first[k]=-1;
   for (k=0; k<ncol; ++k) {
     j=post[k];
-    // delta[j]=1 if j is a leaf
-    delta[j] = (first[j]==-1) ? 1 : 0;
+    // count[j]=1 if j is a leaf
+    count[j] = (first[j]==-1) ? 1 : 0;
     for (; j!=-1 && first[j]==-1; j=parent[j]) first[j]=k;
   }
   if (ata) {
     // Invert post (use ancestor as work vector)
     for (k=0; k<ncol; ++k) ancestor[post[k]] = k;
+    for (k=0; k<ncol+1; ++k) head[k]=-1;
     for (i=0; i<nrow; ++i) {
-      for (k=nrow, p=rowind[i]; p<rowind[i+1]; ++p) {
+      for (k=ncol, p=rowind[i]; p<rowind[i+1]; ++p) {
         k = std::min(k, ancestor[col[p]]);
-        // Place row i in linked list k
-        next[i] = head[k];
-        head[k] = i;
       }
+      // Place row i in linked list k
+      next[i] = head[k];
+      head[k] = i;
     }
   }
+
   // Clear workspace
   for (k=0; k<ncol; ++k) maxfirst[k]=-1;
   for (k=0; k<ncol; ++k) prevleaf[k]=-1;
@@ -164,19 +171,19 @@ void casadi_colcounts(const int* tr_sp, const int* parent,
   for (k=0; k<ncol; ++k) {
     // j is the kth node in the postordered etree
     j=post[k];
-    if (parent[j]!=-1) delta[parent[j]]--; // j is not a root
+    if (parent[j]!=-1) count[parent[j]]--; // j is not a root
     for (J=ata?head[k]:j; J!=-1; J=ata?next[J]:-1) { // J=j for LL' = A case
       for (p=rowind[J]; p<rowind[J+1]; ++p) {
         i=col[p];
         q = casadi_leaf(i, j, first, maxfirst, prevleaf, ancestor, &jleaf);
-        if (jleaf>=1) delta[j]++; // A(i,j) is in skeleton
-        if (jleaf==2) delta[q]++; // account for overlap in q
+        if (jleaf>=1) count[j]++; // A(i,j) is in skeleton
+        if (jleaf==2) count[q]--; // account for overlap in q
       }
     }
     if (parent[j]!=-1) ancestor[j]=parent[j];
   }
-  // Sum up deltas of each child
+  // Sum up counts of each child
   for (j=0; j<ncol; ++j) {
-    if (parent[j]!=-1) colcount[parent[j]] += colcount[j];
+    if (parent[j]!=-1) count[parent[j]] += count[j];
   }
 }

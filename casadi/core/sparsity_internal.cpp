@@ -1572,9 +1572,9 @@ namespace casadi {
 
       // row counts chol(C'*C)
       S_cp.resize(C.size2());
-      w.resize(5*C.size2() + size1());
-      casadi_colcounts(C.T(), get_ptr(S_parent), get_ptr(post), get_ptr(S_cp),
-                       get_ptr(w), 1);
+      w.resize(5*C.size2() + size1()+1);
+      casadi_counts(C.T(), get_ptr(S_parent), get_ptr(post), get_ptr(S_cp),
+                    get_ptr(w), 1);
       post.clear();
 
       C->vcount(S_pinv, S_parent, S_leftmost, S_m2, S_lnz);
