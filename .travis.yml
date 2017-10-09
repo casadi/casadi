@@ -285,7 +285,6 @@ matrix:
         - Xvfb :1 &
         - export DISPLAY=:1
         - octave --no-gui --no-window-system --eval "addpath('/home/travis/build/octave-install/matlab');savepath;"
-        - remote_access
         - pushd test && make octave && popd
 branches:
   except:
