@@ -2958,7 +2958,7 @@ namespace casadi {
 
     SX ret = val->at(0);
     for (int i=0; i<n-1; ++i) {
-      ret += (val(0, i+1)-val(0, i)) * (t>=tval(0, i));
+      ret += (val(i+1)-val(i)) * (t>=tval(i));
     }
 
     return ret;
@@ -2969,23 +2969,20 @@ namespace casadi {
     // Number of points
     int N = tval.numel();
     casadi_assert(N>=2, "pw_lin: N>=2");
+    casadi_assert(val.numel() == N, "dimensions do not match");
 
     // Gradient for each line segment
     SX g = SX(1, N-1);
-    for (int i=0; i<N-1; ++i) {
-      g(0, i) = (val(0, i+1)- val(0, i))/(tval(0, i+1)-tval(0, i));
-    }
+    for (int i=0; i<N-1; ++i)
+      g(i) = (val(i+1)- val(i))/(tval(i+1)-tval(i));
 
     // Line segments
     SX lseg = SX(1, N-1);
     for (int i=0; i<N-1; ++i)
-      lseg(0, i) = val(0, i) + g(0, i)*(t-tval(0, i));
-
-    // interior time points
-    SX tint = tval(0, range(N-2));
+      lseg(i) = val(i) + g(i)*(t-tval(i));
 
     // Return piecewise linear function
-    return pw_const(t, tint, lseg);
+    return pw_const(t, tval(range(1, N-1)), lseg);
   }
 
   template<>
