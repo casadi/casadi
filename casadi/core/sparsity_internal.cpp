@@ -896,113 +896,6 @@ namespace casadi {
     return 1;
   }
 
-  void SparsityInternal::init_ata(const int *post, int *w, int **head, int **next) const {
-    int i, k, p, m = size2(), n = size1();
-    const int *ATp = colind();
-    const int *ATi = row();
-    *head = w+4*n, *next = w+5*n+1;
-
-    // invert post
-    for (k=0; k<n; ++k)
-      w[post[k]] = k;
-
-    for (i=0; i<m; ++i) {
-      for (k=n, p=ATp[i]; p<ATp[i+1]; ++p)
-        k = std::min(k, w[ATi[p]]);
-
-      // place col i in linked list k
-      (*next)[i] = (*head)[k];
-      (*head)[k] = i ;
-    }
-  }
-
-#define HEAD(k, j) (ata ? head[k] : j)
-#define NEXT(J)   (ata ? next[J] : -1)
-  std::vector<int> SparsityInternal::counts(const int *parent, const int *post, int ata) const {
-    int i, j, k, n, m, J, s, p, q, jleaf=0, *maxfirst, *prevleaf, *ancestor,
-        *head = 0, *next = 0, *first;
-
-    m = size1();
-    n = size2();
-    s = 4*n + (ata ? (n+m+1) : 0);
-
-    // allocate result
-    vector<int> rowcount(n);
-    vector<int>& delta = rowcount;
-
-    // get workspace
-    vector<int> w(s);
-
-    // AT = A'
-    Sparsity AT = T();
-
-    ancestor = &w.front();
-    maxfirst = &w.front()+n;
-    prevleaf = &w.front()+2*n;
-    first = &w.front()+3*n;
-
-    // clear workspace w[0..s-1]
-    for (k=0; k<s; ++k)
-      w[k] = -1;
-
-    // find first[j]
-    for (k=0; k<n; ++k) {
-      j = post[k];
-
-      // delta[j]=1 if j is a leaf
-      delta[j] = (first[j] == -1) ? 1 : 0;
-
-      for (; j!=-1 && first[j] == -1; j=parent[j])
-        first[j] = k;
-    }
-
-    const int* ATp = AT.colind();
-    const int* ATi = AT.row();
-    if (ata) AT->init_ata(post, &w.front(), &head, &next);
-
-    // each node in its own set
-    for (i=0; i<n; ++i)
-      ancestor[i] = i;
-
-    for (k=0; k<n; ++k) {
-      // j is the kth node in postordered etree
-      j = post[k];
-
-      // j is not a root
-      if (parent[j] != -1)
-        delta[parent[j]]--;
-
-      // J=j for LL'=A case
-      for (J=HEAD(k, j); J != -1; J=NEXT(J)) {
-        for (p = ATp[J]; p<ATp[J+1]; ++p) {
-          i = ATi[p] ;
-          q = casadi_leaf(i, j, first, maxfirst, prevleaf, ancestor, &jleaf);
-
-          // A(i, j) is in skeleton
-          if (jleaf >= 1)
-            delta[j]++ ;
-
-          // account for overlap in q
-          if (jleaf == 2)
-            delta[q]-- ;
-        }
-      }
-      if (parent[j] != -1)
-        ancestor[j] = parent[j] ;
-    }
-
-    // sum up delta's of each child
-    for (j = 0 ; j < n ; ++j) {
-      if (parent[j] != -1)
-        rowcount[parent[j]] += rowcount[j] ;
-    }
-
-    // success
-    return rowcount;
-  }
-#undef HEAD
-#undef NEXT
-
   int SparsityInternal::wclear(int mark, int lemax, int *w, int n) {
     int k ;
     if (mark < 2 || (mark + lemax < 0)) {
@@ -1678,7 +1571,10 @@ namespace casadi {
       casadi_postorder(get_ptr(S_parent), n, get_ptr(post), get_ptr(w));
 
       // row counts chol(C'*C)
-      S_cp = C->counts(&S_parent.front(), &post.front(), 1);
+      S_cp.resize(C.size2());
+      w.resize(5*C.size2() + size1());
+      casadi_colcounts(C.T(), get_ptr(S_parent), get_ptr(post), get_ptr(S_cp),
+                       get_ptr(w), 1);
       post.clear();
 
       C->vcount(S_pinv, S_parent, S_leftmost, S_m2, S_lnz);

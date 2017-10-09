@@ -191,12 +191,6 @@ namespace casadi {
     int vcount(std::vector<int>& pinv, std::vector<int>& parent, std::vector<int>& leftmost,
                int& S_m2, double& S_lnz) const;
 
-    /// row counts of LL'=A or LL'=A'A, given parent & post ordering: see init_ata in CSparse
-    void init_ata(const int *post, int *w, int **head, int **next) const;
-
-    /// Row counts: See cs_counts in CSparse
-    std::vector<int> counts(const int *parent, const int *post, int ata) const;
-
     /** Approximate minimal degree, p = amd(A+A') if symmetric is true, or amd(A'A) otherwise.
      * order 0:natural, 1:Chol, 2:LU, 3:QR. See cs_amd in CSparse
      */
