@@ -69,7 +69,7 @@ namespace casadi {
     // Both modes equally expensive by default (no "taping" needed)
     ad_weight_sp_ = 0.49; // Forward when tie
     jac_penalty_ = 2;
-    max_num_dir_ = optimized_num_dir;
+    max_num_dir_ = GlobalOptions::getMaxNumDir();
     user_data_ = 0;
     regularity_check_ = false;
     inputs_check_ = true;

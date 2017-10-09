@@ -61,6 +61,8 @@ namespace casadi {
 
       static bool hierarchical_sparsity;
 
+      static int max_num_dir;
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
@@ -72,6 +74,9 @@ namespace casadi {
 
       static void setCasadiPath(const std::string & path) { casadipath = path; }
       static std::string getCasadiPath() { return casadipath; }
+
+      static void setMaxNumDir(int ndir) { max_num_dir=ndir; }
+      static int getMaxNumDir() { return max_num_dir; }
 
   };
 
