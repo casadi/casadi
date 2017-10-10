@@ -849,7 +849,6 @@ namespace casadi {
     // Work vector, adjoint derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
-    if (verbose_) casadi_message("Allocated derivative work vector (adjoint mode)");
 
     // Loop over computational nodes in reverse order
     for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {

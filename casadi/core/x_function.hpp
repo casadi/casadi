@@ -504,10 +504,12 @@ namespace casadi {
         casadi_assert_dev(aseed.size()==0);
         if (verbose_) casadi_message("Calling 'ad_forward'");
         static_cast<const DerivedType*>(this)->ad_forward(fseed, fsens);
+        if (verbose_) casadi_message("Back from 'ad_forward'");
       } else if (aseed.size()>0) {
         casadi_assert_dev(fseed.size()==0);
         if (verbose_) casadi_message("Calling 'ad_reverse'");
         static_cast<const DerivedType*>(this)->ad_reverse(aseed, asens);
+        if (verbose_) casadi_message("Back from 'ad_reverse'");
       }
 
       // Carry out the forward sweeps
