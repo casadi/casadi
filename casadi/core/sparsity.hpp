@@ -252,18 +252,26 @@ namespace casadi {
     int columns() const {return size2();}
 
     /** \brief The total number of elements, including structural zeros, i.e. size2()*size1()
-        \see nnz()  */
+      * Beware of overflow
+      * \see nnz()
+      */
     int numel() const;
 
+    /** \brief The percentage of nonzero
+     * Equivalent to (100.0 * nnz())/numel(), but avoids overflow
+     */
+    double density() const;
+
     /** \brief Check if the sparsity is empty
-    *
-    * A sparsity is considered empty if one of the dimensions is zero
-    * (or optionally both dimensions)
-    */
+     *
+     * A sparsity is considered empty if one of the dimensions is zero
+     * (or optionally both dimensions)
+     */
     bool is_empty(bool both=false) const;
 
     /** \brief Get the number of (structural) non-zeros
-        \see numel() */
+      * \see numel()
+      */
     int nnz() const;
 
     /** \brief Number of non-zeros in the upper triangular half,

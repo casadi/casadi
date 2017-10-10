@@ -135,6 +135,14 @@ namespace casadi {
     return (*this)->numel();
   }
 
+  double Sparsity::density() const {
+    double r = 100;
+    r *= nnz();
+    r /= size1();
+    r /= size2();
+    return r;
+  }
+
   bool Sparsity::is_empty(bool both) const {
     return (*this)->is_empty(both);
   }

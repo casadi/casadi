@@ -608,7 +608,7 @@ namespace casadi {
     Sparsity ret = Sparsity::triplet(nz_out, nz_in, jcol, jrow);
     if (verbose_) {
       casadi_message("Formed Jacobian sparsity pattern (dimension " + str(ret.size()) + ", "
-          + str(ret.nnz()) + " nonzeros, " + str((100.0*ret.nnz())/ret.numel()) + " % nonzeros).");
+          + str(ret.nnz()) + " (" + str(ret.density()) + " %) nonzeros.");
     }
     return ret;
   }
@@ -835,7 +835,7 @@ namespace casadi {
     if (verbose_) {
       casadi_message("Number of sweeps: " + str(nsweeps));
       casadi_message("Formed Jacobian sparsity pattern (dimension " + str(r.size()) +
-          ", " + str(r.nnz()) + " nonzeros, " + str((100.0*r.nnz())/r.numel()) + " % nonzeros).");
+          ", " + str(r.nnz()) + " (" + str(r.density()) + " %) nonzeros.");
     }
 
     return r.T();
@@ -1129,7 +1129,7 @@ namespace casadi {
     if (verbose_) {
       casadi_message("Number of sweeps: " + str(nsweeps));
       casadi_message("Formed Jacobian sparsity pattern (dimension " + str(r.size()) + ", " +
-          str(r.nnz()) + " nonzeros, " + str((100.0*r.nnz())/r.numel()) + " % nonzeros).");
+          str(r.nnz()) + " (" + str(r.density()) + " %) nonzeros.");
     }
 
     return r.T();
