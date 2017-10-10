@@ -3191,9 +3191,12 @@ namespace casadi {
   }
 
   template<>
-  SX SX::jacobian(const SX &ex, const SX &arg, const Dict& opts) {
-    Function temp("temp", {arg}, {ex});
-    return temp.get<SXFunction>()->jac(0, 0, opts);
+  SX SX::jacobian(const SX &f, const SX &x, const Dict& opts) {
+    // Propagate verbose option to helper function
+    Dict h_opts;
+    if (opts.count("verbose")) h_opts["verbose"] = opts.at("verbose");
+    Function h("jac_helper", {x}, {f}, h_opts);
+    return h.get<SXFunction>()->jac(0, 0, opts);
   }
 
   template<>

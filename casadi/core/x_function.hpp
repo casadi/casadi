@@ -306,6 +306,8 @@ namespace casadi {
         allow_forward = op.second;
       } else if (op.first=="allow_reverse") {
         allow_reverse = op.second;
+      } else if (op.first=="verbose") {
+        continue;
       } else {
         casadi_error("No such Jacobian option: " + string(op.second));
       }

@@ -1542,8 +1542,11 @@ namespace casadi {
   }
 
   MX MX::jacobian(const MX &f, const MX &x, const Dict& opts) {
-    Function temp("helper_jacobian_MX", {x}, {f});
-    return temp.get<MXFunction>()->jac(0, 0, opts);
+    // Propagate verbose option to helper function
+    Dict h_opts;
+    if (opts.count("verbose")) h_opts["verbose"] = opts.at("verbose");
+    Function h("helper_jacobian_MX", {x}, {f}, h_opts);
+    return h.get<MXFunction>()->jac(0, 0, opts);
   }
 
   MX MX::hessian(const MX& f, const MX& x) {
