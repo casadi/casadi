@@ -60402,7 +60402,7 @@ Check if the pattern is a row vector (i.e. size1()==1)
 %feature("docstring")  casadi::Sparsity::numel() const  "
 
 The total number of elements, including structural zeros, i.e.
-size2()*size1()
+size2()*size1() Beware of overflow.
 
 See:   nnz()
 
@@ -60565,6 +60565,15 @@ submatrix[k] = originalmatrix[mapping[k]]
 
 Create the sparsity pattern for a unit vector of length n and a nonzero on
 position el.
+
+";
+
+%feature("docstring")  casadi::Sparsity::symbfact(std::vector< int >
+&output_count, std::vector< int > &output_parent, std::vector< int >
+&output_post, bool ata=false) const  "
+
+Symbolic factorization analysis See Direct Methods for Sparse Linear Systems
+by Davis (2006).
 
 ";
 
@@ -60773,6 +60782,13 @@ Ordering options: None (0), largest first (1)
 
 ";
 
+%feature("docstring")  casadi::Sparsity::density() const  "
+
+The percentage of nonzero Equivalent to (100.0 * nnz())/numel(), but avoids
+overflow.
+
+";
+
 %feature("docstring")  casadi::Sparsity::enlarge(int nrow, int ncol, const
 std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false) "
 
@@ -60910,11 +60926,11 @@ Get the size along a particular dimensions.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::etree(bool col=false) const  "
+%feature("docstring")  casadi::Sparsity::etree(bool ata=false) const  "
 
 Calculate the elimination tree See Direct Methods for Sparse Linear Systems
-by Davis (2006). If the parameter col is false, the algorithm is equivalent
-to MATLAB's etree(A), except that the indices are zero- based. If col is
+by Davis (2006). If the parameter ata is false, the algorithm is equivalent
+to MATLAB's etree(A), except that the indices are zero- based. If ata is
 true, the algorithm is equivalent to MATLAB's etree(A, 'col').
 
 ";
@@ -65637,6 +65653,11 @@ bvec_t &r) "
 
 ";
 
+%feature("docstring")  casadi::casadi_counts(const int *tr_sp, const int
+*parent, const int *post, int *count, int *w, int ata) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::conic_options(const std::string &name) "
 
 Get all options for a plugin.
@@ -67438,7 +67459,7 @@ ldwork=0) "
 ";
 
 %feature("docstring")  casadi::casadi_etree(const int *sp, int *parent, int
-*w, int col) "
+*w, int ata) "
 
 [INTERNAL] ";
 

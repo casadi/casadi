@@ -43613,7 +43613,7 @@ Check if the pattern is a row vector (i.e. size1()==1)
 %feature("docstring") casadi::Sparsity::numel "
 
 The total number of elements, including structural zeros, i.e.
-size2()*size1()
+size2()*size1() Beware of overflow.
 
 See:   nnz()
 
@@ -43745,6 +43745,13 @@ submatrix[k] = originalmatrix[mapping[k]]
 
 Create the sparsity pattern for a unit vector of length n and a nonzero on
 position el.
+
+";
+
+%feature("docstring") casadi::Sparsity::symbfact "
+
+Symbolic factorization analysis See Direct Methods for Sparse Linear Systems
+by Davis (2006).
 
 ";
 
@@ -43934,6 +43941,13 @@ Ordering options: None (0), largest first (1)
 
 ";
 
+%feature("docstring") casadi::Sparsity::density "
+
+The percentage of nonzero Equivalent to (100.0 * nnz())/numel(), but avoids
+overflow.
+
+";
+
 %feature("docstring") casadi::Sparsity::enlarge "
 
 Enlarge matrix Make the matrix larger by inserting empty rows and columns,
@@ -44071,8 +44085,8 @@ Get the size along a particular dimensions.
 %feature("docstring") casadi::Sparsity::etree "
 
 Calculate the elimination tree See Direct Methods for Sparse Linear Systems
-by Davis (2006). If the parameter col is false, the algorithm is equivalent
-to MATLAB's etree(A), except that the indices are zero- based. If col is
+by Davis (2006). If the parameter ata is false, the algorithm is equivalent
+to MATLAB's etree(A), except that the indices are zero- based. If ata is
 true, the algorithm is equivalent to MATLAB's etree(A, 'col').
 
 ";
@@ -47605,6 +47619,8 @@ Check if the vector is strictly increasing.
 ";
 
 %feature("docstring") casadi::Contraction "";
+
+%feature("docstring") casadi::casadi_counts "[INTERNAL] ";
 
 %feature("docstring") casadi::conic_options "
 
