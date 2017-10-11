@@ -111,7 +111,7 @@ int casadi_leaf(int i, int j, const int* first, int* maxfirst,
   // if first leaf, q is root of ith subtree
   if (*jleaf==1) return i;
   // Path compression
-  for (q=jprev; q!=ancestor[q]; q=ancestor[q]);
+  for (q=jprev; q!=ancestor[q]; q=ancestor[q]) {}
   for (s=jprev; s!=q; s=sparent) {
     sparent = ancestor[s];
     ancestor[s] = q;
@@ -172,13 +172,15 @@ void casadi_counts(const int* tr_sp, const int* parent,
     // j is the kth node in the postordered etree
     j=post[k];
     if (parent[j]!=-1) count[parent[j]]--; // j is not a root
-    for (J=ata?head[k]:j; J!=-1; J=ata?next[J]:-1) { // J=j for LL' = A case
+    J=ata?head[k]:j;
+    while (J!=-1) { // J=j for LL' = A case
       for (p=rowind[J]; p<rowind[J+1]; ++p) {
         i=col[p];
         q = casadi_leaf(i, j, first, maxfirst, prevleaf, ancestor, &jleaf);
         if (jleaf>=1) count[j]++; // A(i,j) is in skeleton
         if (jleaf==2) count[q]--; // account for overlap in q
       }
+      J = ata ? next[J] : -1;
     }
     if (parent[j]!=-1) ancestor[j]=parent[j];
   }
@@ -187,3 +189,12 @@ void casadi_counts(const int* tr_sp, const int* parent,
     if (parent[j]!=-1) count[parent[j]] += count[j];
   }
 }
+
+// SYMBOL "casadi_counts"
+// Ref: Section 4.5, Direct Methods for Sparse Linear Systems by Tim Davis
+// len[count] = ncol
+// len[w] >= 4*ncol + (ata ? nrow+ncol+1 : 0)
+// C-REPLACE "std::min" "casadi_min"
+inline
+void casadi_(const int* tr_sp, const int* parent,
+                   const int* post, int* count, int* w, int ata) {
