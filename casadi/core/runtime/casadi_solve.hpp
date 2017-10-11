@@ -120,14 +120,15 @@ int casadi_leaf(int i, int j, const int* first, int* maxfirst,
   return q;
 }
 
-// SYMBOL "casadi_counts"
+// SYMBOL "casadi_solve_colind"
+// Calculate the column offsets for the Cholesky L factor
 // Ref: Section 4.5, Direct Methods for Sparse Linear Systems by Tim Davis
-// len[count] = ncol
+// len[colind] = ncol+1
 // len[w] >= 4*ncol + (ata ? nrow+ncol+1 : 0)
 // C-REPLACE "std::min" "casadi_min"
 inline
-void casadi_counts(const int* tr_sp, const int* parent,
-                   const int* post, int* count, int* w, int ata) {
+void casadi_solve_colind(const int* tr_sp, const int* parent,
+                         const int* post, int* l_colind, int* w, int ata) {
   int ncol = *tr_sp++, nrow = *tr_sp++;
   const int *rowind=tr_sp, *col=tr_sp+nrow+1;
   int i, j, k, J, p, q, jleaf, *maxfirst, *prevleaf,
@@ -145,8 +146,8 @@ void casadi_counts(const int* tr_sp, const int* parent,
   for (k=0; k<ncol; ++k) first[k]=-1;
   for (k=0; k<ncol; ++k) {
     j=post[k];
-    // count[j]=1 if j is a leaf
-    count[j] = (first[j]==-1) ? 1 : 0;
+    // l_colind[j]=1 if j is a leaf
+    l_colind[1+j] = (first[j]==-1) ? 1 : 0;
     for (; j!=-1 && first[j]==-1; j=parent[j]) first[j]=k;
   }
   if (ata) {
@@ -171,14 +172,14 @@ void casadi_counts(const int* tr_sp, const int* parent,
   for (k=0; k<ncol; ++k) {
     // j is the kth node in the postordered etree
     j=post[k];
-    if (parent[j]!=-1) count[parent[j]]--; // j is not a root
+    if (parent[j]!=-1) l_colind[1+parent[j]]--; // j is not a root
     J=ata?head[k]:j;
     while (J!=-1) { // J=j for LL' = A case
       for (p=rowind[J]; p<rowind[J+1]; ++p) {
         i=col[p];
         q = casadi_leaf(i, j, first, maxfirst, prevleaf, ancestor, &jleaf);
-        if (jleaf>=1) count[j]++; // A(i,j) is in skeleton
-        if (jleaf==2) count[q]--; // account for overlap in q
+        if (jleaf>=1) l_colind[1+j]++; // A(i,j) is in skeleton
+        if (jleaf==2) l_colind[1+q]--; // account for overlap in q
       }
       J = ata ? next[J] : -1;
     }
@@ -186,6 +187,12 @@ void casadi_counts(const int* tr_sp, const int* parent,
   }
   // Sum up counts of each child
   for (j=0; j<ncol; ++j) {
-    if (parent[j]!=-1) count[parent[j]] += count[j];
+    if (parent[j]!=-1) l_colind[1+parent[j]] += l_colind[1+j];
+  }
+
+  // Cumsum
+  l_colind[0] = 0;
+  for (j=0; j<ncol; ++j) {
+    l_colind[j+1] += l_colind[j];
   }
 }

@@ -1570,12 +1570,16 @@ namespace casadi {
       w.resize(3*n);
       casadi_postorder(get_ptr(S_parent), n, get_ptr(post), get_ptr(w));
 
-      // row counts chol(C'*C)
-      S_cp.resize(C.size2());
+      // column counts chol(C'*C)
+      std::vector<int> L_colind(1+C.size2());
       w.resize(5*C.size2() + size1()+1);
-      casadi_counts(C.T(), get_ptr(S_parent), get_ptr(post), get_ptr(S_cp),
-                    get_ptr(w), 1);
+      casadi_solve_colind(C.T(), get_ptr(S_parent), get_ptr(post), get_ptr(L_colind),
+                          get_ptr(w), 1);
       post.clear();
+
+      // Calculate column counts
+      S_cp.resize(C.size2());
+      for (int i=0; i<S_cp.size(); ++i) S_cp[i] = L_colind[i+1] - L_colind[i];
 
       C->vcount(S_pinv, S_parent, S_leftmost, S_m2, S_lnz);
       for (S_unz = 0, k = 0; k<n; k++)

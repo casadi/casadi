@@ -595,9 +595,12 @@ namespace casadi {
     post.resize(size2());
     casadi_postorder(get_ptr(parent), size2(), get_ptr(post), get_ptr(w));
     // Calculate column counts
+    std::vector<int> L_colind(1+size2());
+    casadi_solve_colind(T(), get_ptr(parent), get_ptr(post), get_ptr(L_colind),
+                        get_ptr(w), ata);
+    // Calculate column counts
     count.resize(size2());
-    casadi_counts(T(), get_ptr(parent), get_ptr(post), get_ptr(count),
-                  get_ptr(w), ata);
+    for (int i=0; i<count.size(); ++i) count[i] = L_colind[i+1] - L_colind[i];
   }
 
   int Sparsity::dfs(int j, int top, std::vector<int>& xi,
