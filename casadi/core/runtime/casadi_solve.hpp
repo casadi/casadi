@@ -189,12 +189,3 @@ void casadi_counts(const int* tr_sp, const int* parent,
     if (parent[j]!=-1) count[parent[j]] += count[j];
   }
 }
-
-// SYMBOL "casadi_counts"
-// Ref: Section 4.5, Direct Methods for Sparse Linear Systems by Tim Davis
-// len[count] = ncol
-// len[w] >= 4*ncol + (ata ? nrow+ncol+1 : 0)
-// C-REPLACE "std::min" "casadi_min"
-inline
-void casadi_(const int* tr_sp, const int* parent,
-                   const int* post, int* count, int* w, int ata) {
