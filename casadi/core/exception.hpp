@@ -32,6 +32,8 @@
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
+#include <ctime>
+#include <iomanip>
 
 #include <casadi/core/casadi_export.h>
 
@@ -94,11 +96,19 @@ inline std::string trim_path(const std::string& full_path) {
   }
 }
 
+// Current time as a string
+inline std::ostream& message_prefix(std::ostream &stream) {
+  stream << "CasADi - ";
+  auto time = std::time(nullptr);
+  stream << std::put_time(std::localtime(&time), "%F %T");
+  return stream;
+}
+
 // Convert to string
 #define CASADI_STR1(x) #x
 #define CASADI_STR(x) CASADI_STR1(x)
 
-// String denoting where the assertion is situated
+// String denoting where the macro is situated
 #define CASADI_WHERE casadi::trim_path(__FILE__ ":" CASADI_STR(__LINE__))
 
 // Throw an exception with information about source code location
@@ -116,13 +126,13 @@ if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n"\
 
 // Issue a warning, including location in the source code
 #define casadi_warning(msg) \
-  casadi::uerr() \
-    << "CasADi warning at " << CASADI_WHERE << ": " << msg << "\n"
+  casadi::message_prefix(casadi::uerr()) \
+    << " WARNING(\"" << msg << "\") [" << CASADI_WHERE << "]\n"
 
 // Issue a message, including location in the source code
 #define casadi_message(msg) \
-  casadi::uout() \
-    << "CasADi message at " << CASADI_WHERE << ": " << msg << "\n"
+  casadi::message_prefix(casadi::uout()) \
+    << " MESSAGE(\"" << msg << "\") [" << CASADI_WHERE << "]\n"
 
 } // namespace casadi
 
