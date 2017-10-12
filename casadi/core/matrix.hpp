@@ -479,11 +479,8 @@ namespace casadi {
     }
 
     /** \brief Obtain a Cholesky factorisation of a matrix
-     * Returns an upper triangular R such that R'R = A.
-     * Matrix A must be positive definite.
-     *
-     * At the moment, the algorithm is dense (Cholesky-Banachiewicz).
-     * There is an open ticket #1212 to make it sparse.
+     * Performs and LDL transformation [L,D] = ldl(A) and
+     * returns diag(sqrt(D))*L'
      */
     friend inline Matrix<Scalar> chol(const Matrix<Scalar>& A) {
       return Matrix<Scalar>::chol(A);

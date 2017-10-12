@@ -1926,7 +1926,7 @@ namespace casadi {
                            Matrix<Scalar>& L, Matrix<Scalar> &D) {
     // Make sure symmetric
     casadi_assert(A.sparsity().is_symmetric(),
-                  "LDL factorization only defined for symmetric matrices." );
+                  "LDL factorization only defined for symmetric matrices.");
     // Get dimension
     int n=A.size1();
     // Calculate colind in L (strictly lower entries only)
@@ -1991,34 +1991,11 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::chol(const Matrix<Scalar>& A) {
-    // Cholesky-Banachiewicz algorithm
-    // Naive, dense implementation O(n^3)
-
-    // check dimensions
-    casadi_assert(A.size1() == A.size2(), "Cholesky decomposition requires square matrix."
-                                              "Got " + str(A.dim()) + " instead.");
-
-    Matrix<Scalar> ret = Matrix<Scalar>(Sparsity::lower(A.size1()));
-
-    for (int i=0; i<A.size1(); ++i) { // loop over rows
-      for (int j=0; j<i; ++j) {
-        // Loop over columns before diagonal
-        Matrix<Scalar> sum=0;
-        for (int k=0;k<j;++k) {
-          sum += ret(i, k)*ret(j, k);
-        }
-        ret(i, j) = (A(i, j)-sum)/ret(j, j);
-      }
-
-      // Treat the diagonal element separately
-      int j = i;
-      Matrix<Scalar> sum = 0;
-      for (int k=0;k<j;++k) {
-        sum += pow(ret(j, k), 2);
-      }
-      ret(j, j) = sqrt(A(j, j)-sum);
-    }
-    return ret.T();
+    // Perform an LDL transformation
+    Matrix<Scalar> L, D;
+    ldl(A, L, D);
+    // Get the cholesky factor
+    return mtimes(diag(sqrt(D)), L.T());
   }
 
   template<typename Scalar>
