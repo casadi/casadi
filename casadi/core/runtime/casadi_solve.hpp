@@ -91,8 +91,84 @@ void casadi_postorder(const int* parent, int n, int* post, int* w) {
   }
 }
 
+// SYMBOL "chol_colind"
+// Calculate the column offsets for the L factor (strictly lower entries only)
+// for an LDL^T factorization
+// Ref: User Guide for LDL by Tim Davis
+// len[colind] = ncol+1
+// len[parent] = ncol
+// len[w] >= ncol
+inline
+void casadi_chol_colind(const int* sp, int* parent,
+                        int* l_colind, int* w) {
+  int n = sp[0];
+  const int *colind=sp+2, *row=sp+2+n+1;
+  // Local variables
+  int r, c, k;
+  // Work vectors
+  int* visited=w; w+=n;
+  // Loop over columns
+  for (c=0; c<n; ++c) {
+    // L(c,:) pattern: all nodes reachable in etree from nz in A(0:c-1,c)
+    parent[c] = -1; // parent of c is not yet known
+    visited[c] = c; // mark node c as visited
+    l_colind[1+c] = 0; // count of nonzeros in column c of L
+    // Loop over strictly upper triangular entries A
+    for (k=colind[c]; k<colind[c+1] && (r=row[k])<c; ++k) {
+      // Follow path from r to root of etree, stop at visited node
+      while (visited[r]!=c) {
+        // Find parent of r if not yet determined
+        if (parent[r]==-1) parent[r]=c;
+        l_colind[1+r]++; // L(c,r) is nonzero
+        visited[r] = c; // mark r as visited
+        r=parent[r]; // proceed to parent row
+      }
+    }
+  }
+  // Cumsum
+  l_colind[0] = 0;
+  for (c=0; c<n; ++c) l_colind[c+1] += l_colind[c];
+}
+
+// SYMBOL "chol_row"
+// Calculate the row indices for the L factor (strictly lower entries only)
+// for an LDL^T factorization
+// Ref: User Guide for LDL by Tim Davis
+// len[w] >= n
+inline
+void casadi_chol_row(const int* sp, const int* parent, int* l_colind, int* l_row, int *w) {
+  // Extract sparsity
+  int n = sp[0];
+  const int *colind = sp+2, *row = sp+n+3;
+  // Work vectors
+  int *visited=w; w+=n;
+  // Local variables
+  int r, c, k;
+  // Compute nonzero pattern of kth row of L
+  for (c=0; c<n; ++c) {
+    // Not yet visited
+    visited[c] = c;
+    // Loop over nonzeros in upper triangular half
+    for (k=colind[c]; k<colind[c+1] && (r=row[k])<c; ++k) {
+      // Loop over dependent rows
+      while (visited[r]!=c) {
+        l_row[l_colind[r]++] = c; // L(c,r) is nonzero
+        visited[r] = c; // mark r as visited
+        r=parent[r]; // proceed to parent row
+      }
+    }
+  }
+  // Restore l_colind by shifting it forward
+  k=0;
+  for (c=0; c<n; ++c) {
+    r=l_colind[c];
+    l_colind[c]=k;
+    k=r;
+  }
+}
+
 // SYMBOL "leaf"
-// Needed by casadi_counts
+// Needed by casadi_lu_colind
 // Ref: Section 4.4, Direct Methods for Sparse Linear Systems by Tim Davis
 inline
 int casadi_leaf(int i, int j, const int* first, int* maxfirst,
@@ -120,103 +196,12 @@ int casadi_leaf(int i, int j, const int* first, int* maxfirst,
   return q;
 }
 
-// SYMBOL "chol_colind"
-// Calculate the column offsets for the Cholesky L factor
-// Ref: Section 4.5, Direct Methods for Sparse Linear Systems by Tim Davis
-// len[colind] = ncol+1
-// len[w] >= 4*ncol
-// C-REPLACE "std::min" "casadi_min"
-inline
-void casadi_chol_colind(const int* sp, const int* parent,
-                        const int* post, int* l_colind, int* w) {
-  int n = sp[0];
-  const int *colind=sp+2, *row=sp+2+n+1;
-  int i, j, k, p, q, jleaf, *maxfirst, *prevleaf, *ancestor, *first;
-  // Work vectors
-  ancestor=w; w+=n;
-  maxfirst=w; w+=n;
-  prevleaf=w; w+=n;
-  first=w; w+=n;
-  // Find first [j]
-  for (k=0; k<n; ++k) first[k]=-1;
-  for (k=0; k<n; ++k) {
-    j=post[k];
-    // l_colind[j]=1 if j is a leaf
-    l_colind[1+j] = (first[j]==-1) ? 1 : 0;
-    for (; j!=-1 && first[j]==-1; j=parent[j]) first[j]=k;
-  }
-
-  // Clear workspace
-  for (k=0; k<n; ++k) maxfirst[k]=-1;
-  for (k=0; k<n; ++k) prevleaf[k]=-1;
-  // Each node in its own set
-  for (i=0; i<n; ++i) ancestor[i]=i;
-  for (k=0; k<n; ++k) {
-    // j is the kth node in the postordered etree
-    j=post[k];
-    if (parent[j]!=-1) l_colind[1+parent[j]]--; // j is not a root
-    for (p=colind[j]; p<colind[j+1]; ++p) {
-      i=row[p];
-      q = casadi_leaf(i, j, first, maxfirst, prevleaf, ancestor, &jleaf);
-      if (jleaf>=1) l_colind[1+j]++; // A(i,j) is in skeleton
-      if (jleaf==2) l_colind[1+q]--; // account for overlap in q
-    }
-    if (parent[j]!=-1) ancestor[j]=parent[j];
-  }
-  // Sum up counts of each child
-  for (j=0; j<n; ++j) {
-    if (parent[j]!=-1) l_colind[1+parent[j]] += l_colind[1+j];
-  }
-
-  // Cumsum
-  l_colind[0] = 0;
-  for (j=0; j<n; ++j) l_colind[j+1] += l_colind[j];
-}
-
-// SYMBOL "casadi_chol_row"
-// Calculate the row indices for the LDL factorization
-// Ref: User Guide for LDL by Tim Davis
-// len[w] >= 2*n
-inline
-void casadi_chol_row(const int* sp, const int* parent, int* l_colind, int* l_row, int *w) {
-  // Extract sparsity
-  int n = sp[0];
-  const int *colind = sp+2, *row = sp+n+3;
-  // Work vectors
-  int *pattern; w+=n;
-  int *visited; w+=n;
-  // Local variables
-  int r, c, k;
-  // Compute nonzero pattern of kth row of L
-  for (c=0; c<n; ++c) {
-    // Not yet visited
-    visited[c] = c;
-    // Loop over nonzeros in upper triangular half
-    for (k=colind[c]; k<colind[c+1] && (r=row[k])<c; ++k) {
-      // Loop over dependent rows
-      while (visited[r]!=c) {
-        l_row[l_colind[r]++] = c; // L(c,r) is nonzero
-        visited[r] = c; // mark r as visited
-        r=parent[r]; // proceed to parent row
-      }
-    }
-    // Include diagonal
-    l_row[l_colind[c]++] = c; // L(c,c) is nonzero
-  }
-  // Restore l_colind by shifting it forward
-  k=0;
-  for (c=0; c<n; ++c) {
-    r=l_colind[c];
-    l_colind[c]=k;
-    k=r;
-  }
-}
-
 // SYMBOL "lu_colind"
 // Calculate the column offsets for the LU L factor
 // Ref: Section 4.5, Direct Methods for Sparse Linear Systems by Tim Davis
 // len[colind] = ncol+1
 // len[w] >= 5*ncol + nrow + 1
+// C-REPLACE "std::min" "casadi_min"
 inline
 void casadi_lu_colind(const int* tr_sp, const int* parent,
                       const int* post, int* l_colind, int* w) {

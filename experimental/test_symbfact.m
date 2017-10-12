@@ -5,8 +5,7 @@ row = [0, 1, 4, 1, 2, 4, 0, 2, 0, 3, 3, 4];
 nz = [19, 12, 12, 21, 12, 12, 21, 16, 21, 5, 21, 18];
 S = casadi.Sparsity(nrow, ncol, colind, row);
 A = casadi.DM(S, nz);
-
-for ata=[false,true]
+for ata=[false, true]
     % Make s.p.d.?
     if ata
         A_test = A;
