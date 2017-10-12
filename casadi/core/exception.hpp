@@ -34,6 +34,7 @@
 #include <stdexcept>
 #include <ctime>
 #include <iomanip>
+#include <chrono>
 
 #include <casadi/core/casadi_export.h>
 
