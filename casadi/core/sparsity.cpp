@@ -585,8 +585,10 @@ namespace casadi {
   }
 
   void Sparsity::symbfact(std::vector<int>& count, std::vector<int>& parent,
-                          std::vector<int>& post, bool ata) const {
-    // work vector
+                          std::vector<int>& post, Sparsity& L, bool ata) const {
+    casadi_assert(ata || is_symmetric(),
+                 "Symmetric factorization requires a symmetric matrix");
+    // Work vector
     std::vector<int> w(5*size2()+size1()+1);
     // Calculate elimination tree
     parent.resize(size2());
@@ -594,13 +596,23 @@ namespace casadi {
     // Calculate postorder
     post.resize(size2());
     casadi_postorder(get_ptr(parent), size2(), get_ptr(post), get_ptr(w));
-    // Calculate column counts
+    // Calculate colind in L
     std::vector<int> L_colind(1+size2());
     casadi_solve_colind(T(), get_ptr(parent), get_ptr(post), get_ptr(L_colind),
                         get_ptr(w), ata);
     // Calculate column counts
     count.resize(size2());
     for (int i=0; i<count.size(); ++i) count[i] = L_colind[i+1] - L_colind[i];
+    if (ata) {
+      // Not implemented
+      L = Sparsity();
+    } else {
+      // Get rows in L
+      std::vector<int> L_row(L_colind.back());
+      casadi_ldl_row(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(L_row),
+                       get_ptr(w));
+      L = Sparsity(size2(), size2(), L_colind, L_row);
+    }
   }
 
   int Sparsity::dfs(int j, int top, std::vector<int>& xi,

@@ -196,3 +196,42 @@ void casadi_solve_colind(const int* tr_sp, const int* parent,
     l_colind[j+1] += l_colind[j];
   }
 }
+
+// SYMBOL "casadi_ldl_row"
+// Calculate the row indices for the LDL factorization
+// Ref: User Guide for LDL by Tim Davis
+// len[w] >= 2*n
+inline
+void casadi_ldl_row(const int* sp, const int* parent, int* l_colind, int* l_row, int *w) {
+  // Extract sparsity
+  int n = sp[0];
+  const int *colind = sp+2, *row = sp+n+3;
+  // Work vectors
+  int *pattern; w+=n;
+  int *visited; w+=n;
+  // Local variables
+  int r, c, k;
+  // Compute nonzero pattern of kth row of L
+  for (c=0; c<n; ++c) {
+    // Not yet visited
+    visited[c] = c;
+    // Loop over nonzeros in upper triangular half
+    for (k=colind[c]; k<colind[c+1] && (r=row[k])<c; ++k) {
+      // Loop over dependent rows
+      while (visited[r]!=c) {
+        l_row[l_colind[r]++] = c; // L(c,r) is nonzero
+        visited[r] = c; // mark r as visited
+        r=parent[r]; // proceed to parent row
+      }
+    }
+    // Include diagonal
+    l_row[l_colind[c]++] = c; // L(c,c) is nonzero
+  }
+  // Restore l_colind by shifting it forward
+  k=0;
+  for (c=0; c<n; ++c) {
+    r=l_colind[c];
+    l_colind[c]=k;
+    k=r;
+  }
+}

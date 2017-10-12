@@ -17,12 +17,12 @@ for ata=[false,true]
     
     % MATLAB builtin
     if ata
-        [count,h,parent,post] = symbfact(sparse(A_test), 'col');
+        [count,h,parent,post, L] = symbfact(sparse(A_test), 'col', 'lower');
     else
-        [count,h,parent,post] = symbfact(sparse(A_test));
+        [count,h,parent,post, L] = symbfact(sparse(A_test), 'sym', 'lower');
     end
     % CasADi
-    [ca_count, ca_parent, ca_post] = S_test.symbfact(ata);
+    [ca_count, ca_parent, ca_post, ca_L] = S_test.symbfact(ata);
     disp('parent')
     disp(parent)
     disp(ca_parent+1)
@@ -34,4 +34,9 @@ for ata=[false,true]
     disp('count')
     disp(count)
     disp(ca_count)
+
+    if ~ca_L.is_null() 
+      disp(full(casadi.DM(ca_L, 1)))
+      disp(full(L))
+    end
 end

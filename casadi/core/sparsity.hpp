@@ -604,7 +604,7 @@ namespace casadi {
     void symbfact(std::vector<int>& SWIG_OUTPUT(count),
                   std::vector<int>& SWIG_OUTPUT(parent),
                   std::vector<int>& SWIG_OUTPUT(post),
-                  bool ata=false) const;
+                  Sparsity& SWIG_OUTPUT(L), bool ata=false) const;
 
     /** \brief Depth-first search on the adjacency graph of the sparsity
         See Direct Methods for Sparse Linear Systems by Davis (2006).
