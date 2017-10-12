@@ -615,10 +615,10 @@ namespace casadi {
       // Allocate work
       w.resize(3*size2);
       // Calculate colind in L (strictly lower entries only)
-      casadi_chol_colind(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(w));
+      casadi_ldl_colind(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(w));
       // Get rows in L (strictly lower entries only)
       L_row.resize(L_colind.back());
-      casadi_chol_row(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(L_row),
+      casadi_ldl_row(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(L_row),
                       get_ptr(w));
       // Sparsity of L
       L = Sparsity(size2, size2, L_colind, L_row) + diag(size2, size2);

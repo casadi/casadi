@@ -91,7 +91,7 @@ void casadi_postorder(const int* parent, int n, int* post, int* w) {
   }
 }
 
-// SYMBOL "chol_colind"
+// SYMBOL "ldl_colind"
 // Calculate the column offsets for the L factor (strictly lower entries only)
 // for an LDL^T factorization
 // Ref: User Guide for LDL by Tim Davis
@@ -99,7 +99,7 @@ void casadi_postorder(const int* parent, int n, int* post, int* w) {
 // len[parent] = ncol
 // len[w] >= ncol
 inline
-void casadi_chol_colind(const int* sp, int* parent,
+void casadi_ldl_colind(const int* sp, int* parent,
                         int* l_colind, int* w) {
   int n = sp[0];
   const int *colind=sp+2, *row=sp+2+n+1;
@@ -130,13 +130,13 @@ void casadi_chol_colind(const int* sp, int* parent,
   for (c=0; c<n; ++c) l_colind[c+1] += l_colind[c];
 }
 
-// SYMBOL "chol_row"
+// SYMBOL "ldl_row"
 // Calculate the row indices for the L factor (strictly lower entries only)
 // for an LDL^T factorization
 // Ref: User Guide for LDL by Tim Davis
 // len[w] >= n
 inline
-void casadi_chol_row(const int* sp, const int* parent, int* l_colind, int* l_row, int *w) {
+void casadi_ldl_row(const int* sp, const int* parent, int* l_colind, int* l_row, int *w) {
   // Extract sparsity
   int n = sp[0];
   const int *colind = sp+2, *row = sp+n+3;
@@ -164,6 +164,54 @@ void casadi_chol_row(const int* sp, const int* parent, int* l_colind, int* l_row
     r=l_colind[c];
     l_colind[c]=k;
     k=r;
+  }
+}
+
+// SYMBOL "ldl"
+// Calculate the nonzeros of the L factor (strictly lower entries only)
+// as well as D for an LDL^T factorization
+// Ref: User Guide for LDL by Tim Davis
+// len[iw] >= 2*n
+// len[w] >= n
+template<typename T1>
+void casadi_ldl(const int* sp_a, const int* parent, const int* sp_l,
+                 const T1* a, T1* l, T1* d, int *iw, T1* w) {
+  // Extract sparsities
+  int n = sp_a[0];
+  const int *colind = sp_a+2, *row = sp_a+n+3;
+  const int *l_colind = sp_l+2, *l_row = sp_l+n+3;
+  // Work vectors
+  int *visited=iw; iw+=n;
+  int *currcol=iw; iw+=n;
+  T1* y = w; w+=n;
+  // Local variables
+  int r, c, k, k2;
+  T1 yr;
+  // Keep track of current nonzero for each column of L
+  for (c=0; c<n; ++c) currcol[c] = l_colind[c];
+  // Compute nonzero pattern of kth row of L
+  for (c=0; c<n; ++c) {
+    // Not yet visited
+    visited[c] = c;
+    // Get nonzeros of column c in a dense vector
+    y[c]=0; // Make sure y is all-zero until index c
+    for (k=colind[c]; k<colind[c+1] && (r=row[k])<=c; ++k) y[r] = a[k];
+    // Get D(c,c) and clear Y(c)
+    d[c] = y[c];
+    y[c] = 0;
+    // Loop over matching entries in L(:,c), i.e. L(c,:)
+    for (k=colind[c]; k<colind[c+1] && (r=row[k])<c; ++k) {
+      while (visited[r]!=c) {
+        // Get and clear y(r)
+        yr = y[r];
+        y[r] = 0;
+        for (k2=l_colind[r]; k2<l_colind[r+1]; ++k2) y[l_row[k2]] -= l[k2]*yr;
+        // The nonzero entry L(c,r)
+        d[c] -= (l[currcol[r]++]=yr/d[r]) * yr;
+        visited[r] = c; // mark r as visited
+        r=parent[r]; // proceed to parent row
+      }
+    }
   }
 }
 

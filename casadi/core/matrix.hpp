@@ -427,6 +427,7 @@ namespace casadi {
     static Matrix<Scalar> poly_roots(const Matrix<Scalar>& p);
     static Matrix<Scalar> eig_symbolic(const Matrix<Scalar>& m);
     static void qr(const Matrix<Scalar>& A, Matrix<Scalar>& Q, Matrix<Scalar>& R);
+    static void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& L, Matrix<Scalar>& D);
     static Matrix<Scalar> all(const Matrix<Scalar>& x);
     static Matrix<Scalar> any(const Matrix<Scalar>& x);
     static Matrix<Scalar> adj(const Matrix<Scalar>& x);
@@ -486,6 +487,13 @@ namespace casadi {
      */
     friend inline Matrix<Scalar> chol(const Matrix<Scalar>& A) {
       return Matrix<Scalar>::chol(A);
+    }
+
+    /** \brief Sparse LDL factorization
+     * Only guarenteed to work for positive definite matrices.
+     */
+    friend inline void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& L, Matrix<Scalar>& D) {
+      return Matrix<Scalar>::ldl(A, L, D);
     }
 
     /** \brief Returns true only if any element in the matrix is true

@@ -3137,6 +3137,10 @@ DECL void casadi_qr(const M& A, M& OUTPUT1, M& OUTPUT2) {
   return qr(A, OUTPUT1, OUTPUT2);
 }
 
+DECL void casadi_ldl(const M& A, M& OUTPUT1, M& OUTPUT2) {
+  return ldl(A, OUTPUT1, OUTPUT2);
+}
+
 DECL M casadi_chol(const M& A) {
   return chol(A);
 }
