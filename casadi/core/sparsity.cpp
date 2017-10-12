@@ -598,19 +598,26 @@ namespace casadi {
     casadi_postorder(get_ptr(parent), size2(), get_ptr(post), get_ptr(w));
     // Calculate colind in L
     std::vector<int> L_colind(1+size2());
-    casadi_solve_colind(T(), get_ptr(parent), get_ptr(post), get_ptr(L_colind),
-                        get_ptr(w), ata);
+    if (ata) {
+      casadi_lu_colind(T(), get_ptr(parent), get_ptr(post),
+                       get_ptr(L_colind), get_ptr(w));
+    } else {
+      casadi_chol_colind(*this, get_ptr(parent), get_ptr(post),
+                         get_ptr(L_colind), get_ptr(w));
+    }
+
     // Calculate column counts
     count.resize(size2());
     for (int i=0; i<count.size(); ++i) count[i] = L_colind[i+1] - L_colind[i];
+
     if (ata) {
       // Not implemented
       L = Sparsity();
     } else {
       // Get rows in L
       std::vector<int> L_row(L_colind.back());
-      casadi_ldl_row(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(L_row),
-                       get_ptr(w));
+      casadi_chol_row(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(L_row),
+                      get_ptr(w));
       L = Sparsity(size2(), size2(), L_colind, L_row);
     }
   }
