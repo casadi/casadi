@@ -1352,7 +1352,9 @@ class SXtests(casadiTestCase):
               if s is not None and jacobian(a,b).is_empty():
                 s2 = jtimes(a,b,c,tr).shape
                 assert s==s2
-                #which_depends(a,b,2,True)
+                for i in range(2):
+                  assert which_depends(a,b,i,True)==[False]*a.numel()
+                  assert which_depends(a,b,i,False)==[False]*b.numel()
 
       
 if __name__ == '__main__':

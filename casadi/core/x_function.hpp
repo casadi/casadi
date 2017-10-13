@@ -956,6 +956,11 @@ namespace casadi {
 
   template<typename MatType>
   std::vector<bool> _which_depends(const MatType &expr, const MatType &var, int order, bool tr) {
+    // Short-circuit
+    if (expr.is_empty() || var.is_empty()) {
+      return std::vector<bool>(tr? expr.numel() : var.numel(), false);
+    }
+
     MatType e = expr;
 
     // Create a function for calculating a forward-mode derivative
