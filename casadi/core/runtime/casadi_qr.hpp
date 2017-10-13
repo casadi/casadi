@@ -193,6 +193,67 @@ void casadi_qr_colind(const int* tr_sp, const int* parent,
   }
 }
 
+// SYMBOL "qr_nnz"
+// Calculate the number of nonzeros in the QR V matrix
+// Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
+// len[w] >= nrow + 3*ncol
+// len[pinv] == nrow + ncol
+// len[leftmost] == nrow
+inline
+int casadi_qr_nnz(const int* sp, int* pinv, int* leftmost, const int* parent, int* nrow_ext, int* w) {
+  // Extract sparsity
+  int nrow = sp[0], ncol = sp[1];
+  const int *colind=sp+2, *row=sp+2+ncol+1;
+  // Work vectors
+  int *next=w; w+=nrow;
+  int *head=w; w+=ncol;
+  int *tail=w; w+=ncol;
+  int *nque=w; w+=ncol;
+  // Local variables
+  int r, c, k, pa;
+  // Clear queue
+  for (c=0; c<ncol; ++c) head[c] = -1;
+  for (c=0; c<ncol; ++c) tail[c] = -1;
+  for (c=0; c<ncol; ++c) nque[c] = 0;
+  for (r=0; r<nrow; ++r) leftmost[r] = -1;
+  // leftmost[r] = min(find(A(r,:)))
+  for (c=ncol-1; c>=0; --c) {
+    for (k=colind[c]; k<colind[c+1]; ++k) {
+      leftmost[row[k]] = k;
+    }
+  }
+  // Scan rows in reverse order
+  for (r=nrow-1; r>=0; --r) {
+    pinv[r] = -1; // row r not yet ordered
+    c=leftmost[r];
+    if (c==-1) continue; // row r is empty
+    if (nque[c]++ == 0) tail[c]=r; // first row in queue c
+    next[r] = head[c]; // put r at head of queue c
+    head[c] = r;
+  }
+  // Find row permutation and nnz(V)
+  int v_nnz = 0;
+  int nrow_new = nrow;
+  for (c=0; c<ncol; ++c) {
+    r = head[c]; // remove r from queue c
+    v_nnz++; // count V(c,c) as nonzero
+    if (r<0) r=nrow_new++; // add a fictitious row
+    pinv[r] = c; // associate row r with V(:,c)
+    if (--nque[c]<=0) continue; // skip if V(c+1,nrow,c) is empty
+    v_nnz += nque[c]; // nque[c] is nnz(V(c+1:nrow, c))
+    if ((pa=parent[c]) != 1) {
+      // Move all rows to parent of c
+      if (nque[pa]==0) tail[pa] = tail[c];
+      next[tail[c]] = head[pa];
+      head[pa] = next[r];
+      nque[pa] += nque[c];
+    }
+  }
+  for (r=0; r<nrow; ++r) if (pinv[r]<0) pinv[r] = k++;
+  if (nrow_ext) *nrow_ext = nrow_new;
+  return v_nnz;
+}
+
 // SYMBOL "house"
 // Householder reflection
 // Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
@@ -220,8 +281,8 @@ T1 casadi_house(T1* x, T1* beta, int n) {
 template<typename T1>
 void casadi_happly(const int* sp, const T1* v, int i, T1 beta, T1* x) {
   // Extract sparsity
-  int nrow = *sp++, ncol = *sp++;
-  const int *colind = sp, *row = sp+ncol+1;
+  int nrow = sp[0], ncol = sp[1];
+  const int *colind=sp+2, *row=sp+2+ncol+1;
   // Local variables
   int k;
   // tau = v'*x

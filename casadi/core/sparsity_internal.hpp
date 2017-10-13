@@ -185,21 +185,10 @@ namespace casadi {
                  std::vector<int>& colind_C,
                  std::vector<int>& row_C) const;
 
-    /** compute nnz(V) = S->lnz, S->pinv, S->leftmost, S->m2 from A and S->parent:
-     * See cs_vcount in CSparse
-     */
-    int vcount(std::vector<int>& pinv, std::vector<int>& parent, std::vector<int>& leftmost,
-               int& S_m2, double& S_lnz) const;
-
     /** Approximate minimal degree, p = amd(A+A') if symmetric is true, or amd(A'A) otherwise.
      * order 0:natural, 1:Chol, 2:LU, 3:QR. See cs_amd in CSparse
      */
     std::vector<int> amd(int order) const;
-
-    /// symbolic ordering and analysis for QR or LU: See cs_sqr in CSparse
-    void prefactorize(int order, int qr, std::vector<int>& pinv, std::vector<int>& q,
-                      std::vector<int>& parent, std::vector<int>& cp, std::vector<int>& leftmost,
-                      int& m2, double& lnz, double& unz) const;
 
     /// clear w: cs_wclear in CSparse
     static int wclear(int mark, int lemax, int *w, int n);
