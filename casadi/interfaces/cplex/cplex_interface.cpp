@@ -250,12 +250,12 @@ namespace casadi {
     // Matrix A, count the number of elements per column
     m->matcnt.resize(A_.size2());
     transform(A_.colind()+1, A_.colind() + A_.size2()+1, A_.colind(), m->matcnt.begin(),
-              minus<int>());
+              std::minus<int>());
 
     // Matrix H, count the number of elements per column
     m->qmatcnt.resize(H_.size2());
     transform(H_.colind()+1, H_.colind() + H_.size2()+1, H_.colind(), m->qmatcnt.begin(),
-              minus<int>());
+              std::minus<int>());
 
     // Create problem object
     casadi_assert_dev(m->lp==0);

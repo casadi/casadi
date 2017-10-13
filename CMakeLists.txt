@@ -580,6 +580,7 @@ add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITR
 
 # CPLEX: A sparse mixed-integer QP solver
 option(WITH_CPLEX "Compile the interface to CPLEX" OFF)
+option(WITH_CPLEX_SHARED "Use shared cplex libraries" OFF)
 if(WITH_CPLEX)
   find_package(CPLEX REQUIRED)
 endif()
