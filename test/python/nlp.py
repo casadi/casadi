@@ -337,19 +337,14 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[-10]
       solver_in["ubg"]=[10]
 
-      if 'worhp' in str(Solver):
-        with self.assertRaises(Exception):
-          solver_out = solver(**solver_in)
-        return
-
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,7,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1,7,str(Solver))
       if "stabilizedsqp" not in str(Solver):
-        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,6,str(Solver))
-        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(Solver))
-        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,6,str(Solver))
+        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,5,str(Solver))
+        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,5,str(Solver))
+        if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,5,str(Solver))
 
   def test_warmstart(self):
 
@@ -542,11 +537,6 @@ class NLPtests(casadiTestCase):
       solver_in = {}
       solver_in["lbx"]=[1,-10]
       solver_in["ubx"]=[1,10]
-
-      if 'worhp' in str(Solver):
-        with self.assertRaises(Exception):
-          solver_out = solver(**solver_in)
-        return
 
 
 
@@ -752,10 +742,6 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[-10]
       solver_in["ubg"]=[10]
 
-      if 'worhp' in str(Solver):
-        with self.assertRaises(Exception):
-          solver_out = solver(**solver_in)
-        return
 
 
       solver_out = solver(**solver_in)
@@ -917,10 +903,6 @@ class NLPtests(casadiTestCase):
       solver_in["ubg"]=UBA
       if 'sqic' in str(solver_options):
         continue
-      if Solver=='worhp':
-        with self.assertRaises(Exception):
-          solver_out = solver(**solver_in)
-        return
 
       solver_out = solver(**solver_in)
 

@@ -110,7 +110,8 @@ namespace casadi {
         int_opts_[op.first] = op.second;
         break;
       default:
-        casadi_error("Cannot handle WORHP option \"" + op.first + "\": Unknown type " + str(WorhpGetParamType(ind)) + ".");
+        casadi_error("Cannot handle WORHP option \"" + op.first + "\": Unknown type " +
+          str(WorhpGetParamType(ind)) + ".");
         break;
       }
     }
@@ -146,7 +147,7 @@ namespace casadi {
     if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<WorhpMemory*>(mem);
 
-    SetWorhpPrint(&worhp_print);
+    SetWorhpPrint(&worhp_disp);
 
     WorhpPreInit(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
 
@@ -234,9 +235,10 @@ namespace casadi {
       }
     }
 
-
     // Mark the parameters as set
     m->worhp_p.initialised = true;
+    m->init_ = false;
+
     return 0;
   }
 
@@ -281,6 +283,7 @@ namespace casadi {
 
     /* Data structure initialisation. */
     WorhpInit(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
+    m->init_ = true;
     if (m->worhp_c.status != FirstCall) {
       string msg = return_codes(m->worhp_c.status);
       casadi_error("Main: Initialisation failed. Status: " + msg);
@@ -338,6 +341,16 @@ namespace casadi {
 
     // Check the provided inputs
     check_inputs(mem);
+
+    if (m->lbg && m->ubg) {
+      for (int i=0; i<ng_; ++i) {
+        casadi_assert(!(m->lbg[i]==-inf && m->ubg[i] == inf),
+                        "WorhpInterface::evaluate: Worhp cannot handle the case when both "
+                        "LBG and UBG are infinite."
+                        "You have that case at non-zero " + str(i)+ "."
+                        "Reformulate your problem eliminating the corresponding constraint.");
+      }
+    }
 
     // Pass inputs to WORHP data structures
     casadi_copy(m->x0, nx_, m->worhp_o.X);
@@ -543,9 +556,11 @@ namespace casadi {
   }
 
   WorhpMemory::~WorhpMemory() {
-    if (this->worhp_p.initialised || this->worhp_o.initialised ||
-        this->worhp_w.initialised || this->worhp_c.initialised) {
-      WorhpFree(&this->worhp_o, &this->worhp_w, &this->worhp_p, &this->worhp_c);
+    if (this->init_) {
+      if (this->worhp_p.initialised || this->worhp_o.initialised ||
+          this->worhp_w.initialised || this->worhp_c.initialised) {
+        WorhpFree(&this->worhp_o, &this->worhp_w, &this->worhp_p, &this->worhp_c);
+      }
     }
   }
 

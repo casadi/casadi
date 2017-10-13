@@ -67,6 +67,8 @@ namespace casadi {
     int return_code;
     const char* return_status;
 
+    bool init_;
+
     /// Constructor
     WorhpMemory();
 
