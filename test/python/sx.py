@@ -1337,7 +1337,7 @@ class SXtests(casadiTestCase):
       self.checkarray(E(7),1)
       
   def test_empty_jtimes(self):
-          
+    x= SX.sym("x")
     for a in [SX.zeros(0,1),SX.zeros(0,0),SX.zeros(0,1),x]:
       for b in [SX.zeros(0,1),SX.zeros(0,0),SX.zeros(0,1),x]:
           for c in [SX.zeros(0,1),SX.zeros(0,0),SX.zeros(0,1),x]:
@@ -1348,7 +1348,7 @@ class SXtests(casadiTestCase):
               s = mtimes(jacobian(a,b),c).shape
             except:
               pass
-            if s is not None and not jacobian(a,b).is_empty():
+            if s is not None and jacobian(a,b).is_empty():
               print(a.shape, b.shape, c.shape, jacobian(a,b).shape, s)
               s2 = jtimes(a,b,c).shape
               assert s==s2
