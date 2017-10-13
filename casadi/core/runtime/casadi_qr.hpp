@@ -3,7 +3,7 @@
 // Calculate the elimination tree for a matrix
 // len[w] >= ata ? ncol + nrow : ncol
 // len[parent] == ncol
-// Ref: Section 4.1, Direct Methods for Sparse Linear Systems by Tim Davis
+// Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
 inline
 void casadi_etree(const int* sp, int* parent, int *w, int ata) {
   int r, c, k, rnext;
@@ -40,7 +40,7 @@ void casadi_etree(const int* sp, int* parent, int *w, int ata) {
 
 // SYMBOL "postorder_dfs"
 // Traverse an elimination tree using depth first search
-// Ref: Section 4.3, Direct Methods for Sparse Linear Systems by Tim Davis
+// Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
 inline
 int casadi_postorder_dfs(int j, int k, int* head, int* next,
                          int* post, int* stack) {
@@ -64,7 +64,7 @@ int casadi_postorder_dfs(int j, int k, int* head, int* next,
 
 // SYMBOL "postorder"
 // Calculate the postorder permuation
-// Ref: Section 4.3, Direct Methods for Sparse Linear Systems by Tim Davis
+// Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
 // len[w] >= 3*n
 // len[post] == n
 inline
@@ -93,7 +93,7 @@ void casadi_postorder(const int* parent, int n, int* post, int* w) {
 
 // SYMBOL "leaf"
 // Needed by casadi_qr_colind
-// Ref: Section 4.4, Direct Methods for Sparse Linear Systems by Tim Davis
+// Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
 inline
 int casadi_leaf(int i, int j, const int* first, int* maxfirst,
                  int* prevleaf, int* ancestor, int* jleaf) {
@@ -122,7 +122,7 @@ int casadi_leaf(int i, int j, const int* first, int* maxfirst,
 
 // SYMBOL "qr_colind"
 // Calculate the column offsets for the QR V matrix
-// Ref: Section 4.5, Direct Methods for Sparse Linear Systems by Tim Davis
+// Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
 // len[colind] = ncol+1
 // len[w] >= 5*ncol + nrow + 1
 // C-REPLACE "std::min" "casadi_min"
@@ -191,4 +191,25 @@ void casadi_qr_colind(const int* tr_sp, const int* parent,
   for (j=0; j<ncol; ++j) {
     l_colind[j+1] += l_colind[j];
   }
+}
+
+// SYMBOL "house"
+// Householder reflection
+// Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
+template<typename T1>
+T1 casadi_house(T1* x, T1* beta, int n) {
+  // Local variable
+  int i;
+  // Calculate norm
+  T1 x0 = x[0]; // Save x0 (overwritten below)
+  T1 sigma=0;
+  for (i=1; i<n; ++i) sigma += x[i]*x[i];
+  T1 s = sqrt(x0*x0 + sigma); // s = norm(x)
+  // Calculate consistently with symbolic datatypes (SXElem)
+  T1 sigma_is_zero = sigma==0;
+  T1 x0_nonpos = x0<=0;
+  x[0] = if_else(sigma_is_zero, 1,
+                 if_else(x0_nonpos, x0-s, -sigma/(x0+s)));
+  *beta = if_else(sigma_is_zero, 2*x0_nonpos, -1/(s*x[0]));
+  return s;
 }
