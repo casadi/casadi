@@ -220,13 +220,14 @@ int casadi_qr_nnz(const int* sp, int* pinv, int* leftmost,
   // leftmost[r] = min(find(A(r,:)))
   for (c=ncol-1; c>=0; --c) {
     for (k=colind[c]; k<colind[c+1]; ++k) {
-      leftmost[row[k]] = k;
+      leftmost[row[k]] = c;
     }
   }
   // Scan rows in reverse order
   for (r=nrow-1; r>=0; --r) {
     pinv[r] = -1; // row r not yet ordered
     c=leftmost[r];
+
     if (c==-1) continue; // row r is empty
     if (nque[c]++ == 0) tail[c]=r; // first row in queue c
     next[r] = head[c]; // put r at head of queue c
@@ -242,7 +243,7 @@ int casadi_qr_nnz(const int* sp, int* pinv, int* leftmost,
     pinv[r] = c; // associate row r with V(:,c)
     if (--nque[c]<=0) continue; // skip if V(c+1,nrow,c) is empty
     v_nnz += nque[c]; // nque[c] is nnz(V(c+1:nrow, c))
-    if ((pa=parent[c]) != 1) {
+    if ((pa=parent[c]) != -1) {
       // Move all rows to parent of c
       if (nque[pa]==0) tail[pa] = tail[c];
       next[tail[c]] = head[pa];
@@ -250,7 +251,7 @@ int casadi_qr_nnz(const int* sp, int* pinv, int* leftmost,
       nque[pa] += nque[c];
     }
   }
-  for (r=0; r<nrow; ++r) if (pinv[r]<0) pinv[r] = k++;
+  for (r=0; r<nrow; ++r) if (pinv[r]<0) pinv[r] = c++;
   if (nrow_ext) *nrow_ext = nrow_new;
   return v_nnz;
 }
