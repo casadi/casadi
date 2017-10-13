@@ -1336,5 +1336,24 @@ class SXtests(casadiTestCase):
       self.checkarray(E(5),2)
       self.checkarray(E(7),1)
       
+  def test_empty_jtimes(self):
+          
+    for a in [SX.zeros(0,1),SX.zeros(0,0),SX.zeros(0,1),x]:
+      for b in [SX.zeros(0,1),SX.zeros(0,0),SX.zeros(0,1),x]:
+          for c in [SX.zeros(0,1),SX.zeros(0,0),SX.zeros(0,1),x]:
+          
+            s = None
+            
+            try:
+              s = mtimes(jacobian(a,b),c).shape
+            except:
+              pass
+            if s is not None and jacobian(a,b).is_empty():
+              print a.shape, b.shape, c.shape, jacobian(a,b).shape, s
+              s2 = jtimes(a,b,c).shape
+              assert s==s2
+              which_depends(a,b,2,False)
+
+      
 if __name__ == '__main__':
     unittest.main()

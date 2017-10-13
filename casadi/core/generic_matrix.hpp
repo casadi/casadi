@@ -1061,6 +1061,12 @@ namespace casadi {
   template<typename MatType>
   MatType GenericMatrix<MatType>::jtimes(const MatType &ex, const MatType &arg,
                                          const MatType &v, bool tr) {
+    if (ex.is_empty() || arg.is_empty()) {
+      MatType J = MatType::zeros(ex.numel(), arg.numel());
+      if (tr) J = J.T();
+      return mtimes(J, v);
+    }
+
     // Seeds as a vector of vectors
     int seed_dim = tr ? ex.size2() : arg.size2();
     casadi_assert_dev(v.size2() % seed_dim == 0);
