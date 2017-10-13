@@ -293,7 +293,7 @@ branches:
 before_install:
   - export casadi_build_flags="-DWITH_COMMON=ON "
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
-  - pushd testbot && git checkout merged && source recipes/setup.sh && popd
+  - pushd testbot && source recipes/setup.sh && popd
   - python_setup
   - sudo apt-get install p7zip-full -y
   - |
