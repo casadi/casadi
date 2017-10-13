@@ -121,7 +121,7 @@ int casadi_leaf(int i, int j, const int* first, int* maxfirst,
 }
 
 // SYMBOL "qr_colind"
-// Calculate the column offsets for the QR V matrix
+// Calculate the row offsets for the QR R matrix
 // Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
 // len[colind] = ncol+1
 // len[w] >= 5*ncol + nrow + 1
@@ -200,7 +200,8 @@ void casadi_qr_colind(const int* tr_sp, const int* parent,
 // len[pinv] == nrow + ncol
 // len[leftmost] == nrow
 inline
-int casadi_qr_nnz(const int* sp, int* pinv, int* leftmost, const int* parent, int* nrow_ext, int* w) {
+int casadi_qr_nnz(const int* sp, int* pinv, int* leftmost,
+                  const int* parent, int* nrow_ext, int* w) {
   // Extract sparsity
   int nrow = sp[0], ncol = sp[1];
   const int *colind=sp+2, *row=sp+2+ncol+1;
@@ -279,10 +280,10 @@ T1 casadi_house(T1* x, T1* beta, int n) {
 // Apply householder reflection
 // Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
 template<typename T1>
-void casadi_happly(const int* sp, const T1* v, int i, T1 beta, T1* x) {
+void casadi_happly(const int* sp_v, const T1* v, int i, T1 beta, T1* x) {
   // Extract sparsity
-  int nrow = sp[0], ncol = sp[1];
-  const int *colind=sp+2, *row=sp+2+ncol+1;
+  int nrow=sp_v[0], ncol=sp_v[1];
+  const int *colind=sp_v+2, *row=sp_v+2+ncol+1;
   // Local variables
   int k;
   // tau = v'*x
@@ -292,4 +293,93 @@ void casadi_happly(const int* sp, const T1* v, int i, T1 beta, T1* x) {
   tau *= beta;
   // x -= v*tau
   for (k=colind[i]; k<colind[i+1]; ++k) x[row[k]] -= v[k]*tau;
+}
+
+// SYMBOL "qr"
+// Apply householder reflection
+// Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
+// Note: nrow <= nrow_ext <= ncol
+// len[iw] = nrow_ext + ncol
+// len[x] = nrow_ext
+// sp_v = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_v]
+// len[v] nnz_v
+// sp_r = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_r]
+// len[r] nnz_r
+// len[beta] ncol
+template<typename T1>
+void casadi_qr(const int* sp_a, T1* nz_a, int* iw, T1* x,
+               int* sp_v, T1* nz_v, int* sp_r, T1* nz_r, T1* beta,
+               const int* leftmost, const int* parent, const int* pinv) {
+  // Extract sparsities
+  int nrow = sp_a[0], ncol = sp_a[1];
+  const int *colind=sp_a+2, *row=sp_a+2+ncol+1;
+  int nrow_ext = sp_v[0];
+  int *v_colind=sp_v+2, *v_row=sp_v+2+ncol+1;
+  int *r_colind=sp_r+2, *r_row=sp_r+2+ncol+1;
+  // Work vectors
+  int* s = iw; iw += ncol;
+  // Local variables
+  int r, c, k, k1, top, len, k2, r2;
+  // Clear workspace x
+  for (r=0; r<nrow_ext; ++r) x[r] = 0;
+  // Clear w to mark nodes
+  for (r=0; r<nrow_ext; ++r) iw[r] = 0;
+  // Number of nonzeros in v and r
+  int nnz_r=0, nnz_v=0;
+  // Compute V and R
+  for (c=0; c<ncol; ++c) {
+    // R(:,c) starts here
+    r_colind[c] = nnz_r;
+    // V(:, c) starts here
+    v_colind[c] = k1 = nnz_v;
+    // Add V(c,c) to pattern of V
+    iw[c] = c;
+    v_row[nnz_v++] = c;
+    top = ncol;
+    for (k=colind[c]; k<colind[c+1]; ++k) {
+      r = leftmost[row[k]]; // r = min(find(A(r,:))
+      // Traverse up c
+      for (len=0; iw[r]!=c; r=parent[r]) {
+        s[len++] = r;
+        iw[r] = c;
+      }
+      while (len>0) s[--top] = s[--len]; // push path on stack
+      r = pinv[row[k]]; // r = permuted row of A(:,c)
+      x[r] = nz_a[k]; // x(r) = A(:,c)
+      if (r>c && iw[r]>c) {
+        v_colind[nnz_v++] = r; // add r to pattern of V(:,c)
+        iw[r] = c;
+      }
+    }
+    // For each r in pattern of R(:,c)
+    for (k = top; k<ncol; ++k) {
+      // R(r,c) is nonzero
+      r = s[k];
+      // Apply (V(r), beta(r)) to x
+      casadi_happly(sp_v, nz_v, r, beta[r], x);
+      r_row[nnz_r] = r;
+      nz_r[nnz_r++] = x[r];
+      x[r] = 0;
+      if (parent[r]==c) {
+        for (k2=v_colind[r]; k2<v_colind[r+1]; ++k2) {
+          r2 = v_row[k2];
+          if (iw[r2]<c) {
+            iw[r2] = c;
+            v_row[nnz_v++] = r2;
+          }
+        }
+      }
+    }
+    // Gather V(:,c) = x
+    for (k=k1; k<nnz_v; ++k) {
+      nz_v[k] = x[v_row[k]];
+      x[v_row[k]] = 0;
+    }
+    // R(c,c) = norm(x)
+    r_row[nnz_r] = c;
+    nz_r[nnz_r++] = casadi_house(nz_v + k1, beta + c, nnz_v-k1);
+  }
+  // Finalize R, V
+  r_colind[ncol] = nnz_r;
+  v_colind[ncol] = nnz_v;
 }
