@@ -242,7 +242,9 @@ matrix:
       dist: trusty
       env: NEEDMATLAB=1
       script:
-        - sudo apt-get install -y gcc-4.7 g++-4.7 gfortran-4.7
+        - sudo apt-get install -y gcc-4.7 g++-4.7 gfortran-4.7 locate
+        - sudo updatedb
+        - locate libstdc++.so
         - export CC=gcc-4.7
         - export CXX=g++-4.7
 
