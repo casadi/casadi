@@ -213,3 +213,22 @@ T1 casadi_house(T1* x, T1* beta, int n) {
   *beta = if_else(sigma_is_zero, 2*x0_nonpos, -1/(s*x[0]));
   return s;
 }
+
+// SYMBOL "happly"
+// Apply householder reflection
+// Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
+template<typename T1>
+void casadi_happly(const int* sp, const T1* v, int i, T1 beta, T1* x) {
+  // Extract sparsity
+  int nrow = *sp++, ncol = *sp++;
+  const int *colind = sp, *row = sp+ncol+1;
+  // Local variables
+  int k;
+  // tau = v'*x
+  T1 tau=0;
+  for (k=colind[i]; k<colind[i+1]; ++k) tau += v[k] * x[row[k]];
+  // tau = beta*v'*x
+  tau *= beta;
+  // x -= v*tau
+  for (k=colind[i]; k<colind[i+1]; ++k) x[row[k]] -= v[k]*tau;
+}
