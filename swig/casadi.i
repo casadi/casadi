@@ -498,6 +498,7 @@ namespace std {
     GUESTOBJECT* from_ptr(const std::vector<double> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<int>** m);
     GUESTOBJECT* from_ptr(const std::vector<int> *a);
+    GUESTOBJECT* from_ptr(const std::vector<bool> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m);
     GUESTOBJECT* from_ptr(const std::vector<std::string> *a);
 #endif // SWIGMATLAB
@@ -1224,6 +1225,11 @@ namespace std {
     GUESTOBJECT* from_ptr(const std::vector<int> *a) {
       mxArray* ret = mxCreateDoubleMatrix(1, a->size(), mxREAL);
       std::copy(a->begin(), a->end(), static_cast<double*>(mxGetData(ret)));
+      return ret;
+    }
+    GUESTOBJECT* from_ptr(const std::vector<bool> *a) {
+      mxArray* ret = mxCreateLogicalMatrix(1, a->size());
+      std::copy(a->begin(), a->end(), static_cast<bool*>(mxGetData(ret)));
       return ret;
     }
     GUESTOBJECT* from_ptr(const std::vector<std::string> *a) {
