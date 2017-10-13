@@ -43882,9 +43882,11 @@ Print dense matrix-stype.
 
 ";
 
-%feature("docstring")  casadi::Matrix< T >::has_nz(int rr, int cc) const  "
+%feature("docstring")  ldl(const Matrix< Scalar > &A, Matrix< Scalar > &L,
+Matrix< Scalar > &D) "
 
-Returns true if the matrix has a non-zero at location rr, cc.
+Sparse LDL factorization Only guarenteed to work for positive definite
+matrices.
 
 ";
 
@@ -43956,6 +43958,13 @@ Get the size along a particular dimensions.
 >::mpower(const Matrix< Scalar > &x, const Matrix< Scalar > &y) "
 
 Functions called by friend functions defined here
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::size1()
+const "
+
+Get the first dimension (i.e. number of rows)
 
 ";
 
@@ -44045,10 +44054,9 @@ Functions called by friend functions defined here
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::size1()
-const "
+%feature("docstring")  casadi::Matrix< T >::has_nz(int rr, int cc) const  "
 
-Get the first dimension (i.e. number of rows)
+Returns true if the matrix has a non-zero at location rr, cc.
 
 ";
 
@@ -44251,11 +44259,8 @@ the scalar conversion is valid.
 
 %feature("docstring")  chol(const Matrix< Scalar > &A) "
 
-Obtain a Cholesky factorisation of a matrix Returns an upper triangular R
-such that R'R = A. Matrix A must be positive definite.
-
-At the moment, the algorithm is dense (Cholesky-Banachiewicz). There is an
-open ticket #1212 to make it sparse.
+Obtain a Cholesky factorisation of a matrix Performs and LDL transformation
+[L,D] = ldl(A) and returns diag(sqrt(D))*L'.
 
 ";
 
@@ -60570,7 +60575,7 @@ position el.
 
 %feature("docstring")  casadi::Sparsity::symbfact(std::vector< int >
 &output_count, std::vector< int > &output_parent, std::vector< int >
-&output_post, bool ata=false) const  "
+&output_post, Sparsity &output_L, bool ata=false) const  "
 
 Symbolic factorization analysis See Direct Methods for Sparse Linear Systems
 by Davis (2006).
@@ -65644,6 +65649,11 @@ Check if the vector is strictly increasing.
 
 ";
 
+%feature("docstring")  casadi::casadi_lu_colind(const int *tr_sp, const int
+*parent, const int *post, int *l_colind, int *w) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::Contraction(const T &a, const T &b, T &r) "
 
 ";
@@ -65653,8 +65663,8 @@ bvec_t &r) "
 
 ";
 
-%feature("docstring")  casadi::casadi_counts(const int *tr_sp, const int
-*parent, const int *post, int *count, int *w, int ata) "
+%feature("docstring")  casadi::casadi_ldl_row(const int *sp, const int
+*parent, int *l_colind, int *l_row, int *w) "
 
 [INTERNAL] ";
 
@@ -66022,6 +66032,11 @@ Implements simple newton iterations to solve an implicit function.
 Joel Andersson
 
 ";
+
+%feature("docstring")  casadi::casadi_ldl(const int *sp_a, const int
+*parent, const int *sp_l, const T1 *a, T1 *l, T1 *d, int *iw, T1 *w) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::dple_n_in() "
 
@@ -67432,6 +67447,11 @@ Get the documentation string for a plugin.
 
 ";
 
+%feature("docstring")  casadi::casadi_ldl_colind(const int *sp, int *parent,
+int *l_colind, int *w) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_densify(const T1 *x, const int *sp_x,
 T2 *y, int tr) "
 
@@ -68229,6 +68249,10 @@ Get the documentation string for a plugin.
 %feature("docstring")  casadi::casadi_dot(int n, const T1 *x, const T1 *y) "
 
 [INTERNAL]  Inner product.
+
+";
+
+%feature("docstring")  casadi::message_prefix(std::ostream &stream) "
 
 ";
 

@@ -31590,9 +31590,10 @@ Print dense matrix-stype.
 
 ";
 
-%feature("docstring") casadi::Matrix::has_nz "
+%feature("docstring") friendwrap_ldl "
 
-Returns true if the matrix has a non-zero at location rr, cc.
+Sparse LDL factorization Only guarenteed to work for positive definite
+matrices.
 
 ";
 
@@ -31646,6 +31647,12 @@ Get the size along a particular dimensions.
 %feature("docstring") casadi::Matrix::mpower "
 
 Functions called by friend functions defined here
+
+";
+
+%feature("docstring") casadi::Matrix::size1 "
+
+Get the first dimension (i.e. number of rows)
 
 ";
 
@@ -31711,9 +31718,9 @@ Functions called by friend functions defined here
 
 ";
 
-%feature("docstring") casadi::Matrix::size1 "
+%feature("docstring") casadi::Matrix::has_nz "
 
-Get the first dimension (i.e. number of rows)
+Returns true if the matrix has a non-zero at location rr, cc.
 
 ";
 
@@ -31888,11 +31895,8 @@ the scalar conversion is valid.
 
 %feature("docstring") friendwrap_chol "
 
-Obtain a Cholesky factorisation of a matrix Returns an upper triangular R
-such that R'R = A. Matrix A must be positive definite.
-
-At the moment, the algorithm is dense (Cholesky-Banachiewicz). There is an
-open ticket #1212 to make it sparse.
+Obtain a Cholesky factorisation of a matrix Performs and LDL transformation
+[L,D] = ldl(A) and returns diag(sqrt(D))*L'.
 
 ";
 
@@ -47618,9 +47622,11 @@ Check if the vector is strictly increasing.
 
 ";
 
+%feature("docstring") casadi::casadi_lu_colind "[INTERNAL] ";
+
 %feature("docstring") casadi::Contraction "";
 
-%feature("docstring") casadi::casadi_counts "[INTERNAL] ";
+%feature("docstring") casadi::casadi_ldl_row "[INTERNAL] ";
 
 %feature("docstring") casadi::conic_options "
 
@@ -47938,6 +47944,8 @@ Implements simple newton iterations to solve an implicit function.
 Joel Andersson
 
 ";
+
+%feature("docstring") casadi::casadi_ldl "[INTERNAL] ";
 
 %feature("docstring") casadi::dple_n_in "
 
@@ -49311,6 +49319,8 @@ Get the documentation string for a plugin.
 
 ";
 
+%feature("docstring") casadi::casadi_ldl_colind "[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
 dense.
 
@@ -50026,6 +50036,8 @@ Get the documentation string for a plugin.
 %feature("docstring") casadi::casadi_dot "[INTERNAL]  Inner product.
 
 ";
+
+%feature("docstring") casadi::message_prefix "";
 
 %feature("docstring") casadi::casadi_de_boor "[INTERNAL] ";
 
