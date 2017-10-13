@@ -1573,7 +1573,7 @@ namespace casadi {
       // column counts chol(C'*C)
       std::vector<int> L_colind(1+C.size2());
       w.resize(5*C.size2() + size1()+1);
-      casadi_lu_colind(C.T(), get_ptr(S_parent), get_ptr(post), get_ptr(L_colind),
+      casadi_qr_colind(C.T(), get_ptr(S_parent), get_ptr(post), get_ptr(L_colind),
                        get_ptr(w));
       post.clear();
 

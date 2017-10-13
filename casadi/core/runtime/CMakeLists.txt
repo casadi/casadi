@@ -30,12 +30,13 @@ set(RUNTIME_SRC
   casadi_project.hpp
   casadi_rank1.hpp
   casadi_scal.hpp
-  casadi_solve.hpp
   casadi_sparsify.hpp
   casadi_sum_viol.hpp
   casadi_swap.hpp
   casadi_trans.hpp
   casadi_finite_diff.hpp
+  casadi_ldl.hpp
+  casadi_qr.hpp
 )
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 

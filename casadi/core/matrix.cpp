@@ -1924,25 +1924,20 @@ namespace casadi {
   template<typename Scalar>
   void Matrix<Scalar>::ldl(const Matrix<Scalar>& A,
                            Matrix<Scalar>& L, Matrix<Scalar> &D) {
-    // Make sure symmetric
-    casadi_assert(A.sparsity().is_symmetric(),
-                  "LDL factorization only defined for symmetric matrices.");
+    // Symbolic factorization
+    vector<int> parent;
+    Sparsity L_sp = A.sparsity().ldl(parent);
+
     // Get dimension
     int n=A.size1();
-    // Calculate colind in L (strictly lower entries only)
-    vector<int> iw(3*n), L_colind(n+1), parent(n);
-    casadi_ldl_colind(A.sparsity(), get_ptr(parent), get_ptr(L_colind), get_ptr(iw));
-    // Calculate row in L (strictly lower entries only)
-    vector<int> L_row(L_colind.back());
-    casadi_ldl_row(A.sparsity(), get_ptr(parent), get_ptr(L_colind), get_ptr(L_row),
-                    get_ptr(iw));
-    // Assemble sparsity pattern
-    Sparsity L_sp(n, n, L_colind, L_row);
+
     // Calculate entries in L and D
+    vector<int> iw(2*n);
     vector<Scalar> D_nz(n), L_nz(L_sp.nnz()), w(n);
     casadi_ldl(A.sparsity(), get_ptr(parent), L_sp, get_ptr(A.nonzeros()),
                get_ptr(L_nz), get_ptr(D_nz), get_ptr(iw), get_ptr(w));
-    // Return result
+
+    // Assemble L and D
     L = Matrix<Scalar>(L_sp, L_nz) + Matrix<Scalar>::eye(n);
     D = D_nz;
   }

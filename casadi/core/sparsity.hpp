@@ -598,6 +598,11 @@ namespace casadi {
     */
     std::vector<int> etree(bool ata=false) const;
 
+    /** \brief Symbolic LDL factorization
+        Returns the sparsity pattern of L as well as the elimination tree
+    */
+    Sparsity ldl(std::vector<int>& SWIG_OUTPUT(parent)) const;
+
     /** \brief Symbolic factorization analysis
         See Direct Methods for Sparse Linear Systems by Davis (2006).
     */

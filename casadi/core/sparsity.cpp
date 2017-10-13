@@ -584,10 +584,28 @@ namespace casadi {
     return parent;
   }
 
+  Sparsity Sparsity::ldl(std::vector<int>& parent) const {
+    casadi_assert(is_symmetric(),
+                 "LDL factorization requires a symmetric matrix");
+    // Dimension
+    int n=size1();
+    // Work vector
+    std::vector<int> w(3*n);
+    // Elimination tree
+    parent.resize(n);
+    // Calculate colind in L (strictly lower entries only)
+    std::vector<int> L_colind(1+n);
+    casadi_ldl_colind(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(w));
+    // Get rows in L (strictly lower entries only)
+    std::vector<int> L_row(L_colind.back());
+    casadi_ldl_row(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(L_row),
+                    get_ptr(w));
+    // Sparsity of L
+    return Sparsity(n, n, L_colind, L_row);
+  }
+
   void Sparsity::symbfact(std::vector<int>& count, std::vector<int>& parent,
                           std::vector<int>& post, Sparsity& L, bool ata) const {
-    casadi_assert(ata || is_symmetric(),
-                 "Symmetric factorization requires a symmetric matrix");
     // Dimensions
     int size1=this->size1(), size2=this->size2();
     // Allocate vectors
@@ -595,37 +613,33 @@ namespace casadi {
     parent.resize(size2);
     post.resize(size2);
     count.resize(size2);
-    std::vector<int> L_colind(1+size2), L_row;
 
     if (ata) {
       // Allocate work
-      w.resize(5*size2+size1+1);
+      w.resize(size1+size2);
       // Calculate elimination tree
       casadi_etree(*this, get_ptr(parent), get_ptr(w), ata);
       // Calculate postorder
+      w.resize(3*size2);
       casadi_postorder(get_ptr(parent), size2, get_ptr(post), get_ptr(w));
       // Calculate colind in L
-      casadi_lu_colind(T(), get_ptr(parent), get_ptr(post),
+      w.resize(size1 + 5*size2 + 1);
+      std::vector<int> L_colind(1+size2);
+      casadi_qr_colind(T(), get_ptr(parent), get_ptr(post),
                        get_ptr(L_colind), get_ptr(w));
       // Not implemented
       L = Sparsity();
       // Calculate column counts
       for (int i=0; i<size2; ++i) count[i] = L_colind[i+1] - L_colind[i];
     } else {
-      // Allocate work
-      w.resize(3*size2);
-      // Calculate colind in L (strictly lower entries only)
-      casadi_ldl_colind(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(w));
-      // Get rows in L (strictly lower entries only)
-      L_row.resize(L_colind.back());
-      casadi_ldl_row(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(L_row),
-                      get_ptr(w));
-      // Sparsity of L
-      L = Sparsity(size2, size2, L_colind, L_row) + diag(size2, size2);
+      // Symbolic LDL factorization
+      L = ldl(parent) + diag(size2, size2);
       // Calculate postorder
+      w.resize(3*size2);
       casadi_postorder(get_ptr(parent), size2, get_ptr(post), get_ptr(w));
       // Calculate column counts
-      for (int i=0; i<size2; ++i) count[i] = L_colind[i+1] - L_colind[i] + 1;
+      const int* L_colind = L.colind();
+      for (int i=0; i<size2; ++i) count[i] = L_colind[i+1] - L_colind[i];
     }
   }
 
