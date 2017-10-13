@@ -176,11 +176,6 @@ namespace casadi {
     return node;
   }
 
-  SXElem if_else(const SXElem& cond, const SXElem& if_true,
-                    const SXElem& if_false, bool short_circuit) {
-    return if_else_zero(cond, if_true) + if_else_zero(!cond, if_false);
-  }
-
   SXElem SXElem::binary(int op, const SXElem& x, const SXElem& y) {
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {

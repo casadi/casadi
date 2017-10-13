@@ -279,6 +279,7 @@ namespace casadi {
 
   /// Conditional assignment
   inline double if_else_zero(double x, double y) { return x ? y : 0;}
+  inline double if_else(double x, double y, double z) { return x ? y : z;}
 #ifdef HAS_ERFINV
   using ::erfinv;
 #else // HAS ERFINV

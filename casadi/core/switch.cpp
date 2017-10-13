@@ -346,7 +346,7 @@ namespace casadi {
         for (int i=0; i<n_out_; ++i) {
           if (res[i]) {
             for (int j=0; j<nnz_out(i); ++j) {
-              res[i][j] = if_else(cond, res_temp[i][j], res[i][j], true);
+              res[i][j] = if_else(cond, res_temp[i][j], res[i][j]);
             }
           }
         }
