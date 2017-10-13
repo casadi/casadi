@@ -101,7 +101,9 @@ inline std::string trim_path(const std::string& full_path) {
 inline std::ostream& message_prefix(std::ostream &stream) {
   stream << "CasADi - ";
   auto time = std::time(nullptr);
-  stream << std::put_time(std::localtime(&time), "%F %T"); // NOLINT(runtime/threadsafe_fn)
+  char stamp[30];
+  strftime(stamp, 30, "%F %T", std::localtime(&time)); // NOLINT(runtime/threadsafe_fn)
+  stream << stamp;
   return stream;
 }
 
