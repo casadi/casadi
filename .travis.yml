@@ -248,6 +248,7 @@ matrix:
         - export CC=gcc-4.7
         - export CXX=g++-4.7
 
+
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
 
@@ -263,6 +264,9 @@ matrix:
         - sudo make -j2 install
         - popd
         - matlabtunnel
+        
+        # needed for worhp
+        - export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6 
         - pushd test && PATH=/home/travis/build/matlab/bin/:$PATH make matlab && popd
     - compiler: gcc
       os: linux
