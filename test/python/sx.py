@@ -1348,8 +1348,8 @@ class SXtests(casadiTestCase):
               s = mtimes(jacobian(a,b),c).shape
             except:
               pass
-            if s is not None and jacobian(a,b).is_empty():
-              print a.shape, b.shape, c.shape, jacobian(a,b).shape, s
+            if s is not None and not jacobian(a,b).is_empty():
+              print(a.shape, b.shape, c.shape, jacobian(a,b).shape, s)
               s2 = jtimes(a,b,c).shape
               assert s==s2
               which_depends(a,b,2,False)
