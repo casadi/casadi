@@ -321,6 +321,7 @@ void casadi_qr(const int* sp_a, const T1* nz_a, int* iw, T1* x,
   int* s = iw; iw += ncol;
   // Local variables
   int r, c, k, k1, top, len, k2, r2;
+  T1 tau;
   // Clear workspace x
   for (r=0; r<nrow_ext; ++r) x[r] = 0;
   // Clear w to mark nodes
@@ -356,8 +357,11 @@ void casadi_qr(const int* sp_a, const T1* nz_a, int* iw, T1* x,
     for (k = top; k<ncol; ++k) {
       // R(r,c) is nonzero
       r = s[k];
-      // Apply (V(r), beta(r)) to x
-      casadi_happly(sp_v, nz_v, r, beta[r], x);
+      // Apply (V(r), beta(r)) to x: x -= v*beta*v'*x
+      tau=0;
+      for (k2=v_colind[r]; k2<v_colind[r+1]; ++k2) tau += nz_v[k2] * x[v_row[k2]];
+      tau *= beta[r];
+      for (k2=v_colind[r]; k2<v_colind[r+1]; ++k2) x[v_row[k2]] -= nz_v[k2]*tau;
       r_row[nnz_r] = r;
       nz_r[nnz_r++] = x[r];
       x[r] = 0;
