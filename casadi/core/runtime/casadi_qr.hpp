@@ -308,7 +308,7 @@ void casadi_happly(const int* sp_v, const T1* v, int i, T1 beta, T1* x) {
 // len[r] nnz_r
 // len[beta] ncol
 template<typename T1>
-void casadi_qr(const int* sp_a, T1* nz_a, int* iw, T1* x,
+void casadi_qr(const int* sp_a, const T1* nz_a, int* iw, T1* x,
                int* sp_v, T1* nz_v, int* sp_r, T1* nz_r, T1* beta,
                const int* leftmost, const int* parent, const int* pinv) {
   // Extract sparsities
@@ -324,7 +324,7 @@ void casadi_qr(const int* sp_a, T1* nz_a, int* iw, T1* x,
   // Clear workspace x
   for (r=0; r<nrow_ext; ++r) x[r] = 0;
   // Clear w to mark nodes
-  for (r=0; r<nrow_ext; ++r) iw[r] = 0;
+  for (r=0; r<nrow_ext; ++r) iw[r] = -1;
   // Number of nonzeros in v and r
   int nnz_r=0, nnz_v=0;
   // Compute V and R
@@ -347,8 +347,8 @@ void casadi_qr(const int* sp_a, T1* nz_a, int* iw, T1* x,
       while (len>0) s[--top] = s[--len]; // push path on stack
       r = pinv[row[k]]; // r = permuted row of A(:,c)
       x[r] = nz_a[k]; // x(r) = A(:,c)
-      if (r>c && iw[r]>c) {
-        v_colind[nnz_v++] = r; // add r to pattern of V(:,c)
+      if (r>c && iw[r]<c) {
+        v_row[nnz_v++] = r; // add r to pattern of V(:,c)
         iw[r] = c;
       }
     }
