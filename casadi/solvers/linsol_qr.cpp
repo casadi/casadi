@@ -86,21 +86,22 @@ namespace casadi {
     casadi_postorder(get_ptr(m->parent), size2, get_ptr(m->post), get_ptr(m->iw));
 
     // Number of nonzeros in R
+    int nrow_ext, v_nnz, r_nnz;
+
     m->iw.resize(size1 + 5*size2 + 1);
     vector<int> L_colind(1+size2);
     Sparsity Asp = Sparsity::compressed(m->sparsity);
     casadi_qr_colind(Asp.T(), get_ptr(m->parent), get_ptr(m->post),
                      get_ptr(L_colind), get_ptr(m->iw));
-    int r_nnz = L_colind.back();
+    r_nnz = L_colind.back();
 
     // Number of nonzeros in V
-    m->iw.resize(size1 + 3*size2);
+    m->iw.resize(size1 + 4*size2);
     m->pinv.resize(size1 + size2);
     m->leftmost.resize(size1);
-    int nrow_ext;
-    int v_nnz = casadi_qr_nnz(get_ptr(m->sparsity), get_ptr(m->pinv), get_ptr(m->leftmost),
-                              get_ptr(m->parent), &nrow_ext, get_ptr(m->iw));
-
+    casadi_qr_init(get_ptr(m->sparsity),
+                   get_ptr(m->leftmost), get_ptr(m->parent), get_ptr(m->pinv),
+                   &nrow_ext, &v_nnz, &r_nnz, get_ptr(m->iw));
     m->nz_v.resize(v_nnz);
     m->nz_r.resize(r_nnz);
     m->beta.resize(size2);
