@@ -277,23 +277,32 @@ T1 casadi_house(T1* x, T1* beta, int n) {
   return s;
 }
 
-// SYMBOL "happly"
-// Apply householder reflection
-// Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
+// SYMBOL "qr_mv"
+// Multiply QR Q matrix from the right with a vector, with Q represented
+// by the Householder vectors V and beta
+// x = Q*x or x = Q'*x
+// with Q = (I-beta(1)*v(:,1)*v(:,1)')*...*(I-beta(n)*v(:,n)*v(:,n)')
+// len[x] >= nrow_ext
 template<typename T1>
-void casadi_happly(const int* sp_v, const T1* v, int i, T1 beta, T1* x) {
+void casadi_qr_mv(const int* sp_v, const T1* v, const T1* beta, T1* x,
+                  int tr) {
   // Extract sparsity
-  int nrow=sp_v[0], ncol=sp_v[1];
+  int ncol=sp_v[1];
   const int *colind=sp_v+2, *row=sp_v+2+ncol+1;
   // Local variables
-  int k;
-  // tau = v'*x
-  T1 tau=0;
-  for (k=colind[i]; k<colind[i+1]; ++k) tau += v[k] * x[row[k]];
-  // tau = beta*v'*x
-  tau *= beta;
-  // x -= v*tau
-  for (k=colind[i]; k<colind[i+1]; ++k) x[row[k]] -= v[k]*tau;
+  int c, c1, k;
+  T1 alpha;
+  // Loop over vectors
+  for (c1=0; c1<ncol; ++c1) {
+    // Forward order for transpose, otherwards backwards
+    c = tr ? c1 : ncol-1-c1;
+    // Calculate scalar factor alpha = beta(c)*dot(v(:,c), x)
+    alpha=0;
+    for (k=colind[c]; k<colind[c+1]; ++k) alpha += v[k]*x[row[k]];
+    alpha *= beta[c];
+    // x -= alpha*v(:,c)
+    for (k=colind[c]; k<colind[c+1]; ++k) x[row[k]] -= alpha*v[k];
+  }
 }
 
 // SYMBOL "qr"
