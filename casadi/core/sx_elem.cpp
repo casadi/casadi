@@ -363,8 +363,6 @@ namespace casadi {
           } else {
             return 0;
           }
-        } else if (y->is_one()) {
-          return x;
         }
       }
     }
