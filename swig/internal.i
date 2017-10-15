@@ -1150,6 +1150,18 @@
 %exception  casadi::LinsolInternal::get_n_out() override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::LinsolQr::alloc_mem() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolQr::class_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolQr::init(const Dict &opts) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolQr::plugin_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Lsqr::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1793,6 +1805,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::LinearInterpolantJac::LinearInterpolantJac(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::LinsolQr::LinsolQr(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Lsqr::Lsqr(const std::string &name) {
