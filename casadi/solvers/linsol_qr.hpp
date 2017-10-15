@@ -41,8 +41,9 @@ namespace casadi {
     // Destructor
     ~LinsolQrMemory();
 
-    // Temporary
-    std::vector<double> temp_;
+    std::vector<int> iw, parent, post, count, pinv, leftmost;
+    std::vector<int> sp_v, sp_r;
+    std::vector<double> nz_v, nz_r, beta, w, y;
   };
 
   /** \brief \pluginbrief{LinsolInternal,qr}

@@ -305,10 +305,46 @@ void casadi_qr_mv(const int* sp_v, const T1* v, const T1* beta, T1* x,
   }
 }
 
+// SYMBOL "qr_trs"
+// Solve for an (optionally transposed) upper triangular matrix R
+template<typename T1>
+void casadi_qr_trs(const int* sp_r, const T1* nz_r, T1* x, int tr) {
+  // Extract sparsity
+  int ncol=sp_r[1];
+  const int *colind=sp_r+2, *row=sp_r+2+ncol+1;
+  // Local variables
+  int r, c, k;
+  if (tr) {
+    // Forward substitution
+    for (c=0; c<ncol; ++c) {
+      for (k=colind[c]; k<colind[c+1]; ++k) {
+        r = row[k];
+        if (r==c) {
+          x[c] /= nz_r[k];
+        } else {
+          x[c] -= nz_r[k]*x[r];
+        }
+      }
+    }
+  } else {
+    // Backward substitution
+    for (c=ncol-1; c>=0; --c) {
+      for (k=colind[c+1]-1; k>=colind[c]; --k) {
+        r=row[k];
+        if (r==c) {
+          x[r] /= nz_r[k];
+        } else {
+          x[r] -= nz_r[k]*x[c];
+        }
+      }
+    }
+  }
+}
+
 // SYMBOL "qr"
-// Apply householder reflection
+// Numeric QR factorization
 // Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
-// Note: nrow <= nrow_ext <= ncol
+// Note: nrow <= nrow_ext <= nrow+ncol
 // len[iw] = nrow_ext + ncol
 // len[x] = nrow_ext
 // sp_v = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_v]
