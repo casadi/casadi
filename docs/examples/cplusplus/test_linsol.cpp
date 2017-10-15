@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
   tests.push_back({"ma27", SYM});
   tests.push_back({"symbolicqr", UNSYM});
   tests.push_back({"qr", UNSYM});
+  tests.push_back({"ldl", SYM});
 
   // Test all combinations
   for (auto s : {UNSYM, SYM, PD}) {

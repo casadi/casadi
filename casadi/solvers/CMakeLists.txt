@@ -36,8 +36,14 @@ casadi_plugin(Linsol symbolicqr
   symbolic_qr.hpp symbolic_qr.cpp symbolic_qr_meta.cpp
 )
 
+# Sparse direct QR - implemented in CasADi's C runtime
 casadi_plugin(Linsol qr
   linsol_qr.hpp linsol_qr.cpp linsol_qr_meta.cpp
+)
+
+# Sparse direct LDL' - implemented in CasADi's C runtime
+casadi_plugin(Linsol ldl
+  linsol_ldl.hpp linsol_ldl.cpp linsol_ldl_meta.cpp
 )
 
 casadi_plugin(Linsol lsqr

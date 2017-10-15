@@ -122,3 +122,29 @@ void casadi_ldl(const int* sp_a, const int* parent, const int* sp_l,
     }
   }
 }
+
+// SYMBOL "ldl_trs"
+// Solve for (I+L) with L an optionally transposed strictly lower triangular matrix.
+template<typename T1>
+void casadi_ldl_trs(const int* sp_l, const T1* nz_l, T1* x, int tr) {
+  // Extract sparsity
+  int ncol=sp_l[1];
+  const int *colind=sp_l+2, *row=sp_l+2+ncol+1;
+  // Local variables
+  int c, k;
+  if (tr) {
+    // Backward substitution
+    for (c=ncol-1; c>=0; --c) {
+      for (k=colind[c]; k<colind[c+1]; ++k) {
+        x[c] -= nz_l[k]*x[row[k]];
+      }
+    }
+  } else {
+    // Forward substitution
+    for (c=0; c<ncol; ++c) {
+      for (k=colind[c]; k<colind[c+1]; ++k) {
+        x[row[k]] -= nz_l[k]*x[c];
+      }
+    }
+  }
+}
