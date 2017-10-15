@@ -268,14 +268,17 @@ int casadi_qr_nnz(const int* sp, int* pinv, int* leftmost,
 // len[r] nnz_r
 // len[beta] ncol
 inline
-void casadi_qr_row(const int* sp_a, int* iw, int* sp_v, int* sp_r,
-                   const int* leftmost, const int* parent, const int* pinv) {
+void casadi_qr_sparsities(const int* sp_a, int nrow_ext, int* sp_v, int* sp_r,
+                          const int* leftmost, const int* parent, const int* pinv,
+                          int* iw) {
   // Extract sparsities
   int nrow = sp_a[0], ncol = sp_a[1];
   const int *colind=sp_a+2, *row=sp_a+2+ncol+1;
-  int nrow_ext = sp_v[0];
   int *v_colind=sp_v+2, *v_row=sp_v+2+ncol+1;
   int *r_colind=sp_r+2, *r_row=sp_r+2+ncol+1;
+  // Specify dimensions of V and R
+  sp_v[0] = sp_r[0] = nrow_ext;
+  sp_v[1] = sp_r[1] = ncol;
   // Work vectors
   int* s = iw; iw += ncol;
   // Local variables
