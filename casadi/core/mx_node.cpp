@@ -96,22 +96,23 @@ namespace casadi {
           bool found_dep = false;
 
           // Start destruction method if any of the dependencies has dependencies
-          for (vector<MX>::iterator ii=t->dep_.begin(); ii!=t->dep_.end(); ++ii) {
+          while (!t->dep_.empty()) {
+            const MX& ii = t->dep_.back();
 
             // Skip if constant
-            if (ii->is_constant()) continue;
-
+            if (ii.is_constant()) {
+              t->dep_.pop_back();
+              continue;
+            }
             // Check if this is the only reference to the element
-            if (ii->getCount()==1) {
-
+            if (ii.getCount()==1) {
               // Remove and add to stack
-              deletion_stack.push(*ii);
-              *ii = MX();
+              deletion_stack.push(ii);
+              t->dep_.pop_back();
               found_dep = true;
               break;
             } else {
-              // Replace with an element without dependencies
-              *ii = MX();
+              t->dep_.pop_back();
             }
           }
 
