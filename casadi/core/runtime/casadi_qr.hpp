@@ -256,6 +256,82 @@ int casadi_qr_nnz(const int* sp, int* pinv, int* leftmost,
   return v_nnz;
 }
 
+// SYMBOL "qr_row"
+// Get the row indices for V and R in QR factorization
+// Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
+// Note: nrow <= nrow_ext <= nrow+ncol
+// len[iw] = nrow_ext + ncol
+// len[x] = nrow_ext
+// sp_v = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_v]
+// len[v] nnz_v
+// sp_r = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_r]
+// len[r] nnz_r
+// len[beta] ncol
+inline
+void casadi_qr_row(const int* sp_a, int* iw, int* sp_v, int* sp_r,
+                   const int* leftmost, const int* parent, const int* pinv) {
+  // Extract sparsities
+  int nrow = sp_a[0], ncol = sp_a[1];
+  const int *colind=sp_a+2, *row=sp_a+2+ncol+1;
+  int nrow_ext = sp_v[0];
+  int *v_colind=sp_v+2, *v_row=sp_v+2+ncol+1;
+  int *r_colind=sp_r+2, *r_row=sp_r+2+ncol+1;
+  // Work vectors
+  int* s = iw; iw += ncol;
+  // Local variables
+  int r, c, k, k1, top, len, k2, r2;
+  // Clear w to mark nodes
+  for (r=0; r<nrow_ext; ++r) iw[r] = -1;
+  // Number of nonzeros in v and r
+  int nnz_r=0, nnz_v=0;
+  // Compute V and R
+  for (c=0; c<ncol; ++c) {
+    // R(:,c) starts here
+    r_colind[c] = nnz_r;
+    // V(:, c) starts here
+    v_colind[c] = k1 = nnz_v;
+    // Add V(c,c) to pattern of V
+    iw[c] = c;
+    v_row[nnz_v++] = c;
+    top = ncol;
+    for (k=colind[c]; k<colind[c+1]; ++k) {
+      r = leftmost[row[k]]; // r = min(find(A(r,:))
+      // Traverse up c
+      for (len=0; iw[r]!=c; r=parent[r]) {
+        s[len++] = r;
+        iw[r] = c;
+      }
+      while (len>0) s[--top] = s[--len]; // push path on stack
+      r = pinv[row[k]]; // r = permuted row of A(:,c)
+      if (r>c && iw[r]<c) {
+        v_row[nnz_v++] = r; // add r to pattern of V(:,c)
+        iw[r] = c;
+      }
+    }
+    // For each r in pattern of R(:,c)
+    for (k = top; k<ncol; ++k) {
+      // R(r,c) is nonzero
+      r = s[k];
+      // Apply (V(r), beta(r)) to x: x -= v*beta*v'*x
+      r_row[nnz_r++] = r;
+      if (parent[r]==c) {
+        for (k2=v_colind[r]; k2<v_colind[r+1]; ++k2) {
+          r2 = v_row[k2];
+          if (iw[r2]<c) {
+            iw[r2] = c;
+            v_row[nnz_v++] = r2;
+          }
+        }
+      }
+    }
+    // R(c,c) = norm(x)
+    r_row[nnz_r++] = c;
+  }
+  // Finalize R, V
+  r_colind[ncol] = nnz_r;
+  v_colind[ncol] = nnz_v;
+}
+
 // SYMBOL "house"
 // Householder reflection
 // Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
@@ -275,6 +351,92 @@ T1 casadi_house(T1* x, T1* beta, int n) {
                  if_else(x0_nonpos, x0-s, -sigma/(x0+s)));
   *beta = if_else(sigma_is_zero, 2*x0_nonpos, -1/(s*x[0]));
   return s;
+}
+
+// SYMBOL "qr"
+// Numeric QR factorization
+// Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
+// Note: nrow <= nrow_ext <= nrow+ncol
+// len[iw] = nrow_ext + ncol
+// len[x] = nrow_ext
+// sp_v = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_v]
+// len[v] nnz_v
+// sp_r = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_r]
+// len[r] nnz_r
+// len[beta] ncol
+template<typename T1>
+void casadi_qr(const int* sp_a, const T1* nz_a, int* iw, T1* x,
+               const int* sp_v, T1* nz_v, const int* sp_r, T1* nz_r, T1* beta,
+               const int* leftmost, const int* parent, const int* pinv) {
+  // Extract sparsities
+  int nrow = sp_a[0], ncol = sp_a[1];
+  const int *colind=sp_a+2, *row=sp_a+2+ncol+1;
+  int nrow_ext = sp_v[0];
+  const int *v_colind=sp_v+2, *v_row=sp_v+2+ncol+1;
+  const int *r_colind=sp_r+2, *r_row=sp_r+2+ncol+1;
+  // Work vectors
+  int* s = iw; iw += ncol;
+  // Local variables
+  int r, c, k, k1, top, len, k2, r2;
+  T1 tau;
+  // Clear workspace x
+  for (r=0; r<nrow_ext; ++r) x[r] = 0;
+  // Clear w to mark nodes
+  for (r=0; r<nrow_ext; ++r) iw[r] = -1;
+  // Number of nonzeros in v and r
+  int nnz_r=0, nnz_v=0;
+  // Compute V and R
+  for (c=0; c<ncol; ++c) {
+    // V(:, c) starts here
+    k1 = nnz_v;
+    // Add V(c,c) to pattern of V
+    iw[c] = c;
+    nnz_v++;
+    top = ncol;
+    for (k=colind[c]; k<colind[c+1]; ++k) {
+      r = leftmost[row[k]]; // r = min(find(A(r,:))
+      // Traverse up c
+      for (len=0; iw[r]!=c; r=parent[r]) {
+        s[len++] = r;
+        iw[r] = c;
+      }
+      while (len>0) s[--top] = s[--len]; // push path on stack
+      r = pinv[row[k]]; // r = permuted row of A(:,c)
+      x[r] = nz_a[k]; // x(r) = A(:,c)
+      if (r>c && iw[r]<c) {
+        nnz_v++; // add r to pattern of V(:,c)
+        iw[r] = c;
+      }
+    }
+    // For each r in pattern of R(:,c)
+    for (k = top; k<ncol; ++k) {
+      // R(r,c) is nonzero
+      r = s[k];
+      // Apply (V(r), beta(r)) to x: x -= v*beta*v'*x
+      tau=0;
+      for (k2=v_colind[r]; k2<v_colind[r+1]; ++k2) tau += nz_v[k2] * x[v_row[k2]];
+      tau *= beta[r];
+      for (k2=v_colind[r]; k2<v_colind[r+1]; ++k2) x[v_row[k2]] -= nz_v[k2]*tau;
+      nz_r[nnz_r++] = x[r];
+      x[r] = 0;
+      if (parent[r]==c) {
+        for (k2=v_colind[r]; k2<v_colind[r+1]; ++k2) {
+          r2 = v_row[k2];
+          if (iw[r2]<c) {
+            iw[r2] = c;
+            nnz_v++;
+          }
+        }
+      }
+    }
+    // Gather V(:,c) = x
+    for (k=k1; k<nnz_v; ++k) {
+      nz_v[k] = x[v_row[k]];
+      x[v_row[k]] = 0;
+    }
+    // R(c,c) = norm(x)
+    nz_r[nnz_r++] = casadi_house(nz_v + k1, beta + c, nnz_v-k1);
+  }
 }
 
 // SYMBOL "qr_mv"
@@ -339,97 +501,4 @@ void casadi_qr_trs(const int* sp_r, const T1* nz_r, T1* x, int tr) {
       }
     }
   }
-}
-
-// SYMBOL "qr"
-// Numeric QR factorization
-// Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
-// Note: nrow <= nrow_ext <= nrow+ncol
-// len[iw] = nrow_ext + ncol
-// len[x] = nrow_ext
-// sp_v = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_v]
-// len[v] nnz_v
-// sp_r = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_r]
-// len[r] nnz_r
-// len[beta] ncol
-template<typename T1>
-void casadi_qr(const int* sp_a, const T1* nz_a, int* iw, T1* x,
-               int* sp_v, T1* nz_v, int* sp_r, T1* nz_r, T1* beta,
-               const int* leftmost, const int* parent, const int* pinv) {
-  // Extract sparsities
-  int nrow = sp_a[0], ncol = sp_a[1];
-  const int *colind=sp_a+2, *row=sp_a+2+ncol+1;
-  int nrow_ext = sp_v[0];
-  int *v_colind=sp_v+2, *v_row=sp_v+2+ncol+1;
-  int *r_colind=sp_r+2, *r_row=sp_r+2+ncol+1;
-  // Work vectors
-  int* s = iw; iw += ncol;
-  // Local variables
-  int r, c, k, k1, top, len, k2, r2;
-  T1 tau;
-  // Clear workspace x
-  for (r=0; r<nrow_ext; ++r) x[r] = 0;
-  // Clear w to mark nodes
-  for (r=0; r<nrow_ext; ++r) iw[r] = -1;
-  // Number of nonzeros in v and r
-  int nnz_r=0, nnz_v=0;
-  // Compute V and R
-  for (c=0; c<ncol; ++c) {
-    // R(:,c) starts here
-    r_colind[c] = nnz_r;
-    // V(:, c) starts here
-    v_colind[c] = k1 = nnz_v;
-    // Add V(c,c) to pattern of V
-    iw[c] = c;
-    v_row[nnz_v++] = c;
-    top = ncol;
-    for (k=colind[c]; k<colind[c+1]; ++k) {
-      r = leftmost[row[k]]; // r = min(find(A(r,:))
-      // Traverse up c
-      for (len=0; iw[r]!=c; r=parent[r]) {
-        s[len++] = r;
-        iw[r] = c;
-      }
-      while (len>0) s[--top] = s[--len]; // push path on stack
-      r = pinv[row[k]]; // r = permuted row of A(:,c)
-      x[r] = nz_a[k]; // x(r) = A(:,c)
-      if (r>c && iw[r]<c) {
-        v_row[nnz_v++] = r; // add r to pattern of V(:,c)
-        iw[r] = c;
-      }
-    }
-    // For each r in pattern of R(:,c)
-    for (k = top; k<ncol; ++k) {
-      // R(r,c) is nonzero
-      r = s[k];
-      // Apply (V(r), beta(r)) to x: x -= v*beta*v'*x
-      tau=0;
-      for (k2=v_colind[r]; k2<v_colind[r+1]; ++k2) tau += nz_v[k2] * x[v_row[k2]];
-      tau *= beta[r];
-      for (k2=v_colind[r]; k2<v_colind[r+1]; ++k2) x[v_row[k2]] -= nz_v[k2]*tau;
-      r_row[nnz_r] = r;
-      nz_r[nnz_r++] = x[r];
-      x[r] = 0;
-      if (parent[r]==c) {
-        for (k2=v_colind[r]; k2<v_colind[r+1]; ++k2) {
-          r2 = v_row[k2];
-          if (iw[r2]<c) {
-            iw[r2] = c;
-            v_row[nnz_v++] = r2;
-          }
-        }
-      }
-    }
-    // Gather V(:,c) = x
-    for (k=k1; k<nnz_v; ++k) {
-      nz_v[k] = x[v_row[k]];
-      x[v_row[k]] = 0;
-    }
-    // R(c,c) = norm(x)
-    r_row[nnz_r] = c;
-    nz_r[nnz_r++] = casadi_house(nz_v + k1, beta + c, nnz_v-k1);
-  }
-  // Finalize R, V
-  r_colind[ncol] = nnz_r;
-  v_colind[ncol] = nnz_v;
 }

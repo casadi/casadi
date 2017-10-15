@@ -111,6 +111,11 @@ namespace casadi {
     m->iw.resize(nrow_ext + size2);
     m->w.resize(nrow_ext);
     m->y.resize(nrow_ext);
+
+    // Get the row indices
+    casadi_qr_row(get_ptr(m->sparsity), get_ptr(m->iw),
+                  get_ptr(m->sp_v), get_ptr(m->sp_r),
+                  get_ptr(m->leftmost), get_ptr(m->parent), get_ptr(m->pinv));
   }
 
   void LinsolQr::pivoting(void* mem, const double* A) const {
