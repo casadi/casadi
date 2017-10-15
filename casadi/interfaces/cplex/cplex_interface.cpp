@@ -424,7 +424,7 @@ namespace casadi {
       int problem_type = CPXgetprobtype(m->env, m->lp);
 
       // The solver switched to a MIQP
-      if (problem_type == CPXPROB_MIQP){
+      if (problem_type == CPXPROB_MIQP) {
 
           // Get objective value
           if (CPXgetobjval(m->env, m->lp, &f)) {
