@@ -60281,15 +60281,9 @@ See:   scc
 
 ";
 
-%feature("docstring")  casadi::Sparsity::star_coloring2(int ordering=1, int
-cutoff=std::numeric_limits< int >::max()) const  "
+%feature("docstring")  casadi::Sparsity::is_triu() const  "
 
-Perform a star coloring of a symmetric matrix: A new greedy distance-2
-coloring algorithm Algorithm 4.1 in NEW ACYCLIC AND STAR COLORING ALGORITHMS
-WITH APPLICATION TO COMPUTING HESSIANS A. H. GEBREMEDHIN, A. TARAFDAR, F.
-MANNE, A. POTHEN SIAM J. SCI. COMPUT. Vol. 29, No. 3, pp. 10421072 (2007)
-
-Ordering options: None (0), largest first (1)
+Is upper triangular?
 
 ";
 
@@ -60448,6 +60442,14 @@ Is square?
 %feature("docstring")  casadi::Sparsity::appendColumns(const Sparsity &sp) "
 
 Append another sparsity patten horizontally.
+
+";
+
+%feature("docstring")  casadi::Sparsity::ldl(std::vector< int >
+&output_parent) const  "
+
+Symbolic LDL factorization Returns the sparsity pattern of L as well as the
+elimination tree.
 
 ";
 
@@ -60877,9 +60879,15 @@ Get the number of rows.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::is_triu() const  "
+%feature("docstring")  casadi::Sparsity::star_coloring2(int ordering=1, int
+cutoff=std::numeric_limits< int >::max()) const  "
 
-Is upper triangular?
+Perform a star coloring of a symmetric matrix: A new greedy distance-2
+coloring algorithm Algorithm 4.1 in NEW ACYCLIC AND STAR COLORING ALGORITHMS
+WITH APPLICATION TO COMPUTING HESSIANS A. H. GEBREMEDHIN, A. TARAFDAR, F.
+MANNE, A. POTHEN SIAM J. SCI. COMPUT. Vol. 29, No. 3, pp. 10421072 (2007)
+
+Ordering options: None (0), largest first (1)
 
 ";
 
@@ -65649,11 +65657,6 @@ Check if the vector is strictly increasing.
 
 ";
 
-%feature("docstring")  casadi::casadi_lu_colind(const int *tr_sp, const int
-*parent, const int *post, int *l_colind, int *w) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::Contraction(const T &a, const T &b, T &r) "
 
 ";
@@ -66079,6 +66082,11 @@ Get the documentation string for a plugin.
 Get the number of expm solver inputs.
 
 ";
+
+%feature("docstring")  casadi::casadi_qr_colind(const int *tr_sp, const int
+*parent, const int *post, int *l_colind, int *w) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::conic_in() "
 
@@ -67854,6 +67862,11 @@ Joel Andersson
 
 ";
 
+%feature("docstring")  casadi::casadi_qr_nnz(const int *sp, int *pinv, int
+*leftmost, const int *parent, int *nrow_ext, int *w) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::dplesol(const std::string &name, const
 std::string &solver, const SpDict &qp, const Dict &opts=Dict()) "
 
@@ -68240,6 +68253,12 @@ Check if the vector is strictly decreasing.
 
 ";
 
+%feature("docstring")  casadi::casadi_qr(const int *sp_a, const T1 *nz_a,
+int *iw, T1 *x, int *sp_v, T1 *nz_v, int *sp_r, T1 *nz_r, T1 *beta, const
+int *leftmost, const int *parent, const int *pinv) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::doc_integrator(const std::string &name) "
 
 Get the documentation string for a plugin.
@@ -68435,6 +68454,10 @@ order:  Order of interpolating polynomials
 
 ";
 
+%feature("docstring")  casadi::casadi_house(T1 *x, T1 *beta, int n) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::nlpsol_in() "
 
 Get input scheme of NLP solvers.
@@ -68498,6 +68521,10 @@ Get NLP solver input scheme name by index.
 +---------------+--------+-------------------------------------------------+
 
 ";
+
+%feature("docstring")  casadi::matrixName< SXElem >() "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::conic_n_in() "
 
@@ -69345,7 +69372,8 @@ y.size1()+x.size2()+1
 
 ";
 
-%feature("docstring")  casadi::matrixName< SXElem >() "
+%feature("docstring")  casadi::casadi_qr_mv(const int *sp_v, const T1 *v,
+const T1 *beta, T1 *x, int tr) "
 
 [INTERNAL] ";
 
