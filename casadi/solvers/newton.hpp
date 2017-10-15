@@ -27,7 +27,7 @@
 #define CASADI_NEWTON_HPP
 
 #include "casadi/core/rootfinder_impl.hpp"
-#include <casadi/solvers/rootfinder/casadi_rootfinder_newton_export.h>
+#include <casadi/solvers/casadi_rootfinder_newton_export.h>
 
 /** \defgroup plugin_Rootfinder_newton
      Implements simple newton iterations to solve an implicit function.

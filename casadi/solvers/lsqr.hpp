@@ -27,7 +27,7 @@
 #define CASADI_LSQR_HPP
 
 #include "casadi/core/linsol_internal.hpp"
-#include <casadi/solvers/linsol/casadi_linsol_lsqr_export.h>
+#include <casadi/solvers/casadi_linsol_lsqr_export.h>
 
 /** \defgroup plugin_Linsol_symbolicqr
 

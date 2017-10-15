@@ -27,7 +27,7 @@
 #define CASADI_RUNGE_KUTTA_HPP
 
 #include "casadi/core/integrator_impl.hpp"
-#include <casadi/solvers/integrator/casadi_integrator_rk_export.h>
+#include <casadi/solvers/casadi_integrator_rk_export.h>
 
 /** \defgroup plugin_Integrator_rk
       Fixed-step explicit Runge-Kutta integrator for ODEs

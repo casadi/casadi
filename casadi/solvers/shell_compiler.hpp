@@ -27,7 +27,7 @@
 #define CASADI_SHELL_INTERFACE_HPP
 
 #include "casadi/core/importer_internal.hpp"
-#include <casadi/solvers/importer/casadi_importer_shell_export.h>
+#include <casadi/solvers/casadi_importer_shell_export.h>
 
 /** \defgroup plugin_Importer_shell
       Interface to the JIT compiler SHELL

@@ -27,7 +27,7 @@
 #define CASADI_IMPLICIT_TO_NLP_HPP
 
 #include "casadi/core/rootfinder_impl.hpp"
-#include <casadi/solvers/rootfinder/casadi_rootfinder_nlpsol_export.h>
+#include <casadi/solvers/casadi_rootfinder_nlpsol_export.h>
 
 /** \defgroup plugin_Rootfinder_nlp
   Use an Nlpsol as Rootfinder solver

@@ -27,7 +27,7 @@
 #define CASADI_QP_TO_NLP_HPP
 
 #include "casadi/core/conic_impl.hpp"
-#include <casadi/solvers/conic/casadi_conic_nlpsol_export.h>
+#include <casadi/solvers/casadi_conic_nlpsol_export.h>
 
 
 /** \defgroup plugin_Conic_nlpsol
