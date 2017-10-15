@@ -36,6 +36,10 @@ casadi_plugin(Linsol symbolicqr
   symbolic_qr.hpp symbolic_qr.cpp symbolic_qr_meta.cpp
 )
 
+casadi_plugin(Linsol qr
+  linsol_qr.hpp linsol_qr.cpp linsol_qr_meta.cpp
+)
+
 casadi_plugin(Linsol lsqr
   lsqr.hpp lsqr.cpp lsqr_meta.cpp
 )
