@@ -1882,6 +1882,26 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  void Matrix<Scalar>::
+  qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar> &R,
+            Matrix<Scalar>& beta, std::vector<int>& pinv) {
+    // Calculate the pattern
+    Sparsity spV, spR;
+    vector<int> leftmost, parent;
+    A.sparsity().qr_sparse(spV, spR, pinv, leftmost, parent);
+    // Calculate the nonzeros
+    int nrow_ext = spV.size1(), ncol = spV.size2();
+    V = nan(spV);
+    R = nan(spR);
+    beta = nan(ncol, 1);
+    vector<int> iw(nrow_ext + ncol);
+    vector<Scalar> w(nrow_ext);
+    casadi_qr(A.sparsity(), A.ptr(), get_ptr(iw), get_ptr(w), spV, V.ptr(),
+              spR, R.ptr(), beta.ptr(),
+              get_ptr(leftmost), get_ptr(parent), get_ptr(pinv));
+  }
+
+  template<typename Scalar>
   void Matrix<Scalar>::qr(const Matrix<Scalar>& A,
                             Matrix<Scalar>& Q, Matrix<Scalar> &R) {
     // The following algorithm is taken from J. Demmel:

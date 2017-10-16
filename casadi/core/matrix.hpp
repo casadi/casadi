@@ -426,6 +426,8 @@ namespace casadi {
     static Matrix<Scalar> poly_coeff(const Matrix<Scalar>& ex, const Matrix<Scalar>&x);
     static Matrix<Scalar> poly_roots(const Matrix<Scalar>& p);
     static Matrix<Scalar> eig_symbolic(const Matrix<Scalar>& m);
+    static void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
+                          Matrix<Scalar>& beta, std::vector<int>& pinv);
     static void qr(const Matrix<Scalar>& A, Matrix<Scalar>& Q, Matrix<Scalar>& R);
     static void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& L, Matrix<Scalar>& D);
     static Matrix<Scalar> all(const Matrix<Scalar>& x);
@@ -476,6 +478,14 @@ namespace casadi {
      */
     friend inline void qr(const Matrix<Scalar>& A, Matrix<Scalar>& Q, Matrix<Scalar>& R) {
       return Matrix<Scalar>::qr(A, Q, R);
+    }
+
+    /** \brief Sparse direct QR factorization
+     * See T. Davis: Direct Methods for Sparse Linear Systems
+     */
+    friend inline void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
+                                 Matrix<Scalar>& beta, std::vector<int>& pinv) {
+      return Matrix<Scalar>::qr_sparse(A, V, R, beta, pinv);
     }
 
     /** \brief Obtain a Cholesky factorisation of a matrix

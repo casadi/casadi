@@ -3143,6 +3143,10 @@ DECL void casadi_qr(const M& A, M& OUTPUT1, M& OUTPUT2) {
   return qr(A, OUTPUT1, OUTPUT2);
 }
 
+DECL void casadi_qr_sparse(const M& A, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3, std::vector<int>& OUTPUT4) {
+  return qr_sparse(A, OUTPUT1, OUTPUT2, OUTPUT3, OUTPUT4);
+}
+
 DECL void casadi_ldl(const M& A, M& OUTPUT1, M& OUTPUT2) {
   return ldl(A, OUTPUT1, OUTPUT2);
 }

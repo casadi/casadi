@@ -604,6 +604,33 @@ namespace casadi {
     return Sparsity(n, n, L_colind, L_row);
   }
 
+  void Sparsity::qr_sparse(Sparsity& V, Sparsity& R, std::vector<int>& pinv,
+                           std::vector<int>& leftmost, std::vector<int>& parent) const {
+    // Dimensions
+    int size1=this->size1(), size2=this->size2();
+
+    // Allocate memory
+    leftmost.resize(size1);
+    parent.resize(size2);
+    pinv.resize(size1 + size2);
+    vector<int> iw(size1 + 7*size2 + 1);
+
+    // Initialize QP solve
+    int nrow_ext, v_nnz, r_nnz;
+    casadi_qr_init(*this, T(),
+                   get_ptr(leftmost), get_ptr(parent), get_ptr(pinv),
+                   &nrow_ext, &v_nnz, &r_nnz, get_ptr(iw));
+
+    // Calculate sparsities
+    vector<int> sp_v(2 + size2 + 1 + v_nnz);
+    vector<int> sp_r(2 + size2 + 1 + r_nnz);
+    casadi_qr_sparsities(*this, nrow_ext, get_ptr(sp_v), get_ptr(sp_r),
+                       get_ptr(leftmost), get_ptr(parent), get_ptr(pinv),
+                       get_ptr(iw));
+    V = compressed(sp_v);
+    R = compressed(sp_r);
+  }
+
   void Sparsity::symbfact(std::vector<int>& count, std::vector<int>& parent,
                           std::vector<int>& post, Sparsity& L, bool ata) const {
     // Dimensions

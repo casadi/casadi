@@ -603,6 +603,15 @@ namespace casadi {
     */
     Sparsity ldl(std::vector<int>& SWIG_OUTPUT(parent)) const;
 
+    /** \brief Symbolic QR factorization
+        Returns the sparsity pattern of V (compact representation of Q) and R
+        as well as vectors needed for the numerical factorization and solution.
+    */
+    void qr_sparse(Sparsity& SWIG_OUTPUT(V), Sparsity& SWIG_OUTPUT(R),
+                   std::vector<int>& SWIG_OUTPUT(pinv),
+                   std::vector<int>& SWIG_OUTPUT(leftmost),
+                   std::vector<int>& SWIG_OUTPUT(parent)) const;
+
     /** \brief Symbolic factorization analysis
         See Direct Methods for Sparse Linear Systems by Davis (2006).
     */
