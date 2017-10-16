@@ -40221,7 +40221,7 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::neig(void *mem) const  "
+%feature("docstring")  casadi::LinsolLdl::neig(void *mem) const override "
 
 [INTERNAL]  Number of negative eigenvalues.
 
@@ -40509,7 +40509,7 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::rank(void *mem) const  "
+%feature("docstring")  casadi::LinsolLdl::rank(void *mem) const override "
 
 [INTERNAL]   Matrix rank.
 
@@ -46511,6 +46511,14 @@ Matrix adjoint.
 
 Set the 'precision, width & scientific' used in printing and serializing to
 streams.
+
+";
+
+%feature("docstring")  qr_sparse(const Matrix< Scalar > &A, Matrix< Scalar >
+&V, Matrix< Scalar > &R, Matrix< Scalar > &beta, std::vector< int > &pinv) "
+
+Sparse direct QR factorization See T. Davis: Direct Methods for Sparse
+Linear Systems.
 
 ";
 
@@ -62669,10 +62677,13 @@ Is upper triangular?
 
 ";
 
-%feature("docstring")  casadi::Sparsity::enlargeColumns(int ncol, const
-std::vector< int > &cc, bool ind1=false) "
+%feature("docstring")  casadi::Sparsity::qr_sparse(Sparsity &output_V,
+Sparsity &output_R, std::vector< int > &output_pinv, std::vector< int >
+&output_leftmost, std::vector< int > &output_parent) const  "
 
-Enlarge the matrix along the second dimension (i.e. insert columns)
+Symbolic QR factorization Returns the sparsity pattern of V (compact
+representation of Q) and R as well as vectors needed for the numerical
+factorization and solution.
 
 ";
 
@@ -63293,6 +63304,13 @@ Dense column vector: \"[5]\"
 Dense matrix: \"[5x10]\"
 
 Otherwise: \"[5x10,3nz]\"
+
+";
+
+%feature("docstring")  casadi::Sparsity::enlargeColumns(int ncol, const
+std::vector< int > &cc, bool ind1=false) "
+
+Enlarge the matrix along the second dimension (i.e. insert columns)
 
 ";
 
@@ -68039,6 +68057,12 @@ Check if the vector is strictly increasing.
 
 ";
 
+%feature("docstring")  casadi::casadi_qr_init(const int *sp, const int
+*sp_tr, int *leftmost, int *parent, int *pinv, int *nrow_ext, int *v_nnz,
+int *r_nnz, int *w) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::Contraction(const T &a, const T &b, T &r) "
 
 ";
@@ -68418,6 +68442,12 @@ Joel Andersson
 
 ";
 
+%feature("docstring")  casadi::casadi_qr_sparsities(const int *sp_a, int
+nrow_ext, int *sp_v, int *sp_r, const int *leftmost, const int *parent,
+const int *pinv, int *iw) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_ldl(const int *sp_a, const int
 *parent, const int *sp_l, const T1 *a, T1 *l, T1 *d, int *iw, T1 *w) "
 
@@ -68464,11 +68494,6 @@ Get the documentation string for a plugin.
 Get the number of expm solver inputs.
 
 ";
-
-%feature("docstring")  casadi::casadi_qr_colind(const int *tr_sp, const int
-*parent, const int *post, int *l_colind, int *w) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::conic_in() "
 
@@ -69873,6 +69898,11 @@ ldwork=0) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_qr_counts(const int *tr_sp, const int
+*parent, const int *post, int *counts, int *w) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::collocation_interpolators(const std::vector<
 double > &tau_root, std::vector< std::vector< double > > &output_C,
 std::vector< double > &output_D) "
@@ -70641,8 +70671,8 @@ Check if the vector is strictly decreasing.
 ";
 
 %feature("docstring")  casadi::casadi_qr(const int *sp_a, const T1 *nz_a,
-int *iw, T1 *x, int *sp_v, T1 *nz_v, int *sp_r, T1 *nz_r, T1 *beta, const
-int *leftmost, const int *parent, const int *pinv) "
+int *iw, T1 *x, const int *sp_v, T1 *nz_v, const int *sp_r, T1 *nz_r, T1
+*beta, const int *leftmost, const int *parent, const int *pinv) "
 
 [INTERNAL] ";
 

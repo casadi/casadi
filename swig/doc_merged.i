@@ -33413,6 +33413,13 @@ streams.
 
 ";
 
+%feature("docstring") friendwrap_qr_sparse "
+
+Sparse direct QR factorization See T. Davis: Direct Methods for Sparse
+Linear Systems.
+
+";
+
 %feature("docstring") friendwrap_pw_const "
 
 Create a piecewise constant function Create a piecewise constant function
@@ -45133,9 +45140,11 @@ Is upper triangular?
 
 ";
 
-%feature("docstring") casadi::Sparsity::enlargeColumns "
+%feature("docstring") casadi::Sparsity::qr_sparse "
 
-Enlarge the matrix along the second dimension (i.e. insert columns)
+Symbolic QR factorization Returns the sparsity pattern of V (compact
+representation of Q) and R as well as vectors needed for the numerical
+factorization and solution.
 
 ";
 
@@ -45691,6 +45700,12 @@ Dense column vector: \"[5]\"
 Dense matrix: \"[5x10]\"
 
 Otherwise: \"[5x10,3nz]\"
+
+";
+
+%feature("docstring") casadi::Sparsity::enlargeColumns "
+
+Enlarge the matrix along the second dimension (i.e. insert columns)
 
 ";
 
@@ -49257,6 +49272,8 @@ Check if the vector is strictly increasing.
 
 ";
 
+%feature("docstring") casadi::casadi_qr_init "[INTERNAL] ";
+
 %feature("docstring") casadi::Contraction "";
 
 %feature("docstring") casadi::casadi_ldl_row "[INTERNAL] ";
@@ -49578,6 +49595,8 @@ Joel Andersson
 
 ";
 
+%feature("docstring") casadi::casadi_qr_sparsities "[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_ldl "[INTERNAL] ";
 
 %feature("docstring") casadi::dple_n_in "
@@ -49619,8 +49638,6 @@ Get the documentation string for a plugin.
 Get the number of expm solver inputs.
 
 ";
-
-%feature("docstring") casadi::casadi_qr_colind "[INTERNAL] ";
 
 %feature("docstring") casadi::conic_in "
 
@@ -50971,6 +50988,8 @@ violation.
 ";
 
 %feature("docstring") casadi::casadi_etree "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qr_counts "[INTERNAL] ";
 
 %feature("docstring") casadi::collocation_interpolators "
 
