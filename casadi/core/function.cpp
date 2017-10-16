@@ -588,7 +588,7 @@ namespace casadi {
     // Quick return if possible
     if (n==1) return *this;
     // Unroll?
-    if (parallelization=="unroll") {
+    if (parallelization=="unroll" || parallelization=="inline") {
       // Construct symbolic inputs
       std::vector<MX> arg(n_in());
       std::vector<std::vector<MX>> v(n, arg);
@@ -600,7 +600,11 @@ namespace casadi {
         arg[i] = horzcat(tmp);
       }
       // Evaluate
-      for (auto&& w : v) w = (*this)(w);
+      if (parallelization=="unroll") {
+        for (auto&& w : v) w = (*this)(w);
+      } else {
+        for (auto&& w : v) call(std::vector<MX>(w), w, true, false);
+      }
       // Gather outputs
       std::vector<MX> res(n_out());
       for (int i=0; i<res.size(); ++i) {

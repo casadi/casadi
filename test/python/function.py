@@ -476,7 +476,7 @@ class Functiontests(casadiTestCase):
     Z = [MX.sym("z",2,2) for i in range(n)]
     V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
 
-    for parallelization in ["serial","openmp","unroll"] if args.run_slow else ["serial"]:
+    for parallelization in ["serial","openmp","unroll","inline"] if args.run_slow else ["serial"]:
         print(parallelization)
         res = fun.map(n, parallelization).call([horzcat(*x) for x in [X,Y,Z,V]])
 
