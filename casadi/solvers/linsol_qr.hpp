@@ -41,7 +41,7 @@ namespace casadi {
     // Destructor
     ~LinsolQrMemory();
 
-    std::vector<int> iw, parent, post, count, pinv, leftmost;
+    std::vector<int> parent, pinv, leftmost, iw;
     std::vector<int> sp_v, sp_r;
     std::vector<double> nz_v, nz_r, beta, w, y;
   };

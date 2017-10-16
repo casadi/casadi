@@ -73,48 +73,31 @@ namespace casadi {
     int size1 = m->nrow(), size2 = m->ncol();
 
     // Allocate memory
-    m->parent.resize(size2);
-    m->post.resize(size2);
-    m->count.resize(size2);
-
-    // Calculate elimination tree
-    m->iw.resize(size1+size2);
-    casadi_etree(get_ptr(m->sparsity), get_ptr(m->parent), get_ptr(m->iw), true);
-
-    // Calculate postorder
-    m->iw.resize(3*size2);
-    casadi_postorder(get_ptr(m->parent), size2, get_ptr(m->post), get_ptr(m->iw));
-
-    // Number of nonzeros in R
-    int nrow_ext, v_nnz, r_nnz;
-
-    m->iw.resize(size1 + 5*size2 + 1);
-    vector<int> L_colind(1+size2);
-    Sparsity Asp = Sparsity::compressed(m->sparsity);
-    casadi_qr_colind(Asp.T(), get_ptr(m->parent), get_ptr(m->post),
-                     get_ptr(L_colind), get_ptr(m->iw));
-    r_nnz = L_colind.back();
-
-    // Number of nonzeros in V
-    m->iw.resize(size1 + 4*size2);
-    m->pinv.resize(size1 + size2);
     m->leftmost.resize(size1);
-    casadi_qr_init(get_ptr(m->sparsity),
+    m->parent.resize(size2);
+    m->pinv.resize(size1 + size2);
+    m->iw.resize(size1 + 7*size2 + 2);
+
+    // Initialize QP solve
+    int nrow_ext, v_nnz, r_nnz;
+    Sparsity Asp = Sparsity::compressed(m->sparsity);
+    casadi_qr_init(get_ptr(m->sparsity), Asp.T(),
                    get_ptr(m->leftmost), get_ptr(m->parent), get_ptr(m->pinv),
                    &nrow_ext, &v_nnz, &r_nnz, get_ptr(m->iw));
-    m->nz_v.resize(v_nnz);
-    m->nz_r.resize(r_nnz);
-    m->beta.resize(size2);
+
+    // Calculate sparsities
     m->sp_v.resize(2 + size2 + 1 + v_nnz);
     m->sp_r.resize(2 + size2 + 1 + r_nnz);
-    m->iw.resize(nrow_ext + size2);
-    m->w.resize(nrow_ext);
-    m->y.resize(nrow_ext);
-
-    // Get the row indices
     casadi_qr_sparsities(get_ptr(m->sparsity), nrow_ext, get_ptr(m->sp_v), get_ptr(m->sp_r),
                          get_ptr(m->leftmost), get_ptr(m->parent), get_ptr(m->pinv),
                          get_ptr(m->iw));
+
+    // Memory for numerical solution
+    m->nz_v.resize(v_nnz);
+    m->nz_r.resize(r_nnz);
+    m->beta.resize(size2);
+    m->w.resize(nrow_ext);
+    m->y.resize(nrow_ext);
   }
 
   void LinsolQr::pivoting(void* mem, const double* A) const {

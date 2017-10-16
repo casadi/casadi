@@ -259,28 +259,27 @@ int casadi_qr_nnz(const int* sp, int* pinv, int* leftmost,
 // SYMBOL "qr_init"
 // Setup QP solver
 // Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
-// len[w] >= nrow + 4*ncol
+// len[w] >= nrow + 7*ncol + 2
 // len[pinv] == nrow + ncol
 // len[leftmost] == nrow
 inline
-void casadi_qr_init(const int* sp, int* leftmost, int* parent, int* pinv,
-                   int* nrow_ext, int* v_nnz, int* r_nnz, int* w) {
+void casadi_qr_init(const int* sp, const int* sp_tr,
+                    int* leftmost, int* parent, int* pinv,
+                    int* nrow_ext, int* v_nnz, int* r_nnz, int* w) {
   // Extract sparsity
-  int nrow = sp[0], ncol = sp[1];
-  const int *colind=sp+2, *row=sp+2+ncol+1;
+  int ncol = sp[1];
   // Calculate elimination tree for A'A
   casadi_etree(sp, parent, w, 1); // len[w] >= nrow+ncol
   // Calculate postorder
   int* post = w; w += ncol;
   casadi_postorder(parent, ncol, post, w); // len[w] >= 3*ncol
-
-  // Post can be overwritten
-  w -= ncol;
-
+  // Calculate nnnz in r
+  int *L_colind = w; w += ncol+1;
+  casadi_qr_colind(sp_tr, parent, post, L_colind, w);
+  *r_nnz = L_colind[ncol];
   // Number of nonzeros in V
   *v_nnz = casadi_qr_nnz(sp, pinv, leftmost, parent, nrow_ext, w);
 }
-
 
 // SYMBOL "qr_row"
 // Get the row indices for V and R in QR factorization
