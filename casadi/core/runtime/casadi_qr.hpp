@@ -121,14 +121,14 @@ int casadi_leaf(int i, int j, const int* first, int* maxfirst,
 }
 
 // SYMBOL "qr_colind"
-// Calculate the row offsets for the QR R matrix
+// Calculate the column offsets for the QR R matrix
 // Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
-// len[colind] = ncol+1
+// len[counts] = ncol
 // len[w] >= 5*ncol + nrow + 1
 // C-REPLACE "std::min" "casadi_min"
 inline
-void casadi_qr_colind(const int* tr_sp, const int* parent,
-                      const int* post, int* l_colind, int* w) {
+int casadi_qr_counts(const int* tr_sp, const int* parent,
+                     const int* post, int* counts, int* w) {
   int ncol = *tr_sp++, nrow = *tr_sp++;
   const int *rowind=tr_sp, *col=tr_sp+nrow+1;
   int i, j, k, J, p, q, jleaf, *maxfirst, *prevleaf,
@@ -144,8 +144,8 @@ void casadi_qr_colind(const int* tr_sp, const int* parent,
   for (k=0; k<ncol; ++k) first[k]=-1;
   for (k=0; k<ncol; ++k) {
     j=post[k];
-    // l_colind[j]=1 if j is a leaf
-    l_colind[1+j] = (first[j]==-1) ? 1 : 0;
+    // counts[j]=1 if j is a leaf
+    counts[j] = (first[j]==-1) ? 1 : 0;
     for (; j!=-1 && first[j]==-1; j=parent[j]) first[j]=k;
   }
   // Invert post (use ancestor as work vector)
@@ -168,14 +168,14 @@ void casadi_qr_colind(const int* tr_sp, const int* parent,
   for (k=0; k<ncol; ++k) {
     // j is the kth node in the postordered etree
     j=post[k];
-    if (parent[j]!=-1) l_colind[1+parent[j]]--; // j is not a root
+    if (parent[j]!=-1) counts[parent[j]]--; // j is not a root
     J=head[k];
     while (J!=-1) { // J=j for LL' = A case
       for (p=rowind[J]; p<rowind[J+1]; ++p) {
         i=col[p];
         q = casadi_leaf(i, j, first, maxfirst, prevleaf, ancestor, &jleaf);
-        if (jleaf>=1) l_colind[1+j]++; // A(i,j) is in skeleton
-        if (jleaf==2) l_colind[1+q]--; // account for overlap in q
+        if (jleaf>=1) counts[j]++; // A(i,j) is in skeleton
+        if (jleaf==2) counts[q]--; // account for overlap in q
       }
       J = next[J];
     }
@@ -183,14 +183,13 @@ void casadi_qr_colind(const int* tr_sp, const int* parent,
   }
   // Sum up counts of each child
   for (j=0; j<ncol; ++j) {
-    if (parent[j]!=-1) l_colind[1+parent[j]] += l_colind[1+j];
+    if (parent[j]!=-1) counts[parent[j]] += counts[j];
   }
 
-  // Cumsum
-  l_colind[0] = 0;
-  for (j=0; j<ncol; ++j) {
-    l_colind[j+1] += l_colind[j];
-  }
+  // Sum of counts
+  int sum_counts = 0;
+  for (j=0; j<ncol; ++j) sum_counts += counts[j];
+  return sum_counts;
 }
 
 // SYMBOL "qr_nnz"
@@ -259,7 +258,7 @@ int casadi_qr_nnz(const int* sp, int* pinv, int* leftmost,
 // SYMBOL "qr_init"
 // Setup QP solver
 // Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
-// len[w] >= nrow + 7*ncol + 2
+// len[w] >= nrow + 7*ncol + 1
 // len[pinv] == nrow + ncol
 // len[leftmost] == nrow
 inline
@@ -273,11 +272,9 @@ void casadi_qr_init(const int* sp, const int* sp_tr,
   // Calculate postorder
   int* post = w; w += ncol;
   casadi_postorder(parent, ncol, post, w); // len[w] >= 3*ncol
-  // Calculate nnnz in r
-  int *L_colind = w; w += ncol+1;
-  casadi_qr_colind(sp_tr, parent, post, L_colind, w);
-  *r_nnz = L_colind[ncol];
-  // Number of nonzeros in V
+  // Calculate nnz in R
+  *r_nnz = casadi_qr_counts(sp_tr, parent, post, w, w+ncol);
+  // Calculate nnz in V
   *v_nnz = casadi_qr_nnz(sp, pinv, leftmost, parent, nrow_ext, w);
 }
 

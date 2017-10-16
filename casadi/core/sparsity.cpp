@@ -624,13 +624,10 @@ namespace casadi {
       casadi_postorder(get_ptr(parent), size2, get_ptr(post), get_ptr(w));
       // Calculate colind in L
       w.resize(size1 + 5*size2 + 1);
-      std::vector<int> L_colind(1+size2);
-      casadi_qr_colind(T(), get_ptr(parent), get_ptr(post),
-                       get_ptr(L_colind), get_ptr(w));
+      casadi_qr_counts(T(), get_ptr(parent), get_ptr(post),
+                       get_ptr(count), get_ptr(w));
       // Not implemented
       L = Sparsity();
-      // Calculate column counts
-      for (int i=0; i<size2; ++i) count[i] = L_colind[i+1] - L_colind[i];
     } else {
       // Symbolic LDL factorization
       L = ldl(parent) + diag(size2, size2);

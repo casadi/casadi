@@ -76,7 +76,7 @@ namespace casadi {
     m->leftmost.resize(size1);
     m->parent.resize(size2);
     m->pinv.resize(size1 + size2);
-    m->iw.resize(size1 + 7*size2 + 2);
+    m->iw.resize(size1 + 7*size2 + 1);
 
     // Initialize QP solve
     int nrow_ext, v_nnz, r_nnz;
