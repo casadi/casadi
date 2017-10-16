@@ -88,6 +88,12 @@ namespace casadi {
     // Solve the linear system
     void solve(void* mem, double* x, int nrhs, bool tr) const override;
 
+    /// Number of negative eigenvalues
+    int neig(void* mem) const override;
+
+    /// Matrix rank
+    int rank(void* mem) const override;
+
     /// A documentation string
     static const std::string meta_doc;
 

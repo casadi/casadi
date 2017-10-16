@@ -118,4 +118,22 @@ namespace casadi {
     }
   }
 
+  int LinsolLdl::neig(void* mem) const {
+    // Count number of negative eigenvalues
+    auto m = static_cast<LinsolLdlMemory*>(mem);
+    int n = m->nrow();
+    int ret = 0;
+    for (int i=0; i<n; ++i) if (m->d[i]<0) ret++;
+    return ret;
+  }
+
+  int LinsolLdl::rank(void* mem) const {
+    // Count number of nonzero eigenvalues
+    auto m = static_cast<LinsolLdlMemory*>(mem);
+    int n = m->nrow();
+    int ret = 0;
+    for (int i=0; i<n; ++i) if (m->d[i]!=0) ret++;
+    return ret;
+  }
+
 } // namespace casadi
