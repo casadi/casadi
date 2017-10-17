@@ -70,7 +70,7 @@ if(FORTRAN_REQUIRED)
 else()
   if(Fortran_language_works)
     enable_language(Fortran OPTIONAL)
-  endif()  
+  endif()
 endif()
 
 ########################################################################
@@ -630,6 +630,10 @@ if(WITH_SQIC)
   find_package(SQIC REQUIRED)
 endif()
 add_feature_info(sqic-interface WITH_SQIC "Interface to the QP solver SQIC.")
+
+# AMPL: Interface to the AMPL solver library and interfaced solvers
+option(WITH_AMPL "Compile the interface to AMPL" OFF)
+add_feature_info(ampl-interface WITH_AMPL "Interface to the AMPL solver library.")
 
 # @jgillis: What it this for?
 option(WITH_SLICOT "Enable SLICOT interface" OFF)
