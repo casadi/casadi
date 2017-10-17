@@ -78,6 +78,10 @@ if(WITH_SLICOT)
   add_subdirectory(slicot)
 endif()
 
+if(WITH_AMPL)
+  add_subdirectory(ampl)
+endif()
+
 if(WITH_LINT)
   set(LINT_TARGETS ${LINT_TARGETS} PARENT_SCOPE)
 endif()
