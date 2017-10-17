@@ -809,7 +809,7 @@ void OptiNode::assert_empty() const {
 void OptiNode::minimize(const MX& f) {
   assert_only_opti_nondual(f);
   mark_problem_dirty();
-  casadi_assert(f.is_scalar(), "Objective must be scalar, got " + f.dims() + ".");
+  casadi_assert(f.is_scalar(), "Objective must be scalar, got " + f.dim() + ".");
   f_ = f;
 }
 
