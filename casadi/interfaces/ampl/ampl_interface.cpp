@@ -202,8 +202,29 @@ namespace casadi {
         case OP_ADD: work[o0] = "o0\n" + work[i0] + work[i1]; break;
         case OP_SUB: work[o0] = "o1\n" + work[i0] + work[i1]; break;
         case OP_MUL: work[o0] = "o2\n" + work[i0] + work[i1]; break;
+        case OP_DIV: work[o0] = "o3\n" + work[i0] + work[i1]; break;
         case OP_SQ: work[o0] = "o5\n" + work[i0] + "n2\n"; break;
         case OP_POW: work[o0] = "o5\n" + work[i0] + work[i1]; break;
+        case OP_FLOOR: work[o0] = "o13\n" + work[i0]; break;
+        case OP_CEIL: work[o0] = "o14\n" + work[i0]; break;
+        case OP_FABS: work[o0] = "o15\n" + work[i0]; break;
+        case OP_NEG: work[o0] = "o16\n" + work[i0]; break;
+        case OP_TANH: work[o0] = "o37\n" + work[i0]; break;
+        case OP_TAN: work[o0] = "o38\n" + work[i0]; break;
+        case OP_SQRT: work[o0] = "o39\n" + work[i0]; break;
+        case OP_SINH: work[o0] = "o40\n" + work[i0]; break;
+        case OP_SIN: work[o0] = "o41\n" + work[i0]; break;
+        case OP_LOG: work[o0] = "o43\n" + work[i0]; break;
+        case OP_EXP: work[o0] = "o44\n" + work[i0]; break;
+        case OP_COSH: work[o0] = "o45\n" + work[i0]; break;
+        case OP_COS: work[o0] = "o46\n" + work[i0]; break;
+        case OP_ATANH: work[o0] = "o47\n" + work[i0]; break;
+        case OP_ATAN2: work[o0] = "o48\n" + work[i0] + work[i1]; break;
+        case OP_ATAN: work[o0] = "o49\n" + work[i0]; break;
+        case OP_ASINH: work[o0] = "o50\n" + work[i0]; break;
+        case OP_ASIN: work[o0] = "o51\n" + work[i0]; break;
+        case OP_ACOSH: work[o0] = "o52\n" + work[i0]; break;
+        case OP_ACOS: work[o0] = "o53\n" + work[i0]; break;
         default:
         if (casadi_math<double>::ndeps(op)==1) {
           casadi_error(casadi_math<double>::print(op, "x") + " not supported");
