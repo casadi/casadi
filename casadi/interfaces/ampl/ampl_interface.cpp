@@ -398,7 +398,7 @@ namespace casadi {
     // Get the primal solution
     if (m->x) {
       for (int i=0; i<nx_; ++i) {
-        istringstream s(sol_lines.at(sol_lines.size()-nx_-ng_+i-1));
+        istringstream s(sol_lines.at(sol_lines.size()-nx_+i-1));
         s >> m->x[i];
       }
     }
@@ -406,8 +406,9 @@ namespace casadi {
     // Get the dual solution
     if (m->lam_g) {
       for (int i=0; i<ng_; ++i) {
-        istringstream s(sol_lines.at(sol_lines.size()-ng_+i-1));
+        istringstream s(sol_lines.at(sol_lines.size()-ng_-nx_+i-1));
         s >> m->lam_g[i];
+        m->lam_g[i] *= -1;
       }
     }
 
