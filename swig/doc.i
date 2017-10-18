@@ -71174,6 +71174,8 @@ List of plugins
 
 
 
+- AmplInterface
+
 - blocksqp
 
 - bonmin
@@ -71194,6 +71196,25 @@ Note: some of the plugins in this list might not be available on your
 system. Also, there might be extra plugins available to you that are not
 listed here. You can obtain their documentation with
 Nlpsol.doc(\"myextraplugin\")
+
+
+
+--------------------------------------------------------------------------------
+
+AmplInterface
+-------------
+
+
+
+>List of available options
+
++--------+-----------+--------------------+
+|   Id   |   Type    |    Description     |
++========+===========+====================+
+| solver | OT_STRING | AMPL solver binary |
++--------+-----------+--------------------+
+
+--------------------------------------------------------------------------------
 
 
 

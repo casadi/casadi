@@ -1,4 +1,55 @@
 /// \cond INTERNAL
+/** \class casadi::AmplInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>solver</td><td>OT_STRING</td><td>AMPL solver binary</td><td>casadi::AmplInterface</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_Nlpsol_AmplInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>solver</td><td>OT_STRING</td><td>AMPL solver binary</td></tr>
+</table>
+*/
+/** \addtogroup general_AmplInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
+<tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback</td><td>OT_FUNCTION</td><td>A function that will be called at each iteration with the solver as input. Check documentation of Callback.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOL</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INT</td><td>Only call the callback function every few iterations.</td><td>casadi::Nlpsol</td></tr>
+<tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>solver</td><td>OT_STRING</td><td>AMPL solver binary</td><td>casadi::AmplInterface</td></tr>
+<tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::BSpline
 \n
 \par
