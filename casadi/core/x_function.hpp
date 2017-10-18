@@ -242,40 +242,21 @@ namespace casadi {
   void XFunction<DerivedType, MatType, NodeType>::sort_depth_first(
       std::stack<NodeType*>& s, std::vector<NodeType*>& nodes) {
     while (!s.empty()) {
-
       // Get the topmost element
       NodeType* t = s.top();
-
       // If the last element on the stack has not yet been added
-      if (t && !t->temp) {
-
-        // Find out which not yet added dependency has most number of dependencies
-        int max_deps = -1, dep_with_max_deps = -1;
-        for (int i=0; i<t->n_dep(); ++i) {
-          if (t->dep(i).get() !=0 && static_cast<NodeType*>(t->dep(i).get())->temp == 0) {
-            int ndep_i = t->dep(i)->n_dep();
-            if (ndep_i>max_deps) {
-              max_deps = ndep_i;
-              dep_with_max_deps = i;
-            }
-          }
-        }
-
+      if (t && t->temp>=0) {
+        // Get the index of the next dependency
+        int next_dep = t->temp++;
         // If there is any dependency which has not yet been added
-        if (dep_with_max_deps>=0) {
-
-          // Add to the stack the dependency with the most number of dependencies
-          // (so that constants, inputs etc are added last)
-          s.push(static_cast<NodeType*>(t->dep(dep_with_max_deps).get()));
-
+        if (next_dep < t->n_dep()) {
+          // Add dependency to stack
+          s.push(static_cast<NodeType*>(t->dep(next_dep).get()));
         } else {
-
           // if no dependencies need to be added, we can add the node to the algorithm
           nodes.push_back(t);
-
           // Mark the node as found
-          t->temp = 1;
-
+          t->temp = -1;
           // Remove from stack
           s.pop();
         }
