@@ -130,12 +130,12 @@ if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n"\
 // Issue a warning, including location in the source code
 #define casadi_warning(msg) \
   casadi::message_prefix(casadi::uerr()) \
-    << " WARNING(\"" << msg << "\") [" << CASADI_WHERE << "]\n"
+    << " WARNING(\"" << msg << "\") [" << CASADI_WHERE << "]\n" << std::flush;
 
 // Issue a message, including location in the source code
 #define casadi_message(msg) \
   casadi::message_prefix(casadi::uout()) \
-    << " MESSAGE(\"" << msg << "\") [" << CASADI_WHERE << "]\n"
+    << " MESSAGE(\"" << msg << "\") [" << CASADI_WHERE << "]\n" << std::flush;
 
 } // namespace casadi
 
