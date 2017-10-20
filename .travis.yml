@@ -29,7 +29,7 @@ matrix:
         - sudo apt-add-repository ppa:octave/stable -y
         - sudo apt-get update -qq
         - sudo apt-cache policy octave
-        - sudo apt-get install octave=4.0.2-1ubuntu5~octave~precise2  liboctave-dev -y
+        - sudo apt-get install octave=4.0.2-1ubuntu5~octave~precise2  liboctave-dev octave-dbg -y
         - sudo apt-get install -y xvfb
         - sudo apt-get install -y libgl1-mesa-dri
         
