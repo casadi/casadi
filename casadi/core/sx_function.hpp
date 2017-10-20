@@ -125,7 +125,13 @@ class CASADI_EXPORT SXFunction :
   /** \brief Get the (integer) input arguments of an atomic operation */
   std::vector<int> instruction_input(int k) const override {
     auto e = algorithm_.at(k);
-    return {e.i1, e.i2};
+    if (casadi_math<double>::ndeps(e.op)==2 || e.op==OP_INPUT) {
+      return {e.i1, e.i2};
+    } else if (casadi_math<double>::ndeps(e.op)==1) {
+      return {e.i1};
+    } else {
+      return {};
+    }
   }
 
   /** \brief Get the floating point output argument of an atomic operation */
@@ -134,7 +140,27 @@ class CASADI_EXPORT SXFunction :
   }
 
   /** \brief Get the (integer) output argument of an atomic operation */
-  std::vector<int> instruction_output(int k) const override { return {algorithm_.at(k).i0};}
+  std::vector<int> instruction_output(int k) const override {
+    auto e = algorithm_.at(k);
+    if (e.op==OP_OUTPUT) {
+      return {e.i0, e.i2};
+    } else {
+      return {e.i0};
+    }
+  }
+
+#ifdef WITH_DEPRECATED_FEATURES
+  std::pair<int, int> getAtomicInput(int k) const override {
+    auto e = algorithm_.at(k);
+    return {e.i1, e.i2};
+  }
+
+  /** \brief Get the (integer) output argument of an atomic operation */
+  int getAtomicOutput(int k) const override {
+    auto e = algorithm_.at(k);
+    return e.i0;
+  }
+#endif // WITH_DEPRECATED_FEATURES
 
   /** \brief Number of nodes in the algorithm */
   int n_nodes() const override { return algorithm_.size() - nnz_out();}

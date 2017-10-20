@@ -1258,6 +1258,16 @@ namespace casadi {
     }
   }
 
+#ifdef WITH_DEPRECATED_FEATURES
+  std::pair<int, int> Function::getAtomicInput(int k) const {
+      return (*this)->getAtomicInput(k);
+  }
+
+  int Function::getAtomicOutput(int k) const {
+      return (*this)->getAtomicOutput(k);
+  }
+#endif
+
   double Function::instruction_constant(int k) const {
     try {
       return (*this)->instruction_constant(k);

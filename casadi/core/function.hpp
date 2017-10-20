@@ -784,16 +784,13 @@ namespace casadi {
     int getAtomicOperation(int k) const {return instruction_id(k);}
 
     /** \brief [DEPRECATED] Renamed instruction_index */
-    std::pair<int, int> getAtomicInput(int k) const {
-        std::vector<int> r = instruction_input(k);
-        return {r[0], r[1]};
-    }
+    std::pair<int, int> getAtomicInput(int k) const;
 
     /** \brief [DEPRECATED] Renamed instruction_constant */
     double getAtomicInputReal(int k) const { return instruction_constant(k);}
 
     /** \brief [DEPRECATED] Renamed instruction_output */
-    int getAtomicOutput(int k) const { return instruction_output(k);}
+    int getAtomicOutput(int k) const;
 #endif // WITH_DEPRECATED_FEATURES
 
     ///@{

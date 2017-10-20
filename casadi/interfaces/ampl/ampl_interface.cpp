@@ -175,12 +175,12 @@ namespace casadi {
       int op = F.instruction_id(k);
       // Get the operation indices
       std::vector<int> o = F.instruction_output(k);
-      int o0 = o[0], i0, i1;
-      if (op!=OP_CONST) {
-        std::vector<int> i = F.instruction_input(k);
-        i0 = i[0];
-        i1 = i[1];
-      }
+      int o0=-1, o1=-1, i0=-1, i1=-1;
+      if (o.size()>0) o0 = o[0];
+      if (o.size()>1) o1 = o[1];
+      std::vector<int> i = F.instruction_input(k);
+      if (i.size()>0) i0 = i[0];
+      if (i.size()>1) i1 = i[1];
       switch (op) {
         case OP_CONST:
         work[o0] = "n" + str(F.instruction_constant(k)) + "\n";
@@ -191,13 +191,13 @@ namespace casadi {
         case OP_OUTPUT:
         if (o0==0) {
           // Common subexpression
-          nl_init_ << "V" << (x.nnz()+i1) << " 0 0\n" << work[i0];
+          nl_init_ << "V" << (x.nnz()+o1) << " 0 0\n" << work[i0];
         } else if (o0==1) {
           // Nonlinear objective term
-          nl_init_ << "O" << i1 << " 0\n" << work[i0];
+          nl_init_ << "O" << o1 << " 0\n" << work[i0];
         } else {
           // Nonlinear constraint term
-          nl_init_ << "C" << i1 << "\n" << work[i0];
+          nl_init_ << "C" << o1 << "\n" << work[i0];
         }
         break;
         case OP_ADD: work[o0] = "o0\n" + work[i0] + work[i1]; break;
