@@ -62,6 +62,26 @@ namespace casadi {
     return algorithm_.at(k).data;
   }
 
+  std::vector<int> MXFunction::instruction_input(int k) const {
+    auto e = algorithm_.at(k);
+    if (e.op==OP_INPUT) {
+      const IOInstruction* io = static_cast<const IOInstruction*>(e.data.get());
+      return { io->ind() };
+    } else {
+      return e.arg;
+    }
+  }
+
+  std::vector<int> MXFunction::instruction_output(int k) const {
+    auto e = algorithm_.at(k);
+    if (e.op==OP_OUTPUT) {
+      const IOInstruction* io = static_cast<const IOInstruction*>(e.data.get());
+      return { io->ind() };
+    } else {
+      return e.res;
+    }
+  }
+
   void MXFunction::init(const Dict& opts) {
     // Call the init function of the base class
     XFunction<MXFunction, MX, MXNode>::init(opts);
