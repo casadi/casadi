@@ -1234,6 +1234,14 @@ namespace casadi {
     }
   }
 
+  MX Function::instruction_MX(int k) const {
+    try {
+      return (*this)->instruction_MX(k);
+    } catch (exception& e) {
+      THROW_ERROR("instruction_MX", e.what());
+    }
+  }
+
   int Function::instruction_id(int k) const {
     try {
       return (*this)->instruction_id(k);
@@ -1242,7 +1250,7 @@ namespace casadi {
     }
   }
 
-  pair<int, int> Function::instruction_input(int k) const {
+  std::vector<int> Function::instruction_input(int k) const {
     try {
       return (*this)->instruction_input(k);
     } catch (exception& e) {
@@ -1258,7 +1266,7 @@ namespace casadi {
     }
   }
 
-  int Function::instruction_output(int k) const {
+  std::vector<int> Function::instruction_output(int k) const {
     try {
       return (*this)->instruction_output(k);
     } catch (exception& e) {

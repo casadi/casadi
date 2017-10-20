@@ -751,20 +751,27 @@ namespace casadi {
     /** \brief Number of nodes in the algorithm */
     int n_nodes() const;
 
-    /** \brief Number of instruction in the algorithm (SXFunction) */
+    /** \brief Number of instruction in the algorithm (SXFunction/MXFunction) */
     int n_instructions() const;
 
-    /** \brief Identifier index of the instruction (SXFunction) */
+    /** \brief Identifier index of the instruction (SXFunction/MXFunction) */
     int instruction_id(int k) const;
 
-    /** \brief Locations in the work vector for the inputs of the instruction (SXFunction) */
-    std::pair<int, int> instruction_input(int k) const;
+    /** \brief Locations in the work vector for the inputs of the instruction
+     * (SXFunction/MXFunction) */
+    std::vector<int> instruction_input(int k) const;
 
     /** \brief Get the floating point output argument of an instruction (SXFunction) */
     double instruction_constant(int k) const;
 
-    /** \brief Location in the work vector for the output of the instruction (SXFunction) */
-    int instruction_output(int k) const;
+    /** \brief Location in the work vector for the output of the instruction
+     * (SXFunction/MXFunction) */
+    std::vector<int> instruction_output(int k) const;
+
+    //SX node_SX(int k) const;
+
+    MX instruction_MX(int k) const;
+
 
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Renamed n_instructions */
@@ -777,7 +784,10 @@ namespace casadi {
     int getAtomicOperation(int k) const {return instruction_id(k);}
 
     /** \brief [DEPRECATED] Renamed instruction_index */
-    std::pair<int, int> getAtomicInput(int k) const { return instruction_input(k);}
+    std::pair<int, int> getAtomicInput(int k) const {
+        std::vector<int> r = instruction_input(k);
+        return {r[0], r[1]};
+    }
 
     /** \brief [DEPRECATED] Renamed instruction_constant */
     double getAtomicInputReal(int k) const { return instruction_constant(k);}

@@ -174,11 +174,12 @@ namespace casadi {
       // Get the atomic operation
       int op = F.instruction_id(k);
       // Get the operation indices
-      int o0 = F.instruction_output(k), i0, i1;
+      std::vector<int> o = F.instruction_output(k);
+      int o0 = o[0], i0, i1;
       if (op!=OP_CONST) {
-        pair<int,int> i = F.instruction_input(k);
-        i0 = i.first;
-        i1 = i.second;
+        std::vector<int> i = F.instruction_input(k);
+        i0 = i[0];
+        i1 = i[1];
       }
       switch (op) {
         case OP_CONST:
@@ -392,7 +393,7 @@ namespace casadi {
     ifstream out(outname, ifstream::in);
     casadi_assert(out.is_open(), "Failed to open " + outname);
     string line;
-    while(!out.eof()){
+    while (!out.eof()) {
       getline(out, line);
       uout() << line << "\n";
     }
@@ -411,7 +412,7 @@ namespace casadi {
 
     // Get all the lines
     vector<string> sol_lines;
-    while(!sol.eof()){
+    while (!sol.eof()) {
       getline(sol, line);
       sol_lines.push_back(line);
     }

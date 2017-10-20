@@ -175,8 +175,23 @@ namespace casadi {
     /** \brief Number of nodes in the algorithm */
     int n_nodes() const override { return algorithm_.size();}
 
+    /** *\brief get MX expression associated with instruction */
+    MX instruction_MX(int k) const override;
+
+    /** \brief Get an atomic operation operator index */
+    int instruction_id(int k) const override { return algorithm_.at(k).op;}
+
     /** \brief Get default input value */
     double get_default_in(int ind) const override { return default_in_.at(ind);}
+
+    /** \brief Get the (integer) input arguments of an atomic operation */
+    std::vector<int> instruction_input(int k) const override {
+      return algorithm_.at(k).arg;
+    }
+
+    /** \brief Get the (integer) output argument of an atomic operation */
+    std::vector<int> instruction_output(int k) const override { return algorithm_.at(k).res; }
+
 
     /// Substitute inplace, internal implementation
     void substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const;

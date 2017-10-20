@@ -270,6 +270,9 @@ namespace casadi {
     /// Get operation type
     int op() const;
 
+    /** Obtain information about node */
+    Dict info() const;
+
     /// \cond INTERNAL
     /// Get the temporary variable
     int get_temp() const;

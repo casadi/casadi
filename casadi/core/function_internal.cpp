@@ -2336,7 +2336,7 @@ namespace casadi {
     casadi_error("'instruction_id' not defined for " + class_name());
   }
 
-  std::pair<int, int> FunctionInternal::instruction_input(int k) const {
+  std::vector<int> FunctionInternal::instruction_input(int k) const {
     casadi_error("'instruction_input' not defined for " + class_name());
   }
 
@@ -2344,8 +2344,12 @@ namespace casadi {
     casadi_error("'instruction_constant' not defined for " + class_name());
   }
 
-  int FunctionInternal::instruction_output(int k) const {
+  std::vector<int> FunctionInternal::instruction_output(int k) const {
     casadi_error("'instruction_output' not defined for " + class_name());
+  }
+
+  MX FunctionInternal::instruction_MX(int k) const {
+    casadi_error("'instruction_MX' not defined for " + class_name());
   }
 
   int FunctionInternal::n_nodes() const {

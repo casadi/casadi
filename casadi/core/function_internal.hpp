@@ -331,16 +331,19 @@ namespace casadi {
     virtual int instruction_id(int k) const;
 
     /** \brief Get the (integer) input arguments of an atomic operation */
-    virtual std::pair<int, int> instruction_input(int k) const;
+    virtual std::vector<int> instruction_input(int k) const;
 
     /** \brief Get the floating point output argument of an atomic operation */
     virtual double instruction_constant(int k) const;
 
     /** \brief Get the (integer) output argument of an atomic operation */
-    virtual int instruction_output(int k) const;
+    virtual std::vector<int> instruction_output(int k) const;
 
     /** \brief Number of nodes in the algorithm */
     virtual int n_nodes() const;
+
+    /** *\brief get MX expression associated with instruction */
+    virtual MX instruction_MX(int k) const;
 
     /** \brief Wrap in an Function instance consisting of only one MX call */
     Function wrap() const;

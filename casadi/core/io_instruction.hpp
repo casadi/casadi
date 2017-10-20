@@ -60,6 +60,9 @@ namespace casadi {
 
     // Get IO offset
     int offset() const override { return offset_;}
+
+    /** Obtain information about node */
+    Dict info() const override;
   };
 
   /** \brief Input instruction  */
@@ -80,6 +83,7 @@ namespace casadi {
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
                   const std::vector<int>& arg, const std::vector<int>& res) const override;
+
   };
 
   /** \brief Input instruction  */

@@ -399,6 +399,9 @@ namespace casadi {
     }
   }
 
+  Dict MXNode::info() const {
+    return Dict();
+  }
 
   MX MXNode::get_mac(const MX& y, const MX& z) const {
     // Get reference to transposed first argument

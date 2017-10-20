@@ -58,6 +58,10 @@ namespace casadi {
      }
   };
 
+  MX MXFunction::instruction_MX(int k) const {
+    return algorithm_.at(k).data;
+  }
+
   void MXFunction::init(const Dict& opts) {
     // Call the init function of the base class
     XFunction<MXFunction, MX, MXNode>::init(opts);

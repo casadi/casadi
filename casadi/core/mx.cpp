@@ -693,6 +693,10 @@ namespace casadi {
     return (*this)->op();
   }
 
+  Dict MX::info() const {
+    return (*this)->info();
+  }
+
   bool MX::is_equal(const MX& x, const MX& y, int depth) {
     return MXNode::is_equal(x.get(), y.get(), depth);
   }

@@ -170,6 +170,9 @@ namespace casadi {
     /** \brief Get the operation */
     virtual int op() const = 0;
 
+    /** Obtain information about node */
+    virtual Dict info() const;
+
     /** \brief Check if two nodes are equivalent up to a given depth */
     static bool is_equal(const MXNode* x, const MXNode* y, int depth);
     virtual bool is_equal(const MXNode* node, int depth) const { return false;}
