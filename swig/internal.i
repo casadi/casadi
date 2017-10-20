@@ -676,6 +676,9 @@
 %exception  casadi::FunctionInternal::init(const Dict &opts) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::instruction_MX(int k) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::instruction_constant(int k) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
