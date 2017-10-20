@@ -28,33 +28,7 @@ matrix:
       script:
         - sudo apt-add-repository ppa:octave/stable -y
         - sudo apt-get update -qq
-        - sudo apt-cache policy octave
-        - sudo apt-get install octave=4.0.2-1ubuntu5~octave~precise2  liboctave-dev octave-dbg -y
-        - sudo apt-get install -y xvfb
-        - sudo apt-get install -y libgl1-mesa-dri
-        
-        # travis-wait seems to stop at 20 mins, regardless if output is being generated
-        - (while true ; do sleep 60 ; echo "ping" ; done ) &
-
-        - mkdir build
-        - pushd build
-        - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DCMAKE_INSTALL_PREFIX=/home/travis/build/octave-install -DWITH_DEEPBIND=ON -DWITH_OCTAVE=ON -DWITH_OCTAVE_IMPORT=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON ..
-        - make -j2
-        - sudo make -j2 install
-        - popd
-        - Xvfb :1 &
-        - export DISPLAY=:1
-        - octave --no-gui --no-window-system --eval "addpath('/home/travis/build/octave-install/matlab');savepath;"
-        - pushd test && make octave && popd
-
-    - compiler: gcc
-      os: linux
-      dist: trusty
-      env: NEEDMATLAB=1
-      script:
-        - sudo apt-add-repository ppa:octave/stable -y
-        - sudo apt-get update -qq
-        - sudo apt-get install octave liboctave-dev -y
+        - sudo apt-get install octave liboctave-dev octave-dbg gdb -y
         - sudo apt-get install -y xvfb
         - sudo apt-get install -y libgl1-mesa-dri
         
