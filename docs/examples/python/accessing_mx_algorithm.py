@@ -31,15 +31,16 @@ import numpy
 
 a = MX.sym('a')
 b = MX.sym('b',2)
+c = MX.sym('c',2,2)
 
 # Input expressions
-input_ex = [a,b]
+input_ex = [a,b,c]
 
 # Input values of the same dimensions as the above
-input_val = [numpy.array([2.0]),numpy.array([3.0,4.0])]
+input_val = [numpy.array([2.0]),numpy.array([3.0,4.0]),numpy.array([[5.0,1.0],[8.0,4.0]])]
 
 # Output expressions
-output_ex = [mtimes(a,b) + b]
+output_ex = [3*mtimes(c,b)*a + b]
 
 # Output values to be calculated of the same dimensions as the above
 output_val = [numpy.zeros(2)]
@@ -60,23 +61,25 @@ for k in range(f.n_instructions()):
   i = f.instruction_input(k)
   
   if(op==OP_CONST):
-    x = f.instruction_MX(k)
-    work[o[0]] = x.getMatrixValue()
-    print('work[', o[0], '] = ', x.getMatrixValue())
+    v = f.instruction_MX(k).to_DM()
+    work[o[0]] = v
+    print('work[{o[0]}] = {v}'.format(o=o,v=v))
   else:
     if op==OP_INPUT:
       work[o[0]] = input_val[i[0]]
-      print('work[', o[0], '] = input[', i[0], ']            ---> ' , work[o[0]])
-      
+      print('work[{o[0]}] = input[{i[0]}]            ---> {v}'.format(o=o,i=i,v=work[o[0]]))
     elif op==OP_OUTPUT:
       output_val[o[0]] = work[i[0]]
-      print('output[', o[0], '] = work[', i[0], ']','             ---> ', output_val[o[0]])
+      print('output[{o[0]}] = work[{i[0]}]             ---> {v}'.format(o=o,i=i,v=output_val[o[0]]))
     elif op==OP_ADD:
       work[o[0]] = work[i[0]] + work[i[1]]
-      print('work[', o[0], '] = work[', i[0], '] + work[', i[1], ']','        ---> ', work[o[0]])
+      print('work[{o[0]}] = work[{i[0]}] + work[{i[1]}]      ---> {v}'.format(o=o,i=i,v=work[o[0]]))
     elif op==OP_MUL:
       work[o[0]] = work[i[0]] * work[i[1]]
-      print('work[', o[0], '] = work[', i[0], '] * work[', i[1], ']','        ---> ', work[o[0]])
+      print('work[{o[0]}] = work[{i[0]}] * work[{i[1]}]        ---> {v}'.format(o=o,i=i,v=work[o[0]]))
+    elif op==OP_MTIMES:
+      work[o[0]] = np.dot(work[i[1]], work[i[2]])+work[i[0]]
+      print('work[{o[0]}] = work[{i[1]}] @ work[{i[2]}] + work[{i[0]}]        ---> {v}'.format(o=o,i=i,v=work[o[0]]))
     else:
       print('Unknown operation: ', op)
 
