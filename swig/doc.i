@@ -30386,34 +30386,43 @@ Interface to the JIT compiler SHELL
 
 >List of available options
 
-+----------------+-----------------+---------------------------------------+
-|       Id       |      Type       |              Description              |
-+================+=================+=======================================+
-| cleanup        | OT_BOOL         | Cleanup temporary files when          |
-|                |                 | unloading. Default: true              |
-+----------------+-----------------+---------------------------------------+
-| compiler       | OT_STRING       | Compiler command                      |
-+----------------+-----------------+---------------------------------------+
-| compiler_flags | OT_STRINGVECTOR | Alias for 'compiler_flags'            |
-+----------------+-----------------+---------------------------------------+
-| compiler_setup | OT_STRING       | Compiler setup command. Intended to   |
-|                |                 | be fixed. The 'flag' option is the    |
-|                |                 | prefered way to set custom flags.     |
-+----------------+-----------------+---------------------------------------+
-| flags          | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
-|                |                 | Default: None                         |
-+----------------+-----------------+---------------------------------------+
-| folder         | OT_STRING       | Folder to put temporary objects in.   |
-+----------------+-----------------+---------------------------------------+
-| linker         | OT_STRING       | Linker command                        |
-+----------------+-----------------+---------------------------------------+
-| linker_flags   | OT_STRINGVECTOR | Linker flags for the JIT compiler.    |
-|                |                 | Default: None                         |
-+----------------+-----------------+---------------------------------------+
-| linker_setup   | OT_STRING       | Linker setup command. Intended to be  |
-|                |                 | fixed. The 'flag' option is the       |
-|                |                 | prefered way to set custom flags.     |
-+----------------+-----------------+---------------------------------------+
++----------------------+-----------------+---------------------------------+
+|          Id          |      Type       |           Description           |
++======================+=================+=================================+
+| cleanup              | OT_BOOL         | Cleanup temporary files when    |
+|                      |                 | unloading. Default: true        |
++----------------------+-----------------+---------------------------------+
+| compiler             | OT_STRING       | Compiler command                |
++----------------------+-----------------+---------------------------------+
+| compiler_flags       | OT_STRINGVECTOR | Alias for 'compiler_flags'      |
++----------------------+-----------------+---------------------------------+
+| compiler_output_flag | OT_STRING       | Compiler flag to denote object  |
+|                      |                 | output. Default: '-o '          |
++----------------------+-----------------+---------------------------------+
+| compiler_setup       | OT_STRING       | Compiler setup command.         |
+|                      |                 | Intended to be fixed. The       |
+|                      |                 | 'flag' option is the prefered   |
+|                      |                 | way to set custom flags.        |
++----------------------+-----------------+---------------------------------+
+| flags                | OT_STRINGVECTOR | Compile flags for the JIT       |
+|                      |                 | compiler. Default: None         |
++----------------------+-----------------+---------------------------------+
+| folder               | OT_STRING       | Folder to put temporary objects |
+|                      |                 | in.                             |
++----------------------+-----------------+---------------------------------+
+| linker               | OT_STRING       | Linker command                  |
++----------------------+-----------------+---------------------------------+
+| linker_flags         | OT_STRINGVECTOR | Linker flags for the JIT        |
+|                      |                 | compiler. Default: None         |
++----------------------+-----------------+---------------------------------+
+| linker_output_flag   | OT_STRING       | Linker flag to denote shared    |
+|                      |                 | library output. Default: '-o '  |
++----------------------+-----------------+---------------------------------+
+| linker_setup         | OT_STRING       | Linker setup command. Intended  |
+|                      |                 | to be fixed. The 'flag' option  |
+|                      |                 | is the prefered way to set      |
+|                      |                 | custom flags.                   |
++----------------------+-----------------+---------------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -59292,86 +59301,109 @@ Joel Andersson  Interface to the JIT compiler SHELL
 
 >List of available options
 
-+----------------+-----------------+---------------------------------------+
-|       Id       |      Type       |              Description              |
-+================+=================+=======================================+
-| cleanup        | OT_BOOL         | Cleanup temporary files when          |
-|                |                 | unloading. Default: true              |
-+----------------+-----------------+---------------------------------------+
-| compiler       | OT_STRING       | Compiler command                      |
-+----------------+-----------------+---------------------------------------+
-| compiler_flags | OT_STRINGVECTOR | Alias for 'compiler_flags'            |
-+----------------+-----------------+---------------------------------------+
-| compiler_setup | OT_STRING       | Compiler setup command. Intended to   |
-|                |                 | be fixed. The 'flag' option is the    |
-|                |                 | prefered way to set custom flags.     |
-+----------------+-----------------+---------------------------------------+
-| flags          | OT_STRINGVECTOR | Compile flags for the JIT compiler.   |
-|                |                 | Default: None                         |
-+----------------+-----------------+---------------------------------------+
-| folder         | OT_STRING       | Folder to put temporary objects in.   |
-+----------------+-----------------+---------------------------------------+
-| linker         | OT_STRING       | Linker command                        |
-+----------------+-----------------+---------------------------------------+
-| linker_flags   | OT_STRINGVECTOR | Linker flags for the JIT compiler.    |
-|                |                 | Default: None                         |
-+----------------+-----------------+---------------------------------------+
-| linker_setup   | OT_STRING       | Linker setup command. Intended to be  |
-|                |                 | fixed. The 'flag' option is the       |
-|                |                 | prefered way to set custom flags.     |
-+----------------+-----------------+---------------------------------------+
++----------------------+-----------------+---------------------------------+
+|          Id          |      Type       |           Description           |
++======================+=================+=================================+
+| cleanup              | OT_BOOL         | Cleanup temporary files when    |
+|                      |                 | unloading. Default: true        |
++----------------------+-----------------+---------------------------------+
+| compiler             | OT_STRING       | Compiler command                |
++----------------------+-----------------+---------------------------------+
+| compiler_flags       | OT_STRINGVECTOR | Alias for 'compiler_flags'      |
++----------------------+-----------------+---------------------------------+
+| compiler_output_flag | OT_STRING       | Compiler flag to denote object  |
+|                      |                 | output. Default: '-o '          |
++----------------------+-----------------+---------------------------------+
+| compiler_setup       | OT_STRING       | Compiler setup command.         |
+|                      |                 | Intended to be fixed. The       |
+|                      |                 | 'flag' option is the prefered   |
+|                      |                 | way to set custom flags.        |
++----------------------+-----------------+---------------------------------+
+| flags                | OT_STRINGVECTOR | Compile flags for the JIT       |
+|                      |                 | compiler. Default: None         |
++----------------------+-----------------+---------------------------------+
+| folder               | OT_STRING       | Folder to put temporary objects |
+|                      |                 | in.                             |
++----------------------+-----------------+---------------------------------+
+| linker               | OT_STRING       | Linker command                  |
++----------------------+-----------------+---------------------------------+
+| linker_flags         | OT_STRINGVECTOR | Linker flags for the JIT        |
+|                      |                 | compiler. Default: None         |
++----------------------+-----------------+---------------------------------+
+| linker_output_flag   | OT_STRING       | Linker flag to denote shared    |
+|                      |                 | library output. Default: '-o '  |
++----------------------+-----------------+---------------------------------+
+| linker_setup         | OT_STRING       | Linker setup command. Intended  |
+|                      |                 | to be fixed. The 'flag' option  |
+|                      |                 | is the prefered way to set      |
+|                      |                 | custom flags.                   |
++----------------------+-----------------+---------------------------------+
 
 >List of available options
 
-+----------------+-----------------+-------------------+-------------------+
-|       Id       |      Type       |    Description    |      Used in      |
-+================+=================+===================+===================+
-| cleanup        | OT_BOOL         | Cleanup temporary | casadi::ShellComp |
-|                |                 | files when        | iler              |
-|                |                 | unloading.        |                   |
-|                |                 | Default: true     |                   |
-+----------------+-----------------+-------------------+-------------------+
-| compiler       | OT_STRING       | Compiler command  | casadi::ShellComp |
-|                |                 |                   | iler              |
-+----------------+-----------------+-------------------+-------------------+
-| compiler_flags | OT_STRINGVECTOR | Alias for         | casadi::ShellComp |
-|                |                 | 'compiler_flags'  | iler              |
-+----------------+-----------------+-------------------+-------------------+
-| compiler_setup | OT_STRING       | Compiler setup    | casadi::ShellComp |
-|                |                 | command. Intended | iler              |
-|                |                 | to be fixed. The  |                   |
-|                |                 | 'flag' option is  |                   |
-|                |                 | the prefered way  |                   |
-|                |                 | to set custom     |                   |
-|                |                 | flags.            |                   |
-+----------------+-----------------+-------------------+-------------------+
-| flags          | OT_STRINGVECTOR | Compile flags for | casadi::ShellComp |
-|                |                 | the JIT compiler. | iler              |
-|                |                 | Default: None     |                   |
-+----------------+-----------------+-------------------+-------------------+
-| folder         | OT_STRING       | Folder to put     | casadi::ShellComp |
-|                |                 | temporary objects | iler              |
-|                |                 | in.               |                   |
-+----------------+-----------------+-------------------+-------------------+
-| linker         | OT_STRING       | Linker command    | casadi::ShellComp |
-|                |                 |                   | iler              |
-+----------------+-----------------+-------------------+-------------------+
-| linker_flags   | OT_STRINGVECTOR | Linker flags for  | casadi::ShellComp |
-|                |                 | the JIT compiler. | iler              |
-|                |                 | Default: None     |                   |
-+----------------+-----------------+-------------------+-------------------+
-| linker_setup   | OT_STRING       | Linker setup      | casadi::ShellComp |
-|                |                 | command. Intended | iler              |
-|                |                 | to be fixed. The  |                   |
-|                |                 | 'flag' option is  |                   |
-|                |                 | the prefered way  |                   |
-|                |                 | to set custom     |                   |
-|                |                 | flags.            |                   |
-+----------------+-----------------+-------------------+-------------------+
-| verbose        | OT_BOOL         | Verbose           | casadi::ImporterI |
-|                |                 | evaluation  for   | nternal           |
-|                |                 | debugging         |                   |
-+----------------+-----------------+-------------------+-------------------+
++------------------+-----------------+------------------+------------------+
+|        Id        |      Type       |   Description    |     Used in      |
++==================+=================+==================+==================+
+| cleanup          | OT_BOOL         | Cleanup          | casadi::ShellCom |
+|                  |                 | temporary files  | piler            |
+|                  |                 | when unloading.  |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
+| compiler         | OT_STRING       | Compiler command | casadi::ShellCom |
+|                  |                 |                  | piler            |
++------------------+-----------------+------------------+------------------+
+| compiler_flags   | OT_STRINGVECTOR | Alias for        | casadi::ShellCom |
+|                  |                 | 'compiler_flags' | piler            |
++------------------+-----------------+------------------+------------------+
+| compiler_output_ | OT_STRING       | Compiler flag to | casadi::ShellCom |
+| flag             |                 | denote object    | piler            |
+|                  |                 | output. Default: |                  |
+|                  |                 | '-o '            |                  |
++------------------+-----------------+------------------+------------------+
+| compiler_setup   | OT_STRING       | Compiler setup   | casadi::ShellCom |
+|                  |                 | command.         | piler            |
+|                  |                 | Intended to be   |                  |
+|                  |                 | fixed. The       |                  |
+|                  |                 | 'flag' option is |                  |
+|                  |                 | the prefered way |                  |
+|                  |                 | to set custom    |                  |
+|                  |                 | flags.           |                  |
++------------------+-----------------+------------------+------------------+
+| flags            | OT_STRINGVECTOR | Compile flags    | casadi::ShellCom |
+|                  |                 | for the JIT      | piler            |
+|                  |                 | compiler.        |                  |
+|                  |                 | Default: None    |                  |
++------------------+-----------------+------------------+------------------+
+| folder           | OT_STRING       | Folder to put    | casadi::ShellCom |
+|                  |                 | temporary        | piler            |
+|                  |                 | objects in.      |                  |
++------------------+-----------------+------------------+------------------+
+| linker           | OT_STRING       | Linker command   | casadi::ShellCom |
+|                  |                 |                  | piler            |
++------------------+-----------------+------------------+------------------+
+| linker_flags     | OT_STRINGVECTOR | Linker flags for | casadi::ShellCom |
+|                  |                 | the JIT          | piler            |
+|                  |                 | compiler.        |                  |
+|                  |                 | Default: None    |                  |
++------------------+-----------------+------------------+------------------+
+| linker_output_fl | OT_STRING       | Linker flag to   | casadi::ShellCom |
+| ag               |                 | denote shared    | piler            |
+|                  |                 | library output.  |                  |
+|                  |                 | Default: '-o '   |                  |
++------------------+-----------------+------------------+------------------+
+| linker_setup     | OT_STRING       | Linker setup     | casadi::ShellCom |
+|                  |                 | command.         | piler            |
+|                  |                 | Intended to be   |                  |
+|                  |                 | fixed. The       |                  |
+|                  |                 | 'flag' option is |                  |
+|                  |                 | the prefered way |                  |
+|                  |                 | to set custom    |                  |
+|                  |                 | flags.           |                  |
++------------------+-----------------+------------------+------------------+
+| verbose          | OT_BOOL         | Verbose          | casadi::Importer |
+|                  |                 | evaluation  for  | Internal         |
+|                  |                 | debugging        |                  |
++------------------+-----------------+------------------+------------------+
 
 Diagrams
 --------
