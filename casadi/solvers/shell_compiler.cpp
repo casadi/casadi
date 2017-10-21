@@ -28,7 +28,12 @@
 #include "casadi/core/casadi_meta.hpp"
 #include "casadi/core/casadi_logger.hpp"
 #include <fstream>
-#include <dlfcn.h>
+
+// Set default object file suffix
+#ifndef OBJECT_FILE_SUFFIX
+#define OBJECT_FILE_SUFFIX ".o"
+#endif // OBJECT_FILE_SUFFIX
+
 #include <cstdlib>
 #include <unistd.h>
 
@@ -58,7 +63,11 @@ namespace casadi {
 
   ShellCompiler::~ShellCompiler() {
     // Unload
+#ifdef _WIN32
+    if (handle_) FreeLibrary(handle_);
+#else // _WIN32
     if (handle_) dlclose(handle_);
+#endif // _WIN32
 
     if (cleanup_) {
       // Delete the temporary file
@@ -101,7 +110,13 @@ namespace casadi {
         "Linker flags for the JIT compiler. Default: None"}},
       {"cleanup",
        {OT_BOOL,
-        "Cleanup temporary files when unloading. Default: true"}}
+        "Cleanup temporary files when unloading. Default: true"}},
+      {"compiler_output_flag",
+       {OT_STRING,
+       "Compiler flag to denote object output. Default: '-o '"}},
+      {"linker_output_flag",
+       {OT_STRING,
+       "Linker flag to denote shared library output. Default: '-o '"}}
      }
   };
 
@@ -119,6 +134,8 @@ namespace casadi {
     vector<string> compiler_flags;
     vector<string> linker_flags;
 
+    std::string compiler_output_flag = "-o ";
+    std::string linker_output_flag = "-o ";
 
     // Read options
     for (auto&& op : opts) {
@@ -136,35 +153,40 @@ namespace casadi {
         compiler_flags = op.second;
       } else if (op.first=="linker_flags") {
         linker_flags = op.second;
+      } else if (op.first=="compiler_output_flag") {
+        compiler_output_flag = op.second.to_string();
+      } else if (op.first=="linker_output_flag") {
+        linker_output_flag = op.second.to_string();
       }
     }
 
     // Name of temporary file
 #ifdef HAVE_MKSTEMPS
     // Preferred solution
-    char obj_name[] = "tmp_casadi_compiler_shell_XXXXXX.o";
+    char obj_name[] = "tmp_casadi_compiler_shell_XXXXXX" OBJECT_FILE_SUFFIX;
     if (mkstemps(obj_name, 2) == -1) {
       casadi_error("Failed to create a temporary object file name");
     }
     obj_name_ = obj_name;
 
-    char bin_name[] = "tmp_casadi_compiler_shell_XXXXXX.so";
+    char bin_name[] = "tmp_casadi_compiler_shell_XXXXXX" SHARED_LIBRARY_SUFFIX;
     if (mkstemps(bin_name, 3) == -1) {
       casadi_error("Failed to create a temporary library file name");
     }
     bin_name_ = bin_name;
 #else
     // Fallback, may result in deprecation warnings
-    char* bin_name = tempnam(0, "ca.so");
+    char* bin_name = tempnam(0, "ca" SHARED_LIBRARY_SUFFIX);
     bin_name_ = bin_name;
     free(bin_name);
 
     // Fallback, may result in deprecation warnings
-    char* obj_name = tempnam(0, "ca.o");
+    char* obj_name = tempnam(0, "ca" OBJECT_FILE_SUFFIX);
     obj_name_ = obj_name;
     free(obj_name);
 #endif
 
+#ifndef _WIN32
     // Have relative paths start with ./
     if (obj_name_.at(0)!='/') {
       obj_name_ = "./" + obj_name_;
@@ -173,6 +195,7 @@ namespace casadi {
     if (bin_name_.at(0)!='/') {
       bin_name_ = "./" + bin_name_;
     }
+#endif // _WIN32
 
     // Construct the compiler command
     stringstream cccmd;
@@ -186,7 +209,7 @@ namespace casadi {
     cccmd << " " << name_;
 
     // Temporary object file
-    cccmd << " -o " << obj_name_;
+    cccmd << " " + compiler_output_flag << obj_name_;
 
     // Compile into an object
     if (verbose_) uout() << "calling \"" << cccmd.str() + "\"" << std::endl;
@@ -203,7 +226,7 @@ namespace casadi {
     ldcmd << " " << linker_setup;
 
     // Temporary file
-    ldcmd << " " << obj_name_ << " -o " << bin_name_;
+    ldcmd << " " << obj_name_ << " " + linker_output_flag + bin_name_;
 
     // Compile into a shared library
     if (verbose_) uout() << "calling \"" << ldcmd.str() << "\"" << std::endl;
@@ -211,23 +234,35 @@ namespace casadi {
       casadi_error("Linking failed. Tried \"" + ldcmd.str() + "\"");
     }
 
-    // Load shared library
+#ifdef _WIN32
+    handle_ = LoadLibrary(TEXT(bin_name_.c_str()));
+    SetDllDirectory(NULL);
+#else // _WIN32
     handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
+#endif // _WIN32
+
+#ifdef _WIN32
+    casadi_assert(handle_!=0,
+      "CommonExternal: Cannot open function: " + bin_name_ + ". error code: " +
+      STRING(GetLastError()));
+#else // _WIN32
     casadi_assert(handle_!=0,
       "CommonExternal: Cannot open function: " + bin_name_ + ". error code: " +
       str(dlerror()));
-    // reset error
-    dlerror();
+#endif // _WIN32
   }
 
   signal_t ShellCompiler::get_function(const std::string& symname) {
-    signal_t ret;
-    ret = reinterpret_cast<signal_t>(dlsym(handle_, symname.c_str()));
+#ifdef _WIN32
+    return (signal_t)GetProcAddress(handle_, TEXT(symname.c_str()));
+#else // _WIN32
+    signal_t fcnPtr = reinterpret_cast<signal_t>(dlsym(handle_, symname.c_str()));
     if (dlerror()) {
-      ret=0;
+      fcnPtr=0;
       dlerror(); // Reset error flags
     }
-    return ret;
+    return fcnPtr;
+#endif // _WIN32
   }
 
 } // namespace casadi

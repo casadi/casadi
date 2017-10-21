@@ -28,6 +28,7 @@
 
 #include "casadi/core/importer_internal.hpp"
 #include <casadi/solvers/casadi_importer_shell_export.h>
+#include "casadi/core/plugin_interface.hpp"
 
 /** \defgroup plugin_Importer_shell
       Interface to the JIT compiler SHELL
@@ -91,7 +92,7 @@ namespace casadi {
     bool cleanup_;
 
     // Shared library handle
-    typedef void* handle_t;
+    typedef DL_HANDLE_TYPE handle_t;
     handle_t handle_;
   };
 

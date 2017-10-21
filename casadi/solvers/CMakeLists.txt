@@ -4,7 +4,7 @@ casadi_plugin(Conic nlpsol
   qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
 
 # Simple just-in-time compiler, using shell commands
-if(WITH_DL AND NOT WIN32)
+if(WITH_DL)
   casadi_plugin(Importer shell
     shell_compiler.hpp
     shell_compiler.cpp
