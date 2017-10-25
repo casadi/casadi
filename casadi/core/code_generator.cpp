@@ -367,8 +367,9 @@ namespace casadi {
         << "#define sign CASADI_PREFIX(sign)\n"
         << "casadi_real CASADI_PREFIX(sign)(casadi_real x) { return x<0 ? -1 : x>0 ? 1 : x;}\n"
         << "#define twice CASADI_PREFIX(twice)\n"
-        << "casadi_real twice(casadi_real x) { return x+x;}\n\n";
-
+        << "casadi_real twice(casadi_real x) { return x+x;}\n\n"
+        << "#define nonan CASADI_PREFIX(nonan)\n"
+        << "casadi_real nonan(casadi_real x) { return x-x==x-x? x: 0;}\n\n";
     // Macros
     if (!added_shorthands_.empty()) {
       s << "/* Add prefix to internal symbols */\n";

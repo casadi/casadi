@@ -273,6 +273,16 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
+    /** \brief nonan: x -> x==x? x : 0 */
+    static ExType nonan(const ExType& x) {
+      return ExType::unary(OP_NONAN, x);
+    }
+    friend inline ExType nonan(const ExType& x) {
+      return ExType::nonan(x);
+    }
+    ///@}
+
+    ///@{
     /** \brief Sine: x -> sin(x) */
     static ExType sin(const ExType& x) {
       return ExType::unary(OP_SIN, x);

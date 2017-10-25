@@ -1355,7 +1355,43 @@ class SXtests(casadiTestCase):
                 for i in range(2):
                   assert which_depends(a,b,i,True)==[False]*a.numel()
                   assert which_depends(a,b,i,False)==[False]*b.numel()
+  def test_nonan(self):
+    for X in [MX,SX]:
 
+      x = X.sym("x")
+      a = X.sym("a")
+      b = X.sym("b")
+
+      y = b*(x+1)**2*cos(nonan(nonan(a)/nonan(x)))
+      yc = b*(x+1)**2*cos(a/x)
+      yc0 = b*(x+1)**2
+
+      f = Function('f',[x,a,b],[y])
+      fc = Function('f',[x,a,b],[yc])
+      fc0 = Function('f',[x,a,b],[yc0])
+
+      de_f = [1,2,3]
+      de_r = [1]
+
+      for e in [[0,2,3],[0.1,2,3]]:
+
+        fr = fc0 if e[0]==0 else fc
+
+        self.checkfunction(f,fr,inputs=e)
+        self.check_codegen(f,inputs=e)
+        self.checkarray(f(*e),fr(*e))
+
+        self.checkarray(f.forward(1)(*(e+[0]+de_f)),fr.forward(1)(*(e+[0]+de_f)))
+
+        self.checkarray(f.reverse(1)(*(e+[0]+de_r)),fr.reverse(1)(*(e+[0]+de_r)))
+        
+        self.checkarray(f.reverse(1)(*(e+[0]+de_r)),fr.reverse(1)(*(e+[0]+de_r)))
+        
+        J = Function('J',[x,a,b],[jacobian(y,x,{"allow_forward":True,"allow_reverse":False})])
+        out1 = J(*e)
+        J = Function('J',[x,a,b],[jacobian(y,x,{"allow_forward":False,"allow_reverse":True})])
+        out2 = J(*e)
+        self.checkarray(out1,out2)
       
 if __name__ == '__main__':
     unittest.main()

@@ -3077,6 +3077,7 @@ DECL M casadi_or(const M& x, const M& y) { return x||y; }
 DECL M casadi_not(const M& x) { return !x; }
 DECL M casadi_abs(const M& x) { return fabs(x); }
 DECL M casadi_sqrt(const M& x) { return sqrt(x); }
+DECL M casadi_nonan(const M& x) { using casadi::nonan; return nonan(x); }
 DECL M casadi_sin(const M& x) { return sin(x); }
 DECL M casadi_cos(const M& x) { return cos(x); }
 DECL M casadi_tan(const M& x) { return tan(x); }
@@ -3855,6 +3856,7 @@ namespace casadi {
       def logic_or(x, y): return _casadi.logic_or(x, y)
       def fabs(x): return _casadi.fabs(x)
       def sqrt(x): return _casadi.sqrt(x)
+      def nonan(x): return _casadi.nonan(x)
       def sin(x): return _casadi.sin(x)
       def cos(x): return _casadi.cos(x)
       def tan(x): return _casadi.tan(x)

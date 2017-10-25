@@ -66,27 +66,41 @@ namespace casadi {
 
   void UnaryMX::ad_forward(const std::vector<std::vector<MX> >& fseed,
                      std::vector<std::vector<MX> >& fsens) const {
-    // Get partial derivatives
-    MX pd[2];
-    MX dummy; // Function value, dummy second argument
-    casadi_math<MX>::der(op_, dep(), dummy, shared_from_this<MX>(), pd);
+    if (op_==OP_NONAN) {
+      // Propagate forward seeds
+      for (int d=0; d<fsens.size(); ++d) {
+        fsens[d][0] = nonan(fseed[d][0]);
+      }
+    } else {
+      // Get partial derivatives
+      MX pd[2];
+      MX dummy; // Function value, dummy second argument
+      casadi_math<MX>::der(op_, dep(), dummy, shared_from_this<MX>(), pd);
 
-    // Propagate forward seeds
-    for (int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = pd[0]*fseed[d][0];
+      // Propagate forward seeds
+      for (int d=0; d<fsens.size(); ++d) {
+        fsens[d][0] = pd[0]*fseed[d][0];
+      }
     }
   }
 
   void UnaryMX::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                      std::vector<std::vector<MX> >& asens) const {
-    // Get partial derivatives
-    MX pd[2];
-    MX dummy; // Function value, dummy second argument
-    casadi_math<MX>::der(op_, dep(), dummy, shared_from_this<MX>(), pd);
+    if (op_==OP_NONAN) {
+      // Propagate adjoint seeds
+      for (int d=0; d<aseed.size(); ++d) {
+        asens[d][0] += nonan(aseed[d][0]);
+      }
+    } else {
+      // Get partial derivatives
+      MX pd[2];
+      MX dummy; // Function value, dummy second argument
+      casadi_math<MX>::der(op_, dep(), dummy, shared_from_this<MX>(), pd);
 
-    // Propagate adjoint seeds
-    for (int d=0; d<aseed.size(); ++d) {
-      asens[d][0] += pd[0]*aseed[d][0];
+      // Propagate adjoint seeds
+      for (int d=0; d<aseed.size(); ++d) {
+        asens[d][0] += pd[0]*aseed[d][0];
+      }
     }
   }
 

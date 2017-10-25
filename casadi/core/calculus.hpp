@@ -181,9 +181,10 @@ namespace casadi {
     OP_PRINTME,
     OP_LIFT,
 
-    OP_EINSTEIN
+    OP_EINSTEIN,
+    OP_NONAN
   };
-  #define NUM_BUILT_IN_OPS (OP_EINSTEIN+1)
+  #define NUM_BUILT_IN_OPS (OP_NONAN+1)
 
 #ifndef SWIG
 
@@ -262,6 +263,7 @@ namespace casadi {
 
   ///@{
   /** \brief  CasADi additions */
+  inline double nonan(double x) { return x-x==x-x? x : 0;}
   inline double simplify(double x) { return x;}
   inline double constpow(double x, double y) { return pow(x, y);}
   inline double printme(double x, double y) {
@@ -493,6 +495,7 @@ namespace casadi {
   template<>      struct F0XChecker<OP_ERFINV>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_AND>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_NONAN>{ static const bool check=true;};
   ///@}
 
   ///@{
@@ -542,6 +545,7 @@ namespace casadi {
   template<>      struct NonnegativeChecker<OP_NOT>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_AND>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_OR>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_NONAN>{ static const bool check=true;};
   ///@}
 
   ///@{
@@ -670,6 +674,14 @@ namespace casadi {
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = sq(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=twice(x);}
+  };
+
+  /// nonan
+  template<>
+  struct UnaryOperation<OP_NONAN>{
+  public:
+    template<typename T> static inline void fcn(const T& x, T& f) { f = nonan(x); }
+    template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=1; }
   };
 
   /// Times two
@@ -1041,6 +1053,7 @@ namespace casadi {
     case OP_PRINTME:       return F<OP_PRINTME>::check;
     case OP_LIFT:          return F<OP_LIFT>::check;
     case OP_EINSTEIN:      return F<OP_EINSTEIN>::check;
+    case OP_NONAN:         return F<OP_NONAN>::check;
     }
     return T();
   }
@@ -1219,7 +1232,8 @@ namespace casadi {
   case OP_ATAN2:     CNAME<OP_ATAN2>::fcn(X, Y, F, N);         break;   \
   case OP_ERFINV:    CNAME<OP_ERFINV>::fcn(X, Y, F, N);        break;   \
   case OP_LIFT:      CNAME<OP_LIFT>::fcn(X, Y, F, N);          break;   \
-  case OP_PRINTME:   CNAME<OP_PRINTME>::fcn(X, Y, F, N);       break;
+  case OP_PRINTME:   CNAME<OP_PRINTME>::fcn(X, Y, F, N);       break;   \
+  case OP_NONAN:     CNAME<OP_NONAN>::fcn(X, Y, F, N);         break;
 
 #define CASADI_MATH_FUN_BUILTIN(X, Y, F) CASADI_MATH_FUN_BUILTIN_GEN(BinaryOperationSS, X, Y, F, 1)
 
@@ -1301,8 +1315,8 @@ namespace casadi {
   case OP_ATAN2:     BinaryOperation<OP_ATAN2>::der(X, Y, F, D);      break; \
   case OP_ERFINV:    BinaryOperation<OP_ERFINV>::der(X, Y, F, D);     break; \
   case OP_LIFT:      BinaryOperation<OP_LIFT>::der(X, Y, F, D);       break; \
-  case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X, Y, F, D);    break;
-
+  case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X, Y, F, D);    break; \
+  case OP_NONAN:     BinaryOperation<OP_NONAN>::der(X, Y, F, D);      break;
     switch (op) {
     CASADI_MATH_DER_BUILTIN(x, y, f, d)
       }
@@ -1360,8 +1374,8 @@ namespace casadi {
   case OP_ATAN2:     DerBinaryOpertion<OP_ATAN2>::derf(X, Y, F, D);      break; \
   case OP_ERFINV:    DerBinaryOpertion<OP_ERFINV>::derf(X, Y, F, D);     break; \
   case OP_LIFT:      DerBinaryOpertion<OP_LIFT>::derf(X, Y, F, D);       break; \
-  case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X, Y, F, D);    break;
-
+  case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X, Y, F, D);    break; \
+  case OP_NONAN:     DerBinaryOpertion<OP_NONAN>::derf(X, Y, F, D);      break;
     switch (op) {
       CASADI_MATH_DERF_BUILTIN(x, y, f, d)
         }
@@ -1500,6 +1514,7 @@ namespace casadi {
     case OP_PRINTME:        return "printme";
     case OP_LIFT:           return "lift";
     case OP_EINSTEIN:       return "einstein";
+    case OP_NONAN:          return "nonan";
     }
     return 0;
   }
