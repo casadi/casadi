@@ -102,8 +102,7 @@ namespace casadi {
 
   void LinsolQr::pivoting(void* mem, const double* A) const {
     LinsolInternal::pivoting(mem, A);
-    auto m = static_cast<LinsolQrMemory*>(mem);
-
+    //auto m = static_cast<LinsolQrMemory*>(mem);
    }
 
   void LinsolQr::factorize(void* mem, const double* A) const {

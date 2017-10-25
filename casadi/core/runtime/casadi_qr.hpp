@@ -294,7 +294,7 @@ void casadi_qr_sparsities(const int* sp_a, int nrow_ext, int* sp_v, int* sp_r,
                           const int* leftmost, const int* parent, const int* pinv,
                           int* iw) {
   // Extract sparsities
-  int nrow = sp_a[0], ncol = sp_a[1];
+  int ncol = sp_a[1];
   const int *colind=sp_a+2, *row=sp_a+2+ncol+1;
   int *v_colind=sp_v+2, *v_row=sp_v+2+ncol+1;
   int *r_colind=sp_r+2, *r_row=sp_r+2+ncol+1;
@@ -394,11 +394,10 @@ void casadi_qr(const int* sp_a, const T1* nz_a, int* iw, T1* x,
                const int* sp_v, T1* nz_v, const int* sp_r, T1* nz_r, T1* beta,
                const int* leftmost, const int* parent, const int* pinv) {
   // Extract sparsities
-  int nrow = sp_a[0], ncol = sp_a[1];
+  int ncol = sp_a[1];
   const int *colind=sp_a+2, *row=sp_a+2+ncol+1;
   int nrow_ext = sp_v[0];
   const int *v_colind=sp_v+2, *v_row=sp_v+2+ncol+1;
-  const int *r_colind=sp_r+2, *r_row=sp_r+2+ncol+1;
   // Work vectors
   int* s = iw; iw += ncol;
   // Local variables
