@@ -453,4 +453,9 @@ namespace casadi {
     g << "}\n";
   }
 
+  Dict Switch::info() const {
+    return {{"project_in", project_in_}, {"project_out", project_out_},
+            {"f_def", f_def_}, {"f", f_}};
+  }
+
 } // namespace casadi

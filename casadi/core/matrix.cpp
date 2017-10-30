@@ -1358,6 +1358,12 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  void Matrix<Scalar>::export_code(const std::string& lang,
+       std::ostream &stream, const Dict& options) const {
+    casadi_error("'export_code' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
   bool Matrix<Scalar>::is_valid_input() const {
     return false;
   }
@@ -3643,6 +3649,83 @@ namespace casadi {
 
   template<> vector<SX> SX::get_free(const Function& f) {
     return f.free_sx();
+  }
+
+  template<> void DM::export_code(const std::string& lang,
+       std::ostream &stream, const Dict& options) const {
+
+    casadi_assert(lang=="matlab", "Only matlab language supported for now.");
+    bool opt_inline = false;
+    std::string name = "m";
+    int indent_level = 0;
+
+    // Read options
+    for (auto&& op : options) {
+      if (op.first=="inline") {
+        opt_inline = op.second;
+      } else if (op.first=="name") {
+        name = op.second.to_string();
+      } else if (op.first=="indent_level") {
+        indent_level = op.second;
+      } else {
+        casadi_error("Unknown option '" + op.first + "'.");
+      }
+    }
+
+    // Construct indent string
+    std::string indent = "";
+    for (int i=0;i<indent_level;++i) {
+      indent += "  ";
+    }
+
+    casadi_assert(!opt_inline, "Inline not supported for now.");
+
+    std::ios_base::fmtflags fmtfl = stream.flags();
+    stream << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+
+    if (is_scalar()) {
+      stream << indent << name << " = " << static_cast<double>(*this) << ";" << std::endl;
+      stream.flags(fmtfl);
+      return;
+    }
+
+    std::vector<double> d = nonzeros();
+    for (double& e : d) {
+      if (e==0) e=1e-200;
+    }
+    bool all_equal = true;
+    for (double e : d) {
+      if (e!=d[0]) {
+        all_equal = false;
+        break;
+      }
+    }
+
+    if (all_equal && d.size()>=0) {
+      stream << indent << name << "_nz = ones(1, " << d.size() << ")*" << d[0] << ";" << std::endl;
+    } else {
+      stream << indent << name << "_nz = [";
+      // Nonzero values
+
+      for (int i=0;i<d.size();++i) {
+        stream << d[i] << " ";
+        if ((i+1)%20 == 0) stream << "..." << std::endl << indent << "  ";
+      }
+      stream << "];" << std::endl;
+    }
+    if (is_dense()) {
+      stream << indent << name << " = reshape(";
+      stream << name << "_nz, ";
+      stream << size1() << ", " << size2() << ");" << endl;
+    } else {
+      Dict opts = options;
+      opts["as_matrix"] = false;
+      sparsity().export_code(lang, stream, opts);
+      stream << indent << name << " = sparse(" << name << "_i, " << name << "_j, ";
+      stream << name << "_nz, ";
+      stream << size1() << ", " << size2() << ");" << endl;
+    }
+
   }
 
   // Instantiate templates

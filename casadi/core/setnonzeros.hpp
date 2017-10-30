@@ -122,6 +122,9 @@ namespace casadi {
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, int depth) const override;
 
+    /** Obtain information about node */
+    Dict info() const override { return {{"nz", nz_}}; }
+
     /// Operation sequence
     std::vector<int> nz_;
   };
@@ -165,6 +168,9 @@ namespace casadi {
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, int depth) const override;
+
+    /** Obtain information about node */
+    Dict info() const override { return {{"slice", s_.info()}}; }
 
     // Data member
     Slice s_;
@@ -210,6 +216,9 @@ namespace casadi {
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, int depth) const override;
+
+    /** Obtain information about node */
+    Dict info() const override { return {{"inner", inner_.info()}, {"outer", outer_.info()}}; }
 
     // Data members
     Slice inner_, outer_;

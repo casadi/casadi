@@ -1384,4 +1384,9 @@ namespace casadi {
     }
   }
 
+  Dict Function::info() const {
+    return (*this)->info();
+  }
+
+
 } // namespace casadi

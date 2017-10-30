@@ -82,4 +82,8 @@ namespace casadi {
     casadi_error("not ready");
   }
 
+  Dict SubRef::info() const {
+    return {{"i", i_.info()}, {"j", j_.info()}};
+  }
+
 } // namespace casadi

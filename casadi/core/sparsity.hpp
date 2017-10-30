@@ -30,6 +30,7 @@
 #include "printable.hpp"
 #include "casadi_common.hpp"
 #include "sparsity_interface.hpp"
+#include "generic_type.hpp"
 #include <vector>
 #include <list>
 #include <limits>
@@ -750,6 +751,10 @@ namespace casadi {
     /** \brief Generate a script for Matlab or Octave which visualizes
      * the sparsity using the spy command  */
     void spy_matlab(const std::string& mfile) const;
+
+    /** \brief Export sparsity in Matlab format */
+    void export_code(const std::string& lang, std::ostream &stream=casadi::uout(),
+       const Dict& options=Dict()) const;
 
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Alias for disp */

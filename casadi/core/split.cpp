@@ -121,6 +121,14 @@ namespace casadi {
     }
   }
 
+  Dict Split::info() const {
+    std::vector<MX> arg;
+    for (auto& sp : output_sparsity_)
+      arg.push_back(MX::sym("x", sp));
+    Function output("output", std::vector<MX>{}, arg);
+    return {{"offset", offset_}, {"output", output}};
+  }
+
   Horzsplit::Horzsplit(const MX& x, const std::vector<int>& offset) : Split(x, offset) {
 
     // Split up the sparsity pattern

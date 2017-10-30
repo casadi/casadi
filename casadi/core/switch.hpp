@@ -108,6 +108,10 @@ namespace casadi {
 
     // Sparsity projection needed?
     bool project_in_, project_out_;
+
+    /** Obtain information about node */
+    Dict info() const override;
+
   };
 
 } // namespace casadi

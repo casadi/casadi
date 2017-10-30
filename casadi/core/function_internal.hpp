@@ -613,6 +613,9 @@ namespace casadi {
     virtual bool adjViaJac(int nadj) const;
     ///@}
 
+    /** Obtain information about function */
+    virtual Dict info() const;
+
     /// Checkout a memory object
     int checkout() const;
 

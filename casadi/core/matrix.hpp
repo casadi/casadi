@@ -981,6 +981,10 @@ namespace casadi {
     }
     ///@}
 
+    /** \brief Export matrix in Matlab format */
+    void export_code(const std::string& lang,
+        std::ostream &stream=casadi::uout(), const Dict& options=Dict()) const;
+
 #ifndef SWIG
     /// Sparse matrix with a given sparsity with all values same
     Matrix(const Sparsity& sp, const Scalar& val, bool dummy);

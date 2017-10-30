@@ -2002,6 +2002,10 @@ namespace casadi {
     return false;
   }
 
+  Dict FunctionInternal::info() const {
+    return Dict();
+  }
+
   void FunctionInternal::
   call_forward(const std::vector<MX>& arg, const std::vector<MX>& res,
              const std::vector<std::vector<MX> >& fseed,

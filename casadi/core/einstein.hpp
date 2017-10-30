@@ -94,6 +94,15 @@ namespace casadi {
     /** \brief Get required length of w field */
     size_t sz_w() const override { return sparsity().size1();}
 
+    /** Obtain information about node */
+    Dict info() const override {
+      return {{"dim_a", dim_a_}, {"dim_b", dim_b_}, {"dim_c", dim_c_},
+              {"a", a_}, {"b", b_}, {"c", c_},
+              {"iter_dims", iter_dims_},
+              {"strides_a", strides_a_}, {"strides_b", strides_b_}, {"strides_c", strides_c_},
+              {"n_iter", n_iter_}};
+    }
+
     /// Dimensions of tensors A B C
     std::vector<int> dim_c_, dim_a_, dim_b_;
     /// Einstein indices
