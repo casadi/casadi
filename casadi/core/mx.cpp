@@ -702,13 +702,11 @@ namespace casadi {
   }
 
   MX MX::mmin(const MX &x) {
-    casadi_error("Not implemented");
-    return x;
+    return x->get_mmin();
   }
 
   MX MX::mmax(const MX &x) {
-    casadi_error("Not implemented");
-    return x;
+    return x->get_mmax();
   }
 
   bool MX::is_commutative() const {

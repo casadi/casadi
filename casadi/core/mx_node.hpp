@@ -368,6 +368,12 @@ namespace casadi {
     /// 1-norm
     virtual MX get_norm_1() const;
 
+    /// Min
+    virtual MX get_mmin() const;
+
+    /// Max
+    virtual MX get_mmax() const;
+
     /// Assertion
     MX get_assert(const MX& y, const std::string& fail_message) const;
 

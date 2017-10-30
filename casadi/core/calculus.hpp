@@ -171,6 +171,9 @@ namespace casadi {
     // Norms
     OP_NORM2, OP_NORM1, OP_NORMINF, OP_NORMF,
 
+    // min/max
+    OP_MMIN, OP_MMAX,
+
     // Horizontal repeat
     OP_HORZREPMAT,
 

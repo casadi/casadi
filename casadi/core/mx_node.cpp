@@ -42,6 +42,7 @@
 #include "inverse.hpp"
 #include "dot.hpp"
 #include "norm.hpp"
+#include "mmin.hpp"
 #include "concat.hpp"
 #include "split.hpp"
 #include "assertion.hpp"
@@ -757,6 +758,14 @@ namespace casadi {
 
   MX MXNode::get_norm_1() const {
     return MX::create(new Norm1(shared_from_this<MX>()));
+  }
+
+  MX MXNode::get_mmin() const {
+    return MX::create(new MMin(shared_from_this<MX>()));
+  }
+
+  MX MXNode::get_mmax() const {
+    return MX::create(new MMax(shared_from_this<MX>()));
   }
 
   MX MXNode::get_horzcat(const vector<MX>& x) const {
