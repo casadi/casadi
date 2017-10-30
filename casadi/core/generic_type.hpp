@@ -50,6 +50,7 @@ namespace casadi {
     OT_STRINGVECTOR,
     OT_DICT,
     OT_FUNCTION,
+    OT_FUNCTIONVECTOR,
     OT_VOIDPTR,
     OT_UNKNOWN};
 #endif // SWIG
@@ -85,6 +86,7 @@ namespace casadi {
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
     GenericType(const Function& f);
+    GenericType(const std::vector<Function>& f);
     GenericType(const Dict& dict);
     GenericType(void* ptr);
 
@@ -115,6 +117,7 @@ namespace casadi {
     operator std::vector<double>() const { return to_double_vector();}
     operator std::vector<std::string>() const { return to_string_vector();}
     operator const Function&() const { return as_function();}
+    operator const std::vector<Function>&() const { return as_function_vector();}
     operator const Dict&() const { return as_dict();}
     ///@}
 
@@ -141,6 +144,7 @@ namespace casadi {
     bool is_string_vector() const;
     bool is_dict() const;
     bool is_function() const;
+    bool is_function_vector() const;
     bool is_void_pointer() const;
     ///@}
 
@@ -157,6 +161,7 @@ namespace casadi {
     const std::vector<std::string>& as_string_vector() const;
     const Dict& as_dict() const;
     const Function& as_function() const;
+    const std::vector<Function>& as_function_vector() const;
     void* const & as_void_pointer() const;
     ///@}
 
@@ -173,6 +178,7 @@ namespace casadi {
     std::vector<std::string> to_string_vector() const;
     Dict to_dict() const;
     Function to_function() const;
+    std::vector<Function> to_function_vector() const;
     void* to_void_pointer() const;
     ///@}
 

@@ -45,6 +45,7 @@ namespace casadi {
                               std::vector< std::vector<int> > > IntVectorVectorType;
   typedef GenericTypeInternal<OT_STRINGVECTOR, std::vector<std::string> > StringVectorType;
   typedef GenericTypeInternal<OT_FUNCTION, Function> FunctionType;
+  typedef GenericTypeInternal<OT_FUNCTIONVECTOR, std::vector<Function> > FunctionVectorType;
   typedef GenericTypeInternal<OT_DICT, Dict> DictType;
   typedef GenericTypeInternal<OT_VOIDPTR, void*> VoidPointerType;
   /// \endcond
@@ -109,6 +110,8 @@ namespace casadi {
       return "OT_DICT";
     case OT_FUNCTION:
       return "OT_FUNCTION";
+    case OT_FUNCTIONVECTOR:
+      return "OT_FUNCTIONVECTOR";
     case OT_VOIDPTR:
       return "OT_VOIDPTR";
     default:
@@ -164,6 +167,10 @@ namespace casadi {
 
   bool GenericType::is_function() const {
     return getType()==OT_FUNCTION;
+  }
+
+  bool GenericType::is_function_vector() const {
+    return getType()==OT_FUNCTIONVECTOR;
   }
 
   bool GenericType::is_void_pointer() const {
@@ -223,6 +230,10 @@ namespace casadi {
     own(new FunctionType(f));
   }
 
+  GenericType::GenericType(const std::vector<Function>& f) {
+    own(new FunctionVectorType(f));
+  }
+
   const bool& GenericType::as_bool() const {
     casadi_assert_dev(is_bool());
     return static_cast<const BoolType*>(get())->d_;
@@ -276,6 +287,11 @@ namespace casadi {
   const Function& GenericType::as_function() const {
     casadi_assert_dev(is_function());
     return static_cast<const FunctionType*>(get())->d_;
+  }
+
+  const std::vector<Function>& GenericType::as_function_vector() const {
+    casadi_assert_dev(is_function_vector());
+    return static_cast<const FunctionVectorType*>(get())->d_;
   }
 
   void* const & GenericType::as_void_pointer() const {
@@ -368,6 +384,11 @@ namespace casadi {
   Function GenericType::to_function() const {
     casadi_assert(is_function(), "type mismatch");
     return as_function();
+  }
+
+  std::vector<Function> GenericType::to_function_vector() const {
+    casadi_assert(is_function_vector(), "type mismatch");
+    return as_function_vector();
   }
 
   bool GenericType::operator==(const GenericType& op2) const {
