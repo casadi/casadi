@@ -156,6 +156,10 @@ namespace casadi {
   template<typename T>
   std::string str(const std::vector<T>& v, bool more=false);
 
+  /// String representation of set
+  template<typename T>
+  std::string str(const std::set<T>& v, bool more=false);
+
   /// String representation of pair
   template<typename T1, typename T2>
   std::string str(const std::pair<T1, T2>& p, bool more=false);
@@ -246,6 +250,19 @@ namespace casadi {
       ss << v[i];
     }
     ss << "]";
+    return ss.str();
+  }
+
+  template<typename T>
+  std::string str(const std::set<T>& v, bool more) {
+    std::stringstream ss;
+    ss << "{";
+    int cnt = 0;
+    for (const auto& e : v) {
+      if (cnt++!=0) ss << ", ";
+      ss << e;
+    }
+    ss << "}";
     return ss.str();
   }
 

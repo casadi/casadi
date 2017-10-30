@@ -266,6 +266,13 @@ namespace std {
     return stream;
   }
 
+  /// Enables flushing an std::set to a stream (prints representation)
+  template<typename T>
+  ostream& operator<<(ostream& stream, const set<T>& v) {
+    stream << casadi::str(v);
+    return stream;
+  }
+
   template<typename T1, typename T2>
   ostream& operator<<(ostream& stream, const pair<T1, T2>& p) {
     stream << casadi::str(p);
