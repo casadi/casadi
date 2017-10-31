@@ -673,6 +673,9 @@
 %exception  casadi::FunctionInternal::index_out(const std::string &name) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::info() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::init(const Dict &opts) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1255,6 +1258,9 @@
 %exception  casadi::Map::has_sprev() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Map::info() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Map::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1706,6 +1712,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Switch::has_reverse(int nadj) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Switch::info() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Switch::init(const Dict &opts) override {
