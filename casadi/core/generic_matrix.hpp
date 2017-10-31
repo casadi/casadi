@@ -1064,7 +1064,7 @@ namespace casadi {
     if (ex.is_empty() || arg.is_empty()) {
       MatType J = MatType::zeros(ex.numel(), arg.numel());
       if (tr) J = J.T();
-      return mtimes(J, v);
+      return MatType::mtimes(J, v);
     }
 
     // Seeds as a vector of vectors
