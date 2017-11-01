@@ -1038,6 +1038,8 @@ namespace casadi {
     case OP_NORM1:         return F<OP_NORM1>::check;
     case OP_NORMINF:       return F<OP_NORMINF>::check;
     case OP_NORMF:         return F<OP_NORMF>::check;
+    case OP_MMIN:          return F<OP_MMIN>::check;
+    case OP_MMAX:          return F<OP_MMAX>::check;
     case OP_HORZREPMAT:    return F<OP_HORZREPMAT>::check;
     case OP_HORZREPSUM:    return F<OP_HORZREPSUM>::check;
     case OP_ERFINV:        return F<OP_ERFINV>::check;
