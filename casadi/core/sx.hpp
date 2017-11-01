@@ -48,8 +48,6 @@ namespace casadi {
   template<> void SX::expand(const SX& f, SX& weights, SX& terms);
   template<> SX SX::pw_const(const SX& t, const SX& tval, const SX& val);
   template<> SX SX::pw_lin(const SX& t, const SX &tval, const SX &val);
-  template<> SX SX::if_else(const SX &cond, const SX &if_true, const SX &if_false,
-                            bool short_circuit);
   template<> SX SX::gauss_quadrature(const SX& f, const SX &x, const SX &a,
                                      const SX &b, int order,
                                      const SX& w);

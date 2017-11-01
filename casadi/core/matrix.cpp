@@ -2310,9 +2310,7 @@ namespace casadi {
                                              const Matrix<Scalar> &if_true,
                                              const Matrix<Scalar> &if_false,
                                              bool short_circuit) {
-    casadi_assert(!short_circuit,
-      "Short-circuiting 'if_else' not supported for " + type_name());
-    return cond*if_true + !cond*if_false;
+    return if_else_zero(cond, if_true) + if_else_zero(!cond, if_false);
   }
 
   template<typename Scalar>
@@ -3007,11 +3005,6 @@ namespace casadi {
 
     // Return piecewise linear function
     return pw_const(t, tval(range(1, N-1)), lseg);
-  }
-
-  template<>
-  SX SX::if_else(const SX &cond, const SX &if_true, const SX &if_false, bool short_circuit) {
-    return if_else_zero(cond, if_true) + if_else_zero(!cond, if_false);
   }
 
   template<>
