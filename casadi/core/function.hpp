@@ -669,6 +669,13 @@ namespace casadi {
     /** \brief Export / Generate C code for the dependency function */
     std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict()) const;
 
+    /** \brief Export function in specific language
+     *
+     * Only allowed for (a subset of) SX/MX Functions
+     */
+    void export_code(const std::string& lang,
+      std::ostream &stream=casadi::uout(), const Dict& options=Dict()) const;
+
 #ifndef SWIG
     /// \cond INTERNAL
     /// Get a const pointer to the node

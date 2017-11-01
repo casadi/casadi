@@ -392,6 +392,10 @@ namespace casadi {
     /** \brief Jit dependencies */
     virtual void jit_dependencies(const std::string& fname) {}
 
+    /** \brief Export function in a specific language */
+    virtual void export_code(const std::string& lang,
+      std::ostream &stream, const Dict& options) const;
+
     /** \brief Display object */
     void disp(std::ostream& stream, bool more) const override;
 

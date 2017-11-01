@@ -224,6 +224,10 @@ class CASADI_EXPORT SXFunction :
   /** \brief Get default input value */
   double get_default_in(int ind) const override { return default_in_.at(ind);}
 
+  /** \brief Export function in a specific language */
+  void export_code_body(const std::string& lang,
+    std::ostream &stream, const Dict& options) const override;
+
   /// With just-in-time compilation using OpenCL
   bool just_in_time_opencl_;
 

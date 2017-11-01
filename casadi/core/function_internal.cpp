@@ -1498,6 +1498,11 @@ namespace casadi {
     casadi_error("'get_reverse' not defined for " + class_name());
   }
 
+  void FunctionInternal::export_code(const std::string& lang, std::ostream &stream,
+      const Dict& options) const {
+    casadi_error("'export_code' not defined for " + class_name());
+  }
+
   int FunctionInternal::nnz_in() const {
     int ret=0;
     for (int iind=0; iind<n_in_; ++iind) ret += nnz_in(iind);

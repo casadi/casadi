@@ -190,7 +190,12 @@ namespace casadi {
     std::vector<int> instruction_input(int k) const override;
 
     /** \brief Get the (integer) output argument of an atomic operation */
-    std::vector<int> instruction_output(int k) const override ;
+    std::vector<int> instruction_output(int k) const override;
+
+    /** \brief Export function in a specific language */
+    void export_code_body(const std::string& lang,
+      std::ostream &stream, const Dict& options) const override;
+
     /// Substitute inplace, internal implementation
     void substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const;
   };

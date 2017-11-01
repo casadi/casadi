@@ -961,6 +961,11 @@ namespace casadi {
     return (*this)->generate_dependencies(fname, opts);
   }
 
+  void Function::export_code(const std::string& lang,
+      std::ostream &stream, const Dict& options) const {
+    return (*this)->export_code(lang, stream, options);
+  }
+
   string Function::name() const {
     if (is_null()) {
       return "null";

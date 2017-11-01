@@ -134,6 +134,14 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override = 0;
 
+    /** \brief Export function in a specific language */
+    void export_code(const std::string& lang,
+      std::ostream &stream, const Dict& options) const override;
+
+    /** \brief Export function body in a specific language */
+    virtual void export_code_body(const std::string& lang,
+        std::ostream &stream, const Dict& options) const = 0;
+
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
 
@@ -773,6 +781,47 @@ namespace casadi {
     // Assembe function
     return Function(name, ret_in, ret_out,
                     ret_in_name, ret_out_name, opts);
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>
+  ::export_code(const std::string& lang, std::ostream &ss, const Dict& options) const {
+
+    casadi_assert(lang=="matlab", "Only matlab language supported for now.");
+
+    // start function
+    ss << "function [varargout] = " << name() << "(varargin)" << std::endl;
+
+    // Allocate space for output argument (segments)
+    for (int i=0;i<n_out_;++i) {
+      ss << "  argout_" << i <<  " = cell(" << nnz_out(i) << ",1);" << std::endl;
+    }
+
+    Dict opts;
+    opts["indent_level"] = 1;
+    export_code_body(lang, ss, opts);
+
+    // Process the outputs
+    for (int i=0;i<n_out_;++i) {
+      const Sparsity& out = sparsity_out_.at(i);
+      if (out.is_dense()) {
+        // Special case if dense
+        ss << "  varargout{" << i+1 <<  "} = reshape(vertcat(argout_" << i << "{:}), ";
+        ss << out.size1() << ", " << out.size2() << ");" << std::endl;
+      } else {
+        // For sparse outputs, export sparsity and call 'sparse'
+        Dict opts;
+        opts["name"] = "sp";
+        opts["indent_level"] = 1;
+        opts["as_matrix"] = false;
+        out.export_code("matlab", ss, opts);
+        ss << "  varargout{" << i+1 <<  "} = ";
+        ss << "sparse(sp_i, sp_j, vertcat(argout_" << i << "{:}), sp_m, sp_n);" << std::endl;
+      }
+    }
+
+    // end function
+    ss << "end" << std::endl;
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

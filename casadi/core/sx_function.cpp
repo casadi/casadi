@@ -811,4 +811,82 @@ namespace casadi {
                                   SX, SXNode>::is_a(type, recursive));
   }
 
+  void SXFunction::export_code_body(const std::string& lang,
+      std::ostream &ss, const Dict& options) const {
+
+    // Default values for options
+    int indent_level = 0;
+
+    // Read options
+    for (auto&& op : options) {
+      if (op.first=="indent_level") {
+        indent_level = op.second;
+      } else {
+        casadi_error("Unknown option '" + op.first + "'.");
+      }
+    }
+
+    // Construct indent string
+    std::string indent = "";
+    for (int i=0;i<indent_level;++i) {
+      indent += "  ";
+    }
+
+    // On long matlab codes, jit slows things down
+    ss << "feature('jit','off');feature('accel','on');" << std::endl;
+
+    // Non-cell aliases for inputs
+    for (int i=0;i<n_in_;++i) {
+      ss << indent << "argin_" << i <<  " = varargin{" << i+1 << "};" << std::endl;
+    }
+
+    Function f = shared_from_this<Function>();
+
+    for (int k=0;k<f.n_instructions();++k) {
+      // Get operation
+      int op = f.instruction_id(k);
+      // Get input positions into workvector
+      std::vector<int> o = f.instruction_output(k);
+      // Get output positions into workvector
+      std::vector<int> i = f.instruction_input(k);
+      switch (op) {
+        case OP_INPUT:
+          {
+            ss << indent << "w" << o[0] << " = " << "argin_" << i[0] << "(" << i[1]+1 << ");";
+            ss << std::endl;
+          }
+          break;
+        case OP_OUTPUT:
+          {
+            ss << indent << "argout_" << o[0] << "{" << o[1]+1 << "} = w" << i[0] << ";";
+            ss << std::endl;
+          }
+          break;
+        case OP_CONST:
+          {
+            std::ios_base::fmtflags fmtfl = ss.flags();
+            ss << indent << "w" << o[0] << " = ";
+            ss << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+            ss << f.instruction_constant(k) << ";" << std::endl;
+            ss.flags(fmtfl);
+          }
+          break;
+        case OP_SQ:
+          {
+            ss << indent << "w" << o[0] << " = " << "w" << i[1] << "^2;" << std::endl;
+          }
+          break;
+        default:
+          if (casadi::casadi_math<double>::ndeps(op)==2) {
+            ss << indent << "w" << o[0] << " = " << casadi::casadi_math<double>::print(op,
+              "w"+std::to_string(i[0]), "w"+std::to_string(i[1])) << ";" << std::endl;
+          } else {
+            ss << indent << "w" << o[0] << " = " << casadi::casadi_math<double>::print(op,
+              "w"+std::to_string(i[0])) << ";" << std::endl;
+          }
+      }
+    }
+    ss << "feature('jit','on');feature('accel','on');" << std::endl;
+  }
+
 } // namespace casadi
