@@ -166,13 +166,13 @@ namespace casadi {
 #ifdef HAVE_MKSTEMPS
     // Preferred solution
     char obj_name[] = "tmp_casadi_compiler_shell_XXXXXX" OBJECT_FILE_SUFFIX;
-    if (mkstemps(obj_name, 2) == -1) {
+    if (mkstemps(obj_name, string(OBJECT_FILE_SUFFIX).size()) == -1) {
       casadi_error("Failed to create a temporary object file name");
     }
     obj_name_ = obj_name;
 
     char bin_name[] = "tmp_casadi_compiler_shell_XXXXXX" SHARED_LIBRARY_SUFFIX;
-    if (mkstemps(bin_name, 3) == -1) {
+    if (mkstemps(bin_name, string(SHARED_LIBRARY_SUFFIX).size()) == -1) {
       casadi_error("Failed to create a temporary library file name");
     }
     bin_name_ = bin_name;
