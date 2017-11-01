@@ -676,6 +676,9 @@ namespace casadi {
     void export_code(const std::string& lang,
       std::ostream &stream=casadi::uout(), const Dict& options=Dict()) const;
 
+    void export_code(const std::string& lang,
+      const std::string &fname, const Dict& options=Dict()) const;
+
 #ifndef SWIG
     /// \cond INTERNAL
     /// Get a const pointer to the node

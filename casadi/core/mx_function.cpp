@@ -1373,15 +1373,33 @@ namespace casadi {
           ss << indent << "w" << o[0] << " = " << "w" << i[0] << ".';" << std::endl;
           break;
         case OP_HORZCAT:
+        case OP_VERTCAT:
           {
             ss << indent << "w" << o[0] << " = [";
             for (int e : i) {
-              ss << "w" << e << " ";
+              ss << "w" << e << (op==OP_HORZCAT ? " " : ";");
             }
             ss << "];" << std::endl;
           }
           break;
+        case OP_DIAGCAT:
+          {
+            ss << indent << "w" << o[0] << " = [";
+            for (int e : i) {
+              ss << "nonzeros(w" << e << ");";
+            }
+            ss << "];" << std::endl;
+            Dict opts;
+            opts["name"] = "sp";
+            opts["indent_level"] = indent_level;
+            opts["as_matrix"] = false;
+            x.sparsity().export_code("matlab", ss, opts);
+            ss << indent << "w" << o[0] << " = ";
+            ss << "sparse(sp_i, sp_j, w" << o[0] << ", sp_m, sp_n);" << std::endl;
+          }
+          break;
         case OP_HORZSPLIT:
+        case OP_VERTSPLIT:
           {
             Dict info = x.info();
             std::vector<int> offset = info["offset"];
@@ -1408,14 +1426,30 @@ namespace casadi {
             Dict info = x.info();
 
             std::string nonzeros;
-            if (info.find("slice")==info.end()) {
+            if (info.find("nz")!=info.end()) {
               nonzeros = "1+" + str(info["nz"]);
-            } else {
+            } else if (info.find("slice")!=info.end()) {
               Dict s = info["slice"];
               int start = s["start"];
               int step = s["step"];
               int stop = s["stop"];
               nonzeros = str(start+1) + ":" + str(step) + ":" + str(stop);
+            } else {
+              Dict inner = info["inner"];
+              Dict outer = info["outer"];
+              int inner_start = inner["start"];
+              int inner_step  = inner["step"];
+              int inner_stop  = inner["stop"];
+              int outer_start = outer["start"];
+              int outer_step  = outer["step"];
+              int outer_stop  = outer["stop"];
+              std::string inner_slice = "(" + str(inner_start) + ":" +
+                str(inner_step) + ":" + str(inner_stop-1)+")";
+              std::string outer_slice = "(" + str(outer_start+1) + ":" +
+                str(outer_step) + ":" + str(outer_stop)+")";
+              int N = range(outer_start, outer_step, outer_stop).size();
+              nonzeros = "repmat("+ inner_slice  +"', 1, " + str(N) + ")+" + outer_slice;
+              nonzeros = "nonzeros(" + nonzeros + ")";
             }
 
             Dict opts;

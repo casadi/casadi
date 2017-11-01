@@ -833,11 +833,11 @@ namespace casadi {
     }
 
     // On long matlab codes, jit slows things down
-    ss << "feature('jit','off');feature('accel','on');" << std::endl;
+    ss << indent << "feature('jit','off');feature('accel','on');" << std::endl;
 
     // Non-cell aliases for inputs
     for (int i=0;i<n_in_;++i) {
-      ss << indent << "argin_" << i <<  " = varargin{" << i+1 << "};" << std::endl;
+      ss << indent << "argin_" << i <<  " = nonzeros(varargin{" << i+1 << "});" << std::endl;
     }
 
     Function f = shared_from_this<Function>();
@@ -873,7 +873,7 @@ namespace casadi {
           break;
         case OP_SQ:
           {
-            ss << indent << "w" << o[0] << " = " << "w" << i[1] << "^2;" << std::endl;
+            ss << indent << "w" << o[0] << " = " << "w" << i[0] << "^2;" << std::endl;
           }
           break;
         default:
@@ -886,7 +886,7 @@ namespace casadi {
           }
       }
     }
-    ss << "feature('jit','on');feature('accel','on');" << std::endl;
+    ss << indent << "feature('jit','on');feature('accel','on');" << std::endl;
   }
 
 } // namespace casadi
