@@ -793,6 +793,11 @@ function have free variables.
 
 ";
 
+%feature("docstring") casadi::BackwardDiff::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::BackwardDiff::instruction_MX "[INTERNAL]  get
 MX expression associated with instruction
 
@@ -1278,6 +1283,11 @@ mode AD, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::Blocksqp::fwd_seed "[INTERNAL]  Symbolic
 expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::Blocksqp::getCount "[INTERNAL]  Get the
+reference count.
 
 ";
 
@@ -2389,8 +2399,8 @@ information about function
 
 %feature("docstring") casadi::Blocksqp::sizeInitialHessian "[INTERNAL] ";
 
-%feature("docstring") casadi::Blocksqp::getCount "[INTERNAL]  Get the
-reference count.
+%feature("docstring") casadi::Blocksqp::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -2869,6 +2879,11 @@ in the algorithm.
 
 %feature("docstring") casadi::BSpline::construct "[INTERNAL]  Construct
 Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::BSpline::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -4148,6 +4163,11 @@ function have free variables.
 
 %feature("docstring") casadi::BSplineCommon::check_res "[INTERNAL]  Check
 if output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::BSplineCommon::export_code "[INTERNAL]
+Export function in a specific language.
 
 ";
 
@@ -5665,6 +5685,11 @@ the unidirectional or bidirectional partition.
 
 ";
 
+%feature("docstring") casadi::BSplineDual::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::BSplineDual::name "[INTERNAL]  Name of the
 function.
 
@@ -6036,6 +6061,11 @@ Parallel evaluation.
 
 %feature("docstring") casadi::BSplineInterpolant::setup "[INTERNAL]  Set
 the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::export_code "[INTERNAL]
+Export function in a specific language.
 
 ";
 
@@ -6737,6 +6767,14 @@ length of arg field.
 %feature("docstring") casadi::Callback::slice "
 
 returns a new function with a selection of inputs/outputs of the original
+
+";
+
+%feature("docstring") casadi::Callback::export_code "
+
+Export function in specific language.
+
+Only allowed for (a subset of) SX/MX Functions
 
 ";
 
@@ -7740,6 +7778,11 @@ function.
 
 %feature("docstring") casadi::CentralDiff::nnz_out "[INTERNAL]  Number of
 input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::CentralDiff::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -9788,6 +9831,11 @@ cached version is available.
 
 ";
 
+%feature("docstring") casadi::Collocation::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::Collocation::fwdViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
 
@@ -10911,6 +10959,11 @@ cached version is available.
 
 %feature("docstring") casadi::Conic::get_jacobian_sparsity "[INTERNAL]  Get
 Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::Conic::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -12628,6 +12681,11 @@ codegen.
 
 ";
 
+%feature("docstring") casadi::Dple::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::Dple::sprint "[INTERNAL]  C-style formatted
 printing to string.
 
@@ -13006,6 +13064,11 @@ instance consisting of only one MX call.
 
 %feature("docstring") casadi::Expm::call "[INTERNAL]   Call a function,
 templated.
+
+";
+
+%feature("docstring") casadi::Expm::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -13876,6 +13939,11 @@ formatted printing to string.
 
 %feature("docstring") casadi::External::get_free "[INTERNAL]  Print free
 variables.
+
+";
+
+%feature("docstring") casadi::External::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -15147,6 +15215,11 @@ Codegen sparsities.
 
 ";
 
+%feature("docstring") casadi::FiniteDiff::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::FiniteDiff::getAtomicOutput "
 
 [DEPRECATED] Renamed instruction_output
@@ -15727,6 +15800,11 @@ Generate a function that calculates nadj adjoint derivatives.
 
 %feature("docstring") casadi::FixedStepIntegrator::info "[INTERNAL]  Obtain
 information about function
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::export_code "[INTERNAL]
+Export function in a specific language.
 
 ";
 
@@ -17083,6 +17161,11 @@ Codegen incref for dependencies.
 
 %feature("docstring") casadi::ForwardDiff::calc_fd "[INTERNAL] ";
 
+%feature("docstring") casadi::ForwardDiff::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::ForwardDiff::which_depends "[INTERNAL]  Which
 variables enter with some order.
 
@@ -17956,6 +18039,14 @@ Get all the free variables of the function.
 
 ";
 
+%feature("docstring") casadi::Function::export_code "
+
+Export function in specific language.
+
+Only allowed for (a subset of) SX/MX Functions
+
+";
+
 %feature("docstring") casadi::Function::size_out "
 
 Get output dimension.
@@ -18744,6 +18835,11 @@ Extract the functions needed for the Lifted Newton method.
 
 %feature("docstring") casadi::GenericExternal::mapsum_mx "[INTERNAL]
 Parallel evaluation.
+
+";
+
+%feature("docstring") casadi::GenericExternal::export_code "[INTERNAL]
+Export function in a specific language.
 
 ";
 
@@ -20314,6 +20410,10 @@ elements.
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::export_code "[INTERNAL]  Export function in a specific language.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::sx_out "[INTERNAL]  Get function input(s) and output(s)
 
 ";
@@ -21851,6 +21951,11 @@ cached version is available.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::export_code "[INTERNAL]
+Export function in a specific language.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::which_depends "[INTERNAL]
 Which variables enter with some order.
 
@@ -22877,6 +22982,11 @@ memory (called from destructor)
 
 ";
 
+%feature("docstring") casadi::Integrator::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::Integrator::eval "[INTERNAL]  evaluate
 
 ";
@@ -23403,8 +23513,8 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::Interpolant::set_temp "[INTERNAL]  Set the
-(temporary) work vectors.
+%feature("docstring") casadi::Interpolant::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -23449,6 +23559,11 @@ function have free variables.
 ";
 
 %feature("docstring") casadi::Interpolant::has_function "[INTERNAL] ";
+
+%feature("docstring") casadi::Interpolant::set_temp "[INTERNAL]  Set the
+(temporary) work vectors.
+
+";
 
 %feature("docstring") casadi::Interpolant::getJacSparsityGen "[INTERNAL]
 Get the sparsity pattern, forward mode.
@@ -24996,6 +25111,11 @@ reference to the object.
 
 ";
 
+%feature("docstring") casadi::JitFunction::get_sparsity_out "[INTERNAL]
+Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::JitFunction::has_free "[INTERNAL]  Does the
 function have free variables.
 
@@ -25032,8 +25152,8 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::JitFunction::get_sparsity_out "[INTERNAL]
-Get sparsity of a given output.
+%feature("docstring") casadi::JitFunction::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -25498,6 +25618,11 @@ Codegen sparsities.
 ";
 
 %feature("docstring") casadi::LapackLu::pivoting "[INTERNAL] ";
+
+%feature("docstring") casadi::LapackLu::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
 
 %feature("docstring") casadi::LapackLu::codegen_incref "[INTERNAL]  Codegen
 incref for dependencies.
@@ -26202,6 +26327,11 @@ nodes in the algorithm.
 
 %feature("docstring") casadi::LapackQr::has_spfwd "[INTERNAL]  Is the class
 able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::LapackQr::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -27657,6 +27787,11 @@ an Function instance consisting of only one MX call.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::export_code "[INTERNAL]
+Export function in a specific language.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::sp_forward "[INTERNAL]
 Propagate sparsity forward.
 
@@ -28107,6 +28242,11 @@ Call a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::get_stats "[INTERNAL]
+Get all statistics.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::class_name "[INTERNAL]
 Get type name.
 
@@ -28141,8 +28281,8 @@ Get free variables (SX)
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::get_stats "[INTERNAL]
-Get all statistics.
+%feature("docstring") casadi::LinearInterpolantJac::export_code "[INTERNAL]
+Export function in a specific language.
 
 ";
 
@@ -29650,6 +29790,11 @@ Extract the functions needed for the Lifted Newton method.
 
 ";
 
+%feature("docstring") casadi::LinsolLdl::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::LinsolLdl::size1_in "[INTERNAL]  Input/output
 dimensions.
 
@@ -30378,6 +30523,11 @@ function signature: name:(inputs)->(outputs)
 
 ";
 
+%feature("docstring") casadi::LinsolQr::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::LinsolQr::memory "[INTERNAL]  Memory objects.
 
 ";
@@ -30797,6 +30947,11 @@ statistics.
 
 ";
 
+%feature("docstring") casadi::Lsqr::sprint "[INTERNAL]  C-style formatted
+printing to string.
+
+";
+
 %feature("docstring") casadi::Lsqr::print_options "[INTERNAL]  Print list
 of options.
 
@@ -30928,8 +31083,8 @@ Jacobian sparsity.
 
 ";
 
-%feature("docstring") casadi::Lsqr::sprint "[INTERNAL]  C-style formatted
-printing to string.
+%feature("docstring") casadi::Lsqr::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -32053,8 +32208,8 @@ sparsity backwards.
 
 ";
 
-%feature("docstring") casadi::Map::index_out "[INTERNAL]  Get output scheme
-index by name.
+%feature("docstring") casadi::Map::get_abstol "[INTERNAL]  Get absolute
+tolerance.
 
 ";
 
@@ -32362,6 +32517,11 @@ of function inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::Map::index_out "[INTERNAL]  Get output scheme
+index by name.
+
+";
+
 %feature("docstring") casadi::Map::instruction_MX "[INTERNAL]  get MX
 expression associated with instruction
 
@@ -32430,8 +32590,8 @@ Jacobian sparsity.
 
 ";
 
-%feature("docstring") casadi::Map::get_abstol "[INTERNAL]  Get absolute
-tolerance.
+%feature("docstring") casadi::Map::export_code "[INTERNAL]  Export function
+in a specific language.
 
 ";
 
@@ -33249,6 +33409,11 @@ scheme index by name.
 
 %feature("docstring") casadi::MapOmp::construct "[INTERNAL]  Construct
 Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::MapOmp::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -35232,6 +35397,11 @@ unidirectional or bidirectional partition.
 
 ";
 
+%feature("docstring") casadi::Newton::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::Newton::instruction_input "[INTERNAL]  Get
 the (integer) input arguments of an atomic operation.
 
@@ -36295,6 +36465,11 @@ is available.
 
 %feature("docstring") casadi::Nlpsol::n_instructions "[INTERNAL]  Get the
 number of atomic operations.
+
+";
+
+%feature("docstring") casadi::Nlpsol::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -38260,6 +38435,11 @@ the function is of a particular type.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::export_code "[INTERNAL]
+Export function in a specific language.
+
+";
+
 %feature("docstring") casadi::OracleFunction::definition "[INTERNAL]  Get
 function signature: name:(inputs)->(outputs)
 
@@ -39909,6 +40089,11 @@ factor for chosing forward/reverse mode.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::QpToNlp::check_arg "[INTERNAL]  Check if
 input arguments have correct length and dimensions.
 
@@ -40520,6 +40705,11 @@ sparsity backwards.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::Rootfinder::eval_dm "[INTERNAL]  Evaluate
 with DM matrices.
 
@@ -40886,6 +41076,11 @@ initialization.
 
 %feature("docstring") casadi::RungeKutta::numel_in "[INTERNAL]  Number of
 input/output elements.
+
+";
+
+%feature("docstring") casadi::RungeKutta::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -41812,6 +42007,11 @@ required length of res field.
 
 %feature("docstring") casadi::Scpgen::codegen_body "[INTERNAL]  Generate
 code for the function body.
+
+";
+
+%feature("docstring") casadi::Scpgen::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -43174,6 +43374,11 @@ of function input and outputs.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::SlicotDple::init "[INTERNAL]  Initialize.
 
 ";
@@ -44143,6 +44348,11 @@ factor for chosing forward/reverse mode, sparsity propagation.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::print_dimensions "[INTERNAL]
+Print dimensions of inputs and outputs.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::factory "[INTERNAL] ";
 
 %feature("docstring") casadi::SlicotExpm::codegen_name "[INTERNAL]  Get
@@ -44240,8 +44450,8 @@ variables (SX)
 
 ";
 
-%feature("docstring") casadi::SlicotExpm::print_dimensions "[INTERNAL]
-Print dimensions of inputs and outputs.
+%feature("docstring") casadi::SlicotExpm::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -45814,6 +46024,11 @@ input/output elements.
 ";
 
 %feature("docstring") casadi::Smoothing::n_pert "[INTERNAL] ";
+
+%feature("docstring") casadi::Smoothing::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
 
 %feature("docstring") casadi::Smoothing::mx_in "[INTERNAL]  Get function
 input(s) and output(s)
@@ -47678,6 +47893,11 @@ the number of atomic operations.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::getRegularization "[INTERNAL] ";
 
 %feature("docstring") casadi::Sqpmethod::all_scalar "[INTERNAL]  Are all
@@ -48348,6 +48568,11 @@ factor for chosing forward/reverse mode, sparsity propagation.
 
 %feature("docstring") casadi::Switch::class_name "[INTERNAL]  Get type
 name.
+
+";
+
+%feature("docstring") casadi::Switch::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
@@ -49726,6 +49951,11 @@ Obtain solver name from Adaptor.
 
 %feature("docstring") casadi::SymbolicQr::get_partition "[INTERNAL]  Get
 the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::export_code "[INTERNAL]  Export
+function in a specific language.
 
 ";
 
