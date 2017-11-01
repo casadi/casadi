@@ -9201,6 +9201,11 @@ Only allowed for (a subset of) SX/MX Functions
 
 ";
 
+%feature("docstring")  casadi::Function::export_code(const std::string
+&lang, const std::string &fname, const Dict &options=Dict()) const  "
+
+";
+
 %feature("docstring")  casadi::Function::hessian_old(int iind, int oind)
 const  "
 
@@ -24816,6 +24821,11 @@ const  "
 Export function in specific language.
 
 Only allowed for (a subset of) SX/MX Functions
+
+";
+
+%feature("docstring")  casadi::Function::export_code(const std::string
+&lang, const std::string &fname, const Dict &options=Dict()) const  "
 
 ";
 

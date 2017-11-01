@@ -6772,6 +6772,9 @@ returns a new function with a selection of inputs/outputs of the original
 
 %feature("docstring") casadi::Callback::export_code "
 
+>  void casadi::Function::export_code(const std::string &lang, std::ostream &stream=casadi::uout(), const Dict &options=Dict()) const 
+------------------------------------------------------------------------
+
 Export function in specific language.
 
 Only allowed for (a subset of) SX/MX Functions
@@ -18040,6 +18043,9 @@ Get all the free variables of the function.
 ";
 
 %feature("docstring") casadi::Function::export_code "
+
+>  void casadi::Function::export_code(const std::string &lang, std::ostream &stream=casadi::uout(), const Dict &options=Dict()) const 
+------------------------------------------------------------------------
 
 Export function in specific language.
 
