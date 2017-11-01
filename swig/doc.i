@@ -46545,7 +46545,22 @@ triangle function
 &lang, std::ostream &stream=casadi::uout(), const Dict &options=Dict())
 const  "
 
-Export matrix in Matlab format.
+Export matrix in specific language.
+
+lang: only 'matlab' supported for now
+
+::
+
+  * options:
+  *   inline: Indicates if you want everything on a single line (default: False)
+  *   name: Name of exported variable (default: 'm')
+  *   indent_level: Level of indentation (default: 0)
+  *   spoof_zero: Replace numerical zero by a 1e-200 (default: false)
+  *               might be needed for matlab sparse construct,
+  *               which doesn't allow numerical zero
+  * 
+
+
 
 ";
 
@@ -64038,7 +64053,20 @@ optionally both dimensions)
 &lang, std::ostream &stream=casadi::uout(), const Dict &options=Dict())
 const  "
 
-Export sparsity in Matlab format.
+Export matrix in specific language.
+
+lang: only 'matlab' supported for now
+
+::
+
+   * options:
+   *   inline: Indicates if you want everything on a single line (default: False)
+   *   name: Name of exported variable (default: 'sp')
+   *   as_matrix: Matlab does not have a sparsity object. (default: false)
+  *               With this option true, a numeric matrix will be constructed
+   * 
+
+
 
 ";
 
