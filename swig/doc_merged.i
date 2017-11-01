@@ -49887,6 +49887,8 @@ Get type info for a particular option.
 
 ";
 
+%feature("docstring") casadi::temporary_file "";
+
 %feature("docstring") casadi::load_expm "
 
 Explicitly load a plugin dynamically.

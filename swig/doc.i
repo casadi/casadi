@@ -68870,6 +68870,11 @@ Get type info for a particular option.
 
 ";
 
+%feature("docstring")  casadi::temporary_file(const std::string &prefix,
+const std::string &suffix) "
+
+";
+
 %feature("docstring")  casadi::load_expm(const std::string &name) "
 
 Explicitly load a plugin dynamically.
