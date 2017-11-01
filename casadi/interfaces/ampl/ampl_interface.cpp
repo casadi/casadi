@@ -28,9 +28,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
-#ifdef HAVE_MKSTEMPS
-#include <unistd.h>
-#endif
 using namespace std;
 namespace casadi {
 
@@ -283,19 +280,8 @@ namespace casadi {
     // Check the provided inputs
     check_inputs(mem);
 
-    // Temporary name for the .nl file
-    std::string nlname;
-    #ifdef HAVE_MKSTEMPS
-    char nlnamebuf[] = "casadi_ampl_tmpXXXXXX.nl";
-    if (mkstemps(nlnamebuf, 3) == -1) {
-      casadi_error("Failed to create .nl file");
-    }
-    nlname = nlnamebuf;
-    #else
-    nlname = "casadi_ampl_tmp" + string(tmpnam(nullptr)) + ".nl";
-    #endif
-
     // Create .nl file and add preamble
+    std::string nlname = temporary_file("casadi_ampl_tmp", ".nl");
     ofstream nl(nlname, ofstream::out);
     if (verbose_) casadi_message("Opened " + nlname);
     nl << nl_init_.str();
@@ -356,29 +342,10 @@ namespace casadi {
     nl.close();
 
     // Temporary name for the .sol file
-    std::string solname;
-    #ifdef HAVE_MKSTEMPS
-    char solnamebuf[] = "casadi_ampl_tmpXXXXXX.sol";
-    if (mkstemps(solnamebuf, 4) == -1) {
-      casadi_error("Failed to create .sol file");
-    }
-    solname = solnamebuf;
-    #else
-    solname = "casadi_ampl_tmp" + string(tmpnam(nullptr)) + ".sol";
-    #endif
+    std::string solname = temporary_file("casadi_ampl_tmp", ".sol");
 
     // Temporary name for the solver output
-    std::string outname;
-    #ifdef HAVE_MKSTEMPS
-    char outnamebuf[] = "casadi_ampl_tmpXXXXXX.out";
-    if (mkstemps(outnamebuf, 4) == -1) {
-      casadi_error("Failed to create .out file");
-    }
-    outname = outnamebuf;
-    #else
-    outname = "casadi_ampl_tmp" + string(tmpnam(nullptr)) + ".out";
-    #endif
-
+    std::string outname = temporary_file("casadi_ampl_tmp", ".out");
     // Call executable
     string system_cmd = solver_ + " -o" + solname + " " + nlname + " > " + outname;
     system(system_cmd.c_str());

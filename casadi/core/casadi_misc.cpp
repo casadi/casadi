@@ -26,6 +26,10 @@
 #include "mx.hpp"
 
 #include "casadi_misc.hpp"
+#ifdef HAVE_MKSTEMPS
+#include <unistd.h>
+#endif
+using namespace std;
 
 namespace casadi {
   std::vector<int> range(int start, int stop, int step, int len) {
@@ -116,5 +120,20 @@ namespace casadi {
     }
     return ss.str();
   }
+
+  std::string temporary_file(const std::string& prefix, const std::string& suffix) {
+    #ifdef HAVE_MKSTEMPS
+    // Preferred solution
+    string ret = prefix + "XXXXXX" + suffix;
+    if (mkstemps(&ret[0], suffix.size()) == -1) {
+      casadi_error("Failed to create temporary file: '" + ret + "'");
+    }
+    return ret;
+    #else // HAVE_MKSTEMPS
+    // Fallback, may result in deprecation warnings
+    return prefix + string(tmpnam(nullptr)) + suffix;
+    #endif // HAVE_MKSTEMPS
+  }
+
 
 } // namespace casadi

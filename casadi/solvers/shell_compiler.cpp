@@ -35,9 +35,6 @@
 #endif // OBJECT_FILE_SUFFIX
 
 #include <cstdlib>
-#ifdef HAVE_MKSTEMPS
-#include <unistd.h>
-#endif
 
 using namespace std;
 namespace casadi {
@@ -160,30 +157,8 @@ namespace casadi {
     }
 
     // Name of temporary file
-#ifdef HAVE_MKSTEMPS
-    // Preferred solution
-    char obj_name[] = "tmp_casadi_compiler_shell_XXXXXX" OBJECT_FILE_SUFFIX;
-    if (mkstemps(obj_name, string(OBJECT_FILE_SUFFIX).size()) == -1) {
-      casadi_error("Failed to create a temporary object file name");
-    }
-    obj_name_ = obj_name;
-
-    char bin_name[] = "tmp_casadi_compiler_shell_XXXXXX" SHARED_LIBRARY_SUFFIX;
-    if (mkstemps(bin_name, string(SHARED_LIBRARY_SUFFIX).size()) == -1) {
-      casadi_error("Failed to create a temporary library file name");
-    }
-    bin_name_ = bin_name;
-#else
-    // Fallback, may result in deprecation warnings
-    char* bin_name = tempnam(0, "ca" SHARED_LIBRARY_SUFFIX);
-    bin_name_ = bin_name;
-    free(bin_name);
-
-    // Fallback, may result in deprecation warnings
-    char* obj_name = tempnam(0, "ca" OBJECT_FILE_SUFFIX);
-    obj_name_ = obj_name;
-    free(obj_name);
-#endif
+    obj_name_ = temporary_file("tmp_casadi_compiler_shell", OBJECT_FILE_SUFFIX);
+    bin_name_ = temporary_file("tmp_casadi_compiler_shell", SHARED_LIBRARY_SUFFIX);
 
 #ifndef _WIN32
     // Have relative paths start with ./

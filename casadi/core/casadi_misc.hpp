@@ -253,6 +253,9 @@ namespace casadi {
     return true;
   }
 
+  // Create a temporary file
+  CASADI_EXPORT std::string temporary_file(const std::string& prefix, const std::string& suffix);
+
 } // namespace casadi
 
 #ifndef SWIG

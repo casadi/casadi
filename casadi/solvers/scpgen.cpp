@@ -31,9 +31,6 @@
 #include <cmath>
 #include <cfloat>
 #include <cstdlib>
-#ifdef HAVE_MKSTEMPS
-#include <unistd.h>
-#endif
 
 using namespace std;
 namespace casadi {
@@ -531,20 +528,7 @@ namespace casadi {
     // Generate c code and load as DLL
     if (codegen_) {
       // Name of temporary file
-      string cname;
-#ifdef HAVE_MKSTEMPS
-      // Preferred solution
-      char cname_array[] = "tmp_casadi_scpgen_XXXXXX.c";
-      if (mkstemps(cname_array, 3) == -1) {
-        casadi_error("Failed to create a temporary file name");
-      }
-      cname = cname_array;
-#else
-      // Fallback, may result in deprecation warnings
-      char* cname_array = tempnam(0, "scp.c");
-      cname = cname_array;
-      free(cname_array);
-#endif
+      string cname = temporary_file("tmp_casadi_scpgen", ".c");
 
       // Codegen the functions
       CodeGenerator gen(cname);
