@@ -752,7 +752,17 @@ namespace casadi {
      * the sparsity using the spy command  */
     void spy_matlab(const std::string& mfile) const;
 
-    /** \brief Export sparsity in Matlab format */
+    /** \brief Export matrix in specific language
+     *
+     * lang: only 'matlab' supported for now
+     * \verbatim
+     * options:
+     *   inline: Indicates if you want everything on a single line (default: False)
+     *   name: Name of exported variable (default: 'sp')
+     *   as_matrix: Matlab does not have a sparsity object. (default: false)
+    *               With this option true, a numeric matrix will be constructed
+     * \endverbatim
+     */
     void export_code(const std::string& lang, std::ostream &stream=casadi::uout(),
        const Dict& options=Dict()) const;
 

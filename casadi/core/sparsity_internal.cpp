@@ -3287,6 +3287,7 @@ namespace casadi {
       std::ostream &stream, const Dict& options) const {
     casadi_assert(lang=="matlab", "Only matlab language supported for now.");
 
+    // Default values for options
     bool opt_inline = false;
     std::string name = "sp";
     bool as_matrix = true;
@@ -3315,9 +3316,9 @@ namespace casadi {
 
     casadi_assert(!opt_inline, "Inline not supported for now.");
 
+    // Export dimensions
     stream << indent << name << "_m = " << size1() << ";" << endl;
     stream << indent << name << "_n = " << size2() << ";" << endl;
-
 
     // Matlab indices are one-based
     const int index_offset = 1;

@@ -981,7 +981,19 @@ namespace casadi {
     }
     ///@}
 
-    /** \brief Export matrix in Matlab format */
+    /** \brief Export matrix in specific language
+     *
+     * lang: only 'matlab' supported for now
+     * \verbatim
+     * options:
+     *   inline: Indicates if you want everything on a single line (default: False)
+     *   name: Name of exported variable (default: 'm')
+     *   indent_level: Level of indentation (default: 0)
+     *   spoof_zero: Replace numerical zero by a 1e-200 (default: false)
+     *               might be needed for matlab sparse construct,
+     *               which doesn't allow numerical zero
+     * \endverbatim
+     */
     void export_code(const std::string& lang,
         std::ostream &stream=casadi::uout(), const Dict& options=Dict()) const;
 

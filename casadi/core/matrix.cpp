@@ -3648,9 +3648,12 @@ namespace casadi {
        std::ostream &stream, const Dict& options) const {
 
     casadi_assert(lang=="matlab", "Only matlab language supported for now.");
+
+    // Default values for options
     bool opt_inline = false;
     std::string name = "m";
     int indent_level = 0;
+    bool spoof_zero = false;
 
     // Read options
     for (auto&& op : options) {
@@ -3660,6 +3663,8 @@ namespace casadi {
         name = op.second.to_string();
       } else if (op.first=="indent_level") {
         indent_level = op.second;
+      } else if (op.first=="spoof_zero") {
+        spoof_zero = op.second;
       } else {
         casadi_error("Unknown option '" + op.first + "'.");
       }
@@ -3673,19 +3678,27 @@ namespace casadi {
 
     casadi_assert(!opt_inline, "Inline not supported for now.");
 
+    // Prepare stream for emitting full precision
     std::ios_base::fmtflags fmtfl = stream.flags();
     stream << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 
-    if (is_scalar()) {
+    // Short-circuit for (dense) scalars
+    if (is_scalar(true)) {
       stream << indent << name << " = " << static_cast<double>(*this) << ";" << std::endl;
       stream.flags(fmtfl);
       return;
     }
 
+    // Obtain nonzeros of matrix
     std::vector<double> d = nonzeros();
-    for (double& e : d) {
-      if (e==0) e=1e-200;
+
+    // Spoof numericals
+    if (spoof_zero) {
+      for (double& e : d) {
+        if (e==0) e=1e-200;
+      }
     }
+    // Are all nonzeros equal?
     bool all_equal = true;
     for (double e : d) {
       if (e!=d[0]) {
@@ -3694,31 +3707,40 @@ namespace casadi {
       }
     }
 
-    if (all_equal && d.size()>=0) {
+    if (all_equal && d.size()>0) {
+      // No need to export all individual nonzeros if they are all equal
       stream << indent << name << "_nz = ones(1, " << d.size() << ")*" << d[0] << ";" << std::endl;
     } else {
+      // Export nonzeros
       stream << indent << name << "_nz = [";
-      // Nonzero values
-
       for (int i=0;i<d.size();++i) {
         stream << d[i] << " ";
         if ((i+1)%20 == 0) stream << "..." << std::endl << indent << "  ";
       }
       stream << "];" << std::endl;
     }
+
+    // Reset stream properties
+    stream.flags(fmtfl);
+
+    // Cast nonzeros in correct shape
     if (is_dense()) {
+      // Special case for dense (for readibility of exported code)
       stream << indent << name << " = reshape(";
       stream << name << "_nz, ";
       stream << size1() << ", " << size2() << ");" << endl;
     } else {
-      Dict opts = options;
+      // For sparse matrices, export Sparsity and use sparse constructor
+      Dict opts;
       opts["as_matrix"] = false;
+      opts["indent_level"] = indent_level;
+      opts["name"] = name;
+      opts["indent_level"] = opt_inline;
       sparsity().export_code(lang, stream, opts);
       stream << indent << name << " = sparse(" << name << "_i, " << name << "_j, ";
       stream << name << "_nz, ";
       stream << size1() << ", " << size2() << ");" << endl;
     }
-
   }
 
   // Instantiate templates
