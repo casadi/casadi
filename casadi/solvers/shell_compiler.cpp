@@ -72,11 +72,8 @@ namespace casadi {
 #endif // _WIN32
 
     if (cleanup_) {
-      // Delete the temporary file
-      std::string rmcmd = "rm " + bin_name_;
-      if (system(rmcmd.c_str())) {
-        casadi_warning("Failed to delete temporary file:" + bin_name_);
-      }
+      if (remove(bin_name_.c_str())) casadi_warning("Failed to remove " + bin_name_);
+      if (remove(obj_name_.c_str())) casadi_warning("Failed to remove " + obj_name_);
     }
   }
 
