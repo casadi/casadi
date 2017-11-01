@@ -3682,13 +3682,6 @@ namespace casadi {
     std::ios_base::fmtflags fmtfl = stream.flags();
     stream << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 
-    // Short-circuit for (dense) scalars
-    if (is_scalar(true)) {
-      stream << indent << name << " = " << static_cast<double>(*this) << ";" << std::endl;
-      stream.flags(fmtfl);
-      return;
-    }
-
     // Obtain nonzeros of matrix
     std::vector<double> d = nonzeros();
 
@@ -3698,6 +3691,14 @@ namespace casadi {
         if (e==0) e=1e-200;
       }
     }
+
+    // Short-circuit for (dense) scalars
+    if (is_scalar(true)) {
+      stream << indent << name << " = " << d[0] << ";" << std::endl;
+      stream.flags(fmtfl);
+      return;
+    }
+
     // Are all nonzeros equal?
     bool all_equal = true;
     for (double e : d) {
