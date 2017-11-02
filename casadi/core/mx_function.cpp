@@ -1447,8 +1447,10 @@ namespace casadi {
                 str(inner_step) + ":" + str(inner_stop-1)+")";
               std::string outer_slice = "(" + str(outer_start+1) + ":" +
                 str(outer_step) + ":" + str(outer_stop)+")";
-              int N = range(outer_start, outer_step, outer_stop).size();
-              nonzeros = "repmat("+ inner_slice  +"', 1, " + str(N) + ")+" + outer_slice;
+              int N = range(outer_start, outer_stop, outer_step).size();
+              int M = range(inner_start, inner_stop, inner_step).size();
+              nonzeros = "repmat("+ inner_slice  +"', 1, " + str(N) + ")+" +
+                         "repmat("+ outer_slice  +", " + str(M) + ", 1)";
               nonzeros = "nonzeros(" + nonzeros + ")";
             }
 
