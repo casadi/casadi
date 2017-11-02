@@ -35,19 +35,20 @@ macro(casadi_library name)
     # Not core
     target_link_libraries(${name} casadi)
     install(TARGETS ${name}
-      LIBRARY DESTINATION ${LIB_PREFIX}
-      ARCHIVE DESTINATION ${LIB_PREFIX}
-      RUNTIME DESTINATION ${BIN_PREFIX}
+      LIBRARY DESTINATION ${DEF_LIB_PREFIX}
+      ARCHIVE DESTINATION ${DEF_LIB_PREFIX}
+      RUNTIME DESTINATION ${DEF_BIN_PREFIX}
     )
   else()
     # Core
     install(TARGETS ${name}
       # IMPORTANT: Add the library to the "export-set"
       EXPORT casadi-targets
-      LIBRARY DESTINATION ${LIB_PREFIX}
-      ARCHIVE DESTINATION ${LIB_PREFIX}
-      RUNTIME DESTINATION ${BIN_PREFIX}
+      LIBRARY DESTINATION ${DEF_LIB_PREFIX}
+      ARCHIVE DESTINATION ${DEF_LIB_PREFIX}
+      RUNTIME DESTINATION ${DEF_BIN_PREFIX}
     )
+    install(EXPORT casadi-targets DESTINATION ${DEF_CMAKE_PREFIX})
   endif()
 
   if(WITH_SO_VERSION)
