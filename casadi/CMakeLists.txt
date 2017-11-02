@@ -48,7 +48,6 @@ macro(casadi_library name)
       ARCHIVE DESTINATION ${DEF_LIB_PREFIX}
       RUNTIME DESTINATION ${DEF_BIN_PREFIX}
     )
-    install(EXPORT casadi-targets DESTINATION ${DEF_CMAKE_PREFIX})
   endif()
 
   if(WITH_SO_VERSION)
