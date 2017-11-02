@@ -24,8 +24,10 @@ for i=1:2
   M3 = vertsplit(X,2);
   M4 = vertsplit(vec(X),2);
   M5 = diagcat(X,2*X);
-  g = {g{:} M, M2, M3{1}, M4{1},M5,M5+3};
+  g = {g{:} M, M2, M3{1}, M4{1},M5,M5+3,2*X};
 end
+g = {g{:}, 1./x};
+
 
 args = symvar(veccat(g{:}));
 f_mx = Function('f',args,g);

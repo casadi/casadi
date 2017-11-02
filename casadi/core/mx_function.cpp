@@ -1358,6 +1358,18 @@ namespace casadi {
             ss << std::endl;
           }
           break;
+        case OP_TWICE:
+          {
+            ss << indent << "w" << o[0] << " = 2*w" << i[0] << ";";
+            ss << std::endl;
+          }
+          break;
+        case OP_INV:
+          {
+            ss << indent << "w" << o[0] << " = 1./w" << i[0] << ";";
+            ss << std::endl;
+          }
+          break;
         case OP_DIV:
           {
             std::string prefix = (x.dep(0).is_scalar() || x.dep(1).is_scalar()) ? "" : ".";
