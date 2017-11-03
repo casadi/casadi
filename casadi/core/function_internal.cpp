@@ -96,13 +96,13 @@ namespace casadi {
   }
 
   ProtoFunction::~ProtoFunction() {
-  }
-
-  FunctionInternal::~FunctionInternal() {
     for (void* m : mem_) {
       if (m!=0) casadi_warning("Memory object has not been properly freed");
     }
     mem_.clear();
+  }
+
+  FunctionInternal::~FunctionInternal() {
   }
 
   void FunctionInternal::construct(const Dict& opts) {
@@ -2441,11 +2441,11 @@ namespace casadi {
     set_temp(mem, arg, res, iw, w);
   }
 
-  void FunctionInternal::free_mem(void *mem) const {
+  void ProtoFunction::free_mem(void *mem) const {
     casadi_warning("'free_mem' not defined for " + class_name());
   }
 
-  void FunctionInternal::clear_mem() {
+  void ProtoFunction::clear_mem() {
     for (auto&& i : mem_) {
       if (i!=0) free_mem(i);
     }
@@ -2503,11 +2503,11 @@ namespace casadi {
     return Sparsity::scalar();
   }
 
-  void* FunctionInternal::memory(int ind) const {
+  void* ProtoFunction::memory(int ind) const {
     return mem_.at(ind);
   }
 
-  int FunctionInternal::checkout() const {
+  int ProtoFunction::checkout() const {
     if (unused_.empty()) {
       // Allocate a new memory object
       void* m = alloc_mem();
@@ -2524,7 +2524,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::release(int mem) const {
+  void ProtoFunction::release(int mem) const {
     unused_.push(mem);
   }
 

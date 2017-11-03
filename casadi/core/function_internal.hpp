@@ -68,9 +68,36 @@ namespace casadi {
     /** \brief  Destructor */
     ~ProtoFunction() override = 0;
 
+    /// Checkout a memory object
+    int checkout() const;
+
+    /// Release a memory object
+    void release(int mem) const;
+
+    /// Memory objects
+    void* memory(int ind) const;
+
+    /** \brief Create memory block */
+    virtual void* alloc_mem() const {return 0;}
+
+    /** \brief Initalize memory block */
+    virtual int init_mem(void* mem) const { return 0;}
+
+    /** \brief Free memory block */
+    virtual void free_mem(void *mem) const;
+
+    /** \brief Clear all memory (called from destructor) */
+    void clear_mem();
+
   protected:
     /// Name
     std::string name_;
+  private:
+    /// Memory objects
+    mutable std::vector<void*> mem_;
+
+    /// Unused memory objects
+    mutable std::stack<int> unused_;
   };
 
   /** \brief Internal class for Function
@@ -597,21 +624,6 @@ namespace casadi {
     /** \brief Ensure work vectors long enough to evaluate function */
     void alloc(const Function& f, bool persistent=false);
 
-    /// Memory objects
-    void* memory(int ind) const;
-
-    /** \brief Create memory block */
-    virtual void* alloc_mem() const {return 0;}
-
-    /** \brief Initalize memory block */
-    virtual int init_mem(void* mem) const { return 0;}
-
-    /** \brief Free memory block */
-    virtual void free_mem(void *mem) const;
-
-    /** \brief Clear all memory (called from destructor) */
-    void clear_mem();
-
     /// Get all statistics
     virtual Dict get_stats(void* mem) const { return Dict();}
 
@@ -634,12 +646,6 @@ namespace casadi {
 
     /** Obtain information about function */
     virtual Dict info() const;
-
-    /// Checkout a memory object
-    int checkout() const;
-
-    /// Release a memory object
-    void release(int mem) const;
 
     /// Number of inputs and outputs
     size_t n_in_, n_out_;
@@ -740,12 +746,6 @@ namespace casadi {
     void set_jac_sparsity(const Sparsity& sp);
 
   private:
-    /// Memory objects
-    mutable std::vector<void*> mem_;
-
-    /// Unused memory objects
-    mutable std::stack<int> unused_;
-
     /** \brief Memory that is persistent during a call (but not between calls) */
     size_t sz_arg_per_, sz_res_per_, sz_iw_per_, sz_w_per_;
 
