@@ -53,10 +53,10 @@ namespace casadi {
     return ret;
   }
 
-  ProtoFunction::ProtoFunction() {
+  ProtoFunction::ProtoFunction(const std::string& name) : name_(name) {
   }
 
-  FunctionInternal::FunctionInternal(const std::string& name) : name_(name) {
+  FunctionInternal::FunctionInternal(const std::string& name) : ProtoFunction(name) {
     // Make sure valid function name
     if (!Function::check_name(name_)) {
       casadi_error("Function name is not valid. A valid function name is a string "
@@ -119,7 +119,7 @@ namespace casadi {
     try {
       init(opts);
     } catch (exception& e) {
-      casadi_error("Error calling " + class_name() + "::init for '" + name() + "':\n"
+      casadi_error("Error calling " + class_name() + "::init for '" + name_ + "':\n"
         + string(e.what()));
     }
 
@@ -127,7 +127,7 @@ namespace casadi {
     try {
       finalize(opts);
     } catch (exception& e) {
-      casadi_error("Error calling " + class_name() + "::finalize for '" + name() + "':\n"
+      casadi_error("Error calling " + class_name() + "::finalize for '" + name_ + "':\n"
         + string(e.what()));
     }
   }
@@ -360,15 +360,15 @@ namespace casadi {
     if (jit_) {
       string jit_name = "jit_tmp";
       if (has_codegen()) {
-        if (verbose_) casadi_message("Codegenerating function '" + name() + "'.");
+        if (verbose_) casadi_message("Codegenerating function '" + name_ + "'.");
         // JIT everything
         CodeGenerator gen(jit_name);
         gen.add(self());
-        if (verbose_) casadi_message("Compiling function '" + name() + "'..");
+        if (verbose_) casadi_message("Compiling function '" + name_ + "'..");
         compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
-        if (verbose_) casadi_message("Compiling function '" + name() + "' done.");
+        if (verbose_) casadi_message("Compiling function '" + name_ + "' done.");
         // Try to load
-        eval_ = (eval_t)compiler_.get_function(name());
+        eval_ = (eval_t)compiler_.get_function(name_);
         casadi_assert(eval_!=0, "Cannot load JIT'ed function.");
       } else {
         // Just jit dependencies
@@ -1846,7 +1846,7 @@ namespace casadi {
     for (auto&& e : g.added_functions_) {
       if (e.f.get()==this) return e.codegen_name;
     }
-    casadi_error("Function '" + name() + "' not found");
+    casadi_error("Function '" + name_ + "' not found");
   }
 
   void FunctionInternal::codegen_declarations(CodeGenerator& g) const {
@@ -1854,7 +1854,7 @@ namespace casadi {
   }
 
   void FunctionInternal::codegen_body(CodeGenerator& g) const {
-    casadi_warning("The function \"" + name() + "\", which is of type \""
+    casadi_warning("The function \"" + name_ + "\", which is of type \""
                    + class_name() + "\" cannot be code generated. The generation "
                    "will proceed, but compilation of the code will not be possible.");
     g << "#error Code generation not supported for " << class_name() << "\n";

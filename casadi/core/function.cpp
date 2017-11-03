@@ -976,7 +976,7 @@ namespace casadi {
     if (is_null()) {
       return "null";
     } else {
-      return (*this)->name();
+      return (*this)->name_;
     }
   }
 

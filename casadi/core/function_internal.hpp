@@ -63,10 +63,14 @@ namespace casadi {
   class CASADI_EXPORT ProtoFunction : public SharedObjectInternal {
   public:
     /** \brief Constructor */
-    ProtoFunction();
+    ProtoFunction(const std::string& name);
 
     /** \brief  Destructor */
     ~ProtoFunction() override = 0;
+
+  protected:
+    /// Name
+    std::string name_;
   };
 
   /** \brief Internal class for Function
@@ -74,6 +78,7 @@ namespace casadi {
       \date 2010-2015
   */
   class CASADI_EXPORT FunctionInternal : public ProtoFunction {
+    friend class Function;
   public:
     /** \brief Constructor */
     FunctionInternal(const std::string& name);
@@ -471,9 +476,6 @@ namespace casadi {
     /** \brief Are all inputs and outputs scalar */
     bool all_scalar() const;
 
-    /** \brief Name of the function */
-    const std::string& name() const { return name_;}
-
     /// Generate the sparsity of a Jacobian block
     virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric) const;
 
@@ -680,9 +682,6 @@ namespace casadi {
 
     /// User-set field
     void* user_data_;
-
-    /// Name
-    std::string name_;
 
     /// Just-in-time compiler
     std::string compilerplugin_;
