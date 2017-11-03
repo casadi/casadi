@@ -1,2 +1,8 @@
-# - Config file for the CasADi package
-include("${CMAKE_CURRENT_LIST_DIR}/casadi-targets.cmake")
+# Config file for the CasADi package
+get_filename_component(CASADI_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+include("${CASADI_CMAKE_DIR}/casadi-targets.cmake")
+
+# RPath handling
+set(CASADI_LIBRARIES "@CONF_LIBRARY_DIRS@")
+list(APPEND CMAKE_INSTALL_RPATH ${CASADI_LIBRARIES})
