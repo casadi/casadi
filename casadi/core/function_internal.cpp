@@ -53,6 +53,9 @@ namespace casadi {
     return ret;
   }
 
+  ProtoFunction::ProtoFunction() {
+  }
+
   FunctionInternal::FunctionInternal(const std::string& name) : name_(name) {
     // Make sure valid function name
     if (!Function::check_name(name_)) {
@@ -90,6 +93,9 @@ namespace casadi {
     sz_res_per_ = 0;
     sz_iw_per_ = 0;
     sz_w_per_ = 0;
+  }
+
+  ProtoFunction::~ProtoFunction() {
   }
 
   FunctionInternal::~FunctionInternal() {

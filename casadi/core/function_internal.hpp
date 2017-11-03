@@ -56,11 +56,24 @@ namespace casadi {
   /// Combine two dictionaries, giving priority to first one
   Dict CASADI_EXPORT combine(const Dict& first, const Dict& second);
 
+  /** \brief Base class for FunctionInternal and LinsolInternal
+    \author Joel Andersson
+    \date 2017
+  */
+  class CASADI_EXPORT ProtoFunction : public SharedObjectInternal {
+  public:
+    /** \brief Constructor */
+    ProtoFunction();
+
+    /** \brief  Destructor */
+    ~ProtoFunction() override = 0;
+  };
+
   /** \brief Internal class for Function
       \author Joel Andersson
       \date 2010-2015
   */
-  class CASADI_EXPORT FunctionInternal : public SharedObjectInternal {
+  class CASADI_EXPORT FunctionInternal : public ProtoFunction {
   public:
     /** \brief Constructor */
     FunctionInternal(const std::string& name);
