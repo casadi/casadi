@@ -54,6 +54,8 @@ namespace casadi {
   }
 
   ProtoFunction::ProtoFunction(const std::string& name) : name_(name) {
+    // Default options (can be overridden in derived classes)
+    verbose_ = false;
   }
 
   FunctionInternal::FunctionInternal(const std::string& name) : ProtoFunction(name) {
@@ -65,8 +67,6 @@ namespace casadi {
                    "'null', 'jac' or 'hess'. Got '" + name_ + "'");
     }
 
-    // Default options (can be overridden in derived classes)
-    verbose_ = false;
     // By default, reverse mode is about twice as expensive as forward mode
     ad_weight_ = 0.33; // i.e. nf <= 2*na <=> 1/3*nf <= (1-1/3)*na, forward when tie
     // Both modes equally expensive by default (no "taping" needed)
@@ -105,7 +105,7 @@ namespace casadi {
   FunctionInternal::~FunctionInternal() {
   }
 
-  void FunctionInternal::construct(const Dict& opts) {
+  void ProtoFunction::construct(const Dict& opts) {
     // Sanitize dictionary is needed
     if (!Options::is_sane(opts)) {
       // Call recursively
@@ -132,12 +132,17 @@ namespace casadi {
     }
   }
 
-  Options FunctionInternal::options_
+  Options ProtoFunction::options_
   = {{},
      {{"verbose",
        {OT_BOOL,
-        "Verbose evaluation -- for debugging"}},
-      {"ad_weight",
+        "Verbose evaluation -- for debugging"}}
+      }
+  };
+
+  Options FunctionInternal::options_
+  = {{&ProtoFunction::options_},
+      {{"ad_weight",
        {OT_DOUBLE,
         "Weighting factor for derivative calculation."
         "When there is an option of either using forward or reverse mode "
@@ -229,15 +234,25 @@ namespace casadi {
      }
   };
 
+  void ProtoFunction::init(const Dict& opts) {
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="verbose") {
+        verbose_ = op.second;
+      }
+    }
+  }
+
   void FunctionInternal::init(const Dict& opts) {
+    // Call the initialization method of the base class
+    ProtoFunction::init(opts);
+
     // Default options
     fd_step_ = 1e-8;
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="verbose") {
-        verbose_ = op.second;
-      } else if (op.first=="jac_penalty") {
+      if (op.first=="jac_penalty") {
         jac_penalty_ = op.second;
       } else if (op.first=="user_data") {
         user_data_ = op.second.to_void_pointer();
@@ -375,7 +390,11 @@ namespace casadi {
         jit_dependencies(jit_name);
       }
     }
+    // Finalize base classes
+    ProtoFunction::finalize(opts);
+  }
 
+  void ProtoFunction::finalize(const Dict& opts) {
     // Create memory object
     int mem = checkout();
     casadi_assert_dev(mem==0);

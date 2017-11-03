@@ -68,6 +68,30 @@ namespace casadi {
     /** \brief  Destructor */
     ~ProtoFunction() override = 0;
 
+    /** \brief Construct
+        Prepares the function for evaluation
+     */
+    void construct(const Dict& opts);
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    virtual const Options& get_options() const { return options_;}
+    ///@}
+
+    /** \brief Initialize
+        Initialize and make the object ready for setting arguments and evaluation.
+        This method is typically called after setting options but before evaluating.
+        If passed to another class (in the constructor), this class should invoke
+        this function when initialized. */
+    virtual void init(const Dict& opts);
+
+    /** \brief Finalize the object creation
+        This function, which visits the class hierarchy in reverse order is run after
+        init() has been completed.
+    */
+    virtual void finalize(const Dict& opts);
+
     /// Checkout a memory object
     int checkout() const;
 
@@ -92,6 +116,9 @@ namespace casadi {
   protected:
     /// Name
     std::string name_;
+
+    /// Verbose printout
+    bool verbose_;
   private:
     /// Memory objects
     mutable std::vector<void*> mem_;
@@ -116,29 +143,17 @@ namespace casadi {
     /** \brief  Obtain solver name from Adaptor */
     virtual std::string getAdaptorSolverName() const { return ""; }
 
-    /** \brief Construct
-        Prepares the function for evaluation
-     */
-    void construct(const Dict& opts);
-
     ///@{
     /** \brief Options */
     static Options options_;
-    virtual const Options& get_options() const { return options_;}
+    const Options& get_options() const override { return options_;}
     ///@}
 
-    /** \brief Initialize
-        Initialize and make the object ready for setting arguments and evaluation.
-        This method is typically called after setting options but before evaluating.
-        If passed to another class (in the constructor), this class should invoke
-        this function when initialized. */
-    virtual void init(const Dict& opts);
+    /** \brief Initialize */
+    void init(const Dict& opts) override;
 
-    /** \brief Finalize the object creation
-        This function, which visits the class hierarchy in reverse order is run after
-        init() has been completed.
-    */
-    virtual void finalize(const Dict& opts);
+    /** \brief Finalize the object creation */
+    void finalize(const Dict& opts) override;
 
     /** \brief Get a public class instance */
     Function self() const { return shared_from_this<Function>();}
@@ -655,9 +670,6 @@ namespace casadi {
 
     /// Input and output scheme
     std::vector<std::string> name_in_, name_out_;
-
-    /** \brief  Verbose -- for debugging purposes */
-    bool verbose_;
 
     /** \brief  Use just-in-time compiler */
     bool jit_;
