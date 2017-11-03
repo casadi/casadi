@@ -1455,7 +1455,7 @@ namespace casadi {
     case OP_FLOOR:          return "floor";
     case OP_CEIL:           return "ceil";
     case OP_FMOD:           return "fmod";
-    case OP_FABS:           return "fabs";
+    case OP_FABS:           return "abs";
     case OP_SIGN:           return "sign";
     case OP_COPYSIGN:       return "copysign";
     case OP_IF_ELSE_ZERO:   return "if_else_zero";
