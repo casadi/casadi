@@ -771,4 +771,4 @@ install(FILES
   DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
 
 # Install the export set for use with the install-tree
-install(EXPORT casadi-targets DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
+install(EXPORT casadi-targets DESTINATION "${DEF_CMAKE_PREFIX}" COMPONENT dev)
