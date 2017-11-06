@@ -29,7 +29,9 @@ using namespace std;
 namespace casadi {
 
   Bilin::Bilin(const MX& A, const MX& x, const MX& y) {
-    set_dep(A, x, y);
+    casadi_assert(x.is_column(), "Dimension mismatch");
+    casadi_assert(y.is_column(), "Dimension mismatch");
+    set_dep(A, densify(x), densify(y));
     set_sparsity(Sparsity::scalar());
   }
 
@@ -77,7 +79,7 @@ namespace casadi {
 
   int Bilin::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     /* Get sparsities */
-    int ncol_A = sparsity().size2();
+    int ncol_A = dep(0).size2();
     const int *colind_A = dep(0).colind(), *row_A = dep(0).row();
 
     /* Return value */
@@ -101,12 +103,11 @@ namespace casadi {
 
   int Bilin::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
     /* Get sparsities */
-    int ncol_A = sparsity().size2();
+    int ncol_A = dep(0).size2();
     const int *colind_A = dep(0).colind(), *row_A = dep(0).row();
 
     /* Seed */
-    bvec_t s=*res[0];
-    *res[0] = 0;
+    bvec_t s_r=res[0][0]; res[0][0] = 0;
 
     /* Loop over the columns of A */
     int cc, rr, el;
@@ -117,9 +118,9 @@ namespace casadi {
         rr=row_A[el];
 
         /* Add contribution */
-        arg[0][el] |= s;
-        arg[1][rr] |= s;
-        arg[2][cc] |= s;
+        arg[0][el] |= s_r;
+        arg[1][rr] |= s_r;
+        arg[2][cc] |= s_r;
       }
     }
     return 0;
