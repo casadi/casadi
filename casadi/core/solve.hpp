@@ -84,7 +84,6 @@ namespace casadi {
     /// Can the operation be performed inplace (i.e. overwrite the result)
     int n_inplace() const override { return 1;}
 
-#if 0
     /** \brief Get required length of arg field */
     size_t sz_arg() const override;
 
@@ -96,7 +95,6 @@ namespace casadi {
 
     /** \brief Get required length of w field */
     size_t sz_w() const override;
-#endif
 
     /** Obtain information about function */
     Dict info() const override {

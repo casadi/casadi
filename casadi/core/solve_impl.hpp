@@ -241,27 +241,25 @@ namespace casadi {
     return 0;
   }
 
-#if 0
   template<bool Tr>
   size_t Solve<Tr>::sz_arg() const {
-    return n_dep() + linsol_->sz_arg();
+    return n_dep() /*+ linsol_->sz_arg() */;
   }
 
   template<bool Tr>
   size_t Solve<Tr>::sz_res() const {
-    return nout() + linsol_->sz_res();
+    return nout() /*+ linsol_->sz_res() */;
   }
 
   template<bool Tr>
   size_t Solve<Tr>::sz_iw() const {
-    return linsol_->sz_iw();
+    return 0 /*linsol_->sz_iw() */;
   }
 
   template<bool Tr>
   size_t Solve<Tr>::sz_w() const {
-    return linsol_->sz_w() + sparsity().size1();
+    return /*linsol_->sz_w() +*/ sparsity().size1();
   }
-#endif
 
 } // namespace casadi
 
