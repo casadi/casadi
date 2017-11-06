@@ -58,35 +58,21 @@ namespace casadi {
 
   Options SymbolicQr::options_
   = {{&FunctionInternal::options_},
-    {{"codegen",
-      {OT_BOOL,
-       "C-code generation"}},
-      {"compiler",
-      {OT_STRING,
-       "Compiler command to be used for compiling generated code"}}
-   }
+    {{"fopts",
+      {OT_DICT,
+       "Options to be passed to generated function objects"}}
+     }
   };
 
   void SymbolicQr::init(const Dict& opts) {
     // Call the base class initializer
     LinsolInternal::init(opts);
 
-    // Default options
-    bool codegen = false;
-
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="codegen") {
-        codegen = op.second;
-      } else if (op.first=="compiler") {
-        casadi_error("Option \"compiler\" has been removed");
+      if (op.first=="fopts") {
+        fopts_ = op.second;
       }
-    }
-
-    // Codegen options
-    if (codegen) {
-      fopts_["compiler"] = compilerplugin_;
-      fopts_["jit_options"] = jit_options_;
     }
   }
 
