@@ -557,7 +557,7 @@ namespace casadi {
 
     // Print
     if (verbose_) {
-      casadi_message(str(nsweep) + string(fwd ? "forward" : "reverse") + " sweeps "
+      casadi_message(str(nsweep) + string(fwd ? " forward" : " reverse") + " sweeps "
                      "needed for " + str(seed.size()) + " directions");
     }
 
