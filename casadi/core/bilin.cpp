@@ -54,7 +54,7 @@ namespace casadi {
   void Bilin::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                       std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
-      asens[d][0] = rank1(project(asens[d][0], sparsity()),
+      asens[d][0] = rank1(project(asens[d][0], dep(0).sparsity()),
                           aseed[d][0], dep(1), dep(2));
       asens[d][1] += aseed[d][0] * mtimes(dep(0), dep(2));
       asens[d][2] += aseed[d][0] * mtimes(dep(0).T(), dep(1));
