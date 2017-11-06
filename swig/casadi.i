@@ -1020,17 +1020,18 @@ namespace std {
       if (mxGetClassID(p)==mxCELL_CLASS) {
         int nrow = mxGetM(p), ncol = mxGetN(p);
         if (nrow==1 || (nrow==0 && ncol==0) || ncol==1) {
+          int n = std::max(nrow, ncol);
           // Allocate elements
           if (m) {
             (**m).clear();
-            (**m).reserve(ncol);
+            (**m).reserve(n);
           }
 
           // Temporary
           M tmp;
 
           // Loop over elements
-          for (int i=0; i<ncol; ++i) {
+          for (int i=0; i<n; ++i) {
             // Get element
             mxArray* pe = mxGetCell(p, i);
             if (pe==0) return false;
