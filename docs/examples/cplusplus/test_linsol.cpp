@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
       }
 
       // Create a solver instance
-      Linsol F("F", t.solver);
+      Linsol F("F", t.solver, A_test.sparsity());
 
       // Solve
       F.reset(A_test.sparsity());

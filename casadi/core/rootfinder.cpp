@@ -143,7 +143,7 @@ namespace casadi {
       "sprank(J)=" + str(sprank(sp_jac_)) + " (instead of " + str(sp_jac_.size1()) + ")");
 
     // Get the linear solver creator function
-    linsol_ = Linsol("linsol", linear_solver, linear_solver_options);
+    linsol_ = Linsol("linsol", linear_solver, sp_jac_, linear_solver_options);
 
     // Constraints
     casadi_assert(u_c_.size()==n_ || u_c_.empty(),

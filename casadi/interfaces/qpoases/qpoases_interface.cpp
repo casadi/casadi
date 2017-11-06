@@ -847,7 +847,7 @@ namespace casadi {
     m->nz.resize(sp.nnz());
 
     // Create linear solver
-    m->linsol = Linsol("linsol", m->linsol_plugin);
+    m->linsol = Linsol("linsol", m->linsol_plugin, sp);
 
     // Pass to linear solver
     m->linsol.reset(sp);

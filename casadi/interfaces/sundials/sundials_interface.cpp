@@ -223,9 +223,11 @@ namespace casadi {
     alloc_w(2*max(nx_+nz_, nrx_+nrz_), true); // v1, v2
 
     // Allocate linear solvers
-    linsolF_ = Linsol("linsolF", linear_solver_, linear_solver_options_);
+    linsolF_ = Linsol("linsolF", linear_solver_,
+      get_function("jacF").sparsity_out(0), linear_solver_options_);
     if (nrx_>0) {
-      linsolB_ = Linsol("linsolB", linear_solver_, linear_solver_options_);
+      linsolB_ = Linsol("linsolB", linear_solver_,
+        get_function("jacB").sparsity_out(0), linear_solver_options_);
     }
   }
 

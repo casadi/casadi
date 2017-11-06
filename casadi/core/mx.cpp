@@ -1693,7 +1693,7 @@ namespace casadi {
   }
 
   MX MX::solve(const MX& a, const MX& b, const std::string& lsolver, const Dict& dict) {
-    Linsol mysolver("tmp", lsolver, dict);
+    Linsol mysolver("tmp", lsolver, a.sparsity(), dict);
     return mysolver.solve(a, b, false);
   }
 

@@ -33,7 +33,7 @@ namespace casadi {
   }
 
   Linsol::Linsol(const std::string& name, const std::string& solver,
-                 const Dict& opts) {
+                 const Sparsity& sp, const Dict& opts) {
     own(LinsolInternal::getPlugin(solver).creator(name));
     (*this)->construct(opts);
   }
