@@ -37,9 +37,18 @@
 #include <unordered_map>
 
 namespace casadi {
-
   // Forward declaration
   class SparsityInternal;
+
+  #ifndef SWIG
+    /** \brief Compact representation of a sparsity pattern */
+    struct CASADI_EXPORT SparsityStruct {
+      int nrow;
+      int ncol;
+      const int* colind;
+      const int* row;
+    };
+  #endif // SWIG
 
   /** \brief General sparsity class
    *
@@ -235,6 +244,9 @@ namespace casadi {
 
     /** \brief Implicit or explicit type conversion to compact representation */
     operator const std::vector<int>&() const;
+
+    /** \brief Implicit or explicit type conversion to C representation */
+    operator SparsityStruct() const;
 #endif // SWIG
 
     /// \name Size and element counting

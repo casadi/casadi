@@ -78,20 +78,17 @@ namespace casadi {
   }
 
   int Bilin::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
-    /* Get sparsities */
-    int ncol_A = dep(0).size2();
-    const int *colind_A = dep(0).colind(), *row_A = dep(0).row();
-
     /* Return value */
     bvec_t r=0;
 
     /* Loop over the columns of A */
+    SparsityStruct sp_A = dep(0).sparsity();
     int cc, rr, el;
-    for (cc=0; cc<ncol_A; ++cc) {
+    for (cc=0; cc<sp_A.ncol; ++cc) {
       /* Loop over the nonzeros of A */
-      for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
+      for (el=sp_A.colind[cc]; el<sp_A.colind[cc+1]; ++el) {
         /* Get the row */
-        rr=row_A[el];
+        rr=sp_A.row[el];
 
         /* Add contribution */
         r |= arg[1][rr] | arg[0][el] | arg[2][cc];
@@ -102,20 +99,17 @@ namespace casadi {
   }
 
   int Bilin::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
-    /* Get sparsities */
-    int ncol_A = dep(0).size2();
-    const int *colind_A = dep(0).colind(), *row_A = dep(0).row();
-
     /* Seed */
     bvec_t s_r=res[0][0]; res[0][0] = 0;
 
     /* Loop over the columns of A */
+    SparsityStruct sp_A = dep(0).sparsity();
     int cc, rr, el;
-    for (cc=0; cc<ncol_A; ++cc) {
+    for (cc=0; cc<sp_A.ncol; ++cc) {
       /* Loop over the nonzeros of A */
-      for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
+      for (el=sp_A.colind[cc]; el<sp_A.colind[cc+1]; ++el) {
         /* Get the row */
-        rr=row_A[el];
+        rr=sp_A.row[el];
 
         /* Add contribution */
         arg[0][el] |= s_r;
