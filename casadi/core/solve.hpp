@@ -96,6 +96,11 @@ namespace casadi {
     /** \brief Get required length of w field */
     size_t sz_w() const override;
 
+    /** Obtain information about function */
+    Dict info() const override {
+      return {{"tr", Tr}};
+    }
+
     /// Linear Solver (may be shared between multiple nodes)
     Linsol linsol_;
   };

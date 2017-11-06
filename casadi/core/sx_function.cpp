@@ -876,6 +876,11 @@ namespace casadi {
             ss << indent << "w" << o[0] << " = " << "w" << i[0] << "^2;" << std::endl;
           }
           break;
+        case OP_FABS:
+          {
+            ss << indent << "w" << o[0] << " = abs(" << "w" << i[0] << ");" << std::endl;
+          }
+          break;
         default:
           if (casadi::casadi_math<double>::ndeps(op)==2) {
             ss << indent << "w" << o[0] << " = " << casadi::casadi_math<double>::print(op,

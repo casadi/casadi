@@ -29,7 +29,7 @@ using namespace std;
 namespace casadi {
 
   Bilin::Bilin(const MX& A, const MX& x, const MX& y) {
-    set_dep(x, A);
+    set_dep(A, x, y);
     set_sparsity(Sparsity::scalar());
   }
 

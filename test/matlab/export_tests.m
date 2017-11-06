@@ -3,6 +3,8 @@ import casadi.*
 n = 5;
 x = MX.sym('x',n,n);
 y = MX.sym('y',Sparsity.lower(n));
+z = MX.sym('z',n,1);
+z2 = MX.sym('z2',n,1);
 
 w = x*3;
 
@@ -13,7 +15,7 @@ w = w./DM(magic(n));
 
 w(1:2) = y(1);
 
-g = {w, norm(w,'fro')};
+g = {w, norm(w,'fro'), abs(w),z'*z,dot(z,z2),bilin(x,z,z2),rank1(x,0.3,z,z2)};
 
 Xc = {x,y};
 for i=1:2
@@ -36,6 +38,7 @@ f_sx = f_mx.expand();
 f_mx.export_code('matlab','f_mx_exported.m')
 f_sx.export_code('matlab','f_sx_exported.m')
 rehash
+
 
 rng(1);
 
@@ -66,3 +69,40 @@ end
 
 delete('f_mx_exported.m')
 delete('f_sx_exported.m')
+
+
+linsol = Linsol('solver', 'lapackqr')
+
+r = linsol.solve(x,y,false)
+rt = linsol.solve(x,y,true)
+
+f_mx = Function('f',args,{inv_node(x), inv_node(y), det(x), det(y),x\y,r,rt});
+f_mx.disp(true)
+f_mx.export_code('matlab','f_mx_exported.m')
+rehash
+
+fref = @(x,y) {inv(x),inv(y),det(x),det(y),x\y,x\y,(x'\y)'};
+
+rng(1);
+
+N = f_mx.n_out;
+
+args={x,y};
+args_num = {};
+for i=1:numel(args)
+   a = args{i};
+   args_num{i} = sparse(casadi.DM(sparsity(a),rand(nnz(a),1)));
+end
+
+f_mx_res = cell(1,1);
+f_mx_exported_res = cell(1,1);
+
+f_mx_res = fref(args_num{:});
+
+[f_mx_exported_res{1:N}] = f_mx_exported(args_num{:});
+
+for i=1:length(f_mx_res)
+    assert(norm(full(f_mx_res{i}-f_mx_exported_res{i}))<1e-12);
+end
+
+delete('f_mx_exported.m')

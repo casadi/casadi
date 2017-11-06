@@ -1359,15 +1359,43 @@ namespace casadi {
           }
           break;
         case OP_TWICE:
-          {
-            ss << indent << "w" << o[0] << " = 2*w" << i[0] << ";";
-            ss << std::endl;
-          }
+          ss << indent << "w" << o[0] << " = 2*w" << i[0] << ";" << std::endl;
           break;
         case OP_INV:
+          ss << indent << "w" << o[0] << " = 1./w" << i[0] << ";" << std::endl;
+          break;
+        case OP_DOT:
+          ss << indent << "w" << o[0] << " = dot(w" << i[0] << ",w" << i[1]<< ");" << std::endl;
+          break;
+        case OP_BILIN:
+          ss << indent << "w" << o[0] << " = w" << i[1] << ".'*w" << i[0]<< "*w" << i[2] << ";";
+          ss << std::endl;
+          break;
+        case OP_RANK1:
+          ss << indent << "w" << o[0] << " = w" << i[0] << "+";
+          ss << "w" << i[1] << "*w" << i[2] << "*w" << i[3] << ".';";
+          ss << std::endl;
+          break;
+        case OP_FABS:
+          ss << indent << "w" << o[0] << " = abs(w" << i[0] << ");" << std::endl;
+          break;
+        case OP_DETERMINANT:
+          ss << indent << "w" << o[0] << " = det(w" << i[0] << ");" << std::endl;
+          break;
+        case OP_INVERSE:
+          ss << indent << "w" << o[0] << " = inv(w" << i[0] << ");";
+          ss << "w" << o[0] << "(w" << o[0] << "==0) = 1e-200;" << std::endl;
+          break;
+        case OP_SOLVE:
           {
-            ss << indent << "w" << o[0] << " = 1./w" << i[0] << ";";
-            ss << std::endl;
+            bool tr = x.info()["tr"];
+            if (tr) {
+              ss << indent << "w" << o[0] << " = ((w" << i[1] << ".')\\w" << i[0] << ").';";
+              ss << std::endl;
+            } else {
+              ss << indent << "w" << o[0] << " = w" << i[1] << "\\w" << i[0] << ";" << std::endl;
+            }
+            ss << "w" << o[0] << "(w" << o[0] << "==0) = 1e-200;" << std::endl;
           }
           break;
         case OP_DIV:
