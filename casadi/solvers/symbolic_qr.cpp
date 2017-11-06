@@ -84,15 +84,12 @@ namespace casadi {
     LinsolInternal::reset(mem, sp);
     auto m = static_cast<SymbolicQrMemory*>(mem);
 
-    // Get sparsity
-    Sparsity s = Sparsity::compressed(m->sparsity);
-
     // Symbolic expression for A
-    SX A = SX::sym("A", s);
+    SX A = SX::sym("A", sp_);
 
     // BTF factorization
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    s.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+    sp_.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
     // Get the inverted column permutation
     std::vector<int> inv_colperm(colperm.size());
@@ -116,7 +113,7 @@ namespace casadi {
     // Symbolic expressions for solve function
     SX Q = SX::sym("Q", Q1.sparsity());
     SX R = SX::sym("R", R1.sparsity());
-    SX b = SX::sym("b", s.size2(), 1);
+    SX b = SX::sym("b", sp_.size2(), 1);
 
     // Solve non-transposed
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b
@@ -154,7 +151,7 @@ namespace casadi {
     m->alloc(m->solveT);
 
     // Temporary storage
-    m->w.resize(m->w.size() + s.size1());
+    m->w.resize(m->w.size() + sp_.size1());
 
     // Allocate storage for QR factorization
     m->q.resize(m->factorize.nnz_out(0));
@@ -185,11 +182,11 @@ namespace casadi {
     m->arg[1] = get_ptr(m->r);
     fill_n(get_ptr(m->res), solv.n_out(), nullptr);
     for (int i=0; i<nrhs; ++i) {
-      copy_n(x, m->nrow(), get_ptr(m->w)); // Copy x to a temporary
+      copy_n(x, nrow(), get_ptr(m->w)); // Copy x to a temporary
       m->arg[2] = get_ptr(m->w);
       m->res[0] = x;
-      solv(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w)+m->nrow(), 0);
-      x += m->nrow();
+      solv(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w)+nrow(), 0);
+      x += nrow();
     }
   }
 
@@ -201,8 +198,7 @@ namespace casadi {
     casadi_assert_dev(res[0]!=0);
 
     // Get A and factorize it
-    Sparsity sp = Sparsity::compressed(m->sparsity);
-    SX A = SX::zeros(sp);
+    SX A = SX::zeros(sp_);
     copy(arg[1], arg[1]+A.nnz(), A->begin());
     vector<SX> v = m->factorize(A);
 

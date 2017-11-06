@@ -98,31 +98,16 @@ namespace casadi {
     casadi_assert_dev(sp!=0);
     auto m = static_cast<LinsolMemory*>((*this)->memory(0));
 
-    // Check if pattern has changed
-    bool changed_pattern = m->sparsity.empty();
-    if (!changed_pattern) {
-      for (int i=0; i<m->sparsity.size(); ++i) {
-        if (sp[i] != m->sparsity[i]) {
-          changed_pattern = true;
-          break;
-        }
-      }
-    }
+    // New factorization will be required
+    m->is_pivoted = m->is_factorized = false;
 
-    // Update pattern, if needed
-    if (changed_pattern) {
-      // New factorization will be required
-      m->is_pivoted = m->is_factorized = false;
-
-      // Update pattern
-      (*this)->reset(m, sp);
-    }
+    // Update pattern
+    (*this)->reset(m, sp);
   }
 
   void Linsol::pivoting(const double* A) const {
     casadi_assert_dev(A!=0);
     auto m = static_cast<LinsolMemory*>((*this)->memory(0));
-    casadi_assert(!m->sparsity.empty(), "No sparsity pattern set");
 
     // Factorization will be needed after this step
     m->is_pivoted = m->is_factorized = false;

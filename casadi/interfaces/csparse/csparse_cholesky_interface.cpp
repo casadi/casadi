@@ -75,12 +75,12 @@ namespace casadi {
 
     m->L = 0;
     m->S = 0;
-    m->A.nzmax = m->nnz();  // maximum number of entries
-    m->A.m = m->nrow(); // number of columns
-    m->A.n = m->ncol(); // number of rows
-    m->A.p = const_cast<int*>(m->colind()); // row pointers (size n+1)
+    m->A.nzmax = this->nnz();  // maximum number of entries
+    m->A.m = this->nrow(); // number of columns
+    m->A.n = this->ncol(); // number of rows
+    m->A.p = const_cast<int*>(this->colind()); // row pointers (size n+1)
     // or row indices (size nzmax)
-    m->A.i = const_cast<int*>(m->row()); // column indices, size nzmax
+    m->A.i = const_cast<int*>(this->row()); // column indices, size nzmax
     m->A.x = 0; // numerical values, size nzmax
     m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-row
 
@@ -107,7 +107,7 @@ namespace casadi {
     m->A.x = const_cast<double*>(A);
 
     // Make sure that all entries of the linear system are valid
-    int nnz = m->nnz();
+    int nnz = this->nnz();
     for (int k=0; k<nnz; ++k) {
       casadi_assert(!isnan(A[k]),
         "Nonzero " + str(k) + " is not-a-number");
@@ -189,7 +189,7 @@ namespace casadi {
         cs_ltsolve(m->L->L, t) ;              // t = U\t
         cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
       }
-      x += m->ncol();
+      x += this->ncol();
     }
   }
 
@@ -205,7 +205,7 @@ namespace casadi {
       if (tr) cs_lsolve(m->L->L, t) ; // t = L\t
       if (!tr) cs_ltsolve(m->L->L, t) ; // t = U\t
       cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
-      x += m->ncol();
+      x += ncol();
     }
   }
 

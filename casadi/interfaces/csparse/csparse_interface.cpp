@@ -73,12 +73,12 @@ namespace casadi {
 
     m->N = 0;
     m->S = 0;
-    m->A.nzmax = m->nnz();  // maximum number of entries
-    m->A.m = m->nrow(); // number of rows
-    m->A.n = m->ncol(); // number of columns
-    m->A.p = const_cast<int*>(m->colind()); // column pointers (size n+1)
+    m->A.nzmax = this->nnz();  // maximum number of entries
+    m->A.m = this->nrow(); // number of rows
+    m->A.n = this->ncol(); // number of columns
+    m->A.p = const_cast<int*>(this->colind()); // column pointers (size n+1)
     // or column indices (size nzmax)
-    m->A.i = const_cast<int*>(m->row()); // row indices, size nzmax
+    m->A.i = const_cast<int*>(this->row()); // row indices, size nzmax
     m->A.x = 0; // numerical values, size nzmax
     m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-column
 
@@ -106,7 +106,7 @@ namespace casadi {
     m->A.x = const_cast<double*>(A);
 
     // Make sure that all entries of the linear system are valid
-    for (int k=0; k<m->nnz(); ++k) {
+    for (int k=0; k<this->nnz(); ++k) {
       casadi_assert(!isnan(A[k]),
         "Nonzero " + str(k) + " is not-a-number");
       casadi_assert(!isinf(A[k]),
@@ -116,8 +116,7 @@ namespace casadi {
     if (verbose_) {
       uout() << "CsparseInterface::prepare: numeric factorization" << endl;
       uout() << "linear system to be factorized = " << endl;
-      Sparsity sp = Sparsity::compressed(m->sparsity);
-      DM(sp, vector<double>(A, A+m->nnz())).print_sparse(uout());
+      DM(sp_, vector<double>(A, A+nnz())).print_sparse(uout());
     }
 
     double tol = 1e-8;
@@ -125,8 +124,7 @@ namespace casadi {
     if (m->N) cs_nfree(m->N);
     m->N = cs_lu(&m->A, m->S, tol) ;                 // numeric LU factorization
     if (m->N==0) {
-      Sparsity sp = Sparsity::compressed(m->sparsity);
-      DM temp(sp, vector<double>(A, A+sp.nnz()));
+      DM temp(sp_, vector<double>(A, A+nnz()));
       temp = sparsify(temp);
       if (temp.sparsity().is_singular()) {
         stringstream ss;
@@ -137,7 +135,7 @@ namespace casadi {
             " sprank: " << sprank(temp.sparsity()) << " <-> " << temp.size2() << endl;
         if (verbose_) {
           ss << "Sparsity of the linear system: " << endl;
-          sp.disp(ss, true); // print detailed
+          sp_.disp(ss, true); // print detailed
         }
         throw CasadiException(ss.str());
       } else {
@@ -146,7 +144,7 @@ namespace casadi {
            << endl;
         if (verbose_) {
           ss << "Sparsity of the linear system: " << endl;
-          sp.disp(ss, true); // print detailed
+          sp_.disp(ss, true); // print detailed
         }
         throw CasadiException(ss.str());
       }
@@ -173,7 +171,7 @@ namespace casadi {
         cs_usolve(m->N->U, t) ;               // t = U\t
         cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
       }
-      x += m->ncol();
+      x += ncol();
     }
   }
 

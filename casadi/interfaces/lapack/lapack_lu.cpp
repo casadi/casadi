@@ -91,13 +91,13 @@ namespace casadi {
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Allocate matrix
-    m->mat.resize(m->nrow() * m->ncol());
-    m->ipiv.resize(m->ncol());
+    m->mat.resize(nrow() * ncol());
+    m->ipiv.resize(ncol());
 
     // Equilibration
     if (equilibriate_) {
-      m->r.resize(m->nrow());
-      m->c.resize(m->ncol());
+      m->r.resize(nrow());
+      m->c.resize(ncol());
     }
     m->equed = 'N'; // No equilibration
   }
@@ -106,11 +106,11 @@ namespace casadi {
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Dimensions
-    int nrow = m->nrow();
-    int ncol = m->ncol();
+    int nrow = this->nrow();
+    int ncol = this->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, get_ptr(m->sparsity), get_ptr(m->mat), false);
+    casadi_densify(A, sp_, get_ptr(m->mat), false);
 
     if (equilibriate_) {
       // Calculate the col and row scaling factors
@@ -155,8 +155,8 @@ namespace casadi {
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Dimensions
-    int nrow = m->nrow();
-    int ncol = m->ncol();
+    int nrow = this->nrow();
+    int ncol = this->ncol();
 
     // Scale the right hand side
     if (tr) {

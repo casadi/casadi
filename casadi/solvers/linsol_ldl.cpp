@@ -70,7 +70,7 @@ namespace casadi {
     auto m = static_cast<LinsolLdlMemory*>(mem);
 
     // Dimension
-    int n=m->nrow();
+    int n=this->nrow();
     // Work vector
     m->iw.resize(3*n);
     // Elimination tree
@@ -97,13 +97,13 @@ namespace casadi {
 
   void LinsolLdl::factorize(void* mem, const double* A) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    casadi_ldl(get_ptr(m->sparsity), get_ptr(m->parent), get_ptr(m->sp_l),
+    casadi_ldl(sp_, get_ptr(m->parent), get_ptr(m->sp_l),
                A, get_ptr(m->nz_l), get_ptr(m->d), get_ptr(m->iw), get_ptr(m->w));
   }
 
   void LinsolLdl::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    int n = m->nrow();
+    int n = this->nrow();
     for (int k=0; k<nrhs; ++k) {
       //      LDL'x = b <=> x = L\D\L'\b
       //  Solve for L'
@@ -120,7 +120,7 @@ namespace casadi {
   int LinsolLdl::neig(void* mem) const {
     // Count number of negative eigenvalues
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    int n = m->nrow();
+    int n = this->nrow();
     int ret = 0;
     for (int i=0; i<n; ++i) if (m->d[i]<0) ret++;
     return ret;
@@ -129,7 +129,7 @@ namespace casadi {
   int LinsolLdl::rank(void* mem) const {
     // Count number of nonzero eigenvalues
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    int n = m->nrow();
+    int n = this->nrow();
     int ret = 0;
     for (int i=0; i<n; ++i) if (m->d[i]!=0) ret++;
     return ret;

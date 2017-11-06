@@ -35,18 +35,8 @@
 namespace casadi {
 
   struct CASADI_EXPORT LinsolMemory {
-    // Sparsity pattern (allowed to change)
-    std::vector<int> sparsity;
-
     // Current state of factorization
     bool is_pivoted, is_factorized;
-
-    /// Get sparsity pattern
-    int nrow() const { return sparsity[0];}
-    int ncol() const { return sparsity[1];}
-    const int* colind() const { return &sparsity[2];}
-    const int* row() const { return colind() + ncol() + 1;}
-    int nnz() const { return colind()[ncol()];}
 
     // Constructor
     LinsolMemory() : is_pivoted(false), is_factorized(false) {}
@@ -127,6 +117,13 @@ namespace casadi {
 
     // Get name of the plugin
     const char* plugin_name() const override = 0;
+
+    /// Get sparsity pattern
+    int nrow() const { return sp_.size1();}
+    int ncol() const { return sp_.size2();}
+    const int* colind() const { return sp_.colind();}
+    const int* row() const { return sp_.row();}
+    int nnz() const { return sp_.nnz();}
 
     // Sparsity pattern of the linear system
     Sparsity sp_;

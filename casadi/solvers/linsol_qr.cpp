@@ -70,7 +70,7 @@ namespace casadi {
     auto m = static_cast<LinsolQrMemory*>(mem);
 
     // Dimensions
-    int size1 = m->nrow(), size2 = m->ncol();
+    int size1 = this->nrow(), size2 = this->ncol();
 
     // Allocate memory
     m->leftmost.resize(size1);
@@ -80,15 +80,14 @@ namespace casadi {
 
     // Initialize QP solve
     int nrow_ext, v_nnz, r_nnz;
-    Sparsity Asp = Sparsity::compressed(m->sparsity);
-    casadi_qr_init(get_ptr(m->sparsity), Asp.T(),
+    casadi_qr_init(sp_, sp_.T(),
                    get_ptr(m->leftmost), get_ptr(m->parent), get_ptr(m->pinv),
                    &nrow_ext, &v_nnz, &r_nnz, get_ptr(m->iw));
 
     // Calculate sparsities
     m->sp_v.resize(2 + size2 + 1 + v_nnz);
     m->sp_r.resize(2 + size2 + 1 + r_nnz);
-    casadi_qr_sparsities(get_ptr(m->sparsity), nrow_ext, get_ptr(m->sp_v), get_ptr(m->sp_r),
+    casadi_qr_sparsities(sp_, nrow_ext, get_ptr(m->sp_v), get_ptr(m->sp_r),
                          get_ptr(m->leftmost), get_ptr(m->parent), get_ptr(m->pinv),
                          get_ptr(m->iw));
 
@@ -107,7 +106,7 @@ namespace casadi {
 
   void LinsolQr::factorize(void* mem, const double* A) const {
     auto m = static_cast<LinsolQrMemory*>(mem);
-    casadi_qr(get_ptr(m->sparsity), A, get_ptr(m->iw), get_ptr(m->w),
+    casadi_qr(sp_, A, get_ptr(m->iw), get_ptr(m->w),
               get_ptr(m->sp_v), get_ptr(m->nz_v), get_ptr(m->sp_r), get_ptr(m->nz_r),
               get_ptr(m->beta), get_ptr(m->leftmost), get_ptr(m->parent), get_ptr(m->pinv));
   }
@@ -115,7 +114,7 @@ namespace casadi {
   void LinsolQr::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LinsolQrMemory*>(mem);
     int nrow_ext = m->y.size();
-    int ncol = m->ncol();
+    int ncol = this->ncol();
 
     for (int k=0; k<nrhs; ++k) {
       if (tr) {

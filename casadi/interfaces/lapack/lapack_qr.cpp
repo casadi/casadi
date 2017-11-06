@@ -82,9 +82,9 @@ namespace casadi {
   void LapackQr::reset(void* mem, const int* sp) const {
     LinsolInternal::reset(mem, sp);
     auto m = static_cast<LapackQrMemory*>(mem);
-    m->mat.resize(m->ncol() * m->ncol());
-    m->tau.resize(m->ncol());
-    m->work.resize(max(max_nrhs_, m->ncol())*10);
+    m->mat.resize(ncol() * ncol());
+    m->tau.resize(ncol());
+    m->work.resize(max(max_nrhs_, ncol())*10);
   }
 
   void LapackQr::factorize(void* mem, const double* A) const {
@@ -92,10 +92,10 @@ namespace casadi {
 
     // Dimensions
     //int nrow = this->nrow();
-    int ncol = m->ncol();
+    int ncol = this->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, get_ptr(m->sparsity), get_ptr(m->mat), false);
+    casadi_densify(A, sp_, get_ptr(m->mat), false);
 
     // Factorize the matrix
     int info = -100;
@@ -114,7 +114,7 @@ namespace casadi {
     while (nrhs>0) {
       _solve(m, x+offset, min(max_nrhs_, nrhs), tr);
       nrhs-= max_nrhs_;
-      offset+= max_nrhs_*m->nrow();
+      offset+= max_nrhs_*nrow();
     }
   }
 
@@ -123,7 +123,7 @@ namespace casadi {
 
     // Dimensions
     //int nrow = this->nrow();
-    int ncol = m->ncol();
+    int ncol = this->ncol();
 
     // Properties of R
     char uploR = 'U';

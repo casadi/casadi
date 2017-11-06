@@ -70,28 +70,6 @@ namespace casadi {
 
   void LinsolInternal::reset(void* mem, const int* sp) const {
     auto m = static_cast<LinsolMemory*>(mem);
-
-    // Decompress pattern
-    int nrow = *sp++;
-    int ncol = *sp++;
-    const int* colind = sp;
-    int nnz = colind[ncol];
-    const int* row = nnz==nrow*ncol ? 0 : sp+ncol+1;
-
-    // Save to sparsity field
-    m->sparsity.clear();
-    m->sparsity.push_back(nrow);
-    m->sparsity.push_back(ncol);
-    m->sparsity.insert(m->sparsity.end(), colind, colind+ncol+1);
-    if (row) {
-      m->sparsity.insert(m->sparsity.end(), row, row+nnz);
-    } else {
-      for (int cc=0; cc<ncol; ++cc) {
-        for (int rr=0; rr<nrow; ++rr) {
-          m->sparsity.push_back(rr);
-        }
-      }
-    }
   }
 
   void LinsolInternal::factorize(void* mem, const double* A) const {
