@@ -56,40 +56,6 @@ namespace casadi {
     clear_mem();
   }
 
-  Options Lsqr::options_
-  = {{&FunctionInternal::options_},
-    {{"codegen",
-      {OT_BOOL,
-       "C-code generation"}},
-      {"compiler",
-      {OT_STRING,
-       "Compiler command to be used for compiling generated code"}}
-   }
-  };
-
-  void Lsqr::init(const Dict& opts) {
-    // Call the base class initializer
-    LinsolInternal::init(opts);
-
-    // Default options
-    bool codegen = false;
-
-    // Read options
-    for (auto&& op : opts) {
-      if (op.first=="codegen") {
-        codegen = op.second;
-      } else if (op.first=="compiler") {
-        casadi_error("Option \"compiler\" has been removed");
-      }
-    }
-
-    // Codegen options
-    if (codegen) {
-      fopts_["compiler"] = compilerplugin_;
-      fopts_["jit_options"] = jit_options_;
-    }
-  }
-
   int Lsqr::init_mem(void* mem) const {
     return LinsolInternal::init_mem(mem);
   }

@@ -77,15 +77,6 @@ namespace casadi {
       return new Lsqr(name);
     }
 
-    ///@{
-    /** \brief Options */
-    static Options options_;
-    const Options& get_options() const override { return options_;}
-    ///@}
-
-    // Initialize
-    void init(const Dict& opts) override;
-
     /** \brief Create memory block */
     void* alloc_mem() const override { return new LsqrMemory();}
 
@@ -106,9 +97,6 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
-
-    // Generated function options
-    Dict fopts_;
   };
 
 } // namespace casadi
