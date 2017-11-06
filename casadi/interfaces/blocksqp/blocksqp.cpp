@@ -462,11 +462,6 @@ namespace casadi {
     //               qpsol_options);
     //alloc(qpsol_);
 
-    // [Workaround] Create linear solver for qpOASES
-    if (schur_) {
-      linsol_ = Linsol("linsol", linsol_plugin_);
-    }
-
     // Allocate memory
     alloc_w(Asp_.nnz(), true); // jac
     alloc_w(nx_, true); // xk
@@ -506,7 +501,8 @@ namespace casadi {
 
     // Create qpOASES memory
     if (schur_) {
-      m->qpoases_mem = new QpoasesMemory(linsol_);
+      m->qpoases_mem = new QpoasesMemory();
+      m->qpoases_mem->linsol_plugin = linsol_plugin_;
     }
     return 0;
   }

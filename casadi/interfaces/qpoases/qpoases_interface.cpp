@@ -286,11 +286,6 @@ namespace casadi {
       }
     }
 
-    // Create linear solver
-    if (schur_) {
-      linsol_ = Linsol("linsol", linsol_plugin_);
-    }
-
     // Allocate work vectors
     if (sparse_) {
       alloc_w(nnz_in(CONIC_H), true); // h
@@ -310,6 +305,9 @@ namespace casadi {
   int QpoasesInterface::init_mem(void* mem) const {
     auto m = static_cast<QpoasesMemory*>(mem);
     m->called_once = false;
+
+    // Linear solver, if any
+    m->linsol_plugin = linsol_plugin_;
 
     // Create qpOASES instance
     if (m->qp) delete m->qp;
@@ -807,7 +805,7 @@ namespace casadi {
     }
   }
 
-  QpoasesMemory::QpoasesMemory(const Linsol& linsol) : linsol(linsol) {
+  QpoasesMemory::QpoasesMemory() {
     this->qp = 0;
     this->h = 0;
     this->a = 0;
@@ -847,6 +845,9 @@ namespace casadi {
 
     // Allocate memory for nonzeros
     m->nz.resize(sp.nnz());
+
+    // Create linear solver
+    m->linsol = Linsol("linsol", m->linsol_plugin);
 
     // Pass to linear solver
     m->linsol.reset(sp);
