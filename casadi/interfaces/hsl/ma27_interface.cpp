@@ -46,8 +46,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_ma27);
   }
 
-  Ma27Interface::Ma27Interface(const std::string& name)
-    : LinsolInternal(name) {
+  Ma27Interface::Ma27Interface(const std::string& name, const Sparsity& sp)
+    : LinsolInternal(name, sp) {
   }
 
   Ma27Interface::~Ma27Interface() {

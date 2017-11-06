@@ -45,8 +45,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_ldl);
   }
 
-  LinsolLdl::LinsolLdl(const std::string& name)
-    : LinsolInternal(name) {
+  LinsolLdl::LinsolLdl(const std::string& name, const Sparsity& sp)
+    : LinsolInternal(name, sp) {
   }
 
   LinsolLdl::~LinsolLdl() {

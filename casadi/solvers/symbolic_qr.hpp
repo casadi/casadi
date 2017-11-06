@@ -71,7 +71,7 @@ namespace casadi {
   class CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQr : public LinsolInternal {
   public:
     // Constructor
-    SymbolicQr(const std::string& name);
+    SymbolicQr(const std::string& name, const Sparsity& sp);
 
     // Destructor
     ~SymbolicQr() override;
@@ -83,8 +83,8 @@ namespace casadi {
     std::string class_name() const override { return "SymbolicQr";}
 
     /** \brief  Create a new Linsol */
-    static LinsolInternal* creator(const std::string& name) {
-      return new SymbolicQr(name);
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new SymbolicQr(name, sp);
     }
 
     ///@{

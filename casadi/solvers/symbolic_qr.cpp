@@ -48,8 +48,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_symbolicqr);
   }
 
-  SymbolicQr::SymbolicQr(const std::string& name) :
-    LinsolInternal(name) {
+  SymbolicQr::SymbolicQr(const std::string& name, const Sparsity& sp) :
+    LinsolInternal(name, sp) {
   }
 
   SymbolicQr::~SymbolicQr() {

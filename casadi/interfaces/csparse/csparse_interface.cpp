@@ -45,8 +45,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_csparse);
   }
 
-  CsparseInterface::CsparseInterface(const std::string& name)
-    : LinsolInternal(name) {
+  CsparseInterface::CsparseInterface(const std::string& name, const Sparsity& sp)
+    : LinsolInternal(name, sp) {
   }
 
   CsparseInterface::~CsparseInterface() {

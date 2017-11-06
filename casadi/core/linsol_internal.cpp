@@ -28,7 +28,8 @@
 using namespace std;
 namespace casadi {
 
-  LinsolInternal::LinsolInternal(const std::string& name) : ProtoFunction(name) {
+  LinsolInternal::LinsolInternal(const std::string& name, const Sparsity& sp)
+   : ProtoFunction(name), sp_(sp) {
   }
 
   LinsolInternal::~LinsolInternal() {

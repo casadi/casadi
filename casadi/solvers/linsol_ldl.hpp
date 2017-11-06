@@ -54,11 +54,11 @@ namespace casadi {
   public:
 
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LinsolLdl(const std::string& name);
+    LinsolLdl(const std::string& name, const Sparsity& sp);
 
     /** \brief  Create a new LinsolInternal */
-    static LinsolInternal* creator(const std::string& name) {
-      return new LinsolLdl(name);
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new LinsolLdl(name, sp);
     }
 
     // Destructor

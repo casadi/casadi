@@ -45,8 +45,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_qr);
   }
 
-  LinsolQr::LinsolQr(const std::string& name)
-    : LinsolInternal(name) {
+  LinsolQr::LinsolQr(const std::string& name, const Sparsity& sp)
+    : LinsolInternal(name, sp) {
   }
 
   LinsolQr::~LinsolQr() {

@@ -48,8 +48,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_lsqr);
   }
 
-  Lsqr::Lsqr(const std::string& name) :
-    LinsolInternal(name) {
+  Lsqr::Lsqr(const std::string& name, const Sparsity& sp) :
+    LinsolInternal(name, sp) {
   }
 
   Lsqr::~Lsqr() {

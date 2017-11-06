@@ -61,7 +61,7 @@ namespace casadi {
   class CASADI_LINSOL_LSQR_EXPORT Lsqr : public LinsolInternal {
   public:
     // Constructor
-    Lsqr(const std::string& name);
+    Lsqr(const std::string& name, const Sparsity& sp);
 
     // Destructor
     ~Lsqr() override;
@@ -73,8 +73,8 @@ namespace casadi {
     std::string class_name() const override { return "Lsqr";}
 
     /** \brief  Create a new Linsol */
-    static LinsolInternal* creator(const std::string& name) {
-      return new Lsqr(name);
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new Lsqr(name, sp);
     }
 
     /** \brief Create memory block */

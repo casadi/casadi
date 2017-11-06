@@ -59,7 +59,7 @@ namespace casadi {
     : public ProtoFunction, public PluginInterface<LinsolInternal> {
   public:
     /// Constructor
-    LinsolInternal(const std::string& name);
+    LinsolInternal(const std::string& name, const Sparsity& sp);
 
     /// Destructor
     ~LinsolInternal() override;
@@ -114,7 +114,7 @@ namespace casadi {
     virtual int rank(void* mem) const;
 
     // Creator function for internal class
-    typedef LinsolInternal* (*Creator)(const std::string& name);
+    typedef LinsolInternal* (*Creator)(const std::string& name, const Sparsity& sp);
 
     // No static functions exposed
     struct Exposed{ };
@@ -127,6 +127,9 @@ namespace casadi {
 
     // Get name of the plugin
     const char* plugin_name() const override = 0;
+
+    // Sparsity pattern of the linear system
+    Sparsity sp_;
   };
 
 } // namespace casadi
