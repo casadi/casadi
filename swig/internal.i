@@ -454,9 +454,6 @@
 %exception  casadi::FunctionInternal::alloc_iw(size_t sz_iw, bool persistent=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::alloc_mem() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::alloc_res(size_t sz_res, bool persistent=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -490,12 +487,6 @@
 %exception  casadi::FunctionInternal::check_res(const std::vector< M > &res) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::checkout() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::clear_mem() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::codegen(CodeGenerator &g, const std::string &fname) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -520,9 +511,6 @@
 %exception  casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::construct(const Dict &opts) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::definition() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -544,7 +532,7 @@
 %exception  casadi::FunctionInternal::factory(const std::string &name, const std::vector< std::string > &s_in, const std::vector< std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::finalize(const Dict &opts) {
+%exception  casadi::FunctionInternal::finalize(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::forward(int nfwd) const  {
@@ -625,7 +613,7 @@
 %exception  casadi::FunctionInternal::get_name_out(int i) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::get_options() const  {
+%exception  casadi::FunctionInternal::get_options() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::get_partition(int iind, int oind, Sparsity &D1, Sparsity &D2, bool compact, bool symmetric, bool allow_forward, bool allow_reverse) const  {
@@ -679,7 +667,7 @@
 %exception  casadi::FunctionInternal::info() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::init(const Dict &opts) {
+%exception  casadi::FunctionInternal::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::instruction_MX(int k) const  {
@@ -715,9 +703,6 @@
 %exception  casadi::FunctionInternal::matching_res(const std::vector< M > &arg) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::memory(int ind) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::FunctionInternal::mx_in() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -734,9 +719,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::n_nodes() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::nnz_in() const  {
@@ -773,9 +755,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::print_options(std::ostream &stream) const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::FunctionInternal::release(int mem) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::replace_arg(const std::vector< M > &arg) const  {
@@ -1406,6 +1385,24 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::PluginInterface< Rootfinder  >::plugin_name() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ProtoFunction::alloc_mem() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ProtoFunction::checkout() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ProtoFunction::clear_mem() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ProtoFunction::construct(const Dict &opts) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ProtoFunction::memory(int ind) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ProtoFunction::release(int mem) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::QpToNlp::class_name() const override {
