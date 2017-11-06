@@ -1132,10 +1132,13 @@
 %exception  casadi::LinearInterpolantJac::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinsolInternal::get_n_in() override {
+%exception  casadi::LinsolInternal::disp(std::ostream &stream, bool more) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinsolInternal::get_n_out() override {
+%exception  casadi::LinsolInternal::disp_more(std::ostream &stream) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolInternal::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinsolLdl::alloc_mem() const override {
@@ -1166,12 +1169,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Lsqr::class_name() const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Lsqr::get_options() const override {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::Lsqr::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Lsqr::plugin_name() const override {
@@ -1397,6 +1394,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ProtoFunction::construct(const Dict &opts) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ProtoFunction::finalize(const Dict &opts) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ProtoFunction::get_options() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ProtoFunction::memory(int ind) const  {
