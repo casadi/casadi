@@ -60,14 +60,6 @@ namespace casadi {
 
   }
 
-  void Ma27Interface::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
-    //auto m = static_cast<Ma27Memory*>(mem);
-
-    // Set work in base classes
-    LinsolInternal::set_work(mem, arg, res, iw, w);
-  }
-
   int Ma27Interface::init_mem(void* mem) const {
     if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<Ma27Memory*>(mem);

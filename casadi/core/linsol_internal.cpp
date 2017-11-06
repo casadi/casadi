@@ -28,7 +28,7 @@
 using namespace std;
 namespace casadi {
 
-  LinsolInternal::LinsolInternal(const std::string& name) : FunctionInternal(name) {
+  LinsolInternal::LinsolInternal(const std::string& name) : ProtoFunction(name) {
   }
 
   LinsolInternal::~LinsolInternal() {
@@ -36,10 +36,17 @@ namespace casadi {
 
   void LinsolInternal::init(const Dict& opts) {
     // Call the base class initializer
-    FunctionInternal::init(opts);
+    ProtoFunction::init(opts);
 
   }
 
+  void LinsolInternal::disp(ostream &stream, bool more) const {
+    stream << "Linear solver " << class_name();
+    if (more) {
+      stream << endl;
+      disp_more(stream);
+    }
+  }
 
   int LinsolInternal::init_mem(void* mem) const {
     if (!mem) return 1;

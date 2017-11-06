@@ -56,7 +56,7 @@ namespace casadi {
       @copydoc Linsol_doc
   */
   class CASADI_EXPORT LinsolInternal
-    : public FunctionInternal, public PluginInterface<LinsolInternal> {
+    : public ProtoFunction, public PluginInterface<LinsolInternal> {
   public:
     /// Constructor
     LinsolInternal(const std::string& name);
@@ -64,11 +64,11 @@ namespace casadi {
     /// Destructor
     ~LinsolInternal() override;
 
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    size_t get_n_in() override { return 0;}
-    size_t get_n_out() override { return 0;}
-    ///@}
+    /** \brief Display object */
+    void disp(std::ostream& stream, bool more) const override;
+
+    /** \brief  Print more */
+    virtual void disp_more(std::ostream& stream) const {}
 
     /// Initialize
     void init(const Dict& opts) override;

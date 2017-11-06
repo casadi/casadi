@@ -160,10 +160,6 @@ namespace casadi {
 
     // Get name of the class
     std::string class_name() const override { return "Ma27Interface";}
-
-    /** \brief Set the (persistent) work vectors */
-    void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
   };
 
 } // namespace casadi
