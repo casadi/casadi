@@ -1330,7 +1330,7 @@ namespace casadi {
             Dict info = x.info();
             int segment = info["segment"];
             ss << indent << "argout_" << o[0] << "{" << (1+segment) << "} = ";
-            ss << "nonzeros(w" << i[0] << ");" << std::endl;
+            ss << "nonzeros_gen(w" << i[0] << ");" << std::endl;
           }
           break;
         case OP_CONST:
@@ -1426,7 +1426,7 @@ namespace casadi {
           {
             ss << indent << "w" << o[0] << " = [";
             for (int e : i) {
-              ss << "nonzeros(w" << e << ");";
+              ss << "nonzeros_gen(w" << e << ");";
             }
             ss << "];" << std::endl;
             Dict opts;
@@ -1449,7 +1449,7 @@ namespace casadi {
               sp.push_back(output.sparsity_out(i));
               for (int k=0;k<o.size();++k) {
                 if (o[k]==-1) continue;
-                ss << indent << "tmp = nonzeros(w" << i[0]<< ");" << std::endl;
+                ss << indent << "tmp = nonzeros_gen(w" << i[0]<< ");" << std::endl;
                 Dict opts;
                 opts["name"] = "sp";
                 opts["indent_level"] = indent_level;
@@ -1491,7 +1491,7 @@ namespace casadi {
               int M = range(inner_start, inner_stop, inner_step).size();
               nonzeros = "repmat("+ inner_slice  +"', 1, " + str(N) + ")+" +
                          "repmat("+ outer_slice  +", " + str(M) + ", 1)";
-              nonzeros = "nonzeros(" + nonzeros + ")";
+              nonzeros = "nonzeros_gen(" + nonzeros + ")";
             }
 
             Dict opts;
@@ -1501,11 +1501,11 @@ namespace casadi {
             x.sparsity().export_code("matlab", ss, opts);
 
             if (op==OP_GETNONZEROS) {
-              ss << indent << "in_flat = nonzeros(w" << i[0] << ");" << std::endl;
+              ss << indent << "in_flat = nonzeros_gen(w" << i[0] << ");" << std::endl;
               ss << indent << "w" << o[0] << " = in_flat(" << nonzeros << ");" << std::endl;
             } else {
-              ss << indent << "in_flat = nonzeros(w" << i[1] << ");" << std::endl;
-              ss << indent << "w" << o[0] << " = nonzeros(w" << i[0] << ");" << std::endl;
+              ss << indent << "in_flat = nonzeros_gen(w" << i[1] << ");" << std::endl;
+              ss << indent << "w" << o[0] << " = nonzeros_gen(w" << i[0] << ");" << std::endl;
               ss << indent << "w" << o[0] << "(" << nonzeros << ")  = ";
               if (info["add"]) ss << "w" << o[0] << "(" << nonzeros << ") + ";
               ss << "in_flat;";
@@ -1542,6 +1542,22 @@ namespace casadi {
         case OP_MMAX:
           ss << indent << "w" << o[0] << " = max(w" << i[0] << ");" << std::endl;
           break;
+        case OP_NOT:
+          ss << indent << "w" << o[0] << " = ~" << "w" << i[0] << ";" << std::endl;
+          break;
+        case OP_OR:
+          ss << indent << "w" << o[0] << " = w" << i[0] << " | w" << i[1] << ";" << std::endl;
+          break;
+        case OP_AND:
+          ss << indent << "w" << o[0] << " = w" << i[0] << " & w" << i[1] << ";" << std::endl;
+          break;
+        case OP_NE:
+          ss << indent << "w" << o[0] << " = w" << i[0] << " ~= w" << i[1] << ";" << std::endl;
+          break;
+        case OP_IF_ELSE_ZERO:
+          ss << indent << "w" << o[0] << " = ";
+          ss << "if_else_zero_gen(w" << i[0] << ", w" << i[1] << ");" << std::endl;
+          break;
         case OP_RESHAPE:
           {
             Dict opts;
@@ -1550,7 +1566,7 @@ namespace casadi {
             opts["as_matrix"] = false;
             x.sparsity().export_code("matlab", ss, opts);
             ss << indent << "w" << o[0] << " = sparse(sp_i, sp_j, ";
-            ss << "nonzeros(w" << i[0] << "), sp_m, sp_n);" << std::endl;
+            ss << "nonzeros_gen(w" << i[0] << "), sp_m, sp_n);" << std::endl;
           }
           break;
         default:

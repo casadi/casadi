@@ -837,7 +837,7 @@ namespace casadi {
 
     // Non-cell aliases for inputs
     for (int i=0;i<n_in_;++i) {
-      ss << indent << "argin_" << i <<  " = nonzeros(varargin{" << i+1 << "});" << std::endl;
+      ss << indent << "argin_" << i <<  " = nonzeros_gen(varargin{" << i+1 << "});" << std::endl;
     }
 
     Function f = shared_from_this<Function>();
@@ -880,6 +880,22 @@ namespace casadi {
           {
             ss << indent << "w" << o[0] << " = abs(" << "w" << i[0] << ");" << std::endl;
           }
+          break;
+        case OP_NOT:
+          ss << indent << "w" << o[0] << " = ~" << "w" << i[0] << ";" << std::endl;
+          break;
+        case OP_OR:
+          ss << indent << "w" << o[0] << " = w" << i[0] << " | w" << i[1] << ";" << std::endl;
+          break;
+        case OP_AND:
+          ss << indent << "w" << o[0] << " = w" << i[0] << " & w" << i[1] << ";" << std::endl;
+          break;
+        case OP_NE:
+          ss << indent << "w" << o[0] << " = w" << i[0] << " ~= w" << i[1] << ";" << std::endl;
+          break;
+        case OP_IF_ELSE_ZERO:
+          ss << indent << "w" << o[0] << " = ";
+          ss << "if_else_zero_gen(w" << i[0] << ", w" << i[1] << ");" << std::endl;
           break;
         default:
           if (casadi::casadi_math<double>::ndeps(op)==2) {
