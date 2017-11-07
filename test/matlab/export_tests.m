@@ -95,7 +95,7 @@ for i=1:numel(args)
 end
 
 f_mx_res = cell(1,1);
-f_mx_exported_res = cell(1,1);
+f_mx_exported_res = cell(N,1);
 
 f_mx_res = fref(args_num{:});
 
