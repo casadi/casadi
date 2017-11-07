@@ -76,15 +76,12 @@ namespace casadi {
   }
 
   int LapackQr::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void LapackQr::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
+    if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<LapackQrMemory*>(mem);
     m->mat.resize(ncol() * ncol());
     m->tau.resize(ncol());
     m->work.resize(max(max_nrhs_, ncol())*10);
+    return 0;
   }
 
   void LapackQr::factorize(void* mem, const double* A) const {

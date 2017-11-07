@@ -62,11 +62,7 @@ namespace casadi {
   }
 
   int LinsolLdl::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void LinsolLdl::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
+    if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<LinsolLdlMemory*>(mem);
 
     // Dimension
@@ -79,15 +75,16 @@ namespace casadi {
     m->sp_l.resize(2+n+1);
     m->sp_l[0] = n;
     m->sp_l[1] = n;
-    casadi_ldl_colind(sp, get_ptr(m->parent), get_ptr(m->sp_l)+2, get_ptr(m->iw));
+    casadi_ldl_colind(sp_, get_ptr(m->parent), get_ptr(m->sp_l)+2, get_ptr(m->iw));
     // Get rows in L (strictly lower entries only)
     int nnz_l = m->sp_l[2+n];
     m->sp_l.resize(2 + n+1 + nnz_l);
-    casadi_ldl_row(sp, get_ptr(m->parent), get_ptr(m->sp_l)+2, get_ptr(m->sp_l)+2+n+1,
+    casadi_ldl_row(sp_, get_ptr(m->parent), get_ptr(m->sp_l)+2, get_ptr(m->sp_l)+2+n+1,
                     get_ptr(m->iw));
     m->nz_l.resize(nnz_l);
     m->d.resize(n);
     m->w.resize(n);
+    return 0;
   }
 
   void LinsolLdl::pivoting(void* mem, const double* A) const {

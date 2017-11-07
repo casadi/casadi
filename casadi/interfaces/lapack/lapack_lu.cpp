@@ -83,11 +83,7 @@ namespace casadi {
   }
 
   int LapackLu::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void LapackLu::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
+    if (LinsolInternal::init_mem(mem)) return 0;
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Allocate matrix
@@ -100,6 +96,7 @@ namespace casadi {
       m->c.resize(ncol());
     }
     m->equed = 'N'; // No equilibration
+    return 0;
   }
 
   void LapackLu::factorize(void* mem, const double* A) const {

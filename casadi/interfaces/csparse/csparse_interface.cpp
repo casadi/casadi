@@ -64,11 +64,7 @@ namespace casadi {
   }
 
   int CsparseInterface::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void CsparseInterface::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
+    if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<CsparseMemory*>(mem);
 
     m->N = 0;
@@ -84,6 +80,7 @@ namespace casadi {
 
     // Temporary
     m->temp_.resize(m->A.n);
+    return 0;
   }
 
   void CsparseInterface::pivoting(void* mem, const double* A) const {

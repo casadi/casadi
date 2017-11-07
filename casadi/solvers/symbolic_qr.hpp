@@ -45,9 +45,6 @@ namespace casadi {
 
   /** \brief Memory for SymbolicQR  */
   struct CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQrMemory : public LinsolMemory {
-    // Functions for factorization and (optionally transposed) solve
-    Function factorize, solve, solveT;
-
     // Work vectors
     std::vector<const double*> arg;
     std::vector<double*> res;
@@ -105,9 +102,6 @@ namespace casadi {
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<SymbolicQrMemory*>(mem);}
 
-    // Set sparsity pattern
-    void reset(void* mem, const int* sp) const override;
-
     // Factorize the linear system
     void factorize(void* mem, const double* A) const override;
 
@@ -120,6 +114,9 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    // Functions for factorization and (optionally transposed) solve
+    Function factorize_, solve_, solveT_;
 
     // Generated function options
     Dict fopts_;

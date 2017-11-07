@@ -241,11 +241,6 @@ namespace casadi {
     m->rxz = N_VNew_Serial(nrx_+nrz_);
     m->rq = N_VNew_Serial(nrq_);
 
-    // Reset linear solvers
-    linsolF_.reset(get_function("jacF").sparsity_out(0));
-    if (nrx_>0) {
-      linsolB_.reset(get_function("jacB").sparsity_out(0));
-    }
     return 0;
   }
 

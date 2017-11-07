@@ -74,15 +74,6 @@ namespace casadi {
         fopts_ = op.second;
       }
     }
-  }
-
-  int SymbolicQr::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void SymbolicQr::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
-    auto m = static_cast<SymbolicQrMemory*>(mem);
 
     // Symbolic expression for A
     SX A = SX::sym("A", sp_);
@@ -107,8 +98,7 @@ namespace casadi {
     // Generate the QR factorization function
     SX Q1, R1;
     qr(Aperm, Q1, R1);
-    m->factorize = Function("QR_fact", {A}, {Q1, R1}, fopts_);
-    m->alloc(m->factorize);
+    factorize_ = Function("QR_fact", {A}, {Q1, R1}, fopts_);
 
     // Symbolic expressions for solve function
     SX Q = SX::sym("Q", Q1.sparsity());
@@ -129,8 +119,7 @@ namespace casadi {
 
     // Generate the QR solve function
     vector<SX> solv_in = {Q, R, b};
-    m->solve = Function("QR_solv", solv_in, {x}, fopts_);
-    m->alloc(m->solve);
+    solve_ = Function("QR_solv", solv_in, {x}, fopts_);
 
     // Solve transposed
     // We have (Pb' * Q * R * Px)' * x = b
@@ -147,34 +136,43 @@ namespace casadi {
     x = xperm(inv_rowperm, Slice());
 
     // Mofify the QR solve function
-    m->solveT = Function("QR_solv_T", solv_in, {x}, fopts_);
-    m->alloc(m->solveT);
+    solveT_ = Function("QR_solv_T", solv_in, {x}, fopts_);
+  }
+
+  int SymbolicQr::init_mem(void* mem) const {
+    if (LinsolInternal::init_mem(mem)) return 1;
+    auto m = static_cast<SymbolicQrMemory*>(mem);
+
+    m->alloc(solveT_);
+    m->alloc(solve_);
+    m->alloc(factorize_);
 
     // Temporary storage
     m->w.resize(m->w.size() + sp_.size1());
 
     // Allocate storage for QR factorization
-    m->q.resize(m->factorize.nnz_out(0));
-    m->r.resize(m->factorize.nnz_out(1));
+    m->q.resize(factorize_.nnz_out(0));
+    m->r.resize(factorize_.nnz_out(1));
+    return 0;
   }
 
   void SymbolicQr::factorize(void* mem, const double* A) const {
     auto m = static_cast<SymbolicQrMemory*>(mem);
 
     // Factorize
-    fill_n(get_ptr(m->arg), m->factorize.n_in(), nullptr);
+    fill_n(get_ptr(m->arg), factorize_.n_in(), nullptr);
     m->arg[0] = A;
-    fill_n(get_ptr(m->res), m->factorize.n_out(), nullptr);
+    fill_n(get_ptr(m->res), factorize_.n_out(), nullptr);
     m->res[0] = get_ptr(m->q);
     m->res[1] = get_ptr(m->r);
-    m->factorize(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w));
+    factorize_(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w));
   }
 
   void SymbolicQr::solve(void* mem, double* x, int nrhs, bool tr) const {
     auto m = static_cast<SymbolicQrMemory*>(mem);
 
     // Select solve function
-    const Function& solv = tr ? m->solveT : m->solve;
+    const Function& solv = tr ? solveT_ : solve_;
 
     // Solve for all right hand sides
     fill_n(get_ptr(m->arg), solv.n_in(), nullptr);
@@ -200,10 +198,10 @@ namespace casadi {
     // Get A and factorize it
     SX A = SX::zeros(sp_);
     copy(arg[1], arg[1]+A.nnz(), A->begin());
-    vector<SX> v = m->factorize(A);
+    vector<SX> v = factorize_(A);
 
     // Select solve function
-    Function& solv = tr ? m->solveT : m->solve;
+    const Function& solv = tr ? solveT_ : solve_;
 
     // Solve for every right hand side
     v.push_back(SX::zeros(A.size1()));

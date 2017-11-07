@@ -62,11 +62,7 @@ namespace casadi {
   }
 
   int LinsolQr::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void LinsolQr::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
+    if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<LinsolQrMemory*>(mem);
 
     // Dimensions
@@ -97,6 +93,7 @@ namespace casadi {
     m->beta.resize(size2);
     m->w.resize(nrow_ext);
     m->y.resize(nrow_ext);
+    return 0;
   }
 
   void LinsolQr::pivoting(void* mem, const double* A) const {

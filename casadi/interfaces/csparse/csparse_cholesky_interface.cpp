@@ -66,11 +66,7 @@ namespace casadi {
   }
 
   int CSparseCholeskyInterface::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void CSparseCholeskyInterface::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
+    if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     m->L = 0;
@@ -86,6 +82,8 @@ namespace casadi {
 
     // Temporary
     m->temp.resize(m->A.n);
+
+    return 0;
   }
 
   void CSparseCholeskyInterface::pivoting(void* mem, const double* A) const {

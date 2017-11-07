@@ -86,9 +86,6 @@ namespace casadi {
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<LsqrMemory*>(mem);}
 
-    // Set sparsity pattern
-    void reset(void* mem, const int* sp) const override;
-
     // Factorize the linear system
     void factorize(void* mem, const double* A) const override;
 

@@ -71,9 +71,6 @@ namespace casadi {
       "Linsol::solve: Dimension mismatch. A and b must have matching row count. "
       "Got " + A.dim() + " and " + B.dim() + ".");
 
-    // Set sparsity
-    reset(A.sparsity());
-
     // Calculate partial pivots
     pivoting(A.ptr());
 
@@ -92,17 +89,6 @@ namespace casadi {
 
   void Linsol::solve_cholesky(double* x, int nrhs, bool tr) const {
     (*this)->solve_cholesky((*this)->memory(0), x, nrhs, tr);
-  }
-
-  void Linsol::reset(const int* sp) const {
-    casadi_assert_dev(sp!=0);
-    auto m = static_cast<LinsolMemory*>((*this)->memory(0));
-
-    // New factorization will be required
-    m->is_pivoted = m->is_factorized = false;
-
-    // Update pattern
-    (*this)->reset(m, sp);
   }
 
   void Linsol::pivoting(const double* A) const {

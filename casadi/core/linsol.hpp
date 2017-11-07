@@ -88,9 +88,6 @@ namespace casadi {
     MX solve(const MX& A, const MX& B, bool tr=false) const;
 
 #ifndef SWIG
-    // Set sparsity pattern
-    void reset(const int* sp) const;
-
     // Select pivots
     void pivoting(const double* A) const;
 

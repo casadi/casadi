@@ -53,7 +53,6 @@ namespace casadi {
   template<bool Tr>
   int Solve<Tr>::eval(const double** arg, double** res, int* iw, double* w) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    linsol_.reset(dep(1).sparsity());
     linsol_.pivoting(arg[1]);
     linsol_.factorize(arg[1]);
     linsol_.solve(res[0], dep(0).size2(), Tr);
@@ -62,7 +61,6 @@ namespace casadi {
 
   template<bool Tr>
   int Solve<Tr>::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
-    linsol_.reset(dep(1).sparsity());
     linsol_->linsol_eval_sx(arg, res, iw, w, linsol_->memory(0), Tr, dep(0).size2());
     return 0;
   }

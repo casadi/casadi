@@ -79,9 +79,6 @@ namespace casadi {
     /// Solve Cholesky
     virtual void solve_cholesky(void* mem, double* x, int nrhs, bool tr) const;
 
-    // Set sparsity pattern
-    virtual void reset(void* mem, const int* sp) const;
-
     // Symbolic factorization - partial pivoting (optional)
     virtual void pivoting(void* mem, const double* A) const {}
 

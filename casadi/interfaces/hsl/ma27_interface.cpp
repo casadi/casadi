@@ -69,12 +69,6 @@ namespace casadi {
     m->icntl[0] = 0;       // Suppress error messages
     m->icntl[1] = 0;       // Suppress diagnostic messages
     m->cntl[0] = 1e-8;     // Set pivot tolerance
-    return 0;
-  }
-
-  void Ma27Interface::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
-    auto m = static_cast<Ma27Memory*>(mem);
 
     // Dynamically resized work vectors
     int N = this->ncol();
@@ -87,6 +81,7 @@ namespace casadi {
     m->jcn.resize(nnz);
     m->iw1.resize(2*N);
     m->ikeep.resize(3*N);
+    return 0;
   }
 
   void Ma27Interface::factorize(void* mem, const double* A) const {

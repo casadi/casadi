@@ -57,16 +57,13 @@ namespace casadi {
   }
 
   int Lsqr::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void Lsqr::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
+    if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<LsqrMemory*>(mem);
 
     // Temporary storage
     m->w.resize(nrow()+4*ncol());
     m->A.resize(sp_.nnz());
+    return 0;
   }
 
   void Lsqr::factorize(void* mem, const double* A) const {

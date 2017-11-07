@@ -68,10 +68,6 @@ namespace casadi {
     casadi_error("'solve_cholesky' not defined for " + class_name());
   }
 
-  void LinsolInternal::reset(void* mem, const int* sp) const {
-    auto m = static_cast<LinsolMemory*>(mem);
-  }
-
   void LinsolInternal::factorize(void* mem, const double* A) const {
     casadi_error("'factorize' not defined for " + class_name());
   }

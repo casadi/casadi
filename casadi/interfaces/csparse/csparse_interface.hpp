@@ -85,9 +85,6 @@ namespace casadi {
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<CsparseMemory*>(mem);}
 
-    // Set sparsity pattern
-    void reset(void* mem, const int* sp) const override;
-
     // Symbolic factorization
     void pivoting(void* mem, const double* A) const override;
 
