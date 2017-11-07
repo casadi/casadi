@@ -88,14 +88,14 @@ namespace casadi {
     MX solve(const MX& A, const MX& B, bool tr=false) const;
 
 #ifndef SWIG
-    // Select pivots
-    void pivoting(const double* A) const;
+    // Symbolic factorization of the linear system, e.g. selecting pivots
+    int sfact(const double* A, int mem=0) const;
 
-    // Factorize linear system of equations
-    void factorize(const double* A) const;
+    // Numeric factorization of the linear system
+    int nfact(const double* A, int mem=0) const;
 
     // Solve factorized linear system of equations
-    void solve(double* x, int nrhs=1, bool tr=false) const;
+    int solve(const double* A, double* x, int nrhs=1, bool tr=false, int mem=0) const;
 
     /** \brief Solve the system of equations <tt>Lx = b</tt>
         Only when a Cholesky factorization is available

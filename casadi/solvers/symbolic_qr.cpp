@@ -156,7 +156,7 @@ namespace casadi {
     return 0;
   }
 
-  void SymbolicQr::factorize(void* mem, const double* A) const {
+  int SymbolicQr::nfact(void* mem, const double* A) const {
     auto m = static_cast<SymbolicQrMemory*>(mem);
 
     // Factorize
@@ -165,10 +165,11 @@ namespace casadi {
     fill_n(get_ptr(m->res), factorize_.n_out(), nullptr);
     m->res[0] = get_ptr(m->q);
     m->res[1] = get_ptr(m->r);
-    factorize_(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w));
+    if (factorize_(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w))) return 1;
+    return 0;
   }
 
-  void SymbolicQr::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int SymbolicQr::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<SymbolicQrMemory*>(mem);
 
     // Select solve function
@@ -183,9 +184,11 @@ namespace casadi {
       copy_n(x, nrow(), get_ptr(m->w)); // Copy x to a temporary
       m->arg[2] = get_ptr(m->w);
       m->res[0] = x;
-      solv(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w)+nrow(), 0);
+      if (solv(get_ptr(m->arg), get_ptr(m->res),
+               get_ptr(m->iw), get_ptr(m->w)+nrow(), 0)) return 1;
       x += nrow();
     }
+    return 0;
   }
 
   void SymbolicQr::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,

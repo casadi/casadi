@@ -87,18 +87,18 @@ namespace casadi {
     return 0;
   }
 
-  void LinsolLdl::pivoting(void* mem, const double* A) const {
-    LinsolInternal::pivoting(mem, A);
-//    auto m = static_cast<LinsolLdlMemory*>(mem);
-   }
+  int LinsolLdl::sfact(void* mem, const double* A) const {
+    return 0;
+  }
 
-  void LinsolLdl::factorize(void* mem, const double* A) const {
+  int LinsolLdl::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
     casadi_ldl(sp_, get_ptr(m->parent), get_ptr(m->sp_l),
                A, get_ptr(m->nz_l), get_ptr(m->d), get_ptr(m->iw), get_ptr(m->w));
+    return 0;
   }
 
-  void LinsolLdl::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int LinsolLdl::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
     int n = this->nrow();
     for (int k=0; k<nrhs; ++k) {
@@ -112,6 +112,7 @@ namespace casadi {
       // Next rhs
       x += n;
     }
+    return 0;
   }
 
   int LinsolLdl::neig(void* mem) const {

@@ -66,10 +66,11 @@ namespace casadi {
     return 0;
   }
 
-  void Lsqr::factorize(void* mem, const double* A) const {
+  int Lsqr::nfact(void* mem, const double* A) const {
     auto m = static_cast<LsqrMemory*>(mem);
 
     std::copy(A, A+m->A.size(), get_ptr(m->A));
+    return 0;
   }
 
 
@@ -95,7 +96,7 @@ namespace casadi {
     }
   }
 
-  void solve_(void* mem, const Sparsity& sp, double* x, bool tr) {
+  int solve_(void* mem, const Sparsity& sp, double* x, bool tr) {
     auto m = static_cast<LsqrMemory*>(mem);
 
     const double*A = get_ptr(m->A);
@@ -251,18 +252,18 @@ namespace casadi {
 
     }
     std::copy(xx, xx+m_, x);
-
+    return 0;
   }
 
-  void Lsqr::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int Lsqr::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LsqrMemory*>(mem);
 
     int n_ = ncol();
 
     for (int i=0; i<nrhs;++i) {
-      solve_(mem, sp_, x+i*n_, tr);
+      if (solve_(mem, sp_, x+i*n_, tr)) return 1;
     }
-
+    return 0;
   }
 
 

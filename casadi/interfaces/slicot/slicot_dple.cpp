@@ -276,8 +276,8 @@ namespace casadi {
         // ********** STOP ***************
         // Solve Discrete Periodic Sylvester Equation Solver
 
-        solver.pivoting(m->A);
-        solver.factorize(m->A);
+        solver.sfact(m->A);
+        solver.nfact(m->A);
 
       }
     }
@@ -366,7 +366,7 @@ namespace casadi {
 
           // Critical observation: Prepare step is not needed
           // n^2 K
-          solver.solve(m->B, 1, true);
+          solver.solve(m->A, m->B, 1, true);
 
           // Extract solution and store it in X
           double * sol = m->B;

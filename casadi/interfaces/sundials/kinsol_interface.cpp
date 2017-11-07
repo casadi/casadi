@@ -460,7 +460,7 @@ namespace casadi {
     m.arg[iin_] = NV_DATA_S(u);
     fill_n(m.res, n_out_+1, nullptr);
     m.res[0] = m.jac;
-    calc_function(&m, "jac_f_z");
+    if (calc_function(&m, "jac_f_z")) casadi_error("Jacobian calculation failed");
 
     // Get sparsity and non-zero elements
     //const int* colind = sp_jac_.colind();
@@ -468,7 +468,7 @@ namespace casadi {
     //const int* row = sp_jac_.row();
 
     // Factorize the linear system
-    linsol_.factorize(m.jac);
+    if (linsol_.nfact(m.jac)) casadi_error("'nfact' failed");
   }
 
   int KinsolInterface::psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval,
@@ -487,7 +487,7 @@ namespace casadi {
   void KinsolInterface::psolve(KinsolMemory& m, N_Vector u, N_Vector uscale, N_Vector fval,
                             N_Vector fscale, N_Vector v, N_Vector tmp) const {
     // Solve the factorized system
-    linsol_.solve(NV_DATA_S(v));
+    if (linsol_.solve(m.jac, NV_DATA_S(v))) casadi_error("'solve' failed");
   }
 
   int KinsolInterface::lsetup(KINMem kin_mem) {

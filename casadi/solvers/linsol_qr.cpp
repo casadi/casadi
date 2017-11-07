@@ -96,25 +96,25 @@ namespace casadi {
     return 0;
   }
 
-  void LinsolQr::pivoting(void* mem, const double* A) const {
-    LinsolInternal::pivoting(mem, A);
-    //auto m = static_cast<LinsolQrMemory*>(mem);
-   }
+  int LinsolQr::sfact(void* mem, const double* A) const {
+    return 0;
+  }
 
-  void LinsolQr::factorize(void* mem, const double* A) const {
+  int LinsolQr::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolQrMemory*>(mem);
     casadi_qr(sp_, A, get_ptr(m->iw), get_ptr(m->w),
               get_ptr(m->sp_v), get_ptr(m->nz_v), get_ptr(m->sp_r), get_ptr(m->nz_r),
               get_ptr(m->beta), get_ptr(m->leftmost), get_ptr(m->parent), get_ptr(m->pinv));
+    return 0;
   }
 
-  void LinsolQr::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int LinsolQr::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LinsolQrMemory*>(mem);
     int nrow_ext = m->y.size();
     int ncol = this->ncol();
-
     for (int k=0; k<nrhs; ++k) {
       if (tr) {
+
         // ('P'Q R)' x = R'Q'P x = b <-> x = P' Q R' \ b
         // Copy to y
         casadi_copy(x, ncol, get_ptr(m->y));
@@ -140,6 +140,8 @@ namespace casadi {
       }
       x += ncol;
     }
+
+    return 0;
   }
 
 } // namespace casadi

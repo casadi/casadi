@@ -86,13 +86,13 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<CsparseMemory*>(mem);}
 
     // Symbolic factorization
-    void pivoting(void* mem, const double* A) const override;
+    int sfact(void* mem, const double* A) const override;
 
     // Factorize the linear system
-    void factorize(void* mem, const double* A) const override;
+    int nfact(void* mem, const double* A) const override;
 
     // Solve the linear system
-    void solve(void* mem, double* x, int nrhs, bool tr) const override;
+    int solve(void* mem, const double* A, double* x, int nrhs, bool tr) const override;
 
     /// A documentation string
     static const std::string meta_doc;

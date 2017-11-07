@@ -83,8 +83,7 @@ namespace casadi {
     return 0;
   }
 
-  void CsparseInterface::pivoting(void* mem, const double* A) const {
-    LinsolInternal::pivoting(mem, A);
+  int CsparseInterface::sfact(void* mem, const double* A) const {
     auto m = static_cast<CsparseMemory*>(mem);
 
     // Set the nonzeros of the matrix
@@ -94,9 +93,10 @@ namespace casadi {
     int order = 0; // ordering?
     if (m->S) cs_sfree(m->S);
     m->S = cs_sqr(order, &m->A, 0);
-   }
+    return 0;
+  }
 
-  void CsparseInterface::factorize(void* mem, const double* A) const {
+  int CsparseInterface::nfact(void* mem, const double* A) const {
     auto m = static_cast<CsparseMemory*>(mem);
 
     // Set the nonzeros of the matrix
@@ -147,9 +147,10 @@ namespace casadi {
       }
     }
     casadi_assert_dev(m->N!=0);
+    return 0;
   }
 
-  void CsparseInterface::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int CsparseInterface::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseMemory*>(mem);
     casadi_assert_dev(m->N!=0);
 
@@ -170,6 +171,7 @@ namespace casadi {
       }
       x += ncol();
     }
+    return 0;
   }
 
 } // namespace casadi

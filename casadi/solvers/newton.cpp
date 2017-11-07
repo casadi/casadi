@@ -156,8 +156,8 @@ namespace casadi {
       }
 
       // Factorize the linear solver with J
-      linsol_.factorize(m->jac);
-      linsol_.solve(m->f, 1, false);
+      linsol_.nfact(m->jac);
+      linsol_.solve(m->jac, m->f, 1, false);
 
       // Check convergence again
       double abstolStep=0;

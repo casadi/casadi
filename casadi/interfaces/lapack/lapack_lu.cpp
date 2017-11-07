@@ -99,7 +99,7 @@ namespace casadi {
     return 0;
   }
 
-  void LapackLu::factorize(void* mem, const double* A) const {
+  int LapackLu::nfact(void* mem, const double* A) const {
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Dimensions
@@ -116,19 +116,13 @@ namespace casadi {
       int info = -100;
       dgeequ_(&ncol, &nrow, get_ptr(m->mat), &ncol, get_ptr(m->r),
               get_ptr(m->c), &colcnd, &rowcnd, &amax, &info);
-      if (info < 0)
-          throw CasadiException("LapackQrDense::prepare: "
-                                "dgeequ_ failed to calculate the scaling factors");
-      if (info>0) {
+      if (info < 0) return 1;
+      if (info > 0) {
         stringstream ss;
         ss << "LapackLu::prepare: ";
         if (info<=ncol)  ss << (info-1) << "-th row (zero-based) is exactly zero";
         else             ss << (info-1-ncol) << "-th col (zero-based) is exactly zero";
-
         uout() << "Warning: " << ss.str() << endl;
-
-
-
         if (allow_equilibration_failure_)  uout() << "Warning: " << ss.str() << endl;
         else                              casadi_error(ss.str());
       }
@@ -144,11 +138,14 @@ namespace casadi {
     // Factorize the matrix
     int info = -100;
     dgetrf_(&ncol, &ncol, get_ptr(m->mat), &ncol, get_ptr(m->ipiv), &info);
-    casadi_assert(info==0, "LapackLu::prepare: "
-                          "dgetrf_ failed to factorize the Jacobian");
+    if (info) {
+      if (verbose_) casadi_warning("dgetrf_ failed: Info: " + str(info));
+      return 1;
+    }
+    return 0;
   }
 
-  void LapackLu::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int LapackLu::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Dimensions
@@ -172,8 +169,7 @@ namespace casadi {
     int info = 100;
     char trans = tr ? 'T' : 'N';
     dgetrs_(&trans, &ncol, &nrhs, get_ptr(m->mat), &ncol, get_ptr(m->ipiv), x, &ncol, &info);
-    if (info != 0) throw CasadiException("LapackLu::solve: "
-                                        "failed to solve the linear system");
+    if (info) return 1;
 
     // Scale the solution
     if (tr) {
@@ -187,6 +183,7 @@ namespace casadi {
           for (int i=0; i<nrow; ++i)
             x[i+rhs*nrow] *= m->c[i];
     }
+    return 0;
   }
 
 } // namespace casadi

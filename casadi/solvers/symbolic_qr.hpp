@@ -103,10 +103,10 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<SymbolicQrMemory*>(mem);}
 
     // Factorize the linear system
-    void factorize(void* mem, const double* A) const override;
+    int nfact(void* mem, const double* A) const override;
 
     // Solve the linear system
-    void solve(void* mem, double* x, int nrhs, bool tr) const override;
+    int solve(void* mem, const double* A, double* x, int nrhs, bool tr) const override;
 
     /** \brief Evaluate symbolically (SX) */
     void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,

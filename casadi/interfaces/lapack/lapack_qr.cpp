@@ -84,7 +84,7 @@ namespace casadi {
     return 0;
   }
 
-  void LapackQr::factorize(void* mem, const double* A) const {
+  int LapackQr::nfact(void* mem, const double* A) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Dimensions
@@ -99,23 +99,27 @@ namespace casadi {
     int lwork = m->work.size();
     dgeqrf_(&ncol, &ncol, get_ptr(m->mat), &ncol, get_ptr(m->tau),
             get_ptr(m->work), &lwork, &info);
-    casadi_assert(info == 0,
-      "LapackQr::prepare: dgeqrf_ failed to factorize the Jacobian. Info: " + str(info) + ".");
+    if (info) {
+      if (verbose_) casadi_warning("dgeqrf_ failed: Info: " + str(info));
+      return 1;
+    }
+    return 0;
   }
 
-  void LapackQr::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int LapackQr::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Solve up to max_nrhs rhs at a time
     int offset = 0;
     while (nrhs>0) {
-      _solve(m, x+offset, min(max_nrhs_, nrhs), tr);
+      if (solve_batch(m, A, x+offset, min(max_nrhs_, nrhs), tr)) return 1;
       nrhs-= max_nrhs_;
       offset+= max_nrhs_*nrow();
     }
+    return 0;
   }
 
-  void LapackQr::_solve(void* mem, double* x, int nrhs, bool tr) const {
+  int LapackQr::solve_batch(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Dimensions
@@ -160,6 +164,7 @@ namespace casadi {
       dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,
              get_ptr(m->mat), &ncol, x, &ncol);
     }
+    return 0;
   }
 
 } // namespace casadi

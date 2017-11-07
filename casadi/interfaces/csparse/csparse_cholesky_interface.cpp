@@ -86,8 +86,7 @@ namespace casadi {
     return 0;
   }
 
-  void CSparseCholeskyInterface::pivoting(void* mem, const double* A) const {
-    LinsolInternal::pivoting(mem, A);
+  int CSparseCholeskyInterface::sfact(void* mem, const double* A) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     // Set the nonzeros of the matrix
@@ -96,9 +95,10 @@ namespace casadi {
     // ordering and symbolic analysis
     int order = 0; // ordering?
     m->S = cs_schol(order, &m->A);
+    return 0;
   }
 
-  void CSparseCholeskyInterface::factorize(void* mem, const double* A) const {
+  int CSparseCholeskyInterface::nfact(void* mem, const double* A) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     // Set the nonzeros of the matrix
@@ -116,6 +116,7 @@ namespace casadi {
     if (m->L) cs_nfree(m->L);
     m->L = cs_chol(&m->A, m->S) ;                 // numeric Cholesky factorization
     casadi_assert_dev(m->L!=0);
+    return 0;
   }
 
   Sparsity CSparseCholeskyInterface::linsol_cholesky_sparsity(void* mem, bool tr) const {
@@ -169,7 +170,8 @@ namespace casadi {
     return tr ? ret.T() : ret;
   }
 
-  void CSparseCholeskyInterface::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int CSparseCholeskyInterface::
+  solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     casadi_assert_dev(m->L!=0);
@@ -189,6 +191,7 @@ namespace casadi {
       }
       x += this->ncol();
     }
+    return 0;
   }
 
   void CSparseCholeskyInterface::solve_cholesky(void* mem, double* x, int nrhs, bool tr) const {

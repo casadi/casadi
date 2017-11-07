@@ -84,7 +84,7 @@ namespace casadi {
     return 0;
   }
 
-  void Ma27Interface::factorize(void* mem, const double* A) const {
+  int Ma27Interface::nfact(void* mem, const double* A) const {
     auto m = static_cast<Ma27Memory*>(mem);
     casadi_assert_dev(A!=0);
 
@@ -158,6 +158,7 @@ namespace casadi {
 
     // Real work array
     if (m->w.size() < m->maxfrt) m->w.resize(m->maxfrt);
+    return 0;
   }
 
   int Ma27Interface::neig(void* mem) const {
@@ -170,7 +171,7 @@ namespace casadi {
     return m->rank;
   }
 
-  void Ma27Interface::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int Ma27Interface::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<Ma27Memory*>(mem);
 
     // Solve for each right-hand-side
@@ -182,6 +183,7 @@ namespace casadi {
               &m->maxfrt, x, get_ptr(m->iw1), &m->nsteps, m->icntl, m->cntl);
       x += N;
     }
+    return 0;
   }
 
   Ma27Memory::Ma27Memory() {

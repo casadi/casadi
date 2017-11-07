@@ -860,7 +860,7 @@ namespace casadi {
     for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->lin_map[i]];
 
     // Pass to linear solver
-    m->linsol.pivoting(get_ptr(m->nz));
+    m->linsol.sfact(get_ptr(m->nz));
 
     return 0;
   }
@@ -874,7 +874,7 @@ namespace casadi {
     for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->lin_map[i]];
 
     // Pass to linear solver
-    m->linsol.factorize(get_ptr(m->nz));
+    m->linsol.nfact(get_ptr(m->nz));
 
     // Number of negative eigenvalues
     if (neig) *neig = m->linsol.neig();
@@ -890,7 +890,7 @@ namespace casadi {
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Pass to linear solver
-    m->linsol.solve(rhs, nrhs);
+    m->linsol.solve(get_ptr(m->nz), rhs, nrhs);
 
     return 0;
   }

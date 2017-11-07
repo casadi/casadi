@@ -36,10 +36,10 @@ namespace casadi {
 
   struct CASADI_EXPORT LinsolMemory {
     // Current state of factorization
-    bool is_pivoted, is_factorized;
+    bool is_sfact, is_nfact;
 
     // Constructor
-    LinsolMemory() : is_pivoted(false), is_factorized(false) {}
+    LinsolMemory() : is_sfact(false), is_nfact(false) {}
   };
 
   /** Internal class
@@ -79,14 +79,25 @@ namespace casadi {
     /// Solve Cholesky
     virtual void solve_cholesky(void* mem, double* x, int nrhs, bool tr) const;
 
-    // Symbolic factorization - partial pivoting (optional)
-    virtual void pivoting(void* mem, const double* A) const {}
+#if 0
+    // (Re)factorize the system
+    int factorize(void* mem, const double* A) const;
 
-    /// Factorize the linear system
-    virtual void factorize(void* mem, const double* A) const;
+    // Needs symbolic factorization
+    virtual bool needs_sfact(void* mem, const double* A) const;
+
+    // Needs numeric factorization
+    virtual bool needs_nfact(void* mem, const double* A) const;
+#endif
+
+    // Symbolic factorization
+    virtual int sfact(void* mem, const double* A) const { return 0;}
+
+    /// Numeric factorization
+    virtual int nfact(void* mem, const double* A) const;
 
     // Solve numerically
-    virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
+    virtual int solve(void* mem, const double* A, double* x, int nrhs, bool tr) const;
 
     /// Sparsity pattern of the cholesky factors
     virtual Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const;
