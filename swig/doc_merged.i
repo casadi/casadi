@@ -25100,6 +25100,11 @@ memory block.
 
 %feature("docstring") casadi::LapackLu::sfact "[INTERNAL] ";
 
+%feature("docstring") casadi::LapackLu::generate "[INTERNAL]  Generate C
+code.
+
+";
+
 %feature("docstring") casadi::LapackLu::linsol_eval_sx "[INTERNAL]
 Evaluate SX, possibly transposed.
 
@@ -25774,6 +25779,11 @@ Evaluate SX, possibly transposed.
 
 %feature("docstring") casadi::LapackQr::neig "[INTERNAL]  Number of
 negative eigenvalues.
+
+";
+
+%feature("docstring") casadi::LapackQr::generate "[INTERNAL]  Generate C
+code.
 
 ";
 
@@ -27774,6 +27784,11 @@ Evaluate SX, possibly transposed.
 
 ";
 
+%feature("docstring") casadi::LinsolLdl::generate "[INTERNAL]  Generate C
+code.
+
+";
+
 %feature("docstring") casadi::LinsolLdl::finalize "[INTERNAL]  Finalize the
 object creation This function, which visits the class hierarchy in reverse
 order is run after init() has been completed.
@@ -27915,6 +27930,11 @@ memory block.
 
 %feature("docstring") casadi::LinsolQr::sfact "[INTERNAL] ";
 
+%feature("docstring") casadi::LinsolQr::generate "[INTERNAL]  Generate C
+code.
+
+";
+
 %feature("docstring") casadi::LinsolQr::get_options "[INTERNAL]  Options.
 
 ";
@@ -27957,6 +27977,10 @@ factorization.
 ";
 
 %feature("docstring") casadi::Lsqr::sfact "[INTERNAL] ";
+
+%feature("docstring") casadi::Lsqr::generate "[INTERNAL]  Generate C code.
+
+";
 
 %feature("docstring") casadi::Lsqr::solve "[INTERNAL] ";
 
@@ -45245,8 +45269,8 @@ C++ includes: symbolic_qr.hpp ";
 
 %feature("docstring") casadi::SymbolicQr::ncol "[INTERNAL] ";
 
-%feature("docstring") casadi::SymbolicQr::nfact "[INTERNAL]  Numeric
-factorization.
+%feature("docstring") casadi::SymbolicQr::generate "[INTERNAL]  Generate C
+code.
 
 ";
 
@@ -45281,6 +45305,11 @@ reverse order is run after init() has been completed.
 ";
 
 %feature("docstring") casadi::SymbolicQr::solve "[INTERNAL] ";
+
+%feature("docstring") casadi::SymbolicQr::nfact "[INTERNAL]  Numeric
+factorization.
+
+";
 
 %feature("docstring") casadi::SymbolicQr::sfact "[INTERNAL] ";
 

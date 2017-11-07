@@ -34729,6 +34729,13 @@ double *x, int nrhs, bool tr) const override "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::LinsolInternal::generate(CodeGenerator &g,
+const std::string &A, const std::string &x, int nrhs, bool tr) const  "
+
+[INTERNAL]  Generate C code.
+
+";
+
 %feature("docstring")  casadi::LinsolInternal::linsol_eval_sx(const SXElem
 **arg, SXElem **res, int *iw, SXElem *w, void *mem, bool tr, int nrhs) const
 "
@@ -35481,6 +35488,13 @@ C++ includes: lapack_qr.hpp ";
 *A) const  "
 
 [INTERNAL]  Number of negative eigenvalues.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::generate(CodeGenerator &g,
+const std::string &A, const std::string &x, int nrhs, bool tr) const  "
+
+[INTERNAL]  Generate C code.
 
 ";
 
@@ -38309,6 +38323,13 @@ const override "
 
 ";
 
+%feature("docstring")  casadi::LinsolInternal::generate(CodeGenerator &g,
+const std::string &A, const std::string &x, int nrhs, bool tr) const  "
+
+[INTERNAL]  Generate C code.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::finalize(const Dict &opts) "
 
 [INTERNAL]  Finalize the object creation This function, which visits the
@@ -38515,6 +38536,13 @@ const override "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::LinsolQr::generate(CodeGenerator &g, const
+std::string &A, const std::string &x, int nrhs, bool tr) const override "
+
+[INTERNAL]  Generate C code.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::get_options() const  "
 
 [INTERNAL]  Options.
@@ -38572,6 +38600,13 @@ override "
 *A) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::LinsolInternal::generate(CodeGenerator &g,
+const std::string &A, const std::string &x, int nrhs, bool tr) const  "
+
+[INTERNAL]  Generate C code.
+
+";
 
 %feature("docstring")  casadi::Lsqr::solve(void *mem, const double *A,
 double *x, int nrhs, bool tr) const override "
@@ -62219,10 +62254,10 @@ C++ includes: symbolic_qr.hpp ";
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::SymbolicQr::nfact(void *mem, const double *A)
-const override "
+%feature("docstring")  casadi::LinsolInternal::generate(CodeGenerator &g,
+const std::string &A, const std::string &x, int nrhs, bool tr) const  "
 
-[INTERNAL]  Numeric factorization.
+[INTERNAL]  Generate C code.
 
 ";
 
@@ -62272,6 +62307,13 @@ class hierarchy in reverse order is run after init() has been completed.
 double *x, int nrhs, bool tr) const override "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::SymbolicQr::nfact(void *mem, const double *A)
+const override "
+
+[INTERNAL]  Numeric factorization.
+
+";
 
 %feature("docstring")  casadi::LinsolInternal::sfact(void *mem, const double
 *A) const  "

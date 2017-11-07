@@ -1141,6 +1141,9 @@
 %exception  casadi::LinsolInternal::disp_more(std::ostream &stream) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::LinsolInternal::generate(CodeGenerator &g, const std::string &A, const std::string &x, int nrhs, bool tr) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::LinsolInternal::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1172,6 +1175,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinsolQr::class_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolQr::generate(CodeGenerator &g, const std::string &A, const std::string &x, int nrhs, bool tr) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinsolQr::init(const Dict &opts) override {
