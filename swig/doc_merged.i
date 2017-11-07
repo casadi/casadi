@@ -25067,6 +25067,11 @@ exception.hpp ";
 
 ";
 
+%feature("docstring") casadi::LapackLu::nrow "[INTERNAL]  Get sparsity
+pattern.
+
+";
+
 %feature("docstring") casadi::LapackLu::solve "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackLu::init "[INTERNAL]  Initialize the
@@ -25104,10 +25109,7 @@ the linear system.
 
 ";
 
-%feature("docstring") casadi::LapackLu::clear_mem "[INTERNAL]  Clear all
-memory (called from destructor)
-
-";
+%feature("docstring") casadi::LapackLu::ncol "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackLu::LapackLu "[INTERNAL] ";
 
@@ -25133,6 +25135,8 @@ memory object.
 
 ";
 
+%feature("docstring") casadi::LapackLu::colind "[INTERNAL] ";
+
 %feature("docstring") casadi::LapackLu::alloc_mem "[INTERNAL]  Create
 memory block.
 
@@ -25142,6 +25146,8 @@ memory block.
 reference to the object.
 
 ";
+
+%feature("docstring") casadi::LapackLu::nnz "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackLu::release "[INTERNAL]  Release a
 memory object.
@@ -25407,9 +25413,16 @@ Diagrams
 
 C++ includes: lapack_lu.hpp ";
 
+%feature("docstring") casadi::LapackLu::clear_mem "[INTERNAL]  Clear all
+memory (called from destructor)
+
+";
+
 %feature("docstring") casadi::LapackLu::linsol_cholesky_sparsity "[INTERNAL]   Sparsity pattern of the cholesky factors.
 
 ";
+
+%feature("docstring") casadi::LapackLu::row "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackLu::get_options "[INTERNAL]  Options.
 
@@ -25494,10 +25507,14 @@ memory object.
 
 ";
 
+%feature("docstring") casadi::LapackQr::colind "[INTERNAL] ";
+
 %feature("docstring") casadi::LapackQr::weak "[INTERNAL]  Get a weak
 reference to the object.
 
 ";
+
+%feature("docstring") casadi::LapackQr::nnz "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackQr::release "[INTERNAL]  Release a
 memory object.
@@ -25760,6 +25777,8 @@ Diagrams
 
 C++ includes: lapack_qr.hpp ";
 
+%feature("docstring") casadi::LapackQr::row "[INTERNAL] ";
+
 %feature("docstring") casadi::LapackQr::init_mem "[INTERNAL]  Initalize
 memory block.
 
@@ -25799,6 +25818,11 @@ name of the internal class.
 
 ";
 
+%feature("docstring") casadi::LapackQr::nrow "[INTERNAL]  Get sparsity
+pattern.
+
+";
+
 %feature("docstring") casadi::LapackQr::solve "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackQr::~LapackQr "[INTERNAL] ";
@@ -25813,6 +25837,8 @@ Prepares the function for evaluation.
 ";
 
 %feature("docstring") casadi::LapackQr::pivoting "[INTERNAL] ";
+
+%feature("docstring") casadi::LapackQr::ncol "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackQr::plugin_name "[INTERNAL] ";
 
@@ -27463,10 +27489,10 @@ Create a solve node.
 
 Default constructor.
 
->  casadi::Linsol::Linsol(const std::string &name, const std::string &solver, const Dict &opts=Dict())
+>  casadi::Linsol::Linsol(const std::string &name, const std::string &solver, const Sparsity &sp, const Dict &opts=Dict())
 ------------------------------------------------------------------------
 
-Importer factory.
+Constructor.
 
 ";
 
@@ -27695,10 +27721,16 @@ pointer to the internal class
 
 
 // File: classcasadi_1_1LinsolLdl.xml
+%feature("docstring") casadi::LinsolLdl::nnz "[INTERNAL] ";
+
 %feature("docstring") casadi::LinsolLdl::factorize "[INTERNAL]  Factorize
 the linear system.
 
 ";
+
+%feature("docstring") casadi::LinsolLdl::ncol "[INTERNAL] ";
+
+%feature("docstring") casadi::LinsolLdl::row "[INTERNAL] ";
 
 %feature("docstring") casadi::LinsolLdl::disp "[INTERNAL]  Display object.
 
@@ -27813,7 +27845,14 @@ memory object.
 
 %feature("docstring") casadi::LinsolLdl::solve "[INTERNAL] ";
 
+%feature("docstring") casadi::LinsolLdl::nrow "[INTERNAL]  Get sparsity
+pattern.
+
+";
+
 %feature("docstring") casadi::LinsolLdl::pivoting "[INTERNAL] ";
+
+%feature("docstring") casadi::LinsolLdl::colind "[INTERNAL] ";
 
 %feature("docstring") casadi::LinsolLdl::free_mem "[INTERNAL]  Free memory
 block.
@@ -27863,6 +27902,8 @@ the linear system.
 
 %feature("docstring") casadi::LinsolQr::~LinsolQr "[INTERNAL] ";
 
+%feature("docstring") casadi::LinsolQr::ncol "[INTERNAL] ";
+
 %feature("docstring") casadi::LinsolQr::memory "[INTERNAL]  Memory objects.
 
 ";
@@ -27887,6 +27928,8 @@ reference to the object.
 
 ";
 
+%feature("docstring") casadi::LinsolQr::colind "[INTERNAL] ";
+
 %feature("docstring") casadi::LinsolQr::disp_more "[INTERNAL]  Print more.
 
 ";
@@ -27895,6 +27938,8 @@ reference to the object.
 memory block.
 
 ";
+
+%feature("docstring") casadi::LinsolQr::nnz "[INTERNAL] ";
 
 %feature("docstring") casadi::LinsolQr::release "[INTERNAL]  Release a
 memory object.
@@ -27911,9 +27956,16 @@ Evaluate SX, possibly transposed.
 
 ";
 
+%feature("docstring") casadi::LinsolQr::nrow "[INTERNAL]  Get sparsity
+pattern.
+
+";
+
 %feature("docstring") casadi::LinsolQr::rank "[INTERNAL]   Matrix rank.
 
 ";
+
+%feature("docstring") casadi::LinsolQr::row "[INTERNAL] ";
 
 %feature("docstring") casadi::LinsolQr "[INTERNAL]  'qr' plugin for
 LinsolInternal
@@ -27963,9 +28015,13 @@ C++ includes: casadi_logger.hpp ";
 
 
 // File: classcasadi_1_1Lsqr.xml
+%feature("docstring") casadi::Lsqr::row "[INTERNAL] ";
+
 %feature("docstring") casadi::Lsqr::pivoting "[INTERNAL] ";
 
 %feature("docstring") casadi::Lsqr::solve "[INTERNAL] ";
+
+%feature("docstring") casadi::Lsqr::nnz "[INTERNAL] ";
 
 %feature("docstring") casadi::Lsqr::clear_mem "[INTERNAL]  Clear all memory
 (called from destructor)
@@ -28007,6 +28063,8 @@ to the object.
 
 ";
 
+%feature("docstring") casadi::Lsqr::colind "[INTERNAL] ";
+
 %feature("docstring") casadi::Lsqr::class_name "[INTERNAL]  Readable name
 of the internal class.
 
@@ -28029,6 +28087,8 @@ object.
 %feature("docstring") casadi::Lsqr::rank "[INTERNAL]   Matrix rank.
 
 ";
+
+%feature("docstring") casadi::Lsqr::ncol "[INTERNAL] ";
 
 %feature("docstring") casadi::Lsqr::~Lsqr "[INTERNAL] ";
 
@@ -28094,6 +28154,10 @@ block.
 ";
 
 %feature("docstring") casadi::Lsqr::reset "[INTERNAL] ";
+
+%feature("docstring") casadi::Lsqr::nrow "[INTERNAL]  Get sparsity pattern.
+
+";
 
 %feature("docstring") casadi::Lsqr::free_mem "[INTERNAL]  Free memory
 block.
@@ -44994,8 +45058,18 @@ Evaluate symbolically (SX)
 
 ";
 
+%feature("docstring") casadi::SymbolicQr::memory "[INTERNAL]  Memory
+objects.
+
+";
+
 %feature("docstring") casadi::SymbolicQr::disp_more "[INTERNAL]  Print
 more.
+
+";
+
+%feature("docstring") casadi::SymbolicQr::nrow "[INTERNAL]  Get sparsity
+pattern.
 
 ";
 
@@ -45257,6 +45331,8 @@ Diagrams
 
 C++ includes: symbolic_qr.hpp ";
 
+%feature("docstring") casadi::SymbolicQr::nnz "[INTERNAL] ";
+
 %feature("docstring") casadi::SymbolicQr::factorize "[INTERNAL]  Factorize
 the linear system.
 
@@ -45298,10 +45374,9 @@ reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::memory "[INTERNAL]  Memory
-objects.
+%feature("docstring") casadi::SymbolicQr::ncol "[INTERNAL] ";
 
-";
+%feature("docstring") casadi::SymbolicQr::row "[INTERNAL] ";
 
 %feature("docstring") casadi::SymbolicQr::getCount "[INTERNAL]  Get the
 reference count.
@@ -45317,6 +45392,8 @@ memory block.
 Prepares the function for evaluation.
 
 ";
+
+%feature("docstring") casadi::SymbolicQr::colind "[INTERNAL] ";
 
 %feature("docstring") casadi::SymbolicQr::free_mem "[INTERNAL]  Free memory
 block.

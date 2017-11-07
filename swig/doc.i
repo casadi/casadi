@@ -34682,6 +34682,12 @@ bool more) const override "
 
 ";
 
+%feature("docstring")  casadi::LinsolInternal::nrow() const  "
+
+[INTERNAL]  Get sparsity pattern.
+
+";
+
 %feature("docstring")  casadi::LapackLu::solve(void *mem, double *x, int
 nrhs, bool tr) const override "
 
@@ -34738,13 +34744,12 @@ double *A) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::clear_mem() "
+%feature("docstring")  casadi::LinsolInternal::ncol() const  "
 
-[INTERNAL]  Clear all memory (called from destructor)
+[INTERNAL] ";
 
-";
-
-%feature("docstring") casadi::LapackLu::LapackLu(const std::string &name) "
+%feature("docstring") casadi::LapackLu::LapackLu(const std::string &name,
+const Sparsity &sp) "
 
 [INTERNAL] ";
 
@@ -34779,6 +34784,10 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring")  casadi::LinsolInternal::colind() const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::LapackLu::alloc_mem() const override "
 
 [INTERNAL]  Create memory block.
@@ -34790,6 +34799,10 @@ class hierarchy in reverse order is run after init() has been completed.
 [INTERNAL]  Get a weak reference to the object.
 
 ";
+
+%feature("docstring")  casadi::LinsolInternal::nnz() const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
@@ -35056,12 +35069,22 @@ Diagrams
 
 C++ includes: lapack_lu.hpp ";
 
+%feature("docstring")  casadi::ProtoFunction::clear_mem() "
+
+[INTERNAL]  Clear all memory (called from destructor)
+
+";
+
 %feature("docstring")  casadi::LinsolInternal::linsol_cholesky_sparsity(void
 *mem, bool tr) const  "
 
 [INTERNAL]   Sparsity pattern of the cholesky factors.
 
 ";
+
+%feature("docstring")  casadi::LinsolInternal::row() const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::LapackLu::get_options() const override "
 
@@ -35179,11 +35202,19 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring")  casadi::LinsolInternal::colind() const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
 
 ";
+
+%feature("docstring")  casadi::LinsolInternal::nnz() const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
@@ -35447,6 +35478,10 @@ Diagrams
 
 C++ includes: lapack_qr.hpp ";
 
+%feature("docstring")  casadi::LinsolInternal::row() const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::LapackQr::init_mem(void *mem) const override
 "
 
@@ -35474,7 +35509,8 @@ bool tr) const  "
 
 ";
 
-%feature("docstring") casadi::LapackQr::LapackQr(const std::string &name) "
+%feature("docstring") casadi::LapackQr::LapackQr(const std::string &name,
+const Sparsity &sp) "
 
 [INTERNAL] ";
 
@@ -35503,6 +35539,12 @@ double *x, int nrhs, bool tr) const  "
 
 ";
 
+%feature("docstring")  casadi::LinsolInternal::nrow() const  "
+
+[INTERNAL]  Get sparsity pattern.
+
+";
+
 %feature("docstring")  casadi::LapackQr::solve(void *mem, double *x, int
 nrhs, bool tr) const override "
 
@@ -35526,6 +35568,10 @@ nrhs, bool tr) const override "
 
 %feature("docstring")  casadi::LinsolInternal::pivoting(void *mem, const
 double *A) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::LinsolInternal::ncol() const  "
 
 [INTERNAL] ";
 
@@ -37941,9 +37987,9 @@ Default constructor.
 ";
 
 %feature("docstring") casadi::Linsol::Linsol(const std::string &name, const
-std::string &solver, const Dict &opts=Dict()) "
+std::string &solver, const Sparsity &sp, const Dict &opts=Dict()) "
 
-Importer factory.
+Constructor.
 
 ";
 
@@ -38176,12 +38222,24 @@ Query plugin name.
 
 
 // File: classcasadi_1_1LinsolLdl.xml
+%feature("docstring")  casadi::LinsolInternal::nnz() const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::LinsolLdl::factorize(void *mem, const double
 *A) const override "
 
 [INTERNAL]  Factorize the linear system.
 
 ";
+
+%feature("docstring")  casadi::LinsolInternal::ncol() const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::LinsolInternal::row() const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::LinsolInternal::disp(std::ostream &stream,
 bool more) const override "
@@ -38255,8 +38313,8 @@ bool more) const override "
 
 ";
 
-%feature("docstring") casadi::LinsolLdl::LinsolLdl(const std::string &name)
-"
+%feature("docstring") casadi::LinsolLdl::LinsolLdl(const std::string &name,
+const Sparsity &sp) "
 
 [INTERNAL] ";
 
@@ -38342,8 +38400,18 @@ nrhs, bool tr) const override "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::LinsolInternal::nrow() const  "
+
+[INTERNAL]  Get sparsity pattern.
+
+";
+
 %feature("docstring")  casadi::LinsolLdl::pivoting(void *mem, const double
 *A) const override "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::LinsolInternal::colind() const  "
 
 [INTERNAL] ";
 
@@ -38423,6 +38491,10 @@ const override "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::LinsolInternal::ncol() const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
 
 [INTERNAL]  Memory objects.
@@ -38455,6 +38527,10 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring")  casadi::LinsolInternal::colind() const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::LinsolInternal::disp_more(std::ostream
 &stream) const  "
 
@@ -38467,6 +38543,10 @@ class hierarchy in reverse order is run after init() has been completed.
 [INTERNAL]  Create memory block.
 
 ";
+
+%feature("docstring")  casadi::LinsolInternal::nnz() const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
@@ -38489,11 +38569,21 @@ double *x, int nrhs, bool tr) const  "
 
 ";
 
+%feature("docstring")  casadi::LinsolInternal::nrow() const  "
+
+[INTERNAL]  Get sparsity pattern.
+
+";
+
 %feature("docstring")  casadi::LinsolInternal::rank(void *mem) const  "
 
 [INTERNAL]   Matrix rank.
 
 ";
+
+%feature("docstring")  casadi::LinsolInternal::row() const  "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::LinsolQr "
 
@@ -38521,7 +38611,8 @@ C++ includes: linsol_qr.hpp ";
 
 ";
 
-%feature("docstring") casadi::LinsolQr::LinsolQr(const std::string &name) "
+%feature("docstring") casadi::LinsolQr::LinsolQr(const std::string &name,
+const Sparsity &sp) "
 
 [INTERNAL] ";
 
@@ -38556,6 +38647,10 @@ C++ includes: casadi_logger.hpp ";
 
 
 // File: classcasadi_1_1Lsqr.xml
+%feature("docstring")  casadi::LinsolInternal::row() const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::LinsolInternal::pivoting(void *mem, const
 double *A) const  "
 
@@ -38563,6 +38658,10 @@ double *A) const  "
 
 %feature("docstring")  casadi::Lsqr::solve(void *mem, double *x, int nrhs,
 bool tr) const override "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::LinsolInternal::nnz() const  "
 
 [INTERNAL] ";
 
@@ -38617,6 +38716,10 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring")  casadi::LinsolInternal::colind() const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::Lsqr::class_name() const override "
 
 [INTERNAL]  Readable name of the internal class.
@@ -38646,6 +38749,10 @@ class hierarchy in reverse order is run after init() has been completed.
 [INTERNAL]   Matrix rank.
 
 ";
+
+%feature("docstring")  casadi::LinsolInternal::ncol() const  "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Lsqr::~Lsqr "
 
@@ -38736,13 +38843,20 @@ override "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::LinsolInternal::nrow() const  "
+
+[INTERNAL]  Get sparsity pattern.
+
+";
+
 %feature("docstring")  casadi::Lsqr::free_mem(void *mem) const override "
 
 [INTERNAL]  Free memory block.
 
 ";
 
-%feature("docstring") casadi::Lsqr::Lsqr(const std::string &name) "
+%feature("docstring") casadi::Lsqr::Lsqr(const std::string &name, const
+Sparsity &sp) "
 
 [INTERNAL] ";
 
@@ -61903,7 +62017,7 @@ double *A) const  "
 ";
 
 %feature("docstring") casadi::SymbolicQr::SymbolicQr(const std::string
-&name) "
+&name, const Sparsity &sp) "
 
 [INTERNAL] ";
 
@@ -61944,10 +62058,22 @@ override "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
+
+[INTERNAL]  Memory objects.
+
+";
+
 %feature("docstring")  casadi::LinsolInternal::disp_more(std::ostream
 &stream) const  "
 
 [INTERNAL]  Print more.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::nrow() const  "
+
+[INTERNAL]  Get sparsity pattern.
 
 ";
 
@@ -62209,6 +62335,10 @@ Diagrams
 
 C++ includes: symbolic_qr.hpp ";
 
+%feature("docstring")  casadi::LinsolInternal::nnz() const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::SymbolicQr::factorize(void *mem, const double
 *A) const override "
 
@@ -62270,11 +62400,13 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::memory(int ind) const  "
+%feature("docstring")  casadi::LinsolInternal::ncol() const  "
 
-[INTERNAL]  Memory objects.
+[INTERNAL] ";
 
-";
+%feature("docstring")  casadi::LinsolInternal::row() const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
@@ -62294,6 +62426,10 @@ override "
 [INTERNAL]  Construct Prepares the function for evaluation.
 
 ";
+
+%feature("docstring")  casadi::LinsolInternal::colind() const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::SymbolicQr::free_mem(void *mem) const
 override "

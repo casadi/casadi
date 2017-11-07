@@ -1132,6 +1132,9 @@
 %exception  casadi::LinearInterpolantJac::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::LinsolInternal::colind() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::LinsolInternal::disp(std::ostream &stream, bool more) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1139,6 +1142,18 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinsolInternal::init(const Dict &opts) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolInternal::ncol() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolInternal::nnz() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolInternal::nrow() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolInternal::row() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinsolLdl::alloc_mem() const override {
@@ -1822,10 +1837,10 @@
 %exception casadi::JitFunction::JitFunction(const std::string &name, const std::string &body, const std::vector< std::string > &name_in, const std::vector< std::string > &name_out, const std::vector< Sparsity > &sparsity_in, const std::vector< Sparsity > &sparsity_out) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::LapackLu::LapackLu(const std::string &name) {
+%exception casadi::LapackLu::LapackLu(const std::string &name, const Sparsity &sp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::LapackQr::LapackQr(const std::string &name) {
+%exception casadi::LapackQr::LapackQr(const std::string &name, const Sparsity &sp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::LinearInterpolant::LinearInterpolant(const std::string &name, const std::vector< double > &grid, const std::vector< int > &offset, const std::vector< double > &values) {
@@ -1834,13 +1849,13 @@
 %exception casadi::LinearInterpolantJac::LinearInterpolantJac(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::LinsolLdl::LinsolLdl(const std::string &name) {
+%exception casadi::LinsolLdl::LinsolLdl(const std::string &name, const Sparsity &sp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::LinsolQr::LinsolQr(const std::string &name) {
+%exception casadi::LinsolQr::LinsolQr(const std::string &name, const Sparsity &sp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::Lsqr::Lsqr(const std::string &name) {
+%exception casadi::Lsqr::Lsqr(const std::string &name, const Sparsity &sp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Newton::Newton(const std::string &name, const Function &f) {
@@ -1900,6 +1915,6 @@
 %exception casadi::Switch::Switch(const std::string &name, const std::vector< Function > &f, const Function &f_def) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::SymbolicQr::SymbolicQr(const std::string &name) {
+%exception casadi::SymbolicQr::SymbolicQr(const std::string &name, const Sparsity &sp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
