@@ -3770,7 +3770,7 @@ namespace casadi {
 
   template<>
   Dict SX::info() const {
-    return {{"function", Function("f", {}, {*this})}};
+    return {{"function", Function("f", std::vector<SX>{}, std::vector<SX>{*this})}};
   }
 
   template<>
