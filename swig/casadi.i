@@ -2603,14 +2603,10 @@ namespace casadi{
 %extend Sparsity {
   %pythoncode %{
     def __setstate__(self, state):
-        if state:
-          self.__init__(state["nrow"],state["ncol"],state["colind"],state["row"])
-        else:
-          self.__init__()
+        self.__init__(Sparsity.from_info(state))
 
     def __getstate__(self):
-        if self.is_null(): return {}
-        return {"nrow": self.size1(), "ncol": self.size2(), "colind": numpy.array(self.colind(),dtype=int), "row": numpy.array(self.row(),dtype=int)}
+        return self.info()
   %}
 }
 
@@ -3437,12 +3433,10 @@ namespace casadi{
 
   %pythoncode %{
     def __setstate__(self, state):
-        sp = Sparsity.__new__(Sparsity)
-        sp.__setstate__(state["sparsity"])
-        self.__init__(sp,state["data"])
+        self.__init__(self.from_info(state))
 
     def __getstate__(self):
-        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros(),dtype=int)}
+        return self.info()
   %}
 }
 
@@ -3450,12 +3444,10 @@ namespace casadi{
 
   %pythoncode %{
     def __setstate__(self, state):
-        sp = Sparsity.__new__(Sparsity)
-        sp.__setstate__(state["sparsity"])
-        self.__init__(sp,state["data"])
+        self.__init__(self.from_info(state))
 
     def __getstate__(self):
-        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros(),dtype=float)}
+        return self.info()
   %}
 
 }
@@ -3463,6 +3455,133 @@ namespace casadi{
 
 } // namespace casadi
 #endif // SWIGPYTHON
+
+
+#ifdef SWIGMATLAB
+namespace casadi{
+// Logic for pickling
+%extend Matrix<int> {
+
+  %matlabcode %{
+     function s = saveobj(obj)
+        s = obj.info();
+     end
+  %}
+  %matlabcode_static %{
+     function obj = loadobj(s)
+        if isstruct(s)
+           obj = casadi.IM.from_info(s);
+        else
+           obj = s;
+        end
+     end
+  %}
+}
+
+%extend Matrix<double> {
+
+  %matlabcode %{
+     function s = saveobj(obj)
+        s = obj.info();
+     end
+  %}
+  %matlabcode_static %{
+     function obj = loadobj(s)
+        if isstruct(s)
+           obj = casadi.DM.from_info(s);
+        else
+           obj = s;
+        end
+     end
+  %}
+}
+
+%extend Sparsity {
+  %matlabcode %{
+     function s = saveobj(obj)
+        s = obj.info();
+     end
+  %}
+  %matlabcode_static %{
+     function obj = loadobj(s)
+        if isstruct(s)
+           obj = casadi.Sparsity.from_info(s);
+        else
+           obj = s;
+        end
+     end
+  %}
+}
+
+
+%extend Function {
+
+  %matlabcode %{
+     function s = saveobj(obj)
+       try
+            s = struct;
+            s.code = obj.export_code('matlab');
+            s.sparsity_in = cell(obj.n_in, 1);
+            s.name_in = cell(obj.n_in, 1);
+            for i=1:obj.n_in
+              s.sparsity_in{i} = obj.sparsity_in(i-1);
+              s.name_in{i} = obj.name_in(i-1);
+            end
+            s.sparsity_out = cell(obj.n_out, 1);
+            s.name_out = cell(obj.n_out, 1);
+            for i=1:obj.n_out
+              s.sparsity_out{i} = obj.sparsity_out(i-1);
+              s.name_out{i} = obj.name_out(i-1);
+            end
+            s.type = obj.class_name();
+            s.name = obj.name;
+            warning('Serializing of CasADi Functions is still experimental');
+        catch exception
+            warning(['Serializing of CasADi Function failed:' getReport(exception) ]);
+            s = struct;
+        end
+     end
+  %}
+  %matlabcode_static %{
+     function obj = loadobj(s)
+        warning('Serializing of CasADi Functions is still experimental');
+        try
+          if isstruct(s)
+             if ~isfield(s,'code')
+               warning('Not supported');
+               obj = casadi.Function();
+               return;
+             end
+             args_in = cell(length(s.sparsity_in),1);
+             for i=1:numel(args_in)
+               if strcmp(s.type,'MXFunction')
+                 args_in{i} = casadi.MX.sym(s.name_in{i}, s.sparsity_in{i});
+               else
+                 args_in{i} = casadi.SX.sym(s.name_in{i}, s.sparsity_in{i});
+               end
+             end
+
+             f = fopen(['temp_' s.name '.m'],'w');
+             fprintf(f, s.code);
+             fclose(f);
+             rehash
+             [args_out{1:length(s.sparsity_out)}] = feval(['temp_' s.name], args_in{:});
+             delete(['temp_' s.name '.m'])
+             obj = casadi.Function(s.name, args_in, args_out, s.name_in, s.name_out);
+          else
+             obj = s;
+          end
+        catch exception
+            warning(['Serializing of CasADi Function failed:' getReport(exception) ]);
+            s = struct;
+        end
+     end
+  %}
+
+}
+
+} // namespace casadi
+#endif // SWIGMATLAB
 
 %include <casadi/core/sx_elem.hpp>
 

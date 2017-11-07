@@ -997,6 +997,12 @@ namespace casadi {
     void export_code(const std::string& lang,
         std::ostream &stream=casadi::uout(), const Dict& options=Dict()) const;
 
+    /** Obtain information about sparsity */
+    Dict info() const;
+
+    /** Construct instance from info */
+    static Matrix from_info(const Dict& info);
+
 #ifndef SWIG
     /// Sparse matrix with a given sparsity with all values same
     Matrix(const Sparsity& sp, const Scalar& val, bool dummy);

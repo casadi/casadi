@@ -311,6 +311,12 @@ namespace casadi {
     int size(int axis) const;
     /// @}
 
+    /** Obtain information about sparsity */
+    Dict info() const;
+
+    /** Construct instance from info */
+    static Sparsity from_info(const Dict& info);
+
 #ifndef SWIG
     /** \brief Get a reference to row-vector,
      * containing rows for all non-zero elements (see class description) */

@@ -971,6 +971,11 @@ namespace casadi {
     std::ofstream stream(fname);
     return (*this)->export_code(lang, stream, options);
   }
+  std::string Function::export_code(const std::string& lang, const Dict& options) const {
+    std::stringstream ss;
+    (*this)->export_code(lang, ss, options);
+    return ss.str();
+  }
 
   string Function::name() const {
     if (is_null()) {
