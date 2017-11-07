@@ -526,3 +526,38 @@ void casadi_qr_trs(const int* sp_r, const T1* nz_r, T1* x, int tr) {
     }
   }
 }
+
+// SYMBOL "qr_solve"
+// Solve a factorized linear system
+template<typename T1>
+void casadi_qr_solve(T1* x, int nrhs, bool tr,
+                     const int* sp_v, const T1* v, const int* sp_r, const T1* r,
+                     const T1* beta, const int* pinv, T1* w) {
+  int k, c;
+  int nrow_ext = sp_v[0], ncol = sp_v[1];
+  for (k=0; k<nrhs; ++k) {
+    if (tr) {
+      // ('P'Q R)' x = R'Q'P x = b <-> x = P' Q R' \ b
+      // Copy to w
+      casadi_copy(x, ncol, w);
+      //  Solve for R'
+      casadi_qr_trs(sp_r, r, w, 1);
+      // Multiply by Q
+      casadi_qr_mv(sp_v, v, beta, w, 0);
+      // Multiply by P'
+      for (c=0; c<ncol; ++c) x[c] = w[pinv[c]];
+    } else {
+      //P'Q R x = b <-> x = R \ Q' P b
+      // Multiply with P
+      casadi_fill(w, nrow_ext, 0.);
+      for (c=0; c<ncol; ++c) w[pinv[c]] = x[c];
+      // Multiply with Q'
+      casadi_qr_mv(sp_v, v, beta, w, 1);
+      //  Solve for R
+      casadi_qr_trs(sp_r, r, w, 0);
+      // Copy to x
+      casadi_copy(w, ncol, x);
+    }
+    x += ncol;
+  }
+}
