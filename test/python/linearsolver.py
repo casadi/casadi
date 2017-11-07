@@ -268,7 +268,7 @@ class LinearSolverTests(casadiTestCase):
         A0 = A.T+A
       else:
         A0 = A
-      solver = casadi.Linsol("solver", Solver, options)
+      solver = casadi.Linsol("solver", Solver, A0.sparsity(), options)
       b = DM([1,0.5])
       x = solver.solve(A0.T, b)
       res = np.linalg.solve(A0.T,b)
@@ -282,7 +282,7 @@ class LinearSolverTests(casadiTestCase):
         A0 = A.T+A
       else:
         A0 = A
-      solver = casadi.Linsol("solver", Solver, options)
+      solver = casadi.Linsol("solver", Solver, A0.sparsity(), options)
       b = DM([1,0.5])
       x = solver.solve(A0, b)
       res = np.linalg.solve(A0,b)
@@ -297,7 +297,7 @@ class LinearSolverTests(casadiTestCase):
       b = MX.sym("b",b_.sparsity())
       if "symmetry" in req: A_ = A_.T + A_
       print(Solver)
-      solver = casadi.Linsol("solver", Solver, options)
+      solver = casadi.Linsol("solver", Solver, A.sparsity(), options)
       solver_in = {}
       solver_in["A"]=A_
       solver_in["B"]=b_
@@ -334,7 +334,7 @@ class LinearSolverTests(casadiTestCase):
         A = MX.sym("A",A_.sparsity())
         b = MX.sym("b",b_.sparsity())
         print(Solver)
-        solver = casadi.Linsol("solver", Solver, options)
+        solver = casadi.Linsol("solver", Solver, A.sparsity(), options)
         for tr in [True, False]:
           x = solver.solve(A,b,tr)
           f = Function("f", [A,b],[x])
