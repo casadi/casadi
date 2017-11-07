@@ -192,7 +192,7 @@ namespace casadi {
 
       m->dpse_solvers[i].reserve(n_*(n_+1)/2);
       for (int k=0;k<n_*(n_+1)/2;++k) {
-        m->dpse_solvers[i].push_back(Linsol("solver", linear_solver_));
+        m->dpse_solvers[i].push_back(Linsol("solver", linear_solver_, sp));
         m->dpse_solvers[i][k].reset(sp);
       }
     }
