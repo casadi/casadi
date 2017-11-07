@@ -50,7 +50,7 @@ namespace casadi {
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
-                          const std::vector<int>& arg, const std::vector<int>& res) const override;
+                  const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /// Evaluate the function (template)
     template<typename T>

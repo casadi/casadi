@@ -102,6 +102,10 @@ namespace casadi {
     /// Matrix rank
     virtual int rank(void* mem, const double* A) const;
 
+    /// Generate C code
+    virtual void generate(CodeGenerator& g, const std::string& A, const std::string& x,
+                          int nrhs, bool tr) const;
+
     // Creator function for internal class
     typedef LinsolInternal* (*Creator)(const std::string& name, const Sparsity& sp);
 

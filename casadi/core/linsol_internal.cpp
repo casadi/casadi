@@ -102,6 +102,11 @@ namespace casadi {
     casadi_error("'rank' not defined for " + class_name());
   }
 
+  void LinsolInternal::generate(CodeGenerator& g, const std::string& A, const std::string& x,
+                                int nrhs, bool tr) const {
+    g << "#error " <<  class_name() << " does not support code generation\n";
+  }
+
   std::map<std::string, LinsolInternal::Plugin> LinsolInternal::solvers_;
 
   const std::string LinsolInternal::infix_ = "linsol";

@@ -240,23 +240,30 @@ namespace casadi {
   }
 
   template<bool Tr>
-  size_t Solve<Tr>::sz_arg() const {
-    return n_dep() /*+ linsol_->sz_arg() */;
-  }
-
-  template<bool Tr>
-  size_t Solve<Tr>::sz_res() const {
-    return nout() /*+ linsol_->sz_res() */;
-  }
-
-  template<bool Tr>
-  size_t Solve<Tr>::sz_iw() const {
-    return 0 /*linsol_->sz_iw() */;
-  }
-
-  template<bool Tr>
   size_t Solve<Tr>::sz_w() const {
-    return /*linsol_->sz_w() +*/ sparsity().size1();
+    return sparsity().size1();
+  }
+
+  template<bool Tr>
+  void Solve<Tr>::generate(CodeGenerator& g,
+                           const std::vector<int>& arg, const std::vector<int>& res) const {
+    // Number of right-hand-sides
+    int nrhs = dep(0).size2();
+
+    // Array for x
+    g.local("rr", "casadi_real", "*");
+    g << "rr = " << g.work(res[0], nnz()) << ";\n";
+
+    // Array for A
+    g.local("ss", "casadi_real", "*");
+    g << "ss = " << g.work(arg[1], dep(1).nnz()) << ";\n";
+
+    // Copy b to x if not inplace
+    if (arg[0]!=res[0]) {
+      g << g.copy(g.work(arg[0], nnz()), nnz(), "rr") << '\n';
+    }
+    // Solver specific codegen
+    linsol_->generate(g, "ss", "rr", nrhs, Tr);
   }
 
 } // namespace casadi
