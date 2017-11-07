@@ -1673,4 +1673,27 @@ namespace casadi {
     }
   }
 
+  Dict Sparsity::info() const {
+    if (is_null()) return Dict();
+    return {{"nrow", size1()}, {"ncol", size2()}, {"colind", get_colind()}, {"row", get_row()}};
+  }
+
+  Sparsity Sparsity::from_info(const Dict& info) {
+    auto it = info.find("nrow");
+    if (it==info.end()) return Sparsity();
+    int nrow = info.at("nrow");
+    int ncol = info.at("ncol");
+    std::vector<int> row, colind;
+    if (info.at("row").is_int_vector()) {
+      row = info.at("row");
+    } else {
+      row.push_back(info.at("row"));
+    }
+    if (info.at("colind").is_int_vector()) {
+      colind = info.at("colind");
+    } else {
+      colind.push_back(info.at("colind"));
+    }
+    return Sparsity(nrow, ncol, colind, row);
+  }
 } // namespace casadi

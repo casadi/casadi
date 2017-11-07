@@ -3744,6 +3744,41 @@ namespace casadi {
     }
   }
 
+  template<>
+  Dict DM::info() const {
+    return {{"sparsity", sparsity().info()}, {"data", nonzeros()}};
+  }
+
+  template<>
+  DM DM::from_info(const Dict& info) {
+    Sparsity sp = Sparsity::from_info(info.at("sparsity"));
+    std::vector<double> data = info.at("data");
+    return DM(sp, data);
+  }
+
+  template<>
+  Dict IM::info() const {
+    return {{"sparsity", sparsity().info()}, {"data", nonzeros()}};
+  }
+
+  template<>
+  IM IM::from_info(const Dict& info) {
+    Sparsity sp = Sparsity::from_info(info.at("sparsity"));
+    std::vector<int> data = info.at("data");
+    return IM(sp, data);
+  }
+
+  template<>
+  Dict SX::info() const {
+    return {{"function", Function("f", {}, {*this})}};
+  }
+
+  template<>
+  SX SX::from_info(const Dict& info) {
+    casadi_error("Not implemented");
+    return SX();
+  }
+
   // Instantiate templates
   template class casadi_limits<double>;
   template class casadi_limits<int>;

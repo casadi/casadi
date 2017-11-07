@@ -673,12 +673,16 @@ namespace casadi {
      *
      * Only allowed for (a subset of) SX/MX Functions
      */
-    void export_code(const std::string& lang,
-      std::ostream &stream=casadi::uout(), const Dict& options=Dict()) const;
-
+    ///@{
     void export_code(const std::string& lang,
       const std::string &fname, const Dict& options=Dict()) const;
 
+    std::string export_code(const std::string& lang, const Dict& options=Dict()) const;
+#ifndef SWIG
+    void export_code(const std::string& lang,
+      std::ostream &stream, const Dict& options=Dict()) const;
+#endif // SWIG
+    ///@}
 #ifndef SWIG
     /// \cond INTERNAL
     /// Get a const pointer to the node
