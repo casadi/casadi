@@ -81,23 +81,34 @@ namespace casadi {
     /// Query plugin name
     std::string plugin_name() const;
 
-    /// Solve numerically
-    DM solve(const DM& A, const DM& B, bool tr=false) const;
+    /// Get linear system sparsity
+    const Sparsity& sparsity() const;
 
-    /// Create a solve node
-    MX solve(const MX& A, const MX& B, bool tr=false) const;
-
-#ifndef SWIG
-    // Symbolic factorization of the linear system, e.g. selecting pivots
+    ///@{
+    /// Symbolic factorization of the linear system, e.g. selecting pivots
+    void sfact(const DM& A) const;
+    #ifndef SWIG
     int sfact(const double* A, int mem=0) const;
+    #endif // SWIG
+    ///@}
 
-    // Numeric factorization of the linear system
+    ///@{
+    /// Numeric factorization of the linear system
+    void nfact(const DM& A) const;
+    #ifndef SWIG
     int nfact(const double* A, int mem=0) const;
+    #endif // SWIG
+    ///@}
 
-    // Solve factorized linear system of equations
+    ///@{
+    /// Solve linear system of equations
+    DM solve(const DM& A, const DM& B, bool tr=false) const;
+    MX solve(const MX& A, const MX& B, bool tr=false) const;
+#ifndef SWIG
     int solve(const double* A, double* x, int nrhs=1, bool tr=false, int mem=0) const;
-
 #endif // SWIG
+    ///@}
+
     /** \brief Number of negative eigenvalues
       * Not available for all solvers
       */

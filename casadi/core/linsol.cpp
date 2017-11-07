@@ -66,6 +66,10 @@ namespace casadi {
     return (*this)->plugin_name();
   }
 
+  const Sparsity& Linsol::sparsity() const {
+    return (*this)->sp_;
+  }
+
   DM Linsol::solve(const DM& A, const DM& B, bool tr) const {
     casadi_assert(A.size1()==B.size1(),
       "Linsol::solve: Dimension mismatch. A and b must have matching row count. "
@@ -85,6 +89,16 @@ namespace casadi {
 
   MX Linsol::solve(const MX& A, const MX& B, bool tr) const {
     return A->get_solve(B, tr, *this);
+  }
+
+  void Linsol::sfact(const DM& A) const {
+    if (A.sparsity()!=sparsity()) return sfact(project(A, sparsity()));
+    if (sfact(A.ptr())) casadi_error("'sfact' failed");
+  }
+
+  void Linsol::nfact(const DM& A) const {
+    if (A.sparsity()!=sparsity()) return nfact(project(A, sparsity()));
+    if (nfact(A.ptr())) casadi_error("'nfact' failed");
   }
 
   int Linsol::sfact(const double* A, int mem) const {
