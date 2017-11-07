@@ -371,55 +371,6 @@ class LinearSolverTests(casadiTestCase):
 
           self.checkfunction(solversx,solution,digits_sens = 7)
 
-  @known_bug()
-  @requiresPlugin(Linsol,"csparsecholesky")
-  def test_cholesky(self):
-    numpy.random.seed(0)
-    n = 10
-    L = self.randDM(n,n,sparsity=0.2) +  1.5*c.diag(list(range(1,n+1)))
-    L = L[Sparsity.lower(n)]
-    M = mtimes(L,L.T)
-    b = self.randDM(n,1)
-
-    M.sparsity().spy()
-
-    S = casadi.Linsol("S", "csparsecholesky")
-    S_in = [0]*S.n_in()
-    S_in[0]=M
-    S.linsol_prepare()
-
-    self.checkarray(M,M.T)
-
-    C = S.linsol_cholesky()
-    self.checkarray(mtimes(C,C.T),M)
-    self.checkarray(C,L)
-
-    print(C)
-
-    S.linsol_cholesky_sparsity().spy()
-
-    C = solve(M,b,"csparsecholesky")
-    self.checkarray(mtimes(M,C),b)
-
-
-  @known_bug()
-  @requiresPlugin(Linsol,"csparsecholesky")
-  def test_cholesky2(self):
-    numpy.random.seed(0)
-    n = 10
-    L = c.diag(list(range(1,n+1)))
-    M = mtimes(L,L.T)
-
-    print(L)
-    S = casadi.linsol("S", "csparsecholesky", M.sparsity(), 0)
-
-    S.linsol_cholesky_sparsity().spy()
-    S_in = [0]*S.n_in();S_in[0]=M
-    S.linsol_prepare()
-
-    C = S.linsol_cholesky()
-    self.checkarray(mtimes(C,C.T),M)
-
   def test_large_sparse(self):
 
     n = 10

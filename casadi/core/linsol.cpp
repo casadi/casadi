@@ -87,10 +87,6 @@ namespace casadi {
     return A->get_solve(B, tr, *this);
   }
 
-  void Linsol::solve_cholesky(double* x, int nrhs, bool tr) const {
-    (*this)->solve_cholesky((*this)->memory(0), x, nrhs, tr);
-  }
-
   int Linsol::sfact(const double* A, int mem) const {
     if (A==0) return 1;
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
@@ -136,16 +132,7 @@ namespace casadi {
   int Linsol::solve(const double* A, double* x, int nrhs, bool tr, int mem) const {
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
     casadi_assert(m->is_nfact, "Linear system has not been factorized");
-
     return (*this)->solve(m, A, x, nrhs, tr);
-  }
-
-  Sparsity Linsol::cholesky_sparsity(bool tr) const {
-    return (*this)->linsol_cholesky_sparsity((*this)->memory(0), tr);
-  }
-
-  DM Linsol::cholesky(bool tr) const {
-    return (*this)->linsol_cholesky((*this)->memory(0), tr);
   }
 
   bool has_linsol(const string& name) {

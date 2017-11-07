@@ -119,57 +119,6 @@ namespace casadi {
     return 0;
   }
 
-  Sparsity CSparseCholeskyInterface::linsol_cholesky_sparsity(void* mem, bool tr) const {
-    auto m = static_cast<CsparseCholMemory*>(mem);
-
-    casadi_assert_dev(m->S);
-    int n = m->A.n;
-    int nzmax = m->S->cp[n];
-    std::vector< int > row(n+1);
-    std::copy(m->S->cp, m->S->cp+n+1, row.begin());
-    std::vector< int > colind(nzmax);
-    int *Li = &colind.front();
-    int *Lp = &row.front();
-    const cs* C;
-    C = m->S->pinv ? cs_symperm(&m->A, m->S->pinv, 1) : &m->A;
-    std::vector< int > temp(2*n);
-    int *c = &temp.front();
-    int *s = c+n;
-    for (int k = 0 ; k < n ; k++) c[k] = m->S->cp[k] ;
-    for (int k = 0 ; k < n ; k++) {       /* compute L(k, :) for L*L' = C */
-      int top = cs_ereach(C, k, m->S->parent, s, c) ;
-      for ( ; top < n ; top++) {  /* solve L(0:k-1, 0:k-1) * x = C(:, k) */
-          int i = s[top] ;               /* s[top..n-1] is pattern of L(k, :) */
-          int p = c[i]++ ;
-          Li[p] = k ;                /* store L(k, i) in row i */
-      }
-      int p = c[k]++ ;
-      Li[p] = k ;
-    }
-    Lp[n] = m->S->cp[n] ;
-    Sparsity ret(n, n, row, colind); // BUG?
-
-    return tr ? ret.T() : ret;
-
-  }
-
-  DM CSparseCholeskyInterface::linsol_cholesky(void* mem, bool tr) const {
-    auto m = static_cast<CsparseCholMemory*>(mem);
-
-    casadi_assert_dev(m->L);
-    cs *L = m->L->L;
-    int nz = L->nzmax;
-    std::vector< int > colind(L->m+1);
-    std::copy(L->p, L->p+L->m+1, colind.begin());
-    std::vector< int > row(nz);
-    std::copy(L->i, L->i+nz, row.begin());
-    std::vector< double > data(nz);
-    std::copy(L->x, L->x+nz, data.begin());
-    DM ret(Sparsity(L->n, L->m, colind, row), data, false);
-
-    return tr ? ret.T() : ret;
-  }
-
   int CSparseCholeskyInterface::
   solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
@@ -192,22 +141,6 @@ namespace casadi {
       x += this->ncol();
     }
     return 0;
-  }
-
-  void CSparseCholeskyInterface::solve_cholesky(void* mem, double* x, int nrhs, bool tr) const {
-    auto m = static_cast<CsparseCholMemory*>(mem);
-
-    casadi_assert_dev(m->L!=0);
-
-    double *t = get_ptr(m->temp);
-
-    for (int k=0; k<nrhs; ++k) {
-      cs_ipvec(m->L->pinv, x, t, m->A.n) ;   // t = P1\b
-      if (tr) cs_lsolve(m->L->L, t) ; // t = L\t
-      if (!tr) cs_ltsolve(m->L->L, t) ; // t = U\t
-      cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
-      x += ncol();
-    }
   }
 
 } // namespace casadi

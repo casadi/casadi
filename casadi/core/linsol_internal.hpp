@@ -76,9 +76,6 @@ namespace casadi {
     virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
                                bool tr, int nrhs) const;
 
-    /// Solve Cholesky
-    virtual void solve_cholesky(void* mem, double* x, int nrhs, bool tr) const;
-
 #if 0
     // (Re)factorize the system
     int factorize(void* mem, const double* A) const;
@@ -98,12 +95,6 @@ namespace casadi {
 
     // Solve numerically
     virtual int solve(void* mem, const double* A, double* x, int nrhs, bool tr) const;
-
-    /// Sparsity pattern of the cholesky factors
-    virtual Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const;
-
-    /// Get Cholesky factor
-    virtual DM linsol_cholesky(void* mem, bool tr) const;
 
     /// Number of negative eigenvalues
     virtual int neig(void* mem) const;

@@ -97,22 +97,7 @@ namespace casadi {
     // Solve factorized linear system of equations
     int solve(const double* A, double* x, int nrhs=1, bool tr=false, int mem=0) const;
 
-    /** \brief Solve the system of equations <tt>Lx = b</tt>
-        Only when a Cholesky factorization is available
-    */
-    void solve_cholesky(double* x, int nrhs, bool tr) const;
 #endif // SWIG
-
-    /** \brief Obtain a symbolic Cholesky factorization
-        Only for Cholesky solvers
-    */
-    Sparsity cholesky_sparsity(bool tr=false) const;
-
-    /** \brief Obtain a numeric Cholesky factorization
-        Only for Cholesky solvers
-     */
-    DM cholesky(bool tr=false) const;
-
     /** \brief Number of negative eigenvalues
       * Not available for all solvers
       */

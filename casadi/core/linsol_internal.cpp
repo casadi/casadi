@@ -64,10 +64,6 @@ namespace casadi {
     casadi_error("'solve' not defined for " + class_name());
   }
 
-  void LinsolInternal::solve_cholesky(void* mem, double* x, int nrhs, bool tr) const {
-    casadi_error("'solve_cholesky' not defined for " + class_name());
-  }
-
 #if 0
   int LinsolInternal::factorize(void* mem, const double* A) const {
     // Symbolic factorization, if needed
@@ -96,14 +92,6 @@ namespace casadi {
 
   int LinsolInternal::nfact(void* mem, const double* A) const {
     casadi_error("'nfact' not defined for " + class_name());
-  }
-
-  Sparsity LinsolInternal::linsol_cholesky_sparsity(void* mem, bool tr) const {
-    casadi_error("'linsol_cholesky_sparsity' not defined for " + class_name());
-  }
-
-  DM LinsolInternal::linsol_cholesky(void* mem, bool tr) const {
-    casadi_error("'linsol_cholesky' not defined for " + class_name());
   }
 
   int LinsolInternal::neig(void* mem) const {

@@ -98,15 +98,6 @@ namespace casadi {
     // Solve the linear system
     int solve(void* mem, const double* A, double* x, int nrhs, bool tr) const override;
 
-    // Solve the system of equations <tt>Lx = b</tt>
-    void solve_cholesky(void* mem, double* x, int nrhs, bool tr) const override;
-
-    /// Obtain a symbolic Cholesky factorization
-    Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const override;
-
-    /// Obtain a numeric Cholesky factorization
-    DM linsol_cholesky(void* mem, bool tr) const override;
-
     /// A documentation string
     static const std::string meta_doc;
 
