@@ -822,6 +822,26 @@ namespace casadi {
 
     // end function
     ss << "end" << std::endl;
+    ss << "function y=nonzeros_gen(x)" << std::endl;
+    ss << "  if isa(x,'casadi.SX') || isa(x,'casadi.MX') || isa(x,'casadi.DM')" << std::endl;
+    ss << "    y = x{:};" << std::endl;
+    ss << "  else" << std::endl;
+    ss << "    y = nonzeros(x);" << std::endl;
+    ss << "  end" << std::endl;
+    ss << "end" << std::endl;
+    ss << "function y=if_else_zero_gen(c,e)" << std::endl;
+    ss << "  if isa(c+e,'casadi.SX') || isa(c+e,'casadi.MX') || isa(c+e,'casadi.DM')" << std::endl;
+    ss << "    y = if_else(c, e, 0);" << std::endl;
+    ss << "  else" << std::endl;
+    ss << "    if c" << std::endl;
+    ss << "        y = x;" << std::endl;
+    ss << "    else" << std::endl;
+    ss << "        y = 0;" << std::endl;
+    ss << "    end" << std::endl;
+    ss << "  end" << std::endl;
+    ss << "end" << std::endl;
+
+
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
