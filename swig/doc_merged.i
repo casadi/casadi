@@ -25063,7 +25063,8 @@ exception.hpp ";
 
 
 // File: classcasadi_1_1LapackLu.xml
-%feature("docstring") casadi::LapackLu::disp "[INTERNAL]  Display object.
+%feature("docstring") casadi::LapackLu::nfact "[INTERNAL]  Numeric
+factorization.
 
 ";
 
@@ -25088,8 +25089,6 @@ Prepares the function for evaluation.
 
 ";
 
-%feature("docstring") casadi::LapackLu::pivoting "[INTERNAL] ";
-
 %feature("docstring") casadi::LapackLu::init_mem "[INTERNAL]  Initalize
 memory block.
 
@@ -25099,21 +25098,25 @@ memory block.
 
 ";
 
+%feature("docstring") casadi::LapackLu::sfact "[INTERNAL] ";
+
 %feature("docstring") casadi::LapackLu::linsol_eval_sx "[INTERNAL]
 Evaluate SX, possibly transposed.
 
 ";
 
-%feature("docstring") casadi::LapackLu::factorize "[INTERNAL]  Factorize
-the linear system.
+%feature("docstring") casadi::LapackLu::ncol "[INTERNAL] ";
+
+%feature("docstring") casadi::LapackLu::clear_mem "[INTERNAL]  Clear all
+memory (called from destructor)
 
 ";
 
-%feature("docstring") casadi::LapackLu::ncol "[INTERNAL] ";
-
 %feature("docstring") casadi::LapackLu::LapackLu "[INTERNAL] ";
 
-%feature("docstring") casadi::LapackLu::reset "[INTERNAL] ";
+%feature("docstring") casadi::LapackLu::disp "[INTERNAL]  Display object.
+
+";
 
 %feature("docstring") casadi::LapackLu::free_mem "[INTERNAL]  Free memory
 block.
@@ -25413,15 +25416,6 @@ Diagrams
 
 C++ includes: lapack_lu.hpp ";
 
-%feature("docstring") casadi::LapackLu::clear_mem "[INTERNAL]  Clear all
-memory (called from destructor)
-
-";
-
-%feature("docstring") casadi::LapackLu::linsol_cholesky_sparsity "[INTERNAL]   Sparsity pattern of the cholesky factors.
-
-";
-
 %feature("docstring") casadi::LapackLu::row "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackLu::get_options "[INTERNAL]  Options.
@@ -25433,22 +25427,12 @@ reference count.
 
 ";
 
-%feature("docstring") casadi::LapackLu::linsol_cholesky "[INTERNAL]  Get
-Cholesky factor.
-
-";
-
 %feature("docstring") casadi::LapackLu::disp_more "[INTERNAL]  Print more.
 
 ";
 
 %feature("docstring") casadi::LapackLu::neig "[INTERNAL]  Number of
 negative eigenvalues.
-
-";
-
-%feature("docstring") casadi::LapackLu::solve_cholesky "[INTERNAL]   Solve
-Cholesky.
 
 ";
 
@@ -25472,6 +25456,8 @@ reference count.
 
 ";
 
+%feature("docstring") casadi::LapackQr::sfact "[INTERNAL] ";
+
 %feature("docstring") casadi::LapackQr::alloc_mem "[INTERNAL]  Create
 memory block.
 
@@ -25481,12 +25467,7 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::LapackQr::factorize "[INTERNAL]  Factorize
-the linear system.
-
-";
-
-%feature("docstring") casadi::LapackQr::_solve "[INTERNAL] ";
+%feature("docstring") casadi::LapackQr::ncol "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackQr::disp "[INTERNAL]  Display object.
 
@@ -25497,6 +25478,8 @@ object creation This function, which visits the class hierarchy in reverse
 order is run after init() has been completed.
 
 ";
+
+%feature("docstring") casadi::LapackQr::solve_batch "[INTERNAL] ";
 
 %feature("docstring") casadi::LapackQr::checkout "[INTERNAL]  Checkout a
 memory object.
@@ -25784,27 +25767,8 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::LapackQr::reset "[INTERNAL] ";
-
-%feature("docstring") casadi::LapackQr::linsol_cholesky "[INTERNAL]  Get
-Cholesky factor.
-
-";
-
 %feature("docstring") casadi::LapackQr::linsol_eval_sx "[INTERNAL]
 Evaluate SX, possibly transposed.
-
-";
-
-%feature("docstring") casadi::LapackQr::LapackQr "[INTERNAL] ";
-
-%feature("docstring") casadi::LapackQr::clear_mem "[INTERNAL]  Clear all
-memory (called from destructor)
-
-";
-
-%feature("docstring") casadi::LapackQr::solve_cholesky "[INTERNAL]   Solve
-Cholesky.
 
 ";
 
@@ -25813,8 +25777,20 @@ negative eigenvalues.
 
 ";
 
+%feature("docstring") casadi::LapackQr::clear_mem "[INTERNAL]  Clear all
+memory (called from destructor)
+
+";
+
+%feature("docstring") casadi::LapackQr::LapackQr "[INTERNAL] ";
+
 %feature("docstring") casadi::LapackQr::class_name "[INTERNAL]  Readable
 name of the internal class.
+
+";
+
+%feature("docstring") casadi::LapackQr::nfact "[INTERNAL]  Numeric
+factorization.
 
 ";
 
@@ -25836,15 +25812,7 @@ Prepares the function for evaluation.
 
 ";
 
-%feature("docstring") casadi::LapackQr::pivoting "[INTERNAL] ";
-
-%feature("docstring") casadi::LapackQr::ncol "[INTERNAL] ";
-
 %feature("docstring") casadi::LapackQr::plugin_name "[INTERNAL] ";
-
-%feature("docstring") casadi::LapackQr::linsol_cholesky_sparsity "[INTERNAL]   Sparsity pattern of the cholesky factors.
-
-";
 
 
 // File: classcasadi_1_1LinearInterpolant.xml
@@ -27438,12 +27406,6 @@ public class instance.
 
 
 // File: classcasadi_1_1Linsol.xml
-%feature("docstring") casadi::Linsol::cholesky "
-
-Obtain a numeric Cholesky factorization Only for Cholesky solvers.
-
-";
-
 %feature("docstring") casadi::Linsol::neig "
 
 Number of negative eigenvalues Not available for all solvers.
@@ -27462,23 +27424,15 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::Linsol::cholesky_sparsity "
+%feature("docstring") casadi::Linsol::nfact "
 
-Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
+Numeric factorization of the linear system.
 
 ";
 
 %feature("docstring") casadi::Linsol::solve "
 
->  DM casadi::Linsol::solve(const DM &A, const DM &B, bool tr=false) const 
-------------------------------------------------------------------------
-
-Solve numerically.
-
->  MX casadi::Linsol::solve(const MX &A, const MX &B, bool tr=false) const 
-------------------------------------------------------------------------
-
-Create a solve node.
+Solve linear system of equations
 
 ";
 
@@ -27690,6 +27644,12 @@ Joel Andersson
 
 C++ includes: linsol.hpp ";
 
+%feature("docstring") casadi::Linsol::sfact "
+
+Symbolic factorization of the linear system, e.g. selecting pivots.
+
+";
+
 %feature("docstring") casadi::Linsol::rank "
 
 Matrix rank Not available for all solvers.
@@ -27719,14 +27679,15 @@ pointer to the internal class
 
 ";
 
+%feature("docstring") casadi::Linsol::sparsity "
+
+Get linear system sparsity.
+
+";
+
 
 // File: classcasadi_1_1LinsolLdl.xml
 %feature("docstring") casadi::LinsolLdl::nnz "[INTERNAL] ";
-
-%feature("docstring") casadi::LinsolLdl::factorize "[INTERNAL]  Factorize
-the linear system.
-
-";
 
 %feature("docstring") casadi::LinsolLdl::ncol "[INTERNAL] ";
 
@@ -27796,28 +27757,20 @@ LinsolInternal
 
 C++ includes: linsol_ldl.hpp ";
 
-%feature("docstring") casadi::LinsolLdl::solve_cholesky "[INTERNAL]   Solve
-Cholesky.
+%feature("docstring") casadi::LinsolLdl::nfact "[INTERNAL]  Numeric
+factorization.
 
 ";
 
-%feature("docstring") casadi::LinsolLdl::linsol_cholesky "[INTERNAL]  Get
-Cholesky factor.
+%feature("docstring") casadi::LinsolLdl::sfact "[INTERNAL] ";
 
-";
-
-%feature("docstring") casadi::LinsolLdl::init_mem "[INTERNAL]  Initalize
-memory block.
+%feature("docstring") casadi::LinsolLdl::getCount "[INTERNAL]  Get the
+reference count.
 
 ";
 
 %feature("docstring") casadi::LinsolLdl::linsol_eval_sx "[INTERNAL]
 Evaluate SX, possibly transposed.
-
-";
-
-%feature("docstring") casadi::LinsolLdl::getCount "[INTERNAL]  Get the
-reference count.
 
 ";
 
@@ -27828,10 +27781,6 @@ order is run after init() has been completed.
 ";
 
 %feature("docstring") casadi::LinsolLdl::plugin_name "[INTERNAL] ";
-
-%feature("docstring") casadi::LinsolLdl::linsol_cholesky_sparsity "[INTERNAL]   Sparsity pattern of the cholesky factors.
-
-";
 
 %feature("docstring") casadi::LinsolLdl::weak "[INTERNAL]  Get a weak
 reference to the object.
@@ -27850,7 +27799,10 @@ pattern.
 
 ";
 
-%feature("docstring") casadi::LinsolLdl::pivoting "[INTERNAL] ";
+%feature("docstring") casadi::LinsolLdl::init_mem "[INTERNAL]  Initalize
+memory block.
+
+";
 
 %feature("docstring") casadi::LinsolLdl::colind "[INTERNAL] ";
 
@@ -27859,20 +27811,11 @@ block.
 
 ";
 
-%feature("docstring") casadi::LinsolLdl::reset "[INTERNAL] ";
-
 
 // File: classcasadi_1_1LinsolQr.xml
-%feature("docstring") casadi::LinsolQr::linsol_cholesky "[INTERNAL]  Get
-Cholesky factor.
-
-";
-
 %feature("docstring") casadi::LinsolQr::disp "[INTERNAL]  Display object.
 
 ";
-
-%feature("docstring") casadi::LinsolQr::pivoting "[INTERNAL] ";
 
 %feature("docstring") casadi::LinsolQr::neig "[INTERNAL]  Number of
 negative eigenvalues.
@@ -27881,7 +27824,10 @@ negative eigenvalues.
 
 %feature("docstring") casadi::LinsolQr::solve "[INTERNAL] ";
 
-%feature("docstring") casadi::LinsolQr::reset "[INTERNAL] ";
+%feature("docstring") casadi::LinsolQr "[INTERNAL]  'qr' plugin for
+LinsolInternal
+
+C++ includes: linsol_qr.hpp ";
 
 %feature("docstring") casadi::LinsolQr::class_name "[INTERNAL]  Readable
 name of the internal class.
@@ -27894,11 +27840,6 @@ memory (called from destructor)
 ";
 
 %feature("docstring") casadi::LinsolQr::plugin_name "[INTERNAL] ";
-
-%feature("docstring") casadi::LinsolQr::factorize "[INTERNAL]  Factorize
-the linear system.
-
-";
 
 %feature("docstring") casadi::LinsolQr::~LinsolQr "[INTERNAL] ";
 
@@ -27946,11 +27887,6 @@ memory object.
 
 ";
 
-%feature("docstring") casadi::LinsolQr::solve_cholesky "[INTERNAL]   Solve
-Cholesky.
-
-";
-
 %feature("docstring") casadi::LinsolQr::linsol_eval_sx "[INTERNAL]
 Evaluate SX, possibly transposed.
 
@@ -27967,12 +27903,8 @@ pattern.
 
 %feature("docstring") casadi::LinsolQr::row "[INTERNAL] ";
 
-%feature("docstring") casadi::LinsolQr "[INTERNAL]  'qr' plugin for
-LinsolInternal
-
-C++ includes: linsol_qr.hpp ";
-
-%feature("docstring") casadi::LinsolQr::linsol_cholesky_sparsity "[INTERNAL]   Sparsity pattern of the cholesky factors.
+%feature("docstring") casadi::LinsolQr::nfact "[INTERNAL]  Numeric
+factorization.
 
 ";
 
@@ -27980,6 +27912,8 @@ C++ includes: linsol_qr.hpp ";
 memory block.
 
 ";
+
+%feature("docstring") casadi::LinsolQr::sfact "[INTERNAL] ";
 
 %feature("docstring") casadi::LinsolQr::get_options "[INTERNAL]  Options.
 
@@ -28017,7 +27951,12 @@ C++ includes: casadi_logger.hpp ";
 // File: classcasadi_1_1Lsqr.xml
 %feature("docstring") casadi::Lsqr::row "[INTERNAL] ";
 
-%feature("docstring") casadi::Lsqr::pivoting "[INTERNAL] ";
+%feature("docstring") casadi::Lsqr::nfact "[INTERNAL]  Numeric
+factorization.
+
+";
+
+%feature("docstring") casadi::Lsqr::sfact "[INTERNAL] ";
 
 %feature("docstring") casadi::Lsqr::solve "[INTERNAL] ";
 
@@ -28037,19 +27976,8 @@ object.
 
 ";
 
-%feature("docstring") casadi::Lsqr::linsol_cholesky_sparsity "[INTERNAL]
-Sparsity pattern of the cholesky factors.
-
-";
-
 %feature("docstring") casadi::Lsqr::neig "[INTERNAL]  Number of negative
 eigenvalues.
-
-";
-
-%feature("docstring") casadi::Lsqr::finalize "[INTERNAL]  Finalize the
-object creation This function, which visits the class hierarchy in reverse
-order is run after init() has been completed.
 
 ";
 
@@ -28088,14 +28016,7 @@ object.
 
 ";
 
-%feature("docstring") casadi::Lsqr::ncol "[INTERNAL] ";
-
 %feature("docstring") casadi::Lsqr::~Lsqr "[INTERNAL] ";
-
-%feature("docstring") casadi::Lsqr::factorize "[INTERNAL]  Factorize the
-linear system.
-
-";
 
 %feature("docstring") casadi::Lsqr::linsol_eval_sx "[INTERNAL]  Evaluate
 SX, possibly transposed.
@@ -28109,8 +28030,13 @@ block.
 
 ";
 
-%feature("docstring") casadi::Lsqr::solve_cholesky "[INTERNAL]   Solve
-Cholesky.
+%feature("docstring") casadi::Lsqr::finalize "[INTERNAL]  Finalize the
+object creation This function, which visits the class hierarchy in reverse
+order is run after init() has been completed.
+
+";
+
+%feature("docstring") casadi::Lsqr::disp "[INTERNAL]  Display object.
 
 ";
 
@@ -28139,11 +28065,6 @@ C++ includes: lsqr.hpp ";
 
 ";
 
-%feature("docstring") casadi::Lsqr::linsol_cholesky "[INTERNAL]  Get
-Cholesky factor.
-
-";
-
 %feature("docstring") casadi::Lsqr::init_mem "[INTERNAL]  Initalize memory
 block.
 
@@ -28152,8 +28073,6 @@ block.
 %feature("docstring") casadi::Lsqr::disp_more "[INTERNAL]  Print more.
 
 ";
-
-%feature("docstring") casadi::Lsqr::reset "[INTERNAL] ";
 
 %feature("docstring") casadi::Lsqr::nrow "[INTERNAL]  Get sparsity pattern.
 
@@ -28166,9 +28085,7 @@ block.
 
 %feature("docstring") casadi::Lsqr::Lsqr "[INTERNAL] ";
 
-%feature("docstring") casadi::Lsqr::disp "[INTERNAL]  Display object.
-
-";
+%feature("docstring") casadi::Lsqr::ncol "[INTERNAL] ";
 
 
 // File: classcasadi_1_1Map.xml
@@ -45018,8 +44935,6 @@ the (integer) input arguments of an atomic operation.
 
 
 // File: classcasadi_1_1SymbolicQr.xml
-%feature("docstring") casadi::SymbolicQr::pivoting "[INTERNAL] ";
-
 %feature("docstring") casadi::SymbolicQr::neig "[INTERNAL]  Number of
 negative eigenvalues.
 
@@ -45031,11 +44946,6 @@ name of the internal class.
 ";
 
 %feature("docstring") casadi::SymbolicQr::SymbolicQr "[INTERNAL] ";
-
-%feature("docstring") casadi::SymbolicQr::solve_cholesky "[INTERNAL]
-Solve Cholesky.
-
-";
 
 %feature("docstring") casadi::SymbolicQr::alloc_mem "[INTERNAL]  Create
 memory block.
@@ -45333,19 +45243,15 @@ C++ includes: symbolic_qr.hpp ";
 
 %feature("docstring") casadi::SymbolicQr::nnz "[INTERNAL] ";
 
-%feature("docstring") casadi::SymbolicQr::factorize "[INTERNAL]  Factorize
-the linear system.
+%feature("docstring") casadi::SymbolicQr::ncol "[INTERNAL] ";
+
+%feature("docstring") casadi::SymbolicQr::nfact "[INTERNAL]  Numeric
+factorization.
 
 ";
-
-%feature("docstring") casadi::SymbolicQr::solve "[INTERNAL] ";
 
 %feature("docstring") casadi::SymbolicQr::clear_mem "[INTERNAL]  Clear all
 memory (called from destructor)
-
-";
-
-%feature("docstring") casadi::SymbolicQr::linsol_cholesky_sparsity "[INTERNAL]   Sparsity pattern of the cholesky factors.
 
 ";
 
@@ -45374,7 +45280,9 @@ reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring") casadi::SymbolicQr::ncol "[INTERNAL] ";
+%feature("docstring") casadi::SymbolicQr::solve "[INTERNAL] ";
+
+%feature("docstring") casadi::SymbolicQr::sfact "[INTERNAL] ";
 
 %feature("docstring") casadi::SymbolicQr::row "[INTERNAL] ";
 
@@ -45402,13 +45310,6 @@ block.
 
 %feature("docstring") casadi::SymbolicQr::release "[INTERNAL]  Release a
 memory object.
-
-";
-
-%feature("docstring") casadi::SymbolicQr::reset "[INTERNAL] ";
-
-%feature("docstring") casadi::SymbolicQr::linsol_cholesky "[INTERNAL]  Get
-Cholesky factor.
 
 ";
 

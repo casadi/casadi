@@ -34675,10 +34675,10 @@ C++ includes: exception.hpp ";
 
 
 // File: classcasadi_1_1LapackLu.xml
-%feature("docstring")  casadi::LinsolInternal::disp(std::ostream &stream,
-bool more) const override "
+%feature("docstring")  casadi::LapackLu::nfact(void *mem, const double *A)
+const override "
 
-[INTERNAL]  Display object.
+[INTERNAL]  Numeric factorization.
 
 ";
 
@@ -34688,8 +34688,8 @@ bool more) const override "
 
 ";
 
-%feature("docstring")  casadi::LapackLu::solve(void *mem, double *x, int
-nrhs, bool tr) const override "
+%feature("docstring")  casadi::LapackLu::solve(void *mem, const double *A,
+double *x, int nrhs, bool tr) const override "
 
 [INTERNAL] ";
 
@@ -34711,11 +34711,6 @@ nrhs, bool tr) const override "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::pivoting(void *mem, const
-double *A) const  "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::LapackLu::init_mem(void *mem) const override
 "
 
@@ -34729,6 +34724,11 @@ double *A) const  "
 
 ";
 
+%feature("docstring")  casadi::LinsolInternal::sfact(void *mem, const double
+*A) const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::LinsolInternal::linsol_eval_sx(const SXElem
 **arg, SXElem **res, int *iw, SXElem *w, void *mem, bool tr, int nrhs) const
 "
@@ -34737,26 +34737,27 @@ double *A) const  "
 
 ";
 
-%feature("docstring")  casadi::LapackLu::factorize(void *mem, const double
-*A) const override "
-
-[INTERNAL]  Factorize the linear system.
-
-";
-
 %feature("docstring")  casadi::LinsolInternal::ncol() const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::ProtoFunction::clear_mem() "
+
+[INTERNAL]  Clear all memory (called from destructor)
+
+";
 
 %feature("docstring") casadi::LapackLu::LapackLu(const std::string &name,
 const Sparsity &sp) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::LapackLu::reset(void *mem, const int *sp)
-const override "
+%feature("docstring")  casadi::LinsolInternal::disp(std::ostream &stream,
+bool more) const override "
 
-[INTERNAL] ";
+[INTERNAL]  Display object.
+
+";
 
 %feature("docstring")  casadi::LapackLu::free_mem(void *mem) const override
 "
@@ -34778,7 +34779,8 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::rank(void *mem) const  "
+%feature("docstring")  casadi::LinsolInternal::rank(void *mem, const double
+*A) const  "
 
 [INTERNAL]   Matrix rank.
 
@@ -35069,19 +35071,6 @@ Diagrams
 
 C++ includes: lapack_lu.hpp ";
 
-%feature("docstring")  casadi::ProtoFunction::clear_mem() "
-
-[INTERNAL]  Clear all memory (called from destructor)
-
-";
-
-%feature("docstring")  casadi::LinsolInternal::linsol_cholesky_sparsity(void
-*mem, bool tr) const  "
-
-[INTERNAL]   Sparsity pattern of the cholesky factors.
-
-";
-
 %feature("docstring")  casadi::LinsolInternal::row() const  "
 
 [INTERNAL] ";
@@ -35098,13 +35087,6 @@ C++ includes: lapack_lu.hpp ";
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::linsol_cholesky(void *mem,
-bool tr) const  "
-
-[INTERNAL]  Get Cholesky factor.
-
-";
-
 %feature("docstring")  casadi::LinsolInternal::disp_more(std::ostream
 &stream) const  "
 
@@ -35112,16 +35094,10 @@ bool tr) const  "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::neig(void *mem) const  "
+%feature("docstring")  casadi::LinsolInternal::neig(void *mem, const double
+*A) const  "
 
 [INTERNAL]  Number of negative eigenvalues.
-
-";
-
-%feature("docstring")  casadi::LinsolInternal::solve_cholesky(void *mem,
-double *x, int nrhs, bool tr) const  "
-
-[INTERNAL]   Solve Cholesky.
 
 ";
 
@@ -35152,6 +35128,11 @@ double *x, int nrhs, bool tr) const  "
 
 ";
 
+%feature("docstring")  casadi::LinsolInternal::sfact(void *mem, const double
+*A) const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::LapackQr::alloc_mem() const override "
 
 [INTERNAL]  Create memory block.
@@ -35165,14 +35146,7 @@ double *x, int nrhs, bool tr) const  "
 
 ";
 
-%feature("docstring")  casadi::LapackQr::factorize(void *mem, const double
-*A) const override "
-
-[INTERNAL]  Factorize the linear system.
-
-";
-
-%feature("docstring") casadi::LapackQr::_solve "
+%feature("docstring")  casadi::LinsolInternal::ncol() const  "
 
 [INTERNAL] ";
 
@@ -35190,13 +35164,19 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring")  casadi::LapackQr::solve_batch(void *mem, const double
+*A, double *x, int nrhs, bool tr) const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::ProtoFunction::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::rank(void *mem) const  "
+%feature("docstring")  casadi::LinsolInternal::rank(void *mem, const double
+*A) const  "
 
 [INTERNAL]   Matrix rank.
 
@@ -35489,18 +35469,6 @@ C++ includes: lapack_qr.hpp ";
 
 ";
 
-%feature("docstring")  casadi::LapackQr::reset(void *mem, const int *sp)
-const override "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::LinsolInternal::linsol_cholesky(void *mem,
-bool tr) const  "
-
-[INTERNAL]  Get Cholesky factor.
-
-";
-
 %feature("docstring")  casadi::LinsolInternal::linsol_eval_sx(const SXElem
 **arg, SXElem **res, int *iw, SXElem *w, void *mem, bool tr, int nrhs) const
 "
@@ -35509,10 +35477,12 @@ bool tr) const  "
 
 ";
 
-%feature("docstring") casadi::LapackQr::LapackQr(const std::string &name,
-const Sparsity &sp) "
+%feature("docstring")  casadi::LinsolInternal::neig(void *mem, const double
+*A) const  "
 
-[INTERNAL] ";
+[INTERNAL]  Number of negative eigenvalues.
+
+";
 
 %feature("docstring")  casadi::ProtoFunction::clear_mem() "
 
@@ -35520,22 +35490,21 @@ const Sparsity &sp) "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::solve_cholesky(void *mem,
-double *x, int nrhs, bool tr) const  "
+%feature("docstring") casadi::LapackQr::LapackQr(const std::string &name,
+const Sparsity &sp) "
 
-[INTERNAL]   Solve Cholesky.
-
-";
-
-%feature("docstring")  casadi::LinsolInternal::neig(void *mem) const  "
-
-[INTERNAL]  Number of negative eigenvalues.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::LapackQr::class_name() const override "
 
 [INTERNAL]  Readable name of the internal class.
+
+";
+
+%feature("docstring")  casadi::LapackQr::nfact(void *mem, const double *A)
+const override "
+
+[INTERNAL]  Numeric factorization.
 
 ";
 
@@ -35545,8 +35514,8 @@ double *x, int nrhs, bool tr) const  "
 
 ";
 
-%feature("docstring")  casadi::LapackQr::solve(void *mem, double *x, int
-nrhs, bool tr) const override "
+%feature("docstring")  casadi::LapackQr::solve(void *mem, const double *A,
+double *x, int nrhs, bool tr) const override "
 
 [INTERNAL] ";
 
@@ -35566,25 +35535,9 @@ nrhs, bool tr) const override "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::pivoting(void *mem, const
-double *A) const  "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::LinsolInternal::ncol() const  "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::LapackQr::plugin_name() const override "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::LinsolInternal::linsol_cholesky_sparsity(void
-*mem, bool tr) const  "
-
-[INTERNAL]   Sparsity pattern of the cholesky factors.
-
-";
 
 
 // File: classcasadi_1_1LinearInterpolant.xml
@@ -37935,13 +37888,7 @@ propagation.
 
 
 // File: classcasadi_1_1Linsol.xml
-%feature("docstring")  casadi::Linsol::cholesky(bool tr=false) const  "
-
-Obtain a numeric Cholesky factorization Only for Cholesky solvers.
-
-";
-
-%feature("docstring")  casadi::Linsol::neig() const  "
+%feature("docstring")  casadi::Linsol::neig(const DM &A) const  "
 
 Number of negative eigenvalues Not available for all solvers.
 
@@ -37959,24 +37906,23 @@ Is a null pointer?
 
 ";
 
-%feature("docstring")  casadi::Linsol::cholesky_sparsity(bool tr=false)
-const  "
+%feature("docstring")  casadi::Linsol::nfact(const DM &A) const  "
 
-Obtain a symbolic Cholesky factorization Only for Cholesky solvers.
+Numeric factorization of the linear system.
 
 ";
 
 %feature("docstring")  casadi::Linsol::solve(const DM &A, const DM &B, bool
 tr=false) const  "
 
-Solve numerically.
+Solve linear system of equations
 
 ";
 
 %feature("docstring")  casadi::Linsol::solve(const MX &A, const MX &B, bool
 tr=false) const  "
 
-Create a solve node.
+Solve linear system of equations
 
 ";
 
@@ -38187,7 +38133,13 @@ Joel Andersson
 
 C++ includes: linsol.hpp ";
 
-%feature("docstring")  casadi::Linsol::rank() const  "
+%feature("docstring")  casadi::Linsol::sfact(const DM &A) const  "
+
+Symbolic factorization of the linear system, e.g. selecting pivots.
+
+";
+
+%feature("docstring")  casadi::Linsol::rank(const DM &A) const  "
 
 Matrix rank Not available for all solvers.
 
@@ -38220,18 +38172,17 @@ Query plugin name.
 
 ";
 
+%feature("docstring")  casadi::Linsol::sparsity() const  "
+
+Get linear system sparsity.
+
+";
+
 
 // File: classcasadi_1_1LinsolLdl.xml
 %feature("docstring")  casadi::LinsolInternal::nnz() const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::LinsolLdl::factorize(void *mem, const double
-*A) const override "
-
-[INTERNAL]  Factorize the linear system.
-
-";
 
 %feature("docstring")  casadi::LinsolInternal::ncol() const  "
 
@@ -38261,13 +38212,15 @@ bool more) const override "
 
 ";
 
-%feature("docstring")  casadi::LinsolLdl::neig(void *mem) const override "
+%feature("docstring")  casadi::LinsolLdl::neig(void *mem, const double *A)
+const override "
 
 [INTERNAL]  Number of negative eigenvalues.
 
 ";
 
-%feature("docstring")  casadi::LinsolLdl::rank(void *mem) const override "
+%feature("docstring")  casadi::LinsolLdl::rank(void *mem, const double *A)
+const override "
 
 [INTERNAL]   Matrix rank.
 
@@ -38330,24 +38283,21 @@ const Sparsity &sp) "
 
 C++ includes: linsol_ldl.hpp ";
 
-%feature("docstring")  casadi::LinsolInternal::solve_cholesky(void *mem,
-double *x, int nrhs, bool tr) const  "
+%feature("docstring")  casadi::LinsolLdl::nfact(void *mem, const double *A)
+const override "
 
-[INTERNAL]   Solve Cholesky.
-
-";
-
-%feature("docstring")  casadi::LinsolInternal::linsol_cholesky(void *mem,
-bool tr) const  "
-
-[INTERNAL]  Get Cholesky factor.
+[INTERNAL]  Numeric factorization.
 
 ";
 
-%feature("docstring")  casadi::LinsolLdl::init_mem(void *mem) const override
-"
+%feature("docstring")  casadi::LinsolLdl::sfact(void *mem, const double *A)
+const override "
 
-[INTERNAL]  Initalize memory block.
+[INTERNAL] ";
+
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -38356,12 +38306,6 @@ bool tr) const  "
 "
 
 [INTERNAL]  Evaluate SX, possibly transposed.
-
-";
-
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
-
-[INTERNAL]  Get the reference count.
 
 ";
 
@@ -38376,13 +38320,6 @@ class hierarchy in reverse order is run after init() has been completed.
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::LinsolInternal::linsol_cholesky_sparsity(void
-*mem, bool tr) const  "
-
-[INTERNAL]   Sparsity pattern of the cholesky factors.
-
-";
-
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -38395,8 +38332,8 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::LinsolLdl::solve(void *mem, double *x, int
-nrhs, bool tr) const override "
+%feature("docstring")  casadi::LinsolLdl::solve(void *mem, const double *A,
+double *x, int nrhs, bool tr) const override "
 
 [INTERNAL] ";
 
@@ -38406,10 +38343,12 @@ nrhs, bool tr) const override "
 
 ";
 
-%feature("docstring")  casadi::LinsolLdl::pivoting(void *mem, const double
-*A) const override "
+%feature("docstring")  casadi::LinsolLdl::init_mem(void *mem) const override
+"
 
-[INTERNAL] ";
+[INTERNAL]  Initalize memory block.
+
+";
 
 %feature("docstring")  casadi::LinsolInternal::colind() const  "
 
@@ -38422,20 +38361,8 @@ nrhs, bool tr) const override "
 
 ";
 
-%feature("docstring")  casadi::LinsolLdl::reset(void *mem, const int *sp)
-const override "
-
-[INTERNAL] ";
-
 
 // File: classcasadi_1_1LinsolQr.xml
-%feature("docstring")  casadi::LinsolInternal::linsol_cholesky(void *mem,
-bool tr) const  "
-
-[INTERNAL]  Get Cholesky factor.
-
-";
-
 %feature("docstring")  casadi::LinsolInternal::disp(std::ostream &stream,
 bool more) const override "
 
@@ -38443,26 +38370,23 @@ bool more) const override "
 
 ";
 
-%feature("docstring")  casadi::LinsolQr::pivoting(void *mem, const double
-*A) const override "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::LinsolInternal::neig(void *mem) const  "
+%feature("docstring")  casadi::LinsolInternal::neig(void *mem, const double
+*A) const  "
 
 [INTERNAL]  Number of negative eigenvalues.
 
 ";
 
-%feature("docstring")  casadi::LinsolQr::solve(void *mem, double *x, int
-nrhs, bool tr) const override "
+%feature("docstring")  casadi::LinsolQr::solve(void *mem, const double *A,
+double *x, int nrhs, bool tr) const override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::LinsolQr::reset(void *mem, const int *sp)
-const override "
+%feature("docstring") casadi::LinsolQr "
 
-[INTERNAL] ";
+[INTERNAL]  'qr' plugin for LinsolInternal
+
+C++ includes: linsol_qr.hpp ";
 
 %feature("docstring")  casadi::LinsolQr::class_name() const override "
 
@@ -38479,13 +38403,6 @@ const override "
 %feature("docstring")  casadi::LinsolQr::plugin_name() const override "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::LinsolQr::factorize(void *mem, const double
-*A) const override "
-
-[INTERNAL]  Factorize the linear system.
-
-";
 
 %feature("docstring") casadi::LinsolQr::~LinsolQr "
 
@@ -38554,13 +38471,6 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::solve_cholesky(void *mem,
-double *x, int nrhs, bool tr) const  "
-
-[INTERNAL]   Solve Cholesky.
-
-";
-
 %feature("docstring")  casadi::LinsolInternal::linsol_eval_sx(const SXElem
 **arg, SXElem **res, int *iw, SXElem *w, void *mem, bool tr, int nrhs) const
 "
@@ -38575,7 +38485,8 @@ double *x, int nrhs, bool tr) const  "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::rank(void *mem) const  "
+%feature("docstring")  casadi::LinsolInternal::rank(void *mem, const double
+*A) const  "
 
 [INTERNAL]   Matrix rank.
 
@@ -38585,16 +38496,10 @@ double *x, int nrhs, bool tr) const  "
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::LinsolQr "
+%feature("docstring")  casadi::LinsolQr::nfact(void *mem, const double *A)
+const override "
 
-[INTERNAL]  'qr' plugin for LinsolInternal
-
-C++ includes: linsol_qr.hpp ";
-
-%feature("docstring")  casadi::LinsolInternal::linsol_cholesky_sparsity(void
-*mem, bool tr) const  "
-
-[INTERNAL]   Sparsity pattern of the cholesky factors.
+[INTERNAL]  Numeric factorization.
 
 ";
 
@@ -38604,6 +38509,11 @@ C++ includes: linsol_qr.hpp ";
 [INTERNAL]  Initalize memory block.
 
 ";
+
+%feature("docstring")  casadi::LinsolQr::sfact(void *mem, const double *A)
+const override "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::ProtoFunction::get_options() const  "
 
@@ -38651,13 +38561,20 @@ C++ includes: casadi_logger.hpp ";
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::LinsolInternal::pivoting(void *mem, const
-double *A) const  "
+%feature("docstring")  casadi::Lsqr::nfact(void *mem, const double *A) const
+override "
+
+[INTERNAL]  Numeric factorization.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::sfact(void *mem, const double
+*A) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Lsqr::solve(void *mem, double *x, int nrhs,
-bool tr) const override "
+%feature("docstring")  casadi::Lsqr::solve(void *mem, const double *A,
+double *x, int nrhs, bool tr) const override "
 
 [INTERNAL] ";
 
@@ -38684,23 +38601,10 @@ override "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::linsol_cholesky_sparsity(void
-*mem, bool tr) const  "
-
-[INTERNAL]   Sparsity pattern of the cholesky factors.
-
-";
-
-%feature("docstring")  casadi::LinsolInternal::neig(void *mem) const  "
+%feature("docstring")  casadi::LinsolInternal::neig(void *mem, const double
+*A) const  "
 
 [INTERNAL]  Number of negative eigenvalues.
-
-";
-
-%feature("docstring")  casadi::ProtoFunction::finalize(const Dict &opts) "
-
-[INTERNAL]  Finalize the object creation This function, which visits the
-class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
@@ -38744,26 +38648,16 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::rank(void *mem) const  "
+%feature("docstring")  casadi::LinsolInternal::rank(void *mem, const double
+*A) const  "
 
 [INTERNAL]   Matrix rank.
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::ncol() const  "
-
-[INTERNAL] ";
-
 %feature("docstring") casadi::Lsqr::~Lsqr "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::Lsqr::factorize(void *mem, const double *A)
-const override "
-
-[INTERNAL]  Factorize the linear system.
-
-";
 
 %feature("docstring")  casadi::LinsolInternal::linsol_eval_sx(const SXElem
 **arg, SXElem **res, int *iw, SXElem *w, void *mem, bool tr, int nrhs) const
@@ -38783,10 +38677,17 @@ const override "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::solve_cholesky(void *mem,
-double *x, int nrhs, bool tr) const  "
+%feature("docstring")  casadi::ProtoFunction::finalize(const Dict &opts) "
 
-[INTERNAL]   Solve Cholesky.
+[INTERNAL]  Finalize the object creation This function, which visits the
+class hierarchy in reverse order is run after init() has been completed.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::disp(std::ostream &stream,
+bool more) const override "
+
+[INTERNAL]  Display object.
 
 ";
 
@@ -38818,13 +38719,6 @@ C++ includes: lsqr.hpp ";
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::linsol_cholesky(void *mem,
-bool tr) const  "
-
-[INTERNAL]  Get Cholesky factor.
-
-";
-
 %feature("docstring")  casadi::Lsqr::init_mem(void *mem) const override "
 
 [INTERNAL]  Initalize memory block.
@@ -38837,11 +38731,6 @@ bool tr) const  "
 [INTERNAL]  Print more.
 
 ";
-
-%feature("docstring")  casadi::Lsqr::reset(void *mem, const int *sp) const
-override "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::LinsolInternal::nrow() const  "
 
@@ -38860,12 +38749,9 @@ Sparsity &sp) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::LinsolInternal::disp(std::ostream &stream,
-bool more) const override "
+%feature("docstring")  casadi::LinsolInternal::ncol() const  "
 
-[INTERNAL]  Display object.
-
-";
+[INTERNAL] ";
 
 
 // File: classcasadi_1_1Map.xml
@@ -61999,12 +61885,8 @@ const  "
 
 
 // File: classcasadi_1_1SymbolicQr.xml
-%feature("docstring")  casadi::LinsolInternal::pivoting(void *mem, const
-double *A) const  "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::LinsolInternal::neig(void *mem) const  "
+%feature("docstring")  casadi::LinsolInternal::neig(void *mem, const double
+*A) const  "
 
 [INTERNAL]  Number of negative eigenvalues.
 
@@ -62020,13 +61902,6 @@ double *A) const  "
 &name, const Sparsity &sp) "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::LinsolInternal::solve_cholesky(void *mem,
-double *x, int nrhs, bool tr) const  "
-
-[INTERNAL]   Solve Cholesky.
-
-";
 
 %feature("docstring")  casadi::SymbolicQr::alloc_mem() const override "
 
@@ -62052,7 +61927,8 @@ override "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::LinsolInternal::rank(void *mem) const  "
+%feature("docstring")  casadi::LinsolInternal::rank(void *mem, const double
+*A) const  "
 
 [INTERNAL]   Matrix rank.
 
@@ -62339,28 +62215,20 @@ C++ includes: symbolic_qr.hpp ";
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::SymbolicQr::factorize(void *mem, const double
-*A) const override "
-
-[INTERNAL]  Factorize the linear system.
-
-";
-
-%feature("docstring")  casadi::SymbolicQr::solve(void *mem, double *x, int
-nrhs, bool tr) const override "
+%feature("docstring")  casadi::LinsolInternal::ncol() const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::SymbolicQr::nfact(void *mem, const double *A)
+const override "
+
+[INTERNAL]  Numeric factorization.
+
+";
 
 %feature("docstring")  casadi::ProtoFunction::clear_mem() "
 
 [INTERNAL]  Clear all memory (called from destructor)
-
-";
-
-%feature("docstring")  casadi::LinsolInternal::linsol_cholesky_sparsity(void
-*mem, bool tr) const  "
-
-[INTERNAL]   Sparsity pattern of the cholesky factors.
 
 ";
 
@@ -62400,7 +62268,13 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::ncol() const  "
+%feature("docstring")  casadi::SymbolicQr::solve(void *mem, const double *A,
+double *x, int nrhs, bool tr) const override "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::LinsolInternal::sfact(void *mem, const double
+*A) const  "
 
 [INTERNAL] ";
 
@@ -62441,18 +62315,6 @@ override "
 %feature("docstring")  casadi::ProtoFunction::release(int mem) const  "
 
 [INTERNAL]  Release a memory object.
-
-";
-
-%feature("docstring")  casadi::SymbolicQr::reset(void *mem, const int *sp)
-const override "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::LinsolInternal::linsol_cholesky(void *mem,
-bool tr) const  "
-
-[INTERNAL]  Get Cholesky factor.
 
 ";
 
