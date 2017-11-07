@@ -6734,9 +6734,6 @@ returns a new function with a selection of inputs/outputs of the original
 
 %feature("docstring") casadi::Callback::export_code "
 
->  void casadi::Function::export_code(const std::string &lang, std::ostream &stream=casadi::uout(), const Dict &options=Dict()) const 
-------------------------------------------------------------------------
-
 Export function in specific language.
 
 Only allowed for (a subset of) SX/MX Functions
@@ -17955,9 +17952,6 @@ Get all the free variables of the function.
 ";
 
 %feature("docstring") casadi::Function::export_code "
-
->  void casadi::Function::export_code(const std::string &lang, std::ostream &stream=casadi::uout(), const Dict &options=Dict()) const 
-------------------------------------------------------------------------
 
 Export function in specific language.
 
@@ -30009,6 +30003,12 @@ Attempts to find the roots of a polynomial.
 
 This will only work for polynomials up to order 3 It is assumed that the
 roots are real.
+
+";
+
+%feature("docstring") casadi::Matrix::info "
+
+Obtain information about sparsity
 
 ";
 
@@ -42445,10 +42445,9 @@ k = A.find() A[k] will contain the elements of A that are non-zero in B
 
 ";
 
-%feature("docstring") casadi::Sparsity::spy_matlab "
+%feature("docstring") casadi::Sparsity::repr_el "
 
-Generate a script for Matlab or Octave which visualizes the sparsity using
-the spy command.
+Describe the nonzero location k as a string.
 
 ";
 
@@ -42464,9 +42463,10 @@ Transpose the matrix.
 
 ";
 
-%feature("docstring") casadi::Sparsity::repr_el "
+%feature("docstring") casadi::Sparsity::nnz_diag "
 
-Describe the nonzero location k as a string.
+Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with
+j==i.
 
 ";
 
@@ -42492,12 +42492,6 @@ format.
 ------------------------------------------------------------------------
 
 Create a sparse matrix with all structural zeros.
-
-";
-
-%feature("docstring") casadi::Sparsity::pattern_inverse "
-
-Take the inverse of a sparsity pattern; flip zeros and non-zeros.
 
 ";
 
@@ -42620,16 +42614,22 @@ Make a patten dense.
 
 ";
 
-%feature("docstring") casadi::Sparsity::nnz_diag "
+%feature("docstring") casadi::Sparsity::pattern_inverse "
 
-Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with
-j==i.
+Take the inverse of a sparsity pattern; flip zeros and non-zeros.
 
 ";
 
 %feature("docstring") casadi::Sparsity::dense "
 
 Create a dense rectangular sparsity pattern.
+
+";
+
+%feature("docstring") casadi::Sparsity::spy_matlab "
+
+Generate a script for Matlab or Octave which visualizes the sparsity using
+the spy command.
 
 ";
 
@@ -42755,6 +42755,12 @@ compressed format.
 %feature("docstring") casadi::Sparsity::is_symmetric "
 
 Is symmetric?
+
+";
+
+%feature("docstring") casadi::Sparsity::info "
+
+Obtain information about sparsity
 
 ";
 
