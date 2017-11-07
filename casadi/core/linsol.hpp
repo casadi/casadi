@@ -84,40 +84,38 @@ namespace casadi {
     /// Get linear system sparsity
     const Sparsity& sparsity() const;
 
-    ///@{
     /// Symbolic factorization of the linear system, e.g. selecting pivots
     void sfact(const DM& A) const;
-    #ifndef SWIG
-    int sfact(const double* A, int mem=0) const;
-    #endif // SWIG
-    ///@}
 
-    ///@{
     /// Numeric factorization of the linear system
     void nfact(const DM& A) const;
-    #ifndef SWIG
-    int nfact(const double* A, int mem=0) const;
-    #endif // SWIG
-    ///@}
 
     ///@{
     /// Solve linear system of equations
     DM solve(const DM& A, const DM& B, bool tr=false) const;
     MX solve(const MX& A, const MX& B, bool tr=false) const;
-#ifndef SWIG
-    int solve(const double* A, double* x, int nrhs=1, bool tr=false, int mem=0) const;
-#endif // SWIG
     ///@}
 
     /** \brief Number of negative eigenvalues
       * Not available for all solvers
       */
-    int neig() const;
+    int neig(const DM& A) const;
 
     /** \brief Matrix rank
       * Not available for all solvers
       */
-    int rank() const;
+    int rank(const DM& A) const;
+
+    #ifndef SWIG
+    ///@{
+    /// Low-level API
+    int sfact(const double* A, int mem=0) const;
+    int nfact(const double* A, int mem=0) const;
+    int solve(const double* A, double* x, int nrhs=1, bool tr=false, int mem=0) const;
+    int neig(const double* A, int mem=0) const;
+    int rank(const double* A, int mem=0) const;
+    ///@}
+    #endif // SWIG
   };
 
   /// Check if a particular plugin is available

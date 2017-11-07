@@ -115,7 +115,7 @@ namespace casadi {
     return 0;
   }
 
-  int LinsolLdl::neig(void* mem) const {
+  int LinsolLdl::neig(void* mem, const double* A) const {
     // Count number of negative eigenvalues
     auto m = static_cast<LinsolLdlMemory*>(mem);
     int n = this->nrow();
@@ -124,7 +124,7 @@ namespace casadi {
     return ret;
   }
 
-  int LinsolLdl::rank(void* mem) const {
+  int LinsolLdl::rank(void* mem, const double* A) const {
     // Count number of nonzero eigenvalues
     auto m = static_cast<LinsolLdlMemory*>(mem);
     int n = this->nrow();

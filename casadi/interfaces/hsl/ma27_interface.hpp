@@ -141,10 +141,10 @@ namespace casadi {
     int nfact(void* mem, const double* A) const override;
 
     /// Number of negative eigenvalues
-    int neig(void* mem) const override;
+    int neig(void* mem, const double* A) const override;
 
     /// Matrix rank
-    int rank(void* mem) const override;
+    int rank(void* mem, const double* A) const override;
 
     // Solve the linear system
     int solve(void* mem, const double* A, double* x, int nrhs, bool tr) const override;

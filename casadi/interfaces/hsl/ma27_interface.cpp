@@ -161,13 +161,15 @@ namespace casadi {
     return 0;
   }
 
-  int Ma27Interface::neig(void* mem) const {
+  int Ma27Interface::neig(void* mem, const double* A) const {
     auto m = static_cast<Ma27Memory*>(mem);
+    casadi_assert_dev(m->is_nfact);
     return m->neig;
   }
 
-  int Ma27Interface::rank(void* mem) const {
+  int Ma27Interface::rank(void* mem, const double* A) const {
     auto m = static_cast<Ma27Memory*>(mem);
+    casadi_assert_dev(m->is_nfact);
     return m->rank;
   }
 

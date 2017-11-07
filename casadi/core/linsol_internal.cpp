@@ -94,11 +94,11 @@ namespace casadi {
     casadi_error("'nfact' not defined for " + class_name());
   }
 
-  int LinsolInternal::neig(void* mem) const {
+  int LinsolInternal::neig(void* mem, const double* A) const {
     casadi_error("'neig' not defined for " + class_name());
   }
 
-  int LinsolInternal::rank(void* mem) const {
+  int LinsolInternal::rank(void* mem, const double* A) const {
     casadi_error("'rank' not defined for " + class_name());
   }
 

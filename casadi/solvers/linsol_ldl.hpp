@@ -86,10 +86,10 @@ namespace casadi {
     int solve(void* mem, const double* A, double* x, int nrhs, bool tr) const override;
 
     /// Number of negative eigenvalues
-    int neig(void* mem) const override;
+    int neig(void* mem, const double* A) const override;
 
     /// Matrix rank
-    int rank(void* mem) const override;
+    int rank(void* mem, const double* A) const override;
 
     /// A documentation string
     static const std::string meta_doc;

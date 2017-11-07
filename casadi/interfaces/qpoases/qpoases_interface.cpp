@@ -877,10 +877,10 @@ namespace casadi {
     m->linsol.nfact(get_ptr(m->nz));
 
     // Number of negative eigenvalues
-    if (neig) *neig = m->linsol.neig();
+    if (neig) *neig = m->linsol.neig(get_ptr(m->nz));
 
     // Rank of the matrix
-    if (rank) *rank = m->linsol.rank();
+    if (rank) *rank = m->linsol.rank(get_ptr(m->nz));
 
     return 0;
   }
