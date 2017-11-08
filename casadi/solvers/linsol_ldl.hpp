@@ -38,12 +38,8 @@
 
 namespace casadi {
   struct CASADI_LINSOL_LDL_EXPORT LinsolLdlMemory : public LinsolMemory {
-    // Destructor
-    ~LinsolLdlMemory();
-
-    std::vector<int> iw, parent;
-    std::vector<int> sp_l;
-    std::vector<double> nz_l, d, w;
+    std::vector<int> iw;
+    std::vector<double> l, d, w;
   };
 
   /** \brief \pluginbrief{LinsolInternal,ldl}
@@ -99,6 +95,10 @@ namespace casadi {
 
     // Get name of the class
     std::string class_name() const override { return "LinsolLdl";}
+
+    // Symbolic factorization
+    std::vector<int> parent_;
+    Sparsity sp_L_;
   };
 
 } // namespace casadi
