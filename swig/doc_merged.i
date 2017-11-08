@@ -46261,6 +46261,8 @@ Joel Andersson
 
 %feature("docstring") casadi::casadi_ldl "[INTERNAL] ";
 
+%feature("docstring") casadi::casadi_imax "[INTERNAL] ";
+
 %feature("docstring") casadi::dple_n_in "
 
 Get the number of QP solver inputs.
@@ -46343,21 +46345,7 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring") casadi::hash_combine "
-
->  void casadi::hash_combine(std::size_t &seed, T v)
-
->  void casadi::hash_combine(std::size_t &seed, const std::vector< int > &v)
-------------------------------------------------------------------------
-
-Generate a hash value incrementally (function taken from boost)
-
->  void casadi::hash_combine(std::size_t &seed, const int *v, int sz)
-------------------------------------------------------------------------
-
-Generate a hash value incrementally, array.
-
-";
+%feature("docstring") casadi::casadi_imin "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_copy_int "[INTERNAL] ";
 
@@ -47733,6 +47721,8 @@ Checks if array does not contain NaN or Inf.
 
 %feature("docstring") casadi::getcopy "[INTERNAL] ";
 
+%feature("docstring") casadi::casadi_qr_solve "[INTERNAL] ";
+
 %feature("docstring") casadi::nlpsol_option_info "
 
 Get documentation for a particular option.
@@ -47820,6 +47810,22 @@ Get the number of QP solver outputs.
 %feature("docstring") casadi::doc_interpolant "
 
 Get the documentation string for a plugin.
+
+";
+
+%feature("docstring") casadi::hash_combine "
+
+>  void casadi::hash_combine(std::size_t &seed, T v)
+
+>  void casadi::hash_combine(std::size_t &seed, const std::vector< int > &v)
+------------------------------------------------------------------------
+
+Generate a hash value incrementally (function taken from boost)
+
+>  void casadi::hash_combine(std::size_t &seed, const int *v, int sz)
+------------------------------------------------------------------------
+
+Generate a hash value incrementally, array.
 
 ";
 

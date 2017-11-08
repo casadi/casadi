@@ -63396,6 +63396,10 @@ const int *pinv, int *iw) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_imax(int a, int b) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::dple_n_in() "
 
 Get the number of QP solver inputs.
@@ -63484,25 +63488,9 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
+%feature("docstring")  casadi::casadi_imin(int a, int b) "
 
-Generate a hash value incrementally (function taken from boost)
-
-";
-
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, const int *v,
-int sz) "
-
-Generate a hash value incrementally, array.
-
-";
-
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, const
-std::vector< int > &v) "
-
-Generate a hash value incrementally (function taken from boost)
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_copy_int(const int *x, int n, int *y)
 "
@@ -64927,6 +64915,12 @@ SharedObjectInternal *, SharedObject > &already_copied) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_qr_solve(T1 *x, int nrhs, int tr,
+const int *sp_v, const T1 *v, const int *sp_r, const T1 *r, const T1 *beta,
+const int *pinv, T1 *w) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::nlpsol_option_info(const std::string &name,
 const std::string &op) "
 
@@ -65067,6 +65061,26 @@ Get the number of QP solver outputs.
 %feature("docstring")  casadi::doc_interpolant(const std::string &name) "
 
 Get the documentation string for a plugin.
+
+";
+
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
+
+Generate a hash value incrementally (function taken from boost)
+
+";
+
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, const int *v,
+int sz) "
+
+Generate a hash value incrementally, array.
+
+";
+
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, const
+std::vector< int > &v) "
+
+Generate a hash value incrementally (function taken from boost)
 
 ";
 

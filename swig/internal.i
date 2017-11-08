@@ -1759,6 +1759,12 @@
 %exception  casadi::SymbolicQr::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::casadi_imax(int a, int b) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::casadi_imin(int a, int b) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::check_exposed(T t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
