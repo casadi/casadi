@@ -825,6 +825,10 @@ namespace casadi {
     ss << "function y=nonzeros_gen(x)" << std::endl;
     ss << "  if isa(x,'casadi.SX') || isa(x,'casadi.MX') || isa(x,'casadi.DM')" << std::endl;
     ss << "    y = x{:};" << std::endl;
+    ss << "  elseif isa(x,'sdpvar')" << std::endl;
+    ss << "    b = getbase(x);" << std::endl;
+    ss << "    f = find(sum(b~=0,2));" << std::endl;
+    ss << "    y = sdpvar(length(f),1,[],getvariables(x),b(f,:));" << std::endl;
     ss << "  else" << std::endl;
     ss << "    y = nonzeros(x);" << std::endl;
     ss << "  end" << std::endl;
