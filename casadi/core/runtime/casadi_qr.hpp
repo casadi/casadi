@@ -120,12 +120,25 @@ int casadi_leaf(int i, int j, const int* first, int* maxfirst,
   return q;
 }
 
+// SYMBOL "imin"
+// Smallest of two integers
+inline
+int casadi_imin(int a, int b) {
+  return a<b ? a : b;
+}
+
+// SYMBOL "imax"
+// Largest of two integers
+inline
+int casadi_imax(int a, int b) {
+  return a>b ? a : b;
+}
+
 // SYMBOL "qr_colind"
 // Calculate the column offsets for the QR R matrix
 // Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
 // len[counts] = ncol
 // len[w] >= 5*ncol + nrow + 1
-// C-REPLACE "std::min" "casadi_min"
 inline
 int casadi_qr_counts(const int* tr_sp, const int* parent,
                      const int* post, int* counts, int* w) {
@@ -153,7 +166,7 @@ int casadi_qr_counts(const int* tr_sp, const int* parent,
   for (k=0; k<ncol+1; ++k) head[k]=-1;
   for (i=0; i<nrow; ++i) {
     for (k=ncol, p=rowind[i]; p<rowind[i+1]; ++p) {
-      k = std::min(k, ancestor[col[p]]);
+      k = casadi_imin(k, ancestor[col[p]]);
     }
     // Place row i in linked list k
     next[i] = head[k];
@@ -530,7 +543,7 @@ void casadi_qr_trs(const int* sp_r, const T1* nz_r, T1* x, int tr) {
 // SYMBOL "qr_solve"
 // Solve a factorized linear system
 template<typename T1>
-void casadi_qr_solve(T1* x, int nrhs, bool tr,
+void casadi_qr_solve(T1* x, int nrhs, int tr,
                      const int* sp_v, const T1* v, const int* sp_r, const T1* r,
                      const T1* beta, const int* pinv, T1* w) {
   int k, c;

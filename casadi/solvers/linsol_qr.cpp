@@ -117,21 +117,31 @@ namespace casadi {
 
   void LinsolQr::generate(CodeGenerator& g, const std::string& A, const std::string& x,
                           int nrhs, bool tr) const {
-    // Not ready
-    return LinsolInternal::generate(g, A, x, nrhs, tr);
-    #if 0
+    // Codegen the integer vectors
+    string leftmost = g.constant(leftmost_);
+    string parent = g.constant(parent_);
+    string pinv = g.constant(pinv_);
+    string sp = g.sparsity(sp_);
+    string sp_v = g.sparsity(sp_v_);
+    string sp_r = g.sparsity(sp_r_);
+
     // Place in block to avoid conflicts caused by local variables
-    g << "{";
+    g << "{\n";
     // Work vectors TODO(@jaeandersson): Use work vectors from Solve
-    g << "real_t v[" << sp_v_.nnz() << "], "
+    g << "casadi_real v[" << sp_v_.nnz() << "], "
          "r[" << sp_r_.nnz() << "], "
          "beta[" << ncol() << "], "
-         "w[" << sp_r_.size1() << "], "
+         "w[" << sp_r_.size1() << "];\n";
     g << "int iw[" << nrow() + 7*ncol() + 1 << "];\n";
 
+    // Factorize
+    g << g.qr(sp, A, "iw", "w", sp_v, "v", sp_r, "r", "beta", leftmost, parent, pinv) << "\n";
+
+    // Solve
+    g << g.qr_solve(x, nrhs, tr, sp_v, "v", sp_r, "r", "beta", pinv, "w") << "\n";
+
     // End of block
-    g << "}\n"
-    #endif
+    g << "}\n";
   }
 
 } // namespace casadi
