@@ -37,10 +37,16 @@ f_sx = f_mx.expand();
 
 f_mx.export_code('matlab','f_mx_exported.m')
 f_sx.export_code('matlab','f_sx_exported.m')
+clear f_mx_exported
+clear f_sx_exported
 rehash
 
 
-rng(1);
+try
+  rng(1);
+catch
+  rand ('state', 1)
+end
 
 N = f_mx.n_out;
 
@@ -79,11 +85,11 @@ rt = linsol.solve(x,y,true)
 f_mx = Function('f',args,{inv_node(x), inv_node(y), det(x), det(y),x\y,r,rt});
 f_mx.disp(true)
 f_mx.export_code('matlab','f_mx_exported.m')
+clear f_mx_exported
 rehash
 
 fref = @(x,y) {inv(x),inv(y),det(x),det(y),x\y,x\y,(x'\y)'};
 
-rng(1);
 
 N = f_mx.n_out;
 
@@ -108,58 +114,59 @@ end
 delete('f_mx_exported.m')
 
 
+if ~is_octave
+% Seems like octave does not support this
+
+  A = Sparsity.upper(3);
+
+  save('test.mat','A');
+
+  d = load('test.mat');
+
+  assert(d.A==A);
 
 
-A = Sparsity.upper(3);
+  A = DM(Sparsity.upper(3),rand(6,1));
 
-save('test.mat','A');
+  save('test.mat','A');
 
-d = load('test.mat');
+  d = load('test.mat');
 
-assert(d.A==A);
-
-
-A = DM(Sparsity.upper(3),rand(6,1));
-
-save('test.mat','A');
-
-d = load('test.mat');
-
-assert(norm(full(d.A-A))==0);
+  assert(norm(full(d.A-A))==0);
 
 
-x = SX.sym('x',3);
-A = SX.sym('A',Sparsity.lower(3));
+  x = SX.sym('x',3);
+  A = SX.sym('A',Sparsity.lower(3));
 
-x0 = rand(3,1);
-A0 = sparse(DM(Sparsity.lower(3),rand(6,1)));
+  x0 = rand(3,1);
+  A0 = sparse(DM(Sparsity.lower(3),rand(6,1)));
 
-f = Function('f',{x,A},{A*x});
+  f = Function('f',{x,A},{A*x});
 
-save('test.mat','f');
-d = load('test.mat');
+  save('test.mat','f');
+  d = load('test.mat');
 
-f_comp = d.f;
+  f_comp = d.f;
 
-assert(norm(full(f(x0,A0)-f_comp(x0,A0)))<1e-9);
-
-
-x = MX.sym('x',3);
-A = MX.sym('A',Sparsity.lower(3));
-
-x0 = rand(3,1);
-A0 = sparse(DM(Sparsity.lower(3),rand(6,1)));
-
-f = Function('f',{x,A},{A*x});
-
-save('test.mat','f');
-d = load('test.mat');
-
-f_comp = d.f;
-
-assert(norm(full(f(x0,A0)-f_comp(x0,A0)))<1e-9);
+  assert(norm(full(f(x0,A0)-f_comp(x0,A0)))<1e-9);
 
 
+  x = MX.sym('x',3);
+  A = MX.sym('A',Sparsity.lower(3));
+
+  x0 = rand(3,1);
+  A0 = sparse(DM(Sparsity.lower(3),rand(6,1)));
+
+  f = Function('f',{x,A},{A*x});
+
+  save('test.mat','f');
+  d = load('test.mat');
+
+  f_comp = d.f;
+
+  assert(norm(full(f(x0,A0)-f_comp(x0,A0)))<1e-9);
+
+end
 
 
 

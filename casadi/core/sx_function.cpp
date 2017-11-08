@@ -832,9 +832,6 @@ namespace casadi {
       indent += "  ";
     }
 
-    // On long matlab codes, jit slows things down
-    ss << indent << "feature('jit','off');feature('accel','on');" << std::endl;
-
     // Non-cell aliases for inputs
     for (int i=0;i<n_in_;++i) {
       ss << indent << "argin_" << i <<  " = nonzeros_gen(varargin{" << i+1 << "});" << std::endl;
@@ -907,7 +904,7 @@ namespace casadi {
           }
       }
     }
-    ss << indent << "feature('jit','on');feature('accel','on');" << std::endl;
+
   }
 
 } // namespace casadi

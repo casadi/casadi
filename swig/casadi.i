@@ -3567,12 +3567,14 @@ namespace casadi{
                end
              end
 
-             f = fopen(['temp_' s.name '.m'],'w');
+             alphabet= 'a':'z';
+             filename = ['temp_' alphabet(randi(length(alphabet),1,20))];
+             f = fopen([filename '.m'],'w');
              fprintf(f, s.code);
              fclose(f);
-             rehash
-             [args_out{1:length(s.sparsity_out)}] = feval(['temp_' s.name], args_in{:});
-             delete(['temp_' s.name '.m'])
+             clear(filename)
+             [args_out{1:length(s.sparsity_out)}] = feval(filename, args_in{:});
+             delete([filename '.m'])
              obj = casadi.Function(s.name, args_in, args_out, s.name_in, s.name_out);
           else
              obj = s;
