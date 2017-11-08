@@ -148,3 +148,23 @@ void casadi_ldl_trs(const int* sp_l, const T1* nz_l, T1* x, int tr) {
     }
   }
 }
+
+// SYMBOL "ldl_solve"
+// Linear solve using an LDL factorized linear system
+template<typename T1>
+void casadi_ldl_solve(T1* x, int nrhs, const int* sp_l, const T1* l,
+                      const T1* d) {
+  int n = sp_l[1];
+  int i, k;
+  for (k=0; k<nrhs; ++k) {
+    //      LDL'x = b <=> x = L\D\L'\b
+    //  Solve for L'
+    casadi_ldl_trs(sp_l, l, x, 0);
+    // Divide by D
+    for (i=0; i<n; ++i) x[i] /= d[i];
+    // Solve for L
+    casadi_ldl_trs(sp_l, l, x, 1);
+    // Next rhs
+    x += n;
+  }
+}

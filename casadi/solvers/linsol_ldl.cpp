@@ -88,18 +88,7 @@ namespace casadi {
 
   int LinsolLdl::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    int n = this->nrow();
-    for (int k=0; k<nrhs; ++k) {
-      //      LDL'x = b <=> x = L\D\L'\b
-      //  Solve for L'
-      casadi_ldl_trs(sp_L_, get_ptr(m->l), x, 0);
-      // Divide by D
-      for (int i=0; i<n; ++i) x[i] /= m->d[i];
-      // Solve for L
-      casadi_ldl_trs(sp_L_, get_ptr(m->l), x, 1);
-      // Next rhs
-      x += n;
-    }
+    casadi_ldl_solve(x, nrhs, sp_L_, get_ptr(m->l), get_ptr(m->d));
     return 0;
   }
 
