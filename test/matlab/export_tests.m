@@ -37,7 +37,8 @@ f_sx = f_mx.expand();
 
 f_mx.export_code('matlab','f_mx_exported.m')
 f_sx.export_code('matlab','f_sx_exported.m')
-rehash
+clear f_mx_exported
+clear f_sx_exported
 
 
 rng(1);
@@ -79,7 +80,7 @@ rt = linsol.solve(x,y,true)
 f_mx = Function('f',args,{inv_node(x), inv_node(y), det(x), det(y),x\y,r,rt});
 f_mx.disp(true)
 f_mx.export_code('matlab','f_mx_exported.m')
-rehash
+clear f_mx_exported
 
 fref = @(x,y) {inv(x),inv(y),det(x),det(y),x\y,x\y,(x'\y)'};
 
