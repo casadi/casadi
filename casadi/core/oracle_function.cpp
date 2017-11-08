@@ -205,7 +205,7 @@ namespace casadi {
       f(m->arg, m->res, m->iw, m->w, 0);
     } catch(exception& ex) {
       // Fatal error
-      casadi_warning(name() + ":" + fcn + " failed:" + std::string(ex.what()));
+      casadi_warning(name_ + ":" + fcn + " failed:" + std::string(ex.what()));
       return 1;
     }
 
@@ -240,7 +240,7 @@ namespace casadi {
         auto it = find_if(m->res[i], m->res[i]+f.nnz_out(i), [](double v) { return !isfinite(v);});
         int k = distance(m->res[i], it);
         bool is_nan = isnan(m->res[i][k]);
-        ss << name() << ":" << fcn << " failed: " << (is_nan? "NaN" : "Inf") <<
+        ss << name_ << ":" << fcn << " failed: " << (is_nan? "NaN" : "Inf") <<
         " detected for output " << f.name_out(i) << ", at " << f.sparsity_out(i).repr_el(k) << ".";
 
         if (regularity_check_) {
@@ -358,7 +358,7 @@ namespace casadi {
   const Function& OracleFunction::get_function(const std::string &name) const {
     auto it = all_functions_.find(name);
     casadi_assert(it!=all_functions_.end(),
-      "No function \"" + name + "\" in " + this->name() + ". " +
+      "No function \"" + name + "\" in " + name_ + ". " +
       "Available functions: " + join(get_function()) + ".");
     return it->second.f;
   }
@@ -366,7 +366,7 @@ namespace casadi {
   bool OracleFunction::monitored(const std::string &name) const {
     auto it = all_functions_.find(name);
     casadi_assert(it!=all_functions_.end(),
-      "No function \"" + name + "\" in " + this->name()+ ". " +
+      "No function \"" + name + "\" in " + name_+ ". " +
       "Available functions: " + join(get_function()) + ".");
     return it->second.monitored;
   }

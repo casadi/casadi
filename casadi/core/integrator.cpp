@@ -723,7 +723,7 @@ namespace casadi {
       aug_dae = map2oracle(dae_name, aug_fwd<MX>(nfwd));
     }
     aug_opts["derivative_of"] = self();
-    Function aug_int = integrator(aug_prefix + this->name(), plugin_name(),
+    Function aug_int = integrator(aug_prefix + name_, plugin_name(),
       aug_dae, aug_opts);
 
     // All inputs of the return function
@@ -845,7 +845,7 @@ namespace casadi {
       aug_dae = map2oracle(dae_name, aug_adj<MX>(nadj));
     }
     aug_opts["derivative_of"] = self();
-    Function aug_int = integrator(aug_prefix + this->name(), plugin_name(),
+    Function aug_int = integrator(aug_prefix + name_, plugin_name(),
       aug_dae, aug_opts);
 
     // All inputs of the return function

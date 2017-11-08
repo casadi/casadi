@@ -46,8 +46,9 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_csparsecholesky);
   }
 
-  CSparseCholeskyInterface::CSparseCholeskyInterface(const std::string& name) :
-    LinsolInternal(name) {
+  CSparseCholeskyInterface::
+  CSparseCholeskyInterface(const std::string& name, const Sparsity& sp) :
+    LinsolInternal(name, sp) {
   }
 
   CSparseCholeskyInterface::~CSparseCholeskyInterface() {
@@ -65,30 +66,27 @@ namespace casadi {
   }
 
   int CSparseCholeskyInterface::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void CSparseCholeskyInterface::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
+    if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     m->L = 0;
     m->S = 0;
-    m->A.nzmax = m->nnz();  // maximum number of entries
-    m->A.m = m->nrow(); // number of columns
-    m->A.n = m->ncol(); // number of rows
-    m->A.p = const_cast<int*>(m->colind()); // row pointers (size n+1)
+    m->A.nzmax = this->nnz();  // maximum number of entries
+    m->A.m = this->nrow(); // number of columns
+    m->A.n = this->ncol(); // number of rows
+    m->A.p = const_cast<int*>(this->colind()); // row pointers (size n+1)
     // or row indices (size nzmax)
-    m->A.i = const_cast<int*>(m->row()); // column indices, size nzmax
+    m->A.i = const_cast<int*>(this->row()); // column indices, size nzmax
     m->A.x = 0; // numerical values, size nzmax
     m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-row
 
     // Temporary
     m->temp.resize(m->A.n);
+
+    return 0;
   }
 
-  void CSparseCholeskyInterface::pivoting(void* mem, const double* A) const {
-    LinsolInternal::pivoting(mem, A);
+  int CSparseCholeskyInterface::sfact(void* mem, const double* A) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     // Set the nonzeros of the matrix
@@ -97,16 +95,17 @@ namespace casadi {
     // ordering and symbolic analysis
     int order = 0; // ordering?
     m->S = cs_schol(order, &m->A);
+    return 0;
   }
 
-  void CSparseCholeskyInterface::factorize(void* mem, const double* A) const {
+  int CSparseCholeskyInterface::nfact(void* mem, const double* A) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     // Set the nonzeros of the matrix
     m->A.x = const_cast<double*>(A);
 
     // Make sure that all entries of the linear system are valid
-    int nnz = m->nnz();
+    int nnz = this->nnz();
     for (int k=0; k<nnz; ++k) {
       casadi_assert(!isnan(A[k]),
         "Nonzero " + str(k) + " is not-a-number");
@@ -117,60 +116,11 @@ namespace casadi {
     if (m->L) cs_nfree(m->L);
     m->L = cs_chol(&m->A, m->S) ;                 // numeric Cholesky factorization
     casadi_assert_dev(m->L!=0);
+    return 0;
   }
 
-  Sparsity CSparseCholeskyInterface::linsol_cholesky_sparsity(void* mem, bool tr) const {
-    auto m = static_cast<CsparseCholMemory*>(mem);
-
-    casadi_assert_dev(m->S);
-    int n = m->A.n;
-    int nzmax = m->S->cp[n];
-    std::vector< int > row(n+1);
-    std::copy(m->S->cp, m->S->cp+n+1, row.begin());
-    std::vector< int > colind(nzmax);
-    int *Li = &colind.front();
-    int *Lp = &row.front();
-    const cs* C;
-    C = m->S->pinv ? cs_symperm(&m->A, m->S->pinv, 1) : &m->A;
-    std::vector< int > temp(2*n);
-    int *c = &temp.front();
-    int *s = c+n;
-    for (int k = 0 ; k < n ; k++) c[k] = m->S->cp[k] ;
-    for (int k = 0 ; k < n ; k++) {       /* compute L(k, :) for L*L' = C */
-      int top = cs_ereach(C, k, m->S->parent, s, c) ;
-      for ( ; top < n ; top++) {  /* solve L(0:k-1, 0:k-1) * x = C(:, k) */
-          int i = s[top] ;               /* s[top..n-1] is pattern of L(k, :) */
-          int p = c[i]++ ;
-          Li[p] = k ;                /* store L(k, i) in row i */
-      }
-      int p = c[k]++ ;
-      Li[p] = k ;
-    }
-    Lp[n] = m->S->cp[n] ;
-    Sparsity ret(n, n, row, colind); // BUG?
-
-    return tr ? ret.T() : ret;
-
-  }
-
-  DM CSparseCholeskyInterface::linsol_cholesky(void* mem, bool tr) const {
-    auto m = static_cast<CsparseCholMemory*>(mem);
-
-    casadi_assert_dev(m->L);
-    cs *L = m->L->L;
-    int nz = L->nzmax;
-    std::vector< int > colind(L->m+1);
-    std::copy(L->p, L->p+L->m+1, colind.begin());
-    std::vector< int > row(nz);
-    std::copy(L->i, L->i+nz, row.begin());
-    std::vector< double > data(nz);
-    std::copy(L->x, L->x+nz, data.begin());
-    DM ret(Sparsity(L->n, L->m, colind, row), data, false);
-
-    return tr ? ret.T() : ret;
-  }
-
-  void CSparseCholeskyInterface::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int CSparseCholeskyInterface::
+  solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
     casadi_assert_dev(m->L!=0);
@@ -188,24 +138,9 @@ namespace casadi {
         cs_ltsolve(m->L->L, t) ;              // t = U\t
         cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
       }
-      x += m->ncol();
+      x += this->ncol();
     }
-  }
-
-  void CSparseCholeskyInterface::solve_cholesky(void* mem, double* x, int nrhs, bool tr) const {
-    auto m = static_cast<CsparseCholMemory*>(mem);
-
-    casadi_assert_dev(m->L!=0);
-
-    double *t = get_ptr(m->temp);
-
-    for (int k=0; k<nrhs; ++k) {
-      cs_ipvec(m->L->pinv, x, t, m->A.n) ;   // t = P1\b
-      if (tr) cs_lsolve(m->L->L, t) ; // t = L\t
-      if (!tr) cs_ltsolve(m->L->L, t) ; // t = U\t
-      cs_ipvec(m->S->q, t, x, m->A.n) ;      // x = P2\t
-      x += m->ncol();
-    }
+    return 0;
   }
 
 } // namespace casadi

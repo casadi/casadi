@@ -16,5 +16,5 @@ casadi_plugin(Expm slicot
   slicot_la.hpp
   slicot_expm_meta.cpp)
 
-casadi_plugin_link_libraries(Dple slicot ${SLICOT_LIBRARIES})
-casadi_plugin_link_libraries(Expm slicot ${SLICOT_LIBRARIES})
+casadi_plugin_link_libraries(Dple slicot ${SLICOT_LIBRARIES} ${LAPACK_LIBRARIES})
+casadi_plugin_link_libraries(Expm slicot ${SLICOT_LIBRARIES} ${LAPACK_LIBRARIES})

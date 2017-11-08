@@ -45,8 +45,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_ldl);
   }
 
-  LinsolLdl::LinsolLdl(const std::string& name)
-    : LinsolInternal(name) {
+  LinsolLdl::LinsolLdl(const std::string& name, const Sparsity& sp)
+    : LinsolInternal(name, sp) {
   }
 
   LinsolLdl::~LinsolLdl() {
@@ -62,15 +62,11 @@ namespace casadi {
   }
 
   int LinsolLdl::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void LinsolLdl::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
+    if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<LinsolLdlMemory*>(mem);
 
     // Dimension
-    int n=m->nrow();
+    int n=this->nrow();
     // Work vector
     m->iw.resize(3*n);
     // Elimination tree
@@ -79,31 +75,32 @@ namespace casadi {
     m->sp_l.resize(2+n+1);
     m->sp_l[0] = n;
     m->sp_l[1] = n;
-    casadi_ldl_colind(sp, get_ptr(m->parent), get_ptr(m->sp_l)+2, get_ptr(m->iw));
+    casadi_ldl_colind(sp_, get_ptr(m->parent), get_ptr(m->sp_l)+2, get_ptr(m->iw));
     // Get rows in L (strictly lower entries only)
     int nnz_l = m->sp_l[2+n];
     m->sp_l.resize(2 + n+1 + nnz_l);
-    casadi_ldl_row(sp, get_ptr(m->parent), get_ptr(m->sp_l)+2, get_ptr(m->sp_l)+2+n+1,
+    casadi_ldl_row(sp_, get_ptr(m->parent), get_ptr(m->sp_l)+2, get_ptr(m->sp_l)+2+n+1,
                     get_ptr(m->iw));
     m->nz_l.resize(nnz_l);
     m->d.resize(n);
     m->w.resize(n);
+    return 0;
   }
 
-  void LinsolLdl::pivoting(void* mem, const double* A) const {
-    LinsolInternal::pivoting(mem, A);
-//    auto m = static_cast<LinsolLdlMemory*>(mem);
-   }
+  int LinsolLdl::sfact(void* mem, const double* A) const {
+    return 0;
+  }
 
-  void LinsolLdl::factorize(void* mem, const double* A) const {
+  int LinsolLdl::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    casadi_ldl(get_ptr(m->sparsity), get_ptr(m->parent), get_ptr(m->sp_l),
+    casadi_ldl(sp_, get_ptr(m->parent), get_ptr(m->sp_l),
                A, get_ptr(m->nz_l), get_ptr(m->d), get_ptr(m->iw), get_ptr(m->w));
+    return 0;
   }
 
-  void LinsolLdl::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int LinsolLdl::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    int n = m->nrow();
+    int n = this->nrow();
     for (int k=0; k<nrhs; ++k) {
       //      LDL'x = b <=> x = L\D\L'\b
       //  Solve for L'
@@ -115,21 +112,22 @@ namespace casadi {
       // Next rhs
       x += n;
     }
+    return 0;
   }
 
-  int LinsolLdl::neig(void* mem) const {
+  int LinsolLdl::neig(void* mem, const double* A) const {
     // Count number of negative eigenvalues
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    int n = m->nrow();
+    int n = this->nrow();
     int ret = 0;
     for (int i=0; i<n; ++i) if (m->d[i]<0) ret++;
     return ret;
   }
 
-  int LinsolLdl::rank(void* mem) const {
+  int LinsolLdl::rank(void* mem, const double* A) const {
     // Count number of nonzero eigenvalues
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    int n = m->nrow();
+    int n = this->nrow();
     int ret = 0;
     for (int i=0; i<n; ++i) if (m->d[i]!=0) ret++;
     return ret;

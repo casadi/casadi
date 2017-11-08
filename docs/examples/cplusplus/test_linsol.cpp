@@ -90,14 +90,13 @@ int main(int argc, char *argv[])
       }
 
       // Create a solver instance
-      Linsol F("F", t.solver);
+      Linsol F("F", t.solver, A_test.sparsity());
 
       // Solve
-      F.reset(A_test.sparsity());
-      F.pivoting(A_test.ptr());
-      F.factorize(A_test.ptr());
+      if (F.sfact(A_test.ptr())) casadi_error("'sfact' failed");
+      if (F.nfact(A_test.ptr())) casadi_error("'nfact' failed");
       DM x = densify(b);
-      F.solve(x.ptr(), x.size2());
+      if (F.solve(A_test.ptr(), x.ptr(), x.size2())) casadi_error("'solve' failed");
 
       // Print the solution
       cout << "solution: " << x << " (" <<  t.solver << ")" << endl;

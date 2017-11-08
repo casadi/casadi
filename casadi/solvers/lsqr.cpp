@@ -48,71 +48,29 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_lsqr);
   }
 
-  Lsqr::Lsqr(const std::string& name) :
-    LinsolInternal(name) {
+  Lsqr::Lsqr(const std::string& name, const Sparsity& sp) :
+    LinsolInternal(name, sp) {
   }
 
   Lsqr::~Lsqr() {
     clear_mem();
   }
 
-  Options Lsqr::options_
-  = {{&FunctionInternal::options_},
-    {{"codegen",
-      {OT_BOOL,
-       "C-code generation"}},
-      {"compiler",
-      {OT_STRING,
-       "Compiler command to be used for compiling generated code"}}
-   }
-  };
-
-  void Lsqr::init(const Dict& opts) {
-    // Call the base class initializer
-    LinsolInternal::init(opts);
-
-    // Default options
-    bool codegen = false;
-
-    // Read options
-    for (auto&& op : opts) {
-      if (op.first=="codegen") {
-        codegen = op.second;
-      } else if (op.first=="compiler") {
-        casadi_error("Option \"compiler\" has been removed");
-      }
-    }
-
-    // Codegen options
-    if (codegen) {
-      fopts_["compiler"] = compilerplugin_;
-      fopts_["jit_options"] = jit_options_;
-    }
-  }
-
   int Lsqr::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void Lsqr::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
+    if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<LsqrMemory*>(mem);
 
-    Sparsity spA = Sparsity::compressed(m->sparsity);
-
-    int m_ = sp[0];
-    int n_ = sp[1];
-
     // Temporary storage
-    m->w.resize(m_+4*n_);
-    m->A.resize(spA.nnz());
-
+    m->w.resize(nrow()+4*ncol());
+    m->A.resize(sp_.nnz());
+    return 0;
   }
 
-  void Lsqr::factorize(void* mem, const double* A) const {
+  int Lsqr::nfact(void* mem, const double* A) const {
     auto m = static_cast<LsqrMemory*>(mem);
 
     std::copy(A, A+m->A.size(), get_ptr(m->A));
+    return 0;
   }
 
 
@@ -138,13 +96,13 @@ namespace casadi {
     }
   }
 
-  void solve_(void* mem, double* x, bool tr) {
+  int solve_(void* mem, const Sparsity& sp, double* x, bool tr) {
     auto m = static_cast<LsqrMemory*>(mem);
 
     const double*A = get_ptr(m->A);
 
-    int m_ = m->sparsity[0];
-    int n_ = m->sparsity[1];
+    int m_ = sp.size1();
+    int n_ = sp.size2();
 
     double damp = 0;
     double atol=1e-15;
@@ -182,7 +140,7 @@ namespace casadi {
 
     if (beta>0) {
       for (int i=0;i<m_;++i) u[i]*=1/beta;
-      casadi_mv(A, get_ptr(m->sparsity), u, v, !tr);
+      casadi_mv(A, sp, u, v, !tr);
       alpha = casadi_norm_2(n_, v);
     }
 
@@ -214,14 +172,14 @@ namespace casadi {
     while (itn<iter_lim) {
       itn++;
       for (int i=0;i<m_;++i) u[i]*=-alpha;
-      casadi_mv(A, get_ptr(m->sparsity), v, u, tr);
+      casadi_mv(A, sp, v, u, tr);
       beta = casadi_norm_2(m_, u);
 
       if (beta>0) {
         for (int i=0;i<m_;++i) u[i]*=1/beta;
         anorm = sqrt(anorm*anorm + alpha*alpha+beta*beta+damp*damp);
         for (int i=0;i<n_;++i) v[i]*=-beta;
-        casadi_mv(A, get_ptr(m->sparsity), u, v, !tr);
+        casadi_mv(A, sp, u, v, !tr);
         alpha = casadi_norm_2(n_, v);
         if (alpha>0) for (int i=0;i<n_;++i) v[i]*=1/alpha;
       }
@@ -294,18 +252,18 @@ namespace casadi {
 
     }
     std::copy(xx, xx+m_, x);
-
+    return 0;
   }
 
-  void Lsqr::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int Lsqr::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LsqrMemory*>(mem);
 
-    int n_ = m->sparsity[1];
+    int n_ = ncol();
 
-    for (int i=0;i<nrhs;++i) {
-      solve_(mem, x+i*n_, tr);
+    for (int i=0; i<nrhs;++i) {
+      if (solve_(mem, sp_, x+i*n_, tr)) return 1;
     }
-
+    return 0;
   }
 
 

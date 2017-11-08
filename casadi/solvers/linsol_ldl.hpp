@@ -54,11 +54,11 @@ namespace casadi {
   public:
 
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LinsolLdl(const std::string& name);
+    LinsolLdl(const std::string& name, const Sparsity& sp);
 
     /** \brief  Create a new LinsolInternal */
-    static LinsolInternal* creator(const std::string& name) {
-      return new LinsolLdl(name);
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new LinsolLdl(name, sp);
     }
 
     // Destructor
@@ -76,23 +76,20 @@ namespace casadi {
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<LinsolLdlMemory*>(mem);}
 
-    // Set sparsity pattern
-    void reset(void* mem, const int* sp) const override;
-
     // Symbolic factorization
-    void pivoting(void* mem, const double* A) const override;
+    int sfact(void* mem, const double* A) const override;
 
     // Factorize the linear system
-    void factorize(void* mem, const double* A) const override;
+    int nfact(void* mem, const double* A) const override;
 
     // Solve the linear system
-    void solve(void* mem, double* x, int nrhs, bool tr) const override;
+    int solve(void* mem, const double* A, double* x, int nrhs, bool tr) const override;
 
     /// Number of negative eigenvalues
-    int neig(void* mem) const override;
+    int neig(void* mem, const double* A) const override;
 
     /// Matrix rank
-    int rank(void* mem) const override;
+    int rank(void* mem, const double* A) const override;
 
     /// A documentation string
     static const std::string meta_doc;

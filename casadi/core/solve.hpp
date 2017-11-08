@@ -84,14 +84,9 @@ namespace casadi {
     /// Can the operation be performed inplace (i.e. overwrite the result)
     int n_inplace() const override { return 1;}
 
-    /** \brief Get required length of arg field */
-    size_t sz_arg() const override;
-
-    /** \brief Get required length of res field */
-    size_t sz_res() const override;
-
-    /** \brief Get required length of iw field */
-    size_t sz_iw() const override;
+    /** \brief Generate code for the operation */
+    void generate(CodeGenerator& g,
+                  const std::vector<int>& arg, const std::vector<int>& res) const override;
 
     /** \brief Get required length of w field */
     size_t sz_w() const override;

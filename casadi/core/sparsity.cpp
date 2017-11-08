@@ -1193,6 +1193,13 @@ namespace casadi {
     return (*this)->sp();
   }
 
+  Sparsity::operator SparsityStruct() const {
+    const int* sp = *this;
+    int nrow = sp[0], ncol = sp[1];
+    const int* colind = sp+2, *row = sp+2+ncol+1;
+    return SparsityStruct{nrow, ncol, colind, row};
+  }
+
   Sparsity Sparsity::compressed(const std::vector<int>& v) {
     // Check consistency
     casadi_assert_dev(v.size() >= 2);

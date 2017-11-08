@@ -53,7 +53,12 @@ namespace casadi {
     return ret;
   }
 
-  FunctionInternal::FunctionInternal(const std::string& name) : name_(name) {
+  ProtoFunction::ProtoFunction(const std::string& name) : name_(name) {
+    // Default options (can be overridden in derived classes)
+    verbose_ = false;
+  }
+
+  FunctionInternal::FunctionInternal(const std::string& name) : ProtoFunction(name) {
     // Make sure valid function name
     if (!Function::check_name(name_)) {
       casadi_error("Function name is not valid. A valid function name is a string "
@@ -62,8 +67,6 @@ namespace casadi {
                    "'null', 'jac' or 'hess'. Got '" + name_ + "'");
     }
 
-    // Default options (can be overridden in derived classes)
-    verbose_ = false;
     // By default, reverse mode is about twice as expensive as forward mode
     ad_weight_ = 0.33; // i.e. nf <= 2*na <=> 1/3*nf <= (1-1/3)*na, forward when tie
     // Both modes equally expensive by default (no "taping" needed)
@@ -92,14 +95,17 @@ namespace casadi {
     sz_w_per_ = 0;
   }
 
-  FunctionInternal::~FunctionInternal() {
+  ProtoFunction::~ProtoFunction() {
     for (void* m : mem_) {
       if (m!=0) casadi_warning("Memory object has not been properly freed");
     }
     mem_.clear();
   }
 
-  void FunctionInternal::construct(const Dict& opts) {
+  FunctionInternal::~FunctionInternal() {
+  }
+
+  void ProtoFunction::construct(const Dict& opts) {
     // Sanitize dictionary is needed
     if (!Options::is_sane(opts)) {
       // Call recursively
@@ -113,7 +119,7 @@ namespace casadi {
     try {
       init(opts);
     } catch (exception& e) {
-      casadi_error("Error calling " + class_name() + "::init for '" + name() + "':\n"
+      casadi_error("Error calling " + class_name() + "::init for '" + name_ + "':\n"
         + string(e.what()));
     }
 
@@ -121,17 +127,22 @@ namespace casadi {
     try {
       finalize(opts);
     } catch (exception& e) {
-      casadi_error("Error calling " + class_name() + "::finalize for '" + name() + "':\n"
+      casadi_error("Error calling " + class_name() + "::finalize for '" + name_ + "':\n"
         + string(e.what()));
     }
   }
 
-  Options FunctionInternal::options_
+  Options ProtoFunction::options_
   = {{},
      {{"verbose",
        {OT_BOOL,
-        "Verbose evaluation -- for debugging"}},
-      {"ad_weight",
+        "Verbose evaluation -- for debugging"}}
+      }
+  };
+
+  Options FunctionInternal::options_
+  = {{&ProtoFunction::options_},
+      {{"ad_weight",
        {OT_DOUBLE,
         "Weighting factor for derivative calculation."
         "When there is an option of either using forward or reverse mode "
@@ -223,15 +234,25 @@ namespace casadi {
      }
   };
 
+  void ProtoFunction::init(const Dict& opts) {
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="verbose") {
+        verbose_ = op.second;
+      }
+    }
+  }
+
   void FunctionInternal::init(const Dict& opts) {
+    // Call the initialization method of the base class
+    ProtoFunction::init(opts);
+
     // Default options
     fd_step_ = 1e-8;
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="verbose") {
-        verbose_ = op.second;
-      } else if (op.first=="jac_penalty") {
+      if (op.first=="jac_penalty") {
         jac_penalty_ = op.second;
       } else if (op.first=="user_data") {
         user_data_ = op.second.to_void_pointer();
@@ -354,22 +375,26 @@ namespace casadi {
     if (jit_) {
       string jit_name = "jit_tmp";
       if (has_codegen()) {
-        if (verbose_) casadi_message("Codegenerating function '" + name() + "'.");
+        if (verbose_) casadi_message("Codegenerating function '" + name_ + "'.");
         // JIT everything
         CodeGenerator gen(jit_name);
         gen.add(self());
-        if (verbose_) casadi_message("Compiling function '" + name() + "'..");
+        if (verbose_) casadi_message("Compiling function '" + name_ + "'..");
         compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
-        if (verbose_) casadi_message("Compiling function '" + name() + "' done.");
+        if (verbose_) casadi_message("Compiling function '" + name_ + "' done.");
         // Try to load
-        eval_ = (eval_t)compiler_.get_function(name());
+        eval_ = (eval_t)compiler_.get_function(name_);
         casadi_assert(eval_!=0, "Cannot load JIT'ed function.");
       } else {
         // Just jit dependencies
         jit_dependencies(jit_name);
       }
     }
+    // Finalize base classes
+    ProtoFunction::finalize(opts);
+  }
 
+  void ProtoFunction::finalize(const Dict& opts) {
     // Create memory object
     int mem = checkout();
     casadi_assert_dev(mem==0);
@@ -532,7 +557,7 @@ namespace casadi {
 
     // Print
     if (verbose_) {
-      casadi_message(str(nsweep) + string(fwd ? "forward" : "reverse") + " sweeps "
+      casadi_message(str(nsweep) + string(fwd ? " forward" : " reverse") + " sweeps "
                      "needed for " + str(seed.size()) + " directions");
     }
 
@@ -1840,7 +1865,7 @@ namespace casadi {
     for (auto&& e : g.added_functions_) {
       if (e.f.get()==this) return e.codegen_name;
     }
-    casadi_error("Function '" + name() + "' not found");
+    casadi_error("Function '" + name_ + "' not found");
   }
 
   void FunctionInternal::codegen_declarations(CodeGenerator& g) const {
@@ -1848,7 +1873,7 @@ namespace casadi {
   }
 
   void FunctionInternal::codegen_body(CodeGenerator& g) const {
-    casadi_warning("The function \"" + name() + "\", which is of type \""
+    casadi_warning("The function \"" + name_ + "\", which is of type \""
                    + class_name() + "\" cannot be code generated. The generation "
                    "will proceed, but compilation of the code will not be possible.");
     g << "#error Code generation not supported for " << class_name() << "\n";
@@ -2435,11 +2460,11 @@ namespace casadi {
     set_temp(mem, arg, res, iw, w);
   }
 
-  void FunctionInternal::free_mem(void *mem) const {
+  void ProtoFunction::free_mem(void *mem) const {
     casadi_warning("'free_mem' not defined for " + class_name());
   }
 
-  void FunctionInternal::clear_mem() {
+  void ProtoFunction::clear_mem() {
     for (auto&& i : mem_) {
       if (i!=0) free_mem(i);
     }
@@ -2497,11 +2522,11 @@ namespace casadi {
     return Sparsity::scalar();
   }
 
-  void* FunctionInternal::memory(int ind) const {
+  void* ProtoFunction::memory(int ind) const {
     return mem_.at(ind);
   }
 
-  int FunctionInternal::checkout() const {
+  int ProtoFunction::checkout() const {
     if (unused_.empty()) {
       // Allocate a new memory object
       void* m = alloc_mem();
@@ -2518,7 +2543,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::release(int mem) const {
+  void ProtoFunction::release(int mem) const {
     unused_.push(mem);
   }
 

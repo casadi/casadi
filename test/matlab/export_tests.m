@@ -71,7 +71,7 @@ delete('f_mx_exported.m')
 delete('f_sx_exported.m')
 
 
-linsol = Linsol('solver', 'lapackqr')
+linsol = Linsol('solver', 'lapackqr', x.sparsity())
 
 r = linsol.solve(x,y,false)
 rt = linsol.solve(x,y,true)

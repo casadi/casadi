@@ -524,7 +524,7 @@ namespace casadi {
       casadi_copy(v, s.nx_, m->v1);
 
       // Solve for undifferentiated right-hand-side, save to output
-      s.linsolF_.solve(m->v1, 1);
+      if (s.linsolF_.solve(m->jac, m->v1, 1)) casadi_error("Linear system solve failed");
       v = NV_DATA_S(z); // possibly different from r
       casadi_copy(m->v1, s.nx1_, v);
 
@@ -546,7 +546,7 @@ namespace casadi {
         }
 
         // Solve for sensitivity right-hand-sides
-        s.linsolF_.solve(m->v1 + s.nx1_, s.ns_);
+        if (s.linsolF_.solve(m->jac, m->v1 + s.nx1_, s.ns_)) casadi_error("Linear solve failed");
 
         // Save to output, reordered
         casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
@@ -573,7 +573,7 @@ namespace casadi {
       casadi_copy(v, s.nrx_, m->v1);
 
       // Solve for undifferentiated right-hand-side, save to output
-      s.linsolB_.solve(m->v1, 1);
+      if (s.linsolB_.solve(m->jacB, m->v1, 1)) casadi_error("Linear solve failed");
       v = NV_DATA_S(zvecB); // possibly different from rvecB
       casadi_copy(m->v1, s.nrx1_, v);
 
@@ -597,7 +597,9 @@ namespace casadi {
         }
 
         // Solve for sensitivity right-hand-sides
-        s.linsolB_.solve(m->v1 + s.nx1_, s.ns_);
+        if (s.linsolB_.solve(m->jacB, m->v1 + s.nx1_, s.ns_)) {
+          casadi_error("Linear solve failed");
+        }
 
         // Save to output, reordered
         casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
@@ -629,10 +631,10 @@ namespace casadi {
       m->arg[3] = &d1;
       m->arg[4] = &d2;
       m->res[0] = m->jac;
-      s.calc_function(m, "jacF");
+      if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
 
       // Prepare the solution of the linear system (e.g. factorize)
-      s.linsolF_.factorize(m->jac);
+      if (s.linsolF_.nfact(m->jac)) casadi_error("'jacF' factorization failed");
 
       return 0;
     } catch(int flag) { // recoverable error
@@ -662,10 +664,10 @@ namespace casadi {
       m->arg[5] = &gammaB;
       m->arg[6] = &one;
       m->res[0] = m->jacB;
-      s.calc_function(m, "jacB");
+      if (s.calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
 
       // Prepare the solution of the linear system (e.g. factorize)
-      s.linsolB_.factorize(m->jacB);
+      if (s.linsolB_.nfact(m->jacB)) casadi_error("'jacB' factorization failed");
 
       return 0;
     } catch(int flag) { // recoverable error

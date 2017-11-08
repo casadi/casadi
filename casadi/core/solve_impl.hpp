@@ -53,16 +53,14 @@ namespace casadi {
   template<bool Tr>
   int Solve<Tr>::eval(const double** arg, double** res, int* iw, double* w) const {
     if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
-    linsol_.reset(dep(1).sparsity());
-    linsol_.pivoting(arg[1]);
-    linsol_.factorize(arg[1]);
-    linsol_.solve(res[0], dep(0).size2(), Tr);
+    if (linsol_.sfact(arg[1])) return 1;
+    if (linsol_.nfact(arg[1])) return 1;
+    if (linsol_.solve(arg[1], res[0], dep(0).size2(), Tr)) return 1;
     return 0;
   }
 
   template<bool Tr>
   int Solve<Tr>::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
-    linsol_.reset(dep(1).sparsity());
     linsol_->linsol_eval_sx(arg, res, iw, w, linsol_->memory(0), Tr, dep(0).size2());
     return 0;
   }
@@ -242,23 +240,30 @@ namespace casadi {
   }
 
   template<bool Tr>
-  size_t Solve<Tr>::sz_arg() const {
-    return n_dep() + linsol_->sz_arg();
-  }
-
-  template<bool Tr>
-  size_t Solve<Tr>::sz_res() const {
-    return nout() + linsol_->sz_res();
-  }
-
-  template<bool Tr>
-  size_t Solve<Tr>::sz_iw() const {
-    return linsol_->sz_iw();
-  }
-
-  template<bool Tr>
   size_t Solve<Tr>::sz_w() const {
-    return linsol_->sz_w() + sparsity().size1();
+    return sparsity().size1();
+  }
+
+  template<bool Tr>
+  void Solve<Tr>::generate(CodeGenerator& g,
+                           const std::vector<int>& arg, const std::vector<int>& res) const {
+    // Number of right-hand-sides
+    int nrhs = dep(0).size2();
+
+    // Array for x
+    g.local("rr", "casadi_real", "*");
+    g << "rr = " << g.work(res[0], nnz()) << ";\n";
+
+    // Array for A
+    g.local("ss", "casadi_real", "*");
+    g << "ss = " << g.work(arg[1], dep(1).nnz()) << ";\n";
+
+    // Copy b to x if not inplace
+    if (arg[0]!=res[0]) {
+      g << g.copy(g.work(arg[0], nnz()), nnz(), "rr") << '\n';
+    }
+    // Solver specific codegen
+    linsol_->generate(g, "ss", "rr", nrhs, Tr);
   }
 
 } // namespace casadi

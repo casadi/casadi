@@ -790,7 +790,7 @@ namespace casadi {
     casadi_assert(lang=="matlab", "Only matlab language supported for now.");
 
     // start function
-    ss << "function [varargout] = " << name() << "(varargin)" << std::endl;
+    ss << "function [varargout] = " << name_ << "(varargin)" << std::endl;
 
     // Allocate space for output argument (segments)
     for (int i=0;i<n_out_;++i) {

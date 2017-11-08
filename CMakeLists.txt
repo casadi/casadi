@@ -635,11 +635,14 @@ add_feature_info(sqic-interface WITH_SQIC "Interface to the QP solver SQIC.")
 option(WITH_AMPL "Compile the interface to AMPL" OFF)
 add_feature_info(ampl-interface WITH_AMPL "Interface to the AMPL solver library.")
 
-# @jgillis: What it this for?
+# Slicot: used for expm, dple
 option(WITH_SLICOT "Enable SLICOT interface" OFF)
 if(WITH_SLICOT)
   if (NOT Fortran_language_works)
     message(FATAL_ERROR "SLICOT requires Fortran support.")
+  endif()
+  if (NOT WITH_LAPACK)
+     message(FATAL_ERROR "WITH_SLICOT requires WITH_LAPACK.")
   endif()
   find_package(SLICOT REQUIRED)
 endif()

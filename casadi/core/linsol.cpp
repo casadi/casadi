@@ -33,8 +33,8 @@ namespace casadi {
   }
 
   Linsol::Linsol(const std::string& name, const std::string& solver,
-                 const Dict& opts) {
-    own(LinsolInternal::getPlugin(solver).creator(name));
+                 const Sparsity& sp, const Dict& opts) {
+    own(LinsolInternal::getPlugin(solver).creator(name, sp));
     (*this)->construct(opts);
   }
 
@@ -66,23 +66,24 @@ namespace casadi {
     return (*this)->plugin_name();
   }
 
+  const Sparsity& Linsol::sparsity() const {
+    return (*this)->sp_;
+  }
+
   DM Linsol::solve(const DM& A, const DM& B, bool tr) const {
     casadi_assert(A.size1()==B.size1(),
       "Linsol::solve: Dimension mismatch. A and b must have matching row count. "
       "Got " + A.dim() + " and " + B.dim() + ".");
 
-    // Set sparsity
-    reset(A.sparsity());
+    // Symbolic factorization
+    if (sfact(A.ptr())) casadi_error("Linsol::solve: 'sfact' failed");
 
-    // Calculate partial pivots
-    pivoting(A.ptr());
-
-    // Factorize
-    factorize(A.ptr());
+    // Numeric factorization
+    if (nfact(A.ptr())) casadi_error("Linsol::solve: 'nfact' failed");
 
     // Solve
     DM x = densify(B);
-    solve(x.ptr(), x.size2());
+    if (solve(A.ptr(), x.ptr(), x.size2())) casadi_error("Linsol::solve: 'solve' failed");
     return x;
   }
 
@@ -90,87 +91,72 @@ namespace casadi {
     return A->get_solve(B, tr, *this);
   }
 
-  void Linsol::solve_cholesky(double* x, int nrhs, bool tr) const {
-    (*this)->solve_cholesky((*this)->memory(0), x, nrhs, tr);
+  void Linsol::sfact(const DM& A) const {
+    if (A.sparsity()!=sparsity()) return sfact(project(A, sparsity()));
+    if (sfact(A.ptr())) casadi_error("'sfact' failed");
   }
 
-  void Linsol::reset(const int* sp) const {
-    casadi_assert_dev(sp!=0);
-    auto m = static_cast<LinsolMemory*>((*this)->memory(0));
-
-    // Check if pattern has changed
-    bool changed_pattern = m->sparsity.empty();
-    if (!changed_pattern) {
-      for (int i=0; i<m->sparsity.size(); ++i) {
-        if (sp[i] != m->sparsity[i]) {
-          changed_pattern = true;
-          break;
-        }
-      }
-    }
-
-    // Update pattern, if needed
-    if (changed_pattern) {
-      // New factorization will be required
-      m->is_pivoted = m->is_factorized = false;
-
-      // Update pattern
-      (*this)->reset(m, sp);
-    }
-  }
-
-  void Linsol::pivoting(const double* A) const {
-    casadi_assert_dev(A!=0);
-    auto m = static_cast<LinsolMemory*>((*this)->memory(0));
-    casadi_assert(!m->sparsity.empty(), "No sparsity pattern set");
+  int Linsol::sfact(const double* A, int mem) const {
+    if (A==0) return 1;
+    auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
     // Factorization will be needed after this step
-    m->is_pivoted = m->is_factorized = false;
+    m->is_sfact = m->is_nfact = false;
 
     // Perform pivoting
-    (*this)->pivoting(m, A);
+    if ((*this)->sfact(m, A)) return 1;
 
     // Mark as (successfully) pivoted
-    m->is_pivoted = true;
+    m->is_sfact = true;
+    return 0;
   }
 
-  void Linsol::factorize(const double* A) const {
-    casadi_assert_dev(A!=0);
-    auto m = static_cast<LinsolMemory*>((*this)->memory(0));
+  void Linsol::nfact(const DM& A) const {
+    if (A.sparsity()!=sparsity()) return nfact(project(A, sparsity()));
+    if (nfact(A.ptr())) casadi_error("'nfact' failed");
+  }
+
+  int Linsol::nfact(const double* A, int mem) const {
+    if (A==0) return 1;
+    auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
     // Perform pivoting, if required
-    if (!m->is_pivoted) pivoting(A);
+    if (!m->is_sfact) {
+      if (sfact(A)) return 1;
+    }
 
-    m->is_factorized = false;
-    (*this)->factorize(m, A);
-    m->is_factorized = true;
+    m->is_nfact = false;
+    if ((*this)->nfact(m, A)) return 1;
+    m->is_nfact = true;
+    return 0;
   }
 
-  int Linsol::neig() const {
-    auto m = static_cast<LinsolMemory*>((*this)->memory(0));
-    casadi_assert_dev(m->is_factorized);
-    return (*this)->neig(m);
+  int Linsol::neig(const DM& A) const {
+    if (A.sparsity()!=sparsity()) return neig(project(A, sparsity()));
+    int n = neig(A.ptr());
+    casadi_assert(n>=0, "'neig' failed");
+    return n;
   }
 
-  int Linsol::rank() const {
-    auto m = static_cast<LinsolMemory*>((*this)->memory(0));
-    casadi_assert_dev(m->is_factorized);
-    return (*this)->rank(m);
+  int Linsol::neig(const double* A, int mem) const {
+    return (*this)->neig((*this)->memory(mem), A);
   }
 
-  void Linsol::solve(double* x, int nrhs, bool tr) const {
-    auto m = static_cast<LinsolMemory*>((*this)->memory(0));
-    casadi_assert(m->is_factorized, "Linear system has not been factorized");
-
-    (*this)->solve(m, x, nrhs, tr);
+  int Linsol::rank(const DM& A) const {
+    if (A.sparsity()!=sparsity()) return rank(project(A, sparsity()));
+    int n = rank(A.ptr());
+    casadi_assert(n>=0, "'rank' failed");
+    return n;
   }
 
-  Sparsity Linsol::cholesky_sparsity(bool tr) const {
-    return (*this)->linsol_cholesky_sparsity((*this)->memory(0), tr);
+  int Linsol::rank(const double* A, int mem) const {
+    return (*this)->rank((*this)->memory(mem), A);
   }
 
-  DM Linsol::cholesky(bool tr) const {
-    return (*this)->linsol_cholesky((*this)->memory(0), tr);
+  int Linsol::solve(const double* A, double* x, int nrhs, bool tr, int mem) const {
+    auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
+    casadi_assert(m->is_nfact, "Linear system has not been factorized");
+    return (*this)->solve(m, A, x, nrhs, tr);
   }
 
   bool has_linsol(const string& name) {

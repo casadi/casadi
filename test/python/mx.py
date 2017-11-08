@@ -2532,7 +2532,6 @@ class MXtests(casadiTestCase):
 
     self.checkarray(F(v),np.interp(xq,x,v))
     
-  @known_bug()
   def test_bilin_etc(self):
     x = MX.sym("x",3,3)
     y = MX.sym("y",3,1)

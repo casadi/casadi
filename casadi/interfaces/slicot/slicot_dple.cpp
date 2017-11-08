@@ -192,8 +192,7 @@ namespace casadi {
 
       m->dpse_solvers[i].reserve(n_*(n_+1)/2);
       for (int k=0;k<n_*(n_+1)/2;++k) {
-        m->dpse_solvers[i].push_back(Linsol("solver", linear_solver_));
-        m->dpse_solvers[i][k].reset(sp);
+        m->dpse_solvers[i].push_back(Linsol("solver", linear_solver_, sp));
       }
     }
     return 0;
@@ -277,8 +276,8 @@ namespace casadi {
         // ********** STOP ***************
         // Solve Discrete Periodic Sylvester Equation Solver
 
-        solver.pivoting(m->A);
-        solver.factorize(m->A);
+        solver.sfact(m->A);
+        solver.nfact(m->A);
 
       }
     }
@@ -367,7 +366,7 @@ namespace casadi {
 
           // Critical observation: Prepare step is not needed
           // n^2 K
-          solver.solve(m->B, 1, true);
+          solver.solve(m->A, m->B, 1, true);
 
           // Extract solution and store it in X
           double * sol = m->B;

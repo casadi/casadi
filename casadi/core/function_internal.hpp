@@ -56,20 +56,17 @@ namespace casadi {
   /// Combine two dictionaries, giving priority to first one
   Dict CASADI_EXPORT combine(const Dict& first, const Dict& second);
 
-  /** \brief Internal class for Function
-      \author Joel Andersson
-      \date 2010-2015
+  /** \brief Base class for FunctionInternal and LinsolInternal
+    \author Joel Andersson
+    \date 2017
   */
-  class CASADI_EXPORT FunctionInternal : public SharedObjectInternal {
+  class CASADI_EXPORT ProtoFunction : public SharedObjectInternal {
   public:
     /** \brief Constructor */
-    FunctionInternal(const std::string& name);
+    ProtoFunction(const std::string& name);
 
     /** \brief  Destructor */
-    ~FunctionInternal() override = 0;
-
-    /** \brief  Obtain solver name from Adaptor */
-    virtual std::string getAdaptorSolverName() const { return ""; }
+    ~ProtoFunction() override = 0;
 
     /** \brief Construct
         Prepares the function for evaluation
@@ -94,6 +91,69 @@ namespace casadi {
         init() has been completed.
     */
     virtual void finalize(const Dict& opts);
+
+    /// Checkout a memory object
+    int checkout() const;
+
+    /// Release a memory object
+    void release(int mem) const;
+
+    /// Memory objects
+    void* memory(int ind) const;
+
+    /** \brief Create memory block */
+    virtual void* alloc_mem() const {return 0;}
+
+    /** \brief Initalize memory block */
+    virtual int init_mem(void* mem) const { return 0;}
+
+    /** \brief Free memory block */
+    virtual void free_mem(void *mem) const;
+
+    /** \brief Clear all memory (called from destructor) */
+    void clear_mem();
+
+  protected:
+    /// Name
+    std::string name_;
+
+    /// Verbose printout
+    bool verbose_;
+  private:
+    /// Memory objects
+    mutable std::vector<void*> mem_;
+
+    /// Unused memory objects
+    mutable std::stack<int> unused_;
+  };
+
+  /** \brief Internal class for Function
+      \author Joel Andersson
+      \date 2010-2015
+  */
+  class CASADI_EXPORT FunctionInternal : public ProtoFunction {
+    friend class Function;
+  public:
+    /** \brief Constructor */
+    FunctionInternal(const std::string& name);
+
+    /** \brief  Destructor */
+    ~FunctionInternal() override = 0;
+
+    /** \brief  Obtain solver name from Adaptor */
+    virtual std::string getAdaptorSolverName() const { return ""; }
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
+
+    /** \brief Initialize */
+    void init(const Dict& opts) override;
+
+    /** \brief Finalize the object creation */
+    void finalize(const Dict& opts) override;
 
     /** \brief Get a public class instance */
     Function self() const { return shared_from_this<Function>();}
@@ -458,9 +518,6 @@ namespace casadi {
     /** \brief Are all inputs and outputs scalar */
     bool all_scalar() const;
 
-    /** \brief Name of the function */
-    const std::string& name() const { return name_;}
-
     /// Generate the sparsity of a Jacobian block
     virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric) const;
 
@@ -582,21 +639,6 @@ namespace casadi {
     /** \brief Ensure work vectors long enough to evaluate function */
     void alloc(const Function& f, bool persistent=false);
 
-    /// Memory objects
-    void* memory(int ind) const;
-
-    /** \brief Create memory block */
-    virtual void* alloc_mem() const {return 0;}
-
-    /** \brief Initalize memory block */
-    virtual int init_mem(void* mem) const { return 0;}
-
-    /** \brief Free memory block */
-    virtual void free_mem(void *mem) const;
-
-    /** \brief Clear all memory (called from destructor) */
-    void clear_mem();
-
     /// Get all statistics
     virtual Dict get_stats(void* mem) const { return Dict();}
 
@@ -620,12 +662,6 @@ namespace casadi {
     /** Obtain information about function */
     virtual Dict info() const;
 
-    /// Checkout a memory object
-    int checkout() const;
-
-    /// Release a memory object
-    void release(int mem) const;
-
     /// Number of inputs and outputs
     size_t n_in_, n_out_;
 
@@ -634,9 +670,6 @@ namespace casadi {
 
     /// Input and output scheme
     std::vector<std::string> name_in_, name_out_;
-
-    /** \brief  Verbose -- for debugging purposes */
-    bool verbose_;
 
     /** \brief  Use just-in-time compiler */
     bool jit_;
@@ -667,9 +700,6 @@ namespace casadi {
 
     /// User-set field
     void* user_data_;
-
-    /// Name
-    std::string name_;
 
     /// Just-in-time compiler
     std::string compilerplugin_;
@@ -728,12 +758,6 @@ namespace casadi {
     void set_jac_sparsity(const Sparsity& sp);
 
   private:
-    /// Memory objects
-    mutable std::vector<void*> mem_;
-
-    /// Unused memory objects
-    mutable std::stack<int> unused_;
-
     /** \brief Memory that is persistent during a call (but not between calls) */
     size_t sz_arg_per_, sz_res_per_, sz_iw_per_, sz_w_per_;
 

@@ -318,7 +318,6 @@ namespace casadi {
     //Function qpsol_;
 
     // Linear solver in qpOASES
-    Linsol linsol_;
     std::string linsol_plugin_;
 
     // General options
