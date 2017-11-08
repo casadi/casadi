@@ -57,29 +57,8 @@ namespace casadi {
     // Call the init method of the base class
     LinsolInternal::init(opts);
 
-    // Dimensions
-    int nrow = this->nrow(), ncol = this->ncol();
-
-    // Allocate memory
-    leftmost_.resize(nrow);
-    parent_.resize(ncol);
-    pinv_.resize(nrow + ncol);
-    vector<int> iw(nrow + 7*ncol + 1);
-
-    // Initialize QP solve
-    int nrow_ext, v_nnz, r_nnz;
-    casadi_qr_init(sp_, sp_.T(),
-                   get_ptr(leftmost_), get_ptr(parent_), get_ptr(pinv_),
-                   &nrow_ext, &v_nnz, &r_nnz, get_ptr(iw));
-
-    // Calculate sparsities
-    vector<int> sp_v(2 + ncol + 1 + v_nnz);
-    vector<int> sp_r(2 + ncol + 1 + r_nnz);
-    casadi_qr_sparsities(sp_, nrow_ext, get_ptr(sp_v), get_ptr(sp_r),
-                         get_ptr(leftmost_), get_ptr(parent_), get_ptr(pinv_),
-                         get_ptr(iw));
-    sp_v_ = Sparsity::compressed(sp_v);
-    sp_r_ = Sparsity::compressed(sp_r);
+    // Symbolic factorization
+    sp_.qr_sparse(sp_v_, sp_r_, pinv_, leftmost_, parent_);
   }
 
   int LinsolQr::init_mem(void* mem) const {
@@ -91,7 +70,7 @@ namespace casadi {
     m->r.resize(sp_r_.nnz());
     m->beta.resize(ncol());
     m->w.resize(sp_r_.size1());
-    m->iw.resize(nrow() + 7*ncol() + 1);
+    m->iw.resize(sp_r_.size1() + ncol());
     return 0;
   }
 
@@ -132,7 +111,7 @@ namespace casadi {
          "r[" << sp_r_.nnz() << "], "
          "beta[" << ncol() << "], "
          "w[" << sp_r_.size1() << "];\n";
-    g << "int iw[" << nrow() + 7*ncol() + 1 << "];\n";
+    g << "int iw[" << sp_r_.size1() + ncol() << "];\n";
 
     // Factorize
     g << g.qr(sp, A, "iw", "w", sp_v, "v", sp_r, "r", "beta", leftmost, parent, pinv) << "\n";
