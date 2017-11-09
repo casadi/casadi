@@ -98,14 +98,13 @@ lbg = [];
 ubg = [];
 
 % "Lift" initial conditions
-X0 = MX.sym('X0', 2);
-w = {w{:}, X0};
+Xk = MX.sym('X0', 2);
+w = {w{:}, Xk};
 lbw = [lbw; 0; 1];
 ubw = [ubw; 0; 1];
 w0 = [w0; 0; 1];
 
 % Formulate the NLP
-Xk = X0;
 for k=0:N-1
     % New NLP variable for the control
     Uk = MX.sym(['U_' num2str(k)]);
