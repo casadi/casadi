@@ -2549,9 +2549,28 @@ class MXtests(casadiTestCase):
       f_sx = f.expand()    
       self.checkfunction(f,fref,inputs=[x0,y0,z0])
       self.checkfunction(f_sx,fref,inputs=[x0,y0,z0])
+
+  def test_det_shape(self):
+    X = MX.sym("x",2,3)
+    with self.assertRaises(RuntimeError):
+      det(X)
+    X = MX.sym("x",3,3)
+    det(X)
     
     
+  @known_bug()
+  def test_det(self):
+    X = MX.sym("x",3,3)
+    x = SX.sym("x",3,3)
+
+    import numpy
+    numpy.random.seed(42)
+    x0 = numpy.random.random((3,3))
     
+    f = Function('f',[x],[det(x)])
+    F = Function('F',[X],[det(X)])
+    self.checkfunction(f,F,inputs=[x0])
+
     
     
 
