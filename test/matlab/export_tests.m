@@ -1,5 +1,7 @@
 import casadi.*
 
+is_octave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
+
 n = 5;
 x = MX.sym('x',n,n);
 y = MX.sym('y',Sparsity.lower(n));
