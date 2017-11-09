@@ -69,7 +69,7 @@ namespace casadi {
     m->v.resize(sp_v_.nnz());
     m->r.resize(sp_r_.nnz());
     m->beta.resize(ncol());
-    m->w.resize(sp_r_.size1());
+    m->w.resize(nrow() + ncol());
     m->iw.resize(sp_r_.size1() + ncol());
     return 0;
   }
@@ -110,7 +110,7 @@ namespace casadi {
     g << "casadi_real v[" << sp_v_.nnz() << "], "
          "r[" << sp_r_.nnz() << "], "
          "beta[" << ncol() << "], "
-         "w[" << sp_r_.size1() << "];\n";
+         "w[" << nrow() + ncol() << "];\n";
     g << "int iw[" << sp_r_.size1() + ncol() << "];\n";
 
     // Factorize

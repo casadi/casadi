@@ -542,6 +542,7 @@ void casadi_qr_trs(const int* sp_r, const T1* nz_r, T1* x, int tr) {
 
 // SYMBOL "qr_solve"
 // Solve a factorized linear system
+// len[w] >= max(ncol, nrow_ext)
 template<typename T1>
 void casadi_qr_solve(T1* x, int nrhs, int tr,
                      const int* sp_v, const T1* v, const int* sp_r, const T1* r,
@@ -562,7 +563,8 @@ void casadi_qr_solve(T1* x, int nrhs, int tr,
     } else {
       //P'Q R x = b <-> x = R \ Q' P b
       // Multiply with P
-      casadi_fill(w, nrow_ext, 0.);
+      // C-REPLACE "T1(0)" "0"
+      casadi_fill(w, nrow_ext, T1(0));
       for (c=0; c<ncol; ++c) w[pinv[c]] = x[c];
       // Multiply with Q'
       casadi_qr_mv(sp_v, v, beta, w, 1);

@@ -1908,6 +1908,26 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::
+  qr_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& v,
+           const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
+           const std::vector<int>& pinv, bool tr) {
+    // Get dimensions, check consistency
+    int nrow_ext = v.size1(), ncol = v.size2();
+    int nrow = b.size1(), nrhs = b.size2();
+    casadi_assert(r.size()==v.size(), "'r', 'v' dimension mismatch");
+    casadi_assert(beta.is_vector() && beta.numel()==ncol, "'beta' has wrong dimension");
+    casadi_assert(pinv.size()==nrow+ncol, "'pinv' has wrong dimension");
+    // Work vector
+    std::vector<Scalar> w(nrow+ncol);
+    // Return value
+    Matrix<Scalar> x = densify(b);
+    casadi_qr_solve(x.ptr(), nrhs, tr, v.sparsity(), v.ptr(), r.sparsity(), r.ptr(),
+                    beta.ptr(), get_ptr(pinv), get_ptr(w));
+    return x;
+  }
+
+  template<typename Scalar>
   void Matrix<Scalar>::qr(const Matrix<Scalar>& A,
                             Matrix<Scalar>& Q, Matrix<Scalar> &R) {
     // The following algorithm is taken from J. Demmel:

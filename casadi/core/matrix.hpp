@@ -428,6 +428,9 @@ namespace casadi {
     static Matrix<Scalar> eig_symbolic(const Matrix<Scalar>& m);
     static void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
                           Matrix<Scalar>& beta, std::vector<int>& pinv);
+    static Matrix<Scalar> qr_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& v,
+                                   const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
+                                   const std::vector<int>& pinv, bool tr=false);
     static void qr(const Matrix<Scalar>& A, Matrix<Scalar>& Q, Matrix<Scalar>& R);
     static void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& L, Matrix<Scalar>& D);
     static Matrix<Scalar> all(const Matrix<Scalar>& x);
@@ -486,6 +489,13 @@ namespace casadi {
     friend inline void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
                                  Matrix<Scalar>& beta, std::vector<int>& pinv) {
       return Matrix<Scalar>::qr_sparse(A, V, R, beta, pinv);
+    }
+
+    friend inline Matrix<Scalar>
+    qr_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& v,
+             const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
+             const std::vector<int>& pinv, bool tr=false) {
+        return Matrix<Scalar>::qr_solve(b, v, r, beta, pinv, tr);
     }
 
     /** \brief Obtain a Cholesky factorisation of a matrix

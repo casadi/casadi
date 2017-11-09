@@ -10,6 +10,16 @@ b0 = DM.ones(n)
 x0 = solve(A0, b0)
 print(x0)
 
+# Test sparse QR
+[V, R, beta, pinv] = qr_sparse(A0)
+x0 = qr_solve(b0, V, R, beta, pinv)
+print(x0)
+
+# Test sparse QR, transposed
+[V, R, beta, pinv] = qr_sparse(A0.T)
+x0 = qr_solve(b0, V, R, beta, pinv, True)
+print(x0)
+
 A = MX.sym('A', Asp)
 b = MX.sym('b', n)
 x = solve(A, b, 'qr')

@@ -1087,8 +1087,7 @@ namespace casadi {
       if (line == "inline") continue;
 
       // If line starts with "// SYMBOL", add shorthand
-      // If line starts with "// C-REPLACE", add to list of replacements
-      if (line.find("// SYMBOL")==0) {
+      if (line.find("// SYMBOL") != string::npos) {
         n1 = line.find("\"");
         n2 = line.find("\"", n1+1);
         string sym = line.substr(n1+1, n2-n1-1);
@@ -1100,7 +1099,7 @@ namespace casadi {
       }
 
       // If line starts with "// C-REPLACE", add to list of replacements
-      if (line.find("// C-REPLACE")==0) {
+      if (line.find("// C-REPLACE") != string::npos) {
         // Get C++ string
         n1 = line.find("\"");
         n2 = line.find("\"", n1+1);
