@@ -1179,6 +1179,19 @@ namespace casadi {
     return Sparsity::triplet(nrow, ncol, row, col, mapping, false);
   }
 
+  Sparsity Sparsity::nonzeros(int nrow, int ncol, const std::vector<int>& nz, bool ind1) {
+    casadi_assert(nrow>0, "nrow must be >0.");
+    std::vector<int> row(nz.size());
+    std::vector<int> col(nz.size());
+    for (int i=0;i<nz.size();++i) {
+      int k = nz[i];
+      k-= ind1;
+      row[i] = k % nrow;
+      col[i] = k / nrow;
+    }
+    return triplet(nrow, ncol, row, col);
+  }
+
   bool Sparsity::is_singular() const {
     casadi_assert(is_square(),
       "is_singular: only defined for square matrices, but got " + dim());

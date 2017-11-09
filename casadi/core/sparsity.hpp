@@ -184,6 +184,12 @@ namespace casadi {
     static Sparsity triplet(int nrow, int ncol, const std::vector<int>& row,
                             const std::vector<int>& col);
 
+    /** \brrief Create a sparsity from nonzeros
+    *
+    * Inverse of `find()`
+    */
+    static Sparsity nonzeros(int nrow, int ncol, const std::vector<int>& nz, bool ind1=SWIG_IND1);
+
     /** Create from a single vector containing the pattern in compressed column storage format:
      * The format:
      * The first two entries are the number of rows (nrow) and columns (ncol)
@@ -700,6 +706,8 @@ namespace casadi {
 
         k = A.find()
         A[k] will contain the elements of A that are non-zero in B
+
+        Inverse of `nonzeros`.
     */
     std::vector<int> find(bool ind1=SWIG_IND1) const;
 
