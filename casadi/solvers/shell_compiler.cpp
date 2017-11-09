@@ -121,17 +121,27 @@ namespace casadi {
     ImporterInternal::init(opts);
 
     // Default options
-    string compiler = "gcc";
+
     cleanup_ = true;
 
-    string linker = "gcc";
-    string compiler_setup = "-fPIC -c";
-    string linker_setup = "-shared";
     vector<string> compiler_flags;
     vector<string> linker_flags;
 
+#ifdef _WIN32
+    string compiler = "cl.exe";
+    string linker = "link.exe";
+    string compiler_setup = "/c";
+    string linker_setup = "/DLL";
+    std::string compiler_output_flag = "/Fo";
+    std::string linker_output_flag = "/out:";
+#else
+    string compiler = "gcc";
+    string linker = "gcc";
+    string compiler_setup = "-fPIC -c";
+    string linker_setup = "-shared";
     std::string compiler_output_flag = "-o ";
     std::string linker_output_flag = "-o ";
+#endif
 
     // Read options
     for (auto&& op : opts) {
