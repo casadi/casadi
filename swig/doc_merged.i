@@ -19706,7 +19706,7 @@ or \"4x5,10nz\".
 
 %feature("docstring") friendwrap_sum_square "
 
-Calculate some of squares: sum_ij X_ij^2.
+[DEPRECATED] Renamed sumsqr
 
 ";
 
@@ -20100,6 +20100,12 @@ Matrix power x^n.
 %feature("docstring") friendwrap_norm_fro "
 
 Frobenius norm.
+
+";
+
+%feature("docstring") friendwrap_sumsqr "
+
+Calculate sum of squares: sum_ij X_ij^2.
 
 ";
 
@@ -47726,6 +47732,8 @@ Checks if array does not contain NaN or Inf.
 ";
 
 %feature("docstring") casadi::getcopy "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_ldl_solve "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_qr_solve "[INTERNAL] ";
 

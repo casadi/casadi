@@ -27100,7 +27100,7 @@ or \"4x5,10nz\".
 
 %feature("docstring")  sum_square(const MatType &x) "
 
-Calculate some of squares: sum_ij X_ij^2.
+[DEPRECATED] Renamed sumsqr
 
 ";
 
@@ -27548,6 +27548,12 @@ Matrix power x^n.
 %feature("docstring")  norm_fro(const MatType &x) "
 
 Frobenius norm.
+
+";
+
+%feature("docstring")  sumsqr(const MatType &x) "
+
+Calculate sum of squares: sum_ij X_ij^2.
 
 ";
 
@@ -64930,6 +64936,11 @@ Checks if array does not contain NaN or Inf.
 
 %feature("docstring")  casadi::getcopy(const A &a, std::map<
 SharedObjectInternal *, SharedObject > &already_copied) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_ldl_solve(T1 *x, int nrhs, const int
+*sp_l, const T1 *l, const T1 *d) "
 
 [INTERNAL] ";
 

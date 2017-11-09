@@ -34,3 +34,6 @@
 %exception  casadi::Sparsity::print_compact(std::ostream &stream=casadi::uout()) const  {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
+%exception  sum_square(const MatType &x) {
+ CATCH_OR_NOT(DEPRECATED_MSG("") $action)
+}
