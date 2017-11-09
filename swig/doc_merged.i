@@ -42449,6 +42449,8 @@ zeros.
 
 k = A.find() A[k] will contain the elements of A that are non-zero in B
 
+Inverse of nonzeros.
+
 ";
 
 %feature("docstring") casadi::Sparsity::repr_el "
