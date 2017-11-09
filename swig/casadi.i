@@ -2780,6 +2780,9 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 DECL std::vector<bool> casadi_nl_var(const M& expr, const M& var) {
   return nl_var(expr, var);
 }
+DECL M casadi_sum_square(const M& X) {
+  return sum_square(X);
+}
 #endif
 #if FLAG & IS_MEMBER
 DECL M casadi_mpower(const M& x, const M& n) {
@@ -2805,12 +2808,6 @@ DECL M casadi_bilin(const M& A, const M& x, const M& y) {
 DECL M casadi_rank1(const M& A, const M& alpha, const M& x, const M& y) {
   return rank1(A, alpha, x, y);
 }
-
-#ifdef WITH_DEPRECATED_FEATURES
-DECL M casadi_sum_square(const M& X) {
-  return sum_square(X);
-}
-#endif // WITH_DEPRECATED_FEATURES
 
 DECL M casadi_sumsqr(const M& X) {
   return sumsqr(X);
