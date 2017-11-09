@@ -1020,7 +1020,7 @@ namespace std {
       if (mxGetClassID(p)==mxCELL_CLASS) {
         int nrow = mxGetM(p), ncol = mxGetN(p);
         if (nrow==1 || (nrow==0 && ncol==0) || ncol==1) {
-          int n = std::max(nrow, ncol);
+          int n = (nrow==0 || ncol==0) ? 0 : std::max(nrow, ncol);
           // Allocate elements
           if (m) {
             (**m).clear();
