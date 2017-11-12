@@ -461,6 +461,7 @@ public:
 
   DMDict arg() const;
   void res(const DMDict& res);
+  DMDict res() const;
   std::vector<MX> constraints() const;
   MX objective() const;
 

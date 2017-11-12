@@ -514,6 +514,14 @@ void OptiAdvanced::res(const DMDict& res) {
   }
 }
 
+DMDict OptiAdvanced::res() const {
+  try {
+    return (*this)->res();
+  } catch (exception& e) {
+    THROW_ERROR("res", e.what());
+  }
+}
+
 std::vector<MX> OptiAdvanced::constraints() const {
   try {
     return (*this)->constraints();

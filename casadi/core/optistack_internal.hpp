@@ -180,6 +180,7 @@ public:
 
   DMDict arg() const { return arg_; }
   void res(const DMDict& res);
+  DMDict res() const { return res_; }
   std::vector<MX> constraints() const { return g_; }
   MX objective() const { return f_; }
 
