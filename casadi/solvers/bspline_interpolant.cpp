@@ -101,6 +101,7 @@ namespace casadi {
     std::vector<double> ret;
     if (k%2) {
       int m = (k-1)/2;
+      casadi_assert(x.size()>=2*m+2, "Need more data points");
       for (int i=0;i<k+1;++i) ret.push_back(x[0]);
       for (int i=0;i<x.size()-2*m-2;++i) ret.push_back(x[m+1+i]);
       for (int i=0;i<k+1;++i) ret.push_back(x[x.size()-1]);
