@@ -41324,6 +41324,14 @@ Scalar > &x) "
 
 ";
 
+%feature("docstring")  qr_solve(const Matrix< Scalar > &b, const Matrix<
+Scalar > &v, const Matrix< Scalar > &r, const Matrix< Scalar > &beta, const
+std::vector< int > &pinv, bool tr=false) "
+
+Matrix adjoint.
+
+";
+
 %feature("docstring")  casadi::Matrix< T >::set_precision(int precision) "
 
 Set the 'precision, width & scientific' used in printing and serializing to

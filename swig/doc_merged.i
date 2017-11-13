@@ -29856,6 +29856,12 @@ their ID.
 
 ";
 
+%feature("docstring") friendwrap_qr_solve "
+
+Matrix adjoint.
+
+";
+
 %feature("docstring") casadi::Matrix::set_precision "
 
 Set the 'precision, width & scientific' used in printing and serializing to
