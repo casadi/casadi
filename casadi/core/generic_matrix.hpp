@@ -1071,18 +1071,24 @@ namespace casadi {
   template<typename MatType>
   MatType GenericMatrix<MatType>::jtimes(const MatType &ex, const MatType &arg,
                                          const MatType &v, bool tr) {
-    if (ex.is_empty() || arg.is_empty()) {
-      MatType J = MatType::zeros(ex.numel(), arg.numel());
-      if (tr) J = J.T();
-      return MatType::mtimes(J, v);
+    // Assert consistent input dimensions
+    if (tr) {
+      casadi_assert(v.size1() == ex.size1() && v.size2() % ex.size2() == 0,
+                    "'v' has inconsistent dimensions");
+    } else {
+      casadi_assert(v.size1() == arg.size1() && v.size2() % arg.size2() == 0,
+                    "'v' has inconsistent dimensions");
     }
 
+    // Quick return if no seeds
+    if (v.is_empty()) return MatType(tr ? arg.size1() : ex.size1(), 0);
+
+    // Split up the seed into its components
+    std::vector<MatType> w = horzsplit(v, tr ? ex.size2() : arg.size2());
+
     // Seeds as a vector of vectors
-    int seed_dim = tr ? ex.size2() : arg.size2();
-    casadi_assert_dev(v.size2() % seed_dim == 0);
-    std::vector<MatType> w = horzsplit(v, seed_dim);
-    std::vector<std::vector<MatType> > ww(w.size(), std::vector<MatType>(1));
-    for (int i=0; i<w.size(); ++i) ww[i][0] = w[i];
+    std::vector<std::vector<MatType> > ww(w.size());
+    for (int i=0; i<w.size(); ++i) ww[i] = {w[i]};
 
     // Calculate directional derivatives
     if (tr) {

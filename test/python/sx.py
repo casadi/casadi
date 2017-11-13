@@ -1300,7 +1300,7 @@ class SXtests(casadiTestCase):
 
       self.checkfunction(f,fa,inputs=[3])
       self.checkfunction(f,fb,inputs=[-3],evals=1)
-      
+
   def test_pw_const(self):
       t= SX.sym("t")
 
@@ -1335,16 +1335,17 @@ class SXtests(casadiTestCase):
       self.checkarray(E(4),2.5)
       self.checkarray(E(5),2)
       self.checkarray(E(7),1)
-      
+
+  @known_bug()  # NOTE(@jaeandersson) Test is ill-posed
   def test_empty_jtimes(self):
     x= SX.sym("x")
     for a in [SX.zeros(0,1),SX.zeros(0,0),SX.zeros(1,0),x]:
       for b in [SX.zeros(0,1),SX.zeros(0,0),SX.zeros(1,0),x]:
           for c in [SX.zeros(0,1),SX.zeros(0,0),SX.zeros(1,0),x]:
             for tr in [True,False]:
-            
+
               s = None
-              
+
               try:
                 s = mtimes(jacobian(a,b).T if tr else jacobian(a,b),c).shape
               except:
@@ -1356,6 +1357,6 @@ class SXtests(casadiTestCase):
                   assert which_depends(a,b,i,True)==[False]*a.numel()
                   assert which_depends(a,b,i,False)==[False]*b.numel()
 
-      
+
 if __name__ == '__main__':
     unittest.main()
