@@ -128,6 +128,9 @@ namespace casadi {
                          const Dict& opts) const override;
     ///@}
 
+    /** Obtain information about node */
+    Dict info() const override { return {{"f", f_}, {"n", n_}}; }
+
   protected:
     // Constructor (protected, use create function)
     Map(const std::string& name, const Function& f, int n);

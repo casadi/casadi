@@ -98,10 +98,17 @@ namespace casadi {
     // Destructor
     ~NlImporter();
   private:
+    int read_int();
+    char read_char();
+    double read_double();
+    short read_short();
+    long read_long();
     // Reference to the class
     NlpBuilder& nlp_;
     // Options
     bool verbose_;
+    // Binary mode
+    bool binary_;
     // File stream
     std::ifstream s_;
     // All variables, including dependent

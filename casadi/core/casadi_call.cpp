@@ -25,7 +25,7 @@
 
 #include "casadi_call.hpp"
 #include "function_internal.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 
 using namespace std;
 
@@ -59,7 +59,7 @@ namespace casadi {
 
     // Number inputs and outputs
     int num_in = fcn.n_in();
-    casadi_assert_message(arg.size()==num_in, "Argument list length (" + str(arg.size())
+    casadi_assert(arg.size()==num_in, "Argument list length (" + str(arg.size())
                           + ") does not match number of inputs (" + str(num_in)
                           + ") for function " + fcn.name());
 

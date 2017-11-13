@@ -39,7 +39,7 @@ using namespace casadi;
 using namespace std;
 
 // Print a (typically 64-bit) unsigned integer
-void printBinary(bvec_t v){
+void print_binary(bvec_t v){
   for(int k=0; k<bvec_size; ++k){
     if(k%4==0) cout << " ";
     if(k%16==0) cout << " ";
@@ -78,7 +78,7 @@ int main(){
     cout << "forward mode" << endl;
 
     // Make sure that the class is able to support the dependency propagation
-    casadi_assert(f.has_spfwd());
+    casadi_assert(f.has_spfwd(), "Forward sparsity propagation not supported");
 
     // Pass seeds
     f_in[0] = bvec_t(1) << 0; // seed in direction 0
@@ -92,13 +92,13 @@ int main(){
     f({&f_in.front()}, {&f_out.front()});
 
     // Print the result
-    printBinary(f_out[0]);
+    print_binary(f_out[0]);
 
     // Propagate from output to input (adjoint/reverse/backward mode)
     cout << "backward mode" << endl;
 
     // Make sure that the class is able to support the dependency propagation
-    casadi_assert(f.has_sprev());
+    casadi_assert(f.has_sprev(), "Backward sparsity propagation not supported");
 
     // Pass seeds
     f_out[0] = (bvec_t(1) << 5) | (bvec_t(1) << 6); // seed in direction 5 and 6
@@ -112,9 +112,9 @@ int main(){
     f.rev({&f_in.front()}, {&f_out.front()});
 
     // Print the result
-    printBinary(f_in[0]);
-    printBinary(f_in[1]);
-    printBinary(f_in[2]);
+    print_binary(f_in[0]);
+    print_binary(f_in[1]);
+    print_binary(f_in[2]);
   }
 
   return 0;

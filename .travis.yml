@@ -77,7 +77,6 @@ matrix:
         - pip install pydot2 lxml
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
-
         - pushd test && make trunktesterbot_no_unittests_py && popd
         - pushd test && make unittests_py_slow && popd
         - pushd build && make json && popd
@@ -263,9 +262,12 @@ matrix:
       dist: trusty
       env: NEEDMATLAB=1
       script:
-        - sudo apt-get install -y gcc-4.7 g++-4.7 gfortran-4.7
+        - sudo apt-get install -y gcc-4.7 g++-4.7 gfortran-4.7 locate
+        - sudo updatedb
+        - locate libstdc++.so
         - export CC=gcc-4.7
         - export CXX=g++-4.7
+
 
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
@@ -282,6 +284,9 @@ matrix:
         - sudo make -j2 install
         - popd
         - matlabtunnel
+        
+        # needed for worhp
+        - matlabgcc
         - pushd test && PATH=/home/travis/build/matlab/bin/:$PATH make matlab && popd
     - compiler: gcc
       os: linux
@@ -306,6 +311,7 @@ matrix:
         - Xvfb :1 &
         - export DISPLAY=:1
         - octave --no-gui --no-window-system --eval "addpath('/home/travis/build/octave-install/matlab');savepath;"
+        - matlabgcc
         - pushd test && make octave && popd
 branches:
   except:
@@ -314,7 +320,7 @@ branches:
 before_install:
   - export casadi_build_flags="-DWITH_COMMON=ON "
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
-  - pushd testbot && git checkout merged && source recipes/setup.sh && popd
+  - pushd testbot && source recipes/setup.sh && popd
   - python_setup
   - sudo apt-get install p7zip-full -y
   - |

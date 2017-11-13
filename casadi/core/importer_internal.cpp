@@ -90,7 +90,7 @@ namespace casadi {
           // Read name
           string sym;
           ss >> sym;
-          casadi_assert(ss.good());
+          casadi_assert_dev(ss.good());
           // Default attributes
           bool inlined = false;
 
@@ -99,11 +99,11 @@ namespace casadi {
           if (eqpos != string::npos) {
             string attr = "inline";
             if (line.compare(eqpos-attr.size(), attr.size(), attr)==0) {
-              casadi_assert(line.size()>eqpos+1);
+              casadi_assert_dev(line.size()>eqpos+1);
               if (line.at(eqpos+1)=='1') {
                 inlined=true;
               } else {
-                casadi_assert(line.at(eqpos+1)=='0');
+                casadi_assert_dev(line.at(eqpos+1)=='0');
               }
             }
           }
@@ -135,7 +135,7 @@ namespace casadi {
       if (line.empty() || line.at(0)=='#') continue;
 
       // Get command string
-      casadi_assert_message(line.at(0)==':',
+      casadi_assert(line.at(0)==':',
                             "Syntax error: " + line + " is not a command string");
       string cmd = line.substr(1, line.find(' ')-1);
 
@@ -164,7 +164,7 @@ namespace casadi {
 
       // Insert new element in map
       auto new_el = meta_.insert(make_pair(cmd, make_pair(offset, ss.str())));
-      casadi_assert_message(new_el.second, "Duplicate entry: \"" + cmd + "\"");
+      casadi_assert(new_el.second, "Duplicate entry: \"" + cmd + "\"");
     }
     casadi_error("End-of-file reached while searching for \"*/\"");
   }
@@ -192,7 +192,7 @@ namespace casadi {
       // End of declaration found?
       if (line.find("/*CASADIEXTERNAL") != string::npos) {
         auto new_el = external_.insert(make_pair(sym, make_pair(inlined, ss.str())));
-        casadi_assert_message(new_el.second, "Duplicate symbol: \"" + sym + "\"");
+        casadi_assert(new_el.second, "Duplicate symbol: \"" + sym + "\"");
         return;
       }
 
@@ -217,12 +217,12 @@ namespace casadi {
 #ifdef WITH_DL
 #ifdef _WIN32
     handle_ = LoadLibrary(TEXT(name_.c_str()));
-    casadi_assert_message(handle_!=0,
+    casadi_assert(handle_!=0,
       "CommonExternal: Cannot open \"" + name_ + "\". "
       "Error code (WIN32): " + str(GetLastError()));
 #else // _WIN32
     handle_ = dlopen(name_.c_str(), RTLD_LAZY);
-    casadi_assert_message(handle_!=0,
+    casadi_assert(handle_!=0,
       "CommonExternal: Cannot open \"" + name_ + "\". "
       "Error code: " + str(dlerror()));
     // reset error
@@ -261,7 +261,7 @@ namespace casadi {
 
   std::string ImporterInternal::get_meta(const std::string& cmd, int ind) const {
     if (ind>=0) return get_meta(indexed(cmd, ind));
-    casadi_assert_message(has_meta(cmd), "No such command: " + cmd);
+    casadi_assert(has_meta(cmd), "No such command: " + cmd);
     return meta_.at(cmd).second;
   }
 
@@ -277,7 +277,7 @@ namespace casadi {
 
   std::string ImporterInternal::body(const std::string& symname) const {
     auto it = external_.find(symname);
-    casadi_assert(it!=external_.end() && it->second.first);
+    casadi_assert_dev(it!=external_.end() && it->second.first);
     return it->second.second;
   }
 

@@ -32,7 +32,7 @@
 #include <streambuf>
 #include <vector>
 
-#include "casadi_types.hpp"
+#include "casadi_common.hpp"
 
 namespace casadi {
 

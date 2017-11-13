@@ -100,6 +100,14 @@ class Sparsitytests(casadiTestCase):
     Ad = DM(array(A))
     for i in a.find():
       self.assertEqual(Ad.nz[i],1)
+      
+  def test_find_nonzero(self):
+    numpy.random.seed(0)
+    d = self.randDM(20,10,0.6)
+    sp = d.sparsity()
+    
+    sp2 = Sparsity.nonzeros(20,10,sp.find())
+    self.assertTrue(sp==sp2)
 
   def test_enlarge(self):
     self.message("enlarge")

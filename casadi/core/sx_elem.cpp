@@ -102,7 +102,7 @@ namespace casadi {
   }
 
   void SXElem::assignIfDuplicate(const SXElem& scalar, int depth) {
-    casadi_assert(depth>=1);
+    casadi_assert_dev(depth>=1);
     if (!is_equal(*this, scalar, 0) && is_equal(*this, scalar, depth)) {
       *this = scalar;
     }
@@ -149,7 +149,7 @@ namespace casadi {
 
   bool SXElem::__nonzero__() const {
     if (is_constant()) return !is_zero();
-    casadi_error("Cannot compute the truth value of a CasADi SXElem symbolic expression.")
+    casadi_error("Cannot compute the truth value of a CasADi SXElem symbolic expression.");
   }
 
   bool SXElem::is_doubled() const {
@@ -174,11 +174,6 @@ namespace casadi {
 
   SXNode* SXElem::operator->() {
     return node;
-  }
-
-  SXElem if_else(const SXElem& cond, const SXElem& if_true,
-                    const SXElem& if_false, bool short_circuit) {
-    return if_else_zero(cond, if_true) + if_else_zero(!cond, if_false);
   }
 
   SXElem SXElem::binary(int op, const SXElem& x, const SXElem& y) {
@@ -419,7 +414,7 @@ namespace casadi {
   }
 
   bool SXElem::is_commutative() const {
-    casadi_assert_message(n_dep(), "SX::is_commutative: must be binary");
+    casadi_assert(n_dep(), "SX::is_commutative: must be binary");
     return operation_checker<CommChecker>(op());
   }
 
@@ -505,7 +500,7 @@ namespace casadi {
   }
 
   SXElem SXElem::dep(int ch) const {
-    casadi_assert(ch==0 || ch==1)
+    casadi_assert_dev(ch==0 || ch==1);
     return node->dep(ch);
   }
 

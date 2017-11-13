@@ -24,7 +24,7 @@
 
 
 #include "knitro_interface.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
@@ -85,7 +85,7 @@ namespace casadi {
     if (contype_.empty()) {
       contype_.resize(ng_, KTR_CONTYPE_GENERAL);
     } else {
-      casadi_assert(contype_.size()==ng_);
+      casadi_assert_dev(contype_.size()==ng_);
     }
 
     // Setup NLP functions
@@ -136,9 +136,9 @@ namespace casadi {
     check_inputs(mem);
 
     // Allocate KNITRO memory block (move back to init!)
-    casadi_assert(m->kc==0);
+    casadi_assert_dev(m->kc==0);
     m->kc = KTR_new();
-    casadi_assert(m->kc!=0);
+    casadi_assert_dev(m->kc!=0);
     int status;
 
     // Jacobian sparsity
@@ -155,10 +155,10 @@ namespace casadi {
       Hcol = hesslag_sp_.get_col();
       Hrow = hesslag_sp_.get_row();
       status = KTR_set_int_param_by_name(m->kc, "hessopt", KTR_HESSOPT_EXACT);
-      casadi_assert_message(status==0, "KTR_set_int_param failed");
+      casadi_assert(status==0, "KTR_set_int_param failed");
     } else {
       status = KTR_set_int_param_by_name(m->kc, "hessopt", KTR_HESSOPT_LBFGS);
-      casadi_assert_message(status==0, "KTR_set_int_param failed");
+      casadi_assert(status==0, "KTR_set_int_param failed");
     }
 
     // Pass user set options
@@ -218,26 +218,26 @@ namespace casadi {
                            ng_, get_ptr(contype_), get_ptr(ftype),
                            m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
                            nnzH, get_ptr(Hrow), get_ptr(Hcol), m->wx, 0);
-      casadi_assert_message(status==0, "KTR_mip_init_problem failed");
+      casadi_assert(status==0, "KTR_mip_init_problem failed");
     } else {
       status =
       KTR_init_problem(m->kc, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
                        m->wlbx, m->wubx, ng_, get_ptr(contype_),
                        m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
                        nnzH, get_ptr(Hrow), get_ptr(Hcol), m->wx, 0); // initial lambda
-      casadi_assert_message(status==0, "KTR_init_problem failed");
+      casadi_assert(status==0, "KTR_init_problem failed");
     }
 
     // Register callback functions
     status = KTR_set_func_callback(m->kc, &callback);
-    casadi_assert_message(status==0, "KTR_set_func_callback failed");
+    casadi_assert(status==0, "KTR_set_func_callback failed");
 
     status = KTR_set_grad_callback(m->kc, &callback);
-    casadi_assert_message(status==0, "KTR_set_grad_callbackfailed");
+    casadi_assert(status==0, "KTR_set_grad_callbackfailed");
 
     if (nnzH>0) {
       status = KTR_set_hess_callback(m->kc, &callback);
-      casadi_assert_message(status==0, "KTR_set_hess_callbackfailed");
+      casadi_assert(status==0, "KTR_set_hess_callbackfailed");
     }
 
     // Lagrange multipliers
@@ -325,7 +325,7 @@ namespace casadi {
 
       return 0;
     } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "KnitroInterface::callback caugth exception: "
+      uerr() << "KnitroInterface::callback caugth exception: "
                                << ex.what() << endl;
       return -1;
     }

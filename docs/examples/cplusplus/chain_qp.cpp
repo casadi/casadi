@@ -130,7 +130,7 @@ int main(){
   SXDict qp = {{"x", vertcat(x)}, {"f", Vchain}, {"g", vertcat(g)}};
 
   // Solve with a QP solver or NLP solver
-  Function solver = qpsol("solver", "qpoases", qp, {{"sparse", true}, {"schur", false}});
+  Function solver = qpsol("solver", "qpoases", qp, {{"sparse", true}, {"schur", false}, {"print_time", true}});
   //Function solver = qpsol("solver", "cplex", qp);
   //Function solver = qpsol("solver", "ooqp", qp);
   //Function solver = qpsol("solver", "gurobi", qp);

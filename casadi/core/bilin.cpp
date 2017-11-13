@@ -29,7 +29,9 @@ using namespace std;
 namespace casadi {
 
   Bilin::Bilin(const MX& A, const MX& x, const MX& y) {
-    set_dep(x, A);
+    casadi_assert(x.is_column(), "Dimension mismatch");
+    casadi_assert(y.is_column(), "Dimension mismatch");
+    set_dep(A, densify(x), densify(y));
     set_sparsity(Sparsity::scalar());
   }
 
@@ -54,7 +56,7 @@ namespace casadi {
   void Bilin::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                       std::vector<std::vector<MX> >& asens) const {
     for (int d=0; d<aseed.size(); ++d) {
-      asens[d][0] = rank1(project(asens[d][0], sparsity()),
+      asens[d][0] = rank1(project(asens[d][0], dep(0).sparsity()),
                           aseed[d][0], dep(1), dep(2));
       asens[d][1] += aseed[d][0] * mtimes(dep(0), dep(2));
       asens[d][2] += aseed[d][0] * mtimes(dep(0).T(), dep(1));
@@ -76,20 +78,17 @@ namespace casadi {
   }
 
   int Bilin::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
-    /* Get sparsities */
-    int ncol_A = sparsity().size2();
-    const int *colind_A = dep(0).colind(), *row_A = dep(0).row();
-
     /* Return value */
     bvec_t r=0;
 
     /* Loop over the columns of A */
+    SparsityStruct sp_A = dep(0).sparsity();
     int cc, rr, el;
-    for (cc=0; cc<ncol_A; ++cc) {
+    for (cc=0; cc<sp_A.ncol; ++cc) {
       /* Loop over the nonzeros of A */
-      for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
+      for (el=sp_A.colind[cc]; el<sp_A.colind[cc+1]; ++el) {
         /* Get the row */
-        rr=row_A[el];
+        rr=sp_A.row[el];
 
         /* Add contribution */
         r |= arg[1][rr] | arg[0][el] | arg[2][cc];
@@ -100,26 +99,22 @@ namespace casadi {
   }
 
   int Bilin::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
-    /* Get sparsities */
-    int ncol_A = sparsity().size2();
-    const int *colind_A = dep(0).colind(), *row_A = dep(0).row();
-
     /* Seed */
-    bvec_t s=*res[0];
-    *res[0] = 0;
+    bvec_t s_r=res[0][0]; res[0][0] = 0;
 
     /* Loop over the columns of A */
+    SparsityStruct sp_A = dep(0).sparsity();
     int cc, rr, el;
-    for (cc=0; cc<ncol_A; ++cc) {
+    for (cc=0; cc<sp_A.ncol; ++cc) {
       /* Loop over the nonzeros of A */
-      for (el=colind_A[cc]; el<colind_A[cc+1]; ++el) {
+      for (el=sp_A.colind[cc]; el<sp_A.colind[cc+1]; ++el) {
         /* Get the row */
-        rr=row_A[el];
+        rr=sp_A.row[el];
 
         /* Add contribution */
-        arg[0][el] |= s;
-        arg[1][rr] |= s;
-        arg[2][cc] |= s;
+        arg[0][el] |= s_r;
+        arg[1][rr] |= s_r;
+        arg[2][cc] |= s_r;
       }
     }
     return 0;

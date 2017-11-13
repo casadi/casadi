@@ -51,7 +51,7 @@ namespace casadi {
 
   XmlNode TinyXmlInterface::parse(const std::string& filename) {
     bool flag = doc_.LoadFile(filename.c_str());
-    casadi_assert_message(flag, "Cound not open " + filename);
+    casadi_assert(flag, "Cound not open " + filename);
     return addNode(&doc_);
   }
 
@@ -99,7 +99,7 @@ namespace casadi {
       } else if (childtype == TiXmlNode::TINYXML_TEXT) {
         ret.text_ = child->ToText()->Value();
       } else if (childtype == TiXmlNode::TINYXML_DECLARATION) {
-        userOut() << "Warning: Skipped TiXmlNode::TINYXML_DECLARATION" << endl;
+        uout() << "Warning: Skipped TiXmlNode::TINYXML_DECLARATION" << endl;
       } else {
         casadi_error("addNode: Unknown node type");
       }

@@ -25,7 +25,7 @@
 
 #include "bspline.hpp"
 #include "function_internal.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "mx_node.hpp"
 #include <typeinfo>
 
@@ -58,7 +58,7 @@ namespace casadi {
     }
 
     if (!lookup_mode.empty()) {
-      casadi_assert(lookup_mode.size()==offset_.size()-1);
+      casadi_assert_dev(lookup_mode.size()==offset_.size()-1);
       for (int i=0;i<offset_.size()-1;++i) {
         if (lookup_mode[i]=="linear") {
           lookup_mode_[i] = 0;
@@ -67,7 +67,7 @@ namespace casadi {
           std::vector<double> grid(
               knots_.begin()+offset_[i]+degree_[i],
               knots_.begin()+offset_[i+1]-degree_[i]);
-          casadi_assert(is_increasing(grid) && is_equally_spaced(grid));
+          casadi_assert_dev(is_increasing(grid) && is_equally_spaced(grid));
         } else {
           casadi_error("Unknown lookup_mode option '" + lookup_mode[i] + ". "
                        "Allowed values: linear, exact.");
@@ -144,7 +144,7 @@ namespace casadi {
     void BSpline::init(const Dict& opts) {
       casadi::BSplineCommon::init(opts);
 
-      casadi_assert_message(coeffs_size_==coeffs_.size(),
+      casadi_assert(coeffs_size_==coeffs_.size(),
         "Expected coefficient size " + str(coeffs_size_) + ", "
         "got " + str(coeffs_.size()) + " instead.");
     }
@@ -261,7 +261,7 @@ namespace casadi {
       DM r = einstein(DM(coeffs_), vec(T*degree_[i]), coeffs_dims_, {T.size1(), T.size2()},
         coeffs_dims_new, ai, bi, ci);
       coeffs = r.nonzeros();
-      casadi_assert(coeffs.size()==product(coeffs_dims_new));
+      casadi_assert_dev(coeffs.size()==product(coeffs_dims_new));
       return coeffs;
     }
 
@@ -300,7 +300,7 @@ namespace casadi {
 
       int n_dims = degree_.size();
       N_ = x_.size()/n_dims;
-      casadi_assert(N_*n_dims==x_.size());
+      casadi_assert_dev(N_*n_dims==x_.size());
     }
 
     void BSplineDual::init(const Dict& opts) {

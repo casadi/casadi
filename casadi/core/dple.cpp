@@ -55,7 +55,7 @@ namespace casadi {
 
   CASADI_EXPORT MXVector dplesol(const MXVector& A, const MXVector& V, const std::string& solver,
     const Dict& opts) {
-      casadi_assert_message(A.size()==V.size(),
+      casadi_assert(A.size()==V.size(),
         "dplesol: sizes of A vector (" + str(A.size()) + ") and V vector "
         "(" + str(V.size()) + ") must match.");
       std::vector<MX> Adense, Vdense;
@@ -71,7 +71,7 @@ namespace casadi {
 
   CASADI_EXPORT DMVector dplesol(const DMVector& A, const DMVector& V, const std::string& solver,
     const Dict& opts) {
-      casadi_assert_message(A.size()==V.size(),
+      casadi_assert(A.size()==V.size(),
         "dplesol: sizes of A vector (" + str(A.size()) + ") and V vector "
         "(" + str(V.size()) + ") must match.");
       std::vector<DM> Adense, Vdense;
@@ -213,27 +213,27 @@ namespace casadi {
       }
     }
 
-    casadi_assert(V_.size2() % V_.size1() == 0);
+    casadi_assert_dev(V_.size2() % V_.size1() == 0);
     nrhs_ = V_.size2() / V_.size1();
-    casadi_assert(nrhs_>=1);
+    casadi_assert_dev(nrhs_>=1);
 
     std::vector<Sparsity> Vs = horzsplit(V_, V_.size1());
     Sparsity Vref = Vs[0];
-    casadi_assert_message(Vref.is_symmetric(),
+    casadi_assert(Vref.is_symmetric(),
       "V must be symmetric but got " + Vref.dim() + ".");
 
     for (auto&& s : Vs)
-      casadi_assert(s==Vref);
+      casadi_assert_dev(s==Vref);
 
-    casadi_assert_message(const_dim_, "Not implemented");
+    casadi_assert(const_dim_, "Not implemented");
 
     int blocksize = Vref.colind()[1];
     K_ = Vref.size1()/blocksize;
     Sparsity block = Sparsity::dense(blocksize, blocksize);
 
     std::vector<Sparsity> blocks(K_, block);
-    casadi_assert_message(Vref==diagcat(blocks), "Structure not recognised.");
-    casadi_assert_message(A_==Vref, "Structure not recognised.");
+    casadi_assert(Vref==diagcat(blocks), "Structure not recognised.");
+    casadi_assert(A_==Vref, "Structure not recognised.");
 
 
   }

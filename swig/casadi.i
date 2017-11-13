@@ -82,10 +82,7 @@
 %}
 %init %{
   // Set logger functions
-  casadi::Logger::writeWarn = casadi::pythonlogger;
-  casadi::Logger::writeProg = casadi::pythonlogger;
-  casadi::Logger::writeDebug = casadi::pythonlogger;
-  casadi::Logger::writeAll = casadi::pythonlogger;
+  casadi::Logger::writeFun = casadi::pythonlogger;
 
   // @jgillis: please document
   casadi::InterruptHandler::checkInterrupted = casadi::pythoncheckinterrupted;
@@ -155,10 +152,7 @@
 
 
   // Set logger functions
-  casadi::Logger::writeWarn = casadi::mexlogger;
-  casadi::Logger::writeProg = casadi::mexlogger;
-  casadi::Logger::writeDebug = casadi::mexlogger;
-  casadi::Logger::writeAll = casadi::mexlogger;
+  casadi::Logger::writeFun = casadi::mexlogger;
   casadi::Logger::flush = casadi::mexflush;
 
   // @jgillis: please document
@@ -504,6 +498,7 @@ namespace std {
     GUESTOBJECT* from_ptr(const std::vector<double> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<int>** m);
     GUESTOBJECT* from_ptr(const std::vector<int> *a);
+    GUESTOBJECT* from_ptr(const std::vector<bool> *a);
     bool to_ptr(GUESTOBJECT *p, std::vector<std::string>** m);
     GUESTOBJECT* from_ptr(const std::vector<std::string> *a);
 #endif // SWIGMATLAB
@@ -768,7 +763,7 @@ namespace std {
         return true;
       }
     }
-    
+
     bool is_scalar_np_array(GUESTOBJECT *p) {
       if (PyObject_HasAttrString(p, "__array__")) {
         PyObject *cr = PyObject_GetAttrString(p, (char*) "size");
@@ -785,7 +780,7 @@ namespace std {
       }
       return false;
    }
-      
+
 #endif
 
 
@@ -1025,17 +1020,18 @@ namespace std {
       if (mxGetClassID(p)==mxCELL_CLASS) {
         int nrow = mxGetM(p), ncol = mxGetN(p);
         if (nrow==1 || (nrow==0 && ncol==0) || ncol==1) {
+          int n = (nrow==0 || ncol==0) ? 0 : std::max(nrow, ncol);
           // Allocate elements
           if (m) {
             (**m).clear();
-            (**m).reserve(ncol);
+            (**m).reserve(n);
           }
 
           // Temporary
           M tmp;
 
           // Loop over elements
-          for (int i=0; i<ncol; ++i) {
+          for (int i=0; i<n; ++i) {
             // Get element
             mxArray* pe = mxGetCell(p, i);
             if (pe==0) return false;
@@ -1232,6 +1228,11 @@ namespace std {
       std::copy(a->begin(), a->end(), static_cast<double*>(mxGetData(ret)));
       return ret;
     }
+    GUESTOBJECT* from_ptr(const std::vector<bool> *a) {
+      mxArray* ret = mxCreateLogicalMatrix(1, a->size());
+      std::copy(a->begin(), a->end(), static_cast<bool*>(mxGetData(ret)));
+      return ret;
+    }
     GUESTOBJECT* from_ptr(const std::vector<std::string> *a) {
       // Collect arguments as char arrays
       std::vector<const char*> str(a->size());
@@ -1324,6 +1325,7 @@ namespace std {
           || to_generic<std::vector<std::string> >(p, m)
           || to_generic<std::vector<std::vector<int> > >(p, m)
           || to_generic<casadi::Function>(p, m)
+          || to_generic<std::vector<casadi::Function> >(p, m)
           || to_generic<casadi::GenericType::Dict>(p, m)) {
         return true;
       }
@@ -1348,6 +1350,7 @@ namespace std {
       case OT_STRINGVECTOR: return from_tmp(a->as_string_vector());
       case OT_DICT: return from_tmp(a->as_dict());
       case OT_FUNCTION: return from_tmp(a->as_function());
+      case OT_FUNCTIONVECTOR: return from_tmp(a->as_function_vector());
 #ifdef SWIGPYTHON
       case OT_NULL: return Py_None;
 #endif // SWIGPYTHON
@@ -2107,9 +2110,9 @@ namespace std {
 
 #ifndef SWIGXML
 
-// std::ostream & is redirected to casadi::userOut()
+// std::ostream & is redirected to casadi::uout()
 %typemap(in, noblock=1, numinputs=0) std::ostream &stream {
-  $1 = &casadi::userOut();
+  $1 = &casadi::uout();
 }
 
 // Add trailing newline in MATLAB and Octave
@@ -2472,7 +2475,7 @@ class NZproxy:
   namespace casadi {
     /// Helper function: Convert ':' to Slice
     inline Slice char2Slice(char ch) {
-      casadi_assert(ch==':');
+      casadi_assert_dev(ch==':');
       return Slice();
     }
   } // namespace casadi
@@ -2481,7 +2484,7 @@ class NZproxy:
 %define %matrix_helpers(Type)
     // Get a submatrix (index-1)
     const Type paren(char rr) const {
-      casadi_assert(rr==':');
+      casadi_assert_dev(rr==':');
       return vec(*$self);
     }
     const Type paren(const Matrix<int>& rr) const {
@@ -2545,7 +2548,7 @@ class NZproxy:
 
     // Needed for brace syntax to access nonzeros
     int numel(char rr) const {
-      casadi_assert(rr==':');
+      casadi_assert_dev(rr==':');
       return 1;
     }
 
@@ -2587,8 +2590,8 @@ namespace casadi{
 } // namespace casadi
 
 %include <casadi/core/shared_object.hpp>
-%include <casadi/core/std_vector_tools.hpp>
-%include <casadi/core/casadi_types.hpp>
+%include <casadi/core/casadi_misc.hpp>
+%include <casadi/core/casadi_common.hpp>
 %include <casadi/core/generic_type.hpp>
 %include <casadi/core/calculus.hpp>
 %include <casadi/core/sparsity_interface.hpp>
@@ -2600,14 +2603,10 @@ namespace casadi{
 %extend Sparsity {
   %pythoncode %{
     def __setstate__(self, state):
-        if state:
-          self.__init__(state["nrow"],state["ncol"],state["colind"],state["row"])
-        else:
-          self.__init__()
+        self.__init__(Sparsity.from_info(state))
 
     def __getstate__(self):
-        if self.is_null(): return {}
-        return {"nrow": self.size1(), "ncol": self.size2(), "colind": numpy.array(self.colind(),dtype=int), "row": numpy.array(self.row(),dtype=int)}
+        return self.info()
   %}
 }
 
@@ -2781,6 +2780,9 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 DECL std::vector<bool> casadi_nl_var(const M& expr, const M& var) {
   return nl_var(expr, var);
 }
+DECL M casadi_sum_square(const M& X) {
+  return sum_square(X);
+}
 #endif
 #if FLAG & IS_MEMBER
 DECL M casadi_mpower(const M& x, const M& n) {
@@ -2807,8 +2809,8 @@ DECL M casadi_rank1(const M& A, const M& alpha, const M& x, const M& y) {
   return rank1(A, alpha, x, y);
 }
 
-DECL M casadi_sum_square(const M& X) {
-  return sum_square(X);
+DECL M casadi_sumsqr(const M& X) {
+  return sumsqr(X);
 }
 
 DECL M casadi_linspace(const M& a, const M& b, int nsteps) {
@@ -3143,6 +3145,19 @@ DECL void casadi_qr(const M& A, M& OUTPUT1, M& OUTPUT2) {
   return qr(A, OUTPUT1, OUTPUT2);
 }
 
+DECL void casadi_qr_sparse(const M& A, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3, std::vector<int>& OUTPUT4) {
+  return qr_sparse(A, OUTPUT1, OUTPUT2, OUTPUT3, OUTPUT4);
+}
+
+DECL M casadi_qr_solve(const M& b, const M& v, const M& r, const M& beta,
+                       const std::vector<int>& pinv, bool tr=false) {
+  return qr_solve(b, v, r, beta, pinv, tr);
+}
+
+DECL void casadi_ldl(const M& A, M& OUTPUT1, M& OUTPUT2) {
+  return ldl(A, OUTPUT1, OUTPUT2);
+}
+
 DECL M casadi_chol(const M& A) {
   return chol(A);
 }
@@ -3426,12 +3441,10 @@ namespace casadi{
 
   %pythoncode %{
     def __setstate__(self, state):
-        sp = Sparsity.__new__(Sparsity)
-        sp.__setstate__(state["sparsity"])
-        self.__init__(sp,state["data"])
+        self.__init__(self.from_info(state))
 
     def __getstate__(self):
-        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros(),dtype=int)}
+        return self.info()
   %}
 }
 
@@ -3439,12 +3452,10 @@ namespace casadi{
 
   %pythoncode %{
     def __setstate__(self, state):
-        sp = Sparsity.__new__(Sparsity)
-        sp.__setstate__(state["sparsity"])
-        self.__init__(sp,state["data"])
+        self.__init__(self.from_info(state))
 
     def __getstate__(self):
-        return {"sparsity" : self.sparsity().__getstate__(), "data": numpy.array(self.nonzeros(),dtype=float)}
+        return self.info()
   %}
 
 }
@@ -3452,6 +3463,135 @@ namespace casadi{
 
 } // namespace casadi
 #endif // SWIGPYTHON
+
+
+#ifdef SWIGMATLAB
+namespace casadi{
+// Logic for pickling
+%extend Matrix<int> {
+
+  %matlabcode %{
+     function s = saveobj(obj)
+        s = obj.info();
+     end
+  %}
+  %matlabcode_static %{
+     function obj = loadobj(s)
+        if isstruct(s)
+           obj = casadi.IM.from_info(s);
+        else
+           obj = s;
+        end
+     end
+  %}
+}
+
+%extend Matrix<double> {
+
+  %matlabcode %{
+     function s = saveobj(obj)
+        s = obj.info();
+     end
+  %}
+  %matlabcode_static %{
+     function obj = loadobj(s)
+        if isstruct(s)
+           obj = casadi.DM.from_info(s);
+        else
+           obj = s;
+        end
+     end
+  %}
+}
+
+%extend Sparsity {
+  %matlabcode %{
+     function s = saveobj(obj)
+        s = obj.info();
+     end
+  %}
+  %matlabcode_static %{
+     function obj = loadobj(s)
+        if isstruct(s)
+           obj = casadi.Sparsity.from_info(s);
+        else
+           obj = s;
+        end
+     end
+  %}
+}
+
+
+%extend Function {
+
+  %matlabcode %{
+     function s = saveobj(obj)
+       try
+            s = struct;
+            s.code = obj.export_code('matlab');
+            s.sparsity_in = cell(obj.n_in, 1);
+            s.name_in = cell(obj.n_in, 1);
+            for i=1:obj.n_in
+              s.sparsity_in{i} = obj.sparsity_in(i-1);
+              s.name_in{i} = obj.name_in(i-1);
+            end
+            s.sparsity_out = cell(obj.n_out, 1);
+            s.name_out = cell(obj.n_out, 1);
+            for i=1:obj.n_out
+              s.sparsity_out{i} = obj.sparsity_out(i-1);
+              s.name_out{i} = obj.name_out(i-1);
+            end
+            s.type = obj.class_name();
+            s.name = obj.name;
+            warning('Serializing of CasADi Functions is still experimental');
+        catch exception
+            warning(['Serializing of CasADi Function failed:' getReport(exception) ]);
+            s = struct;
+        end
+     end
+  %}
+  %matlabcode_static %{
+     function obj = loadobj(s)
+        warning('Serializing of CasADi Functions is still experimental');
+        try
+          if isstruct(s)
+             if ~isfield(s,'code')
+               warning('Not supported');
+               obj = casadi.Function();
+               return;
+             end
+             args_in = cell(length(s.sparsity_in),1);
+             for i=1:numel(args_in)
+               if strcmp(s.type,'MXFunction')
+                 args_in{i} = casadi.MX.sym(s.name_in{i}, s.sparsity_in{i});
+               else
+                 args_in{i} = casadi.SX.sym(s.name_in{i}, s.sparsity_in{i});
+               end
+             end
+
+             alphabet= 'a':'z';
+             filename = ['temp_' alphabet(randi(length(alphabet),1,20))];
+             f = fopen([filename '.m'],'w');
+             fprintf(f, s.code);
+             fclose(f);
+             clear(filename)
+             [args_out{1:length(s.sparsity_out)}] = feval(filename, args_in{:});
+             delete([filename '.m'])
+             obj = casadi.Function(s.name, args_in, args_out, s.name_in, s.name_out);
+          else
+             obj = s;
+          end
+        catch exception
+            warning(['Serializing of CasADi Function failed:' getReport(exception) ]);
+            s = struct;
+        end
+     end
+  %}
+
+}
+
+} // namespace casadi
+#endif // SWIGMATLAB
 
 %include <casadi/core/sx_elem.hpp>
 

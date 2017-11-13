@@ -30,7 +30,7 @@
 #include <vector>
 #include <map>
 #include "exception.hpp"
-#include "casadi_types.hpp"
+#include "casadi_common.hpp"
 
 /// \cond INTERNAL
 
@@ -60,7 +60,7 @@ namespace casadi {
 
       // check if the attribute exists
       if (it == attributes_.end()) {
-        casadi_assert_message(!assert_existance,
+        casadi_assert(!assert_existance,
                               "Error in XmlNode::readAttribute: could not find " + attribute_name);
       } else {
         readString(it->second, val);

@@ -24,7 +24,7 @@
 
 
 #include "cvodes_interface.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 
 #define THROWING(fcn, ...) \
 cvodes_error(CASADI_STR(fcn), fcn(__VA_ARGS__))
@@ -96,7 +96,7 @@ namespace casadi {
     create_function("quadB", {"rx", "rp", "x", "p", "t"}, {"rquad"});
 
     // Algebraic variables not supported
-    casadi_assert_message(nz_==0 && nrz_==0,
+    casadi_assert(nz_==0 && nrz_==0,
       "CVODES does not support algebraic variables");
 
     if (linear_multistep_method=="adams") {
@@ -131,7 +131,7 @@ namespace casadi {
 
     // Create CVodes memory block
     m->mem = CVodeCreate(lmm_, iter_);
-    casadi_assert_message(m->mem!=0, "CVodeCreate: Creation failed");
+    casadi_assert(m->mem!=0, "CVodeCreate: Creation failed");
 
     // Set error handler function
     THROWING(CVodeSetErrHandlerFn, m->mem, ehfun, m);
@@ -170,7 +170,7 @@ namespace casadi {
       // Iterative scheme
       int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
       switch (newton_scheme_) {
-      case SD_DIRECT: casadi_assert(0);
+      case SD_DIRECT: casadi_assert_dev(0);
       case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
       case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
       case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
@@ -206,7 +206,7 @@ namespace casadi {
 
   int CvodesInterface::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
       m->arg[0] = NV_DATA_S(x);
@@ -218,7 +218,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "rhs failed: " << e.what() << endl;
+      uerr() << "rhs failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -253,10 +253,10 @@ namespace casadi {
                                 double* z, double* q) const {
     auto m = to_mem(mem);
 
-    casadi_assert_message(t>=grid_.front(),
+    casadi_assert(t>=grid_.front(),
       "CvodesInterface::integrate(" + str(t) + "): "
       "Cannot integrate to a time earlier than t0 (" + str(grid_.front()) + ")");
-    casadi_assert_message(t<=grid_.back() || !stop_at_end_,
+    casadi_assert(t<=grid_.back() || !stop_at_end_,
       "CvodesInterface::integrate(" + str(t) + "): "
       "Cannot integrate past a time later than tf (" + str(grid_.back()) + ") "
       "unless stop_at_end is set to False.");
@@ -288,7 +288,6 @@ namespace casadi {
     THROWING(CVodeGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
              &m->netfails, &m->qlast, &m->qcur, &m->hinused,
              &m->hlast, &m->hcur, &m->tcur);
-
     THROWING(CVodeGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
   }
 
@@ -319,7 +318,7 @@ namespace casadi {
         // Iterative scheme
         int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
         switch (newton_scheme_) {
-        case SD_DIRECT: casadi_assert(0);
+        case SD_DIRECT: casadi_assert_dev(0);
         case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype, max_krylov_); break;
         case SD_BCGSTAB: THROWING(CVSpbcgB, m->mem, m->whichB, pretype, max_krylov_); break;
         case SD_TFQMR: THROWING(CVSptfqmrB, m->mem, m->whichB, pretype, max_krylov_); break;
@@ -366,6 +365,7 @@ namespace casadi {
     THROWING(CVodeGetIntegratorStats, cvB_mem->cv_mem, &m->nstepsB,
            &m->nfevalsB, &m->nlinsetupsB, &m->netfailsB, &m->qlastB,
            &m->qcurB, &m->hinusedB, &m->hlastB, &m->hcurB, &m->tcurB);
+    THROWING(CVodeGetNonlinSolvStats, cvB_mem->cv_mem, &m->nnitersB, &m->nncfailsB);
   }
 
   void CvodesInterface::cvodes_error(const char* module, int flag) {
@@ -382,14 +382,14 @@ namespace casadi {
   void CvodesInterface::ehfun(int error_code, const char *module, const char *function,
                               char *msg, void *user_data) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
       if (!s.disable_internal_warnings_) {
-        userOut<true, PL_WARN>() << msg << endl;
+        uerr() << msg << endl;
       }
     } catch(exception& e) {
-      userOut<true, PL_WARN>() << "ehfun failed: " << e.what() << endl;
+      uerr() << "ehfun failed: " << e.what() << endl;
     }
   }
 
@@ -406,7 +406,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "rhsQ failed: " << e.what() << endl;
+      uerr() << "rhsQ failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -414,7 +414,7 @@ namespace casadi {
   int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
                             void *user_data) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
       m->arg[0] = NV_DATA_S(rx);
@@ -432,7 +432,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "rhsB failed: " << e.what() << endl;
+      uerr() << "rhsB failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -440,7 +440,7 @@ namespace casadi {
   int CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx,
                              N_Vector rqdot, void *user_data) {
     try {
-      casadi_assert(user_data);
+      casadi_assert_dev(user_data);
       auto m = to_mem(user_data);
       auto& s = m->self;
       m->arg[0] = NV_DATA_S(rx);
@@ -458,7 +458,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "rhsQB failed: " << e.what() << endl;
+      uerr() << "rhsQB failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -478,7 +478,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;
+      uerr() << "jtimes failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -501,7 +501,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "jtimes failed: " << e.what() << endl;
+      uerr() << "jtimes failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -524,7 +524,7 @@ namespace casadi {
       casadi_copy(v, s.nx_, m->v1);
 
       // Solve for undifferentiated right-hand-side, save to output
-      s.linsolF_.solve(m->v1, 1);
+      if (s.linsolF_.solve(m->jac, m->v1, 1)) casadi_error("Linear system solve failed");
       v = NV_DATA_S(z); // possibly different from r
       casadi_copy(m->v1, s.nx1_, v);
 
@@ -546,7 +546,7 @@ namespace casadi {
         }
 
         // Solve for sensitivity right-hand-sides
-        s.linsolF_.solve(m->v1 + s.nx1_, s.ns_);
+        if (s.linsolF_.solve(m->jac, m->v1 + s.nx1_, s.ns_)) casadi_error("Linear solve failed");
 
         // Save to output, reordered
         casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
@@ -556,7 +556,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "psolve failed: " << e.what() << endl;
+      uerr() << "psolve failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -573,7 +573,7 @@ namespace casadi {
       casadi_copy(v, s.nrx_, m->v1);
 
       // Solve for undifferentiated right-hand-side, save to output
-      s.linsolB_.solve(m->v1, 1);
+      if (s.linsolB_.solve(m->jacB, m->v1, 1)) casadi_error("Linear solve failed");
       v = NV_DATA_S(zvecB); // possibly different from rvecB
       casadi_copy(m->v1, s.nrx1_, v);
 
@@ -597,7 +597,9 @@ namespace casadi {
         }
 
         // Solve for sensitivity right-hand-sides
-        s.linsolB_.solve(m->v1 + s.nx1_, s.ns_);
+        if (s.linsolB_.solve(m->jacB, m->v1 + s.nx1_, s.ns_)) {
+          casadi_error("Linear solve failed");
+        }
 
         // Save to output, reordered
         casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
@@ -607,7 +609,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "psolveB failed: " << e.what() << endl;
+      uerr() << "psolveB failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -629,16 +631,16 @@ namespace casadi {
       m->arg[3] = &d1;
       m->arg[4] = &d2;
       m->res[0] = m->jac;
-      s.calc_function(m, "jacF");
+      if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
 
       // Prepare the solution of the linear system (e.g. factorize)
-      s.linsolF_.factorize(m->jac);
+      if (s.linsolF_.nfact(m->jac)) casadi_error("'jacF' factorization failed");
 
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "psetup failed: " << e.what() << endl;
+      uerr() << "psetup failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -662,16 +664,16 @@ namespace casadi {
       m->arg[5] = &gammaB;
       m->arg[6] = &one;
       m->res[0] = m->jacB;
-      s.calc_function(m, "jacB");
+      if (s.calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
 
       // Prepare the solution of the linear system (e.g. factorize)
-      s.linsolB_.factorize(m->jacB);
+      if (s.linsolB_.nfact(m->jacB)) casadi_error("'jacB' factorization failed");
 
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "psetupB failed: " << e.what() << endl;
+      uerr() << "psetupB failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -697,7 +699,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "lsetup failed: " << e.what() << endl;
+      uerr() << "lsetup failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -733,7 +735,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "lsetupB failed: " << e.what() << endl;
+      uerr() << "lsetupB failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -764,7 +766,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "lsolve failed: " << e.what() << endl;
+      uerr() << "lsolve failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -807,7 +809,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      userOut<true, PL_WARN>() << "lsolveB failed: " << e.what() << endl;
+      uerr() << "lsolveB failed: " << e.what() << endl;
       return -1;
     }
   }

@@ -141,9 +141,6 @@ namespace casadi {
     void ad_reverse(const std::vector<std::vector<MX> >& adjSeed,
                         std::vector<std::vector<MX> >& adjSens) const;
 
-    /** \brief Expand the matrix valued graph into a scalar valued graph */
-    Function expand(const std::vector<SX>& inputv);
-
     /// Get a vector of symbolic variables corresponding to the outputs
     std::vector<MX> symbolic_output(const std::vector<MX>& arg) const override;
 
@@ -178,8 +175,26 @@ namespace casadi {
     /** \brief Number of nodes in the algorithm */
     int n_nodes() const override { return algorithm_.size();}
 
+    int n_instructions() const override { return algorithm_.size();}
+
+    /** *\brief get MX expression associated with instruction */
+    MX instruction_MX(int k) const override;
+
+    /** \brief Get an atomic operation operator index */
+    int instruction_id(int k) const override { return algorithm_.at(k).op;}
+
     /** \brief Get default input value */
     double get_default_in(int ind) const override { return default_in_.at(ind);}
+
+    /** \brief Get the (integer) input arguments of an atomic operation */
+    std::vector<int> instruction_input(int k) const override;
+
+    /** \brief Get the (integer) output argument of an atomic operation */
+    std::vector<int> instruction_output(int k) const override;
+
+    /** \brief Export function in a specific language */
+    void export_code_body(const std::string& lang,
+      std::ostream &stream, const Dict& options) const override;
 
     /// Substitute inplace, internal implementation
     void substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const;

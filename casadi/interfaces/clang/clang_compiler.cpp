@@ -24,7 +24,7 @@
 
 
 #include "clang_compiler.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/casadi_meta.hpp"
 #include <fstream>
 
@@ -145,7 +145,7 @@ namespace casadi {
 
     // The compiler invocation needs a DiagnosticsEngine so it can report problems
     clang::DiagnosticOptions* diagOpts = new clang::DiagnosticOptions();
-    myerr_ = new llvm::raw_os_ostream(userOut<true>());
+    myerr_ = new llvm::raw_os_ostream(uerr());
     clang::TextDiagnosticPrinter *diagClient = new clang::TextDiagnosticPrinter(*myerr_, diagOpts);
 
     clang::DiagnosticIDs* diagID = new clang::DiagnosticIDs();

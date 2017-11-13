@@ -83,6 +83,13 @@ namespace casadi {
 
   }
 
+  Dict IOInstruction::info() const {
+    Dict ret;
+    ret["ind"] = ind_;
+    ret["segment"] = segment_;
+    ret["offset"] = offset_;
+    return ret;
+  }
 
 
 } // namespace casadi

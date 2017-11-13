@@ -71,7 +71,7 @@ if(FORTRAN_REQUIRED)
 else()
   if(Fortran_language_works)
     enable_language(Fortran OPTIONAL)
-  endif()  
+  endif()
 endif()
 
 ########################################################################
@@ -581,6 +581,7 @@ add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITR
 
 # CPLEX: A sparse mixed-integer QP solver
 option(WITH_CPLEX "Compile the interface to CPLEX" OFF)
+option(WITH_CPLEX_SHARED "Use shared cplex libraries" OFF)
 if(WITH_CPLEX)
   find_package(CPLEX REQUIRED)
 endif()
@@ -631,11 +632,18 @@ if(WITH_SQIC)
 endif()
 add_feature_info(sqic-interface WITH_SQIC "Interface to the QP solver SQIC.")
 
-# @jgillis: What it this for?
+# AMPL: Interface to the AMPL solver library and interfaced solvers
+option(WITH_AMPL "Compile the interface to AMPL" OFF)
+add_feature_info(ampl-interface WITH_AMPL "Interface to the AMPL solver library.")
+
+# Slicot: used for expm, dple
 option(WITH_SLICOT "Enable SLICOT interface" OFF)
 if(WITH_SLICOT)
   if (NOT Fortran_language_works)
     message(FATAL_ERROR "SLICOT requires Fortran support.")
+  endif()
+  if (NOT WITH_LAPACK)
+     message(FATAL_ERROR "WITH_SLICOT requires WITH_LAPACK.")
   endif()
   find_package(SLICOT REQUIRED)
 endif()

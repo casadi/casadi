@@ -88,7 +88,7 @@ namespace casadi {
   }
 
   SharedObjectInternal* SharedObject::operator->() const {
-    casadi_assert(!is_null());
+    casadi_assert_dev(!is_null());
     return node;
   }
 
@@ -127,7 +127,7 @@ namespace casadi {
   }
 
   WeakRef::WeakRef(int dummy) {
-    casadi_assert(dummy==0);
+    casadi_assert_dev(dummy==0);
   }
 
   bool WeakRef::alive() const {

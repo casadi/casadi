@@ -31,7 +31,7 @@
 
 // Generic tools
 #include "polynomial.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "global_options.hpp"
 #include "casadi_meta.hpp"
 

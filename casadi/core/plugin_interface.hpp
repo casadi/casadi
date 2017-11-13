@@ -71,7 +71,7 @@ namespace casadi {
   // Avoid segmentation faults when exposed function not implemented
   template<typename T>
   T check_exposed(T t) {
-    casadi_assert_message(t!=0, "Static function not implemented for plugin");
+    casadi_assert(t!=0, "Static function not implemented for plugin");
     return t;
   }
 
@@ -154,7 +154,7 @@ namespace casadi {
   template<class Derived>
   const Options& PluginInterface<Derived>::plugin_options(const std::string& pname) {
     const Options *op = getPlugin(pname).options;
-    casadi_assert_message(op!=0, "Plugin \"" + pname + "\" does not support options");
+    casadi_assert(op!=0, "Plugin \"" + pname + "\" does not support options");
     return *op;
   }
 
@@ -166,7 +166,7 @@ namespace casadi {
 
     // Set the fields
     int flag = regfcn(&plugin);
-    casadi_assert(flag==0);
+    casadi_assert_dev(flag==0);
 
     return plugin;
   }
@@ -289,7 +289,7 @@ namespace casadi {
 
     resultpath = searchpath;
 
-    casadi_assert_message(handle!=0, errors.str());
+    casadi_assert(handle!=0, errors.str());
 
     return handle;
 
@@ -328,7 +328,7 @@ namespace casadi {
     // Load creator
     reg = (RegFcn)dlsym(handle, regName.c_str());
 #endif // _WIN32
-    casadi_assert_message(reg!=0,
+    casadi_assert(reg!=0,
       "PluginInterface::load_plugin: no \"" + regName + "\" found in " + searchpath + ".");
 
     // Create a temporary struct
@@ -353,7 +353,7 @@ namespace casadi {
 
     // Check if the solver name is in use
     typename std::map<std::string, Plugin>::iterator it=Derived::solvers_.find(plugin.name);
-    casadi_assert_message(it==Derived::solvers_.end(),
+    casadi_assert(it==Derived::solvers_.end(),
       "Solver " + str(plugin.name) + " is already in use");
 
     // Add to list of solvers
@@ -372,7 +372,7 @@ namespace casadi {
       load_plugin(pname);
       it=Derived::solvers_.find(pname);
     }
-    casadi_assert(it!=Derived::solvers_.end());
+    casadi_assert_dev(it!=Derived::solvers_.end());
     return it->second;
   }
 

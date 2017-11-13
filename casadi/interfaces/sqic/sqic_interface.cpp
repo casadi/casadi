@@ -26,7 +26,7 @@
 #include "sqic_interface.hpp"
 #include "casadi/core/conic.hpp"
 #include "casadi/core/mx_function.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 
 #include "wsqic.hpp"
 #include "casadi/interfaces/sqic/resource_sqic.hpp"
@@ -262,7 +262,7 @@ namespace casadi {
     for (int i=0;i<pi_.size();++i) {
       file << "  pi(" << i +1 << ") = " <<  0 << std::endl; //pi_[i] << std::endl;
     }
-    userOut() << "lam_x0:::" << input(CONIC_LAM_X0) << std::endl;
+    uout() << "lam_x0:::" << input(CONIC_LAM_X0) << std::endl;
     for (int i=0;i<rc_.size();++i) {
       file << "  rc(" << i +1 << ") = "
            << ((i<input(CONIC_LAM_X0).size()) ? -input(CONIC_LAM_X0).at(i) : 0.0)
@@ -277,7 +277,7 @@ namespace casadi {
        for (int i=0;i<pi_.size();++i) {
        file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
        }
-       userOut() << "lam_x0:::" << input(CONIC_LAM_X0) << std::endl;
+       uout() << "lam_x0:::" << input(CONIC_LAM_X0) << std::endl;
        for (int i=0;i<rc_.size();++i) {
        file << "  rc(" << i +1 << ") = "
        << ((i<input(CONIC_LAM_X0).size()) ? -input(CONIC_LAM_X0).at(i) : 0.0)
@@ -291,7 +291,7 @@ namespace casadi {
        for (int i=0;i<pi_.size();++i) {
        file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
        }
-       userOut() << "lam_x0:::" << input(CONIC_LAM_X0) << std::endl;
+       uout() << "lam_x0:::" << input(CONIC_LAM_X0) << std::endl;
        for (int i=0;i<rc_.size();++i) {
        file << "  rc(" << i +1 << ") = "
        << ((i<input(CONIC_LAM_X0).size()) ? -input(CONIC_LAM_X0).at(i) : 0.0)

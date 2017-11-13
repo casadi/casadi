@@ -212,11 +212,11 @@ int main(){
   // Compile the C-code to a shared library
   string compile_command = "gcc -fPIC -shared -O3 f.c -o f.so";
   int flag = system(compile_command.c_str());
-  casadi_assert_message(flag==0, "Compilation failed");
+  casadi_assert(flag==0, "Compilation failed");
 
   // Usage from C
   flag = usage_c();
-  casadi_assert_message(flag==0, "Example failed");
+  casadi_assert(flag==0, "Example failed");
 
   // Usage from C++
   usage_cplusplus();

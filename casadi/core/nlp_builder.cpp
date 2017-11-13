@@ -72,9 +72,13 @@ namespace casadi {
     }
 
     // Assert that the file is not in binary form
-    casadi_assert_message(header.at(0).at(0)=='g',
-    "File could not be read, or file is binary format "
-    "(currently not supported)");
+    if (header.at(0).at(0)=='g') {
+      binary_ = false;
+    } else if (header.at(0).at(0)=='b') {
+      binary_ = true;
+    } else {
+      casadi_error("File could not be read");
+    }
 
     // Get the number of objectives and constraints
     stringstream ss(header[1]);
@@ -150,11 +154,18 @@ namespace casadi {
     // other integer
     for (int j = 0; j<niv_; ++j) nlp_.discrete.push_back(true);
 
-    casadi_assert_message(nlp_.discrete.size()==n_var_,
+    casadi_assert(nlp_.discrete.size()==n_var_,
       "Number of variables in the header don't match");
 
     // All variables, including dependent
     v_ = nlp_.x;
+
+    if (binary_) {
+      streampos offset = s_.tellg();
+      s_.close();
+      s_.open(filename.c_str(), std::ifstream::binary);
+      s_.seekg(offset);
+    }
 
     // Read segments
     parse();
@@ -175,7 +186,7 @@ namespace casadi {
     // Process segments
     while (true) {
       // Read segment key
-      s_ >> key;
+      key = read_char();
       if (s_.eof()) break; // end of file encountered
       switch (key) {
         case 'F': F_segment(); break;
@@ -198,8 +209,7 @@ namespace casadi {
 
   MX NlImporter::expr() {
     // Read the instruction
-    char inst;
-    s_ >> inst;
+    char inst = read_char();
 
     // Temporaries
     int i;
@@ -210,10 +220,11 @@ namespace casadi {
 
     // Process instruction
     switch (inst) {
+
       // Symbolic variable
       case 'v':
       // Read the variable number
-      s_ >> i;
+      i = read_int();
 
       // Return the corresponding expression
       return v_.at(i);
@@ -222,7 +233,25 @@ namespace casadi {
       case 'n':
 
       // Read the floating point number
-      s_ >> d;
+      d = read_double();
+
+      // Return an expression containing the number
+      return d;
+
+      // Numeric expression
+      case 's':
+
+      // Read the short number
+      d = read_short();
+
+      // Return an expression containing the number
+      return d;
+
+      // Numeric expression
+      case 'l':
+
+      // Read the short number
+      d = read_long();
 
       // Return an expression containing the number
       return d;
@@ -231,7 +260,7 @@ namespace casadi {
       case 'o':
 
       // Read the operation
-      s_ >> i;
+      i = read_int();
 
       // Process
       switch (i) {
@@ -318,8 +347,7 @@ namespace casadi {
         case 11: case 12: case 54: case 59: case 60: case 61: case 70: case 71: case 74:
         {
           // Number of elements in the sum
-          int n;
-          s_ >> n;
+          int n = read_int();
 
           // Collect the arguments
           vector<MX> args(n);
@@ -363,11 +391,12 @@ namespace casadi {
         break;
 
         default:
-        casadi_error("Unknown operatio: " + str(i));
+        casadi_error("Unknown operation: " + str(i));
       }
       break;
 
       default:
+       uout() << s_.tellg() << std::endl;
       casadi_error("Unknown instruction: " + str(inst));
     }
 
@@ -385,8 +414,9 @@ namespace casadi {
 
   void NlImporter::V_segment() {
     // Read header
-    int i, j, k;
-    s_ >> i >> j >> k;
+    int i = read_int();
+    int j = read_int();
+    read_int();
 
     // Make sure that v is long enough
     if (i >= v_.size()) {
@@ -399,12 +429,11 @@ namespace casadi {
     // Add the linear terms
     for (int jj=0; jj<j; ++jj) {
       // Linear term
-      int pl;
-      double cl;
-      s_ >> pl >> cl;
+      int pl = read_int();
+      double cl = read_double();
 
       // Add to variable definition (assuming it has already been defined)
-      casadi_assert_message(!v_.at(pl).is_empty(), "Circular dependencies not supported");
+      casadi_assert(!v_.at(pl).is_empty(), "Circular dependencies not supported");
       v_.at(i) += cl*v_.at(pl);
     }
 
@@ -412,10 +441,59 @@ namespace casadi {
     v_.at(i) += expr();
   }
 
+  int NlImporter::read_int() {
+    int i;
+    if (binary_) {
+      s_.read(reinterpret_cast<char *>(&i), sizeof(int));
+    } else {
+      s_ >> i;
+    }
+    return i;
+  }
+
+  char NlImporter::read_char() {
+    char c;
+    if (binary_) {
+      s_.read(&c, 1);
+    } else {
+      s_ >> c;
+    }
+    return c;
+  }
+
+  double NlImporter::read_double() {
+    double d;
+    if (binary_) {
+      s_.read(reinterpret_cast<char *>(&d), sizeof(double));
+    } else {
+      s_ >> d;
+    }
+    return d;
+  }
+
+  short NlImporter::read_short() {
+    short d;
+    if (binary_) {
+      s_.read(reinterpret_cast<char *>(&d), 2);
+    } else {
+      s_ >> d;
+    }
+    return d;
+  }
+
+  long NlImporter::read_long() {
+    long d;
+    if (binary_) {
+      s_.read(reinterpret_cast<char *>(&d), 4);
+    } else {
+      s_ >> d;
+    }
+    return d;
+  }
+
   void NlImporter::C_segment() {
     // Get the number
-    int i;
-    s_ >> i;
+    int i = read_int();
 
     // Parse and save expression
     nlp_.g.at(i) = expr();
@@ -427,12 +505,10 @@ namespace casadi {
 
   void NlImporter::O_segment() {
     // Get the number
-    int i;
-    s_ >> i;
+    read_int(); // i
 
     // Should the objective be maximized
-    int sigma;
-    s_ >> sigma;
+    int sigma= read_int();
     sign_ = sigma!=0 ? -1 : 1;
 
     // Parse and save expression
@@ -441,15 +517,13 @@ namespace casadi {
 
   void NlImporter::d_segment() {
     // Read the number of guesses supplied
-    int m;
-    s_ >> m;
+    int m = read_int();
 
     // Process initial guess for the fual variables
     for (int i=0; i<m; ++i) {
       // Offset and value
-      int offset;
-      double d;
-      s_ >> offset >> d;
+      int offset = read_int();
+      double d = read_double();
 
       // Save initial guess
       nlp_.lambda_init.at(offset) = d;
@@ -458,15 +532,13 @@ namespace casadi {
 
   void NlImporter::x_segment() {
     // Read the number of guesses supplied
-    int m;
-    s_ >> m;
+    int m = read_int();
 
     // Process initial guess
     for (int i=0; i<m; ++i) {
       // Offset and value
-      int offset;
-      double d;
-      s_ >> offset >> d;
+      int offset = read_int();
+      double d = read_double();
 
       // Save initial guess
       nlp_.x_init.at(offset) = d;
@@ -478,49 +550,48 @@ namespace casadi {
     for (int i=0; i<n_con_; ++i) {
 
       // Read constraint type
-      int c_type;
-      s_ >> c_type;
+      char c_type = read_char();
 
       // Temporary
       double c;
 
       switch (c_type) {
         // Upper and lower bounds
-        case 0:
-        s_ >> c;
+        case '0':
+        c = read_double();
         nlp_.g_lb.at(i) = c;
-        s_ >> c;
+        c = read_double();
         nlp_.g_ub.at(i) = c;
         continue;
 
         // Only upper bounds
-        case 1:
-        s_ >> c;
+        case '1':
+        c = read_double();
         nlp_.g_ub.at(i) = c;
         continue;
 
         // Only lower bounds
-        case 2:
-        s_ >> c;
+        case '2':
+        c = read_double();
         nlp_.g_lb.at(i) = c;
         continue;
 
         // No bounds
-        case 3:
+        case '3':
         continue;
 
         // Equality constraints
-        case 4:
-        s_ >> c;
+        case '4':
+        c = read_double();
         nlp_.g_lb.at(i) = nlp_.g_ub.at(i) = c;
         continue;
 
         // Complementary constraints
-        case 5:
+        case '5':
         {
           // Read the indices
-          int ck, ci;
-          s_ >> ck >> ci;
+          read_int(); // ck
+          read_int(); // ci
           casadi_error("Complementary constraints unsupported");
           continue;
         }
@@ -536,40 +607,39 @@ namespace casadi {
     for (int i=0; i<n_var_; ++i) {
 
       // Read constraint type
-      int c_type;
-      s_ >> c_type;
+      char c_type = read_char();
 
       // Temporary
       double c;
 
       switch (c_type) {
         // Upper and lower bounds
-        case 0:
-        s_ >> c;
+        case '0':
+        c = read_double();
         nlp_.x_lb.at(i) = c;
-        s_ >> c;
+        c = read_double();
         nlp_.x_ub.at(i) = c;
         continue;
 
         // Only upper bounds
-        case 1:
-        s_ >> c;
+        case '1':
+        c = read_double();
         nlp_.x_ub.at(i) = c;
         continue;
 
         // Only lower bounds
-        case 2:
-        s_ >> c;
+        case '2':
+        c = read_double();
         nlp_.x_lb.at(i) = c;
         continue;
 
         // No bounds
-        case 3:
+        case '3':
         continue;
 
         // Equality constraints
-        case 4:
-        s_ >> c;
+        case '4':
+        c = read_double();
         nlp_.x_lb.at(i) = nlp_.x_ub.at(i) = c;
         continue;
 
@@ -584,28 +654,26 @@ namespace casadi {
     vector<int> rowind(n_var_+1);
 
     // Get the number of offsets
-    int k;
-    s_ >> k;
-    casadi_assert(k==n_var_-1);
+    int k = read_int();
+    casadi_assert_dev(k==n_var_-1);
 
     // Get the row offsets
     rowind[0]=0;
     for (int i=0; i<k; ++i) {
-      s_ >> rowind[i+1];
+      rowind[i+1] = read_int();
     }
   }
 
   void NlImporter::J_segment() {
     // Get constraint number and number of terms
-    int i, k;
-    s_ >> i >> k;
+    int i = read_int();
+    int k = read_int();
 
     // Get terms
     for (int kk=0; kk<k; ++kk) {
       // Get the term
-      int j;
-      double c;
-      s_ >> j >> c;
+      int j = read_int();
+      double c = read_double();
 
       // Add to constraints
       nlp_.g.at(i) += c*v_.at(j);
@@ -614,15 +682,14 @@ namespace casadi {
 
   void NlImporter::G_segment() {
     // Get objective number and number of terms
-    int i, k;
-    s_ >> i >> k;
+    read_int(); // i
+    int k = read_int();
 
     // Get terms
     for (int kk=0; kk<k; ++kk) {
       // Get the term
-      int j;
-      double c;
-      s_ >> j >> c;
+      int j = read_int();
+      double c = read_double();
 
       // Add to objective
       nlp_.f += c*v_.at(j);

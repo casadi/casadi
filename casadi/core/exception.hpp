@@ -32,6 +32,9 @@
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
+#include <ctime>
+#include <iomanip>
+#include <chrono>
 
 #include <casadi/core/casadi_export.h>
 
@@ -70,19 +73,6 @@ class CasadiException : public std::exception {
     return msg_.c_str();
   }
 
-  //! \brief Append a message
-  CasadiException& operator<<(const std::string& msg) {
-    msg_ += msg;
-    return *this;
-  }
-
-  //! \brief Append an exception
-  CasadiException& operator<<(const std::exception& ex) {
-    msg_ += " => ";
-    msg_ += ex.what();
-    return *this;
-  }
-
   protected:
   std::string msg_;
 };
@@ -107,44 +97,45 @@ inline std::string trim_path(const std::string& full_path) {
   }
 }
 
+// Current time as a string
+inline std::ostream& message_prefix(std::ostream &stream) {
+  stream << "CasADi - ";
+  auto time = std::time(nullptr);
+  char stamp[30];
+  strftime(stamp, 30, "%F %T", std::localtime(&time)); // NOLINT(runtime/threadsafe_fn)
+  stream << stamp;
+  return stream;
+}
+
 // Convert to string
 #define CASADI_STR1(x) #x
 #define CASADI_STR(x) CASADI_STR1(x)
 
-// String denoting where the assertion is situated
+// String denoting where the macro is situated
 #define CASADI_WHERE casadi::trim_path(__FILE__ ":" CASADI_STR(__LINE__))
 
 // Throw an exception with information about source code location
-#define casadi_error(msg) \
-  throw casadi::CasadiException(CASADI_WHERE + ": " + std::string(msg));
+#define casadi_error(msg, ...) \
+throw casadi::CasadiException(CASADI_WHERE + ": "\
+          + casadi::fmtstr(msg, casadi::strvec(__VA_ARGS__)))
 
 // This assertion checks for illegal user inputs
-#define casadi_assert_message(x, msg) \
-  if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n" + std::string(msg));
+#define casadi_assert(x, msg, ...) \
+if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n"\
+          + std::string(msg), __VA_ARGS__)
 
-// This assertion if for errors caused by bugs in CasADi, use it instead of C:s assert(),
-// but never in destructors
-#if NDEBUG
-#define casadi_assert(x) casadi_assert_message(x, "Please notify the CasADi developers.")
-#else
-#define casadi_assert(x) casadi_assert_message(x, "Please notify the CasADi developers.\n"\
-    "Hint for developers: GlobalOptions.setCatchErrorsSwig(False)" \
-    " to obtain gdb stacktrace in python.")
-#endif
+// This assertion if for internal errors caused by bugs in CasADi
+#define casadi_assert_dev(x) casadi_assert(x, "Notify the CasADi developers.")
 
 // Issue a warning, including location in the source code
 #define casadi_warning(msg) \
-  casadi::userOut<true, casadi::PL_WARN>() \
-    << "CasADi warning at " << CASADI_WHERE << ": " << msg << "\n";
-
-// Issue a warning if an assertion fails
-#define casadi_assert_warning(x, msg) \
-  if (!(x)) casadi_warning("Assertion \"" CASADI_STR(x) "\" failed.");
+  casadi::message_prefix(casadi::uerr()) \
+    << " WARNING(\"" << msg << "\") [" << CASADI_WHERE << "]\n" << std::flush;
 
 // Issue a message, including location in the source code
 #define casadi_message(msg) \
-  casadi::userOut() \
-    << "CasADi message at " << CASADI_WHERE << ": " << msg << "\n";
+  casadi::message_prefix(casadi::uout()) \
+    << " MESSAGE(\"" << msg << "\") [" << CASADI_WHERE << "]\n" << std::flush;
 
 } // namespace casadi
 

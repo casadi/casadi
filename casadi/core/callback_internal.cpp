@@ -30,7 +30,7 @@ namespace casadi {
 
   #define TRY_CALL(FCN, OBJ, ...) \
   try { \
-    casadi_assert_message((OBJ)!=0, "Callback object has been deleted"); \
+    casadi_assert((OBJ)!=0, "Callback object has been deleted"); \
     return (OBJ)->FCN(__VA_ARGS__);\
   } catch (std::exception& ex) { \
     casadi_error("Error calling \"" CASADI_STR(FCN) "\" for object " \
@@ -74,13 +74,13 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     // Initialize this
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
+    casadi_assert(self_!=0, "Callback object has been deleted");
     self_->init();
   }
 
   void CallbackInternal::finalize(const Dict& opts) {
     // Finalize this
-    casadi_assert_message(self_!=0, "Callback object has been deleted");
+    casadi_assert(self_!=0, "Callback object has been deleted");
     self_->finalize();
 
     // Finalize the base classes

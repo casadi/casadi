@@ -397,7 +397,7 @@ public:
     casadi_error("Callback objects cannot be copied");
   }
   virtual void call(int i) {
-    userOut() << "This is a simple callback at iteration" << i << std::endl;
+    uout() << "This is a simple callback at iteration" << i << std::endl;
   }
   virtual ~OptiCallback() {}
 };
@@ -461,6 +461,7 @@ public:
 
   DMDict arg() const;
   void res(const DMDict& res);
+  DMDict res() const;
   std::vector<MX> constraints() const;
   MX objective() const;
 

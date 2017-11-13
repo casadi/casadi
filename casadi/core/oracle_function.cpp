@@ -66,7 +66,7 @@ namespace casadi {
       } else if (op.first=="specific_options") {
         specific_options_ = op.second;
         for (auto&& i : specific_options_) {
-          casadi_assert_message(i.second.is_dict(),
+          casadi_assert(i.second.is_dict(),
             "specific_option must be a nested dictionary."
             " Type mismatch for entry '" + i.first+ "': "
             " got type " + i.second.get_description() + ".");
@@ -93,7 +93,7 @@ namespace casadi {
         casadi_warning("Ignoring monitor '" + fname + "'."
                        " Available functions: " + join(get_function()) + ".");
       } else {
-        casadi_assert_warning(!it->second.monitored, "Duplicate monitor " + fname);
+        if (it->second.monitored) casadi_warning("Duplicate monitor " + fname);
         it->second.monitored = true;
       }
     }
@@ -141,7 +141,7 @@ namespace casadi {
 
   void OracleFunction::
   set_function(const Function& fcn, const std::string& fname, bool jit) {
-    casadi_assert_message(!has_function(fname), "Duplicate function " + fname);
+    casadi_assert(!has_function(fname), "Duplicate function " + fname);
     RegFun& r = all_functions_[fname];
     r.f = fcn;
     r.jit = jit;
@@ -205,7 +205,7 @@ namespace casadi {
       f(m->arg, m->res, m->iw, m->w, 0);
     } catch(exception& ex) {
       // Fatal error
-      casadi_warning(name() + ":" + fcn + " failed:" + std::string(ex.what()));
+      casadi_warning(name_ + ":" + fcn + " failed:" + std::string(ex.what()));
       return 1;
     }
 
@@ -240,7 +240,7 @@ namespace casadi {
         auto it = find_if(m->res[i], m->res[i]+f.nnz_out(i), [](double v) { return !isfinite(v);});
         int k = distance(m->res[i], it);
         bool is_nan = isnan(m->res[i][k]);
-        ss << name() << ":" << fcn << " failed: " << (is_nan? "NaN" : "Inf") <<
+        ss << name_ << ":" << fcn << " failed: " << (is_nan? "NaN" : "Inf") <<
         " detected for output " << f.name_out(i) << ", at " << f.sparsity_out(i).repr_el(k) << ".";
 
         if (regularity_check_) {
@@ -289,89 +289,28 @@ namespace casadi {
   }
 
   void OracleFunction::print_fstats(const OracleMemory* m) const {
-
-    size_t maxNameLen=0;
-
-    // Retrieve all nlp keys
-    std::vector<std::string> keys;
-    std::vector<std::string> keys_other;
+    // Length of the name being printed
+    size_t name_len=0;
     for (auto &&s : m->fstats) {
-      maxNameLen = max(s.first.size(), maxNameLen);
-      if (s.first.find("nlp")!=std::string::npos) {
-        keys.push_back(s.first);
-      } else if (s.first.find("mainloop")==std::string::npos) {
-        keys_other.push_back(s.first);
-      } else {
-        continue;
-      }
+      name_len = max(s.first.size(), name_len);
     }
 
-    maxNameLen = max(std::string("all previous").size(), maxNameLen);
-    maxNameLen = max(std::string("solver").size(), maxNameLen);
+    // Print name with a given length. Format: "%NNs "
+    char namefmt[10];
+    sprint(namefmt, sizeof(namefmt), "%%%ds ", static_cast<int>(name_len));
 
     // Print header
-    std::stringstream s;
-    std::string blankName(maxNameLen, ' ');
-    s << blankName
-      << "      proc           wall      num           mean             mean"
-      << endl << blankName
-      << "      time           time     evals       proc time        wall time"
-      << endl;
-    userOut() << s.str();
+    print(namefmt, "");
+    print("%12s %12s %9s\n", "t_proc [s]", "t_wall [s]", "n_eval");
 
-    // Sort the keys according to order
-    std::vector<std::string> keys_order0;
-    std::vector<std::string> keys_order1;
-    std::vector<std::string> keys_order2;
-    for (auto k : keys) {
-      if (k.find("hess")!=std::string::npos) {
-        keys_order2.push_back(k);
-        continue;
+    // Print keys
+    for (auto &&s : m->fstats) {
+      const FStats& fs = m->fstats.at(s.first);
+      if (fs.n_call!=0) {
+        print(namefmt, s.first.c_str());
+        print("%12.3g %12.3g %9d\n", fs.t_proc, fs.t_wall, fs.n_call);
       }
-      if (k.find("grad")!=std::string::npos ||
-          k.find("jac")!=std::string::npos) {
-        keys_order1.push_back(k);
-        continue;
-      }
-      keys_order0.push_back(k);
     }
-
-    // Print all NLP stats
-    for (auto keys : {&keys_order0, &keys_order1, &keys_order2}) {
-        std::sort(keys->begin(), keys->end());
-        for (auto k : *keys) {
-          const FStats& fs = m->fstats.at(k);
-          print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
-        }
-    }
-
-    // Sum the previously printed stats
-    double t_wall_all_previous = 0;
-    double t_proc_all_previous = 0;
-    for (auto k : keys) {
-      const FStats& fs = m->fstats.at(k);
-      t_proc_all_previous += fs.t_proc;
-      t_wall_all_previous += fs.t_wall;
-    }
-    print_stats_line(maxNameLen, "all previous", -1, t_proc_all_previous, t_wall_all_previous);
-
-    // Sort and show the remainder of keys
-    std::sort(keys_other.begin(), keys_other.end());
-    for (std::string k : keys_other) {
-      const FStats& fs = m->fstats.at(k);
-      print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
-      t_proc_all_previous += fs.t_proc;
-      t_wall_all_previous += fs.t_wall;
-    }
-
-    // Show the mainloop stats
-    const FStats& fs_mainloop = m->fstats.at("mainloop");
-    if (fs_mainloop.n_call>0) {
-      print_stats_line(maxNameLen, "solver", -1,
-        fs_mainloop.t_proc-t_proc_all_previous, fs_mainloop.t_wall-t_wall_all_previous);
-      print_stats_line(maxNameLen, "mainloop", -1, fs_mainloop.t_proc, fs_mainloop.t_wall);
-    }
-
   }
 
   Dict OracleFunction::get_stats(void *mem) const {
@@ -418,16 +357,16 @@ namespace casadi {
 
   const Function& OracleFunction::get_function(const std::string &name) const {
     auto it = all_functions_.find(name);
-    casadi_assert_message(it!=all_functions_.end(),
-      "No function \"" + name + "\" in " + this->name() + ". " +
+    casadi_assert(it!=all_functions_.end(),
+      "No function \"" + name + "\" in " + name_ + ". " +
       "Available functions: " + join(get_function()) + ".");
     return it->second.f;
   }
 
   bool OracleFunction::monitored(const std::string &name) const {
     auto it = all_functions_.find(name);
-    casadi_assert_message(it!=all_functions_.end(),
-      "No function \"" + name + "\" in " + this->name()+ ". " +
+    casadi_assert(it!=all_functions_.end(),
+      "No function \"" + name + "\" in " + name_+ ". " +
       "Available functions: " + join(get_function()) + ".");
     return it->second.monitored;
   }

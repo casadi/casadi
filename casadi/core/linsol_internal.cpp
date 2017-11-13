@@ -28,7 +28,8 @@
 using namespace std;
 namespace casadi {
 
-  LinsolInternal::LinsolInternal(const std::string& name) : FunctionInternal(name) {
+  LinsolInternal::LinsolInternal(const std::string& name, const Sparsity& sp)
+   : ProtoFunction(name), sp_(sp) {
   }
 
   LinsolInternal::~LinsolInternal() {
@@ -36,10 +37,17 @@ namespace casadi {
 
   void LinsolInternal::init(const Dict& opts) {
     // Call the base class initializer
-    FunctionInternal::init(opts);
+    ProtoFunction::init(opts);
 
   }
 
+  void LinsolInternal::disp(ostream &stream, bool more) const {
+    stream << "Linear solver " << class_name();
+    if (more) {
+      stream << endl;
+      disp_more(stream);
+    }
+  }
 
   int LinsolInternal::init_mem(void* mem) const {
     if (!mem) return 1;
@@ -52,58 +60,51 @@ namespace casadi {
     casadi_error("eval_sx not defined for " + class_name());
   }
 
-  void LinsolInternal::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int LinsolInternal::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     casadi_error("'solve' not defined for " + class_name());
   }
 
-  void LinsolInternal::solve_cholesky(void* mem, double* x, int nrhs, bool tr) const {
-    casadi_error("'solve_cholesky' not defined for " + class_name());
-  }
-
-  void LinsolInternal::reset(void* mem, const int* sp) const {
-    auto m = static_cast<LinsolMemory*>(mem);
-
-    // Decompress pattern
-    int nrow = *sp++;
-    int ncol = *sp++;
-    const int* colind = sp;
-    int nnz = colind[ncol];
-    const int* row = nnz==nrow*ncol ? 0 : sp+ncol+1;
-
-    // Save to sparsity field
-    m->sparsity.clear();
-    m->sparsity.push_back(nrow);
-    m->sparsity.push_back(ncol);
-    m->sparsity.insert(m->sparsity.end(), colind, colind+ncol+1);
-    if (row) {
-      m->sparsity.insert(m->sparsity.end(), row, row+nnz);
-    } else {
-      for (int cc=0; cc<ncol; ++cc) {
-        for (int rr=0; rr<nrow; ++rr) {
-          m->sparsity.push_back(rr);
-        }
-      }
+#if 0
+  int LinsolInternal::factorize(void* mem, const double* A) const {
+    // Symbolic factorization, if needed
+    if (needs_sfact(mem, A)) {
+      if (sfact(mem, A)) return 1;
     }
+
+    // Numeric factorization, if needed
+    if (needs_nfact(mem, A)) {
+      if (nfact(mem, A)) return 1;
+    }
+
+    return 0;
   }
 
-  void LinsolInternal::factorize(void* mem, const double* A) const {
-    casadi_error("'factorize' not defined for " + class_name());
+  bool LinsolInternal::needs_sfact(void* mem, const double* A) const {
+    auto m = static_cast<LinsolMemory*>(mem);
+    return m->is_sfact;
   }
 
-  Sparsity LinsolInternal::linsol_cholesky_sparsity(void* mem, bool tr) const {
-    casadi_error("'linsol_cholesky_sparsity' not defined for " + class_name());
+  bool LinsolInternal::needs_nfact(void* mem, const double* A) const {
+    auto m = static_cast<LinsolMemory*>(mem);
+    return m->is_nfact;
+  }
+#endif
+
+  int LinsolInternal::nfact(void* mem, const double* A) const {
+    casadi_error("'nfact' not defined for " + class_name());
   }
 
-  DM LinsolInternal::linsol_cholesky(void* mem, bool tr) const {
-    casadi_error("'linsol_cholesky' not defined for " + class_name());
-  }
-
-  int LinsolInternal::neig(void* mem) const {
+  int LinsolInternal::neig(void* mem, const double* A) const {
     casadi_error("'neig' not defined for " + class_name());
   }
 
-  int LinsolInternal::rank(void* mem) const {
+  int LinsolInternal::rank(void* mem, const double* A) const {
     casadi_error("'rank' not defined for " + class_name());
+  }
+
+  void LinsolInternal::generate(CodeGenerator& g, const std::string& A, const std::string& x,
+                                int nrhs, bool tr) const {
+    g << "#error " <<  class_name() << " does not support code generation\n";
   }
 
   std::map<std::string, LinsolInternal::Plugin> LinsolInternal::solvers_;

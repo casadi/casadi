@@ -24,7 +24,7 @@
 
 
 #include "integrator_impl.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 
 using namespace std;
 namespace casadi {
@@ -151,10 +151,9 @@ namespace casadi {
   eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
     auto m = static_cast<IntegratorMemory*>(mem);
 
-    // Statistics
+    // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
-
-    m->fstats.at("mainloop").tic();
+    m->fstats.at(name_).tic();
 
     // Read inputs
     const double* x0 = arg[INTEGRATOR_X0];
@@ -201,13 +200,10 @@ namespace casadi {
       retreat(m, grid_.front(), rx, rz, rq);
     }
 
-    m->fstats.at("mainloop").toc();
-
-    // Print statistics
-    if (print_stats_) print_stats(m, userOut());
-
-    // Show statistics
-    if (print_time_)  print_fstats(static_cast<OracleMemory*>(mem));
+    // Finalize/print statistics
+    m->fstats.at(name_).toc();
+    if (print_stats_) print_stats(m);
+    if (print_time_)  print_fstats(m);
     return 0;
   }
 
@@ -282,12 +278,12 @@ namespace casadi {
     alloc(oracle_);
 
     // Error if sparse input
-    casadi_assert_message(x().is_dense(), "Sparse DAE not supported");
-    casadi_assert_message(z().is_dense(), "Sparse DAE not supported");
-    casadi_assert_message(p().is_dense(), "Sparse DAE not supported");
-    casadi_assert_message(rx().is_dense(), "Sparse DAE not supported");
-    casadi_assert_message(rz().is_dense(), "Sparse DAE not supported");
-    casadi_assert_message(rp().is_dense(), "Sparse DAE not supported");
+    casadi_assert(x().is_dense(), "Sparse DAE not supported");
+    casadi_assert(z().is_dense(), "Sparse DAE not supported");
+    casadi_assert(p().is_dense(), "Sparse DAE not supported");
+    casadi_assert(rx().is_dense(), "Sparse DAE not supported");
+    casadi_assert(rz().is_dense(), "Sparse DAE not supported");
+    casadi_assert(rp().is_dense(), "Sparse DAE not supported");
 
     // Get dimensions (excluding sensitivity equations)
     nx1_ = x().size1();
@@ -314,13 +310,13 @@ namespace casadi {
 
     // Get the sparsities of the forward and reverse DAE
     sp_jac_dae_ = sp_jac_dae();
-    casadi_assert_message(!sp_jac_dae_.is_singular(),
+    casadi_assert(!sp_jac_dae_.is_singular(),
                           "Jacobian of the forward problem is structurally rank-deficient. "
                           "sprank(J)=" + str(sprank(sp_jac_dae_)) + "<"
                           + str(nx_+nz_));
     if (nrx_>0) {
       sp_jac_rdae_ = sp_jac_rdae();
-      casadi_assert_message(!sp_jac_rdae_.is_singular(),
+      casadi_assert(!sp_jac_rdae_.is_singular(),
                             "Jacobian of the backward problem is structurally rank-deficient. "
                             "sprank(J)=" + str(sprank(sp_jac_rdae_)) + "<"
                             + str(nrx_+nrz_));
@@ -338,7 +334,7 @@ namespace casadi {
     if (OracleFunction::init_mem(mem)) return 1;
 
     auto m = static_cast<IntegratorMemory*>(mem);
-    m->fstats["mainloop"] = FStats();
+    m->add_stat(name_);
     return 0;
   }
 
@@ -388,9 +384,9 @@ namespace casadi {
     oracle_->call_forward(arg, res, seed, sens, true, false);
 
     // Collect sensitivity equations
-    casadi_assert(sens.size()==nfwd);
+    casadi_assert_dev(sens.size()==nfwd);
     for (int d=0; d<nfwd; ++d) {
-      casadi_assert(sens[d].size()==DE_NUM_OUT);
+      casadi_assert_dev(sens[d].size()==DE_NUM_OUT);
       aug_ode.push_back(vec(project(sens[d][DE_ODE], x())));
       aug_alg.push_back(vec(project(sens[d][DE_ALG], z())));
       aug_quad.push_back(vec(project(sens[d][DE_QUAD], q())));
@@ -462,9 +458,9 @@ namespace casadi {
     oracle_->call_reverse(arg, res, seed, sens, true, false);
 
     // Collect sensitivity equations
-    casadi_assert(sens.size()==nadj);
+    casadi_assert_dev(sens.size()==nadj);
     for (int d=0; d<nadj; ++d) {
-      casadi_assert(sens[d].size()==DE_NUM_IN);
+      casadi_assert_dev(sens[d].size()==DE_NUM_IN);
       aug_rode.push_back(vec(project(sens[d][DE_X], x())));
       aug_ralg.push_back(vec(project(sens[d][DE_Z], z())));
       aug_rquad.push_back(vec(project(sens[d][DE_P], p())));
@@ -727,7 +723,7 @@ namespace casadi {
       aug_dae = map2oracle(dae_name, aug_fwd<MX>(nfwd));
     }
     aug_opts["derivative_of"] = self();
-    Function aug_int = integrator(aug_prefix + this->name(), plugin_name(),
+    Function aug_int = integrator(aug_prefix + name_, plugin_name(),
       aug_dae, aug_opts);
 
     // All inputs of the return function
@@ -849,7 +845,7 @@ namespace casadi {
       aug_dae = map2oracle(dae_name, aug_adj<MX>(nadj));
     }
     aug_opts["derivative_of"] = self();
-    Function aug_int = integrator(aug_prefix + this->name(), plugin_name(),
+    Function aug_int = integrator(aug_prefix + name_, plugin_name(),
       aug_dae, aug_opts);
 
     // All inputs of the return function
@@ -1054,7 +1050,7 @@ namespace casadi {
     }
 
     // Number of finite elements and time steps
-    casadi_assert(nk_>0);
+    casadi_assert_dev(nk_>0);
     h_ = (grid_.back() - grid_.front())/nk_;
 
     // Setup discrete time dynamics
@@ -1104,7 +1100,7 @@ namespace casadi {
     // Get discrete time sought
     int k_out = std::ceil((t - grid_.front())/h_);
     k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
-    casadi_assert(k_out>=0);
+    casadi_assert_dev(k_out>=0);
 
     // Explicit discrete time dynamics
     const Function& F = getExplicit();
@@ -1157,7 +1153,7 @@ namespace casadi {
     // Get discrete time sought
     int k_out = std::floor((t - grid_.front())/h_);
     k_out = std::max(k_out, 0); //  make sure that rounding errors does not result in k_out>nk_
-    casadi_assert(k_out<=nk_);
+    casadi_assert_dev(k_out<=nk_);
 
     // Explicit discrete time dynamics
     const Function& G = getExplicitB();
@@ -1354,7 +1350,7 @@ namespace casadi {
     }
 
     // Make sure x and ode exist
-    casadi_assert_message(!de_in[DE_X].is_empty(), "Ill-posed ODE - no state");
+    casadi_assert(!de_in[DE_X].is_empty(), "Ill-posed ODE - no state");
 
     // Number of right-hand-sides
     int nrhs = de_in[DE_X].size2();
@@ -1367,28 +1363,28 @@ namespace casadi {
         // Number of rows
         int nr = e.size1();
         // Make sure no change in number of elements
-        casadi_assert_message(e.numel()==nr*nrhs, "Inconsistent number of rhs");
+        casadi_assert(e.numel()==nr*nrhs, "Inconsistent number of rhs");
         e = reshape(e, nr, nrhs);
       }
     }
 
     // Consistent sparsity for x
-    casadi_assert_message(de_in[DE_X].size()==de_out[DE_ODE].size(),
+    casadi_assert(de_in[DE_X].size()==de_out[DE_ODE].size(),
       "Dimension mismatch for 'ode'");
     de_out[DE_ODE] = project(de_out[DE_ODE], de_in[DE_X].sparsity());
 
     // Consistent sparsity for z
-    casadi_assert_message(de_in[DE_Z].size()==de_out[DE_ALG].size(),
+    casadi_assert(de_in[DE_Z].size()==de_out[DE_ALG].size(),
       "Dimension mismatch for 'alg'");
     de_out[DE_ALG] = project(de_out[DE_ALG], de_in[DE_Z].sparsity());
 
     // Consistent sparsity for rx
-    casadi_assert_message(de_in[DE_RX].size()==de_out[DE_RODE].size(),
+    casadi_assert(de_in[DE_RX].size()==de_out[DE_RODE].size(),
       "Dimension mismatch for 'rode'");
     de_out[DE_RODE] = project(de_out[DE_RODE], de_in[DE_RX].sparsity());
 
     // Consistent sparsity for rz
-    casadi_assert_message(de_in[DE_RZ].size()==de_out[DE_RALG].size(),
+    casadi_assert(de_in[DE_RZ].size()==de_out[DE_RALG].size(),
       "Dimension mismatch for 'ralg'");
     de_out[DE_RALG] = project(de_out[DE_RALG], de_in[DE_RZ].sparsity());
 

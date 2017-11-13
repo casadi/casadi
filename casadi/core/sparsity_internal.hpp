@@ -89,9 +89,6 @@ namespace casadi {
      */
     Sparsity get_diag(std::vector<int>& mapping) const;
 
-    /// Calculate the elimination tree: See cs_etree in CSparse
-    std::vector<int> etree(bool ata) const;
-
     /// Find strongly connected components: See cs_dfs in CSparse
     int dfs(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
                          const std::vector<int>& pinv, std::vector<bool>& marked) const;
@@ -188,38 +185,10 @@ namespace casadi {
                  std::vector<int>& colind_C,
                  std::vector<int>& row_C) const;
 
-    /// consider A(i, j), node j in ith col subtree and return lca(jprev, j): See cs_leaf in CSparse
-    static int leaf(int i, int j, const int *first, int *maxfirst,
-                     int *prevleaf, int *ancestor, int *jleaf);
-
-    /** compute nnz(V) = S->lnz, S->pinv, S->leftmost, S->m2 from A and S->parent:
-     * See cs_vcount in CSparse
-     */
-    int vcount(std::vector<int>& pinv, std::vector<int>& parent, std::vector<int>& leftmost,
-               int& S_m2, double& S_lnz) const;
-
-    /// post order a forest: See cs_post in CSparse
-    static std::vector<int> postorder(const std::vector<int>& parent, int n);
-
-    /// Depth-first search and postorder of a tree rooted at node j: See cs_tdfs in CSparse
-    static int dfs_postorder(int j, int k, int *head,
-                                            const int *next, int *post, int *stack);
-
-    /// row counts of LL'=A or LL'=A'A, given parent & post ordering: see init_ata in CSparse
-    void init_ata(const int *post, int *w, int **head, int **next) const;
-
-    /// Row counts: See cs_counts in CSparse
-    std::vector<int> counts(const int *parent, const int *post, int ata) const;
-
     /** Approximate minimal degree, p = amd(A+A') if symmetric is true, or amd(A'A) otherwise.
      * order 0:natural, 1:Chol, 2:LU, 3:QR. See cs_amd in CSparse
      */
     std::vector<int> amd(int order) const;
-
-    /// symbolic ordering and analysis for QR or LU: See cs_sqr in CSparse
-    void prefactorize(int order, int qr, std::vector<int>& pinv, std::vector<int>& q,
-                      std::vector<int>& parent, std::vector<int>& cp, std::vector<int>& leftmost,
-                      int& m2, double& lnz, double& unz) const;
 
     /// clear w: cs_wclear in CSparse
     static int wclear(int mark, int lemax, int *w, int n);
@@ -453,6 +422,10 @@ namespace casadi {
 
     /// Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
     void spy_matlab(const std::string& mfile) const;
+
+    /** \brief Export sparsity in Matlab format */
+    void export_code(const std::string& lang, std::ostream &stream,
+       const Dict& options) const;
 
     /// Propagate sparsity through a linear solve
     void spsolve(bvec_t* X, const bvec_t* B, bool tr) const;

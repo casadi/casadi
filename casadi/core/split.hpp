@@ -72,6 +72,9 @@ namespace casadi {
     void generate(CodeGenerator& g,
                           const std::vector<int>& arg, const std::vector<int>& res) const override;
 
+    /** Obtain information about node */
+    Dict info() const override;
+
     // Sparsity pattern of the outputs
     std::vector<int> offset_;
     std::vector<Sparsity> output_sparsity_;
@@ -109,6 +112,7 @@ namespace casadi {
 
     /// Create a horizontal concatenation node
     MX get_horzcat(const std::vector<MX>& x) const override;
+
   };
 
   /** \brief Diag split, x -> x0, x1, ...

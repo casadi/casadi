@@ -26,7 +26,7 @@
 
 #include "bonmin_interface.hpp"
 #include "bonmin_nlp.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 #include "../../core/global_options.hpp"
 #include "../../core/casadi_interrupt.hpp"
 
@@ -152,18 +152,18 @@ namespace casadi {
         grad_f_options = op.second;
       } else if (op.first=="hess_lag") {
         Function f = op.second;
-        casadi_assert(f.n_in()==4);
-        casadi_assert(f.n_out()==1);
+        casadi_assert_dev(f.n_in()==4);
+        casadi_assert_dev(f.n_out()==1);
         set_function(f, "nlp_hess_l");
       } else if (op.first=="jac_g") {
         Function f = op.second;
-        casadi_assert(f.n_in()==2);
-        casadi_assert(f.n_out()==2);
+        casadi_assert_dev(f.n_in()==2);
+        casadi_assert_dev(f.n_out()==2);
         set_function(f, "nlp_jac_g");
       } else if (op.first=="grad_f") {
         Function f = op.second;
-        casadi_assert(f.n_in()==2);
-        casadi_assert(f.n_out()==2);
+        casadi_assert_dev(f.n_in()==2);
+        casadi_assert_dev(f.n_out()==2);
         set_function(f, "nlp_grad_f");
       }
     }
@@ -264,7 +264,7 @@ namespace casadi {
   }
 
 
-  /** \brief Helper class to direct messages to userOut()
+  /** \brief Helper class to direct messages to uout()
   *
   * IPOPT has the concept of a Jorunal/Journalist
   * BOONMIN and CBC do not.
@@ -274,7 +274,7 @@ namespace casadi {
     BonMinMessageHandler(): CoinMessageHandler() { }
     /// Core of the class: the method that directs the messages
     int print() override {
-      userOut() << messageBuffer_ << std::endl;
+      uout() << messageBuffer_ << std::endl;
       return 0;
     }
     ~BonMinMessageHandler() override { }
@@ -309,9 +309,6 @@ namespace casadi {
     // Reset number of iterations
     m->n_iter = 0;
 
-    // Statistics
-    for (auto&& s : m->fstats) s.second.reset();
-
     // MINLP instance
     SmartPtr<BonminUserClass> tminlp = new BonminUserClass(*this, m);
 
@@ -325,9 +322,9 @@ namespace casadi {
     SmartPtr<Bonmin::RegisteredOptions> roptions = new Bonmin::RegisteredOptions();
 
     {
-      // Direct output through casadi::userOut()
+      // Direct output through casadi::uout()
       StreamJournal* jrnl_raw = new StreamJournal("console", J_ITERSUMMARY);
-      jrnl_raw->SetOutputStream(&casadi::userOut());
+      jrnl_raw->SetOutputStream(&casadi::uout());
       jrnl_raw->SetPrintLevel(J_DBG, J_NONE);
       SmartPtr<Journal> jrnl = jrnl_raw;
       journalist->AddJournal(jrnl);
@@ -374,8 +371,6 @@ namespace casadi {
     // Initialize
     bonmin.initialize(GetRawPtr(tminlp));
 
-    m->fstats.at("mainloop").tic();
-
     if (true) {
       // Branch-and-bound
       try {
@@ -385,8 +380,6 @@ namespace casadi {
         casadi_error("CoinError occured: " + to_str(e));
       }
     }
-
-    m->fstats.at("mainloop").toc();
 
     // Save results to outputs
     casadi_copy(&m->fk, 1, m->f);
@@ -426,7 +419,7 @@ namespace casadi {
           casadi_copy(g, ng_, m->gk);
         } else {
           if (iter==0) {
-            userOut<true, PL_WARN>()
+            uerr()
               << "Warning: intermediate_callback is disfunctional in your installation. "
               "You will only be able to use stats(). "
               "See https://github.com/casadi/casadi/wiki/enableBonminCallback to enable it."
@@ -464,7 +457,7 @@ namespace casadi {
       return 0;
     } catch(exception& ex) {
       if (iteration_callback_ignore_errors_) {
-        userOut<true, PL_WARN>() << "intermediate_callback: " << ex.what() << endl;
+        uerr() << "intermediate_callback: " << ex.what() << endl;
         return 1;
       }
       return 0;
@@ -501,7 +494,7 @@ namespace casadi {
       m->return_status = return_status_string(status);
 
     } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "finalize_solution failed: " << ex.what() << endl;
+      uerr() << "finalize_solution failed: " << ex.what() << endl;
     }
   }
 
@@ -515,7 +508,7 @@ namespace casadi {
       casadi_copy(m->ubg, ng_, g_u);
       return true;
     } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "get_bounds_info failed: " << ex.what() << endl;
+      uerr() << "get_bounds_info failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -550,7 +543,7 @@ namespace casadi {
 
       return true;
     } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "get_starting_point failed: " << ex.what() << endl;
+      uerr() << "get_starting_point failed: " << ex.what() << endl;
       return false;
     }
   }
@@ -571,7 +564,7 @@ namespace casadi {
       nnz_h_lag = exact_hessian_ ? hesslag_sp_.nnz() : 0;
 
     } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "get_nlp_info failed: " << ex.what() << endl;
+      uerr() << "get_nlp_info failed: " << ex.what() << endl;
     }
   }
 
@@ -587,7 +580,7 @@ namespace casadi {
         return nv;
       }
     } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
+      uerr() << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
       return -1;
     }
   }
@@ -600,7 +593,7 @@ namespace casadi {
       }
       return true;
     } catch(exception& ex) {
-      userOut<true, PL_WARN>() << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
+      uerr() << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
       return false;
     }
   }

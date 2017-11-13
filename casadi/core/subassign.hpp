@@ -82,6 +82,9 @@ namespace casadi {
     /** \brief Get the operation */
     int op() const override { return OP_SUBASSIGN;}
 
+    /** Obtain information about node */
+    Dict info() const override;
+
     /// Data members
     Slice i_, j_;
   };

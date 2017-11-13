@@ -30,6 +30,8 @@ using namespace std;
 namespace casadi {
 
   Determinant::Determinant(const MX& x) {
+    casadi_assert(x.is_square(), "Dimension mismatch. Matrix must be square, "
+      "but got " + x.dim() + " instead.");
     set_dep(x);
     set_sparsity(Sparsity::dense(1, 1));
   }

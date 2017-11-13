@@ -23,7 +23,7 @@
  */
 
 #include "casadi_runtime.hpp"
-#include "../std_vector_tools.hpp"
+#include "../casadi_misc.hpp"
 #include <vector>
 #include <map>
 
@@ -39,19 +39,19 @@ int einstein_process(const T& A, const T& B, const T& C,
   std::vector<int>& strides_a, std::vector<int>& strides_b, std::vector<int>& strides_c
 ) {
 
-    casadi_assert(A.is_vector() && A.is_dense());
-    casadi_assert(B.is_vector() && B.is_dense());
-    casadi_assert(C.is_vector() && C.is_dense());
+    casadi_assert_dev(A.is_vector() && A.is_dense());
+    casadi_assert_dev(B.is_vector() && B.is_dense());
+    casadi_assert_dev(C.is_vector() && C.is_dense());
 
     // Dimension check
-    casadi_assert(A.numel()==product(dim_a));
-    casadi_assert(B.numel()==product(dim_b));
-    casadi_assert(C.numel()==product(dim_c));
+    casadi_assert_dev(A.numel()==product(dim_a));
+    casadi_assert_dev(B.numel()==product(dim_b));
+    casadi_assert_dev(C.numel()==product(dim_c));
 
-    casadi_assert(dim_a.size()==a.size());
-    casadi_assert(dim_b.size()==b.size());
+    casadi_assert_dev(dim_a.size()==a.size());
+    casadi_assert_dev(dim_b.size()==b.size());
 
-    casadi_assert(c.size()<=a.size()+b.size());
+    casadi_assert_dev(c.size()<=a.size()+b.size());
 
     std::map<int, int> dim_map;
 
@@ -63,7 +63,7 @@ int einstein_process(const T& A, const T& B, const T& C,
       if (al==dim_map.end()) {
         dim_map[ai] = dim_a[i];
       } else {
-        casadi_assert(al->second==dim_a[i]);
+        casadi_assert_dev(al->second==dim_a[i]);
       }
     }
 
@@ -74,7 +74,7 @@ int einstein_process(const T& A, const T& B, const T& C,
       if (bl==dim_map.end()) {
         dim_map[bi] = dim_b[i];
       } else {
-        casadi_assert(bl->second==dim_b[i]);
+        casadi_assert_dev(bl->second==dim_b[i]);
       }
     }
 
@@ -85,7 +85,7 @@ int einstein_process(const T& A, const T& B, const T& C,
       if (cl==dim_map.end()) {
         dim_map[ci] = dim_c[i];
       } else {
-        casadi_assert(cl->second==dim_c[i]);
+        casadi_assert_dev(cl->second==dim_c[i]);
       }
     }
 

@@ -116,7 +116,7 @@ namespace casadi {
     Dict get_stats(void* mem) const override;
 
     /** \brief  Print solver statistics */
-    void print_stats(IntegratorMemory* mem, std::ostream &stream) const override;
+    void print_stats(IntegratorMemory* mem) const override;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
     void reset(IntegratorMemory* mem, double t, const double* x,
@@ -129,7 +129,7 @@ namespace casadi {
     /** \brief Cast to memory object */
     static SundialsMemory* to_mem(void *mem) {
       SundialsMemory* m = static_cast<SundialsMemory*>(mem);
-      casadi_assert(m);
+      casadi_assert_dev(m);
       return m;
     }
 
@@ -170,12 +170,12 @@ namespace casadi {
 
     // Print a variable
     static void printvar(const std::string& id, double v) {
-      userOut() << id << " = " << v << std::endl;
+      uout() << id << " = " << v << std::endl;
     }
     // Print an N_Vector
     static void printvar(const std::string& id, N_Vector v) {
       std::vector<double> tmp(NV_DATA_S(v), NV_DATA_S(v)+NV_LENGTH_S(v));
-      userOut() << id << " = " << tmp << std::endl;
+      uout() << id << " = " << tmp << std::endl;
     }
   };
 

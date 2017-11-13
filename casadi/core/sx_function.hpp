@@ -123,9 +123,15 @@ class CASADI_EXPORT SXFunction :
   int instruction_id(int k) const override { return algorithm_.at(k).op;}
 
   /** \brief Get the (integer) input arguments of an atomic operation */
-  std::pair<int, int> instruction_input(int k) const override {
+  std::vector<int> instruction_input(int k) const override {
     auto e = algorithm_.at(k);
-    return std::pair<int, int>(e.i1, e.i2);
+    if (casadi_math<double>::ndeps(e.op)==2 || e.op==OP_INPUT) {
+      return {e.i1, e.i2};
+    } else if (casadi_math<double>::ndeps(e.op)==1) {
+      return {e.i1};
+    } else {
+      return {};
+    }
   }
 
   /** \brief Get the floating point output argument of an atomic operation */
@@ -134,7 +140,27 @@ class CASADI_EXPORT SXFunction :
   }
 
   /** \brief Get the (integer) output argument of an atomic operation */
-  int instruction_output(int k) const override { return algorithm_.at(k).i0;}
+  std::vector<int> instruction_output(int k) const override {
+    auto e = algorithm_.at(k);
+    if (e.op==OP_OUTPUT) {
+      return {e.i0, e.i2};
+    } else {
+      return {e.i0};
+    }
+  }
+
+#ifdef WITH_DEPRECATED_FEATURES
+  std::pair<int, int> getAtomicInput(int k) const override {
+    auto e = algorithm_.at(k);
+    return {e.i1, e.i2};
+  }
+
+  /** \brief Get the (integer) output argument of an atomic operation */
+  int getAtomicOutput(int k) const override {
+    auto e = algorithm_.at(k);
+    return e.i0;
+  }
+#endif // WITH_DEPRECATED_FEATURES
 
   /** \brief Number of nodes in the algorithm */
   int n_nodes() const override { return algorithm_.size() - nnz_out();}
@@ -197,6 +223,10 @@ class CASADI_EXPORT SXFunction :
 
   /** \brief Get default input value */
   double get_default_in(int ind) const override { return default_in_.at(ind);}
+
+  /** \brief Export function in a specific language */
+  void export_code_body(const std::string& lang,
+    std::ostream &stream, const Dict& options) const override;
 
   /// With just-in-time compilation using OpenCL
   bool just_in_time_opencl_;

@@ -24,7 +24,7 @@
 
 
 #include "repmat.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 
 using namespace std;
 
@@ -104,7 +104,7 @@ namespace casadi {
   }
 
   HorzRepsum::HorzRepsum(const MX& x, int n) : n_(n) {
-    casadi_assert(x.size2() % n == 0);
+    casadi_assert_dev(x.size2() % n == 0);
     std::vector<Sparsity> sp = horzsplit(x.sparsity(), x.size2()/n);
     Sparsity block = sp[0];
     for (int i=1;i<sp.size();++i) {

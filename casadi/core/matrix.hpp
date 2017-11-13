@@ -28,7 +28,7 @@
 
 #include "exception.hpp"
 #include "casadi_limits.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "runtime/casadi_runtime.hpp"
 #include "generic_matrix.hpp"
 #include "generic_expression.hpp"
@@ -426,7 +426,13 @@ namespace casadi {
     static Matrix<Scalar> poly_coeff(const Matrix<Scalar>& ex, const Matrix<Scalar>&x);
     static Matrix<Scalar> poly_roots(const Matrix<Scalar>& p);
     static Matrix<Scalar> eig_symbolic(const Matrix<Scalar>& m);
+    static void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
+                          Matrix<Scalar>& beta, std::vector<int>& pinv);
+    static Matrix<Scalar> qr_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& v,
+                                   const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
+                                   const std::vector<int>& pinv, bool tr=false);
     static void qr(const Matrix<Scalar>& A, Matrix<Scalar>& Q, Matrix<Scalar>& R);
+    static void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& L, Matrix<Scalar>& D);
     static Matrix<Scalar> all(const Matrix<Scalar>& x);
     static Matrix<Scalar> any(const Matrix<Scalar>& x);
     static Matrix<Scalar> adj(const Matrix<Scalar>& x);
@@ -477,15 +483,34 @@ namespace casadi {
       return Matrix<Scalar>::qr(A, Q, R);
     }
 
+    /** \brief Sparse direct QR factorization
+     * See T. Davis: Direct Methods for Sparse Linear Systems
+     */
+    friend inline void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
+                                 Matrix<Scalar>& beta, std::vector<int>& pinv) {
+      return Matrix<Scalar>::qr_sparse(A, V, R, beta, pinv);
+    }
+
+    friend inline Matrix<Scalar>
+    qr_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& v,
+             const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
+             const std::vector<int>& pinv, bool tr=false) {
+        return Matrix<Scalar>::qr_solve(b, v, r, beta, pinv, tr);
+    }
+
     /** \brief Obtain a Cholesky factorisation of a matrix
-     * Returns an upper triangular R such that R'R = A.
-     * Matrix A must be positive definite.
-     *
-     * At the moment, the algorithm is dense (Cholesky-Banachiewicz).
-     * There is an open ticket #1212 to make it sparse.
+     * Performs and LDL transformation [L,D] = ldl(A) and
+     * returns diag(sqrt(D))*L'
      */
     friend inline Matrix<Scalar> chol(const Matrix<Scalar>& A) {
       return Matrix<Scalar>::chol(A);
+    }
+
+    /** \brief Sparse LDL factorization
+     * Only guarenteed to work for positive definite matrices.
+     */
+    friend inline void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& L, Matrix<Scalar>& D) {
+      return Matrix<Scalar>::ldl(A, L, D);
     }
 
     /** \brief Returns true only if any element in the matrix is true
@@ -748,11 +773,7 @@ namespace casadi {
     void disp(std::ostream& stream, bool more=false) const;
 
     /// Get string representation
-    std::string get_str(bool more=false) const {
-      std::stringstream ss;
-      disp(ss, more);
-      return ss.str();
-    }
+    std::string get_str(bool more=false) const;
 
     /// Print scalar
     void print_scalar(std::ostream &stream) const;
@@ -969,6 +990,28 @@ namespace casadi {
       return rand(rc.first, rc.second); // NOLINT(runtime/threadsafe_fn)
     }
     ///@}
+
+    /** \brief Export matrix in specific language
+     *
+     * lang: only 'matlab' supported for now
+     * \verbatim
+     * options:
+     *   inline: Indicates if you want everything on a single line (default: False)
+     *   name: Name of exported variable (default: 'm')
+     *   indent_level: Level of indentation (default: 0)
+     *   spoof_zero: Replace numerical zero by a 1e-200 (default: false)
+     *               might be needed for matlab sparse construct,
+     *               which doesn't allow numerical zero
+     * \endverbatim
+     */
+    void export_code(const std::string& lang,
+        std::ostream &stream=casadi::uout(), const Dict& options=Dict()) const;
+
+    /** Obtain information about sparsity */
+    Dict info() const;
+
+    /** Construct instance from info */
+    static Matrix from_info(const Dict& info);
 
 #ifndef SWIG
     /// Sparse matrix with a given sparsity with all values same

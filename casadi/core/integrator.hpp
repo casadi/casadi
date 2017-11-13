@@ -117,6 +117,129 @@ namespace casadi {
   CASADI_EXPORT int integrator_n_out();
   /** @} */
 
+#ifndef SWIG
+/// Inputs of the symbolic representation of the DAE
+enum DeIn {
+  DE_T,
+  DE_X,
+  DE_Z,
+  DE_P,
+  DE_RX,
+  DE_RZ,
+  DE_RP,
+  DE_NUM_IN};
+
+/// Shortnames for DAE symbolic representation inputs
+const std::vector<std::string> DE_INPUTS = {"t", "x", "z", "p", "rx", "rz", "rp"};
+
+/// Inputs of the symbolic representation of the DAE
+enum DeOut {
+  DE_ODE,
+  DE_ALG,
+  DE_QUAD,
+  DE_RODE,
+  DE_RALG,
+  DE_RQUAD,
+  DE_NUM_OUT};
+
+/// Shortnames for DAE symbolic representation outputs
+const std::vector<std::string> DE_OUTPUTS = {"ode", "alg", "quad", "rode", "ralg", "rquad"};
+
+/// Input arguments of an ODE/DAE function
+enum DAEInput {
+  /// Differential state
+  DAE_X,
+  /// Algebraic state
+  DAE_Z,
+  /// Parameter
+  DAE_P,
+  /// Explicit time dependence
+  DAE_T,
+  /// Number of arguments
+  DAE_NUM_IN
+};
+
+/// Output arguments of an DAE function
+enum DAEOutput {
+  /// Right hand side of the implicit ODE
+  DAE_ODE,
+  /// Right hand side of algebraic equations
+  DAE_ALG,
+  /// Right hand side of quadratures equations
+  DAE_QUAD,
+  /// Number of arguments
+  DAE_NUM_OUT
+};
+
+/// Input arguments of an ODE/DAE backward integration function
+enum RDAEInput {
+  /// Backward differential state
+  RDAE_RX,
+  /// Backward algebraic state
+  RDAE_RZ,
+  /// Backward  parameter vector
+  RDAE_RP,
+  /// Forward differential state
+  RDAE_X,
+  /// Forward algebraic state
+  RDAE_Z,
+  /// Parameter vector
+  RDAE_P,
+  /// Explicit time dependence
+  RDAE_T,
+  /// Number of arguments
+  RDAE_NUM_IN
+};
+
+/// Output arguments of an ODE/DAE backward integration function
+enum RDAEOutput {
+  /// Right hand side of ODE
+  RDAE_ODE,
+  /// Right hand side of algebraic equations
+  RDAE_ALG,
+  /// Right hand side of quadratures
+  RDAE_QUAD,
+  /// Number of arguments
+  RDAE_NUM_OUT
+};
+
+/// Input arguments of an integrator
+enum IntegratorInput {
+  /// Differential state at the initial time
+  INTEGRATOR_X0,
+  /// Parameters
+  INTEGRATOR_P,
+  /// Initial guess for the algebraic variable
+  INTEGRATOR_Z0,
+  /// Backward differential state at the final time
+  INTEGRATOR_RX0,
+  /// Backward parameter vector
+  INTEGRATOR_RP,
+  /// Initial guess for the backwards algebraic variable
+  INTEGRATOR_RZ0,
+  /// Number of input arguments of an integrator
+  INTEGRATOR_NUM_IN
+};
+
+/// Output arguments of an integrator
+enum IntegratorOutput {
+  /// Differential state at the final time
+  INTEGRATOR_XF,
+  /// Quadrature state at the final time
+  INTEGRATOR_QF,
+  /// Algebraic variable at the final time
+  INTEGRATOR_ZF,
+  /// Backward differential state at the initial time
+  INTEGRATOR_RXF,
+  /// Backward quadrature state at the initial time
+  INTEGRATOR_RQF,
+  /// Backward algebraic variable at the initial time
+  INTEGRATOR_RZF,
+  /// Number of output arguments of an integrator
+  INTEGRATOR_NUM_OUT
+};
+#endif // SWIG
+
 } // namespace casadi
 
 #endif // CASADI_INTEGRATOR_HPP

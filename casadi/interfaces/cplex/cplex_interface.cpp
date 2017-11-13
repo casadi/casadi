@@ -23,7 +23,7 @@
  */
 
 #include "cplex_interface.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
@@ -145,7 +145,7 @@ namespace casadi {
 
     // Start CPLEX
     int status;
-    casadi_assert(m->env==0);
+    casadi_assert_dev(m->env==0);
     m->env = CPXopenCPLEX(&status);
     if (m->env==0) {
       char errmsg[CPXMESSAGEBUFSIZE];
@@ -250,17 +250,17 @@ namespace casadi {
     // Matrix A, count the number of elements per column
     m->matcnt.resize(A_.size2());
     transform(A_.colind()+1, A_.colind() + A_.size2()+1, A_.colind(), m->matcnt.begin(),
-              minus<int>());
+              std::minus<int>());
 
     // Matrix H, count the number of elements per column
     m->qmatcnt.resize(H_.size2());
     transform(H_.colind()+1, H_.colind() + H_.size2()+1, H_.colind(), m->qmatcnt.begin(),
-              minus<int>());
+              std::minus<int>());
 
     // Create problem object
-    casadi_assert(m->lp==0);
+    casadi_assert_dev(m->lp==0);
     m->lp = CPXcreateprob(m->env, &status, "QP from CasADi");
-    casadi_assert_message(m->lp!=0, "CPXcreateprob failed");
+    casadi_assert(m->lp!=0, "CPXcreateprob failed");
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
@@ -424,7 +424,7 @@ namespace casadi {
       int problem_type = CPXgetprobtype(m->env, m->lp);
 
       // The solver switched to a MIQP
-      if (problem_type == CPXPROB_MIQP){
+      if (problem_type == CPXPROB_MIQP) {
 
           // Get objective value
           if (CPXgetobjval(m->env, m->lp, &f)) {
@@ -462,7 +462,7 @@ namespace casadi {
 
     int solnstat = CPXgetstat(m->env, m->lp);
     stringstream errormsg;
-    // NOTE: Why not print directly to userOut() and userOut<true, PL_WARN>()?
+    // NOTE: Why not print directly to uout() and uerr()?
     if (verbose_) {
       if (solnstat == CPX_STAT_OPTIMAL) {
         errormsg << "CPLEX: solution status: Optimal solution found.\n";
@@ -484,12 +484,12 @@ namespace casadi {
       } else {
         errormsg << "CPLEX: solution status: " <<  solnstat << "\n";
       }
-      userOut() << errormsg.str();
+      uout() << errormsg.str();
 
       // Printing basis condition number
       //double cn;
       //status = CPXgetdblquality(m->env, m->lp, &cn, CPX_KAPPA);
-      //userOut() << "CPLEX: Basis condition number: " << cn << endl;
+      //uout() << "CPLEX: Basis condition number: " << cn << endl;
     }
     if (solnstat != CPX_STAT_OPTIMAL) {
       //    throw CasadiException(errormsg.c_str());
@@ -534,7 +534,7 @@ namespace casadi {
     if (this->lp!=0) {
       status = CPXfreeprob(this->env, &this->lp);
       if (status!=0) {
-        userOut<true, PL_WARN>() << "CPXfreeprob failed, error code " << status << ".\n";
+        uerr() << "CPXfreeprob failed, error code " << status << ".\n";
       }
       this->lp = 0;
     }
@@ -543,7 +543,7 @@ namespace casadi {
     if (this->env!=0) {
       status = CPXcloseCPLEX(&this->env);
       if (status!=0) {
-        userOut<true, PL_WARN>() << "CPXcloseCPLEX failed, error code " << status << ".\n";
+        uerr() << "CPXcloseCPLEX failed, error code " << status << ".\n";
       }
       this->env = 0;
     }

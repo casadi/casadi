@@ -47,7 +47,7 @@ namespace casadi {
   template<typename T>
   std::vector<std::pair<std::string, T>> zip(const std::vector<std::string>& id,
                                              const std::vector<T>& mat) {
-    casadi_assert(id.size()==mat.size());
+    casadi_assert_dev(id.size()==mat.size());
     std::vector<std::pair<std::string, T>> r(id.size());
     for (unsigned int i=0; i<r.size(); ++i) r[i] = make_pair(id[i], mat[i]);
     return r;
@@ -56,20 +56,17 @@ namespace casadi {
   /// Combine two dictionaries, giving priority to first one
   Dict CASADI_EXPORT combine(const Dict& first, const Dict& second);
 
-  /** \brief Internal class for Function
-      \author Joel Andersson
-      \date 2010-2015
+  /** \brief Base class for FunctionInternal and LinsolInternal
+    \author Joel Andersson
+    \date 2017
   */
-  class CASADI_EXPORT FunctionInternal : public SharedObjectInternal {
+  class CASADI_EXPORT ProtoFunction : public SharedObjectInternal {
   public:
     /** \brief Constructor */
-    FunctionInternal(const std::string& name);
+    ProtoFunction(const std::string& name);
 
     /** \brief  Destructor */
-    ~FunctionInternal() override = 0;
-
-    /** \brief  Obtain solver name from Adaptor */
-    virtual std::string getAdaptorSolverName() const { return ""; }
+    ~ProtoFunction() override = 0;
 
     /** \brief Construct
         Prepares the function for evaluation
@@ -94,6 +91,69 @@ namespace casadi {
         init() has been completed.
     */
     virtual void finalize(const Dict& opts);
+
+    /// Checkout a memory object
+    int checkout() const;
+
+    /// Release a memory object
+    void release(int mem) const;
+
+    /// Memory objects
+    void* memory(int ind) const;
+
+    /** \brief Create memory block */
+    virtual void* alloc_mem() const {return 0;}
+
+    /** \brief Initalize memory block */
+    virtual int init_mem(void* mem) const { return 0;}
+
+    /** \brief Free memory block */
+    virtual void free_mem(void *mem) const;
+
+    /** \brief Clear all memory (called from destructor) */
+    void clear_mem();
+
+  protected:
+    /// Name
+    std::string name_;
+
+    /// Verbose printout
+    bool verbose_;
+  private:
+    /// Memory objects
+    mutable std::vector<void*> mem_;
+
+    /// Unused memory objects
+    mutable std::stack<int> unused_;
+  };
+
+  /** \brief Internal class for Function
+      \author Joel Andersson
+      \date 2010-2015
+  */
+  class CASADI_EXPORT FunctionInternal : public ProtoFunction {
+    friend class Function;
+  public:
+    /** \brief Constructor */
+    FunctionInternal(const std::string& name);
+
+    /** \brief  Destructor */
+    ~FunctionInternal() override = 0;
+
+    /** \brief  Obtain solver name from Adaptor */
+    virtual std::string getAdaptorSolverName() const { return ""; }
+
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
+
+    /** \brief Initialize */
+    void init(const Dict& opts) override;
+
+    /** \brief Finalize the object creation */
+    void finalize(const Dict& opts) override;
 
     /** \brief Get a public class instance */
     Function self() const { return shared_from_this<Function>();}
@@ -297,6 +357,9 @@ namespace casadi {
         sparsity propagation */
     virtual double sp_weight() const;
 
+    /** \brief Get Jacobian sparsity */
+    virtual Sparsity get_jacobian_sparsity() const;
+
     ///@{
     /** \brief Get function input(s) and output(s)  */
     virtual const SX sx_in(int ind) const;
@@ -328,16 +391,27 @@ namespace casadi {
     virtual int instruction_id(int k) const;
 
     /** \brief Get the (integer) input arguments of an atomic operation */
-    virtual std::pair<int, int> instruction_input(int k) const;
+    virtual std::vector<int> instruction_input(int k) const;
 
     /** \brief Get the floating point output argument of an atomic operation */
     virtual double instruction_constant(int k) const;
 
     /** \brief Get the (integer) output argument of an atomic operation */
-    virtual int instruction_output(int k) const;
+    virtual std::vector<int> instruction_output(int k) const;
+
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Renamed instruction_index */
+    virtual std::pair<int, int> getAtomicInput(int k) const;
+
+    /** \brief [DEPRECATED] Renamed instruction_output */
+    virtual int getAtomicOutput(int k) const;
+#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Number of nodes in the algorithm */
     virtual int n_nodes() const;
+
+    /** *\brief get MX expression associated with instruction */
+    virtual MX instruction_MX(int k) const;
 
     /** \brief Wrap in an Function instance consisting of only one MX call */
     Function wrap() const;
@@ -378,11 +452,21 @@ namespace casadi {
     /** \brief Jit dependencies */
     virtual void jit_dependencies(const std::string& fname) {}
 
-    /** \brief  Print */
+    /** \brief Export function in a specific language */
+    virtual void export_code(const std::string& lang,
+      std::ostream &stream, const Dict& options) const;
+
+    /** \brief Display object */
     void disp(std::ostream& stream, bool more) const override;
 
     /** \brief  Print more */
     virtual void disp_more(std::ostream& stream) const {}
+
+    /** \brief C-style formatted printing during evaluation */
+    void print(const char* fmt, ...) const;
+
+    /** \brief C-style formatted printing to string */
+    void sprint(char* buf, size_t buf_sz, const char* fmt, ...) const;
 
     /** \brief Get function signature: name:(inputs)->(outputs) */
     std::string definition() const;
@@ -433,9 +517,6 @@ namespace casadi {
     ///@{
     /** \brief Are all inputs and outputs scalar */
     bool all_scalar() const;
-
-    /** \brief Name of the function */
-    const std::string& name() const { return name_;}
 
     /// Generate the sparsity of a Jacobian block
     virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric) const;
@@ -558,21 +639,6 @@ namespace casadi {
     /** \brief Ensure work vectors long enough to evaluate function */
     void alloc(const Function& f, bool persistent=false);
 
-    /// Memory objects
-    void* memory(int ind) const;
-
-    /** \brief Create memory block */
-    virtual void* alloc_mem() const {return 0;}
-
-    /** \brief Initalize memory block */
-    virtual int init_mem(void* mem) const { return 0;}
-
-    /** \brief Free memory block */
-    virtual void free_mem(void *mem) const;
-
-    /** \brief Clear all memory (called from destructor) */
-    void clear_mem();
-
     /// Get all statistics
     virtual Dict get_stats(void* mem) const { return Dict();}
 
@@ -593,11 +659,8 @@ namespace casadi {
     virtual bool adjViaJac(int nadj) const;
     ///@}
 
-    /// Checkout a memory object
-    int checkout() const;
-
-    /// Release a memory object
-    void release(int mem) const;
+    /** Obtain information about function */
+    virtual Dict info() const;
 
     /// Number of inputs and outputs
     size_t n_in_, n_out_;
@@ -607,9 +670,6 @@ namespace casadi {
 
     /// Input and output scheme
     std::vector<std::string> name_in_, name_out_;
-
-    /** \brief  Verbose -- for debugging purposes */
-    bool verbose_;
 
     /** \brief  Use just-in-time compiler */
     bool jit_;
@@ -640,9 +700,6 @@ namespace casadi {
 
     /// User-set field
     void* user_data_;
-
-    /// Name
-    std::string name_;
 
     /// Just-in-time compiler
     std::string compilerplugin_;
@@ -697,19 +754,10 @@ namespace casadi {
     symbolicAdjSeed(int nadj, const std::vector<MatType>& v) const;
 
   protected:
-    static void print_stats_line(int maxNameLen, std::string label, double n_call,
-      double t_proc, double t_wall);
-
     /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization */
     void set_jac_sparsity(const Sparsity& sp);
 
   private:
-    /// Memory objects
-    mutable std::vector<void*> mem_;
-
-    /// Unused memory objects
-    mutable std::stack<int> unused_;
-
     /** \brief Memory that is persistent during a call (but not between calls) */
     size_t sz_arg_per_, sz_res_per_, sz_iw_per_, sz_w_per_;
 
@@ -805,7 +853,7 @@ namespace casadi {
             // Call recursively with scalar arguments
             call(arg1, res1, always_inline, never_inline);
             // Get results
-            casadi_assert(res.size() == res1.size());
+            casadi_assert_dev(res.size() == res1.size());
             for (int i=0; i<res.size(); ++i) res[i](r, c) = res1[i];
           }
         }
@@ -826,10 +874,10 @@ namespace casadi {
   template<typename D>
   void FunctionInternal::call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
                                bool always_inline, bool never_inline) const {
-    casadi_assert_message(!never_inline, "Call-nodes only possible in MX expressions");
+    casadi_assert(!never_inline, "Call-nodes only possible in MX expressions");
     // Check if matching input sparsity
     bool matching_sparsity = true;
-    casadi_assert(arg.size()==n_in_);
+    casadi_assert_dev(arg.size()==n_in_);
     for (int i=0; matching_sparsity && i<n_in_; ++i)
       matching_sparsity = arg[i].sparsity()==sparsity_in_.at(i);
 
@@ -869,10 +917,10 @@ namespace casadi {
 
   template<typename M>
   void FunctionInternal::check_arg(const std::vector<M>& arg) const {
-    casadi_assert_message(arg.size()==n_in_, "Incorrect number of inputs: Expected "
+    casadi_assert(arg.size()==n_in_, "Incorrect number of inputs: Expected "
                           + str(n_in_) + ", got " + str(arg.size()));
     for (int i=0; i<n_in_; ++i) {
-      casadi_assert_message(check_mat(arg[i].sparsity(), sparsity_in_.at(i)),
+      casadi_assert(check_mat(arg[i].sparsity(), sparsity_in_.at(i)),
                             "Input " + str(i) + " (" + name_in_[i] + ") has mismatching shape. "
                             "Expected " + str(size_in(i)) + ", got " + str(arg[i].size()));
     }
@@ -880,10 +928,10 @@ namespace casadi {
 
   template<typename M>
   void FunctionInternal::check_res(const std::vector<M>& res) const {
-    casadi_assert_message(res.size()==n_out_, "Incorrect number of outputs: Expected "
+    casadi_assert(res.size()==n_out_, "Incorrect number of outputs: Expected "
                           + str(n_out_) + ", got " + str(res.size()));
     for (int i=0; i<n_out_; ++i) {
-      casadi_assert_message(check_mat(res[i].sparsity(), sparsity_out_.at(i)),
+      casadi_assert(check_mat(res[i].sparsity(), sparsity_out_.at(i)),
                             "Output " + str(i) + " (" + name_out_[i] + ") has mismatching shape. "
                             "Expected " + str(size_out(i)) + ", got " + str(res[i].size()));
     }
@@ -920,7 +968,7 @@ namespace casadi {
       return M(inp, arg);
     } else {
       // Assign vector with transposing
-      casadi_assert(arg.size1()==inp.size2() && arg.size2()==inp.size1()
+      casadi_assert_dev(arg.size1()==inp.size2() && arg.size2()==inp.size1()
                     && (arg.is_column() || inp.is_column()));
       return arg.T();
     }

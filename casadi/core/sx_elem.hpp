@@ -211,19 +211,13 @@ namespace casadi {
     /** \brief SXElem nodes are not allowed to be null */
     inline bool is_null() {return false;}
 
+    /** \brief Ternary if_else: x ? y : z */
+    friend inline SXElem if_else(const SXElem& x, const SXElem& y, const SXElem& z) {
+      return if_else_zero(x, y) + if_else_zero(!x, z);
+    }
   private:
     /// Pointer to node (SXElem is only a reference class)
     SXNode* node;
-
-    /**
-    \ingroup expression_tools
-    @{
-    */
-    /** \brief inline if-test */
-    /// replaces the ternary conditional operator "?:", which cannot be overloaded
-    friend SXElem if_else(const SXElem& cond, const SXElem& if_true,
-                             const SXElem& if_false, bool short_circuit);
-    /** @} */
   };
 
   template<>

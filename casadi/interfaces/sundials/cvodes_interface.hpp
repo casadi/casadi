@@ -140,7 +140,7 @@ namespace casadi {
     /** \brief Cast to memory object */
     static CvodesMemory* to_mem(void *mem) {
       CvodesMemory* m = static_cast<CvodesMemory*>(mem);
-      casadi_assert(m);
+      casadi_assert_dev(m);
       return m;
     }
 

@@ -288,6 +288,17 @@ class MXtests(casadiTestCase):
     self.assertAlmostEqual(z2, 21,10)
     self.assertAlmostEqual(z1, 10,10)
 
+  def test_which_depends_empty(self):
+    for X in [SX,MX]:
+      x=X.sym("x")
+
+      for tr in [True,False]:
+        for i in [0,1,2]:
+          self.assertEqual(which_depends(x,X(0,1),i,tr),[False]*(1 if tr else 0))
+
+          self.assertEqual(which_depends(X(0,1),x,i,tr),[False]*(0 if tr else 1))
+          self.assertTrue(len(which_depends(X(0,1),X(0,1),i,tr))==0)
+
   def test_issue83(self):
     x=MX.sym("x")
     y=MX.sym("y")
@@ -2531,6 +2542,48 @@ class MXtests(casadiTestCase):
     F = Function("f",[vs],[interp1d(x,vs,xq,"linear",True)])
 
     self.checkarray(F(v),np.interp(xq,x,v))
+    
+  def test_bilin_etc(self):
+    x = MX.sym("x",3,3)
+    y = MX.sym("y",3,1)
+    z = MX.sym("z",3,1)
+    
+    import numpy
+    numpy.random.seed(42)
+    x0 = numpy.random.random((3,3))
+    y0 = numpy.random.random((3,1))
+    z0 = numpy.random.random((3,1))
+    
+    for e in [(bilin(x,y,z),mtimes(mtimes(y.T,x),z)),(rank1(x,0.3,y,z),x+0.3*mtimes(y,z.T))]:
+      f = Function('f',[x,y,z],[e[0]])
+      fref = Function('fref',[x,y,z],[e[1]])
+      f_sx = f.expand()    
+      self.checkfunction(f,fref,inputs=[x0,y0,z0])
+      self.checkfunction(f_sx,fref,inputs=[x0,y0,z0])
+
+  def test_det_shape(self):
+    X = MX.sym("x",2,3)
+    with self.assertRaises(RuntimeError):
+      det(X)
+    X = MX.sym("x",3,3)
+    det(X)
+    
+    
+  @known_bug()
+  def test_det(self):
+    X = MX.sym("x",3,3)
+    x = SX.sym("x",3,3)
+
+    import numpy
+    numpy.random.seed(42)
+    x0 = numpy.random.random((3,3))
+    
+    f = Function('f',[x],[det(x)])
+    F = Function('F',[X],[det(X)])
+    self.checkfunction(f,F,inputs=[x0])
+
+    
+    
 
 if __name__ == '__main__':
     unittest.main()

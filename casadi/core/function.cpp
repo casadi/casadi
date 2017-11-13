@@ -24,7 +24,7 @@
 
 
 #include "function_internal.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "sx_function.hpp"
 #include "mx_function.hpp"
 #include "map.hpp"
@@ -32,6 +32,7 @@
 #include "bspline.hpp"
 #include "nlpsol.hpp"
 #include "conic.hpp"
+#include "jit_function.hpp"
 
 #include <typeinfo>
 #include <fstream>
@@ -45,6 +46,12 @@ namespace casadi {
   throw CasadiException("Error in Function::" FNAME " for '" + this->name() + "' "\
     "[" + this->class_name() + "] at " + CASADI_WHERE + ":\n"\
     + string(WHAT));
+
+  // Throw informative error message from constructor
+  #define THROW_ERROR_NOOBJ(FNAME, WHAT, CLASS_NAME) \
+  throw CasadiException("Error in Function::" FNAME " for '" + name + "' "\
+      "[" CLASS_NAME "] at " + CASADI_WHERE + ":\n"\
+      + string(WHAT));
 
   Function::Function() {
   }
@@ -206,8 +213,12 @@ namespace casadi {
                            const vector<string>& name_in,
                            const vector<string>& name_out,
                            const Dict& opts) {
-    own(new SXFunction(name, ex_in, ex_out, name_in, name_out));
-    (*this)->construct(opts);
+    try {
+      own(new SXFunction(name, ex_in, ex_out, name_in, name_out));
+      (*this)->construct(opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("Function", e.what(), "SXFunction");
+    }
   }
 
   void Function::construct(const string& name,
@@ -215,12 +226,43 @@ namespace casadi {
                            const vector<string>& name_in,
                            const vector<string>& name_out,
                            const Dict& opts) {
-    own(new MXFunction(name, ex_in, ex_out, name_in, name_out));
-    (*this)->construct(opts);
+    try {
+      own(new MXFunction(name, ex_in, ex_out, name_in, name_out));
+      (*this)->construct(opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("Function", e.what(), "MXFunction");
+    }
+  }
+
+  Function Function::jit(const std::string& name, const std::string& body,
+                     const std::vector<std::string>& name_in,
+                     const std::vector<std::string>& name_out,
+                     const Dict& opts) {
+    // Pass empty vectors -> default values
+    std::vector<Sparsity> sparsity_in, sparsity_out;
+    return jit(name, body, name_in, name_out, sparsity_in, sparsity_out, opts);
+  }
+
+  Function Function::jit(const std::string& name, const std::string& body,
+                     const std::vector<std::string>& name_in,
+                     const std::vector<std::string>& name_out,
+                     const std::vector<Sparsity>& sparsity_in,
+                     const std::vector<Sparsity>& sparsity_out,
+                     const Dict& opts) {
+    try {
+      return create(new JitFunction(name, body, name_in, name_out,
+                                    sparsity_in, sparsity_out), opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("jit", e.what(), "JitFunction");
+    }
   }
 
   Function Function::expand() const {
-    return expand(name());
+    Dict opts;
+    opts["ad_weight"] = (*this)->ad_weight();
+    opts["ad_weight_sp"] = (*this)->sp_weight();
+    opts["max_num_dir"] = (*this)->max_num_dir_;
+    return expand(name(), opts);
   }
 
   Function Function::expand(const string& name, const Dict& opts) const {
@@ -242,7 +284,7 @@ namespace casadi {
   }
 
   FunctionInternal* Function::operator->() const {
-    casadi_assert(!is_null());
+    casadi_assert_dev(!is_null());
     return get();
   }
 
@@ -266,11 +308,11 @@ namespace casadi {
   }
 
   vector<const double*> Function::buf_in(Function::VecArg arg) const {
-    casadi_assert(arg.size()==n_in());
+    casadi_assert_dev(arg.size()==n_in());
     auto arg_it=arg.begin();
     vector<const double*> buf_arg(sz_arg());
     for (unsigned int i=0; i<arg.size(); ++i) {
-      casadi_assert(arg_it->size()==nnz_in(i));
+      casadi_assert_dev(arg_it->size()==nnz_in(i));
       buf_arg[i] = get_ptr(*arg_it++);
     }
     return buf_arg;
@@ -288,11 +330,11 @@ namespace casadi {
   }
 
   vector<double*> Function::buf_out(Function::VPrRes res) const {
-    casadi_assert(res.size()==n_out());
+    casadi_assert_dev(res.size()==n_out());
     auto res_it=res.begin();
     vector<double*> buf_res(sz_res());
     for (unsigned int i=0; i<res.size(); ++i) {
-      casadi_assert(*res_it!=0);
+      casadi_assert_dev(*res_it!=0);
       (*res_it)->resize(nnz_out(i));
       buf_res[i] = get_ptr(**res_it++);
     }
@@ -306,7 +348,7 @@ namespace casadi {
     // Read inputs
     for (auto i=arg.begin(); i!=arg.end(); ++i) {
       int ind = index_in(i->first);
-      casadi_assert(i->second.size()==nnz_in(ind));
+      casadi_assert_dev(i->second.size()==nnz_in(ind));
       ret[ind] = get_ptr(i->second);
     }
 
@@ -334,7 +376,7 @@ namespace casadi {
     // Read outputs
     for (auto i=res.begin(); i!=res.end(); ++i) {
       int ind = index_out(i->first);
-      casadi_assert(i->second!=0);
+      casadi_assert_dev(i->second!=0);
       i->second->resize(nnz_out(ind));
       ret[ind] = get_ptr(*i->second);
     }
@@ -345,11 +387,11 @@ namespace casadi {
   template<typename D>
   void Function::call_gen(vector<const D*> arg, vector<D*> res) const {
     // Input buffer
-    casadi_assert(arg.size()>=n_in());
+    casadi_assert_dev(arg.size()>=n_in());
     arg.resize(sz_arg());
 
     // Output buffer
-    casadi_assert(res.size()>=n_out());
+    casadi_assert_dev(res.size()>=n_out());
     res.resize(sz_res());
 
     // Work vectors
@@ -375,11 +417,11 @@ namespace casadi {
 
   int Function::rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const {
     // Input buffer
-    casadi_assert(arg.size()>=n_in());
+    casadi_assert_dev(arg.size()>=n_in());
     arg.resize(sz_arg());
 
     // Output buffer
-    casadi_assert(res.size()>=n_out());
+    casadi_assert_dev(res.size()>=n_out());
     res.resize(sz_res());
 
     // Work vectors
@@ -390,15 +432,49 @@ namespace casadi {
     return rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
-  Function Function::mapaccum(const string& name, int n, int n_accum,
+  Function Function::mapaccum(const string& name, int N, const Dict& opts) const {
+    return mapaccum(name, N, 1, opts);
+  }
+  Function Function::mapaccum(const string& name, int N, int n_accum,
                               const Dict& opts) const {
+    Dict options = opts;
+
+    // Default base
+    int base = 10;
+    auto it = options.find("base");
+    if (it!=options.end()) {
+      base = it->second;
+      options.erase(it);
+    }
+
+    casadi_assert(N>0, "mapaccum: N must be positive");
+
+    if (base==-1)
+      return mapaccum(name, std::vector<Function>(N, *this), n_accum, options);
+    casadi_assert(base>=2, "mapaccum: base must be positive");
+
+    // Decompose N into
+    std::vector<Function> chain;
+    Function c = *this;
+    while (N!=0) {
+      int r = N % base;
+      chain.insert(chain.end(), r, c);
+      N = (N-r)/base;
+      c = c.mapaccum(c.name()+"_acc"+str(base), std::vector<Function>(base, c), n_accum, options);
+    }
+    return mapaccum(name, chain, n_accum, options);
+  }
+
+  Function Function::mapaccum(const std::string& name,
+                      const std::vector<Function>& chain, int n_accum,
+                      const Dict& opts) const {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
-    casadi_assert_message(n>0, "mapaccum: n must be positive");
-    casadi_assert_message(n_accum<=min(n_in, n_out), "mapaccum: too many accumulators");
+    casadi_assert(!chain.empty(), "mapaccum: chain must be non-empty");
+    casadi_assert(n_accum<=min(n_in, n_out), "mapaccum: too many accumulators");
     // Quick return?
-    if (n==1) return *this;
+    if (chain.size()==1) return chain[0];
     // Get symbolic expressions for inputs and outputs
     vector<MX> arg = mx_in();
     vector<MX> res;
@@ -406,25 +482,25 @@ namespace casadi {
     vector<vector<MX>> varg(n_in), vres(n_out);
     for (int i=0; i<n_accum; ++i) varg[i].push_back(arg[i]);
     // For each function call
-    for (int iter=0; iter<n; ++iter) {
+    for (const auto& f : chain) {
+
       // Stacked input expressions
       for (int i=n_accum; i<n_in; ++i) {
-        arg[i] = MX::sym(name_in(i) + "_" + str(i), sparsity_in(i));
+        arg[i] = MX::sym(name_in(i) + "_" + str(i), f.sparsity_in(i));
         varg[i].push_back(arg[i]);
       }
+
       // Call f
-      res = (*this)(arg);
+      res = f(arg);
       // Save output expressions
       for (int i=0; i<n_out; ++i) vres[i].push_back(res[i]);
-      // Done?
-      if (iter==n-1) break;
       // Copy function output to input
       copy_n(res.begin(), n_accum, arg.begin());
       for (int i=0; i<n_accum; ++i) {
         // Ony get last component (allows nested calls)
-        int nrow_out=size2_out(i), nrow_in=size2_in(i);
-        if (nrow_out>nrow_in) {
-          arg[i] = horzsplit(arg[i], {0, nrow_out-nrow_in, nrow_out}).back();
+        int ncol_out=f.size2_out(i), ncol_in=size2_in(i);
+        if (ncol_out>ncol_in) {
+          arg[i] = horzsplit(arg[i], {0, ncol_out-ncol_in, ncol_out}).back();
         }
       }
     }
@@ -441,9 +517,9 @@ namespace casadi {
     // Shorthands
     int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
-    casadi_assert(in_range(accum_in, n_in) && isUnique(accum_in));
-    casadi_assert(in_range(accum_out, n_out) && isUnique(accum_out));
-    casadi_assert(accum_in.size()==accum_out.size());
+    casadi_assert_dev(in_range(accum_in, n_in) && isUnique(accum_in));
+    casadi_assert_dev(in_range(accum_out, n_out) && isUnique(accum_out));
+    casadi_assert_dev(accum_in.size()==accum_out.size());
     int n_accum=accum_in.size();
 
     // Quick return if no need to reorder
@@ -508,11 +584,11 @@ namespace casadi {
   Function
   Function::map(int n, const std::string& parallelization) const {
     // Make sure not degenerate
-    casadi_assert_message(n>0, "Degenerate map operation");
+    casadi_assert(n>0, "Degenerate map operation");
     // Quick return if possible
     if (n==1) return *this;
     // Unroll?
-    if (parallelization=="unroll") {
+    if (parallelization=="unroll" || parallelization=="inline") {
       // Construct symbolic inputs
       std::vector<MX> arg(n_in());
       std::vector<std::vector<MX>> v(n, arg);
@@ -524,7 +600,11 @@ namespace casadi {
         arg[i] = horzcat(tmp);
       }
       // Evaluate
-      for (auto&& w : v) w = (*this)(w);
+      if (parallelization=="unroll") {
+        for (auto&& w : v) w = (*this)(w);
+      } else {
+        for (auto&& w : v) call(std::vector<MX>(w), w, true, false);
+      }
       // Gather outputs
       std::vector<MX> res(n_out());
       for (int i=0; i<res.size(); ++i) {
@@ -561,24 +641,40 @@ namespace casadi {
 
   Function Function::conditional(const string& name, const vector<Function>& f,
                                  const Function& f_def, const Dict& opts) {
-    return create(new Switch(name, f, f_def), opts);
+    try {
+      return create(new Switch(name, f, f_def), opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("conditional", e.what(), "Switch");
+    }
   }
 
   Function Function::bspline(const std::string &name,
-    const std::vector< std::vector<double> >& knots, const vector<double>& coeffs,
-    const vector<int>& degree, int m, const Dict& opts) {
-    return BSpline::create(name, knots, coeffs, degree, m, opts);
+      const std::vector< std::vector<double> >& knots,
+      const vector<double>& coeffs, const vector<int>& degree, int m, const Dict& opts) {
+    try {
+      return BSpline::create(name, knots, coeffs, degree, m, opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("bspline", e.what(), "BSpline");
+    }
   }
 
   Function Function::bspline_dual(const std::string &name,
-    const std::vector< std::vector<double> >& knots, const vector<double>& x,
-    const vector<int>& degree, int m, bool reverse, const Dict& opts) {
-    return BSplineDual::create(name, knots, x, degree, m, reverse, opts);
+      const std::vector< std::vector<double> >& knots, const vector<double>& x,
+      const vector<int>& degree, int m, bool reverse, const Dict& opts) {
+    try {
+      return BSplineDual::create(name, knots, x, degree, m, reverse, opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("bspline_dual", e.what(), "BSplineDual");
+    }
   }
 
   Function Function::if_else(const string& name, const Function& f_true,
                              const Function& f_false, const Dict& opts) {
-    return create(new Switch(name, vector<Function>(1, f_false), f_true), opts);
+    try {
+      return create(new Switch(name, vector<Function>(1, f_false), f_true), opts);
+    } catch (exception& e) {
+      THROW_ERROR_NOOBJ("if_else", e.what(), "Switch");
+    }
   }
 
   int Function::n_in() const {
@@ -865,11 +961,27 @@ namespace casadi {
     return (*this)->generate_dependencies(fname, opts);
   }
 
+  void Function::export_code(const std::string& lang,
+      std::ostream &stream, const Dict& options) const {
+    return (*this)->export_code(lang, stream, options);
+  }
+
+  void Function::export_code(const std::string& lang,
+      const std::string &fname, const Dict& options) const {
+    std::ofstream stream(fname);
+    return (*this)->export_code(lang, stream, options);
+  }
+  std::string Function::export_code(const std::string& lang, const Dict& options) const {
+    std::stringstream ss;
+    (*this)->export_code(lang, ss, options);
+    return ss.str();
+  }
+
   string Function::name() const {
     if (is_null()) {
       return "null";
     } else {
-      return (*this)->name();
+      return (*this)->name_;
     }
   }
 
@@ -1138,6 +1250,14 @@ namespace casadi {
     }
   }
 
+  MX Function::instruction_MX(int k) const {
+    try {
+      return (*this)->instruction_MX(k);
+    } catch (exception& e) {
+      THROW_ERROR("instruction_MX", e.what());
+    }
+  }
+
   int Function::instruction_id(int k) const {
     try {
       return (*this)->instruction_id(k);
@@ -1146,13 +1266,23 @@ namespace casadi {
     }
   }
 
-  pair<int, int> Function::instruction_input(int k) const {
+  std::vector<int> Function::instruction_input(int k) const {
     try {
       return (*this)->instruction_input(k);
     } catch (exception& e) {
       THROW_ERROR("instruction_input", e.what());
     }
   }
+
+#ifdef WITH_DEPRECATED_FEATURES
+  std::pair<int, int> Function::getAtomicInput(int k) const {
+      return (*this)->getAtomicInput(k);
+  }
+
+  int Function::getAtomicOutput(int k) const {
+      return (*this)->getAtomicOutput(k);
+  }
+#endif
 
   double Function::instruction_constant(int k) const {
     try {
@@ -1162,7 +1292,7 @@ namespace casadi {
     }
   }
 
-  int Function::instruction_output(int k) const {
+  std::vector<int> Function::instruction_output(int k) const {
     try {
       return (*this)->instruction_output(k);
     } catch (exception& e) {
@@ -1191,7 +1321,7 @@ namespace casadi {
   }
 
   void Function::assert_size_in(int i, int nrow, int ncol) const {
-    casadi_assert_message(size1_in(i)==nrow && size2_in(i)==ncol,
+    casadi_assert(size1_in(i)==nrow && size2_in(i)==ncol,
       "Incorrect shape for " + str(*this) + " input " + str(i) + " \""
       + name_in(i) + "\". Expected " + str(nrow) + "-by-" + str(ncol)
       + " but got " + str(size1_in(i)) +  "-by-" + str(size2_in(i)));
@@ -1199,7 +1329,7 @@ namespace casadi {
   }
 
   void Function::assert_size_out(int i, int nrow, int ncol) const {
-    casadi_assert_message(size1_out(i)==nrow && size2_out(i)==ncol,
+    casadi_assert(size1_out(i)==nrow && size2_out(i)==ncol,
       "Incorrect shape for " + str(*this) + " output " + str(i) + " \""
       + name_out(i) + "\". Expected " + str(nrow) + "-by-" + str(ncol)
       + " but got " + str(size1_out(i)) +  "-by-" + str(size2_out(i)));
@@ -1262,12 +1392,17 @@ namespace casadi {
 
   bool Function::operator==(const Function& f) const {
     try {
-      casadi_assert_message(!is_null(), "lhs is null");
-      casadi_assert_message(!f.is_null(), "rhs is null");
+      casadi_assert(!is_null(), "lhs is null");
+      casadi_assert(!f.is_null(), "rhs is null");
       return get()==f.get();
     } catch (exception& e) {
       THROW_ERROR("operator==", e.what());
     }
   }
+
+  Dict Function::info() const {
+    return (*this)->info();
+  }
+
 
 } // namespace casadi

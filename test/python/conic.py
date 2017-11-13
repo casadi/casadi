@@ -37,8 +37,8 @@ if has_nlpsol("ipopt"):
   conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{}))
 
 if has_nlpsol("worhp"):
-  worhp_options = {"TolOpti":1e-9}
-  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{}))
+  worhp_options = {"TolOpti":1e-13}
+  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1}))
 
 
 if has_conic("ooqp"):

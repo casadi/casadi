@@ -121,6 +121,46 @@ namespace casadi {
   CASADI_EXPORT void conic_debug(const Function& f, std::ostream &file);
 
   /** @} */
+
+#ifndef SWIG
+/// Input arguments of a QP problem
+enum ConicInput {
+  /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
+  /// The matrix is assumed to be symmetrical.
+  CONIC_H,
+  /// The vector g: dense,  (n x 1)
+  CONIC_G,
+  /// The matrix A: sparse, (nc x n) - product with x must be dense.
+  CONIC_A,
+  /// dense, (nc x 1)
+  CONIC_LBA,
+  /// dense, (nc x 1)
+  CONIC_UBA,
+  /// dense, (n x 1)
+  CONIC_LBX,
+  /// dense, (n x 1)
+  CONIC_UBX,
+  /// dense, (n x 1)
+  CONIC_X0,
+  /// dense
+  CONIC_LAM_X0,
+  /// dense
+  CONIC_LAM_A0,
+  CONIC_NUM_IN};
+
+/// Output arguments of an QP Solver
+enum ConicOutput {
+  /// The primal solution
+  CONIC_X,
+  /// The optimal cost
+  CONIC_COST,
+  /// The dual solution corresponding to linear bounds
+  CONIC_LAM_A,
+  /// The dual solution corresponding to simple bounds
+  CONIC_LAM_X,
+  CONIC_NUM_OUT};
+#endif // SWIG
+
 } // namespace casadi
 
 #endif // CASADI_CONIC_HPP

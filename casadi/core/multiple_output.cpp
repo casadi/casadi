@@ -25,7 +25,7 @@
 
 #include "multiple_output.hpp"
 #include "function_internal.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 
 using namespace std;
 

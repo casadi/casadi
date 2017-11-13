@@ -28,17 +28,27 @@
 
 #include "shared_object.hpp"
 #include "printable.hpp"
-#include "casadi_types.hpp"
+#include "casadi_common.hpp"
 #include "sparsity_interface.hpp"
+#include "generic_type.hpp"
 #include <vector>
 #include <list>
 #include <limits>
 #include <unordered_map>
 
 namespace casadi {
-
   // Forward declaration
   class SparsityInternal;
+
+  #ifndef SWIG
+    /** \brief Compact representation of a sparsity pattern */
+    struct CASADI_EXPORT SparsityStruct {
+      int nrow;
+      int ncol;
+      const int* colind;
+      const int* row;
+    };
+  #endif // SWIG
 
   /** \brief General sparsity class
    *
@@ -174,6 +184,12 @@ namespace casadi {
     static Sparsity triplet(int nrow, int ncol, const std::vector<int>& row,
                             const std::vector<int>& col);
 
+    /** \brrief Create a sparsity from nonzeros
+    *
+    * Inverse of `find()`
+    */
+    static Sparsity nonzeros(int nrow, int ncol, const std::vector<int>& nz, bool ind1=SWIG_IND1);
+
     /** Create from a single vector containing the pattern in compressed column storage format:
      * The format:
      * The first two entries are the number of rows (nrow) and columns (ncol)
@@ -234,6 +250,9 @@ namespace casadi {
 
     /** \brief Implicit or explicit type conversion to compact representation */
     operator const std::vector<int>&() const;
+
+    /** \brief Implicit or explicit type conversion to C representation */
+    operator SparsityStruct() const;
 #endif // SWIG
 
     /// \name Size and element counting
@@ -252,18 +271,26 @@ namespace casadi {
     int columns() const {return size2();}
 
     /** \brief The total number of elements, including structural zeros, i.e. size2()*size1()
-        \see nnz()  */
+      * Beware of overflow
+      * \see nnz()
+      */
     int numel() const;
 
+    /** \brief The percentage of nonzero
+     * Equivalent to (100.0 * nnz())/numel(), but avoids overflow
+     */
+    double density() const;
+
     /** \brief Check if the sparsity is empty
-    *
-    * A sparsity is considered empty if one of the dimensions is zero
-    * (or optionally both dimensions)
-    */
+     *
+     * A sparsity is considered empty if one of the dimensions is zero
+     * (or optionally both dimensions)
+     */
     bool is_empty(bool both=false) const;
 
     /** \brief Get the number of (structural) non-zeros
-        \see numel() */
+      * \see numel()
+      */
     int nnz() const;
 
     /** \brief Number of non-zeros in the upper triangular half,
@@ -289,6 +316,12 @@ namespace casadi {
     /** \brief  Get the size along a particular dimensions */
     int size(int axis) const;
     /// @}
+
+    /** Obtain information about sparsity */
+    Dict info() const;
+
+    /** Construct instance from info */
+    static Sparsity from_info(const Dict& info);
 
 #ifndef SWIG
     /** \brief Get a reference to row-vector,
@@ -590,6 +623,28 @@ namespace casadi {
     */
     std::vector<int> etree(bool ata=false) const;
 
+    /** \brief Symbolic LDL factorization
+        Returns the sparsity pattern of L as well as the elimination tree
+    */
+    Sparsity ldl(std::vector<int>& SWIG_OUTPUT(parent)) const;
+
+    /** \brief Symbolic QR factorization
+        Returns the sparsity pattern of V (compact representation of Q) and R
+        as well as vectors needed for the numerical factorization and solution.
+    */
+    void qr_sparse(Sparsity& SWIG_OUTPUT(V), Sparsity& SWIG_OUTPUT(R),
+                   std::vector<int>& SWIG_OUTPUT(pinv),
+                   std::vector<int>& SWIG_OUTPUT(leftmost),
+                   std::vector<int>& SWIG_OUTPUT(parent)) const;
+
+    /** \brief Symbolic factorization analysis
+        See Direct Methods for Sparse Linear Systems by Davis (2006).
+    */
+    void symbfact(std::vector<int>& SWIG_OUTPUT(count),
+                  std::vector<int>& SWIG_OUTPUT(parent),
+                  std::vector<int>& SWIG_OUTPUT(post),
+                  Sparsity& SWIG_OUTPUT(L), bool ata=false) const;
+
     /** \brief Depth-first search on the adjacency graph of the sparsity
         See Direct Methods for Sparse Linear Systems by Davis (2006).
     */
@@ -651,6 +706,8 @@ namespace casadi {
 
         k = A.find()
         A[k] will contain the elements of A that are non-zero in B
+
+        Inverse of `nonzeros`.
     */
     std::vector<int> find(bool ind1=SWIG_IND1) const;
 
@@ -715,15 +772,29 @@ namespace casadi {
 
     /** \brief Print a textual representation of sparsity
      */
-    void spy(std::ostream &stream=casadi::userOut()) const;
+    void spy(std::ostream &stream=casadi::uout()) const;
 
     /** \brief Generate a script for Matlab or Octave which visualizes
      * the sparsity using the spy command  */
     void spy_matlab(const std::string& mfile) const;
 
+    /** \brief Export matrix in specific language
+     *
+     * lang: only 'matlab' supported for now
+     * \verbatim
+     * options:
+     *   inline: Indicates if you want everything on a single line (default: False)
+     *   name: Name of exported variable (default: 'sp')
+     *   as_matrix: Matlab does not have a sparsity object. (default: false)
+    *               With this option true, a numeric matrix will be constructed
+     * \endverbatim
+     */
+    void export_code(const std::string& lang, std::ostream &stream=casadi::uout(),
+       const Dict& options=Dict()) const;
+
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Alias for disp */
-    void print_compact(std::ostream &stream=casadi::userOut()) const {
+    void print_compact(std::ostream &stream=casadi::uout()) const {
       disp(stream);
     }
 #endif // WITH_DEPRECATED_FEATURES
@@ -923,7 +994,7 @@ namespace casadi {
       if (nel==0 && val_nel==0) return;
 
       // Make sure that dimension matches
-      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
+      casadi_assert(sz2==val_sz2 && sz1==val_sz1,
                             "Sparsity::add<DataType>: shape mismatch. lhs is "
                             + dim() + ", while rhs is " + val_sp.dim() + ".");
 
@@ -1003,7 +1074,7 @@ namespace casadi {
       if (nel==0 && val_nel==0) return;
 
       // Make sure that dimension matches
-      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
+      casadi_assert(sz2==val_sz2 && sz1==val_sz1,
                             "Sparsity::add<DataType>: shape mismatch. lhs is "
                             + dim() + ", while rhs is " + val_sp.dim() + ".");
 

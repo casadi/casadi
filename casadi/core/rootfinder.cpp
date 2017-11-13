@@ -114,18 +114,18 @@ namespace casadi {
     }
 
     // Get the number of equations and check consistency
-    casadi_assert_message(iin_>=0 && iin_<oracle_.n_in() && oracle_.n_in()>0,
+    casadi_assert(iin_>=0 && iin_<oracle_.n_in() && oracle_.n_in()>0,
                           "Implicit input not in range");
-    casadi_assert_message(iout_>=0 && iout_<oracle_.n_out() && oracle_.n_out()>0,
+    casadi_assert(iout_>=0 && iout_<oracle_.n_out() && oracle_.n_out()>0,
                           "Implicit output not in range");
-    casadi_assert_message(oracle_.sparsity_out(iout_).is_dense()
+    casadi_assert(oracle_.sparsity_out(iout_).is_dense()
                           && oracle_.sparsity_out(iout_).is_column(),
                           "Residual must be a dense vector");
-    casadi_assert_message(oracle_.sparsity_in(iin_).is_dense()
+    casadi_assert(oracle_.sparsity_in(iin_).is_dense()
                           && oracle_.sparsity_in(iin_).is_column(),
                           "Unknown must be a dense vector");
     n_ = oracle_.nnz_out(iout_);
-    casadi_assert_message(n_ == oracle_.nnz_in(iin_),
+    casadi_assert(n_ == oracle_.nnz_in(iin_),
       "Dimension mismatch. Input size is " + str(oracle_.nnz_in(iin_)) + ", "
       "while output size is " + str(oracle_.nnz_out(iout_)));
 
@@ -138,15 +138,15 @@ namespace casadi {
     sp_jac_ = jac.sparsity_out(0);
 
     // Check for structural singularity in the Jacobian
-    casadi_assert_message(!sp_jac_.is_singular(),
+    casadi_assert(!sp_jac_.is_singular(),
       "Rootfinder::init: singularity - the jacobian is structurally rank-deficient. "
       "sprank(J)=" + str(sprank(sp_jac_)) + " (instead of " + str(sp_jac_.size1()) + ")");
 
     // Get the linear solver creator function
-    linsol_ = Linsol("linsol", linear_solver, linear_solver_options);
+    linsol_ = Linsol("linsol", linear_solver, sp_jac_, linear_solver_options);
 
     // Constraints
-    casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),
+    casadi_assert(u_c_.size()==n_ || u_c_.empty(),
       "Constraint vector if supplied, must be of length n, but got "
       + str(u_c_.size()) + " and n = " + str(n_));
 
@@ -162,7 +162,6 @@ namespace casadi {
   int Rootfinder::init_mem(void* mem) const {
     if (OracleFunction::init_mem(mem)) return 1;
     //auto m = static_cast<RootfinderMemory*>(mem);
-    linsol_.reset(sp_jac_);
     return 0;
   }
 

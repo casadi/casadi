@@ -24,7 +24,7 @@
 
 
 #include "external_impl.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -116,7 +116,7 @@ namespace casadi {
     if (get_name_in_) {
       // Use function pointer
       const char* n = get_name_in_(i);
-      casadi_assert_message(n!=0, "Error querying input name");
+      casadi_assert(n!=0, "Error querying input name");
       return n;
     } else if (li_.has_meta(name_ + "_NAME_IN", i)) {
       // Read meta
@@ -131,7 +131,7 @@ namespace casadi {
     if (get_name_out_) {
       // Use function pointer
       const char* n = get_name_out_(i);
-      casadi_assert_message(n!=0, "Error querying output name");
+      casadi_assert(n!=0, "Error querying output name");
       return n;
     } else if (li_.has_meta(name_ + "_NAME_OUT", i)) {
       // Read meta
@@ -196,7 +196,7 @@ namespace casadi {
 
     // Reference counting?
     has_refcount_ = li_.has_function(name_ + "_incref");
-    casadi_assert_message(has_refcount_==li_.has_function(name_ + "_decref"),
+    casadi_assert(has_refcount_==li_.has_function(name_ + "_decref"),
                           "External functions must provide functions for both increasing "
                           "and decreasing the reference count, or neither.");
 
@@ -204,10 +204,10 @@ namespace casadi {
     int sz_arg=0, sz_res=0, sz_iw=0, sz_w=0;
     if (work_) {
       int flag = work_(&sz_arg, &sz_res, &sz_iw, &sz_w);
-      casadi_assert_message(flag==0, "External: \"work\" failed");
+      casadi_assert(flag==0, "External: \"work\" failed");
     } else if (li_.has_meta(name_ + "_WORK")) {
       vector<int> v = li_.meta_vector<int>(name_ + "_WORK");
-      casadi_assert(v.size()==4);
+      casadi_assert_dev(v.size()==4);
       sz_arg = v[0];
       sz_res = v[1];
       sz_iw = v[2];
@@ -322,152 +322,30 @@ namespace casadi {
     Function ret = external(name, li_, opts);
 
     // Inputs consistency checks
-    casadi_assert_message(s_in.size() == ret.n_in(),
+    casadi_assert(s_in.size() == ret.n_in(),
       "Inconsistent number of inputs. Expected " + str(s_in.size())+ "  "
       "(" + str(s_in) + "), got " + str(ret.n_in()) + ".");
     for (int i=0; i<s_in.size(); ++i) {
       string s = s_in[i];
       replace(s.begin(), s.end(), ':', '_');
-      casadi_assert_message(s == ret.name_in(i),
+      casadi_assert(s == ret.name_in(i),
         "Inconsistent input name. Expected: " + str(s_in) + ", "
         "got " + ret.name_in(i) + " for input " + str(i));
     }
 
     // Outputs consistency checks
-    casadi_assert_message(s_out.size() == ret.n_out(),
+    casadi_assert(s_out.size() == ret.n_out(),
       "Inconsistent number of outputs. Expected " + str(s_out.size()) + " "
       "(" + str(s_out) + "), got " + str(ret.n_out()) + ".");
     for (int i=0; i<s_out.size(); ++i) {
       string s = s_out[i];
       replace(s.begin(), s.end(), ':', '_');
-      casadi_assert_message(s == ret.name_out(i),
+      casadi_assert(s == ret.name_out(i),
         "Inconsistent output name. Expected: " + str(s_out) + ", "
         "got " + ret.name_out(i) + " for output " + str(i));
     }
 
     return ret;
-  }
-
-  Function jit_function(const std::string& name,
-                    const std::vector<std::string>& name_in,
-                    const std::vector<std::string>& name_out,
-                    const std::string& body, const Dict& opts) {
-    // Pass empty vectors -> default values
-    std::vector<Sparsity> sparsity_in, sparsity_out;
-    return jit_function(name, name_in, name_out, sparsity_in, sparsity_out, body, opts);
-  }
-
-  Function jit_function(const std::string& name,
-                     const std::vector<std::string>& name_in,
-                     const std::vector<std::string>& name_out,
-                     const std::vector<Sparsity>& sparsity_in,
-                     const std::vector<Sparsity>& sparsity_out,
-                     const std::string& body, const Dict& opts) {
-    return Function::create(new JitFunction(name, name_in, name_out, sparsity_in,
-                                          sparsity_out, body), opts);
-  }
-
-  JitFunction::JitFunction(const std::string& name,
-                      const std::vector<std::string>& name_in,
-                      const std::vector<std::string>& name_out,
-                      const std::vector<Sparsity>& sparsity_in,
-                      const std::vector<Sparsity>& sparsity_out,
-                      const std::string& body) : FunctionInternal(name), body_(body) {
-    // Set sparsity
-    sparsity_in_ = sparsity_in;
-    sparsity_out_ = sparsity_out;
-    name_in_ = name_in;
-    name_out_ = name_out;
-
-    // Default options
-    jit_ = true; // override default
-    buffered_ = true;
-    enable_fd_ = true; // override default
-  }
-
-  Options JitFunction::options_
-  = {{&FunctionInternal::options_},
-     {{"buffered",
-      {OT_BOOL,
-        "Buffer the calls, user does not need to "}},
-       {"jac",
-      {OT_STRING,
-        "Function body for Jacobian"}},
-      {"hess",
-       {OT_STRING,
-        "Function body for Hessian"}}
-     }
-  };
-
-  void JitFunction::init(const Dict& opts) {
-    // Call the initialization method of the base class
-    FunctionInternal::init(opts);
-
-    // Read options
-    for (auto&& op : opts) {
-      if (op.first=="buffered") {
-        buffered_ = op.second;
-      } else if (op.first=="jac") {
-        jac_body_ = op.second.to_string();
-      } else if (op.first=="hess") {
-        hess_body_ = op.second.to_string();
-      }
-    }
-
-    // Arrays for holding inputs and outputs
-    if (buffered_) {
-      alloc_w(nnz_in() + nnz_out());
-    }
-  }
-
-  JitFunction::~JitFunction() {
-  }
-
-  void JitFunction::codegen_body(CodeGenerator& g) const {
-    // Add all input arguments as local variables
-    for (int i=0; i<n_in_; ++i) {
-      g.local(name_in_[i], "const casadi_real", "*");
-      if (buffered_) {
-        g << g.copy("*arg++", nnz_in(i), "w") << "\n"
-          << name_in_[i] << " = w; w += " << nnz_in(i) << ";\n";
-      } else {
-        g << name_in_[i] << " = *arg++;\n";
-      }
-    }
-
-    // Add all output arguments as local variables
-    for (int i=0; i<n_out_; ++i) {
-      g.local(name_out_[i], "casadi_real", "*");
-      if (buffered_) {
-        g << name_out_[i] << " = w; w += " << nnz_out(i) << ";\n";
-      } else {
-        g << name_out_[i] << " = *res++;\n";
-      }
-    }
-
-    // Codegen function body
-    g << body_;
-
-    // Get results
-    for (int i=0; i<n_out_; ++i) {
-      if (buffered_) {
-        g << g.copy(name_out_[i], nnz_out(i), "*res++") << "\n";
-      }
-    }
-  }
-
-  bool JitFunction::has_jacobian() const {
-    return !jac_body_.empty();
-  }
-
-  Function JitFunction::get_jacobian(const std::string& name,
-                                   const std::vector<std::string>& inames,
-                                   const std::vector<std::string>& onames,
-                                   const Dict& opts) const {
-    // Create a JIT-function for the Jacobian
-    Dict jac_opts;
-    if (!hess_body_.empty()) jac_opts["jac"] = hess_body_;
-    return jit_function(name, inames, onames, jac_body_, jac_opts);
   }
 
 } // namespace casadi

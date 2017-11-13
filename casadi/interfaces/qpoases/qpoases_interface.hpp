@@ -45,8 +45,11 @@ namespace casadi {
   class QpoasesInterface;
 
   struct CASADI_CONIC_QPOASES_EXPORT QpoasesMemory : public ConicMemory {
-    // Reference to the function
-    const Linsol& linsol;
+    // Linear solver
+    Linsol linsol;
+
+    // Linear solver plugin class
+    std::string linsol_plugin;
 
     /// QP Solver
     union {
@@ -71,7 +74,7 @@ namespace casadi {
     std::vector<double> nz;
 
     /// Constructor
-    QpoasesMemory(const Linsol& linsol);
+    QpoasesMemory();
 
     /// Destructor
     ~QpoasesMemory();
@@ -120,7 +123,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Create memory block */
-    void* alloc_mem() const override { return new QpoasesMemory(linsol_);}
+    void* alloc_mem() const override { return new QpoasesMemory();}
 
     /** \brief Initalize memory block */
     int init_mem(void* mem) const override;
@@ -175,10 +178,6 @@ namespace casadi {
 
     /// Get qpOASES error message
     static std::string getErrorMessage(int flag);
-
-    // Linear solver
-    Linsol linsol_;
-
   };
 
 } // namespace casadi

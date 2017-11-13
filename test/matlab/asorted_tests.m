@@ -14,6 +14,12 @@ z = MX.sym('z',3);
 DM(true)
 SX(true)
 
+r = which_depends([x;y],[x;y])
+assert(islogical(r))
+
+f = Function('f',{}, {0})
+f = Function('f',cell(1,0), {0})
+f = Function('f',cell(0,1), {0})
 
 f = Function('f',{x},{cos(x)})
 r = f(3)

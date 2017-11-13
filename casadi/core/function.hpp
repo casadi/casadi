@@ -136,6 +136,47 @@ namespace casadi {
 #endif // SWIG
     ///@}
 
+    ///@{
+    /** \brief Create a just-in-time compiled function from a C language string
+     * The names and sparsity patterns of all the inputs and outputs must be provided.
+     * If sparsities are not provided, all inputs and outputs are assumed to be scalar.
+     * Only specify the function body, assuming that input and output nonzeros are
+     * stored in arrays with the specified naming convension.
+     * The data type used is 'casadi_real', which is typically equal to 'double` or
+     * another data type with the same API as 'double'.
+     *
+     * Inputs may be null pointers. This means that the all entries are zero.
+     * Outputs may be null points. This means that the corresponding result can be ignored.
+     *
+     * If an error occurs in the evaluation, issue "return 1;";
+     *
+     * The final generated function will have a structure similar to:
+     *
+     * int fname(const casadi_real** arg, casadi_real** res, int* iw,
+                 casadi_real* w, void* mem) {
+     *   const casadi_real *x1, *x2;
+     *   casadi_real *r1, *r2;
+     *   x1 = *arg++;
+     *   x2 = *arg++;
+     *   r1 = *res++;
+     *   r2 = *res++;
+     *   <FUNCTION_BODY>
+     *   return 0;
+     * }
+     *
+     */
+    static Function jit(const std::string& name, const std::string& body,
+             const std::vector<std::string>& name_in,
+             const std::vector<std::string>& name_out,
+             const Dict& opts=Dict());
+    static Function jit(const std::string& name, const std::string& body,
+             const std::vector<std::string>& name_in,
+             const std::vector<std::string>& name_out,
+             const std::vector<Sparsity>& sparsity_in,
+             const std::vector<Sparsity>& sparsity_out,
+             const Dict& opts=Dict());
+    ///@}
+
     /** \brief  Destructor */
     ~Function();
 
@@ -297,13 +338,13 @@ namespace casadi {
                                     int order=1, bool tr=false) const;
 
     /** \brief Print dimensions of inputs and outputs */
-    void print_dimensions(std::ostream &stream=casadi::userOut()) const;
+    void print_dimensions(std::ostream &stream=casadi::uout()) const;
 
     /** \brief Print options to a stream */
-    void print_options(std::ostream &stream=casadi::userOut()) const;
+    void print_options(std::ostream &stream=casadi::uout()) const;
 
     /** \brief Print all information there is to know about a certain option */
-    void print_option(const std::string &name, std::ostream &stream = casadi::userOut()) const;
+    void print_option(const std::string &name, std::ostream &stream = casadi::uout()) const;
 
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const;
@@ -465,9 +506,25 @@ namespace casadi {
                 x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
         \endverbatim
 
+        Mapaccum has the following benefits over writing an equivalent for-loop:
+           - much faster at construction time
+           - potentially much faster compilation times (for codegen)
+           - offers a trade-off between memory and evaluation time
+
+        The base (settable through the options dictionary, default 10),
+        is used to create a tower of function calls,
+        containing unrolled for-loops of length maximum base.
+
+        This technique is much more scalable in terms of memory-usage,
+        but slightly slower at evaluation, than a plain for-loop.
+        The effect is similar to that of a for-loop with a check-pointing instruction
+        after each chunk of iterations with size base.
+
+        Set base to -1 to unroll all the way; no gains in memory efficiency here.
 
     */
-    Function mapaccum(const std::string& name, int n, int n_accum=1,
+    Function mapaccum(const std::string& name, int n, const Dict& opts = Dict()) const;
+    Function mapaccum(const std::string& name, int n, int n_accum,
                       const Dict& opts = Dict()) const;
     Function mapaccum(const std::string& name, int n,
                       const std::vector<int>& accum_in,
@@ -612,6 +669,20 @@ namespace casadi {
     /** \brief Export / Generate C code for the dependency function */
     std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict()) const;
 
+    /** \brief Export function in specific language
+     *
+     * Only allowed for (a subset of) SX/MX Functions
+     */
+    ///@{
+    void export_code(const std::string& lang,
+      const std::string &fname, const Dict& options=Dict()) const;
+
+    std::string export_code(const std::string& lang, const Dict& options=Dict()) const;
+#ifndef SWIG
+    void export_code(const std::string& lang,
+      std::ostream &stream, const Dict& options=Dict()) const;
+#endif // SWIG
+    ///@}
 #ifndef SWIG
     /// \cond INTERNAL
     /// Get a const pointer to the node
@@ -621,7 +692,7 @@ namespace casadi {
     template<typename T>
     T* get() const {
       T* ret = dynamic_cast<T*>(get());
-      casadi_assert(ret!=0);
+      casadi_assert_dev(ret!=0);
       return ret;
     }
 
@@ -676,7 +747,7 @@ namespace casadi {
 
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Use get_free instead */
-    void print_free(std::ostream &stream=casadi::userOut()) const {
+    void print_free(std::ostream &stream=casadi::uout()) const {
       stream << get_free();
     }
 #endif // WITH_DEPRECATED_FEATURES
@@ -694,20 +765,27 @@ namespace casadi {
     /** \brief Number of nodes in the algorithm */
     int n_nodes() const;
 
-    /** \brief Number of instruction in the algorithm (SXFunction) */
+    /** \brief Number of instruction in the algorithm (SXFunction/MXFunction) */
     int n_instructions() const;
 
-    /** \brief Identifier index of the instruction (SXFunction) */
+    /** \brief Identifier index of the instruction (SXFunction/MXFunction) */
     int instruction_id(int k) const;
 
-    /** \brief Locations in the work vector for the inputs of the instruction (SXFunction) */
-    std::pair<int, int> instruction_input(int k) const;
+    /** \brief Locations in the work vector for the inputs of the instruction
+     * (SXFunction/MXFunction) */
+    std::vector<int> instruction_input(int k) const;
 
     /** \brief Get the floating point output argument of an instruction (SXFunction) */
     double instruction_constant(int k) const;
 
-    /** \brief Location in the work vector for the output of the instruction (SXFunction) */
-    int instruction_output(int k) const;
+    /** \brief Location in the work vector for the output of the instruction
+     * (SXFunction/MXFunction) */
+    std::vector<int> instruction_output(int k) const;
+
+    //SX node_SX(int k) const;
+
+    MX instruction_MX(int k) const;
+
 
 #ifdef WITH_DEPRECATED_FEATURES
     /** \brief [DEPRECATED] Renamed n_instructions */
@@ -720,13 +798,13 @@ namespace casadi {
     int getAtomicOperation(int k) const {return instruction_id(k);}
 
     /** \brief [DEPRECATED] Renamed instruction_index */
-    std::pair<int, int> getAtomicInput(int k) const { return instruction_input(k);}
+    std::pair<int, int> getAtomicInput(int k) const;
 
     /** \brief [DEPRECATED] Renamed instruction_constant */
     double getAtomicInputReal(int k) const { return instruction_constant(k);}
 
     /** \brief [DEPRECATED] Renamed instruction_output */
-    int getAtomicOutput(int k) const { return instruction_output(k);}
+    int getAtomicOutput(int k) const;
 #endif // WITH_DEPRECATED_FEATURES
 
     ///@{
@@ -825,6 +903,9 @@ namespace casadi {
     // Check if a particular dependency exists
     bool has_function(const std::string& fname) const;
 
+    /** Obtain information about function */
+    Dict info() const;
+
 #ifdef WITH_DEPRECATED_FEATURES
     /** Generate native code in the interfaced language for debugging */
     void conic_debug(const std::string &filename) const;
@@ -856,7 +937,14 @@ namespace casadi {
 
     /// Helper function for parsing .casadi files
     static bool proceed_to(std::istream& file, const std::string& str);
+
+    /// Helper function for mapaccum
+    Function mapaccum(const std::string& name, const std::vector<Function>& chain, int n_accum=1,
+                      const Dict& opts = Dict()) const;
+
 #endif // SWIG
+
+
   };
 
 } // namespace casadi

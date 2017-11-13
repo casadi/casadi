@@ -286,11 +286,6 @@ namespace casadi {
       }
     }
 
-    // Create linear solver
-    if (schur_) {
-      linsol_ = Linsol("linsol", linsol_plugin_);
-    }
-
     // Allocate work vectors
     if (sparse_) {
       alloc_w(nnz_in(CONIC_H), true); // h
@@ -310,6 +305,9 @@ namespace casadi {
   int QpoasesInterface::init_mem(void* mem) const {
     auto m = static_cast<QpoasesMemory*>(mem);
     m->called_once = false;
+
+    // Linear solver, if any
+    m->linsol_plugin = linsol_plugin_;
 
     // Create qpOASES instance
     if (m->qp) delete m->qp;
@@ -807,7 +805,7 @@ namespace casadi {
     }
   }
 
-  QpoasesMemory::QpoasesMemory(const Linsol& linsol) : linsol(linsol) {
+  QpoasesMemory::QpoasesMemory() {
     this->qp = 0;
     this->h = 0;
     this->a = 0;
@@ -821,7 +819,7 @@ namespace casadi {
 
   int QpoasesInterface::
   qpoases_init(void* mem, int dim, int nnz, const int* row, const int* col) {
-    casadi_assert(mem!=0);
+    casadi_assert_dev(mem!=0);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Get sparsity pattern in sparse triplet format
@@ -848,51 +846,51 @@ namespace casadi {
     // Allocate memory for nonzeros
     m->nz.resize(sp.nnz());
 
-    // Pass to linear solver
-    m->linsol.reset(sp);
+    // Create linear solver
+    m->linsol = Linsol("linsol", m->linsol_plugin, sp);
 
     return 0;
   }
 
   int QpoasesInterface::qpoases_sfact(void* mem, const double* vals) {
-    casadi_assert(mem!=0);
+    casadi_assert_dev(mem!=0);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Get nonzero elements (entire elements)
     for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->lin_map[i]];
 
     // Pass to linear solver
-    m->linsol.pivoting(get_ptr(m->nz));
+    m->linsol.sfact(get_ptr(m->nz));
 
     return 0;
   }
 
   int QpoasesInterface::
   qpoases_nfact(void* mem, const double* vals, int* neig, int* rank) {
-    casadi_assert(mem!=0);
+    casadi_assert_dev(mem!=0);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Get nonzero elements (entire elements)
     for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->lin_map[i]];
 
     // Pass to linear solver
-    m->linsol.factorize(get_ptr(m->nz));
+    m->linsol.nfact(get_ptr(m->nz));
 
     // Number of negative eigenvalues
-    if (neig) *neig = m->linsol.neig();
+    if (neig) *neig = m->linsol.neig(get_ptr(m->nz));
 
     // Rank of the matrix
-    if (rank) *rank = m->linsol.rank();
+    if (rank) *rank = m->linsol.rank(get_ptr(m->nz));
 
     return 0;
   }
 
   int QpoasesInterface::qpoases_solve(void* mem, int nrhs, double* rhs) {
-    casadi_assert(mem!=0);
+    casadi_assert_dev(mem!=0);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Pass to linear solver
-    m->linsol.solve(rhs, nrhs);
+    m->linsol.solve(get_ptr(m->nz), rhs, nrhs);
 
     return 0;
   }

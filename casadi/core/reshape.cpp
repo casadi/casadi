@@ -24,14 +24,14 @@
 
 
 #include "reshape.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 
 using namespace std;
 
 namespace casadi {
 
   Reshape::Reshape(const MX& x, Sparsity sp) {
-    casadi_assert(x.nnz()==sp.nnz());
+    casadi_assert_dev(x.nnz()==sp.nnz());
     set_dep(x);
     set_sparsity(sp);
   }

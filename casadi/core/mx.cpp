@@ -27,7 +27,7 @@
 #include "symbolic_mx.hpp"
 #include "constant_mx.hpp"
 #include "multiple_output.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "norm.hpp"
 #include "calculus.hpp"
 #include "mx_function.hpp"
@@ -82,7 +82,7 @@ namespace casadi {
         own(ConstantMX::create(Sparsity(sp.size()), 0));
       }
     } else {
-      casadi_assert(val.is_column() && sp.nnz()==val.size1());
+      casadi_assert_dev(val.is_column() && sp.nnz()==val.size1());
       *this = densify(val)->get_nzref(sp, range(sp.nnz()));
     }
   }
@@ -108,7 +108,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::createMultipleOutput(MXNode* node) {
-    casadi_assert(dynamic_cast<MultipleOutput*>(node)!=0);
+    casadi_assert_dev(dynamic_cast<MultipleOutput*>(node)!=0);
     MX x =  MX::create(node);
     std::vector<MX> ret(x->nout());
     for (int i=0; i<ret.size(); ++i) {
@@ -143,9 +143,9 @@ namespace casadi {
 
   void MX::get(MX& m, bool ind1, const Matrix<int>& rr, const Matrix<int>& cc) const {
     // Make sure dense vectors
-    casadi_assert_message(rr.is_dense() && rr.is_vector(),
+    casadi_assert(rr.is_dense() && rr.is_vector(),
                           "Marix::get: First index must be a dense vector");
-    casadi_assert_message(cc.is_dense() && cc.is_vector(),
+    casadi_assert(cc.is_dense() && cc.is_vector(),
                           "Marix::get: Second index must be a dense vector");
 
     // Get the sparsity pattern - does bounds checking
@@ -180,7 +180,7 @@ namespace casadi {
   }
 
   void MX::get(MX& m, bool ind1, const Sparsity& sp) const {
-    casadi_assert_message(size()==sp.size(),
+    casadi_assert(size()==sp.size(),
       "get(Sparsity sp): shape mismatch. This matrix has shape "
       + str(size()) + ", but supplied sparsity index has shape "
       + str(sp.size()) + ".");
@@ -214,9 +214,9 @@ namespace casadi {
     }
 
     // Make sure rr and cc are dense vectors
-    casadi_assert_message(rr.is_dense() && rr.is_column(),
+    casadi_assert(rr.is_dense() && rr.is_column(),
       "MX::set: First index not dense vector");
-    casadi_assert_message(cc.is_dense() && cc.is_column(),
+    casadi_assert(cc.is_dense() && cc.is_column(),
       "MX::set: Second index not dense vector");
 
     // Assert dimensions of assigning matrix
@@ -335,7 +335,7 @@ namespace casadi {
   }
 
   void MX::set(const MX& m, bool ind1, const Sparsity& sp) {
-    casadi_assert_message(size()==sp.size(),
+    casadi_assert(size()==sp.size(),
       "set(Sparsity sp): shape mismatch. This matrix has shape "
       + str(size()) + ", but supplied sparsity index has shape "
       + str(sp.size()) + ".");
@@ -370,7 +370,7 @@ namespace casadi {
     if (ind1 || *std::min_element(kk->begin(), kk->end())<0) {
       Matrix<int> kk_mod = kk;
       for (auto&& i : kk_mod.nonzeros()) {
-        casadi_assert_message(!(ind1 && i<=0),
+        casadi_assert(!(ind1 && i<=0),
           "Matlab is 1-based, but requested index " + str(i) + ". "
           "Note that negative slices are disabled in the Matlab interface. "
           "Possibly you may want to use 'end'.");
@@ -391,7 +391,7 @@ namespace casadi {
   }
 
   void MX::set_nz(const MX& m, bool ind1, const Matrix<int>& kk) {
-    casadi_assert_message(kk.nnz()==m.nnz() || m.nnz()==1,
+    casadi_assert(kk.nnz()==m.nnz() || m.nnz()==1,
       "MX::set_nz: length of non-zero indices (" + str(kk.nnz()) + ") " +
       "must match size of rhs (" + str(m.nnz()) + ").");
 
@@ -432,7 +432,7 @@ namespace casadi {
     if (ind1 || *std::min_element(kk->begin(), kk->end())<0) {
       Matrix<int> kk_mod = kk;
       for (auto&& i : kk_mod.nonzeros()) {
-        casadi_assert_message(!(ind1 && i<=0),
+        casadi_assert(!(ind1 && i<=0),
           "Matlab is 1-based, but requested index " + str(i) + ". "
           "Note that negative slices are disabled in the Matlab interface. "
           "Possibly you may want to use 'end'.");
@@ -575,7 +575,7 @@ namespace casadi {
     }
 
     // Check matching dimensions
-    casadi_assert_message(x.size2()==y.size1(),
+    casadi_assert(x.size2()==y.size1(),
       "Matrix product with incompatible dimensions. Lhs is "
       + x.dim() + " and rhs is " + y.dim() + ".");
 
@@ -600,7 +600,7 @@ namespace casadi {
   }
 
   MX MX::attachAssert(const MX& y, const std::string &fail_message) const {
-    casadi_assert_message(y.is_scalar(),
+    casadi_assert(y.is_scalar(),
       "Error in attachAssert: assertion expression y must be scalar, "
       "but got " + y.dim());
     return(*this)->get_assert(y, fail_message);
@@ -611,7 +611,7 @@ namespace casadi {
   }
 
   MX MX::lift(const MX& x, const MX& x_guess) {
-    casadi_assert(x.sparsity()==x_guess.sparsity());
+    casadi_assert_dev(x.sparsity()==x_guess.sparsity());
     return x->_get_binary(OP_LIFT, x_guess, false, false);
   }
 
@@ -693,23 +693,25 @@ namespace casadi {
     return (*this)->op();
   }
 
+  Dict MX::info() const {
+    return (*this)->info();
+  }
+
   bool MX::is_equal(const MX& x, const MX& y, int depth) {
     return MXNode::is_equal(x.get(), y.get(), depth);
   }
 
   MX MX::mmin(const MX &x) {
-    casadi_error("Not implemented");
-    return x;
+    return x->get_mmin();
   }
 
   MX MX::mmax(const MX &x) {
-    casadi_error("Not implemented");
-    return x;
+    return x->get_mmax();
   }
 
   bool MX::is_commutative() const {
     if (is_unary()) return true;
-    casadi_assert_message(is_binary() || is_unary(),
+    casadi_assert(is_binary() || is_unary(),
       "MX::is_commutative: must be binary or unary operation");
     return operation_checker<CommChecker>(op());
   }
@@ -738,7 +740,7 @@ namespace casadi {
     if (x.is_empty() || (sp==x.sparsity())) {
       return x;
     } else {
-      casadi_assert_message(sp.size()==x.size(), "Dimension mismatch");
+      casadi_assert(sp.size()==x.size(), "Dimension mismatch");
       if (intersect) {
         return x->get_project(sp.intersect(x.sparsity()));
       } else {
@@ -748,7 +750,7 @@ namespace casadi {
   }
 
   MX MX::densify(const MX& x, const MX& val) {
-    casadi_assert(val.is_scalar());
+    casadi_assert_dev(val.is_scalar());
     if (x.is_dense()) {
       return x; // Already ok
     } else if (val->is_zero()) {
@@ -790,7 +792,7 @@ namespace casadi {
     std::vector<MX> ret(n_primitives());
     std::vector<MX>::iterator it=ret.begin();
     (*this)->primitives(it);
-    casadi_assert(it==ret.end());
+    casadi_assert_dev(it==ret.end());
     return ret;
   }
 
@@ -798,15 +800,15 @@ namespace casadi {
     std::vector<MX> ret(n_primitives());
     std::vector<MX>::iterator it=ret.begin();
     (*this)->split_primitives(x, it);
-    casadi_assert(it==ret.end());
+    casadi_assert_dev(it==ret.end());
     return ret;
   }
 
   MX MX::join_primitives(const std::vector<MX>& v) const {
-    casadi_assert_message(v.size()==n_primitives(), "Wrong number of primitives supplied");
+    casadi_assert(v.size()==n_primitives(), "Wrong number of primitives supplied");
     std::vector<MX>::const_iterator it=v.begin();
     MX ret = (*this)->join_primitives(it);
-    casadi_assert(it==v.end());
+    casadi_assert_dev(it==v.end());
     return ret;
   }
 
@@ -879,7 +881,7 @@ namespace casadi {
     if (x.size()>1) {
       vector<MX> ne = trim_empty(x, true);
       for (int i=0;i<ne.size();i++) {
-        casadi_assert_message(ne[i].size1()==ne[0].size1(),
+        casadi_assert(ne[i].size1()==ne[0].size1(),
           "horzcat dimension mismatch  x[" + str(i) + "]:" + ne[i].dim() +
           " and x[0]: " + ne[0].dim() + ".");
       }
@@ -898,7 +900,7 @@ namespace casadi {
         int nrow = 0;
         for (int i=0;i<ret.size();++i) {
           s+= ret[i].size2();
-          casadi_assert(nrow==0 || nrow==ret[i].size1())
+          casadi_assert_dev(nrow==0 || nrow==ret[i].size1());
           nrow = ret[i].size1();
         }
         return MX::zeros(nrow, s);
@@ -940,7 +942,7 @@ namespace casadi {
     if (x.size()>1) {
       vector<MX> ne = trim_empty(x, true);
       for (int i=0;i<ne.size();i++) {
-        casadi_assert_message(ne[i].size2()==ne[0].size2(),
+        casadi_assert(ne[i].size2()==ne[0].size2(),
           "vertcat dimension mismatch  x[" + str(i) + "]:" + ne[i].dim() +
           " and x[0]: " + ne[0].dim() + ".");
       }
@@ -959,7 +961,7 @@ namespace casadi {
         int ncol = 0;
         for (int i=0;i<ret.size();++i) {
           s+= ret[i].size1();
-          casadi_assert(ncol==0 || ret[i].size2()==ncol);
+          casadi_assert_dev(ncol==0 || ret[i].size2()==ncol);
           ncol = ret[i].size2();
         }
         return MX::zeros(s, ncol);
@@ -978,10 +980,10 @@ namespace casadi {
 
   std::vector<MX> MX::horzsplit(const MX& x, const std::vector<int>& offset) {
     // Consistency check
-    casadi_assert(offset.size()>=1);
-    casadi_assert(offset.front()==0);
-    casadi_assert(offset.back()==x.size2());
-    casadi_assert(is_monotone(offset));
+    casadi_assert_dev(offset.size()>=1);
+    casadi_assert_dev(offset.front()==0);
+    casadi_assert_dev(offset.back()==x.size2());
+    casadi_assert_dev(is_monotone(offset));
 
     // Trivial return if possible
     if (offset.size()==1) {
@@ -996,16 +998,16 @@ namespace casadi {
   std::vector<MX> MX::diagsplit(const MX& x, const std::vector<int>& offset1,
                                 const std::vector<int>& offset2) {
     // Consistency check
-    casadi_assert(offset1.size()>=1);
-    casadi_assert(offset1.front()==0);
-    casadi_assert(offset1.back()==x.size1());
-    casadi_assert(is_monotone(offset1));
+    casadi_assert_dev(offset1.size()>=1);
+    casadi_assert_dev(offset1.front()==0);
+    casadi_assert_dev(offset1.back()==x.size1());
+    casadi_assert_dev(is_monotone(offset1));
 
     // Consistency check
-    casadi_assert(offset2.size()>=1);
-    casadi_assert(offset2.front()==0);
-    casadi_assert(offset2.back()==x.size2());
-    casadi_assert(is_monotone(offset2));
+    casadi_assert_dev(offset2.size()>=1);
+    casadi_assert_dev(offset2.front()==0);
+    casadi_assert_dev(offset2.back()==x.size2());
+    casadi_assert_dev(is_monotone(offset2));
 
     return x->get_diagsplit(offset1, offset2);
   }
@@ -1013,10 +1015,10 @@ namespace casadi {
   std::vector<MX> MX::vertsplit(const MX& x, const std::vector<int>& offset) {
     if (x.is_column()) {
       // Consistency check
-      casadi_assert(offset.size()>=1);
-      casadi_assert(offset.front()==0);
-      casadi_assert(offset.back()==x.size1());
-      casadi_assert(is_monotone(offset));
+      casadi_assert_dev(offset.size()>=1);
+      casadi_assert_dev(offset.front()==0);
+      casadi_assert_dev(offset.back()==x.size1());
+      casadi_assert_dev(is_monotone(offset));
 
       // Trivial return if possible
       if (offset.size()==1) {
@@ -1040,7 +1042,7 @@ namespace casadi {
     // Make sure same number of block columns
     int ncols = v.front().size();
     for (auto&& e : v) {
-      casadi_assert_message(e.size()==ncols, "blockcat: Inconsistent number of block columns");
+      casadi_assert(e.size()==ncols, "blockcat: Inconsistent number of block columns");
     }
 
     // Quick return if no block columns
@@ -1177,7 +1179,7 @@ namespace casadi {
   }
 
   MX MX::trace(const MX& x) {
-    casadi_assert_message(x.is_square(), "trace: must be square");
+    casadi_assert(x.is_square(), "trace: must be square");
     MX res(0);
     for (int i=0; i < x.size2(); i ++) {
       res += x(i, i);
@@ -1210,8 +1212,8 @@ namespace casadi {
   }
 
   MX MX::polyval(const MX& p, const MX& x) {
-    casadi_assert_message(p.is_dense(), "polynomial coefficients vector must be a vector");
-    casadi_assert_message(p.is_column() && p.nnz()>0, "polynomial coefficients must be a vector");
+    casadi_assert(p.is_dense(), "polynomial coefficients vector must be a vector");
+    casadi_assert(p.is_column() && p.nnz()>0, "polynomial coefficients must be a vector");
     MX ret = p.nz(0);
     for (int i=1; i<p.nnz(); ++i) {
       ret = ret*x + p.nz(i);
@@ -1225,15 +1227,15 @@ namespace casadi {
 
   void MX::substitute_inplace(const std::vector<MX>& v, std::vector<MX>& vdef,
                              std::vector<MX>& ex, bool reverse) {
-    casadi_assert_message(v.size()==vdef.size(),
+    casadi_assert(v.size()==vdef.size(),
                           "Mismatch in the number of expression to substitute.");
     for (int k=0; k<v.size(); ++k) {
-      casadi_assert_message(v[k].is_symbolic(),
+      casadi_assert(v[k].is_symbolic(),
         "Variable " + str(k) + " is not symbolic");
-      casadi_assert_message(v[k].size() == vdef[k].size(),
+      casadi_assert(v[k].size() == vdef[k].size(),
         "Inconsistent shape for variable " + str(k) + ".");
     }
-    casadi_assert_message(reverse==false, "Not implemented");
+    casadi_assert(reverse==false, "Not implemented");
 
     // quick return if nothing to replace
     if (v.empty()) return;
@@ -1276,7 +1278,7 @@ namespace casadi {
   std::vector<MX> MX::substitute(const std::vector<MX> &ex, const std::vector<MX> &v,
                                  const std::vector<MX> &vdef) {
     // Assert consistent dimensions
-    casadi_assert(v.size()==vdef.size());
+    casadi_assert_dev(v.size()==vdef.size());
 
     // Quick return if all equal
     bool all_equal = true;
@@ -1303,7 +1305,7 @@ namespace casadi {
   std::vector<MX> MX::graph_substitute(const std::vector<MX>& ex,
                                        const std::vector<MX>& expr,
                                        const std::vector<MX>& exprs) {
-    casadi_assert_message(expr.size()==exprs.size(),
+    casadi_assert(expr.size()==exprs.size(),
       "Mismatch in the number of expression to substitute: "
       + str(expr.size()) + " <-> " + str(exprs.size()) + ".");
 
@@ -1360,7 +1362,7 @@ namespace casadi {
         tainted[it->res.front()] = false;
         break;
       case OP_OUTPUT:
-        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        casadi_assert(it->data->segment()==0, "Not implemented");
         f_out[it->data->ind()] = swork[it->arg.front()];
         break;
       default:
@@ -1398,7 +1400,7 @@ namespace casadi {
       all_found = all_found && expr_found[i];
     }
 
-    //casadi_assert_message(all_found,
+    //casadi_assert(all_found,
     //             "MXFunction::extractNodes(const std::vector<MX>& expr):"
     //             " failed to locate all input expr."
     //             << std::endl << "Here's a boolean list showing which ones where found: "
@@ -1491,7 +1493,7 @@ namespace casadi {
     for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
       switch (it->op) {
       case OP_OUTPUT:
-        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        casadi_assert(it->data->segment()==0, "Not implemented");
         ex[it->data->ind()] = work[it->arg.front()];
         break;
       case OP_CONST:
@@ -1542,8 +1544,11 @@ namespace casadi {
   }
 
   MX MX::jacobian(const MX &f, const MX &x, const Dict& opts) {
-    Function temp("helper_jacobian_MX", {x}, {f});
-    return temp.get<MXFunction>()->jac(0, 0, opts);
+    // Propagate verbose option to helper function
+    Dict h_opts;
+    if (opts.count("verbose")) h_opts["verbose"] = opts.at("verbose");
+    Function h("helper_jacobian_MX", {x}, {f}, h_opts);
+    return h.get<MXFunction>()->jac(0, 0, opts);
   }
 
   MX MX::hessian(const MX& f, const MX& x) {
@@ -1688,7 +1693,7 @@ namespace casadi {
   }
 
   MX MX::solve(const MX& a, const MX& b, const std::string& lsolver, const Dict& dict) {
-    Linsol mysolver("tmp", lsolver, dict);
+    Linsol mysolver("tmp", lsolver, a.sparsity(), dict);
     return mysolver.solve(a, b, false);
   }
 

@@ -129,7 +129,7 @@ int main(){
   offset += nx;
 
   // Make sure that the size of the variable vector is consistent with the number of variables that we have referenced
-  casadi_assert(offset==NV);
+  casadi_assert(offset==NV, "");
 
   // Objective function
   MX J = 0;

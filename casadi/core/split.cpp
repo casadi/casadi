@@ -24,7 +24,7 @@
 
 
 #include "split.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "global_options.hpp"
 
 using namespace std;
@@ -105,7 +105,7 @@ namespace casadi {
           g << g.workel(res[i]) << " = ";
           if (dep(0).nnz()==1) {
             // rhs is also scalar
-            casadi_assert(nz_first==0);
+            casadi_assert_dev(nz_first==0);
             g << g.workel(arg[0]) << ";\n";
           } else {
             // rhs is an element in a vector
@@ -119,6 +119,14 @@ namespace casadi {
         }
       }
     }
+  }
+
+  Dict Split::info() const {
+    std::vector<MX> arg;
+    for (auto& sp : output_sparsity_)
+      arg.push_back(MX::sym("x", sp));
+    Function output("output", std::vector<MX>{}, arg);
+    return {{"offset", offset_}, {"output", output}};
   }
 
   Horzsplit::Horzsplit(const MX& x, const std::vector<int>& offset) : Split(x, offset) {
@@ -197,7 +205,7 @@ namespace casadi {
       offset_.push_back(offset_.back() + s.nnz());
     }
 
-    casadi_assert_message(offset_.back()==x.nnz(),
+    casadi_assert(offset_.back()==x.nnz(),
       "DiagSplit:: the presence of nonzeros outside the diagonal blocks in unsupported.");
   }
 

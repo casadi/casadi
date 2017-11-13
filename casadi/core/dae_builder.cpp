@@ -32,7 +32,7 @@
 #include <ctime>
 #include <cctype>
 
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "exception.hpp"
 #include "code_generator.hpp"
 #include "calculus.hpp"
@@ -317,13 +317,15 @@ namespace casadi {
     }
 
     // Make sure that the dimensions are consistent at this point
-    casadi_assert_warning(this->s.size()==this->dae.size(),
-                          "The number of differential-algebraic equations does not match "
-                          "the number of implicitly defined states.");
-    casadi_assert_warning(this->z.size()==this->alg.size(),
-                          "The number of algebraic equations (equations not involving "
-                          "differentiated variables) does not match the number of "
-                          "algebraic variables.");
+    if (this->s.size()!=this->dae.size()) {
+      casadi_warning("The number of differential-algebraic equations does not match "
+                     "the number of implicitly defined states.");
+    }
+    if (this->z.size()!=this->alg.size()) {
+      casadi_warning("The number of algebraic equations (equations not involving "
+                    "differentiated variables) does not match the number of "
+                    "algebraic variables.");
+    }
   }
 
   Variable& DaeBuilder::read_variable(const XmlNode& node) {
@@ -535,7 +537,7 @@ namespace casadi {
     for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
       if (it->second.nominal!=1) {
         Variable& v=it->second;
-        casadi_assert(v.nominal!=0);
+        casadi_assert_dev(v.nominal!=0);
         v.min /= v.nominal;
         v.max /= v.nominal;
         v.start /= v.nominal;
@@ -573,7 +575,7 @@ namespace casadi {
     for (int i=0; i<this->d.size(); ++i) this->ddef[i] = *it++ / nominal(this->d[i]);
     for (int i=0; i<this->y.size(); ++i) this->ydef[i] = *it++ / nominal(this->y[i]);
     for (int i=0; i<this->init.size(); ++i) this->init[i] = *it++;
-    casadi_assert(it==ex.end());
+    casadi_assert_dev(it==ex.end());
 
     // Nominal value is 1 after scaling
     for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
@@ -588,7 +590,7 @@ namespace casadi {
     // Find out which intermediates depends on which other
     Function f("tmp", {vertcat(this->d)}, {vertcat(this->d) - vertcat(this->ddef)});
     Sparsity sp = f.sparsity_jac(0, 0);
-    casadi_assert(sp.is_square());
+    casadi_assert_dev(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -619,7 +621,7 @@ namespace casadi {
     substitute_inplace(this->d, this->ddef, ex);
 
     // Make sure that the interdependencies have been properly eliminated
-    casadi_assert(!depends_on(vertcat(this->ddef), vertcat(this->d)));
+    casadi_assert_dev(!depends_on(vertcat(this->ddef), vertcat(this->d)));
   }
 
   void DaeBuilder::eliminate_d() {
@@ -649,7 +651,7 @@ namespace casadi {
     for (int i=0; i<this->q.size(); ++i) this->quad[i] = *it++;
     for (int i=0; i<this->y.size(); ++i) this->ydef[i] = *it++;
     for (int i=0; i<this->init.size(); ++i) this->init[i] = *it++;
-    casadi_assert(it==ex.end());
+    casadi_assert_dev(it==ex.end());
   }
 
   void DaeBuilder::scale_equations() {
@@ -663,7 +665,7 @@ namespace casadi {
     // Find out which differential equation depends on which differential state
     Function f("tmp", {vertcat(this->sdot)}, {vertcat(this->dae)});
     Sparsity sp = f.sparsity_jac(0, 0);
-    casadi_assert(sp.is_square());
+    casadi_assert_dev(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -691,7 +693,7 @@ namespace casadi {
     // Find out which algebraic equation depends on which algebraic state
     Function f("tmp", {vertcat(this->z)}, {vertcat(this->alg)});
     Sparsity sp = f.sparsity_jac(0, 0);
-    casadi_assert(sp.is_square());
+    casadi_assert_dev(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -726,7 +728,7 @@ namespace casadi {
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
     Sparsity sp = f.sparsity_jac(0, 0);
-    casadi_assert(sp.is_square());
+    casadi_assert_dev(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -768,7 +770,7 @@ namespace casadi {
 
       // If Jb depends on xb, then the state derivative does not enter linearly
       // in the ODE and we cannot solve for the state derivative
-      casadi_assert_message(!depends_on(Jb, vertcat(xdotb)),
+      casadi_assert(!depends_on(Jb, vertcat(xdotb)),
         "Cannot find an explicit expression for variable(s) " + str(xb));
 
       // Divide fb into a part which depends on vb and a part which doesn't according to
@@ -807,7 +809,7 @@ namespace casadi {
     // Get the sparsity of the Jacobian which can be used to determine which
     // variable can be calculated from which other
     Sparsity sp = f.sparsity_jac(0, 0);
-    casadi_assert(sp.is_square());
+    casadi_assert_dev(sp.is_square());
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
@@ -899,7 +901,7 @@ namespace casadi {
     eliminate_alg();
 
     // Error if still algebraic variables
-    casadi_assert_message(this->z.empty(), "Failed to eliminate algebraic variables");
+    casadi_assert(this->z.empty(), "Failed to eliminate algebraic variables");
   }
 
   const Variable& DaeBuilder::variable(const std::string& name) const {
@@ -1059,75 +1061,75 @@ namespace casadi {
 
   void DaeBuilder::sanity_check() const {
     // Time
-    casadi_assert_message(this->t.is_symbolic(), "Non-symbolic time t");
-    casadi_assert_message(this->t.is_scalar(), "Non-scalar time t");
+    casadi_assert(this->t.is_symbolic(), "Non-symbolic time t");
+    casadi_assert(this->t.is_scalar(), "Non-scalar time t");
 
     // Differential states
-    casadi_assert_message(this->x.size()==this->ode.size(),
+    casadi_assert(this->x.size()==this->ode.size(),
                           "x and ode have different lengths");
     for (int i=0; i<this->x.size(); ++i) {
-      casadi_assert_message(this->x[i].size()==this->ode[i].size(),
+      casadi_assert(this->x[i].size()==this->ode[i].size(),
                             "ode has wrong dimensions");
-      casadi_assert_message(this->x[i].is_symbolic(), "Non-symbolic state x");
+      casadi_assert(this->x[i].is_symbolic(), "Non-symbolic state x");
     }
 
     // DAE
-    casadi_assert_message(this->s.size()==this->sdot.size(),
+    casadi_assert(this->s.size()==this->sdot.size(),
                           "s and sdot have different lengths");
-    casadi_assert_message(this->s.size()==this->dae.size(),
+    casadi_assert(this->s.size()==this->dae.size(),
                           "s and dae have different lengths");
     for (int i=0; i<this->s.size(); ++i) {
-      casadi_assert_message(this->s[i].is_symbolic(), "Non-symbolic state s");
-      casadi_assert_message(this->s[i].size()==this->sdot[i].size(),
+      casadi_assert(this->s[i].is_symbolic(), "Non-symbolic state s");
+      casadi_assert(this->s[i].size()==this->sdot[i].size(),
                             "sdot has wrong dimensions");
-      casadi_assert_message(this->s[i].size()==this->dae[i].size(),
+      casadi_assert(this->s[i].size()==this->dae[i].size(),
                             "dae has wrong dimensions");
     }
 
     // Algebraic variables/equations
-    casadi_assert_message(this->z.size()==this->alg.size(),
+    casadi_assert(this->z.size()==this->alg.size(),
                           "z and alg have different lengths");
     for (int i=0; i<this->z.size(); ++i) {
-      casadi_assert_message(this->z[i].is_symbolic(), "Non-symbolic algebraic variable z");
-      casadi_assert_message(this->z[i].size()==this->alg[i].size(),
+      casadi_assert(this->z[i].is_symbolic(), "Non-symbolic algebraic variable z");
+      casadi_assert(this->z[i].size()==this->alg[i].size(),
                             "alg has wrong dimensions");
     }
 
     // Quadrature states/equations
-    casadi_assert_message(this->q.size()==this->quad.size(),
+    casadi_assert(this->q.size()==this->quad.size(),
                           "q and quad have different lengths");
     for (int i=0; i<this->q.size(); ++i) {
-      casadi_assert_message(this->q[i].is_symbolic(), "Non-symbolic quadrature state q");
-      casadi_assert_message(this->q[i].size()==this->quad[i].size(),
+      casadi_assert(this->q[i].is_symbolic(), "Non-symbolic quadrature state q");
+      casadi_assert(this->q[i].size()==this->quad[i].size(),
                             "quad has wrong dimensions");
     }
 
     // Intermediate variables
-    casadi_assert_message(this->d.size()==this->ddef.size(),
+    casadi_assert(this->d.size()==this->ddef.size(),
                           "d and ddef have different lengths");
     for (int i=0; i<this->d.size(); ++i) {
-      casadi_assert_message(this->d[i].is_symbolic(), "Non-symbolic dependent parameter d");
-      casadi_assert_message(this->d[i].size()==this->ddef[i].size(),
+      casadi_assert(this->d[i].is_symbolic(), "Non-symbolic dependent parameter d");
+      casadi_assert(this->d[i].size()==this->ddef[i].size(),
                             "ddef has wrong dimensions");
     }
 
     // Output equations
-    casadi_assert_message(this->y.size()==this->ydef.size(),
+    casadi_assert(this->y.size()==this->ydef.size(),
                           "y and ydef have different lengths");
     for (int i=0; i<this->y.size(); ++i) {
-      casadi_assert_message(this->y[i].is_symbolic(), "Non-symbolic output y");
-      casadi_assert_message(this->y[i].size()==this->ydef[i].size(),
+      casadi_assert(this->y[i].is_symbolic(), "Non-symbolic output y");
+      casadi_assert(this->y[i].size()==this->ydef[i].size(),
                             "ydef has wrong dimensions");
     }
 
     // Control
     for (int i=0; i<this->u.size(); ++i) {
-      casadi_assert_message(this->u[i].is_symbolic(), "Non-symbolic control u");
+      casadi_assert(this->u[i].is_symbolic(), "Non-symbolic control u");
     }
 
     // Parameter
     for (int i=0; i<this->p.size(); ++i) {
-      casadi_assert_message(this->p[i].is_symbolic(), "Non-symbolic parameter p");
+      casadi_assert(this->p[i].is_symbolic(), "Non-symbolic parameter p");
     }
   }
 
@@ -1163,7 +1165,7 @@ namespace casadi {
   }
 
   MX DaeBuilder::der(const MX& var) const {
-    casadi_assert(var.is_column() && var.is_symbolic());
+    casadi_assert_dev(var.is_column() && var.is_symbolic());
     MX ret = MX::zeros(var.sparsity());
     for (int i=0; i<ret.nnz(); ++i) {
       ret.nz(i) = der(var.nz(i).name());
@@ -1183,7 +1185,7 @@ namespace casadi {
 
     // Number of s
     int ns = f.nnz_in(0);
-    casadi_assert(f.nnz_out(0)==ns);
+    casadi_assert_dev(f.nnz_out(0)==ns);
 
     // Input/output buffers
     vector<bvec_t> f_sdot(ns, 1);
@@ -1198,7 +1200,7 @@ namespace casadi {
       if (f_dae[i]==bvec_t(1)) {
         new_dae.push_back(this->dae[i]);
       } else {
-        casadi_assert(f_dae[i]==bvec_t(0));
+        casadi_assert_dev(f_dae[i]==bvec_t(0));
         new_alg.push_back(this->dae[i]);
       }
     }
@@ -1217,13 +1219,13 @@ namespace casadi {
         new_s.push_back(this->s[i]);
         new_sdot.push_back(this->sdot[i]);
       } else {
-        casadi_assert(f_sdot[i]==bvec_t(0));
+        casadi_assert_dev(f_sdot[i]==bvec_t(0));
         new_z.push_back(this->s[i]);
       }
     }
 
     // Make sure split was successful
-    casadi_assert(new_dae.size()==new_s.size());
+    casadi_assert_dev(new_dae.size()==new_s.size());
 
     // Divide up the s and dae
     this->dae = new_dae;
@@ -1238,7 +1240,7 @@ namespace casadi {
   }
 
   std::string DaeBuilder::unit(const MX& var) const {
-    casadi_assert_message(!var.is_column() && var.is_valid_input(),
+    casadi_assert(!var.is_column() && var.is_valid_input(),
                           "DaeBuilder::unit: Argument must be a symbolic vector");
     if (var.is_empty()) {
       return "n/a";
@@ -1246,7 +1248,7 @@ namespace casadi {
       std::vector<MX> prim = var.primitives();
       string ret = unit(prim.at(0).name());
       for (int i=1; i<prim.size(); ++i) {
-        casadi_assert_message(ret == unit(prim.at(i).name()),
+        casadi_assert(ret == unit(prim.at(i).name()),
                               "DaeBuilder::unit: Argument has mixed units");
       }
       return ret;
@@ -1266,47 +1268,47 @@ namespace casadi {
   }
 
   std::vector<double> DaeBuilder::nominal(const MX& var) const {
-    casadi_assert_message(var.is_column() && var.is_valid_input(),
+    casadi_assert(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::nominal: Argument must be a symbolic vector");
     std::vector<double> ret(var.nnz());
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
-      casadi_assert(prim[i].nnz()==1);
+      casadi_assert_dev(prim[i].nnz()==1);
       ret[i] = nominal(prim.at(i).name());
     }
     return ret;
   }
 
   void DaeBuilder::set_nominal(const MX& var, const std::vector<double>& val) {
-    casadi_assert_message(var.is_column() && var.is_valid_input(),
+    casadi_assert(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::nominal: Argument must be a symbolic vector");
-    casadi_assert_message(var.nnz()==var.nnz(), "DaeBuilder::nominal: Dimension mismatch");
+    casadi_assert(var.nnz()==var.nnz(), "DaeBuilder::nominal: Dimension mismatch");
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
-      casadi_assert(prim[i].nnz()==1);
+      casadi_assert_dev(prim[i].nnz()==1);
       set_nominal(prim.at(i).name(), val.at(i));
     }
   }
 
   std::vector<double> DaeBuilder::attribute(getAtt f, const MX& var, bool normalized) const {
-    casadi_assert_message(var.is_column() && var.is_valid_input(),
+    casadi_assert(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::attribute: Argument must be a symbolic vector");
     std::vector<double> ret(var.nnz());
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
-      casadi_assert(prim[i].nnz()==1);
+      casadi_assert_dev(prim[i].nnz()==1);
       ret[i] = (this->*f)(prim[i].name(), normalized);
     }
     return ret;
   }
 
   MX DaeBuilder::attribute(getAttS f, const MX& var) const {
-    casadi_assert_message(var.is_column() && var.is_valid_input(),
+    casadi_assert(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::attribute: Argument must be a symbolic vector");
     MX ret = MX::zeros(var.sparsity());
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
-      casadi_assert(prim[i].nnz()==1);
+      casadi_assert_dev(prim[i].nnz()==1);
       ret.nz(i) = (this->*f)(prim[i].name());
     }
     return ret;
@@ -1314,24 +1316,24 @@ namespace casadi {
 
   void DaeBuilder::set_attribute(setAtt f, const MX& var, const std::vector<double>& val,
                                  bool normalized) {
-    casadi_assert_message(var.is_column() && var.is_valid_input(),
+    casadi_assert(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::set_attribute: Argument must be a symbolic vector");
-    casadi_assert_message(var.nnz()==val.size(), "DaeBuilder::set_attribute: Dimension mismatch");
+    casadi_assert(var.nnz()==val.size(), "DaeBuilder::set_attribute: Dimension mismatch");
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
-      casadi_assert(prim[i].nnz()==1);
+      casadi_assert_dev(prim[i].nnz()==1);
       (this->*f)(prim[i].name(), val[i], normalized);
     }
   }
 
   void DaeBuilder::set_attribute(setAttS f, const MX& var, const MX& val) {
-    casadi_assert_message(var.is_column() && var.is_valid_input(),
+    casadi_assert(var.is_column() && var.is_valid_input(),
                           "DaeBuilder::set_attribute: Argument must be a symbolic vector");
-    casadi_assert_message(var.sparsity()==val.sparsity(),
+    casadi_assert(var.sparsity()==val.sparsity(),
                           "DaeBuilder::set_attribute: Sparsity mismatch");
     std::vector<MX> prim = var.primitives();
     for (int i=0; i<prim.size(); ++i) {
-      casadi_assert(prim[i].nnz()==1);
+      casadi_assert_dev(prim[i].nnz()==1);
       (this->*f)(var.nz(i).name(), val.nz(i));
     }
   }
@@ -1615,15 +1617,15 @@ namespace casadi {
     sanity_check();
 
     // Make sure name is valid
-    casadi_assert_message(!name.empty(), "DaeBuilder::add_lc: \"name\" is empty");
+    casadi_assert(!name.empty(), "DaeBuilder::add_lc: \"name\" is empty");
     for (string::const_iterator i=name.begin(); i!=name.end(); ++i) {
-      casadi_assert_message(isalnum(*i),
+      casadi_assert(isalnum(*i),
                             "DaeBuilder::add_lc: \"name\" must be alphanumeric");
     }
 
     // Get a reference to the expression
     MX& ret = lin_comb_[name];
-    casadi_assert_warning(ret.is_empty(), "DaeBuilder::add_lc: Overwriting " << name);
+    if (!ret.is_empty()) casadi_warning("DaeBuilder::add_lc: Overwriting " << name);
     ret = 0;
 
     // Get indices of outputs
@@ -1631,10 +1633,10 @@ namespace casadi {
     std::vector<bool> in_use(DAE_BUILDER_NUM_OUT, false);
     for (int i=0; i<f_out.size(); ++i) {
       DaeBuilderOut oind = enum_out(f_out[i]);
-      casadi_assert_message(oind!=DAE_BUILDER_NUM_OUT,
+      casadi_assert(oind!=DAE_BUILDER_NUM_OUT,
         "DaeBuilder::add_lc: No output expression " + f_out[i] + ". "
         "Valid expressions are " + name_out());
-      casadi_assert_message(!in_use[oind],
+      casadi_assert(!in_use[oind],
         "DaeBuilder::add_lc: Duplicate expression " + f_out[i]);
       in_use[oind] = true;
 
@@ -1660,7 +1662,7 @@ namespace casadi {
       // Primal variable
       DaeBuilderIn iind = enum_in(*s_in_it);
       if (iind!=DAE_BUILDER_NUM_IN) {
-        casadi_assert_message(!input_used[iind],
+        casadi_assert(!input_used[iind],
           "DaeBuilder::function: Duplicate expression " + *s_in_it);
         input_used[iind] = true;
         ret_in[s_in_it-s_in.begin()] = vertcat(input(iind));
@@ -1671,7 +1673,7 @@ namespace casadi {
       if (s_in_it->size()>4 && s_in_it->substr(0, 4)=="lam_") {
         DaeBuilderOut oind = enum_out(s_in_it->substr(4, string::npos));
         if (oind!=DAE_BUILDER_NUM_OUT) {
-          casadi_assert_message(!output_used[oind],
+          casadi_assert(!output_used[oind],
             "DaeBuilder::function: Duplicate expression " + *s_in_it);
           output_used[oind] = true;
           ret_in[s_in_it-s_in.begin()] = vertcat(multiplier(oind));
@@ -1743,7 +1745,7 @@ namespace casadi {
     for (int i=0; i<s_out_noatt.size(); ++i) {
       DaeBuilderOut oind = enum_out(s_out_noatt[i]);
       if (oind!=DAE_BUILDER_NUM_OUT) {
-        casadi_assert_message(!output_used[oind],
+        casadi_assert(!output_used[oind],
           "DaeBuilder::function: Duplicate expression " + s_out_noatt[i]);
         output_used[oind] = true;
         ret_out[i] = vertcat(output(oind));
@@ -1790,7 +1792,7 @@ namespace casadi {
       if (iind==DAE_BUILDER_NUM_IN) continue;
 
       // Check if duplicate
-      casadi_assert_message(wanted[oind][iind]==-1,
+      casadi_assert(wanted[oind][iind]==-1,
         "DaeBuilder::function: Duplicate Jacobian " + so);
       wanted[oind][iind] = i;
     }
@@ -1883,7 +1885,7 @@ namespace casadi {
         if (iind2==DAE_BUILDER_NUM_IN) continue;
 
         // Check if duplicate
-        casadi_assert_message(wanted[iind1][iind2]==-1,
+        casadi_assert(wanted[iind1][iind2]==-1,
           "DaeBuilder::function: Duplicate Hessian " + so);
         wanted[iind1][iind2] = i;
       }
@@ -1974,7 +1976,7 @@ namespace casadi {
   }
 
   Function DaeBuilder::add_fun(const Function& f) {
-    casadi_assert_message(!has_fun(f.name()), "Function '" + f.name() + "' already exists");
+    casadi_assert(!has_fun(f.name()), "Function '" + f.name() + "' already exists");
     fun_.push_back(f);
     return f;
   }
@@ -1983,7 +1985,7 @@ namespace casadi {
                                const std::vector<std::string>& arg,
                                const std::vector<std::string>& res,
                                const Dict& opts) {
-    casadi_assert_message(!has_fun(name), "Function '" + name + "' already exists");
+    casadi_assert(!has_fun(name), "Function '" + name + "' already exists");
 
     // Get inputs
     vector<MX> arg_ex, res_ex;
@@ -1997,7 +1999,7 @@ namespace casadi {
           break;
         }
       }
-      casadi_assert_message(d_ind<this->d.size(), "Cannot find dependent '" + s + "'");
+      casadi_assert(d_ind<this->d.size(), "Cannot find dependent '" + s + "'");
     }
     Function ret(name, arg_ex, res_ex, arg, res, opts);
     return add_fun(ret);
@@ -2005,7 +2007,7 @@ namespace casadi {
 
   Function DaeBuilder::add_fun(const std::string& name, const Importer& compiler,
                                const Dict& opts) {
-    casadi_assert_message(!has_fun(name), "Function '" + name + "' already exists");
+    casadi_assert(!has_fun(name), "Function '" + name + "' already exists");
     return add_fun(external(name, compiler, opts));
   }
 
@@ -2017,7 +2019,7 @@ namespace casadi {
   }
 
   Function DaeBuilder::fun(const std::string& name) const {
-    casadi_assert_message(has_fun(name), "No such function: '" + name + "'");
+    casadi_assert(has_fun(name), "No such function: '" + name + "'");
     for (const Function& f : fun_) {
       if (f.name()==name) return f;
     }

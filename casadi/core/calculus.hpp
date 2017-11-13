@@ -31,7 +31,7 @@
 #include <cmath>
 #include <limits>
 #include <algorithm>
-#include "casadi_types.hpp"
+#include "casadi_common.hpp"
 
 // Define pi if the compiler fails to do so
 
@@ -171,6 +171,9 @@ namespace casadi {
     // Norms
     OP_NORM2, OP_NORM1, OP_NORMINF, OP_NORMF,
 
+    // min/max
+    OP_MMIN, OP_MMAX,
+
     // Horizontal repeat
     OP_HORZREPMAT,
 
@@ -279,6 +282,7 @@ namespace casadi {
 
   /// Conditional assignment
   inline double if_else_zero(double x, double y) { return x ? y : 0;}
+  inline double if_else(double x, double y, double z) { return x ? y : z;}
 #ifdef HAS_ERFINV
   using ::erfinv;
 #else // HAS ERFINV
@@ -1034,6 +1038,8 @@ namespace casadi {
     case OP_NORM1:         return F<OP_NORM1>::check;
     case OP_NORMINF:       return F<OP_NORMINF>::check;
     case OP_NORMF:         return F<OP_NORMF>::check;
+    case OP_MMIN:          return F<OP_MMIN>::check;
+    case OP_MMAX:          return F<OP_MMAX>::check;
     case OP_HORZREPMAT:    return F<OP_HORZREPMAT>::check;
     case OP_HORZREPSUM:    return F<OP_HORZREPSUM>::check;
     case OP_ERFINV:        return F<OP_ERFINV>::check;
@@ -1406,14 +1412,14 @@ namespace casadi {
   inline std::string
   casadi_math<T>::print(unsigned char op,
                         const std::string& x, const std::string& y) {
-    casadi_assert(ndeps(op)==2);
+    casadi_assert_dev(ndeps(op)==2);
     return pre(op) + x + sep(op) + y + post(op);
   }
 
   template<typename T>
   inline std::string
   casadi_math<T>::print(unsigned char op, const std::string& x) {
-    casadi_assert(ndeps(op)==1);
+    casadi_assert_dev(ndeps(op)==1);
     return pre(op) + x + post(op);
   }
 

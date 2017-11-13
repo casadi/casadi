@@ -27,7 +27,7 @@
 #define CASADI_GENERIC_TYPE_INTERNAL_HPP
 
 #include "generic_type.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "shared_object_internal.hpp"
 
 /// \cond INTERNAL

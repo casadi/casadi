@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   void conic_debug(const Function& f, std::ostream &file) {
-    casadi_assert(!f.is_null());
+    casadi_assert_dev(!f.is_null());
     const Conic* n = f.get<Conic>();
     return n->generateNativeCode(file);
   }
@@ -141,13 +141,13 @@ namespace casadi {
     if (g.is_empty()) g = M(0, 1);
 
     // Dimension checks
-    casadi_assert_message(g.is_dense() && g.is_vector(),
+    casadi_assert(g.is_dense() && g.is_vector(),
       "Expected a dense vector 'g', but got " + g.dim() + ".");
 
-    casadi_assert_message(f.is_dense() && f.is_scalar(),
+    casadi_assert(f.is_dense() && f.is_scalar(),
       "Expected a dense scalar 'f', but got " + f.dim() + ".");
 
-    casadi_assert_message(x.is_dense() && x.is_vector(),
+    casadi_assert(x.is_dense() && x.is_vector(),
       "Expected a dense vector 'x', but got " + x.dim() + ".");
 
     if (g.is_empty(true)) g = M(0, 1); // workaround
@@ -171,7 +171,7 @@ namespace casadi {
     Function prob(name + "_qp", {x, p}, {H, c, A, b});
 
     // Make sure that the problem is sound
-    casadi_assert_message(!prob.has_free(), "Cannot create '" + prob.name() + "' "
+    casadi_assert(!prob.has_free(), "Cannot create '" + prob.name() + "' "
                           "since " + str(prob.get_free()) + " are free.");
 
     // Create the QP solver
@@ -246,7 +246,7 @@ namespace casadi {
     }
 
     // We need either A or H
-    casadi_assert_message(!A_.is_null() || !H_.is_null(),
+    casadi_assert(!A_.is_null() || !H_.is_null(),
       "Cannot determine dimension");
 
     // Generate A or H
@@ -256,14 +256,14 @@ namespace casadi {
       H_ = Sparsity(A_.size2(), A_.size2());
     } else {
       // Consistency check
-      casadi_assert_message(A_.size2()==H_.size2(),
+      casadi_assert(A_.size2()==H_.size2(),
         "Got incompatible dimensions.\n"
         "min x'Hx + G'x s.t. LBA <= Ax <= UBA :\n"
         "H: " + H_.dim() + " - A: " + A_.dim() + "\n"
         "We need: H.size2()==A.size2()");
     }
 
-    casadi_assert_message(H_.is_symmetric(),
+    casadi_assert(H_.is_symmetric(),
       "Got incompatible dimensions. min x'Hx + G'x\n"
       "H: " + H_.dim() +
       "We need H square & symmetric");
@@ -330,9 +330,9 @@ namespace casadi {
 
     // Check options
     if (!discrete_.empty()) {
-      casadi_assert_message(discrete_.size()==nx_, "\"discrete\" option has wrong length");
+      casadi_assert(discrete_.size()==nx_, "\"discrete\" option has wrong length");
       if (std::find(discrete_.begin(), discrete_.end(), true)!=discrete_.end()) {
-        casadi_assert_message(integer_support(),
+        casadi_assert(integer_support(),
                               "Discrete variables require a solver with integer support");
       }
     }
@@ -345,14 +345,14 @@ namespace casadi {
                           const double* lba, const double* uba) const {
     for (int i=0; i<nx_; ++i) {
       double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;
-      casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
+      casadi_assert(lb <= ub && lb!=inf && ub!=-inf,
         "Ill-posed problem detected: "
         "LBX[" + str(i) + "] <= UBX[" + str(i) + "] was violated. "
         "Got LBX[" + str(i) + "]=" + str(lb) + " and UBX[" + str(i) + "] = " + str(ub) + ".");
     }
     for (int i=0; i<na_; ++i) {
       double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
-      casadi_assert_message(lb <= ub && lb!=inf && ub!=-inf,
+      casadi_assert(lb <= ub && lb!=inf && ub!=-inf,
         "Ill-posed problem detected: "
         "LBA[" + str(i) + "] <= UBA[" + str(i) + "] was violated. "
         "Got LBA[" + str(i) + "] = " + str(lb) + " and UBA[" + str(i) + "] = " + str(ub) + ".");
@@ -381,42 +381,28 @@ namespace casadi {
   }
 
   void Conic::print_fstats(const ConicMemory* m) const {
-
-    size_t maxNameLen=0;
-
-    // Retrieve all qp keys
-    std::vector<std::string> keys;
+    // Length of the name being printed
+    size_t name_len=0;
     for (auto &&s : m->fstats) {
-      maxNameLen = max(s.first.size(), maxNameLen);
-      keys.push_back(s.first);
+      name_len = max(s.first.size(), name_len);
     }
+
+    // Print name with a given length. Format: "%NNs "
+    char namefmt[10];
+    sprint(namefmt, sizeof(namefmt), "%%%ds ", static_cast<int>(name_len));
 
     // Print header
-    std::stringstream s;
-    std::string blankName(maxNameLen, ' ');
-    s
-      << blankName
-      << "      proc           wall      num           mean             mean"
-      << endl << blankName
-      << "      time           time     evals       proc time        wall time";
-    userOut() << s.str() << endl;
+    print(namefmt, "");
+    print("%12s %12s %9s\n", "t_proc [s]", "t_wall [s]", "n_eval");
 
-    std::sort(keys.begin(), keys.end());
-    for (auto k : keys) {
-      const FStats& fs = m->fstats.at(k);
-      print_stats_line(maxNameLen, k, fs.n_call, fs.t_proc, fs.t_wall);
+    // Print keys
+    for (auto &&s : m->fstats) {
+      const FStats& fs = m->fstats.at(s.first);
+      if (fs.n_call!=0) {
+        print(namefmt, s.first.c_str());
+        print("%12.3g %12.3g %9d\n", fs.t_proc, fs.t_wall, fs.n_call);
+      }
     }
-
-    // Sum the previously printed stats
-    double t_wall_all_previous = 0;
-    double t_proc_all_previous = 0;
-    for (auto k : keys) {
-      const FStats& fs = m->fstats.at(k);
-      t_proc_all_previous += fs.t_proc;
-      t_wall_all_previous += fs.t_wall;
-    }
-    print_stats_line(maxNameLen, "all previous", -1, t_proc_all_previous, t_wall_all_previous);
-
   }
 
   std::vector<std::string> conic_options(const std::string& name) {

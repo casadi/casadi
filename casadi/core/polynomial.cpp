@@ -24,7 +24,7 @@
 
 
 #include "polynomial.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include <sstream>
 
 using namespace std;
@@ -75,7 +75,7 @@ namespace casadi {
   }
 
   Polynomial::casadi_real Polynomial::scalar() const {
-    casadi_assert(degree()==0);
+    casadi_assert_dev(degree()==0);
     return p_.front();
   }
 

@@ -50,7 +50,7 @@ p = vertcat(x,y)
 q = vertcat(u,v)
 
 # System dynamics
-F = -k*(p-q) - beta*v*sqrt(sum_square(vel) + c**2)
+F = -k*(p-q) - beta*v*sqrt(sumsqr(vel) + c**2)
 
 # System right hand side
 rhs = struct_SX(states)

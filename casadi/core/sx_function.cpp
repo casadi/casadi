@@ -30,9 +30,9 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "sx_node.hpp"
-#include "casadi_types.hpp"
+#include "casadi_common.hpp"
 #include "sparsity_internal.hpp"
 #include "global_options.hpp"
 #include "casadi_interrupt.hpp"
@@ -48,7 +48,7 @@ namespace casadi {
                          const vector<std::string>& name_in,
                          const vector<std::string>& name_out)
     : XFunction<SXFunction, SX, SXNode>(name, inputv, outputv, name_in, name_out) {
-    casadi_assert(!out_.empty()); // NOTE: Remove?
+    casadi_assert_dev(!out_.empty()); // NOTE: Remove?
 
     // Default (persistent) options
     just_in_time_opencl_ = false;
@@ -233,7 +233,7 @@ namespace casadi {
     if (default_in_.empty()) {
       default_in_.resize(n_in_, 0);
     } else {
-      casadi_assert_message(default_in_.size()==n_in_,
+      casadi_assert(default_in_.size()==n_in_,
                             "Option 'default_in' has incorrect length");
     }
 
@@ -539,7 +539,7 @@ namespace casadi {
 
     // Make sure seeds have matching sparsity patterns
     for (auto it=fseed.begin(); it!=fseed.end(); ++it) {
-      casadi_assert(it->size()==n_in_);
+      casadi_assert_dev(it->size()==n_in_);
       for (int i=0; i<n_in_; ++i) {
         if (it->at(i).sparsity()!=sparsity_in_[i]) {
           // Correct sparsity
@@ -633,7 +633,7 @@ namespace casadi {
     // Make sure matching sparsity of fseed
     bool matching_sparsity = true;
     for (int d=0; d<nadj; ++d) {
-      casadi_assert(aseed[d].size()==n_out_);
+      casadi_assert_dev(aseed[d].size()==n_out_);
       for (int i=0; matching_sparsity && i<n_out_; ++i)
         matching_sparsity = aseed[d][i].sparsity()==sparsity_out_[i];
     }
@@ -809,6 +809,102 @@ namespace casadi {
   bool SXFunction::is_a(const std::string& type, bool recursive) const {
     return type=="SXFunction" || (recursive && XFunction<SXFunction,
                                   SX, SXNode>::is_a(type, recursive));
+  }
+
+  void SXFunction::export_code_body(const std::string& lang,
+      std::ostream &ss, const Dict& options) const {
+
+    // Default values for options
+    int indent_level = 0;
+
+    // Read options
+    for (auto&& op : options) {
+      if (op.first=="indent_level") {
+        indent_level = op.second;
+      } else {
+        casadi_error("Unknown option '" + op.first + "'.");
+      }
+    }
+
+    // Construct indent string
+    std::string indent = "";
+    for (int i=0;i<indent_level;++i) {
+      indent += "  ";
+    }
+
+    // Non-cell aliases for inputs
+    for (int i=0;i<n_in_;++i) {
+      ss << indent << "argin_" << i <<  " = nonzeros_gen(varargin{" << i+1 << "});" << std::endl;
+    }
+
+    Function f = shared_from_this<Function>();
+
+    for (int k=0;k<f.n_instructions();++k) {
+      // Get operation
+      int op = f.instruction_id(k);
+      // Get input positions into workvector
+      std::vector<int> o = f.instruction_output(k);
+      // Get output positions into workvector
+      std::vector<int> i = f.instruction_input(k);
+      switch (op) {
+        case OP_INPUT:
+          {
+            ss << indent << "w" << o[0] << " = " << "argin_" << i[0] << "(" << i[1]+1 << ");";
+            ss << std::endl;
+          }
+          break;
+        case OP_OUTPUT:
+          {
+            ss << indent << "argout_" << o[0] << "{" << o[1]+1 << "} = w" << i[0] << ";";
+            ss << std::endl;
+          }
+          break;
+        case OP_CONST:
+          {
+            std::ios_base::fmtflags fmtfl = ss.flags();
+            ss << indent << "w" << o[0] << " = ";
+            ss << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+            ss << f.instruction_constant(k) << ";" << std::endl;
+            ss.flags(fmtfl);
+          }
+          break;
+        case OP_SQ:
+          {
+            ss << indent << "w" << o[0] << " = " << "w" << i[0] << "^2;" << std::endl;
+          }
+          break;
+        case OP_FABS:
+          {
+            ss << indent << "w" << o[0] << " = abs(" << "w" << i[0] << ");" << std::endl;
+          }
+          break;
+        case OP_NOT:
+          ss << indent << "w" << o[0] << " = ~" << "w" << i[0] << ";" << std::endl;
+          break;
+        case OP_OR:
+          ss << indent << "w" << o[0] << " = w" << i[0] << " | w" << i[1] << ";" << std::endl;
+          break;
+        case OP_AND:
+          ss << indent << "w" << o[0] << " = w" << i[0] << " & w" << i[1] << ";" << std::endl;
+          break;
+        case OP_NE:
+          ss << indent << "w" << o[0] << " = w" << i[0] << " ~= w" << i[1] << ";" << std::endl;
+          break;
+        case OP_IF_ELSE_ZERO:
+          ss << indent << "w" << o[0] << " = ";
+          ss << "if_else_zero_gen(w" << i[0] << ", w" << i[1] << ");" << std::endl;
+          break;
+        default:
+          if (casadi::casadi_math<double>::ndeps(op)==2) {
+            ss << indent << "w" << o[0] << " = " << casadi::casadi_math<double>::print(op,
+              "w"+std::to_string(i[0]), "w"+std::to_string(i[1])) << ";" << std::endl;
+          } else {
+            ss << indent << "w" << o[0] << " = " << casadi::casadi_math<double>::print(op,
+              "w"+std::to_string(i[0])) << ";" << std::endl;
+          }
+      }
+    }
+
   }
 
 } // namespace casadi

@@ -7,7 +7,7 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}/runtime")
 set(CASADI_PUBLIC
   # MISC
   casadi_limits.hpp
-  casadi_types.hpp
+  casadi_common.hpp
   casadi_logger.hpp
   casadi_interrupt.hpp
   exception.hpp
@@ -18,7 +18,7 @@ set(CASADI_PUBLIC
   shared_object.hpp           # This base class implements the reference counting (garbage collection) framework used in CasADi
   generic_type.hpp            # Generic type used for options and for compatibility with dynamically typed languages like Python
   options.hpp                 # Functionality for passing options to a class
-  std_vector_tools.hpp        # Set of useful functions for the vector template class in STL
+  casadi_misc.hpp             # Set of useful functions
   timing.hpp
   polynomial.hpp              # Helper class for differentiating and integrating simple polynomials
 
@@ -78,7 +78,7 @@ set(CASADI_INTERNAL
   generic_type.cpp
   generic_type_internal.hpp
   options.cpp
-  std_vector_tools.cpp
+  casadi_misc.cpp
   timing.cpp
   polynomial.cpp
 
@@ -111,6 +111,7 @@ set(CASADI_INTERNAL
   casadi_call.hpp         casadi_call.cpp         # Function call
   casadi_find.hpp         casadi_find.cpp         # Find first nonzero
   norm.hpp                norm.cpp                # 1-norm, 2-norm and infinity-norm
+  mmin.hpp                mmin.cpp                # Matrix minimum
   transpose.hpp           transpose.cpp           # Transpose
   concat.hpp              concat.cpp              # Concatenation
   split.hpp               split.cpp               # Split (inverse of concatenation)
@@ -142,7 +143,8 @@ set(CASADI_INTERNAL
   x_function.hpp                                           # Base class for SXFunction and MXFunction
   sx_function.hpp         sx_function.cpp
   mx_function.hpp         mx_function.cpp
-  external.cpp
+  external_impl.hpp       external.cpp
+  jit_function.hpp        jit_function.cpp
   linsol.cpp              linsol_internal.hpp  linsol_internal.cpp
   rootfinder_impl.hpp     rootfinder.cpp
   integrator_impl.hpp     integrator.cpp

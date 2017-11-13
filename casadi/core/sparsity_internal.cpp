@@ -24,7 +24,7 @@
 
 
 #include "sparsity_internal.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include <climits>
 #include <cstdlib>
 #include <cmath>
@@ -68,19 +68,19 @@ namespace casadi {
     const int* colind = this->colind();
     const int* row = this->row();
     int nnz = this->nnz();
-    casadi_assert_message(nrow >=0,
+    casadi_assert(nrow >=0,
                           "number of rows must be positive, but got " + str(nrow) + ".");
-    casadi_assert_message(ncol>=0 ,
+    casadi_assert(ncol>=0 ,
                           "number of columns must be positive, but got " + str(ncol) + ".");
     if (complete) {
 
       for (int k=0; k<ncol; k++) {
-        casadi_assert_message(colind[k+1]>=colind[k],
+        casadi_assert(colind[k+1]>=colind[k],
                               "Compressed Column Storage is not sane. "
                               "colind must be monotone.");
       }
 
-      casadi_assert_message(colind[0]==0,
+      casadi_assert(colind[0]==0,
                             "Compressed Column Storage is not sane. "
                             "First element of colind must be zero.");
 
@@ -129,57 +129,6 @@ namespace casadi {
 
     // Create the sparsity pattern
     return Sparsity::triplet(size2(), size1(), trans_row, trans_col, mapping, invert_mapping);
-  }
-
-  std::vector<int> SparsityInternal::etree(bool ata) const {
-    const int* colind = this->colind();
-    const int* row = this->row();
-
-    // Allocate result
-    vector<int> parent(size2());
-
-    // Allocate workspace
-    vector<int> ancestor(size2());
-    vector<int> prev(ata ? size1() : 0, -1);
-
-    // Loop over columns
-    for (int k=0; k<size2(); ++k) {
-      // Start with no parent or ancestor
-      parent[k] = -1;
-      ancestor[k] = -1;
-
-      // Loop over nonzeros
-      for (int p=colind[k]; p<colind[k+1]; ++p) {
-
-        // What is this?
-        int i=ata ? (prev[row[p]]) : (row[p]);
-
-        // Transverse from i to k
-        while (i!=-1 && i<k) {
-
-          // Next i is the ancestor of i
-          int inext = ancestor[i];
-
-          // Path compression
-          ancestor[i] = k;
-
-          // No ancestor, parent is k
-          if (inext==-1)
-            parent[i] = k;
-
-          // Update i
-          i=inext;
-        }
-
-        // What is this?
-        if (ata) {
-          prev[row[p]] = k;
-        }
-      }
-    }
-
-    return parent;
-
   }
 
   int SparsityInternal::dfs(int j, int top, std::vector<int>& xi,
@@ -844,305 +793,6 @@ namespace casadi {
     return nz ;
   }
 
-  int SparsityInternal::leaf(int i, int j, const int *first, int *maxfirst, int *prevleaf,
-                             int *ancestor, int *jleaf) {
-    int q, s, sparent, jprev ;
-    if (!first || !maxfirst || !prevleaf || !ancestor || !jleaf) return (-1) ;
-    *jleaf = 0 ;
-    if (i <= j || first[j] <= maxfirst[i]) return (-1) ;  /* j not a leaf */
-    maxfirst[i] = first[j] ;      /* update max first[j] seen so far */
-    jprev = prevleaf[i] ;          /* jprev = previous leaf of ith subtree */
-    prevleaf[i] = j ;
-    *jleaf = (jprev == -1) ? 1: 2 ; /* j is first or subsequent leaf */
-    if (*jleaf == 1) return (i) ;   /* if 1st leaf, q = root of ith subtree */
-    for (q = jprev ; q != ancestor[q] ; q = ancestor[q]) ;
-    for (s = jprev ; s != q ; s = sparent) {
-        sparent = ancestor[s] ;    /* path compression */
-        ancestor[s] = q ;
-    }
-    return (q) ;                    /* q = least common ancester (jprev, j) */
-  }
-
-  int SparsityInternal::vcount(std::vector<int>& pinv,
-                               std::vector<int>& parent,
-                               std::vector<int>& leftmost,
-                               int& S_m2, double& S_lnz) const {
-    int i, k, p, pa;
-    int n = size2(), m = size1();
-    const int* Ap = colind();
-    const int* Ai = row();
-
-    // allocate pinv
-    pinv.resize(m+n);
-    fill(pinv.begin(), pinv.end(), 0);
-
-    // and leftmost
-    leftmost.resize(m);
-
-    // get workspace
-    vector<int> w(m+3*n);
-
-    int *next = &w.front();
-    int *head = &w.front() + m;
-    int *tail = &w.front() + m + n;
-    int *nque = &w.front() + m + 2*n;
-
-    // queue k is empty
-    for (k = 0 ; k < n ; k++)
-      head[k] = -1;
-
-    for (k=0; k<n; ++k)
-      tail[k] = -1;
-
-    for (k=0; k<n; ++k)
-      nque[k] = 0;
-
-    for (i=0; i<m; ++i)
-      leftmost[i] = -1;
-
-    for (k=n-1; k>=0; --k) {
-      for (p=Ap[k]; p<Ap[k+1]; ++p) {
-        // leftmost[i] = min(find(A(i, :)))
-        leftmost[Ai[p]] = k;
-      }
-    }
-
-    // scan columns in reverse order
-    for (i = m-1; i >= 0; i--) {
-      // col i is not yet ordered
-      pinv[i] = -1;
-      k = leftmost[i] ;
-
-      // col i is empty
-      if (k == -1) continue;
-
-      // first col in queue k
-      if (nque[k]++ == 0)
-        tail[k] = i;
-
-      // put i at head of queue k
-      next[i] = head[k];
-      head[k] = i;
-    }
-    S_lnz = 0;
-    S_m2 = m;
-
-    // find col permutation and nnz(V)
-    for (k=0; k<n; ++k) {
-      // remove col i from queue k
-      i = head[k];
-
-      // count V(k, k) as nonzero
-      S_lnz++;
-
-      // add a fictitious col
-      if (i < 0)
-        i = S_m2++;
-
-      // associate col i with V(:, k)
-      pinv[i] = k;
-
-      // skip if V(k+1:m, k) is empty
-      if (--nque[k] <= 0) continue;
-
-      // nque [k] is nnz (V(k+1:m, k))
-      S_lnz += nque[k];
-
-      // move all columns to parent of k
-      if ((pa = parent[k]) != -1) {
-        if (nque[pa] == 0)
-          tail[pa] = tail[k];
-
-        next[tail[k]] = head[pa] ;
-        head[pa] = next[i] ;
-        nque[pa] += nque[k] ;
-      }
-    }
-    for (i=0; i<m ; ++i)
-      if (pinv[i] < 0)
-        pinv[i] = k++;
-
-    pinv.resize(m);
-    return 1;
-  }
-
-  std::vector<int> SparsityInternal::postorder(const std::vector<int>& parent, int n) {
-    int j, k = 0, *head, *next, *stack ;
-
-    // allocate result
-    vector<int> post(n);
-
-    // get workspace
-    vector<int> w(3*n);
-
-    head = &w.front() ;
-    next = &w.front() + n ;
-    stack = &w.front() + 2*n;
-
-    // empty linked lists
-    for (j=0; j<n; ++j)
-      head[j] = -1;
-
-    // traverse nodes in reverse order
-    for (j=n-1; j>=0; --j) {
-      // j is a root
-      if (parent[j] == -1) continue;
-
-      // add j to list of its parent
-      next[j] = head[parent[j]];
-      head[parent[j]] = j ;
-    }
-
-    for (j=0; j<n; ++j) {
-      // skip j if it is not a root
-      if (parent[j] != -1) continue;
-
-      k = dfs_postorder(j, k, head, next, &post.front(), stack);
-    }
-
-    // success; return post
-    return post;
-  }
-
-  int SparsityInternal::dfs_postorder(int j, int k, int *head,
-                                                     const int *next, int *post, int *stack) {
-    int i, p, top = 0;
-
-    // place j on the stack
-    stack[0] = j;
-
-    // while (stack is not empty)
-    while (top >= 0) {
-      // p = top of stack
-      p = stack[top];
-
-      // i = youngest child of p
-      i = head[p];
-      if (i == -1) {
-        // p has no unordered children left
-        top--;
-
-        // node p is the kth postordered node
-        post[k++] = p;
-      } else {
-        // remove i from children of p
-        head[p] = next[i];
-
-        // start dfs on child node i
-        stack[++top] = i;
-      }
-    }
-
-    return k;
-  }
-
-  void SparsityInternal::init_ata(const int *post, int *w, int **head, int **next) const {
-    int i, k, p, m = size2(), n = size1();
-    const int *ATp = colind();
-    const int *ATi = row();
-    *head = w+4*n, *next = w+5*n+1;
-
-    // invert post
-    for (k=0; k<n; ++k)
-      w[post[k]] = k;
-
-    for (i=0; i<m; ++i) {
-      for (k=n, p=ATp[i]; p<ATp[i+1]; ++p)
-        k = std::min(k, w[ATi[p]]);
-
-      // place col i in linked list k
-      (*next)[i] = (*head)[k];
-      (*head)[k] = i ;
-    }
-  }
-
-#define HEAD(k, j) (ata ? head[k] : j)
-#define NEXT(J)   (ata ? next[J] : -1)
-  std::vector<int> SparsityInternal::counts(const int *parent, const int *post, int ata) const {
-    int i, j, k, n, m, J, s, p, q, jleaf=0, *maxfirst, *prevleaf, *ancestor,
-        *head = 0, *next = 0, *first;
-
-    m = size1();
-    n = size2();
-    s = 4*n + (ata ? (n+m+1) : 0);
-
-    // allocate result
-    vector<int> rowcount(n);
-    vector<int>& delta = rowcount;
-
-    // get workspace
-    vector<int> w(s);
-
-    // AT = A'
-    Sparsity AT = T();
-
-    ancestor = &w.front();
-    maxfirst = &w.front()+n;
-    prevleaf = &w.front()+2*n;
-    first = &w.front()+3*n;
-
-    // clear workspace w[0..s-1]
-    for (k=0; k<s; ++k)
-      w[k] = -1;
-
-    // find first[j]
-    for (k=0; k<n; ++k) {
-      j = post[k];
-
-      // delta[j]=1 if j is a leaf
-      delta[j] = (first[j] == -1) ? 1 : 0;
-
-      for (; j!=-1 && first[j] == -1; j=parent[j])
-        first[j] = k;
-    }
-
-    const int* ATp = AT.colind();
-    const int* ATi = AT.row();
-    if (ata) AT->init_ata(post, &w.front(), &head, &next);
-
-    // each node in its own set
-    for (i=0; i<n; ++i)
-      ancestor[i] = i;
-
-    for (k=0; k<n; ++k) {
-      // j is the kth node in postordered etree
-      j = post[k];
-
-      // j is not a root
-      if (parent[j] != -1)
-        delta[parent[j]]--;
-
-      // J=j for LL'=A case
-      for (J=HEAD(k, j); J != -1; J=NEXT(J)) {
-        for (p = ATp[J]; p<ATp[J+1]; ++p) {
-          i = ATi[p] ;
-          q = leaf(i, j, first, maxfirst, prevleaf, ancestor, &jleaf);
-
-          // A(i, j) is in skeleton
-          if (jleaf >= 1)
-            delta[j]++ ;
-
-          // account for overlap in q
-          if (jleaf == 2)
-            delta[q]-- ;
-        }
-      }
-      if (parent[j] != -1)
-        ancestor[j] = parent[j] ;
-    }
-
-    // sum up delta's of each child
-    for (j = 0 ; j < n ; ++j) {
-      if (parent[j] != -1)
-        rowcount[parent[j]] += rowcount[j] ;
-    }
-
-    // success
-    return rowcount;
-  }
-#undef HEAD
-#undef NEXT
-
   int SparsityInternal::wclear(int mark, int lemax, int *w, int n) {
     int k ;
     if (mark < 2 || (mark + lemax < 0)) {
@@ -1718,8 +1368,9 @@ namespace casadi {
 
     // postorder the assembly tree
     for (k = 0, i = 0 ; i <= n ; i++) {
-      if (Cp[i] == -1)
-        k = dfs_postorder(i, k, head, next, &P.front(), w) ;
+      if (Cp[i] == -1) {
+        k = casadi_postorder_dfs(i, k, head, next, &P.front(), w) ;
+      }
     }
 
     return P;
@@ -1747,7 +1398,7 @@ namespace casadi {
 
   Sparsity SparsityInternal::multiply(const Sparsity& B) const {
     int nz = 0;
-    casadi_assert_message(size2() == B.size1(), "Dimension mismatch.");
+    casadi_assert(size2() == B.size1(), "Dimension mismatch.");
     int m = size1();
     int anz = nnz();
     int n = B.size2();
@@ -1782,55 +1433,6 @@ namespace casadi {
 
     // Success
     return Sparsity(m, n, C_colind, C_row);
-  }
-
-  void SparsityInternal::prefactorize(int order, int qr, std::vector<int>& S_pinv,
-                                      std::vector<int>& S_q, std::vector<int>& S_parent,
-                                      std::vector<int>& S_cp, std::vector<int>& S_leftmost,
-                                      int& S_m2, double& S_lnz, double& S_unz) const {
-    const int* colind = this->colind();
-    int k;
-    int n = size2();
-    vector<int> post;
-
-    // fill-reducing ordering
-    if (order!=0) {
-      S_q = amd(order);
-    }
-
-    // QR symbolic analysis
-    if (qr) {
-      Sparsity C;
-      if (order!=0) {
-        std::vector<int> pinv_tmp;
-        C = permute(pinv_tmp, S_q, 0);
-      } else {
-        C = shared_from_this<Sparsity>();
-      }
-
-      // etree of C'*C, where C=A(:, q)
-      S_parent = C->etree(1);
-
-      post = postorder(S_parent, n);
-
-      // row counts chol(C'*C)
-      S_cp = C->counts(&S_parent.front(), &post.front(), 1);
-      post.clear();
-
-      C->vcount(S_pinv, S_parent, S_leftmost, S_m2, S_lnz);
-      for (S_unz = 0, k = 0; k<n; k++)
-        S_unz += S_cp[k];
-
-      // int overflow guard
-      casadi_assert(S_lnz >= 0);
-      casadi_assert(S_unz >= 0);
-    } else {
-      // for LU factorization only
-      S_unz = 4*(colind[n]) + n ;
-
-      // guess nnz(L) and nnz(U)
-      S_lnz = S_unz;
-    }
   }
 
   Sparsity SparsityInternal::get_diag(std::vector<int>& mapping) const {
@@ -2288,7 +1890,7 @@ namespace casadi {
 
   Sparsity SparsityInternal::sub(const vector<int>& rr, const SparsityInternal& sp,
                                  vector<int>& mapping, bool ind1) const {
-    casadi_assert(rr.size()==sp.nnz());
+    casadi_assert_dev(rr.size()==sp.nnz());
 
     // Check bounds
     casadi_assert_in_range(rr, -numel()+ind1, numel()+ind1);
@@ -2297,7 +1899,7 @@ namespace casadi {
     if (ind1 || has_negative(rr)) {
       std::vector<int> rr_mod = rr;
       for (vector<int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
-        casadi_assert_message(!(ind1 && (*i)<=0),
+        casadi_assert(!(ind1 && (*i)<=0),
           "Matlab is 1-based, but requested index " + str(*i) +  ". "
           "Note that negative slices are disabled in the Matlab interface. "
           "Possibly you may want to use 'end'.");
@@ -2497,7 +2099,7 @@ namespace casadi {
                                                vector<unsigned char>& mapping) const {
 
     // Assert dimensions
-    casadi_assert_message(size2()==y.size2() && size1()==y.size1(), "Dimension mismatch");
+    casadi_assert(size2()==y.size2() && size1()==y.size1(), "Dimension mismatch");
 
     // Sparsity pattern of the argument
     const int* y_colind = y.colind();
@@ -2612,8 +2214,8 @@ namespace casadi {
 
   bool SparsityInternal::is_equal(int y_nrow, int y_ncol, const std::vector<int>& y_colind,
                                  const std::vector<int>& y_row) const {
-    casadi_assert(y_colind.size()==y_ncol+1);
-    casadi_assert(y_row.size()==y_colind.back());
+    casadi_assert_dev(y_colind.size()==y_ncol+1);
+    casadi_assert_dev(y_row.size()==y_colind.back());
     return is_equal(y_nrow, y_ncol, get_ptr(y_colind), get_ptr(y_row));
   }
 
@@ -2642,7 +2244,7 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::_appendVector(const SparsityInternal& sp) const {
-    casadi_assert_message(size2() == 1 && sp.size2() == 1,
+    casadi_assert(size2() == 1 && sp.size2() == 1,
       "_appendVector(sp): Both arguments must be vectors but got "
        + str(size2()) + " columns for lhs, and " + str(sp.size2()) + " columns for rhs.");
 
@@ -2663,7 +2265,7 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::_appendColumns(const SparsityInternal& sp) const {
-    casadi_assert_message(size1()== sp.size1(),
+    casadi_assert(size1()== sp.size1(),
       "_appendColumns(sp): row sizes must match but got " + str(size1())
                           + " for lhs, and " + str(sp.size1()) + " for rhs.");
 
@@ -2736,7 +2338,7 @@ namespace casadi {
     }
 
     // Assert dimensions
-    casadi_assert(rr.size() == size1());
+    casadi_assert_dev(rr.size() == size1());
 
     // Begin by sparsify the rows
     vector<int> new_row = get_row();
@@ -2768,9 +2370,9 @@ namespace casadi {
     const int* row = this->row();
 
     // Check consistency
-    casadi_assert_message(rr>=0 && rr<size1(), "Row index " + str(rr)
+    casadi_assert(rr>=0 && rr<size1(), "Row index " + str(rr)
                           + " out of bounds [0, " + str(size1()) + ")");
-    casadi_assert_message(cc>=0 && cc<size2(), "Column index " + str(cc)
+    casadi_assert(cc>=0 && cc<size2(), "Column index " + str(cc)
                           + " out of bounds [0, " + str(size2()) + ")");
 
     // Quick return if matrix is dense
@@ -2798,7 +2400,7 @@ namespace casadi {
       return _reshape(nrow, numel()/nrow);
     }
 
-    casadi_assert_message(numel() == nrow*ncol,
+    casadi_assert(numel() == nrow*ncol,
                           "reshape: number of elements must remain the same. Old shape is "
                           + dim() + ". New shape is " + str(nrow) + "x" + str(ncol)
                           + "=" + str(nrow*ncol) + ".");
@@ -2874,7 +2476,7 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::_removeDuplicates(std::vector<int>& mapping) const {
-    casadi_assert(mapping.size()==nnz());
+    casadi_assert_dev(mapping.size()==nnz());
 
     // Return value (to be hashed)
     vector<int> ret_colind = get_colind(), ret_row = get_row();
@@ -2895,7 +2497,7 @@ namespace casadi {
       for (int k=ret_colind[i]; k<ret_colind[i+1]; ++k) {
 
         // Make sure that the rows appear sequentially
-        casadi_assert_message(ret_row[k] >= lastrow, "rows are not sequential");
+        casadi_assert(ret_row[k] >= lastrow, "rows are not sequential");
 
         // Skip if duplicate
         if (ret_row[k] == lastrow) continue;
@@ -3115,16 +2717,17 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::star_coloring2(int ordering, int cutoff) const {
-    casadi_assert_warning(size2()==size1(),
-                          "StarColoring requires a square matrix, but got "
-                          << dim() << ".");
+    if (!is_square()) {
+      // NOTE(@jaeandersson) Why warning and not error?
+      casadi_message("StarColoring requires a square matrix, got " + dim() + ".");
+    }
 
     // TODO(Joel): What we need here, is a distance-2 smallest last ordering
     // Reorder, if necessary
     const int* colind = this->colind();
     const int* row = this->row();
     if (ordering!=0) {
-      casadi_assert(ordering==1);
+      casadi_assert_dev(ordering==1);
 
       // Ordering
       vector<int> ord = largest_first();
@@ -3367,11 +2970,14 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::star_coloring(int ordering, int cutoff) const {
-    casadi_assert_warning(size2()==size1(), "StarColoring requires a square matrix, but got "
-                          << dim() << ".");
+    if (!is_square()) {
+      // NOTE(@jaeandersson) Why warning and not error?
+      casadi_message("StarColoring requires a square matrix, got " + dim() + ".");
+    }
+
     // Reorder, if necessary
     if (ordering!=0) {
-      casadi_assert(ordering==1);
+      casadi_assert_dev(ordering==1);
 
       // Ordering
       vector<int> ord = largest_first();
@@ -3535,7 +3141,7 @@ namespace casadi {
     // Possibly permute columns
     if (permute_columns) {
       // Assert dimensions
-      casadi_assert(p.size()==size2());
+      casadi_assert_dev(p.size()==size2());
 
       // Permute
       for (int k=0; k<col.size(); ++k) {
@@ -3550,7 +3156,7 @@ namespace casadi {
     // Possibly permute rows
     if (permute_rows) {
       // Assert dimensions
-      casadi_assert(p.size()==size1());
+      casadi_assert_dev(p.size()==size1());
 
       // Permute
       for (int k=0; k<nnz(); ++k) {
@@ -3677,6 +3283,80 @@ namespace casadi {
     }
   }
 
+  void SparsityInternal::export_code(const std::string& lang,
+      std::ostream &stream, const Dict& options) const {
+    casadi_assert(lang=="matlab", "Only matlab language supported for now.");
+
+    // Default values for options
+    bool opt_inline = false;
+    std::string name = "sp";
+    bool as_matrix = true;
+    int indent_level = 0;
+
+    // Read options
+    for (auto&& op : options) {
+      if (op.first=="inline") {
+        opt_inline = op.second;
+      } else if (op.first=="name") {
+        name = op.second.to_string();
+      } else if (op.first=="as_matrix") {
+        as_matrix = op.second;
+      } else if (op.first=="indent_level") {
+        indent_level = op.second;
+      } else {
+        casadi_error("Unknown option '" + op.first + "'.");
+      }
+    }
+
+    // Construct indent string
+    std::string indent = "";
+    for (int i=0;i<indent_level;++i) {
+      indent += "  ";
+    }
+
+    casadi_assert(!opt_inline, "Inline not supported for now.");
+
+    // Export dimensions
+    stream << indent << name << "_m = " << size1() << ";" << endl;
+    stream << indent << name << "_n = " << size2() << ";" << endl;
+
+    // Matlab indices are one-based
+    const int index_offset = 1;
+
+    // Print columns
+    const int* colind = this->colind();
+    const int* row = this->row();
+    stream << indent << name<< "_j = [";
+    bool first = true;
+    for (int i=0; i<size2(); ++i) {
+      for (int el=colind[i]; el<colind[i+1]; ++el) {
+        if (!first) stream << ", ";
+        stream << (i+index_offset);
+        first = false;
+      }
+    }
+    stream << "];" << endl;
+
+    // Print rows
+    stream << indent << name << "_i = [";
+    first = true;
+    int nz = nnz();
+    for (int i=0; i<nz; ++i) {
+      if (!first) stream << ", ";
+      stream << (row[i]+index_offset);
+      first = false;
+    }
+    stream << "];" << endl;
+
+    if (as_matrix) {
+      // Generate matrix
+      stream << indent << name << " = sparse(" << name << "_i, " << name << "_j, ";
+      stream << "ones(size(" << name << "_i)), ";
+      stream << name << "_m, " << name << "_n);" << endl;
+    }
+
+  }
+
   void SparsityInternal::spy_matlab(const std::string& mfile_name) const {
     // Create the .m file
     ofstream mfile;
@@ -3685,40 +3365,9 @@ namespace casadi {
     // Header
     mfile << "% This function was automatically generated by CasADi" << endl;
 
-    // Print dimensions
-    mfile << "n = " << size1() << ";" << endl;
-    mfile << "m = " << size2() << ";" << endl;
-
-    // Matlab indices are one-based
-    const int index_offset = 1;
-
-    // Print columns
-    const int* colind = this->colind();
-    const int* row = this->row();
-    mfile << "i = [";
-    bool first = true;
-    for (int i=0; i<size2(); ++i) {
-      for (int el=colind[i]; el<colind[i+1]; ++el) {
-        if (!first) mfile << ", ";
-        mfile << (i+index_offset);
-        first = false;
-      }
-    }
-    mfile << "];" << endl;
-
-    // Print rows
-    mfile << "j = [";
-    first = true;
-    int nz = nnz();
-    for (int i=0; i<nz; ++i) {
-      if (!first) mfile << ", ";
-      mfile << (row[i]+index_offset);
-      first = false;
-    }
-    mfile << "];" << endl;
-
-    // Generate matrix
-    mfile << "A = sparse(i, j, ones(size(i)), m, n)';" << endl;
+    Dict opts;
+    opts["name"] = "A";
+    export_code("matlab", mfile, opts);
 
     // Issue spy command
     mfile << "spy(A);" << endl;

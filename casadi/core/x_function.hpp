@@ -121,6 +121,9 @@ namespace casadi {
                           const Dict& opts) const override;
     ///@}
 
+    /** \brief Get Jacobian sparsity */
+    Sparsity get_jacobian_sparsity() const override;
+
     /** \brief returns a new function with a selection of inputs/outputs of the original */
     Function slice(const std::string& name, const std::vector<int>& order_in,
                    const std::vector<int>& order_out, const Dict& opts) const override;
@@ -130,6 +133,14 @@ namespace casadi {
 
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override = 0;
+
+    /** \brief Export function in a specific language */
+    void export_code(const std::string& lang,
+      std::ostream &stream, const Dict& options) const override;
+
+    /** \brief Export function body in a specific language */
+    virtual void export_code_body(const std::string& lang,
+        std::ostream &stream, const Dict& options) const = 0;
 
     /** \brief Is codegen supported? */
     bool has_codegen() const override { return true;}
@@ -187,13 +198,13 @@ namespace casadi {
     : FunctionInternal(name), in_(ex_in),  out_(ex_out) {
     // Names of inputs
     if (!name_in.empty()) {
-      casadi_assert_message(ex_in.size()==name_in.size(),
+      casadi_assert(ex_in.size()==name_in.size(),
       "Mismatching number of input names");
       name_in_ = name_in;
     }
     // Names of outputs
     if (!name_out.empty()) {
-      casadi_assert_message(ex_out.size()==name_out.size(),
+      casadi_assert(ex_out.size()==name_out.size(),
       "Mismatching number of output names");
       name_out_ = name_out;
     }
@@ -239,40 +250,21 @@ namespace casadi {
   void XFunction<DerivedType, MatType, NodeType>::sort_depth_first(
       std::stack<NodeType*>& s, std::vector<NodeType*>& nodes) {
     while (!s.empty()) {
-
       // Get the topmost element
       NodeType* t = s.top();
-
       // If the last element on the stack has not yet been added
-      if (t && !t->temp) {
-
-        // Find out which not yet added dependency has most number of dependencies
-        int max_deps = -1, dep_with_max_deps = -1;
-        for (int i=0; i<t->n_dep(); ++i) {
-          if (t->dep(i).get() !=0 && static_cast<NodeType*>(t->dep(i).get())->temp == 0) {
-            int ndep_i = t->dep(i)->n_dep();
-            if (ndep_i>max_deps) {
-              max_deps = ndep_i;
-              dep_with_max_deps = i;
-            }
-          }
-        }
-
+      if (t && t->temp>=0) {
+        // Get the index of the next dependency
+        int next_dep = t->temp++;
         // If there is any dependency which has not yet been added
-        if (dep_with_max_deps>=0) {
-
-          // Add to the stack the dependency with the most number of dependencies
-          // (so that constants, inputs etc are added last)
-          s.push(static_cast<NodeType*>(t->dep(dep_with_max_deps).get()));
-
+        if (next_dep < t->n_dep()) {
+          // Add dependency to stack
+          s.push(static_cast<NodeType*>(t->dep(next_dep).get()));
         } else {
-
           // if no dependencies need to be added, we can add the node to the algorithm
           nodes.push_back(t);
-
           // Mark the node as found
-          t->temp = 1;
-
+          t->temp = -1;
           // Remove from stack
           s.pop();
         }
@@ -303,6 +295,8 @@ namespace casadi {
         allow_forward = op.second;
       } else if (op.first=="allow_reverse") {
         allow_reverse = op.second;
+      } else if (op.first=="verbose") {
+        continue;
       } else {
         casadi_error("No such Jacobian option: " + string(op.second));
       }
@@ -317,7 +311,7 @@ namespace casadi {
     }
 
     if (symmetric) {
-      casadi_assert(sparsity_out_.at(oind).is_dense());
+      casadi_assert_dev(sparsity_out_.at(oind).is_dense());
     }
 
     // Create return object
@@ -496,13 +490,15 @@ namespace casadi {
 
       // Evaluate symbolically
       if (fseed.size()>0) {
-        casadi_assert(aseed.size()==0);
+        casadi_assert_dev(aseed.size()==0);
         if (verbose_) casadi_message("Calling 'ad_forward'");
         static_cast<const DerivedType*>(this)->ad_forward(fseed, fsens);
+        if (verbose_) casadi_message("Back from 'ad_forward'");
       } else if (aseed.size()>0) {
-        casadi_assert(fseed.size()==0);
+        casadi_assert_dev(fseed.size()==0);
         if (verbose_) casadi_message("Calling 'ad_reverse'");
         static_cast<const DerivedType*>(this)->ad_reverse(aseed, asens);
+        if (verbose_) casadi_message("Back from 'ad_reverse'");
       }
 
       // Carry out the forward sweeps
@@ -669,7 +665,7 @@ namespace casadi {
 
     // Evaluate symbolically
     static_cast<const DerivedType*>(this)->ad_forward(fseed, fsens);
-    casadi_assert(fsens.size()==fseed.size());
+    casadi_assert_dev(fsens.size()==fseed.size());
 
     // All inputs of the return function
     std::vector<MatType> ret_in(inames.size());
@@ -753,6 +749,14 @@ namespace casadi {
     return Function(name, ret_in, {J}, inames, onames, opts);
   }
 
+  template<typename DerivedType, typename MatType, typename NodeType>
+  Sparsity XFunction<DerivedType, MatType, NodeType>
+  ::get_jacobian_sparsity() const {
+    // Temporary single-input, single-output function FIXME(@jaeandersson)
+    Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
+                 {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
+    return tmp.sparsity_jac(0, 0);
+  }
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
@@ -780,6 +784,71 @@ namespace casadi {
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>
+  ::export_code(const std::string& lang, std::ostream &ss, const Dict& options) const {
+
+    casadi_assert(lang=="matlab", "Only matlab language supported for now.");
+
+    // start function
+    ss << "function [varargout] = " << name_ << "(varargin)" << std::endl;
+
+    // Allocate space for output argument (segments)
+    for (int i=0;i<n_out_;++i) {
+      ss << "  argout_" << i <<  " = cell(" << nnz_out(i) << ",1);" << std::endl;
+    }
+
+    Dict opts;
+    opts["indent_level"] = 1;
+    export_code_body(lang, ss, opts);
+
+    // Process the outputs
+    for (int i=0;i<n_out_;++i) {
+      const Sparsity& out = sparsity_out_.at(i);
+      if (out.is_dense()) {
+        // Special case if dense
+        ss << "  varargout{" << i+1 <<  "} = reshape(vertcat(argout_" << i << "{:}), ";
+        ss << out.size1() << ", " << out.size2() << ");" << std::endl;
+      } else {
+        // For sparse outputs, export sparsity and call 'sparse'
+        Dict opts;
+        opts["name"] = "sp";
+        opts["indent_level"] = 1;
+        opts["as_matrix"] = false;
+        out.export_code("matlab", ss, opts);
+        ss << "  varargout{" << i+1 <<  "} = ";
+        ss << "sparse(sp_i, sp_j, vertcat(argout_" << i << "{:}), sp_m, sp_n);" << std::endl;
+      }
+    }
+
+    // end function
+    ss << "end" << std::endl;
+    ss << "function y=nonzeros_gen(x)" << std::endl;
+    ss << "  if isa(x,'casadi.SX') || isa(x,'casadi.MX') || isa(x,'casadi.DM')" << std::endl;
+    ss << "    y = x{:};" << std::endl;
+    ss << "  elseif isa(x,'sdpvar')" << std::endl;
+    ss << "    b = getbase(x);" << std::endl;
+    ss << "    f = find(sum(b~=0,2));" << std::endl;
+    ss << "    y = sdpvar(length(f),1,[],getvariables(x),b(f,:));" << std::endl;
+    ss << "  else" << std::endl;
+    ss << "    y = nonzeros(x);" << std::endl;
+    ss << "  end" << std::endl;
+    ss << "end" << std::endl;
+    ss << "function y=if_else_zero_gen(c,e)" << std::endl;
+    ss << "  if isa(c+e,'casadi.SX') || isa(c+e,'casadi.MX') || isa(c+e,'casadi.DM')" << std::endl;
+    ss << "    y = if_else(c, e, 0);" << std::endl;
+    ss << "  else" << std::endl;
+    ss << "    if c" << std::endl;
+    ss << "        y = x;" << std::endl;
+    ss << "    else" << std::endl;
+    ss << "        y = 0;" << std::endl;
+    ss << "    end" << std::endl;
+    ss << "  end" << std::endl;
+    ss << "end" << std::endl;
+
+
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
   bool XFunction<DerivedType, MatType, NodeType>
   ::isInput(const std::vector<MatType>& arg) const {
     // Check if arguments matches the input expressions, in which case
@@ -800,7 +869,7 @@ namespace casadi {
                const std::vector<std::vector<MatType> >& fseed,
                std::vector<std::vector<MatType> >& fsens,
                bool always_inline, bool never_inline) const {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    casadi_assert(!(always_inline && never_inline), "Inconsistent options");
     if (!should_inline(always_inline, never_inline)) {
       // The non-inlining version is implemented in the base class
       return FunctionInternal::call_forward(arg, res, fseed, fsens,
@@ -831,7 +900,7 @@ namespace casadi {
                const std::vector<std::vector<MatType> >& aseed,
                std::vector<std::vector<MatType> >& asens,
                bool always_inline, bool never_inline) const {
-    casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+    casadi_assert(!(always_inline && never_inline), "Inconsistent options");
     if (!should_inline(always_inline, never_inline)) {
       // The non-inlining version is implemented in the base class
       return FunctionInternal::call_reverse(arg, res, aseed, asens,
@@ -924,14 +993,14 @@ namespace casadi {
 
     // Input arguments
     auto it = find(name_in_.begin(), name_in_.end(), s_in);
-    casadi_assert(it!=name_in_.end());
+    casadi_assert_dev(it!=name_in_.end());
     MatType arg = in_.at(it-name_in_.begin());
 
     // Output arguments
     vector<MatType> res;
     for (auto&& s : s_out) {
       it = find(name_out_.begin(), name_out_.end(), s);
-      casadi_assert(it!=name_out_.end());
+      casadi_assert_dev(it!=name_out_.end());
       res.push_back(out_.at(it-name_out_.begin()));
     }
 
@@ -941,10 +1010,15 @@ namespace casadi {
 
   template<typename MatType>
   std::vector<bool> _which_depends(const MatType &expr, const MatType &var, int order, bool tr) {
+    // Short-circuit
+    if (expr.is_empty() || var.is_empty()) {
+      return std::vector<bool>(tr? expr.numel() : var.numel(), false);
+    }
+
     MatType e = expr;
 
     // Create a function for calculating a forward-mode derivative
-    casadi_assert_message(order==1 || order==2,
+    casadi_assert(order==1 || order==2,
       "which_depends: order argument must be 1 or 2, got " + str(order) + " instead.");
 
     MatType v = MatType::sym("v", var.sparsity());

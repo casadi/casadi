@@ -1301,5 +1301,40 @@ class SXtests(casadiTestCase):
       self.checkfunction(f,fa,inputs=[3])
       self.checkfunction(f,fb,inputs=[-3],evals=1)
 
+  def test_pw_const(self):
+      t= SX.sym("t")
+
+      e = pw_const(t, [0,2,3],[7,1,3,5])
+
+      E = Function("E",[t],[e])
+
+      self.checkarray(E(-2),7)
+      self.checkarray(E(-1),7)
+      self.checkarray(E(0),1)
+      self.checkarray(E(1),1)
+      self.checkarray(E(1.9999),1)
+      self.checkarray(E(2),3)
+      self.checkarray(E(2.5),3)
+      self.checkarray(E(3),5)
+      self.checkarray(E(10),5)
+
+  def test_pw_lin(self):
+      t= SX.sym("t")
+
+      e = pw_lin(t, [0,2,3,5], [7,1,3,2])
+
+      E = Function("E",[t],[e])
+
+      self.checkarray(E(-2),13)
+      self.checkarray(E(-1),10)
+      self.checkarray(E(0),7)
+      self.checkarray(E(1),4)
+      self.checkarray(E(2),1)
+      self.checkarray(E(2.5),2)
+      self.checkarray(E(3),3)
+      self.checkarray(E(4),2.5)
+      self.checkarray(E(5),2)
+      self.checkarray(E(7),1)
+
 if __name__ == '__main__':
     unittest.main()

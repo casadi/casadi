@@ -26,7 +26,7 @@
 #ifndef CASADI_SHARED_OBJECT_HPP
 #define CASADI_SHARED_OBJECT_HPP
 
-#include "casadi_types.hpp"
+#include "casadi_common.hpp"
 #include "exception.hpp"
 #include <map>
 #include <vector>
@@ -138,7 +138,7 @@ namespace casadi {
 
     /// \cond INTERNAL
     /// Print the pointer to the internal class
-    void print_ptr(std::ostream &stream=casadi::userOut()) const;
+    void print_ptr(std::ostream &stream=casadi::uout()) const;
     /// \endcond
 
     /// Is a null pointer?

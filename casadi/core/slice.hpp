@@ -31,6 +31,7 @@
 #include "printable.hpp"
 #include <limits>
 #include <iostream>
+#include "generic_type.hpp"
 
 namespace casadi {
 
@@ -88,6 +89,11 @@ namespace casadi {
       std::stringstream ss;
       disp(ss, more);
       return ss.str();
+    }
+
+    /** Obtain information */
+    Dict info() const {
+      return {{"start", start}, {"stop", stop}, {"step", step}};
     }
   };
 

@@ -136,14 +136,14 @@ namespace casadi {
   void Factory<MatType>::
   add_input(const std::string& s, const MatType& e) {
     auto it = in_.insert(make_pair(s, e));
-    casadi_assert_message(it.second, "Duplicate input expression \"" + s + "\"");
+    casadi_assert(it.second, "Duplicate input expression \"" + s + "\"");
   }
 
   template<typename MatType>
   void Factory<MatType>::
   add_output(const std::string& s, const MatType& e) {
     auto it = out_.insert(make_pair(s, e));
-    casadi_assert_message(it.second, "Duplicate output expression \"" + s + "\"");
+    casadi_assert(it.second, "Duplicate output expression \"" + s + "\"");
   }
 
   template<typename MatType>
@@ -155,19 +155,19 @@ namespace casadi {
     if (has_in(s)) return s;
 
     // Get prefix
-    casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\" as input."
+    casadi_assert(has_prefix(s), "Cannot process \"" + s + "\" as input."
                                          " Available: " + join(name_in()) + ".");
     pair<string, string> ss = split_prefix(s);
 
     if (ss.first=="fwd") {
       // Forward mode directional derivative
-      casadi_assert_message(has_in(ss.second), "Cannot process \"" + ss.second + "\""
+      casadi_assert(has_in(ss.second), "Cannot process \"" + ss.second + "\""
                                                " (from \"" + s + "\") as input."
                                                " Available: " + join(name_in()) + ".");
       fwd_in_.push_back(ss.second);
     } else if (ss.first=="adj") {
       // Reverse mode directional derivative
-      casadi_assert_message(has_out(ss.second), "Cannot process \"" + ss.second + "\""
+      casadi_assert(has_out(ss.second), "Cannot process \"" + ss.second + "\""
                                                 " (from \"" + s + "\") as output."
                                                 " Available: " + join(name_out()) + ".");
       adj_in_.push_back(ss.second);
@@ -188,47 +188,47 @@ namespace casadi {
     if (has_out(s)) return s;
 
     // Get prefix
-    casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\" as output."
+    casadi_assert(has_prefix(s), "Cannot process \"" + s + "\" as output."
                                          " Available: " + join(name_out()) + ".");
     pair<string, string> ss = split_prefix(s);
 
     if (ss.first=="fwd") {
       // Forward mode directional derivative
-      casadi_assert_message(has_out(ss.second), "Cannot process \"" + ss.second + "\""
+      casadi_assert(has_out(ss.second), "Cannot process \"" + ss.second + "\""
                                                 " (from \"" + s + "\") as output."
                                                 " Available: " + join(name_out()) + ".");
       fwd_out_.push_back(ss.second);
     } else if (ss.first=="adj") {
       // Reverse mode directional derivative
-      casadi_assert_message(has_in(ss.second),
+      casadi_assert(has_in(ss.second),
         "Cannot process \"" + ss.second + "\" (from \"" + s + "\") as input. "
         "Available: " + join(name_in()) + ".");
       adj_out_.push_back(ss.second);
     } else if (ss.first=="jac") {
       jac_.push_back(ss.second);
-      casadi_assert_message(has_out(jac_.back().ex),
+      casadi_assert(has_out(jac_.back().ex),
         "Cannot process \"" + jac_.back().ex + "\" (from \"" + s + "\") as output. "
         "Available: " + join(name_out()) + ".");
-      casadi_assert_message(has_in(jac_.back().arg),
+      casadi_assert(has_in(jac_.back().arg),
         "Cannot process \"" + jac_.back().arg + "\" (from \"" + s + "\") as input. "
         "Available: " + join(name_in()) + ".");
     } else if (ss.first=="grad") {
       grad_.push_back(ss.second);
-      casadi_assert_message(has_out(grad_.back().ex),
+      casadi_assert(has_out(grad_.back().ex),
         "Cannot process \"" + grad_.back().ex + "\" (from \"" + s + "\") as output. "
         "Available: " + join(name_out()) + ".");
-      casadi_assert_message(has_in(grad_.back().arg),
+      casadi_assert(has_in(grad_.back().arg),
         "Cannot process \"" + grad_.back().arg + "\" (from \"" + s + "\") as input. "
         "Available: " + join(name_in()) + ".");
     } else if (ss.first=="hess") {
       hess_.push_back(ss.second);
-      casadi_assert_message(has_out(hess_.back().ex),
+      casadi_assert(has_out(hess_.back().ex),
         "Cannot process \"" + hess_.back().ex + "\" (from \"" + s + "\") as output. "
         "Available: " + join(name_out()) + ".");
-      casadi_assert_message(has_in(hess_.back().arg1),
+      casadi_assert(has_in(hess_.back().arg1),
         "Cannot process \"" + hess_.back().arg1 + "\" (from \"" + s + "\") as input. "
         "Available: " + join(name_in()) + ".");
-      casadi_assert_message(has_in(hess_.back().arg2),
+      casadi_assert(has_in(hess_.back().arg2),
         "Cannot process \"" + hess_.back().arg2 + "\" (from \"" + s + "\") as input. "
         "Available: " + join(name_in()) + ".");
     } else {
@@ -253,7 +253,7 @@ namespace casadi {
 
     // Forward mode directional derivatives
     if (!fwd_out_.empty()) {
-      casadi_assert(!fwd_in_.empty());
+      casadi_assert_dev(!fwd_in_.empty());
 
       vector<MatType> arg, res;
       vector<vector<MatType>> seed(1), sens(1);
@@ -283,7 +283,7 @@ namespace casadi {
 
     // Reverse mode directional derivatives
     if (!adj_out_.empty()) {
-      casadi_assert(!adj_in_.empty());
+      casadi_assert_dev(!adj_in_.empty());
       vector<MatType> arg, res;
       vector<vector<MatType>> seed(1), sens(1);
       // Inputs
@@ -344,7 +344,7 @@ namespace casadi {
     // Hessian blocks
     for (auto &&b : hess_) {
       const MatType& ex = out_.at(b.ex);
-      casadi_assert_message(b.arg1==b.arg2, "Mixed Hessian terms not supported");
+      casadi_assert(b.arg1==b.arg2, "Mixed Hessian terms not supported");
       const MatType& arg1 = in_.at(b.arg1);
       //const MatType& arg2 = in_.at(b.arg2);
       try {
@@ -358,7 +358,7 @@ namespace casadi {
   template<typename MatType>
   MatType Factory<MatType>::get_input(const std::string& s) {
     auto it = in_.find(s);
-    casadi_assert_message(it!=in_.end(), "Cannot retrieve \"" + s + "\"");
+    casadi_assert(it!=in_.end(), "Cannot retrieve \"" + s + "\"");
     return it->second;
   }
 
@@ -371,7 +371,7 @@ namespace casadi {
     if (it!=out_.end()) return it->second;
 
     // Assume attribute
-    casadi_assert_message(has_prefix(s), "Cannot process \"" + s + "\"");
+    casadi_assert(has_prefix(s), "Cannot process \"" + s + "\"");
     pair<string, string> ss = split_prefix(s);
     string a = ss.first;
     MatType r = get_output(ss.second);
@@ -405,9 +405,9 @@ namespace casadi {
   std::pair<std::string, std::string> Factory<MatType>::
   split_prefix(const std::string& s) {
     // Get prefix
-    casadi_assert(!s.empty());
+    casadi_assert_dev(!s.empty());
     size_t pos = s.find(':');
-    casadi_assert_message(pos<s.size(), "Cannot process \"" + s + "\"");
+    casadi_assert(pos<s.size(), "Cannot process \"" + s + "\"");
     return make_pair(s.substr(0, pos), s.substr(pos+1, std::string::npos));
   }
 

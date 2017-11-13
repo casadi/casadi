@@ -27,7 +27,7 @@
 #define CASADI_EINSTEIN_CPP
 
 #include "einstein.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "function_internal.hpp"
 #include "runtime/shared.hpp"
 

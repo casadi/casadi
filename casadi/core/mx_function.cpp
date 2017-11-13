@@ -23,8 +23,8 @@
  */
 
 #include "mx_function.hpp"
-#include "std_vector_tools.hpp"
-#include "casadi_types.hpp"
+#include "casadi_misc.hpp"
+#include "casadi_common.hpp"
 #include "global_options.hpp"
 #include "casadi_interrupt.hpp"
 #include "io_instruction.hpp"
@@ -58,6 +58,30 @@ namespace casadi {
      }
   };
 
+  MX MXFunction::instruction_MX(int k) const {
+    return algorithm_.at(k).data;
+  }
+
+  std::vector<int> MXFunction::instruction_input(int k) const {
+    auto e = algorithm_.at(k);
+    if (e.op==OP_INPUT) {
+      const IOInstruction* io = static_cast<const IOInstruction*>(e.data.get());
+      return { io->ind() };
+    } else {
+      return e.arg;
+    }
+  }
+
+  std::vector<int> MXFunction::instruction_output(int k) const {
+    auto e = algorithm_.at(k);
+    if (e.op==OP_OUTPUT) {
+      const IOInstruction* io = static_cast<const IOInstruction*>(e.data.get());
+      return { io->ind() };
+    } else {
+      return e.res;
+    }
+  }
+
   void MXFunction::init(const Dict& opts) {
     // Call the init function of the base class
     XFunction<MXFunction, MX, MXNode>::init(opts);
@@ -79,7 +103,7 @@ namespace casadi {
     if (default_in_.empty()) {
       default_in_.resize(n_in_, 0);
     } else {
-      casadi_assert_message(default_in_.size()==n_in_,
+      casadi_assert(default_in_.size()==n_in_,
                             "Option 'default_in' has incorrect length");
     }
 
@@ -561,7 +585,7 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::eval_mx");
 
     // Resize the number of outputs
-    casadi_assert_message(arg.size()==n_in_, "Wrong number of input arguments");
+    casadi_assert(arg.size()==n_in_, "Wrong number of input arguments");
     res.resize(out_.size());
 
     // Trivial inline by default if output known
@@ -627,7 +651,7 @@ namespace casadi {
 
   void MXFunction::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                 std::vector<std::vector<MX> >& fsens) const {
-    if (verbose_) casadi_message(name_ + "::ad_forward");
+    if (verbose_) casadi_message(name_ + "::ad_forward(" + str(fseed.size())+ ")");
 
     // Allocate results
     int nfwd = fseed.size();
@@ -773,7 +797,7 @@ namespace casadi {
 
   void MXFunction::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                                 std::vector<std::vector<MX> >& asens) const {
-    if (verbose_) casadi_message(name_ + "::ad_reverse");
+    if (verbose_) casadi_message(name_ + "::ad_reverse(" + str(aseed.size())+ ")");
 
     // Allocate results
     int nadj = aseed.size();
@@ -849,7 +873,6 @@ namespace casadi {
     // Work vector, adjoint derivatives
     std::vector<std::vector<MX> > dwork(workloc_.size()-1);
     fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
-    if (verbose_) casadi_message("Allocated derivative work vector (adjoint mode)");
 
     // Loop over computational nodes in reverse order
     for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
@@ -998,51 +1021,6 @@ namespace casadi {
       }
     }
     return 0;
-  }
-
-  Function MXFunction::expand(const std::vector<SX>& inputvsx) {
-
-    // Create inputs with the same name and sparsity as the matrix valued symbolic inputs
-    vector<SX> arg(in_.size());
-    if (inputvsx.empty()) { // No symbolic input provided
-      for (int i=0; i<arg.size(); ++i) {
-        // Start with matrix with the correct sparsity
-        arg[i] = SX::zeros(in_[i].sparsity());
-
-        // Divide input into primitives and create corresponding SX
-        auto ait = arg[i]->begin();
-        vector<MX> prim = in_[i].primitives();
-        for (auto pit=prim.begin(); pit!=prim.end(); ++pit) {
-          SX t = SX::sym(pit->name(), pit->sparsity());
-          copy(t->begin(), t->end(), ait);
-          ait += t.nnz();
-        }
-        casadi_assert(ait==arg[i]->end());
-      }
-    } else { // Use provided symbolic input
-      // Make sure number of inputs matches
-      casadi_assert(inputvsx.size()==in_.size());
-
-      // Make sure that sparsity matches
-      for (int i=0; i<inputvsx.size(); ++i) {
-        casadi_assert(inputvsx[i].sparsity() == in_[i].sparsity());
-      }
-
-      // Copy to argument vector
-      copy(inputvsx.begin(), inputvsx.end(), arg.begin());
-    }
-
-    // Create output vector with correct sparsity
-    vector<SX> res(out_.size());
-    for (int i=0; i<res.size(); ++i) {
-      res[i] = SX::zeros(out_[i].sparsity());
-    }
-
-    // Evaluate symbolically
-    call(arg, res, true, false);
-
-    // Create function
-    return Function("expand_" + name_, arg, res, name_in_, name_out_);
   }
 
   void MXFunction::codegen_declarations(CodeGenerator& g) const {
@@ -1257,7 +1235,7 @@ namespace casadi {
     for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it) {
       switch (it->op) {
       case OP_INPUT:
-        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        casadi_assert(it->data->segment()==0, "Not implemented");
         work.at(it->res.front()) = vdef.at(it->data->ind());
         break;
       case OP_PARAMETER:
@@ -1265,7 +1243,7 @@ namespace casadi {
         work.at(it->res.front()) = it->data;
         break;
       case OP_OUTPUT:
-        casadi_assert_message(it->data->segment()==0, "Not implemented");
+        casadi_assert(it->data->segment()==0, "Not implemented");
         if (it->data->ind()<vdef.size()) {
           vdef.at(it->data->ind()) = work.at(it->arg.front());
         } else {
@@ -1297,9 +1275,9 @@ namespace casadi {
 
   bool MXFunction::should_inline(bool always_inline, bool never_inline) const {
     // If inlining has been specified
-    casadi_assert_message(!(always_inline && never_inline),
+    casadi_assert(!(always_inline && never_inline),
       "Inconsistent options for " + definition());
-    casadi_assert_message(!(never_inline && has_free()),
+    casadi_assert(!(never_inline && has_free()),
       "Must inline " + definition());
     if (always_inline) return true;
     if (never_inline) return false;
@@ -1307,6 +1285,302 @@ namespace casadi {
     if (has_free()) return true;
     // No inlining by default
     return false;
+  }
+
+  void MXFunction::export_code_body(const std::string& lang,
+      std::ostream &ss, const Dict& options) const {
+
+    // Default values for options
+    int indent_level = 0;
+
+    // Read options
+    for (auto&& op : options) {
+      if (op.first=="indent_level") {
+        indent_level = op.second;
+      } else {
+        casadi_error("Unknown option '" + op.first + "'.");
+      }
+    }
+
+    // Construct indent string
+    std::string indent = "";
+    for (int i=0;i<indent_level;++i) {
+      indent += "  ";
+    }
+
+    Function f = shared_from_this<Function>();
+
+    // Loop over algorithm
+    for (int k=0;k<f.n_instructions();++k) {
+      // Get operation
+      int op = f.instruction_id(k);
+      // Get MX node
+      MX x = f.instruction_MX(k);
+      // Get input positions into workvector
+      std::vector<int> o = f.instruction_output(k);
+      // Get output positions into workvector
+      std::vector<int> i = f.instruction_input(k);
+
+      switch (op) {
+        case OP_INPUT:
+          ss << indent << "w" << o[0] << " = varargin{" << i[0]+1 << "};" << std::endl;
+          break;
+        case OP_OUTPUT:
+          {
+            Dict info = x.info();
+            int segment = info["segment"];
+            ss << indent << "argout_" << o[0] << "{" << (1+segment) << "} = ";
+            ss << "nonzeros_gen(w" << i[0] << ");" << std::endl;
+          }
+          break;
+        case OP_CONST:
+          {
+            DM v = static_cast<DM>(x);
+            Dict opts;
+            opts["name"] = "m";
+            opts["indent_level"] = indent_level;
+            opts["spoof_zero"] = true;
+            v.export_code("matlab", ss, opts);
+            ss << indent << "w" << o[0] << " = m;" << std::endl;
+          }
+          break;
+        case OP_SQ:
+          ss << indent << "w" << o[0] << " = " << "w" << i[0] << ".^2;" << std::endl;
+          break;
+        case OP_MTIMES:
+          ss << indent << "w" << o[0] << " = ";
+          ss << "w" << i[1] << "*w" << i[2] << "+w" << i[0] << ";" << std::endl;
+          break;
+        case OP_MUL:
+          {
+            std::string prefix = (x.dep(0).is_scalar() || x.dep(1).is_scalar()) ? "" : ".";
+            ss << indent << "w" << o[0] << " = " << "w" << i[0] << prefix << "*w" << i[1] << ";";
+            ss << std::endl;
+          }
+          break;
+        case OP_TWICE:
+          ss << indent << "w" << o[0] << " = 2*w" << i[0] << ";" << std::endl;
+          break;
+        case OP_INV:
+          ss << indent << "w" << o[0] << " = 1./w" << i[0] << ";" << std::endl;
+          break;
+        case OP_DOT:
+          ss << indent << "w" << o[0] << " = dot(w" << i[0] << ",w" << i[1]<< ");" << std::endl;
+          break;
+        case OP_BILIN:
+          ss << indent << "w" << o[0] << " = w" << i[1] << ".'*w" << i[0]<< "*w" << i[2] << ";";
+          ss << std::endl;
+          break;
+        case OP_RANK1:
+          ss << indent << "w" << o[0] << " = w" << i[0] << "+";
+          ss << "w" << i[1] << "*w" << i[2] << "*w" << i[3] << ".';";
+          ss << std::endl;
+          break;
+        case OP_FABS:
+          ss << indent << "w" << o[0] << " = abs(w" << i[0] << ");" << std::endl;
+          break;
+        case OP_DETERMINANT:
+          ss << indent << "w" << o[0] << " = det(w" << i[0] << ");" << std::endl;
+          break;
+        case OP_INVERSE:
+          ss << indent << "w" << o[0] << " = inv(w" << i[0] << ");";
+          ss << "w" << o[0] << "(w" << o[0] << "==0) = 1e-200;" << std::endl;
+          break;
+        case OP_SOLVE:
+          {
+            bool tr = x.info()["tr"];
+            if (tr) {
+              ss << indent << "w" << o[0] << " = ((w" << i[1] << ".')\\w" << i[0] << ").';";
+              ss << std::endl;
+            } else {
+              ss << indent << "w" << o[0] << " = w" << i[1] << "\\w" << i[0] << ";" << std::endl;
+            }
+            ss << "w" << o[0] << "(w" << o[0] << "==0) = 1e-200;" << std::endl;
+          }
+          break;
+        case OP_DIV:
+          {
+            std::string prefix = (x.dep(0).is_scalar() || x.dep(1).is_scalar()) ? "" : ".";
+            ss << indent << "w" << o[0] << " = " << "w" << i[0] << prefix << "/w" << i[1] << ";";
+            ss << std::endl;
+          }
+          break;
+        case OP_POW:
+        case OP_CONSTPOW:
+          ss << indent << "w" << o[0] << " = " << "w" << i[0] << ".^w" << i[1] << ";" << std::endl;
+          break;
+        case OP_TRANSPOSE:
+          ss << indent << "w" << o[0] << " = " << "w" << i[0] << ".';" << std::endl;
+          break;
+        case OP_HORZCAT:
+        case OP_VERTCAT:
+          {
+            ss << indent << "w" << o[0] << " = [";
+            for (int e : i) {
+              ss << "w" << e << (op==OP_HORZCAT ? " " : ";");
+            }
+            ss << "];" << std::endl;
+          }
+          break;
+        case OP_DIAGCAT:
+          {
+            ss << indent << "w" << o[0] << " = [";
+            for (int e : i) {
+              ss << "nonzeros_gen(w" << e << ");";
+            }
+            ss << "];" << std::endl;
+            Dict opts;
+            opts["name"] = "sp";
+            opts["indent_level"] = indent_level;
+            opts["as_matrix"] = false;
+            x.sparsity().export_code("matlab", ss, opts);
+            ss << indent << "w" << o[0] << " = ";
+            ss << "sparse(sp_i, sp_j, w" << o[0] << ", sp_m, sp_n);" << std::endl;
+          }
+          break;
+        case OP_HORZSPLIT:
+        case OP_VERTSPLIT:
+          {
+            Dict info = x.info();
+            std::vector<int> offset = info["offset"];
+            casadi::Function output = info["output"];
+            std::vector<Sparsity> sp;
+            for (int i=0;i<output.n_out();i++)
+              sp.push_back(output.sparsity_out(i));
+              for (int k=0;k<o.size();++k) {
+                if (o[k]==-1) continue;
+                ss << indent << "tmp = nonzeros_gen(w" << i[0]<< ");" << std::endl;
+                Dict opts;
+                opts["name"] = "sp";
+                opts["indent_level"] = indent_level;
+                opts["as_matrix"] = false;
+                sp[k].export_code("matlab", ss, opts);
+                ss << indent << "w" << o[k] << " = sparse(sp_i, sp_j, ";
+                ss << "tmp(" << offset[k]+1 << ":" << offset[k+1] << "), sp_m, sp_n);" << std::endl;
+             }
+           }
+           break;
+         case OP_GETNONZEROS:
+         case OP_SETNONZEROS:
+            {
+            Dict info = x.info();
+
+            std::string nonzeros;
+            if (info.find("nz")!=info.end()) {
+              nonzeros = "1+" + str(info["nz"]);
+            } else if (info.find("slice")!=info.end()) {
+              Dict s = info["slice"];
+              int start = s["start"];
+              int step = s["step"];
+              int stop = s["stop"];
+              nonzeros = str(start+1) + ":" + str(step) + ":" + str(stop);
+            } else {
+              Dict inner = info["inner"];
+              Dict outer = info["outer"];
+              int inner_start = inner["start"];
+              int inner_step  = inner["step"];
+              int inner_stop  = inner["stop"];
+              int outer_start = outer["start"];
+              int outer_step  = outer["step"];
+              int outer_stop  = outer["stop"];
+              std::string inner_slice = "(" + str(inner_start) + ":" +
+                str(inner_step) + ":" + str(inner_stop-1)+")";
+              std::string outer_slice = "(" + str(outer_start+1) + ":" +
+                str(outer_step) + ":" + str(outer_stop)+")";
+              int N = range(outer_start, outer_stop, outer_step).size();
+              int M = range(inner_start, inner_stop, inner_step).size();
+              nonzeros = "repmat("+ inner_slice  +"', 1, " + str(N) + ")+" +
+                         "repmat("+ outer_slice  +", " + str(M) + ", 1)";
+              nonzeros = "nonzeros_gen(" + nonzeros + ")";
+            }
+
+            Dict opts;
+            opts["name"] = "sp";
+            opts["indent_level"] = indent_level;
+            opts["as_matrix"] = false;
+            x.sparsity().export_code("matlab", ss, opts);
+
+            if (op==OP_GETNONZEROS) {
+              ss << indent << "in_flat = nonzeros_gen(w" << i[0] << ");" << std::endl;
+              ss << indent << "w" << o[0] << " = in_flat(" << nonzeros << ");" << std::endl;
+            } else {
+              ss << indent << "in_flat = nonzeros_gen(w" << i[1] << ");" << std::endl;
+              ss << indent << "w" << o[0] << " = nonzeros_gen(w" << i[0] << ");" << std::endl;
+              ss << indent << "w" << o[0] << "(" << nonzeros << ")  = ";
+              if (info["add"]) ss << "w" << o[0] << "(" << nonzeros << ") + ";
+              ss << "in_flat;";
+            }
+            ss << indent << "w" << o[0] << " = ";
+            ss << "sparse(sp_i, sp_j, w" << o[0] << ", sp_m, sp_n);" << std::endl;
+          }
+          break;
+        case OP_PROJECT:
+          {
+            Dict opts;
+            opts["name"] = "sp";
+            opts["indent_level"] = indent_level;
+            x.sparsity().export_code("matlab", ss, opts);
+            ss << indent << "w" << o[0] << " = ";
+            ss << "sparse(sp_i, sp_j, w" << i[0] << "(sp==1), sp_m, sp_n);" << std::endl;
+          }
+          break;
+        case OP_NORM1:
+          ss << indent << "w" << o[0] << " = norm(w" << i[0] << ", 1);" << std::endl;
+          break;
+        case OP_NORM2:
+          ss << indent << "w" << o[0] << " = norm(w" << i[0] << ", 2);" << std::endl;
+          break;
+        case OP_NORMF:
+          ss << indent << "w" << o[0] << " = norm(w" << i[0] << ", 'fro');" << std::endl;
+          break;
+        case OP_NORMINF:
+          ss << indent << "w" << o[0] << " = norm(w" << i[0] << ", inf);" << std::endl;
+          break;
+        case OP_MMIN:
+          ss << indent << "w" << o[0] << " = min(w" << i[0] << ");" << std::endl;
+          break;
+        case OP_MMAX:
+          ss << indent << "w" << o[0] << " = max(w" << i[0] << ");" << std::endl;
+          break;
+        case OP_NOT:
+          ss << indent << "w" << o[0] << " = ~" << "w" << i[0] << ";" << std::endl;
+          break;
+        case OP_OR:
+          ss << indent << "w" << o[0] << " = w" << i[0] << " | w" << i[1] << ";" << std::endl;
+          break;
+        case OP_AND:
+          ss << indent << "w" << o[0] << " = w" << i[0] << " & w" << i[1] << ";" << std::endl;
+          break;
+        case OP_NE:
+          ss << indent << "w" << o[0] << " = w" << i[0] << " ~= w" << i[1] << ";" << std::endl;
+          break;
+        case OP_IF_ELSE_ZERO:
+          ss << indent << "w" << o[0] << " = ";
+          ss << "if_else_zero_gen(w" << i[0] << ", w" << i[1] << ");" << std::endl;
+          break;
+        case OP_RESHAPE:
+          {
+            Dict opts;
+            opts["name"] = "sp";
+            opts["indent_level"] = 1;
+            opts["as_matrix"] = false;
+            x.sparsity().export_code("matlab", ss, opts);
+            ss << indent << "w" << o[0] << " = sparse(sp_i, sp_j, ";
+            ss << "nonzeros_gen(w" << i[0] << "), sp_m, sp_n);" << std::endl;
+          }
+          break;
+        default:
+          if (x.is_binary()) {
+            ss << indent << "w" << o[0] << " = " << casadi::casadi_math<double>::print(op,
+              "w"+std::to_string(i[0]), "w"+std::to_string(i[1])) << ";" << std::endl;
+          } else if (x.is_unary()) {
+            ss << indent << "w" << o[0] << " = " << casadi::casadi_math<double>::print(op,
+              "w"+std::to_string(i[0])) << ";" << std::endl;
+          } else {
+            ss << "unknown" + x.class_name() << std::endl;
+          }
+      }
+    }
   }
 
 } // namespace casadi

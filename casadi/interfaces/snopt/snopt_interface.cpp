@@ -23,7 +23,7 @@
  */
 
 #include "snopt_interface.hpp"
-#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/casadi_misc.hpp"
 
 #include <stdio.h>
 #include <string.h>
@@ -156,7 +156,7 @@ namespace casadi {
     }
 
     // We don't need a dummy row if a linear objective row is present
-    casadi_assert(!(dummyrow_ && jacF_row_));
+    casadi_assert_dev(!(dummyrow_ && jacF_row_));
 
     // Allocate temporary memory
     alloc_w(nx_, true); // xk2_
@@ -210,8 +210,6 @@ namespace casadi {
     // Check the provided inputs
     check_inputs(mem);
 
-    m->fstats.at("mainloop").tic();
-
     // Memory object
     snProblem prob;
 
@@ -246,13 +244,13 @@ namespace casadi {
     int nea = A_structure_.nnz();
     double ObjAdd = 0;
 
-    casadi_assert(m_ > 0);
-    casadi_assert(n > 0);
-    casadi_assert(nea > 0);
-    casadi_assert(A_structure_.nnz() == nea);
+    casadi_assert_dev(m_ > 0);
+    casadi_assert_dev(n > 0);
+    casadi_assert_dev(nea > 0);
+    casadi_assert_dev(A_structure_.nnz() == nea);
 
     // Pointer magic, courtesy of Greg
-    casadi_assert_message(!jac_f_fcn_.is_null(), "blaasssshc");
+    casadi_assert(!jac_f_fcn_.is_null(), "blaasssshc");
 
     // Outputs
     //double Obj = 0; // TODO(Greg): get this from snopt
@@ -302,7 +300,7 @@ namespace casadi {
 
       // Try integer
       if (op.second.can_cast_to(OT_INT)) {
-        casadi_assert(opname.size() <= 55);
+        casadi_assert_dev(opname.size() <= 55);
         int flag = setIntParameter(&prob, const_cast<char*>(opname.c_str()),
                                    op.second.to_int());
         if (flag==0) continue;
@@ -310,7 +308,7 @@ namespace casadi {
 
       // Try double
       if (op.second.can_cast_to(OT_DOUBLE)) {
-        casadi_assert(opname.size() <= 55);
+        casadi_assert_dev(opname.size() <= 55);
         int flag = setRealParameter(&prob, const_cast<char*>(opname.c_str()),
                                     op.second.to_double());
         if (flag==0) continue;
@@ -319,7 +317,7 @@ namespace casadi {
       // try string
       if (op.second.can_cast_to(OT_STRING)) {
         std::string buffer = opname + " " + op.second.to_string();
-        casadi_assert(buffer.size() <= 72);
+        casadi_assert_dev(buffer.size() <= 72);
         int flag = setParameter(&prob, const_cast<char*>(buffer.c_str()));
         if (flag==0) continue;
       }
@@ -328,11 +326,9 @@ namespace casadi {
       casadi_error("SNOPT error setting option \"" + opname + "\"");
     }
 
-    m->fstats.at("mainloop").toc();
-
     // Run SNOPT
     int info = solveC(&prob, Cold_, &m->fk);
-    casadi_assert_message(99 != info, "snopt problem set up improperly");
+    casadi_assert(99 != info, "snopt problem set up improperly");
 
     // Negate rc to match CasADi's definition
     casadi_scal(nx_ + ng_, -1., prob.rc);
@@ -361,9 +357,9 @@ namespace casadi {
           int lenru) const {
     try {
 
-      casadi_assert_message(nnCon_ == nnCon, "Con " + str(nnCon_) + " <-> " + str(nnCon));
-      casadi_assert_message(nnObj_ == nnObj, "Obj " + str(nnObj_) + " <-> " + str(nnObj));
-      casadi_assert_message(nnJac_ == nnJac, "Jac " + str(nnJac_) + " <-> " + str(nnJac));
+      casadi_assert(nnCon_ == nnCon, "Con " + str(nnCon_) + " <-> " + str(nnCon));
+      casadi_assert(nnObj_ == nnObj, "Obj " + str(nnObj_) + " <-> " + str(nnObj));
+      casadi_assert(nnJac_ == nnJac, "Jac " + str(nnJac_) + " <-> " + str(nnJac));
 
       // Get reduced decision variables
       casadi_fill(m->xk2, nx_, 0.);
@@ -419,7 +415,7 @@ namespace casadi {
           }
         }
 
-        casadi_assert(kk == 0 || kk == neJac);
+        casadi_assert_dev(kk == 0 || kk == neJac);
 
         // provide nonlinear part of objective to SNOPT
         for (int k = 0; k < nnCon; ++k) {
@@ -428,7 +424,7 @@ namespace casadi {
       }
 
     } catch(std::exception& ex) {
-      userOut<true, PL_WARN>() << "eval_nlp failed: " << ex.what() << std::endl;
+      uerr() << "eval_nlp failed: " << ex.what() << std::endl;
       *mode = -1;  // Reduce step size - we've got problems
       return;
     }

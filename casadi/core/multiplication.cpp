@@ -27,7 +27,7 @@
 #define CASADI_MULTIPLICATION_CPP
 
 #include "multiplication.hpp"
-#include "std_vector_tools.hpp"
+#include "casadi_misc.hpp"
 #include "function_internal.hpp"
 
 using namespace std;
@@ -35,7 +35,7 @@ using namespace std;
 namespace casadi {
 
   Multiplication::Multiplication(const MX& z, const MX& x, const MX& y) {
-    casadi_assert_message(x.size2() == y.size1() && x.size1() == z.size1()
+    casadi_assert(x.size2() == y.size1() && x.size1() == z.size1()
       && y.size2() == z.size2(),
       "Multiplication::Multiplication: dimension mismatch. Attempting to multiply "
       + x.dim() + " with " + y.dim()
