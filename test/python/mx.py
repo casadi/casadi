@@ -288,6 +288,17 @@ class MXtests(casadiTestCase):
     self.assertAlmostEqual(z2, 21,10)
     self.assertAlmostEqual(z1, 10,10)
 
+  def test_which_depends_empty(self):
+    for X in [SX,MX]:
+      x=X.sym("x")
+
+      for tr in [True,False]:
+        for i in [0,1,2]:
+          self.assertEqual(which_depends(x,X(0,1),i,tr),[False]*(1 if tr else 0))
+
+          self.assertEqual(which_depends(X(0,1),x,i,tr),[False]*(0 if tr else 1))
+          self.assertTrue(len(which_depends(X(0,1),X(0,1),i,tr))==0)
+
   def test_issue83(self):
     x=MX.sym("x")
     y=MX.sym("y")
