@@ -46949,6 +46949,10 @@ Each parameter must be given a value before 'solve' can be called
 
 ";
 
+%feature("docstring")  casadi::OptiAdvanced::res() const  "
+
+";
+
 %feature("docstring")  casadi::Opti::debug() const  "
 
 Get a copy with advanced functionality.
