@@ -1913,7 +1913,7 @@ namespace casadi {
            const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
            const std::vector<int>& pinv, bool tr) {
     // Get dimensions, check consistency
-    int nrow_ext = v.size1(), ncol = v.size2();
+    int ncol = v.size2();
     int nrow = b.size1(), nrhs = b.size2();
     casadi_assert(r.size()==v.size(), "'r', 'v' dimension mismatch");
     casadi_assert(beta.is_vector() && beta.numel()==ncol, "'beta' has wrong dimension");

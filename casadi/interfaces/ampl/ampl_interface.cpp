@@ -260,14 +260,14 @@ namespace casadi {
 
   int AmplInterface::init_mem(void* mem) const {
     if (Nlpsol::init_mem(mem)) return 1;
-    auto m = static_cast<AmplInterfaceMemory*>(mem);
+    //auto m = static_cast<AmplInterfaceMemory*>(mem);
 
     return 0;
   }
 
   void AmplInterface::set_work(void* mem, const double**& arg, double**& res,
                                    int*& iw, double*& w) const {
-    auto m = static_cast<AmplInterfaceMemory*>(mem);
+    //auto m = static_cast<AmplInterfaceMemory*>(mem);
 
     // Set work in base classes
     Nlpsol::set_work(mem, arg, res, iw, w);

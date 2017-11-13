@@ -171,15 +171,15 @@ namespace casadi {
       *lba=arg[CONIC_LBA],
       *uba=arg[CONIC_UBA],
       *lbx=arg[CONIC_LBX],
-      *ubx=arg[CONIC_UBX],
-      *x0=arg[CONIC_X0],
-      *lam_x0=arg[CONIC_LAM_X0];
+      *ubx=arg[CONIC_UBX];
+      //*x0=arg[CONIC_X0],
+      //*lam_x0=arg[CONIC_LAM_X0];
 
     // Outputs
     double *x=res[CONIC_X],
-      *cost=res[CONIC_COST],
-      *lam_a=res[CONIC_LAM_A],
-      *lam_x=res[CONIC_LAM_X];
+      *cost=res[CONIC_COST];
+      //*lam_a=res[CONIC_LAM_A],
+      //*lam_x=res[CONIC_LAM_X];
 
     // Temporary memory
     double *val=w; w+=nx_;

@@ -102,7 +102,7 @@ namespace casadi {
     double tol = 1e-8;
     int ret = slicot_mb05nd(n_, arg[1][0], arg[0], n_, m->A, n_, m->H, n_,
       tol, m->iwork, m->dwork, 2*n_*n_);
-
+    casadi_assert(ret==0, "Slicot mb05nd failed with status " + str(ret) + ".");
     if (res[0]) std::copy(m->A, m->A+n_*n_, res[0]);
     return 0;
   }
