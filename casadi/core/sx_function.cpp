@@ -878,6 +878,10 @@ namespace casadi {
             ss << indent << "w" << o[0] << " = abs(" << "w" << i[0] << ");" << std::endl;
           }
           break;
+        case OP_POW:
+        case OP_CONSTPOW:
+          ss << indent << "w" << o[0] << " = " << "w" << i[0] << ".^w" << i[1] << ";" << std::endl;
+          break;
         case OP_NOT:
           ss << indent << "w" << o[0] << " = ~" << "w" << i[0] << ";" << std::endl;
           break;
