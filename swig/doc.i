@@ -8676,7 +8676,7 @@ override "
 
 %feature("docstring") casadi::BSplineInterpolant::BSplineInterpolant(const
 std::string &name, const std::vector< double > &grid, const std::vector< int
-> &offset, const std::vector< double > &values) "
+> &offset, const std::vector< double > &values, int m) "
 
 [INTERNAL] ";
 
@@ -32837,7 +32837,7 @@ bvec_t **res, int *iw, bvec_t *w, void *mem) const  "
 
 %feature("docstring") casadi::Interpolant::Interpolant(const std::string
 &name, const std::vector< double > &grid, const std::vector< int > &offset,
-const std::vector< double > &values) "
+const std::vector< double > &values, int m) "
 
 [INTERNAL]  Constructor.
 
@@ -36116,7 +36116,7 @@ const  "
 
 %feature("docstring") casadi::LinearInterpolant::LinearInterpolant(const
 std::string &name, const std::vector< double > &grid, const std::vector< int
-> &offset, const std::vector< double > &values) "
+> &offset, const std::vector< double > &values, int m) "
 
 [INTERNAL] ";
 
