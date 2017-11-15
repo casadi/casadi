@@ -58,8 +58,9 @@ namespace casadi {
   LinearInterpolant(const string& name,
                     const std::vector<double>& grid,
                     const std::vector<int>& offset,
-                    const vector<double>& values)
-                    : Interpolant(name, grid, offset, values) {
+                    const vector<double>& values,
+                    int m)
+                    : Interpolant(name, grid, offset, values, m) {
   }
 
   LinearInterpolant::~LinearInterpolant() {
@@ -68,6 +69,8 @@ namespace casadi {
   void LinearInterpolant::init(const Dict& opts) {
     // Call the base class initializer
     Interpolant::init(opts);
+
+    casadi_assert(m_==1, "Multiple outputs not supported");
 
     lookup_mode_ = std::vector<int>(offset_.size()-1, 0);
 

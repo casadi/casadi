@@ -58,7 +58,8 @@ namespace casadi {
       casadi_assert(g.size()>=2, "Need at least two grid points for every input");
       nel *= g.size();
     }
-    casadi_assert(nel==values.size(), "Inconsistent number of elements");
+    casadi_assert(values.size() % nel== 0, "Inconsistent number of elements");
+    casadi_assert(values.size()>0, "Values cannot be empty");
 
     // Grid must be strictly increasing
     for (auto&& g : grid) {
@@ -80,16 +81,18 @@ namespace casadi {
     vector<double> stacked;
     stacked.reserve(offset.back());
     for (auto&& g : grid) stacked.insert(stacked.end(), g.begin(), g.end());
+    int m = values.size()/nel;
     return Function::create(Interpolant::getPlugin(solver)
-                            .creator(name, stacked, offset, values), opts);
+                            .creator(name, stacked, offset, values, m), opts);
   }
 
   Interpolant::
   Interpolant(const std::string& name,
               const std::vector<double>& grid,
               const std::vector<int>& offset,
-              const std::vector<double>& values)
-              : FunctionInternal(name), grid_(grid), offset_(offset), values_(values) {
+              const std::vector<double>& values,
+              int m)
+              : FunctionInternal(name), grid_(grid), offset_(offset), values_(values), m_(m) {
     // Number of grid points
     ndim_ = offset_.size()-1;
   }
@@ -104,7 +107,7 @@ namespace casadi {
 
   Sparsity Interpolant::get_sparsity_out(int i) {
     casadi_assert_dev(i==0);
-    return Sparsity::scalar();
+    return Sparsity::dense(m_);
   }
 
   std::string Interpolant::get_name_in(int i) {

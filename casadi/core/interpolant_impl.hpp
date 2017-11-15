@@ -44,7 +44,8 @@ namespace casadi {
     Interpolant(const std::string& name,
                 const std::vector<double>& grid,
                 const std::vector<int>& offset,
-                const std::vector<double>& values);
+                const std::vector<double>& values,
+                int m);
 
     /// Destructor
     ~Interpolant() override;
@@ -71,7 +72,8 @@ namespace casadi {
     typedef Interpolant* (*Creator)(const std::string& name,
                                     const std::vector<double>& grid,
                                     const std::vector<int>& offset,
-                                    const std::vector<double>& values);
+                                    const std::vector<double>& values,
+                                    int m);
 
     // No static functions exposed
     struct Exposed{ };
@@ -84,6 +86,9 @@ namespace casadi {
 
     // Number of dimensions
     int ndim_;
+
+    // Number of outputs
+    int m_;
 
     // Input grid
     std::vector<double> grid_;

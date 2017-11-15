@@ -59,8 +59,9 @@ namespace casadi {
   BSplineInterpolant(const string& name,
                     const std::vector<double>& grid,
                     const std::vector<int>& offset,
-                    const vector<double>& values)
-                    : Interpolant(name, grid, offset, values) {
+                    const vector<double>& values,
+                    int m)
+                    : Interpolant(name, grid, offset, values, m) {
 
   }
 
@@ -157,13 +158,14 @@ namespace casadi {
 
     casadi_assert_dev(J.size1()==J.size2());
 
-    DM C_opt = solve(J, DM(values_), linear_solver_);
+    DM V = DM::reshape(DM(values_), m_, -1).T();
+    DM C_opt = solve(J, V, linear_solver_);
 
-    double fit = static_cast<double>(norm_1(mtimes(J, C_opt) - DM(values_)));
+    double fit = static_cast<double>(norm_1(mtimes(J, C_opt) - V));
 
     uout() << "Lookup table fitting error: " << fit << std::endl;
 
-    S_ = Function::bspline("spline", knots, C_opt.nonzeros(), degree_, 1);
+    S_ = Function::bspline("spline", knots, C_opt.T().nonzeros(), degree_, m_);
 
     alloc_w(S_->sz_w(), true);
     alloc_iw(S_->sz_iw(), true);

@@ -1533,5 +1533,41 @@ class Functiontests(casadiTestCase):
 
     self.assertTrue("ffff_acc4_acc4_acc4" in code)
 
+  def test_2d_bspline_multiout(self):
+    np.random.seed(0)
+
+    d_knots = [list(np.linspace(0,1,5)),list(np.linspace(0,1,6))]
+
+    data0 = np.random.random([len(e) for e in d_knots])
+    data1 = np.random.random([len(e) for e in d_knots])
+    r = np.meshgrid(*d_knots,indexing='ij')
+
+    xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
+
+    d_flat0 = data0.ravel(order='F')
+
+    LUT0 = casadi.interpolant('name','bspline',d_knots,d_flat0)
+
+    d_flat1 = data1.ravel(order='F')
+
+    LUT1 = casadi.interpolant('name','bspline',d_knots,d_flat1)
+    
+    data = np.vstack((data0.ravel(order='F'),data1.ravel(order='F'))).ravel(order='F')
+
+    d_flat = data.ravel(order='F')
+
+    
+    LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
+    
+    
+    x = MX.sym("x")
+    y = MX.sym("y")
+    
+    
+    LUT_sep = Function('f',[x,y],[vertcat(LUT0(vertcat(x,y)),LUT1(vertcat(x,y)))])
+    LUT = Function('f',[x,y],[LUT(vertcat(x,y))])
+    
+    self.checkfunction(LUT,LUT_sep, inputs=[0.2,0.333])
+
 if __name__ == '__main__':
     unittest.main()

@@ -52,7 +52,8 @@ namespace casadi {
     LinearInterpolant(const std::string& name,
                       const std::vector<double>& grid,
                       const std::vector<int>& offset,
-                      const std::vector<double>& values);
+                      const std::vector<double>& values,
+                      int m);
 
     // Destructor
     ~LinearInterpolant() override;
@@ -67,8 +68,9 @@ namespace casadi {
     static Interpolant* creator(const std::string& name,
                                 const std::vector<double>& grid,
                                 const std::vector<int>& offset,
-                                const std::vector<double>& values) {
-      return new LinearInterpolant(name, grid, offset, values);
+                                const std::vector<double>& values,
+                                int m) {
+      return new LinearInterpolant(name, grid, offset, values, m);
     }
 
     // Initialize
