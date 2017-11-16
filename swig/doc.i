@@ -36762,12 +36762,11 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_jacobian(const
+%feature("docstring")  casadi::LinearInterpolantJac::get_jacobian(const
 std::string &name, const std::vector< std::string > &inames, const
-std::vector< std::string > &onames, const Dict &opts) const  "
+std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Full Jacobian.
 
 ";
 
@@ -37516,10 +37515,10 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
+%feature("docstring")  casadi::LinearInterpolantJac::has_jacobian() const
+override "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Full Jacobian.
 
 ";
 
@@ -59000,6 +58999,15 @@ Is diagonal?
 
 ";
 
+%feature("docstring")  casadi::Sparsity::amd() const  "
+
+Approximate minimal degree preordering Fill-reducing ordering applied to the
+sparsity pattern of a linear system prior to factorization. The system must
+be symmetric, for an unsymmetric matrix A, first form the square of the
+pattern, A'*A. See Direct Methods for Sparse Linear Systems by Davis (2006).
+
+";
+
 %feature("docstring")  casadi::SharedObject::class_name() const  "
 
 Get class name.
@@ -63078,7 +63086,7 @@ T1 *grid, const int *offset, const T1 *values, const T1 *x, int *iw, T1 *w)
 
 %feature("docstring")  casadi::casadi_interpn_grad(T1 *grad, int ndim, const
 T1 *grid, const int *offset, const T1 *values, const T1 *x, const int
-*lookup_mode, int *iw, T1 *w) "
+*lookup_mode, int m, int *iw, T1 *w) "
 
 [INTERNAL] ";
 
@@ -63142,9 +63150,9 @@ const int *offset, const T1 *values, const T1 *x, int *iw, T1 *w) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_interpn(int ndim, const T1 *grid,
-const int *offset, const T1 *values, const T1 *x, const int *lookup_mode,
-int *iw, T1 *w) "
+%feature("docstring")  casadi::casadi_interpn(T1 *res, int ndim, const T1
+*grid, const int *offset, const T1 *values, const T1 *x, const int
+*lookup_mode, int m, int *iw, T1 *w) "
 
 [INTERNAL] ";
 
@@ -65020,6 +65028,12 @@ scheme:   Collocation scheme, as excepted by collocationPoints function.
 %feature("docstring")  casadi::casadi_interpn_interpolate(int ndim, const
 int *offset, const T1 *values, const T1 *alpha, const int *index, const int
 *corner, T1 *coeff) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_interpn_interpolate(T1 *res, int ndim,
+const int *offset, const T1 *values, const T1 *alpha, const int *index,
+const int *corner, T1 *coeff, int m) "
 
 [INTERNAL] ";
 

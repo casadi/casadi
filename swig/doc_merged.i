@@ -26650,8 +26650,7 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::get_jacobian "[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+%feature("docstring") casadi::LinearInterpolantJac::get_jacobian "[INTERNAL]  Full Jacobian.
 
 ";
 
@@ -27137,8 +27136,7 @@ Get number of temporary variables needed.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::has_jacobian "[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+%feature("docstring") casadi::LinearInterpolantJac::has_jacobian "[INTERNAL]  Full Jacobian.
 
 ";
 
@@ -42808,6 +42806,15 @@ As an alternative, P can be transposed (inverted).
 %feature("docstring") casadi::Sparsity::is_diag "
 
 Is diagonal?
+
+";
+
+%feature("docstring") casadi::Sparsity::amd "
+
+Approximate minimal degree preordering Fill-reducing ordering applied to the
+sparsity pattern of a linear system prior to factorization. The system must
+be symmetric, for an unsymmetric matrix A, first form the square of the
+pattern, A'*A. See Direct Methods for Sparse Linear Systems by Davis (2006).
 
 ";
 
