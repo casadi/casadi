@@ -89,12 +89,21 @@ namespace casadi {
      */
     Sparsity get_diag(std::vector<int>& mapping) const;
 
+    /// has diagonal entries?
+    bool has_diag() const;
+
+    /// Drop diagonal entries
+    Sparsity drop_diag() const;
+
     /// Find strongly connected components: See cs_dfs in CSparse
     int dfs(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
                          const std::vector<int>& pinv, std::vector<bool>& marked) const;
 
     /// Find the strongly connected components of a square matrix: See cs_scc in CSparse
     int scc(std::vector<int>& p, std::vector<int>& r) const;
+
+    /// Approximate minimal degree preordering: See cs_amd in CSparse
+    std::vector<int> amd() const;
 
     /// Transpose the matrix
     Sparsity T() const;
@@ -184,11 +193,6 @@ namespace casadi {
                  const std::vector<int>& q, int values,
                  std::vector<int>& colind_C,
                  std::vector<int>& row_C) const;
-
-    /** Approximate minimal degree, p = amd(A+A') if symmetric is true, or amd(A'A) otherwise.
-     * order 0:natural, 1:Chol, 2:LU, 3:QR. See cs_amd in CSparse
-     */
-    std::vector<int> amd(int order) const;
 
     /// clear w: cs_wclear in CSparse
     static int wclear(int mark, int lemax, int *w, int n);

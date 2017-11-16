@@ -677,6 +677,10 @@ namespace casadi {
     return (*this)->scc(p, r);
   }
 
+  std::vector<int> Sparsity::amd() const {
+    return (*this)->amd();
+  }
+
   int Sparsity::btf(std::vector<int>& rowperm, std::vector<int>& colperm,
                                   std::vector<int>& rowblock, std::vector<int>& colblock,
                                   std::vector<int>& coarse_rowblock,

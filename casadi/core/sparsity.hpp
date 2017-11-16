@@ -672,7 +672,6 @@ namespace casadi {
     int scc(std::vector<int>& SWIG_OUTPUT(index),
             std::vector<int>& SWIG_OUTPUT(offset)) const;
 
-    /// @{
     /** \brief Calculate the block triangular form (BTF)
         See Direct Methods for Sparse Linear Systems by Davis (2006).
 
@@ -692,7 +691,15 @@ namespace casadi {
             std::vector<int>& SWIG_OUTPUT(rowblock), std::vector<int>& SWIG_OUTPUT(colblock),
             std::vector<int>& SWIG_OUTPUT(coarse_rowblock),
             std::vector<int>& SWIG_OUTPUT(coarse_colblock)) const;
-    /// @}
+
+    /** \brief Approximate minimal degree preordering
+      Fill-reducing ordering applied to the sparsity pattern of a linear system
+      prior to factorization.
+      The system must be symmetric, for an unsymmetric matrix A, first form the square
+      of the pattern, A'*A.
+      See Direct Methods for Sparse Linear Systems by Davis (2006).
+    */
+    std::vector<int> amd() const;
 
 #ifndef SWIG
     /** \brief Propagate sparsity through a linear solve

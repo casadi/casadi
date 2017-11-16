@@ -265,6 +265,315 @@ namespace casadi {
     return nb;
   }
 
+  std::vector<int> SparsityInternal::amd() const {
+    casadi_assert(is_symmetric(), "AMD requires a symmetric matrix");
+    /*
+    cs *C, *A2, *AT ;
+    int *Cp, *Ci, *last, *W, *len, *nv, *next, *P, *head, *elen, *degree, *w,
+        *hhead, *ATp, *ATi, d, dk, dext, lemax = 0, e, elenk, eln, i, j, k, k1,
+        k2, k3, jlast, ln, dense, nzmax, mindeg = 0, nvi, nvj, nvk, mark, wnvi,
+        ok, cnz, nel = 0, p, p1, p2, p3, p4, pj, pk, pk1, pk2, pn, q, n, m, t ;
+    unsigned int h ;
+    */
+    // Get sparsity
+    int n=size2();
+    vector<int> colind = get_colind();
+    vector<int> row = get_row();
+    // Drop diagonal entries
+    int nnz = 0; // number of nonzeros after pruning
+    int col_begin, col_end=0;
+    for (int c=0; c<n; ++c) {
+      // Get the range of nonzeros for the column, before pruning
+      col_begin = col_end;
+      col_end = colind[c+1];
+      // Loop over nonzeros
+      for (int k=col_begin; k<col_end; ++k) {
+        if (row[k]!=c) {
+          row[nnz++] = row[k];
+        }
+      }
+      colind[c+1] = nnz;
+    }
+    // dense threshold
+    int dense = std::max(16, static_cast<int>(10*sqrt(static_cast<double>(n))));
+    dense = std::min(n-2, dense);
+    // Allocate result
+    vector<int> P(n+1);
+    // Work vectors
+    vector<int> len(n+1), nv(n+1), next(n+1), head(n+1), elen(n+1), degree(n+1),
+                w(n+1), hhead(n+1);
+    // Number of elements
+    int nel = 0;
+    // Minimal degree
+    int mindeg = 0;
+    // Maximum length of w
+    int lemax = 0;
+    // Degree
+    int d;
+    // ?
+    unsigned int h;
+    // Flip
+    #define FLIP(i) (-(i)-2)
+    // Elbow room
+    //int t = nnz + nnz/5 + 2*n;
+    // Initialize quotient graph
+    for (int k = 0; k<n; ++k) len[k] = colind[k+1] - colind[k];
+    len[n] = 0;
+    int nzmax = row.size();
+    for (int i=0; i<=n; ++i) {
+      head[i] = -1;                     // degree list i is empty
+      P[i] = -1;
+      next[i] = -1;
+      hhead[i] = -1;                    // hash list i is empty
+      nv[i] = 1;                        // node i is just one node
+      w[i] = 1;                         // node i is alive
+      elen[i] = 0;                      // Ek of node i is empty
+      degree[i] = len[i];               // degree of node i
+    }
+    int mark = wclear(0, 0, get_ptr(w), n); // clear w
+    elen[n] = -2;                           // n is a dead element
+    colind[n] = -1;                         // n is a root of assembly tree
+    w[n] = 0;                               // n is a dead element
+    // Initialize degree lists
+    for (int i = 0; i < n; ++i) {
+      d = degree[i];
+      if (d == 0) {                        // node i is empty
+        elen[i] = -2;                      // element i is dead
+        nel++;
+        colind[i] = -1;                    // i is a root of assembly tree
+        w[i] = 0;
+      } else if (d > dense) {              // node i is dense
+        nv[i] = 0;                         // absorb i into element n
+        elen[i] = -1;                      // node i is dead
+        nel++;
+        colind[i] = FLIP(n);
+        nv[n]++;
+      } else {
+        if (head[d] != -1) P[head[d]] = i;
+        next[i] = head[d];                 // put node i in degree list d
+        head[d] = i;
+      }
+    }
+    while (nel < n) {                        // while (selecting pivots) do
+      // Select node of minimum approximate degree
+      int k;
+      for (k = -1; mindeg < n && (k = head[mindeg]) == -1; mindeg++);
+      if (next[k] != -1) P[next[k]] = -1;
+      head[mindeg] = next[k];          // remove k from degree list
+      int elenk = elen[k];             // elenk = |Ek|
+      int nvk = nv[k];                     // # of nodes k represents
+      nel += nvk;                      // nv[k] nodes of A eliminated
+      // Garbage collection
+      if (elenk > 0 && nnz + mindeg >= nzmax) {
+        for (int j = 0; j < n; j++) {
+          int p;
+          if ((p = colind[j]) >= 0) {  // j is a live node or element
+            colind[j] = row[p];        // save first entry of object
+            row[p] = FLIP(j);          // first entry is now FLIP(j)
+          }
+        }
+        int q, p;
+        for (q = 0, p = 0; p < nnz; ) { // scan all of memory
+          int j;
+          if ((j = FLIP(row[p++])) >= 0) { // found object j
+            row[q] = colind[j];         // restore first entry of object
+            colind[j] = q++;            // new pointer to object j
+            for (int k3 = 0; k3 < len[j]-1; k3++) row[q++] = row[p++];
+          }
+        }
+        nnz = q;                        // row[nnz...nzmax-1] now free
+      }
+      // Construct new element
+      int dk = 0;
+      nv[k] = -nvk;                     // flag k as in Lk
+      int p = colind[k];
+      int pk1 = (elenk == 0) ? p : nnz;      // do in place if elen[k] == 0
+      int pk2 = pk1;
+      int e, pj, ln;
+      for (int k1 = 1; k1 <= elenk + 1; k1++) {
+        if (k1 > elenk) {
+          e = k;                   // search the nodes in k
+          pj = p;                  // list of nodes starts at row[pj]
+          ln = len[k] - elenk;     // length of list of nodes in k
+        } else {
+          e = row[p++];            // search the nodes in e
+          pj = colind[e];
+          ln = len[e];             // length of list of nodes in e
+        }
+        for (int k2 = 1; k2 <= ln; k2++) {
+          int i = row[pj++];
+          int nvi;
+          if ((nvi = nv[i]) <= 0) continue; // node i dead, or seen
+          dk += nvi;                 // degree[Lk] += size of node i
+          nv[i] = -nvi;              // negate nv[i] to denote i in Lk
+          row[pk2++] = i;            // place i in Lk
+          if (next[i] != -1) P[next[i]] = P[i];
+          if (P[i] != -1) {          // remove i from degree list
+            next[P[i]] = next[i];
+          } else {
+            head[degree[i]] = next[i];
+          }
+        }
+        if (e != k) {
+          colind[e] = FLIP (k);      // absorb e into k
+          w[e] = 0;                  // e is now a dead element
+        }
+      }
+      if (elenk != 0) nnz = pk2;        // row[nnz...nzmax] is free
+      degree[k] = dk;                   // external degree of k - |Lk\i|
+      colind[k] = pk1;                  // element k is in row[pk1..pk2-1]
+      len[k] = pk2 - pk1;
+      elen[k] = -2;                     // k is now an element
+      // Find set differences
+      mark = wclear(mark, lemax, get_ptr(w), n);  // clear w if necessary
+      for (int pk = pk1; pk < pk2; pk++) {   // scan 1: find |Le\Lk|
+        int i = row[pk];
+        int eln;
+        if ((eln = elen[i]) <= 0) continue; // skip if elen[i] empty
+        int nvi = -nv[i];                   // nv[i] was negated
+        int wnvi = mark - nvi;
+        for (p = colind[i]; p <= colind[i] + eln - 1; p++) { // scan Ei
+          e = row[p];
+          if (w[e] >= mark) {
+            w[e] -= nvi;          // decrement |Le\Lk|
+          } else if (w[e] != 0) {   // ensure e is a live element
+            w[e] = degree[e] + wnvi; /* 1st time e seen in scan 1 */
+          }
+        }
+      }
+      // Degree update
+      for (int pk = pk1; pk < pk2; pk++) { // scan2: degree update
+        int i = row[pk];                   // consider node i in Lk
+        int p1 = colind[i];
+        int p2 = p1 + elen[i] - 1;
+        int pn = p1;
+        for (h = 0, d = 0, p = p1; p <= p2; p++) { // scan Ei
+          e = row[p];
+          if (w[e] != 0) {         // e is an unabsorbed element
+            int dext = w[e] - mark;    // dext = |Le\Lk|
+            if (dext > 0) {
+              d += dext;          // sum up the set differences
+              row[pn++] = e;      // keep e in Ei
+              h += e;             // compute the hash of node i
+            } else {
+              colind[e] = FLIP (k);  // aggressive absorb. e->k
+              w[e] = 0;             // e is a dead element
+            }
+          }
+        }
+        elen[i] = pn - p1 + 1; // elen[i] = |Ei|
+        int p3 = pn;
+        int p4 = p1 + len[i];
+        for (p = p2 + 1; p < p4; p++) { // prune edges in Ai
+          int j = row[p];
+          int nvj;
+          if ((nvj = nv[j]) <= 0) continue; // node j dead or in Lk
+          d += nvj;                  // degree(i) += |j|
+          row[pn++] = j;             // place j in node list of i
+          h += j;                    // compute hash for node i
+        }
+        if (d == 0) {                    // check for mass elimination
+          colind[i] = FLIP(k);      // absorb i into k
+          int nvi = -nv[i];
+          dk -= nvi;                 // |Lk| -= |i|
+          nvk += nvi;                // |k| += nv[i]
+          nel += nvi;
+          nv[i] = 0;
+          elen[i] = -1;             // node i is dead
+        } else {
+          degree[i] = std::min(degree[i], d);   // update degree(i)
+          row[pn] = row[p3];         // move first node to end
+          row[p3] = row[p1];         // move 1st el. to end of Ei
+          row[p1] = k;               // add k as 1st element in of Ei
+          len[i] = pn - p1 + 1;     // new len of adj. list of node i
+          h %= n;                    // finalize hash of i
+          next[i] = hhead[h];      // place i in hash bucket
+          hhead[h] = i;
+          P[i] = h;              // save hash of i in P[i]
+        }
+      }                          // scan2 is done
+      degree[k] = dk;          // finalize |Lk|
+      lemax = std::max(lemax, dk);
+      mark = wclear(mark+lemax, lemax, get_ptr(w), n);  // clear w
+      // Supernode detection
+      for (int pk = pk1; pk < pk2; pk++) {
+        int i = row[pk];
+        if (nv[i] >= 0) continue;      // skip if i is dead
+        h = P[i];                      // scan hash bucket of node i
+        i = hhead[h];
+        hhead[h] = -1;                 // hash bucket will be empty
+        for (; i != -1 && next[i] != -1; i = next[i], mark++) {
+          ln = len[i];
+          int eln = elen[i];
+          for (p = colind[i]+1; p <= colind[i] + ln-1; p++) w[row[p]] = mark;
+          int jlast = i;
+          for (int j = next[i]; j != -1; ) { // compare i with all j
+            int ok = (len[j] == ln) && (elen[j] == eln);
+            for (p = colind[j] + 1; ok && p <= colind[j] + ln - 1; p++) {
+              if (w[row[p]] != mark) ok = 0; // compare i and j
+            }
+            if (ok) {                    // i and j are identical
+              colind[j] = FLIP (i);  // absorb j into i
+              nv[i] += nv[j];
+              nv[j] = 0;
+              elen[j] = -1;         // node j is dead
+              j = next[j];          // delete j from hash bucket
+              next[jlast] = j;
+            } else {
+              jlast = j;             // j and i are different
+              j = next[j];
+            }
+          }
+        }
+      }
+      // Finalize new element
+      int pk;
+      for (p = pk1, pk = pk1; pk < pk2; pk++) {  // finalize Lk
+        int i = row[pk];
+        int nvi;
+        if ((nvi = -nv[i]) <= 0) continue; // skip if i is dead
+        nv[i] = nvi;                      // restore nv[i]
+        d = degree[i] + dk - nvi;         // compute external degree(i)
+        d = std::min(d, n - nel - nvi);
+        if (head[d] != -1) P[head[d]] = i;
+        next[i] = head[d];               // put i back in degree list
+        P[i] = -1;
+        head[d] = i;
+        mindeg = std::min(mindeg, d);    // find new minimum degree
+        degree[i] = d;
+        row[p++] = i;                    // place i in Lk
+      }
+      nv[k] = nvk;                      // # nodes absorbed into k
+      if ((len[k] = p-pk1) == 0) {      // length of adj list of element k
+        colind[k] = -1;                 // k is a root of the tree
+        w[k] = 0;                       // k is now a dead element
+      }
+      if (elenk != 0) nnz = p;          // free unused space in Lk
+    }
+    // Postordering
+    for (int i = 0; i < n; i++) colind[i] = FLIP(colind[i]); // fix assembly tree
+    for (int j = 0; j <= n; j++) head[j] = -1;
+    for (int j = n; j >= 0; j--) {            // place unordered nodes in lists
+      if (nv[j] > 0) continue;            // skip if j is an element
+      next[j] = head[colind[j]];          // place j in list of its parent
+      head[colind[j]] = j;
+    }
+    for (int e = n; e >= 0; e--) {            // place elements in lists
+      if (nv[e] <= 0) continue;           // skip unless e is an element
+      if (colind[e] != -1) {
+        next[e] = head[colind[e]];        // place e in list of its parent
+        head[colind[e]] = e;
+      }
+    }
+    for (int k = 0, i = 0; i <= n; i++) {     // postorder the assembly tree
+      if (colind[i] == -1) k = casadi_postorder_dfs(i, k, get_ptr(head), get_ptr(next),
+                                                    get_ptr(P), get_ptr(w));
+    }
+    P.resize(n);
+    return P;
+    #undef FLIP
+  }
+
   void SparsityInternal::breadthFirstSearch(int n, std::vector<int>& wi, std::vector<int>& wj,
                                             std::vector<int>& queue, const std::vector<int>& imatch,
                                             const std::vector<int>& jmatch, int mark) const {
@@ -794,586 +1103,16 @@ namespace casadi {
   }
 
   int SparsityInternal::wclear(int mark, int lemax, int *w, int n) {
-    int k ;
     if (mark < 2 || (mark + lemax < 0)) {
-        for (k = 0 ; k < n ; k++) if (w[k] != 0) w[k] = 1 ;
-        mark = 2 ;
-      }
-    return (mark) ;     /* at this point, w[0..n-1] < mark holds */
+      for (int k = 0; k<n; ++k) if (w[k] != 0) w[k] = 1;
+      mark = 2 ;
+    }
+    // at this point, w [0..n-1] < mark holds
+    return mark;
   }
 
   int SparsityInternal::diag(int i, int j, double aij, void *other) {
     return (i != j) ;
-  }
-
-#define CS_FLIP(i) (-(i)-2)
-
-  std::vector<int> SparsityInternal::amd(int order) const {
-
-    int *Cp, *Ci, *last, *len, *nv, *next, *head, *elen, *degree, *w;
-    int *hhead, d, dk, dext, lemax = 0, e, elenk, eln, i, j, k, k1;
-    int k2, k3, jlast, ln, nzmax, mindeg = 0, nvi, nvj, nvk, mark, wnvi;
-    int ok, cnz, nel = 0, p, p1, p2, p3, p4, pj, pk, pk1, pk2, pn, q;
-
-    unsigned int h;
-
-    //-- Construct matrix C -----------------------------------------------
-    Sparsity AT = T() ;              // compute A'
-    vector<int> AT_colind = AT.get_colind();
-    vector<int> AT_row = AT.get_row();
-
-    int m = size1();
-    int n = size2();
-    // find dense threshold:
-    int dense = std::max(16, 10 * static_cast<int>(sqrt(static_cast<double>(n))));
-    dense = std::min(n-2, dense);
-    Sparsity C;
-    if (order == 1 && n == m) {
-      // C = A+A
-      C = combine(AT, false, false);
-    } else if (order==2) {
-
-      // drop dense rows from AT
-      for (p2=0, j=0; j<m; ++j) {
-
-        // row j of AT starts here
-        p = AT_colind[j];
-
-        // new row j starts here
-        AT_colind[j] = p2;
-
-        // skip dense row j
-        if (AT_colind[j+1] - p > dense)
-          continue ;
-
-        for ( ; p < AT_colind[j+1] ; p++)
-          AT_row[p2++] = AT_row[p];
-      }
-
-      // finalize AT
-      AT_colind[m] = p2;
-
-      // Resize row vector
-      AT_row.resize(p2);
-      AT = Sparsity(AT.size1(), AT.size2(), AT_colind, AT_row);
-
-      // A2 = AT'
-      Sparsity A2 = AT.T();
-
-      // C=A'*A with no dense columns
-      C = AT->multiply(A2);
-    } else {
-      // C=A'*A
-      C = AT->multiply(shared_from_this<Sparsity>());
-    }
-    vector<int> C_colind = C.get_colind();
-    vector<int> C_row = C.get_row();
-
-    // Free memory
-    AT = Sparsity();
-    // drop diagonal entries
-    drop(diag, 0, C.size1(), C.size2(), C_colind, C_row);
-
-    Cp = &C_colind.front();
-    cnz = Cp[n] ;
-
-    // allocate result
-    vector<int> P(n+1);
-
-    // get workspace
-    vector<int> W(8*(n+1));
-
-    len = &W.front();
-    nv = &W.front()  + (n+1);
-    next = &W.front() + 2*(n+1);
-    head = &W.front() + 3*(n+1);
-    elen = &W.front() + 4*(n+1);
-    degree = &W.front() + 5*(n+1);
-    w= &W.front() + 6*(n+1);
-    hhead = &W.front() + 7*(n+1);
-
-    // use P as workspace for last
-    last = &P.front();
-
-    // --- Initialize quotient graph ----------------------------------------
-    for (k=0; k<n; ++k)
-      len[k] = Cp[k+1]-Cp[k];
-
-    len[n] = 0;
-    nzmax = C.nnz();
-    Ci = &C_row.front() ;
-    for (i=0; i<=n; ++i) {
-      // degree list i is empty
-      head[i] = -1;
-      last[i] = -1;
-      next[i] = -1;
-
-      // hash list i is empty
-      hhead[i] = -1;
-
-      // node i is just one node
-      nv[i] = 1;
-
-      // node i is alive
-      w[i] = 1;
-
-      // Ek of node i is empty
-      elen[i] = 0;
-
-      // degree of node i
-      degree[i] = len[i];
-    }
-
-    // clear w
-    mark = wclear(0, 0, w, n);
-
-    // n is a dead element
-    elen[n] = -2;
-
-    // n is a root of assembly tree
-    Cp[n] = -1;
-
-    // n is a dead element
-    w[n] = 0;
-
-    // --- Initialize degree lists ------------------------------------------
-    for (i = 0; i<n; ++i) {
-      d = degree[i];
-
-      // node i is empty
-      if (d == 0) {
-        // element i is dead
-        elen[i] = -2;
-        nel++;
-
-        // i is a root of assembly tree
-        Cp[i] = -1;
-        w[i] = 0;
-      } else if (d > dense) { // node i is dense
-        // absorb i into element n
-        nv[i] = 0;
-
-        // node i is dead
-        elen[i] = -1;
-        nel++;
-        Cp[i] = CS_FLIP(n) ;
-        nv[n]++ ;
-      } else {
-        if (head[d] != -1)
-          last[head[d]] = i;
-
-        // put node i in degree list d
-        next[i] = head[d];
-        head[d] = i;
-      }
-    }
-
-    // while (selecting pivots) do
-    while (nel < n) {
-      // --- Select node of minimum approximate degree --------------------
-      for (k = -1 ; mindeg < n && (k = head[mindeg]) == -1; mindeg++) {}
-
-      if (next[k] != -1) last[next[k]] = -1 ;
-
-      // remove k from degree list
-      head[mindeg] = next[k];
-
-      // elenk = |Ek|
-      elenk = elen[k];
-
-      // # of nodes k represents
-      nvk = nv[k];
-
-      // nv[k] nodes of A eliminated
-      nel += nvk;
-
-      // --- Garbage collection -------------------------------------------
-      if (elenk > 0 && cnz + mindeg >= nzmax) {
-        for (j=0; j<n; ++j) {
-          // j is a live node or element
-          if ((p = Cp[j]) >= 0) {
-            // save first entry of object
-            Cp[j] = Ci[p];
-
-            // first entry is now CS_FLIP(j)
-            Ci[p] = CS_FLIP(j);
-          }
-        }
-
-        // scan all of memory
-        for (q = 0, p = 0 ; p < cnz ;) {
-          // found object j
-          if ((j = CS_FLIP(Ci[p++])) >= 0) {
-            // restore first entry of object
-            Ci[q] = Cp[j];
-
-            // new pointer to object j
-            Cp[j] = q++;
-            for (k3 = 0 ; k3 < len[j]-1 ; k3++)
-              Ci[q++] = Ci[p++] ;
-          }
-        }
-
-        // Ci[cnz...nzmax-1] now free
-        cnz = q;
-      }
-
-      // --- Construct new element ----------------------------------------
-      dk = 0 ;
-
-      // flag k as in Lk
-      nv[k] = -nvk;
-      p = Cp[k] ;
-
-      // do in place if elen[k] == 0
-      pk1 = (elenk == 0) ? p : cnz;
-      pk2 = pk1 ;
-      for (k1 = 1 ; k1 <= elenk + 1 ; k1++) {
-        if (k1 > elenk) {
-          // search the nodes in k
-          e = k;
-
-          // list of nodes starts at Ci[pj]
-          pj = p;
-
-          // length of list of nodes in k
-          ln = len[k] - elenk;
-        } else {
-          // search the nodes in e
-          e = Ci[p++];
-          pj = Cp[e] ;
-
-          // length of list of nodes in e
-          ln = len[e];
-        }
-
-        for (k2=1; k2<=ln ; ++k2) {
-          i = Ci[pj++] ;
-
-          // node i dead, or seen
-          if ((nvi = nv[i]) <= 0) continue;
-
-          // degree[Lk] += size of node i
-          dk += nvi;
-
-          // negate nv[i] to denote i in Lk
-          nv[i] = -nvi;
-
-          // place i in Lk
-          Ci[pk2++] = i;
-
-          if (next[i] != -1)
-            last[next[i]] = last[i];
-
-          // remove i from degree list
-          if (last[i] != -1) {
-            next[last[i]] = next[i] ;
-          } else {
-            head[degree[i]] = next[i] ;
-          }
-        }
-
-        if (e != k) {
-          // absorb e into k
-          Cp[e] = CS_FLIP(k);
-
-          // e is now a dead element
-          w[e] = 0;
-        }
-      }
-
-      // Ci[cnz...nzmax] is free
-      if (elenk != 0)
-        cnz = pk2;
-
-      // external degree of k - |Lk\i|
-      degree[k] = dk;
-
-      // element k is in Ci[pk1..pk2-1]
-      Cp[k] = pk1;
-      len[k] = pk2 - pk1 ;
-
-      // k is now an element
-      elen[k] = -2;
-
-      // --- Find set differences -----------------------------------------
-
-      // clear w if necessary
-      mark = wclear(mark, lemax, w, n);
-
-      // scan 1: find |Le\Lk|
-      for (pk = pk1 ; pk < pk2 ; ++pk) {
-        i = Ci[pk] ;
-
-        // skip if elen[i] empty
-        if ((eln = elen[i]) <= 0)
-          continue;
-
-        // nv[i] was negated
-        nvi = -nv[i];
-
-        wnvi = mark - nvi ;
-
-        // scan Ei
-        for (p = Cp[i] ; p <= Cp[i] + eln - 1 ; ++p) {
-          e = Ci[p];
-          if (w[e] >= mark) {
-            // decrement |Le\Lk|
-            w[e] -= nvi;
-          } else if (w[e] != 0) {        /* ensure e is a live element */
-            w[e] = degree[e] + wnvi ; /* 1st time e seen in scan 1 */
-          }
-        }
-      }
-
-      // --- Degree update ------------------------------------------------
-      // scan2: degree update
-      for (pk = pk1 ; pk < pk2 ; ++pk) {
-        // consider node i in Lk
-        i = Ci[pk];
-        p1 = Cp[i] ;
-        p2 = p1 + elen[i] - 1 ;
-        pn = p1 ;
-
-        // scan Ei
-        for (h = 0, d = 0, p = p1 ; p <= p2 ; p++) {
-          e = Ci[p] ;
-
-          // e is an unabsorbed element
-          if (w[e] != 0) {
-            // dext = |Le\Lk|
-            dext = w[e] - mark;
-            if (dext > 0) {
-              // sum up the set differences
-              d += dext;
-
-              // keep e in Ei
-              Ci[pn++] = e;
-
-              // compute the hash of node i
-              h += e;
-
-            } else {
-              // aggressive absorb. e->k
-              Cp[e] = CS_FLIP(k);
-
-              // e is a dead element
-              w[e] = 0;
-            }
-          }
-        }
-
-        // elen[i] = |Ei|
-        elen[i] = pn - p1 + 1;
-        p3 = pn ;
-        p4 = p1 + len[i] ;
-
-        // prune edges in Ai
-        for (p = p2 + 1 ; p < p4 ; p++) {
-          j = Ci[p] ;
-
-          // node j dead or in Lk
-          if ((nvj = nv[j]) <= 0)
-            continue;
-
-          // degree(i) += |j|
-          d += nvj;
-
-          // place j in node list of i
-          Ci[pn++] = j;
-
-          // compute hash for node i
-          h += j;
-        }
-
-        // check for mass elimination
-        if (d == 0) {
-          // absorb i into k
-          Cp[i] = CS_FLIP(k);
-          nvi = -nv[i];
-
-          // |Lk| -= |i|
-          dk -= nvi;
-
-          // |k| += nv[i]
-          nvk += nvi;
-          nel += nvi;
-          nv[i] = 0 ;
-
-          // node i is dead
-          elen[i] = -1;
-        } else {
-          // update degree(i)
-          degree[i] = std::min(degree[i], d);
-
-          // move first node to end
-          Ci[pn] = Ci[p3];
-
-          // move 1st el. to end of Ei
-          Ci[p3] = Ci[p1];
-
-          // add k as 1st element in of Ei
-          Ci[p1] = k;
-
-          // new len of adj. list of node i
-          len[i] = pn - p1 + 1;
-
-          // finalize hash of i
-          h %= n;
-
-          // place i in hash bucket
-          next[i] = hhead[h];
-          hhead[h] = i ;
-
-          // save hash of i in last[i]
-          last[i] = h;
-        }
-      } // scan2 is done
-
-      // finalize |Lk|
-      degree[k] = dk;
-      lemax = std::max(lemax, dk);
-
-      // clear w
-      mark = wclear(mark+lemax, lemax, w, n);
-
-      // --- Supernode detection ------------------------------------------
-      for (pk = pk1 ; pk < pk2 ; pk++) {
-        i = Ci[pk] ;
-
-        // skip if i is dead
-        if (nv[i] >= 0)
-          continue;
-
-        // scan hash bucket of node i
-        h = last[i];
-        i = hhead[h];
-
-        // hash bucket will be empty
-        hhead[h] = -1;
-        for ( ; i != -1 && next[i] != -1 ; i = next[i], mark++) {
-          ln = len[i] ;
-          eln = elen[i] ;
-          for (p = Cp[i]+1 ; p <= Cp[i] + ln-1 ; p++)
-            w[Ci[p]] = mark;
-
-          jlast = i;
-
-          // compare i with all j
-          for (j = next[i] ; j != -1 ;) {
-            ok = (len[j] == ln) && (elen[j] == eln) ;
-            for (p = Cp[j] + 1 ; ok && p <= Cp[j] + ln - 1 ; p++) {
-              if (w[Ci[p]] != mark) ok = 0 ;    /* compare i and j*/
-            }
-
-            // i and j are identical
-            if (ok) {
-              // absorb j into i
-              Cp[j] = CS_FLIP(i);
-              nv[i] += nv[j] ;
-              nv[j] = 0;
-
-              // node j is dead
-              elen[j] = -1;
-
-              // delete j from hash bucket
-              j = next[j];
-              next[jlast] = j ;
-            } else {
-              // j and i are different
-              jlast = j;
-              j = next[j] ;
-            }
-          }
-        }
-      }
-
-      //  --- Finalize new element------------------------------------------
-      // finalize Lk
-      for (p = pk1, pk = pk1 ; pk < pk2 ; pk++) {
-        i = Ci[pk] ;
-
-        // skip if i is dead
-        if ((nvi = -nv[i]) <= 0)
-          continue;
-
-        // restore nv[i]
-        nv[i] = nvi;
-
-        // compute external degree(i)
-        d = degree[i] + dk - nvi ;
-        d = std::min(d, n - nel - nvi);
-        if (head[d] != -1)
-          last[head[d]] = i;
-
-        // put i back in degree list
-        next[i] = head[d];
-        last[i] = -1 ;
-        head[d] = i ;
-
-        // find new minimum degree
-        mindeg = std::min(mindeg, d);
-        degree[i] = d ;
-
-        // place i in Lk
-        Ci[p++] = i;
-      }
-
-      // # nodes absorbed into k
-      nv[k] = nvk;
-
-      // length of adj list of element k
-      if ((len[k] = p-pk1) == 0) {
-        // k is a root of the tree
-        Cp[k] = -1;
-
-        // k is now a dead element
-        w[k] = 0;
-      }
-
-      // free unused space in Lk
-      if (elenk != 0)
-        cnz = p;
-    }
-
-    // --- Postordering -----------------------------------------------------
-
-    // fix assembly tree
-    for (i=0; i<n; ++i)
-      Cp[i] = CS_FLIP(Cp[i]);
-
-    for (j = 0 ; j <= n ; j++)
-      head[j] = -1 ;
-
-    // place unordered nodes in lists
-    for (j = n ; j >= 0 ; j--) {
-      // skip if j is an element
-      if (nv[j] > 0) continue;
-
-      // place j in list of its parent
-      next[j] = head[Cp[j]];
-      head[Cp[j]] = j;
-    }
-
-    // place elements in lists
-    for (e = n ; e >= 0 ; e--) {
-      // skip unless e is an element
-      if (nv[e] <= 0) continue;
-      if (Cp[e] != -1) {
-        // place e in list of its parent
-        next[e] = head[Cp[e]];
-        head[Cp[e]] = e ;
-      }
-    }
-
-    // postorder the assembly tree
-    for (k = 0, i = 0 ; i <= n ; i++) {
-      if (Cp[i] == -1) {
-        k = casadi_postorder_dfs(i, k, head, next, &P.front(), w) ;
-      }
-    }
-
-    return P;
   }
 
   int SparsityInternal::scatter(int j, std::vector<int>& w, int mark, int* Ci, int nz) const {
@@ -1484,6 +1223,39 @@ namespace casadi {
       // Construct sparsity pattern
       return Sparsity(n, 1, ret_colind, ret_row);
     }
+  }
+
+  bool SparsityInternal::has_diag() const {
+    int nrow = this->size1();
+    int ncol = this->size2();
+    const int* colind = this->colind();
+    const int* row = this->row();
+    for (int c=0; c<ncol && c<nrow; ++c) {
+      for (int k=colind[c]; k<colind[c+1]; ++k) {
+        if (row[k]==c) return true;
+      }
+    }
+    return false;
+  }
+
+  Sparsity SparsityInternal::drop_diag() const {
+    int nrow = this->size1();
+    int ncol = this->size2();
+    const int* colind = this->colind();
+    const int* row = this->row();
+    // Return sparsity
+    vector<int> ret_colind(ncol+1), ret_row;
+    ret_colind[0] = 0;
+    ret_row.reserve(nnz());
+    for (int c=0; c<ncol; ++c) {
+      for (int k=colind[c]; k<colind[c+1]; ++k) {
+        if (row[k]!=c) {
+          ret_row.push_back(row[k]);
+        }
+      }
+      ret_colind[c+1] = ret_row.size();
+    }
+    return Sparsity(nrow, ncol, ret_colind, ret_row);
   }
 
   std::string SparsityInternal::dim(bool with_nz) const {
