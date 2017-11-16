@@ -135,6 +135,20 @@ namespace casadi {
     return ret;
   }
 
+  Function LinearInterpolantJac::
+  get_jacobian(const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
+                  const Dict& opts) const {
+    std::vector<MX> args = mx_in();
+    std::vector<MX> res(n_out_);
+    for (int i=0;i<n_out_;++i)
+      res[i] = DM(size1_out(i), size2_out(i));
+    Function f("f", args, res);
+
+    return f->get_jacobian(name, inames, onames, Dict());
+  }
+
   void LinearInterpolantJac::init(const Dict& opts) {
     // Call the base class initializer
     FunctionInternal::init(opts);

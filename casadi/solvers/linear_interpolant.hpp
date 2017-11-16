@@ -129,6 +129,16 @@ namespace casadi {
 
     /// Evaluate numerically
     int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+
+    ///@{
+    /** \brief Full Jacobian */
+    bool has_jacobian() const override { return true;}
+    Function get_jacobian(const std::string& name,
+                                      const std::vector<std::string>& inames,
+                                      const std::vector<std::string>& onames,
+                                      const Dict& opts) const override;
+    ///@}
+
   };
 
 } // namespace casadi
