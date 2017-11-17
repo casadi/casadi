@@ -177,7 +177,8 @@ namespace casadi {
                       const std::string& x, const std::string& y);
 
     /** \brief Multilinear interpolation */
-    std::string interpn(const std::string& res, int ndim, const std::string& grid, const std::string& offset,
+    std::string interpn(const std::string& res, int ndim, const std::string& grid,
+                        const std::string& offset,
                         const std::string& values, const std::string& x,
                         const std::string& lookup_mode, int m,
                         const std::string& iw, const std::string& w);

@@ -357,7 +357,7 @@ namespace casadi {
     while (nel < n) {                        // while (selecting pivots) do
       // Select node of minimum approximate degree
       int k;
-      for (k = -1; mindeg < n && (k = head[mindeg]) == -1; mindeg++);
+      for (k = -1; mindeg < n && (k = head[mindeg]) == -1; mindeg++) {}
       if (next[k] != -1) P[next[k]] = -1;
       head[mindeg] = next[k];          // remove k from degree list
       int elenk = elen[k];             // elenk = |Ek|
@@ -415,7 +415,7 @@ namespace casadi {
           }
         }
         if (e != k) {
-          colind[e] = FLIP (k);      // absorb e into k
+          colind[e] = FLIP(k);      // absorb e into k
           w[e] = 0;                  // e is now a dead element
         }
       }
@@ -456,7 +456,7 @@ namespace casadi {
               row[pn++] = e;      // keep e in Ei
               h += e;             // compute the hash of node i
             } else {
-              colind[e] = FLIP (k);  // aggressive absorb. e->k
+              colind[e] = FLIP(k);  // aggressive absorb. e->k
               w[e] = 0;             // e is a dead element
             }
           }
@@ -513,7 +513,7 @@ namespace casadi {
               if (w[row[p]] != mark) ok = 0; // compare i and j
             }
             if (ok) {                    // i and j are identical
-              colind[j] = FLIP (i);  // absorb j into i
+              colind[j] = FLIP(i);  // absorb j into i
               nv[i] += nv[j];
               nv[j] = 0;
               elen[j] = -1;         // node j is dead

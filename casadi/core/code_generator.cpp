@@ -854,7 +854,8 @@ namespace casadi {
     return s.str();
   }
 
-  string CodeGenerator::interpn(const std::string& res, int ndim, const string& grid, const string& offset,
+  string CodeGenerator::interpn(const std::string& res, int ndim, const string& grid,
+                                   const string& offset,
                                    const string& values, const string& x,
                                    const string& lookup_mode, int m,
                                    const string& iw, const string& w) {
