@@ -404,6 +404,11 @@ namespace casadi {
   }
 
   Sparsity Sparsity::mtimes(const Sparsity& x, const Sparsity& y) {
+    // Check matching dimensions
+    casadi_assert(x.size2()==y.size1(),
+      "Matrix product with incompatible dimensions. Lhs is "
+      + x.dim() + " and rhs is " + y.dim() + ".");
+
     return x->_mtimes(y);
   }
 

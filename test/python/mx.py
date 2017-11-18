@@ -2582,7 +2582,9 @@ class MXtests(casadiTestCase):
     F = Function('F',[X],[det(X)])
     self.checkfunction(f,F,inputs=[x0])
 
-    
+  def test_mtimes_mismatch_segfault(self):
+    with self.assertInException("incompatible dimensions"):
+      mtimes(DM(Sparsity.lower(5)),MX.sym('x',100))
     
 
 if __name__ == '__main__':
