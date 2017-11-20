@@ -150,20 +150,14 @@ namespace casadi {
 
   void SXFunction::codegen_body(CodeGenerator& g) const {
 
-    // Which variables have been declared
-    vector<bool> declared(sz_w(), false);
-
     // Run the algorithm
     for (auto&& a : algorithm_) {
       if (a.op==OP_OUTPUT) {
         g << "if (res[" << a.i0 << "]!=0) "
           << "res["<< a.i0 << "][" << a.i2 << "]=" << "a" << a.i1;
       } else {
-        // Declare result if not already declared
-        if (!declared[a.i0]) {
-          g << "casadi_real ";
-          declared[a.i0]=true;
-        }
+        // Make sure work vector element has been declared
+        g.local("a" + str(a.i0), "casadi_real");
 
         // Where to store the result
         g << "a" << a.i0 << "=";
