@@ -5,6 +5,7 @@
  *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright (C) 2006-2009 Timothy A. Davis
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -76,8 +77,11 @@ namespace casadi {
    Since the object is reference counted (it inherits from SharedObject), several matrices are
    allowed to share the same sparsity pattern.
 
-   The implementations of some methods of this class has been taken from the CSparse package and
-   modified to use C++ standard library and CasADi data structures.
+   The implementations of methods marked as such in this class has been taken from the
+   CSparse package and modified to fit CasADi data structures and separation of
+   sparsity pattern calculation and numerical evaluation.
+   These functions are Copyright(c) Timothy A. Davis, 2006-2009
+   and licensed as a derivative work under the GNU LGPL
 
    * \see Matrix
    *
@@ -697,7 +701,10 @@ namespace casadi {
       prior to factorization.
       The system must be symmetric, for an unsymmetric matrix A, first form the square
       of the pattern, A'*A.
-      See Direct Methods for Sparse Linear Systems by Davis (2006).
+
+      The implementation is a modified version of cs_amd in CSparse
+      Copyright(c) Timothy A. Davis, 2006-2009
+      Licensed as a derivative work under the GNU LGPL
     */
     std::vector<int> amd() const;
 

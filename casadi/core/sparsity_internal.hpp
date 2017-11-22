@@ -5,6 +5,7 @@
  *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright (C) 2006-2009 Timothy A. Davis
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -102,7 +103,11 @@ namespace casadi {
     /// Find the strongly connected components of a square matrix: See cs_scc in CSparse
     int scc(std::vector<int>& p, std::vector<int>& r) const;
 
-    /// Approximate minimal degree preordering: See cs_amd in CSparse
+    /** Approximate minimal degree preordering
+      * The implementation is a modified version of cs_amd in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
     std::vector<int> amd() const;
 
     /// Transpose the matrix

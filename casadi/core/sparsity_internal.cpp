@@ -5,6 +5,7 @@
  *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright (C) 2006-2009 Timothy A. Davis
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -266,15 +267,12 @@ namespace casadi {
   }
 
   std::vector<int> SparsityInternal::amd() const {
-    casadi_assert(is_symmetric(), "AMD requires a symmetric matrix");
     /*
-    cs *C, *A2, *AT ;
-    int *Cp, *Ci, *last, *W, *len, *nv, *next, *P, *head, *elen, *degree, *w,
-        *hhead, *ATp, *ATi, d, dk, dext, lemax = 0, e, elenk, eln, i, j, k, k1,
-        k2, k3, jlast, ln, dense, nzmax, mindeg = 0, nvi, nvj, nvk, mark, wnvi,
-        ok, cnz, nel = 0, p, p1, p2, p3, p4, pj, pk, pk1, pk2, pn, q, n, m, t ;
-    unsigned int h ;
+    Modified version of cs_amd in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
     */
+    casadi_assert(is_symmetric(), "AMD requires a symmetric matrix");
     // Get sparsity
     int n=size2();
     vector<int> colind = get_colind();
