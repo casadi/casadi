@@ -58463,9 +58463,11 @@ arbitrary element in constant time.
 Since the object is reference counted (it inherits from SharedObject),
 several matrices are allowed to share the same sparsity pattern.
 
-The implementations of some methods of this class has been taken from the
-CSparse package and modified to use C++ standard library and CasADi data
-structures.
+The implementations of methods marked as such in this class has been taken
+from the CSparse package and modified to fit CasADi data structures and
+separation of sparsity pattern calculation and numerical evaluation. These
+functions are Copyright(c) Timothy A. Davis, 2006-2009 and licensed as a
+derivative work under the GNU LGPL
 
 See:   Matrix
 
@@ -59004,7 +59006,10 @@ Is diagonal?
 Approximate minimal degree preordering Fill-reducing ordering applied to the
 sparsity pattern of a linear system prior to factorization. The system must
 be symmetric, for an unsymmetric matrix A, first form the square of the
-pattern, A'*A. See Direct Methods for Sparse Linear Systems by Davis (2006).
+pattern, A'*A.
+
+The implementation is a modified version of cs_amd in CSparse Copyright(c)
+Timothy A. Davis, 2006-2009 Licensed as a derivative work under the GNU LGPL
 
 ";
 
