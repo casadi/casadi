@@ -2144,7 +2144,7 @@ namespace std {
 #endif
 
 %casadi_typemaps(L_STR, PREC_STRING, std::string)
-%casadi_template("[" L_STR "]", PREC_VECTOR, std::vector<std::string>)
+%casadi_template(LL L_STR LR, PREC_VECTOR, std::vector<std::string>)
 %casadi_typemaps("Sparsity", PREC_SPARSITY, casadi::Sparsity)
 %casadi_template(LL "Sparsity" LR, PREC_SPARSITY, std::vector< casadi::Sparsity>)
 %casadi_template(LL LL "Sparsity"  LR  LR, PREC_SPARSITY, std::vector<std::vector< casadi::Sparsity> >)
@@ -2192,6 +2192,7 @@ namespace std {
 %casadi_template(LL "Function" LR, PREC_FUNCTION, std::vector<casadi::Function>)
 %casadi_template(LPAIR("Function","Function"), PREC_FUNCTION, std::pair<casadi::Function, casadi::Function>)
 %casadi_template(L_DICT, PREC_DICT, std::map<std::string, casadi::GenericType>)
+%casadi_template(LDICT(LL L_STR LR), PREC_DICT, std::map<std::string, std::vector<std::string> >)
 
 #undef L_INT
 #undef L_BOOL
