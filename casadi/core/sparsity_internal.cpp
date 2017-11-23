@@ -2297,6 +2297,10 @@ namespace casadi {
   }
 
   void SparsityInternal::find(std::vector<int>& loc, bool ind1) const {
+    if (is_dense()) {
+      loc = range(ind1, numel()+ind1);
+      return;
+    }
     const int* colind = this->colind();
     const int* row = this->row();
 
@@ -2321,6 +2325,8 @@ namespace casadi {
   void SparsityInternal::get_nz(std::vector<int>& indices) const {
     // Quick return if no elements
     if (indices.empty()) return;
+    // In a dense matrix, all indices can be found
+    if (is_dense()) return;
     const int* colind = this->colind();
     const int* row = this->row();
 
