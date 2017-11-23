@@ -283,6 +283,7 @@ namespace casadi {
 
   void GetNonzeros::ad_forward(const std::vector<std::vector<MX> >& fseed,
                             std::vector<std::vector<MX> >& fsens) const {
+
     // Get all the nonzeros
     vector<int> nz = all();
 
@@ -297,11 +298,10 @@ namespace casadi {
     // Input sparsity
     const Sparsity& isp = dep().sparsity();
     //const vector<int>& irow = isp.row();
-    vector<int> icol = isp.get_col();
+    vector<int> icol;
 
     // Get all input elements
     vector<int> el_input;
-    isp.find(el_input);
 
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_colind, r_row, r_nz, r_ind;
@@ -313,52 +313,64 @@ namespace casadi {
       const MX& arg = fseed[d][0];
       MX& res = fsens[d][0];
 
-      // Get the matching nonzeros
-      r_ind.resize(el_input.size());
-      copy(el_input.begin(), el_input.end(), r_ind.begin());
-      arg.sparsity().get_nz(r_ind);
-
-      // Sparsity pattern for the result
-      r_colind.resize(osp.size2()+1); // Col count
-      fill(r_colind.begin(), r_colind.end(), 0);
-      r_row.clear();
-
-      // Perform the assignments
-      r_nz.clear();
-      for (int k=0; k<nz.size(); ++k) {
-
-        // Get the corresponding nonzero for the input
-        int el = nz[k];
-
-        // Skip if zero assignment
-        if (el==-1) continue;
-
-        // Get the corresponding nonzero in the argument
-        int el_arg = r_ind[el];
-
-        // Skip if no argument
-        if (el_arg==-1) continue;
-
-        // Save the assignment
-        r_nz.push_back(el_arg);
-
-        // Get the corresponding element
-        int i=ocol[k], j=orow[k];
-
-        // Add to sparsity pattern
-        r_row.push_back(j);
-        r_colind[1+i]++;
-      }
-
-      // col count -> col offset
-      for (int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1];
-
-      // Create a sparsity pattern from vectors
-      if (r_nz.size()==0) {
-        res = MX(osp.size());
+      if (arg.sparsity()==isp) { // Matching sparsity
+        if (nz.size()==0) {
+          res = MX(osp.size());
+        } else {
+          res = arg->get_nzref(osp, nz);
+        }
       } else {
-        Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);
-        res = arg->get_nzref(f_sp, r_nz);
+        // Expensive operations
+        if (el_input.empty()) isp.find(el_input);
+        if (icol.empty()) icol = isp.get_col();
+
+        // Get the matching nonzeros
+        r_ind.resize(el_input.size());
+        copy(el_input.begin(), el_input.end(), r_ind.begin());
+        arg.sparsity().get_nz(r_ind);
+
+        // Sparsity pattern for the result
+        r_colind.resize(osp.size2()+1); // Col count
+        fill(r_colind.begin(), r_colind.end(), 0);
+        r_row.clear();
+
+        // Perform the assignments
+        r_nz.clear();
+        for (int k=0; k<nz.size(); ++k) {
+
+          // Get the corresponding nonzero for the input
+          int el = nz[k];
+
+          // Skip if zero assignment
+          if (el==-1) continue;
+
+          // Get the corresponding nonzero in the argument
+          int el_arg = r_ind[el];
+
+          // Skip if no argument
+          if (el_arg==-1) continue;
+
+          // Save the assignment
+          r_nz.push_back(el_arg);
+
+          // Get the corresponding element
+          int i=ocol[k], j=orow[k];
+
+          // Add to sparsity pattern
+          r_row.push_back(j);
+          r_colind[1+i]++;
+        }
+
+        // col count -> col offset
+        for (int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1];
+
+        // Create a sparsity pattern from vectors
+        if (r_nz.size()==0) {
+          res = MX(osp.size());
+        } else {
+          Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);
+          res = arg->get_nzref(f_sp, r_nz);
+        }
       }
     }
   }
