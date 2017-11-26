@@ -34,6 +34,344 @@
 using namespace std;
 
 namespace casadi {
+  void SparsityInternal::etree(const int* sp, int* parent, int *w, int ata) {
+    /*
+    Modified version of cs_etree in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
+    int r, c, k, rnext;
+    // Extract sparsity
+    int nrow = *sp++, ncol = *sp++;
+    const int *colind = sp, *row = sp+ncol+1;
+    // Highest known ascestor of a node
+    int *ancestor=w;
+    // Path for A'A
+    int *prev;
+    if (ata) {
+      prev=w+ncol;
+      for (r=0; r<nrow; ++r) prev[r] = -1;
+    }
+    // Loop over columns
+    for (c=0; c<ncol; ++c) {
+      parent[c] = -1; // No parent yet
+      ancestor[c] = -1; // No ancestor
+      // Loop over nonzeros
+      for (k=colind[c]; k<colind[c+1]; ++k) {
+        r = row[k];
+        if (ata) r = prev[r];
+        // Traverse from r to c
+        while (r!=-1 && r<c) {
+          rnext = ancestor[r];
+          ancestor[r] = c;
+          if (rnext==-1) parent[r] = c;
+          r = rnext;
+        }
+        if (ata) prev[row[k]] = c;
+      }
+    }
+  }
+
+  int SparsityInternal::postorder_dfs(int j, int k, int* head, int* next,
+                                      int* post, int* stack) {
+    /* Modified version of cs_tdfs in CSparse
+      Copyright(c) Timothy A. Davis, 2006-2009
+      Licensed as a derivative work under the GNU LGPL
+    */
+    int i, p, top=0;
+    stack[0] = j;
+    while (top>=0) {
+      p = stack[top];
+      i = head[p];
+      if (i==-1) {
+        // No children
+        top--;
+        post[k++] = p;
+      } else {
+        // Add to stack
+        head[p] = next[i];
+        stack[++top] = i;
+      }
+    }
+    return k;
+  }
+
+  void SparsityInternal::postorder(const int* parent, int n, int* post, int* w) {
+    /* Modified version of cs_post in CSparse
+      Copyright(c) Timothy A. Davis, 2006-2009
+      Licensed as a derivative work under the GNU LGPL
+    */
+    int j, k=0;
+    // Work vectors
+    int *head, *next, *stack;
+    head=w; w+=n;
+    next=w; w+=n;
+    stack=w; w+=n;
+    // Empty linked lists
+    for (j=0; j<n; ++j) head[j] = -1;
+    // Traverse nodes in reverse order
+    for (j=n-1; j>=0; --j) {
+      if (parent[j]!=-1) {
+        next[j] = head[parent[j]];
+        head[parent[j]] = j;
+      }
+    }
+    for (j=0; j<n; j++) {
+      if (parent[j]==-1) {
+        k = postorder_dfs(j, k, head, next, post, stack);
+      }
+    }
+  }
+
+  int SparsityInternal::
+  leaf(int i, int j, const int* first, int* maxfirst,
+       int* prevleaf, int* ancestor, int* jleaf) {
+    /* Modified version of cs_leaf in CSparse
+      Copyright(c) Timothy A. Davis, 2006-2009
+      Licensed as a derivative work under the GNU LGPL
+    */
+    int q, s, sparent, jprev;
+    *jleaf = 0;
+    // Quick return if j is not a leaf
+    if (i<=j || first[j]<=maxfirst[i]) return -1;
+    // Update max first[j] seen so far
+    maxfirst[i] = first[j];
+    // Previous leaf of ith subtree
+    jprev = prevleaf[i];
+    prevleaf[i] = j;
+    // j is first or subsequent leaf
+    *jleaf = (jprev == -1) ? 1 : 2;
+    // if first leaf, q is root of ith subtree
+    if (*jleaf==1) return i;
+    // Path compression
+    for (q=jprev; q!=ancestor[q]; q=ancestor[q]) {}
+    for (s=jprev; s!=q; s=sparent) {
+      sparent = ancestor[s];
+      ancestor[s] = q;
+    }
+    // Return least common ancestor
+    return q;
+  }
+
+  int SparsityInternal::
+  qr_counts(const int* tr_sp, const int* parent,
+            const int* post, int* counts, int* w) {
+    /* Modified version of cs_counts in CSparse
+      Copyright(c) Timothy A. Davis, 2006-2009
+      Licensed as a derivative work under the GNU LGPL
+    */
+    int ncol = *tr_sp++, nrow = *tr_sp++;
+    const int *rowind=tr_sp, *col=tr_sp+nrow+1;
+    int i, j, k, J, p, q, jleaf, *maxfirst, *prevleaf,
+      *ancestor, *head=0, *next=0, *first;
+    // Work vectors
+    ancestor=w; w+=ncol;
+    maxfirst=w; w+=ncol;
+    prevleaf=w; w+=ncol;
+    first=w; w+=ncol;
+    head=w; w+=ncol+1;
+    next=w; w+=nrow;
+    // Find first [j]
+    for (k=0; k<ncol; ++k) first[k]=-1;
+    for (k=0; k<ncol; ++k) {
+      j=post[k];
+      // counts[j]=1 if j is a leaf
+      counts[j] = (first[j]==-1) ? 1 : 0;
+      for (; j!=-1 && first[j]==-1; j=parent[j]) first[j]=k;
+    }
+    // Invert post (use ancestor as work vector)
+    for (k=0; k<ncol; ++k) ancestor[post[k]] = k;
+    for (k=0; k<ncol+1; ++k) head[k]=-1;
+    for (i=0; i<nrow; ++i) {
+      for (k=ncol, p=rowind[i]; p<rowind[i+1]; ++p) {
+        k = std::min(k, ancestor[col[p]]);
+      }
+      // Place row i in linked list k
+      next[i] = head[k];
+      head[k] = i;
+    }
+
+    // Clear workspace
+    for (k=0; k<ncol; ++k) maxfirst[k]=-1;
+    for (k=0; k<ncol; ++k) prevleaf[k]=-1;
+    // Each node in its own set
+    for (i=0; i<ncol; ++i) ancestor[i]=i;
+    for (k=0; k<ncol; ++k) {
+      // j is the kth node in the postordered etree
+      j=post[k];
+      if (parent[j]!=-1) counts[parent[j]]--; // j is not a root
+      J=head[k];
+      while (J!=-1) { // J=j for LL' = A case
+        for (p=rowind[J]; p<rowind[J+1]; ++p) {
+          i=col[p];
+          q = leaf(i, j, first, maxfirst, prevleaf, ancestor, &jleaf);
+          if (jleaf>=1) counts[j]++; // A(i,j) is in skeleton
+          if (jleaf==2) counts[q]--; // account for overlap in q
+        }
+        J = next[J];
+      }
+      if (parent[j]!=-1) ancestor[j]=parent[j];
+    }
+    // Sum up counts of each child
+    for (j=0; j<ncol; ++j) {
+      if (parent[j]!=-1) counts[parent[j]] += counts[j];
+    }
+
+    // Sum of counts
+    int sum_counts = 0;
+    for (j=0; j<ncol; ++j) sum_counts += counts[j];
+    return sum_counts;
+  }
+
+  int SparsityInternal::
+  qr_nnz(const int* sp, int* pinv, int* leftmost,
+         const int* parent, int* nrow_ext, int* w) {
+    /* Modified version of cs_sqr in CSparse
+      Copyright(c) Timothy A. Davis, 2006-2009
+      Licensed as a derivative work under the GNU LGPL
+    */
+    // Extract sparsity
+    int nrow = sp[0], ncol = sp[1];
+    const int *colind=sp+2, *row=sp+2+ncol+1;
+    // Work vectors
+    int *next=w; w+=nrow;
+    int *head=w; w+=ncol;
+    int *tail=w; w+=ncol;
+    int *nque=w; w+=ncol;
+    // Local variables
+    int r, c, k, pa;
+    // Clear queue
+    for (c=0; c<ncol; ++c) head[c] = -1;
+    for (c=0; c<ncol; ++c) tail[c] = -1;
+    for (c=0; c<ncol; ++c) nque[c] = 0;
+    for (r=0; r<nrow; ++r) leftmost[r] = -1;
+    // leftmost[r] = min(find(A(r,:)))
+    for (c=ncol-1; c>=0; --c) {
+      for (k=colind[c]; k<colind[c+1]; ++k) {
+        leftmost[row[k]] = c;
+      }
+    }
+    // Scan rows in reverse order
+    for (r=nrow-1; r>=0; --r) {
+      pinv[r] = -1; // row r not yet ordered
+      c=leftmost[r];
+
+      if (c==-1) continue; // row r is empty
+      if (nque[c]++ == 0) tail[c]=r; // first row in queue c
+      next[r] = head[c]; // put r at head of queue c
+      head[c] = r;
+    }
+    // Find row permutation and nnz(V)
+    int v_nnz = 0;
+    int nrow_new = nrow;
+    for (c=0; c<ncol; ++c) {
+      r = head[c]; // remove r from queue c
+      v_nnz++; // count V(c,c) as nonzero
+      if (r<0) r=nrow_new++; // add a fictitious row
+      pinv[r] = c; // associate row r with V(:,c)
+      if (--nque[c]<=0) continue; // skip if V(c+1,nrow,c) is empty
+      v_nnz += nque[c]; // nque[c] is nnz(V(c+1:nrow, c))
+      if ((pa=parent[c]) != -1) {
+        // Move all rows to parent of c
+        if (nque[pa]==0) tail[pa] = tail[c];
+        next[tail[c]] = head[pa];
+        head[pa] = next[r];
+        nque[pa] += nque[c];
+      }
+    }
+    for (r=0; r<nrow; ++r) if (pinv[r]<0) pinv[r] = c++;
+    if (nrow_ext) *nrow_ext = nrow_new;
+    return v_nnz;
+  }
+
+  void SparsityInternal::
+  qr_init(const int* sp, const int* sp_tr,
+          int* leftmost, int* parent, int* pinv,
+          int* nrow_ext, int* v_nnz, int* r_nnz, int* w) {
+    // Extract sparsity
+    int ncol = sp[1];
+    // Calculate elimination tree for A'A
+    etree(sp, parent, w, 1); // len[w] >= nrow+ncol
+    // Calculate postorder
+    int* post = w; w += ncol;
+    postorder(parent, ncol, post, w); // len[w] >= 3*ncol
+    // Calculate nnz in R
+    *r_nnz = qr_counts(sp_tr, parent, post, w, w+ncol);
+    // Calculate nnz in V
+    *v_nnz = qr_nnz(sp, pinv, leftmost, parent, nrow_ext, w);
+  }
+
+  void SparsityInternal::
+  qr_sparsities(const int* sp_a, int nrow_ext, int* sp_v, int* sp_r,
+                const int* leftmost, const int* parent, const int* pinv,
+                int* iw) {
+    /* Modified version of cs_qr in CSparse
+      Copyright(c) Timothy A. Davis, 2006-2009
+      Licensed as a derivative work under the GNU LGPL
+    */
+    // Extract sparsities
+    int ncol = sp_a[1];
+    const int *colind=sp_a+2, *row=sp_a+2+ncol+1;
+    int *v_colind=sp_v+2, *v_row=sp_v+2+ncol+1;
+    int *r_colind=sp_r+2, *r_row=sp_r+2+ncol+1;
+    // Specify dimensions of V and R
+    sp_v[0] = sp_r[0] = nrow_ext;
+    sp_v[1] = sp_r[1] = ncol;
+    // Work vectors
+    int* s = iw; iw += ncol;
+    // Local variables
+    int r, c, k, k1, top, len, k2, r2;
+    // Clear w to mark nodes
+    for (r=0; r<nrow_ext; ++r) iw[r] = -1;
+    // Number of nonzeros in v and r
+    int nnz_r=0, nnz_v=0;
+    // Compute V and R
+    for (c=0; c<ncol; ++c) {
+      // R(:,c) starts here
+      r_colind[c] = nnz_r;
+      // V(:, c) starts here
+      v_colind[c] = k1 = nnz_v;
+      // Add V(c,c) to pattern of V
+      iw[c] = c;
+      v_row[nnz_v++] = c;
+      top = ncol;
+      for (k=colind[c]; k<colind[c+1]; ++k) {
+        r = leftmost[row[k]]; // r = min(find(A(r,:))
+        // Traverse up c
+        for (len=0; iw[r]!=c; r=parent[r]) {
+          s[len++] = r;
+          iw[r] = c;
+        }
+        while (len>0) s[--top] = s[--len]; // push path on stack
+        r = pinv[row[k]]; // r = permuted row of A(:,c)
+        if (r>c && iw[r]<c) {
+          v_row[nnz_v++] = r; // add r to pattern of V(:,c)
+          iw[r] = c;
+        }
+      }
+      // For each r in pattern of R(:,c)
+      for (k = top; k<ncol; ++k) {
+        // R(r,c) is nonzero
+        r = s[k];
+        // Apply (V(r), beta(r)) to x: x -= v*beta*v'*x
+        r_row[nnz_r++] = r;
+        if (parent[r]==c) {
+          for (k2=v_colind[r]; k2<v_colind[r+1]; ++k2) {
+            r2 = v_row[k2];
+            if (iw[r2]<c) {
+              iw[r2] = c;
+              v_row[nnz_v++] = r2;
+            }
+          }
+        }
+      }
+      // R(c,c) = norm(x)
+      r_row[nnz_r++] = c;
+    }
+    // Finalize R, V
+    r_colind[ncol] = nnz_r;
+    v_colind[ncol] = nnz_v;
+  }
 
   SparsityInternal::
   SparsityInternal(int nrow, int ncol, const int* colind, const int* row) :
@@ -564,8 +902,8 @@ namespace casadi {
       }
     }
     for (int k = 0, i = 0; i <= n; i++) {     // postorder the assembly tree
-      if (colind[i] == -1) k = casadi_postorder_dfs(i, k, get_ptr(head), get_ptr(next),
-                                                    get_ptr(P), get_ptr(w));
+      if (colind[i] == -1) k = postorder_dfs(i, k, get_ptr(head), get_ptr(next),
+                                             get_ptr(P), get_ptr(w));
     }
     P.resize(n);
     return P;

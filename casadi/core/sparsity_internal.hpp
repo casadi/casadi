@@ -103,12 +103,101 @@ namespace casadi {
     /// Find the strongly connected components of a square matrix: See cs_scc in CSparse
     int scc(std::vector<int>& p, std::vector<int>& r) const;
 
-    /** Approximate minimal degree preordering
+    /** \brief Approximate minimal degree preordering
       * The implementation is a modified version of cs_amd in CSparse
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
     std::vector<int> amd() const;
+
+    /** \brief Calculate the elimination tree for a matrix
+      * len[w] >= ata ? ncol + nrow : ncol
+      * len[parent] == ncol
+      * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
+      * Modified version of cs_etree in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
+    static void etree(const int* sp, int* parent, int *w, int ata);
+
+    /** \brief Traverse an elimination tree using depth first search
+      * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
+      * Modified version of cs_tdfs in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
+    static int postorder_dfs(int j, int k, int* head, int* next,
+                             int* post, int* stack);
+
+    /** \brief Calculate the postorder permuation
+      * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
+      * len[w] >= 3*n
+      * len[post] == n
+      * Modified version of cs_post in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
+    static void postorder(const int* parent, int n, int* post, int* w);
+
+    /** \brief Needed by casadi_qr_colind
+      * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
+      * Modified version of cs_leaf in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
+    static int leaf(int i, int j, const int* first, int* maxfirst,
+                    int* prevleaf, int* ancestor, int* jleaf);
+
+    /** \brief Calculate the column offsets for the QR R matrix
+      * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
+      * len[counts] = ncol
+      * len[w] >= 5*ncol + nrow + 1
+      * Modified version of cs_counts in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
+    static int qr_counts(const int* tr_sp, const int* parent,
+                         const int* post, int* counts, int* w);
+
+    /** \brief Calculate the number of nonzeros in the QR V matrix
+      * Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
+      * len[w] >= nrow + 3*ncol
+      * len[pinv] == nrow + ncol
+      * len[leftmost] == nrow
+      * Modified version of cs_sqr in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
+    static int qr_nnz(const int* sp, int* pinv, int* leftmost,
+                      const int* parent, int* nrow_ext, int* w);
+
+    /** \brief Setup QP solver
+      * Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
+      * len[w] >= nrow + 7*ncol + 1
+      * len[pinv] == nrow + ncol
+      * len[leftmost] == nrow
+      */
+    static void qr_init(const int* sp, const int* sp_tr,
+                        int* leftmost, int* parent, int* pinv,
+                        int* nrow_ext, int* v_nnz, int* r_nnz, int* w);
+
+    /** \brief Get the row indices for V and R in QR factorization
+      * Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
+      * Note: nrow <= nrow_ext <= nrow+ncol
+      * len[iw] = nrow_ext + ncol
+      * len[x] = nrow_ext
+      * sp_v = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_v]
+      * len[v] nnz_v
+      * sp_r = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_r]
+      * len[r] nnz_r
+      * len[beta] ncol
+      * Modified version of cs_qr in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
+    static void qr_sparsities(const int* sp_a, int nrow_ext, int* sp_v, int* sp_r,
+                              const int* leftmost, const int* parent, const int* pinv,
+                              int* iw);
 
     /// Transpose the matrix
     Sparsity T() const;
