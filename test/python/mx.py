@@ -2586,6 +2586,34 @@ class MXtests(casadiTestCase):
     with self.assertInException("incompatible dimensions"):
       mtimes(DM(Sparsity.lower(5)),MX.sym('x',100))
     
+    
+  @memory_heavy()    
+  def test_getsetnonzeros(self):
+    import numpy
+    numpy.random.seed(42)
+    for S in [Sparsity.lower(5),Sparsity.dense(5,5)]:
+      M = MX.sym("X",S.nnz())
+      
+      m = sin(MX(S,M))
+      for i in [0,2]:
+        for ind in [(i,i),(1,i),(i,1),(slice(None),i),(i,slice(None)),(slice(i,i+2),slice(i,i+2)),(slice(i,i+2),slice(None)),([i,i],[0,0]),([],[])]:
+          E = m.__getitem__(ind)
+          e = cos(E)
+          e = dot(e,e)
+          f = Function('f',[M],[e])
+          self.checkfunction(f,f.expand(),inputs=[ numpy.random.random((S.nnz(),1))])
+        
+          mc = m+0
+          
+          Y = MX.sym("y",E.nnz())
+          y = MX(E.sparsity(),Y)
+          mc.__setitem__(ind,y)
+          e = cos(mc)
+          e = dot(e,e)
+          
+          f = Function('f',[M,Y],[e])
+          self.checkfunction(f,f.expand(),inputs=[ numpy.random.random((S.nnz(),1)), numpy.random.random((E.nnz(),1))])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -385,16 +385,15 @@ namespace casadi {
 
     // Output sparsity
     const Sparsity& osp = sparsity();
-    vector<int> ocol = osp.get_col();
+    vector<int> ocol;
 
     // Input sparsity
     const Sparsity& isp = dep().sparsity();
     //const vector<int>& irow = isp.row();
-    vector<int> icol = isp.get_col();
+    vector<int> icol;
 
     // Get all input elements
     vector<int> el_input;
-    isp.find(el_input);
 
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_colind, r_row, r_nz, r_ind;
@@ -407,55 +406,63 @@ namespace casadi {
       MX aseed0 = aseed[d][0];
       MX asens0 = asens[d][0]; // Sensitivity before addition
 
-      // Get the corresponding nz locations in the output sparsity pattern
-      aseed0.sparsity().find(r_nz);
-      osp.get_nz(r_nz);
+      if (aseed0.sparsity()==osp && asens0.sparsity().nnz()==0) { // Matching sparsity
+        asens[d][0] = aseed0->get_nzadd(DM::zeros(isp), nz);
+      } else {
+        // Expensive operations
+        if (el_input.empty()) isp.find(el_input);
+        if (icol.empty()) icol = isp.get_col();
+        if (ocol.empty()) ocol = osp.get_col();
 
-      // Filter out ignored entries and check if there is anything to add at all
-      bool elements_to_add = false;
-      for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-        if (*k>=0) {
-          if (nz[*k]>=0) {
-            elements_to_add = true;
-          } else {
-            *k = -1;
+        // Get the corresponding nz locations in the output sparsity pattern
+        aseed0.sparsity().find(r_nz);
+        osp.get_nz(r_nz);
+
+        // Filter out ignored entries and check if there is anything to add at all
+        bool elements_to_add = false;
+        for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+          if (*k>=0) {
+            if (nz[*k]>=0) {
+              elements_to_add = true;
+            } else {
+              *k = -1;
+            }
           }
         }
-      }
 
-      // Quick continue of no elements to add
-      if (!elements_to_add) continue;
+        // Quick continue of no elements to add
+        if (!elements_to_add) continue;
 
-      // Get the nz locations in the adjoint sensitivity corresponding to the inputs
-      r_ind.resize(el_input.size());
-      copy(el_input.begin(), el_input.end(), r_ind.begin());
-      asens0.sparsity().get_nz(r_ind);
+        // Get the nz locations in the adjoint sensitivity corresponding to the inputs
+        r_ind.resize(el_input.size());
+        copy(el_input.begin(), el_input.end(), r_ind.begin());
+        asens0.sparsity().get_nz(r_ind);
 
-      // Enlarge the sparsity pattern of the sensitivity if not all additions fit
-      for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-        if (*k>=0 && r_ind[nz[*k]]<0) {
+        // Enlarge the sparsity pattern of the sensitivity if not all additions fit
+        for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+          if (*k>=0 && r_ind[nz[*k]]<0) {
 
-          // Create a new pattern which includes both the the previous seed and the addition
-          Sparsity sp = asens0.sparsity().unite(dep().sparsity());
-          asens0 = asens0->get_project(sp);
+            // Create a new pattern which includes both the the previous seed and the addition
+            Sparsity sp = asens0.sparsity().unite(dep().sparsity());
+            asens0 = asens0->get_project(sp);
 
-          // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
-          copy(el_input.begin(), el_input.end(), r_ind.begin());
-          asens0.sparsity().get_nz(r_ind);
+            // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
+            copy(el_input.begin(), el_input.end(), r_ind.begin());
+            asens0.sparsity().get_nz(r_ind);
 
-          break;
+            break;
+          }
         }
-      }
 
-      // Have r_nz point to locations in the sensitivity instead of the output
-      for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-        if (*k>=0) {
-          *k = r_ind[nz[*k]];
+        // Have r_nz point to locations in the sensitivity instead of the output
+        for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+          if (*k>=0) {
+            *k = r_ind[nz[*k]];
+          }
         }
-      }
 
-      // Add to the element to the sensitivity
-      asens[d][0] = aseed0->get_nzadd(asens0, r_nz);
+        asens[d][0] = aseed0->get_nzadd(asens0, r_nz);
+      }
     }
   }
 

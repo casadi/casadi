@@ -225,49 +225,23 @@ namespace casadi {
     // Output sparsity
     const Sparsity &osp = sparsity();
     const int* orow = osp.row();
-    vector<int> ocol = osp.get_col();
+    vector<int> ocol;
 
     // Input sparsity (first input same as output)
     const Sparsity &isp = dep(1).sparsity();
-    vector<int> icol = isp.get_col();
+    vector<int> icol;
 
-    // We next need to resort the assignment vector by outputs instead of inputs
-    // Start by counting the number of output nonzeros corresponding to each input nonzero
-    vector<int> onz_count(osp.nnz()+2, 0);
-    for (vector<int>::const_iterator it=nz.begin(); it!=nz.end(); ++it) {
-      onz_count[*it+2]++;
-    }
+    bool first_run = true;
 
-    // Cumsum to get index offset for output nonzero
-    for (int i=0; i<onz_count.size()-1; ++i) {
-      onz_count[i+1] += onz_count[i];
-    }
+    vector<int> onz_count;
 
-    // Get the order of assignments
-    vector<int> nz_order(nz.size());
-    for (int k=0; k<nz.size(); ++k) {
-      // Save the new index
-      nz_order[onz_count[1+nz[k]]++] = k;
-    }
+    vector<int> nz_order;
 
     // Find out which elements are being set
-    vector<int>& with_duplicates = onz_count; // Reuse memory
-    onz_count.resize(nz.size());
-    for (int k=0; k<nz.size(); ++k) {
-      // Get output nonzero
-      int onz_k = nz[nz_order[k]];
-
-      // Get element (note: may contain duplicates)
-      if (onz_k>=0) {
-        with_duplicates[k] = ocol[onz_k]*osp.size1() + orow[onz_k];
-      } else {
-        with_duplicates[k] = -1;
-      }
-    }
+    vector<int>& with_duplicates = onz_count;
 
     // Get all output elements (this time without duplicates)
     vector<int> el_output;
-    osp.find(el_output);
 
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_colind, r_row, r_nz, r_ind;
@@ -278,71 +252,133 @@ namespace casadi {
       // Get references to arguments and results
       const MX& arg = fseed[d][1];
       const MX& arg0 = fseed[d][0];
+
       MX& res = fsens[d][0];
       res = arg0;
 
-      // Entries in res with elements zero'ed out
-      if (!Add) {
+      if (isp==arg.sparsity() && arg0.sparsity()==osp) {
+        /*
+          dep(0) <-> y
+          dep(1) <-> x
 
-        // Get the nz locations in res corresponding to the output sparsity pattern
-        r_nz.resize(with_duplicates.size());
-        copy(with_duplicates.begin(), with_duplicates.end(), r_nz.begin());
-        res.sparsity().get_nz(r_nz);
+          y[nz]+=x
 
-        // Zero out the corresponding entries
-        res = MX::zeros(isp)->get_nzassign(res, r_nz);
-      }
+          dot(y)[nz]+=dot(x)
 
-      // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
-      arg.sparsity().find(r_nz);
-      isp.get_nz(r_nz);
+          dot(x)->get_nzadd(dot(y), nz)
 
-      // Filter out ignored entries and check if there is anything to add at all
-      bool elements_to_add = false;
-      for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-        if (*k>=0) {
-          if (nz[*k]>=0) {
-            elements_to_add = true;
-          } else {
-            *k = -1;
+        */
+        if (!Add) {
+          // Zero out the corresponding entries
+          res = MX::zeros(isp)->get_nzassign(res, nz);
+        }
+
+        res = arg->get_nzadd(res, nz);
+      } else {
+        if (first_run) {
+          osp.find(el_output);
+          ocol = osp.get_col();
+          icol = isp.get_col();
+
+          // We next need to resort the assignment vector by outputs instead of inputs
+          // Start by counting the number of output nonzeros corresponding to each input nonzero
+          onz_count.resize(osp.nnz()+2, 0);
+          for (vector<int>::const_iterator it=nz.begin(); it!=nz.end(); ++it) {
+            onz_count[*it+2]++;
+          }
+
+          // Cumsum to get index offset for output nonzero
+          for (int i=0; i<onz_count.size()-1; ++i) {
+            onz_count[i+1] += onz_count[i];
+          }
+
+          // Get the order of assignments
+          nz_order.resize(nz.size());
+          for (int k=0; k<nz.size(); ++k) {
+            // Save the new index
+            nz_order[onz_count[1+nz[k]]++] = k;
+          }
+
+          onz_count.resize(nz.size());
+          for (int k=0; k<nz.size(); ++k) {
+            // Get output nonzero
+            int onz_k = nz[nz_order[k]];
+
+            // Get element (note: may contain duplicates)
+            if (onz_k>=0) {
+              with_duplicates[k] = ocol[onz_k]*osp.size1() + orow[onz_k];
+            } else {
+              with_duplicates[k] = -1;
+            }
+          }
+
+
+          first_run = false;
+        }
+
+        // Entries in res with elements zero'ed out
+        if (!Add) {
+
+          // Get the nz locations in res corresponding to the output sparsity pattern
+          r_nz.resize(with_duplicates.size());
+          copy(with_duplicates.begin(), with_duplicates.end(), r_nz.begin());
+          res.sparsity().get_nz(r_nz);
+
+          // Zero out the corresponding entries
+          res = MX::zeros(isp)->get_nzassign(res, r_nz);
+        }
+
+        // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
+        arg.sparsity().find(r_nz);
+        isp.get_nz(r_nz);
+
+        // Filter out ignored entries and check if there is anything to add at all
+        bool elements_to_add = false;
+        for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+          if (*k>=0) {
+            if (nz[*k]>=0) {
+              elements_to_add = true;
+            } else {
+              *k = -1;
+            }
           }
         }
-      }
 
-      // Quick continue of no elements to set/add
-      if (!elements_to_add) continue;
+        // Quick continue of no elements to set/add
+        if (!elements_to_add) continue;
 
-      // Get the nz locations in the argument corresponding to the inputs
-      r_ind.resize(el_output.size());
-      copy(el_output.begin(), el_output.end(), r_ind.begin());
-      res.sparsity().get_nz(r_ind);
+        // Get the nz locations in the argument corresponding to the inputs
+        r_ind.resize(el_output.size());
+        copy(el_output.begin(), el_output.end(), r_ind.begin());
+        res.sparsity().get_nz(r_ind);
 
-      // Enlarge the sparsity pattern of the arguments if not all assignments fit
-      for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-        if (*k>=0 && nz[*k]>=0 && r_ind[nz[*k]]<0) {
+        // Enlarge the sparsity pattern of the arguments if not all assignments fit
+        for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+          if (*k>=0 && nz[*k]>=0 && r_ind[nz[*k]]<0) {
 
-          // Create a new pattern which includes both the the previous seed
-          // and the addition/assignment
-          Sparsity sp = res.sparsity().unite(osp);
-          res = res->get_project(sp);
+            // Create a new pattern which includes both the the previous seed
+            // and the addition/assignment
+            Sparsity sp = res.sparsity().unite(osp);
+            res = res->get_project(sp);
 
-          // Recalculate the nz locations in the arguments corresponding to the inputs
-          copy(el_output.begin(), el_output.end(), r_ind.begin());
-          res.sparsity().get_nz(r_ind);
+            // Recalculate the nz locations in the arguments corresponding to the inputs
+            copy(el_output.begin(), el_output.end(), r_ind.begin());
+            res.sparsity().get_nz(r_ind);
 
-          break;
+            break;
+          }
         }
-      }
 
-      // Have r_nz point to locations in the result instead of the output
-      for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-        if (*k>=0) {
-          *k = r_ind[nz[*k]];
+        // Have r_nz point to locations in the result instead of the output
+        for (vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+          if (*k>=0) {
+            *k = r_ind[nz[*k]];
+          }
         }
-      }
 
-      // Add to the element to the sensitivity, if any
-      res = arg->get_nzadd(res, r_nz);
+        // Add to the element to the sensitivity, if any
+        res = arg->get_nzadd(res, r_nz);
+      }
     }
   }
 
@@ -358,107 +394,139 @@ namespace casadi {
     // Output sparsity
     const Sparsity &osp = sparsity();
     const int* orow = osp.row();
-    vector<int> ocol = osp.get_col();
+    vector<int> ocol;
 
     // Input sparsity (first input same as output)
     const Sparsity &isp = dep(1).sparsity();
     const int* irow = isp.row();
-    vector<int> icol = isp.get_col();
+    vector<int> icol;
 
-    // We next need to resort the assignment vector by outputs instead of inputs
-    // Start by counting the number of output nonzeros corresponding to each input nonzero
-    vector<int> onz_count(osp.nnz()+2, 0);
-    for (vector<int>::const_iterator it=nz.begin(); it!=nz.end(); ++it) {
-      onz_count[*it+2]++;
-    }
-
-    // Cumsum to get index offset for output nonzero
-    for (int i=0; i<onz_count.size()-1; ++i) {
-      onz_count[i+1] += onz_count[i];
-    }
+    vector<int> onz_count;
 
     // Get the order of assignments
-    vector<int> nz_order(nz.size());
-    for (int k=0; k<nz.size(); ++k) {
-      // Save the new index
-      nz_order[onz_count[1+nz[k]]++] = k;
-    }
+    vector<int> nz_order;
 
-    // Find out which elements are being set
     vector<int>& with_duplicates = onz_count; // Reuse memory
-    onz_count.resize(nz.size());
-    for (int k=0; k<nz.size(); ++k) {
-      // Get output nonzero
-      int onz_k = nz[nz_order[k]];
-
-      // Get element (note: may contain duplicates)
-      if (onz_k>=0) {
-        with_duplicates[k] = ocol[onz_k]*osp.size1() + orow[onz_k];
-      } else {
-        with_duplicates[k] = -1;
-      }
-    }
 
     // Get all output elements (this time without duplicates)
     vector<int> el_output;
-    osp.find(el_output);
+
+    bool first_run = true;
 
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_colind, r_row, r_nz, r_ind;
 
     for (int d=0; d<nadj; ++d) {
-      // Get the matching nonzeros
-      r_ind.resize(el_output.size());
-      copy(el_output.begin(), el_output.end(), r_ind.begin());
-      aseed[d][0].sparsity().get_nz(r_ind);
+      if (osp==aseed[d][0].sparsity()) {
+        /*
+          dep(0) <-> y
+          dep(1) <-> x
 
-      // Sparsity pattern for the result
-      r_colind.resize(isp.size2()+1); // Col count
-      fill(r_colind.begin(), r_colind.end(), 0);
-      r_row.clear();
+          z: y[nz]+=x
 
-      // Perform the assignments
-      r_nz.clear();
-      for (int k=0; k<nz.size(); ++k) {
-
-        // Get the corresponding nonzero for the input
-        int el = nz[k];
-
-        // Skip if zero assignment
-        if (el==-1) continue;
-
-        // Get the corresponding nonzero in the argument
-        int el_arg = r_ind[el];
-
-        // Skip if no argument
-        if (el_arg==-1) continue;
-
-        // Save the assignment
-        r_nz.push_back(el_arg);
-
-        // Get the corresponding element
-        int i=icol[k], j=irow[k];
-
-        // Add to sparsity pattern
-        r_row.push_back(j);
-        r_colind[1+i]++;
-      }
-
-      // col count -> col offset
-      for (int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1];
-
-      // If anything to set/add
-      if (!r_nz.empty()) {
-        // Create a sparsity pattern from vectors
-        Sparsity f_sp(isp.size1(), isp.size2(), r_colind, r_row);
-        asens[d][1] += aseed[d][0]->get_nzref(f_sp, r_nz);
+          bar(x) += bar(z)[nz]
+          bar(y) += bar(z)
+        */
+        asens[d][1] += aseed[d][0]->get_nzref(isp, nz);
         if (!Add) {
-          asens[d][0] += MX::zeros(f_sp)->get_nzassign(aseed[d][0], r_nz);
+          asens[d][0] += MX::zeros(isp)->get_nzassign(aseed[d][0], nz);
         } else {
           asens[d][0] += aseed[d][0];
         }
       } else {
-        asens[d][0] += aseed[d][0];
+        if (first_run) {
+          ocol = osp.get_col();
+          icol = isp.get_col();
+          // We next need to resort the assignment vector by outputs instead of inputs
+          // Start by counting the number of output nonzeros corresponding to each input nonzero
+          onz_count.resize(osp.nnz()+2, 0);
+          for (vector<int>::const_iterator it=nz.begin(); it!=nz.end(); ++it) {
+            onz_count[*it+2]++;
+          }
+
+          // Cumsum to get index offset for output nonzero
+          for (int i=0; i<onz_count.size()-1; ++i) {
+            onz_count[i+1] += onz_count[i];
+          }
+
+          // Get the order of assignments
+          nz_order.resize(nz.size());
+          for (int k=0; k<nz.size(); ++k) {
+            // Save the new index
+            nz_order[onz_count[1+nz[k]]++] = k;
+          }
+
+          // Find out which elements are being set
+          onz_count.resize(nz.size());
+          for (int k=0; k<nz.size(); ++k) {
+            // Get output nonzero
+            int onz_k = nz[nz_order[k]];
+
+            // Get element (note: may contain duplicates)
+            if (onz_k>=0) {
+              with_duplicates[k] = ocol[onz_k]*osp.size1() + orow[onz_k];
+            } else {
+              with_duplicates[k] = -1;
+            }
+          }
+
+          osp.find(el_output);
+          first_run = false;
+        }
+
+        // Get the matching nonzeros
+        r_ind.resize(el_output.size());
+        copy(el_output.begin(), el_output.end(), r_ind.begin());
+        aseed[d][0].sparsity().get_nz(r_ind);
+
+        // Sparsity pattern for the result
+        r_colind.resize(isp.size2()+1); // Col count
+        fill(r_colind.begin(), r_colind.end(), 0);
+        r_row.clear();
+
+        // Perform the assignments
+        r_nz.clear();
+        for (int k=0; k<nz.size(); ++k) {
+
+          // Get the corresponding nonzero for the input
+          int el = nz[k];
+
+          // Skip if zero assignment
+          if (el==-1) continue;
+
+          // Get the corresponding nonzero in the argument
+          int el_arg = r_ind[el];
+
+          // Skip if no argument
+          if (el_arg==-1) continue;
+
+          // Save the assignment
+          r_nz.push_back(el_arg);
+
+          // Get the corresponding element
+          int i=icol[k], j=irow[k];
+
+          // Add to sparsity pattern
+          r_row.push_back(j);
+          r_colind[1+i]++;
+        }
+
+        // col count -> col offset
+        for (int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1];
+
+        // If anything to set/add
+        if (!r_nz.empty()) {
+          // Create a sparsity pattern from vectors
+          Sparsity f_sp(isp.size1(), isp.size2(), r_colind, r_row);
+          asens[d][1] += aseed[d][0]->get_nzref(f_sp, r_nz);
+          if (!Add) {
+            asens[d][0] += MX::zeros(f_sp)->get_nzassign(aseed[d][0], r_nz);
+          } else {
+            asens[d][0] += aseed[d][0];
+          }
+        } else {
+          asens[d][0] += aseed[d][0];
+        }
       }
     }
   }

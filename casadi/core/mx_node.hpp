@@ -320,13 +320,26 @@ namespace casadi {
     */
     virtual MX get_solve(const MX& r, bool tr, const Linsol& linear_solver) const;
 
-    /// Get the nonzeros of matrix
+    /** \brief Get the nonzeros of matrix
+    *
+    *   a->get_nzref(sp,nz)
+    *
+    *   returns Matrix(sp,a[nz])
+    */
     virtual MX get_nzref(const Sparsity& sp, const std::vector<int>& nz) const;
 
-    /// Assign the nonzeros of a matrix to another matrix
+    /** \brief Assign the nonzeros of a matrix to another matrix
+    *
+    *   a->get_nzassign(b,nz)
+    *   returns b with b[nz]=a
+    */
     virtual MX get_nzassign(const MX& y, const std::vector<int>& nz) const;
 
-    /// Add the nonzeros of a matrix to another matrix
+    /** \brief Add the nonzeros of a matrix to another matrix
+    *
+    *   a->get_nzadd(b,nz)
+    *   returns b with b[nz]+=a
+    */
     virtual MX get_nzadd(const MX& y, const std::vector<int>& nz) const;
 
     /// Get submatrix reference
