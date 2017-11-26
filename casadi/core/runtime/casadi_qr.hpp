@@ -22,8 +22,6 @@ T1 casadi_house(T1* x, T1* beta, int n) {
 
 // SYMBOL "qr"
 // Numeric QR factorization
-// Only declaration, no implementation due to license restrictions.
-// Cf. Issue #2134
 // Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
 // Note: nrow <= nrow_ext <= nrow+ncol
 // len[iw] = nrow_ext + ncol
@@ -33,6 +31,9 @@ T1 casadi_house(T1* x, T1* beta, int n) {
 // sp_r = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_r]
 // len[r] nnz_r
 // len[beta] ncol
+/* Only declaration, no implementation due to license restrictions.
+  Cf. https://github.com/casadi/casadi/issues/2134
+ */
 template<typename T1>
 void casadi_qr(const int* sp_a, const T1* nz_a, int* iw, T1* x,
                const int* sp_v, T1* nz_v, const int* sp_r, T1* nz_r, T1* beta,
