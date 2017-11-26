@@ -63051,12 +63051,6 @@ Check if the vector is strictly increasing.
 
 ";
 
-%feature("docstring")  casadi::casadi_qr_init(const int *sp, const int
-*sp_tr, int *leftmost, int *parent, int *pinv, int *nrow_ext, int *v_nnz,
-int *r_nnz, int *w) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::Contraction(const T &a, const T &b, T &r) "
 
 ";
@@ -63436,18 +63430,8 @@ Joel Andersson
 
 ";
 
-%feature("docstring")  casadi::casadi_qr_sparsities(const int *sp_a, int
-nrow_ext, int *sp_v, int *sp_r, const int *leftmost, const int *parent,
-const int *pinv, int *iw) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::casadi_ldl(const int *sp_a, const int
 *parent, const int *sp_l, const T1 *a, T1 *l, T1 *d, int *iw, T1 *w) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_imax(int a, int b) "
 
 [INTERNAL] ";
 
@@ -63539,9 +63523,25 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring")  casadi::casadi_imin(int a, int b) "
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
 
-[INTERNAL] ";
+Generate a hash value incrementally (function taken from boost)
+
+";
+
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, const int *v,
+int sz) "
+
+Generate a hash value incrementally, array.
+
+";
+
+%feature("docstring")  casadi::hash_combine(std::size_t &seed, const
+std::vector< int > &v) "
+
+Generate a hash value incrementally (function taken from boost)
+
+";
 
 %feature("docstring")  casadi::casadi_copy_int(const int *x, int n, int *y)
 "
@@ -64875,16 +64875,6 @@ ldwork=0) "
 
 ";
 
-%feature("docstring")  casadi::casadi_etree(const int *sp, int *parent, int
-*w, int ata) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_qr_counts(const int *tr_sp, const int
-*parent, const int *post, int *counts, int *w) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::collocation_interpolators(const std::vector<
 double > &tau_root, std::vector< std::vector< double > > &output_C,
 std::vector< double > &output_D) "
@@ -65126,26 +65116,6 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, T v) "
-
-Generate a hash value incrementally (function taken from boost)
-
-";
-
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, const int *v,
-int sz) "
-
-Generate a hash value incrementally, array.
-
-";
-
-%feature("docstring")  casadi::hash_combine(std::size_t &seed, const
-std::vector< int > &v) "
-
-Generate a hash value incrementally (function taken from boost)
-
-";
-
 %feature("docstring")  casadi::casadi_project(const T1 *x, const int *sp_x,
 T1 *y, const int *sp_y, T1 *w) "
 
@@ -65297,11 +65267,6 @@ linear
 Joel Andersson
 
 ";
-
-%feature("docstring")  casadi::casadi_qr_nnz(const int *sp, int *pinv, int
-*leftmost, const int *parent, int *nrow_ext, int *w) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::dplesol(const std::string &name, const
 std::string &solver, const SpDict &qp, const Dict &opts=Dict()) "
@@ -65988,16 +65953,6 @@ std::string &solver, const MXDict &qp, const Dict &opts=Dict()) "
 Get the documentation string for a plugin.
 
 ";
-
-%feature("docstring")  casadi::casadi_leaf(int i, int j, const int *first,
-int *maxfirst, int *prevleaf, int *ancestor, int *jleaf) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_postorder(const int *parent, int n,
-int *post, int *w) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::dple_in() "
 
@@ -66813,11 +66768,6 @@ std::string &solver, const NlpBuilder &nl, const Dict &opts=Dict()) "
 Check if the vector is monotone.
 
 ";
-
-%feature("docstring")  casadi::casadi_postorder_dfs(int j, int k, int *head,
-int *next, int *post, int *stack) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_norm_inf_mul(const T1 *x, const int
 *sp_x, const T1 *y, const int *sp_y, T1 *dwork, int *iwork) "

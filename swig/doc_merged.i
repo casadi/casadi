@@ -45966,8 +45966,6 @@ Check if the vector is strictly increasing.
 
 ";
 
-%feature("docstring") casadi::casadi_qr_init "[INTERNAL] ";
-
 %feature("docstring") casadi::Contraction "";
 
 %feature("docstring") casadi::casadi_ldl_row "[INTERNAL] ";
@@ -46289,11 +46287,7 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::casadi_qr_sparsities "[INTERNAL] ";
-
 %feature("docstring") casadi::casadi_ldl "[INTERNAL] ";
-
-%feature("docstring") casadi::casadi_imax "[INTERNAL] ";
 
 %feature("docstring") casadi::dple_n_in "
 
@@ -46377,7 +46371,21 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring") casadi::casadi_imin "[INTERNAL] ";
+%feature("docstring") casadi::hash_combine "
+
+>  void casadi::hash_combine(std::size_t &seed, T v)
+
+>  void casadi::hash_combine(std::size_t &seed, const std::vector< int > &v)
+------------------------------------------------------------------------
+
+Generate a hash value incrementally (function taken from boost)
+
+>  void casadi::hash_combine(std::size_t &seed, const int *v, int sz)
+------------------------------------------------------------------------
+
+Generate a hash value incrementally, array.
+
+";
 
 %feature("docstring") casadi::casadi_copy_int "[INTERNAL] ";
 
@@ -47669,10 +47677,6 @@ violation.
 
 ";
 
-%feature("docstring") casadi::casadi_etree "[INTERNAL] ";
-
-%feature("docstring") casadi::casadi_qr_counts "[INTERNAL] ";
-
 %feature("docstring") casadi::collocation_interpolators "
 
 Obtain collocation interpolating matrices.
@@ -47847,22 +47851,6 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring") casadi::hash_combine "
-
->  void casadi::hash_combine(std::size_t &seed, T v)
-
->  void casadi::hash_combine(std::size_t &seed, const std::vector< int > &v)
-------------------------------------------------------------------------
-
-Generate a hash value incrementally (function taken from boost)
-
->  void casadi::hash_combine(std::size_t &seed, const int *v, int sz)
-------------------------------------------------------------------------
-
-Generate a hash value incrementally, array.
-
-";
-
 %feature("docstring") casadi::casadi_project "[INTERNAL]  Sparse copy: y <-
 x, w work vector (length >= number of rows)
 
@@ -48010,8 +47998,6 @@ linear
 Joel Andersson
 
 ";
-
-%feature("docstring") casadi::casadi_qr_nnz "[INTERNAL] ";
 
 %feature("docstring") casadi::dplesol "
 
@@ -48638,10 +48624,6 @@ Get the number of QP solver inputs.
 Get the documentation string for a plugin.
 
 ";
-
-%feature("docstring") casadi::casadi_leaf "[INTERNAL] ";
-
-%feature("docstring") casadi::casadi_postorder "[INTERNAL] ";
 
 %feature("docstring") casadi::dple_in "
 
@@ -49435,8 +49417,6 @@ Joel Andersson
 Check if the vector is monotone.
 
 ";
-
-%feature("docstring") casadi::casadi_postorder_dfs "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_norm_inf_mul "[INTERNAL]  Inf-norm of
 a Matrix-matrix product,*
