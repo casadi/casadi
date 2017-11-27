@@ -32,7 +32,7 @@ T1 casadi_house(T1* x, T1* beta, int n) {
 // len[r] nnz_r
 // len[beta] ncol
 /* Only declaration, no implementation due to license restrictions.
-  Cf. https://github.com/casadi/casadi/issues/2134
+  Cf. CasADi issue #2134
  */
 template<typename T1>
 void casadi_qr(const int* sp_a, const T1* nz_a, int* iw, T1* x,
