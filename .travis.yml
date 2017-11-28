@@ -21,7 +21,7 @@ language: generic
 
 matrix:
   include:
-    - compiler: gcc
+    - compiler: gcc.travis.yml
       os: linux
       dist: trusty
       env: TESTMODE=valgrind
@@ -342,6 +342,7 @@ before_install:
   - slurp ipopt
   - slurp worhp
   - slurp slicot
+  - slurp gurobi
   - popd
   - sudo apt-get update -qq
   - sudo apt-get install -q -y binutils gcc g++ gfortran git cmake liblapack-dev liblapack3 libblas3 coinor-libipopt-dev libmumps-seq-dev libxml2-dev
