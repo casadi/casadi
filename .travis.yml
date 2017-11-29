@@ -247,6 +247,14 @@ matrix:
         #- brew doctor
         - sudo easy_install pip
         - pip install matplotlib numpy scipy
+        - slurp hsl
+        - slurp clang
+        - slurp ecos
+        - slurp bonmin
+        - slurp ipopt
+        - slurp worhp
+        - slurp slicot
+        - slurp gurobi
       script:
         - mkdir build
         - pushd build
