@@ -719,7 +719,7 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
         return con;
       }
       // Fall through to generic inequalities
-    } else if (args.size()==3 && (parametric[0] || parametric[2])) {
+    } else if (args.size()==3 && parametric[0] && parametric[2]) {
       // lb(p) <= g(x,p) <= ub(p)
       con.type = OPTI_DOUBLE_INEQUALITY;
       con.lb = args[0]*DM::ones(args[1].sparsity());
@@ -817,6 +817,9 @@ void OptiNode::subject_to(const MX& g) {
   assert_only_opti_nondual(g);
   mark_problem_dirty();
   g_.push_back(g);
+
+  casadi_assert(!g.is_constant(), "You passed a constant to `subject_to`. "
+                                  "You need a symbol to form a constraint.");
 
   // Store the meta-data
   set_meta_con(g, canon_expr(g));

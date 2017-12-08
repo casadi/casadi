@@ -249,6 +249,34 @@ class OptiStacktests(inherit_from):
           opti.minimize(sum1(F))
           sol = opti.solve()
 
+    def test_symb_boundedshapes(self):
+        
+          opti = Opti()
+          
+          y = opti.variable()
+          x = opti.variable()
+         
+          opti.subject_to(opti.bounded(0,y,x))
+
+          opti.solver(nlpsolver,nlpsolver_options)
+          opti.minimize(x**2+(y-6)**2)
+          
+          opti.subject_to(x<=3)
+          sol = opti.solve()
+          
+          self.checkarray(sol.value(y), 3, digits=3)
+
+    def test_symb_parametric(self):
+        
+          opti = Opti()
+          
+          y = opti.parameter(3,1)
+          x = opti.parameter(3,1)
+         
+          with self.assertInException("!parametric[0]"):
+            opti.subject_to(x<=y)
+
+          
     def test_callback(self):
         
           opti = Opti()
