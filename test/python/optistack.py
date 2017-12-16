@@ -736,7 +736,33 @@ class OptiStacktests(inherit_from):
 
         self.checkarray(sol.value(P), R)
 
-   
+    def test_broadcast(self):
+        opti = Opti()
+        
+        x = opti.variable(3, 1)
+        
+
+        f = mtimes(x.T,x)
+        
+        opti.minimize(f)
+        
+        opti.subject_to(x[0]>=vertcat(1,2,3))
+        opti.solver(nlpsolver,nlpsolver_options)
+        sol = opti.solve()
+        self.checkarray(sol.value(x[0]), 3,digits=7)
+        
+
+        f = mtimes(x.T,x)
+        
+        opti.minimize(f)
+        
+        opti.subject_to();
+        
+        opti.subject_to(x[0]>=vertcat(1+x[1],0.5,0))
+        opti.solver(nlpsolver,nlpsolver_options)
+        sol = opti.solve()
+        self.checkarray(sol.value(x[0]), 0.5,digits=4)
+        
 
 if __name__ == '__main__':
     unittest.main()

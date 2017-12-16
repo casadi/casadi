@@ -710,11 +710,11 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
         if (parametric[0]) {
           con.lb = args[0]*DM::ones(e.sparsity());
           con.ub = inf*DM::ones(e.sparsity());
-          con.canon = args[1];
+          con.canon = args[1]*DM::ones(e.sparsity());
         } else {
           con.lb = -inf*DM::ones(e.sparsity());
           con.ub = args[1]*DM::ones(e.sparsity());
-          con.canon = args[0];
+          con.canon = args[0]*DM::ones(e.sparsity());
         }
         return con;
       }
@@ -724,7 +724,7 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
       con.type = OPTI_DOUBLE_INEQUALITY;
       con.lb = args[0]*DM::ones(args[1].sparsity());
       con.ub = args[2]*DM::ones(args[1].sparsity());
-      con.canon = args[1];
+      con.canon = args[1]*DM::ones(args[1].sparsity());
       con.flipped = flipped;
       con.n = 2;
       return con;
@@ -767,11 +767,11 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
 
     MX e = c.dep(0)-c.dep(1);
     if (is_parametric(c.dep(0))) {
-      con.canon = c.dep(1);
+      con.canon = c.dep(1)*DM::ones(e.sparsity());
       con.lb = c.dep(0)*DM::ones(e.sparsity());
       con.type = OPTI_EQUALITY;
     } else if (is_parametric(c.dep(1))) {
-      con.canon = c.dep(0);
+      con.canon = c.dep(0)*DM::ones(e.sparsity());
       con.lb = c.dep(1)*DM::ones(e.sparsity());
       con.type = OPTI_EQUALITY;
     } else {
