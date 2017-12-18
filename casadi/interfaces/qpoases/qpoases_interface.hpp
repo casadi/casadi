@@ -149,6 +149,9 @@ namespace casadi {
     /// qpOASES linear solver solve
     static int qpoases_solve(void* mem, int nrhs, double* rhs);
 
+    /// qpOases printing function
+    static void qpoases_printf(const char* s);
+
   protected:
 
     ///@{

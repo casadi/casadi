@@ -51,6 +51,16 @@ namespace casadi {
   QpoasesInterface::QpoasesInterface(const std::string& name,
                                      const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
+    // Redirect output to CasADi
+    static bool first_call = true;
+    if (first_call) {
+      qpOASES::setPrintf(qpoases_printf);
+      first_call = false;
+    }
+  }
+
+  void QpoasesInterface::qpoases_printf(const char* s) {
+    uout() << s;
   }
 
   QpoasesInterface::~QpoasesInterface() {
