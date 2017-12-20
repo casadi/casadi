@@ -240,16 +240,16 @@ def IM_from_array(m, check_only=True):
       return (nrow,ncol,m.flat)
   return False
 
-def SX_from_array(m):
+def SX_from_array(m, check_only=True):
   import numpy as np
   if isinstance(m, np.ndarray):
     if len(m.shape)>2:
-      return None
+      return False
     if m.dtype!=np.object: return None
     shape = m.shape + (1, 1)
     nrow, ncol = shape[0], shape[1]
     return (nrow,ncol,m.flat)
-  return None
+  return False
 
 def DM_from_csc(m, check_only=True):
   if hasattr(m,"tocsc"):
@@ -675,93 +675,84 @@ namespace std {
       PyObject* dict = PyModule_GetDict(module);
       return PyDict_GetItemString(dict, (char*) name.c_str());
     }
+    
+    template<class T>
+    bool casadi_object_from_fun(GUESTOBJECT *p, T** m, const std::string& fun, const std::function<bool(PyObject*, T**)> & conv) {
+      PyObject* dm = get_Python_helper(fun);
+      if (!dm) return false;
+      PyObject *check_only = m? Py_False : Py_True;
+      PyObject *cr = PyObject_CallFunctionObjArgs(dm, p, check_only, NULL);
+      if (!cr) return false;
+      bool ret;
+      if (PyBool_Check(cr)) {
+        ret = PyObject_IsTrue(cr);
+      } else {
+        ret = conv(cr, m);
+      }
+      Py_DECREF(cr);      
+      return ret;
+    }
+
+    bool SX_from_array_conv(GUESTOBJECT *p, casadi::SX** m) {
+      std::vector<SXElem> data;
+      if (!to_val(PyTuple_GetItem(p, 2), &data)) return false;
+      int nrow; to_val(PyTuple_GetItem(p, 0), &nrow);
+      int ncol; to_val(PyTuple_GetItem(p, 1), &ncol);
+      if (m) {
+        **m = casadi::SX::zeros(nrow, ncol);
+        casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
+      }
+      return true;
+    }
+
+    bool IM_from_array_conv(GUESTOBJECT *p, casadi::IM** m) {
+      if (!m) return true;
+      std::vector<int> data;
+      if (!to_val(PyTuple_GetItem(p, 2), &data)) return false;
+      int nrow; to_val(PyTuple_GetItem(p, 0), &nrow);
+      int ncol; to_val(PyTuple_GetItem(p, 1), &ncol);
+      **m = IM::zeros(nrow, ncol);
+      casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
+      return true;
+    }
+    
+    bool DM_from_array_conv(GUESTOBJECT *p, casadi::DM** m) {
+      if (!m) return true;
+      std::vector<double> data;
+      if (!to_val(PyTuple_GetItem(p, 2), &data)) return false;
+      int nrow; to_val(PyTuple_GetItem(p, 0), &nrow);
+      int ncol; to_val(PyTuple_GetItem(p, 1), &ncol);
+      **m = DM::zeros(nrow, ncol);
+      casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
+      return true;
+    }
+    
+    bool DM_from_csc_conv(GUESTOBJECT *p, casadi::DM** m) {
+      std::vector<double> data;
+      std::vector<int> colind, row;
+      if (!to_val(PyTuple_GetItem(p, 4), &data)) return false;
+      if (!to_val(PyTuple_GetItem(p, 3), &row)) return false;
+      if (!to_val(PyTuple_GetItem(p, 2), &colind)) return false;
+      int nrow; to_val(PyTuple_GetItem(p, 0), &nrow);
+      int ncol; to_val(PyTuple_GetItem(p, 1), &ncol);
+      **m = casadi::Matrix<double>(casadi::Sparsity(nrow,ncol,colind,row), data, false);
+      return true;
+    }
 
     bool SX_from_array(GUESTOBJECT *p, casadi::SX** m) {
-      PyObject* dm = get_Python_helper("SX_from_array");
-      if (!dm) return false;
-      PyObject *cr = PyObject_CallFunctionObjArgs(dm, p, NULL);
-      if (!cr) return false;
-      if (cr==Py_None) {
-        return false;
-      } else {
-        std::vector<SXElem> data;
-        if (!to_val(PyTuple_GetItem(cr, 2), &data)) return false;
-        int nrow; to_val(PyTuple_GetItem(cr, 0), &nrow);
-        int ncol; to_val(PyTuple_GetItem(cr, 1), &ncol);
-        if (m) {
-          **m = casadi::SX::zeros(nrow, ncol);
-          casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
-        }
-        return true;
-      }
+      return casadi_object_from_fun<casadi::SX>(p, m, "SX_from_array", SX_from_array_conv);
     }
 
     bool IM_from_array(GUESTOBJECT *p, casadi::IM** m) {
-      PyObject* dm = get_Python_helper("IM_from_array");
-      if (!dm) return false;
-      PyObject *check_only = m? Py_False : Py_True;
-      PyObject *cr = PyObject_CallFunctionObjArgs(dm, p, check_only, NULL);
-      if (!cr) return false;
-      if (PyBool_Check(cr)) {
-        Py_DECREF(cr);
-        return PyObject_IsTrue(cr);
-      } else {
-        if (m) {
-          std::vector<int> data;
-          if (!to_val(PyTuple_GetItem(cr, 2), &data)) return false;
-          int nrow; to_val(PyTuple_GetItem(cr, 0), &nrow);
-          int ncol; to_val(PyTuple_GetItem(cr, 1), &ncol);
-          **m = IM::zeros(nrow, ncol);
-          casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
-        }
-        return true;
-      }
+      return casadi_object_from_fun<casadi::IM>(p, m, "IM_from_array", IM_from_array_conv);
     }
 
     bool DM_from_array(GUESTOBJECT *p, casadi::DM** m) {
-      PyObject* dm = get_Python_helper("DM_from_array");
-      if (!dm) return false;
-      PyObject *check_only = m? Py_False : Py_True;
-      PyObject *cr = PyObject_CallFunctionObjArgs(dm, p, check_only, NULL);
-      if (!cr) return false;
-      if (PyBool_Check(cr)) {
-        Py_DECREF(cr);
-        return PyObject_IsTrue(cr);
-      } else {
-        if (m) {
-          std::vector<double> data;
-          if (!to_val(PyTuple_GetItem(cr, 2), &data)) return false;
-          int nrow; to_val(PyTuple_GetItem(cr, 0), &nrow);
-          int ncol; to_val(PyTuple_GetItem(cr, 1), &ncol);
-          **m = DM::zeros(nrow, ncol);
-          casadi_densify(get_ptr(data), (**m).sparsity().T(), (**m).ptr(), true);
-        }
-        return true;
-      }
+      return casadi_object_from_fun<casadi::DM>(p, m, "DM_from_array", DM_from_array_conv);
     }
 
     bool DM_from_csc(GUESTOBJECT *p, casadi::DM** m) {
-      PyObject* dm = get_Python_helper("DM_from_csc");
-      if (!dm) return false;
-      PyObject *check_only = m? Py_False : Py_True;
-      PyObject *cr = PyObject_CallFunctionObjArgs(dm, p, check_only, NULL);
-      if (!cr) return false;
-      if (PyBool_Check(cr)) {
-        Py_DECREF(cr);
-        return PyObject_IsTrue(cr);
-      } else {
-        if (m) {
-          std::vector<double> data;
-          std::vector<int> colind, row;
-          if (!to_val(PyTuple_GetItem(cr, 4), &data)) return false;
-          if (!to_val(PyTuple_GetItem(cr, 3), &row)) return false;
-          if (!to_val(PyTuple_GetItem(cr, 2), &colind)) return false;
-          int nrow; to_val(PyTuple_GetItem(cr, 0), &nrow);
-          int ncol; to_val(PyTuple_GetItem(cr, 1), &ncol);
-          **m = casadi::Matrix<double>(casadi::Sparsity(nrow,ncol,colind,row), data, false);
-        }
-        return true;
-      }
+      return casadi_object_from_fun<casadi::DM>(p, m, "DM_from_csc", DM_from_csc_conv);
     }
 
     bool is_scalar_np_array(GUESTOBJECT *p) {
