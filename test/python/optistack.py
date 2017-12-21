@@ -762,7 +762,23 @@ class OptiStacktests(inherit_from):
         opti.solver(nlpsolver,nlpsolver_options)
         sol = opti.solve()
         self.checkarray(sol.value(x[0]), 0.5,digits=4)
-        
+
+    def test_constraint_dim_mismatch(self):
+        opti = Opti()
+        x = opti.variable(5,1)
+
+        p = opti.parameter(1,1)
+        q = opti.parameter(1,1)
+
+
+        opti.minimize(dot(x,x))
+        self.assertInException("Constraint must contain decision variables."):
+          opti.subject_to(p==q)
+        self.assertInException("Constraint shape mismatch."):
+          opti.subject_to(x[0]==vertcat(1,2,3))
+        self.assertInException("Constraint shape mismatch."):
+          opti.subject_to(vertcat(1,2,3)==x[0])
+
 
 if __name__ == '__main__':
     unittest.main()

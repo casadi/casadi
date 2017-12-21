@@ -705,7 +705,8 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
       // case: g(x,p) <= bound(p)
       MX e = args[0]-args[1];
       if (e.is_vector()) {
-        casadi_assert_dev(!parametric[0] || !parametric[1]);
+        casadi_assert(!parametric[0] || !parametric[1],
+          "Constraint must contain decision variables.");
         con.type = OPTI_INEQUALITY;
         if (parametric[0]) {
           con.lb = args[0]*DM::ones(e.sparsity());
@@ -764,16 +765,21 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
     }
     return con;
   } else if (c.is_op(OP_EQ)) { // Inequalities
-
+    casadi_assert(!is_parametric(c.dep(0)) || !is_parametric(c.dep(1)),
+      "Constraint must contain decision variables.");
     MX e = c.dep(0)-c.dep(1);
     if (is_parametric(c.dep(0))) {
       con.canon = c.dep(1)*DM::ones(e.sparsity());
       con.lb = c.dep(0)*DM::ones(e.sparsity());
       con.type = OPTI_EQUALITY;
+      casadi_assert(c.dep(0).size1()<=c.dep(1).size1() && c.dep(0).size2()<=c.dep(1).size2(),
+        "Constraint shape mismatch.");
     } else if (is_parametric(c.dep(1))) {
       con.canon = c.dep(0)*DM::ones(e.sparsity());
       con.lb = c.dep(1)*DM::ones(e.sparsity());
       con.type = OPTI_EQUALITY;
+      casadi_assert(c.dep(1).size1()<=c.dep(0).size1() && c.dep(1).size2()<=c.dep(0).size2(),
+        "Constraint shape mismatch.");
     } else {
       con.lb = DM::zeros(e.sparsity());
       con.canon = e;
