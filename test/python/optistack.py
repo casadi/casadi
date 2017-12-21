@@ -772,11 +772,11 @@ class OptiStacktests(inherit_from):
 
 
         opti.minimize(dot(x,x))
-        self.assertInException("Constraint must contain decision variables."):
+        with self.assertInException("Constraint must contain decision variables."):
           opti.subject_to(p==q)
-        self.assertInException("Constraint shape mismatch."):
+        with self.assertInException("Constraint shape mismatch."):
           opti.subject_to(x[0]==vertcat(1,2,3))
-        self.assertInException("Constraint shape mismatch."):
+        with self.assertInException("Constraint shape mismatch."):
           opti.subject_to(vertcat(1,2,3)==x[0])
 
 
