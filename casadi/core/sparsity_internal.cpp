@@ -2635,6 +2635,7 @@ namespace casadi {
   }
 
   void SparsityInternal::find(std::vector<int>& loc, bool ind1) const {
+    casadi_assert(!mul_overflows(size1(), size2()), "Integer overflow detected");
     const int* colind = this->colind();
     const int* row = this->row();
 

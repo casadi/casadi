@@ -294,6 +294,12 @@ namespace std {
     return stream;
   }
 
+  template<typename T>
+  bool mul_overflows(const T& a, const T& b) {
+    if (a==0 || b==0) return false;
+    return abs(std::numeric_limits<T>::max()/a) < abs(b);
+  }
+
 } // namespace std
 
 // Implementations
