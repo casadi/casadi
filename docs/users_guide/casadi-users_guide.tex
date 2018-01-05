@@ -3222,6 +3222,7 @@ After setting up the problem, you may call the solve method, which constructs a 
 \begin{lstlisting}[language=Python]
 sol = opti.solve()
 \end{lstlisting}
+The call will fail with an error if the solver fails to convergence. You may still inspect the non-converged solution (see Section 'extra').
 
 You may call \python{solve} any number of times. You will always get an immutable copy of the problem specification and its solution.
 Consecutively calling \python{solve} will not help the convergence of the problem.
