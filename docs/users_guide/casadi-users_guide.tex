@@ -3233,6 +3233,13 @@ opti.set_initial(sol1.value_variables())
 sol2 = opti.solve()
 \end{lstlisting}
 
+In order to initialize the dual variables, e.g. when solving a set of similar optimization problems, you can use the following syntax:
+\begin{lstlisting}[language=Python]
+sol = opti.solve()
+lam_g0 = sol.value(opti.lam_g)
+opti.set_initial(opti.lam_g, lam_g0)
+\end{lstlisting}
+
 \paragraph{Numerical value at the solution}
 Afterwards, you may retrieve the numerical values of variables (or expressions of those variables) at the solution:
 
