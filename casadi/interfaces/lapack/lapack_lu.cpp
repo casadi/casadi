@@ -145,42 +145,44 @@ namespace casadi {
     return 0;
   }
 
-  int LapackLu::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
+  int LapackLu::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
     auto m = static_cast<LapackLuMemory*>(mem);
 
     // Dimensions
     int nrow = this->nrow();
     int ncol = this->ncol();
 
+    int n_rhs = nrhs;
+
     // Scale the right hand side
     if (tr) {
       if (m->equed=='C' || m->equed=='B')
-        for (int rhs=0; rhs<nrhs; ++rhs)
-          for (int i=0; i<nrow; ++i)
+        for (casadi_int rhs=0; rhs<nrhs; ++rhs)
+          for (casadi_int i=0; i<nrow; ++i)
             x[i+rhs*nrow] *= m->c[i];
     } else {
       if (m->equed=='R' || m->equed=='B')
-        for (int rhs=0; rhs<nrhs; ++rhs)
-          for (int i=0; i<ncol; ++i)
+        for (casadi_int rhs=0; rhs<nrhs; ++rhs)
+          for (casadi_int i=0; i<ncol; ++i)
             x[i+rhs*nrow] *= m->r[i];
     }
 
     // Solve the system of equations
     int info = 100;
     char trans = tr ? 'T' : 'N';
-    dgetrs_(&trans, &ncol, &nrhs, get_ptr(m->mat), &ncol, get_ptr(m->ipiv), x, &ncol, &info);
+    dgetrs_(&trans, &ncol, &n_rhs, get_ptr(m->mat), &ncol, get_ptr(m->ipiv), x, &ncol, &info);
     if (info) return 1;
 
     // Scale the solution
     if (tr) {
       if (m->equed=='R' || m->equed=='B')
-        for (int rhs=0; rhs<nrhs; ++rhs)
-          for (int i=0; i<ncol; ++i)
+        for (casadi_int rhs=0; rhs<nrhs; ++rhs)
+          for (casadi_int i=0; i<ncol; ++i)
             x[i+rhs*nrow] *= m->r[i];
     } else {
       if (m->equed=='C' || m->equed=='B')
-        for (int rhs=0; rhs<nrhs; ++rhs)
-          for (int i=0; i<nrow; ++i)
+        for (casadi_int rhs=0; rhs<nrhs; ++rhs)
+          for (casadi_int i=0; i<nrow; ++i)
             x[i+rhs*nrow] *= m->c[i];
     }
     return 0;

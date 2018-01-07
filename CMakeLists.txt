@@ -406,6 +406,14 @@ if(WITH_DL)
 endif()
 add_feature_info(dynamic-loading WITH_DL "Compile with support for dynamic loading of generated functions (needed for ExternalFunction)")
 
+# Dynamic loading (needed for loading plugins and external functions)
+option(WITH_LONGLONG_CORE "Use long long (64 bit) for integer types in CasADi core" OFF)
+if(WITH_LONGLONG_CORE)
+  add_definitions(-DWITH_LONGLONG_CORE)
+endif()
+add_feature_info(longlong-core WITH_LONGLONG_CORE "Use long long (64 bit) for integer types in CasADi core (allows matrices with nrwos*ncols >2e9)")
+
+
 # Include support for deprecated features (to be removed in the next release)
 option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)
 if (WITH_DEPRECATED_FEATURES)

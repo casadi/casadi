@@ -136,15 +136,15 @@ namespace casadi {
     ///@{
     /// Options
     double abstol_, reltol_;
-    int max_num_steps_;
+    casadi_int max_num_steps_;
     bool stop_at_end_;
     bool quad_err_con_;
-    int steps_per_checkpoint_;
+    casadi_int steps_per_checkpoint_;
     bool disable_internal_warnings_;
-    int max_multistep_order_;
+    casadi_int max_multistep_order_;
     std::string linear_solver_;
     Dict linear_solver_options_;
-    int max_krylov_;
+    casadi_int max_krylov_;
     bool use_precon_;
     bool second_order_correction_;
     double step0_;
@@ -166,7 +166,7 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     // Print a variable
     static void printvar(const std::string& id, double v) {

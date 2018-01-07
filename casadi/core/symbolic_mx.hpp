@@ -41,7 +41,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructors */
-    explicit SymbolicMX(const std::string& name, int nrow=1, int ncol=1);
+    explicit SymbolicMX(const std::string& name, casadi_int nrow=1, casadi_int ncol=1);
 
     /** \brief  Constructors */
     explicit SymbolicMX(const std::string& name, const Sparsity & sp);
@@ -53,10 +53,10 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
@@ -70,16 +70,16 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Get the name */
     const std::string& name() const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_PARAMETER;}
+    casadi_int op() const override { return OP_PARAMETER;}
 
     /** \brief  Check if valid function input */
     bool is_valid_input() const override { return true;}

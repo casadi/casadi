@@ -9,18 +9,18 @@
   Cf. CasADi issue #2158
  */
 template<typename T1>
-void casadi_ldl(const int* sp_a, const int* parent, const int* sp_l,
-                 const T1* a, T1* l, T1* d, int *iw, T1* w);
+void casadi_ldl(const casadi_int* sp_a, const casadi_int* parent, const casadi_int* sp_l,
+                 const T1* a, T1* l, T1* d, casadi_int *iw, T1* w);
 
 // SYMBOL "ldl_trs"
 // Solve for (I+L) with L an optionally transposed strictly lower triangular matrix.
 template<typename T1>
-void casadi_ldl_trs(const int* sp_l, const T1* nz_l, T1* x, int tr) {
+void casadi_ldl_trs(const casadi_int* sp_l, const T1* nz_l, T1* x, casadi_int tr) {
   // Extract sparsity
-  int ncol=sp_l[1];
-  const int *colind=sp_l+2, *row=sp_l+2+ncol+1;
+  casadi_int ncol=sp_l[1];
+  const casadi_int *colind=sp_l+2, *row=sp_l+2+ncol+1;
   // Local variables
-  int c, k;
+  casadi_int c, k;
   if (tr) {
     // Backward substitution
     for (c=ncol-1; c>=0; --c) {
@@ -41,10 +41,10 @@ void casadi_ldl_trs(const int* sp_l, const T1* nz_l, T1* x, int tr) {
 // SYMBOL "ldl_solve"
 // Linear solve using an LDL factorized linear system
 template<typename T1>
-void casadi_ldl_solve(T1* x, int nrhs, const int* sp_l, const T1* l,
+void casadi_ldl_solve(T1* x, casadi_int nrhs, const casadi_int* sp_l, const T1* l,
                       const T1* d) {
-  int n = sp_l[1];
-  int i, k;
+  casadi_int n = sp_l[1];
+  casadi_int i, k;
   for (k=0; k<nrhs; ++k) {
     //      LDL'x = b <=> x = L\D\L'\b
     //  Solve for L'

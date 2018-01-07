@@ -43,7 +43,7 @@ namespace casadi {
 
   void Dot::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
-    for (int d=0; d<fsens.size(); ++d) {
+    for (casadi_int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = dep(0)->get_dot(fseed[d][1])
         + fseed[d][0]->get_dot(dep(1));
     }
@@ -51,41 +51,41 @@ namespace casadi {
 
   void Dot::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
-    for (int d=0; d<aseed.size(); ++d) {
+    for (casadi_int d=0; d<aseed.size(); ++d) {
       asens[d][0] += aseed[d][0] * dep(1);
       asens[d][1] += aseed[d][0] * dep(0);
     }
   }
 
-  int Dot::eval(const double** arg, double** res, int* iw, double* w) const {
+  int Dot::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
-  int Dot::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+  int Dot::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  int Dot::eval_gen(const T** arg, T** res, int* iw, T* w) const {
+  int Dot::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
     *res[0] = casadi_dot(dep(0).nnz(), arg[0], arg[1]);
     return 0;
   }
 
-  int Dot::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  int Dot::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t* r = res[0];
-    const int n = dep(0).nnz();
+    const casadi_int n = dep(0).nnz();
     *r = 0;
-    for (int i=0; i<n; ++i) {
+    for (casadi_int i=0; i<n; ++i) {
       *r |= *a0++ | *a1++;
     }
     return 0;
   }
 
-  int Dot::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  int Dot::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     bvec_t *a0=arg[0], *a1=arg[1], *r=res[0];
-    const int n = dep(0).nnz();
-    for (int i=0; i<n; ++i) {
+    const casadi_int n = dep(0).nnz();
+    for (casadi_int i=0; i<n; ++i) {
       *a0++ |= *r;
       *a1++ |= *r;
     }
@@ -94,7 +94,8 @@ namespace casadi {
   }
 
   void Dot::generate(CodeGenerator& g,
-                           const std::vector<int>& arg, const std::vector<int>& res) const {
+                      const std::vector<casadi_int>& arg,
+                      const std::vector<casadi_int>& res) const {
     g << g.workel(res[0]) << " = "
       << g.dot(dep().nnz(), g.work(arg[0], dep(0).nnz()), g.work(arg[1], dep(1).nnz()))
       << ";\n";

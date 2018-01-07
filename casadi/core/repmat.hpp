@@ -42,11 +42,11 @@ namespace casadi {
   public:
 
     /// Constructor
-    HorzRepmat(const MX& x, int n);
+    HorzRepmat(const MX& x, casadi_int n);
 
     /// Evaluate the function (template)
     template<typename T>
-    int eval_gen(const T** arg, T** res, int* iw, T* w) const;
+    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const;
 
     /// Destructor
     ~HorzRepmat() override {}
@@ -55,19 +55,19 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Calculate forward mode directional derivatives */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
@@ -79,12 +79,13 @@ namespace casadi {
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
-                  const std::vector<int>& arg, const std::vector<int>& res) const override;
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_HORZREPMAT;}
+    casadi_int op() const override { return OP_HORZREPMAT;}
 
-    int n_;
+    casadi_int n_;
   };
 
   /** \brief Horizontal repsum
@@ -95,11 +96,11 @@ namespace casadi {
   public:
 
     /// Constructor
-    HorzRepsum(const MX& x, int n);
+    HorzRepsum(const MX& x, casadi_int n);
 
     /// Evaluate the function (template)
     template<typename T, typename R>
-    int eval_gen(const T** arg, T** res, int* iw, T* w, R reduction) const;
+    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w, R reduction) const;
 
     /// Destructor
     ~HorzRepsum() override {}
@@ -108,19 +109,19 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Calculate forward mode directional derivatives */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
@@ -132,12 +133,13 @@ namespace casadi {
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
-                  const std::vector<int>& arg, const std::vector<int>& res) const override;
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_HORZREPSUM;}
+    casadi_int op() const override { return OP_HORZREPSUM;}
 
-    int n_;
+    casadi_int n_;
   };
 
 } // namespace casadi

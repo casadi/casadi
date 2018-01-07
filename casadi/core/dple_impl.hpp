@@ -50,14 +50,14 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(int i) override;
-    Sparsity get_sparsity_out(int i) override;
+    Sparsity get_sparsity_in(casadi_int i) override;
+    Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
-    std::string get_name_in(int i) override { return dple_in(i);}
-    std::string get_name_out(int i) override { return dple_out(i);}
+    std::string get_name_in(casadi_int i) override { return dple_in(i);}
+    std::string get_name_out(casadi_int i) override { return dple_out(i);}
     /// @}
 
     ///@{
@@ -71,8 +71,8 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    bool has_forward(int nfwd) const override { return true;}
-    Function get_forward(int nfwd, const std::string& name,
+    bool has_forward(casadi_int nfwd) const override { return true;}
+    Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -80,8 +80,8 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    bool has_reverse(int nadj) const override { return true;}
-    Function get_reverse(int nadj, const std::string& name,
+    bool has_reverse(casadi_int nadj) const override { return true;}
+    Function get_reverse(casadi_int nadj, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -112,7 +112,7 @@ namespace casadi {
     Sparsity V_;
 
     /// Period
-    int K_;
+    casadi_int K_;
 
     /// Constant dimensions
     bool const_dim_;
@@ -127,7 +127,7 @@ namespace casadi {
     double eps_unstable_;
 
     /// Number of right hand sides
-    int nrhs_;
+    casadi_int nrhs_;
 
   };
 

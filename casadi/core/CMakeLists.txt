@@ -6,6 +6,7 @@ add_subdirectory(runtime)
 set(CASADI_PUBLIC
   # MISC
   casadi_limits.hpp
+  casadi_types.hpp
   casadi_common.hpp
   casadi_logger.hpp
   casadi_interrupt.hpp

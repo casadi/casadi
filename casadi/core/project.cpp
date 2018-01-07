@@ -46,16 +46,16 @@ namespace casadi {
   }
 
   template<typename T>
-  int Project::eval_gen(const T** arg, T** res, int* iw, T* w) const {
+  int Project::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
     casadi_project(arg[0], dep().sparsity(), res[0], sparsity(), w);
     return 0;
   }
 
-  int Project::eval(const double** arg, double** res, int* iw, double* w) const {
+  int Project::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
-  int Project::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+  int Project::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
@@ -65,33 +65,34 @@ namespace casadi {
 
   void Project::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
-    int nfwd = fsens.size();
-    for (int d=0; d<nfwd; ++d) {
+    casadi_int nfwd = fsens.size();
+    for (casadi_int d=0; d<nfwd; ++d) {
       fsens[d][0] = project(fseed[d][0], sparsity(), true);
     }
   }
 
   void Project::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
-    int nadj = aseed.size();
-    for (int d=0; d<nadj; ++d) {
+    casadi_int nadj = aseed.size();
+    for (casadi_int d=0; d<nadj; ++d) {
       asens[d][0] += project(aseed[d][0], dep().sparsity(), true);
     }
   }
 
-  int Project::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  int Project::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     sparsity().set(res[0], arg[0], dep().sparsity());
     return 0;
   }
 
-  int Project::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  int Project::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     dep().sparsity().bor(arg[0], res[0], sparsity());
     fill(res[0], res[0]+nnz(), 0);
     return 0;
   }
 
   void Project::generate(CodeGenerator& g,
-                         const std::vector<int>& arg, const std::vector<int>& res) const {
+                          const std::vector<casadi_int>& arg,
+                          const std::vector<casadi_int>& res) const {
     g << g.project(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
                            g.work(res.front(), nnz()), sparsity(), "w") << "\n";
   }

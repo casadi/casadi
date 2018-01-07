@@ -51,6 +51,9 @@ namespace casadi {
 
     /// Destructor
     ~ClpMemory();
+
+    std::vector<int> colind, row;
+
   };
 
   /** \brief \pluginbrief{Conic,clp}
@@ -95,7 +98,7 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<ClpMemory*>(mem);}
 
     // Solve the QP
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;

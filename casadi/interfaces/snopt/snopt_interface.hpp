@@ -54,13 +54,13 @@ namespace casadi {
     // Current calculated quantities
     double fk, *gk, *jac_fk, *jac_gk;
 
-    int n_iter; // number of major iterations
+    casadi_int n_iter; // number of major iterations
 
     std::vector<double> A_data;
 
     // Memory pool
     static std::vector<SnoptMemory*> mempool;
-    int memind;
+    casadi_int memind;
 
     /// Constructor
     SnoptMemory(const SnoptInterface& self);
@@ -121,7 +121,7 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     // Solve the NLP
     void solve(void* mem) const override;
@@ -129,22 +129,22 @@ namespace casadi {
     /// Exact Hessian?
     bool exact_hessian_;
 
-    std::map<int, std::string> status_;
+    std::map<casadi_int, std::string> status_;
 
-    std::string formatStatus(int status) const;
+    std::string formatStatus(casadi_int status) const;
 
     void userfun(SnoptMemory* m, int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
                  double* x, double* fObj, double*gObj, double* fCon, double* gCon,
                  int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru) const;
 
-    int nnJac_;
-    int nnObj_;
-    int nnCon_;
+    casadi_int nnJac_;
+    casadi_int nnObj_;
+    casadi_int nnCon_;
 
     IM A_structure_;
 
-    int m_;
-    int iObj_;
+    casadi_int m_;
+    casadi_int iObj_;
 
     static void userfunPtr(int * mode, int* nnObj, int * nnCon, int *nJac, int *nnL, int * neJac,
                            double *x, double *fObj, double *gObj, double * fCon, double* gCon,
@@ -160,7 +160,7 @@ namespace casadi {
     static const std::string meta_doc;
 
     /// Warm-start settings
-    int Cold_;
+    casadi_int Cold_;
 
   private:
       // options

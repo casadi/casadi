@@ -32,27 +32,27 @@ namespace casadi {
     if (equidistant) {
       double delta = x[1]-x[0];
       double i = (xq-x[0])/delta;
-      double imax = x.size()-1;
+      double imax = static_cast<double>(x.size()-1);
       return std::max(std::min(i, imax), 0.0);
 
     } else {
       std::vector<double>::const_iterator it = std::lower_bound(x.begin(), x.end(), xq);
 
       // End of x
-      if (it==x.end()) return x.size()-1;
+      if (it==x.end()) return static_cast<double>(x.size()-1);
 
       // Start of x
-      if (it==x.begin()) return 0;
+      if (it==x.begin()) return 0.0;
 
-      int i = std::distance(x.begin(), it);
+      casadi_int i = std::distance(x.begin(), it);
 
       // Exactly on an entry
-      if (*it == xq) return i;
+      if (*it == xq) return static_cast<double>(i);
 
       double b = *it;
       double a = *(it-1);
 
-      return i+(xq-b)/(b-a);
+      return static_cast<double>(i)+(xq-b)/(b-a);
     }
   }
 

@@ -32,10 +32,9 @@
 
 // http://www.yolinux.com/TUTORIALS/LinuxTutorialMixingFortranAndC.html
 
-int main(int argc, char *argv[])
-{
-  int n = 15;
-  int m = 18;
+casadi_int main(casadi_int argc, char *argv[]) {
+  casadi_int n = 15;
+  casadi_int m = 18;
   std::vector<double> bl(n+m);
   std::vector<double> bu(n+m);
 
@@ -78,7 +77,7 @@ int main(int argc, char *argv[])
   //iObj   = 18  means the linear objective is row 18 in valA(*).
   //The objective row is free.
 
-  int iObj   = 17;
+  casadi_int iObj   = 17;
   bl[n+iObj] = -inf;
 
   // LBG

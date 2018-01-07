@@ -276,7 +276,7 @@ namespace casadi {
       }
 
       // Get directional derivatives
-      for (int i=0; i<fwd_out_.size(); ++i) {
+      for (casadi_int i=0; i<fwd_out_.size(); ++i) {
         out_["fwd:" + fwd_out_[i]] = project(sens[0].at(i), res.at(i).sparsity());
       }
     }
@@ -305,7 +305,7 @@ namespace casadi {
       }
 
       // Get directional derivatives
-      for (int i=0; i<adj_out_.size(); ++i) {
+      for (casadi_int i=0; i<adj_out_.size(); ++i) {
         out_["adj:" + adj_out_[i]] = project(sens[0].at(i), arg.at(i).sparsity());
       }
     }

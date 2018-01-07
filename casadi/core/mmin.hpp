@@ -49,7 +49,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_MMIN;}
+    casadi_int op() const override { return OP_MMIN;}
   };
 
   /** \brief Matrix maximum
@@ -70,7 +70,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_MMAX;}
+    casadi_int op() const override { return OP_MMAX;}
   };
 
 } // namespace casadi

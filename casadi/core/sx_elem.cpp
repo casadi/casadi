@@ -41,7 +41,7 @@ namespace casadi {
 
 
   // Allocate storage for the caching
-  CACHING_MAP<int, IntegerSX*> IntegerSX::cached_constants_;
+  CACHING_MAP<casadi_int, IntegerSX*> IntegerSX::cached_constants_;
   CACHING_MAP<double, RealtypeSX*> RealtypeSX::cached_constants_;
 
   SXElem::SXElem() {
@@ -63,8 +63,8 @@ namespace casadi {
   }
 
   SXElem::SXElem(double val) {
-    int intval = static_cast<int>(val);
-    if (val-intval == 0) { // check if integer
+    casadi_int intval = static_cast<casadi_int>(val);
+    if (val-static_cast<double>(intval) == 0) { // check if integer
       if (intval == 0)             node = casadi_limits<SXElem>::zero.node;
       else if (intval == 1)        node = casadi_limits<SXElem>::one.node;
       else if (intval == 2)        node = casadi_limits<SXElem>::two.node;
@@ -101,7 +101,7 @@ namespace casadi {
     return *this;
   }
 
-  void SXElem::assignIfDuplicate(const SXElem& scalar, int depth) {
+  void SXElem::assignIfDuplicate(const SXElem& scalar, casadi_int depth) {
     casadi_assert_dev(depth>=1);
     if (!is_equal(*this, scalar, 0) && is_equal(*this, scalar, depth)) {
       *this = scalar;
@@ -176,7 +176,7 @@ namespace casadi {
     return node;
   }
 
-  SXElem SXElem::binary(int op, const SXElem& x, const SXElem& y) {
+  SXElem SXElem::binary(casadi_int op, const SXElem& x, const SXElem& y) {
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {
       switch (op) {
@@ -318,7 +318,7 @@ namespace casadi {
       case OP_POW:
         if (y->is_constant()) {
           if (y->is_integer()) {
-            int nn = y->to_int();
+            casadi_int nn = y->to_int();
             if (nn == 0) {
               return 1;
             } else if (nn>100 || nn<-100) { // maximum depth
@@ -369,7 +369,7 @@ namespace casadi {
     return BinarySX::create(Operation(op), x, y);
   }
 
-  SXElem SXElem::unary(int op, const SXElem& x) {
+  SXElem SXElem::unary(casadi_int op, const SXElem& x) {
     // Simplifications
     if (GlobalOptions::simplification_on_the_fly) {
       switch (op) {
@@ -462,15 +462,15 @@ namespace casadi {
     return node->name();
   }
 
-  int SXElem::op() const {
+  casadi_int SXElem::op() const {
     return node->op();
   }
 
-  bool SXElem::is_op(int op) const {
+  bool SXElem::is_op(casadi_int op) const {
     return node->is_op(op);
   }
 
-  bool SXElem::is_equal(const SXElem& x, const SXElem& y, int depth) {
+  bool SXElem::is_equal(const SXElem& x, const SXElem& y, casadi_int depth) {
     SXNode *x_node = x.get(), *y_node = y.get();
     if (x_node==y_node) {
       return true;
@@ -495,16 +495,16 @@ namespace casadi {
     return node->to_double();
   }
 
-  SXElem::operator int() const {
+  SXElem::operator casadi_int() const {
     return node->to_int();
   }
 
-  SXElem SXElem::dep(int ch) const {
+  SXElem SXElem::dep(casadi_int ch) const {
     casadi_assert_dev(ch==0 || ch==1);
     return node->dep(ch);
   }
 
-  int SXElem::n_dep() const {
+  casadi_int SXElem::n_dep() const {
     return node->n_dep();
   }
 
@@ -528,7 +528,7 @@ namespace casadi {
     return val.is_zero();
   }
 
-  bool casadi_limits<SXElem>::is_equal(const SXElem& x, const SXElem& y, int depth) {
+  bool casadi_limits<SXElem>::is_equal(const SXElem& x, const SXElem& y, casadi_int depth) {
     return SXElem::is_equal(x, y, depth);
   }
 

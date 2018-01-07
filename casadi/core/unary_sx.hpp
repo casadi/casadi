@@ -67,23 +67,23 @@ class UnarySX : public SXNode {
 
     bool is_smooth() const override { return operation_checker<SmoothChecker>(op_);}
 
-    bool is_op(int op) const override { return op_==op; }
+    bool is_op(casadi_int op) const override { return op_==op; }
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    bool is_equal(const SXNode* node, int depth) const override {
+    bool is_equal(const SXNode* node, casadi_int depth) const override {
       const UnarySX* n = dynamic_cast<const UnarySX*>(node);
       return n && n->op_ == op_ &&  SXElem::is_equal(n->dep_, dep_, depth-1);
     }
 
     /** \brief  Number of dependencies */
-    int n_dep() const override { return 1;}
+    casadi_int n_dep() const override { return 1;}
 
     /** \brief  get the reference of a dependency */
-    const SXElem& dep(int i) const override { return dep_; }
-    SXElem& dep(int i) override { return dep_; }
+    const SXElem& dep(casadi_int i) const override { return dep_; }
+    SXElem& dep(casadi_int i) override { return dep_; }
 
     /** \brief  Get the operation */
-    int op() const override { return op_;}
+    casadi_int op() const override { return op_;}
 
     /** \brief  Print expression */
     std::string print(const std::string& arg1, const std::string& arg2) const  override {

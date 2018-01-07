@@ -38,7 +38,7 @@ namespace casadi {
   class CASADI_EXPORT FiniteDiff : public FunctionInternal {
   public:
     // Constructor (protected, use create function)
-    FiniteDiff(const std::string& name, int n);
+    FiniteDiff(const std::string& name, casadi_int n);
 
     /** \brief Destructor */
     ~FiniteDiff() override;
@@ -51,12 +51,12 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(int i) override;
-    Sparsity get_sparsity_out(int i) override;
+    Sparsity get_sparsity_in(casadi_int i) override;
+    Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     /** \brief Get default input value */
-    double get_default_in(int ind) const override;
+    double get_default_in(casadi_int ind) const override;
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -66,15 +66,15 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs */
-    std::string get_name_in(int i) override;
-    std::string get_name_out(int i) override;
+    std::string get_name_in(casadi_int i) override;
+    std::string get_name_out(casadi_int i) override;
     ///@}
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
     // Evaluate numerically
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /** \brief Is the scheme using the (nondifferentiated) output? */
     bool uses_output() const override {return true;}
@@ -90,13 +90,13 @@ namespace casadi {
 
   protected:
     // Number of function evaluations needed
-    virtual int n_pert() const = 0;
+    virtual casadi_int n_pert() const = 0;
 
     // Get perturbation expression
     virtual std::string pert(const std::string& k) const = 0;
 
     // Get perturbation expression
-    virtual double pert(int k, double h) const = 0;
+    virtual double pert(casadi_int k, double h) const = 0;
 
     // Calculate finite difference approximation
     virtual double calc_fd(double** yk, double* y0, double* J, double h) const = 0;
@@ -105,22 +105,22 @@ namespace casadi {
     virtual std::string calc_fd() const = 0;
 
     // Is an error estimate available?
-    virtual int has_err() const = 0;
+    virtual casadi_int has_err() const = 0;
 
     // Calculate step size from absolute tolerance
     virtual double calc_stepsize(double abstol) const = 0;
 
     // Number of directional derivatives
-    int n_;
+    casadi_int n_;
 
     // Iterations to improve h
-    int h_iter_;
+    casadi_int h_iter_;
 
     // Perturbation
     double h_;
 
     // Dimensions
-    int n_z_, n_y_;
+    casadi_int n_z_, n_y_;
 
     // Target ratio of truncation error to roundoff error
     double u_aim_;
@@ -139,7 +139,7 @@ namespace casadi {
   class CASADI_EXPORT ForwardDiff : public FiniteDiff {
   public:
     // Constructor
-    ForwardDiff(const std::string& name, int n) : FiniteDiff(name, n) {}
+    ForwardDiff(const std::string& name, casadi_int n) : FiniteDiff(name, n) {}
 
     /** \brief Destructor */
     ~ForwardDiff() override {}
@@ -148,7 +148,7 @@ namespace casadi {
     std::string class_name() const override {return "ForwardDiff";}
 
     // Number of function evaluations needed
-    int n_pert() const override {return 1;};
+    casadi_int n_pert() const override {return 1;};
 
     // Get perturbation expression
     std::string pert(const std::string& k) const override {
@@ -156,7 +156,7 @@ namespace casadi {
     }
 
     // Get perturbation expression
-    double pert(int k, double h) const override {
+    double pert(casadi_int k, double h) const override {
       return h;
     }
 
@@ -167,7 +167,7 @@ namespace casadi {
     std::string calc_fd() const override {return "casadi_forward_diff";}
 
     // Is an error estimate available?
-    int has_err() const override {return false;}
+    casadi_int has_err() const override {return false;}
 
     // Calculate step size from absolute tolerance
     double calc_stepsize(double abstol) const override { return sqrt(abstol);}
@@ -177,8 +177,8 @@ namespace casadi {
 
     ///@{
     /** \brief Second order derivatives */
-    bool has_forward(int nfwd) const override { return true;}
-    Function get_forward(int nfwd, const std::string& name,
+    bool has_forward(casadi_int nfwd) const override { return true;}
+    Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -192,7 +192,7 @@ namespace casadi {
   class CASADI_EXPORT BackwardDiff : public ForwardDiff {
   public:
     // Constructor
-    BackwardDiff(const std::string& name, int n) : ForwardDiff(name, n) {}
+    BackwardDiff(const std::string& name, casadi_int n) : ForwardDiff(name, n) {}
 
     /** \brief Destructor */
     ~BackwardDiff() override {}
@@ -213,7 +213,7 @@ namespace casadi {
   class CASADI_EXPORT CentralDiff : public FiniteDiff {
   public:
     // Constructor
-    CentralDiff(const std::string& name, int n) : FiniteDiff(name, n) {}
+    CentralDiff(const std::string& name, casadi_int n) : FiniteDiff(name, n) {}
 
     /** \brief Destructor */
     ~CentralDiff() override {}
@@ -222,7 +222,7 @@ namespace casadi {
     std::string class_name() const override {return "CentralDiff";}
 
     // Number of function evaluations needed
-    int n_pert() const override {return 2;};
+    casadi_int n_pert() const override {return 2;};
 
     // Get perturbation expression
     std::string pert(const std::string& k) const override {
@@ -230,8 +230,8 @@ namespace casadi {
     }
 
     // Get perturbation expression
-    double pert(int k, double h) const override {
-      return (2*k-1)*h;
+    double pert(casadi_int k, double h) const override {
+      return (2*static_cast<double>(k)-1)*h;
     }
 
     // Calculate finite difference approximation
@@ -241,7 +241,7 @@ namespace casadi {
     std::string calc_fd() const override {return "casadi_central_diff";}
 
     // Is an error estimate available?
-    int has_err() const override {return true;}
+    casadi_int has_err() const override {return true;}
 
     // Calculate step size from absolute tolerance
     double calc_stepsize(double abstol) const override { return pow(abstol, 1./3);}
@@ -251,8 +251,8 @@ namespace casadi {
 
     ///@{
     /** \brief Second order derivatives */
-    bool has_forward(int nfwd) const override { return true;}
-    Function get_forward(int nfwd, const std::string& name,
+    bool has_forward(casadi_int nfwd) const override { return true;}
+    Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -266,7 +266,7 @@ namespace casadi {
   class CASADI_EXPORT Smoothing : public FiniteDiff {
   public:
     // Constructor
-    Smoothing(const std::string& name, int n) : FiniteDiff(name, n) {}
+    Smoothing(const std::string& name, casadi_int n) : FiniteDiff(name, n) {}
 
     /** \brief Destructor */
     ~Smoothing() override {}
@@ -275,13 +275,13 @@ namespace casadi {
     std::string class_name() const override {return "Smoothing";}
 
     // Number of function evaluations needed
-    int n_pert() const override {return 4;};
+    casadi_int n_pert() const override {return 4;};
 
     // Get perturbation expression
     std::string pert(const std::string& k) const override;
 
     // Get perturbation expression
-    double pert(int k, double h) const override;
+    double pert(casadi_int k, double h) const override;
 
     // Calculate finite difference approximation
     double calc_fd(double** yk, double* y0, double* J, double h) const override;
@@ -290,7 +290,7 @@ namespace casadi {
     std::string calc_fd() const override {return "casadi_smoothing_diff";}
 
     // Is an error estimate available?
-    int has_err() const override {return true;}
+    casadi_int has_err() const override {return true;}
 
     // Calculate step size from absolute tolerance
     double calc_stepsize(double abstol) const override { return pow(abstol, 1./3);}
@@ -300,8 +300,8 @@ namespace casadi {
 
     ///@{
     /** \brief Second order derivatives */
-    bool has_forward(int nfwd) const override { return true;}
-    Function get_forward(int nfwd, const std::string& name,
+    bool has_forward(casadi_int nfwd) const override { return true;}
+    Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;

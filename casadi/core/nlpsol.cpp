@@ -134,7 +134,7 @@ namespace casadi {
     return ret;
   }
 
-  double nlpsol_default_in(int ind) {
+  double nlpsol_default_in(casadi_int ind) {
     switch (ind) {
     case NLPSOL_LBX:
     case NLPSOL_LBG:
@@ -153,7 +153,7 @@ namespace casadi {
     return ret;
   }
 
-  string nlpsol_in(int ind) {
+  string nlpsol_in(casadi_int ind) {
     switch (static_cast<NlpsolInput>(ind)) {
     case NLPSOL_X0:     return "x0";
     case NLPSOL_P:      return "p";
@@ -168,7 +168,7 @@ namespace casadi {
     return string();
   }
 
-  string nlpsol_out(int ind) {
+  string nlpsol_out(casadi_int ind) {
     switch (static_cast<NlpsolOutput>(ind)) {
     case NLPSOL_X:     return "x";
     case NLPSOL_F:     return "f";
@@ -181,11 +181,11 @@ namespace casadi {
     return string();
   }
 
-  int nlpsol_n_in() {
+  casadi_int nlpsol_n_in() {
     return NLPSOL_NUM_IN;
   }
 
-  int nlpsol_n_out() {
+  casadi_int nlpsol_n_out() {
     return NLPSOL_NUM_OUT;
   }
 
@@ -205,7 +205,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Sparsity Nlpsol::get_sparsity_in(int i) {
+  Sparsity Nlpsol::get_sparsity_in(casadi_int i) {
     switch (static_cast<NlpsolInput>(i)) {
     case NLPSOL_X0:
     case NLPSOL_LBX:
@@ -223,7 +223,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity Nlpsol::get_sparsity_out(int i) {
+  Sparsity Nlpsol::get_sparsity_out(casadi_int i) {
     switch (static_cast<NlpsolOutput>(i)) {
     case NLPSOL_F:
       return oracle_.sparsity_out(NL_F);
@@ -347,7 +347,7 @@ namespace casadi {
         "Callback function must return a scalar.");
       casadi_assert(fcallback_.n_in()==n_out_,
         "Callback input signature must match the NLP solver output signature");
-      for (int i=0; i<n_out_; ++i) {
+      for (casadi_int i=0; i<n_out_; ++i) {
         casadi_assert(fcallback_.size_in(i)==size_out(i),
           "Callback function input size mismatch. For argument '" + nlpsol_out(i) + "', "
           "callback has shape " + fcallback_.sparsity_in(i).dim() + " while NLP has " +
@@ -388,10 +388,10 @@ namespace casadi {
     const double inf = std::numeric_limits<double>::infinity();
 
     // Number of equality constraints
-    int n_eq = 0;
+    casadi_int n_eq = 0;
 
     // Detect ill-posed problems (simple bounds)
-    for (int i=0; i<nx_; ++i) {
+    for (casadi_int i=0; i<nx_; ++i) {
       double lb = m->lbx ? m->lbx[i] : 0;
       double ub = m->ubx ? m->ubx[i] : 0;
       double x0 = m->x0 ? m->x0[i] : 0;
@@ -408,7 +408,7 @@ namespace casadi {
     }
 
     // Detect ill-posed problems (nonlinear bounds)
-    for (int i=0; i<ng_; ++i) {
+    for (casadi_int i=0; i<ng_; ++i) {
       double lb = m->lbg ? m->lbg[i] : 0;
       double ub = m->ubg ? m->ubg[i] : 0;
       casadi_assert(lb <= ub && lb!=inf && ub!=-inf,
@@ -439,7 +439,7 @@ namespace casadi {
     casadi_error("setOptionsFromFile not defined for class " + class_name());
   }
 
-  int Nlpsol::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int Nlpsol::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<NlpsolMemory*>(mem);
 
     // Reset statistics
@@ -474,7 +474,7 @@ namespace casadi {
 
       if (m->lam_x) {
         casadi_scal(nx_, -1., m->lam_x);
-        for (int i=0; i<nx_; ++i) {
+        for (casadi_int i=0; i<nx_; ++i) {
           if (m->lam_x[i]>0) {
             // If upper bound isn't active, multiplier is zero
             if (m->x[i] < (m->ubx ? m->ubx[i] : 0)) m->lam_x[i] = 0;
@@ -496,7 +496,7 @@ namespace casadi {
   }
 
   void Nlpsol::set_work(void* mem, const double**& arg, double**& res,
-                        int*& iw, double*& w) const {
+                        casadi_int*& iw, double*& w) const {
     auto m = static_cast<NlpsolMemory*>(mem);
 
     // Get input pointers

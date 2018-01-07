@@ -165,7 +165,8 @@ namespace casadi {
     return 0;
   }
 
-  int Rootfinder::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int Rootfinder::eval(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const {
     // Reset the solver, prepare for solution
     setup(mem, arg, res, iw, w);
 
@@ -175,7 +176,7 @@ namespace casadi {
   }
 
   void Rootfinder::set_work(void* mem, const double**& arg, double**& res,
-                        int*& iw, double*& w) const {
+                        casadi_int*& iw, double*& w) const {
     auto m = static_cast<RootfinderMemory*>(mem);
 
     // Get input pointers
@@ -188,7 +189,7 @@ namespace casadi {
   }
 
   Function Rootfinder
-  ::get_forward(int nfwd, const std::string& name,
+  ::get_forward(casadi_int nfwd, const std::string& name,
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
@@ -202,20 +203,20 @@ namespace casadi {
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
     vector<MX> v(nfwd);
-    for (int i=0; i<n_in_; ++i) {
-      for (int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
+    for (casadi_int i=0; i<n_in_; ++i) {
+      for (casadi_int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
       arg.push_back(horzcat(v));
     }
     res.clear();
-    for (int i=0; i<n_out_; ++i) {
-      for (int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
+    for (casadi_int i=0; i<n_out_; ++i) {
+      for (casadi_int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
       res.push_back(horzcat(v));
     }
     return Function(name, arg, res, inames, onames, opts);
   }
 
   Function Rootfinder
-  ::get_reverse(int nadj, const std::string& name,
+  ::get_reverse(casadi_int nadj, const std::string& name,
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
@@ -230,20 +231,20 @@ namespace casadi {
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
     vector<MX> v(nadj);
-    for (int i=0; i<n_out_; ++i) {
-      for (int d=0; d<nadj; ++d) v[d] = aseed[d][i];
+    for (casadi_int i=0; i<n_out_; ++i) {
+      for (casadi_int d=0; d<nadj; ++d) v[d] = aseed[d][i];
       arg.push_back(horzcat(v));
     }
     res.clear();
-    for (int i=0; i<n_in_; ++i) {
-      for (int d=0; d<nadj; ++d) v[d] = asens[d][i];
+    for (casadi_int i=0; i<n_in_; ++i) {
+      for (casadi_int d=0; d<nadj; ++d) v[d] = asens[d][i];
       res.push_back(horzcat(v));
     }
     return Function(name, arg, res, inames, onames, opts);
   }
 
   int Rootfinder::
-  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
     bvec_t* tmp1 = w; w += n_;
     bvec_t* tmp2 = w; w += n_;
 
@@ -271,7 +272,8 @@ namespace casadi {
     return 0;
   }
 
-  int Rootfinder::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
+  int Rootfinder::sp_reverse(bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, void* mem) const {
     bvec_t* tmp1 = w; w += n_;
     bvec_t* tmp2 = w; w += n_;
 
@@ -299,7 +301,7 @@ namespace casadi {
     sp_jac_.spsolve(tmp2, tmp1, true);
 
     // Propagate dependencies through the function
-    for (int i=0; i<n_out_; ++i) res1[i] = 0;
+    for (casadi_int i=0; i<n_out_; ++i) res1[i] = 0;
     res1[iout_] = tmp2;
     arg1[iin_] = 0; // just a guess
     if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
@@ -316,7 +318,7 @@ namespace casadi {
           std::vector<std::vector<MX> >& fsens,
           bool always_inline, bool never_inline) const {
     // Number of directional derivatives
-    int nfwd = fseed.size();
+    casadi_int nfwd = fseed.size();
     fsens.resize(nfwd);
 
     // Quick return if no seeds
@@ -328,7 +330,7 @@ namespace casadi {
     vector<MX> f_res(res);
     f_res.at(iout_) = MX(size_in(iin_)); // zero residual
     std::vector<std::vector<MX> > f_fseed(fseed);
-    for (int d=0; d<nfwd; ++d) {
+    for (casadi_int d=0; d<nfwd; ++d) {
       f_fseed[d].at(iin_) = MX(size_in(iin_)); // ignore seeds for guess
     }
     oracle_->call_forward(f_arg, f_res, f_fseed, fsens,
@@ -340,16 +342,16 @@ namespace casadi {
 
     // Solve for all the forward derivatives at once
     vector<MX> rhs(nfwd);
-    for (int d=0; d<nfwd; ++d) rhs[d] = vec(fsens[d][iout_]);
+    for (casadi_int d=0; d<nfwd; ++d) rhs[d] = vec(fsens[d][iout_]);
     rhs = horzsplit(J->get_solve(-horzcat(rhs), false, linsol_));
-    for (int d=0; d<nfwd; ++d) fsens[d][iout_] = reshape(rhs[d], size_in(iin_));
+    for (casadi_int d=0; d<nfwd; ++d) fsens[d][iout_] = reshape(rhs[d], size_in(iin_));
 
     // Propagate to auxiliary outputs
     if (n_out_>1) {
-      for (int d=0; d<nfwd; ++d) f_fseed[d][iin_] = fsens[d][iout_];
+      for (casadi_int d=0; d<nfwd; ++d) f_fseed[d][iin_] = fsens[d][iout_];
       oracle_->call_forward(f_arg, f_res, f_fseed, fsens,
                             always_inline, never_inline);
-      for (int d=0; d<nfwd; ++d) fsens[d][iout_] = f_fseed[d][iin_]; // Otherwise overwritten
+      for (casadi_int d=0; d<nfwd; ++d) fsens[d][iout_] = f_fseed[d][iin_]; // Otherwise overwritten
     }
   }
 
@@ -360,7 +362,7 @@ namespace casadi {
           bool always_inline, bool never_inline) const {
 
     // Number of directional derivatives
-    int nadj = aseed.size();
+    casadi_int nadj = aseed.size();
     asens.resize(nadj);
 
     // Quick return if no seeds
@@ -376,9 +378,9 @@ namespace casadi {
     vector<MX> f_res(res);
     f_res[iout_] = MX(size_in(iin_)); // zero residual
     vector<vector<MX> > f_aseed(nadj);
-    for (int d=0; d<nadj; ++d) {
+    for (casadi_int d=0; d<nadj; ++d) {
       f_aseed[d].resize(n_out_);
-      for (int i=0; i<n_out_; ++i) f_aseed[d][i] = i==iout_ ? f_res[iout_] : aseed[d][i];
+      for (casadi_int i=0; i<n_out_; ++i) f_aseed[d][i] = i==iout_ ? f_res[iout_] : aseed[d][i];
     }
 
     // Propagate dependencies from auxiliary outputs
@@ -386,15 +388,15 @@ namespace casadi {
     vector<vector<MX> > asens_aux;
     if (n_out_>1) {
       oracle_->call_reverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
-      for (int d=0; d<nadj; ++d) rhs[d] = vec(asens_aux[d][iin_] + aseed[d][iout_]);
+      for (casadi_int d=0; d<nadj; ++d) rhs[d] = vec(asens_aux[d][iin_] + aseed[d][iout_]);
     } else {
-      for (int d=0; d<nadj; ++d) rhs[d] = vec(aseed[d][iout_]);
+      for (casadi_int d=0; d<nadj; ++d) rhs[d] = vec(aseed[d][iout_]);
     }
 
     // Solve for all the adjoint seeds at once
     rhs = horzsplit(J->get_solve(-horzcat(rhs), true, linsol_));
-    for (int d=0; d<nadj; ++d) {
-      for (int i=0; i<n_out_; ++i) {
+    for (casadi_int d=0; d<nadj; ++d) {
+      for (casadi_int i=0; i<n_out_; ++i) {
         if (i==iout_) {
           f_aseed[d][i] = reshape(rhs[d], size_out(i));
         } else {
@@ -406,7 +408,7 @@ namespace casadi {
 
     // No dependency on guess (1)
     vector<MX> tmp(nadj);
-    for (int d=0; d<nadj; ++d) {
+    for (casadi_int d=0; d<nadj; ++d) {
       asens[d].resize(n_in_);
       tmp[d] = asens[d][iin_].is_empty(true) ? MX(size_in(iin_)) : asens[d][iin_];
     }
@@ -415,14 +417,14 @@ namespace casadi {
     oracle_->call_reverse(f_arg, f_res, f_aseed, asens, always_inline, never_inline);
 
     // No dependency on guess (2)
-    for (int d=0; d<nadj; ++d) {
+    for (casadi_int d=0; d<nadj; ++d) {
       asens[d][iin_] = tmp[d];
     }
 
     // Add contribution from auxiliary outputs
     if (n_out_>1) {
-      for (int d=0; d<nadj; ++d) {
-        for (int i=0; i<n_in_; ++i) if (i!=iin_) asens[d][i] += asens_aux[d][i];
+      for (casadi_int d=0; d<nadj; ++d) {
+        for (casadi_int i=0; i<n_in_; ++i) if (i!=iin_) asens[d][i] += asens_aux[d][i];
       }
     }
   }

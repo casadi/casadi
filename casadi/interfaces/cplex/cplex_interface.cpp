@@ -121,7 +121,7 @@ namespace casadi {
     // Type of variable
     if (mip_) {
       ctype_.resize(nx_);
-      for (int i=0; i<nx_; ++i) {
+      for (casadi_int i=0; i<nx_; ++i) {
         ctype_[i] = discrete_[i] ? 'I' : 'C';
       }
     }
@@ -221,7 +221,7 @@ namespace casadi {
         break;
       case CPX_PARAMTYPE_LONG:
         status = CPXsetlongparam(m->env, whichparam,
-                                 static_cast<CPXLONG>(static_cast<int>(op.second)));
+                                 static_cast<CPXLONG>(static_cast<casadi_int>(op.second)));
         break;
         default:
           casadi_error("Unknown CPLEX parameter type (" + str(paramtype) + ") for " + op.first);
@@ -250,17 +250,27 @@ namespace casadi {
     // Matrix A, count the number of elements per column
     m->matcnt.resize(A_.size2());
     transform(A_.colind()+1, A_.colind() + A_.size2()+1, A_.colind(), m->matcnt.begin(),
-              std::minus<int>());
+              std::minus<casadi_int>());
 
     // Matrix H, count the number of elements per column
     m->qmatcnt.resize(H_.size2());
     transform(H_.colind()+1, H_.colind() + H_.size2()+1, H_.colind(), m->qmatcnt.begin(),
-              std::minus<int>());
+              std::minus<casadi_int>());
 
     // Create problem object
     casadi_assert_dev(m->lp==0);
     m->lp = CPXcreateprob(m->env, &status, "QP from CasADi");
     casadi_assert(m->lp!=0, "CPXcreateprob failed");
+
+    m->a_colind.resize(A_.size2()+1);
+    m->a_row.resize(A_.nnz());
+    m->h_colind.resize(H_.size2()+1);
+    m->h_row.resize(H_.nnz());
+
+    copy_vector(A_.colind(), m->a_colind);
+    copy_vector(A_.row(), m->a_row);
+    copy_vector(H_.colind(), m->h_colind);
+    copy_vector(H_.row(), m->h_row);
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
@@ -269,7 +279,7 @@ namespace casadi {
   }
 
   int CplexInterface::
-  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<CplexMemory*>(mem);
 
     // Statistics
@@ -309,7 +319,7 @@ namespace casadi {
       (void)CPXsetintparam(m->env, CPX_PARAM_QPMETHOD, 1);
     }
 
-    for (int i = 0; i < na_; ++i) {
+    for (casadi_int i = 0; i < na_; ++i) {
       // CPX_INFBOUND
 
       // Equality
@@ -335,8 +345,9 @@ namespace casadi {
     }
 
     // Copying objective, constraints, and bounds.
-    const int* matbeg = A_.colind();
-    const int* matind = A_.row();
+    const int* matbeg = get_ptr(m->a_colind);
+    const int* matind = get_ptr(m->a_row);
+
     const double* matval = A;
     const double* obj = g;
     const double* lb = lbx;
@@ -347,8 +358,8 @@ namespace casadi {
     }
 
     // Preparing coefficient matrix Q
-    const int* qmatbeg = H_.colind();
-    const int* qmatind = H_.row();
+    const int* qmatbeg = get_ptr(m->h_colind);
+    const int* qmatind = get_ptr(m->h_row);
     const double* qmatval = H;
     if (CPXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
     }
@@ -396,13 +407,13 @@ namespace casadi {
       }
 
       // Get primal solution
-      int cur_numcols = CPXgetnumcols(m->env, m->lp);
+      casadi_int cur_numcols = CPXgetnumcols(m->env, m->lp);
       if (CPXgetx(m->env, m->lp, x, 0, cur_numcols-1)) {
         casadi_error("CPXgetx failed");
       }
 
       // Get slacks
-      int cur_numrows = CPXgetnumrows(m->env, m->lp);
+      casadi_int cur_numrows = CPXgetnumrows(m->env, m->lp);
       if (CPXgetslack(m->env, m->lp, get_ptr(slack), 0, cur_numrows-1)) {
         casadi_error("CPXgetslack failed");
       }
@@ -421,7 +432,7 @@ namespace casadi {
       m->fstats.at("solver").toc();
       m->fstats.at("postprocessing").tic();
 
-      int problem_type = CPXgetprobtype(m->env, m->lp);
+      casadi_int problem_type = CPXgetprobtype(m->env, m->lp);
 
       // The solver switched to a MIQP
       if (problem_type == CPXPROB_MIQP) {
@@ -432,7 +443,7 @@ namespace casadi {
           }
 
           // Get primal solution
-          int cur_numcols = CPXgetnumcols(m->env, m->lp);
+          casadi_int cur_numcols = CPXgetnumcols(m->env, m->lp);
           if (CPXgetx(m->env, m->lp, x, 0, cur_numcols-1)) {
             casadi_error("CPXgetx failed");
           }
@@ -460,7 +471,7 @@ namespace casadi {
     casadi_scal(na_, -1., lam_a);
     casadi_scal(nx_, -1., lam_x);
 
-    int solnstat = CPXgetstat(m->env, m->lp);
+    casadi_int solnstat = CPXgetstat(m->env, m->lp);
     stringstream errormsg;
     // NOTE: Why not print directly to uout() and uerr()?
     if (verbose_) {
@@ -528,7 +539,7 @@ namespace casadi {
 
   CplexMemory::~CplexMemory() {
     // Return flag
-    int status;
+    casadi_int status;
 
     // Only free if Cplex problem if it has been allocated
     if (this->lp!=0) {

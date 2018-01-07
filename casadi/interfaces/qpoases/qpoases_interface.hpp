@@ -65,10 +65,12 @@ namespace casadi {
     bool called_once;
 
     // Map linear system nonzeros
-    std::vector<int> lin_map;
+    std::vector<casadi_int> lin_map;
 
     // Sparsity pattern as sparse triplet
-    std::vector<int> row, col, nz_map;
+    std::vector<casadi_int> row, col, nz_map;
+
+    std::vector<int> h_row, h_colind, a_row, a_colind;
 
     // Nonzero entries
     std::vector<double> nz;
@@ -132,7 +134,7 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<QpoasesMemory*>(mem);}
 
     /** \brief  Evaluate numerically */
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -166,21 +168,21 @@ namespace casadi {
 
     ///@{
     /// Options
-    int max_nWSR_;
+    casadi_int max_nWSR_;
     double max_cputime_;
     qpOASES::Options ops_;
     qpOASES::HessianType hess_;
     bool sparse_;
     bool schur_;
-    int max_schur_;
+    casadi_int max_schur_;
     std::string linsol_plugin_;
     ///@}
 
     /// Throw error
-    static void qpoases_error(const std::string& module, int flag);
+    static void qpoases_error(const std::string& module, casadi_int flag);
 
     /// Get qpOASES error message
-    static std::string getErrorMessage(int flag);
+    static std::string getErrorMessage(casadi_int flag);
   };
 
 } // namespace casadi

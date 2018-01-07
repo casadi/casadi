@@ -68,7 +68,7 @@ namespace casadi {
     }
 
     /// Degree of the polynomial
-    int degree() const;
+    casadi_int degree() const;
 
     /// Get scalar value (error if degree()!=0)
     casadi_real scalar() const;

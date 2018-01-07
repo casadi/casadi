@@ -128,10 +128,10 @@ namespace casadi {
     // Construct the linear objective row
     IM d = mapping_gradF(Slice(0), Slice());
 
-    std::vector<int> ii = mapping_gradF.sparsity().get_col();
-    for (int j = 0; j < nnObj_; ++j) {
+    std::vector<casadi_int> ii = mapping_gradF.sparsity().get_col();
+    for (casadi_int j = 0; j < nnObj_; ++j) {
       if (d.colind(j) != d.colind(j+1)) {
-        int k = d.colind(j);
+        casadi_int k = d.colind(j);
         d.nz(k) = 0;
       }
     }
@@ -178,7 +178,7 @@ namespace casadi {
     return 0;
   }
 
-  std::string SnoptInterface::formatStatus(int status) const {
+  std::string SnoptInterface::formatStatus(casadi_int status) const {
     if (status_.find(status) == status_.end()) {
       return "Unknown status: " + str(status);
     } else {
@@ -187,7 +187,7 @@ namespace casadi {
   }
 
   void SnoptInterface::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
+                                casadi_int*& iw, double*& w) const {
     auto m = static_cast<SnoptMemory*>(mem);
 
     // Set work in base classes
@@ -229,8 +229,8 @@ namespace casadi {
     // perform the mapping:
     // populate A_data_ (the nonzeros of A)
     // with numbers pulled from jacG and gradF
-    for (int k = 0; k < A_structure_.nnz(); ++k) {
-      int i = A_structure_.nonzeros()[k];
+    for (casadi_int k = 0; k < A_structure_.nnz(); ++k) {
+      casadi_int i = A_structure_.nonzeros()[k];
       if (i == 0) {
         m->A_data[k] = 0;
       } else if (i > 0) {
@@ -240,8 +240,8 @@ namespace casadi {
       }
     }
 
-    int n = nx_;
-    int nea = A_structure_.nnz();
+    casadi_int n = nx_;
+    casadi_int nea = A_structure_.nnz();
     double ObjAdd = 0;
 
     casadi_assert_dev(m_ > 0);
@@ -258,8 +258,8 @@ namespace casadi {
     // snInit must be called first.
     //   9, 6 are print and summary unit numbers (for Fortran).
     //   6 == standard out
-    int iprint = 9;
-    int isumm = 6;
+    casadi_int iprint = 9;
+    casadi_int isumm = 6;
     std::string outname = name_ + ".out";
     snInit(&prob, const_cast<char*>(name_.c_str()),
            const_cast<char*>(outname.c_str()), iprint, isumm);
@@ -301,7 +301,7 @@ namespace casadi {
       // Try integer
       if (op.second.can_cast_to(OT_INT)) {
         casadi_assert_dev(opname.size() <= 55);
-        int flag = setIntParameter(&prob, const_cast<char*>(opname.c_str()),
+        casadi_int flag = setIntParameter(&prob, const_cast<char*>(opname.c_str()),
                                    op.second.to_int());
         if (flag==0) continue;
       }
@@ -309,7 +309,7 @@ namespace casadi {
       // Try double
       if (op.second.can_cast_to(OT_DOUBLE)) {
         casadi_assert_dev(opname.size() <= 55);
-        int flag = setRealParameter(&prob, const_cast<char*>(opname.c_str()),
+        casadi_int flag = setRealParameter(&prob, const_cast<char*>(opname.c_str()),
                                     op.second.to_double());
         if (flag==0) continue;
       }
@@ -318,7 +318,7 @@ namespace casadi {
       if (op.second.can_cast_to(OT_STRING)) {
         std::string buffer = opname + " " + op.second.to_string();
         casadi_assert_dev(buffer.size() <= 72);
-        int flag = setParameter(&prob, const_cast<char*>(buffer.c_str()));
+        casadi_int flag = setParameter(&prob, const_cast<char*>(buffer.c_str()));
         if (flag==0) continue;
       }
 
@@ -327,7 +327,7 @@ namespace casadi {
     }
 
     // Run SNOPT
-    int info = solveC(&prob, Cold_, &m->fk);
+    casadi_int info = solveC(&prob, Cold_, &m->fk);
     casadi_assert(99 != info, "snopt problem set up improperly");
 
     // Negate rc to match CasADi's definition
@@ -363,7 +363,7 @@ namespace casadi {
 
       // Get reduced decision variables
       casadi_fill(m->xk2, nx_, 0.);
-      for (int k = 0; k < nnObj; ++k) m->xk2[k] = x[k];
+      for (casadi_int k = 0; k < nnObj; ++k) m->xk2[k] = x[k];
 
       // Evaluate gradF with the linear variables put to zero
       const double** arg = m->arg;
@@ -375,8 +375,8 @@ namespace casadi {
       calc_function(m, "nlp_jac_f");
 
       // provide nonlinear part of objective gradient to SNOPT
-      for (int k = 0; k < nnObj; ++k) {
-        int el = jac_f_fcn_.sparsity_out(1).colind(k);
+      for (casadi_int k = 0; k < nnObj; ++k) {
+        casadi_int el = jac_f_fcn_.sparsity_out(1).colind(k);
         if (jac_f_fcn_.sparsity_out(1).colind(k+1) > el) {
           gObj[k] = m->jac_fk[el];
         } else {
@@ -390,7 +390,7 @@ namespace casadi {
       if (!jac_g_fcn_.is_null()) {
         // Get reduced decision variables
         casadi_fill(m->xk2, nx_, 0.);
-        for (int k = 0; k < nnJac; ++k) {
+        for (casadi_int k = 0; k < nnJac; ++k) {
           m->xk2[k] = x[k];
         }
 
@@ -404,11 +404,12 @@ namespace casadi {
         calc_function(m, "nlp_jac_g");
 
         // provide nonlinear part of constraint jacobian to SNOPT
-        int kk = 0;
-        for (int j = 0; j < nnJac; ++j) {
-          for (int k = A_structure_.colind(j); k < A_structure_.sparsity().colind(j+1); ++k) {
+        casadi_int kk = 0;
+        for (casadi_int j = 0; j < nnJac; ++j) {
+          for (casadi_int k = A_structure_.colind(j);
+              k < A_structure_.sparsity().colind(j+1); ++k) {
             if (A_structure_.row(k) >= nnCon) break;
-            int i = A_structure_.nonzeros()[k];
+            casadi_int i = A_structure_.nonzeros()[k];
             if (i > 0) {
               gCon[kk++] = m->jac_gk[i-1];
             }
@@ -418,7 +419,7 @@ namespace casadi {
         casadi_assert_dev(kk == 0 || kk == neJac);
 
         // provide nonlinear part of objective to SNOPT
-        for (int k = 0; k < nnCon; ++k) {
+        for (casadi_int k = 0; k < nnCon; ++k) {
           fCon[k] = m->gk[k];
         }
       }

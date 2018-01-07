@@ -112,7 +112,7 @@ namespace casadi {
     }
   }
 
-  string External::get_name_in(int i) {
+  string External::get_name_in(casadi_int i) {
     if (get_name_in_) {
       // Use function pointer
       const char* n = get_name_in_(i);
@@ -127,7 +127,7 @@ namespace casadi {
     }
   }
 
-  string External::get_name_out(int i) {
+  string External::get_name_out(casadi_int i) {
     if (get_name_out_) {
       // Use function pointer
       const char* n = get_name_out_(i);
@@ -142,24 +142,24 @@ namespace casadi {
     }
   }
 
-  Sparsity GenericExternal::get_sparsity_in(int i) {
+  Sparsity GenericExternal::get_sparsity_in(casadi_int i) {
     // Use sparsity retrieval function, if present
     if (get_sparsity_in_) {
       return Sparsity::compressed(get_sparsity_in_(i));
     } else if (li_.has_meta(name_ + "_SPARSITY_IN", i)) {
-      return Sparsity::compressed(li_.meta_vector<int>(name_ + "_SPARSITY_IN", i));
+      return Sparsity::compressed(li_.meta_vector<casadi_int>(name_ + "_SPARSITY_IN", i));
     } else {
       // Fall back to base class
       return FunctionInternal::get_sparsity_in(i);
     }
   }
 
-  Sparsity GenericExternal::get_sparsity_out(int i) {
+  Sparsity GenericExternal::get_sparsity_out(casadi_int i) {
     // Use sparsity retrieval function, if present
     if (get_sparsity_out_) {
       return Sparsity::compressed(get_sparsity_out_(i));
     } else if (li_.has_meta(name_ + "_SPARSITY_OUT", i)) {
-      return Sparsity::compressed(li_.meta_vector<int>(name_ + "_SPARSITY_OUT", i));
+      return Sparsity::compressed(li_.meta_vector<casadi_int>(name_ + "_SPARSITY_OUT", i));
     } else {
       // Fall back to base class
       return FunctionInternal::get_sparsity_out(i);
@@ -201,12 +201,12 @@ namespace casadi {
                           "and decreasing the reference count, or neither.");
 
     // Allocate work vectors
-    int sz_arg=0, sz_res=0, sz_iw=0, sz_w=0;
+    casadi_int sz_arg=0, sz_res=0, sz_iw=0, sz_w=0;
     if (work_) {
-      int flag = work_(&sz_arg, &sz_res, &sz_iw, &sz_w);
+      casadi_int flag = work_(&sz_arg, &sz_res, &sz_iw, &sz_w);
       casadi_assert(flag==0, "External: \"work\" failed");
     } else if (li_.has_meta(name_ + "_WORK")) {
-      vector<int> v = li_.meta_vector<int>(name_ + "_WORK");
+      vector<casadi_int> v = li_.meta_vector<casadi_int>(name_ + "_WORK");
       casadi_assert_dev(v.size()==4);
       sz_arg = v[0];
       sz_res = v[1];
@@ -219,7 +219,7 @@ namespace casadi {
     if (jac_sparsity_fcn) {
       set_jac_sparsity(Sparsity::compressed(jac_sparsity_fcn(0)));
     } else if (li_.has_meta("JAC_" + name_ + "_SPARSITY_OUT", 0)) {
-      vector<int> sp = li_.meta_vector<int>("jac_" + name_ + "_SPARSITY_OUT", 0);
+      vector<casadi_int> sp = li_.meta_vector<casadi_int>("jac_" + name_ + "_SPARSITY_OUT", 0);
       set_jac_sparsity(Sparsity::compressed(sp));
     }
 
@@ -267,44 +267,44 @@ namespace casadi {
   }
 
   Function External
-  ::get_forward(int nfwd, const std::string& name,
+  ::get_forward(casadi_int nfwd, const std::string& name,
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Consistency check
-    int n=1;
+    casadi_int n=1;
     while (n<nfwd) n*=2;
     if (n!=nfwd || !has_forward(nfwd)) {
       // Inefficient code to be replaced later
       Function fwd1 = forward(1);
-      return fwd1.map(name, "serial", nfwd, range(n_in_+n_out_), std::vector<int>(), opts);
+      return fwd1.map(name, "serial", nfwd, range(n_in_+n_out_), std::vector<casadi_int>(), opts);
       //casadi_error("Internal error: Refactoring needed, cf. #1055");
     }
     return external(name, li_, opts);
   }
 
-  bool External::has_forward(int nfwd) const {
+  bool External::has_forward(casadi_int nfwd) const {
     return li_.has_function("fwd" + str(nfwd) + "_" + name_);
   }
 
   Function External
-  ::get_reverse(int nadj, const std::string& name,
+  ::get_reverse(casadi_int nadj, const std::string& name,
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Consistency check
-    int n=1;
+    casadi_int n=1;
     while (n<nadj) n*=2;
     if (n!=nadj || !has_reverse(nadj)) {
       // Inefficient code to be replaced later
       Function adj1 = reverse(1);
-      return adj1.map(name, "serial", nadj, range(n_in_+n_out_), std::vector<int>(), opts);
+      return adj1.map(name, "serial", nadj, range(n_in_+n_out_), std::vector<casadi_int>(), opts);
       //casadi_error("Internal error: Refactoring needed, cf. #1055");
     }
     return external(name, li_, opts);
   }
 
-  bool External::has_reverse(int nadj) const {
+  bool External::has_reverse(casadi_int nadj) const {
     return li_.has_function("adj" + str(nadj) + "_" + name_);
   }
 
@@ -325,7 +325,7 @@ namespace casadi {
     casadi_assert(s_in.size() == ret.n_in(),
       "Inconsistent number of inputs. Expected " + str(s_in.size())+ "  "
       "(" + str(s_in) + "), got " + str(ret.n_in()) + ".");
-    for (int i=0; i<s_in.size(); ++i) {
+    for (casadi_int i=0; i<s_in.size(); ++i) {
       string s = s_in[i];
       replace(s.begin(), s.end(), ':', '_');
       casadi_assert(s == ret.name_in(i),
@@ -337,7 +337,7 @@ namespace casadi {
     casadi_assert(s_out.size() == ret.n_out(),
       "Inconsistent number of outputs. Expected " + str(s_out.size()) + " "
       "(" + str(s_out) + "), got " + str(ret.n_out()) + ".");
-    for (int i=0; i<s_out.size(); ++i) {
+    for (casadi_int i=0; i<s_out.size(); ++i) {
       string s = s_out[i];
       replace(s.begin(), s.end(), ':', '_');
       casadi_assert(s == ret.name_out(i),

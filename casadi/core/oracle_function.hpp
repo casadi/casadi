@@ -37,7 +37,7 @@ namespace casadi {
     // Work vectors
     const double** arg;
     double** res;
-    int* iw;
+    casadi_int* iw;
     double* w;
 
     // Function specific statistics
@@ -111,7 +111,7 @@ namespace casadi {
     void set_function(const Function& fcn) { set_function(fcn, fcn.name()); }
 
     // Calculate an oracle function
-    int calc_function(OracleMemory* m, const std::string& fcn,
+    casadi_int calc_function(OracleMemory* m, const std::string& fcn,
                       const double* const* arg=0) const;
 
     // Get list of dependency functions
@@ -143,7 +143,7 @@ namespace casadi {
 
     /** \brief Set the work vectors */
     void set_temp(void* mem, const double** arg, double** res,
-                          int* iw, double* w) const override;
+                          casadi_int* iw, double* w) const override;
 
     /// Print statistics
     void print_fstats(const OracleMemory* m) const;

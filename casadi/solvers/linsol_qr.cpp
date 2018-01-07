@@ -86,7 +86,7 @@ namespace casadi {
     return 0;
   }
 
-  int LinsolQr::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
+  int LinsolQr::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
     auto m = static_cast<LinsolQrMemory*>(mem);
     casadi_qr_solve(x, nrhs, tr,
                     sp_v_, get_ptr(m->v), sp_r_, get_ptr(m->r),
@@ -95,7 +95,7 @@ namespace casadi {
   }
 
   void LinsolQr::generate(CodeGenerator& g, const std::string& A, const std::string& x,
-                          int nrhs, bool tr) const {
+                          casadi_int nrhs, bool tr) const {
     // Codegen the integer vectors
     string leftmost = g.constant(leftmost_);
     string parent = g.constant(parent_);
@@ -111,7 +111,7 @@ namespace casadi {
          "r[" << sp_r_.nnz() << "], "
          "beta[" << ncol() << "], "
          "w[" << nrow() + ncol() << "];\n";
-    g << "int iw[" << sp_r_.size1() + ncol() << "];\n";
+    g << "casadi_int iw[" << sp_r_.size1() + ncol() << "];\n";
 
     // Factorize
     g << g.qr(sp, A, "iw", "w", sp_v, "v", sp_r, "r", "beta", leftmost, parent, pinv) << "\n";

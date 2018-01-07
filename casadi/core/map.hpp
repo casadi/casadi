@@ -40,7 +40,7 @@ namespace casadi {
   public:
     // Create function (use instead of constructor)
     static Function create(const std::string& parallelization,
-                           const Function& f, int n);
+                           const Function& f, casadi_int n);
 
     /** \brief Destructor */
     ~Map() override;
@@ -50,16 +50,16 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(int i) override {
+    Sparsity get_sparsity_in(casadi_int i) override {
       return repmat(f_.sparsity_in(i), 1, n_);
     }
-    Sparsity get_sparsity_out(int i) override {
+    Sparsity get_sparsity_out(casadi_int i) override {
       return repmat(f_.sparsity_out(i), 1, n_);
     }
     /// @}
 
     /** \brief Get default input value */
-    double get_default_in(int ind) const override { return f_.default_in(ind);}
+    double get_default_in(casadi_int ind) const override { return f_.default_in(ind);}
 
     ///@{
     /** \brief Number of function inputs and outputs */
@@ -69,28 +69,30 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs */
-    std::string get_name_in(int i) override { return f_.name_in(i);}
-    std::string get_name_out(int i) override { return f_.name_out(i);}
+    std::string get_name_in(casadi_int i) override { return f_.name_in(i);}
+    std::string get_name_out(casadi_int i) override { return f_.name_out(i);}
     /// @}
 
     /** \brief  Evaluate or propagate sparsities */
     template<typename T>
-    int eval_gen(const T** arg, T** res, int* iw, T* w) const;
+    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /// Type of parallellization
     virtual std::string parallelization() const { return "serial"; }
 
     /** \brief  evaluate symbolically while also propagating directional derivatives */
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res,
+                casadi_int* iw, SXElem* w, void* mem) const override;
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res,
+                    casadi_int* iw, bvec_t* w, void* mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?
@@ -112,8 +114,8 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    bool has_forward(int nfwd) const override { return true;}
-    Function get_forward(int nfwd, const std::string& name,
+    bool has_forward(casadi_int nfwd) const override { return true;}
+    Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -121,8 +123,8 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    bool has_reverse(int nadj) const override { return true;}
-    Function get_reverse(int nadj, const std::string& name,
+    bool has_reverse(casadi_int nadj) const override { return true;}
+    Function get_reverse(casadi_int nadj, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -133,13 +135,13 @@ namespace casadi {
 
   protected:
     // Constructor (protected, use create function)
-    Map(const std::string& name, const Function& f, int n);
+    Map(const std::string& name, const Function& f, casadi_int n);
 
     // The function which is to be evaluated in parallel
     Function f_;
 
     // Number of times to evaluate this function
-    int n_;
+    casadi_int n_;
   };
 
   /** A map Evaluate in parallel using OpenMP
@@ -153,7 +155,7 @@ namespace casadi {
     friend class Map;
   protected:
     // Constructor (protected, use create function in Map)
-    MapOmp(const std::string& name, const Function& f, int n) : Map(name, f, n) {}
+    MapOmp(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
 
     /** \brief  Destructor */
     ~MapOmp() override;
@@ -162,7 +164,7 @@ namespace casadi {
     std::string class_name() const override {return "MapOmp";}
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;

@@ -1,12 +1,12 @@
 // NOLINT(legal/copyright)
 // SYMBOL "mv"
 template<typename T1>
-void casadi_mv(const T1* x, const int* sp_x, const T1* y, T1* z, int tr) {
+void casadi_mv(const T1* x, const casadi_int* sp_x, const T1* y, T1* z, casadi_int tr) {
   if (!x || !y || !z) return;
   // Get sparsities
-  int ncol_x = sp_x[1];
-  const int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
-  int i, el;
+  casadi_int ncol_x = sp_x[1];
+  const casadi_int *colind_x = sp_x+2, *row_x = sp_x + 2 + ncol_x+1;
+  casadi_int i, el;
   if (tr) {
     // loop over the columns of x
     for (i=0; i<ncol_x; ++i) {

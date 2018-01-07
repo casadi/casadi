@@ -248,7 +248,7 @@ namespace casadi {
   }
 
   void KinsolInterface::set_work(void* mem, const double**& arg, double**& res,
-                        int*& iw, double*& w) const {
+                        casadi_int*& iw, double*& w) const {
       Rootfinder::set_work(mem, arg, res, iw, w);
       auto m = static_cast<KinsolMemory*>(mem);
       m->jac = w; w += sp_jac_.nnz();
@@ -355,16 +355,16 @@ namespace casadi {
     calc_function(&m, "jac_f_z");
 
     // Get sparsity and non-zero elements
-    const int* colind = sp_jac_.colind();
-    int ncol = sp_jac_.size2();
-    const int* row = sp_jac_.row();
+    const casadi_int* colind = sp_jac_.colind();
+    casadi_int ncol = sp_jac_.size2();
+    const casadi_int* row = sp_jac_.row();
 
     // Loop over columns
-    for (int cc=0; cc<ncol; ++cc) {
+    for (casadi_int cc=0; cc<ncol; ++cc) {
       // Loop over non-zero entries
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+      for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
         // Get row
-        int rr = row[el];
+        casadi_int rr = row[el];
 
         // Set the element
         DENSE_ELEM(J, rr, cc) = m.jac[el];
@@ -396,16 +396,16 @@ namespace casadi {
     calc_function(&m, "jac_f_z");
 
     // Get sparsity and non-zero elements
-    const int* colind = sp_jac_.colind();
-    int ncol = sp_jac_.size2();
-    const int* row = sp_jac_.row();
+    const casadi_int* colind = sp_jac_.colind();
+    casadi_int ncol = sp_jac_.size2();
+    const casadi_int* row = sp_jac_.row();
 
     // Loop over cols
-    for (int cc=0; cc<ncol; ++cc) {
+    for (casadi_int cc=0; cc<ncol; ++cc) {
       // Loop over non-zero entries
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+      for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
         // Get row
-        int rr = row[el];
+        casadi_int rr = row[el];
 
         // Set the element
         if (rr-cc>=-mupper && rr-cc<=mlower) {

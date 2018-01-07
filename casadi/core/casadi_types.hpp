@@ -22,26 +22,24 @@
  *
  */
 
-#include "casadi_common.hpp"
-#include "casadi_logger.hpp"
 
-namespace casadi {
+#ifndef CASADI_TYPES_HPP
+#define CASADI_TYPES_HPP
 
-  void (*Logger::writeFun)(const char* s, std::streamsize num, bool error) =
-    Logger::writeDefault;
+#ifdef WITH_LONGLONG_CORE
+#define CASADI_INT_TYPE long long int
+#else // WITH_LONGLONG_CORE
+#define CASADI_INT_TYPE int
+#endif // WITH_LONGLONG_CORE
 
-  void (*Logger::flush)(bool error) =Logger::flushDefault;
+typedef CASADI_INT_TYPE casadi_int;
+#ifndef SWIG  // Not in public API
+typedef unsigned CASADI_INT_TYPE casadi_uint;
+#endif // SWIG
 
-  std::ostream& uout() {
-    // Singleton pattern
-    static Logger::Stream<false> instance;
-    return instance;
-  }
+// Convert to string
+#define CASADI_STR1(x) #x
+#define CASADI_STR(x) CASADI_STR1(x)
+#define CASADI_INT_TYPE_STR CASADI_STR(CASADI_INT_TYPE)
 
-  std::ostream& uerr() {
-    // Singleton pattern
-    static Logger::Stream<true> instance;
-    return instance;
-  }
-
-} // namespace casadi
+#endif // CASADI_TYPES_HPP

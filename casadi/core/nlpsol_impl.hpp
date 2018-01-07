@@ -43,7 +43,7 @@ namespace casadi {
     double *x, *f, *g, *lam_x, *lam_g, *lam_p;
 
     // number of iterations
-    int n_iter;
+    casadi_int n_iter;
   };
 
   /** \brief NLP solver storage class
@@ -56,19 +56,19 @@ namespace casadi {
   Nlpsol : public OracleFunction, public PluginInterface<Nlpsol> {
   public:
     /// Number of variables
-    int nx_;
+    casadi_int nx_;
 
     /// Number of constraints
-    int ng_;
+    casadi_int ng_;
 
     /// Number of parameters
-    int np_;
+    casadi_int np_;
 
     /// callback function, executed at each iteration
     Function fcallback_;
 
     /// Execute the callback function only after this amount of iterations
-    int callback_step_;
+    casadi_int callback_step_;
 
     // Evaluation errors are fatal
     bool eval_errors_fatal_;
@@ -102,14 +102,14 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(int i) override;
-    Sparsity get_sparsity_out(int i) override;
+    Sparsity get_sparsity_in(casadi_int i) override;
+    Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
-    std::string get_name_in(int i) override { return nlpsol_in(i);}
-    std::string get_name_out(int i) override { return nlpsol_out(i);}
+    std::string get_name_in(casadi_int i) override { return nlpsol_in(i);}
+    std::string get_name_out(casadi_int i) override { return nlpsol_out(i);}
     /// @}
 
     ///@{
@@ -137,17 +137,17 @@ namespace casadi {
     virtual void check_inputs(void* mem) const;
 
     /** \brief Get default input value */
-    double get_default_in(int ind) const override { return nlpsol_default_in(ind);}
+    double get_default_in(casadi_int ind) const override { return nlpsol_default_in(ind);}
 
     /// Can discrete variables be treated
     virtual bool integer_support() const { return false;}
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     // Evaluate numerically
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     // Solve the NLP
     virtual void solve(void* mem) const = 0;

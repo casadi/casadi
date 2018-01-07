@@ -113,7 +113,7 @@ namespace casadi {
     SharedObjectInternal* get() const;
 
     /// Get the reference count
-    int getCount() const;
+    casadi_int getCount() const;
 
     /// Swap content with another instance
     void swap(SharedObject& other);

@@ -43,7 +43,7 @@ namespace casadi {
     return nnz()==0;
   }
 
-  int ConstantMX::n_primitives() const {
+  casadi_int ConstantMX::n_primitives() const {
     if (nnz()==0) {
       return 0;
     } else {
@@ -78,7 +78,7 @@ namespace casadi {
  void ConstantMX::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
    MX zero_sens(size1(), size2());
-   for (int d=0; d<fsens.size(); ++d) {
+   for (casadi_int d=0; d<fsens.size(); ++d) {
      fsens[d][0] = zero_sens;
    }
  }
@@ -87,18 +87,19 @@ namespace casadi {
                            std::vector<std::vector<MX> >& asens) const {
   }
 
-  int ConstantMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  int ConstantMX::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     fill_n(res[0], nnz(), 0);
     return 0;
   }
 
-  int ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  int ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     fill_n(res[0], nnz(), 0);
     return 0;
   }
 
   void ConstantDM::generate(CodeGenerator& g,
-                                 const std::vector<int>& arg, const std::vector<int>& res) const {
+                            const std::vector<casadi_int>& arg,
+                            const std::vector<casadi_int>& res) const {
     // Print the constant
     string ind = g.constant(x_.nonzeros());
 
@@ -112,7 +113,7 @@ namespace casadi {
     return !is_zero();
   }
 
-  ConstantMX* ConstantMX::create(const Sparsity& sp, int val) {
+  ConstantMX* ConstantMX::create(const Sparsity& sp, casadi_int val) {
     if (sp.is_empty(true)) {
       return ZeroByZero::getInstance();
     } else {
@@ -120,7 +121,7 @@ namespace casadi {
       case 0: return new Constant<CompiletimeConst<0> >(sp);
       case 1: return new Constant<CompiletimeConst<1> >(sp);
       case -1: return new Constant<CompiletimeConst<(-1)> >(sp);
-      default: return new Constant<RuntimeConst<int> >(sp, val);
+      default: return new Constant<RuntimeConst<casadi_int> >(sp, val);
       }
     }
   }
@@ -129,8 +130,8 @@ namespace casadi {
     if (sp.is_empty(true)) {
       return ZeroByZero::getInstance();
     } else {
-      int intval(val);
-      if (intval-val==0) {
+      casadi_int intval = static_cast<casadi_int>(val);
+      if (static_cast<double>(intval)-val==0) {
         return create(sp, intval);
       } else {
         return new Constant<RuntimeConst<double> >(sp, val);
@@ -197,7 +198,7 @@ namespace casadi {
     }
   }
 
-  bool ConstantDM::is_equal(const MXNode* node, int depth) const {
+  bool ConstantDM::is_equal(const MXNode* node, casadi_int depth) const {
     // Check if same node
     const ConstantDM* n = dynamic_cast<const ConstantDM*>(node);
     if (n==0) return false;
@@ -219,12 +220,12 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::get_nzref(const Sparsity& sp, const std::vector<int>& nz) const {
+  MX ZeroByZero::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
     casadi_assert_dev(nz.empty());
     return MX::zeros(sp);
   }
 
-  MX ZeroByZero::get_nzassign(const MX& y, const std::vector<int>& nz) const {
+  MX ZeroByZero::get_nzassign(const MX& y, const std::vector<casadi_int>& nz) const {
     return shared_from_this<MX>();
   }
 
@@ -232,11 +233,11 @@ namespace casadi {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::get_unary(int op) const {
+  MX ZeroByZero::get_unary(casadi_int op) const {
     return shared_from_this<MX>();
   }
 
-  MX ZeroByZero::_get_binary(int op, const MX& y, bool ScX, bool ScY) const {
+  MX ZeroByZero::_get_binary(casadi_int op, const MX& y, bool ScX, bool ScY) const {
     return shared_from_this<MX>();
   }
 

@@ -32,13 +32,14 @@
 using namespace std;
 
 namespace casadi {
-  std::vector<int> range(int start, int stop, int step, int len) {
+  std::vector<casadi_int> range(casadi_int start, casadi_int stop,
+      casadi_int step, casadi_int len) {
     start = std::min(start, len);
     stop = std::min(stop, len);
-    int nret = (stop-start)/step + ((stop-start)%step!=0);
-    std::vector<int> ret(nret);
-    int ind = start;
-    for (std::vector<int>::iterator it=ret.begin(); it!=ret.end(); ++it) {
+    casadi_int nret = (stop-start)/step + ((stop-start)%step!=0);
+    std::vector<casadi_int> ret(nret);
+    casadi_int ind = start;
+    for (std::vector<casadi_int>::iterator it=ret.begin(); it!=ret.end(); ++it) {
       *it = ind;
       ind += step;
     }
@@ -50,28 +51,29 @@ namespace casadi {
 
     double margin = (v[v.size()-1]-v[0])*1e-14;
 
-    for (int i=2;i<v.size();++i) {
-      double ref = v[0]+(i*(v[v.size()-1]-v[0]))/(v.size()-1);
+    for (casadi_int i=2;i<v.size();++i) {
+      double ref = v[0]+(static_cast<double>(i)*(v[v.size()-1]-v[0]))/
+        static_cast<double>(v.size()-1);
       if (abs(ref-v[i])>margin) return false;
     }
     return true;
   }
 
-  std::vector<int> range(int stop) {
+  std::vector<casadi_int> range(casadi_int stop) {
     return range(0, stop);
   }
 
-  std::vector<int> complement(const std::vector<int> &v, int size) {
+  std::vector<casadi_int> complement(const std::vector<casadi_int> &v, casadi_int size) {
     casadi_assert(in_range(v, size),
                           "complement: out of bounds. Some elements in v fall out of [0, size[");
-    std::vector<int> lookup(size, 0);
-    std::vector<int> ret;
+    std::vector<casadi_int> lookup(size, 0);
+    std::vector<casadi_int> ret;
 
-    for (int i=0;i<v.size();i++) {
+    for (casadi_int i=0;i<v.size();i++) {
       lookup[v[i]] = 1;
     }
 
-    for (int i=0;i<size;i++) {
+    for (casadi_int i=0;i<size;i++) {
       if (lookup[i]==0) ret.push_back(i);
     }
 
@@ -79,18 +81,18 @@ namespace casadi {
 
   }
 
-  std::vector<int> lookupvector(const std::vector<int> &v, int size) {
+  std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v, casadi_int size) {
     casadi_assert(in_range(v, size),
                           "lookupvector: out of bounds. Some elements in v fall out of [0, size[");
-    std::vector<int> lookup(size, -1);
+    std::vector<casadi_int> lookup(size, -1);
 
-    for (int i=0;i<v.size();i++) {
+    for (casadi_int i=0;i<v.size();i++) {
       lookup[v[i]] = i;
     }
     return lookup;
   }
 
-  std::vector<int> lookupvector(const std::vector<int> &v) {
+  std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v) {
     casadi_assert_dev(!has_negative(v));
     return lookupvector(v, (*std::max_element(v.begin(), v.end()))+1);
   }
@@ -114,7 +116,7 @@ namespace casadi {
 
   std::string join(const std::vector<std::string>& l, const std::string& delim) {
     std::stringstream ss;
-    for (int i=0;i<l.size();++i) {
+    for (casadi_int i=0;i<l.size();++i) {
       if (i>0) ss << delim;
       ss << l[i];
     }
@@ -125,7 +127,7 @@ namespace casadi {
     #ifdef HAVE_MKSTEMPS
     // Preferred solution
     string ret = prefix + "XXXXXX" + suffix;
-    if (mkstemps(&ret[0], suffix.size()) == -1) {
+    if (mkstemps(&ret[0], static_cast<int>(suffix.size())) == -1) {
       casadi_error("Failed to create temporary file: '" + ret + "'");
     }
     return ret;

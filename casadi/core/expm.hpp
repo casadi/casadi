@@ -58,10 +58,10 @@ namespace casadi {
   ///@}
 
   /** \brief Get the number of expm solver inputs */
-  CASADI_EXPORT int expm_n_in();
+  CASADI_EXPORT casadi_int expm_n_in();
 
   /** \brief Get the number of expm solver outputs */
-  CASADI_EXPORT int expm_n_out();
+  CASADI_EXPORT casadi_int expm_n_out();
 
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_expm(const std::string& name);

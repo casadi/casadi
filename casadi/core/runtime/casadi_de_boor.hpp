@@ -1,10 +1,10 @@
 // NOLINT(legal/copyright)
 // SYMBOL "de_boor"
 template<typename T1>
-void casadi_de_boor(T1 x, const T1* knots, int n_knots, int degree, T1* boor) {
+void casadi_de_boor(T1 x, const T1* knots, casadi_int n_knots, casadi_int degree, T1* boor) {
   // length boor: n_knots-1
-  for (int d=1;d<degree+1;++d) {
-    for (int i=0;i<n_knots-d-1;++i) {
+  for (casadi_int d=1;d<degree+1;++d) {
+    for (casadi_int i=0;i<n_knots-d-1;++i) {
       T1 b = 0;
       T1 bottom = knots[i + d] - knots[i];
       if (bottom) b = (x - knots[i]) * boor[i] / bottom;

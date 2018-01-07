@@ -271,7 +271,7 @@ namespace casadi {
   }
 
   void IpoptInterface::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
+                                casadi_int*& iw, double*& w) const {
     auto m = static_cast<IpoptMemory*>(mem);
 
     // Set work in base classes
@@ -392,7 +392,7 @@ namespace casadi {
         m->fstats.at("callback_fun").tic();
         if (full_callback) {
           casadi_copy(x, nx_, m->xk);
-          for (int i=0; i<nx_; ++i) {
+          for (casadi_int i=0; i<nx_; ++i) {
             m->lam_xk[i] = z_U[i]-z_L[i];
           }
           casadi_copy(lambda, ng_, m->lam_gk);
@@ -426,7 +426,7 @@ namespace casadi {
         m->res[0] = &ret_double;
 
         fcallback_(m->arg, m->res, m->iw, m->w, 0);
-        int ret = static_cast<int>(ret_double);
+        casadi_int ret = static_cast<casadi_int>(ret_double);
 
         m->fstats.at("callback_fun").toc();
         return  !ret;
@@ -456,7 +456,7 @@ namespace casadi {
 
       // Get dual solution (simple bounds)
       if (m->lam_xk) {
-        for (int i=0; i<nx_; ++i) {
+        for (casadi_int i=0; i<nx_; ++i) {
           m->lam_xk[i] = z_U[i]-z_L[i];
         }
       }
@@ -503,7 +503,7 @@ namespace casadi {
       // Initialize dual variables (simple bounds)
       if (init_z) {
         if (m->lam_x0) {
-          for (int i=0; i<nx_; ++i) {
+          for (casadi_int i=0; i<nx_; ++i) {
             z_L[i] = max(0., -m->lam_x0[i]);
             z_U[i] = max(0., m->lam_x0[i]);
           }

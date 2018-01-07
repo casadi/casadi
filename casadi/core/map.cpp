@@ -29,7 +29,7 @@ using namespace std;
 
 namespace casadi {
 
-  Function Map::create(const std::string& parallelization, const Function& f, int n) {
+  Function Map::create(const std::string& parallelization, const Function& f, casadi_int n) {
     // Create instance of the right class
     string name = f.name() + "_" + str(n);
     if (parallelization == "serial") {
@@ -41,7 +41,7 @@ namespace casadi {
     }
   }
 
-  Map::Map(const std::string& name, const Function& f, int n)
+  Map::Map(const std::string& name, const Function& f, casadi_int n)
     : FunctionInternal(name), f_(f), n_(n) {
   }
 
@@ -60,42 +60,43 @@ namespace casadi {
   }
 
   template<typename T>
-  int Map::eval_gen(const T** arg, T** res, int* iw, T* w) const {
+  int Map::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
     const T** arg1 = arg+n_in_;
     copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;
     copy_n(res, n_out_, res1);
-    for (int i=0; i<n_; ++i) {
+    for (casadi_int i=0; i<n_; ++i) {
       if (f_(arg1, res1, iw, w)) return 1;
-      for (int j=0; j<n_in_; ++j) {
+      for (casadi_int j=0; j<n_in_; ++j) {
         if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }
-      for (int j=0; j<n_out_; ++j) {
+      for (casadi_int j=0; j<n_out_; ++j) {
         if (res1[j]) res1[j] += f_.nnz_out(j);
       }
     }
     return 0;
   }
 
-  int Map::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
+  int Map::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem) const {
     return eval_gen(arg, res, iw, w);
   }
 
-  int Map::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
+  int Map::sp_forward(const bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, void* mem) const {
     return eval_gen(arg, res, iw, w);
   }
 
-  int Map::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const {
+  int Map::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
     bvec_t** arg1 = arg+n_in_;
     copy_n(arg, n_in_, arg1);
     bvec_t** res1 = res+n_out_;
     copy_n(res, n_out_, res1);
-    for (int i=0; i<n_; ++i) {
+    for (casadi_int i=0; i<n_; ++i) {
       if (f_.rev(arg1, res1, iw, w)) return 1;
-      for (int j=0; j<n_in_; ++j) {
+      for (casadi_int j=0; j<n_in_; ++j) {
         if (arg1[j]) arg1[j] += f_.nnz_in(j);
       }
-      for (int j=0; j<n_out_; ++j) {
+      for (casadi_int j=0; j<n_out_; ++j) {
         if (res1[j]) res1[j] += f_.nnz_out(j);
       }
     }
@@ -107,7 +108,7 @@ namespace casadi {
   }
 
   void Map::codegen_body(CodeGenerator& g) const {
-    g << "int i;\n";
+    g << "casadi_int i;\n";
     // Input buffer
     g << "const casadi_real** arg1 = arg+" << n_in_ << ";\n"
       << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
@@ -118,18 +119,18 @@ namespace casadi {
     // Evaluate
     g << "if (" << g(f_, "arg1", "res1", "iw", "w") << ") return 1;\n";
     // Update input buffers
-    for (int j=0; j<n_in_; ++j) {
+    for (casadi_int j=0; j<n_in_; ++j) {
       g << "if (arg1[" << j << "]) arg1[" << j << "]+=" << f_.nnz_in(j) << ";\n";
     }
     // Update output buffers
-    for (int j=0; j<n_out_; ++j) {
+    for (casadi_int j=0; j<n_out_; ++j) {
       g << "if (res1[" << j << "]) res1[" << j << "]+=" << f_.nnz_out(j) << ";\n";
     }
     g << "}\n";
   }
 
   Function Map
-  ::get_forward(int nfwd, const std::string& name,
+  ::get_forward(casadi_int nfwd, const std::string& name,
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
@@ -143,13 +144,13 @@ namespace casadi {
     // Need to reorder sensitivity inputs
     vector<MX> res = arg;
     vector<MX>::iterator it=res.begin()+n_in_+n_out_;
-    vector<int> ind;
-    for (int i=0; i<n_in_; ++i, ++it) {
-      int sz = f_.size2_in(i);
+    vector<casadi_int> ind;
+    for (casadi_int i=0; i<n_in_; ++i, ++it) {
+      casadi_int sz = f_.size2_in(i);
       ind.clear();
-      for (int k=0; k<n_; ++k) {
-        for (int d=0; d<nfwd; ++d) {
-          for (int j=0; j<sz; ++j) {
+      for (casadi_int k=0; k<n_; ++k) {
+        for (casadi_int d=0; d<nfwd; ++d) {
+          for (casadi_int j=0; j<sz; ++j) {
             ind.push_back((d*n_ + k)*sz + j);
           }
         }
@@ -162,12 +163,12 @@ namespace casadi {
 
     // Reorder sensitivity outputs
     it = res.begin();
-    for (int i=0; i<n_out_; ++i, ++it) {
-      int sz = f_.size2_out(i);
+    for (casadi_int i=0; i<n_out_; ++i, ++it) {
+      casadi_int sz = f_.size2_out(i);
       ind.clear();
-      for (int d=0; d<nfwd; ++d) {
-        for (int k=0; k<n_; ++k) {
-          for (int j=0; j<sz; ++j) {
+      for (casadi_int d=0; d<nfwd; ++d) {
+        for (casadi_int k=0; k<n_; ++k) {
+          for (casadi_int j=0; j<sz; ++j) {
             ind.push_back((k*nfwd + d)*sz + j);
           }
         }
@@ -180,7 +181,7 @@ namespace casadi {
   }
 
   Function Map
-  ::get_reverse(int nadj, const std::string& name,
+  ::get_reverse(casadi_int nadj, const std::string& name,
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
@@ -194,13 +195,13 @@ namespace casadi {
     // Need to reorder sensitivity inputs
     vector<MX> res = arg;
     vector<MX>::iterator it=res.begin()+n_in_+n_out_;
-    vector<int> ind;
-    for (int i=0; i<n_out_; ++i, ++it) {
-      int sz = f_.size2_out(i);
+    vector<casadi_int> ind;
+    for (casadi_int i=0; i<n_out_; ++i, ++it) {
+      casadi_int sz = f_.size2_out(i);
       ind.clear();
-      for (int k=0; k<n_; ++k) {
-        for (int d=0; d<nadj; ++d) {
-          for (int j=0; j<sz; ++j) {
+      for (casadi_int k=0; k<n_; ++k) {
+        for (casadi_int d=0; d<nadj; ++d) {
+          for (casadi_int j=0; j<sz; ++j) {
             ind.push_back((d*n_ + k)*sz + j);
           }
         }
@@ -213,12 +214,12 @@ namespace casadi {
 
     // Reorder sensitivity outputs
     it = res.begin();
-    for (int i=0; i<n_in_; ++i, ++it) {
-      int sz = f_.size2_in(i);
+    for (casadi_int i=0; i<n_in_; ++i, ++it) {
+      casadi_int sz = f_.size2_in(i);
       ind.clear();
-      for (int d=0; d<nadj; ++d) {
-        for (int k=0; k<n_; ++k) {
-          for (int j=0; j<sz; ++j) {
+      for (casadi_int d=0; d<nadj; ++d) {
+        for (casadi_int k=0; k<n_; ++k) {
+          for (casadi_int j=0; j<sz; ++j) {
             ind.push_back((k*nadj + d)*sz + j);
           }
         }
@@ -230,14 +231,14 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  int Map::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int Map::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     return eval_gen(arg, res, iw, w);
   }
 
   MapOmp::~MapOmp() {
   }
 
-  int MapOmp::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int MapOmp::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
 #ifndef WITH_OPENMP
     return Map::eval(arg, res, iw, w, mem);
 #else // WITH_OPENMP
@@ -245,24 +246,24 @@ namespace casadi {
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
 
     // Error flag
-    int flag = 0;
+    casadi_int flag = 0;
 
     // Checkout memory objects
-    int* ind = iw; iw += n_;
-    for (int i=0; i<n_; ++i) ind[i] = f_.checkout();
+    casadi_int* ind = iw; iw += n_;
+    for (casadi_int i=0; i<n_; ++i) ind[i] = f_.checkout();
 
     // Evaluate in parallel
 #pragma omp parallel for reduction(||:flag)
-    for (int i=0; i<n_; ++i) {
+    for (casadi_int i=0; i<n_; ++i) {
       // Input buffers
       const double** arg1 = arg + n_in_ + i*sz_arg;
-      for (int j=0; j<n_in_; ++j) {
+      for (casadi_int j=0; j<n_in_; ++j) {
         arg1[j] = arg[j] ? arg[j] + i*f_.nnz_in(j) : 0;
       }
 
       // Output buffers
       double** res1 = res + n_out_ + i*sz_res;
-      for (int j=0; j<n_out_; ++j) {
+      for (casadi_int j=0; j<n_out_; ++j) {
         res1[j] = res[j] ? res[j] + i*f_.nnz_out(j) : 0;
       }
 
@@ -270,7 +271,7 @@ namespace casadi {
       flag = f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i]) || flag;
     }
     // Release memory objects
-    for (int i=0; i<n_; ++i) f_.release(ind[i]);
+    for (casadi_int i=0; i<n_; ++i) f_.release(ind[i]);
     // Return error flag
     return flag;
 #endif  // WITH_OPENMP
@@ -279,19 +280,19 @@ namespace casadi {
   void MapOmp::codegen_body(CodeGenerator& g) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-    g << "int i;\n"
+    g << "casadi_int i;\n"
       << "const double** arg1;\n"
       << "double** res1;\n"
-      << "int flag = 0;\n"
+      << "casadi_int flag = 0;\n"
       << "#pragma omp parallel for private(i,arg1,res1) reduction(||:flag)\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n"
       << "arg1 = arg + " << n_in_ << "+i*" << sz_arg << ";\n";
-    for (int j=0; j<n_in_; ++j) {
+    for (casadi_int j=0; j<n_in_; ++j) {
       g << "arg1[" << j << "] = arg[" << j << "] ? "
         << "arg[" << j << "]+i*" << f_.nnz_in(j) << ": 0;\n";
     }
     g << "res1 = res + " <<  n_out_ << "+i*" <<  sz_res << ";\n";
-    for (int j=0; j<n_out_; ++j) {
+    for (casadi_int j=0; j<n_out_; ++j) {
       g << "res1[" << j << "] = res[" << j << "] ?"
         << "res[" << j << "]+i*" << f_.nnz_out(j) << ": 0;\n";
     }

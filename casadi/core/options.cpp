@@ -71,40 +71,40 @@ namespace casadi {
   double Options::word_distance(const std::string &a, const std::string &b) {
     /// Levenshtein edit distance
     if (a == b) return 0;
-    int na = a.size();
-    int nb = b.size();
-    if (na == 0) return nb;
-    if (nb == 0) return na;
+    casadi_int na = a.size();
+    casadi_int nb = b.size();
+    if (na == 0) return static_cast<double>(nb);
+    if (nb == 0) return static_cast<double>(na);
 
-    vector<int> v0(nb+1, 0);
-    vector<int> v1(nb+1, 0);
+    vector<casadi_int> v0(nb+1, 0);
+    vector<casadi_int> v1(nb+1, 0);
 
-    for (int i=0;i<nb+1;++i)
+    for (casadi_int i=0;i<nb+1;++i)
       v0[i] = i;
 
     char s;
     char t;
     std::locale loc;
-    for (int i=0;i<na;i++) {
+    for (casadi_int i=0;i<na;i++) {
       v1[0] = i + 1;
-      for (int j=0; j<nb; j++) {
+      for (casadi_int j=0; j<nb; j++) {
         s = std::tolower(a[i], loc);
         t = std::tolower(b[j], loc);
-        int cost = 0;
+        casadi_int cost = 0;
         if (s != t)
           cost = 1;
 
         v1[j+1] = min(min(v1[j] + 1, v0[j+1] + 1), v0[j] + cost);
       }
 
-      for (int j=0; j<nb+1; j++)
+      for (casadi_int j=0; j<nb+1; j++)
         v0[j] = v1[j];
     }
 
-    return v1[nb];
+    return static_cast<double>(v1[nb]);
   }
 
-  vector<string> Options::suggestions(const string& word, int amount) const {
+  vector<string> Options::suggestions(const string& word, casadi_int amount) const {
     // Best distances so far
     const double inf = numeric_limits<double>::infinity();
     vector<pair<double, string> > best(amount, {inf, ""});

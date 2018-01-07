@@ -42,16 +42,16 @@ namespace casadi {
   /** \brief  An element of the algorithm, namely an MX node */
   struct MXAlgEl {
     /// Operator index
-    int op;
+    casadi_int op;
 
     /// Data associated with the operation
     MX data;
 
     /// Work vector indices of the arguments
-    std::vector<int> arg;
+    std::vector<casadi_int> arg;
 
     /// Work vector indices of the results
-    std::vector<int> res;
+    std::vector<casadi_int> res;
   };
 #endif // SWIG
 
@@ -69,7 +69,7 @@ namespace casadi {
     std::vector<AlgEl> algorithm_;
 
     /** \brief Offsets for elements in the w_ vector */
-    std::vector<int> workloc_;
+    std::vector<casadi_int> workloc_;
 
     /// Free variables
     std::vector<MX> free_vars_;
@@ -87,7 +87,7 @@ namespace casadi {
     ~MXFunction() override;
 
     /** \brief  Evaluate numerically, work vectors given */
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /** \brief  Print description */
     void disp_more(std::ostream& stream) const override;
@@ -127,7 +127,8 @@ namespace casadi {
     bool should_inline(bool always_inline, bool never_inline) const override;
 
     /** \brief Evaluate symbolically, SX type*/
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const override;
+    int eval_sx(const SXElem** arg, SXElem** res,
+                casadi_int* iw, SXElem* w, void* mem) const override;
 
     /** \brief Evaluate symbolically, MX type */
     void eval_mx(const MXVector& arg, MXVector& res,
@@ -145,17 +146,18 @@ namespace casadi {
     std::vector<MX> symbolic_output(const std::vector<MX>& arg) const override;
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res,
+                  casadi_int* iw, bvec_t* w, void* mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
     // print an element of an algorithm
     std::string print(const AlgEl& el) const;
 
     ///@{
     /** \brief Get function input(s) and output(s)  */
-    const MX mx_in(int ind) const override;
+    const MX mx_in(casadi_int ind) const override;
     const std::vector<MX> mx_in() const override;
     ///@}
 
@@ -173,24 +175,24 @@ namespace casadi {
     }
 
     /** \brief Number of nodes in the algorithm */
-    int n_nodes() const override { return algorithm_.size();}
+    casadi_int n_nodes() const override { return algorithm_.size();}
 
-    int n_instructions() const override { return algorithm_.size();}
+    casadi_int n_instructions() const override { return algorithm_.size();}
 
     /** *\brief get MX expression associated with instruction */
-    MX instruction_MX(int k) const override;
+    MX instruction_MX(casadi_int k) const override;
 
     /** \brief Get an atomic operation operator index */
-    int instruction_id(int k) const override { return algorithm_.at(k).op;}
+    casadi_int instruction_id(casadi_int k) const override { return algorithm_.at(k).op;}
 
     /** \brief Get default input value */
-    double get_default_in(int ind) const override { return default_in_.at(ind);}
+    double get_default_in(casadi_int ind) const override { return default_in_.at(ind);}
 
     /** \brief Get the (integer) input arguments of an atomic operation */
-    std::vector<int> instruction_input(int k) const override;
+    std::vector<casadi_int> instruction_input(casadi_int k) const override;
 
     /** \brief Get the (integer) output argument of an atomic operation */
-    std::vector<int> instruction_output(int k) const override;
+    std::vector<casadi_int> instruction_output(casadi_int k) const override;
 
     /** \brief Export function in a specific language */
     void export_code_body(const std::string& lang,

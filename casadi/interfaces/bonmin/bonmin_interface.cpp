@@ -214,7 +214,7 @@ namespace casadi {
   }
 
   void BonminInterface::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
+                                casadi_int*& iw, double*& w) const {
     auto m = static_cast<BonminMemory*>(mem);
 
     // Set work in base classes
@@ -412,7 +412,7 @@ namespace casadi {
         m->fstats.at("callback_fun").tic();
         if (full_callback) {
           casadi_copy(x, nx_, m->xk);
-          for (int i=0; i<nx_; ++i) {
+          for (casadi_int i=0; i<nx_; ++i) {
             m->lam_xk[i] = z_U[i]-z_L[i];
           }
           casadi_copy(lambda, ng_, m->lam_gk);
@@ -476,7 +476,7 @@ namespace casadi {
 
       // Get dual solution (simple bounds)
       if (m->lam_xk) {
-        for (int i=0; i<nx_; ++i) {
+        for (casadi_int i=0; i<nx_; ++i) {
           m->lam_xk[i] = casadi::nan;
         }
       }
@@ -526,7 +526,7 @@ namespace casadi {
       // Initialize dual variables (simple bounds)
       if (init_z) {
         if (m->lam_x0) {
-          for (int i=0; i<nx_; ++i) {
+          for (casadi_int i=0; i<nx_; ++i) {
             z_L[i] = max(0., -m->lam_x0[i]);
             z_U[i] = max(0., m->lam_x0[i]);
           }
@@ -588,7 +588,7 @@ namespace casadi {
   bool BonminInterface::
   get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const {
     try {
-      for (int i=0; i<nl_ex_.size(); ++i) {
+      for (casadi_int i=0; i<nl_ex_.size(); ++i) {
         if (nl_ex_[i]) *pos_nonlin_vars++ = i;
       }
       return true;

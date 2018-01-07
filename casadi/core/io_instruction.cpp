@@ -28,7 +28,7 @@
 using namespace std;
 
 namespace casadi {
-  Input::Input(const Sparsity& sp, int ind, int segment, int offset)
+  Input::Input(const Sparsity& sp, casadi_int ind, casadi_int segment, casadi_int offset)
     : IOInstruction(ind, segment, offset) {
     set_sparsity(sp);
   }
@@ -40,11 +40,11 @@ namespace casadi {
   }
 
   void Input::generate(CodeGenerator& g,
-                       const vector<int>& arg, const vector<int>& res) const {
-    int nnz = this->nnz();
+                       const vector<casadi_int>& arg, const vector<casadi_int>& res) const {
+    casadi_int nnz = this->nnz();
     if (nnz==0) return; // quick return
     string a = "arg[" + str(ind_) + "]";
-    int i = res.front();
+    casadi_int i = res.front();
     if (nnz==1) {
       g << g.workel(i) << " = " << a << " ? " << a << "[" << offset_ << "] : 0;\n";
     } else if (offset_==0) {
@@ -55,7 +55,7 @@ namespace casadi {
     }
   }
 
-  Output::Output(const MX& x, int ind, int segment, int offset)
+  Output::Output(const MX& x, casadi_int ind, casadi_int segment, casadi_int offset)
     : IOInstruction(ind, segment, offset) {
     set_dep(x);
   }
@@ -67,10 +67,10 @@ namespace casadi {
   }
 
   void Output::generate(CodeGenerator& g,
-                       const vector<int>& arg, const vector<int>& res) const {
-    int nnz = dep().nnz();
+                       const vector<casadi_int>& arg, const vector<casadi_int>& res) const {
+    casadi_int nnz = dep().nnz();
     if (nnz==0) return; // quick return
-    int i = arg.front();
+    casadi_int i = arg.front();
     string r = "res[" + str(ind_) + "]";
     if (nnz==1) {
       g << "if (" << r << ") " << r << "[" << offset_ << "] = " << g.workel(i) << ";\n";

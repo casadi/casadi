@@ -114,7 +114,7 @@ namespace casadi {
     other = temp;
   }
 
-  int SharedObject::getCount() const {
+  casadi_int SharedObject::getCount() const {
     return (*this)->getCount();
   }
 

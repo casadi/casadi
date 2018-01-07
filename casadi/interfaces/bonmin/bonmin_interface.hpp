@@ -79,9 +79,9 @@ namespace casadi {
     // Stats
     std::vector<double> inf_pr, inf_du, mu, d_norm, regularization_size,
       obj, alpha_pr, alpha_du;
-    std::vector<int> ls_trials;
+    std::vector<casadi_int> ls_trials;
     const char* return_status;
-    int iter_count;
+    casadi_int iter_count;
 
     /// Constructor
     BonminMemory();
@@ -138,7 +138,7 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     // Solve the NLP
     void solve(void* mem) const override;

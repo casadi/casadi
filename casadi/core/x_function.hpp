@@ -71,7 +71,7 @@ namespace casadi {
     static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes);
 
     /** \brief  Construct a complete Jacobian by compression */
-    MatType jac(int iind, int oind, const Dict& opts) const;
+    MatType jac(casadi_int iind, casadi_int oind, const Dict& opts) const;
 
     /** \brief Check if the function is of a particular type */
     bool is_a(const std::string& type, bool recursive) const override {
@@ -92,12 +92,12 @@ namespace casadi {
     */
     std::vector<bool> which_depends(const std::string& s_in,
                                             const std::vector<std::string>& s_out,
-                                            int order, bool tr=false) const override;
+                                            casadi_int order, bool tr=false) const override;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    bool has_forward(int nfwd) const override { return true;}
-    Function get_forward(int nfwd, const std::string& name,
+    bool has_forward(casadi_int nfwd) const override { return true;}
+    Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -105,8 +105,8 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    bool has_reverse(int nadj) const override { return true;}
-    Function get_reverse(int nadj, const std::string& name,
+    bool has_reverse(casadi_int nadj) const override { return true;}
+    Function get_reverse(casadi_int nadj, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -125,8 +125,8 @@ namespace casadi {
     Sparsity get_jacobian_sparsity() const override;
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
-    Function slice(const std::string& name, const std::vector<int>& order_in,
-                   const std::vector<int>& order_out, const Dict& opts) const override;
+    Function slice(const std::string& name, const std::vector<casadi_int>& order_in,
+                   const std::vector<casadi_int>& order_out, const Dict& opts) const override;
 
     /** \brief Generate code for the declarations of the C function */
     void codegen_declarations(CodeGenerator& g) const override = 0;
@@ -173,8 +173,8 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(int i) override { return in_.at(i).sparsity();}
-    Sparsity get_sparsity_out(int i) override { return out_.at(i).sparsity();}
+    Sparsity get_sparsity_in(casadi_int i) override { return in_.at(i).sparsity();}
+    Sparsity get_sparsity_out(casadi_int i) override { return out_.at(i).sparsity();}
     /// @}
 
     // Data members (all public)
@@ -217,7 +217,7 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::init");
 
     // Make sure that inputs are symbolic
-    for (int i=0; i<n_in_; ++i) {
+    for (casadi_int i=0; i<n_in_; ++i) {
       if (in_.at(i).nnz()>0 && !in_.at(i).is_valid_input()) {
         casadi_error("Xfunction input arguments must be purely symbolic. \n"
                      "Argument " + str(i) + "(" + name_in_[i] + ") is not symbolic.");
@@ -239,7 +239,7 @@ namespace casadi {
     if (has_duplicates) {
       std::stringstream s;
       s << "The input expressions are not independent:\n";
-      for (int iind=0; iind<in_.size(); ++iind) {
+      for (casadi_int iind=0; iind<in_.size(); ++iind) {
         s << iind << ": " << in_[iind] << "\n";
       }
       casadi_error(s.str());
@@ -255,7 +255,7 @@ namespace casadi {
       // If the last element on the stack has not yet been added
       if (t && t->temp>=0) {
         // Get the index of the next dependency
-        int next_dep = t->temp++;
+        casadi_int next_dep = t->temp++;
         // If there is any dependency which has not yet been added
         if (next_dep < t->n_dep()) {
           // Add dependency to stack
@@ -277,7 +277,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   MatType XFunction<DerivedType, MatType, NodeType>
-  ::jac(int iind, int oind, const Dict& opts) const {
+  ::jac(casadi_int iind, casadi_int oind, const Dict& opts) const {
     using namespace std;
     if (verbose_) casadi_message(name_ + "::jac");
 
@@ -304,7 +304,7 @@ namespace casadi {
 
     // Quick return if trivially empty
     if (nnz_in(iind)==0 || nnz_out(oind)==0) {
-      std::pair<int, int> jac_shape;
+      std::pair<casadi_int, casadi_int> jac_shape;
       jac_shape.first = compact ? nnz_out(oind) : numel_out(oind);
       jac_shape.second = compact ? nnz_in(iind) : numel_in(iind);
       return MatType(jac_shape);
@@ -329,15 +329,15 @@ namespace casadi {
     if (verbose_) casadi_message("Graph coloring completed");
 
     // Get the number of forward and adjoint sweeps
-    int nfdir = D1.is_null() ? 0 : D1.size2();
-    int nadir = D2.is_null() ? 0 : D2.size2();
+    casadi_int nfdir = D1.is_null() ? 0 : D1.size2();
+    casadi_int nadir = D2.is_null() ? 0 : D2.size2();
 
     // Number of derivative directions supported by the function
-    int max_nfdir = max_num_dir_;
-    int max_nadir = max_num_dir_;
+    casadi_int max_nfdir = max_num_dir_;
+    casadi_int max_nadir = max_num_dir_;
 
     // Current forward and adjoint direction
-    int offset_nfdir = 0, offset_nadir = 0;
+    casadi_int offset_nfdir = 0, offset_nadir = 0;
 
     // Evaluation result (known)
     std::vector<MatType> res(out_);
@@ -347,56 +347,56 @@ namespace casadi {
 
     // Get the sparsity of the Jacobian block
     Sparsity jsp = sparsity_jac(iind, oind, true, symmetric).T();
-    const int* jsp_colind = jsp.colind();
-    const int* jsp_row = jsp.row();
+    const casadi_int* jsp_colind = jsp.colind();
+    const casadi_int* jsp_row = jsp.row();
 
     // Input sparsity
-    std::vector<int> input_col = sparsity_in_.at(iind).get_col();
-    const int* input_row = sparsity_in_.at(iind).row();
+    std::vector<casadi_int> input_col = sparsity_in_.at(iind).get_col();
+    const casadi_int* input_row = sparsity_in_.at(iind).row();
 
     // Output sparsity
-    std::vector<int> output_col = sparsity_out_.at(oind).get_col();
-    const int* output_row = sparsity_out_.at(oind).row();
+    std::vector<casadi_int> output_col = sparsity_out_.at(oind).get_col();
+    const casadi_int* output_row = sparsity_out_.at(oind).row();
 
     // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
     if (verbose_) casadi_message("jac transposes and mapping");
-    std::vector<int> mapping;
+    std::vector<casadi_int> mapping;
     Sparsity jsp_trans;
     if (nfdir>0) {
       jsp_trans = jsp.transpose(mapping);
     }
 
     // The nonzeros of the sensitivity matrix
-    std::vector<int> nzmap, nzmap2;
+    std::vector<casadi_int> nzmap, nzmap2;
 
     // Additions to the jacobian matrix
-    std::vector<int> adds, adds2;
+    std::vector<casadi_int> adds, adds2;
 
     // Temporary vector
-    std::vector<int> tmp;
+    std::vector<casadi_int> tmp;
 
     // Progress
-    int progress = -10;
+    casadi_int progress = -10;
 
     // Number of sweeps
-    int nsweep_fwd = nfdir/max_nfdir;   // Number of sweeps needed for the forward mode
+    casadi_int nsweep_fwd = nfdir/max_nfdir;   // Number of sweeps needed for the forward mode
     if (nfdir%max_nfdir>0) nsweep_fwd++;
-    int nsweep_adj = nadir/max_nadir;   // Number of sweeps needed for the adjoint mode
+    casadi_int nsweep_adj = nadir/max_nadir;   // Number of sweeps needed for the adjoint mode
     if (nadir%max_nadir>0) nsweep_adj++;
-    int nsweep = std::max(nsweep_fwd, nsweep_adj);
+    casadi_int nsweep = std::max(nsweep_fwd, nsweep_adj);
     if (verbose_) {
       casadi_message(str(nsweep) + " sweeps needed for " + str(nfdir) + " forward and "
                      + str(nadir) + " reverse directions");
     }
 
     // Sparsity of the seeds
-    vector<int> seed_col, seed_row;
+    vector<casadi_int> seed_col, seed_row;
 
     // Evaluate until everything has been determined
-    for (int s=0; s<nsweep; ++s) {
+    for (casadi_int s=0; s<nsweep; ++s) {
       // Print progress
       if (verbose_) {
-        int progress_new = (s*100)/nsweep;
+        casadi_int progress_new = (s*100)/nsweep;
         // Print when entering a new decade
         if (progress_new / 10 > progress / 10) {
           progress = progress_new;
@@ -405,21 +405,21 @@ namespace casadi {
       }
 
       // Number of forward and adjoint directions in the current "batch"
-      int nfdir_batch = std::min(nfdir - offset_nfdir, max_nfdir);
-      int nadir_batch = std::min(nadir - offset_nadir, max_nadir);
+      casadi_int nfdir_batch = std::min(nfdir - offset_nfdir, max_nfdir);
+      casadi_int nadir_batch = std::min(nadir - offset_nadir, max_nadir);
 
       // Forward seeds
       fseed.resize(nfdir_batch);
-      for (int d=0; d<nfdir_batch; ++d) {
+      for (casadi_int d=0; d<nfdir_batch; ++d) {
         // Nonzeros of the seed matrix
         seed_col.clear();
         seed_row.clear();
 
         // For all the directions
-        for (int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el) {
+        for (casadi_int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el) {
 
           // Get the direction
-          int c = D1.row(el);
+          casadi_int c = D1.row(el);
 
           // Give a seed in the direction
           seed_col.push_back(input_col[c]);
@@ -428,8 +428,8 @@ namespace casadi {
 
         // initialize to zero
         fseed[d].resize(n_in_);
-        for (int ind=0; ind<fseed[d].size(); ++ind) {
-          int nrow = size1_in(ind), ncol = size2_in(ind); // Input dimensions
+        for (casadi_int ind=0; ind<fseed[d].size(); ++ind) {
+          casadi_int nrow = size1_in(ind), ncol = size2_in(ind); // Input dimensions
           if (ind==iind) {
             fseed[d][ind] = MatType::ones(Sparsity::triplet(nrow, ncol, seed_row, seed_col));
           } else {
@@ -440,16 +440,16 @@ namespace casadi {
 
       // Adjoint seeds
       aseed.resize(nadir_batch);
-      for (int d=0; d<nadir_batch; ++d) {
+      for (casadi_int d=0; d<nadir_batch; ++d) {
         // Nonzeros of the seed matrix
         seed_col.clear();
         seed_row.clear();
 
         // For all the directions
-        for (int el = D2.colind(offset_nadir+d); el<D2.colind(offset_nadir+d+1); ++el) {
+        for (casadi_int el = D2.colind(offset_nadir+d); el<D2.colind(offset_nadir+d+1); ++el) {
 
           // Get the direction
-          int c = D2.row(el);
+          casadi_int c = D2.row(el);
 
           // Give a seed in the direction
           seed_col.push_back(output_col[c]);
@@ -458,8 +458,8 @@ namespace casadi {
 
         //initialize to zero
         aseed[d].resize(n_out_);
-        for (int ind=0; ind<aseed[d].size(); ++ind) {
-          int nrow = size1_out(ind), ncol = size2_out(ind); // Output dimensions
+        for (casadi_int ind=0; ind<aseed[d].size(); ++ind) {
+          casadi_int nrow = size1_out(ind), ncol = size2_out(ind); // Output dimensions
           if (ind==oind) {
             aseed[d][ind] = MatType::ones(Sparsity::triplet(nrow, ncol, seed_row, seed_col));
           } else {
@@ -470,20 +470,20 @@ namespace casadi {
 
       // Forward sensitivities
       fsens.resize(nfdir_batch);
-      for (int d=0; d<nfdir_batch; ++d) {
+      for (casadi_int d=0; d<nfdir_batch; ++d) {
         // initialize to zero
         fsens[d].resize(n_out_);
-        for (int oind=0; oind<fsens[d].size(); ++oind) {
+        for (casadi_int oind=0; oind<fsens[d].size(); ++oind) {
           fsens[d][oind] = MatType::zeros(sparsity_out_.at(oind));
         }
       }
 
       // Adjoint sensitivities
       asens.resize(nadir_batch);
-      for (int d=0; d<nadir_batch; ++d) {
+      for (casadi_int d=0; d<nadir_batch; ++d) {
         // initialize to zero
         asens[d].resize(n_in_);
-        for (int ind=0; ind<asens[d].size(); ++ind) {
+        for (casadi_int ind=0; ind<asens[d].size(); ++ind) {
           asens[d][ind] = MatType::zeros(sparsity_in_.at(ind));
         }
       }
@@ -502,7 +502,7 @@ namespace casadi {
       }
 
       // Carry out the forward sweeps
-      for (int d=0; d<nfdir_batch; ++d) {
+      for (casadi_int d=0; d<nfdir_batch; ++d) {
         // Skip if nothing to add
         if (fsens[d][oind].nnz()==0) {
           continue;
@@ -515,13 +515,13 @@ namespace casadi {
           fill(tmp.begin(), tmp.end(), 0);
 
           // "Multiply" Jacobian sparsity by seed vector
-          for (int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el) {
+          for (casadi_int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el) {
 
             // Get the input nonzero
-            int c = D1.row(el);
+            casadi_int c = D1.row(el);
 
             // Propagate dependencies
-            for (int el_jsp=jsp_colind[c]; el_jsp<jsp_colind[c+1]; ++el_jsp) {
+            for (casadi_int el_jsp=jsp_colind[c]; el_jsp<jsp_colind[c+1]; ++el_jsp) {
               tmp[jsp_row[el_jsp]]++;
             }
           }
@@ -545,27 +545,27 @@ namespace casadi {
         }
 
         // For all the input nonzeros treated in the sweep
-        for (int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el) {
+        for (casadi_int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el) {
 
           // Get the input nonzero
-          int c = D1.row(el);
-          //int f2_out;
+          casadi_int c = D1.row(el);
+          //casadi_int f2_out;
           //if (symmetric) {
           //  f2_out = nzmap2[c];
           //}
 
           // Loop over the output nonzeros corresponding to this input nonzero
-          for (int el_out = jsp_trans.colind(c); el_out<jsp_trans.colind(c+1); ++el_out) {
+          for (casadi_int el_out = jsp_trans.colind(c); el_out<jsp_trans.colind(c+1); ++el_out) {
 
             // Get the output nonzero
-            int r_out = jsp_trans.row(el_out);
+            casadi_int r_out = jsp_trans.row(el_out);
 
             // Get the forward sensitivity nonzero
-            int f_out = nzmap[r_out];
+            casadi_int f_out = nzmap[r_out];
             if (f_out<0) continue; // Skip if structurally zero
 
             // The nonzero of the Jacobian now treated
-            int elJ = mapping[el_out];
+            casadi_int elJ = mapping[el_out];
 
             if (symmetric) {
               if (tmp[r_out]==1) {
@@ -581,8 +581,8 @@ namespace casadi {
 
         // Get entries in fsens[d][oind] with nonnegative indices
         tmp.resize(adds.size());
-        int sz = 0;
-        for (int i=0; i<adds.size(); ++i) {
+        casadi_int sz = 0;
+        for (casadi_int i=0; i<adds.size(); ++i) {
           if (adds[i]>=0) {
             adds[sz] = adds[i];
             tmp[sz++] = i;
@@ -598,7 +598,7 @@ namespace casadi {
           // Get entries in fsens[d][oind] with nonnegative indices
           tmp.resize(adds2.size());
           sz = 0;
-          for (int i=0; i<adds2.size(); ++i) {
+          for (casadi_int i=0; i<adds2.size(); ++i) {
             if (adds2[i]>=0) {
               adds2[sz] = adds2[i];
               tmp[sz++] = i;
@@ -613,7 +613,7 @@ namespace casadi {
       }
 
       // Add elements to the Jacobian matrix
-      for (int d=0; d<nadir_batch; ++d) {
+      for (casadi_int d=0; d<nadir_batch; ++d) {
         // Skip if nothing to add
         if (asens[d][iind].nnz()==0) {
           continue;
@@ -624,19 +624,19 @@ namespace casadi {
         asens[d][iind].sparsity().get_nz(nzmap);
 
         // For all the output nonzeros treated in the sweep
-        for (int el = D2.colind(offset_nadir+d); el<D2.colind(offset_nadir+d+1); ++el) {
+        for (casadi_int el = D2.colind(offset_nadir+d); el<D2.colind(offset_nadir+d+1); ++el) {
 
           // Get the output nonzero
-          int r = D2.row(el);
+          casadi_int r = D2.row(el);
 
           // Loop over the input nonzeros that influences this output nonzero
-          for (int elJ = jsp.colind(r); elJ<jsp.colind(r+1); ++elJ) {
+          for (casadi_int elJ = jsp.colind(r); elJ<jsp.colind(r+1); ++elJ) {
 
             // Get the input nonzero
-            int inz = jsp.row(elJ);
+            casadi_int inz = jsp.row(elJ);
 
             // Get the corresponding adjoint sensitivity nonzero
-            int anz = nzmap[inz];
+            casadi_int anz = nzmap[inz];
             if (anz<0) continue;
 
             // Get the input seed
@@ -656,7 +656,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::get_forward(int nfwd, const std::string& name,
+  ::get_forward(casadi_int nfwd, const std::string& name,
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
@@ -670,19 +670,19 @@ namespace casadi {
     // All inputs of the return function
     std::vector<MatType> ret_in(inames.size());
     copy(in_.begin(), in_.end(), ret_in.begin());
-    for (int i=0; i<n_out_; ++i) {
+    for (casadi_int i=0; i<n_out_; ++i) {
       ret_in.at(n_in_+i) = MatType::sym(inames[n_in_+i], Sparsity(out_.at(i).size()));
     }
     std::vector<MatType> v(nfwd);
-    for (int i=0; i<n_in_; ++i) {
-      for (int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
+    for (casadi_int i=0; i<n_in_; ++i) {
+      for (casadi_int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
       ret_in.at(n_in_ + n_out_ + i) = horzcat(v);
     }
 
     // All outputs of the return function
     std::vector<MatType> ret_out(onames.size());
-    for (int i=0; i<n_out_; ++i) {
-      for (int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
+    for (casadi_int i=0; i<n_out_; ++i) {
+      for (casadi_int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
       ret_out.at(i) = horzcat(v);
     }
 
@@ -692,7 +692,7 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::get_reverse(int nadj, const std::string& name,
+  ::get_reverse(casadi_int nadj, const std::string& name,
                 const std::vector<std::string>& inames,
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
@@ -705,19 +705,19 @@ namespace casadi {
     // All inputs of the return function
     std::vector<MatType> ret_in(inames.size());
     copy(in_.begin(), in_.end(), ret_in.begin());
-    for (int i=0; i<n_out_; ++i) {
+    for (casadi_int i=0; i<n_out_; ++i) {
       ret_in.at(n_in_ + i) = MatType::sym(inames[n_in_+i], Sparsity(out_.at(i).size()));
     }
     std::vector<MatType> v(nadj);
-    for (int i=0; i<n_out_; ++i) {
-      for (int d=0; d<nadj; ++d) v[d] = aseed[d][i];
+    for (casadi_int i=0; i<n_out_; ++i) {
+      for (casadi_int d=0; d<nadj; ++d) v[d] = aseed[d][i];
       ret_in.at(n_in_ + n_out_ + i)  = horzcat(v);
     }
 
     // All outputs of the return function
     std::vector<MatType> ret_out(onames.size());
-    for (int i=0; i<n_in_; ++i) {
-      for (int d=0; d<nadj; ++d) v[d] = asens[d][i];
+    for (casadi_int i=0; i<n_in_; ++i) {
+      for (casadi_int d=0; d<nadj; ++d) v[d] = asens[d][i];
       ret_out.at(i) = horzcat(v);
     }
 
@@ -741,7 +741,7 @@ namespace casadi {
     // All inputs of the return function
     std::vector<MatType> ret_in(inames.size());
     copy(in_.begin(), in_.end(), ret_in.begin());
-    for (int i=0; i<n_out_; ++i) {
+    for (casadi_int i=0; i<n_out_; ++i) {
       ret_in.at(n_in_+i) = MatType::sym(inames[n_in_+i], Sparsity(out_.at(i).size()));
     }
 
@@ -760,20 +760,20 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   Function XFunction<DerivedType, MatType, NodeType>
-  ::slice(const std::string& name, const std::vector<int>& order_in,
-          const std::vector<int>& order_out, const Dict& opts) const {
+  ::slice(const std::string& name, const std::vector<casadi_int>& order_in,
+          const std::vector<casadi_int>& order_out, const Dict& opts) const {
     // Return expressions
     std::vector<MatType> ret_in, ret_out;
     std::vector<std::string> ret_in_name, ret_out_name;
 
     // Reorder inputs
-    for (int k : order_in) {
+    for (casadi_int k : order_in) {
       ret_in.push_back(in_.at(k));
       ret_in_name.push_back(name_in_.at(k));
     }
 
     // Reorder outputs
-    for (int k : order_out) {
+    for (casadi_int k : order_out) {
       ret_out.push_back(out_.at(k));
       ret_out_name.push_back(name_out_.at(k));
     }
@@ -793,7 +793,7 @@ namespace casadi {
     ss << "function [varargout] = " << name_ << "(varargin)" << std::endl;
 
     // Allocate space for output argument (segments)
-    for (int i=0;i<n_out_;++i) {
+    for (casadi_int i=0;i<n_out_;++i) {
       ss << "  argout_" << i <<  " = cell(" << nnz_out(i) << ",1);" << std::endl;
     }
 
@@ -802,7 +802,7 @@ namespace casadi {
     export_code_body(lang, ss, opts);
 
     // Process the outputs
-    for (int i=0;i<n_out_;++i) {
+    for (casadi_int i=0;i<n_out_;++i) {
       const Sparsity& out = sparsity_out_.at(i);
       if (out.is_dense()) {
         // Special case if dense
@@ -853,8 +853,8 @@ namespace casadi {
   ::isInput(const std::vector<MatType>& arg) const {
     // Check if arguments matches the input expressions, in which case
     // the output is known to be the output expressions
-    const int checking_depth = 2;
-    for (int i=0; i<arg.size(); ++i) {
+    const casadi_int checking_depth = 2;
+    for (casadi_int i=0; i<arg.size(); ++i) {
       if (!is_equal(arg[i], in_[i], checking_depth)) {
         return false;
       }
@@ -935,8 +935,8 @@ namespace casadi {
 
     // Create an expression factory
     Factory<MatType> f(aux);
-    for (int i=0; i<in_.size(); ++i) f.add_input(name_in_[i], in_[i]);
-    for (int i=0; i<out_.size(); ++i) f.add_output(name_out_[i], out_[i]);
+    for (casadi_int i=0; i<in_.size(); ++i) f.add_input(name_in_[i], in_[i]);
+    for (casadi_int i=0; i<out_.size(); ++i) f.add_output(name_out_[i], out_[i]);
 
     // Specify input expressions to be calculated
     vector<string> ret_iname;
@@ -988,7 +988,7 @@ namespace casadi {
   template<typename DerivedType, typename MatType, typename NodeType>
   std::vector<bool> XFunction<DerivedType, MatType, NodeType>::
   which_depends(const std::string& s_in, const std::vector<std::string>& s_out,
-      int order, bool tr) const {
+      casadi_int order, bool tr) const {
     using namespace std;
 
     // Input arguments
@@ -1009,7 +1009,8 @@ namespace casadi {
   }
 
   template<typename MatType>
-  std::vector<bool> _which_depends(const MatType &expr, const MatType &var, int order, bool tr) {
+  std::vector<bool> _which_depends(const MatType &expr, const MatType &var,
+      casadi_int order, bool tr) {
     // Short-circuit
     if (expr.is_empty() || var.is_empty()) {
       return std::vector<bool>(tr? expr.numel() : var.numel(), false);
@@ -1022,7 +1023,7 @@ namespace casadi {
       "which_depends: order argument must be 1 or 2, got " + str(order) + " instead.");
 
     MatType v = MatType::sym("v", var.sparsity());
-    for (int i=1;i<order;++i) {
+    for (casadi_int i=1;i<order;++i) {
       e = jtimes(e, var, v);
     }
 
@@ -1042,17 +1043,17 @@ namespace casadi {
     // Project the result back on the original sparsity
     if (tr && e.sparsity()!=expr.sparsity()) {
       // std::vector<bool> is not accessible as bool*
-      // bool -> int
-      std::vector<int> source(sens.size());
+      // bool -> casadi_int
+      std::vector<casadi_int> source(sens.size());
       std::copy(ret.begin(), ret.end(), source.begin());
-      std::vector<int> target(expr.nnz());
+      std::vector<casadi_int> target(expr.nnz());
 
       // project
-      std::vector<int> scratch(expr.size1());
+      std::vector<casadi_int> scratch(expr.size1());
       casadi_project(get_ptr(source), e.sparsity(), get_ptr(target), expr.sparsity(),
         get_ptr(scratch));
 
-      // int -> bool
+      // casadi_int -> bool
       ret.resize(expr.nnz());
       std::copy(target.begin(), target.end(), ret.begin());
     }

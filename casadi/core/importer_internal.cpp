@@ -67,7 +67,7 @@ namespace casadi {
   void ImporterInternal::init(const Dict& opts) {
     // Read meta information from file
     if (can_have_meta()) {
-      int offset = 0;
+      casadi_int offset = 0;
       ifstream file(name_);
       std::string line;
       while (getline(file, line)) {
@@ -122,7 +122,7 @@ namespace casadi {
     }
   }
 
-  void ImporterInternal::read_meta(istream& file, int& offset) {
+  void ImporterInternal::read_meta(istream& file, casadi_int& offset) {
     // Loop over the lines
     std::string line;
     while (getline(file, line)) {
@@ -170,7 +170,7 @@ namespace casadi {
   }
 
   void ImporterInternal::
-  read_external(const string& sym, bool inlined, istream& file, int& offset) {
+  read_external(const string& sym, bool inlined, istream& file, casadi_int& offset) {
     // New entry
     stringstream ss;
 
@@ -259,13 +259,13 @@ namespace casadi {
 #endif // WITH_DL
   }
 
-  std::string ImporterInternal::get_meta(const std::string& cmd, int ind) const {
+  std::string ImporterInternal::get_meta(const std::string& cmd, casadi_int ind) const {
     if (ind>=0) return get_meta(indexed(cmd, ind));
     casadi_assert(has_meta(cmd), "No such command: " + cmd);
     return meta_.at(cmd).second;
   }
 
-  bool ImporterInternal::has_meta(const std::string& cmd, int ind) const {
+  bool ImporterInternal::has_meta(const std::string& cmd, casadi_int ind) const {
     if (ind>=0) return has_meta(indexed(cmd, ind));
     return meta_.find(cmd) != meta_.end();
   }

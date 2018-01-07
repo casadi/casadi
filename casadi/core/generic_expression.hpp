@@ -549,7 +549,7 @@ class GenericExpression : public GenericExpressionCommon {
      *
      *  is_equal(a,b,0)  will return false, but a.is_equal(a,b,1) will return true
      */
-     friend inline bool is_equal(const ExType& x, const ExType& y, int depth=0) {
+     friend inline bool is_equal(const ExType& x, const ExType& y, casadi_int depth=0) {
        return ExType::is_equal(x, y, depth);
      }
      ///@}

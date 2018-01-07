@@ -30,7 +30,7 @@ using namespace std;
 
 namespace casadi {
 
-  HorzRepmat::HorzRepmat(const MX& x, int n) : n_(n) {
+  HorzRepmat::HorzRepmat(const MX& x, casadi_int n) : n_(n) {
     set_dep(x);
     set_sparsity(repmat(x.sparsity(), 1, n));
   }
@@ -42,19 +42,19 @@ namespace casadi {
   }
 
   template<typename T>
-  int HorzRepmat::eval_gen(const T** arg, T** res, int* iw, T* w) const {
-    int nnz = dep(0).nnz();
-    for (int i=0; i<n_; ++i) {
+  int HorzRepmat::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
+    casadi_int nnz = dep(0).nnz();
+    for (casadi_int i=0; i<n_; ++i) {
       std::copy(arg[0], arg[0]+nnz, res[0]+i*nnz);
     }
     return 0;
   }
 
-  int HorzRepmat::eval(const double** arg, double** res, int* iw, double* w) const {
+  int HorzRepmat::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
-  int HorzRepmat::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+  int HorzRepmat::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
@@ -64,15 +64,15 @@ namespace casadi {
 
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
-  int HorzRepmat::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
-    int nnz = dep(0).nnz();
+  int HorzRepmat::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    casadi_int nnz = dep(0).nnz();
     std::fill(res[0], res[0]+nnz, 0);
     return eval_gen<bvec_t>(arg, res, iw, w);
   }
 
-  int HorzRepmat::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
-    int nnz = dep(0).nnz();
-    for (int i=0;i<n_;++i) {
+  int HorzRepmat::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    casadi_int nnz = dep(0).nnz();
+    for (casadi_int i=0;i<n_;++i) {
       std::transform(res[0]+i*nnz, res[0]+(i+1)*nnz, arg[0], arg[0], &Orring);
     }
     std::fill(res[0], res[0]+nnz, 0);
@@ -81,33 +81,34 @@ namespace casadi {
 
   void HorzRepmat::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
-    for (int d=0; d<fsens.size(); ++d) {
+    for (casadi_int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0]->get_repmat(1, n_);
     }
   }
 
   void HorzRepmat::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
-    for (int d=0; d<asens.size(); ++d) {
+    for (casadi_int d=0; d<asens.size(); ++d) {
       asens[d][0] += aseed[d][0]->get_repsum(1, n_);
     }
   }
 
   void HorzRepmat::generate(CodeGenerator& g,
-                            const std::vector<int>& arg, const std::vector<int>& res) const {
-    int nnz = dep(0).nnz();
-    g.local("i", "int");
+                            const std::vector<casadi_int>& arg,
+                            const std::vector<casadi_int>& res) const {
+    casadi_int nnz = dep(0).nnz();
+    g.local("i", "casadi_int");
     g << "for (i=0;i<" << n_ << ";++i) {\n"
       << "    " << g.copy(g.work(arg[0], dep(0).nnz()), nnz,
                           g.work(res[0], sparsity().nnz()) + "+ i*" + str(nnz)) << "\n"
       << "  }\n";
   }
 
-  HorzRepsum::HorzRepsum(const MX& x, int n) : n_(n) {
+  HorzRepsum::HorzRepsum(const MX& x, casadi_int n) : n_(n) {
     casadi_assert_dev(x.size2() % n == 0);
     std::vector<Sparsity> sp = horzsplit(x.sparsity(), x.size2()/n);
     Sparsity block = sp[0];
-    for (int i=1;i<sp.size();++i) {
+    for (casadi_int i=1;i<sp.size();++i) {
       block = block+sp[i];
     }
     Sparsity goal = repmat(block, 1, n);
@@ -122,21 +123,21 @@ namespace casadi {
   }
 
   template<typename T, typename R>
-  int HorzRepsum::eval_gen(const T** arg, T** res, int* iw, T* w,
+  int HorzRepsum::eval_gen(const T** arg, T** res, casadi_int* iw, T* w,
                            R reduction) const {
-    int nnz = sparsity().nnz();
+    casadi_int nnz = sparsity().nnz();
     fill_n(res[0], nnz, 0);
-    for (int i=0;i<n_;++i) {
+    for (casadi_int i=0;i<n_;++i) {
       std::transform(arg[0]+i*nnz, arg[0]+(i+1)*nnz, res[0], res[0], reduction);
     }
     return 0;
   }
 
-  int HorzRepsum::eval(const double** arg, double** res, int* iw, double* w) const {
+  int HorzRepsum::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w, std::plus<double>());
   }
 
-  int HorzRepsum::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+  int HorzRepsum::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     return eval_gen<SXElem>(arg, res, iw, w, std::plus<SXElem>());
   }
 
@@ -144,15 +145,15 @@ namespace casadi {
     res[0] = arg[0]->get_repsum(1, n_);
   }
 
-  int HorzRepsum::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
-    int nnz = sparsity().nnz();
+  int HorzRepsum::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    casadi_int nnz = sparsity().nnz();
     std::fill(res[0], res[0]+nnz, 0);
     return eval_gen<bvec_t>(arg, res, iw, w, &Orring);
   }
 
-  int HorzRepsum::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
-    int nnz = sparsity().nnz();
-    for (int i=0;i<n_;++i) {
+  int HorzRepsum::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
+    casadi_int nnz = sparsity().nnz();
+    for (casadi_int i=0;i<n_;++i) {
       std::transform(res[0], res[0]+nnz, arg[0]+i*nnz, arg[0]+i*nnz, &Orring);
     }
     std::fill(res[0], res[0]+nnz, 0);
@@ -161,23 +162,24 @@ namespace casadi {
 
   void HorzRepsum::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
-    for (int d=0; d<fsens.size(); ++d) {
+    for (casadi_int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = fseed[d][0]->get_repsum(1, n_);
     }
   }
 
   void HorzRepsum::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
-    for (int d=0; d<asens.size(); ++d) {
+    for (casadi_int d=0; d<asens.size(); ++d) {
       asens[d][0] += aseed[d][0]->get_repmat(1, n_);
     }
   }
 
   void HorzRepsum::generate(CodeGenerator& g,
-                            const std::vector<int>& arg, const std::vector<int>& res) const {
-    int nnz = sparsity().nnz();
-    g.local("i", "int");
-    g.local("j", "int");
+                            const std::vector<casadi_int>& arg,
+                            const std::vector<casadi_int>& res) const {
+    casadi_int nnz = sparsity().nnz();
+    g.local("i", "casadi_int");
+    g.local("j", "casadi_int");
     g << g.fill(g.work(res[0], nnz), nnz, "0") << "\n"
       << "  for (i=0;i<" << n_ << ";++i) {\n"
       << "    for (j=0;j<" << nnz << ";++j) {\n"

@@ -48,13 +48,13 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    int eval_gen(const T* const* arg, T* const* res, int* iw, T* w) const;
+    int eval_gen(const T* const* arg, T* const* res, casadi_int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
@@ -68,20 +68,21 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Print expression */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
-                          const std::vector<int>& arg, const std::vector<int>& res) const override;
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_TRANSPOSE;}
+    casadi_int op() const override { return OP_TRANSPOSE;}
 
     /** \brief Get required length of iw field */
     size_t sz_iw() const override { return size2()+1;}
@@ -94,7 +95,7 @@ namespace casadi {
     // return dep()->get_solve(r, !tr, linear_solver);} // FIXME #1001
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    bool is_equal(const MXNode* node, int depth) const override {
+    bool is_equal(const MXNode* node, casadi_int depth) const override {
       return sameOpAndDeps(node, depth);
     }
   };
@@ -114,23 +115,24 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    int eval_gen(const T* const* arg, T* const* res, int* iw, T* w) const;
+    int eval_gen(const T* const* arg, T* const* res, casadi_int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
-                          const std::vector<int>& arg, const std::vector<int>& res) const override;
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
 
     /** \brief Get required length of iw field */
     size_t sz_iw() const override { return 0;}

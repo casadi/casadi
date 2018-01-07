@@ -101,11 +101,11 @@ namespace casadi {
     vector<double> B(deg_+1, 0);
 
     // For all collocation points
-    for (int j=0; j<deg_+1; ++j) {
+    for (casadi_int j=0; j<deg_+1; ++j) {
 
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
       Polynomial p = 1;
-      for (int r=0; r<deg_+1; ++r) {
+      for (casadi_int r=0; r<deg_+1; ++r) {
         if (r!=j) {
           p *= Polynomial(-tau_root[r], 1)/(tau_root[j]-tau_root[r]);
         }
@@ -122,7 +122,7 @@ namespace casadi {
       // Evaluate the time derivative of the polynomial at all collocation points to
       // get the coefficients of the continuity equation
       Polynomial dp = p.derivative();
-      for (int r=0; r<deg_+1; ++r) {
+      for (casadi_int r=0; r<deg_+1; ++r) {
         C[j][r] = dp(tau_root[r]);
       }
 
@@ -138,8 +138,8 @@ namespace casadi {
 
     // Implicitly defined variables (z and x)
     MX v = MX::sym("v", deg_*(nx_+nz_));
-    vector<int> v_offset(1, 0);
-    for (int d=0; d<deg_; ++d) {
+    vector<casadi_int> v_offset(1, 0);
+    for (casadi_int d=0; d<deg_; ++d) {
       v_offset.push_back(v_offset.back()+nx_);
       v_offset.push_back(v_offset.back()+nz_);
     }
@@ -148,7 +148,7 @@ namespace casadi {
 
     // Collocated states
     vector<MX> x(deg_+1), z(deg_+1);
-    for (int d=1; d<=deg_; ++d) {
+    for (casadi_int d=1; d<=deg_; ++d) {
       x[d] = reshape(*vv_it++, size_in(INTEGRATOR_X0));
       z[d] = reshape(*vv_it++, size_in(INTEGRATOR_Z0));
     }
@@ -156,7 +156,7 @@ namespace casadi {
 
     // Collocation time points
     vector<MX> tt(deg_+1);
-    for (int d=0; d<=deg_; ++d) {
+    for (casadi_int d=0; d<=deg_; ++d) {
       tt[d] = t + h_*tau_root[d];
     }
 
@@ -170,8 +170,8 @@ namespace casadi {
     MX xf = D[0]*x0;
 
     // For all collocation points
-    for (int j=1; j<deg_+1; ++j) {
-      //for (int j=deg_; j>=1; --j) {
+    for (casadi_int j=1; j<deg_+1; ++j) {
+      //for (casadi_int j=deg_; j>=1; --j) {
 
       // Evaluate the DAE
       vector<MX> f_arg(DAE_NUM_IN);
@@ -183,7 +183,7 @@ namespace casadi {
 
       // Get an expression for the state derivative at the collocation point
       MX xp_j = C[0][j] * x0;
-      for (int r=1; r<deg_+1; ++r) {
+      for (casadi_int r=1; r<deg_+1; ++r) {
         xp_j += C[r][j] * x[r];
       }
 
@@ -224,8 +224,8 @@ namespace casadi {
 
       // Implicitly defined variables (rz and rx)
       MX rv = MX::sym("v", deg_*(nrx_+nrz_));
-      vector<int> rv_offset(1, 0);
-      for (int d=0; d<deg_; ++d) {
+      vector<casadi_int> rv_offset(1, 0);
+      for (casadi_int d=0; d<deg_; ++d) {
         rv_offset.push_back(rv_offset.back()+nrx_);
         rv_offset.push_back(rv_offset.back()+nrz_);
       }
@@ -234,7 +234,7 @@ namespace casadi {
 
       // Collocated states
       vector<MX> rx(deg_+1), rz(deg_+1);
-      for (int d=1; d<=deg_; ++d) {
+      for (casadi_int d=1; d<=deg_; ++d) {
         rx[d] = reshape(*rvv_it++, this->rx().size());
         rz[d] = reshape(*rvv_it++, this->rz().size());
       }
@@ -250,7 +250,7 @@ namespace casadi {
       MX rxf = D[0]*rx0;
 
       // For all collocation points
-      for (int j=1; j<deg_+1; ++j) {
+      for (casadi_int j=1; j<deg_+1; ++j) {
 
         // Evaluate the backward DAE
         vector<MX> g_arg(RDAE_NUM_IN);
@@ -265,7 +265,7 @@ namespace casadi {
 
         // Get an expression for the state derivative at the collocation point
         MX rxp_j = -D[j]*rx0;
-        for (int r=1; r<deg_+1; ++r) {
+        for (casadi_int r=1; r<deg_+1; ++r) {
           rxp_j += (B[r]*C[j][r]) * rx[r];
         }
 
@@ -309,7 +309,7 @@ namespace casadi {
 
     // Initial guess for Z
     double* Z = m->Z.ptr();
-    for (int d=0; d<deg_; ++d) {
+    for (casadi_int d=0; d<deg_; ++d) {
       casadi_copy(x, nx_, Z);
       Z += nx_;
       casadi_copy(z, nz_, Z);
@@ -326,7 +326,7 @@ namespace casadi {
 
     // Initial guess for RZ
     double* RZ = m->RZ.ptr();
-    for (int d=0; d<deg_; ++d) {
+    for (casadi_int d=0; d<deg_; ++d) {
       casadi_copy(rx, nrx_, RZ);
       RZ += nrx_;
       casadi_copy(rz, nrz_, RZ);

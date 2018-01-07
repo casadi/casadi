@@ -47,8 +47,8 @@ namespace casadi {
   * Elements larger than or equal to stop are chopped off.
   *
   */
-  CASADI_EXPORT std::vector<int> range(int start, int stop, int step=1,
-                                                int len=std::numeric_limits<int>::max());
+  CASADI_EXPORT std::vector<casadi_int> range(casadi_int start, casadi_int stop, casadi_int step=1,
+                                            casadi_int len=std::numeric_limits<casadi_int>::max());
 
   CASADI_EXPORT std::string join(const std::vector<std::string>& l, const std::string& delim=",");
 
@@ -57,7 +57,7 @@ namespace casadi {
   *
   * \return list [0, 1, 2...stop-1]
   */
-  CASADI_EXPORT std::vector<int> range(int stop);
+  CASADI_EXPORT std::vector<casadi_int> range(casadi_int stop);
 
   CASADI_EXPORT bool is_equally_spaced(const std::vector<double> &v);
 
@@ -66,7 +66,7 @@ namespace casadi {
   *  \param i List of indices
   */
   template<typename T>
-  std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<int> &i);
+  std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<casadi_int> &i);
 
   /** \brief Reverse a list
   */
@@ -82,11 +82,11 @@ namespace casadi {
 
   /// Check if for each element of v holds: v_i < upper
   template<typename T>
-  bool in_range(const std::vector<T> &v, int upper);
+  bool in_range(const std::vector<T> &v, casadi_int upper);
 
   /// Check if for each element of v holds: lower <= v_i < upper
   template<typename T>
-  bool in_range(const std::vector<T> &v, int lower, int upper);
+  bool in_range(const std::vector<T> &v, casadi_int lower, casadi_int upper);
 
   // Assert that a indices are in a range
   #define casadi_assert_in_range(v, lower, upper) \
@@ -110,7 +110,8 @@ namespace casadi {
   * The supplied vector will be checked for bounds
   * The result vector is guaranteed to be monotonously increasing
   */
-  CASADI_EXPORT std::vector<int> complement(const std::vector<int> &v, int size);
+  CASADI_EXPORT std::vector<casadi_int> complement(const std::vector<casadi_int> &v,
+                                                    casadi_int size);
 
   /** \brief Returns a vector for quickly looking up entries of supplied list
   *
@@ -119,8 +120,9 @@ namespace casadi {
   *
   *  Duplicates are treated by looking up last occurrence
   */
-  CASADI_EXPORT std::vector<int> lookupvector(const std::vector<int> &v, int size);
-  CASADI_EXPORT std::vector<int> lookupvector(const std::vector<int> &v);
+  CASADI_EXPORT std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v,
+                                                     casadi_int size);
+  CASADI_EXPORT std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v);
 
   /// \cond INTERNAL
 #ifndef SWIG
@@ -221,8 +223,8 @@ namespace casadi {
   * \param[in] invert_indices Output indices such that 'sorted_values[indices=values'
   **/
   template<typename T>
-  void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices,
-            bool invert_indices =false);
+  void sort(const std::vector<T> &values, std::vector<T> &sorted_values,
+            std::vector<casadi_int> &indices, bool invert_indices =false);
 
   /** \brief product
   *
@@ -306,11 +308,11 @@ namespace std {
 namespace casadi {
 
   template<typename T>
-  std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<int> &i) {
+  std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<casadi_int> &i) {
     std::vector<T> ret;
     ret.reserve(i.size());
-    for (int k=0;k<i.size();++k) {
-       int j = i[k];
+    for (casadi_int k=0;k<i.size();++k) {
+       casadi_int j = i[k];
        casadi_assert(j>=0,
          "vector_slice: Indices should be larger than zero."
          "You have " + str(j) + " at location " + str(k) + ".");
@@ -348,19 +350,38 @@ namespace casadi {
   void applymap(void (*f)(T &), std::vector<T>& comp) {
     std::for_each(comp.begin(), comp.end(), f);
   }
+
+  template<class S, class D>
+  void copy_vector(const std::vector<S>& s, std::vector<D>& d) {
+    casadi_assert(s.size()==d.size(), "Dimension mismatch.");
+    std::copy(s.begin(), s.end(), d.begin());
+  }
+
+  template<class S, class D>
+  void copy_vector(const S* s, std::vector<D>& d) {
+    for (casadi_int i=0;i<d.size();++i) {
+      d[i] = static_cast<D>(s[i]);
+    }
+  }
+
+  template<class S, class D>
+  void init_vector(std::vector<S>& d, const std::vector<D>& s) {
+    d.resize(s.size());
+    std::copy(s.begin(), s.end(), d.begin());
+  }
 #endif //SWIG
 
   template<typename T>
-  bool in_range(const std::vector<T> &v, int upper) {
+  bool in_range(const std::vector<T> &v, casadi_int upper) {
     return in_range(v, 0, upper);
   }
 
   template<typename T>
-  bool in_range(const std::vector<T> &v, int lower, int upper) {
+  bool in_range(const std::vector<T> &v, casadi_int lower, casadi_int upper) {
     if (v.size()==0) return true;
-    int max = *std::max_element(v.begin(), v.end());
+    casadi_int max = *std::max_element(v.begin(), v.end());
     if (max >= upper) return false;
-    int min = *std::min_element(v.begin(), v.end());
+    casadi_int min = *std::min_element(v.begin(), v.end());
     return (min >= lower);
   }
 
@@ -374,7 +395,7 @@ namespace casadi {
   bool is_increasing(const std::vector<T> &v) {
     if (v.size()==0) return true;
     T el = v[0];
-    for (int i=1;i<v.size();++i) {
+    for (casadi_int i=1;i<v.size();++i) {
       if (!(v[i] > el)) return false;
       el = v[i];
     }
@@ -385,7 +406,7 @@ namespace casadi {
   bool is_decreasing(const std::vector<T> &v) {
     if (v.size()==0) return true;
     T el = v[0];
-    for (int i=1;i<v.size();++i) {
+    for (casadi_int i=1;i<v.size();++i) {
       if (!(v[i] < el)) return false;
       el = v[i];
     }
@@ -396,7 +417,7 @@ namespace casadi {
   bool is_nonincreasing(const std::vector<T> &v) {
     if (v.size()==0) return true;
     T el = v[0];
-    for (int i=1;i<v.size();++i) {
+    for (casadi_int i=1;i<v.size();++i) {
       if (!(v[i] <= el)) return false;
       el = v[i];
     }
@@ -407,7 +428,7 @@ namespace casadi {
   bool is_nondecreasing(const std::vector<T> &v) {
     if (v.size()==0) return true;
     T el = v[0];
-    for (int i=1;i<v.size();++i) {
+    for (casadi_int i=1;i<v.size();++i) {
       if (!(v[i] >= el)) return false;
       el = v[i];
     }
@@ -439,7 +460,7 @@ namespace casadi {
 
   template<typename T>
   void write_matlab(std::ostream &stream, const std::vector<std::vector<T> > &v) {
-    for (unsigned int i=0; i<v.size(); ++i) {
+    for (casadi_uint i=0; i<v.size(); ++i) {
       std::copy(v[i].begin(), v[i].end(), std::ostream_iterator<T>(stream, " "));
       stream << std::endl;
     }
@@ -526,15 +547,15 @@ namespace casadi {
   struct sortCompare {
     const std::vector<T> &v_;
     sortCompare(const std::vector<T> &v) : v_(v) {}
-    bool operator() (int i, int j) const { return v_[i]<v_[j];}
+    bool operator() (casadi_int i, casadi_int j) const { return v_[i]<v_[j];}
   };
 
   template<typename T>
   void sort(const std::vector<T> &values, std::vector<T> &sorted_values,
-            std::vector<int> &indices, bool invert_indices) {
+            std::vector<casadi_int> &indices, bool invert_indices) {
     // Call recursively if indices need to be inverted
     if (invert_indices) {
-      std::vector<int> inverted;
+      std::vector<casadi_int> inverted;
       sort(values, sorted_values, inverted, false);
       indices.resize(inverted.size());
       for (size_t i=0; i<inverted.size(); ++i) {
@@ -560,7 +581,7 @@ namespace casadi {
   template<typename T>
   T product(const std::vector<T> &values) {
     T r = 1;
-    for (int i=0;i<values.size();++i) r*=values[i];
+    for (casadi_int i=0;i<values.size();++i) r*=values[i];
     return r;
   }
 
@@ -568,7 +589,7 @@ namespace casadi {
   std::vector<T> cumsum(const std::vector<T> &values) {
     std::vector<T> ret(values.size());
     T acc = 0;
-    for (int i=0;i<values.size();++i) {
+    for (casadi_int i=0;i<values.size();++i) {
       acc+= values[i];
       ret[i] = acc;
     }
@@ -579,7 +600,7 @@ namespace casadi {
   std::vector<T> cumsum0(const std::vector<T> &values) {
     std::vector<T> ret(values.size()+1, 0);
     T acc = 0;
-    for (int i=0;i<values.size();++i) {
+    for (casadi_int i=0;i<values.size();++i) {
       acc+= values[i];
       ret[i+1] = acc;
     }
@@ -589,7 +610,7 @@ namespace casadi {
   template<typename T>
   T dot(const std::vector<T>& a, const std::vector<T>& b) {
     T ret = 0;
-    for (int k=0; k<a.size(); ++k) {
+    for (casadi_int k=0; k<a.size(); ++k) {
       ret += a[k]*b[k];
     }
     return ret;
@@ -598,7 +619,7 @@ namespace casadi {
   template<typename T>
   T norm_inf(const std::vector<T>& x) {
     T ret = 0;
-    for (int k=0; k<x.size(); ++k) {
+    for (casadi_int k=0; k<x.size(); ++k) {
       ret = fmax(ret, fabs(x[k]));
     }
     return ret;
@@ -607,7 +628,7 @@ namespace casadi {
   template<typename T>
   T norm_1(const std::vector<T>& x) {
     T ret = 0;
-    for (int k=0; k<x.size(); ++k) {
+    for (casadi_int k=0; k<x.size(); ++k) {
       ret += fabs(x[k]);
     }
     return ret;
@@ -616,7 +637,7 @@ namespace casadi {
   template<typename T>
   T norm_2(const std::vector<T>& x) {
     T ret = 0;
-    for (int k=0; k<x.size(); ++k) {
+    for (casadi_int k=0; k<x.size(); ++k) {
       ret += x[k]*x[k];
     }
     return sqrt(ret);

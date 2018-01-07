@@ -63,10 +63,10 @@ public:
   ~OptiNode();
 
   /// Create a decision variable (symbol)
-  MX variable(int n=1, int m=1, const std::string& attribute="full");
+  MX variable(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
 
   /// Create a parameter (symbol); fixed during optimization
-  MX parameter(int n=1, int m=1, const std::string& attribute="full");
+  MX parameter(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
 
   /// Set objective
   void minimize(const MX& f);
@@ -168,12 +168,12 @@ public:
   std::vector<MX> active_symvar(VariableType type) const;
   std::vector<DM> active_values(VariableType type) const;
 
-  MX x_lookup(int i) const;
-  MX g_lookup(int i) const;
+  MX x_lookup(casadi_int i) const;
+  MX g_lookup(casadi_int i) const;
 
-  std::string x_describe(int i) const;
-  std::string g_describe(int i) const;
-  std::string describe(const MX& x, int indent=0) const;
+  std::string x_describe(casadi_int i) const;
+  std::string g_describe(casadi_int i) const;
+  std::string describe(const MX& x, casadi_int indent=0) const;
 
   void solve_prepare();
   DMDict solve_actual(const DMDict& args);
@@ -193,19 +193,19 @@ public:
   std::string class_name() const override { return "OptiNode"; }
 
   /// Number of (scalarised) decision variables
-  int nx() const {
+  casadi_int nx() const {
     if (problem_dirty()) return baked_copy().nx();
     return nlp_.at("x").size1();
   }
 
   /// Number of (scalarised) parameters
-  int np() const {
+  casadi_int np() const {
     if (problem_dirty()) return baked_copy().np();
     return nlp_.at("p").size1();
   }
 
   /// Number of (scalarised) constraints
-  int ng() const {
+  casadi_int ng() const {
     if (problem_dirty()) return baked_copy().ng();
     return nlp_.at("g").size1();
   }
@@ -257,7 +257,7 @@ public:
   /// Fix the structure of the optimization problem
   void bake();
 
-  int instance_number() const;
+  casadi_int instance_number() const;
 
   static OptiNode* create();
 
@@ -330,11 +330,11 @@ private:
   std::vector<MX> symbols_;
 
   /// Symbol counter
-  int count_;
+  casadi_int count_;
 
-  int count_var_;
-  int count_par_;
-  int count_dual_;
+  casadi_int count_var_;
+  casadi_int count_par_;
+  casadi_int count_dual_;
 
   /// Storing initial/latest values for all variables (including inactive)
   std::map< VariableType, std::vector<DM> > store_initial_, store_latest_;
@@ -374,13 +374,13 @@ private:
   void assert_only_opti_nondual(const MX& e) const;
 
 
-  static int instance_count_;
-  int instance_number_;
+  static casadi_int instance_count_;
+  casadi_int instance_number_;
 
 
   std::string name_prefix() const;
 
-  static std::string format_stacktrace(const Dict& stacktrace, int indent);
+  static std::string format_stacktrace(const Dict& stacktrace, casadi_int indent);
 
 };
 

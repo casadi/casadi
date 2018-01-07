@@ -188,6 +188,8 @@ namespace casadi {
   };
   #define NUM_BUILT_IN_OPS (OP_EINSTEIN+1)
 
+  #define OP_
+
 #ifndef SWIG
 
   ///@{
@@ -231,20 +233,20 @@ namespace casadi {
     return log(x + sqrt(1+x)*sqrt(x-1));
   }
 
-  inline int isnan(double x) throw() { return x!=x;}
-  inline int isinf(double x) throw() { return isnan(x-x);}
+  inline casadi_int isnan(double x) throw() { return x!=x;}
+  inline casadi_int isinf(double x) throw() { return isnan(x-x);}
 
   /// Sign function, note that sign(nan) == nan
   inline double sign(double x) { return x<0 ? -1 : x>0 ? 1 : x;}
 
   /// fmin, fmax and erf should be available if C99 and/or C++11 required
   inline double fmin(double x, double y) throw() { return std::min(x, y);}
-  inline int fmin(int x, int y) throw() { return std::min(x, y);}
+  inline casadi_int fmin(casadi_int x, casadi_int y) throw() { return std::min(x, y);}
   inline double fmax(double x, double y) throw() { return std::max(x, y);}
-  inline int fmax(int x, int y) throw() { return std::max(x, y);}
+  inline casadi_int fmax(casadi_int x, casadi_int y) throw() { return std::max(x, y);}
 
-  /// fabs(int) was added in C++11
-  inline int fabs(int x) throw() { return std::abs(x);}
+  /// fabs(casadi_int) was added in C++11
+  inline casadi_int fabs(casadi_int x) throw() { return std::abs(x);}
   ///@}
 
 #ifdef HAS_ERF
@@ -271,7 +273,7 @@ namespace casadi {
     std::cout << "|> " << y << " : " << x << std::endl;
     return x;
   }
-  inline bool is_equal(double x, double y, int depth=0) { return x==y;}
+  inline bool is_equal(double x, double y, casadi_int depth=0) { return x==y;}
 
   #ifdef HAS_COPYSIGN
   using std::copysign;
@@ -327,7 +329,7 @@ namespace casadi {
     return x*x;
   }
 
-  template<int I>
+  template<casadi_int I>
   struct UnaryOperation {
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, T& f);
@@ -336,7 +338,7 @@ namespace casadi {
     template<typename T> static inline void der(const T& x, const T& f, T* d);
   };
 
-  template<int I>
+  template<casadi_int I>
   struct BinaryOperation {
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) {
@@ -347,7 +349,7 @@ namespace casadi {
         UnaryOperation<I>::der(x, f, d); d[1]=0; }
   };
 
-  template<int I>
+  template<casadi_int I>
   struct BinaryOperationE {
     /// Function evaluation
     template<typename T> static inline T fcn(const T& x, const T& y) {
@@ -358,7 +360,7 @@ namespace casadi {
   };
 
   /// Calculate function and derivative
-  template<int I>
+  template<casadi_int I>
   struct DerBinaryOpertion {
     /// Perform the operation
     template<typename T> static inline void derf(const T& x, const T& y, T& f, T* d) {
@@ -380,69 +382,73 @@ namespace casadi {
   };
 
   /// Perform a binary operation on two scalars
-  template<int I>
+  template<casadi_int I>
   struct BinaryOperationSS {
     /// Function evaluation
-    template<typename T> static inline void fcn(const T& x, const T& y, T& f, int n) {
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f, casadi_int n) {
       BinaryOperation<I>::fcn(x, y, f);
     }
 
     /// Partial derivatives - binary function
-    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d, int n) {
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d,
+        casadi_int n) {
       BinaryOperation<I>::der(x, y, f, d);
     }
   };
 
 
   /// Perform a binary operation on two vectors
-  template<int I>
+  template<casadi_int I>
   struct BinaryOperationVV {
     /// Function evaluation
-    template<typename T> static inline void fcn(const T* x, const T* y, T* f, int n) {
-      for (int i=0; i<n; ++i) {
+    template<typename T> static inline void fcn(const T* x, const T* y, T* f, casadi_int n) {
+      for (casadi_int i=0; i<n; ++i) {
         BinaryOperation<I>::fcn(*x++, *y++, *f++);
       }
     }
 
     /// Partial derivatives - binary function
-    template<typename T> static inline void der(const T* x, const T* y, const T* f, T* d, int n) {
-      for (int i=0; i<n; ++i, d+=2) {
+    template<typename T> static inline void der(const T* x, const T* y,
+        const T* f, T* d, casadi_int n) {
+      for (casadi_int i=0; i<n; ++i, d+=2) {
         BinaryOperation<I>::der(*x++, *y++, *f++, d);
       }
     }
   };
 
   /// Perform a binary operation on a vector and a scalar
-  template<int I>
+  template<casadi_int I>
   struct BinaryOperationVS {
     /// Function evaluation
-    template<typename T> static inline void fcn(const T* x, const T& y, T* f, int n) {
-      for (int i=0; i<n; ++i) {
+    template<typename T> static inline void fcn(const T* x, const T& y, T* f, casadi_int n) {
+      for (casadi_int i=0; i<n; ++i) {
         BinaryOperation<I>::fcn(*x++, y, *f++);
       }
     }
 
     /// Partial derivatives - binary function
-    template<typename T> static inline void der(const T* x, const T& y, const T* f, T* d, int n) {
-      for (int i=0; i<n; ++i, d+=2) {
+    template<typename T> static inline void der(const T* x, const T& y,
+        const T* f, T* d, casadi_int n) {
+      for (casadi_int i=0; i<n; ++i, d+=2) {
         BinaryOperation<I>::der(*x++, y, *f++, d);
       }
     }
   };
 
   /// Perform a binary operation on a scalar and a vector
-  template<int I>
+  template<casadi_int I>
   struct BinaryOperationSV {
     /// Function evaluation
-    template<typename T> static inline void fcn(const T& x, const T* y, T* f, int n) {
-      for (int i=0; i<n; ++i) {
+    template<typename T> static inline void fcn(const T& x, const T* y, T* f, casadi_int n) {
+      for (casadi_int i=0; i<n; ++i) {
         BinaryOperation<I>::fcn(x, *y++, *f++);
       }
     }
 
     /// Partial derivatives - binary function
-    template<typename T> static inline void der(const T& x, const T* y, const T* f, T* d, int n) {
-      for (int i=0; i<n; ++i, d+=2) {
+    template<typename T> static inline void der(const T& x, const T* y,
+        const T* f, T* d, casadi_int n) {
+      for (casadi_int i=0; i<n; ++i, d+=2) {
         BinaryOperation<I>::der(x, *y++, *f++, d);
       }
     }
@@ -450,7 +456,7 @@ namespace casadi {
 
   ///@{
   /// Smoothness (by default true)
-  template<int I> struct SmoothChecker { static const bool check=true;};
+  template<casadi_int I> struct SmoothChecker { static const bool check=true;};
   template<>      struct SmoothChecker<OP_LT>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_LE>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_FLOOR>{ static const bool check=false;};
@@ -468,7 +474,7 @@ namespace casadi {
 
   ///@{
   /// If evaluated with the first argument zero, is the result zero?
-  template<int I> struct F0XChecker { static const bool check=false;};
+  template<casadi_int I> struct F0XChecker { static const bool check=false;};
   template<>      struct F0XChecker<OP_ASSIGN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_MUL>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_DIV>{ static const bool check=true;};
@@ -500,7 +506,7 @@ namespace casadi {
 
   ///@{
   /// If evaluated with the second argument zero, is the result zero?
-  template<int I> struct FX0Checker { static const bool check=false;};
+  template<casadi_int I> struct FX0Checker { static const bool check=false;};
   template<>      struct FX0Checker<OP_MUL>{ static const bool check=true;};
   template<>      struct FX0Checker<OP_AND>{ static const bool check=true;};
   template<>      struct FX0Checker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
@@ -508,7 +514,7 @@ namespace casadi {
 
   ///@{
   /// If evaluated with both arguments zero, is the result zero?
-  template<int I> struct F00Checker {
+  template<casadi_int I> struct F00Checker {
     static const bool check=F0XChecker<I>::check || FX0Checker<I>::check;
   };
   template<>      struct F00Checker<OP_ADD>{ static const bool check=true;};
@@ -523,7 +529,7 @@ namespace casadi {
 
   ///@{
   /// Is commutative
-  template<int I> struct CommChecker { static const bool check=false;};
+  template<casadi_int I> struct CommChecker { static const bool check=false;};
   template<>      struct CommChecker<OP_ADD>{ static const bool check=true;};
   template<>      struct CommChecker<OP_MUL>{ static const bool check=true;};
   template<>      struct CommChecker<OP_EQ>{ static const bool check=true;};
@@ -534,7 +540,7 @@ namespace casadi {
 
   ///@{
   /// Always non-negative (false by default)
-  template<int I> struct NonnegativeChecker { static const bool check=false;};
+  template<casadi_int I> struct NonnegativeChecker { static const bool check=false;};
   template<>      struct NonnegativeChecker<OP_SQRT>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_SQ>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_EXP>{ static const bool check=true;};
@@ -549,27 +555,27 @@ namespace casadi {
 
   ///@{
   /// Is the operation binary as opposed to unary
-  template<int I> struct NargChecker { static const int check=1;};
-  template<>      struct NargChecker<OP_ADD>{ static const int check=2;};
-  template<>      struct NargChecker<OP_SUB>{ static const int check=2;};
-  template<>      struct NargChecker<OP_MUL>{ static const int check=2;};
-  template<>      struct NargChecker<OP_DIV>{ static const int check=2;};
-  template<>      struct NargChecker<OP_POW>{ static const int check=2;};
-  template<>      struct NargChecker<OP_CONSTPOW>{ static const int check=2;};
-  template<>      struct NargChecker<OP_EQ>{ static const int check=2;};
-  template<>      struct NargChecker<OP_NE>{ static const int check=2;};
-  template<>      struct NargChecker<OP_AND>{ static const int check=2;};
-  template<>      struct NargChecker<OP_OR>{ static const int check=2;};
-  template<>      struct NargChecker<OP_FMIN>{ static const int check=2;};
-  template<>      struct NargChecker<OP_FMAX>{ static const int check=2;};
-  template<>      struct NargChecker<OP_PRINTME>{ static const int check=2;};
-  template<>      struct NargChecker<OP_ATAN2>{ static const int check=2;};
-  template<>      struct NargChecker<OP_IF_ELSE_ZERO>{ static const int check=2;};
-  template<>      struct NargChecker<OP_FMOD>{ static const int check=2;};
-  template<>      struct NargChecker<OP_COPYSIGN>{ static const int check=2;};
-  template<>      struct NargChecker<OP_CONST>{ static const int check=0;};
-  template<>      struct NargChecker<OP_PARAMETER>{ static const int check=0;};
-  template<>      struct NargChecker<OP_INPUT>{ static const int check=0;};
+  template<casadi_int I> struct NargChecker { static const casadi_int check=1;};
+  template<>      struct NargChecker<OP_ADD>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_SUB>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_MUL>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_DIV>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_POW>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_CONSTPOW>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_EQ>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_NE>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_AND>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_OR>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_FMIN>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_FMAX>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_PRINTME>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_ATAN2>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_IF_ELSE_ZERO>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_FMOD>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_COPYSIGN>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_CONST>{ static const casadi_int check=0;};
+  template<>      struct NargChecker<OP_PARAMETER>{ static const casadi_int check=0;};
+  template<>      struct NargChecker<OP_INPUT>{ static const casadi_int check=0;};
   ///@}
 
   /// Simple assignment
@@ -955,8 +961,8 @@ namespace casadi {
         d[0] = 1; d[1] = 0; }
   };
 
-  template<template<int> class F, typename T>
-  T operation_getter(unsigned int op) {
+  template<template<casadi_int> class F, typename T>
+  T operation_getter(casadi_int op) {
     switch (static_cast<Operation>(op)) {
     case OP_ASSIGN:        return F<OP_ASSIGN>::check;
     case OP_ADD:           return F<OP_ADD>::check;
@@ -1050,8 +1056,8 @@ namespace casadi {
     return T();
   }
 
-  template<template<int> class F>
-  bool operation_checker(unsigned int op) {
+  template<template<casadi_int> class F>
+  bool operation_checker(casadi_int op) {
     return operation_getter<F, bool>(op);
   }
 
@@ -1063,13 +1069,13 @@ namespace casadi {
     static inline void fun(unsigned char op, const T& x, const T& y, T& f);
 
     /** \brief Evaluate a built in function (vector-vector) */
-    static inline void fun(unsigned char op, const T* x, const T* y, T* f, int n);
+    static inline void fun(unsigned char op, const T* x, const T* y, T* f, casadi_int n);
 
     /** \brief Evaluate a built in function (vector-scalar) */
-    static inline void fun(unsigned char op, const T* x, const T& y, T* f, int n);
+    static inline void fun(unsigned char op, const T* x, const T& y, T* f, casadi_int n);
 
     /** \brief Evaluate a built in function (scalar-vector) */
-    static inline void fun(unsigned char op, const T& x, const T* y, T* f, int n);
+    static inline void fun(unsigned char op, const T& x, const T* y, T* f, casadi_int n);
 
     /** \brief Evaluate a built in derivative function */
     static inline void der(unsigned char op, const T& x, const T& y, const T& f, T* d);
@@ -1078,7 +1084,7 @@ namespace casadi {
     static inline void derF(unsigned char op, const T& x, const T& y, T& f, T* d);
 
     /** \brief Number of dependencies */
-    static inline int ndeps(unsigned char op);
+    static inline casadi_int ndeps(unsigned char op);
 
     /** \brief Print */
     static inline std::string print(unsigned char op, const std::string& x,
@@ -1092,60 +1098,66 @@ namespace casadi {
 
   /// Specialize the class so that it can be used with integer type
   template<>
-  struct casadi_math<int>{
+  struct casadi_math<casadi_int>{
 
     /** \brief Evaluate a built in function */
-    static inline void fun(unsigned char op, const int& x, const int& y, int& f) {
+    static inline void fun(unsigned char op, const casadi_int& x,
+        const casadi_int& y, casadi_int& f) {
       double ff(0);
       casadi_math<double>::fun(op, static_cast<double>(x), static_cast<double>(y), ff);
-      f = static_cast<int>(ff);
+      f = static_cast<casadi_int>(ff);
     }
 
-    static inline void fun(unsigned char op, const int* x, const int* y, int* f, int n) {
-      for (int i=0; i<n; ++i) {
+    static inline void fun(unsigned char op, const casadi_int* x, const casadi_int* y,
+        casadi_int* f, casadi_int n) {
+      for (casadi_int i=0; i<n; ++i) {
         double ff(0);
         casadi_math<double>::fun(op, static_cast<double>(*x++), static_cast<double>(*y++), ff);
-        *f++ = static_cast<int>(ff);
+        *f++ = static_cast<casadi_int>(ff);
       }
     }
 
-    static inline void fun(unsigned char op, const int* x, const int& y, int* f, int n) {
-      for (int i=0; i<n; ++i) {
+    static inline void fun(unsigned char op, const casadi_int* x, const casadi_int& y,
+        casadi_int* f, casadi_int n) {
+      for (casadi_int i=0; i<n; ++i) {
         double ff;
         casadi_math<double>::fun(op, static_cast<double>(*x++), static_cast<double>(y), ff);
-        *f++ = static_cast<int>(ff);
+        *f++ = static_cast<casadi_int>(ff);
       }
     }
 
-    static inline void fun(unsigned char op, const int& x, const int* y, int* f, int n) {
-      for (int i=0; i<n; ++i) {
+    static inline void fun(unsigned char op, const casadi_int& x, const casadi_int* y,
+        casadi_int* f, casadi_int n) {
+      for (casadi_int i=0; i<n; ++i) {
         double ff;
         casadi_math<double>::fun(op, static_cast<double>(x), static_cast<double>(*y++), ff);
-        *f++ = static_cast<int>(ff);
+        *f++ = static_cast<casadi_int>(ff);
       }
     }
 
     /** \brief Evaluate a built in derivative function */
-    static inline void der(unsigned char op, const int& x, const int& y, const int& f, int* d) {
+    static inline void der(unsigned char op, const casadi_int& x, const casadi_int& y,
+        const casadi_int& f, casadi_int* d) {
       double d_real[2] = {static_cast<double>(d[0]), static_cast<double>(d[1])};
       casadi_math<double>::der(op, static_cast<double>(x), static_cast<double>(y),
                                static_cast<double>(f), d_real);
-      d[0] = static_cast<int>(d_real[0]);
-      d[1] = static_cast<int>(d_real[1]);
+      d[0] = static_cast<casadi_int>(d_real[0]);
+      d[1] = static_cast<casadi_int>(d_real[1]);
     }
 
     /** \brief Evaluate the function and the derivative function */
-    static inline void derF(unsigned char op, const int& x, const int& y, int& f, int* d) {
+    static inline void derF(unsigned char op, const casadi_int& x, const casadi_int& y,
+        casadi_int& f, casadi_int* d) {
       double d_real[2] = {static_cast<double>(d[0]), static_cast<double>(d[1])};
-      double f_real(f);
+      double f_real = static_cast<double>(f);
       casadi_math<double>::derF(op, static_cast<double>(x), static_cast<double>(y), f_real, d_real);
-      f = static_cast<int>(f_real);
-      d[0] = static_cast<int>(d_real[0]);
-      d[1] = static_cast<int>(d_real[1]);
+      f = static_cast<casadi_int>(f_real);
+      d[0] = static_cast<casadi_int>(d_real[0]);
+      d[1] = static_cast<casadi_int>(d_real[1]);
     }
 
     /** \brief Number of dependencies */
-    static inline int ndeps(unsigned char op) {
+    static inline casadi_int ndeps(unsigned char op) {
       return casadi_math<double>::ndeps(op);
     }
 
@@ -1234,21 +1246,21 @@ namespace casadi {
   }
 
   template<typename T>
-  inline void casadi_math<T>::fun(unsigned char op, const T* x, const T* y, T* f, int n) {
+  inline void casadi_math<T>::fun(unsigned char op, const T* x, const T* y, T* f, casadi_int n) {
     switch (op) {
       CASADI_MATH_FUN_BUILTIN_GEN(BinaryOperationVV, x, y, f, n)
         }
   }
 
   template<typename T>
-  inline void casadi_math<T>::fun(unsigned char op, const T* x, const T& y, T* f, int n) {
+  inline void casadi_math<T>::fun(unsigned char op, const T* x, const T& y, T* f, casadi_int n) {
     switch (op) {
       CASADI_MATH_FUN_BUILTIN_GEN(BinaryOperationVS, x, y, f, n)
         }
   }
 
   template<typename T>
-  inline void casadi_math<T>::fun(unsigned char op, const T& x, const T* y, T* f, int n) {
+  inline void casadi_math<T>::fun(unsigned char op, const T& x, const T* y, T* f, casadi_int n) {
     switch (op) {
       CASADI_MATH_FUN_BUILTIN_GEN(BinaryOperationSV, x, y, f, n)
         }
@@ -1373,7 +1385,7 @@ namespace casadi {
   }
 
   template<typename T>
-  inline int casadi_math<T>::ndeps(unsigned char op) {
+  inline casadi_int casadi_math<T>::ndeps(unsigned char op) {
 #define CASADI_MATH_BINARY_BUILTIN              \
     case OP_ADD:                                \
   case OP_SUB:                                  \
