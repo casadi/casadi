@@ -92,7 +92,7 @@ namespace casadi {
               const std::vector<int>& offset,
               const std::vector<double>& values,
               int m)
-              : FunctionInternal(name), grid_(grid), offset_(offset), values_(values), m_(m) {
+              : FunctionInternal(name), m_(m), grid_(grid), offset_(offset),  values_(values) {
     // Number of grid points
     ndim_ = offset_.size()-1;
   }
