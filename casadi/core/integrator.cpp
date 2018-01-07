@@ -1051,7 +1051,7 @@ namespace casadi {
 
     // Number of finite elements and time steps
     casadi_assert_dev(nk_>0);
-    h_ = (grid_.back() - grid_.front())/nk_;
+    h_ = static_cast<double>(grid_.back() - grid_.front())/nk_;
 
     // Setup discrete time dynamics
     setupFG();
