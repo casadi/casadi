@@ -824,6 +824,12 @@ void OptiNode::subject_to(const MX& g) {
   mark_problem_dirty();
   g_.push_back(g);
 
+  casadi_assert(g.is_empty(),     "You passed an empty expression to `subject_to`. "
+                                  "Make sure the number of rows and columns is non-zero. "
+                                  "Got " + g.dim(true) + ".");
+  casadi_assert(g.nnz()>0,        "You passed a fully sparse expression to `subject_to`. "
+                                  "Make sure the expression has at least one nonzero. "
+                                  "Got " + g.dim(true) + ".");
   casadi_assert(!g.is_constant(), "You passed a constant to `subject_to`. "
                                   "You need a symbol to form a constraint.");
 
