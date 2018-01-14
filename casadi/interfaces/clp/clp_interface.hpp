@@ -31,6 +31,7 @@
 #include "ClpSimplex.hpp"
 #include "ClpFactorization.hpp"
 #include "ClpNetworkMatrix.hpp"
+#include "ClpEventHandler.hpp"
 
 #include <string>
 
@@ -51,6 +52,9 @@ namespace casadi {
 
     /// Destructor
     ~ClpMemory();
+
+    int return_status;
+    int secondary_return_status;
   };
 
   /** \brief \pluginbrief{Conic,clp}
@@ -93,6 +97,9 @@ namespace casadi {
 
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<ClpMemory*>(mem);}
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     // Solve the QP
     int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
