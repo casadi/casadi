@@ -328,7 +328,8 @@ namespace casadi {
           res = MX::zeros(isp)->get_nzassign(res, r_nz);
         }
 
-        // Get the nz locations of the elements in arg corresponding to the argument sparsity pattern
+        // Get the nz locations of the elements in arg corresponding to the argument
+        // sparsity pattern
         arg.sparsity().find(r_nz);
         isp.get_nz(r_nz);
 
