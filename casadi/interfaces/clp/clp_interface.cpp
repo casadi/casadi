@@ -174,6 +174,16 @@ namespace casadi {
     }
   }
 
+  class CasadiHandler : public CoinMessageHandler {
+    public:
+      virtual int print() ;
+  };
+
+  int CasadiHandler::print() {
+    uout() << messageBuffer() << std::endl;
+    return 0;
+  }
+
   void ClpInterface::init(const Dict& opts) {
     // Call the init method of the base class
     Conic::init(opts);
@@ -246,6 +256,9 @@ namespace casadi {
     ClpSimplex model;
     model.loadProblem(A_.size2(), A_.size1(), get_ptr(m->colind), get_ptr(m->row), A,
                       lbx, ubx, g, lba, uba, nullptr);
+
+    CasadiHandler ch;
+    model.passInMessageHandler(&ch);
 
     m->fstats.at("preprocessing").toc();
     m->fstats.at("solver").tic();
