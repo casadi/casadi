@@ -586,7 +586,7 @@ namespace casadi {
 
   std::vector<int> Sparsity::etree(bool ata) const {
     vector<int> parent(size2()), w(size1() + size2());
-    casadi_etree(*this, get_ptr(parent), get_ptr(w), ata);
+    SparsityInternal::etree(*this, get_ptr(parent), get_ptr(w), ata);
     return parent;
   }
 
@@ -623,16 +623,16 @@ namespace casadi {
 
     // Initialize QP solve
     int nrow_ext, v_nnz, r_nnz;
-    casadi_qr_init(*this, T(),
-                   get_ptr(leftmost), get_ptr(parent), get_ptr(pinv),
-                   &nrow_ext, &v_nnz, &r_nnz, get_ptr(iw));
+    SparsityInternal::qr_init(*this, T(),
+                              get_ptr(leftmost), get_ptr(parent), get_ptr(pinv),
+                              &nrow_ext, &v_nnz, &r_nnz, get_ptr(iw));
 
     // Calculate sparsities
     vector<int> sp_v(2 + size2 + 1 + v_nnz);
     vector<int> sp_r(2 + size2 + 1 + r_nnz);
-    casadi_qr_sparsities(*this, nrow_ext, get_ptr(sp_v), get_ptr(sp_r),
-                       get_ptr(leftmost), get_ptr(parent), get_ptr(pinv),
-                       get_ptr(iw));
+    SparsityInternal::qr_sparsities(*this, nrow_ext, get_ptr(sp_v), get_ptr(sp_r),
+                                    get_ptr(leftmost), get_ptr(parent), get_ptr(pinv),
+                                    get_ptr(iw));
     V = compressed(sp_v);
     R = compressed(sp_r);
   }
@@ -651,14 +651,14 @@ namespace casadi {
       // Allocate work
       w.resize(size1+size2);
       // Calculate elimination tree
-      casadi_etree(*this, get_ptr(parent), get_ptr(w), ata);
+      SparsityInternal::etree(*this, get_ptr(parent), get_ptr(w), ata);
       // Calculate postorder
       w.resize(3*size2);
-      casadi_postorder(get_ptr(parent), size2, get_ptr(post), get_ptr(w));
+      SparsityInternal::postorder(get_ptr(parent), size2, get_ptr(post), get_ptr(w));
       // Calculate colind in L
       w.resize(size1 + 5*size2 + 1);
-      casadi_qr_counts(T(), get_ptr(parent), get_ptr(post),
-                       get_ptr(count), get_ptr(w));
+      SparsityInternal::qr_counts(T(), get_ptr(parent), get_ptr(post),
+                                  get_ptr(count), get_ptr(w));
       // Not implemented
       L = Sparsity();
     } else {
@@ -666,7 +666,7 @@ namespace casadi {
       L = ldl(parent) + diag(size2, size2);
       // Calculate postorder
       w.resize(3*size2);
-      casadi_postorder(get_ptr(parent), size2, get_ptr(post), get_ptr(w));
+      SparsityInternal::postorder(get_ptr(parent), size2, get_ptr(post), get_ptr(w));
       // Calculate column counts
       const int* L_colind = L.colind();
       for (int i=0; i<size2; ++i) count[i] = L_colind[i+1] - L_colind[i];

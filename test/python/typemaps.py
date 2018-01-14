@@ -25,6 +25,7 @@ from casadi import *
 import casadi as c
 import numpy
 import numpy as n
+import sys
 from numpy import array, double, int32, atleast_2d, ones, matrix, zeros
 import unittest
 from types import *
@@ -44,6 +45,23 @@ class typemaptests(casadiTestCase):
   def setUp(self):
     pass
 
+  def test_memleak(self):
+  
+   a = numpy.array([[0, 0]])
+   self.assertEqual(sys.getrefcount(a), 2)
+   casadi.DM(a)
+   self.assertEqual(sys.getrefcount(a), 2)
+   casadi.DM(a)
+   self.assertEqual(sys.getrefcount(a), 2)
+   casadi.IM(a)
+   self.assertEqual(sys.getrefcount(a), 2)   
+   casadi.IM(a)
+   self.assertEqual(sys.getrefcount(a), 2)
+   casadi.SX(a)
+   self.assertEqual(sys.getrefcount(a), 2)   
+   casadi.SX(a)
+   self.assertEqual(sys.getrefcount(a), 2)
+   
   def test_0a(self):
     self.message("Typemap array -> IM")
     arrays = [array([[1,2,3],[4,5,6]],dtype=int32),array([[1,2,3],[4,5,6]]),array([[1,2,3],[4,5,6]],dtype=int)]

@@ -256,7 +256,7 @@ namespace casadi {
   }
 
   int Lsqr::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
-    auto m = static_cast<LsqrMemory*>(mem);
+    //auto m = static_cast<LsqrMemory*>(mem);
 
     int n_ = ncol();
 

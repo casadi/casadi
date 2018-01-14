@@ -705,26 +705,27 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
       // case: g(x,p) <= bound(p)
       MX e = args[0]-args[1];
       if (e.is_vector()) {
-        casadi_assert_dev(!parametric[0] || !parametric[1]);
+        casadi_assert(!parametric[0] || !parametric[1],
+          "Constraint must contain decision variables.");
         con.type = OPTI_INEQUALITY;
         if (parametric[0]) {
           con.lb = args[0]*DM::ones(e.sparsity());
           con.ub = inf*DM::ones(e.sparsity());
-          con.canon = args[1];
+          con.canon = args[1]*DM::ones(e.sparsity());
         } else {
           con.lb = -inf*DM::ones(e.sparsity());
           con.ub = args[1]*DM::ones(e.sparsity());
-          con.canon = args[0];
+          con.canon = args[0]*DM::ones(e.sparsity());
         }
         return con;
       }
       // Fall through to generic inequalities
-    } else if (args.size()==3 && (parametric[0] || parametric[2])) {
+    } else if (args.size()==3 && parametric[0] && parametric[2]) {
       // lb(p) <= g(x,p) <= ub(p)
       con.type = OPTI_DOUBLE_INEQUALITY;
       con.lb = args[0]*DM::ones(args[1].sparsity());
       con.ub = args[2]*DM::ones(args[1].sparsity());
-      con.canon = args[1];
+      con.canon = args[1]*DM::ones(args[1].sparsity());
       con.flipped = flipped;
       con.n = 2;
       return con;
@@ -764,16 +765,21 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
     }
     return con;
   } else if (c.is_op(OP_EQ)) { // Inequalities
-
+    casadi_assert(!is_parametric(c.dep(0)) || !is_parametric(c.dep(1)),
+      "Constraint must contain decision variables.");
     MX e = c.dep(0)-c.dep(1);
     if (is_parametric(c.dep(0))) {
-      con.canon = c.dep(1);
+      con.canon = c.dep(1)*DM::ones(e.sparsity());
       con.lb = c.dep(0)*DM::ones(e.sparsity());
       con.type = OPTI_EQUALITY;
+      casadi_assert(c.dep(0).size1()<=c.dep(1).size1() && c.dep(0).size2()<=c.dep(1).size2(),
+        "Constraint shape mismatch.");
     } else if (is_parametric(c.dep(1))) {
-      con.canon = c.dep(0);
+      con.canon = c.dep(0)*DM::ones(e.sparsity());
       con.lb = c.dep(1)*DM::ones(e.sparsity());
       con.type = OPTI_EQUALITY;
+      casadi_assert(c.dep(1).size1()<=c.dep(0).size1() && c.dep(1).size2()<=c.dep(0).size2(),
+        "Constraint shape mismatch.");
     } else {
       con.lb = DM::zeros(e.sparsity());
       con.canon = e;
@@ -817,6 +823,15 @@ void OptiNode::subject_to(const MX& g) {
   assert_only_opti_nondual(g);
   mark_problem_dirty();
   g_.push_back(g);
+
+  casadi_assert(g.is_empty(),     "You passed an empty expression to `subject_to`. "
+                                  "Make sure the number of rows and columns is non-zero. "
+                                  "Got " + g.dim(true) + ".");
+  casadi_assert(g.nnz()>0,        "You passed a fully sparse expression to `subject_to`. "
+                                  "Make sure the expression has at least one nonzero. "
+                                  "Got " + g.dim(true) + ".");
+  casadi_assert(!g.is_constant(), "You passed a constant to `subject_to`. "
+                                  "You need a symbol to form a constraint.");
 
   // Store the meta-data
   set_meta_con(g, canon_expr(g));

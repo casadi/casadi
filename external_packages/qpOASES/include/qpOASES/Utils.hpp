@@ -88,6 +88,10 @@ returnValue print(  const int_t* const index,   /**< Index array to be printed. 
 returnValue myPrintf(   const char* s   /**< String to be written. */
                         );
 
+/** Sets a custom printing function.
+  * \return SUCCESSFUL_RETURN */
+returnValue setPrintf( printf_t pf /**< custom printing function. */
+                      );
 
 /** Prints qpOASES copyright notice.
  * \return SUCCESSFUL_RETURN */
@@ -216,14 +220,14 @@ inline real_t getSign(  real_t arg  /**< real-valued argument whose sign is to b
 inline int_t getMax(    int_t x,    /**< First integer. */
                         int_t y     /**< Second integer. */
                         );
-                    
+
 /** Returns minimum of two integers.
  * \return  Minimum of two integers */
 inline int_t getMin(    int_t x,    /**< First integer. */
                         int_t y     /**< Second integer. */
                         );
 
-    
+
 /** Returns maximum of two reals.
  * \return  Maximum of two reals */
 inline real_t getMax(   real_t x,   /**< First real number. */
@@ -307,7 +311,7 @@ returnValue convertPrintLevelToString(  PrintLevel value,       /**< Value to be
                                         );
 
 
-/** Converts a returnValue from an (S)QProblem(B) object into a more 
+/** Converts a returnValue from an (S)QProblem(B) object into a more
  *  simple status flag.
  *
  * \return  0: QP problem solved
@@ -349,7 +353,7 @@ extern "C" void gdb_printmat(   const char *fname,          /**< File name. */
 
 #if defined(__DSPACE__) || defined(__XPCTARGET__) || defined(__C_WRAPPER__)
 extern "C" void __cxa_pure_virtual( void );
-#endif /* __DSPACE__ || __XPCTARGET__*/ 
+#endif /* __DSPACE__ || __XPCTARGET__*/
 
 
 

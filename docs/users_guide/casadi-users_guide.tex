@@ -2744,7 +2744,7 @@ In the following, we will outline the legacy approach, using
 \python{parse_fmi}.
 
 \subsection*{Legacy import of a \texttt{modelDescription.xml} file}
-To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/tested/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} and \htmladdnormallink{cstr.cpp}{https://github.com/casadi/casadi/blob/tested/examples/cplusplus/cstr.cpp} in \CasADi's example collection.
+To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/master/docs/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} in \CasADi's example collection.
 
 Assuming that the Modelica/Optimica model \texttt{ModelicaClass.ModelicaModel} is defined in the files \texttt{file1.mo} and \texttt{file2.mop}, the Python compile command is:
 \begin{lstlisting}[language=Python]
@@ -3222,6 +3222,7 @@ After setting up the problem, you may call the solve method, which constructs a 
 \begin{lstlisting}[language=Python]
 sol = opti.solve()
 \end{lstlisting}
+The call will fail with an error if the solver fails to convergence. You may still inspect the non-converged solution (see Section 'extra').
 
 You may call \python{solve} any number of times. You will always get an immutable copy of the problem specification and its solution.
 Consecutively calling \python{solve} will not help the convergence of the problem.
@@ -3231,6 +3232,13 @@ To warm start a solver, you need to explicitly transfer the solution of one prob
 sol1 = opti.solve()
 opti.set_initial(sol1.value_variables())
 sol2 = opti.solve()
+\end{lstlisting}
+
+In order to initialize the dual variables, e.g. when solving a set of similar optimization problems, you can use the following syntax:
+\begin{lstlisting}[language=Python]
+sol = opti.solve()
+lam_g0 = sol.value(opti.lam_g)
+opti.set_initial(opti.lam_g, lam_g0)
 \end{lstlisting}
 
 \paragraph{Numerical value at the solution}

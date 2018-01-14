@@ -353,6 +353,10 @@ typedef int_t (*linsol_nfact_t)(linsol_memory_t mem,
 typedef int_t (*linsol_solve_t)(linsol_memory_t mem,
                                 int_t nrhs, real_t* rhs);
 
+/** Custom printing function.
+  */
+typedef void (*printf_t)(const char* s);
+
 END_NAMESPACE_QPOASES
 
 

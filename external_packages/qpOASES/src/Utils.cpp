@@ -218,6 +218,11 @@ returnValue print( const int_t* const index, int_t n, const char* name )
     return SUCCESSFUL_RETURN;
 }
 
+static printf_t custom_printfun = 0;
+returnValue setPrintf( printf_t pf ) {
+  custom_printfun = pf;
+  return SUCCESSFUL_RETURN;
+}
 
 /*
  *  m y P r i n t f
@@ -225,7 +230,6 @@ returnValue print( const int_t* const index, int_t n, const char* name )
 returnValue myPrintf( const char* s )
 {
     #ifndef __SUPPRESSANYOUTPUT__
-
 
         if ( s == 0 )
             return RET_INVALID_ARGUMENTS;
@@ -236,10 +240,14 @@ returnValue myPrintf( const char* s )
             #ifdef __SCILAB__
                 sciprint( s );
             #else
+              if (custom_printfun) {
+                custom_printfun(s);
+              } else {
                 FILE* outputfile = getGlobalMessageHandler( )->getOutputFile( );
                 if ( outputfile == 0 )
                     return THROWERROR( RET_NO_GLOBAL_MESSAGE_OUTPUTFILE );
                 fprintf( outputfile, "%s", s );
+              }
             #endif /* __SCILAB__ */
         #endif /* __MATLAB__ */
 
