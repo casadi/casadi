@@ -34,25 +34,28 @@ if has_nlpsol("ipopt"):
                    "jac_d_constant":"yes",
                    "hessian_constant":"yes",
                    "tol":1e-12}
-  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{}))
+  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True}))
 
 if has_nlpsol("worhp"):
   worhp_options = {"TolOpti":1e-13}
-  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1}))
+  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True}))
 
 
 if has_conic("ooqp"):
-  conics.append(("ooqp",{},{"less_digits":1}))
+  conics.append(("ooqp",{},{"less_digits":1,"quadratic": True}))
 
 if has_conic("qpoases"):
-  conics.append(("qpoases",{},{}))
+  conics.append(("qpoases",{},{"quadratic": True}))
 
 if has_conic("cplex"):
-  conics.append(("cplex",{},{}))
+  conics.append(("cplex",{},{"quadratic": True}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
 
+if has_conic("clp"):
+  conics.append(("clp",{"verbose":True},{"quadratic": False}))
+  
 print(conics)
 
 class ConicTests(casadiTestCase):
@@ -141,7 +144,7 @@ class ConicTests(casadiTestCase):
 
     for conic, qp_options, aux_options in conics:
       self.message("general_convex: " + str(conic))
-
+      if not aux_options["quadratic"]: continue
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
@@ -173,6 +176,7 @@ class ConicTests(casadiTestCase):
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
 
     for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
       self.message("general_convex: " + str(conic))
 
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
@@ -209,6 +213,7 @@ class ConicTests(casadiTestCase):
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
 
     for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
       self.message("general_convex: " + str(conic))
 
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
@@ -349,6 +354,7 @@ class ConicTests(casadiTestCase):
 
 
     for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
       self.message("general_convex: " + str(conic))
 
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
@@ -504,6 +510,7 @@ class ConicTests(casadiTestCase):
     UBX = DM([10])
 
     for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
       self.message("degenerate hessian: " + str(conic))
       if 'qcqp' in str(conic): continue
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
@@ -550,6 +557,7 @@ class ConicTests(casadiTestCase):
 
 
     for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
       self.message("no inequality: " + str(conic))
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
@@ -595,6 +603,7 @@ class ConicTests(casadiTestCase):
 
 
     for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
       if "cplex" in str(conic):
         continue
       self.message("no A: " + str(conic))
@@ -636,6 +645,7 @@ class ConicTests(casadiTestCase):
     UBX = DM([10])
 
     for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
 
@@ -679,6 +689,7 @@ class ConicTests(casadiTestCase):
     UBX = DM([1000]*N)
 
     for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
       if 'cplex' in str(conic):
         continue
       if 'worhp' in str(conic): # works but occasionaly throws segfaults, ulimit on travis?
@@ -724,6 +735,7 @@ class ConicTests(casadiTestCase):
       options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
 
       for conic, qp_options, aux_options in conics:
+        if not aux_options["quadratic"]: continue
         if 'qcqp' in str(conic): continue
         solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
