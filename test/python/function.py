@@ -1384,26 +1384,26 @@ class Functiontests(casadiTestCase):
 
       nlp = {"x": x, "f": x**2}
 
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp)
       self.assertTrue("nlp_f" not in out[0])
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":True}})
       self.assertTrue("nlp_f" in out[0])
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_f" : {"verbose":True}}})
       self.assertTrue("nlp_f" in out[0])
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":True},"specific_options":{ "nlp_f" : {"verbose":False}}})
       self.assertTrue("nlp_f" not in out[0])
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":False},"specific_options":{ "nlp_f" : {"verbose":True}}})
       self.assertTrue("nlp_f" in out[0])
 
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp)
       self.assertTrue(len(out[1])==0)
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : {"verbose":True}}})
       self.assertTrue("Ignoring" + out[1])
       self.assertTrue("nlp_g" in out[1])
