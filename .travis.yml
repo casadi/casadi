@@ -243,10 +243,7 @@ matrix:
         - brew update
         - brew tap homebrew/science
         - brew outdated swig ; brew install swig
-        #- brew outdated pkg-config || brew install pkg-config
-        #- brew doctor
-        - sudo easy_install pip
-        - pip install matplotlib numpy scipy
+        - python_setup
       script:
         - mkdir build
         - pushd build
