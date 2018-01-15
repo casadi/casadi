@@ -83,6 +83,9 @@ namespace casadi {
     /// Last return status
     const char* return_status;
 
+    /// Iteration count
+    int iter_count;
+
   };
 
   /** \brief  \pluginbrief{Nlpsol,sqpmethod}

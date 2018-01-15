@@ -326,6 +326,8 @@ namespace casadi {
 
     // Jacobian
     m->Jk = w; w += Asp_.nnz();
+
+    m->iter_count = -1;
   }
 
   void Sqpmethod::solve(void* mem) const {
@@ -673,6 +675,8 @@ namespace casadi {
       }
     }
 
+    m->iter_count = iter;
+
     // Save results to outputs
     if (m->f) *m->f = m->fk;
     if (m->x) casadi_copy(m->xk, nx_, m->x);
@@ -779,6 +783,7 @@ namespace casadi {
     Dict stats = Nlpsol::get_stats(mem);
     auto m = static_cast<SqpmethodMemory*>(mem);
     stats["return_status"] = m->return_status;
+    stats["iter_count"] = m->iter_count;
     return stats;
   }
 } // namespace casadi
