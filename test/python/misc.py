@@ -326,7 +326,7 @@ class Misctests(casadiTestCase):
   def test_output(self):
     with capture_stdout() as result:
       DM([1,2]).print_dense()
-    print result
+
 
     assert "2" in result[0]
 
