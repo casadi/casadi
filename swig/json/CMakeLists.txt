@@ -28,7 +28,7 @@ set(CPACK_COMPONENTS_ALL Unspecified componentjson)
 
 # Pass meta information
 configure_file(
-  ${CMAKE_SOURCE_DIR}/swig/linklist.txt.cmake
+  ${PROJECT_SOURCE_DIR}/swig/linklist.txt.cmake
   ${PROJECT_BINARY_DIR}/swig/linklist.txt
   ESCAPE_QUOTES
 )
