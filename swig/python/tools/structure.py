@@ -570,7 +570,7 @@ class GetterDispatcher(Dispatcher):
 
       try:
         if type is None:
-          return self.master[i]
+          return self.master[i].T if i.is_vector() and i.is_row() else self.master[i]
         elif type=="symm":
           return triu2symm(self.master[i])
         else:
