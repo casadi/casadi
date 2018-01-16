@@ -188,6 +188,10 @@ class TestSuite:
       if m:
         self.skipfiles+=m.group(1).split(' ')
         okay = True
+      m = re.search('-skipdirs=(.*)', arg)
+      if m:
+        self.skipdirs+=m.group(1).split(' ')
+        okay = True
       m = re.search('-memcheck', arg)
       if m:
         self.memcheck = True
