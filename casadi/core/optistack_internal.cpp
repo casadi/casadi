@@ -971,6 +971,19 @@ DMDict OptiNode::solve_actual(const DMDict& arg) {
   return solver_(arg);
 }
 
+bool override_num(const std::map<int, MX> & temp, std::vector<DM>& num, int i) {
+  // Override when values are supplied
+  auto it = temp.find(i);
+  if (it==temp.end()) {
+    return true;
+  } else {
+    Slice all;
+    DM t = static_cast<DM>(it->second);
+    num.back().set(t, false, all, all);
+  }
+  return false;
+}
+
 DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
   std::vector<MX> x   = symvar(expr, OPTI_VAR);
   std::vector<MX> p   = symvar(expr, OPTI_PAR);
@@ -981,31 +994,41 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
     casadi_error("This expression has symbols that are not defined "
       "within Opti using variable/parameter.");
 
-
-  std::map<int, MX> temp;
+  std::map<VariableType, std::map<int, MX> > temp;
+  temp[OPTI_DUAL_G] = std::map<int, MX>();
   for (const auto& v : values) {
     casadi_assert_dev(v.is_op(OP_EQ));
     int i = meta(v.dep(1)).i;
     casadi_assert_dev(v.dep(0).is_constant());
-    temp[i] = v.dep(0);
+    temp[meta(v.dep(1)).type][i] = v.dep(0);
   }
 
   bool undecided_vars = false;
   std::vector<DM> x_num;
   for (const auto& e : x) {
     int i = meta(e).i;
-    x_num.push_back(store_latest_.at(OPTI_VAR)[i]);
+    x_num.push_back(store_latest_.at(OPTI_VAR).at(i));
+    undecided_vars |= override_num(temp[OPTI_VAR], x_num, i);
+  }
 
-    // Override when values are supplied
-    auto it = temp.find(i);
-    if (it==temp.end()) {
-      undecided_vars = true;
-    } else {
-      Slice all;
-      DM t = static_cast<DM>(it->second);
-      x_num.back().set(t, false, all, all);
-    }
+  std::vector<DM> lam_num;
+  for (const auto& e : lam) {
+    int i = meta(e).i;
+    casadi_assert(i<store_latest_.at(OPTI_DUAL_G).size(),
+      "This expression has a dual for a constraint that is not given to Opti:\n" +
+      describe(e, 1));
+    lam_num.push_back(store_latest_.at(OPTI_DUAL_G).at(i));
+    undecided_vars |= override_num(temp[OPTI_DUAL_G], lam_num, i);
+  }
 
+  std::vector<DM> p_num;
+  for (const auto& e : p) {
+    int i = meta(e).i;
+    p_num.push_back(store_initial_.at(OPTI_PAR).at(i));
+    override_num(temp[OPTI_PAR], p_num, i);
+    casadi_assert(p_num.back().is_regular(),
+      "This expression depends on a parameter with unset value:\n"+
+      describe(e, 1));
   }
 
   if (undecided_vars) {
@@ -1014,22 +1037,10 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
       casadi_assert(symbol_active_[meta(e).count],
         "This expression has symbols that do not appear in the constraints and objective:\n" +
         describe(e, 1));
-  }
-
-  std::vector<DM> p_num;
-  for (const auto& e : p) {
-    p_num.push_back(store_initial_.at(OPTI_PAR)[meta(e).i]);
-  }
-
-  std::vector<DM> lam_num;
-  if (lam.size()>0) {
-    assert_solved();
-    for (const auto& e : lam) {
+    for (const auto& e : lam)
       casadi_assert(symbol_active_[meta(e).count],
         "This expression has a dual for a constraint that is not given to Opti:\n" +
         describe(e, 1));
-      lam_num.push_back(store_latest_.at(OPTI_DUAL_G)[meta(e).i]);
-    }
   }
 
   std::vector<DM> arg = helper(std::vector<DM>{veccat(x_num), veccat(p_num), veccat(lam_num)});

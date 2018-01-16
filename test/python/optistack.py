@@ -780,5 +780,43 @@ class OptiStacktests(inherit_from):
           opti.subject_to(vertcat(1,2,3)==x[0])
 
 
+    def test_value(self):
+        opti = Opti()
+        x = opti.variable()
+        y = opti.variable()
+        z = opti.variable()
+        p = opti.parameter()
+        q = opti.parameter()
+        g = x-p>=0
+        opti.subject_to(g)
+        opti.minimize(x**2+(y-3)**2)
+        lam = opti.dual(g)
+        
+        self.assertEqual(opti.debug.value(p**3,[p==2]),8)
+        self.assertEqual(opti.debug.value(x**3,[x==2]),8)
+        self.assertEqual(opti.debug.value(x+p,[x==2,p==3]),5)
+        self.assertEqual(opti.debug.value(lam**3,[opti.lam_g==2]),8)
+        with self.assertInException("This expression depends on a parameter with unset value"):
+          opti.debug.value(p**3)
+        with self.assertInException("This action is forbidden since you have not solved"):
+          opti.debug.value(x**3)
+        with self.assertInException("This action is forbidden since you have not solved"):
+          opti.debug.value(lam**3)
+        opti.solver("ipopt")
+        
+        opti.set_value(p,2)
+        sol = opti.solve()
+        self.assertEqual(opti.debug.value(p**2),4)
+        self.assertEqual(opti.debug.value(p**2,[p==3]),9)
+        self.checkarray(opti.debug.value(x**2),4,digits=5)
+        self.checkarray(opti.debug.value(x**2,[x==3]),9)
+        self.checkarray(opti.debug.value(lam**2),16,digits=5)
+        self.checkarray(opti.debug.value(lam**2,[opti.lam_g==1]),1,digits=5)
+        with self.assertInException("This expression has symbols that do not appear in the constraints and objective:"):
+          opti.debug.value(z**3)
+        self.assertEqual(opti.debug.value(z**3,[z==2]),8)
+        with self.assertInException("This expression depends on a parameter with unset value"):
+          opti.debug.value(q)
+
 if __name__ == '__main__':
     unittest.main()
