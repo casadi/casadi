@@ -288,6 +288,23 @@ MX Opti::f() const {
   }
 }
 
+MX Opti::lbg() const {
+  try {
+    return (*this)->lbg();
+  } catch (exception& e) {
+    THROW_ERROR("lbg", e.what());
+  }
+}
+
+MX Opti::ubg() const {
+  try {
+    return (*this)->ubg();
+  } catch (exception& e) {
+    THROW_ERROR("ubg", e.what());
+  }
+}
+
+
 MX Opti::lam_g() const {
   try {
     return (*this)->lam_g();

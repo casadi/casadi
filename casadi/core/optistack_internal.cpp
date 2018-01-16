@@ -606,8 +606,11 @@ void OptiNode::bake() {
   // Create bounds helper function
   MXDict bounds;
   bounds["p"] = nlp_["p"];
-  bounds["lbg"] = veccat(lbg_all);
-  bounds["ubg"] = veccat(ubg_all);
+  bounds_lbg_ = veccat(lbg_all);
+  bounds_ubg_ = veccat(ubg_all);
+
+  bounds["lbg"] = bounds_lbg_;
+  bounds["ubg"] = bounds_ubg_;
 
   bounds_ = Function("bounds", bounds, {"p"}, {"lbg", "ubg"});
   mark_problem_dirty(false);

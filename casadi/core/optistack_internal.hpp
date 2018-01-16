@@ -234,6 +234,16 @@ public:
     return nlp_.at("f");
   }
 
+  MX lbg() const {
+    if (problem_dirty()) return baked_copy().lbg();
+    return bounds_lbg_;
+  }
+
+  MX ubg() const {
+    if (problem_dirty()) return baked_copy().ubg();
+    return bounds_ubg_;
+  }
+
   /// Get dual variables as a symbolic column vector
   MX lam_g() const {
     if (problem_dirty()) return baked_copy().lam_g();
@@ -343,6 +353,8 @@ private:
 
   /// Bounds helper function: p -> lbg, ubg
   Function bounds_;
+  MX bounds_lbg_;
+  MX bounds_ubg_;
 
   /// Constraints verbatim as passed in with 'subject_to'
   std::vector<MX> g_;

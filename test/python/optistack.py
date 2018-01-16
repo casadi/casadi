@@ -818,5 +818,25 @@ class OptiStacktests(inherit_from):
         with self.assertInException("This expression depends on a parameter with unset value"):
           opti.debug.value(q)
 
+    def test_introspection(self):
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      p = opti.parameter()
+      
+      opti.minimize((x-y**2)**2)
+      opti.subject_to(x+y+p>=1)
+      opti.subject_to(z+x>=1)
+      
+      opti.solver('ipopt')
+      opti.set_value(p, 3)
+      sol = opti.solve()
+
+      solver = nlpsol("solver","ipopt",{"x": opti.x, "f": opti.f, "g": opti.g, "p": opti.p})
+      sol2 = solver(p=sol.value(p),lbg=sol.value(opti.lbg),ubg=sol.value(opti.ubg))
+      
+      self.checkarray(sol2["x"],sol.value(opti.x))
+      
 if __name__ == '__main__':
     unittest.main()

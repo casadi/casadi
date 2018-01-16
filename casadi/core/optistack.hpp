@@ -251,6 +251,10 @@ public:
   /// Get objective expression
   MX f() const;
 
+  /// Get all (scalarised) bounds on constraints as a column vector
+  MX lbg() const;
+  MX ubg() const;
+
   /** \brief Get all (scalarised) dual variables as a symbolic column vector
   *
   * Useful for obtaining the Lagrange Hessian:
