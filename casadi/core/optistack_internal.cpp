@@ -234,6 +234,11 @@ OptiNode::OptiNode() : count_(0), count_var_(0), count_par_(0), count_dual_(0) {
   f_ = 0;
   instance_number_ = instance_count_++;
   user_callback_ = 0;
+  store_initial_[OPTI_VAR] = {};
+  store_initial_[OPTI_PAR] = {};
+  store_initial_[OPTI_DUAL_G] = {};
+  store_latest_[OPTI_VAR] = {};
+  store_latest_[OPTI_DUAL_G] = {};
   mark_problem_dirty();
 }
 
@@ -267,8 +272,8 @@ MX OptiNode::variable(int n, int m, const std::string& attribute) {
 
   // Store the symbol; preventing it from going ut of scope
   symbols_.push_back(symbol);
-  initial_.push_back(DM::zeros(symbol.sparsity()));
-  latest_.push_back(DM::nan(symbol.sparsity()));
+  store_initial_[OPTI_VAR].push_back(DM::zeros(symbol.sparsity()));
+  store_latest_[OPTI_VAR].push_back(DM::nan(symbol.sparsity()));
 
   set_meta(symbol, meta_data);
   return ret;
@@ -326,8 +331,8 @@ void OptiNode::register_dual(MetaCon& c) {
   }
 
   symbols_.push_back(symbol);
-  initial_duals_.push_back(DM::zeros(symbol.sparsity()));
-  latest_duals_.push_back(DM::nan(symbol.sparsity()));
+  store_initial_[OPTI_DUAL_G].push_back(DM::zeros(symbol.sparsity()));
+  store_latest_[OPTI_DUAL_G].push_back(DM::nan(symbol.sparsity()));
 
   c.dual = ret;
   c.dual_canon = symbol;
@@ -349,7 +354,7 @@ MX OptiNode::parameter(int n, int m, const std::string& attribute) {
 
   MX symbol = MX::sym(name_prefix() + "p_" + str(count_par_), n, m);
   symbols_.push_back(symbol);
-  values_.push_back(DM::nan(symbol.sparsity()));
+  store_initial_[OPTI_PAR].push_back(DM::nan(symbol.sparsity()));
 
   set_meta(symbol, meta_data);
   return symbol;
@@ -513,10 +518,8 @@ std::map<VariableType, std::string> OptiNode::VariableType2String_ =
 std::vector<MX> OptiNode::initial() const {
   std::vector<MX> ret;
   for (const auto& e : symvar()) {
-    if (meta(e).type==OPTI_VAR)
-      ret.push_back(e==initial_[meta(e).i]);
-    if (meta(e).type==OPTI_DUAL_G)
-      ret.push_back(e==initial_duals_[meta(e).i]);
+    if (meta(e).type==OPTI_VAR || meta(e).type==OPTI_DUAL_G)
+      ret.push_back(e==store_initial_.at(meta(e).type)[meta(e).i]);
   }
   return ret;
 }
@@ -525,7 +528,7 @@ std::vector<MX> OptiNode::value_variables() const {
   std::vector<MX> ret;
   for (const auto& e : symvar()) {
     if (meta(e).type==OPTI_VAR)
-      ret.push_back(e==latest_[meta(e).i]);
+      ret.push_back(e==store_latest_.at(meta(e).type)[meta(e).i]);
   }
   return ret;
 }
@@ -534,7 +537,7 @@ std::vector<MX> OptiNode::value_parameters() const {
   std::vector<MX> ret;
   for (const auto& e : symvar()) {
     if (meta(e).type==OPTI_PAR)
-      ret.push_back(e==values_[meta(e).i]);
+      ret.push_back(e==store_initial_.at(meta(e).type)[meta(e).i]);
   }
   return ret;
 }
@@ -841,8 +844,8 @@ void OptiNode::subject_to(const MX& g) {
 void OptiNode::subject_to() {
   mark_problem_dirty();
   g_.clear();
-  latest_duals_.clear();
-  initial_duals_.clear();
+  store_initial_[OPTI_DUAL_G].clear();
+  store_latest_[OPTI_DUAL_G].clear();
   count_dual_ = 0;
 }
 
@@ -859,14 +862,14 @@ void OptiNode::res(const DMDict& res) {
   const std::vector<double> & x_v = res.at("x").nonzeros();
   for (const auto &v : active_symvar(OPTI_VAR)) {
     int i = meta(v).i;
-    std::vector<double> & data_v = latest_[i].nonzeros();
+    std::vector<double> & data_v = store_latest_[OPTI_VAR][i].nonzeros();
     std::copy(x_v.begin()+meta(v).start, x_v.begin()+meta(v).stop, data_v.begin());
   }
   if (res.find("lam_g")!=res.end()) {
     const std::vector<double> & lam_v = res.at("lam_g").nonzeros();
     for (const auto &v : active_symvar(OPTI_DUAL_G)) {
       int i = meta(v).i;
-      std::vector<double> & data_v = latest_duals_[i].nonzeros();
+      std::vector<double> & data_v = store_latest_[OPTI_DUAL_G][i].nonzeros();
       std::copy(lam_v.begin()+meta(v).start, lam_v.begin()+meta(v).stop, data_v.begin());
     }
   }
@@ -991,7 +994,7 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
   std::vector<DM> x_num;
   for (const auto& e : x) {
     int i = meta(e).i;
-    x_num.push_back(latest_[i]);
+    x_num.push_back(store_latest_.at(OPTI_VAR)[i]);
 
     // Override when values are supplied
     auto it = temp.find(i);
@@ -1015,7 +1018,7 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
 
   std::vector<DM> p_num;
   for (const auto& e : p) {
-    p_num.push_back(values_[meta(e).i]);
+    p_num.push_back(store_initial_.at(OPTI_PAR)[meta(e).i]);
   }
 
   std::vector<DM> lam_num;
@@ -1025,7 +1028,7 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
       casadi_assert(symbol_active_[meta(e).count],
         "This expression has a dual for a constraint that is not given to Opti:\n" +
         describe(e, 1));
-      lam_num.push_back(latest_duals_[meta(e).i]);
+      lam_num.push_back(store_latest_.at(OPTI_DUAL_G)[meta(e).i]);
     }
   }
 
@@ -1058,11 +1061,11 @@ void OptiNode::set_value(const std::vector<MX>& assignments) {
   }
 }
 
-void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& store) {
+void OptiNode::set_value_internal(const MX& x, const DM& v) {
   mark_solved(false);
   casadi_assert_dev(v.is_regular());
   if (x.is_symbolic()) {
-    DM& target = store[meta(x).i];
+    DM& target = store_initial_[meta(x).type][meta(x).i];
     Slice all;
     target.set(v, false, all, all);
     return;
@@ -1132,7 +1135,7 @@ void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& sto
 
   int offset = 0;
   for (const auto & s : symbols) {
-    DM& target = store[meta(s).i];
+    DM& target = store_initial_[meta(s).type][meta(s).i];
     std::vector<double>& data = target.nonzeros();
     // Loop over nonzeros in each symbol
     for (int i=0;i<s.nnz();++i) {
@@ -1146,18 +1149,17 @@ void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& sto
 }
 
 void OptiNode::set_initial(const MX& x, const DM& v) {
-  for (const auto & s : MX::symvar(x)) {
+  for (const auto & s : MX::symvar(x))
     casadi_assert(meta(s).type!=OPTI_PAR,
       "You cannot set an initial value for a parameter. Did you mean 'set_value'?");
-    set_value_internal(x, v, meta(s).type==OPTI_VAR ? initial_ : initial_duals_);
-  }
+  set_value_internal(x, v);
 }
 
 void OptiNode::set_value(const MX& x, const DM& v) {
   for (const auto & s : MX::symvar(x))
     casadi_assert(meta(s).type!=OPTI_VAR,
       "You cannot set a value for a variable. Did you mean 'set_initial'?");
-  set_value_internal(x, v, values_);
+  set_value_internal(x, v);
 }
 
 std::vector<MX> OptiNode::active_symvar(VariableType type) const {
@@ -1175,13 +1177,7 @@ std::vector<DM> OptiNode::active_values(VariableType type) const {
   std::vector<DM> ret;
   for (const auto& s : symbols_) {
     if (symbol_active_[meta(s).count] && meta(s).type==type) {
-      if (type==OPTI_VAR) {
-        ret.push_back(initial_[meta(s).i]);
-      } else if (type==OPTI_PAR) {
-        ret.push_back(values_[meta(s).i]);
-      } else if (type==OPTI_DUAL_G) {
-        ret.push_back(initial_duals_[meta(s).i]);
-      }
+      ret.push_back(store_initial_.at(meta(s).type)[meta(s).i]);
     }
   }
   return ret;

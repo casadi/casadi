@@ -275,7 +275,7 @@ private:
   void register_dual(MetaCon& meta);
 
   /// Set value of symbol
-  void set_value_internal(const MX& x, const DM& v, std::vector<DM>& store);
+  void set_value_internal(const MX& x, const DM& v);
 
   /** \brief decompose a chain of inequalities
   *
@@ -326,17 +326,8 @@ private:
   int count_par_;
   int count_dual_;
 
-  /// Storing latest values for all parameters (including inactive)
-  std::vector<DM> values_;
-  /// Storing initial values for all variables (including inactive)
-  std::vector<DM> initial_;
-  /// Storing latest values for all variables (including inactive)
-  std::vector<DM> latest_;
-
-  /// Storing initial values for all duals (including inactive)
-  std::vector<DM> initial_duals_;
-  /// Storing latest values for all duals (including inactive)
-  std::vector<DM> latest_duals_;
+  /// Storing initial/latest values for all variables (including inactive)
+  std::map< VariableType, std::vector<DM> > store_initial_, store_latest_;
 
   /// Is symbol present in problem?
   std::vector<bool> symbol_active_;
