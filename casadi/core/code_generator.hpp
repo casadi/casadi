@@ -319,6 +319,12 @@ namespace casadi {
     // Generate main entry point
     void generate_main(std::ostream &s) const;
 
+    // Generate export symbol macros
+    void generate_export_symbol(std::ostream &s) const;
+
+    // Generate import symbol macros
+    void generate_import_symbol(std::ostream &s) const;
+
     //  private:
   public:
     /// \cond INTERNAL

@@ -218,6 +218,40 @@ namespace casadi {
       << "#endif\n\n";
   }
 
+  void  CodeGenerator::generate_export_symbol(std::ostream &s) const {
+      s << "/* Symbol visibility in DLLs */\n"
+      << "#ifndef CASADI_SYMBOL_EXPORT\n"
+      << "  #if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)\n"
+      << "    #if defined(STATIC_LINKED)\n"
+      << "      #define CASADI_SYMBOL_EXPORT\n"
+      << "    #else\n"
+      << "      #define CASADI_SYMBOL_EXPORT __declspec(dllexport)\n"
+      << "    #endif\n"
+      << "  #elif defined(__GNUC__) && defined(GCC_HASCLASSVISIBILITY)\n"
+      << "    #define CASADI_SYMBOL_EXPORT __attribute__ ((visibility (\"default\")))\n"
+      << "  #else"  << endl
+      << "    #define CASADI_SYMBOL_EXPORT\n"
+      << "  #endif\n"
+      << "#endif\n\n";
+  }
+
+  void  CodeGenerator::generate_import_symbol(std::ostream &s) const {
+      s << "/* Symbol visibility in DLLs */\n"
+      << "#ifndef CASADI_SYMBOL_EXPORT\n"
+      << "  #if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)\n"
+      << "    #if defined(STATIC_LINKED)\n"
+      << "      #define CASADI_SYMBOL_EXPORT\n"
+      << "    #else\n"
+      << "      #define CASADI_SYMBOL_EXPORT __declspec(dllimport)\n"
+      << "    #endif\n"
+      << "  #elif defined(__GNUC__) && defined(GCC_HASCLASSVISIBILITY)\n"
+      << "    #define CASADI_SYMBOL_EXPORT __attribute__ ((visibility (\"default\")))\n"
+      << "  #else"  << endl
+      << "    #define CASADI_SYMBOL_EXPORT\n"
+      << "  #endif\n"
+      << "#endif\n\n";
+  }
+
   string CodeGenerator::generate(const string& prefix) const {
     // Throw an error if the prefix contains the filename, since since syntax
     // has changed
@@ -249,6 +283,9 @@ namespace casadi {
 
       // Define the casadi_real type (typically double)
       generate_casadi_real(s);
+
+      // Generate export symbol macros
+      if (this->with_export) generate_import_symbol(s);
 
       // Add declarations
       s << this->header.str();
@@ -394,22 +431,7 @@ namespace casadi {
     }
     s << endl;
 
-    if (this->with_export) {
-      s << "/* Symbol visibility in DLLs */\n"
-        << "#ifndef CASADI_SYMBOL_EXPORT\n"
-        << "  #if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)\n"
-        << "    #if defined(STATIC_LINKED)\n"
-        << "      #define CASADI_SYMBOL_EXPORT\n"
-        << "    #else\n"
-        << "      #define CASADI_SYMBOL_EXPORT __declspec(dllexport)\n"
-        << "    #endif\n"
-        << "  #elif defined(__GNUC__) && defined(GCC_HASCLASSVISIBILITY)\n"
-        << "    #define CASADI_SYMBOL_EXPORT __attribute__ ((visibility (\"default\")))\n"
-        << "  #else"  << endl
-        << "    #define CASADI_SYMBOL_EXPORT\n"
-        << "  #endif\n"
-        << "#endif\n\n";
-    }
+    if (this->with_export) generate_export_symbol(s);
 
     // Print integer constants
     if (!integer_constants_.empty()) {
