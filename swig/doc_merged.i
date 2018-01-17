@@ -33592,6 +33592,12 @@ Joris Gillis, Erik Lambrechts, Joel Andersson
 
 C++ includes: optistack.hpp ";
 
+%feature("docstring") casadi::Opti::lbg "
+
+Get all (scalarised) bounds on constraints as a column vector.
+
+";
+
 %feature("docstring") casadi::Opti::return_status "
 
 Get return status of solver passed as-is from nlpsol No stability can be
@@ -33683,6 +33689,8 @@ The copy is effectively a deep copy: Updating the state of the copy does not
 update the original.
 
 ";
+
+%feature("docstring") casadi::Opti::ubg "";
 
 %feature("docstring") casadi::Opti::solver "
 
@@ -33810,6 +33818,8 @@ Set meta-data of an expression.
 
 %feature("docstring") casadi::OptiAdvanced::instance_number "";
 
+%feature("docstring") casadi::OptiAdvanced::ubg "";
+
 %feature("docstring") casadi::OptiAdvanced::user_dict "
 
 Get user data.
@@ -33912,6 +33922,16 @@ Get the underlying CasADi solver of the Opti stack.
 
 ";
 
+%feature("docstring") casadi::OptiAdvanced::update_user_dict "
+
+>  void casadi::Opti::update_user_dict(const MX &m, const Dict &meta)
+------------------------------------------------------------------------
+
+add user data Add arbitrary data in the form of a dictionary to symbols or
+constraints
+
+";
+
 %feature("docstring") casadi::OptiAdvanced::set_initial "
 
 Set initial guess for decision variables
@@ -33952,13 +33972,9 @@ Get string representation.
 
 %feature("docstring") casadi::OptiAdvanced::mark_solver_dirty "";
 
-%feature("docstring") casadi::OptiAdvanced::update_user_dict "
+%feature("docstring") casadi::OptiAdvanced::lbg "
 
->  void casadi::Opti::update_user_dict(const MX &m, const Dict &meta)
-------------------------------------------------------------------------
-
-add user data Add arbitrary data in the form of a dictionary to symbols or
-constraints
+Get all (scalarised) bounds on constraints as a column vector.
 
 ";
 
