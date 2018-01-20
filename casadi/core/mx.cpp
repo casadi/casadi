@@ -1305,6 +1305,9 @@ namespace casadi {
   std::vector<MX> MX::graph_substitute(const std::vector<MX>& ex,
                                        const std::vector<MX>& expr,
                                        const std::vector<MX>& exprs) {
+
+
+
     casadi_assert(expr.size()==exprs.size(),
       "Mismatch in the number of expression to substitute: "
       + str(expr.size()) + " <-> " + str(exprs.size()) + ".");
@@ -1317,17 +1320,13 @@ namespace casadi {
     const vector<MXAlgEl>& algorithm = ff->algorithm_;
     vector<MX> swork(ff->workloc_.size()-1);
 
-    // A boolean vector indicated whoch nodes are tainted by substitutions
+    // A boolean vector indicating which nodes are tainted by substitutions
     vector<bool> tainted(swork.size());
-
-    // Temporary stringstream
-    stringstream ss;
 
     // Construct lookup table for expressions
     std::map<const MXNode*, int> expr_lookup;
-    for (int i=0;i<expr.size();++i) {
-      expr_lookup[expr[i].operator->()] = i;
-    }
+    for (int i=0;i<expr.size();++i)
+      expr_lookup[expr[i].get()] = i;
 
     // Construct found map
     std::vector<bool> expr_found(expr.size());
@@ -1339,11 +1338,15 @@ namespace casadi {
     // expr_lookup iterator
     std::map<const MXNode*, int>::const_iterator it_lookup;
 
+    // Allocate storage for split outputs
+    vector<vector<MX> > res_split(ex.size());
+    for (int i=0; i<ex.size(); ++i) res_split[i].resize(ex[i].n_primitives());
+
     for (auto it=algorithm.begin(); it!=algorithm.end(); ++it) {
 
       if (it->op != OP_OUTPUT) {
         // Check if it->data points to a supplied expr
-        it_lookup = expr_lookup.find((it->data).operator->());
+        it_lookup = expr_lookup.find(it->data.get());
 
         if (it->res.front()>=0 && it_lookup!=expr_lookup.end()) {
           // Fill in that expression in-place
@@ -1362,8 +1365,7 @@ namespace casadi {
         tainted[it->res.front()] = false;
         break;
       case OP_OUTPUT:
-        casadi_assert(it->data->segment()==0, "Not implemented");
-        f_out[it->data->ind()] = swork[it->arg.front()];
+        res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
         break;
       default:
         {
@@ -1400,11 +1402,8 @@ namespace casadi {
       all_found = all_found && expr_found[i];
     }
 
-    //casadi_assert(all_found,
-    //             "MXFunction::extractNodes(const std::vector<MX>& expr):"
-    //             " failed to locate all input expr."
-    //             << std::endl << "Here's a boolean list showing which ones where found: "
-    //             << expr_found);
+    // Join split outputs
+    for (int i=0; i<f_out.size(); ++i) f_out[i] = ex[i].join_primitives(res_split[i]);
 
     return f_out;
 

@@ -1751,6 +1751,40 @@ class MXtests(casadiTestCase):
 
     self.checkarray(F_out,9*DM.ones(4,4))
 
+  def test_partial_expand(self):
+
+    a = MX.sym("a")
+    b = MX.sym("b")
+    c = MX.sym("c")
+
+    f1 = Function('f1',[a],[2*a])
+    f2 = Function('f2',[a,b],[a*b])
+    f3 = Function('f3',[a,b,c],[a*b*c])
+
+    w1 = a+b
+
+    w2 = w1+c
+
+    w3 = cos(c)
+    w4 = f2(w2,c)
+    w5 = sin(w4)
+    w6 = cos(w5)
+    w7 = f1(w4)
+    w8 = a*w2
+    w9 = sqrt(w7)
+    w10 = f1(w6)
+    w11 = f3(w9, w4, w10)
+    w12 = w8+w11
+    w13 = w11+w3
+    w14 = sin(w13)
+    w15 = w12-w2
+    w16 = w15+w14
+
+    f = Function('f',[a,b,c],[w16])
+
+    fe = f.partial_expand()
+    
+    self.checkfunction(f,fe,inputs=[0.1,0.3,0.7])
 
   def test_matrix_expand(self):
     n = 2

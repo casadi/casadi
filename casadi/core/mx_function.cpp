@@ -82,6 +82,228 @@ namespace casadi {
     }
   }
 
+  Function sub_function(const std::string& name,
+      const std::vector<MX>& input, const std::vector<MX>& output,
+      const std::vector<std::string>& name_in, const std::vector<std::string>& name_out) {
+
+    // Get mutable copy
+    std::vector<MX> inputs = input;
+
+    // For non-symbolic inputs, create symbols
+    std::vector<MX> non_symbols, symbols;
+
+    int c = 0;
+    for (MX& e : inputs) {
+      if (!e.is_symbolic()) {
+        if (e.op() == -1) {
+          casadi_assert(e.dep(0).n_out()==1, "Not implemented");
+          e = e.dep(0);
+        }
+        non_symbols.push_back(e);
+        e = MX::sym("h"+str(c++), e.sparsity());
+        symbols.push_back(e);
+      }
+    }
+
+    std::vector<MX> outputs = graph_substitute(output, non_symbols, symbols);
+
+    Function ret(name, inputs, outputs, name_in, name_out);
+    casadi_assert_dev(!ret.has_free());
+
+    return ret;
+  }
+
+  Function MXFunction::partial_expand(const std::string& name,
+                      const Dict& opts, const Dict& expand_opts) const {
+
+    // Get all nodes
+    vector<MXNode*> nodes = ordered_nodes();
+
+    // Set the temporary variables to be the corresponding place in the sorted graph
+    for (int i=0; i<nodes.size(); ++i) nodes[i]->temp = i;
+
+    // flows_from[k] list all edges emanating from node k
+    // flows_to[k]   list all edges arriving at node k
+    std::vector< std::set<int> > flows_from(nodes.size()), flows_to(nodes.size());
+
+    for (auto&& n : nodes) {
+      for (int i=0; i<n->n_dep();++i) {
+        flows_from[n->dep(i)->temp].insert(n->temp);
+        flows_to[n->temp].insert(n->dep(i)->temp);
+      }
+    }
+
+    // Mark all nodes as being expandable
+    std::vector<bool> can_expand(nodes.size(), true);
+
+    for (auto&& n : nodes) {
+      int op = n->op();
+      if (op==OP_CALL || op==-1 || op==OP_NORMINF) {
+        can_expand[n->temp] = false;
+      }
+    }
+
+    // Each node has a (default-empty) set of markers
+    std::vector< std::set<int> > markers(nodes.size());
+
+    for (auto&& a : nodes) {
+      int ia = a->temp;
+      // While traversing all edges a->b, ...
+      for (int ib : flows_from[ia]) {
+        std::set<int> & markers_b = markers[ib];
+
+        // propagate markers downstream, ...
+        markers_b.insert(markers[ia].begin(), markers[ia].end());
+
+        // and add a marker when crossing an expandable/non-expandable border.
+        if (can_expand[ia] && !can_expand[ib]) {
+          // [ SX ] -> [ MX ] : marker b
+          // 1-based counting since each marker should have a negative counterpart
+          markers_b.insert(ib+1);
+        } else if (!can_expand[ia] && can_expand[ib]) {
+          // [ MX ] -> [ SX ] : marker -(last)
+          int last = *markers_b.rbegin();
+          casadi_assert_dev(last>=0);
+          markers_b.erase(last);
+          markers_b.insert(-last);
+        }
+      }
+    }
+
+    // Remember the indices of inputs and outputs
+    std::vector<int> id_in, id_out;
+    for (auto&& a : out_) id_out.push_back(a->temp);
+    for (auto&& a : in_) id_in.push_back(a->temp);
+
+    // Reset temporary variables
+    for (int i=0; i<nodes.size(); ++i) nodes[i]->temp = 0;
+
+    // A group is a collection of nodes
+    struct Group {
+      std::set<int> markers;
+      std::vector<int> members; // ordered
+      bool can_expand;
+
+      static bool cmp(const Group& a, const Group& b) {
+          return a.members.at(0) < b.members.at(0);
+      }
+    };
+
+    /// Find unique marker combinations
+    std::set< std::set<int> > unique_markers(markers.begin(), markers.end());
+
+    std::vector<Group> groups;
+    for (auto&& m : unique_markers) {
+      Group g;
+      g.markers = m;
+      g.can_expand = true;
+      for (int j=0;j<markers.size();++j) {
+        if (markers[j]==m) {
+          g.members.push_back(j);
+          g.can_expand = g.can_expand && can_expand[j];
+        }
+      }
+      groups.push_back(g);
+    }
+
+    // TODO(jgillis): merge independant groups, remove small groups
+
+    // Find an order for groups such that group[k] does not depend on results of group[>k]
+    std::sort(groups.begin(), groups.end(), Group::cmp);
+
+    // Let each node know which group it belongs to
+    std::vector<const Group*> group_of(nodes.size());
+    for (const Group & g : groups)
+      for (int i : g.members) group_of[i] = &g;
+
+
+    // Holds the MXes that will make up the returned Function
+    std::vector<MX> store(nodes.size());
+
+    for (int i=0;i<n_in_;++i) store[id_in[i]] = in_[i];
+
+    // Process all groups, in order
+    int ig = 0;
+    for (const Group& g : groups) {
+
+      // Determine cross-group inflow/outflow (id)
+      std::set<int> id_inputs, id_outputs;
+      for (int m : g.members) {
+        for (int j : flows_from[m]) {
+          if (group_of[j]!=&g) id_outputs.insert(m);
+        }
+        for (int j : flows_to[m]) {
+          if (group_of[j]!=&g) id_inputs.insert(j);
+        }
+        if (nodes[m]->op()==OP_PARAMETER) id_inputs.insert(m);
+        if (nodes[m]->op()==OP_OUTPUT) {
+          auto t = flows_to[m];
+          casadi_assert_dev(t.size()==1);
+          id_outputs.insert(*t.begin());
+        }
+      }
+
+      // Obtain MXes from input/output ids
+      std::vector<MX> inputs, outputs;
+      for (int i : id_inputs)  inputs.push_back(MX::create(nodes[i]));
+      for (int i : id_outputs) outputs.push_back(MX::create(nodes[i]));
+
+      // Create labels (for debugging)
+      std::vector<std::string> name_in, name_out;
+      for (int i : id_inputs)  name_in.push_back("i"+str(i));
+      for (int i : id_outputs) name_out.push_back("o"+str(i));
+
+      // Create a sub-Function, allowing for non-symbolic inputs.
+      Function f = sub_function(name_ + "_G" + str(ig++), inputs, outputs, name_in, name_out);
+
+      // Expand when appropriate
+      if (g.can_expand) f = f.expand();
+
+      // Inputs for calling the sub-Function
+      std::vector<MX> call_in;
+      for (int j : id_inputs) call_in.push_back(store[j]);
+
+      // Make a call to the sub-Function, inlined if non-expandable
+      std::vector<MX> call_out;
+      f.call(call_in, call_out, !g.can_expand, g.can_expand);
+
+      // Store results of the call
+      int k=0;
+      for (int j : id_outputs) store[j] = call_out[k++];
+    }
+
+    // New output expressions
+    std::vector<MX> new_out;
+    for (int i : id_out) new_out.push_back(store[i]);
+
+    return Function(name, in_, new_out, name_in_, name_out_, opts);
+  }
+
+  std::vector<MXNode*> MXFunction::ordered_nodes() const {
+    // Stack used to sort the computational graph
+    stack<MXNode*> s;
+
+    // All nodes
+    vector<MXNode*> nodes;
+
+    // Add the list of nodes
+    for (int ind=0; ind<out_.size(); ++ind) {
+      // Loop over primitives of each output
+      vector<MX> prim = out_[ind].primitives();
+      int nz_offset=0;
+      for (int p=0; p<prim.size(); ++p) {
+        // Get the nodes using a depth first search
+        s.push(prim[p].get());
+        sort_depth_first(s, nodes);
+        // Add an output instruction ("data" below will take ownership)
+        nodes.push_back(new Output(prim[p], ind, p, nz_offset));
+        // Update offset
+        nz_offset += prim[p].nnz();
+      }
+    }
+    return nodes;
+  }
+
   void MXFunction::init(const Dict& opts) {
     // Call the init function of the base class
     XFunction<MXFunction, MX, MXNode>::init(opts);
@@ -107,27 +329,8 @@ namespace casadi {
                             "Option 'default_in' has incorrect length");
     }
 
-    // Stack used to sort the computational graph
-    stack<MXNode*> s;
-
     // All nodes
-    vector<MXNode*> nodes;
-
-    // Add the list of nodes
-    for (int ind=0; ind<out_.size(); ++ind) {
-      // Loop over primitives of each output
-      vector<MX> prim = out_[ind].primitives();
-      int nz_offset=0;
-      for (int p=0; p<prim.size(); ++p) {
-        // Get the nodes using a depth first search
-        s.push(prim[p].get());
-        sort_depth_first(s, nodes);
-        // Add an output instruction ("data" below will take ownership)
-        nodes.push_back(new Output(prim[p], ind, p, nz_offset));
-        // Update offset
-        nz_offset += prim[p].nnz();
-      }
-    }
+    vector<MXNode*> nodes = ordered_nodes();
 
     // Set the temporary variables to be the corresponding place in the sorted graph
     for (int i=0; i<nodes.size(); ++i) {

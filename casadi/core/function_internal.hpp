@@ -577,6 +577,12 @@ namespace casadi {
       return eps;
     }
 
+    /** \brief Partial expand */
+    virtual Function partial_expand(const std::string& name,
+                            const Dict& opts, const Dict& expand_opts) const {
+      return shared_from_this<Function>();
+    }
+
     /** \brief Get sparsity of a given input */
     virtual Sparsity get_sparsity_in(int i);
 

@@ -198,6 +198,14 @@ namespace casadi {
 
     /// Substitute inplace, internal implementation
     void substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const;
+
+    /// Obtain sorted nodes
+    std::vector<MXNode*> ordered_nodes() const;
+
+    /** \brief Partial expand */
+    Function partial_expand(const std::string& name,
+                        const Dict& opts, const Dict& expand_opts) const override;
+
   };
 
 } // namespace casadi

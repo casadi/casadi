@@ -265,10 +265,23 @@ namespace casadi {
     return expand(name(), opts);
   }
 
+  Function Function::partial_expand(const Dict& expand_opts) const {
+    Dict opts;
+    opts["ad_weight"] = (*this)->ad_weight();
+    opts["ad_weight_sp"] = (*this)->sp_weight();
+    opts["max_num_dir"] = (*this)->max_num_dir_;
+    return partial_expand(name(), opts, expand_opts);
+  }
+
   Function Function::expand(const string& name, const Dict& opts) const {
     vector<SX> ex_in = sx_in();
     vector<SX> ex_out = Function(*this)(ex_in);
     return Function(name, ex_in, ex_out, name_in(), name_out(), opts);
+  }
+
+  Function Function::partial_expand(const string& name, const Dict& opts,
+      const Dict& expand_opts) const {
+    return (*this)->partial_expand(name, opts, expand_opts);
   }
 
   Function Function::create(FunctionInternal* node) {

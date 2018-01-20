@@ -187,6 +187,13 @@ namespace casadi {
                     const Dict& opts=Dict()) const;
     ///@}
 
+    /// Partial expand (experimental)
+    /// @{
+    Function partial_expand(const Dict& expand_opts=Dict()) const;
+    Function partial_expand(const std::string& name,
+                    const Dict& opts=Dict(), const Dict& expand_opts=Dict()) const;
+    /// @}
+
     /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node */
