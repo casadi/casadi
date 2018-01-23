@@ -564,4 +564,11 @@ namespace casadi {
     }
   }
 
+  Dict WorhpInterface::get_stats(void* mem) const {
+    Dict stats = Nlpsol::get_stats(mem);
+    auto m = static_cast<WorhpMemory*>(mem);
+    stats["return_status"] = m->return_status;
+    return stats;
+  }
+
 } // namespace casadi

@@ -923,7 +923,7 @@ OptiSol OptiNode::solve() {
 
   std::string ret = return_status();
 
-  bool success = ret=="Solve_Succeeded" || ret=="Solved_To_Acceptable_Level" || ret=="SUCCESS";
+  bool success = ret=="Solve_Succeeded" || ret=="Solved_To_Acceptable_Level" || ret=="SUCCESS" || ret=="OptimalSolution";
 
   casadi_assert(success,
     "Solver failed. You may use opti.debug.value to investigate the latest values of variables."

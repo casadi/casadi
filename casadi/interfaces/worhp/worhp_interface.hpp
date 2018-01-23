@@ -129,6 +129,9 @@ namespace casadi {
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<WorhpMemory*>(mem);}
 
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
+
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
                           int*& iw, double*& w) const override;
