@@ -226,6 +226,7 @@ namespace casadi {
 
   /* \brief Implementation of casadi_qr
    * Code generation not supported due to license restrictions.
+   * Cf. CasADi issue #2158
    *
    * Modified version of cs_qr in CSparse
    * Copyright(c) Timothy A. Davis, 2006-2009
@@ -305,6 +306,55 @@ namespace casadi {
     }
   }
 
+  /* \brief Implementation of casadi_ldl
+   * Code generation not supported due to license restrictions.
+   * Cf. CasADi issue #2158
+   *
+   * Modified version of LDL
+   * Copyright(c) Timothy A. Davis, 2005-2013
+   * Licensed as a derivative work under the GNU LGPL
+   */
+  template<typename T1>
+  void casadi_ldl(const int* sp_a, const int* parent, const int* sp_l,
+                   const T1* a, T1* l, T1* d, int *iw, T1* w) {
+    // Extract sparsities
+    int n = sp_a[0];
+    const int *colind = sp_a+2, *row = sp_a+n+3;
+    const int *l_colind = sp_l+2, *l_row = sp_l+n+3;
+    // Work vectors
+    int *visited=iw; iw+=n;
+    int *currcol=iw; iw+=n;
+    T1* y = w; w+=n;
+    // Local variables
+    int r, c, k, k2;
+    T1 yr;
+    // Keep track of current nonzero for each column of L
+    for (c=0; c<n; ++c) currcol[c] = l_colind[c];
+    // Compute nonzero pattern of kth row of L
+    for (c=0; c<n; ++c) {
+      // Not yet visited
+      visited[c] = c;
+      // Get nonzeros of column c in a dense vector
+      y[c]=0; // Make sure y is all-zero until index c
+      for (k=colind[c]; k<colind[c+1] && (r=row[k])<=c; ++k) y[r] = a[k];
+      // Get D(c,c) and clear Y(c)
+      d[c] = y[c];
+      y[c] = 0;
+      // Loop over matching entries in L(:,c), i.e. L(c,:)
+      for (k=colind[c]; k<colind[c+1] && (r=row[k])<c; ++k) {
+        while (visited[r]!=c) {
+          // Get and clear y(r)
+          yr = y[r];
+          y[r] = 0;
+          for (k2=l_colind[r]; k2<l_colind[r+1]; ++k2) y[l_row[k2]] -= l[k2]*yr;
+          // The nonzero entry L(c,r)
+          d[c] -= (l[currcol[r]++]=yr/d[r]) * yr;
+          visited[r] = c; // mark r as visited
+          r=parent[r]; // proceed to parent row
+        }
+      }
+    }
+  }
 
 } // namespace casadi
 

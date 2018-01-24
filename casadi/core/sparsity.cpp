@@ -5,7 +5,7 @@
  *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
- *    Copyright (C) 2006-2009 Timothy A. Davis
+ *    Copyright (C) 2005-2013 Timothy A. Davis
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -601,10 +601,10 @@ namespace casadi {
     parent.resize(n);
     // Calculate colind in L (strictly lower entries only)
     std::vector<int> L_colind(1+n);
-    casadi_ldl_colind(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(w));
+    SparsityInternal::ldl_colind(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(w));
     // Get rows in L (strictly lower entries only)
     std::vector<int> L_row(L_colind.back());
-    casadi_ldl_row(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(L_row),
+    SparsityInternal::ldl_row(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(L_row),
                     get_ptr(w));
     // Sparsity of L
     return Sparsity(n, n, L_colind, L_row);

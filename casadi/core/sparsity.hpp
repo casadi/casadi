@@ -5,7 +5,7 @@
  *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
- *    Copyright (C) 2006-2009 Timothy A. Davis
+ *    Copyright (C) 2005-2013 Timothy A. Davis
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -643,6 +643,9 @@ namespace casadi {
     /** \brief Symbolic QR factorization
         Returns the sparsity pattern of V (compact representation of Q) and R
         as well as vectors needed for the numerical factorization and solution.
+        The implementation is a modified version of CSparse
+        Copyright(c) Timothy A. Davis, 2006-2009
+        Licensed as a derivative work under the GNU LGPL
     */
     void qr_sparse(Sparsity& SWIG_OUTPUT(V), Sparsity& SWIG_OUTPUT(R),
                    std::vector<int>& SWIG_OUTPUT(pinv),

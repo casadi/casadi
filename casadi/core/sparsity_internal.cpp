@@ -5,7 +5,7 @@
  *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
- *    Copyright (C) 2006-2009 Timothy A. Davis
+ *    Copyright (C) 2005-2013 Timothy A. Davis
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -371,6 +371,77 @@ namespace casadi {
     // Finalize R, V
     r_colind[ncol] = nnz_r;
     v_colind[ncol] = nnz_v;
+  }
+
+  void SparsityInternal::
+  ldl_colind(const int* sp, int* parent, int* l_colind, int* w) {
+    /* Modified version of LDL
+      Copyright(c) Timothy A. Davis, 2005-2013
+      Licensed as a derivative work under the GNU LGPL
+    */
+    int n = sp[0];
+    const int *colind=sp+2, *row=sp+2+n+1;
+    // Local variables
+    int r, c, k;
+    // Work vectors
+    int* visited=w; w+=n;
+    // Loop over columns
+    for (c=0; c<n; ++c) {
+      // L(c,:) pattern: all nodes reachable in etree from nz in A(0:c-1,c)
+      parent[c] = -1; // parent of c is not yet known
+      visited[c] = c; // mark node c as visited
+      l_colind[1+c] = 0; // count of nonzeros in column c of L
+      // Loop over strictly upper triangular entries A
+      for (k=colind[c]; k<colind[c+1] && (r=row[k])<c; ++k) {
+        // Follow path from r to root of etree, stop at visited node
+        while (visited[r]!=c) {
+          // Find parent of r if not yet determined
+          if (parent[r]==-1) parent[r]=c;
+          l_colind[1+r]++; // L(c,r) is nonzero
+          visited[r] = c; // mark r as visited
+          r=parent[r]; // proceed to parent row
+        }
+      }
+    }
+    // Cumsum
+    l_colind[0] = 0;
+    for (c=0; c<n; ++c) l_colind[c+1] += l_colind[c];
+  }
+
+  void SparsityInternal::
+  ldl_row(const int* sp, const int* parent, int* l_colind, int* l_row, int *w) {
+    /* Modified version of LDL
+      Copyright(c) Timothy A. Davis, 2005-2013
+      Licensed as a derivative work under the GNU LGPL
+    */
+    // Extract sparsity
+    int n = sp[0];
+    const int *colind = sp+2, *row = sp+n+3;
+    // Work vectors
+    int *visited=w; w+=n;
+    // Local variables
+    int r, c, k;
+    // Compute nonzero pattern of kth row of L
+    for (c=0; c<n; ++c) {
+      // Not yet visited
+      visited[c] = c;
+      // Loop over nonzeros in upper triangular half
+      for (k=colind[c]; k<colind[c+1] && (r=row[k])<c; ++k) {
+        // Loop over dependent rows
+        while (visited[r]!=c) {
+          l_row[l_colind[r]++] = c; // L(c,r) is nonzero
+          visited[r] = c; // mark r as visited
+          r=parent[r]; // proceed to parent row
+        }
+      }
+    }
+    // Restore l_colind by shifting it forward
+    k=0;
+    for (c=0; c<n; ++c) {
+      r=l_colind[c];
+      l_colind[c]=k;
+      k=r;
+    }
   }
 
   SparsityInternal::

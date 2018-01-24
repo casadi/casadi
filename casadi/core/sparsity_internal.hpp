@@ -5,7 +5,7 @@
  *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
- *    Copyright (C) 2006-2009 Timothy A. Davis
+ *    Copyright (C) 2005-2013 Timothy A. Davis
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -206,6 +206,28 @@ namespace casadi {
     static void qr_sparsities(const int* sp_a, int nrow_ext, int* sp_v, int* sp_r,
                               const int* leftmost, const int* parent, const int* pinv,
                               int* iw);
+
+    /** \brief Calculate the column offsets for the L factor of an LDL^T factorization
+      * Strictly lower entries only.
+      * Ref: User Guide for LDL by Tim Davis
+      * len[colind] = ncol+1
+      * len[parent] = ncol
+      * len[w] >= ncol
+      * Modified version of LDL
+      * Copyright(c) Timothy A. Davis, 2005-2013
+      * Licensed as a derivative work under the GNU LGPL
+      */
+    static void ldl_colind(const int* sp, int* parent, int* l_colind, int* w);
+
+    /** \brief Calculate the row indices for the L factor of an LDL^T factorization
+      * Strictly lower entries only.
+      * Ref: User Guide for LDL by Tim Davis
+      * len[w] >= n
+      * Modified version of LDL
+      * Copyright(c) Timothy A. Davis, 2005-2013
+      * Licensed as a derivative work under the GNU LGPL
+      */
+    static void ldl_row(const int* sp, const int* parent, int* l_colind, int* l_row, int *w);
 
     /// Transpose the matrix
     Sparsity T() const;
