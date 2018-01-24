@@ -473,6 +473,11 @@ namespace casadi {
   int SparsityInternal::dfs(int j, int top, std::vector<int>& xi,
                                          std::vector<int>& pstack, const std::vector<int>& pinv,
                                          std::vector<bool>& marked) const {
+    /*
+    Modified version of cs_dfs in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     int head = 0;
     const int* colind = this->colind();
     const int* row = this->row();
@@ -531,8 +536,11 @@ namespace casadi {
 
   int SparsityInternal::scc(std::vector<int>& p,
                             std::vector<int>& r) const {
-    // NOTE: This implementation has been copied from CSparse and then modified,
-    // it needs cleaning up to be proper C++
+    /*
+    Modified version of cs_scc in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     vector<int> tmp;
 
     Sparsity AT = T();
@@ -910,11 +918,14 @@ namespace casadi {
     #undef FLIP
   }
 
-  void SparsityInternal::breadthFirstSearch(int n, std::vector<int>& wi, std::vector<int>& wj,
+  void SparsityInternal::bfs(int n, std::vector<int>& wi, std::vector<int>& wj,
                                             std::vector<int>& queue, const std::vector<int>& imatch,
                                             const std::vector<int>& jmatch, int mark) const {
-    // NOTE: This implementation has been copied from CSparse and then modified,
-    // it needs cleaning up to be proper C++
+    /*
+    Modified version of cs_bfs in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     int head = 0, tail = 0, j, i, p, j2 ;
 
     // place all unmatched nodes in queue
@@ -976,8 +987,11 @@ namespace casadi {
                                  const std::vector<int>& imatch, std::vector<int>& p,
                                  std::vector<int>& q, std::vector<int>& cc, std::vector<int>& rr,
                                  int set, int mark) {
-    // NOTE: This implementation has been copied from CSparse and then modified,
-    // it needs cleaning up to be proper C++
+    /*
+    Modified version of cs_matched in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     int kc = cc[set];
     int kr = rr[set-1] ;
     for (int j=0; j<n; ++j) {
@@ -994,8 +1008,11 @@ namespace casadi {
 
   void SparsityInternal::unmatched(int m, const std::vector<int>& wi, std::vector<int>& p,
                                    std::vector<int>& rr, int set) {
-    // NOTE: This implementation has been copied from CSparse and then modified,
-    // it needs cleaning up to be proper C++
+    /*
+    Modified version of cs_unmatched in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     int i, kr = rr[set] ;
     for (i=0; i<m; i++)
       if (wi[i] == 0)
@@ -1005,16 +1022,22 @@ namespace casadi {
   }
 
   int SparsityInternal::rprune(int i, int j, double aij, void *other) {
-    // NOTE: This implementation has been copied from CSparse and then modified,
-    // it needs cleaning up to be proper C++
+    /*
+    Modified version of cs_rprune in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     vector<int> &rr = *static_cast<vector<int> *>(other);
     return (i >= rr[1] && i < rr[2]) ;
   }
 
-  void SparsityInternal::augmentingPath(int k, std::vector<int>& jmatch, int *cheap,
+  void SparsityInternal::augment(int k, std::vector<int>& jmatch, int *cheap,
                                         std::vector<int>& w, int *js, int *is, int *ps) const {
-    // NOTE: This implementation has been copied from CSparse and then modified,
-    // it needs cleaning up to be proper C++
+    /*
+    Modified version of cs_augment in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     const int* colind = this->colind();
     const int* row = this->row();
 
@@ -1082,10 +1105,13 @@ namespace casadi {
         jmatch[is[p]] = js[p];
   }
 
-  void SparsityInternal::maxTransversal(std::vector<int>& imatch, std::vector<int>& jmatch,
-                                        Sparsity& trans, int seed) const {
-    // NOTE: This implementation has been copied from CSparse and then modified,
-    // it needs cleaning up to be proper C++
+  void SparsityInternal::maxtrans(std::vector<int>& imatch, std::vector<int>& jmatch,
+                                  Sparsity& trans, int seed) const {
+    /*
+    Modified version of cs_maxtrans in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     const int* colind = this->colind();
     const int* row = this->row();
 
@@ -1153,11 +1179,11 @@ namespace casadi {
       Cjmatch[i] = -1;
 
     // q = random permutation
-    std::vector<int> q = randomPermutation(C->size2(), seed);
+    std::vector<int> q = randperm(C->size2(), seed);
 
     // augment, starting at row q[k]
     for (k=0; k<C->size2(); ++k) {
-      C->augmentingPath(!q.empty() ? q[k]: k, Cjmatch, cheap, w, js, is, ps);
+      C->augment(!q.empty() ? q[k]: k, Cjmatch, cheap, w, js, is, ps);
     }
 
     // find col match
@@ -1175,6 +1201,11 @@ namespace casadi {
                                 std::vector<int>& colblock,
                                 std::vector<int>& coarse_rowblock,
                                 std::vector<int>& coarse_colblock) const {
+    /*
+    Modified version of cs_dmperm in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     int seed = 0;
 
     // The transpose of the expression
@@ -1204,7 +1235,7 @@ namespace casadi {
 
     // max transversal
     vector<int> imatch, jmatch;
-    maxTransversal(imatch, jmatch, trans, seed);
+    maxtrans(imatch, jmatch, trans, seed);
 
     // Coarse decomposition
 
@@ -1221,10 +1252,10 @@ namespace casadi {
       wi[i] = -1 ;
 
     // find C1, R1 from C0
-    breadthFirstSearch(size2(), wi, wj, colperm, imatch, jmatch, 1);
+    bfs(size2(), wi, wj, colperm, imatch, jmatch, 1);
 
     // find R3, C3 from R0
-    breadthFirstSearch(size1(), wj, wi, rowperm, jmatch, imatch, 3);
+    bfs(size1(), wj, wi, rowperm, jmatch, imatch, 3);
 
     // unmatched set C0
     unmatched(size2(), wj, colperm, coarse_colblock, 0);
@@ -1328,7 +1359,12 @@ namespace casadi {
     colblock.resize(nb2+1);
   }
 
-  std::vector<int> SparsityInternal::randomPermutation(int n, int seed) {
+  std::vector<int> SparsityInternal::randperm(int n, int seed) {
+    /*
+    Modified version of cs_randperm in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     // Return object
     std::vector<int> p;
 
@@ -1366,16 +1402,8 @@ namespace casadi {
   }
 
   std::vector<int> SparsityInternal::invertPermutation(const std::vector<int>& p) {
-    // pinv = p', or p = pinv'
-
-    // allocate result
     vector<int> pinv(p.size());
-
-    // invert the permutation
-    for (int k=0; k<p.size(); ++k)
-      pinv[p[k]] = k;
-
-    // return result
+    for (int k=0; k<p.size(); ++k) pinv[p[k]] = k;
     return pinv;
   }
 
@@ -1390,6 +1418,11 @@ namespace casadi {
                                  const std::vector<int>& q, int values,
                                  std::vector<int>& colind_C,
                                  std::vector<int>& row_C) const {
+    /*
+    Modified version of cs_permute in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     const int* colind = this->colind();
     const int* row = this->row();
 
@@ -1417,6 +1450,11 @@ namespace casadi {
   int SparsityInternal::drop(int (*fkeep)(int, int, double, void *),
                              void *other, int nrow, int ncol,
                              std::vector<int>& colind, std::vector<int>& row) {
+    /*
+    Modified version of cs_fkeep in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     int nz = 0;
 
     for (int j = 0; j<ncol; ++j) {
@@ -1439,6 +1477,11 @@ namespace casadi {
   }
 
   int SparsityInternal::wclear(int mark, int lemax, int *w, int n) {
+    /*
+    Modified version of cs_wclear in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     if (mark < 2 || (mark + lemax < 0)) {
       for (int k = 0; k<n; ++k) if (w[k] != 0) w[k] = 1;
       mark = 2 ;
@@ -1448,10 +1491,20 @@ namespace casadi {
   }
 
   int SparsityInternal::diag(int i, int j, double aij, void *other) {
+    /*
+    Modified version of cs_diag in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     return (i != j) ;
   }
 
   int SparsityInternal::scatter(int j, std::vector<int>& w, int mark, int* Ci, int nz) const {
+    /*
+    Modified version of cs_scatter in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     int i, p;
     const int *Ap = colind();
     const int *Ai = row();
@@ -1472,6 +1525,11 @@ namespace casadi {
   }
 
   Sparsity SparsityInternal::multiply(const Sparsity& B) const {
+    /*
+    Modified version of cs_multiply in CSparse
+    Copyright(c) Timothy A. Davis, 2006-2009
+    Licensed as a derivative work under the GNU LGPL
+    */
     int nz = 0;
     casadi_assert(size2() == B.size1(), "Dimension mismatch.");
     int m = size1();

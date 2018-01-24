@@ -96,11 +96,19 @@ namespace casadi {
     /// Drop diagonal entries
     Sparsity drop_diag() const;
 
-    /// Find strongly connected components: See cs_dfs in CSparse
+    /** \brief Depth-first search
+      * The implementation is a modified version of cs_dfs in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
     int dfs(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
                          const std::vector<int>& pinv, std::vector<bool>& marked) const;
 
-    /// Find the strongly connected components of a square matrix: See cs_scc in CSparse
+    /** \brief Find the strongly connected components of a square matrix
+      * The implementation is a modified version of cs_scc in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
     int scc(std::vector<int>& p, std::vector<int>& r) const;
 
     /** \brief Approximate minimal degree preordering
@@ -214,31 +222,49 @@ namespace casadi {
     /// Check if the sparsity is a reshape of another
     bool is_reshape(const SparsityInternal& y) const;
 
-    /// Breadth-first search for coarse decomposition: see cs_bfs in CSparse
-    void breadthFirstSearch(int n, std::vector<int>& wi, std::vector<int>& wj,
-                            std::vector<int>& queue, const std::vector<int>& imatch,
-                            const std::vector<int>& jmatch, int mark) const;
+    /** \brief Breadth-first search for coarse decomposition
+      * The implementation is a modified version of cs_bfs in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
+    void bfs(int n, std::vector<int>& wi, std::vector<int>& wj,
+             std::vector<int>& queue, const std::vector<int>& imatch,
+             const std::vector<int>& jmatch, int mark) const;
 
-    /// Collect matched cols and rows into p and q: see cs_matched in CSparse
+    /** \brief Collect matched columns and rows into p and q
+      * The implementation is a modified version of cs_matched in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
     static void matched(int n, const std::vector<int>& wj, const std::vector<int>& imatch,
                         std::vector<int>& p, std::vector<int>& q, std::vector<int>& cc,
                         std::vector<int>& rr, int set, int mark);
 
-    /// Collect unmatched cols into the permutation vector p : see cs_unmatched in CSparse
+    /** \brief Collect unmatched columns into the permutation vector p
+      * The implementation is a modified version of cs_unmatched in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
     static void unmatched(int m, const std::vector<int>& wi, std::vector<int>& p,
                           std::vector<int>& rr, int set);
 
-    /// return 1 if col i is in R2 : see cs_rprune in CSparse
+    /** \brief return 1 if column i is in R2
+      * The implementation is a modified version of cs_rprune in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
     static int rprune(int i, int j, double aij, void *other);
 
-    /** \brief drop entries for which fkeep(A(i, j)) is false; return nz if OK, else -1: :
-     * see cs_fkeep in CSparse
-     */
+     /** \brief drop entries for which fkeep(A(i, j)) is false; return nz if OK, else -1
+       * The implementation is a modified version of cs_fkeep in CSparse
+       * Copyright(c) Timothy A. Davis, 2006-2009
+       * Licensed as a derivative work under the GNU LGPL
+       */
     static int drop(int (*fkeep)(int, int, double, void *), void *other,
                     int nrow, int ncol,
                     std::vector<int>& colind, std::vector<int>& row);
 
-    /// Compute the Dulmage-Mendelsohn decomposition : see cs_dmperm in CSparse
+    /// Compute the Dulmage-Mendelsohn decomposition
     int btf(std::vector<int>& rowperm, std::vector<int>& colperm,
                           std::vector<int>& rowblock, std::vector<int>& colblock,
                           std::vector<int>& coarse_rowblock,
@@ -251,55 +277,83 @@ namespace casadi {
     /// Get cached block triangular form
     const Btf& btf() const;
 
-
-    /** \brief Compute the Dulmage-Mendelsohn decomposition
-     *
-     * -- upper triangular TODO: refactor and merge with the above
-     */
+     /** \brief Compute the Dulmage-Mendelsohn decomposition
+       * The implementation is a modified version of cs_dmperm in CSparse
+       * Copyright(c) Timothy A. Davis, 2006-2009
+       * Licensed as a derivative work under the GNU LGPL
+       */
     void dmperm(std::vector<int>& rowperm, std::vector<int>& colperm,
                 std::vector<int>& rowblock, std::vector<int>& colblock,
                 std::vector<int>& coarse_rowblock,
                 std::vector<int>& coarse_colblock) const;
 
-    /// Compute the maximum transversal (maximum matching): see cs_maxtrans in CSparse
-    void maxTransversal(std::vector<int>& imatch,
-                        std::vector<int>& jmatch, Sparsity& trans, int seed) const;
+    /** \brief Compute the maximum transversal (maximum matching)
+      * The implementation is a modified version of cs_maxtrans in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
+    void maxtrans(std::vector<int>& imatch,
+                  std::vector<int>& jmatch, Sparsity& trans, int seed) const;
 
-    /// Find an augmenting path: see cs_augment in CSparse
-    void augmentingPath(int k, std::vector<int>& jmatch,
-                        int *cheap, std::vector<int>& w, int *js, int *is, int *ps) const;
+    /** \brief Find an augmenting path
+      * The implementation is a modified version of cs_augment in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
+    void augment(int k, std::vector<int>& jmatch,
+                 int *cheap, std::vector<int>& w, int *js, int *is, int *ps) const;
 
-    /**
-     * return a random permutation vector, the identity perm, or p = n-1:-1:0.
-     * seed = -1 means p = n-1:-1:0.  seed = 0 means p = identity.
-     * otherwise p = random permutation. See cs_randperm in CSparse
-     */
-    static std::vector<int> randomPermutation(int n, int seed);
+     /** \brief return a random permutation vector
+       * return a random permutation vector, the identity perm, or p = n-1:-1:0.
+       * seed = -1 means p = n-1:-1:0.  seed = 0 means p = identity.
+       * The implementation is a modified version of cs_randperm in CSparse
+       * Copyright(c) Timothy A. Davis, 2006-2009
+       * Licensed as a derivative work under the GNU LGPL
+       */
+    static std::vector<int> randperm(int n, int seed);
 
-    /// Invert a permutation matrix: see cs_pinv in CSparse
+    /** \brief Invert a permutation vector */
     static std::vector<int> invertPermutation(const std::vector<int>& p);
 
-    /// C = A(p, q) where p and q are permutations of 0..m-1 and 0..n-1.: see cs_permute in CSparse
+    /// C = A(p, q) where p and q are permutations of 0..m-1 and 0..n-1.
     Sparsity permute(const std::vector<int>& pinv, const std::vector<int>& q, int values) const;
 
-    /// C = A(p, q) where p and q are permutations of 0..m-1 and 0..n-1.: see cs_permute in CSparse
+    /** \brief C = A(p, q) where p and q are permutations of 0..m-1 and 0..n-1
+      * The implementation is a modified version of cs_permute in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
     void permute(const std::vector<int>& pinv,
                  const std::vector<int>& q, int values,
                  std::vector<int>& colind_C,
                  std::vector<int>& row_C) const;
 
-    /// clear w: cs_wclear in CSparse
+    /** \brief clear w
+      * The implementation is a modified version of cs_wclear in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
     static int wclear(int mark, int lemax, int *w, int n);
 
-    /// keep off-diagonal entries; drop diagonal entries: See cs_diag in CSparse
+    /** \brief keep off-diagonal entries; drop diagonal entries
+      * The implementation is a modified version of cs_diag in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
     static int diag(int i, int j, double aij, void *other);
 
-    /// C = A*B: See cs_multiply in CSparse
+    /** \brief C = A*B
+      * The implementation is a modified version of cs_multiply in CSparse
+      * Copyright(c) Timothy A. Davis, 2006-2009
+      * Licensed as a derivative work under the GNU LGPL
+      */
     Sparsity multiply(const Sparsity& B) const;
 
-    /** x = x + beta * A(:, j), where x is a dense vector and A(:, j) is sparse:
-     * See cs_scatter in CSparse
-     */
+     /** \brief x = x + beta * A(:, j), where x is a dense vector and A(:, j) is sparse
+       * The implementation is a modified version of cs_scatter in CSparse
+       * Copyright(c) Timothy A. Davis, 2006-2009
+       * Licensed as a derivative work under the GNU LGPL
+       */
     int scatter(int j, std::vector<int>& w, int mark, int* Ci, int nz) const;
 
     /// Get row() as a vector

@@ -624,11 +624,19 @@ namespace casadi {
         If the parameter ata is false, the algorithm is equivalent to MATLAB's etree(A), except that
         the indices are zero-based. If ata is true, the algorithm is equivalent to MATLAB's
         etree(A, 'col').
+
+        The implementation is a modified version of cs_etree in CSparse
+        Copyright(c) Timothy A. Davis, 2006-2009
+        Licensed as a derivative work under the GNU LGPL
     */
     std::vector<int> etree(bool ata=false) const;
 
     /** \brief Symbolic LDL factorization
         Returns the sparsity pattern of L as well as the elimination tree
+
+        The implementation is a modified version of LDL
+        Copyright(c) Timothy A. Davis, 2005-2013
+        Licensed as a derivative work under the GNU LGPL
     */
     Sparsity ldl(std::vector<int>& SWIG_OUTPUT(parent)) const;
 
@@ -672,6 +680,9 @@ namespace casadi {
         => A[p, p] will appear block-diagonal with n blocks and
         with the indices of the block boundaries to be found in r.
 
+        The implementation is a modified version of cs_scc in CSparse
+        Copyright(c) Timothy A. Davis, 2006-2009
+        Licensed as a derivative work under the GNU LGPL
     */
     int scc(std::vector<int>& SWIG_OUTPUT(index),
             std::vector<int>& SWIG_OUTPUT(offset)) const;
@@ -690,6 +701,10 @@ namespace casadi {
         non-symmetric.
 
         \sa scc
+
+        The implementation is a modified version of cs_dmperm in CSparse
+        Copyright(c) Timothy A. Davis, 2006-2009
+        Licensed as a derivative work under the GNU LGPL
     */
     int btf(std::vector<int>& SWIG_OUTPUT(rowperm), std::vector<int>& SWIG_OUTPUT(colperm),
             std::vector<int>& SWIG_OUTPUT(rowblock), std::vector<int>& SWIG_OUTPUT(colblock),
