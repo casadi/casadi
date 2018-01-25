@@ -264,6 +264,7 @@ matrix:
         - locate libstdc++.so
         - export CC=gcc-4.7
         - export CXX=g++-4.7
+        - export FC=gfortran-4.7
 
 
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
