@@ -54,13 +54,17 @@ namespace casadi {
     // Current calculated quantities
     double fk, *gk, *jac_fk, *jac_gk;
 
+    std::vector<double> bl, bu, xx;
+
+    std::vector<int> hs, locJ, indJ;
+
     casadi_int n_iter; // number of major iterations
 
-    std::vector<double> A_data;
+    std::vector<double> A_data, valJ, rc, pi;
 
     // Memory pool
     static std::vector<SnoptMemory*> mempool;
-    casadi_int memind;
+    int memind;
 
     /// Constructor
     SnoptMemory(const SnoptInterface& self);
@@ -161,6 +165,8 @@ namespace casadi {
 
     /// Warm-start settings
     casadi_int Cold_;
+
+    double inf_;
 
   private:
       // options

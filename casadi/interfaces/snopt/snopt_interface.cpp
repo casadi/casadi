@@ -94,6 +94,14 @@ namespace casadi {
       }
     }
 
+    inf_ = 1e20;
+
+    for (auto&& op : opts_) {
+      if (op.first=="Infinite_bound") {
+        inf_ = op.second;
+      }
+    }
+
     // Get/generate required functions
     jac_f_fcn_ = create_function("nlp_jac_f", {"x", "p"}, {"f", "jac:f:x"});
     jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
@@ -103,6 +111,8 @@ namespace casadi {
     nnJac_ = nx_;
     nnObj_ = nx_;
     nnCon_ = ng_;
+
+    casadi_assert(ng_>0, "SNOPT requires at least one constraint");
 
     // Here follows the core of the mapping
     //  Two integer matrices are constructed:
@@ -169,12 +179,21 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::init_mem(void* mem) const {
+  int SnoptInterface::init_mem(void* mem) const {
     if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<SnoptMemory*>(mem);
 
     // Allocate data structures needed in evaluate
     m->A_data.resize(A_structure_.nnz());
+    m->bl.resize(nx_+ng_);
+    m->bu.resize(nx_+ng_);
+    m->hs.resize(nx_+ng_);
+    m->xx.resize(nx_+ng_);
+    m->rc.resize(nx_+ng_);
+    m->pi.resize(ng_);
+    m->locJ.resize(A_structure_.size2()+1);
+    m->indJ.resize(A_structure_.nnz());
+    m->valJ.resize(A_structure_.nnz());
     return 0;
   }
 
@@ -249,49 +268,40 @@ namespace casadi {
     casadi_assert_dev(nea > 0);
     casadi_assert_dev(A_structure_.nnz() == nea);
 
-    // Pointer magic, courtesy of Greg
-    casadi_assert(!jac_f_fcn_.is_null(), "blaasssshc");
-
-    // Outputs
-    //double Obj = 0; // TODO(Greg): get this from snopt
+    casadi_assert_dev(!jac_f_fcn_.is_null());
 
     // snInit must be called first.
     //   9, 6 are print and summary unit numbers (for Fortran).
     //   6 == standard out
-    casadi_int iprint = 9;
     casadi_int isumm = 6;
     std::string outname = name_ + ".out";
     snInit(&prob, const_cast<char*>(name_.c_str()),
-           const_cast<char*>(outname.c_str()), iprint, isumm);
-
-    // Set the problem size and other data.
-    // This will allocate arrays inside snProblem struct.
-    setProblemSize(&prob, m_, nx_, nea, nnCon_, nnJac_, nnObj_);
-    setObjective(&prob, iObj_, ObjAdd);
-    setUserfun(&prob, userfunPtr);
+           const_cast<char*>(outname.c_str()), isumm);
 
     // user data
     prob.leniu = 1;
     prob.iu = &m->memind;
 
     // Pass bounds
-    casadi_copy(m->lbx, nx_, prob.bl);
-    casadi_copy(m->ubx, nx_, prob.bu);
-    casadi_copy(m->lbg, ng_, prob.bl + nx_);
-    casadi_copy(m->ubg, ng_, prob.bu + nx_);
+    casadi_copy(m->lbx, nx_, get_ptr(m->bl));
+    casadi_copy(m->ubx, nx_, get_ptr(m->bu));
+    casadi_copy(m->lbg, ng_, get_ptr(m->bl) + nx_);
+    casadi_copy(m->ubg, ng_, get_ptr(m->bu) + nx_);
 
+    for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bl[i])) m->bl[i] = -inf_;
+    for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bu[i])) m->bu[i] = inf_;
     // Initialize states and slack
-    casadi_fill(prob.hs, ng_ + nx_, 0);
-    casadi_copy(m->x0, nx_, prob.x);
-    casadi_fill(prob.x + nx_, ng_, 0.);
+    casadi_fill(get_ptr(m->hs), ng_ + nx_, 0);
+    casadi_copy(m->x0, nx_, get_ptr(m->xx));
+    casadi_fill(get_ptr(m->xx) + nx_, ng_, 0.);
 
     // Initialize multipliers
-    casadi_copy(m->lam_g0, ng_, prob.pi);
+    casadi_copy(m->lam_g0, ng_, get_ptr(m->pi));
 
     // Set up Jacobian matrix
-    casadi_copy(A_structure_.colind(), A_structure_.size2()+1, prob.locJ);
-    casadi_copy(A_structure_.row(), A_structure_.nnz(), prob.indJ);
-    casadi_copy(get_ptr(m->A_data), A_structure_.nnz(), prob.valJ);
+    copy_vector(A_structure_.colind(), m->locJ);
+    copy_vector(A_structure_.row(), m->indJ);
+    casadi_copy(get_ptr(m->A_data), A_structure_.nnz(), get_ptr(m->valJ));
 
     for (auto&& op : opts_) {
       // Replace underscores with spaces
@@ -326,19 +336,28 @@ namespace casadi {
       casadi_error("SNOPT error setting option \"" + opname + "\"");
     }
 
+    int nS = 0, nInf = 0;
+    double sInf;
+
     // Run SNOPT
-    casadi_int info = solveC(&prob, Cold_, &m->fk);
+    casadi_int info = solveC(&prob, Cold_, m_, nx_, nea, nnCon_, nnObj_, nnJac_,
+                                    iObj_, ObjAdd,
+                                    userfunPtr,
+                                    get_ptr(m->valJ), get_ptr(m->indJ), get_ptr(m->locJ),
+                                    get_ptr(m->bl), get_ptr(m->bu), get_ptr(m->hs),
+                                    get_ptr(m->xx), get_ptr(m->pi), get_ptr(m->rc),
+                                    &m->fk, &nS, &nInf, &sInf);
     casadi_assert(99 != info, "snopt problem set up improperly");
 
     // Negate rc to match CasADi's definition
-    casadi_scal(nx_ + ng_, -1., prob.rc);
+    casadi_scal(nx_ + ng_, -1., get_ptr(m->rc));
 
     // Get primal solution
-    casadi_copy(prob.x, nx_, m->x);
+    casadi_copy(get_ptr(m->xx), nx_, m->x);
 
     // Get dual solution
-    casadi_copy(prob.rc, nx_, m->lam_x);
-    casadi_copy(prob.rc+nx_, ng_, m->lam_g);
+    casadi_copy(get_ptr(m->rc), nx_, m->lam_x);
+    casadi_copy(get_ptr(m->rc)+nx_, ng_, m->lam_g);
 
     // Copy optimal cost to output
     if (m->f) *m->f = m->fk;
