@@ -899,7 +899,7 @@ namespace std {
   } // namespace casadi
  }
 
-%fragment("casadi_int", "header", fragment="casadi_aux", fragment=SWIG_AsVal_frag(int), fragment=SWIG_AsVal_frag(long)) {
+%fragment("casadi_int", "header", fragment="casadi_aux", fragment=SWIG_AsVal_frag(int), fragment=SWIG_AsVal_frag(long), fragment=SWIG_AsVal_frag(long long)) {
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, casadi_int** m) {
       // Treat Null
