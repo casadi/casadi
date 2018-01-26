@@ -81,8 +81,12 @@ namespace casadi {
 
   int LinsolLdl::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    casadi_ldl(sp_, get_ptr(parent_), sp_L_,
-               A, get_ptr(m->l), get_ptr(m->d), get_ptr(m->iw), get_ptr(m->w));
+    Sparsity sp_lt = sp_L_.T();
+    vector<double> nz_lt(sp_lt.nnz());
+    casadi_ldl_new(sp_, sp_lt, A, get_ptr(nz_lt), get_ptr(m->d), get_ptr(m->w));
+    DM dm_lt(sp_lt, nz_lt);
+    dm_lt = dm_lt.T();
+    copy(dm_lt->begin(), dm_lt->end(), m->l.begin());
     return 0;
   }
 
