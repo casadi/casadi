@@ -13,30 +13,37 @@ void casadi_ldl_new(const int* sp_a, const int* parent, const int* sp_lt,
                  const T1* a, T1* lt, T1* d, int *iw, T1* w) {
   // Extract sparsities
   int n=sp_lt[1];
-  const int *lt_colind=sp_lt+2, *lt_row=sp_lt+2+n+1;
+  const int *lt_colind=sp_lt+2, *l_row=sp_lt+2+n+1;
   const int *a_colind=sp_a+2, *a_row=sp_a+2+n+1;
   // Local variables
-  int r, c, k;
+  int r, c, k, k2;
   // Clear w
   for (r=0; r<n; ++r) w[r] = 0;
-  // Loop over columns of A
+  // Sparse copy of A to L and D
   for (c=0; c<n; ++c) {
-    // Copy column of a to w
     for (k=a_colind[c]; k<a_colind[c+1]; ++k) w[a_row[k]] = a[k];
-    // Calculate d using d_cc = a_cc - sum_{k<c} d_k * l_ck^2
+    for (k=lt_colind[c]; k<lt_colind[c+1]; ++k) lt[k] = w[lt_row[k]];
     d[c] = w[c];
+    for (k=a_colind[c]; k<a_colind[c+1]; ++k) w[a_row[k]] = 0;
+  }
+  // Loop over columns of L
+  for (c=0; c<n; ++c) {
+    // Finalize d(c)
     for (k=lt_colind[c]; k<lt_colind[c+1]; ++k) {
       r = lt_row[k];
-      d[c] -= d[r]*lt[k]*lt[k]
+      d[c] -= d[r]*lt[k]*lt[k];
     }
-    // Calculate l using l_rc = (a_rc - sum_{k<c} d_k * l_rk * l_kc) / d_c
+    // Calculate l(r,c) with r<c
     for (k=lt_colind[c]; k<lt_colind[c+1]; ++k) {
       r = lt_row[k];
-      // FIXME: Looping over r will destroy algorithm complexity, need to
-      // keep track of visited nodes
+      for (k2=lt_colind[r]; k2<lt_colind[r+1]; ++k2) {
+        lt[k] -= d[lt_row[k2]] * lt[k] * w[lt_row[k2]];
+      }
+      lt[k] /= d[r];
+      w[r] = lt[k]*d[r];
     }
     // Clear w
-    for (k=a_colind[c]; k<a_colind[c+1]; ++k) w[a_row[k]] = 0;
+    for (k=lt_colind[c]; k<lt_colind[c+1]; ++k) w[lt_row[k]] = 0;
   }
 }
 
