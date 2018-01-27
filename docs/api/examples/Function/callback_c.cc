@@ -8,8 +8,8 @@ public:
   }
 
   // Number of inputs and outputs
-  int get_n_in() override { return 1;}
-  int get_n_out() override { return 1;}
+  casadi_int get_n_in() override { return 1;}
+  casadi_int get_n_out() override { return 1;}
 
   // Evaluate numerically
   std::vector<DM> eval(const std::vector<DM>& arg) const override {

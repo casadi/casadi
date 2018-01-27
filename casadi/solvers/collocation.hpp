@@ -98,7 +98,7 @@ namespace casadi {
                         const double* rz, const double* rp) const override;
 
     // Interpolation order
-    int deg_;
+    casadi_int deg_;
 
     // Collocation scheme
     std::string collocation_scheme_;

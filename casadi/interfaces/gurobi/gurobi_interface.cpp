@@ -80,7 +80,7 @@ namespace casadi {
     if (!vtype.empty()) {
       casadi_assert(vtype.size()==nx_, "Option 'vtype' has wrong length");
       vtype_.resize(nx_);
-      for (int i=0; i<nx_; ++i) {
+      for (casadi_int i=0; i<nx_; ++i) {
         if (vtype[i]=="continuous") {
           vtype_[i] = GRB_CONTINUOUS;
         } else if (vtype[i]=="binary") {
@@ -108,7 +108,7 @@ namespace casadi {
     auto m = static_cast<GurobiMemory*>(mem);
 
     // Load environment
-    int flag = GRBloadenv(&m->env, 0); // no log file
+    casadi_int flag = GRBloadenv(&m->env, 0); // no log file
     casadi_assert(!flag && m->env, "Failed to create GUROBI environment");
 
     m->fstats["preprocessing"]  = FStats();
@@ -117,7 +117,7 @@ namespace casadi {
     return 0;
   }
 
-  inline const char* return_status_string(int status) {
+  inline const char* return_status_string(casadi_int status) {
     switch (status) {
     case GRB_LOADED:
       return "LOADED";
@@ -152,7 +152,7 @@ namespace casadi {
   }
 
   int GurobiInterface::
-  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<GurobiMemory*>(mem);
 
     // Statistics
@@ -183,18 +183,18 @@ namespace casadi {
 
     // Temporary memory
     double *val=w; w+=nx_;
-    int *ind=iw; iw+=nx_;
-    int *ind2=iw; iw+=nx_;
-    int *tr_ind=iw; iw+=nx_;
+    int *ind=reinterpret_cast<int*>(iw); iw+=nx_;
+    int *ind2=reinterpret_cast<int*>(iw); iw+=nx_;
+    int *tr_ind=reinterpret_cast<int*>(iw); iw+=nx_;
 
     // Greate an empty model
     GRBmodel *model = 0;
     try {
-      int flag = GRBnewmodel(m->env, &model, name_.c_str(), 0, 0, 0, 0, 0, 0);
+      casadi_int flag = GRBnewmodel(m->env, &model, name_.c_str(), 0, 0, 0, 0, 0, 0);
       casadi_assert(!flag, GRBgeterrormsg(m->env));
 
       // Add variables
-      for (int i=0; i<nx_; ++i) {
+      for (casadi_int i=0; i<nx_; ++i) {
         // Get bounds
         double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;
         if (isinf(lb)) lb = -GRB_INFINITY;
@@ -221,12 +221,12 @@ namespace casadi {
       casadi_assert(!flag, GRBgeterrormsg(m->env));
 
       // Add quadratic terms
-      const int *H_colind=H_.colind(), *H_row=H_.row();
+      const casadi_int *H_colind=H_.colind(), *H_row=H_.row();
       for (int i=0; i<nx_; ++i) {
 
         // Quadratic term nonzero indices
-        int numqnz = H_colind[1]-H_colind[0];
-        casadi_copy(H_row, numqnz, ind);
+        casadi_int numqnz = H_colind[1]-H_colind[0];
+        for (casadi_int k=0;k<numqnz;++k) ind[k]=H_row[k];
         H_colind++;
         H_row += numqnz;
 
@@ -248,17 +248,17 @@ namespace casadi {
       }
 
       // Add constraints
-      const int *A_colind=A_.colind(), *A_row=A_.row();
-      casadi_copy(A_colind, nx_, tr_ind);
-      for (int i=0; i<na_; ++i) {
+      const casadi_int *A_colind=A_.colind(), *A_row=A_.row();
+      for (casadi_int k=0;k<nx_;++k) tr_ind[k]=H_row[k];
+      for (casadi_int i=0; i<na_; ++i) {
         // Get bounds
         double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
 //        if (isinf(lb)) lb = -GRB_INFINITY;
 //        if (isinf(ub)) ub =  GRB_INFINITY;
 
         // Constraint nonzeros
-        int numnz = 0;
-        for (int j=0; j<nx_; ++j) {
+        casadi_int numnz = 0;
+        for (casadi_int j=0; j<nx_; ++j) {
           if (tr_ind[j]<A_colind[j+1] && A_row[tr_ind[j]]==i) {
             ind[numnz] = j;
             val[numnz] = a ? a[tr_ind[j]] : 0;

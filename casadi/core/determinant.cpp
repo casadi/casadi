@@ -49,7 +49,7 @@ namespace casadi {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();
     MX trans_inv_X = inv(X).T();
-    for (int d=0; d<fsens.size(); ++d) {
+    for (casadi_int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = det_X * dot(trans_inv_X, fseed[d][0]);
     }
   }
@@ -59,7 +59,7 @@ namespace casadi {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();
     MX trans_inv_X = inv(X).T();
-    for (int d=0; d<aseed.size(); ++d) {
+    for (casadi_int d=0; d<aseed.size(); ++d) {
       asens[d][0] += aseed[d][0]*det_X * trans_inv_X;
     }
   }

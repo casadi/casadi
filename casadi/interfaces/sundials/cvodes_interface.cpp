@@ -168,7 +168,7 @@ namespace casadi {
       cv_mem->cv_setupNonNull = TRUE;
     } else {
       // Iterative scheme
-      int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
+      casadi_int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
       switch (newton_scheme_) {
       case SD_DIRECT: casadi_assert_dev(0);
       case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
@@ -196,7 +196,7 @@ namespace casadi {
 
     // Initialize adjoint sensitivities
     if (nrx_>0) {
-      int interpType = interp_==SD_HERMITE ? CV_HERMITE : CV_POLYNOMIAL;
+      casadi_int interpType = interp_==SD_HERMITE ? CV_HERMITE : CV_POLYNOMIAL;
       THROWING(CVodeAdjInit, m->mem, steps_per_checkpoint_, interpType);
     }
 
@@ -316,7 +316,7 @@ namespace casadi {
         cvB_mem->cv_mem->cv_setupNonNull = TRUE;
       } else {
         // Iterative scheme
-        int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
+        casadi_int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
         switch (newton_scheme_) {
         case SD_DIRECT: casadi_assert_dev(0);
         case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype, max_krylov_); break;
@@ -475,7 +475,7 @@ namespace casadi {
       m->res[0] = NV_DATA_S(Jv);
       s.calc_function(m, "jtimesF");
       return 0;
-    } catch(int flag) { // recoverable error
+    } catch(casadi_int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
       uerr() << "jtimes failed: " << e.what() << endl;
@@ -756,7 +756,7 @@ namespace casadi {
       double delta = 0.0;
 
       // Left/right preconditioner
-      int lr = 1;
+      casadi_int lr = 1;
 
       // Call the preconditioner solve function (which solves the linear system)
       if (psolve(t, x, xdot, b, b, gamma, delta,

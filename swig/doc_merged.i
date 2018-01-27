@@ -86,8 +86,8 @@ Sparsities of function inputs and outputs.
 
 %feature("docstring") casadi::BackwardDiff::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -278,14 +278,14 @@ derivatives be calculated in any way?
 
 %feature("docstring") casadi::BackwardDiff::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -332,8 +332,8 @@ if necessary generate, the sparsity of a Jacobian block.
 
 %feature("docstring") casadi::BackwardDiff::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -871,8 +871,8 @@ all information there is to know about a certain option.
 
 %feature("docstring") casadi::BackwardDiff::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -905,8 +905,8 @@ input/output nonzeros.
 
 %feature("docstring") casadi::BackwardDiff::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -1098,8 +1098,8 @@ function input and outputs.
 
 %feature("docstring") casadi::Blocksqp::get_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -1255,8 +1255,8 @@ globalization strategy.
 
 %feature("docstring") casadi::Blocksqp::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -1378,7 +1378,7 @@ sparsity forward.
 
 %feature("docstring") casadi::Blocksqp::acceptStep "
 
->  void casadi::Blocksqp::acceptStep(BlocksqpMemory *m, const double *deltaXi, const double *lambdaQP, double alpha, int nSOCS) const 
+>  void casadi::Blocksqp::acceptStep(BlocksqpMemory *m, const double *deltaXi, const double *lambdaQP, double alpha, casadi_int nSOCS) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Set new primal dual iterate.
@@ -1390,8 +1390,8 @@ Set new primal dual iterate.
 
 %feature("docstring") casadi::Blocksqp::has_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -1987,8 +1987,8 @@ length of iw field.
 
 %feature("docstring") casadi::Blocksqp::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -2004,12 +2004,12 @@ initial filter, objective function, tolerances etc.
 
 %feature("docstring") casadi::Blocksqp::evaluate "
 
->  int casadi::Blocksqp::evaluate(BlocksqpMemory *m, double *f, double *g, double *grad_f, double *jac_g) const 
+>  casadi_int casadi::Blocksqp::evaluate(BlocksqpMemory *m, double *f, double *g, double *grad_f, double *jac_g) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate objective and constraints, including derivatives.
 
->  int casadi::Blocksqp::evaluate(BlocksqpMemory *m, const double *xk, double *f, double *g) const 
+>  casadi_int casadi::Blocksqp::evaluate(BlocksqpMemory *m, const double *xk, double *f, double *g) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate objective and constraints, no derivatives.
@@ -2038,14 +2038,14 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Blocksqp::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -2300,8 +2300,8 @@ Generate the sparsity of a Jacobian block.
 
 %feature("docstring") casadi::Blocksqp::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -2353,12 +2353,12 @@ input/output elements.
 
 %feature("docstring") casadi::Blocksqp::calcLagrangeGradient "
 
->  void casadi::Blocksqp::calcLagrangeGradient(BlocksqpMemory *m, const double *lam_x, const double *lam_g, const double *grad_f, double *jacNz, double *grad_lag, int flag) const 
+>  void casadi::Blocksqp::calcLagrangeGradient(BlocksqpMemory *m, const double *lam_x, const double *lam_g, const double *grad_f, double *jacNz, double *grad_lag, casadi_int flag) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Compute gradient of Lagrangian function (sparse version)
 
->  void casadi::Blocksqp::calcLagrangeGradient(BlocksqpMemory *m, double *grad_lag, int flag) const 
+>  void casadi::Blocksqp::calcLagrangeGradient(BlocksqpMemory *m, double *grad_lag, casadi_int flag) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Overloaded function for convenience, uses current variables of
@@ -2405,8 +2405,8 @@ input/output nonzeros.
 
 %feature("docstring") casadi::Blocksqp::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -2940,14 +2940,14 @@ inputs and outputs scalar.
 
 %feature("docstring") casadi::BSpline::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -3078,8 +3078,8 @@ signature: name:(inputs)->(outputs)
 
 %feature("docstring") casadi::BSpline::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(int nadj) if no cached version
-is available.
+if available, and calls  Function get_reverse(casadi_int nadj) if no cached
+version is available.
 
 ";
 
@@ -3308,8 +3308,8 @@ Number of function inputs and outputs.
 
 %feature("docstring") casadi::BSpline::forward "[INTERNAL]  Return function
 that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(int nfwd) if no cached version
-is available.
+if available, and calls  Function get_forward(casadi_int nfwd) if no cached
+version is available.
 
 ";
 
@@ -3746,14 +3746,14 @@ reference count.
 // File: classcasadi_1_1BSplineCommon.xml
 %feature("docstring") casadi::BSplineCommon::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -3782,8 +3782,8 @@ length of w field.
 
 %feature("docstring") casadi::BSplineCommon::get_reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -4109,8 +4109,8 @@ name in codegen.
 
 %feature("docstring") casadi::BSplineCommon::get_forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -4253,8 +4253,8 @@ Jit dependencies.
 
 %feature("docstring") casadi::BSplineCommon::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -4300,8 +4300,8 @@ Get sparsity of a given output.
 
 %feature("docstring") casadi::BSplineCommon::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -4367,8 +4367,8 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::BSplineCommon::has_forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -4466,8 +4466,8 @@ Codegen incref for dependencies.
 
 %feature("docstring") casadi::BSplineCommon::has_reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -4788,14 +4788,14 @@ default input value.
 
 %feature("docstring") casadi::BSplineDual::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -5142,8 +5142,8 @@ length of arg field.
 
 %feature("docstring") casadi::BSplineDual::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -5443,8 +5443,8 @@ nodes in the algorithm.
 
 %feature("docstring") casadi::BSplineDual::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -5939,8 +5939,8 @@ Call a function, overloaded.
 
 %feature("docstring") casadi::BSplineInterpolant::forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -6171,8 +6171,8 @@ function, templated.
 
 %feature("docstring") casadi::BSplineInterpolant::has_forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -6313,8 +6313,8 @@ Create memory block.
 
 %feature("docstring") casadi::BSplineInterpolant::get_forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -6374,14 +6374,14 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::BSplineInterpolant::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -6430,8 +6430,8 @@ Get name in codegen.
 
 %feature("docstring") casadi::BSplineInterpolant::get_reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -6452,8 +6452,8 @@ Evaluate numerically.
 
 %feature("docstring") casadi::BSplineInterpolant::reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -6605,8 +6605,8 @@ for symmetric Jacobians
 
 %feature("docstring") casadi::BSplineInterpolant::has_reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -6623,8 +6623,8 @@ Names of function input and outputs.
 %feature("docstring") casadi::Callback::has_forward "
 
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -6795,7 +6795,7 @@ Get all the free variables of the function.
 
 Get output scheme.
 
->  const std::string& casadi::Function::name_out(int ind) const 
+>  const std::string& casadi::Function::name_out(casadi_int ind) const 
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
@@ -6890,8 +6890,8 @@ Is a null pointer?
 %feature("docstring") casadi::Callback::has_reverse "
 
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -7020,9 +7020,10 @@ If an error occurs in the evaluation, issue \"return 1;\";
 
 The final generated function will have a structure similar to:
 
-int fname(const casadi_real** arg, casadi_real** res, int* iw, casadi_real*
-w, void* mem) { const casadi_real *x1, *x2; casadi_real *r1, *r2; x1 =
-*arg++; x2 = *arg++; r1 = *res++; r2 = *res++; <FUNCTION_BODY> return 0; }
+casadi_int fname(const casadi_real** arg, casadi_real** res, casadi_int* iw,
+casadi_real* w, void* mem) { const casadi_real *x1, *x2; casadi_real *r1,
+*r2; x1 = *arg++; x2 = *arg++; r1 = *res++; r2 = *res++; <FUNCTION_BODY>
+return 0; }
 
 ";
 
@@ -7066,8 +7067,8 @@ guarantee that subsequent calls return unique answers.
 %feature("docstring") casadi::Callback::get_forward "
 
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -7196,7 +7197,7 @@ Assert that an output dimension is equal so some given value.
 
 Get input scheme.
 
->  const std::string& casadi::Function::name_in(int ind) const 
+>  const std::string& casadi::Function::name_in(casadi_int ind) const 
 ------------------------------------------------------------------------
 
 Get input scheme name by index.
@@ -7316,15 +7317,15 @@ For a particular input or for all of the inputs
 
 %feature("docstring") casadi::Callback::map "
 
->  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< int > &reduce_in, const std::vector< int > &reduce_out, const Dict &opts=Dict()) const
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, casadi_int n, const std::vector< casadi_int > &reduce_in, const std::vector< casadi_int > &reduce_out, const Dict &opts=Dict()) const
 
->  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< std::string > &reduce_in, const std::vector< std::string > &reduce_out, const Dict &opts=Dict()) const 
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, casadi_int n, const std::vector< std::string > &reduce_in, const std::vector< std::string > &reduce_out, const Dict &opts=Dict()) const 
 ------------------------------------------------------------------------
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
 
->  Function casadi::Function::map(int n, const std::string &parallelization=\"serial\") const 
+>  Function casadi::Function::map(casadi_int n, const std::string &parallelization=\"serial\") const 
 ------------------------------------------------------------------------
 
 Create a mapped version of this function.
@@ -7438,8 +7439,8 @@ Get sparsity of a given input.
 %feature("docstring") casadi::Callback::get_reverse "
 
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -7630,8 +7631,8 @@ if input arguments that needs to be replaced.
 
 %feature("docstring") casadi::CentralDiff::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -7682,14 +7683,14 @@ Sparsities of function inputs and outputs.
 
 %feature("docstring") casadi::CentralDiff::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -7698,8 +7699,8 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::CentralDiff::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -8510,8 +8511,8 @@ inputs and outputs scalar.
 
 %feature("docstring") casadi::CentralDiff::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -8633,8 +8634,8 @@ derivatives by multiplying the full Jacobian and multiplying.
 
 %feature("docstring") casadi::CentralDiff::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -9347,8 +9348,8 @@ memory block.
 
 %feature("docstring") casadi::Collocation::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -9545,14 +9546,14 @@ stage.
 
 %feature("docstring") casadi::Collocation::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -9782,8 +9783,8 @@ Replace 0-by-0 forward seeds.
 
 %feature("docstring") casadi::Collocation::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -9997,8 +9998,8 @@ numerically.
 
 %feature("docstring") casadi::Conic::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -10048,14 +10049,14 @@ length of arg field.
 
 %feature("docstring") casadi::Conic::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -10099,8 +10100,8 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Conic::get_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -10235,8 +10236,8 @@ function input and outputs.
 
 %feature("docstring") casadi::Conic::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -10308,8 +10309,8 @@ expressions for the forward seeds.
 
 %feature("docstring") casadi::Conic::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(int nadj) if no cached version
-is available.
+if available, and calls  Function get_reverse(casadi_int nadj) if no cached
+version is available.
 
 ";
 
@@ -10537,8 +10538,8 @@ reference count.
 
 %feature("docstring") casadi::Conic::has_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -10892,8 +10893,8 @@ instance consisting of only one MX call.
 
 %feature("docstring") casadi::Conic::forward "[INTERNAL]  Return function
 that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(int nfwd) if no cached version
-is available.
+if available, and calls  Function get_forward(casadi_int nfwd) if no cached
+version is available.
 
 ";
 
@@ -11333,7 +11334,7 @@ Import existing problem from FMI/XML
 
 Add a variable.
 
->  MX casadi::DaeBuilder::add_variable(const std::string &name, int n=1)
+>  MX casadi::DaeBuilder::add_variable(const std::string &name, casadi_int n=1)
 
 >  MX casadi::DaeBuilder::add_variable(const std::string &name, const Sparsity &sp)
 ------------------------------------------------------------------------
@@ -11734,8 +11735,8 @@ necessary generate, the sparsity of a Jacobian block.
 
 %feature("docstring") casadi::Dple::forward "[INTERNAL]  Return function
 that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(int nfwd) if no cached version
-is available.
+if available, and calls  Function get_forward(casadi_int nfwd) if no cached
+version is available.
 
 ";
 
@@ -12195,14 +12196,14 @@ dimensions.
 
 %feature("docstring") casadi::Dple::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -12512,8 +12513,8 @@ input/output elements.
 
 %feature("docstring") casadi::Dple::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(int nadj) if no cached version
-is available.
+if available, and calls  Function get_reverse(casadi_int nadj) if no cached
+version is available.
 
 ";
 
@@ -12920,14 +12921,14 @@ input/output nonzeros.
 
 %feature("docstring") casadi::Expm::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -12936,8 +12937,8 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::Expm::forward "[INTERNAL]  Return function
 that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(int nfwd) if no cached version
-is available.
+if available, and calls  Function get_forward(casadi_int nfwd) if no cached
+version is available.
 
 ";
 
@@ -13205,8 +13206,8 @@ temporary variables needed.
 
 %feature("docstring") casadi::Expm::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(int nadj) if no cached version
-is available.
+if available, and calls  Function get_reverse(casadi_int nadj) if no cached
+version is available.
 
 ";
 
@@ -14030,8 +14031,8 @@ expressions for the forward seeds.
 
 %feature("docstring") casadi::External::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -14093,8 +14094,8 @@ scheme index by name.
 
 %feature("docstring") casadi::External::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -14267,14 +14268,14 @@ dimensions.
 
 %feature("docstring") casadi::External::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -14673,14 +14674,14 @@ sparsity backwards.
 
 %feature("docstring") casadi::FiniteDiff::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -14699,8 +14700,8 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::FiniteDiff::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -14994,8 +14995,8 @@ required length of iw field.
 
 %feature("docstring") casadi::FiniteDiff::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -15102,8 +15103,8 @@ memory (called from destructor)
 
 %feature("docstring") casadi::FiniteDiff::has_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -15455,8 +15456,8 @@ C++ includes: finite_differences.hpp ";
 
 %feature("docstring") casadi::FiniteDiff::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -15531,8 +15532,8 @@ expressions for the forward seeds.
 
 %feature("docstring") casadi::FiniteDiff::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -15570,8 +15571,8 @@ with symbolic scalars.
 
 %feature("docstring") casadi::FiniteDiff::get_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -15673,14 +15674,14 @@ Get name in codegen.
 
 %feature("docstring") casadi::FixedStepIntegrator::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -15865,8 +15866,8 @@ Weighting factor for chosing forward/reverse mode.
 
 %feature("docstring") casadi::FixedStepIntegrator::reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -15963,8 +15964,8 @@ Setup F and G.
 
 %feature("docstring") casadi::FixedStepIntegrator::forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -16706,21 +16707,21 @@ function, overloaded.
 
 %feature("docstring") casadi::ForwardDiff::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
 %feature("docstring") casadi::ForwardDiff::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -17215,8 +17216,8 @@ input(s) and output(s)
 
 %feature("docstring") casadi::ForwardDiff::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -17332,8 +17333,8 @@ length of arg field.
 
 %feature("docstring") casadi::ForwardDiff::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -17389,8 +17390,8 @@ Propagate sparsity backwards.
 
 %feature("docstring") casadi::ForwardDiff::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -17726,7 +17727,7 @@ Print a description of the object.
 
 Get output scheme.
 
->  const std::string& casadi::Function::name_out(int ind) const 
+>  const std::string& casadi::Function::name_out(casadi_int ind) const 
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
@@ -18062,15 +18063,15 @@ CasADi 3.2
 
 %feature("docstring") casadi::Function::map "
 
->  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< int > &reduce_in, const std::vector< int > &reduce_out, const Dict &opts=Dict()) const
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, casadi_int n, const std::vector< casadi_int > &reduce_in, const std::vector< casadi_int > &reduce_out, const Dict &opts=Dict()) const
 
->  Function casadi::Function::map(const std::string &name, const std::string &parallelization, int n, const std::vector< std::string > &reduce_in, const std::vector< std::string > &reduce_out, const Dict &opts=Dict()) const 
+>  Function casadi::Function::map(const std::string &name, const std::string &parallelization, casadi_int n, const std::vector< std::string > &reduce_in, const std::vector< std::string > &reduce_out, const Dict &opts=Dict()) const 
 ------------------------------------------------------------------------
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
 
->  Function casadi::Function::map(int n, const std::string &parallelization=\"serial\") const 
+>  Function casadi::Function::map(casadi_int n, const std::string &parallelization=\"serial\") const 
 ------------------------------------------------------------------------
 
 Create a mapped version of this function.
@@ -18153,7 +18154,7 @@ matches one of the base classes (default true)
 
 Get input scheme.
 
->  const std::string& casadi::Function::name_in(int ind) const 
+>  const std::string& casadi::Function::name_in(casadi_int ind) const 
 ------------------------------------------------------------------------
 
 Get input scheme name by index.
@@ -18492,9 +18493,10 @@ If an error occurs in the evaluation, issue \"return 1;\";
 
 The final generated function will have a structure similar to:
 
-int fname(const casadi_real** arg, casadi_real** res, int* iw, casadi_real*
-w, void* mem) { const casadi_real *x1, *x2; casadi_real *r1, *r2; x1 =
-*arg++; x2 = *arg++; r1 = *res++; r2 = *res++; <FUNCTION_BODY> return 0; }
+casadi_int fname(const casadi_real** arg, casadi_real** res, casadi_int* iw,
+casadi_real* w, void* mem) { const casadi_real *x1, *x2; casadi_real *r1,
+*r2; x1 = *arg++; x2 = *arg++; r1 = *res++; r2 = *res++; <FUNCTION_BODY>
+return 0; }
 
 ";
 
@@ -18826,14 +18828,14 @@ output scheme index by name.
 
 %feature("docstring") casadi::GenericExternal::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -18960,8 +18962,8 @@ of nodes in the algorithm.
 
 %feature("docstring") casadi::GenericExternal::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -19114,8 +19116,8 @@ work vectors long enough to evaluate function.
 
 %feature("docstring") casadi::GenericExternal::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -19896,12 +19898,12 @@ Get the number of (structural) non-zero elements.
 
 %feature("docstring") casadi::GenericMatrix::sym "
 
->  static MatType casadi::GenericMatrix< MatType >::sym(const std::string &name, int nrow=1, int ncol=1)
+>  static MatType casadi::GenericMatrix< MatType >::sym(const std::string &name, casadi_int nrow=1, casadi_int ncol=1)
 ------------------------------------------------------------------------
 
 Create an nrow-by-ncol symbolic primitive.
 
->  static MatType casadi::GenericMatrix< MatType >::sym(const std::string &name, const std::pair< int, int > &rc)
+>  static MatType casadi::GenericMatrix< MatType >::sym(const std::string &name, const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
 
 Construct a symbolic primitive with given dimensions.
@@ -19911,24 +19913,24 @@ Construct a symbolic primitive with given dimensions.
 
 Create symbolic primitive with a given sparsity pattern.
 
->  std::vector< MatType > casadi::GenericMatrix< MatType >::sym(const std::string &name, const Sparsity &sp, int p)
+>  std::vector< MatType > casadi::GenericMatrix< MatType >::sym(const std::string &name, const Sparsity &sp, casadi_int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with with matrices with symbolic primitives of
 given sparsity.
 
->  static std::vector<MatType > casadi::GenericMatrix< MatType >::sym(const std::string &name, int nrow, int ncol, int p)
+>  static std::vector<MatType > casadi::GenericMatrix< MatType >::sym(const std::string &name, casadi_int nrow, casadi_int ncol, casadi_int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with nrow-by-ncol symbolic primitives.
 
->  std::vector< std::vector< MatType > > casadi::GenericMatrix< MatType >::sym(const std::string &name, const Sparsity &sp, int p, int r)
+>  std::vector< std::vector< MatType > > casadi::GenericMatrix< MatType >::sym(const std::string &name, const Sparsity &sp, casadi_int p, casadi_int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with symbolic primitives
 with given sparsity.
 
->  static std::vector<std::vector<MatType> > casadi::GenericMatrix< MatType >::sym(const std::string &name, int nrow, int ncol, int p, int r)
+>  static std::vector<std::vector<MatType> > casadi::GenericMatrix< MatType >::sym(const std::string &name, casadi_int nrow, casadi_int ncol, casadi_int p, casadi_int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with nrow-by-ncol
@@ -19980,7 +19982,7 @@ Matrix trace.
 
 %feature("docstring") friendwrap_einstein "
 
->  MatType einstein(const MatType &A, const MatType &B, const MatType &C, const std::vector< int > &dim_a, const std::vector< int > &dim_b, const std::vector< int > &dim_c, const std::vector< int > &a, const std::vector< int > &b, const std::vector< int > &c)
+>  MatType einstein(const MatType &A, const MatType &B, const MatType &C, const std::vector< casadi_int > &dim_a, const std::vector< casadi_int > &dim_b, const std::vector< casadi_int > &dim_c, const std::vector< casadi_int > &a, const std::vector< casadi_int > &b, const std::vector< casadi_int > &c)
 ------------------------------------------------------------------------
 
 Compute any contraction of two dense tensors, using index/einstein notation
@@ -19996,7 +19998,7 @@ labels i,j,k,... we employ -1,-2,-3,...
 A, B, C are represented as CasADi vectors, with dim_a, dim_b, dim_c
 indictating theire tensorial dimensions.
 
->  MatType einstein(const MatType &A, const MatType &B, const std::vector< int > &dim_a, const std::vector< int > &dim_b, const std::vector< int > &dim_c, const std::vector< int > &a, const std::vector< int > &b, const std::vector< int > &c)
+>  MatType einstein(const MatType &A, const MatType &B, const std::vector< casadi_int > &dim_a, const std::vector< casadi_int > &dim_b, const std::vector< casadi_int > &dim_c, const std::vector< casadi_int > &a, const std::vector< casadi_int > &b, const std::vector< casadi_int > &c)
 ------------------------------------------------------------------------
 
 Performs 1d linear interpolation.
@@ -20020,12 +20022,12 @@ Inner product of two matrices with x and y matrices of the same dimension.
 
 %feature("docstring") casadi::GenericMatrix::size "
 
->  std::pair<int, int> casadi::GenericMatrix< MatType >::size() const 
+>  std::pair<casadi_int, casadi_int> casadi::GenericMatrix< MatType >::size() const 
 ------------------------------------------------------------------------
 
 Get the shape.
 
->  int casadi::GenericMatrix< MatType >::size(int axis) const 
+>  casadi_int casadi::GenericMatrix< MatType >::size(casadi_int axis) const 
 ------------------------------------------------------------------------
 
 Get the size along a particular dimensions.
@@ -20163,7 +20165,8 @@ one.
 // File: classcasadi_1_1GenericType.xml
 %feature("docstring") casadi::GenericType "
 
-Generic data type, can hold different types such as bool, int, string etc.
+Generic data type, can hold different types such as bool, casadi_int, string
+etc.
 
 Joel Andersson
 
@@ -20375,7 +20378,7 @@ Jacobian sparsity.
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::forward "[INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(int nfwd) if no cached version is available.
+get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
@@ -20656,14 +20659,14 @@ Obtain information about function
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -20945,7 +20948,7 @@ elements.
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::reverse "[INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(int nadj) if no cached version is available.
+get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
@@ -21433,14 +21436,14 @@ Replace 0-by-0 inputs.
 
 %feature("docstring") casadi::ImplicitToNlp::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -21806,8 +21809,8 @@ Calculate derivatives by multiplying the full Jacobian and multiplying.
 
 %feature("docstring") casadi::ImplicitToNlp::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -21853,8 +21856,8 @@ Sparsities of function inputs and outputs.
 
 %feature("docstring") casadi::ImplicitToNlp::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -22322,8 +22325,8 @@ the number of atomic operations.
 
 %feature("docstring") casadi::Integrator::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -22739,8 +22742,8 @@ function inputs and outputs.
 
 %feature("docstring") casadi::Integrator::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -22781,14 +22784,14 @@ class instance.
 
 %feature("docstring") casadi::Integrator::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -23262,8 +23265,8 @@ the object creation.
 
 %feature("docstring") casadi::Interpolant::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -23309,8 +23312,8 @@ objects.
 
 %feature("docstring") casadi::Interpolant::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -23335,8 +23338,8 @@ reference to the object.
 
 %feature("docstring") casadi::Interpolant::get_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -23508,8 +23511,8 @@ function inputs and outputs.
 
 %feature("docstring") casadi::Interpolant::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -23545,8 +23548,8 @@ Input/output dimensions.
 
 %feature("docstring") casadi::Interpolant::has_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -23646,8 +23649,8 @@ Input/output dimensions.
 
 %feature("docstring") casadi::Interpolant::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -23884,14 +23887,14 @@ Prepares the function for evaluation.
 
 %feature("docstring") casadi::Interpolant::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -24511,8 +24514,8 @@ class able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::JitFunction::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -24533,8 +24536,8 @@ generate the function.
 
 %feature("docstring") casadi::JitFunction::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -24575,14 +24578,14 @@ Input/output dimensions.
 
 %feature("docstring") casadi::JitFunction::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -24621,8 +24624,8 @@ name in codegen.
 
 %feature("docstring") casadi::JitFunction::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -24650,8 +24653,8 @@ Jacobian of all outputs with respect to all inputs.
 
 %feature("docstring") casadi::JitFunction::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -24780,8 +24783,8 @@ the number of atomic operations.
 
 %feature("docstring") casadi::JitFunction::has_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -24819,8 +24822,8 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::JitFunction::get_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -25968,8 +25971,8 @@ free variables ( MX)
 
 %feature("docstring") casadi::LinearInterpolant::get_forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -26068,8 +26071,8 @@ Print all information there is to know about a certain option.
 
 %feature("docstring") casadi::LinearInterpolant::forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -26093,14 +26096,14 @@ Evaluate with symbolic matrices.
 
 %feature("docstring") casadi::LinearInterpolant::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -26262,8 +26265,8 @@ Print free variables.
 
 %feature("docstring") casadi::LinearInterpolant::reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -26299,8 +26302,8 @@ function input(s) and output(s)
 
 %feature("docstring") casadi::LinearInterpolant::has_reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -26362,8 +26365,8 @@ Forward mode AD, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::LinearInterpolant::get_reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -26444,8 +26447,8 @@ Input/output dimensions.
 
 %feature("docstring") casadi::LinearInterpolant::has_forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -26798,8 +26801,8 @@ Get relative tolerance.
 
 %feature("docstring") casadi::LinearInterpolantJac::reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -26877,8 +26880,8 @@ Number of input/output nonzeros.
 
 %feature("docstring") casadi::LinearInterpolantJac::forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -26983,8 +26986,8 @@ in an Function instance consisting of only one MX call.
 
 %feature("docstring") casadi::LinearInterpolantJac::get_reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -27036,14 +27039,14 @@ Calculate derivatives by multiplying the full Jacobian and multiplying.
 
 %feature("docstring") casadi::LinearInterpolantJac::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -27071,8 +27074,8 @@ Propagate sparsity forward.
 
 %feature("docstring") casadi::LinearInterpolantJac::get_forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -27156,8 +27159,8 @@ Code generate the function.
 
 %feature("docstring") casadi::LinearInterpolantJac::has_reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -27232,8 +27235,8 @@ Does the function have free variables.
 
 %feature("docstring") casadi::LinearInterpolantJac::has_forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -28281,8 +28284,8 @@ for chosing forward/reverse mode.
 
 %feature("docstring") casadi::Map::forward "[INTERNAL]  Return function
 that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(int nfwd) if no cached version
-is available.
+if available, and calls  Function get_forward(casadi_int nfwd) if no cached
+version is available.
 
 ";
 
@@ -28470,19 +28473,19 @@ expressions for the forward seeds.
 
 %feature("docstring") casadi::Map::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
 
->  int casadi::Map::eval_gen(const T **arg, T **res, int *iw, T *w) const 
+>  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate or propagate sparsities.
@@ -28724,8 +28727,8 @@ derivative functions need nondifferentiated outputs?
 
 %feature("docstring") casadi::Map::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(int nadj) if no cached version
-is available.
+if available, and calls  Function get_reverse(casadi_int nadj) if no cached
+version is available.
 
 ";
 
@@ -28955,19 +28958,19 @@ function with a selection of inputs/outputs of the original
 
 %feature("docstring") casadi::MapOmp::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
 
->  int casadi::Map::eval_gen(const T **arg, T **res, int *iw, T *w) const 
+>  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate or propagate sparsities.
@@ -29304,8 +29307,8 @@ length of iw field.
 
 %feature("docstring") casadi::MapOmp::forward "[INTERNAL]  Return function
 that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(int nfwd) if no cached version
-is available.
+if available, and calls  Function get_forward(casadi_int nfwd) if no cached
+version is available.
 
 ";
 
@@ -29514,8 +29517,8 @@ necessary generate, the sparsity of a Jacobian block.
 
 %feature("docstring") casadi::MapOmp::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(int nadj) if no cached version
-is available.
+if available, and calls  Function get_reverse(casadi_int nadj) if no cached
+version is available.
 
 ";
 
@@ -29685,7 +29688,7 @@ possible)
 
 %feature("docstring") friendwrap_mtaylor "
 
->  Matrix<Scalar> mtaylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, int order=1)
+>  Matrix<Scalar> mtaylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, casadi_int order=1)
 ------------------------------------------------------------------------
 
 multivariate Taylor series expansion
@@ -29693,7 +29696,7 @@ multivariate Taylor series expansion
 Do Taylor expansions until the aggregated order of a term is equal to
 'order'. The aggregated order of $x^n y^m$ equals $n+m$.
 
->  Matrix<Scalar> mtaylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, int order, const std::vector< int > &order_contributions)
+>  Matrix<Scalar> mtaylor(const Matrix< Scalar > &ex, const Matrix< Scalar > &x, const Matrix< Scalar > &a, casadi_int order, const std::vector< casadi_int > &order_contributions)
 ------------------------------------------------------------------------
 
 multivariate Taylor series expansion
@@ -29722,7 +29725,7 @@ Get all elements.
 
 >  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Slice &rr)
 
->  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Matrix< int > &rr)
+>  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Matrix< casadi_int > &rr)
 
 >  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Sparsity &sp)
 ------------------------------------------------------------------------
@@ -29731,11 +29734,11 @@ Set a submatrix, single argument
 
 >  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Slice &rr, const Slice &cc)
 
->  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Slice &rr, const Matrix< int > &cc)
+>  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Slice &rr, const Matrix< casadi_int > &cc)
 
->  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Matrix< int > &rr, const Slice &cc)
+>  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Matrix< casadi_int > &rr, const Slice &cc)
 
->  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Matrix< int > &rr, const Matrix< int > &cc)
+>  void casadi::Matrix< T >::set(const Matrix< Scalar > &m, bool ind1, const Matrix< casadi_int > &rr, const Matrix< casadi_int > &cc)
 ------------------------------------------------------------------------
 
 Set a submatrix, two arguments
@@ -29758,7 +29761,7 @@ Remove columns and rows Remove/delete rows and/or columns of a matrix.
 
 >  void casadi::Matrix< T >::get(Matrix< Scalar > &output_m, bool ind1, const Slice &rr) const
 
->  void casadi::Matrix< T >::get(Matrix< Scalar > &output_m, bool ind1, const Matrix< int > &rr) const
+>  void casadi::Matrix< T >::get(Matrix< Scalar > &output_m, bool ind1, const Matrix< casadi_int > &rr) const
 
 >  void casadi::Matrix< T >::get(Matrix< Scalar > &output_m, bool ind1, const Sparsity &sp) const 
 ------------------------------------------------------------------------
@@ -29767,11 +29770,11 @@ Get a submatrix, single argument
 
 >  void casadi::Matrix< T >::get(Matrix< Scalar > &output_m, bool ind1, const Slice &rr, const Slice &cc) const
 
->  void casadi::Matrix< T >::get(Matrix< Scalar > &output_m, bool ind1, const Slice &rr, const Matrix< int > &cc) const
+>  void casadi::Matrix< T >::get(Matrix< Scalar > &output_m, bool ind1, const Slice &rr, const Matrix< casadi_int > &cc) const
 
->  void casadi::Matrix< T >::get(Matrix< Scalar > &output_m, bool ind1, const Matrix< int > &rr, const Slice &cc) const
+>  void casadi::Matrix< T >::get(Matrix< Scalar > &output_m, bool ind1, const Matrix< casadi_int > &rr, const Slice &cc) const
 
->  void casadi::Matrix< T >::get(Matrix< Scalar > &output_m, bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) const 
+>  void casadi::Matrix< T >::get(Matrix< Scalar > &output_m, bool ind1, const Matrix< casadi_int > &rr, const Matrix< casadi_int > &cc) const 
 ------------------------------------------------------------------------
 
 Get a submatrix, two arguments
@@ -30049,13 +30052,13 @@ Get the number of non-zeros in the lower triangular half.
 
 %feature("docstring") casadi::Matrix::erase "
 
->  void casadi::Matrix< T >::erase(const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false)
+>  void casadi::Matrix< T >::erase(const std::vector< casadi_int > &rr, const std::vector< casadi_int > &cc, bool ind1=false)
 ------------------------------------------------------------------------
 
 Erase a submatrix (leaving structural zeros in its place) Erase rows and/or
 columns of a matrix.
 
->  void casadi::Matrix< T >::erase(const std::vector< int > &rr, bool ind1=false)
+>  void casadi::Matrix< T >::erase(const std::vector< casadi_int > &rr, bool ind1=false)
 ------------------------------------------------------------------------
 
 Erase a submatrix (leaving structural zeros in its place) Erase elements of
@@ -30151,18 +30154,18 @@ C++ includes: casadi_common.hpp ";
 
 %feature("docstring") casadi::Matrix::dep "[INTERNAL]  Get expressions of
 the children of the expression Only defined if symbolic scalar. Wraps SXElem
-SXElem::dep(int ch=0) const.
+SXElem::dep(casadi_int ch=0) const.
 
 ";
 
 %feature("docstring") casadi::Matrix::sym "
 
->  static Matrix< Scalar >  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, int nrow=1, int ncol=1)
+>  static Matrix< Scalar >  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, casadi_int nrow=1, casadi_int ncol=1)
 ------------------------------------------------------------------------
 
 Create an nrow-by-ncol symbolic primitive.
 
->  static Matrix< Scalar >  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, const std::pair< int, int > &rc)
+>  static Matrix< Scalar >  casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
 
 Construct a symbolic primitive with given dimensions.
@@ -30172,24 +30175,24 @@ Construct a symbolic primitive with given dimensions.
 
 Create symbolic primitive with a given sparsity pattern.
 
->  static std::vector<Matrix< Scalar >  > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, const Sparsity &sp, int p)
+>  static std::vector<Matrix< Scalar >  > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, const Sparsity &sp, casadi_int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with with matrices with symbolic primitives of
 given sparsity.
 
->  static std::vector<Matrix< Scalar >  > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, int nrow, int ncol, int p)
+>  static std::vector<Matrix< Scalar >  > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, casadi_int nrow, casadi_int ncol, casadi_int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with nrow-by-ncol symbolic primitives.
 
->  static std::vector<std::vector<Matrix< Scalar > > > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, const Sparsity &sp, int p, int r)
+>  static std::vector<std::vector<Matrix< Scalar > > > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, const Sparsity &sp, casadi_int p, casadi_int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with symbolic primitives
 with given sparsity.
 
->  static std::vector<std::vector<Matrix< Scalar > > > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, int nrow, int ncol, int p, int r)
+>  static std::vector<std::vector<Matrix< Scalar > > > casadi::GenericMatrix< Matrix< Scalar >  >::sym(const std::string &name, casadi_int nrow, casadi_int ncol, casadi_int p, casadi_int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with nrow-by-ncol
@@ -30277,12 +30280,12 @@ H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
 
 %feature("docstring") casadi::Matrix::size "
 
->  std::pair<int, int> casadi::GenericMatrix< Matrix< Scalar >  >::size() const
+>  std::pair<casadi_int, casadi_int> casadi::GenericMatrix< Matrix< Scalar >  >::size() const
 ------------------------------------------------------------------------
 
 Get the shape.
 
->  int casadi::GenericMatrix< Matrix< Scalar >  >::size(int axis) const
+>  casadi_int casadi::GenericMatrix< Matrix< Scalar >  >::size(casadi_int axis) const
 ------------------------------------------------------------------------
 
 Get the size along a particular dimensions.
@@ -30411,12 +30414,12 @@ x:  Scalar symbol that the polynomial is build up with
 
 %feature("docstring") friendwrap_gauss_quadrature "
 
->  Matrix<Scalar> gauss_quadrature(const Matrix< Scalar > &f, const Matrix< Scalar > &x, const Matrix< Scalar > &a, const Matrix< Scalar > &b, int order=5)
+>  Matrix<Scalar> gauss_quadrature(const Matrix< Scalar > &f, const Matrix< Scalar > &x, const Matrix< Scalar > &a, const Matrix< Scalar > &b, casadi_int order=5)
 ------------------------------------------------------------------------
 
 Integrate f from a to b using Gaussian quadrature with n points.
 
->  Matrix<Scalar> gauss_quadrature(const Matrix< Scalar > &f, const Matrix< Scalar > &x, const Matrix< Scalar > &a, const Matrix< Scalar > &b, int order, const Matrix< Scalar > &w)
+>  Matrix<Scalar> gauss_quadrature(const Matrix< Scalar > &f, const Matrix< Scalar > &x, const Matrix< Scalar > &a, const Matrix< Scalar > &b, casadi_int order, const Matrix< Scalar > &w)
 ------------------------------------------------------------------------
 
 Matrix adjoint.
@@ -30506,7 +30509,7 @@ empty 0-by-0 matrix constructor
 
 Copy constructor.
 
->  casadi::Matrix< T >::Matrix(int nrow, int ncol)
+>  casadi::Matrix< T >::Matrix(casadi_int nrow, casadi_int ncol)
 ------------------------------------------------------------------------
 
 Create a sparse matrix with all structural zeros.
@@ -30726,13 +30729,13 @@ Check if the matrix expression is scalar.
 
 %feature("docstring") casadi::MX::erase "
 
->  void casadi::MX::erase(const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false)
+>  void casadi::MX::erase(const std::vector< casadi_int > &rr, const std::vector< casadi_int > &cc, bool ind1=false)
 ------------------------------------------------------------------------
 
 Erase a submatrix (leaving structural zeros in its place) Erase rows and/or
 columns of a matrix.
 
->  void casadi::MX::erase(const std::vector< int > &rr, bool ind1=false)
+>  void casadi::MX::erase(const std::vector< casadi_int > &rr, bool ind1=false)
 ------------------------------------------------------------------------
 
 Erase a submatrix (leaving structural zeros in its place) Erase elements of
@@ -30780,7 +30783,7 @@ Check if evaluation output.
 
 >  void casadi::MX::set(const MX &m, bool ind1, const Slice &rr)
 
->  void casadi::MX::set(const MX &m, bool ind1, const Matrix< int > &rr)
+>  void casadi::MX::set(const MX &m, bool ind1, const Matrix< casadi_int > &rr)
 
 >  void casadi::MX::set(const MX &m, bool ind1, const Sparsity &sp)
 ------------------------------------------------------------------------
@@ -31075,12 +31078,12 @@ Get string representation.
 
 %feature("docstring") casadi::MX::size "
 
->  std::pair<int, int> casadi::GenericMatrix< MX  >::size() const
+>  std::pair<casadi_int, casadi_int> casadi::GenericMatrix< MX  >::size() const
 ------------------------------------------------------------------------
 
 Get the shape.
 
->  int casadi::GenericMatrix< MX  >::size(int axis) const
+>  casadi_int casadi::GenericMatrix< MX  >::size(casadi_int axis) const
 ------------------------------------------------------------------------
 
 Get the size along a particular dimensions.
@@ -31160,12 +31163,12 @@ keeping the existing non-zeros.
 
 %feature("docstring") casadi::MX::sym "
 
->  static MX  casadi::GenericMatrix< MX  >::sym(const std::string &name, int nrow=1, int ncol=1)
+>  static MX  casadi::GenericMatrix< MX  >::sym(const std::string &name, casadi_int nrow=1, casadi_int ncol=1)
 ------------------------------------------------------------------------
 
 Create an nrow-by-ncol symbolic primitive.
 
->  static MX  casadi::GenericMatrix< MX  >::sym(const std::string &name, const std::pair< int, int > &rc)
+>  static MX  casadi::GenericMatrix< MX  >::sym(const std::string &name, const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
 
 Construct a symbolic primitive with given dimensions.
@@ -31175,24 +31178,24 @@ Construct a symbolic primitive with given dimensions.
 
 Create symbolic primitive with a given sparsity pattern.
 
->  static std::vector<MX  > casadi::GenericMatrix< MX  >::sym(const std::string &name, const Sparsity &sp, int p)
+>  static std::vector<MX  > casadi::GenericMatrix< MX  >::sym(const std::string &name, const Sparsity &sp, casadi_int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with with matrices with symbolic primitives of
 given sparsity.
 
->  static std::vector<MX  > casadi::GenericMatrix< MX  >::sym(const std::string &name, int nrow, int ncol, int p)
+>  static std::vector<MX  > casadi::GenericMatrix< MX  >::sym(const std::string &name, casadi_int nrow, casadi_int ncol, casadi_int p)
 ------------------------------------------------------------------------
 
 Create a vector of length p with nrow-by-ncol symbolic primitives.
 
->  static std::vector<std::vector<MX > > casadi::GenericMatrix< MX  >::sym(const std::string &name, const Sparsity &sp, int p, int r)
+>  static std::vector<std::vector<MX > > casadi::GenericMatrix< MX  >::sym(const std::string &name, const Sparsity &sp, casadi_int p, casadi_int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with symbolic primitives
 with given sparsity.
 
->  static std::vector<std::vector<MX > > casadi::GenericMatrix< MX  >::sym(const std::string &name, int nrow, int ncol, int p, int r)
+>  static std::vector<std::vector<MX > > casadi::GenericMatrix< MX  >::sym(const std::string &name, casadi_int nrow, casadi_int ncol, casadi_int p, casadi_int r)
 ------------------------------------------------------------------------
 
 Create a vector of length r of vectors of length p with nrow-by-ncol
@@ -31216,7 +31219,7 @@ Check if the matrix expression is square.
 
 >  void casadi::MX::get(MX &output_m, bool ind1, const Slice &rr) const
 
->  void casadi::MX::get(MX &output_m, bool ind1, const Matrix< int > &rr) const
+>  void casadi::MX::get(MX &output_m, bool ind1, const Matrix< casadi_int > &rr) const
 
 >  void casadi::MX::get(MX &output_m, bool ind1, const Sparsity &sp) const 
 ------------------------------------------------------------------------
@@ -31225,11 +31228,11 @@ Get a submatrix, single argument
 
 >  void casadi::MX::get(MX &output_m, bool ind1, const Slice &rr, const Slice &cc) const
 
->  void casadi::MX::get(MX &output_m, bool ind1, const Slice &rr, const Matrix< int > &cc) const
+>  void casadi::MX::get(MX &output_m, bool ind1, const Slice &rr, const Matrix< casadi_int > &cc) const
 
->  void casadi::MX::get(MX &output_m, bool ind1, const Matrix< int > &rr, const Slice &cc) const
+>  void casadi::MX::get(MX &output_m, bool ind1, const Matrix< casadi_int > &rr, const Slice &cc) const
 
->  void casadi::MX::get(MX &output_m, bool ind1, const Matrix< int > &rr, const Matrix< int > &cc) const 
+>  void casadi::MX::get(MX &output_m, bool ind1, const Matrix< casadi_int > &rr, const Matrix< casadi_int > &cc) const 
 ------------------------------------------------------------------------
 
 Get a submatrix, two arguments
@@ -31287,7 +31290,7 @@ Get function - only valid when is_call() is true.
 
 Default constructor.
 
->  casadi::MX::MX(int nrow, int ncol)
+>  casadi::MX::MX(casadi_int nrow, casadi_int ncol)
 ------------------------------------------------------------------------
 
 Create a sparse matrix with all structural zeros.
@@ -31640,8 +31643,8 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::Newton::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(int nadj) if no cached version
-is available.
+if available, and calls  Function get_reverse(casadi_int nadj) if no cached
+version is available.
 
 ";
 
@@ -32082,8 +32085,8 @@ decref for dependencies.
 
 %feature("docstring") casadi::Newton::forward "[INTERNAL]  Return function
 that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(int nfwd) if no cached version
-is available.
+if available, and calls  Function get_forward(casadi_int nfwd) if no cached
+version is available.
 
 ";
 
@@ -32163,14 +32166,14 @@ function inputs and outputs.
 
 %feature("docstring") casadi::Newton::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -32538,8 +32541,8 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Nlpsol::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -32599,8 +32602,8 @@ structure recognition.
 
 %feature("docstring") casadi::Nlpsol::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(int nadj) if no cached version
-is available.
+if available, and calls  Function get_reverse(casadi_int nadj) if no cached
+version is available.
 
 ";
 
@@ -32697,8 +32700,8 @@ vectors.
 
 %feature("docstring") casadi::Nlpsol::get_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -32825,8 +32828,8 @@ dimensions.
 
 %feature("docstring") casadi::Nlpsol::has_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -32841,8 +32844,8 @@ output arguments that needs to be replaced.
 
 %feature("docstring") casadi::Nlpsol::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -33032,8 +33035,8 @@ meta-information allowing a user to evaluate a generated function.
 
 %feature("docstring") casadi::Nlpsol::forward "[INTERNAL]  Return function
 that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(int nfwd) if no cached version
-is available.
+if available, and calls  Function get_forward(casadi_int nfwd) if no cached
+version is available.
 
 ";
 
@@ -33267,14 +33270,14 @@ dimensions.
 
 %feature("docstring") casadi::Nlpsol::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -34276,8 +34279,8 @@ C++ includes: optistack.hpp ";
 // File: classcasadi_1_1OracleFunction.xml
 %feature("docstring") casadi::OracleFunction::get_reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -34303,8 +34306,8 @@ Get the unidirectional or bidirectional partition.
 
 %feature("docstring") casadi::OracleFunction::has_forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -34505,8 +34508,8 @@ Forward mode AD, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::OracleFunction::has_reverse "[INTERNAL]
 Return function that calculates adjoint derivatives reverse(nadj) returns a
-cached instance if available, and calls  Function get_reverse(int nadj) if
-no cached version is available.
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -34638,8 +34641,8 @@ of function inputs and outputs.
 
 %feature("docstring") casadi::OracleFunction::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -34650,8 +34653,8 @@ Generate meta-information allowing a user to evaluate a generated function.
 
 %feature("docstring") casadi::OracleFunction::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -34739,8 +34742,8 @@ required length of w field.
 
 %feature("docstring") casadi::OracleFunction::get_forward "[INTERNAL]
 Return function that calculates forward derivatives forward(nfwd) returns a
-cached instance if available, and calls  Function get_forward(int nfwd) if
-no cached version is available.
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -35116,14 +35119,14 @@ Input/output dimensions.
 
 %feature("docstring") casadi::OracleFunction::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -35713,8 +35716,8 @@ evaluation.
 
 %feature("docstring") casadi::QpToNlp::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(int nadj) if no cached version
-is available.
+if available, and calls  Function get_reverse(casadi_int nadj) if no cached
+version is available.
 
 ";
 
@@ -35852,8 +35855,8 @@ output arguments have correct length and dimensions.
 
 %feature("docstring") casadi::QpToNlp::forward "[INTERNAL]  Return function
 that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(int nfwd) if no cached version
-is available.
+if available, and calls  Function get_forward(casadi_int nfwd) if no cached
+version is available.
 
 ";
 
@@ -35866,8 +35869,8 @@ name of the internal class.
 
 %feature("docstring") casadi::QpToNlp::get_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -36007,8 +36010,8 @@ factor for chosing forward/reverse mode, sparsity propagation.
 
 %feature("docstring") casadi::QpToNlp::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -36098,14 +36101,14 @@ block.
 
 %feature("docstring") casadi::QpToNlp::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -36153,8 +36156,8 @@ in codegen.
 
 %feature("docstring") casadi::QpToNlp::has_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -36223,8 +36226,8 @@ the sparsity of a Jacobian block.
 
 %feature("docstring") casadi::QpToNlp::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -36386,8 +36389,8 @@ Extract the functions needed for the Lifted Newton method.
 
 %feature("docstring") casadi::Rootfinder::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -36423,8 +36426,8 @@ scheme index by name.
 
 %feature("docstring") casadi::Rootfinder::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -37048,14 +37051,14 @@ Generate code for the function body.
 
 %feature("docstring") casadi::Rootfinder::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -37332,8 +37335,8 @@ function input and outputs.
 
 %feature("docstring") casadi::RungeKutta::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -37518,8 +37521,8 @@ G.
 
 %feature("docstring") casadi::RungeKutta::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -38009,14 +38012,14 @@ Prepares the function for evaluation.
 
 %feature("docstring") casadi::RungeKutta::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -38200,8 +38203,8 @@ input(s) and output(s)
 
 %feature("docstring") casadi::Scpgen::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -38307,8 +38310,8 @@ object.
 
 %feature("docstring") casadi::Scpgen::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(int nadj) if no cached version
-is available.
+if available, and calls  Function get_reverse(casadi_int nadj) if no cached
+version is available.
 
 ";
 
@@ -38351,8 +38354,8 @@ input(s) and output(s)
 
 %feature("docstring") casadi::Scpgen::get_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -38409,14 +38412,14 @@ variables (SX)
 
 %feature("docstring") casadi::Scpgen::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -38454,8 +38457,8 @@ input(s) and output(s)
 
 %feature("docstring") casadi::Scpgen::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -38559,8 +38562,8 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Scpgen::forward "[INTERNAL]  Return function
 that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(int nfwd) if no cached version
-is available.
+if available, and calls  Function get_forward(casadi_int nfwd) if no cached
+version is available.
 
 ";
 
@@ -38767,8 +38770,8 @@ the functions needed for the Lifted Newton method.
 
 %feature("docstring") casadi::Scpgen::has_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -39459,12 +39462,12 @@ Obtain information
 
 %feature("docstring") casadi::Slice::all "
 
->  std::vector<int> casadi::Slice::all(int len, bool ind1=false) const 
+>  std::vector<casadi_int> casadi::Slice::all(casadi_int len, bool ind1=false) const 
 ------------------------------------------------------------------------
 
 Get a vector of indices.
 
->  std::vector<int> casadi::Slice::all(const Slice &outer, int len) const 
+>  std::vector<casadi_int> casadi::Slice::all(const Slice &outer, casadi_int len) const 
 ------------------------------------------------------------------------
 
 Get a vector of indices (nested slice)
@@ -39478,12 +39481,12 @@ Get a vector of indices (nested slice)
 
 Default constructor - all elements.
 
->  casadi::Slice::Slice(int i, bool ind1=false)
+>  casadi::Slice::Slice(casadi_int i, bool ind1=false)
 ------------------------------------------------------------------------
 
 A single element (explicit to avoid ambiguity with IM overload.
 
->  casadi::Slice::Slice(int start, int stop, int step=1)
+>  casadi::Slice::Slice(casadi_int start, casadi_int stop, casadi_int step=1)
 ------------------------------------------------------------------------
 
 A slice.
@@ -40161,8 +40164,8 @@ memory object.
 
 %feature("docstring") casadi::SlicotDple::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -40183,14 +40186,14 @@ input/output elements.
 
 %feature("docstring") casadi::SlicotDple::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -40229,8 +40232,8 @@ variables (SX)
 
 %feature("docstring") casadi::SlicotDple::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -40698,14 +40701,14 @@ Sparsities of function inputs and outputs.
 
 %feature("docstring") casadi::SlicotExpm::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -40719,8 +40722,8 @@ codegen supported?
 
 %feature("docstring") casadi::SlicotExpm::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -41085,8 +41088,8 @@ Input/output dimensions.
 
 %feature("docstring") casadi::SlicotExpm::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -41464,8 +41467,8 @@ function, overloaded.
 
 %feature("docstring") casadi::Smoothing::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -41490,8 +41493,8 @@ Input/output dimensions.
 
 %feature("docstring") casadi::Smoothing::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -41557,8 +41560,8 @@ required length of res field.
 
 %feature("docstring") casadi::Smoothing::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -41993,14 +41996,14 @@ structure recognition.
 
 %feature("docstring") casadi::Smoothing::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -42084,8 +42087,8 @@ list of options.
 
 %feature("docstring") casadi::Smoothing::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -42425,7 +42428,9 @@ randomly permuted block-diagonal matrix.
 If your matrix is symmetrical, this method is of limited use; permutation
 can make it non-symmetric.
 
-See:   scc
+See:   scc  The implementation is a modified version of cs_dmperm in CSparse
+Copyright(c) Timothy A. Davis, 2006-2009 Licensed as a derivative work under
+the GNU LGPL
 
 ";
 
@@ -42439,7 +42444,9 @@ Is upper triangular?
 
 Symbolic QR factorization Returns the sparsity pattern of V (compact
 representation of Q) and R as well as vectors needed for the numerical
-factorization and solution.
+factorization and solution. The implementation is a modified version of
+CSparse Copyright(c) Timothy A. Davis, 2006-2009 Licensed as a derivative
+work under the GNU LGPL.
 
 ";
 
@@ -42502,23 +42509,23 @@ j==i.
 
 %feature("docstring") casadi::Sparsity::Sparsity "
 
->  casadi::Sparsity::Sparsity(int dummy=0)
+>  casadi::Sparsity::Sparsity(casadi_int dummy=0)
 ------------------------------------------------------------------------
 
 Default constructor.
 
->  casadi::Sparsity::Sparsity(int nrow, int ncol)
+>  casadi::Sparsity::Sparsity(casadi_int nrow, casadi_int ncol)
 ------------------------------------------------------------------------
 
 Pattern with all structural zeros.
 
->  casadi::Sparsity::Sparsity(int nrow, int ncol, const std::vector< int > &colind, const std::vector< int > &row)
+>  casadi::Sparsity::Sparsity(casadi_int nrow, casadi_int ncol, const std::vector< casadi_int > &colind, const std::vector< casadi_int > &row)
 ------------------------------------------------------------------------
 
 Construct from sparsity pattern vectors given in compressed column storage
 format.
 
->  casadi::Sparsity::Sparsity(const std::pair< int, int > &rc)
+>  casadi::Sparsity::Sparsity(const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
 
 Create a sparse matrix with all structural zeros.
@@ -42586,6 +42593,9 @@ Append another sparsity patten horizontally.
 
 Symbolic LDL factorization Returns the sparsity pattern of L as well as the
 elimination tree.
+
+The implementation is a modified version of LDL Copyright(c) Timothy A.
+Davis, 2005-2013 Licensed as a derivative work under the GNU LGPL
 
 ";
 
@@ -42682,7 +42692,7 @@ Get the sparsity in compressed row storage (CRS) format.
 
 %feature("docstring") casadi::Sparsity::sub "
 
->  Sparsity casadi::Sparsity::sub(const std::vector< int > &rr, const std::vector< int > &cc, std::vector< int > &output_mapping, bool ind1=false) const 
+>  Sparsity casadi::Sparsity::sub(const std::vector< casadi_int > &rr, const std::vector< casadi_int > &cc, std::vector< casadi_int > &output_mapping, bool ind1=false) const 
 ------------------------------------------------------------------------
 
 Get a submatrix.
@@ -42690,7 +42700,7 @@ Get a submatrix.
 Returns the sparsity of the submatrix, with a mapping such that submatrix[k]
 = originalmatrix[mapping[k]]
 
->  Sparsity casadi::Sparsity::sub(const std::vector< int > &rr, const Sparsity &sp, std::vector< int > &output_mapping, bool ind1=false) const 
+>  Sparsity casadi::Sparsity::sub(const std::vector< casadi_int > &rr, const Sparsity &sp, std::vector< casadi_int > &output_mapping, bool ind1=false) const 
 ------------------------------------------------------------------------
 
 Get a set of elements.
@@ -42963,6 +42973,9 @@ interpretation: Given a symmetric matrix A and n = A.scc(p, r)
 => A[p, p] will appear block-diagonal with n blocks and with the indices of
 the block boundaries to be found in r.
 
+The implementation is a modified version of cs_scc in CSparse Copyright(c)
+Timothy A. Davis, 2006-2009 Licensed as a derivative work under the GNU LGPL
+
 ";
 
 %feature("docstring") casadi::Sparsity::get_upper "
@@ -43058,12 +43071,12 @@ point to any node, \"0\" is returned.
 
 %feature("docstring") casadi::Sparsity::size "
 
->  std::pair<int, int> casadi::Sparsity::size() const 
+>  std::pair<casadi_int, casadi_int> casadi::Sparsity::size() const 
 ------------------------------------------------------------------------
 
 Get the shape.
 
->  int casadi::Sparsity::size(int axis) const 
+>  casadi_int casadi::Sparsity::size(casadi_int axis) const 
 ------------------------------------------------------------------------
 
 Get the size along a particular dimensions.
@@ -43077,22 +43090,25 @@ by Davis (2006). If the parameter ata is false, the algorithm is equivalent
 to MATLAB's etree(A), except that the indices are zero- based. If ata is
 true, the algorithm is equivalent to MATLAB's etree(A, 'col').
 
+The implementation is a modified version of cs_etree in CSparse Copyright(c)
+Timothy A. Davis, 2006-2009 Licensed as a derivative work under the GNU LGPL
+
 ";
 
 %feature("docstring") casadi::Sparsity::get_nz "
 
->  int casadi::Sparsity::get_nz(int rr, int cc) const 
+>  casadi_int casadi::Sparsity::get_nz(casadi_int rr, casadi_int cc) const 
 ------------------------------------------------------------------------
 
 Get the index of an existing non-zero element return -1 if the element does
 not exist.
 
->  std::vector<int> casadi::Sparsity::get_nz(const std::vector< int > &rr, const std::vector< int > &cc) const 
+>  std::vector<casadi_int> casadi::Sparsity::get_nz(const std::vector< casadi_int > &rr, const std::vector< casadi_int > &cc) const 
 ------------------------------------------------------------------------
 
 Get a set of non-zero element return -1 if the element does not exist.
 
->  void casadi::Sparsity::get_nz(std::vector< int > &INOUT) const 
+>  void casadi::Sparsity::get_nz(std::vector< casadi_int > &INOUT) const 
 ------------------------------------------------------------------------
 
 Get the nonzero index for a set of elements The index vector is used both
@@ -43103,12 +43119,12 @@ column-wise. Elements not found in the sparsity pattern are set to -1.
 
 %feature("docstring") casadi::Sparsity::erase "
 
->  std::vector<int> casadi::Sparsity::erase(const std::vector< int > &rr, const std::vector< int > &cc, bool ind1=false)
+>  std::vector<casadi_int> casadi::Sparsity::erase(const std::vector< casadi_int > &rr, const std::vector< casadi_int > &cc, bool ind1=false)
 ------------------------------------------------------------------------
 
 Erase rows and/or columns of a matrix.
 
->  std::vector<int> casadi::Sparsity::erase(const std::vector< int > &rr, bool ind1=false)
+>  std::vector<casadi_int> casadi::Sparsity::erase(const std::vector< casadi_int > &rr, bool ind1=false)
 ------------------------------------------------------------------------
 
 Erase elements of a matrix.
@@ -43239,14 +43255,14 @@ dimensions.
 
 %feature("docstring") casadi::Sqpmethod::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -43340,15 +43356,15 @@ vectors long enough to evaluate function.
 
 %feature("docstring") casadi::Sqpmethod::has_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
 %feature("docstring") casadi::Sqpmethod::get_reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -43606,8 +43622,8 @@ Symbolic expressions for the adjoint seeds.
 
 %feature("docstring") casadi::Sqpmethod::get_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -43639,7 +43655,7 @@ evaluation.
 [INTERNAL] 
 Print iteration header.
 
->  void casadi::Sqpmethod::print_iteration(int iter, double obj, double pr_inf, double du_inf, double dx_norm, double reg, int ls_trials, bool ls_success) const 
+>  void casadi::Sqpmethod::print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf, double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Print iteration.
@@ -43670,8 +43686,8 @@ the function for evaluation and statistics gathering
 
 %feature("docstring") casadi::Sqpmethod::has_forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -43788,8 +43804,8 @@ variables (SX)
 
 %feature("docstring") casadi::Sqpmethod::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(int nfwd) if no
-cached version is available.
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
@@ -43986,8 +44002,8 @@ memory object.
 
 %feature("docstring") casadi::Sqpmethod::reverse "[INTERNAL]  Return
 function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(int nadj) if no
-cached version is available.
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
@@ -44308,14 +44324,14 @@ length of iw field.
 
 %feature("docstring") casadi::Switch::eval_gen "
 
->  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, int *iw, double *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate numerically.
 
->  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, int *iw, SXElem *w, void *mem) const
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
 
->  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, int *iw, bvec_t *w, void *mem) const 
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate a function, overloaded.
@@ -44831,8 +44847,8 @@ evaluation.
 
 %feature("docstring") casadi::Switch::reverse "[INTERNAL]  Return function
 that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(int nadj) if no cached version
-is available.
+if available, and calls  Function get_reverse(casadi_int nadj) if no cached
+version is available.
 
 ";
 
@@ -44955,8 +44971,8 @@ sparsity backwards.
 
 %feature("docstring") casadi::Switch::forward "[INTERNAL]  Return function
 that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(int nfwd) if no cached version
-is available.
+if available, and calls  Function get_forward(casadi_int nfwd) if no cached
+version is available.
 
 ";
 
@@ -45581,12 +45597,12 @@ Explicitly load a plugin dynamically.
 
 %feature("docstring") casadi::casadi_rank1 "
 
->  void casadi::casadi_rank1(T1 *A, const int *sp_A, T1 alpha, const T1 *x)
+>  void casadi::casadi_rank1(T1 *A, const casadi_int *sp_A, T1 alpha, const T1 *x)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 
->  void casadi::casadi_rank1(T1 *A, const int *sp_A, T1 alpha, const T1 *x, const T1 *y)
+>  void casadi::casadi_rank1(T1 *A, const casadi_int *sp_A, T1 alpha, const T1 *x, const T1 *y)
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
@@ -45606,7 +45622,7 @@ Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 
 Get output scheme of DPLE solvers.
 
->  std::string casadi::dple_out(int ind)
+>  std::string casadi::dple_out(casadi_int ind)
 ------------------------------------------------------------------------
 
 Get DPLE output scheme name by index.
@@ -45937,12 +45953,12 @@ true)
 
 %feature("docstring") casadi::in_range "
 
->  bool casadi::in_range(const std::vector< T > &v, int upper)
+>  bool casadi::in_range(const std::vector< T > &v, casadi_int upper)
 ------------------------------------------------------------------------
 
 Check if for each element of v holds: v_i < upper.
 
->  bool casadi::in_range(const std::vector< T > &v, int lower, int upper)
+>  bool casadi::in_range(const std::vector< T > &v, casadi_int lower, casadi_int upper)
 ------------------------------------------------------------------------
 
 Check if for each element of v holds: lower <= v_i < upper.
@@ -45983,8 +45999,6 @@ Check if the vector is strictly increasing.
 ";
 
 %feature("docstring") casadi::Contraction "";
-
-%feature("docstring") casadi::casadi_ldl_row "[INTERNAL] ";
 
 %feature("docstring") casadi::conic_options "
 
@@ -46082,7 +46096,7 @@ sparse.
 
 %feature("docstring") casadi::hash_sparsity "
 
->  std::size_t casadi::hash_sparsity(int nrow, int ncol, const std::vector< int > &colind, const std::vector< int > &row)
+>  std::size_t casadi::hash_sparsity(casadi_int nrow, casadi_int ncol, const std::vector< casadi_int > &colind, const std::vector< casadi_int > &row)
 ------------------------------------------------------------------------
 
 Hash a sparsity pattern.
@@ -46324,7 +46338,7 @@ Check if the vector has negative entries.
 
 Convert IM to Slice.
 
->  Slice casadi::to_slice(const std::vector< int > &v, bool ind1=false)
+>  Slice casadi::to_slice(const std::vector< casadi_int > &v, bool ind1=false)
 ------------------------------------------------------------------------
 
 Construct from an index vector (requires is_slice(v) to be true)
@@ -46352,7 +46366,7 @@ Get the number of expm solver inputs.
 
 Get input scheme of QP solvers.
 
->  std::string casadi::conic_in(int ind)
+>  std::string casadi::conic_in(casadi_int ind)
 ------------------------------------------------------------------------
 
 Get QP solver input scheme name by index.
@@ -46367,7 +46381,7 @@ Get the documentation string for a plugin.
 
 %feature("docstring") casadi::lookupvector "
 
->  std::vector<int> casadi::lookupvector(const std::vector< int > &v, int size)
+>  std::vector<casadi_int> casadi::lookupvector(const std::vector< casadi_int > &v, casadi_int size)
 ------------------------------------------------------------------------
 
 Returns a vector for quickly looking up entries of supplied list.
@@ -46391,19 +46405,17 @@ Get the documentation string for a plugin.
 
 >  void casadi::hash_combine(std::size_t &seed, T v)
 
->  void casadi::hash_combine(std::size_t &seed, const std::vector< int > &v)
+>  void casadi::hash_combine(std::size_t &seed, const std::vector< casadi_int > &v)
 ------------------------------------------------------------------------
 
 Generate a hash value incrementally (function taken from boost)
 
->  void casadi::hash_combine(std::size_t &seed, const int *v, int sz)
+>  void casadi::hash_combine(std::size_t &seed, const casadi_int *v, std::size_t sz)
 ------------------------------------------------------------------------
 
 Generate a hash value incrementally, array.
 
 ";
-
-%feature("docstring") casadi::casadi_copy_int "[INTERNAL] ";
 
 %feature("docstring") casadi::trim_path "";
 
@@ -46416,6 +46428,8 @@ Check if a particular plugin is available.
 ";
 
 %feature("docstring") casadi::casadi_central_diff "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_copy_s_t "[INTERNAL] ";
 
 %feature("docstring") casadi::integrator "
 
@@ -46878,7 +46892,7 @@ Joel Andersson
 
 Get integrator output scheme of integrators.
 
->  std::string casadi::integrator_out(int ind)
+>  std::string casadi::integrator_out(casadi_int ind)
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
@@ -47677,8 +47691,6 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring") casadi::casadi_ldl_colind "[INTERNAL] ";
-
 %feature("docstring") casadi::casadi_densify "[INTERNAL]  Convert sparse to
 dense.
 
@@ -47752,7 +47764,7 @@ Explicitly load a plugin dynamically.
 
 Get input scheme of integrators.
 
->  std::string casadi::integrator_in(int ind)
+>  std::string casadi::integrator_in(casadi_int ind)
 ------------------------------------------------------------------------
 
 Get integrator input scheme name by index.
@@ -47794,7 +47806,7 @@ polynomial.
 
 ";
 
-%feature("docstring") casadi::casadi_fill_int "[INTERNAL] ";
+%feature("docstring") casadi::casadi_house "[INTERNAL] ";
 
 %feature("docstring") casadi::dense_mul_nt "[INTERNAL] ";
 
@@ -47869,12 +47881,6 @@ Get the documentation string for a plugin.
 
 %feature("docstring") casadi::casadi_project "[INTERNAL]  Sparse copy: y <-
 x, w work vector (length >= number of rows)
-
-";
-
-%feature("docstring") casadi::matrixName< int > "
-
-Get typename.
 
 ";
 
@@ -48376,7 +48382,7 @@ Joris Gillis
 
 Is the IM a Slice.
 
->  bool casadi::is_slice(const std::vector< int > &v, bool ind1=false)
+>  bool casadi::is_slice(const std::vector< casadi_int > &v, bool ind1=false)
 ------------------------------------------------------------------------
 
 Check if an index vector can be represented more efficiently as a slice.
@@ -48497,7 +48503,7 @@ Get NLP solver output scheme of NLP solvers.
 |              |       | solution (np x 1)                                 |
 +--------------+-------+---------------------------------------------------+
 
->  std::string casadi::nlpsol_out(int ind)
+>  std::string casadi::nlpsol_out(casadi_int ind)
 ------------------------------------------------------------------------
 
 Get output scheme name by index.
@@ -48557,8 +48563,6 @@ order:  Order of interpolating polynomials
 
 ";
 
-%feature("docstring") casadi::casadi_house "[INTERNAL] ";
-
 %feature("docstring") casadi::nlpsol_in "
 
 >  std::vector<std::string> casadi::nlpsol_in()
@@ -48592,7 +48596,7 @@ Get input scheme of NLP solvers.
 |               |        | guess (ng x 1)                                  |
 +---------------+--------+-------------------------------------------------+
 
->  std::string casadi::nlpsol_in(int ind)
+>  std::string casadi::nlpsol_in(casadi_int ind)
 ------------------------------------------------------------------------
 
 Get NLP solver input scheme name by index.
@@ -48648,7 +48652,7 @@ Get the documentation string for a plugin.
 
 Get input scheme of DPLE solvers.
 
->  std::string casadi::dple_in(int ind)
+>  std::string casadi::dple_in(casadi_int ind)
 ------------------------------------------------------------------------
 
 Get DPLE input scheme name by index.
@@ -48658,6 +48662,12 @@ Get DPLE input scheme name by index.
 %feature("docstring") casadi::dense_copy_t_stride "[INTERNAL] ";
 
 %feature("docstring") casadi::dense_mul_nn2 "[INTERNAL] ";
+
+%feature("docstring") casadi::matrixName< casadi_int > "
+
+Get typename.
+
+";
 
 %feature("docstring") casadi::nlpsol "
 
@@ -49447,6 +49457,8 @@ y.size1()+x.size2()+1
 
 ";
 
+%feature("docstring") casadi::casadi_fill_s_t "[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qr_mv "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_fill "[INTERNAL]  FILL: x <- alpha.
@@ -49462,7 +49474,7 @@ y.size1()+x.size2()+1
 
 Get QP solver output scheme of QP solvers.
 
->  std::string casadi::conic_out(int ind)
+>  std::string casadi::conic_out(casadi_int ind)
 ------------------------------------------------------------------------
 
 Get output scheme name by index.

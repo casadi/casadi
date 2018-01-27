@@ -121,14 +121,14 @@ namespace casadi {
       return solver_.calc_function(mem_, "nlp_jac_g")==0;
     } else {
       // Get the sparsity pattern
-      int ncol = solver_.jacg_sp_.size2();
-      const int* colind = solver_.jacg_sp_.colind();
-      const int* row = solver_.jacg_sp_.row();
+      casadi_int ncol = solver_.jacg_sp_.size2();
+      const casadi_int* colind = solver_.jacg_sp_.colind();
+      const casadi_int* row = solver_.jacg_sp_.row();
       if (nele_jac!=colind[ncol]) return false; // consistency check
 
       // Pass to IPOPT
-      for (int cc=0; cc<ncol; ++cc) {
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+      for (casadi_int cc=0; cc<ncol; ++cc) {
+        for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
           *iRow++ = row[el];
           *jCol++ = cc;
         }
@@ -153,13 +153,13 @@ namespace casadi {
       return true;
     } else {
       // Get the sparsity pattern
-      int ncol = solver_.hesslag_sp_.size2();
-      const int* colind = solver_.hesslag_sp_.colind();
-      const int* row = solver_.hesslag_sp_.row();
+      casadi_int ncol = solver_.hesslag_sp_.size2();
+      const casadi_int* colind = solver_.hesslag_sp_.colind();
+      const casadi_int* row = solver_.hesslag_sp_.row();
 
       // Pass to IPOPT
-      for (int cc=0; cc<ncol; ++cc) {
-        for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+      for (casadi_int cc=0; cc<ncol; ++cc) {
+        for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
           *iRow++ = row[el];
           *jCol++ = cc;
         }

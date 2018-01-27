@@ -47,7 +47,7 @@ namespace casadi {
     bool is_warm;
 
     /// Nature of problem (always minimization)
-    int objsen;
+    casadi_int objsen;
 
     /// Determines relation >,<, = in the linear constraints
     std::vector<char> sense;
@@ -73,6 +73,8 @@ namespace casadi {
     /// CPLEX environment
     CPXENVptr env;
     CPXLPptr lp;
+
+    std::vector<int> a_colind, a_row, h_colind, h_row;
 
     /// Constructor
     CplexMemory();
@@ -129,7 +131,7 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<CplexMemory*>(mem);}
 
     // Solve the QP
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /// Can discrete variables be treated
     bool integer_support() const override { return true;}
@@ -139,11 +141,11 @@ namespace casadi {
 
     ///@{
     /// Options
-    int qp_method_;
+    casadi_int qp_method_;
     bool dump_to_file_;
     std::string dump_filename_;
     double tol_;
-    int dep_check_;
+    casadi_int dep_check_;
     bool warm_start_;
     ///@}
 

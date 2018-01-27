@@ -60,7 +60,7 @@ namespace casadi {
         "(" + str(V.size()) + ") must match.");
       std::vector<MX> Adense, Vdense;
 
-      for (int i=0;i<A.size();++i) {
+      for (casadi_int i=0;i<A.size();++i) {
         Adense.push_back(densify(A[i]));
         Vdense.push_back(densify(V[i]));
       }
@@ -76,7 +76,7 @@ namespace casadi {
         "(" + str(V.size()) + ") must match.");
       std::vector<DM> Adense, Vdense;
 
-      for (int i=0;i<A.size();++i) {
+      for (casadi_int i=0;i<A.size();++i) {
         Adense.push_back(densify(A[i]));
         Vdense.push_back(densify(V[i]));
       }
@@ -112,7 +112,7 @@ namespace casadi {
     return ret;
   }
 
-  string dple_in(int ind) {
+  string dple_in(casadi_int ind) {
     switch (static_cast<DpleInput>(ind)) {
     case DPLE_A:      return "a";
     case DPLE_V:      return "v";
@@ -121,7 +121,7 @@ namespace casadi {
     return string();
   }
 
-  string dple_out(int ind) {
+  string dple_out(casadi_int ind) {
     switch (static_cast<DpleOutput>(ind)) {
       case DPLE_P:      return "p";
       case DPLE_NUM_OUT: break;
@@ -129,11 +129,11 @@ namespace casadi {
     return string();
   }
 
-  int dple_n_in() {
+  casadi_int dple_n_in() {
     return DPLE_NUM_IN;
   }
 
-  int dple_n_out() {
+  casadi_int dple_n_out() {
     return DPLE_NUM_OUT;
   }
 
@@ -152,7 +152,7 @@ namespace casadi {
 
   }
 
-  Sparsity Dple::get_sparsity_in(int i) {
+  Sparsity Dple::get_sparsity_in(casadi_int i) {
     switch (static_cast<DpleInput>(i)) {
       case DPLE_A:
         return A_;
@@ -163,7 +163,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity Dple::get_sparsity_out(int i) {
+  Sparsity Dple::get_sparsity_out(casadi_int i) {
     switch (static_cast<DpleOutput>(i)) {
       case DPLE_P:
         return V_;
@@ -227,7 +227,7 @@ namespace casadi {
 
     casadi_assert(const_dim_, "Not implemented");
 
-    int blocksize = Vref.colind()[1];
+    casadi_int blocksize = Vref.colind()[1];
     K_ = Vref.size1()/blocksize;
     Sparsity block = Sparsity::dense(blocksize, blocksize);
 
@@ -238,7 +238,7 @@ namespace casadi {
 
   }
 
-  Function Dple::get_forward(int nfwd, const std::string& name,
+  Function Dple::get_forward(casadi_int nfwd, const std::string& name,
                                const std::vector<std::string>& inames,
                                const std::vector<std::string>& onames,
                                const Dict& opts) const {
@@ -259,15 +259,15 @@ namespace casadi {
     MX P = MX::sym("P", V_);
     MX Adot = MX::sym("Adot", repmat(A_, 1, nfwd));
     MX Vdot = MX::sym("Vdot", repmat(V_, 1, nfwd));
-    MX Qdot = Vdotf.map("map", "serial", nrhs_, {0, 2}, std::vector<int>{})
-         .map("map", "serial", nfwd, {0, 1}, std::vector<int>{})({A, P, Adot, Vdot})[0];
+    MX Qdot = Vdotf.map("map", "serial", nrhs_, {0, 2}, std::vector<casadi_int>{})
+         .map("map", "serial", nfwd, {0, 1}, std::vector<casadi_int>{})({A, P, Adot, Vdot})[0];
     MX Pdot = dplesol(A, Qdot, plugin_name(), opts);
     MX V = MX::sym("V", Sparsity(size_in(DPLE_V))); // We dont need V
     return Function(name, {A, V, P, Adot, Vdot}, {Pdot}, inames, onames);
 
   }
 
-  Function Dple::get_reverse(int nadj, const std::string& name,
+  Function Dple::get_reverse(casadi_int nadj, const std::string& name,
                                const std::vector<std::string>& inames,
                                const std::vector<std::string>& onames,
                                const Dict& opts) const {
@@ -277,7 +277,7 @@ namespace casadi {
 
     // Helper function to reverse, reverse-tranpose,
     // and reverse-symmetrize one block-diagonal matrix
-    int n = A_.size1()/K_;
+    casadi_int n = A_.size1()/K_;
     std::vector<MX> ret = diagsplit(A, n);
     std::reverse(ret.begin(), ret.end());
     std::vector<MX> retT;
@@ -316,8 +316,9 @@ namespace casadi {
     // Undo the reversal for Vbar
     MX Vbar = rev.map(nrhs_).map(nadj)(Vbar_rev)[0];
 
-    MX Abar = Abarf.map("map", "serial", nrhs_, std::vector<int>{1}, {0}).
-                    map("map", "serial", nadj, {0, 1}, std::vector<int>{})({P, A_rev, Vbar_rev})[0];
+    MX Abar = Abarf.map("map", "serial", nrhs_, std::vector<casadi_int>{1}, {0}).
+                    map("map", "serial", nadj, {0, 1}, std::vector<casadi_int>{})(
+                      {P, A_rev, Vbar_rev})[0];
 
     MX V = MX::sym("V", Sparsity(size_in(DPLE_V))); // We dont need V
     return Function(name, {A, V, P, Pbar}, {Abar, Vbar}, inames, onames);

@@ -47,7 +47,7 @@ public:
   const std::string& name() const override { return name_; }
 
     /** \brief  Get the operation */
-  int op() const override { return OP_PARAMETER;}
+  casadi_int op() const override { return OP_PARAMETER;}
 
   /** \brief  Name */
   std::string name_;

@@ -85,16 +85,16 @@ namespace casadi {
   CASADI_EXPORT std::vector<std::string> conic_out();
 
   /** \brief Get QP solver input scheme name by index */
-  CASADI_EXPORT std::string conic_in(int ind);
+  CASADI_EXPORT std::string conic_in(casadi_int ind);
 
   /** \brief Get output scheme name by index */
-  CASADI_EXPORT std::string conic_out(int ind);
+  CASADI_EXPORT std::string conic_out(casadi_int ind);
 
   /** \brief Get the number of QP solver inputs */
-  CASADI_EXPORT int conic_n_in();
+  CASADI_EXPORT casadi_int conic_n_in();
 
   /** \brief Get the number of QP solver outputs */
-  CASADI_EXPORT int conic_n_out();
+  CASADI_EXPORT casadi_int conic_n_out();
 
   /** \brief Get all options for a plugin */
   CASADI_EXPORT std::vector<std::string> conic_options(const std::string& name);

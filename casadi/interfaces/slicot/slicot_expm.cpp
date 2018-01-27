@@ -76,7 +76,7 @@ namespace casadi {
 
 
   void SlicotExpm::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
+                                casadi_int*& iw, double*& w) const {
     auto m = static_cast<SlicotExpmMemory*>(mem);
 
     // Set work in base classes
@@ -85,7 +85,7 @@ namespace casadi {
     m->A = w; w += n_*n_;
     m->H = w; w += n_*n_;
     m->dwork = w;
-    m->iwork = iw;
+    m->iwork = reinterpret_cast<int*>(iw);
   }
 
 
@@ -94,7 +94,8 @@ namespace casadi {
     return Expm::init_mem(mem);
   }
 
-  int SlicotExpm::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int SlicotExpm::eval(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<SlicotExpmMemory*>(mem);
 
     setup(mem, arg, res, iw, w);

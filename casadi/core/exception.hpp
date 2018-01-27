@@ -107,10 +107,6 @@ inline std::ostream& message_prefix(std::ostream &stream) {
   return stream;
 }
 
-// Convert to string
-#define CASADI_STR1(x) #x
-#define CASADI_STR(x) CASADI_STR1(x)
-
 // String denoting where the macro is situated
 #define CASADI_WHERE casadi::trim_path(__FILE__ ":" CASADI_STR(__LINE__))
 

@@ -40,8 +40,6 @@
 #include <algorithm>
 #include <iterator>
 
-#include "casadi_logger.hpp"
-
 #ifdef SWIG
 #define SWIG_IF_ELSE(is_swig, not_swig) is_swig
 #define SWIG_OUTPUT(arg) OUTPUT
@@ -59,6 +57,8 @@
 #define SWIG_CONSTREF(arg) const arg &
 #define SWIG_IND1 false
 #endif // SWIG
+
+#include "casadi_types.hpp"
 
 namespace casadi {
 
@@ -134,14 +134,15 @@ namespace casadi {
   ///@{
   /** \brief  Function pointer types for the C API */
   typedef void (*signal_t)(void);
-  typedef int (*getint_t)(void);
-  typedef const char* (*name_t)(int i);
-  typedef const int* (*sparsity_t)(int i);
+  typedef casadi_int (*getint_t)(void);
+  typedef const char* (*name_t)(casadi_int i);
+  typedef const casadi_int* (*sparsity_t)(casadi_int i);
   typedef void* (*alloc_mem_t)(void);
   typedef int (*init_mem_t)(void* mem);
   typedef void (*free_mem_t)(void* mem);
-  typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
-  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, void* mem);
+  typedef int (*work_t)(casadi_int* sz_arg, casadi_int* sz_res,
+    casadi_int* sz_iw, casadi_int* sz_w);
+  typedef int (*eval_t)(const double** arg, double** res, casadi_int* iw, double* w, void* mem);
   ///@}
 
   /// String representation, any type
@@ -245,7 +246,7 @@ namespace casadi {
   std::string str(const std::vector<T>& v, bool more) {
     std::stringstream ss;
     ss << "[";
-    for (int i=0; i<v.size(); ++i) {
+    for (casadi_int i=0; i<v.size(); ++i) {
       if (i!=0) ss << ", ";
       ss << v[i];
     }
@@ -257,7 +258,7 @@ namespace casadi {
   std::string str(const std::set<T>& v, bool more) {
     std::stringstream ss;
     ss << "{";
-    int cnt = 0;
+    casadi_int cnt = 0;
     for (const auto& e : v) {
       if (cnt++!=0) ss << ", ";
       ss << e;
@@ -277,7 +278,7 @@ namespace casadi {
   std::string str(const std::map<T1, T2>& p, bool more) {
     std::stringstream ss;
     ss << "{";
-    int count = 0;
+    casadi_int count = 0;
     for (auto& e : p) {
       ss << e.first << ": " << e.second;
       if (++count < p.size()) ss << ", ";
@@ -290,7 +291,7 @@ namespace casadi {
   std::string str(const std::map<std::string, T2>& p, bool more) {
     std::stringstream ss;
     ss << "{";
-    int count = 0;
+    casadi_int count = 0;
     for (auto& e : p) {
       ss << "\"" << e.first << "\": " << e.second;
       if (++count < p.size()) ss << ", ";
@@ -301,5 +302,7 @@ namespace casadi {
 #endif // SWIG
 
 } // namespace casadi
+
+#include "casadi_logger.hpp"
 
 #endif // CASADI_COMMON_HPP

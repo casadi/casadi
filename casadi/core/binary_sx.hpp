@@ -67,7 +67,7 @@ class BinarySX : public SXNode {
     */
     ~BinarySX() override {
       // Start destruction method if any of the dependencies has dependencies
-      for (int c1=0; c1<2; ++c1) {
+      for (casadi_int c1=0; c1<2; ++c1) {
         // Get the node of the dependency and remove it from the smart pointer
         SXNode* n1 = dep(c1).assignNoDelete(casadi_limits<SXElem>::nan);
 
@@ -95,7 +95,7 @@ class BinarySX : public SXNode {
 
               // Check if the top element has dependencies with dependencies
               bool added_to_stack = false;
-              for (int c2=0; c2<t->n_dep(); ++c2) { // for all dependencies of the dependency
+              for (casadi_int c2=0; c2<t->n_dep(); ++c2) { // for all dependencies of the dependency
 
                 // Get the node of the dependency of the top element
                 // and remove it from the smart pointer
@@ -135,10 +135,10 @@ class BinarySX : public SXNode {
 
     bool is_smooth() const override { return operation_checker<SmoothChecker>(op_);}
 
-    bool is_op(int op) const override { return op_==op; }
+    bool is_op(casadi_int op) const override { return op_==op; }
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    bool is_equal(const SXNode* node, int depth) const override {
+    bool is_equal(const SXNode* node, casadi_int depth) const override {
       const BinarySX* n = dynamic_cast<const BinarySX*>(node);
       if (n==0) return false;
       if (n->op_ != op_) return false;
@@ -151,14 +151,14 @@ class BinarySX : public SXNode {
     }
 
     /** \brief  Number of dependencies */
-    int n_dep() const override { return 2;}
+    casadi_int n_dep() const override { return 2;}
 
     /** \brief  get the reference of a dependency */
-    const SXElem& dep(int i) const override { return i==0 ? dep0_ : dep1_;}
-    SXElem& dep(int i) override { return i==0 ? dep0_ : dep1_;}
+    const SXElem& dep(casadi_int i) const override { return i==0 ? dep0_ : dep1_;}
+    SXElem& dep(casadi_int i) override { return i==0 ? dep0_ : dep1_;}
 
     /** \brief  Get the operation */
-    int op() const override { return op_;}
+    casadi_int op() const override { return op_;}
 
     /** \brief  Print expression */
     std::string print(const std::string& arg1, const std::string& arg2) const override {

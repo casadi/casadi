@@ -47,7 +47,7 @@ namespace casadi {
   void Inverse::ad_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) const {
     MX inv_X = shared_from_this<MX>();
-    for (int d=0; d<fsens.size(); ++d) {
+    for (casadi_int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = -mtimes(inv_X, mtimes(fseed[d][0], inv_X));
     }
   }
@@ -56,7 +56,7 @@ namespace casadi {
                         std::vector<std::vector<MX> >& asens) const {
     MX inv_X = shared_from_this<MX>();
     MX trans_inv_X = inv_X.T();
-    for (int d=0; d<aseed.size(); ++d) {
+    for (casadi_int d=0; d<aseed.size(); ++d) {
       asens[d][0] -= mtimes(trans_inv_X, mtimes(aseed[d][0], trans_inv_X));
     }
   }

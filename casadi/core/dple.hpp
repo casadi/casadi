@@ -78,16 +78,16 @@ namespace casadi {
   CASADI_EXPORT std::vector<std::string> dple_out();
 
   /** \brief Get DPLE input scheme name by index */
-  CASADI_EXPORT std::string dple_in(int ind);
+  CASADI_EXPORT std::string dple_in(casadi_int ind);
 
   /** \brief Get DPLE output scheme name by index */
-  CASADI_EXPORT std::string dple_out(int ind);
+  CASADI_EXPORT std::string dple_out(casadi_int ind);
 
   /** \brief Get the number of QP solver inputs */
-  CASADI_EXPORT int dple_n_in();
+  CASADI_EXPORT casadi_int dple_n_in();
 
   /** \brief Get the number of QP solver outputs */
-  CASADI_EXPORT int dple_n_out();
+  CASADI_EXPORT casadi_int dple_n_out();
 
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_dple(const std::string& name);

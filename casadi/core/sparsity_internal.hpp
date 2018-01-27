@@ -41,14 +41,14 @@ namespace casadi {
        the number of nonzeros (nnz) is given as sp_[sp_[1]+2].
        The last nnz entries are the rows of the nonzeros (row). See public class
        for more info about the CCS format used in CasADi. */
-    std::vector<int> sp_;
+    std::vector<casadi_int> sp_;
 
     /** \brief Structure to hold the block triangular form */
     struct Btf {
-      int nb;
-      std::vector<int> rowperm, colperm;
-      std::vector<int> rowblock, colblock;
-      std::vector<int> coarse_rowblock, coarse_colblock;
+      casadi_int nb;
+      std::vector<casadi_int> rowperm, colperm;
+      std::vector<casadi_int> rowblock, colblock;
+      std::vector<casadi_int> coarse_rowblock, coarse_colblock;
     };
 
     /* \brief The block-triangular factorization for the sparsity
@@ -58,28 +58,29 @@ namespace casadi {
 
   public:
     /// Construct a sparsity pattern from arrays
-    SparsityInternal(int nrow, int ncol, const int* colind, const int* row);
+    SparsityInternal(casadi_int nrow, casadi_int ncol,
+                     const casadi_int* colind, const casadi_int* row);
 
     /// Destructor
     ~SparsityInternal() override;
 
     /** \brief Get number of rows (see public class) */
-    inline const std::vector<int>& sp() const { return sp_;}
+    inline const std::vector<casadi_int>& sp() const { return sp_;}
 
     /** \brief Get number of rows (see public class) */
-    inline int size1() const { return sp_[0];}
+    inline casadi_int size1() const { return sp_[0];}
 
     /** \brief Get number of columns (see public class) */
-    inline int size2() const { return sp_[1];}
+    inline casadi_int size2() const { return sp_[1];}
 
     /** \brief Get column offsets (see public class) */
-    inline const int* colind() const { return &sp_.front()+2;}
+    inline const casadi_int* colind() const { return &sp_.front()+2;}
 
     /** \brief Get row indices (see public class) */
-    inline const int* row() const { return colind()+size2()+1;}
+    inline const casadi_int* row() const { return colind()+size2()+1;}
 
     /// Number of structural non-zeros
-    inline int nnz() const { return colind()[size2()];}
+    inline casadi_int nnz() const { return colind()[size2()];}
 
     /// Check if the dimensions and colind, row vectors are compatible
     void sanity_check(bool complete=false) const;
@@ -88,7 +89,7 @@ namespace casadi {
      *
      * \param[out] mapping will contain the nonzero mapping
      */
-    Sparsity get_diag(std::vector<int>& mapping) const;
+    Sparsity get_diag(std::vector<casadi_int>& mapping) const;
 
     /// has diagonal entries?
     bool has_diag() const;
@@ -101,22 +102,23 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    int dfs(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
-                         const std::vector<int>& pinv, std::vector<bool>& marked) const;
+    casadi_int dfs(casadi_int j, casadi_int top, std::vector<casadi_int>& xi,
+                   std::vector<casadi_int>& pstack,
+                   const std::vector<casadi_int>& pinv, std::vector<bool>& marked) const;
 
     /** \brief Find the strongly connected components of a square matrix
       * The implementation is a modified version of cs_scc in CSparse
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    int scc(std::vector<int>& p, std::vector<int>& r) const;
+    casadi_int scc(std::vector<casadi_int>& p, std::vector<casadi_int>& r) const;
 
     /** \brief Approximate minimal degree preordering
       * The implementation is a modified version of cs_amd in CSparse
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    std::vector<int> amd() const;
+    std::vector<casadi_int> amd() const;
 
     /** \brief Calculate the elimination tree for a matrix
       * len[w] >= ata ? ncol + nrow : ncol
@@ -126,7 +128,7 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static void etree(const int* sp, int* parent, int *w, int ata);
+    static void etree(const casadi_int* sp, casadi_int* parent, casadi_int *w, casadi_int ata);
 
     /** \brief Traverse an elimination tree using depth first search
       * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
@@ -134,8 +136,8 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static int postorder_dfs(int j, int k, int* head, int* next,
-                             int* post, int* stack);
+    static casadi_int postorder_dfs(casadi_int j, casadi_int k, casadi_int* head, casadi_int* next,
+                             casadi_int* post, casadi_int* stack);
 
     /** \brief Calculate the postorder permuation
       * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
@@ -145,7 +147,7 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static void postorder(const int* parent, int n, int* post, int* w);
+    static void postorder(const casadi_int* parent, casadi_int n, casadi_int* post, casadi_int* w);
 
     /** \brief Needed by casadi_qr_colind
       * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
@@ -153,8 +155,9 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static int leaf(int i, int j, const int* first, int* maxfirst,
-                    int* prevleaf, int* ancestor, int* jleaf);
+    static casadi_int leaf(casadi_int i, casadi_int j, const casadi_int* first,
+                    casadi_int* maxfirst,
+                    casadi_int* prevleaf, casadi_int* ancestor, casadi_int* jleaf);
 
     /** \brief Calculate the column offsets for the QR R matrix
       * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
@@ -164,8 +167,8 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static int qr_counts(const int* tr_sp, const int* parent,
-                         const int* post, int* counts, int* w);
+    static casadi_int qr_counts(const casadi_int* tr_sp, const casadi_int* parent,
+                         const casadi_int* post, casadi_int* counts, casadi_int* w);
 
     /** \brief Calculate the number of nonzeros in the QR V matrix
       * Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
@@ -176,8 +179,8 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static int qr_nnz(const int* sp, int* pinv, int* leftmost,
-                      const int* parent, int* nrow_ext, int* w);
+    static casadi_int qr_nnz(const casadi_int* sp, casadi_int* pinv, casadi_int* leftmost,
+                      const casadi_int* parent, casadi_int* nrow_ext, casadi_int* w);
 
     /** \brief Setup QP solver
       * Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
@@ -185,9 +188,9 @@ namespace casadi {
       * len[pinv] == nrow + ncol
       * len[leftmost] == nrow
       */
-    static void qr_init(const int* sp, const int* sp_tr,
-                        int* leftmost, int* parent, int* pinv,
-                        int* nrow_ext, int* v_nnz, int* r_nnz, int* w);
+    static void qr_init(const casadi_int* sp, const casadi_int* sp_tr,
+                        casadi_int* leftmost, casadi_int* parent, casadi_int* pinv,
+                        casadi_int* nrow_ext, casadi_int* v_nnz, casadi_int* r_nnz, casadi_int* w);
 
     /** \brief Get the row indices for V and R in QR factorization
       * Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
@@ -203,9 +206,10 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static void qr_sparsities(const int* sp_a, int nrow_ext, int* sp_v, int* sp_r,
-                              const int* leftmost, const int* parent, const int* pinv,
-                              int* iw);
+    static void qr_sparsities(
+                  const casadi_int* sp_a, casadi_int nrow_ext, casadi_int* sp_v, casadi_int* sp_r,
+                  const casadi_int* leftmost, const casadi_int* parent, const casadi_int* pinv,
+                  casadi_int* iw);
 
     /** \brief Calculate the column offsets for the L factor of an LDL^T factorization
       * Strictly lower entries only.
@@ -217,7 +221,8 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2005-2013
       * Licensed as a derivative work under the GNU LGPL
       */
-    static void ldl_colind(const int* sp, int* parent, int* l_colind, int* w);
+    static void ldl_colind(const casadi_int* sp, casadi_int* parent,
+      casadi_int* l_colind, casadi_int* w);
 
     /** \brief Calculate the row indices for the L factor of an LDL^T factorization
       * Strictly lower entries only.
@@ -227,7 +232,8 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2005-2013
       * Licensed as a derivative work under the GNU LGPL
       */
-    static void ldl_row(const int* sp, const int* parent, int* l_colind, int* l_row, int *w);
+    static void ldl_row(const casadi_int* sp, const casadi_int* parent,
+      casadi_int* l_colind, casadi_int* l_row, casadi_int *w);
 
     /// Transpose the matrix
     Sparsity T() const;
@@ -236,7 +242,7 @@ namespace casadi {
      *
      * \param[out] mapping the non-zeros of the original matrix for each non-zero of the new matrix
      */
-    Sparsity transpose(std::vector<int>& mapping, bool invert_mapping=false) const;
+    Sparsity transpose(std::vector<casadi_int>& mapping, bool invert_mapping=false) const;
 
     /// Check if the sparsity is the transpose of another
     bool is_transpose(const SparsityInternal& y) const;
@@ -249,48 +255,49 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    void bfs(int n, std::vector<int>& wi, std::vector<int>& wj,
-             std::vector<int>& queue, const std::vector<int>& imatch,
-             const std::vector<int>& jmatch, int mark) const;
+    void bfs(casadi_int n, std::vector<casadi_int>& wi, std::vector<casadi_int>& wj,
+             std::vector<casadi_int>& queue, const std::vector<casadi_int>& imatch,
+             const std::vector<casadi_int>& jmatch, casadi_int mark) const;
 
     /** \brief Collect matched columns and rows into p and q
       * The implementation is a modified version of cs_matched in CSparse
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static void matched(int n, const std::vector<int>& wj, const std::vector<int>& imatch,
-                        std::vector<int>& p, std::vector<int>& q, std::vector<int>& cc,
-                        std::vector<int>& rr, int set, int mark);
+    static void matched(
+      casadi_int n, const std::vector<casadi_int>& wj, const std::vector<casadi_int>& imatch,
+      std::vector<casadi_int>& p, std::vector<casadi_int>& q, std::vector<casadi_int>& cc,
+      std::vector<casadi_int>& rr, casadi_int set, casadi_int mark);
 
     /** \brief Collect unmatched columns into the permutation vector p
       * The implementation is a modified version of cs_unmatched in CSparse
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static void unmatched(int m, const std::vector<int>& wi, std::vector<int>& p,
-                          std::vector<int>& rr, int set);
+    static void unmatched(casadi_int m, const std::vector<casadi_int>& wi,
+      std::vector<casadi_int>& p, std::vector<casadi_int>& rr, casadi_int set);
 
     /** \brief return 1 if column i is in R2
       * The implementation is a modified version of cs_rprune in CSparse
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static int rprune(int i, int j, double aij, void *other);
+    static casadi_int rprune(casadi_int i, casadi_int j, double aij, void *other);
 
      /** \brief drop entries for which fkeep(A(i, j)) is false; return nz if OK, else -1
        * The implementation is a modified version of cs_fkeep in CSparse
        * Copyright(c) Timothy A. Davis, 2006-2009
        * Licensed as a derivative work under the GNU LGPL
        */
-    static int drop(int (*fkeep)(int, int, double, void *), void *other,
-                    int nrow, int ncol,
-                    std::vector<int>& colind, std::vector<int>& row);
+    static casadi_int drop(casadi_int (*fkeep)(casadi_int, casadi_int, double, void *), void *other,
+                    casadi_int nrow, casadi_int ncol,
+                    std::vector<casadi_int>& colind, std::vector<casadi_int>& row);
 
     /// Compute the Dulmage-Mendelsohn decomposition
-    int btf(std::vector<int>& rowperm, std::vector<int>& colperm,
-                          std::vector<int>& rowblock, std::vector<int>& colblock,
-                          std::vector<int>& coarse_rowblock,
-                          std::vector<int>& coarse_colblock) const {
+    casadi_int btf(std::vector<casadi_int>& rowperm, std::vector<casadi_int>& colperm,
+                          std::vector<casadi_int>& rowblock, std::vector<casadi_int>& colblock,
+                          std::vector<casadi_int>& coarse_rowblock,
+                          std::vector<casadi_int>& coarse_colblock) const {
       T()->dmperm(colperm, rowperm, colblock, rowblock,
                   coarse_colblock, coarse_rowblock);
       return rowblock.size()-1;
@@ -304,26 +311,27 @@ namespace casadi {
        * Copyright(c) Timothy A. Davis, 2006-2009
        * Licensed as a derivative work under the GNU LGPL
        */
-    void dmperm(std::vector<int>& rowperm, std::vector<int>& colperm,
-                std::vector<int>& rowblock, std::vector<int>& colblock,
-                std::vector<int>& coarse_rowblock,
-                std::vector<int>& coarse_colblock) const;
+    void dmperm(std::vector<casadi_int>& rowperm, std::vector<casadi_int>& colperm,
+                std::vector<casadi_int>& rowblock, std::vector<casadi_int>& colblock,
+                std::vector<casadi_int>& coarse_rowblock,
+                std::vector<casadi_int>& coarse_colblock) const;
 
     /** \brief Compute the maximum transversal (maximum matching)
       * The implementation is a modified version of cs_maxtrans in CSparse
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    void maxtrans(std::vector<int>& imatch,
-                  std::vector<int>& jmatch, Sparsity& trans, int seed) const;
+    void maxtrans(std::vector<casadi_int>& imatch,
+                  std::vector<casadi_int>& jmatch, Sparsity& trans, casadi_int seed) const;
 
     /** \brief Find an augmenting path
       * The implementation is a modified version of cs_augment in CSparse
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    void augment(int k, std::vector<int>& jmatch,
-                 int *cheap, std::vector<int>& w, int *js, int *is, int *ps) const;
+    void augment(casadi_int k, std::vector<casadi_int>& jmatch,
+                 casadi_int *cheap, std::vector<casadi_int>& w, casadi_int *js,
+                 casadi_int *is, casadi_int *ps) const;
 
      /** \brief return a random permutation vector
        * return a random permutation vector, the identity perm, or p = n-1:-1:0.
@@ -332,37 +340,38 @@ namespace casadi {
        * Copyright(c) Timothy A. Davis, 2006-2009
        * Licensed as a derivative work under the GNU LGPL
        */
-    static std::vector<int> randperm(int n, int seed);
+    static std::vector<casadi_int> randperm(casadi_int n, casadi_int seed);
 
     /** \brief Invert a permutation vector */
-    static std::vector<int> invertPermutation(const std::vector<int>& p);
+    static std::vector<casadi_int> invertPermutation(const std::vector<casadi_int>& p);
 
     /// C = A(p, q) where p and q are permutations of 0..m-1 and 0..n-1.
-    Sparsity permute(const std::vector<int>& pinv, const std::vector<int>& q, int values) const;
+    Sparsity permute(const std::vector<casadi_int>& pinv,
+      const std::vector<casadi_int>& q, casadi_int values) const;
 
     /** \brief C = A(p, q) where p and q are permutations of 0..m-1 and 0..n-1
       * The implementation is a modified version of cs_permute in CSparse
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    void permute(const std::vector<int>& pinv,
-                 const std::vector<int>& q, int values,
-                 std::vector<int>& colind_C,
-                 std::vector<int>& row_C) const;
+    void permute(const std::vector<casadi_int>& pinv,
+                 const std::vector<casadi_int>& q, casadi_int values,
+                 std::vector<casadi_int>& colind_C,
+                 std::vector<casadi_int>& row_C) const;
 
     /** \brief clear w
       * The implementation is a modified version of cs_wclear in CSparse
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static int wclear(int mark, int lemax, int *w, int n);
+    static casadi_int wclear(casadi_int mark, casadi_int lemax, casadi_int *w, casadi_int n);
 
     /** \brief keep off-diagonal entries; drop diagonal entries
       * The implementation is a modified version of cs_diag in CSparse
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static int diag(int i, int j, double aij, void *other);
+    static casadi_int diag(casadi_int i, casadi_int j, double aij, void *other);
 
     /** \brief C = A*B
       * The implementation is a modified version of cs_multiply in CSparse
@@ -376,43 +385,44 @@ namespace casadi {
        * Copyright(c) Timothy A. Davis, 2006-2009
        * Licensed as a derivative work under the GNU LGPL
        */
-    int scatter(int j, std::vector<int>& w, int mark, int* Ci, int nz) const;
+    casadi_int scatter(casadi_int j, std::vector<casadi_int>& w, casadi_int mark,
+                       casadi_int* Ci, casadi_int nz) const;
 
     /// Get row() as a vector
-    std::vector<int> get_row() const;
+    std::vector<casadi_int> get_row() const;
 
     /// Get colind() as a vector
-    std::vector<int> get_colind() const;
+    std::vector<casadi_int> get_colind() const;
 
     /// Get the column for each nonzero
-    std::vector<int> get_col() const;
+    std::vector<casadi_int> get_col() const;
 
     /// Resize
-    Sparsity _resize(int nrow, int ncol) const;
+    Sparsity _resize(casadi_int nrow, casadi_int ncol) const;
 
     /// Reshape a sparsity, order of nonzeros remains the same
-    Sparsity _reshape(int nrow, int ncol) const;
+    Sparsity _reshape(casadi_int nrow, casadi_int ncol) const;
 
     /// Number of elements
-    int numel() const;
+    casadi_int numel() const;
 
     /// Number of non-zeros in the lower triangular half
-    int nnz_lower(bool strictly=false) const;
+    casadi_int nnz_lower(bool strictly=false) const;
 
     /// Number of non-zeros in the upper triangular half
-    int nnz_upper(bool strictly=false) const;
+    casadi_int nnz_upper(bool strictly=false) const;
 
     /// Number of non-zeros on the diagonal
-    int nnz_diag() const;
+    casadi_int nnz_diag() const;
 
     /** \brief Upper half-bandwidth */
-    int bw_upper() const;
+    casadi_int bw_upper() const;
 
     /** \brief Lower half-bandwidth */
-    int bw_lower() const;
+    casadi_int bw_lower() const;
 
     /// Shape
-    std::pair<int, int> size() const;
+    std::pair<casadi_int, casadi_int> size() const;
 
     /// Is scalar?
     bool is_scalar(bool scalar_and_dense) const;
@@ -458,16 +468,16 @@ namespace casadi {
     Sparsity _tril(bool includeDiagonal) const;
 
     /// Get nonzeros in lower triangular part
-    std::vector<int> get_lower() const;
+    std::vector<casadi_int> get_lower() const;
 
     /// Get nonzeros in upper triangular part
-    std::vector<int> get_upper() const;
+    std::vector<casadi_int> get_upper() const;
 
     /// Get the dimension as a string
     std::string dim(bool with_nz=false) const;
 
     /// Describe the nonzero location k as a string
-    std::string repr_el(int k) const;
+    std::string repr_el(casadi_int k) const;
 
     /// Sparsity pattern for a matrix-matrix product (details in public class)
     Sparsity _mtimes(const Sparsity& y) const;
@@ -493,28 +503,29 @@ namespace casadi {
     bool is_equal(const Sparsity& y) const;
 
     /// Check if two sparsity patterns are the same
-    bool is_equal(int y_nrow, int y_ncol, const std::vector<int>& y_colind,
-                 const std::vector<int>& y_row) const;
+    bool is_equal(casadi_int y_nrow, casadi_int y_ncol, const std::vector<casadi_int>& y_colind,
+                 const std::vector<casadi_int>& y_row) const;
 
     /// Check if two sparsity patterns are the same
-    bool is_equal(int y_nrow, int y_ncol, const int* y_colind, const int* y_row) const;
+    bool is_equal(casadi_int y_nrow, casadi_int y_ncol,
+                  const casadi_int* y_colind, const casadi_int* y_row) const;
 
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
-    Sparsity _enlargeRows(int nrow, const std::vector<int>& rr, bool ind1) const;
+    Sparsity _enlargeRows(casadi_int nrow, const std::vector<casadi_int>& rr, bool ind1) const;
 
     /// Enlarge the matrix along the second dimension (i.e. insert columns)
-    Sparsity _enlargeColumns(int ncol, const std::vector<int>& cc, bool ind1) const;
+    Sparsity _enlargeColumns(casadi_int ncol, const std::vector<casadi_int>& cc, bool ind1) const;
 
     /// Make a patten dense
-    Sparsity makeDense(std::vector<int>& mapping) const;
+    Sparsity makeDense(std::vector<casadi_int>& mapping) const;
 
     /// Erase rows and/or columns - does bounds checking
-    Sparsity _erase(const std::vector<int>& rr, const std::vector<int>& cc,
-                      bool ind1, std::vector<int>& mapping) const;
+    Sparsity _erase(const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
+                      bool ind1, std::vector<casadi_int>& mapping) const;
 
     /// Erase elements
-    Sparsity _erase(const std::vector<int>& rr, bool ind1,
-                      std::vector<int>& mapping) const;
+    Sparsity _erase(const std::vector<casadi_int>& rr, bool ind1,
+                      std::vector<casadi_int>& mapping) const;
 
     /// Append another sparsity patten vertically (vectors only)
     Sparsity _appendVector(const SparsityInternal& sp) const;
@@ -526,24 +537,25 @@ namespace casadi {
     * Does bounds checking
     * rr and rr are not required to be monotonous
     */
-    Sparsity sub(const std::vector<int>& rr, const std::vector<int>& cc,
-                 std::vector<int>& mapping, bool ind1) const;
+    Sparsity sub(const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
+                 std::vector<casadi_int>& mapping, bool ind1) const;
 
     /** \brief Get a set of elements
     * Does bounds checking
     * rr is not required to be monotonous
     */
-    Sparsity sub(const std::vector<int>& rr, const SparsityInternal& sp,
-                 std::vector<int>& mapping, bool ind1) const;
+    Sparsity sub(const std::vector<casadi_int>& rr, const SparsityInternal& sp,
+                 std::vector<casadi_int>& mapping, bool ind1) const;
 
     /// Get the index of an existing non-zero element
-    int get_nz(int rr, int cc) const;
+    casadi_int get_nz(casadi_int rr, casadi_int cc) const;
 
     /// Get a set of non-zero element - does bounds checking
-    std::vector<int> get_nz(const std::vector<int>& rr, const std::vector<int>& cc) const;
+    std::vector<casadi_int> get_nz(const std::vector<casadi_int>& rr,
+                                    const std::vector<casadi_int>& cc) const;
 
     /// Get the nonzero index for a set of elements (see description in public class)
-    void get_nz(std::vector<int>& indices) const;
+    void get_nz(std::vector<casadi_int>& indices) const;
 
     /// Does the rows appear sequentially on each col
     bool rowsSequential(bool strictly) const;
@@ -553,10 +565,10 @@ namespace casadi {
      * The same indices will be removed from the mapping vector,
      * which must have the same length as the number of nonzeros
      */
-    Sparsity _removeDuplicates(std::vector<int>& mapping) const;
+    Sparsity _removeDuplicates(std::vector<casadi_int>& mapping) const;
 
     /// Get element index for each nonzero
-    void find(std::vector<int>& loc, bool ind1) const;
+    void find(std::vector<casadi_int>& loc, bool ind1) const;
 
     /// Hash the sparsity pattern
     std::size_t hash() const;
@@ -572,23 +584,23 @@ namespace casadi {
      * A greedy distance-2 coloring algorithm
      * (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
      */
-    Sparsity uni_coloring(const Sparsity& AT, int cutoff) const;
+    Sparsity uni_coloring(const Sparsity& AT, casadi_int cutoff) const;
 
     /** \brief A greedy distance-2 coloring algorithm
      * See description in public class.
      */
-    Sparsity star_coloring(int ordering, int cutoff) const;
+    Sparsity star_coloring(casadi_int ordering, casadi_int cutoff) const;
 
     /** \brief An improved distance-2 coloring algorithm
      * See description in public class.
      */
-    Sparsity star_coloring2(int ordering, int cutoff) const;
+    Sparsity star_coloring2(casadi_int ordering, casadi_int cutoff) const;
 
     /// Order the columns by decreasing degree
-    std::vector<int> largest_first() const;
+    std::vector<casadi_int> largest_first() const;
 
     /// Permute rows and/or columns
-    Sparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_cols=true,
+    Sparsity pmult(const std::vector<casadi_int>& p, bool permute_rows=true, bool permute_cols=true,
                    bool invert_permutation=false) const;
 
     /** \brief Print a textual representation of sparsity */

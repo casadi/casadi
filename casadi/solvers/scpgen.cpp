@@ -199,7 +199,7 @@ namespace casadi {
     // Name the components
     if (name_x_.empty()) {
       name_x_.resize(nx_);
-      for (int i=0; i<nx_; ++i) {
+      for (casadi_int i=0; i<nx_; ++i) {
         stringstream ss;
         ss << "x" << i;
         name_x_[i] = ss.str();
@@ -223,7 +223,7 @@ namespace casadi {
     MX x = vdef_in.at(0);
     MX p = vdef_in.at(1);
     v_.resize(vdef_in.size()-2);
-    for (int i=0; i<v_.size(); ++i) {
+    for (casadi_int i=0; i<v_.size(); ++i) {
       v_[i].v = vdef_in.at(i+2);
       v_[i].v_def = vdef_out.at(i+2);
       v_[i].n = v_[i].v.nnz();
@@ -249,7 +249,7 @@ namespace casadi {
 
       // Lagrange multipliers corresponding to the definition of the dependent variables
       stringstream ss;
-      int i=0;
+      casadi_int i=0;
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         ss.str(string());
         ss << "lam_x" << i++;
@@ -296,7 +296,7 @@ namespace casadi {
 
     // Inputs
     vector<MX> res_fcn_in;
-    int n=0;
+    casadi_int n=0;
     res_fcn_in.push_back(x);             res_x_ = n++;
     res_fcn_in.push_back(p);             res_p_ = n++;
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
@@ -334,7 +334,7 @@ namespace casadi {
 
     // Declare difference vector d and substitute out p and v
     stringstream ss;
-    int i=0;
+    casadi_int i=0;
     for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       ss.str(string());
       ss << "d" << i++;
@@ -344,7 +344,7 @@ namespace casadi {
 
     // Declare difference vector lam_d and substitute out lam
     if (!gauss_newton_) {
-      int i=0;
+      casadi_int i=0;
       for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         ss.str(string());
         ss << "d_lam" << i++;
@@ -594,7 +594,7 @@ namespace casadi {
       }
 
       // Count the total number of variables
-      int n_lifted = 0;
+      casadi_int n_lifted = 0;
       for (vector<Var>::const_iterator i=v_.begin(); i!=v_.end(); ++i) {
         n_lifted += i->n;
       }
@@ -643,8 +643,8 @@ namespace casadi {
     }
 
     // Allocate memory, lifted problem
-    for (int i=0; i<v_.size(); ++i) {
-      int n = v_[i].n;
+    for (casadi_int i=0; i<v_.size(); ++i) {
+      casadi_int n = v_[i].n;
       alloc_w(n, true); // dx
       alloc_w(n, true); // x0
       alloc_w(n, true); // x
@@ -691,7 +691,7 @@ namespace casadi {
 
     // Lifted memory
     m->lifted_mem.resize(v_.size());
-    for (int i=0; i<v_.size(); ++i) {
+    for (casadi_int i=0; i<v_.size(); ++i) {
       m->lifted_mem[i].n = v_[i].n;
     }
 
@@ -701,7 +701,7 @@ namespace casadi {
   }
 
   void Scpgen::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
+                                casadi_int*& iw, double*& w) const {
     auto m = static_cast<ScpgenMemory*>(mem);
 
     // Set work in base classes
@@ -768,7 +768,7 @@ namespace casadi {
       m->arg[0] = m->x0;
       m->arg[1] = m->p;
       fill_n(m->res, vinit_fcn_.n_out(), nullptr);
-      for (int i=0; i<v_.size(); ++i) {
+      for (casadi_int i=0; i<v_.size(); ++i) {
         m->res[i] = m->lifted_mem[i].x0;
       }
       vinit_fcn_(m->arg, m->res, m->iw, m->w, 0);
@@ -817,7 +817,7 @@ namespace casadi {
     m->du_step = 0;
 
     // Reset line-search
-    int ls_iter = 0;
+    casadi_int ls_iter = 0;
     bool ls_success = true;
 
     // Reset regularization
@@ -947,7 +947,7 @@ namespace casadi {
     stream << ' ';
 
     // Print variables
-    for (vector<int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
+    for (vector<casadi_int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
       stream << setw(9) << name_x_.at(*i);
     }
 
@@ -955,8 +955,8 @@ namespace casadi {
     stream.unsetf(std::ios::floatfield);
   }
 
-  void Scpgen::printIteration(ScpgenMemory* m, std::ostream &stream, int iter, double obj,
-                              double pr_inf, double du_inf, double rg, int ls_trials,
+  void Scpgen::printIteration(ScpgenMemory* m, std::ostream &stream, casadi_int iter, double obj,
+                              double pr_inf, double du_inf, double rg, casadi_int ls_trials,
                               bool ls_success) const {
     stream << setw(4) << iter;
     stream << scientific;
@@ -977,7 +977,7 @@ namespace casadi {
     stream << (ls_success ? ' ' : 'F');
 
     // Print variables
-    for (vector<int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
+    for (vector<casadi_int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
       stream << setw(9) << setprecision(4) << m->xk[*i];
     }
 
@@ -1192,7 +1192,7 @@ namespace casadi {
     m->t_solve_qp += (time2-time1)/CLOCKS_PER_SEC;
   }
 
-  void Scpgen::line_search(ScpgenMemory* m, int& ls_iter, bool& ls_success) const {
+  void Scpgen::line_search(ScpgenMemory* m, casadi_int& ls_iter, bool& ls_success) const {
     // Make sure that we have a decent direction
     if (!gauss_newton_) {
       // Get the curvature in the step direction
@@ -1207,7 +1207,7 @@ namespace casadi {
 
     // Right-hand side of Armijo condition
     double F_sens = 0;
-    for (int i=0; i<nx_; ++i) F_sens += m->dxk[i] * m->gfk[i];
+    for (casadi_int i=0; i<nx_; ++i) F_sens += m->dxk[i] * m->gfk[i];
     double L1dir = F_sens - m->sigma * l1_infeas;
     double L1merit = m->fk + m->sigma * l1_infeas;
 
@@ -1305,7 +1305,7 @@ namespace casadi {
 
     // Outputs
     fill_n(m->res, exp_fcn_.n_out(), nullptr);
-    for (int i=0; i<v_.size(); ++ i) {
+    for (casadi_int i=0; i<v_.size(); ++ i) {
       m->res[v_[i].exp_def] = m->lifted_mem[i].dx; // Expanded primal step
       if (!gauss_newton_) {
         m->res[v_[i].exp_defL] = m->lifted_mem[i].dlam; // Expanded dual step

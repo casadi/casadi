@@ -284,7 +284,7 @@ namespace casadi {
   }
 
   void Sqpmethod::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
+                                casadi_int*& iw, double*& w) const {
     auto m = static_cast<SqpmethodMemory*>(mem);
 
     // Set work in base classes
@@ -386,10 +386,10 @@ namespace casadi {
     transform(m->gLag, m->gLag+nx_, m->mu_x, m->gLag, std::plus<double>());
 
     // Number of SQP iterations
-    int iter = 0;
+    casadi_int iter = 0;
 
     // Number of line-search iterations
-    int ls_iter = 0;
+    casadi_int ls_iter = 0;
 
     // Last linesearch successfull
     bool ls_success = true;
@@ -449,7 +449,7 @@ namespace casadi {
           if (!iteration_callback_ignore_errors_) ret=1;
         }
 
-        if (static_cast<int>(ret)) {
+        if (static_cast<casadi_int>(ret)) {
           print("WARNING(sqpmethod): Aborted by callback...\n");
           m->return_status = "User_Requested_Stop";
           break;
@@ -532,7 +532,7 @@ namespace casadi {
 
         // Line-search loop
         while (true) {
-          for (int i=0; i<nx_; ++i) m->x_cand[i] = m->xk[i] + t * m->dx[i];
+          for (casadi_int i=0; i<nx_; ++i) m->x_cand[i] = m->xk[i] + t * m->dx[i];
 
           try {
             // Evaluating objective and constraints
@@ -579,8 +579,8 @@ namespace casadi {
         }
 
         // Candidate accepted, update dual variables
-        for (int i=0; i<ng_; ++i) m->mu[i] = t * m->qp_DUAL_A[i] + (1 - t) * m->mu[i];
-        for (int i=0; i<nx_; ++i) m->mu_x[i] = t * m->qp_DUAL_X[i] + (1 - t) * m->mu_x[i];
+        for (casadi_int i=0; i<ng_; ++i) m->mu[i] = t * m->qp_DUAL_A[i] + (1 - t) * m->mu[i];
+        for (casadi_int i=0; i<nx_; ++i) m->mu_x[i] = t * m->qp_DUAL_X[i] + (1 - t) * m->mu_x[i];
 
         // Candidate accepted, update the primal variable
         casadi_copy(m->xk, nx_, m->x_old);
@@ -634,11 +634,11 @@ namespace casadi {
         // BFGS with careful updates and restarts
         if (iter % lbfgs_memory_ == 0) {
           // Reset Hessian approximation by dropping all off-diagonal entries
-          const int* colind = Hsp_.colind();      // Access sparsity (column offset)
-          int ncol = Hsp_.size2();
-          const int* row = Hsp_.row();            // Access sparsity (row)
-          for (int cc=0; cc<ncol; ++cc) {     // Loop over the columns of the Hessian
-            for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+          const casadi_int* colind = Hsp_.colind();      // Access sparsity (column offset)
+          casadi_int ncol = Hsp_.size2();
+          const casadi_int* row = Hsp_.row();            // Access sparsity (row)
+          for (casadi_int cc=0; cc<ncol; ++cc) {     // Loop over the columns of the Hessian
+            for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
               // Loop over the nonzero elements of the column
               if (cc!=row[el]) m->Bk[el] = 0;               // Remove if off-diagonal entries
             }
@@ -690,9 +690,10 @@ namespace casadi {
           "inf_du", "||d||", "lg(rg)", "ls");
   }
 
-  void Sqpmethod::print_iteration(int iter, double obj,
+  void Sqpmethod::print_iteration(casadi_int iter, double obj,
                                   double pr_inf, double du_inf,
-                                  double dx_norm, double rg, int ls_trials, bool ls_success) const {
+                                  double dx_norm, double rg,
+                                  casadi_int ls_trials, bool ls_success) const {
     print("%4d %14.6e %9.2e %9.2e %9.2e ", iter, obj, pr_inf, du_inf, dx_norm);
     if (rg>0) {
       print("%7.2d ", log10(rg));
@@ -712,14 +713,14 @@ namespace casadi {
   }
 
   double Sqpmethod::getRegularization(const double* H) const {
-    const int* colind = Hsp_.colind();
-    int ncol = Hsp_.size2();
-    const int* row = Hsp_.row();
+    const casadi_int* colind = Hsp_.colind();
+    casadi_int ncol = Hsp_.size2();
+    const casadi_int* row = Hsp_.row();
     double reg_param = 0;
-    for (int cc=0; cc<ncol; ++cc) {
+    for (casadi_int cc=0; cc<ncol; ++cc) {
       double mineig = 0;
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        int rr = row[el];
+      for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
+        casadi_int rr = row[el];
         if (rr == cc) {
           mineig += H[el];
         } else {
@@ -732,13 +733,13 @@ namespace casadi {
   }
 
   void Sqpmethod::regularize(double* H, double reg) const {
-    const int* colind = Hsp_.colind();
-    int ncol = Hsp_.size2();
-    const int* row = Hsp_.row();
+    const casadi_int* colind = Hsp_.colind();
+    casadi_int ncol = Hsp_.size2();
+    const casadi_int* row = Hsp_.row();
 
-    for (int cc=0; cc<ncol; ++cc) {
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        int rr = row[el];
+    for (casadi_int cc=0; cc<ncol; ++cc) {
+      for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
+        casadi_int rr = row[el];
         if (rr==cc) {
           H[el] += reg;
         }

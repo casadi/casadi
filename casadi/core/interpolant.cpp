@@ -53,7 +53,7 @@ namespace casadi {
     casadi_assert(grid.size()>0, "At least one input required");
 
     // Consistency check, number of elements
-    unsigned int nel=1;
+    casadi_uint nel=1;
     for (auto&& g : grid) {
       casadi_assert(g.size()>=2, "Need at least two grid points for every input");
       nel *= g.size();
@@ -72,7 +72,7 @@ namespace casadi {
     }
 
     // Get offset for each input dimension
-    vector<int> offset;
+    vector<casadi_int> offset;
     offset.reserve(grid.size()+1);
     offset.push_back(0);
     for (auto&& g : grid) offset.push_back(offset.back()+g.size());
@@ -81,7 +81,7 @@ namespace casadi {
     vector<double> stacked;
     stacked.reserve(offset.back());
     for (auto&& g : grid) stacked.insert(stacked.end(), g.begin(), g.end());
-    int m = values.size()/nel;
+    casadi_int m = values.size()/nel;
     return Function::create(Interpolant::getPlugin(solver)
                             .creator(name, stacked, offset, values, m), opts);
   }
@@ -89,9 +89,9 @@ namespace casadi {
   Interpolant::
   Interpolant(const std::string& name,
               const std::vector<double>& grid,
-              const std::vector<int>& offset,
+              const std::vector<casadi_int>& offset,
               const std::vector<double>& values,
-              int m)
+              casadi_int m)
               : FunctionInternal(name), m_(m), grid_(grid), offset_(offset),  values_(values) {
     // Number of grid points
     ndim_ = offset_.size()-1;
@@ -100,22 +100,22 @@ namespace casadi {
   Interpolant::~Interpolant() {
   }
 
-  Sparsity Interpolant::get_sparsity_in(int i) {
+  Sparsity Interpolant::get_sparsity_in(casadi_int i) {
     casadi_assert_dev(i==0);
     return Sparsity::dense(ndim_);
   }
 
-  Sparsity Interpolant::get_sparsity_out(int i) {
+  Sparsity Interpolant::get_sparsity_out(casadi_int i) {
     casadi_assert_dev(i==0);
     return Sparsity::dense(m_);
   }
 
-  std::string Interpolant::get_name_in(int i) {
+  std::string Interpolant::get_name_in(casadi_int i) {
     casadi_assert_dev(i==0);
     return "x";
   }
 
-  std::string Interpolant::get_name_out(int i) {
+  std::string Interpolant::get_name_out(casadi_int i) {
     casadi_assert_dev(i==0);
     return "f";
   }

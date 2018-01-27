@@ -96,7 +96,7 @@ namespace casadi {
     if (sfact(A.ptr())) casadi_error("'sfact' failed");
   }
 
-  int Linsol::sfact(const double* A, int mem) const {
+  int Linsol::sfact(const double* A, casadi_int mem) const {
     if (A==0) return 1;
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
@@ -116,7 +116,7 @@ namespace casadi {
     if (nfact(A.ptr())) casadi_error("'nfact' failed");
   }
 
-  int Linsol::nfact(const double* A, int mem) const {
+  int Linsol::nfact(const double* A, casadi_int mem) const {
     if (A==0) return 1;
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
@@ -131,29 +131,29 @@ namespace casadi {
     return 0;
   }
 
-  int Linsol::neig(const DM& A) const {
+  casadi_int Linsol::neig(const DM& A) const {
     if (A.sparsity()!=sparsity()) return neig(project(A, sparsity()));
-    int n = neig(A.ptr());
+    casadi_int n = neig(A.ptr());
     casadi_assert(n>=0, "'neig' failed");
     return n;
   }
 
-  int Linsol::neig(const double* A, int mem) const {
+  casadi_int Linsol::neig(const double* A, casadi_int mem) const {
     return (*this)->neig((*this)->memory(mem), A);
   }
 
-  int Linsol::rank(const DM& A) const {
+  casadi_int Linsol::rank(const DM& A) const {
     if (A.sparsity()!=sparsity()) return rank(project(A, sparsity()));
-    int n = rank(A.ptr());
+    casadi_int n = rank(A.ptr());
     casadi_assert(n>=0, "'rank' failed");
     return n;
   }
 
-  int Linsol::rank(const double* A, int mem) const {
+  casadi_int Linsol::rank(const double* A, casadi_int mem) const {
     return (*this)->rank((*this)->memory(mem), A);
   }
 
-  int Linsol::solve(const double* A, double* x, int nrhs, bool tr, int mem) const {
+  int Linsol::solve(const double* A, double* x, casadi_int nrhs, bool tr, casadi_int mem) const {
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
     casadi_assert(m->is_nfact, "Linear system has not been factorized");
     return (*this)->solve(m, A, x, nrhs, tr);

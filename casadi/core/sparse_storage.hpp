@@ -55,16 +55,16 @@ namespace casadi {
     SparseStorage<DataType>& operator=(const SparseStorage<DataType>& m);
 
     /// get a reference to an element
-    DataType& elem(int rr, int cc);
+    DataType& elem(casadi_int rr, casadi_int cc);
 
     /// Returns true if the matrix has a non-zero at location rr, cc
-    bool has_nz(int rr, int cc) const { return sparsity().has_nz(rr, cc); }
+    bool has_nz(casadi_int rr, casadi_int cc) const { return sparsity().has_nz(rr, cc); }
 
     // Get the sparsity pattern
     void clear();
-    void resize(int nrow, int ncol);
-    void reserve(int nnz);
-    void reserve(int nnz, int ncol);
+    void resize(casadi_int nrow, casadi_int ncol);
+    void reserve(casadi_int nnz);
+    void reserve(casadi_int nnz, casadi_int ncol);
 
     /// Access the non-zero elements
     std::vector<DataType>& nonzeros();

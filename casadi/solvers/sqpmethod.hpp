@@ -135,7 +135,7 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     // Solve the NLP
     void solve(void* mem) const override;
@@ -147,10 +147,10 @@ namespace casadi {
     bool exact_hessian_;
 
     /// maximum number of sqp iterations
-    int max_iter_;
+    casadi_int max_iter_;
 
     /// Memory size of L-BFGS method
-    int lbfgs_memory_;
+    casadi_int lbfgs_memory_;
     /// Tolerance of primal infeasibility
     double tol_pr_;
     /// Tolerance of dual infeasibility
@@ -163,8 +163,8 @@ namespace casadi {
     ///@{
     double c1_;
     double beta_;
-    int max_iter_ls_;
-    int merit_memsize_;
+    casadi_int max_iter_ls_;
+    casadi_int merit_memsize_;
     ///@}
 
     // Print options
@@ -193,8 +193,8 @@ namespace casadi {
     void print_iteration() const;
 
     /// Print iteration
-    void print_iteration(int iter, double obj, double pr_inf, double du_inf,
-                         double dx_norm, double reg, int ls_trials, bool ls_success) const;
+    void print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf,
+                         double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const;
 
     // Reset the Hessian or Hessian approximation
     void reset_h(SqpmethodMemory* m) const;

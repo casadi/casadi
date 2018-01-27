@@ -47,6 +47,8 @@ CASADI_STRINGIFY("${CMAKE_CURRENT_BINARY_DIR}/casadi_runtime_str.h"
   casadi_from_mex.hpp
 )
 
+set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Wno-conversion")
+
 install(FILES casadi_runtime.hpp shared.hpp ${RUNTIME_SRC}
   DESTINATION ${INCLUDE_PREFIX}/casadi/core/runtime
 )

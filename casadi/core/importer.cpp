@@ -81,11 +81,11 @@ namespace casadi {
     return (*this)->get_function(symname);
   }
 
-  bool Importer::has_meta(const std::string& cmd, int ind) const {
+  bool Importer::has_meta(const std::string& cmd, casadi_int ind) const {
     return (*this)->has_meta(cmd, ind);
   }
 
-  std::string Importer::get_meta(const std::string& cmd, int ind) const {
+  std::string Importer::get_meta(const std::string& cmd, casadi_int ind) const {
     return (*this)->get_meta(cmd, ind);
   }
 

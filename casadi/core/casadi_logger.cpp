@@ -22,7 +22,7 @@
  *
  */
 
-
+#include "casadi_common.hpp"
 #include "casadi_logger.hpp"
 
 namespace casadi {

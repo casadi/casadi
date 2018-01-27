@@ -265,7 +265,7 @@ namespace casadi {
     std::string searchpath;
 
     // Try getting a handle
-    for (int i=0;i<search_paths.size();++i) {
+    for (casadi_int i=0;i<search_paths.size();++i) {
       searchpath = search_paths[i];
 #ifdef _WIN32
       SetDllDirectory(TEXT(searchpath.c_str()));

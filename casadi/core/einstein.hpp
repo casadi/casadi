@@ -40,8 +40,10 @@ namespace casadi {
 
     /** \brief  Constructor */
     Einstein(const MX& C, const MX& A, const MX& B,
-      const std::vector<int>& dim_c, const std::vector<int>& dim_a, const std::vector<int>& dim_b,
-      const std::vector<int>& c, const std::vector<int>& a, const std::vector<int>& b);
+      const std::vector<casadi_int>& dim_c, const std::vector<casadi_int>& dim_a,
+      const std::vector<casadi_int>& dim_b,
+      const std::vector<casadi_int>& c, const std::vector<casadi_int>& a,
+      const std::vector<casadi_int>& b);
 
     /** \brief  Destructor */
     ~Einstein() override {}
@@ -51,17 +53,18 @@ namespace casadi {
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
-                          const std::vector<int>& arg, const std::vector<int>& res) const override;
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
 
     /// Evaluate the function (template)
     template<typename T>
-    int eval_gen(const T** arg, T** res, int* iw, T* w) const;
+    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
@@ -75,19 +78,19 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_EINSTEIN;}
+    casadi_int op() const override { return OP_EINSTEIN;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    int n_inplace() const override { return 1;}
+    casadi_int n_inplace() const override { return 1;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    bool is_equal(const MXNode* node, int depth) const override {
+    bool is_equal(const MXNode* node, casadi_int depth) const override {
       return sameOpAndDeps(node, depth) && dynamic_cast<const Einstein*>(node)!=0;
     }
 
@@ -104,17 +107,17 @@ namespace casadi {
     }
 
     /// Dimensions of tensors A B C
-    std::vector<int> dim_c_, dim_a_, dim_b_;
+    std::vector<casadi_int> dim_c_, dim_a_, dim_b_;
     /// Einstein indices
-    std::vector<int> c_, a_, b_;
+    std::vector<casadi_int> c_, a_, b_;
 
-    std::vector<int> iter_dims_;
+    std::vector<casadi_int> iter_dims_;
 
-    std::vector<int> strides_a_;
-    std::vector<int> strides_b_;
-    std::vector<int> strides_c_;
+    std::vector<casadi_int> strides_a_;
+    std::vector<casadi_int> strides_b_;
+    std::vector<casadi_int> strides_c_;
 
-    int n_iter_;
+    casadi_int n_iter_;
 
   };
 

@@ -152,22 +152,22 @@ namespace casadi {
      */
     ///@{
     /// Add a new parameter
-    MX add_p(const std::string& name=std::string(), int n=1);
+    MX add_p(const std::string& name=std::string(), casadi_int n=1);
 
     /// Add a new control
-    MX add_u(const std::string& name=std::string(), int n=1);
+    MX add_u(const std::string& name=std::string(), casadi_int n=1);
 
     /// Add a new differential state
-    MX add_x(const std::string& name=std::string(), int n=1);
+    MX add_x(const std::string& name=std::string(), casadi_int n=1);
 
     /// Add a implicit state
-    std::pair<MX, MX> add_s(const std::string& name=std::string(), int n=1);
+    std::pair<MX, MX> add_s(const std::string& name=std::string(), casadi_int n=1);
 
     /// Add a new algebraic variable
-    MX add_z(const std::string& name=std::string(), int n=1);
+    MX add_z(const std::string& name=std::string(), casadi_int n=1);
 
     /// Add a new quadrature state
-    MX add_q(const std::string& name=std::string(), int n=1);
+    MX add_q(const std::string& name=std::string(), casadi_int n=1);
 
     /// Add a new dependent parameter
     MX add_d(const std::string& name, const MX& new_ddef);
@@ -188,7 +188,7 @@ namespace casadi {
     void add_quad(const std::string& name, const MX& new_quad);
 
     /// Add an auxiliary variable
-    MX add_aux(const std::string& name=std::string(), int n=1);
+    MX add_aux(const std::string& name=std::string(), casadi_int n=1);
 
     /// Check if dimensions match
     void sanity_check() const;
@@ -456,7 +456,7 @@ namespace casadi {
     void add_variable(const std::string& name, const Variable& var);
 
     /// Add a new variable: returns corresponding symbolic expression
-    MX add_variable(const std::string& name, int n=1);
+    MX add_variable(const std::string& name, casadi_int n=1);
 
     /// Add a new variable: returns corresponding symbolic expression
     MX add_variable(const std::string& name, const Sparsity& sp);

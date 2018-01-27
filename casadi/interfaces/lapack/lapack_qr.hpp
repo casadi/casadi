@@ -106,10 +106,10 @@ namespace casadi {
     int nfact(void* mem, const double* A) const override;
 
     // Solve the linear system
-    int solve_batch(void* mem, const double* A, double* x, int nrhs, bool tr) const;
+    int solve_batch(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const;
 
     // Solve the linear system
-    int solve(void* mem, const double* A, double* x, int nrhs, bool tr) const override;
+    int solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const override;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -121,7 +121,7 @@ namespace casadi {
     std::string class_name() const override { return "LapackQr";}
 
     // Maximum number of right-hand-sides
-    int max_nrhs_;
+    casadi_int max_nrhs_;
   };
 
 } // namespace casadi

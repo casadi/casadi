@@ -49,11 +49,11 @@ namespace casadi {
     return numeric_limits<double>::quiet_NaN();
   }
 
-  int SXNode::to_int() const {
+  casadi_int SXNode::to_int() const {
     casadi_error("to_int not defined for " + class_name());
   }
 
-  bool SXNode::is_equal(const SXNode* node, int depth) const {
+  bool SXNode::is_equal(const SXNode* node, casadi_int depth) const {
     return false;
   }
 
@@ -61,17 +61,17 @@ namespace casadi {
     casadi_error("'name' not defined for " + class_name());
   }
 
-  const SXElem& SXNode::dep(int i) const {
+  const SXElem& SXNode::dep(casadi_int i) const {
     casadi_error("'dep' not defined for " + class_name());
   }
 
-  SXElem& SXNode::dep(int i) {
+  SXElem& SXNode::dep(casadi_int i) {
     casadi_error("'dep' not defined for " + class_name());
   }
 
   void SXNode::disp(std::ostream& stream, bool more) const {
     // Find out which noded can be inlined
-    std::map<const SXNode*, int> nodeind;
+    std::map<const SXNode*, casadi_int> nodeind;
     can_inline(nodeind);
 
     // Print expression
@@ -79,7 +79,7 @@ namespace casadi {
     string s = print_compact(nodeind, intermed);
 
     // Print intermediate expressions
-    for (int i=0; i<intermed.size(); ++i)
+    for (casadi_int i=0; i<intermed.size(); ++i)
       stream << "@" << (i+1) << "=" << intermed[i] << ", ";
 
     // Print this
@@ -94,15 +94,15 @@ namespace casadi {
     temp = -temp-1;
   }
 
-  void SXNode::can_inline(std::map<const SXNode*, int>& nodeind) const {
+  void SXNode::can_inline(std::map<const SXNode*, casadi_int>& nodeind) const {
     // Add or mark node in map
-    std::map<const SXNode*, int>::iterator it=nodeind.find(this);
+    std::map<const SXNode*, casadi_int>::iterator it=nodeind.find(this);
     if (it==nodeind.end()) {
       // First time encountered, mark inlined
       nodeind.insert(it, make_pair(this, 0));
 
       // Handle dependencies with recursion
-      for (int i=0; i<n_dep(); ++i) {
+      for (casadi_int i=0; i<n_dep(); ++i) {
         dep(i)->can_inline(nodeind);
       }
     } else if (it->second==0 && op()!=OP_PARAMETER) {
@@ -111,10 +111,10 @@ namespace casadi {
     }
   }
 
-  std::string SXNode::print_compact(std::map<const SXNode*, int>& nodeind,
+  std::string SXNode::print_compact(std::map<const SXNode*, casadi_int>& nodeind,
                                    std::vector<std::string>& intermed) const {
     // Get reference to node index
-    int& ind = nodeind[this];
+    casadi_int& ind = nodeind[this];
 
     // If positive, already in intermediate expressions
     if (ind>0) {
@@ -125,7 +125,7 @@ namespace casadi {
 
     // Get expressions for dependencies
     std::string arg[2];
-    for (int i=0; i<n_dep(); ++i) {
+    for (casadi_int i=0; i<n_dep(); ++i) {
       arg[i] = dep(i)->print_compact(nodeind, intermed);
     }
 
@@ -146,6 +146,6 @@ namespace casadi {
     }
   }
 
-  int SXNode::eq_depth_ = 1;
+  casadi_int SXNode::eq_depth_ = 1;
 
 } // namespace casadi

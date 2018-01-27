@@ -39,12 +39,12 @@ namespace casadi {
     return "find(" + arg.at(0) + ")";
   }
 
-  int Find::eval(const double** arg, double** res, int* iw, double* w) const {
+  int Find::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     const double* x = arg[0];
-    int nnz = dep(0).nnz();
-    int k=0;
+    casadi_int nnz = dep(0).nnz();
+    casadi_int k=0;
     while (k<nnz && *x++ == 0) k++;
-    res[0][0] = k<nnz ? dep(0).row(k) : dep(0).size1();
+    res[0][0] = k<nnz ? static_cast<double>(dep(0).row(k)) : static_cast<double>(dep(0).size1());
     return 0;
   }
 
@@ -54,7 +54,7 @@ namespace casadi {
 
   void Find::ad_forward(const std::vector<std::vector<MX> >& fseed,
                      std::vector<std::vector<MX> >& fsens) const {
-    for (int d=0; d<fsens.size(); ++d) {
+    for (casadi_int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = 0;
     }
   }
@@ -63,20 +63,21 @@ namespace casadi {
                      std::vector<std::vector<MX> >& asens) const {
   }
 
-  int Find::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  int Find::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     res[0][0] = 0; // pw constant
     return 0;
   }
 
-  int Find::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  int Find::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     res[0][0] = 0; // pw constant
     return 0;
   }
 
   void Find::generate(CodeGenerator& g,
-                      const std::vector<int>& arg, const std::vector<int>& res) const {
-    int nnz = dep(0).nnz();
-    g.local("i", "int");
+                      const std::vector<casadi_int>& arg,
+                      const std::vector<casadi_int>& res) const {
+    casadi_int nnz = dep(0).nnz();
+    g.local("i", "casadi_int");
     g.local("cr", "const casadi_real", "*");
     g << "for (i=0, cr=" << g.work(arg[0], nnz) << "; i<" << nnz
       << " && *cr++==0; ++i) {}\n"

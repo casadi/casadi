@@ -41,42 +41,43 @@ namespace casadi {
   class CASADI_EXPORT Split : public MultipleOutput {
   public:
     /// Constructor
-    Split(const MX& x, const std::vector<int>& offset);
+    Split(const MX& x, const std::vector<casadi_int>& offset);
 
     /// Destructor
     ~Split() override = 0;
 
     /** \brief  Number of outputs */
-    int nout() const override { return output_sparsity_.size(); }
+    casadi_int nout() const override { return output_sparsity_.size(); }
 
     /** \brief  Get the sparsity of output oind */
-    const Sparsity& sparsity(int oind) const override { return output_sparsity_.at(oind);}
+    const Sparsity& sparsity(casadi_int oind) const override { return output_sparsity_.at(oind);}
 
     /// Evaluate the function (template)
     template<typename T>
-    int eval_gen(const T** arg, T** res, int* iw, T* w) const;
+    int eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
-                          const std::vector<int>& arg, const std::vector<int>& res) const override;
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
 
     /** Obtain information about node */
     Dict info() const override;
 
     // Sparsity pattern of the outputs
-    std::vector<int> offset_;
+    std::vector<casadi_int> offset_;
     std::vector<Sparsity> output_sparsity_;
   };
 
@@ -88,7 +89,7 @@ namespace casadi {
   public:
 
     /// Constructor
-    Horzsplit(const MX& x, const std::vector<int>& offset);
+    Horzsplit(const MX& x, const std::vector<casadi_int>& offset);
 
     /// Destructor
     ~Horzsplit() override {}
@@ -108,7 +109,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_HORZSPLIT;}
+    casadi_int op() const override { return OP_HORZSPLIT;}
 
     /// Create a horizontal concatenation node
     MX get_horzcat(const std::vector<MX>& x) const override;
@@ -123,7 +124,8 @@ namespace casadi {
   public:
 
     /// Constructor
-    Diagsplit(const MX& x, const std::vector<int>& offset1, const std::vector<int>& offset2);
+    Diagsplit(const MX& x,
+      const std::vector<casadi_int>& offset1, const std::vector<casadi_int>& offset2);
 
     /// Destructor
     ~Diagsplit() override {}
@@ -143,7 +145,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_DIAGSPLIT;}
+    casadi_int op() const override { return OP_DIAGSPLIT;}
 
     /// Create a diagonal concatenation node
     MX get_diagcat(const std::vector<MX>& x) const override;
@@ -157,7 +159,7 @@ namespace casadi {
   public:
 
     /// Constructor
-    Vertsplit(const MX& x, const std::vector<int>& offset);
+    Vertsplit(const MX& x, const std::vector<casadi_int>& offset);
 
     /// Destructor
     ~Vertsplit() override {}
@@ -177,7 +179,7 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_VERTSPLIT;}
+    casadi_int op() const override { return OP_VERTSPLIT;}
 
     /// Create a vertical concatenation node (vectors only)
     MX get_vertcat(const std::vector<MX>& x) const override;

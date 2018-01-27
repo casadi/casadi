@@ -33,6 +33,6 @@ namespace casadi {
 
   std::string GlobalOptions::casadipath = "";
 
-  int GlobalOptions::max_num_dir = 64;
+  casadi_int GlobalOptions::max_num_dir = 64;
 
 } // namespace casadi

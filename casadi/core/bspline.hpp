@@ -38,7 +38,7 @@ namespace casadi {
   class BSplineCommon : public FunctionInternal {
   public:
     BSplineCommon(const std::string &name, const std::vector<double>& knots,
-      const std::vector<int>& offset, const std::vector<int>& degree, int m);
+      const std::vector<casadi_int>& offset, const std::vector<casadi_int>& degree, casadi_int m);
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;
@@ -56,49 +56,49 @@ namespace casadi {
     ///@}
 
     static void from_knots(const std::vector< std::vector<double> >& knots,
-      std::vector<int>& offset, std::vector<double>& stacked);
+      std::vector<casadi_int>& offset, std::vector<double>& stacked);
 
-    std::vector<int> lookup_mode_;
+    std::vector<casadi_int> lookup_mode_;
     std::vector<double> knots_;
-    std::vector<int> offset_;
-    std::vector<int> degree_;
-    std::vector<int> strides_;
+    std::vector<casadi_int> offset_;
+    std::vector<casadi_int> degree_;
+    std::vector<casadi_int> strides_;
 
-    std::vector<int> coeffs_dims_;
-    int coeffs_size_;
-    int m_;
+    std::vector<casadi_int> coeffs_dims_;
+    casadi_int coeffs_size_;
+    casadi_int m_;
   };
 
   class BSpline : public BSplineCommon {
   public:
     static Function create(const std::string &name,
       const std::vector< std::vector<double> >& knots,
-      const std::vector<double>& coeffs, const std::vector<int>& degree, int m=1,
+      const std::vector<double>& coeffs, const std::vector<casadi_int>& degree, casadi_int m=1,
       const Dict& opts=Dict());
 
     BSpline(const std::string &name, const std::vector<double>& knots,
-      const std::vector<int>& offset, const std::vector<double>& coeffs,
-      const std::vector<int>& degree, int m);
+      const std::vector<casadi_int>& offset, const std::vector<double>& coeffs,
+      const std::vector<casadi_int>& degree, casadi_int m);
 
     /** \brief  Destructor */
     ~BSpline() override {}
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(int i) override { return Sparsity::dense(offset_.size()-1); }
-    Sparsity get_sparsity_out(int i) override { return Sparsity::dense(m_, 1); }
+    Sparsity get_sparsity_in(casadi_int i) override { return Sparsity::dense(offset_.size()-1); }
+    Sparsity get_sparsity_out(casadi_int i) override { return Sparsity::dense(m_, 1); }
     /// @}
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
     /** \brief  Evaluate numerically, work vectors given */
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    bool has_forward(int nfwd) const override { return true;}
-    Function get_forward(int nfwd, const std::string& name,
+    bool has_forward(casadi_int nfwd) const override { return true;}
+    Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -106,8 +106,8 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    bool has_reverse(int nadj) const override { return true;}
-    Function get_reverse(int nadj, const std::string& name,
+    bool has_reverse(casadi_int nadj) const override { return true;}
+    Function get_reverse(casadi_int nadj, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -134,7 +134,7 @@ namespace casadi {
     std::vector<double> coeffs_;
 
   private:
-    std::vector<double> derivative_coeff(int i) const;
+    std::vector<double> derivative_coeff(casadi_int i) const;
     MX jac(const MX& x) const;
   };
 
@@ -143,12 +143,13 @@ namespace casadi {
   public:
     static Function create(const std::string &name,
       const std::vector< std::vector<double> >& knots,
-      const std::vector<double>& x, const std::vector<int>& degree, int m=1, bool reverse=false,
+      const std::vector<double>& x, const std::vector<casadi_int>& degree,
+      casadi_int m=1, bool reverse=false,
       const Dict& opts=Dict());
 
     BSplineDual(const std::string &name, const std::vector<double>& knots,
-      const std::vector<int>& offset, const std::vector<double>& x,
-      const std::vector<int>& degree, int m, bool reverse);
+      const std::vector<casadi_int>& offset, const std::vector<double>& x,
+      const std::vector<casadi_int>& degree, casadi_int m, bool reverse);
 
     /** \brief  Destructor */
     ~BSplineDual() override {}
@@ -161,20 +162,20 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(int i) override;
-    Sparsity get_sparsity_out(int i) override;
+    Sparsity get_sparsity_in(casadi_int i) override;
+    Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
     /** \brief  Evaluate numerically, work vectors given */
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    bool has_forward(int nfwd) const override { return true;}
-    Function get_forward(int nfwd, const std::string& name,
+    bool has_forward(casadi_int nfwd) const override { return true;}
+    Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -182,8 +183,8 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    bool has_reverse(int nadj) const override { return true;}
-    Function get_reverse(int nadj, const std::string& name,
+    bool has_reverse(casadi_int nadj) const override { return true;}
+    Function get_reverse(casadi_int nadj, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
@@ -191,10 +192,11 @@ namespace casadi {
 
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w, void* mem) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, void* mem) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
     ///@{
     /// Is the class able to propagate seeds through the algorithm?
@@ -213,7 +215,7 @@ namespace casadi {
 
     std::vector<double> x_;
     bool reverse_;
-    int N_;
+    casadi_int N_;
   };
 
 } // namespace casadi

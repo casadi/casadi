@@ -57,9 +57,9 @@ namespace casadi {
   LinearInterpolant::
   LinearInterpolant(const string& name,
                     const std::vector<double>& grid,
-                    const std::vector<int>& offset,
+                    const std::vector<casadi_int>& offset,
                     const vector<double>& values,
-                    int m)
+                    casadi_int m)
                     : Interpolant(name, grid, offset, values, m) {
   }
 
@@ -70,7 +70,7 @@ namespace casadi {
     // Call the base class initializer
     Interpolant::init(opts);
 
-    lookup_mode_ = std::vector<int>(offset_.size()-1, 0);
+    lookup_mode_ = std::vector<casadi_int>(offset_.size()-1, 0);
 
     std::vector<std::string> lookup_mode;
 
@@ -83,7 +83,7 @@ namespace casadi {
 
     if (!lookup_mode.empty()) {
       casadi_assert_dev(lookup_mode.size()==offset_.size()-1);
-      for (int i=0;i<offset_.size()-1;++i) {
+      for (casadi_int i=0;i<offset_.size()-1;++i) {
         if (lookup_mode[i]=="linear") {
           lookup_mode_[i] = 0;
         } else if (lookup_mode[i]=="exact") {
@@ -107,7 +107,7 @@ namespace casadi {
   }
 
   int LinearInterpolant::
-  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     if (res[0]) {
       casadi_interpn(res[0], ndim_, get_ptr(grid_), get_ptr(offset_),
                      get_ptr(values_), arg[0], get_ptr(lookup_mode_), m_, iw, w);
@@ -140,7 +140,7 @@ namespace casadi {
                   const Dict& opts) const {
     std::vector<MX> args = mx_in();
     std::vector<MX> res(n_out_);
-    for (int i=0;i<n_out_;++i)
+    for (casadi_int i=0;i<n_out_;++i)
       res[i] = DM(size1_out(i), size2_out(i));
     Function f("f", args, res);
 
@@ -158,7 +158,7 @@ namespace casadi {
   }
 
   int LinearInterpolantJac::
-  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = derivative_of_.get<LinearInterpolant>();
     casadi_interpn_grad(res[0], m->ndim_, get_ptr(m->grid_), get_ptr(m->offset_),
                         get_ptr(m->values_), arg[0], get_ptr(m->lookup_mode_), m->m_, iw, w);

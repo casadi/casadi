@@ -102,7 +102,7 @@ namespace casadi {
       radau_points6, radau_points7, radau_points8, radau_points9};
 
   template<typename RealT>
-  std::vector<RealT> collocation_pointsGen(int order, const std::string& scheme) {
+  std::vector<RealT> collocation_pointsGen(casadi_int order, const std::string& scheme) {
     if (scheme=="radau") {
       casadi_assert(order>0 && order<10,
         "Error in collocationPoints(order, scheme): "
@@ -119,15 +119,15 @@ namespace casadi {
     }
   }
 
-  std::vector<double> collocation_points(int order, const std::string& scheme) {
+  std::vector<double> collocation_points(casadi_int order, const std::string& scheme) {
     return collocation_pointsGen<double>(order, scheme);
   }
 
-  std::vector<long double> collocation_pointsL(int order, const std::string& scheme) {
+  std::vector<long double> collocation_pointsL(casadi_int order, const std::string& scheme) {
     return collocation_pointsGen<long double>(order, scheme);
   }
 
-  Function simpleRK(Function f, int N, int order) {
+  Function simpleRK(Function f, casadi_int N, casadi_int order) {
     // Consistency check
     casadi_assert(N>=1,
       "Parameter N (number of steps) must be at least 1, but got " + str(N) + ".");
@@ -168,10 +168,10 @@ namespace casadi {
 
     // Integrate
     MX xf = x0;
-    for (int i=0; i<N; ++i) {
-      for (int j=0; j<order; ++j) {
+    for (casadi_int i=0; i<N; ++i) {
+      for (casadi_int j=0; j<order; ++j) {
         MX xL = 0;
-        for (int jj=0; jj<j; ++jj) {
+        for (casadi_int jj=0; jj<j; ++jj) {
           xL += k.at(jj)*A.at(j-1).at(jj);
         }
         f_arg[0] = xf+xL;
@@ -179,7 +179,7 @@ namespace casadi {
         k[j] = dt*f(f_arg).at(0);
       }
 
-      for (int j=0; j<order; ++j) {
+      for (casadi_int j=0; j<order; ++j) {
         xf += b.at(j)*k.at(j);
       }
     }
@@ -191,7 +191,7 @@ namespace casadi {
   void collocation_interpolators(const std::vector<double> & tau_root,
                                 std::vector< std::vector<double> > &C, std::vector< double > &D) {
     // Find the degree of the interpolation
-    int deg = tau_root.size();
+    casadi_int deg = tau_root.size();
 
     // Include zero
     std::vector<double> etau_root = tau_root;
@@ -199,7 +199,7 @@ namespace casadi {
 
     // Allocate storage space for resulting coefficients
     C.resize(deg+1);
-    for (int i=0;i<deg+1;++i) {
+    for (casadi_int i=0;i<deg+1;++i) {
       C[i].resize(deg+1);
     }
     D.resize(deg+1);
@@ -208,10 +208,10 @@ namespace casadi {
     SX tau = SX::sym("tau");
 
     // For all collocation points
-    for (int j=0; j<deg+1; ++j) {
+    for (casadi_int j=0; j<deg+1; ++j) {
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
       SX L = 1;
-      for (int j2=0; j2<deg+1; ++j2) {
+      for (casadi_int j2=0; j2<deg+1; ++j2) {
         if (j2 != j) {
           L *= (tau-etau_root[j2])/(etau_root[j]-etau_root[j2]);
         }
@@ -226,13 +226,13 @@ namespace casadi {
       // Evaluate the time derivative of the polynomial at all collocation points to
       // get the coefficients of the continuity equation
       Function tfcn("tfcn", {tau}, {tangent(L, tau)});
-      for (int j2=0; j2<deg+1; ++j2) {
+      for (casadi_int j2=0; j2<deg+1; ++j2) {
         C[j2][j] =  tfcn(vector<DM>{etau_root[j2]}).at(0)->front();
       }
     }
   }
 
-  Function simpleIRK(Function f, int N, int order, const std::string& scheme,
+  Function simpleIRK(Function f, casadi_int N, casadi_int order, const std::string& scheme,
                        const std::string& solver,
                        const Dict& solver_options) {
     // Consistency check
@@ -264,10 +264,10 @@ namespace casadi {
 
     // Collect the equations that implicitly define v
     std::vector<MX> V_eq, f_in(2), f_out;
-    for (int j=1; j<order+1; ++j) {
+    for (casadi_int j=1; j<order+1; ++j) {
       // Expression for the state derivative at the collocation point
       MX xp_j = 0;
-      for (int r=0; r<=order; ++r) xp_j+= C[j][r]*x[r];
+      for (casadi_int r=0; r<=order; ++r) xp_j+= C[j][r]*x[r];
 
       // Collocation equations
       f_in[0] = x[j];
@@ -284,13 +284,13 @@ namespace casadi {
 
     // Get state at end time
     MX xf = x0;
-    for (int k=0; k<N; ++k) {
+    for (casadi_int k=0; k<N; ++k) {
       std::vector<MX> ifcn_out = ifcn({repmat(xf, order), xf, p, h});
       x = vertsplit(ifcn_out[0], x0.size1());
 
       // State at end of step
       xf = D[0]*x0;
-      for (int i=1; i<=order; ++i) {
+      for (casadi_int i=1; i<=order; ++i) {
         xf += D[i]*x[i-1];
       }
     }
@@ -314,8 +314,8 @@ namespace casadi {
     MX u = MX::sym("u", vertcat(Sparsity::scalar(), vec(p_sp))); // augment p with t
 
     // Normalized xdot
-    int u_offset[] = {0, 1, 1+p_sp.size1()};
-    vector<MX> pp = vertsplit(u, vector<int>(u_offset, u_offset+3));
+    casadi_int u_offset[] = {0, 1, 1+p_sp.size1()};
+    vector<MX> pp = vertsplit(u, vector<casadi_int>(u_offset, u_offset+3));
     MX h = pp[0];
     MX p = reshape(pp[1], p_sp.size());
     MX f_in[] = {x, p};

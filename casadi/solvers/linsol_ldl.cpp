@@ -66,7 +66,7 @@ namespace casadi {
     auto m = static_cast<LinsolLdlMemory*>(mem);
 
     // Work vectors
-    int nrow = this->nrow();
+    casadi_int nrow = this->nrow();
     m->d.resize(nrow);
     m->l.resize(sp_Lt_.nnz());
     m->w.resize(nrow);
@@ -84,27 +84,27 @@ namespace casadi {
     return 0;
   }
 
-  int LinsolLdl::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
+  int LinsolLdl::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
     casadi_ldl_solve(x, nrhs, sp_Lt_, get_ptr(m->l), get_ptr(m->d));
     return 0;
   }
 
-  int LinsolLdl::neig(void* mem, const double* A) const {
+  casadi_int LinsolLdl::neig(void* mem, const double* A) const {
     // Count number of negative eigenvalues
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    int nrow = this->nrow();
-    int ret = 0;
-    for (int i=0; i<nrow; ++i) if (m->d[i]<0) ret++;
+    casadi_int nrow = this->nrow();
+    casadi_int ret = 0;
+    for (casadi_int i=0; i<nrow; ++i) if (m->d[i]<0) ret++;
     return ret;
   }
 
-  int LinsolLdl::rank(void* mem, const double* A) const {
+  casadi_int LinsolLdl::rank(void* mem, const double* A) const {
     // Count number of nonzero eigenvalues
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    int nrow = this->nrow();
-    int ret = 0;
-    for (int i=0; i<nrow; ++i) if (m->d[i]!=0) ret++;
+    casadi_int nrow = this->nrow();
+    casadi_int ret = 0;
+    for (casadi_int i=0; i<nrow; ++i) if (m->d[i]!=0) ret++;
     return ret;
   }
 
