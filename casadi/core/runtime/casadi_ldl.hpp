@@ -40,26 +40,26 @@ void casadi_ldl_new(const int* sp_a, const int* sp_lt,
 }
 
 // SYMBOL "ldl_trs"
-// Solve for (I+L) with L an optionally transposed strictly lower triangular matrix.
+// Solve for (I+R) with R an optionally transposed strictly upper triangular matrix.
 template<typename T1>
-void casadi_ldl_trs(const int* sp_l, const T1* nz_l, T1* x, int tr) {
+void casadi_ldl_trs_new(const int* sp_r, const T1* nz_r, T1* x, int tr) {
   // Extract sparsity
-  int ncol=sp_l[1];
-  const int *colind=sp_l+2, *row=sp_l+2+ncol+1;
+  int ncol=sp_r[1];
+  const int *colind=sp_r+2, *row=sp_r+2+ncol+1;
   // Local variables
   int c, k;
   if (tr) {
-    // Backward substitution
-    for (c=ncol-1; c>=0; --c) {
-      for (k=colind[c]; k<colind[c+1]; ++k) {
-        x[c] -= nz_l[k]*x[row[k]];
-      }
-    }
-  } else {
     // Forward substitution
     for (c=0; c<ncol; ++c) {
       for (k=colind[c]; k<colind[c+1]; ++k) {
-        x[row[k]] -= nz_l[k]*x[c];
+        x[c] -= nz_r[k]*x[row[k]];
+      }
+    }
+  } else {
+    // Backward substitution
+    for (c=ncol-1; c>=0; --c) {
+      for (k=colind[c+1]-1; k>=colind[c]; --k) {
+        x[row[k]] -= nz_r[k]*x[c];
       }
     }
   }
@@ -68,18 +68,18 @@ void casadi_ldl_trs(const int* sp_l, const T1* nz_l, T1* x, int tr) {
 // SYMBOL "ldl_solve"
 // Linear solve using an LDL factorized linear system
 template<typename T1>
-void casadi_ldl_solve(T1* x, int nrhs, const int* sp_l, const T1* l,
+void casadi_ldl_solve_new(T1* x, int nrhs, const int* sp_lt, const T1* lt,
                       const T1* d) {
-  int n = sp_l[1];
+  int n = sp_lt[1];
   int i, k;
   for (k=0; k<nrhs; ++k) {
     //      LDL'x = b <=> x = L'\D\L\b
     //  Solve for L
-    casadi_ldl_trs(sp_l, l, x, 0);
+    casadi_ldl_trs_new(sp_lt, lt, x, 1);
     // Divide by D
     for (i=0; i<n; ++i) x[i] /= d[i];
     // Solve for L'
-    casadi_ldl_trs(sp_l, l, x, 1);
+    casadi_ldl_trs_new(sp_lt, lt, x, 0);
     // Next rhs
     x += n;
   }

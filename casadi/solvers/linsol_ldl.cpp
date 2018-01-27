@@ -58,7 +58,8 @@ namespace casadi {
     LinsolInternal::init(opts);
 
     // Symbolic factorization
-    sp_L_ = sp_.ldl(parent_);
+    std::vector<int> parent;
+    sp_Lt_ = sp_.ldl(parent).T();
   }
 
   int LinsolLdl::init_mem(void* mem) const {
@@ -68,7 +69,7 @@ namespace casadi {
     // Work vectors
     int nrow = this->nrow();
     m->d.resize(nrow);
-    m->l.resize(sp_L_.nnz());
+    m->l.resize(sp_Lt_.nnz());
     m->iw.resize(2*nrow);
     m->w.resize(nrow);
 
@@ -81,18 +82,13 @@ namespace casadi {
 
   int LinsolLdl::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    Sparsity sp_lt = sp_L_.T();
-    vector<double> nz_lt(sp_lt.nnz());
-    casadi_ldl_new(sp_, sp_lt, A, get_ptr(nz_lt), get_ptr(m->d), get_ptr(m->w));
-    DM dm_lt(sp_lt, nz_lt);
-    dm_lt = dm_lt.T();
-    copy(dm_lt->begin(), dm_lt->end(), m->l.begin());
+    casadi_ldl_new(sp_, sp_Lt_, A, get_ptr(m->l), get_ptr(m->d), get_ptr(m->w));
     return 0;
   }
 
   int LinsolLdl::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    casadi_ldl_solve(x, nrhs, sp_L_, get_ptr(m->l), get_ptr(m->d));
+    casadi_ldl_solve_new(x, nrhs, sp_Lt_, get_ptr(m->l), get_ptr(m->d));
     return 0;
   }
 
