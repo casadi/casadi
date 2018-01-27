@@ -632,13 +632,13 @@ namespace casadi {
     std::vector<int> etree(bool ata=false) const;
 
     /** \brief Symbolic LDL factorization
-        Returns the sparsity pattern of L as well as the elimination tree
+        Returns the sparsity pattern of L^T
 
         The implementation is a modified version of LDL
         Copyright(c) Timothy A. Davis, 2005-2013
         Licensed as a derivative work under the GNU LGPL
     */
-    Sparsity ldl(std::vector<int>& SWIG_OUTPUT(parent)) const;
+    Sparsity ldl() const;
 
     /** \brief Symbolic QR factorization
         Returns the sparsity pattern of V (compact representation of Q) and R
@@ -651,14 +651,6 @@ namespace casadi {
                    std::vector<int>& SWIG_OUTPUT(pinv),
                    std::vector<int>& SWIG_OUTPUT(leftmost),
                    std::vector<int>& SWIG_OUTPUT(parent)) const;
-
-    /** \brief Symbolic factorization analysis
-        See Direct Methods for Sparse Linear Systems by Davis (2006).
-    */
-    void symbfact(std::vector<int>& SWIG_OUTPUT(count),
-                  std::vector<int>& SWIG_OUTPUT(parent),
-                  std::vector<int>& SWIG_OUTPUT(post),
-                  Sparsity& SWIG_OUTPUT(L), bool ata=false) const;
 
     /** \brief Depth-first search on the adjacency graph of the sparsity
         See Direct Methods for Sparse Linear Systems by Davis (2006).

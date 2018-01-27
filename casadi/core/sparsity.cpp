@@ -590,7 +590,7 @@ namespace casadi {
     return parent;
   }
 
-  Sparsity Sparsity::ldl(std::vector<int>& parent) const {
+  Sparsity Sparsity::ldl() const {
     casadi_assert(is_symmetric(),
                  "LDL factorization requires a symmetric matrix");
     // Dimension
@@ -598,7 +598,7 @@ namespace casadi {
     // Work vector
     std::vector<int> w(3*n);
     // Elimination tree
-    parent.resize(n);
+    std::vector<int> parent(n);
     // Calculate colind in L (strictly lower entries only)
     std::vector<int> L_colind(1+n);
     SparsityInternal::ldl_colind(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(w));
@@ -606,8 +606,8 @@ namespace casadi {
     std::vector<int> L_row(L_colind.back());
     SparsityInternal::ldl_row(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(L_row),
                     get_ptr(w));
-    // Sparsity of L
-    return Sparsity(n, n, L_colind, L_row);
+    // Sparsity of L^T
+    return Sparsity(n, n, L_colind, L_row).T();
   }
 
   void Sparsity::qr_sparse(Sparsity& V, Sparsity& R, std::vector<int>& pinv,
@@ -635,42 +635,6 @@ namespace casadi {
                                     get_ptr(iw));
     V = compressed(sp_v);
     R = compressed(sp_r);
-  }
-
-  void Sparsity::symbfact(std::vector<int>& count, std::vector<int>& parent,
-                          std::vector<int>& post, Sparsity& L, bool ata) const {
-    // Dimensions
-    int size1=this->size1(), size2=this->size2();
-    // Allocate vectors
-    std::vector<int> w;
-    parent.resize(size2);
-    post.resize(size2);
-    count.resize(size2);
-
-    if (ata) {
-      // Allocate work
-      w.resize(size1+size2);
-      // Calculate elimination tree
-      SparsityInternal::etree(*this, get_ptr(parent), get_ptr(w), ata);
-      // Calculate postorder
-      w.resize(3*size2);
-      SparsityInternal::postorder(get_ptr(parent), size2, get_ptr(post), get_ptr(w));
-      // Calculate colind in L
-      w.resize(size1 + 5*size2 + 1);
-      SparsityInternal::qr_counts(T(), get_ptr(parent), get_ptr(post),
-                                  get_ptr(count), get_ptr(w));
-      // Not implemented
-      L = Sparsity();
-    } else {
-      // Symbolic LDL factorization
-      L = ldl(parent) + diag(size2, size2);
-      // Calculate postorder
-      w.resize(3*size2);
-      SparsityInternal::postorder(get_ptr(parent), size2, get_ptr(post), get_ptr(w));
-      // Calculate column counts
-      const int* L_colind = L.colind();
-      for (int i=0; i<size2; ++i) count[i] = L_colind[i+1] - L_colind[i];
-    }
   }
 
   int Sparsity::dfs(int j, int top, std::vector<int>& xi,

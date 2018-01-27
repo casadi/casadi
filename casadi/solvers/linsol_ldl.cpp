@@ -58,8 +58,7 @@ namespace casadi {
     LinsolInternal::init(opts);
 
     // Symbolic factorization
-    std::vector<int> parent;
-    sp_Lt_ = sp_.ldl(parent).T();
+    sp_Lt_ = sp_.ldl();
   }
 
   int LinsolLdl::init_mem(void* mem) const {

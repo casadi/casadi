@@ -1971,8 +1971,7 @@ namespace casadi {
   void Matrix<Scalar>::ldl(const Matrix<Scalar>& A,
                            Matrix<Scalar>& L, Matrix<Scalar> &D) {
     // Symbolic factorization
-    vector<int> parent;
-    Sparsity Lt_sp = A.sparsity().ldl(parent).T();
+    Sparsity Lt_sp = A.sparsity().ldl();
 
     // Get dimension
     int n=A.size1();
