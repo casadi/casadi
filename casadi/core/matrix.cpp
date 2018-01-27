@@ -1972,19 +1972,18 @@ namespace casadi {
                            Matrix<Scalar>& L, Matrix<Scalar> &D) {
     // Symbolic factorization
     vector<int> parent;
-    Sparsity L_sp = A.sparsity().ldl(parent);
+    Sparsity Lt_sp = A.sparsity().ldl(parent).T();
 
     // Get dimension
     int n=A.size1();
 
     // Calculate entries in L and D
-    vector<int> iw(2*n);
-    vector<Scalar> D_nz(n), L_nz(L_sp.nnz()), w(n);
-    casadi_ldl(A.sparsity(), get_ptr(parent), L_sp, get_ptr(A.nonzeros()),
-               get_ptr(L_nz), get_ptr(D_nz), get_ptr(iw), get_ptr(w));
+    vector<Scalar> D_nz(n), L_nz(Lt_sp.nnz()), w(n);
+    casadi_ldl_new(A.sparsity(), Lt_sp, get_ptr(A.nonzeros()),
+              get_ptr(L_nz), get_ptr(D_nz), get_ptr(w));
 
     // Assemble L and D
-    L = Matrix<Scalar>(L_sp, L_nz) + Matrix<Scalar>::eye(n);
+    L = Matrix<Scalar>(Lt_sp, L_nz).T() + Matrix<Scalar>::eye(n);
     D = D_nz;
   }
 
