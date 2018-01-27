@@ -69,7 +69,6 @@ namespace casadi {
     int nrow = this->nrow();
     m->d.resize(nrow);
     m->l.resize(sp_Lt_.nnz());
-    m->iw.resize(2*nrow);
     m->w.resize(nrow);
 
     return 0;
@@ -81,13 +80,13 @@ namespace casadi {
 
   int LinsolLdl::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    casadi_ldl_new(sp_, sp_Lt_, A, get_ptr(m->l), get_ptr(m->d), get_ptr(m->w));
+    casadi_ldl(sp_, sp_Lt_, A, get_ptr(m->l), get_ptr(m->d), get_ptr(m->w));
     return 0;
   }
 
   int LinsolLdl::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    casadi_ldl_solve_new(x, nrhs, sp_Lt_, get_ptr(m->l), get_ptr(m->d));
+    casadi_ldl_solve(x, nrhs, sp_Lt_, get_ptr(m->l), get_ptr(m->d));
     return 0;
   }
 
