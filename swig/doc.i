@@ -59625,11 +59625,9 @@ Append another sparsity patten horizontally.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::ldl(std::vector< casadi_int >
-&output_parent) const  "
+%feature("docstring")  casadi::Sparsity::ldl() const  "
 
-Symbolic LDL factorization Returns the sparsity pattern of L as well as the
-elimination tree.
+Symbolic LDL factorization Returns the sparsity pattern of L^T.
 
 The implementation is a modified version of LDL Copyright(c) Timothy A.
 Davis, 2005-2013 Licensed as a derivative work under the GNU LGPL
@@ -59785,15 +59783,6 @@ submatrix[k] = originalmatrix[mapping[k]]
 
 Create the sparsity pattern for a unit vector of length n and a nonzero on
 position el.
-
-";
-
-%feature("docstring")  casadi::Sparsity::symbfact(std::vector< casadi_int >
-&output_count, std::vector< casadi_int > &output_parent, std::vector<
-casadi_int > &output_post, Sparsity &output_L, bool ata=false) const  "
-
-Symbolic factorization analysis See Direct Methods for Sparse Linear Systems
-by Davis (2006).
 
 ";
 
@@ -64407,8 +64396,7 @@ Joel Andersson
 ";
 
 %feature("docstring")  casadi::casadi_ldl(const casadi_int *sp_a, const
-casadi_int *parent, const casadi_int *sp_l, const T1 *a, T1 *l, T1 *d,
-casadi_int *iw, T1 *w) "
+casadi_int *sp_lt, const T1 *a, T1 *lt, T1 *d, T1 *w) "
 
 [INTERNAL] ";
 
@@ -65930,7 +65918,7 @@ SharedObjectInternal *, SharedObject > &already_copied) "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_ldl_solve(T1 *x, casadi_int nrhs,
-const casadi_int *sp_l, const T1 *l, const T1 *d) "
+const casadi_int *sp_lt, const T1 *lt, const T1 *d) "
 
 [INTERNAL] ";
 
@@ -66067,8 +66055,8 @@ tol, int *iwork, double *dwork, int ldwork) "
 
 ";
 
-%feature("docstring")  casadi::casadi_ldl_trs(const casadi_int *sp_l, const
-T1 *nz_l, T1 *x, casadi_int tr) "
+%feature("docstring")  casadi::casadi_ldl_trs(const casadi_int *sp_r, const
+T1 *nz_r, T1 *x, casadi_int tr) "
 
 [INTERNAL] ";
 

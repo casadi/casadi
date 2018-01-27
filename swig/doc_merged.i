@@ -42591,8 +42591,7 @@ Append another sparsity patten horizontally.
 
 %feature("docstring") casadi::Sparsity::ldl "
 
-Symbolic LDL factorization Returns the sparsity pattern of L as well as the
-elimination tree.
+Symbolic LDL factorization Returns the sparsity pattern of L^T.
 
 The implementation is a modified version of LDL Copyright(c) Timothy A.
 Davis, 2005-2013 Licensed as a derivative work under the GNU LGPL
@@ -42714,13 +42713,6 @@ submatrix[k] = originalmatrix[mapping[k]]
 
 Create the sparsity pattern for a unit vector of length n and a nonzero on
 position el.
-
-";
-
-%feature("docstring") casadi::Sparsity::symbfact "
-
-Symbolic factorization analysis See Direct Methods for Sparse Linear Systems
-by Davis (2006).
 
 ";
 
