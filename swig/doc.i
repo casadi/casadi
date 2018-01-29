@@ -59464,9 +59464,7 @@ Is upper triangular?
 ";
 
 %feature("docstring")  casadi::Sparsity::qr_sparse(Sparsity &output_V,
-Sparsity &output_R, std::vector< casadi_int > &output_pinv, std::vector<
-casadi_int > &output_leftmost, std::vector< casadi_int > &output_parent)
-const  "
+Sparsity &output_R, std::vector< casadi_int > &output_pinv) const  "
 
 Symbolic QR factorization Returns the sparsity pattern of V (compact
 representation of Q) and R as well as vectors needed for the numerical
@@ -66616,9 +66614,8 @@ Check if the vector is strictly decreasing.
 ";
 
 %feature("docstring")  casadi::casadi_qr(const casadi_int *sp_a, const T1
-*nz_a, casadi_int *iw, T1 *x, const casadi_int *sp_v, T1 *nz_v, const
-casadi_int *sp_r, T1 *nz_r, T1 *beta, const casadi_int *leftmost, const
-casadi_int *parent, const casadi_int *pinv) "
+*nz_a, T1 *x, const casadi_int *sp_v, T1 *nz_v, const casadi_int *sp_r, T1
+*nz_r, T1 *beta, const casadi_int *pinv) "
 
 [INTERNAL] ";
 
