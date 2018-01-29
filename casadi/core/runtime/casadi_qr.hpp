@@ -2,8 +2,6 @@
 // SYMBOL "house"
 // Householder reflection
 // Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
 template<typename T1>
 T1 casadi_house(T1* x, T1* beta, casadi_int n) {
   // Local variable
@@ -31,10 +29,10 @@ T1 casadi_house(T1* x, T1* beta, casadi_int n) {
 // sp_r = [nrow, ncol, 0, 0, ...] len[3 + ncol + nnz_r]
 // len[r] nnz_r
 // len[beta] ncol
- template<typename T1>
- void casadi_qr(const casadi_int* sp_a, const T1* nz_a, T1* x,
-                const casadi_int* sp_v, T1* nz_v, const casadi_int* sp_r, T1* nz_r, T1* beta,
-                const casadi_int* pinv) {
+template<typename T1>
+void casadi_qr(const casadi_int* sp_a, const T1* nz_a, T1* x,
+               const casadi_int* sp_v, T1* nz_v, const casadi_int* sp_r, T1* nz_r, T1* beta,
+               const casadi_int* pinv) {
    // Extract sparsities
    casadi_int ncol = sp_a[1];
    const casadi_int *a_colind=sp_a+2, *a_row=sp_a+2+ncol+1;
@@ -175,4 +173,3 @@ void casadi_qr_solve(T1* x, casadi_int nrhs, casadi_int tr,
     x += ncol;
   }
 }
-#pragma GCC diagnostic pop
