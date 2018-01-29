@@ -25,21 +25,55 @@ T1 casadi_house(T1* x, T1* beta, casadi_int n) {
 // SYMBOL "qr"
 // Numeric QR factorization
 // Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
-// Note: nrow <= nrow_ext <= nrow+ncol
-// len[iw] = nrow_ext + ncol
-// len[x] = nrow_ext
-// sp_v = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_v]
+// len[x] = nrow
+// sp_v = [nrow, ncol, 0, 0, ...] len[3 + ncol + nnz_v]
 // len[v] nnz_v
-// sp_r = [nrow_ext, ncol, 0, 0, ...] len[3 + ncol + nnz_r]
+// sp_r = [nrow, ncol, 0, 0, ...] len[3 + ncol + nnz_r]
 // len[r] nnz_r
 // len[beta] ncol
-/* Only declaration, no implementation due to license restrictions.
-  Cf. CasADi issue #2158
- */
-template<typename T1>
-void casadi_qr(const casadi_int* sp_a, const T1* nz_a, casadi_int* iw, T1* x,
-               const casadi_int* sp_v, T1* nz_v, const casadi_int* sp_r, T1* nz_r, T1* beta,
-               const casadi_int* leftmost, const casadi_int* parent, const casadi_int* pinv);
+ template<typename T1>
+ void casadi_qr(const casadi_int* sp_a, const T1* nz_a, casadi_int* iw, T1* x,
+                const casadi_int* sp_v, T1* nz_v, const casadi_int* sp_r, T1* nz_r, T1* beta,
+                const casadi_int* leftmost, const casadi_int* parent, const casadi_int* pinv) {
+   // Extract sparsities
+   casadi_int ncol = sp_a[1];
+   const casadi_int *a_colind=sp_a+2, *a_row=sp_a+2+ncol+1;
+   casadi_int nrow = sp_v[0];
+   const casadi_int *v_colind=sp_v+2, *v_row=sp_v+2+ncol+1;
+   const casadi_int *r_colind=sp_r+2, *r_row=sp_r+2+ncol+1;
+   // Local variables
+   casadi_int r, c, k, k1;
+   T1 alpha;
+   // Clear work vector
+   for (r=0; r<nrow; ++r) x[r] = 0;
+   // Loop over columns of R, A and V
+   for (c=0; c<ncol; ++c) {
+     // Copy (permuted) column of A to x
+     for (k=a_colind[c]; k<a_colind[c+1]; ++k) x[pinv[a_row[k]]] = nz_a[k];
+     // Use the equality R = (I-betan*vn*vn')*...*(I-beta1*v1*v1')*A to get
+     // strictly upper triangular entries of R
+     for (k=r_colind[c]; k<r_colind[c+1] && (r=r_row[k])<c; ++k) {
+       // Calculate scalar factor alpha = beta(r)*dot(v(:,r), x)
+       alpha = 0;
+       for (k1=v_colind[r]; k1<v_colind[r+1]; ++k1) alpha += nz_v[k1]*x[v_row[k1]];
+       alpha *= beta[r];
+       // x -= alpha*v(:,r)
+       for (k1=v_colind[r]; k1<v_colind[r+1]; ++k1) x[v_row[k1]] -= alpha*nz_v[k1];
+       // Get r entry
+       *nz_r++ = x[r];
+       // Strictly upper triangular entries in x no longer needed
+       x[r] = 0;
+     }
+     // Get V column
+     for (k=v_colind[c]; k<v_colind[c+1]; ++k) {
+       nz_v[k] = x[v_row[k]];
+       // Lower triangular entries of x no longer needed
+       x[v_row[k]] = 0;
+     }
+     // Get diagonal entry of R, normalize V column
+     *nz_r++ = casadi_house(nz_v + v_colind[c], beta + c, v_colind[c+1] - v_colind[c]);
+   }
+ }
 
 // SYMBOL "qr_mv"
 // Multiply QR Q matrix from the right with a vector, with Q represented
