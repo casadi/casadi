@@ -75,6 +75,17 @@ try:
 except:
   pass
 
+try:
+  load_linsol("qr")
+  lsolvers.append(("qr",{},set()))
+except:
+  pass
+
+try:
+  load_linsol("ldl")
+  lsolvers.append(("ldl",{},{"posdef","symmetry"}))
+except:
+  pass
 
 nsolvers = []
 
@@ -422,7 +433,10 @@ class LinearSolverTests(casadiTestCase):
       print(Solver)
       A = self.randDM(n,n,sparsity=0.5)
       b = self.randDM(n,3)
-      if "symmetry" in req:
+      if "posdef" in req:
+        A = mtimes(A.T, A)
+        A = densify(A)
+      elif "symmetry" in req:
         A = A.T+A
         A[Sparsity.diag(n)] =1e-8
         A = densify(A)
@@ -430,7 +444,6 @@ class LinearSolverTests(casadiTestCase):
       As = MX.sym("A",A.sparsity())
       bs = MX.sym("B",b.sparsity())
       C = solve(A,b,Solver,options)
-
       digits = 7 if "ma" in str(Solver) else 10
 
       self.checkarray(mtimes(A,C),b,digits=digits)
