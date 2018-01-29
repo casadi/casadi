@@ -1246,7 +1246,7 @@ namespace casadi {
       const std::string& d, const std::string& w) {
     add_auxiliary(CodeGenerator::AUX_LDL);
     return "casadi_ldl(" + sp_a + ", " + a + ", " + sp_lt + ", " + lt + ", "
-           + d + ", " + w + ")";
+           + d + ", " + w + ");";
   }
 
   std::string CodeGenerator::
@@ -1255,7 +1255,7 @@ namespace casadi {
             const std::string& d) {
     add_auxiliary(CodeGenerator::AUX_LDL);
     return "casadi_ldl_solve(" + x + ", " + str(nrhs) + ", " + sp_lt + ", "
-           + lt + ", " + d +  ")";
+           + lt + ", " + d +  ");";
   }
 
 } // namespace casadi

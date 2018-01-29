@@ -3176,6 +3176,10 @@ DECL void casadi_ldl(const M& A, M& OUTPUT1, M& OUTPUT2) {
   return ldl(A, OUTPUT1, OUTPUT2);
 }
 
+DECL M casadi_ldl_solve(const M& b, const M& D, const M& LT) {
+  return ldl_solve(b, D, LT);
+}
+
 DECL M casadi_chol(const M& A) {
   return chol(A);
 }

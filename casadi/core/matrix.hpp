@@ -438,7 +438,9 @@ namespace casadi {
                                    const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
                                    const std::vector<casadi_int>& pinv, bool tr=false);
     static void qr(const Matrix<Scalar>& A, Matrix<Scalar>& Q, Matrix<Scalar>& R);
-    static void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& L, Matrix<Scalar>& D);
+    static void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& D, Matrix<Scalar>& LT);
+    static Matrix<Scalar> ldl_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& D,
+                                    const Matrix<Scalar>& LT);
     static Matrix<Scalar> all(const Matrix<Scalar>& x);
     static Matrix<Scalar> any(const Matrix<Scalar>& x);
     static Matrix<Scalar> adj(const Matrix<Scalar>& x);
@@ -497,6 +499,7 @@ namespace casadi {
       return Matrix<Scalar>::qr_sparse(A, V, R, beta, pinv);
     }
 
+    /** \brief Solve using a sparse QR factorization */
     friend inline Matrix<Scalar>
     qr_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& v,
              const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
@@ -512,11 +515,19 @@ namespace casadi {
       return Matrix<Scalar>::chol(A);
     }
 
-    /** \brief Sparse LDL factorization
+    /** \brief Sparse LDL^T factorization
+     * Returns D and the strictly upper triangular entries of L^T
+     * I.e. ones on the diagonal are ignored.
      * Only guarenteed to work for positive definite matrices.
      */
-    friend inline void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& L, Matrix<Scalar>& D) {
-      return Matrix<Scalar>::ldl(A, L, D);
+    friend inline void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& D, Matrix<Scalar>& LT) {
+      return Matrix<Scalar>::ldl(A, D, LT);
+    }
+
+    /** \brief Solve using a sparse LDL^T factorization */
+    friend inline Matrix<Scalar>
+    ldl_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& D, const Matrix<Scalar>& LT) {
+      return Matrix<Scalar>::ldl_solve(b, D, LT);
     }
 
     /** \brief Returns true only if any element in the matrix is true

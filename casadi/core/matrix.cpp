@@ -1979,7 +1979,7 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::ldl(const Matrix<Scalar>& A,
-                           Matrix<Scalar>& L, Matrix<Scalar> &D) {
+                           Matrix<Scalar> &D, Matrix<Scalar>& LT) {
     // Symbolic factorization
     Sparsity Lt_sp = A.sparsity().ldl();
 
@@ -1992,8 +1992,21 @@ namespace casadi {
               get_ptr(L_nz), get_ptr(D_nz), get_ptr(w));
 
     // Assemble L and D
-    L = Matrix<Scalar>(Lt_sp, L_nz).T() + Matrix<Scalar>::eye(n);
+    LT = Matrix<Scalar>(Lt_sp, L_nz);
     D = D_nz;
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::
+  ldl_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& D, const Matrix<Scalar>& LT) {
+    // Get dimensions, check consistency
+    casadi_int n = b.size1(), nrhs = b.size2();
+    casadi_assert(LT.size1()==n && LT.size2()==n, "'LT' has wrong dimension");
+    casadi_assert(D.is_vector() && D.numel()==n, "'D' has wrong dimension");
+    // Return value
+    Matrix<Scalar> x = densify(b);
+    casadi_ldl_solve(x.ptr(), nrhs, LT.sparsity(), LT.ptr(), D.ptr());
+    return x;
   }
 
   template<typename Scalar>
@@ -2041,10 +2054,12 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::chol(const Matrix<Scalar>& A) {
     // Perform an LDL transformation
-    Matrix<Scalar> L, D;
-    ldl(A, L, D);
+    Matrix<Scalar> D, LT;
+    ldl(A, D, LT);
+    // Square root of D
+    Matrix<Scalar> sqrt_D = sqrt(D);
     // Get the cholesky factor
-    return mtimes(diag(sqrt(D)), L.T());
+    return mtimes(diag(sqrt_D), LT) + sqrt_D;
   }
 
   template<typename Scalar>
