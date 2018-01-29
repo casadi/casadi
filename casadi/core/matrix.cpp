@@ -1988,7 +1988,7 @@ namespace casadi {
 
     // Calculate entries in L and D
     vector<Scalar> D_nz(n), L_nz(Lt_sp.nnz()), w(n);
-    casadi_ldl(A.sparsity(), Lt_sp, get_ptr(A.nonzeros()),
+    casadi_ldl(A.sparsity(), get_ptr(A.nonzeros()), Lt_sp,
               get_ptr(L_nz), get_ptr(D_nz), get_ptr(w));
 
     // Assemble L and D

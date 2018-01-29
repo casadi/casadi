@@ -4,8 +4,8 @@
 // as well as D for an LDL^T factorization
 // len[w] >= n
 template<typename T1>
-void casadi_ldl(const casadi_int* sp_a, const casadi_int* sp_lt,
-                const T1* a, T1* lt, T1* d, T1* w) {
+void casadi_ldl(const casadi_int* sp_a, const T1* a,
+                const casadi_int* sp_lt, T1* lt, T1* d, T1* w) {
   // Extract sparsities
   int n=sp_lt[1];
   const casadi_int *lt_colind=sp_lt+2, *lt_row=sp_lt+2+n+1;

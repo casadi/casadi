@@ -781,6 +781,9 @@ namespace casadi {
       add_auxiliary(AUX_FILL);
       this->auxiliaries << sanitize_source(casadi_qr_str, inst);
       break;
+    case AUX_LDL:
+      this->auxiliaries << sanitize_source(casadi_ldl_str, inst);
+      break;
     }
   }
 
@@ -1235,6 +1238,24 @@ namespace casadi {
     return "casadi_qr_solve(" + x + ", " + str(nrhs) + ", " + (tr ? "1" : "0") + ", "
            + sp_v + ", " + v + ", " + sp_r + ", " + r + ", "
            + beta + ", " + pinv + ", " + w + ");";
+  }
+
+  std::string CodeGenerator::
+  ldl(const std::string& sp_a, const std::string& a,
+      const std::string& sp_lt, const std::string& lt,
+      const std::string& d, const std::string& w) {
+    add_auxiliary(CodeGenerator::AUX_LDL);
+    return "casadi_ldl(" + sp_a + ", " + a + ", " + sp_lt + ", " + lt + ", "
+           + d + ", " + w + ")";
+  }
+
+  std::string CodeGenerator::
+  ldl_solve(const std::string& x, casadi_int nrhs,
+            const std::string& sp_lt, const std::string& lt,
+            const std::string& d) {
+    add_auxiliary(CodeGenerator::AUX_LDL);
+    return "casadi_ldl_solve(" + x + ", " + str(nrhs) + ", " + sp_lt + ", "
+           + lt + ", " + d +  ")";
   }
 
 } // namespace casadi

@@ -80,7 +80,7 @@ namespace casadi {
 
   int LinsolLdl::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    casadi_ldl(sp_, sp_Lt_, A, get_ptr(m->l), get_ptr(m->d), get_ptr(m->w));
+    casadi_ldl(sp_, A, sp_Lt_, get_ptr(m->l), get_ptr(m->d), get_ptr(m->w));
     return 0;
   }
 
@@ -106,6 +106,29 @@ namespace casadi {
     casadi_int ret = 0;
     for (casadi_int i=0; i<nrow; ++i) if (m->d[i]!=0) ret++;
     return ret;
+  }
+
+  void LinsolLdl::generate(CodeGenerator& g, const std::string& A, const std::string& x,
+                          casadi_int nrhs, bool tr) const {
+    // Codegen the integer vectors
+    string sp = g.sparsity(sp_);
+    string sp_Lt = g.sparsity(sp_Lt_);
+
+    // Place in block to avoid conflicts caused by local variables
+    g << "{\n";
+    // Work vectors TODO(@jaeandersson): Use work vectors from Solve
+    g << "casadi_real lt[" << sp_Lt_.nnz() << "], "
+         "d[" << nrow() << "], "
+         "w[" << nrow() << "];\n";
+
+    // Factorize
+    g << g.ldl(sp, A, sp_Lt, "lt", "d", "w") << "\n";
+
+    // Solve
+    g << g.ldl_solve(x, nrhs, sp_Lt, "lt", "d") << "\n";
+
+    // End of block
+    g << "}\n";
   }
 
 } // namespace casadi

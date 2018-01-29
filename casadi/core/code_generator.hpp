@@ -210,6 +210,16 @@ namespace casadi {
                          const std::string& beta, const std::string& pinv,
                          const std::string& w);
 
+    /** \brief LDL factorization */
+    std::string ldl(const std::string& sp_a, const std::string& a,
+                   const std::string& sp_lt, const std::string& lt,
+                   const std::string& d, const std::string& w);
+
+    /** \brief LDL solve */
+    std::string ldl_solve(const std::string& x, casadi_int nrhs,
+                         const std::string& sp_lt, const std::string& lt,
+                         const std::string& d);
+
     /** \brief Declare a function */
     std::string declare(std::string s);
 
@@ -247,7 +257,8 @@ namespace casadi {
       AUX_DE_BOOR,
       AUX_ND_BOOR_EVAL,
       AUX_FINITE_DIFF,
-      AUX_QR
+      AUX_QR,
+      AUX_LDL
     };
 
     /** \brief Add a built-in auxiliary function */
