@@ -198,11 +198,10 @@ namespace casadi {
 
     /** \brief QR factorization */
     std::string qr(const std::string& sp, const std::string& A,
-                   const std::string& iw, const std::string& w,
-                   const std::string& sp_v, const std::string& v,
-                   const std::string& sp_r, const std::string& r,
-                   const std::string& beta, const std::string& leftmost,
-                   const std::string& parent, const std::string& pinv);
+                   const std::string& w, const std::string& sp_v,
+                   const std::string& v, const std::string& sp_r,
+                   const std::string& r, const std::string& beta,
+                   const std::string& pinv);
 
     /** \brief QR solve */
     std::string qr_solve(const std::string& x, casadi_int nrhs, bool tr,

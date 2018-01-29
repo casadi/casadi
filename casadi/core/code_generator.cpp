@@ -1216,16 +1216,13 @@ namespace casadi {
   }
 
   string CodeGenerator::
-  qr(const string& sp, const string& A,
-     const string& iw, const string& w,
-     const string& sp_v, const string& v,
-     const string& sp_r, const string& r,
-     const string& beta, const string& leftmost,
-     const string& parent, const string& pinv) {
+  qr(const string& sp, const string& A, const string& w,
+     const string& sp_v, const string& v, const string& sp_r,
+     const string& r, const string& beta, const string& pinv) {
     add_auxiliary(CodeGenerator::AUX_QR);
-    return "casadi_qr(" + sp + ", " + A + ", " + iw + ", " + w + ", "
+    return "casadi_qr(" + sp + ", " + A + ", " + w + ", "
            + sp_v + ", " + v + ", " + sp_r + ", " + r + ", "
-           + beta + ", " + leftmost + ", " + parent + ", " + pinv + ");";
+           + beta + ", " + pinv + ");";
   }
 
   string CodeGenerator::

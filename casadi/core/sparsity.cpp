@@ -613,15 +613,13 @@ namespace casadi {
     return Sparsity(n, n, L_colind, L_row).T();
   }
 
-  void Sparsity::qr_sparse(Sparsity& V, Sparsity& R, std::vector<casadi_int>& pinv,
-                            std::vector<casadi_int>& leftmost,
-                            std::vector<casadi_int>& parent) const {
+  void Sparsity::qr_sparse(Sparsity& V, Sparsity& R, std::vector<casadi_int>& pinv) const {
     // Dimensions
     casadi_int size1=this->size1(), size2=this->size2();
 
     // Allocate memory
-    leftmost.resize(size1);
-    parent.resize(size2);
+    vector<casadi_int> leftmost(size1);
+    vector<casadi_int> parent(size2);
     pinv.resize(size1 + size2);
     vector<casadi_int> iw(size1 + 7*size2 + 1);
 

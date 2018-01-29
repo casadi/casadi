@@ -32,9 +32,9 @@ T1 casadi_house(T1* x, T1* beta, casadi_int n) {
 // len[r] nnz_r
 // len[beta] ncol
  template<typename T1>
- void casadi_qr(const casadi_int* sp_a, const T1* nz_a, casadi_int* iw, T1* x,
+ void casadi_qr(const casadi_int* sp_a, const T1* nz_a, T1* x,
                 const casadi_int* sp_v, T1* nz_v, const casadi_int* sp_r, T1* nz_r, T1* beta,
-                const casadi_int* leftmost, const casadi_int* parent, const casadi_int* pinv) {
+                const casadi_int* pinv) {
    // Extract sparsities
    casadi_int ncol = sp_a[1];
    const casadi_int *a_colind=sp_a+2, *a_row=sp_a+2+ncol+1;

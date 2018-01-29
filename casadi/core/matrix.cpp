@@ -1905,18 +1905,16 @@ namespace casadi {
             Matrix<Scalar>& beta, std::vector<casadi_int>& pinv) {
     // Calculate the pattern
     Sparsity spV, spR;
-    vector<casadi_int> leftmost, parent;
-    A.sparsity().qr_sparse(spV, spR, pinv, leftmost, parent);
+    A.sparsity().qr_sparse(spV, spR, pinv);
     // Calculate the nonzeros
     casadi_int nrow_ext = spV.size1(), ncol = spV.size2();
     V = nan(spV);
     R = nan(spR);
     beta = nan(ncol, 1);
-    vector<casadi_int> iw(nrow_ext + ncol);
     vector<Scalar> w(nrow_ext);
-    casadi_qr(A.sparsity(), A.ptr(), get_ptr(iw), get_ptr(w), spV, V.ptr(),
+    casadi_qr(A.sparsity(), A.ptr(), get_ptr(w), spV, V.ptr(),
               spR, R.ptr(), beta.ptr(),
-              get_ptr(leftmost), get_ptr(parent), get_ptr(pinv));
+              get_ptr(pinv));
   }
 
   template<typename Scalar>
