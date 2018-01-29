@@ -434,12 +434,12 @@ namespace casadi {
     static void substitute_inplace(const std::vector<MX>& v,
                                   std::vector<MX>& vdef,
                                   std::vector<MX>& ex, bool reverse);
-    static MX solve(const MX& A, const MX& b, const std::string& lsolver="csparse",
+    static MX solve(const MX& A, const MX& b, const std::string& lsolver="qr",
                     const Dict& dict = Dict());
     static MX inv_minor(const MX& A);
     static MX inv_node(const MX& A);
-    static MX inv(const MX& A, const std::string& lsolver="csparse", const Dict& dict = Dict());
-    static MX pinv(const MX& A, const std::string& lsolver="csparse",
+    static MX inv(const MX& A, const std::string& lsolver="qr", const Dict& dict = Dict());
+    static MX pinv(const MX& A, const std::string& lsolver="qr",
                const Dict& dict = Dict());
     static MX expm_const(const MX& A, const MX& t);
     static MX expm(const MX& A);

@@ -93,7 +93,7 @@ namespace casadi {
 
     // Default (temporary) options
     Dict linear_solver_options;
-    string linear_solver = "csparse";
+    string linear_solver = "qr";
     Function jac; // Jacobian of f with respect to z
 
     // Read options

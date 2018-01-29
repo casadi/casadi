@@ -86,7 +86,7 @@ namespace casadi {
         "Type of interpolation for the adjoint sensitivities"}},
       {"linear_solver",
        {OT_STRING,
-        "A custom linear solver creator function [default: csparse]"}},
+        "A custom linear solver creator function [default: qr]"}},
       {"linear_solver_options",
        {OT_DICT,
         "Options to be passed to the linear solver"}},
@@ -120,7 +120,7 @@ namespace casadi {
     stop_at_end_ = true;
     use_precon_ = true;
     max_krylov_ = 10;
-    linear_solver_ = "csparse";
+    linear_solver_ = "qr";
     string newton_scheme = "direct";
     quad_err_con_ = false;
     string interpolation_type = "hermite";
