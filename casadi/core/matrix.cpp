@@ -2056,10 +2056,10 @@ namespace casadi {
     // Perform an LDL transformation
     Matrix<Scalar> D, LT;
     ldl(A, D, LT);
-    // Square root of D
-    Matrix<Scalar> sqrt_D = sqrt(D);
-    // Get the cholesky factor
-    return mtimes(diag(sqrt_D), LT) + sqrt_D;
+    // Add unit diagonal
+    LT += Matrix<Scalar>::eye(D.size1());
+    // Get the cholesky factor: R*R' = L*D*L' = (sqrt(D)*L')'*(sqrt(D)*L')
+    return mtimes(diag(sqrt(D)), LT);
   }
 
   template<typename Scalar>
