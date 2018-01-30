@@ -407,7 +407,7 @@ endif()
 add_feature_info(dynamic-loading WITH_DL "Compile with support for dynamic loading of generated functions (needed for ExternalFunction)")
 
 # Dynamic loading (needed for loading plugins and external functions)
-option(WITH_LONGLONG_CORE "Use long long (64 bit) for integer types in CasADi core" OFF)
+option(WITH_LONGLONG_CORE "Use long long (64 bit) for integer types in CasADi core" ON)
 if(WITH_LONGLONG_CORE)
   add_definitions(-DWITH_LONGLONG_CORE)
 endif()
