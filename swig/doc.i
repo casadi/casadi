@@ -55345,6 +55345,21 @@ A slice.
 
 ";
 
+%feature("docstring") casadi::Slice::Slice(int start, int stop, int step=1)
+"
+
+";
+
+%feature("docstring") casadi::Slice::Slice(int start, casadi_int stop, int
+step=1) "
+
+";
+
+%feature("docstring") casadi::Slice::Slice(casadi_int start, int stop, int
+step=1) "
+
+";
+
 %feature("docstring")  casadi::Slice::get_str(bool more=false) const  "
 
 Get string representation.
