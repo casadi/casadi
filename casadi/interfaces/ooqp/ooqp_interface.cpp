@@ -143,7 +143,7 @@ namespace casadi {
     alloc_iw(na_); // casadi_trans
   }
 
-  casadi_int OoqpInterface::
+  int OoqpInterface::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
@@ -186,14 +186,14 @@ namespace casadi {
     double* dQ_ = w; w += nQ_;
     double* dA_ = w; w += nA_;
     double* dC_ = w; w += nA_;
-    casadi_int* irowQ_ = iw; iw += nQ_;
-    casadi_int* jcolQ_ = iw; iw += nQ_;
-    casadi_int* irowA_ = iw; iw += nA_;
-    casadi_int* jcolA_ = iw; iw += nA_;
-    casadi_int* irowC_ = iw; iw += nA_;
-    casadi_int* jcolC_ = iw; iw += nA_;
-    casadi_int* x_index_ = iw; iw += nx_;
-    casadi_int* c_index_ = iw; iw += na_;
+    int* irowQ_ = reinterpret_cast<int*>(iw); iw += nQ_;
+    int* jcolQ_ = reinterpret_cast<int*>(iw); iw += nQ_;
+    int* irowA_ = reinterpret_cast<int*>(iw); iw += nA_;
+    int* jcolA_ = reinterpret_cast<int*>(iw); iw += nA_;
+    int* irowC_ = reinterpret_cast<int*>(iw); iw += nA_;
+    int* jcolC_ = reinterpret_cast<int*>(iw); iw += nA_;
+    int* x_index_ = reinterpret_cast<int*>(iw); iw += nx_;
+    int* c_index_ = reinterpret_cast<int*>(iw); iw += na_;
     double* p_ = w; w += nx_;
     double* AT = w; w += nA_;
 
@@ -353,7 +353,7 @@ namespace casadi {
     // Solve the QP
     double objectiveValue;
 
-    casadi_int ierr;
+    int ierr;
     if (false) { // Use C interface
       // TODO(jgillis): Change to conicvehb, see OOQP users guide
       qpsolvesp(c_, nx,
@@ -374,9 +374,9 @@ namespace casadi {
       ierr=0;
       // All OOQP related allocations in evaluate
 
-      std::vector<casadi_int> krowQ(nx+1);
-      std::vector<casadi_int> krowA(nA+1);
-      std::vector<casadi_int> krowC(nC+1);
+      std::vector<int> krowQ(nx+1);
+      std::vector<int> krowA(nA+1);
+      std::vector<int> krowC(nC+1);
 
       //casadi_int status_code = 0;
       makehb(irowQ_, nnzQ, get_ptr(krowQ), nx, &ierr);
