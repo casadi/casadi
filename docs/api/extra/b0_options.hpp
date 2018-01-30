@@ -811,7 +811,7 @@
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>Integrator scheme: BDF|adams</td><td>casadi::CvodesInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: qr]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
@@ -843,7 +843,7 @@
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>Integrator scheme: BDF|adams</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: qr]</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td></tr>
@@ -874,7 +874,7 @@
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>Integrator scheme: BDF|adams</td><td>casadi::CvodesInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: qr]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
@@ -1340,7 +1340,7 @@
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>init_xdot</td><td>OT_DOUBLEVECTOR</td><td>Initial values for the state derivatives</td><td>casadi::IdasInterface</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: qr]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
@@ -1377,7 +1377,7 @@
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td></tr>
 <tr><td>init_xdot</td><td>OT_DOUBLEVECTOR</td><td>Initial values for the state derivatives</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: qr]</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td></tr>
@@ -1413,7 +1413,7 @@
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>init_xdot</td><td>OT_DOUBLEVECTOR</td><td>Initial values for the state derivatives</td><td>casadi::IdasInterface</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: qr]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
@@ -2916,7 +2916,7 @@
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: qr]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>
@@ -2955,7 +2955,7 @@
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>Type of interpolation for the adjoint sensitivities</td><td>casadi::SundialsInterface</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: csparse]</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>A custom linear solver creator function [default: qr]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICT</td><td>Options to be passed to the linear solver</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_krylov</td><td>OT_INT</td><td>Maximum Krylov subspace size</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INT</td><td>Maximum order for the (variable-order) multistep method</td><td>casadi::SundialsInterface</td></tr>

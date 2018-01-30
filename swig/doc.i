@@ -38901,9 +38901,9 @@ casadi_int nrhs) const  "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::generate(CodeGenerator &g,
-const std::string &A, const std::string &x, casadi_int nrhs, bool tr) const
-"
+%feature("docstring")  casadi::LinsolLdl::generate(CodeGenerator &g, const
+std::string &A, const std::string &x, casadi_int nrhs, bool tr) const
+override "
 
 [INTERNAL]  Generate C code.
 
@@ -41953,7 +41953,7 @@ Matrix< Scalar > &x) "
 Scalar > &v, const Matrix< Scalar > &r, const Matrix< Scalar > &beta, const
 std::vector< casadi_int > &pinv, bool tr=false) "
 
-Matrix adjoint.
+Solve using a sparse QR factorization.
 
 ";
 
@@ -42468,11 +42468,12 @@ Print dense matrix-stype.
 
 ";
 
-%feature("docstring")  ldl(const Matrix< Scalar > &A, Matrix< Scalar > &L,
-Matrix< Scalar > &D) "
+%feature("docstring")  ldl(const Matrix< Scalar > &A, Matrix< Scalar > &D,
+Matrix< Scalar > &LT) "
 
-Sparse LDL factorization Only guarenteed to work for positive definite
-matrices.
+Sparse LDL^T factorization Returns D and the strictly upper triangular
+entries of L^T I.e. ones on the diagonal are ignored. Only guarenteed to
+work for positive definite matrices.
 
 ";
 
@@ -42906,6 +42907,13 @@ Matrix< Scalar > &x, const Matrix< Scalar > &y) "
 Get all nonzeros.
 
 Implementation of Matrix::get_nonzeros (in public API)
+
+";
+
+%feature("docstring")  ldl_solve(const Matrix< Scalar > &b, const Matrix<
+Scalar > &D, const Matrix< Scalar > &LT) "
+
+Solve using a sparse LDL^T factorization.
 
 ";
 
@@ -64393,8 +64401,8 @@ Joel Andersson
 
 ";
 
-%feature("docstring")  casadi::casadi_ldl(const casadi_int *sp_a, const
-casadi_int *sp_lt, const T1 *a, T1 *lt, T1 *d, T1 *w) "
+%feature("docstring")  casadi::casadi_ldl(const casadi_int *sp_a, const T1
+*a, const casadi_int *sp_lt, T1 *lt, T1 *d, T1 *w) "
 
 [INTERNAL] ";
 
@@ -64735,7 +64743,7 @@ times t_i.
 | linear_multistep_method    | OT_STRING | Integrator scheme: BDF|adams    |
 +----------------------------+-----------+---------------------------------+
 | linear_solver              | OT_STRING | A custom linear solver creator  |
-|                            |           | function [default: csparse]     |
+|                            |           | function [default: qr]          |
 +----------------------------+-----------+---------------------------------+
 | linear_solver_options      | OT_DICT   | Options to be passed to the     |
 |                            |           | linear solver                   |
@@ -64844,7 +64852,7 @@ Interface to IDAS from the Sundials suite.
 +---------------------------+-----------------+----------------------------+
 | linear_solver             | OT_STRING       | A custom linear solver     |
 |                           |                 | creator function [default: |
-|                           |                 | csparse]                   |
+|                           |                 | qr]                        |
 +---------------------------+-----------------+----------------------------+
 | linear_solver_options     | OT_DICT         | Options to be passed to    |
 |                           |                 | the linear solver          |

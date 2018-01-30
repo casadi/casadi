@@ -29859,7 +29859,7 @@ their ID.
 
 %feature("docstring") friendwrap_qr_solve "
 
-Matrix adjoint.
+Solve using a sparse QR factorization.
 
 ";
 
@@ -30240,8 +30240,9 @@ Print dense matrix-stype.
 
 %feature("docstring") friendwrap_ldl "
 
-Sparse LDL factorization Only guarenteed to work for positive definite
-matrices.
+Sparse LDL^T factorization Returns D and the strictly upper triangular
+entries of L^T I.e. ones on the diagonal are ignored. Only guarenteed to
+work for positive definite matrices.
 
 ";
 
@@ -30594,6 +30595,12 @@ their ID.
 Get all nonzeros.
 
 Implementation of Matrix::get_nonzeros (in public API)
+
+";
+
+%feature("docstring") friendwrap_ldl_solve "
+
+Solve using a sparse LDL^T factorization.
 
 ";
 
@@ -46629,7 +46636,7 @@ times t_i.
 | linear_multistep_method    | OT_STRING | Integrator scheme: BDF|adams    |
 +----------------------------+-----------+---------------------------------+
 | linear_solver              | OT_STRING | A custom linear solver creator  |
-|                            |           | function [default: csparse]     |
+|                            |           | function [default: qr]          |
 +----------------------------+-----------+---------------------------------+
 | linear_solver_options      | OT_DICT   | Options to be passed to the     |
 |                            |           | linear solver                   |
@@ -46738,7 +46745,7 @@ Interface to IDAS from the Sundials suite.
 +---------------------------+-----------------+----------------------------+
 | linear_solver             | OT_STRING       | A custom linear solver     |
 |                           |                 | creator function [default: |
-|                           |                 | csparse]                   |
+|                           |                 | qr]                        |
 +---------------------------+-----------------+----------------------------+
 | linear_solver_options     | OT_DICT         | Options to be passed to    |
 |                           |                 | the linear solver          |
