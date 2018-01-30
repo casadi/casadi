@@ -358,6 +358,13 @@ namespace casadi {
   }
 
   template<class S, class D>
+  void assign_vector(const std::vector<S>& s, std::vector<D>& d) {
+    casadi_assert(d.empty(), "Receiving vector must be empty");
+    d.resize(s.size());
+    std::copy(s.begin(), s.end(), d.begin());
+  }
+
+  template<class S, class D>
   void copy_vector(const S* s, std::vector<D>& d) {
     for (casadi_int i=0;i<d.size();++i) {
       d[i] = static_cast<D>(s[i]);

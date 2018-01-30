@@ -117,9 +117,9 @@ namespace casadi {
     bool integer_support() const override { return true;}
 
     // KNITRO callback wrapper
-    static casadi_int callback(const casadi_int evalRequestCode,
-                        const casadi_int n, const casadi_int m, const casadi_int nnzJ,
-                        const casadi_int nnzH, const double * const x, const double * const lambda,
+    static int callback(const int evalRequestCode,
+                        const int n, const int m, const int nnzJ,
+                        const int nnzH, const double * const x, const double * const lambda,
                         double * const obj, double * const c, double * const objGrad,
                         double * const jac, double * const hessian,
                         double * const hessVector, void *userParams);
@@ -131,7 +131,7 @@ namespace casadi {
     Dict opts_;
 
     // Type of constraints
-    std::vector<casadi_int> contype_;
+    std::vector<int> contype_;
 
     /// A documentation string
     static const std::string meta_doc;

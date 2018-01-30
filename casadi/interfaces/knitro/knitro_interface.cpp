@@ -142,18 +142,18 @@ namespace casadi {
     casadi_int status;
 
     // Jacobian sparsity
-    vector<casadi_int> Jcol, Jrow;
+    vector<int> Jcol, Jrow;
     if (!jacg_sp_.is_null()) {
-      Jcol = jacg_sp_.get_col();
-      Jrow = jacg_sp_.get_row();
+      assign_vector(jacg_sp_.get_col(), Jcol);
+      assign_vector(jacg_sp_.get_row(), Jrow);
     }
 
     // Hessian sparsity
     casadi_int nnzH = hesslag_sp_.is_null() ? 0 : hesslag_sp_.nnz();
-    vector<casadi_int> Hcol, Hrow;
+    vector<int> Hcol, Hrow;
     if (nnzH>0) {
-      Hcol = hesslag_sp_.get_col();
-      Hrow = hesslag_sp_.get_row();
+      assign_vector(hesslag_sp_.get_col(), Hcol);
+      assign_vector(hesslag_sp_.get_row(), Hrow);
       status = KTR_set_int_param_by_name(m->kc, "hessopt", KTR_HESSOPT_EXACT);
       casadi_assert(status==0, "KTR_set_int_param failed");
     } else {
@@ -202,14 +202,14 @@ namespace casadi {
       const casadi_int objFnType = KTR_FNTYPE_UNCERTAIN;
 
       // Types of variables
-      vector<casadi_int> vtype;
+      vector<int> vtype;
       vtype.reserve(nx_);
       for (auto&& e : discrete_) {
         vtype.push_back(e ? KTR_VARTYPE_INTEGER : KTR_VARTYPE_CONTINUOUS);
       }
 
       // Convexity status of the constraint functions
-      vector<casadi_int> ftype(ng_, KTR_FNTYPE_UNCERTAIN);
+      vector<int> ftype(ng_, KTR_FNTYPE_UNCERTAIN);
 
       // Intialize
       status =
@@ -281,9 +281,9 @@ namespace casadi {
     m->kc = 0;
   }
 
-  casadi_int KnitroInterface::callback(const casadi_int evalRequestCode, const casadi_int n,
-                              const casadi_int m, const casadi_int nnzJ,
-                              const casadi_int nnzH, const double* const x,
+  int KnitroInterface::callback(const int evalRequestCode, const int n,
+                              const int m, const int nnzJ,
+                              const int nnzH, const double* const x,
                               const double* const lambda,
                               double* const obj, double* const c, double* const objGrad,
                               double* const jac, double* const hessian, double* const hessVector,
