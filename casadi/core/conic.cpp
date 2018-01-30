@@ -58,16 +58,6 @@ namespace casadi {
     return n->generateNativeCode(file);
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  void Function::conic_debug(const string &filename) const {
-    casadi::conic_debug(*this, filename);
-  }
-
-  void Function::conic_debug(ostream &file) const {
-    casadi::conic_debug(*this, file);
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   vector<string> conic_in() {
     vector<string> ret(conic_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=conic_in(i);

@@ -400,14 +400,6 @@ namespace casadi {
     /** \brief Get the (integer) output argument of an atomic operation */
     virtual std::vector<casadi_int> instruction_output(casadi_int k) const;
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Renamed instruction_index */
-    virtual std::pair<casadi_int, casadi_int> getAtomicInput(casadi_int k) const;
-
-    /** \brief [DEPRECATED] Renamed instruction_output */
-    virtual casadi_int getAtomicOutput(casadi_int k) const;
-#endif // WITH_DEPRECATED_FEATURES
-
     /** \brief Number of nodes in the algorithm */
     virtual casadi_int n_nodes() const;
 

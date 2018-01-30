@@ -831,13 +831,6 @@ namespace casadi {
     void export_code(const std::string& lang, std::ostream &stream=casadi::uout(),
        const Dict& options=Dict()) const;
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Alias for disp */
-    void print_compact(std::ostream &stream=casadi::uout()) const {
-      disp(stream);
-    }
-#endif // WITH_DEPRECATED_FEATURES
-
     /// Readable name of the public class
     static std::string type_name() {return "Sparsity";}
 

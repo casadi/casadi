@@ -173,9 +173,6 @@ namespace casadi {
       return project(x, Sparsity::triu(x.sparsity(), includeDiagonal));
     }
     static MatType sumsqr(const MatType &x) { return dot(x, x);}
-#ifdef WITH_DEPRECATED_FEATURES
-    static MatType sum_square(const MatType &x) { return sumsqr(x);}
-#endif // WITH_DEPRECATED_FEATURES
     static MatType linspace(const MatType &a, const MatType &b, casadi_int nsteps);
     static MatType cross(const MatType &a, const MatType &b, casadi_int dim=-1);
     static MatType skew(const MatType &a);
@@ -330,13 +327,6 @@ namespace casadi {
     inline friend MatType sumsqr(const MatType &x) {
       return MatType::sumsqr(x);
     }
-
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Renamed sumsqr */
-    inline friend MatType sum_square(const MatType &x) {
-      return MatType::sum_square(x);
-    }
-#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Matlab's \c linspace command
      */

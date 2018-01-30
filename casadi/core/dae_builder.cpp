@@ -991,38 +991,6 @@ namespace casadi {
     return new_aux;
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  MX DaeBuilder::add_d(const MX& new_ddef, const std::string& name) {
-    if (name.empty()) return add_d(new_ddef, "d" + str(this->d.size()));
-    return add_d(name, new_ddef);
-  }
-
-  MX DaeBuilder::add_y(const MX& new_ydef, const std::string& name) {
-    if (name.empty()) return add_y(new_ydef, "y" + str(this->y.size()));
-    return add_y(name, new_ydef);
-  }
-
-  void DaeBuilder::add_ode(const MX& new_ode, const std::string& name) {
-    if (name.empty()) return add_ode(new_ode, "ode" + str(this->ode.size()));
-    return add_ode(name, new_ode);
-  }
-
-  void DaeBuilder::add_dae(const MX& new_dae, const std::string& name) {
-    if (name.empty()) return add_dae(new_dae, "dae" + str(this->dae.size()));
-    return add_dae(name, new_dae);
-  }
-
-  void DaeBuilder::add_alg(const MX& new_alg, const std::string& name) {
-    if (name.empty()) return add_alg(new_alg, "alg" + str(this->alg.size()));
-    return add_alg(name, new_alg);
-  }
-
-  void DaeBuilder::add_quad(const MX& new_quad, const std::string& name) {
-    if (name.empty()) return add_quad(new_quad, "quad" + str(this->quad.size()));
-    return add_quad(name, new_quad);
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   MX DaeBuilder::add_d(const std::string& name, const MX& new_ddef) {
     MX new_d = add_variable(name, new_ddef.sparsity());
     this->d.push_back(new_d);

@@ -2393,15 +2393,6 @@ namespace casadi {
     casadi_error("'instruction_output' not defined for " + class_name());
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  std::pair<casadi_int, casadi_int> FunctionInternal::getAtomicInput(casadi_int k) const {
-    casadi_error("'getAtomicInput' not defined for " + class_name());
-  }
-  casadi_int FunctionInternal::getAtomicOutput(casadi_int k) const {
-    casadi_error("'getAtomicOutput' not defined for " + class_name());
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   MX FunctionInternal::instruction_MX(casadi_int k) const {
     casadi_error("'instruction_MX' not defined for " + class_name());
   }

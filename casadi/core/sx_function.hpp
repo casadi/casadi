@@ -150,19 +150,6 @@ class CASADI_EXPORT SXFunction :
     }
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  std::pair<casadi_int, casadi_int> getAtomicInput(casadi_int k) const override {
-    auto e = algorithm_.at(k);
-    return {e.i1, e.i2};
-  }
-
-  /** \brief Get the (integer) output argument of an atomic operation */
-  casadi_int getAtomicOutput(casadi_int k) const override {
-    auto e = algorithm_.at(k);
-    return e.i0;
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   /** \brief Number of nodes in the algorithm */
   casadi_int n_nodes() const override { return algorithm_.size() - nnz_out();}
 

@@ -373,11 +373,6 @@ namespace casadi {
      */
     Function jacobian() const;
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Alias of Function::jacobian */
-    Function fullJacobian() const {return jacobian();}
-#endif // WITH_DEPRECATED_FEATURES
-
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
     void call(const std::vector<DM> &arg, std::vector<DM>& SWIG_OUTPUT(res),
@@ -751,13 +746,6 @@ namespace casadi {
     /** \brief Get free variables as a string */
     std::vector<std::string> get_free() const;
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Use get_free instead */
-    void print_free(std::ostream &stream=casadi::uout()) const {
-      stream << get_free();
-    }
-#endif // WITH_DEPRECATED_FEATURES
-
     /** \brief Get all the free variables of the function */
     std::vector<SX> free_sx() const;
 
@@ -788,42 +776,14 @@ namespace casadi {
      * (SXFunction/MXFunction) */
     std::vector<casadi_int> instruction_output(casadi_int k) const;
 
-    //SX node_SX(casadi_int k) const;
-
+    /** \brief Get the MX node corresponding to an instruction (MXFunction) */
     MX instruction_MX(casadi_int k) const;
-
-
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Renamed n_instructions */
-    casadi_int getAlgorithmSize() const {return n_instructions();}
-
-    /** \brief [DEPRECATED] Use sz_w instead */
-    casadi_int getWorkSize() const {return sz_w();}
-
-    /** \brief [DEPRECATED] Renamed instruction_id */
-    casadi_int getAtomicOperation(casadi_int k) const {return instruction_id(k);}
-
-    /** \brief [DEPRECATED] Renamed instruction_index */
-    std::pair<casadi_int, casadi_int> getAtomicInput(casadi_int k) const;
-
-    /** \brief [DEPRECATED] Renamed instruction_constant */
-    double getAtomicInputReal(casadi_int k) const { return instruction_constant(k);}
-
-    /** \brief [DEPRECATED] Renamed instruction_output */
-    casadi_int getAtomicOutput(casadi_int k) const;
-#endif // WITH_DEPRECATED_FEATURES
 
     ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     bool has_spfwd() const;
     bool has_sprev() const;
     ///@}
-
-    /// \cond INTERNAL
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Use has_spfwd, has_sprev */
-    bool spCanEvaluate(bool fwd) const { return fwd ? has_spfwd() : has_sprev();}
-#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Get required length of arg field */
     size_t sz_arg() const;
@@ -913,14 +873,6 @@ namespace casadi {
 
     /** Obtain information about function */
     Dict info() const;
-
-#ifdef WITH_DEPRECATED_FEATURES
-    /** Generate native code in the interfaced language for debugging */
-    void conic_debug(const std::string &filename) const;
-
-    /** Generate native code in the interfaced language for debugging */
-    void conic_debug(std::ostream &file) const;
-#endif // WITH_DEPRECATED_FEATURES
 
 #ifndef SWIG
     protected:

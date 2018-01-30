@@ -2794,14 +2794,6 @@ SPARSITY_INTERFACE_FUN(DECL, (FLAG | IS_SX), Matrix<SXElem>)
 #endif
 
 %define GENERIC_MATRIX_FUN(DECL, FLAG, M)
-#if defined(WITH_DEPRECATED_FEATURES) & FLAG & IS_MEMBER
-DECL std::vector<bool> casadi_nl_var(const M& expr, const M& var) {
-  return nl_var(expr, var);
-}
-DECL M casadi_sum_square(const M& X) {
-  return sum_square(X);
-}
-#endif
 #if FLAG & IS_MEMBER
 DECL M casadi_mpower(const M& x, const M& n) {
   return mpower(x, n);
