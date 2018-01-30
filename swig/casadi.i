@@ -51,9 +51,9 @@
     // Redirect printout
     static void pythonlogger(const char* s, std::streamsize num, bool error) {
       if (error) {
-        PySys_WriteStderr("%.*s", static_cast<casadi_int>(num), s);
+        PySys_WriteStderr("%.*s", static_cast<int>(num), s);
       } else {
-        PySys_WriteStdout("%.*s", static_cast<casadi_int>(num), s);
+        PySys_WriteStdout("%.*s", static_cast<int>(num), s);
       }
     }
 
