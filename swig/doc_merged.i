@@ -233,12 +233,6 @@ evaluation.
 
 ";
 
-%feature("docstring") casadi::BackwardDiff::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::BackwardDiff::codegen "[INTERNAL]  Generate
 code the function.
 
@@ -916,12 +910,6 @@ of input/output elements.
 ";
 
 %feature("docstring") casadi::BackwardDiff::getAdaptorSolverName "[INTERNAL]  Obtain solver name from Adaptor.
-
-";
-
-%feature("docstring") casadi::BackwardDiff::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -1928,11 +1916,6 @@ templated.
 
 %feature("docstring") casadi::Blocksqp::augmentFilter "[INTERNAL] ";
 
-%feature("docstring") casadi::Blocksqp::print_option "[INTERNAL]  Print all
-information there is to know about a certain option.
-
-";
-
 %feature("docstring") casadi::Blocksqp::numel_out "[INTERNAL]  Number of
 input/output elements.
 
@@ -2233,12 +2216,6 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::Blocksqp::fwdViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
 
@@ -2427,9 +2404,8 @@ variables (SX)
 
 %feature("docstring") casadi::Blocksqp::feasibilityRestorationHeuristic "[INTERNAL] ";
 
-%feature("docstring") casadi::Blocksqp::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
+%feature("docstring") casadi::Blocksqp::print_option "[INTERNAL]  Print all
+information there is to know about a certain option.
 
 ";
 
@@ -2787,12 +2763,6 @@ necessary generate, the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::BSpline::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::BSpline::self "[INTERNAL]  Get a public class
 instance.
 
@@ -2846,12 +2816,6 @@ variables ( MX)
 
 %feature("docstring") casadi::BSpline::getJacSparsityGen "[INTERNAL]  Get
 the sparsity pattern, forward mode.
-
-";
-
-%feature("docstring") casadi::BSpline::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -4402,12 +4366,6 @@ function, templated.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
-
-";
-
 %feature("docstring") casadi::BSplineCommon::get_n_in "
 
 Number of function inputs and outputs.
@@ -4552,12 +4510,6 @@ memory block.
 
 %feature("docstring") casadi::BSplineCommon::getJacSparsityGen "[INTERNAL]
 Get the sparsity pattern, forward mode.
-
-";
-
-%feature("docstring") casadi::BSplineCommon::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -4919,9 +4871,8 @@ an atomic operation operator index.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
+%feature("docstring") casadi::BSplineDual::n_nodes "[INTERNAL]  Number of
+nodes in the algorithm.
 
 ";
 
@@ -4987,12 +4938,6 @@ of function input and outputs.
 
 %feature("docstring") casadi::BSplineDual::nnz_in "[INTERNAL]  Number of
 input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::BSplineDual::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -5433,11 +5378,6 @@ Get the (integer) input arguments of an atomic operation.
 
 %feature("docstring") casadi::BSplineDual::size1_in "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::BSplineDual::n_nodes "[INTERNAL]  Number of
-nodes in the algorithm.
 
 ";
 
@@ -5927,11 +5867,6 @@ Check if output arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::sz_iw "[INTERNAL]  Get
-required length of iw field.
-
-";
-
 %feature("docstring") casadi::BSplineInterpolant::call_gen "[INTERNAL]
 Call a function, overloaded.
 
@@ -6276,12 +6211,6 @@ an Function instance consisting of only one MX call.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::BSplineInterpolant::sz_w "[INTERNAL]  Get
 required length of w field.
 
@@ -6398,9 +6327,8 @@ Generate code for the body of the C function.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
+%feature("docstring") casadi::BSplineInterpolant::sz_iw "[INTERNAL]  Get
+required length of iw field.
 
 ";
 
@@ -6709,20 +6637,15 @@ Get the sparsity of an input This function is called during construction.
 
 ";
 
-%feature("docstring") casadi::Callback::getWorkSize "
-
-[DEPRECATED] Use sz_w instead
-
-";
-
 %feature("docstring") casadi::Callback::instruction_id "
 
 Identifier index of the instruction (SXFunction/MXFunction)
 
 ";
 
-%feature("docstring") casadi::Callback::sz_arg "[INTERNAL]  Get required
-length of arg field.
+%feature("docstring") casadi::Callback::sz_arg "
+
+Get required length of arg field.
 
 ";
 
@@ -6773,12 +6696,6 @@ Parameters:
 -----------
 
 parallelization:  Type of parallelization used: unroll|serial|openmp
-
-";
-
-%feature("docstring") casadi::Callback::print_free "
-
-[DEPRECATED] Use get_free instead
 
 ";
 
@@ -6862,12 +6779,6 @@ Export / Generate C code for the function.
 
 ";
 
-%feature("docstring") casadi::Callback::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::Callback::instruction_input "
 
 Locations in the work vector for the inputs of the instruction
@@ -6875,9 +6786,9 @@ Locations in the work vector for the inputs of the instruction
 
 ";
 
-%feature("docstring") casadi::Callback::getAtomicInputReal "
+%feature("docstring") casadi::Callback::sz_iw "
 
-[DEPRECATED] Renamed instruction_constant
+Get required length of iw field.
 
 ";
 
@@ -6899,11 +6810,6 @@ nadj) if no cached version is available.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
-
-";
-
-%feature("docstring") casadi::Callback::sz_iw "[INTERNAL]  Get required
-length of iw field.
 
 ";
 
@@ -6957,12 +6863,6 @@ Destructor.
 
 ";
 
-%feature("docstring") casadi::Callback::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
-
-";
-
 %feature("docstring") casadi::Callback::instruction_output "
 
 Location in the work vector for the output of the instruction
@@ -6979,11 +6879,6 @@ Do the derivative functions need nondifferentiated outputs?
 %feature("docstring") casadi::Callback::has_spfwd "
 
 Is the class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::Callback::conic_debug "[INTERNAL]  Generate
-native code in the interfaced language for debugging
 
 ";
 
@@ -7114,12 +7009,6 @@ Get output dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::spCanEvaluate "
-
-[DEPRECATED] Use has_spfwd, has_sprev
-
-";
-
 %feature("docstring") casadi::Callback::n_instructions "
 
 Number of instruction in the algorithm (SXFunction/MXFunction)
@@ -7240,8 +7129,9 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::Callback::sz_w "[INTERNAL]  Get required
-length of w field.
+%feature("docstring") casadi::Callback::sz_w "
+
+Get required length of w field.
 
 ";
 
@@ -7251,18 +7141,17 @@ Obtain information about function
 
 ";
 
-%feature("docstring") casadi::Callback::instruction_MX "";
+%feature("docstring") casadi::Callback::instruction_MX "
 
-%feature("docstring") casadi::Callback::factory "";
-
-%feature("docstring") casadi::Callback::getAlgorithmSize "
-
-[DEPRECATED] Renamed n_instructions
+Get the MX node corresponding to an instruction ( MXFunction)
 
 ";
 
-%feature("docstring") casadi::Callback::sz_res "[INTERNAL]  Get required
-length of res field.
+%feature("docstring") casadi::Callback::factory "";
+
+%feature("docstring") casadi::Callback::sz_res "
+
+Get required length of res field.
 
 ";
 
@@ -7306,12 +7195,6 @@ Evaluate numerically, temporary matrices and work vectors.
 Get number of input elements.
 
 For a particular input or for all of the inputs
-
-";
-
-%feature("docstring") casadi::Callback::getAtomicOperation "
-
-[DEPRECATED] Renamed instruction_id
 
 ";
 
@@ -7537,12 +7420,6 @@ Name of the function.
 %feature("docstring") casadi::Callback::size_out "
 
 Get output dimension.
-
-";
-
-%feature("docstring") casadi::Callback::fullJacobian "
-
-[DEPRECATED] Alias of Function::jacobian
 
 ";
 
@@ -8401,12 +8278,6 @@ function have free variables.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::CentralDiff::sp_forward "[INTERNAL]
 Propagate sparsity forward.
 
@@ -8636,12 +8507,6 @@ derivatives by multiplying the full Jacobian and multiplying.
 function that calculates adjoint derivatives reverse(nadj) returns a cached
 instance if available, and calls  Function get_reverse(casadi_int nadj) if
 no cached version is available.
-
-";
-
-%feature("docstring") casadi::CentralDiff::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -9086,12 +8951,6 @@ variables.
 
 %feature("docstring") casadi::Collocation::get_partition "[INTERNAL]  Get
 the unidirectional or bidirectional partition.
-
-";
-
-%feature("docstring") casadi::Collocation::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -9750,12 +9609,6 @@ augmented DAE system with nfwd forward sensitivities.
 
 ";
 
-%feature("docstring") casadi::Collocation::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::Collocation::instruction_MX "[INTERNAL]  get
 MX expression associated with instruction
 
@@ -10175,12 +10028,6 @@ arguments have correct length and dimensions.
 
 %feature("docstring") casadi::Conic::free_mx "[INTERNAL]  Get free
 variables ( MX)
-
-";
-
-%feature("docstring") casadi::Conic::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -10875,12 +10722,6 @@ block.
 
 ";
 
-%feature("docstring") casadi::Conic::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::Conic::wrap "[INTERNAL]  Wrap in an Function
 instance consisting of only one MX call.
 
@@ -11038,15 +10879,7 @@ Get the lower bound(s) by expression.
 
 %feature("docstring") casadi::DaeBuilder::add_quad "
 
->  void casadi::DaeBuilder::add_quad(const std::string &name, const MX &new_quad)
-------------------------------------------------------------------------
-
 Add a quadrature equation.
-
->  void casadi::DaeBuilder::add_quad(const MX &new_quad, const std::string &name=std::string())
-------------------------------------------------------------------------
-[INTERNAL] 
-Add a quadrature equation. Old syntax: Swap arguments.
 
 ";
 
@@ -11124,15 +10957,7 @@ Get function by name.
 
 %feature("docstring") casadi::DaeBuilder::add_dae "
 
->  void casadi::DaeBuilder::add_dae(const std::string &name, const MX &new_dae)
-------------------------------------------------------------------------
-
 Add a differential-algebraic equation.
-
->  void casadi::DaeBuilder::add_dae(const MX &new_dae, const std::string &name=std::string())
-------------------------------------------------------------------------
-[INTERNAL] 
-Add a differential-algebraic equation. Old syntax: Swap arguments.
 
 ";
 
@@ -11269,15 +11094,7 @@ Add a new algebraic variable.
 
 %feature("docstring") casadi::DaeBuilder::add_y "
 
->  MX casadi::DaeBuilder::add_y(const std::string &name, const MX &new_ydef)
-------------------------------------------------------------------------
-
 Add a new output.
-
->  MX casadi::DaeBuilder::add_y(const MX &new_ydef, const std::string &name=std::string())
-------------------------------------------------------------------------
-[INTERNAL] 
-Add a new output. Old syntax: Swap arguments.
 
 ";
 
@@ -11345,15 +11162,7 @@ Add a new variable: returns corresponding symbolic expression.
 
 %feature("docstring") casadi::DaeBuilder::add_d "
 
->  MX casadi::DaeBuilder::add_d(const std::string &name, const MX &new_ddef)
-------------------------------------------------------------------------
-
 Add a new dependent parameter.
-
->  MX casadi::DaeBuilder::add_d(const MX &new_ddef, const std::string &name=std::string())
-------------------------------------------------------------------------
-[INTERNAL] 
-Add a new dependent parameter. Old syntax: Swap arguments.
 
 ";
 
@@ -11379,15 +11188,7 @@ Set the initial guess(es) by expression.
 
 %feature("docstring") casadi::DaeBuilder::add_alg "
 
->  void casadi::DaeBuilder::add_alg(const std::string &name, const MX &new_alg)
-------------------------------------------------------------------------
-
 Add an algebraic equation.
-
->  void casadi::DaeBuilder::add_alg(const MX &new_alg, const std::string &name=std::string())
-------------------------------------------------------------------------
-[INTERNAL] 
-Add an algebraic equation. Old syntax: Swap arguments.
 
 ";
 
@@ -11538,15 +11339,7 @@ Get string representation.
 
 %feature("docstring") casadi::DaeBuilder::add_ode "
 
->  void casadi::DaeBuilder::add_ode(const std::string &name, const MX &new_ode)
-------------------------------------------------------------------------
-
 Add an ordinary differential equation.
-
->  void casadi::DaeBuilder::add_ode(const MX &new_ode, const std::string &name=std::string())
-------------------------------------------------------------------------
-[INTERNAL] 
-Add an ordinary differential equation. Old syntax: Swap arguments.
 
 ";
 
@@ -12419,12 +12212,6 @@ of iw field.
 
 ";
 
-%feature("docstring") casadi::Dple::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::Dple::ad_weight "[INTERNAL]  Weighting factor
 for chosing forward/reverse mode.
 
@@ -12541,12 +12328,6 @@ function input and outputs.
 
 %feature("docstring") casadi::Dple::codegen "[INTERNAL]  Generate code the
 function.
-
-";
-
-%feature("docstring") casadi::Dple::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -12777,12 +12558,6 @@ length of w field.
 
 %feature("docstring") casadi::Expm::info "[INTERNAL]  Obtain information
 about function
-
-";
-
-%feature("docstring") casadi::Expm::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -13130,12 +12905,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::Expm::alloc_arg "[INTERNAL]  Ensure required
 length of arg field.
-
-";
-
-%feature("docstring") casadi::Expm::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -13898,9 +13667,8 @@ length of arg field.
 
 ";
 
-%feature("docstring") casadi::External::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
+%feature("docstring") casadi::External::codegen_name "[INTERNAL]  Get name
+in codegen.
 
 ";
 
@@ -13975,11 +13743,6 @@ Codegen sparsities.
 
 %feature("docstring") casadi::External::has_free "[INTERNAL]  Does the
 function have free variables.
-
-";
-
-%feature("docstring") casadi::External::codegen_name "[INTERNAL]  Get name
-in codegen.
 
 ";
 
@@ -14454,12 +14217,6 @@ symbolic scalars.
 
 %feature("docstring") casadi::External::n_instructions "[INTERNAL]  Get the
 number of atomic operations.
-
-";
-
-%feature("docstring") casadi::External::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -15123,12 +14880,6 @@ Generate meta-information allowing a user to evaluate a generated function.
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::FiniteDiff::mapsum_mx "[INTERNAL]  Parallel
 evaluation.
 
@@ -15141,12 +14892,6 @@ Codegen sparsities.
 
 %feature("docstring") casadi::FiniteDiff::export_code "[INTERNAL]  Export
 function in a specific language.
-
-";
-
-%feature("docstring") casadi::FiniteDiff::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -15776,12 +15521,6 @@ Calculate derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::call "[INTERNAL]   Call
 a function, templated.
 
@@ -15836,12 +15575,6 @@ Ensure required length of w field.
 ";
 
 %feature("docstring") casadi::FixedStepIntegrator::~FixedStepIntegrator "[INTERNAL]  Destructor.
-
-";
-
-%feature("docstring") casadi::FixedStepIntegrator::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -17052,12 +16785,6 @@ formatted printing to string.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::ForwardDiff::checkout "[INTERNAL]  Checkout a
 memory object.
 
@@ -17121,9 +16848,8 @@ Function instance consisting of only one MX call.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
+%feature("docstring") casadi::ForwardDiff::sz_iw "[INTERNAL]  Get required
+length of iw field.
 
 ";
 
@@ -17161,11 +16887,6 @@ required length of res field.
 
 %feature("docstring") casadi::ForwardDiff::getAdaptorSolverName "[INTERNAL]
 Obtain solver name from Adaptor.
-
-";
-
-%feature("docstring") casadi::ForwardDiff::sz_iw "[INTERNAL]  Get required
-length of iw field.
 
 ";
 
@@ -17630,8 +17351,6 @@ Name of the function.
 
 ";
 
-%feature("docstring") casadi::Function::has_function "";
-
 %feature("docstring") casadi::Function::jacobian "
 
 Generate a Jacobian function of all the inputs elements with respect to all
@@ -17663,28 +17382,9 @@ Identifier index of the instruction (SXFunction/MXFunction)
 
 ";
 
-%feature("docstring") casadi::Function::instruction_output "
-
-Location in the work vector for the output of the instruction
-(SXFunction/MXFunction)
-
-";
-
 %feature("docstring") casadi::Function::wrap "
 
 Wrap in an Function instance consisting of only one MX call.
-
-";
-
-%feature("docstring") casadi::Function::getAtomicOperation "
-
-[DEPRECATED] Renamed instruction_id
-
-";
-
-%feature("docstring") casadi::Function::getAlgorithmSize "
-
-[DEPRECATED] Renamed n_instructions
 
 ";
 
@@ -17714,9 +17414,10 @@ Get free variables as a string.
 
 ";
 
-%feature("docstring") casadi::Function::disp "
+%feature("docstring") casadi::Function::__hash__ "
 
-Print a description of the object.
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -17860,8 +17561,9 @@ For a particular input or for all of the inputs
 
 %feature("docstring") casadi::Function::get_function "";
 
-%feature("docstring") casadi::Function::sz_res "[INTERNAL]  Get required
-length of res field.
+%feature("docstring") casadi::Function::sz_res "
+
+Get required length of res field.
 
 ";
 
@@ -17894,9 +17596,10 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::Function::getAtomicInput "
+%feature("docstring") casadi::Function::instruction_output "
 
-[DEPRECATED] Renamed instruction_index
+Location in the work vector for the output of the instruction
+(SXFunction/MXFunction)
 
 ";
 
@@ -17929,10 +17632,9 @@ Destructor.
 
 ";
 
-%feature("docstring") casadi::Function::__hash__ "
+%feature("docstring") casadi::Function::disp "
 
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
+Print a description of the object.
 
 ";
 
@@ -18040,12 +17742,6 @@ Print all information there is to know about a certain option.
 
 ";
 
-%feature("docstring") casadi::Function::fullJacobian "
-
-[DEPRECATED] Alias of Function::jacobian
-
-";
-
 %feature("docstring") casadi::Function::hessian_old "
 
 Generate a Hessian function of output oind with respect to input iind.
@@ -18124,19 +17820,9 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Function::getAtomicOutput "
+%feature("docstring") casadi::Function::sz_iw "
 
-[DEPRECATED] Renamed instruction_output
-
-";
-
-%feature("docstring") casadi::Function::conic_debug "[INTERNAL]  Generate
-native code in the interfaced language for debugging
-
-";
-
-%feature("docstring") casadi::Function::sz_iw "[INTERNAL]  Get required
-length of iw field.
+Get required length of iw field.
 
 ";
 
@@ -18423,17 +18109,9 @@ member functions. Joel Andersson >List of available options
 
 C++ includes: function.hpp ";
 
-%feature("docstring") casadi::Function::instruction_MX "";
+%feature("docstring") casadi::Function::instruction_MX "
 
-%feature("docstring") casadi::Function::print_free "
-
-[DEPRECATED] Use get_free instead
-
-";
-
-%feature("docstring") casadi::Function::getAtomicInputReal "
-
-[DEPRECATED] Renamed instruction_constant
+Get the MX node corresponding to an instruction ( MXFunction)
 
 ";
 
@@ -18537,12 +18215,6 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::Function::getWorkSize "
-
-[DEPRECATED] Use sz_w instead
-
-";
-
 %feature("docstring") casadi::Function::call "
 
 >  void casadi::Function::call(const std::vector< DM > &arg, std::vector< DM > &output_res, bool always_inline=false, bool never_inline=false) const 
@@ -18589,8 +18261,9 @@ pre-CasADi 3.2
 
 ";
 
-%feature("docstring") casadi::Function::sz_arg "[INTERNAL]  Get required
-length of arg field.
+%feature("docstring") casadi::Function::sz_arg "
+
+Get required length of arg field.
 
 ";
 
@@ -18618,8 +18291,9 @@ Get the floating point output argument of an instruction ( SXFunction)
 
 ";
 
-%feature("docstring") casadi::Function::sz_w "[INTERNAL]  Get required
-length of w field.
+%feature("docstring") casadi::Function::sz_w "
+
+Get required length of w field.
 
 ";
 
@@ -18629,11 +18303,7 @@ Expand a function to SX.
 
 ";
 
-%feature("docstring") casadi::Function::spCanEvaluate "
-
-[DEPRECATED] Use has_spfwd, has_sprev
-
-";
+%feature("docstring") casadi::Function::has_function "";
 
 %feature("docstring") casadi::Function::sx_out "
 
@@ -18889,12 +18559,6 @@ Forward mode AD, virtual functions overloaded in derived classes.
 
 %feature("docstring") casadi::GenericExternal::numel_in "[INTERNAL]  Number
 of input/output elements.
-
-";
-
-%feature("docstring") casadi::GenericExternal::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -19200,12 +18864,6 @@ Evaluate with symbolic scalars.
 
 %feature("docstring") casadi::GenericExternal::self "[INTERNAL]  Get a
 public class instance.
-
-";
-
-%feature("docstring") casadi::GenericExternal::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -19703,12 +19361,6 @@ Unite two matrices no overlapping sparsity.
 
 Get string representation of dimensions. The representation is e.g. \"4x5\"
 or \"4x5,10nz\".
-
-";
-
-%feature("docstring") friendwrap_sum_square "
-
-[DEPRECATED] Renamed sumsqr
 
 ";
 
@@ -20738,12 +20390,6 @@ Wrap in an Function instance consisting of only one MX call.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
-
-";
-
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::codegen "[INTERNAL]  Generate code the function.
 
 ";
@@ -20923,9 +20569,7 @@ Obtain solver name from Adaptor.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::construct "[INTERNAL]  Construct Prepares the function for evaluation.
 
 ";
 
@@ -20939,10 +20583,6 @@ elements.
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::setup "[INTERNAL]  Set the (persistent and temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::construct "[INTERNAL]  Construct Prepares the function for evaluation.
 
 ";
 
@@ -21504,12 +21144,6 @@ Generate a function that calculates nfwd forward derivatives.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::ImplicitToNlp::sprint "[INTERNAL]  C-style
 formatted printing to string.
 
@@ -21650,11 +21284,6 @@ with DM matrices.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::print_dimensions "[INTERNAL]
-Print dimensions of inputs and outputs.
-
-";
-
 %feature("docstring") casadi::ImplicitToNlp::slice "[INTERNAL]  returns a
 new function with a selection of inputs/outputs of the original
 
@@ -21685,9 +21314,8 @@ Replace 0-by-0 reverse seeds.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
+%feature("docstring") casadi::ImplicitToNlp::print_dimensions "[INTERNAL]
+Print dimensions of inputs and outputs.
 
 ";
 
@@ -22256,11 +21884,6 @@ Jacobian of all input elements with respect to all output elements.
 
 %feature("docstring") casadi::Integrator::factory "[INTERNAL] ";
 
-%feature("docstring") casadi::Integrator::print_option "[INTERNAL]  Print
-all information there is to know about a certain option.
-
-";
-
 %feature("docstring") casadi::Integrator::size1_in "[INTERNAL]
 Input/output dimensions.
 
@@ -22475,9 +22098,8 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Integrator::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
+%feature("docstring") casadi::Integrator::codegen_incref "[INTERNAL]
+Codegen incref for dependencies.
 
 ";
 
@@ -22631,12 +22253,6 @@ statistics.
 
 %feature("docstring") casadi::Integrator::getAdaptorSolverName "[INTERNAL]
 Obtain solver name from Adaptor.
-
-";
-
-%feature("docstring") casadi::Integrator::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -22857,8 +22473,8 @@ Destructor.
 
 ";
 
-%feature("docstring") casadi::Integrator::codegen_incref "[INTERNAL]
-Codegen incref for dependencies.
+%feature("docstring") casadi::Integrator::print_option "[INTERNAL]  Print
+all information there is to know about a certain option.
 
 ";
 
@@ -23348,12 +22964,6 @@ input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::Interpolant::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::Interpolant::codegen_decref "[INTERNAL]
 Codegen decref for dependencies.
 
@@ -23361,12 +22971,6 @@ Codegen decref for dependencies.
 
 %feature("docstring") casadi::Interpolant::check_res "[INTERNAL]  Check if
 output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::Interpolant::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -24735,12 +24339,6 @@ if necessary generate, the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::JitFunction::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
-
-";
-
 %feature("docstring") casadi::JitFunction::sx_in "[INTERNAL]  Get function
 input(s) and output(s)
 
@@ -24811,12 +24409,6 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring") casadi::JitFunction::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -26285,11 +25877,6 @@ Export function in a specific language.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::sp_forward "[INTERNAL]
-Propagate sparsity forward.
-
-";
-
 %feature("docstring") casadi::LinearInterpolant::alloc_arg "[INTERNAL]
 Ensure required length of arg field.
 
@@ -26309,12 +25896,6 @@ nadj) if no cached version is available.
 
 %feature("docstring") casadi::LinearInterpolant::clear_mem "[INTERNAL]
 Clear all memory (called from destructor)
-
-";
-
-%feature("docstring") casadi::LinearInterpolant::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -26598,9 +26179,8 @@ public class instance.
 
 %feature("docstring") casadi::LinearInterpolant::~LinearInterpolant "[INTERNAL] ";
 
-%feature("docstring") casadi::LinearInterpolant::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
+%feature("docstring") casadi::LinearInterpolant::sp_forward "[INTERNAL]
+Propagate sparsity forward.
 
 ";
 
@@ -27133,9 +26713,8 @@ Get number of temporary variables needed.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
+%feature("docstring") casadi::LinearInterpolantJac::memory "[INTERNAL]
+Memory objects.
 
 ";
 
@@ -27319,12 +26898,6 @@ Symbolic expressions for the forward seeds.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
-
-";
-
 %feature("docstring") casadi::LinearInterpolantJac::alloc_w "[INTERNAL]
 Ensure required length of w field.
 
@@ -27332,11 +26905,6 @@ Ensure required length of w field.
 
 %feature("docstring") casadi::LinearInterpolantJac::alloc_arg "[INTERNAL]
 Ensure required length of arg field.
-
-";
-
-%feature("docstring") casadi::LinearInterpolantJac::memory "[INTERNAL]
-Memory objects.
 
 ";
 
@@ -28401,12 +27969,6 @@ length of w field.
 
 ";
 
-%feature("docstring") casadi::Map::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::Map::class_name "[INTERNAL]  Get type name.
 
 ";
@@ -28772,12 +28334,6 @@ of res field.
 
 ";
 
-%feature("docstring") casadi::Map::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
-
-";
-
 %feature("docstring") casadi::Map::adjViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
 
@@ -29044,12 +28600,6 @@ reference to the object.
 
 ";
 
-%feature("docstring") casadi::MapOmp::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
-
-";
-
 %feature("docstring") casadi::MapOmp::sp_reverse "[INTERNAL]  Propagate
 sparsity backwards.
 
@@ -29087,12 +28637,6 @@ vectors long enough to evaluate function.
 
 %feature("docstring") casadi::MapOmp::replace_aseed "[INTERNAL]  Replace
 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring") casadi::MapOmp::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -31522,12 +31066,6 @@ of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Newton::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
-
-";
-
 %feature("docstring") casadi::Newton::get_free "[INTERNAL]  Print free
 variables.
 
@@ -32318,12 +31856,6 @@ variables ( MX)
 
 ";
 
-%feature("docstring") casadi::Newton::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::Newton::solve "[INTERNAL]   Solve the system
 of equations and calculate derivatives.
 
@@ -32651,12 +32183,6 @@ output arguments have correct length and dimensions.
 
 %feature("docstring") casadi::Nlpsol::sz_res "[INTERNAL]  Get required
 length of res field.
-
-";
-
-%feature("docstring") casadi::Nlpsol::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -33127,12 +32653,6 @@ printing during evaluation.
 
 %feature("docstring") casadi::Nlpsol::definition "[INTERNAL]  Get function
 signature: name:(inputs)->(outputs)
-
-";
-
-%feature("docstring") casadi::Nlpsol::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -34581,12 +34101,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::OracleFunction::sp_reverse "[INTERNAL]
 Propagate sparsity backwards.
 
@@ -34613,12 +34127,6 @@ object.
 ";
 
 %feature("docstring") casadi::OracleFunction::get_function "[INTERNAL] ";
-
-%feature("docstring") casadi::OracleFunction::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
-
-";
 
 %feature("docstring") casadi::OracleFunction::fwdViaJac "[INTERNAL]
 Calculate derivatives by multiplying the full Jacobian and multiplying.
@@ -35511,9 +35019,8 @@ Get the floating point output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
+%feature("docstring") casadi::QpToNlp::print "[INTERNAL]  C-style formatted
+printing during evaluation.
 
 ";
 
@@ -35839,12 +35346,6 @@ number of atomic operations.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::QpToNlp::replace_res "[INTERNAL]  Replace
 0-by-0 outputs.
 
@@ -35983,11 +35484,6 @@ able to propagate seeds through the algorithm?
 
 %feature("docstring") casadi::QpToNlp::free_sx "[INTERNAL]  Get free
 variables (SX)
-
-";
-
-%feature("docstring") casadi::QpToNlp::print "[INTERNAL]  C-style formatted
-printing during evaluation.
 
 ";
 
@@ -36842,12 +36338,6 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::Rootfinder::codegen_sparsities "[INTERNAL]
 Codegen sparsities.
 
@@ -36997,12 +36487,6 @@ statistics.
 
 %feature("docstring") casadi::Rootfinder::size1_in "[INTERNAL]
 Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::Rootfinder::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -37230,12 +36714,6 @@ input/output elements.
 
 %feature("docstring") casadi::RungeKutta::export_code "[INTERNAL]  Export
 function in a specific language.
-
-";
-
-%feature("docstring") casadi::RungeKutta::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -37590,12 +37068,6 @@ solution in time.
 
 %feature("docstring") casadi::RungeKutta::clear_mem "[INTERNAL]  Clear all
 memory (called from destructor)
-
-";
-
-%feature("docstring") casadi::RungeKutta::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -38376,12 +37848,6 @@ memory block.
 
 ";
 
-%feature("docstring") casadi::Scpgen::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::Scpgen::instruction_output "[INTERNAL]  Get
 the (integer) output argument of an atomic operation.
 
@@ -38742,12 +38208,6 @@ dependencies.
 
 %feature("docstring") casadi::Scpgen::size_in "[INTERNAL]  Input/output
 dimensions.
-
-";
-
-%feature("docstring") casadi::Scpgen::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -39527,11 +38987,6 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::get_min_in "[INTERNAL]  Get
-smallest input value.
-
-";
-
 %feature("docstring") casadi::SlicotDple::generate_lifted "[INTERNAL]
 Extract the functions needed for the Lifted Newton method.
 
@@ -39564,12 +39019,6 @@ Input/output dimensions.
 
 %feature("docstring") casadi::SlicotDple::mx_out "[INTERNAL]  Get function
 input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::SlicotDple::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -39967,8 +39416,8 @@ vectors long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::n_nodes "[INTERNAL]  Number of
-nodes in the algorithm.
+%feature("docstring") casadi::SlicotDple::get_min_in "[INTERNAL]  Get
+smallest input value.
 
 ";
 
@@ -39997,9 +39446,8 @@ Codegen decref for dependencies.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
+%feature("docstring") casadi::SlicotDple::n_nodes "[INTERNAL]  Number of
+nodes in the algorithm.
 
 ";
 
@@ -40390,12 +39838,6 @@ required length of arg field.
 
 // File: classcasadi_1_1SlicotExpm.xml
 %feature("docstring") casadi::SlicotExpm::plugin_name "[INTERNAL] ";
-
-%feature("docstring") casadi::SlicotExpm::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
 
 %feature("docstring") casadi::SlicotExpm::get_abstol "[INTERNAL]  Get
 absolute tolerance.
@@ -40941,12 +40383,6 @@ default input value.
 
 %feature("docstring") casadi::SlicotExpm::alloc_iw "[INTERNAL]  Ensure
 required length of iw field.
-
-";
-
-%feature("docstring") casadi::SlicotExpm::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -41740,12 +41176,6 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Smoothing::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::Smoothing::instruction_MX "[INTERNAL]  get MX
 expression associated with instruction
 
@@ -41872,12 +41302,6 @@ length of arg field.
 
 %feature("docstring") casadi::Smoothing::instruction_id "[INTERNAL]  Get an
 atomic operation operator index.
-
-";
-
-%feature("docstring") casadi::Smoothing::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
@@ -42875,12 +42299,6 @@ Check whether the sparsity-pattern indicates structural singularity.
 
 ";
 
-%feature("docstring") casadi::Sparsity::print_compact "
-
-[DEPRECATED] Alias for disp
-
-";
-
 %feature("docstring") casadi::Sparsity::is_dense "
 
 Is dense?
@@ -43636,9 +43054,8 @@ symbolic matrices.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
+%feature("docstring") casadi::Sqpmethod::codegen_meta "[INTERNAL]  Generate
+meta-information allowing a user to evaluate a generated function.
 
 ";
 
@@ -43853,12 +43270,6 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring") casadi::Sqpmethod::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
 
 ";
 
@@ -44165,11 +43576,6 @@ Jacobian of all input elements with respect to all output elements.
 ";
 
 %feature("docstring") casadi::Sqpmethod::~Sqpmethod "[INTERNAL] ";
-
-%feature("docstring") casadi::Sqpmethod::codegen_meta "[INTERNAL]  Generate
-meta-information allowing a user to evaluate a generated function.
-
-";
 
 %feature("docstring") casadi::Sqpmethod::matching_res "[INTERNAL]  Check if
 output arguments that needs to be replaced.
@@ -44727,12 +44133,6 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::Switch::getAtomicInput "
-
-[DEPRECATED] Renamed instruction_index
-
-";
-
 %feature("docstring") casadi::Switch::get_options "[INTERNAL]  Options.
 
 ";
@@ -44763,12 +44163,6 @@ required length of arg field.
 
 %feature("docstring") casadi::Switch::get_sparsity_out "[INTERNAL]
 Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::Switch::getAtomicOutput "
-
-[DEPRECATED] Renamed instruction_output
 
 ";
 
