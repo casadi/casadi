@@ -348,7 +348,8 @@ namespace casadi {
     std::string outname = temporary_file("casadi_ampl_tmp", ".out");
     // Call executable
     string system_cmd = solver_ + " -o" + solname + " " + nlname + " > " + outname;
-    system(system_cmd.c_str());
+    int ret = system(system_cmd.c_str());
+    casadi_assert_dev(ret==0);
 
     // Delete the nl file
     if (remove(nlname.c_str())!=0) {

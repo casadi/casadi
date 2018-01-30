@@ -2040,7 +2040,7 @@ namespace casadi {
     double cpuTime = matricesChanged ? max_time_qp_ : 0.1*max_time_qp_;
     int maxIt = matricesChanged ? max_it_qp_ : 0.1*max_it_qp_;
     qpOASES::SolutionAnalysis solAna;
-    qpOASES::returnValue ret;
+    qpOASES::returnValue ret = qpOASES::RET_INFO_UNDEFINED;
 
     /*
      * QP solving loop for convex combinations (sequential)
