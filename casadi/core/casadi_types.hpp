@@ -26,11 +26,9 @@
 #ifndef CASADI_TYPES_HPP
 #define CASADI_TYPES_HPP
 
-#ifdef WITH_LONGLONG_CORE
+#ifndef CASADI_INT_TYPE
 #define CASADI_INT_TYPE long long int
-#else // WITH_LONGLONG_CORE
-#define CASADI_INT_TYPE int
-#endif // WITH_LONGLONG_CORE
+#endif // CASADI_INT_TYPE
 
 typedef CASADI_INT_TYPE casadi_int;
 #ifndef SWIG  // Not in public API

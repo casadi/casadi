@@ -77,16 +77,12 @@ namespace casadi {
     /// Constructors (implicit type conversion)
     GenericType(bool b);
     GenericType(casadi_int i);
-#ifdef WITH_LONGLONG_CORE
     GenericType(int i) : GenericType(static_cast<casadi_int>(i)) {}
-#endif // WITH_LONGLONG_CORE
     GenericType(double d);
     GenericType(const std::string& s);
     GenericType(const std::vector<bool>& iv);
     GenericType(const std::vector<casadi_int>& iv);
-#ifdef WITH_LONGLONG_CORE
     GenericType(const std::vector<int>& iv);
-#endif // WITH_LONGLONG_CORE
     GenericType(const std::vector< std::vector<casadi_int> >& ivv);
     GenericType(const std::vector<double>& dv);
     GenericType(const std::vector<std::string>& sv);
@@ -119,9 +115,7 @@ namespace casadi {
     operator std::string() const { return to_string();}
     operator std::vector<bool>() const { return to_bool_vector();}
     operator std::vector<casadi_int>() const { return to_int_vector();}
-#ifdef WITH_LONGLONG_CORE
     operator std::vector<int>() const;
-#endif // WITH_LONGLONG_CORE
     operator std::vector<std::vector<casadi_int> >() const { return to_int_vector_vector();}
     operator std::vector<double>() const { return to_double_vector();}
     operator std::vector<std::string>() const { return to_string_vector();}

@@ -52,11 +52,10 @@ namespace casadi {
 
     // Creator (all values are the same integer)
     static ConstantMX* create(const Sparsity& sp, casadi_int val);
-#ifdef WITH_LONGLONG_CORE
     static ConstantMX* create(const Sparsity& sp, int val) {
       return create(sp, static_cast<casadi_int>(val));
     }
-#endif // WITH_LONGLONG_CORE
+
     // Creator (all values are the same floating point value)
     static ConstantMX* create(const Sparsity& sp, double val);
 

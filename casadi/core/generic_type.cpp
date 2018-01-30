@@ -200,13 +200,11 @@ namespace casadi {
     own(new IntVectorType(iv));
   }
 
-#ifdef WITH_LONGLONG_CORE
   GenericType::GenericType(const vector<int>& iv) {
     std::vector<casadi_int> temp(iv.size());
     std::copy(iv.begin(), iv.end(), temp.begin());
     own(new IntVectorType(temp));
   }
-#endif // WITH_LONGLONG_CORE
 
   GenericType::GenericType(const vector<vector<casadi_int> >& ivv) {
     own(new IntVectorVectorType(ivv));
@@ -359,15 +357,12 @@ namespace casadi {
     return as_int_vector();
   }
 
-
-#ifdef WITH_LONGLONG_CORE
   GenericType::operator std::vector<int>() const {
     std::vector<int> ret;
     std::vector<casadi_int> source = to_int_vector();
     std::copy(source.begin(), source.end(), ret.begin());
     return ret;
   }
-#endif // WITH_LONGLONG_CORE
 
   vector<bool> GenericType::to_bool_vector() const {
     casadi_assert(is_int_vector(), "type mismatch");

@@ -57,11 +57,10 @@ namespace casadi {
 
     /// A slice
     Slice(casadi_int start, casadi_int stop, casadi_int step=1);
-#ifdef WITH_LONGLONG_CORE
     Slice(int start, int stop, int step=1);
     Slice(int start, casadi_int stop, int step=1);
     Slice(casadi_int start, int stop, int step=1);
-#endif // WITH_LONGLONG_CORE
+
     /// Get a vector of indices
     std::vector<casadi_int> all(casadi_int len, bool ind1=false) const;
 

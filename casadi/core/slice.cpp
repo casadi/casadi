@@ -44,14 +44,13 @@ namespace casadi {
   Slice::Slice(casadi_int start, casadi_int stop, casadi_int step) :
     start(start), stop(stop), step(step) { }
 
-#ifdef WITH_LONGLONG_CORE
   Slice::Slice(int start, int stop, int step) : start(start), stop(stop), step(step) {
   }
   Slice::Slice(int start, casadi_int stop, int step) : start(start), stop(stop), step(step) {
   }
   Slice::Slice(casadi_int start, int stop, int step) : start(start), stop(stop), step(step) {
   }
-#endif // WITH_LONGLONG_CORE
+
   std::vector<casadi_int> Slice::all(casadi_int len, bool ind1) const {
     casadi_int start = this->start;
     if (start==std::numeric_limits<casadi_int>::min()) {
