@@ -38,7 +38,6 @@
 
 namespace casadi {
   struct CASADI_LINSOL_LDL_EXPORT LinsolLdlMemory : public LinsolMemory {
-    std::vector<casadi_int> iw;
     std::vector<double> l, d, w;
   };
 

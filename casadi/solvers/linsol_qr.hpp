@@ -39,7 +39,6 @@
 namespace casadi {
   struct CASADI_LINSOL_QR_EXPORT LinsolQrMemory : public LinsolMemory {
     std::vector<double> v, r, beta, w;
-    std::vector<casadi_int> iw;
   };
 
   /** \brief \pluginbrief{LinsolInternal,qr}
@@ -95,7 +94,7 @@ namespace casadi {
     static const std::string meta_doc;
 
     /// Symbolic factorization
-    std::vector<casadi_int> parent_, pinv_, leftmost_;
+    std::vector<casadi_int> pinv_;
     Sparsity sp_v_, sp_r_;
   };
 
