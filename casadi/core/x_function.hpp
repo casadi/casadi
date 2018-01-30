@@ -787,6 +787,8 @@ namespace casadi {
   void XFunction<DerivedType, MatType, NodeType>
   ::export_code(const std::string& lang, std::ostream &ss, const Dict& options) const {
 
+    casadi_assert(!has_free(), "export_code needs a Function without free variables");
+
     casadi_assert(lang=="matlab", "Only matlab language supported for now.");
 
     // start function
