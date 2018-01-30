@@ -321,18 +321,10 @@ before_install:
   - pushd testbot && source recipes/setup.sh && popd
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-      brew update
-      brew tap homebrew/science
-      brew cask uninstall oclint
-      brew install binutils p7zip
-      brew reinstall gcc49 --with-fortran
+      osx_gcc49_setup
       export SLURP_OS=osx
       export SLURP_GCC=4.9
       slurp swig_matlab
-      export CC=gcc-$SLURP_GCC
-      export CXX=g++-$SLURP_GCC
-      export FC=gfortran-$SLURP_GCC
-      export F77=gfortran-$SLURP_GCC
     else
       sudo apt-get install p7zip-full -y
       sudo apt-get update -qq
