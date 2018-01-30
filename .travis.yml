@@ -183,19 +183,6 @@ matrix:
       dist: trusty
       env: TESTMODE=minimal
       script:
-        - mkdir build
-        - pushd build
-        - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_LONGLONG_CORE=ON -DWITH_PYTHON=ON -DWITH_JSON=ON ..
-        - make
-        - sudo make install
-        - popd
-        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test && make unittests_py examples_code_py && popd
-    - compiler: gcc
-      os: linux
-      dist: trusty
-      env: TESTMODE=minimal
-      script:
         - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
         - sudo apt-get update -qq
         - sudo apt-get install gcc-6 g++-6
@@ -248,21 +235,22 @@ matrix:
           #fi
           fi
     - os: osx
+      osx_image: xcode7.3
       env: TESTMODE=minimal SLURP_OS=osx
       compiler: clang
-      before_install:
-        - shell_session_update() { :; } # Workaround for travis-ci/travis-ci#6522
-        - brew update
-        - brew tap homebrew/science
-        - brew outdated swig ; brew install swig
-        - python_setup
       script:
         - mkdir build
         - pushd build
         - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
+
+        - #cmake $casadi_build_flags -DPYTHON_LIBRARY=$CMAKE_PYTHON_LIBRARY -DPYTHON_INCLUDE_DIR=$CMAKE_PYTHON_INCLUDE_DIR -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON -DCMAKE_INSTALL_PREFIX=../python_install -DPYTHON_PREFIX=../python_install ..
+        - osx_rpath
         - make VERBOSE=1
         - sudo make install
+        - sudo cp $GCC_FULL $QUADMATH_FULL $FORTRAN_FULL $CXX_FULL /usr/local/lib/
         - popd
+        - #export PYTHONPATH=$PYTHONPATH:`pwd`/python_install
+        - otool -l /usr/local/python/casadi/_casadi.so
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         - pushd test && make unittests_py && popd
 
@@ -276,7 +264,6 @@ matrix:
         - locate libstdc++.so
         - export CC=gcc-4.7
         - export CXX=g++-4.7
-        - export FC=gfortran-4.7
 
 
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
@@ -328,34 +315,45 @@ branches:
     - /.*appveyor.*/
 
 before_install:
+  - shell_session_update() { :; } # Workaround for travis-ci/travis-ci#6522
   - export casadi_build_flags="-DWITH_COMMON=ON "
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
   - pushd testbot && source recipes/setup.sh && popd
-  - python_setup
-  - sudo apt-get install p7zip-full -y
   - |
-    if [ $NEEDMATLAB ]
-    then
-      export SLURP_GCC=4.7
+    if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+      brew update
+      brew tap homebrew/science
+      brew cask uninstall oclint
+      brew install binutils p7zip
+      brew reinstall gcc49 --with-fortran
+      export SLURP_OS=osx
+      export SLURP_GCC=4.9
       slurp swig_matlab
+      export CC=gcc-$SLURP_GCC
+      export CXX=g++-$SLURP_GCC
+      export FC=gfortran-$SLURP_GCC
+      export F77=gfortran-$SLURP_GCC
     else
-      slurp swig
+      sudo apt-get install p7zip-full -y
+      sudo apt-get update -qq
+      sudo apt-get install -q -y binutils gcc g++ gfortran git cmake liblapack-dev liblapack3 libblas3 coinor-libipopt-dev libmumps-seq-dev libxml2-dev
+      if [ $NEEDMATLAB ]
+      then
+        export SLURP_GCC=4.7
+      fi
+      slurp swig_matlab
     fi
-  - slurp hsl
-  - slurp clang
-  - travis_retry testbot/recipes/fetch.sh mosek7.tar.bz2 && tar -xf mosek7.tar.bz2 && rm mosek7.tar.bz2
-  - slurp ecos
-  - slurp snopt
-  - slurp cplex
-  - slurp bonmin
-  - slurp ipopt
-  - slurp worhp
-  - slurp slicot
+  - python_setup
+  - slurp_common
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      slurp cplex
+    fi
   - popd
-  - sudo apt-get update -qq
-  - sudo apt-get install -q -y binutils gcc g++ gfortran git cmake liblapack-dev liblapack3 libblas3 coinor-libipopt-dev libmumps-seq-dev libxml2-dev
+
   - pip install github3.py
  
 after_failure:
   - pushd /home/travis/build/testbot/ && python -c "from github3 import login;from testbotcredentials import TestBotCredentials;tbc = TestBotCredentials();login(*tbc.github).repository('casadi','casadi').create_comment(sha='$TRAVIS_COMMIT',body='Failure reported by [travis](https://travis-ci.org/casadi/casadi/jobs/$TRAVIS_JOB_ID) in $TRAVIS_COMMIT_RANGE -- $TRAVIS_TEST_RESULT')" && popd
+
 
