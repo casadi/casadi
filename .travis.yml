@@ -256,7 +256,7 @@ matrix:
         - #export PYTHONPATH=$PYTHONPATH:`pwd`/python_install
         - otool -l /usr/local/python/casadi/_casadi.so
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test && make unittests_py && popd
+        - pushd test && make unittests_py || remote_access && popd
 
     - compiler: gcc
       os: linux
