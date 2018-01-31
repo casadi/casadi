@@ -837,6 +837,14 @@ class typemaptests(casadiTestCase):
       solver = nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": SX.sym("x")}})
 
     nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": 1}})
+  
+  def to_longlong(self):
+    a = IM(10)
+
+
+    b = a**15
+
+    self.assertEqual(int(b),10**15)
 
 if __name__ == '__main__':
     unittest.main()

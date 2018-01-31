@@ -905,39 +905,12 @@ namespace std {
       // Treat Null
       if (is_null(p)) return false;
 
-      // long within casadi_int bounds
+      // long long
       {
         long long tmp;
         if (SWIG_IsOK(SWIG_AsVal(long long)(p, &tmp))) {
-          // Check if within bounds
-          if (tmp>=std::numeric_limits<casadi_int>::min() && tmp<=std::numeric_limits<casadi_int>::max()) {
-            if (m) **m = static_cast<casadi_int>(tmp);
-            return true;
-          }
-        }
-      }
-
-      // long within casadi_int bounds
-      {
-        long tmp;
-        if (SWIG_IsOK(SWIG_AsVal(long)(p, &tmp))) {
-          // Check if within bounds
-          if (tmp>=std::numeric_limits<casadi_int>::min() && tmp<=std::numeric_limits<casadi_int>::max()) {
-            if (m) **m = static_cast<casadi_int>(tmp);
-            return true;
-          }
-        }
-      }
-
-      // long within casadi_int bounds
-      {
-        int tmp;
-        if (SWIG_IsOK(SWIG_AsVal(int)(p, &tmp))) {
-          // Check if within bounds
-          if (tmp>=std::numeric_limits<casadi_int>::min() && tmp<=std::numeric_limits<casadi_int>::max()) {
-            if (m) **m = static_cast<casadi_int>(tmp);
-            return true;
-          }
+          if (m) **m = static_cast<casadi_int>(tmp);
+          return true;
         }
       }
 
