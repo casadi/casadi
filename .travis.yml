@@ -13,8 +13,12 @@ env:
     - NUMPYVERSION=1.11
 
 before_script:
-  - set -e
-  - set -o pipefail  # otherwise, piping with grep discards exit statuses
+  - |
+    if [ -n "$KEEP_GOING" ];
+    then
+      set -e
+      set -o pipefail  # otherwise, piping with grep discards exit statuses
+    fi
 
 language: generic
 
