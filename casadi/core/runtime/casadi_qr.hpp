@@ -32,7 +32,7 @@ T1 casadi_house(T1* x, T1* beta, casadi_int n) {
 template<typename T1>
 void casadi_qr(const casadi_int* sp_a, const T1* nz_a, T1* x,
                const casadi_int* sp_v, T1* nz_v, const casadi_int* sp_r, T1* nz_r, T1* beta,
-               const casadi_int* pinv) {
+               const casadi_int* prinv, const casadi_int* pc) {
    // Extract sparsities
    casadi_int ncol = sp_a[1];
    const casadi_int *a_colind=sp_a+2, *a_row=sp_a+2+ncol+1;
@@ -47,7 +47,7 @@ void casadi_qr(const casadi_int* sp_a, const T1* nz_a, T1* x,
    // Loop over columns of R, A and V
    for (c=0; c<ncol; ++c) {
      // Copy (permuted) column of A to x
-     for (k=a_colind[c]; k<a_colind[c+1]; ++k) x[pinv[a_row[k]]] = nz_a[k];
+     for (k=a_colind[pc[c]]; k<a_colind[pc[c]+1]; ++k) x[prinv[a_row[k]]] = nz_a[k];
      // Use the equality R = (I-betan*vn*vn')*...*(I-beta1*v1*v1')*A to get
      // strictly upper triangular entries of R
      for (k=r_colind[c]; k<r_colind[c+1] && (r=r_row[k])<c; ++k) {
@@ -143,32 +143,32 @@ void casadi_qr_trs(const casadi_int* sp_r, const T1* nz_r, T1* x, casadi_int tr)
 template<typename T1>
 void casadi_qr_solve(T1* x, casadi_int nrhs, casadi_int tr,
                      const casadi_int* sp_v, const T1* v, const casadi_int* sp_r, const T1* r,
-                     const T1* beta, const casadi_int* pinv, T1* w) {
+                     const T1* beta, const casadi_int* prinv, const casadi_int* pc, T1* w) {
   casadi_int k, c;
   casadi_int nrow_ext = sp_v[0], ncol = sp_v[1];
   for (k=0; k<nrhs; ++k) {
     if (tr) {
       // ('P'Q R)' x = R'Q'P x = b <-> x = P' Q R' \ b
       // Copy to w
-      casadi_copy(x, ncol, w);
+      for (c=0; c<ncol; ++c) w[c] = x[pc[c]];
       //  Solve for R'
       casadi_qr_trs(sp_r, r, w, 1);
       // Multiply by Q
       casadi_qr_mv(sp_v, v, beta, w, 0);
       // Multiply by P'
-      for (c=0; c<ncol; ++c) x[c] = w[pinv[c]];
+      for (c=0; c<ncol; ++c) x[c] = w[prinv[c]];
     } else {
       //P'Q R x = b <-> x = R \ Q' P b
       // Multiply with P
       // C-REPLACE "T1(0)" "0"
       casadi_fill(w, nrow_ext, T1(0));
-      for (c=0; c<ncol; ++c) w[pinv[c]] = x[c];
+      for (c=0; c<ncol; ++c) w[prinv[c]] = x[c];
       // Multiply with Q'
       casadi_qr_mv(sp_v, v, beta, w, 1);
       //  Solve for R
       casadi_qr_trs(sp_r, r, w, 0);
       // Copy to x
-      casadi_copy(w, ncol, x);
+      for (c=0; c<ncol; ++c) x[pc[c]] = w[c];
     }
     x += ncol;
   }

@@ -1902,10 +1902,10 @@ namespace casadi {
   template<typename Scalar>
   void Matrix<Scalar>::
   qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar> &R,
-            Matrix<Scalar>& beta, std::vector<casadi_int>& pinv) {
+            Matrix<Scalar>& beta, std::vector<casadi_int>& prinv, std::vector<casadi_int>& pc) {
     // Calculate the pattern
     Sparsity spV, spR;
-    A.sparsity().qr_sparse(spV, spR, pinv);
+    A.sparsity().qr_sparse(spV, spR, prinv, pc);
     // Calculate the nonzeros
     casadi_int nrow_ext = spV.size1(), ncol = spV.size2();
     V = nan(spV);
@@ -1914,26 +1914,27 @@ namespace casadi {
     vector<Scalar> w(nrow_ext);
     casadi_qr(A.sparsity(), A.ptr(), get_ptr(w), spV, V.ptr(),
               spR, R.ptr(), beta.ptr(),
-              get_ptr(pinv));
+              get_ptr(prinv), get_ptr(pc));
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::
   qr_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& v,
            const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
-           const std::vector<casadi_int>& pinv, bool tr) {
+           const std::vector<casadi_int>& prinv, const std::vector<casadi_int>& pc,
+           bool tr) {
     // Get dimensions, check consistency
     casadi_int ncol = v.size2();
     casadi_int nrow = b.size1(), nrhs = b.size2();
     casadi_assert(r.size()==v.size(), "'r', 'v' dimension mismatch");
     casadi_assert(beta.is_vector() && beta.numel()==ncol, "'beta' has wrong dimension");
-    casadi_assert(pinv.size()==nrow+ncol, "'pinv' has wrong dimension");
+    casadi_assert(prinv.size()==nrow+ncol, "'pinv' has wrong dimension");
     // Work vector
     std::vector<Scalar> w(nrow+ncol);
     // Return value
     Matrix<Scalar> x = densify(b);
     casadi_qr_solve(x.ptr(), nrhs, tr, v.sparsity(), v.ptr(), r.sparsity(), r.ptr(),
-                    beta.ptr(), get_ptr(pinv), get_ptr(w));
+                    beta.ptr(), get_ptr(prinv), get_ptr(pc), get_ptr(w));
     return x;
   }
 

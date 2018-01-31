@@ -613,27 +613,37 @@ namespace casadi {
     return Sparsity(n, n, L_colind, L_row).T();
   }
 
-  void Sparsity::qr_sparse(Sparsity& V, Sparsity& R, std::vector<casadi_int>& pinv) const {
+  void Sparsity::
+  qr_sparse(Sparsity& V, Sparsity& R, std::vector<casadi_int>& prinv,
+            std::vector<casadi_int>& pc, bool amd) const {
     // Dimensions
     casadi_int size1=this->size1(), size2=this->size2();
+
+    // Recursive call if amd
+    if (amd) {
+      casadi_error("not ready");
+    }
+
+    // No column permutation
+    pc = range(size2);
 
     // Allocate memory
     vector<casadi_int> leftmost(size1);
     vector<casadi_int> parent(size2);
-    pinv.resize(size1 + size2);
+    prinv.resize(size1 + size2);
     vector<casadi_int> iw(size1 + 7*size2 + 1);
 
     // Initialize QP solve
     casadi_int nrow_ext, v_nnz, r_nnz;
     SparsityInternal::qr_init(*this, T(),
-                              get_ptr(leftmost), get_ptr(parent), get_ptr(pinv),
+                              get_ptr(leftmost), get_ptr(parent), get_ptr(prinv),
                               &nrow_ext, &v_nnz, &r_nnz, get_ptr(iw));
 
     // Calculate sparsities
     vector<casadi_int> sp_v(2 + size2 + 1 + v_nnz);
     vector<casadi_int> sp_r(2 + size2 + 1 + r_nnz);
     SparsityInternal::qr_sparsities(*this, nrow_ext, get_ptr(sp_v), get_ptr(sp_r),
-                                    get_ptr(leftmost), get_ptr(parent), get_ptr(pinv),
+                                    get_ptr(leftmost), get_ptr(parent), get_ptr(prinv),
                                     get_ptr(iw));
     V = compressed(sp_v);
     R = compressed(sp_r);

@@ -201,14 +201,14 @@ namespace casadi {
                    const std::string& w, const std::string& sp_v,
                    const std::string& v, const std::string& sp_r,
                    const std::string& r, const std::string& beta,
-                   const std::string& pinv);
+                   const std::string& prinv, const std::string& pc);
 
     /** \brief QR solve */
     std::string qr_solve(const std::string& x, casadi_int nrhs, bool tr,
                          const std::string& sp_v, const std::string& v,
                          const std::string& sp_r, const std::string& r,
-                         const std::string& beta, const std::string& pinv,
-                         const std::string& w);
+                         const std::string& beta, const std::string& prinv,
+                         const std::string& pc, const std::string& w);
 
     /** \brief LDL factorization */
     std::string ldl(const std::string& sp_a, const std::string& a,

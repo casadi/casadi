@@ -94,7 +94,7 @@ namespace casadi {
     static const std::string meta_doc;
 
     /// Symbolic factorization
-    std::vector<casadi_int> pinv_;
+    std::vector<casadi_int> prinv_, pc_;
     Sparsity sp_v_, sp_r_;
   };
 

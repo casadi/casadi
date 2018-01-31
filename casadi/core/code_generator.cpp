@@ -1221,23 +1221,23 @@ namespace casadi {
   string CodeGenerator::
   qr(const string& sp, const string& A, const string& w,
      const string& sp_v, const string& v, const string& sp_r,
-     const string& r, const string& beta, const string& pinv) {
+     const string& r, const string& beta, const string& prinv, const string& pc) {
     add_auxiliary(CodeGenerator::AUX_QR);
     return "casadi_qr(" + sp + ", " + A + ", " + w + ", "
            + sp_v + ", " + v + ", " + sp_r + ", " + r + ", "
-           + beta + ", " + pinv + ");";
+           + beta + ", " + prinv + ", " + pc + ");";
   }
 
   string CodeGenerator::
   qr_solve(const string& x, casadi_int nrhs, bool tr,
            const string& sp_v, const string& v,
            const string& sp_r, const string& r,
-           const string& beta, const string& pinv,
-           const string& w) {
+           const string& beta, const string& prinv,
+           const string& pc, const string& w) {
     add_auxiliary(CodeGenerator::AUX_QR);
     return "casadi_qr_solve(" + x + ", " + str(nrhs) + ", " + (tr ? "1" : "0") + ", "
            + sp_v + ", " + v + ", " + sp_r + ", " + r + ", "
-           + beta + ", " + pinv + ", " + w + ");";
+           + beta + ", " + prinv + ", " + pc + ", " + w + ");";
   }
 
   std::string CodeGenerator::

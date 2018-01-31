@@ -3128,13 +3128,15 @@ DECL void casadi_qr(const M& A, M& OUTPUT1, M& OUTPUT2) {
   return qr(A, OUTPUT1, OUTPUT2);
 }
 
-DECL void casadi_qr_sparse(const M& A, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3, std::vector<casadi_int>& OUTPUT4) {
-  return qr_sparse(A, OUTPUT1, OUTPUT2, OUTPUT3, OUTPUT4);
+DECL void casadi_qr_sparse(const M& A, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3,
+          std::vector<casadi_int>& OUTPUT4, std::vector<casadi_int>& OUTPUT5) {
+  return qr_sparse(A, OUTPUT1, OUTPUT2, OUTPUT3, OUTPUT4, OUTPUT5);
 }
 
 DECL M casadi_qr_solve(const M& b, const M& v, const M& r, const M& beta,
-                       const std::vector<casadi_int>& pinv, bool tr=false) {
-  return qr_solve(b, v, r, beta, pinv, tr);
+                       const std::vector<casadi_int>& prinv,
+                       const std::vector<casadi_int>& pc, bool tr=false) {
+  return qr_solve(b, v, r, beta, prinv, pc, tr);
 }
 
 DECL void casadi_ldl(const M& A, M& OUTPUT1, M& OUTPUT2) {

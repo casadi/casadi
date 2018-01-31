@@ -433,10 +433,12 @@ namespace casadi {
     static Matrix<Scalar> poly_roots(const Matrix<Scalar>& p);
     static Matrix<Scalar> eig_symbolic(const Matrix<Scalar>& m);
     static void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
-                          Matrix<Scalar>& beta, std::vector<casadi_int>& pinv);
+                          Matrix<Scalar>& beta, std::vector<casadi_int>& prinv,
+                          std::vector<casadi_int>& pc);
     static Matrix<Scalar> qr_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& v,
                                    const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
-                                   const std::vector<casadi_int>& pinv, bool tr=false);
+                                   const std::vector<casadi_int>& prinv, 
+                                   const std::vector<casadi_int>& pc, bool tr=false);
     static void qr(const Matrix<Scalar>& A, Matrix<Scalar>& Q, Matrix<Scalar>& R);
     static void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& D, Matrix<Scalar>& LT);
     static Matrix<Scalar> ldl_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& D,
@@ -495,16 +497,18 @@ namespace casadi {
      * See T. Davis: Direct Methods for Sparse Linear Systems
      */
     friend inline void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
-                                 Matrix<Scalar>& beta, std::vector<casadi_int>& pinv) {
-      return Matrix<Scalar>::qr_sparse(A, V, R, beta, pinv);
+                                 Matrix<Scalar>& beta, std::vector<casadi_int>& prinv,
+                                 std::vector<casadi_int>& pc) {
+      return Matrix<Scalar>::qr_sparse(A, V, R, beta, prinv, pc);
     }
 
     /** \brief Solve using a sparse QR factorization */
     friend inline Matrix<Scalar>
     qr_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& v,
              const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
-             const std::vector<casadi_int>& pinv, bool tr=false) {
-        return Matrix<Scalar>::qr_solve(b, v, r, beta, pinv, tr);
+             const std::vector<casadi_int>& prinv,
+             const std::vector<casadi_int>& pc, bool tr=false) {
+        return Matrix<Scalar>::qr_solve(b, v, r, beta, prinv, pc, tr);
     }
 
     /** \brief Obtain a Cholesky factorisation of a matrix
