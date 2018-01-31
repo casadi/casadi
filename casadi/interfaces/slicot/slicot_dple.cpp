@@ -79,7 +79,14 @@ namespace casadi {
     clear_mem();
   }
 
+  bool SlicotDple::has_loaded_ = false;
+
   void SlicotDple::init(const Dict& opts) {
+
+    if (!has_loaded_) {
+      has_loaded_ = true;
+      casadi_warning("Loaded plugin with GPL license.");
+    }
 
     Dple::init(opts);
 

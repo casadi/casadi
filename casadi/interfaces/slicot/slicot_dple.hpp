@@ -165,6 +165,9 @@ namespace casadi {
     /// Options to be passed to linear solver constructor
     Dict linear_solver_options_;
 
+    /// Has the plugin been loaded already?
+    static bool has_loaded_;
+
   };
 
 

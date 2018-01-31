@@ -119,7 +119,8 @@ namespace casadi {
 
     casadi_int n_;
 
-
+    /// Has the plugin been loaded already?
+    static bool has_loaded_;
   };
 
 } // namespace casadi
