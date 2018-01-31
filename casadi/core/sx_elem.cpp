@@ -63,7 +63,8 @@ namespace casadi {
   }
 
   SXElem::SXElem(double val) {
-    casadi_int intval = static_cast<casadi_int>(val);
+    // Only ints fit here, not casadi_int
+    int intval = static_cast<int>(val);
     if (val-static_cast<double>(intval) == 0) { // check if integer
       if (intval == 0)             node = casadi_limits<SXElem>::zero.node;
       else if (intval == 1)        node = casadi_limits<SXElem>::one.node;

@@ -142,7 +142,8 @@ class IntegerSX : public ConstantSX {
   private:
     /// Constructor is private, use "create" below
     explicit IntegerSX(casadi_int value) : value(static_cast<int>(value)) {
-      casadi_assert(value<std::numeric_limits<int>::max(), "Integer overflow");
+      casadi_assert(value<=std::numeric_limits<int>::max() &&
+                    value>=std::numeric_limits<int>::min(), "Integer overflow");
     }
 
   public:

@@ -838,13 +838,20 @@ class typemaptests(casadiTestCase):
 
     nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"ipopt": {"acceptable_tol": 1}})
   
-  def to_longlong(self):
+  def test_to_longlong(self):
     a = IM(10)
 
 
     b = a**15
 
     self.assertEqual(int(b),10**15)
+
+  def test_buglonglong(self):
+    x = SX.sym("x")
+
+    jacobian(x/1.458151064450277e-12,x)
+
+
 
 if __name__ == '__main__':
     unittest.main()
