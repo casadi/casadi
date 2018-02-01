@@ -9,7 +9,7 @@ void casadi_interpn(T1* res, casadi_int ndim, const T1* grid, const casadi_int* 
   // Left index and fraction of interval
   casadi_interpn_weights(ndim, grid, offset, x, alpha, index, lookup_mode);
   // Loop over all corners, add contribution to output
-  casadi_fill_s_t(corner, ndim, 0);
+  casadi_fill_casadi_int(corner, ndim, 0);
   casadi_fill(res, m, 0.0);
   do {
     T1* coeff = 0;

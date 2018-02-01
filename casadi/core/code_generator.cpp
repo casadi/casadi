@@ -392,7 +392,7 @@ namespace casadi {
     // Real type (usually double)
     generate_casadi_real(s);
 
-    // Real type (usually double)
+    // Integer type (usually long long)
     generate_casadi_int(s);
 
     // Type conversion

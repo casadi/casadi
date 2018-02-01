@@ -14,7 +14,7 @@ void casadi_interpn_grad(T1* grad, casadi_int ndim, const T1* grid, const casadi
   // Left index and fraction of interval
   casadi_interpn_weights(ndim, grid, offset, x, alpha, index, lookup_mode);
   // Loop over all corners, add contribution to output
-  casadi_fill_s_t(corner, ndim, 0);
+  casadi_fill_casadi_int(corner, ndim, 0);
   casadi_fill(grad, ndim*m, 0.);
   do {
     // Get coefficients

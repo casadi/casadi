@@ -39,7 +39,7 @@ unittests: unittests_py
 unittests_knownbugs: unittests_py_knownbugs
 
 unittests_py_slow:
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--ignore_memory_light --run_slow"
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--run_slow"
 
 unittests_py_valgrind:
 	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -memcheck -passoptions="--ignore_memory_heavy"
