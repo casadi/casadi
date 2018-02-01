@@ -13,7 +13,7 @@ mxArray* casadi_to_mex(const casadi_int* sp, const T1* x) {
     for (i=0, j=mxGetIr(p); i<nnz; ++i) *j++ = *row++;
     if (x) {
       double* d = (double*)mxGetData(p);
-      for (i=0; i<nnz; ++i) *d++ = to_double(*x++);
+      for (i=0; i<nnz; ++i) *d++ = casadi_to_double(*x++);
     }
     return p;
   }
@@ -24,7 +24,7 @@ mxArray* casadi_to_mex(const casadi_int* sp, const T1* x) {
     casadi_int c, k;
     for (c=0; c<ncol; ++c) {
       for (k=colind[c]; k<colind[c+1]; ++k) {
-        d[row[k]+c*nrow] = to_double(*x++);
+        d[row[k]+c*nrow] = casadi_to_double(*x++);
       }
     }
   }

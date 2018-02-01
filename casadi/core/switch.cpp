@@ -376,7 +376,8 @@ namespace casadi {
 
     // Codegen condition
     bool if_else = f_.size()==1;
-    g << (if_else ? "if" : "switch")  << " (arg[0] ? to_int(*arg[0]) : 0) {\n";
+    g.add_auxiliary(CodeGenerator::AUX_TO_INT);
+    g << (if_else ? "if" : "switch")  << " (arg[0] ? casadi_to_int(*arg[0]) : 0) {\n";
 
     // Loop over cases/functions
     for (casadi_int k=0; k<=f_.size(); ++k) {

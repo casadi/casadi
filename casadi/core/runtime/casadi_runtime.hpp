@@ -176,9 +176,6 @@ namespace casadi {
                             casadi_int* iw, T1* w);
 
   // Alias names
-  inline void casadi_copy_s_t(const casadi_int* x, casadi_int n, casadi_int* y) {
-    casadi_copy(x, n, y);
-  }
   inline void casadi_fill_casadi_int(casadi_int* x, casadi_int n, casadi_int alpha) {
     casadi_fill(x, n, alpha);
   }

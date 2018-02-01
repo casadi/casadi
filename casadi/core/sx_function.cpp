@@ -170,15 +170,9 @@ namespace casadi {
           g << "arg[" << a.i1 << "] ? arg[" << a.i1 << "][" << a.i2 << "] : 0";
         } else {
           casadi_int ndep = casadi_math<double>::ndeps(a.op);
-          g << casadi_math<double>::pre(a.op);
-          for (casadi_int c=0; c<ndep; ++c) {
-            if (c==0) {
-              g << "a" << a.i1;
-            } else {
-              g << casadi_math<double>::sep(a.op) << "a" << a.i2;
-            }
-          }
-          g << casadi_math<double>::post(a.op);
+          casadi_assert_dev(ndep>0);
+          if (ndep==1) g << g.print_op(a.op, "a"+str(a.i1));
+          if (ndep==2) g << g.print_op(a.op, "a"+str(a.i1), "a"+str(a.i2));
         }
       }
       g  << ";\n";

@@ -397,35 +397,6 @@ namespace casadi {
     // Integer type (usually long long)
     generate_casadi_int(s);
 
-    // Type conversion
-    s << "#define to_double(x) "
-      << (this->cpp ? "static_cast<double>(x)" : "(double) x") << endl
-      << "#define to_int(x) "
-      << (this->cpp ? "static_cast<casadi_int>(x)" : "(casadi_int) x") << endl
-      << "#define CASADI_CAST(x,y) "
-      << (this->cpp ? "static_cast<x>(y)" : "(x) y") << endl << endl;
-
-    // Pre-C99
-    s << "/* Pre-c99 compatibility */\n"
-      << "#if __STDC_VERSION__ < 199901L\n"
-      << "  #define fmin CASADI_PREFIX(fmin)\n"
-      << "  casadi_real fmin(casadi_real x, casadi_real y) { return x<y ? x : y;}\n"
-      << "  #define fmax CASADI_PREFIX(fmax)\n"
-      << "  casadi_real fmax(casadi_real x, casadi_real y) { return x>y ? x : y;}\n"
-      << "#endif\n\n";
-
-      // CasADi extensions
-      s << "/* CasADi extensions */\n"
-        << "#define sq CASADI_PREFIX(sq)\n"
-        << "casadi_real sq(casadi_real x) { return x*x;}\n"
-        << "#define sign CASADI_PREFIX(sign)\n"
-        << "casadi_real CASADI_PREFIX(sign)(casadi_real x) { return x<0 ? -1 : x>0 ? 1 : x;}\n"
-        << "#define twice CASADI_PREFIX(twice)\n"
-        << "casadi_real twice(casadi_real x) { return x+x;}\n"
-        << "#define if_else CASADI_PREFIX(if_else)\n"
-        << "casadi_real if_else(casadi_real c, casadi_real x, casadi_real y) "
-           "{ return c!=0 ? x : y;}\n\n";
-
     // Macros
     if (!added_shorthands_.empty()) {
       s << "/* Add prefix to internal symbols */\n";
@@ -434,19 +405,6 @@ namespace casadi {
       }
       s << endl;
     }
-
-    // Printing routing
-    s << "/* Printing routine */\n";
-    if (this->mex) {
-      s << "#ifdef MATLAB_MEX_FILE\n"
-        << "  #define PRINTF mexPrintf\n"
-        << "#else\n"
-        << "  #define PRINTF printf\n"
-        << "#endif\n";
-    } else {
-      s << "#define PRINTF printf\n";
-    }
-    s << endl;
 
     if (this->with_export) generate_export_symbol(s);
 
@@ -525,6 +483,31 @@ namespace casadi {
   void CodeGenerator::print_vector(std::ostream &s, const string& name,
                                   const vector<double>& v) {
     s << array("static const casadi_real", name, v.size(), initializer(v));
+  }
+
+  std::string CodeGenerator::print_op(casadi_int op, const std::string& a0) {
+    switch (op) {
+      case OP_SQ:
+        add_auxiliary(AUX_SQ);
+        return "casadi_sq("+a0+")";
+      case OP_SIGN:
+        add_auxiliary(AUX_SIGN);
+        return "casadi_sign("+a0+")";
+      default:
+        return casadi_math<double>::print(op, a0);
+    }
+  }
+  std::string CodeGenerator::print_op(casadi_int op, const std::string& a0, const std::string& a1) {
+    switch (op) {
+      case OP_FMIN:
+        add_auxiliary(AUX_FMIN);
+        return "casadi_fmin("+a0+","+a1+")";
+      case OP_FMAX:
+        add_auxiliary(AUX_FMAX);
+        return "casadi_fmax("+a0+","+a1+")";
+      default:
+        return casadi_math<double>::print(op, a0, a1);
+    }
   }
 
   void CodeGenerator::add_include(const string& new_include, bool relative_path,
@@ -755,6 +738,7 @@ namespace casadi {
       break;
     case AUX_DENSIFY:
       add_auxiliary(AUX_FILL);
+      add_auxiliary(AUX_CAST);
       {
         vector<string> inst2 = inst;
         if (inst.size()==1) inst2.push_back(inst[0]);
@@ -765,6 +749,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_trans_str, inst);
       break;
     case AUX_TO_MEX:
+      add_auxiliary(AUX_TO_DOUBLE);
       this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
                         << sanitize_source(casadi_to_mex_str, inst)
                         << "#endif\n\n";
@@ -779,10 +764,72 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_finite_diff_str, inst);
       break;
     case AUX_QR:
+      add_auxiliary(AUX_IF_ELSE);
       this->auxiliaries << sanitize_source(casadi_qr_str, inst);
       break;
     case AUX_LDL:
       this->auxiliaries << sanitize_source(casadi_ldl_str, inst);
+      break;
+    case AUX_TO_DOUBLE:
+      this->auxiliaries << "#define casadi_to_double(x) "
+                        << "(" << (this->cpp ? "static_cast<double>(x)" : "(double) x") << ")\n\n";
+      break;
+    case AUX_TO_INT:
+      this->auxiliaries << "#define casadi_to_int(x) "
+                        << "(" << (this->cpp ? "static_cast<casadi_int>(x)" : "(casadi_int) x")
+                        << ")\n\n";
+      break;
+    case AUX_CAST:
+      this->auxiliaries << "#define CASADI_CAST(x,y) "
+                        << "(" << (this->cpp ? "static_cast<x>(y)" : "(x) y") << ")\n\n";
+      break;
+    case AUX_SQ:
+      shorthand("sq");
+      this->auxiliaries << "casadi_real casadi_sq(casadi_real x) { return x*x;}\n\n";
+      break;
+    case AUX_SIGN:
+      shorthand("sign");
+      this->auxiliaries << "casadi_real casadi_sign(casadi_real x) "
+                        << "{ return x<0 ? -1 : x>0 ? 1 : x;}\n\n";
+      break;
+    case AUX_IF_ELSE:
+      shorthand("if_else");
+      this->auxiliaries << "casadi_real casadi_if_else"
+                        << "(casadi_real c, casadi_real x, casadi_real y) "
+                        << "{ return c!=0 ? x : y;}\n\n";
+      break;
+    case AUX_PRINTF:
+      if (this->mex) {
+        this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
+                          << "  #define CASADI_PRINTF mexPrintf\n"
+                          << "#else\n"
+                          << "  #define CASADI_PRINTF printf\n"
+                          << "#endif\n\n";
+      } else {
+        this->auxiliaries << "#define CASADI_PRINTF printf\n\n";
+      }
+      break;
+    case AUX_FMIN:
+      shorthand("fmin");
+      this->auxiliaries << "casadi_real casadi_fmin(casadi_real x, casadi_real y) {\n"
+                        << "/* Pre-c99 compatibility */\n"
+                        << "#if __STDC_VERSION__ < 199901L\n"
+                        << "  return x<y ? x : y;\n"
+                        << "#else\n"
+                        << "  return fmin(x, y);\n"
+                        << "#endif\n"
+                        << "}\n\n";
+      break;
+    case AUX_FMAX:
+      shorthand("fmax");
+      this->auxiliaries << "casadi_real casadi_fmax(casadi_real x, casadi_real y) {\n"
+                        << "/* Pre-c99 compatibility */\n"
+                        << "#if __STDC_VERSION__ < 199901L\n"
+                        << "  return x>y ? x : y;\n"
+                        << "#else\n"
+                        << "  return fmax(x, y);\n"
+                        << "#endif\n"
+                        << "}\n\n";
       break;
     }
   }
@@ -960,8 +1007,9 @@ namespace casadi {
 
   string CodeGenerator::printf(const string& str, const vector<string>& arg) {
     add_include("stdio.h");
+    add_auxiliary(AUX_PRINTF);
     stringstream s;
-    s << "PRINTF(\"" << str << "\"";
+    s << "CASADI_PRINTF(\"" << str << "\"";
     for (casadi_int i=0; i<arg.size(); ++i) s << ", " << arg[i];
     s << ");";
     return s.str();

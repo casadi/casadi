@@ -14,6 +14,7 @@ T1 casadi_house(T1* x, T1* beta, casadi_int n) {
   // Calculate consistently with symbolic datatypes (SXElem)
   T1 sigma_is_zero = sigma==0;
   T1 x0_nonpos = x0<=0;
+  // C-REPLACE "if_else" "casadi_if_else"
   x[0] = if_else(sigma_is_zero, 1,
                  if_else(x0_nonpos, x0-s, -sigma/(x0+s)));
   *beta = if_else(sigma_is_zero, 2*x0_nonpos, -1/(s*x[0]));

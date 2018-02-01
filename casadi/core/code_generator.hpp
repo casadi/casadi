@@ -260,7 +260,16 @@ namespace casadi {
       AUX_ND_BOOR_EVAL,
       AUX_FINITE_DIFF,
       AUX_QR,
-      AUX_LDL
+      AUX_LDL,
+      AUX_TO_DOUBLE,
+      AUX_TO_INT,
+      AUX_CAST,
+      AUX_SQ,
+      AUX_SIGN,
+      AUX_IF_ELSE,
+      AUX_PRINTF,
+      AUX_FMIN,
+      AUX_FMAX
     };
 
     /** \brief Add a built-in auxiliary function */
@@ -315,6 +324,10 @@ namespace casadi {
     std::string printf(const std::string& str, const std::string& arg1, const std::string& arg2);
     std::string printf(const std::string& str, const std::string& arg1, const std::string& arg2,
                        const std::string& arg3);
+
+    /** \brief Print an operation to a c file */
+    std::string print_op(casadi_int op, const std::string& a0);
+    std::string print_op(casadi_int op, const std::string& a0, const std::string& a1);
   private:
 
     /// Print file header

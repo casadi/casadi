@@ -156,7 +156,7 @@ namespace casadi {
     if (inplace) {
       g << casadi_math<double>::sep(op_) << "= " << y;
     } else {
-      g << " = " << casadi_math<double>::print(op_, x, y);
+      g << " = " << g.print_op(op_, x, y);
     }
     g << ";\n";
   }

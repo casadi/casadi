@@ -120,7 +120,7 @@ namespace casadi {
     }
 
     // Output the operation
-    g << r << " = " << casadi_math<double>::print(op_, " " + x + " ") << ";\n";
+    g << r << " = " << g.print_op(op_, " " + x + " ") << ";\n";
   }
 
   MX UnaryMX::get_unary(casadi_int op) const {
