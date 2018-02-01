@@ -1493,13 +1493,11 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_forward(casadi_int
-nfwd, const std::string &name, const std::vector< std::string > &inames,
-const std::vector< std::string > &onames, const Dict &opts) const  "
+%feature("docstring")  casadi::Nlpsol::get_forward(casadi_int nfwd, const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(casadi_int nfwd) if no cached version is available.
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -1958,12 +1956,10 @@ double alpha) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::has_forward(casadi_int
-nfwd) const  "
+%feature("docstring")  casadi::Nlpsol::has_forward(casadi_int nfwd) const
+override "
 
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(casadi_int nfwd) if no cached version is available.
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -2602,7 +2598,7 @@ casadi_int updateType, casadi_int hessScaling) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+%feature("docstring")  casadi::Nlpsol::uses_output() const override "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
@@ -45095,10 +45091,9 @@ bool persistent=false) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
-std::vector< MX > &arg) const  "
+%feature("docstring")  casadi::Nlpsol::uses_output() const override "
 
-[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -45256,9 +45251,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
+std::vector< MX > &arg) const  "
 
-[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
 
 ";
 
@@ -45269,13 +45265,11 @@ double **arg, double **res, casadi_int *iw, double *w) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_forward(casadi_int
-nfwd, const std::string &name, const std::vector< std::string > &inames,
-const std::vector< std::string > &onames, const Dict &opts) const  "
+%feature("docstring")  casadi::Nlpsol::get_forward(casadi_int nfwd, const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(casadi_int nfwd) if no cached version is available.
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -45456,12 +45450,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_forward(casadi_int
-nfwd) const  "
+%feature("docstring")  casadi::Nlpsol::has_forward(casadi_int nfwd) const
+override "
 
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(casadi_int nfwd) if no cached version is available.
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -53099,7 +53091,7 @@ override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+%feature("docstring")  casadi::Nlpsol::uses_output() const override "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
@@ -53262,13 +53254,11 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_forward(casadi_int
-nfwd, const std::string &name, const std::vector< std::string > &inames,
-const std::vector< std::string > &onames, const Dict &opts) const  "
+%feature("docstring")  casadi::Nlpsol::get_forward(casadi_int nfwd, const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(casadi_int nfwd) if no cached version is available.
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -53872,12 +53862,10 @@ std::vector< M > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_forward(casadi_int
-nfwd) const  "
+%feature("docstring")  casadi::Nlpsol::has_forward(casadi_int nfwd) const
+override "
 
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(casadi_int nfwd) if no cached version is available.
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -60185,13 +60173,11 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_forward(casadi_int
-nfwd, const std::string &name, const std::vector< std::string > &inames,
-const std::vector< std::string > &onames, const Dict &opts) const  "
+%feature("docstring")  casadi::Nlpsol::get_forward(casadi_int nfwd, const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(casadi_int nfwd) if no cached version is available.
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -60288,12 +60274,10 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_forward(casadi_int
-nfwd) const  "
+%feature("docstring")  casadi::Nlpsol::has_forward(casadi_int nfwd) const
+override "
 
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(casadi_int nfwd) if no cached version is available.
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -60796,7 +60780,7 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+%feature("docstring")  casadi::Nlpsol::uses_output() const override "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 

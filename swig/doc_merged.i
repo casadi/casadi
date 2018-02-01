@@ -1084,10 +1084,8 @@ function input and outputs.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::get_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(casadi_int nfwd) if
-no cached version is available.
+%feature("docstring") casadi::Blocksqp::get_forward "[INTERNAL]  Generate a
+function that calculates nfwd forward derivatives.
 
 ";
 
@@ -1376,10 +1374,8 @@ Set new primal dual iterate.
 [INTERNAL] 
 ";
 
-%feature("docstring") casadi::Blocksqp::has_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(casadi_int nfwd) if
-no cached version is available.
+%feature("docstring") casadi::Blocksqp::has_forward "[INTERNAL]  Generate a
+function that calculates nfwd forward derivatives.
 
 ";
 
@@ -32122,8 +32118,8 @@ inputs and outputs scalar.
 
 %feature("docstring") casadi::Nlpsol::monitored "[INTERNAL] ";
 
-%feature("docstring") casadi::Nlpsol::symbolic_output "[INTERNAL]  Get a
-vector of symbolic variables corresponding to the outputs.
+%feature("docstring") casadi::Nlpsol::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -32221,8 +32217,8 @@ sparsity forward.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::uses_output "[INTERNAL]  Do the
-derivative functions need nondifferentiated outputs?
+%feature("docstring") casadi::Nlpsol::symbolic_output "[INTERNAL]  Get a
+vector of symbolic variables corresponding to the outputs.
 
 ";
 
@@ -32231,10 +32227,8 @@ vectors.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::get_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(casadi_int nfwd) if
-no cached version is available.
+%feature("docstring") casadi::Nlpsol::get_forward "[INTERNAL]  Generate a
+function that calculates nfwd forward derivatives.
 
 ";
 
@@ -32359,10 +32353,8 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::has_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(casadi_int nfwd) if
-no cached version is available.
+%feature("docstring") casadi::Nlpsol::has_forward "[INTERNAL]  Generate a
+function that calculates nfwd forward derivatives.
 
 ";
 
@@ -37831,10 +37823,8 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::Scpgen::get_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(casadi_int nfwd) if
-no cached version is available.
+%feature("docstring") casadi::Scpgen::get_forward "[INTERNAL]  Generate a
+function that calculates nfwd forward derivatives.
 
 ";
 
@@ -38235,10 +38225,8 @@ the functions needed for the Lifted Newton method.
 
 ";
 
-%feature("docstring") casadi::Scpgen::has_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(casadi_int nfwd) if
-no cached version is available.
+%feature("docstring") casadi::Scpgen::has_forward "[INTERNAL]  Generate a
+function that calculates nfwd forward derivatives.
 
 ";
 
@@ -43037,10 +43025,8 @@ Symbolic expressions for the adjoint seeds.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::get_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(casadi_int nfwd) if
-no cached version is available.
+%feature("docstring") casadi::Sqpmethod::get_forward "[INTERNAL]  Generate
+a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -43100,10 +43086,8 @@ the function for evaluation and statistics gathering
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::has_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(casadi_int nfwd) if
-no cached version is available.
+%feature("docstring") casadi::Sqpmethod::has_forward "[INTERNAL]  Generate
+a function that calculates nfwd forward derivatives.
 
 ";
 
