@@ -41409,7 +41409,8 @@ Matrix< Scalar > &x) "
 
 %feature("docstring")  qr_solve(const Matrix< Scalar > &b, const Matrix<
 Scalar > &v, const Matrix< Scalar > &r, const Matrix< Scalar > &beta, const
-std::vector< casadi_int > &pinv, bool tr=false) "
+std::vector< casadi_int > &prinv, const std::vector< casadi_int > &pc, bool
+tr=false) "
 
 Solve using a sparse QR factorization.
 
@@ -42181,7 +42182,7 @@ streams.
 
 %feature("docstring")  qr_sparse(const Matrix< Scalar > &A, Matrix< Scalar >
 &V, Matrix< Scalar > &R, Matrix< Scalar > &beta, std::vector< casadi_int >
-&pinv) "
+&prinv, std::vector< casadi_int > &pc) "
 
 Sparse direct QR factorization See T. Davis: Direct Methods for Sparse
 Linear Systems.
@@ -58805,7 +58806,8 @@ Is upper triangular?
 ";
 
 %feature("docstring")  casadi::Sparsity::qr_sparse(Sparsity &output_V,
-Sparsity &output_R, std::vector< casadi_int > &output_pinv) const  "
+Sparsity &output_R, std::vector< casadi_int > &output_prinv, std::vector<
+casadi_int > &output_pc, bool amd=true) const  "
 
 Symbolic QR factorization Returns the sparsity pattern of V (compact
 representation of Q) and R as well as vectors needed for the numerical
@@ -65228,7 +65230,8 @@ const casadi_int *sp_lt, const T1 *lt, const T1 *d) "
 
 %feature("docstring")  casadi::casadi_qr_solve(T1 *x, casadi_int nrhs,
 casadi_int tr, const casadi_int *sp_v, const T1 *v, const casadi_int *sp_r,
-const T1 *r, const T1 *beta, const casadi_int *pinv, T1 *w) "
+const T1 *r, const T1 *beta, const casadi_int *prinv, const casadi_int *pc,
+T1 *w) "
 
 [INTERNAL] ";
 
@@ -65921,7 +65924,7 @@ Check if the vector is strictly decreasing.
 
 %feature("docstring")  casadi::casadi_qr(const casadi_int *sp_a, const T1
 *nz_a, T1 *x, const casadi_int *sp_v, T1 *nz_v, const casadi_int *sp_r, T1
-*nz_r, T1 *beta, const casadi_int *pinv) "
+*nz_r, T1 *beta, const casadi_int *prinv, const casadi_int *pc) "
 
 [INTERNAL] ";
 
