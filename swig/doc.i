@@ -41928,7 +41928,7 @@ Print dense matrix-stype.
 ";
 
 %feature("docstring")  ldl(const Matrix< Scalar > &A, Matrix< Scalar > &D,
-Matrix< Scalar > &LT) "
+Matrix< Scalar > &LT, std::vector< casadi_int > &p, bool amd=true) "
 
 Sparse LDL^T factorization Returns D and the strictly upper triangular
 entries of L^T I.e. ones on the diagonal are ignored. Only guarenteed to
@@ -42182,7 +42182,7 @@ streams.
 
 %feature("docstring")  qr_sparse(const Matrix< Scalar > &A, Matrix< Scalar >
 &V, Matrix< Scalar > &R, Matrix< Scalar > &beta, std::vector< casadi_int >
-&prinv, std::vector< casadi_int > &pc) "
+&prinv, std::vector< casadi_int > &pc, bool amd=true) "
 
 Sparse direct QR factorization See T. Davis: Direct Methods for Sparse
 Linear Systems.
@@ -42370,7 +42370,8 @@ Implementation of Matrix::get_nonzeros (in public API)
 ";
 
 %feature("docstring")  ldl_solve(const Matrix< Scalar > &b, const Matrix<
-Scalar > &D, const Matrix< Scalar > &LT) "
+Scalar > &D, const Matrix< Scalar > &LT, const std::vector< casadi_int > &p)
+"
 
 Solve using a sparse LDL^T factorization.
 
@@ -58966,7 +58967,8 @@ Append another sparsity patten horizontally.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::ldl() const  "
+%feature("docstring")  casadi::Sparsity::ldl(std::vector< casadi_int >
+&output_p, bool amd=true) const  "
 
 Symbolic LDL factorization Returns the sparsity pattern of L^T.
 
@@ -63702,7 +63704,7 @@ Joel Andersson
 ";
 
 %feature("docstring")  casadi::casadi_ldl(const casadi_int *sp_a, const T1
-*a, const casadi_int *sp_lt, T1 *lt, T1 *d, T1 *w) "
+*a, const casadi_int *sp_lt, T1 *lt, T1 *d, const casadi_int *p, T1 *w) "
 
 [INTERNAL] ";
 
@@ -65224,7 +65226,8 @@ SharedObjectInternal *, SharedObject > &already_copied) "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_ldl_solve(T1 *x, casadi_int nrhs,
-const casadi_int *sp_lt, const T1 *lt, const T1 *d) "
+const casadi_int *sp_lt, const T1 *lt, const T1 *d, const casadi_int *p, T1
+*w) "
 
 [INTERNAL] ";
 
