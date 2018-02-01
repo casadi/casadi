@@ -660,7 +660,7 @@ namespace casadi {
     */
     void qr_sparse(Sparsity& SWIG_OUTPUT(V), Sparsity& SWIG_OUTPUT(R),
                    std::vector<casadi_int>& SWIG_OUTPUT(prinv),
-                   std::vector<casadi_int>& SWIG_OUTPUT(pc), bool amd=false) const;
+                   std::vector<casadi_int>& SWIG_OUTPUT(pc), bool amd=true) const;
 
     /** \brief Depth-first search on the adjacency graph of the sparsity
         See Direct Methods for Sparse Linear Systems by Davis (2006).
