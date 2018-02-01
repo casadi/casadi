@@ -378,11 +378,11 @@ namespace casadi {
      */
     bool codegen_scalars;
 
-    // Have a flag for exporting symbols
-    bool with_export;
+    // Have a flag for exporting/importing symbols
+    bool with_export, with_import;
 
     // Prefix symbols in DLLs?
-    std::string dll_export;
+    std::string dll_export, dll_import;
 
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;

@@ -44,6 +44,7 @@ namespace casadi {
     this->with_header = false;
     this->with_mem = false;
     this->with_export = true;
+    this->with_import = false;
     indent_ = 2;
 
     // Read options
@@ -68,7 +69,9 @@ namespace casadi {
         this->with_mem = e.second;
       } else if (e.first=="with_export") {
         this->with_export = e.second;
-      } else if (e.first=="indent") {
+      } else if (e.first=="with_import") {
+        this->with_import = e.second;
+      }  else if (e.first=="indent") {
         indent_ = e.second;
         casadi_assert_dev(indent_>=0);
       } else {
@@ -91,9 +94,8 @@ namespace casadi {
     }
 
     // Symbol prefix
-    if (this->with_export) {
-      dll_export = "CASADI_SYMBOL_EXPORT ";
-    }
+    if (this->with_export) dll_export = "CASADI_SYMBOL_EXPORT ";
+    if (this->with_import) dll_import = "CASADI_SYMBOL_IMPORT ";
 
     // Make sure that the base name is sane
     casadi_assert_dev(Function::check_name(this->name));
@@ -240,17 +242,17 @@ namespace casadi {
 
   void  CodeGenerator::generate_import_symbol(std::ostream &s) const {
       s << "/* Symbol visibility in DLLs */\n"
-      << "#ifndef CASADI_SYMBOL_EXPORT\n"
+      << "#ifndef CASADI_SYMBOL_IMPORT\n"
       << "  #if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)\n"
       << "    #if defined(STATIC_LINKED)\n"
-      << "      #define CASADI_SYMBOL_EXPORT\n"
+      << "      #define CASADI_SYMBOL_IMPORT\n"
       << "    #else\n"
-      << "      #define CASADI_SYMBOL_EXPORT __declspec(dllimport)\n"
+      << "      #define CASADI_SYMBOL_IMPORT __declspec(dllimport)\n"
       << "    #endif\n"
       << "  #elif defined(__GNUC__) && defined(GCC_HASCLASSVISIBILITY)\n"
-      << "    #define CASADI_SYMBOL_EXPORT __attribute__ ((visibility (\"default\")))\n"
+      << "    #define CASADI_SYMBOL_IMPORT __attribute__ ((visibility (\"default\")))\n"
       << "  #else"  << endl
-      << "    #define CASADI_SYMBOL_EXPORT\n"
+      << "    #define CASADI_SYMBOL_IMPORT\n"
       << "  #endif\n"
       << "#endif\n\n";
   }
@@ -293,11 +295,11 @@ namespace casadi {
       // Define the casadi_real type (typically double)
       generate_casadi_real(s);
 
-      // Generate export symbol macros
-      if (this->with_export) generate_import_symbol(s);
-
       // Define the casadi_int type
       generate_casadi_int(s);
+
+      // Generate export symbol macros
+      if (this->with_import) generate_import_symbol(s);
 
       // Add declarations
       s << this->header.str();
@@ -934,7 +936,7 @@ namespace casadi {
 
     // To header file
     if (this->with_header) {
-      this->header << cpp_prefix << s << ";\n";
+      this->header << cpp_prefix << this->dll_import << s << ";\n";
     }
 
     // Return name with declarations
