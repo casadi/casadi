@@ -619,9 +619,15 @@ namespace casadi {
     // Dimensions
     casadi_int size1=this->size1(), size2=this->size2();
 
-    // Recursive call if amd
+    // Recursive call if AMD
     if (amd) {
-      casadi_error("not ready");
+      // Get AMD reordering
+      pc = mtimes(T(), *this).amd();
+      // Permute sparsity pattern
+      std::vector<casadi_int> tmp;
+      Sparsity Aperm = sub(range(size1), pc, tmp);
+      // Call recursively
+      return Aperm.qr_sparse(V, R, prinv, tmp, false);
     }
 
     // No column permutation
@@ -645,6 +651,7 @@ namespace casadi {
     SparsityInternal::qr_sparsities(*this, nrow_ext, get_ptr(sp_v), get_ptr(sp_r),
                                     get_ptr(leftmost), get_ptr(parent), get_ptr(prinv),
                                     get_ptr(iw));
+    prinv.resize(nrow_ext);
     V = compressed(sp_v);
     R = compressed(sp_r);
   }

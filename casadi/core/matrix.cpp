@@ -1928,7 +1928,7 @@ namespace casadi {
     casadi_int nrow = b.size1(), nrhs = b.size2();
     casadi_assert(r.size()==v.size(), "'r', 'v' dimension mismatch");
     casadi_assert(beta.is_vector() && beta.numel()==ncol, "'beta' has wrong dimension");
-    casadi_assert(prinv.size()==nrow+ncol, "'pinv' has wrong dimension");
+    casadi_assert(prinv.size()==r.size1(), "'pinv' has wrong dimension");
     // Work vector
     std::vector<Scalar> w(nrow+ncol);
     // Return value
