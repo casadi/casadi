@@ -537,4 +537,112 @@ namespace casadi {
     oracle_.disp(stream, true);
   }
 
+  Function Nlpsol::
+  get_forward(casadi_int nfwd, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
+              const Dict& opts) const {
+    // Symbolic expression for the input
+    vector<MX> arg = mx_in(), res = mx_out();
+    vector<vector<MX>> fseed = fwd_seed<MX>(nfwd), fsens;
+
+    // Initial guesses not used for derivative calculations
+    for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
+      arg[i] = MX::sym(arg[i].name(), Sparsity(arg[i].size()));
+    }
+
+    // Calculates Hessian of the Lagrangian and Jacobian of the constraints
+    Function HJ_fun = oracle_.factory("HJ", {"x", "p", "lam:f", "lam:g"},
+      {"g", "jac:g:x", "grad:gamma:x", "sym:hess:gamma:x:x"},
+      {{"gamma", {"f", "g"}}});
+
+    // Optimal solution
+    MX x = res[NLPSOL_X];
+    MX p = res[NLPSOL_P];
+    MX lam_g = res[NLPSOL_LAM_G];
+
+    // Inputs used
+    MX lbx = arg[NLPSOL_LBX];
+    MX ubx = arg[NLPSOL_UBX];
+    MX lbg = arg[NLPSOL_LBG];
+    MX ubg = arg[NLPSOL_UBG];
+
+    // Hessian of the Lagrangian, Jacobian of the constraints
+    vector<MX> HJ_res = HJ_fun({x, p, 1, lam_g});
+    MX g = HJ_res[0];
+    MX JG = HJ_res[1];
+    MX lam_x = -HJ_res[2];
+    MX HL = HJ_res[3];
+
+    // Make sure that lam_x is zero if bounds are inactive
+    lam_x = if_else(fmin(ubx-x, x-lbx)<1e-9, lam_x, 0);
+
+    // Active bounds
+    MX lam_x_pos = lam_x>0;
+    MX lam_x_neg = lam_x<0;
+    MX lam_g_pos = lam_g>0;
+    MX lam_g_neg = lam_g<0;
+
+    // Common
+    MX alpha_x = if_else(lam_x_pos, ubx, 0) + if_else(lam_x_neg, lbx, 0);
+    MX alpha_g = if_else(lam_g_pos, ubg, 0) + if_else(lam_g_neg, lbg, 0);
+    MX a = alpha_x-x;
+
+    // KKT matrix
+    MX H_11 = mtimes(diag(a), HL) + diag(lam_x);
+    MX H_12 = mtimes(diag(a), JG.T());
+    MX H_21 = -mtimes(diag(lam_g), JG);
+    MX H_22 = diag(alpha_g - g);
+    MX H = MX::blockcat({{H_11, H_12}, {H_21, H_22}});
+
+    // Calculate sensitivities
+    fsens.resize(nfwd);
+    for (casadi_int d=0; d<nfwd; ++d) {
+      // Forward seeds
+      MX fwd_lbx = fseed[d][NLPSOL_LBX];
+      MX fwd_ubx = fseed[d][NLPSOL_UBX];
+      MX fwd_lbg = fseed[d][NLPSOL_LBG];
+      MX fwd_ubg = fseed[d][NLPSOL_UBG];
+
+      // Propagate forward seeds
+      MX fwd_alpha_x = if_else(lam_x_pos, fwd_ubx, 0) + if_else(lam_x_neg, fwd_lbx, 0);
+      MX fwd_alpha_g = if_else(lam_g_pos, fwd_ubg, 0) + if_else(lam_g_neg, fwd_lbg, 0);
+      MX v_x = -lam_x * fwd_alpha_x;
+      MX v_lam_g = lam_g * fwd_alpha_g;
+      MX v = MX::vertcat({v_x, v_lam_g});
+
+      // Solve
+      v = -MX::solve(H, v, "qr");
+
+      // Extract sensitivities in x, lam_x and lam_g
+      vector<MX> v_split = vertsplit(v, {0, nx_, nx_+ng_});
+      MX fwd_x = v_split[0];
+      MX fwd_lam_g = v_split[1];
+
+      // Save to fsens
+      fsens[d].resize(NLPSOL_NUM_OUT);
+      fsens[d][NLPSOL_X] = fwd_x;
+      fsens[d][NLPSOL_F] = MX(size_out(NLPSOL_F));
+      fsens[d][NLPSOL_G] = MX(size_out(NLPSOL_G));
+      fsens[d][NLPSOL_LAM_X] = MX(size_out(NLPSOL_LAM_X));
+      fsens[d][NLPSOL_LAM_G] = fwd_lam_g;
+      fsens[d][NLPSOL_LAM_P] = MX(size_out(NLPSOL_LAM_P));
+    }
+
+    // Gather return values
+    arg.insert(arg.end(), res.begin(), res.end());
+    vector<MX> v(nfwd);
+    for (casadi_int i=0; i<NLPSOL_NUM_IN; ++i) {
+      for (casadi_int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
+      arg.push_back(horzcat(v));
+    }
+    res.clear();
+    for (casadi_int i=0; i<NLPSOL_NUM_OUT; ++i) {
+      for (casadi_int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
+      res.push_back(horzcat(v));
+    }
+
+    return Function(name, arg, res, inames, onames, opts);
+  }
+
 } // namespace casadi

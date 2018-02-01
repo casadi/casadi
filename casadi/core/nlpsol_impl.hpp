@@ -152,6 +152,18 @@ namespace casadi {
     // Solve the NLP
     virtual void solve(void* mem) const = 0;
 
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    bool uses_output() const override {return true;}
+
+    ///@{
+    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    bool has_forward(casadi_int nfwd) const override { return true;}
+    Function get_forward(casadi_int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
+
     // Creator function for internal class
     typedef Nlpsol* (*Creator)(const std::string& name, const Function& oracle);
 
