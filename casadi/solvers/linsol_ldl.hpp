@@ -100,6 +100,7 @@ namespace casadi {
     std::string class_name() const override { return "LinsolLdl";}
 
     // Symbolic factorization
+    std::vector<casadi_int> p_;
     Sparsity sp_Lt_;
   };
 

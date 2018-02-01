@@ -1901,11 +1901,12 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::
-  qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar> &R,
-            Matrix<Scalar>& beta, std::vector<casadi_int>& prinv, std::vector<casadi_int>& pc) {
+  qr_sparse(const Matrix<Scalar>& A,
+    Matrix<Scalar>& V, Matrix<Scalar> &R, Matrix<Scalar>& beta,
+    std::vector<casadi_int>& prinv, std::vector<casadi_int>& pc, bool amd) {
     // Calculate the pattern
     Sparsity spV, spR;
-    A.sparsity().qr_sparse(spV, spR, prinv, pc);
+    A.sparsity().qr_sparse(spV, spR, prinv, pc, amd);
     // Calculate the nonzeros
     casadi_int nrow_ext = spV.size1(), ncol = spV.size2();
     V = nan(spV);
@@ -1979,10 +1980,10 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::ldl(const Matrix<Scalar>& A,
-                           Matrix<Scalar> &D, Matrix<Scalar>& LT) {
+  void Matrix<Scalar>::ldl(const Matrix<Scalar>& A, Matrix<Scalar> &D,
+    Matrix<Scalar>& LT, std::vector<casadi_int>& p, bool amd) {
     // Symbolic factorization
-    Sparsity Lt_sp = A.sparsity().ldl();
+    Sparsity Lt_sp = A.sparsity().ldl(p, amd);
 
     // Get dimension
     casadi_int n=A.size1();
@@ -1990,7 +1991,7 @@ namespace casadi {
     // Calculate entries in L and D
     vector<Scalar> D_nz(n), L_nz(Lt_sp.nnz()), w(n);
     casadi_ldl(A.sparsity(), get_ptr(A.nonzeros()), Lt_sp,
-              get_ptr(L_nz), get_ptr(D_nz), get_ptr(w));
+              get_ptr(L_nz), get_ptr(D_nz), get_ptr(p), get_ptr(w));
 
     // Assemble L and D
     LT = Matrix<Scalar>(Lt_sp, L_nz);
@@ -1999,14 +2000,17 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::
-  ldl_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& D, const Matrix<Scalar>& LT) {
+  ldl_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& D, const Matrix<Scalar>& LT,
+            const std::vector<casadi_int>& p) {
     // Get dimensions, check consistency
     casadi_int n = b.size1(), nrhs = b.size2();
+    casadi_assert(p.size()==n, "'p' has wrong dimension");
     casadi_assert(LT.size1()==n && LT.size2()==n, "'LT' has wrong dimension");
     casadi_assert(D.is_vector() && D.numel()==n, "'D' has wrong dimension");
-    // Return value
+    // Solve for all right-hand-sides
     Matrix<Scalar> x = densify(b);
-    casadi_ldl_solve(x.ptr(), nrhs, LT.sparsity(), LT.ptr(), D.ptr());
+    std::vector<Scalar> w(n);
+    casadi_ldl_solve(x.ptr(), nrhs, LT.sparsity(), LT.ptr(), D.ptr(), get_ptr(p), get_ptr(w));
     return x;
   }
 
@@ -2056,7 +2060,8 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::chol(const Matrix<Scalar>& A) {
     // Perform an LDL transformation
     Matrix<Scalar> D, LT;
-    ldl(A, D, LT);
+    std::vector<casadi_int> p;
+    ldl(A, D, LT, p, false);
     // Add unit diagonal
     LT += Matrix<Scalar>::eye(D.size1());
     // Get the cholesky factor: R*R' = L*D*L' = (sqrt(D)*L')'*(sqrt(D)*L')

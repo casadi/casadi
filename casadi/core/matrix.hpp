@@ -434,15 +434,16 @@ namespace casadi {
     static Matrix<Scalar> eig_symbolic(const Matrix<Scalar>& m);
     static void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
                           Matrix<Scalar>& beta, std::vector<casadi_int>& prinv,
-                          std::vector<casadi_int>& pc);
+                          std::vector<casadi_int>& pc, bool amd=true);
     static Matrix<Scalar> qr_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& v,
                                    const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
-                                   const std::vector<casadi_int>& prinv, 
+                                   const std::vector<casadi_int>& prinv,
                                    const std::vector<casadi_int>& pc, bool tr=false);
     static void qr(const Matrix<Scalar>& A, Matrix<Scalar>& Q, Matrix<Scalar>& R);
-    static void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& D, Matrix<Scalar>& LT);
+    static void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& D, Matrix<Scalar>& LT,
+                    std::vector<casadi_int>& p, bool amd=true);
     static Matrix<Scalar> ldl_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& D,
-                                    const Matrix<Scalar>& LT);
+                                    const Matrix<Scalar>& LT, const std::vector<casadi_int>& p);
     static Matrix<Scalar> all(const Matrix<Scalar>& x);
     static Matrix<Scalar> any(const Matrix<Scalar>& x);
     static Matrix<Scalar> adj(const Matrix<Scalar>& x);
@@ -498,8 +499,8 @@ namespace casadi {
      */
     friend inline void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
                                  Matrix<Scalar>& beta, std::vector<casadi_int>& prinv,
-                                 std::vector<casadi_int>& pc) {
-      return Matrix<Scalar>::qr_sparse(A, V, R, beta, prinv, pc);
+                                 std::vector<casadi_int>& pc, bool amd=true) {
+      return Matrix<Scalar>::qr_sparse(A, V, R, beta, prinv, pc, amd);
     }
 
     /** \brief Solve using a sparse QR factorization */
@@ -524,14 +525,16 @@ namespace casadi {
      * I.e. ones on the diagonal are ignored.
      * Only guarenteed to work for positive definite matrices.
      */
-    friend inline void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& D, Matrix<Scalar>& LT) {
-      return Matrix<Scalar>::ldl(A, D, LT);
+    friend inline void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& D, Matrix<Scalar>& LT,
+                           std::vector<casadi_int>& p, bool amd=true) {
+      return Matrix<Scalar>::ldl(A, D, LT, p, amd);
     }
 
     /** \brief Solve using a sparse LDL^T factorization */
     friend inline Matrix<Scalar>
-    ldl_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& D, const Matrix<Scalar>& LT) {
-      return Matrix<Scalar>::ldl_solve(b, D, LT);
+    ldl_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& D, const Matrix<Scalar>& LT,
+              const std::vector<casadi_int>& p) {
+      return Matrix<Scalar>::ldl_solve(b, D, LT, p);
     }
 
     /** \brief Returns true only if any element in the matrix is true

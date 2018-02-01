@@ -593,11 +593,23 @@ namespace casadi {
     return parent;
   }
 
-  Sparsity Sparsity::ldl() const {
+  Sparsity Sparsity::ldl(std::vector<casadi_int>& p, bool amd) const {
     casadi_assert(is_symmetric(),
                  "LDL factorization requires a symmetric matrix");
+    // Recursive call if AMD
+    if (amd) {
+      // Get AMD reordering
+      p = this->amd();
+      // Permute sparsity pattern
+      std::vector<casadi_int> tmp;
+      Sparsity Aperm = sub(p, p, tmp);
+      // Call recursively
+      return Aperm.ldl(tmp, false);
+    }
     // Dimension
     casadi_int n=size1();
+    // Natural ordering
+    p = range(n);
     // Work vector
     std::vector<casadi_int> w(3*n);
     // Elimination tree

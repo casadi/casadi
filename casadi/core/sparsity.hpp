@@ -649,7 +649,7 @@ namespace casadi {
         Copyright(c) Timothy A. Davis, 2005-2013
         Licensed as a derivative work under the GNU LGPL
     */
-    Sparsity ldl() const;
+    Sparsity ldl(std::vector<casadi_int>& SWIG_OUTPUT(p), bool amd=true) const;
 
     /** \brief Symbolic QR factorization
         Returns the sparsity pattern of V (compact representation of Q) and R

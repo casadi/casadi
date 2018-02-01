@@ -58,7 +58,7 @@ namespace casadi {
     LinsolInternal::init(opts);
 
     // Symbolic factorization
-    sp_Lt_ = sp_.ldl();
+    sp_Lt_ = sp_.ldl(p_);
   }
 
   int LinsolLdl::init_mem(void* mem) const {
@@ -80,13 +80,16 @@ namespace casadi {
 
   int LinsolLdl::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    casadi_ldl(sp_, A, sp_Lt_, get_ptr(m->l), get_ptr(m->d), get_ptr(m->w));
+    casadi_ldl(sp_, A, sp_Lt_, get_ptr(m->l), get_ptr(m->d), get_ptr(p_), get_ptr(m->w));
+    for (double d : m->d) {
+      if (d==0) casadi_warning("LDL factorization has zeros in D");
+    }
     return 0;
   }
 
   int LinsolLdl::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    casadi_ldl_solve(x, nrhs, sp_Lt_, get_ptr(m->l), get_ptr(m->d));
+    casadi_ldl_solve(x, nrhs, sp_Lt_, get_ptr(m->l), get_ptr(m->d), get_ptr(p_), get_ptr(m->w));
     return 0;
   }
 
@@ -113,19 +116,20 @@ namespace casadi {
     // Codegen the integer vectors
     string sp = g.sparsity(sp_);
     string sp_Lt = g.sparsity(sp_Lt_);
+    string p = g.constant(p_);
 
     // Place in block to avoid conflicts caused by local variables
     g << "{\n";
-    // Work vectors TODO(@jaeandersson): Use work vectors from Solve
+    g.comment("FIXME(@jaeandersson): Memory allocation can be avoided");
     g << "casadi_real lt[" << sp_Lt_.nnz() << "], "
          "d[" << nrow() << "], "
          "w[" << nrow() << "];\n";
 
     // Factorize
-    g << g.ldl(sp, A, sp_Lt, "lt", "d", "w") << "\n";
+    g << g.ldl(sp, A, sp_Lt, "lt", "d", p, "w") << "\n";
 
     // Solve
-    g << g.ldl_solve(x, nrhs, sp_Lt, "lt", "d") << "\n";
+    g << g.ldl_solve(x, nrhs, sp_Lt, "lt", "d", p, "w") << "\n";
 
     // End of block
     g << "}\n";

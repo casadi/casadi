@@ -213,12 +213,14 @@ namespace casadi {
     /** \brief LDL factorization */
     std::string ldl(const std::string& sp_a, const std::string& a,
                    const std::string& sp_lt, const std::string& lt,
-                   const std::string& d, const std::string& w);
+                   const std::string& d, const std::string& p,
+                   const std::string& w);
 
     /** \brief LDL solve */
     std::string ldl_solve(const std::string& x, casadi_int nrhs,
                          const std::string& sp_lt, const std::string& lt,
-                         const std::string& d);
+                         const std::string& d, const std::string& p,
+                         const std::string& w);
 
     /** \brief Declare a function */
     std::string declare(std::string s);

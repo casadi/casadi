@@ -3129,8 +3129,8 @@ DECL void casadi_qr(const M& A, M& OUTPUT1, M& OUTPUT2) {
 }
 
 DECL void casadi_qr_sparse(const M& A, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3,
-          std::vector<casadi_int>& OUTPUT4, std::vector<casadi_int>& OUTPUT5) {
-  return qr_sparse(A, OUTPUT1, OUTPUT2, OUTPUT3, OUTPUT4, OUTPUT5);
+          std::vector<casadi_int>& OUTPUT4, std::vector<casadi_int>& OUTPUT5, bool amd=true) {
+  return qr_sparse(A, OUTPUT1, OUTPUT2, OUTPUT3, OUTPUT4, OUTPUT5, amd);
 }
 
 DECL M casadi_qr_solve(const M& b, const M& v, const M& r, const M& beta,
@@ -3139,12 +3139,12 @@ DECL M casadi_qr_solve(const M& b, const M& v, const M& r, const M& beta,
   return qr_solve(b, v, r, beta, prinv, pc, tr);
 }
 
-DECL void casadi_ldl(const M& A, M& OUTPUT1, M& OUTPUT2) {
-  return ldl(A, OUTPUT1, OUTPUT2);
+DECL void casadi_ldl(const M& A, M& OUTPUT1, M& OUTPUT2, std::vector<casadi_int>& OUTPUT3, bool amd=true) {
+  return ldl(A, OUTPUT1, OUTPUT2, OUTPUT3, amd);
 }
 
-DECL M casadi_ldl_solve(const M& b, const M& D, const M& LT) {
-  return ldl_solve(b, D, LT);
+DECL M casadi_ldl_solve(const M& b, const M& D, const M& LT, const std::vector<casadi_int>& p) {
+  return ldl_solve(b, D, LT, p);
 }
 
 DECL M casadi_chol(const M& A) {

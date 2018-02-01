@@ -418,6 +418,7 @@ class LinearSolverTests(casadiTestCase):
 
       ref = np.linalg.solve(A,b)
       for Solver, options, req in lsolvers:
+        if "posdef" in req: continue
         As = MX.sym("A",A.sparsity())
         bs = MX.sym("B",b.sparsity())
         C = solve(A,b,Solver,options)

@@ -148,26 +148,25 @@ void casadi_qr_solve(T1* x, casadi_int nrhs, casadi_int tr,
   casadi_int nrow_ext = sp_v[0], ncol = sp_v[1];
   for (k=0; k<nrhs; ++k) {
     if (tr) {
-      // ('P'Q R)' x = R'Q'P x = b <-> x = P' Q R' \ b
-      // Copy to w
+      // (PR' Q R PC)' x = PC' R' Q' PR x = b <-> x = PR' Q R' \ PC b
+      // Multiply by PC
       for (c=0; c<ncol; ++c) w[c] = x[pc[c]];
       //  Solve for R'
       casadi_qr_trs(sp_r, r, w, 1);
       // Multiply by Q
       casadi_qr_mv(sp_v, v, beta, w, 0);
-      // Multiply by P'
+      // Multiply by PR'
       for (c=0; c<ncol; ++c) x[c] = w[prinv[c]];
     } else {
-      //P'Q R x = b <-> x = R \ Q' P b
-      // Multiply with P
-      // C-REPLACE "T1(0)" "0"
-      casadi_fill(w, nrow_ext, T1(0));
+      //PR' Q R PC x = b <-> x = PC' R \ Q' PR b
+      // Multiply with PR
+      for (c=0; c<nrow_ext; ++c) w[c] = 0;
       for (c=0; c<ncol; ++c) w[prinv[c]] = x[c];
       // Multiply with Q'
       casadi_qr_mv(sp_v, v, beta, w, 1);
       //  Solve for R
       casadi_qr_trs(sp_r, r, w, 0);
-      // Copy to x
+      // Multiply with PC'
       for (c=0; c<ncol; ++c) x[pc[c]] = w[c];
     }
     x += ncol;

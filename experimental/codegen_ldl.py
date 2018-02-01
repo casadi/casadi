@@ -13,8 +13,8 @@ x0 = solve(A0, b0)
 print(x0)
 
 # Test sparse QR
-[D, LT] = ldl(A0)
-x0 = ldl_solve(b0, D, LT)
+[D, LT, p] = ldl(A0)
+x0 = ldl_solve(b0, D, LT, p)
 print(x0)
 
 A = MX.sym('A', Asp)

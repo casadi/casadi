@@ -104,7 +104,7 @@ namespace casadi {
 
     // Place in block to avoid conflicts caused by local variables
     g << "{\n";
-    // Work vectors TODO(@jaeandersson): Use work vectors from Solve
+    g.comment("FIXME(@jaeandersson): Memory allocation can be avoided");
     g << "casadi_real v[" << sp_v_.nnz() << "], "
          "r[" << sp_r_.nnz() << "], "
          "beta[" << ncol() << "], "

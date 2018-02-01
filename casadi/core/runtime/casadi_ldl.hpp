@@ -5,21 +5,22 @@
 // len[w] >= n
 template<typename T1>
 void casadi_ldl(const casadi_int* sp_a, const T1* a,
-                const casadi_int* sp_lt, T1* lt, T1* d, T1* w) {
+                const casadi_int* sp_lt, T1* lt, T1* d, const casadi_int* p, T1* w) {
   // Extract sparsities
   int n=sp_lt[1];
   const casadi_int *lt_colind=sp_lt+2, *lt_row=sp_lt+2+n+1;
   const casadi_int *a_colind=sp_a+2, *a_row=sp_a+2+n+1;
   // Local variables
-  casadi_int r, c, k, k2;
+  casadi_int r, c, c1, k, k2;
   // Clear w
   for (r=0; r<n; ++r) w[r] = 0;
   // Sparse copy of A to L and D
   for (c=0; c<n; ++c) {
-    for (k=a_colind[c]; k<a_colind[c+1]; ++k) w[a_row[k]] = a[k];
-    for (k=lt_colind[c]; k<lt_colind[c+1]; ++k) lt[k] = w[lt_row[k]];
-    d[c] = w[c];
-    for (k=a_colind[c]; k<a_colind[c+1]; ++k) w[a_row[k]] = 0;
+    c1 = p[c];
+    for (k=a_colind[c1]; k<a_colind[c1+1]; ++k) w[a_row[k]] = a[k];
+    for (k=lt_colind[c]; k<lt_colind[c+1]; ++k) lt[k] = w[p[lt_row[k]]];
+    d[c] = w[p[c]];
+    for (k=a_colind[c1]; k<a_colind[c1+1]; ++k) w[a_row[k]] = 0;
   }
   // Loop over columns of L
   for (c=0; c<n; ++c) {
@@ -66,20 +67,24 @@ void casadi_ldl_trs(const casadi_int* sp_r, const T1* nz_r, T1* x, casadi_int tr
 }
 
 // SYMBOL "ldl_solve"
-// Linear solve using an LDL factorized linear system
+// Linear solve using an LDL^T factorized linear system
 template<typename T1>
 void casadi_ldl_solve(T1* x, casadi_int nrhs, const casadi_int* sp_lt, const T1* lt,
-                      const T1* d) {
+                      const T1* d, const casadi_int* p, T1* w) {
   casadi_int n = sp_lt[1];
   casadi_int i, k;
   for (k=0; k<nrhs; ++k) {
-    //      LDL'x = b <=> x = L'\D\L\b
+    // P' L D L' P x = b <=> x = P' L' \ D \ L \ P b
+    // Multiply by P
+    for (i=0; i<n; ++i) w[i] = x[p[i]];
     //  Solve for L
-    casadi_ldl_trs(sp_lt, lt, x, 1);
+    casadi_ldl_trs(sp_lt, lt, w, 1);
     // Divide by D
-    for (i=0; i<n; ++i) x[i] /= d[i];
+    for (i=0; i<n; ++i) w[i] /= d[i];
     // Solve for L'
-    casadi_ldl_trs(sp_lt, lt, x, 0);
+    casadi_ldl_trs(sp_lt, lt, w, 0);
+    // Multiply by P'
+    for (i=0; i<n; ++i) x[p[i]] = w[i];
     // Next rhs
     x += n;
   }
