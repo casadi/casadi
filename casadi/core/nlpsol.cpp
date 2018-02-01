@@ -553,13 +553,15 @@ namespace casadi {
 
     // Calculates Hessian of the Lagrangian and Jacobian of the constraints
     Function HJ_fun = oracle_.factory("HJ", {"x", "p", "lam:f", "lam:g"},
-      {"g", "jac:g:x", "grad:gamma:x", "sym:hess:gamma:x:x"},
+      {"jac:g:x", "grad:gamma:x", "sym:hess:gamma:x:x"},
       {{"gamma", {"f", "g"}}});
 
     // Optimal solution
     MX x = res[NLPSOL_X];
     MX p = res[NLPSOL_P];
     MX lam_g = res[NLPSOL_LAM_G];
+    MX f = res[NLPSOL_F];
+    MX g = res[NLPSOL_G];
 
     // Inputs used
     MX lbx = arg[NLPSOL_LBX];
@@ -569,10 +571,9 @@ namespace casadi {
 
     // Hessian of the Lagrangian, Jacobian of the constraints
     vector<MX> HJ_res = HJ_fun({x, p, 1, lam_g});
-    MX g = HJ_res[0];
-    MX JG = HJ_res[1];
-    MX lam_x = -HJ_res[2];
-    MX HL = HJ_res[3];
+    MX JG = HJ_res[0];
+    MX lam_x = -HJ_res[1];
+    MX HL = HJ_res[2];
 
     // Make sure that lam_x is zero if bounds are inactive
     lam_x = if_else(fmin(ubx-x, x-lbx)<1e-9, lam_x, 0);
