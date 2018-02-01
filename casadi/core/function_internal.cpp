@@ -1234,7 +1234,7 @@ namespace casadi {
           casadi_assert_dev(sp.size1()==nnz_out(oind));
 
           // New row for each old row
-          vector<casadi_int> row_map = sparsity_out_.at(oind).find();
+          vector<casadi_int> row_map = sparsity_out(oind).find();
 
           // Insert rows
           sp.enlargeRows(numel_out(oind), row_map);
@@ -1245,7 +1245,7 @@ namespace casadi {
           casadi_assert_dev(sp.size2()==nnz_in(iind));
 
           // New column for each old column
-          vector<casadi_int> col_map = sparsity_in_.at(iind).find();
+          vector<casadi_int> col_map = sparsity_in(iind).find();
 
           // Insert columns
           sp.enlargeColumns(numel_in(iind), col_map);
@@ -2309,11 +2309,11 @@ namespace casadi {
   }
 
   const SX FunctionInternal::sx_in(casadi_int ind) const {
-    return SX::sym("x_" + str(ind), sparsity_in_.at(ind));
+    return SX::sym("x_" + str(ind), sparsity_in(ind));
   }
 
   const SX FunctionInternal::sx_out(casadi_int ind) const {
-    return SX::sym("r_" + str(ind), sparsity_out_.at(ind));
+    return SX::sym("r_" + str(ind), sparsity_out(ind));
   }
 
   const std::vector<SX> FunctionInternal::sx_in() const {
@@ -2333,11 +2333,11 @@ namespace casadi {
   }
 
   const MX FunctionInternal::mx_in(casadi_int ind) const {
-    return MX::sym("x_" + str(ind), sparsity_in_.at(ind));
+    return MX::sym("x_" + str(ind), sparsity_in(ind));
   }
 
   const MX FunctionInternal::mx_out(casadi_int ind) const {
-    return MX::sym("r_" + str(ind), sparsity_out_.at(ind));
+    return MX::sym("r_" + str(ind), sparsity_out(ind));
   }
 
   const std::vector<MX> FunctionInternal::mx_in() const {
@@ -2612,9 +2612,9 @@ namespace casadi {
     vector<vector<Sparsity>> blocks = blocksplit(sp, v_offset, h_offset);
     // Save to jac_sparsity_ and jac_sparsity_compact_
     for (casadi_int oind=0; oind<n_out_; ++oind) {
-      vector<casadi_int> row_nz = sparsity_out_.at(oind).find();
+      vector<casadi_int> row_nz = sparsity_out(oind).find();
       for (casadi_int iind=0; iind<n_in_; ++iind) {
-        vector<casadi_int> col_nz = sparsity_in_.at(iind).find();
+        vector<casadi_int> col_nz = sparsity_in(iind).find();
         const Sparsity& sp = blocks.at(oind).at(iind);
         jac_sparsity_.elem(oind, iind) = sp;
         vector<casadi_int> mapping;

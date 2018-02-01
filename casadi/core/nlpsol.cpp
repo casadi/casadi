@@ -622,11 +622,11 @@ namespace casadi {
       // Save to fsens
       fsens[d].resize(NLPSOL_NUM_OUT);
       fsens[d][NLPSOL_X] = fwd_x;
-      fsens[d][NLPSOL_F] = MX(size_out(NLPSOL_F));
-      fsens[d][NLPSOL_G] = MX(size_out(NLPSOL_G));
-      fsens[d][NLPSOL_LAM_X] = MX(size_out(NLPSOL_LAM_X));
+      fsens[d][NLPSOL_F] = MX::nan(sparsity_out(NLPSOL_F));
+      fsens[d][NLPSOL_G] = MX::nan(sparsity_out(NLPSOL_G));
+      fsens[d][NLPSOL_LAM_X] = MX::nan(sparsity_out(NLPSOL_LAM_X));
       fsens[d][NLPSOL_LAM_G] = fwd_lam_g;
-      fsens[d][NLPSOL_LAM_P] = MX(size_out(NLPSOL_LAM_P));
+      fsens[d][NLPSOL_LAM_P] = MX::nan(sparsity_out(NLPSOL_LAM_P));
     }
 
     // Gather return values

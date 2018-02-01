@@ -484,31 +484,37 @@ namespace casadi {
     ///@{
     /** \brief Number of input/output nonzeros */
     casadi_int nnz_in() const;
-    casadi_int nnz_in(casadi_int ind) const { return sparsity_in_.at(ind).nnz(); }
+    casadi_int nnz_in(casadi_int ind) const { return sparsity_in(ind).nnz(); }
     casadi_int nnz_out() const;
-    casadi_int nnz_out(casadi_int ind) const { return sparsity_out_.at(ind).nnz(); }
+    casadi_int nnz_out(casadi_int ind) const { return sparsity_out(ind).nnz(); }
     ///@}
 
     ///@{
     /** \brief Number of input/output elements */
     casadi_int numel_in() const;
-    casadi_int numel_in(casadi_int ind) const { return sparsity_in_.at(ind).numel(); }
-    casadi_int numel_out(casadi_int ind) const { return sparsity_out_.at(ind).numel(); }
+    casadi_int numel_in(casadi_int ind) const { return sparsity_in(ind).numel(); }
+    casadi_int numel_out(casadi_int ind) const { return sparsity_out(ind).numel(); }
     casadi_int numel_out() const;
     ///@}
 
     ///@{
     /** \brief Input/output dimensions */
-    casadi_int size1_in(casadi_int ind) const { return sparsity_in_.at(ind).size1(); }
-    casadi_int size2_in(casadi_int ind) const { return sparsity_in_.at(ind).size2(); }
-    casadi_int size1_out(casadi_int ind) const { return sparsity_out_.at(ind).size1(); }
-    casadi_int size2_out(casadi_int ind) const { return sparsity_out_.at(ind).size2(); }
+    casadi_int size1_in(casadi_int ind) const { return sparsity_in(ind).size1(); }
+    casadi_int size2_in(casadi_int ind) const { return sparsity_in(ind).size2(); }
+    casadi_int size1_out(casadi_int ind) const { return sparsity_out(ind).size1(); }
+    casadi_int size2_out(casadi_int ind) const { return sparsity_out(ind).size2(); }
     std::pair<casadi_int, casadi_int> size_in(casadi_int ind) const {
-      return sparsity_in_.at(ind).size();
+      return sparsity_in(ind).size();
     }
     std::pair<casadi_int, casadi_int> size_out(casadi_int ind) const {
-      return sparsity_out_.at(ind).size();
+      return sparsity_out(ind).size();
     }
+    ///@}
+
+    ///@{
+    /** \brief Input/output sparsity */
+    const Sparsity& sparsity_in(casadi_int ind) const { return sparsity_in_.at(ind); }
+    const Sparsity& sparsity_out(casadi_int ind) const { return sparsity_out_.at(ind); }
     ///@}
 
     ///@{
@@ -782,7 +788,7 @@ namespace casadi {
       fseed[dir].resize(n_in_);
       for (casadi_int iind=0; iind<n_in_; ++iind) {
         std::string n = "f" + str(dir) + "_" +  name_in_[iind];
-        fseed[dir][iind] = MatType::sym(n, sparsity_in_.at(iind));
+        fseed[dir][iind] = MatType::sym(n, sparsity_in(iind));
       }
     }
     return fseed;
@@ -878,22 +884,22 @@ namespace casadi {
     bool matching_sparsity = true;
     casadi_assert_dev(arg.size()==n_in_);
     for (casadi_int i=0; matching_sparsity && i<n_in_; ++i)
-      matching_sparsity = arg[i].sparsity()==sparsity_in_.at(i);
+      matching_sparsity = arg[i].sparsity()==sparsity_in(i);
 
     // Correct input sparsity if needed
     if (!matching_sparsity) {
       std::vector<Matrix<D> > arg2(arg);
       for (casadi_int i=0; i<n_in_; ++i)
-        if (arg2[i].sparsity()!=sparsity_in_.at(i))
-          arg2[i] = project(arg2[i], sparsity_in_.at(i));
+        if (arg2[i].sparsity()!=sparsity_in(i))
+          arg2[i] = project(arg2[i], sparsity_in(i));
       return call_gen(arg2, res, always_inline, never_inline);
     }
 
     // Allocate results
     res.resize(n_out_);
     for (casadi_int i=0; i<n_out_; ++i) {
-      if (res[i].sparsity()!=sparsity_out_.at(i)) {
-        res[i] = Matrix<D>::zeros(sparsity_out_.at(i));
+      if (res[i].sparsity()!=sparsity_out(i)) {
+        res[i] = Matrix<D>::zeros(sparsity_out(i));
       }
     }
 
@@ -919,7 +925,7 @@ namespace casadi {
     casadi_assert(arg.size()==n_in_, "Incorrect number of inputs: Expected "
                           + str(n_in_) + ", got " + str(arg.size()));
     for (casadi_int i=0; i<n_in_; ++i) {
-      casadi_assert(check_mat(arg[i].sparsity(), sparsity_in_.at(i)),
+      casadi_assert(check_mat(arg[i].sparsity(), sparsity_in(i)),
                             "Input " + str(i) + " (" + name_in_[i] + ") has mismatching shape. "
                             "Expected " + str(size_in(i)) + ", got " + str(arg[i].size()));
     }
@@ -930,7 +936,7 @@ namespace casadi {
     casadi_assert(res.size()==n_out_, "Incorrect number of outputs: Expected "
                           + str(n_out_) + ", got " + str(res.size()));
     for (casadi_int i=0; i<n_out_; ++i) {
-      casadi_assert(check_mat(res[i].sparsity(), sparsity_out_.at(i)),
+      casadi_assert(check_mat(res[i].sparsity(), sparsity_out(i)),
                             "Output " + str(i) + " (" + name_out_[i] + ") has mismatching shape. "
                             "Expected " + str(size_out(i)) + ", got " + str(res[i].size()));
     }
@@ -976,14 +982,14 @@ namespace casadi {
   template<typename M>
   std::vector<M> FunctionInternal::replace_arg(const std::vector<M>& arg) const {
     std::vector<M> r(arg.size());
-    for (casadi_int i=0; i<r.size(); ++i) r[i] = replace_mat(arg[i], sparsity_in_.at(i));
+    for (casadi_int i=0; i<r.size(); ++i) r[i] = replace_mat(arg[i], sparsity_in(i));
     return r;
   }
 
   template<typename M>
   std::vector<M> FunctionInternal::replace_res(const std::vector<M>& res) const {
     std::vector<M> r(res.size());
-    for (casadi_int i=0; i<r.size(); ++i) r[i] = replace_mat(res[i], sparsity_out_.at(i));
+    for (casadi_int i=0; i<r.size(); ++i) r[i] = replace_mat(res[i], sparsity_out(i));
     return r;
   }
 
