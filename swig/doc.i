@@ -63836,6 +63836,11 @@ bvec_t &r) "
 
 ";
 
+%feature("docstring")  casadi::casadi_fill_casadi_int(casadi_int *x,
+casadi_int n, casadi_int alpha) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::conic_options(const std::string &name) "
 
 Get all options for a plugin.
@@ -64335,11 +64340,6 @@ Check if a particular plugin is available.
 
 %feature("docstring")  casadi::casadi_central_diff(T1 **yk, T1 *y0, T1 *J,
 T1 h, casadi_int n_y, const casadi_finite_diff_mem< T1 > *m) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_copy_s_t(const casadi_int *x,
-casadi_int n, casadi_int *y) "
 
 [INTERNAL] ";
 
@@ -67562,11 +67562,6 @@ iwork:  A integer work vector that you must allocate Minimum size:
 y.size1()+x.size2()+1
 
 ";
-
-%feature("docstring")  casadi::casadi_fill_s_t(casadi_int *x, casadi_int n,
-casadi_int alpha) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_qr_mv(const casadi_int *sp_v, const T1
 *v, const T1 *beta, T1 *x, casadi_int tr) "

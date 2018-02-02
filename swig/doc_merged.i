@@ -45744,6 +45744,8 @@ Check if the vector is strictly increasing.
 
 %feature("docstring") casadi::Contraction "";
 
+%feature("docstring") casadi::casadi_fill_casadi_int "[INTERNAL] ";
+
 %feature("docstring") casadi::conic_options "
 
 Get all options for a plugin.
@@ -46172,8 +46174,6 @@ Check if a particular plugin is available.
 ";
 
 %feature("docstring") casadi::casadi_central_diff "[INTERNAL] ";
-
-%feature("docstring") casadi::casadi_copy_s_t "[INTERNAL] ";
 
 %feature("docstring") casadi::integrator "
 
@@ -49200,8 +49200,6 @@ iwork:  A integer work vector that you must allocate Minimum size:
 y.size1()+x.size2()+1
 
 ";
-
-%feature("docstring") casadi::casadi_fill_s_t "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_qr_mv "[INTERNAL] ";
 
