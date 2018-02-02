@@ -44,6 +44,7 @@ namespace casadi {
     this->with_header = false;
     this->with_mem = false;
     this->with_export = true;
+    this->with_import = false;
     avoid_stack_ = false;
     indent_ = 2;
 
