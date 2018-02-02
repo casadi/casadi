@@ -255,7 +255,7 @@ matrix:
         - popd
         - #export PYTHONPATH=$PYTHONPATH:`pwd`/python_install
         - otool -l /usr/local/python/casadi/_casadi.so
-        - ls $DYLD_LIBRARY_PATH
+        - echo $DYLD_LIBRARY_PATH
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         - pushd test && make unittests_py || remote_access && popd
 
