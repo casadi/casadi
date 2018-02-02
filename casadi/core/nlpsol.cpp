@@ -554,6 +554,7 @@ namespace casadi {
     MX x = res[NLPSOL_X];
     MX lam_g = res[NLPSOL_LAM_G];
     MX lam_x = res[NLPSOL_LAM_X];
+    MX lam_p = res[NLPSOL_LAM_P];
     MX f = res[NLPSOL_F];
     MX g = res[NLPSOL_G];
 
@@ -621,25 +622,35 @@ namespace casadi {
 
     // Calculate sensitivities in f and g
     Function fwd_oracle = oracle_.forward(nfwd);
-    vector<MX> vv(NL_NUM_IN + NL_NUM_OUT + NL_NUM_IN);
-    vv[NL_X] = x;
-    vv[NL_P] = p;
-    vv[NL_NUM_IN + NL_F] = f;
-    vv[NL_NUM_IN + NL_G] = g;
-    vv[NL_NUM_IN + NL_NUM_OUT + NL_X] = fwd_x;
-    vv[NL_NUM_IN + NL_NUM_OUT + NL_P] = fwd_p;
+    vector<MX> vv = {x, p, f, g, fwd_x, fwd_p};
     vv = fwd_oracle(vv);
     MX fwd_f = vv[NL_F];
     MX fwd_g = vv[NL_G];
+
+    // Calculate sensitivities in lam_x, lam_g
+    Function rev_oracle = oracle_.reverse(1);
+    // rev_reverse has the signature
+    // (x, p, out_f, out_g, adj_f, adj_g) -> (adj_x, adj_p)
+    // with adj_f=1, adj_g=lam_g, adj_x = -lam_x, adj_p = -lam_p
+    Function fwd_rev_oracle = rev_oracle.forward(nfwd);
+    // fwd_rev_oracle has the signature
+    // (x, p, out_f, out_g, adj_f, adj_g, out_adj_x, out_adj_p,
+    //  fwd_x, fwd_p, fwd_out_f, fwd_out_g, fwd_adj_f, fwd_adj_g)
+    // -> (fwd_adj_x, fwd_adj_p)
+    vv = {x, p, f, g, 1, lam_g, -lam_x, -lam_p,
+          fwd_x, fwd_p, fwd_f, fwd_g, 0, fwd_lam_g};
+    vv = fwd_rev_oracle(vv);
+    MX fwd_lam_x = -vv[NL_X];
+    MX fwd_lam_p = -vv[NL_P];
 
     // Forward sensitivities
     vector<MX> fsens(NLPSOL_NUM_OUT);
     fsens[NLPSOL_X] = fwd_x;
     fsens[NLPSOL_F] = fwd_f;
     fsens[NLPSOL_G] = fwd_g;
-    fsens[NLPSOL_LAM_X] = MX::nan(repmat(sparsity_out(NLPSOL_LAM_X), 1, nfwd));
+    fsens[NLPSOL_LAM_X] = fwd_lam_x;
     fsens[NLPSOL_LAM_G] = fwd_lam_g;
-    fsens[NLPSOL_LAM_P] = MX::nan(repmat(sparsity_out(NLPSOL_LAM_P), 1, nfwd));
+    fsens[NLPSOL_LAM_P] = fwd_lam_p;
 
     // Gather return values
     arg.insert(arg.end(), res.begin(), res.end());
