@@ -15,7 +15,8 @@ void casadi_nd_boor_eval(T1* ret, casadi_int n_dims, const T1* all_knots, const 
   coeff_offset[n_dims] = 0;
 
   casadi_int n_iter = 1;
-  for (casadi_int k=0;k<n_dims;++k) {
+  casadi_int k, i;
+  for (k=0;k<n_dims;++k) {
     T1* boor = all_boor+boor_offset[k];
 
     casadi_int degree = all_degree[k];
@@ -52,15 +53,16 @@ void casadi_nd_boor_eval(T1* ret, casadi_int n_dims, const T1* all_knots, const 
   casadi_fill_casadi_int(index, n_dims, 0);
 
   // Prepare cumulative product
-  for (casadi_int pivot=n_dims-1;pivot>=0;--pivot) {
+  casadi_int pivot;
+  for (pivot=n_dims-1;pivot>=0;--pivot) {
     cumprod[pivot] = (*(all_boor+boor_offset[pivot]))*cumprod[pivot+1];
     coeff_offset[pivot] = starts[pivot]*strides[pivot]+coeff_offset[pivot+1];
   }
 
-  for (casadi_int k=0;k<n_iter;++k) {
+  for (k=0;k<n_iter;++k) {
 
     // accumulate result
-    for (casadi_int i=0;i<m;++i) {
+    for (i=0;i<m;++i) {
       if (reverse) {
         ret[coeff_offset[0]+i] += c[i]*cumprod[0];
       } else {
