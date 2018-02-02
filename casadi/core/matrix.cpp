@@ -1214,12 +1214,12 @@ namespace casadi {
   matrix_matrix(casadi_int op, const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
     // Check, correct dimensions
     if (x.size() != y.size()) {
-      // x and y are multiples of each other?
+      // x and y are horizontal multiples of each other?
       if (!x.is_empty() && !y.is_empty()) {
-        if (x.size1() % y.size1() == 0 && x.size2() % y.size2() == 0) {
-          return matrix_matrix(op, x, repmat(y, x.size1() / y.size1(), x.size2() / y.size2()));
-        } else if (y.size1() % x.size1() == 0 && y.size2() % x.size2() == 0) {
-          return matrix_matrix(op, repmat(x, y.size1() / x.size1(), y.size2() / x.size2()), y);
+        if (x.size1() == y.size1() && x.size2() % y.size2() == 0) {
+          return matrix_matrix(op, x, repmat(y, 1, x.size2() / y.size2()));
+        } else if (y.size1() == x.size1() && y.size2() % x.size2() == 0) {
+          return matrix_matrix(op, repmat(x, 1, y.size2() / x.size2()), y);
         }
       }
       // Dimension mismatch
