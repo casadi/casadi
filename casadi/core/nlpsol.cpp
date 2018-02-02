@@ -605,12 +605,10 @@ namespace casadi {
     }
 
     // Propagate forward seeds
-    MX fwd_alpha_x = if_else(repmat(lam_x_pos, 1, nfwd), fwd_ubx, 0)
-      + if_else(repmat(lam_x_neg, 1, nfwd), fwd_lbx, 0);
-    MX fwd_alpha_g = if_else(repmat(lam_g_pos, 1, nfwd), fwd_ubg, 0)
-      + if_else(repmat(lam_g_neg, 1, nfwd), fwd_lbg, 0);
-    MX v_x = -repmat(lam_x, 1, nfwd) * fwd_alpha_x;
-    MX v_lam_g = repmat(lam_g, 1, nfwd) * fwd_alpha_g;
+    MX fwd_alpha_x = if_else(lam_x_pos, fwd_ubx, 0) + if_else(lam_x_neg, fwd_lbx, 0);
+    MX fwd_alpha_g = if_else(lam_g_pos, fwd_ubg, 0) + if_else(lam_g_neg, fwd_lbg, 0);
+    MX v_x = -lam_x * fwd_alpha_x;
+    MX v_lam_g = lam_g * fwd_alpha_g;
     MX v = MX::vertcat({v_x, v_lam_g});
 
     // Solve

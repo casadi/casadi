@@ -1131,19 +1131,18 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::binary(casadi_int op,
                                             const Matrix<Scalar> &x,
                                             const Matrix<Scalar> &y) {
-    if (x.numel()==1)
+    if (x.is_scalar()) {
       return scalar_matrix(op, x, y);
-    else if (y.numel()==1)
+    } else if (y.is_scalar()) {
       return matrix_scalar(op, x, y);
-    else
+    } else {
       return matrix_matrix(op, x, y);
+    }
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::scalar_matrix(casadi_int op,
-                                                   const Matrix<Scalar> &x,
-                                                   const Matrix<Scalar> &y) {
-
+  Matrix<Scalar> Matrix<Scalar>::
+  scalar_matrix(casadi_int op, const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
     if ( (operation_checker<FX0Checker>(op) && y.nnz()==0) ||
          (operation_checker<F0XChecker>(op) && x.nnz()==0))
             return Matrix<Scalar>::zeros(Sparsity(y.size()));
@@ -1176,9 +1175,8 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::matrix_scalar(casadi_int op,
-                                                   const Matrix<Scalar> &x,
-                                                   const Matrix<Scalar> &y) {
+  Matrix<Scalar> Matrix<Scalar>::
+  matrix_scalar(casadi_int op, const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
 
     if ( (operation_checker<FX0Checker>(op) && y.nnz()==0) ||
          (operation_checker<F0XChecker>(op) && x.nnz()==0))
@@ -1212,22 +1210,29 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::matrix_matrix(casadi_int op,
-                                               const Matrix<Scalar> &x,
-                                               const Matrix<Scalar> &y) {
-    casadi_assert(x.size()==y.size(),
-      "Dimension mismatch in element-wise operation %s.\n"
-      "Left argument is %s, right is %s. "
-      "Dimensions should be equal.",
-      casadi_math<Scalar>::print(op, "lhs", "rhs"), x.dim(), y.dim());
+  Matrix<Scalar> Matrix<Scalar>::
+  matrix_matrix(casadi_int op, const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
+    // Check, correct dimensions
+    if (x.size() != y.size()) {
+      // x and y are multiples of each other?
+      if (!x.is_empty() && !y.is_empty()) {
+        if (x.size1() % y.size1() == 0 && x.size2() % y.size2() == 0) {
+          return matrix_matrix(op, x, repmat(y, x.size1() / y.size1(), x.size2() / y.size2()));
+        } else if (y.size1() % x.size1() == 0 && y.size2() % x.size2() == 0) {
+          return matrix_matrix(op, repmat(x, y.size1() / x.size1(), y.size2() / x.size2()), y);
+        }
+      }
+      // Dimension mismatch
+      casadi_error("Dimension mismatch for " + casadi_math<Scalar>::print(op, "x", "y") +
+                   ", x is " + x.dim() + ", while y is " + y.dim());
+    }
 
     // Get the sparsity pattern of the result
     // (ignoring structural zeros giving rise to nonzero result)
     const Sparsity& x_sp = x.sparsity();
     const Sparsity& y_sp = y.sparsity();
-    Sparsity r_sp = x_sp.combine(y_sp,
-                                        operation_checker<F0XChecker>(op),
-                                        operation_checker<FX0Checker>(op));
+    Sparsity r_sp = x_sp.combine(y_sp, operation_checker<F0XChecker>(op),
+                                 operation_checker<FX0Checker>(op));
 
     // Return value
     Matrix<Scalar> r = zeros(r_sp);
@@ -1235,24 +1240,20 @@ namespace casadi {
     // Perform the operations elementwise
     if (x_sp==y_sp) {
       // Matching sparsities
-      casadi_math<Scalar>::fun(op, get_ptr(x.nonzeros()), get_ptr(y.nonzeros()),
-                                 get_ptr(r.nonzeros()), r_sp.nnz());
+      casadi_math<Scalar>::fun(op, x.ptr(), y.ptr(), r.ptr(), r_sp.nnz());
     } else if (y_sp==r_sp) {
       // Project first argument
       Matrix<Scalar> x_mod = x(r_sp);
-      casadi_math<Scalar>::fun(op, get_ptr(x_mod.nonzeros()), get_ptr(y.nonzeros()),
-                                 get_ptr(r.nonzeros()), r_sp.nnz());
+      casadi_math<Scalar>::fun(op, x_mod.ptr(), y.ptr(), r.ptr(), r_sp.nnz());
     } else if (x_sp==r_sp) {
       // Project second argument
       Matrix<Scalar> y_mod = y(r_sp);
-      casadi_math<Scalar>::fun(op, get_ptr(x.nonzeros()),
-                                 get_ptr(y_mod.nonzeros()), get_ptr(r.nonzeros()), r_sp.nnz());
+      casadi_math<Scalar>::fun(op, x.ptr(), y_mod.ptr(), r.ptr(), r_sp.nnz());
     } else {
       // Project both arguments
       Matrix<Scalar> x_mod = x(r_sp);
       Matrix<Scalar> y_mod = y(r_sp);
-      casadi_math<Scalar>::fun(op, get_ptr(x_mod.nonzeros()), get_ptr(y_mod.nonzeros()),
-                                 get_ptr(r.nonzeros()), r_sp.nnz());
+      casadi_math<Scalar>::fun(op, x_mod.ptr(), y_mod.ptr(), r.ptr(), r_sp.nnz());
     }
 
     // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
@@ -1260,7 +1261,7 @@ namespace casadi {
       // Get the value for the structural zeros
       Scalar fcn_0;
       casadi_math<Scalar>::fun(op, casadi_limits<Scalar>::zero,
-                                 casadi_limits<Scalar>::zero, fcn_0);
+                               casadi_limits<Scalar>::zero, fcn_0);
       r = densify(r, fcn_0);
     }
 

@@ -444,6 +444,21 @@ namespace casadi {
   }
 
   MX MX::binary(casadi_int op, const MX &x, const MX &y) {
+    // Check, correct dimensions
+    if (x.size()!=y.size() && !x.is_scalar() && !y.is_scalar()) {
+      // x and y are multiples of each other?
+      if (!x.is_empty() && !y.is_empty()) {
+        if (x.size1() % y.size1() == 0 && x.size2() % y.size2() == 0) {
+          return binary(op, x, repmat(y, x.size1() / y.size1(), x.size2() / y.size2()));
+        } else if (y.size1() % x.size1() == 0 && y.size2() % x.size2() == 0) {
+          return binary(op, repmat(x, y.size1() / x.size1(), y.size2() / x.size2()), y);
+        }
+      }
+      // Dimension mismatch
+      casadi_error("Dimension mismatch for " + casadi_math<double>::print(op, "x", "y") +
+                   ", x is " + x.dim() + ", while y is " + y.dim());
+    }
+    // Call internal class
     return x->get_binary(op, y);
   }
 
