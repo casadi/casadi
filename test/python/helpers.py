@@ -525,8 +525,13 @@ class casadiTestCase(unittest.TestCase):
       Fout = F.call(inputs)
       Fout2 = F2.call(inputs)
 
-      for i in range(F.n_out()):
-        self.checkarray(Fout[i],Fout2[i])
+      if isinstance(inputs, dict):
+        self.assertEqual(F.name_out(), F2.name_out())
+        for k in F.name_out():
+          self.checkarray(Fout[k],Fout2[k])
+      else:
+        for i in range(F.n_out()):
+          self.checkarray(Fout[i],Fout2[i])
 
 
 class run_only(object):

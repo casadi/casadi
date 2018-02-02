@@ -2586,6 +2586,30 @@ class MXtests(casadiTestCase):
     with self.assertInException("incompatible dimensions"):
       mtimes(DM(Sparsity.lower(5)),MX.sym('x',100))
     
+  def test_monitor(self):
+    x = MX.sym("x")
+    y = sqrt(x.monitor("hey"))
+
+    f = Function('f',[x],[y])
+    with capture_stdout() as out:
+      f(3)
+    self.assertTrue(out[0]=="hey:\n[3]\n")
+
+    with capture_stdout() as out2:
+      self.check_codegen(f,inputs=[3])
+    
+    self.assertTrue(out2[0]=="hey:\n[3]\n")
+
+  def test_codegen_specials(self):
+    x = MX.sym("x")
+    y = MX.sym("y")
+
+    for z in [ x**2, if_else(y>0,2*x,x*y), fmin(x,y), fmax(x,y), sign(x*y)]:
+      f = Function('f',[x,y],[z])
+      self.check_codegen(f,inputs=[1,2])
+      self.check_codegen(f,inputs=[1,-2])
+
+
 
 if __name__ == '__main__':
     unittest.main()

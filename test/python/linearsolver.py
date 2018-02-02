@@ -328,7 +328,11 @@ class LinearSolverTests(casadiTestCase):
 
       solution = Function("solution", {"A":A, "B":b, "X":vertcat(*[(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])}, ["A", "B"], ["X"])
 
-      self.checkfunction(relay,solution,inputs=solver_in,jacobian=False,evals=False)
+
+      self.checkfunction(relay,solution,inputs=solver_in)
+
+      if Solver in ["qr","ldl"]:
+        self.check_codegen(relay,inputs=solver_in)
 
   @memory_heavy()
   def test_simple_solve_node(self):
