@@ -1607,6 +1607,13 @@ class Functiontests(casadiTestCase):
     self.checkfunction(LUT,LUT_sep, inputs=[0.2,0.333])
     self.check_codegen(LUT,inputs=[0.2,0.333])
 
+  def test_codegen_avoid_stack(self):
+    x = SX.sym("x",3,3)
+    f = Function('f',[x],[det(x)])
+    np.random.seed(0)
+    self.check_codegen(f,inputs=[np.random.random((3,3))])
+    self.check_codegen(f,inputs=[np.random.random((3,3))], opts={"avoid_stack": True})
+  
 
 if __name__ == '__main__':
     unittest.main()

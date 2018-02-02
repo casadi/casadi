@@ -1710,6 +1710,10 @@ namespace casadi {
     // Codegen sparsities
     codegen_sparsities(g);
 
+    // Determine work vector size
+    int sz_w_codegen = sz_w();
+    if (is_a("SXFunction", true) && !g.avoid_stack()) sz_w_codegen = 0;
+
     // Function that returns work vector lengths
     g << g.declare(
         "casadi_int " + name_ + "_work(casadi_int *sz_arg, casadi_int* sz_res, "
@@ -1718,7 +1722,7 @@ namespace casadi {
       << "if (sz_arg) *sz_arg = " << sz_arg() << ";\n"
       << "if (sz_res) *sz_res = " << sz_res() << ";\n"
       << "if (sz_iw) *sz_iw = " << sz_iw() << ";\n"
-      << "if (sz_w) *sz_w = " << sz_w() << ";\n"
+      << "if (sz_w) *sz_w = " << sz_w_codegen << ";\n"
       << "return 0;\n"
       << "}\n\n";
 

@@ -44,7 +44,7 @@ namespace casadi {
     this->with_header = false;
     this->with_mem = false;
     this->with_export = true;
-    this->with_import = false;
+    avoid_stack_ = false;
     indent_ = 2;
 
     // Read options
@@ -71,9 +71,11 @@ namespace casadi {
         this->with_export = e.second;
       } else if (e.first=="with_import") {
         this->with_import = e.second;
-      }  else if (e.first=="indent") {
+      } else if (e.first=="indent") {
         indent_ = e.second;
         casadi_assert_dev(indent_>=0);
+      } else if (e.first=="avoid_stack") {
+        avoid_stack_ = e.second;
       } else {
         casadi_error("Unrecongnized option: " + str(e.first));
       }
@@ -1135,6 +1137,19 @@ namespace casadi {
       // Consistency check
       casadi_assert(it->second.first==type, "Type mismatch for " + name);
       casadi_assert(it->second.second==ref, "Type mismatch for " + name);
+    }
+  }
+
+  std::string CodeGenerator::sx_work(casadi_int i) {
+    if (avoid_stack_) {
+      return "w[" + str(i) + "]";
+    } else {
+      std::string name = "a"+str(i);
+
+      // Make sure work vector element has been declared
+      local(name, "casadi_real");
+
+      return name;
     }
   }
 

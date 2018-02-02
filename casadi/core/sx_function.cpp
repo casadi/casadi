@@ -155,13 +155,11 @@ namespace casadi {
     for (auto&& a : algorithm_) {
       if (a.op==OP_OUTPUT) {
         g << "if (res[" << a.i0 << "]!=0) "
-          << "res["<< a.i0 << "][" << a.i2 << "]=" << "a" << a.i1;
+          << "res["<< a.i0 << "][" << a.i2 << "]=" << g.sx_work(a.i1);
       } else {
-        // Make sure work vector element has been declared
-        g.local("a" + str(a.i0), "casadi_real");
 
         // Where to store the result
-        g << "a" << a.i0 << "=";
+        g << g.sx_work(a.i0) << "=";
 
         // What to store
         if (a.op==OP_CONST) {
@@ -171,8 +169,8 @@ namespace casadi {
         } else {
           casadi_int ndep = casadi_math<double>::ndeps(a.op);
           casadi_assert_dev(ndep>0);
-          if (ndep==1) g << g.print_op(a.op, "a"+str(a.i1));
-          if (ndep==2) g << g.print_op(a.op, "a"+str(a.i1), "a"+str(a.i2));
+          if (ndep==1) g << g.print_op(a.op, g.sx_work(a.i1));
+          if (ndep==2) g << g.print_op(a.op, g.sx_work(a.i1), g.sx_work(a.i2));
         }
       }
       g  << ";\n";

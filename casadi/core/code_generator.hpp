@@ -123,6 +123,9 @@ namespace casadi {
     /** \brief Declare a local variable */
     void local(const std::string& name, const std::string& type, const std::string& ref="");
 
+    /** \brief Declare a work vector element */
+    std::string sx_work(casadi_int i);
+
     /** \brief Specify the default value for a local variable */
     void init_local(const std::string& name, const std::string& def);
 
@@ -131,6 +134,9 @@ namespace casadi {
 
     /** \brief Decrease indentation */
     void unindent() {current_indent_--;}
+
+    /** \brief Avoid stack? */
+    bool avoid_stack() { return avoid_stack_;}
 
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);
@@ -384,6 +390,9 @@ namespace casadi {
 
     // Should we generate a main (allowing evaluation from command line)
     bool main;
+
+    // Do we want to be lean on stack usage?
+    bool avoid_stack_;
 
     /** \brief Codegen scalar
      * Use the work vector for storing work vector elements of length 1
