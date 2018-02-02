@@ -544,7 +544,6 @@ namespace casadi {
               const Dict& opts) const {
     // Symbolic expression for the input
     vector<MX> arg = mx_in(), res = mx_out();
-    vector<vector<MX>> fseed = fwd_seed<MX>(nfwd), fsens;
 
     // Initial guesses not used for derivative calculations
     for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
@@ -596,52 +595,48 @@ namespace casadi {
     MX H_22 = diag(alpha_g - g);
     MX H = MX::blockcat({{H_11, H_12}, {H_21, H_22}});
 
-    // Calculate sensitivities
-    fsens.resize(nfwd);
-    for (casadi_int d=0; d<nfwd; ++d) {
-      // Forward seeds
-      MX fwd_lbx = fseed[d][NLPSOL_LBX];
-      MX fwd_ubx = fseed[d][NLPSOL_UBX];
-      MX fwd_lbg = fseed[d][NLPSOL_LBG];
-      MX fwd_ubg = fseed[d][NLPSOL_UBG];
+    // Sensitivity inputs
+    vector<MX> fseed(NLPSOL_NUM_IN);
+    MX fwd_lbx = fseed[NLPSOL_LBX] = MX::sym("fwd_lbx", repmat(x.sparsity(), 1, nfwd));
+    MX fwd_ubx = fseed[NLPSOL_UBX] = MX::sym("fwd_ubx", repmat(x.sparsity(), 1, nfwd));
+    MX fwd_lbg = fseed[NLPSOL_LBG] = MX::sym("fwd_lbg", repmat(g.sparsity(), 1, nfwd));
+    MX fwd_ubg = fseed[NLPSOL_UBG] = MX::sym("fwd_ubg", repmat(g.sparsity(), 1, nfwd));
 
-      // Propagate forward seeds
-      MX fwd_alpha_x = if_else(lam_x_pos, fwd_ubx, 0) + if_else(lam_x_neg, fwd_lbx, 0);
-      MX fwd_alpha_g = if_else(lam_g_pos, fwd_ubg, 0) + if_else(lam_g_neg, fwd_lbg, 0);
-      MX v_x = -lam_x * fwd_alpha_x;
-      MX v_lam_g = lam_g * fwd_alpha_g;
-      MX v = MX::vertcat({v_x, v_lam_g});
-
-      // Solve
-      v = -MX::solve(H, v, "qr");
-
-      // Extract sensitivities in x, lam_x and lam_g
-      vector<MX> v_split = vertsplit(v, {0, nx_, nx_+ng_});
-      MX fwd_x = v_split[0];
-      MX fwd_lam_g = v_split[1];
-
-      // Save to fsens
-      fsens[d].resize(NLPSOL_NUM_OUT);
-      fsens[d][NLPSOL_X] = fwd_x;
-      fsens[d][NLPSOL_F] = MX::nan(sparsity_out(NLPSOL_F));
-      fsens[d][NLPSOL_G] = MX::nan(sparsity_out(NLPSOL_G));
-      fsens[d][NLPSOL_LAM_X] = MX::nan(sparsity_out(NLPSOL_LAM_X));
-      fsens[d][NLPSOL_LAM_G] = fwd_lam_g;
-      fsens[d][NLPSOL_LAM_P] = MX::nan(sparsity_out(NLPSOL_LAM_P));
+    // Guesses are unused
+    for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
+      fseed[i] = MX(repmat(Sparsity(arg[i].size()), 1, nfwd));
     }
+
+    // Propagate forward seeds
+    MX fwd_alpha_x = if_else(repmat(lam_x_pos, 1, nfwd), fwd_ubx, 0)
+      + if_else(repmat(lam_x_neg, 1, nfwd), fwd_lbx, 0);
+    MX fwd_alpha_g = if_else(repmat(lam_g_pos, 1, nfwd), fwd_ubg, 0)
+      + if_else(repmat(lam_g_neg, 1, nfwd), fwd_lbg, 0);
+    MX v_x = -repmat(lam_x, 1, nfwd) * fwd_alpha_x;
+    MX v_lam_g = repmat(lam_g, 1, nfwd) * fwd_alpha_g;
+    MX v = MX::vertcat({v_x, v_lam_g});
+
+    // Solve
+    v = -MX::solve(H, v, "qr");
+
+    // Extract sensitivities in x, lam_x and lam_g
+    vector<MX> v_split = vertsplit(v, {0, nx_, nx_+ng_});
+    MX fwd_x = v_split[0];
+    MX fwd_lam_g = v_split[1];
+
+    // Forward sensitivities
+    vector<MX> fsens(NLPSOL_NUM_OUT);
+    fsens[NLPSOL_X] = fwd_x;
+    fsens[NLPSOL_F] = MX::nan(repmat(sparsity_out(NLPSOL_F), 1, nfwd));
+    fsens[NLPSOL_G] = MX::nan(repmat(sparsity_out(NLPSOL_G), 1, nfwd));
+    fsens[NLPSOL_LAM_X] = MX::nan(repmat(sparsity_out(NLPSOL_LAM_X), 1, nfwd));
+    fsens[NLPSOL_LAM_G] = fwd_lam_g;
+    fsens[NLPSOL_LAM_P] = MX::nan(repmat(sparsity_out(NLPSOL_LAM_P), 1, nfwd));
 
     // Gather return values
     arg.insert(arg.end(), res.begin(), res.end());
-    vector<MX> v(nfwd);
-    for (casadi_int i=0; i<NLPSOL_NUM_IN; ++i) {
-      for (casadi_int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
-      arg.push_back(horzcat(v));
-    }
-    res.clear();
-    for (casadi_int i=0; i<NLPSOL_NUM_OUT; ++i) {
-      for (casadi_int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
-      res.push_back(horzcat(v));
-    }
+    arg.insert(arg.end(), fseed.begin(), fseed.end());
+    res = fsens;
 
     return Function(name, arg, res, inames, onames, opts);
   }
