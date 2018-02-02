@@ -550,14 +550,10 @@ namespace casadi {
       arg[i] = MX::sym(arg[i].name(), Sparsity(arg[i].size()));
     }
 
-    // Calculates Hessian of the Lagrangian and Jacobian of the constraints
-    Function HJ_fun = oracle_.factory("HJ", {"x", "p", "lam:f", "lam:g"},
-      {"jac:g:x", "grad:gamma:x", "sym:hess:gamma:x:x"},
-      {{"gamma", {"f", "g"}}});
-
     // Optimal solution
     MX x = res[NLPSOL_X];
     MX lam_g = res[NLPSOL_LAM_G];
+    MX lam_x = res[NLPSOL_LAM_X];
     MX f = res[NLPSOL_F];
     MX g = res[NLPSOL_G];
 
@@ -568,14 +564,14 @@ namespace casadi {
     MX ubg = arg[NLPSOL_UBG];
     MX p = arg[NLPSOL_P];
 
+    // Calculates Hessian of the Lagrangian and Jacobian of the constraints
+    Function HJ_fun = oracle_.factory("HJ", {"x", "p", "lam:f", "lam:g"},
+      {"jac:g:x", "sym:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+
     // Hessian of the Lagrangian, Jacobian of the constraints
     vector<MX> HJ_res = HJ_fun({x, p, 1, lam_g});
     MX JG = HJ_res[0];
-    MX lam_x = -HJ_res[1];
-    MX HL = HJ_res[2];
-
-    // Make sure that lam_x is zero if bounds are inactive
-    lam_x = if_else(fmin(ubx-x, x-lbx)<1e-9, lam_x, 0);
+    MX HL = HJ_res[1];
 
     // Active bounds
     MX lam_x_pos = lam_x>0;
