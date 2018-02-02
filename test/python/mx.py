@@ -2597,8 +2597,8 @@ class MXtests(casadiTestCase):
 
     with capture_stdout() as out2:
       self.check_codegen(f,inputs=[3])
-    
-    self.assertTrue(out2[0]=="hey:\n[3]\n")
+    if args.run_slow:
+      self.assertTrue(out2[0]=="hey:\n[3]\n")
 
   def test_codegen_specials(self):
     x = MX.sym("x")
