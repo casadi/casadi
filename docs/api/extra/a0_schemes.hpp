@@ -51,6 +51,14 @@
 <tr><td>DAE_QUAD</td><td>quad</td><td>Right hand side of quadratures equations.</td></tr>
 </table>
 */
+/** \defgroup scheme_RootfinderInput
+<a name='schemes'></a><table>
+<caption>Input scheme: casadi::RootfinderInput  (ROOTFINDER_NUM_IN = 2)</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>ROOTFINDER_X0</td><td>x0</td><td>Initial guess for the solution.</td></tr>
+<tr><td>ROOTFINDER_P</td><td>p</td><td>Parameters.</td></tr>
+</table>
+*/
 /** \defgroup scheme_DAEInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::DAEInput  (DAE_NUM_IN = 4)</caption>
@@ -116,6 +124,13 @@
 <tr><td>INTEGRATOR_RXF</td><td>rxf</td><td>Backward differential state at the initial time.</td></tr>
 <tr><td>INTEGRATOR_RQF</td><td>rqf</td><td>Backward quadrature state at the initial time.</td></tr>
 <tr><td>INTEGRATOR_RZF</td><td>rzf</td><td>Backward algebraic variable at the initial time.</td></tr>
+</table>
+*/
+/** \defgroup scheme_RootfinderOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::RootfinderOutput  (ROOTFINDER_NUM_OUT = 1)</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>ROOTFINDER_X</td><td>x</td><td>Solution to the system of equations.</td></tr>
 </table>
 */
 /** \defgroup scheme_ConicInput

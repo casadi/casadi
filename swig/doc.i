@@ -64003,7 +64003,7 @@ slices.
 ";
 
 %feature("docstring")  casadi::rootfinder(const std::string &name, const
-std::string &solver, const Function &f, const Dict &opts=Dict()) "
+std::string &solver, const SXDict &rfp, const Dict &opts=Dict()) "
 
 Create a solver for rootfinding problems Takes a function where one of the
 inputs is unknown and one of the outputs is a residual function that is
@@ -64086,6 +64086,24 @@ General information
 |                  |                 | Nested           |                  |
 |                  |                 | dictionary.      |                  |
 +------------------+-----------------+------------------+------------------+
+
+>Input scheme: casadi::RootfinderInput (ROOTFINDER_NUM_IN = 2)
+
++---------------+-------+---------------------------------+
+|   Full name   | Short |           Description           |
++===============+=======+=================================+
+| ROOTFINDER_X0 | x0    | Initial guess for the solution. |
++---------------+-------+---------------------------------+
+| ROOTFINDER_P  | p     | Parameters.                     |
++---------------+-------+---------------------------------+
+
+>Output scheme: casadi::RootfinderOutput (ROOTFINDER_NUM_OUT = 1)
+
++--------------+-------+--------------------------------------+
+|  Full name   | Short |             Description              |
++==============+=======+======================================+
+| ROOTFINDER_X | x     | Solution to the system of equations. |
++--------------+-------+--------------------------------------+
 
 List of plugins
 ===============
@@ -64210,6 +64228,16 @@ Joel Andersson
 
 ";
 
+%feature("docstring")  casadi::rootfinder(const std::string &name, const
+std::string &solver, const MXDict &rfp, const Dict &opts=Dict()) "
+
+";
+
+%feature("docstring")  casadi::rootfinder(const std::string &name, const
+std::string &solver, const Function &f, const Dict &opts=Dict()) "
+
+";
+
 %feature("docstring")  casadi::casadi_ldl(const casadi_int *sp_a, const T1
 *a, const casadi_int *sp_lt, T1 *lt, T1 *d, const casadi_int *p, T1 *w) "
 
@@ -64254,6 +64282,18 @@ Get the documentation string for a plugin.
 %feature("docstring")  casadi::expm_n_in() "
 
 Get the number of expm solver inputs.
+
+";
+
+%feature("docstring")  casadi::rootfinder_out() "
+
+Get rootfinder output scheme.
+
+";
+
+%feature("docstring")  casadi::rootfinder_out(casadi_int ind) "
+
+Get rootfinder output scheme name by index.
 
 ";
 
@@ -64321,6 +64361,12 @@ Generate a hash value incrementally, array.
 std::vector< casadi_int > &v) "
 
 Generate a hash value incrementally (function taken from boost)
+
+";
+
+%feature("docstring")  casadi::rootfinder_n_in() "
+
+Number of rootfinder inputs.
 
 ";
 
@@ -64815,6 +64861,13 @@ Get output scheme name by index.
 %feature("docstring")  casadi::has_dple(const std::string &name) "
 
 Check if a particular plugin is available.
+
+";
+
+%feature("docstring")  casadi::rootfinder_option_info(const std::string
+&name, const std::string &op) "
+
+Get documentation for a particular option.
 
 ";
 
@@ -65627,6 +65680,12 @@ Get the documentation string for a plugin.
 
 ";
 
+%feature("docstring")  casadi::rootfinder_options(const std::string &name) "
+
+Get all options for a plugin.
+
+";
+
 %feature("docstring")  casadi::zip(const std::vector< std::string > &id,
 const std::vector< T > &mat) "
 
@@ -65768,6 +65827,12 @@ x) "
 casadi_int l, const double *A, const double *B, double *C) "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::rootfinder_n_out() "
+
+Number of rootfinder outputs.
+
+";
 
 %feature("docstring")  casadi::casadi_flip(casadi_int *corner, casadi_int
 ndim) "
@@ -66038,6 +66103,18 @@ linear
 
 
 Joel Andersson
+
+";
+
+%feature("docstring")  casadi::rootfinder_in() "
+
+Get rootfinder input scheme.
+
+";
+
+%feature("docstring")  casadi::rootfinder_in(casadi_int ind) "
+
+Get rootfinder input scheme name by index.
 
 ";
 
@@ -66464,6 +66541,13 @@ Check if a particular plugin is available.
 %feature("docstring")  casadi::load_conic(const std::string &name) "
 
 Explicitly load a plugin dynamically.
+
+";
+
+%feature("docstring")  casadi::rootfinder_option_type(const std::string
+&name, const std::string &op) "
+
+Get type info for a particular option.
 
 ";
 

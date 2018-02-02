@@ -45858,6 +45858,9 @@ slices.
 
 %feature("docstring") casadi::rootfinder "
 
+>  Function casadi::rootfinder(const std::string &name, const std::string &solver, const SXDict &rfp, const Dict &opts=Dict())
+------------------------------------------------------------------------
+
 Create a solver for rootfinding problems Takes a function where one of the
 inputs is unknown and one of the outputs is a residual function that is
 always zero, defines a new function where the the unknown input has been
@@ -45939,6 +45942,24 @@ General information
 |                  |                 | Nested           |                  |
 |                  |                 | dictionary.      |                  |
 +------------------+-----------------+------------------+------------------+
+
+>Input scheme: casadi::RootfinderInput (ROOTFINDER_NUM_IN = 2)
+
++---------------+-------+---------------------------------+
+|   Full name   | Short |           Description           |
++===============+=======+=================================+
+| ROOTFINDER_X0 | x0    | Initial guess for the solution. |
++---------------+-------+---------------------------------+
+| ROOTFINDER_P  | p     | Parameters.                     |
++---------------+-------+---------------------------------+
+
+>Output scheme: casadi::RootfinderOutput (ROOTFINDER_NUM_OUT = 1)
+
++--------------+-------+--------------------------------------+
+|  Full name   | Short |             Description              |
++==============+=======+======================================+
+| ROOTFINDER_X | x     | Solution to the system of equations. |
++--------------+-------+--------------------------------------+
 
 List of plugins
 ===============
@@ -46105,6 +46126,20 @@ Get the number of expm solver inputs.
 
 ";
 
+%feature("docstring") casadi::rootfinder_out "
+
+>  std::vector<std::string> casadi::rootfinder_out()
+------------------------------------------------------------------------
+
+Get rootfinder output scheme.
+
+>  std::string casadi::rootfinder_out(casadi_int ind)
+------------------------------------------------------------------------
+
+Get rootfinder output scheme name by index.
+
+";
+
 %feature("docstring") casadi::conic_in "
 
 >  std::vector<std::string> casadi::conic_in()
@@ -46160,6 +46195,12 @@ Generate a hash value incrementally (function taken from boost)
 ------------------------------------------------------------------------
 
 Generate a hash value incrementally, array.
+
+";
+
+%feature("docstring") casadi::rootfinder_n_in "
+
+Number of rootfinder inputs.
 
 ";
 
@@ -46646,6 +46687,12 @@ Get output scheme name by index.
 %feature("docstring") casadi::has_dple "
 
 Check if a particular plugin is available.
+
+";
+
+%feature("docstring") casadi::rootfinder_option_info "
+
+Get documentation for a particular option.
 
 ";
 
@@ -47440,6 +47487,12 @@ dense.
 
 ";
 
+%feature("docstring") casadi::rootfinder_options "
+
+Get all options for a plugin.
+
+";
+
 %feature("docstring") casadi::zip "[INTERNAL] ";
 
 %feature("docstring") casadi::slicot_mb03wd "";
@@ -47553,6 +47606,12 @@ polynomial.
 %feature("docstring") casadi::casadi_house "[INTERNAL] ";
 
 %feature("docstring") casadi::dense_mul_nt "[INTERNAL] ";
+
+%feature("docstring") casadi::rootfinder_n_out "
+
+Number of rootfinder outputs.
+
+";
 
 %feature("docstring") casadi::casadi_flip "[INTERNAL] ";
 
@@ -47762,6 +47821,20 @@ linear
 
 
 Joel Andersson
+
+";
+
+%feature("docstring") casadi::rootfinder_in "
+
+>  std::vector<std::string> casadi::rootfinder_in()
+------------------------------------------------------------------------
+
+Get rootfinder input scheme.
+
+>  std::string casadi::rootfinder_in(casadi_int ind)
+------------------------------------------------------------------------
+
+Get rootfinder input scheme name by index.
 
 ";
 
@@ -48164,6 +48237,12 @@ Check if a particular plugin is available.
 %feature("docstring") casadi::load_conic "
 
 Explicitly load a plugin dynamically.
+
+";
+
+%feature("docstring") casadi::rootfinder_option_type "
+
+Get type info for a particular option.
 
 ";
 
