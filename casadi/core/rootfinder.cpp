@@ -33,6 +33,55 @@
 using namespace std;
 namespace casadi {
 
+  vector<string> rootfinder_in() {
+    vector<string> ret(rootfinder_n_in());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=rootfinder_in(i);
+    return ret;
+  }
+
+  vector<string> rootfinder_out() {
+    vector<string> ret(rootfinder_n_out());
+    for (size_t i=0; i<ret.size(); ++i) ret[i]=rootfinder_out(i);
+    return ret;
+  }
+
+  string rootfinder_in(casadi_int ind) {
+    switch (static_cast<RootfinderInput>(ind)) {
+    case ROOTFINDER_X0:  return "x0";
+    case ROOTFINDER_P:   return "p";
+    case ROOTFINDER_NUM_IN: break;
+    }
+    return string();
+  }
+
+  string rootfinder_out(casadi_int ind) {
+    switch (static_cast<RootfinderOutput>(ind)) {
+    case ROOTFINDER_X:  return "x";
+    case ROOTFINDER_NUM_OUT: break;
+    }
+    return string();
+  }
+
+  casadi_int rootfinder_n_in() {
+    return ROOTFINDER_NUM_IN;
+  }
+
+  casadi_int rootfinder_n_out() {
+    return ROOTFINDER_NUM_OUT;
+  }
+
+  std::vector<std::string> rootfinder_options(const std::string& name) {
+    return Rootfinder::plugin_options(name).all();
+  }
+
+  std::string rootfinder_option_type(const std::string& name, const std::string& op) {
+    return Rootfinder::plugin_options(name).type(op);
+  }
+
+  std::string rootfinder_option_info(const std::string& name, const std::string& op) {
+    return Rootfinder::plugin_options(name).info(op);
+  }
+
   bool has_rootfinder(const string& name) {
     return Rootfinder::has_plugin(name);
   }
@@ -43,6 +92,47 @@ namespace casadi {
 
   string doc_rootfinder(const string& name) {
     return Rootfinder::getPlugin(name).doc;
+  }
+
+  Function rootfinder(const string& name, const string& solver,
+                      const SXDict& rfp, const Dict& opts) {
+    return rootfinder(name, solver, Rootfinder::create_oracle(rfp, opts), opts);
+  }
+
+  Function rootfinder(const string& name, const string& solver,
+                      const MXDict& rfp, const Dict& opts) {
+    return rootfinder(name, solver, Rootfinder::create_oracle(rfp, opts), opts);
+  }
+
+  template<typename XType>
+  Function Rootfinder::create_oracle(const std::map<std::string, XType>& d,
+                                 const Dict& opts) {
+    std::vector<XType> rfp_in(RFP_NUM_IN), rfp_out(RFP_NUM_OUT);
+    for (auto&& i : d) {
+      if (i.first=="x") {
+        rfp_in[RFP_X]=i.second;
+      } else if (i.first=="p") {
+        rfp_in[RFP_P]=i.second;
+      } else if (i.first=="g") {
+        rfp_out[RFP_G]=i.second;
+      } else {
+        casadi_error("No such field: " + i.first);
+      }
+    }
+
+    // Options for the oracle
+    Dict oracle_options;
+    Dict::const_iterator it = opts.find("oracle_options");
+    if (it!=opts.end()) {
+      // "oracle_options" has been set
+      oracle_options = it->second;
+    } else if ((it=opts.find("verbose")) != opts.end()) {
+      // "oracle_options" has not been set, but "verbose" has
+      oracle_options["verbose"] = it->second;
+    }
+
+    // Create oracle
+    return Function("rfp", rfp_in, rfp_out, RFP_INPUTS, RFP_OUTPUTS, oracle_options);
   }
 
   Function rootfinder(const std::string& name, const std::string& solver,

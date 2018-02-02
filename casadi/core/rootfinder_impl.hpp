@@ -168,6 +168,11 @@ namespace casadi {
 
     /// Infix
     static const std::string infix_;
+
+    /// Convert dictionary to Problem
+    template<typename XType>
+      static Function create_oracle(const std::map<std::string, XType>& d,
+                                    const Dict& opts);
   };
 
 
