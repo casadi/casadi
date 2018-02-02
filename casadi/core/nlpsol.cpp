@@ -605,11 +605,18 @@ namespace casadi {
       fseed[i] = MX(repmat(Sparsity(arg[i].size()), 1, nfwd));
     }
 
+    // Calculate sensitivities in f and g
+    Function fwd_oracle = oracle_.forward(nfwd);
+    vector<MX> vv = {x, p, f, g, 0, fwd_p};
+    vv = fwd_oracle(vv);
+    MX fwd_f0 = vv[NL_F];
+    MX fwd_g0 = vv[NL_G];
+
     // Propagate forward seeds
     MX fwd_alpha_x = if_else(lam_x_pos, fwd_ubx, 0) + if_else(lam_x_neg, fwd_lbx, 0);
     MX fwd_alpha_g = if_else(lam_g_pos, fwd_ubg, 0) + if_else(lam_g_neg, fwd_lbg, 0);
-    MX v_x = -lam_x * fwd_alpha_x;
-    MX v_lam_g = lam_g * fwd_alpha_g;
+    MX v_x = fwd_f0 * (alpha_x - x) - fwd_alpha_x * lam_x;
+    MX v_lam_g = lam_g * (fwd_alpha_g - fwd_g0);
     MX v = MX::vertcat({v_x, v_lam_g});
 
     // Solve
@@ -621,8 +628,7 @@ namespace casadi {
     MX fwd_lam_g = v_split[1];
 
     // Calculate sensitivities in f and g
-    Function fwd_oracle = oracle_.forward(nfwd);
-    vector<MX> vv = {x, p, f, g, fwd_x, fwd_p};
+    vv = {x, p, f, g, fwd_x, fwd_p};
     vv = fwd_oracle(vv);
     MX fwd_f = vv[NL_F];
     MX fwd_g = vv[NL_G];
