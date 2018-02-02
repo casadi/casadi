@@ -557,7 +557,6 @@ namespace casadi {
 
     // Optimal solution
     MX x = res[NLPSOL_X];
-    MX p = res[NLPSOL_P];
     MX lam_g = res[NLPSOL_LAM_G];
     MX f = res[NLPSOL_F];
     MX g = res[NLPSOL_G];
@@ -567,6 +566,7 @@ namespace casadi {
     MX ubx = arg[NLPSOL_UBX];
     MX lbg = arg[NLPSOL_LBG];
     MX ubg = arg[NLPSOL_UBG];
+    MX p = arg[NLPSOL_P];
 
     // Hessian of the Lagrangian, Jacobian of the constraints
     vector<MX> HJ_res = HJ_fun({x, p, 1, lam_g});
@@ -601,6 +601,7 @@ namespace casadi {
     MX fwd_ubx = fseed[NLPSOL_UBX] = MX::sym("fwd_ubx", repmat(x.sparsity(), 1, nfwd));
     MX fwd_lbg = fseed[NLPSOL_LBG] = MX::sym("fwd_lbg", repmat(g.sparsity(), 1, nfwd));
     MX fwd_ubg = fseed[NLPSOL_UBG] = MX::sym("fwd_ubg", repmat(g.sparsity(), 1, nfwd));
+    MX fwd_p = fseed[NLPSOL_P] = MX::sym("fwd_p", repmat(p.sparsity(), 1, nfwd));
 
     // Guesses are unused
     for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
@@ -624,11 +625,24 @@ namespace casadi {
     MX fwd_x = v_split[0];
     MX fwd_lam_g = v_split[1];
 
+    // Calculate sensitivities in f and g
+    Function fwd_oracle = oracle_.forward(nfwd);
+    vector<MX> vv(NL_NUM_IN + NL_NUM_OUT + NL_NUM_IN);
+    vv[NL_X] = x;
+    vv[NL_P] = p;
+    vv[NL_NUM_IN + NL_F] = f;
+    vv[NL_NUM_IN + NL_G] = g;
+    vv[NL_NUM_IN + NL_NUM_OUT + NL_X] = fwd_x;
+    vv[NL_NUM_IN + NL_NUM_OUT + NL_P] = fwd_p;
+    vv = fwd_oracle(vv);
+    MX fwd_f = vv[NL_F];
+    MX fwd_g = vv[NL_G];
+
     // Forward sensitivities
     vector<MX> fsens(NLPSOL_NUM_OUT);
     fsens[NLPSOL_X] = fwd_x;
-    fsens[NLPSOL_F] = MX::nan(repmat(sparsity_out(NLPSOL_F), 1, nfwd));
-    fsens[NLPSOL_G] = MX::nan(repmat(sparsity_out(NLPSOL_G), 1, nfwd));
+    fsens[NLPSOL_F] = fwd_f;
+    fsens[NLPSOL_G] = fwd_g;
     fsens[NLPSOL_LAM_X] = MX::nan(repmat(sparsity_out(NLPSOL_LAM_X), 1, nfwd));
     fsens[NLPSOL_LAM_G] = fwd_lam_g;
     fsens[NLPSOL_LAM_P] = MX::nan(repmat(sparsity_out(NLPSOL_LAM_P), 1, nfwd));
