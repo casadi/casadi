@@ -766,7 +766,13 @@
 %exception  casadi::FunctionInternal::sp_weight() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::sparsity_in(casadi_int ind) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::sparsity_out(casadi_int ind) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::sx_in() const  {
