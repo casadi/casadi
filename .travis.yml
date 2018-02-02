@@ -269,6 +269,7 @@ matrix:
         - locate libstdc++.so
         - export CC=gcc-4.7
         - export CXX=g++-4.7
+        - export FC=gfortran-4.7
 
 
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
@@ -343,7 +344,7 @@ before_install:
   - python_setup
   - slurp_common
   - export DYLD_LIBRARY_PATH=$MY_LIBRARY_PATH:$DYLD_LIBRARY_PATH
-  - ls $DYLD_LIBRARY_PATH
+  - echo $DYLD_LIBRARY_PATH
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
       slurp cplex
