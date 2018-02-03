@@ -5,9 +5,13 @@ T1* casadi_from_mex(const mxArray* p, T1* y, const casadi_int* sp, T1* w) {
   if (!mxIsDouble(p) || mxGetNumberOfDimensions(p)!=2)
     mexErrMsgIdAndTxt("Casadi:RuntimeError",
       "\"from_mex\" failed: Not a two-dimensional matrix of double precision.");
-  casadi_int nrow = *sp++, ncol = *sp++, nnz = sp[ncol];
-  const casadi_int *colind=sp, *row=sp+ncol+1;
-  size_t p_nrow = mxGetM(p), p_ncol = mxGetN(p);
+  casadi_int nrow = *sp++;
+  casadi_int ncol = *sp++;
+  casadi_int nnz = sp[ncol];
+  const casadi_int *colind=sp;
+  const casadi_int *row=sp+ncol+1;
+  size_t p_nrow = mxGetM(p);
+  size_t p_ncol = mxGetN(p);
   casadi_int is_sparse = mxIsSparse(p);
   mwIndex *Jc, *Ir;
   if (is_sparse) {
