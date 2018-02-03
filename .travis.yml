@@ -343,8 +343,8 @@ before_install:
     fi
   - python_setup
   - slurp_common
-  - export DYLD_LIBRARY_PATH=$MY_LIBRARY_PATH:$DYLD_LIBRARY_PATH
-  - echo $DYLD_LIBRARY_PATH
+  - bake_my_library_path
+  - ls -al /usr/local/lib
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
       slurp cplex
