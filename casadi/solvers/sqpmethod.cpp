@@ -389,7 +389,7 @@ namespace casadi {
     casadi_copy(m->gf, nx_, m->gLag);
     if (ng_>0) casadi_mv(m->Jk, Asp_, m->mu, m->gLag, true);
     // gLag += mu_x_;
-    transform(m->gLag, m->gLag+nx_, m->mu_x, m->gLag, std::plus<double>());
+    casadi_axpy(nx_, 1., m->mu_x, m->gLag);
 
     // Number of SQP iterations
     casadi_int iter = 0;
@@ -489,10 +489,14 @@ namespace casadi {
 
       if (verbose_) print("Formulating QP\n");
       // Formulate the QP
-      transform(m->lbx, m->lbx + nx_, m->xk, m->qp_LBX, std::minus<double>());
-      transform(m->ubx, m->ubx + nx_, m->xk, m->qp_UBX, std::minus<double>());
-      transform(m->lbg, m->lbg + ng_, m->gk, m->qp_LBA, std::minus<double>());
-      transform(m->ubg, m->ubg + ng_, m->gk, m->qp_UBA, std::minus<double>());
+      casadi_copy(m->lbx, nx_, m->qp_LBX);
+      casadi_axpy(nx_, -1., m->xk, m->qp_LBX);
+      casadi_copy(m->ubx, nx_, m->qp_UBX);
+      casadi_axpy(nx_, -1., m->xk, m->qp_UBX);
+      casadi_copy(m->lbg, ng_, m->qp_LBA);
+      casadi_axpy(ng_, -1., m->gk, m->qp_LBA);
+      casadi_copy(m->ubg, ng_, m->qp_UBA);
+      casadi_axpy(ng_, -1., m->gk, m->qp_UBA);
 
       // Solve the QP
       solve_QP(m, m->Bk, m->gf, m->qp_LBX, m->qp_UBX, m->Jk, m->qp_LBA,
@@ -598,7 +602,7 @@ namespace casadi {
         casadi_copy(m->qp_DUAL_X, nx_, m->mu_x);
         casadi_copy(m->xk, nx_, m->x_old);
         // x+=dx
-        transform(m->xk, m->xk+nx_, m->dx, m->xk, std::plus<double>());
+        casadi_axpy(nx_, 1., m->dx, m->xk);
       }
 
       if (!exact_hessian_) {
@@ -606,7 +610,7 @@ namespace casadi {
         casadi_copy(m->gf, nx_, m->gLag_old);
         if (ng_>0) casadi_mv(m->Jk, Asp_, m->mu, m->gLag_old, true);
         // gLag_old += mu_x_;
-        transform(m->gLag_old, m->gLag_old+nx_, m->mu_x, m->gLag_old, std::plus<double>());
+        casadi_axpy(nx_, 1., m->mu_x, m->gLag_old);
       }
 
       // Evaluate the constraint Jacobian
@@ -632,7 +636,7 @@ namespace casadi {
       if (ng_>0) casadi_mv(m->Jk, Asp_, m->mu, m->gLag, true);
 
       // gLag += mu_x_;
-      transform(m->gLag, m->gLag+nx_, m->mu_x, m->gLag, std::plus<double>());
+      casadi_axpy(nx_, 1., m->mu_x, m->gLag);
 
       // Updating Lagrange Hessian
       if (!exact_hessian_) {
