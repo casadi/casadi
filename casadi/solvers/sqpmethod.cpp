@@ -76,6 +76,9 @@ namespace casadi {
       {"max_iter",
        {OT_INT,
         "Maximum number of SQP iterations"}},
+      {"min_iter",
+       {OT_INT,
+        "Minimum number of SQP iterations"}},
       {"max_iter_ls",
        {OT_INT,
         "Maximum number of linesearch iterations"}},
@@ -117,6 +120,7 @@ namespace casadi {
     Nlpsol::init(opts);
 
     // Default options
+    min_iter_ = 0;
     max_iter_ = 50;
     max_iter_ls_ = 3;
     c1_ = 1e-4;
@@ -137,6 +141,8 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="max_iter") {
         max_iter_ = op.second;
+      } else if (op.first=="min_iter") {
+        min_iter_ = op.second;
       } else if (op.first=="max_iter_ls") {
         max_iter_ls_ = op.second;
       } else if (op.first=="c1") {
@@ -459,7 +465,7 @@ namespace casadi {
       }
 
       // Checking convergence criteria
-      if (pr_inf < tol_pr_ && gLag_norminf < tol_du_) {
+      if (iter >= min_iter_ && pr_inf < tol_pr_ && gLag_norminf < tol_du_) {
         print("MESSAGE(sqpmethod): Convergence achieved after %d iterations\n", iter);
         m->return_status = "Solve_Succeeded";
         break;
@@ -471,7 +477,7 @@ namespace casadi {
         break;
       }
 
-      if (iter > 0 && dx_norminf <= min_step_size_) {
+      if (iter >= 1 && iter >= min_iter_ && dx_norminf <= min_step_size_) {
         print("MESSAGE(sqpmethod): Search direction becomes too small without "
               "convergence criteria being met.\n");
         m->return_status = "Search_Direction_Becomes_Too_Small";

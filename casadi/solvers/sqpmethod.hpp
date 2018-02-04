@@ -146,15 +146,14 @@ namespace casadi {
     /// Exact Hessian?
     bool exact_hessian_;
 
-    /// maximum number of sqp iterations
-    casadi_int max_iter_;
+    /// Maximum, minimum number of SQP iterations
+    casadi_int max_iter_, min_iter_;
 
     /// Memory size of L-BFGS method
     casadi_int lbfgs_memory_;
-    /// Tolerance of primal infeasibility
-    double tol_pr_;
-    /// Tolerance of dual infeasibility
-    double tol_du_;
+
+    /// Tolerance of primal and dual infeasibility
+    double tol_pr_, tol_du_;
 
     /// Minimum step size allowed
     double min_step_size_;
