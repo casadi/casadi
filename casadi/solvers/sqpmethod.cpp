@@ -411,7 +411,8 @@ namespace casadi {
     while (true) {
 
       // Primal infeasability
-      double pr_inf = primalInfeasibility(m->xk, m->lbx, m->ubx, m->gk, m->lbg, m->ubg);
+      double pr_inf = std::fmax(casadi_max_viol(nx_, m->xk, m->lbx, m->ubx),
+                                casadi_max_viol(ng_, m->gk, m->lbg, m->ubg));
 
       // inf-norm of lagrange gradient
       double gLag_norminf = casadi_norm_inf(nx_, m->gLag);
@@ -510,11 +511,12 @@ namespace casadi {
       }
 
       // Calculate penalty parameter of merit function
-      m->sigma = std::max(m->sigma, 1.01*casadi_norm_inf(nx_, m->qp_DUAL_X));
-      m->sigma = std::max(m->sigma, 1.01*casadi_norm_inf(ng_, m->qp_DUAL_A));
+      m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_, m->qp_DUAL_X));
+      m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(ng_, m->qp_DUAL_A));
 
       // Calculate L1-merit function in the actual iterate
-      double l1_infeas = primalInfeasibility(m->xk, m->lbx, m->ubx, m->gk, m->lbg, m->ubg);
+      double l1_infeas = std::fmax(casadi_max_viol(nx_, m->xk, m->lbx, m->ubx),
+                                   casadi_max_viol(ng_, m->gk, m->lbg, m->ubg));
 
       // Right-hand side of Armijo condition
       double F_sens = casadi_dot(nx_, m->dx, m->gf);
@@ -566,8 +568,8 @@ namespace casadi {
           ls_iter++;
 
           // Calculating merit-function in candidate
-          l1_infeas = primalInfeasibility(m->x_cand, m->lbx, m->ubx, m->gk_cand, m->lbg, m->ubg);
-
+          l1_infeas = std::fmax(casadi_max_viol(nx_, m->x_cand, m->lbx, m->ubx),
+                                casadi_max_viol(ng_, m->gk_cand, m->lbg, m->ubg));
           L1merit_cand = fk_cand + m->sigma * l1_infeas;
           // Calculating maximal merit function value so far
           double meritmax = *max_element(m->merit_mem.begin(), m->merit_mem.end());
@@ -780,14 +782,6 @@ namespace casadi {
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);
-  }
-
-  double Sqpmethod::
-  primalInfeasibility(const double* x, const double* lbx, const double* ubx,
-                      const double* g, const double* lbg, const double* ubg) const {
-    // Linf-norm of the primal infeasibility
-    return fmax(casadi_max_viol(nx_, x, lbx, ubx),
-                casadi_max_viol(ng_, g, lbg, ubg));
   }
 
   Dict Sqpmethod::get_stats(void* mem) const {

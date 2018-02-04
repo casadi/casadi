@@ -210,11 +210,6 @@ namespace casadi {
                           const double* A, const double* lbA, const double* ubA,
                           double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const;
 
-    // Calculate the L1-norm of the primal infeasibility
-    double primalInfeasibility(const double* x,
-                               const double* lbx, const double* ubx,
-                               const double* g, const double* lbg, const double* ubg) const;
-
     /// A documentation string
     static const std::string meta_doc;
 
