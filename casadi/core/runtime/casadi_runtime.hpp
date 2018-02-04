@@ -222,6 +222,7 @@ namespace casadi {
   #include "casadi_finite_diff.hpp"
   #include "casadi_ldl.hpp"
   #include "casadi_qr.hpp"
+  #include "casadi_bfgs.hpp"
 
 } // namespace casadi
 
