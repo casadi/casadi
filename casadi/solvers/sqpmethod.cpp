@@ -178,19 +178,18 @@ namespace casadi {
     exact_hessian_ = hessian_approximation =="exact";
 
     // Get/generate required functions
-    f_fcn_ = create_function("nlp_f", {"x", "p"}, {"f"});
-    g_fcn_ = create_function("nlp_g", {"x", "p"}, {"g"});
-    grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
-    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
+    create_function("nlp_fg", {"x", "p"}, {"f", "g"});
+    create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
+    Function jac_g_fcn, hess_l_fcn;
+    jac_g_fcn = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     if (exact_hessian_) {
-      hess_l_fcn_ = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                                    {"sym:hess:gamma:x:x"},
-                                    {{"gamma", {"f", "g"}}});
+      hess_l_fcn = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+                                   {"sym:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
     }
 
     // Allocate a QP solver
-    Hsp_ = exact_hessian_ ? hess_l_fcn_.sparsity_out(0) : Sparsity::dense(nx_, nx_);
-    Asp_ = jac_g_fcn_.is_null() ? Sparsity(0, nx_) : jac_g_fcn_.sparsity_out(1);
+    Hsp_ = exact_hessian_ ? hess_l_fcn.sparsity_out(0) : Sparsity::dense(nx_, nx_);
+    Asp_ = jac_g_fcn.is_null() ? Sparsity(0, nx_) : jac_g_fcn.sparsity_out(1);
 
     // Allocate a QP solver
     casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
@@ -520,11 +519,8 @@ namespace casadi {
             m->arg[0] = m->x_cand;
             m->arg[1] = m->p;
             m->res[0] = &fk_cand;
-            if (calc_function(m, "nlp_f")) casadi_error("nlp_f failed");
-            if (ng_) {
-              m->res[0] = m->gk_cand;
-              if (calc_function(m, "nlp_g")) casadi_error("nlp_g failed");
-            }
+            m->res[1] = m->gk_cand;
+            if (calc_function(m, "nlp_fg")) casadi_error("nlp_fg failed");
           } catch(const CasadiException& ex) {
             (void)ex;
             // Silent ignore; line-search failed

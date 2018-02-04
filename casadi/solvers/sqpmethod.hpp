@@ -94,13 +94,6 @@ namespace casadi {
   */
   class CASADI_NLPSOL_SQPMETHOD_EXPORT Sqpmethod : public Nlpsol {
   public:
-    // NLP functions
-    Function f_fcn_;
-    Function g_fcn_;
-    Function grad_f_fcn_;
-    Function jac_g_fcn_;
-    Function hess_l_fcn_;
-
     explicit Sqpmethod(const std::string& name, const Function& nlp);
     ~Sqpmethod() override;
 
