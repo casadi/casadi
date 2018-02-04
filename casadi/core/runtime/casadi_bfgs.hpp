@@ -36,3 +36,17 @@ void casadi_bfgs(const casadi_int* sp_h, T1* h, const T1* x, const T1* x_old,
   casadi_rank1(h, sp_h, theta, yk, yk);
   casadi_rank1(h, sp_h, -phi, qk, qk);
 }
+
+// SYMBOL "bfgs_reset"
+// Removes off-diagonal entries
+template<typename T1>
+void casadi_bfgs_reset(const casadi_int* sp_h, T1* h) {
+  casadi_int ncol = sp_h[1];
+  const casadi_int *colind = sp_h+2, *row = sp_h+ncol+3;
+  int c, k;
+  for (c=0; c<ncol; ++c) {
+    for (k=colind[c]; k<colind[c+1]; ++k) {
+      if (c!=row[k]) h[k] = 0;
+    }
+  }
+}

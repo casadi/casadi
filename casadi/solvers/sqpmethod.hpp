@@ -175,9 +175,6 @@ namespace casadi {
     // Jacobian sparsity
     Sparsity Asp_;
 
-    /// Initial Hessian approximation (BFGS)
-    DM B_init_;
-
     /// Regularization
     bool regularize_;
 
@@ -190,9 +187,6 @@ namespace casadi {
     /// Print iteration
     void print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf,
                          double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const;
-
-    // Reset the Hessian or Hessian approximation
-    void reset_h(SqpmethodMemory* m) const;
 
     // Calculate the regularization parameter using Gershgorin theorem
     double getRegularization(const double* H) const;

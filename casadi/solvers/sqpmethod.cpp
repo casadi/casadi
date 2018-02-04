@@ -198,11 +198,9 @@ namespace casadi {
                    qpsol_options);
     alloc(qpsol_);
 
-    // Create Hessian update function
+    // BFGS?
     if (!exact_hessian_) {
       alloc_w(3*nx_); // casadi_bfgs
-      // Initial Hessian approximation
-      B_init_ = project(DM::eye(nx_), Hsp_);
     }
 
     // Header
@@ -352,7 +350,8 @@ namespace casadi {
         if (m->reg > 0) regularize(m->Bk, m->reg);
       }
     } else {
-      reset_h(m);
+      casadi_fill(m->Bk, Hsp_.nnz(), 1.);
+      casadi_bfgs_reset(Hsp_, m->Bk);
     }
 
     // Evaluate the initial gradient of the Lagrangian
@@ -613,20 +612,8 @@ namespace casadi {
       // Updating Lagrange Hessian
       if (!exact_hessian_) {
         if (verbose_) print("Updating Hessian (BFGS)\n");
-        // BFGS with careful updates and restarts
-        if (iter % lbfgs_memory_ == 0) {
-          // Reset Hessian approximation by dropping all off-diagonal entries
-          const casadi_int* colind = Hsp_.colind();      // Access sparsity (column offset)
-          casadi_int ncol = Hsp_.size2();
-          const casadi_int* row = Hsp_.row();            // Access sparsity (row)
-          for (casadi_int cc=0; cc<ncol; ++cc) {     // Loop over the columns of the Hessian
-            for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
-              // Loop over the nonzero elements of the column
-              if (cc!=row[el]) m->Bk[el] = 0;               // Remove if off-diagonal entries
-            }
-          }
-        }
-
+        // Restart BFGS if needed
+        if (iter % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, m->Bk);
         // Update the Hessian approximation
         casadi_bfgs(Hsp_, m->Bk, m->xk, m->x_old, m->gLag, m->gLag_old, m->w);
       } else {
@@ -676,13 +663,6 @@ namespace casadi {
     print("%2d", ls_trials);
     if (!ls_success) print("F");
     print("\n");
-  }
-
-  void Sqpmethod::reset_h(SqpmethodMemory* m) const {
-    // Initial Hessian approximation of BFGS
-    if (!exact_hessian_) {
-      copy_n(B_init_.ptr(), Hsp_.nnz(), m->Bk);
-    }
   }
 
   double Sqpmethod::getRegularization(const double* H) const {
