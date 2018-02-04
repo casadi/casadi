@@ -200,37 +200,7 @@ namespace casadi {
 
     // Create Hessian update function
     if (!exact_hessian_) {
-      // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
-      SX Bk = SX::sym("Bk", Hsp_);
-      SX x = SX::sym("x", sparsity_in_.at(NLPSOL_X0));
-      SX x_old = SX::sym("x", x.sparsity());
-      SX gLag = SX::sym("gLag", x.sparsity());
-      SX gLag_old = SX::sym("gLag_old", x.sparsity());
-
-      SX sk = x - x_old;
-      SX yk = gLag - gLag_old;
-      SX qk = mtimes(Bk, sk);
-
-      // Calculating theta
-      SX skBksk = dot(sk, qk);
-      SX omega = if_else(dot(yk, sk) < 0.2 * dot(sk, qk),
-                         0.8 * skBksk / (skBksk - dot(sk, yk)),
-                         1);
-      yk = omega * yk + (1 - omega) * qk;
-      SX theta = 1. / dot(sk, yk);
-      SX phi = 1. / dot(qk, sk);
-      SX Bk_new = Bk + theta * mtimes(yk, yk.T()) - phi * mtimes(qk, qk.T());
-
-      // Inputs of the BFGS update function
-      vector<SX> bfgs_in(BFGS_NUM_IN);
-      bfgs_in[BFGS_BK] = Bk;
-      bfgs_in[BFGS_X] = x;
-      bfgs_in[BFGS_X_OLD] = x_old;
-      bfgs_in[BFGS_GLAG] = gLag;
-      bfgs_in[BFGS_GLAG_OLD] = gLag_old;
-      bfgs_ = Function("bfgs", bfgs_in, {Bk_new});
-      alloc(bfgs_);
-
+      alloc_w(3*nx_); // casadi_bfgs
       // Initial Hessian approximation
       B_init_ = project(DM::eye(nx_), Hsp_);
     }
@@ -658,16 +628,7 @@ namespace casadi {
         }
 
         // Update the Hessian approximation
-        fill_n(m->arg, bfgs_.n_in(), nullptr);
-        m->arg[BFGS_BK] = m->Bk;
-        m->arg[BFGS_X] = m->xk;
-        m->arg[BFGS_X_OLD] = m->x_old;
-        m->arg[BFGS_GLAG] = m->gLag;
-        m->arg[BFGS_GLAG_OLD] = m->gLag_old;
-        fill_n(m->res, bfgs_.n_out(), nullptr);
-        m->res[0] = m->Bk;
-        bfgs_(m->arg, m->res, m->iw, m->w, 0);
-
+        casadi_bfgs(Hsp_, m->Bk, m->xk, m->x_old, m->gLag, m->gLag_old, m->w);
       } else {
         // Exact Hessian
         if (verbose_) print("Evaluating hessian\n");
