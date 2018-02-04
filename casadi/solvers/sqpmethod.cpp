@@ -513,8 +513,8 @@ namespace casadi {
 
         // Line-search loop
         while (true) {
-          for (casadi_int i=0; i<nx_; ++i) m->x_cand[i] = m->xk[i] + t * m->dx[i];
-
+          casadi_copy(m->xk, nx_, m->x_cand);
+          casadi_axpy(nx_, t, m->dx, m->x_cand);
           try {
             // Evaluating objective and constraints
             m->arg[0] = m->x_cand;
@@ -560,8 +560,10 @@ namespace casadi {
         }
 
         // Candidate accepted, update dual variables
-        for (casadi_int i=0; i<ng_; ++i) m->mu[i] = t * m->qp_DUAL_A[i] + (1 - t) * m->mu[i];
-        for (casadi_int i=0; i<nx_; ++i) m->mu_x[i] = t * m->qp_DUAL_X[i] + (1 - t) * m->mu_x[i];
+        casadi_scal(ng_, 1-t, m->mu);
+        casadi_axpy(ng_, t, m->qp_DUAL_A, m->mu);
+        casadi_scal(nx_, 1-t, m->mu_x);
+        casadi_axpy(nx_, t, m->qp_DUAL_X, m->mu_x);
 
         // Candidate accepted, update the primal variable
         casadi_copy(m->xk, nx_, m->x_old);
