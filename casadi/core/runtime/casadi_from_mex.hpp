@@ -2,18 +2,22 @@
 // SYMBOL "from_mex"
 template<typename T1>
 T1* casadi_from_mex(const mxArray* p, T1* y, const casadi_int* sp, T1* w) {
+  casadi_int nrow, ncol, nnz, is_sparse, c, k;
+  const casadi_int *colind, *row;
+  size_t p_nrow, p_ncol;
+  mwIndex *Jc, *Ir;
+  const double* p_data;
   if (!mxIsDouble(p) || mxGetNumberOfDimensions(p)!=2)
     mexErrMsgIdAndTxt("Casadi:RuntimeError",
       "\"from_mex\" failed: Not a two-dimensional matrix of double precision.");
-  casadi_int nrow = *sp++;
-  casadi_int ncol = *sp++;
-  casadi_int nnz = sp[ncol];
-  const casadi_int *colind=sp;
-  const casadi_int *row=sp+ncol+1;
-  size_t p_nrow = mxGetM(p);
-  size_t p_ncol = mxGetN(p);
-  casadi_int is_sparse = mxIsSparse(p);
-  mwIndex *Jc, *Ir;
+  nrow = *sp++;
+  ncol = *sp++;
+  nnz = sp[ncol];
+  colind = sp;
+  row = sp+ncol+1;
+  p_nrow = mxGetM(p);
+  p_ncol = mxGetN(p);
+  is_sparse = mxIsSparse(p);
   if (is_sparse) {
 #ifndef CASADI_MEX_NO_SPARSE
     Jc = mxGetJc(p);
@@ -23,7 +27,7 @@ T1* casadi_from_mex(const mxArray* p, T1* y, const casadi_int* sp, T1* w) {
       "\"from_mex\" failed: Sparse inputs disabled.");
 #endif /* CASADI_MEX_NO_SPARSE */
   }
-  const double* p_data = (const double*)mxGetData(p);
+  p_data = (const double*)mxGetData(p);
   if (p_nrow==1 && p_ncol==1) {
     double v = is_sparse && Jc[1]==0 ? 0 : *p_data;
     casadi_fill(y, nnz, v);
@@ -34,7 +38,6 @@ T1* casadi_from_mex(const mxArray* p, T1* y, const casadi_int* sp, T1* w) {
       if (!tr) mexErrMsgIdAndTxt("Casadi:RuntimeError",
                                  "\"from_mex\" failed: Dimension mismatch.");
     }
-    casadi_int r, c, k;
     if (is_sparse) {
       if (tr) {
         for (c=0; c<ncol; ++c)
