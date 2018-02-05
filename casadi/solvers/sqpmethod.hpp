@@ -41,9 +41,6 @@
 namespace casadi {
 
   struct CASADI_NLPSOL_SQPMETHOD_EXPORT SqpmethodMemory : public NlpsolMemory {
-    /// Lagrange multipliers of the NLP
-    double *mu, *mu_x;
-
     /// Current and previous linearization point and candidate
     double *x_old, *x_cand;
 

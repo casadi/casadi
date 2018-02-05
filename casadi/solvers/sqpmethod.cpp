@@ -262,10 +262,6 @@ namespace casadi {
     // Set work in base classes
     Nlpsol::set_work(mem, arg, res, iw, w);
 
-    // Lagrange multipliers of the NLP
-    m->mu = w; w += ng_;
-    m->mu_x = w; w += nx_;
-
     // Current linearization point
     m->x_cand = w; w += nx_;
     m->x_old = w; w += nx_;
@@ -306,10 +302,6 @@ namespace casadi {
     // Check the provided inputs
     check_inputs(mem);
 
-    // Initialize Lagrange multipliers of the NLP
-    casadi_copy(m->lam_g, ng_, m->mu);
-    casadi_copy(m->lam_x, nx_, m->mu_x);
-
     // Initial constraint Jacobian
     if (ng_) {
       m->arg[0] = m->x;
@@ -333,7 +325,7 @@ namespace casadi {
       m->arg[0] = m->x;
       m->arg[1] = m->p;
       m->arg[2] = &sigma;
-      m->arg[3] = m->mu;
+      m->arg[3] = m->lam_g;
       m->res[0] = m->Bk;
       if (calc_function(m, "nlp_hess_l")) casadi_error("nlp_hess_l");
 
@@ -349,9 +341,9 @@ namespace casadi {
 
     // Evaluate the initial gradient of the Lagrangian
     casadi_copy(m->gf, nx_, m->gLag);
-    if (ng_>0) casadi_mv(m->Jk, Asp_, m->mu, m->gLag, true);
+    if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag, true);
     // gLag += mu_x_;
-    casadi_axpy(nx_, 1., m->mu_x, m->gLag);
+    casadi_axpy(nx_, 1., m->lam_x, m->gLag);
 
     // Number of SQP iterations
     casadi_int iter = 0;
@@ -521,10 +513,10 @@ namespace casadi {
         }
 
         // Candidate accepted, update dual variables
-        casadi_scal(ng_, 1-t, m->mu);
-        casadi_axpy(ng_, t, m->qp_DUAL_A, m->mu);
-        casadi_scal(nx_, 1-t, m->mu_x);
-        casadi_axpy(nx_, t, m->qp_DUAL_X, m->mu_x);
+        casadi_scal(ng_, 1-t, m->lam_g);
+        casadi_axpy(ng_, t, m->qp_DUAL_A, m->lam_g);
+        casadi_scal(nx_, 1-t, m->lam_x);
+        casadi_axpy(nx_, t, m->qp_DUAL_X, m->lam_x);
 
         // Candidate accepted, update the primal variable
         casadi_copy(m->x, nx_, m->x_old);
@@ -532,19 +524,19 @@ namespace casadi {
 
       } else {
         // Full step
-        casadi_copy(m->qp_DUAL_A, ng_, m->mu);
-        casadi_copy(m->qp_DUAL_X, nx_, m->mu_x);
+        casadi_copy(m->qp_DUAL_A, ng_, m->lam_g);
+        casadi_copy(m->qp_DUAL_X, nx_, m->lam_x);
         casadi_copy(m->x, nx_, m->x_old);
         // x+=dx
         casadi_axpy(nx_, 1., m->dx, m->x);
       }
 
       if (!exact_hessian_) {
-        // Evaluate the gradient of the Lagrangian with the old x but new mu (for BFGS)
+        // Evaluate the gradient of the Lagrangian with the old x but new lam_g (for BFGS)
         casadi_copy(m->gf, nx_, m->gLag_old);
-        if (ng_>0) casadi_mv(m->Jk, Asp_, m->mu, m->gLag_old, true);
-        // gLag_old += mu_x_;
-        casadi_axpy(nx_, 1., m->mu_x, m->gLag_old);
+        if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag_old, true);
+        // gLag_old += lam_x_;
+        casadi_axpy(nx_, 1., m->lam_x, m->gLag_old);
       }
 
       // Evaluate the constraint Jacobian
@@ -567,10 +559,10 @@ namespace casadi {
 
       // Evaluate the gradient of the Lagrangian with the new x and new mu
       casadi_copy(m->gf, nx_, m->gLag);
-      if (ng_>0) casadi_mv(m->Jk, Asp_, m->mu, m->gLag, true);
+      if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag, true);
 
       // gLag += mu_x_;
-      casadi_axpy(nx_, 1., m->mu_x, m->gLag);
+      casadi_axpy(nx_, 1., m->lam_x, m->gLag);
 
       // Updating Lagrange Hessian
       if (!exact_hessian_) {
@@ -586,7 +578,7 @@ namespace casadi {
         m->arg[0] = m->x;
         m->arg[1] = m->p;
         m->arg[2] = &sigma;
-        m->arg[3] = m->mu;
+        m->arg[3] = m->lam_g;
         m->res[0] = m->Bk;
         if (calc_function(m, "nlp_hess_l")) casadi_error("nlp_hess_l");
 
@@ -599,10 +591,6 @@ namespace casadi {
     }
 
     m->iter_count = iter;
-
-    // Save results to outputs
-    if (m->lam_g) casadi_copy(m->mu, ng_, m->lam_g);
-    if (m->lam_x) casadi_copy(m->mu_x, nx_, m->lam_x);
 
     return 0;
   }
