@@ -46,7 +46,7 @@ namespace casadi {
     double *lam_g, *lam_x, *lam_p;
 
     // Outputs
-    double *f, *g;
+    double f, *g;
 
     // number of iterations
     casadi_int n_iter;

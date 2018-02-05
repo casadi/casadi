@@ -467,7 +467,7 @@ namespace casadi {
 
     // Get output pointers
     double *x = res[NLPSOL_X];
-    m->f = res[NLPSOL_F];
+    double *f = res[NLPSOL_F];
     m->g = res[NLPSOL_G];
     double *lam_x = res[NLPSOL_LAM_X];
     double *lam_g = res[NLPSOL_LAM_G];
@@ -485,6 +485,9 @@ namespace casadi {
     // Set multipliers to nan
     casadi_fill(m->lam_p, np_, nan);
 
+    // Reset f, g
+    m->f = nan;
+
     // Solve the NLP
     int flag = solve(m);
 
@@ -493,6 +496,7 @@ namespace casadi {
     casadi_copy(m->lam_x, nx_, lam_x);
     casadi_copy(m->lam_g, ng_, lam_g);
     casadi_copy(m->lam_p, np_, lam_p);
+    casadi_copy(&m->f, 1, f);
 
     // Calculate multiplers
     if (calc_multipliers_) {

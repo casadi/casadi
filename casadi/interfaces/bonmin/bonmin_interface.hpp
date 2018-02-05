@@ -71,7 +71,7 @@ namespace casadi {
 
   struct CASADI_NLPSOL_BONMIN_EXPORT BonminMemory : public NlpsolMemory {
     // Current calculated quantities
-    double fk, *gk, *grad_fk, *jac_gk, *hess_lk, *grad_lk;
+    double *gk, *grad_fk, *jac_gk, *hess_lk, *grad_lk;
 
     // Stats
     std::vector<double> inf_pr, inf_du, mu, d_norm, regularization_size,

@@ -43,9 +43,6 @@
 namespace casadi {
 
   struct CASADI_NLPSOL_SCPGEN_EXPORT ScpgenMemory : public NlpsolMemory {
-    // Current objective value
-    double fk;
-
     // Work vectors, nonlifted problem
     double *gk, *dxk, *lam_xk, *dlam_xk, *dlam_gk, *gfk, *gL, *b_gn;
 

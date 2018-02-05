@@ -324,7 +324,7 @@ namespace casadi {
     // Initial objective gradient
     m->arg[0] = m->x;
     m->arg[1] = m->p;
-    m->res[0] = &m->fk;
+    m->res[0] = &m->f;
     m->res[1] = m->gf;
     if (calc_function(m, "nlp_grad_f")) casadi_error("nlp_grad_f");
 
@@ -389,12 +389,12 @@ namespace casadi {
 
       // Printing information about the actual iterate
       if (print_iteration_) {
-        print_iteration(iter, m->fk, pr_inf, gLag_norminf, dx_norminf,
+        print_iteration(iter, m->f, pr_inf, gLag_norminf, dx_norminf,
                        m->reg, ls_iter, ls_success);
       }
 
       // Callback function
-      if (callback(m, m->x, &m->fk, m->g, m->lam_x, m->lam_g, 0)) {
+      if (callback(m, m->x, &m->f, m->g, m->lam_x, m->lam_g, 0)) {
         print("WARNING(sqpmethod): Aborted by callback...\n");
         m->return_status = "User_Requested_Stop";
         break;
@@ -456,7 +456,7 @@ namespace casadi {
       // Right-hand side of Armijo condition
       double F_sens = casadi_dot(nx_, m->dx, m->gf);
       double L1dir = F_sens - m->sigma * l1_infeas;
-      double L1merit = m->fk + m->sigma * l1_infeas;
+      double L1merit = m->f + m->sigma * l1_infeas;
 
       // Storing the actual merit function value in a list
       m->merit_mem.push_back(L1merit);
@@ -563,7 +563,7 @@ namespace casadi {
       if (verbose_) print("Evaluating grad_f\n");
       m->arg[0] = m->x;
       m->arg[1] = m->p;
-      m->res[0] = &m->fk;
+      m->res[0] = &m->f;
       m->res[1] = m->gf;
       if (calc_function(m, "nlp_grad_f")) casadi_error("nlp_grad_f");
 
@@ -603,7 +603,6 @@ namespace casadi {
     m->iter_count = iter;
 
     // Save results to outputs
-    if (m->f) *m->f = m->fk;
     if (m->lam_g) casadi_copy(m->mu, ng_, m->lam_g);
     if (m->lam_x) casadi_copy(m->mu_x, nx_, m->lam_x);
     if (m->g) casadi_copy(m->gk, ng_, m->g);

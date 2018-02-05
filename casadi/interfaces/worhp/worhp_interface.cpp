@@ -431,7 +431,7 @@ namespace casadi {
         m->arg[1] = m->p;
         m->res[0] = &m->worhp_o.F;
         calc_function(m, "nlp_f");
-        if (m->f) *m->f = m->worhp_o.F; // Store cost, before scaling
+        m->f = m->worhp_o.F; // Store cost, before scaling
         m->worhp_o.F *= m->worhp_w.ScaleObj;
         DoneUserAction(&m->worhp_c, evalF);
       }

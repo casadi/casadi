@@ -358,7 +358,6 @@ namespace casadi {
     m->return_status = return_status_string(status);
 
     // Save results to outputs
-    casadi_copy(&m->fk, 1, m->f);
     casadi_copy(m->gk, ng_, m->g);
 
     return 0;
@@ -445,7 +444,7 @@ namespace casadi {
       casadi_copy(x, nx_, m->x);
 
       // Get optimal cost
-      m->fk = obj_value;
+      m->f = obj_value;
 
       // Get dual solution (simple bounds)
       for (casadi_int i=0; i<nx_; ++i) {

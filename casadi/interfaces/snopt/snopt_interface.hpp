@@ -52,7 +52,7 @@ namespace casadi {
     double *xk2, *lam_gk, *lam_xk;
 
     // Current calculated quantities
-    double fk, *gk, *jac_fk, *jac_gk;
+    double *gk, *jac_fk, *jac_gk;
 
     std::vector<double> bl, bu, xx;
 

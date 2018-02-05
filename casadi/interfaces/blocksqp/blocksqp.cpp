@@ -642,7 +642,7 @@ namespace casadi {
     if (ret==1) print("***WARNING: Maximum number of iterations reached\n");
 
     // Get optimal cost
-    if (m->f) *m->f = m->obj;
+    m->f = m->obj;
     // Get constraints at solution
     casadi_copy(m->gk, ng_, m->g);
     // Get dual solution (simple bounds)

@@ -343,7 +343,7 @@ namespace casadi {
                                     get_ptr(m->valJ), get_ptr(m->indJ), get_ptr(m->locJ),
                                     get_ptr(m->bl), get_ptr(m->bu), get_ptr(m->hs),
                                     get_ptr(m->xx), get_ptr(m->pi), get_ptr(m->rc),
-                                    &m->fk, &nS, &nInf, &sInf);
+                                    &m->f, &nS, &nInf, &sInf);
     casadi_assert(99 != info, "snopt problem set up improperly");
 
     // Negate rc to match CasADi's definition
@@ -355,9 +355,6 @@ namespace casadi {
     // Get dual solution
     casadi_copy(get_ptr(m->rc), nx_, m->lam_x);
     casadi_copy(get_ptr(m->rc)+nx_, ng_, m->lam_g);
-
-    // Copy optimal cost to output
-    if (m->f) *m->f = m->fk;
 
     // Copy optimal constraint values to output
     casadi_copy(m->gk, ng_, m->g);

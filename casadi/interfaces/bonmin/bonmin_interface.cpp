@@ -378,7 +378,6 @@ namespace casadi {
     }
 
     // Save results to outputs
-    casadi_copy(&m->fk, 1, m->f);
     casadi_copy(m->gk, ng_, m->g);
     return 0;
   }
@@ -462,9 +461,9 @@ namespace casadi {
       const double* x, double obj_value) const {
     try {
       // Get optimal cost
-      m->fk = obj_value;
+      m->f = obj_value;
 
-      // Get dual solution
+      // Dual solution not calculated
       casadi_fill(m->lam_x, nx_, nan);
       casadi_fill(m->lam_g, ng_, nan);
 

@@ -89,13 +89,13 @@ namespace casadi {
     }
 
     // Setup NLP functions
-    fg_fcn_ = create_function("nlp_fg", {"x", "p"}, {"f", "g"});
-    gf_jg_fcn_ = create_function("nlp_gf_jg", {"x", "p"}, {"grad:f:x", "jac:g:x"});
-    jacg_sp_ = gf_jg_fcn_.sparsity_out(1);
-    hess_l_fcn_ = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+    create_function("nlp_fg", {"x", "p"}, {"f", "g"});
+    Function gf_jg_fcn = create_function("nlp_gf_jg", {"x", "p"}, {"grad:f:x", "jac:g:x"});
+    jacg_sp_ = gf_jg_fcn.sparsity_out(1);
+    Function hess_l_fcn = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
                                   {"hess:gamma:x:x"},
                                   {{"gamma", {"f", "g"}}});
-    hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
+    hesslag_sp_ = hess_l_fcn.sparsity_out(0);
 
     // Allocate persistent memory
     alloc_w(nx_, true); // wlbx_
@@ -259,7 +259,7 @@ namespace casadi {
     casadi_copy(get_ptr(lambda)+ng_, nx_, m->lam_x);
 
     // Output optimal cost
-    if (m->f) *m->f = f;
+    m->f = f;
 
     // Calculate constraints
     if (m->g) {

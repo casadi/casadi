@@ -782,9 +782,6 @@ namespace casadi {
       }
     }
 
-    // Objective value
-    m->fk = numeric_limits<double>::quiet_NaN();
-
     // Reset line-search
     fill(m->merit_mem.begin(), m->merit_mem.end(), 0.0);
     m->merit_ind = 0;
@@ -837,7 +834,7 @@ namespace casadi {
       if (m->iter_count % 10 == 0) printIteration(m, uout());
 
       // Printing information about the actual iterate
-      printIteration(m, uout(), m->iter_count, m->fk, pr_inf, du_inf, m->reg,
+      printIteration(m, uout(), m->iter_count, m->f, pr_inf, du_inf, m->reg,
                      ls_iter, ls_success);
 
       // Checking convergence criteria
@@ -856,7 +853,7 @@ namespace casadi {
       }
 
       // Check if not-a-number
-      if (m->fk!=m->fk || m->pr_step != m->pr_step || pr_inf != pr_inf) {
+      if (m->f!=m->f || m->pr_step != m->pr_step || pr_inf != pr_inf) {
         uout() << "casadi::SCPgen: Aborted, nan detected" << endl;
         break;
       }
@@ -883,10 +880,9 @@ namespace casadi {
     m->t_mainloop = (time2-time1)/CLOCKS_PER_SEC;
 
     // Store optimal value
-    uout() << "optimal cost = " << m->fk << endl;
+    uout() << "optimal cost = " << m->f << endl;
 
     // Save results to outputs
-    casadi_copy(&m->fk, 1, m->f);
     casadi_copy(m->lam_xk, nx_, m->lam_x);
     casadi_copy(m->gk, ng_, m->g);
 
@@ -1047,7 +1043,7 @@ namespace casadi {
 
     // Outputs
     fill_n(m->res, res_fcn_.n_out(), nullptr);
-    m->res[res_f_] = &m->fk; // Objective
+    m->res[res_f_] = &m->f; // Objective
     m->res[res_gl_] = gauss_newton_ ? m->b_gn : m->gfk; // Objective gradient
     m->res[res_g_] = m->gk; // Constraints
     for (size_t i=0; i<v_.size(); ++i) {
@@ -1200,7 +1196,7 @@ namespace casadi {
     double F_sens = 0;
     for (casadi_int i=0; i<nx_; ++i) F_sens += m->dxk[i] * m->gfk[i];
     double L1dir = F_sens - m->sigma * l1_infeas;
-    double L1merit = m->fk + m->sigma * l1_infeas;
+    double L1merit = m->f + m->sigma * l1_infeas;
 
     // Storing the actual merit function value in a list
     m->merit_mem[m->merit_ind] = L1merit;
@@ -1240,7 +1236,7 @@ namespace casadi {
 
       // Calculating merit-function in candidate
       l1_infeas = primalInfeasibility(m);
-      L1merit_cand = m->fk + m->sigma * l1_infeas;
+      L1merit_cand = m->f + m->sigma * l1_infeas;
 
       // Calculating maximal merit function value so far
       double meritmax = *max_element(m->merit_mem.begin(), m->merit_mem.end());

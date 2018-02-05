@@ -67,10 +67,6 @@ namespace casadi {
   */
   class CASADI_NLPSOL_KNITRO_EXPORT KnitroInterface : public Nlpsol {
   public:
-    // NLP functions
-    Function fg_fcn_;
-    Function gf_jg_fcn_;
-    Function hess_l_fcn_;
     Sparsity jacg_sp_;
     Sparsity hesslag_sp_;
 

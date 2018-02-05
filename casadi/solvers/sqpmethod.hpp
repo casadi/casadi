@@ -41,9 +41,6 @@
 namespace casadi {
 
   struct CASADI_NLPSOL_SQPMETHOD_EXPORT SqpmethodMemory : public NlpsolMemory {
-    /// Current cost function value
-    double fk;
-
     /// Lagrange multipliers of the NLP
     double *mu, *mu_x;
 
