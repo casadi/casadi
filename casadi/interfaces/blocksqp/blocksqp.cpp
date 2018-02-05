@@ -561,7 +561,7 @@ namespace casadi {
     }
   }
 
-  void Blocksqp::solve(void* mem) const {
+  int Blocksqp::solve(void* mem) const {
     auto m = static_cast<BlocksqpMemory*>(mem);
 
     // Check the provided inputs
@@ -660,6 +660,7 @@ namespace casadi {
       casadi_copy(m->lam_gk, ng_, m->lam_g);
       casadi_scal(ng_, -1., m->lam_g);
     }
+    return 0;
   }
 
   casadi_int Blocksqp::run(BlocksqpMemory* m, casadi_int maxIt, casadi_int warmStart) const {

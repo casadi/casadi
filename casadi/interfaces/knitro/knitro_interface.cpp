@@ -129,7 +129,7 @@ namespace casadi {
     m->wubg = w; w += ng_;
   }
 
-  void KnitroInterface::solve(void* mem) const {
+  int KnitroInterface::solve(void* mem) const {
     auto m = static_cast<KnitroMemory*>(mem);
 
     // Check the provided inputs
@@ -279,6 +279,7 @@ namespace casadi {
     // Free memory (move to destructor!)
     KTR_free(&m->kc);
     m->kc = 0;
+    return 0;
   }
 
   int KnitroInterface::callback(const int evalRequestCode, const int n,

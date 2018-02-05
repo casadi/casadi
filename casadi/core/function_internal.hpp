@@ -916,8 +916,10 @@ namespace casadi {
     for (casadi_int i=0; i<n_out_; ++i) resp[i]=get_ptr(res[i]);
 
     // Call memory-less
-    (void)eval_gen(get_ptr(argp), get_ptr(resp),
-                get_ptr(iw_tmp), get_ptr(w_tmp), memory(0));
+    if (eval_gen(get_ptr(argp), get_ptr(resp),
+                 get_ptr(iw_tmp), get_ptr(w_tmp), memory(0))) {
+      casadi_error("Evaluation failed");
+    }
   }
 
   template<typename M>

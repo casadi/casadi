@@ -223,7 +223,7 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::solve(void* mem) const {
+  int SnoptInterface::solve(void* mem) const {
     auto m = static_cast<SnoptMemory*>(mem);
 
     // Check the provided inputs
@@ -367,6 +367,7 @@ namespace casadi {
 
     // Free memory
     deleteSNOPT(&prob);
+    return 0;
   }
 
   void SnoptInterface::

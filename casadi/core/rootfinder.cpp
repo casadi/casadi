@@ -261,8 +261,7 @@ namespace casadi {
     setup(mem, arg, res, iw, w);
 
     // Solve the NLP
-    solve(mem);
-    return 0;
+    return solve(mem);
   }
 
   void Rootfinder::set_work(void* mem, const double**& arg, double**& res,

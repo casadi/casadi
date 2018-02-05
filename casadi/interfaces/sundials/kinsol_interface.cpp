@@ -262,7 +262,7 @@ namespace casadi {
     alloc(jtimes_);
   }
 
-  void KinsolInterface::solve(void* mem) const {
+  int KinsolInterface::solve(void* mem) const {
     auto m = static_cast<KinsolMemory*>(mem);
 
     // Get the initial guess
@@ -289,6 +289,7 @@ namespace casadi {
       m->res[iout_] = 0;
       oracle_(m->arg, m->res, m->iw, m->w, 0);
     }
+    return 0;
   }
 
   void KinsolInterface::func(KinsolMemory& m, N_Vector u, N_Vector fval) const {

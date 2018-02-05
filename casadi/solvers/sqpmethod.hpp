@@ -131,7 +131,7 @@ namespace casadi {
                           casadi_int*& iw, double*& w) const override;
 
     // Solve the NLP
-    void solve(void* mem) const override;
+    int solve(void* mem) const override;
 
     /// QP solver for the subproblems
     Function qpsol_;

@@ -128,7 +128,7 @@ namespace casadi {
                           casadi_int*& iw, double*& w) const override;
 
     // Solve the NLP
-    void solve(void* mem) const override;
+    int solve(void* mem) const override;
 
     /// Exact Hessian?
     bool exact_hessian_;

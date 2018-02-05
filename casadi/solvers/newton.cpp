@@ -114,7 +114,7 @@ namespace casadi {
      m->jac = w; w += sp_jac_.nnz();
   }
 
-  void Newton::solve(void* mem) const {
+  int Newton::solve(void* mem) const {
     auto m = static_cast<NewtonMemory*>(mem);
 
     // Get the initial guess
@@ -191,6 +191,7 @@ namespace casadi {
     // Store the iteration count
     if (success) m->return_status = "success";
     if (verbose_) casadi_message("Newton algorithm took " + str(m->iter) + " steps");
+    return 0;
   }
 
   void Newton::printIteration(std::ostream &stream) const {

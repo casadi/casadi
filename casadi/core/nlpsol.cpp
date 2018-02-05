@@ -455,7 +455,10 @@ namespace casadi {
     casadi_fill(m->lam_p, np_, nan);
 
     // Solve the NLP
-    solve(m);
+    if (solve(m)) {
+      casadi_warning("NLP solution failed");
+      return 1;
+    }
 
     // Calculate multiplers
     if (calc_multipliers_) {

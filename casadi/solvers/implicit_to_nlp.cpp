@@ -134,7 +134,7 @@ namespace casadi {
       m->x = w; w += n_;
    }
 
-  void ImplicitToNlp::solve(void* mem) const {
+  int ImplicitToNlp::solve(void* mem) const {
     auto m = static_cast<ImplicitToNlpMemory*>(mem);
 
     // Buffers for calling the NLP solver
@@ -196,6 +196,8 @@ namespace casadi {
       m->res[iout_] = 0;
       oracle_(m->arg, m->res, m->iw, m->w, 0);
     }
+
+    return 0;
   }
 
 } // namespace casadi

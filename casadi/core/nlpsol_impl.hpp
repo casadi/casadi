@@ -150,7 +150,7 @@ namespace casadi {
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     // Solve the NLP
-    virtual void solve(void* mem) const = 0;
+    virtual int solve(void* mem) const = 0;
 
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const override {return true;}

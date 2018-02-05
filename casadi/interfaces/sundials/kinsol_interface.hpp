@@ -100,7 +100,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// Solve the system of equations and calculate derivatives
-    void solve(void* mem) const override;
+    int solve(void* mem) const override;
 
     // Get name of the plugin
     const char* plugin_name() const override { return "kinsol";}

@@ -274,7 +274,7 @@ namespace casadi {
 
   }
 
-  void AmplInterface::solve(void* mem) const {
+  int AmplInterface::solve(void* mem) const {
     auto m = static_cast<AmplInterfaceMemory*>(mem);
 
     // Check the provided inputs
@@ -408,6 +408,8 @@ namespace casadi {
       casadi_warning("Failed to remove " + solname);
     }
     if (verbose_) casadi_message("Removed " + solname);
+
+    return 0;
   }
 
 

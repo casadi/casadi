@@ -333,7 +333,7 @@ namespace casadi {
     return "Unknown";
   }
 
-  void IpoptInterface::solve(void* mem) const {
+  int IpoptInterface::solve(void* mem) const {
     auto m = static_cast<IpoptMemory*>(mem);
 
     // Check the provided inputs
@@ -369,6 +369,8 @@ namespace casadi {
     casadi_copy(m->lam_gk, ng_, m->lam_g);
     casadi_copy(m->lam_xk, nx_, m->lam_x);
     casadi_copy(m->gk, ng_, m->g);
+
+    return 0;
   }
 
   bool IpoptInterface::

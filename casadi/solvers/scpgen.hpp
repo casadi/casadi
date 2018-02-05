@@ -139,7 +139,7 @@ namespace casadi {
                           casadi_int*& iw, double*& w) const override;
 
     // Solve the NLP
-    void solve(void* mem) const override;
+    int solve(void* mem) const override;
 
     // Calculate the L1-norm of the primal infeasibility
     double primalInfeasibility(ScpgenMemory* m) const;

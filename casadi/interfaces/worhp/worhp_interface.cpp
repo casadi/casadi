@@ -336,7 +336,7 @@ namespace casadi {
     }
   }
 
-  void WorhpInterface::solve(void* mem) const {
+  int WorhpInterface::solve(void* mem) const {
     auto m = static_cast<WorhpMemory*>(mem);
 
     // Check the provided inputs
@@ -508,6 +508,7 @@ namespace casadi {
 
     m->return_code = m->worhp_c.status;
     m->return_status = return_codes(m->worhp_c.status);
+    return 0;
   }
 
   const char* WorhpInterface::return_codes(casadi_int flag) {

@@ -93,7 +93,7 @@ namespace casadi {
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     // Solve the NLP
-    virtual void solve(void* mem) const = 0;
+    virtual int solve(void* mem) const = 0;
 
     /** \brief  Propagate sparsity forward */
     int sp_forward(const bvec_t** arg, bvec_t** res,

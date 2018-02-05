@@ -303,7 +303,7 @@ namespace casadi {
     m->iter_count = -1;
   }
 
-  void Sqpmethod::solve(void* mem) const {
+  int Sqpmethod::solve(void* mem) const {
     auto m = static_cast<SqpmethodMemory*>(mem);
 
     // Check the provided inputs
@@ -612,6 +612,8 @@ namespace casadi {
     if (m->lam_g) casadi_copy(m->mu, ng_, m->lam_g);
     if (m->lam_x) casadi_copy(m->mu_x, nx_, m->lam_x);
     if (m->g) casadi_copy(m->gk, ng_, m->g);
+
+    return 0;
   }
 
   void Sqpmethod::print_iteration() const {

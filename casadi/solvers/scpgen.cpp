@@ -759,7 +759,7 @@ namespace casadi {
     }
   }
 
-  void Scpgen::solve(void* mem) const {
+  int Scpgen::solve(void* mem) const {
     auto m = static_cast<ScpgenMemory*>(mem);
 
     if (v_.size()>0) {
@@ -912,6 +912,7 @@ namespace casadi {
     }
 
     uout() << endl;
+    return 0;
   }
 
   double Scpgen::primalInfeasibility(ScpgenMemory* m) const {
