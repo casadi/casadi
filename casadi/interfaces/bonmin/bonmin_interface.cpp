@@ -220,7 +220,6 @@ namespace casadi {
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Work vectors
-    m->lam_xk = w; w += nx_;
     m->gk = w; w += ng_;
     m->grad_fk = w; w += nx_;
     m->jac_gk = w; w += jacg_sp_.nnz();
@@ -380,7 +379,6 @@ namespace casadi {
 
     // Save results to outputs
     casadi_copy(&m->fk, 1, m->f);
-    casadi_copy(m->lam_xk, nx_, m->lam_x);
     casadi_copy(m->gk, ng_, m->g);
     return 0;
   }
@@ -408,7 +406,7 @@ namespace casadi {
         if (full_callback) {
           casadi_copy(x, nx_, m->x);
           for (casadi_int i=0; i<nx_; ++i) {
-            m->lam_xk[i] = z_U[i]-z_L[i];
+            m->lam_x[i] = z_U[i]-z_L[i];
           }
           casadi_copy(lambda, ng_, m->lam_g);
           casadi_copy(g, ng_, m->gk);
@@ -431,7 +429,7 @@ namespace casadi {
           m->arg[NLPSOL_F] = &obj_value;
           m->arg[NLPSOL_G] = g;
           m->arg[NLPSOL_LAM_P] = 0;
-          m->arg[NLPSOL_LAM_X] = m->lam_xk;
+          m->arg[NLPSOL_LAM_X] = m->lam_x;
           m->arg[NLPSOL_LAM_G] = m->lam_g;
         }
 
@@ -466,14 +464,8 @@ namespace casadi {
       // Get optimal cost
       m->fk = obj_value;
 
-      // Get dual solution (simple bounds)
-      if (m->lam_xk) {
-        for (casadi_int i=0; i<nx_; ++i) {
-          m->lam_xk[i] = casadi::nan;
-        }
-      }
-
-      // Get dual solution (nonlinear bounds)
+      // Get dual solution
+      casadi_fill(m->lam_x, nx_, nan);
       casadi_fill(m->lam_g, ng_, nan);
 
       // Get the constraints
@@ -517,14 +509,9 @@ namespace casadi {
 
       // Initialize dual variables (simple bounds)
       if (init_z) {
-        if (m->lam_x0) {
-          for (casadi_int i=0; i<nx_; ++i) {
-            z_L[i] = max(0., -m->lam_x0[i]);
-            z_U[i] = max(0., m->lam_x0[i]);
-          }
-        } else {
-          casadi_fill(z_L, nx_, 0.);
-          casadi_fill(z_U, nx_, 0.);
+        for (casadi_int i=0; i<nx_; ++i) {
+          z_L[i] = max(0., -m->lam_x[i]);
+          z_U[i] = max(0., m->lam_x[i]);
         }
       }
 

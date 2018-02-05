@@ -72,9 +72,6 @@ namespace casadi {
     void* userclass;
     void* app;
 
-    // Current solution
-    double *lam_xk;
-
     // Current calculated quantities
     double fk, *gk, *grad_fk, *jac_gk, *hess_lk, *grad_lk;
 

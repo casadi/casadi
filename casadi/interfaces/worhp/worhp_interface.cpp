@@ -356,7 +356,7 @@ namespace casadi {
     casadi_copy(m->x, nx_, m->worhp_o.X);
     casadi_copy(m->lbx, nx_, m->worhp_o.XL);
     casadi_copy(m->ubx, nx_, m->worhp_o.XU);
-    casadi_copy(m->lam_x0, nx_, m->worhp_o.Lambda);
+    casadi_copy(m->lam_x, nx_, m->worhp_o.Lambda);
     if (m->worhp_o.m>0) {
       casadi_copy(m->lam_g, ng_, m->worhp_o.Mu);
       casadi_copy(m->lbg, ng_, m->worhp_o.GL);

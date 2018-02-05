@@ -629,7 +629,7 @@ namespace casadi {
     initializeFilter(m);
 
     // Primal-dual initial guess
-    casadi_copy(m->lam_x0, nx_, m->lam_xk);
+    casadi_copy(m->lam_x, nx_, m->lam_xk);
     casadi_scal(nx_, -1., m->lam_xk);
     casadi_copy(m->lam_g, ng_, m->lam_gk);
     casadi_scal(ng_, -1., m->lam_gk);

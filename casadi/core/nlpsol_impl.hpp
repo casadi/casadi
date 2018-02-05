@@ -43,13 +43,10 @@ namespace casadi {
     double *x;
 
     // Current dual solution
-    double *lam_g;
-
-    // Inputs
-    const double *lam_x0;
+    double *lam_g, *lam_x;
 
     // Outputs
-    double *f, *g, *lam_x, *lam_p;
+    double *f, *g, *lam_p;
 
     // number of iterations
     casadi_int n_iter;

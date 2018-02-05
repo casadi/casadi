@@ -70,9 +70,6 @@
 namespace casadi {
 
   struct CASADI_NLPSOL_BONMIN_EXPORT BonminMemory : public NlpsolMemory {
-    // Current solution
-    double *xk, lam_fk, *lam_gk, *lam_xk;
-
     // Current calculated quantities
     double fk, *gk, *grad_fk, *jac_gk, *hess_lk, *grad_lk;
 
