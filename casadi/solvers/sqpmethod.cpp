@@ -232,8 +232,7 @@ namespace casadi {
     alloc_w(nx_, true); // gLag_old_
 
     // Constraint function value
-    alloc_w(ng_, true); // gk_
-    alloc_w(ng_, true); // gk_cand_
+    alloc_w(ng_, true); // g_cand_
 
     // Gradient of the objective
     alloc_w(nx_, true); // gf_
@@ -276,8 +275,7 @@ namespace casadi {
     m->gLag_old = w; w += nx_;
 
     // Constraint function value
-    m->gk = w; w += ng_;
-    m->gk_cand = w; w += ng_;
+    m->g_cand = w; w += ng_;
 
     // Gradient of the objective
     m->gf = w; w += nx_;
@@ -316,7 +314,7 @@ namespace casadi {
     if (ng_) {
       m->arg[0] = m->x;
       m->arg[1] = m->p;
-      m->res[0] = m->gk;
+      m->res[0] = m->g;
       m->res[1] = m->Jk;
       if (calc_function(m, "nlp_jac_g")) casadi_error("nlp_jac_g");
     }
@@ -376,7 +374,7 @@ namespace casadi {
 
       // Primal infeasability
       double pr_inf = std::fmax(casadi_max_viol(nx_, m->x, m->lbx, m->ubx),
-                                casadi_max_viol(ng_, m->gk, m->lbg, m->ubg));
+                                casadi_max_viol(ng_, m->g, m->lbg, m->ubg));
 
       // inf-norm of lagrange gradient
       double gLag_norminf = casadi_norm_inf(nx_, m->gLag);
@@ -430,9 +428,9 @@ namespace casadi {
       casadi_copy(m->ubx, nx_, m->qp_UBX);
       casadi_axpy(nx_, -1., m->x, m->qp_UBX);
       casadi_copy(m->lbg, ng_, m->qp_LBA);
-      casadi_axpy(ng_, -1., m->gk, m->qp_LBA);
+      casadi_axpy(ng_, -1., m->g, m->qp_LBA);
       casadi_copy(m->ubg, ng_, m->qp_UBA);
-      casadi_axpy(ng_, -1., m->gk, m->qp_UBA);
+      casadi_axpy(ng_, -1., m->g, m->qp_UBA);
 
       // Solve the QP
       solve_QP(m, m->Bk, m->gf, m->qp_LBX, m->qp_UBX, m->Jk, m->qp_LBA,
@@ -451,7 +449,7 @@ namespace casadi {
 
       // Calculate L1-merit function in the actual iterate
       double l1_infeas = std::fmax(casadi_max_viol(nx_, m->x, m->lbx, m->ubx),
-                                   casadi_max_viol(ng_, m->gk, m->lbg, m->ubg));
+                                   casadi_max_viol(ng_, m->g, m->lbg, m->ubg));
 
       // Right-hand side of Armijo condition
       double F_sens = casadi_dot(nx_, m->dx, m->gf);
@@ -486,7 +484,7 @@ namespace casadi {
             m->arg[0] = m->x_cand;
             m->arg[1] = m->p;
             m->res[0] = &fk_cand;
-            m->res[1] = m->gk_cand;
+            m->res[1] = m->g_cand;
             if (calc_function(m, "nlp_fg")) casadi_error("nlp_fg failed");
           } catch(const CasadiException& ex) {
             (void)ex;
@@ -501,7 +499,7 @@ namespace casadi {
 
           // Calculating merit-function in candidate
           l1_infeas = std::fmax(casadi_max_viol(nx_, m->x_cand, m->lbx, m->ubx),
-                                casadi_max_viol(ng_, m->gk_cand, m->lbg, m->ubg));
+                                casadi_max_viol(ng_, m->g_cand, m->lbg, m->ubg));
           L1merit_cand = fk_cand + m->sigma * l1_infeas;
           // Calculating maximal merit function value so far
           double meritmax = *max_element(m->merit_mem.begin(), m->merit_mem.end());
@@ -554,7 +552,7 @@ namespace casadi {
       if (ng_) {
         m->arg[0] = m->x;
         m->arg[1] = m->p;
-        m->res[0] = m->gk;
+        m->res[0] = m->g;
         m->res[1] = m->Jk;
         if (calc_function(m, "nlp_jac_g")) casadi_error("nlp_jac_g");
       }
@@ -605,7 +603,6 @@ namespace casadi {
     // Save results to outputs
     if (m->lam_g) casadi_copy(m->mu, ng_, m->lam_g);
     if (m->lam_x) casadi_copy(m->mu_x, nx_, m->lam_x);
-    if (m->g) casadi_copy(m->gk, ng_, m->g);
 
     return 0;
   }

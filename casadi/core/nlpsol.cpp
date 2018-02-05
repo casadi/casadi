@@ -345,6 +345,7 @@ namespace casadi {
     alloc_w(nx_, true); // lam_x
     alloc_w(ng_, true); // lam_g
     alloc_w(np_, true); // lam_p
+    alloc_w(ng_, true); // g
 
     if (!fcallback_.is_null()) {
       // Consistency checks
@@ -468,7 +469,7 @@ namespace casadi {
     // Get output pointers
     double *x = res[NLPSOL_X];
     double *f = res[NLPSOL_F];
-    m->g = res[NLPSOL_G];
+    double *g = res[NLPSOL_G];
     double *lam_x = res[NLPSOL_LAM_X];
     double *lam_g = res[NLPSOL_LAM_G];
     double *lam_p = res[NLPSOL_LAM_P];
@@ -487,6 +488,7 @@ namespace casadi {
 
     // Reset f, g
     m->f = nan;
+    casadi_fill(m->g, ng_, nan);
 
     // Solve the NLP
     int flag = solve(m);
@@ -497,6 +499,7 @@ namespace casadi {
     casadi_copy(m->lam_g, ng_, lam_g);
     casadi_copy(m->lam_p, np_, lam_p);
     casadi_copy(&m->f, 1, f);
+    casadi_copy(m->g, ng_, g);
 
     // Calculate multiplers
     if (calc_multipliers_) {
@@ -543,6 +546,7 @@ namespace casadi {
     m->lam_x = w; w += nx_;
     m->lam_g = w; w += ng_;
     m->lam_p = w; w += np_;
+    m->g = w; w += ng_;
   }
 
   std::vector<std::string> nlpsol_options(const std::string& name) {

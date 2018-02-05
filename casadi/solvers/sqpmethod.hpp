@@ -51,7 +51,7 @@ namespace casadi {
     double *gLag, *gLag_old;
 
     /// Constraint function value
-    double *gk, *gk_cand;
+    double *g_cand;
 
     /// Gradient of the objective function
     double *gf;
