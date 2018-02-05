@@ -66,7 +66,7 @@ namespace casadi {
   = {{&Nlpsol::options_},
      {{"qpsol",
        {OT_STRING,
-        "The QP solver to be used by the SQP method"}},
+        "The QP solver to be used by the SQP method [qpoases]"}},
       {"qpsol_options",
        {OT_DICT,
         "Options to be passed to the QP solver"}},
@@ -132,7 +132,7 @@ namespace casadi {
     regularize_ = false;
     string hessian_approximation = "exact";
     min_step_size_ = 1e-10;
-    string qpsol_plugin;
+    string qpsol_plugin = "qpoases";
     Dict qpsol_options;
     print_header_ = true;
     print_iteration_ = true;
