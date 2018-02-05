@@ -245,9 +245,10 @@ matrix:
       script:
         - mkdir build
         - pushd build
+        - echo $casadi_build_flags
         - cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON ..
 
-        - #cmake $casadi_build_flags -DPYTHON_LIBRARY=$CMAKE_PYTHON_LIBRARY -DPYTHON_INCLUDE_DIR=$CMAKE_PYTHON_INCLUDE_DIR -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON -DCMAKE_INSTALL_PREFIX=../python_install -DPYTHON_PREFIX=../python_install ..
+        - #cmake $casadi_build_flags -DPYTHON_LIBRARY=$CMAKE_PYTHON_LIBRARY -DPYTHON_INCLUDE_DIR=$CMAKE_PYTHON_INCLUDE_DIR -DWITH_PYTHON=ON -DCMAKE_INSTALL_PREFIX=../python_install -DPYTHON_PREFIX=../python_install ..
         - osx_rpath
         - make VERBOSE=1
         - sudo make install
