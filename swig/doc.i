@@ -60437,6 +60437,8 @@ A textbook SQPMethod
 | merit_memory          | OT_INT    | Size of memory to store history of   |
 |                       |           | merit function values                |
 +-----------------------+-----------+--------------------------------------+
+| min_iter              | OT_INT    | Minimum number of SQP iterations     |
++-----------------------+-----------+--------------------------------------+
 | min_step_size         | OT_DOUBLE | The size (inf-norm) of the step size |
 |                       |           | should not become smaller than this. |
 +-----------------------+-----------+--------------------------------------+
@@ -60540,6 +60542,9 @@ A textbook SQPMethod
 |                   |               | store history of  | d                |
 |                   |               | merit function    |                  |
 |                   |               | values            |                  |
++-------------------+---------------+-------------------+------------------+
+| min_iter          | OT_INT        | Minimum number of | casadi::Sqpmetho |
+|                   |               | SQP iterations    | d                |
 +-------------------+---------------+-------------------+------------------+
 | min_step_size     | OT_DOUBLE     | The size (inf-    | casadi::Sqpmetho |
 |                   |               | norm) of the step | d                |
@@ -60814,12 +60819,6 @@ const  "
 
 %feature("docstring")  casadi::Sqpmethod::regularize(double *H, double reg)
 const  "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Sqpmethod::primalInfeasibility(const double
-*x, const double *lbx, const double *ubx, const double *g, const double
-*lbg, const double *ubg) const  "
 
 [INTERNAL] ";
 
@@ -61157,11 +61156,6 @@ override "
 
 %feature("docstring")  casadi::OracleFunction::monitored(const std::string
 &name) const  "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Sqpmethod::reset_h(SqpmethodMemory *m) const
-"
 
 [INTERNAL] ";
 
@@ -63762,6 +63756,11 @@ Load a just-in-time compiled external function File name given.
 Number of NLP solver outputs.
 
 ";
+
+%feature("docstring")  casadi::casadi_bfgs_reset(const casadi_int *sp_h, T1
+*h) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_forward_diff(T1 **yk, T1 *y0, T1 *J,
 T1 h, casadi_int n_y, const casadi_finite_diff_mem< T1 > *m) "
@@ -66810,6 +66809,11 @@ Get the documentation string for a plugin.
 
 ";
 
+%feature("docstring")  casadi::casadi_bfgs(const casadi_int *sp_h, T1 *h,
+const T1 *x, const T1 *x_old, const T1 *glag, const T1 *glag_old, T1 *w) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::dple_in() "
 
 Get input scheme of DPLE solvers.
@@ -67572,6 +67576,8 @@ A textbook SQPMethod
 +-----------------------+-----------+--------------------------------------+
 | merit_memory          | OT_INT    | Size of memory to store history of   |
 |                       |           | merit function values                |
++-----------------------+-----------+--------------------------------------+
+| min_iter              | OT_INT    | Minimum number of SQP iterations     |
 +-----------------------+-----------+--------------------------------------+
 | min_step_size         | OT_DOUBLE | The size (inf-norm) of the step size |
 |                       |           | should not become smaller than this. |

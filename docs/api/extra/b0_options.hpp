@@ -2831,6 +2831,7 @@
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>max_iter_ls</td><td>OT_INT</td><td>Maximum number of linesearch iterations</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>merit_memory</td><td>OT_INT</td><td>Size of memory to store history of merit function values</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>min_iter</td><td>OT_INT</td><td>Minimum number of SQP iterations</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>min_step_size</td><td>OT_DOUBLE</td><td>The size (inf-norm) of the step size should not become smaller than this.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Sqpmethod</td></tr>
@@ -2858,6 +2859,7 @@
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td></tr>
 <tr><td>max_iter_ls</td><td>OT_INT</td><td>Maximum number of linesearch iterations</td></tr>
 <tr><td>merit_memory</td><td>OT_INT</td><td>Size of memory to store history of merit function values</td></tr>
+<tr><td>min_iter</td><td>OT_INT</td><td>Minimum number of SQP iterations</td></tr>
 <tr><td>min_step_size</td><td>OT_DOUBLE</td><td>The size (inf-norm) of the step size should not become smaller than this.</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print the iterations</td></tr>
@@ -2889,6 +2891,7 @@
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of SQP iterations</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>max_iter_ls</td><td>OT_INT</td><td>Maximum number of linesearch iterations</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>merit_memory</td><td>OT_INT</td><td>Size of memory to store history of merit function values</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>min_iter</td><td>OT_INT</td><td>Minimum number of SQP iterations</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>min_step_size</td><td>OT_DOUBLE</td><td>The size (inf-norm) of the step size should not become smaller than this.</td><td>casadi::Sqpmethod</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print the header with problem statistics</td><td>casadi::Sqpmethod</td></tr>

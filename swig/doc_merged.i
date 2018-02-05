@@ -43161,6 +43161,8 @@ A textbook SQPMethod
 | merit_memory          | OT_INT    | Size of memory to store history of   |
 |                       |           | merit function values                |
 +-----------------------+-----------+--------------------------------------+
+| min_iter              | OT_INT    | Minimum number of SQP iterations     |
++-----------------------+-----------+--------------------------------------+
 | min_step_size         | OT_DOUBLE | The size (inf-norm) of the step size |
 |                       |           | should not become smaller than this. |
 +-----------------------+-----------+--------------------------------------+
@@ -43264,6 +43266,9 @@ A textbook SQPMethod
 |                   |               | store history of  | d                |
 |                   |               | merit function    |                  |
 |                   |               | values            |                  |
++-------------------+---------------+-------------------+------------------+
+| min_iter          | OT_INT        | Minimum number of | casadi::Sqpmetho |
+|                   |               | SQP iterations    | d                |
 +-------------------+---------------+-------------------+------------------+
 | min_step_size     | OT_DOUBLE     | The size (inf-    | casadi::Sqpmetho |
 |                   |               | norm) of the step | d                |
@@ -43469,8 +43474,6 @@ Get Jacobian sparsity.
 ";
 
 %feature("docstring") casadi::Sqpmethod::regularize "[INTERNAL] ";
-
-%feature("docstring") casadi::Sqpmethod::primalInfeasibility "[INTERNAL] ";
 
 %feature("docstring") casadi::Sqpmethod::size_in "[INTERNAL]  Input/output
 dimensions.
@@ -43694,8 +43697,6 @@ statistics.
 ";
 
 %feature("docstring") casadi::Sqpmethod::monitored "[INTERNAL] ";
-
-%feature("docstring") casadi::Sqpmethod::reset_h "[INTERNAL] ";
 
 %feature("docstring") casadi::Sqpmethod::integer_support "[INTERNAL]  Can
 discrete variables be treated.
@@ -45685,6 +45686,8 @@ Load a just-in-time compiled external function File name given.
 Number of NLP solver outputs.
 
 ";
+
+%feature("docstring") casadi::casadi_bfgs_reset "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_forward_diff "[INTERNAL] ";
 
@@ -48468,6 +48471,8 @@ Get the documentation string for a plugin.
 
 ";
 
+%feature("docstring") casadi::casadi_bfgs "[INTERNAL] ";
+
 %feature("docstring") casadi::dple_in "
 
 >  std::vector<std::string> casadi::dple_in()
@@ -49228,6 +49233,8 @@ A textbook SQPMethod
 +-----------------------+-----------+--------------------------------------+
 | merit_memory          | OT_INT    | Size of memory to store history of   |
 |                       |           | merit function values                |
++-----------------------+-----------+--------------------------------------+
+| min_iter              | OT_INT    | Minimum number of SQP iterations     |
 +-----------------------+-----------+--------------------------------------+
 | min_step_size         | OT_DOUBLE | The size (inf-norm) of the step size |
 |                       |           | should not become smaller than this. |
