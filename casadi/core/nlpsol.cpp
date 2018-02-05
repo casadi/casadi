@@ -490,6 +490,9 @@ namespace casadi {
     m->f = nan;
     casadi_fill(m->g, ng_, nan);
 
+    // Check the provided inputs
+    check_inputs(m);
+
     // Solve the NLP
     int flag = solve(m);
 

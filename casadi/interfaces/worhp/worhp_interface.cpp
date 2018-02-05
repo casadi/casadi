@@ -339,9 +339,6 @@ namespace casadi {
   int WorhpInterface::solve(void* mem) const {
     auto m = static_cast<WorhpMemory*>(mem);
 
-    // Check the provided inputs
-    check_inputs(mem);
-
     if (m->lbg && m->ubg) {
       for (casadi_int i=0; i<ng_; ++i) {
         casadi_assert(!(m->lbg[i]==-inf && m->ubg[i] == inf),

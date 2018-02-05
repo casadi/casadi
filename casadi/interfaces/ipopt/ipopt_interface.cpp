@@ -330,9 +330,6 @@ namespace casadi {
   int IpoptInterface::solve(void* mem) const {
     auto m = static_cast<IpoptMemory*>(mem);
 
-    // Check the provided inputs
-    check_inputs(mem);
-
     // Reset statistics
     m->inf_pr.clear();
     m->inf_du.clear();

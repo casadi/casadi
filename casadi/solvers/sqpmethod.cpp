@@ -299,9 +299,6 @@ namespace casadi {
   int Sqpmethod::solve(void* mem) const {
     auto m = static_cast<SqpmethodMemory*>(mem);
 
-    // Check the provided inputs
-    check_inputs(mem);
-
     // Initial constraint Jacobian
     if (ng_) {
       m->arg[0] = m->x;

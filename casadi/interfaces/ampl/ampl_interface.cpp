@@ -277,9 +277,6 @@ namespace casadi {
   int AmplInterface::solve(void* mem) const {
     auto m = static_cast<AmplInterfaceMemory*>(mem);
 
-    // Check the provided inputs
-    check_inputs(mem);
-
     // Create .nl file and add preamble
     std::string nlname = temporary_file("casadi_ampl_tmp", ".nl");
     ofstream nl(nlname, ofstream::out);

@@ -226,9 +226,6 @@ namespace casadi {
   int SnoptInterface::solve(void* mem) const {
     auto m = static_cast<SnoptMemory*>(mem);
 
-    // Check the provided inputs
-    check_inputs(mem);
-
     // Memory object
     snProblem prob;
 

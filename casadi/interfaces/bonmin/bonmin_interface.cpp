@@ -288,9 +288,6 @@ namespace casadi {
   int BonminInterface::solve(void* mem) const {
     auto m = static_cast<BonminMemory*>(mem);
 
-    // Check the provided inputs
-    check_inputs(mem);
-
     // Reset statistics
     m->inf_pr.clear();
     m->inf_du.clear();
