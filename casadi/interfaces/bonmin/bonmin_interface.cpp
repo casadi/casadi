@@ -199,7 +199,6 @@ namespace casadi {
 
     // Allocate work vectors
     alloc_w(nx_, true); // xk_
-    alloc_w(ng_, true); // lam_gk_
     alloc_w(nx_, true); // lam_xk_
     alloc_w(ng_, true); // gk_
     alloc_w(nx_, true); // grad_fk_
@@ -221,7 +220,6 @@ namespace casadi {
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Work vectors
-    m->lam_gk = w; w += ng_;
     m->lam_xk = w; w += nx_;
     m->gk = w; w += ng_;
     m->grad_fk = w; w += nx_;
@@ -382,7 +380,6 @@ namespace casadi {
 
     // Save results to outputs
     casadi_copy(&m->fk, 1, m->f);
-    casadi_copy(m->lam_gk, ng_, m->lam_g);
     casadi_copy(m->lam_xk, nx_, m->lam_x);
     casadi_copy(m->gk, ng_, m->g);
     return 0;
@@ -413,7 +410,7 @@ namespace casadi {
           for (casadi_int i=0; i<nx_; ++i) {
             m->lam_xk[i] = z_U[i]-z_L[i];
           }
-          casadi_copy(lambda, ng_, m->lam_gk);
+          casadi_copy(lambda, ng_, m->lam_g);
           casadi_copy(g, ng_, m->gk);
         } else {
           if (iter==0) {
@@ -435,7 +432,7 @@ namespace casadi {
           m->arg[NLPSOL_G] = g;
           m->arg[NLPSOL_LAM_P] = 0;
           m->arg[NLPSOL_LAM_X] = m->lam_xk;
-          m->arg[NLPSOL_LAM_G] = m->lam_gk;
+          m->arg[NLPSOL_LAM_G] = m->lam_g;
         }
 
         // Outputs
@@ -477,7 +474,7 @@ namespace casadi {
       }
 
       // Get dual solution (nonlinear bounds)
-      casadi_fill(m->lam_gk, ng_, nan);
+      casadi_fill(m->lam_g, ng_, nan);
 
       // Get the constraints
       casadi_fill(m->gk, ng_, nan);
@@ -533,7 +530,7 @@ namespace casadi {
 
       // Initialize dual variables (nonlinear bounds)
       if (init_lambda) {
-        casadi_copy(m->lam_g0, ng_, lambda);
+        casadi_copy(m->lam_g, ng_, lambda);
       }
 
       return true;

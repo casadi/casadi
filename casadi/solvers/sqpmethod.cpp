@@ -309,7 +309,7 @@ namespace casadi {
     check_inputs(mem);
 
     // Initialize Lagrange multipliers of the NLP
-    casadi_copy(m->lam_g0, ng_, m->mu);
+    casadi_copy(m->lam_g, ng_, m->mu);
     casadi_copy(m->lam_x0, nx_, m->mu_x);
 
     // Initial constraint Jacobian
