@@ -164,6 +164,10 @@ namespace casadi {
                          const Dict& opts) const override;
     ///@}
 
+    // Call the callback function
+    int callback(void* mem, const double* x, const double* f, const double* g,
+                 const double* lam_x, const double* lam_g, const double* lam_p) const;
+
     // Creator function for internal class
     typedef Nlpsol* (*Creator)(const std::string& name, const Function& oracle);
 

@@ -397,40 +397,11 @@ namespace casadi {
                        m->reg, ls_iter, ls_success);
       }
 
-      // Call callback function if present
-      if (!fcallback_.is_null()) {
-        // Callback inputs
-        fill_n(m->arg, fcallback_.n_in(), nullptr);
-        m->arg[NLPSOL_F] = &m->fk;
-        m->arg[NLPSOL_X] = m->x;
-        m->arg[NLPSOL_LAM_G] = m->lam_g;
-        m->arg[NLPSOL_LAM_X] = m->lam_x;
-        m->arg[NLPSOL_G] = m->g;
-
-        // Callback outputs
-        fill_n(m->res, fcallback_.n_out(), nullptr);
-        double ret = 0;
-        m->arg[0] = &ret;
-
-        m->fstats.at("callback_fun").tic();
-
-        try {
-          // Evaluate
-          fcallback_(m->arg, m->res, m->iw, m->w, 0);
-        } catch(KeyboardInterruptException& ex) {
-          throw;
-        } catch(exception& ex) {
-          print("WARNING(sqpmethod): intermediate_callback error: %s\n", ex.what());
-          if (!iteration_callback_ignore_errors_) ret=1;
-        }
-
-        if (static_cast<casadi_int>(ret)) {
-          print("WARNING(sqpmethod): Aborted by callback...\n");
-          m->return_status = "User_Requested_Stop";
-          break;
-        }
-
-        m->fstats.at("callback_fun").toc();
+      // Callback function
+      if (callback(m, m->x, &m->fk, m->g, m->lam_x, m->lam_g, 0)) {
+        print("WARNING(sqpmethod): Aborted by callback...\n");
+        m->return_status = "User_Requested_Stop";
+        break;
       }
 
       // Checking convergence criteria

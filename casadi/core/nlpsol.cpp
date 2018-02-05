@@ -666,4 +666,43 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
+  int Nlpsol::
+  callback(void* mem, const double* x, const double* f, const double* g,
+           const double* lam_x, const double* lam_g, const double* lam_p) const {
+    auto m = static_cast<NlpsolMemory*>(mem);
+    // Quick return if no callback function
+    if (fcallback_.is_null()) return 0;
+    // Callback inputs
+    fill_n(m->arg, fcallback_.n_in(), nullptr);
+    m->arg[NLPSOL_X] = x;
+    m->arg[NLPSOL_F] = f;
+    m->arg[NLPSOL_G] = g;
+    m->arg[NLPSOL_LAM_G] = lam_g;
+    m->arg[NLPSOL_LAM_X] = lam_x;
+
+    // Callback outputs
+    fill_n(m->res, fcallback_.n_out(), nullptr);
+    double ret = 0;
+    m->arg[0] = &ret;
+
+    // Start timer
+    m->fstats.at("callback_fun").tic();
+    try {
+      // Evaluate
+      fcallback_(m->arg, m->res, m->iw, m->w, 0);
+    } catch(KeyboardInterruptException& ex) {
+      throw;
+    } catch(exception& ex) {
+      print("WARNING: intermediate_callback error: %s\n", ex.what());
+      if (!iteration_callback_ignore_errors_) ret=1;
+    }
+
+    // User user interruption?
+    if (static_cast<casadi_int>(ret)) return 1;
+
+    // Stop timer
+    m->fstats.at("callback_fun").toc();
+
+    return 0;
+  }
 } // namespace casadi
