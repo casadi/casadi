@@ -49,7 +49,7 @@ namespace casadi {
     KTR_context_ptr kc;
 
     // Inputs
-    double *wx, *wlbx, *wubx, *wlbg, *wubg;
+    double *wlbx, *wubx, *wlbg, *wubg;
 
     // Stats
     const char* return_status;

@@ -278,7 +278,6 @@ namespace casadi {
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Work vectors
-    m->xk = w; w += nx_;
     m->lam_gk = w; w += ng_;
     m->lam_xk = w; w += nx_;
     m->gk = w; w += ng_;
@@ -365,7 +364,6 @@ namespace casadi {
 
     // Save results to outputs
     casadi_copy(&m->fk, 1, m->f);
-    casadi_copy(m->xk, nx_, m->x);
     casadi_copy(m->lam_gk, ng_, m->lam_g);
     casadi_copy(m->lam_xk, nx_, m->lam_x);
     casadi_copy(m->gk, ng_, m->g);
@@ -393,7 +391,7 @@ namespace casadi {
       if (!fcallback_.is_null()) {
         m->fstats.at("callback_fun").tic();
         if (full_callback) {
-          casadi_copy(x, nx_, m->xk);
+          casadi_copy(x, nx_, m->x);
           for (casadi_int i=0; i<nx_; ++i) {
             m->lam_xk[i] = z_U[i]-z_L[i];
           }
@@ -451,7 +449,7 @@ namespace casadi {
                     int iter_count) const {
     try {
       // Get primal solution
-      casadi_copy(x, nx_, m->xk);
+      casadi_copy(x, nx_, m->x);
 
       // Get optimal cost
       m->fk = obj_value;
@@ -499,7 +497,7 @@ namespace casadi {
     try {
       // Initialize primal variables
       if (init_x) {
-        casadi_copy(m->x0, nx_, x);
+        casadi_copy(m->x, nx_, x);
       }
 
       // Initialize dual variables (simple bounds)

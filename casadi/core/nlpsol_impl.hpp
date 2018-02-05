@@ -36,11 +36,17 @@ namespace casadi {
 
   /** \brief Integrator memory */
   struct CASADI_EXPORT NlpsolMemory : public OracleMemory {
+    // Bounds, given parameter values
+    const double *lbx, *ubx, *lbg, *ubg, *p;
+
+    // Current primal solution
+    double *x;
+
     // Inputs
-    const double *x0, *p, *lbx, *ubx, *lbg, *ubg, *lam_x0, *lam_g0;
+    const double *lam_x0, *lam_g0;
 
     // Outputs
-    double *x, *f, *g, *lam_x, *lam_g, *lam_p;
+    double *f, *g, *lam_x, *lam_g, *lam_p;
 
     // number of iterations
     casadi_int n_iter;

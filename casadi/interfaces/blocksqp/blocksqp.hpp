@@ -85,7 +85,6 @@ namespace casadi {
     double lambdaStepNorm;  // norm of step in dual variables
     double tol;  // current optimality tolerance
 
-    double *xk; // variable vector
     double *lam_xk, *lam_gk; // dual variables
     double *gk;  // constraint vector
 

@@ -289,8 +289,7 @@ namespace casadi {
     // Primal intial guess
     nl << "x" << nx_ << "\n";
     for (casadi_int i=0; i<nx_; ++i) {
-      double x0 = m->x0 ? m->x0[i] : 0;
-      nl << i << " " << x0 << "\n";
+      nl << i << " " << m->x[i] << "\n";
     }
 
 

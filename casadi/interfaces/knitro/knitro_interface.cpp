@@ -98,7 +98,6 @@ namespace casadi {
     hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
 
     // Allocate persistent memory
-    alloc_w(nx_, true); // wx_
     alloc_w(nx_, true); // wlbx_
     alloc_w(nx_, true); // wubx_
     alloc_w(ng_, true); // wlbg_
@@ -122,7 +121,6 @@ namespace casadi {
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Copy inputs to temporary arrays
-    m->wx = w; w += nx_;
     m->wlbx = w; w += nx_;
     m->wubx = w; w += nx_;
     m->wlbg = w; w += ng_;
@@ -187,7 +185,6 @@ namespace casadi {
     }
 
     // "Correct" upper and lower bounds
-    casadi_copy(m->x0, nx_, m->wx);
     casadi_copy(m->lbx, nx_, m->wlbx);
     casadi_copy(m->ubx, nx_, m->wubx);
     casadi_copy(m->lbg, ng_, m->wlbg);
@@ -217,14 +214,14 @@ namespace casadi {
                            objFnType, get_ptr(vtype), m->wlbx, m->wubx,
                            ng_, get_ptr(contype_), get_ptr(ftype),
                            m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
-                           nnzH, get_ptr(Hrow), get_ptr(Hcol), m->wx, 0);
+                           nnzH, get_ptr(Hrow), get_ptr(Hcol), m->x, 0);
       casadi_assert(status==0, "KTR_mip_init_problem failed");
     } else {
       status =
       KTR_init_problem(m->kc, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
                        m->wlbx, m->wubx, ng_, get_ptr(contype_),
                        m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
-                       nnzH, get_ptr(Hrow), get_ptr(Hcol), m->wx, 0); // initial lambda
+                       nnzH, get_ptr(Hrow), get_ptr(Hcol), m->x, 0); // initial lambda
       casadi_assert(status==0, "KTR_init_problem failed");
     }
 
@@ -247,18 +244,15 @@ namespace casadi {
     double f;
     if (mi_) {
       status =
-      KTR_mip_solve(m->kc, m->wx, get_ptr(lambda), 0, &f,
+      KTR_mip_solve(m->kc, m->x, get_ptr(lambda), 0, &f,
                     0, 0, 0, 0, 0, static_cast<void*>(m));
 
     } else {
       status =
-      KTR_solve(m->kc, m->wx, get_ptr(lambda), 0, &f,
+      KTR_solve(m->kc, m->x, get_ptr(lambda), 0, &f,
                 0, 0, 0, 0, 0, static_cast<void*>(m));
     }
     m->return_status = return_codes(status);
-
-    // Output primal solution
-    casadi_copy(m->wx, nx_, m->x);
 
     // Output dual solution
     casadi_copy(get_ptr(lambda), ng_, m->lam_g);
@@ -269,7 +263,7 @@ namespace casadi {
 
     // Calculate constraints
     if (m->g) {
-      m->arg[0] = m->wx;
+      m->arg[0] = m->x;
       m->arg[1] = m->p;
       m->res[0] = 0;
       m->res[1] = m->g;

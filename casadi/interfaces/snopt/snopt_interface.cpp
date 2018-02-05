@@ -292,7 +292,7 @@ namespace casadi {
     for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bu[i])) m->bu[i] = inf_;
     // Initialize states and slack
     casadi_fill(get_ptr(m->hs), ng_ + nx_, 0);
-    casadi_copy(m->x0, nx_, get_ptr(m->xx));
+    casadi_copy(m->x, nx_, get_ptr(m->xx));
     casadi_fill(get_ptr(m->xx) + nx_, ng_, 0.);
 
     // Initialize multipliers

@@ -48,7 +48,7 @@ namespace casadi {
     double *mu, *mu_x;
 
     /// Current and previous linearization point and candidate
-    double *xk, *x_old, *x_cand;
+    double *x_old, *x_cand;
 
     /// Lagrange gradient in the next iterate
     double *gLag, *gLag_old;

@@ -353,7 +353,7 @@ namespace casadi {
     }
 
     // Pass inputs to WORHP data structures
-    casadi_copy(m->x0, nx_, m->worhp_o.X);
+    casadi_copy(m->x, nx_, m->worhp_o.X);
     casadi_copy(m->lbx, nx_, m->worhp_o.XL);
     casadi_copy(m->ubx, nx_, m->worhp_o.XU);
     casadi_copy(m->lam_x0, nx_, m->worhp_o.Lambda);

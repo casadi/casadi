@@ -340,6 +340,9 @@ namespace casadi {
       }
     }
 
+    // Allocate work vectors
+    alloc_w(nx_, true);
+
     if (!fcallback_.is_null()) {
       // Consistency checks
       casadi_assert_dev(!fcallback_.is_null());
@@ -394,7 +397,7 @@ namespace casadi {
     for (casadi_int i=0; i<nx_; ++i) {
       double lb = m->lbx ? m->lbx[i] : 0;
       double ub = m->ubx ? m->ubx[i] : 0;
-      double x0 = m->x0 ? m->x0[i] : 0;
+      double x0 = m->x[i];
       casadi_assert(lb <= ub && lb!=inf && ub!=-inf,
           "Ill-posed problem detected: "
           "LBX[" + str(i) + "] <= UBX[" + str(i) + "] was violated. "
@@ -446,8 +449,31 @@ namespace casadi {
     for (auto&& s : m->fstats) s.second.reset();
     m->fstats.at(name_).tic();
 
+    // Get input pointers
+    const double *x0 = arg[NLPSOL_X0];
+    m->p = arg[NLPSOL_P];
+    m->lbx = arg[NLPSOL_LBX];
+    m->ubx = arg[NLPSOL_UBX];
+    m->lbg = arg[NLPSOL_LBG];
+    m->ubg = arg[NLPSOL_UBG];
+    m->lam_x0 = arg[NLPSOL_LAM_X0];
+    m->lam_g0 = arg[NLPSOL_LAM_G0];
+    arg += NLPSOL_NUM_IN;
+
+    // Get output pointers
+    double *x = res[NLPSOL_X];
+    m->f = res[NLPSOL_F];
+    m->g = res[NLPSOL_G];
+    m->lam_x = res[NLPSOL_LAM_X];
+    m->lam_g = res[NLPSOL_LAM_G];
+    m->lam_p = res[NLPSOL_LAM_P];
+    res += NLPSOL_NUM_OUT;
+
     // Reset the solver, prepare for solution
     setup(m, arg, res, iw, w);
+
+    // Set initial guess
+    casadi_copy(x0, nx_, m->x);
 
     // Set multipliers to nan
     casadi_fill(m->lam_x, nx_, nan);
@@ -455,14 +481,13 @@ namespace casadi {
     casadi_fill(m->lam_p, np_, nan);
 
     // Solve the NLP
-    if (solve(m)) {
-      casadi_warning("NLP solution failed");
-      return 1;
-    }
+    int flag = solve(m);
+
+    // Get optimal solution
+    casadi_copy(m->x, nx_, x);
 
     // Calculate multiplers
     if (calc_multipliers_) {
-      casadi_assert(m->x!=0, "Not implemented");
       casadi_assert(ng_==0 || m->lam_g!=0, "Not implemented");
       double lam_f = 1.;
       m->arg[0] = m->x;
@@ -495,32 +520,15 @@ namespace casadi {
     // Finalize/print statistics
     m->fstats.at(name_).toc();
     if (print_time_)  print_fstats(m);
-    return 0;
+    return flag;
   }
 
   void Nlpsol::set_work(void* mem, const double**& arg, double**& res,
                         casadi_int*& iw, double*& w) const {
     auto m = static_cast<NlpsolMemory*>(mem);
 
-    // Get input pointers
-    m->x0 = arg[NLPSOL_X0];
-    m->p = arg[NLPSOL_P];
-    m->lbx = arg[NLPSOL_LBX];
-    m->ubx = arg[NLPSOL_UBX];
-    m->lbg = arg[NLPSOL_LBG];
-    m->ubg = arg[NLPSOL_UBG];
-    m->lam_x0 = arg[NLPSOL_LAM_X0];
-    m->lam_g0 = arg[NLPSOL_LAM_G0];
-    arg += NLPSOL_NUM_IN;
-
-    // Get output pointers
-    m->x = res[NLPSOL_X];
-    m->f = res[NLPSOL_F];
-    m->g = res[NLPSOL_G];
-    m->lam_x = res[NLPSOL_LAM_X];
-    m->lam_g = res[NLPSOL_LAM_G];
-    m->lam_p = res[NLPSOL_LAM_P];
-    res += NLPSOL_NUM_OUT;
+    // Allocate memory
+    m->x = w; w += nx_;
   }
 
   std::vector<std::string> nlpsol_options(const std::string& name) {

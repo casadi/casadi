@@ -268,7 +268,6 @@ namespace casadi {
     m->mu_x = w; w += nx_;
 
     // Current linearization point
-    m->xk = w; w += nx_;
     m->x_cand = w; w += nx_;
     m->x_old = w; w += nx_;
 
@@ -309,16 +308,13 @@ namespace casadi {
     // Check the provided inputs
     check_inputs(mem);
 
-    // Set linearization point to initial guess
-    casadi_copy(m->x0, nx_, m->xk);
-
     // Initialize Lagrange multipliers of the NLP
     casadi_copy(m->lam_g0, ng_, m->mu);
     casadi_copy(m->lam_x0, nx_, m->mu_x);
 
     // Initial constraint Jacobian
     if (ng_) {
-      m->arg[0] = m->xk;
+      m->arg[0] = m->x;
       m->arg[1] = m->p;
       m->res[0] = m->gk;
       m->res[1] = m->Jk;
@@ -326,7 +322,7 @@ namespace casadi {
     }
 
     // Initial objective gradient
-    m->arg[0] = m->xk;
+    m->arg[0] = m->x;
     m->arg[1] = m->p;
     m->res[0] = &m->fk;
     m->res[1] = m->gf;
@@ -336,7 +332,7 @@ namespace casadi {
     m->reg = 0;
     if (exact_hessian_) {
       double sigma = 1.;
-      m->arg[0] = m->xk;
+      m->arg[0] = m->x;
       m->arg[1] = m->p;
       m->arg[2] = &sigma;
       m->arg[3] = m->mu;
@@ -379,7 +375,7 @@ namespace casadi {
     while (true) {
 
       // Primal infeasability
-      double pr_inf = std::fmax(casadi_max_viol(nx_, m->xk, m->lbx, m->ubx),
+      double pr_inf = std::fmax(casadi_max_viol(nx_, m->x, m->lbx, m->ubx),
                                 casadi_max_viol(ng_, m->gk, m->lbg, m->ubg));
 
       // inf-norm of lagrange gradient
@@ -430,9 +426,9 @@ namespace casadi {
       if (verbose_) print("Formulating QP\n");
       // Formulate the QP
       casadi_copy(m->lbx, nx_, m->qp_LBX);
-      casadi_axpy(nx_, -1., m->xk, m->qp_LBX);
+      casadi_axpy(nx_, -1., m->x, m->qp_LBX);
       casadi_copy(m->ubx, nx_, m->qp_UBX);
-      casadi_axpy(nx_, -1., m->xk, m->qp_UBX);
+      casadi_axpy(nx_, -1., m->x, m->qp_UBX);
       casadi_copy(m->lbg, ng_, m->qp_LBA);
       casadi_axpy(ng_, -1., m->gk, m->qp_LBA);
       casadi_copy(m->ubg, ng_, m->qp_UBA);
@@ -454,7 +450,7 @@ namespace casadi {
       m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(ng_, m->qp_DUAL_A));
 
       // Calculate L1-merit function in the actual iterate
-      double l1_infeas = std::fmax(casadi_max_viol(nx_, m->xk, m->lbx, m->ubx),
+      double l1_infeas = std::fmax(casadi_max_viol(nx_, m->x, m->lbx, m->ubx),
                                    casadi_max_viol(ng_, m->gk, m->lbg, m->ubg));
 
       // Right-hand side of Armijo condition
@@ -483,7 +479,7 @@ namespace casadi {
 
         // Line-search loop
         while (true) {
-          casadi_copy(m->xk, nx_, m->x_cand);
+          casadi_copy(m->x, nx_, m->x_cand);
           casadi_axpy(nx_, t, m->dx, m->x_cand);
           try {
             // Evaluating objective and constraints
@@ -533,16 +529,16 @@ namespace casadi {
         casadi_axpy(nx_, t, m->qp_DUAL_X, m->mu_x);
 
         // Candidate accepted, update the primal variable
-        casadi_copy(m->xk, nx_, m->x_old);
-        casadi_copy(m->x_cand, nx_, m->xk);
+        casadi_copy(m->x, nx_, m->x_old);
+        casadi_copy(m->x_cand, nx_, m->x);
 
       } else {
         // Full step
         casadi_copy(m->qp_DUAL_A, ng_, m->mu);
         casadi_copy(m->qp_DUAL_X, nx_, m->mu_x);
-        casadi_copy(m->xk, nx_, m->x_old);
+        casadi_copy(m->x, nx_, m->x_old);
         // x+=dx
-        casadi_axpy(nx_, 1., m->dx, m->xk);
+        casadi_axpy(nx_, 1., m->dx, m->x);
       }
 
       if (!exact_hessian_) {
@@ -556,7 +552,7 @@ namespace casadi {
       // Evaluate the constraint Jacobian
       if (verbose_) print("Evaluating jac_g\n");
       if (ng_) {
-        m->arg[0] = m->xk;
+        m->arg[0] = m->x;
         m->arg[1] = m->p;
         m->res[0] = m->gk;
         m->res[1] = m->Jk;
@@ -565,7 +561,7 @@ namespace casadi {
 
       // Evaluate the gradient of the objective function
       if (verbose_) print("Evaluating grad_f\n");
-      m->arg[0] = m->xk;
+      m->arg[0] = m->x;
       m->arg[1] = m->p;
       m->res[0] = &m->fk;
       m->res[1] = m->gf;
@@ -584,12 +580,12 @@ namespace casadi {
         // Restart BFGS if needed
         if (iter % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, m->Bk);
         // Update the Hessian approximation
-        casadi_bfgs(Hsp_, m->Bk, m->xk, m->x_old, m->gLag, m->gLag_old, m->w);
+        casadi_bfgs(Hsp_, m->Bk, m->x, m->x_old, m->gLag, m->gLag_old, m->w);
       } else {
         // Exact Hessian
         if (verbose_) print("Evaluating hessian\n");
         double sigma = 1.;
-        m->arg[0] = m->xk;
+        m->arg[0] = m->x;
         m->arg[1] = m->p;
         m->arg[2] = &sigma;
         m->arg[3] = m->mu;
@@ -608,7 +604,6 @@ namespace casadi {
 
     // Save results to outputs
     if (m->f) *m->f = m->fk;
-    if (m->x) casadi_copy(m->xk, nx_, m->x);
     if (m->lam_g) casadi_copy(m->mu, ng_, m->lam_g);
     if (m->lam_x) casadi_copy(m->mu_x, nx_, m->lam_x);
     if (m->g) casadi_copy(m->gk, ng_, m->g);

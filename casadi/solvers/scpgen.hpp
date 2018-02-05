@@ -47,7 +47,7 @@ namespace casadi {
     double fk;
 
     // Work vectors, nonlifted problem
-    double *xk, *gk, *dxk, *lam_xk, *dlam_xk, *lam_gk, *dlam_gk, *gfk, *gL, *b_gn;
+    double *gk, *dxk, *lam_xk, *dlam_xk, *lam_gk, *dlam_gk, *gfk, *gL, *b_gn;
 
     // Memory for lifted variables
     struct VarMem {
