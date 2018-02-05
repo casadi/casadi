@@ -223,6 +223,7 @@ namespace casadi {
   #include "casadi_ldl.hpp"
   #include "casadi_qr.hpp"
   #include "casadi_bfgs.hpp"
+  #include "casadi_regularize.hpp"
 
 } // namespace casadi
 

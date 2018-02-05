@@ -181,12 +181,6 @@ namespace casadi {
     void print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf,
                          double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const;
 
-    // Calculate the regularization parameter using Gershgorin theorem
-    double getRegularization(const double* H) const;
-
-    // Regularize by adding a multiple of the identity
-    void regularize(double* H, double reg) const;
-
     // Solve the QP subproblem
     virtual void solve_QP(SqpmethodMemory* m, const double* H, const double* g,
                           const double* lbx, const double* ubx,

@@ -38,6 +38,7 @@ set(RUNTIME_SRC
   casadi_ldl.hpp
   casadi_qr.hpp
   casadi_bfgs.hpp
+  casadi_regularize.hpp
 )
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 

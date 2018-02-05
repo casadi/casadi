@@ -345,8 +345,8 @@ namespace casadi {
 
       // Determing regularization parameter with Gershgorin theorem
       if (regularize_) {
-        m->reg = getRegularization(m->Bk);
-        if (m->reg > 0) regularize(m->Bk, m->reg);
+        m->reg = std::fmin(0, -casadi_lb_eig(Hsp_, m->Bk));
+        if (m->reg > 0) casadi_regularize(Hsp_, m->Bk, m->reg);
       }
     } else {
       casadi_fill(m->Bk, Hsp_.nnz(), 1.);
@@ -627,8 +627,8 @@ namespace casadi {
 
         // Determing regularization parameter with Gershgorin theorem
         if (regularize_) {
-          m->reg = getRegularization(m->Bk);
-          if (m->reg > 0) regularize(m->Bk, m->reg);
+          m->reg = std::fmin(0, -casadi_lb_eig(Hsp_, m->Bk));
+          if (m->reg > 0) casadi_regularize(Hsp_, m->Bk, m->reg);
         }
       }
     }
@@ -661,41 +661,6 @@ namespace casadi {
     print("%2d", ls_trials);
     if (!ls_success) print("F");
     print("\n");
-  }
-
-  double Sqpmethod::getRegularization(const double* H) const {
-    const casadi_int* colind = Hsp_.colind();
-    casadi_int ncol = Hsp_.size2();
-    const casadi_int* row = Hsp_.row();
-    double reg_param = 0;
-    for (casadi_int cc=0; cc<ncol; ++cc) {
-      double mineig = 0;
-      for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
-        casadi_int rr = row[el];
-        if (rr == cc) {
-          mineig += H[el];
-        } else {
-          mineig -= fabs(H[el]);
-        }
-      }
-      reg_param = fmin(reg_param, mineig);
-    }
-    return -reg_param;
-  }
-
-  void Sqpmethod::regularize(double* H, double reg) const {
-    const casadi_int* colind = Hsp_.colind();
-    casadi_int ncol = Hsp_.size2();
-    const casadi_int* row = Hsp_.row();
-
-    for (casadi_int cc=0; cc<ncol; ++cc) {
-      for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
-        casadi_int rr = row[el];
-        if (rr==cc) {
-          H[el] += reg;
-        }
-      }
-    }
   }
 
   void Sqpmethod::solve_QP(SqpmethodMemory* m, const double* H, const double* g,
