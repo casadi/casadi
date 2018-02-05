@@ -344,6 +344,7 @@ namespace casadi {
     alloc_w(nx_, true); // x
     alloc_w(nx_, true); // lam_x
     alloc_w(ng_, true); // lam_g
+    alloc_w(np_, true); // lam_p
 
     if (!fcallback_.is_null()) {
       // Consistency checks
@@ -470,7 +471,7 @@ namespace casadi {
     m->g = res[NLPSOL_G];
     double *lam_x = res[NLPSOL_LAM_X];
     double *lam_g = res[NLPSOL_LAM_G];
-    m->lam_p = res[NLPSOL_LAM_P];
+    double *lam_p = res[NLPSOL_LAM_P];
     res += NLPSOL_NUM_OUT;
 
     // Reset the solver, prepare for solution
@@ -491,6 +492,7 @@ namespace casadi {
     casadi_copy(m->x, nx_, x);
     casadi_copy(m->lam_x, nx_, lam_x);
     casadi_copy(m->lam_g, ng_, lam_g);
+    casadi_copy(m->lam_p, np_, lam_p);
 
     // Calculate multiplers
     if (calc_multipliers_) {
@@ -536,6 +538,7 @@ namespace casadi {
     m->x = w; w += nx_;
     m->lam_x = w; w += nx_;
     m->lam_g = w; w += ng_;
+    m->lam_p = w; w += np_;
   }
 
   std::vector<std::string> nlpsol_options(const std::string& name) {
