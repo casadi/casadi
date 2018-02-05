@@ -5,10 +5,10 @@ mxArray* casadi_to_mex(const casadi_int* sp, const T1* x) {
   casadi_int nrow, ncol, nnz, c, k;
   const casadi_int *colind, *row;
   mxArray *p;
+  double *d;
 #ifndef CASADI_MEX_NO_SPARSE
   casadi_int i;
   mwIndex *j;
-  double *d;
 #endif /* CASADI_MEX_NO_SPARSE */
   nrow = *sp++;
   ncol = *sp++;
