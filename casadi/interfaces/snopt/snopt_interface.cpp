@@ -233,16 +233,13 @@ namespace casadi {
     snProblem prob;
 
     // Evaluate gradF and jacG at initial value
-    const double** arg = m->arg;
-    *arg++ = m->x0;
-    *arg++ = m->p;
-    double** res = m->res;
-    *res++ = 0;
-    *res++ = m->jac_gk;
+    m->arg[0] = m->x;
+    m->arg[1] = m->p;
+    m->res[0] = 0;
+    m->res[1] = m->jac_gk;
     calc_function(m, "nlp_jac_g");
-    res = m->res;
-    *res++ = 0;
-    *res++ = m->jac_fk;
+    m->res[0] = 0;
+    m->res[1] = m->jac_fk;
     calc_function(m, "nlp_jac_f");
 
     // perform the mapping:
