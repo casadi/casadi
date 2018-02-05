@@ -1630,6 +1630,12 @@ std::vector< M > &res) const  "
 
 ";
 
+%feature("docstring")  casadi::Nlpsol::callback(void *mem, const double *x,
+const double *f, const double *g, const double *lam_x, const double *lam_g,
+const double *lam_p) const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::replace_fseed(const
 std::vector< std::vector< M > > &fseed) const  "
 
@@ -45129,6 +45135,12 @@ Print a description of the object.
 
 
 // File: classcasadi_1_1Nlpsol.xml
+%feature("docstring")  casadi::Nlpsol::callback(void *mem, const double *x,
+const double *f, const double *g, const double *lam_x, const double *lam_g,
+const double *lam_p) const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
 bool persistent=false) "
 
@@ -53970,6 +53982,12 @@ double **arg, double **res, casadi_int *iw, double *w) const override "
 
 ";
 
+%feature("docstring")  casadi::Nlpsol::callback(void *mem, const double *x,
+const double *f, const double *g, const double *lam_x, const double *lam_g,
+const double *lam_p) const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::has_sprev() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -60448,7 +60466,7 @@ A textbook SQPMethod
 | print_iteration       | OT_BOOL   | Print the iterations                 |
 +-----------------------+-----------+--------------------------------------+
 | qpsol                 | OT_STRING | The QP solver to be used by the SQP  |
-|                       |           | method                               |
+|                       |           | method [qpoases]                     |
 +-----------------------+-----------+--------------------------------------+
 | qpsol_options         | OT_DICT   | Options to be passed to the QP       |
 |                       |           | solver                               |
@@ -60566,6 +60584,7 @@ A textbook SQPMethod
 | qpsol             | OT_STRING     | The QP solver to  | casadi::Sqpmetho |
 |                   |               | be used by the    | d                |
 |                   |               | SQP method        |                  |
+|                   |               | [qpoases]         |                  |
 +-------------------+---------------+-------------------+------------------+
 | qpsol_options     | OT_DICT       | Options to be     | casadi::Sqpmetho |
 |                   |               | passed to the QP  | d                |
@@ -60817,10 +60836,12 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Sqpmethod::regularize(double *H, double reg)
-const  "
+%feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
+double **arg, double **res, casadi_int *iw, double *w) const  "
 
-[INTERNAL] ";
+[INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::size_in(casadi_int ind)
 const  "
@@ -60885,13 +60906,6 @@ std::vector< MX > &arg) const  "
 override "
 
 [INTERNAL]  Finalize initialization.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
-double **arg, double **res, casadi_int *iw, double *w) const  "
-
-[INTERNAL]  Set the (persistent and temporary) work vectors.
 
 ";
 
@@ -60968,6 +60982,12 @@ forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
+
+%feature("docstring")  casadi::Nlpsol::callback(void *mem, const double *x,
+const double *f, const double *g, const double *lam_x, const double *lam_g,
+const double *lam_p) const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
@@ -61296,11 +61316,6 @@ ind) const  "
 [INTERNAL]  Input/output sparsity.
 
 ";
-
-%feature("docstring")  casadi::Sqpmethod::getRegularization(const double *H)
-const  "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::all_scalar() const  "
 
@@ -65785,6 +65800,11 @@ SharedObjectInternal *, SharedObject > &already_copied) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_regularize(const casadi_int *sp_h, T1
+*h, T1 reg) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_ldl_solve(T1 *x, casadi_int nrhs,
 const casadi_int *sp_lt, const T1 *lt, const T1 *d, const casadi_int *p, T1
 *w) "
@@ -66549,6 +66569,11 @@ Explicitly load a plugin dynamically.
 Get type info for a particular option.
 
 ";
+
+%feature("docstring")  casadi::casadi_lb_eig(const casadi_int *sp_h, const
+T1 *h) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_smoothing_diff(T1 **yk, T1 *y0, T1 *J,
 T1 h, casadi_int n_y, const casadi_finite_diff_mem< T1 > *m) "
@@ -67588,7 +67613,7 @@ A textbook SQPMethod
 | print_iteration       | OT_BOOL   | Print the iterations                 |
 +-----------------------+-----------+--------------------------------------+
 | qpsol                 | OT_STRING | The QP solver to be used by the SQP  |
-|                       |           | method                               |
+|                       |           | method [qpoases]                     |
 +-----------------------+-----------+--------------------------------------+
 | qpsol_options         | OT_DICT   | Options to be passed to the QP       |
 |                       |           | solver                               |

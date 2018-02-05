@@ -1171,6 +1171,8 @@ required length of w field.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::callback "[INTERNAL] ";
+
 %feature("docstring") casadi::Blocksqp::replace_fseed "[INTERNAL]  Replace
 0-by-0 forward seeds.
 
@@ -32166,6 +32168,8 @@ Print a description of the object.
 
 
 // File: classcasadi_1_1Nlpsol.xml
+%feature("docstring") casadi::Nlpsol::callback "[INTERNAL] ";
+
 %feature("docstring") casadi::Nlpsol::alloc "[INTERNAL]  Ensure work
 vectors long enough to evaluate function.
 
@@ -38315,6 +38319,8 @@ symbolic matrices.
 
 ";
 
+%feature("docstring") casadi::Scpgen::callback "[INTERNAL] ";
+
 %feature("docstring") casadi::Scpgen::has_sprev "[INTERNAL]  Is the class
 able to propagate seeds through the algorithm?
 
@@ -43172,7 +43178,7 @@ A textbook SQPMethod
 | print_iteration       | OT_BOOL   | Print the iterations                 |
 +-----------------------+-----------+--------------------------------------+
 | qpsol                 | OT_STRING | The QP solver to be used by the SQP  |
-|                       |           | method                               |
+|                       |           | method [qpoases]                     |
 +-----------------------+-----------+--------------------------------------+
 | qpsol_options         | OT_DICT   | Options to be passed to the QP       |
 |                       |           | solver                               |
@@ -43290,6 +43296,7 @@ A textbook SQPMethod
 | qpsol             | OT_STRING     | The QP solver to  | casadi::Sqpmetho |
 |                   |               | be used by the    | d                |
 |                   |               | SQP method        |                  |
+|                   |               | [qpoases]         |                  |
 +-------------------+---------------+-------------------+------------------+
 | qpsol_options     | OT_DICT       | Options to be     | casadi::Sqpmetho |
 |                   |               | passed to the QP  | d                |
@@ -43473,7 +43480,10 @@ Get Jacobian sparsity.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::regularize "[INTERNAL] ";
+%feature("docstring") casadi::Sqpmethod::setup "[INTERNAL]  Set the
+(persistent and temporary) work vectors.
+
+";
 
 %feature("docstring") casadi::Sqpmethod::size_in "[INTERNAL]  Input/output
 dimensions.
@@ -43520,11 +43530,6 @@ initialization.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::setup "[INTERNAL]  Set the
-(persistent and temporary) work vectors.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::mx_in "[INTERNAL]  Get function
 input(s) and output(s)
 
@@ -43563,6 +43568,8 @@ instance if available, and calls  Function get_forward(casadi_int nfwd) if
 no cached version is available.
 
 ";
+
+%feature("docstring") casadi::Sqpmethod::callback "[INTERNAL] ";
 
 %feature("docstring") casadi::Sqpmethod::alloc_res "[INTERNAL]  Ensure
 required length of res field.
@@ -43798,8 +43805,6 @@ function in a specific language.
 Input/output sparsity.
 
 ";
-
-%feature("docstring") casadi::Sqpmethod::getRegularization "[INTERNAL] ";
 
 %feature("docstring") casadi::Sqpmethod::all_scalar "[INTERNAL]  Are all
 inputs and outputs scalar.
@@ -47585,6 +47590,8 @@ Checks if array does not contain NaN or Inf.
 
 %feature("docstring") casadi::getcopy "[INTERNAL] ";
 
+%feature("docstring") casadi::casadi_regularize "[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_ldl_solve "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_qr_solve "[INTERNAL] ";
@@ -48248,6 +48255,8 @@ Explicitly load a plugin dynamically.
 Get type info for a particular option.
 
 ";
+
+%feature("docstring") casadi::casadi_lb_eig "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_smoothing_diff "[INTERNAL] ";
 
@@ -49245,7 +49254,7 @@ A textbook SQPMethod
 | print_iteration       | OT_BOOL   | Print the iterations                 |
 +-----------------------+-----------+--------------------------------------+
 | qpsol                 | OT_STRING | The QP solver to be used by the SQP  |
-|                       |           | method                               |
+|                       |           | method [qpoases]                     |
 +-----------------------+-----------+--------------------------------------+
 | qpsol_options         | OT_DICT   | Options to be passed to the QP       |
 |                       |           | solver                               |
