@@ -27,8 +27,6 @@
 #define CASADI_SQPMETHOD_HPP
 
 #include "casadi/core/nlpsol_impl.hpp"
-#include <deque>
-
 #include <casadi/solvers/casadi_nlpsol_sqpmethod_export.h>
 
 /** \defgroup plugin_Nlpsol_sqpmethod
@@ -72,14 +70,14 @@ namespace casadi {
     double sigma;
 
     // Storage for merit function
-    std::deque<double> merit_mem;
+    double* merit_mem;
+    size_t merit_ind;
 
     /// Last return status
     const char* return_status;
 
     /// Iteration count
     int iter_count;
-
   };
 
   /** \brief  \pluginbrief{Nlpsol,sqpmethod}

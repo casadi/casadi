@@ -247,6 +247,9 @@ namespace casadi {
 
     // Jacobian
     alloc_w(Asp_.nnz(), true); // Jk_
+
+    // merit_mem
+    alloc_w(merit_memsize_, true);
   }
 
   void Sqpmethod::set_work(void* mem, const double**& arg, double**& res,
@@ -286,6 +289,9 @@ namespace casadi {
     // Jacobian
     m->Jk = w; w += Asp_.nnz();
 
+    // merit_mem
+    m->merit_mem = w; w += merit_memsize_;
+
     m->iter_count = -1;
   }
 
@@ -302,7 +308,7 @@ namespace casadi {
     bool ls_success = true;
 
     // Reset
-    m->merit_mem.clear();
+    m->merit_ind = 0;
     m->sigma = 0.;    // NOTE: Move this into the main optimization loop
     m->reg = 0;
 
@@ -439,10 +445,9 @@ namespace casadi {
       double L1merit = m->f + m->sigma * l1_infeas;
 
       // Storing the actual merit function value in a list
-      m->merit_mem.push_back(L1merit);
-      if (m->merit_mem.size() > merit_memsize_) {
-        m->merit_mem.pop_front();
-      }
+      m->merit_mem[m->merit_ind] = L1merit;
+      ++m->merit_ind %= merit_memsize_;
+
       // Stepsize
       t = 1.0;
       double fk_cand;
@@ -482,7 +487,11 @@ namespace casadi {
                                 casadi_max_viol(ng_, m->g_cand, m->lbg, m->ubg));
           L1merit_cand = fk_cand + m->sigma * l1_infeas;
           // Calculating maximal merit function value so far
-          double meritmax = *max_element(m->merit_mem.begin(), m->merit_mem.end());
+          double meritmax = m->merit_mem[0];
+          for (size_t i=1; i<merit_memsize_ && i<m->iter_count; ++i) {
+            if (meritmax < m->merit_mem[i]) meritmax = m->merit_mem[i];
+          }
+
           if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
             break;
           }
