@@ -66835,7 +66835,7 @@ Get the documentation string for a plugin.
 ";
 
 %feature("docstring")  casadi::casadi_bfgs(const casadi_int *sp_h, T1 *h,
-const T1 *x, const T1 *x_old, const T1 *glag, const T1 *glag_old, T1 *w) "
+const T1 *dx, const T1 *glag, const T1 *glag_old, T1 *w) "
 
 [INTERNAL] ";
 
