@@ -299,49 +299,6 @@ namespace casadi {
   int Sqpmethod::solve(void* mem) const {
     auto m = static_cast<SqpmethodMemory*>(mem);
 
-    // Initial constraint Jacobian
-    if (ng_) {
-      m->arg[0] = m->x;
-      m->arg[1] = m->p;
-      m->res[0] = m->g;
-      m->res[1] = m->Jk;
-      if (calc_function(m, "nlp_jac_g")) casadi_error("nlp_jac_g");
-    }
-
-    // Initial objective gradient
-    m->arg[0] = m->x;
-    m->arg[1] = m->p;
-    m->res[0] = &m->f;
-    m->res[1] = m->gf;
-    if (calc_function(m, "nlp_grad_f")) casadi_error("nlp_grad_f");
-
-    // Initialize or reset the Hessian or Hessian approximation
-    m->reg = 0;
-    if (exact_hessian_) {
-      double sigma = 1.;
-      m->arg[0] = m->x;
-      m->arg[1] = m->p;
-      m->arg[2] = &sigma;
-      m->arg[3] = m->lam_g;
-      m->res[0] = m->Bk;
-      if (calc_function(m, "nlp_hess_l")) casadi_error("nlp_hess_l");
-
-      // Determing regularization parameter with Gershgorin theorem
-      if (regularize_) {
-        m->reg = std::fmin(0, -casadi_lb_eig(Hsp_, m->Bk));
-        if (m->reg > 0) casadi_regularize(Hsp_, m->Bk, m->reg);
-      }
-    } else {
-      casadi_fill(m->Bk, Hsp_.nnz(), 1.);
-      casadi_bfgs_reset(Hsp_, m->Bk);
-    }
-
-    // Evaluate the initial gradient of the Lagrangian
-    casadi_copy(m->gf, nx_, m->gLag);
-    if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag, true);
-    // gLag += mu_x_;
-    casadi_axpy(nx_, 1., m->lam_x, m->gLag);
-
     // Number of SQP iterations
     casadi_int iter = 0;
 
@@ -360,6 +317,108 @@ namespace casadi {
 
     // MAIN OPTIMIZATION LOOP
     while (true) {
+
+      if (ls_iter==0) {
+
+        // Initial constraint Jacobian
+        if (ng_) {
+          m->arg[0] = m->x;
+          m->arg[1] = m->p;
+          m->res[0] = m->g;
+          m->res[1] = m->Jk;
+          if (calc_function(m, "nlp_jac_g")) return 1;
+        }
+
+        // Initial objective gradient
+        m->arg[0] = m->x;
+        m->arg[1] = m->p;
+        m->res[0] = &m->f;
+        m->res[1] = m->gf;
+        if (calc_function(m, "nlp_grad_f")) return 1;
+
+        // Initialize or reset the Hessian or Hessian approximation
+        m->reg = 0;
+        if (exact_hessian_) {
+          double sigma = 1.;
+          m->arg[0] = m->x;
+          m->arg[1] = m->p;
+          m->arg[2] = &sigma;
+          m->arg[3] = m->lam_g;
+          m->res[0] = m->Bk;
+          if (calc_function(m, "nlp_hess_l")) return 1;
+
+          // Determing regularization parameter with Gershgorin theorem
+          if (regularize_) {
+            m->reg = std::fmin(0, -casadi_lb_eig(Hsp_, m->Bk));
+            if (m->reg > 0) casadi_regularize(Hsp_, m->Bk, m->reg);
+          }
+        } else {
+          casadi_fill(m->Bk, Hsp_.nnz(), 1.);
+          casadi_bfgs_reset(Hsp_, m->Bk);
+        }
+
+        // Evaluate the initial gradient of the Lagrangian
+        casadi_copy(m->gf, nx_, m->gLag);
+        if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag, true);
+        // gLag += lam_x_;
+        casadi_axpy(nx_, 1., m->lam_x, m->gLag);
+
+      } else {
+
+        if (!exact_hessian_) {
+          // Evaluate the gradient of the Lagrangian with the old x but new lam_g (for BFGS)
+          casadi_copy(m->gf, nx_, m->gLag_old);
+          if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag_old, true);
+          // gLag_old += lam_x_;
+          casadi_axpy(nx_, 1., m->lam_x, m->gLag_old);
+        }
+
+        // Evaluate the constraint Jacobian
+        if (ng_) {
+          m->arg[0] = m->x;
+          m->arg[1] = m->p;
+          m->res[0] = m->g;
+          m->res[1] = m->Jk;
+          if (calc_function(m, "nlp_jac_g")) return 1;
+        }
+
+        // Evaluate the gradient of the objective function
+        m->arg[0] = m->x;
+        m->arg[1] = m->p;
+        m->res[0] = &m->f;
+        m->res[1] = m->gf;
+        if (calc_function(m, "nlp_grad_f")) return 1;
+
+        // Evaluate the gradient of the Lagrangian with the new x and new mu
+        casadi_copy(m->gf, nx_, m->gLag);
+        if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag, true);
+
+        // gLag += mu_x_;
+        casadi_axpy(nx_, 1., m->lam_x, m->gLag);
+
+        // Updating Lagrange Hessian
+        if (!exact_hessian_) {
+          // Restart BFGS if needed
+          if (iter % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, m->Bk);
+          // Update the Hessian approximation
+          casadi_bfgs(Hsp_, m->Bk, m->x, m->x_old, m->gLag, m->gLag_old, m->w);
+        } else {
+          // Exact Hessian
+          double sigma = 1.;
+          m->arg[0] = m->x;
+          m->arg[1] = m->p;
+          m->arg[2] = &sigma;
+          m->arg[3] = m->lam_g;
+          m->res[0] = m->Bk;
+          if (calc_function(m, "nlp_hess_l")) return 1;
+
+          // Determing regularization parameter with Gershgorin theorem
+          if (regularize_) {
+            m->reg = std::fmin(0, -casadi_lb_eig(Hsp_, m->Bk));
+            if (m->reg > 0) casadi_regularize(Hsp_, m->Bk, m->reg);
+          }
+        }
+      }
 
       // Primal infeasability
       double pr_inf = std::fmax(casadi_max_viol(nx_, m->x, m->lbx, m->ubx),
@@ -526,64 +585,6 @@ namespace casadi {
         casadi_copy(m->x, nx_, m->x_old);
         // x+=dx
         casadi_axpy(nx_, 1., m->dx, m->x);
-      }
-
-      if (!exact_hessian_) {
-        // Evaluate the gradient of the Lagrangian with the old x but new lam_g (for BFGS)
-        casadi_copy(m->gf, nx_, m->gLag_old);
-        if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag_old, true);
-        // gLag_old += lam_x_;
-        casadi_axpy(nx_, 1., m->lam_x, m->gLag_old);
-      }
-
-      // Evaluate the constraint Jacobian
-      if (verbose_) print("Evaluating jac_g\n");
-      if (ng_) {
-        m->arg[0] = m->x;
-        m->arg[1] = m->p;
-        m->res[0] = m->g;
-        m->res[1] = m->Jk;
-        if (calc_function(m, "nlp_jac_g")) casadi_error("nlp_jac_g");
-      }
-
-      // Evaluate the gradient of the objective function
-      if (verbose_) print("Evaluating grad_f\n");
-      m->arg[0] = m->x;
-      m->arg[1] = m->p;
-      m->res[0] = &m->f;
-      m->res[1] = m->gf;
-      if (calc_function(m, "nlp_grad_f")) casadi_error("nlp_grad_f");
-
-      // Evaluate the gradient of the Lagrangian with the new x and new mu
-      casadi_copy(m->gf, nx_, m->gLag);
-      if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag, true);
-
-      // gLag += mu_x_;
-      casadi_axpy(nx_, 1., m->lam_x, m->gLag);
-
-      // Updating Lagrange Hessian
-      if (!exact_hessian_) {
-        if (verbose_) print("Updating Hessian (BFGS)\n");
-        // Restart BFGS if needed
-        if (iter % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, m->Bk);
-        // Update the Hessian approximation
-        casadi_bfgs(Hsp_, m->Bk, m->x, m->x_old, m->gLag, m->gLag_old, m->w);
-      } else {
-        // Exact Hessian
-        if (verbose_) print("Evaluating hessian\n");
-        double sigma = 1.;
-        m->arg[0] = m->x;
-        m->arg[1] = m->p;
-        m->arg[2] = &sigma;
-        m->arg[3] = m->lam_g;
-        m->res[0] = m->Bk;
-        if (calc_function(m, "nlp_hess_l")) casadi_error("nlp_hess_l");
-
-        // Determing regularization parameter with Gershgorin theorem
-        if (regularize_) {
-          m->reg = std::fmin(0, -casadi_lb_eig(Hsp_, m->Bk));
-          if (m->reg > 0) casadi_regularize(Hsp_, m->Bk, m->reg);
-        }
       }
     }
 
