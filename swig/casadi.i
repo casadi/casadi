@@ -2450,7 +2450,12 @@ class NZproxy:
       if hasattr(self,'__array_custom__'):
         return self.__array_custom__(*args,**kwargs)
       else:
-        return self.full()
+        try:
+          return self.full()
+        except:
+          raise Exception("Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
+                     + "This may occur when you pass a CasADi object to a numpy function.\n"
+                     + "Use an equivalent CasADi function instead of that numpy function.")
 
 %}
 %enddef

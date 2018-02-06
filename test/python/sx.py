@@ -1336,5 +1336,10 @@ class SXtests(casadiTestCase):
       self.checkarray(E(5),2)
       self.checkarray(E(7),1)
 
+  def test_numpy_error(self):
+      x = SX.sym("x",3)
+      with self.assertInException("Use an equivalent CasADi function"):
+        np.linalg.norm(x)
+
 if __name__ == '__main__':
     unittest.main()
