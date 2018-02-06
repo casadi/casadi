@@ -507,6 +507,7 @@ namespace std {
     GUESTOBJECT* from_ptr(const std::vector<std::string> *a);
 #endif // SWIGMATLAB
     template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector<M>** m);
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector< std::vector<M> >** m);
     template<typename M> GUESTOBJECT* from_ptr(const std::vector<M> *a);
 
     // std::pair
@@ -1263,6 +1264,66 @@ namespace std {
   } // namespace casadi
 }
 
+
+%fragment("casadi_vectorvector", "header", fragment="casadi_aux") {
+  namespace casadi {
+
+#ifdef SWIGMATLAB
+
+    // Cell array
+    template<typename M> bool to_ptr_cell2(GUESTOBJECT *p, std::vector< std::vector<M> >** m) {
+      // Cell arrays (only row vectors)
+      if (mxGetClassID(p)==mxCELL_CLASS) {
+        casadi_int nrow = mxGetM(p), ncol = mxGetN(p);
+        if (true) {
+          // Allocate elements
+          if (m) {
+            (**m).clear();
+            (**m).resize(nrow, std::vector<M>(ncol));
+          }
+
+          // Temporary
+          M tmp;
+
+          // Loop over elements
+          for (casadi_int i=0; i<nrow*ncol; ++i) {
+            // Get element
+            mxArray* pe = mxGetCell(p, i);
+            if (pe==0) return false;
+
+            // Convert element
+            M *m_i = m ? &tmp : 0;
+            if (!to_ptr(pe, m_i ? &m_i : 0)) {
+              return false;
+            }
+
+            if (m) (**m)[i % nrow][i / nrow] = tmp;
+          }
+          return true;
+        }
+      }
+      return false;
+    }
+
+#endif // SWIGMATLAB
+
+    template<typename M> bool to_ptr(GUESTOBJECT *p, std::vector< std::vector<M> >** m) {
+      // Treat Null
+      if (is_null(p)) return false;
+
+      // Pass on to to_ptr(GUESTOBJECT *p, std::vector<M>** m)
+      if (to_ptr< std::vector<M> >(p, m)) return true;
+
+#ifdef SWIGMATLAB
+      // Cell array
+      if (to_ptr_cell2(p, m)) return true;
+#endif // SWIGMATLAB
+      return false;
+    }
+
+  } // namespace casadi
+}
+
 %fragment("casadi_function", "header", fragment="casadi_aux") {
   namespace casadi {
     bool to_ptr(GUESTOBJECT *p, Function** m) {
@@ -1940,7 +2001,7 @@ namespace std {
 %fragment("casadi_extra", "header") {}
 
 // Collect all fragments
-%fragment("casadi_all", "header", fragment="casadi_aux,casadi_extra,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_function,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_sx,casadi_sxelem,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
+%fragment("casadi_all", "header", fragment="casadi_aux,casadi_extra,casadi_bool,casadi_int,casadi_double,casadi_vector,casadi_vectorvector,casadi_function,casadi_generictype,casadi_string,casadi_slice,casadi_map,casadi_pair,casadi_sx,casadi_sxelem,casadi_mx,casadi_dmatrix,casadi_sparsity,casadi_imatrix") { }
 
 #endif // SWIGXML
 
@@ -2663,9 +2724,6 @@ namespace casadi{
  casadi_vertsplit(const M& v, casadi_int incr=1) {
  return vertsplit(v, incr);
  }
- DECL M casadi_blockcat(const std::vector< std::vector< M > > &v) {
- return blockcat(v);
- }
  DECL M casadi_blockcat(const M& A, const M& B, const M& C, const M& D) {
  return vertcat(horzcat(A, B), horzcat(C, D));
  }
@@ -3038,7 +3096,9 @@ DECL void casadi_shared(const std::vector< M >& ex,
                                const std::string& v_suffix="") {
   shared(ex, OUTPUT1, OUTPUT2, OUTPUT3, v_prefix, v_suffix);
 }
-
+DECL M casadi_blockcat(const std::vector< std::vector< M > > &v) {
+ return blockcat(v);
+}
 #endif // FLAG & IS_GLOBAL
 %enddef
 

@@ -441,3 +441,21 @@ for j=1:2;
   end
 
 end
+
+c = {1,2,4;3 5 6}
+e = full(casadi.blockcat(c))
+assert(norm(cell2mat(c)-e)==0)
+
+e = full(casadi.blockcat({{1,2,4};{3 5 6}}))
+assert(norm(cell2mat(c)-e)==0)
+e = full(casadi.blockcat({{1,2,4} {3 5 6}}))
+assert(norm(cell2mat(c)-e)==0)
+e = full(casadi.blockcat({{1;2;4} {3 5 6}}))
+assert(norm(cell2mat(c)-e)==0)
+e = full(casadi.blockcat({{1;2;4} {3;5;6}}))
+assert(norm(cell2mat(c)-e)==0)
+
+c = casadi.blockcat({1 2 3})
+assert(norm(size(c)-[1 3])==0)
+c = casadi.blockcat({1;2;3})
+assert(norm(size(c)-[3 1])==0)
