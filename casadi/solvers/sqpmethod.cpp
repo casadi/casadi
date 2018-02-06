@@ -218,14 +218,8 @@ namespace casadi {
       print("\n");
     }
 
-    // Lagrange multipliers of the NLP
-    alloc_w(ng_, true); // mu_
-    alloc_w(nx_, true); // mu_x_
-
     // Current linearization point
-    alloc_w(nx_, true); // x_
     alloc_w(nx_, true); // x_cand_
-    alloc_w(nx_, true); // x_old_
 
     // Lagrange gradient in the next iterate
     alloc_w(nx_, true); // gLag_
@@ -264,7 +258,6 @@ namespace casadi {
 
     // Current linearization point
     m->x_cand = w; w += nx_;
-    m->x_old = w; w += nx_;
 
     // Lagrange gradient in the next iterate
     m->gLag = w; w += nx_;
@@ -406,7 +399,7 @@ namespace casadi {
         // Update BFGS
         if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, m->Bk);
         // Update the Hessian approximation
-        casadi_bfgs(Hsp_, m->Bk, m->x, m->x_old, m->gLag, m->gLag_old, m->w);
+        casadi_bfgs(Hsp_, m->Bk, m->dx, m->gLag, m->gLag_old, m->w);
       }
 
       // Formulate the QP
@@ -516,14 +509,12 @@ namespace casadi {
         casadi_axpy(nx_, t, m->qp_DUAL_X, m->lam_x);
 
         // Candidate accepted, update the primal variable
-        casadi_copy(m->x, nx_, m->x_old);
         casadi_copy(m->x_cand, nx_, m->x);
 
       } else {
         // Full step
         casadi_copy(m->qp_DUAL_A, ng_, m->lam_g);
         casadi_copy(m->qp_DUAL_X, nx_, m->lam_x);
-        casadi_copy(m->x, nx_, m->x_old);
         // x+=dx
         casadi_axpy(nx_, 1., m->dx, m->x);
       }
