@@ -334,11 +334,9 @@ namespace casadi {
       m->res[1] = m->gf;
       if (calc_function(m, "nlp_grad_f")) return 1;
 
-      // Evaluate the gradient of the Lagrangian with the new x and new lam_g
+      // Evaluate the gradient of the Lagrangian
       casadi_copy(m->gf, nx_, m->gLag);
-      if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag, true);
-
-      // gLag += lam_x_;
+      casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag, true);
       casadi_axpy(nx_, 1., m->lam_x, m->gLag);
 
       // Primal infeasability
@@ -533,8 +531,7 @@ namespace casadi {
       if (!exact_hessian_) {
         // Evaluate the gradient of the Lagrangian with the old x but new lam_g (for BFGS)
         casadi_copy(m->gf, nx_, m->gLag_old);
-        if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag_old, true);
-        // gLag_old += lam_x_;
+        casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag_old, true);
         casadi_axpy(nx_, 1., m->lam_x, m->gLag_old);
       }
     }
