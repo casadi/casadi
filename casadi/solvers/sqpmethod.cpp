@@ -179,17 +179,19 @@ namespace casadi {
 
     // Get/generate required functions
     create_function("nlp_fg", {"x", "p"}, {"f", "g"});
-    create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
-    Function jac_g_fcn, hess_l_fcn;
-    jac_g_fcn = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
+    // First order derivative information
+    Function jac_g_fcn = create_function("nlp_jac_fg", {"x", "p"},
+                                        {"f", "grad:f:x", "g", "jac:g:x"});
+    Asp_ = jac_g_fcn.sparsity_out(3);
+
     if (exact_hessian_) {
-      hess_l_fcn = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                                   {"sym:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+      Function hess_l_fcn = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+                                           {"sym:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+      Hsp_ = hess_l_fcn.sparsity_out(0);
+    } else {
+      Hsp_ = Sparsity::dense(nx_, nx_);
     }
 
-    // Allocate a QP solver
-    Hsp_ = exact_hessian_ ? hess_l_fcn.sparsity_out(0) : Sparsity::dense(nx_, nx_);
-    Asp_ = jac_g_fcn.is_null() ? Sparsity(0, nx_) : jac_g_fcn.sparsity_out(1);
 
     // Allocate a QP solver
     casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
@@ -315,23 +317,19 @@ namespace casadi {
     // Default stepsize
     double t = 0;
 
+    // For seeds
+    const double one = 1.;
+
     // MAIN OPTIMIZATION LOOP
     while (true) {
-      // Initial constraint Jacobian
-      if (ng_) {
-        m->arg[0] = m->x;
-        m->arg[1] = m->p;
-        m->res[0] = m->g;
-        m->res[1] = m->Jk;
-        if (calc_function(m, "nlp_jac_g")) return 1;
-      }
-
-      // Initial objective gradient
+      // Evaluate f, g and first order derivative information
       m->arg[0] = m->x;
       m->arg[1] = m->p;
       m->res[0] = &m->f;
       m->res[1] = m->gf;
-      if (calc_function(m, "nlp_grad_f")) return 1;
+      m->res[2] = m->g;
+      m->res[3] = m->Jk;
+      if (calc_function(m, "nlp_jac_fg")) return 1;
 
       // Evaluate the gradient of the Lagrangian
       casadi_copy(m->gf, nx_, m->gLag);
@@ -384,10 +382,9 @@ namespace casadi {
 
       if (exact_hessian_) {
         // Update/reset exact Hessian
-        double sigma = 1.;
         m->arg[0] = m->x;
         m->arg[1] = m->p;
-        m->arg[2] = &sigma;
+        m->arg[2] = &one;
         m->arg[3] = m->lam_g;
         m->res[0] = m->Bk;
         if (calc_function(m, "nlp_hess_l")) return 1;
