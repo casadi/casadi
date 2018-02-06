@@ -670,6 +670,9 @@ namespace casadi {
     alloc_w(ng_, true); // qp_lba_
     alloc_w(ng_, true); // qp_uba_
 
+    // Line-search memory
+    alloc_w(merit_memsize_, true);
+
     // Temporary work vectors
     alloc(mat_fcn_);
     alloc(res_fcn_);
@@ -691,8 +694,6 @@ namespace casadi {
       m->lifted_mem[i].n = v_[i].n;
     }
 
-    // Line-search memory
-    m->merit_mem.resize(merit_memsize_);
     return 0;
   }
 
@@ -746,6 +747,9 @@ namespace casadi {
     m->qp_lba = w; w += ng_;
     m->qp_uba = w; w += ng_;
 
+    // merit_mem
+    m->merit_mem = w; w += merit_memsize_;
+
     // Residual
     for (auto&& v : m->lifted_mem) casadi_fill(v.res, v.n, 0.);
     if (!gauss_newton_) {
@@ -783,7 +787,6 @@ namespace casadi {
     }
 
     // Reset line-search
-    fill(m->merit_mem.begin(), m->merit_mem.end(), 0.0);
     m->merit_ind = 0;
 
     // Current guess for the primal solution
@@ -1193,14 +1196,19 @@ namespace casadi {
     double l1_infeas = primalInfeasibility(m);
 
     // Right-hand side of Armijo condition
-    double F_sens = 0;
-    for (casadi_int i=0; i<nx_; ++i) F_sens += m->dxk[i] * m->gfk[i];
+    double F_sens = casadi_dot(nx_, m->dxk, m->gfk);
     double L1dir = F_sens - m->sigma * l1_infeas;
     double L1merit = m->f + m->sigma * l1_infeas;
 
     // Storing the actual merit function value in a list
     m->merit_mem[m->merit_ind] = L1merit;
     ++m->merit_ind %= merit_memsize_;
+
+    // Calculating maximal merit function value so far
+    double meritmax = m->merit_mem[0];
+    for (size_t i=1; i<merit_memsize_ && i<m->iter_count; ++i) {
+      if (meritmax < m->merit_mem[i]) meritmax = m->merit_mem[i];
+    }
 
     // Stepsize
     double t = 1.0, t_prev = 0.0;
@@ -1237,9 +1245,6 @@ namespace casadi {
       // Calculating merit-function in candidate
       l1_infeas = primalInfeasibility(m);
       L1merit_cand = m->f + m->sigma * l1_infeas;
-
-      // Calculating maximal merit function value so far
-      double meritmax = *max_element(m->merit_mem.begin(), m->merit_mem.end());
       if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
 
         // Accepting candidate

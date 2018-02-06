@@ -248,7 +248,7 @@ namespace casadi {
     // Jacobian
     alloc_w(Asp_.nnz(), true); // Jk_
 
-    // merit_mem
+    // Line-search memory
     alloc_w(merit_memsize_, true);
   }
 
@@ -448,6 +448,12 @@ namespace casadi {
       m->merit_mem[m->merit_ind] = L1merit;
       ++m->merit_ind %= merit_memsize_;
 
+      // Calculating maximal merit function value so far
+      double meritmax = m->merit_mem[0];
+      for (size_t i=1; i<merit_memsize_ && i<m->iter_count; ++i) {
+        if (meritmax < m->merit_mem[i]) meritmax = m->merit_mem[i];
+      }
+
       // Stepsize
       t = 1.0;
       double fk_cand;
@@ -486,12 +492,6 @@ namespace casadi {
           l1_infeas = std::fmax(casadi_max_viol(nx_, m->x_cand, m->lbx, m->ubx),
                                 casadi_max_viol(ng_, m->g_cand, m->lbg, m->ubg));
           L1merit_cand = fk_cand + m->sigma * l1_infeas;
-          // Calculating maximal merit function value so far
-          double meritmax = m->merit_mem[0];
-          for (size_t i=1; i<merit_memsize_ && i<m->iter_count; ++i) {
-            if (meritmax < m->merit_mem[i]) meritmax = m->merit_mem[i];
-          }
-
           if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
             break;
           }

@@ -74,7 +74,7 @@ namespace casadi {
     double *qp_lbx, *qp_ubx, *qp_lba, *qp_uba;
 
     // Linesearch parameters
-    std::vector<double> merit_mem;
+    double* merit_mem;
     casadi_int merit_ind;
 
     // Timers
