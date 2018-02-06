@@ -300,7 +300,7 @@ namespace casadi {
     auto m = static_cast<SqpmethodMemory*>(mem);
 
     // Number of SQP iterations
-    casadi_int iter = 0;
+    m->iter_count = 0;
 
     // Number of line-search iterations
     casadi_int ls_iter = 0;
@@ -318,14 +318,6 @@ namespace casadi {
 
     // MAIN OPTIMIZATION LOOP
     while (true) {
-      if (ls_iter>0 && !exact_hessian_) {
-        // Evaluate the gradient of the Lagrangian with the old x but new lam_g (for BFGS)
-        casadi_copy(m->gf, nx_, m->gLag_old);
-        if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag_old, true);
-        // gLag_old += lam_x_;
-        casadi_axpy(nx_, 1., m->lam_x, m->gLag_old);
-      }
-
       // Initial constraint Jacobian
       if (ng_) {
         m->arg[0] = m->x;
@@ -349,6 +341,50 @@ namespace casadi {
       // gLag += lam_x_;
       casadi_axpy(nx_, 1., m->lam_x, m->gLag);
 
+      // Primal infeasability
+      double pr_inf = std::fmax(casadi_max_viol(nx_, m->x, m->lbx, m->ubx),
+                                casadi_max_viol(ng_, m->g, m->lbg, m->ubg));
+
+      // inf-norm of lagrange gradient
+      double gLag_norminf = casadi_norm_inf(nx_, m->gLag);
+
+      // inf-norm of step
+      double dx_norminf = casadi_norm_inf(nx_, m->dx);
+
+      // Printing information about the actual iterate
+      if (print_iteration_) {
+        if (m->iter_count % 10 == 0) print_iteration();
+        print_iteration(m->iter_count, m->f, pr_inf, gLag_norminf, dx_norminf,
+                        m->reg, ls_iter, ls_success);
+      }
+
+      // Callback function
+      if (callback(m, m->x, &m->f, m->g, m->lam_x, m->lam_g, 0)) {
+        print("WARNING(sqpmethod): Aborted by callback...\n");
+        m->return_status = "User_Requested_Stop";
+        break;
+      }
+
+      // Checking convergence criteria
+      if (m->iter_count >= min_iter_ && pr_inf < tol_pr_ && gLag_norminf < tol_du_) {
+        print("MESSAGE(sqpmethod): Convergence achieved after %d iterations\n", m->iter_count);
+        m->return_status = "Solve_Succeeded";
+        break;
+      }
+
+      if (m->iter_count >= max_iter_) {
+        print("MESSAGE(sqpmethod): Maximum number of iterations reached.\n");
+        m->return_status = "Maximum_Iterations_Exceeded";
+        break;
+      }
+
+      if (m->iter_count >= 1 && m->iter_count >= min_iter_ && dx_norminf <= min_step_size_) {
+        print("MESSAGE(sqpmethod): Search direction becomes too small without "
+              "convergence criteria being met.\n");
+        m->return_status = "Search_Direction_Becomes_Too_Small";
+        break;
+      }
+
       if (exact_hessian_) {
         // Update/reset exact Hessian
         double sigma = 1.;
@@ -364,67 +400,17 @@ namespace casadi {
           m->reg = std::fmin(0, -casadi_lb_eig(Hsp_, m->Bk));
           if (m->reg > 0) casadi_regularize(Hsp_, m->Bk, m->reg);
         }
-      } else if (ls_iter==0) {
+      } else if (m->iter_count==0) {
         // Initialize BFGS
         casadi_fill(m->Bk, Hsp_.nnz(), 1.);
         casadi_bfgs_reset(Hsp_, m->Bk);
       } else {
         // Update BFGS
-        if (iter % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, m->Bk);
+        if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, m->Bk);
         // Update the Hessian approximation
         casadi_bfgs(Hsp_, m->Bk, m->x, m->x_old, m->gLag, m->gLag_old, m->w);
       }
 
-      // Primal infeasability
-      double pr_inf = std::fmax(casadi_max_viol(nx_, m->x, m->lbx, m->ubx),
-                                casadi_max_viol(ng_, m->g, m->lbg, m->ubg));
-
-      // inf-norm of lagrange gradient
-      double gLag_norminf = casadi_norm_inf(nx_, m->gLag);
-
-      // inf-norm of step
-      double dx_norminf = casadi_norm_inf(nx_, m->dx);
-
-      // Print header occasionally
-      if (print_iteration_ && iter % 10 == 0) print_iteration();
-
-      // Printing information about the actual iterate
-      if (print_iteration_) {
-        print_iteration(iter, m->f, pr_inf, gLag_norminf, dx_norminf,
-                       m->reg, ls_iter, ls_success);
-      }
-
-      // Callback function
-      if (callback(m, m->x, &m->f, m->g, m->lam_x, m->lam_g, 0)) {
-        print("WARNING(sqpmethod): Aborted by callback...\n");
-        m->return_status = "User_Requested_Stop";
-        break;
-      }
-
-      // Checking convergence criteria
-      if (iter >= min_iter_ && pr_inf < tol_pr_ && gLag_norminf < tol_du_) {
-        print("MESSAGE(sqpmethod): Convergence achieved after %d iterations\n", iter);
-        m->return_status = "Solve_Succeeded";
-        break;
-      }
-
-      if (iter >= max_iter_) {
-        print("MESSAGE(sqpmethod): Maximum number of iterations reached.\n");
-        m->return_status = "Maximum_Iterations_Exceeded";
-        break;
-      }
-
-      if (iter >= 1 && iter >= min_iter_ && dx_norminf <= min_step_size_) {
-        print("MESSAGE(sqpmethod): Search direction becomes too small without "
-              "convergence criteria being met.\n");
-        m->return_status = "Search_Direction_Becomes_Too_Small";
-        break;
-      }
-
-      // Start a new iteration
-      iter++;
-
-      if (verbose_) print("Formulating QP\n");
       // Formulate the QP
       casadi_copy(m->lbx, nx_, m->qp_LBX);
       casadi_axpy(nx_, -1., m->x, m->qp_LBX);
@@ -435,10 +421,12 @@ namespace casadi {
       casadi_copy(m->ubg, ng_, m->qp_UBA);
       casadi_axpy(ng_, -1., m->g, m->qp_UBA);
 
+      // Increase counter
+      m->iter_count++;
+
       // Solve the QP
       solve_QP(m, m->Bk, m->gf, m->qp_LBX, m->qp_UBX, m->Jk, m->qp_LBA,
                m->qp_UBA, m->dx, m->qp_DUAL_X, m->qp_DUAL_A);
-      if (verbose_) print("QP solved\n");
 
       // Detecting indefiniteness
       double gain = casadi_bilin(m->Bk, Hsp_, m->dx, m->dx);
@@ -541,9 +529,15 @@ namespace casadi {
         // x+=dx
         casadi_axpy(nx_, 1., m->dx, m->x);
       }
-    }
 
-    m->iter_count = iter;
+      if (!exact_hessian_) {
+        // Evaluate the gradient of the Lagrangian with the old x but new lam_g (for BFGS)
+        casadi_copy(m->gf, nx_, m->gLag_old);
+        if (ng_>0) casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag_old, true);
+        // gLag_old += lam_x_;
+        casadi_axpy(nx_, 1., m->lam_x, m->gLag_old);
+      }
+    }
 
     return 0;
   }
@@ -591,6 +585,7 @@ namespace casadi {
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);
+    if (verbose_) print("QP solved\n");
   }
 
   Dict Sqpmethod::get_stats(void* mem) const {
