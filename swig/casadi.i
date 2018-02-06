@@ -2222,7 +2222,7 @@ namespace std {
 %casadi_template(LL "SXElem" LR, PREC_SXVector, std::vector<casadi::SXElem>)
 %casadi_typemaps("SX", PREC_SX, casadi::Matrix<casadi::SXElem>)
 %casadi_template(LL "SX" LR, PREC_SXVector, std::vector< casadi::Matrix<casadi::SXElem> >)
-%casadi_template(LL "SX" LR LR, PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElem> > >)
+%casadi_template(LL LL "SX" LR LR, PREC_SXVectorVector, std::vector<std::vector< casadi::Matrix<casadi::SXElem> > >)
 %casadi_template(LDICT("SX"), PREC_SX, std::map<std::string, casadi::Matrix<casadi::SXElem> >)
 %casadi_typemaps("MX", PREC_MX, casadi::MX)
 %casadi_template(LL "MX" LR, PREC_MXVector, std::vector<casadi::MX>)
