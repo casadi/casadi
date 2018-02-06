@@ -199,7 +199,7 @@ namespace casadi {
 
     // BFGS?
     if (!exact_hessian_) {
-      alloc_w(3*nx_); // casadi_bfgs
+      alloc_w(2*nx_); // casadi_bfgs
     }
 
     // Header
@@ -459,25 +459,23 @@ namespace casadi {
 
         // Line-search loop
         while (true) {
+          // Increase counter
+          ls_iter++;
+
+          // Candidate step
           casadi_copy(m->x, nx_, m->x_cand);
           casadi_axpy(nx_, t, m->dx, m->x_cand);
-          try {
-            // Evaluating objective and constraints
-            m->arg[0] = m->x_cand;
-            m->arg[1] = m->p;
-            m->res[0] = &fk_cand;
-            m->res[1] = m->g_cand;
-            if (calc_function(m, "nlp_fg")) casadi_error("nlp_fg failed");
-          } catch(const CasadiException& ex) {
-            (void)ex;
-            // Silent ignore; line-search failed
-            ls_iter++;
-            // Backtracking
+
+          // Evaluating objective and constraints
+          m->arg[0] = m->x_cand;
+          m->arg[1] = m->p;
+          m->res[0] = &fk_cand;
+          m->res[1] = m->g_cand;
+          if (calc_function(m, "nlp_fg")) {
+            // line-search failed, skip iteration
             t = beta_ * t;
             continue;
           }
-
-          ls_iter++;
 
           // Calculating merit-function in candidate
           l1_infeas = std::fmax(casadi_max_viol(nx_, m->x_cand, m->lbx, m->ubx),
@@ -486,15 +484,12 @@ namespace casadi {
           // Calculating maximal merit function value so far
           double meritmax = *max_element(m->merit_mem.begin(), m->merit_mem.end());
           if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
-            // Accepting candidate
-            if (verbose_) print("Line-search completed, candidate accepted\n");
             break;
           }
 
           // Line-search not successful, but we accept it.
           if (ls_iter == max_iter_ls_) {
             ls_success = false;
-            if (verbose_) print("Line-search completed, maximum number of iterations\n");
             break;
           }
 
@@ -508,16 +503,16 @@ namespace casadi {
         casadi_scal(nx_, 1-t, m->lam_x);
         casadi_axpy(nx_, t, m->qp_DUAL_X, m->lam_x);
 
-        // Candidate accepted, update the primal variable
-        casadi_copy(m->x_cand, nx_, m->x);
+        casadi_scal(nx_, t, m->dx);
 
       } else {
         // Full step
         casadi_copy(m->qp_DUAL_A, ng_, m->lam_g);
         casadi_copy(m->qp_DUAL_X, nx_, m->lam_x);
-        // x+=dx
-        casadi_axpy(nx_, 1., m->dx, m->x);
       }
+
+      // Take step
+      casadi_axpy(nx_, 1., m->dx, m->x);
 
       if (!exact_hessian_) {
         // Evaluate the gradient of the Lagrangian with the old x but new lam_g (for BFGS)
