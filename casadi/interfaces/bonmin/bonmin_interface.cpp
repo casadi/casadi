@@ -457,6 +457,9 @@ namespace casadi {
   finalize_solution(BonminMemory* m, TMINLP::SolverReturn status,
       const double* x, double obj_value) const {
     try {
+      // Get primal solution
+      casadi_copy(x, nx_, m->x);
+
       // Get optimal cost
       m->f = obj_value;
 
