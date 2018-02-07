@@ -569,6 +569,22 @@ namespace casadi {
     oracle_.disp(stream, true);
   }
 
+  Function Nlpsol::kkt() const {
+    // Quick return if cached
+    if (kkt_.alive()) {
+      return shared_cast<Function>(kkt_.shared());
+    }
+
+    // Generate KKT function
+    Function ret = oracle_.factory("kkt", {"x", "p", "lam:f", "lam:g"},
+      {"jac:g:x", "sym:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+
+    // Cache and return
+    kkt_ = ret;
+    return ret;
+  }
+
+
   Function Nlpsol::
   get_forward(casadi_int nfwd, const std::string& name,
               const std::vector<std::string>& inames,
@@ -597,12 +613,11 @@ namespace casadi {
     MX ubg = arg[NLPSOL_UBG];
     MX p = arg[NLPSOL_P];
 
-    // Calculates Hessian of the Lagrangian and Jacobian of the constraints
-    Function HJ_fun = oracle_.factory("HJ", {"x", "p", "lam:f", "lam:g"},
-      {"jac:g:x", "sym:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+    // Get KKT function
+    Function kkt = this->kkt();
 
     // Hessian of the Lagrangian, Jacobian of the constraints
-    vector<MX> HJ_res = HJ_fun({x, p, 1, lam_g});
+    vector<MX> HJ_res = kkt({x, p, 1, lam_g});
     MX JG = HJ_res[0];
     MX HL = HJ_res[1];
 
