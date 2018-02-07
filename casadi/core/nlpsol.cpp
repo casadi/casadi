@@ -496,14 +496,6 @@ namespace casadi {
     // Solve the NLP
     int flag = solve(m);
 
-    // Get optimal solution
-    casadi_copy(m->x, nx_, x);
-    casadi_copy(m->lam_x, nx_, lam_x);
-    casadi_copy(m->lam_g, ng_, lam_g);
-    casadi_copy(m->lam_p, np_, lam_p);
-    casadi_copy(&m->f, 1, f);
-    casadi_copy(m->g, ng_, g);
-
     // Calculate multiplers
     if (calc_multipliers_) {
       double lam_f = 1.;
@@ -533,6 +525,14 @@ namespace casadi {
         casadi_scal(np_, -1., m->lam_p);
       }
     }
+
+    // Get optimal solution
+    casadi_copy(m->x, nx_, x);
+    casadi_copy(m->lam_x, nx_, lam_x);
+    casadi_copy(m->lam_g, ng_, lam_g);
+    casadi_copy(m->lam_p, np_, lam_p);
+    casadi_copy(&m->f, 1, f);
+    casadi_copy(m->g, ng_, g);
 
     // Finalize/print statistics
     m->fstats.at(name_).toc();
