@@ -391,6 +391,9 @@ namespace casadi {
     // Should we generate a main (allowing evaluation from command line)
     bool main;
 
+    // Should we include mayth library?
+    bool include_math;
+
     // Do we want to be lean on stack usage?
     bool avoid_stack_;
 

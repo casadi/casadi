@@ -45,6 +45,7 @@ namespace casadi {
     this->with_mem = false;
     this->with_export = true;
     this->with_import = false;
+    this->include_math = true;
     avoid_stack_ = false;
     indent_ = 2;
 
@@ -72,6 +73,8 @@ namespace casadi {
         this->with_export = e.second;
       } else if (e.first=="with_import") {
         this->with_import = e.second;
+      } else if (e.first=="include_math") {
+        this->include_math = e.second;
       } else if (e.first=="indent") {
         indent_ = e.second;
         casadi_assert_dev(indent_>=0);
@@ -104,7 +107,7 @@ namespace casadi {
     casadi_assert_dev(Function::check_name(this->name));
 
     // Includes needed
-    add_include("math.h");
+    if (this->include_math) add_include("math.h");
     if (this->main) add_include("stdio.h");
 
     // Mex and main need string.h
@@ -337,7 +340,7 @@ namespace casadi {
       << "    /* name error */\n";
     for (casadi_int i=0; i<exposed_fname.size(); ++i) {
       s << "  } else if (strcmp(buf, \"" << exposed_fname[i] << "\")==0) {\n"
-        << "    return mex_" << exposed_fname[i] << "(resc, resv, argc, argv);\n";
+        << "    mex_" << exposed_fname[i] << "(resc, resv, argc, argv);\n";
     }
     s << "  }\n";
 
