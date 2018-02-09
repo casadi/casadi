@@ -1511,7 +1511,7 @@ std::vector< M > &arg) const  "
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+[INTERNAL]  Generate a function that calculates forward mode derivatives.
 
 ";
 
@@ -1636,12 +1636,9 @@ const double *lam_p) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::replace_fseed(const
-std::vector< std::vector< M > > &fseed) const  "
+%feature("docstring")  casadi::Nlpsol::kkt() const  "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Blocksqp::init(const Dict &opts) override "
 
@@ -1649,10 +1646,9 @@ std::vector< std::vector< M > > &fseed) const  "
 
 ";
 
-%feature("docstring")  casadi::Blocksqp::run(BlocksqpMemory *m, casadi_int
-maxIt, casadi_int warmStart=0) const  "
+%feature("docstring")  casadi::FunctionInternal::has_spfwd() const  "
 
-[INTERNAL]  Main Loop of SQP method.
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
 
 ";
 
@@ -1759,12 +1755,10 @@ std::string &fname) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_reverse(casadi_int
-nadj) const  "
+%feature("docstring")  casadi::Nlpsol::has_reverse(casadi_int nadj) const
+override "
 
-[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(casadi_int nadj) if no cached version is available.
+[INTERNAL]  Generate a function that calculates reverse mode derivatives.
 
 ";
 
@@ -1979,7 +1973,7 @@ double alpha) const  "
 %feature("docstring")  casadi::Nlpsol::has_forward(casadi_int nfwd) const
 override "
 
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+[INTERNAL]  Generate a function that calculates forward mode derivatives.
 
 ";
 
@@ -2910,9 +2904,10 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_spfwd() const  "
+%feature("docstring")  casadi::Blocksqp::run(BlocksqpMemory *m, casadi_int
+maxIt, casadi_int warmStart=0) const  "
 
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+[INTERNAL]  Main Loop of SQP method.
 
 ";
 
@@ -2944,6 +2939,13 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::replace_fseed(const
+std::vector< std::vector< M > > &fseed) const  "
+
+[INTERNAL]  Replace 0-by-0 forward seeds.
 
 ";
 
@@ -3294,13 +3296,11 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_reverse(casadi_int
-nadj, const std::string &name, const std::vector< std::string > &inames,
-const std::vector< std::string > &onames, const Dict &opts) const  "
+%feature("docstring")  casadi::Nlpsol::get_reverse(casadi_int nadj, const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(casadi_int nadj) if no cached version is available.
+[INTERNAL]  Generate a function that calculates reverse mode derivatives.
 
 ";
 
@@ -45411,13 +45411,11 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_reverse(casadi_int
-nadj, const std::string &name, const std::vector< std::string > &inames,
-const std::vector< std::string > &onames, const Dict &opts) const  "
+%feature("docstring")  casadi::Nlpsol::get_reverse(casadi_int nadj, const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(casadi_int nadj) if no cached version is available.
+[INTERNAL]  Generate a function that calculates reverse mode derivatives.
 
 ";
 
@@ -45652,7 +45650,7 @@ double **arg, double **res, casadi_int *iw, double *w) const override "
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+[INTERNAL]  Generate a function that calculates forward mode derivatives.
 
 ";
 
@@ -45767,16 +45765,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::numel_in() const  "
-
-[INTERNAL]  Number of input/output elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::numel_in(casadi_int ind)
+%feature("docstring")  casadi::FunctionInternal::size2_in(casadi_int ind)
 const  "
 
-[INTERNAL]  Number of input/output elements.
+[INTERNAL]  Input/output dimensions.
 
 ";
 
@@ -45808,6 +45800,10 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::Nlpsol::kkt() const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::Nlpsol::solve(void *mem) const  "
 
 [INTERNAL] ";
@@ -45836,7 +45832,7 @@ const  "
 %feature("docstring")  casadi::Nlpsol::has_forward(casadi_int nfwd) const
 override "
 
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+[INTERNAL]  Generate a function that calculates forward mode derivatives.
 
 ";
 
@@ -45856,12 +45852,10 @@ std::vector< M > &arg) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::has_reverse(casadi_int
-nadj) const  "
+%feature("docstring")  casadi::Nlpsol::has_reverse(casadi_int nadj) const
+override "
 
-[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(casadi_int nadj) if no cached version is available.
+[INTERNAL]  Generate a function that calculates reverse mode derivatives.
 
 ";
 
@@ -46360,10 +46354,16 @@ std::string &fname, const Dict &opts) const override "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::size2_in(casadi_int ind)
+%feature("docstring")  casadi::FunctionInternal::numel_in() const  "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::numel_in(casadi_int ind)
 const  "
 
-[INTERNAL]  Input/output dimensions.
+[INTERNAL]  Number of input/output elements.
 
 ";
 
@@ -53456,13 +53456,11 @@ const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::get_reverse(casadi_int
-nadj, const std::string &name, const std::vector< std::string > &inames,
-const std::vector< std::string > &onames, const Dict &opts) const  "
+%feature("docstring")  casadi::Nlpsol::get_reverse(casadi_int nadj, const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(casadi_int nadj) if no cached version is available.
+[INTERNAL]  Generate a function that calculates reverse mode derivatives.
 
 ";
 
@@ -53704,7 +53702,7 @@ always_inline, bool never_inline) const  "
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+[INTERNAL]  Generate a function that calculates forward mode derivatives.
 
 ";
 
@@ -53852,12 +53850,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_reverse(casadi_int
-nadj) const  "
+%feature("docstring")  casadi::Nlpsol::has_reverse(casadi_int nadj) const
+override "
 
-[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(casadi_int nadj) if no cached version is available.
+[INTERNAL]  Generate a function that calculates reverse mode derivatives.
 
 ";
 
@@ -54044,10 +54040,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::jacobian() const  "
+%feature("docstring")  casadi::Nlpsol::get_name_out(casadi_int i) override "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Names of function input and outputs.
 
 ";
 
@@ -54070,9 +54065,10 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::get_name_out(casadi_int i) override "
+%feature("docstring")  casadi::FunctionInternal::jacobian() const  "
 
-[INTERNAL]  Names of function input and outputs.
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
 
 ";
 
@@ -54217,6 +54213,10 @@ ind) const  "
 
 ";
 
+%feature("docstring")  casadi::Nlpsol::kkt() const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::Nlpsol::eval(const double **arg, double
 **res, casadi_int *iw, double *w, void *mem) const override "
 
@@ -54331,7 +54331,7 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::Nlpsol::has_forward(casadi_int nfwd) const
 override "
 
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+[INTERNAL]  Generate a function that calculates forward mode derivatives.
 
 ";
 
@@ -60389,22 +60389,18 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_reverse(casadi_int
-nadj) const  "
+%feature("docstring")  casadi::Nlpsol::has_reverse(casadi_int nadj) const
+override "
 
-[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(casadi_int nadj) if no cached version is available.
+[INTERNAL]  Generate a function that calculates reverse mode derivatives.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_reverse(casadi_int
-nadj, const std::string &name, const std::vector< std::string > &inames,
-const std::vector< std::string > &onames, const Dict &opts) const  "
+%feature("docstring")  casadi::Nlpsol::get_reverse(casadi_int nadj, const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(casadi_int nadj) if no cached version is available.
+[INTERNAL]  Generate a function that calculates reverse mode derivatives.
 
 ";
 
@@ -60698,7 +60694,7 @@ nadj, const std::vector< MatType > &v) const  "
 std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const override "
 
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+[INTERNAL]  Generate a function that calculates forward mode derivatives.
 
 ";
 
@@ -60798,7 +60794,7 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 %feature("docstring")  casadi::Nlpsol::has_forward(casadi_int nfwd) const
 override "
 
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+[INTERNAL]  Generate a function that calculates forward mode derivatives.
 
 ";
 
@@ -61316,6 +61312,10 @@ ind) const  "
 [INTERNAL]  Input/output sparsity.
 
 ";
+
+%feature("docstring")  casadi::Nlpsol::kkt() const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::all_scalar() const  "
 

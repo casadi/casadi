@@ -1095,7 +1095,7 @@ function input and outputs.
 ";
 
 %feature("docstring") casadi::Blocksqp::get_forward "[INTERNAL]  Generate a
-function that calculates nfwd forward derivatives.
+function that calculates forward mode derivatives.
 
 ";
 
@@ -1173,17 +1173,14 @@ required length of w field.
 
 %feature("docstring") casadi::Blocksqp::callback "[INTERNAL] ";
 
-%feature("docstring") casadi::Blocksqp::replace_fseed "[INTERNAL]  Replace
-0-by-0 forward seeds.
-
-";
+%feature("docstring") casadi::Blocksqp::kkt "[INTERNAL] ";
 
 %feature("docstring") casadi::Blocksqp::init "[INTERNAL]  Initialize.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::run "[INTERNAL]  Main Loop of SQP
-method.
+%feature("docstring") casadi::Blocksqp::has_spfwd "[INTERNAL]  Is the class
+able to propagate seeds through the algorithm?
 
 ";
 
@@ -1251,10 +1248,8 @@ globalization strategy.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::has_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(casadi_int nadj) if
-no cached version is available.
+%feature("docstring") casadi::Blocksqp::has_reverse "[INTERNAL]  Generate a
+function that calculates reverse mode derivatives.
 
 ";
 
@@ -1387,7 +1382,7 @@ Set new primal dual iterate.
 ";
 
 %feature("docstring") casadi::Blocksqp::has_forward "[INTERNAL]  Generate a
-function that calculates nfwd forward derivatives.
+function that calculates forward mode derivatives.
 
 ";
 
@@ -2151,8 +2146,8 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::Blocksqp::has_spfwd "[INTERNAL]  Is the class
-able to propagate seeds through the algorithm?
+%feature("docstring") casadi::Blocksqp::run "[INTERNAL]  Main Loop of SQP
+method.
 
 ";
 
@@ -2170,6 +2165,11 @@ smallest input value.
 
 %feature("docstring") casadi::Blocksqp::get_free "[INTERNAL]  Print free
 variables.
+
+";
+
+%feature("docstring") casadi::Blocksqp::replace_fseed "[INTERNAL]  Replace
+0-by-0 forward seeds.
 
 ";
 
@@ -2398,10 +2398,8 @@ Input/output sparsity.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::get_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(casadi_int nadj) if
-no cached version is available.
+%feature("docstring") casadi::Blocksqp::get_reverse "[INTERNAL]  Generate a
+function that calculates reverse mode derivatives.
 
 ";
 
@@ -32340,10 +32338,8 @@ Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::get_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(casadi_int nadj) if
-no cached version is available.
+%feature("docstring") casadi::Nlpsol::get_reverse "[INTERNAL]  Generate a
+function that calculates reverse mode derivatives.
 
 ";
 
@@ -32494,7 +32490,7 @@ vectors.
 ";
 
 %feature("docstring") casadi::Nlpsol::get_forward "[INTERNAL]  Generate a
-function that calculates nfwd forward derivatives.
+function that calculates forward mode derivatives.
 
 ";
 
@@ -32577,8 +32573,8 @@ function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::numel_in "[INTERNAL]  Number of
-input/output elements.
+%feature("docstring") casadi::Nlpsol::size2_in "[INTERNAL]  Input/output
+dimensions.
 
 ";
 
@@ -32602,6 +32598,8 @@ templated.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::kkt "[INTERNAL] ";
+
 %feature("docstring") casadi::Nlpsol::solve "[INTERNAL] ";
 
 %feature("docstring") casadi::Nlpsol::instruction_input "[INTERNAL]  Get
@@ -32620,7 +32618,7 @@ dimensions.
 ";
 
 %feature("docstring") casadi::Nlpsol::has_forward "[INTERNAL]  Generate a
-function that calculates nfwd forward derivatives.
+function that calculates forward mode derivatives.
 
 ";
 
@@ -32633,10 +32631,8 @@ output arguments that needs to be replaced.
 
 %feature("docstring") casadi::Nlpsol::calc_function "[INTERNAL] ";
 
-%feature("docstring") casadi::Nlpsol::has_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(casadi_int nadj) if
-no cached version is available.
+%feature("docstring") casadi::Nlpsol::has_reverse "[INTERNAL]  Generate a
+function that calculates reverse mode derivatives.
 
 ";
 
@@ -33004,8 +33000,8 @@ Export / Generate C code for the generated functions.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::size2_in "[INTERNAL]  Input/output
-dimensions.
+%feature("docstring") casadi::Nlpsol::numel_in "[INTERNAL]  Number of
+input/output elements.
 
 ";
 
@@ -37983,10 +37979,8 @@ input(s) and output(s)
 
 %feature("docstring") casadi::Scpgen::expand "[INTERNAL] ";
 
-%feature("docstring") casadi::Scpgen::get_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(casadi_int nadj) if
-no cached version is available.
+%feature("docstring") casadi::Scpgen::get_reverse "[INTERNAL]  Generate a
+function that calculates reverse mode derivatives.
 
 ";
 
@@ -38135,7 +38129,7 @@ input(s) and output(s)
 ";
 
 %feature("docstring") casadi::Scpgen::get_forward "[INTERNAL]  Generate a
-function that calculates nfwd forward derivatives.
+function that calculates forward mode derivatives.
 
 ";
 
@@ -38229,10 +38223,8 @@ input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::Scpgen::has_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(casadi_int nadj) if
-no cached version is available.
+%feature("docstring") casadi::Scpgen::has_reverse "[INTERNAL]  Generate a
+function that calculates reverse mode derivatives.
 
 ";
 
@@ -38362,8 +38354,8 @@ dimensions.
 
 ";
 
-%feature("docstring") casadi::Scpgen::jacobian "[INTERNAL]  Return Jacobian
-of all input elements with respect to all output elements.
+%feature("docstring") casadi::Scpgen::get_name_out "[INTERNAL]  Names of
+function input and outputs.
 
 ";
 
@@ -38383,8 +38375,8 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::Scpgen::get_name_out "[INTERNAL]  Names of
-function input and outputs.
+%feature("docstring") casadi::Scpgen::jacobian "[INTERNAL]  Return Jacobian
+of all input elements with respect to all output elements.
 
 ";
 
@@ -38469,6 +38461,8 @@ Input/output sparsity.
 
 ";
 
+%feature("docstring") casadi::Scpgen::kkt "[INTERNAL] ";
+
 %feature("docstring") casadi::Scpgen::eval "[INTERNAL]  Evaluate
 numerically.
 
@@ -38549,7 +38543,7 @@ the functions needed for the Lifted Newton method.
 ";
 
 %feature("docstring") casadi::Scpgen::has_forward "[INTERNAL]  Generate a
-function that calculates nfwd forward derivatives.
+function that calculates forward mode derivatives.
 
 ";
 
@@ -43112,17 +43106,13 @@ vectors long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::has_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(casadi_int nadj) if
-no cached version is available.
+%feature("docstring") casadi::Sqpmethod::has_reverse "[INTERNAL]  Generate
+a function that calculates reverse mode derivatives.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::get_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(casadi_int nadj) if
-no cached version is available.
+%feature("docstring") casadi::Sqpmethod::get_reverse "[INTERNAL]  Generate
+a function that calculates reverse mode derivatives.
 
 ";
 
@@ -43390,7 +43380,7 @@ Symbolic expressions for the adjoint seeds.
 ";
 
 %feature("docstring") casadi::Sqpmethod::get_forward "[INTERNAL]  Generate
-a function that calculates nfwd forward derivatives.
+a function that calculates forward mode derivatives.
 
 ";
 
@@ -43451,7 +43441,7 @@ the function for evaluation and statistics gathering
 ";
 
 %feature("docstring") casadi::Sqpmethod::has_forward "[INTERNAL]  Generate
-a function that calculates nfwd forward derivatives.
+a function that calculates forward mode derivatives.
 
 ";
 
@@ -43805,6 +43795,8 @@ function in a specific language.
 Input/output sparsity.
 
 ";
+
+%feature("docstring") casadi::Sqpmethod::kkt "[INTERNAL] ";
 
 %feature("docstring") casadi::Sqpmethod::all_scalar "[INTERNAL]  Are all
 inputs and outputs scalar.
