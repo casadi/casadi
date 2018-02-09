@@ -3,14 +3,15 @@
 // Use Gershgorin to finds upper and lower bounds on the eigenvalues
 template<typename T1>
 double casadi_lb_eig(const casadi_int* sp_h, const T1* h) {
-  // Get sparsity
-  casadi_int ncol = sp_h[1];
-  const casadi_int *colind = sp_h+2, *row = sp_h+ncol+3;
+  // Local variables
+  casadi_int ncol, c, k;
+  T1 center, radius;
+  const casadi_int *colind, *row;
   // Return value
   T1 lb_eig;
-  // Local variables
-  int c, k;
-  T1 center, radius;
+  // Get sparsity
+  ncol = sp_h[1];
+  colind = sp_h+2; row = sp_h+ncol+3;
   for (c=0; c<ncol; ++c) {
     // Calculate Gershgorin discs
     center = 0;
@@ -36,11 +37,12 @@ double casadi_lb_eig(const casadi_int* sp_h, const T1* h) {
 // Add a multiple of the identity matrix to the diagonal
 template<typename T1>
 void casadi_regularize(const casadi_int* sp_h, T1* h, T1 reg) {
-  // Get sparsity
-  casadi_int ncol = sp_h[1];
-  const casadi_int *colind = sp_h+2, *row = sp_h+ncol+3;
   // Local variables
-  int c, k;
+  casadi_int ncol, c, k;
+  const casadi_int *colind, *row;
+  // Get sparsity
+  ncol = sp_h[1];
+  colind = sp_h+2; row = sp_h+ncol+3;
   // Shift diagonal entries
   for (c=0; c<ncol; ++c) {
     for (k=colind[c]; k<colind[c+1]; ++k) {

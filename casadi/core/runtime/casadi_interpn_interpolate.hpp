@@ -2,10 +2,11 @@
 // SYMBOL "interpn_interpolate"
 template<typename T1>
 void casadi_interpn_interpolate(T1* res, casadi_int ndim, const casadi_int* offset, const T1* values, const T1* alpha, const casadi_int* index, const casadi_int* corner, T1* coeff, casadi_int m) { // NOLINT(whitespace/line_length)
+  T1 c;
+  casadi_int ld, i;
   // Get weight and value for corner
-  T1 c=1;
-  casadi_int ld=1; // leading dimension
-  casadi_int i;
+  c=1;
+  ld=1; // leading dimension
   for (i=0; i<ndim; ++i) {
     if (coeff) *coeff++ = c;
     if (corner[i]) {

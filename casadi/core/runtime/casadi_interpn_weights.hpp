@@ -5,13 +5,16 @@ void casadi_interpn_weights(casadi_int ndim, const T1* grid, const casadi_int* o
   // Left index and fraction of interval
   casadi_int i;
   for (i=0; i<ndim; ++i) {
+    casadi_int ng, j;
+    T1 xi;
+    const T1* g;
     // Grid point
-    T1 xi = x ? x[i] : 0;
+    xi = x ? x[i] : 0;
     // Grid
-    const T1* g = grid + offset[i];
-    casadi_int ng = offset[i+1]-offset[i];
+    g = grid + offset[i];
+    ng = offset[i+1]-offset[i];
     // Find left index
-    casadi_int j = index[i] = casadi_low(xi, g, ng, lookup_mode[i]);
+    j = index[i] = casadi_low(xi, g, ng, lookup_mode[i]);
     // Get interpolation/extrapolation alpha
     alpha[i] = (xi-g[j])/(g[j+1]-g[j]);
   }

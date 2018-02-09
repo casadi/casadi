@@ -519,7 +519,7 @@ class casadiTestCase(unittest.TestCase):
       if opts is None: opts = {}
       F.generate(name, opts)
       import subprocess
-      p = subprocess.Popen("gcc -fPIC -shared -Wall -Werror -Wno-unknown-pragmas -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
+      p = subprocess.Popen("gcc -pedantic -std=c89 -fPIC -shared -Wall -Werror -Wextra -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
       F2 = external(F.name(), './' + name + '.so')
 
       Fout = F.call(inputs)

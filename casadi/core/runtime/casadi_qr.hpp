@@ -6,14 +6,15 @@ template<typename T1>
 T1 casadi_house(T1* x, T1* beta, casadi_int n) {
   // Local variable
   casadi_int i;
+  T1 x0, sigma, s, sigma_is_zero, x0_nonpos;
   // Calculate norm
-  T1 x0 = x[0]; // Save x0 (overwritten below)
-  T1 sigma=0;
+  x0 = x[0]; // Save x0 (overwritten below)
+  sigma=0;
   for (i=1; i<n; ++i) sigma += x[i]*x[i];
-  T1 s = sqrt(x0*x0 + sigma); // s = norm(x)
+  s = sqrt(x0*x0 + sigma); // s = norm(x)
   // Calculate consistently with symbolic datatypes (SXElem)
-  T1 sigma_is_zero = sigma==0;
-  T1 x0_nonpos = x0<=0;
+  sigma_is_zero = sigma==0;
+  x0_nonpos = x0<=0;
   // C-REPLACE "if_else" "casadi_if_else"
   x[0] = if_else(sigma_is_zero, 1,
                  if_else(x0_nonpos, x0-s, -sigma/(x0+s)));
@@ -34,15 +35,16 @@ template<typename T1>
 void casadi_qr(const casadi_int* sp_a, const T1* nz_a, T1* x,
                const casadi_int* sp_v, T1* nz_v, const casadi_int* sp_r, T1* nz_r, T1* beta,
                const casadi_int* prinv, const casadi_int* pc) {
-   // Extract sparsities
-   casadi_int ncol = sp_a[1];
-   const casadi_int *a_colind=sp_a+2, *a_row=sp_a+2+ncol+1;
-   casadi_int nrow = sp_v[0];
-   const casadi_int *v_colind=sp_v+2, *v_row=sp_v+2+ncol+1;
-   const casadi_int *r_colind=sp_r+2, *r_row=sp_r+2+ncol+1;
    // Local variables
-   casadi_int r, c, k, k1;
+   casadi_int ncol, nrow, r, c, k, k1;
    T1 alpha;
+   const casadi_int *a_colind, *a_row, *v_colind, *v_row, *r_colind, *r_row;
+   // Extract sparsities
+   ncol = sp_a[1];
+   a_colind=sp_a+2; a_row=sp_a+2+ncol+1;
+   nrow = sp_v[0];
+   v_colind=sp_v+2; v_row=sp_v+2+ncol+1;
+   r_colind=sp_r+2; r_row=sp_r+2+ncol+1;
    // Clear work vector
    for (r=0; r<nrow; ++r) x[r] = 0;
    // Loop over columns of R, A and V
@@ -83,12 +85,13 @@ void casadi_qr(const casadi_int* sp_a, const T1* nz_a, T1* x,
 template<typename T1>
 void casadi_qr_mv(const casadi_int* sp_v, const T1* v, const T1* beta, T1* x,
                   casadi_int tr) {
-  // Extract sparsity
-  casadi_int ncol=sp_v[1];
-  const casadi_int *colind=sp_v+2, *row=sp_v+2+ncol+1;
   // Local variables
-  casadi_int c, c1, k;
+  casadi_int ncol, c, c1, k;
   T1 alpha;
+  const casadi_int *colind, *row;
+  // Extract sparsity
+  ncol=sp_v[1];
+  colind=sp_v+2; row=sp_v+2+ncol+1;
   // Loop over vectors
   for (c1=0; c1<ncol; ++c1) {
     // Forward order for transpose, otherwise backwards
@@ -106,11 +109,12 @@ void casadi_qr_mv(const casadi_int* sp_v, const T1* v, const T1* beta, T1* x,
 // Solve for an (optionally transposed) upper triangular matrix R
 template<typename T1>
 void casadi_qr_trs(const casadi_int* sp_r, const T1* nz_r, T1* x, casadi_int tr) {
-  // Extract sparsity
-  casadi_int ncol=sp_r[1];
-  const casadi_int *colind=sp_r+2, *row=sp_r+2+ncol+1;
   // Local variables
-  casadi_int r, c, k;
+  casadi_int ncol, r, c, k;
+  const casadi_int *colind, *row;
+  // Extract sparsity
+  ncol=sp_r[1];
+  colind=sp_r+2; row=sp_r+2+ncol+1;
   if (tr) {
     // Forward substitution
     for (c=0; c<ncol; ++c) {
@@ -145,8 +149,8 @@ template<typename T1>
 void casadi_qr_solve(T1* x, casadi_int nrhs, casadi_int tr,
                      const casadi_int* sp_v, const T1* v, const casadi_int* sp_r, const T1* r,
                      const T1* beta, const casadi_int* prinv, const casadi_int* pc, T1* w) {
-  casadi_int k, c;
-  casadi_int nrow_ext = sp_v[0], ncol = sp_v[1];
+  casadi_int k, c, nrow_ext, ncol;
+  nrow_ext = sp_v[0]; ncol = sp_v[1];
   for (k=0; k<nrhs; ++k) {
     if (tr) {
       // (PR' Q R PC)' x = PC' R' Q' PR x = b <-> x = PR' Q R' \ PC b

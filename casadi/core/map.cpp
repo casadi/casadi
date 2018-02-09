@@ -109,11 +109,13 @@ namespace casadi {
 
   void Map::codegen_body(CodeGenerator& g) const {
     g << "casadi_int i;\n";
+    g << "const casadi_real** arg1;\n";
+    g << "casadi_real** res1;\n";
     // Input buffer
-    g << "const casadi_real** arg1 = arg+" << n_in_ << ";\n"
+    g << "arg1 = arg+" << n_in_ << ";\n"
       << "for (i=0; i<" << n_in_ << "; ++i) arg1[i]=arg[i];\n";
     // Output buffer
-    g << "casadi_real** res1 = res+" << n_out_ << ";\n"
+    g << "res1 = res+" << n_out_ << ";\n"
       << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n"
       << "for (i=0; i<" << n_ << "; ++i) {\n";
     // Evaluate

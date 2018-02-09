@@ -362,17 +362,21 @@ namespace casadi {
     if (project_in_) {
       // Project one or more argument
       g.local("i", "casadi_int");
-      g << "const casadi_real** arg1 = arg + " << n_in_ << ";\n"
-        << "for(i=0; i<" << n_in_-1 << "; ++i) arg1[i]=arg[i+1];\n";
+      g << "const casadi_real** arg1 = arg + " << n_in_ << ";\n";
     }
 
     // Temporary memory for results with different sparsity
     if (project_out_) {
       // Project one or more results
       g.local("i", "casadi_int");
-      g << "casadi_real** res1 = res + " << n_out_ << ";\n"
-        << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n";
+      g << "casadi_real** res1 = res + " << n_out_ << ";\n";
     }
+
+    if (project_in_)
+      g  << "for (i=0; i<" << n_in_-1 << "; ++i) arg1[i]=arg[i+1];\n";
+
+    if (project_out_)
+      g  << "for (i=0; i<" << n_out_ << "; ++i) res1[i]=res[i];\n";
 
     // Codegen condition
     bool if_else = f_.size()==1;

@@ -6,12 +6,12 @@
 template<typename T1>
 void casadi_ldl(const casadi_int* sp_a, const T1* a,
                 const casadi_int* sp_lt, T1* lt, T1* d, const casadi_int* p, T1* w) {
+  const casadi_int *lt_colind, *lt_row, *a_colind, *a_row;
+  casadi_int n, r, c, c1, k, k2;
   // Extract sparsities
-  int n=sp_lt[1];
-  const casadi_int *lt_colind=sp_lt+2, *lt_row=sp_lt+2+n+1;
-  const casadi_int *a_colind=sp_a+2, *a_row=sp_a+2+n+1;
-  // Local variables
-  casadi_int r, c, c1, k, k2;
+  n=sp_lt[1];
+  lt_colind=sp_lt+2; lt_row=sp_lt+2+n+1;
+  a_colind=sp_a+2; a_row=sp_a+2+n+1;
   // Clear w
   for (r=0; r<n; ++r) w[r] = 0;
   // Sparse copy of A to L and D
@@ -44,11 +44,11 @@ void casadi_ldl(const casadi_int* sp_a, const T1* a,
 // Solve for (I+R) with R an optionally transposed strictly upper triangular matrix.
 template<typename T1>
 void casadi_ldl_trs(const casadi_int* sp_r, const T1* nz_r, T1* x, casadi_int tr) {
+  casadi_int ncol, c, k;
+  const casadi_int *colind, *row;
   // Extract sparsity
-  casadi_int ncol=sp_r[1];
-  const casadi_int *colind=sp_r+2, *row=sp_r+2+ncol+1;
-  // Local variables
-  casadi_int c, k;
+  ncol=sp_r[1];
+  colind=sp_r+2; row=sp_r+2+ncol+1;
   if (tr) {
     // Forward substitution
     for (c=0; c<ncol; ++c) {
@@ -71,8 +71,8 @@ void casadi_ldl_trs(const casadi_int* sp_r, const T1* nz_r, T1* x, casadi_int tr
 template<typename T1>
 void casadi_ldl_solve(T1* x, casadi_int nrhs, const casadi_int* sp_lt, const T1* lt,
                       const T1* d, const casadi_int* p, T1* w) {
-  casadi_int n = sp_lt[1];
   casadi_int i, k;
+  casadi_int n = sp_lt[1];
   for (k=0; k<nrhs; ++k) {
     // P' L D L' P x = b <=> x = P' L' \ D \ L \ P b
     // Multiply by P

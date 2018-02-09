@@ -31,12 +31,13 @@ template<typename T1>
 T1 casadi_central_diff(T1** yk, T1* y0, T1* J,
                        T1 h, casadi_int n_y, const casadi_finite_diff_mem<T1>* m) {
   // Return value
-  T1 u=0;
+  T1 u;
   // Stencil
   T1 yf, yc, yb;
   // Local variables
   T1 err_trunc, err_round;
   casadi_int i;
+  u = 0;
   for (i=0; i<n_y; ++i) {
     // Copy to local variables, return -1 if invalid entry
     if (!isfinite((yf=yk[1][i])) || !isfinite((yc=y0[i])) || !isfinite((yb=yk[0][i]))) {
@@ -61,12 +62,13 @@ template<typename T1>
 T1 casadi_smoothing_diff(T1** yk, T1* y0, T1* J,
                          T1 h, casadi_int n_y, const casadi_finite_diff_mem<T1>* m) {
   // Return value
-  T1 u=0;
+  T1 u;
   // Stencil
   T1 yb, yc, yf;
   // Local variables
   T1 Jk, wk, sw, ui, err_trunc, err_round, sm;
   casadi_int i, k;
+  u = 0;
   for (i=0; i<n_y; ++i) {
     // Reset derivative estimate, sum of weights, error estimate
     J[i] = sw = ui = 0;
