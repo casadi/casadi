@@ -1736,15 +1736,6 @@ namespace casadi {
         << "(casadi_int resc, mxArray *resv[], casadi_int argc, const mxArray *argv[]) {\n"
         << "casadi_int i, j;\n";
 
-      // Check arguments
-      g << "if (argc>" << n_in_ << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
-        << "\"Evaluation of \\\"" << name_ << "\\\" failed. Too many input arguments "
-        << "(%d, max " << n_in_ << ")\", argc);\n";
-
-      g << "if (resc>" << n_out_ << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
-        << "\"Evaluation of \\\"" << name_ << "\\\" failed. "
-        << "Too many output arguments (%d, max " << n_out_ << ")\", resc);\n";
-
       // Work vectors, including input and output buffers
       casadi_int i_nnz = nnz_in(), o_nnz = nnz_out();
       size_t sz_w = this->sz_w();
@@ -1754,13 +1745,26 @@ namespace casadi {
         sz_w = max(sz_w, static_cast<size_t>(s.size2())); // To be able to copy a row
       }
       sz_w += i_nnz + o_nnz;
-      g << g.array("casadi_int", "iw", sz_iw());
       g << g.array("casadi_real", "w", sz_w);
+      g << g.array("casadi_int", "iw", sz_iw());
       string fw = "w+" + str(i_nnz + o_nnz);
 
       // Copy inputs to buffers
       casadi_int offset=0;
       g << g.array("const casadi_real*", "arg", n_in_, "{0}");
+
+      // Allocate output buffers
+      g << "casadi_real* res[" << n_out_ << "] = {0};\n";
+
+      // Check arguments
+      g << "if (argc>" << n_in_ << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
+        << "\"Evaluation of \\\"" << name_ << "\\\" failed. Too many input arguments "
+        << "(%d, max " << n_in_ << ")\", argc);\n";
+
+      g << "if (resc>" << n_out_ << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
+        << "\"Evaluation of \\\"" << name_ << "\\\" failed. "
+        << "Too many output arguments (%d, max " << n_out_ << ")\", resc);\n";
+
       for (casadi_int i=0; i<n_in_; ++i) {
         std::string p = "argv[" + str(i) + "]";
         g << "if (--argc>=0) arg[" << i << "] = "
@@ -1768,8 +1772,6 @@ namespace casadi {
         offset += nnz_in(i);
       }
 
-      // Allocate output buffers
-      g << "casadi_real* res[" << n_out_ << "] = {0};\n";
       for (casadi_int i=0; i<n_out_; ++i) {
         if (i==0) {
           // if i==0, always store output (possibly ans output)

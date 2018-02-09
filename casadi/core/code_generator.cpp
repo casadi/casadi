@@ -340,7 +340,8 @@ namespace casadi {
       << "    /* name error */\n";
     for (casadi_int i=0; i<exposed_fname.size(); ++i) {
       s << "  } else if (strcmp(buf, \"" << exposed_fname[i] << "\")==0) {\n"
-        << "    mex_" << exposed_fname[i] << "(resc, resv, argc, argv);\n";
+        << "    mex_" << exposed_fname[i] << "(resc, resv, argc, argv);\n"
+        << "    return;\n";
     }
     s << "  }\n";
 
