@@ -2560,6 +2560,7 @@ class MXtests(casadiTestCase):
       f_sx = f.expand()    
       self.checkfunction(f,fref,inputs=[x0,y0,z0])
       self.checkfunction(f_sx,fref,inputs=[x0,y0,z0])
+      self.check_codegen(f,inputs=[x0,y0,z0])
 
   def test_det_shape(self):
     X = MX.sym("x",2,3)

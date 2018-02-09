@@ -124,7 +124,7 @@ namespace casadi {
                        const std::vector<casadi_int>& arg,
                        const std::vector<casadi_int>& res) const {
     g << g.workel(res[0]) << " = "
-      << g.bilin(g.work(arg[0], dep(0).nnz()), sparsity(),
+      << g.bilin(g.work(arg[0], dep(0).nnz()), dep(0).sparsity(),
                  g.work(arg[1], dep(1).nnz()),
                  g.work(arg[2], dep(2).nnz())) << ";\n";
   }
