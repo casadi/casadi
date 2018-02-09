@@ -681,14 +681,14 @@ namespace casadi {
     MX HL = HJ_res[1];
 
     // Active bounds
-    MX lam_x_pos = lam_x>0;
-    MX lam_x_neg = lam_x<0;
-    MX lam_g_pos = lam_g>0;
-    MX lam_g_neg = lam_g<0;
+    MX ubx_active = lam_x>0;
+    MX lbx_active = lam_x<0;
+    MX ubg_active = lam_g>0;
+    MX lbg_active = lam_g<0;
 
     // Common
-    MX alpha_x = if_else(lam_x_pos, ubx, 0) + if_else(lam_x_neg, lbx, 0);
-    MX alpha_g = if_else(lam_g_pos, ubg, 0) + if_else(lam_g_neg, lbg, 0);
+    MX alpha_x = if_else(ubx_active, ubx, 0) + if_else(lbx_active, lbx, 0);
+    MX alpha_g = if_else(ubg_active, ubg, 0) + if_else(lbg_active, lbg, 0);
     MX a = alpha_x-x;
 
     // KKT matrix
@@ -719,8 +719,8 @@ namespace casadi {
     MX fwd_g0 = vv[NL_G];
 
     // Propagate forward seeds
-    MX fwd_alpha_x = if_else(lam_x_pos, fwd_ubx, 0) + if_else(lam_x_neg, fwd_lbx, 0);
-    MX fwd_alpha_g = if_else(lam_g_pos, fwd_ubg, 0) + if_else(lam_g_neg, fwd_lbg, 0);
+    MX fwd_alpha_x = if_else(ubx_active, fwd_ubx, 0) + if_else(lbx_active, fwd_lbx, 0);
+    MX fwd_alpha_g = if_else(ubg_active, fwd_ubg, 0) + if_else(lbg_active, fwd_lbg, 0);
     MX v_x = fwd_f0 * (alpha_x - x) - fwd_alpha_x * lam_x;
     MX v_lam_g = lam_g * (fwd_alpha_g - fwd_g0);
     MX v = MX::vertcat({v_x, v_lam_g});
@@ -809,14 +809,14 @@ namespace casadi {
     MX HL = HJ_res[1];
 
     // Active bounds
-    MX lam_x_pos = lam_x>0;
-    MX lam_x_neg = lam_x<0;
-    MX lam_g_pos = lam_g>0;
-    MX lam_g_neg = lam_g<0;
+    MX ubx_active = lam_x>0;
+    MX lbx_active = lam_x<0;
+    MX ubg_active = lam_g>0;
+    MX lbg_active = lam_g<0;
 
     // Common
-    MX alpha_x = if_else(lam_x_pos, ubx, 0) + if_else(lam_x_neg, lbx, 0);
-    MX alpha_g = if_else(lam_g_pos, ubg, 0) + if_else(lam_g_neg, lbg, 0);
+    MX alpha_x = if_else(ubx_active, ubx, 0) + if_else(lbx_active, lbx, 0);
+    MX alpha_g = if_else(ubg_active, ubg, 0) + if_else(lbg_active, lbg, 0);
     MX a = alpha_x-x;
 
     // KKT matrix
@@ -855,10 +855,10 @@ namespace casadi {
 
     // Reverse sensitivities
     vector<MX> asens(NLPSOL_NUM_IN);
-    asens[NLPSOL_LBX] = -if_else(lam_x_pos, alpha_x_bar, 0);
-    asens[NLPSOL_UBX] = -if_else(lam_x_neg, alpha_x_bar, 0);
-    asens[NLPSOL_LBG] = -if_else(lam_g_pos, alpha_g_bar, 0);
-    asens[NLPSOL_UBG] = -if_else(lam_g_neg, alpha_g_bar, 0);
+    asens[NLPSOL_LBX] = if_else(ubx_active, -alpha_x_bar, 0);
+    asens[NLPSOL_UBX] = if_else(lbx_active, -alpha_x_bar, 0);
+    asens[NLPSOL_LBG] = if_else(ubg_active, -alpha_g_bar, 0);
+    asens[NLPSOL_UBG] = if_else(lbg_active, -alpha_g_bar, 0);
     asens[NLPSOL_P] = MX::zeros(repmat(p.sparsity(), 1, nadj));
 
     // Guesses are unused
