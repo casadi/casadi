@@ -189,6 +189,10 @@ namespace casadi {
     // Get KKT function
     Function kkt() const;
 
+    // Make sure primal-dual solution is consistent with bounds
+    static void bound_consistency(casadi_int n, double* x, double* lam,
+                                  const double* lbx, const double* ubx);
+
     // Creator function for internal class
     typedef Nlpsol* (*Creator)(const std::string& name, const Function& oracle);
 

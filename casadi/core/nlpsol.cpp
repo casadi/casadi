@@ -445,6 +445,33 @@ namespace casadi {
     casadi_error("setOptionsFromFile not defined for class " + class_name());
   }
 
+  void Nlpsol::bound_consistency(casadi_int n, double* x, double* lam,
+                                 const double* lbx, const double* ubx) {
+    // NOTE: Move to C runtime?
+    // Local variables
+    casadi_int i;
+    double lb, ub;
+    // Loop over variables
+    for (i=0; i<n; ++i) {
+      // Get bounds
+      lb = lbx ? lbx[i] : 0.;
+      ub = ubx ? ubx[i] : 0.;
+      // Make sure bounds are respected
+      x[i] = std::fmin(std::fmax(x[i], lb), ub);
+      // Adjust multipliers
+      if (std::isinf(lb) && std::isinf(ub)) {
+        // Both multipliers are infinite
+        lam[i] = 0.;
+      } else if (std::isinf(lb) || x[i] - lb > ub - x[i]) {
+        // Infinite lower bound or closer to upper bound than lower bound
+        lam[i] = std::fmax(0., lam[i]);
+      } else if (std::isinf(ub) || x[i] - lb < ub - x[i]) {
+        // Infinite upper bound or closer to lower bound than upper bound
+        lam[i] = std::fmin(0., lam[i]);
+      }
+    }
+  }
+
   int Nlpsol::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<NlpsolMemory*>(mem);
 
@@ -509,22 +536,10 @@ namespace casadi {
       if (calc_function(m, "nlp_grad")) {
         casadi_warning("Failed to calculate multipliers");
       }
-
-      if (m->lam_x) {
-        casadi_scal(nx_, -1., m->lam_x);
-        for (casadi_int i=0; i<nx_; ++i) {
-          if (m->lam_x[i]>0) {
-            // If upper bound isn't active, multiplier is zero
-            if (m->x[i] < (m->ubx ? m->ubx[i] : 0)) m->lam_x[i] = 0;
-          } else if (m->lam_x[i]<0) {
-            // If lower bound isn't active, multiplier is zero
-            if (m->x[i] > (m->lbx ? m->lbx[i] : 0)) m->lam_x[i] = 0;
-          }
-        }
-      }
-      if (m->lam_p) {
-        casadi_scal(np_, -1., m->lam_p);
-      }
+      casadi_scal(nx_, -1., m->lam_x);
+      casadi_scal(np_, -1., m->lam_p);
+      bound_consistency(nx_, m->x, m->lam_x, m->lbx, m->ubx);
+      bound_consistency(ng_, m->g, m->lam_g, m->lbg, m->ubg);
     }
 
     // Get optimal solution
