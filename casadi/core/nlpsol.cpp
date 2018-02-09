@@ -371,11 +371,10 @@ namespace casadi {
       alloc(fcallback_);
     }
 
-    // Function to calculate multiplers
-    if (calc_multipliers_) {
-      create_function("nlp_mult", {"x", "p", "lam:f", "lam:g"},
-                      {"grad:gamma:x", "grad:gamma:p"}, {{"gamma", {"f", "g"}}});
-    }
+    // Function calculating f, g and the gradient of the Lagrangian w.r.t. x and p
+    create_function("nlp_grad", {"x", "p", "lam:f", "lam:g"},
+                    {"f", "g", "grad:gamma:x", "grad:gamma:p"},
+                    {{"gamma", {"f", "g"}}});
   }
 
   int Nlpsol::init_mem(void* mem) const {
@@ -503,9 +502,11 @@ namespace casadi {
       m->arg[1] = m->p;
       m->arg[2] = &lam_f;
       m->arg[3] = m->lam_g;
-      m->res[0] = m->lam_x;
-      m->res[1] = m->lam_p;
-      if (calc_function(m, "nlp_mult")) {
+      m->res[0] = &m->f;
+      m->res[1] = m->g;
+      m->res[2] = m->lam_x;
+      m->res[3] = m->lam_p;
+      if (calc_function(m, "nlp_grad")) {
         casadi_warning("Failed to calculate multipliers");
       }
 
