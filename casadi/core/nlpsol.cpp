@@ -749,27 +749,25 @@ namespace casadi {
     MX fwd_x = v_split[0];
     MX fwd_lam_g = v_split[1];
 
-    // Calculate sensitivities in f and g
-    vv = {x, p, f, g, fwd_x, fwd_p};
-    vv = fwd_oracle(vv);
-    MX fwd_f = vv[NL_F];
-    MX fwd_g = vv[NL_G];
+    // nlp_grad has the signature
+    // (x, p, lam_f, lam_g) -> (f, g, grad_x, grad_p)
+    // with lam_f=1 and lam_g=lam_g, grad_x = -lam_x, grad_p=-lam_p
+    Function nlp_grad = get_function("nlp_grad");
+
+    // fwd_nlp_grad has the signature
+    // (x, p, lam_f, lam_g, f, g, grad_x, grad_p,
+    //  fwd_x, fwd_p, fwd_lam_f, fwd_lam_g)
+    // -> (fwd_f, fwd_g, fwd_grad_x, fwd_grad_p)
+    Function fwd_nlp_grad = nlp_grad.forward(nfwd);
 
     // Calculate sensitivities in lam_x, lam_g
-    Function rev_oracle = oracle_.reverse(1);
-    // rev_reverse has the signature
-    // (x, p, out_f, out_g, adj_f, adj_g) -> (adj_x, adj_p)
-    // with adj_f=1, adj_g=lam_g, adj_x = -lam_x, adj_p = -lam_p
-    Function fwd_rev_oracle = rev_oracle.forward(nfwd);
-    // fwd_rev_oracle has the signature
-    // (x, p, out_f, out_g, adj_f, adj_g, out_adj_x, out_adj_p,
-    //  fwd_x, fwd_p, fwd_out_f, fwd_out_g, fwd_adj_f, fwd_adj_g)
-    // -> (fwd_adj_x, fwd_adj_p)
-    vv = {x, p, f, g, 1, lam_g, -lam_x, -lam_p,
-          fwd_x, fwd_p, fwd_f, fwd_g, 0, fwd_lam_g};
-    vv = fwd_rev_oracle(vv);
-    MX fwd_lam_x = -vv[NL_X];
-    MX fwd_lam_p = -vv[NL_P];
+    vv = {x, p, 1, lam_g, f, g, -lam_x, -lam_p,
+          fwd_x, fwd_p, 0, fwd_lam_g};
+    vv = fwd_nlp_grad(vv);
+    MX fwd_f = vv[0];
+    MX fwd_g = vv[1];
+    MX fwd_lam_x = -vv[2];
+    MX fwd_lam_p = -vv[3];
 
     // Forward sensitivities
     vector<MX> fsens(NLPSOL_NUM_OUT);
