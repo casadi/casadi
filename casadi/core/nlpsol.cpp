@@ -652,7 +652,7 @@ namespace casadi {
       fseed[i] = MX(repmat(Sparsity(arg[i].size()), 1, nfwd));
     }
 
-    // Calculate sensitivities in f and g
+    // Calculate sensitivities from fwd_p
     Function fwd_oracle = oracle_.forward(nfwd);
     vector<MX> vv = {x, p, f, g, 0, fwd_p};
     vv = fwd_oracle(vv);
@@ -710,6 +710,107 @@ namespace casadi {
     arg.insert(arg.end(), fseed.begin(), fseed.end());
     res = fsens;
 
+    return Function(name, arg, res, inames, onames, opts);
+  }
+
+  Function Nlpsol::
+  get_reverse(casadi_int nadj, const std::string& name,
+              const std::vector<std::string>& inames,
+              const std::vector<std::string>& onames,
+              const Dict& opts) const {
+    // Symbolic expression for the input
+    vector<MX> arg = mx_in(), res = mx_out();
+
+    // Initial guesses not used for derivative calculations
+    for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
+      arg[i] = MX::sym(arg[i].name(), Sparsity(arg[i].size()));
+    }
+
+    // Optimal solution
+    MX x = res[NLPSOL_X];
+    MX lam_g = res[NLPSOL_LAM_G];
+    MX lam_x = res[NLPSOL_LAM_X];
+    MX lam_p = res[NLPSOL_LAM_P];
+    MX f = res[NLPSOL_F];
+    MX g = res[NLPSOL_G];
+
+    // Inputs used
+    MX lbx = arg[NLPSOL_LBX];
+    MX ubx = arg[NLPSOL_UBX];
+    MX lbg = arg[NLPSOL_LBG];
+    MX ubg = arg[NLPSOL_UBG];
+    MX p = arg[NLPSOL_P];
+
+    // Get KKT function
+    Function kkt = this->kkt();
+
+    // Hessian of the Lagrangian, Jacobian of the constraints
+    vector<MX> HJ_res = kkt({x, p, 1, lam_g});
+    MX JG = HJ_res[0];
+    MX HL = HJ_res[1];
+
+    // Active bounds
+    MX lam_x_pos = lam_x>0;
+    MX lam_x_neg = lam_x<0;
+    MX lam_g_pos = lam_g>0;
+    MX lam_g_neg = lam_g<0;
+
+    // Common
+    MX alpha_x = if_else(lam_x_pos, ubx, 0) + if_else(lam_x_neg, lbx, 0);
+    MX alpha_g = if_else(lam_g_pos, ubg, 0) + if_else(lam_g_neg, lbg, 0);
+    MX a = alpha_x-x;
+
+    // KKT matrix
+    MX H_11 = mtimes(diag(a), HL) + diag(lam_x);
+    MX H_12 = mtimes(diag(a), JG.T());
+    MX H_21 = -mtimes(diag(lam_g), JG);
+    MX H_22 = diag(alpha_g - g);
+    MX H = MX::blockcat({{H_11, H_12}, {H_21, H_22}});
+
+    // Sensitivity inputs
+    vector<MX> aseed(NLPSOL_NUM_OUT);
+    MX adj_x = aseed[NLPSOL_X] = MX::sym("adj_x", repmat(x.sparsity(), 1, nadj));
+    MX adj_lam_g = aseed[NLPSOL_LAM_G] = MX::sym("adj_lam_g", repmat(g.sparsity(), 1, nadj));
+    MX adj_lam_x = aseed[NLPSOL_LAM_X] = MX::sym("adj_lam_x", repmat(x.sparsity(), 1, nadj));
+    MX adj_lam_p = aseed[NLPSOL_LAM_P] = MX::sym("adj_lam_p", repmat(p.sparsity(), 1, nadj));
+    MX adj_f = aseed[NLPSOL_F] = MX::sym("adj_f", Sparsity::dense(1, nadj));
+    MX adj_g = aseed[NLPSOL_G] = MX::sym("adj_g", repmat(g.sparsity(), 1, nadj));
+
+    // Calculate sensitivities from f and g
+    Function adj_oracle = oracle_.reverse(nadj);
+    vector<MX> vv = {x, p, f, g, adj_f, adj_g};
+    vv = adj_oracle(vv);
+    MX adj_x0 = vv[NL_X];
+    MX adj_p0 = vv[NL_P];
+
+    // Solve to get beta_x_hat, beta_g_hat
+    MX v = MX::vertcat({adj_x + adj_x0, adj_lam_g});
+    v = MX::solve(H.T(), v, "qr");
+    vector<MX> v_split = vertsplit(v, {0, nx_, nx_+ng_});
+    MX beta_x_hat = v_split[0];
+    MX beta_g_hat = v_split[1];
+
+    // Calculate alpha_x_bar, alpha_g_bar
+    MX alpha_x_bar = -lam_x * beta_x_hat;
+    MX alpha_g_bar = lam_g * beta_g_hat;
+
+    // Reverse sensitivities
+    vector<MX> asens(NLPSOL_NUM_IN);
+    asens[NLPSOL_LBX] = -if_else(lam_x_pos, alpha_x_bar, 0);
+    asens[NLPSOL_UBX] = -if_else(lam_x_neg, alpha_x_bar, 0);
+    asens[NLPSOL_LBG] = -if_else(lam_g_pos, alpha_g_bar, 0);
+    asens[NLPSOL_UBG] = -if_else(lam_g_neg, alpha_g_bar, 0);
+    asens[NLPSOL_P] = MX::zeros(repmat(p.sparsity(), 1, nadj));
+
+    // Guesses are unused
+    for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
+      asens[i] = MX(repmat(Sparsity(arg[i].size()), 1, nadj));
+    }
+
+    // Gather return values
+    arg.insert(arg.end(), res.begin(), res.end());
+    arg.insert(arg.end(), aseed.begin(), aseed.end());
+    res = asens;
     return Function(name, arg, res, inames, onames, opts);
   }
 
