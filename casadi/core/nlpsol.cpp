@@ -202,6 +202,7 @@ namespace casadi {
     bound_consistency_ = true;
     calc_lam_x_ = calc_f_ = calc_g_ = false;
     calc_lam_p_ = true;
+    no_nlp_grad_ = false;
   }
 
   Nlpsol::~Nlpsol() {
@@ -290,6 +291,9 @@ namespace casadi {
       {"calc_g",
        {OT_BOOL,
         "Calculate 'g' in the Nlpsol base class"}},
+      {"no_nlp_grad",
+       {OT_BOOL,
+        "Prevent the creation of the 'nlp_grad' function"}},
       {"bound_consistency",
        {OT_BOOL,
         "Ensure that primal-dual solution is consistent with the bounds"}},
@@ -332,6 +336,8 @@ namespace casadi {
         calc_f_ = op.second;
       } else if (op.first=="calc_g") {
         calc_g_ = op.second;
+      } else if (op.first=="no_nlp_grad") {
+        no_nlp_grad_ = op.second;
       } else if (op.first=="bound_consistency") {
         bound_consistency_ = op.second;
       }
@@ -354,6 +360,14 @@ namespace casadi {
     // No need to calculate non-existant quantities
     if (np_==0) calc_lam_p_ = false;
     if (ng_==0) calc_g_ = false;
+
+    // Consistency check
+    if (no_nlp_grad_) {
+      casadi_assert(!calc_lam_p_, "Options 'no_nlp_grad' and 'calc_lam_p' inconsistent");
+      casadi_assert(!calc_lam_x_, "Options 'no_nlp_grad' and 'calc_lam_x' inconsistent");
+      casadi_assert(!calc_f_, "Options 'no_nlp_grad' and 'calc_f' inconsistent");
+      casadi_assert(!calc_g_, "Options 'no_nlp_grad' and 'calc_g' inconsistent");
+    }
 
     // Dimension checks
     casadi_assert(sparsity_out_.at(NLPSOL_G).is_dense()
@@ -410,9 +424,11 @@ namespace casadi {
     }
 
     // Function calculating f, g and the gradient of the Lagrangian w.r.t. x and p
-    create_function("nlp_grad", {"x", "p", "lam:f", "lam:g"},
-                    {"f", "g", "grad:gamma:x", "grad:gamma:p"},
-                    {{"gamma", {"f", "g"}}});
+    if (!no_nlp_grad_) {
+      create_function("nlp_grad", {"x", "p", "lam:f", "lam:g"},
+                      {"f", "g", "grad:gamma:x", "grad:gamma:p"},
+                      {{"gamma", {"f", "g"}}});
+    }
   }
 
   int Nlpsol::init_mem(void* mem) const {

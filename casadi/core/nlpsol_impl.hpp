@@ -84,6 +84,7 @@ namespace casadi {
     bool calc_multipliers_;
     bool calc_lam_x_, calc_lam_p_, calc_f_, calc_g_;
     bool bound_consistency_;
+    bool no_nlp_grad_;
     std::vector<bool> discrete_;
     ///@}
 
