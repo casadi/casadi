@@ -2146,6 +2146,28 @@ Dennis Janka, Joel Andersson
 | block_hess        | OT_INT        | Blockwise Hessian | casadi::Blocksqp |
 |                   |               | approximation?    |                  |
 +-------------------+---------------+-------------------+------------------+
+| bound_consistency | OT_BOOL       | Ensure that       | casadi::Nlpsol   |
+|                   |               | primal-dual       |                  |
+|                   |               | solution is       |                  |
+|                   |               | consistent with   |                  |
+|                   |               | the bounds        |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_f            | OT_BOOL       | Calculate 'f' in  | casadi::Nlpsol   |
+|                   |               | the Nlpsol base   |                  |
+|                   |               | class             |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_g            | OT_BOOL       | Calculate 'g' in  | casadi::Nlpsol   |
+|                   |               | the Nlpsol base   |                  |
+|                   |               | class             |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_lam_p        | OT_BOOL       | Calculate 'lam_p' | casadi::Nlpsol   |
+|                   |               | in the Nlpsol     |                  |
+|                   |               | base class        |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_lam_x        | OT_BOOL       | Calculate 'lam_x' | casadi::Nlpsol   |
+|                   |               | in the Nlpsol     |                  |
+|                   |               | base class        |                  |
++-------------------+---------------+-------------------+------------------+
 | calc_multipliers  | OT_BOOL       | Calculate         | casadi::Nlpsol   |
 |                   |               | Lagrange          |                  |
 |                   |               | multipliers in    |                  |
@@ -3388,6 +3410,28 @@ const  "
 +===================+===============+===================+==================+
 | bonmin            | OT_DICT       | Options to be     | casadi::BonMinMe |
 |                   |               | passed to BONMIN  | ssageHandler     |
++-------------------+---------------+-------------------+------------------+
+| bound_consistency | OT_BOOL       | Ensure that       | casadi::Nlpsol   |
+|                   |               | primal-dual       |                  |
+|                   |               | solution is       |                  |
+|                   |               | consistent with   |                  |
+|                   |               | the bounds        |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_f            | OT_BOOL       | Calculate 'f' in  | casadi::Nlpsol   |
+|                   |               | the Nlpsol base   |                  |
+|                   |               | class             |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_g            | OT_BOOL       | Calculate 'g' in  | casadi::Nlpsol   |
+|                   |               | the Nlpsol base   |                  |
+|                   |               | class             |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_lam_p        | OT_BOOL       | Calculate 'lam_p' | casadi::Nlpsol   |
+|                   |               | in the Nlpsol     |                  |
+|                   |               | base class        |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_lam_x        | OT_BOOL       | Calculate 'lam_x' | casadi::Nlpsol   |
+|                   |               | in the Nlpsol     |                  |
+|                   |               | base class        |                  |
 +-------------------+---------------+-------------------+------------------+
 | calc_multipliers  | OT_BOOL       | Calculate         | casadi::Nlpsol   |
 |                   |               | Lagrange          |                  |
@@ -45924,6 +45968,30 @@ Joel Andersson
 +------------------+-----------------+------------------+------------------+
 |        Id        |      Type       |   Description    |     Used in      |
 +==================+=================+==================+==================+
+| bound_consistenc | OT_BOOL         | Ensure that      | casadi::Nlpsol   |
+| y                |                 | primal-dual      |                  |
+|                  |                 | solution is      |                  |
+|                  |                 | consistent with  |                  |
+|                  |                 | the bounds       |                  |
++------------------+-----------------+------------------+------------------+
+| calc_f           | OT_BOOL         | Calculate 'f' in | casadi::Nlpsol   |
+|                  |                 | the Nlpsol base  |                  |
+|                  |                 | class            |                  |
++------------------+-----------------+------------------+------------------+
+| calc_g           | OT_BOOL         | Calculate 'g' in | casadi::Nlpsol   |
+|                  |                 | the Nlpsol base  |                  |
+|                  |                 | class            |                  |
++------------------+-----------------+------------------+------------------+
+| calc_lam_p       | OT_BOOL         | Calculate        | casadi::Nlpsol   |
+|                  |                 | 'lam_p' in the   |                  |
+|                  |                 | Nlpsol base      |                  |
+|                  |                 | class            |                  |
++------------------+-----------------+------------------+------------------+
+| calc_lam_x       | OT_BOOL         | Calculate        | casadi::Nlpsol   |
+|                  |                 | 'lam_x' in the   |                  |
+|                  |                 | Nlpsol base      |                  |
+|                  |                 | class            |                  |
++------------------+-----------------+------------------+------------------+
 | calc_multipliers | OT_BOOL         | Calculate        | casadi::Nlpsol   |
 |                  |                 | Lagrange         |                  |
 |                  |                 | multipliers in   |                  |
@@ -54545,9 +54613,31 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |                   |                 | factor of         |                |
 |                   |                 | stepsize          |                |
 +-------------------+-----------------+-------------------+----------------+
+| bound_consistency | OT_BOOL         | Ensure that       | casadi::Nlpsol |
+|                   |                 | primal-dual       |                |
+|                   |                 | solution is       |                |
+|                   |                 | consistent with   |                |
+|                   |                 | the bounds        |                |
++-------------------+-----------------+-------------------+----------------+
 | c1                | OT_DOUBLE       | Armijo condition, | casadi::Scpgen |
 |                   |                 | coefficient of    |                |
 |                   |                 | decrease in merit |                |
++-------------------+-----------------+-------------------+----------------+
+| calc_f            | OT_BOOL         | Calculate 'f' in  | casadi::Nlpsol |
+|                   |                 | the Nlpsol base   |                |
+|                   |                 | class             |                |
++-------------------+-----------------+-------------------+----------------+
+| calc_g            | OT_BOOL         | Calculate 'g' in  | casadi::Nlpsol |
+|                   |                 | the Nlpsol base   |                |
+|                   |                 | class             |                |
++-------------------+-----------------+-------------------+----------------+
+| calc_lam_p        | OT_BOOL         | Calculate 'lam_p' | casadi::Nlpsol |
+|                   |                 | in the Nlpsol     |                |
+|                   |                 | base class        |                |
++-------------------+-----------------+-------------------+----------------+
+| calc_lam_x        | OT_BOOL         | Calculate 'lam_x' | casadi::Nlpsol |
+|                   |                 | in the Nlpsol     |                |
+|                   |                 | base class        |                |
 +-------------------+-----------------+-------------------+----------------+
 | calc_multipliers  | OT_BOOL         | Calculate         | casadi::Nlpsol |
 |                   |                 | Lagrange          |                |
@@ -60488,9 +60578,31 @@ A textbook SQPMethod
 |                   |               | factor of         |                  |
 |                   |               | stepsize          |                  |
 +-------------------+---------------+-------------------+------------------+
+| bound_consistency | OT_BOOL       | Ensure that       | casadi::Nlpsol   |
+|                   |               | primal-dual       |                  |
+|                   |               | solution is       |                  |
+|                   |               | consistent with   |                  |
+|                   |               | the bounds        |                  |
++-------------------+---------------+-------------------+------------------+
 | c1                | OT_DOUBLE     | Armijo condition, | casadi::Sqpmetho |
 |                   |               | coefficient of    | d                |
 |                   |               | decrease in merit |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_f            | OT_BOOL       | Calculate 'f' in  | casadi::Nlpsol   |
+|                   |               | the Nlpsol base   |                  |
+|                   |               | class             |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_g            | OT_BOOL       | Calculate 'g' in  | casadi::Nlpsol   |
+|                   |               | the Nlpsol base   |                  |
+|                   |               | class             |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_lam_p        | OT_BOOL       | Calculate 'lam_p' | casadi::Nlpsol   |
+|                   |               | in the Nlpsol     |                  |
+|                   |               | base class        |                  |
++-------------------+---------------+-------------------+------------------+
+| calc_lam_x        | OT_BOOL       | Calculate 'lam_x' | casadi::Nlpsol   |
+|                   |               | in the Nlpsol     |                  |
+|                   |               | base class        |                  |
 +-------------------+---------------+-------------------+------------------+
 | calc_multipliers  | OT_BOOL       | Calculate         | casadi::Nlpsol   |
 |                   |               | Lagrange          |                  |
@@ -66899,6 +67011,30 @@ General information
 +------------------+-----------------+------------------+------------------+
 |        Id        |      Type       |   Description    |     Used in      |
 +==================+=================+==================+==================+
+| bound_consistenc | OT_BOOL         | Ensure that      | casadi::Nlpsol   |
+| y                |                 | primal-dual      |                  |
+|                  |                 | solution is      |                  |
+|                  |                 | consistent with  |                  |
+|                  |                 | the bounds       |                  |
++------------------+-----------------+------------------+------------------+
+| calc_f           | OT_BOOL         | Calculate 'f' in | casadi::Nlpsol   |
+|                  |                 | the Nlpsol base  |                  |
+|                  |                 | class            |                  |
++------------------+-----------------+------------------+------------------+
+| calc_g           | OT_BOOL         | Calculate 'g' in | casadi::Nlpsol   |
+|                  |                 | the Nlpsol base  |                  |
+|                  |                 | class            |                  |
++------------------+-----------------+------------------+------------------+
+| calc_lam_p       | OT_BOOL         | Calculate        | casadi::Nlpsol   |
+|                  |                 | 'lam_p' in the   |                  |
+|                  |                 | Nlpsol base      |                  |
+|                  |                 | class            |                  |
++------------------+-----------------+------------------+------------------+
+| calc_lam_x       | OT_BOOL         | Calculate        | casadi::Nlpsol   |
+|                  |                 | 'lam_x' in the   |                  |
+|                  |                 | Nlpsol base      |                  |
+|                  |                 | class            |                  |
++------------------+-----------------+------------------+------------------+
 | calc_multipliers | OT_BOOL         | Calculate        | casadi::Nlpsol   |
 |                  |                 | Lagrange         |                  |
 |                  |                 | multipliers in   |                  |

@@ -5,6 +5,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
@@ -35,6 +40,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
@@ -228,6 +238,11 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>block_hess</td><td>OT_INT</td><td>Blockwise Hessian approximation?</td><td>casadi::Blocksqp</td></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>col_eps</td><td>OT_DOUBLE</td><td>Epsilon for COL scaling strategy</td><td>casadi::Blocksqp</td></tr>
 <tr><td>col_tau1</td><td>OT_DOUBLE</td><td>tau1 for COL scaling strategy</td><td>casadi::Blocksqp</td></tr>
@@ -360,6 +375,11 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>block_hess</td><td>OT_INT</td><td>Blockwise Hessian approximation?</td><td>casadi::Blocksqp</td></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>col_eps</td><td>OT_DOUBLE</td><td>Epsilon for COL scaling strategy</td><td>casadi::Blocksqp</td></tr>
 <tr><td>col_tau1</td><td>OT_DOUBLE</td><td>tau1 for COL scaling strategy</td><td>casadi::Blocksqp</td></tr>
@@ -432,6 +452,11 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>bonmin</td><td>OT_DICT</td><td>Options to be passed to BONMIN</td><td>casadi::BonMinMessageHandler</td></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>con_integer_md</td><td>OT_DICT</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to BONMIN</td><td>casadi::BonMinMessageHandler</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to BONMIN</td><td>casadi::BonMinMessageHandler</td></tr>
@@ -467,6 +492,11 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>bonmin</td><td>OT_DICT</td><td>Options to be passed to BONMIN</td><td>casadi::BonminInterface</td></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>con_integer_md</td><td>OT_DICT</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to BONMIN</td><td>casadi::BonminInterface</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to BONMIN</td><td>casadi::BonminInterface</td></tr>
@@ -523,6 +553,11 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>bonmin</td><td>OT_DICT</td><td>Options to be passed to BONMIN</td><td>casadi::BonminInterface</td></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>con_integer_md</td><td>OT_DICT</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to BONMIN</td><td>casadi::BonminInterface</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to BONMIN</td><td>casadi::BonminInterface</td></tr>
@@ -1592,6 +1627,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>con_integer_md</td><td>OT_DICT</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
@@ -1642,6 +1682,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>con_integer_md</td><td>OT_DICT</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
@@ -1788,6 +1833,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>contype</td><td>OT_INTVECTOR</td><td>Type of constraint</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
@@ -1820,6 +1870,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>contype</td><td>OT_INTVECTOR</td><td>Type of constraint</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
@@ -2115,6 +2170,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>common_options</td><td>OT_DICT</td><td>Options for auto-generated functions</td><td>casadi::OracleFunction</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
@@ -2138,6 +2198,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>common_options</td><td>OT_DICT</td><td>Options for auto-generated functions</td><td>casadi::OracleFunction</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
@@ -2511,7 +2576,12 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Scpgen</td></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Scpgen</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::Scpgen</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
@@ -2579,7 +2649,12 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Scpgen</td></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Scpgen</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::Scpgen</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
@@ -2762,6 +2837,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
@@ -2794,6 +2874,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
@@ -2817,7 +2902,12 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
@@ -2877,7 +2967,12 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>beta</td><td>OT_DOUBLE</td><td>Line-search parameter, restoration factor of stepsize</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
 <tr><td>c1</td><td>OT_DOUBLE</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::Sqpmethod</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
@@ -3063,6 +3158,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
@@ -3093,6 +3193,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>bound_consistency</td><td>OT_BOOL</td><td>Ensure that primal-dual solution is consistent with the bounds</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_f</td><td>OT_BOOL</td><td>Calculate 'f' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_g</td><td>OT_BOOL</td><td>Calculate 'g' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_p</td><td>OT_BOOL</td><td>Calculate 'lam_p' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
+<tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
