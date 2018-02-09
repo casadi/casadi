@@ -199,6 +199,9 @@ namespace casadi {
     iteration_callback_ignore_errors_ = false;
     print_time_ = true;
     calc_multipliers_ = false;
+    bound_consistency_ = true;
+    calc_lam_x_ = calc_f_ = calc_g_ = false;
+    calc_lam_p_ = true;
   }
 
   Nlpsol::~Nlpsol() {
@@ -275,9 +278,24 @@ namespace casadi {
       {"calc_multipliers",
       {OT_BOOL,
        "Calculate Lagrange multipliers in the Nlpsol base class"}},
+      {"calc_lam_x",
+       {OT_BOOL,
+        "Calculate 'lam_x' in the Nlpsol base class"}},
+      {"calc_lam_p",
+       {OT_BOOL,
+        "Calculate 'lam_p' in the Nlpsol base class"}},
+      {"calc_f",
+       {OT_BOOL,
+        "Calculate 'f' in the Nlpsol base class"}},
+      {"calc_g",
+       {OT_BOOL,
+        "Calculate 'g' in the Nlpsol base class"}},
+      {"bound_consistency",
+       {OT_BOOL,
+        "Ensure that primal-dual solution is consistent with the bounds"}},
       {"oracle_options",
-      {OT_DICT,
-       "Options to be passed to the oracle function"}}
+       {OT_DICT,
+        "Options to be passed to the oracle function"}}
      }
   };
 
@@ -306,7 +324,23 @@ namespace casadi {
         discrete_ = op.second;
       } else if (op.first=="calc_multipliers") {
         calc_multipliers_ = op.second;
+      } else if (op.first=="calc_lam_x") {
+        calc_lam_x_ = op.second;
+      } else if (op.first=="calc_lam_p") {
+        calc_lam_p_ = op.second;
+      } else if (op.first=="calc_f") {
+        calc_f_ = op.second;
+      } else if (op.first=="calc_g") {
+        calc_g_ = op.second;
+      } else if (op.first=="bound_consistency") {
+        bound_consistency_ = op.second;
       }
+    }
+
+    // Deprecated option
+    if (calc_multipliers_) {
+      calc_lam_x_ = true;
+      calc_lam_p_ = true;
     }
 
     // Replace MX oracle with SX oracle?
@@ -316,6 +350,10 @@ namespace casadi {
     nx_ = nnz_out(NLPSOL_X);
     np_ = nnz_in(NLPSOL_P);
     ng_ = nnz_out(NLPSOL_G);
+
+    // No need to calculate non-existant quantities
+    if (np_==0) calc_lam_p_ = false;
+    if (ng_==0) calc_g_ = false;
 
     // Dimension checks
     casadi_assert(sparsity_out_.at(NLPSOL_G).is_dense()
@@ -448,6 +486,7 @@ namespace casadi {
   void Nlpsol::bound_consistency(casadi_int n, double* x, double* lam,
                                  const double* lbx, const double* ubx) {
     // NOTE: Move to C runtime?
+    casadi_assert(x!=0 && lam!=0, "Need x, lam");
     // Local variables
     casadi_int i;
     double lb, ub;
@@ -523,21 +562,25 @@ namespace casadi {
     int flag = solve(m);
 
     // Calculate multiplers
-    if (calc_multipliers_) {
-      double lam_f = 1.;
+    if ((calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) && !flag) {
+      const double lam_f = 1.;
       m->arg[0] = m->x;
       m->arg[1] = m->p;
       m->arg[2] = &lam_f;
       m->arg[3] = m->lam_g;
-      m->res[0] = &m->f;
-      m->res[1] = m->g;
-      m->res[2] = m->lam_x;
-      m->res[3] = m->lam_p;
+      m->res[0] = calc_f_ ? &m->f : 0;
+      m->res[1] = calc_g_ ? m->g : 0;
+      m->res[2] = calc_lam_x_ ? m->lam_x : 0;
+      m->res[3] = calc_lam_p_ ? m->lam_p : 0;
       if (calc_function(m, "nlp_grad")) {
         casadi_warning("Failed to calculate multipliers");
       }
-      casadi_scal(nx_, -1., m->lam_x);
-      casadi_scal(np_, -1., m->lam_p);
+      if (calc_lam_x_) casadi_scal(nx_, -1., m->lam_x);
+      if (calc_lam_p_) casadi_scal(np_, -1., m->lam_p);
+    }
+
+    // Make sure that an optimal solution is consistant with bounds
+    if (bound_consistency_ && !flag) {
       bound_consistency(nx_, m->x, m->lam_x, m->lbx, m->ubx);
       bound_consistency(ng_, m->g, m->lam_g, m->lbg, m->ubg);
     }

@@ -76,20 +76,16 @@ namespace casadi {
     /// Execute the callback function only after this amount of iterations
     casadi_int callback_step_;
 
-    // Evaluation errors are fatal
+    ///@{
+    /** \brief Options */
     bool eval_errors_fatal_;
-
-    // Warn if initial bounds are violated
     bool warn_initial_bounds_;
-
-    // Ignore errors in the iteration callbacks
     bool iteration_callback_ignore_errors_;
-
-    // Calculate multipliers in the base class
     bool calc_multipliers_;
-
-    /// Which variables are discrete?
+    bool calc_lam_x_, calc_lam_p_, calc_f_, calc_g_;
+    bool bound_consistency_;
     std::vector<bool> discrete_;
+    ///@}
 
     // Mixed integer problem?
     bool mi_;
