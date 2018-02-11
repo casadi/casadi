@@ -6111,32 +6111,64 @@ fitpack
 
 >List of available options
 
-+---------------+--------------+-------------------------------------------+
-|      Id       |     Type     |                Description                |
-+===============+==============+===========================================+
-| degree        | OT_INTVECTOR | Sets, for each grid dimenion, the degree  |
-|               |              | of the spline.                            |
-+---------------+--------------+-------------------------------------------+
-| linear_solver | OT_STRING    | Solver used for constructing the          |
-|               |              | coefficient tensor.                       |
-+---------------+--------------+-------------------------------------------+
++--------------------+--------------+--------------------------------------+
+|         Id         |     Type     |             Description              |
++====================+==============+======================================+
+| algorithm          | OT_STRING    | Algorithm used for fitting the data: |
+|                    |              | 'not_a_knot' (default, same as       |
+|                    |              | Matlab), 'smooth_linear'.            |
++--------------------+--------------+--------------------------------------+
+| degree             | OT_INTVECTOR | Sets, for each grid dimenion, the    |
+|                    |              | degree of the spline.                |
++--------------------+--------------+--------------------------------------+
+| linear_solver      | OT_STRING    | Solver used for constructing the     |
+|                    |              | coefficient tensor.                  |
++--------------------+--------------+--------------------------------------+
+| smooth_linear_frac | OT_DOUBLE    | When 'smooth_linear' algorithm is    |
+|                    |              | active, determines sharpness between |
+|                    |              | 0 (sharp, as linear interpolation)   |
+|                    |              | and 0.5 (smooth).Default value is    |
+|                    |              | 0.1.                                 |
++--------------------+--------------+--------------------------------------+
 
 Joris Gillis
 
 >List of available options
 
-+---------------+--------------+---------------------+---------------------+
-|      Id       |     Type     |     Description     |       Used in       |
-+===============+==============+=====================+=====================+
-| degree        | OT_INTVECTOR | Sets, for each grid | casadi::BSplineInte |
-|               |              | dimenion, the       | rpolant             |
-|               |              | degree of the       |                     |
-|               |              | spline.             |                     |
-+---------------+--------------+---------------------+---------------------+
-| linear_solver | OT_STRING    | Solver used for     | casadi::BSplineInte |
-|               |              | constructing the    | rpolant             |
-|               |              | coefficient tensor. |                     |
-+---------------+--------------+---------------------+---------------------+
++-------------------+--------------+-------------------+-------------------+
+|        Id         |     Type     |    Description    |      Used in      |
++===================+==============+===================+===================+
+| algorithm         | OT_STRING    | Algorithm used    | casadi::BSplineIn |
+|                   |              | for fitting the   | terpolant         |
+|                   |              | data:             |                   |
+|                   |              | 'not_a_knot'      |                   |
+|                   |              | (default, same as |                   |
+|                   |              | Matlab),          |                   |
+|                   |              | 'smooth_linear'.  |                   |
++-------------------+--------------+-------------------+-------------------+
+| degree            | OT_INTVECTOR | Sets, for each    | casadi::BSplineIn |
+|                   |              | grid dimenion,    | terpolant         |
+|                   |              | the degree of the |                   |
+|                   |              | spline.           |                   |
++-------------------+--------------+-------------------+-------------------+
+| linear_solver     | OT_STRING    | Solver used for   | casadi::BSplineIn |
+|                   |              | constructing the  | terpolant         |
+|                   |              | coefficient       |                   |
+|                   |              | tensor.           |                   |
++-------------------+--------------+-------------------+-------------------+
+| smooth_linear_fra | OT_DOUBLE    | When              | casadi::BSplineIn |
+| c                 |              | 'smooth_linear'   | terpolant         |
+|                   |              | algorithm is      |                   |
+|                   |              | active,           |                   |
+|                   |              | determines        |                   |
+|                   |              | sharpness between |                   |
+|                   |              | 0 (sharp, as      |                   |
+|                   |              | linear            |                   |
+|                   |              | interpolation)    |                   |
+|                   |              | and 0.5           |                   |
+|                   |              | (smooth).Default  |                   |
+|                   |              | value is 0.1.     |                   |
++-------------------+--------------+-------------------+-------------------+
 
 Diagrams
 --------
@@ -47897,15 +47929,25 @@ bspline
 
 >List of available options
 
-+---------------+--------------+-------------------------------------------+
-|      Id       |     Type     |                Description                |
-+===============+==============+===========================================+
-| degree        | OT_INTVECTOR | Sets, for each grid dimenion, the degree  |
-|               |              | of the spline.                            |
-+---------------+--------------+-------------------------------------------+
-| linear_solver | OT_STRING    | Solver used for constructing the          |
-|               |              | coefficient tensor.                       |
-+---------------+--------------+-------------------------------------------+
++--------------------+--------------+--------------------------------------+
+|         Id         |     Type     |             Description              |
++====================+==============+======================================+
+| algorithm          | OT_STRING    | Algorithm used for fitting the data: |
+|                    |              | 'not_a_knot' (default, same as       |
+|                    |              | Matlab), 'smooth_linear'.            |
++--------------------+--------------+--------------------------------------+
+| degree             | OT_INTVECTOR | Sets, for each grid dimenion, the    |
+|                    |              | degree of the spline.                |
++--------------------+--------------+--------------------------------------+
+| linear_solver      | OT_STRING    | Solver used for constructing the     |
+|                    |              | coefficient tensor.                  |
++--------------------+--------------+--------------------------------------+
+| smooth_linear_frac | OT_DOUBLE    | When 'smooth_linear' algorithm is    |
+|                    |              | active, determines sharpness between |
+|                    |              | 0 (sharp, as linear interpolation)   |
+|                    |              | and 0.5 (smooth).Default value is    |
+|                    |              | 0.1.                                 |
++--------------------+--------------+--------------------------------------+
 
 --------------------------------------------------------------------------------
 

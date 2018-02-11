@@ -165,8 +165,10 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>algorithm</td><td>OT_STRING</td><td>Algorithm used for fitting the data: 'not_a_knot' (default, same as Matlab), 'smooth_linear'.</td><td>casadi::BSplineInterpolant</td></tr>
 <tr><td>degree</td><td>OT_INTVECTOR</td><td>Sets, for each grid dimenion, the degree of the spline.</td><td>casadi::BSplineInterpolant</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>Solver used for constructing the coefficient tensor.</td><td>casadi::BSplineInterpolant</td></tr>
+<tr><td>smooth_linear_frac</td><td>OT_DOUBLE</td><td>When 'smooth_linear' algorithm is active, determines sharpness between 0 (sharp, as linear interpolation) and 0.5 (smooth).Default value is 0.1.</td><td>casadi::BSplineInterpolant</td></tr>
 </table>
 */
 /// \endcond
@@ -176,8 +178,10 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>algorithm</td><td>OT_STRING</td><td>Algorithm used for fitting the data: 'not_a_knot' (default, same as Matlab), 'smooth_linear'.</td></tr>
 <tr><td>degree</td><td>OT_INTVECTOR</td><td>Sets, for each grid dimenion, the degree of the spline.</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>Solver used for constructing the coefficient tensor.</td></tr>
+<tr><td>smooth_linear_frac</td><td>OT_DOUBLE</td><td>When 'smooth_linear' algorithm is active, determines sharpness between 0 (sharp, as linear interpolation) and 0.5 (smooth).Default value is 0.1.</td></tr>
 </table>
 */
 /** \addtogroup general_BSplineInterpolant
@@ -186,8 +190,10 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>algorithm</td><td>OT_STRING</td><td>Algorithm used for fitting the data: 'not_a_knot' (default, same as Matlab), 'smooth_linear'.</td><td>casadi::BSplineInterpolant</td></tr>
 <tr><td>degree</td><td>OT_INTVECTOR</td><td>Sets, for each grid dimenion, the degree of the spline.</td><td>casadi::BSplineInterpolant</td></tr>
 <tr><td>linear_solver</td><td>OT_STRING</td><td>Solver used for constructing the coefficient tensor.</td><td>casadi::BSplineInterpolant</td></tr>
+<tr><td>smooth_linear_frac</td><td>OT_DOUBLE</td><td>When 'smooth_linear' algorithm is active, determines sharpness between 0 (sharp, as linear interpolation) and 0.5 (smooth).Default value is 0.1.</td><td>casadi::BSplineInterpolant</td></tr>
 </table>
 */
 /// \cond INTERNAL
