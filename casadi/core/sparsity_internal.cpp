@@ -2776,6 +2776,10 @@ namespace casadi {
 
   void SparsityInternal::find(std::vector<casadi_int>& loc, bool ind1) const {
     casadi_assert(!mul_overflows(size1(), size2()), "Integer overflow detected");
+    if (is_dense()) {
+      loc = range(ind1, numel()+ind1);
+      return;
+    }
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
 
@@ -2800,6 +2804,8 @@ namespace casadi {
   void SparsityInternal::get_nz(std::vector<casadi_int>& indices) const {
     // Quick return if no elements
     if (indices.empty()) return;
+    // In a dense matrix, all indices can be found
+    if (is_dense()) return;
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
 
