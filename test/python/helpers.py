@@ -451,7 +451,7 @@ class casadiTestCase(unittest.TestCase):
           aseeds = [sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())]
           inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
           res = f.call(inputss,True)
-          print res, "sp", [i.sparsity().dim(True) for i in fseeds]
+          #print res, "sp", [i.sparsity().dim(True) for i in fseeds]
           [fwdsens] = forward(res, inputss, [fseeds])
           [adjsens] = reverse(res, inputss, [aseeds])
 
