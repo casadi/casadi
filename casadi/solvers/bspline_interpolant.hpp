@@ -114,6 +114,13 @@ namespace casadi {
 
     // Spline Function
     Function S_;
+
+    enum FittingAlgorithm {ALG_NOT_A_KNOT, ALG_SMOOTH_LINEAR};
+    FittingAlgorithm algorithm_;
+    double smooth_linear_frac_;
+
+    static std::vector<double> greville_points(const std::vector<double>& x, casadi_int degree);
+
   };
 
 

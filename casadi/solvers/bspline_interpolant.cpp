@@ -51,7 +51,16 @@ namespace casadi {
         "Sets, for each grid dimenion, the degree of the spline."}},
        {"linear_solver",
         {OT_STRING,
-         "Solver used for constructing the coefficient tensor."}}
+         "Solver used for constructing the coefficient tensor."}},
+       {"algorithm",
+        {OT_STRING,
+         "Algorithm used for fitting the data: 'not_a_knot' (default, same as Matlab),"
+        " 'smooth_linear'."}},
+       {"smooth_linear_frac",
+        {OT_DOUBLE,
+         "When 'smooth_linear' algorithm is active, determines sharpness between"
+         " 0 (sharp, as linear interpolation) and 0.5 (smooth)."
+         "Default value is 0.1."}}
      }
   };
 
@@ -122,6 +131,8 @@ namespace casadi {
     degree_  = std::vector<casadi_int>(offset_.size()-1, 3);
 
     linear_solver_ = "lsqr";
+    algorithm_ = ALG_NOT_A_KNOT;
+    smooth_linear_frac_ = 0.1;
 
     // Read options
     for (auto&& op : opts) {
@@ -129,47 +140,150 @@ namespace casadi {
         degree_ = op.second;
       } else if (op.first=="linear_solver") {
         linear_solver_ = op.second.to_string();
+      } else if (op.first=="algorithm") {
+        std::string alg = op.second.to_string();
+        if (alg=="not_a_knot") {
+          algorithm_ = ALG_NOT_A_KNOT;
+        } else if (alg=="smooth_linear") {
+          algorithm_ = ALG_SMOOTH_LINEAR;
+        } else {
+          casadi_error("Algorithm option invalid: " + get_options().info("algorithm"));
+        }
+      } else if (op.first=="smooth_linear_frac_") {
+        smooth_linear_frac_ = op.second;
+        casadi_assert(smooth_linear_frac_>0 && smooth_linear_frac_<0.5,
+          "smooth_linear_frac must be in ]0,0.5[");
       }
     }
 
     casadi_assert_dev(degree_.size()==offset_.size()-1);
 
-    std::vector< std::vector<double> > knots;
     std::vector< std::vector<double> > grid;
     for (casadi_int k=0;k<degree_.size();++k) {
       std::vector<double> local_grid(grid_.begin()+offset_[k], grid_.begin()+offset_[k+1]);
       grid.push_back(local_grid);
-      knots.push_back(not_a_knot(local_grid, degree_[k]));
     }
 
-    Dict opts_dual;
-    opts_dual["ad_weight_sp"] = 0;
+    switch (algorithm_) {
+      case ALG_NOT_A_KNOT:
+        {
+          std::vector< std::vector<double> > knots;
+          for (casadi_int k=0;k<degree_.size();++k)
+            knots.push_back(not_a_knot(grid[k], degree_[k]));
+          Dict opts_dual;
+          opts_dual["ad_weight_sp"] = 0;
 
-    Function B = Function::bspline_dual("spline", knots, meshgrid(grid), degree_, 1, false,
-      opts_dual);
+          Function B = Function::bspline_dual("spline", knots, meshgrid(grid), degree_, 1, false,
+            opts_dual);
 
-    Function Jf = B.jacobian_old(0, 0);
+          Function Jf = B.jacobian_old(0, 0);
 
-    MX C = MX::sym("C", B.size_in(0));
+          MX C = MX::sym("C", B.size_in(0));
 
-    MX Js = Jf(std::vector<MX>{C})[0];
-    Function temp = Function("J", {C}, {Js});
-    DM J = temp(std::vector<DM>{0})[0];
+          MX Js = Jf(std::vector<MX>{C})[0];
+          Function temp = Function("J", {C}, {Js});
+          DM J = temp(std::vector<DM>{0})[0];
 
-    casadi_assert_dev(J.size1()==J.size2());
+          casadi_assert_dev(J.size1()==J.size2());
 
-    DM V = DM::reshape(DM(values_), m_, -1).T();
-    DM C_opt = solve(J, V, linear_solver_);
+          DM V = DM::reshape(DM(values_), m_, -1).T();
+          DM C_opt = solve(J, V, linear_solver_);
 
-    double fit = static_cast<double>(norm_1(mtimes(J, C_opt) - V));
+          double fit = static_cast<double>(norm_1(mtimes(J, C_opt) - V));
 
-    uout() << "Lookup table fitting error: " << fit << std::endl;
+          uout() << "Lookup table fitting error: " << fit << std::endl;
 
-    S_ = Function::bspline("spline", knots, C_opt.T().nonzeros(), degree_, m_);
+          S_ = Function::bspline("spline", knots, C_opt.T().nonzeros(), degree_, m_);
+        }
+        break;
+      case ALG_SMOOTH_LINEAR:
+        {
+          casadi_int n_dim = degree_.size();
+          // Linear fit
+          Function linear = interpolant("linear", "linear", grid, values_);
+
+          std::vector< std::vector<double> > egrid;
+          std::vector< std::vector<double> > new_grid;
+
+          for (casadi_int k=0;k<n_dim;++k) {
+            casadi_assert(degree_[k]==3, "Only degree 3 supported for 'smooth_linear'.");
+
+            // Add extra knots
+            const std::vector<double>& g = grid[k];
+
+            // Determine smallest gap.
+            double m = inf;
+            for (casadi_int i=0;i<g.size()-1;++i) {
+              double delta = g[i+1]-g[i];
+              if (delta<m) m = delta;
+            }
+            double step = smooth_linear_frac_*m;
+
+            // Add extra knots
+            std::vector<double> new_g;
+            new_g.push_back(g.front());
+            new_g.push_back(g.front()+step);
+            for (casadi_int i=1;i<g.size()-1;++i) {
+              new_g.push_back(g[i]-step);
+              new_g.push_back(g[i]);
+              new_g.push_back(g[i]+step);
+            }
+            new_g.push_back(g.back()-step);
+            new_g.push_back(g.back());
+            new_grid.push_back(new_g);
+
+            // Correct multiplicity
+            double v1 = new_g.front();
+            double vend = new_g.back();
+            new_g.insert(new_g.begin(), degree_[k], v1);
+            new_g.insert(new_g.end(), degree_[k], vend);
+
+            grid[k] = new_g;
+
+            // Compute greville points
+            egrid.push_back(greville_points(new_g, degree_[k]));
+          }
+
+          // Evaluate linear interpolation on greville grid
+          std::vector<double> mg = meshgrid(egrid);
+          std::vector<double> Z(m_*mg.size()/n_dim);
+
+          // Work vectors
+          vector<casadi_int> iw(linear.sz_iw());
+          vector<double> w(linear.sz_w());
+
+          std::vector<const double*> arg(1);
+          std::vector<double*> res(1);
+
+          for (int i=0;i<Z.size();++i) {
+            arg[0] = get_ptr(mg)+n_dim*i;
+            res[0] = get_ptr(Z)+m_*i;
+            linear(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+          }
+          S_ = Function::bspline("spline", grid, Z, degree_, m_);
+        }
+        break;
+    }
 
     alloc_w(S_->sz_w(), true);
     alloc_iw(S_->sz_iw(), true);
 
+  }
+
+
+
+  std::vector<double> BSplineInterpolant::greville_points(const std::vector<double>& x,
+                                                          casadi_int deg) {
+    casadi_int dim = x.size()-deg-1;
+    std::vector<double> ret(dim);
+    for (casadi_int i = 0; i < dim; ++i) {
+      ret[i] = 0;
+      for (casadi_int j = 0; j < deg; j++) {
+        ret[i] += x[i+1+j];
+      }
+      ret[i] = ret[i] / deg;
+    }
+    return ret;
   }
 
   int BSplineInterpolant::eval(const double** arg, double** res,
