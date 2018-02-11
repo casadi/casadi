@@ -257,6 +257,7 @@ class ConicTests(casadiTestCase):
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
 
     for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
       self.message("general_convex: " + str(conic))
 
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
@@ -322,7 +323,7 @@ class ConicTests(casadiTestCase):
       if "worhp" in str(qp_options):
         with self.assertRaises(Exception):
           solver_out = solver(solver_in)
-        return
+        continue
       solver_out = solver(**solver_in)
 
       self.assertAlmostEqual(solver_out["x"][0],5,max(1,6-less_digits),str(conic))
@@ -421,6 +422,7 @@ class ConicTests(casadiTestCase):
 
     for conic, qp_options, aux_options in conics:
       self.message("equality: " + str(conic))
+      if not aux_options["quadratic"]: continue
       if "ooqp" in str(conic):
         continue
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':Sparsity.dense(3,2)},qp_options)
@@ -449,7 +451,7 @@ class ConicTests(casadiTestCase):
       if 'worhp' in str(qp_options):
         with self.assertRaises(Exception):
           solver_out = solver(solver_in)
-        return
+        continue
 
       solver_out = solver(**solver_in)
 
