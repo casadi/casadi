@@ -414,17 +414,17 @@ class casadiTestCase(unittest.TestCase):
         ret = DM(x)
         if ret.numel()>0:
           ret[0,0] = DM(1,1)
-          return ret
+          return ret.sparsity()
         else:
-          return ret
+          return ret.sparsity()
 
       def remove_last(x):
         ret = DM(x)
         if ret.nnz()>0:
           ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = DM(1,1)
-          return ret
+          return ret.sparsity()
         else:
-          return x
+          return ret.sparsity()
 
       #spmods = [lambda x: x , remove_first, remove_last]
       spmods = [lambda x: x]
@@ -450,7 +450,8 @@ class casadiTestCase(unittest.TestCase):
           fseeds = [sym("f",spmod(f.sparsity_in(i))) for i in range(f.n_in())]
           aseeds = [sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())]
           inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
-          res = f.call(inputss)
+          res = f.call(inputss,True)
+          #print res, "sp", [i.sparsity().dim(True) for i in fseeds]
           [fwdsens] = forward(res, inputss, [fseeds])
           [adjsens] = reverse(res, inputss, [aseeds])
 
