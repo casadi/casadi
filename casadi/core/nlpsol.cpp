@@ -694,8 +694,8 @@ namespace casadi {
 
     // Hessian of the Lagrangian, Jacobian of the constraints
     vector<MX> HJ_res = kkt({x, p, 1, lam_g});
-    MX JG = HJ_res[0];
-    MX HL = HJ_res[1];
+    MX JG = HJ_res.at(0);
+    MX HL = HJ_res.at(1);
 
     // Active bounds
     MX ubx_active = lam_x>0;
@@ -742,8 +742,8 @@ namespace casadi {
     // Calculate sensitivities from fwd_p
     vector<MX> vv = {x, p, 1, lam_g, f, g, -lam_x, -lam_p, 0., fwd_p, 0., 0.};
     vv = fwd_nlp_grad(vv);
-    MX fwd_g_p = vv[1];
-    MX fwd_gL_p = vv[2];
+    MX fwd_g_p = vv.at(1);
+    MX fwd_gL_p = vv.at(2);
 
     // Propagate forward seeds
     MX fwd_alpha_x = if_else(ubx_active, fwd_ubx, 0) + if_else(lbx_active, fwd_lbx, 0);
@@ -758,17 +758,17 @@ namespace casadi {
 
     // Extract sensitivities in x, lam_x and lam_g
     vector<MX> v_split = vertsplit(v, {0, nx_, nx_+ng_});
-    MX fwd_x = v_split[0];
-    MX fwd_lam_g = v_split[1];
+    MX fwd_x = v_split.at(0);
+    MX fwd_lam_g = v_split.at(1);
 
     // Calculate sensitivities in lam_x, lam_g
     vv = {x, p, 1, lam_g, f, g, -lam_x, -lam_p,
           fwd_x, fwd_p, 0, fwd_lam_g};
     vv = fwd_nlp_grad(vv);
-    MX fwd_f = vv[0];
-    MX fwd_g = vv[1];
-    MX fwd_lam_x = -vv[2];
-    MX fwd_lam_p = -vv[3];
+    MX fwd_f = vv.at(0);
+    MX fwd_g = vv.at(1);
+    MX fwd_lam_x = -vv.at(2);
+    MX fwd_lam_p = -vv.at(3);
 
     // Forward sensitivities
     vector<MX> fsens(NLPSOL_NUM_OUT);
@@ -820,8 +820,8 @@ namespace casadi {
 
     // Hessian of the Lagrangian, Jacobian of the constraints
     vector<MX> HJ_res = kkt({x, p, 1, lam_g});
-    MX JG = HJ_res[0];
-    MX HL = HJ_res[1];
+    MX JG = HJ_res.at(0);
+    MX HL = HJ_res.at(1);
 
     // Active bounds
     MX ubx_active = lam_x>0;
@@ -850,24 +850,6 @@ namespace casadi {
     MX adj_f = aseed[NLPSOL_F] = MX::sym("adj_f", Sparsity::dense(1, nadj));
     MX adj_g = aseed[NLPSOL_G] = MX::sym("adj_g", repmat(g.sparsity(), 1, nadj));
 
-    // Calculate sensitivities from f and g
-    Function adj_oracle = oracle_.reverse(nadj);
-    vector<MX> vv = {x, p, f, g, adj_f, adj_g};
-    vv = adj_oracle(vv);
-    MX adj_x0 = vv[NL_X];
-    MX adj_p0 = vv[NL_P];
-
-    // Solve to get beta_x_hat, beta_g_hat
-    MX v = MX::vertcat({adj_x + adj_x0, adj_lam_g});
-    v = MX::solve(H.T(), v, "qr");
-    vector<MX> v_split = vertsplit(v, {0, nx_, nx_+ng_});
-    MX beta_x_hat = v_split[0];
-    MX beta_g_hat = v_split[1];
-
-    // Calculate alpha_x_bar, alpha_g_bar
-    MX alpha_x_bar = -lam_x * beta_x_hat;
-    MX alpha_g_bar = lam_g * beta_g_hat;
-
     // nlp_grad has the signature
     // (x, p, lam_f, lam_g) -> (f, g, grad_x, grad_p)
     // with lam_f=1 and lam_g=lam_g, grad_x = -lam_x, grad_p=-lam_p
@@ -879,11 +861,30 @@ namespace casadi {
     // -> (adj_x, adj_p, adj_lam_f, adj_lam_g)
     Function rev_nlp_grad = nlp_grad.reverse(nadj);
 
+    // Calculate sensitivities from f, g and lam_x
+    vector<MX> vv = {x, p, 1, lam_g, f, g, -lam_x, -lam_p,
+                     adj_f, adj_g, -adj_lam_x, -adj_lam_p};
+    vv = rev_nlp_grad(vv);
+    MX adj_x0 = vv.at(0);
+    MX adj_p0 = vv.at(1);
+    MX adj_lam_g0 = vv.at(3);
+
+    // Solve to get beta_x_hat, beta_g_hat
+    MX v = MX::vertcat({adj_x + adj_x0, adj_lam_g + adj_lam_g0});
+    v = MX::solve(H.T(), v, "qr");
+    vector<MX> v_split = vertsplit(v, {0, nx_, nx_+ng_});
+    MX beta_x_hat = v_split.at(0);
+    MX beta_g_hat = v_split.at(1);
+
+    // Calculate alpha_x_bar, alpha_g_bar
+    MX alpha_x_bar = -lam_x * beta_x_hat;
+    MX alpha_g_bar = lam_g * beta_g_hat;
+
     // Calculate sensitivities in p
     vv = {x, p, 1, lam_g, f, g, -lam_x, -lam_p,
-          0, alpha_g_bar, (x-alpha_x)*beta_x_hat, adj_lam_p};
+          0, alpha_g_bar, (x-alpha_x)*beta_x_hat, 0};
     vv = rev_nlp_grad(vv);
-    MX adj_p = vv[1];
+    MX adj_p = vv.at(1);
 
     // Reverse sensitivities
     vector<MX> asens(NLPSOL_NUM_IN);
