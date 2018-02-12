@@ -58,7 +58,10 @@ namespace casadi {
   = {{&Conic::options_},
      {{"vtype",
        {OT_STRINGVECTOR,
-        "Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]"}}
+        "Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]"}},
+      {"gurobi",
+       {OT_DICT,
+        "Options to be passed to gurobi."}}
      }
   };
 
@@ -73,6 +76,8 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="vtype") {
         vtype = op.second;
+      } else if (op.first=="gurobi") {
+        opts_ = op.second;
       }
     }
 
@@ -291,6 +296,32 @@ namespace casadi {
             casadi_assert(!flag, GRBgeterrormsg(m->env));
           }
         }
+      }
+
+      flag = 0;
+      for (auto && op : opts_) {
+        int ret = GRBgetparamtype(m->env, op.first.c_str());
+        switch (ret) {
+          case -1:
+            casadi_error("Parameter '" + op.first + "' unknown to Gurobi.");
+          case 1:
+            {
+              flag = GRBsetintparam(GRBgetenv(model), op.first.c_str(), op.second);
+              break;
+            }
+          case 2:
+              flag = GRBsetdblparam(GRBgetenv(model), op.first.c_str(), op.second);
+              break;
+          case 3:
+            {
+              std::string s = op.second;
+              flag = GRBsetstrparam(GRBgetenv(model), op.first.c_str(), s.c_str());
+              break;
+            }
+          default:
+            casadi_error("Not implememented : " + str(ret));
+        }
+        casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
 
       m->fstats.at("preprocessing").toc();
