@@ -32,6 +32,11 @@
 #include <stack>
 #include <typeinfo>
 
+// Throw informative error message
+#define CASADI_THROW_ERROR(FNAME, WHAT) \
+throw CasadiException("Error in MXFunction::" FNAME " at " + CASADI_WHERE + ":\n"\
+  + std::string(WHAT));
+
 using namespace std;
 
 namespace casadi {
@@ -585,401 +590,411 @@ namespace casadi {
   void MXFunction::eval_mx(const MXVector& arg, MXVector& res,
                            bool always_inline, bool never_inline) const {
     if (verbose_) casadi_message(name_ + "::eval_mx");
+    try {
+      // Resize the number of outputs
+      casadi_assert(arg.size()==n_in_, "Wrong number of input arguments");
+      res.resize(out_.size());
 
-    // Resize the number of outputs
-    casadi_assert(arg.size()==n_in_, "Wrong number of input arguments");
-    res.resize(out_.size());
+      // Trivial inline by default if output known
+      if (!never_inline && isInput(arg)) {
+        copy(out_.begin(), out_.end(), res.begin());
+        return;
+      }
 
-    // Trivial inline by default if output known
-    if (!never_inline && isInput(arg)) {
-      copy(out_.begin(), out_.end(), res.begin());
-      return;
-    }
+      // non-inlining call is implemented in the base-class
+      if (!should_inline(always_inline, never_inline)) {
+        return FunctionInternal::eval_mx(arg, res, false, true);
+      }
 
-    // non-inlining call is implemented in the base-class
-    if (!should_inline(always_inline, never_inline)) {
-      return FunctionInternal::eval_mx(arg, res, false, true);
-    }
+      // Symbolic work, non-differentiated
+      vector<MX> swork(workloc_.size()-1);
+      if (verbose_) casadi_message("Allocated work vector");
 
-    // Symbolic work, non-differentiated
-    vector<MX> swork(workloc_.size()-1);
-    if (verbose_) casadi_message("Allocated work vector");
+      // Split up inputs analogous to symbolic primitives
+      vector<vector<MX> > arg_split(in_.size());
+      for (casadi_int i=0; i<in_.size(); ++i) arg_split[i] = in_[i].split_primitives(arg[i]);
 
-    // Split up inputs analogous to symbolic primitives
-    vector<vector<MX> > arg_split(in_.size());
-    for (casadi_int i=0; i<in_.size(); ++i) arg_split[i] = in_[i].split_primitives(arg[i]);
+      // Allocate storage for split outputs
+      vector<vector<MX> > res_split(out_.size());
+      for (casadi_int i=0; i<out_.size(); ++i) res_split[i].resize(out_[i].n_primitives());
 
-    // Allocate storage for split outputs
-    vector<vector<MX> > res_split(out_.size());
-    for (casadi_int i=0; i<out_.size(); ++i) res_split[i].resize(out_[i].n_primitives());
+      vector<MX> arg1, res1;
 
-    vector<MX> arg1, res1;
+      // Loop over computational nodes in forward order
+      casadi_int alg_counter = 0;
+      for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
+        if (it->op == OP_INPUT) {
+          swork[it->res.front()] = project(arg_split.at(it->data->ind()).at(it->data->segment()),
+                                           it->data.sparsity(), true);
+        } else if (it->op==OP_OUTPUT) {
+          // Collect the results
+          res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
+        } else if (it->op==OP_PARAMETER) {
+          // Fetch parameter
+          swork[it->res.front()] = it->data;
+        } else {
+          // Arguments of the operation
+          arg1.resize(it->arg.size());
+          for (casadi_int i=0; i<arg1.size(); ++i) {
+            casadi_int el = it->arg[i]; // index of the argument
+            arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
+          }
 
-    // Loop over computational nodes in forward order
-    casadi_int alg_counter = 0;
-    for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
-      if (it->op == OP_INPUT) {
-        swork[it->res.front()] = project(arg_split.at(it->data->ind()).at(it->data->segment()),
-                                         it->data.sparsity(), true);
-      } else if (it->op==OP_OUTPUT) {
-        // Collect the results
-        res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
-      } else if (it->op==OP_PARAMETER) {
-        // Fetch parameter
-        swork[it->res.front()] = it->data;
-      } else {
-        // Arguments of the operation
-        arg1.resize(it->arg.size());
-        for (casadi_int i=0; i<arg1.size(); ++i) {
-          casadi_int el = it->arg[i]; // index of the argument
-          arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
-        }
+          // Perform the operation
+          res1.resize(it->res.size());
+          it->data->eval_mx(arg1, res1);
 
-        // Perform the operation
-        res1.resize(it->res.size());
-        it->data->eval_mx(arg1, res1);
-
-        // Get the result
-        for (casadi_int i=0; i<res1.size(); ++i) {
-          casadi_int el = it->res[i]; // index of the output
-          if (el>=0) swork[el] = res1[i];
+          // Get the result
+          for (casadi_int i=0; i<res1.size(); ++i) {
+            casadi_int el = it->res[i]; // index of the output
+            if (el>=0) swork[el] = res1[i];
+          }
         }
       }
-    }
 
-    // Join split outputs
-    for (casadi_int i=0; i<res.size(); ++i) res[i] = out_[i].join_primitives(res_split[i]);
+      // Join split outputs
+      for (casadi_int i=0; i<res.size(); ++i) res[i] = out_[i].join_primitives(res_split[i]);
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("eval_mx", e.what());
+    }
   }
 
   void MXFunction::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                 std::vector<std::vector<MX> >& fsens) const {
     if (verbose_) casadi_message(name_ + "::ad_forward(" + str(fseed.size())+ ")");
-
-    // Allocate results
-    casadi_int nfwd = fseed.size();
-    fsens.resize(nfwd);
-    for (casadi_int d=0; d<nfwd; ++d) {
-      fsens[d].resize(n_out_);
-    }
-
-    // Quick return if no directions
-    if (nfwd==0) return;
-
-    // Check if seeds need to have dimensions corrected
-    for (auto&& r : fseed) {
-      if (!matching_arg(r)) {
-        return ad_forward(replace_fseed(fseed), fsens);
+    try {
+      // Allocate results
+      casadi_int nfwd = fseed.size();
+      fsens.resize(nfwd);
+      for (casadi_int d=0; d<nfwd; ++d) {
+        fsens[d].resize(n_out_);
       }
-    }
 
-    // Check if there are any zero seeds
-    for (auto&& r : fseed) {
-      if (purgable(r)) {
-        // New argument without all-zero directions
-        std::vector<std::vector<MX> > fseed_purged, fsens_purged;
-        fseed_purged.reserve(nfwd);
-        vector<casadi_int> index_purged;
-        for (casadi_int d=0; d<nfwd; ++d) {
-          if (purgable(fseed[d])) {
-            for (casadi_int i=0; i<fsens[d].size(); ++i) {
-              fsens[d][i] = MX(size_out(i));
-            }
-          } else {
-            fseed_purged.push_back(fsens[d]);
-            index_purged.push_back(d);
-          }
+      // Quick return if no directions
+      if (nfwd==0) return;
+
+      // Check if seeds need to have dimensions corrected
+      for (auto&& r : fseed) {
+        if (!matching_arg(r)) {
+          return ad_forward(replace_fseed(fseed), fsens);
         }
-
-        // Call recursively
-        ad_forward(fseed_purged, fsens_purged);
-
-        // Fetch result
-        for (casadi_int d=0; d<fseed_purged.size(); ++d) {
-          fsens[index_purged[d]] = fsens_purged[d];
-        }
-        return;
       }
-    }
 
-    // Work vector, forward derivatives
-    std::vector<std::vector<MX> > dwork(workloc_.size()-1);
-    fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
-    if (verbose_) casadi_message("Allocated derivative work vector (forward mode)");
-
-    // Split up fseed analogous to symbolic primitives
-    vector<vector<vector<MX> > > fseed_split(nfwd);
-    for (casadi_int d=0; d<nfwd; ++d) {
-      fseed_split[d].resize(fseed[d].size());
-      for (casadi_int i=0; i<fseed[d].size(); ++i) {
-        fseed_split[d][i] = in_[i].split_primitives(fseed[d][i]);
-      }
-    }
-
-    // Allocate splited forward sensitivities
-    vector<vector<vector<MX> > > fsens_split(nfwd);
-    for (casadi_int d=0; d<nfwd; ++d) {
-      fsens_split[d].resize(out_.size());
-      for (casadi_int i=0; i<out_.size(); ++i) {
-        fsens_split[d][i].resize(out_[i].n_primitives());
-      }
-    }
-
-    // Pointers to the arguments of the current operation
-    vector<vector<MX> > oseed, osens;
-    oseed.reserve(nfwd);
-    osens.reserve(nfwd);
-    vector<bool> skip(nfwd, false);
-
-    // Loop over computational nodes in forward order
-    for (auto&& e : algorithm_) {
-      if (e.op == OP_INPUT) {
-        // Fetch forward seed
-        for (casadi_int d=0; d<nfwd; ++d) {
-          dwork[e.res.front()][d] =
-            project(fseed_split[d].at(e.data->ind()).at(e.data->segment()),
-                                      e.data.sparsity(), true);
-        }
-      } else if (e.op==OP_OUTPUT) {
-        // Collect forward sensitivity
-        for (casadi_int d=0; d<nfwd; ++d) {
-          fsens_split[d][e.data->ind()][e.data->segment()] = dwork[e.arg.front()][d];
-        }
-      } else if (e.op==OP_PARAMETER) {
-        // Fetch parameter
-        for (casadi_int d=0; d<nfwd; ++d) {
-          dwork[e.res.front()][d] = MX();
-        }
-      } else {
-        // Get seeds, ignoring all-zero directions
-        oseed.clear();
-        for (casadi_int d=0; d<nfwd; ++d) {
-          // Collect seeds, skipping directions with only zeros
-          vector<MX> seed(e.arg.size());
-          skip[d] = true; // All seeds are zero?
-          for (casadi_int i=0; i<e.arg.size(); ++i) {
-            casadi_int el = e.arg[i];
-            if (el<0 || dwork[el][d].is_empty(true)) {
-              seed[i] = MX(e.data->dep(i).size());
+      // Check if there are any zero seeds
+      for (auto&& r : fseed) {
+        if (purgable(r)) {
+          // New argument without all-zero directions
+          std::vector<std::vector<MX> > fseed_purged, fsens_purged;
+          fseed_purged.reserve(nfwd);
+          vector<casadi_int> index_purged;
+          for (casadi_int d=0; d<nfwd; ++d) {
+            if (purgable(fseed[d])) {
+              for (casadi_int i=0; i<fsens[d].size(); ++i) {
+                fsens[d][i] = MX(size_out(i));
+              }
             } else {
-              seed[i] = dwork[el][d];
-            }
-            if (skip[d] && !seed[i].is_zero()) skip[d] = false;
-          }
-          if (!skip[d]) oseed.push_back(seed);
-        }
-
-        // Perform the operation
-        osens.resize(oseed.size());
-        if (!osens.empty()) {
-          fill(osens.begin(), osens.end(), vector<MX>(e.res.size()));
-          e.data->ad_forward(oseed, osens);
-        }
-
-        // Store sensitivities
-        casadi_int d1=0;
-        for (casadi_int d=0; d<nfwd; ++d) {
-          for (casadi_int i=0; i<e.res.size(); ++i) {
-            casadi_int el = e.res[i];
-            if (el>=0) {
-              dwork[el][d] = skip[d] ? MX(e.data->sparsity(i).size()) : osens[d1][i];
+              fseed_purged.push_back(fsens[d]);
+              index_purged.push_back(d);
             }
           }
-          if (!skip[d]) d1++;
+
+          // Call recursively
+          ad_forward(fseed_purged, fsens_purged);
+
+          // Fetch result
+          for (casadi_int d=0; d<fseed_purged.size(); ++d) {
+            fsens[index_purged[d]] = fsens_purged[d];
+          }
+          return;
         }
       }
-    }
 
-    // Get forward sensitivities
-    for (casadi_int d=0; d<nfwd; ++d) {
-      for (casadi_int i=0; i<out_.size(); ++i) {
-        fsens[d][i] = out_[i].join_primitives(fsens_split[d][i]);
+      // Work vector, forward derivatives
+      std::vector<std::vector<MX> > dwork(workloc_.size()-1);
+      fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
+      if (verbose_) casadi_message("Allocated derivative work vector (forward mode)");
+
+      // Split up fseed analogous to symbolic primitives
+      vector<vector<vector<MX> > > fseed_split(nfwd);
+      for (casadi_int d=0; d<nfwd; ++d) {
+        fseed_split[d].resize(fseed[d].size());
+        for (casadi_int i=0; i<fseed[d].size(); ++i) {
+          fseed_split[d][i] = in_[i].split_primitives(fseed[d][i]);
+        }
       }
+
+      // Allocate splited forward sensitivities
+      vector<vector<vector<MX> > > fsens_split(nfwd);
+      for (casadi_int d=0; d<nfwd; ++d) {
+        fsens_split[d].resize(out_.size());
+        for (casadi_int i=0; i<out_.size(); ++i) {
+          fsens_split[d][i].resize(out_[i].n_primitives());
+        }
+      }
+
+      // Pointers to the arguments of the current operation
+      vector<vector<MX> > oseed, osens;
+      oseed.reserve(nfwd);
+      osens.reserve(nfwd);
+      vector<bool> skip(nfwd, false);
+
+      // Loop over computational nodes in forward order
+      for (auto&& e : algorithm_) {
+        if (e.op == OP_INPUT) {
+          // Fetch forward seed
+          for (casadi_int d=0; d<nfwd; ++d) {
+            dwork[e.res.front()][d] =
+              project(fseed_split[d].at(e.data->ind()).at(e.data->segment()),
+                                        e.data.sparsity(), true);
+          }
+        } else if (e.op==OP_OUTPUT) {
+          // Collect forward sensitivity
+          for (casadi_int d=0; d<nfwd; ++d) {
+            fsens_split[d][e.data->ind()][e.data->segment()] = dwork[e.arg.front()][d];
+          }
+        } else if (e.op==OP_PARAMETER) {
+          // Fetch parameter
+          for (casadi_int d=0; d<nfwd; ++d) {
+            dwork[e.res.front()][d] = MX();
+          }
+        } else {
+          // Get seeds, ignoring all-zero directions
+          oseed.clear();
+          for (casadi_int d=0; d<nfwd; ++d) {
+            // Collect seeds, skipping directions with only zeros
+            vector<MX> seed(e.arg.size());
+            skip[d] = true; // All seeds are zero?
+            for (casadi_int i=0; i<e.arg.size(); ++i) {
+              casadi_int el = e.arg[i];
+              if (el<0 || dwork[el][d].is_empty(true)) {
+                seed[i] = MX(e.data->dep(i).size());
+              } else {
+                seed[i] = dwork[el][d];
+              }
+              if (skip[d] && !seed[i].is_zero()) skip[d] = false;
+            }
+            if (!skip[d]) oseed.push_back(seed);
+          }
+
+          // Perform the operation
+          osens.resize(oseed.size());
+          if (!osens.empty()) {
+            fill(osens.begin(), osens.end(), vector<MX>(e.res.size()));
+            e.data.ad_forward(oseed, osens);
+          }
+
+          // Store sensitivities
+          casadi_int d1=0;
+          for (casadi_int d=0; d<nfwd; ++d) {
+            for (casadi_int i=0; i<e.res.size(); ++i) {
+              casadi_int el = e.res[i];
+              if (el>=0) {
+                dwork[el][d] = skip[d] ? MX(e.data->sparsity(i).size()) : osens[d1][i];
+              }
+            }
+            if (!skip[d]) d1++;
+          }
+        }
+      }
+
+      // Get forward sensitivities
+      for (casadi_int d=0; d<nfwd; ++d) {
+        for (casadi_int i=0; i<out_.size(); ++i) {
+          fsens[d][i] = out_[i].join_primitives(fsens_split[d][i]);
+        }
+      }
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("ad_forward", e.what());
     }
   }
 
   void MXFunction::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                                 std::vector<std::vector<MX> >& asens) const {
     if (verbose_) casadi_message(name_ + "::ad_reverse(" + str(aseed.size())+ ")");
+    try {
 
-    // Allocate results
-    casadi_int nadj = aseed.size();
-    asens.resize(nadj);
-    for (casadi_int d=0; d<nadj; ++d) {
-      asens[d].resize(n_in_);
-    }
-
-    // Quick return if no directions
-    if (nadj==0) return;
-
-    // Check if seeds need to have dimensions corrected
-    for (auto&& r : aseed) {
-      if (!matching_res(r)) {
-        return ad_reverse(replace_aseed(aseed), asens);
+      // Allocate results
+      casadi_int nadj = aseed.size();
+      asens.resize(nadj);
+      for (casadi_int d=0; d<nadj; ++d) {
+        asens[d].resize(n_in_);
       }
-    }
 
-    // Check if there are any zero seeds
-    for (auto&& r : aseed) {
-      // If any direction can be skipped
-      if (purgable(r)) {
-        // New argument without all-zero directions
-        std::vector<std::vector<MX> > aseed_purged, asens_purged;
-        aseed_purged.reserve(nadj);
-        vector<casadi_int> index_purged;
-        for (casadi_int d=0; d<nadj; ++d) {
-          if (purgable(aseed[d])) {
-            for (casadi_int i=0; i<asens[d].size(); ++i) {
-              asens[d][i] = MX(size_in(i));
-            }
-          } else {
-            aseed_purged.push_back(asens[d]);
-            index_purged.push_back(d);
-          }
+      // Quick return if no directions
+      if (nadj==0) return;
+
+      // Check if seeds need to have dimensions corrected
+      for (auto&& r : aseed) {
+        if (!matching_res(r)) {
+          return ad_reverse(replace_aseed(aseed), asens);
         }
-
-        // Call recursively
-        ad_reverse(aseed_purged, asens_purged);
-
-        // Fetch result
-        for (casadi_int d=0; d<aseed_purged.size(); ++d) {
-          asens[index_purged[d]] = asens_purged[d];
-        }
-        return;
       }
-    }
 
-    // Split up aseed analogous to symbolic primitives
-    vector<vector<vector<MX> > > aseed_split(nadj);
-    for (casadi_int d=0; d<nadj; ++d) {
-      aseed_split[d].resize(out_.size());
-      for (casadi_int i=0; i<out_.size(); ++i) {
-        aseed_split[d][i] = out_[i].split_primitives(aseed[d][i]);
-      }
-    }
-
-    // Allocate splited adjoint sensitivities
-    vector<vector<vector<MX> > > asens_split(nadj);
-    for (casadi_int d=0; d<nadj; ++d) {
-      asens_split[d].resize(in_.size());
-      for (casadi_int i=0; i<in_.size(); ++i) {
-        asens_split[d][i].resize(in_[i].n_primitives());
-      }
-    }
-
-    // Pointers to the arguments of the current operation
-    vector<vector<MX> > oseed, osens;
-    oseed.reserve(nadj);
-    osens.reserve(nadj);
-    vector<bool> skip(nadj, false);
-
-    // Work vector, adjoint derivatives
-    std::vector<std::vector<MX> > dwork(workloc_.size()-1);
-    fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
-
-    // Loop over computational nodes in reverse order
-    for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
-      if (it->op == OP_INPUT) {
-        // Get the adjoint sensitivities
-        for (casadi_int d=0; d<nadj; ++d) {
-          asens_split[d].at(it->data->ind()).at(it->data->segment()) = dwork[it->res.front()][d];
-          dwork[it->res.front()][d] = MX();
-        }
-      } else if (it->op==OP_OUTPUT) {
-        // Pass the adjoint seeds
-        for (casadi_int d=0; d<nadj; ++d) {
-          MX a = project(aseed_split[d].at(it->data->ind()).at(it->data->segment()),
-                         it->data.dep().sparsity(), true);
-          if (dwork[it->arg.front()][d].is_empty(true)) {
-            dwork[it->arg.front()][d] = a;
-          } else {
-            dwork[it->arg.front()][d] += a;
-          }
-        }
-      } else if (it->op==OP_PARAMETER) {
-        // Clear adjoint seeds
-        for (casadi_int d=0; d<nadj; ++d) {
-          dwork[it->res.front()][d] = MX();
-        }
-      } else {
-        // Collect and reset seeds
-        oseed.clear();
-        for (casadi_int d=0; d<nadj; ++d) {
-          // Can the direction be skipped completely?
-          skip[d] = true;
-
-          // Seeds for direction d
-          vector<MX> seed(it->res.size());
-          for (casadi_int i=0; i<it->res.size(); ++i) {
-            // Get and clear seed
-            casadi_int el = it->res[i];
-            if (el>=0) {
-              seed[i] = dwork[el][d];
-              dwork[el][d] = MX();
+      // Check if there are any zero seeds
+      for (auto&& r : aseed) {
+        // If any direction can be skipped
+        if (purgable(r)) {
+          // New argument without all-zero directions
+          std::vector<std::vector<MX> > aseed_purged, asens_purged;
+          aseed_purged.reserve(nadj);
+          vector<casadi_int> index_purged;
+          for (casadi_int d=0; d<nadj; ++d) {
+            if (purgable(aseed[d])) {
+              for (casadi_int i=0; i<asens[d].size(); ++i) {
+                asens[d][i] = MX(size_in(i));
+              }
             } else {
-              seed[i] = MX();
+              aseed_purged.push_back(asens[d]);
+              index_purged.push_back(d);
             }
-
-            // If first time encountered, reset to zero of right dimension
-            if (seed[i].is_empty(true)) seed[i] = MX(it->data->sparsity(i).size());
-
-            // If nonzero seeds, keep direction
-            if (skip[d] && !seed[i].is_zero()) skip[d] = false;
           }
-          // Add to list of derivatives
-          if (!skip[d]) oseed.push_back(seed);
-        }
 
-        // Get values of sensitivities before addition
-        osens.resize(oseed.size());
-        casadi_int d1=0;
-        for (casadi_int d=0; d<nadj; ++d) {
-          if (skip[d]) continue;
-          osens[d1].resize(it->arg.size());
-          for (casadi_int i=0; i<it->arg.size(); ++i) {
-            // Pass seed and reset to avoid counting twice
-            casadi_int el = it->arg[i];
-            if (el>=0) {
-              osens[d1][i] = dwork[el][d];
-              dwork[el][d] = MX();
+          // Call recursively
+          ad_reverse(aseed_purged, asens_purged);
+
+          // Fetch result
+          for (casadi_int d=0; d<aseed_purged.size(); ++d) {
+            asens[index_purged[d]] = asens_purged[d];
+          }
+          return;
+        }
+      }
+
+      // Split up aseed analogous to symbolic primitives
+      vector<vector<vector<MX> > > aseed_split(nadj);
+      for (casadi_int d=0; d<nadj; ++d) {
+        aseed_split[d].resize(out_.size());
+        for (casadi_int i=0; i<out_.size(); ++i) {
+          aseed_split[d][i] = out_[i].split_primitives(aseed[d][i]);
+        }
+      }
+
+      // Allocate splited adjoint sensitivities
+      vector<vector<vector<MX> > > asens_split(nadj);
+      for (casadi_int d=0; d<nadj; ++d) {
+        asens_split[d].resize(in_.size());
+        for (casadi_int i=0; i<in_.size(); ++i) {
+          asens_split[d][i].resize(in_[i].n_primitives());
+        }
+      }
+
+      // Pointers to the arguments of the current operation
+      vector<vector<MX> > oseed, osens;
+      oseed.reserve(nadj);
+      osens.reserve(nadj);
+      vector<bool> skip(nadj, false);
+
+      // Work vector, adjoint derivatives
+      std::vector<std::vector<MX> > dwork(workloc_.size()-1);
+      fill(dwork.begin(), dwork.end(), std::vector<MX>(nadj));
+
+      // Loop over computational nodes in reverse order
+      for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it) {
+        if (it->op == OP_INPUT) {
+          // Get the adjoint sensitivities
+          for (casadi_int d=0; d<nadj; ++d) {
+            asens_split[d].at(it->data->ind()).at(it->data->segment()) = dwork[it->res.front()][d];
+            dwork[it->res.front()][d] = MX();
+          }
+        } else if (it->op==OP_OUTPUT) {
+          // Pass the adjoint seeds
+          for (casadi_int d=0; d<nadj; ++d) {
+            MX a = project(aseed_split[d].at(it->data->ind()).at(it->data->segment()),
+                           it->data.dep().sparsity(), true);
+            if (dwork[it->arg.front()][d].is_empty(true)) {
+              dwork[it->arg.front()][d] = a;
             } else {
-              osens[d1][i] = MX();
+              dwork[it->arg.front()][d] += a;
             }
-
-            // If first time encountered, reset to zero of right dimension
-            if (osens[d1][i].is_empty(true)) osens[d1][i] = MX(it->data->dep(i).size());
           }
-          d1++;
-        }
+        } else if (it->op==OP_PARAMETER) {
+          // Clear adjoint seeds
+          for (casadi_int d=0; d<nadj; ++d) {
+            dwork[it->res.front()][d] = MX();
+          }
+        } else {
+          // Collect and reset seeds
+          oseed.clear();
+          for (casadi_int d=0; d<nadj; ++d) {
+            // Can the direction be skipped completely?
+            skip[d] = true;
 
-        // Perform the operation
-        if (!osens.empty()) {
-          it->data->ad_reverse(oseed, osens);
-        }
-
-        // Store sensitivities
-        d1=0;
-        for (casadi_int d=0; d<nadj; ++d) {
-          if (skip[d]) continue;
-          for (casadi_int i=0; i<it->arg.size(); ++i) {
-            casadi_int el = it->arg[i];
-            if (el>=0) {
-              if (dwork[el][d].is_empty(true)) {
-                dwork[el][d] = osens[d1][i];
+            // Seeds for direction d
+            vector<MX> seed(it->res.size());
+            for (casadi_int i=0; i<it->res.size(); ++i) {
+              // Get and clear seed
+              casadi_int el = it->res[i];
+              if (el>=0) {
+                seed[i] = dwork[el][d];
+                dwork[el][d] = MX();
               } else {
-                dwork[el][d] += osens[d1][i];
+                seed[i] = MX();
+              }
+
+              // If first time encountered, reset to zero of right dimension
+              if (seed[i].is_empty(true)) seed[i] = MX(it->data->sparsity(i).size());
+
+              // If nonzero seeds, keep direction
+              if (skip[d] && !seed[i].is_zero()) skip[d] = false;
+            }
+            // Add to list of derivatives
+            if (!skip[d]) oseed.push_back(seed);
+          }
+
+          // Get values of sensitivities before addition
+          osens.resize(oseed.size());
+          casadi_int d1=0;
+          for (casadi_int d=0; d<nadj; ++d) {
+            if (skip[d]) continue;
+            osens[d1].resize(it->arg.size());
+            for (casadi_int i=0; i<it->arg.size(); ++i) {
+              // Pass seed and reset to avoid counting twice
+              casadi_int el = it->arg[i];
+              if (el>=0) {
+                osens[d1][i] = dwork[el][d];
+                dwork[el][d] = MX();
+              } else {
+                osens[d1][i] = MX();
+              }
+
+              // If first time encountered, reset to zero of right dimension
+              if (osens[d1][i].is_empty(true)) osens[d1][i] = MX(it->data->dep(i).size());
+            }
+            d1++;
+          }
+
+          // Perform the operation
+          if (!osens.empty()) {
+            it->data.ad_reverse(oseed, osens);
+          }
+
+          // Store sensitivities
+          d1=0;
+          for (casadi_int d=0; d<nadj; ++d) {
+            if (skip[d]) continue;
+            for (casadi_int i=0; i<it->arg.size(); ++i) {
+              casadi_int el = it->arg[i];
+              if (el>=0) {
+                if (dwork[el][d].is_empty(true)) {
+                  dwork[el][d] = osens[d1][i];
+                } else {
+                  dwork[el][d] += osens[d1][i];
+                }
               }
             }
+            d1++;
           }
-          d1++;
         }
       }
-    }
 
-    // Get adjoint sensitivities
-    for (casadi_int d=0; d<nadj; ++d) {
-      for (casadi_int i=0; i<in_.size(); ++i) {
-        asens[d][i] = in_[i].join_primitives(asens_split[d][i]);
+      // Get adjoint sensitivities
+      for (casadi_int d=0; d<nadj; ++d) {
+        for (casadi_int i=0; i<in_.size(); ++i) {
+          asens[d][i] = in_[i].join_primitives(asens_split[d][i]);
+        }
       }
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("ad_reverse", e.what());
     }
   }
 
@@ -1191,7 +1206,7 @@ namespace casadi {
 
             // Perform the operation
             res1.resize(e.res.size());
-            e.data->eval_mx(arg1, res1);
+            e.data.eval_mx(arg1, res1);
 
             // Get the result
             for (casadi_int i=0; i<res1.size(); ++i) {

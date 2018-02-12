@@ -34,6 +34,16 @@
 #include "linsol.hpp"
 #include "expm.hpp"
 
+// Throw informative error message
+#define CASADI_THROW_ERROR(FNAME, WHAT) \
+throw CasadiException("Error in MX::" FNAME " at " + CASADI_WHERE + ":\n"\
+  + std::string(WHAT));
+
+// Throw informative error message
+#define CASADI_THROW_ERROR_OBJ(FNAME, WHAT) \
+throw CasadiException("Error in MX::" FNAME " for node of type " \
+  + this->class_name() + " at " + CASADI_WHERE + ":\n" + std::string(WHAT));
+
 using namespace std;
 namespace casadi {
 
@@ -1429,143 +1439,150 @@ namespace casadi {
 
   void MX::shared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
                          const std::string& v_prefix, const std::string& v_suffix) {
+    try {
+      // Sort the expression
+      Function f("tmp", vector<MX>{}, ex);
+      auto *ff = f.get<MXFunction>();
 
-    // Sort the expression
-    Function f("tmp", vector<MX>{}, ex);
-    auto *ff = f.get<MXFunction>();
+      // Get references to the internal data structures
+      const vector<MXAlgEl>& algorithm = ff->algorithm_;
+      vector<MX> work(ff->workloc_.size()-1);
 
-    // Get references to the internal data structures
-    const vector<MXAlgEl>& algorithm = ff->algorithm_;
-    vector<MX> work(ff->workloc_.size()-1);
+      // Count how many times an expression has been used
+      vector<casadi_int> usecount(work.size(), 0);
 
-    // Count how many times an expression has been used
-    vector<casadi_int> usecount(work.size(), 0);
+      // Remember the origin of every calculation
+      vector<pair<casadi_int, casadi_int> > origin(work.size(), make_pair(-1, -1));
 
-    // Remember the origin of every calculation
-    vector<pair<casadi_int, casadi_int> > origin(work.size(), make_pair(-1, -1));
+      // Which evaluations to replace
+      vector<pair<casadi_int, casadi_int> > replace;
 
-    // Which evaluations to replace
-    vector<pair<casadi_int, casadi_int> > replace;
-
-    // Evaluate the algorithm to identify which evaluations to replace
-    casadi_int k=0;
-    for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
-      // Increase usage counters
-      switch (it->op) {
-      case OP_CONST:
-      case OP_PARAMETER:
-        break;
-      default: // Unary operation, binary operation or output
-        for (casadi_int c=0; c<it->arg.size(); ++c) {
-          if (usecount[it->arg[c]]==0) {
-            usecount[it->arg[c]]=1;
-          } else if (usecount[it->arg[c]]==1) {
-            replace.push_back(origin[it->arg[c]]);
-            usecount[it->arg[c]]=-1; // Extracted, do not extract again
+      // Evaluate the algorithm to identify which evaluations to replace
+      casadi_int k=0;
+      for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
+        // Increase usage counters
+        switch (it->op) {
+        case OP_CONST:
+        case OP_PARAMETER:
+          break;
+        default: // Unary operation, binary operation or output
+          for (casadi_int c=0; c<it->arg.size(); ++c) {
+            if (usecount[it->arg[c]]==0) {
+              usecount[it->arg[c]]=1;
+            } else if (usecount[it->arg[c]]==1) {
+              replace.push_back(origin[it->arg[c]]);
+              usecount[it->arg[c]]=-1; // Extracted, do not extract again
+            }
           }
         }
-      }
 
-      // Perform the operation
-      switch (it->op) {
-      case OP_OUTPUT:
-        break;
-      case OP_CONST:
-      case OP_PARAMETER:
-        usecount[it->res.front()] = -1; // Never extract since it is a primitive type
-        break;
-      default:
-        for (casadi_int c=0; c<it->res.size(); ++c) {
-          if (it->res[c]>=0) {
-            work[it->res[c]] = it->data.get_output(c);
-            usecount[it->res[c]] = 0; // Not (yet) extracted
-            origin[it->res[c]] = make_pair(k, c);
-          }
-        }
-        break;
-      }
-    }
-
-    // New variables and definitions
-    v.clear();
-    v.reserve(replace.size());
-    vdef.clear();
-    vdef.reserve(replace.size());
-
-    // Quick return
-    if (replace.empty()) return;
-
-    // Sort the elements to be replaced in the order of appearence in the algorithm
-    sort(replace.begin(), replace.end());
-    vector<pair<casadi_int, casadi_int> >::const_iterator replace_it=replace.begin();
-
-    // Name of intermediate variables
-    stringstream v_name;
-
-    // Arguments for calling the atomic operations
-    vector<MX> oarg, ores;
-
-    // Evaluate the algorithm
-    k=0;
-    for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
-      switch (it->op) {
-      case OP_OUTPUT:
-        casadi_assert(it->data->segment()==0, "Not implemented");
-        ex[it->data->ind()] = work[it->arg.front()];
-        break;
-      case OP_CONST:
-      case OP_PARAMETER:
-        work[it->res.front()] = it->data;
-        break;
-      default:
-        {
-          // Arguments of the operation
-          oarg.resize(it->arg.size());
-          for (casadi_int i=0; i<oarg.size(); ++i) {
-            casadi_int el = it->arg[i];
-            oarg[i] = el<0 ? MX(it->data->dep(i).size()) : work.at(el);
-          }
-
-          // Perform the operation
-          ores.resize(it->res.size());
-          it->data->eval_mx(oarg, ores);
-
-          // Get the result
-          for (casadi_int i=0; i<ores.size(); ++i) {
-            casadi_int el = it->res[i];
-            if (el>=0) work.at(el) = ores[i];
-          }
-
-          // Possibly replace results with new variables
+        // Perform the operation
+        switch (it->op) {
+        case OP_OUTPUT:
+          break;
+        case OP_CONST:
+        case OP_PARAMETER:
+          usecount[it->res.front()] = -1; // Never extract since it is a primitive type
+          break;
+        default:
           for (casadi_int c=0; c<it->res.size(); ++c) {
-            casadi_int ind = it->res[c];
-            if (ind>=0 && replace_it->first==k && replace_it->second==c) {
-              // Store the result
-              vdef.push_back(work[ind]);
+            if (it->res[c]>=0) {
+              work[it->res[c]] = it->data.get_output(c);
+              usecount[it->res[c]] = 0; // Not (yet) extracted
+              origin[it->res[c]] = make_pair(k, c);
+            }
+          }
+          break;
+        }
+      }
 
-              // Create a new variable
-              v_name.str(string());
-              v_name << v_prefix << v.size() << v_suffix;
-              v.push_back(MX::sym(v_name.str()));
+      // New variables and definitions
+      v.clear();
+      v.reserve(replace.size());
+      vdef.clear();
+      vdef.reserve(replace.size());
 
-              // Use in calculations
-              work[ind] = v.back();
+      // Quick return
+      if (replace.empty()) return;
 
-              // Go to the next element to be replaced
-              replace_it++;
+      // Sort the elements to be replaced in the order of appearence in the algorithm
+      sort(replace.begin(), replace.end());
+      vector<pair<casadi_int, casadi_int> >::const_iterator replace_it=replace.begin();
+
+      // Name of intermediate variables
+      stringstream v_name;
+
+      // Arguments for calling the atomic operations
+      vector<MX> oarg, ores;
+
+      // Evaluate the algorithm
+      k=0;
+      for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
+        switch (it->op) {
+        case OP_OUTPUT:
+          casadi_assert(it->data->segment()==0, "Not implemented");
+          ex[it->data->ind()] = work[it->arg.front()];
+          break;
+        case OP_CONST:
+        case OP_PARAMETER:
+          work[it->res.front()] = it->data;
+          break;
+        default:
+          {
+            // Arguments of the operation
+            oarg.resize(it->arg.size());
+            for (casadi_int i=0; i<oarg.size(); ++i) {
+              casadi_int el = it->arg[i];
+              oarg[i] = el<0 ? MX(it->data->dep(i).size()) : work.at(el);
+            }
+
+            // Perform the operation
+            ores.resize(it->res.size());
+            it->data->eval_mx(oarg, ores);
+
+            // Get the result
+            for (casadi_int i=0; i<ores.size(); ++i) {
+              casadi_int el = it->res[i];
+              if (el>=0) work.at(el) = ores[i];
+            }
+
+            // Possibly replace results with new variables
+            for (casadi_int c=0; c<it->res.size(); ++c) {
+              casadi_int ind = it->res[c];
+              if (ind>=0 && replace_it->first==k && replace_it->second==c) {
+                // Store the result
+                vdef.push_back(work[ind]);
+
+                // Create a new variable
+                v_name.str(string());
+                v_name << v_prefix << v.size() << v_suffix;
+                v.push_back(MX::sym(v_name.str()));
+
+                // Use in calculations
+                work[ind] = v.back();
+
+                // Go to the next element to be replaced
+                replace_it++;
+              }
             }
           }
         }
       }
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("shared", e.what());
     }
   }
 
   MX MX::jacobian(const MX &f, const MX &x, const Dict& opts) {
-    // Propagate verbose option to helper function
-    Dict h_opts;
-    if (opts.count("verbose")) h_opts["verbose"] = opts.at("verbose");
-    Function h("helper_jacobian_MX", {x}, {f}, h_opts);
-    return h.get<MXFunction>()->jac(0, 0, opts);
+    try {
+      // Propagate verbose option to helper function
+      Dict h_opts;
+      if (opts.count("verbose")) h_opts["verbose"] = opts.at("verbose");
+      Function h("helper_jacobian_MX", {x}, {f}, h_opts);
+      return h.get<MXFunction>()->jac(0, 0, opts);
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("jacobian", e.what());
+    }
   }
 
   MX MX::hessian(const MX& f, const MX& x) {
@@ -1574,54 +1591,66 @@ namespace casadi {
   }
 
   MX MX::hessian(const MX& f, const MX& x, MX &g) {
-    g = gradient(f, x);
-    return jacobian(g, x, {{"symmetric", true}});
+    try {
+      g = gradient(f, x);
+      return jacobian(g, x, {{"symmetric", true}});
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("hessian", e.what());
+    }
   }
 
   std::vector<std::vector<MX> >
   MX::forward(const std::vector<MX> &ex,
               const std::vector<MX> &arg,
               const std::vector<std::vector<MX> > &v, const Dict& opts) {
-    // Read options
-    bool always_inline = true;
-    bool never_inline = false;
-    for (auto&& op : opts) {
-      if (op.first=="always_inline") {
-        always_inline = op.second;
-      } else if (op.first=="never_inline") {
-        never_inline = op.second;
-      } else {
-        casadi_error("No such option: " + string(op.second));
+    try {
+      // Read options
+      bool always_inline = true;
+      bool never_inline = false;
+      for (auto&& op : opts) {
+        if (op.first=="always_inline") {
+          always_inline = op.second;
+        } else if (op.first=="never_inline") {
+          never_inline = op.second;
+        } else {
+          casadi_error("No such option: " + string(op.second));
+        }
       }
+      // Call internal function on a temporary object
+      Function temp("forward_temp", arg, ex);
+      std::vector<std::vector<MX> > ret;
+      temp->call_forward(arg, ex, v, ret, always_inline, never_inline);
+      return ret;
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("forward", e.what());
     }
-    // Call internal function on a temporary object
-    Function temp("forward_temp", arg, ex);
-    std::vector<std::vector<MX> > ret;
-    temp->call_forward(arg, ex, v, ret, always_inline, never_inline);
-    return ret;
   }
 
   std::vector<std::vector<MX> >
   MX::reverse(const std::vector<MX> &ex,
               const std::vector<MX> &arg,
               const std::vector<std::vector<MX> > &v, const Dict& opts) {
-    // Read options
-    bool always_inline = true;
-    bool never_inline = false;
-    for (auto&& op : opts) {
-      if (op.first=="always_inline") {
-        always_inline = op.second;
-      } else if (op.first=="never_inline") {
-        never_inline = op.second;
-      } else {
-        casadi_error("No such option: " + string(op.second));
+    try {
+      // Read options
+      bool always_inline = true;
+      bool never_inline = false;
+      for (auto&& op : opts) {
+        if (op.first=="always_inline") {
+          always_inline = op.second;
+        } else if (op.first=="never_inline") {
+          never_inline = op.second;
+        } else {
+          casadi_error("No such option: " + string(op.second));
+        }
       }
+      // Call internal function on a temporary object
+      Function temp("reverse_temp", arg, ex);
+      std::vector<std::vector<MX> > ret;
+      temp->call_reverse(arg, ex, v, ret, always_inline, never_inline);
+      return ret;
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("reverse", e.what());
     }
-    // Call internal function on a temporary object
-    Function temp("reverse_temp", arg, ex);
-    std::vector<std::vector<MX> > ret;
-    temp->call_reverse(arg, ex, v, ret, always_inline, never_inline);
-    return ret;
   }
 
   std::vector<bool> MX::which_depends(const MX &expr, const MX &var, casadi_int order, bool tr) {
@@ -1778,4 +1807,31 @@ namespace casadi {
    return A->get_rank1(alpha, x, y);
  }
 
+ void MX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+   try {
+     (*this)->eval_mx(arg, res);
+   } catch (std::exception& e) {
+     CASADI_THROW_ERROR_OBJ("eval_mx", e.what());
+   }
+ }
+
+ void MX::ad_forward(const std::vector<std::vector<MX> >& fseed,
+                 std::vector<std::vector<MX> >& fsens) const {
+   try {
+     (*this)->ad_forward(fseed, fsens);
+   } catch (std::exception& e) {
+     CASADI_THROW_ERROR_OBJ("ad_forward", e.what());
+   }
+ }
+
+ void MX::ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                 std::vector<std::vector<MX> >& asens) const {
+   try {
+     (*this)->ad_reverse(aseed, asens);
+   } catch (std::exception& e) {
+     CASADI_THROW_ERROR_OBJ("ad_reverse", e.what());
+   }
+ }
+
+#undef CASADI_THROW_ERROR
 } // namespace casadi

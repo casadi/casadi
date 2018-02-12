@@ -2133,7 +2133,7 @@ namespace casadi {
         }
 
         // Create the evaluation node
-        Function dfcn = forward(nfwd_batch);
+        Function dfcn = self().forward(nfwd_batch);
         vector<MX> x = Call::create(dfcn, darg);
 
         casadi_assert_dev(x.size()==n_out_);
@@ -2239,7 +2239,7 @@ namespace casadi {
         }
 
         // Create the evaluation node
-        Function dfcn = reverse(nadj_batch);
+        Function dfcn = self().reverse(nadj_batch);
         vector<MX> x = Call::create(dfcn, darg);
         casadi_assert_dev(x.size()==n_in_);
 

@@ -770,9 +770,13 @@ namespace casadi {
     ///@}
   };
 
+  // Throw informative error message
+  #define CASADI_THROW_ERROR(FNAME, WHAT) \
+  throw CasadiException("Error in " + MatType::type_name() \
+    + "::" FNAME " at " + CASADI_WHERE + ":\n" + std::string(WHAT));
+
 #ifndef SWIG
   // Implementations
-
   template<typename MatType>
   const Sparsity& GenericMatrix<MatType>::sparsity() const {
     return self().sparsity();
@@ -1075,49 +1079,61 @@ namespace casadi {
   template<typename MatType>
   MatType GenericMatrix<MatType>::jtimes(const MatType &ex, const MatType &arg,
                                          const MatType &v, bool tr) {
-    // Assert consistent input dimensions
-    if (tr) {
-      casadi_assert(v.size1() == ex.size1() && v.size2() % ex.size2() == 0,
-                    "'v' has inconsistent dimensions");
-    } else {
-      casadi_assert(v.size1() == arg.size1() && v.size2() % arg.size2() == 0,
-                    "'v' has inconsistent dimensions");
+    try {
+      // Assert consistent input dimensions
+      if (tr) {
+        casadi_assert(v.size1() == ex.size1() && v.size2() % ex.size2() == 0,
+                      "'v' has inconsistent dimensions");
+      } else {
+        casadi_assert(v.size1() == arg.size1() && v.size2() % arg.size2() == 0,
+                      "'v' has inconsistent dimensions");
+      }
+
+      // Quick return if no seeds
+      if (v.is_empty()) return MatType(tr ? arg.size1() : ex.size1(), 0);
+
+      // Split up the seed into its components
+      std::vector<MatType> w = horzsplit(v, tr ? ex.size2() : arg.size2());
+
+      // Seeds as a vector of vectors
+      std::vector<std::vector<MatType> > ww(w.size());
+      for (casadi_int i=0; i<w.size(); ++i) ww[i] = {w[i]};
+
+      // Calculate directional derivatives
+      if (tr) {
+        ww = reverse({ex}, {arg}, ww);
+      } else {
+        ww = forward({ex}, {arg}, ww);
+      }
+
+      // Get results
+      for (casadi_int i=0; i<w.size(); ++i) w[i] = ww[i][0];
+      return horzcat(w);
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("jtimes", e.what());
     }
-
-    // Quick return if no seeds
-    if (v.is_empty()) return MatType(tr ? arg.size1() : ex.size1(), 0);
-
-    // Split up the seed into its components
-    std::vector<MatType> w = horzsplit(v, tr ? ex.size2() : arg.size2());
-
-    // Seeds as a vector of vectors
-    std::vector<std::vector<MatType> > ww(w.size());
-    for (casadi_int i=0; i<w.size(); ++i) ww[i] = {w[i]};
-
-    // Calculate directional derivatives
-    if (tr) {
-      ww = reverse({ex}, {arg}, ww);
-    } else {
-      ww = forward({ex}, {arg}, ww);
-    }
-
-    // Get results
-    for (casadi_int i=0; i<w.size(); ++i) w[i] = ww[i][0];
-    return horzcat(w);
   }
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::gradient(const MatType &ex, const MatType &arg) {
-    casadi_assert(ex.is_scalar(),
-                          "'gradient' only defined for scalar outputs: Use 'jacobian' instead.");
-    return project(jtimes(ex, arg, MatType::ones(ex.sparsity()), true), arg.sparsity());
+    try {
+      casadi_assert(ex.is_scalar(),
+                    "'gradient' only defined for scalar outputs: Use 'jacobian' instead.");
+      return project(jtimes(ex, arg, MatType::ones(ex.sparsity()), true), arg.sparsity());
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("gradient", e.what());
+    }
   }
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::tangent(const MatType &ex, const MatType &arg) {
-    casadi_assert(arg.is_scalar(),
-                          "'tangent' only defined for scalar inputs: Use 'jacobian' instead.");
-    return project(jtimes(ex, arg, MatType::ones(arg.sparsity()), false), ex.sparsity());
+    try {
+      casadi_assert(arg.is_scalar(),
+                    "'tangent' only defined for scalar inputs: Use 'jacobian' instead.");
+      return project(jtimes(ex, arg, MatType::ones(arg.sparsity()), false), ex.sparsity());
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("tangent", e.what());
+    }
   }
 
   template<typename MatType>
@@ -1157,7 +1173,7 @@ namespace casadi {
     }
   }
 
-
+#undef CASADI_THROW_ERROR
 
 } // namespace casadi
 

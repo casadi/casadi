@@ -27,6 +27,10 @@
 #include "function_internal.hpp"
 #include "casadi_misc.hpp"
 
+#define CASADI_THROW_ERROR(FNAME, WHAT) \
+throw CasadiException("Error in Call::" FNAME " for '" + fcn_.name() + "' "\
+  "[" + fcn_.class_name() + "] at " + CASADI_WHERE + ":\n" + std::string(WHAT));
+
 using namespace std;
 
 namespace casadi {
@@ -105,33 +109,41 @@ namespace casadi {
 
   void Call::ad_forward(const vector<vector<MX> >& fseed,
                      vector<vector<MX> >& fsens) const {
-    // Nondifferentiated inputs and outputs
-    vector<MX> arg(n_dep());
-    for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-    vector<MX> res(nout());
-    for (casadi_int i=0; i<res.size(); ++i) res[i] = get_output(i);
+    try {
+      // Nondifferentiated inputs and outputs
+      vector<MX> arg(n_dep());
+      for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
+      vector<MX> res(nout());
+      for (casadi_int i=0; i<res.size(); ++i) res[i] = get_output(i);
 
-    // Call the cached functions
-    fcn_->call_forward(arg, res, fseed, fsens, false, false);
+      // Call the cached functions
+      fcn_->call_forward(arg, res, fseed, fsens, false, false);
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("ad_forward", e.what());
+    }
   }
 
   void Call::ad_reverse(const vector<vector<MX> >& aseed,
                      vector<vector<MX> >& asens) const {
-    // Nondifferentiated inputs and outputs
-    vector<MX> arg(n_dep());
-    for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-    vector<MX> res(nout());
-    for (casadi_int i=0; i<res.size(); ++i) res[i] = get_output(i);
+    try {
+      // Nondifferentiated inputs and outputs
+      vector<MX> arg(n_dep());
+      for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
+      vector<MX> res(nout());
+      for (casadi_int i=0; i<res.size(); ++i) res[i] = get_output(i);
 
-    // Call the cached functions
-    vector<vector<MX> > v;
-    fcn_->call_reverse(arg, res, aseed, v, false, false);
-    for (casadi_int i=0; i<v.size(); ++i) {
-      for (casadi_int j=0; j<v[i].size(); ++j) {
-        if (!v[i][j].is_empty()) { // TODO(@jaeandersson): Hack
-          asens[i][j] += v[i][j];
+      // Call the cached functions
+      vector<vector<MX> > v;
+      fcn_->call_reverse(arg, res, aseed, v, false, false);
+      for (casadi_int i=0; i<v.size(); ++i) {
+        for (casadi_int j=0; j<v[i].size(); ++j) {
+          if (!v[i][j].is_empty()) { // TODO(@jaeandersson): Hack
+            asens[i][j] += v[i][j];
+          }
         }
       }
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("ad_reverse", e.what());
     }
   }
 

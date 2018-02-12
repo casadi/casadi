@@ -608,6 +608,15 @@ namespace casadi {
     typedef std::map<std::string, MX> MXDict;
 
 #ifndef SWIG
+    ///@{
+    /** \brief Called from MXFunction */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
+    void ad_forward(const std::vector<std::vector<MX> >& fseed,
+                    std::vector<std::vector<MX> >& fsens) const;
+    void ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                    std::vector<std::vector<MX> >& asens) const;
+    ///@}
+
     /// Construct constant matrix with a given sparsity and values
     MX(const Sparsity& sp, double val, bool dummy);
 
