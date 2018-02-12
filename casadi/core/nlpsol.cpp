@@ -887,10 +887,10 @@ namespace casadi {
 
     // Reverse sensitivities
     vector<MX> asens(NLPSOL_NUM_IN);
-    asens[NLPSOL_LBX] = if_else(ubx_active, -alpha_x_bar, 0);
-    asens[NLPSOL_UBX] = if_else(lbx_active, -alpha_x_bar, 0);
-    asens[NLPSOL_LBG] = if_else(ubg_active, -alpha_g_bar, 0);
-    asens[NLPSOL_UBG] = if_else(lbg_active, -alpha_g_bar, 0);
+    asens[NLPSOL_UBX] = if_else(ubx_active, -alpha_x_bar, 0);
+    asens[NLPSOL_LBX] = if_else(lbx_active, -alpha_x_bar, 0);
+    asens[NLPSOL_UBG] = if_else(ubg_active, -alpha_g_bar, 0);
+    asens[NLPSOL_LBG] = if_else(lbg_active, -alpha_g_bar, 0);
     asens[NLPSOL_P] = adj_p;
 
     // Guesses are unused
