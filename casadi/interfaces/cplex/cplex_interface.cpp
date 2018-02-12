@@ -30,8 +30,6 @@
 #include <sstream>
 #include <vector>
 
-#include "ilcplex/cplex.h"
-
 namespace casadi {
 
   using namespace std;
@@ -146,46 +144,46 @@ namespace casadi {
     // Start CPLEX
     int status;
     casadi_assert_dev(m->env==0);
-    m->env = CPXopenCPLEX(&status);
+    m->env = CPXXopenCPLEX(&status);
     if (m->env==0) {
       char errmsg[CPXMESSAGEBUFSIZE];
-      CPXgeterrorstring(m->env, status, errmsg);
+      CPXXgeterrorstring(m->env, status, errmsg);
       casadi_error(string("Cannot initialize CPLEX environment: ") + errmsg);
     }
 
     // Set parameters to their default values
-    if (CPXsetdefaults(m->env)) {
-      casadi_error("CPXsetdefaults failed");
+    if (CPXXsetdefaults(m->env)) {
+      casadi_error("CPXXsetdefaults failed");
     }
 
     // Enable output by default
-    if (CPXsetintparam(m->env, CPX_PARAM_SCRIND, CPX_ON)) {
+    if (CPXXsetintparam(m->env, CPX_PARAM_SCRIND, CPX_ON)) {
       casadi_error("Failure setting CPX_PARAM_SCRIND");
     }
 
     // Optimality tolerance
-    if (CPXsetdblparam(m->env, CPX_PARAM_EPOPT, tol_)) {
+    if (CPXXsetdblparam(m->env, CPX_PARAM_EPOPT, tol_)) {
       casadi_error("Failure setting CPX_PARAM_EPOPT");
     }
 
     // Feasibility tolerance
-    if (CPXsetdblparam(m->env, CPX_PARAM_EPRHS, tol_)) {
+    if (CPXXsetdblparam(m->env, CPX_PARAM_EPRHS, tol_)) {
       casadi_error("Failure setting CPX_PARAM_EPRHS");
     }
 
     // We start with barrier if crossover was chosen.
-    if (CPXsetintparam(m->env, CPX_PARAM_QPMETHOD, qp_method_ == 7 ? 4 : qp_method_)) {
+    if (CPXXsetintparam(m->env, CPX_PARAM_QPMETHOD, qp_method_ == 7 ? 4 : qp_method_)) {
       casadi_error("Failure setting CPX_PARAM_QPMETHOD");
     }
 
     // Setting dependency check option
-    if (CPXsetintparam(m->env, CPX_PARAM_DEPIND, dep_check_)) {
+    if (CPXXsetintparam(m->env, CPX_PARAM_DEPIND, dep_check_)) {
       casadi_error("Failure setting CPX_PARAM_DEPIND");
     }
 
     // Setting crossover algorithm
     if (qp_method_ == 7) {
-      if (CPXsetintparam(m->env, CPX_PARAM_BARCROSSALG, 1)) {
+      if (CPXXsetintparam(m->env, CPX_PARAM_BARCROSSALG, 1)) {
         casadi_error("Failure setting CPX_PARAM_BARCROSSALG");
       }
     }
@@ -194,14 +192,14 @@ namespace casadi {
     for (auto&& op : opts_) {
       // Get parameter index
       int whichparam;
-      if (CPXgetparamnum(m->env, op.first.c_str(), &whichparam)) {
+      if (CPXXgetparamnum(m->env, op.first.c_str(), &whichparam)) {
         casadi_error("No such CPLEX parameter: " + op.first);
       }
 
       // Get type of parameter
       int paramtype;
-      if (CPXgetparamtype(m->env, whichparam, &paramtype)) {
-        casadi_error("CPXgetparamtype failed");
+      if (CPXXgetparamtype(m->env, whichparam, &paramtype)) {
+        casadi_error("CPXXgetparamtype failed");
       }
 
       // Pass to CPLEX
@@ -210,17 +208,17 @@ namespace casadi {
         casadi_error("CPX_PARAMTYPE_NONE unsupported");
         break;
       case CPX_PARAMTYPE_INT:
-        status = CPXsetintparam(m->env, whichparam, op.second);
+        status = CPXXsetintparam(m->env, whichparam, op.second);
         break;
       case CPX_PARAMTYPE_DOUBLE:
-        status = CPXsetdblparam(m->env, whichparam, op.second);
+        status = CPXXsetdblparam(m->env, whichparam, op.second);
         break;
       case CPX_PARAMTYPE_STRING:
-        status = CPXsetstrparam(m->env, whichparam,
+        status = CPXXsetstrparam(m->env, whichparam,
                                 static_cast<string>(op.second).c_str());
         break;
       case CPX_PARAMTYPE_LONG:
-        status = CPXsetlongparam(m->env, whichparam,
+        status = CPXXsetlongparam(m->env, whichparam,
                                  static_cast<CPXLONG>(static_cast<casadi_int>(op.second)));
         break;
         default:
@@ -259,17 +257,13 @@ namespace casadi {
 
     // Create problem object
     casadi_assert_dev(m->lp==0);
-    m->lp = CPXcreateprob(m->env, &status, "QP from CasADi");
-    casadi_assert(m->lp!=0, "CPXcreateprob failed");
+    m->lp = CPXXcreateprob(m->env, &status, "QP from CasADi");
+    casadi_assert(m->lp!=0, "CPXXcreateprob failed");
 
-    m->a_colind.resize(A_.size2()+1);
     m->a_row.resize(A_.nnz());
-    m->h_colind.resize(H_.size2()+1);
     m->h_row.resize(H_.nnz());
 
-    copy_vector(A_.colind(), m->a_colind);
     copy_vector(A_.row(), m->a_row);
-    copy_vector(H_.colind(), m->h_colind);
     copy_vector(H_.row(), m->h_row);
 
     m->fstats["preprocessing"]  = FStats();
@@ -316,7 +310,7 @@ namespace casadi {
 
     // We change method in crossover
     if (m->is_warm && qp_method_ == 7) {
-      (void)CPXsetintparam(m->env, CPX_PARAM_QPMETHOD, 1);
+      (void)CPXXsetintparam(m->env, CPX_PARAM_QPMETHOD, 1);
     }
 
     for (casadi_int i = 0; i < na_; ++i) {
@@ -345,39 +339,39 @@ namespace casadi {
     }
 
     // Copying objective, constraints, and bounds.
-    const int* matbeg = get_ptr(m->a_colind);
+    const casadi_int* matbeg = A_.colind();
     const int* matind = get_ptr(m->a_row);
 
     const double* matval = A;
     const double* obj = g;
     const double* lb = lbx;
     const double* ub = ubx;
-    if (CPXcopylp(m->env, m->lp, nx_, na_, m->objsen, obj, get_ptr(m->rhs), get_ptr(m->sense),
+    if (CPXXcopylp(m->env, m->lp, nx_, na_, m->objsen, obj, get_ptr(m->rhs), get_ptr(m->sense),
                   matbeg, get_ptr(m->matcnt), matind, matval, lb, ub, get_ptr(m->rngval))) {
-      casadi_error("CPXcopylp failed");
+      casadi_error("CPXXcopylp failed");
     }
 
     // Preparing coefficient matrix Q
-    const int* qmatbeg = get_ptr(m->h_colind);
+    const casadi_int* qmatbeg = H_.colind();
     const int* qmatind = get_ptr(m->h_row);
     const double* qmatval = H;
-    if (CPXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
+    if (CPXXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
     }
 
     if (dump_to_file_) {
-      CPXwriteprob(m->env, m->lp, dump_filename_.c_str(), "LP");
-      casadi_error("CPXwriteprob failed");
+      CPXXwriteprob(m->env, m->lp, dump_filename_.c_str(), "LP");
+      casadi_error("CPXXwriteprob failed");
     }
 
     // Warm-starting if possible
     if (qp_method_ != 0 && qp_method_ != 4 && m->is_warm) {
       // TODO(Joel): Initialize slacks and dual variables of bound constraints
-      if (CPXcopystart(m->env, m->lp, get_ptr(m->cstat), get_ptr(m->rstat), x, 0, 0, lam_x)) {
-        casadi_error("CPXcopystart failed");
+      if (CPXXcopystart(m->env, m->lp, get_ptr(m->cstat), get_ptr(m->rstat), x, 0, 0, lam_x)) {
+        casadi_error("CPXXcopystart failed");
       }
     } else {
-      if (CPXcopystart(m->env, m->lp, 0, 0, x, 0, 0, lam_x)) {
-        casadi_error("CPXcopystart failed");
+      if (CPXXcopystart(m->env, m->lp, 0, 0, x, 0, 0, lam_x)) {
+        casadi_error("CPXXcopystart failed");
       }
     }
 
@@ -388,34 +382,34 @@ namespace casadi {
 
     if (mip_) {
       // Pass type of variables
-      if (CPXcopyctype(m->env, m->lp, &ctype_[0])) {
-        casadi_error("CPXcopyctype failed");
+      if (CPXXcopyctype(m->env, m->lp, &ctype_[0])) {
+        casadi_error("CPXXcopyctype failed");
       }
 
       m->fstats.at("preprocessing").toc();
       m->fstats.at("solver").tic();
       // Optimize
-      if (CPXmipopt(m->env, m->lp)) {
-        casadi_error("CPXmipopt failed");
+      if (CPXXmipopt(m->env, m->lp)) {
+        casadi_error("CPXXmipopt failed");
       }
       m->fstats.at("solver").toc();
       m->fstats.at("postprocessing").tic();
 
       // Get objective value
-      if (CPXgetobjval(m->env, m->lp, &f)) {
-        casadi_error("CPXgetobjval failed");
+      if (CPXXgetobjval(m->env, m->lp, &f)) {
+        casadi_error("CPXXgetobjval failed");
       }
 
       // Get primal solution
-      casadi_int cur_numcols = CPXgetnumcols(m->env, m->lp);
-      if (CPXgetx(m->env, m->lp, x, 0, cur_numcols-1)) {
-        casadi_error("CPXgetx failed");
+      casadi_int cur_numcols = CPXXgetnumcols(m->env, m->lp);
+      if (CPXXgetx(m->env, m->lp, x, 0, cur_numcols-1)) {
+        casadi_error("CPXXgetx failed");
       }
 
       // Get slacks
-      casadi_int cur_numrows = CPXgetnumrows(m->env, m->lp);
-      if (CPXgetslack(m->env, m->lp, get_ptr(slack), 0, cur_numrows-1)) {
-        casadi_error("CPXgetslack failed");
+      casadi_int cur_numrows = CPXXgetnumrows(m->env, m->lp);
+      if (CPXXgetslack(m->env, m->lp, get_ptr(slack), 0, cur_numrows-1)) {
+        casadi_error("CPXXgetslack failed");
       }
 
       // Not a number as dual variables (not calculated with MIQP algorithm)
@@ -426,26 +420,26 @@ namespace casadi {
       m->fstats.at("preprocessing").toc();
       m->fstats.at("solver").tic();
       // Optimize
-      if (CPXqpopt(m->env, m->lp)) {
-        casadi_error("CPXqpopt failed");
+      if (CPXXqpopt(m->env, m->lp)) {
+        casadi_error("CPXXqpopt failed");
       }
       m->fstats.at("solver").toc();
       m->fstats.at("postprocessing").tic();
 
-      casadi_int problem_type = CPXgetprobtype(m->env, m->lp);
+      casadi_int problem_type = CPXXgetprobtype(m->env, m->lp);
 
       // The solver switched to a MIQP
       if (problem_type == CPXPROB_MIQP) {
 
           // Get objective value
-          if (CPXgetobjval(m->env, m->lp, &f)) {
-            casadi_error("CPXgetobjval failed");
+          if (CPXXgetobjval(m->env, m->lp, &f)) {
+            casadi_error("CPXXgetobjval failed");
           }
 
           // Get primal solution
-          casadi_int cur_numcols = CPXgetnumcols(m->env, m->lp);
-          if (CPXgetx(m->env, m->lp, x, 0, cur_numcols-1)) {
-            casadi_error("CPXgetx failed");
+          casadi_int cur_numcols = CPXXgetnumcols(m->env, m->lp);
+          if (CPXXgetx(m->env, m->lp, x, 0, cur_numcols-1)) {
+            casadi_error("CPXXgetx failed");
           }
 
           // Not a number as dual variables (not calculated with MIQP algorithm)
@@ -456,22 +450,22 @@ namespace casadi {
       } else {
 
           // Retrieving solution
-          if (CPXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x)) {
-            casadi_error("CPXsolution failed");
+          if (CPXXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x)) {
+            casadi_error("CPXXsolution failed");
           }
       }
     }
 
     // Retrieving the basis
     if (qp_method_ != 0 && qp_method_ != 4) {
-      (void)CPXgetbase(m->env, m->lp, get_ptr(m->cstat), get_ptr(m->rstat));
+      (void)CPXXgetbase(m->env, m->lp, get_ptr(m->cstat), get_ptr(m->rstat));
     }
 
     // Flip the sign of the multipliers
     casadi_scal(na_, -1., lam_a);
     casadi_scal(nx_, -1., lam_x);
 
-    casadi_int solnstat = CPXgetstat(m->env, m->lp);
+    casadi_int solnstat = CPXXgetstat(m->env, m->lp);
     stringstream errormsg;
     // NOTE: Why not print directly to uout() and uerr()?
     if (verbose_) {
@@ -499,7 +493,7 @@ namespace casadi {
 
       // Printing basis condition number
       //double cn;
-      //status = CPXgetdblquality(m->env, m->lp, &cn, CPX_KAPPA);
+      //status = CPXXgetdblquality(m->env, m->lp, &cn, CPX_KAPPA);
       //uout() << "CPLEX: Basis condition number: " << cn << endl;
     }
     if (solnstat != CPX_STAT_OPTIMAL) {
@@ -543,18 +537,18 @@ namespace casadi {
 
     // Only free if Cplex problem if it has been allocated
     if (this->lp!=0) {
-      status = CPXfreeprob(this->env, &this->lp);
+      status = CPXXfreeprob(this->env, &this->lp);
       if (status!=0) {
-        uerr() << "CPXfreeprob failed, error code " << status << ".\n";
+        uerr() << "CPXXfreeprob failed, error code " << status << ".\n";
       }
       this->lp = 0;
     }
 
     // Closing down license
     if (this->env!=0) {
-      status = CPXcloseCPLEX(&this->env);
+      status = CPXXcloseCPLEX(&this->env);
       if (status!=0) {
-        uerr() << "CPXcloseCPLEX failed, error code " << status << ".\n";
+        uerr() << "CPXXcloseCPLEX failed, error code " << status << ".\n";
       }
       this->env = 0;
     }

@@ -27,7 +27,7 @@
 
 #include "casadi/core/conic_impl.hpp"
 #include <casadi/interfaces/cplex/casadi_conic_cplex_export.h>
-#include "ilcplex/cplex.h"
+#include "ilcplex/cplexx.h"
 
 #include <string>
 
@@ -74,7 +74,7 @@ namespace casadi {
     CPXENVptr env;
     CPXLPptr lp;
 
-    std::vector<int> a_colind, a_row, h_colind, h_row;
+    std::vector<int> a_row, h_row;
 
     /// Constructor
     CplexMemory();
