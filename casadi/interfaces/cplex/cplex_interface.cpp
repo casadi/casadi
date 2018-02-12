@@ -260,10 +260,14 @@ namespace casadi {
     m->lp = CPXXcreateprob(m->env, &status, "QP from CasADi");
     casadi_assert(m->lp!=0, "CPXXcreateprob failed");
 
+    m->a_colind.resize(A_.size2()+1);
     m->a_row.resize(A_.nnz());
+    m->h_colind.resize(H_.size2()+1);
     m->h_row.resize(H_.nnz());
 
+    copy_vector(A_.colind(), m->a_colind);
     copy_vector(A_.row(), m->a_row);
+    copy_vector(H_.colind(), m->h_colind);
     copy_vector(H_.row(), m->h_row);
 
     m->fstats["preprocessing"]  = FStats();

@@ -75,6 +75,8 @@ namespace casadi {
     CPXLPptr lp;
 
     std::vector<int> a_row, h_row;
+    std::vector<CPXNNZ> a_colind, h_colind;
+
 
     /// Constructor
     CplexMemory();
