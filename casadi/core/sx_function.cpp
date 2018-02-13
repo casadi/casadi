@@ -805,6 +805,138 @@ namespace casadi {
                                   SX, SXNode>::is_a(type, recursive));
   }
 
+  Function SXFunction::deserialize(std::istream &stream) {
+
+    std::string name;
+    std::vector<Sparsity> sp_in, sp_out;
+    std::vector<std::string> names_in, names_out;
+    casadi_int sz_w, sz_iw;
+    deserialize_header(stream, name, sp_in, sp_out, names_in, names_out,
+        sz_w, sz_iw);
+
+    std::vector<SX> arg;
+    for (const Sparsity& e : sp_in) arg.push_back(SX::sym("x", e));
+
+    std::vector<SX> res;
+    for (const Sparsity& e : sp_out) res.push_back(SX::zeros(e));
+
+    std::vector<SXElem> w(sz_w);
+
+    char c;
+    stream >> c;
+    casadi_assert_dev(c=='a');
+    casadi_int n_instructions;
+    stream >> n_instructions;
+    for (casadi_int k=0;k<n_instructions;++k) {
+      stream >> c;
+      switch (c) {
+        case 'i':
+          {
+            casadi_int o; stream >> o; stream >> c;
+            casadi_int i1; stream >> i1; stream >> c;
+            casadi_int i2; stream >> i2;
+            w.at(o) = arg[i1].nonzeros()[i2];
+          }
+          break;
+        case 'o':
+          {
+            casadi_int i; stream >> i; stream >> c;
+            casadi_int o1; stream >> o1; stream >> c;
+            casadi_int o2; stream >> o2;
+            res[o1].nonzeros()[o2] = w.at(i);
+          }
+          break;
+        case 'c':
+          {
+            casadi_int o; stream >> o; stream >> c;
+            double d; stream >> d;
+            w.at(o) = d;
+          }
+          break;
+        case 'u':
+          {
+            casadi_int op; stream >> op; stream >> c;
+            casadi_int o; stream >> o; stream >> c;
+            casadi_int i; stream >> i;
+            w.at(o) = SXElem::unary(op, w.at(i));
+          }
+          break;
+        case 'b':
+          {
+            casadi_int op; stream >> op; stream >> c;
+            casadi_int o; stream >> o; stream >> c;
+            casadi_int i1; stream >> i1; stream >> c;
+            casadi_int i2; stream >> i2;
+            w.at(o) = SXElem::binary(op, w.at(i1), w.at(i2));
+
+          }
+          break;
+        default:
+          casadi_error("Not implemented");
+      }
+    }
+
+    return Function(name, arg, res, names_in, names_out);
+  }
+
+  void SXFunction::serialize(std::ostream &ss) const {
+    Function f = shared_from_this<Function>();
+
+    casadi_assert_dev(!f.has_free());
+
+    // SX Function identifier
+    ss << "S";
+
+    serialize_header(ss);
+
+    std::ios_base::fmtflags fmtfl = ss.flags();
+    ss << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+
+    ss << "a" << f.n_instructions();
+
+    for (casadi_int k=0;k<f.n_instructions();++k) {
+      // Get operation
+      casadi_int op = static_cast<casadi_int>(f.instruction_id(k));
+      // Get input positions into workvector
+      std::vector<casadi_int> o = f.instruction_output(k);
+      // Get output positions into workvector
+      std::vector<casadi_int> i = f.instruction_input(k);
+      switch (op) {
+        case OP_INPUT:
+          {
+            ss << "i" << o[0] << ":" << i[0] << ":" << i[1];
+          }
+          break;
+        case OP_OUTPUT:
+          {
+            ss << "o"  << i[0] << ":" << o[0] << ":" << o[1];
+          }
+          break;
+        case OP_CONST:
+          {
+            ss << "c" << o[0] << ":" << f.instruction_constant(k);
+          }
+          break;
+        default:
+          switch (casadi::casadi_math<double>::ndeps(op)) {
+            case 0:
+              casadi_error("Not implemented");
+              break;
+            case 1:
+              ss << "u" << op << ":" << o[0] << ":" << i[0];
+              break;
+            case 2:
+              ss << "b" << op << ":" << o[0] << ":" << i[0] << ":" <<  i[1];
+              break;
+            default:
+              casadi_error("Not implemented");
+          }
+
+      }
+    }
+    ss.flags(fmtfl);
+  }
+
   void SXFunction::export_code_body(const std::string& lang,
       std::ostream &ss, const Dict& options) const {
 

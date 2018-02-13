@@ -1614,6 +1614,31 @@ class Functiontests(casadiTestCase):
     self.check_codegen(f,inputs=[np.random.random((3,3))])
     self.check_codegen(f,inputs=[np.random.random((3,3))], opts={"avoid_stack": True})
   
+  def test_sx_serialize(self):
+    x = SX.sym("x")
+    y = x+3
+    z = sin(y)
+
+    f = Function('f',[x],[z])
+    fs = Function.deserialize(f.serialize())
+
+    self.checkfunction(f,fs,inputs=[2])
+
+    x = SX.sym("x")
+    y = SX.sym("y", Sparsity.lower(3))
+    z = x+y
+    z1 = sparsify(vertcat(z[0],0,z[1]))
+    z2 = z.T
+
+    f = Function('f',[x,y],[z1,z2,x**2],["x","y"],["a","b","c"])
+    fs = Function.deserialize(f.serialize())
+    
+    self.assertEqual(fs.name_in(0), "x")
+    self.assertEqual(fs.name_out(0), "a")
+    self.assertEqual(fs.name(), "f")
+
+    self.checkfunction(f,fs,inputs=[3.7,np.array([[1,0,0],[2,3,0],[4,5,6]])],hessian=False)
+
 
 if __name__ == '__main__':
     unittest.main()

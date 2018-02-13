@@ -678,6 +678,14 @@ namespace casadi {
     void export_code(const std::string& lang,
       const std::string &fname, const Dict& options=Dict()) const;
 
+#ifndef SWIG
+    /** \brief Serialize */
+    void serialize(std::ostream &stream) const;
+#endif
+
+    /** \brief Serialize */
+    std::string serialize() const;
+
     std::string export_code(const std::string& lang, const Dict& options=Dict()) const;
 #ifndef SWIG
     void export_code(const std::string& lang,
@@ -844,6 +852,12 @@ namespace casadi {
      * consecutive undercores are dropped
      */
     static std::string fix_name(const std::string& name);
+
+    /** \brief Build function from serialization */
+    static Function deserialize(std::istream& istream);
+
+    /** \brief Build function from serialization */
+    static Function deserialize(const std::string& s);
 
     /// Assert that an input dimension is equal so some given value
     void assert_size_in(casadi_int i, casadi_int nrow, casadi_int ncol) const;

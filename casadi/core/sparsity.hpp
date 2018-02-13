@@ -335,6 +335,20 @@ namespace casadi {
     static Sparsity from_info(const Dict& info);
 
 #ifndef SWIG
+    /** \brief Serialize */
+    void serialize(std::ostream &stream) const;
+#endif
+
+    /** \brief Serialize */
+    std::string serialize() const;
+
+    /** \brief Build Sparsity from serialization */
+    static Sparsity deserialize(std::istream& istream);
+
+    /** \brief Build Sparsity from serialization */
+    static Sparsity deserialize(const std::string& s);
+
+#ifndef SWIG
     /** \brief Get a reference to row-vector,
      * containing rows for all non-zero elements (see class description) */
     const casadi_int* row() const;
