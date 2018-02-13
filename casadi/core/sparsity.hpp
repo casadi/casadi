@@ -841,6 +841,12 @@ namespace casadi {
     /// Check if a particular cast is allowed
     static bool test_cast(const SharedObjectInternal* ptr);
 
+    /** \brief Get KKT system sparsity
+     * [H + I1, J'; J, I2] where I1 and I2 are optional
+     */
+    static Sparsity kkt(const Sparsity& H, const Sparsity& J,
+                        bool with_x_diag=true, bool with_lam_g_diag=true);
+
 #ifndef SWIG
     /** \brief Assign the nonzero entries of one sparsity pattern to the nonzero
      * entries of another sparsity pattern */

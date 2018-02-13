@@ -1731,4 +1731,22 @@ namespace casadi {
     }
     return Sparsity(nrow, ncol, colind, row);
   }
+
+  Sparsity Sparsity::kkt(const Sparsity& H, const Sparsity& J,
+                         bool with_x_diag, bool with_lam_g_diag) {
+    // Consistency check
+    casadi_assert(H.is_square(), "H must be square");
+    casadi_assert(H.size1() == J.size2(), "Dimension mismatch");
+
+    // Add diagonal to H recursively
+    if (with_x_diag) return kkt(H + diag(H.size()), J, false, with_lam_g_diag);
+
+    // Lower right entry
+    int ng = J.size1();
+    Sparsity B = with_lam_g_diag ? diag(ng, ng) : Sparsity(ng, ng);
+
+    // Concatenate
+    return blockcat({{H, J.T()}, {J, B}});
+  }
+
 } // namespace casadi
