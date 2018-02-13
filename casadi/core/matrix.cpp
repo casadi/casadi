@@ -1349,7 +1349,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  size_t Matrix<Scalar>::element_hash() const {
+  casadi_int Matrix<Scalar>::element_hash() const {
     casadi_error("'element_hash' not defined for " + type_name());
   }
 
@@ -2836,7 +2836,7 @@ namespace casadi {
   }
 
   template<>
-  size_t SX::element_hash() const {
+  casadi_int SX::element_hash() const {
     return scalar().__hash__();
   }
 

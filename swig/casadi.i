@@ -3997,13 +3997,16 @@ namespace casadi {
 namespace casadi {
   %extend GenericExpressionCommon {
     %pythoncode %{
-      def __hash__(self): return SharedObject.__hash__(self)
+      def __hash__(self):
+        try:
+          return self.element_hash()
+        except:
+          return SharedObject.__hash__(self)
       def __matmul__(x, y): return _casadi.mtimes(x, y)
       def __rmatmul__(x, y): return _casadi.mtimes(y, x)
     %}
   }
 }
-%rename(__hash__) element_hash;
 #endif
 namespace casadi {
   %extend GenericExpressionCommon {

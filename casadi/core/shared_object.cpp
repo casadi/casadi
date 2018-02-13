@@ -122,8 +122,8 @@ namespace casadi {
     return (*this)->weak();
   }
 
-  size_t SharedObject::__hash__() const {
-    return reinterpret_cast<size_t>(get());
+  casadi_int SharedObject::__hash__() const {
+    return reinterpret_cast<casadi_int>(get());
   }
 
   WeakRef::WeakRef(int dummy) {

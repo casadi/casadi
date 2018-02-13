@@ -509,8 +509,8 @@ namespace casadi {
     return node->n_dep();
   }
 
-  size_t SXElem::__hash__() const {
-    return reinterpret_cast<size_t>(node);
+  casadi_int SXElem::__hash__() const {
+    return reinterpret_cast<casadi_int>(node);
   }
 
   // node corresponding to a constant 0

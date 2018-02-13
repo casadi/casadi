@@ -46,7 +46,7 @@ namespace casadi {
   template<> std::string SX::name() const;
   template<> void SX::set_max_depth(casadi_int eq_depth);
   template<> casadi_int SX::get_max_depth();
-  template<> size_t SX::element_hash() const;
+  template<> casadi_int SX::element_hash() const;
   template<> void SX::expand(const SX& f, SX& weights, SX& terms);
   template<> SX SX::pw_const(const SX& t, const SX& tval, const SX& val);
   template<> SX SX::pw_lin(const SX& t, const SX &tval, const SX &val);

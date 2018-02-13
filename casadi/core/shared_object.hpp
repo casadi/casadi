@@ -147,7 +147,7 @@ namespace casadi {
     /** \brief Returns a number that is unique for a given Node.
      * If the Object does not point to any node, "0" is returned.
      */
-    size_t __hash__() const;
+    casadi_int __hash__() const;
 
 /// \cond INTERNAL
 #ifndef SWIG

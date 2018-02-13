@@ -896,7 +896,7 @@ namespace casadi {
      *
      * Only defined if symbolic scalar.
      */
-    size_t element_hash() const;
+    casadi_int element_hash() const;
 
     /// Checks if expression does not contain NaN or Inf
     bool is_regular() const;
