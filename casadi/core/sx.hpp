@@ -38,6 +38,7 @@ namespace casadi {
   template<> bool SX::is_symbolic() const;
   template<> bool SX::is_valid_input() const;
   template<> bool SX::has_duplicates() const;
+  template<> bool SX::is_op(casadi_int op) const;
   template<> casadi_int SX::op() const;
   template<> void SX::reset_input() const;
   template<> SX SX::dep(casadi_int ch) const;

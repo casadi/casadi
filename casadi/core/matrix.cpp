@@ -1374,6 +1374,11 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  bool Matrix<Scalar>::is_op(casadi_int k) const {
+    casadi_error("'is_op' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
   void Matrix<Scalar>::export_code(const std::string& lang,
        std::ostream &stream, const Dict& options) const {
     casadi_error("'export_code' not defined for " + type_name());
@@ -2857,6 +2862,11 @@ namespace casadi {
   template<>
   casadi_int SX::op() const {
     return scalar().op();
+  }
+
+  template<>
+  bool SX::is_op(casadi_int op) const {
+    return scalar().is_op(op);
   }
 
   template<>

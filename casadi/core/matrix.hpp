@@ -962,6 +962,9 @@ namespace casadi {
     /// Get operation type
     casadi_int op() const;
 
+    /// Is it a certain operation
+    bool is_op(casadi_int op) const;
+
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool has_zeros() const;
 
