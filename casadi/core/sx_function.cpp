@@ -48,7 +48,6 @@ namespace casadi {
                          const vector<std::string>& name_in,
                          const vector<std::string>& name_out)
     : XFunction<SXFunction, SX, SXNode>(name, inputv, outputv, name_in, name_out) {
-    casadi_assert_dev(!out_.empty()); // NOTE: Remove?
 
     // Default (persistent) options
     just_in_time_opencl_ = false;
