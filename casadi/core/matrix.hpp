@@ -959,6 +959,9 @@ namespace casadi {
      * are possible)*/
     bool is_eye() const;
 
+    /// Get operation type
+    casadi_int op() const;
+
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool has_zeros() const;
 
