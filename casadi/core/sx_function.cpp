@@ -807,26 +807,28 @@ namespace casadi {
 
   Function SXFunction::deserialize(std::istream &stream) {
 
+    // Read in information from header
     std::string name;
     std::vector<Sparsity> sp_in, sp_out;
     std::vector<std::string> names_in, names_out;
     casadi_int sz_w, sz_iw;
-    deserialize_header(stream, name, sp_in, sp_out, names_in, names_out,
-        sz_w, sz_iw);
+    deserialize_header(stream, name, sp_in, sp_out, names_in, names_out, sz_w, sz_iw);
 
+    // Create symbolic inputs
     std::vector<SX> arg;
     for (const Sparsity& e : sp_in) arg.push_back(SX::sym("x", e));
 
+    // Allocate space for outputs
     std::vector<SX> res;
     for (const Sparsity& e : sp_out) res.push_back(SX::zeros(e));
 
+    // Allocate work vector
     std::vector<SXElem> w(sz_w);
 
     char c;
-    stream >> c;
-    casadi_assert_dev(c=='a');
-    casadi_int n_instructions;
-    stream >> n_instructions;
+    // Start of algorithm
+    stream >> c; casadi_assert_dev(c=='a');
+    casadi_int n_instructions; stream >> n_instructions;
     for (casadi_int k=0;k<n_instructions;++k) {
       stream >> c;
       switch (c) {
@@ -887,11 +889,14 @@ namespace casadi {
     // SX Function identifier
     ss << "S";
 
+    // Header information
     serialize_header(ss);
 
+    // Make sure doubles are output exactly
     std::ios_base::fmtflags fmtfl = ss.flags();
     ss << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 
+    // Start of algorithm
     ss << "a" << f.n_instructions();
 
     for (casadi_int k=0;k<f.n_instructions();++k) {
@@ -903,19 +908,13 @@ namespace casadi {
       std::vector<casadi_int> i = f.instruction_input(k);
       switch (op) {
         case OP_INPUT:
-          {
-            ss << "i" << o[0] << ":" << i[0] << ":" << i[1];
-          }
+          ss << "i" << o[0] << ":" << i[0] << ":" << i[1];
           break;
         case OP_OUTPUT:
-          {
-            ss << "o"  << i[0] << ":" << o[0] << ":" << o[1];
-          }
+          ss << "o"  << i[0] << ":" << o[0] << ":" << o[1];
           break;
         case OP_CONST:
-          {
-            ss << "c" << o[0] << ":" << f.instruction_constant(k);
-          }
+          ss << "c" << o[0] << ":" << f.instruction_constant(k);
           break;
         default:
           switch (casadi::casadi_math<double>::ndeps(op)) {

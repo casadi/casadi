@@ -1740,6 +1740,7 @@ namespace casadi {
       stream << ":" << row()[i];
     for (int i=0;i<size2()+1;++i)
       stream << ":" << colind()[i];
+    stream << "s";
   }
 
   Sparsity Sparsity::deserialize(std::istream &stream) {
@@ -1759,6 +1760,7 @@ namespace casadi {
       stream >> ch;
       stream >> colind[i];
     }
+    stream >> ch;
     return Sparsity(nrow, ncol, colind, row);
   }
 
