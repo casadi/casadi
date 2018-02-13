@@ -1534,6 +1534,9 @@
 %exception  casadi::SX::name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SX::op() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SX::print_split(std::vector< std::string > &output_nz, std::vector< std::string > &output_inter) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

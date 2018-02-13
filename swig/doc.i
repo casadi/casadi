@@ -41937,6 +41937,12 @@ Functions called by friend functions defined here
 
 ";
 
+%feature("docstring")  casadi::SX::op() const  "
+
+[INTERNAL]  Get operation type.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
 >::sparsity() const "
 

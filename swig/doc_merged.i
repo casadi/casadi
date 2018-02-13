@@ -29803,6 +29803,10 @@ Functions called by friend functions defined here
 
 ";
 
+%feature("docstring") casadi::Matrix::op "[INTERNAL]  Get operation type.
+
+";
+
 %feature("docstring") casadi::Matrix::sparsity "
 
 Get the sparsity pattern.
