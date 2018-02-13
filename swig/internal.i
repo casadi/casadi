@@ -1516,6 +1516,9 @@
 %exception  casadi::SX::is_leaf() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SX::is_op(casadi_int op) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SX::is_regular() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

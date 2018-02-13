@@ -29774,6 +29774,11 @@ Check if the matrix is upper triangular.
 
 ";
 
+%feature("docstring") casadi::Matrix::is_op "[INTERNAL]  Is it a certain
+operation.
+
+";
+
 %feature("docstring") friendwrap_all "
 
 Returns true only if every element in the matrix is true.

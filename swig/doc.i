@@ -41897,6 +41897,12 @@ Check if the matrix is upper triangular.
 
 ";
 
+%feature("docstring")  casadi::SX::is_op(casadi_int op) const  "
+
+[INTERNAL]  Is it a certain operation.
+
+";
+
 %feature("docstring")  all(const Matrix< Scalar > &x) "
 
 Returns true only if every element in the matrix is true.
