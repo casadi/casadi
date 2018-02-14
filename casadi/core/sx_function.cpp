@@ -851,7 +851,8 @@ namespace casadi {
         case 'c':
           {
             casadi_int o; stream >> o; stream >> c;
-            double d; stream >> d;
+            casadi_int b; stream >> b;
+            const double& d = reinterpret_cast<double&>(b);
             w.at(o) = d;
           }
           break;
@@ -874,7 +875,7 @@ namespace casadi {
           }
           break;
         default:
-          casadi_error("Not implemented");
+          casadi_error("Not implemented" + str(c));
       }
     }
 
@@ -884,7 +885,7 @@ namespace casadi {
   void SXFunction::serialize(std::ostream &ss) const {
     Function f = shared_from_this<Function>();
 
-    casadi_assert(!f.has_free(), "Cannot serialize SXFunction with free parameters");
+    casadi_assert(!f.has_free(), "Cannot serialize SXFunction with free parameters.");
 
     // SX Function identifier
     ss << "S";
@@ -914,7 +915,11 @@ namespace casadi {
           ss << "o"  << i[0] << ":" << o[0] << ":" << o[1];
           break;
         case OP_CONST:
-          ss << "c" << o[0] << ":" << f.instruction_constant(k);
+          {
+            double v = f.instruction_constant(k);
+            const casadi_int& b = reinterpret_cast<casadi_int&>(v);
+            ss << "c" << o[0] << ":" << b;
+          }
           break;
         default:
           switch (casadi::casadi_math<double>::ndeps(op)) {

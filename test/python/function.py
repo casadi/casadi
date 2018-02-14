@@ -1615,6 +1615,7 @@ class Functiontests(casadiTestCase):
     self.check_codegen(f,inputs=[np.random.random((3,3))])
     self.check_codegen(f,inputs=[np.random.random((3,3))], opts={"avoid_stack": True})
   
+
   def test_sx_serialize(self):
     x = SX.sym("x")
     y = x+3
@@ -1622,6 +1623,18 @@ class Functiontests(casadiTestCase):
 
     f = Function('f',[x],[z])
     fs = Function.deserialize(f.serialize())
+
+    self.checkfunction(f,fs,inputs=[2])
+
+    x = SX.sym("x")
+    y = x+3
+    z = sin(y)
+
+    f = Function('f',[x],[z,np.nan,-np.inf,np.inf])
+    print f.serialize()
+    fs = Function.deserialize(f.serialize())
+
+    print fs(0)
 
     self.checkfunction(f,fs,inputs=[2])
 
@@ -1658,6 +1671,7 @@ class Functiontests(casadiTestCase):
 
     with self.assertInException("'serialize' not defined for MXFunction"):
       pickle.loads(pickle.dumps(f))
+
 
 
 if __name__ == '__main__':
