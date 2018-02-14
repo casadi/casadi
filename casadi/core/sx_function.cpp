@@ -884,7 +884,7 @@ namespace casadi {
   void SXFunction::serialize(std::ostream &ss) const {
     Function f = shared_from_this<Function>();
 
-    casadi_assert_dev(!f.has_free());
+    casadi_assert(!f.has_free(), "Cannot serialize SXFunction with free parameters");
 
     // SX Function identifier
     ss << "S";

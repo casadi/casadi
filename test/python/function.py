@@ -27,6 +27,7 @@ import numpy
 import unittest
 from types import *
 from helpers import *
+import pickle
 
 scipy_interpolate = False
 try:
@@ -1638,6 +1639,25 @@ class Functiontests(casadiTestCase):
     self.assertEqual(fs.name(), "f")
 
     self.checkfunction(f,fs,inputs=[3.7,np.array([[1,0,0],[2,3,0],[4,5,6]])],hessian=False)
+
+
+    fs = pickle.loads(pickle.dumps(f))
+    self.checkfunction(f,fs,inputs=[3.7,np.array([[1,0,0],[2,3,0],[4,5,6]])],hessian=False)
+
+    x = SX.sym("x")
+    p = SX.sym("p")
+
+    f = Function('f',[x],[p])
+
+    with self.assertInException("Cannot serialize SXFunction with free parameters"):
+      pickle.loads(pickle.dumps(f))
+
+
+    x = MX.sym("x")
+    f = Function('f',[x],[x**2])
+
+    with self.assertInException("'serialize' not defined for MXFunction"):
+      pickle.loads(pickle.dumps(f))
 
 
 if __name__ == '__main__':
