@@ -1750,13 +1750,15 @@ namespace casadi {
   }
 
   void Sparsity::serialize(std::ostream &stream) const {
+    casadi_int size1=this->size1(), size2=this->size2(), nnz=this->nnz();
+    const casadi_int *colind = this->colind(), *row = this->row();
     stream << "sp";
-    stream << size1() << "x" << size2();
-    stream << "n" << nnz();
-    for (int i=0;i<nnz();++i)
-      stream << ":" << row()[i];
-    for (int i=0;i<size2()+1;++i)
-      stream << ":" << colind()[i];
+    stream << size1 << "x" << size2;
+    stream << "n" << nnz;
+    for (int i=0; i<nnz; ++i)
+      stream << ":" << row[i];
+    for (int i=0; i<size2+1; ++i)
+      stream << ":" << colind[i];
     stream << "s";
   }
 
@@ -1769,11 +1771,11 @@ namespace casadi {
     stream >> ncol; stream >> ch;
     stream >> nnz;
     std::vector<casadi_int> row(nnz), colind(ncol+1);
-    for (int i=0;i<nnz;++i) {
+    for (int i=0; i<nnz; ++i){
       stream >> ch;
       stream >> row[i];
     }
-    for (int i=0;i<ncol+1;++i) {
+    for (int i=0; i<ncol+1; ++i) {
       stream >> ch;
       stream >> colind[i];
     }
