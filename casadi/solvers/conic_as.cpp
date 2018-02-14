@@ -68,7 +68,7 @@ namespace casadi {
     Conic::init(opts);
 
     // Default options
-    string nlpsol_plugin;
+    string nlpsol_plugin = "ipopt";
     Dict nlpsol_options;
 
     // Read user options
@@ -80,108 +80,102 @@ namespace casadi {
       }
     }
 
-    // Create a symbolic matrix for the decision variables
-    SX X = SX::sym("X", nx_, 1);
+    // Assemble KKT system sparsity
+    kkt_ = Sparsity::kkt(H_, A_);
+    AT_ = A_.T();
 
-    // Parameters to the problem
-    SX H = SX::sym("H", H_);
-    SX G = SX::sym("G", nx_);
-    SX A = SX::sym("A", A_);
+    // Allocate memory
+    alloc_w(kkt_.nnz(), true); // kkt
+    alloc_w(nx_, true); // xk
+    alloc_w(nx_, true); // lam_xk
+    alloc_w(na_, true); // lam_ak
+    alloc_w(A_.nnz()); // trans(A)
+    alloc_iw(na_); // casadi_trans
+  }
 
-    // Put parameters in a vector
-    std::vector<SX> par;
-    par.push_back(H.nonzeros());
-    par.push_back(G.nonzeros());
-    par.push_back(A.nonzeros());
+  template<typename T1>
+  void casadi_set_sub(const T1* y, T1* x, const casadi_int* sp_x,
+                      casadi_int rbeg, casadi_int rend,
+                      casadi_int cbeg, casadi_int cend) {
+    // Local variables
+    casadi_int r, c, k;
+    // Get sparsities
+    casadi_int nrow=sp_x[0], ncol=sp_x[1];
+    const casadi_int *colind=sp_x+2, *row=sp_x+2+ncol+1;
+    // Set elements in subblock
+    for (c=cbeg; c<cend; ++c) {
+      for (k=colind[c]; k<colind[c+1] && (r=row[k])<rend; ++k) {
+        if (r>=rbeg) x[k] = *y++;
+      }
+    }
+  }
 
-    // The nlp looks exactly like a mathematical description of the NLP
-    SXDict nlp = {{"x", X}, {"p", vertcat(par)},
-                  {"f", mtimes(G.T(), X) + 0.5*mtimes(mtimes(X.T(), H), X)},
-                  {"g", mtimes(A, X)}};
-
-    // Create an Nlpsol instance
-    casadi_assert(!nlpsol_plugin.empty(), "'nlpsol' option has not been set");
-    solver_ = nlpsol("nlpsol", nlpsol_plugin, nlp, nlpsol_options);
-    alloc(solver_);
-
-    // Allocate storage for NLP solver  parameters
-    alloc_w(solver_.nnz_in(NLPSOL_P), true);
+  template<typename T1>
+  void casadi_fill_sub(T1 y, T1* x, const casadi_int* sp_x,
+                      casadi_int rbeg, casadi_int rend,
+                      casadi_int cbeg, casadi_int cend) {
+    // Local variables
+    casadi_int r, c, k;
+    // Get sparsities
+    casadi_int nrow=sp_x[0], ncol=sp_x[1];
+    const casadi_int *colind=sp_x+2, *row=sp_x+2+ncol+1;
+    // Set elements in subblock
+    for (c=cbeg; c<cend; ++c) {
+      for (k=colind[c]; k<colind[c+1] && (r=row[k])<rend; ++k) {
+        if (r>=rbeg) x[k] = y;
+      }
+    }
   }
 
   int ConicAs::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    // Inputs
-    const double *h_, *g_, *a_, *lba_, *uba_, *lbx_, *ubx_, *x0_;
-    // Outputs
-    double *x_, *f_, *lam_a_, *lam_x_;
-
     // Get input pointers
-    h_ = arg[CONIC_H];
-    g_ = arg[CONIC_G];
-    a_ = arg[CONIC_A];
-    lba_ = arg[CONIC_LBA];
-    uba_ = arg[CONIC_UBA];
-    lbx_ = arg[CONIC_LBX];
-    ubx_ = arg[CONIC_UBX];
-    x0_ = arg[CONIC_X0];
+    const double *h, *g, *a, *lba, *uba, *lbx, *ubx, *x0, *lam_x0, *lam_a0;
+    h = arg[CONIC_H];
+    g = arg[CONIC_G];
+    a = arg[CONIC_A];
+    lba = arg[CONIC_LBA];
+    uba = arg[CONIC_UBA];
+    lbx = arg[CONIC_LBX];
+    ubx = arg[CONIC_UBX];
+    x0 = arg[CONIC_X0];
+    lam_x0 = arg[CONIC_LAM_X0];
+    lam_a0 = arg[CONIC_LAM_A0];
 
     // Get output pointers
-    x_ = res[CONIC_X];
-    f_ = res[CONIC_COST];
-    lam_a_ = res[CONIC_LAM_A];
-    lam_x_ = res[CONIC_LAM_X];
+    double *x, *f, *lam_a, *lam_x;
+    x = res[CONIC_X];
+    f = res[CONIC_COST];
+    lam_a = res[CONIC_LAM_A];
+    lam_x = res[CONIC_LAM_X];
 
-    // Buffers for calling the NLP solver
-    const double** arg1 = arg + n_in_;
-    double** res1 = res + n_out_;
-    fill_n(arg1, static_cast<casadi_int>(NLPSOL_NUM_IN), nullptr);
-    fill_n(res1, static_cast<casadi_int>(NLPSOL_NUM_OUT), nullptr);
+    // Work vectors
+    double *kkt, *xk, *lam_xk, *lam_ak;
+    kkt = w; w += kkt_.nnz();
+    xk = w; w += nx_;
+    lam_xk = w; w += nx_;
+    lam_ak = w; w += na_;
 
-    // NLP inputs
-    arg1[NLPSOL_X0] = x0_;
-    arg1[NLPSOL_LBG] = lba_;
-    arg1[NLPSOL_UBG] = uba_;
-    arg1[NLPSOL_LBX] = lbx_;
-    arg1[NLPSOL_UBX] = ubx_;
+    // Pass initial guess
+    casadi_copy(x0, nx_, xk);
+    casadi_copy(lam_x0, nx_, lam_xk);
+    casadi_copy(lam_a0, na_, lam_ak);
 
-    // NLP parameters
-    arg1[NLPSOL_P] = w;
+    // Copy A' to w
+    casadi_trans(a, A_, w, AT_, iw);
 
-    // Quadratic term
-    casadi_int nh = nnz_in(CONIC_H);
-    if (h_) {
-      copy_n(h_, nh, w);
-    } else {
-      fill_n(w, nh, 0);
-    }
-    w += nh;
+    // Assemble the KKT matrix
+    casadi_set_sub(h, kkt, kkt_, 0, nx_, 0, nx_); // h
+    casadi_set_sub(a, kkt, kkt_, nx_, nx_+na_, 0, nx_); // a
+    casadi_set_sub(w, kkt, kkt_, 0, nx_, nx_, nx_+na_); // a'
+    casadi_fill_sub(0., kkt, kkt_, nx_, nx_+na_, nx_, nx_+na_); // 0
 
-    // Linear objective term
-    casadi_int ng = nnz_in(CONIC_G);
-    if (g_) {
-      copy_n(g_, ng, w);
-    } else {
-      fill_n(w, ng, 0);
-    }
-    w += ng;
+    // Get solution
+    casadi_copy(xk, nx_, x);
+    casadi_copy(lam_xk, nx_, lam_x);
+    casadi_copy(lam_ak, na_, lam_a);
 
-    // Linear constraints
-    casadi_int na = nnz_in(CONIC_A);
-    if (a_) {
-      copy_n(a_, na, w);
-    } else {
-      fill_n(w, na, 0);
-    }
-    w += na;
-
-    // Solution
-    res1[NLPSOL_X] = x_;
-    res1[NLPSOL_F] = f_;
-    res1[NLPSOL_LAM_X] = lam_x_;
-    res1[NLPSOL_LAM_G] = lam_a_;
-
-    // Solve the NLP
-    return solver_(arg1, res1, iw, w, 0);
+    return 1;
   }
 
 } // namespace casadi
