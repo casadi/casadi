@@ -211,6 +211,11 @@ Sparsities of function inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::BackwardDiff::serialize_header "[INTERNAL]
+Serialize function header.
+
+";
+
 %feature("docstring") casadi::BackwardDiff::getJacSparsityHierarchicalSymm "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition for symmetric Jacobians
 
@@ -259,6 +264,11 @@ Replace 0-by-0 forward seeds.
 ";
 
 %feature("docstring") casadi::BackwardDiff::factory "[INTERNAL] ";
+
+%feature("docstring") casadi::BackwardDiff::serialize "[INTERNAL]
+Serialize.
+
+";
 
 %feature("docstring") casadi::BackwardDiff::set_work "[INTERNAL]  Set the
 (persistent) work vectors.
@@ -1205,6 +1215,11 @@ Codegen sparsities.
 
 %feature("docstring") casadi::Blocksqp::sprint "[INTERNAL]  C-style
 formatted printing to string.
+
+";
+
+%feature("docstring") casadi::Blocksqp::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -2212,6 +2227,10 @@ function have free variables.
 
 %feature("docstring") casadi::Blocksqp::updateDeltaGamma "[INTERNAL] ";
 
+%feature("docstring") casadi::Blocksqp::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::Blocksqp::free_mx "[INTERNAL]  Get free
 variables ( MX)
 
@@ -3075,6 +3094,11 @@ DM matrices.
 
 ";
 
+%feature("docstring") casadi::BSpline::serialize_header "[INTERNAL]
+Serialize function header.
+
+";
+
 %feature("docstring") casadi::BSpline::has_sprev "[INTERNAL]  Is the class
 able to propagate seeds through the algorithm?
 
@@ -3321,6 +3345,10 @@ dimensions of inputs and outputs.
 
 %feature("docstring") casadi::BSpline::codegen_decref "[INTERNAL]  Codegen
 decref for dependencies.
+
+";
+
+%feature("docstring") casadi::BSpline::serialize "[INTERNAL]  Serialize.
 
 ";
 
@@ -4394,6 +4422,11 @@ class able to propagate seeds through the algorithm?
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::serialize "[INTERNAL]
+Serialize.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::fwdViaJac "[INTERNAL]
 Calculate derivatives by multiplying the full Jacobian and multiplying.
 
@@ -4620,6 +4653,11 @@ Replace 0-by-0 outputs.
 
 %feature("docstring") casadi::BSplineCommon::alloc_res "[INTERNAL]  Ensure
 required length of res field.
+
+";
+
+%feature("docstring") casadi::BSplineCommon::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -5023,6 +5061,11 @@ of function input and outputs.
 
 %feature("docstring") casadi::BSplineDual::set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::BSplineDual::serialize "[INTERNAL]
+Serialize.
 
 ";
 
@@ -5493,6 +5536,11 @@ Function instance consisting of only one MX call.
 
 ";
 
+%feature("docstring") casadi::BSplineDual::serialize_header "[INTERNAL]
+Serialize function header.
+
+";
+
 %feature("docstring") casadi::BSplineDual::get_max_in "[INTERNAL]  Get
 largest input value.
 
@@ -5953,6 +6001,11 @@ Input/output sparsity.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::serialize "[INTERNAL]
+Serialize.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::instruction_id "[INTERNAL]  Get an atomic operation operator index.
 
 ";
@@ -6289,6 +6342,10 @@ Full Jacobian.
 
 %feature("docstring") casadi::BSplineInterpolant::sz_res "[INTERNAL]  Get
 required length of res field.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::serialize_header "[INTERNAL]  Serialize function header.
 
 ";
 
@@ -7145,6 +7202,12 @@ Allocate work vectors.
 
 ";
 
+%feature("docstring") casadi::Callback::serialize "
+
+Serialize.
+
+";
+
 %feature("docstring") casadi::Callback::size1_out "
 
 Get output dimension.
@@ -7660,8 +7723,8 @@ Extract the functions needed for the Lifted Newton method.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::symbolicAdjSeed "[INTERNAL]
-Symbolic expressions for the adjoint seeds.
+%feature("docstring") casadi::CentralDiff::serialize "[INTERNAL]
+Serialize.
 
 ";
 
@@ -7755,6 +7818,11 @@ with symbolic scalars.
 
 %feature("docstring") casadi::CentralDiff::has_jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::CentralDiff::symbolicAdjSeed "[INTERNAL]
+Symbolic expressions for the adjoint seeds.
 
 ";
 
@@ -8367,6 +8435,11 @@ codegen supported?
 
 %feature("docstring") casadi::CentralDiff::print "[INTERNAL]  C-style
 formatted printing during evaluation.
+
+";
+
+%feature("docstring") casadi::CentralDiff::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -9091,6 +9164,11 @@ explicit dynamics (backward problem)
 
 ";
 
+%feature("docstring") casadi::Collocation::serialize_header "[INTERNAL]
+Serialize function header.
+
+";
+
 %feature("docstring") casadi::Collocation::setupFG "[INTERNAL]  Setup F and
 G.
 
@@ -9189,6 +9267,11 @@ memory object.
 
 %feature("docstring") casadi::Collocation::alloc_res "[INTERNAL]  Ensure
 required length of res field.
+
+";
+
+%feature("docstring") casadi::Collocation::serialize "[INTERNAL]
+Serialize.
 
 ";
 
@@ -10203,6 +10286,10 @@ to the object.
 
 ";
 
+%feature("docstring") casadi::Conic::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::Conic::index_in "[INTERNAL]  Get input scheme
 index by name.
 
@@ -10252,6 +10339,11 @@ function input and outputs.
 function that calculates adjoint derivatives reverse(nadj) returns a cached
 instance if available, and calls  Function get_reverse(casadi_int nadj) if
 no cached version is available.
+
+";
+
+%feature("docstring") casadi::Conic::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -12615,8 +12707,17 @@ of the internal class.
 
 ";
 
+%feature("docstring") casadi::Dple::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::Dple::matching_arg "[INTERNAL]  Check if
 input arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::Dple::serialize_header "[INTERNAL]  Serialize
+function header.
 
 ";
 
@@ -13222,6 +13323,10 @@ input value.
 
 ";
 
+%feature("docstring") casadi::Expm::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::Expm::size_out "[INTERNAL]  Input/output
 dimensions.
 
@@ -13497,6 +13602,11 @@ overloaded.
 
 ";
 
+%feature("docstring") casadi::Expm::release "[INTERNAL]  Release a memory
+object.
+
+";
+
 %feature("docstring") casadi::Expm::generate_dependencies "[INTERNAL]
 Export / Generate C code for the dependency function.
 
@@ -13527,8 +13637,8 @@ expressions for the adjoint seeds.
 
 ";
 
-%feature("docstring") casadi::Expm::release "[INTERNAL]  Release a memory
-object.
+%feature("docstring") casadi::Expm::serialize_header "[INTERNAL]  Serialize
+function header.
 
 ";
 
@@ -13888,6 +13998,10 @@ dimensions of inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::External::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::External::replace_res "[INTERNAL]  Replace
 0-by-0 outputs.
 
@@ -14109,6 +14223,11 @@ Get the floating point output argument of an atomic operation.
 
 %feature("docstring") casadi::External::instruction_id "[INTERNAL]  Get an
 atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::External::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -14609,6 +14728,10 @@ input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::FiniteDiff::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::FiniteDiff::matching_res "[INTERNAL]  Check
 if output arguments that needs to be replaced.
 
@@ -14934,6 +15057,11 @@ function, overloaded.
 
 %feature("docstring") casadi::FiniteDiff::has_sprev "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::FiniteDiff::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -15912,6 +16040,10 @@ Readable name of the internal class.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::symbolicAdjSeed "[INTERNAL]  Symbolic expressions for the adjoint seeds.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::setupFG "[INTERNAL]
 Setup F and G.
 
@@ -16141,7 +16273,8 @@ Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::symbolicAdjSeed "[INTERNAL]  Symbolic expressions for the adjoint seeds.
+%feature("docstring") casadi::FixedStepIntegrator::serialize "[INTERNAL]
+Serialize.
 
 ";
 
@@ -16212,6 +16345,10 @@ Get input scheme index by name.
 
 %feature("docstring") casadi::FixedStepIntegrator::check_res "[INTERNAL]
 Check if output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::serialize_header "[INTERNAL]  Serialize function header.
 
 ";
 
@@ -16472,6 +16609,11 @@ Display object.
 
 
 // File: classcasadi_1_1ForwardDiff.xml
+%feature("docstring") casadi::ForwardDiff::serialize "[INTERNAL]
+Serialize.
+
+";
+
 %feature("docstring") casadi::ForwardDiff::fwdViaJac "[INTERNAL]  Calculate
 derivatives by multiplying the full Jacobian and multiplying.
 
@@ -16510,6 +16652,11 @@ function, templated.
 
 %feature("docstring") casadi::ForwardDiff::memory "[INTERNAL]  Memory
 objects.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -17646,10 +17793,9 @@ Get free variables as a string.
 
 ";
 
-%feature("docstring") casadi::Function::__hash__ "
+%feature("docstring") casadi::Function::disp "
 
-Returns a number that is unique for a given Node. If the Object does not
-point to any node, \"0\" is returned.
+Print a description of the object.
 
 ";
 
@@ -17793,6 +17939,12 @@ For a particular input or for all of the inputs
 
 %feature("docstring") casadi::Function::get_function "";
 
+%feature("docstring") casadi::Function::serialize "
+
+Serialize.
+
+";
+
 %feature("docstring") casadi::Function::sz_res "
 
 Get required length of res field.
@@ -17864,9 +18016,10 @@ Destructor.
 
 ";
 
-%feature("docstring") casadi::Function::disp "
+%feature("docstring") casadi::Function::__hash__ "
 
-Print a description of the object.
+Returns a number that is unique for a given Node. If the Object does not
+point to any node, \"0\" is returned.
 
 ";
 
@@ -18654,6 +18807,11 @@ Extract the functions needed for the Lifted Newton method.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::serialize "[INTERNAL]
+Serialize.
+
+";
+
 %feature("docstring") casadi::GenericExternal::mapsum_mx "[INTERNAL]
 Parallel evaluation.
 
@@ -18895,6 +19053,11 @@ the reference count.
 
 %feature("docstring") casadi::GenericExternal::sx_out "[INTERNAL]  Get
 function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::GenericExternal::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -20499,6 +20662,15 @@ the (integer) output argument of an atomic operation.
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::serialize_header
+"[INTERNAL]  Serialize function header.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::size2_in "[INTERNAL]  Input/output dimensions.
 
 ";
@@ -21324,6 +21496,11 @@ Replace 0-by-0 inputs.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::serialize "[INTERNAL]
+Serialize.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::setup "[INTERNAL]  Set the
 (persistent and temporary) work vectors.
 
@@ -21687,6 +21864,11 @@ memory block.
 
 %feature("docstring") casadi::ImplicitToNlp::codegen_sparsities "[INTERNAL]
 Codegen sparsities.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -22082,8 +22264,8 @@ if output arguments that needs to be replaced.
 
 ";
 
-%feature("docstring") casadi::Integrator::sz_arg "[INTERNAL]  Get required
-length of arg field.
+%feature("docstring") casadi::Integrator::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -22094,6 +22276,11 @@ dimensions.
 
 %feature("docstring") casadi::Integrator::sprint "[INTERNAL]  C-style
 formatted printing to string.
+
+";
+
+%feature("docstring") casadi::Integrator::sz_arg "[INTERNAL]  Get required
+length of arg field.
 
 ";
 
@@ -22503,6 +22690,10 @@ inputs and outputs scalar.
 
 %feature("docstring") casadi::Integrator::has_spfwd "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::Integrator::serialize "[INTERNAL]  Serialize.
 
 ";
 
@@ -23333,6 +23524,11 @@ function have free variables.
 
 %feature("docstring") casadi::Interpolant::has_function "[INTERNAL] ";
 
+%feature("docstring") casadi::Interpolant::serialize "[INTERNAL]
+Serialize.
+
+";
+
 %feature("docstring") casadi::Interpolant::set_temp "[INTERNAL]  Set the
 (temporary) work vectors.
 
@@ -23360,6 +23556,11 @@ Get the (integer) output argument of an atomic operation.
 
 %feature("docstring") casadi::Interpolant::size2_in "[INTERNAL]
 Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Interpolant::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -24372,6 +24573,11 @@ Function instance consisting of only one MX call.
 
 ";
 
+%feature("docstring") casadi::JitFunction::serialize "[INTERNAL]
+Serialize.
+
+";
+
 %feature("docstring") casadi::JitFunction::instruction_constant "[INTERNAL]
 Get the floating point output argument of an atomic operation.
 
@@ -24651,6 +24857,11 @@ memory block.
 
 %feature("docstring") casadi::JitFunction::instruction_id "[INTERNAL]  Get
 an atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::JitFunction::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -26162,6 +26373,11 @@ an Function instance consisting of only one MX call.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::serialize "[INTERNAL]
+Serialize.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::sparsity_out "[INTERNAL]
 Input/output sparsity.
 
@@ -26224,6 +26440,10 @@ input scheme index by name.
 
 %feature("docstring") casadi::LinearInterpolant::get_n_out "[INTERNAL]
 Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::serialize_header "[INTERNAL]  Serialize function header.
 
 ";
 
@@ -26745,6 +26965,11 @@ Display object.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::serialize "[INTERNAL]
+Serialize.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::get_abstol "[INTERNAL]
 Get absolute tolerance.
 
@@ -27176,6 +27401,10 @@ Are all inputs and outputs scalar.
 
 %feature("docstring") casadi::LinearInterpolantJac::size_in "[INTERNAL]
 Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::serialize_header "[INTERNAL]  Serialize function header.
 
 ";
 
@@ -28723,6 +28952,11 @@ dimensions.
 
 ";
 
+%feature("docstring") casadi::Map::serialize_header "[INTERNAL]  Serialize
+function header.
+
+";
+
 %feature("docstring") casadi::Map::getJacSparsityGen "[INTERNAL]  Get the
 sparsity pattern, forward mode.
 
@@ -28744,6 +28978,10 @@ vector of symbolic variables corresponding to the outputs.
 ";
 
 %feature("docstring") casadi::Map::has_function "[INTERNAL] ";
+
+%feature("docstring") casadi::Map::serialize "[INTERNAL]  Serialize.
+
+";
 
 %feature("docstring") casadi::Map::codegen "[INTERNAL]  Generate code the
 function.
@@ -29009,6 +29247,10 @@ function, overloaded.
 
 ";
 
+%feature("docstring") casadi::MapOmp::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::MapOmp::sp_weight "[INTERNAL]  Weighting
 factor for chosing forward/reverse mode, sparsity propagation.
 
@@ -29250,6 +29492,11 @@ signature: name:(inputs)->(outputs)
 
 %feature("docstring") casadi::MapOmp::alloc_res "[INTERNAL]  Ensure
 required length of res field.
+
+";
+
+%feature("docstring") casadi::MapOmp::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -31998,6 +32245,11 @@ mode AD, virtual functions overloaded in derived classes.
 
 ";
 
+%feature("docstring") casadi::Newton::serialize_header "[INTERNAL]
+Serialize function header.
+
+";
+
 %feature("docstring") casadi::Newton::index_out "[INTERNAL]  Get output
 scheme index by name.
 
@@ -32186,6 +32438,10 @@ numerically.
 
 %feature("docstring") casadi::Newton::call_gen "[INTERNAL]   Call a
 function, overloaded.
+
+";
+
+%feature("docstring") casadi::Newton::serialize "[INTERNAL]  Serialize.
 
 ";
 
@@ -32746,6 +33002,10 @@ input(s) and output(s)
 
 ";
 
+%feature("docstring") casadi::Nlpsol::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::Nlpsol::get_default_in "[INTERNAL]  Get
 default input value.
 
@@ -33046,6 +33306,11 @@ memory object.
 
 %feature("docstring") casadi::Nlpsol::get_stats "[INTERNAL]  Get all
 statistics.
+
+";
+
+%feature("docstring") casadi::Nlpsol::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -34293,8 +34558,13 @@ of nodes in the algorithm.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::print_options "[INTERNAL]
-Print list of options.
+%feature("docstring") casadi::OracleFunction::get_free "[INTERNAL]  Print
+free variables.
+
+";
+
+%feature("docstring") casadi::OracleFunction::serialize "[INTERNAL]
+Serialize.
 
 ";
 
@@ -34399,6 +34669,11 @@ absolute tolerance.
 
 %feature("docstring") casadi::OracleFunction::eval_mx "[INTERNAL]  Evaluate
 with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::OracleFunction::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -34974,8 +35249,8 @@ Register the function for evaluation and statistics gathering
 
 ";
 
-%feature("docstring") casadi::OracleFunction::get_free "[INTERNAL]  Print
-free variables.
+%feature("docstring") casadi::OracleFunction::print_options "[INTERNAL]
+Print list of options.
 
 ";
 
@@ -35412,6 +35687,11 @@ block.
 
 %feature("docstring") casadi::QpToNlp::instruction_constant "[INTERNAL]
 Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::QpToNlp::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -35985,6 +36265,10 @@ unidirectional or bidirectional partition.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::QpToNlp::get_name_in "[INTERNAL]  Names of
 function input and outputs.
 
@@ -36453,6 +36737,10 @@ reference to the object.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::Rootfinder::wrap "[INTERNAL]  Wrap in an
 Function instance consisting of only one MX call.
 
@@ -36864,6 +37152,11 @@ input arguments have correct length and dimensions.
 
 %feature("docstring") casadi::Rootfinder::construct "[INTERNAL]  Construct
 Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::Rootfinder::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -37322,6 +37615,11 @@ a function that calculates nfwd forward derivatives.
 
 ";
 
+%feature("docstring") casadi::RungeKutta::serialize_header "[INTERNAL]
+Serialize function header.
+
+";
+
 %feature("docstring") casadi::RungeKutta::instruction_input "[INTERNAL]
 Get the (integer) input arguments of an atomic operation.
 
@@ -37379,6 +37677,10 @@ length of iw field.
 
 %feature("docstring") casadi::RungeKutta::free_sx "[INTERNAL]  Get free
 variables (SX)
+
+";
+
+%feature("docstring") casadi::RungeKutta::serialize "[INTERNAL]  Serialize.
 
 ";
 
@@ -38529,6 +38831,10 @@ decref for dependencies.
 
 ";
 
+%feature("docstring") casadi::Scpgen::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::Scpgen::check_inputs "[INTERNAL]  Check if
 the inputs correspond to a well-posed problem.
 
@@ -38573,6 +38879,11 @@ matrices.
 
 %feature("docstring") casadi::Scpgen::get_function "[INTERNAL] ";
 
+%feature("docstring") casadi::Scpgen::info "[INTERNAL]  Obtain information
+about function
+
+";
+
 %feature("docstring") casadi::Scpgen::print_fstats "[INTERNAL]  Print
 statistics.
 
@@ -38597,8 +38908,8 @@ options from parameter xml.
 
 ";
 
-%feature("docstring") casadi::Scpgen::info "[INTERNAL]  Obtain information
-about function
+%feature("docstring") casadi::Scpgen::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -39797,6 +40108,11 @@ derivatives be calculated in any way?
 
 ";
 
+%feature("docstring") casadi::SlicotDple::serialize_header "[INTERNAL]
+Serialize function header.
+
+";
+
 %feature("docstring") casadi::SlicotDple::get_max_in "[INTERNAL]  Get
 largest input value.
 
@@ -39892,8 +40208,7 @@ Replace 0-by-0 reverse seeds.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::sz_iw "[INTERNAL]  Get required
-length of iw field.
+%feature("docstring") casadi::SlicotDple::serialize "[INTERNAL]  Serialize.
 
 ";
 
@@ -40123,6 +40438,11 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::SlicotDple::generate_dependencies "[INTERNAL]
 Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring") casadi::SlicotDple::sz_iw "[INTERNAL]  Get required
+length of iw field.
 
 ";
 
@@ -40552,6 +40872,11 @@ C++ includes: slicot_expm.hpp ";
 
 %feature("docstring") casadi::SlicotExpm::size1_in "[INTERNAL]
 Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::SlicotExpm::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -41034,6 +41359,10 @@ the unidirectional or bidirectional partition.
 
 %feature("docstring") casadi::SlicotExpm::codegen "[INTERNAL]  Generate
 code the function.
+
+";
+
+%feature("docstring") casadi::SlicotExpm::serialize "[INTERNAL]  Serialize.
 
 ";
 
@@ -41871,6 +42200,10 @@ order derivatives.
 
 ";
 
+%feature("docstring") casadi::Smoothing::serialize "[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::Smoothing::symbolicAdjSeed "[INTERNAL]
 Symbolic expressions for the adjoint seeds.
 
@@ -41883,6 +42216,11 @@ formatted printing during evaluation.
 
 %feature("docstring") casadi::Smoothing::get_free "[INTERNAL]  Print free
 variables.
+
+";
+
+%feature("docstring") casadi::Smoothing::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -42606,6 +42944,12 @@ Get the sparsity in compressed row storage (CRS) format.
 
 ";
 
+%feature("docstring") casadi::Sparsity::serialize "
+
+Serialize.
+
+";
+
 %feature("docstring") casadi::Sparsity::sub "
 
 >  Sparsity casadi::Sparsity::sub(const std::vector< casadi_int > &rr, const std::vector< casadi_int > &cc, std::vector< casadi_int > &output_mapping, bool ind1=false) const 
@@ -43143,6 +43487,11 @@ factor for chosing forward/reverse mode, sparsity propagation.
 
 %feature("docstring") casadi::Sqpmethod::getJacSparsityGen "[INTERNAL]  Get
 the sparsity pattern, forward mode.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
@@ -43685,6 +44034,10 @@ Read options from parameter xml.
 
 %feature("docstring") casadi::Sqpmethod::replace_fseed "[INTERNAL]  Replace
 0-by-0 forward seeds.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::serialize "[INTERNAL]  Serialize.
 
 ";
 
@@ -44693,6 +45046,11 @@ Sparsities of function inputs and outputs.
 
 ";
 
+%feature("docstring") casadi::Switch::serialize_header "[INTERNAL]
+Serialize function header.
+
+";
+
 %feature("docstring") casadi::Switch::get_function "[INTERNAL] ";
 
 %feature("docstring") casadi::Switch::getAdaptorSolverName "[INTERNAL]
@@ -44774,6 +45132,10 @@ version is available.
 
 %feature("docstring") casadi::Switch::mx_out "[INTERNAL]  Get function
 input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Switch::serialize "[INTERNAL]  Serialize.
 
 ";
 
