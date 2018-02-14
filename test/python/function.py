@@ -1631,11 +1631,7 @@ class Functiontests(casadiTestCase):
     z = sin(y)
 
     f = Function('f',[x],[z,np.nan,-np.inf,np.inf])
-    print f.serialize()
     fs = Function.deserialize(f.serialize())
-
-    print fs(0)
-
     self.checkfunction(f,fs,inputs=[2])
 
     x = SX.sym("x")
