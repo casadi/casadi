@@ -148,6 +148,18 @@
 %exception  casadi::Conic::integer_support() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::ConicAs::class_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ConicAs::get_options() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ConicAs::init(const Dict &opts) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ConicAs::plugin_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DllLibrary::can_have_meta() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1805,6 +1817,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Conic::Conic(const std::string &name, const std::map< std::string, Sparsity > &st) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::ConicAs::ConicAs(const std::string &name, const std::map< std::string, Sparsity > &st) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::DllLibrary::DllLibrary(const std::string &bin_name) {
