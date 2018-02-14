@@ -739,6 +739,12 @@
 %exception  casadi::FunctionInternal::self() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::serialize(std::ostream &stream) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::serialize_header(std::ostream &stream) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::signature(const std::string &fname) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1516,6 +1522,9 @@
 %exception  casadi::SX::is_leaf() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SX::is_op(casadi_int op) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SX::is_regular() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1532,6 +1541,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SX::name() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::op() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SX::print_split(std::vector< std::string > &output_nz, std::vector< std::string > &output_inter) const  {

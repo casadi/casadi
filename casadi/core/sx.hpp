@@ -38,13 +38,15 @@ namespace casadi {
   template<> bool SX::is_symbolic() const;
   template<> bool SX::is_valid_input() const;
   template<> bool SX::has_duplicates() const;
+  template<> bool SX::is_op(casadi_int op) const;
+  template<> casadi_int SX::op() const;
   template<> void SX::reset_input() const;
   template<> SX SX::dep(casadi_int ch) const;
   template<> casadi_int SX::n_dep() const;
   template<> std::string SX::name() const;
   template<> void SX::set_max_depth(casadi_int eq_depth);
   template<> casadi_int SX::get_max_depth();
-  template<> size_t SX::element_hash() const;
+  template<> casadi_int SX::element_hash() const;
   template<> void SX::expand(const SX& f, SX& weights, SX& terms);
   template<> SX SX::pw_const(const SX& t, const SX& tval, const SX& val);
   template<> SX SX::pw_lin(const SX& t, const SX &tval, const SX &val);

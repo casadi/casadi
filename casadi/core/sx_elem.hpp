@@ -175,7 +175,7 @@ namespace casadi {
     /** \brief Returns a number that is unique for a given SXNode.
      * If the SXElem does not point to any node, 0 is returned.
      */
-    size_t __hash__() const;
+    casadi_int __hash__() const;
 
     /** \brief  Negation */
     SXElem operator-() const;

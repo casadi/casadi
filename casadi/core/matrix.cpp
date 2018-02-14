@@ -1349,7 +1349,7 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  size_t Matrix<Scalar>::element_hash() const {
+  casadi_int Matrix<Scalar>::element_hash() const {
     casadi_error("'element_hash' not defined for " + type_name());
   }
 
@@ -1366,6 +1366,16 @@ namespace casadi {
   template<typename Scalar>
   bool Matrix<Scalar>::is_symbolic() const {
     return false;
+  }
+
+  template<typename Scalar>
+  casadi_int Matrix<Scalar>::op() const {
+    casadi_error("'op' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
+  bool Matrix<Scalar>::is_op(casadi_int k) const {
+    casadi_error("'is_op' not defined for " + type_name());
   }
 
   template<typename Scalar>
@@ -2826,7 +2836,7 @@ namespace casadi {
   }
 
   template<>
-  size_t SX::element_hash() const {
+  casadi_int SX::element_hash() const {
     return scalar().__hash__();
   }
 
@@ -2847,6 +2857,16 @@ namespace casadi {
     } else {
       return false;
     }
+  }
+
+  template<>
+  casadi_int SX::op() const {
+    return scalar().op();
+  }
+
+  template<>
+  bool SX::is_op(casadi_int op) const {
+    return scalar().is_op(op);
   }
 
   template<>

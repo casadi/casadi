@@ -1287,6 +1287,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>gurobi</td><td>OT_DICT</td><td>Options to be passed to gurobi.</td><td>casadi::GurobiInterface</td></tr>
 <tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]</td><td>casadi::GurobiInterface</td></tr>
 </table>
 */
@@ -1297,6 +1298,7 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>gurobi</td><td>OT_DICT</td><td>Options to be passed to gurobi.</td></tr>
 <tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]</td></tr>
 </table>
 */
@@ -1307,6 +1309,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>gurobi</td><td>OT_DICT</td><td>Options to be passed to gurobi.</td><td>casadi::GurobiInterface</td></tr>
 <tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]</td><td>casadi::GurobiInterface</td></tr>
 </table>
 */

@@ -1749,4 +1749,47 @@ namespace casadi {
     return blockcat({{H, J.T()}, {J, B}});
   }
 
+  void Sparsity::serialize(std::ostream &stream) const {
+    stream << "sp";
+    stream << size1() << "x" << size2();
+    stream << "n" << nnz();
+    for (int i=0;i<nnz();++i)
+      stream << ":" << row()[i];
+    for (int i=0;i<size2()+1;++i)
+      stream << ":" << colind()[i];
+    stream << "s";
+  }
+
+  Sparsity Sparsity::deserialize(std::istream &stream) {
+    char ch;
+    stream >> ch;
+    stream >> ch;
+    casadi_int nrow, ncol, nnz;
+    stream >> nrow; stream >> ch;
+    stream >> ncol; stream >> ch;
+    stream >> nnz;
+    std::vector<casadi_int> row(nnz), colind(ncol+1);
+    for (int i=0;i<nnz;++i) {
+      stream >> ch;
+      stream >> row[i];
+    }
+    for (int i=0;i<ncol+1;++i) {
+      stream >> ch;
+      stream >> colind[i];
+    }
+    stream >> ch;
+    return Sparsity(nrow, ncol, colind, row);
+  }
+
+  std::string Sparsity::serialize() const {
+    std::stringstream ss;
+    serialize(ss);
+    return ss.str();
+  }
+
+  Sparsity Sparsity::deserialize(const std::string& s) {
+    std::stringstream ss;
+    ss << s;
+    return deserialize(ss);
+  }
 } // namespace casadi

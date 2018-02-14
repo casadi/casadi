@@ -74,7 +74,7 @@ namespace casadi {
     CPXENVptr env;
     CPXLPptr lp;
 
-    std::vector<int> a_row, h_row;
+    std::vector<CPXDIM> a_row, h_row;
     std::vector<CPXNNZ> a_colind, h_colind;
 
 

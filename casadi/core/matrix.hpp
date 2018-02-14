@@ -896,7 +896,7 @@ namespace casadi {
      *
      * Only defined if symbolic scalar.
      */
-    size_t element_hash() const;
+    casadi_int element_hash() const;
 
     /// Checks if expression does not contain NaN or Inf
     bool is_regular() const;
@@ -958,6 +958,12 @@ namespace casadi {
     /** \brief  check if the matrix is an identity matrix (note that false negative answers
      * are possible)*/
     bool is_eye() const;
+
+    /// Get operation type
+    casadi_int op() const;
+
+    /// Is it a certain operation
+    bool is_op(casadi_int op) const;
 
     /** \brief  Check if the matrix has any zero entries which are not structural zeros */
     bool has_zeros() const;

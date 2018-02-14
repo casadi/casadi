@@ -343,8 +343,8 @@ namespace casadi {
     }
 
     // Copying objective, constraints, and bounds.
-    const casadi_int* matbeg = A_.colind();
-    const int* matind = get_ptr(m->a_row);
+    const CPXNNZ* matbeg = get_ptr(m->a_colind);
+    const CPXDIM* matind = get_ptr(m->a_row);
 
     const double* matval = A;
     const double* obj = g;
@@ -356,8 +356,8 @@ namespace casadi {
     }
 
     // Preparing coefficient matrix Q
-    const casadi_int* qmatbeg = H_.colind();
-    const int* qmatind = get_ptr(m->h_row);
+    const CPXNNZ* qmatbeg = get_ptr(m->h_colind);
+    const CPXDIM* qmatind = get_ptr(m->h_row);
     const double* qmatval = H;
     if (CPXXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
     }

@@ -974,6 +974,17 @@ namespace casadi {
     std::ofstream stream(fname);
     return (*this)->export_code(lang, stream, options);
   }
+
+  std::string Function::serialize() const {
+    std::stringstream ss;
+    serialize(ss);
+    return ss.str();
+  }
+
+  void Function::serialize(std::ostream &stream) const {
+    return (*this)->serialize(stream);
+  }
+
   std::string Function::export_code(const std::string& lang, const Dict& options) const {
     std::stringstream ss;
     (*this)->export_code(lang, ss, options);
@@ -1014,6 +1025,24 @@ namespace casadi {
 
     // Valid function name if reached this point
     return true;
+  }
+
+  Function Function::deserialize(std::istream& stream) {
+    char type;
+    stream >> type;
+    switch (type) {
+      case 'S':
+        return SXFunction::deserialize(stream);
+      default:
+        casadi_error("Not implemented");
+    }
+    return Function();
+  }
+
+  Function Function::deserialize(const std::string& s) {
+    std::stringstream ss;
+    ss << s;
+    return deserialize(ss);
   }
 
   string Function::fix_name(const string& name) {

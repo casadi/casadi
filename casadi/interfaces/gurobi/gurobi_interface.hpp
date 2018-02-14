@@ -110,6 +110,9 @@ namespace casadi {
 
     // Variable types
     std::vector<char> vtype_;
+
+    /// Gurobi options
+    Dict opts_;
   };
 
 } // namespace casadi
