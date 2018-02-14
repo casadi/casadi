@@ -1100,7 +1100,7 @@ class MXVeccatStruct(CasadiStructured,MasterGettable):
       raise Exception("Problem in MX vecNZcat structure cat: missing expressions. The following entries are missing: %s" % str(missing))
 
     if self.dirty:
-      self.master_cached = vertcat(*[casadi.vec(i.nz[:]) for i in self.storage])
+      self.master_cached = vertcat(*[casadi.vec(i if i.is_dense() else i.nz[:]) for i in self.storage])
 
     return self.master_cached
 
