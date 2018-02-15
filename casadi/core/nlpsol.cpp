@@ -704,15 +704,14 @@ namespace casadi {
     MX lbg_active = lam_g<0;
 
     // Common
-    MX alpha_x = if_else(ubx_active, ubx, 0) + if_else(lbx_active, lbx, 0);
-    MX alpha_g = if_else(ubg_active, ubg, 0) + if_else(lbg_active, lbg, 0);
-    MX a = alpha_x-x;
+    MX alpha_x = x - if_else(ubx_active, ubx, 0) - if_else(lbx_active, lbx, 0);
+    MX alpha_g = g - if_else(ubg_active, ubg, 0) - if_else(lbg_active, lbg, 0);
 
     // KKT matrix
-    MX H_11 = mtimes(diag(a), HL) + diag(lam_x);
-    MX H_12 = mtimes(diag(a), JG.T());
+    MX H_11 = mtimes(diag(alpha_x), HL) - diag(lam_x);
+    MX H_12 = mtimes(diag(alpha_x), JG.T());
     MX H_21 = -mtimes(diag(lam_g), JG);
-    MX H_22 = diag(alpha_g - g);
+    MX H_22 = -diag(alpha_g);
     MX H = MX::blockcat({{H_11, H_12}, {H_21, H_22}});
 
     // Sensitivity inputs
@@ -746,15 +745,12 @@ namespace casadi {
     MX fwd_gL_p = vv.at(2);
 
     // Propagate forward seeds
-    MX fwd_alpha_x = if_else(ubx_active, fwd_ubx, 0) + if_else(lbx_active, fwd_lbx, 0);
-    MX fwd_alpha_g = if_else(ubg_active, fwd_ubg, 0) + if_else(lbg_active, fwd_lbg, 0);
-
-    MX v_x = fwd_gL_p * (alpha_x - x) - fwd_alpha_x * lam_x;
-    MX v_lam_g = lam_g * (fwd_alpha_g - fwd_g_p);
-    MX v = MX::vertcat({v_x, v_lam_g});
+    MX fwd_alpha_x = -if_else(ubx_active, fwd_ubx, 0) - if_else(lbx_active, fwd_lbx, 0);
+    MX fwd_alpha_g = fwd_g_p - if_else(ubg_active, fwd_ubg, 0) - if_else(lbg_active, fwd_lbg, 0);
+    MX v = MX::vertcat({fwd_alpha_x * lam_x - alpha_x * fwd_gL_p, fwd_alpha_g * lam_g});
 
     // Solve
-    v = -MX::solve(H, v, "qr");
+    v = MX::solve(H, v, "qr");
 
     // Extract sensitivities in x, lam_x and lam_g
     vector<MX> v_split = vertsplit(v, {0, nx_, nx_+ng_});
