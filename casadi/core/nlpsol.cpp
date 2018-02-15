@@ -887,7 +887,7 @@ namespace casadi {
     asens[NLPSOL_LBX] = if_else(lbx_active, alpha_x_bar, 0);
     asens[NLPSOL_UBG] = if_else(ubg_active, alpha_g_bar, 0);
     asens[NLPSOL_LBG] = if_else(lbg_active, alpha_g_bar, 0);
-    asens[NLPSOL_P] = adj_p;
+    asens[NLPSOL_P] = adj_p + adj_p0;
 
     // Guesses are unused
     for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
