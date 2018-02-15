@@ -2801,34 +2801,41 @@ namespace casadi {
     vector<casadi_int>::iterator it=indices.begin();
     while (*it<0) it++; // first non-ignored
 
-    // Current element sought
-    casadi_int el_row = *it % size1();
-    casadi_int el_col = *it / size1();
+    // Position in flattened matrix
+    casadi_int cur_pos = -1;
+
+    casadi_int col_pos = 0;
 
     // Loop over columns
-    for (casadi_int i=0; i<size2(); ++i) {
+    for (casadi_int i=0; i<size2(); ++i, col_pos+=size1()) {
+
+      // Last position in flattened matrix for current column
+      casadi_int last_pos = -1;
+
+      // Early skip to next column
+      if (colind[i+1]>colind[i]) {
+        casadi_int el = colind[i+1] - 1;
+        casadi_int j = row[el];
+        last_pos = col_pos + j;
+      } else {
+        continue;
+      }
 
       // Loop over the nonzeros
-      for (casadi_int el=colind[i]; el<colind[i+1] && el_col<=i; ++el) {
-
+      for (casadi_int el=colind[i]; el<colind[i+1] && last_pos >= *it; ++el) {
         // Get row
         casadi_int j = row[el];
 
+        cur_pos = col_pos + j;
+
         // Add leading elements not in pattern
-        while (i>el_col || (i==el_col && j>el_row)) {
+        while (*it < cur_pos) {
           // Mark as not found
           *it = -1;
-
-          // Increase index and terminate if end of vector reached
           if (++it==indices.end()) return;
-
-          // Next element sought
-          el_row = *it % size1();
-          el_col = *it / size1();
         }
 
-        // Add elements in pattern
-        while (i==el_col && j==el_row) {
+        while (cur_pos == *it) {
           // Save element index
           *it = el;
 
@@ -2836,10 +2843,6 @@ namespace casadi {
           do {
             if (++it==indices.end()) return;
           } while (*it<0);
-
-          // Next element sought
-          el_row = *it % size1();
-          el_col = *it / size1();
         }
       }
     }
