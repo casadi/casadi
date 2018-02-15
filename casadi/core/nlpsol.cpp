@@ -865,29 +865,29 @@ namespace casadi {
     MX adj_p0 = vv.at(1);
     MX adj_lam_g0 = vv.at(3);
 
-    // Solve to get beta_x_hat, beta_g_hat
+    // Solve to get beta_x_bar, beta_g_bar
     MX v = MX::vertcat({adj_x + adj_x0, adj_lam_g + adj_lam_g0});
     v = MX::solve(H.T(), v, "qr");
     vector<MX> v_split = vertsplit(v, {0, nx_, nx_+ng_});
-    MX beta_x_hat = v_split.at(0);
-    MX beta_g_hat = v_split.at(1);
+    MX beta_x_bar = v_split.at(0);
+    MX beta_g_bar = -v_split.at(1);
 
     // Calculate alpha_x_bar, alpha_g_bar
-    MX alpha_x_bar = -lam_x * beta_x_hat;
-    MX alpha_g_bar = lam_g * beta_g_hat;
+    MX alpha_x_bar = lam_x * beta_x_bar;
+    MX alpha_g_bar = lam_g * beta_g_bar;
 
     // Calculate sensitivities in p
     vv = {x, p, 1, lam_g, f, g, -lam_x, -lam_p,
-          0, alpha_g_bar, alpha_x*beta_x_hat, 0};
+          0, -alpha_g_bar, -alpha_x*beta_x_bar, 0};
     vv = rev_nlp_grad(vv);
     MX adj_p = vv.at(1);
 
     // Reverse sensitivities
     vector<MX> asens(NLPSOL_NUM_IN);
-    asens[NLPSOL_UBX] = if_else(ubx_active, -alpha_x_bar, 0);
-    asens[NLPSOL_LBX] = if_else(lbx_active, -alpha_x_bar, 0);
-    asens[NLPSOL_UBG] = if_else(ubg_active, -alpha_g_bar, 0);
-    asens[NLPSOL_LBG] = if_else(lbg_active, -alpha_g_bar, 0);
+    asens[NLPSOL_UBX] = if_else(ubx_active, alpha_x_bar, 0);
+    asens[NLPSOL_LBX] = if_else(lbx_active, alpha_x_bar, 0);
+    asens[NLPSOL_UBG] = if_else(ubg_active, alpha_g_bar, 0);
+    asens[NLPSOL_LBG] = if_else(lbg_active, alpha_g_bar, 0);
     asens[NLPSOL_P] = adj_p;
 
     // Guesses are unused
