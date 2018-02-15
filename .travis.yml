@@ -20,6 +20,9 @@ before_script:
       set -o pipefail  # otherwise, piping with grep discards exit statuses
     fi
 
+notifications:
+  email: false
+
 language: generic
 
 matrix:
