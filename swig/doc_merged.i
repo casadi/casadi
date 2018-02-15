@@ -20585,6 +20585,14 @@ Check if the matrix is lower triangular.
 
 ";
 
+%feature("docstring") friendwrap_linear_coeff "
+
+Recognizes linear form in vector expression.
+
+A x + b
+
+";
+
 %feature("docstring") casadi::GenericMatrix::colind "
 
 Get the sparsity pattern. See the Sparsity class for details.
@@ -20721,6 +20729,15 @@ Extract shared subexpressions from an set of expressions.
 
 ";
 
+%feature("docstring") friendwrap_is_linear "
+
+Is expr linear in var?
+
+False negatives are possible (an expression may not be recognised as linear
+while it really is), false positives not.
+
+";
+
 %feature("docstring") casadi::GenericMatrix::is_empty "
 
 Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
@@ -20839,6 +20856,15 @@ with given sparsity.
 
 Create a vector of length r of vectors of length p with nrow-by-ncol
 symbolic primitives.
+
+";
+
+%feature("docstring") friendwrap_is_quadratic "
+
+Is expr quadratic in var?
+
+False negatives are possible (an expression may not be recognised as
+quadratic while it really is), false positives not.
 
 ";
 
@@ -21025,6 +21051,16 @@ zero.
 %feature("docstring") friendwrap_reverse "
 
 Reverse directional derivative.
+
+";
+
+%feature("docstring") friendwrap_quadratic_coeff "
+
+Recognizes quadratic form in scalar expression.
+
+1/2*x' A x + b' x + c
+
+e = 0.5*bilin(A,x,x)+dot(b,x)+c
 
 ";
 
@@ -31183,6 +31219,14 @@ for up to 3x3 matrices.
 
 ";
 
+%feature("docstring") friendwrap_evalf "
+
+Evaluates the expression numerically.
+
+An error is raised when the expression contains symbols
+
+";
+
 %feature("docstring") casadi::Matrix::is_leaf "[INTERNAL]  Check if SX is a
 leaf of the SX graph.
 
@@ -32044,6 +32088,14 @@ point to any node, \"0\" is returned.
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 zero.
+
+";
+
+%feature("docstring") friendwrap_evalf "
+
+Evaluates the expression numerically.
+
+An error is raised when the expression contains symbols
 
 ";
 

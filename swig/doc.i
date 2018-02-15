@@ -28838,6 +28838,15 @@ Check if the matrix is lower triangular.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MatType >::linear_coeff(const
+MatType &expr, const MatType &var, MatType &A, MatType &b) "
+
+Recognizes linear form in vector expression.
+
+A x + b
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::colind(casadi_int
 col) const  "
 
@@ -29001,6 +29010,16 @@ Extract shared subexpressions from an set of expressions.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_linear(const
+MatType &expr, const MatType &var) "
+
+Is expr linear in var?
+
+False negatives are possible (an expression may not be recognised as linear
+while it really is), false positives not.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::is_empty(bool
 both=false) const  "
 
@@ -29139,6 +29158,16 @@ casadi_int r) "
 
 Create a vector of length r of vectors of length p with nrow-by-ncol
 symbolic primitives.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::is_quadratic(const
+MatType &expr, const MatType &var) "
+
+Is expr quadratic in var?
+
+False negatives are possible (an expression may not be recognised as
+quadratic while it really is), false positives not.
 
 ";
 
@@ -29356,6 +29385,18 @@ std::vector< MatType > &arg, const std::vector< std::vector< MatType > > &v,
 const Dict &opts=Dict()) "
 
 Reverse directional derivative.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType
+>::quadratic_coeff(const MatType &expr, const MatType &var, MatType &A,
+MatType &b, MatType &c) "
+
+Recognizes quadratic form in scalar expression.
+
+1/2*x' A x + b' x + c
+
+e = 0.5*bilin(A,x,x)+dot(b,x)+c
 
 ";
 
@@ -43942,6 +43983,14 @@ for up to 3x3 matrices.
 
 ";
 
+%feature("docstring")  evalf(const Matrix< Scalar > &expr) "
+
+Evaluates the expression numerically.
+
+An error is raised when the expression contains symbols
+
+";
+
 %feature("docstring")  casadi::SX::is_leaf() const  "
 
 [INTERNAL]  Check if SX is a leaf of the SX graph.
@@ -45020,6 +45069,14 @@ casadi_int, casadi_int > &rc) "
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 zero.
+
+";
+
+%feature("docstring")  evalf(const MX &expr) "
+
+Evaluates the expression numerically.
+
+An error is raised when the expression contains symbols
 
 ";
 
