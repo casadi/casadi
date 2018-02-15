@@ -1410,6 +1410,15 @@ class SXtests(casadiTestCase):
       f2 = Function('f',[xy,p],[e])
       self.checkfunction(f,f2,inputs=[1.1,1.3])
 
+  def test_evalf(self):
+    x = SX.sym("x")
+
+    y = SX(5)
+
+    self.checkarray(evalf(y),5)
+    with self.assertInException("since variables [x] are free"):
+      evalf(x)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -432,6 +432,7 @@ namespace casadi {
     static Matrix<Scalar> poly_coeff(const Matrix<Scalar>& ex, const Matrix<Scalar>&x);
     static Matrix<Scalar> poly_roots(const Matrix<Scalar>& p);
     static Matrix<Scalar> eig_symbolic(const Matrix<Scalar>& m);
+    static Matrix<double> evalf(const Matrix<Scalar>& m);
     static void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
                           Matrix<Scalar>& beta, std::vector<casadi_int>& prinv,
                           std::vector<casadi_int>& pc, bool amd=true);
@@ -770,6 +771,15 @@ namespace casadi {
      */
     friend inline Matrix<Scalar> eig_symbolic(const Matrix<Scalar>& m) {
       return Matrix<Scalar>::eig_symbolic(m);
+    }
+
+
+    /** \brief Evaluates the expression numerically
+    *
+    * An error is raised when the expression contains symbols
+    */
+    inline friend Matrix<double> evalf(const Matrix<Scalar>& expr) {
+      return Matrix<Scalar>::evalf(expr);
     }
 /** @} */
 #endif

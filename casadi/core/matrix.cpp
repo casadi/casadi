@@ -2586,6 +2586,12 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  DM Matrix<Scalar>::evalf(const Matrix<Scalar>& m) {
+    Function f("f", std::vector<SX>{}, {m});
+    return f(std::vector<DM>{})[0];
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::sparsify(const Matrix<Scalar>& x, double tol) {
     // Quick return if there are no entries to be removed
     bool remove_nothing = true;

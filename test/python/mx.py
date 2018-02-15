@@ -2638,6 +2638,23 @@ class MXtests(casadiTestCase):
           f = Function('f',[M,Y],[e])
           self.checkfunction(f,f.expand(),inputs=[ numpy.random.random((S.nnz(),1)), numpy.random.random((E.nnz(),1))])
 
+  def test_evalf(self):
+    x = MX.sym("x")
+
+    p = MX.sym("p")
+    f = Function('f',[x],[sin(x)])
+    y = f.call([p],False,True)[0]
+    y = substitute(y,p,3)
+
+    with self.assertInException("not defined"):
+      y.to_DM()
+    self.checkarray(evalf(y),sin(3))
+    with self.assertInException("since variables [x] are free"):
+      evalf(x)
+
+
+
+
 
 
 if __name__ == '__main__':

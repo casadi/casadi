@@ -491,6 +491,7 @@ namespace casadi {
                                          const std::vector<MX>& boundary,
                                          const Dict& options);
     static MX lift(const MX& x, const MX& x_guess);
+    static DM evalf(const MX& x);
     ///@}
     /// \endcond
 
@@ -567,6 +568,14 @@ namespace casadi {
      */
     inline friend MX inv_node(const MX& x) {
       return MX::inv_node(x);
+    }
+
+    /** \brief Evaluates the expression numerically
+    *
+    * An error is raised when the expression contains symbols
+    */
+    inline friend DM evalf(const MX& expr) {
+      return MX::evalf(expr);
     }
 
 /** @} */

@@ -642,6 +642,11 @@ namespace casadi {
     return x->_get_binary(OP_LIFT, x_guess, false, false);
   }
 
+  DM MX::evalf(const MX& m) {
+    Function f("f", std::vector<MX>{}, {m});
+    return f(std::vector<DM>{})[0];
+  }
+
   MX MX::mrdivide(const MX& b, const MX& a) {
     if (a.is_scalar() || b.is_scalar()) return b/a;
     return solve(a.T(), b.T()).T();

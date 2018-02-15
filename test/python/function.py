@@ -1668,7 +1668,20 @@ class Functiontests(casadiTestCase):
     with self.assertInException("'serialize' not defined for MXFunction"):
       pickle.loads(pickle.dumps(f))
 
+  def test_string(self):
+    x=MX.sym("x")
+    y=MX.sym("y")
+    f = Function('f',[x],[],["x"],[])
+    self.assertTrue("(x)->()" in str(f))
 
+    f = Function('f',[],[x],[],["y"])
+    self.assertTrue("()->(y)" in str(f))
+
+    f = Function('f',[x],[x**2],["x"],["y"])
+    self.assertTrue("(x)->(y)" in str(f))
+
+    f = Function('f',[x,y],[x**2,x*y],["x","y"],["w","z"])
+    self.assertTrue("(x,y)->(w,z)" in str(f))
 
 if __name__ == '__main__':
     unittest.main()
