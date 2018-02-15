@@ -13,6 +13,9 @@ env:
     - TRAVIS_PYTHON_VERSION=2.7
     - NUMPYVERSION=1.11
 
+notifications:
+  email: false
+
 before_script:
   - set -e
   - set -o pipefail  # otherwise, piping with grep discards exit statuses
