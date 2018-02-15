@@ -3072,7 +3072,7 @@ DECL M casadi_einstein(const M& A, const M& B,
 }
 DECL M casadi_mmin(const M& x) { return mmin(x); }
 DECL M casadi_mmax(const M& x) { return mmax(x); }
-DECL DM casadi_evalf(const M& x) {
+DECL casadi::DM casadi_evalf(const M& x) {
   return evalf(x);
 }
 #endif // FLAG & IS_MEMBER
