@@ -32,6 +32,20 @@
 using namespace std;
 
 namespace casadi {
+  bool all(const std::vector<bool>& v) {
+    for (auto && e : v) {
+      if (!e) return false;
+    }
+    return true;
+  }
+
+  bool any(const std::vector<bool>& v) {
+    for (auto && e : v) {
+      if (e) return true;
+    }
+    return false;
+  }
+
   std::vector<casadi_int> range(casadi_int start, casadi_int stop,
       casadi_int step, casadi_int len) {
     start = std::min(start, len);

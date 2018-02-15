@@ -3021,6 +3021,14 @@ DECL std::vector<bool> casadi_which_depends(const M& expr, const M& var,
   return which_depends(expr, var, order, tr);
 }
 
+DECL bool casadi_is_linear(const M& expr, const M& var) {
+  return is_linear(expr, var);
+}
+
+DECL bool casadi_is_quadratic(const M& expr, const M& var) {
+  return is_quadratic(expr, var);
+}
+
 DECL M casadi_gradient(const M &ex, const M &arg) {
   return gradient(ex, arg);
 }
@@ -3031,6 +3039,14 @@ DECL M casadi_tangent(const M &ex, const M &arg) {
 
 DECL M casadi_hessian(const M& ex, const M& arg, M& OUTPUT1) {
   return hessian(ex, arg, OUTPUT1);
+}
+
+DECL void casadi_quadratic_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3) {
+  quadratic_coeff(ex, arg, OUTPUT1, OUTPUT2, OUTPUT3);
+}
+
+DECL void casadi_linear_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2) {
+  linear_coeff(ex, arg, OUTPUT1, OUTPUT2);
 }
 
 DECL casadi_int casadi_n_nodes(const M& A) {
