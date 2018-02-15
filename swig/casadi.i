@@ -2662,10 +2662,10 @@ namespace casadi{
 %extend Sparsity {
   %pythoncode %{
     def __setstate__(self, state):
-        self.__init__(Sparsity.deserialize(state["serialization"]))
+        self.__init__(Sparsity.from_info(state))
 
     def __getstate__(self):
-        return {"serialization": self.serialize()}
+        return self.info()
   %}
 }
 
