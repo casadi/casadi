@@ -84,6 +84,9 @@ namespace casadi {
     kkt_ = Sparsity::kkt(H_, A_);
     AT_ = A_.T();
 
+    // Symbolic QR factorization
+    kkt_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
+
     // Allocate memory
     alloc_w(kkt_.nnz(), true); // kkt
     alloc_w(nx_, true); // xk
@@ -91,6 +94,13 @@ namespace casadi {
     alloc_w(na_, true); // lam_ak
     alloc_w(A_.nnz()); // trans(A)
     alloc_iw(na_); // casadi_trans
+
+    // Memory for numerical solution
+    alloc_w(sp_v_.nnz(), true); // v
+    alloc_w(sp_r_.nnz(), true); // r
+    alloc_w(nx_+na_, true); // beta
+    alloc_w(2*na_+2*nx_); // casadi_qr
+
   }
 
   template<typename T1>
@@ -150,11 +160,14 @@ namespace casadi {
     lam_x = res[CONIC_LAM_X];
 
     // Work vectors
-    double *kkt, *xk, *lam_xk, *lam_ak;
+    double *kkt, *xk, *lam_xk, *lam_ak, *v, *r, *beta;
     kkt = w; w += kkt_.nnz();
     xk = w; w += nx_;
     lam_xk = w; w += nx_;
     lam_ak = w; w += na_;
+    v = w; w += sp_v_.nnz();
+    r = w; w += sp_r_.nnz();
+    beta = w; w += nx_+na_;
 
     // Pass initial guess
     casadi_copy(x0, nx_, xk);
@@ -169,6 +182,9 @@ namespace casadi {
     casadi_set_sub(a, kkt, kkt_, nx_, nx_+na_, 0, nx_); // a
     casadi_set_sub(w, kkt, kkt_, 0, nx_, nx_, nx_+na_); // a'
     casadi_fill_sub(0., kkt, kkt_, nx_, nx_+na_, nx_, nx_+na_); // 0
+
+    // QR factorization
+    casadi_qr(kkt_, kkt, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
 
     // Get solution
     casadi_copy(xk, nx_, x);

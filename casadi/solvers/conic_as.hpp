@@ -84,6 +84,10 @@ namespace casadi {
 
     /// KKT system sparsity
     Sparsity kkt_, AT_;
+
+    /// QR factorization
+    std::vector<casadi_int> prinv_, pc_;
+    Sparsity sp_v_, sp_r_;
   };
 
 } // namespace casadi
