@@ -439,15 +439,15 @@ namespace casadi {
     stringstream s;
 
     // Print name
-    s << name_ << ":";
+    s << name_ << ":(";
     // Print input arguments
     for (casadi_int i=0; i<n_in_; ++i) {
-      s << (i==0 ? "(" : ",") << name_in_[i] << sparsity_in_[i].postfix_dim();
+      s << name_in_[i] << sparsity_in_[i].postfix_dim() << (i==n_in_-1 ? "" : ",");
     }
-    s << ")->";
+    s << ")->(";
     // Print output arguments
     for (casadi_int i=0; i<n_out_; ++i) {
-      s << (i==0 ? "(" : ",") << name_out_[i] << sparsity_out_[i].postfix_dim();
+      s << name_out_[i] << sparsity_out_[i].postfix_dim() << (i==n_out_-1 ? "" : ",");
     }
     s << ")";
 
