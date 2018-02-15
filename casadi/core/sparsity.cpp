@@ -1771,7 +1771,7 @@ namespace casadi {
     stream >> ncol; stream >> ch;
     stream >> nnz;
     std::vector<casadi_int> row(nnz), colind(ncol+1);
-    for (int i=0; i<nnz; ++i){
+    for (int i=0; i<nnz; ++i) {
       stream >> ch;
       stream >> row[i];
     }
