@@ -11,7 +11,10 @@ env:
     - PYTHONPATH=/usr/local/python
     - TRAVIS_PYTHON_VERSION=2.7
     - NUMPYVERSION=1.11
-    - casadi_build_flags="-DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_EXTRA_CHECKS=ON"
+    - casadi_build_flags="-DWITH_EXTRA_WARNINGS=ON -DWITH_EXTRA_CHECKS=ON"
+   
+notifications:
+  email: false
 
 before_script:
   - |
@@ -163,7 +166,7 @@ matrix:
       script:
         - mkdir build
         - pushd build
-        - bash -c "cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
+        - bash -c "cmake $casadi_build_flags -DWITH_WERROR=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
         - make
         - sudo make install
         - popd
@@ -178,7 +181,7 @@ matrix:
       script:
         - mkdir build
         - pushd build
-        - bash -c "cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
+        - bash -c "cmake $casadi_build_flags -DWITH_WERROR=ON -DWITH_SLICOT=OFF -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
         - make
         - sudo make install
         - popd
@@ -196,7 +199,7 @@ matrix:
         - export CXX=g++-6
         - mkdir build
         - pushd build
-        - bash -c "cmake  $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
+        - bash -c "cmake  $casadi_build_flags -DWITH_WERROR=ON -DWITH_SLICOT=OFF -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
         - make
         - sudo make install
         - popd
@@ -214,7 +217,7 @@ matrix:
         - export CXX=g++-7
         - mkdir build
         - pushd build
-        - bash -c "cmake  $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
+        - bash -c "cmake  $casadi_build_flags -DWITH_WERROR=ON -DWITH_SLICOT=OFF -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
         - make
         - sudo make install
         - popd
@@ -266,7 +269,7 @@ matrix:
         - mkdir build
         - pushd build
         - echo $casadi_build_flags
-        - bash -c "cmake $casadi_build_flags -DWITH_PYTHON=ON -DWITH_JSON=ON .."
+        - bash -c "cmake $casadi_build_flags -DWITH_WERROR=ON -DWITH_PYTHON=ON -DWITH_JSON=ON .."
 
         - #cmake $casadi_build_flags -DPYTHON_LIBRARY=$CMAKE_PYTHON_LIBRARY -DPYTHON_INCLUDE_DIR=$CMAKE_PYTHON_INCLUDE_DIR -DWITH_PYTHON=ON -DCMAKE_INSTALL_PREFIX=../python_install -DPYTHON_PREFIX=../python_install ..
         - osx_rpath
@@ -275,7 +278,7 @@ matrix:
         - sudo cp $GCC_FULL $QUADMATH_FULL $FORTRAN_FULL $CXX_FULL /usr/local/lib/
         - popd
         - #export PYTHONPATH=$PYTHONPATH:`pwd`/python_install
-        - otool -l /usr/local/python/casadi/_casadi.so
+        - otool -l /Users/travis/miniconda2/envs/condaenv_build/lib/python2.7/site-packages/casadi/_casadi.so
         - echo $DYLD_LIBRARY_PATH
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         - pushd test && make unittests_py || remote_access && popd
