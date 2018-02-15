@@ -826,15 +826,15 @@ namespace casadi {
     MX lbg_active = lam_g<0;
 
     // Common
-    MX alpha_x = if_else(ubx_active, ubx, 0) + if_else(lbx_active, lbx, 0);
-    MX alpha_g = if_else(ubg_active, ubg, 0) + if_else(lbg_active, lbg, 0);
-    MX a = alpha_x-x;
+    MX alpha_x = x - if_else(ubx_active, ubx, 0) - if_else(lbx_active, lbx, 0);
+    MX alpha_g = g - if_else(ubg_active, ubg, 0) - if_else(lbg_active, lbg, 0);
+    MX a = -alpha_x;
 
     // KKT matrix
     MX H_11 = mtimes(diag(a), HL) + diag(lam_x);
     MX H_12 = mtimes(diag(a), JG.T());
     MX H_21 = -mtimes(diag(lam_g), JG);
-    MX H_22 = diag(alpha_g - g);
+    MX H_22 = -diag(alpha_g);
     MX H = MX::blockcat({{H_11, H_12}, {H_21, H_22}});
 
     // Sensitivity inputs
@@ -878,7 +878,7 @@ namespace casadi {
 
     // Calculate sensitivities in p
     vv = {x, p, 1, lam_g, f, g, -lam_x, -lam_p,
-          0, alpha_g_bar, (x-alpha_x)*beta_x_hat, 0};
+          0, alpha_g_bar, alpha_x*beta_x_hat, 0};
     vv = rev_nlp_grad(vv);
     MX adj_p = vv.at(1);
 
