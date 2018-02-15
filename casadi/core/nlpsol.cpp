@@ -828,11 +828,10 @@ namespace casadi {
     // Common
     MX alpha_x = x - if_else(ubx_active, ubx, 0) - if_else(lbx_active, lbx, 0);
     MX alpha_g = g - if_else(ubg_active, ubg, 0) - if_else(lbg_active, lbg, 0);
-    MX a = -alpha_x;
 
     // KKT matrix
-    MX H_11 = mtimes(diag(a), HL) + diag(lam_x);
-    MX H_12 = mtimes(diag(a), JG.T());
+    MX H_11 = mtimes(diag(alpha_x), HL) - diag(lam_x);
+    MX H_12 = mtimes(diag(alpha_x), JG.T());
     MX H_21 = -mtimes(diag(lam_g), JG);
     MX H_22 = -diag(alpha_g);
     MX H = MX::blockcat({{H_11, H_12}, {H_21, H_22}});
@@ -866,11 +865,11 @@ namespace casadi {
     MX adj_lam_g0 = vv.at(3);
 
     // Solve to get beta_x_bar, beta_g_bar
-    MX v = MX::vertcat({adj_x + adj_x0, adj_lam_g + adj_lam_g0});
+    MX v = MX::vertcat({-adj_x - adj_x0, -adj_lam_g - adj_lam_g0});
     v = MX::solve(H.T(), v, "qr");
     vector<MX> v_split = vertsplit(v, {0, nx_, nx_+ng_});
     MX beta_x_bar = v_split.at(0);
-    MX beta_g_bar = -v_split.at(1);
+    MX beta_g_bar = v_split.at(1);
 
     // Calculate alpha_x_bar, alpha_g_bar
     MX alpha_x_bar = lam_x * beta_x_bar;
