@@ -1376,7 +1376,7 @@ namespace casadi {
     }
     row_C.resize(colind_C.back());
     casadi_int nrow_C = nc ;
-    Sparsity C(nrow_C, ncol_C, colind_C, row_C);
+    Sparsity C(nrow_C, ncol_C, colind_C, row_C, true);
 
     // find strongly connected components of C
     vector<casadi_int> scc_p, scc_r;

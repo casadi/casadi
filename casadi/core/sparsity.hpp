@@ -102,14 +102,16 @@ namespace casadi {
 
     /// Construct from sparsity pattern vectors given in compressed column storage format
     Sparsity(casadi_int nrow, casadi_int ncol,
-              const std::vector<casadi_int>& colind, const std::vector<casadi_int>& row);
+             const std::vector<casadi_int>& colind, const std::vector<casadi_int>& row,
+             bool order_rows=false);
 
     /** \brief Create a sparse matrix with all structural zeros */
     explicit Sparsity(const std::pair<casadi_int, casadi_int>& rc);
 
 #ifndef SWIG
     /// Construct from sparsity pattern vectors given in compressed column storage format
-    Sparsity(casadi_int nrow, casadi_int ncol, const casadi_int* colind, const casadi_int* row);
+    Sparsity(casadi_int nrow, casadi_int ncol, const casadi_int* colind, const casadi_int* row,
+            bool order_rows=false);
 
     /** \brief  Create from node */
     static Sparsity create(SparsityInternal *node);
@@ -208,9 +210,9 @@ namespace casadi {
      * The last colind[ncol] entries are the row indices
      **/
     ///@{
-    static Sparsity compressed(const std::vector<casadi_int>& v);
+    static Sparsity compressed(const std::vector<casadi_int>& v, bool order_rows=false);
 #ifndef SWIG
-    static Sparsity compressed(const casadi_int* v);
+    static Sparsity compressed(const casadi_int* v, bool order_rows=false);
 #endif // SWIG
     ///@}
 
@@ -881,11 +883,11 @@ namespace casadi {
   private:
     /// Construct a sparsity pattern from vectors, reuse cached pattern if possible
     void assign_cached(casadi_int nrow, casadi_int ncol, const std::vector<casadi_int>& colind,
-                      const std::vector<casadi_int>& row);
+                      const std::vector<casadi_int>& row, bool order_rows=false);
 
     /// Construct a sparsity pattern from vectors, reuse cached pattern if possible
     void assign_cached(casadi_int nrow, casadi_int ncol,
-                        const casadi_int* colind, const casadi_int* row);
+                        const casadi_int* colind, const casadi_int* row, bool order_rows=false);
 
 #endif //SWIG
   };

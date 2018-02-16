@@ -30,6 +30,10 @@
 #include "sparse_storage_impl.hpp"
 #include <climits>
 
+#define CASADI_THROW_ERROR(FNAME, WHAT) \
+throw CasadiException("Error in Sparsity::" FNAME " at " + CASADI_WHERE + ":\n"\
+  + std::string(WHAT));
+
 using namespace std;
 
 namespace casadi {
@@ -92,15 +96,15 @@ namespace casadi {
   }
 
   Sparsity::Sparsity(casadi_int nrow, casadi_int ncol, const std::vector<casadi_int>& colind,
-                     const std::vector<casadi_int>& row) {
+                     const std::vector<casadi_int>& row, bool order_rows) {
     casadi_assert_dev(nrow>=0);
     casadi_assert_dev(ncol>=0);
-    assign_cached(nrow, ncol, colind, row);
+    assign_cached(nrow, ncol, colind, row, order_rows);
     sanity_check(true);
   }
 
   Sparsity::Sparsity(casadi_int nrow, casadi_int ncol,
-      const casadi_int* colind, const casadi_int* row) {
+      const casadi_int* colind, const casadi_int* row, bool order_rows) {
     casadi_assert_dev(nrow>=0);
     casadi_assert_dev(ncol>=0);
     if (colind==0 || colind[ncol]==nrow*ncol) {
@@ -108,7 +112,7 @@ namespace casadi {
     } else {
       vector<casadi_int> colindv(colind, colind+ncol+1);
       vector<casadi_int> rowv(row, row+colind[ncol]);
-      assign_cached(nrow, ncol, colindv, rowv);
+      assign_cached(nrow, ncol, colindv, rowv, order_rows);
       sanity_check(true);
     }
   }
@@ -622,7 +626,7 @@ namespace casadi {
     SparsityInternal::ldl_row(*this, get_ptr(parent), get_ptr(L_colind), get_ptr(L_row),
                     get_ptr(w));
     // Sparsity of L^T
-    return Sparsity(n, n, L_colind, L_row).T();
+    return Sparsity(n, n, L_colind, L_row, true).T();
   }
 
   void Sparsity::
@@ -664,8 +668,8 @@ namespace casadi {
                                     get_ptr(leftmost), get_ptr(parent), get_ptr(prinv),
                                     get_ptr(iw));
     prinv.resize(nrow_ext);
-    V = compressed(sp_v);
-    R = compressed(sp_r);
+    V = compressed(sp_v, true);
+    R = compressed(sp_r, true);
   }
 
   casadi_int Sparsity::dfs(casadi_int j, casadi_int top, std::vector<casadi_int>& xi,
@@ -687,8 +691,12 @@ namespace casadi {
                             std::vector<casadi_int>& rowblock, std::vector<casadi_int>& colblock,
                             std::vector<casadi_int>& coarse_rowblock,
                             std::vector<casadi_int>& coarse_colblock) const {
-    return (*this)->btf(rowperm, colperm, rowblock, colblock,
-                        coarse_rowblock, coarse_colblock);
+    try {
+      return (*this)->btf(rowperm, colperm, rowblock, colblock,
+                          coarse_rowblock, coarse_colblock);
+    } catch (exception &e) {
+      CASADI_THROW_ERROR("btf", e.what());
+    }
   }
 
   void Sparsity::spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
@@ -769,14 +777,14 @@ namespace casadi {
 
   void Sparsity::assign_cached(casadi_int nrow, casadi_int ncol,
                                 const std::vector<casadi_int>& colind,
-                                const std::vector<casadi_int>& row) {
+                                const std::vector<casadi_int>& row, bool order_rows) {
     casadi_assert_dev(colind.size()==ncol+1);
     casadi_assert_dev(row.size()==colind.back());
-    assign_cached(nrow, ncol, get_ptr(colind), get_ptr(row));
+    assign_cached(nrow, ncol, get_ptr(colind), get_ptr(row), order_rows);
   }
 
   void Sparsity::assign_cached(casadi_int nrow, casadi_int ncol,
-      const casadi_int* colind, const casadi_int* row) {
+      const casadi_int* colind, const casadi_int* row, bool order_rows) {
     // Scalars and empty patterns are handled separately
     if (ncol==0 && nrow==0) {
       // If empty
@@ -792,6 +800,53 @@ namespace casadi {
         *this = getScalar();
         return;
       }
+    }
+
+    // Make sure colind starts with zero
+    casadi_assert(colind[0]==0,
+                  "Compressed Column Storage is not sane. "
+                  "First element of colind must be zero.");
+
+    // Make sure colind is montone
+    for (casadi_int c=0; c<ncol; c++) {
+      casadi_assert(colind[c+1]>=colind[c],
+                    "Compressed Column Storage is not sane. "
+                    "colind must be monotone.");
+    }
+
+    // Check if rows correct and ordered without duplicates
+    bool rows_ordered = true;
+    for (casadi_int c=0; c<ncol; ++c) {
+      casadi_int last_r = -1;
+      for (casadi_int k=colind[c]; k<colind[c+1]; ++k) {
+        casadi_int r = row[k];
+        // Make sure values are in within the [0,ncol) range
+        casadi_assert(r>=0 && r<nrow,
+                      "Compressed Column Storage is not sane.\n"
+                      "row[ " + str(k) + " == " + str(r) + " not in range "
+                      "[0, " + str(nrow) + ")");
+        // Check if ordered
+        if (r<=last_r) rows_ordered = false;
+        last_r = r;
+      }
+    }
+
+    // If unordered, need to order
+    if (!rows_ordered) {
+      casadi_assert(order_rows,
+                    "Compressed Column Storage is not sane.\n"
+                    "Row indices not strictly monotonically increasing for each "
+                    "column and reordering is not enabled.");
+      // Number of nonzeros
+      casadi_int nnz = colind[ncol];
+      // Get all columns
+      vector<casadi_int> col(nnz);
+      for (casadi_int c=0; c<ncol; ++c) {
+        for (casadi_int k=colind[c]; k<colind[c+1]; ++k) col[k] = c;
+      }
+      // Make sane via triplet format
+      *this = triplet(nrow, ncol, vector<casadi_int>(row, row+nnz), col);
+      return;
     }
 
     // Hash the pattern
@@ -1224,7 +1279,7 @@ namespace casadi {
     return SparsityStruct{nrow, ncol, colind, row};
   }
 
-  Sparsity Sparsity::compressed(const std::vector<casadi_int>& v) {
+  Sparsity Sparsity::compressed(const std::vector<casadi_int>& v, bool order_rows) {
     // Check consistency
     casadi_assert_dev(v.size() >= 2);
     casadi_int nrow = v[0];
@@ -1236,10 +1291,10 @@ namespace casadi {
     casadi_assert_dev(dense || sparse);
 
     // Call array version
-    return compressed(&v.front());
+    return compressed(&v.front(), order_rows);
   }
 
-  Sparsity Sparsity::compressed(const casadi_int* v) {
+  Sparsity Sparsity::compressed(const casadi_int* v, bool order_rows) {
     casadi_assert_dev(v!=0);
 
     // Get sparsity pattern
@@ -1259,7 +1314,7 @@ namespace casadi {
       const casadi_int *row = v + 2 + ncol+1;
       return Sparsity(nrow, ncol,
                       vector<casadi_int>(colind, colind+ncol+1),
-                      vector<casadi_int>(row, row+nnz));
+                      vector<casadi_int>(row, row+nnz), order_rows);
     }
   }
 
