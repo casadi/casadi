@@ -395,9 +395,6 @@ namespace casadi {
         }
       }
 
-      jac_f_fcn_.sparsity_out(1).sanity_check(true);
-      jac_f_fcn_.sparsity_out(1).sanity_check(false);
-
       if (!jac_g_fcn_.is_null()) {
         // Get reduced decision variables
         casadi_fill(m->xk2, nx_, 0.);
