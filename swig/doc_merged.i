@@ -43673,7 +43673,7 @@ Default constructor.
 
 Pattern with all structural zeros.
 
->  casadi::Sparsity::Sparsity(casadi_int nrow, casadi_int ncol, const std::vector< casadi_int > &colind, const std::vector< casadi_int > &row)
+>  casadi::Sparsity::Sparsity(casadi_int nrow, casadi_int ncol, const std::vector< casadi_int > &colind, const std::vector< casadi_int > &row, bool order_rows=false)
 ------------------------------------------------------------------------
 
 Construct from sparsity pattern vectors given in compressed column storage

@@ -61341,7 +61341,7 @@ Pattern with all structural zeros.
 
 %feature("docstring") casadi::Sparsity::Sparsity(casadi_int nrow, casadi_int
 ncol, const std::vector< casadi_int > &colind, const std::vector< casadi_int
-> &row) "
+> &row, bool order_rows=false) "
 
 Construct from sparsity pattern vectors given in compressed column storage
 format.
@@ -61770,7 +61770,7 @@ result
 ";
 
 %feature("docstring")  casadi::Sparsity::compressed(const std::vector<
-casadi_int > &v) "
+casadi_int > &v, bool order_rows=false) "
 
 Create from a single vector containing the pattern in compressed column
 storage format: The format: The first two entries are the number of rows
