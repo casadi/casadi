@@ -82,10 +82,13 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
-    /// KKT system sparsity
+    // KKT system sparsity
     Sparsity kkt_, AT_;
 
-    /// QR factorization
+    // KKT with diagonal
+    Sparsity kktd_;
+
+    // QR factorization
     std::vector<casadi_int> prinv_, pc_;
     Sparsity sp_v_, sp_r_;
   };
