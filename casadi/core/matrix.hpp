@@ -120,11 +120,10 @@ namespace casadi {
     /** \brief Construct matrix with a given sparsity and nonzeros */
     Matrix(const Sparsity& sp, const Matrix<Scalar>& d);
 
-    /** \brief Check if the dimensions and colind, row vectors are compatible.
-     * \param complete  set to true to also check elementwise
-     * throws an error as possible result
-     */
-    void sanity_check(bool complete=false) const;
+#ifdef WITH_DEPRECATED_FEATURES
+    /** \brief [DEPRECATED] Correctness is checked during construction */
+    void sanity_check(bool complete=false) const {}
+#endif // WITH_DEPRECATED_FEATURES
 
     /// This constructor enables implicit type conversion from a numeric type
     Matrix(double val);

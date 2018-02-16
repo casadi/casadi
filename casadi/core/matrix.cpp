@@ -1018,19 +1018,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::sanity_check(bool complete) const {
-    sparsity_.sanity_check(complete);
-    if (nonzeros_.size()!=sparsity_.nnz()) {
-      std::stringstream s;
-      s << "Matrix is not sane. The following must hold:" << std::endl;
-      s << "  nonzeros().size() = sparsity().nnz(), but got nonzeros().size()  = "
-        << nonzeros_.size()
-        << "   and sparsity().nnz() = "  << sparsity_.nnz() << std::endl;
-      casadi_error(s.str());
-    }
-  }
-
-  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
