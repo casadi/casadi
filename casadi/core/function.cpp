@@ -773,6 +773,14 @@ namespace casadi {
     }
   }
 
+  Function Function::jac() const {
+    try {
+      return (*this)->jac();
+    } catch (exception& e) {
+      THROW_ERROR("jac", e.what());
+    }
+  }
+
   bool Function::test_cast(const SharedObjectInternal* ptr) {
     return dynamic_cast<const FunctionInternal*>(ptr)!=0;
   }

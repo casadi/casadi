@@ -373,6 +373,21 @@ namespace casadi {
      */
     Function jacobian() const;
 
+    /** \brief Calculate all Jacobian blocks
+      * Generates a function that takes all non-differentiated inputs and outputs
+      * and calculates all Jacobian blocks.
+      * Inputs that are not needed by the routine are all-zero sparse matrices
+      * with the correct dimensions. Output blocks that are not calculated,
+      * e.g. if the corresponding input or output is marked non-differentiated
+      * are also all-zero sparse.
+      * The Jacobian blocks are sorted starting by all the blocks for the first
+      * output, then all the blocks for the second output and so on.
+      * E.g. f:(x,y)->(r,s) results in the function
+      * jac_f:(x,y,r,s)->(dr_dx, dr_dy, ds_dx, ds_dy)
+      * This function is cached.
+      */
+    Function jac() const;
+
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
     void call(const std::vector<DM> &arg, std::vector<DM>& SWIG_OUTPUT(res),

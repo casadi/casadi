@@ -314,6 +314,16 @@ namespace casadi {
     ///@}
 
     ///@{
+    /** \brief Return Jacobian of all input elements with respect to all output elements */
+    Function jac() const;
+    virtual bool has_jac() const { return false;}
+    virtual Function get_jac(const std::string& name,
+                             const std::vector<std::string>& inames,
+                             const std::vector<std::string>& onames,
+                             const Dict& opts) const;
+    ///@}
+
+    ///@{
     /** \brief Return function that calculates forward derivatives
      *    forward(nfwd) returns a cached instance if available,
      *    and calls <tt>Function get_forward(casadi_int nfwd)</tt>
@@ -703,6 +713,9 @@ namespace casadi {
 
     /// Cache for functions to evaluate directional derivatives
     mutable std::vector<WeakRef> forward_, reverse_;
+
+    /// Cache for full Jacobian (new)
+    mutable WeakRef jac_;
 
     /// Cache for full Jacobian
     mutable WeakRef jacobian_;

@@ -1644,6 +1644,53 @@ namespace casadi {
     res = Call::create(self(), arg);
   }
 
+  Function FunctionInternal::jac() const {
+    // Used wrapped function if jacobian not available
+/*    if (!has_jac()) {
+      // Derivative information must be available
+      casadi_assert(has_derivative(),
+                    "Derivatives cannot be calculated for " + name_);
+      return wrap().jac();
+    } */
+
+    // Quick return if cached
+    if (jac_.alive()) return shared_cast<Function>(jac_.shared());
+
+    // Give it a suitable name
+    string name = "jac_" + name_;
+
+    // Names of inputs
+    std::vector<std::string> inames = name_in_;
+    inames.insert(inames.end(), name_out_.begin(), name_out_.end());
+
+    // Names of outputs
+    std::vector<std::string> onames;
+    onames.reserve(n_in_*n_out_);
+    for (size_t oind=0; oind<n_out_; ++oind) {
+      for (size_t iind=0; iind<n_in_; ++iind) {
+        onames.push_back("d" + name_out_[oind] + "_d" + name_in_[iind]);
+      }
+    }
+
+    // Options
+    Dict opts;
+    opts["derivative_of"] = self();
+
+    // Generate derivative function
+    casadi_assert_dev(enable_jacobian_);
+    Function ret = get_jac(name, inames, onames, opts);
+
+    // Consistency check
+    casadi_assert(ret.n_in()==inames.size(),
+                  "Return function has wrong number of inputs");
+    casadi_assert(ret.n_out()==onames.size(),
+                  "Return function has wrong number of outputs");
+
+    // Cache it for reuse and return
+    jac_ = ret;
+    return ret;
+  }
+
   Function FunctionInternal::jacobian() const {
     // Used wrapped function if jacobian not available
     if (!has_jacobian()) {
@@ -1692,6 +1739,14 @@ namespace casadi {
                const std::vector<std::string>& onames,
                const Dict& opts) const {
     casadi_error("'get_jacobian' not defined for " + class_name());
+  }
+
+  Function FunctionInternal::
+  get_jac(const std::string& name,
+               const std::vector<std::string>& inames,
+               const std::vector<std::string>& onames,
+               const Dict& opts) const {
+    casadi_error("'get_jac' not defined for " + class_name());
   }
 
   Sparsity FunctionInternal::get_jacobian_sparsity() const {
