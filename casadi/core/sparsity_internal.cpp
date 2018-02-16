@@ -456,7 +456,6 @@ namespace casadi {
     sp_[1] = ncol;
     std::copy(colind, colind+ncol+1, sp_.begin()+2);
     std::copy(row, row+colind[ncol], sp_.begin()+2+ncol+1);
-    sanity_check(false);
   }
 
   SparsityInternal::~SparsityInternal() {
@@ -475,39 +474,6 @@ namespace casadi {
 
   casadi_int SparsityInternal::numel() const {
     return size1()*size2();
-  }
-
-  void SparsityInternal::sanity_check(bool complete) const {
-    casadi_int nrow = size1();
-    casadi_int ncol = size2();
-    const casadi_int* colind = this->colind();
-    const casadi_int* row = this->row();
-    casadi_int nnz = this->nnz();
-    casadi_assert(nrow >=0,
-                          "number of rows must be positive, but got " + str(nrow) + ".");
-    casadi_assert(ncol>=0 ,
-                          "number of columns must be positive, but got " + str(ncol) + ".");
-    if (complete) {
-
-      for (casadi_int k=0; k<ncol; k++) {
-        casadi_assert(colind[k+1]>=colind[k],
-                              "Compressed Column Storage is not sane. "
-                              "colind must be monotone.");
-      }
-
-      casadi_assert(colind[0]==0,
-                            "Compressed Column Storage is not sane. "
-                            "First element of colind must be zero.");
-
-      for (casadi_int k=0; k<nnz; k++) {
-        if (row[k]>=nrow || row[k] < 0) {
-          casadi_error("Compressed Column Storage is not sane.\n"
-            "The following must hold: 0 <= row[i] < nrow for each i, "
-            "but got row[" + str(k) + "] = " + str(row[k])
-            + " and nrow = " + str(nrow));
-        }
-      }
-    }
   }
 
   void SparsityInternal::disp(ostream &stream, bool more) const {

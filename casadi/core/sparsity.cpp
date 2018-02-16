@@ -84,7 +84,6 @@ namespace casadi {
     casadi_assert_dev(ncol>=0);
     std::vector<casadi_int> row, colind(ncol+1, 0);
     assign_cached(nrow, ncol, colind, row);
-    sanity_check(true);
   }
 
   Sparsity::Sparsity(const std::pair<casadi_int, casadi_int>& rc) {
@@ -92,7 +91,6 @@ namespace casadi {
     casadi_assert_dev(rc.second>=0);
     std::vector<casadi_int> row, colind(rc.second+1, 0);
     assign_cached(rc.first, rc.second, colind, row);
-    sanity_check(true);
   }
 
   Sparsity::Sparsity(casadi_int nrow, casadi_int ncol, const std::vector<casadi_int>& colind,
@@ -100,7 +98,6 @@ namespace casadi {
     casadi_assert_dev(nrow>=0);
     casadi_assert_dev(ncol>=0);
     assign_cached(nrow, ncol, colind, row, order_rows);
-    sanity_check(true);
   }
 
   Sparsity::Sparsity(casadi_int nrow, casadi_int ncol,
@@ -113,7 +110,6 @@ namespace casadi {
       vector<casadi_int> colindv(colind, colind+ncol+1);
       vector<casadi_int> rowv(row, row+colind[ncol]);
       assign_cached(nrow, ncol, colindv, rowv, order_rows);
-      sanity_check(true);
     }
   }
 
@@ -191,10 +187,6 @@ namespace casadi {
         + str(cc) + " out of range [0," + str(size2()) + "]");
     }
     return colind()[cc];
-  }
-
-  void Sparsity::sanity_check(bool complete) const {
-    (*this)->sanity_check(complete);
   }
 
   void Sparsity::resize(casadi_int nrow, casadi_int ncol) {

@@ -82,9 +82,6 @@ namespace casadi {
     /// Number of structural non-zeros
     inline casadi_int nnz() const { return colind()[size2()];}
 
-    /// Check if the dimensions and colind, row vectors are compatible
-    void sanity_check(bool complete=false) const;
-
     /** \brief Get the diagonal of the matrix/create a diagonal matrix
      *
      * \param[out] mapping will contain the nonzero mapping

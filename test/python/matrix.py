@@ -865,7 +865,6 @@ class Matrixtests(casadiTestCase):
         #  print("ref:")
         #  c_ref.sparsity().spy()
         #  c_ref.print_dense()
-        #  a.sparsity().sanity_check()
         #  a.print_dense()
         #  raise e
 
