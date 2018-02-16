@@ -61759,13 +61759,8 @@ Is dense?
 %feature("docstring")  casadi::Sparsity::sanity_check(bool complete=false)
 const  "
 
-Check if the dimensions and colind, row vectors are compatible.
-
-Parameters:
------------
-
-complete:  set to true to also check elementwise throws an error as possible
-result
+[DEPRECATED] Correctness of sparsity patterns are checked during
+construction
 
 ";
 
