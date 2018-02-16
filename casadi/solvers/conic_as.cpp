@@ -104,6 +104,7 @@ namespace casadi {
     alloc_w(nx_ + na_); // casadi_project, [alpha_x, -lambda_g], [lambda_x, alpha_g]
     alloc_w(nx_, true); // alpha_x
     alloc_w(na_, true); // alpha_a
+    alloc_w(nx_+na_, true); // step
 
     // Memory for numerical solution
     alloc_w(sp_v_.nnz(), true); // v
@@ -232,7 +233,8 @@ namespace casadi {
     lam_x = res[CONIC_LAM_X];
 
     // Work vectors
-    double *kkt, *kktd, *xk, *lam_xk, *lam_ak, *v, *r, *beta, *alpha_x, *alpha_a, *gk;
+    double *kkt, *kktd, *xk, *lam_xk, *lam_ak, *v, *r, *beta,
+           *alpha_x, *alpha_a, *gk, *step;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     xk = w; w += nx_;
@@ -244,6 +246,7 @@ namespace casadi {
     alpha_x = w; w += nx_;
     alpha_a = w; w += na_;
     gk = w; w += nx_;
+    step = w; w += nx_+na_;
 
     // Pass initial guess
     casadi_copy(x0, nx_, xk);
@@ -290,13 +293,6 @@ namespace casadi {
       }
     }
 
-    // Adjust signs for active constraints
-//    for (i=0; i<nx_; ++i)
-
-
-//    casadi_fill(w, nx_, 0.);
-  //  casadi_mv(h, H_, xk, w, 0);
-
     // Calculate alpha_a
     for (i=0; i<na_; ++i) {
       alpha_a[i] = gk[i];
@@ -306,12 +302,6 @@ namespace casadi {
         alpha_a[i] -= uba[i];
       }
     }
-
-//    cout << "kktd = " << endl;
-  //  print_matrix(kktd, kktd_);
-    //cout << "w = " << endl;
-    //print_vector(w, nx_ + na_);
-    //cout << "endl" << endl;
 
     // Multiply kktd with diag([alpha_x; -lambda_a]) from the left
     for (i=0; i<nx_; ++i) w[i] = alpha_a[i];
@@ -326,15 +316,22 @@ namespace casadi {
     // QR factorization
     casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
 
-    // Calculate residual
-    casadi_fill(w, nx_, 0.);
-    casadi_mv(h, H_, xk, w, 0);
-    for (i=0; i<nx_; ++i) w[i] *= alpha_x[i];
-    for (i=0; i<na_; ++i) w[nx_+i] *= -lam_ak[i]*alpha_a[i];
+    // Calculate negative KKT residual
+    casadi_copy(g, nx_, step);
+    casadi_mv(h, H_, xk, step, 0); // gradient of the objective
+    casadi_mv(a, A_, lam_ak, step, 1); // gradient of the Lagrangian
+    for (i=0; i<nx_; ++i) step[i] *= -alpha_x[i];
+    for (i=0; i<na_; ++i) step[nx_+i] *= lam_ak[i]*alpha_a[i];
 
-    cout << "residual = " << endl;
-    print_vector(w, nx_ + na_);
+    cout << "negative residual = " << endl;
+    print_vector(step, nx_ + na_);
 
+    // Solve to get primal-dual step
+    casadi_qr_solve(step, 1, 0, sp_v_, v, sp_r_, r, beta,
+                    get_ptr(prinv_), get_ptr(pc_), w);
+
+    cout << "step = " << endl;
+    print_vector(step, nx_ + na_);
 
     cout << "kktd scaled, shifted = " << endl;
     print_matrix(kktd, kktd_);
