@@ -821,21 +821,21 @@ namespace casadi {
     MX JG = HJ_res.at(0);
     MX HL = HJ_res.at(1);
 
-    // Active bounds
+    // Active set (assumed known and given by the multiplier signs)
     MX ubIx = lam_x>0;
     MX lbIx = lam_x<0;
+    MX bIx = lam_x!=0;
+    MX iIx = lam_x==0;
     MX ubIg = lam_g>0;
     MX lbIg = lam_g<0;
-
-    // Common
-    MX alpha_x = x - if_else(ubIx, ubx, 0) - if_else(lbIx, lbx, 0);
-    MX alpha_g = g - if_else(ubIg, ubg, 0) - if_else(lbIg, lbg, 0);
+    MX bIg = lam_g!=0;
+    MX iIg = lam_g==0;
 
     // KKT matrix
-    MX H_11 = mtimes(diag(alpha_x), HL) - diag(lam_x);
-    MX H_12 = mtimes(diag(alpha_x), JG.T());
-    MX H_21 = -mtimes(diag(lam_g), JG);
-    MX H_22 = -diag(alpha_g);
+    MX H_11 = mtimes(diag(iIx), HL) + diag(bIx);
+    MX H_12 = mtimes(diag(iIx), JG.T());
+    MX H_21 = mtimes(diag(bIg), JG);
+    MX H_22 = diag(-iIg);
     MX H = MX::blockcat({{H_11, H_12}, {H_21, H_22}});
 
     // Sensitivity inputs
@@ -873,23 +873,19 @@ namespace casadi {
     MX beta_x_bar = v_split.at(0);
     MX beta_g_bar = v_split.at(1);
 
-    // Calculate alpha_x_bar, alpha_g_bar
-    MX alpha_x_bar = lam_x * beta_x_bar;
-    MX alpha_g_bar = lam_g * beta_g_bar;
-
     // Calculate sensitivities in p
     vv = {x, p, 1, lam_g, f, g, -lam_x, -lam_p,
-          0, alpha_g_bar, -alpha_x*beta_x_bar, 0};
+          0, bIg*beta_g_bar, iIx*beta_x_bar, 0};
     vv = rev_nlp_grad(vv);
     MX adj_p = vv.at(1);
 
     // Reverse sensitivities
     vector<MX> asens(NLPSOL_NUM_IN);
-    asens[NLPSOL_UBX] = -if_else(ubIx, alpha_x_bar, 0);
-    asens[NLPSOL_LBX] = -if_else(lbIx, alpha_x_bar, 0);
-    asens[NLPSOL_UBG] = -if_else(ubIg, alpha_g_bar, 0);
-    asens[NLPSOL_LBG] = -if_else(lbIg, alpha_g_bar, 0);
-    asens[NLPSOL_P] = adj_p + adj_p0;
+    asens[NLPSOL_UBX] = if_else(ubIx, beta_x_bar, 0);
+    asens[NLPSOL_LBX] = if_else(lbIx, beta_x_bar, 0);
+    asens[NLPSOL_UBG] = if_else(ubIg, beta_g_bar, 0);
+    asens[NLPSOL_LBG] = if_else(lbIg, beta_g_bar, 0);
+    asens[NLPSOL_P] = adj_p0 - adj_p;
 
     // Guesses are unused
     for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
@@ -900,6 +896,7 @@ namespace casadi {
     arg.insert(arg.end(), res.begin(), res.end());
     arg.insert(arg.end(), aseed.begin(), aseed.end());
     res = asens;
+
     return Function(name, arg, res, inames, onames, opts);
   }
 
