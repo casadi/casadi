@@ -261,14 +261,16 @@ namespace casadi {
     casadi_set_sub(a, kkt, kkt_, nx_, nx_+na_, 0, nx_); // a
     casadi_set_sub(w, kkt, kkt_, 0, nx_, nx_, nx_+na_); // a'
 
-    // Copy kkt to kktd
-    casadi_project(kkt, kkt_, kktd, kktd_, w);
-
-    // Make sure that simple bounds are respected
+    // Make sure that free variables have zero multipliers
     for (i=0; i<nx_; ++i) {
       lb = lbx ? lbx[i] : 0.;
       ub = ubx ? ubx[i] : 0.;
-      xk[i] = std::max(std::min(xk[i], ub), lb);
+      //      xk[i] = std::max(std::min(xk[i], ub), lb);
+    //  if (xk[i]<lb && lam_xk[i]>=0) lam_xk[i] = -std::numeric_limits<double>::min();
+      //if (xk[i]>ub && lam_xk[i]<=0) lam_xk[i] =  std::numeric_limits<double>::min();
+
+//      if (xk[i]>lb && xk[i]<ub) lam_xk[i] = 0;
+  //    lam_xk[i] = 0;
     }
 
     // Calculate g
@@ -279,55 +281,84 @@ namespace casadi {
     for (i=0; i<na_; ++i) {
       lb = lba ? lba[i] : 0.;
       ub = uba ? uba[i] : 0.;
-      if (gk[i]<lb && lam_ak[i]>=0) lam_ak[i] = -std::numeric_limits<double>::min();
-      if (gk[i]>ub && lam_ak[i]<=0) lam_ak[i] = std::numeric_limits<double>::min();
+    //  if (gk[i]<lb && lam_ak[i]>=0) lam_ak[i] = -std::numeric_limits<double>::min();
+  //    if (gk[i]>ub && lam_ak[i]<=0) lam_ak[i] =  std::numeric_limits<double>::min();
     }
 
-    // Calculate alpha_x
-    for (i=0; i<nx_; ++i) {
-      alpha_x[i] = xk[i];
-      if (lam_xk[i]<0 && lbx) {
-        alpha_x[i] -= lbx[i];
-      } else if (lam_xk[i]>0 && ubx) {
-        alpha_x[i] -= ubx[i];
+    // Copy kkt to kktd
+    casadi_project(kkt, kkt_, kktd, kktd_, w);
+
+    // kktd sparsity
+    const casadi_int* kkt_colind = kktd_.colind();
+    const casadi_int* kkt_row = kktd_.row();
+
+    // Loop over kktd entries (left two blocks of the transposed KKT)
+    for (casadi_int c=0; c<nx_; ++c) {
+      if (lam_xk[c]!=0) {
+        // Zero out column, set diagonal entry to 1
+        for (casadi_int k=kkt_colind[c]; k<kkt_colind[c+1]; ++k) {
+          kktd[k] = kkt_row[k]==c ? 1. : 0.;
+        }
       }
     }
 
-    // Calculate alpha_a
-    for (i=0; i<na_; ++i) {
-      alpha_a[i] = gk[i];
-      if (lam_ak[i]<0 && lba) {
-        alpha_a[i] -= lba[i];
-      } else if (lam_ak[i]>0 && uba) {
-        alpha_a[i] -= uba[i];
+    // Loop over kktd entries (right two blocks of the transposed KKT)
+    for (casadi_int c=0; c<na_; ++c) {
+      if (lam_ak[c]==0) {
+        // Zero out column, set diagonal entry to -1
+        for (casadi_int k=kkt_colind[nx_+c]; k<kkt_colind[nx_+c+1]; ++k) {
+          kktd[k] = kkt_row[k]==nx_+c ? -1. : 0.;
+        }
       }
     }
-
-    // Multiply kktd with diag([alpha_x; -lambda_a]) from the left
-    for (i=0; i<nx_; ++i) w[i] = alpha_a[i];
-    for (i=0; i<na_; ++i) w[nx_+i] = -lam_ak[i];
-    casadi_row_scal(kktd, kktd_, w);
-
-    // Subtract diag([lambda_x; alpha_x])
-    for (i=0; i<nx_; ++i) w[i] = -lam_xk[i];
-    for (i=0; i<na_; ++i) w[nx_+i] = -alpha_a[i];
-    casadi_add_diag(kktd, kktd_, w);
 
     // QR factorization
     casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
 
-    // Calculate negative KKT residual
+    // Evaluate gradient of the Lagrangian and constraint functions
     casadi_copy(g, nx_, step);
     casadi_mv(h, H_, xk, step, 0); // gradient of the objective
     casadi_mv(a, A_, lam_ak, step, 1); // gradient of the Lagrangian
+    casadi_copy(gk, na_, step + nx_); // constraint evaluation
+
+    cout << "infeasibility before = " << endl;
+    print_vector(step, nx_ + na_);
+
+    // Correct for active simple bounds
+    for (i=0; i<nx_; ++i) {
+      if (lam_xk[i]!=0) {
+        step[i] = xk[i];
+        if (lbx && lam_xk[i]<0) step[i] -= lbx[i];
+        if (ubx && lam_xk[i]>0) step[i] -= ubx[i];
+      }
+    }
+
+    // Correct for inactive constraints
+    for (i=0; i<na_; ++i) {
+      if (lam_ak[i]==0) {
+        step[nx_+i] = 0;
+      } else if (lba && lam_ak[i]<0) {
+        step[nx_+i] -= lba[i];
+      } else if (uba && lam_ak[i]>0) {
+        step[nx_+i] -= uba[i];
+      }
+    }
+
+
+    cout << "infeasibility after = " << endl;
+    print_vector(step, nx_ + na_);
+
+/*
+    // Calculate negative KKT residual
     for (i=0; i<nx_; ++i) step[i] *= -alpha_x[i];
     for (i=0; i<na_; ++i) step[nx_+i] *= lam_ak[i]*alpha_a[i];
 
     cout << "negative residual = " << endl;
     print_vector(step, nx_ + na_);
+    */
 
     // Solve to get primal-dual step
-    casadi_qr_solve(step, 1, 0, sp_v_, v, sp_r_, r, beta,
+    casadi_qr_solve(step, 1, 1, sp_v_, v, sp_r_, r, beta,
                     get_ptr(prinv_), get_ptr(pc_), w);
 
     cout << "step = " << endl;
