@@ -698,14 +698,14 @@ namespace casadi {
     MX HL = HJ_res.at(1);
 
     // Active bounds
-    MX ubx_active = lam_x>0;
-    MX lbx_active = lam_x<0;
-    MX ubg_active = lam_g>0;
-    MX lbg_active = lam_g<0;
+    MX ubIx = lam_x>0;
+    MX lbIx = lam_x<0;
+    MX ubIg = lam_g>0;
+    MX lbIg = lam_g<0;
 
     // Common
-    MX alpha_x = x - if_else(ubx_active, ubx, 0) - if_else(lbx_active, lbx, 0);
-    MX alpha_g = g - if_else(ubg_active, ubg, 0) - if_else(lbg_active, lbg, 0);
+    MX alpha_x = x - if_else(ubIx, ubx, 0) - if_else(lbIx, lbx, 0);
+    MX alpha_g = g - if_else(ubIg, ubg, 0) - if_else(lbIg, lbg, 0);
 
     // KKT matrix
     MX H_11 = mtimes(diag(alpha_x), HL) - diag(lam_x);
@@ -745,8 +745,8 @@ namespace casadi {
     MX fwd_gL_p = vv.at(2);
 
     // Propagate forward seeds
-    MX fwd_alpha_x = -if_else(ubx_active, fwd_ubx, 0) - if_else(lbx_active, fwd_lbx, 0);
-    MX fwd_alpha_g = fwd_g_p - if_else(ubg_active, fwd_ubg, 0) - if_else(lbg_active, fwd_lbg, 0);
+    MX fwd_alpha_x = -if_else(ubIx, fwd_ubx, 0) - if_else(lbIx, fwd_lbx, 0);
+    MX fwd_alpha_g = fwd_g_p - if_else(ubIg, fwd_ubg, 0) - if_else(lbIg, fwd_lbg, 0);
     MX v = MX::vertcat({fwd_alpha_x * lam_x - alpha_x * fwd_gL_p, fwd_alpha_g * lam_g});
 
     // Solve
@@ -820,14 +820,14 @@ namespace casadi {
     MX HL = HJ_res.at(1);
 
     // Active bounds
-    MX ubx_active = lam_x>0;
-    MX lbx_active = lam_x<0;
-    MX ubg_active = lam_g>0;
-    MX lbg_active = lam_g<0;
+    MX ubIx = lam_x>0;
+    MX lbIx = lam_x<0;
+    MX ubIg = lam_g>0;
+    MX lbIg = lam_g<0;
 
     // Common
-    MX alpha_x = x - if_else(ubx_active, ubx, 0) - if_else(lbx_active, lbx, 0);
-    MX alpha_g = g - if_else(ubg_active, ubg, 0) - if_else(lbg_active, lbg, 0);
+    MX alpha_x = x - if_else(ubIx, ubx, 0) - if_else(lbIx, lbx, 0);
+    MX alpha_g = g - if_else(ubIg, ubg, 0) - if_else(lbIg, lbg, 0);
 
     // KKT matrix
     MX H_11 = mtimes(diag(alpha_x), HL) - diag(lam_x);
@@ -883,10 +883,10 @@ namespace casadi {
 
     // Reverse sensitivities
     vector<MX> asens(NLPSOL_NUM_IN);
-    asens[NLPSOL_UBX] = -if_else(ubx_active, alpha_x_bar, 0);
-    asens[NLPSOL_LBX] = -if_else(lbx_active, alpha_x_bar, 0);
-    asens[NLPSOL_UBG] = -if_else(ubg_active, alpha_g_bar, 0);
-    asens[NLPSOL_LBG] = -if_else(lbg_active, alpha_g_bar, 0);
+    asens[NLPSOL_UBX] = -if_else(ubIx, alpha_x_bar, 0);
+    asens[NLPSOL_LBX] = -if_else(lbIx, alpha_x_bar, 0);
+    asens[NLPSOL_UBG] = -if_else(ubIg, alpha_g_bar, 0);
+    asens[NLPSOL_LBG] = -if_else(lbIg, alpha_g_bar, 0);
     asens[NLPSOL_P] = adj_p + adj_p0;
 
     // Guesses are unused
