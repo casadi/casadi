@@ -697,21 +697,21 @@ namespace casadi {
     MX JG = HJ_res.at(0);
     MX HL = HJ_res.at(1);
 
-    // Active bounds
+    // Active set (assumed known and given by the multiplier signs)
     MX ubIx = lam_x>0;
     MX lbIx = lam_x<0;
+    MX bIx = lam_x!=0;
+    MX iIx = lam_x==0;
     MX ubIg = lam_g>0;
     MX lbIg = lam_g<0;
-
-    // Common
-    MX alpha_x = x - if_else(ubIx, ubx, 0) - if_else(lbIx, lbx, 0);
-    MX alpha_g = g - if_else(ubIg, ubg, 0) - if_else(lbIg, lbg, 0);
+    MX bIg = lam_g!=0;
+    MX iIg = lam_g==0;
 
     // KKT matrix
-    MX H_11 = mtimes(diag(alpha_x), HL) - diag(lam_x);
-    MX H_12 = mtimes(diag(alpha_x), JG.T());
-    MX H_21 = -mtimes(diag(lam_g), JG);
-    MX H_22 = -diag(alpha_g);
+    MX H_11 = mtimes(diag(iIx), HL) + diag(bIx);
+    MX H_12 = mtimes(diag(iIx), JG.T());
+    MX H_21 = mtimes(diag(bIg), JG);
+    MX H_22 = diag(-iIg);
     MX H = MX::blockcat({{H_11, H_12}, {H_21, H_22}});
 
     // Sensitivity inputs
@@ -745,9 +745,11 @@ namespace casadi {
     MX fwd_gL_p = vv.at(2);
 
     // Propagate forward seeds
-    MX fwd_alpha_x = -if_else(ubIx, fwd_ubx, 0) - if_else(lbIx, fwd_lbx, 0);
-    MX fwd_alpha_g = fwd_g_p - if_else(ubIg, fwd_ubg, 0) - if_else(lbIg, fwd_lbg, 0);
-    MX v = MX::vertcat({fwd_alpha_x * lam_x - alpha_x * fwd_gL_p, fwd_alpha_g * lam_g});
+    MX fwd_alpha_x = (if_else(lbIx, fwd_lbx, 0) + if_else(ubIx, fwd_ubx, 0))
+                   - if_else(iIx, fwd_gL_p, 0);
+    MX fwd_alpha_g = (if_else(ubIg, fwd_ubg, 0) + if_else(lbIg, fwd_lbg, 0))
+                   - if_else(bIg, fwd_g_p, 0);
+    MX v = MX::vertcat({fwd_alpha_x, fwd_alpha_g});
 
     // Solve
     v = MX::solve(H, v, "qr");
