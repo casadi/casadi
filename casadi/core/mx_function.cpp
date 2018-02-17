@@ -412,7 +412,7 @@ namespace casadi {
       } else if (e.op==OP_OUTPUT) {
         // Get an output
         double *w1 = w+workloc_[e.arg.front()];
-        casadi_int nnz=e.data.dep().nnz();
+        casadi_int nnz=e.data->dep().nnz();
         casadi_int i=e.data->ind();
         casadi_int nz_offset=e.data->offset();
         if (res[i]) copy(w1, w1+nnz, res[i]+nz_offset);
