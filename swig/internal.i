@@ -565,6 +565,9 @@
 %exception  casadi::FunctionInternal::get_function(const std::string &name) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::get_jac(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::get_jacobian(const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -622,6 +625,9 @@
 %exception  casadi::FunctionInternal::has_function(const std::string &fname) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::has_jac() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::has_jacobian() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -662,6 +668,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::is_a(const std::string &type, bool recursive) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::jac() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::jacobian() const  {
