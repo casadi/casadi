@@ -32627,7 +32627,7 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::get_stats(void *mem) const
+%feature("docstring")  casadi::ImplicitToNlp::get_stats(void *mem) const
 override "
 
 [INTERNAL]  Get all statistics.
