@@ -518,5 +518,22 @@ class Sparsitytests(casadiTestCase):
 
     self.checkarray(IM(c_,1),IM(c.kron(a,b).sparsity(),1))
 
+  def test_nz_method(self):
+    n = 20
+    m = 25
+    import random
+    random.seed(0)
+    numpy.random.seed(0)
+    d = self.randDM(n,m,0.5)
+    D = densify(vec(d))
+    dn = DM(d.nonzeros())
+    sp = d.sparsity()
+    z = np.unique([random.randint(0,n*m-1) for i in range(200)])
+    zres = sp.get_nz(z)
+    A = dn[[e for e in zres if e>=0]]
+    B = D[[e for e,k in zip(z,zres) if k>=0]]
+    self.checkarray(A,B)
+    self.assertFalse(np.any(D[[e for e,k in zip(z,zres) if k==-1]]))    
+
 if __name__ == '__main__':
     unittest.main()
