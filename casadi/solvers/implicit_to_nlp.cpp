@@ -174,7 +174,6 @@ namespace casadi {
 
     // Solve the NLP
     solver_(m->arg, m->res, m->iw, m->w, 0);
-    m->solver_stats = solver_.stats();
 
     // Get the implicit variable
     casadi_copy(m->x, n_, m->ires[iout_]);
@@ -198,6 +197,10 @@ namespace casadi {
     }
 
     return 0;
+  }
+
+  Dict ImplicitToNlp::get_stats(void* mem) const {
+    return solver_.stats();
   }
 
 } // namespace casadi
