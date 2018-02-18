@@ -120,6 +120,15 @@ namespace casadi {
 
     ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
+    bool has_jac() const override { return true;}
+    Function get_jac(const std::string& name,
+                     const std::vector<std::string>& inames,
+                     const std::vector<std::string>& onames,
+                     const Dict& opts) const override;
+    ///@}
+
+    ///@{
+    /** \brief Return Jacobian of all input elements with respect to all output elements */
     bool has_jacobian() const override { return true;}
     Function get_jacobian(const std::string& name,
                           const std::vector<std::string>& inames,
@@ -738,6 +747,45 @@ namespace casadi {
       return Function(name, ret_in, ret_out, inames, onames, opts);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("get_reverse", e.what());
+    }
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  Function XFunction<DerivedType, MatType, NodeType>
+  ::get_jac(const std::string& name,
+            const std::vector<std::string>& inames,
+            const std::vector<std::string>& onames,
+            const Dict& opts) const {
+    try {
+      // Temporary single-input, single-output function FIXME(@jaeandersson)
+      Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
+                   {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
+
+      // Jacobian expression
+      MatType J = tmp.get<DerivedType>()->jac(0, 0, Dict());
+
+      // Split up Jacobian blocks
+      std::vector<casadi_int> r_offset = {0}, c_offset = {0};
+      for (auto& e : out_) r_offset.push_back(r_offset.back() + e.numel());
+      for (auto& e : in_) c_offset.push_back(c_offset.back() + e.numel());
+      auto Jblocks = MatType::blocksplit(J, r_offset, c_offset);
+
+      // Collect all outputs
+      std::vector<MatType> ret_out;
+      ret_out.reserve(onames.size());
+      for (auto& e1 : Jblocks) for (auto& e2 : e1) ret_out.push_back(e2);
+
+      // All inputs of the return function
+      std::vector<MatType> ret_in(inames.size());
+      copy(in_.begin(), in_.end(), ret_in.begin());
+      for (casadi_int i=0; i<n_out_; ++i) {
+        ret_in.at(n_in_+i) = MatType::sym(inames[n_in_+i], Sparsity(out_.at(i).size()));
+      }
+
+      // Assemble function and return
+      return Function(name, ret_in, ret_out, inames, onames, opts);
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("get_jac", e.what());
     }
   }
 

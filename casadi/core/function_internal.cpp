@@ -1646,18 +1646,18 @@ namespace casadi {
 
   Function FunctionInternal::jac() const {
     // Used wrapped function if jacobian not available
-/*    if (!has_jac()) {
+    if (!has_jac()) {
       // Derivative information must be available
       casadi_assert(has_derivative(),
                     "Derivatives cannot be calculated for " + name_);
       return wrap().jac();
-    } */
+    }
 
     // Quick return if cached
     if (jac_.alive()) return shared_cast<Function>(jac_.shared());
 
     // Give it a suitable name
-    string name = "jac_" + name_;
+    string name = "JAC_" + name_;
 
     // Names of inputs
     std::vector<std::string> inames = name_in_;
@@ -1668,7 +1668,7 @@ namespace casadi {
     onames.reserve(n_in_*n_out_);
     for (size_t oind=0; oind<n_out_; ++oind) {
       for (size_t iind=0; iind<n_in_; ++iind) {
-        onames.push_back("d" + name_out_[oind] + "_d" + name_in_[iind]);
+        onames.push_back("D" + name_out_[oind] + "D" + name_in_[iind]);
       }
     }
 
