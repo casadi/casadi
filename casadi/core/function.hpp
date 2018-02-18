@@ -931,7 +931,16 @@ namespace casadi {
     Function mapaccum(const std::string& name, const std::vector<Function>& chain,
                       casadi_int n_accum=1, const Dict& opts = Dict()) const;
 
+#ifdef WITH_EXTRA_CHECKS
+    public:
+    // How many times have we passed through
+    // operator()(const double** arg, double** res, casadi_int* iw, double* w, casadi_int mem)?
+    static thread_local casadi_int call_depth_;
+#endif
+
+
 #endif // SWIG
+
 
 
   };

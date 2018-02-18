@@ -794,6 +794,9 @@ namespace casadi {
 
     /** \brief Temporary memory inside a function */
     size_t sz_arg_tmp_, sz_res_tmp_, sz_iw_tmp_, sz_w_tmp_;
+
+    /** \brief Fall back to eval_DM */
+    int eval_fallback(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
   };
 
   // Template implementations

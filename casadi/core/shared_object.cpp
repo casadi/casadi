@@ -24,6 +24,9 @@
 
 #include "shared_object_internal.hpp"
 #include "sparse_storage_impl.hpp"
+#ifdef WITH_EXTRA_CHECKS
+#include "function.hpp"
+#endif // WITH_EXTRA_CHECKS
 #include <typeinfo>
 
 using namespace std;
@@ -77,10 +80,16 @@ namespace casadi {
   }
 
   void SharedObject::count_up() {
+#ifdef WITH_EXTRA_CHECKS
+    casadi_assert_dev(Function::call_depth_==0);
+#endif // WITH_EXTRA_CHECKS
     if (node) node->count++;
   }
 
   void SharedObject::count_down() {
+#ifdef WITH_EXTRA_CHECKS
+    casadi_assert_dev(Function::call_depth_==0);
+#endif // WITH_EXTRA_CHECKS
     if (node && --node->count == 0) {
       delete node;
       node = 0;

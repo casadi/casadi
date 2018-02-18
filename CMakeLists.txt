@@ -359,6 +359,14 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   # I don't know the MSVC warnings, so do nothing for now
 endif()
+#######################################################################
+############################### Extra runtime checks ##################
+#######################################################################
+option(WITH_EXTRA_CHECKS "Compile in extra runtime checks (for developers)" OFF)
+if(WITH_EXTRA_CHECKS)
+   add_definitions(-DWITH_EXTRA_CHECKS)
+endif()
+
 
 #######################################################################
 ############################# -fPIC ###################################

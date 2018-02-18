@@ -2757,7 +2757,7 @@ namespace casadi {
   }
 
   int FunctionInternal::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  eval_fallback(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     // As a fallback, redirect to (the less efficient) eval_dm
 
     // Allocate input matrices
@@ -2796,6 +2796,26 @@ namespace casadi {
 
     // Successful return
     return 0;
+  }
+
+  int FunctionInternal::
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+#ifdef WITH_EXTRA_CHECKS
+    casadi_int call_depth = Function::call_depth_;
+    Function::call_depth_ = 0;
+#endif // WITH_EXTRA_CHECKS
+    try {
+      int ret = eval_fallback(arg, res, iw, w, mem);
+#ifdef WITH_EXTRA_CHECKS
+      Function::call_depth_ = call_depth;
+#endif // WITH_EXTRA_CHECKS
+      return ret;
+    } catch (exception&) {
+#ifdef WITH_EXTRA_CHECKS
+      Function::call_depth_ = call_depth;
+#endif
+      throw;
+    }
   }
 
   void FunctionInternal::sprint(char* buf, size_t buf_sz, const char* fmt, ...) const {

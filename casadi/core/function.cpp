@@ -1176,13 +1176,37 @@ namespace casadi {
     return (*this)->get_min_in(ind);
   }
 
+#ifdef WITH_EXTRA_CHECKS
+  // Initialize at zero depth
+  thread_local casadi_int Function::call_depth_ = 0;
+#endif // WITH_EXTRA_CHECKS
+
   int Function::operator()(const double** arg, double** res,
       casadi_int* iw, double* w, casadi_int mem) const {
     try {
-      return (*this)->eval_gen(arg, res, iw, w, memory(mem));
+#ifdef WITH_EXTRA_CHECKS
+      // Should never happen
+      casadi_assert_dev(call_depth_>=0);
+      call_depth_++;
+      // For consistency check
+      casadi_int depth = call_depth_;
+#endif // WITH_EXTRA_CHECKS
+      int ret = (*this)->eval_gen(arg, res, iw, w, memory(mem));
+#ifdef WITH_EXTRA_CHECKS
+      // Consitency check
+      casadi_assert_dev(call_depth_==depth);
+      call_depth_--;
+#endif // WITH_EXTRA_CHECKS
+      return ret;
     } catch (KeyboardInterruptException& e) {
+#ifdef WITH_EXTRA_CHECKS
+      call_depth_--;
+#endif // WITH_EXTRA_CHECKS
       throw;
     } catch (exception& e) {
+#ifdef WITH_EXTRA_CHECKS
+      call_depth_--;
+#endif // WITH_EXTRA_CHECKS
       THROW_ERROR("operator()", e.what());
     }
   }
