@@ -323,364 +323,295 @@ namespace casadi {
       }
     }
 
-    for (casadi_int iter=0; iter<max_iter_; ++iter) {
-
-
-    if (verbose_) {
-    casadi_message("Iteration: " + str(iter));
-    cout << "Current x:" << endl;
-    print_vector(xk, nx_);
-    cout << "Current g:" << endl;
-    print_vector(gk, na_);
-    cout << "Current lam_x:" << endl;
-    print_vector(lam_ak, nx_);
-    cout << "Current lam_a:" << endl;
-    print_vector(lam_ak, na_);
-
-    cout << "Current active set (x): ";
-    for (i=0; i<nx_; ++i) {
-      if (lam_xk[i]==0) {
-        cout << "0, ";
-      } else if (lam_xk[i]>0) {
-        cout << "+, ";
-      } else {
-        cout << "-, ";
-      }
-    }
-    cout << endl;
-
-    cout << "Current active set (g): ";
-    for (i=0; i<na_; ++i) {
-      if (lam_ak[i]==0) {
-        cout << "0, ";
-      } else if (lam_ak[i]>0) {
-        cout << "+, ";
-      } else {
-        cout << "-, ";
-      }
-    }
-    cout << endl;
-  }
-
-
-
-    // Copy kkt to kktd
-    casadi_project(kkt, kkt_, kktd, kktd_, w);
-
     // kktd sparsity
     const casadi_int* kkt_colind = kktd_.colind();
     const casadi_int* kkt_row = kktd_.row();
 
-    // Loop over kktd entries (left two blocks of the transposed KKT)
-    for (casadi_int c=0; c<nx_; ++c) {
-      if (lam_xk[c]!=0) {
-        // Zero out column, set diagonal entry to 1
-        for (casadi_int k=kkt_colind[c]; k<kkt_colind[c+1]; ++k) {
-          kktd[k] = kkt_row[k]==c ? 1. : 0.;
+    // QP iterations
+    for (casadi_int iter=0; iter<max_iter_; ++iter) {
+
+      // Debugging
+      if (verbose_) {
+        print("Current xk = \n");
+        print_vector(xk, nx_);
+        print("Current gk = \n");
+        print_vector(gk, na_);
+        print("Current lam_xk = \n");
+        print_vector(lam_xk, nx_);
+        print("Current lam_ak = \n");
+        print_vector(lam_ak, na_);
+      }
+
+      // Copy kkt to kktd
+      casadi_project(kkt, kkt_, kktd, kktd_, w);
+
+      // Loop over kktd entries (left two blocks of the transposed KKT)
+      for (casadi_int c=0; c<nx_; ++c) {
+        if (lam_xk[c]!=0) {
+          // Zero out column, set diagonal entry to 1
+          for (casadi_int k=kkt_colind[c]; k<kkt_colind[c+1]; ++k) {
+            kktd[k] = kkt_row[k]==c ? 1. : 0.;
+          }
         }
       }
-    }
 
-    // Loop over kktd entries (right two blocks of the transposed KKT)
-    for (casadi_int c=0; c<na_; ++c) {
-      if (lam_ak[c]==0) {
-        // Zero out column, set diagonal entry to -1
-        for (casadi_int k=kkt_colind[nx_+c]; k<kkt_colind[nx_+c+1]; ++k) {
-          kktd[k] = kkt_row[k]==nx_+c ? -1. : 0.;
+      // Loop over kktd entries (right two blocks of the transposed KKT)
+      for (casadi_int c=0; c<na_; ++c) {
+        if (lam_ak[c]==0) {
+          // Zero out column, set diagonal entry to -1
+          for (casadi_int k=kkt_colind[nx_+c]; k<kkt_colind[nx_+c+1]; ++k) {
+            kktd[k] = kkt_row[k]==nx_+c ? -1. : 0.;
+          }
         }
       }
-    }
 
-    // QR factorization
-    casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
+      // QR factorization
+      casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
 
-    // Evaluate gradient of the Lagrangian and constraint functions
-    casadi_copy(g, nx_, step);
-    casadi_mv(h, H_, xk, step, 0); // gradient of the objective
-    casadi_mv(a, A_, lam_ak, step, 1); // gradient of the Lagrangian
-    casadi_copy(gk, na_, step + nx_); // constraint evaluation
+      // Evaluate gradient of the Lagrangian and constraint functions
+      casadi_copy(g, nx_, step);
+      casadi_mv(h, H_, xk, step, 0); // gradient of the objective
+      casadi_mv(a, A_, lam_ak, step, 1); // gradient of the Lagrangian
+      casadi_copy(gk, na_, step + nx_); // constraint evaluation
 
-    // Correct for active simple bounds
-    for (i=0; i<nx_; ++i) {
-      if (lam_xk[i]!=0.) {
-        step[i] = xk[i];
-        if (lbx && lam_xk[i]<0) step[i] -= lbx[i];
-        if (ubx && lam_xk[i]>0) step[i] -= ubx[i];
+      // Correct for active simple bounds
+      for (i=0; i<nx_; ++i) {
+        if (lam_xk[i]!=0.) {
+          step[i] = xk[i];
+          if (lbx && lam_xk[i]<0) step[i] -= lbx[i];
+          if (ubx && lam_xk[i]>0) step[i] -= ubx[i];
+        }
       }
-    }
 
-    // Correct for inactive constraints
-    for (i=0; i<na_; ++i) {
-      if (lam_ak[i]==0) {
-        step[nx_+i] = 0.; // -lam_ak[i]
-      } else if (lba && lam_ak[i]<0) {
-        step[nx_+i] -= lba[i];
-      } else if (uba && lam_ak[i]>0) {
-        step[nx_+i] -= uba[i];
+      // Correct for inactive constraints
+      for (i=0; i<na_; ++i) {
+        if (lam_ak[i]==0) {
+          step[nx_+i] = 0.; // -lam_ak[i]
+        } else if (lba && lam_ak[i]<0) {
+          step[nx_+i] -= lba[i];
+        } else if (uba && lam_ak[i]>0) {
+          step[nx_+i] -= uba[i];
+        }
       }
-    }
 
-    if (verbose_) {
+      if (verbose_) {
+        print("KKT residual = \n");
+        print_vector(step, nx_ + na_);
+      }
 
-    cout << "Residual = " << endl;
-    print_vector(step, nx_ + na_);
-  }
+      // Negative residual
+      casadi_scal(nx_+na_, -1., step);
 
-    // Negative residual
-    casadi_scal(nx_+na_, -1., step);
+      // Solve to get primal-dual step
+      casadi_qr_solve(step, 1, 1, sp_v_, v, sp_r_, r, beta,
+                      get_ptr(prinv_), get_ptr(pc_), w);
 
-    // Solve to get primal-dual step
-    casadi_qr_solve(step, 1, 1, sp_v_, v, sp_r_, r, beta,
-                    get_ptr(prinv_), get_ptr(pc_), w);
+      // Calculate change in Lagrangian gradient
+      casadi_fill(dlam_x, nx_, 0.);
+      casadi_mv(h, H_, step, dlam_x, 0); // gradient of the objective
+      casadi_mv(a, A_, step+nx_, dlam_x, 1); // gradient of the Lagrangian
 
-    // Calculate change in Lagrangian gradient
-    casadi_fill(dlam_x, nx_, 0.);
-    casadi_mv(h, H_, step, dlam_x, 0); // gradient of the objective
-    casadi_mv(a, A_, step+nx_, dlam_x, 1); // gradient of the Lagrangian
+      // Step in lambda_x
+      casadi_scal(nx_, -1., dlam_x);
 
-    // Step in lambda_x
-    casadi_scal(nx_, -1., dlam_x);
+      // Step in g
+      casadi_fill(dg, na_, 0.);
+      casadi_mv(a, A_, step, dg, 0);
 
-    // Step in g
-    casadi_fill(dg, na_, 0.);
-    casadi_mv(a, A_, step, dg, 0);
+      if (verbose_) {
+        print("dx = \n");
+        print_vector(step, nx_);
+        print("dg = \n");
+        print_vector(dg, na_);
+        print("dlam_x = \n");
+        print_vector(dlam_x, nx_);
+        print("dlam_g = \n");
+        print_vector(step+nx_, na_);
+      }
 
-    if (verbose_) {
+      // Get maximum step size
+      double tau = 1.;
 
-    cout << "dx = " << endl;
-    print_vector(step, nx_);
+      // Remember best tau for each constraint
+      casadi_fill(w, nx_+na_, -1.);
 
-    cout << "dg = " << endl;
-    print_vector(dg, na_);
+      // iw will be used to mark the new sign:
+      // -1: Lower bound became active
+      //  0: Bound became inactive
+      //  1: Upper bound became active
 
-    cout << "dlam_x = " << endl;
-    print_vector(dlam_x, nx_);
+      // Loop over primal variables
+      for (i=0; i<nx_; ++i) {
+        lb = lbx ? lbx[i] : 0.;
+        ub = ubx ? ubx[i] : 0.;
+        if (lam_xk[i]==0.) {
+          // Trial step
+          trial=xk[i] + tau*step[i];
 
-    cout << "dlam_g = " << endl;
-    print_vector(step+nx_, na_);
-}
+          // Constraint is inactive, check for primal blocking constraints
+          if (trial<=lb && xk[i]>lb) {
+            // Lower bound hit
+            tau = (lb-xk[i])/step[i];
+            w[i] = tau;
+            iw[i] = -1;
+          } else if (trial>=ub && xk[i]<ub) {
+            // Upper bound hit
+            tau = (ub-xk[i])/step[i];
+            w[i] = tau;
+            iw[i] = 1;
+          }
+        } else {
+          trial = lam_xk[i] + tau*dlam_x[i];
+          // Constraint is active, check for dual blocking constraints
+          if ((lam_xk[i]<0. && trial>=0) || (lam_xk[i]>0. && trial<=0)) {
+            // Sign changes
+            tau = -lam_xk[i]/dlam_x[i];
+            w[i] = tau;
+            iw[i] = 0;
+          }
+        }
+      }
 
+      // Loop over constraints
+      for (i=0; i<na_; ++i) {
+        lb = lba ? lba[i] : 0.;
+        ub = uba ? uba[i] : 0.;
+        if (lam_ak[i]==0.) {
+          // Trial step
+          trial=gk[i] + tau*dg[i];
+          // Constraint is inactive, check for primal blocking constraints
+          if (trial<lb && gk[i]>=lb) {
+            // Lower bound hit
+            tau = (lb-gk[i])/dg[i];
+            w[nx_+i] = tau;
+            iw[nx_+i] = -1;
+          } else if (trial>ub && gk[i]<=ub) {
+            // Upper bound hit
+            tau = (ub-gk[i])/dg[i];
+            w[nx_+i] = tau;
+            iw[nx_+i] = 1;
+          }
+        } else {
+          trial = lam_ak[i] + tau*step[nx_+i];
+          // Constraint is active, check for dual blocking constraints
+          if ((lam_ak[i]<0. && trial>=0) || (lam_ak[i]>0. && trial<=0)) {
+            // Sign changes
+            tau = -lam_ak[i]/step[nx_+i];
+            w[nx_+i] = tau;
+            iw[nx_+i] = 0;
+          }
+        }
+      }
 
-  //  cout << "kktd scaled, shifted = " << endl;
-//    print_matrix(kktd, kktd_);
-  //  cout << "beta" << endl;
-    //print_vector(beta, nx_ + na_);
-    //cout << "v = " << endl;
-    //print_matrix(v, sp_v_);
-  //  cout << "r = " << endl;
-  //  print_matrix(r, sp_r_);
+      // Take primal step
+      casadi_axpy(nx_, tau, step, xk);
 
-    // Get maximum step size
-    double tau = 1.;
+      // Update lam_xk carefully
+      for (i=0; i<nx_; ++i) {
+        // Get the current sign
+        casadi_int s = lam_xk[i]>0. ? 1 : lam_xk[i]<0. ? -1 : 0;
+        // Account for sign changes
+        if (w[i]==tau) s = iw[i];
+        // Take step
+        lam_xk[i] += tau*dlam_x[i];
+        // Ensure correct sign
+        switch (s) {
+          case -1: lam_xk[i] = fmin(lam_xk[i], -DMIN); break;
+          case  1: lam_xk[i] = fmax(lam_xk[i],  DMIN); break;
+          case  0: lam_xk[i] = 0.; break;
+        }
+      }
 
-    // Remember best tau for each constraint
-    casadi_fill(w, nx_+na_, -1.);
+      // Update lam_ak carefully
+      for (i=0; i<na_; ++i) {
+        // Get the current sign
+        casadi_int s = lam_ak[i]>0. ? 1 : lam_ak[i]<0. ? -1 : 0;
+        // Account for sign changes
+        if (w[i]==tau) s = iw[nx_+i];
+        // Take step
+        lam_ak[i] += tau*step[nx_+i];
+        // Ensure correct sign
+        switch (s) {
+          case -1: lam_ak[i] = fmin(lam_ak[i], -DMIN); break;
+          case  1: lam_ak[i] = fmax(lam_ak[i],  DMIN); break;
+          case  0: lam_ak[i] = 0.; break;
+        }
+      }
 
-    // iw will be used to mark the new sign:
-    // -1: Lower bound became active
-    //  0: Bound became inactive
-    //  1: Upper bound became active
+      // Recalculate g
+      casadi_fill(gk, na_, 0.);
+      casadi_mv(a, A_, xk, gk, 0);
 
-    // Loop over primal variables
-    for (i=0; i<nx_; ++i) {
-      lb = lbx ? lbx[i] : 0.;
-      ub = ubx ? ubx[i] : 0.;
-      if (lam_xk[i]==0.) {
-        // Trial step
-        trial=xk[i] + tau*step[i];
+      // Calculate cost
+      fk = casadi_bilin(h, H_, xk, xk)/2. + casadi_dot(nx_, xk, g);
 
-        // Constraint is inactive, check for primal blocking constraints
-        if (trial<=lb && xk[i]>lb) {
-          // Lower bound hit
-          tau = (lb-xk[i])/step[i];
-          w[i] = tau;
-          iw[i] = -1;
-        } else if (trial>=ub && xk[i]<ub) {
-          // Upper bound hit
-          tau = (ub-xk[i])/step[i];
-          w[i] = tau;
-          iw[i] = 1;
+      // Check if there is any active set change
+      bool has_change = false;
+      for (i=0; i<nx_+na_ && !has_change; ++i) has_change = w[i]==tau;
+
+      // Look for largest x bound violation
+      double maxviol = 0.;
+      casadi_int imaxviol;
+      for (i=0; i<nx_; ++i) {
+        lb = lbx ? lbx[i] : 0.;
+        ub = ubx ? ubx[i] : 0.;
+        if (xk[i] > ub+maxviol) {
+          maxviol = xk[i]-ub;
+          imaxviol = i;
+        } else if (xk[i] < lb-maxviol) {
+          maxviol = lb-xk[i];
+          imaxviol = i;
+        }
+      }
+
+      // Look for largest a bound violation
+      for (i=0; i<na_; ++i) {
+        lb = lba ? lba[i] : 0.;
+        ub = uba ? uba[i] : 0.;
+        if (gk[i] > ub+maxviol) {
+          maxviol = gk[i]-ub;
+          imaxviol = nx_+i;
+        } else if (gk[i] < lb-maxviol) {
+          maxviol = lb-gk[i];
+          imaxviol = nx_+i;
+        }
+      }
+
+      // Print iteration progress:
+      print("Iteration %d: fk=%g, tau=%g, |pr|=%g\n", iter, fk, tau, maxviol);
+
+      // Keep iterating?
+      if (has_change) continue;
+
+      // Terminate successfully?
+      if (maxviol<1e-10) break;
+
+      // Constraint on x or g?
+      if (imaxviol<nx_) {
+        // No offset
+        i = imaxviol;
+        // If already active constraint, terminate
+        if (lam_xk[i]!=0.) break;
+        // Add constraint to active set
+        if (xk[i] < lb) {
+          lam_xk[i] = -DMIN;
+        } else {
+          lam_xk[i] = DMIN;
         }
       } else {
-        trial = lam_xk[i] + tau*dlam_x[i];
-        // Constraint is active, check for dual blocking constraints
-        if ((lam_xk[i]<0. && trial>=0) || (lam_xk[i]>0. && trial<=0)) {
-          // Sign changes
-          tau = -lam_xk[i]/dlam_x[i];
-          w[i] = tau;
-          iw[i] = 0;
+        // Remove offset
+        i = imaxviol-nx_;
+
+        // If already active constraint, terminate
+        if (lam_ak[i]!=0.) break;
+        // Add constraint to active set
+        if (gk[i] < lb) {
+          lam_ak[i] = -DMIN;
+        } else {
+          lam_ak[i] = DMIN;
         }
       }
-      casadi_assert(tau>=0 && tau<=1., "tau at i=" + str(i) + " = " + str(tau));
     }
-
-
-    // Loop over constraints
-    for (i=0; i<na_; ++i) {
-      lb = lba ? lba[i] : 0.;
-      ub = uba ? uba[i] : 0.;
-      if (lam_ak[i]==0.) {
-        // Trial step
-        trial=gk[i] + tau*dg[i];
-        // Constraint is inactive, check for primal blocking constraints
-        if (trial<lb && gk[i]>=lb) {
-          // Lower bound hit
-          tau = (lb-gk[i])/dg[i];
-          w[nx_+i] = tau;
-          iw[nx_+i] = -1;
-        } else if (trial>ub && gk[i]<=ub) {
-          // Upper bound hit
-          tau = (ub-gk[i])/dg[i];
-          w[nx_+i] = tau;
-          iw[nx_+i] = 1;
-        }
-      } else {
-        trial = lam_ak[i] + tau*step[nx_+i];
-        // Constraint is active, check for dual blocking constraints
-        if ((lam_ak[i]<0. && trial>=0) || (lam_ak[i]>0. && trial<=0)) {
-          // Sign changes
-          tau = -lam_ak[i]/step[nx_+i];
-          w[nx_+i] = tau;
-          iw[nx_+i] = 0;
-        }
-      }
-      casadi_assert(tau>=0 && tau<=1., "tau at i=" + str(i) + " = " + str(tau));
-    }
-
-    if (verbose_) {
-
-    cout << "Affected bounds: {";
-    for (i=0; i<nx_+na_; ++i) {
-      if (w[i]==tau) {
-        cout << i << ": " << iw[i] << ", ";
-      }
-    }
-    cout << "}" << endl;
-
-    casadi_message("tau: " + str(tau));
-
-/*
-    if (tau_i<0) {
-      casadi_message("Full step");
-    } else if (lam_xk[tau_i]!=0.) {
-      casadi_message("Constraint removed for x[" + str(tau_i) + "]");
-    } else if (upper) {
-      casadi_message("Upper constraint added for x[" + str(tau_i) + "]");
-    } else {
-      casadi_message("Lower constraint added for x[" + str(tau_i) + "]");
-    }
-*/
-}
-
-    // Take step
-    casadi_axpy(nx_, tau, step, xk);
-
-    // Update lam_xk
-    for (i=0; i<nx_; ++i) {
-      // Get the current sign
-      casadi_int s = lam_xk[i]>0. ? 1 : lam_xk[i]<0. ? -1 : 0;
-      // Account for sign changes
-      if (w[i]==tau) s = iw[i];
-      // Take step
-      lam_xk[i] += tau*dlam_x[i];
-      // Ensure correct sign
-      switch (s) {
-        case -1: lam_xk[i] = fmin(lam_xk[i], -DMIN); break;
-        case  1: lam_xk[i] = fmax(lam_xk[i],  DMIN); break;
-        case  0: lam_xk[i] = 0.; break;
-      }
-    }
-
-    // Update lam_ak
-    for (i=0; i<na_; ++i) {
-      // Get the current sign
-      casadi_int s = lam_ak[i]>0. ? 1 : lam_ak[i]<0. ? -1 : 0;
-      // Account for sign changes
-      if (w[i]==tau) s = iw[nx_+i];
-      // Take step
-      lam_ak[i] += tau*step[nx_+i];
-      // Ensure correct sign
-      switch (s) {
-        case -1: lam_ak[i] = fmin(lam_ak[i], -DMIN); break;
-        case  1: lam_ak[i] = fmax(lam_ak[i],  DMIN); break;
-        case  0: lam_ak[i] = 0.; break;
-      }
-    }
-
-    // Recalculate g
-    casadi_fill(gk, na_, 0.);
-    casadi_mv(a, A_, xk, gk, 0);
-
-    // Calculate cost
-    fk = casadi_bilin(h, H_, xk, xk)/2. + casadi_dot(nx_, xk, g);
-
-    // Check if there is any active set change
-    bool has_change = false;
-    for (i=0; i<nx_+na_ && !has_change; ++i) has_change = w[i]==tau;
-
-    // Look for largest x bound violation
-    double maxviol = 0.;
-    casadi_int imaxviol;
-    for (i=0; i<nx_; ++i) {
-      lb = lbx ? lbx[i] : 0.;
-      ub = ubx ? ubx[i] : 0.;
-      if (xk[i] > ub+maxviol) {
-        maxviol = xk[i]-ub;
-        imaxviol = i;
-      } else if (xk[i] < lb-maxviol) {
-        maxviol = lb-xk[i];
-        imaxviol = i;
-      }
-    }
-
-    // Look for largest a bound violation
-    for (i=0; i<na_; ++i) {
-      lb = lba ? lba[i] : 0.;
-      ub = uba ? uba[i] : 0.;
-      if (gk[i] > ub+maxviol) {
-        maxviol = gk[i]-ub;
-        imaxviol = nx_+i;
-      } else if (gk[i] < lb-maxviol) {
-        maxviol = lb-gk[i];
-        imaxviol = nx_+i;
-      }
-    }
-
-    // Print iteration progress:
-    print("Iteration %d: fk=%g, tau=%g, |pr|=%g\n", iter, fk, tau, maxviol);
-
-    // Keep iterating?
-    if (has_change) continue;
-
-    // Terminate successfully?
-    if (maxviol<1e-10) break;
-
-    // Constraint on x or g?
-    if (imaxviol<nx_) {
-      // No offset
-      i = imaxviol;
-      // If already active constraint, terminate
-      if (lam_xk[i]!=0.) break;
-      // Add constraint to active set
-      if (xk[i] < lb) {
-        lam_xk[i] = fmin(lam_xk[i], -DMIN); break;
-      } else {
-        lam_xk[i] = fmax(lam_xk[i],  DMIN); break;
-      }
-    } else {
-      // Remove offset
-      i = imaxviol-nx_;
-
-      // If already active constraint, terminate
-      if (lam_ak[i]!=0.) break;
-      // Add constraint to active set
-      if (gk[i] < lb) {
-        lam_ak[i] = -DMIN;
-      } else {
-        lam_ak[i] = DMIN;
-      }
-    }
-  }
 
     // Calculate optimal cost
     if (f) *f = fk;
