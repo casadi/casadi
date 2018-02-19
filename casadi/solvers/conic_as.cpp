@@ -100,7 +100,7 @@ namespace casadi {
     alloc_w(nx_, true); // lam_xk
     alloc_w(na_, true); // lam_ak
     alloc_w(A_.nnz()); // trans(A)
-    alloc_iw(na_); // casadi_trans
+    alloc_iw(nx_, na_); // casadi_trans, tau type
     alloc_w(nx_ + na_); // casadi_project, [alpha_x, -lambda_g], [lambda_x, alpha_g], tau memory
     alloc_w(nx_, true); // alpha_x
     alloc_w(na_, true); // alpha_a
@@ -288,6 +288,9 @@ namespace casadi {
     print_vector(uba, na_);
 }
 
+    // Smallest strictly positive number
+    const double DMIN = std::numeric_limits<double>::min();
+
     // Determine initial active set for simple bounds
     for (i=0; i<nx_; ++i) {
       lb = lbx ? lbx[i] : 0.;
@@ -297,10 +300,10 @@ namespace casadi {
         lam_xk[i] = 0;
       } else if (xk[i]<=lb) {
         // Lower bound active (including satisfied bounds)
-        lam_xk[i] = fmin(lam_xk[i], -std::numeric_limits<double>::min());
+        lam_xk[i] = fmin(lam_xk[i], -DMIN);
       } else {
         // Upper bound active (excluding satisfied bounds)
-        lam_xk[i] = fmax(lam_xk[i],  std::numeric_limits<double>::min());
+        lam_xk[i] = fmax(lam_xk[i],  DMIN);
       }
     }
 
@@ -469,11 +472,14 @@ namespace casadi {
 
     // Get maximum step size
     double tau = 1.;
-    casadi_int tau_i = -1;
-    bool upper;
 
     // Remember best tau for each constraint
     casadi_fill(w, nx_+na_, -1.);
+
+    // iw will be used to mark the new sign:
+    // -1: Lower bound became active
+    //  0: Bound became inactive
+    //  1: Upper bound became active
 
     // Loop over primal variables
     for (i=0; i<nx_; ++i) {
@@ -483,27 +489,17 @@ namespace casadi {
         // Trial step
         trial=xk[i] + tau*step[i];
 
-//        if (i==0) {
-  //        cout << "trial = " << trial << endl;
-    //      cout << "ub = " << ub << endl;
-      //    cout << "(trial>=ub) = " << (trial>=ub) << endl;
-        //}
-
         // Constraint is inactive, check for primal blocking constraints
-        if (trial>=ub && xk[i]<ub) {
-          // Upper bound crossed
-          tau = (ub-xk[i])/step[i];
-          casadi_assert(tau>=0 && tau<=1., "tau at i=" + str(i) + " = " + str(tau));
-          w[i] = tau;
-          tau_i = i;
-          upper = true;
-        } else if (trial<=lb && xk[i]>lb) {
-          // Lower bound crossed
+        if (trial<=lb && xk[i]>lb) {
+          // Lower bound hit
           tau = (lb-xk[i])/step[i];
-          casadi_assert(tau>=0 && tau<=1., "tau at i=" + str(i) + " = " + str(tau));
-          tau_i = i;
-          upper = false;
           w[i] = tau;
+          iw[i] = -1;
+        } else if (trial>=ub && xk[i]<ub) {
+          // Upper bound hit
+          tau = (ub-xk[i])/step[i];
+          w[i] = tau;
+          iw[i] = 1;
         }
       } else {
         trial = lam_xk[i] + tau*dlam_x[i];
@@ -511,9 +507,8 @@ namespace casadi {
         if ((lam_xk[i]<0. && trial>=0) || (lam_xk[i]>0. && trial<=0)) {
           // Sign changes
           tau = -lam_xk[i]/dlam_x[i];
-          tau_i = i;
           w[i] = tau;
-          casadi_assert(tau>=0 && tau<=1., "tau at i=" + str(i) + " = " + str(tau));
+          iw[i] = 0;
         }
       }
       casadi_assert(tau>=0 && tau<=1., "tau at i=" + str(i) + " = " + str(tau));
@@ -528,20 +523,16 @@ namespace casadi {
         // Trial step
         trial=gk[i] + tau*dg[i];
         // Constraint is inactive, check for primal blocking constraints
-        if (trial>ub && gk[i]<=ub) {
-          // Upper bound crossed
-          tau = (ub-gk[i])/dg[i];
-          casadi_assert(tau>=0 && tau<=1., "tau at i=" + str(i) + " = " + str(tau));
-          tau_i = nx_ + i;
-          upper = true;
-          w[nx_+i] = tau;
-        } else if (trial<lb && gk[i]>=lb) {
-          // Lower bound crossed
+        if (trial<lb && gk[i]>=lb) {
+          // Lower bound hit
           tau = (lb-gk[i])/dg[i];
-          casadi_assert(tau>=0 && tau<=1., "tau at i=" + str(i) + " = " + str(tau));
-          tau_i = nx_ + i;
-          upper = false;
           w[nx_+i] = tau;
+          iw[nx_+i] = -1;
+        } else if (trial>ub && gk[i]<=ub) {
+          // Upper bound hit
+          tau = (ub-gk[i])/dg[i];
+          w[nx_+i] = tau;
+          iw[nx_+i] = 1;
         }
       } else {
         trial = lam_ak[i] + tau*step[nx_+i];
@@ -549,9 +540,8 @@ namespace casadi {
         if ((lam_ak[i]<0. && trial>=0) || (lam_ak[i]>0. && trial<=0)) {
           // Sign changes
           tau = -lam_ak[i]/step[nx_+i];
-          tau_i = nx_ + i;
           w[nx_+i] = tau;
-          casadi_assert(tau>=0 && tau<=1., "tau at i=" + str(i) + " = " + str(tau));
+          iw[nx_+i] = 0;
         }
       }
       casadi_assert(tau>=0 && tau<=1., "tau at i=" + str(i) + " = " + str(tau));
@@ -562,14 +552,14 @@ namespace casadi {
     cout << "Affected bounds: {";
     for (i=0; i<nx_+na_; ++i) {
       if (w[i]==tau) {
-        cout << i << ", ";
+        cout << i << ": " << iw[i] << ", ";
       }
     }
     cout << "}" << endl;
 
     casadi_message("tau: " + str(tau));
 
-
+/*
     if (tau_i<0) {
       casadi_message("Full step");
     } else if (lam_xk[tau_i]!=0.) {
@@ -579,14 +569,43 @@ namespace casadi {
     } else {
       casadi_message("Lower constraint added for x[" + str(tau_i) + "]");
     }
-  }
+*/
+}
 
     // Take step
     casadi_axpy(nx_, tau, step, xk);
-    casadi_axpy(na_, tau, step+nx_, lam_ak);
 
-    casadi_axpy(nx_, tau, dlam_x, lam_xk);
-//    casadi_axpy(na_, tau, dg, gk);
+    // Update lam_xk
+    for (i=0; i<nx_; ++i) {
+      // Get the current sign
+      casadi_int s = lam_xk[i]>0. ? 1 : lam_xk[i]<0. ? -1 : 0;
+      // Account for sign changes
+      if (w[i]==tau) s = iw[i];
+      // Take step
+      lam_xk[i] += tau*dlam_x[i];
+      // Ensure correct sign
+      switch (s) {
+        case -1: lam_xk[i] = fmin(lam_xk[i], -DMIN); break;
+        case  1: lam_xk[i] = fmax(lam_xk[i],  DMIN); break;
+        case  0: lam_xk[i] = 0.; break;
+      }
+    }
+
+    // Update lam_ak
+    for (i=0; i<na_; ++i) {
+      // Get the current sign
+      casadi_int s = lam_ak[i]>0. ? 1 : lam_ak[i]<0. ? -1 : 0;
+      // Account for sign changes
+      if (w[i]==tau) s = iw[nx_+i];
+      // Take step
+      lam_ak[i] += tau*step[nx_+i];
+      // Ensure correct sign
+      switch (s) {
+        case -1: lam_ak[i] = fmin(lam_ak[i], -DMIN); break;
+        case  1: lam_ak[i] = fmax(lam_ak[i],  DMIN); break;
+        case  0: lam_ak[i] = 0.; break;
+      }
+    }
 
     // Recalculate g
     casadi_fill(gk, na_, 0.);
