@@ -91,6 +91,12 @@ namespace casadi {
     // QR factorization
     std::vector<casadi_int> prinv_, pc_;
     Sparsity sp_v_, sp_r_;
+
+    ///@{
+    // Options
+    casadi_int max_iter_;
+    ///@}
+
   };
 
 } // namespace casadi
