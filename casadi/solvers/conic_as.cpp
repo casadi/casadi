@@ -261,28 +261,40 @@ namespace casadi {
     casadi_set_sub(a, kkt, kkt_, nx_, nx_+na_, 0, nx_); // a
     casadi_set_sub(w, kkt, kkt_, 0, nx_, nx_, nx_+na_); // a'
 
-    // Make sure that free variables have zero multipliers
+    // Determine initial active set for simple bounds
     for (i=0; i<nx_; ++i) {
       lb = lbx ? lbx[i] : 0.;
       ub = ubx ? ubx[i] : 0.;
-      //      xk[i] = std::max(std::min(xk[i], ub), lb);
-    //  if (xk[i]<lb && lam_xk[i]>=0) lam_xk[i] = -std::numeric_limits<double>::min();
-      //if (xk[i]>ub && lam_xk[i]<=0) lam_xk[i] =  std::numeric_limits<double>::min();
-
-//      if (xk[i]>lb && xk[i]<ub) lam_xk[i] = 0;
-  //    lam_xk[i] = 0;
+      if (lb!=ub) {
+        // All inequality constraints are inactive
+        lam_xk[i] = 0;
+      } else if (xk[i]<=lb) {
+        // Lower bound active (including satisfied bounds)
+        lam_xk[i] = fmin(lam_xk[i], -std::numeric_limits<double>::min());
+      } else {
+        // Upper bound active (excluding satisfied bounds)
+        lam_xk[i] = fmax(lam_xk[i],  std::numeric_limits<double>::min());
+      }
     }
 
     // Calculate g
     casadi_fill(gk, na_, 0.);
     casadi_mv(a, A_, xk, gk, 0);
 
-    // Make sure that violated constraints have the correct multiplier signs
+    // Determine initial active set for simple bounds
     for (i=0; i<na_; ++i) {
       lb = lba ? lba[i] : 0.;
       ub = uba ? uba[i] : 0.;
-    //  if (gk[i]<lb && lam_ak[i]>=0) lam_ak[i] = -std::numeric_limits<double>::min();
-  //    if (gk[i]>ub && lam_ak[i]<=0) lam_ak[i] =  std::numeric_limits<double>::min();
+      if (lb!=ub) {
+        // All inequality constraints are inactive
+        lam_ak[i] = 0;
+      } else if (gk[i]<=ub) {
+        // Lower bound active (including satisfied bounds)
+        lam_ak[i] = fmin(lam_ak[i], -std::numeric_limits<double>::min());
+      } else {
+        // Upper bound active (excluding satisfied bounds)
+        lam_ak[i] = fmax(lam_ak[i],  std::numeric_limits<double>::min());
+      }
     }
 
     // Copy kkt to kktd
