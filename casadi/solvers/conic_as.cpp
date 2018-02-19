@@ -275,19 +275,6 @@ namespace casadi {
     casadi_fill(gk, na_, 0.);
     casadi_mv(a, A_, xk, gk, 0);
 
-    if (verbose_) {
-
-    cout << "lbx:" << endl;
-    print_vector(lbx, nx_);
-    cout << "ubx:" << endl;
-    print_vector(ubx, nx_);
-
-    cout << "lba:" << endl;
-    print_vector(lba, na_);
-    cout << "uba:" << endl;
-    print_vector(uba, na_);
-}
-
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
 
@@ -316,10 +303,10 @@ namespace casadi {
         lam_ak[i] = 0;
       } else if (gk[i]<=ub) {
         // Lower bound active (including satisfied bounds)
-        lam_ak[i] = fmin(lam_ak[i], -std::numeric_limits<double>::min());
+        lam_ak[i] = fmin(lam_ak[i], -DMIN);
       } else {
         // Upper bound active (excluding satisfied bounds)
-        lam_ak[i] = fmax(lam_ak[i],  std::numeric_limits<double>::min());
+        lam_ak[i] = fmax(lam_ak[i],  DMIN);
       }
     }
 
