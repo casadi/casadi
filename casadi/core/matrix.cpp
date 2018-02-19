@@ -2574,7 +2574,7 @@ namespace casadi {
 
   template<typename Scalar>
   DM Matrix<Scalar>::evalf(const Matrix<Scalar>& m) {
-    Function f("f", std::vector<SX>{}, {m});
+    Function f("f", std::vector<SX>{}, std::vector<SX>{m});
     return f(std::vector<DM>{})[0];
   }
 
