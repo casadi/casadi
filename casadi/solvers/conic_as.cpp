@@ -329,6 +329,12 @@ namespace casadi {
     const casadi_int* kkt_colind = kktd_.colind();
     const casadi_int* kkt_row = kktd_.row();
 
+    // A sparsity
+    const casadi_int* a_colind = A_.colind();
+    const casadi_int* a_row = A_.row();
+
+    // QP iterations
+
     // QP iterations
     casadi_int iter;
     for (iter=0; iter<max_iter_; ++iter) {
@@ -512,21 +518,9 @@ namespace casadi {
       // Take primal step
       casadi_axpy(nx_, tau, step, xk);
 
-      // Update lam_xk carefully
-      for (i=0; i<nx_; ++i) {
-        // Get the current sign
-        casadi_int s = lam_xk[i]>0. ? 1 : lam_xk[i]<0. ? -1 : 0;
-        // Account for sign changes
-        if (w[i]==tau) s = iw[i];
-        // Take step
-        lam_xk[i] += tau*dlam_x[i];
-        // Ensure correct sign
-        switch (s) {
-          case -1: lam_xk[i] = fmin(lam_xk[i], -DMIN); break;
-          case  1: lam_xk[i] = fmax(lam_xk[i],  DMIN); break;
-          case  0: lam_xk[i] = 0.; break;
-        }
-      }
+      // Recalculate g
+      casadi_fill(gk, na_, 0.);
+      casadi_mv(a, A_, xk, gk, 0);
 
       // Update lam_ak carefully
       for (i=0; i<na_; ++i) {
@@ -544,9 +538,26 @@ namespace casadi {
         }
       }
 
-      // Recalculate g
-      casadi_fill(gk, na_, 0.);
-      casadi_mv(a, A_, xk, gk, 0);
+      // Recalculate gradient of the Lagrangian
+      casadi_copy(g, nx_, dlam_x);
+      casadi_mv(h, H_, xk, dlam_x, 0); // gradient of the objective
+      casadi_mv(a, A_, lam_ak, dlam_x, 1);
+
+      // Update lam_xk carefully
+      for (i=0; i<nx_; ++i) {
+        // Get the current sign
+        casadi_int s = lam_xk[i]>0. ? 1 : lam_xk[i]<0. ? -1 : 0;
+        // Account for sign changes
+        if (w[i]==tau) s = iw[i];
+        // Take step
+        lam_xk[i] = -dlam_x[i];
+        // Ensure correct sign
+        switch (s) {
+          case -1: lam_xk[i] = fmin(lam_xk[i], -DMIN); break;
+          case  1: lam_xk[i] = fmax(lam_xk[i],  DMIN); break;
+          case  0: lam_xk[i] = 0.; break;
+        }
+      }
 
       // Calculate cost
       fk = casadi_bilin(h, H_, xk, xk)/2. + casadi_dot(nx_, xk, g);
@@ -584,10 +595,7 @@ namespace casadi {
       }
 
       // Calculate dual infeasibility
-      casadi_copy(g, nx_, w);
-      casadi_mv(h, H_, xk, w, 0); // gradient of the objective
-      casadi_mv(a, A_, lam_ak, w, 1); // gradient of the Lagrangian
-      casadi_axpy(nx_, 1., lam_xk, w);
+      casadi_axpy(nx_, 1., lam_xk, dlam_x);
       double maxdu = 0.;
       casadi_int imaxdu;
       for (i=0; i<nx_; ++i) {
@@ -652,22 +660,37 @@ namespace casadi {
         continue;
       }
 
-      // Not yet implemented
+      // We're feasible but not optimal, try remove a bound on x
+      i=imaxdu;
+      lb = lbx ? lbx[i] : 0.;
+      ub = ubx ? ubx[i] : 0.;
+      if (lam_xk[i]<0. && fabs(xk[i]-lb)>1e-10) {
+        lam_xk[i]=0.;
+        continue;
+      } else if (lam_xk[i]>0. && fabs(xk[i]-ub)>1e-10) {
+        lam_xk[i]=0.;
+        continue;
+      }
+
+      // We're feasible but not optimal, try remove a bound on g
+      for (casadi_int k=a_colind[imaxdu]; k<a_colind[imaxdu+1]; ++k) {
+        // Loop over entries which can unblock imaxdu
+        if (a[k]!=0.) {
+          i = a_row[k];
+          lb = lba ? lba[i] : 0.;
+          ub = uba ? uba[i] : 0.;
+          if (lam_ak[i]<0. && fabs(gk[i]-lb)>1e-10) {
+            lam_ak[i]=0.;
+            continue;
+          } else if (lam_ak[i]>0. && fabs(gk[i]-ub)>1e-10) {
+            lam_ak[i]=0.;
+            continue;
+          }
+        }
+      }
+
       casadi_warning("Failed to restore dual feasibility");
       break;
-
-/*
-      // Try to remove a bound to restore dual feasibility
-      if (false && maxdu>1e-10) {
-        i = imaxdu;
-        // If already active constraint, terminate
-        if (lam_xk[i]==0.) {
-          casadi_warning("Terminating unsuccessfully?");
-          break;
-        }
-        lam_xk[i]=0.;
-      }
-      */
     }
 
     // Maximum number of iterations reached
