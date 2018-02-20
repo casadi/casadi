@@ -333,6 +333,9 @@ namespace casadi {
     const casadi_int* a_colind = A_.colind();
     const casadi_int* a_row = A_.row();
 
+    // No change so far
+    bool new_active_set = true;
+
     // QP iterations
     casadi_int iter = 0;
     while (true) {
@@ -353,11 +356,143 @@ namespace casadi {
       casadi_mv(h, H_, xk, step, 0); // gradient of the objective
       casadi_mv(a, A_, lam_ak, step, 1); // gradient of the Lagrangian
 
+      // Calculate cost
+      fk = casadi_bilin(h, H_, xk, xk)/2. + casadi_dot(nx_, xk, g);
+
+      // Look for largest x bound violation
+      double maxpr = 0.;
+      casadi_int imaxpr;
+      for (i=0; i<nx_; ++i) {
+        lb = lbx ? lbx[i] : 0.;
+        ub = ubx ? ubx[i] : 0.;
+        if (xk[i] > ub+maxpr) {
+          maxpr = xk[i]-ub;
+          imaxpr = i;
+        } else if (xk[i] < lb-maxpr) {
+          maxpr = lb-xk[i];
+          imaxpr = i;
+        }
+      }
+
+      // Look for largest a bound violation
+      for (i=0; i<na_; ++i) {
+        lb = lba ? lba[i] : 0.;
+        ub = uba ? uba[i] : 0.;
+        if (gk[i] > ub+maxpr) {
+          maxpr = gk[i]-ub;
+          imaxpr = nx_+i;
+        } else if (gk[i] < lb-maxpr) {
+          maxpr = lb-gk[i];
+          imaxpr = nx_+i;
+        }
+      }
+
+      // Calculate dual infeasibility
+      double maxdu = 0.;
+      casadi_int imaxdu;
+      for (i=0; i<nx_; ++i) {
+        double maxdu_trial = fabs(step[i]+lam_xk[i]);
+        if (maxdu_trial>maxdu) {
+          maxdu = maxdu_trial;
+          imaxdu = i;
+        }
+      }
+
+      // Print iteration progress:
+      print("Iteration %d: fk=%g, |pr|=%g, |du|=%g\n",
+            iter, fk, maxpr, maxdu);
+
+      // Terminate successfully?
+      if (maxpr<1e-10 && maxdu<1e-10) break;
+
       // Start new iteration
       if (++iter==max_iter_) {
         casadi_warning("Maximum number of iterations reached");
         break;
       }
+
+      // Feasibility restoration?
+      if (!new_active_set) {
+        if (maxpr>1e-10) {
+          // Restore primal feasibility
+          if (imaxpr<nx_) {
+            i = imaxpr;
+            // Add x constraint
+            lb = lbx ? lbx[i] : 0.;
+            ub = ubx ? ubx[i] : 0.;
+            // If already active constraint, terminate
+            if (lam_xk[i]!=0.) {
+              casadi_warning("Failed to restore primal feasibility");
+              break;
+            }
+
+            // Add constraint to active set
+            if (xk[i] < lb) {
+              lam_xk[i] = fmin(-w[i], -DMIN);
+            } else if (xk[i] > ub) {
+              lam_xk[i] = fmax(-w[i],  DMIN);
+            } else {
+              casadi_warning("Failed to restore primal feasibility");
+              break; // can it happen?
+            }
+          } else {
+            i = imaxpr-nx_;
+            // Add a constraint
+            lb = lba ? lba[i] : 0.;
+            ub = uba ? uba[i] : 0.;
+            // If already active constraint, terminate
+            if (lam_ak[i]!=0.) {
+              casadi_warning("Failed to restore primal feasibility");
+              break;
+            }
+            // Add constraint to active set
+            if (gk[i] < lb) {
+              lam_ak[i] = -DMIN;
+            } else if (gk[i] > ub) {
+              lam_ak[i] = DMIN;
+            } else {
+              casadi_warning("Failed to restore primal feasibility");
+              break; // can it happen?
+            }
+          }
+        } else {
+          #if 0
+        // We're feasible but not optimal, try remove a bound on x
+          i=imaxdu;
+          lb = lbx ? lbx[i] : 0.;
+          ub = ubx ? ubx[i] : 0.;
+          if (lam_xk[i]<0. && fabs(xk[i]-lb)>1e-10) {
+            lam_xk[i]=0.;
+            continue;
+          } else if (lam_xk[i]>0. && fabs(xk[i]-ub)>1e-10) {
+            lam_xk[i]=0.;
+            continue;
+          }
+
+          // We're feasible but not optimal, try remove a bound on g
+          for (casadi_int k=a_colind[imaxdu]; k<a_colind[imaxdu+1]; ++k) {
+            // Loop over entries which can unblock imaxdu
+            if (a[k]!=0.) {
+              i = a_row[k];
+              lb = lba ? lba[i] : 0.;
+              ub = uba ? uba[i] : 0.;
+              if (lam_ak[i]<0. && fabs(gk[i]-lb)>1e-10) {
+                lam_ak[i]=0.;
+                continue;
+              } else if (lam_ak[i]>0. && fabs(gk[i]-ub)>1e-10) {
+                lam_ak[i]=0.;
+                continue;
+              }
+            }
+          }
+    #endif
+          casadi_warning("Failed to restore dual feasibility");
+          break;
+        }
+      }
+
+      // No change so far
+      new_active_set = false;
 
       // Calculate KKT residual: Correct for active simple bounds
       for (i=0; i<nx_; ++i) {
@@ -528,7 +663,10 @@ namespace casadi {
         // Get the current sign
         casadi_int s = lam_ak[i]>0. ? 1 : lam_ak[i]<0. ? -1 : 0;
         // Account for sign changes
-        if (w[i]==tau) s = iw[nx_+i];
+        if (w[i]==tau) {
+          new_active_set = true;
+          s = iw[nx_+i];
+        }
         // Take step
         lam_ak[i] += tau*step[nx_+i];
         // Ensure correct sign
@@ -549,7 +687,10 @@ namespace casadi {
         // Get the current sign
         casadi_int s = lam_xk[i]>0. ? 1 : lam_xk[i]<0. ? -1 : 0;
         // Account for sign changes
-        if (w[i]==tau) s = iw[i];
+        if (w[i]==tau) {
+          new_active_set = true;
+          s = iw[i];
+        }
         // Take step
         lam_xk[i] = -dlam_x[i];
         // Ensure correct sign
@@ -559,139 +700,6 @@ namespace casadi {
           case  0: lam_xk[i] = 0.; break;
         }
       }
-
-      // Calculate cost
-      fk = casadi_bilin(h, H_, xk, xk)/2. + casadi_dot(nx_, xk, g);
-
-      // Active set change?
-      bool has_change = false;
-      for (i=0; i<nx_+na_ && !has_change; ++i) has_change = w[i]==tau;
-
-      // Look for largest x bound violation
-      double maxpr = 0.;
-      casadi_int imaxpr;
-      for (i=0; i<nx_; ++i) {
-        lb = lbx ? lbx[i] : 0.;
-        ub = ubx ? ubx[i] : 0.;
-        if (xk[i] > ub+maxpr) {
-          maxpr = xk[i]-ub;
-          imaxpr = i;
-        } else if (xk[i] < lb-maxpr) {
-          maxpr = lb-xk[i];
-          imaxpr = i;
-        }
-      }
-
-      // Look for largest a bound violation
-      for (i=0; i<na_; ++i) {
-        lb = lba ? lba[i] : 0.;
-        ub = uba ? uba[i] : 0.;
-        if (gk[i] > ub+maxpr) {
-          maxpr = gk[i]-ub;
-          imaxpr = nx_+i;
-        } else if (gk[i] < lb-maxpr) {
-          maxpr = lb-gk[i];
-          imaxpr = nx_+i;
-        }
-      }
-
-      // Calculate dual infeasibility
-      casadi_axpy(nx_, 1., lam_xk, dlam_x);
-      double maxdu = 0.;
-      casadi_int imaxdu;
-      for (i=0; i<nx_; ++i) {
-        if (fabs(w[i])>maxdu) {
-          maxdu = fabs(w[i]);
-          imaxdu = i;
-        }
-      }
-
-      // Print iteration progress:
-      print("Iteration %d: fk=%g, tau=%g, |pr|=%g, |du|=%g\n",
-            iter, fk, tau, maxpr, maxdu);
-
-      // Keep iterating?
-      if (has_change) continue;
-
-      // Terminate successfully?
-      if (maxpr<1e-10 && maxdu<1e-10) break;
-
-      // Restore primal feasibility
-      if (maxpr>1e-10) {
-        if (imaxpr<nx_) {
-          i = imaxpr;
-          // Add x constraint
-          lb = lbx ? lbx[i] : 0.;
-          ub = ubx ? ubx[i] : 0.;
-          // If already active constraint, terminate
-          if (lam_xk[i]!=0.) {
-            casadi_warning("Failed to restore primal feasibility");
-            break;
-          }
-
-          // Add constraint to active set
-          if (xk[i] < lb) {
-            lam_xk[i] = fmin(-w[i], -DMIN);
-          } else if (xk[i] > ub) {
-            lam_xk[i] = fmax(-w[i],  DMIN);
-          } else {
-            casadi_warning("Failed to restore primal feasibility");
-            break; // can it happen?
-          }
-        } else {
-          i = imaxpr-nx_;
-          // Add a constraint
-          lb = lba ? lba[i] : 0.;
-          ub = uba ? uba[i] : 0.;
-          // If already active constraint, terminate
-          if (lam_ak[i]!=0.) {
-            casadi_warning("Failed to restore primal feasibility");
-            break;
-          }
-          // Add constraint to active set
-          if (gk[i] < lb) {
-            lam_ak[i] = -DMIN;
-          } else if (gk[i] > ub) {
-            lam_ak[i] = DMIN;
-          } else {
-            casadi_warning("Failed to restore primal feasibility");
-            break; // can it happen?
-          }
-        }
-        continue;
-      }
-
-      // We're feasible but not optimal, try remove a bound on x
-      i=imaxdu;
-      lb = lbx ? lbx[i] : 0.;
-      ub = ubx ? ubx[i] : 0.;
-      if (lam_xk[i]<0. && fabs(xk[i]-lb)>1e-10) {
-        lam_xk[i]=0.;
-        continue;
-      } else if (lam_xk[i]>0. && fabs(xk[i]-ub)>1e-10) {
-        lam_xk[i]=0.;
-        continue;
-      }
-
-      // We're feasible but not optimal, try remove a bound on g
-      for (casadi_int k=a_colind[imaxdu]; k<a_colind[imaxdu+1]; ++k) {
-        // Loop over entries which can unblock imaxdu
-        if (a[k]!=0.) {
-          i = a_row[k];
-          lb = lba ? lba[i] : 0.;
-          ub = uba ? uba[i] : 0.;
-          if (lam_ak[i]<0. && fabs(gk[i]-lb)>1e-10) {
-            lam_ak[i]=0.;
-            continue;
-          } else if (lam_ak[i]>0. && fabs(gk[i]-ub)>1e-10) {
-            lam_ak[i]=0.;
-            continue;
-          }
-        }
-      }
-
-      casadi_warning("Failed to restore dual feasibility");
-      break;
     }
 
     // Calculate optimal cost
