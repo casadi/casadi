@@ -334,11 +334,8 @@ namespace casadi {
     const casadi_int* a_row = A_.row();
 
     // QP iterations
-
-    // QP iterations
-    casadi_int iter;
-    for (iter=0; iter<max_iter_; ++iter) {
-
+    casadi_int iter = 0;
+    while (true) {
       // Debugging
       if (verbose_) {
         print("Current xk = \n");
@@ -349,6 +346,43 @@ namespace casadi {
         print_vector(lam_xk, nx_);
         print("Current lam_ak = \n");
         print_vector(lam_ak, na_);
+      }
+
+      // Evaluate gradient of the Lagrangian and constraint functions
+      casadi_copy(g, nx_, step);
+      casadi_mv(h, H_, xk, step, 0); // gradient of the objective
+      casadi_mv(a, A_, lam_ak, step, 1); // gradient of the Lagrangian
+
+      // Start new iteration
+      if (++iter==max_iter_) {
+        casadi_warning("Maximum number of iterations reached");
+        break;
+      }
+
+      // Calculate KKT residual: Correct for active simple bounds
+      for (i=0; i<nx_; ++i) {
+        if (lam_xk[i]!=0.) {
+          step[i] = xk[i];
+          if (lbx && lam_xk[i]<0) step[i] -= lbx[i];
+          if (ubx && lam_xk[i]>0) step[i] -= ubx[i];
+        }
+      }
+
+      // Calculate KKT residual: Correct for inactive constraints
+      casadi_copy(gk, na_, step + nx_); // constraint evaluation
+      for (i=0; i<na_; ++i) {
+        if (lam_ak[i]==0) {
+          step[nx_+i] = 0.; // -lam_ak[i]
+        } else if (lba && lam_ak[i]<0) {
+          step[nx_+i] -= lba[i];
+        } else if (uba && lam_ak[i]>0) {
+          step[nx_+i] -= uba[i];
+        }
+      }
+
+      if (verbose_) {
+        print("KKT residual = \n");
+        print_vector(step, nx_ + na_);
       }
 
       // Copy kkt to kktd
@@ -377,41 +411,8 @@ namespace casadi {
       // QR factorization
       casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
 
-      // Evaluate gradient of the Lagrangian and constraint functions
-      casadi_copy(g, nx_, step);
-      casadi_mv(h, H_, xk, step, 0); // gradient of the objective
-      casadi_mv(a, A_, lam_ak, step, 1); // gradient of the Lagrangian
-      casadi_copy(gk, na_, step + nx_); // constraint evaluation
-
-      // Correct for active simple bounds
-      for (i=0; i<nx_; ++i) {
-        if (lam_xk[i]!=0.) {
-          step[i] = xk[i];
-          if (lbx && lam_xk[i]<0) step[i] -= lbx[i];
-          if (ubx && lam_xk[i]>0) step[i] -= ubx[i];
-        }
-      }
-
-      // Correct for inactive constraints
-      for (i=0; i<na_; ++i) {
-        if (lam_ak[i]==0) {
-          step[nx_+i] = 0.; // -lam_ak[i]
-        } else if (lba && lam_ak[i]<0) {
-          step[nx_+i] -= lba[i];
-        } else if (uba && lam_ak[i]>0) {
-          step[nx_+i] -= uba[i];
-        }
-      }
-
-      if (verbose_) {
-        print("KKT residual = \n");
-        print_vector(step, nx_ + na_);
-      }
-
-      // Negative residual
-      casadi_scal(nx_+na_, -1., step);
-
       // Solve to get primal-dual step
+      casadi_scal(nx_+na_, -1., step);
       casadi_qr_solve(step, 1, 1, sp_v_, v, sp_r_, r, beta,
                       get_ptr(prinv_), get_ptr(pc_), w);
 
@@ -691,11 +692,6 @@ namespace casadi {
 
       casadi_warning("Failed to restore dual feasibility");
       break;
-    }
-
-    // Maximum number of iterations reached
-    if (iter==max_iter_) {
-      casadi_warning("Maximum number of iterations reached");
     }
 
     // Calculate optimal cost
