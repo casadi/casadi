@@ -330,7 +330,8 @@ namespace casadi {
     const casadi_int* kkt_row = kktd_.row();
 
     // QP iterations
-    for (casadi_int iter=0; iter<max_iter_; ++iter) {
+    casadi_int iter;
+    for (iter=0; iter<max_iter_; ++iter) {
 
       // Debugging
       if (verbose_) {
@@ -625,7 +626,7 @@ namespace casadi {
           } else if (xk[i] > ub) {
             lam_xk[i] = fmax(-w[i],  DMIN);
           } else {
-            casadi_warning("Failed to restore primal feasibility?");
+            casadi_warning("Failed to restore primal feasibility");
             break; // can it happen?
           }
         } else {
@@ -635,7 +636,7 @@ namespace casadi {
           ub = uba ? uba[i] : 0.;
           // If already active constraint, terminate
           if (lam_ak[i]!=0.) {
-            casadi_warning("Failed to restore primal feasibility?");
+            casadi_warning("Failed to restore primal feasibility");
             break;
           }
           // Add constraint to active set
@@ -644,7 +645,7 @@ namespace casadi {
           } else if (gk[i] > ub) {
             lam_ak[i] = DMIN;
           } else {
-            casadi_warning("Failed to restore primal feasibility?");
+            casadi_warning("Failed to restore primal feasibility");
             break; // can it happen?
           }
         }
@@ -652,7 +653,7 @@ namespace casadi {
       }
 
       // Not yet implemented
-      casadi_warning("Failed to restore dual feasibility?");
+      casadi_warning("Failed to restore dual feasibility");
       break;
 
 /*
@@ -667,6 +668,11 @@ namespace casadi {
         lam_xk[i]=0.;
       }
       */
+    }
+
+    // Maximum number of iterations reached
+    if (iter==max_iter_) {
+      casadi_warning("Maximum number of iterations reached");
     }
 
     // Calculate optimal cost
