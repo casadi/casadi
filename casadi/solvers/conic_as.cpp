@@ -550,8 +550,7 @@ namespace casadi {
       // Calculate cost
       fk = casadi_bilin(h, H_, xk, xk)/2. + casadi_dot(nx_, xk, g);
 
-
-      // Check if there is any active set change
+      // Active set change?
       bool has_change = false;
       for (i=0; i<nx_+na_ && !has_change; ++i) has_change = w[i]==tau;
 
@@ -589,9 +588,11 @@ namespace casadi {
       casadi_mv(a, A_, lam_ak, w, 1); // gradient of the Lagrangian
       casadi_axpy(nx_, 1., lam_xk, w);
       double maxdu = 0.;
+      casadi_int imaxdu;
       for (i=0; i<nx_; ++i) {
         if (fabs(w[i])>maxdu) {
           maxdu = fabs(w[i]);
+          imaxdu = i;
         }
       }
 
@@ -605,39 +606,67 @@ namespace casadi {
       // Terminate successfully?
       if (maxpr<1e-10 && maxdu<1e-10) break;
 
-      // Largest primal or dual infeasibility?
-      if (imaxpr<nx_) {
-        // Add x constraint
-        i = imaxpr;
-        lb = lbx ? lbx[i] : 0.;
-        ub = ubx ? ubx[i] : 0.;
-        // If already active constraint, terminate
-        if (lam_xk[i]!=0.) break;
+      // Restore primal feasibility
+      if (maxpr>1e-10) {
+        if (imaxpr<nx_) {
+          i = imaxpr;
+          // Add x constraint
+          lb = lbx ? lbx[i] : 0.;
+          ub = ubx ? ubx[i] : 0.;
+          // If already active constraint, terminate
+          if (lam_xk[i]!=0.) {
+            casadi_warning("Failed to restore primal feasibility");
+            break;
+          }
 
-        // Add constraint to active set
-        if (xk[i] < lb) {
-          lam_xk[i] = -DMIN;
-        } else if (xk[i] > ub) {
-          lam_xk[i] = DMIN;
+          // Add constraint to active set
+          if (xk[i] < lb) {
+            lam_xk[i] = fmin(-w[i], -DMIN);
+          } else if (xk[i] > ub) {
+            lam_xk[i] = fmax(-w[i],  DMIN);
+          } else {
+            casadi_warning("Failed to restore primal feasibility?");
+            break; // can it happen?
+          }
         } else {
-          break; // can it happen?
+          i = imaxpr-nx_;
+          // Add a constraint
+          lb = lba ? lba[i] : 0.;
+          ub = uba ? uba[i] : 0.;
+          // If already active constraint, terminate
+          if (lam_ak[i]!=0.) {
+            casadi_warning("Failed to restore primal feasibility?");
+            break;
+          }
+          // Add constraint to active set
+          if (gk[i] < lb) {
+            lam_ak[i] = -DMIN;
+          } else if (gk[i] > ub) {
+            lam_ak[i] = DMIN;
+          } else {
+            casadi_warning("Failed to restore primal feasibility?");
+            break; // can it happen?
+          }
         }
-      } else {
-        // Add a constraint
-        i = imaxpr-nx_;
-        lb = lba ? lba[i] : 0.;
-        ub = uba ? uba[i] : 0.;
-        // If already active constraint, terminate
-        if (lam_ak[i]!=0.) break;
-        // Add constraint to active set
-        if (gk[i] < lb) {
-          lam_ak[i] = -DMIN;
-        } else if (gk[i] > ub) {
-          lam_ak[i] = DMIN;
-        } else {
-          break; // can it happen?
-        }
+        continue;
       }
+
+      // Not yet implemented
+      casadi_warning("Failed to restore dual feasibility?");
+      break;
+
+/*
+      // Try to remove a bound to restore dual feasibility
+      if (false && maxdu>1e-10) {
+        i = imaxdu;
+        // If already active constraint, terminate
+        if (lam_xk[i]==0.) {
+          casadi_warning("Terminating unsuccessfully?");
+          break;
+        }
+        lam_xk[i]=0.;
+      }
+      */
     }
 
     // Calculate optimal cost
