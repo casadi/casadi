@@ -2230,6 +2230,7 @@ namespace std {
 %casadi_template(LL "MX" LR, PREC_MXVector, std::vector<casadi::MX>)
 %casadi_template(LL LL "MX" LR LR, PREC_MXVectorVector, std::vector<std::vector<casadi::MX> >)
 %casadi_template(LDICT("MX"), PREC_MX, std::map<std::string, casadi::MX>)
+%casadi_template(LPAIR("MX","MX"), PREC_MXVector, std::pair<casadi::MX, casadi::MX>)
 %casadi_typemaps("DM", PREC_DM, casadi::Matrix<double>)
 %casadi_template(LL "DM" LR, PREC_DMVector, std::vector< casadi::Matrix<double> >)
 %casadi_template(LL LL "DM" LR LR, PREC_DMVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
