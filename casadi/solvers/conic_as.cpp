@@ -408,6 +408,9 @@ namespace casadi {
       casadi_qr_solve(step, 1, 1, sp_v_, v, sp_r_, r, beta,
                       get_ptr(prinv_), get_ptr(pc_), w);
 
+      // Remove NaNs
+      for (i=0; i<nx_+na_; ++i) if (isnan(step[i])) step[i]=0.;
+
       // Calculate change in Lagrangian gradient
       casadi_fill(dlam_x, nx_, 0.);
       casadi_mv(h, H_, step, dlam_x, 0); // gradient of the objective
@@ -546,6 +549,7 @@ namespace casadi {
 
       // Calculate cost
       fk = casadi_bilin(h, H_, xk, xk)/2. + casadi_dot(nx_, xk, g);
+
 
       // Check if there is any active set change
       bool has_change = false;
