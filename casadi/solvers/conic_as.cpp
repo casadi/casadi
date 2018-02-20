@@ -398,21 +398,9 @@ namespace casadi {
         }
       }
 
-      // Print iteration progress:
-      print("Iteration %d: fk=%g, |pr|=%g, |du|=%g\n",
-            iter, fk, maxpr, maxdu);
-
-      // Terminate successfully?
-      if (maxpr<1e-10 && maxdu<1e-10) break;
-
-      // Start new iteration
-      if (++iter==max_iter_) {
-        casadi_warning("Maximum number of iterations reached");
-        break;
-      }
-
       // Feasibility restoration?
-      if (!new_active_set) {
+      if (!(maxpr<1e-10 && maxdu<1e-10) && !new_active_set) {
+//        print("Feasibility step\n");
         if (maxpr>1e-10) {
           // Restore primal feasibility
           if (imaxpr<nx_) {
@@ -429,8 +417,12 @@ namespace casadi {
             // Add constraint to active set
             if (xk[i] < lb) {
               lam_xk[i] = fmin(-w[i], -DMIN);
+              new_active_set = true;
+              continue;
             } else if (xk[i] > ub) {
               lam_xk[i] = fmax(-w[i],  DMIN);
+              new_active_set = true;
+              continue;
             } else {
               casadi_warning("Failed to restore primal feasibility");
               break; // can it happen?
@@ -448,25 +440,52 @@ namespace casadi {
             // Add constraint to active set
             if (gk[i] < lb) {
               lam_ak[i] = -DMIN;
+              new_active_set = true;
+              continue;
             } else if (gk[i] > ub) {
               lam_ak[i] = DMIN;
+              new_active_set = true;
+              continue;
             } else {
               casadi_warning("Failed to restore primal feasibility");
               break; // can it happen?
             }
           }
         } else {
-          #if 0
-        // We're feasible but not optimal, try remove a bound on x
+          // We're feasible but not optimal, try remove a bound on x
           i=imaxdu;
           lb = lbx ? lbx[i] : 0.;
           ub = ubx ? ubx[i] : 0.;
-          if (lam_xk[i]<0. && fabs(xk[i]-lb)>1e-10) {
+
+/*
+          if (lam_xk[i]<0.) {
             lam_xk[i]=0.;
+            new_active_set = true;
             continue;
-          } else if (lam_xk[i]>0. && fabs(xk[i]-ub)>1e-10) {
+          } else if (lam_xk[i]>0.) {
             lam_xk[i]=0.;
+            new_active_set = true;
             continue;
+          }
+          */
+
+          // Try to add a weakly active bound
+          if (lam_xk[i]==0.) {
+            if (step[i]+lam_xk[imaxdu]>0) {
+              // need a negative lambda_xk
+              if (fabs(xk[i]-lb) < 1e-10) {
+                lam_xk[i] = -DMIN;
+                new_active_set = true;
+                continue;
+              }
+            } else {
+              // need a positive lambda_xk
+              if (fabs(xk[i]-ub) < 1e-10) {
+                lam_xk[i] = DMIN;
+                new_active_set = true;
+                continue;
+              }
+            }
           }
 
           // We're feasible but not optimal, try remove a bound on g
@@ -476,19 +495,64 @@ namespace casadi {
               i = a_row[k];
               lb = lba ? lba[i] : 0.;
               ub = uba ? uba[i] : 0.;
+              // Check if weakly active bound
+              if (lam_ak[i]==0.) {
+                if ((step[imaxdu]+lam_xk[imaxdu]>0) == (a[k] > 0)) {
+                  // need a negative lambda_ak
+                  if (fabs(gk[i]-lb) < 1e-10) {
+                    lam_ak[i] = -DMIN;
+                    new_active_set = true;
+                    continue;
+                  }
+                } else {
+                  // need a positive lambda_ak
+                  if (fabs(gk[i]-ub) < 1e-10) {
+                    lam_ak[i] = DMIN;
+                    new_active_set = true;
+                    continue;
+                  }
+                }
+              }
+
+/*
+              cout << "lb = " << lb << endl;
+              cout << "ub = " << ub << endl;
+              cout << "maxdu = " << maxdu << endl;
+              cout << "lam_ak[" << i << "] = " << lam_ak[i] << endl;
+              cout << "gk[" << i << "] = " << gk[i] << endl;
+              cout << "lam_ak[" << i << "]==0 = " << (lam_ak[i]==0) << endl;
+*/
+/*
               if (lam_ak[i]<0. && fabs(gk[i]-lb)>1e-10) {
                 lam_ak[i]=0.;
+                new_active_set = true;
                 continue;
               } else if (lam_ak[i]>0. && fabs(gk[i]-ub)>1e-10) {
                 lam_ak[i]=0.;
+                new_active_set = true;
                 continue;
               }
+              */
             }
           }
-    #endif
-          casadi_warning("Failed to restore dual feasibility");
-          break;
+          if (new_active_set) continue;
         }
+
+        casadi_warning("Failed to restore dual feasibility");
+        break;
+      }
+
+      // Print iteration progress:
+      print("Iteration %d: fk=%g, |pr|=%g, |du|=%g\n",
+            iter, fk, maxpr, maxdu);
+
+      // Terminate successfully?
+      if (maxpr<1e-10 && maxdu<1e-10) break;
+
+      // Start new iteration
+      if (++iter==max_iter_) {
+        casadi_warning("Maximum number of iterations reached");
+        break;
       }
 
       // No change so far
