@@ -39,6 +39,9 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  struct CASADI_CONIC_AS_EXPORT ConicAsMemory : public ConicMemory {
+  };
+
   /** \brief \pluginbrief{Conic,as}
 
       @copydoc Conic_doc
@@ -68,6 +71,15 @@ namespace casadi {
     // Get name of the class
     std::string class_name() const override { return "ConicAs";}
 
+    /** \brief Create memory block */
+    void* alloc_mem() const override { return new ConicAsMemory();}
+
+    /** \brief Initalize memory block */
+    int init_mem(void* mem) const override;
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<ConicAsMemory*>(mem);}
+
     ///@{
     /** \brief Options */
     static Options options_;
@@ -77,7 +89,8 @@ namespace casadi {
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res,
+             casadi_int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;

@@ -50,6 +50,7 @@ namespace casadi {
   }
 
   ConicAs::~ConicAs() {
+    clear_mem();
   }
 
   Options ConicAs::options_
@@ -215,8 +216,22 @@ namespace casadi {
     }
   }
 
+  int ConicAs::init_mem(void* mem) const {
+    auto m = static_cast<ConicAsMemory*>(mem);
+    return 0;
+  }
+
   int ConicAs::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    auto m = static_cast<ConicAsMemory*>(mem);
+
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
+
+    if (inputs_check_) {
+      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+    }
+
     // Local variables
     casadi_int i;
     double lb, ub, trial, fk;
