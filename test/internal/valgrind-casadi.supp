@@ -414,3 +414,16 @@ obj:*libworhp*
    fun:malloc
    fun:ECOS_setup
 }
+
+# OpenMP
+{
+   Some issue with openmp
+   Memcheck:Param
+   sched_setaffinity(mask)
+   fun:syscall
+   fun:__kmp_affinity_determine_capable
+   fun:_Z20__kmp_env_initializePKc
+   fun:*kmp_do_serial_initialize*
+   fun:__kmp_get_global_thread_id_reg
+   fun:GOMP_parallel_start@@VERSION
+}

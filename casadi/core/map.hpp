@@ -176,6 +176,38 @@ namespace casadi {
     void codegen_body(CodeGenerator& g) const override;
   };
 
+  /** A map Evaluate in parallel using std::thread
+      Note: Do not use this class with much more than the intended number of
+      threads for the parallel evaluation as it will cause excessive memory use.
+
+      \author Joris Gillis
+      \date 2018
+  */
+  class CASADI_EXPORT MapThread : public Map {
+    friend class Map;
+  protected:
+    // Constructor (protected, use create function in Map)
+    MapThread(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
+
+    /** \brief  Destructor */
+    ~MapThread() override;
+
+    /** \brief Get type name */
+    std::string class_name() const override {return "MapThreads";}
+
+    /// Evaluate the function numerically
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+
+    /** \brief  Initialize */
+    void init(const Dict& opts) override;
+
+    /// Type of parallellization
+    std::string parallelization() const override { return "thread"; }
+
+    /** \brief Generate code for the body of the C function */
+    void codegen_body(CodeGenerator& g) const override;
+  };
+
 } // namespace casadi
 /// \endcond
 

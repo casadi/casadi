@@ -25,6 +25,14 @@
 
 #include "map.hpp"
 
+#ifdef WITH_THREAD
+#ifdef WITH_THREAD_MINGW
+#include <mingw.thread.h>
+#else // WITH_THREAD_MINGW
+#include <thread>
+#endif // WITH_THREAD_MINGW
+#endif // WITH_THREAD
+
 using namespace std;
 
 namespace casadi {
@@ -36,6 +44,8 @@ namespace casadi {
       return Function::create(new Map(name, f, n), Dict());
     } else if (parallelization== "openmp") {
       return Function::create(new MapOmp(name, f, n), Dict());
+    } else if (parallelization== "thread") {
+      return Function::create(new MapThread(name, f, n), Dict());
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }
@@ -305,6 +315,102 @@ namespace casadi {
   }
 
   void MapOmp::init(const Dict& opts) {
+    // Call the initialization method of the base class
+    Map::init(opts);
+
+    // Allocate memory for holding memory object references
+    alloc_iw(n_, true);
+
+    // Allocate sufficient memory for parallel evaluation
+    alloc_arg(f_.sz_arg() * n_);
+    alloc_res(f_.sz_res() * n_);
+    alloc_w(f_.sz_w() * n_);
+    alloc_iw(f_.sz_iw() * n_);
+  }
+
+
+  MapThread::~MapThread() {
+  }
+
+  void ThreadsWork(const Function& f, casadi_int start, casadi_int stop,
+      const double** arg, double** res,
+      casadi_int* iw, double* w,
+      casadi_int ind, int& ret) {
+
+    // Function dimensions
+    casadi_int n_in = f.n_in();
+    casadi_int n_out = f.n_out();
+
+    // Function work sizes
+    size_t sz_arg, sz_res, sz_iw, sz_w;
+    f.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+
+    ret = 0;
+    for (casadi_int i=start; i<stop; ++i) {
+      // Input buffers
+      const double** arg1 = arg + n_in + i*sz_arg;
+      for (casadi_int j=0; j<n_in; ++j) {
+        arg1[j] = arg[j] ? arg[j] + i*f.nnz_in(j) : 0;
+      }
+
+      // Output buffers
+      double** res1 = res + n_out + i*sz_res;
+      for (casadi_int j=0; j<n_out; ++j) {
+        res1[j] = res[j] ? res[j] + i*f.nnz_out(j) : 0;
+      }
+
+      ret = ret || f(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind);
+    }
+  }
+
+  int MapThread::eval(const double** arg, double** res, casadi_int* iw, double* w,
+      void* mem) const {
+
+#ifndef WITH_THREAD
+    return Map::eval(arg, res, iw, w, mem);
+#else // WITH_THREAD
+    // Checkout memory objects
+    casadi_int* ind = iw; iw += n_;
+    for (casadi_int i=0; i<n_; ++i) ind[i] = f_.checkout();
+
+    // Allocate space for return values
+    std::vector<int> ret_values(n_);
+
+    // Spawn threads
+    std::vector<std::thread> threads;
+    for (casadi_int i=0; i<n_; ++i) {
+      // Why the lambda function?
+      // Because it was the first iteration to pass tests on MingGW
+      // using mingw-std-threads.
+      threads.emplace_back(
+        [i](const Function& f, const double** arg, double** res,
+            casadi_int* iw, double* w, casadi_int ind, int& ret) {
+              ThreadsWork(f, i, i+1, arg, res, iw, w, ind, ret);
+            },
+        std::ref(f_), arg, res, iw, w, ind[i], std::ref(ret_values[i]));
+    }
+
+    // Join threads
+    for (auto && th : threads) th.join();
+
+    // Release memory objects
+    for (casadi_int i=0; i<n_; ++i) f_.release(ind[i]);
+
+    // Anticipate success
+    int ret = 0;
+
+    // Compute aggregate return value
+    for (int e : ret_values) ret = ret || e;
+
+    return ret;
+#endif // WITH_THREAD
+  }
+
+  void MapThread::codegen_body(CodeGenerator& g) const {
+    Map::codegen_body(g);
+  }
+
+  void MapThread::init(const Dict& opts) {
     // Call the initialization method of the base class
     Map::init(opts);
 

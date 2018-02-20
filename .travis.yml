@@ -284,7 +284,7 @@ matrix:
         - popd
         - mkdir build
         - pushd build
-        - bash -c "cmake $casadi_build_flags -DWITH_SLICOT=OFF -DCMAKE_INSTALL_PREFIX=/home/travis/build/matlab-install -DWITH_DEEPBIND=ON -DWITH_MATLAB=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON .."
+        - bash -c "cmake $casadi_build_flags -DWITH_EXTRA_CHECKS=OFF -DWITH_SLICOT=OFF -DCMAKE_INSTALL_PREFIX=/home/travis/build/matlab-install -DWITH_DEEPBIND=ON -DWITH_MATLAB=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON .."
         - make -j2 VERBOSE=1
         - sudo make -j2 install
         - popd
