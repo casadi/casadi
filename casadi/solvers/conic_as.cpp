@@ -556,17 +556,17 @@ namespace casadi {
       for (i=0; i<nx_+na_ && !has_change; ++i) has_change = w[i]==tau;
 
       // Look for largest x bound violation
-      double maxviol = 0.;
-      casadi_int imaxviol;
+      double maxpr = 0.;
+      casadi_int imaxpr;
       for (i=0; i<nx_; ++i) {
         lb = lbx ? lbx[i] : 0.;
         ub = ubx ? ubx[i] : 0.;
-        if (xk[i] > ub+maxviol) {
-          maxviol = xk[i]-ub;
-          imaxviol = i;
-        } else if (xk[i] < lb-maxviol) {
-          maxviol = lb-xk[i];
-          imaxviol = i;
+        if (xk[i] > ub+maxpr) {
+          maxpr = xk[i]-ub;
+          imaxpr = i;
+        } else if (xk[i] < lb-maxpr) {
+          maxpr = lb-xk[i];
+          imaxpr = i;
         }
       }
 
@@ -574,47 +574,68 @@ namespace casadi {
       for (i=0; i<na_; ++i) {
         lb = lba ? lba[i] : 0.;
         ub = uba ? uba[i] : 0.;
-        if (gk[i] > ub+maxviol) {
-          maxviol = gk[i]-ub;
-          imaxviol = nx_+i;
-        } else if (gk[i] < lb-maxviol) {
-          maxviol = lb-gk[i];
-          imaxviol = nx_+i;
+        if (gk[i] > ub+maxpr) {
+          maxpr = gk[i]-ub;
+          imaxpr = nx_+i;
+        } else if (gk[i] < lb-maxpr) {
+          maxpr = lb-gk[i];
+          imaxpr = nx_+i;
+        }
+      }
+
+      // Calculate dual infeasibility
+      casadi_copy(g, nx_, w);
+      casadi_mv(h, H_, xk, w, 0); // gradient of the objective
+      casadi_mv(a, A_, lam_ak, w, 1); // gradient of the Lagrangian
+      casadi_axpy(nx_, 1., lam_xk, w);
+      double maxdu = 0.;
+      for (i=0; i<nx_; ++i) {
+        if (fabs(w[i])>maxdu) {
+          maxdu = fabs(w[i]);
         }
       }
 
       // Print iteration progress:
-      print("Iteration %d: fk=%g, tau=%g, |pr|=%g\n", iter, fk, tau, maxviol);
+      print("Iteration %d: fk=%g, tau=%g, |pr|=%g, |du|=%g\n",
+            iter, fk, tau, maxpr, maxdu);
 
       // Keep iterating?
       if (has_change) continue;
 
       // Terminate successfully?
-      if (maxviol<1e-10) break;
+      if (maxpr<1e-10 && maxdu<1e-10) break;
 
-      // Constraint on x or g?
-      if (imaxviol<nx_) {
-        // No offset
-        i = imaxviol;
+      // Largest primal or dual infeasibility?
+      if (imaxpr<nx_) {
+        // Add x constraint
+        i = imaxpr;
+        lb = lbx ? lbx[i] : 0.;
+        ub = ubx ? ubx[i] : 0.;
         // If already active constraint, terminate
         if (lam_xk[i]!=0.) break;
+
         // Add constraint to active set
         if (xk[i] < lb) {
           lam_xk[i] = -DMIN;
-        } else {
+        } else if (xk[i] > ub) {
           lam_xk[i] = DMIN;
+        } else {
+          break; // can it happen?
         }
       } else {
-        // Remove offset
-        i = imaxviol-nx_;
-
+        // Add a constraint
+        i = imaxpr-nx_;
+        lb = lba ? lba[i] : 0.;
+        ub = uba ? uba[i] : 0.;
         // If already active constraint, terminate
         if (lam_ak[i]!=0.) break;
         // Add constraint to active set
         if (gk[i] < lb) {
           lam_ak[i] = -DMIN;
-        } else {
+        } else if (gk[i] > ub) {
           lam_ak[i] = DMIN;
+        } else {
+          break; // can it happen?
         }
       }
     }
