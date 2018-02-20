@@ -261,17 +261,17 @@ namespace casadi {
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     xk = w; w += nx_;
+    gk = w; w += na_;
     lam_xk = w; w += nx_;
     lam_ak = w; w += na_;
-    v = w; w += sp_v_.nnz();
-    r = w; w += sp_r_.nnz();
-    beta = w; w += nx_+na_;
     alpha_x = w; w += nx_;
     alpha_a = w; w += na_;
-    gk = w; w += nx_;
     step = w; w += nx_+na_;
     dlam_x = w; w += nx_;
     dg = w; w += na_;
+    v = w; w += sp_v_.nnz();
+    r = w; w += sp_r_.nnz();
+    beta = w; w += nx_+na_;
 
     // Pass initial guess
     casadi_copy(x0, nx_, xk);
