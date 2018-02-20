@@ -101,7 +101,7 @@ namespace casadi {
     alloc_w(nx_, true); // lam_xk
     alloc_w(na_, true); // lam_ak
     alloc_w(A_.nnz()); // trans(A)
-    alloc_iw(nx_, na_); // casadi_trans, tau type
+    alloc_iw(nx_ + na_); // casadi_trans, tau type
     alloc_w(nx_ + na_); // casadi_project, [alpha_x, -lambda_g], [lambda_x, alpha_g], tau memory
     alloc_w(nx_, true); // alpha_x
     alloc_w(na_, true); // alpha_a
