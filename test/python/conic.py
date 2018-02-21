@@ -55,7 +55,10 @@ if has_conic("cplex"):
 
 if has_conic("clp"):
   conics.append(("clp",{"verbose":True},{"quadratic": False}))
-  
+
+if has_conic("activeset"):
+  conics.append(("activeset",{},{"quadratic": True}))
+
 print(conics)
 
 class ConicTests(casadiTestCase):
@@ -66,7 +69,7 @@ class ConicTests(casadiTestCase):
 
     for conic, qp_options, aux_options in conics:
       solver = qpsol("mysolver", conic, qp, qp_options)
-      
+
       for x in ["x","g"]:
         lb = "lb"+x
         ub = "ub"+x
@@ -79,7 +82,7 @@ class ConicTests(casadiTestCase):
           print(data)
           with self.assertInException("Ill-posed"):
             solver(**data)
-   
+
   def test_missing_symbols(self):
     x = MX.sym("x")
     p = MX.sym("p")
@@ -121,7 +124,7 @@ class ConicTests(casadiTestCase):
     for conic, qp_options, aux_options in conics:
       with self.assertInException("dense scalar"):
         solver = qpsol("mysolver", conic, qp, qp_options)
-        
+
     x = vec(diag(SX.sym("x",2)))
     qp={'x':x, 'f':mtimes(x.T,x),'g':x[0]}
     for conic, qp_options, aux_options in conics:
@@ -304,6 +307,7 @@ class ConicTests(casadiTestCase):
       solver_in["h"]=0
 
       if 'qcqp' in str(conic): continue # Singular hessian
+      if 'activeset' in str(conic): continue # Singular hessian
 
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(conic))
@@ -739,6 +743,7 @@ class ConicTests(casadiTestCase):
       for conic, qp_options, aux_options in conics:
         if not aux_options["quadratic"]: continue
         if 'qcqp' in str(conic): continue
+        if 'activeset' in str(conic): continue
         solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
         try:
