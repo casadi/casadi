@@ -822,4 +822,5 @@ install(FILES
 install(EXPORT casadi-targets DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
 
 set(CPACK_PACKAGE_CONTACT "casadi-users@googlegroups.com")
+set(CPACK_PACKAGE_VERSION ${PACKAGE_VERSION_FULL})
 include(CPack)
