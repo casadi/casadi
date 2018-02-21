@@ -23,9 +23,9 @@
  */
 
 
-      #include "conic_as.hpp"
+      #include "conic_activeset.hpp"
       #include <string>
 
-      const std::string casadi::ConicAs::meta_doc=
+      const std::string casadi::ConicActiveSet::meta_doc=
       "\n"
 ;

@@ -23,62 +23,62 @@
  */
 
 
-#ifndef CASADI_CONIC_AS_HPP
-#define CASADI_CONIC_AS_HPP
+#ifndef CASADI_CONIC_ACTIVESET_HPP
+#define CASADI_CONIC_ACTIVESET_HPP
 
 #include "casadi/core/conic_impl.hpp"
-#include <casadi/solvers/casadi_conic_as_export.h>
+#include <casadi/solvers/casadi_conic_activeset_export.h>
 
 
-/** \defgroup plugin_Conic_as
+/** \defgroup plugin_Conic_activeset
  Solve QPs using an active-set method
 */
 
-/** \pluginsection{Conic,as} */
+/** \pluginsection{Conic,activeset} */
 
 /// \cond INTERNAL
 namespace casadi {
 
-  struct CASADI_CONIC_AS_EXPORT ConicAsMemory : public ConicMemory {
+  struct CASADI_CONIC_ACTIVESET_EXPORT ConicActiveSetMemory : public ConicMemory {
   };
 
-  /** \brief \pluginbrief{Conic,as}
+  /** \brief \pluginbrief{Conic,activeset}
 
       @copydoc Conic_doc
-      @copydoc plugin_Conic_as
+      @copydoc plugin_Conic_activeset
 
       \author Joel Andersson
       \date 2018
   */
-  class CASADI_CONIC_AS_EXPORT ConicAs : public Conic {
+  class CASADI_CONIC_ACTIVESET_EXPORT ConicActiveSet : public Conic {
   public:
     /** \brief  Create a new Solver */
-    explicit ConicAs(const std::string& name,
+    explicit ConicActiveSet(const std::string& name,
                      const std::map<std::string, Sparsity> &st);
 
     /** \brief  Create a new QP Solver */
     static Conic* creator(const std::string& name,
                           const std::map<std::string, Sparsity>& st) {
-      return new ConicAs(name, st);
+      return new ConicActiveSet(name, st);
     }
 
     /** \brief  Destructor */
-    ~ConicAs() override;
+    ~ConicActiveSet() override;
 
     // Get name of the plugin
     const char* plugin_name() const override { return "as";}
 
     // Get name of the class
-    std::string class_name() const override { return "ConicAs";}
+    std::string class_name() const override { return "ConicActiveSet";}
 
     /** \brief Create memory block */
-    void* alloc_mem() const override { return new ConicAsMemory();}
+    void* alloc_mem() const override { return new ConicActiveSetMemory();}
 
     /** \brief Initalize memory block */
     int init_mem(void* mem) const override;
 
     /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<ConicAsMemory*>(mem);}
+    void free_mem(void *mem) const override { delete static_cast<ConicActiveSetMemory*>(mem);}
 
     ///@{
     /** \brief Options */
@@ -115,4 +115,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_CONIC_AS_HPP
+#endif // CASADI_CONIC_ACTIVESET_HPP

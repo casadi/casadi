@@ -1,4 +1,4 @@
-/*
+ /*
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
@@ -23,37 +23,37 @@
  */
 
 
-#include "conic_as.hpp"
+#include "conic_activeset.hpp"
 #include "casadi/core/nlpsol.hpp"
 
 using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_CONIC_AS_EXPORT
-  casadi_register_conic_as(Conic::Plugin* plugin) {
-    plugin->creator = ConicAs::creator;
-    plugin->name = "as";
-    plugin->doc = ConicAs::meta_doc.c_str();
+  int CASADI_CONIC_ACTIVESET_EXPORT
+  casadi_register_conic_activeset(Conic::Plugin* plugin) {
+    plugin->creator = ConicActiveSet::creator;
+    plugin->name = "activeset";
+    plugin->doc = ConicActiveSet::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
-    plugin->options = &ConicAs::options_;
+    plugin->options = &ConicActiveSet::options_;
     return 0;
   }
 
   extern "C"
-  void CASADI_CONIC_AS_EXPORT casadi_load_conic_as() {
-    Conic::registerPlugin(casadi_register_conic_as);
+  void CASADI_CONIC_ACTIVESET_EXPORT casadi_load_conic_activeset() {
+    Conic::registerPlugin(casadi_register_conic_activeset);
   }
 
-  ConicAs::ConicAs(const std::string& name, const std::map<std::string, Sparsity> &st)
+  ConicActiveSet::ConicActiveSet(const std::string& name, const std::map<std::string, Sparsity> &st)
     : Conic(name, st) {
   }
 
-  ConicAs::~ConicAs() {
+  ConicActiveSet::~ConicActiveSet() {
     clear_mem();
   }
 
-  Options ConicAs::options_
+  Options ConicActiveSet::options_
   = {{&Conic::options_},
      {{"max_iter",
        {OT_INT,
@@ -67,7 +67,7 @@ namespace casadi {
      }
   };
 
-  void ConicAs::init(const Dict& opts) {
+  void ConicActiveSet::init(const Dict& opts) {
     // Initialize the base classes
     Conic::init(opts);
 
@@ -123,7 +123,7 @@ namespace casadi {
 
     // Print summary
     print("-------------------------------------------\n");
-    print("This is casadi::ConicAs.\n");
+    print("This is casadi::ConicActiveSet.\n");
     print("Number of variables:                       %9d\n", nx_);
     print("Number of constraints:                     %9d\n", na_);
     print("Work in progress!\n");
@@ -222,14 +222,14 @@ namespace casadi {
     }
   }
 
-  int ConicAs::init_mem(void* mem) const {
-    auto m = static_cast<ConicAsMemory*>(mem);
+  int ConicActiveSet::init_mem(void* mem) const {
+    auto m = static_cast<ConicActiveSetMemory*>(mem);
     return 0;
   }
 
-  int ConicAs::
+  int ConicActiveSet::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    auto m = static_cast<ConicAsMemory*>(mem);
+    auto m = static_cast<ConicActiveSetMemory*>(mem);
 
     // Statistics
     for (auto&& s : m->fstats) s.second.reset();

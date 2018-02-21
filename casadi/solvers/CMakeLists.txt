@@ -4,8 +4,8 @@ casadi_plugin(Conic nlpsol
   qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
 
 # Active-set QP solver
-casadi_plugin(Conic as
-    conic_as.hpp conic_as.cpp conic_as_meta.cpp)
+casadi_plugin(Conic activeset
+    conic_activeset.hpp conic_activeset.cpp conic_activeset_meta.cpp)
 
 # Simple just-in-time compiler, using shell commands
 if(WITH_DL)
