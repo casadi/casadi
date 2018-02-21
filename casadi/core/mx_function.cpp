@@ -1470,24 +1470,24 @@ namespace casadi {
             std::vector<Sparsity> sp;
             for (casadi_int i=0;i<output.n_out();i++)
               sp.push_back(output.sparsity_out(i));
-              for (casadi_int k=0;k<o.size();++k) {
-                if (o[k]==-1) continue;
-                x.dep(0).sparsity().export_code("matlab", ss,
-                  {{"name", "sp_in"}, {"indent_level", indent_level}, {"as_matrix", true}});
-                ss << indent << "tmp = w" << i[0]<< "(sp_in==1);" << std::endl;
-                Dict opts;
-                opts["name"] = "sp";
-                opts["indent_level"] = indent_level;
-                opts["as_matrix"] = false;
-                sp[k].export_code("matlab", ss, opts);
-                ss << indent << "w" << o[k] << " = sparse(sp_i, sp_j, ";
-                ss << "tmp(" << offset[k]+1 << ":" << offset[k+1] << "), sp_m, sp_n);" << std::endl;
-             }
-           }
-           break;
-         case OP_GETNONZEROS:
-         case OP_SETNONZEROS:
-            {
+            for (casadi_int k=0;k<o.size();++k) {
+              if (o[k]==-1) continue;
+              x.dep(0).sparsity().export_code("matlab", ss,
+                {{"name", "sp_in"}, {"indent_level", indent_level}, {"as_matrix", true}});
+              ss << indent << "tmp = w" << i[0]<< "(sp_in==1);" << std::endl;
+              Dict opts;
+              opts["name"] = "sp";
+              opts["indent_level"] = indent_level;
+              opts["as_matrix"] = false;
+              sp[k].export_code("matlab", ss, opts);
+              ss << indent << "w" << o[k] << " = sparse(sp_i, sp_j, ";
+              ss << "tmp(" << offset[k]+1 << ":" << offset[k+1] << "), sp_m, sp_n);" << std::endl;
+            }
+          }
+          break;
+        case OP_GETNONZEROS:
+        case OP_SETNONZEROS:
+          {
             Dict info = x.info();
 
             std::string nonzeros;

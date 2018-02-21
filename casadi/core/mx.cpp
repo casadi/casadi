@@ -1389,6 +1389,7 @@ namespace casadi {
       switch (it->op) {
       case OP_INPUT:
         tainted[it->res.front()] = false;
+        break;
       case OP_PARAMETER:
         swork[it->res.front()] = it->data;
         tainted[it->res.front()] = false;

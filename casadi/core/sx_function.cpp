@@ -851,9 +851,9 @@ namespace casadi {
         case 'c':
           {
             casadi_int o; stream >> o; stream >> c;
-            casadi_int b; stream >> b;
-            const double& d = reinterpret_cast<double&>(b);
-            w.at(o) = d;
+            int64_t b; stream >> b;
+            const double* d = reinterpret_cast<double*>(&b);
+            w.at(o) = *d;
           }
           break;
         case 'u':
@@ -917,8 +917,8 @@ namespace casadi {
         case OP_CONST:
           {
             double v = f.instruction_constant(k);
-            const casadi_int& b = reinterpret_cast<casadi_int&>(v);
-            ss << "c" << o[0] << ":" << b;
+            const int64_t* b = reinterpret_cast<int64_t*>(&v);
+            ss << "c" << o[0] << ":" << *b;
           }
           break;
         default:
