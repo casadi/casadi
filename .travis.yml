@@ -11,6 +11,7 @@ env:
     - PYTHONPATH=/usr/local/python
     - TRAVIS_PYTHON_VERSION=2.7
     - NUMPYVERSION=1.11
+    - casadi_build_flags="-DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_EXTRA_CHECKS=ON"
 
 before_script:
   - |
@@ -195,7 +196,7 @@ matrix:
         - export CXX=g++-6
         - mkdir build
         - pushd build
-        - bash -c "cmake  $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_ERROR=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
+        - bash -c "cmake  $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
         - make
         - sudo make install
         - popd
@@ -217,7 +218,7 @@ matrix:
         - export languagetool="$mypwd/LanguageTool-2.7"
         - mkdir build
         - pushd build
-        - bash -c "cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_SPELL=ON -DWITH_LINT=ON .."
+        - bash -c "cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_SPELL=ON -DWITH_LINT=ON .."
         - make lint
         - export languagetool="$mypwd/LanguageTool-2.7" make spell
         - popd && pushd misc && python autogencode.py && popd
@@ -284,7 +285,7 @@ matrix:
         - popd
         - mkdir build
         - pushd build
-        - bash -c "cmake $casadi_build_flags -DWITH_SLICOT=OFF -DCMAKE_INSTALL_PREFIX=/home/travis/build/matlab-install -DWITH_DEEPBIND=ON -DWITH_MATLAB=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON .."
+        - bash -c "cmake $casadi_build_flags -DWITH_EXTRA_CHECKS=OFF -DWITH_SLICOT=OFF -DCMAKE_INSTALL_PREFIX=/home/travis/build/matlab-install -DWITH_DEEPBIND=ON -DWITH_MATLAB=ON -DWITH_PROFILING=ON -DWITH_DOC=ON -DWITH_EXAMPLES=ON -DWITH_COVERAGE=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_JSON=ON .."
         - make -j2 VERBOSE=1
         - sudo make -j2 install
         - popd
@@ -324,7 +325,6 @@ branches:
 
 before_install:
   - shell_session_update() { :; } # Workaround for travis-ci/travis-ci#6522
-  - export casadi_build_flags="-DWITH_COMMON=ON -DWITH_EXTRA_CHECKS=ON"
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
   - pushd testbot && source recipes/setup.sh && popd
   - |

@@ -11207,9 +11207,11 @@ Solve QPs using an active-set method
 +----------+-----------+--------------------------------------+
 |    Id    |   Type    |             Description              |
 +==========+===========+======================================+
+| du_tol   | OT_DOUBLE | Dual tolerance [1e-8].               |
++----------+-----------+--------------------------------------+
 | max_iter | OT_INT    | Maximum number of iterations [1000]. |
 +----------+-----------+--------------------------------------+
-| nlpsol   | OT_STRING | Name of solver.                      |
+| pr_tol   | OT_DOUBLE | Primal tolerance [1e-8].             |
 +----------+-----------+--------------------------------------+
 
 Joel Andersson
@@ -11223,10 +11225,12 @@ Joel Andersson
 |          |               | variables are discrete,     |                 |
 |          |               | i.e. integer-valued         |                 |
 +----------+---------------+-----------------------------+-----------------+
+| du_tol   | OT_DOUBLE     | Dual tolerance [1e-8].      | casadi::ConicAs |
++----------+---------------+-----------------------------+-----------------+
 | max_iter | OT_INT        | Maximum number of           | casadi::ConicAs |
 |          |               | iterations [1000].          |                 |
 +----------+---------------+-----------------------------+-----------------+
-| nlpsol   | OT_STRING     | Name of solver.             | casadi::ConicAs |
+| pr_tol   | OT_DOUBLE     | Primal tolerance [1e-8].    | casadi::ConicAs |
 +----------+---------------+-----------------------------+-----------------+
 
 Diagrams
@@ -31066,6 +31070,784 @@ printing during evaluation.
 ";
 
 
+// File: classcasadi_1_1MapThread.xml
+%feature("docstring") casadi::MapThread::size1_in "[INTERNAL]  Input/output
+dimensions.
+
+";
+
+%feature("docstring") casadi::MapThread::get_sparsity_out "[INTERNAL]
+Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::MapThread::adjViaJac "[INTERNAL]  Calculate
+derivatives by multiplying the full Jacobian and multiplying.
+
+";
+
+%feature("docstring") casadi::MapThread::release "[INTERNAL]  Release a
+memory object.
+
+";
+
+%feature("docstring") casadi::MapThread::has_function "[INTERNAL] ";
+
+%feature("docstring") casadi::MapThread::all_scalar "[INTERNAL]  Are all
+inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::MapThread::sz_iw "[INTERNAL]  Get required
+length of iw field.
+
+";
+
+%feature("docstring") casadi::MapThread::factory "[INTERNAL] ";
+
+%feature("docstring") casadi::MapThread::sz_work "[INTERNAL]  Get number of
+temporary variables needed.
+
+";
+
+%feature("docstring") casadi::MapThread::get_jacobian_sparsity "[INTERNAL]
+Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::MapThread::alloc_res "[INTERNAL]  Ensure
+required length of res field.
+
+";
+
+%feature("docstring") casadi::MapThread::print_option "[INTERNAL]  Print
+all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::MapThread::sp_reverse "[INTERNAL]  Propagate
+sparsity backwards.
+
+";
+
+%feature("docstring") casadi::MapThread::export_code "[INTERNAL]  Export
+function in a specific language.
+
+";
+
+%feature("docstring") casadi::MapThread::wrap "[INTERNAL]  Wrap in an
+Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::MapThread "[INTERNAL]  A map Evaluate in
+parallel using std::thread Note: Do not use this class with much more than
+the intended number of threads for the parallel evaluation as it will cause
+excessive memory use.
+
+Joris Gillis
+
+C++ includes: map.hpp ";
+
+%feature("docstring") casadi::MapThread::codegen_sparsities "[INTERNAL]
+Codegen sparsities.
+
+";
+
+%feature("docstring") casadi::MapThread::set_temp "[INTERNAL]  Set the
+(temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::MapThread::symbolicAdjSeed "[INTERNAL]
+Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring") casadi::MapThread::finalize "[INTERNAL]  Finalize the
+object creation.
+
+";
+
+%feature("docstring") casadi::MapThread::serialize "[INTERNAL]  Serialize.
+
+";
+
+%feature("docstring") casadi::MapThread::disp "[INTERNAL]  Display object.
+
+";
+
+%feature("docstring") casadi::MapThread::replace_res "[INTERNAL]  Replace
+0-by-0 outputs.
+
+";
+
+%feature("docstring") casadi::MapThread::get_jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::MapThread::alloc_arg "[INTERNAL]  Ensure
+required length of arg field.
+
+";
+
+%feature("docstring") casadi::MapThread::sparsity_jac "[INTERNAL]  Get, if
+necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::MapThread::instruction_MX "[INTERNAL]  get MX
+expression associated with instruction
+
+";
+
+%feature("docstring") casadi::MapThread::get_stats "[INTERNAL]  Get all
+statistics.
+
+";
+
+%feature("docstring") casadi::MapThread::codegen "[INTERNAL]  Generate code
+the function.
+
+";
+
+%feature("docstring") casadi::MapThread::jac "[INTERNAL]  Return Jacobian
+of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::MapThread::fwdViaJac "[INTERNAL]  Calculate
+derivatives by multiplying the full Jacobian and multiplying.
+
+";
+
+%feature("docstring") casadi::MapThread::sz_arg "[INTERNAL]  Get required
+length of arg field.
+
+";
+
+%feature("docstring") casadi::MapThread::alloc_w "[INTERNAL]  Ensure
+required length of w field.
+
+";
+
+%feature("docstring") casadi::MapThread::call_reverse "[INTERNAL]  Reverse
+mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::MapThread::codegen_name "[INTERNAL]  Get name
+in codegen.
+
+";
+
+%feature("docstring") casadi::MapThread::eval_mx "[INTERNAL]  Evaluate with
+symbolic matrices.
+
+";
+
+%feature("docstring") casadi::MapThread::free_sx "[INTERNAL]  Get free
+variables (SX)
+
+";
+
+%feature("docstring") casadi::MapThread::has_jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::MapThread::fwd_seed "[INTERNAL]  Symbolic
+expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::MapThread::instruction_input "[INTERNAL]  Get
+the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::MapThread::checkout "[INTERNAL]  Checkout a
+memory object.
+
+";
+
+%feature("docstring") casadi::MapThread::sp_weight "[INTERNAL]  Weighting
+factor for chosing forward/reverse mode, sparsity propagation.
+
+";
+
+%feature("docstring") casadi::MapThread::jit_dependencies "[INTERNAL]  Jit
+dependencies.
+
+";
+
+%feature("docstring") casadi::MapThread::set_work "[INTERNAL]  Set the
+(persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::MapThread::numel_out "[INTERNAL]  Number of
+input/output elements.
+
+";
+
+%feature("docstring") casadi::MapThread::eval_gen "
+
+>  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate numerically.
+
+>  int casadi::FunctionInternal::eval_gen(const SXElem **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem) const
+
+>  int casadi::FunctionInternal::eval_gen(const bvec_t **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate a function, overloaded.
+
+>  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate or propagate sparsities.
+
+";
+
+%feature("docstring") casadi::MapThread::get_partition "[INTERNAL]  Get the
+unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::MapThread::get_max_in "[INTERNAL]  Get
+largest input value.
+
+";
+
+%feature("docstring") casadi::MapThread::index_in "[INTERNAL]  Get input
+scheme index by name.
+
+";
+
+%feature("docstring") casadi::MapThread::size_in "[INTERNAL]  Input/output
+dimensions.
+
+";
+
+%feature("docstring") casadi::MapThread::get_min_in "[INTERNAL]  Get
+smallest input value.
+
+";
+
+%feature("docstring") casadi::MapThread::check_res "[INTERNAL]  Check if
+output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::MapThread::replace_aseed "[INTERNAL]  Replace
+0-by-0 reverse seeds.
+
+";
+
+%feature("docstring") casadi::MapThread::slice "[INTERNAL]  returns a new
+function with a selection of inputs/outputs of the original
+
+";
+
+%feature("docstring") casadi::MapThread::is_a "[INTERNAL]  Check if the
+function is of a particular type.
+
+";
+
+%feature("docstring") casadi::MapThread::has_jac "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::MapThread::get_jac "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::MapThread::replace_fseed "[INTERNAL]  Replace
+0-by-0 forward seeds.
+
+";
+
+%feature("docstring") casadi::MapThread::get_default_in "[INTERNAL]  Get
+default input value.
+
+";
+
+%feature("docstring") casadi::MapThread::print_options "[INTERNAL]  Print
+list of options.
+
+";
+
+%feature("docstring") casadi::MapThread::has_derivative "[INTERNAL]  Can
+derivatives be calculated in any way?
+
+";
+
+%feature("docstring") casadi::MapThread::free_mem "[INTERNAL]  Free memory
+block.
+
+";
+
+%feature("docstring") casadi::MapThread::getCount "[INTERNAL]  Get the
+reference count.
+
+";
+
+%feature("docstring") casadi::MapThread::eval_sx "[INTERNAL]  evaluate
+symbolically while also propagating directional derivatives
+
+";
+
+%feature("docstring") casadi::MapThread::sprint "[INTERNAL]  C-style
+formatted printing to string.
+
+";
+
+%feature("docstring") casadi::MapThread::codegen_declarations "[INTERNAL]
+Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::MapThread::alloc_mem "[INTERNAL]  Create
+memory block.
+
+";
+
+%feature("docstring") casadi::MapThread::instruction_constant "[INTERNAL]
+Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::MapThread::disp_more "[INTERNAL]  Print more.
+
+";
+
+%feature("docstring") casadi::MapThread::size2_in "[INTERNAL]  Input/output
+dimensions.
+
+";
+
+%feature("docstring") casadi::MapThread::has_free "[INTERNAL]  Does the
+function have free variables.
+
+";
+
+%feature("docstring") casadi::MapThread::get_reverse "[INTERNAL]  Generate
+a function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring") casadi::MapThread::jacobian "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::MapThread::sx_in "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::MapThread::sz_w "[INTERNAL]  Get required
+length of w field.
+
+";
+
+%feature("docstring") casadi::MapThread::codegen_meta "[INTERNAL]  Generate
+meta-information allowing a user to evaluate a generated function.
+
+";
+
+%feature("docstring") casadi::MapThread::setup "[INTERNAL]  Set the
+(persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::MapThread::print "[INTERNAL]  C-style
+formatted printing during evaluation.
+
+";
+
+%feature("docstring") casadi::MapThread::generate_lifted "[INTERNAL]
+Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring") casadi::MapThread::mx_in "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::MapThread::uses_output "[INTERNAL]  Do the
+derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring") casadi::MapThread::has_sprev "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::MapThread::nnz_in "[INTERNAL]  Number of
+input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::MapThread::get_reltol "[INTERNAL]  Get
+relative tolerance.
+
+";
+
+%feature("docstring") casadi::MapThread::instruction_id "[INTERNAL]  Get an
+atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::MapThread::symbolic_output "[INTERNAL]  Get a
+vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::MapThread::size1_out "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::MapThread::call_forward "[INTERNAL]  Forward
+mode AD, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::MapThread::generate_dependencies "[INTERNAL]
+Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring") casadi::MapThread::index_out "[INTERNAL]  Get output
+scheme index by name.
+
+";
+
+%feature("docstring") casadi::MapThread::get_function "[INTERNAL] ";
+
+%feature("docstring") casadi::MapThread::getJacSparsityGen "[INTERNAL]  Get
+the sparsity pattern, forward mode.
+
+";
+
+%feature("docstring") casadi::MapThread::sparsity_in "[INTERNAL]
+Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::MapThread::get_sparsity_in "[INTERNAL]
+Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::MapThread::getJacSparsityHierarchicalSymm "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring") casadi::MapThread::serialize_header "[INTERNAL]
+Serialize function header.
+
+";
+
+%feature("docstring") casadi::MapThread::get_free "[INTERNAL]  Print free
+variables.
+
+";
+
+%feature("docstring") casadi::MapThread::alloc_iw "[INTERNAL]  Ensure
+required length of iw field.
+
+";
+
+%feature("docstring") casadi::MapThread::get_forward "[INTERNAL]  Generate
+a function that calculates nfwd forward derivatives.
+
+";
+
+%feature("docstring") casadi::MapThread::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
+
+";
+
+%feature("docstring") casadi::MapThread::sp_forward "[INTERNAL]  Propagate
+sparsity forward.
+
+";
+
+%feature("docstring") casadi::MapThread::sx_out "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::MapThread::sparsity_out "[INTERNAL]
+Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::MapThread::get_abstol "[INTERNAL]  Get
+absolute tolerance.
+
+";
+
+%feature("docstring") casadi::MapThread::weak "[INTERNAL]  Get a weak
+reference to the object.
+
+";
+
+%feature("docstring") casadi::MapThread::check_arg "[INTERNAL]  Check if
+input arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::MapThread::ad_weight "[INTERNAL]  Weighting
+factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring") casadi::MapThread::replace_arg "[INTERNAL]  Replace
+0-by-0 inputs.
+
+";
+
+%feature("docstring") casadi::MapThread::get_n_in "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::MapThread::size_out "[INTERNAL]  Input/output
+dimensions.
+
+";
+
+%feature("docstring") casadi::MapThread::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::MapThread::signature "[INTERNAL]  Code
+generate the function.
+
+";
+
+%feature("docstring") casadi::MapThread::getJacSparsity "[INTERNAL]
+Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::MapThread::eval_dm "[INTERNAL]  Evaluate with
+DM matrices.
+
+";
+
+%feature("docstring") casadi::MapThread::print_dimensions "[INTERNAL]
+Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::MapThread::n_instructions "[INTERNAL]  Get
+the number of atomic operations.
+
+";
+
+%feature("docstring") casadi::MapThread::codegen_decref "[INTERNAL]
+Codegen decref for dependencies.
+
+";
+
+%feature("docstring") casadi::MapThread::alloc "[INTERNAL]  Ensure work
+vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::MapThread::construct "[INTERNAL]  Construct
+Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::MapThread::get_options "[INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::MapThread::call "[INTERNAL]   Call a
+function, templated.
+
+";
+
+%feature("docstring") casadi::MapThread::info "[INTERNAL]  Obtain
+information about node
+
+";
+
+%feature("docstring") casadi::MapThread::size2_out "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::MapThread::call_gen "[INTERNAL]   Call a
+function, overloaded.
+
+";
+
+%feature("docstring") casadi::MapThread::matching_arg "[INTERNAL]  Check if
+input arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::MapThread::get_name_out "[INTERNAL]  Names of
+function input and outputs.
+
+";
+
+%feature("docstring") casadi::MapThread::numel_in "[INTERNAL]  Number of
+input/output elements.
+
+";
+
+%feature("docstring") casadi::MapThread::get_n_out "[INTERNAL]  Number of
+function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::MapThread::matching_res "[INTERNAL]  Check if
+output arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::MapThread::getAdaptorSolverName "[INTERNAL]
+Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring") casadi::MapThread::has_forward "[INTERNAL]  Generate
+a function that calculates nfwd forward derivatives.
+
+";
+
+%feature("docstring") casadi::MapThread::which_depends "[INTERNAL]  Which
+variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::MapThread::sz_res "[INTERNAL]  Get required
+length of res field.
+
+";
+
+%feature("docstring") casadi::MapThread::forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
+
+";
+
+%feature("docstring") casadi::MapThread::codegen_incref "[INTERNAL]
+Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::MapThread::instruction_output "[INTERNAL]
+Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::MapThread::mx_out "[INTERNAL]  Get function
+input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::MapThread::reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
+
+";
+
+%feature("docstring") casadi::MapThread::has_reverse "[INTERNAL]  Generate
+a function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring") casadi::MapThread::init_mem "[INTERNAL]  Initalize
+memory block.
+
+";
+
+%feature("docstring") casadi::MapThread::nnz_out "[INTERNAL]  Number of
+input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::MapThread::free_mx "[INTERNAL]  Get free
+variables ( MX)
+
+";
+
+%feature("docstring") casadi::MapThread::oracle "[INTERNAL]  Get oracle.
+
+";
+
+%feature("docstring") casadi::MapThread::memory "[INTERNAL]  Memory
+objects.
+
+";
+
+%feature("docstring") casadi::MapThread::has_spfwd "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::MapThread::self "[INTERNAL]  Get a public
+class instance.
+
+";
+
+%feature("docstring") casadi::MapThread::get_name_in "[INTERNAL]  Names of
+function input and outputs.
+
+";
+
+%feature("docstring") casadi::MapThread::mapsum_mx "[INTERNAL]  Parallel
+evaluation.
+
+";
+
+%feature("docstring") casadi::MapThread::has_codegen "[INTERNAL]  Is
+codegen supported?
+
+";
+
+%feature("docstring") casadi::MapThread::n_nodes "[INTERNAL]  Number of
+nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::MapThread::clear_mem "[INTERNAL]  Clear all
+memory (called from destructor)
+
+";
+
+
 // File: classcasadi_1_1Matrix.xml
 
 
@@ -49439,9 +50221,11 @@ Solve QPs using an active-set method
 +----------+-----------+--------------------------------------+
 |    Id    |   Type    |             Description              |
 +==========+===========+======================================+
+| du_tol   | OT_DOUBLE | Dual tolerance [1e-8].               |
++----------+-----------+--------------------------------------+
 | max_iter | OT_INT    | Maximum number of iterations [1000]. |
 +----------+-----------+--------------------------------------+
-| nlpsol   | OT_STRING | Name of solver.                      |
+| pr_tol   | OT_DOUBLE | Primal tolerance [1e-8].             |
 +----------+-----------+--------------------------------------+
 
 --------------------------------------------------------------------------------

@@ -136,7 +136,7 @@ namespace casadi {
     // Local variables
     casadi_int r, c, k;
     // Get sparsities
-    casadi_int nrow=sp_x[0], ncol=sp_x[1];
+    casadi_int ncol=sp_x[1];
     const casadi_int *colind=sp_x+2, *row=sp_x+2+ncol+1;
     // Set elements in subblock
     for (c=cbeg; c<cend; ++c) {
@@ -223,7 +223,7 @@ namespace casadi {
   }
 
   int ConicActiveSet::init_mem(void* mem) const {
-    auto m = static_cast<ConicActiveSetMemory*>(mem);
+    //auto m = static_cast<ConicActiveSetMemory*>(mem);
     return 0;
   }
 
@@ -263,15 +263,15 @@ namespace casadi {
 
     // Work vectors
     double *kkt, *kktd, *xk, *lam_xk, *lam_ak, *v, *r, *beta,
-           *alpha_x, *alpha_a, *gk, *step, *dlam_x, *dg;
+           /**alpha_x, *alpha_a,*/ *gk, *step, *dlam_x, *dg;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     xk = w; w += nx_;
     gk = w; w += na_;
     lam_xk = w; w += nx_;
     lam_ak = w; w += na_;
-    alpha_x = w; w += nx_;
-    alpha_a = w; w += na_;
+    /*alpha_x = w;*/ w += nx_;
+    /*alpha_a = w;*/ w += na_;
     step = w; w += nx_+na_;
     dlam_x = w; w += nx_;
     dg = w; w += na_;

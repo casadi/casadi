@@ -342,6 +342,8 @@ class casadiTestCase(unittest.TestCase):
         continue
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
 
+  def checkfunction_light(self,trial,solution,inputs=None,**kwargs):
+    self.checkfunction(trial,solution,inputs,fwd=False,adj=False,jacobian=False,gradient=False,hessian=False,sens_der=False,evals=False,**kwargs)
   def checkfunction(self,trial,solution,inputs=None,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True,allow_nondiff=False):
 
     if isinstance(inputs,dict):
