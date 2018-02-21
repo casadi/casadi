@@ -55,12 +55,15 @@ namespace casadi {
 
   Options ConicAs::options_
   = {{&Conic::options_},
-     {{"nlpsol",
-       {OT_STRING,
-        "Name of solver."}},
-      {"max_iter",
+     {{"max_iter",
        {OT_INT,
-        "Maximum number of iterations [1000]."}}
+        "Maximum number of iterations [1000]."}},
+      {"pr_tol",
+       {OT_DOUBLE,
+        "Primal tolerance [1e-8]."}},
+      {"du_tol",
+       {OT_DOUBLE,
+        "Dual tolerance [1e-8]."}}
      }
   };
 
@@ -69,15 +72,18 @@ namespace casadi {
     Conic::init(opts);
 
     // Default options
-    string nlpsol_plugin = "ipopt";
     max_iter_ = 1000;
+    pr_tol_ = 1e-8;
+    du_tol_ = 1e-8;
 
     // Read user options
     for (auto&& op : opts) {
-      if (op.first=="nlpsol") {
-        nlpsol_plugin = op.second.to_string();
-      } else if (op.first=="max_iter") {
+      if (op.first=="max_iter") {
         max_iter_ = op.second;
+      } else if (op.first=="pr_tol") {
+        pr_tol_ = op.second;
+      } else if (op.first=="du_tol") {
+        du_tol_ = op.second;
       }
     }
 
@@ -399,9 +405,9 @@ namespace casadi {
       }
 
       // Feasibility restoration?
-      if (!(maxpr<1e-10 && maxdu<1e-10) && !new_active_set) {
+      if (!(maxpr<pr_tol_ && maxdu<du_tol_) && !new_active_set) {
 //        print("Feasibility step\n");
-        if (maxpr>1e-10) {
+        if (maxpr>pr_tol_) {
           // Restore primal feasibility
           if (imaxpr<nx_) {
             i = imaxpr;
@@ -547,7 +553,7 @@ namespace casadi {
             iter, fk, maxpr, maxdu);
 
       // Terminate successfully?
-      if (maxpr<1e-10 && maxdu<1e-10) break;
+      if (maxpr<pr_tol_ && maxdu<du_tol_) break;
 
       // Start new iteration
       if (++iter==max_iter_) {
