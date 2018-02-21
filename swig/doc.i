@@ -15639,9 +15639,11 @@ Solve QPs using an active-set method
 +----------+-----------+--------------------------------------+
 |    Id    |   Type    |             Description              |
 +==========+===========+======================================+
+| du_tol   | OT_DOUBLE | Dual tolerance [1e-8].               |
++----------+-----------+--------------------------------------+
 | max_iter | OT_INT    | Maximum number of iterations [1000]. |
 +----------+-----------+--------------------------------------+
-| nlpsol   | OT_STRING | Name of solver.                      |
+| pr_tol   | OT_DOUBLE | Primal tolerance [1e-8].             |
 +----------+-----------+--------------------------------------+
 
 Joel Andersson
@@ -15655,10 +15657,12 @@ Joel Andersson
 |          |               | variables are discrete,     |                 |
 |          |               | i.e. integer-valued         |                 |
 +----------+---------------+-----------------------------+-----------------+
+| du_tol   | OT_DOUBLE     | Dual tolerance [1e-8].      | casadi::ConicAs |
++----------+---------------+-----------------------------+-----------------+
 | max_iter | OT_INT        | Maximum number of           | casadi::ConicAs |
 |          |               | iterations [1000].          |                 |
 +----------+---------------+-----------------------------+-----------------+
-| nlpsol   | OT_STRING     | Name of solver.             | casadi::ConicAs |
+| pr_tol   | OT_DOUBLE     | Primal tolerance [1e-8].    | casadi::ConicAs |
 +----------+---------------+-----------------------------+-----------------+
 
 Diagrams
@@ -68513,9 +68517,11 @@ Solve QPs using an active-set method
 +----------+-----------+--------------------------------------+
 |    Id    |   Type    |             Description              |
 +==========+===========+======================================+
+| du_tol   | OT_DOUBLE | Dual tolerance [1e-8].               |
++----------+-----------+--------------------------------------+
 | max_iter | OT_INT    | Maximum number of iterations [1000]. |
 +----------+-----------+--------------------------------------+
-| nlpsol   | OT_STRING | Name of solver.                      |
+| pr_tol   | OT_DOUBLE | Primal tolerance [1e-8].             |
 +----------+-----------+--------------------------------------+
 
 --------------------------------------------------------------------------------
