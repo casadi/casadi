@@ -357,10 +357,23 @@ namespace casadi {
         print_vector(lam_ak, na_);
       }
 
+      // Recalculate g
+      casadi_fill(gk, na_, 0.);
+      casadi_mv(a, A_, xk, gk, 0);
+
       // Evaluate gradient of the Lagrangian and constraint functions
       casadi_copy(g, nx_, step);
       casadi_mv(h, H_, xk, step, 0); // gradient of the objective
       casadi_mv(a, A_, lam_ak, step, 1); // gradient of the Lagrangian
+
+      // Recalculate lam_xk, without changing the sign
+      for (i=0; i<nx_; ++i) {
+        if (lam_xk[i]>0) {
+          lam_xk[i] = fmax(-step[i], DMIN);
+        } else if (lam_xk[i]<0) {
+          lam_xk[i] = fmin(-step[i], -DMIN);
+        }
+      }
 
       // Calculate cost
       fk = casadi_bilin(h, H_, xk, xk)/2. + casadi_dot(nx_, xk, g);
@@ -404,8 +417,11 @@ namespace casadi {
         }
       }
 
+      // Found optimal value?
+      bool success = maxpr<pr_tol_ && maxdu<du_tol_;
+
       // Feasibility restoration?
-      if (!(maxpr<pr_tol_ && maxdu<du_tol_) && !new_active_set) {
+      if (!success && !new_active_set) {
 //        print("Feasibility step\n");
         if (maxpr>pr_tol_) {
           // Restore primal feasibility
@@ -541,8 +557,8 @@ namespace casadi {
               */
             }
           }
-          if (new_active_set) continue;
         }
+        if (new_active_set) continue;
 
         casadi_warning("Failed to restore dual feasibility");
         break;
@@ -553,7 +569,11 @@ namespace casadi {
             iter, fk, maxpr, maxdu);
 
       // Terminate successfully?
-      if (maxpr<pr_tol_ && maxdu<du_tol_) break;
+      if (!new_active_set) {
+        if (maxpr>pr_tol_) casadi_warning("Primal tolerance not met");
+        if (maxdu>du_tol_) casadi_warning("Dual tolerance not met");
+        break;
+      }
 
       // Start new iteration
       if (++iter==max_iter_) {
@@ -721,12 +741,11 @@ namespace casadi {
         }
       }
 
+      // If tau==0, no step to take
+      if (tau==0.) continue;
+
       // Take primal step
       casadi_axpy(nx_, tau, step, xk);
-
-      // Recalculate g
-      casadi_fill(gk, na_, 0.);
-      casadi_mv(a, A_, xk, gk, 0);
 
       // Update lam_ak carefully
       for (i=0; i<na_; ++i) {
@@ -747,27 +766,11 @@ namespace casadi {
         }
       }
 
-      // Recalculate gradient of the Lagrangian
-      casadi_copy(g, nx_, dlam_x);
-      casadi_mv(h, H_, xk, dlam_x, 0); // gradient of the objective
-      casadi_mv(a, A_, lam_ak, dlam_x, 1);
-
-      // Update lam_xk carefully
+      // Update sign for lam_xk
       for (i=0; i<nx_; ++i) {
-        // Get the current sign
-        casadi_int s = lam_xk[i]>0. ? 1 : lam_xk[i]<0. ? -1 : 0;
-        // Account for sign changes
         if (w[i]==tau) {
           new_active_set = true;
-          s = iw[i];
-        }
-        // Take step
-        lam_xk[i] = -dlam_x[i];
-        // Ensure correct sign
-        switch (s) {
-          case -1: lam_xk[i] = fmin(lam_xk[i], -DMIN); break;
-          case  1: lam_xk[i] = fmax(lam_xk[i],  DMIN); break;
-          case  0: lam_xk[i] = 0.; break;
+          lam_xk[i] = iw[i]; // only sign, value will be calculated later
         }
       }
     }
