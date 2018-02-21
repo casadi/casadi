@@ -15636,31 +15636,30 @@ Solve QPs using an active-set method
 
 >List of available options
 
-+----------------+-----------+---------------------------------+
-|       Id       |   Type    |           Description           |
-+================+===========+=================================+
-| nlpsol         | OT_STRING | Name of solver.                 |
-+----------------+-----------+---------------------------------+
-| nlpsol_options | OT_DICT   | Options to be passed to solver. |
-+----------------+-----------+---------------------------------+
++----------+-----------+--------------------------------------+
+|    Id    |   Type    |             Description              |
++==========+===========+======================================+
+| max_iter | OT_INT    | Maximum number of iterations [1000]. |
++----------+-----------+--------------------------------------+
+| nlpsol   | OT_STRING | Name of solver.                      |
++----------+-----------+--------------------------------------+
 
 Joel Andersson
 
 >List of available options
 
-+----------------+---------------+-----------------------+-----------------+
-|       Id       |     Type      |      Description      |     Used in     |
-+================+===============+=======================+=================+
-| discrete       | OT_BOOLVECTOR | Indicates which of    | casadi::Conic   |
-|                |               | the variables are     |                 |
-|                |               | discrete, i.e.        |                 |
-|                |               | integer-valued        |                 |
-+----------------+---------------+-----------------------+-----------------+
-| nlpsol         | OT_STRING     | Name of solver.       | casadi::ConicAs |
-+----------------+---------------+-----------------------+-----------------+
-| nlpsol_options | OT_DICT       | Options to be passed  | casadi::ConicAs |
-|                |               | to solver.            |                 |
-+----------------+---------------+-----------------------+-----------------+
++----------+---------------+-----------------------------+-----------------+
+|    Id    |     Type      |         Description         |     Used in     |
++==========+===============+=============================+=================+
+| discrete | OT_BOOLVECTOR | Indicates which of the      | casadi::Conic   |
+|          |               | variables are discrete,     |                 |
+|          |               | i.e. integer-valued         |                 |
++----------+---------------+-----------------------------+-----------------+
+| max_iter | OT_INT        | Maximum number of           | casadi::ConicAs |
+|          |               | iterations [1000].          |                 |
++----------+---------------+-----------------------------+-----------------+
+| nlpsol   | OT_STRING     | Name of solver.             | casadi::ConicAs |
++----------+---------------+-----------------------------+-----------------+
 
 Diagrams
 --------
@@ -15951,7 +15950,7 @@ override "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::init_mem(void *mem) const  "
+%feature("docstring")  casadi::ConicAs::init_mem(void *mem) const override "
 
 [INTERNAL]  Initalize memory block.
 
@@ -16412,7 +16411,7 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::alloc_mem() const  "
+%feature("docstring")  casadi::ConicAs::alloc_mem() const override "
 
 [INTERNAL]  Create memory block.
 
@@ -16598,7 +16597,7 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::free_mem(void *mem) const  "
+%feature("docstring")  casadi::ConicAs::free_mem(void *mem) const override "
 
 [INTERNAL]  Free memory block.
 
@@ -68511,13 +68510,13 @@ Solve QPs using an active-set method
 
 >List of available options
 
-+----------------+-----------+---------------------------------+
-|       Id       |   Type    |           Description           |
-+================+===========+=================================+
-| nlpsol         | OT_STRING | Name of solver.                 |
-+----------------+-----------+---------------------------------+
-| nlpsol_options | OT_DICT   | Options to be passed to solver. |
-+----------------+-----------+---------------------------------+
++----------+-----------+--------------------------------------+
+|    Id    |   Type    |             Description              |
++==========+===========+======================================+
+| max_iter | OT_INT    | Maximum number of iterations [1000]. |
++----------+-----------+--------------------------------------+
+| nlpsol   | OT_STRING | Name of solver.                      |
++----------+-----------+--------------------------------------+
 
 --------------------------------------------------------------------------------
 

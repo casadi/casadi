@@ -805,8 +805,8 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td><td>casadi::ConicAs</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::ConicAs</td></tr>
-<tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::ConicAs</td></tr>
 </table>
 */
 /// \endcond
@@ -816,8 +816,8 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td></tr>
-<tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td></tr>
 </table>
 */
 /** \addtogroup general_ConicAs
@@ -827,8 +827,8 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td><td>casadi::ConicAs</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::ConicAs</td></tr>
-<tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::ConicAs</td></tr>
 </table>
 */
 /// \cond INTERNAL

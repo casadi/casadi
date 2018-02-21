@@ -148,6 +148,9 @@
 %exception  casadi::Conic::integer_support() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::ConicAs::alloc_mem() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::ConicAs::class_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
