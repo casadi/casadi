@@ -143,6 +143,11 @@
   // Truncate at separator
   path = path.substr(0, path.rfind(sep));
 
+  // Octave-on-Windows seems to pick up superfluous +casadi
+  // Make sure we exclude it
+  if (path.rfind(sep)!=std::string::npos && path.substr(path.rfind(sep)+1)=="+casadi")
+    path = path.substr(0, path.rfind(sep));
+
   // Set library path
   casadi::GlobalOptions::setCasadiPath(path);
 
