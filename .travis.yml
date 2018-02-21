@@ -195,7 +195,7 @@ matrix:
         - export CXX=g++-6
         - mkdir build
         - pushd build
-        - bash -c "cmake  $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_ERROR=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
+        - bash -c "cmake  $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_DEPRECATED_FEATURES=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
         - make
         - sudo make install
         - popd
