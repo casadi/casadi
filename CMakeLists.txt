@@ -289,6 +289,16 @@ else()
   set(DEF_BIN_PREFIX bin)
   set(DEF_CMAKE_PREFIX lib/cmake/casadi)
   set(DEF_PYTHON_PREFIX python)
+  if (WITH_PYTHON)
+    set(PYTHON_VERSION_REQ "")
+    if (WITH_PYTHON3)
+      set(PYTHON_VERSION_REQ "3")
+    endif()
+    find_package(PythonInterp ${PYTHON_VERSION_REQ} REQUIRED)
+    execute_process ( COMMAND ${PYTHON_EXECUTABLE} -c "from __future__ import print_function; from distutils.sysconfig import get_python_lib; print(get_python_lib())"
+      OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
+    set(DEF_PYTHON_PREFIX ${PYTHON_SITE_PACKAGES})
+  endif()
   set(DEF_MATLAB_PREFIX matlab)
   set(DEF_INCLUDE_PREFIX include)
 endif()
@@ -810,3 +820,6 @@ install(FILES
 
 # Install the export set for use with the install-tree
 install(EXPORT casadi-targets DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
+
+set(CPACK_PACKAGE_CONTACT "casadi-users@googlegroups.com")
+include(CPack)
