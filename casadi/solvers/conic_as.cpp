@@ -418,11 +418,13 @@ namespace casadi {
       }
 
       // Found optimal value?
-      bool success = maxpr<pr_tol_ && maxdu<du_tol_;
+      bool pr_feasible = maxpr<pr_tol_;
+      bool du_feasible = maxdu<du_tol_;
+      bool success = pr_feasible && du_feasible;
 
       // Feasibility restoration?
       if (!success && !new_active_set) {
-        if (maxpr>pr_tol_) {
+        if (!pr_feasible) {
           // Restore primal feasibility
           if (imaxpr<nx_) {
             i = imaxpr;
@@ -474,91 +476,44 @@ namespace casadi {
             }
           }
         } else {
-          // We're feasible but not optimal, try remove a bound on x
+          // We're feasible but not optimal, let's remove a redundant constraint
+          double best_a = 0.;
+          casadi_int ibest_a;
+
+          // If calculated residual is positive, we need a negative lhs
+          bool negative_lhs = step[i]+lam_xk[i]>0.;
+
+          // Check redundancy in x bounds with the right sign
+          bool negative_lambda = negative_lhs; // coefficient is 1.
           i=imaxdu;
-          lb = lbx ? lbx[i] : 0.;
-          ub = ubx ? ubx[i] : 0.;
-
-/*
-          if (lam_xk[i]<0.) {
-            lam_xk[i]=0.;
-            new_active_set = true;
-            continue;
-          } else if (lam_xk[i]>0.) {
-            lam_xk[i]=0.;
-            new_active_set = true;
-            continue;
-          }
-          */
-
-          // Try to add a weakly active bound
-          if (lam_xk[i]==0.) {
-            if (step[i]+lam_xk[imaxdu]>0) {
-              // need a negative lambda_xk
-              if (fabs(xk[i]-lb) < 1e-10) {
-                lam_xk[i] = -DMIN;
-                new_active_set = true;
-                continue;
-              }
-            } else {
-              // need a positive lambda_xk
-              if (fabs(xk[i]-ub) < 1e-10) {
-                lam_xk[i] = DMIN;
-                new_active_set = true;
-                continue;
-              }
-            }
+          if (lam_xk[i]!=0. && negative_lambda==(lam_xk[i]>0.)) {
+            best_a = 1.;
+            ibest_a = i;
           }
 
-          // We're feasible but not optimal, try remove a bound on g
+          // Check redundancy in g bounds matching imaxdu with the right sign
           for (casadi_int k=a_colind[imaxdu]; k<a_colind[imaxdu+1]; ++k) {
-            // Loop over entries which can unblock imaxdu
-            if (a[k]!=0.) {
-              i = a_row[k];
-              lb = lba ? lba[i] : 0.;
-              ub = uba ? uba[i] : 0.;
-              // Check if weakly active bound
-              if (lam_ak[i]==0.) {
-                if ((step[imaxdu]+lam_xk[imaxdu]>0) == (a[k] > 0)) {
-                  // need a negative lambda_ak
-                  if (fabs(gk[i]-lb) < 1e-10) {
-                    lam_ak[i] = -DMIN;
-                    new_active_set = true;
-                    continue;
-                  }
-                } else {
-                  // need a positive lambda_ak
-                  if (fabs(gk[i]-ub) < 1e-10) {
-                    lam_ak[i] = DMIN;
-                    new_active_set = true;
-                    continue;
-                  }
-                }
+            i = a_row[k];
+            if (lam_ak[i]!=0. && fabs(a[k])>best_a) {
+              negative_lambda = negative_lhs==a[k]>0.;
+              if (negative_lambda==(lam_ak[i]>0.)) {
+                best_a = fabs(a[k]);
+                ibest_a = nx_+i;
               }
-
-/*
-              cout << "lb = " << lb << endl;
-              cout << "ub = " << ub << endl;
-              cout << "maxdu = " << maxdu << endl;
-              cout << "lam_ak[" << i << "] = " << lam_ak[i] << endl;
-              cout << "gk[" << i << "] = " << gk[i] << endl;
-              cout << "lam_ak[" << i << "]==0 = " << (lam_ak[i]==0) << endl;
-*/
-/*
-              if (lam_ak[i]<0. && fabs(gk[i]-lb)>1e-10) {
-                lam_ak[i]=0.;
-                new_active_set = true;
-                continue;
-              } else if (lam_ak[i]>0. && fabs(gk[i]-ub)>1e-10) {
-                lam_ak[i]=0.;
-                new_active_set = true;
-                continue;
-              }
-              */
             }
+          }
+
+          // Remove redundant constraint, if any
+          if (best_a>0.) {
+            if (ibest_a<nx_) {
+              lam_xk[ibest_a] = 0.;
+            } else {
+              lam_ak[ibest_a-nx_] = 0.;
+            }
+            new_active_set = true;
+            continue;
           }
         }
-        if (new_active_set) continue;
 
         casadi_warning("Failed to restore dual feasibility");
         break;
@@ -569,9 +524,9 @@ namespace casadi {
             iter, fk, maxpr, maxdu);
 
       // Terminate successfully?
-      if (!new_active_set) {
-        if (maxpr>pr_tol_) casadi_warning("Primal tolerance not met");
-        if (maxdu>du_tol_) casadi_warning("Dual tolerance not met");
+      if (success || !new_active_set)  {
+        if (!pr_feasible) casadi_warning("Primal tolerance not met");
+        if (!du_feasible) casadi_warning("Dual tolerance not met");
         break;
       }
 
@@ -739,6 +694,10 @@ namespace casadi {
             iw[nx_+i] = 0;
           }
         }
+      }
+
+      if (verbose_) {
+        print("tau = %g\n", tau);
       }
 
       // If tau==0, no step to take
