@@ -179,8 +179,34 @@ namespace casadi {
     }
   }
 
-  void print_vector(const double* x, casadi_int n) {
-    cout << vector<double>(x, x+n) << endl;
+  void ConicActiveSet::
+  print_vector(const char* id, const double* x, casadi_int n) const {
+    print("%s: [", id);
+    for (casadi_int i=0; i<n; ++i) {
+      if (i!=0) print(", ");
+      print("%g", x[i]);
+    }
+    print("]\n");
+  }
+
+  void ConicActiveSet::
+  print_ivector(const char* id, const casadi_int* x, casadi_int n) const {
+    print("%s: [", id);
+    for (casadi_int i=0; i<n; ++i) {
+      if (i!=0) print(", ");
+      print("%d", x[i]);
+    }
+    print("]\n");
+  }
+
+  void ConicActiveSet::
+  print_signs(const char* id, const double* x, casadi_int n) const {
+    print("%s: [", id);
+    for (casadi_int i=0; i<n; ++i) {
+      if (i!=0) print(", ");
+      print(x[i]==0 ? "0" : x[i]>0 ? "+" : "-");
+    }
+    print("]\n");
   }
 
   void print_matrix(const double* x, const casadi_int* sp_x) {
@@ -289,7 +315,7 @@ namespace casadi {
     enum CType {FREE, LOWER, UPPER, FIXED, RANGE};
     for (i=0; i<nx_+na_; ++i) {
       lb = i<nx_ ? (lbx ? lbx[i] : 0.) : (lba ? lba[i-nx_] : 0.);
-      lb = i<nx_ ? (ubx ? ubx[i] : 0.) : (uba ? uba[i-nx_] : 0.);
+      ub = i<nx_ ? (ubx ? ubx[i] : 0.) : (uba ? uba[i-nx_] : 0.);
       if (isinf(lb) && isinf(ub)) {
         ctype[i]=FREE; // unconstrained
       } else if (isinf(ub)) {
@@ -301,6 +327,11 @@ namespace casadi {
       } else {
         ctype[i]=RANGE; // range
       }
+    }
+
+    if (verbose_) {
+      print_ivector("ctype (x)", ctype, nx_);
+      print_ivector("ctype (a)", ctype+nx_, na_);
     }
 
     // Pass initial guess
@@ -368,14 +399,12 @@ namespace casadi {
     while (true) {
       // Debugging
       if (verbose_) {
-        print("Current xk = \n");
-        print_vector(xk, nx_);
-        print("Current gk = \n");
-        print_vector(gk, na_);
-        print("Current lam_xk = \n");
-        print_vector(lam_xk, nx_);
-        print("Current lam_ak = \n");
-        print_vector(lam_ak, na_);
+        print_vector("xk", xk, nx_);
+        print_vector("gk", gk, na_);
+        print_vector("lam_xk", lam_xk, nx_);
+        print_vector("lam_ak", lam_ak, na_);
+        print_signs("sign(lam_xk)", lam_xk, nx_);
+        print_signs("sign(lam_ak)", lam_ak, na_);
       }
 
       // Recalculate g
@@ -551,11 +580,14 @@ namespace casadi {
         break;
       }
 
-      // Start new iteration
-      if (++iter==max_iter_) {
+      // Too many iterations?
+      if (iter>=max_iter_) {
         casadi_warning("Maximum number of iterations reached");
         break;
       }
+
+      // Start new iteration
+      iter++;
 
       // No change so far
       new_active_set = false;
@@ -585,8 +617,7 @@ namespace casadi {
       }
 
       if (verbose_) {
-        print("KKT residual = \n");
-        print_vector(step, nx_ + na_);
+        print_vector("KKT residual", step, nx_ + na_);
       }
 
       // Copy kkt to kktd
@@ -636,14 +667,10 @@ namespace casadi {
       casadi_mv(a, A_, step, dg, 0);
 
       if (verbose_) {
-        print("dx = \n");
-        print_vector(step, nx_);
-        print("dg = \n");
-        print_vector(dg, na_);
-        print("dlam_x = \n");
-        print_vector(dlam_x, nx_);
-        print("dlam_g = \n");
-        print_vector(step+nx_, na_);
+        print_vector("dx", step, nx_);
+        print_vector("dg", dg, na_);
+        print_vector("dlam_x", dlam_x, nx_);
+        print_vector("dlam_g", step+nx_, na_);
       }
 
       // Get maximum step size
