@@ -11,7 +11,7 @@ env:
     - PYTHONPATH=/usr/local/python
     - TRAVIS_PYTHON_VERSION=2.7
     - NUMPYVERSION=1.11
-    - casadi_build_flags="-DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON"
+    - casadi_build_flags="-DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_EXTRA_CHECKS=ON"
 
 before_script:
   - |
@@ -325,7 +325,6 @@ branches:
 
 before_install:
   - shell_session_update() { :; } # Workaround for travis-ci/travis-ci#6522
-  - export casadi_build_flags="-DWITH_COMMON=ON -DWITH_EXTRA_CHECKS=ON"
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
   - pushd testbot && source recipes/setup.sh && popd
   - |
