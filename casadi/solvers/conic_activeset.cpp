@@ -103,6 +103,8 @@ namespace casadi {
     alloc_w(kkt_.nnz(), true); // kkt
     alloc_w(kktd_.nnz(), true); // kktd
     alloc_w(nx_+na_, true); // z=[xk,gk]
+    alloc_w(nx_+na_, true); // lbz
+    alloc_w(nx_+na_, true); // ubz
     alloc_w(nx_+na_, true); // lam
     alloc_w(A_.nnz()); // trans(A)
     alloc_iw(nx_+na_); // casadi_trans, tau type
@@ -285,11 +287,13 @@ namespace casadi {
 
     // Work vectors
     double *kkt, *kktd, *z, *lam, *v, *r, *beta,
-           *step, *dlam_x, *dg;
+           *step, *dlam_x, *dg, *lbz, *ubz;
     casadi_int* ctype;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     z = w; w += nx_+na_;
+    lbz = w; w += nx_+na_;
+    ubz = w; w += nx_+na_;
     lam = w; w += nx_+na_;
     step = w; w += nx_+na_;
     dlam_x = w; w += nx_;
@@ -302,18 +306,22 @@ namespace casadi {
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
 
+    // Bounds on z
+    casadi_copy(lbx, nx_, lbz);
+    casadi_copy(lba, na_, lbz+nx_);
+    casadi_copy(ubx, nx_, ubz);
+    casadi_copy(uba, na_, ubz+nx_);
+
     // Get type of constraints
     enum CType {FREE, LOWER, UPPER, FIXED, RANGE};
     for (i=0; i<nx_+na_; ++i) {
-      lb = i<nx_ ? (lbx ? lbx[i] : 0.) : (lba ? lba[i-nx_] : 0.);
-      ub = i<nx_ ? (ubx ? ubx[i] : 0.) : (uba ? uba[i-nx_] : 0.);
-      if (isinf(lb) && isinf(ub)) {
+      if (isinf(lbz[i]) && isinf(ubz[i])) {
         ctype[i]=FREE; // unconstrained
-      } else if (isinf(ub)) {
+      } else if (isinf(ubz[i])) {
         ctype[i]=LOWER; // only lower bound
-      } else if (isinf(lb)) {
+      } else if (isinf(lbz[i])) {
         ctype[i]=UPPER; // only upper bound
-      } else if (lb==ub) {
+      } else if (lbz[i]==ubz[i]) {
         ctype[i]=FIXED; // equality constraints
       } else {
         ctype[i]=RANGE; // range
@@ -342,35 +350,17 @@ namespace casadi {
     casadi_fill(z+nx_, na_, 0.);
     casadi_mv(a, A_, z, z+nx_, 0);
 
-    // Determine initial active set for simple bounds
-    for (i=0; i<nx_; ++i) {
-      lb = lbx ? lbx[i] : 0.;
-      ub = ubx ? ubx[i] : 0.;
-      if (lb!=ub) {
+    // Determine initial active set
+    for (i=0; i<nx_+na_; ++i) {
+      if (lbz[i]!=ubz[i]) {
         // All inequality constraints are inactive
         lam[i] = 0;
-      } else if (z[i]<=lb) {
+      } else if (z[i]<=lbz[i]) {
         // Lower bound active (including satisfied bounds)
         lam[i] = fmin(lam[i], -DMIN);
       } else {
         // Upper bound active (excluding satisfied bounds)
         lam[i] = fmax(lam[i],  DMIN);
-      }
-    }
-
-    // Determine initial active set for simple bounds
-    for (i=0; i<na_; ++i) {
-      lb = lba ? lba[i] : 0.;
-      ub = uba ? uba[i] : 0.;
-      if (lb!=ub) {
-        // All inequality constraints are inactive
-        lam[nx_+i] = 0;
-      } else if (z[nx_+i]<=ub) {
-        // Lower bound active (including satisfied bounds)
-        lam[nx_+i] = fmin(lam[nx_+i], -DMIN);
-      } else {
-        // Upper bound active (excluding satisfied bounds)
-        lam[nx_+i] = fmax(lam[nx_+i], DMIN);
       }
     }
 
@@ -425,33 +415,19 @@ namespace casadi {
       // Calculate cost
       fk = casadi_bilin(h, H_, z, z)/2. + casadi_dot(nx_, z, g);
 
-      // Look for largest x bound violation
+      // Look for largest bound violation
       double maxpr = 0.;
       casadi_int imaxpr;
-      for (i=0; i<nx_; ++i) {
-        lb = lbx ? lbx[i] : 0.;
-        ub = ubx ? ubx[i] : 0.;
-        if (z[i] > ub+maxpr) {
-          maxpr = z[i]-ub;
+      for (i=0; i<nx_+na_; ++i) {
+        if (z[i] > ubz[i]+maxpr) {
+          maxpr = z[i]-ubz[i];
           imaxpr = i;
-        } else if (z[i] < lb-maxpr) {
-          maxpr = lb-z[i];
+        } else if (z[i] < lbz[i]-maxpr) {
+          maxpr = lbz[i]-z[i];
           imaxpr = i;
         }
       }
 
-      // Look for largest a bound violation
-      for (i=0; i<na_; ++i) {
-        lb = lba ? lba[i] : 0.;
-        ub = uba ? uba[i] : 0.;
-        if (z[nx_+i] > ub+maxpr) {
-          maxpr = z[nx_+i]-ub;
-          imaxpr = nx_+i;
-        } else if (z[nx_+i] < lb-maxpr) {
-          maxpr = lb-z[nx_+i];
-          imaxpr = nx_+i;
-        }
-      }
       // If calculated residual is positive, we need a negative lhs
       bool negative_lhs = step[i]+lam[i]>0.;
 
