@@ -58,12 +58,9 @@ namespace casadi {
      {{"max_iter",
        {OT_INT,
         "Maximum number of iterations [1000]."}},
-      {"pr_tol",
+      {"tol",
        {OT_DOUBLE,
-        "Primal tolerance [1e-8]."}},
-      {"du_tol",
-       {OT_DOUBLE,
-        "Dual tolerance [1e-8]."}}
+        "Tolerance [1e-8]."}}
      }
   };
 
@@ -73,17 +70,14 @@ namespace casadi {
 
     // Default options
     max_iter_ = 1000;
-    pr_tol_ = 1e-8;
-    du_tol_ = 1e-8;
+    tol_ = 1e-8;
 
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="max_iter") {
         max_iter_ = op.second;
-      } else if (op.first=="pr_tol") {
-        pr_tol_ = op.second;
-      } else if (op.first=="du_tol") {
-        du_tol_ = op.second;
+      } else if (op.first=="tol") {
+        tol_ = op.second;
       }
     }
 
@@ -111,6 +105,7 @@ namespace casadi {
     alloc_w(nx_+na_); // casadi_project, tau memory
     alloc_w(nx_+na_, true); // dz
     alloc_w(nx_+na_, true); // dlam
+    alloc_w(nx_+na_, true); // kktres
 
     // Memory for numerical solution
     alloc_w(sp_v_.nnz(), true); // v
@@ -285,7 +280,7 @@ namespace casadi {
 
     // Work vectors
     double *kkt, *kktd, *z, *lam, *v, *r, *beta,
-           *dz, *dlam, *lbz, *ubz;
+           *dz, *dlam, *lbz, *ubz, *kktres;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     z = w; w += nx_+na_;
@@ -297,6 +292,7 @@ namespace casadi {
     v = w; w += sp_v_.nnz();
     r = w; w += sp_r_.nnz();
     beta = w; w += nx_+na_;
+    kktres = w; w += nx_+na_;
 
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
@@ -415,8 +411,8 @@ namespace casadi {
             iter, fk, maxpr, maxdu);
 
       // Feasibility and optimality?
-      bool pr_feasible = maxpr<pr_tol_;
-      bool du_feasible = maxdu<du_tol_;
+      bool pr_feasible = maxpr<tol_;
+      bool du_feasible = maxdu<tol_;
 
       if (pr_feasible && du_feasible) {
         // Successful return
@@ -435,32 +431,21 @@ namespace casadi {
       // No change so far
       changed_active_set = false;
 
-      // Calculate KKT residual
-      for (i=0; i<nx_; ++i) {
-        if (lam[i]!=0.) {
-          dz[i] = z[i];
-          if (lam[i]<0) {
-            dz[i] -= lbz[i];
-          } else if (lam[i]>0) {
-            dz[i] -= ubz[i];
-          }
-        }
-      }
-
-      // Calculate KKT residual: Correct for inactive constraints
-      casadi_copy(z+nx_, na_, dz + nx_);
-      for (i=0; i<na_; ++i) {
-        if (lam[nx_+i]==0) {
-          dz[nx_+i] = 0.; // -lam[nx_+i]
-        } else if (lam[nx_+i]<0) {
-          dz[nx_+i] -= lbz[nx_+i];
-        } else if (lam[nx_+i]>0) {
-          dz[nx_+i] -= ubz[nx_+i];
+      // KKT residual
+      for (i=0; i<nx_+na_; ++i) {
+        if (lam[i]>0.) {
+          kktres[i] = z[i]-ubz[i];
+        } else if (lam[i]<0.) {
+          kktres[i] = z[i]-lbz[i];
+        } else if (i<nx_) {
+          kktres[i] = dz[i]; // gradient of the Lagrangian
+        } else {
+          kktres[i] = -lam[i];
         }
       }
 
       if (verbose_) {
-        print_vector("KKT residual", dz, nx_ + na_);
+        print_vector("KKT residual", kktres, nx_ + na_);
       }
 
       // Copy kkt to kktd
@@ -490,6 +475,7 @@ namespace casadi {
       casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
 
       // Solve to get primal-dual step
+      casadi_copy(kktres, nx_+na_, dz);
       casadi_scal(nx_+na_, -1., dz);
       casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
                       get_ptr(prinv_), get_ptr(pc_), w);
