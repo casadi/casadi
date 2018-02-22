@@ -470,11 +470,11 @@ namespace casadi {
             } else {
               // Add constraint to active set
               if (z[i] < lbz[i]) {
-                lam[i] = i<nx_ ? fmin(-w[i], -DMIN) : -DMIN;
+                lam[i] = -DMIN;
                 changed_active_set = true;
                 continue;
               } else if (z[i] > ubz[i]) {
-                lam[i] = i<nx_ ? fmax(-w[i],  DMIN) : DMIN;
+                lam[i] = DMIN;
                 changed_active_set = true;
                 continue;
               } else {
@@ -536,7 +536,7 @@ namespace casadi {
       // No change so far
       changed_active_set = false;
 
-      // Calculate KKT residual: Correct for active simple bounds
+      // Calculate KKT residual
       for (i=0; i<nx_; ++i) {
         if (lam[i]!=0.) {
           dz[i] = z[i];
@@ -549,7 +549,7 @@ namespace casadi {
       }
 
       // Calculate KKT residual: Correct for inactive constraints
-      casadi_copy(z+nx_, na_, dz + nx_); // constraint evaluation
+      casadi_copy(z+nx_, na_, dz + nx_);
       for (i=0; i<na_; ++i) {
         if (lam[nx_+i]==0) {
           dz[nx_+i] = 0.; // -lam[nx_+i]
