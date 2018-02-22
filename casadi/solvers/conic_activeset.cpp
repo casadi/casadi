@@ -104,13 +104,10 @@ namespace casadi {
     alloc_w(kktd_.nnz(), true); // kktd
     alloc_w(nx_, true); // xk
     alloc_w(na_, true); // gk
-    alloc_w(nx_, true); // lam_xk
-    alloc_w(na_, true); // lam_ak
+    alloc_w(nx_+na_, true); // lam
     alloc_w(A_.nnz()); // trans(A)
-    alloc_iw(nx_ + na_); // casadi_trans, tau type
-    alloc_w(nx_ + na_); // casadi_project, [alpha_x, -lambda_g], [lambda_x, alpha_g], tau memory
-    alloc_w(nx_, true); // alpha_x
-    alloc_w(na_, true); // alpha_a
+    alloc_iw(nx_+na_); // casadi_trans, tau type
+    alloc_w(nx_+na_); // casadi_project, tau memory
     alloc_w(nx_+na_, true); // step
     alloc_w(nx_, true); // dlam_x
     alloc_w(na_, true); // dg
@@ -288,17 +285,14 @@ namespace casadi {
     lam_x = res[CONIC_LAM_X];
 
     // Work vectors
-    double *kkt, *kktd, *xk, *lam_xk, *lam_ak, *v, *r, *beta,
+    double *kkt, *kktd, *xk, *lam, *v, *r, *beta,
            *gk, *step, *dlam_x, *dg;
     casadi_int* ctype;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     xk = w; w += nx_;
     gk = w; w += na_;
-    lam_xk = w; w += nx_;
-    lam_ak = w; w += na_;
-    /*alpha_x = w;*/ w += nx_;
-    /*alpha_a = w;*/ w += na_;
+    lam = w; w += nx_+na_;
     step = w; w += nx_+na_;
     dlam_x = w; w += nx_;
     dg = w; w += na_;
@@ -335,8 +329,8 @@ namespace casadi {
 
     // Pass initial guess
     casadi_copy(x0, nx_, xk);
-    casadi_copy(lam_x0, nx_, lam_xk);
-    casadi_copy(lam_a0, na_, lam_ak);
+    casadi_copy(lam_x0, nx_, lam);
+    casadi_copy(lam_a0, na_, lam+nx_);
 
     // Copy A' to w
     casadi_trans(a, A_, w, AT_, iw);
@@ -356,13 +350,13 @@ namespace casadi {
       ub = ubx ? ubx[i] : 0.;
       if (lb!=ub) {
         // All inequality constraints are inactive
-        lam_xk[i] = 0;
+        lam[i] = 0;
       } else if (xk[i]<=lb) {
         // Lower bound active (including satisfied bounds)
-        lam_xk[i] = fmin(lam_xk[i], -DMIN);
+        lam[i] = fmin(lam[i], -DMIN);
       } else {
         // Upper bound active (excluding satisfied bounds)
-        lam_xk[i] = fmax(lam_xk[i],  DMIN);
+        lam[i] = fmax(lam[i],  DMIN);
       }
     }
 
@@ -372,13 +366,13 @@ namespace casadi {
       ub = uba ? uba[i] : 0.;
       if (lb!=ub) {
         // All inequality constraints are inactive
-        lam_ak[i] = 0;
+        lam[nx_+i] = 0;
       } else if (gk[i]<=ub) {
         // Lower bound active (including satisfied bounds)
-        lam_ak[i] = fmin(lam_ak[i], -DMIN);
+        lam[nx_+i] = fmin(lam[nx_+i], -DMIN);
       } else {
         // Upper bound active (excluding satisfied bounds)
-        lam_ak[i] = fmax(lam_ak[i], DMIN);
+        lam[nx_+i] = fmax(lam[nx_+i], DMIN);
       }
     }
 
@@ -406,10 +400,10 @@ namespace casadi {
       if (verbose_) {
         print_vector("xk", xk, nx_);
         print_vector("gk", gk, na_);
-        print_vector("lam_xk", lam_xk, nx_);
-        print_vector("lam_ak", lam_ak, na_);
-        print_signs("sign(lam_xk)", lam_xk, nx_);
-        print_signs("sign(lam_ak)", lam_ak, na_);
+        print_vector("lam(x)", lam, nx_);
+        print_vector("lam(a)", lam+nx_, na_);
+        print_signs("sign(lam_x)", lam, nx_);
+        print_signs("sign(lam_a)", lam+nx_, na_);
       }
 
       // Recalculate g
@@ -419,14 +413,14 @@ namespace casadi {
       // Evaluate gradient of the Lagrangian and constraint functions
       casadi_copy(g, nx_, step);
       casadi_mv(h, H_, xk, step, 0); // gradient of the objective
-      casadi_mv(a, A_, lam_ak, step, 1); // gradient of the Lagrangian
+      casadi_mv(a, A_, lam+nx_, step, 1); // gradient of the Lagrangian
 
-      // Recalculate lam_xk, without changing the sign
+      // Recalculate lam_x, without changing the sign
       for (i=0; i<nx_; ++i) {
-        if (lam_xk[i]>0) {
-          lam_xk[i] = fmax(-step[i], DMIN);
-        } else if (lam_xk[i]<0) {
-          lam_xk[i] = fmin(-step[i], -DMIN);
+        if (lam[i]>0) {
+          lam[i] = fmax(-step[i], DMIN);
+        } else if (lam[i]<0) {
+          lam[i] = fmin(-step[i], -DMIN);
         }
       }
 
@@ -461,13 +455,13 @@ namespace casadi {
         }
       }
       // If calculated residual is positive, we need a negative lhs
-      bool negative_lhs = step[i]+lam_xk[i]>0.;
+      bool negative_lhs = step[i]+lam[i]>0.;
 
       // Calculate dual infeasibility
       double maxdu = 0.;
       casadi_int imaxdu;
       for (i=0; i<nx_; ++i) {
-        double maxdu_trial = fabs(step[i]+lam_xk[i]);
+        double maxdu_trial = fabs(step[i]+lam[i]);
         if (maxdu_trial>maxdu) {
           maxdu = maxdu_trial;
           imaxdu = i;
@@ -501,18 +495,18 @@ namespace casadi {
               lb = lbx ? lbx[i] : 0.;
               ub = ubx ? ubx[i] : 0.;
 
-              if (lam_xk[i]!=0.) {
+              if (lam[i]!=0.) {
                 // If already active constraint, terminate
                 casadi_warning("Failed to restore primal feasibility");
                 break;
               } else {
                 // Add constraint to active set
                 if (xk[i] < lb) {
-                  lam_xk[i] = fmin(-w[i], -DMIN);
+                  lam[i] = fmin(-w[i], -DMIN);
                   changed_active_set = true;
                   continue;
                 } else if (xk[i] > ub) {
-                  lam_xk[i] = fmax(-w[i],  DMIN);
+                  lam[i] = fmax(-w[i],  DMIN);
                   changed_active_set = true;
                   continue;
                 } else {
@@ -526,17 +520,17 @@ namespace casadi {
               lb = lba ? lba[i] : 0.;
               ub = uba ? uba[i] : 0.;
               // If already active constraint, terminate
-              if (lam_ak[i]!=0.) {
+              if (lam[nx_+i]!=0.) {
                 casadi_warning("Failed to restore primal feasibility");
                 break;
               } else {
                 // Add constraint to active set
                 if (gk[i] < lb) {
-                  lam_ak[i] = -DMIN;
+                  lam[nx_+i] = -DMIN;
                   changed_active_set = true;
                   continue;
                 } else if (gk[i] > ub) {
-                  lam_ak[i] = DMIN;
+                  lam[nx_+i] = DMIN;
                   changed_active_set = true;
                   continue;
                 } else {
@@ -553,12 +547,12 @@ namespace casadi {
           casadi_int ibest_a;
 
           // If calculated residual is positive, we need a negative lhs
-          bool negative_lhs = step[i]+lam_xk[i]>0.;
+          bool negative_lhs = step[i]+lam[i]>0.;
 
           // Check redundancy in x bounds with the right sign
           bool negative_lambda = negative_lhs; // coefficient is 1.
           i=imaxdu;
-          if (ctype[i]!=FIXED && lam_xk[i]!=0. && negative_lambda==(lam_xk[i]>0.)) {
+          if (ctype[i]!=FIXED && lam[i]!=0. && negative_lambda==(lam[i]>0.)) {
             best_a = 1.;
             ibest_a = i;
           }
@@ -566,9 +560,9 @@ namespace casadi {
           // Check redundancy in g bounds matching imaxdu with the right sign
           for (casadi_int k=a_colind[imaxdu]; k<a_colind[imaxdu+1]; ++k) {
             i = a_row[k];
-            if (ctype[i]!=FIXED && lam_ak[i]!=0. && fabs(a[k])>best_a) {
+            if (ctype[i]!=FIXED && lam[nx_+i]!=0. && fabs(a[k])>best_a) {
               negative_lambda = negative_lhs==a[k]>0.;
-              if (negative_lambda==(lam_ak[i]>0.)) {
+              if (negative_lambda==(lam[nx_+i]>0.)) {
                 best_a = fabs(a[k]);
                 ibest_a = nx_+i;
               }
@@ -577,11 +571,7 @@ namespace casadi {
 
           // Remove redundant constraint, if any
           if (best_a>0.) {
-            if (ibest_a<nx_) {
-              lam_xk[ibest_a] = 0.;
-            } else {
-              lam_ak[ibest_a-nx_] = 0.;
-            }
+            lam[ibest_a] = 0.;
             changed_active_set = true;
             continue;
           }
@@ -605,11 +595,11 @@ namespace casadi {
 
       // Calculate KKT residual: Correct for active simple bounds
       for (i=0; i<nx_; ++i) {
-        if (lam_xk[i]!=0.) {
+        if (lam[i]!=0.) {
           step[i] = xk[i];
-          if (ctype[i]==FIXED || lam_xk[i]<0) {
+          if (ctype[i]==FIXED || lam[i]<0) {
             if (lbx) step[i] -= lbx[i];
-          } else if (lam_xk[i]>0) {
+          } else if (lam[i]>0) {
             if (ubx) step[i] -= ubx[i];
           }
         }
@@ -618,11 +608,11 @@ namespace casadi {
       // Calculate KKT residual: Correct for inactive constraints
       casadi_copy(gk, na_, step + nx_); // constraint evaluation
       for (i=0; i<na_; ++i) {
-        if (lam_ak[i]==0) {
-          step[nx_+i] = 0.; // -lam_ak[i]
-        } else if (lba && lam_ak[i]<0) {
+        if (lam[nx_+i]==0) {
+          step[nx_+i] = 0.; // -lam[nx_+i]
+        } else if (lba && lam[nx_+i]<0) {
           step[nx_+i] -= lba[i];
-        } else if (uba && lam_ak[i]>0) {
+        } else if (uba && lam[nx_+i]>0) {
           step[nx_+i] -= uba[i];
         }
       }
@@ -636,7 +626,7 @@ namespace casadi {
 
       // Loop over kktd entries (left two blocks of the transposed KKT)
       for (casadi_int c=0; c<nx_; ++c) {
-        if (lam_xk[c]!=0) {
+        if (lam[c]!=0) {
           // Zero out column, set diagonal entry to 1
           for (casadi_int k=kkt_colind[c]; k<kkt_colind[c+1]; ++k) {
             kktd[k] = kkt_row[k]==c ? 1. : 0.;
@@ -646,7 +636,7 @@ namespace casadi {
 
       // Loop over kktd entries (right two blocks of the transposed KKT)
       for (casadi_int c=0; c<na_; ++c) {
-        if (lam_ak[c]==0) {
+        if (lam[nx_+c]==0) {
           // Zero out column, set diagonal entry to -1
           for (casadi_int k=kkt_colind[nx_+c]; k<kkt_colind[nx_+c+1]; ++k) {
             kktd[k] = kkt_row[k]==nx_+c ? -1. : 0.;
@@ -719,7 +709,7 @@ namespace casadi {
       for (i=0; i<nx_; ++i) {
         lb = lbx ? lbx[i] : 0.;
         ub = ubx ? ubx[i] : 0.;
-        if (lam_xk[i]==0.) {
+        if (lam[i]==0.) {
           // Trial step
           trial=xk[i] + tau*step[i];
           // Constraint is inactive, check for primal blocking constraints
@@ -735,11 +725,11 @@ namespace casadi {
             iw[i] = 1;
           }
         } else if (ctype[i]!=FIXED) {
-          trial = lam_xk[i] + tau*dlam_x[i];
+          trial = lam[i] + tau*dlam_x[i];
           // Constraint is active, check for dual blocking constraints
-          if ((lam_xk[i]<0. && trial>=0) || (lam_xk[i]>0. && trial<=0)) {
+          if ((lam[i]<0. && trial>=0) || (lam[i]>0. && trial<=0)) {
             // Sign changes
-            tau = -lam_xk[i]/dlam_x[i];
+            tau = -lam[i]/dlam_x[i];
             w[i] = tau;
             iw[i] = 0;
           }
@@ -750,7 +740,7 @@ namespace casadi {
       for (i=0; i<na_; ++i) {
         lb = lba ? lba[i] : 0.;
         ub = uba ? uba[i] : 0.;
-        if (lam_ak[i]==0.) {
+        if (lam[nx_+i]==0.) {
           // Trial step
           trial=gk[i] + tau*dg[i];
           // Constraint is inactive, check for primal blocking constraints
@@ -766,11 +756,11 @@ namespace casadi {
             iw[nx_+i] = 1;
           }
         } else if (ctype[nx_+i]!=FIXED) {
-          trial = lam_ak[i] + tau*step[nx_+i];
+          trial = lam[nx_+i] + tau*step[nx_+i];
           // Constraint is active, check for sign changes
-          if (lam_ak[i]!=0 && ((lam_ak[i]>0)!=(trial>0))) {
+          if (lam[nx_+i]!=0 && ((lam[nx_+i]>0)!=(trial>0))) {
             // Sign changes
-            tau = -lam_ak[i]/step[nx_+i];
+            tau = -lam[nx_+i]/step[nx_+i];
             w[nx_+i] = tau;
             iw[nx_+i] = 0;
           }
@@ -787,44 +777,44 @@ namespace casadi {
       // Take primal step
       casadi_axpy(nx_, tau, step, xk);
 
-      // Update lam_xk carefully
+      // Update lam_x carefully
       for (i=0; i<nx_; ++i) {
         // Get the current sign
-        casadi_int s = lam_xk[i]>0. ? 1 : lam_xk[i]<0. ? -1 : 0;
+        casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
         // Account for sign changes
         if (w[i]==tau) {
           changed_active_set = true;
           s = iw[i];
         }
         // Take step
-        lam_xk[i] += tau*dlam_x[i];
+        lam[i] += tau*dlam_x[i];
         // Ensure correct sign, unless fixed and nonzero
-        if (ctype[i]!=FIXED || lam_xk[i]==0.) {
+        if (ctype[i]!=FIXED || lam[i]==0.) {
           switch (s) {
-            case -1: lam_xk[i] = fmin(lam_xk[i], -DMIN); break;
-            case  1: lam_xk[i] = fmax(lam_xk[i],  DMIN); break;
-            case  0: lam_xk[i] = 0.; break;
+            case -1: lam[i] = fmin(lam[i], -DMIN); break;
+            case  1: lam[i] = fmax(lam[i],  DMIN); break;
+            case  0: lam[i] = 0.; break;
           }
         }
       }
 
-      // Update lam_ak carefully
+      // Update lam carefully
       for (i=0; i<na_; ++i) {
         // Get the current sign
-        casadi_int s = lam_ak[i]>0. ? 1 : lam_ak[i]<0. ? -1 : 0;
+        casadi_int s = lam[nx_+i]>0. ? 1 : lam[nx_+i]<0. ? -1 : 0;
         // Account for sign changes
         if (w[nx_+i]==tau) {
           changed_active_set = true;
           s = iw[nx_+i];
         }
         // Take step
-        lam_ak[i] += tau*step[nx_+i];
+        lam[nx_+i] += tau*step[nx_+i];
         // Ensure correct sign, unless fixed
-        if (ctype[nx_+i]!=FIXED || lam_ak[i]==0.) {
+        if (ctype[nx_+i]!=FIXED || lam[nx_+i]==0.) {
           switch (s) {
-            case -1: lam_ak[i] = fmin(lam_ak[i], -DMIN); break;
-            case  1: lam_ak[i] = fmax(lam_ak[i],  DMIN); break;
-            case  0: lam_ak[i] = 0.; break;
+            case -1: lam[nx_+i] = fmin(lam[nx_+i], -DMIN); break;
+            case  1: lam[nx_+i] = fmax(lam[nx_+i],  DMIN); break;
+            case  0: lam[nx_+i] = 0.; break;
           }
         }
       }
@@ -835,8 +825,8 @@ namespace casadi {
 
     // Get solution
     casadi_copy(xk, nx_, x);
-    casadi_copy(lam_xk, nx_, lam_x);
-    casadi_copy(lam_ak, na_, lam_a);
+    casadi_copy(lam, nx_, lam_x);
+    casadi_copy(lam+nx_, na_, lam_a);
 
     return 0;
   }
