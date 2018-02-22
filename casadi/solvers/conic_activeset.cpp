@@ -109,9 +109,8 @@ namespace casadi {
     alloc_w(A_.nnz()); // trans(A)
     alloc_iw(nx_+na_); // casadi_trans, tau type
     alloc_w(nx_+na_); // casadi_project, tau memory
-    alloc_w(nx_+na_, true); // step
+    alloc_w(nx_+na_, true); // dz
     alloc_w(nx_+na_, true); // dlam
-    alloc_w(na_, true); // dg
     alloc_iw(nx_+na_, true); // ctype
 
     // Memory for numerical solution
@@ -287,7 +286,7 @@ namespace casadi {
 
     // Work vectors
     double *kkt, *kktd, *z, *lam, *v, *r, *beta,
-           *step, *dlam, *dg, *lbz, *ubz;
+           *dz, *dlam, *lbz, *ubz;
     casadi_int* ctype;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
@@ -295,9 +294,8 @@ namespace casadi {
     lbz = w; w += nx_+na_;
     ubz = w; w += nx_+na_;
     lam = w; w += nx_+na_;
-    step = w; w += nx_+na_;
+    dz = w; w += nx_+na_;
     dlam = w; w += nx_+na_;
-    dg = w; w += na_;
     v = w; w += sp_v_.nnz();
     r = w; w += sp_r_.nnz();
     beta = w; w += nx_+na_;
@@ -399,16 +397,16 @@ namespace casadi {
       casadi_mv(a, A_, z, z+nx_, 0);
 
       // Evaluate gradient of the Lagrangian and constraint functions
-      casadi_copy(g, nx_, step);
-      casadi_mv(h, H_, z, step, 0); // gradient of the objective
-      casadi_mv(a, A_, lam+nx_, step, 1); // gradient of the Lagrangian
+      casadi_copy(g, nx_, dz);
+      casadi_mv(h, H_, z, dz, 0); // gradient of the objective
+      casadi_mv(a, A_, lam+nx_, dz, 1); // gradient of the Lagrangian
 
       // Recalculate lam_x, without changing the sign
       for (i=0; i<nx_; ++i) {
         if (lam[i]>0) {
-          lam[i] = fmax(-step[i], DMIN);
+          lam[i] = fmax(-dz[i], DMIN);
         } else if (lam[i]<0) {
-          lam[i] = fmin(-step[i], -DMIN);
+          lam[i] = fmin(-dz[i], -DMIN);
         }
       }
 
@@ -429,13 +427,13 @@ namespace casadi {
       }
 
       // If calculated residual is positive, we need a negative lhs
-      bool negative_lhs = step[i]+lam[i]>0.;
+      bool negative_lhs = dz[i]+lam[i]>0.;
 
       // Calculate dual infeasibility
       double maxdu = 0.;
       casadi_int imaxdu;
       for (i=0; i<nx_; ++i) {
-        double maxdu_trial = fabs(step[i]+lam[i]);
+        double maxdu_trial = fabs(dz[i]+lam[i]);
         if (maxdu_trial>maxdu) {
           maxdu = maxdu_trial;
           imaxdu = i;
@@ -515,7 +513,7 @@ namespace casadi {
           casadi_int ibest_a;
 
           // If calculated residual is positive, we need a negative lhs
-          bool negative_lhs = step[i]+lam[i]>0.;
+          bool negative_lhs = dz[i]+lam[i]>0.;
 
           // Check redundancy in x bounds with the right sign
           bool negative_lambda = negative_lhs; // coefficient is 1.
@@ -564,29 +562,29 @@ namespace casadi {
       // Calculate KKT residual: Correct for active simple bounds
       for (i=0; i<nx_; ++i) {
         if (lam[i]!=0.) {
-          step[i] = z[i];
+          dz[i] = z[i];
           if (ctype[i]==FIXED || lam[i]<0) {
-            step[i] -= lbz[i];
+            dz[i] -= lbz[i];
           } else if (lam[i]>0) {
-            step[i] -= ubz[i];
+            dz[i] -= ubz[i];
           }
         }
       }
 
       // Calculate KKT residual: Correct for inactive constraints
-      casadi_copy(z+nx_, na_, step + nx_); // constraint evaluation
+      casadi_copy(z+nx_, na_, dz + nx_); // constraint evaluation
       for (i=0; i<na_; ++i) {
         if (lam[nx_+i]==0) {
-          step[nx_+i] = 0.; // -lam[nx_+i]
+          dz[nx_+i] = 0.; // -lam[nx_+i]
         } else if (lba && lam[nx_+i]<0) {
-          step[nx_+i] -= lba[i];
+          dz[nx_+i] -= lba[i];
         } else if (uba && lam[nx_+i]>0) {
-          step[nx_+i] -= uba[i];
+          dz[nx_+i] -= uba[i];
         }
       }
 
       if (verbose_) {
-        print_vector("KKT residual", step, nx_ + na_);
+        print_vector("KKT residual", dz, nx_ + na_);
       }
 
       // Copy kkt to kktd
@@ -616,31 +614,31 @@ namespace casadi {
       casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
 
       // Solve to get primal-dual step
-      casadi_scal(nx_+na_, -1., step);
-      casadi_qr_solve(step, 1, 1, sp_v_, v, sp_r_, r, beta,
+      casadi_scal(nx_+na_, -1., dz);
+      casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
                       get_ptr(prinv_), get_ptr(pc_), w);
 
       // Remove NaNs
-      for (i=0; i<nx_+na_; ++i) if (isnan(step[i])) step[i]=0.;
+      for (i=0; i<nx_+na_; ++i) if (isnan(dz[i])) dz[i]=0.;
 
       // Calculate change in Lagrangian gradient
       casadi_fill(dlam, nx_, 0.);
-      casadi_mv(h, H_, step, dlam, 0); // gradient of the objective
-      casadi_mv(a, A_, step+nx_, dlam, 1); // gradient of the Lagrangian
+      casadi_mv(h, H_, dz, dlam, 0); // gradient of the objective
+      casadi_mv(a, A_, dz+nx_, dlam, 1); // gradient of the Lagrangian
 
       // Step in lam(x)
       casadi_scal(nx_, -1., dlam);
 
       // Step in lam(g)
-      casadi_copy(step+nx_, na_, dlam+nx_);
+      casadi_copy(dz+nx_, na_, dlam+nx_);
 
-      // Step in g
-      casadi_fill(dg, na_, 0.);
-      casadi_mv(a, A_, step, dg, 0);
+      // Step in z(g)
+      casadi_fill(dz+nx_, na_, 0.);
+      casadi_mv(a, A_, dz, dz+nx_, 0);
 
       if (verbose_) {
-        print_vector("dx", step, nx_);
-        print_vector("dg", dg, na_);
+        print_vector("dz(x)", dz, nx_);
+        print_vector("dz(g)", dz+nx_, na_);
         print_vector("dlam(x)", dlam, nx_);
         print_vector("dlam(g)", dlam+nx_, na_);
       }
@@ -650,13 +648,13 @@ namespace casadi {
       if (!pr_feasible) {
         i = imaxpr;
         if (i<nx_) {
-          if (step[i]==0. || (z[i]<lbz[i])==(step[i]<0)) {
+          if (dz[i]==0. || (z[i]<lbz[i])==(dz[i]<0)) {
             casadi_message("Direction does not improve feasibility");
             continue;
           }
         } else {
           i -= nx_;
-          if (dg[i]==0. || (z[nx_+i]<lbz[nx_+i])==(dg[i]<0)) {
+          if (dz[nx_+i]==0. || (z[nx_+i]<lbz[nx_+i])==(dz[nx_+i]<0)) {
             casadi_message("Direction does not improve feasibility");
             continue;
           }
@@ -678,16 +676,16 @@ namespace casadi {
       for (i=0; i<nx_; ++i) {
         if (lam[i]==0.) {
           // Trial step
-          trial=z[i] + tau*step[i];
+          trial=z[i] + tau*dz[i];
           // Constraint is inactive, check for primal blocking constraints
           if (trial<=lbz[i] && z[i]>lbz[i]) {
             // Lower bound hit
-            tau = (lbz[i]-z[i])/step[i];
+            tau = (lbz[i]-z[i])/dz[i];
             w[i] = tau;
             iw[i] = -1;
           } else if (trial>=ubz[i] && z[i]<ubz[i]) {
             // Upper bound hit
-            tau = (ubz[i]-z[i])/step[i];
+            tau = (ubz[i]-z[i])/dz[i];
             w[i] = tau;
             iw[i] = 1;
           }
@@ -707,16 +705,16 @@ namespace casadi {
       for (i=0; i<na_; ++i) {
         if (lam[nx_+i]==0.) {
           // Trial step
-          trial=z[nx_+i] + tau*dg[i];
+          trial=z[nx_+i] + tau*dz[nx_+i];
           // Constraint is inactive, check for primal blocking constraints
           if (trial<lbz[nx_+i] && z[nx_+i]>=lbz[nx_+i]) {
             // Lower bound hit
-            tau = (lbz[nx_+i]-z[nx_+i])/dg[i];
+            tau = (lbz[nx_+i]-z[nx_+i])/dz[nx_+i];
             w[nx_+i] = tau;
             iw[nx_+i] = -1;
           } else if (trial>ubz[nx_+i] && z[nx_+i]<=ubz[nx_+i]) {
             // Upper bound hit
-            tau = (ubz[nx_+i]-z[nx_+i])/dg[i];
+            tau = (ubz[nx_+i]-z[nx_+i])/dz[nx_+i];
             w[nx_+i] = tau;
             iw[nx_+i] = 1;
           }
@@ -740,7 +738,7 @@ namespace casadi {
       if (tau==0.) continue;
 
       // Take primal step
-      casadi_axpy(nx_, tau, step, z);
+      casadi_axpy(nx_, tau, dz, z);
 
       // Update lam_x carefully
       for (i=0; i<nx_; ++i) {
