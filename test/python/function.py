@@ -539,6 +539,29 @@ class Functiontests(casadiTestCase):
         for f in [F, F.expand('expand_'+F.name())]:
           self.checkfunction_light(f,Fref,inputs=X_+Y_+Z_+V_,)
 
+  def test_map_node_n_threads(self):
+    x = SX.sym("x")
+    y = SX.sym("y",2)
+    z = SX.sym("z",2,2)
+    v = SX.sym("z",Sparsity.upper(3))
+
+    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+
+    X_ = [ DM(x.sparsity(),np.random.random(x.nnz())) for i in range(10) ]
+    Y_ = [ DM(y.sparsity(),np.random.random(y.nnz())) for i in range(10) ]
+    Z_ = [ DM(z.sparsity(),np.random.random(z.nnz())) for i in range(10) ]
+    V_ = [ DM(v.sparsity(),np.random.random(v.nnz())) for i in range(10) ]
+
+
+    print(fun.map(3,"thread",2))
+    
+
+    self.checkfunction_light(fun.map(2,"thread",1),fun.map(2),inputs=[hcat(X_[:2]),hcat(Y_[:2]),hcat(Z_[:2]),hcat(V_[:2])])
+    self.checkfunction_light(fun.map(3,"thread",1),fun.map(3),inputs=[hcat(X_[:3]),hcat(Y_[:3]),hcat(Z_[:3]),hcat(V_[:3])])
+    self.checkfunction_light(fun.map(3,"thread",2),fun.map(3),inputs=[hcat(X_[:3]),hcat(Y_[:3]),hcat(Z_[:3]),hcat(V_[:3])])
+    self.checkfunction_light(fun.map(4,"thread",2),fun.map(4),inputs=[hcat(X_[:4]),hcat(Y_[:4]),hcat(Z_[:4]),hcat(V_[:4])])
+    self.checkfunction_light(fun.map(4,"thread",5),fun.map(4),inputs=[hcat(X_[:4]),hcat(Y_[:4]),hcat(Z_[:4]),hcat(V_[:4])])
+
   @memory_heavy()
   def test_mapsum(self):
     x = SX.sym("x")

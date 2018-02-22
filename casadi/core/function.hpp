@@ -576,6 +576,8 @@ namespace casadi {
         \param parallelization Type of parallelization used: unroll|serial|openmp
     */
     Function map(casadi_int n, const std::string& parallelization="serial") const;
+    Function map(casadi_int n, const std::string& parallelization,
+      casadi_int max_num_threads) const;
 
     ///@{
     /** \brief Map with reduction

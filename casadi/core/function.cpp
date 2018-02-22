@@ -583,6 +583,37 @@ namespace casadi {
   }
 
   Function
+  Function::map(casadi_int n, const std::string& parallelization,
+      casadi_int max_num_threads) const {
+    casadi_assert(max_num_threads>=1, "max_num_threads invalid.");
+    // No need for logic when we are not saturating the limit
+    if (n<=max_num_threads) return map(n, parallelization);
+
+    // Floored division
+    casadi_int d = n/max_num_threads;
+    if (d*max_num_threads==n) {
+      // Easy when n is divisable by max_num_threads
+      return map(d, "serial").map(max_num_threads, parallelization);
+    } else {
+      // Create a base map that computes a bit too much
+      Function base = map(d+1, "serial").map(max_num_threads, parallelization);
+      std::vector<MX> ret_in, base_in;
+      casadi_int rem = (d+1)*max_num_threads-n;
+      for (casadi_int i=0;i<n_in();++i) {
+        MX arg = MX::sym("arg", repmat(sparsity_in(i), 1, n));
+        ret_in.push_back(arg);
+        MX last_arg = arg(Slice(), range((n-1)*size2_in(i), n*size2_in(i)));
+        base_in.push_back(horzcat(arg, repmat(last_arg, 1, rem)));
+      }
+      std::vector<MX> ret_out = base(base_in);
+      for (casadi_int i=0;i<n_out();++i) {
+        ret_out[i] = horzsplit(ret_out[i], {0, n*size2_out(i), ret_out[i].size2()})[0];
+      }
+      return Function("helper", ret_in, ret_out);
+    }
+  }
+
+  Function
   Function::map(casadi_int n, const std::string& parallelization) const {
     // Make sure not degenerate
     casadi_assert(n>0, "Degenerate map operation");
