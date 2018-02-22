@@ -401,7 +401,7 @@ namespace casadi {
       casadi_mv(h, H_, z, dz, 0); // gradient of the objective
       casadi_mv(a, A_, lam+nx_, dz, 1); // gradient of the Lagrangian
 
-      // Recalculate lam_x, without changing the sign
+      // Recalculate lam(x), without changing the sign
       for (i=0; i<nx_; ++i) {
         if (lam[i]>0) {
           lam[i] = fmax(-dz[i], DMIN);
@@ -461,48 +461,25 @@ namespace casadi {
             feasibility_phase = false;
           } else {
             // Restore primal feasibility
-            if (imaxpr<nx_) {
-              i = imaxpr;
-              // Add x constraint
-              if (lam[i]!=0.) {
-                // If already active constraint, terminate
-                casadi_warning("Failed to restore primal feasibility");
-                break;
-              } else {
-                // Add constraint to active set
-                if (z[i] < lbz[i]) {
-                  lam[i] = fmin(-w[i], -DMIN);
-                  changed_active_set = true;
-                  continue;
-                } else if (z[i] > ubz[i]) {
-                  lam[i] = fmax(-w[i],  DMIN);
-                  changed_active_set = true;
-                  continue;
-                } else {
-                  casadi_warning("Failed to restore primal feasibility");
-                  break; // can it happen?
-                }
-              }
-            } else {
-              i = imaxpr-nx_;
+            i = imaxpr;
+            // Add x constraint
+            if (lam[i]!=0.) {
               // If already active constraint, terminate
-              if (lam[nx_+i]!=0.) {
-                casadi_warning("Failed to restore primal feasibility");
-                break;
+              casadi_warning("Failed to restore primal feasibility");
+              break;
+            } else {
+              // Add constraint to active set
+              if (z[i] < lbz[i]) {
+                lam[i] = i<nx_ ? fmin(-w[i], -DMIN) : -DMIN;
+                changed_active_set = true;
+                continue;
+              } else if (z[i] > ubz[i]) {
+                lam[i] = i<nx_ ? fmax(-w[i],  DMIN) : DMIN;
+                changed_active_set = true;
+                continue;
               } else {
-                // Add constraint to active set
-                if (z[nx_+i] < lbz[nx_+i]) {
-                  lam[nx_+i] = -DMIN;
-                  changed_active_set = true;
-                  continue;
-                } else if (z[nx_+i] > ubz[nx_+i]) {
-                  lam[nx_+i] = DMIN;
-                  changed_active_set = true;
-                  continue;
-                } else {
-                  casadi_warning("Failed to restore primal feasibility");
-                  break; // can it happen?
-                }
+                casadi_warning("Failed to restore primal feasibility");
+                break; // can it happen?
               }
             }
           }
@@ -576,10 +553,10 @@ namespace casadi {
       for (i=0; i<na_; ++i) {
         if (lam[nx_+i]==0) {
           dz[nx_+i] = 0.; // -lam[nx_+i]
-        } else if (lba && lam[nx_+i]<0) {
-          dz[nx_+i] -= lba[i];
-        } else if (uba && lam[nx_+i]>0) {
-          dz[nx_+i] -= uba[i];
+        } else if (lam[nx_+i]<0) {
+          dz[nx_+i] -= lbz[nx_+i];
+        } else if (lam[nx_+i]>0) {
+          dz[nx_+i] -= ubz[nx_+i];
         }
       }
 
@@ -647,17 +624,9 @@ namespace casadi {
       // improves in the imaxpr direction
       if (!pr_feasible) {
         i = imaxpr;
-        if (i<nx_) {
-          if (dz[i]==0. || (z[i]<lbz[i])==(dz[i]<0)) {
-            casadi_message("Direction does not improve feasibility");
-            continue;
-          }
-        } else {
-          i -= nx_;
-          if (dz[nx_+i]==0. || (z[nx_+i]<lbz[nx_+i])==(dz[nx_+i]<0)) {
-            casadi_message("Direction does not improve feasibility");
-            continue;
-          }
+        if (dz[i]==0. || (z[i]<lbz[i])==(dz[i]<0)) {
+          casadi_message("Direction does not improve feasibility");
+          continue;
         }
       }
 
@@ -672,8 +641,8 @@ namespace casadi {
       //  0: Bound became inactive
       //  1: Upper bound became active
 
-      // Loop over primal variables
-      for (i=0; i<nx_; ++i) {
+      // Loop over variables and constraints
+      for (i=0; i<nx_+na_; ++i) {
         if (lam[i]==0.) {
           // Trial step
           trial=z[i] + tau*dz[i];
@@ -691,41 +660,12 @@ namespace casadi {
           }
         } else if (ctype[i]!=FIXED) {
           trial = lam[i] + tau*dlam[i];
-          // Constraint is active, check for dual blocking constraints
-          if ((lam[i]<0. && trial>=0) || (lam[i]>0. && trial<=0)) {
+          // Constraint is active, check for sign changes
+          if (lam[i]!=0 && ((lam[i]>0)!=(trial>0))) {
             // Sign changes
             tau = -lam[i]/dlam[i];
             w[i] = tau;
             iw[i] = 0;
-          }
-        }
-      }
-
-      // Loop over constraints
-      for (i=0; i<na_; ++i) {
-        if (lam[nx_+i]==0.) {
-          // Trial step
-          trial=z[nx_+i] + tau*dz[nx_+i];
-          // Constraint is inactive, check for primal blocking constraints
-          if (trial<lbz[nx_+i] && z[nx_+i]>=lbz[nx_+i]) {
-            // Lower bound hit
-            tau = (lbz[nx_+i]-z[nx_+i])/dz[nx_+i];
-            w[nx_+i] = tau;
-            iw[nx_+i] = -1;
-          } else if (trial>ubz[nx_+i] && z[nx_+i]<=ubz[nx_+i]) {
-            // Upper bound hit
-            tau = (ubz[nx_+i]-z[nx_+i])/dz[nx_+i];
-            w[nx_+i] = tau;
-            iw[nx_+i] = 1;
-          }
-        } else if (ctype[nx_+i]!=FIXED) {
-          trial = lam[nx_+i] + tau*dlam[nx_+i];
-          // Constraint is active, check for sign changes
-          if (lam[nx_+i]!=0 && ((lam[nx_+i]>0)!=(trial>0))) {
-            // Sign changes
-            tau = -lam[nx_+i]/dlam[nx_+i];
-            w[nx_+i] = tau;
-            iw[nx_+i] = 0;
           }
         }
       }
@@ -740,8 +680,8 @@ namespace casadi {
       // Take primal step
       casadi_axpy(nx_, tau, dz, z);
 
-      // Update lam_x carefully
-      for (i=0; i<nx_; ++i) {
+      // Update lam carefully
+      for (i=0; i<nx_+na_; ++i) {
         // Get the current sign
         casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
         // Account for sign changes
@@ -757,27 +697,6 @@ namespace casadi {
             case -1: lam[i] = fmin(lam[i], -DMIN); break;
             case  1: lam[i] = fmax(lam[i],  DMIN); break;
             case  0: lam[i] = 0.; break;
-          }
-        }
-      }
-
-      // Update lam carefully
-      for (i=0; i<na_; ++i) {
-        // Get the current sign
-        casadi_int s = lam[nx_+i]>0. ? 1 : lam[nx_+i]<0. ? -1 : 0;
-        // Account for sign changes
-        if (w[nx_+i]==tau) {
-          changed_active_set = true;
-          s = iw[nx_+i];
-        }
-        // Take step
-        lam[nx_+i] += tau*dlam[nx_+i];
-        // Ensure correct sign, unless fixed
-        if (ctype[nx_+i]!=FIXED || lam[nx_+i]==0.) {
-          switch (s) {
-            case -1: lam[nx_+i] = fmin(lam[nx_+i], -DMIN); break;
-            case  1: lam[nx_+i] = fmax(lam[nx_+i],  DMIN); break;
-            case  0: lam[nx_+i] = 0.; break;
           }
         }
       }
