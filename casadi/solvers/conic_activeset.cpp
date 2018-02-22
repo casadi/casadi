@@ -553,7 +553,7 @@ namespace casadi {
       for (i=0; i<na_; ++i) {
         if (lam[nx_+i]==0) {
           dz[nx_+i] = 0.; // -lam[nx_+i]
-        } else if (lam[nx_+i]<0) {
+        } else if (ctype[nx_+i]==FIXED || lam[nx_+i]<0) {
           dz[nx_+i] -= lbz[nx_+i];
         } else if (lam[nx_+i]>0) {
           dz[nx_+i] -= ubz[nx_+i];
