@@ -349,12 +349,6 @@ namespace casadi {
     // No change so far
     bool changed_active_set = true;
 
-    // Feasibility phase or optimality phase?
-    bool feasibility_phase = true;
-
-    // Print iteration progress:
-    print("Entering feasibility phase\n");
-
     // QP iterations
     casadi_int iter = 0;
     while (true) {
@@ -426,77 +420,6 @@ namespace casadi {
 
       if (pr_feasible && du_feasible) {
         // Successful return
-        break;
-      } else if (!changed_active_set) {
-        // If active set is unchanged, check feasibility and optimality
-        if (feasibility_phase) {
-          // Feasibility phase
-          if (pr_feasible) {
-            // Feasibility achieved
-            print("Entering optimality phase\n");
-            feasibility_phase = false;
-          } else {
-            // Restore primal feasibility
-            i = imaxpr;
-            // Add x constraint
-            if (lam[i]!=0.) {
-              // If already active constraint, terminate
-              casadi_warning("Failed to restore primal feasibility");
-              break;
-            } else {
-              // Add constraint to active set
-              if (z[i] < lbz[i]) {
-                lam[i] = -DMIN;
-                changed_active_set = true;
-                continue;
-              } else if (z[i] > ubz[i]) {
-                lam[i] = DMIN;
-                changed_active_set = true;
-                continue;
-              } else {
-                casadi_warning("Failed to restore primal feasibility");
-                break; // can it happen?
-              }
-            }
-          }
-        } else {
-          // Optimality phase
-          // We're feasible but not optimal, let's remove a redundant constraint
-          double best_a = 0.;
-          casadi_int ibest_a;
-
-          // If calculated residual is positive, we need a negative lhs
-          bool negative_lhs = dz[i]+lam[i]>0.;
-
-          // Check redundancy in x bounds with the right sign
-          bool negative_lambda = negative_lhs; // coefficient is 1.
-          i=imaxdu;
-          if (lam[i]!=0. && negative_lambda==(lam[i]>0.)) {
-            best_a = 1.;
-            ibest_a = i;
-          }
-
-          // Check redundancy in g bounds matching imaxdu with the right sign
-          for (casadi_int k=a_colind[imaxdu]; k<a_colind[imaxdu+1]; ++k) {
-            i = a_row[k];
-            if (lam[nx_+i]!=0. && fabs(a[k])>best_a) {
-              negative_lambda = negative_lhs==a[k]>0.;
-              if (negative_lambda==(lam[nx_+i]>0.)) {
-                best_a = fabs(a[k]);
-                ibest_a = nx_+i;
-              }
-            }
-          }
-
-          // Remove redundant constraint, if any
-          if (best_a>0.) {
-            lam[ibest_a] = 0.;
-            changed_active_set = true;
-            continue;
-          }
-        }
-
-        casadi_warning("Failed to restore dual feasibility");
         break;
       }
 
