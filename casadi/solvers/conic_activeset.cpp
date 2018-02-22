@@ -203,7 +203,6 @@ namespace casadi {
   print_signs(const char* id, const double* x, casadi_int n) const {
     print("%s: [", id);
     for (casadi_int i=0; i<n; ++i) {
-      if (i!=0) print(", ");
       print(x[i]==0 ? "0" : x[i]>0 ? "+" : "-");
     }
     print("]\n");
@@ -409,9 +408,9 @@ namespace casadi {
         print_vector("gk", gk, na_);
         print_vector("lam_xk", lam_xk, nx_);
         print_vector("lam_ak", lam_ak, na_);
+        print_signs("sign(lam_xk)", lam_xk, nx_);
+        print_signs("sign(lam_ak)", lam_ak, na_);
       }
-      print_signs("sign(lam_xk)", lam_xk, nx_);
-      print_signs("sign(lam_ak)", lam_ak, na_);
 
       // Recalculate g
       casadi_fill(gk, na_, 0.);
@@ -461,6 +460,8 @@ namespace casadi {
           imaxpr = nx_+i;
         }
       }
+      // If calculated residual is positive, we need a negative lhs
+      bool negative_lhs = step[i]+lam_xk[i]>0.;
 
       // Calculate dual infeasibility
       double maxdu = 0.;
@@ -499,6 +500,7 @@ namespace casadi {
               // Add x constraint
               lb = lbx ? lbx[i] : 0.;
               ub = ubx ? ubx[i] : 0.;
+
               if (lam_xk[i]!=0.) {
                 // If already active constraint, terminate
                 casadi_warning("Failed to restore primal feasibility");
@@ -680,6 +682,26 @@ namespace casadi {
         print_vector("dg", dg, na_);
         print_vector("dlam_x", dlam_x, nx_);
         print_vector("dlam_g", step+nx_, na_);
+      }
+
+      // If we're in the feasibility phase, make sure that the feasibility
+      // improves in the imaxpr direction
+      if (!pr_feasible) {
+        i = imaxpr;
+        if (i<nx_) {
+          lb = lbx ? lbx[i] : 0.;
+          if (step[i]==0. || (xk[i]<lb)==(step[i]<0)) {
+            casadi_message("Direction does not improve feasibility");
+            continue;
+          }
+        } else {
+          i -= nx_;
+          lb = lba ? lba[i] : 0.;
+          if (dg[i]==0. || (gk[i]<lb)==(dg[i]<0)) {
+            casadi_message("Direction does not improve feasibility");
+            continue;
+          }
+        }
       }
 
       // Get maximum step size
