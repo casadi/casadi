@@ -110,7 +110,7 @@ namespace casadi {
     alloc_iw(nx_+na_); // casadi_trans, tau type
     alloc_w(nx_+na_); // casadi_project, tau memory
     alloc_w(nx_+na_, true); // step
-    alloc_w(nx_, true); // dlam_x
+    alloc_w(nx_+na_, true); // dlam
     alloc_w(na_, true); // dg
     alloc_iw(nx_+na_, true); // ctype
 
@@ -287,7 +287,7 @@ namespace casadi {
 
     // Work vectors
     double *kkt, *kktd, *z, *lam, *v, *r, *beta,
-           *step, *dlam_x, *dg, *lbz, *ubz;
+           *step, *dlam, *dg, *lbz, *ubz;
     casadi_int* ctype;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
@@ -296,7 +296,7 @@ namespace casadi {
     ubz = w; w += nx_+na_;
     lam = w; w += nx_+na_;
     step = w; w += nx_+na_;
-    dlam_x = w; w += nx_;
+    dlam = w; w += nx_+na_;
     dg = w; w += na_;
     v = w; w += sp_v_.nnz();
     r = w; w += sp_r_.nnz();
@@ -624,12 +624,15 @@ namespace casadi {
       for (i=0; i<nx_+na_; ++i) if (isnan(step[i])) step[i]=0.;
 
       // Calculate change in Lagrangian gradient
-      casadi_fill(dlam_x, nx_, 0.);
-      casadi_mv(h, H_, step, dlam_x, 0); // gradient of the objective
-      casadi_mv(a, A_, step+nx_, dlam_x, 1); // gradient of the Lagrangian
+      casadi_fill(dlam, nx_, 0.);
+      casadi_mv(h, H_, step, dlam, 0); // gradient of the objective
+      casadi_mv(a, A_, step+nx_, dlam, 1); // gradient of the Lagrangian
 
-      // Step in lambda_x
-      casadi_scal(nx_, -1., dlam_x);
+      // Step in lam(x)
+      casadi_scal(nx_, -1., dlam);
+
+      // Step in lam(g)
+      casadi_copy(step+nx_, na_, dlam+nx_);
 
       // Step in g
       casadi_fill(dg, na_, 0.);
@@ -638,8 +641,8 @@ namespace casadi {
       if (verbose_) {
         print_vector("dx", step, nx_);
         print_vector("dg", dg, na_);
-        print_vector("dlam_x", dlam_x, nx_);
-        print_vector("dlam_g", step+nx_, na_);
+        print_vector("dlam(x)", dlam, nx_);
+        print_vector("dlam(g)", dlam+nx_, na_);
       }
 
       // If we're in the feasibility phase, make sure that the feasibility
@@ -689,11 +692,11 @@ namespace casadi {
             iw[i] = 1;
           }
         } else if (ctype[i]!=FIXED) {
-          trial = lam[i] + tau*dlam_x[i];
+          trial = lam[i] + tau*dlam[i];
           // Constraint is active, check for dual blocking constraints
           if ((lam[i]<0. && trial>=0) || (lam[i]>0. && trial<=0)) {
             // Sign changes
-            tau = -lam[i]/dlam_x[i];
+            tau = -lam[i]/dlam[i];
             w[i] = tau;
             iw[i] = 0;
           }
@@ -718,11 +721,11 @@ namespace casadi {
             iw[nx_+i] = 1;
           }
         } else if (ctype[nx_+i]!=FIXED) {
-          trial = lam[nx_+i] + tau*step[nx_+i];
+          trial = lam[nx_+i] + tau*dlam[nx_+i];
           // Constraint is active, check for sign changes
           if (lam[nx_+i]!=0 && ((lam[nx_+i]>0)!=(trial>0))) {
             // Sign changes
-            tau = -lam[nx_+i]/step[nx_+i];
+            tau = -lam[nx_+i]/dlam[nx_+i];
             w[nx_+i] = tau;
             iw[nx_+i] = 0;
           }
@@ -749,7 +752,7 @@ namespace casadi {
           s = iw[i];
         }
         // Take step
-        lam[i] += tau*dlam_x[i];
+        lam[i] += tau*dlam[i];
         // Ensure correct sign, unless fixed and nonzero
         if (ctype[i]!=FIXED || lam[i]==0.) {
           switch (s) {
@@ -770,7 +773,7 @@ namespace casadi {
           s = iw[nx_+i];
         }
         // Take step
-        lam[nx_+i] += tau*step[nx_+i];
+        lam[nx_+i] += tau*dlam[nx_+i];
         // Ensure correct sign, unless fixed
         if (ctype[nx_+i]!=FIXED || lam[nx_+i]==0.) {
           switch (s) {
