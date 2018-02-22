@@ -601,6 +601,19 @@ namespace casadi {
       if (!pr_feasible) {
         i = imaxpr;
         if (dz[i]==0. || (z[i]<lbz[i])==(dz[i]<0)) {
+          // Not a descent direction
+          if (lam[i]==0) {
+            // Add constraint to active set
+            if (z[i] <= lbz[i]) {
+              lam[i] = -DMIN;
+              changed_active_set = true;
+              continue;
+            } else if (z[i] >= ubz[i]) {
+              lam[i] = DMIN;
+              changed_active_set = true;
+              continue;
+            }
+          }
           casadi_message("Direction does not improve feasibility");
           continue;
         }
