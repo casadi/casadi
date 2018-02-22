@@ -111,7 +111,6 @@ namespace casadi {
     alloc_w(nx_+na_); // casadi_project, tau memory
     alloc_w(nx_+na_, true); // dz
     alloc_w(nx_+na_, true); // dlam
-    alloc_iw(nx_+na_, true); // ctype
 
     // Memory for numerical solution
     alloc_w(sp_v_.nnz(), true); // v
@@ -287,7 +286,6 @@ namespace casadi {
     // Work vectors
     double *kkt, *kktd, *z, *lam, *v, *r, *beta,
            *dz, *dlam, *lbz, *ubz;
-    casadi_int* ctype;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     z = w; w += nx_+na_;
@@ -299,7 +297,6 @@ namespace casadi {
     v = w; w += sp_v_.nnz();
     r = w; w += sp_r_.nnz();
     beta = w; w += nx_+na_;
-    ctype = iw; iw += nx_+na_;
 
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
@@ -309,27 +306,6 @@ namespace casadi {
     casadi_copy(lba, na_, lbz+nx_);
     casadi_copy(ubx, nx_, ubz);
     casadi_copy(uba, na_, ubz+nx_);
-
-    // Get type of constraints
-    enum CType {FREE, LOWER, UPPER, FIXED, RANGE};
-    for (i=0; i<nx_+na_; ++i) {
-      if (isinf(lbz[i]) && isinf(ubz[i])) {
-        ctype[i]=FREE; // unconstrained
-      } else if (isinf(ubz[i])) {
-        ctype[i]=LOWER; // only lower bound
-      } else if (isinf(lbz[i])) {
-        ctype[i]=UPPER; // only upper bound
-      } else if (lbz[i]==ubz[i]) {
-        ctype[i]=FIXED; // equality constraints
-      } else {
-        ctype[i]=RANGE; // range
-      }
-    }
-
-    if (verbose_) {
-      print_ivector("ctype (x)", ctype, nx_);
-      print_ivector("ctype (a)", ctype+nx_, na_);
-    }
 
     // Pass initial guess
     casadi_copy(x0, nx_, z);
@@ -495,7 +471,7 @@ namespace casadi {
           // Check redundancy in x bounds with the right sign
           bool negative_lambda = negative_lhs; // coefficient is 1.
           i=imaxdu;
-          if (ctype[i]!=FIXED && lam[i]!=0. && negative_lambda==(lam[i]>0.)) {
+          if (lam[i]!=0. && negative_lambda==(lam[i]>0.)) {
             best_a = 1.;
             ibest_a = i;
           }
@@ -503,7 +479,7 @@ namespace casadi {
           // Check redundancy in g bounds matching imaxdu with the right sign
           for (casadi_int k=a_colind[imaxdu]; k<a_colind[imaxdu+1]; ++k) {
             i = a_row[k];
-            if (ctype[i]!=FIXED && lam[nx_+i]!=0. && fabs(a[k])>best_a) {
+            if (lam[nx_+i]!=0. && fabs(a[k])>best_a) {
               negative_lambda = negative_lhs==a[k]>0.;
               if (negative_lambda==(lam[nx_+i]>0.)) {
                 best_a = fabs(a[k]);
@@ -540,7 +516,7 @@ namespace casadi {
       for (i=0; i<nx_; ++i) {
         if (lam[i]!=0.) {
           dz[i] = z[i];
-          if (ctype[i]==FIXED || lam[i]<0) {
+          if (lam[i]<0) {
             dz[i] -= lbz[i];
           } else if (lam[i]>0) {
             dz[i] -= ubz[i];
@@ -553,7 +529,7 @@ namespace casadi {
       for (i=0; i<na_; ++i) {
         if (lam[nx_+i]==0) {
           dz[nx_+i] = 0.; // -lam[nx_+i]
-        } else if (ctype[nx_+i]==FIXED || lam[nx_+i]<0) {
+        } else if (lam[nx_+i]<0) {
           dz[nx_+i] -= lbz[nx_+i];
         } else if (lam[nx_+i]>0) {
           dz[nx_+i] -= ubz[nx_+i];
@@ -658,7 +634,7 @@ namespace casadi {
             w[i] = tau;
             iw[i] = 1;
           }
-        } else if (ctype[i]!=FIXED) {
+        } else {
           trial = lam[i] + tau*dlam[i];
           // Constraint is active, check for sign changes
           if (lam[i]!=0 && ((lam[i]>0)!=(trial>0))) {
@@ -691,13 +667,11 @@ namespace casadi {
         }
         // Take step
         lam[i] += tau*dlam[i];
-        // Ensure correct sign, unless fixed and nonzero
-        if (ctype[i]!=FIXED || lam[i]==0.) {
-          switch (s) {
-            case -1: lam[i] = fmin(lam[i], -DMIN); break;
-            case  1: lam[i] = fmax(lam[i],  DMIN); break;
-            case  0: lam[i] = 0.; break;
-          }
+        // Ensure correct sign
+        switch (s) {
+          case -1: lam[i] = fmin(lam[i], -DMIN); break;
+          case  1: lam[i] = fmax(lam[i],  DMIN); break;
+          case  0: lam[i] = 0.; break;
         }
       }
     }
