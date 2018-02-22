@@ -262,7 +262,7 @@ namespace casadi {
 
     // Local variables
     casadi_int i;
-    double trial, fk;
+    double fk;
     // Get input pointers
     const double *h, *g, *a, *lba, *uba, *lbx, *ubx, *x0, *lam_x0, *lam_a0;
     h = arg[CONIC_H];
@@ -619,25 +619,38 @@ namespace casadi {
 
       // Loop over variables and constraints
       for (i=0; i<nx_+na_; ++i) {
+        // Trial primal step
+        double trial_z=z[i] + tau*dz[i];
         if (lam[i]==0.) {
-          // Trial step
-          trial=z[i] + tau*dz[i];
-          // Constraint is inactive, check for primal blocking constraints
-          if (trial<=lbz[i] && z[i]>lbz[i]) {
-            // Lower bound hit
+          // Constraint is inactive, check if it becomes active
+          if (z[i]>=lbz[i] && trial_z<lbz[i]) {
             tau = (lbz[i]-z[i])/dz[i];
             w[i] = tau;
             iw[i] = -1;
-          } else if (trial>=ubz[i] && z[i]<ubz[i]) {
-            // Upper bound hit
+          } else if (z[i]<=ubz[i] && trial_z>ubz[i]) {
             tau = (ubz[i]-z[i])/dz[i];
             w[i] = tau;
             iw[i] = 1;
           }
         } else {
-          trial = lam[i] + tau*dlam[i];
+          if (trial_z<lbz[i]-maxpr) {
+            // Trial would increase maximum infeasibility
+            tau = (lbz[i]-maxpr-z[i])/dz[i];
+            w[i] = tau;
+            iw[i] = -1;
+          } else if (trial_z>ubz[i]+maxpr) {
+            // Trial would increase maximum infeasibility
+            tau = (ubz[i]+maxpr-z[i])/dz[i];
+            w[i] = tau;
+            iw[i] = 1;
+          }
+        }
+        // Trial dual step
+        double trial_lam = lam[i] + tau*dlam[i];
+        if (lam[i]==0.) {
+        } else {
           // Constraint is active, check for sign changes
-          if (lam[i]!=0 && ((lam[i]>0)!=(trial>0))) {
+          if ((lam[i]>0)!=(trial_lam>0)) {
             // Sign changes
             tau = -lam[i]/dlam[i];
             w[i] = tau;
@@ -650,9 +663,6 @@ namespace casadi {
         print("tau = %g\n", tau);
       }
 
-      // If tau==0, no step to take
-      if (tau==0.) continue;
-
       // Take primal step
       casadi_axpy(nx_, tau, dz, z);
 
@@ -662,7 +672,7 @@ namespace casadi {
         casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
         // Account for sign changes
         if (w[i]==tau) {
-          changed_active_set = true;
+          if (s!=iw[i]) changed_active_set = true;
           s = iw[i];
         }
         // Take step
