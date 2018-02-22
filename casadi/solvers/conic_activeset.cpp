@@ -264,7 +264,7 @@ namespace casadi {
 
     // Local variables
     casadi_int i;
-    double lb, ub, trial, fk;
+    double trial, fk;
     // Get input pointers
     const double *h, *g, *a, *lba, *uba, *lbx, *ubx, *x0, *lam_x0, *lam_a0;
     h = arg[CONIC_H];
@@ -466,20 +466,17 @@ namespace casadi {
             if (imaxpr<nx_) {
               i = imaxpr;
               // Add x constraint
-              lb = lbx ? lbx[i] : 0.;
-              ub = ubx ? ubx[i] : 0.;
-
               if (lam[i]!=0.) {
                 // If already active constraint, terminate
                 casadi_warning("Failed to restore primal feasibility");
                 break;
               } else {
                 // Add constraint to active set
-                if (z[i] < lb) {
+                if (z[i] < lbz[i]) {
                   lam[i] = fmin(-w[i], -DMIN);
                   changed_active_set = true;
                   continue;
-                } else if (z[i] > ub) {
+                } else if (z[i] > ubz[i]) {
                   lam[i] = fmax(-w[i],  DMIN);
                   changed_active_set = true;
                   continue;
@@ -490,20 +487,17 @@ namespace casadi {
               }
             } else {
               i = imaxpr-nx_;
-              // Add a constraint
-              lb = lba ? lba[i] : 0.;
-              ub = uba ? uba[i] : 0.;
               // If already active constraint, terminate
               if (lam[nx_+i]!=0.) {
                 casadi_warning("Failed to restore primal feasibility");
                 break;
               } else {
                 // Add constraint to active set
-                if (z[nx_+i] < lb) {
+                if (z[nx_+i] < lbz[nx_+i]) {
                   lam[nx_+i] = -DMIN;
                   changed_active_set = true;
                   continue;
-                } else if (z[nx_+i] > ub) {
+                } else if (z[nx_+i] > ubz[nx_+i]) {
                   lam[nx_+i] = DMIN;
                   changed_active_set = true;
                   continue;
@@ -572,9 +566,9 @@ namespace casadi {
         if (lam[i]!=0.) {
           step[i] = z[i];
           if (ctype[i]==FIXED || lam[i]<0) {
-            if (lbx) step[i] -= lbx[i];
+            step[i] -= lbz[i];
           } else if (lam[i]>0) {
-            if (ubx) step[i] -= ubx[i];
+            step[i] -= ubz[i];
           }
         }
       }
@@ -653,15 +647,13 @@ namespace casadi {
       if (!pr_feasible) {
         i = imaxpr;
         if (i<nx_) {
-          lb = lbx ? lbx[i] : 0.;
-          if (step[i]==0. || (z[i]<lb)==(step[i]<0)) {
+          if (step[i]==0. || (z[i]<lbz[i])==(step[i]<0)) {
             casadi_message("Direction does not improve feasibility");
             continue;
           }
         } else {
           i -= nx_;
-          lb = lba ? lba[i] : 0.;
-          if (dg[i]==0. || (z[nx_+i]<lb)==(dg[i]<0)) {
+          if (dg[i]==0. || (z[nx_+i]<lbz[nx_+i])==(dg[i]<0)) {
             casadi_message("Direction does not improve feasibility");
             continue;
           }
@@ -681,20 +673,18 @@ namespace casadi {
 
       // Loop over primal variables
       for (i=0; i<nx_; ++i) {
-        lb = lbx ? lbx[i] : 0.;
-        ub = ubx ? ubx[i] : 0.;
         if (lam[i]==0.) {
           // Trial step
           trial=z[i] + tau*step[i];
           // Constraint is inactive, check for primal blocking constraints
-          if (trial<=lb && z[i]>lb) {
+          if (trial<=lbz[i] && z[i]>lbz[i]) {
             // Lower bound hit
-            tau = (lb-z[i])/step[i];
+            tau = (lbz[i]-z[i])/step[i];
             w[i] = tau;
             iw[i] = -1;
-          } else if (trial>=ub && z[i]<ub) {
+          } else if (trial>=ubz[i] && z[i]<ubz[i]) {
             // Upper bound hit
-            tau = (ub-z[i])/step[i];
+            tau = (ubz[i]-z[i])/step[i];
             w[i] = tau;
             iw[i] = 1;
           }
@@ -712,20 +702,18 @@ namespace casadi {
 
       // Loop over constraints
       for (i=0; i<na_; ++i) {
-        lb = lba ? lba[i] : 0.;
-        ub = uba ? uba[i] : 0.;
         if (lam[nx_+i]==0.) {
           // Trial step
           trial=z[nx_+i] + tau*dg[i];
           // Constraint is inactive, check for primal blocking constraints
-          if (trial<lb && z[nx_+i]>=lb) {
+          if (trial<lbz[nx_+i] && z[nx_+i]>=lbz[nx_+i]) {
             // Lower bound hit
-            tau = (lb-z[nx_+i])/dg[i];
+            tau = (lbz[nx_+i]-z[nx_+i])/dg[i];
             w[nx_+i] = tau;
             iw[nx_+i] = -1;
-          } else if (trial>ub && z[nx_+i]<=ub) {
+          } else if (trial>ubz[nx_+i] && z[nx_+i]<=ubz[nx_+i]) {
             // Upper bound hit
-            tau = (ub-z[nx_+i])/dg[i];
+            tau = (ubz[nx_+i]-z[nx_+i])/dg[i];
             w[nx_+i] = tau;
             iw[nx_+i] = 1;
           }
