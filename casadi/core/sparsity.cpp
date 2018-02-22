@@ -1779,6 +1779,32 @@ namespace casadi {
     return Sparsity(nrow, ncol, colind, row);
   }
 
+  void Sparsity::to_file(const std::string& filename, const std::string& format_hint) const {
+    std::string format = format_hint;
+    if (format_hint=="") {
+      std::string extension = filename.substr(filename.rfind(".")+1);
+      if (extension=="mtx") {
+        format = "mtx";
+      } else {
+        casadi_error("Could not detect format from extension '" + extension + "'");
+      }
+    }
+    std::ofstream out(filename);
+    if (format=="mtx") {
+      out << std::scientific << std::setprecision(15);
+      out << "%%MatrixMarket matrix coordinate pattern general" << std::endl;
+      out << size1() << " " << size2() << " " << nnz() << std::endl;
+      std::vector<casadi_int> row = get_row();
+      std::vector<casadi_int> col = get_col();
+
+      for (casadi_int k=0;k<row.size();++k) {
+        out << row[k]+1 << " " << col[k]+1 << std::endl;
+      }
+    } else {
+      casadi_error("Unknown format '" + format + "'");
+    }
+  }
+
   Sparsity Sparsity::kkt(const Sparsity& H, const Sparsity& J,
                          bool with_x_diag, bool with_lam_g_diag) {
     // Consistency check

@@ -337,6 +337,13 @@ namespace casadi {
     /** Construct instance from info */
     static Sparsity from_info(const Dict& info);
 
+    /** Export sparsity pattern to file
+    *
+    * Supported formats:
+    *   - .mtx   Matrix Market
+    */
+    void to_file(const std::string& filename, const std::string& format="") const;
+
 #ifndef SWIG
     /** \brief Serialize */
     void serialize(std::ostream &stream) const;

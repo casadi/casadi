@@ -1060,6 +1060,13 @@ namespace casadi {
     /** Construct instance from info */
     static Matrix from_info(const Dict& info);
 
+    /** Export numerical matrix to file
+    *
+    * Supported formats:
+    *   - .mtx   Matrix Market
+    */
+    void to_file(const std::string& filename, const std::string& format="") const;
+
 #ifndef SWIG
     /// Sparse matrix with a given sparsity with all values same
     Matrix(const Sparsity& sp, const Scalar& val, bool dummy);
