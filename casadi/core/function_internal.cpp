@@ -1793,7 +1793,7 @@ namespace casadi {
   }
 
   std::string FunctionInternal::signature(const std::string& fname) const {
-    return "casadi_int " + fname + "(const casadi_real** arg, casadi_real** res, "
+    return "int " + fname + "(const casadi_real** arg, casadi_real** res, "
                             "casadi_int* iw, casadi_real* w, void* mem)";
   }
 
@@ -1843,7 +1843,7 @@ namespace casadi {
 
     // Function that returns work vector lengths
     g << g.declare(
-        "casadi_int " + name_ + "_work(casadi_int *sz_arg, casadi_int* sz_res, "
+        "int " + name_ + "_work(casadi_int *sz_arg, casadi_int* sz_res, "
         "casadi_int *sz_iw, casadi_int *sz_w)")
       << " {\n"
       << "if (sz_arg) *sz_arg = " << sz_arg() << ";\n"
@@ -1860,7 +1860,7 @@ namespace casadi {
 
       // Declare wrapper
       g << "void mex_" << name_
-        << "(casadi_int resc, mxArray *resv[], casadi_int argc, const mxArray *argv[]) {\n"
+        << "(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {\n"
         << "casadi_int i, j;\n";
 
       // Work vectors, including input and output buffers
