@@ -25,6 +25,7 @@
 
 #include "sx_node.hpp"
 #include <limits>
+#include <stack>
 
 using namespace std;
 namespace casadi {
@@ -143,6 +144,49 @@ namespace casadi {
       stringstream ss;
       ss << "@" << ind;
       return ss.str();
+    }
+  }
+
+  void SXNode::safe_delete(SXNode* n) {
+    // Quick return if more owners
+    if (n->count>0) return;
+    // Delete straight away if it doesn't have any dependencies
+    if (!n->n_dep()) {
+      delete n;
+      return;
+    }
+    // Stack of expressions to be deleted
+    std::stack<SXNode*> deletion_stack;
+    // Add the node to the deletion stack
+    deletion_stack.push(n);
+    // Process stack
+    while (!deletion_stack.empty()) {
+      // Top element
+      SXNode *t = deletion_stack.top();
+      // Check if the top element has dependencies with dependencies
+      bool added_to_stack = false;
+      for (casadi_int c2=0; c2<t->n_dep(); ++c2) { // for all dependencies of the dependency
+        // Get the node of the dependency of the top element
+        // and remove it from the smart pointer
+        SXNode *n2 = t->dep(c2).assignNoDelete(casadi_limits<SXElem>::nan);
+        // Check if this is the only reference to the element
+        if (n2->count == 0) {
+          // Check if unary or binary
+          if (!n2->n_dep()) {
+            // Delete straight away if not binary
+            delete n2;
+          } else {
+            // Add to deletion stack
+            deletion_stack.push(n2);
+            added_to_stack = true;
+          }
+        }
+      }
+      // Delete and pop from stack if nothing added to the stack
+      if (!added_to_stack) {
+        delete deletion_stack.top();
+        deletion_stack.pop();
+      }
     }
   }
 

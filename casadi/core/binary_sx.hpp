@@ -27,7 +27,6 @@
 #define CASADI_BINARY_SX_HPP
 
 #include "sx_node.hpp"
-#include <stack>
 
 
 /// \cond INTERNAL
@@ -66,68 +65,8 @@ class BinarySX : public SXNode {
     can cause stack overflow due to recursive calling.
     */
     ~BinarySX() override {
-      // Start destruction method if any of the dependencies has dependencies
-      for (casadi_int c1=0; c1<2; ++c1) {
-        // Get the node of the dependency and remove it from the smart pointer
-        SXNode* n1 = dep(c1).assignNoDelete(casadi_limits<SXElem>::nan);
-
-        // Check if this was the last reference
-        if (n1->count==0) {
-
-          // Check if binary
-          if (!n1->n_dep()) { // n1 is not binary
-
-            delete n1; // Delete straight away
-
-          } else { // n1 is binary
-
-            // Stack of expressions to be deleted
-            std::stack<SXNode*> deletion_stack;
-
-            // Add the node to the deletion stack
-            deletion_stack.push(n1);
-
-            // Process stack
-            while (!deletion_stack.empty()) {
-
-              // Top element
-              SXNode *t = deletion_stack.top();
-
-              // Check if the top element has dependencies with dependencies
-              bool added_to_stack = false;
-              for (casadi_int c2=0; c2<t->n_dep(); ++c2) { // for all dependencies of the dependency
-
-                // Get the node of the dependency of the top element
-                // and remove it from the smart pointer
-                SXNode *n2 = t->dep(c2).assignNoDelete(casadi_limits<SXElem>::nan);
-
-                // Check if this is the only reference to the element
-                if (n2->count == 0) {
-
-                  // Check if binary
-                  if (!n2->n_dep()) {
-
-                    // Delete straight away if not binary
-                    delete n2;
-
-                  } else {
-
-                    // Add to deletion stack
-                    deletion_stack.push(n2);
-                    added_to_stack = true;
-                  }
-                }
-              }
-
-              // Delete and pop from stack if nothing added to the stack
-              if (!added_to_stack) {
-                delete deletion_stack.top();
-                deletion_stack.pop();
-              }
-            } // while
-          }
-        }
-      }
+      safe_delete(dep0_.assignNoDelete(casadi_limits<SXElem>::nan));
+      safe_delete(dep1_.assignNoDelete(casadi_limits<SXElem>::nan));
     }
 
     // Class name

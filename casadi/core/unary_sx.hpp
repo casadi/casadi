@@ -27,7 +27,6 @@
 #define UNARY_SX_HPP
 
 #include "sx_node.hpp"
-#include <stack>
 
 /// \cond INTERNAL
 
@@ -60,7 +59,9 @@ class UnarySX : public SXNode {
     }
 
     /** \brief Destructor */
-    ~UnarySX() override {}
+    ~UnarySX() override {
+      safe_delete(dep_.assignNoDelete(casadi_limits<SXElem>::nan));
+    }
 
     // Class name
     std::string class_name() const override {return "UnarySX";}
