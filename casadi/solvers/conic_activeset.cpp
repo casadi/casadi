@@ -559,30 +559,33 @@ namespace casadi {
         print("tau = %g\n", tau);
       }
 
-      // Take primal step
-      casadi_axpy(nx_, tau, dz, z);
+      // If acceptable step
+      if (tau>1e-16) {
+        // Take primal step
+        casadi_axpy(nx_, tau, dz, z);
 
-      // Update lam carefully
-      for (i=0; i<nx_+na_; ++i) {
-        // Get the current sign
-        casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
-        // Account for sign changes
-        if (i==index) {
-          changed_active_set = true;
-          s = sign;
+        // Update lam carefully
+        for (i=0; i<nx_+na_; ++i) {
+          // Get the current sign
+          casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
+          // Account for sign changes
+          if (i==index) {
+            changed_active_set = true;
+            s = sign;
+          }
+          // Take step
+          lam[i] += tau*dlam[i];
+          // Ensure correct sign
+          switch (s) {
+            case -1: lam[i] = fmin(lam[i], -DMIN); break;
+            case  1: lam[i] = fmax(lam[i],  DMIN); break;
+            case  0: lam[i] = 0.; break;
+          }
         }
-        // Take step
-        lam[i] += tau*dlam[i];
-        // Ensure correct sign
-        switch (s) {
-          case -1: lam[i] = fmin(lam[i], -DMIN); break;
-          case  1: lam[i] = fmax(lam[i],  DMIN); break;
-          case  0: lam[i] = 0.; break;
-        }
+
+        // Success?
+        continue;
       }
-
-      // Success?
-      if (changed_active_set || tau==1.) continue;
 
       // If step becomes zero with no change, look for redundant constraints
       double best = -tol_;
@@ -601,14 +604,14 @@ namespace casadi {
         }
       }
       if (index>=0) {
-        casadi_assert(best>0,
-          "Step rejected since it would cause infeasibility: " + str(best));
+        //casadi_assert(best>=0,
+          //"Step rejected since it would cause infeasibility: " + str(best));
         // index is redundant
         lam[index] = 0.;
         changed_active_set = true;
         continue;
       }
-      casadi_error("Failed to find a better step");
+      casadi_error("Failed to find a better step: " + str(prerr) + ", " + str(duerr));
     }
 
     // Calculate optimal cost
