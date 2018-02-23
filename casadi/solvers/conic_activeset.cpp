@@ -524,22 +524,15 @@ namespace casadi {
         }
       }
 
-      // Get maximum step size
+      // Get maximum step size and corresponding index and new sign
       double tau = 1.;
+      casadi_int sign, index=-1;
 
       // Check if the step is nonzero
       bool zero_step = true;
       for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dz[i]==0.;
       for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dlam[i]==0.;
       if (zero_step) tau = 0.;
-
-      // Remember best tau for each constraint
-      casadi_fill(w, nx_+na_, -1.);
-
-      // iw will be used to mark the new sign:
-      // -1: Lower bound became active
-      //  0: Bound became inactive
-      //  1: Upper bound became active
 
       // Loop over variables and constraints
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
@@ -552,22 +545,22 @@ namespace casadi {
           // Constraint is inactive, check if it becomes active
           if (z[i]>=lbz[i] && trial_z<lbz[i]) {
             tau = (lbz[i]-z[i])/dz[i];
-            w[i] = tau;
-            iw[i] = -1;
+            index = i;
+            sign = -1;
           } else if (z[i]<=ubz[i] && trial_z>ubz[i]) {
             tau = (ubz[i]-z[i])/dz[i];
-            w[i] = tau;
-            iw[i] = 1;
+            index = i;
+            sign = 1;
           } else if (trial_z<lbz[i]-err) {
             // Trial would increase maximum infeasibility
             tau = (lbz[i]-err-z[i])/dz[i];
-            w[i] = tau;
-            iw[i] = -1;
+            index = i;
+            sign = -1;
           } else if (trial_z>ubz[i]+err) {
             // Trial would increase maximum infeasibility
             tau = (ubz[i]+err-z[i])/dz[i];
-            w[i] = tau;
-            iw[i] = 1;
+            index = i;
+            sign = 1;
           }
         } else {
           // Skip zero steps
@@ -578,8 +571,8 @@ namespace casadi {
           if ((lam[i]>0)!=(trial_lam>0)) {
             // Sign change
             tau = -lam[i]/dlam[i];
-            w[i] = tau;
-            iw[i] = 0;
+            index = i;
+            sign = 0;
           }
         }
       }
@@ -596,9 +589,9 @@ namespace casadi {
         // Get the current sign
         casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
         // Account for sign changes
-        if (w[i]==tau) {
-          if (s!=iw[i]) changed_active_set = true;
-          s = iw[i];
+        if (i==index) {
+          changed_active_set = true;
+          s = sign;
         }
         // Take step
         lam[i] += tau*dlam[i];
