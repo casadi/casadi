@@ -555,7 +555,7 @@ namespace casadi {
           if (dlam[i]==0.) continue; // Skip zero steps
           // Trial dual step
           double trial_lam = lam[i] + tau*dlam[i];
-          if ((lam[i]>0 && trial_lam<=0) || (lam[i]<0 && trial_lam>=0)) {
+          if ((lam[i]>0 && trial_lam<0) || (lam[i]<0 && trial_lam>0)) {
             tau = -lam[i]/dlam[i];
             index = i;
             // Don't allow equality constraints to become inactive
@@ -563,6 +563,9 @@ namespace casadi {
           }
         }
       }
+
+      // Ignore sign changes if they happen for a full step
+      if (tau==1.) index = -1;
 
       if (verbose_) {
         print("tau = %g\n", tau);
@@ -587,6 +590,34 @@ namespace casadi {
           case -1: lam[i] = fmin(lam[i], -DMIN); break;
           case  1: lam[i] = fmax(lam[i],  DMIN); break;
           case  0: lam[i] = 0.; break;
+        }
+      }
+
+      // If full step, check if we should also change the active set
+      if (tau==1.) {
+
+        // Calculate g
+        casadi_fill(z+nx_, na_, 0.);
+        casadi_mv(a, A_, z, z+nx_, 0);
+
+        // Look for largest bound violation corresponding to an unenforced constraint
+        double prerr = 0.;
+        casadi_int iprerr = -1;
+        for (i=0; i<nx_+na_; ++i) {
+          if (lam[i]!=0.) continue;
+          if (z[i] > ubz[i]+prerr) {
+            prerr = z[i]-ubz[i];
+            iprerr = i;
+          } else if (z[i] < lbz[i]-prerr) {
+            prerr = lbz[i]-z[i];
+            iprerr = i;
+          }
+        }
+
+        // If any violation, activate bound
+        if (iprerr>=0) {
+          lam[iprerr] = z[iprerr]>ubz[iprerr] ? DMIN : -DMIN;
+          changed_active_set = true;
         }
       }
 
