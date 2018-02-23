@@ -549,6 +549,8 @@ namespace casadi {
                       const std::vector<std::string>& accum_in,
                       const std::vector<std::string>& accum_out,
                       const Dict& opts=Dict()) const;
+    Function mapaccum(casadi_int n, const Dict& opts = Dict()) const;
+    Function fold(casadi_int n, const Dict& opts = Dict()) const;
     ///@}
 
     /** \brief  Create a mapped version of this function

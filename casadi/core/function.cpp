@@ -432,6 +432,16 @@ namespace casadi {
     return rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
+  Function Function::fold(casadi_int N, const Dict& opts) const {
+    Function base = mapaccum(N, opts);
+    std::vector<MX> base_in = base.mx_in();
+    std::vector<MX> out = base(base_in);
+    out[0] = out[0](Slice(), range((N-1)*size2_out(0), N*size2_out(0)));
+    return Function("fold_"+name(), base_in, out, name_in(), name_out(), opts);
+  }
+  Function Function::mapaccum(casadi_int N, const Dict& opts) const {
+    return mapaccum("mapaccum_"+name(), N, opts);
+  }
   Function Function::mapaccum(const string& name, casadi_int N, const Dict& opts) const {
     return mapaccum(name, N, 1, opts);
   }
@@ -609,7 +619,7 @@ namespace casadi {
       for (casadi_int i=0;i<n_out();++i) {
         ret_out[i] = horzsplit(ret_out[i], {0, n*size2_out(i), ret_out[i].size2()})[0];
       }
-      return Function("helper", ret_in, ret_out);
+      return Function("helper", ret_in, ret_out, name_in(), name_out());
     }
   }
 

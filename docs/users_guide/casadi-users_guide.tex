@@ -1735,6 +1735,122 @@ x_opt = r['x']
 print('x_opt: ', x_opt)
 \end{pytexoutput}
 
+\section{For-loop equivalents} \label{sec:forloop}
+
+When modeling using expression graphs in \CasADi, it is a common pattern to use of for-loop constructs of the host language (C++/Python/Matlab).
+
+The graph size will grow linearly with the loop size $N$, and so will the construction time of the expression graph and the initialization time of functions using that expression.
+
+We offer some special constructs that improve on this complexity.
+
+\subsection{Map}
+
+Suppose you are interested in computing a function $f : \mathbb{R}^{n} \rightarrow \mathbb{R}^{m}$ repeatedly on all columns of a matrix $X \in \mathbb{R}^{n \times N}$, and aggregating all results in a result matrix $Y \in \mathbb{R}^{m \times N}$: 
+
+\begin{minipage}[t]{0.5\textwidth} 
+\begin{lstlisting}[language=Python]
+# Python
+ys = []
+for i in range(N):
+  ys.append(f(X[:,i]))
+
+Y = hcat(ys)
+F = Function('f',[X],[Y])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+ys = {};
+for i=1:N
+  ys = {ys{:} f(X(:,i))};
+end
+Y = hcat(ys);
+F = Function('f',{X},{Y});
+\end{lstlisting}
+\end{minipage}
+
+The aggregate function $F : \mathbb{R}^{n \times N} \rightarrow \mathbb{R}^{m \times N}$ can be obtained with the \texttt{map} construct:
+
+\begin{minipage}[t]{0.5\textwidth} 
+\begin{lstlisting}[language=Python]
+# Python
+F = f.map(N)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+F = f.map(N);
+\end{lstlisting}
+\end{minipage}
+
+\CasADi can be instructed to parallelize when $F$ gets evaluated. In the following example, we dedicate 4 threads for the \texttt{map} task.
+
+\begin{minipage}[t]{0.5\textwidth} 
+\begin{lstlisting}[language=Python]
+# Python
+F = f.map(N,"thread",4)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+F = f.map(N,'thread',4);
+\end{lstlisting}
+\end{minipage}
+
+The \texttt{map} operation supports primitive functions $f$ with multiple inputs/outputs which can also be matrices. Aggregation will always happen horizontally.
+
+The \texttt{map} operation exhibits constant graph size and initialization time.
+
+\subsection{Fold}
+
+In case each for-loop iteration depends on the result from the previous iteration, the \texttt{fold} construct applies. In the following, the \texttt{x} variable acts as an accumulater that is initialized by $x_0 \in \mathbb{R}^{n}$:
+\begin{minipage}[t]{0.5\textwidth} 
+\begin{lstlisting}[language=Python]
+# Python
+x = x0
+for i in range(N):
+  x = f(x)
+
+F = Function('f',[x0],[x])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+x = x0;
+for i=1:N
+  x = f(x);
+end
+F = Function('f',{x0},{x});
+\end{lstlisting}
+\end{minipage}
+
+For a given function $f : \mathbb{R}^{n} \rightarrow \mathbb{R}^{n}$, the result function $F : \mathbb{R}^{n} \rightarrow \mathbb{R}^{n}$ can be obtained with the \texttt{fold} construct:
+
+
+\begin{minipage}[t]{0.5\textwidth} 
+\begin{lstlisting}[language=Python]
+# Python
+F = f.fold(N)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+F = f.fold(N);
+\end{lstlisting}
+\end{minipage}
+
+In case intermediate accumulator values are desired as output ($\mathbb{R}^{n} \rightarrow \mathbb{R}^{n \times N}$), use \texttt{mapaccum} instead of \texttt{fold}.
+
+The \texttt{fold}/\texttt{mapaccum} operation supports primitive functions $f$ with multiple inputs/outputs which can also be matrices.
+The first input and output are used for accumulating, while the remainder inputs are read column-wise over the iterations.
+
+The \texttt{map}/\texttt{mapaccum} operation exhibits a graph size and initialization time that scales logarithmically with $N$.
+
 \chapter{Generating C-code}
 
 The numerical evaluation of function objects in \CasADi normally takes place in \emph{virtual machines},

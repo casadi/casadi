@@ -1746,6 +1746,19 @@ class Functiontests(casadiTestCase):
     f = Function('f',[x,y],[x**2,x*y],["x","y"],["w","z"])
     self.assertTrue("(x,y)->(w,z)" in str(f))
 
+  def test_fold(self):
+    x = SX.sym("x",2,2)
+
+    f = Function("f",[x],[sin(x)])
+
+    F = f.fold(10)
+
+    x0 = x
+    for i in range(10):
+      x = f(x)
+    Fref = Function("f",[x0],[x])
+
+    self.checkfunction(F,Fref,inputs=[DM([[1,2],[3,7]])])
 
 if __name__ == '__main__':
     unittest.main()
