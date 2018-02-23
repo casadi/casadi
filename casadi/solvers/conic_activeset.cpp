@@ -106,6 +106,7 @@ namespace casadi {
     alloc_w(nx_+na_, true); // dz
     alloc_w(nx_+na_, true); // dlam
     alloc_w(nx_+na_, true); // kktres
+    alloc_w(nx_, true); // glag
 
     // Memory for numerical solution
     alloc_w(sp_v_.nnz(), true); // v
@@ -280,7 +281,7 @@ namespace casadi {
 
     // Work vectors
     double *kkt, *kktd, *z, *lam, *v, *r, *beta,
-           *dz, *dlam, *lbz, *ubz, *kktres;
+           *dz, *dlam, *lbz, *ubz, *kktres, *glag;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     z = w; w += nx_+na_;
@@ -293,6 +294,7 @@ namespace casadi {
     r = w; w += sp_r_.nnz();
     beta = w; w += nx_+na_;
     kktres = w; w += nx_+na_;
+    glag = w; w += nx_;
 
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
@@ -363,16 +365,16 @@ namespace casadi {
       casadi_mv(a, A_, z, z+nx_, 0);
 
       // Evaluate gradient of the Lagrangian and constraint functions
-      casadi_copy(g, nx_, dz);
-      casadi_mv(h, H_, z, dz, 0); // gradient of the objective
-      casadi_mv(a, A_, lam+nx_, dz, 1); // gradient of the Lagrangian
+      casadi_copy(g, nx_, glag);
+      casadi_mv(h, H_, z, glag, 0); // gradient of the objective
+      casadi_mv(a, A_, lam+nx_, glag, 1); // gradient of the Lagrangian
 
       // Recalculate lam(x), without changing the sign
       for (i=0; i<nx_; ++i) {
         if (lam[i]>0) {
-          lam[i] = fmax(-dz[i], DMIN);
+          lam[i] = fmax(-glag[i], DMIN);
         } else if (lam[i]<0) {
-          lam[i] = fmin(-dz[i], -DMIN);
+          lam[i] = fmin(-glag[i], -DMIN);
         }
       }
 
@@ -396,7 +398,7 @@ namespace casadi {
       double duerr = 0.;
       casadi_int iduerr;
       for (i=0; i<nx_; ++i) {
-        double duerr_trial = fabs(dz[i]+lam[i]);
+        double duerr_trial = fabs(glag[i]+lam[i]);
         if (duerr_trial>duerr) {
           duerr = duerr_trial;
           iduerr = i;
@@ -434,7 +436,7 @@ namespace casadi {
         } else if (lam[i]<0.) {
           kktres[i] = z[i]-lbz[i];
         } else if (i<nx_) {
-          kktres[i] = dz[i]; // gradient of the Lagrangian
+          kktres[i] = glag[i];
         } else {
           kktres[i] = -lam[i];
         }
