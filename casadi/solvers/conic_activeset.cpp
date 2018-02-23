@@ -347,6 +347,9 @@ namespace casadi {
     // No change so far
     bool changed_active_set = true;
 
+    // Stepsize
+    double tau = -1.;
+
     // QP iterations
     casadi_int iter = 0;
     while (true) {
@@ -405,9 +408,15 @@ namespace casadi {
         }
       }
 
+      // Smallest nonzero lambda
+      double lam_min = 0.;
+      for (i=0; i<nx_+na_; ++i) {
+        if (lam[i]!=0. && fabs(lam[i])<lam_min) lam_min = fabs(lam[i]);
+      }
+
       // Print iteration progress:
-      print("Iteration %d: fk=%g, |pr|=%g(%d), |du|=%g(%d)\n",
-            iter, fk, prerr, iprerr, duerr, iduerr);
+      print("Iteration %d: fk=%g, |pr|=%g(%d), |du|=%g(%d), tau=%g, lam_min=%g\n",
+            iter, fk, prerr, iprerr, duerr, iduerr, tau, lam_min);
 
       // Overall error
       double err = fmax(prerr, duerr);
@@ -507,7 +516,7 @@ namespace casadi {
       }
 
       // Get maximum step size and corresponding index and new sign
-      double tau = 1.;
+      tau = 1.;
       casadi_int sign, index=-1;
 
       // Check if the step is nonzero
