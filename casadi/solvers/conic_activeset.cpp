@@ -577,6 +577,32 @@ namespace casadi {
         }
       }
 
+      // If step becomes zero with no change, look for redundant constraints
+      if (tau==0.) {
+        double best = -tol_;
+        // Look for redundant constraints
+        for (i=0; i<nx_+na_; ++i) {
+          // skip inactive constraints
+          if (lam[i]==0.) continue;
+          if (z[i]>lbz[i]+best) {
+            best = z[i]-lbz[i];
+            index = i;
+          } else if (z[i]<ubz[i]-best) {
+            best = ubz[i]-z[i];
+            index = i;
+          }
+        }
+        if (index>=0) {
+          casadi_assert(best>0,
+            "Step rejected since it would cause infeasibility: " + str(best));
+          // index is redundant
+          lam[index] = 0.;
+          changed_active_set = true;
+          continue;
+        }
+        casadi_error("Failed to find a better step");
+      }
+
       if (verbose_) {
         print("tau = %g\n", tau);
       }
