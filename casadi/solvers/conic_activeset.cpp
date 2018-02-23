@@ -527,6 +527,12 @@ namespace casadi {
       // Get maximum step size
       double tau = 1.;
 
+      // Check if the step is nonzero
+      bool zero_step = true;
+      for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dz[i]==0.;
+      for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dlam[i]==0.;
+      if (zero_step) tau = 0.;
+
       // Remember best tau for each constraint
       casadi_fill(w, nx_+na_, -1.);
 
@@ -536,10 +542,13 @@ namespace casadi {
       //  1: Upper bound became active
 
       // Loop over variables and constraints
-      for (i=0; i<nx_+na_; ++i) {
-        // Trial primal step
-        double trial_z=z[i] + tau*dz[i];
+      for (i=0; i<nx_+na_ && tau>0.; ++i) {
+        // Inactive or active?
         if (lam[i]==0.) {
+          // Skip zero steps
+          if (dz[i]==0.) continue;
+          // Trial primal step
+          double trial_z=z[i] + tau*dz[i];
           // Constraint is inactive, check if it becomes active
           if (z[i]>=lbz[i] && trial_z<lbz[i]) {
             tau = (lbz[i]-z[i])/dz[i];
@@ -549,27 +558,25 @@ namespace casadi {
             tau = (ubz[i]-z[i])/dz[i];
             w[i] = tau;
             iw[i] = 1;
-          }
-        } else {
-          if (trial_z<lbz[i]-prerr) {
+          } else if (trial_z<lbz[i]-err) {
             // Trial would increase maximum infeasibility
-            tau = (lbz[i]-prerr-z[i])/dz[i];
+            tau = (lbz[i]-err-z[i])/dz[i];
             w[i] = tau;
             iw[i] = -1;
-          } else if (trial_z>ubz[i]+prerr) {
+          } else if (trial_z>ubz[i]+err) {
             // Trial would increase maximum infeasibility
-            tau = (ubz[i]+prerr-z[i])/dz[i];
+            tau = (ubz[i]+err-z[i])/dz[i];
             w[i] = tau;
             iw[i] = 1;
           }
-        }
-        // Trial dual step
-        double trial_lam = lam[i] + tau*dlam[i];
-        if (lam[i]==0.) {
         } else {
-          // Constraint is active, check for sign changes
+          // Skip zero steps
+          if (dlam[i]==0.) continue;
+          // Trial dual step
+          double trial_lam = lam[i] + tau*dlam[i];
+          // Constraint is active, check for sign changes and violation
           if ((lam[i]>0)!=(trial_lam>0)) {
-            // Sign changes
+            // Sign change
             tau = -lam[i]/dlam[i];
             w[i] = tau;
             iw[i] = 0;
