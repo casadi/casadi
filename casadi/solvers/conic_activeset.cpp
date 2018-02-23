@@ -501,29 +501,6 @@ namespace casadi {
         print_vector("dlam(g)", dlam+nx_, na_);
       }
 
-      // If we're in the feasibility phase, make sure that the feasibility
-      // improves in the iprerr direction
-      if (prerr>=tol_) {
-        i = iprerr;
-        if (dz[i]==0. || (z[i]<lbz[i])==(dz[i]<0)) {
-          // Not a descent direction
-          if (lam[i]==0) {
-            // Add constraint to active set
-            if (z[i] <= lbz[i]) {
-              lam[i] = -DMIN;
-              changed_active_set = true;
-              continue;
-            } else if (z[i] >= ubz[i]) {
-              lam[i] = DMIN;
-              changed_active_set = true;
-              continue;
-            }
-          }
-          casadi_message("Direction does not improve feasibility");
-          continue;
-        }
-      }
-
       // Get maximum step size and corresponding index and new sign
       double tau = 1.;
       casadi_int sign, index=-1;
@@ -578,7 +555,7 @@ namespace casadi {
       }
 
       // If step becomes zero with no change, look for redundant constraints
-      if (tau==0.) {
+      if (tau==0. && index<0) {
         double best = -tol_;
         // Look for redundant constraints
         for (i=0; i<nx_+na_; ++i) {
