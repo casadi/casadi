@@ -726,6 +726,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_norm_2_str, inst);
       break;
     case AUX_NORM_INF:
+      add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_norm_inf_str, inst);
       break;
     case AUX_FILL:
@@ -768,6 +769,7 @@ namespace casadi {
                         << "#endif\n\n";
       break;
     case AUX_FINITE_DIFF:
+      add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_finite_diff_str, inst);
       break;
     case AUX_QR:

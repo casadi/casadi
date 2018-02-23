@@ -14,6 +14,7 @@ struct casadi_finite_diff_mem {
 
 // C-REPLACE "casadi_finite_diff_mem<T1>" "struct casadi_finite_diff_mem"
 // C-REPLACE "std::numeric_limits<T1>::quiet_NaN()" "NAN"
+// C-REPLACE "fmax" "casadi_fmax"
 
 // SYMBOL "forward_diff"
 template<typename T1>
