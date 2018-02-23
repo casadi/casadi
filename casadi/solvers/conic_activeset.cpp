@@ -383,7 +383,7 @@ namespace casadi {
 
       // Look for largest bound violation
       double prerr = 0.;
-      casadi_int iprerr;
+      casadi_int iprerr = -1;
       for (i=0; i<nx_+na_; ++i) {
         if (z[i] > ubz[i]+prerr) {
           prerr = z[i]-ubz[i];
@@ -396,7 +396,7 @@ namespace casadi {
 
       // Calculate dual infeasibility
       double duerr = 0.;
-      casadi_int iduerr;
+      casadi_int iduerr = -1;
       for (i=0; i<nx_; ++i) {
         double duerr_trial = fabs(glag[i]+lam[i]);
         if (duerr_trial>duerr) {
@@ -406,8 +406,8 @@ namespace casadi {
       }
 
       // Print iteration progress:
-      print("Iteration %d: fk=%g, |pr|=%g, |du|=%g\n",
-            iter, fk, prerr, duerr);
+      print("Iteration %d: fk=%g, |pr|=%g(%d), |du|=%g(%d)\n",
+            iter, fk, prerr, iprerr, duerr, iduerr);
 
       // Overall error
       double err = fmax(prerr, duerr);
@@ -488,6 +488,9 @@ namespace casadi {
 
       // Step in lam(x)
       casadi_scal(nx_, -1., dlam);
+
+      // For active constraints, step is zero
+      for (i=0; i<nx_; ++i) if (lam[i]==0.) dlam[i] = 0.;
 
       // Step in lam(g)
       casadi_copy(dz+nx_, na_, dlam+nx_);
