@@ -515,10 +515,8 @@ namespace casadi {
 
       // Loop over variables and constraints
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
-        // Inactive or active?
         if (lam[i]==0.) {
-          // Skip zero steps
-          if (dz[i]==0.) continue;
+          if (dz[i]==0.) continue; // Skip zero steps
           // Trial primal step
           double trial_z=z[i] + tau*dz[i];
           // Constraint is inactive, check if it becomes active
@@ -542,16 +540,14 @@ namespace casadi {
             sign = 1;
           }
         } else {
-          // Skip zero steps
-          if (dlam[i]==0.) continue;
+          if (dlam[i]==0.) continue; // Skip zero steps
           // Trial dual step
           double trial_lam = lam[i] + tau*dlam[i];
-          // Constraint is active, check for sign changes and violation
-          if ((lam[i]>0)!=(trial_lam>0)) {
-            // Sign change
+          if ((lam[i]>0 && trial_lam<=0) || (lam[i]<0 && trial_lam>=0)) {
             tau = -lam[i]/dlam[i];
             index = i;
-            sign = 0;
+            // Don't allow equality constraints to become inactive
+            sign = lbz[i]!=ubz[i] ? 0 : lam[i]>0 ? -DMIN : DMIN;
           }
         }
       }
