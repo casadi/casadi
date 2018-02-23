@@ -380,42 +380,38 @@ namespace casadi {
       fk = casadi_bilin(h, H_, z, z)/2. + casadi_dot(nx_, z, g);
 
       // Look for largest bound violation
-      double maxpr = 0.;
-      casadi_int imaxpr;
+      double prerr = 0.;
+      casadi_int iprerr;
       for (i=0; i<nx_+na_; ++i) {
-        if (z[i] > ubz[i]+maxpr) {
-          maxpr = z[i]-ubz[i];
-          imaxpr = i;
-        } else if (z[i] < lbz[i]-maxpr) {
-          maxpr = lbz[i]-z[i];
-          imaxpr = i;
+        if (z[i] > ubz[i]+prerr) {
+          prerr = z[i]-ubz[i];
+          iprerr = i;
+        } else if (z[i] < lbz[i]-prerr) {
+          prerr = lbz[i]-z[i];
+          iprerr = i;
         }
       }
 
-      // If calculated residual is positive, we need a negative lhs
-      bool negative_lhs = dz[i]+lam[i]>0.;
-
       // Calculate dual infeasibility
-      double maxdu = 0.;
-      casadi_int imaxdu;
+      double duerr = 0.;
+      casadi_int iduerr;
       for (i=0; i<nx_; ++i) {
-        double maxdu_trial = fabs(dz[i]+lam[i]);
-        if (maxdu_trial>maxdu) {
-          maxdu = maxdu_trial;
-          imaxdu = i;
+        double duerr_trial = fabs(dz[i]+lam[i]);
+        if (duerr_trial>duerr) {
+          duerr = duerr_trial;
+          iduerr = i;
         }
       }
 
       // Print iteration progress:
       print("Iteration %d: fk=%g, |pr|=%g, |du|=%g\n",
-            iter, fk, maxpr, maxdu);
+            iter, fk, prerr, duerr);
 
-      // Feasibility and optimality?
-      bool pr_feasible = maxpr<tol_;
-      bool du_feasible = maxdu<tol_;
+      // Overall error
+      double err = fmax(prerr, duerr);
 
-      if (pr_feasible && du_feasible) {
-        // Successful return
+      // Successful return?
+      if (err<tol_) {
         break;
       }
 
@@ -506,9 +502,9 @@ namespace casadi {
       }
 
       // If we're in the feasibility phase, make sure that the feasibility
-      // improves in the imaxpr direction
-      if (!pr_feasible) {
-        i = imaxpr;
+      // improves in the iprerr direction
+      if (prerr>=tol_) {
+        i = iprerr;
         if (dz[i]==0. || (z[i]<lbz[i])==(dz[i]<0)) {
           // Not a descent direction
           if (lam[i]==0) {
@@ -555,14 +551,14 @@ namespace casadi {
             iw[i] = 1;
           }
         } else {
-          if (trial_z<lbz[i]-maxpr) {
+          if (trial_z<lbz[i]-prerr) {
             // Trial would increase maximum infeasibility
-            tau = (lbz[i]-maxpr-z[i])/dz[i];
+            tau = (lbz[i]-prerr-z[i])/dz[i];
             w[i] = tau;
             iw[i] = -1;
-          } else if (trial_z>ubz[i]+maxpr) {
+          } else if (trial_z>ubz[i]+prerr) {
             // Trial would increase maximum infeasibility
-            tau = (ubz[i]+maxpr-z[i])/dz[i];
+            tau = (ubz[i]+prerr-z[i])/dz[i];
             w[i] = tau;
             iw[i] = 1;
           }
