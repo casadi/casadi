@@ -400,11 +400,13 @@ namespace casadi {
       // Calculate dual infeasibility
       double duerr = 0.;
       casadi_int iduerr = -1;
+      bool duerr_pos;
       for (i=0; i<nx_; ++i) {
         double duerr_trial = fabs(glag[i]+lam[i]);
         if (duerr_trial>duerr) {
           duerr = duerr_trial;
           iduerr = i;
+          duerr_pos = glag[i]+lam[i]>0;
         }
       }
 
@@ -647,6 +649,46 @@ namespace casadi {
         changed_active_set = true;
         continue;
       }
+
+      // Try to minimize maximum dual infeasibility, check which bound to enforce
+      casadi_assert(iduerr>=0, "No dual infeasibility");
+      // Check bounds on x
+      double goodness;
+      best = -fabs(kktres[iduerr]); // We want to decrease the dual error
+
+      // Check what happens if we enforce a bound on x
+      index = -1;
+      bool best_is_pos;
+      i = iduerr;
+      bool need_pos = !duerr_pos;
+      if (lam[i]==0) {
+        goodness = need_pos ? z[i]-ubz[i] : lbz[i]-z[i];
+        if (goodness>best) {
+          best=goodness;
+          index=i;
+          best_is_pos = need_pos;
+        }
+      }
+
+      // Check what happens if we enforce a bound on a
+      for (casadi_int k=a_colind[iduerr]; k<a_colind[iduerr+1]; ++k) {
+        if (a[k]==0. || lam[i]!=0.) continue; // not a candidate
+        need_pos = a[k]>0. ? !duerr_pos : duerr_pos; // for negative a, need negative lam[i]
+        i = nx_ + a_row[k];
+        goodness = need_pos ? fabs(a[k])*(z[i]-ubz[i]) : fabs(a[k])*(lbz[i]-z[i]);
+        if (goodness>best) {
+          best=goodness;
+          index=i;
+          best_is_pos = need_pos;
+        }
+      }
+
+      if (index>=0) {
+        lam[index] = best_is_pos ? duerr : -duerr;
+        changed_active_set = true;
+        continue;
+      }
+
       casadi_warning("Step size becomes zero");
       flag = 1;
       break;
