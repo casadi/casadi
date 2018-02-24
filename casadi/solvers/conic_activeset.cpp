@@ -422,7 +422,7 @@ namespace casadi {
       double err = fmax(prerr, duerr);
 
       // Successful return?
-      if (err<tol_) {
+      if (!changed_active_set) {
         flag = 0;
         break;
       }
@@ -519,7 +519,7 @@ namespace casadi {
 
       // Get maximum step size and corresponding index and new sign
       tau = 1.;
-      casadi_int sign, index=-1;
+      casadi_int sign=0, index=-1;
 
       // Check if the step is nonzero
       bool zero_step = true;
@@ -529,27 +529,19 @@ namespace casadi {
 
       // Loop over variables and constraints
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
+        double e = fabs(kktres[i]);
         if (lam[i]==0.) {
           if (dz[i]==0.) continue; // Skip zero steps
           // Trial primal step
           double trial_z=z[i] + tau*dz[i];
-          // Constraint is inactive, check if it becomes active
-          if (z[i]>=lbz[i] && trial_z<lbz[i]) {
-            tau = (lbz[i]-z[i])/dz[i];
+          if (trial_z<lbz[i]-e) {
+            // Trial would increase maximum infeasibility
+            tau = (lbz[i]-e-z[i])/dz[i];
             index = i;
             sign = -1;
-          } else if (z[i]<=ubz[i] && trial_z>ubz[i]) {
-            tau = (ubz[i]-z[i])/dz[i];
-            index = i;
-            sign = 1;
-          } else if (trial_z<lbz[i]-err) {
+          } else if (trial_z>ubz[i]+e) {
             // Trial would increase maximum infeasibility
-            tau = (lbz[i]-err-z[i])/dz[i];
-            index = i;
-            sign = -1;
-          } else if (trial_z>ubz[i]+err) {
-            // Trial would increase maximum infeasibility
-            tau = (ubz[i]+err-z[i])/dz[i];
+            tau = (ubz[i]+e-z[i])/dz[i];
             index = i;
             sign = 1;
           }
@@ -557,11 +549,14 @@ namespace casadi {
           if (dlam[i]==0.) continue; // Skip zero steps
           // Trial dual step
           double trial_lam = lam[i] + tau*dlam[i];
-          if ((lam[i]>0 && trial_lam<0) || (lam[i]<0 && trial_lam>0)) {
-            tau = -lam[i]/dlam[i];
+          if (lam[i]>0 && trial_lam < -e) {
+            tau = -(lam[i]+e)/dlam[i];
             index = i;
-            // Don't allow equality constraints to become inactive
-            sign = lbz[i]!=ubz[i] ? 0 : lam[i]>0 ? -DMIN : DMIN;
+            sign = 0;
+          } else if (lam[i]<0 && trial_lam > e) {
+            tau = -(lam[i]-e)/dlam[i];
+            index = i;
+            sign = 0;
           }
         }
       }
