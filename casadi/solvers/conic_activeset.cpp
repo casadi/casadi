@@ -643,7 +643,7 @@ namespace casadi {
         }
       }
       if (index>=0) {
-        casadi_assert(best>0,
+        casadi_assert(best>=0,
           "Step rejected since it would cause infeasibility: " + str(best));
         // index is redundant
         lam[index] = 0.;
