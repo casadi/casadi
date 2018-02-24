@@ -257,7 +257,7 @@ namespace casadi {
     }
 
     // Local variables
-    casadi_int i;
+    casadi_int i, flag;
     double fk;
     // Get input pointers
     const double *h, *g, *a, *lba, *uba, *lbx, *ubx, *x0, *lam_x0, *lam_a0;
@@ -423,12 +423,14 @@ namespace casadi {
 
       // Successful return?
       if (err<tol_) {
+        flag = 0;
         break;
       }
 
       // Too many iterations?
       if (iter>=max_iter_) {
         casadi_warning("Maximum number of iterations reached");
+        flag = 1;
         break;
       }
 
@@ -650,7 +652,9 @@ namespace casadi {
         changed_active_set = true;
         continue;
       }
-      casadi_error("Failed to find a better step");
+      casadi_warning("Step size becomes zero");
+      flag = 1;
+      break;
     }
 
     // Calculate optimal cost
@@ -661,7 +665,7 @@ namespace casadi {
     casadi_copy(lam, nx_, lam_x);
     casadi_copy(lam+nx_, na_, lam_a);
 
-    return 0;
+    return flag;
   }
 
 } // namespace casadi
