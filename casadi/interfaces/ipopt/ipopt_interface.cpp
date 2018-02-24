@@ -341,6 +341,8 @@ namespace casadi {
     m->obj.clear();
     m->ls_trials.clear();
 
+    // Problem has not been solved at this point
+    m->success = false;
     // Reset number of iterations
     m->n_iter = 0;
 
@@ -353,6 +355,8 @@ namespace casadi {
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
     m->return_status = return_status_string(status);
+    m->success = status==Solve_Succeeded || status==Solved_To_Acceptable_Level
+                 || status==Feasible_Point_Found;
 
     // Save results to outputs
     casadi_copy(m->gk, ng_, m->g);
@@ -596,6 +600,7 @@ namespace casadi {
     auto m = static_cast<IpoptMemory*>(mem);
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter_count;
+    stats["success"] = m->success;
     if (m->inf_pr.size()>0) {
       Dict iterations;
       iterations["inf_pr"] = m->inf_pr;

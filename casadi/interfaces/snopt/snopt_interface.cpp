@@ -197,11 +197,73 @@ namespace casadi {
     return 0;
   }
 
-  std::string SnoptInterface::formatStatus(casadi_int status) const {
+std::map<int, std::string> SnoptInterface::status_ =
+          {{0, "Finished successfully"},
+           {1, "The problem appears to be infeasible"},
+           {2, "The problem appears to be unbounded"},
+           {3, "Resource limit error"},
+           {4, "Terminated after numerical difficulties"},
+           {5, "Error in the user-supplied functions"},
+           {6, "Undefined user-supplied functions"},
+           {7, "User requested termination"},
+           {8, "Insufficient storage allocated"},
+           {9, "Input arguments out of range"},
+           {14, "System error"}};
+
+std::map<int, std::string> SnoptInterface::secondary_status_ =
+                     {{1, "optimality conditions satisfied"},
+                     {2, "feasible point found"},
+                     {3, "requested accuracy could not be achieve"},
+                     {5, "elastic objective minimized"},
+                     {6, "elastic infeasibilities minimized"},
+                     {11, "infeasible linear constraints"},
+                     {12, "infeasible linear equality constraints"},
+                     {13, "nonlinear infeasibilities minimized"},
+                     {14, "linear infeasibilities minimized"},
+                     {15, "infeasible linear constraints in QP subproblem"},
+                     {16, "infeasible nonelastic constraints"},
+                     {21, "unbounded objective"},
+                     {22, "constraint violation limit reached"},
+                     {31, "iteration limit reached"},
+                     {32, "major iteration limit reached"},
+                     {33, "the superbasics limit is too small"},
+                     {34, "time limit reached"},
+                     {41, "current point cannot be improved"},
+                     {42, "singular basis"},
+                     {43, "cannot satisfy the general constraints"},
+                     {44, "ill-conditioned null-space basis"},
+                     {45, "unable to compute acceptable LU factors"},
+                     {51, "incorrect objective derivatives"},
+                     {52, "incorrect constraint derivatives"},
+                     {56, "irregular or badly scaled problem functions"},
+                     {61, "undefined function at the first feasible point"},
+                     {62, "undefined function at the initial point"},
+                     {63, "unable to proceed into undefined region"},
+                     {71, "terminated during function evaluation"},
+                     {74, "terminated from monitor routine"},
+                     {81, "work arrays must have at least 500 elements"},
+                     {82, "not enough character storage"},
+                     {83, "not enough integer storage"},
+                     {84, "not enough real storage"},
+                     {91, "invalid input argument"},
+                     {92, "basis file dimensions do not match this problem"},
+                     {141, "wrong number of basic variables"},
+                     {142, "error in basis package"}};
+
+  std::string SnoptInterface::formatStatus(int status) const {
+    status = status/10;
     if (status_.find(status) == status_.end()) {
       return "Unknown status: " + str(status);
     } else {
       return (*status_.find(status)).second;
+    }
+  }
+
+  std::string SnoptInterface::formatSecondaryStatus(int status) const {
+    if (secondary_status_.find(status) == secondary_status_.end()) {
+      return "Unknown status: " + str(status);
+    } else {
+      return (*secondary_status_.find(status)).second;
     }
   }
 
@@ -228,6 +290,10 @@ namespace casadi {
 
     // Memory object
     snProblem prob;
+
+    // Problem has not been solved at this point
+    m->success = false;
+    m->return_status = -1;
 
     // Evaluate gradF and jacG at initial value
     m->arg[0] = m->x;
@@ -334,14 +400,19 @@ namespace casadi {
     double sInf;
 
     // Run SNOPT
-    casadi_int info = solveC(&prob, Cold_, m_, nx_, nea, nnCon_, nnObj_, nnJac_,
+    int info = solveC(&prob, Cold_, m_, nx_, nea, nnCon_, nnObj_, nnJac_,
                                     iObj_, ObjAdd,
                                     userfunPtr,
                                     get_ptr(m->valJ), get_ptr(m->indJ), get_ptr(m->locJ),
                                     get_ptr(m->bl), get_ptr(m->bu), get_ptr(m->hs),
                                     get_ptr(m->xx), get_ptr(m->pi), get_ptr(m->rc),
                                     &m->f, &nS, &nInf, &sInf);
+    m->success = info<10;
+    m->return_status = info;
     casadi_assert(99 != info, "snopt problem set up improperly");
+
+    if (verbose_) casadi_message("SNOPT return status: " + formatStatus(m->return_status) +
+                                 ":" + formatSecondaryStatus(m->return_status));
 
     // Negate rc to match CasADi's definition
     casadi_scal(nx_ + ng_, -1., get_ptr(m->rc));
@@ -473,6 +544,16 @@ namespace casadi {
     } else {
       *mem_it = nullptr;
     }
+  }
+
+  Dict SnoptInterface::get_stats(void* mem) const {
+    Dict stats = Nlpsol::get_stats(mem);
+    auto m = static_cast<SnoptMemory*>(mem);
+    stats["return_status"] = formatStatus(m->return_status);
+    stats["secondary_return_status"] = formatSecondaryStatus(m->return_status);
+    stats["success"] = m->success;
+
+    return stats;
   }
 
   std::vector<SnoptMemory*> SnoptMemory::mempool;

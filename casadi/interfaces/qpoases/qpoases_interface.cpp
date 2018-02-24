@@ -353,6 +353,10 @@ namespace casadi {
 
     m->fstats.at("preprocessing").tic();
 
+    // Problem has not been solved at this point
+    m->success = false;
+    m->return_status = -1;
+
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
@@ -445,8 +449,13 @@ namespace casadi {
 
     m->fstats.at("postprocessing").tic();
 
+    m->return_status = flag;
+    m->success = flag==qpOASES::SUCCESSFUL_RETURN;
+
+    if (verbose_) casadi_message("qpOASES return status: " + getErrorMessage(m->return_status));
+
     if (flag!=qpOASES::SUCCESSFUL_RETURN && flag!=qpOASES::RET_MAX_NWSR_REACHED) {
-      throw CasadiException("qpOASES failed: " + getErrorMessage(flag));
+      casadi_error("qpOASES failed: " + getErrorMessage(flag));
     }
 
     // Get optimal cost
@@ -910,6 +919,14 @@ namespace casadi {
     m->linsol.solve(get_ptr(m->nz), rhs, nrhs);
 
     return 0;
+  }
+
+  Dict QpoasesInterface::get_stats(void* mem) const {
+    Dict stats = Conic::get_stats(mem);
+    auto m = static_cast<QpoasesMemory*>(mem);
+    stats["return_status"] = getErrorMessage(m->return_status);
+    stats["success"] = m->success;
+    return stats;
   }
 
 } // namespace casadi

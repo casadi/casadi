@@ -78,6 +78,7 @@ namespace casadi {
       obj, alpha_pr, alpha_du;
     std::vector<casadi_int> ls_trials;
     const char* return_status;
+    bool success;
     casadi_int iter_count;
 
     /// Constructor

@@ -57,6 +57,7 @@ namespace casadi {
 
     int return_status;
     int secondary_return_status;
+    bool success;
 
   };
 

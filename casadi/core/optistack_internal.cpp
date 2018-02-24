@@ -377,6 +377,18 @@ std::string OptiNode::return_status() const {
   return "unknown";
 }
 
+bool OptiNode::return_success() const {
+  Dict mystats;
+  try {
+    mystats = stats();
+  } catch (...) {
+    //
+  }
+  if (mystats.find("success")!=mystats.end())
+    return mystats.at("success");
+  return false;
+}
+
 Function OptiNode::casadi_solver() const {
   return solver_;
 }
@@ -923,10 +935,7 @@ OptiSol OptiNode::solve() {
 
   std::string ret = return_status();
 
-  bool success = ret=="Solve_Succeeded" || ret=="Solved_To_Acceptable_Level"
-              || ret=="SUCCESS" || ret=="OptimalSolution";
-
-  casadi_assert(success,
+  casadi_assert(return_success(),
     "Solver failed. You may use opti.debug.value to investigate the latest values of variables."
     " return_status is '" + ret + "'");
 

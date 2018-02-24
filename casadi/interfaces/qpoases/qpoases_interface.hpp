@@ -75,6 +75,9 @@ namespace casadi {
     // Nonzero entries
     std::vector<double> nz;
 
+    int return_status;
+    bool success;
+
     /// Constructor
     QpoasesMemory();
 
@@ -153,6 +156,9 @@ namespace casadi {
 
     /// qpOases printing function
     static void qpoases_printf(const char* s);
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
   protected:
 

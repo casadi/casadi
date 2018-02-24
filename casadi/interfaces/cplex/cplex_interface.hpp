@@ -78,6 +78,9 @@ namespace casadi {
     std::vector<CPXNNZ> a_colind, h_colind;
 
 
+    int return_status;
+    bool success;
+
     /// Constructor
     CplexMemory();
 
@@ -137,6 +140,9 @@ namespace casadi {
 
     /// Can discrete variables be treated
     bool integer_support() const override { return true;}
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     /// All CPLEX options
     Dict opts_;

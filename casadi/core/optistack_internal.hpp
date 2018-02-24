@@ -116,6 +116,8 @@ public:
 
   /// Get return status of solver
   std::string return_status() const;
+  /// Did the solver return successfully?
+  bool return_success() const;
 
   /// Get the underlying CasADi solver of the Opti stack
   Function casadi_solver() const;

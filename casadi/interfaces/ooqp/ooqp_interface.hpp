@@ -81,11 +81,14 @@ namespace casadi {
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /// Throw error
-    static const char* errFlag(casadi_int flag);
+    static const char* errFlag(int flag);
 
     /// Print an OOQP bounds vector
     static std::string printBounds(const std::vector<double>& b,
                                    const std::vector<char>& ib, casadi_int n, const char *sign);
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     // Transpose of linear constraints
     Sparsity spAT_;
@@ -107,6 +110,9 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    mutable int return_status_;
+    mutable bool success_;
 
   };
 

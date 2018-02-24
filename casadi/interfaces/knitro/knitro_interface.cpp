@@ -130,6 +130,9 @@ namespace casadi {
   int KnitroInterface::solve(void* mem) const {
     auto m = static_cast<KnitroMemory*>(mem);
 
+    // Problem has not been solved at this point
+    m->success = false;
+
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert_dev(m->kc==0);
     m->kc = KTR_new();
@@ -250,6 +253,8 @@ namespace casadi {
                 0, 0, 0, 0, 0, static_cast<void*>(m));
     }
     m->return_status = return_codes(status);
+    m->success = status==KTR_RC_OPTIMAL_OR_SATISFACTORY ||
+                 status==KTR_RC_NEAR_OPT;
 
     // Output dual solution
     casadi_copy(get_ptr(lambda), ng_, m->lam_g);
@@ -325,7 +330,7 @@ namespace casadi {
     }
   }
 
-  const char* KnitroInterface::return_codes(casadi_int flag) {
+  const char* KnitroInterface::return_codes(int flag) {
     switch (flag) {
     case KTR_RC_OPTIMAL_OR_SATISFACTORY: return "KTR_RC_OPTIMAL_OR_SATISFACTORY";
     case KTR_RC_NEAR_OPT: return "KTR_RC_NEAR_OPT";
@@ -380,6 +385,15 @@ namespace casadi {
     case KTR_RC_INTERNAL_ERROR: return "KTR_RC_INTERNAL_ERROR";
     }
     return 0;
+  }
+
+  Dict KnitroInterface::get_stats(void* mem) const {
+    Dict stats = Nlpsol::get_stats(mem);
+    auto m = static_cast<KnitroMemory*>(mem);
+    stats["return_status"] = m->return_status;
+    stats["success"] = m->success;
+
+    return stats;
   }
 
   KnitroMemory::KnitroMemory(const KnitroInterface& self) : self(self) {

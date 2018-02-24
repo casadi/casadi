@@ -562,6 +562,8 @@ namespace casadi {
   int Blocksqp::solve(void* mem) const {
     auto m = static_cast<BlocksqpMemory*>(mem);
 
+    m->success = false;
+
     casadi_int ret = 0;
 
     // Create problem evaluation object
@@ -635,6 +637,8 @@ namespace casadi {
     casadi_copy(m->lam_gk, ng_, m->lam_qp+nx_);
 
     ret = run(m, max_iter_, warmstart_);
+
+    m->success = ret==0;
 
     if (ret==1) print("***WARNING: Maximum number of iterations reached\n");
 
@@ -2499,6 +2503,13 @@ namespace casadi {
   lInfConstraintNorm(BlocksqpMemory* m, const double* xk, const double* g) const {
     return fmax(casadi_max_viol(nx_, xk, m->lbx, m->ubx),
                 casadi_max_viol(ng_, g, m->lbg, m->ubg));
+  }
+
+  Dict Blocksqp::get_stats(void* mem) const {
+    Dict stats = Nlpsol::get_stats(mem);
+    auto m = static_cast<BlocksqpMemory*>(mem);
+    stats["success"] = m->success;
+    return stats;
   }
 
 } // namespace casadi

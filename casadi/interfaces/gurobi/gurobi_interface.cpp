@@ -165,6 +165,10 @@ namespace casadi {
 
     m->fstats.at("preprocessing").tic();
 
+    // Problem has not been solved at this point
+    m->success = false;
+    m->return_status = -1;
+
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
@@ -341,6 +345,9 @@ namespace casadi {
       if (verbose_) uout() << "return status: " << return_status_string(optimstatus) <<
         " (" << optimstatus <<")" << std::endl;
 
+      m->return_status = optimstatus;
+      m->success = optimstatus==GRB_OPTIMAL;
+
       // Get the objective value, if requested
       if (cost) {
         flag = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, cost);
@@ -366,6 +373,14 @@ namespace casadi {
     // Show statistics
     if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
     return 0;
+  }
+
+  Dict GurobiInterface::get_stats(void* mem) const {
+    Dict stats = Conic::get_stats(mem);
+    auto m = static_cast<GurobiMemory*>(mem);
+    stats["return_status"] = return_status_string(m->return_status);
+    stats["success"] = m->success;
+    return stats;
   }
 
   GurobiMemory::GurobiMemory() {

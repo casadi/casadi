@@ -339,6 +339,8 @@ namespace casadi {
   int WorhpInterface::solve(void* mem) const {
     auto m = static_cast<WorhpMemory*>(mem);
 
+    // Problem has not been solved at this point
+    m->success = false;
     if (m->lbg && m->ubg) {
       for (casadi_int i=0; i<ng_; ++i) {
         casadi_assert(!(m->lbg[i]==-inf && m->ubg[i] == inf),
@@ -505,12 +507,12 @@ namespace casadi {
 
     m->return_code = m->worhp_c.status;
     m->return_status = return_codes(m->worhp_c.status);
+    m->success = m->return_code > TerminateSuccess;
     return 0;
   }
 
   const char* WorhpInterface::return_codes(casadi_int flag) {
     switch (flag) {
-    case TerminateSuccess: return "TerminateSuccess";
     case OptimalSolution: return "OptimalSolution";
     case OptimalSolutionConstantF: return "OptimalSolutionConstantF";
     case SearchDirectionZero: return "SearchDirectionZero";
@@ -570,6 +572,7 @@ namespace casadi {
     Dict stats = Nlpsol::get_stats(mem);
     auto m = static_cast<WorhpMemory*>(mem);
     stats["return_status"] = m->return_status;
+    stats["success"] = m->success;
     return stats;
   }
 

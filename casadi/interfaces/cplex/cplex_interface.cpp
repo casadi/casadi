@@ -276,6 +276,27 @@ namespace casadi {
     return 0;
   }
 
+
+  inline std::string return_status_string(int status) {
+    switch (status) {
+    case CPX_STAT_OPTIMAL:
+      return "Optimal solution found";
+    case CPX_STAT_UNBOUNDED:
+      return "Model is unbounded";
+    case CPX_STAT_INForUNBD:
+      return "Model is infeasible or unbounded";
+    case CPX_STAT_OPTIMAL_INFEAS:
+      return "Optimal solution is available but with infeasibilities";
+    case CPX_STAT_NUM_BEST:
+      return "Solution available, but not proved optimal due to numeric difficulties";
+    case CPX_STAT_FIRSTORDER:
+      return "Solution satisfies first-order optimality conditions, "
+             "but is not necessarily globally optimal";
+    default:
+      return "unknown";
+    }
+  }
+
   int CplexInterface::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<CplexMemory*>(mem);
@@ -284,6 +305,10 @@ namespace casadi {
     for (auto&& s : m->fstats) s.second.reset();
 
     m->fstats.at("preprocessing").tic();
+
+    // Problem has not been solved at this point
+    m->success = false;
+    m->return_status = -1;
 
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
@@ -469,40 +494,10 @@ namespace casadi {
     casadi_scal(na_, -1., lam_a);
     casadi_scal(nx_, -1., lam_x);
 
-    casadi_int solnstat = CPXXgetstat(m->env, m->lp);
-    stringstream errormsg;
-    // NOTE: Why not print directly to uout() and uerr()?
-    if (verbose_) {
-      if (solnstat == CPX_STAT_OPTIMAL) {
-        errormsg << "CPLEX: solution status: Optimal solution found.\n";
-      } else if (solnstat == CPX_STAT_UNBOUNDED) {
-        errormsg << "CPLEX: solution status: Model is unbounded\n";
-      } else if (solnstat == CPX_STAT_INFEASIBLE) {
-        errormsg << "CPLEX: solution status: Model is infeasible\n";
-      } else if (solnstat == CPX_STAT_INForUNBD) {
-        errormsg << "CPLEX: solution status: Model is infeasible or unbounded\n";
-      } else if (solnstat == CPX_STAT_OPTIMAL_INFEAS) {
-        errormsg << "CPLEX: solution status: Optimal solution "
-            "is available but with infeasibilities\n";
-      } else if (solnstat == CPX_STAT_NUM_BEST) {
-        errormsg << "CPLEX: solution status: Solution available, but not "
-            "proved optimal due to numeric difficulties.\n";
-      } else if (solnstat == CPX_STAT_FIRSTORDER) {
-        errormsg << "CPLEX: solution status: Solution satisfies first-order optimality "
-            "conditions, but is not necessarily globally optimal.\n";
-      } else {
-        errormsg << "CPLEX: solution status: " <<  solnstat << "\n";
-      }
-      uout() << errormsg.str();
+    m->return_status = CPXXgetstat(m->env, m->lp);
+    m->success = m->return_status==CPX_STAT_OPTIMAL || m->return_status==CPX_STAT_FIRSTORDER;
 
-      // Printing basis condition number
-      //double cn;
-      //status = CPXXgetdblquality(m->env, m->lp, &cn, CPX_KAPPA);
-      //uout() << "CPLEX: Basis condition number: " << cn << endl;
-    }
-    if (solnstat != CPX_STAT_OPTIMAL) {
-      //    throw CasadiException(errormsg.c_str());
-    }
+    if (verbose_) casadi_message("CPLEX return status: " + return_status_string(m->return_status));
 
     // Next time we warm start
     if (warm_start_) {
@@ -525,6 +520,15 @@ namespace casadi {
   CplexInterface::~CplexInterface() {
     clear_mem();
   }
+
+  Dict CplexInterface::get_stats(void* mem) const {
+    Dict stats = Conic::get_stats(mem);
+    auto m = static_cast<CplexMemory*>(mem);
+    stats["return_status"] = return_status_string(m->return_status);
+    stats["success"] = m->success;
+    return stats;
+  }
+
 
   CplexMemory::CplexMemory() {
     // Setting warm-start flag
@@ -557,5 +561,7 @@ namespace casadi {
       this->env = 0;
     }
   }
+
+
 
 } // end namespace casadi

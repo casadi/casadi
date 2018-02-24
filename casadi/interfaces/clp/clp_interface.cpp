@@ -215,6 +215,9 @@ namespace casadi {
 
     m->colind.resize(A_.size2()+1);
     m->row.resize(A_.nnz());
+
+    // Problem has not been solved at this point
+    m->success = false;
     return 0;
   }
 
@@ -222,8 +225,10 @@ namespace casadi {
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<ClpMemory*>(mem);
 
-    m->return_status = 0;
-    m->secondary_return_status = 0;
+    // Problem has not been solved at this point
+    m->success = false;
+    m->return_status = -1;
+    m->secondary_return_status = -1;
 
     // Statistics
     for (auto&& s : m->fstats) s.second.reset();
@@ -297,6 +302,7 @@ namespace casadi {
     if (print_time_)  print_fstats(static_cast<ConicMemory*>(mem));
 
     m->return_status = model.status();
+    m->success = m->return_status==0;
     m->secondary_return_status = model.secondaryStatus();
 
     if (verbose_) casadi_message("CLP return status: " + return_status_string(m->return_status));
@@ -322,6 +328,7 @@ namespace casadi {
     auto m = static_cast<ClpMemory*>(mem);
     stats["return_status"] = return_status_string(m->return_status);
     stats["secondary_return_status"] = return_secondary_status_string(m->secondary_return_status);
+    stats["success"] = m->success;
     return stats;
   }
 

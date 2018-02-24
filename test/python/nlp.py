@@ -70,6 +70,7 @@ except:
   pass
 """
 
+
 class NLPtests(casadiTestCase):
   def test_iteration_interrupt(self):
    for Solver, solver_options in solvers:
@@ -181,6 +182,7 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=-100
       solver_in["ubg"]=100
       solver_out = solver(**solver_in)
+      self.assertTrue(solver.stats()["success"])
       self.assertAlmostEqual(solver_out["x"][0],6*pi,6,str(Solver))
 
   def testboundsviol(self):
@@ -223,6 +225,7 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[-10]
       solver_in["ubg"]=[10]
       solver_out = solver(**solver_in)
+      self.assertTrue(solver.stats()["success"])
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["g"][0],1,9,str(Solver))
@@ -245,6 +248,7 @@ class NLPtests(casadiTestCase):
       solver_in["ubg"]=[10]
       solver_in["p"]=1
       solver_out = solver(**solver_in)
+      self.assertTrue(solver.stats()["success"])
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,9,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
@@ -273,6 +277,7 @@ class NLPtests(casadiTestCase):
 
 
       solver_out = solver(**solver_in)
+      self.assertTrue(solver.stats()["success"])
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,7,str(Solver) + str(solver_out["x"][0]-1))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
@@ -293,6 +298,7 @@ class NLPtests(casadiTestCase):
       solver_in["lbx"]=[-10]*2
       solver_in["ubx"]=[10]*2
       solver_out = solver(**solver_in)
+      self.assertTrue(solver.stats()["success"])
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,6,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1,6,str(Solver))
@@ -314,6 +320,7 @@ class NLPtests(casadiTestCase):
       solver_in["lbg"]=[-10]
       solver_in["ubg"]=[10]
       solver_out = solver(**solver_in)
+      self.assertTrue(solver.stats()["success"])
 
       digits = 6
 
@@ -341,6 +348,7 @@ class NLPtests(casadiTestCase):
       solver_in["ubg"]=[10]
 
       solver_out = solver(**solver_in)
+      self.assertTrue(solver.stats()["success"])
       self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
       self.assertAlmostEqual(solver_out["x"][0],1,7,str(Solver))
       self.assertAlmostEqual(solver_out["x"][1],1,7,str(Solver))
@@ -1023,6 +1031,18 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options in solvers:
       with self.assertInException("[p] are free"):
         solver = nlpsol("solver",Solver,{"x":x,"f":(x-p)**2}, solver_options)
+
+  @requires_nlpsol("ipopt")
+  def test_no_success(self):
+
+    x=SX.sym("x")
+    y=SX.sym("y")
+
+    f = (1-x)**2+100*(y-x**2)**2
+    solver = nlpsol("solver","ipopt",{'x':vertcat(x,y), 'f':f,'g':x+y},{"ipopt.max_iter":0})
+    solver(x0=0)
+    self.assertFalse(solver.stats()["success"])
+    
 
   @requires_nlpsol("ipopt")
   def test_iteration_Callback(self):

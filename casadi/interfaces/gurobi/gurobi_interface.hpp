@@ -47,6 +47,9 @@ namespace casadi {
     // Gurobi environment
     GRBenv *env;
 
+    int return_status;
+    bool success;
+
     /// Constructor
     GurobiMemory();
 
@@ -107,6 +110,9 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     // Variable types
     std::vector<char> vtype_;

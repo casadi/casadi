@@ -299,6 +299,9 @@ namespace casadi {
     m->obj.clear();
     m->ls_trials.clear();
 
+    // Problem has not been solved at this point
+    m->success = false;
+
     // Reset number of iterations
     m->n_iter = 0;
 
@@ -475,6 +478,7 @@ namespace casadi {
 
       // Interpret return code
       m->return_status = return_status_string(status);
+      m->success = status==Bonmin::TMINLP::SUCCESS;
 
     } catch(exception& ex) {
       uerr() << "finalize_solution failed: " << ex.what() << endl;
@@ -588,6 +592,7 @@ namespace casadi {
     auto m = static_cast<BonminMemory*>(mem);
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter_count;
+    stats["success"] = m->success;
     return stats;
   }
 

@@ -66,6 +66,9 @@ namespace casadi {
     static std::vector<SnoptMemory*> mempool;
     int memind;
 
+    bool success;
+    int return_status;
+
     /// Constructor
     SnoptMemory(const SnoptInterface& self);
 
@@ -130,12 +133,17 @@ namespace casadi {
     // Solve the NLP
     int solve(void* mem) const override;
 
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
+
     /// Exact Hessian?
     bool exact_hessian_;
 
-    std::map<casadi_int, std::string> status_;
+    static std::map<int, std::string> status_;
+    static std::map<int, std::string> secondary_status_;
 
-    std::string formatStatus(casadi_int status) const;
+    std::string formatStatus(int status) const;
+    std::string formatSecondaryStatus(int status) const;
 
     void userfun(SnoptMemory* m, int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
                  double* x, double* fObj, double*gObj, double* fCon, double* gCon,

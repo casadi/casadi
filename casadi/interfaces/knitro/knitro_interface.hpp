@@ -53,6 +53,7 @@ namespace casadi {
 
     // Stats
     const char* return_status;
+    bool success;
 
     /// Constructor
     KnitroMemory(const KnitroInterface& self);
@@ -121,7 +122,10 @@ namespace casadi {
                         double * const hessVector, void *userParams);
 
     // KNITRO return codes
-    static const char* return_codes(casadi_int flag);
+    static const char* return_codes(int flag);
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     // KNITRO options
     Dict opts_;

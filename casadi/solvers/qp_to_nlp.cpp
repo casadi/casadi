@@ -184,4 +184,13 @@ namespace casadi {
     return solver_(arg1, res1, iw, w, 0);
   }
 
+  Dict QpToNlp::get_stats(void* mem) const {
+    Dict stats;
+    Dict solver_stats = solver_.stats();
+    stats["solver_stats"] = solver_stats;
+    stats["success"] = solver_stats["success"];
+
+    return stats;
+  }
+
 } // namespace casadi

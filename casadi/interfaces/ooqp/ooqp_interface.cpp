@@ -145,6 +145,9 @@ namespace casadi {
 
   int OoqpInterface::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+
+    return_status_ = -1;
+    success_ = false;
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
@@ -408,6 +411,8 @@ namespace casadi {
       }
     }
 
+    return_status_ = ierr;
+    success_ = ierr==SUCCESSFUL_TERMINATION;
     if (ierr>0) {
       casadi_warning("Unable to solve problem: " + str(errFlag(ierr)));
     } else if (ierr<0) {
@@ -469,7 +474,7 @@ namespace casadi {
     return 0;
   }
 
-  const char* OoqpInterface::errFlag(casadi_int flag) {
+  const char* OoqpInterface::errFlag(int flag) {
     // Find the error
     //const char* msg;
     switch (flag) {
@@ -480,6 +485,13 @@ namespace casadi {
     case UNKNOWN:                return  "UNKNOWN";
     default:                     return  "N/A";
     }
+  }
+
+  Dict OoqpInterface::get_stats(void* mem) const {
+    Dict stats = Conic::get_stats(mem);
+    stats["return_status"] = return_status_;
+    stats["success"] = success_;
+    return stats;
   }
 
   std::string OoqpInterface::printBounds(const std::vector<double>& b,
