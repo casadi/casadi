@@ -6906,17 +6906,22 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback "
+%feature("docstring") casadi::Callback::reverse "
 
->  casadi::Callback::Callback()
-------------------------------------------------------------------------
+Get a function that calculates nadj adjoint derivatives.
 
-Default constructor.
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
 
->  casadi::Callback::Callback(const Callback &obj)
-------------------------------------------------------------------------
+(n_in = n_in(), n_out = n_out())
 
-Copy constructor (throws an error)
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -7127,22 +7132,17 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::Callback::reverse "
+%feature("docstring") casadi::Callback::Callback "
 
-Get a function that calculates nadj adjoint derivatives.
+>  casadi::Callback::Callback()
+------------------------------------------------------------------------
 
-Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
-first n_in inputs correspond to nondifferentiated inputs. The next n_out
-inputs correspond to nondifferentiated outputs. and the last n_out inputs
-correspond to adjoint seeds, stacked horizontally The n_in outputs
-correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
-n_out = n_out())
+Default constructor.
 
-(n_in = n_in(), n_out = n_out())
+>  casadi::Callback::Callback(const Callback &obj)
+------------------------------------------------------------------------
 
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+Copy constructor (throws an error)
 
 ";
 
@@ -7297,6 +7297,59 @@ Get class name.
 %feature("docstring") casadi::Callback::get_str "
 
 Get string representation.
+
+";
+
+%feature("docstring") casadi::Callback::fold "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+Mapaccum has the following benefits over writing an equivalent for- loop:
+much faster at construction time
+
+potentially much faster compilation times (for codegen)
+
+offers a trade-off between memory and evaluation time
+
+The base (settable through the options dictionary, default 10), is used to
+create a tower of function calls, containing unrolled for- loops of length
+maximum base.
+
+This technique is much more scalable in terms of memory-usage, but slightly
+slower at evaluation, than a plain for-loop. The effect is similar to that
+of a for-loop with a check-pointing instruction after each chunk of
+iterations with size base.
+
+Set base to -1 to unroll all the way; no gains in memory efficiency here.
 
 ";
 
@@ -11168,37 +11221,387 @@ function in a specific language.
 ";
 
 
-// File: classcasadi_1_1ConicAs.xml
-%feature("docstring") casadi::ConicAs::has_derivative "[INTERNAL]  Can
-derivatives be calculated in any way?
+// File: classcasadi_1_1ConicActiveSet.xml
+%feature("docstring") casadi::ConicActiveSet::jit_dependencies "[INTERNAL]
+Jit dependencies.
 
 ";
 
-%feature("docstring") casadi::ConicAs::matching_arg "[INTERNAL]  Check if
-input arguments that needs to be replaced.
+%feature("docstring") casadi::ConicActiveSet::sx_in "[INTERNAL]  Get
+function input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::ConicAs::has_function "[INTERNAL] ";
-
-%feature("docstring") casadi::ConicAs::codegen_meta "[INTERNAL]  Generate
-meta-information allowing a user to evaluate a generated function.
+%feature("docstring") casadi::ConicActiveSet::sz_iw "[INTERNAL]  Get
+required length of iw field.
 
 ";
 
-%feature("docstring") casadi::ConicAs::fwd_seed "[INTERNAL]  Symbolic
-expressions for the forward seeds.
+%feature("docstring") casadi::ConicActiveSet::alloc "[INTERNAL]  Ensure
+work vectors long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::ConicAs::print_options "[INTERNAL]  Print
-list of options.
+%feature("docstring") casadi::ConicActiveSet::get_n_in "[INTERNAL]  Number
+of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::ConicAs "
+%feature("docstring") casadi::ConicActiveSet::replace_fseed "[INTERNAL]
+Replace 0-by-0 forward seeds.
 
-'as' plugin for Conic
+";
+
+%feature("docstring") casadi::ConicActiveSet::sz_arg "[INTERNAL]  Get
+required length of arg field.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::replace_res "[INTERNAL]
+Replace 0-by-0 outputs.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::export_code "[INTERNAL]
+Export function in a specific language.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::get_jac "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::codegen_meta "[INTERNAL]
+Generate meta-information allowing a user to evaluate a generated function.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::free_mem "[INTERNAL]  Free
+memory block.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::sp_forward "[INTERNAL]
+Propagate sparsity forward.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::alloc_w "[INTERNAL]  Ensure
+required length of w field.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::has_spfwd "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::get_name_out "[INTERNAL]
+Names of function input and outputs.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::sparsity_jac "[INTERNAL]
+Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::print_option "[INTERNAL]
+Print all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::sprint "[INTERNAL]  C-style
+formatted printing to string.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::wrap "[INTERNAL]  Wrap in an
+Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::sp_weight "[INTERNAL]
+Weighting factor for chosing forward/reverse mode, sparsity propagation.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::size1_in "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::generate_lifted "[INTERNAL]
+Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::get_abstol "[INTERNAL]  Get
+absolute tolerance.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::print_vector "[INTERNAL]
+Print a vector
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::replace_arg "[INTERNAL]
+Replace 0-by-0 inputs.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::free_mx "[INTERNAL]  Get free
+variables ( MX)
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::slice "[INTERNAL]  returns a
+new function with a selection of inputs/outputs of the original
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::jac "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::get_default_in "[INTERNAL]
+Get default input value.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::setup "[INTERNAL]  Set the
+(persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::integer_support "[INTERNAL]
+Can discrete variables be treated.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::codegen_body "[INTERNAL]
+Generate code for the function body.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::call "[INTERNAL]   Call a
+function, templated.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::size_out "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::codegen "[INTERNAL]  Generate
+code the function.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::fwdViaJac "[INTERNAL]
+Calculate derivatives by multiplying the full Jacobian and multiplying.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::init "[INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::uses_output "[INTERNAL]  Do
+the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::self "[INTERNAL]  Get a
+public class instance.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::print_options "[INTERNAL]
+Print list of options.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::check_res "[INTERNAL]  Check
+if output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::fwd_seed "[INTERNAL]
+Symbolic expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::get_reltol "[INTERNAL]  Get
+relative tolerance.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::instruction_id "[INTERNAL]
+Get an atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::set_work "[INTERNAL]  Set the
+(persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::eval_sx "[INTERNAL]  Evaluate
+with symbolic scalars.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::ad_weight "[INTERNAL]
+Weighting factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::instruction_input "[INTERNAL]
+Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::print "[INTERNAL]  C-style
+formatted printing during evaluation.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::getAdaptorSolverName "[INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::all_scalar "[INTERNAL]  Are
+all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::codegen_declarations "[INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::generate_dependencies "[INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::codegen_incref "[INTERNAL]
+Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::matching_res "[INTERNAL]
+Check if output arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::get_jacobian_sparsity "[INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::set_temp "[INTERNAL]  Set the
+(temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::which_depends "[INTERNAL]
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::n_nodes "[INTERNAL]  Number
+of nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::has_free "[INTERNAL]  Does
+the function have free variables.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::alloc_iw "[INTERNAL]  Ensure
+required length of iw field.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::get_partition "[INTERNAL]
+Get the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::sparsity_in "[INTERNAL]
+Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::print_dimensions "[INTERNAL]
+Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::is_a "[INTERNAL]  Check if
+the function is of a particular type.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::get_max_in "[INTERNAL]  Get
+largest input value.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::numel_in "[INTERNAL]  Number
+of input/output elements.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::~ConicActiveSet "[INTERNAL]
+Destructor.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::get_reverse "[INTERNAL]
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::numel_out "[INTERNAL]  Number
+of input/output elements.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::generateNativeCode "[INTERNAL]  Generate native code in the interfaced language for debugging
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::mx_in "[INTERNAL]  Get
+function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::get_sparsity_out "[INTERNAL]
+Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet "
+
+'activeset' plugin for Conic
 
 Solve QPs using an active-set method
 
@@ -11218,552 +11621,176 @@ Joel Andersson
 
 >List of available options
 
-+----------+---------------+-----------------------------+-----------------+
-|    Id    |     Type      |         Description         |     Used in     |
-+==========+===============+=============================+=================+
-| discrete | OT_BOOLVECTOR | Indicates which of the      | casadi::Conic   |
-|          |               | variables are discrete,     |                 |
-|          |               | i.e. integer-valued         |                 |
-+----------+---------------+-----------------------------+-----------------+
-| du_tol   | OT_DOUBLE     | Dual tolerance [1e-8].      | casadi::ConicAs |
-+----------+---------------+-----------------------------+-----------------+
-| max_iter | OT_INT        | Maximum number of           | casadi::ConicAs |
-|          |               | iterations [1000].          |                 |
-+----------+---------------+-----------------------------+-----------------+
-| pr_tol   | OT_DOUBLE     | Primal tolerance [1e-8].    | casadi::ConicAs |
-+----------+---------------+-----------------------------+-----------------+
++----------+---------------+-----------------------+-----------------------+
+|    Id    |     Type      |      Description      |        Used in        |
++==========+===============+=======================+=======================+
+| discrete | OT_BOOLVECTOR | Indicates which of    | casadi::Conic         |
+|          |               | the variables are     |                       |
+|          |               | discrete, i.e.        |                       |
+|          |               | integer-valued        |                       |
++----------+---------------+-----------------------+-----------------------+
+| du_tol   | OT_DOUBLE     | Dual tolerance        | casadi::ConicActiveSe |
+|          |               | [1e-8].               | t                     |
++----------+---------------+-----------------------+-----------------------+
+| max_iter | OT_INT        | Maximum number of     | casadi::ConicActiveSe |
+|          |               | iterations [1000].    | t                     |
++----------+---------------+-----------------------+-----------------------+
+| pr_tol   | OT_DOUBLE     | Primal tolerance      | casadi::ConicActiveSe |
+|          |               | [1e-8].               | t                     |
++----------+---------------+-----------------------+-----------------------+
 
 Diagrams
 --------
 
 
 
-C++ includes: conic_as.hpp ";
+C++ includes: conic_activeset.hpp ";
 
-%feature("docstring") casadi::ConicAs::eval_sx "[INTERNAL]  Evaluate with
-symbolic scalars.
-
-";
-
-%feature("docstring") casadi::ConicAs::getJacSparsity "[INTERNAL]  Generate
-the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring") casadi::ConicAs::slice "[INTERNAL]  returns a new
-function with a selection of inputs/outputs of the original
-
-";
-
-%feature("docstring") casadi::ConicAs::has_jacobian "[INTERNAL]  Return
-Jacobian of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring") casadi::ConicAs::size_out "[INTERNAL]  Input/output
-dimensions.
-
-";
-
-%feature("docstring") casadi::ConicAs::replace_aseed "[INTERNAL]  Replace
-0-by-0 reverse seeds.
-
-";
-
-%feature("docstring") casadi::ConicAs::serialize_header "[INTERNAL]
-Serialize function header.
-
-";
-
-%feature("docstring") casadi::ConicAs::uses_output "[INTERNAL]  Do the
-derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring") casadi::ConicAs::get_jacobian_sparsity "[INTERNAL]
-Get Jacobian sparsity.
-
-";
-
-%feature("docstring") casadi::ConicAs::n_instructions "[INTERNAL]  Get the
-number of atomic operations.
-
-";
-
-%feature("docstring") casadi::ConicAs::nnz_in "[INTERNAL]  Number of
+%feature("docstring") casadi::ConicActiveSet::nnz_in "[INTERNAL]  Number of
 input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::ConicAs::sparsity_out "[INTERNAL]
-Input/output sparsity.
-
-";
-
-%feature("docstring") casadi::ConicAs::sp_forward "[INTERNAL]  Propagate
-sparsity forward.
-
-";
-
-%feature("docstring") casadi::ConicAs::self "[INTERNAL]  Get a public class
-instance.
-
-";
-
-%feature("docstring") casadi::ConicAs::which_depends "[INTERNAL]  Which
-variables enter with some order.
-
-Parameters:
------------
-
-s_in:   Input name
-
-s_out:   Output name(s)
-
-order:  Only 1 (linear) and 2 (nonlinear) allowed
-
-tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring") casadi::ConicAs::has_sprev "[INTERNAL]  Is the class
-able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::ConicAs::plugin_name "[INTERNAL] ";
-
-%feature("docstring") casadi::ConicAs::jacobian "[INTERNAL]  Return
-Jacobian of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring") casadi::ConicAs::sp_weight "[INTERNAL]  Weighting
-factor for chosing forward/reverse mode, sparsity propagation.
-
-";
-
-%feature("docstring") casadi::ConicAs::alloc "[INTERNAL]  Ensure work
-vectors long enough to evaluate function.
-
-";
-
-%feature("docstring") casadi::ConicAs::instruction_constant "[INTERNAL]
-Get the floating point output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::ConicAs::instruction_id "[INTERNAL]  Get an
-atomic operation operator index.
-
-";
-
-%feature("docstring") casadi::ConicAs::size1_in "[INTERNAL]  Input/output
-dimensions.
-
-";
-
-%feature("docstring") casadi::ConicAs::numel_in "[INTERNAL]  Number of
-input/output elements.
-
-";
-
-%feature("docstring") casadi::ConicAs::getJacSparsityHierarchicalSymm "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition for symmetric Jacobians
-
-";
-
-%feature("docstring") casadi::ConicAs::has_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(casadi_int nfwd) if
-no cached version is available.
-
-";
-
-%feature("docstring") casadi::ConicAs::numel_out "[INTERNAL]  Number of
-input/output elements.
-
-";
-
-%feature("docstring") casadi::ConicAs::codegen_decref "[INTERNAL]  Codegen
-decref for dependencies.
-
-";
-
-%feature("docstring") casadi::ConicAs::get_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(casadi_int nadj) if
-no cached version is available.
-
-";
-
-%feature("docstring") casadi::ConicAs::get_options "[INTERNAL]  Options.
-
-";
-
-%feature("docstring") casadi::ConicAs::signature "[INTERNAL]  Code generate
-the function.
-
-";
-
-%feature("docstring") casadi::ConicAs::eval_mx "[INTERNAL]  Evaluate with
-symbolic matrices.
-
-";
-
-%feature("docstring") casadi::ConicAs::ConicAs "[INTERNAL]  Create a new
-Solver.
-
-";
-
-%feature("docstring") casadi::ConicAs::get_default_in "[INTERNAL]  Get
-default input value.
-
-";
-
-%feature("docstring") casadi::ConicAs::has_free "[INTERNAL]  Does the
-function have free variables.
-
-";
-
-%feature("docstring") casadi::ConicAs::generate_lifted "[INTERNAL]  Extract
-the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring") casadi::ConicAs::init_mem "[INTERNAL]  Initalize
-memory block.
-
-";
-
-%feature("docstring") casadi::ConicAs::reverse "[INTERNAL]  Return function
-that calculates adjoint derivatives reverse(nadj) returns a cached instance
-if available, and calls  Function get_reverse(casadi_int nadj) if no cached
-version is available.
-
-";
-
-%feature("docstring") casadi::ConicAs::print_option "[INTERNAL]  Print all
-information there is to know about a certain option.
-
-";
-
-%feature("docstring") casadi::ConicAs::disp "[INTERNAL]  Display object.
-
-";
-
-%feature("docstring") casadi::ConicAs::free_sx "[INTERNAL]  Get free
-variables (SX)
-
-";
-
-%feature("docstring") casadi::ConicAs::alloc_w "[INTERNAL]  Ensure required
-length of w field.
-
-";
-
-%feature("docstring") casadi::ConicAs::mapsum_mx "[INTERNAL]  Parallel
-evaluation.
-
-";
-
-%feature("docstring") casadi::ConicAs::sparsity_jac "[INTERNAL]  Get, if
-necessary generate, the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring") casadi::ConicAs::instruction_input "[INTERNAL]  Get
-the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring") casadi::ConicAs::get_reltol "[INTERNAL]  Get relative
-tolerance.
-
-";
-
-%feature("docstring") casadi::ConicAs::all_scalar "[INTERNAL]  Are all
-inputs and outputs scalar.
-
-";
-
-%feature("docstring") casadi::ConicAs::free_mx "[INTERNAL]  Get free
-variables ( MX)
-
-";
-
-%feature("docstring") casadi::ConicAs::weak "[INTERNAL]  Get a weak
-reference to the object.
-
-";
-
-%feature("docstring") casadi::ConicAs::has_codegen "[INTERNAL]  Is codegen
-supported?
-
-";
-
-%feature("docstring") casadi::ConicAs::memory "[INTERNAL]  Memory objects.
-
-";
-
-%feature("docstring") casadi::ConicAs::has_reverse "[INTERNAL]  Return
-function that calculates adjoint derivatives reverse(nadj) returns a cached
-instance if available, and calls  Function get_reverse(casadi_int nadj) if
-no cached version is available.
-
-";
-
-%feature("docstring") casadi::ConicAs::codegen_sparsities "[INTERNAL]
-Codegen sparsities.
-
-";
-
-%feature("docstring") casadi::ConicAs::get_name_in "[INTERNAL]  Names of
-function input and outputs.
-
-";
-
-%feature("docstring") casadi::ConicAs::adjViaJac "[INTERNAL]  Calculate
-derivatives by multiplying the full Jacobian and multiplying.
-
-";
-
-%feature("docstring") casadi::ConicAs::codegen_declarations "[INTERNAL]
-Generate code for the declarations of the C function.
-
-";
-
-%feature("docstring") casadi::ConicAs::mx_in "[INTERNAL]  Get function
-input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::ConicAs::sz_iw "[INTERNAL]  Get required
-length of iw field.
-
-";
-
-%feature("docstring") casadi::ConicAs::has_jac "[INTERNAL]  Return Jacobian
-of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring") casadi::ConicAs::print "[INTERNAL]  C-style formatted
-printing during evaluation.
-
-";
-
-%feature("docstring") casadi::ConicAs::codegen_body "[INTERNAL]  Generate
-code for the function body.
-
-";
-
-%feature("docstring") casadi::ConicAs::call_gen "[INTERNAL]   Call a
-function, overloaded.
-
-";
-
-%feature("docstring") casadi::ConicAs::class_name "[INTERNAL]  Readable
-name of the internal class.
-
-";
-
-%feature("docstring") casadi::ConicAs::get_forward "[INTERNAL]  Return
-function that calculates forward derivatives forward(nfwd) returns a cached
-instance if available, and calls  Function get_forward(casadi_int nfwd) if
-no cached version is available.
-
-";
-
-%feature("docstring") casadi::ConicAs::release "[INTERNAL]  Release a
-memory object.
-
-";
-
-%feature("docstring") casadi::ConicAs::disp_more "[INTERNAL]  Print more.
-
-";
-
-%feature("docstring") casadi::ConicAs::getAdaptorSolverName "[INTERNAL]
-Obtain solver name from Adaptor.
-
-";
-
-%feature("docstring") casadi::ConicAs::alloc_res "[INTERNAL]  Ensure
+%feature("docstring") casadi::ConicActiveSet::sz_res "[INTERNAL]  Get
 required length of res field.
 
 ";
 
-%feature("docstring") casadi::ConicAs::check_arg "[INTERNAL]  Check if
-input arguments have correct length and dimensions.
+%feature("docstring") casadi::ConicActiveSet::matching_arg "[INTERNAL]
+Check if input arguments that needs to be replaced.
 
 ";
 
-%feature("docstring") casadi::ConicAs::generateNativeCode "[INTERNAL]
-Generate native code in the interfaced language for debugging
+%feature("docstring") casadi::ConicActiveSet::size2_in "[INTERNAL]
+Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::ConicAs::serialize "[INTERNAL]  Serialize.
+%feature("docstring") casadi::ConicActiveSet::eval_dm "[INTERNAL]  Evaluate
+with DM matrices.
 
 ";
 
-%feature("docstring") casadi::ConicAs::eval_dm "[INTERNAL]  Evaluate with
-DM matrices.
+%feature("docstring") casadi::ConicActiveSet::sz_work "[INTERNAL]  Get
+number of temporary variables needed.
 
 ";
 
-%feature("docstring") casadi::ConicAs::checkout "[INTERNAL]  Checkout a
-memory object.
+%feature("docstring") casadi::ConicActiveSet::get_free "[INTERNAL]  Print
+free variables.
 
 ";
 
-%feature("docstring") casadi::ConicAs::getJacSparsityGen "[INTERNAL]  Get
-the sparsity pattern, forward mode.
+%feature("docstring") casadi::ConicActiveSet::n_instructions "[INTERNAL]
+Get the number of atomic operations.
 
 ";
 
-%feature("docstring") casadi::ConicAs::info "[INTERNAL]  Obtain information
-about function
+%feature("docstring") casadi::ConicActiveSet::adjViaJac "[INTERNAL]
+Calculate derivatives by multiplying the full Jacobian and multiplying.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_sparsity_in "[INTERNAL]
-Sparsities of function inputs and outputs.
+%feature("docstring") casadi::ConicActiveSet::instruction_MX "[INTERNAL]
+get MX expression associated with instruction
 
 ";
 
-%feature("docstring") casadi::ConicAs::replace_fseed "[INTERNAL]  Replace
-0-by-0 forward seeds.
+%feature("docstring") casadi::ConicActiveSet::has_jacobian "[INTERNAL]
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::ConicAs::~ConicAs "[INTERNAL]  Destructor.
+%feature("docstring") casadi::ConicActiveSet::has_sprev "[INTERNAL]  Is the
+class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::ConicAs::fwdViaJac "[INTERNAL]  Calculate
-derivatives by multiplying the full Jacobian and multiplying.
+%feature("docstring") casadi::ConicActiveSet::alloc_arg "[INTERNAL]  Ensure
+required length of arg field.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_stats "[INTERNAL]  Get all
-statistics.
+%feature("docstring") casadi::ConicActiveSet::getJacSparsityHierarchicalSymm
+"[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::ConicAs::finalize "[INTERNAL]  Finalize the
-object creation.
+%feature("docstring") casadi::ConicActiveSet::sparsity_out "[INTERNAL]
+Input/output sparsity.
 
 ";
 
-%feature("docstring") casadi::ConicAs::index_out "[INTERNAL]  Get output
-scheme index by name.
+%feature("docstring") casadi::ConicActiveSet::get_stats "[INTERNAL]  Get
+all statistics.
 
 ";
 
-%feature("docstring") casadi::ConicAs::size1_out "[INTERNAL]  Input/output
-dimensions.
+%feature("docstring") casadi::ConicActiveSet::getJacSparsityGen "[INTERNAL]
+Get the sparsity pattern, forward mode.
 
 ";
 
-%feature("docstring") casadi::ConicAs::symbolicAdjSeed "[INTERNAL]
-Symbolic expressions for the adjoint seeds.
+%feature("docstring") casadi::ConicActiveSet::weak "[INTERNAL]  Get a weak
+reference to the object.
 
 ";
 
-%feature("docstring") casadi::ConicAs::set_work "[INTERNAL]  Set the
-(persistent) work vectors.
+%feature("docstring") casadi::ConicActiveSet::size_in "[INTERNAL]
+Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::ConicAs::factory "[INTERNAL] ";
-
-%feature("docstring") casadi::ConicAs::replace_res "[INTERNAL]  Replace
-0-by-0 outputs.
+%feature("docstring") casadi::ConicActiveSet::getJacSparsity "[INTERNAL]
+Generate the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::ConicAs::jit_dependencies "[INTERNAL]  Jit
-dependencies.
+%feature("docstring") casadi::ConicActiveSet::free_sx "[INTERNAL]  Get free
+variables (SX)
 
 ";
 
-%feature("docstring") casadi::ConicAs::sz_w "[INTERNAL]  Get required
-length of w field.
+%feature("docstring") casadi::ConicActiveSet::forward "[INTERNAL]  Return
+function that calculates forward derivatives forward(nfwd) returns a cached
+instance if available, and calls  Function get_forward(casadi_int nfwd) if
+no cached version is available.
 
 ";
 
-%feature("docstring") casadi::ConicAs::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition.
+%feature("docstring") casadi::ConicActiveSet::eval_mx "[INTERNAL]  Evaluate
+with symbolic matrices.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_max_in "[INTERNAL]  Get largest
-input value.
+%feature("docstring") casadi::ConicActiveSet::codegen_sparsities "[INTERNAL]  Codegen sparsities.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_sparsity_out "[INTERNAL]
-Sparsities of function inputs and outputs.
+%feature("docstring") casadi::ConicActiveSet::construct "[INTERNAL]
+Construct Prepares the function for evaluation.
 
 ";
 
-%feature("docstring") casadi::ConicAs::n_nodes "[INTERNAL]  Number of nodes
-in the algorithm.
+%feature("docstring") casadi::ConicActiveSet::get_forward "[INTERNAL]
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::ConicAs::check_inputs "[INTERNAL]  Check if
-the numerical values of the supplied bounds make sense.
+%feature("docstring") casadi::ConicActiveSet::serialize_header "[INTERNAL]
+Serialize function header.
 
 ";
 
-%feature("docstring") casadi::ConicAs::init "[INTERNAL]  Initialize.
+%feature("docstring") casadi::ConicActiveSet::has_jac "[INTERNAL]  Return
+Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::ConicAs::call "[INTERNAL]   Call a function,
-templated.
-
-";
-
-%feature("docstring") casadi::ConicAs::call_reverse "[INTERNAL]  Reverse
-mode, virtual functions overloaded in derived classes.
-
-";
-
-%feature("docstring") casadi::ConicAs::sz_arg "[INTERNAL]  Get required
-length of arg field.
-
-";
-
-%feature("docstring") casadi::ConicAs::set_temp "[INTERNAL]  Set the
-(temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::ConicAs::alloc_mem "[INTERNAL]  Create memory
-block.
-
-";
-
-%feature("docstring") casadi::ConicAs::size_in "[INTERNAL]  Input/output
-dimensions.
-
-";
-
-%feature("docstring") casadi::ConicAs::export_code "[INTERNAL]  Export
-function in a specific language.
-
-";
-
-%feature("docstring") casadi::ConicAs::matching_res "[INTERNAL]  Check if
-output arguments that needs to be replaced.
-
-";
-
-%feature("docstring") casadi::ConicAs::eval_gen "
+%feature("docstring") casadi::ConicActiveSet::eval_gen "
 
 >  int casadi::FunctionInternal::eval_gen(const double **arg, double **res, casadi_int *iw, double *w, void *mem) const 
 ------------------------------------------------------------------------
@@ -11779,256 +11806,300 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::ConicAs::sx_out "[INTERNAL]  Get function
-input(s) and output(s)
+%feature("docstring") casadi::ConicActiveSet::has_forward "[INTERNAL]
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::ConicAs::wrap "[INTERNAL]  Wrap in an
-Function instance consisting of only one MX call.
+%feature("docstring") casadi::ConicActiveSet::definition "[INTERNAL]  Get
+function signature: name:(inputs)->(outputs)
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_partition "[INTERNAL]  Get the
-unidirectional or bidirectional partition.
+%feature("docstring") casadi::ConicActiveSet::checkout "[INTERNAL]
+Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::ConicAs::check_res "[INTERNAL]  Check if
-output arguments have correct length and dimensions.
+%feature("docstring") casadi::ConicActiveSet::mapsum_mx "[INTERNAL]
+Parallel evaluation.
 
 ";
 
-%feature("docstring") casadi::ConicAs::setup "[INTERNAL]  Set the
-(persistent and temporary) work vectors.
+%feature("docstring") casadi::ConicActiveSet::alloc_mem "[INTERNAL]  Create
+memory block.
 
 ";
 
-%feature("docstring") casadi::ConicAs::oracle "[INTERNAL]  Get oracle.
+%feature("docstring") casadi::ConicActiveSet::instruction_output "[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::ConicAs::replace_arg "[INTERNAL]  Replace
-0-by-0 inputs.
+%feature("docstring") casadi::ConicActiveSet::plugin_name "[INTERNAL] ";
+
+%feature("docstring") casadi::ConicActiveSet::ConicActiveSet "[INTERNAL]
+Create a new Solver.
 
 ";
 
-%feature("docstring") casadi::ConicAs::is_a "[INTERNAL]  Check if the
-function is of a particular type.
+%feature("docstring") casadi::ConicActiveSet::getJacSparsityHierarchical "[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
 
 ";
 
-%feature("docstring") casadi::ConicAs::eval "[INTERNAL]  Evaluate
-numerically.
+%feature("docstring") casadi::ConicActiveSet::get_options "[INTERNAL]
+Options.
 
 ";
 
-%feature("docstring") casadi::ConicAs::sx_in "[INTERNAL]  Get function
-input(s) and output(s)
+%feature("docstring") casadi::ConicActiveSet::print_ivector "[INTERNAL]
+Print an integer vector
 
 ";
 
-%feature("docstring") casadi::ConicAs::sz_work "[INTERNAL]  Get number of
-temporary variables needed.
+%feature("docstring") casadi::ConicActiveSet::class_name "[INTERNAL]
+Readable name of the internal class.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_n_out "[INTERNAL]  Number of
-function inputs and outputs.
+%feature("docstring") casadi::ConicActiveSet::get_function "[INTERNAL] ";
+
+%feature("docstring") casadi::ConicActiveSet::check_inputs "[INTERNAL]
+Check if the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_name_out "[INTERNAL]  Names of
-function input and outputs.
+%feature("docstring") casadi::ConicActiveSet::codegen_decref "[INTERNAL]
+Codegen decref for dependencies.
 
 ";
 
-%feature("docstring") casadi::ConicAs::sp_reverse "[INTERNAL]  Propagate
-sparsity backwards.
+%feature("docstring") casadi::ConicActiveSet::factory "[INTERNAL] ";
+
+%feature("docstring") casadi::ConicActiveSet::release "[INTERNAL]  Release
+a memory object.
 
 ";
 
-%feature("docstring") casadi::ConicAs::getCount "[INTERNAL]  Get the
-reference count.
+%feature("docstring") casadi::ConicActiveSet::codegen_name "[INTERNAL]  Get
+name in codegen.
 
 ";
 
-%feature("docstring") casadi::ConicAs::sz_res "[INTERNAL]  Get required
-length of res field.
+%feature("docstring") casadi::ConicActiveSet::symbolic_output "[INTERNAL]
+Get a vector of symbolic variables corresponding to the outputs.
 
 ";
 
-%feature("docstring") casadi::ConicAs::clear_mem "[INTERNAL]  Clear all
-memory (called from destructor)
+%feature("docstring") casadi::ConicActiveSet::has_function "[INTERNAL] ";
+
+%feature("docstring") casadi::ConicActiveSet::finalize "[INTERNAL]
+Finalize the object creation.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_free "[INTERNAL]  Print free
-variables.
+%feature("docstring") casadi::ConicActiveSet::has_derivative "[INTERNAL]
+Can derivatives be calculated in any way?
 
 ";
 
-%feature("docstring") casadi::ConicAs::generate_dependencies "[INTERNAL]
-Export / Generate C code for the dependency function.
+%feature("docstring") casadi::ConicActiveSet::info "[INTERNAL]  Obtain
+information about function
 
 ";
 
-%feature("docstring") casadi::ConicAs::free_mem "[INTERNAL]  Free memory
-block.
+%feature("docstring") casadi::ConicActiveSet::get_sparsity_in "[INTERNAL]
+Sparsities of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::ConicAs::ad_weight "[INTERNAL]  Weighting
-factor for chosing forward/reverse mode.
+%feature("docstring") casadi::ConicActiveSet::index_out "[INTERNAL]  Get
+output scheme index by name.
 
 ";
 
-%feature("docstring") casadi::ConicAs::definition "[INTERNAL]  Get function
-signature: name:(inputs)->(outputs)
+%feature("docstring") casadi::ConicActiveSet::call_forward "[INTERNAL]
+Forward mode AD, virtual functions overloaded in derived classes.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_jac "[INTERNAL]  Return Jacobian
-of all input elements with respect to all output elements.
+%feature("docstring") casadi::ConicActiveSet::get_name_in "[INTERNAL]
+Names of function input and outputs.
 
 ";
 
-%feature("docstring") casadi::ConicAs::print_dimensions "[INTERNAL]  Print
-dimensions of inputs and outputs.
+%feature("docstring") casadi::ConicActiveSet::get_jacobian "[INTERNAL]
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::ConicAs::index_in "[INTERNAL]  Get input
-scheme index by name.
+%feature("docstring") casadi::ConicActiveSet::check_arg "[INTERNAL]  Check
+if input arguments have correct length and dimensions.
 
 ";
 
-%feature("docstring") casadi::ConicAs::codegen_incref "[INTERNAL]  Codegen
-incref for dependencies.
+%feature("docstring") casadi::ConicActiveSet::nnz_out "[INTERNAL]  Number
+of input/output nonzeros.
 
 ";
 
-%feature("docstring") casadi::ConicAs::symbolic_output "[INTERNAL]  Get a
-vector of symbolic variables corresponding to the outputs.
+%feature("docstring") casadi::ConicActiveSet::call_gen "[INTERNAL]   Call a
+function, overloaded.
 
 ";
 
-%feature("docstring") casadi::ConicAs::call_forward "[INTERNAL]  Forward
-mode AD, virtual functions overloaded in derived classes.
+%feature("docstring") casadi::ConicActiveSet::print_signs "[INTERNAL]
+Print signs for a vector
 
 ";
 
-%feature("docstring") casadi::ConicAs::construct "[INTERNAL]  Construct
-Prepares the function for evaluation.
+%feature("docstring") casadi::ConicActiveSet::sx_out "[INTERNAL]  Get
+function input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::ConicAs::nnz_out "[INTERNAL]  Number of
-input/output nonzeros.
+%feature("docstring") casadi::ConicActiveSet::serialize "[INTERNAL]
+Serialize.
 
 ";
 
-%feature("docstring") casadi::ConicAs::instruction_MX "[INTERNAL]  get MX
-expression associated with instruction
+%feature("docstring") casadi::ConicActiveSet::clear_mem "[INTERNAL]  Clear
+all memory (called from destructor)
 
 ";
 
-%feature("docstring") casadi::ConicAs::size2_in "[INTERNAL]  Input/output
-dimensions.
+%feature("docstring") casadi::ConicActiveSet::instruction_constant "[INTERNAL]  Get the floating point output argument of an atomic operation.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_abstol "[INTERNAL]  Get absolute
-tolerance.
+%feature("docstring") casadi::ConicActiveSet::mx_out "[INTERNAL]  Get
+function input(s) and output(s)
 
 ";
 
-%feature("docstring") casadi::ConicAs::sparsity_in "[INTERNAL]
-Input/output sparsity.
+%feature("docstring") casadi::ConicActiveSet::disp_more "[INTERNAL]  Print
+more.
 
 ";
 
-%feature("docstring") casadi::ConicAs::instruction_output "[INTERNAL]  Get
-the (integer) output argument of an atomic operation.
+%feature("docstring") casadi::ConicActiveSet::init_mem "[INTERNAL]
+Initalize memory block.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_jacobian "[INTERNAL]  Return
+%feature("docstring") casadi::ConicActiveSet::has_codegen "[INTERNAL]  Is
+codegen supported?
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::sz_w "[INTERNAL]  Get
+required length of w field.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::jacobian "[INTERNAL]  Return
 Jacobian of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_min_in "[INTERNAL]  Get smallest
-input value.
+%feature("docstring") casadi::ConicActiveSet::signature "[INTERNAL]  Code
+generate the function.
 
 ";
 
-%feature("docstring") casadi::ConicAs::alloc_iw "[INTERNAL]  Ensure
-required length of iw field.
+%feature("docstring") casadi::ConicActiveSet::eval "[INTERNAL]  Evaluate
+numerically.
 
 ";
 
-%feature("docstring") casadi::ConicAs::codegen "[INTERNAL]  Generate code
-the function.
+%feature("docstring") casadi::ConicActiveSet::memory "[INTERNAL]  Memory
+objects.
 
 ";
 
-%feature("docstring") casadi::ConicAs::mx_out "[INTERNAL]  Get function
-input(s) and output(s)
+%feature("docstring") casadi::ConicActiveSet::reverse "[INTERNAL]  Return
+function that calculates adjoint derivatives reverse(nadj) returns a cached
+instance if available, and calls  Function get_reverse(casadi_int nadj) if
+no cached version is available.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_function "[INTERNAL] ";
-
-%feature("docstring") casadi::ConicAs::jac "[INTERNAL]  Return Jacobian of
-all input elements with respect to all output elements.
+%feature("docstring") casadi::ConicActiveSet::size2_out "[INTERNAL]
+Input/output dimensions.
 
 ";
 
-%feature("docstring") casadi::ConicAs::codegen_name "[INTERNAL]  Get name
-in codegen.
+%feature("docstring") casadi::ConicActiveSet::print_fstats "[INTERNAL]
+Print statistics.
 
 ";
 
-%feature("docstring") casadi::ConicAs::size2_out "[INTERNAL]  Input/output
-dimensions.
+%feature("docstring") casadi::ConicActiveSet::symbolicAdjSeed "[INTERNAL]
+Symbolic expressions for the adjoint seeds.
 
 ";
 
-%feature("docstring") casadi::ConicAs::alloc_arg "[INTERNAL]  Ensure
-required length of arg field.
+%feature("docstring") casadi::ConicActiveSet::index_in "[INTERNAL]  Get
+input scheme index by name.
 
 ";
 
-%feature("docstring") casadi::ConicAs::has_spfwd "[INTERNAL]  Is the class
-able to propagate seeds through the algorithm?
+%feature("docstring") casadi::ConicActiveSet::get_n_out "[INTERNAL]  Number
+of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::ConicAs::sprint "[INTERNAL]  C-style
-formatted printing to string.
+%feature("docstring") casadi::ConicActiveSet::replace_aseed "[INTERNAL]
+Replace 0-by-0 reverse seeds.
 
 ";
 
-%feature("docstring") casadi::ConicAs::print_fstats "[INTERNAL]  Print
-statistics.
+%feature("docstring") casadi::ConicActiveSet::get_min_in "[INTERNAL]  Get
+smallest input value.
 
 ";
 
-%feature("docstring") casadi::ConicAs::forward "[INTERNAL]  Return function
-that calculates forward derivatives forward(nfwd) returns a cached instance
-if available, and calls  Function get_forward(casadi_int nfwd) if no cached
-version is available.
+%feature("docstring") casadi::ConicActiveSet::has_reverse "[INTERNAL]
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::ConicAs::get_n_in "[INTERNAL]  Number of
-function inputs and outputs.
+%feature("docstring") casadi::ConicActiveSet::call_reverse "[INTERNAL]
+Reverse mode, virtual functions overloaded in derived classes.
 
 ";
 
-%feature("docstring") casadi::ConicAs::integer_support "[INTERNAL]  Can
-discrete variables be treated.
+%feature("docstring") casadi::ConicActiveSet::size1_out "[INTERNAL]
+Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::alloc_res "[INTERNAL]  Ensure
+required length of res field.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::getCount "[INTERNAL]  Get the
+reference count.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::disp "[INTERNAL]  Display
+object.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::oracle "[INTERNAL]  Get
+oracle.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::sp_reverse "[INTERNAL]
+Propagate sparsity backwards.
 
 ";
 
@@ -18844,6 +18915,59 @@ the output elements).
 %feature("docstring") casadi::Function::stats "
 
 Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") casadi::Function::fold "
+
+Create a mapaccumulated version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (x, u) -> (x_next , y )
+  
+
+
+
+The the mapaccumulated version has the signature:
+
+::
+
+     F: (x0, U) -> (X , Y )
+  
+      with
+          U: horzcat([u0, u1, ..., u_(N-1)])
+          X: horzcat([x1, x2, ..., x_N])
+          Y: horzcat([y0, y1, ..., y_(N-1)])
+  
+      and
+          x1, y0 <- f(x0, u0)
+          x2, y1 <- f(x1, u1)
+          ...
+          x_N, y_(N-1) <- f(x_(N-1), u_(N-1))
+  
+
+
+
+Mapaccum has the following benefits over writing an equivalent for- loop:
+much faster at construction time
+
+potentially much faster compilation times (for codegen)
+
+offers a trade-off between memory and evaluation time
+
+The base (settable through the options dictionary, default 10), is used to
+create a tower of function calls, containing unrolled for- loops of length
+maximum base.
+
+This technique is much more scalable in terms of memory-usage, but slightly
+slower at evaluation, than a plain for-loop. The effect is similar to that
+of a for-loop with a check-pointing instruction after each chunk of
+iterations with size base.
+
+Set base to -1 to unroll all the way; no gains in memory efficiency here.
 
 ";
 
@@ -32255,6 +32379,13 @@ Get the number of non-zeros in the lower triangular half.
 
 %feature("docstring") casadi::Matrix::reserve "";
 
+%feature("docstring") friendwrap_eig_symbolic "
+
+Attempts to find the eigenvalues of a symbolic matrix This will only work
+for up to 3x3 matrices.
+
+";
+
 %feature("docstring") casadi::Matrix::erase "
 
 >  void casadi::Matrix< T >::erase(const std::vector< casadi_int > &rr, const std::vector< casadi_int > &cc, bool ind1=false)
@@ -32405,10 +32536,11 @@ symbolic primitives.
 
 ";
 
-%feature("docstring") friendwrap_eig_symbolic "
+%feature("docstring") casadi::Matrix::to_file "
 
-Attempts to find the eigenvalues of a symbolic matrix This will only work
-for up to 3x3 matrices.
+Export numerical matrix to file
+
+Supported formats: .mtx Matrix Market
 
 ";
 
@@ -44979,9 +45111,10 @@ Inverse of nonzeros.
 
 ";
 
-%feature("docstring") casadi::Sparsity::repr_el "
+%feature("docstring") casadi::Sparsity::nnz_diag "
 
-Describe the nonzero location k as a string.
+Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with
+j==i.
 
 ";
 
@@ -44997,10 +45130,9 @@ Transpose the matrix.
 
 ";
 
-%feature("docstring") casadi::Sparsity::nnz_diag "
+%feature("docstring") casadi::Sparsity::repr_el "
 
-Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with
-j==i.
+Describe the nonzero location k as a string.
 
 ";
 
@@ -45026,6 +45158,14 @@ format.
 ------------------------------------------------------------------------
 
 Create a sparse matrix with all structural zeros.
+
+";
+
+%feature("docstring") casadi::Sparsity::to_file "
+
+Export sparsity pattern to file
+
+Supported formats: .mtx Matrix Market
 
 ";
 
@@ -49857,7 +49997,7 @@ List of plugins
 
 - sqic
 
-- as
+- activeset
 
 - nlpsol
 
@@ -50210,7 +50350,8 @@ Interface to the SQIC solver for quadratic programming
 
 --------------------------------------------------------------------------------
 
-as --
+activeset
+---------
 
 
 
