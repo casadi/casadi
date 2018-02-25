@@ -11,7 +11,7 @@ env:
     - PYTHONPATH=/usr/local/python
     - TRAVIS_PYTHON_VERSION=2.7
     - NUMPYVERSION=1.11
-    - casadi_build_flags="-DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON -DWITH_EXTRA_CHECKS=ON"
+    - casadi_build_flags="-DWITH_WERROR=OFF -DWITH_EXTRA_WARNINGS=ON -DWITH_EXTRA_CHECKS=ON"
 
 before_script:
   - |
