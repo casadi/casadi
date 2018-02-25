@@ -16208,11 +16208,9 @@ Solve QPs using an active-set method
 +----------+-----------+--------------------------------------+
 |    Id    |   Type    |             Description              |
 +==========+===========+======================================+
-| du_tol   | OT_DOUBLE | Dual tolerance [1e-8].               |
-+----------+-----------+--------------------------------------+
 | max_iter | OT_INT    | Maximum number of iterations [1000]. |
 +----------+-----------+--------------------------------------+
-| pr_tol   | OT_DOUBLE | Primal tolerance [1e-8].             |
+| tol      | OT_DOUBLE | Tolerance [1e-8].                    |
 +----------+-----------+--------------------------------------+
 
 Joel Andersson
@@ -16227,14 +16225,11 @@ Joel Andersson
 |          |               | discrete, i.e.        |                       |
 |          |               | integer-valued        |                       |
 +----------+---------------+-----------------------+-----------------------+
-| du_tol   | OT_DOUBLE     | Dual tolerance        | casadi::ConicActiveSe |
-|          |               | [1e-8].               | t                     |
-+----------+---------------+-----------------------+-----------------------+
 | max_iter | OT_INT        | Maximum number of     | casadi::ConicActiveSe |
 |          |               | iterations [1000].    | t                     |
 +----------+---------------+-----------------------+-----------------------+
-| pr_tol   | OT_DOUBLE     | Primal tolerance      | casadi::ConicActiveSe |
-|          |               | [1e-8].               | t                     |
+| tol      | OT_DOUBLE     | Tolerance [1e-8].     | casadi::ConicActiveSe |
+|          |               |                       | t                     |
 +----------+---------------+-----------------------+-----------------------+
 
 Diagrams
@@ -29176,6 +29171,15 @@ Matrix divide (cf. slash '/' in MATLAB)
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MatType >::linear_coeff(const
+MatType &expr, const MatType &var, MatType &A, MatType &b) "
+
+Recognizes linear form in vector expression.
+
+A x + b
+
+";
+
 %feature("docstring")  if_else(const MatType &cond, const MatType &if_true,
 const MatType &if_false, bool short_circuit=false) "
 
@@ -29321,6 +29325,12 @@ Check if the matrix expression is dense.
 
 ";
 
+%feature("docstring")  cumsum(const MatType &x, casadi_int axis=-1) "
+
+Returns cumulative sum along given axis (MATLAB convention)
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::nnz_lower() const
 "
 
@@ -29424,12 +29434,10 @@ Check if the matrix is lower triangular.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< MatType >::linear_coeff(const
-MatType &expr, const MatType &var, MatType &A, MatType &b) "
+%feature("docstring")  casadi::GenericMatrix< MatType >::diff(const MatType
+&x, casadi_int n=1, casadi_int axis=-1) "
 
-Recognizes linear form in vector expression.
-
-A x + b
+Returns difference (n-th order) along given axis (MATLAB convention)
 
 ";
 
@@ -69700,11 +69708,9 @@ Solve QPs using an active-set method
 +----------+-----------+--------------------------------------+
 |    Id    |   Type    |             Description              |
 +==========+===========+======================================+
-| du_tol   | OT_DOUBLE | Dual tolerance [1e-8].               |
-+----------+-----------+--------------------------------------+
 | max_iter | OT_INT    | Maximum number of iterations [1000]. |
 +----------+-----------+--------------------------------------+
-| pr_tol   | OT_DOUBLE | Primal tolerance [1e-8].             |
+| tol      | OT_DOUBLE | Tolerance [1e-8].                    |
 +----------+-----------+--------------------------------------+
 
 --------------------------------------------------------------------------------

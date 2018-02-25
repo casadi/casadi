@@ -11610,11 +11610,9 @@ Solve QPs using an active-set method
 +----------+-----------+--------------------------------------+
 |    Id    |   Type    |             Description              |
 +==========+===========+======================================+
-| du_tol   | OT_DOUBLE | Dual tolerance [1e-8].               |
-+----------+-----------+--------------------------------------+
 | max_iter | OT_INT    | Maximum number of iterations [1000]. |
 +----------+-----------+--------------------------------------+
-| pr_tol   | OT_DOUBLE | Primal tolerance [1e-8].             |
+| tol      | OT_DOUBLE | Tolerance [1e-8].                    |
 +----------+-----------+--------------------------------------+
 
 Joel Andersson
@@ -11629,14 +11627,11 @@ Joel Andersson
 |          |               | discrete, i.e.        |                       |
 |          |               | integer-valued        |                       |
 +----------+---------------+-----------------------+-----------------------+
-| du_tol   | OT_DOUBLE     | Dual tolerance        | casadi::ConicActiveSe |
-|          |               | [1e-8].               | t                     |
-+----------+---------------+-----------------------+-----------------------+
 | max_iter | OT_INT        | Maximum number of     | casadi::ConicActiveSe |
 |          |               | iterations [1000].    | t                     |
 +----------+---------------+-----------------------+-----------------------+
-| pr_tol   | OT_DOUBLE     | Primal tolerance      | casadi::ConicActiveSe |
-|          |               | [1e-8].               | t                     |
+| tol      | OT_DOUBLE     | Tolerance [1e-8].     | casadi::ConicActiveSe |
+|          |               |                       | t                     |
 +----------+---------------+-----------------------+-----------------------+
 
 Diagrams
@@ -20768,6 +20763,14 @@ Matrix divide (cf. slash '/' in MATLAB)
 
 ";
 
+%feature("docstring") friendwrap_linear_coeff "
+
+Recognizes linear form in vector expression.
+
+A x + b
+
+";
+
 %feature("docstring") friendwrap_if_else "
 
 Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
@@ -20907,6 +20910,12 @@ Check if the matrix expression is dense.
 
 ";
 
+%feature("docstring") friendwrap_cumsum "
+
+Returns cumulative sum along given axis (MATLAB convention)
+
+";
+
 %feature("docstring") casadi::GenericMatrix::nnz_lower "
 
 Get the number of non-zeros in the lower triangular half.
@@ -20995,11 +21004,9 @@ Check if the matrix is lower triangular.
 
 ";
 
-%feature("docstring") friendwrap_linear_coeff "
+%feature("docstring") friendwrap_diff "
 
-Recognizes linear form in vector expression.
-
-A x + b
+Returns difference (n-th order) along given axis (MATLAB convention)
 
 ";
 
@@ -50362,11 +50369,9 @@ Solve QPs using an active-set method
 +----------+-----------+--------------------------------------+
 |    Id    |   Type    |             Description              |
 +==========+===========+======================================+
-| du_tol   | OT_DOUBLE | Dual tolerance [1e-8].               |
-+----------+-----------+--------------------------------------+
 | max_iter | OT_INT    | Maximum number of iterations [1000]. |
 +----------+-----------+--------------------------------------+
-| pr_tol   | OT_DOUBLE | Primal tolerance [1e-8].             |
+| tol      | OT_DOUBLE | Tolerance [1e-8].                    |
 +----------+-----------+--------------------------------------+
 
 --------------------------------------------------------------------------------
