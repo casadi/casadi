@@ -516,6 +516,20 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::cumsum(const Matrix<Scalar> &x, casadi_int axis) {
+    if (axis==-1) axis = x.is_row();
+    Matrix<Scalar> ret = x;
+    if (axis==0) {
+      for (casadi_int i=1;i<x.size1();++i)
+        ret(i, Slice()) += ret(i-1, Slice());
+    } else {
+      for (casadi_int i=1;i<x.size2();++i)
+        ret(Slice(), i) += ret(Slice(), i-1);
+    }
+    return ret;
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::einstein(
       const Matrix<Scalar>& A, const Matrix<Scalar>& B, const Matrix<Scalar>& C,
       const std::vector<casadi_int>& dim_a, const std::vector<casadi_int>& dim_b,

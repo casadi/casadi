@@ -180,6 +180,7 @@ namespace casadi {
     static MatType tril2symm(const MatType &x);
     static MatType triu2symm(const MatType &x);
     static MatType repsum(const MatType &x, casadi_int n, casadi_int m=1);
+    static MatType diff(const MatType &x, casadi_int n=1, casadi_int axis=-1);
 
     static bool is_linear(const MatType &expr, const MatType &var);
     static bool is_quadratic(const MatType &expr, const MatType &var);
@@ -403,8 +404,18 @@ namespace casadi {
     /** \brief Return a row-wise summation of elements */
     inline friend MatType sum1(const MatType &x) { return MatType::sum1(x);}
 
-    /** \brief Return a column-wise summation of elements */
+    /** \brief Return a column-wise summation of elements  */
     inline friend MatType sum2(const MatType &x) { return MatType::sum2(x);}
+
+    /** \brief Returns difference (n-th order) along given axis (MATLAB convention) */
+    inline friend MatType diff(const MatType &x, casadi_int n=1, casadi_int axis=-1) {
+      return MatType::diff(x, n, axis);
+    }
+
+    /** \brief Returns cumulative sum along given axis (MATLAB convention) */
+    inline friend MatType cumsum(const MatType &x, casadi_int axis=-1) {
+      return MatType::cumsum(x, axis);
+    }
 
     /** \brief Inner product of two matrices
         with x and y matrices of the same dimension
@@ -1248,6 +1259,31 @@ namespace casadi {
     casadi_assert(is_linear(expr, var), "'linear_coeff' called on non-linear expression.");
     A = substitute(jacobian(expr, var), var, 0);
     b = vec(substitute(expr, var, 0));
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::diff(const MatType& x, casadi_int n, casadi_int axis) {
+    casadi_assert(axis==-1 || axis==0 || axis==1, "Axis argument invalid");
+    casadi_assert(n>=1, "n argument invalid");
+
+    MatType ret = x;
+    for (casadi_int i=0;i<n;++i) {
+      casadi_int local_axis = axis==-1 ? ret.is_row() : axis;
+      if (local_axis==0) {
+        if (ret.size1()<=1) {
+          ret = MatType::zeros(0, ret.size2());
+        } else {
+          ret = ret(Slice(1, ret.size1()), Slice())-ret(Slice(0, ret.size1()-1), Slice());
+        }
+      } else {
+        if (ret.size2()<=1) {
+          ret = MatType::zeros(ret.size1(), 0);
+        } else {
+          ret = ret(Slice(), Slice(1, ret.size1()))-ret(Slice(), Slice(0, ret.size1()-1));
+        }
+      }
+    }
+    return ret;
   }
 
 #undef CASADI_THROW_ERROR

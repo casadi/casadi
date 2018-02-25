@@ -475,6 +475,7 @@ namespace casadi {
     static MX _bilin(const MX& A, const MX& x, const MX& y);
     static MX _rank1(const MX& A, const MX& alpha, const MX& x, const MX& y);
     static MX project(const MX& x, const Sparsity& sp, bool intersect=false);
+    static MX cumsum(const MX &x, casadi_int axis=-1);
     ///@}
 
     ///@{

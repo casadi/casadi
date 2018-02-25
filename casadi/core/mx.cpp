@@ -595,6 +595,20 @@ namespace casadi {
     return MX::zeros(product(dim_c), 1)->get_einstein(A, B, dim_c, dim_a, dim_b, c, a, b);
   }
 
+  MX MX::cumsum(const MX &x, casadi_int axis) {
+    if (axis==-1) axis = x.is_row();
+    MX r = axis==0 ? x.T() : x;
+    Sparsity sl = r(Slice(), 0).sparsity();
+    MX acc = MX::sym("acc", sl);
+    MX u = MX::sym("u", sl);
+
+    Function f("f", {acc, u}, {acc+u});
+    f = f.mapaccum(r.size2());
+    MX ret = f(std::vector<MX>{0, r})[0];
+
+    return axis==0 ? ret.T() : ret;
+  }
+
   MX MX::mac(const MX& x, const MX& y, const MX& z) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar

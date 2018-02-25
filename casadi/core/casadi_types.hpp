@@ -40,4 +40,6 @@ typedef unsigned CASADI_INT_TYPE casadi_uint;
 #define CASADI_STR(x) CASADI_STR1(x)
 #define CASADI_INT_TYPE_STR CASADI_STR(CASADI_INT_TYPE)
 
+typedef casadi_int casadi_index;
+
 #endif // CASADI_TYPES_HPP

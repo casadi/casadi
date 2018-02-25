@@ -2267,6 +2267,14 @@ namespace std {
 #undef L_STR
 #undef MATLABSTYLE
 
+// Matlab is index-1 based
+#ifdef SWIGMATLAB
+%typemap(in, doc="index", noblock=1) casadi_index {
+  if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input $argnum to type ' index '.");
+  if ($1>=1) $1--;
+}
+#endif
+
 #endif // SWIGXML
 
 #ifdef SWIGPYTHON
@@ -3070,6 +3078,12 @@ DECL std::string casadi_print_operator(const M& xb,
 }
 DECL M casadi_repsum(const M& A, casadi_int n, casadi_int m=1) {
   return repsum(A, n, m);
+}
+DECL M casadi_diff(const M& A, casadi_int n=1, casadi_index axis=-1) {
+  return diff(A, n, axis);
+}
+DECL M casadi_cumsum(const M& A, casadi_index axis=-1) {
+  return cumsum(A, axis);
 }
 DECL M casadi_einstein(const M& A, const M& B, const M& C,
   const std::vector<casadi_int>& dim_a, const std::vector<casadi_int>& dim_b, const std::vector<casadi_int>& dim_c,
