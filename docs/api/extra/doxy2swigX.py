@@ -395,6 +395,8 @@ class Doxy2SWIG_X(Doxy2SWIG):
         grouped_list = []
         grouped_dict = {}
         
+        def fix_signature(a): return a.replace("override","")
+        
         for (origin,pieces) in v:
           origin_nostatic = origin.replace("static ","")
           m = list(re.finditer("\[DEPRECATED(:(.*?))?\]","".join(pieces)))
@@ -459,13 +461,13 @@ class Doxy2SWIG_X(Doxy2SWIG):
              grouped_dict[total] = ([origin],pieces)
              grouped_list.append(grouped_dict[total])
           if not self.merge:
-            self.add_text_original(["%feature(\"docstring\") ", swigname if len(swigname)>0 else k, " \"\n\n"]+pieces+["\";\n","\n"])
+            self.add_text_original(["%feature(\"docstring\") ", fix_signature(swigname if len(swigname)>0 else k), " \"\n\n"]+pieces+["\";\n","\n"])
             
         if self.merge:
           if len(grouped_list)==1:
-            self.add_text_original(["%feature(\"docstring\") ", k, " \"\n"]+grouped_list[0][1]+["\";\n","\n"])
+            self.add_text_original(["%feature(\"docstring\") ", fix_signature(k), " \"\n"]+grouped_list[0][1]+["\";\n","\n"])
           else:
-            self.add_text_original(["%feature(\"docstring\") ",k , " \"\n"])
+            self.add_text_original(["%feature(\"docstring\") ",fix_signature(k) , " \"\n"])
             for (origin,pieces) in grouped_list:
               if len(u"".join(pieces).rstrip())>0:
                 self.add_text_original(["\n"]+["\n>  " + o.replace('"',r'\"') + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
