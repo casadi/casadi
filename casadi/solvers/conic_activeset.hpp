@@ -117,7 +117,7 @@ namespace casadi {
     ///@{
     // Options
     casadi_int max_iter_;
-    double pr_tol_, du_tol_;
+    double tol_;
     ///@}
 
   };
