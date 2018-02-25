@@ -577,33 +577,30 @@ namespace casadi {
         print("tau = %g\n", tau);
       }
 
-      if (tau>1e-16) {
-        // Take primal step
-        casadi_axpy(nx_, tau, dz, z);
+      // Take primal step
+      casadi_axpy(nx_, tau, dz, z);
 
-        // Update lam carefully
-        for (i=0; i<nx_+na_; ++i) {
-          // Get the current sign
-          casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
-          // Account for sign changes
-          if (i==index) {
-            changed_active_set = true;
-            s = sign;
-          }
-          // Take step
-          lam[i] += tau*dlam[i];
-          // Ensure correct sign
-          switch (s) {
-            case -1: lam[i] = fmin(lam[i], -DMIN); break;
-            case  1: lam[i] = fmax(lam[i],  DMIN); break;
-            case  0: lam[i] = 0.; break;
-          }
+      // Update lam carefully
+      for (i=0; i<nx_+na_; ++i) {
+        // Get the current sign
+        casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
+        // Account for sign changes
+        if (i==index) {
+          changed_active_set = true;
+          s = sign;
+        }
+        // Take step
+        lam[i] += tau*dlam[i];
+        // Ensure correct sign
+        switch (s) {
+          case -1: lam[i] = fmin(lam[i], -DMIN); break;
+          case  1: lam[i] = fmax(lam[i],  DMIN); break;
+          case  0: lam[i] = 0.; break;
         }
       }
 
       // If full step, check if we should also change the active set
       if (tau==1.) {
-
         // Calculate g
         casadi_fill(z+nx_, na_, 0.);
         casadi_mv(a, A_, z, z+nx_, 0);
