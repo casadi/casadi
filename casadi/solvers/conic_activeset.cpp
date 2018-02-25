@@ -625,68 +625,118 @@ namespace casadi {
       // Success?
       if (changed_active_set || tau==1.) continue;
 
-      // If step becomes zero with no change, look for redundant constraints
-      double best = -tol_;
-      index = -1;
-
-      // Look for redundant constraints
+      // Find the largest error in the unenforced constraints
+      prerr = 0.;
+      iprerr = -1;
       for (i=0; i<nx_+na_; ++i) {
-        // skip inactive constraints
-        if (lam[i]==0.) continue;
-        if (z[i]>lbz[i]+best) {
-          best = z[i]-lbz[i];
-          index = i;
-        } else if (z[i]<ubz[i]-best) {
-          best = ubz[i]-z[i];
-          index = i;
+        if (lam[i]!=0.) continue;
+        if (z[i] > ubz[i]+prerr) {
+          prerr = z[i]-ubz[i];
+          iprerr = i;
+        } else if (z[i] < lbz[i]-prerr) {
+          prerr = lbz[i]-z[i];
+          iprerr = i;
         }
       }
-      if (index>=0) {
-        casadi_assert(best>=0,
-          "Step rejected since it would cause infeasibility: " + str(best));
-        // index is redundant
-        lam[index] = 0.;
+
+      // Add constraints, if any
+      if (iprerr>=0) {
+        // Add a constraint to restore primal feasibility
+        lam[iprerr] = z[iprerr]>ubz[iprerr] ? DMIN : -DMIN;
         changed_active_set = true;
         continue;
       }
 
-      // Try to minimize maximum dual infeasibility, check which bound to enforce
-      casadi_assert(iduerr>=0, "No dual infeasibility");
-      // Check bounds on x
-      double goodness;
-      best = -fabs(kktres[iduerr]); // We want to decrease the dual error
+      // Try to reduce dual infeasibility
+      casadi_assert(iduerr>=0, "No dual error");
 
-      // Check what happens if we enforce a bound on x
-      index = -1;
-      bool best_is_pos;
-      i = iduerr;
-      bool need_pos = !duerr_pos;
-      if (lam[i]==0) {
-        goodness = need_pos ? z[i]-ubz[i] : lbz[i]-z[i];
-        if (goodness>best) {
-          best=goodness;
-          index=i;
-          best_is_pos = need_pos;
+      // The constraint is either enforced or not
+      if (false && lam[iduerr]==0.) {
+        // We have that A^T * delta(lam_g) + delta(lam_x) = 0
+        // use this to implicitly define the sensitivity with respect
+        // to changing this value
+        casadi_fill(w, nx_+na_, 0.);
+        if (iduerr<nx_) {
+          w[iduerr] = 1.;
+        } else {
+          for (casadi_int c=0; c<nx_; ++c) {
+            for (casadi_int k=a_colind[c]; k<a_colind[c+1]; ++k) {
+              if (a_row[k]==iduerr) w[c] += a[k];
+            }
+          }
         }
+        // Now calculate the sensitivity of this quanitity on lam_x and lam_g
+        casadi_mv(a, A_, w, w+nx_, 0);
+        casadi_assert(w[iduerr]!=0., "Degeneracy");
+        // Scale to get the ratio (sign is enough?)
+        casadi_scal(nx_+na_, 1./w[iduerr], w);
+        // We have that dual error is glad[i] + lam[i]. If it's positive, we can
+        // decrease it by instead increasing another multiplier a factor 1/w[i].
+        // We pick the multiplier that require the smallest change, i.e. largest
+        // w[i] in magnitude.
+        double best = 0;
+        index = -1;
+        bool best_is_pos;
+        for (i=0; i<nx_+na_; ++i) {
+          if (i==iduerr || w[i]==0.) continue; // not a candidate
+          // Only consider free lam[i] for now. Makes sense?
+          if (lam[i]!=0.) continue;
+          // Do we need an increase or decrease in lam[i]?
+          bool need_pos = duerr_pos ? w[i]>0 : w[i]<0;
+          // Make sure that it's an allowed direction
+          if (need_pos ? isinf(ubz[i]) : isinf(lbz[i])) continue;
+          // Check if it's the best so far
+          if (fabs(w[i])>best) {
+            best = fabs(w[i]);
+            index = i;
+            best_is_pos = need_pos;
+          }
+        }
+
+        // Accept?
+        if (index>=0) {
+          cout << "set " << index << " to something " << (best_is_pos ? "postitive" : "negative") << endl;
+          lam[index] = best_is_pos ? duerr/fabs(w[i]) : -duerr/fabs(w[i]);
+          changed_active_set = true;
+          continue;
+        } else {
+          casadi_message( "nothing acceptable");
+        }
+
+        // Make sure equality constraints are active, preferably with lower bound active
+        // Determine initial active set
+        for (i=0; i<nx_+na_; ++i) {
+          if (lam[i]!=0. || lbz[i]!=ubz[i]) continue;
+          lam[i] = z[i]<=lbz[i] ? -DMIN : DMIN;
+          changed_active_set = true;
+          casadi_message("found equality");
+          break;
+        }
+        if (changed_active_set) continue;
       }
 
-      // Check what happens if we enforce a bound on a
-      for (casadi_int k=a_colind[iduerr]; k<a_colind[iduerr+1]; ++k) {
-        if (a[k]==0. || lam[i]!=0.) continue; // not a candidate
-        need_pos = a[k]>0. ? !duerr_pos : duerr_pos; // for negative a, need negative lam[i]
-        i = nx_ + a_row[k];
-        goodness = need_pos ? fabs(a[k])*(z[i]-ubz[i]) : fabs(a[k])*(lbz[i]-z[i]);
-        if (goodness>best) {
-          best=goodness;
-          index=i;
-          best_is_pos = need_pos;
-        }
-      }
+      if (false) {
+        // If step becomes zero with no change, look for redundant constraints
+        double best = 0.;
+        index = -1;
 
-      if (index>=0) {
-        lam[index] = best_is_pos ? duerr : -duerr;
-        changed_active_set = true;
-        continue;
+        // Look for redundant constraints
+        for (i=0; i<nx_+na_; ++i) {
+          // skip inactive constraints
+          if (lam[i]==0. || lam[i]>=err) continue;
+          if (z[i]>lbz[i]+best) {
+            best = z[i]-lbz[i];
+            index = i;
+          } else if (z[i]<ubz[i]-best) {
+            best = ubz[i]-z[i];
+            index = i;
+          }
+        }
+        if (index>=0) {
+          lam[index] = 0.;
+          changed_active_set = true;
+          continue;
+        }
       }
 
       casadi_warning("Step size becomes zero");
