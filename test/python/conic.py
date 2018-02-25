@@ -816,6 +816,7 @@ class ConicTests(casadiTestCase):
     for conic, qp_options, aux_options in conics:
       if 'qcqp' in str(conic): continue
       if 'nlp' in str(conic): continue
+      if 'activeset' in str(conic): continue
       solver = casadi.conic("msyolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
       try:
