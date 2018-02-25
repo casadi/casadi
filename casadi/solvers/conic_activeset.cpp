@@ -605,6 +605,15 @@ namespace casadi {
         casadi_fill(z+nx_, na_, 0.);
         casadi_mv(a, A_, z, z+nx_, 0);
 
+        // Full steps brings us to the bound
+        for (i=0; i<nx_+na_; ++i) {
+          if (lam[i]>0.) {
+            z[i] = ubz[i];
+          } else if (lam[i]<0.) {
+            z[i] = lbz[i];
+          }
+        }
+
         // Look for largest bound violation corresponding to an unenforced constraint
         double prerr = 0.;
         casadi_int iprerr = -1;
