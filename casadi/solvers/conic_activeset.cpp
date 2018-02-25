@@ -534,14 +534,21 @@ namespace casadi {
         double e = fabs(kktres[i]);
         if (lam[i]==0.) {
           if (dz[i]==0.) continue; // Skip zero steps
+          // Check if violation with tau=0 and not improving
+          if (dz[i]<0 ? z[i]<=lbz[i]-e : z[i]>=ubz[i]+e) {
+            tau = 0.;
+            index = i;
+            sign = dz[i]<0 ? -1 : 1;
+            break;
+          }
           // Trial primal step
           double trial_z=z[i] + tau*dz[i];
-          if (trial_z<lbz[i]-e) {
+          if (dz[i]<0 && trial_z<lbz[i]-e) {
             // Trial would increase maximum infeasibility
             tau = (lbz[i]-e-z[i])/dz[i];
             index = i;
             sign = -1;
-          } else if (trial_z>ubz[i]+e) {
+          } else if (dz[i]>0 && trial_z>ubz[i]+e) {
             // Trial would increase maximum infeasibility
             tau = (ubz[i]+e-z[i])/dz[i];
             index = i;
