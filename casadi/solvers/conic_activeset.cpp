@@ -660,11 +660,12 @@ namespace casadi {
         continue;
       }
 
+#if 0
       // Try to reduce dual infeasibility
       casadi_assert(iduerr>=0, "No dual error");
 
       // The constraint is either enforced or not
-      if (false && lam[iduerr]==0.) {
+      if (lam[iduerr]==0.) {
         // We have that A^T * delta(lam_g) + delta(lam_x) = 0
         // use this to implicitly define the sensitivity with respect
         // to changing this value
@@ -708,7 +709,6 @@ namespace casadi {
 
         // Accept?
         if (index>=0) {
-          cout << "set " << index << " to something " << (best_is_pos ? "postitive" : "negative") << endl;
           lam[index] = best_is_pos ? duerr/fabs(w[i]) : -duerr/fabs(w[i]);
           changed_active_set = true;
           continue;
@@ -751,6 +751,7 @@ namespace casadi {
           continue;
         }
       }
+#endif
 
       casadi_warning("Step size becomes zero");
       flag = 1;
