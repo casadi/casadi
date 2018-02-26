@@ -307,6 +307,13 @@ namespace casadi {
     casadi_copy(ubx, nx_, ubz);
     casadi_copy(uba, na_, ubz+nx_);
 
+    if (verbose_) {
+      print_vector("lbz(x)", lbz, nx_);
+      print_vector("ubz(x)", ubz, nx_);
+      print_vector("lbz(g)", lbz+nx_, na_);
+      print_vector("ubz(g)", ubz+nx_, na_);
+    }
+
     // Pass initial guess
     casadi_copy(x0, nx_, z);
     casadi_copy(lam_x0, nx_, lam);
@@ -543,8 +550,8 @@ namespace casadi {
       // Loop over variables and constraints
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
         if (lam[i]==0.) {
-          // Acceptable error (to avoid increasing max primal error)
-          double e = prerr;
+          // Acceptable error (to avoid increasing max error)
+          double e = err;
           if (dz[i]==0.) continue; // Skip zero steps
           // Check if violation with tau=0 and not improving
           if (dz[i]<0 ? z[i]<=lbz[i]-e : z[i]>=ubz[i]+e) {
@@ -645,7 +652,7 @@ namespace casadi {
       }
 
       // If full step, check if we should also change the active set
-      if (tau==1.) {
+      if (true) {
         // Calculate g
         casadi_fill(z+nx_, na_, 0.);
         casadi_mv(a, A_, z, z+nx_, 0);
@@ -690,7 +697,6 @@ namespace casadi {
             duerr_pos = glag[i]+lam[i]>0;
           }
         }
-
         // Try to reduce either primal or dual infeasibility, whichever is larger
         if (prerr>=duerr) {
           // Reduce primal infeasibility by adding a constraint
