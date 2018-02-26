@@ -107,6 +107,7 @@ namespace casadi {
     alloc_w(nx_+na_, true); // dlam
     alloc_w(nx_+na_, true); // kktres
     alloc_w(nx_, true); // glag
+    alloc_w(nx_+na_, true); // sens
 
     // Memory for numerical solution
     alloc_w(sp_v_.nnz(), true); // v
@@ -281,7 +282,7 @@ namespace casadi {
 
     // Work vectors
     double *kkt, *kktd, *z, *lam, *v, *r, *beta,
-           *dz, *dlam, *lbz, *ubz, *kktres, *glag;
+           *dz, *dlam, *lbz, *ubz, *kktres, *glag, *sens;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     z = w; w += nx_+na_;
@@ -295,6 +296,7 @@ namespace casadi {
     beta = w; w += nx_+na_;
     kktres = w; w += nx_+na_;
     glag = w; w += nx_;
+    sens = w; w += nx_+na_;
 
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
@@ -457,6 +459,25 @@ namespace casadi {
 
       if (verbose_) {
         print_vector("KKT residual", kktres, nx_ + na_);
+      }
+
+      // We have that A^T * delta(lam_g) + delta(lam_x) = 0
+      // use this to implicitly define the sensitivity with respect
+      // to changing lambda[iduerr]
+      casadi_fill(sens, nx_+na_, 0.);
+      if (iduerr>=0) {
+        casadi_fill(sens, nx_+na_, 0.);
+        if (iduerr<nx_) {
+          sens[iduerr] = 1.;
+        } else {
+          for (casadi_int c=0; c<nx_; ++c) {
+            for (casadi_int k=a_colind[c]; k<a_colind[c+1]; ++k) {
+              if (a_row[k]==iduerr) sens[c] += a[k];
+            }
+          }
+        }
+        // Now calculate the sensitivity of this quanitity on lam_x and lam_g
+        casadi_mv(a, A_, sens, sens+nx_, 0);
       }
 
       // Copy kkt to kktd
