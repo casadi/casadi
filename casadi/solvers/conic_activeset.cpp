@@ -478,6 +478,8 @@ namespace casadi {
         }
         // Now calculate the sensitivity of this quanitity on lam_x and lam_g
         casadi_mv(a, A_, sens, sens+nx_, 0);
+        // Scale to get the ratio between them
+        casadi_scal(nx_+na_, 1./sens[iduerr], sens);
       }
 
       // Copy kkt to kktd
@@ -552,8 +554,9 @@ namespace casadi {
 
       // Loop over variables and constraints
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
-        double e = fabs(kktres[i]);
         if (lam[i]==0.) {
+          // Acceptable error (to avoid increasing max primal error)
+          double e = prerr;
           if (dz[i]==0.) continue; // Skip zero steps
           // Check if violation with tau=0 and not improving
           if (dz[i]<0 ? z[i]<=lbz[i]-e : z[i]>=ubz[i]+e) {
@@ -577,6 +580,8 @@ namespace casadi {
           }
         } else {
           if (dlam[i]==0.) continue; // Skip zero steps
+          // Acceptable error (to avoid increasing max dual error)
+          double e = duerr*fabs(w[i]);
           // Trial dual step
           double trial_lam = lam[i] + tau*dlam[i];
           if (lam[i]>0 && trial_lam < -e) {
