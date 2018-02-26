@@ -513,7 +513,7 @@ namespace casadi {
       // Step in lam(x)
       casadi_scal(nx_, -1., dlam);
 
-      // For active constraints, step is zero
+      // For inactive constraints, step is zero
       for (i=0; i<nx_; ++i) if (lam[i]==0.) dlam[i] = 0.;
 
       // Step in lam(g)
@@ -568,10 +568,41 @@ namespace casadi {
           }
         } else {
           if (dlam[i]==0.) continue; // Skip zero steps
+          /*
+          if lam[i]<0, we need lam[i] + tau*dlam[i] < e as well as -e < tau*dlam[i] < e
+          i.e.
+               tau*dlam[i] < e           if dlam[i]>0
+          -e < tau*dlam[i] < e - lam[i]  if dlam[i]<0
+          if lam[i]>0, we need -e < lam[i] + tau*dlam[i] as well as -e < tau*dlam[i] < e
+          i.e.
+          -e - lam[i] < tau*dlam[i] < e    if dlam[i]>0
+                   -e < tau*dlam[i]        if dlam[i]<0
+          */
           // Acceptable error (to avoid increasing max dual error)
-          double e = duerr*fabs(w[i]);
+          //double e = duerr;
+          double e = 0.;
+          /*
+          if (i<nx_) {
+            e = duerr;
+          } else {
+            double max_a = 0.;
+            for (casadi_int c=0; c<nx_; ++c) {
+              for (casadi_int k=a_colind[c]; k<a_colind[c+1]; ++k) {
+                if (i==nx_+a_row[k]) max_a = fmax(max_a, fabs(a[k]));
+              }
+            }
+            e = duerr/max_a;
+          }
+          // Trial dual stepsize
+          double trial_dlam = fabs(tau*dlam[i]);
+          if (trial_dlam>e) {
+            tau = e/trial_dlam;
+            index = i;
+            sign = 0;
+          }
+          */
           // Trial dual step
-          double trial_lam = lam[i] + tau*dlam[i];
+          double trial_lam = lam[i] + tau*dlam[i];;
           if (lam[i]>0 && trial_lam < -e) {
             tau = -(lam[i]+e)/dlam[i];
             index = i;
