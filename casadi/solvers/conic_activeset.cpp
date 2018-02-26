@@ -551,7 +551,7 @@ namespace casadi {
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
         if (lam[i]==0.) {
           // Acceptable error (to avoid increasing max error)
-          double e = err;
+          double e = prerr;
           if (dz[i]==0.) continue; // Skip zero steps
           // Check if violation with tau=0 and not improving
           if (dz[i]<0 ? z[i]<=lbz[i]-e : z[i]>=ubz[i]+e) {
