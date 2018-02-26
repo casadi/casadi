@@ -461,24 +461,12 @@ namespace casadi {
         print_vector("KKT residual", kktres, nx_ + na_);
       }
 
-      // We have that A^T * delta(lam_g) + delta(lam_x) = 0
-      // use this to implicitly define the sensitivity with respect
-      // to changing lambda[iduerr]
+      // Calculate the sensitivity of dual infeasibility for iduerr
       casadi_fill(sens, nx_+na_, 0.);
       if (iduerr>=0) {
         casadi_fill(sens, nx_+na_, 0.);
-        if (iduerr<nx_) {
-          sens[iduerr] = 1.;
-        } else {
-          for (casadi_int c=0; c<nx_; ++c) {
-            for (casadi_int k=a_colind[c]; k<a_colind[c+1]; ++k) {
-              if (a_row[k]==iduerr) sens[c] += a[k];
-            }
-          }
-        }
-        // Now calculate the sensitivity of this quanitity on lam_x and lam_g
+        sens[iduerr] = 1.;
         casadi_mv(a, A_, sens, sens+nx_, 0);
-        // Scale to get the ratio between them
         casadi_scal(nx_+na_, 1./sens[iduerr], sens);
       }
 
@@ -640,9 +628,9 @@ namespace casadi {
           }
         }
 
-        // Look for largest bound violation corresponding to an unenforced constraint
-        double prerr = 0.;
-        casadi_int iprerr = -1;
+        // Look for largest primal error in unenforced constraints
+        prerr = 0.;
+        iprerr = -1;
         for (i=0; i<nx_+na_; ++i) {
           if (lam[i]!=0.) continue;
           if (z[i] > ubz[i]+prerr) {
@@ -658,130 +646,50 @@ namespace casadi {
         if (iprerr>=0) {
           lam[iprerr] = z[iprerr]>ubz[iprerr] ? DMIN : -DMIN;
           changed_active_set = true;
+          continue;
         }
-      }
 
-      // Success?
-      if (changed_active_set || tau==1.) continue;
-
-      // Find the largest error in the unenforced constraints
-      prerr = 0.;
-      iprerr = -1;
-      for (i=0; i<nx_+na_; ++i) {
-        if (lam[i]!=0.) continue;
-        if (z[i] > ubz[i]+prerr) {
-          prerr = z[i]-ubz[i];
-          iprerr = i;
-        } else if (z[i] < lbz[i]-prerr) {
-          prerr = lbz[i]-z[i];
-          iprerr = i;
+        // Look for largest dual error
+        duerr = 0.;
+        iduerr = -1;
+        for (i=0; i<nx_; ++i) {
+          double duerr_trial = fabs(glag[i]+lam[i]);
+          if (duerr_trial>duerr) {
+            duerr = duerr_trial;
+            iduerr = i;
+            duerr_pos = glag[i]+lam[i]>0;
+          }
         }
-      }
 
-      // Add constraints, if any
-      if (iprerr>=0) {
-        // Add a constraint to restore primal feasibility
-        lam[iprerr] = z[iprerr]>ubz[iprerr] ? DMIN : -DMIN;
-        changed_active_set = true;
-        continue;
-      }
-
-#if 0
-      // Try to reduce dual infeasibility
-      casadi_assert(iduerr>=0, "No dual error");
-
-      // The constraint is either enforced or not
-      if (lam[iduerr]==0.) {
-        // We have that A^T * delta(lam_g) + delta(lam_x) = 0
-        // use this to implicitly define the sensitivity with respect
-        // to changing this value
-        casadi_fill(w, nx_+na_, 0.);
-        if (iduerr<nx_) {
-          w[iduerr] = 1.;
-        } else {
-          for (casadi_int c=0; c<nx_; ++c) {
-            for (casadi_int k=a_colind[c]; k<a_colind[c+1]; ++k) {
-              if (a_row[k]==iduerr) w[c] += a[k];
+        // Try to reduce largest dual error by removing a constraint
+        if (iduerr>=0) {
+          // Recalculate sens for the new iduerr as above
+          casadi_fill(sens, nx_+na_, 0.);
+          sens[iduerr] = 1.;
+          casadi_mv(a, A_, sens, sens+nx_, 0);
+          // Look for the best constraint to remove
+          double best = 0;
+          index = -1;
+          for (i=0; i<nx_+na_; ++i) {
+            // Only enforced constraints are candidates
+            if (lam[i]==0.) continue;
+            // Projected change from *removing* the constraint
+            double trial = -sens[i]*lam[i];
+            // if duerr_pos is true, we need a decrease. Pick the largest
+            if (duerr_pos ? trial<-best : trial>best) {
+              best = fabs(trial);
+              index = i;
             }
           }
-        }
-        // Now calculate the sensitivity of this quanitity on lam_x and lam_g
-        casadi_mv(a, A_, w, w+nx_, 0);
-        casadi_assert(w[iduerr]!=0., "Degeneracy");
-        // Scale to get the ratio (sign is enough?)
-        casadi_scal(nx_+na_, 1./w[iduerr], w);
-        // We have that dual error is glad[i] + lam[i]. If it's positive, we can
-        // decrease it by instead increasing another multiplier a factor 1/w[i].
-        // We pick the multiplier that require the smallest change, i.e. largest
-        // w[i] in magnitude.
-        double best = 0;
-        index = -1;
-        bool best_is_pos;
-        for (i=0; i<nx_+na_; ++i) {
-          if (i==iduerr || w[i]==0.) continue; // not a candidate
-          // Only consider free lam[i] for now. Makes sense?
-          if (lam[i]!=0.) continue;
-          // Do we need an increase or decrease in lam[i]?
-          bool need_pos = duerr_pos ? w[i]>0 : w[i]<0;
-          // Make sure that it's an allowed direction
-          if (need_pos ? isinf(ubz[i]) : isinf(lbz[i])) continue;
-          // Check if it's the best so far
-          if (fabs(w[i])>best) {
-            best = fabs(w[i]);
-            index = i;
-            best_is_pos = need_pos;
+
+          // Accept?
+          if (index>=0) {
+            lam[index] = 0.;
+            changed_active_set = true;
+            continue;
           }
         }
-
-        // Accept?
-        if (index>=0) {
-          lam[index] = best_is_pos ? duerr/fabs(w[i]) : -duerr/fabs(w[i]);
-          changed_active_set = true;
-          continue;
-        } else {
-          casadi_message( "nothing acceptable");
-        }
-
-        // Make sure equality constraints are active, preferably with lower bound active
-        // Determine initial active set
-        for (i=0; i<nx_+na_; ++i) {
-          if (lam[i]!=0. || lbz[i]!=ubz[i]) continue;
-          lam[i] = z[i]<=lbz[i] ? -DMIN : DMIN;
-          changed_active_set = true;
-          casadi_message("found equality");
-          break;
-        }
-        if (changed_active_set) continue;
       }
-
-      if (false) {
-        // If step becomes zero with no change, look for redundant constraints
-        double best = 0.;
-        index = -1;
-
-        // Look for redundant constraints
-        for (i=0; i<nx_+na_; ++i) {
-          // skip inactive constraints
-          if (lam[i]==0. || lam[i]>=err) continue;
-          if (z[i]>lbz[i]+best) {
-            best = z[i]-lbz[i];
-            index = i;
-          } else if (z[i]<ubz[i]-best) {
-            best = ubz[i]-z[i];
-            index = i;
-          }
-        }
-        if (index>=0) {
-          lam[index] = 0.;
-          changed_active_set = true;
-          continue;
-        }
-      }
-#endif
-
-      casadi_warning("Step size becomes zero");
-      flag = 1;
-      break;
     }
 
     // Calculate optimal cost
