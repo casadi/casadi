@@ -56,8 +56,8 @@ if has_conic("cplex"):
 if has_conic("clp"):
   conics.append(("clp",{"verbose":True},{"quadratic": False}))
 
-#if has_conic("activeset"):
-#  conics.append(("activeset",{},{"quadratic": True}))
+if has_conic("activeset"):
+  conics.append(("activeset",{},{"quadratic": True}))
 
 print(conics)
 
