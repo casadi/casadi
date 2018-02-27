@@ -181,6 +181,7 @@ class ConicTests(casadiTestCase):
 
 
     for conic, qp_options, aux_options in conics:
+      if 'activeset' in str(conic): continue
       if not aux_options["quadratic"]: continue
       self.message("general_convex: " + str(conic))
 
