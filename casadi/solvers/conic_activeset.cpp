@@ -671,11 +671,11 @@ namespace casadi {
           if (lam[i]>0 && trial_lam < -e) {
             tau = -(lam[i]+e)/dlam[i];
             index = i;
-            sign = lbz[i]==ubz[i] ? -1 : 0;
+            sign = 0;
           } else if (lam[i]<0 && trial_lam > e) {
             tau = -(lam[i]-e)/dlam[i];
             index = i;
-            sign = lbz[i]==ubz[i] ? 1 : 0;
+            sign = 0;
           }
         }
         // Consistency check
