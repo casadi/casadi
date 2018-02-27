@@ -598,85 +598,91 @@ namespace casadi {
       for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dlam[i]==0.;
       if (zero_step) tau = 0.;
 
-      // Loop over variables and constraints
+      // Check primal feasibility in the search direction
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
         double tau1 = tau;
-        if (lam[i]==0.) {
-          // Numerics checks
-          casadi_assert(lam[i] + dlam[i] >= -err, "Numerics failure");
-          casadi_assert(lam[i] + dlam[i] <= err, "Numerics failure");
-          // Acceptable error (to avoid increasing max error)
-          double e = prerr;
-          if (dz[i]==0.) continue; // Skip zero steps
-          // Check if violation with tau=0 and not improving
-          if (dz[i]<0 ? z[i]<=lbz[i]-e : z[i]>=ubz[i]+e) {
-            tau = 0.;
-            index = i;
-            sign = dz[i]<0 ? -1 : 1;
-            break;
-          }
-          // Trial primal step
-          double trial_z=z[i] + tau*dz[i];
-          if (dz[i]<0 && trial_z<lbz[i]-e) {
-            // Trial would increase maximum infeasibility
-            tau = (lbz[i]-e-z[i])/dz[i];
-            index = i;
-            sign = -1;
-          } else if (dz[i]>0 && trial_z>ubz[i]+e) {
-            // Trial would increase maximum infeasibility
-            tau = (ubz[i]+e-z[i])/dz[i];
-            index = i;
-            sign = 1;
-          }
+        if (lam[i]!=0.) continue;
+        // Numerics checks
+        casadi_assert(lam[i] + dlam[i] >= -err, "Numerics failure");
+        casadi_assert(lam[i] + dlam[i] <= err, "Numerics failure");
+        // Acceptable error (to avoid increasing max error)
+        double e = prerr;
+        if (dz[i]==0.) continue; // Skip zero steps
+        // Check if violation with tau=0 and not improving
+        if (dz[i]<0 ? z[i]<=lbz[i]-e : z[i]>=ubz[i]+e) {
+          tau = 0.;
+          index = i;
+          sign = dz[i]<0 ? -1 : 1;
+          break;
+        }
+        // Trial primal step
+        double trial_z=z[i] + tau*dz[i];
+        if (dz[i]<0 && trial_z<lbz[i]-e) {
+          // Trial would increase maximum infeasibility
+          tau = (lbz[i]-e-z[i])/dz[i];
+          index = i;
+          sign = -1;
+        } else if (dz[i]>0 && trial_z>ubz[i]+e) {
+          // Trial would increase maximum infeasibility
+          tau = (ubz[i]+e-z[i])/dz[i];
+          index = i;
+          sign = 1;
+        }
+        // Consistency check
+        casadi_assert(tau<=tau1, "Inconsistent step size calculation");
+      }
+
+      // Check dual feasibility in the search direction
+      for (i=0; i<nx_+na_ && tau>0.; ++i) {
+        double tau1 = tau;
+        if (lam[i]==0.) continue;
+        // Check numerics
+        casadi_assert(z[i] + dz[i] >= lbz[i] - err, "Numerics failure");
+        casadi_assert(z[i] + dz[i] <= ubz[i] + err, "Numerics failure");
+        if (dlam[i]==0.) continue; // Skip zero steps
+        /*
+        if lam[i]<0, we need lam[i] + tau*dlam[i] < e as well as -e < tau*dlam[i] < e
+        i.e.
+             tau*dlam[i] < e           if dlam[i]>0
+        -e < tau*dlam[i] < e - lam[i]  if dlam[i]<0
+        if lam[i]>0, we need -e < lam[i] + tau*dlam[i] as well as -e < tau*dlam[i] < e
+        i.e.
+        -e - lam[i] < tau*dlam[i] < e    if dlam[i]>0
+                 -e < tau*dlam[i]        if dlam[i]<0
+        */
+        // Acceptable error (to avoid increasing max dual error)
+        //double e = duerr;
+        double e = 0.;
+        /*
+        if (i<nx_) {
+          e = duerr;
         } else {
-          // Check numerics
-          casadi_assert(z[i] + dz[i] >= lbz[i] - err, "Numerics failure");
-          casadi_assert(z[i] + dz[i] <= ubz[i] + err, "Numerics failure");
-          if (dlam[i]==0.) continue; // Skip zero steps
-          /*
-          if lam[i]<0, we need lam[i] + tau*dlam[i] < e as well as -e < tau*dlam[i] < e
-          i.e.
-               tau*dlam[i] < e           if dlam[i]>0
-          -e < tau*dlam[i] < e - lam[i]  if dlam[i]<0
-          if lam[i]>0, we need -e < lam[i] + tau*dlam[i] as well as -e < tau*dlam[i] < e
-          i.e.
-          -e - lam[i] < tau*dlam[i] < e    if dlam[i]>0
-                   -e < tau*dlam[i]        if dlam[i]<0
-          */
-          // Acceptable error (to avoid increasing max dual error)
-          //double e = duerr;
-          double e = 0.;
-          /*
-          if (i<nx_) {
-            e = duerr;
-          } else {
-            double max_a = 0.;
-            for (casadi_int c=0; c<nx_; ++c) {
-              for (casadi_int k=a_colind[c]; k<a_colind[c+1]; ++k) {
-                if (i==nx_+a_row[k]) max_a = fmax(max_a, fabs(a[k]));
-              }
+          double max_a = 0.;
+          for (casadi_int c=0; c<nx_; ++c) {
+            for (casadi_int k=a_colind[c]; k<a_colind[c+1]; ++k) {
+              if (i==nx_+a_row[k]) max_a = fmax(max_a, fabs(a[k]));
             }
-            e = duerr/max_a;
           }
-          // Trial dual stepsize
-          double trial_dlam = fabs(tau*dlam[i]);
-          if (trial_dlam>e) {
-            tau = e/trial_dlam;
-            index = i;
-            sign = 0;
-          }
-          */
-          // Trial dual step
-          double trial_lam = lam[i] + tau*dlam[i];;
-          if (lam[i]>0 && trial_lam < -e) {
-            tau = -(lam[i]+e)/dlam[i];
-            index = i;
-            sign = 0;
-          } else if (lam[i]<0 && trial_lam > e) {
-            tau = -(lam[i]-e)/dlam[i];
-            index = i;
-            sign = 0;
-          }
+          e = duerr/max_a;
+        }
+        // Trial dual stepsize
+        double trial_dlam = fabs(tau*dlam[i]);
+        if (trial_dlam>e) {
+          tau = e/trial_dlam;
+          index = i;
+          sign = 0;
+        }
+        */
+        // Trial dual step
+        double trial_lam = lam[i] + tau*dlam[i];;
+        if (lam[i]>0 && trial_lam < -e) {
+          tau = -(lam[i]+e)/dlam[i];
+          index = i;
+          sign = 0;
+        } else if (lam[i]<0 && trial_lam > e) {
+          tau = -(lam[i]-e)/dlam[i];
+          index = i;
+          sign = 0;
         }
         // Consistency check
         casadi_assert(tau<=tau1, "Inconsistent step size calculation");
@@ -697,7 +703,7 @@ namespace casadi {
         // Get the current sign
         casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
         // Account for sign changes
-        if (i==index) {
+        if (i==index && s!=sign) {
           changed_active_set = true;
           s = sign;
         }
