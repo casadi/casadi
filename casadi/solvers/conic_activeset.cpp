@@ -422,15 +422,24 @@ namespace casadi {
         }
       }
 
+      // Should we try to reduce primal or dual infeasibility?
+      bool primal_step = prerr>=duerr;
+
       // Smallest nonzero lambda
       double lam_min = 0.;
       for (i=0; i<nx_+na_; ++i) {
         if (lam[i]!=0. && fabs(lam[i])<lam_min) lam_min = fabs(lam[i]);
       }
 
+      if (iter % 10 == 0) {
+        // Print header
+        print("%10s %15s %15s %6s %15s %6s %10s %10s\n",
+              "Iteration", "fk", "|pr|", "con", "|du|", "var", "tau", "lam_min");
+      }
+
       // Print iteration progress:
-      print("Iteration %d: fk=%g, |pr|=%g(%d), |du|=%g(%d), tau=%g, lam_min=%g\n",
-            iter, fk, prerr, iprerr, duerr, iduerr, tau, lam_min);
+      print("%6d (%1s) %15g %15g %6d %15g %6d %10g %10g\n",
+            iter, primal_step ? "P" : "D", fk, prerr, iprerr, duerr, iduerr, tau, lam_min);
 
       // Overall error (must be non-increasing)
       double old_err = err;
@@ -489,14 +498,6 @@ namespace casadi {
 
       // Start new iteration
       iter++;
-
-
-
-
-
-
-
-
 
       // No change so far
       changed_active_set = false;
