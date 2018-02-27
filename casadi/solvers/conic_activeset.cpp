@@ -359,6 +359,9 @@ namespace casadi {
     // Stepsize
     double tau = -1.;
 
+    // Primal and dual error (must be non-increasing)
+    double err=inf;
+
     // QP iterations
     casadi_int iter = 0;
     while (true) {
@@ -429,8 +432,10 @@ namespace casadi {
       print("Iteration %d: fk=%g, |pr|=%g(%d), |du|=%g(%d), tau=%g, lam_min=%g\n",
             iter, fk, prerr, iprerr, duerr, iduerr, tau, lam_min);
 
-      // Overall error
-      double err = fmax(prerr, duerr);
+      // Overall error (must be non-increasing)
+      double old_err = err;
+      err = fmax(prerr, duerr);
+      casadi_assert(err<=old_err, "Consistency check failed");
 
       // Check if we need to change the active set
       if (!changed_active_set) {
@@ -594,6 +599,7 @@ namespace casadi {
 
       // Loop over variables and constraints
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
+        double tau1 = tau;
         if (lam[i]==0.) {
           // Acceptable error (to avoid increasing max error)
           double e = prerr;
@@ -665,6 +671,8 @@ namespace casadi {
             sign = lbz[i]==ubz[i] ? 1 : 0;
           }
         }
+        // Consistency check
+        casadi_assert(tau<=tau1, "Inconsistent step size calculation");
       }
 
       // Ignore sign changes if they happen for a full step
