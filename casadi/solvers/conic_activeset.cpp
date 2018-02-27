@@ -601,6 +601,9 @@ namespace casadi {
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
         double tau1 = tau;
         if (lam[i]==0.) {
+          // Numerics checks
+          casadi_assert(lam[i] + dlam[i] >= -err, "Numerics failure");
+          casadi_assert(lam[i] + dlam[i] <= err, "Numerics failure");
           // Acceptable error (to avoid increasing max error)
           double e = prerr;
           if (dz[i]==0.) continue; // Skip zero steps
@@ -625,6 +628,9 @@ namespace casadi {
             sign = 1;
           }
         } else {
+          // Check numerics
+          casadi_assert(z[i] + dz[i] >= lbz[i] - err, "Numerics failure");
+          casadi_assert(z[i] + dz[i] <= ubz[i] + err, "Numerics failure");
           if (dlam[i]==0.) continue; // Skip zero steps
           /*
           if lam[i]<0, we need lam[i] + tau*dlam[i] < e as well as -e < tau*dlam[i] < e
