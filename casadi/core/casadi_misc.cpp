@@ -111,6 +111,74 @@ namespace casadi {
     return lookupvector(v, (*std::max_element(v.begin(), v.end()))+1);
   }
 
+  // Better have a bool return flag saying if we need reorer at all
+  std::vector<casadi_int> tensor_permute_mapping(const std::vector<casadi_int>& dims,
+      const std::vector<casadi_int>& order) {
+
+     // Get problem dimensions
+     casadi_int N = casadi::product(dims);
+     casadi_int n = dims.size();
+     // Quick return if no elements
+     if (N==0) return std::vector<casadi_int>();
+
+     // One dimesion => null-permutation
+     if (n==1) return range(N);
+
+     // Allocate space for resulting mapping
+     std::vector<casadi_int> mapping(N);
+     // Quick return if scalar
+     if (n==0) return mapping;
+
+
+     // Compute cumulative product
+     std::vector<casadi_int> cumprod(n+1, 1);
+     for (casadi_int k=1;k<dims.size();++k) cumprod[k]=cumprod[k-1]*dims[k-1];
+
+     // Elementary stride
+     casadi_int stride = cumprod[order[0]];
+
+     // Split problem in inner and outer part
+     casadi_int N_inner = dims[order[0]];
+     casadi_int N_outer = N/N_inner;
+
+     // Reorder dims, cumprod
+     std::vector<casadi_int> new_dims(n-1), new_cumprod(n-1, 1);
+     for (casadi_int k=0;k<n-1;++k) {
+       new_dims[k] = dims[order[k+1]];
+       new_cumprod[k] = cumprod[order[k+1]];
+     }
+
+     // Bank of counters
+     std::vector<casadi_int> index_counters(n-1);
+
+     // Inex into mapping
+     casadi_int m_ind = 0;
+
+     for (casadi_int i=0;i<N_outer;++i) {
+       // Compute index
+       casadi_int ind = 0;
+       for (casadi_int k=0;k<n-1;++k) ind+=index_counters[k]*new_cumprod[k];
+
+       // Fill in mapping
+       for (casadi_int j=0;j<N_inner;++j) {
+         mapping.at(m_ind++) = ind;
+         ind+=stride;
+       }
+
+       // Bump first counter
+       index_counters[0]++;
+
+       // Overflow counters when needed
+       for (casadi_int k=0;k<n-2;++k) {
+         if (index_counters[k]==new_dims[k]) {
+           index_counters[k] = 0;
+           index_counters[k+1]++;
+         }
+       }
+     }
+     return mapping;
+  }
+
   bvec_t* get_bvec_t(std::vector<double>& v) {
     if (v.empty()) {
       return 0;

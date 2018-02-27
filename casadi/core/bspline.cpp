@@ -252,20 +252,31 @@ namespace casadi {
       Sparsity sp_band = vertsplit(Sparsity::band(n, -1), {0, n-1, n})[0];
       DM delta_knots_inv = 1/delta_knots;
       DM T = DM(sp_diag, -delta_knots_inv) + DM(sp_band, delta_knots_inv);
-      T = densify(T);
+      T*= degree_[i];
 
-      std::vector<casadi_int> ai(n_dims+1);
-      for (casadi_int j=0;j<n_dims+1;++j) ai[j] = -j-1;
-      std::vector<casadi_int> bi = std::vector<casadi_int>{-n_dims-2, -i-2};
-      std::vector<casadi_int> ci = ai; ci[i+1] = {-n_dims-2};
       std::vector<casadi_int> coeffs_dims_new = coeffs_dims_;
       coeffs_dims_new[i+1] = T.size1();
 
-      DM r = einstein(DM(coeffs_), vec(T*degree_[i]), coeffs_dims_, {T.size1(), T.size2()},
-        coeffs_dims_new, ai, bi, ci);
-      coeffs = r.nonzeros();
-      casadi_assert_dev(coeffs.size()==product(coeffs_dims_new));
-      return coeffs;
+      // Apply transformation T on axis i
+
+      // Bring axis i to the back
+      std::vector<casadi_int> order = range(n_dims+1);
+      std::swap(order.back(), order[i+1]);
+      std::vector<casadi_int> mapping = tensor_permute_mapping(coeffs_dims_, order);
+      DM coeff_matrix = DM(coeffs_).nz(mapping);
+
+      // Cast as matrix
+      coeff_matrix = reshape(coeff_matrix, -1, T.size2());
+
+      // Apply the transformation matrix from the right
+      coeff_matrix = mtimes(coeff_matrix, T.T());
+
+      // Bring axis i back to the original place
+      mapping = tensor_permute_mapping(permute(coeffs_dims_new, order), order);
+      coeff_matrix = coeff_matrix.nz(mapping);
+
+      // Return the flat vector
+      return coeff_matrix.nonzeros();
     }
 
 

@@ -66,6 +66,10 @@ namespace casadi {
 
   CASADI_EXPORT bool is_equally_spaced(const std::vector<double> &v);
 
+  /// Computes a mapping for a (dense) tensor permutation
+  CASADI_EXPORT std::vector<casadi_int> tensor_permute_mapping(const std::vector<casadi_int>& dims,
+      const std::vector<casadi_int>& order);
+
   /**  \brief Slicing vector
   *  \param v Vector to slice
   *  \param i List of indices
@@ -82,6 +86,11 @@ namespace casadi {
   */
   template<typename T>
   std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b);
+
+  /** \brief permute a list
+  */
+  template<typename T>
+  std::vector<T> permute(const std::vector<T> &a, const std::vector<casadi_int> &order);
 
   #endif // SWIG
 
@@ -347,6 +356,16 @@ namespace casadi {
     std::vector<T> ret = a;
     ret.insert(ret.end(), b.begin(), b.end());
     return ret;
+  }
+
+  template<typename T>
+  std::vector<T> permute(const std::vector<T> &a, const std::vector<casadi_int> &order) {
+    casadi_assert_dev(order.size()==a.size());
+    std::set<casadi_int> order_set(order.begin(), order.end());
+    casadi_assert_dev(order_set.size()==a.size());
+    casadi_assert_dev(*order_set.begin()==0);
+    casadi_assert_dev(*order_set.rbegin()==a.size()-1);
+    return vector_slice(a, order);
   }
 
 #ifndef SWIG
