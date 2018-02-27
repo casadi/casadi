@@ -652,7 +652,7 @@ namespace casadi {
         */
         // Acceptable error (to avoid increasing max dual error)
         //double e = duerr;
-        double e = 0.;
+        double e = primal_step ? err : 0.;
         /*
         if (i<nx_) {
           e = duerr;
