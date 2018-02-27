@@ -432,7 +432,44 @@ namespace casadi {
       // Overall error
       double err = fmax(prerr, duerr);
 
-      // Successful return?
+      // Check if we need to change the active set
+      if (!changed_active_set) {
+        // Try to reduce either primal or dual infeasibility, whichever is larger
+        if (prerr>=duerr && iprerr>=0 && lam[iprerr]==0.) {
+          // Reduce primal infeasibility by adding a constraint
+          lam[iprerr] = z[iprerr]>ubz[iprerr] ? DMIN : -DMIN;
+          changed_active_set = true;
+        } else {
+          // Reduce infeasibility by removing a constraint
+          if (iduerr>=0) {
+            // Recalculate sens for the new iduerr as above
+            casadi_fill(sens, nx_+na_, 0.);
+            sens[iduerr] = 1.;
+            casadi_mv(a, A_, sens, sens+nx_, 0);
+            // Look for the best constraint to remove
+            double best = 0;
+            casadi_int index = -1;
+            for (i=0; i<nx_+na_; ++i) {
+              // Only enforced constraints are candidates
+              if (lam[i]==0.) continue;
+              // Projected change from *removing* the constraint
+              double trial = -sens[i]*lam[i];
+              // if duerr_pos is true, we need a decrease. Pick the largest
+              if (duerr_pos ? trial<-best : trial>best) {
+                best = fabs(trial);
+                index = i;
+              }
+            }
+            // Accept if it decreases infeasibility
+            if (index>=0 && fabs(lam[index])<duerr) {
+              lam[index] = 0.;
+              changed_active_set = true;
+            }
+          }
+        }
+      }
+
+      // Successful return if still no change
       if (!changed_active_set) {
         flag = 0;
         break;
@@ -447,6 +484,14 @@ namespace casadi {
 
       // Start new iteration
       iter++;
+
+
+
+
+
+
+
+
 
       // No change so far
       changed_active_set = false;
@@ -648,89 +693,6 @@ namespace casadi {
           case -1: lam[i] = fmin(lam[i], -DMIN); break;
           case  1: lam[i] = fmax(lam[i],  DMIN); break;
           case  0: lam[i] = 0.; break;
-        }
-      }
-
-      // If full step, check if we should also change the active set
-      if (true) {
-        // Calculate g
-        casadi_fill(z+nx_, na_, 0.);
-        casadi_mv(a, A_, z, z+nx_, 0);
-
-        // Evaluate gradient of the Lagrangian and constraint functions
-        casadi_copy(g, nx_, glag);
-        casadi_mv(h, H_, z, glag, 0); // gradient of the objective
-        casadi_mv(a, A_, lam+nx_, glag, 1); // gradient of the Lagrangian
-
-        // Recalculate lam(x), without changing the sign
-        for (i=0; i<nx_; ++i) {
-          if (lam[i]>0) {
-            lam[i] = fmax(-glag[i], DMIN);
-          } else if (lam[i]<0) {
-            lam[i] = fmin(-glag[i], -DMIN);
-          }
-        }
-
-        // Look for largest primal error in unenforced constraints
-        prerr = 0.;
-        iprerr = -1;
-        for (i=0; i<nx_+na_; ++i) {
-          if (z[i] > ubz[i]+prerr) {
-            prerr = z[i]-ubz[i];
-            iprerr = i;
-          } else if (z[i] < lbz[i]-prerr) {
-            prerr = lbz[i]-z[i];
-            iprerr = i;
-          }
-        }
-
-        // Calculate dual infeasibility
-        duerr = 0.;
-        iduerr = -1;
-        bool duerr_pos;
-        for (i=0; i<nx_; ++i) {
-          double duerr_trial = fabs(glag[i]+lam[i]);
-          if (duerr_trial>duerr) {
-            duerr = duerr_trial;
-            iduerr = i;
-            duerr_pos = glag[i]+lam[i]>0;
-          }
-        }
-
-        // Try to reduce either primal or dual infeasibility, whichever is larger
-        if (prerr>=duerr && iprerr>=0 && lam[iprerr]==0.) {
-          // Reduce primal infeasibility by adding a constraint
-          lam[iprerr] = z[iprerr]>ubz[iprerr] ? DMIN : -DMIN;
-          changed_active_set = true;
-          continue;
-        } else {
-          // Reduce infeasibility by removing a constraint
-          if (iduerr>=0) {
-            // Recalculate sens for the new iduerr as above
-            casadi_fill(sens, nx_+na_, 0.);
-            sens[iduerr] = 1.;
-            casadi_mv(a, A_, sens, sens+nx_, 0);
-            // Look for the best constraint to remove
-            double best = 0;
-            index = -1;
-            for (i=0; i<nx_+na_; ++i) {
-              // Only enforced constraints are candidates
-              if (lam[i]==0.) continue;
-              // Projected change from *removing* the constraint
-              double trial = -sens[i]*lam[i];
-              // if duerr_pos is true, we need a decrease. Pick the largest
-              if (duerr_pos ? trial<-best : trial>best) {
-                best = fabs(trial);
-                index = i;
-              }
-            }
-            // Accept if it decreases infeasibility
-            if (index>=0 && fabs(lam[index])<duerr) {
-              lam[index] = 0.;
-              changed_active_set = true;
-              continue;
-            }
-          }
         }
       }
     }
