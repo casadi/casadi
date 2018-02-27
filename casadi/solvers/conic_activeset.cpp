@@ -675,7 +675,6 @@ namespace casadi {
         prerr = 0.;
         iprerr = -1;
         for (i=0; i<nx_+na_; ++i) {
-          if (lam[i]!=0.) continue;
           if (z[i] > ubz[i]+prerr) {
             prerr = z[i]-ubz[i];
             iprerr = i;
@@ -697,16 +696,15 @@ namespace casadi {
             duerr_pos = glag[i]+lam[i]>0;
           }
         }
+
         // Try to reduce either primal or dual infeasibility, whichever is larger
-        if (prerr>=duerr) {
+        if (prerr>=duerr && iprerr>=0 && lam[iprerr]==0.) {
           // Reduce primal infeasibility by adding a constraint
-          if (iprerr>=0) {
-            lam[iprerr] = z[iprerr]>ubz[iprerr] ? DMIN : -DMIN;
-            changed_active_set = true;
-            continue;
-          }
+          lam[iprerr] = z[iprerr]>ubz[iprerr] ? DMIN : -DMIN;
+          changed_active_set = true;
+          continue;
         } else {
-          // Reduce dual infeasibility by removing a constraint
+          // Reduce infeasibility by removing a constraint
           if (iduerr>=0) {
             // Recalculate sens for the new iduerr as above
             casadi_fill(sens, nx_+na_, 0.);
