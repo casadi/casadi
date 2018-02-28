@@ -62,6 +62,9 @@ namespace casadi {
      {{"knitro",
        {OT_DICT,
         "Options to be passed to KNITRO"}},
+      {"detect_linear_constraints",
+       {OT_BOOL,
+        "Detect type of constraints"}},
       {"contype",
        {OT_INTVECTOR,
         "Type of constraint"}}
@@ -72,21 +75,33 @@ namespace casadi {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
+    bool detect_linear_constraints = true;
+
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="knitro") {
         opts_ = op.second;
       } else if (op.first=="contype") {
         contype_ = op.second;
+      } else if (op.first=="detect_linear_constraints") {
+        detect_linear_constraints = op.second;
       }
     }
+
+    casadi_assert(!detect_linear_constraints || contype_.empty(),
+      "When specifying 'contype', set 'detect_linear_constraints' to false");
 
     // Type of constraints, general by default
     if (contype_.empty()) {
       contype_.resize(ng_, KTR_CONTYPE_GENERAL);
-    } else {
-      casadi_assert_dev(contype_.size()==ng_);
+      if (detect_linear_constraints) {
+        std::vector<bool> nl_g = oracle_.which_depends("x", {"g"}, 2, true);
+        for (casadi_int i=0;i<ng_;++i)
+          contype_[i] = nl_g[i] ? KTR_CONTYPE_GENERAL : KTR_CONTYPE_LINEAR;
+      }
     }
+
+    casadi_assert_dev(contype_.size()==ng_);
 
     // Setup NLP functions
     create_function("nlp_fg", {"x", "p"}, {"f", "g"});
