@@ -351,7 +351,7 @@ namespace casadi {
 
       return 0;
     } catch(exception& ex) {
-      uerr() << "KnitroInterface::callback caugth exception: "
+      uerr() << "KnitroInterface::callback caught exception: "
                                << ex.what() << endl;
       return -1;
     }
