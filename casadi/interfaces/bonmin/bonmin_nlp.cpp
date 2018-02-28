@@ -203,14 +203,16 @@ namespace casadi {
  }
 
  bool BonminUserClass::get_variables_linearity(Index n, Ipopt::TNLP::LinearityType* var_types) {
-   for (casadi_int i=0; i<n; ++i) var_types[i] = Ipopt::TNLP::NON_LINEAR;
-   // Ipopt::TNLP::NON_LINEAR / Ipopt::TNLP::LINEAR
+   casadi_assert_dev(n==solver_.nl_ex_.size());
+   for (casadi_int i=0; i<n; ++i)
+    var_types[i] = solver_.nl_ex_[i] ? Ipopt::TNLP::NON_LINEAR : Ipopt::TNLP::LINEAR;
    return true;
  }
 
  bool BonminUserClass::get_constraints_linearity(Index m, Ipopt::TNLP::LinearityType* const_types) {
-   for (casadi_int i=0; i<m; ++i) const_types[i] = Ipopt::TNLP::NON_LINEAR;
-   // Ipopt::TNLP::NON_LINEAR / Ipopt::TNLP::LINEAR
+   casadi_assert_dev(m==solver_.nl_g_.size());
+   for (casadi_int i=0; i<m; ++i)
+    const_types[i] = solver_.nl_g_[i] ? Ipopt::TNLP::NON_LINEAR : Ipopt::TNLP::LINEAR;
    return true;
  }
 

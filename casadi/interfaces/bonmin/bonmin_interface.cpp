@@ -68,6 +68,9 @@ namespace casadi {
      {{"pass_nonlinear_variables",
        {OT_BOOL,
         "Pass list of variables entering nonlinearly to BONMIN"}},
+      {"pass_nonlinear_constraints",
+       {OT_BOOL,
+        "Pass list of constraints entering nonlinearly to BONMIN"}},
       {"bonmin",
        {OT_DICT,
         "Options to be passed to BONMIN"}},
@@ -123,7 +126,8 @@ namespace casadi {
     Nlpsol::init(opts);
 
     // Default options
-    pass_nonlinear_variables_ = false;
+    pass_nonlinear_variables_ = true;
+    pass_nonlinear_constraints_ = true;
     Dict hess_lag_options, jac_g_options, grad_f_options;
 
     // Read user options
@@ -132,7 +136,9 @@ namespace casadi {
         opts_ = op.second;
       } else if (op.first=="pass_nonlinear_variables") {
         pass_nonlinear_variables_ = op.second;
-      } else if (op.first=="var_string_md") {
+      } else if (op.first=="pass_nonlinear_constraints") {
+        pass_nonlinear_constraints_ = op.second;
+      }  else if (op.first=="var_string_md") {
         var_string_md_ = op.second;
       } else if (op.first=="var_integer_md") {
         var_integer_md_ = op.second;
@@ -175,6 +181,7 @@ namespace casadi {
       exact_hessian_ = hessian_approximation->second == "exact";
     }
 
+
     // Setup NLP functions
     create_function("nlp_f", {"x", "p"}, {"f"});
     create_function("nlp_g", {"x", "p"}, {"g"});
@@ -186,6 +193,10 @@ namespace casadi {
     }
     jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
 
+    // By default, assume all nonlinear
+    nl_ex_.resize(nx_, true);
+    nl_g_.resize(ng_, true);
+
     // Allocate temporary work vectors
     if (exact_hessian_) {
       if (!has_function("nlp_hess_l")) {
@@ -193,9 +204,17 @@ namespace casadi {
                         {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
       }
       hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
-    } else if (pass_nonlinear_variables_) {
-      nl_ex_ = oracle_.which_depends("x", {"f", "g"}, 2, false);
+
+      if (pass_nonlinear_variables_) {
+        const casadi_int* col = hesslag_sp_.colind();
+        for (casadi_int i=0;i<nx_;++i) nl_ex_[i] = col[i+1]-col[i];
+      }
+    } else {
+      if (pass_nonlinear_variables_)
+        nl_ex_ = oracle_.which_depends("x", {"f", "g"}, 2, false);
     }
+    if (pass_nonlinear_constraints_)
+      nl_g_ = oracle_.which_depends("x", {"g"}, 2, true);
 
     // Allocate work vectors
     alloc_w(nx_, true); // xk_

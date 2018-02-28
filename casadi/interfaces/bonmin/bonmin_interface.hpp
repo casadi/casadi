@@ -174,7 +174,9 @@ namespace casadi {
 
     // Options
     bool pass_nonlinear_variables_;
+    bool pass_nonlinear_constraints_;
     std::vector<bool> nl_ex_;
+    std::vector<bool> nl_g_;
     Dict var_string_md_, var_integer_md_, var_numeric_md_,
       con_string_md_, con_integer_md_, con_numeric_md_;
   };
