@@ -267,6 +267,7 @@ namespace casadi {
       AUX_FINITE_DIFF,
       AUX_QR,
       AUX_LDL,
+      AUX_NEWTON,
       AUX_TO_DOUBLE,
       AUX_TO_INT,
       AUX_CAST,

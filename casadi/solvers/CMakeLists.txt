@@ -65,5 +65,8 @@ casadi_plugin(Nlpsol scpgen
 casadi_plugin(Rootfinder newton
   newton.hpp newton.cpp newton_meta.cpp)
 
+casadi_plugin(Rootfinder fast_newton
+  fast_newton.hpp fast_newton.cpp fast_newton_meta.cpp)
+
 casadi_plugin(Rootfinder nlpsol
   implicit_to_nlp.hpp implicit_to_nlp.cpp implicit_to_nlp_meta.cpp)

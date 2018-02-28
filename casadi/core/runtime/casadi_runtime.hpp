@@ -180,6 +180,13 @@ namespace casadi {
     casadi_fill(x, n, alpha);
   }
 
+  template <class T1>
+  class casadi_newton_mem;
+
+  // Newton step
+  template<typename T1>
+  int casadi_newton(const casadi_newton_mem<T1>* m);
+
   // Dense matrix multiplication
   #define CASADI_GEMM_NT(M, N, K, A, LDA, B, LDB, C, LDC) \
     for (i=0, rr=C; i<M; ++i) \
@@ -224,7 +231,7 @@ namespace casadi {
   #include "casadi_qr.hpp"
   #include "casadi_bfgs.hpp"
   #include "casadi_regularize.hpp"
-
+  #include "casadi_newton.hpp"
 } // namespace casadi
 
 /// \endcond
