@@ -350,11 +350,14 @@ namespace casadi {
       }
 
       return 0;
+    } catch(KeyboardInterruptException& ex) {
+      return KTR_RC_USER_TERMINATION;
     } catch(exception& ex) {
       uerr() << "KnitroInterface::callback caught exception: "
                                << ex.what() << endl;
       return -1;
     }
+
   }
 
   const char* KnitroInterface::return_codes(int flag) {
