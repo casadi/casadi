@@ -127,6 +127,12 @@ namespace casadi {
     m->wubg = w; w += ng_;
   }
 
+  int casadi_KTR_puts(const char * const str, void * const userParams) {
+    std::string s(str);
+    uout() << s << std::flush;
+    return s.size();
+  }
+
   int KnitroInterface::solve(void* mem) const {
     auto m = static_cast<KnitroMemory*>(mem);
 
@@ -135,7 +141,7 @@ namespace casadi {
 
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert_dev(m->kc==0);
-    m->kc = KTR_new();
+    m->kc = KTR_new_puts(casadi_KTR_puts, 0);
     casadi_assert_dev(m->kc!=0);
     casadi_int status;
 
