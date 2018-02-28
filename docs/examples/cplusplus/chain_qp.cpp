@@ -24,6 +24,7 @@
 
 
 #include <casadi/casadi.hpp>
+#include <string.h>
 /** Solve a simple QP
     We want to model a chain attached to two supports and hanging in between. Let us discretise
     it with N mass points connected by N-1 springs. Each mass i has position (yi,zi), i=1,...,N.
