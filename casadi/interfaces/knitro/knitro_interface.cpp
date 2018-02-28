@@ -182,27 +182,33 @@ namespace casadi {
 
     // Pass user set options
     for (auto&& op : opts_) {
-      // Try double
-      if (op.second.can_cast_to(OT_DOUBLE)) {
-        status = KTR_set_double_param_by_name(m->kc, op.first.c_str(), op.second);
-        if (status==0) continue;
-      }
+      int param_id;
+      casadi_assert(KTR_get_param_id(m->kc, op.first.c_str(), &param_id)==0,
+        "Unknown parameter '" + op.first + "'.");
 
-      // Try integer
-      if (op.second.can_cast_to(OT_INT)) {
-        status = KTR_set_int_param_by_name(m->kc, op.first.c_str(), op.second);
-        if (status==0) continue;
-      }
+      int param_type;
+      casadi_assert(!KTR_get_param_type(m->kc, param_id, &param_type),
+        "Error when setting option '" + op.first + "'.");
 
-      // try string
-      if (op.second.can_cast_to(OT_STRING)) {
-        string str = op.second.to_string();
-        status = KTR_set_char_param_by_name(m->kc, op.first.c_str(), str.c_str());
-        if (status==0) continue;
+      switch (param_type) {
+        case KTR_PARAMTYPE_INTEGER:
+          casadi_assert(!KTR_set_int_param(m->kc, param_id, op.second),
+            "Error when setting option '" + op.first + "'.");
+          continue;
+        case KTR_PARAMTYPE_FLOAT:
+          casadi_assert(!KTR_set_double_param(m->kc, param_id, op.second),
+            "Error when setting option '" + op.first + "'.");
+          continue;
+        case KTR_PARAMTYPE_STRING:
+          {
+            string str = op.second.to_string();
+            casadi_assert(!KTR_set_char_param(m->kc, param_id, str.c_str()),
+              "Error when setting option '" + op.first + "'.");
+          }
+          continue;
+        default:
+          casadi_error("Error when setting option '" + op.first + "'.");
       }
-
-      // Error if reached this point
-      casadi_error("KNITRO error setting option \"" + op.first + "\"");
     }
 
     // "Correct" upper and lower bounds
