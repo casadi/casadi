@@ -201,7 +201,8 @@ namespace casadi {
     print("]\n");
   }
 
-  void print_matrix(const double* x, const casadi_int* sp_x) {
+  void print_matrix(const char* id, const double* x, const casadi_int* sp_x) {
+    cout << id << ": ";
     Sparsity sp = Sparsity::compressed(sp_x);
     vector<double> nz(x, x+sp.nnz());
     DM(sp, nz).print_dense(cout, false);
@@ -422,8 +423,7 @@ namespace casadi {
       casadi_int iduerr = -1;
       bool duerr_pos = false; // TODO(jaeandersson): have a look
       for (i=0; i<nx_; ++i) {
-        w[i] = glag[i]+lam[i];
-        double duerr_trial = fabs(w[i]);
+        double duerr_trial = fabs(glag[i]+lam[i]);
         if (duerr_trial>duerr) {
           duerr = duerr_trial;
           iduerr = i;
@@ -461,72 +461,41 @@ namespace casadi {
           // Constraint is free, enforce
           lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
           changed_active_set = true;
-#if 0
-        } else if (z[iprerr]>=ubz[iprerr] || z[iprerr]<=lbz[iprerr]) {
-          // We are overconstrained, free another constraint. We pick the one
-          // which results in the smallest increase in dual infeasibility
-          double best = inf;
-          casadi_int index = -1;
-          for (i=0; i<nx_+na_; ++i) {
-            // Skip non-candidates
-            if (i==iprerr || lam[i]==0.) continue;
-            // Skip equality constraints, no improvement is possible
-            if (lbz[i]==ubz[i]) continue;
-            // Check largest dual infeasibility resulting from setting lam[i]=0
-            double new_duerr;
-            if (i<nx_) {
-              // Set a lam_x to zero
-              new_duerr = fabs(w[i]-lam[i]);
-            } else {
-              // Set a lam_a to zero
-              new_duerr = 0.;
-              for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-                new_duerr = fmax(new_duerr, fabs(w[at_row[k]]-a[k]*lam[i]));
-              }
-            }
-            // Is this the best one so far?
-            if (new_duerr<best) {
-              best = new_duerr;
-              index = i;
-            }
-          }
-
-          // Accept, if any
-          if (index>=0) {
-            lam[index] = 0.;
-            changed_active_set = true;
-          }
-        } else {
-          // Constraint is active at the wrong bound
-          lam[iprerr] = 0.;
-          changed_active_set = true;
-          #endif
         }
       }
 
       // Can we improve dual feasibility?
       if (!changed_active_set && iduerr>=0) {
-        // Reduce infeasibility by removing a constraint
-        // Recalculate sens for the new iduerr as above
-        casadi_fill(sens, nx_+na_, 0.);
-        sens[iduerr] = 1.;
-        casadi_mv(a, A_, sens, sens+nx_, 0);
-        // Look for the best constraint to remove
-        double best = 0;
+        // Is it possible to improve dual feasibility by removing a constraint
+        double best = duerr;
         casadi_int index = -1;
         for (i=0; i<nx_+na_; ++i) {
-          // Only enforced constraints are candidates
-          if (lam[i]==0.) continue;
-          // Projected change from *removing* the constraint
-          double trial = -sens[i]*lam[i];
-          // if duerr_pos is true, we need a decrease. Pick the largest
-          if (duerr_pos ? trial<-best : trial>best) {
-            best = fabs(trial);
+          // Skip non-candidates
+          if (i==iprerr || lam[i]==0.) continue;
+          // Skip equality constraints, no improvement is possible
+          if (lbz[i]==ubz[i]) continue;
+          // Check largest dual infeasibility resulting from setting lam[i]=0
+          double new_duerr;
+          if (i<nx_) {
+            // Set a lam_x to zero
+            new_duerr = fabs(glag[i]);
+          } else {
+            // Set a lam_a to zero
+            new_duerr = 0.;
+            for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+              casadi_int j = at_row[k];
+              new_duerr = fmax(new_duerr, fabs((glag[j]-a[k]*lam[i]) + lam[j]));
+            }
+          }
+          // Is this the best one so far?
+          if (new_duerr<best) {
+            best = new_duerr;
             index = i;
           }
         }
-        // Accept if it decreases infeasibility
-        if (index>=0 && fabs(lam[index])<duerr) {
+
+        // Accept, if any
+        if (index>=0) {
           lam[index] = 0.;
           changed_active_set = true;
         }
@@ -600,8 +569,18 @@ namespace casadi {
         }
       }
 
+      if (verbose_) {
+        print_matrix("KKT", kktd, kktd_);
+      }
+
       // QR factorization
       casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
+
+      if (verbose_) {
+        print_matrix("QR(V)", v, sp_v_);
+        print_matrix("QR(R)", r, sp_r_);
+        print_vector("beta", beta, nx_+na_);
+      }
 
       // Solve to get primal-dual step
       casadi_copy(kktres, nx_+na_, dz);
@@ -733,6 +712,9 @@ namespace casadi {
 
       // Ignore sign changes if they happen for a full step
       if (tau==1.) index = -1;
+
+      // Avoid acting on noise when we're already feasible
+//      if (prerr<duerr && tau<1e-10) index = -1;
 
       if (verbose_) {
         print("tau = %g\n", tau);
