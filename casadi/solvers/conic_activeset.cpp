@@ -682,6 +682,8 @@ namespace casadi {
         double tau1 = tau;
         // Check numerics
         if (dlam[i]==0.) continue; // Skip zero steps
+        // Inactive constraints remain inactive
+        if (lam[i]==0.) continue;
         /*
         if lam[i]<0, we need lam[i] + tau*dlam[i] < e as well as -e < tau*dlam[i] < e
         i.e.
@@ -692,9 +694,8 @@ namespace casadi {
         -e - lam[i] < tau*dlam[i] < e    if dlam[i]>0
                  -e < tau*dlam[i]        if dlam[i]<0
         */
-        // Acceptable error (to avoid increasing max dual error)
-        //double e = duerr;
-        double e = primal_step ? err : 0.;
+        // Allow some error if we're trying to get primal feasibility (?)
+        double e = prerr>duerr ? 0. : 1e-10; /* avoid numerical noise */
         /*
         if (i<nx_) {
           e = duerr;
