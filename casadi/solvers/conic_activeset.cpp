@@ -650,12 +650,8 @@ namespace casadi {
       // Check primal feasibility in the search direction
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
         double tau1 = tau;
-        if (lam[i]!=0.) continue;
-        // Numerics checks
-        casadi_assert(lam[i] + dlam[i] >= -err, "Numerics failure");
-        casadi_assert(lam[i] + dlam[i] <= err, "Numerics failure");
         // Acceptable error (to avoid increasing max error)
-        double e = prerr;
+        double e = lam[i]==0. ? prerr : 1e-10; /* avoid numerical noise */
         if (dz[i]==0.) continue; // Skip zero steps
         // Check if violation with tau=0 and not improving
         if (dz[i]<0 ? z[i]<=lbz[i]-e : z[i]>=ubz[i]+e) {
