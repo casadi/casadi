@@ -8,7 +8,7 @@ double casadi_lb_eig(const casadi_int* sp_h, const T1* h) {
   T1 center, radius;
   const casadi_int *colind, *row;
   // Return value
-  T1 lb_eig;
+  T1 lb_eig = 0;
   // Get sparsity
   ncol = sp_h[1];
   colind = sp_h+2; row = sp_h+ncol+3;
