@@ -351,6 +351,10 @@ namespace casadi {
     const casadi_int* kkt_colind = kktd_.colind();
     const casadi_int* kkt_row = kktd_.row();
 
+    // R sparsity
+    const casadi_int* r_colind = sp_r_.colind();
+    const casadi_int* r_row = sp_r_.row();
+
     // A sparsity
     //const casadi_int* a_colind = A_.colind();
     //const casadi_int* a_row = A_.row();
@@ -367,6 +371,9 @@ namespace casadi {
 
     // Primal and dual error (must be non-increasing)
     double err=inf;
+
+    // Logarithm of the determinant
+    double log_det = -1;
 
     // QP iterations
     casadi_int iter = 0;
@@ -442,13 +449,15 @@ namespace casadi {
 
       if (iter % 10 == 0) {
         // Print header
-        print("%10s %15s %15s %6s %15s %6s %10s %10s\n",
-              "Iteration", "fk", "|pr|", "con", "|du|", "var", "tau", "lam_min");
+        print("%10s %15s %15s %6s %15s %6s %10s %10s %15s\n",
+              "Iteration", "fk", "|pr|", "con", "|du|", "var", "tau", "lam_min",
+              "log|det(KKT)|");
       }
 
       // Print iteration progress:
-      print("%6d (%1s) %15g %15g %6d %15g %6d %10g %10g\n",
-            iter, primal_step ? "P" : "D", fk, prerr, iprerr, duerr, iduerr, tau, lam_min);
+      print("%6d (%1s) %15g %15g %6d %15g %6d %10g %10g %15g\n",
+            iter, primal_step ? "P" : "D", fk, prerr, iprerr, duerr, iduerr, tau,
+            lam_min, log_det);
 
       // Overall error (must be non-increasing)
       double old_err = err;
@@ -575,6 +584,12 @@ namespace casadi {
 
       // QR factorization
       casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
+
+      // Calculate the logarithm of the determinant
+      log_det = 0;
+      for (casadi_int c=0; c<nx_+na_; ++c) {
+        log_det += log(fabs(r[r_colind[c+1]-1]));
+      }
 
       if (verbose_) {
         print_matrix("QR(V)", v, sp_v_);
