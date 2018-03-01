@@ -493,7 +493,7 @@ namespace casadi {
             new_duerr = 0.;
             for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
               casadi_int j = at_row[k];
-              new_duerr = fmax(new_duerr, fabs((glag[j]-a[k]*lam[i]) + lam[j]));
+              new_duerr = fmax(new_duerr, fabs((glag[j]-trans_a[k]*lam[i]) + lam[j]));
             }
           }
           // Is this the best one so far?
