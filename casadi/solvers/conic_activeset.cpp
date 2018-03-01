@@ -350,8 +350,8 @@ namespace casadi {
     const casadi_int* kkt_row = kktd_.row();
 
     // A sparsity
-    const casadi_int* a_colind = A_.colind();
-    const casadi_int* a_row = A_.row();
+    //const casadi_int* a_colind = A_.colind();
+    //const casadi_int* a_row = A_.row();
 
     // No change so far
     bool changed_active_set = true;
@@ -412,7 +412,7 @@ namespace casadi {
       // Calculate dual infeasibility
       double duerr = 0.;
       casadi_int iduerr = -1;
-      bool duerr_pos;
+      bool duerr_pos = false; // TODO(jaeandersson): have a look
       for (i=0; i<nx_; ++i) {
         double duerr_trial = fabs(glag[i]+lam[i]);
         if (duerr_trial>duerr) {
