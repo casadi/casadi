@@ -328,6 +328,27 @@
 %exception  casadi::Factory< MatType >::request_output(const std::string &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FastNewton::alloc_mem() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FastNewton::class_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FastNewton::codegen_body(CodeGenerator &g) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FastNewton::codegen_declarations(CodeGenerator &g) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FastNewton::get_options() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FastNewton::init(const Dict &opts) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FastNewton::plugin_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FiniteDiff::codegen_body(CodeGenerator &g) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1850,6 +1871,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Factory< MatType >::Factory(const Function::AuxOut &aux) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::FastNewton::FastNewton(const std::string &name, const Function &f) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::FiniteDiff::FiniteDiff(const std::string &name, casadi_int n) {
