@@ -200,8 +200,8 @@ matrix:
         - make
         - sudo make install
         - popd
-        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test && make unittests_py examples_code_py && popd
+        - #python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        - #pushd test && make unittests_py examples_code_py && popd
     - compiler: gcc
       os: linux
       dist: trusty
@@ -218,8 +218,8 @@ matrix:
         - make
         - sudo make install
         - popd
-        - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test && make unittests_py examples_code_py && popd
+        - #python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        - #pushd test && make unittests_py examples_code_py && popd
     - compiler: gcc
       os: linux
       dist: trusty
