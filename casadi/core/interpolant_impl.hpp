@@ -68,6 +68,23 @@ namespace casadi {
     std::string get_name_out(casadi_int i) override;
     /// @}
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
+
+    /// Initialize
+    void init(const Dict& opts) override;
+
+    /// Convert from (optional) lookup modes labels to enum
+    static std::vector<casadi_int> interpret_lookup_mode(const std::vector<std::string>& modes,
+        const std::vector<double>& grid, const std::vector<casadi_int>& offset,
+        const std::vector<casadi_int>& margin_left=std::vector<casadi_int>(),
+        const std::vector<casadi_int>& margin_right=std::vector<casadi_int>());
+
+    static std::vector<std::string> lookup_mode_from_enum(const std::vector<casadi_int>& modes);
+
     // Creator function for internal class
     typedef Interpolant* (*Creator)(const std::string& name,
                                     const std::vector<double>& grid,
@@ -98,6 +115,9 @@ namespace casadi {
 
     // Values at gridpoints
     std::vector<double> values_;
+
+    // Lookup modes
+    std::vector<std::string> lookup_modes_;
   };
 
 } // namespace casadi

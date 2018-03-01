@@ -70,36 +70,7 @@ namespace casadi {
     // Call the base class initializer
     Interpolant::init(opts);
 
-    lookup_mode_ = std::vector<casadi_int>(offset_.size()-1, 0);
-
-    std::vector<std::string> lookup_mode;
-
-    // Read options
-    for (auto&& op : opts) {
-      if (op.first=="lookup_mode") {
-        lookup_mode = op.second;
-      }
-    }
-
-    if (!lookup_mode.empty()) {
-      casadi_assert_dev(lookup_mode.size()==offset_.size()-1);
-      for (casadi_int i=0;i<offset_.size()-1;++i) {
-        if (lookup_mode[i]=="linear") {
-          lookup_mode_[i] = 0;
-        } else if (lookup_mode[i]=="exact") {
-          lookup_mode_[i] = 1;
-          std::vector<double> grid(
-              grid_.begin()+offset_[i],
-              grid_.begin()+offset_[i+1]);
-          casadi_assert_dev(is_increasing(grid) && is_equally_spaced(grid));
-        } else {
-          casadi_error("Unknown lookup_mode option '" + lookup_mode[i] + ". "
-                       "Allowed values: linear, exact.");
-        }
-      }
-    }
-
-
+    lookup_mode_ = Interpolant::interpret_lookup_mode(lookup_modes_, grid_, offset_);
 
     // Needed by casadi_interpn
     alloc_w(ndim_, true);

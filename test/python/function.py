@@ -994,7 +994,7 @@ class Functiontests(casadiTestCase):
   def test_1d_interpolant_uniform(self):
     grid = [[0, 1, 2]]
     values = [0, 1, 2]
-    for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]}]:
+    for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]},{"lookup_mode": ["binary"]}]:
       F = interpolant('F', 'linear', grid, values, opts)
       def same(a, b): return abs(float(a)-b)<1e-8
       self.assertTrue(same(F(2.4), 2.4))
@@ -1010,7 +1010,7 @@ class Functiontests(casadiTestCase):
 
     grid = [[2, 4, 6]]
     values = [10, 7, 1]
-    for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]}]:
+    for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]},{"lookup_mode": ["binary"]}]:
       F = interpolant('F', 'linear', grid, values, opts)
       def same(a, b): return abs(float(a)-b)<1e-8
       self.assertTrue(same(F(1), 11.5))
@@ -1026,7 +1026,7 @@ class Functiontests(casadiTestCase):
   def test_2d_interpolant_uniform(self):
     grid = [[0, 1, 2], [0, 1, 2]]
     values = [0, 1, 2, 10, 11, 12, 20, 21, 22]
-    for opts in [{"lookup_mode": ["linear","linear"]},{"lookup_mode": ["exact","exact"]}]:
+    for opts in [{"lookup_mode": ["linear","linear"]},{"lookup_mode": ["exact","exact"]},{"lookup_mode": ["binary","binary"]}]:
       F = interpolant('F', 'linear', grid, values, opts)
       def same(a, b): return abs(float(a)-b)<1e-8
       self.assertTrue(same(F([2.4, 0.5]), 7.4))

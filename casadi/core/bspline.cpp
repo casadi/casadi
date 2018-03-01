@@ -25,6 +25,7 @@
 
 #include "bspline.hpp"
 #include "function_internal.hpp"
+#include "interpolant_impl.hpp"
 #include "casadi_misc.hpp"
 #include "mx_node.hpp"
 #include <typeinfo>
@@ -34,19 +35,18 @@ namespace casadi {
 
   Options BSplineCommon::options_
   = {{&FunctionInternal::options_},
-     {{"lookup_mode",
-       {OT_STRINGVECTOR,
-        "Sets, for each grid dimenion, the lookup algorithm used to find the correct index. "
-        "'linear' uses a for-loop + break; "
-        "'exact' uses floored division (only for uniform grids)."}},
-     }
+      {{"lookup_mode",
+        {OT_STRINGVECTOR,
+         "Specifies, for each grid dimenion, the lookup algorithm used to find the correct index. "
+         "'linear' uses a for-loop + break; (default when #knots<=100), "
+         "'exact' uses floored division (only for uniform grids), "
+         "'binary' uses a binary search. (default when #knots>100)."}}
+      }
   };
 
 
   void BSplineCommon::init(const Dict& opts) {
     casadi::FunctionInternal::init(opts);
-
-    lookup_mode_ = std::vector<casadi_int>(degree_.size(), 0);
 
     std::vector<std::string> lookup_mode;
 
@@ -57,23 +57,8 @@ namespace casadi {
       }
     }
 
-    if (!lookup_mode.empty()) {
-      casadi_assert_dev(lookup_mode.size()==offset_.size()-1);
-      for (casadi_int i=0;i<offset_.size()-1;++i) {
-        if (lookup_mode[i]=="linear") {
-          lookup_mode_[i] = 0;
-        } else if (lookup_mode[i]=="exact") {
-          lookup_mode_[i] = 1;
-          std::vector<double> grid(
-              knots_.begin()+offset_[i]+degree_[i],
-              knots_.begin()+offset_[i+1]-degree_[i]);
-          casadi_assert_dev(is_increasing(grid) && is_equally_spaced(grid));
-        } else {
-          casadi_error("Unknown lookup_mode option '" + lookup_mode[i] + ". "
-                       "Allowed values: linear, exact.");
-        }
-      }
-    }
+    lookup_mode_ = Interpolant::interpret_lookup_mode(lookup_mode, knots_,
+      offset_, degree_, degree_);
 
     casadi_int n_dims = degree_.size();
 
@@ -232,7 +217,9 @@ namespace casadi {
             degree.push_back(degree_[i]);
           }
         }
-        Function d = Function::bspline("jac_helper", knots, derivative_coeff(k), degree, m_);
+        Dict opts;
+        opts["lookup_mode"] = Interpolant::lookup_mode_from_enum(lookup_mode_);
+        Function d = Function::bspline("jac_helper", knots, derivative_coeff(k), degree, m_, opts);
         parts.push_back(d(std::vector<MX>{x})[0]);
       }
 

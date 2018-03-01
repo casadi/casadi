@@ -124,4 +124,89 @@ namespace casadi {
 
   const std::string Interpolant::infix_ = "interpolant";
 
+  Options Interpolant::options_
+  = {{&FunctionInternal::options_},
+     {{"lookup_mode",
+       {OT_STRINGVECTOR,
+        "Specifies, for each grid dimenion, the lookup algorithm used to find the correct index. "
+        "'linear' uses a for-loop + break; (default when #knots<=100), "
+        "'exact' uses floored division (only for uniform grids), "
+        "'binary' uses a binary search. (default when #knots>100)."}}
+     }
+  };
+
+  void Interpolant::init(const Dict& opts) {
+    // Call the base class initializer
+    FunctionInternal::init(opts);
+
+    // Read options
+    for (auto&& op : opts) {
+      if (op.first=="lookup_mode") {
+        lookup_modes_ = op.second;
+      }
+    }
+
+    // Needed by casadi_interpn
+    alloc_w(ndim_, true);
+    alloc_iw(2*ndim_, true);
+  }
+
+  std::vector<std::string> Interpolant::lookup_mode_from_enum(
+      const std::vector<casadi_int>& modes) {
+    std::vector<std::string> ret(modes.size());
+    for (casadi_int i=0;i<modes.size();++i) {
+      switch (modes[i]) {
+        case 0:
+          ret[i] = "linear";
+          break;
+        case 1:
+          ret[i] = "exact";
+          break;
+        case 2:
+          ret[i] = "binary";
+          break;
+        default:
+          casadi_error("lookup_mode error.");
+      }
+    }
+    return ret;
+  }
+
+  std::vector<casadi_int> Interpolant::interpret_lookup_mode(
+      const std::vector<std::string>& modes, const std::vector<double>& knots,
+      const std::vector<casadi_int>& offset,
+      const std::vector<casadi_int>& margin_left, const std::vector<casadi_int>& margin_right) {
+
+    // Default lookup mode linear
+    std::vector<casadi_int> ret(offset.size()-1, 0);
+
+    for (casadi_int i=0;i<ret.size();++i) {
+      // If more than 100 knots -> default is binary search
+      if (offset[i+1]-offset[i]>100) ret[i] = 2;
+    }
+
+    if (modes.empty()) return ret;
+
+    casadi_assert_dev(modes.size()==offset.size()-1);
+    for (casadi_int i=0;i<offset.size()-1;++i) {
+      if (modes[i]=="linear") {
+        ret[i] = 0;
+      } else if (modes[i]=="exact") {
+        ret[i] = 1;
+        casadi_int m_left  = margin_left.empty() ? 0 : margin_left[i];
+        casadi_int m_right = margin_right.empty() ? 0 : margin_right[i];
+
+        std::vector<double> grid(
+            knots.begin()+offset[i]+m_left,
+            knots.begin()+offset[i+1]-m_right);
+        casadi_assert_dev(is_increasing(grid) && is_equally_spaced(grid));
+      } else if (modes[i]=="binary") {
+        ret[i] = 2;
+      } else {
+        casadi_error("Unknown lookup_mode option '" + modes[i] + ". "
+                     "Allowed values: linear, binary, exact.");
+      }
+    }
+    return ret;
+  }
 } // namespace casadi

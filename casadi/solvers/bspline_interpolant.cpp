@@ -48,7 +48,7 @@ namespace casadi {
   = {{&Interpolant::options_},
       {{"degree",
        {OT_INTVECTOR,
-        "Sets, for each grid dimenion, the degree of the spline."}},
+        "Sets, for each grid dimension, the degree of the spline."}},
        {"linear_solver",
         {OT_STRING,
          "Solver used for constructing the coefficient tensor."}},
@@ -164,6 +164,9 @@ namespace casadi {
       grid.push_back(local_grid);
     }
 
+    Dict opts_bspline;
+    opts_bspline["lookup_mode"] = lookup_modes_;
+
     switch (algorithm_) {
       case ALG_NOT_A_KNOT:
         {
@@ -172,6 +175,7 @@ namespace casadi {
             knots.push_back(not_a_knot(grid[k], degree_[k]));
           Dict opts_dual;
           opts_dual["ad_weight_sp"] = 0;
+          opts_dual["lookup_mode"] = lookup_modes_;
 
           Function B = Function::bspline_dual("spline", knots, meshgrid(grid), degree_, 1, false,
             opts_dual);
@@ -191,9 +195,9 @@ namespace casadi {
 
           double fit = static_cast<double>(norm_1(mtimes(J, C_opt) - V));
 
-          uout() << "Lookup table fitting error: " << fit << std::endl;
+          if (verbose_) casadi_message("Lookup table fitting error: " + str(fit));
 
-          S_ = Function::bspline("spline", knots, C_opt.T().nonzeros(), degree_, m_);
+          S_ = Function::bspline("spline", knots, C_opt.T().nonzeros(), degree_, m_, opts_bspline);
         }
         break;
       case ALG_SMOOTH_LINEAR:
@@ -260,7 +264,7 @@ namespace casadi {
             res[0] = get_ptr(Z)+m_*i;
             linear(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
           }
-          S_ = Function::bspline("spline", grid, Z, degree_, m_);
+          S_ = Function::bspline("spline", grid, Z, degree_, m_, opts_bspline);
         }
         break;
     }
