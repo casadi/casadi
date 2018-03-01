@@ -459,11 +459,6 @@ namespace casadi {
             iter, primal_step ? "P" : "D", fk, prerr, iprerr, duerr, iduerr, tau,
             lam_min, log_det);
 
-      // Overall error (must be non-increasing)
-      double old_err = err;
-      err = fmax(prerr, duerr);
-      casadi_assert(err<=old_err, "Consistency check failed");
-
       // Can we improve primal feasibility?
       if (!changed_active_set && iprerr>=0) {
         if (lam[iprerr]==0.) {
