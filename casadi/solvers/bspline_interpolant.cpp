@@ -149,7 +149,7 @@ namespace casadi {
         } else {
           casadi_error("Algorithm option invalid: " + get_options().info("algorithm"));
         }
-      } else if (op.first=="smooth_linear_frac_") {
+      } else if (op.first=="smooth_linear_frac") {
         smooth_linear_frac_ = op.second;
         casadi_assert(smooth_linear_frac_>0 && smooth_linear_frac_<0.5,
           "smooth_linear_frac must be in ]0,0.5[");
