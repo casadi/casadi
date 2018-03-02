@@ -641,6 +641,9 @@ namespace casadi {
       for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dlam[i]==0.;
       if (zero_step) tau = 0.;
 
+      // Warning if step becomes zero
+      if (zero_step) casadi_warning("Step becomes zero");
+
       // Check primal feasibility in the search direction
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
         double tau1 = tau;
