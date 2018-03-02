@@ -108,6 +108,8 @@ namespace casadi {
     alloc_w(nx_+na_, true); // kktres
     alloc_w(nx_, true); // glag
     alloc_w(nx_+na_, true); // sens
+    alloc_w(nx_, true); // infeas
+    alloc_w(nx_, true); // tinfeas
 
     // Memory for numerical solution
     alloc_w(sp_v_.nnz(), true); // v
@@ -282,8 +284,8 @@ namespace casadi {
     lam_x = res[CONIC_LAM_X];
 
     // Work vectors
-    double *kkt, *kktd, *z, *lam, *v, *r, *beta,
-           *dz, *dlam, *lbz, *ubz, *kktres, *glag, *sens, *trans_a;
+    double *kkt, *kktd, *z, *lam, *v, *r, *beta, *dz, *dlam, *lbz, *ubz,
+           *kktres, *glag, *sens, *trans_a, *infeas, *tinfeas;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     z = w; w += nx_+na_;
@@ -299,6 +301,8 @@ namespace casadi {
     glag = w; w += nx_;
     sens = w; w += nx_+na_;
     trans_a = w; w += AT_.nnz();
+    infeas = w; w += nx_;
+    tinfeas = w; w += nx_;
 
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
@@ -430,7 +434,8 @@ namespace casadi {
       casadi_int iduerr = -1;
       bool duerr_pos = false; // TODO(jaeandersson): have a look
       for (i=0; i<nx_; ++i) {
-        double duerr_trial = fabs(glag[i]+lam[i]);
+        infeas[i] = glag[i]+lam[i];
+        double duerr_trial = fabs(infeas[i]);
         if (duerr_trial>duerr) {
           duerr = duerr_trial;
           iduerr = i;
@@ -664,6 +669,95 @@ namespace casadi {
         }
         // Consistency check
         casadi_assert(tau<=tau1, "Inconsistent step size calculation");
+      }
+
+      // Calculate and order all tau for which there is a sign change
+      casadi_fill(w, nx_+na_, 1.);
+      casadi_int n_tau = 0;
+      for (i=0; i<nx_+na_; ++i) {
+        if (dlam[i]==0.) continue; // Skip zero steps
+        if (lam[i]==0.) continue; // Skip inactive constraints
+        // Skip full steps
+        if (lam[i]>0 ? lam[i]>=-dlam[i] : lam[i]<=-dlam[i]) continue;
+        // Trial dual step
+        double trial_lam = lam[i] + tau*dlam[i];
+        if (lam[i]>0 ? trial_lam < -0. : trial_lam > 0.) {
+          w[i] = -lam[i]/dlam[i];
+        }
+        // Where to insert the w[i]
+        casadi_int loc;
+        for (loc=0; loc<n_tau; ++loc) {
+          if (w[i]<w[iw[loc]]) break;
+        }
+        // Insert element
+        n_tau++;
+        casadi_int next=i, tmp;
+        for (casadi_int j=loc; j<n_tau; ++j) {
+          tmp = iw[j];
+          iw[j] = next;
+          next = tmp;
+        }
+      }
+
+      /* With the search direction (dz, dlam) and the restriction that when
+         lam=0, it stays at zero, we have the following expressions for the
+         updated step in the presence of a zero-crossing
+             z(tau)   = z(0) + tau*dz
+             lam(tau) = lam(0) + tau*dlam     if tau<=tau1
+                        0                     if tau>tau1
+          where tau*dlam = -lam(0), z(tau) = [x(tau);g(tau)]
+          and lam(tau) = [lam_x(tau);lam_g(tau)]
+          This gives the following expression for the dual infeasibility
+          as a function of tau<=tau1:
+            infeas(tau) = g + H*x(tau) + A'*lam_g(tau) + lam_x(tau)
+                        = g + H*lam(0) + A'*lam_g(0) + lam_x(0)
+                        + tau*H*dz + tau*A'*dlam_g + tau*dlam_x
+                        = glag(0) + lam_x(0) + tau*(H*dz + A'*dlam_g + dlam_x)
+                        = infeas(0) + tau*tinfeas
+            The function is continuous in tau, but tinfeas makes a stepwise
+            change when tau=tau1.
+          Let us find the largest possible tau, while keeping maximum
+          dual infeasibility below some value.
+        */
+      double max_duerr = fmax(prerr, duerr);
+      // Tangent of the dual infeasibility at tau=0
+      casadi_fill(tinfeas, nx_, 0.);
+      casadi_mv(h, H_, dz, tinfeas, 0); // A'*dlam_g + dlam_x==0 by definition
+      casadi_mv(a, A_, dlam+nx_, tinfeas, 1);
+      casadi_axpy(nx_, 1., dlam, tinfeas);
+      // How long step can we take without exceeding max_duerr?
+      double tau_k = 0.;
+      for (casadi_int j=0; j<n_tau; ++j) {
+        // Constraint that we're watching
+        i = iw[j];
+        // Distance to the next tau (may be zero)
+        double dtau = w[i] - tau_k;
+        // Check if maximum dual infeasibilty gets exceeded
+        bool found_tau = false;
+        for (i=0; i<nx_ && !found_tau; ++i) {
+          if (fabs(infeas[i]+dtau*tinfeas[i])>max_duerr) {
+            double tau1 = fmin(fmax(tau_k - dtau*(infeas[i]/tinfeas[i]), 0.), tau);
+            print("Step will cause large dual infeasibility. "
+                  "Suggested tau: %g instead of %g\n", tau1, tau);
+            found_tau = true;
+          }
+        }
+        if (found_tau) break;
+
+        // Continue to the next tau
+        tau_k = w[i];
+        // Update infeasibility
+        casadi_axpy(nx_, dtau, tinfeas, infeas);
+        // Update the infeasibility tangent for next iteration
+        if (i<nx_) {
+          // Set a lam_x to zero
+          tinfeas[i] -= lam[i];
+        } else {
+          // Set a lam_a to zero
+          for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+            tinfeas[at_row[k]] -= trans_a[k]*lam[i];
+          }
+        }
       }
 
       // Check dual feasibility in the search direction
