@@ -734,16 +734,22 @@ namespace casadi {
         double dtau = w[i] - tau_k;
         // Check if maximum dual infeasibilty gets exceeded
         bool found_tau = false;
-        for (i=0; i<nx_ && !found_tau; ++i) {
-          if (fabs(infeas[i]+dtau*tinfeas[i])>max_duerr) {
-            double tau1 = fmin(fmax(tau_k - dtau*(infeas[i]/tinfeas[i]), 0.), tau);
-            print("Step will cause large dual infeasibility. "
-                  "Suggested tau: %g instead of %g\n", tau1, tau);
-            found_tau = true;
+        for (j=0; j<nx_ && !found_tau; ++j) {
+          if (fabs(infeas[j]+dtau*tinfeas[j])>max_duerr) {
+            double tau1 = fmax(tau_k - dtau*(infeas[j]/tinfeas[j]), 0.);
+            if (tau1<tau) {
+              // Smallest tau found so far
+              found_tau = true;
+              tau = tau1;
+            }
           }
         }
+        // To not allow the active set change if max_duerr gets exceeded
         if (found_tau) break;
-
+        // Accept the tau, set multiplier to zero but do not change tau
+        //changed_active_set = true;
+        //index = -1;
+        //lam[i] = 0.;
         // Continue to the next tau
         tau_k = w[i];
         // Update infeasibility
