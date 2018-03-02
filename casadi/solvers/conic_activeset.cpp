@@ -737,9 +737,9 @@ namespace casadi {
         double dtau = w[i] - tau_k;
         // Check if maximum dual infeasibilty gets exceeded
         bool found_tau = false;
-        for (j=0; j<nx_ && !found_tau; ++j) {
-          if (fabs(infeas[j]+dtau*tinfeas[j])>max_duerr) {
-            double tau1 = fmax(tau_k - dtau*(infeas[j]/tinfeas[j]), 0.);
+        for (casadi_int k=0; k<nx_ && !found_tau; ++k) {
+          if (fabs(infeas[k]+dtau*tinfeas[k])>max_duerr) {
+            double tau1 = fmax(tau_k - dtau*(infeas[k]/tinfeas[k]), 0.);
             if (tau1<tau) {
               // Smallest tau found so far
               found_tau = true;
