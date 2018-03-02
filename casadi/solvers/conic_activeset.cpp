@@ -465,12 +465,10 @@ namespace casadi {
             lam_min, log_det);
 
       // Can we improve primal feasibility?
-      if (!changed_active_set && iprerr>=0) {
-        if (lam[iprerr]==0.) {
-          // Constraint is free, enforce
-          lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
-          changed_active_set = true;
-        }
+      if (!changed_active_set && iprerr>=0 && lam[iprerr]==0.) {
+        // Constraint is free, enforce
+        lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
+        changed_active_set = true;
       }
 
       // Can we improve dual feasibility?
@@ -501,12 +499,6 @@ namespace casadi {
             best = new_duerr;
             index = i;
           }
-        }
-
-        // Accept, if any
-        if (index>=0) {
-          lam[index] = 0.;
-          changed_active_set = true;
         }
       }
 
@@ -657,6 +649,7 @@ namespace casadi {
           tau = 0.;
           index = i;
           sign = dz[i]<0 ? -1 : 1;
+          changed_active_set = true;
           break;
         }
         // Trial primal step
@@ -666,11 +659,13 @@ namespace casadi {
           tau = (lbz[i]-e-z[i])/dz[i];
           index = i;
           sign = -1;
+          changed_active_set = true;
         } else if (dz[i]>0 && trial_z>ubz[i]+e) {
           // Trial would increase maximum infeasibility
           tau = (ubz[i]+e-z[i])/dz[i];
           index = i;
           sign = 1;
+          changed_active_set = true;
         }
         // Consistency check
         casadi_assert(tau<=tau1, "Inconsistent step size calculation");
@@ -747,6 +742,7 @@ namespace casadi {
               found_tau = true;
               tau = tau1;
               index = -1;
+              changed_active_set = true;
             }
           }
         }
@@ -787,10 +783,7 @@ namespace casadi {
         // Get the current sign
         casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
         // Account for sign changes
-        if (i==index && s!=sign) {
-          changed_active_set = true;
-          s = sign;
-        }
+        if (i==index) s = sign;
         // Take step
         lam[i] += tau*dlam[i];
         // Ensure correct sign
