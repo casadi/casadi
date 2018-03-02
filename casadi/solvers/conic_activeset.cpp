@@ -642,13 +642,15 @@ namespace casadi {
       if (zero_step) tau = 0.;
 
       // Warning if step becomes zero
-      if (zero_step) casadi_warning("Step becomes zero");
+      if (zero_step) casadi_warning("No search direction");
 
       // Check primal feasibility in the search direction
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
         double tau1 = tau;
         // Acceptable error (to avoid increasing max error)
-        double e = lam[i]==0. ? prerr : 1e-10; /* avoid numerical noise */
+//        double e = fmax(prerr, duerr); /* avoid numerical noise */
+        double e = iprerr>=0 ? prerr : 1e-10; /* avoid numerical noise */
+//        double e = fmax(prerr, 1e-10); /* avoid numerical noise */
         if (dz[i]==0.) continue; // Skip zero steps
         // Check if violation with tau=0 and not improving
         if (dz[i]<0 ? z[i]<=lbz[i]-e : z[i]>=ubz[i]+e) {
@@ -744,15 +746,12 @@ namespace casadi {
               // Smallest tau found so far
               found_tau = true;
               tau = tau1;
+              index = -1;
             }
           }
         }
         // To not allow the active set change if max_duerr gets exceeded
         if (found_tau) break;
-        // Accept the tau, set multiplier to zero but do not change tau
-        //changed_active_set = true;
-        //index = -1;
-        //lam[i] = 0.;
         // Continue to the next tau
         tau_k = w[i];
         // Update infeasibility
@@ -767,67 +766,14 @@ namespace casadi {
             tinfeas[at_row[k]] -= trans_a[k]*lam[i];
           }
         }
-      }
-
-      // Check dual feasibility in the search direction
-      for (i=0; i<nx_+na_ && tau>0.; ++i) {
-        double tau1 = tau;
-        // Check numerics
-        if (dlam[i]==0.) continue; // Skip zero steps
-        // Inactive constraints remain inactive
-        if (lam[i]==0.) continue;
-        /*
-        if lam[i]<0, we need lam[i] + tau*dlam[i] < e as well as -e < tau*dlam[i] < e
-        i.e.
-             tau*dlam[i] < e           if dlam[i]>0
-        -e < tau*dlam[i] < e - lam[i]  if dlam[i]<0
-        if lam[i]>0, we need -e < lam[i] + tau*dlam[i] as well as -e < tau*dlam[i] < e
-        i.e.
-        -e - lam[i] < tau*dlam[i] < e    if dlam[i]>0
-                 -e < tau*dlam[i]        if dlam[i]<0
-        */
-        // Allow some error if we're trying to get primal feasibility (?)
-        double e = prerr>duerr ? 0. : 1e-10; /* avoid numerical noise */
-        /*
-        if (i<nx_) {
-          e = duerr;
-        } else {
-          double max_a = 0.;
-          for (casadi_int c=0; c<nx_; ++c) {
-            for (casadi_int k=a_colind[c]; k<a_colind[c+1]; ++k) {
-              if (i==nx_+a_row[k]) max_a = fmax(max_a, fabs(a[k]));
-            }
-          }
-          e = duerr/max_a;
-        }
-        // Trial dual stepsize
-        double trial_dlam = fabs(tau*dlam[i]);
-        if (trial_dlam>e) {
-          tau = e/trial_dlam;
-          index = i;
-          sign = 0;
-        }
-        */
-        // Trial dual step
-        double trial_lam = lam[i] + tau*dlam[i];;
-        if (lam[i]>0 && trial_lam < -e) {
-          tau = -(lam[i]+e)/dlam[i];
-          index = i;
-          sign = 0;
-        } else if (lam[i]<0 && trial_lam > e) {
-          tau = -(lam[i]-e)/dlam[i];
-          index = i;
-          sign = 0;
-        }
-        // Consistency check
-        casadi_assert(tau<=tau1, "Inconsistent step size calculation");
+        // Accept the tau, set multiplier to zero or flip sign if equality
+        changed_active_set = true;
+        lam[i] = lbz[i]!=ubz[i] ? 0 : lam[i]<0 ? DMIN : -DMIN;
+        dlam[i] = 0.;
       }
 
       // Ignore sign changes if they happen for a full step
       if (tau==1.) index = -1;
-
-      // Avoid acting on noise when we're already feasible
-//      if (prerr<duerr && tau<1e-10) index = -1;
 
       if (verbose_) {
         print("tau = %g\n", tau);
