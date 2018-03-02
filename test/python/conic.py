@@ -57,7 +57,7 @@ if has_conic("clp"):
   conics.append(("clp",{"verbose":True},{"quadratic": False}))
 
 if has_conic("activeset"):
-  conics.append(("activeset",{},{"quadratic": True}))
+  conics.append(("activeset",dict(max_iter=100),{"quadratic": True}))
 
 print(conics)
 
@@ -181,7 +181,6 @@ class ConicTests(casadiTestCase):
 
 
     for conic, qp_options, aux_options in conics:
-      if 'activeset' in str(conic): continue
       if not aux_options["quadratic"]: continue
       self.message("general_convex: " + str(conic))
 
@@ -566,7 +565,6 @@ class ConicTests(casadiTestCase):
       for conic, qp_options, aux_options in conics:
         if not aux_options["quadratic"]: continue
         if 'qcqp' in str(conic): continue
-        if 'activeset' in str(conic): continue
         solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
         try:
