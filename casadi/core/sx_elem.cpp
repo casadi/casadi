@@ -597,10 +597,6 @@ namespace casadi {
 
 using namespace casadi;
 namespace std {
-
-  // Template instantiation
-  template class std::numeric_limits<casadi::SXElem>;
-
   SXElem numeric_limits<SXElem>::infinity() throw() {
     return casadi::casadi_limits<SXElem>::inf;
   }
