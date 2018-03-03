@@ -149,7 +149,7 @@ namespace casadi {
     // Local variables
     casadi_int r, c, k;
     // Get sparsities
-    casadi_int nrow=sp_x[0], ncol=sp_x[1];
+    casadi_int ncol=sp_x[1];
     const casadi_int *colind=sp_x+2, *row=sp_x+2+ncol+1;
     // Set elements in subblock
     for (c=cbeg; c<cend; ++c) {
@@ -357,7 +357,7 @@ namespace casadi {
 
     // R sparsity
     const casadi_int* r_colind = sp_r_.colind();
-    const casadi_int* r_row = sp_r_.row();
+    //const casadi_int* r_row = sp_r_.row();
 
     // A sparsity
     //const casadi_int* a_colind = A_.colind();
@@ -372,9 +372,6 @@ namespace casadi {
 
     // Stepsize
     double tau = -1.;
-
-    // Primal and dual error (must be non-increasing)
-    double err=inf;
 
     // Logarithm of the determinant
     double log_det = -1;
