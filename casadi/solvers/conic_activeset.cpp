@@ -636,7 +636,7 @@ namespace casadi {
       // Check primal feasibility in the search direction
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
         double tau1 = tau;
-        // Acceptable error (must be non-increasing)
+        // Acceptable primal error (must be non-increasing)
         double e = fmax(prerr, 1e-10);
         if (dz[i]==0.) continue; // Skip zero steps
         // Check if violation with tau=0 and not improving
@@ -693,7 +693,8 @@ namespace casadi {
           next = tmp;
         }
       }
-
+      // Acceptable dual error (must be non-increasing)
+      double e = fmax(duerr, 1e-10);
       /* With the search direction (dz, dlam) and the restriction that when
          lam=0, it stays at zero, we have the following expressions for the
          updated step in the presence of a zero-crossing
@@ -712,15 +713,14 @@ namespace casadi {
             The function is continuous in tau, but tinfeas makes a stepwise
             change when tau=tau1.
           Let us find the largest possible tau, while keeping maximum
-          dual infeasibility below some value.
+          dual infeasibility below e.
         */
-      double max_duerr = fmax(prerr, duerr);
       // Tangent of the dual infeasibility at tau=0
       casadi_fill(tinfeas, nx_, 0.);
       casadi_mv(h, H_, dz, tinfeas, 0); // A'*dlam_g + dlam_x==0 by definition
       casadi_mv(a, A_, dlam+nx_, tinfeas, 1);
       casadi_axpy(nx_, 1., dlam, tinfeas);
-      // How long step can we take without exceeding max_duerr?
+      // How long step can we take without exceeding e?
       double tau_k = 0.;
       for (casadi_int j=0; j<n_tau; ++j) {
         // Constraint that we're watching
@@ -730,7 +730,7 @@ namespace casadi {
         // Check if maximum dual infeasibilty gets exceeded
         bool found_tau = false;
         for (casadi_int k=0; k<nx_ && !found_tau; ++k) {
-          if (fabs(infeas[k]+dtau*tinfeas[k])>max_duerr) {
+          if (fabs(infeas[k]+dtau*tinfeas[k])>e) {
             double tau1 = fmax(tau_k - dtau*(infeas[k]/tinfeas[k]), 0.);
             if (tau1<tau) {
               // Smallest tau found so far
@@ -741,7 +741,7 @@ namespace casadi {
             }
           }
         }
-        // To not allow the active set change if max_duerr gets exceeded
+        // To not allow the active set change if e gets exceeded
         if (found_tau) break;
         // Continue to the next tau
         tau_k = w[i];
