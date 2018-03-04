@@ -468,6 +468,40 @@ namespace casadi {
         changed_active_set = true;
       }
 
+      // Can we improve dual feasibility by adding a constraint?
+      if (!changed_active_set && iduerr>=0) {
+        // Calculate the sensitivity of dual infeasibility for iduerr
+        casadi_fill(sens, nx_+na_, 0.);
+        sens[iduerr] = duerr_pos ? 1. : -1.;
+        casadi_mv(a, A_, sens, sens+nx_, 0);
+
+        // Is it possible to improve dual feasibility by adding a constraint
+        double best = 0.;
+        casadi_int index = -1;
+        for (i=0; i<nx_+na_; ++i) {
+          // Skip non-candidates
+          if (lam[i]!=0. || sens[i]==0.) continue;
+          // How far are we from the bounds
+          double slack = sens[i]>0 ? ubz[i]-z[i] : z[i]-lbz[i];
+          // Check if it's the best so far
+          if (slack>best) {
+            best = slack;
+            index = i;
+          }
+        }
+
+        // Accept, if any
+        if (index>=0 && duerr>1e-8) {
+          // Not implemented, but at least provide a good error message
+          i = index;
+          print("Improvement still possible by enforcing %s bound %d. "
+                "z=%g, lbz=%g, ubz=%g, slack=%g, sensitivity=%g.\n",
+                sens[i]>0 ? "upper": "lower", i, z[i], lbz[i], ubz[i], best, sens[i]);
+          //lam[index] = sens[index]>0 ? DMIN : -DMIN;
+          //changed_active_set = true;
+        }
+      }
+
 #if 0
       // Can we improve dual feasibility?
       if (!changed_active_set && iduerr>=0) {
