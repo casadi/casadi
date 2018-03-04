@@ -636,10 +636,8 @@ namespace casadi {
       // Check primal feasibility in the search direction
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
         double tau1 = tau;
-        // Acceptable error (to avoid increasing max error)
-//        double e = fmax(prerr, duerr); /* avoid numerical noise */
-        double e = iprerr>=0 ? prerr : 1e-10; /* avoid numerical noise */
-//        double e = fmax(prerr, 1e-10); /* avoid numerical noise */
+        // Acceptable error (must be non-increasing)
+        double e = fmax(prerr, 1e-10);
         if (dz[i]==0.) continue; // Skip zero steps
         // Check if violation with tau=0 and not improving
         if (dz[i]<0 ? z[i]<=lbz[i]-e : z[i]>=ubz[i]+e) {
