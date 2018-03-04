@@ -461,6 +461,41 @@ namespace casadi {
             iter, primal_step ? "P" : "D", fk, prerr, iprerr, duerr, iduerr, tau,
             lam_min, log_det);
 
+      // Can any constraint be removed without increasing dual infeasibility?
+      if (!changed_active_set) {
+        double best = duerr;
+        casadi_int index = -1;
+        for (i=0; i<nx_+na_; ++i) {
+          // Skip non-candidates
+          if (i==iprerr || lam[i]==0.) continue;
+          // Skip equality constraints, no improvement is possible
+          if (lbz[i]==ubz[i]) continue;
+          // Check largest dual infeasibility resulting from setting lam[i]=0
+          double new_duerr;
+          if (i<nx_) {
+            // Set a lam_x to zero
+            new_duerr = fabs(glag[i]);
+          } else {
+            // Set a lam_a to zero
+            new_duerr = 0.;
+            for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+              casadi_int j = at_row[k];
+              new_duerr = fmax(new_duerr, fabs((glag[j]-trans_a[k]*lam[i]) + lam[j]));
+            }
+          }
+          // Is this the best one so far?
+          if (new_duerr<best) {
+            best = new_duerr;
+            index = i;
+          }
+        }
+        // Accept, if any
+        if (index>=0) {
+          lam[index] = 0.;
+          changed_active_set = true;
+        }
+      }
+
       // Can we improve primal feasibility?
       if (!changed_active_set && iprerr>=0 && lam[iprerr]==0.) {
         // Constraint is free, enforce
@@ -501,39 +536,6 @@ namespace casadi {
           //changed_active_set = true;
         }
       }
-
-#if 0
-      // Can we improve dual feasibility?
-      if (!changed_active_set && iduerr>=0) {
-        // Is it possible to improve dual feasibility by removing a constraint
-        double best = duerr;
-        casadi_int index = -1;
-        for (i=0; i<nx_+na_; ++i) {
-          // Skip non-candidates
-          if (i==iprerr || lam[i]==0.) continue;
-          // Skip equality constraints, no improvement is possible
-          if (lbz[i]==ubz[i]) continue;
-          // Check largest dual infeasibility resulting from setting lam[i]=0
-          double new_duerr;
-          if (i<nx_) {
-            // Set a lam_x to zero
-            new_duerr = fabs(glag[i]);
-          } else {
-            // Set a lam_a to zero
-            new_duerr = 0.;
-            for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-              casadi_int j = at_row[k];
-              new_duerr = fmax(new_duerr, fabs((glag[j]-trans_a[k]*lam[i]) + lam[j]));
-            }
-          }
-          // Is this the best one so far?
-          if (new_duerr<best) {
-            best = new_duerr;
-            index = i;
-          }
-        }
-      }
-#endif
 
       // Successful return if still no change
       if (!changed_active_set) {
