@@ -468,6 +468,7 @@ namespace casadi {
         changed_active_set = true;
       }
 
+#if 0
       // Can we improve dual feasibility?
       if (!changed_active_set && iduerr>=0) {
         // Is it possible to improve dual feasibility by removing a constraint
@@ -498,6 +499,7 @@ namespace casadi {
           }
         }
       }
+#endif
 
       // Successful return if still no change
       if (!changed_active_set) {
