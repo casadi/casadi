@@ -1268,7 +1268,7 @@ namespace casadi {
 
     MatType ret = x;
     for (casadi_int i=0;i<n;++i) {
-      casadi_int local_axis = axis==-1 ? ret.is_row() : axis;
+      casadi_int local_axis = (axis==-1) ? ret.is_row() : axis;
       if (local_axis==0) {
         if (ret.size1()<=1) {
           ret = MatType::zeros(0, ret.size2());
@@ -1279,7 +1279,7 @@ namespace casadi {
         if (ret.size2()<=1) {
           ret = MatType::zeros(ret.size1(), 0);
         } else {
-          ret = ret(Slice(), Slice(1, ret.size1()))-ret(Slice(), Slice(0, ret.size1()-1));
+          ret = ret(Slice(), Slice(1, ret.size2()))-ret(Slice(), Slice(0, ret.size2()-1));
         }
       }
     }
