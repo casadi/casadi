@@ -509,6 +509,8 @@ namespace casadi {
         for (i=0; i<nx_+na_; ++i) {
           // Skip non-candidates
           if (lam[i]!=0. || sens[i]==0.) continue;
+          // We cannot enforce an infinite bound
+          if (sens[i]>0. ? isinf(ubz[i]) : isinf(lbz[i])) continue;
           // How far are we from the bounds
           double slack = sens[i]>0 ? ubz[i]-z[i] : z[i]-lbz[i];
           // Check if it's the best so far
@@ -520,13 +522,15 @@ namespace casadi {
 
         // Accept, if any
         if (index>=0 && duerr>1e-8) {
-          // Not implemented, but at least provide a good error message
+          // Enforce
+          lam[index] = sens[index]>0 ? DMIN : -DMIN;
+          changed_active_set = true;
+          snprintf(msg, sizeof(msg), "Added %lld to reduce |du|", iprerr);
+        } else if (index>=0) {
           i = index;
           print("Improvement still possible by enforcing %s bound %lld. "
                 "z=%g, lbz=%g, ubz=%g, slack=%g, sensitivity=%g.\n",
                 sens[i]>0 ? "upper": "lower", i, z[i], lbz[i], ubz[i], best, sens[i]);
-          //lam[index] = sens[index]>0 ? DMIN : -DMIN;
-          //changed_active_set = true;
         }
       }
 
