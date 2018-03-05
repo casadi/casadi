@@ -189,7 +189,7 @@ namespace casadi {
     print("%s: [", id);
     for (casadi_int i=0; i<n; ++i) {
       if (i!=0) print(", ");
-      print("%d", x[i]);
+      print("%lld", x[i]);
     }
     print("]\n");
   }
@@ -367,6 +367,9 @@ namespace casadi {
     const casadi_int* at_colind = AT_.colind();
     const casadi_int* at_row = AT_.row();
 
+    // Message buffer
+    char msg[40] = "";
+
     // No change so far
     bool changed_active_set = true;
 
@@ -449,18 +452,6 @@ namespace casadi {
         if (lam[i]!=0. && fabs(lam[i])<lam_min) lam_min = fabs(lam[i]);
       }
 
-      if (iter % 10 == 0) {
-        // Print header
-        print("%10s %15s %15s %6s %15s %6s %10s %10s %15s\n",
-              "Iteration", "fk", "|pr|", "con", "|du|", "var", "tau", "lam_min",
-              "log|det(KKT)|");
-      }
-
-      // Print iteration progress:
-      print("%6d (%1s) %15g %15g %6d %15g %6d %10g %10g %15g\n",
-            iter, primal_step ? "P" : "D", fk, prerr, iprerr, duerr, iduerr, tau,
-            lam_min, log_det);
-
       // Can any constraint be removed without increasing dual infeasibility?
       if (!changed_active_set) {
         double best = duerr;
@@ -493,6 +484,7 @@ namespace casadi {
         if (index>=0) {
           lam[index] = 0.;
           changed_active_set = true;
+          snprintf(msg, sizeof(msg), "Removed redundant %lld", index);
         }
       }
 
@@ -501,6 +493,7 @@ namespace casadi {
         // Constraint is free, enforce
         lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
         changed_active_set = true;
+        snprintf(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
       }
 
       // Can we improve dual feasibility by adding a constraint?
@@ -529,13 +522,25 @@ namespace casadi {
         if (index>=0 && duerr>1e-8) {
           // Not implemented, but at least provide a good error message
           i = index;
-          print("Improvement still possible by enforcing %s bound %d. "
+          print("Improvement still possible by enforcing %s bound %lld. "
                 "z=%g, lbz=%g, ubz=%g, slack=%g, sensitivity=%g.\n",
                 sens[i]>0 ? "upper": "lower", i, z[i], lbz[i], ubz[i], best, sens[i]);
           //lam[index] = sens[index]>0 ? DMIN : -DMIN;
           //changed_active_set = true;
         }
       }
+
+      if (iter % 10 == 0) {
+        // Print header
+        print("%10s %15s %15s %6s %15s %6s %10s %10s %15s %40s\n",
+              "Iteration", "fk", "|pr|", "con", "|du|", "var", "tau", "lam_min",
+              "log|det(KKT)|", "Note");
+      }
+
+      // Print iteration progress:
+      print("%6d (%1s) %15g %15g %6d %15g %6d %10g %10g %15g %40s\n",
+            iter, primal_step ? "P" : "D", fk, prerr, iprerr, duerr, iduerr, tau,
+            lam_min, log_det, msg);
 
       // Successful return if still no change
       if (!changed_active_set) {
@@ -552,6 +557,7 @@ namespace casadi {
 
       // Start new iteration
       iter++;
+      msg[0] = '\0';
 
       // No change so far
       changed_active_set = false;
@@ -798,6 +804,7 @@ namespace casadi {
         // Accept the tau, set multiplier to zero or flip sign if equality
         changed_active_set = true;
         lam[i] = lbz[i]!=ubz[i] ? 0 : lam[i]<0 ? DMIN : -DMIN;
+        snprintf(msg, sizeof(msg), "Removed %lld", i);
         dlam[i] = 0.;
       }
 
@@ -816,7 +823,10 @@ namespace casadi {
         // Get the current sign
         casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
         // Account for sign changes
-        if (i==index) s = sign;
+        if (i==index) {
+          snprintf(msg, sizeof(msg), "Added %lld (%lld->%lld)", i, s, sign);
+          s = sign;
+        }
         // Take step
         lam[i] += tau*dlam[i];
         // Ensure correct sign
