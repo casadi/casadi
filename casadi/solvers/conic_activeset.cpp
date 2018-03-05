@@ -484,7 +484,7 @@ namespace casadi {
         if (index>=0) {
           lam[index] = 0.;
           changed_active_set = true;
-          snprintf(msg, sizeof(msg), "Removed redundant %lld", index);
+          sprint(msg, sizeof(msg), "Removed redundant %lld", index);
         }
       }
 
@@ -493,7 +493,7 @@ namespace casadi {
         // Constraint is free, enforce
         lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
         changed_active_set = true;
-        snprintf(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
+        sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
       }
 
       // Can we improve dual feasibility by adding a constraint?
@@ -525,12 +525,14 @@ namespace casadi {
           // Enforce
           lam[index] = sens[index]>0 ? DMIN : -DMIN;
           changed_active_set = true;
-          snprintf(msg, sizeof(msg), "Added %lld to reduce |du|", iprerr);
+          sprint(msg, sizeof(msg), "Added %lld to reduce |du|", iprerr);
         } else if (index>=0) {
+#if 0
           i = index;
           print("Improvement still possible by enforcing %s bound %lld. "
                 "z=%g, lbz=%g, ubz=%g, slack=%g, sensitivity=%g.\n",
                 sens[i]>0 ? "upper": "lower", i, z[i], lbz[i], ubz[i], best, sens[i]);
+#endif
         }
       }
 
@@ -806,7 +808,7 @@ namespace casadi {
         if (i!=index) { // ignore if already taken care of
           changed_active_set = true;
           lam[i] = lbz[i]!=ubz[i] ? 0 : lam[i]<0 ? DMIN : -DMIN;
-          snprintf(msg, sizeof(msg), "Removed %lld", i);
+          sprint(msg, sizeof(msg), "Removed %lld", i);
           dlam[i] = 0.;
         }
       }
@@ -827,7 +829,7 @@ namespace casadi {
         casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
         // Account for sign changes
         if (i==index && s!=sign) {
-          snprintf(msg, sizeof(msg), "Added %lld (%lld->%lld)", i, s, sign);
+          sprint(msg, sizeof(msg), "Added %lld (%lld->%lld)", i, s, sign);
           changed_active_set = true;
           s = sign;
         }
