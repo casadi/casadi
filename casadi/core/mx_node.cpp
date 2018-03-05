@@ -157,8 +157,6 @@ namespace casadi {
   }
 
   const string& MXNode::name() const {
-    MX* tmp = 0;
-    tmp->sparsity();
     casadi_error("'name' not defined for class " + class_name());
   }
 
