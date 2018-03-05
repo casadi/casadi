@@ -688,7 +688,6 @@ namespace casadi {
           tau = 0.;
           index = i;
           sign = dz[i]<0 ? -1 : 1;
-          changed_active_set = true;
           break;
         }
         // Trial primal step
@@ -698,13 +697,11 @@ namespace casadi {
           tau = (lbz[i]-e-z[i])/dz[i];
           index = i;
           sign = -1;
-          changed_active_set = true;
         } else if (dz[i]>0 && trial_z>ubz[i]+e) {
           // Trial would increase maximum infeasibility
           tau = (ubz[i]+e-z[i])/dz[i];
           index = i;
           sign = 1;
-          changed_active_set = true;
         }
         // Consistency check
         casadi_assert(tau<=tau1, "Inconsistent step size calculation");
@@ -802,10 +799,12 @@ namespace casadi {
           }
         }
         // Accept the tau, set multiplier to zero or flip sign if equality
-        changed_active_set = true;
-        lam[i] = lbz[i]!=ubz[i] ? 0 : lam[i]<0 ? DMIN : -DMIN;
-        snprintf(msg, sizeof(msg), "Removed %lld", i);
-        dlam[i] = 0.;
+        if (i!=index) { // ignore if already taken care of
+          changed_active_set = true;
+          lam[i] = lbz[i]!=ubz[i] ? 0 : lam[i]<0 ? DMIN : -DMIN;
+          snprintf(msg, sizeof(msg), "Removed %lld", i);
+          dlam[i] = 0.;
+        }
       }
 
       // Ignore sign changes if they happen for a full step
@@ -823,8 +822,9 @@ namespace casadi {
         // Get the current sign
         casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
         // Account for sign changes
-        if (i==index) {
+        if (i==index && s!=sign) {
           snprintf(msg, sizeof(msg), "Added %lld (%lld->%lld)", i, s, sign);
+          changed_active_set = true;
           s = sign;
         }
         // Take step
