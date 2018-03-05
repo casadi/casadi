@@ -413,16 +413,16 @@ namespace casadi {
       // Look for largest bound violation
       double prerr = 0.;
       casadi_int iprerr = -1;
-      bool prerr_pos;
+      //bool prerr_pos;
       for (i=0; i<nx_+na_; ++i) {
         if (z[i] > ubz[i]+prerr) {
           prerr = z[i]-ubz[i];
           iprerr = i;
-          prerr_pos = true;
+          //prerr_pos = true;
         } else if (z[i] < lbz[i]-prerr) {
           prerr = lbz[i]-z[i];
           iprerr = i;
-          prerr_pos = false;
+          //prerr_pos = false;
         }
       }
 
