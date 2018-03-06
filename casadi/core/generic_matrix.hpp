@@ -1268,6 +1268,9 @@ namespace casadi {
 
     MatType ret = x;
     for (casadi_int i=0;i<n;++i) {
+      // Matlab's special case
+      if (axis==-1 && ret.is_scalar()) return MatType();
+
       casadi_int local_axis = (axis==-1) ? ret.is_row() : axis;
       if (local_axis==0) {
         if (ret.size1()<=1) {

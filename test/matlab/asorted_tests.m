@@ -277,7 +277,7 @@ if has_nlpsol('bonmin')
   assert(all(full(sol.x)==[3;4]))
 end
 
-data = { [1 3;11 17] , [1 3] , [1;3] 3};
+data = { [1 3 2;11 17 4], [1 3;11 17] , [1 3] , [1;3] 3};
 
 for i=1:numel(data)
   A = data{i};
