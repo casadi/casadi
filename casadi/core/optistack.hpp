@@ -144,6 +144,12 @@ public:
   * opti.subject_to({x*y>=1,x==3})
   * opti.subject_to( 0<=x<=1 )
   * \endverbatim
+  *
+  *
+  * Related functionalities:
+  *  - opti.lbg,opti.g,opti.ubg represent the vector of flattened constraints
+  *  - opti.debug.show_infeasibilities() may be used to inspect which constraints are violated
+  *
   */
   void subject_to(const MX& g);
   void subject_to(const std::vector<MX>& g);
@@ -453,12 +459,14 @@ public:
   std::vector<MX> active_symvar(VariableType type) const;
   std::vector<DM> active_values(VariableType type) const;
 
-  MX x_lookup(casadi_int i) const;
-  MX g_lookup(casadi_int i) const;
+  MX x_lookup(casadi_index i) const;
+  MX g_lookup(casadi_index i) const;
 
-  std::string x_describe(casadi_int i) const;
-  std::string g_describe(casadi_int i) const;
-  std::string describe(const MX& x, casadi_int indent=0) const;
+  std::string x_describe(casadi_index i) const;
+  std::string g_describe(casadi_index i) const;
+  std::string describe(const MX& x, casadi_index indent=0) const;
+
+  void show_infeasibilities(double tol=0) const;
 
   void solve_prepare();
   DMDict solve_actual(const DMDict& args);

@@ -3419,6 +3419,17 @@ Related, you may inspect the value of an expression, at the initial guess that y
 opti.debug.value(x,opti.initial())
 \end{lstlisting}
 
+In case the solver stops due to problem infeasibility, you may identify the problematic constraints with:
+\begin{lstlisting}[language=Python]
+opti.debug.show_infeasibilities()
+\end{lstlisting}
+
+In case the solver reports NaN/Inf at a certain location, you may find out which constraint or variable is to blame by looking at its description:
+\begin{lstlisting}[language=Python]
+opti.debug.x_describe(index)
+opti.debug.g_describe(index)
+\end{lstlisting}
+
 You may specify a callback function; it will be called at each iteration of the solver, with the current iteration number as argument.
 To plot the progress of the solver, you may access the non-converged solution through debug mode:\\
 \begin{lstlisting}[language=Python]

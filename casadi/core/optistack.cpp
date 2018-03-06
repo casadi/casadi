@@ -24,6 +24,7 @@
 
 #include "optistack_internal.hpp"
 #include "exception.hpp"
+#include "global_options.hpp"
 
 using namespace std;
 namespace casadi {
@@ -496,6 +497,24 @@ std::string OptiAdvanced::describe(const MX& x, casadi_int indent) const {
     return (*this)->describe(x, indent);
   } catch (exception& e) {
     THROW_ERROR("describe", e.what());
+  }
+}
+
+void OptiAdvanced::show_infeasibilities(double tol) const {
+  std::vector<double> g_ = value(g()).get_elements();
+  std::vector<double> lbg_ = value(lbg()).get_elements();
+  std::vector<double> ubg_ = value(ubg()).get_elements();
+
+  uout() << "Violated constraints (tol " << tol << "), in order of declaration:" << std::endl;
+  for (casadi_int i=0;i<g_.size();++i) {
+    double err = std::max(g_[i]-ubg_[i], lbg_[i]-g_[i]);
+    if (err>=tol) {
+      uout() << "------- i = " << i+GlobalOptions::start_index;
+      uout() << "/" << g_.size() << " ------ " << std::endl;
+      uout() << lbg_[i] << " <= " << g_[i] << " <= " << ubg_[i];
+      uout() << " (viol " << err << ")" << std::endl;
+      uout() << g_describe(i) << std::endl;
+    }
   }
 }
 
