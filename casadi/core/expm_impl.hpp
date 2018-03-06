@@ -48,8 +48,8 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(int i) override;
-    Sparsity get_sparsity_out(int i) override;
+    Sparsity get_sparsity_in(casadi_int i) override;
+    Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     ///@{
@@ -63,24 +63,24 @@ namespace casadi {
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    Function get_forward(int nfwd, const std::string& name,
+    Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
-    bool has_forward(int nfwd) const override { return true;}
+    bool has_forward(casadi_int nfwd) const override { return true;}
     ///@}
 
     ///@{
     /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    Function get_reverse(int nadj, const std::string& name,
+    Function get_reverse(casadi_int nadj, const std::string& name,
                          const std::vector<std::string>& inames,
                          const std::vector<std::string>& onames,
                          const Dict& opts) const override;
-    bool has_reverse(int nadj) const override { return true;}
+    bool has_reverse(casadi_int nadj) const override { return true;}
     ///@}
 
     /// Generate the sparsity of a Jacobian block
-    Sparsity getJacSparsity(int iind, int oind, bool symmetric) const override;
+    Sparsity getJacSparsity(casadi_int iind, casadi_int oind, bool symmetric) const override;
 
     // Creator function for internal class
     typedef Expm* (*Creator)(const std::string& name, const Sparsity& A);

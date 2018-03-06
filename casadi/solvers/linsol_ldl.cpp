@@ -58,7 +58,7 @@ namespace casadi {
     LinsolInternal::init(opts);
 
     // Symbolic factorization
-    sp_L_ = sp_.ldl(parent_);
+    sp_Lt_ = sp_.ldl(p_);
   }
 
   int LinsolLdl::init_mem(void* mem) const {
@@ -66,10 +66,9 @@ namespace casadi {
     auto m = static_cast<LinsolLdlMemory*>(mem);
 
     // Work vectors
-    int nrow = this->nrow();
+    casadi_int nrow = this->nrow();
     m->d.resize(nrow);
-    m->l.resize(sp_L_.nnz());
-    m->iw.resize(2*nrow);
+    m->l.resize(sp_Lt_.nnz());
     m->w.resize(nrow);
 
     return 0;
@@ -81,33 +80,59 @@ namespace casadi {
 
   int LinsolLdl::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    casadi_ldl(sp_, get_ptr(parent_), sp_L_,
-               A, get_ptr(m->l), get_ptr(m->d), get_ptr(m->iw), get_ptr(m->w));
+    casadi_ldl(sp_, A, sp_Lt_, get_ptr(m->l), get_ptr(m->d), get_ptr(p_), get_ptr(m->w));
+    for (double d : m->d) {
+      if (d==0) casadi_warning("LDL factorization has zeros in D");
+    }
     return 0;
   }
 
-  int LinsolLdl::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
+  int LinsolLdl::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    casadi_ldl_solve(x, nrhs, sp_L_, get_ptr(m->l), get_ptr(m->d));
+    casadi_ldl_solve(x, nrhs, sp_Lt_, get_ptr(m->l), get_ptr(m->d), get_ptr(p_), get_ptr(m->w));
     return 0;
   }
 
-  int LinsolLdl::neig(void* mem, const double* A) const {
+  casadi_int LinsolLdl::neig(void* mem, const double* A) const {
     // Count number of negative eigenvalues
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    int nrow = this->nrow();
-    int ret = 0;
-    for (int i=0; i<nrow; ++i) if (m->d[i]<0) ret++;
+    casadi_int nrow = this->nrow();
+    casadi_int ret = 0;
+    for (casadi_int i=0; i<nrow; ++i) if (m->d[i]<0) ret++;
     return ret;
   }
 
-  int LinsolLdl::rank(void* mem, const double* A) const {
+  casadi_int LinsolLdl::rank(void* mem, const double* A) const {
     // Count number of nonzero eigenvalues
     auto m = static_cast<LinsolLdlMemory*>(mem);
-    int nrow = this->nrow();
-    int ret = 0;
-    for (int i=0; i<nrow; ++i) if (m->d[i]!=0) ret++;
+    casadi_int nrow = this->nrow();
+    casadi_int ret = 0;
+    for (casadi_int i=0; i<nrow; ++i) if (m->d[i]!=0) ret++;
     return ret;
+  }
+
+  void LinsolLdl::generate(CodeGenerator& g, const std::string& A, const std::string& x,
+                          casadi_int nrhs, bool tr) const {
+    // Codegen the integer vectors
+    string sp = g.sparsity(sp_);
+    string sp_Lt = g.sparsity(sp_Lt_);
+    string p = g.constant(p_);
+
+    // Place in block to avoid conflicts caused by local variables
+    g << "{\n";
+    g.comment("FIXME(@jaeandersson): Memory allocation can be avoided");
+    g << "casadi_real lt[" << sp_Lt_.nnz() << "], "
+         "d[" << nrow() << "], "
+         "w[" << nrow() << "];\n";
+
+    // Factorize
+    g << g.ldl(sp, A, sp_Lt, "lt", "d", p, "w") << "\n";
+
+    // Solve
+    g << g.ldl_solve(x, nrhs, sp_Lt, "lt", "d", p, "w") << "\n";
+
+    // End of block
+    g << "}\n";
   }
 
 } // namespace casadi

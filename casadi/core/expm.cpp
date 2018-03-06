@@ -48,11 +48,11 @@ namespace casadi {
     return Function::create(Expm::instantiate(name, solver, A), opts);
   }
 
-  int expm_n_in() {
+  casadi_int expm_n_in() {
     return 2;
   }
 
-  int expm_n_out() {
+  casadi_int expm_n_out() {
     return 1;
   }
 
@@ -64,7 +64,7 @@ namespace casadi {
 
   }
 
-  Sparsity Expm::get_sparsity_in(int i) {
+  Sparsity Expm::get_sparsity_in(casadi_int i) {
     switch (i) {
       case 0:
         return A_;
@@ -75,7 +75,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity Expm::get_sparsity_out(int i) {
+  Sparsity Expm::get_sparsity_out(casadi_int i) {
     switch (i) {
       case 0:
         return A_;
@@ -107,7 +107,7 @@ namespace casadi {
 
   }
 
-  Function Expm::get_forward(int nfwd, const std::string& name,
+  Function Expm::get_forward(casadi_int nfwd, const std::string& name,
                                const std::vector<std::string>& inames,
                                const std::vector<std::string>& onames,
                                const Dict& opts) const {
@@ -130,11 +130,12 @@ namespace casadi {
 
     Function ret = Function(name, {A, t, Y, Adot, tdot}, {Ydot});
 
-    return ret.map(name, "serial", nfwd, std::vector<int>{0, 1, 2}, std::vector<int>{});
+    return ret.map(name, "serial", nfwd,
+      std::vector<casadi_int>{0, 1, 2}, std::vector<casadi_int>{});
 
   }
 
-  Function Expm::get_reverse(int nadj, const std::string& name,
+  Function Expm::get_reverse(casadi_int nadj, const std::string& name,
                                const std::vector<std::string>& inames,
                                const std::vector<std::string>& onames,
                                const Dict& opts) const {
@@ -158,10 +159,11 @@ namespace casadi {
     }
     Function ret = Function(name, {A, t, Y, Ybar}, {Abar, tbar});
 
-    return ret.map(name, "serial", nadj, std::vector<int>{0, 1, 2}, std::vector<int>{});
+    return ret.map(name, "serial", nadj,
+      std::vector<casadi_int>{0, 1, 2}, std::vector<casadi_int>{});
   }
 
-  Sparsity Expm::getJacSparsity(int iind, int oind, bool symmetric) const {
+  Sparsity Expm::getJacSparsity(casadi_int iind, casadi_int oind, bool symmetric) const {
     if (const_A_ && iind==0) {
       return Sparsity(nnz_out(oind), nnz_in(iind));
     }

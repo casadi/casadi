@@ -55,17 +55,17 @@ namespace casadi {
     return 0;
   }
 
-  void LinsolInternal::linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w,
-                                      void* mem, bool tr, int nrhs) const {
+  void LinsolInternal::linsol_eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w,
+                                      void* mem, bool tr, casadi_int nrhs) const {
     casadi_error("eval_sx not defined for " + class_name());
   }
 
-  int LinsolInternal::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
+  int LinsolInternal::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
     casadi_error("'solve' not defined for " + class_name());
   }
 
 #if 0
-  int LinsolInternal::factorize(void* mem, const double* A) const {
+  casadi_int LinsolInternal::factorize(void* mem, const double* A) const {
     // Symbolic factorization, if needed
     if (needs_sfact(mem, A)) {
       if (sfact(mem, A)) return 1;
@@ -94,16 +94,16 @@ namespace casadi {
     casadi_error("'nfact' not defined for " + class_name());
   }
 
-  int LinsolInternal::neig(void* mem, const double* A) const {
+  casadi_int LinsolInternal::neig(void* mem, const double* A) const {
     casadi_error("'neig' not defined for " + class_name());
   }
 
-  int LinsolInternal::rank(void* mem, const double* A) const {
+  casadi_int LinsolInternal::rank(void* mem, const double* A) const {
     casadi_error("'rank' not defined for " + class_name());
   }
 
   void LinsolInternal::generate(CodeGenerator& g, const std::string& A, const std::string& x,
-                                int nrhs, bool tr) const {
+                                casadi_int nrhs, bool tr) const {
     g << "#error " <<  class_name() << " does not support code generation\n";
   }
 

@@ -37,6 +37,9 @@ set(RUNTIME_SRC
   casadi_finite_diff.hpp
   casadi_ldl.hpp
   casadi_qr.hpp
+  casadi_bfgs.hpp
+  casadi_regularize.hpp
+  casadi_newton.hpp
 )
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 
@@ -46,6 +49,8 @@ CASADI_STRINGIFY("${CMAKE_CURRENT_BINARY_DIR}/casadi_runtime_str.h"
   casadi_to_mex.hpp
   casadi_from_mex.hpp
 )
+
+set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Wno-conversion")
 
 install(FILES casadi_runtime.hpp shared.hpp ${RUNTIME_SRC}
   DESTINATION ${INCLUDE_PREFIX}/casadi/core/runtime

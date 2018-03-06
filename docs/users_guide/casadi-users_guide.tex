@@ -1035,6 +1035,8 @@ gradient(dot(A,A),A)
 print(gradient(dot(A,A),A))
 \end{pytexoutput}
 
+Note that, unlike \verb|jacobian|, \verb|gradient| always returns a dense vector.
+
 Hessians, and as a by-product gradients, are obtained as follows:
 
 \begin{minipage}[t]{0.5\textwidth}
@@ -1732,6 +1734,122 @@ r = S(h=H, g=g, \
 x_opt = r['x']
 print('x_opt: ', x_opt)
 \end{pytexoutput}
+
+\section{For-loop equivalents} \label{sec:forloop}
+
+When modeling using expression graphs in \CasADi, it is a common pattern to use of for-loop constructs of the host language (C++/Python/Matlab).
+
+The graph size will grow linearly with the loop size $N$, and so will the construction time of the expression graph and the initialization time of functions using that expression.
+
+We offer some special constructs that improve on this complexity.
+
+\subsection{Map}
+
+Suppose you are interested in computing a function $f : \mathbb{R}^{n} \rightarrow \mathbb{R}^{m}$ repeatedly on all columns of a matrix $X \in \mathbb{R}^{n \times N}$, and aggregating all results in a result matrix $Y \in \mathbb{R}^{m \times N}$: 
+
+\begin{minipage}[t]{0.5\textwidth} 
+\begin{lstlisting}[language=Python]
+# Python
+ys = []
+for i in range(N):
+  ys.append(f(X[:,i]))
+
+Y = hcat(ys)
+F = Function('f',[X],[Y])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+ys = {};
+for i=1:N
+  ys = {ys{:} f(X(:,i))};
+end
+Y = hcat(ys);
+F = Function('f',{X},{Y});
+\end{lstlisting}
+\end{minipage}
+
+The aggregate function $F : \mathbb{R}^{n \times N} \rightarrow \mathbb{R}^{m \times N}$ can be obtained with the \texttt{map} construct:
+
+\begin{minipage}[t]{0.5\textwidth} 
+\begin{lstlisting}[language=Python]
+# Python
+F = f.map(N)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+F = f.map(N);
+\end{lstlisting}
+\end{minipage}
+
+\CasADi can be instructed to parallelize when $F$ gets evaluated. In the following example, we dedicate 4 threads for the \texttt{map} task.
+
+\begin{minipage}[t]{0.5\textwidth} 
+\begin{lstlisting}[language=Python]
+# Python
+F = f.map(N,"thread",4)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+F = f.map(N,'thread',4);
+\end{lstlisting}
+\end{minipage}
+
+The \texttt{map} operation supports primitive functions $f$ with multiple inputs/outputs which can also be matrices. Aggregation will always happen horizontally.
+
+The \texttt{map} operation exhibits constant graph size and initialization time.
+
+\subsection{Fold}
+
+In case each for-loop iteration depends on the result from the previous iteration, the \texttt{fold} construct applies. In the following, the \texttt{x} variable acts as an accumulater that is initialized by $x_0 \in \mathbb{R}^{n}$:
+\begin{minipage}[t]{0.5\textwidth} 
+\begin{lstlisting}[language=Python]
+# Python
+x = x0
+for i in range(N):
+  x = f(x)
+
+F = Function('f',[x0],[x])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+x = x0;
+for i=1:N
+  x = f(x);
+end
+F = Function('f',{x0},{x});
+\end{lstlisting}
+\end{minipage}
+
+For a given function $f : \mathbb{R}^{n} \rightarrow \mathbb{R}^{n}$, the result function $F : \mathbb{R}^{n} \rightarrow \mathbb{R}^{n}$ can be obtained with the \texttt{fold} construct:
+
+
+\begin{minipage}[t]{0.5\textwidth} 
+\begin{lstlisting}[language=Python]
+# Python
+F = f.fold(N)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+F = f.fold(N);
+\end{lstlisting}
+\end{minipage}
+
+In case intermediate accumulator values are desired as output ($\mathbb{R}^{n} \rightarrow \mathbb{R}^{n \times N}$), use \texttt{mapaccum} instead of \texttt{fold}.
+
+The \texttt{fold}/\texttt{mapaccum} operation supports primitive functions $f$ with multiple inputs/outputs which can also be matrices.
+The first input and output are used for accumulating, while the remainder inputs are read column-wise over the iterations.
+
+The \texttt{map}/\texttt{mapaccum} operation exhibits a graph size and initialization time that scales logarithmically with $N$.
 
 \chapter{Generating C-code}
 
@@ -2744,7 +2862,7 @@ In the following, we will outline the legacy approach, using
 \python{parse_fmi}.
 
 \subsection*{Legacy import of a \texttt{modelDescription.xml} file}
-To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/tested/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} and \htmladdnormallink{cstr.cpp}{https://github.com/casadi/casadi/blob/tested/examples/cplusplus/cstr.cpp} in \CasADi's example collection.
+To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/master/docs/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} in \CasADi's example collection.
 
 Assuming that the Modelica/Optimica model \texttt{ModelicaClass.ModelicaModel} is defined in the files \texttt{file1.mo} and \texttt{file2.mop}, the Python compile command is:
 \begin{lstlisting}[language=Python]
@@ -3222,6 +3340,7 @@ After setting up the problem, you may call the solve method, which constructs a 
 \begin{lstlisting}[language=Python]
 sol = opti.solve()
 \end{lstlisting}
+The call will fail with an error if the solver fails to convergence. You may still inspect the non-converged solution (see Section 'extra').
 
 You may call \python{solve} any number of times. You will always get an immutable copy of the problem specification and its solution.
 Consecutively calling \python{solve} will not help the convergence of the problem.
@@ -3231,6 +3350,13 @@ To warm start a solver, you need to explicitly transfer the solution of one prob
 sol1 = opti.solve()
 opti.set_initial(sol1.value_variables())
 sol2 = opti.solve()
+\end{lstlisting}
+
+In order to initialize the dual variables, e.g. when solving a set of similar optimization problems, you can use the following syntax:
+\begin{lstlisting}[language=Python]
+sol = opti.solve()
+lam_g0 = sol.value(opti.lam_g)
+opti.set_initial(opti.lam_g, lam_g0)
 \end{lstlisting}
 
 \paragraph{Numerical value at the solution}
@@ -3291,6 +3417,17 @@ opti.debug.value(x)
 Related, you may inspect the value of an expression, at the initial guess that you supplied to the solver:\\
 \begin{lstlisting}[language=Python]
 opti.debug.value(x,opti.initial())
+\end{lstlisting}
+
+In case the solver stops due to problem infeasibility, you may identify the problematic constraints with:
+\begin{lstlisting}[language=Python]
+opti.debug.show_infeasibilities()
+\end{lstlisting}
+
+In case the solver reports NaN/Inf at a certain location, you may find out which constraint or variable is to blame by looking at its description:
+\begin{lstlisting}[language=Python]
+opti.debug.x_describe(index)
+opti.debug.g_describe(index)
 \end{lstlisting}
 
 You may specify a callback function; it will be called at each iteration of the solver, with the current iteration number as argument.

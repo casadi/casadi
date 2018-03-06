@@ -91,7 +91,7 @@ namespace casadi {
 
   void JitFunction::codegen_body(CodeGenerator& g) const {
     // Add all input arguments as local variables
-    for (int i=0; i<n_in_; ++i) {
+    for (casadi_int i=0; i<n_in_; ++i) {
       g.local(name_in_[i], "const casadi_real", "*");
       if (buffered_) {
         g << g.copy("*arg++", nnz_in(i), "w") << "\n"
@@ -102,7 +102,7 @@ namespace casadi {
     }
 
     // Add all output arguments as local variables
-    for (int i=0; i<n_out_; ++i) {
+    for (casadi_int i=0; i<n_out_; ++i) {
       g.local(name_out_[i], "casadi_real", "*");
       if (buffered_) {
         g << name_out_[i] << " = w; w += " << nnz_out(i) << ";\n";
@@ -115,7 +115,7 @@ namespace casadi {
     g << body_;
 
     // Get results
-    for (int i=0; i<n_out_; ++i) {
+    for (casadi_int i=0; i<n_out_; ++i) {
       if (buffered_) {
         g << g.copy(name_out_[i], nnz_out(i), "*res++") << "\n";
       }

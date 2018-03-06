@@ -51,6 +51,16 @@ namespace casadi {
   QpoasesInterface::QpoasesInterface(const std::string& name,
                                      const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
+    // Redirect output to CasADi
+    static bool first_call = true;
+    if (first_call) {
+      qpOASES::setPrintf(qpoases_printf);
+      first_call = false;
+    }
+  }
+
+  void QpoasesInterface::qpoases_printf(const char* s) {
+    uout() << s;
   }
 
   QpoasesInterface::~QpoasesInterface() {
@@ -326,17 +336,26 @@ namespace casadi {
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
     m->fstats["postprocessing"] = FStats();
+    m->h_row.resize(H_.nnz());
+    m->h_colind.resize(H_.size2()+1);
+    m->a_row.resize(A_.nnz());
+    m->a_colind.resize(A_.size2()+1);
+
     return 0;
   }
 
   int QpoasesInterface::
-  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<QpoasesMemory*>(mem);
 
     // Statistics
     for (auto&& s : m->fstats) s.second.reset();
 
     m->fstats.at("preprocessing").tic();
+
+    // Problem has not been solved at this point
+    m->success = false;
+    m->return_status = -1;
 
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
@@ -360,26 +379,28 @@ namespace casadi {
     casadi_copy(arg[CONIC_UBA], na_, ubA);
 
     // Return flag
-    int flag;
+    casadi_int flag;
 
     // Sparse or dense mode?
     if (sparse_) {
       // Get quadratic term
-      int* h_colind = const_cast<int*>(H_.colind());
-      int* h_row = const_cast<int*>(H_.row());
+      copy_vector(H_.colind(), m->h_colind);
+      copy_vector(H_.row(), m->h_row);
       double* h=w; w += H_.nnz();
       casadi_copy(arg[CONIC_H], H_.nnz(), h);
       if (m->h) delete m->h;
-      m->h = new qpOASES::SymSparseMat(H_.size1(), H_.size2(), h_row, h_colind, h);
+      m->h = new qpOASES::SymSparseMat(H_.size1(), H_.size2(),
+        get_ptr(m->h_row), get_ptr(m->h_colind), h);
       m->h->createDiagInfo();
 
       // Get linear term
-      int* a_colind = const_cast<int*>(A_.colind());
-      int* a_row = const_cast<int*>(A_.row());
+      copy_vector(A_.colind(), m->a_colind);
+      copy_vector(A_.row(), m->a_row);
       double* a=w; w += A_.nnz();
       casadi_copy(arg[CONIC_A], A_.nnz(), a);
       if (m->a) delete m->a;
-      m->a = new qpOASES::SparseMatrix(A_.size1(), A_.size2(), a_row, a_colind, a);
+      m->a = new qpOASES::SparseMatrix(A_.size1(), A_.size2(),
+        get_ptr(m->a_row), get_ptr(m->a_colind), a);
 
       m->fstats.at("preprocessing").toc();
       m->fstats.at("solver").tic();
@@ -428,8 +449,13 @@ namespace casadi {
 
     m->fstats.at("postprocessing").tic();
 
+    m->return_status = flag;
+    m->success = flag==qpOASES::SUCCESSFUL_RETURN;
+
+    if (verbose_) casadi_message("qpOASES return status: " + getErrorMessage(m->return_status));
+
     if (flag!=qpOASES::SUCCESSFUL_RETURN && flag!=qpOASES::RET_MAX_NWSR_REACHED) {
-      throw CasadiException("qpOASES failed: " + getErrorMessage(flag));
+      casadi_error("qpOASES failed: " + getErrorMessage(flag));
     }
 
     // Get optimal cost
@@ -454,7 +480,7 @@ namespace casadi {
     return 0;
   }
 
-  std::string QpoasesInterface::getErrorMessage(int flag) {
+  std::string QpoasesInterface::getErrorMessage(casadi_int flag) {
     switch (flag) {
     case qpOASES::SUCCESSFUL_RETURN:
       return "Successful return.";
@@ -826,7 +852,7 @@ namespace casadi {
     m->row.clear();
     m->col.clear();
     m->nz_map.clear();
-    for (int k=0; k<nnz; ++k) {
+    for (casadi_int k=0; k<nnz; ++k) {
       // Add upper(?) triangular part (and diagonal)
       m->row.push_back(row[k]-1);
       m->col.push_back(col[k]-1);
@@ -841,7 +867,7 @@ namespace casadi {
 
     // Create sparsity pattern: TODO(@jaeandersson) No memory allocation
     Sparsity sp = Sparsity::triplet(dim, dim, m->row, m->col, m->lin_map, false);
-    for (int& e : m->lin_map) e = m->nz_map[e];
+    for (casadi_int& e : m->lin_map) e = m->nz_map[e];
 
     // Allocate memory for nonzeros
     m->nz.resize(sp.nnz());
@@ -871,7 +897,7 @@ namespace casadi {
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Get nonzero elements (entire elements)
-    for (int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->lin_map[i]];
+    for (casadi_int i=0; i<m->nz.size(); ++i) m->nz[i] = vals[m->lin_map[i]];
 
     // Pass to linear solver
     m->linsol.nfact(get_ptr(m->nz));
@@ -893,6 +919,14 @@ namespace casadi {
     m->linsol.solve(get_ptr(m->nz), rhs, nrhs);
 
     return 0;
+  }
+
+  Dict QpoasesInterface::get_stats(void* mem) const {
+    Dict stats = Conic::get_stats(mem);
+    auto m = static_cast<QpoasesMemory*>(mem);
+    stats["return_status"] = getErrorMessage(m->return_status);
+    stats["success"] = m->success;
+    return stats;
   }
 
 } // namespace casadi

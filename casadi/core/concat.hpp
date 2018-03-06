@@ -48,29 +48,30 @@ namespace casadi {
 
     /// Evaluate the function (template)
     template<typename T>
-    int eval_gen(const T* const* arg, T* const* res, int* iw, T* w) const;
+    int eval_gen(const T* const* arg, T* const* res, casadi_int* iw, T* w) const;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
-                          const std::vector<int>& arg, const std::vector<int>& res) const override;
+                          const std::vector<casadi_int>& arg,
+                          const std::vector<casadi_int>& res) const override;
 
     /// Get the nonzeros of matrix
-    MX get_nzref(const Sparsity& sp, const std::vector<int>& nz) const override;
+    MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    bool is_equal(const MXNode* node, int depth) const override {
+    bool is_equal(const MXNode* node, casadi_int depth) const override {
       return sameOpAndDeps(node, depth);
     }
 
@@ -78,7 +79,7 @@ namespace casadi {
     bool is_valid_input() const override;
 
     /** \brief Get the number of symbolic primitives */
-    int n_primitives() const override;
+    casadi_int n_primitives() const override;
 
     /** \brief Get symbolic primitives */
     void primitives(std::vector<MX>::iterator& it) const override;
@@ -119,7 +120,7 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_HORZCAT;}
+    casadi_int op() const override { return OP_HORZCAT;}
 
     /** \brief Split up an expression along symbolic primitives */
     void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override;
@@ -128,7 +129,7 @@ namespace casadi {
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
 
     /** \brief Get offsets for split */
-    std::vector<int> off() const;
+    std::vector<casadi_int> off() const;
   };
 
   /** \brief Vertical concatenation of vectors
@@ -159,7 +160,7 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_VERTCAT;}
+    casadi_int op() const override { return OP_VERTCAT;}
 
     /** \brief Split up an expression along symbolic primitives */
     void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override;
@@ -168,7 +169,7 @@ namespace casadi {
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
 
     /** \brief Get offsets for split */
-    std::vector<int> off() const;
+    std::vector<casadi_int> off() const;
   };
 
   /** \brief Diagonal concatenation of matrices
@@ -199,7 +200,7 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_DIAGCAT;}
+    casadi_int op() const override { return OP_DIAGCAT;}
 
     /** \brief Split up an expression along symbolic primitives */
     void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override;
@@ -208,7 +209,7 @@ namespace casadi {
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
 
     /** \brief Get offsets for split */
-    std::pair<std::vector<int>, std::vector<int> > off() const;
+    std::pair<std::vector<casadi_int>, std::vector<casadi_int> > off() const;
   };
 
 } // namespace casadi

@@ -78,35 +78,41 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// Solve the QP
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /// Throw error
     static const char* errFlag(int flag);
 
     /// Print an OOQP bounds vector
     static std::string printBounds(const std::vector<double>& b,
-                                   const std::vector<char>& ib, int n, const char *sign);
+                                   const std::vector<char>& ib, casadi_int n, const char *sign);
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     // Transpose of linear constraints
     Sparsity spAT_;
 
     // Number of nonzeros in upper triangular half of Hessian
-    int nQ_;
+    casadi_int nQ_;
 
     // Number of nonzeros in Hessian
-    int nH_;
+    casadi_int nH_;
 
     // Number of nonzeros in constraint matrix
-    int nA_;
+    casadi_int nA_;
 
     // Print level
-    int print_level_;
+    casadi_int print_level_;
 
     // Tolerances
     double mutol_, artol_;
 
     /// A documentation string
     static const std::string meta_doc;
+
+    mutable int return_status_;
+    mutable bool success_;
 
   };
 

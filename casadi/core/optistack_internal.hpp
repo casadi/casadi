@@ -63,10 +63,10 @@ public:
   ~OptiNode();
 
   /// Create a decision variable (symbol)
-  MX variable(int n=1, int m=1, const std::string& attribute="full");
+  MX variable(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
 
   /// Create a parameter (symbol); fixed during optimization
-  MX parameter(int n=1, int m=1, const std::string& attribute="full");
+  MX parameter(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
 
   /// Set objective
   void minimize(const MX& f);
@@ -116,6 +116,8 @@ public:
 
   /// Get return status of solver
   std::string return_status() const;
+  /// Did the solver return successfully?
+  bool return_success() const;
 
   /// Get the underlying CasADi solver of the Opti stack
   Function casadi_solver() const;
@@ -168,12 +170,12 @@ public:
   std::vector<MX> active_symvar(VariableType type) const;
   std::vector<DM> active_values(VariableType type) const;
 
-  MX x_lookup(int i) const;
-  MX g_lookup(int i) const;
+  MX x_lookup(casadi_int i) const;
+  MX g_lookup(casadi_int i) const;
 
-  std::string x_describe(int i) const;
-  std::string g_describe(int i) const;
-  std::string describe(const MX& x, int indent=0) const;
+  std::string x_describe(casadi_int i) const;
+  std::string g_describe(casadi_int i) const;
+  std::string describe(const MX& x, casadi_int indent=0) const;
 
   void solve_prepare();
   DMDict solve_actual(const DMDict& args);
@@ -193,19 +195,19 @@ public:
   std::string class_name() const override { return "OptiNode"; }
 
   /// Number of (scalarised) decision variables
-  int nx() const {
+  casadi_int nx() const {
     if (problem_dirty()) return baked_copy().nx();
     return nlp_.at("x").size1();
   }
 
   /// Number of (scalarised) parameters
-  int np() const {
+  casadi_int np() const {
     if (problem_dirty()) return baked_copy().np();
     return nlp_.at("p").size1();
   }
 
   /// Number of (scalarised) constraints
-  int ng() const {
+  casadi_int ng() const {
     if (problem_dirty()) return baked_copy().ng();
     return nlp_.at("g").size1();
   }
@@ -234,6 +236,16 @@ public:
     return nlp_.at("f");
   }
 
+  MX lbg() const {
+    if (problem_dirty()) return baked_copy().lbg();
+    return bounds_lbg_;
+  }
+
+  MX ubg() const {
+    if (problem_dirty()) return baked_copy().ubg();
+    return bounds_ubg_;
+  }
+
   /// Get dual variables as a symbolic column vector
   MX lam_g() const {
     if (problem_dirty()) return baked_copy().lam_g();
@@ -247,7 +259,7 @@ public:
   /// Fix the structure of the optimization problem
   void bake();
 
-  int instance_number() const;
+  casadi_int instance_number() const;
 
   static OptiNode* create();
 
@@ -275,7 +287,7 @@ private:
   void register_dual(MetaCon& meta);
 
   /// Set value of symbol
-  void set_value_internal(const MX& x, const DM& v, std::vector<DM>& store);
+  void set_value_internal(const MX& x, const DM& v);
 
   /** \brief decompose a chain of inequalities
   *
@@ -320,23 +332,14 @@ private:
   std::vector<MX> symbols_;
 
   /// Symbol counter
-  int count_;
+  casadi_int count_;
 
-  int count_var_;
-  int count_par_;
-  int count_dual_;
+  casadi_int count_var_;
+  casadi_int count_par_;
+  casadi_int count_dual_;
 
-  /// Storing latest values for all parameters (including inactive)
-  std::vector<DM> values_;
-  /// Storing initial values for all variables (including inactive)
-  std::vector<DM> initial_;
-  /// Storing latest values for all variables (including inactive)
-  std::vector<DM> latest_;
-
-  /// Storing initial values for all duals (including inactive)
-  std::vector<DM> initial_duals_;
-  /// Storing latest values for all duals (including inactive)
-  std::vector<DM> latest_duals_;
+  /// Storing initial/latest values for all variables (including inactive)
+  std::map< VariableType, std::vector<DM> > store_initial_, store_latest_;
 
   /// Is symbol present in problem?
   std::vector<bool> symbol_active_;
@@ -352,6 +355,8 @@ private:
 
   /// Bounds helper function: p -> lbg, ubg
   Function bounds_;
+  MX bounds_lbg_;
+  MX bounds_ubg_;
 
   /// Constraints verbatim as passed in with 'subject_to'
   std::vector<MX> g_;
@@ -371,13 +376,13 @@ private:
   void assert_only_opti_nondual(const MX& e) const;
 
 
-  static int instance_count_;
-  int instance_number_;
+  static casadi_int instance_count_;
+  casadi_int instance_number_;
 
 
   std::string name_prefix() const;
 
-  static std::string format_stacktrace(const Dict& stacktrace, int indent);
+  static std::string format_stacktrace(const Dict& stacktrace, casadi_int indent);
 
 };
 

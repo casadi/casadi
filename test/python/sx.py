@@ -1336,5 +1336,89 @@ class SXtests(casadiTestCase):
       self.checkarray(E(5),2)
       self.checkarray(E(7),1)
 
+  def test_numpy_error(self):
+      x = SX.sym("x",3)
+      with self.assertInException("Use an equivalent CasADi function"):
+        np.linalg.norm(x)
+
+
+  def test_quadratic(self):
+    for X in [SX,MX]:
+      x = X.sym("x")
+      p = X.sym("p")
+      y = X.sym("y")
+
+      self.assertFalse(is_quadratic(sin(x),x))
+      self.assertFalse(is_quadratic(x**3,x))
+      self.assertTrue(is_quadratic(x**2,x))
+      self.assertTrue(is_quadratic(4*x,x))
+      self.assertTrue(is_quadratic(5,x))
+
+      self.assertFalse(is_quadratic(sin(x)*p**4,x))
+      self.assertFalse(is_quadratic(x**3*p**4,x))
+      self.assertTrue(is_quadratic(x**2*p**4,x))
+      self.assertTrue(is_quadratic(x*p**4,x))
+      self.assertTrue(is_quadratic(5*p**4,x))
+
+      self.assertFalse(is_linear(sin(x),x))
+      self.assertFalse(is_linear(x**3,x))
+      self.assertFalse(is_linear(x**2,x))
+      self.assertTrue(is_linear(3*x,x))
+      self.assertTrue(is_linear(5,x))
+
+      self.assertFalse(is_linear(sin(x)*p**4,x))
+      self.assertFalse(is_linear(x**3*p**4,x))
+      self.assertFalse(is_linear(x**2*p**4,x))
+      self.assertTrue(is_linear(x*p**4,x))
+      self.assertTrue(is_linear(5*p**4,x))
+
+
+
+      z = x**2+3*y**2 + 0.5*x*y + 7*x + 6*y+7
+      [A,b,c] = quadratic_coeff(z,vertcat(x,y))
+
+      with self.assertInException("non-quadratic"):
+        [A,b,c] = quadratic_coeff(x**2+3*y**2 + 0.5*x*y + 7*x + 6*y+7+sin(x),vertcat(x,y))
+
+      with self.assertInException("scalar"):
+        [A,b,c] = quadratic_coeff(vertcat(x,y),x)
+
+      z = x**2+3*y**2 + 0.5*x*y -p*y + 7*x + 6*y+7
+      [A,b,c] = quadratic_coeff(z,vertcat(x,y))
+
+      xy = vertcat(x,y)
+
+      e = 0.5*bilin(A,xy,xy)+dot(b,xy)+c
+
+      f = Function('f',[xy,p],[z])
+      f2 = Function('f',[xy,p],[e])
+      self.checkfunction(f,f2,inputs=[1.1,1.3])
+
+
+      with self.assertInException("non-linear"):
+        [A,b] = linear_coeff(x**2+3*y**2 + 0.5*x*y + 7*x + 6*y+7,vertcat(x,y))
+
+      with self.assertInException("vector"):
+        [A,b] = linear_coeff(blockcat([[x,y],[y,x]]),x)
+
+      z = vertcat(7*x + 6*y+7 ,5 -p*y )
+      [A,b] = linear_coeff(z,xy)
+
+      e = mtimes(A,xy)+b
+
+      f = Function('f',[xy,p],[z])
+      f2 = Function('f',[xy,p],[e])
+      self.checkfunction(f,f2,inputs=[1.1,1.3])
+
+  def test_evalf(self):
+    x = SX.sym("x")
+
+    y = SX(5)
+
+    self.checkarray(evalf(y),5)
+    with self.assertInException("since variables [x] are free"):
+      evalf(x)
+
+
 if __name__ == '__main__':
     unittest.main()

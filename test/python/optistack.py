@@ -249,6 +249,34 @@ class OptiStacktests(inherit_from):
           opti.minimize(sum1(F))
           sol = opti.solve()
 
+    def test_symb_boundedshapes(self):
+        
+          opti = Opti()
+          
+          y = opti.variable()
+          x = opti.variable()
+         
+          opti.subject_to(opti.bounded(0,y,x))
+
+          opti.solver(nlpsolver,nlpsolver_options)
+          opti.minimize(x**2+(y-6)**2)
+          
+          opti.subject_to(x<=3)
+          sol = opti.solve()
+          
+          self.checkarray(sol.value(y), 3, digits=3)
+
+    def test_symb_parametric(self):
+        
+          opti = Opti()
+          
+          y = opti.parameter(3,1)
+          x = opti.parameter(3,1)
+         
+          with self.assertInException("!parametric[0]"):
+            opti.subject_to(x<=y)
+
+          
     def test_callback(self):
         
           opti = Opti()
@@ -708,7 +736,107 @@ class OptiStacktests(inherit_from):
 
         self.checkarray(sol.value(P), R)
 
-   
+    def test_broadcast(self):
+        opti = Opti()
+        
+        x = opti.variable(3, 1)
+        
 
+        f = mtimes(x.T,x)
+        
+        opti.minimize(f)
+        
+        opti.subject_to(x[0]>=vertcat(1,2,3))
+        opti.solver(nlpsolver,nlpsolver_options)
+        sol = opti.solve()
+        self.checkarray(sol.value(x[0]), 3,digits=7)
+        
+
+        f = mtimes(x.T,x)
+        
+        opti.minimize(f)
+        
+        opti.subject_to();
+        
+        opti.subject_to(x[0]>=vertcat(1+x[1],0.5,0))
+        opti.solver(nlpsolver,nlpsolver_options)
+        sol = opti.solve()
+        self.checkarray(sol.value(x[0]), 0.5,digits=4)
+
+    def test_constraint_dim_mismatch(self):
+        opti = Opti()
+        x = opti.variable(5,1)
+
+        p = opti.parameter(1,1)
+        q = opti.parameter(1,1)
+
+
+        opti.minimize(dot(x,x))
+        with self.assertInException("Constraint must contain decision variables."):
+          opti.subject_to(p==q)
+        with self.assertInException("Constraint shape mismatch."):
+          opti.subject_to(x[0]==vertcat(1,2,3))
+        with self.assertInException("Constraint shape mismatch."):
+          opti.subject_to(vertcat(1,2,3)==x[0])
+
+
+    def test_value(self):
+        opti = Opti()
+        x = opti.variable()
+        y = opti.variable()
+        z = opti.variable()
+        p = opti.parameter()
+        q = opti.parameter()
+        g = x-p>=0
+        opti.subject_to(g)
+        opti.minimize(x**2+(y-3)**2)
+        lam = opti.dual(g)
+        
+        self.assertEqual(opti.debug.value(p**3,[p==2]),8)
+        self.assertEqual(opti.debug.value(x**3,[x==2]),8)
+        self.assertEqual(opti.debug.value(x+p,[x==2,p==3]),5)
+        self.assertEqual(opti.debug.value(lam**3,[opti.lam_g==2]),8)
+        with self.assertInException("This expression depends on a parameter with unset value"):
+          opti.debug.value(p**3)
+        with self.assertInException("This action is forbidden since you have not solved"):
+          opti.debug.value(x**3)
+        with self.assertInException("This action is forbidden since you have not solved"):
+          opti.debug.value(lam**3)
+        opti.solver("ipopt")
+        
+        opti.set_value(p,2)
+        sol = opti.solve()
+        self.assertEqual(opti.debug.value(p**2),4)
+        self.assertEqual(opti.debug.value(p**2,[p==3]),9)
+        self.checkarray(opti.debug.value(x**2),4,digits=5)
+        self.checkarray(opti.debug.value(x**2,[x==3]),9)
+        self.checkarray(opti.debug.value(lam**2),16,digits=5)
+        self.checkarray(opti.debug.value(lam**2,[opti.lam_g==1]),1,digits=5)
+        with self.assertInException("This expression has symbols that do not appear in the constraints and objective:"):
+          opti.debug.value(z**3)
+        self.assertEqual(opti.debug.value(z**3,[z==2]),8)
+        with self.assertInException("This expression depends on a parameter with unset value"):
+          opti.debug.value(q)
+
+    def test_introspection(self):
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      p = opti.parameter()
+      
+      opti.minimize((x-y**2)**2)
+      opti.subject_to(x+y+p>=1)
+      opti.subject_to(z+x>=1)
+      
+      opti.solver('ipopt')
+      opti.set_value(p, 3)
+      sol = opti.solve()
+
+      solver = nlpsol("solver","ipopt",{"x": opti.x, "f": opti.f, "g": opti.g, "p": opti.p})
+      sol2 = solver(p=sol.value(p),lbg=sol.value(opti.lbg),ubg=sol.value(opti.ubg))
+      
+      self.checkarray(sol2["x"],sol.value(opti.x))
+      
 if __name__ == '__main__':
     unittest.main()

@@ -81,7 +81,7 @@ namespace casadi {
     }
 
     // Sort Worhp options
-    int nopts = WorhpGetParamCount();
+    casadi_int nopts = WorhpGetParamCount();
     for (auto&& op : worhp_opts) {
       if (op.first.compare("qp")==0) {
         qp_opts_ = op.second;
@@ -89,7 +89,7 @@ namespace casadi {
       }
 
       // Get corresponding index using a linear search
-      int ind;
+      casadi_int ind;
       for (ind=1; ind<=nopts; ++ind) {
         // Get name in WORHP
         const char* name = WorhpGetParamName(ind);
@@ -243,7 +243,7 @@ namespace casadi {
   }
 
   void WorhpInterface::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
+                                casadi_int*& iw, double*& w) const {
     auto m = static_cast<WorhpMemory*>(mem);
 
     // Set work in base classes
@@ -290,18 +290,18 @@ namespace casadi {
     }
 
     if (m->worhp_w.DF.NeedStructure) {
-      for (int i=0; i<nx_; ++i) {
+      for (casadi_int i=0; i<nx_; ++i) {
         m->worhp_w.DF.row[i] = i + 1; // Index-1 based
       }
     }
 
     if (m->worhp_o.m>0 && m->worhp_w.DG.NeedStructure) {
-      int nz=0;
-      const int* colind = jacg_sp_.colind();
-      const int* row = jacg_sp_.row();
-      for (int c=0; c<nx_; ++c) {
-        for (int el=colind[c]; el<colind[c+1]; ++el) {
-          int r = row[el];
+      casadi_int nz=0;
+      const casadi_int* colind = jacg_sp_.colind();
+      const casadi_int* row = jacg_sp_.row();
+      for (casadi_int c=0; c<nx_; ++c) {
+        for (casadi_int el=colind[c]; el<colind[c+1]; ++el) {
+          casadi_int r = row[el];
           m->worhp_w.DG.col[nz] = c + 1; // Index-1 based
           m->worhp_w.DG.row[nz] = r + 1;
           nz++;
@@ -311,14 +311,14 @@ namespace casadi {
 
     if (m->worhp_w.HM.NeedStructure) {
       // Get the sparsity pattern of the Hessian
-      const int* colind = hesslag_sp_.colind();
-      const int* row = hesslag_sp_.row();
+      const casadi_int* colind = hesslag_sp_.colind();
+      const casadi_int* row = hesslag_sp_.row();
 
-      int nz=0;
+      casadi_int nz=0;
 
       // Strictly lower triangular part of the Hessian (note CCS -> CRS format change)
-      for (int c=0; c<nx_; ++c) {
-        for (int el=colind[c]; el<colind[c+1]; ++el) {
+      for (casadi_int c=0; c<nx_; ++c) {
+        for (casadi_int el=colind[c]; el<colind[c+1]; ++el) {
           if (row[el]>c) {
             m->worhp_w.HM.row[nz] = row[el] + 1;
             m->worhp_w.HM.col[nz] = c + 1;
@@ -328,7 +328,7 @@ namespace casadi {
       }
 
       // Diagonal always included
-      for (int r=0; r<nx_; ++r) {
+      for (casadi_int r=0; r<nx_; ++r) {
         m->worhp_w.HM.row[nz] = r + 1;
         m->worhp_w.HM.col[nz] = r + 1;
         nz++;
@@ -336,14 +336,13 @@ namespace casadi {
     }
   }
 
-  void WorhpInterface::solve(void* mem) const {
+  int WorhpInterface::solve(void* mem) const {
     auto m = static_cast<WorhpMemory*>(mem);
 
-    // Check the provided inputs
-    check_inputs(mem);
-
+    // Problem has not been solved at this point
+    m->success = false;
     if (m->lbg && m->ubg) {
-      for (int i=0; i<ng_; ++i) {
+      for (casadi_int i=0; i<ng_; ++i) {
         casadi_assert(!(m->lbg[i]==-inf && m->ubg[i] == inf),
                         "WorhpInterface::evaluate: Worhp cannot handle the case when both "
                         "LBG and UBG are infinite."
@@ -353,22 +352,26 @@ namespace casadi {
     }
 
     // Pass inputs to WORHP data structures
-    casadi_copy(m->x0, nx_, m->worhp_o.X);
+    casadi_copy(m->x, nx_, m->worhp_o.X);
     casadi_copy(m->lbx, nx_, m->worhp_o.XL);
     casadi_copy(m->ubx, nx_, m->worhp_o.XU);
-    casadi_copy(m->lam_x0, nx_, m->worhp_o.Lambda);
+    casadi_copy(m->lam_x, nx_, m->worhp_o.Lambda);
     if (m->worhp_o.m>0) {
-      casadi_copy(m->lam_g0, ng_, m->worhp_o.Mu);
+      casadi_copy(m->lam_g, ng_, m->worhp_o.Mu);
       casadi_copy(m->lbg, ng_, m->worhp_o.GL);
       casadi_copy(m->ubg, ng_, m->worhp_o.GU);
     }
 
     // Replace infinite bounds with m->worhp_p.Infty
     double inf = numeric_limits<double>::infinity();
-    for (int i=0; i<nx_; ++i) if (m->worhp_o.XL[i]==-inf) m->worhp_o.XL[i] = -m->worhp_p.Infty;
-    for (int i=0; i<nx_; ++i) if (m->worhp_o.XU[i]== inf) m->worhp_o.XU[i] =  m->worhp_p.Infty;
-    for (int i=0; i<ng_; ++i) if (m->worhp_o.GL[i]==-inf) m->worhp_o.GL[i] = -m->worhp_p.Infty;
-    for (int i=0; i<ng_; ++i) if (m->worhp_o.GU[i]== inf) m->worhp_o.GU[i] =  m->worhp_p.Infty;
+    for (casadi_int i=0; i<nx_; ++i)
+      if (m->worhp_o.XL[i]==-inf) m->worhp_o.XL[i] = -m->worhp_p.Infty;
+    for (casadi_int i=0; i<nx_; ++i)
+      if (m->worhp_o.XU[i]== inf) m->worhp_o.XU[i] =  m->worhp_p.Infty;
+    for (casadi_int i=0; i<ng_; ++i)
+      if (m->worhp_o.GL[i]==-inf) m->worhp_o.GL[i] = -m->worhp_p.Infty;
+    for (casadi_int i=0; i<ng_; ++i)
+      if (m->worhp_o.GU[i]== inf) m->worhp_o.GU[i] =  m->worhp_p.Infty;
 
     if (verbose_) casadi_message("WorhpInterface::starting iteration");
 
@@ -411,7 +414,7 @@ namespace casadi {
             // Evaluate the callback function
             fcallback_(m->arg, m->res, m->iw, m->w, 0);
             m->fstats.at("callback_fun").toc();
-            int ret = static_cast<int>(ret_double);
+            casadi_int ret = static_cast<casadi_int>(ret_double);
 
             if (ret) m->worhp_c.status = TerminateError;
           }
@@ -427,7 +430,7 @@ namespace casadi {
         m->arg[1] = m->p;
         m->res[0] = &m->worhp_o.F;
         calc_function(m, "nlp_f");
-        if (m->f) *m->f = m->worhp_o.F; // Store cost, before scaling
+        m->f = m->worhp_o.F; // Store cost, before scaling
         m->worhp_o.F *= m->worhp_w.ScaleObj;
         DoneUserAction(&m->worhp_c, evalF);
       }
@@ -471,11 +474,11 @@ namespace casadi {
         casadi_fill(dval, nx_, 0.);
 
         // Remove diagonal
-        const int* colind = hesslag_sp_.colind();
-        const int* row = hesslag_sp_.row();
-        int ind=0;
-        for (int c=0; c<nx_; ++c) {
-          for (int el=colind[c]; el<colind[c+1]; ++el) {
+        const casadi_int* colind = hesslag_sp_.colind();
+        const casadi_int* row = hesslag_sp_.row();
+        casadi_int ind=0;
+        for (casadi_int c=0; c<nx_; ++c) {
+          for (casadi_int el=colind[c]; el<colind[c+1]; ++el) {
             if (row[el]==c) {
               dval[c] = m->worhp_w.HM.val[el];
             } else {
@@ -504,11 +507,12 @@ namespace casadi {
 
     m->return_code = m->worhp_c.status;
     m->return_status = return_codes(m->worhp_c.status);
+    m->success = m->return_code > TerminateSuccess;
+    return 0;
   }
 
-  const char* WorhpInterface::return_codes(int flag) {
+  const char* WorhpInterface::return_codes(casadi_int flag) {
     switch (flag) {
-    case TerminateSuccess: return "TerminateSuccess";
     case OptimalSolution: return "OptimalSolution";
     case OptimalSolutionConstantF: return "OptimalSolutionConstantF";
     case SearchDirectionZero: return "SearchDirectionZero";
@@ -562,6 +566,14 @@ namespace casadi {
         WorhpFree(&this->worhp_o, &this->worhp_w, &this->worhp_p, &this->worhp_c);
       }
     }
+  }
+
+  Dict WorhpInterface::get_stats(void* mem) const {
+    Dict stats = Nlpsol::get_stats(mem);
+    auto m = static_cast<WorhpMemory*>(mem);
+    stats["return_status"] = m->return_status;
+    stats["success"] = m->success;
+    return stats;
   }
 
 } // namespace casadi

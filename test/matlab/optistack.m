@@ -266,3 +266,22 @@ if ~is_octave
   sol = opti.solve();
   assert(B==3);
 end
+
+
+opti = casadi.Opti();
+x = opti.variable();
+y = opti.variable();
+z = opti.variable();
+opti.minimize(x^2+y^2+z^2);
+opti.subject_to(x+y>=z);
+opti.subject_to(-3<=x<=3);
+opti.subject_to(-3<=y<=3);
+opti.subject_to(x+y>=9);
+opti.solver('ipopt');
+try
+    opti.solve();
+catch
+    
+end
+
+opti.debug.show_infeasibilities;

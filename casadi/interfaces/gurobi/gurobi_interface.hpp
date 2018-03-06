@@ -47,6 +47,9 @@ namespace casadi {
     // Gurobi environment
     GRBenv *env;
 
+    int return_status;
+    bool success;
+
     /// Constructor
     GurobiMemory();
 
@@ -100,7 +103,7 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<GurobiMemory*>(mem);}
 
     /// Solve the QP
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /// Can discrete variables be treated
     bool integer_support() const override { return true;}
@@ -108,8 +111,14 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
+
     // Variable types
     std::vector<char> vtype_;
+
+    /// Gurobi options
+    Dict opts_;
   };
 
 } // namespace casadi

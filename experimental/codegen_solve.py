@@ -11,13 +11,13 @@ x0 = solve(A0, b0)
 print(x0)
 
 # Test sparse QR
-[V, R, beta, pinv] = qr_sparse(A0)
-x0 = qr_solve(b0, V, R, beta, pinv)
+[V, R, beta, prinv, pc] = qr_sparse(A0)
+x0 = qr_solve(b0, V, R, beta, prinv, pc)
 print(x0)
 
 # Test sparse QR, transposed
-[V, R, beta, pinv] = qr_sparse(A0.T)
-x0 = qr_solve(b0, V, R, beta, pinv, True)
+[V, R, beta, prinv, pc] = qr_sparse(A0.T)
+x0 = qr_solve(b0, V, R, beta, prinv, pc, True)
 print(x0)
 
 A = MX.sym('A', Asp)

@@ -68,6 +68,9 @@ namespace casadi {
      {{"pass_nonlinear_variables",
        {OT_BOOL,
         "Pass list of variables entering nonlinearly to BONMIN"}},
+      {"pass_nonlinear_constraints",
+       {OT_BOOL,
+        "Pass list of constraints entering nonlinearly to BONMIN"}},
       {"bonmin",
        {OT_DICT,
         "Options to be passed to BONMIN"}},
@@ -123,7 +126,8 @@ namespace casadi {
     Nlpsol::init(opts);
 
     // Default options
-    pass_nonlinear_variables_ = false;
+    pass_nonlinear_variables_ = true;
+    pass_nonlinear_constraints_ = true;
     Dict hess_lag_options, jac_g_options, grad_f_options;
 
     // Read user options
@@ -132,7 +136,9 @@ namespace casadi {
         opts_ = op.second;
       } else if (op.first=="pass_nonlinear_variables") {
         pass_nonlinear_variables_ = op.second;
-      } else if (op.first=="var_string_md") {
+      } else if (op.first=="pass_nonlinear_constraints") {
+        pass_nonlinear_constraints_ = op.second;
+      }  else if (op.first=="var_string_md") {
         var_string_md_ = op.second;
       } else if (op.first=="var_integer_md") {
         var_integer_md_ = op.second;
@@ -175,6 +181,7 @@ namespace casadi {
       exact_hessian_ = hessian_approximation->second == "exact";
     }
 
+
     // Setup NLP functions
     create_function("nlp_f", {"x", "p"}, {"f"});
     create_function("nlp_g", {"x", "p"}, {"g"});
@@ -186,6 +193,10 @@ namespace casadi {
     }
     jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
 
+    // By default, assume all nonlinear
+    nl_ex_.resize(nx_, true);
+    nl_g_.resize(ng_, true);
+
     // Allocate temporary work vectors
     if (exact_hessian_) {
       if (!has_function("nlp_hess_l")) {
@@ -193,13 +204,20 @@ namespace casadi {
                         {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
       }
       hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
-    } else if (pass_nonlinear_variables_) {
-      nl_ex_ = oracle_.which_depends("x", {"f", "g"}, 2, false);
+
+      if (pass_nonlinear_variables_) {
+        const casadi_int* col = hesslag_sp_.colind();
+        for (casadi_int i=0;i<nx_;++i) nl_ex_[i] = col[i+1]-col[i];
+      }
+    } else {
+      if (pass_nonlinear_variables_)
+        nl_ex_ = oracle_.which_depends("x", {"f", "g"}, 2, false);
     }
+    if (pass_nonlinear_constraints_)
+      nl_g_ = oracle_.which_depends("x", {"g"}, 2, true);
 
     // Allocate work vectors
     alloc_w(nx_, true); // xk_
-    alloc_w(ng_, true); // lam_gk_
     alloc_w(nx_, true); // lam_xk_
     alloc_w(ng_, true); // gk_
     alloc_w(nx_, true); // grad_fk_
@@ -214,16 +232,13 @@ namespace casadi {
   }
 
   void BonminInterface::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
+                                casadi_int*& iw, double*& w) const {
     auto m = static_cast<BonminMemory*>(mem);
 
     // Set work in base classes
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Work vectors
-    m->xk = w; w += nx_;
-    m->lam_gk = w; w += ng_;
-    m->lam_xk = w; w += nx_;
     m->gk = w; w += ng_;
     m->grad_fk = w; w += nx_;
     m->jac_gk = w; w += jacg_sp_.nnz();
@@ -289,11 +304,8 @@ namespace casadi {
     }
   };
 
-  void BonminInterface::solve(void* mem) const {
+  int BonminInterface::solve(void* mem) const {
     auto m = static_cast<BonminMemory*>(mem);
-
-    // Check the provided inputs
-    check_inputs(mem);
 
     // Reset statistics
     m->inf_pr.clear();
@@ -305,6 +317,9 @@ namespace casadi {
     m->alpha_du.clear();
     m->obj.clear();
     m->ls_trials.clear();
+
+    // Problem has not been solved at this point
+    m->success = false;
 
     // Reset number of iterations
     m->n_iter = 0;
@@ -382,12 +397,8 @@ namespace casadi {
     }
 
     // Save results to outputs
-    casadi_copy(&m->fk, 1, m->f);
-    casadi_copy(m->xk, nx_, m->x);
-    casadi_copy(m->lam_gk, ng_, m->lam_g);
-    casadi_copy(m->lam_xk, nx_, m->lam_x);
     casadi_copy(m->gk, ng_, m->g);
-
+    return 0;
   }
 
   bool BonminInterface::
@@ -411,11 +422,11 @@ namespace casadi {
       if (!fcallback_.is_null()) {
         m->fstats.at("callback_fun").tic();
         if (full_callback) {
-          casadi_copy(x, nx_, m->xk);
-          for (int i=0; i<nx_; ++i) {
-            m->lam_xk[i] = z_U[i]-z_L[i];
+          casadi_copy(x, nx_, m->x);
+          for (casadi_int i=0; i<nx_; ++i) {
+            m->lam_x[i] = z_U[i]-z_L[i];
           }
-          casadi_copy(lambda, ng_, m->lam_gk);
+          casadi_copy(lambda, ng_, m->lam_g);
           casadi_copy(g, ng_, m->gk);
         } else {
           if (iter==0) {
@@ -436,8 +447,8 @@ namespace casadi {
           m->arg[NLPSOL_F] = &obj_value;
           m->arg[NLPSOL_G] = g;
           m->arg[NLPSOL_LAM_P] = 0;
-          m->arg[NLPSOL_LAM_X] = m->lam_xk;
-          m->arg[NLPSOL_LAM_G] = m->lam_gk;
+          m->arg[NLPSOL_LAM_X] = m->lam_x;
+          m->arg[NLPSOL_LAM_G] = m->lam_g;
         }
 
         // Outputs
@@ -469,20 +480,14 @@ namespace casadi {
       const double* x, double obj_value) const {
     try {
       // Get primal solution
-      casadi_copy(x, nx_, m->xk);
+      casadi_copy(x, nx_, m->x);
 
       // Get optimal cost
-      m->fk = obj_value;
+      m->f = obj_value;
 
-      // Get dual solution (simple bounds)
-      if (m->lam_xk) {
-        for (int i=0; i<nx_; ++i) {
-          m->lam_xk[i] = casadi::nan;
-        }
-      }
-
-      // Get dual solution (nonlinear bounds)
-      casadi_fill(m->lam_gk, ng_, nan);
+      // Dual solution not calculated
+      casadi_fill(m->lam_x, nx_, nan);
+      casadi_fill(m->lam_g, ng_, nan);
 
       // Get the constraints
       casadi_fill(m->gk, ng_, nan);
@@ -492,6 +497,7 @@ namespace casadi {
 
       // Interpret return code
       m->return_status = return_status_string(status);
+      m->success = status==Bonmin::TMINLP::SUCCESS;
 
     } catch(exception& ex) {
       uerr() << "finalize_solution failed: " << ex.what() << endl;
@@ -520,25 +526,20 @@ namespace casadi {
     try {
       // Initialize primal variables
       if (init_x) {
-        casadi_copy(m->x0, nx_, x);
+        casadi_copy(m->x, nx_, x);
       }
 
       // Initialize dual variables (simple bounds)
       if (init_z) {
-        if (m->lam_x0) {
-          for (int i=0; i<nx_; ++i) {
-            z_L[i] = max(0., -m->lam_x0[i]);
-            z_U[i] = max(0., m->lam_x0[i]);
-          }
-        } else {
-          casadi_fill(z_L, nx_, 0.);
-          casadi_fill(z_U, nx_, 0.);
+        for (casadi_int i=0; i<nx_; ++i) {
+          z_L[i] = max(0., -m->lam_x[i]);
+          z_U[i] = max(0., m->lam_x[i]);
         }
       }
 
       // Initialize dual variables (nonlinear bounds)
       if (init_lambda) {
-        casadi_copy(m->lam_g0, ng_, lambda);
+        casadi_copy(m->lam_g, ng_, lambda);
       }
 
       return true;
@@ -588,7 +589,7 @@ namespace casadi {
   bool BonminInterface::
   get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const {
     try {
-      for (int i=0; i<nl_ex_.size(); ++i) {
+      for (casadi_int i=0; i<nl_ex_.size(); ++i) {
         if (nl_ex_[i]) *pos_nonlin_vars++ = i;
       }
       return true;
@@ -610,6 +611,7 @@ namespace casadi {
     auto m = static_cast<BonminMemory*>(mem);
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter_count;
+    stats["success"] = m->success;
     return stats;
   }
 

@@ -27,6 +27,7 @@ import numpy
 import unittest
 from types import *
 from helpers import *
+import pickle
 
 scipy_interpolate = False
 try:
@@ -476,7 +477,7 @@ class Functiontests(casadiTestCase):
     Z = [MX.sym("z",2,2) for i in range(n)]
     V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
 
-    for parallelization in ["serial","openmp","unroll","inline"] if args.run_slow else ["serial"]:
+    for parallelization in ["serial","openmp","unroll","inline","thread"] if args.run_slow else ["serial"]:
         print(parallelization)
         res = fun.map(n, parallelization).call([horzcat(*x) for x in [X,Y,Z,V]])
 
@@ -500,6 +501,67 @@ class Functiontests(casadiTestCase):
 
           self.checkfunction(f,Fref,inputs=X_+Y_+Z_+V_,sparsity_mod=args.run_slow)
 
+  def test_map_node_light(self):
+    x = SX.sym("x")
+    y = SX.sym("y",2)
+    z = SX.sym("z",2,2)
+    v = SX.sym("z",Sparsity.upper(3))
+
+    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+
+    n = 2
+
+    X = [MX.sym("x") for i in range(n)]
+    Y = [MX.sym("y",2) for i in range(n)]
+    Z = [MX.sym("z",2,2) for i in range(n)]
+    V = [MX.sym("z",Sparsity.upper(3)) for i in range(n)]
+
+    for parallelization in ["serial","openmp","unroll","inline","thread"]:
+        print(parallelization)
+        res = fun.map(n, parallelization).call([horzcat(*x) for x in [X,Y,Z,V]])
+
+
+        F = Function("F",X+Y+Z+V,list(map(sin,res)))
+
+        resref = [[] for i in range(fun.n_out())]
+        for r in zip(X,Y,Z,V):
+          for i,e in enumerate(map(sin,fun.call(r))):
+            resref[i] = resref[i] + [e]
+
+        Fref = Function("F",X+Y+Z+V,[horzcat(*x) for x in resref])
+
+        np.random.seed(0)
+        X_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in X ]
+        Y_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Y ]
+        Z_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in Z ]
+        V_ = [ DM(i.sparsity(),np.random.random(i.nnz())) for i in V ]
+
+        for f in [F, F.expand('expand_'+F.name())]:
+          self.checkfunction_light(f,Fref,inputs=X_+Y_+Z_+V_,)
+
+  def test_map_node_n_threads(self):
+    x = SX.sym("x")
+    y = SX.sym("y",2)
+    z = SX.sym("z",2,2)
+    v = SX.sym("z",Sparsity.upper(3))
+
+    fun = Function("f",[x,y,z,v],[mtimes(z,y)+x,sin(y*x).T,v/x])
+
+    X_ = [ DM(x.sparsity(),np.random.random(x.nnz())) for i in range(10) ]
+    Y_ = [ DM(y.sparsity(),np.random.random(y.nnz())) for i in range(10) ]
+    Z_ = [ DM(z.sparsity(),np.random.random(z.nnz())) for i in range(10) ]
+    V_ = [ DM(v.sparsity(),np.random.random(v.nnz())) for i in range(10) ]
+
+
+    print(fun.map(3,"thread",2))
+    
+
+    self.checkfunction_light(fun.map(2,"thread",1),fun.map(2),inputs=[hcat(X_[:2]),hcat(Y_[:2]),hcat(Z_[:2]),hcat(V_[:2])])
+    self.checkfunction_light(fun.map(3,"thread",1),fun.map(3),inputs=[hcat(X_[:3]),hcat(Y_[:3]),hcat(Z_[:3]),hcat(V_[:3])])
+    self.checkfunction_light(fun.map(3,"thread",2),fun.map(3),inputs=[hcat(X_[:3]),hcat(Y_[:3]),hcat(Z_[:3]),hcat(V_[:3])])
+    self.checkfunction_light(fun.map(4,"thread",2),fun.map(4),inputs=[hcat(X_[:4]),hcat(Y_[:4]),hcat(Z_[:4]),hcat(V_[:4])])
+    self.checkfunction_light(fun.map(4,"thread",5),fun.map(4),inputs=[hcat(X_[:4]),hcat(Y_[:4]),hcat(Z_[:4]),hcat(V_[:4])])
+
   @memory_heavy()
   def test_mapsum(self):
     x = SX.sym("x")
@@ -519,7 +581,7 @@ class Functiontests(casadiTestCase):
     zi = 0
     for Z_alt in [Z,[MX()]*3]:
       zi+= 1
-      for parallelization in ["serial","openmp","unroll"]:
+      for parallelization in ["serial","openmp","unroll","thread"]:
         res = fun.mapsum([horzcat(*x) for x in [X,Y,Z_alt,V]],parallelization) # Joris - clean alternative for this?
 
         for ad_weight_sp in [0,1]:
@@ -540,7 +602,8 @@ class Functiontests(casadiTestCase):
 
           inputs = X_+Y_+Z_+V_
 
-          self.check_codegen(F,inputs=inputs)
+          if parallelization!="thread":
+            self.check_codegen(F,inputs=inputs)
 
           for f in [F,toSX_fun(F)]:
             self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
@@ -564,7 +627,7 @@ class Functiontests(casadiTestCase):
 
     for Z_alt in [Z]:
 
-      for parallelization in ["serial","openmp","unroll"]:
+      for parallelization in ["serial","openmp","unroll","thread"]:
 
         for ad_weight_sp in [0,1]:
           for ad_weight in [0,1]:
@@ -590,7 +653,8 @@ class Functiontests(casadiTestCase):
 
             inputs = [horzcat(*X_),horzcat(*Y_),Z_,V_]
 
-            self.check_codegen(F,inputs=inputs)
+            if parallelization!="thread":
+              self.check_codegen(F,inputs=inputs)
 
             for f in [F,toSX_fun(F)]:
               self.checkfunction(f,Fref,inputs=inputs,sparsity_mod=args.run_slow)
@@ -930,7 +994,7 @@ class Functiontests(casadiTestCase):
   def test_1d_interpolant_uniform(self):
     grid = [[0, 1, 2]]
     values = [0, 1, 2]
-    for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]}]:
+    for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]},{"lookup_mode": ["binary"]}]:
       F = interpolant('F', 'linear', grid, values, opts)
       def same(a, b): return abs(float(a)-b)<1e-8
       self.assertTrue(same(F(2.4), 2.4))
@@ -946,7 +1010,7 @@ class Functiontests(casadiTestCase):
 
     grid = [[2, 4, 6]]
     values = [10, 7, 1]
-    for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]}]:
+    for opts in [{"lookup_mode": ["linear"]},{"lookup_mode": ["exact"]},{"lookup_mode": ["binary"]}]:
       F = interpolant('F', 'linear', grid, values, opts)
       def same(a, b): return abs(float(a)-b)<1e-8
       self.assertTrue(same(F(1), 11.5))
@@ -962,7 +1026,7 @@ class Functiontests(casadiTestCase):
   def test_2d_interpolant_uniform(self):
     grid = [[0, 1, 2], [0, 1, 2]]
     values = [0, 1, 2, 10, 11, 12, 20, 21, 22]
-    for opts in [{"lookup_mode": ["linear","linear"]},{"lookup_mode": ["exact","exact"]}]:
+    for opts in [{"lookup_mode": ["linear","linear"]},{"lookup_mode": ["exact","exact"]},{"lookup_mode": ["binary","binary"]}]:
       F = interpolant('F', 'linear', grid, values, opts)
       def same(a, b): return abs(float(a)-b)<1e-8
       self.assertTrue(same(F([2.4, 0.5]), 7.4))
@@ -1384,26 +1448,26 @@ class Functiontests(casadiTestCase):
 
       nlp = {"x": x, "f": x**2}
 
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp)
       self.assertTrue("nlp_f" not in out[0])
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":True}})
       self.assertTrue("nlp_f" in out[0])
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_f" : {"verbose":True}}})
       self.assertTrue("nlp_f" in out[0])
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":True},"specific_options":{ "nlp_f" : {"verbose":False}}})
       self.assertTrue("nlp_f" not in out[0])
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":False},"specific_options":{ "nlp_f" : {"verbose":True}}})
       self.assertTrue("nlp_f" in out[0])
 
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp)
       self.assertTrue(len(out[1])==0)
-      with capture() as out:
+      with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : {"verbose":True}}})
       self.assertTrue("Ignoring" + out[1])
       self.assertTrue("nlp_g" in out[1])
@@ -1532,6 +1596,169 @@ class Functiontests(casadiTestCase):
     code= c.dump()
 
     self.assertTrue("ffff_acc4_acc4_acc4" in code)
+
+  def test_2d_linear_multiout(self):
+    np.random.seed(0)
+
+    d_knots = [list(np.linspace(0,1,5)),list(np.linspace(0,1,6))]
+
+    data0 = np.random.random([len(e) for e in d_knots])
+    data1 = np.random.random([len(e) for e in d_knots])
+    r = np.meshgrid(*d_knots,indexing='ij')
+
+    xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
+
+    d_flat0 = data0.ravel(order='F')
+
+    LUT0 = casadi.interpolant('name','linear',d_knots,d_flat0)
+
+    d_flat1 = data1.ravel(order='F')
+
+    LUT1 = casadi.interpolant('name','linear',d_knots,d_flat1)
+    
+    data = np.vstack((data0.ravel(order='F'),data1.ravel(order='F'))).ravel(order='F')
+
+    d_flat = data.ravel(order='F')
+
+    
+    LUT = casadi.interpolant('name','linear',d_knots,d_flat)
+    
+    
+    x = MX.sym("x")
+    y = MX.sym("y")
+    
+    
+    LUT_sep = Function('f',[x,y],[vertcat(LUT0(vertcat(x,y)),LUT1(vertcat(x,y)))])
+    LUT = Function('f',[x,y],[LUT(vertcat(x,y))])
+    
+    self.checkfunction(LUT,LUT_sep, inputs=[0.2,0.333])
+    self.check_codegen(LUT,inputs=[0.2,0.333])
+
+  def test_2d_bspline_multiout(self):
+    np.random.seed(0)
+
+    d_knots = [list(np.linspace(0,1,5)),list(np.linspace(0,1,6))]
+
+    data0 = np.random.random([len(e) for e in d_knots])
+    data1 = np.random.random([len(e) for e in d_knots])
+    r = np.meshgrid(*d_knots,indexing='ij')
+
+    xyz = np.vstack(e.ravel(order='F') for e in r).ravel(order='F')
+
+    d_flat0 = data0.ravel(order='F')
+
+    LUT0 = casadi.interpolant('name','bspline',d_knots,d_flat0)
+
+    d_flat1 = data1.ravel(order='F')
+
+    LUT1 = casadi.interpolant('name','bspline',d_knots,d_flat1)
+    
+    data = np.vstack((data0.ravel(order='F'),data1.ravel(order='F'))).ravel(order='F')
+
+    d_flat = data.ravel(order='F')
+
+    
+    LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
+    
+    
+    x = MX.sym("x")
+    y = MX.sym("y")
+    
+    
+    LUT_sep = Function('f',[x,y],[vertcat(LUT0(vertcat(x,y)),LUT1(vertcat(x,y)))])
+    LUT = Function('f',[x,y],[LUT(vertcat(x,y))])
+    
+    self.checkfunction(LUT,LUT_sep, inputs=[0.2,0.333])
+    self.check_codegen(LUT,inputs=[0.2,0.333])
+
+  def test_codegen_avoid_stack(self):
+    x = SX.sym("x",3,3)
+    f = Function('f',[x],[det(x)])
+    np.random.seed(0)
+    self.check_codegen(f,inputs=[np.random.random((3,3))])
+    self.check_codegen(f,inputs=[np.random.random((3,3))], opts={"avoid_stack": True})
+  
+
+  def test_sx_serialize(self):
+    x = SX.sym("x")
+    y = x+3
+    z = sin(y)
+
+    f = Function('f',[x],[z])
+    fs = Function.deserialize(f.serialize())
+
+    self.checkfunction(f,fs,inputs=[2])
+
+    x = SX.sym("x")
+    y = x+3
+    z = sin(y)
+
+    f = Function('f',[x],[z,np.nan,-np.inf,np.inf])
+    fs = Function.deserialize(f.serialize())
+    self.checkfunction(f,fs,inputs=[2])
+
+    x = SX.sym("x")
+    y = SX.sym("y", Sparsity.lower(3))
+    z = x+y
+    z1 = sparsify(vertcat(z[0],0,z[1]))
+    z2 = z.T
+
+    f = Function('f',[x,y],[z1,z2,x**2],["x","y"],["a","b","c"])
+    fs = Function.deserialize(f.serialize())
+    
+    self.assertEqual(fs.name_in(0), "x")
+    self.assertEqual(fs.name_out(0), "a")
+    self.assertEqual(fs.name(), "f")
+
+    self.checkfunction(f,fs,inputs=[3.7,np.array([[1,0,0],[2,3,0],[4,5,6]])],hessian=False)
+
+
+    fs = pickle.loads(pickle.dumps(f))
+    self.checkfunction(f,fs,inputs=[3.7,np.array([[1,0,0],[2,3,0],[4,5,6]])],hessian=False)
+
+    x = SX.sym("x")
+    p = SX.sym("p")
+
+    f = Function('f',[x],[p])
+
+    with self.assertInException("Cannot serialize SXFunction with free parameters"):
+      pickle.loads(pickle.dumps(f))
+
+
+    x = MX.sym("x")
+    f = Function('f',[x],[x**2])
+
+    with self.assertInException("'serialize' not defined for MXFunction"):
+      pickle.loads(pickle.dumps(f))
+
+  def test_string(self):
+    x=MX.sym("x")
+    y=MX.sym("y")
+    f = Function('f',[x],[],["x"],[])
+    self.assertTrue("(x)->()" in str(f))
+
+    f = Function('f',[],[x],[],["y"])
+    self.assertTrue("()->(y)" in str(f))
+
+    f = Function('f',[x],[x**2],["x"],["y"])
+    self.assertTrue("(x)->(y)" in str(f))
+
+    f = Function('f',[x,y],[x**2,x*y],["x","y"],["w","z"])
+    self.assertTrue("(x,y)->(w,z)" in str(f))
+
+  def test_fold(self):
+    x = SX.sym("x",2,2)
+
+    f = Function("f",[x],[sin(x)])
+
+    F = f.fold(10)
+
+    x0 = x
+    for i in range(10):
+      x = f(x)
+    Fref = Function("f",[x0],[x])
+
+    self.checkfunction(F,Fref,inputs=[DM([[1,2],[3,7]])])
 
 if __name__ == '__main__':
     unittest.main()

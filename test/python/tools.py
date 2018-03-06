@@ -811,6 +811,15 @@ class Toolstests(casadiTestCase):
     self.checkarray(g.shape,(1,1))
 
     self.assertTrue(len(g["inequality"])==0)
+    
+  def test_shape_IM(self):
+    M = 1   # If M is changed to something > 1, the error disappears.
+    N = 5
+    s = struct_symMX([entry('u', shape = (M, N))])
+    u = s.prefix['u']
+
+    self.assertTrue(u[:, :].shape,(M, N))
+              
 
 if __name__ == '__main__':
     unittest.main()

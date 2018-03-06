@@ -277,24 +277,43 @@ if has_nlpsol('bonmin')
   assert(all(full(sol.x)==[3;4]))
 end
 
-data = { [1 3;11 17] , [1 3] , [1;3] 3};
+data = { [1 3 2;11 17 4], [1 3;11 17] , [1 3] , [1;3] 3};
 
 for i=1:numel(data)
   A = data{i};
-  B = reshape(DM(A),size(A));
-  assert(all(sum(A)==full(sum(B))))
-  assert(all(sum(A,1)==full(sum(B,1))))
-  assert(all(sum(A,2)==full(sum(B,2))))
+  B_DM = reshape(DM(A),size(A));
+  B_MX = MX(B_DM);
+  Bs = {B_DM, B_MX};
+  for j=1:2
+    B = Bs{j};
+    assert(all(sum(A)==full(evalf(sum(B)))))
+    assert(all(sum(A,1)==full(evalf(sum(B,1)))))
+    assert(all(sum(A,2)==full(evalf(sum(B,2)))))
 
-  if isvector(A)
-    assert(all(norm(A)==full(norm(B))))
-    assert(all(norm(A,1)==full(norm(B,1))))
-    assert(all(norm(A,2)==full(norm(B,2))))
-    assert(all(norm(A,inf)==full(norm(B,inf))))
-    assert(all(norm(A,'inf')==full(norm(B,'inf'))))
-    assert(all(norm(A,'fro')==full(norm(B,'fro'))))
-  else
-    assert(all(norm(A,'fro')==full(norm(B,'fro'))))
+    assert(all(all(cumsum(A)==full(evalf(cumsum(B))))))
+    assert(all(all(cumsum(A,1)==full(evalf(cumsum(B,1))))))
+    assert(all(all(cumsum(A,2)==full(evalf(cumsum(B,2))))))
+
+    assert(all(diff(A)==full(evalf(diff(B)))))
+    assert(all(diff(A,1)==full(evalf(diff(B,1)))))
+    assert(all(diff(A,2)==full(evalf(diff(B,2)))))
+    assert(all(all(diff(A,1,1)==full(evalf(diff(B,1,1))))))
+    assert(all(all(diff(A,1,2)==full(evalf(diff(B,1,2))))))
+    assert(all(all(diff(A,2,1)==full(evalf(diff(B,2,1))))))
+    assert(all(all(diff(A,2,2)==full(evalf(diff(B,2,2))))))
+
+    if j==1
+      if isvector(A)
+        assert(all(norm(A)==full(evalf(norm(B)))))
+        assert(all(norm(A,1)==full(evalf(norm(B,1)))))
+        assert(all(norm(A,2)==full(evalf(norm(B,2)))))
+        assert(all(norm(A,inf)==full(evalf(norm(B,inf)))))
+        assert(all(norm(A,'inf')==full(evalf(norm(B,'inf')))))
+        assert(all(norm(A,'fro')==full(evalf(norm(B,'fro')))))
+      else
+        assert(all(norm(A,'fro')==full(evalf(norm(B,'fro')))))
+      end
+    end
   end
 end
 
@@ -441,3 +460,21 @@ for j=1:2;
   end
 
 end
+
+c = {1,2,4;3 5 6}
+e = full(casadi.blockcat(c))
+assert(norm(cell2mat(c)-e)==0)
+
+e = full(casadi.blockcat({{1,2,4};{3 5 6}}))
+assert(norm(cell2mat(c)-e)==0)
+e = full(casadi.blockcat({{1,2,4} {3 5 6}}))
+assert(norm(cell2mat(c)-e)==0)
+e = full(casadi.blockcat({{1;2;4} {3 5 6}}))
+assert(norm(cell2mat(c)-e)==0)
+e = full(casadi.blockcat({{1;2;4} {3;5;6}}))
+assert(norm(cell2mat(c)-e)==0)
+
+c = casadi.blockcat({1 2 3})
+assert(norm(size(c)-[1 3])==0)
+c = casadi.blockcat({1;2;3})
+assert(norm(size(c)-[3 1])==0)

@@ -45,7 +45,7 @@ namespace casadi {
 
   void Bilin::ad_forward(const std::vector<std::vector<MX> >& fseed,
                       std::vector<std::vector<MX> >& fsens) const {
-    for (int d=0; d<fsens.size(); ++d) {
+    for (casadi_int d=0; d<fsens.size(); ++d) {
       fsens[d][0]
         = bilin(fseed[d][0], dep(1), dep(2))
         + bilin(dep(0), fseed[d][1], dep(2))
@@ -55,7 +55,7 @@ namespace casadi {
 
   void Bilin::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                       std::vector<std::vector<MX> >& asens) const {
-    for (int d=0; d<aseed.size(); ++d) {
+    for (casadi_int d=0; d<aseed.size(); ++d) {
       asens[d][0] = rank1(project(asens[d][0], dep(0).sparsity()),
                           aseed[d][0], dep(1), dep(2));
       asens[d][1] += aseed[d][0] * mtimes(dep(0), dep(2));
@@ -63,27 +63,27 @@ namespace casadi {
     }
   }
 
-  int Bilin::eval(const double** arg, double** res, int* iw, double* w) const {
+  int Bilin::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
-  int Bilin::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+  int Bilin::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<typename T>
-  int Bilin::eval_gen(const T** arg, T** res, int* iw, T* w) const {
+  int Bilin::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
     *res[0] = casadi_bilin(arg[0], dep(0).sparsity(), arg[1], arg[2]);
     return 0;
   }
 
-  int Bilin::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  int Bilin::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     /* Return value */
     bvec_t r=0;
 
     /* Loop over the columns of A */
     SparsityStruct sp_A = dep(0).sparsity();
-    int cc, rr, el;
+    casadi_int cc, rr, el;
     for (cc=0; cc<sp_A.ncol; ++cc) {
       /* Loop over the nonzeros of A */
       for (el=sp_A.colind[cc]; el<sp_A.colind[cc+1]; ++el) {
@@ -98,13 +98,13 @@ namespace casadi {
     return 0;
   }
 
-  int Bilin::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  int Bilin::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     /* Seed */
     bvec_t s_r=res[0][0]; res[0][0] = 0;
 
     /* Loop over the columns of A */
     SparsityStruct sp_A = dep(0).sparsity();
-    int cc, rr, el;
+    casadi_int cc, rr, el;
     for (cc=0; cc<sp_A.ncol; ++cc) {
       /* Loop over the nonzeros of A */
       for (el=sp_A.colind[cc]; el<sp_A.colind[cc+1]; ++el) {
@@ -121,9 +121,10 @@ namespace casadi {
   }
 
   void Bilin::generate(CodeGenerator& g,
-                       const std::vector<int>& arg, const std::vector<int>& res) const {
+                       const std::vector<casadi_int>& arg,
+                       const std::vector<casadi_int>& res) const {
     g << g.workel(res[0]) << " = "
-      << g.bilin(g.work(arg[0], dep(0).nnz()), sparsity(),
+      << g.bilin(g.work(arg[0], dep(0).nnz()), dep(0).sparsity(),
                  g.work(arg[1], dep(1).nnz()),
                  g.work(arg[2], dep(2).nnz())) << ";\n";
   }

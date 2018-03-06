@@ -24,6 +24,7 @@
 
 
 #include <casadi/casadi.hpp>
+#include <string.h>
 /** Solve a simple QP
     We want to model a chain attached to two supports and hanging in between. Let us discretise
     it with N mass points connected by N-1 springs. Each mass i has position (yi,zi), i=1,...,N.
@@ -54,10 +55,22 @@
 using namespace casadi;
 using namespace std;
 
-int main(){
+int main(int argc, char* argv[]) {
+  // Default options
+  string plugin_name = "qpoases";
+  bool schur = false;
+  bool nlp = false;
+  bool large = false;
+  // Read options, first is plugin name
+  if (argc>1) plugin_name = argv[1];
+  for (int i=2; i<argc; ++i) {
+    if (strcmp(argv[i], "schur")==0) schur = true;
+    if (strcmp(argv[i], "nlp")==0) nlp = true;
+    if (strcmp(argv[i], "large")==0) large = true;
+  }
 
   // Constants
-  int N = 40;
+  int N = large ? 200 : 40;
   double m_i = 40.0/N;
   double D_i = 70.0*N;
   double g0 = 9.81;
@@ -129,12 +142,16 @@ int main(){
   // Formulate QP
   SXDict qp = {{"x", vertcat(x)}, {"f", Vchain}, {"g", vertcat(g)}};
 
-  // Solve with a QP solver or NLP solver
-  Function solver = qpsol("solver", "qpoases", qp, {{"sparse", true}, {"schur", false}, {"print_time", true}});
-  //Function solver = qpsol("solver", "cplex", qp);
-  //Function solver = qpsol("solver", "ooqp", qp);
-  //Function solver = qpsol("solver", "gurobi", qp);
-  //Function solver = nlpsol("solver", "ipopt", qp)
+  // Solver specific options
+  Dict solver_options;
+  if (plugin_name == "qpoases") {
+    solver_options["sparse"] = true;
+    solver_options["schur"] = schur;
+    solver_options["print_time"] = true;
+  }
+
+  // Create solver instance
+  Function solver = qpsol("solver", plugin_name, qp, solver_options);
 
   // Get the optimal solution
   DMDict arg = {{"lbx", lbx},

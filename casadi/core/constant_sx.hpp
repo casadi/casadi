@@ -57,10 +57,10 @@ double to_double() const override = 0;
 bool is_constant() const override { return true; }
 
 /** \brief  Get the operation */
-int op() const override { return OP_CONST;}
+casadi_int op() const override { return OP_CONST;}
 
 /** \brief Check if two nodes are equivalent up to a given depth */
-bool is_equal(const SXNode* node, int depth) const override {
+bool is_equal(const SXNode* node, casadi_int depth) const override {
   const ConstantSX* n = dynamic_cast<const ConstantSX*>(node);
   return n && n->to_double()==to_double();
 }
@@ -119,7 +119,7 @@ class RealtypeSX : public ConstantSX {
     ///@{
     /** \brief  Get the value */
     double to_double() const override { return value;}
-    int to_int() const override { return static_cast<int>(value);}
+    casadi_int to_int() const override { return static_cast<casadi_int>(value);}
     ///@}
 
     bool is_almost_zero(double tol) const override { return fabs(value)<=tol; }
@@ -141,7 +141,10 @@ class RealtypeSX : public ConstantSX {
 class IntegerSX : public ConstantSX {
   private:
     /// Constructor is private, use "create" below
-    explicit IntegerSX(int value) : value(value) {}
+    explicit IntegerSX(casadi_int value) : value(static_cast<int>(value)) {
+      casadi_assert(value<=std::numeric_limits<int>::max() &&
+                    value>=std::numeric_limits<int>::min(), "Integer overflow");
+    }
 
   public:
 
@@ -153,9 +156,9 @@ class IntegerSX : public ConstantSX {
     }
 
     /// Static creator function (use instead of constructor)
-    inline static IntegerSX* create(int value) {
+    inline static IntegerSX* create(casadi_int value) {
       // Try to find the constant
-      CACHING_MAP<int, IntegerSX*>::iterator it = cached_constants_.find(value);
+      CACHING_MAP<casadi_int, IntegerSX*>::iterator it = cached_constants_.find(value);
 
       // If not found, add it,
       if (it==cached_constants_.end()) {
@@ -174,8 +177,8 @@ class IntegerSX : public ConstantSX {
 
     ///@{
     /** \brief  evaluate function */
-    double to_double() const override {  return value; }
-    int to_int() const override {  return value; }
+    double to_double() const override {  return static_cast<double>(value); }
+    casadi_int to_int() const override {  return static_cast<casadi_int>(value); }
     ///@}
 
     /** \brief  Properties */
@@ -185,7 +188,7 @@ class IntegerSX : public ConstantSX {
 
     /** \brief Hash map of all constants currently allocated
      * (storage is allocated for it in sx_element.cpp) */
-    static CACHING_MAP<int, IntegerSX*> cached_constants_;
+    static CACHING_MAP<casadi_int, IntegerSX*> cached_constants_;
 
     /** \brief  Data members */
     int value;
@@ -204,7 +207,7 @@ public:
   ///@{
   /** \brief  Get the value */
   double to_double() const override { return 0;}
-  int to_int() const override { return 0;}
+  casadi_int to_int() const override { return 0;}
   ///@}
 
   ///@{
@@ -228,7 +231,7 @@ public:
 
   /** \brief  Get the value */
   double to_double() const override { return 1;}
-  int to_int() const override { return 1;}
+  casadi_int to_int() const override { return 1;}
 
   /** \brief  Properties */
   bool is_integer() const override { return true; }
@@ -250,7 +253,7 @@ public:
   ///@{
   /** \brief  Get the value */
   double to_double() const override { return -1;}
-  int to_int() const override { return -1;}
+  casadi_int to_int() const override { return -1;}
   ///@}
 
   ///@{

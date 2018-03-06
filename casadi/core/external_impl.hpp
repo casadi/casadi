@@ -65,7 +65,7 @@ namespace casadi {
 
     ///@{
     /** \brief Data vectors */
-    std::vector<int> int_data_;
+    std::vector<casadi_int> int_data_;
     std::vector<double> real_data_;
     std::string string_data_;
     ///@}
@@ -104,26 +104,26 @@ namespace casadi {
 
     ///@{
     /** \brief Names of function input and outputs */
-    std::string get_name_in(int i) override;
-    std::string get_name_out(int i) override;
+    std::string get_name_in(casadi_int i) override;
+    std::string get_name_out(casadi_int i) override;
     /// @}
 
     ///@{
     /** \brief Forward mode derivatives */
-    Function get_forward(int nfwd, const std::string& name,
+    Function get_forward(casadi_int nfwd, const std::string& name,
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const override;
-    bool has_forward(int nfwd) const override;
+    bool has_forward(casadi_int nfwd) const override;
     ///@}
 
     ///@{
     /** \brief Reverse mode derivatives */
-    Function get_reverse(int nadj, const std::string& name,
+    Function get_reverse(casadi_int nadj, const std::string& name,
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const override;
-    bool has_reverse(int nadj) const override;
+    bool has_reverse(casadi_int nadj) const override;
     ///@}
 
     ///@{
@@ -157,8 +157,8 @@ namespace casadi {
 
     /// @{
     /** \brief Retreive sparsities */
-    Sparsity get_sparsity_in(int i) override;
-    Sparsity get_sparsity_out(int i) override;
+    Sparsity get_sparsity_in(casadi_int i) override;
+    Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     /** \brief Create memory block */

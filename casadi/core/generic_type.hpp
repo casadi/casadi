@@ -55,7 +55,7 @@ namespace casadi {
     OT_UNKNOWN};
 #endif // SWIG
 
-  /** \brief Generic data type, can hold different types such as bool, int, string etc.
+  /** \brief Generic data type, can hold different types such as bool, casadi_int, string etc.
       \author Joel Andersson
       \date 2010
   */
@@ -76,12 +76,14 @@ namespace casadi {
 
     /// Constructors (implicit type conversion)
     GenericType(bool b);
-    GenericType(int i);
+    GenericType(casadi_int i);
+    GenericType(int i) : GenericType(static_cast<casadi_int>(i)) {}
     GenericType(double d);
     GenericType(const std::string& s);
     GenericType(const std::vector<bool>& iv);
+    GenericType(const std::vector<casadi_int>& iv);
     GenericType(const std::vector<int>& iv);
-    GenericType(const std::vector< std::vector<int> >& ivv);
+    GenericType(const std::vector< std::vector<casadi_int> >& ivv);
     GenericType(const std::vector<double>& dv);
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
@@ -108,12 +110,13 @@ namespace casadi {
     ///@{
     /// Implicit typecasting
     operator bool() const { return to_bool();}
-    operator int() const { return to_int();}
+    operator casadi_int() const { return to_int();}
     operator double() const { return to_double();}
     operator std::string() const { return to_string();}
     operator std::vector<bool>() const { return to_bool_vector();}
-    operator std::vector<int>() const { return to_int_vector();}
-    operator std::vector<std::vector<int> >() const { return to_int_vector_vector();}
+    operator std::vector<casadi_int>() const { return to_int_vector();}
+    operator std::vector<int>() const;
+    operator std::vector<std::vector<casadi_int> >() const { return to_int_vector_vector();}
     operator std::vector<double>() const { return to_double_vector();}
     operator std::vector<std::string>() const { return to_string_vector();}
     operator const Function&() const { return as_function();}
@@ -151,12 +154,12 @@ namespace casadi {
     ///@{
     /** \brief Cast to the internal type */
     const bool& as_bool() const;
-    const int& as_int() const;
+    const casadi_int& as_int() const;
     const double& as_double() const;
     const std::string& as_string() const;
-    const std::vector<int>& as_int_vector() const;
-    const std::vector<int>& as_bool_vector() const;
-    const std::vector<std::vector<int> >& as_int_vector_vector() const;
+    const std::vector<casadi_int>& as_int_vector() const;
+    const std::vector<casadi_int>& as_bool_vector() const;
+    const std::vector<std::vector<casadi_int> >& as_int_vector_vector() const;
     const std::vector<double>& as_double_vector() const;
     const std::vector<std::string>& as_string_vector() const;
     const Dict& as_dict() const;
@@ -168,18 +171,19 @@ namespace casadi {
     ///@{
     //! \brief Convert to a type
     bool to_bool() const;
-    int to_int() const;
+    casadi_int to_int() const;
     double to_double() const;
     std::string to_string() const;
-    std::vector<int> to_int_vector() const;
+    std::vector<casadi_int> to_int_vector() const;
     std::vector<bool> to_bool_vector() const;
-    std::vector< std::vector<int> > to_int_vector_vector() const;
+    std::vector< std::vector<casadi_int> > to_int_vector_vector() const;
     std::vector<double> to_double_vector() const;
     std::vector<std::string> to_string_vector() const;
     Dict to_dict() const;
     Function to_function() const;
     std::vector<Function> to_function_vector() const;
     void* to_void_pointer() const;
+    std::vector<int> to_int_type_vector() const;
     ///@}
 
     //! \brief Equality

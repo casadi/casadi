@@ -27,8 +27,6 @@
 #define CASADI_SQPMETHOD_HPP
 
 #include "casadi/core/nlpsol_impl.hpp"
-#include <deque>
-
 #include <casadi/solvers/casadi_nlpsol_sqpmethod_export.h>
 
 /** \defgroup plugin_Nlpsol_sqpmethod
@@ -41,20 +39,14 @@
 namespace casadi {
 
   struct CASADI_NLPSOL_SQPMETHOD_EXPORT SqpmethodMemory : public NlpsolMemory {
-    /// Current cost function value
-    double fk;
-
-    /// Lagrange multipliers of the NLP
-    double *mu, *mu_x;
-
     /// Current and previous linearization point and candidate
-    double *xk, *x_old, *x_cand;
+    double *x_cand;
 
     /// Lagrange gradient in the next iterate
     double *gLag, *gLag_old;
 
     /// Constraint function value
-    double *gk, *gk_cand;
+    double *g_cand;
 
     /// Gradient of the objective function
     double *gf;
@@ -78,11 +70,15 @@ namespace casadi {
     double sigma;
 
     // Storage for merit function
-    std::deque<double> merit_mem;
+    double* merit_mem;
+    size_t merit_ind;
 
     /// Last return status
     const char* return_status;
+    bool success;
 
+    /// Iteration count
+    int iter_count;
   };
 
   /** \brief  \pluginbrief{Nlpsol,sqpmethod}
@@ -91,13 +87,6 @@ namespace casadi {
   */
   class CASADI_NLPSOL_SQPMETHOD_EXPORT Sqpmethod : public Nlpsol {
   public:
-    // NLP functions
-    Function f_fcn_;
-    Function g_fcn_;
-    Function grad_f_fcn_;
-    Function jac_g_fcn_;
-    Function hess_l_fcn_;
-
     explicit Sqpmethod(const std::string& name, const Function& nlp);
     ~Sqpmethod() override;
 
@@ -132,10 +121,10 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     // Solve the NLP
-    void solve(void* mem) const override;
+    int solve(void* mem) const override;
 
     /// QP solver for the subproblems
     Function qpsol_;
@@ -143,15 +132,14 @@ namespace casadi {
     /// Exact Hessian?
     bool exact_hessian_;
 
-    /// maximum number of sqp iterations
-    int max_iter_;
+    /// Maximum, minimum number of SQP iterations
+    casadi_int max_iter_, min_iter_;
 
     /// Memory size of L-BFGS method
-    int lbfgs_memory_;
-    /// Tolerance of primal infeasibility
-    double tol_pr_;
-    /// Tolerance of dual infeasibility
-    double tol_du_;
+    casadi_int lbfgs_memory_;
+
+    /// Tolerance of primal and dual infeasibility
+    double tol_pr_, tol_du_;
 
     /// Minimum step size allowed
     double min_step_size_;
@@ -160,25 +148,18 @@ namespace casadi {
     ///@{
     double c1_;
     double beta_;
-    int max_iter_ls_;
-    int merit_memsize_;
+    casadi_int max_iter_ls_;
+    casadi_int merit_memsize_;
     ///@}
 
     // Print options
     bool print_header_, print_iteration_;
-
-    /// BFGS update function
-    enum BFGSMdoe { BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN};
-    Function bfgs_;
 
     // Hessian sparsity
     Sparsity Hsp_;
 
     // Jacobian sparsity
     Sparsity Asp_;
-
-    /// Initial Hessian approximation (BFGS)
-    DM B_init_;
 
     /// Regularization
     bool regularize_;
@@ -190,28 +171,14 @@ namespace casadi {
     void print_iteration() const;
 
     /// Print iteration
-    void print_iteration(int iter, double obj, double pr_inf, double du_inf,
-                         double dx_norm, double reg, int ls_trials, bool ls_success) const;
-
-    // Reset the Hessian or Hessian approximation
-    void reset_h(SqpmethodMemory* m) const;
-
-    // Calculate the regularization parameter using Gershgorin theorem
-    double getRegularization(const double* H) const;
-
-    // Regularize by adding a multiple of the identity
-    void regularize(double* H, double reg) const;
+    void print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf,
+                         double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const;
 
     // Solve the QP subproblem
     virtual void solve_QP(SqpmethodMemory* m, const double* H, const double* g,
                           const double* lbx, const double* ubx,
                           const double* A, const double* lbA, const double* ubA,
                           double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const;
-
-    // Calculate the L1-norm of the primal infeasibility
-    double primalInfeasibility(const double* x,
-                               const double* lbx, const double* ubx,
-                               const double* g, const double* lbg, const double* ubg) const;
 
     /// A documentation string
     static const std::string meta_doc;

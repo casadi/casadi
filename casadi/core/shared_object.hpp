@@ -113,7 +113,7 @@ namespace casadi {
     SharedObjectInternal* get() const;
 
     /// Get the reference count
-    int getCount() const;
+    casadi_int getCount() const;
 
     /// Swap content with another instance
     void swap(SharedObject& other);
@@ -147,7 +147,7 @@ namespace casadi {
     /** \brief Returns a number that is unique for a given Node.
      * If the Object does not point to any node, "0" is returned.
      */
-    size_t __hash__() const;
+    casadi_int __hash__() const;
 
 /// \cond INTERNAL
 #ifndef SWIG

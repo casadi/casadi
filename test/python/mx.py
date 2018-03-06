@@ -2560,6 +2560,7 @@ class MXtests(casadiTestCase):
       f_sx = f.expand()    
       self.checkfunction(f,fref,inputs=[x0,y0,z0])
       self.checkfunction(f_sx,fref,inputs=[x0,y0,z0])
+      self.check_codegen(f,inputs=[x0,y0,z0])
 
   def test_det_shape(self):
     X = MX.sym("x",2,3)
@@ -2582,8 +2583,79 @@ class MXtests(casadiTestCase):
     F = Function('F',[X],[det(X)])
     self.checkfunction(f,F,inputs=[x0])
 
+  def test_mtimes_mismatch_segfault(self):
+    with self.assertInException("incompatible dimensions"):
+      mtimes(DM(Sparsity.lower(5)),MX.sym('x',100))
     
-    
+  def test_monitor(self):
+    x = MX.sym("x")
+    y = sqrt(x.monitor("hey"))
+
+    f = Function('f',[x],[y])
+    with capture_stdout() as out:
+      f(3)
+    self.assertTrue(out[0]=="hey:\n[3]\n")
+
+    with capture_stdout() as out2:
+      self.check_codegen(f,inputs=[3])
+    if args.run_slow:
+      self.assertTrue(out2[0]=="hey:\n[3]\n")
+
+  def test_codegen_specials(self):
+    x = MX.sym("x")
+    y = MX.sym("y")
+
+    for z in [ x**2, if_else(y>0,2*x,x*y), fmin(x,y), fmax(x,y), sign(x*y)]:
+      f = Function('f',[x,y],[z])
+      self.check_codegen(f,inputs=[1,2])
+      self.check_codegen(f,inputs=[1,-2])
+
+
+  @memory_heavy()    
+  def test_getsetnonzeros(self):
+    import numpy
+    numpy.random.seed(42)
+    for S in [Sparsity.lower(5),Sparsity.dense(5,5)]:
+      M = MX.sym("X",S.nnz())
+      
+      m = sin(MX(S,M))
+      for i in [0,2]:
+        for ind in [(i,i),(1,i),(i,1),(slice(None),i),(i,slice(None)),(slice(i,i+2),slice(i,i+2)),(slice(i,i+2),slice(None)),([i,i],[0,0]),([],[])]:
+          E = m.__getitem__(ind)
+          e = cos(E)
+          e = dot(e,e)
+          f = Function('f',[M],[e])
+          self.checkfunction(f,f.expand(),inputs=[ numpy.random.random((S.nnz(),1))])
+        
+          mc = m+0
+          
+          Y = MX.sym("y",E.nnz())
+          y = MX(E.sparsity(),Y)
+          mc.__setitem__(ind,y)
+          e = cos(mc)
+          e = dot(e,e)
+          
+          f = Function('f',[M,Y],[e])
+          self.checkfunction(f,f.expand(),inputs=[ numpy.random.random((S.nnz(),1)), numpy.random.random((E.nnz(),1))])
+
+  def test_evalf(self):
+    x = MX.sym("x")
+
+    p = MX.sym("p")
+    f = Function('f',[x],[sin(x)])
+    y = f.call([p],False,True)[0]
+    y = substitute(y,p,3)
+
+    with self.assertInException("not defined"):
+      y.to_DM()
+    self.checkarray(evalf(y),sin(3))
+    with self.assertInException("since variables [x] are free"):
+      evalf(x)
+
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main()

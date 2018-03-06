@@ -47,13 +47,13 @@ namespace casadi {
     return casadi_math<double>::print(op_, arg.at(0));
   }
 
-  int UnaryMX::eval(const double** arg, double** res, int* iw, double* w) const {
+  int UnaryMX::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     double dummy = numeric_limits<double>::quiet_NaN();
     casadi_math<double>::fun(op_, arg[0], dummy, res[0], nnz());
     return 0;
   }
 
-  int UnaryMX::eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+  int UnaryMX::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     SXElem dummy = 0;
     casadi_math<SXElem>::fun(op_, arg[0], dummy, res[0], nnz());
     return 0;
@@ -72,7 +72,7 @@ namespace casadi {
     casadi_math<MX>::der(op_, dep(), dummy, shared_from_this<MX>(), pd);
 
     // Propagate forward seeds
-    for (int d=0; d<fsens.size(); ++d) {
+    for (casadi_int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = pd[0]*fseed[d][0];
     }
   }
@@ -85,23 +85,24 @@ namespace casadi {
     casadi_math<MX>::der(op_, dep(), dummy, shared_from_this<MX>(), pd);
 
     // Propagate adjoint seeds
-    for (int d=0; d<aseed.size(); ++d) {
+    for (casadi_int d=0; d<aseed.size(); ++d) {
       asens[d][0] += pd[0]*aseed[d][0];
     }
   }
 
-  int UnaryMX::sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  int UnaryMX::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     copy_fwd(arg[0], res[0], nnz());
     return 0;
   }
 
-  int UnaryMX::sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  int UnaryMX::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     copy_rev(arg[0], res[0], nnz());
     return 0;
   }
 
   void UnaryMX::generate(CodeGenerator& g,
-                         const std::vector<int>& arg, const std::vector<int>& res) const {
+                          const std::vector<casadi_int>& arg,
+                          const std::vector<casadi_int>& res) const {
     string r, x;
     if (nnz()==1) {
       // Scalar assignment
@@ -111,7 +112,7 @@ namespace casadi {
       // Vector assignment
       g.local("cs", "const casadi_real", "*");
       g.local("rr", "casadi_real", "*");
-      g.local("i", "int");
+      g.local("i", "casadi_int");
       g << "for (i=0, rr=" << g.work(res[0], nnz()) << ", cs=" << g.work(arg[0], nnz())
         << "; i<" << sparsity().nnz() << "; ++i) ";
       r = "*rr++";
@@ -119,10 +120,10 @@ namespace casadi {
     }
 
     // Output the operation
-    g << r << " = " << casadi_math<double>::print(op_, " " + x + " ") << ";\n";
+    g << r << " = " << g.print_op(op_, " " + x + " ") << ";\n";
   }
 
-  MX UnaryMX::get_unary(int op) const {
+  MX UnaryMX::get_unary(casadi_int op) const {
     if (!GlobalOptions::simplification_on_the_fly) return MXNode::get_unary(op);
 
     switch (op_) {
@@ -162,7 +163,7 @@ namespace casadi {
     return MXNode::get_unary(op);
   }
 
-  MX UnaryMX::_get_binary(int op, const MX& y, bool scX, bool scY) const {
+  MX UnaryMX::_get_binary(casadi_int op, const MX& y, bool scX, bool scY) const {
     switch (op_) {
     case OP_NEG:
       if (op==OP_ADD) return y->_get_binary(OP_SUB, dep(), scY, scX);

@@ -77,7 +77,7 @@ namespace casadi {
     std::copy(input(CONIC_LBA)->begin(), input(CONIC_LBA)->end(), bl_.begin()+n_);
     std::copy(input(CONIC_UBA)->begin(), input(CONIC_UBA)->end(), bu_.begin()+n_);
 
-    for (int i=0;i<n_+nc_+1;++i) {
+    for (casadi_int i=0;i<n_+nc_+1;++i) {
       if (bl_[i]==-std::numeric_limits<double>::infinity()) bl_[i]=-inf_;
       if (bu_[i]==std::numeric_limits<double>::infinity()) bu_[i]=inf_;
     }
@@ -118,8 +118,8 @@ namespace casadi {
     indH_ = st_[QP_STRUCT_H].row();
 
     // Fortran indices are one-based
-    for (int i=0;i<indH_.size();++i) indH_[i]+=1;
-    for (int i=0;i<locH_.size();++i) locH_[i]+=1;
+    for (casadi_int i=0;i<indH_.size();++i) indH_[i]+=1;
+    for (casadi_int i=0;i<locH_.size();++i) locH_[i]+=1;
 
     // Sparsity of augmented linear constraint matrix
     Sparsity A_ = vertcat(st_[QP_STRUCT_A], Sparsity::dense(1, n_));
@@ -127,8 +127,8 @@ namespace casadi {
     indA_ = A_.row();
 
     // Fortran indices are one-based
-    for (int i=0;i<indA_.size();++i) indA_[i]+=1;
-    for (int i=0;i<locA_.size();++i) locA_[i]+=1;
+    for (casadi_int i=0;i<indA_.size();++i) indA_[i]+=1;
+    for (casadi_int i=0;i<locA_.size();++i) locA_[i]+=1;
 
     // helper functions for augmented linear constraint matrix
     MX a = MX::sym("A", st_[QP_STRUCT_A]);
@@ -144,11 +144,11 @@ namespace casadi {
 
     is_init_ = true;
 
-    int n = n_;
-    int m = nc_+1;
+    casadi_int n = n_;
+    casadi_int m = nc_+1;
 
-    int nnzA=formatA_.size_out(0);
-    int nnzH=input(CONIC_H).size();
+    casadi_int nnzA=formatA_.size_out(0);
+    casadi_int nnzH=input(CONIC_H).size();
 
     std::fill(hEtype_.begin()+n_, hEtype_.end(), 3);
 
@@ -158,17 +158,17 @@ namespace casadi {
 
   }
 
-  map<int, string> SqicInterface::calc_flagmap() {
-    map<int, string> f;
+  map<casadi_int, string> SqicInterface::calc_flagmap() {
+    map<casadi_int, string> f;
 
     return f;
   }
 
-  map<int, string> SqicInterface::flagmap = SqicInterface::calc_flagmap();
+  map<casadi_int, string> SqicInterface::flagmap = SqicInterface::calc_flagmap();
 
-  void SqicInterface::sqic_error(const string& module, int flag) {
+  void SqicInterface::sqic_error(const string& module, casadi_int flag) {
     // Find the error
-    map<int, string>::const_iterator it = flagmap.find(flag);
+    map<casadi_int, string>::const_iterator it = flagmap.find(flag);
 
     stringstream ss;
     if (it == flagmap.end()) {
@@ -211,10 +211,10 @@ namespace casadi {
     file << "  integer(ip), allocatable:: indA(:), locA(:), indH(:), locH(:), hEtype(:), hs(:)"
          << std::endl;
 
-    int n = n_;
-    int m = nc_+1;
-    int nnzA=formatA_.size_out(0);
-    int nnzH=input(CONIC_H).size();
+    casadi_int n = n_;
+    casadi_int m = nc_+1;
+    casadi_int nnzA=formatA_.size_out(0);
+    casadi_int nnzH=input(CONIC_H).size();
 
     file << "  n = " << n << std::endl;
     file << "  m = " << m << std::endl;
@@ -228,42 +228,42 @@ namespace casadi {
     file << "  allocate ( hs(n+m) )" << std::endl;
     file << "  allocate ( valH(nnzH), locH(n+1), indH(nnzH) )" << std::endl;
 
-    for (int i=0;i<indA_.size();++i) {
+    for (casadi_int i=0;i<indA_.size();++i) {
       file << "  indA(" << i +1 << ") = " << indA_[i] << std::endl;
     }
-    for (int i=0;i<locA_.size();++i) {
+    for (casadi_int i=0;i<locA_.size();++i) {
       file << "  locA(" << i +1 << ") = " << locA_[i] << std::endl;
     }
-    for (int i=0;i<formatA_.size_out(0);++i) {
+    for (casadi_int i=0;i<formatA_.size_out(0);++i) {
       file << "  valA(" << i +1 << ") = " << formatA_.output().at(i) << std::endl;
     }
-    for (int i=0;i<bl_.size();++i) {
+    for (casadi_int i=0;i<bl_.size();++i) {
       file << "  bl(" << i +1 << ") = " << bl_[i] << std::endl;
       file << "  bu(" << i +1 << ") = " << bu_[i] << std::endl;
     }
-    for (int i=0;i<hEtype_.size();++i) {
+    for (casadi_int i=0;i<hEtype_.size();++i) {
       file << "  hEtype(" << i +1 << ") = " << hEtype_[i] << std::endl;
     }
-    for (int i=0;i<hs_.size();++i) {
+    for (casadi_int i=0;i<hs_.size();++i) {
       file << "  hs(" << i +1 << ") = " << hs_[i] << std::endl;
     }
-    for (int i=0;i<indH_.size();++i) {
+    for (casadi_int i=0;i<indH_.size();++i) {
       file << "  indH(" << i +1 << ") = " << indH_[i] << std::endl;
     }
-    for (int i=0;i<locH_.size();++i) {
+    for (casadi_int i=0;i<locH_.size();++i) {
       file << "  locH(" << i +1 << ") = " << locH_[i] << std::endl;
     }
-    for (int i=0;i<input(CONIC_H).size();++i) {
+    for (casadi_int i=0;i<input(CONIC_H).size();++i) {
       file << "  valH(" << i +1 << ") = " << input(CONIC_H).at(i) << std::endl;
     }
-    for (int i=0;i<input(CONIC_X0).size();++i) {
+    for (casadi_int i=0;i<input(CONIC_X0).size();++i) {
       file << "  x(" << i +1 << ") = " << input(CONIC_X0).at(i) << std::endl;
     }
-    for (int i=0;i<pi_.size();++i) {
+    for (casadi_int i=0;i<pi_.size();++i) {
       file << "  pi(" << i +1 << ") = " <<  0 << std::endl; //pi_[i] << std::endl;
     }
     uout() << "lam_x0:::" << input(CONIC_LAM_X0) << std::endl;
-    for (int i=0;i<rc_.size();++i) {
+    for (casadi_int i=0;i<rc_.size();++i) {
       file << "  rc(" << i +1 << ") = "
            << ((i<input(CONIC_LAM_X0).size()) ? -input(CONIC_LAM_X0).at(i) : 0.0)
            << std::endl;
@@ -271,28 +271,28 @@ namespace casadi {
 
     file << "  call wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, "
          << "hs, x, pi, rc, nnzH, indH, locH, valH)" << std::endl;
-    /**for (int i=0;i<input(CONIC_X0).size();++i) {
+    /**for (casadi_int i=0;i<input(CONIC_X0).size();++i) {
        file << "  x(" << i +1 << ") = " << input(CONIC_X0).at(i) << std::endl;
        }
-       for (int i=0;i<pi_.size();++i) {
+       for (casadi_int i=0;i<pi_.size();++i) {
        file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
        }
        uout() << "lam_x0:::" << input(CONIC_LAM_X0) << std::endl;
-       for (int i=0;i<rc_.size();++i) {
+       for (casadi_int i=0;i<rc_.size();++i) {
        file << "  rc(" << i +1 << ") = "
        << ((i<input(CONIC_LAM_X0).size()) ? -input(CONIC_LAM_X0).at(i) : 0.0)
        << std::endl;
        }*/
     /**
        file << "  call sqicSolve(Obj)" << std::endl;
-       for (int i=0;i<input(CONIC_X0).size();++i) {
+       for (casadi_int i=0;i<input(CONIC_X0).size();++i) {
        file << "  x(" << i +1 << ") = " << input(CONIC_X0).at(i) << std::endl;
        }
-       for (int i=0;i<pi_.size();++i) {
+       for (casadi_int i=0;i<pi_.size();++i) {
        file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
        }
        uout() << "lam_x0:::" << input(CONIC_LAM_X0) << std::endl;
-       for (int i=0;i<rc_.size();++i) {
+       for (casadi_int i=0;i<rc_.size();++i) {
        file << "  rc(" << i +1 << ") = "
        << ((i<input(CONIC_LAM_X0).size()) ? -input(CONIC_LAM_X0).at(i) : 0.0)
        << std::endl;

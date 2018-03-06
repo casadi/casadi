@@ -58,7 +58,7 @@ namespace casadi {
     LinsolInternal::init(opts);
 
     // Symbolic factorization
-    sp_.qr_sparse(sp_v_, sp_r_, pinv_, leftmost_, parent_);
+    sp_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
   }
 
   int LinsolQr::init_mem(void* mem) const {
@@ -70,7 +70,6 @@ namespace casadi {
     m->r.resize(sp_r_.nnz());
     m->beta.resize(ncol());
     m->w.resize(nrow() + ncol());
-    m->iw.resize(sp_r_.size1() + ncol());
     return 0;
   }
 
@@ -80,44 +79,42 @@ namespace casadi {
 
   int LinsolQr::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolQrMemory*>(mem);
-    casadi_qr(sp_, A, get_ptr(m->iw), get_ptr(m->w),
+    casadi_qr(sp_, A, get_ptr(m->w),
               sp_v_, get_ptr(m->v), sp_r_, get_ptr(m->r),
-              get_ptr(m->beta), get_ptr(leftmost_), get_ptr(parent_), get_ptr(pinv_));
+              get_ptr(m->beta), get_ptr(prinv_), get_ptr(pc_));
     return 0;
   }
 
-  int LinsolQr::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
+  int LinsolQr::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
     auto m = static_cast<LinsolQrMemory*>(mem);
     casadi_qr_solve(x, nrhs, tr,
                     sp_v_, get_ptr(m->v), sp_r_, get_ptr(m->r),
-                    get_ptr(m->beta), get_ptr(pinv_), get_ptr(m->w));
+                    get_ptr(m->beta), get_ptr(prinv_), get_ptr(pc_), get_ptr(m->w));
     return 0;
   }
 
   void LinsolQr::generate(CodeGenerator& g, const std::string& A, const std::string& x,
-                          int nrhs, bool tr) const {
+                          casadi_int nrhs, bool tr) const {
     // Codegen the integer vectors
-    string leftmost = g.constant(leftmost_);
-    string parent = g.constant(parent_);
-    string pinv = g.constant(pinv_);
+    string prinv = g.constant(prinv_);
+    string pc = g.constant(pc_);
     string sp = g.sparsity(sp_);
     string sp_v = g.sparsity(sp_v_);
     string sp_r = g.sparsity(sp_r_);
 
     // Place in block to avoid conflicts caused by local variables
     g << "{\n";
-    // Work vectors TODO(@jaeandersson): Use work vectors from Solve
+    g.comment("FIXME(@jaeandersson): Memory allocation can be avoided");
     g << "casadi_real v[" << sp_v_.nnz() << "], "
          "r[" << sp_r_.nnz() << "], "
          "beta[" << ncol() << "], "
          "w[" << nrow() + ncol() << "];\n";
-    g << "int iw[" << sp_r_.size1() + ncol() << "];\n";
 
     // Factorize
-    g << g.qr(sp, A, "iw", "w", sp_v, "v", sp_r, "r", "beta", leftmost, parent, pinv) << "\n";
+    g << g.qr(sp, A, "w", sp_v, "v", sp_r, "r", "beta", prinv, pc) << "\n";
 
     // Solve
-    g << g.qr_solve(x, nrhs, tr, sp_v, "v", sp_r, "r", "beta", pinv, "w") << "\n";
+    g << g.qr_solve(x, nrhs, tr, sp_v, "v", sp_r, "r", "beta", prinv, pc, "w") << "\n";
 
     // End of block
     g << "}\n";

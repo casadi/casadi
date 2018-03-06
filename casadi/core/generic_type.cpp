@@ -37,12 +37,12 @@ namespace casadi {
   /// \cond INTERNAL
   typedef GenericTypeInternal<OT_STRING, std::string> StringType;
   typedef GenericTypeInternal<OT_DOUBLE, double> DoubleType;
-  typedef GenericTypeInternal<OT_INT, int> IntType;
+  typedef GenericTypeInternal<OT_INT, casadi_int> IntType;
   typedef GenericTypeInternal<OT_BOOL, bool> BoolType;
   typedef GenericTypeInternal<OT_DOUBLEVECTOR, std::vector<double> > DoubleVectorType;
-  typedef GenericTypeInternal<OT_INTVECTOR, std::vector<int> > IntVectorType;
+  typedef GenericTypeInternal<OT_INTVECTOR, std::vector<casadi_int> > IntVectorType;
   typedef GenericTypeInternal<OT_INTVECTORVECTOR,
-                              std::vector< std::vector<int> > > IntVectorVectorType;
+                              std::vector< std::vector<casadi_int> > > IntVectorVectorType;
   typedef GenericTypeInternal<OT_STRINGVECTOR, std::vector<std::string> > StringVectorType;
   typedef GenericTypeInternal<OT_FUNCTION, Function> FunctionType;
   typedef GenericTypeInternal<OT_FUNCTIONVECTOR, std::vector<Function> > FunctionVectorType;
@@ -72,9 +72,9 @@ namespace casadi {
   GenericType GenericType::from_type(TypeID type) {
     switch (type) {
     case OT_INTVECTOR:
-      return std::vector<int>();
+      return std::vector<casadi_int>();
     case OT_INTVECTORVECTOR:
-      return std::vector< std::vector<int> >();
+      return std::vector< std::vector<casadi_int> >();
     case OT_BOOLVECTOR:
       return std::vector<bool>();
     case OT_DOUBLEVECTOR:
@@ -188,7 +188,7 @@ namespace casadi {
     own(new BoolType(b));
   }
 
-  GenericType::GenericType(int i) {
+  GenericType::GenericType(casadi_int i) {
     own(new IntType(i));
   }
 
@@ -196,16 +196,22 @@ namespace casadi {
     own(new DoubleType(d));
   }
 
-  GenericType::GenericType(const vector<int>& iv) {
+  GenericType::GenericType(const vector<casadi_int>& iv) {
     own(new IntVectorType(iv));
   }
 
-  GenericType::GenericType(const vector<vector<int> >& ivv) {
+  GenericType::GenericType(const vector<int>& iv) {
+    std::vector<casadi_int> temp(iv.size());
+    std::copy(iv.begin(), iv.end(), temp.begin());
+    own(new IntVectorType(temp));
+  }
+
+  GenericType::GenericType(const vector<vector<casadi_int> >& ivv) {
     own(new IntVectorVectorType(ivv));
   }
 
   GenericType::GenericType(const vector<bool>& b_vec) {
-    vector<int> i_vec(b_vec.size());
+    vector<casadi_int> i_vec(b_vec.size());
     copy(b_vec.begin(), b_vec.end(), i_vec.begin());
     own(new IntVectorType(i_vec));
   }
@@ -239,7 +245,7 @@ namespace casadi {
     return static_cast<const BoolType*>(get())->d_;
   }
 
-  const int& GenericType::as_int() const {
+  const casadi_int& GenericType::as_int() const {
     casadi_assert_dev(is_int());
     return static_cast<const IntType*>(get())->d_;
   }
@@ -254,17 +260,17 @@ namespace casadi {
     return static_cast<const StringType*>(get())->d_;
   }
 
-  const std::vector<int>& GenericType::as_int_vector() const {
+  const std::vector<casadi_int>& GenericType::as_int_vector() const {
     casadi_assert_dev(is_int_vector());
     return static_cast<const IntVectorType*>(get())->d_;
   }
 
-  const std::vector<int>& GenericType::as_bool_vector() const {
+  const std::vector<casadi_int>& GenericType::as_bool_vector() const {
     casadi_assert_dev(is_bool_vector());
     return static_cast<const IntVectorType*>(get())->d_;
   }
 
-  const std::vector<std::vector<int> >& GenericType::as_int_vector_vector() const {
+  const std::vector<std::vector<casadi_int> >& GenericType::as_int_vector_vector() const {
     casadi_assert_dev(is_int_vector_vector());
     return static_cast<const IntVectorVectorType*>(get())->d_;
   }
@@ -310,11 +316,11 @@ namespace casadi {
     }
   }
 
-  int GenericType::to_int() const {
+  casadi_int GenericType::to_int() const {
     if (is_double()) {
-      return static_cast<int>(to_double());
+      return static_cast<casadi_int>(to_double());
     } else if (is_bool()) {
-      return static_cast<int>(to_bool());
+      return static_cast<casadi_int>(to_bool());
     } else {
       casadi_assert(is_int(), "type mismatch");
       return as_int();
@@ -335,23 +341,41 @@ namespace casadi {
     return as_string();
   }
 
-  vector<int> GenericType::to_int_vector() const {
+  vector<int> GenericType::to_int_type_vector() const {
+    casadi_assert(is_int_vector(), "type mismatch");
+    std::vector<casadi_int> ret = as_int_vector();
+    std::vector<int> r(ret.size());
+    for (casadi_int i=0;i<ret.size();++i) {
+      casadi_assert(ret[i]<=std::numeric_limits<int>::max(), "Integer overflow detected.");
+      r[i] = ret[i];
+    }
+    return r;
+  }
+
+  vector<casadi_int> GenericType::to_int_vector() const {
     casadi_assert(is_int_vector(), "type mismatch");
     return as_int_vector();
   }
 
+  GenericType::operator std::vector<int>() const {
+    std::vector<int> ret;
+    std::vector<casadi_int> source = to_int_vector();
+    std::copy(source.begin(), source.end(), ret.begin());
+    return ret;
+  }
+
   vector<bool> GenericType::to_bool_vector() const {
     casadi_assert(is_int_vector(), "type mismatch");
-    vector<int> v = to_int_vector();
+    vector<casadi_int> v = to_int_vector();
     vector<bool> ret(v.size());
-    for (int i=0; i<v.size(); ++i) {
+    for (casadi_int i=0; i<v.size(); ++i) {
       casadi_assert(v[i]==0 || v[i]==1, "Entries must be zero or one");
       ret[i] = v[i]==1;
     }
     return ret;
   }
 
-  vector<vector<int> > GenericType::to_int_vector_vector() const {
+  vector<vector<casadi_int> > GenericType::to_int_vector_vector() const {
     casadi_assert(is_int_vector_vector(), "type mismatch");
     return as_int_vector_vector();
   }
@@ -412,27 +436,27 @@ namespace casadi {
       const vector<double> &v1 = to_double_vector();
       const vector<double> &v2 = op2.to_double_vector();
       if (v1.size() != v2.size()) return true;
-      for (int i=0; i<v1.size(); ++i)
+      for (casadi_int i=0; i<v1.size(); ++i)
         if (v1[i] != v2[i]) return true;
       return false;
     }
 
     if (is_int_vector() && op2.is_int_vector()) {
-      const vector<int> &v1 = to_int_vector();
-      const vector<int> &v2 = op2.to_int_vector();
+      const vector<casadi_int> &v1 = to_int_vector();
+      const vector<casadi_int> &v2 = op2.to_int_vector();
       if (v1.size() != v2.size()) return true;
-      for (int i=0; i<v1.size(); ++i)
+      for (casadi_int i=0; i<v1.size(); ++i)
         if (v1[i] != v2[i]) return true;
       return false;
     }
 
     if (is_int_vector_vector() && op2.is_int_vector_vector()) {
-      const vector< vector<int> > &v1 = to_int_vector_vector();
-      const vector< vector<int> > &v2 = op2.to_int_vector_vector();
+      const vector< vector<casadi_int> > &v1 = to_int_vector_vector();
+      const vector< vector<casadi_int> > &v2 = op2.to_int_vector_vector();
       if (v1.size() != v2.size()) return true;
-      for (int i=0; i<v1.size(); ++i) {
+      for (casadi_int i=0; i<v1.size(); ++i) {
         if (v1[i].size() != v2[i].size()) return true;
-        for (int j=0; j<v1[i].size(); ++j) {
+        for (casadi_int j=0; j<v1[i].size(); ++j) {
           if (v1[i][j] != v2[i][j]) return true;
         }
       }

@@ -94,6 +94,14 @@ namespace casadi {
       }
     }
 
+    inf_ = 1e20;
+
+    for (auto&& op : opts_) {
+      if (op.first=="Infinite_bound") {
+        inf_ = op.second;
+      }
+    }
+
     // Get/generate required functions
     jac_f_fcn_ = create_function("nlp_jac_f", {"x", "p"}, {"f", "jac:f:x"});
     jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
@@ -103,6 +111,8 @@ namespace casadi {
     nnJac_ = nx_;
     nnObj_ = nx_;
     nnCon_ = ng_;
+
+    casadi_assert(ng_>0, "SNOPT requires at least one constraint");
 
     // Here follows the core of the mapping
     //  Two integer matrices are constructed:
@@ -128,10 +138,10 @@ namespace casadi {
     // Construct the linear objective row
     IM d = mapping_gradF(Slice(0), Slice());
 
-    std::vector<int> ii = mapping_gradF.sparsity().get_col();
-    for (int j = 0; j < nnObj_; ++j) {
+    std::vector<casadi_int> ii = mapping_gradF.sparsity().get_col();
+    for (casadi_int j = 0; j < nnObj_; ++j) {
       if (d.colind(j) != d.colind(j+1)) {
-        int k = d.colind(j);
+        casadi_int k = d.colind(j);
         d.nz(k) = 0;
       }
     }
@@ -169,16 +179,79 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::init_mem(void* mem) const {
+  int SnoptInterface::init_mem(void* mem) const {
     if (Nlpsol::init_mem(mem)) return 1;
     auto m = static_cast<SnoptMemory*>(mem);
 
     // Allocate data structures needed in evaluate
     m->A_data.resize(A_structure_.nnz());
+    m->bl.resize(nx_+ng_);
+    m->bu.resize(nx_+ng_);
+    m->hs.resize(nx_+ng_);
+    m->xx.resize(nx_+ng_);
+    m->rc.resize(nx_+ng_);
+    m->pi.resize(ng_);
+    m->locJ.resize(A_structure_.size2()+1);
+    m->indJ.resize(A_structure_.nnz());
+    m->valJ.resize(A_structure_.nnz());
     return 0;
   }
 
+std::map<int, std::string> SnoptInterface::status_ =
+          {{0, "Finished successfully"},
+           {1, "The problem appears to be infeasible"},
+           {2, "The problem appears to be unbounded"},
+           {3, "Resource limit error"},
+           {4, "Terminated after numerical difficulties"},
+           {5, "Error in the user-supplied functions"},
+           {6, "Undefined user-supplied functions"},
+           {7, "User requested termination"},
+           {8, "Insufficient storage allocated"},
+           {9, "Input arguments out of range"},
+           {14, "System error"}};
+
+std::map<int, std::string> SnoptInterface::secondary_status_ =
+                     {{1, "optimality conditions satisfied"},
+                     {2, "feasible point found"},
+                     {3, "requested accuracy could not be achieve"},
+                     {5, "elastic objective minimized"},
+                     {6, "elastic infeasibilities minimized"},
+                     {11, "infeasible linear constraints"},
+                     {12, "infeasible linear equality constraints"},
+                     {13, "nonlinear infeasibilities minimized"},
+                     {14, "linear infeasibilities minimized"},
+                     {15, "infeasible linear constraints in QP subproblem"},
+                     {16, "infeasible nonelastic constraints"},
+                     {21, "unbounded objective"},
+                     {22, "constraint violation limit reached"},
+                     {31, "iteration limit reached"},
+                     {32, "major iteration limit reached"},
+                     {33, "the superbasics limit is too small"},
+                     {34, "time limit reached"},
+                     {41, "current point cannot be improved"},
+                     {42, "singular basis"},
+                     {43, "cannot satisfy the general constraints"},
+                     {44, "ill-conditioned null-space basis"},
+                     {45, "unable to compute acceptable LU factors"},
+                     {51, "incorrect objective derivatives"},
+                     {52, "incorrect constraint derivatives"},
+                     {56, "irregular or badly scaled problem functions"},
+                     {61, "undefined function at the first feasible point"},
+                     {62, "undefined function at the initial point"},
+                     {63, "unable to proceed into undefined region"},
+                     {71, "terminated during function evaluation"},
+                     {74, "terminated from monitor routine"},
+                     {81, "work arrays must have at least 500 elements"},
+                     {82, "not enough character storage"},
+                     {83, "not enough integer storage"},
+                     {84, "not enough real storage"},
+                     {91, "invalid input argument"},
+                     {92, "basis file dimensions do not match this problem"},
+                     {141, "wrong number of basic variables"},
+                     {142, "error in basis package"}};
+
   std::string SnoptInterface::formatStatus(int status) const {
+    status = status/10;
     if (status_.find(status) == status_.end()) {
       return "Unknown status: " + str(status);
     } else {
@@ -186,8 +259,16 @@ namespace casadi {
     }
   }
 
+  std::string SnoptInterface::formatSecondaryStatus(int status) const {
+    if (secondary_status_.find(status) == secondary_status_.end()) {
+      return "Unknown status: " + str(status);
+    } else {
+      return (*secondary_status_.find(status)).second;
+    }
+  }
+
   void SnoptInterface::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
+                                casadi_int*& iw, double*& w) const {
     auto m = static_cast<SnoptMemory*>(mem);
 
     // Set work in base classes
@@ -204,33 +285,31 @@ namespace casadi {
     }
   }
 
-  void SnoptInterface::solve(void* mem) const {
+  int SnoptInterface::solve(void* mem) const {
     auto m = static_cast<SnoptMemory*>(mem);
-
-    // Check the provided inputs
-    check_inputs(mem);
 
     // Memory object
     snProblem prob;
 
+    // Problem has not been solved at this point
+    m->success = false;
+    m->return_status = -1;
+
     // Evaluate gradF and jacG at initial value
-    const double** arg = m->arg;
-    *arg++ = m->x0;
-    *arg++ = m->p;
-    double** res = m->res;
-    *res++ = 0;
-    *res++ = m->jac_gk;
+    m->arg[0] = m->x;
+    m->arg[1] = m->p;
+    m->res[0] = 0;
+    m->res[1] = m->jac_gk;
     calc_function(m, "nlp_jac_g");
-    res = m->res;
-    *res++ = 0;
-    *res++ = m->jac_fk;
+    m->res[0] = 0;
+    m->res[1] = m->jac_fk;
     calc_function(m, "nlp_jac_f");
 
     // perform the mapping:
     // populate A_data_ (the nonzeros of A)
     // with numbers pulled from jacG and gradF
-    for (int k = 0; k < A_structure_.nnz(); ++k) {
-      int i = A_structure_.nonzeros()[k];
+    for (casadi_int k = 0; k < A_structure_.nnz(); ++k) {
+      casadi_int i = A_structure_.nonzeros()[k];
       if (i == 0) {
         m->A_data[k] = 0;
       } else if (i > 0) {
@@ -240,8 +319,8 @@ namespace casadi {
       }
     }
 
-    int n = nx_;
-    int nea = A_structure_.nnz();
+    casadi_int n = nx_;
+    casadi_int nea = A_structure_.nnz();
     double ObjAdd = 0;
 
     casadi_assert_dev(m_ > 0);
@@ -249,49 +328,40 @@ namespace casadi {
     casadi_assert_dev(nea > 0);
     casadi_assert_dev(A_structure_.nnz() == nea);
 
-    // Pointer magic, courtesy of Greg
-    casadi_assert(!jac_f_fcn_.is_null(), "blaasssshc");
-
-    // Outputs
-    //double Obj = 0; // TODO(Greg): get this from snopt
+    casadi_assert_dev(!jac_f_fcn_.is_null());
 
     // snInit must be called first.
     //   9, 6 are print and summary unit numbers (for Fortran).
     //   6 == standard out
-    int iprint = 9;
-    int isumm = 6;
+    casadi_int isumm = 6;
     std::string outname = name_ + ".out";
     snInit(&prob, const_cast<char*>(name_.c_str()),
-           const_cast<char*>(outname.c_str()), iprint, isumm);
-
-    // Set the problem size and other data.
-    // This will allocate arrays inside snProblem struct.
-    setProblemSize(&prob, m_, nx_, nea, nnCon_, nnJac_, nnObj_);
-    setObjective(&prob, iObj_, ObjAdd);
-    setUserfun(&prob, userfunPtr);
+           const_cast<char*>(outname.c_str()), isumm);
 
     // user data
     prob.leniu = 1;
     prob.iu = &m->memind;
 
     // Pass bounds
-    casadi_copy(m->lbx, nx_, prob.bl);
-    casadi_copy(m->ubx, nx_, prob.bu);
-    casadi_copy(m->lbg, ng_, prob.bl + nx_);
-    casadi_copy(m->ubg, ng_, prob.bu + nx_);
+    casadi_copy(m->lbx, nx_, get_ptr(m->bl));
+    casadi_copy(m->ubx, nx_, get_ptr(m->bu));
+    casadi_copy(m->lbg, ng_, get_ptr(m->bl) + nx_);
+    casadi_copy(m->ubg, ng_, get_ptr(m->bu) + nx_);
 
+    for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bl[i])) m->bl[i] = -inf_;
+    for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bu[i])) m->bu[i] = inf_;
     // Initialize states and slack
-    casadi_fill(prob.hs, ng_ + nx_, 0);
-    casadi_copy(m->x0, nx_, prob.x);
-    casadi_fill(prob.x + nx_, ng_, 0.);
+    casadi_fill(get_ptr(m->hs), ng_ + nx_, 0);
+    casadi_copy(m->x, nx_, get_ptr(m->xx));
+    casadi_fill(get_ptr(m->xx) + nx_, ng_, 0.);
 
     // Initialize multipliers
-    casadi_copy(m->lam_g0, ng_, prob.pi);
+    casadi_copy(m->lam_g, ng_, get_ptr(m->pi));
 
     // Set up Jacobian matrix
-    casadi_copy(A_structure_.colind(), A_structure_.size2()+1, prob.locJ);
-    casadi_copy(A_structure_.row(), A_structure_.nnz(), prob.indJ);
-    casadi_copy(get_ptr(m->A_data), A_structure_.nnz(), prob.valJ);
+    copy_vector(A_structure_.colind(), m->locJ);
+    copy_vector(A_structure_.row(), m->indJ);
+    casadi_copy(get_ptr(m->A_data), A_structure_.nnz(), get_ptr(m->valJ));
 
     for (auto&& op : opts_) {
       // Replace underscores with spaces
@@ -301,7 +371,7 @@ namespace casadi {
       // Try integer
       if (op.second.can_cast_to(OT_INT)) {
         casadi_assert_dev(opname.size() <= 55);
-        int flag = setIntParameter(&prob, const_cast<char*>(opname.c_str()),
+        casadi_int flag = setIntParameter(&prob, const_cast<char*>(opname.c_str()),
                                    op.second.to_int());
         if (flag==0) continue;
       }
@@ -309,7 +379,7 @@ namespace casadi {
       // Try double
       if (op.second.can_cast_to(OT_DOUBLE)) {
         casadi_assert_dev(opname.size() <= 55);
-        int flag = setRealParameter(&prob, const_cast<char*>(opname.c_str()),
+        casadi_int flag = setRealParameter(&prob, const_cast<char*>(opname.c_str()),
                                     op.second.to_double());
         if (flag==0) continue;
       }
@@ -318,7 +388,7 @@ namespace casadi {
       if (op.second.can_cast_to(OT_STRING)) {
         std::string buffer = opname + " " + op.second.to_string();
         casadi_assert_dev(buffer.size() <= 72);
-        int flag = setParameter(&prob, const_cast<char*>(buffer.c_str()));
+        casadi_int flag = setParameter(&prob, const_cast<char*>(buffer.c_str()));
         if (flag==0) continue;
       }
 
@@ -326,28 +396,40 @@ namespace casadi {
       casadi_error("SNOPT error setting option \"" + opname + "\"");
     }
 
+    int nS = 0, nInf = 0;
+    double sInf;
+
     // Run SNOPT
-    int info = solveC(&prob, Cold_, &m->fk);
+    int info = solveC(&prob, Cold_, m_, nx_, nea, nnCon_, nnObj_, nnJac_,
+                                    iObj_, ObjAdd,
+                                    userfunPtr,
+                                    get_ptr(m->valJ), get_ptr(m->indJ), get_ptr(m->locJ),
+                                    get_ptr(m->bl), get_ptr(m->bu), get_ptr(m->hs),
+                                    get_ptr(m->xx), get_ptr(m->pi), get_ptr(m->rc),
+                                    &m->f, &nS, &nInf, &sInf);
+    m->success = info<10;
+    m->return_status = info;
     casadi_assert(99 != info, "snopt problem set up improperly");
 
+    if (verbose_) casadi_message("SNOPT return status: " + formatStatus(m->return_status) +
+                                 ":" + formatSecondaryStatus(m->return_status));
+
     // Negate rc to match CasADi's definition
-    casadi_scal(nx_ + ng_, -1., prob.rc);
+    casadi_scal(nx_ + ng_, -1., get_ptr(m->rc));
 
     // Get primal solution
-    casadi_copy(prob.x, nx_, m->x);
+    casadi_copy(get_ptr(m->xx), nx_, m->x);
 
     // Get dual solution
-    casadi_copy(prob.rc, nx_, m->lam_x);
-    casadi_copy(prob.rc+nx_, ng_, m->lam_g);
-
-    // Copy optimal cost to output
-    if (m->f) *m->f = m->fk;
+    casadi_copy(get_ptr(m->rc), nx_, m->lam_x);
+    casadi_copy(get_ptr(m->rc)+nx_, ng_, m->lam_g);
 
     // Copy optimal constraint values to output
     casadi_copy(m->gk, ng_, m->g);
 
     // Free memory
     deleteSNOPT(&prob);
+    return 0;
   }
 
   void SnoptInterface::
@@ -363,7 +445,7 @@ namespace casadi {
 
       // Get reduced decision variables
       casadi_fill(m->xk2, nx_, 0.);
-      for (int k = 0; k < nnObj; ++k) m->xk2[k] = x[k];
+      for (casadi_int k = 0; k < nnObj; ++k) m->xk2[k] = x[k];
 
       // Evaluate gradF with the linear variables put to zero
       const double** arg = m->arg;
@@ -375,8 +457,8 @@ namespace casadi {
       calc_function(m, "nlp_jac_f");
 
       // provide nonlinear part of objective gradient to SNOPT
-      for (int k = 0; k < nnObj; ++k) {
-        int el = jac_f_fcn_.sparsity_out(1).colind(k);
+      for (casadi_int k = 0; k < nnObj; ++k) {
+        casadi_int el = jac_f_fcn_.sparsity_out(1).colind(k);
         if (jac_f_fcn_.sparsity_out(1).colind(k+1) > el) {
           gObj[k] = m->jac_fk[el];
         } else {
@@ -384,13 +466,10 @@ namespace casadi {
         }
       }
 
-      jac_f_fcn_.sparsity_out(1).sanity_check(true);
-      jac_f_fcn_.sparsity_out(1).sanity_check(false);
-
       if (!jac_g_fcn_.is_null()) {
         // Get reduced decision variables
         casadi_fill(m->xk2, nx_, 0.);
-        for (int k = 0; k < nnJac; ++k) {
+        for (casadi_int k = 0; k < nnJac; ++k) {
           m->xk2[k] = x[k];
         }
 
@@ -404,11 +483,12 @@ namespace casadi {
         calc_function(m, "nlp_jac_g");
 
         // provide nonlinear part of constraint jacobian to SNOPT
-        int kk = 0;
-        for (int j = 0; j < nnJac; ++j) {
-          for (int k = A_structure_.colind(j); k < A_structure_.sparsity().colind(j+1); ++k) {
+        casadi_int kk = 0;
+        for (casadi_int j = 0; j < nnJac; ++j) {
+          for (casadi_int k = A_structure_.colind(j);
+              k < A_structure_.sparsity().colind(j+1); ++k) {
             if (A_structure_.row(k) >= nnCon) break;
-            int i = A_structure_.nonzeros()[k];
+            casadi_int i = A_structure_.nonzeros()[k];
             if (i > 0) {
               gCon[kk++] = m->jac_gk[i-1];
             }
@@ -418,7 +498,7 @@ namespace casadi {
         casadi_assert_dev(kk == 0 || kk == neJac);
 
         // provide nonlinear part of objective to SNOPT
-        for (int k = 0; k < nnCon; ++k) {
+        for (casadi_int k = 0; k < nnCon; ++k) {
           fCon[k] = m->gk[k];
         }
       }
@@ -464,6 +544,16 @@ namespace casadi {
     } else {
       *mem_it = nullptr;
     }
+  }
+
+  Dict SnoptInterface::get_stats(void* mem) const {
+    Dict stats = Nlpsol::get_stats(mem);
+    auto m = static_cast<SnoptMemory*>(mem);
+    stats["return_status"] = formatStatus(m->return_status);
+    stats["secondary_return_status"] = formatSecondaryStatus(m->return_status);
+    stats["success"] = m->success;
+
+    return stats;
   }
 
   std::vector<SnoptMemory*> SnoptMemory::mempool;

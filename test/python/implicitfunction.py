@@ -30,23 +30,21 @@ from helpers import *
 
 solvers= []
 try:
-  load_linsol("csparse")
   load_rootfinder("kinsol")
-  solvers.append(("kinsol",{"linear_solver": "csparse","abstol":1e-10}))
+  solvers.append(("kinsol",{"abstol":1e-10},[]))
 except:
   pass
 try:
-  load_linsol("csparse")
   load_nlpsol("ipopt")
-  solvers.append(("nlpsol",{"linear_solver": "csparse", "nlpsol": "ipopt"}))
+  solvers.append(("nlpsol",{"nlpsol": "ipopt","nlpsol_options":{"print_time": False,"ipopt": {"print_level": 0}}},[]))
 except:
   pass
 try:
-  load_linsol("csparse")
-  solvers.append(("newton",{"linear_solver": "csparse"}))
+  solvers.append(("newton",{},[]))
 except:
   pass
 
+solvers.append(("fast_newton",{},("codegen")))
 
 print(solvers)
 
@@ -54,7 +52,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
   @memory_heavy()
   def test_linear(self):
-    for Solver, options in solvers:
+    for Solver, options, features in solvers:
       self.message(Solver)
       x=SX.sym("x",2)
       A_ = DM([[1,2],[3,2.1]])
@@ -66,6 +64,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
       refsol = Function("refsol", [x],[solve(A_,b_), mtimes(C_,solve(A_,b_))])
       self.checkfunction(solver,refsol,inputs=[0],digits=10)
+      if "codegen" in features: self.check_codegen(solver,inputs=[0])
 
       A = SX.sym("A",2,2)
       b = SX.sym("b",2)
@@ -77,7 +76,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
       refsol = Function("refsol", [x,A,b],[solve(A,b)])
       self.checkfunction(solver,refsol,inputs=solver_in,digits=10)
-
+      if "codegen" in features: self.check_codegen(solver,inputs=solver_in)
 
       A = SX.sym("A",2,2)
       b = SX.sym("b",2)
@@ -95,9 +94,10 @@ class ImplicitFunctiontests(casadiTestCase):
 
           refsol = Function("refsol", [x,A,b],[solve(A,b),mtimes(C_,solve(A,b))])
           self.checkfunction(solver,refsol,inputs=solver_in,digits=10)
+      if "codegen" in features: self.check_codegen(solver,inputs=solver_in)
 
   def test_missing_symbols(self):
-    for Solver, options in solvers:
+    for Solver, options, features in solvers:
       self.message(Solver)
       x=SX.sym("x")
       p=SX.sym("p")
@@ -107,7 +107,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
   def test_scalar1(self):
     self.message("Scalar implicit problem, n=0")
-    for Solver, options in solvers:
+    for Solver, options, features in solvers:
       self.message(Solver)
       x=SX.sym("x")
       f=Function("f", [x], [sin(x)])
@@ -119,7 +119,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
   def test_scalar2(self):
     self.message("Scalar implicit problem, n=1")
-    for Solver, options in solvers:
+    for Solver, options, features in solvers:
       self.message(Solver)
       message = Solver
       x=SX.sym("x")
@@ -131,7 +131,7 @@ class ImplicitFunctiontests(casadiTestCase):
       self.checkfunction(solver,refsol,inputs=[0,n],digits=6,sens_der=False,failmessage=message)
 
   def test_scalar2_indirect(self):
-    for Solver, options in solvers:
+    for Solver, options, features in solvers:
       self.message(Solver)
       message = Solver
       x=SX.sym("x")
@@ -148,7 +148,7 @@ class ImplicitFunctiontests(casadiTestCase):
       self.checkfunction(trial,refsol,inputs=[n],digits=6,sens_der=False,failmessage=message)
 
   def test_large(self):
-    for Solver, options in solvers:
+    for Solver, options, features in solvers:
       if 'kinsol' in str(Solver): continue
       if 'newton' in str(Solver): continue
 
@@ -186,7 +186,7 @@ class ImplicitFunctiontests(casadiTestCase):
   @known_bug()
   def test_vector2(self):
     self.message("Scalar implicit problem, n=1")
-    for Solver, options in solvers:
+    for Solver, options, features in solvers:
       self.message(Solver)
       message = Solver
       x=SX.sym("x")
@@ -212,7 +212,7 @@ class ImplicitFunctiontests(casadiTestCase):
     self.assertAlmostEqual(solver_out[0],-2*pi,5)
 
   def test_constraints(self):
-    for Solver, options in solvers:
+    for Solver, options, features in solvers:
       if 'kinsol' in str(Solver): continue
       if 'newton' in str(Solver): continue
 
@@ -271,7 +271,7 @@ class ImplicitFunctiontests(casadiTestCase):
     x = SX.sym("x")
     a = SX.sym("a")
     f = Function("f", [x,a],[tan(x)-a,sqrt(a)*x**2 ])
-    for Solver, options in solvers:
+    for Solver, options, features in solvers:
       options2 = dict(options)
       options2["ad_weight_sp"] = 1
       solver=rootfinder("solver", Solver, f, options2)
@@ -279,6 +279,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
       refsol = Function("refsol", [x,a],[arctan(a),sqrt(a)*arctan(a)**2])
       self.checkfunction(solver,refsol,inputs=solver_in,digits=5)
+      if "codegen" in features: self.check_codegen(solver,inputs=solver_in)
 
     x = SX.sym("x",2)
     a = SX.sym("a",2)

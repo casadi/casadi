@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 2.8.6)
 
 # Create runtime
 add_subdirectory(runtime)
-include_directories("${CMAKE_CURRENT_BINARY_DIR}/runtime")
 
 set(CASADI_PUBLIC
   # MISC
   casadi_limits.hpp
+  casadi_types.hpp
   casadi_common.hpp
   casadi_logger.hpp
   casadi_interrupt.hpp
@@ -180,6 +180,14 @@ endforeach()
 
 # Build static and/or shared
 casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL})
+
+file(RELATIVE_PATH TREL_INCLUDE_PREFIX "${CMAKE_INSTALL_PREFIX}" "${INCLUDE_PREFIX}")
+
+target_include_directories(casadi
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/runtime>
+    $<INSTALL_INTERFACE:${TREL_INCLUDE_PREFIX}>
+)
 
 if(WITH_DL)
   # Core needs support for dynamic linking

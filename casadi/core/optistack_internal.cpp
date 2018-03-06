@@ -25,6 +25,7 @@
 #include "optistack_internal.hpp"
 #include "nlpsol.hpp"
 #include "function_internal.hpp"
+#include "global_options.hpp"
 
 using namespace std;
 namespace casadi {
@@ -42,9 +43,9 @@ class InternalOptiCallback : public FunctionInternal {
   // Number of inputs and outputs
   size_t get_n_in() override { return nlpsol_n_out();}
 
-  Sparsity get_sparsity_in(int i) override {
+  Sparsity get_sparsity_in(casadi_int i) override {
     std::string n = nlpsol_out(i);
-    int size = 0;
+    casadi_int size = 0;
     if (n=="f") {
       size = 1;
     } else if (n=="lam_x" || n=="x") {
@@ -66,7 +67,7 @@ class InternalOptiCallback : public FunctionInternal {
   std::vector<DM> eval_dm(const std::vector<DM>& arg) const override {
     DMDict r;
 
-    for (int i=0;i<nlpsol_n_out();++i) {
+    for (casadi_int i=0;i<nlpsol_n_out();++i) {
       r[nlpsol_out(i)] = arg[i];
     }
 
@@ -82,7 +83,7 @@ class InternalOptiCallback : public FunctionInternal {
 
   private:
     OptiNode& sol_;
-    mutable int i;
+    mutable casadi_int i;
 };
 
 OptiNode* OptiNode::create() {
@@ -102,21 +103,21 @@ bool OptiNode::has_callback_class() const {
   return user_callback_ != 0;
 }
 
-std::string OptiNode::format_stacktrace(const Dict& stacktrace, int indent) {
+std::string OptiNode::format_stacktrace(const Dict& stacktrace, casadi_int indent) {
   std::string s_indent;
-  for (int i=0;i<indent;++i) {
+  for (casadi_int i=0;i<indent;++i) {
     s_indent+= "  ";
   }
   std::string description;
   std::string filename = stacktrace.at("file").as_string();
-  int line = stacktrace.at("line").as_int();
+  casadi_int line = stacktrace.at("line").as_int();
   description += "defined at " + filename +":"+str(line);
   std::string name = stacktrace.at("name").as_string();
   if (name!="Unknown" && name!= "<module>")
     description += " in " + stacktrace.at("name").as_string();
   try {
     ifstream file(filename);
-    for (int i=0; i<line-1; ++i) {
+    for (casadi_int i=0; i<line-1; ++i) {
       file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
     std::string contents; std::getline(file, contents);
@@ -130,10 +131,10 @@ std::string OptiNode::format_stacktrace(const Dict& stacktrace, int indent) {
   return description;
 }
 
-std::string OptiNode::describe(const MX& expr, int indent) const {
+std::string OptiNode::describe(const MX& expr, casadi_int indent) const {
   if (problem_dirty()) return baked_copy().describe(expr, indent);
   std::string s_indent;
-  for (int i=0;i<indent;++i) {
+  for (casadi_int i=0;i<indent;++i) {
     s_indent+= "  ";
   }
   std::string description = s_indent;
@@ -160,8 +161,8 @@ std::string OptiNode::describe(const MX& expr, int indent) const {
     }
   } else {
     if (has_con(expr)) {
-      std::string description = "Opti constraint of shape " + expr.dim();
-      const Dict& extra = meta(expr).extra;
+      description = "Opti constraint of shape " + expr.dim();
+      const Dict& extra = meta_con(expr).extra;
       auto it = extra.find("stacktrace");
       if (it!=extra.end()) {
         const Dict& stacktrace = it->second.as_dict();
@@ -173,7 +174,7 @@ std::string OptiNode::describe(const MX& expr, int indent) const {
         description+= "Constant epxression.";
       } else {
         description+= "General expression, dependent on " + str(s.size()) + " symbols:";
-        for (int i=0;i<s.size();++i) {
+        for (casadi_int i=0;i<s.size();++i) {
           description+= "\n"+describe(s[i], indent+1);
           if (i>5) {
             description+= "\n...";
@@ -187,25 +188,27 @@ std::string OptiNode::describe(const MX& expr, int indent) const {
   return description;
 }
 
-std::string OptiNode::g_describe(int i) const {
+std::string OptiNode::g_describe(casadi_int i) const {
   if (problem_dirty()) return baked_copy().g_describe(i);
   MX expr = g_lookup(i);
-  int local_i = i-meta_con(expr).start;
+  casadi_int local_i = i-meta_con(expr).start + GlobalOptions::start_index;
   std::string description = describe(expr);
-  description += "\nAt nonzero " + str(local_i) + ".";
+  if (expr.numel()>1)
+    description += "\nAt nonzero " + str(local_i) + ".";
   return description;
 }
 
-std::string OptiNode::x_describe(int i) const {
+std::string OptiNode::x_describe(casadi_int i) const {
   if (problem_dirty()) return baked_copy().x_describe(i);
   MX symbol = x_lookup(i);
-  int local_i = i-meta(symbol).start;
+  casadi_int local_i = i-meta(symbol).start + GlobalOptions::start_index;
   std::string description = describe(symbol);
-  description += "\nAt nonzero " + str(local_i) + ".";
+  if (symbol.numel()>1)
+    description += "\nAt nonzero " + str(local_i) + ".";
   return description;
 }
 
-MX OptiNode::x_lookup(int i) const {
+MX OptiNode::x_lookup(casadi_int i) const {
   if (problem_dirty()) return baked_copy().x_lookup(i);
   casadi_assert_dev(i>=0);
   casadi_assert_dev(i<nx());
@@ -218,7 +221,7 @@ MX OptiNode::x_lookup(int i) const {
   return MX();
 }
 
-MX OptiNode::g_lookup(int i) const {
+MX OptiNode::g_lookup(casadi_int i) const {
   if (problem_dirty()) return baked_copy().g_lookup(i);
   casadi_assert_dev(i>=0);
   casadi_assert_dev(i<ng());
@@ -234,13 +237,18 @@ OptiNode::OptiNode() : count_(0), count_var_(0), count_par_(0), count_dual_(0) {
   f_ = 0;
   instance_number_ = instance_count_++;
   user_callback_ = 0;
+  store_initial_[OPTI_VAR] = {};
+  store_initial_[OPTI_PAR] = {};
+  store_initial_[OPTI_DUAL_G] = {};
+  store_latest_[OPTI_VAR] = {};
+  store_latest_[OPTI_DUAL_G] = {};
   mark_problem_dirty();
 }
 
 OptiNode::~OptiNode() {
 }
 
-MX OptiNode::variable(int n, int m, const std::string& attribute) {
+MX OptiNode::variable(casadi_int n, casadi_int m, const std::string& attribute) {
 
   // Prepare metadata
   MetaVar meta_data;
@@ -267,8 +275,8 @@ MX OptiNode::variable(int n, int m, const std::string& attribute) {
 
   // Store the symbol; preventing it from going ut of scope
   symbols_.push_back(symbol);
-  initial_.push_back(DM::zeros(symbol.sparsity()));
-  latest_.push_back(DM::nan(symbol.sparsity()));
+  store_initial_[OPTI_VAR].push_back(DM::zeros(symbol.sparsity()));
+  store_latest_[OPTI_VAR].push_back(DM::nan(symbol.sparsity()));
 
   set_meta(symbol, meta_data);
   return ret;
@@ -304,7 +312,7 @@ void OptiNode::register_dual(MetaCon& c) {
 
     Sparsity ret_sp = repmat(c.original.sparsity(), 1, c.n);
 
-    int N = c.canon.sparsity().nnz();
+    casadi_int N = c.canon.sparsity().nnz();
 
     MX flat = vec(symbol);
     if (c.type==OPTI_DOUBLE_INEQUALITY) {
@@ -314,11 +322,11 @@ void OptiNode::register_dual(MetaCon& c) {
       Function sign_map = sign.map(c.canon.sparsity().nnz());
       ret = MX(ret_sp, sign_map((c.flipped ? -1 : 1)*flat)[0].T());
     } else {
-      int block_size = N / c.n;
+      casadi_int block_size = N / c.n;
       std::vector<MX> original_blocks = vertsplit(fabs(flat), block_size);
       std::vector<MX> blocks(N);
-      for (int i=0;i<c.n;++i) {
-        int p = c.flipped? c.n-i-1: i;
+      for (casadi_int i=0;i<c.n;++i) {
+        casadi_int p = c.flipped? c.n-i-1: i;
         blocks[p] = original_blocks[i];
       }
       ret = MX(ret_sp, vertcat(blocks));
@@ -326,8 +334,8 @@ void OptiNode::register_dual(MetaCon& c) {
   }
 
   symbols_.push_back(symbol);
-  initial_duals_.push_back(DM::zeros(symbol.sparsity()));
-  latest_duals_.push_back(DM::nan(symbol.sparsity()));
+  store_initial_[OPTI_DUAL_G].push_back(DM::zeros(symbol.sparsity()));
+  store_latest_[OPTI_DUAL_G].push_back(DM::nan(symbol.sparsity()));
 
   c.dual = ret;
   c.dual_canon = symbol;
@@ -335,7 +343,7 @@ void OptiNode::register_dual(MetaCon& c) {
   set_meta(symbol, meta_data);
 }
 
-MX OptiNode::parameter(int n, int m, const std::string& attribute) {
+MX OptiNode::parameter(casadi_int n, casadi_int m, const std::string& attribute) {
   casadi_assert_dev(attribute=="full");
 
   // Prepare metadata
@@ -349,7 +357,7 @@ MX OptiNode::parameter(int n, int m, const std::string& attribute) {
 
   MX symbol = MX::sym(name_prefix() + "p_" + str(count_par_), n, m);
   symbols_.push_back(symbol);
-  values_.push_back(DM::nan(symbol.sparsity()));
+  store_initial_[OPTI_PAR].push_back(DM::nan(symbol.sparsity()));
 
   set_meta(symbol, meta_data);
   return symbol;
@@ -370,6 +378,18 @@ std::string OptiNode::return_status() const {
   if (mystats.find("return_status")!=mystats.end())
     return mystats.at("return_status");
   return "unknown";
+}
+
+bool OptiNode::return_success() const {
+  Dict mystats;
+  try {
+    mystats = stats();
+  } catch (...) {
+    //
+  }
+  if (mystats.find("success")!=mystats.end())
+    return mystats.at("success");
+  return false;
 }
 
 Function OptiNode::casadi_solver() const {
@@ -476,10 +496,10 @@ void OptiNode::assert_has_con(const MX& m) const {
   casadi_assert(has_con(m), "Constraint not present in Opti stack.");
 }
 
-int OptiNode::instance_count_ = 0;
+casadi_int OptiNode::instance_count_ = 0;
 
 bool OptiNode::parse_opti_name(const std::string& name, VariableType& vt) const {
-  int i = name.find("opti");
+  casadi_int i = name.find("opti");
   if (i!=0) return false;
 
   i = name.find("_");
@@ -513,10 +533,8 @@ std::map<VariableType, std::string> OptiNode::VariableType2String_ =
 std::vector<MX> OptiNode::initial() const {
   std::vector<MX> ret;
   for (const auto& e : symvar()) {
-    if (meta(e).type==OPTI_VAR)
-      ret.push_back(e==initial_[meta(e).i]);
-    if (meta(e).type==OPTI_DUAL_G)
-      ret.push_back(e==initial_duals_[meta(e).i]);
+    if (meta(e).type==OPTI_VAR || meta(e).type==OPTI_DUAL_G)
+      ret.push_back(e==store_initial_.at(meta(e).type)[meta(e).i]);
   }
   return ret;
 }
@@ -525,7 +543,7 @@ std::vector<MX> OptiNode::value_variables() const {
   std::vector<MX> ret;
   for (const auto& e : symvar()) {
     if (meta(e).type==OPTI_VAR)
-      ret.push_back(e==latest_[meta(e).i]);
+      ret.push_back(e==store_latest_.at(meta(e).type)[meta(e).i]);
   }
   return ret;
 }
@@ -534,7 +552,7 @@ std::vector<MX> OptiNode::value_parameters() const {
   std::vector<MX> ret;
   for (const auto& e : symvar()) {
     if (meta(e).type==OPTI_PAR)
-      ret.push_back(e==values_[meta(e).i]);
+      ret.push_back(e==store_initial_.at(meta(e).type)[meta(e).i]);
   }
   return ret;
 }
@@ -555,7 +573,7 @@ void OptiNode::bake() {
     symbol_active_[meta(d).count] = true;
 
   std::vector<MX> x = active_symvar(OPTI_VAR);
-  int offset = 0;
+  casadi_int offset = 0;
   for (const auto& v : x) {
     meta(v).start = offset;
     offset+= v.nnz();
@@ -570,7 +588,7 @@ void OptiNode::bake() {
   nlp_["f"] = f_;
 
   offset = 0;
-  for (int i=0;i<g_.size();++i) {
+  for (casadi_int i=0;i<g_.size();++i) {
     MetaCon& r = meta_con(g_[i]);
     MetaVar& r2 = meta(r.dual_canon);
     symbol_active_[r2.count] = true;
@@ -603,8 +621,11 @@ void OptiNode::bake() {
   // Create bounds helper function
   MXDict bounds;
   bounds["p"] = nlp_["p"];
-  bounds["lbg"] = veccat(lbg_all);
-  bounds["ubg"] = veccat(ubg_all);
+  bounds_lbg_ = veccat(lbg_all);
+  bounds_ubg_ = veccat(ubg_all);
+
+  bounds["lbg"] = bounds_lbg_;
+  bounds["ubg"] = bounds_ubg_;
 
   bounds_ = Function("bounds", bounds, {"p"}, {"lbg", "ubg"});
   mark_problem_dirty(false);
@@ -623,7 +644,7 @@ std::vector<MX> OptiNode::sort(const std::vector<MX>& v) const {
   // We exploit the fact that std::map is ordered
 
   // Populate map
-  std::map<int, MX> unordered;
+  std::map<casadi_int, MX> unordered;
   for (const auto& d : v)
     unordered[meta(d).count] = d;
 
@@ -705,33 +726,34 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
       // case: g(x,p) <= bound(p)
       MX e = args[0]-args[1];
       if (e.is_vector()) {
-        casadi_assert_dev(!parametric[0] || !parametric[1]);
+        casadi_assert(!parametric[0] || !parametric[1],
+          "Constraint must contain decision variables.");
         con.type = OPTI_INEQUALITY;
         if (parametric[0]) {
           con.lb = args[0]*DM::ones(e.sparsity());
           con.ub = inf*DM::ones(e.sparsity());
-          con.canon = args[1];
+          con.canon = args[1]*DM::ones(e.sparsity());
         } else {
           con.lb = -inf*DM::ones(e.sparsity());
           con.ub = args[1]*DM::ones(e.sparsity());
-          con.canon = args[0];
+          con.canon = args[0]*DM::ones(e.sparsity());
         }
         return con;
       }
       // Fall through to generic inequalities
-    } else if (args.size()==3 && (parametric[0] || parametric[2])) {
+    } else if (args.size()==3 && parametric[0] && parametric[2]) {
       // lb(p) <= g(x,p) <= ub(p)
       con.type = OPTI_DOUBLE_INEQUALITY;
       con.lb = args[0]*DM::ones(args[1].sparsity());
       con.ub = args[2]*DM::ones(args[1].sparsity());
-      con.canon = args[1];
+      con.canon = args[1]*DM::ones(args[1].sparsity());
       con.flipped = flipped;
       con.n = 2;
       return con;
     }
 
     bool type_known = false;
-    for (int j=0;j<args.size()-1;++j) {
+    for (casadi_int j=0;j<args.size()-1;++j) {
       MX e = args[j]-args[j+1];
       if (e.is_vector()) {
         // g1(x,p) <= g2(x,p)
@@ -764,16 +786,21 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
     }
     return con;
   } else if (c.is_op(OP_EQ)) { // Inequalities
-
+    casadi_assert(!is_parametric(c.dep(0)) || !is_parametric(c.dep(1)),
+      "Constraint must contain decision variables.");
     MX e = c.dep(0)-c.dep(1);
     if (is_parametric(c.dep(0))) {
-      con.canon = c.dep(1);
+      con.canon = c.dep(1)*DM::ones(e.sparsity());
       con.lb = c.dep(0)*DM::ones(e.sparsity());
       con.type = OPTI_EQUALITY;
+      casadi_assert(c.dep(0).size1()<=c.dep(1).size1() && c.dep(0).size2()<=c.dep(1).size2(),
+        "Constraint shape mismatch.");
     } else if (is_parametric(c.dep(1))) {
-      con.canon = c.dep(0);
+      con.canon = c.dep(0)*DM::ones(e.sparsity());
       con.lb = c.dep(1)*DM::ones(e.sparsity());
       con.type = OPTI_EQUALITY;
+      casadi_assert(c.dep(1).size1()<=c.dep(0).size1() && c.dep(1).size2()<=c.dep(0).size2(),
+        "Constraint shape mismatch.");
     } else {
       con.lb = DM::zeros(e.sparsity());
       con.canon = e;
@@ -818,6 +845,15 @@ void OptiNode::subject_to(const MX& g) {
   mark_problem_dirty();
   g_.push_back(g);
 
+  casadi_assert(!g.is_empty(),    "You passed an empty expression to `subject_to`. "
+                                  "Make sure the number of rows and columns is non-zero. "
+                                  "Got " + g.dim(true) + ".");
+  casadi_assert(g.nnz()>0,        "You passed a fully sparse expression to `subject_to`. "
+                                  "Make sure the expression has at least one nonzero. "
+                                  "Got " + g.dim(true) + ".");
+  casadi_assert(!g.is_constant(), "You passed a constant to `subject_to`. "
+                                  "You need a symbol to form a constraint.");
+
   // Store the meta-data
   set_meta_con(g, canon_expr(g));
   register_dual(meta_con(g));
@@ -826,8 +862,8 @@ void OptiNode::subject_to(const MX& g) {
 void OptiNode::subject_to() {
   mark_problem_dirty();
   g_.clear();
-  latest_duals_.clear();
-  initial_duals_.clear();
+  store_initial_[OPTI_DUAL_G].clear();
+  store_latest_[OPTI_DUAL_G].clear();
   count_dual_ = 0;
 }
 
@@ -843,15 +879,15 @@ std::vector<MX> OptiNode::symvar(const MX& expr, VariableType type) const {
 void OptiNode::res(const DMDict& res) {
   const std::vector<double> & x_v = res.at("x").nonzeros();
   for (const auto &v : active_symvar(OPTI_VAR)) {
-    int i = meta(v).i;
-    std::vector<double> & data_v = latest_[i].nonzeros();
+    casadi_int i = meta(v).i;
+    std::vector<double> & data_v = store_latest_[OPTI_VAR][i].nonzeros();
     std::copy(x_v.begin()+meta(v).start, x_v.begin()+meta(v).stop, data_v.begin());
   }
   if (res.find("lam_g")!=res.end()) {
     const std::vector<double> & lam_v = res.at("lam_g").nonzeros();
     for (const auto &v : active_symvar(OPTI_DUAL_G)) {
-      int i = meta(v).i;
-      std::vector<double> & data_v = latest_duals_[i].nonzeros();
+      casadi_int i = meta(v).i;
+      std::vector<double> & data_v = store_latest_[OPTI_DUAL_G][i].nonzeros();
       std::copy(lam_v.begin()+meta(v).start, lam_v.begin()+meta(v).stop, data_v.begin());
     }
   }
@@ -902,9 +938,7 @@ OptiSol OptiNode::solve() {
 
   std::string ret = return_status();
 
-  bool success = ret=="Solve_Succeeded" || ret=="Solved_To_Acceptable_Level" || ret=="SUCCESS";
-
-  casadi_assert(success,
+  casadi_assert(return_success(),
     "Solver failed. You may use opti.debug.value to investigate the latest values of variables."
     " return_status is '" + ret + "'");
 
@@ -933,7 +967,7 @@ void OptiNode::solve_prepare() {
   if (!arg_["p"].is_regular()) {
     std::vector<MX> s = active_symvar(OPTI_PAR);
     std::vector<DM> v = active_values(OPTI_PAR);
-    for (int i=0;i<s.size();++i) {
+    for (casadi_int i=0;i<s.size();++i) {
       casadi_assert(v[i].is_regular(),
         "You have forgotten to assign a value to a parameter ('set_value'), "
         "or have set it to NaN/Inf:\n" + describe(s[i], 1));
@@ -953,6 +987,19 @@ DMDict OptiNode::solve_actual(const DMDict& arg) {
   return solver_(arg);
 }
 
+bool override_num(const std::map<casadi_int, MX> & temp, std::vector<DM>& num, casadi_int i) {
+  // Override when values are supplied
+  auto it = temp.find(i);
+  if (it==temp.end()) {
+    return true;
+  } else {
+    Slice all;
+    DM t = static_cast<DM>(it->second);
+    num.back().set(t, false, all, all);
+  }
+  return false;
+}
+
 DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
   std::vector<MX> x   = symvar(expr, OPTI_VAR);
   std::vector<MX> p   = symvar(expr, OPTI_PAR);
@@ -963,31 +1010,41 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
     casadi_error("This expression has symbols that are not defined "
       "within Opti using variable/parameter.");
 
-
-  std::map<int, MX> temp;
+  std::map<VariableType, std::map<casadi_int, MX> > temp;
+  temp[OPTI_DUAL_G] = std::map<casadi_int, MX>();
   for (const auto& v : values) {
     casadi_assert_dev(v.is_op(OP_EQ));
-    int i = meta(v.dep(1)).i;
+    casadi_int i = meta(v.dep(1)).i;
     casadi_assert_dev(v.dep(0).is_constant());
-    temp[i] = v.dep(0);
+    temp[meta(v.dep(1)).type][i] = v.dep(0);
   }
 
   bool undecided_vars = false;
   std::vector<DM> x_num;
   for (const auto& e : x) {
-    int i = meta(e).i;
-    x_num.push_back(latest_[i]);
+    casadi_int i = meta(e).i;
+    x_num.push_back(store_latest_.at(OPTI_VAR).at(i));
+    undecided_vars |= override_num(temp[OPTI_VAR], x_num, i);
+  }
 
-    // Override when values are supplied
-    auto it = temp.find(i);
-    if (it==temp.end()) {
-      undecided_vars = true;
-    } else {
-      Slice all;
-      DM t = static_cast<DM>(it->second);
-      x_num.back().set(t, false, all, all);
-    }
+  std::vector<DM> lam_num;
+  for (const auto& e : lam) {
+    casadi_int i = meta(e).i;
+    casadi_assert(i<store_latest_.at(OPTI_DUAL_G).size(),
+      "This expression has a dual for a constraint that is not given to Opti:\n" +
+      describe(e, 1));
+    lam_num.push_back(store_latest_.at(OPTI_DUAL_G).at(i));
+    undecided_vars |= override_num(temp[OPTI_DUAL_G], lam_num, i);
+  }
 
+  std::vector<DM> p_num;
+  for (const auto& e : p) {
+    casadi_int i = meta(e).i;
+    p_num.push_back(store_initial_.at(OPTI_PAR).at(i));
+    override_num(temp[OPTI_PAR], p_num, i);
+    casadi_assert(p_num.back().is_regular(),
+      "This expression depends on a parameter with unset value:\n"+
+      describe(e, 1));
   }
 
   if (undecided_vars) {
@@ -996,22 +1053,10 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
       casadi_assert(symbol_active_[meta(e).count],
         "This expression has symbols that do not appear in the constraints and objective:\n" +
         describe(e, 1));
-  }
-
-  std::vector<DM> p_num;
-  for (const auto& e : p) {
-    p_num.push_back(values_[meta(e).i]);
-  }
-
-  std::vector<DM> lam_num;
-  if (lam.size()>0) {
-    assert_solved();
-    for (const auto& e : lam) {
+    for (const auto& e : lam)
       casadi_assert(symbol_active_[meta(e).count],
         "This expression has a dual for a constraint that is not given to Opti:\n" +
         describe(e, 1));
-      lam_num.push_back(latest_duals_[meta(e).i]);
-    }
   }
 
   std::vector<DM> arg = helper(std::vector<DM>{veccat(x_num), veccat(p_num), veccat(lam_num)});
@@ -1043,11 +1088,11 @@ void OptiNode::set_value(const std::vector<MX>& assignments) {
   }
 }
 
-void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& store) {
+void OptiNode::set_value_internal(const MX& x, const DM& v) {
   mark_solved(false);
   casadi_assert_dev(v.is_regular());
   if (x.is_symbolic()) {
-    DM& target = store[meta(x).i];
+    DM& target = store_initial_[meta(x).type][meta(x).i];
     Slice all;
     target.set(v, false, all, all);
     return;
@@ -1079,19 +1124,19 @@ void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& sto
   value.set(v, false, all, all);
 
   // Purge empty rows
-  std::vector<int> filled_rows = sum2(J).get_row();
+  std::vector<casadi_int> filled_rows = sum2(J).get_row();
   J = J(filled_rows, all);
 
   // Get rows and columns of the mapping
-  std::vector<int> row, col;
+  std::vector<casadi_int> row, col;
   J.sparsity().get_triplet(row, col);
   const std::vector<double>& scaling = J.nonzeros();
   const std::vector<double>& data_original = value.nonzeros();
 
   std::vector<double> data; data.reserve(value.nnz());
-  for (int i=0;i<value.nnz();++i) {
+  for (casadi_int i=0;i<value.nnz();++i) {
     double v = data_original[i];
-    int nz = sp_JT.colind()[i+1]-sp_JT.colind()[i];
+    casadi_int nz = sp_JT.colind()[i+1]-sp_JT.colind()[i];
     casadi_assert(nz<=1, failmessage);
     if (nz) {
       data.push_back(v);
@@ -1104,7 +1149,7 @@ void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& sto
 
   // Contiguous workspace for nonzeros of all involved symbols
   std::vector<double> temp(symbols_cat.nnz(), casadi::nan);
-  for (int k=0;k<data.size();++k) {
+  for (casadi_int k=0;k<data.size();++k) {
     double& lhs = temp[col[k]];
     double rhs = data[row[k]]/scaling[row[k]];
     if (std::isnan(lhs)) {
@@ -1115,12 +1160,12 @@ void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& sto
     }
   }
 
-  int offset = 0;
+  casadi_int offset = 0;
   for (const auto & s : symbols) {
-    DM& target = store[meta(s).i];
+    DM& target = store_initial_[meta(s).type][meta(s).i];
     std::vector<double>& data = target.nonzeros();
     // Loop over nonzeros in each symbol
-    for (int i=0;i<s.nnz();++i) {
+    for (casadi_int i=0;i<s.nnz();++i) {
       // Copy from the workspace (barring fields that were not set)
       double v = temp[offset+i];
       if (!std::isnan(v)) data[i] = v;
@@ -1131,18 +1176,17 @@ void OptiNode::set_value_internal(const MX& x, const DM& v, std::vector<DM>& sto
 }
 
 void OptiNode::set_initial(const MX& x, const DM& v) {
-  for (const auto & s : MX::symvar(x)) {
+  for (const auto & s : MX::symvar(x))
     casadi_assert(meta(s).type!=OPTI_PAR,
       "You cannot set an initial value for a parameter. Did you mean 'set_value'?");
-    set_value_internal(x, v, meta(s).type==OPTI_VAR ? initial_ : initial_duals_);
-  }
+  set_value_internal(x, v);
 }
 
 void OptiNode::set_value(const MX& x, const DM& v) {
   for (const auto & s : MX::symvar(x))
     casadi_assert(meta(s).type!=OPTI_VAR,
       "You cannot set a value for a variable. Did you mean 'set_initial'?");
-  set_value_internal(x, v, values_);
+  set_value_internal(x, v);
 }
 
 std::vector<MX> OptiNode::active_symvar(VariableType type) const {
@@ -1160,13 +1204,7 @@ std::vector<DM> OptiNode::active_values(VariableType type) const {
   std::vector<DM> ret;
   for (const auto& s : symbols_) {
     if (symbol_active_[meta(s).count] && meta(s).type==type) {
-      if (type==OPTI_VAR) {
-        ret.push_back(initial_[meta(s).i]);
-      } else if (type==OPTI_PAR) {
-        ret.push_back(values_[meta(s).i]);
-      } else if (type==OPTI_DUAL_G) {
-        ret.push_back(initial_duals_[meta(s).i]);
-      }
+      ret.push_back(store_initial_.at(meta(s).type)[meta(s).i]);
     }
   }
   return ret;
@@ -1176,7 +1214,7 @@ void OptiNode::disp(ostream &stream, bool more) const {
 
 }
 
-int OptiNode::instance_number() const {
+casadi_int OptiNode::instance_number() const {
     return instance_number_;
 }
 

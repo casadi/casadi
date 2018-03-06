@@ -72,9 +72,12 @@ namespace casadi {
     m->A.nzmax = this->nnz();  // maximum number of entries
     m->A.m = this->nrow(); // number of rows
     m->A.n = this->ncol(); // number of columns
-    m->A.p = const_cast<int*>(this->colind()); // column pointers (size n+1)
-    // or column indices (size nzmax)
-    m->A.i = const_cast<int*>(this->row()); // row indices, size nzmax
+    m->colind.resize(this->ncol()+1);
+    m->row.resize(this->nnz());
+    copy_vector(this->colind(), m->colind);
+    copy_vector(this->row(), m->row);
+    m->A.p = get_ptr(m->colind); // row pointers (size n+1)
+    m->A.i = get_ptr(m->row); // row pointers (size n+1)
     m->A.x = 0; // numerical values, size nzmax
     m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-column
 
@@ -90,7 +93,7 @@ namespace casadi {
     m->A.x = const_cast<double*>(A);
 
     // ordering and symbolic analysis
-    int order = 0; // ordering?
+    casadi_int order = 0; // ordering?
     if (m->S) cs_sfree(m->S);
     m->S = cs_sqr(order, &m->A, 0);
     return 0;
@@ -103,7 +106,7 @@ namespace casadi {
     m->A.x = const_cast<double*>(A);
 
     // Make sure that all entries of the linear system are valid
-    for (int k=0; k<this->nnz(); ++k) {
+    for (casadi_int k=0; k<this->nnz(); ++k) {
       casadi_assert(!isnan(A[k]),
         "Nonzero " + str(k) + " is not-a-number");
       casadi_assert(!isinf(A[k]),
@@ -150,13 +153,14 @@ namespace casadi {
     return 0;
   }
 
-  int CsparseInterface::solve(void* mem, const double* A, double* x, int nrhs, bool tr) const {
+  int CsparseInterface::solve(void* mem, const double* A, double* x,
+      casadi_int nrhs, bool tr) const {
     auto m = static_cast<CsparseMemory*>(mem);
     casadi_assert_dev(m->N!=0);
 
     double *t = &m->temp_.front();
 
-    for (int k=0; k<nrhs; ++k) {
+    for (casadi_int k=0; k<nrhs; ++k) {
       if (tr) {
         cs_pvec(m->S->q, x, t, m->A.n) ;       // t = P2*b
         casadi_assert_dev(m->N->U!=0);

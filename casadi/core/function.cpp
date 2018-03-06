@@ -311,7 +311,7 @@ namespace casadi {
     casadi_assert_dev(arg.size()==n_in());
     auto arg_it=arg.begin();
     vector<const double*> buf_arg(sz_arg());
-    for (unsigned int i=0; i<arg.size(); ++i) {
+    for (casadi_uint i=0; i<arg.size(); ++i) {
       casadi_assert_dev(arg_it->size()==nnz_in(i));
       buf_arg[i] = get_ptr(*arg_it++);
     }
@@ -322,7 +322,7 @@ namespace casadi {
     res.resize(n_out());
     auto res_it=res.begin();
     vector<double*> buf_res(sz_res());
-    for (unsigned int i=0; i<res.size(); ++i) {
+    for (casadi_uint i=0; i<res.size(); ++i) {
       res_it->resize(nnz_out(i));
       buf_res[i] = get_ptr(*res_it++);
     }
@@ -333,7 +333,7 @@ namespace casadi {
     casadi_assert_dev(res.size()==n_out());
     auto res_it=res.begin();
     vector<double*> buf_res(sz_res());
-    for (unsigned int i=0; i<res.size(); ++i) {
+    for (casadi_uint i=0; i<res.size(); ++i) {
       casadi_assert_dev(*res_it!=0);
       (*res_it)->resize(nnz_out(i));
       buf_res[i] = get_ptr(**res_it++);
@@ -347,7 +347,7 @@ namespace casadi {
 
     // Read inputs
     for (auto i=arg.begin(); i!=arg.end(); ++i) {
-      int ind = index_in(i->first);
+      casadi_int ind = index_in(i->first);
       casadi_assert_dev(i->second.size()==nnz_in(ind));
       ret[ind] = get_ptr(i->second);
     }
@@ -361,7 +361,7 @@ namespace casadi {
 
     // Read outputs
     for (auto i=res.begin(); i!=res.end(); ++i) {
-      int ind = index_out(i->first);
+      casadi_int ind = index_out(i->first);
       i->second.resize(nnz_out(ind));
       ret[ind] = get_ptr(i->second);
     }
@@ -375,7 +375,7 @@ namespace casadi {
 
     // Read outputs
     for (auto i=res.begin(); i!=res.end(); ++i) {
-      int ind = index_out(i->first);
+      casadi_int ind = index_out(i->first);
       casadi_assert_dev(i->second!=0);
       i->second->resize(nnz_out(ind));
       ret[ind] = get_ptr(*i->second);
@@ -395,7 +395,7 @@ namespace casadi {
     res.resize(sz_res());
 
     // Work vectors
-    vector<int> iw(sz_iw());
+    vector<casadi_int> iw(sz_iw());
     vector<D> w(sz_w());
 
     // Evaluate memoryless
@@ -425,22 +425,32 @@ namespace casadi {
     res.resize(sz_res());
 
     // Work vectors
-    vector<int> iw(sz_iw());
+    vector<casadi_int> iw(sz_iw());
     vector<bvec_t> w(sz_w());
 
     // Evaluate memoryless
     return rev(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
   }
 
-  Function Function::mapaccum(const string& name, int N, const Dict& opts) const {
+  Function Function::fold(casadi_int N, const Dict& opts) const {
+    Function base = mapaccum(N, opts);
+    std::vector<MX> base_in = base.mx_in();
+    std::vector<MX> out = base(base_in);
+    out[0] = out[0](Slice(), range((N-1)*size2_out(0), N*size2_out(0)));
+    return Function("fold_"+name(), base_in, out, name_in(), name_out(), opts);
+  }
+  Function Function::mapaccum(casadi_int N, const Dict& opts) const {
+    return mapaccum("mapaccum_"+name(), N, opts);
+  }
+  Function Function::mapaccum(const string& name, casadi_int N, const Dict& opts) const {
     return mapaccum(name, N, 1, opts);
   }
-  Function Function::mapaccum(const string& name, int N, int n_accum,
+  Function Function::mapaccum(const string& name, casadi_int N, casadi_int n_accum,
                               const Dict& opts) const {
     Dict options = opts;
 
     // Default base
-    int base = 10;
+    casadi_int base = 10;
     auto it = options.find("base");
     if (it!=options.end()) {
       base = it->second;
@@ -457,7 +467,7 @@ namespace casadi {
     std::vector<Function> chain;
     Function c = *this;
     while (N!=0) {
-      int r = N % base;
+      casadi_int r = N % base;
       chain.insert(chain.end(), r, c);
       N = (N-r)/base;
       c = c.mapaccum(c.name()+"_acc"+str(base), std::vector<Function>(base, c), n_accum, options);
@@ -466,10 +476,10 @@ namespace casadi {
   }
 
   Function Function::mapaccum(const std::string& name,
-                      const std::vector<Function>& chain, int n_accum,
+                      const std::vector<Function>& chain, casadi_int n_accum,
                       const Dict& opts) const {
     // Shorthands
-    int n_in = this->n_in(), n_out = this->n_out();
+    casadi_int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
     casadi_assert(!chain.empty(), "mapaccum: chain must be non-empty");
     casadi_assert(n_accum<=min(n_in, n_out), "mapaccum: too many accumulators");
@@ -480,12 +490,12 @@ namespace casadi {
     vector<MX> res;
     // Vectorized inputs and outputs
     vector<vector<MX>> varg(n_in), vres(n_out);
-    for (int i=0; i<n_accum; ++i) varg[i].push_back(arg[i]);
+    for (casadi_int i=0; i<n_accum; ++i) varg[i].push_back(arg[i]);
     // For each function call
     for (const auto& f : chain) {
 
       // Stacked input expressions
-      for (int i=n_accum; i<n_in; ++i) {
+      for (casadi_int i=n_accum; i<n_in; ++i) {
         arg[i] = MX::sym(name_in(i) + "_" + str(i), f.sparsity_in(i));
         varg[i].push_back(arg[i]);
       }
@@ -493,34 +503,34 @@ namespace casadi {
       // Call f
       res = f(arg);
       // Save output expressions
-      for (int i=0; i<n_out; ++i) vres[i].push_back(res[i]);
+      for (casadi_int i=0; i<n_out; ++i) vres[i].push_back(res[i]);
       // Copy function output to input
       copy_n(res.begin(), n_accum, arg.begin());
-      for (int i=0; i<n_accum; ++i) {
+      for (casadi_int i=0; i<n_accum; ++i) {
         // Ony get last component (allows nested calls)
-        int ncol_out=f.size2_out(i), ncol_in=size2_in(i);
+        casadi_int ncol_out=f.size2_out(i), ncol_in=size2_in(i);
         if (ncol_out>ncol_in) {
           arg[i] = horzsplit(arg[i], {0, ncol_out-ncol_in, ncol_out}).back();
         }
       }
     }
     // Construct return
-    for (int i=0; i<n_in; ++i) arg[i] = horzcat(varg[i]);
-    for (int i=0; i<n_out; ++i) res[i] = horzcat(vres[i]);
+    for (casadi_int i=0; i<n_in; ++i) arg[i] = horzcat(varg[i]);
+    for (casadi_int i=0; i<n_out; ++i) res[i] = horzcat(vres[i]);
     return Function(name, arg, res, name_in(), name_out(), opts);
   }
 
-  Function Function::mapaccum(const string& name, int n,
-                              const vector<int>& accum_in,
-                              const vector<int>& accum_out,
+  Function Function::mapaccum(const string& name, casadi_int n,
+                              const vector<casadi_int>& accum_in,
+                              const vector<casadi_int>& accum_out,
                               const Dict& opts) const {
     // Shorthands
-    int n_in = this->n_in(), n_out = this->n_out();
+    casadi_int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
     casadi_assert_dev(in_range(accum_in, n_in) && isUnique(accum_in));
     casadi_assert_dev(in_range(accum_out, n_out) && isUnique(accum_out));
     casadi_assert_dev(accum_in.size()==accum_out.size());
-    int n_accum=accum_in.size();
+    casadi_int n_accum=accum_in.size();
 
     // Quick return if no need to reorder
     if (accum_in==range(n_accum) && accum_out==range(n_accum)) {
@@ -528,11 +538,11 @@ namespace casadi {
     }
 
     // Need to do some reordering
-    vector<int> temp_in = complement(accum_in, n_in);
-    vector<int> order_in = accum_in;
+    vector<casadi_int> temp_in = complement(accum_in, n_in);
+    vector<casadi_int> order_in = accum_in;
     order_in.insert(order_in.end(), temp_in.begin(), temp_in.end());
-    vector<int> temp_out = complement(accum_out, n_out);
-    vector<int> order_out = accum_out;
+    vector<casadi_int> temp_out = complement(accum_out, n_out);
+    vector<casadi_int> order_out = accum_out;
     order_out.insert(order_out.end(), temp_out.begin(), temp_out.end());
     Function ret = slice("slice_" + name, order_in, order_out);
     ret = ret.mapaccum("mapacc_" + name, n, n_accum, opts);
@@ -540,49 +550,81 @@ namespace casadi {
                      lookupvector(order_out, n_out), opts);
   }
 
-  Function Function::mapaccum(const string& name, int n,
+  Function Function::mapaccum(const string& name, casadi_int n,
                               const vector<string>& accum_in,
                               const vector<string>& accum_out,
                               const Dict& opts) const {
-    vector<int> accum_in_num, accum_out_num;
+    vector<casadi_int> accum_in_num, accum_out_num;
     for (const string& s : accum_in) accum_in_num.push_back(index_in(s));
     for (const string& s : accum_out) accum_out_num.push_back(index_out(s));
     return mapaccum(name, n, accum_in_num, accum_out_num, opts);
   }
 
-  Function Function::map(const string& name, const std::string& parallelization, int n,
-      const vector<int>& reduce_in, const vector<int>& reduce_out, const Dict& opts) const {
+  Function Function::map(const string& name, const std::string& parallelization, casadi_int n,
+      const vector<casadi_int>& reduce_in, const vector<casadi_int>& reduce_out,
+        const Dict& opts) const {
     // Wrap in an MXFunction
     Function f = map(n, parallelization);
     // Start with the fully mapped inputs
     vector<MX> arg = f.mx_in();
     vector<MX> f_arg = arg;
     // Replace reduced inputs
-    for (int i : reduce_in) {
+    for (casadi_int i : reduce_in) {
       arg[i] = mx_in(i);
       f_arg[i] = repmat(arg[i], 1, n);
     }
     // Get fully mapped outputs
     vector<MX> res = f(f_arg);
     // Replace reduced outputs
-    for (int i : reduce_out) {
+    for (casadi_int i : reduce_out) {
       res[i] = repsum(res[i], 1, n);
     }
     // Construct return
     return Function(name, arg, res, name_in(), name_out());
   }
 
-  Function Function::map(const string& name, const string& parallelization, int n,
+  Function Function::map(const string& name, const string& parallelization, casadi_int n,
       const vector<string>& reduce_in, const vector<string>& reduce_out,
       const Dict& opts) const {
-    vector<int> reduce_in_num, reduce_out_num;
+    vector<casadi_int> reduce_in_num, reduce_out_num;
     for (const string& s : reduce_in) reduce_in_num.push_back(index_in(s));
     for (const string& s : reduce_out) reduce_out_num.push_back(index_out(s));
     return map(name, parallelization, n, reduce_in_num, reduce_out_num, opts);
   }
 
   Function
-  Function::map(int n, const std::string& parallelization) const {
+  Function::map(casadi_int n, const std::string& parallelization,
+      casadi_int max_num_threads) const {
+    casadi_assert(max_num_threads>=1, "max_num_threads invalid.");
+    // No need for logic when we are not saturating the limit
+    if (n<=max_num_threads) return map(n, parallelization);
+
+    // Floored division
+    casadi_int d = n/max_num_threads;
+    if (d*max_num_threads==n) {
+      // Easy when n is divisable by max_num_threads
+      return map(d, "serial").map(max_num_threads, parallelization);
+    } else {
+      // Create a base map that computes a bit too much
+      Function base = map(d+1, "serial").map(max_num_threads, parallelization);
+      std::vector<MX> ret_in, base_in;
+      casadi_int rem = (d+1)*max_num_threads-n;
+      for (casadi_int i=0;i<n_in();++i) {
+        MX arg = MX::sym("arg", repmat(sparsity_in(i), 1, n));
+        ret_in.push_back(arg);
+        MX last_arg = arg(Slice(), range((n-1)*size2_in(i), n*size2_in(i)));
+        base_in.push_back(horzcat(arg, repmat(last_arg, 1, rem)));
+      }
+      std::vector<MX> ret_out = base(base_in);
+      for (casadi_int i=0;i<n_out();++i) {
+        ret_out[i] = horzsplit(ret_out[i], {0, n*size2_out(i), ret_out[i].size2()})[0];
+      }
+      return Function("helper", ret_in, ret_out, name_in(), name_out());
+    }
+  }
+
+  Function
+  Function::map(casadi_int n, const std::string& parallelization) const {
     // Make sure not degenerate
     casadi_assert(n>0, "Degenerate map operation");
     // Quick return if possible
@@ -593,8 +635,8 @@ namespace casadi {
       std::vector<MX> arg(n_in());
       std::vector<std::vector<MX>> v(n, arg);
       std::vector<MX> tmp(n);
-      for (int i=0; i<arg.size(); ++i) {
-        for (int k=0; k<n; ++k) {
+      for (casadi_int i=0; i<arg.size(); ++i) {
+        for (casadi_int k=0; k<n; ++k) {
           tmp[k] = v[k][i] = MX::sym(name_in(i)+"_"+str(k), sparsity_in(i));
         }
         arg[i] = horzcat(tmp);
@@ -607,8 +649,8 @@ namespace casadi {
       }
       // Gather outputs
       std::vector<MX> res(n_out());
-      for (int i=0; i<res.size(); ++i) {
-        for (int k=0; k<n; ++k) tmp[k] = v[k][i];
+      for (casadi_int i=0; i<res.size(); ++i) {
+        for (casadi_int k=0; k<n; ++k) tmp[k] = v[k][i];
         res[i] = horzcat(tmp);
       }
       // Construct function
@@ -621,8 +663,8 @@ namespace casadi {
   }
 
   Function Function::
-  slice(const std::string& name, const std::vector<int>& order_in,
-        const std::vector<int>& order_out, const Dict& opts) const {
+  slice(const std::string& name, const std::vector<casadi_int>& order_in,
+        const std::vector<casadi_int>& order_out, const Dict& opts) const {
     try {
       return (*this)->slice(name, order_in, order_out, opts);
     } catch (exception& e) {
@@ -650,7 +692,8 @@ namespace casadi {
 
   Function Function::bspline(const std::string &name,
       const std::vector< std::vector<double> >& knots,
-      const vector<double>& coeffs, const vector<int>& degree, int m, const Dict& opts) {
+      const vector<double>& coeffs, const vector<casadi_int>& degree,
+        casadi_int m, const Dict& opts) {
     try {
       return BSpline::create(name, knots, coeffs, degree, m, opts);
     } catch (exception& e) {
@@ -660,7 +703,7 @@ namespace casadi {
 
   Function Function::bspline_dual(const std::string &name,
       const std::vector< std::vector<double> >& knots, const vector<double>& x,
-      const vector<int>& degree, int m, bool reverse, const Dict& opts) {
+      const vector<casadi_int>& degree, casadi_int m, bool reverse, const Dict& opts) {
     try {
       return BSplineDual::create(name, knots, x, degree, m, reverse, opts);
     } catch (exception& e) {
@@ -677,67 +720,67 @@ namespace casadi {
     }
   }
 
-  int Function::n_in() const {
+  casadi_int Function::n_in() const {
     return (*this)->n_in_;
   }
 
-  int Function::n_out() const {
+  casadi_int Function::n_out() const {
     return (*this)->n_out_;
   }
 
-  int Function::size1_in(int ind) const {
+  casadi_int Function::size1_in(casadi_int ind) const {
     return (*this)->size1_in(ind);
   }
 
-  int Function::size2_in(int ind) const {
+  casadi_int Function::size2_in(casadi_int ind) const {
     return (*this)->size2_in(ind);
   }
 
-  int Function::size1_out(int ind) const {
+  casadi_int Function::size1_out(casadi_int ind) const {
     return (*this)->size1_out(ind);
   }
 
-  int Function::size2_out(int ind) const {
+  casadi_int Function::size2_out(casadi_int ind) const {
     return (*this)->size2_out(ind);
   }
 
-  pair<int, int> Function::size_in(int ind) const {
+  pair<casadi_int, casadi_int> Function::size_in(casadi_int ind) const {
     return (*this)->size_in(ind);
   }
 
-  pair<int, int> Function::size_out(int ind) const {
+  pair<casadi_int, casadi_int> Function::size_out(casadi_int ind) const {
     return (*this)->size_out(ind);
   }
 
-  int Function::nnz_in() const {
+  casadi_int Function::nnz_in() const {
     return (*this)->nnz_in();
   }
 
-  int Function::nnz_out() const {
+  casadi_int Function::nnz_out() const {
     return (*this)->nnz_out();
   }
 
-  int Function::numel_in() const {
+  casadi_int Function::numel_in() const {
     return (*this)->numel_in();
   }
 
-  int Function::numel_out() const {
+  casadi_int Function::numel_out() const {
     return (*this)->numel_out();
   }
 
-  int Function::nnz_in(int ind) const {
+  casadi_int Function::nnz_in(casadi_int ind) const {
     return (*this)->nnz_in(ind);
   }
 
-  int Function::nnz_out(int ind) const {
+  casadi_int Function::nnz_out(casadi_int ind) const {
     return (*this)->nnz_out(ind);
   }
 
-  int Function::numel_in(int ind) const {
+  casadi_int Function::numel_in(casadi_int ind) const {
     return (*this)->numel_in(ind);
   }
 
-  int Function::numel_out(int ind) const {
+  casadi_int Function::numel_out(casadi_int ind) const {
     return (*this)->numel_out(ind);
   }
 
@@ -745,7 +788,7 @@ namespace casadi {
     return (*this)->uses_output();
   }
 
-  Function Function::jacobian_old(int iind, int oind) const {
+  Function Function::jacobian_old(casadi_int iind, casadi_int oind) const {
     // Redirect to factory class
     vector<string> s_in = name_in();
     vector<string> s_out = name_out();
@@ -753,7 +796,7 @@ namespace casadi {
     return factory(name() + "_jac", s_in, s_out);
   }
 
-  Function Function::hessian_old(int iind, int oind) const {
+  Function Function::hessian_old(casadi_int iind, casadi_int oind) const {
     // Redirect to factory class
     vector<string> s_in = name_in();
     vector<string> s_out = name_out();
@@ -771,16 +814,24 @@ namespace casadi {
     }
   }
 
+  Function Function::jac() const {
+    try {
+      return (*this)->jac();
+    } catch (exception& e) {
+      THROW_ERROR("jac", e.what());
+    }
+  }
+
   bool Function::test_cast(const SharedObjectInternal* ptr) {
     return dynamic_cast<const FunctionInternal*>(ptr)!=0;
   }
 
-  Dict Function::stats(int mem) const {
+  Dict Function::stats(casadi_int mem) const {
     return (*this)->get_stats(memory(mem));
   }
 
   const Sparsity Function::
-  sparsity_jac(int iind, int oind, bool compact, bool symmetric) const {
+  sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const {
     try {
       return (*this)->sparsity_jac(iind, oind, compact, symmetric);
     } catch (exception& e) {
@@ -796,7 +847,7 @@ namespace casadi {
     return (*this)->name_out_;
   }
 
-  int Function::index_in(const string &name) const {
+  casadi_int Function::index_in(const string &name) const {
     try {
       return (*this)->index_in(name);
     } catch (exception& e) {
@@ -804,7 +855,7 @@ namespace casadi {
     }
   }
 
-  int Function::index_out(const string &name) const {
+  casadi_int Function::index_out(const string &name) const {
     try {
       return (*this)->index_out(name);
     } catch (exception& e) {
@@ -812,7 +863,7 @@ namespace casadi {
     }
   }
 
-  const string& Function::name_in(int ind) const {
+  const string& Function::name_in(casadi_int ind) const {
     try {
       return (*this)->name_in_.at(ind);
     } catch (exception& e) {
@@ -820,7 +871,7 @@ namespace casadi {
     }
   }
 
-  const string& Function::name_out(int ind) const {
+  const string& Function::name_out(casadi_int ind) const {
     try {
       return (*this)->name_out_.at(ind);
     } catch (exception& e) {
@@ -828,7 +879,7 @@ namespace casadi {
     }
   }
 
-  const Sparsity& Function::sparsity_in(int ind) const {
+  const Sparsity& Function::sparsity_in(casadi_int ind) const {
     try {
       return (*this)->sparsity_in_.at(ind);
     } catch (exception& e) {
@@ -844,7 +895,7 @@ namespace casadi {
     }
   }
 
-  const Sparsity& Function::sparsity_out(int ind) const {
+  const Sparsity& Function::sparsity_out(casadi_int ind) const {
     try {
       return (*this)->sparsity_out_.at(ind);
     } catch (exception& e) {
@@ -872,7 +923,8 @@ namespace casadi {
 
   size_t Function::sz_w() const { return (*this)->sz_w();}
 
-  int Function::operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Function::operator()(const bvec_t** arg, bvec_t** res,
+                            casadi_int* iw, bvec_t* w, casadi_int mem) const {
     try {
       return (*this)->sp_forward(arg, res, iw, w, memory(mem));
     } catch (exception& e) {
@@ -880,7 +932,7 @@ namespace casadi {
     }
   }
 
-  int Function::rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem) const {
+  int Function::rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, casadi_int mem) const {
     try {
       return (*this)->sp_reverse(arg, res, iw, w, memory(mem));
     } catch (exception& e) {
@@ -888,8 +940,8 @@ namespace casadi {
     }
   }
 
-  void Function::set_work(const double**& arg, double**& res, int*& iw, double*& w,
-                          int mem) const {
+  void Function::set_work(const double**& arg, double**& res, casadi_int*& iw, double*& w,
+                          casadi_int mem) const {
     try {
       (*this)->set_work(memory(mem), arg, res, iw, w);
     } catch (exception& e) {
@@ -897,8 +949,8 @@ namespace casadi {
     }
   }
 
-  void Function::set_temp(const double** arg, double** res, int* iw, double* w,
-                          int mem) const {
+  void Function::set_temp(const double** arg, double** res, casadi_int* iw, double* w,
+                          casadi_int mem) const {
     try {
       (*this)->set_temp(memory(mem), arg, res, iw, w);
     } catch (exception& e) {
@@ -906,8 +958,8 @@ namespace casadi {
     }
   }
 
-  void Function::setup(const double** arg, double** res, int* iw, double* w,
-                          int mem) const {
+  void Function::setup(const double** arg, double** res, casadi_int* iw, double* w,
+                          casadi_int mem) const {
     try {
       (*this)->setup(memory(mem), arg, res, iw, w);
     } catch (exception& e) {
@@ -915,7 +967,7 @@ namespace casadi {
     }
   }
 
-  Function Function::forward(int nfwd) const {
+  Function Function::forward(casadi_int nfwd) const {
     try {
       return (*this)->forward(nfwd);
     } catch (exception& e) {
@@ -923,7 +975,7 @@ namespace casadi {
     }
   }
 
-  Function Function::reverse(int nadj) const {
+  Function Function::reverse(casadi_int nadj) const {
     try {
       return (*this)->reverse(nadj);
     } catch (exception& e) {
@@ -971,6 +1023,17 @@ namespace casadi {
     std::ofstream stream(fname);
     return (*this)->export_code(lang, stream, options);
   }
+
+  std::string Function::serialize() const {
+    std::stringstream ss;
+    serialize(ss);
+    return ss.str();
+  }
+
+  void Function::serialize(std::ostream &stream) const {
+    return (*this)->serialize(stream);
+  }
+
   std::string Function::export_code(const std::string& lang, const Dict& options) const {
     std::stringstream ss;
     (*this)->export_code(lang, ss, options);
@@ -1011,6 +1074,24 @@ namespace casadi {
 
     // Valid function name if reached this point
     return true;
+  }
+
+  Function Function::deserialize(std::istream& stream) {
+    char type;
+    stream >> type;
+    switch (type) {
+      case 'S':
+        return SXFunction::deserialize(stream);
+      default:
+        casadi_error("Not implemented");
+    }
+    return Function();
+  }
+
+  Function Function::deserialize(const std::string& s) {
+    std::stringstream ss;
+    ss << s;
+    return deserialize(ss);
   }
 
   string Function::fix_name(const string& name) {
@@ -1071,7 +1152,7 @@ namespace casadi {
                        bool always_inline, bool never_inline) const {
     // Get default inputs
     vector<M> arg_v(n_in());
-    for (int i=0; i<arg_v.size(); ++i) {
+    for (casadi_int i=0; i<arg_v.size(); ++i) {
       arg_v[i] = default_in(i);
     }
 
@@ -1086,7 +1167,7 @@ namespace casadi {
 
     // Save to map
     res.clear();
-    for (int i=0; i<res_v.size(); ++i) {
+    for (casadi_int i=0; i<res_v.size(); ++i) {
       res[name_out(i)] = res_v[i];
     }
   }
@@ -1124,29 +1205,55 @@ namespace casadi {
     return call_gen(arg, res, always_inline, never_inline);
   }
 
-  double Function::default_in(int ind) const {
+  double Function::default_in(casadi_int ind) const {
     return (*this)->get_default_in(ind);
   }
 
-  double Function::max_in(int ind) const {
+  double Function::max_in(casadi_int ind) const {
     return (*this)->get_max_in(ind);
   }
 
-  double Function::min_in(int ind) const {
+  double Function::min_in(casadi_int ind) const {
     return (*this)->get_min_in(ind);
   }
 
-  int Function::operator()(const double** arg, double** res, int* iw, double* w, int mem) const {
+#ifdef WITH_EXTRA_CHECKS
+  // Initialize at zero depth
+  thread_local casadi_int Function::call_depth_ = 0;
+#endif // WITH_EXTRA_CHECKS
+
+  int Function::operator()(const double** arg, double** res,
+      casadi_int* iw, double* w, casadi_int mem) const {
     try {
-      return (*this)->eval_gen(arg, res, iw, w, memory(mem));
+#ifdef WITH_EXTRA_CHECKS
+      // Should never happen
+      casadi_assert_dev(call_depth_>=0);
+      call_depth_++;
+      // For consistency check
+      casadi_int depth = call_depth_;
+#endif // WITH_EXTRA_CHECKS
+      int ret = (*this)->eval_gen(arg, res, iw, w, memory(mem));
+#ifdef WITH_EXTRA_CHECKS
+      // Consitency check
+      casadi_assert_dev(call_depth_==depth);
+      call_depth_--;
+#endif // WITH_EXTRA_CHECKS
+      return ret;
     } catch (KeyboardInterruptException& e) {
+#ifdef WITH_EXTRA_CHECKS
+      call_depth_--;
+#endif // WITH_EXTRA_CHECKS
       throw;
     } catch (exception& e) {
+#ifdef WITH_EXTRA_CHECKS
+      call_depth_--;
+#endif // WITH_EXTRA_CHECKS
       THROW_ERROR("operator()", e.what());
     }
   }
 
-  int Function::operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem) const {
+  int Function::operator()(const SXElem** arg, SXElem** res,
+      casadi_int* iw, SXElem* w, casadi_int mem) const {
     try {
       return (*this)->eval_sx(arg, res, iw, w, memory(mem));
     } catch (exception& e) {
@@ -1154,7 +1261,7 @@ namespace casadi {
     }
   }
 
-  const SX Function::sx_in(int ind) const {
+  const SX Function::sx_in(casadi_int ind) const {
     try {
       return (*this)->sx_in(ind);
     } catch (exception& e) {
@@ -1162,7 +1269,7 @@ namespace casadi {
     }
   }
 
-  const SX Function::sx_out(int ind) const {
+  const SX Function::sx_out(casadi_int ind) const {
     try {
       return (*this)->sx_out(ind);
     } catch (exception& e) {
@@ -1186,11 +1293,11 @@ namespace casadi {
     }
   }
 
-  const MX Function::mx_in(int ind) const {
+  const MX Function::mx_in(casadi_int ind) const {
     return (*this)->mx_in(ind);
   }
 
-  const MX Function::mx_out(int ind) const {
+  const MX Function::mx_out(casadi_int ind) const {
     return (*this)->mx_out(ind);
   }
 
@@ -1242,7 +1349,7 @@ namespace casadi {
     }
   }
 
-  int Function::n_instructions() const {
+  casadi_int Function::n_instructions() const {
     try {
       return (*this)->n_instructions();
     } catch (exception& e) {
@@ -1250,7 +1357,7 @@ namespace casadi {
     }
   }
 
-  MX Function::instruction_MX(int k) const {
+  MX Function::instruction_MX(casadi_int k) const {
     try {
       return (*this)->instruction_MX(k);
     } catch (exception& e) {
@@ -1258,7 +1365,7 @@ namespace casadi {
     }
   }
 
-  int Function::instruction_id(int k) const {
+  casadi_int Function::instruction_id(casadi_int k) const {
     try {
       return (*this)->instruction_id(k);
     } catch (exception& e) {
@@ -1266,7 +1373,7 @@ namespace casadi {
     }
   }
 
-  std::vector<int> Function::instruction_input(int k) const {
+  std::vector<casadi_int> Function::instruction_input(casadi_int k) const {
     try {
       return (*this)->instruction_input(k);
     } catch (exception& e) {
@@ -1274,17 +1381,7 @@ namespace casadi {
     }
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  std::pair<int, int> Function::getAtomicInput(int k) const {
-      return (*this)->getAtomicInput(k);
-  }
-
-  int Function::getAtomicOutput(int k) const {
-      return (*this)->getAtomicOutput(k);
-  }
-#endif
-
-  double Function::instruction_constant(int k) const {
+  double Function::instruction_constant(casadi_int k) const {
     try {
       return (*this)->instruction_constant(k);
     } catch (exception& e) {
@@ -1292,7 +1389,7 @@ namespace casadi {
     }
   }
 
-  std::vector<int> Function::instruction_output(int k) const {
+  std::vector<casadi_int> Function::instruction_output(casadi_int k) const {
     try {
       return (*this)->instruction_output(k);
     } catch (exception& e) {
@@ -1300,7 +1397,7 @@ namespace casadi {
     }
   }
 
-  int Function::n_nodes() const {
+  casadi_int Function::n_nodes() const {
     try {
       return (*this)->n_nodes();
     } catch (exception& e) {
@@ -1308,19 +1405,19 @@ namespace casadi {
     }
   }
 
-  int Function::checkout() const {
+  casadi_int Function::checkout() const {
     return (*this)->checkout();
   }
 
-  void Function::release(int mem) const {
+  void Function::release(casadi_int mem) const {
     (*this)->release(mem);
   }
 
-  void* Function::memory(int ind) const {
+  void* Function::memory(casadi_int ind) const {
     return (*this)->memory(ind);
   }
 
-  void Function::assert_size_in(int i, int nrow, int ncol) const {
+  void Function::assert_size_in(casadi_int i, casadi_int nrow, casadi_int ncol) const {
     casadi_assert(size1_in(i)==nrow && size2_in(i)==ncol,
       "Incorrect shape for " + str(*this) + " input " + str(i) + " \""
       + name_in(i) + "\". Expected " + str(nrow) + "-by-" + str(ncol)
@@ -1328,7 +1425,7 @@ namespace casadi {
 
   }
 
-  void Function::assert_size_out(int i, int nrow, int ncol) const {
+  void Function::assert_size_out(casadi_int i, casadi_int nrow, casadi_int ncol) const {
     casadi_assert(size1_out(i)==nrow && size2_out(i)==ncol,
       "Incorrect shape for " + str(*this) + " output " + str(i) + " \""
       + name_out(i) + "\". Expected " + str(nrow) + "-by-" + str(ncol)
@@ -1350,7 +1447,7 @@ namespace casadi {
   }
 
   vector<bool> Function::
-  which_depends(const string& s_in, const vector<string>& s_out, int order, bool tr) const {
+  which_depends(const string& s_in, const vector<string>& s_out, casadi_int order, bool tr) const {
     try {
       return (*this)->which_depends(s_in, s_out, order, tr);
     } catch (exception& e) {

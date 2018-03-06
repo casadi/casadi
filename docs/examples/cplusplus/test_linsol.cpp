@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
 
   // A
   int ncol = 5, nrow = 5;
-  vector<int> colind = {0, 3, 6, 8, 10, 12};
-  vector<int> row = {0, 1, 4, 1, 2, 4, 0, 2, 0, 3, 3, 4};
+  vector<casadi_int> colind = {0, 3, 6, 8, 10, 12};
+  vector<casadi_int> row = {0, 1, 4, 1, 2, 4, 0, 2, 0, 3, 3, 4};
   vector<double> nz = {19, 12, 12, 21, 12, 12, 21, 16, 21, 5, 21, 18};
   DM A(Sparsity(nrow, ncol, colind, row), nz);
 

@@ -61,15 +61,47 @@ namespace casadi {
   *  @{
   */
 
-
   /** \if EXPANDED
   * @copydoc main_rootfinder
   * \endif
   */
   ///@{
+
+  ///@{
+  CASADI_EXPORT Function rootfinder(const std::string& name, const std::string& solver,
+                                    const SXDict& rfp, const Dict& opts=Dict());
+  CASADI_EXPORT Function rootfinder(const std::string& name, const std::string& solver,
+                                    const MXDict& rfp, const Dict& opts=Dict());
   CASADI_EXPORT Function rootfinder(const std::string& name, const std::string& solver,
                                const Function& f, const Dict& opts=Dict());
   ///@}
+
+  /** \brief Get rootfinder input scheme */
+  CASADI_EXPORT std::vector<std::string> rootfinder_in();
+
+  /** \brief Get rootfinder output scheme */
+  CASADI_EXPORT std::vector<std::string> rootfinder_out();
+
+  /** \brief Get rootfinder input scheme name by index */
+  CASADI_EXPORT std::string rootfinder_in(casadi_int ind);
+
+  /** \brief Get rootfinder output scheme name by index */
+  CASADI_EXPORT std::string rootfinder_out(casadi_int ind);
+
+  /** \brief Number of rootfinder inputs */
+  CASADI_EXPORT casadi_int rootfinder_n_in();
+
+  /** \brief Number of rootfinder outputs */
+  CASADI_EXPORT casadi_int rootfinder_n_out();
+
+  /** \brief Get all options for a plugin */
+  CASADI_EXPORT std::vector<std::string> rootfinder_options(const std::string& name);
+
+  /** \brief Get type info for a particular option */
+  CASADI_EXPORT std::string rootfinder_option_type(const std::string& name, const std::string& op);
+
+  /** \brief Get documentation for a particular option */
+  CASADI_EXPORT std::string rootfinder_option_info(const std::string& name, const std::string& op);
 
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_rootfinder(const std::string& name);
@@ -79,8 +111,44 @@ namespace casadi {
 
   /// Get the documentation string for a plugin
   CASADI_EXPORT std::string doc_rootfinder(const std::string& name);
-
   /** @} */
+
+  #ifndef SWIG
+  /// Inputs of the symbolic representation of the rootfinding problem
+  enum RfpIn {
+    RFP_X,
+    RFP_P,
+    RFP_NUM_IN};
+
+  /// Shortnames for DAE symbolic representation inputs
+  const std::vector<std::string> RFP_INPUTS = {"x", "p"};
+
+  /// Inputs of the symbolic representation of the rootfinding problem
+  enum RfpOut {
+    RFP_G,
+    RFP_NUM_OUT};
+
+  /// Shortnames for DAE symbolic representation outputs
+  const std::vector<std::string> RFP_OUTPUTS = {"g"};
+
+  /// Input arguments of a rootfinder
+  enum RootfinderInput {
+    /// Initial guess for the solution
+    ROOTFINDER_X0,
+    /// Parameters
+    ROOTFINDER_P,
+    /// Number of input arguments of a rootfinder
+    ROOTFINDER_NUM_IN
+  };
+
+  /// Output arguments of a rootfinder
+  enum RootfinderOutput {
+    /// Solution to the system of equations
+    ROOTFINDER_X,
+    /// Number of output arguments of a rootfinder
+    ROOTFINDER_NUM_OUT
+  };
+  #endif // SWIG
 
 } // namespace casadi
 

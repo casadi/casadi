@@ -36,14 +36,20 @@ namespace casadi {
 
   /** \brief Integrator memory */
   struct CASADI_EXPORT NlpsolMemory : public OracleMemory {
-    // Inputs
-    const double *x0, *p, *lbx, *ubx, *lbg, *ubg, *lam_x0, *lam_g0;
+    // Bounds, given parameter values
+    const double *lbx, *ubx, *lbg, *ubg, *p;
+
+    // Current primal solution
+    double *x;
+
+    // Current dual solution
+    double *lam_g, *lam_x, *lam_p;
 
     // Outputs
-    double *x, *f, *g, *lam_x, *lam_g, *lam_p;
+    double f, *g;
 
     // number of iterations
-    int n_iter;
+    casadi_int n_iter;
   };
 
   /** \brief NLP solver storage class
@@ -56,37 +62,37 @@ namespace casadi {
   Nlpsol : public OracleFunction, public PluginInterface<Nlpsol> {
   public:
     /// Number of variables
-    int nx_;
+    casadi_int nx_;
 
     /// Number of constraints
-    int ng_;
+    casadi_int ng_;
 
     /// Number of parameters
-    int np_;
+    casadi_int np_;
 
     /// callback function, executed at each iteration
     Function fcallback_;
 
     /// Execute the callback function only after this amount of iterations
-    int callback_step_;
+    casadi_int callback_step_;
 
-    // Evaluation errors are fatal
+    ///@{
+    /** \brief Options */
     bool eval_errors_fatal_;
-
-    // Warn if initial bounds are violated
     bool warn_initial_bounds_;
-
-    // Ignore errors in the iteration callbacks
     bool iteration_callback_ignore_errors_;
-
-    // Calculate multipliers in the base class
     bool calc_multipliers_;
-
-    /// Which variables are discrete?
+    bool calc_lam_x_, calc_lam_p_, calc_f_, calc_g_;
+    bool bound_consistency_;
+    bool no_nlp_grad_;
     std::vector<bool> discrete_;
+    ///@}
 
     // Mixed integer problem?
     bool mi_;
+
+    /// Cache for KKT function
+    mutable WeakRef kkt_;
 
     /// Constructor
     Nlpsol(const std::string& name, const Function& oracle);
@@ -102,14 +108,14 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(int i) override;
-    Sparsity get_sparsity_out(int i) override;
+    Sparsity get_sparsity_in(casadi_int i) override;
+    Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
-    std::string get_name_in(int i) override { return nlpsol_in(i);}
-    std::string get_name_out(int i) override { return nlpsol_out(i);}
+    std::string get_name_in(casadi_int i) override { return nlpsol_in(i);}
+    std::string get_name_out(casadi_int i) override { return nlpsol_out(i);}
     /// @}
 
     ///@{
@@ -137,20 +143,52 @@ namespace casadi {
     virtual void check_inputs(void* mem) const;
 
     /** \brief Get default input value */
-    double get_default_in(int ind) const override { return nlpsol_default_in(ind);}
+    double get_default_in(casadi_int ind) const override { return nlpsol_default_in(ind);}
 
     /// Can discrete variables be treated
     virtual bool integer_support() const { return false;}
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     // Evaluate numerically
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     // Solve the NLP
-    virtual void solve(void* mem) const = 0;
+    virtual int solve(void* mem) const = 0;
+
+    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    bool uses_output() const override {return true;}
+
+    ///@{
+    /** \brief Generate a function that calculates forward mode derivatives */
+    bool has_forward(casadi_int nfwd) const override { return true;}
+    Function get_forward(casadi_int nfwd, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
+
+    ///@{
+    /** \brief Generate a function that calculates reverse mode derivatives */
+    bool has_reverse(casadi_int nadj) const override { return true;}
+    Function get_reverse(casadi_int nadj, const std::string& name,
+                         const std::vector<std::string>& inames,
+                         const std::vector<std::string>& onames,
+                         const Dict& opts) const override;
+    ///@}
+
+    // Call the callback function
+    int callback(void* mem, const double* x, const double* f, const double* g,
+                 const double* lam_x, const double* lam_g, const double* lam_p) const;
+
+    // Get KKT function
+    Function kkt() const;
+
+    // Make sure primal-dual solution is consistent with bounds
+    static void bound_consistency(casadi_int n, double* x, double* lam,
+                                  const double* lbx, const double* ubx);
 
     // Creator function for internal class
     typedef Nlpsol* (*Creator)(const std::string& name, const Function& oracle);

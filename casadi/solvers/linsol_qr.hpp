@@ -39,7 +39,6 @@
 namespace casadi {
   struct CASADI_LINSOL_QR_EXPORT LinsolQrMemory : public LinsolMemory {
     std::vector<double> v, r, beta, w;
-    std::vector<int> iw;
   };
 
   /** \brief \pluginbrief{LinsolInternal,qr}
@@ -79,11 +78,11 @@ namespace casadi {
     int sfact(void* mem, const double* A) const override;
 
     // Solve the linear system
-    int solve(void* mem, const double* A, double* x, int nrhs, bool tr) const override;
+    int solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const override;
 
     /// Generate C code
     void generate(CodeGenerator& g, const std::string& A, const std::string& x,
-                  int nrhs, bool tr) const override;
+                  casadi_int nrhs, bool tr) const override;
 
     // Get name of the plugin
     const char* plugin_name() const override { return "qr";}
@@ -95,7 +94,7 @@ namespace casadi {
     static const std::string meta_doc;
 
     /// Symbolic factorization
-    std::vector<int> parent_, pinv_, leftmost_;
+    std::vector<casadi_int> prinv_, pc_;
     Sparsity sp_v_, sp_r_;
   };
 

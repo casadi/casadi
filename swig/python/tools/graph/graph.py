@@ -256,7 +256,7 @@ class MXConstantArtist(DotArtist):
     graph = self.graph
     sp = s.sparsity()
     row = sp.row()
-    M = s.getMatrixValue()
+    M = s.to_DM()
     col = "#009900"
     if s.nnz() == s.numel() and s.nnz() == 1:
       graph.add_node(pydot.Node(str(self.s.__hash__())+":f0",label=str(M[0,0]),shape='rectangle',color=col))

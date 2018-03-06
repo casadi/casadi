@@ -120,7 +120,7 @@ int main(){
   solvers.push_back({"cvodes", true, Dict()});
   solvers.push_back({"idas", false, Dict()});
   solvers.push_back({"rk", true, Dict()});
-  Dict kinsol_options = {{"linear_solver", "csparse"},{"linear_solver_type", "dense"}};
+  Dict kinsol_options = {{"linear_solver_type", "dense"}};
 
   Dict coll_opts = {{"rootfinder", "kinsol"},
                     {"collocation_scheme", "legendre"},

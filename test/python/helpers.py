@@ -31,6 +31,7 @@ from math import isnan, isinf
 import itertools
 import time
 from contextlib import contextmanager
+from casadi.tools import capture_stdout
 
 import argparse
 import struct
@@ -104,24 +105,6 @@ class Stderr():
 
     def __exit__(self, type, value, traceback):
         sys.stderr = self.stream.stream
-
-import contextlib
-@contextlib.contextmanager
-def capture():
-    import sys
-    try:
-      from cStringIO import StringIO
-    except:
-      from io import StringIO
-    oldout,olderr = sys.stdout, sys.stderr
-    try:
-        out=[StringIO(), StringIO()]
-        sys.stdout,sys.stderr = out
-        yield out
-    finally:
-        sys.stdout,sys.stderr = oldout, olderr
-        out[0] = out[0].getvalue()
-        out[1] = out[1].getvalue()
 
 class FunctionPool:
   def __init__(self):
@@ -359,6 +342,8 @@ class casadiTestCase(unittest.TestCase):
         continue
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
 
+  def checkfunction_light(self,trial,solution,inputs=None,**kwargs):
+    self.checkfunction(trial,solution,inputs,fwd=False,adj=False,jacobian=False,gradient=False,hessian=False,sens_der=False,evals=False,**kwargs)
   def checkfunction(self,trial,solution,inputs=None,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True,allow_nondiff=False):
 
     if isinstance(inputs,dict):
@@ -431,17 +416,17 @@ class casadiTestCase(unittest.TestCase):
         ret = DM(x)
         if ret.numel()>0:
           ret[0,0] = DM(1,1)
-          return ret
+          return ret.sparsity()
         else:
-          return ret
+          return ret.sparsity()
 
       def remove_last(x):
         ret = DM(x)
         if ret.nnz()>0:
           ret[ret.sparsity().row()[-1],ret.sparsity().get_col()[-1]] = DM(1,1)
-          return ret
+          return ret.sparsity()
         else:
-          return x
+          return ret.sparsity()
 
       #spmods = [lambda x: x , remove_first, remove_last]
       spmods = [lambda x: x]
@@ -467,7 +452,8 @@ class casadiTestCase(unittest.TestCase):
           fseeds = [sym("f",spmod(f.sparsity_in(i))) for i in range(f.n_in())]
           aseeds = [sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())]
           inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
-          res = f.call(inputss)
+          res = f.call(inputss,True)
+          #print res, "sp", [i.sparsity().dim(True) for i in fseeds]
           [fwdsens] = forward(res, inputss, [fseeds])
           [adjsens] = reverse(res, inputss, [aseeds])
 
@@ -529,20 +515,26 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def check_codegen(self,F,inputs=None):
+  def check_codegen(self,F,inputs=None, opts=None):
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
-      F.generate(name)
+      if opts is None: opts = {}
+      F.generate(name, opts)
       import subprocess
-      p = subprocess.Popen("gcc -fPIC -shared -Wall -Werror -Wno-unknown-pragmas -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
+      p = subprocess.Popen("gcc -pedantic -std=c89 -fPIC -shared -Wall -Werror -Wextra -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
       F2 = external(F.name(), './' + name + '.so')
 
       Fout = F.call(inputs)
       Fout2 = F2.call(inputs)
 
-      for i in range(F.n_out()):
-        self.checkarray(Fout[i],Fout2[i])
+      if isinstance(inputs, dict):
+        self.assertEqual(F.name_out(), F2.name_out())
+        for k in F.name_out():
+          self.checkarray(Fout[k],Fout2[k])
+      else:
+        for i in range(F.n_out()):
+          self.checkarray(Fout[i],Fout2[i])
 
 
 class run_only(object):

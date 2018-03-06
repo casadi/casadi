@@ -1,7 +1,7 @@
 # TRY TO FIND THE HSL LIBRARY
 
 find_library(HSL_LIB
-    names coinhsl hsl
+    names hsl coinhsl
     HINTS $ENV{HSL})
 
 if(HSL_LIB)

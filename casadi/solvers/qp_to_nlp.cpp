@@ -109,7 +109,7 @@ namespace casadi {
   }
 
   int QpToNlp::
-  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     // Inputs
     const double *h_, *g_, *a_, *lba_, *uba_, *lbx_, *ubx_, *x0_;
     // Outputs
@@ -134,8 +134,8 @@ namespace casadi {
     // Buffers for calling the NLP solver
     const double** arg1 = arg + n_in_;
     double** res1 = res + n_out_;
-    fill_n(arg1, static_cast<int>(NLPSOL_NUM_IN), nullptr);
-    fill_n(res1, static_cast<int>(NLPSOL_NUM_OUT), nullptr);
+    fill_n(arg1, static_cast<casadi_int>(NLPSOL_NUM_IN), nullptr);
+    fill_n(res1, static_cast<casadi_int>(NLPSOL_NUM_OUT), nullptr);
 
     // NLP inputs
     arg1[NLPSOL_X0] = x0_;
@@ -148,7 +148,7 @@ namespace casadi {
     arg1[NLPSOL_P] = w;
 
     // Quadratic term
-    int nh = nnz_in(CONIC_H);
+    casadi_int nh = nnz_in(CONIC_H);
     if (h_) {
       copy_n(h_, nh, w);
     } else {
@@ -157,7 +157,7 @@ namespace casadi {
     w += nh;
 
     // Linear objective term
-    int ng = nnz_in(CONIC_G);
+    casadi_int ng = nnz_in(CONIC_G);
     if (g_) {
       copy_n(g_, ng, w);
     } else {
@@ -166,7 +166,7 @@ namespace casadi {
     w += ng;
 
     // Linear constraints
-    int na = nnz_in(CONIC_A);
+    casadi_int na = nnz_in(CONIC_A);
     if (a_) {
       copy_n(a_, na, w);
     } else {
@@ -182,6 +182,15 @@ namespace casadi {
 
     // Solve the NLP
     return solver_(arg1, res1, iw, w, 0);
+  }
+
+  Dict QpToNlp::get_stats(void* mem) const {
+    Dict stats;
+    Dict solver_stats = solver_.stats();
+    stats["solver_stats"] = solver_stats;
+    stats["success"] = solver_stats["success"];
+
+    return stats;
   }
 
 } // namespace casadi

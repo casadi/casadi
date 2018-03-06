@@ -86,7 +86,7 @@ namespace casadi {
 
     // So that we can pass it on to createParent
     std::vector<MX> inputs;
-    for (int i=0; i<n_in_; ++i) {
+    for (casadi_int i=0; i<n_in_; ++i) {
       if (i!=iin_) {
         stringstream ss;
         ss << "p" << i;
@@ -101,7 +101,7 @@ namespace casadi {
     // NLP constraints
     std::vector< MX > args_call(n_in_);
     args_call[iin_] = u;
-    for (int i=0, i2=0; i<n_in_; ++i)
+    for (casadi_int i=0, i2=0; i<n_in_; ++i)
       if (i!=iin_) args_call[i] = inputs[i2++];
     MX nlp_g = oracle_(args_call).at(iout_);
 
@@ -125,7 +125,7 @@ namespace casadi {
   }
 
   void ImplicitToNlp::set_work(void* mem, const double**& arg, double**& res,
-                        int*& iw, double*& w) const {
+                        casadi_int*& iw, double*& w) const {
       Rootfinder::set_work(mem, arg, res, iw, w);
       auto m = static_cast<ImplicitToNlpMemory*>(mem);
       m->lbx = w; w += n_;
@@ -134,12 +134,12 @@ namespace casadi {
       m->x = w; w += n_;
    }
 
-  void ImplicitToNlp::solve(void* mem) const {
+  int ImplicitToNlp::solve(void* mem) const {
     auto m = static_cast<ImplicitToNlpMemory*>(mem);
 
     // Buffers for calling the NLP solver
-    fill_n(m->arg, static_cast<int>(NLPSOL_NUM_IN), nullptr);
-    fill_n(m->res, static_cast<int>(NLPSOL_NUM_OUT), nullptr);
+    fill_n(m->arg, static_cast<casadi_int>(NLPSOL_NUM_IN), nullptr);
+    fill_n(m->res, static_cast<casadi_int>(NLPSOL_NUM_OUT), nullptr);
 
     // Initial guess
     m->arg[NLPSOL_X] = m->iarg[iin_];
@@ -153,7 +153,7 @@ namespace casadi {
     m->arg[NLPSOL_LBX] = m->lbx;
     fill_n(m->ubx, n_,  std::numeric_limits<double>::infinity());
     m->arg[NLPSOL_UBX] = m->ubx;
-    for (int k=0; k<u_c_.size(); ++k) {
+    for (casadi_int k=0; k<u_c_.size(); ++k) {
       if (u_c_[k] > 0) m->lbx[k] = 0;
       if (u_c_[k] < 0) m->ubx[k] = 0;
     }
@@ -161,9 +161,9 @@ namespace casadi {
     // NLP parameters
     m->arg[NLPSOL_P] = m->p;
     double* pi = m->p;
-    for (int i=0; i<n_in_; ++i) {
+    for (casadi_int i=0; i<n_in_; ++i) {
       if (i!=iin_) {
-        int n = oracle_.nnz_in(i);
+        casadi_int n = oracle_.nnz_in(i);
         casadi_copy(m->iarg[i], n, pi);
         pi += n;
       }
@@ -174,14 +174,13 @@ namespace casadi {
 
     // Solve the NLP
     solver_(m->arg, m->res, m->iw, m->w, 0);
-    m->solver_stats = solver_.stats();
 
     // Get the implicit variable
     casadi_copy(m->x, n_, m->ires[iout_]);
 
     // Check if any auxilary outputs to evaluate
     bool has_aux = false;
-    for (int i=0; i<n_out_; ++i) {
+    for (casadi_int i=0; i<n_out_; ++i) {
       if (i!=iout_ && m->ires[i]) {
         has_aux = true;
         break;
@@ -196,6 +195,12 @@ namespace casadi {
       m->res[iout_] = 0;
       oracle_(m->arg, m->res, m->iw, m->w, 0);
     }
+
+    return 0;
+  }
+
+  Dict ImplicitToNlp::get_stats(void* mem) const {
+    return solver_.stats();
   }
 
 } // namespace casadi

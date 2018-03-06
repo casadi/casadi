@@ -3,6 +3,10 @@ cmake_minimum_required(VERSION 2.8.6)
 casadi_plugin(Conic nlpsol
   qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
 
+# Active-set QP solver
+casadi_plugin(Conic activeset
+    conic_activeset.hpp conic_activeset.cpp conic_activeset_meta.cpp)
+
 # Simple just-in-time compiler, using shell commands
 if(WITH_DL)
   casadi_plugin(Importer shell
@@ -60,6 +64,9 @@ casadi_plugin(Nlpsol scpgen
 
 casadi_plugin(Rootfinder newton
   newton.hpp newton.cpp newton_meta.cpp)
+
+casadi_plugin(Rootfinder fast_newton
+  fast_newton.hpp fast_newton.cpp fast_newton_meta.cpp)
 
 casadi_plugin(Rootfinder nlpsol
   implicit_to_nlp.hpp implicit_to_nlp.cpp implicit_to_nlp_meta.cpp)

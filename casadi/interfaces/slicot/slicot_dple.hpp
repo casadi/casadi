@@ -71,7 +71,7 @@ namespace casadi {
 
     double *VZ, *T, *Z, *X, *Xbar, *nnKa, *nnKb, *eig_real, *eig_imag, *F, *FF, *A, *B;
     double *dwork, *wruntime;
-    int* partition, *iwruntime;
+    casadi_int* partition, *iwruntime;
 
     /// Solvers for low-order Discrete Periodic Sylvester Equations
     std::vector< std::vector< Linsol> > dpse_solvers;
@@ -139,10 +139,10 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     /** \brief  Evaluate numerically */
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -151,9 +151,10 @@ namespace casadi {
 
   private:
     /// Dimension of state-space
-    int n_;
+    casadi_int n_;
 
-    inline int partindex(const SlicotDpleMemory* m, int i, int j, int k, int r, int c) const;
+    inline casadi_int partindex(const SlicotDpleMemory* m, casadi_int i, casadi_int j, casadi_int k,
+                                casadi_int r, casadi_int c) const;
 
     /// Numerical zero, used in periodic Schur form
     double psd_num_zero_;
@@ -164,10 +165,13 @@ namespace casadi {
     /// Options to be passed to linear solver constructor
     Dict linear_solver_options_;
 
+    /// Has the plugin been loaded already?
+    static bool has_loaded_;
+
   };
 
 
-  void slicot_periodic_schur(int n, int K, const double* a,
+  void slicot_periodic_schur(casadi_int n, casadi_int K, const double* a,
                              double* t,  double * z,
                              double* dwork, double* eig_real,
                              double *eig_imag, double num_zero=0);

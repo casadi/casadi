@@ -75,6 +75,17 @@ try:
 except:
   pass
 
+try:
+  load_linsol("qr")
+  lsolvers.append(("qr",{},set()))
+except:
+  pass
+
+try:
+  load_linsol("ldl")
+  lsolvers.append(("ldl",{},{"posdef","symmetry"}))
+except:
+  pass
 
 nsolvers = []
 
@@ -317,7 +328,11 @@ class LinearSolverTests(casadiTestCase):
 
       solution = Function("solution", {"A":A, "B":b, "X":vertcat(*[(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])}, ["A", "B"], ["X"])
 
-      self.checkfunction(relay,solution,inputs=solver_in,jacobian=False,evals=False)
+
+      self.checkfunction(relay,solution,inputs=solver_in)
+
+      if Solver in ["qr","ldl"]:
+        self.check_codegen(relay,inputs=solver_in)
 
   @memory_heavy()
   def test_simple_solve_node(self):
@@ -407,6 +422,7 @@ class LinearSolverTests(casadiTestCase):
 
       ref = np.linalg.solve(A,b)
       for Solver, options, req in lsolvers:
+        if "posdef" in req: continue
         As = MX.sym("A",A.sparsity())
         bs = MX.sym("B",b.sparsity())
         C = solve(A,b,Solver,options)
@@ -422,7 +438,10 @@ class LinearSolverTests(casadiTestCase):
       print(Solver)
       A = self.randDM(n,n,sparsity=0.5)
       b = self.randDM(n,3)
-      if "symmetry" in req:
+      if "posdef" in req:
+        A = mtimes(A.T, A)
+        A = densify(A)
+      elif "symmetry" in req:
         A = A.T+A
         A[Sparsity.diag(n)] =1e-8
         A = densify(A)
@@ -430,7 +449,6 @@ class LinearSolverTests(casadiTestCase):
       As = MX.sym("A",A.sparsity())
       bs = MX.sym("B",b.sparsity())
       C = solve(A,b,Solver,options)
-
       digits = 7 if "ma" in str(Solver) else 10
 
       self.checkarray(mtimes(A,C),b,digits=digits)

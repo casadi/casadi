@@ -116,7 +116,6 @@ for Integrators in (ODE_integrators,DAE_integrators):
     opts = {'tf':tf}
     if MyIntegrator=='collocation':
       opts['rootfinder'] = 'kinsol'
-      opts['rootfinder_options'] = {'linear_solver':'csparse'}
 
     # Integrator
     I = integrator('I', MyIntegrator, dae, opts)

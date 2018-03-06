@@ -81,19 +81,19 @@ namespace casadi {
     std::string sparsity(const Sparsity& sp);
 
     // Add a sparsity pattern, get index
-    int add_sparsity(const Sparsity& sp);
+    casadi_int add_sparsity(const Sparsity& sp);
 
     /** \brief Get the index of an existing sparsity pattern */
-    int get_sparsity(const Sparsity& sp) const;
+    casadi_int get_sparsity(const Sparsity& sp) const;
 
     /** \brief Get or add a constant */
-    int get_constant(const std::vector<double>& v, bool allow_adding=false);
+    casadi_int get_constant(const std::vector<double>& v, bool allow_adding=false);
 
     /** \brief Get or add an integer constant */
-    int get_constant(const std::vector<int>& v, bool allow_adding=false);
+    casadi_int get_constant(const std::vector<casadi_int>& v, bool allow_adding=false);
 
     /** \brief Represent an array constant; adding it when new */
-    std::string constant(const std::vector<int>& v);
+    std::string constant(const std::vector<casadi_int>& v);
 
     /** \brief Represent an array constant; adding it when new */
     std::string constant(const std::vector<double>& v);
@@ -123,6 +123,9 @@ namespace casadi {
     /** \brief Declare a local variable */
     void local(const std::string& name, const std::string& type, const std::string& ref="");
 
+    /** \brief Declare a work vector element */
+    std::string sx_work(casadi_int i);
+
     /** \brief Specify the default value for a local variable */
     void init_local(const std::string& name, const std::string& def);
 
@@ -132,12 +135,16 @@ namespace casadi {
     /** \brief Decrease indentation */
     void unindent() {current_indent_--;}
 
+    /** \brief Avoid stack? */
+    bool avoid_stack() { return avoid_stack_;}
+
     /** \brief Print a constant in a lossless but compact manner */
     static std::string constant(double v);
+    static std::string constant(casadi_int v);
 
     /** \brief Print an intializer */
     static std::string initializer(const std::vector<double>& v);
-    static std::string initializer(const std::vector<int>& v);
+    static std::string initializer(const std::vector<casadi_int>& v);
 
     /** \brief Sanitize source files for codegen */
     std::string sanitize_source(const std::string& src,
@@ -145,22 +152,22 @@ namespace casadi {
                                 bool add_shorthand=true);
 
     /** \brief Codegen inner product */
-    std::string dot(int n, const std::string& x, const std::string& y);
+    std::string dot(casadi_int n, const std::string& x, const std::string& y);
 
     /** \brief Codegen sparse matrix-vector multiplication */
     std::string mv(const std::string& x, const Sparsity& sp_x,
                    const std::string& y, const std::string& z, bool tr);
 
     /** \brief Codegen dense matrix-vector multiplication */
-    std::string mv(const std::string& x, int nrow_x, int ncol_x,
+    std::string mv(const std::string& x, casadi_int nrow_x, casadi_int ncol_x,
                    const std::string& y, const std::string& z, bool tr);
 
     /** \brief Codegen axpy: y += a*x */
-    std::string axpy(int n, const std::string& a,
+    std::string axpy(casadi_int n, const std::string& a,
                      const std::string& x, const std::string& y);
 
     /** \brief Codegen axpy: x *= alpha */
-    std::string scal(int n, const std::string& alpha, const std::string& x);
+    std::string scal(casadi_int n, const std::string& alpha, const std::string& x);
 
     /** \brief Codegen sparse matrix-matrix multiplication */
     std::string mtimes(const std::string& x, const Sparsity& sp_x,
@@ -177,17 +184,18 @@ namespace casadi {
                       const std::string& x, const std::string& y);
 
     /** \brief Multilinear interpolation */
-    std::string interpn(int ndim, const std::string& grid, const std::string& offset,
+    std::string interpn(const std::string& res, casadi_int ndim, const std::string& grid,
+                        const std::string& offset,
                         const std::string& values, const std::string& x,
-                        const std::string& lookup_mode,
+                        const std::string& lookup_mode, casadi_int m,
                         const std::string& iw, const std::string& w);
 
     /** \brief Multilinear interpolation - calculate gradient */
     std::string interpn_grad(const std::string& grad,
-      int ndim, const std::string& grid,
+      casadi_int ndim, const std::string& grid,
       const std::string& offset,
       const std::string& values, const std::string& x,
-      const std::string& lookup_mode,
+      const std::string& lookup_mode, casadi_int m,
       const std::string& iw, const std::string& w);
 
     /** \brief Transpose */
@@ -196,17 +204,28 @@ namespace casadi {
 
     /** \brief QR factorization */
     std::string qr(const std::string& sp, const std::string& A,
-                   const std::string& iw, const std::string& w,
-                   const std::string& sp_v, const std::string& v,
-                   const std::string& sp_r, const std::string& r,
-                   const std::string& beta, const std::string& leftmost,
-                   const std::string& parent, const std::string& pinv);
+                   const std::string& w, const std::string& sp_v,
+                   const std::string& v, const std::string& sp_r,
+                   const std::string& r, const std::string& beta,
+                   const std::string& prinv, const std::string& pc);
 
     /** \brief QR solve */
-    std::string qr_solve(const std::string& x, int nrhs, bool tr,
+    std::string qr_solve(const std::string& x, casadi_int nrhs, bool tr,
                          const std::string& sp_v, const std::string& v,
                          const std::string& sp_r, const std::string& r,
-                         const std::string& beta, const std::string& pinv,
+                         const std::string& beta, const std::string& prinv,
+                         const std::string& pc, const std::string& w);
+
+    /** \brief LDL factorization */
+    std::string ldl(const std::string& sp_a, const std::string& a,
+                   const std::string& sp_lt, const std::string& lt,
+                   const std::string& d, const std::string& p,
+                   const std::string& w);
+
+    /** \brief LDL solve */
+    std::string ldl_solve(const std::string& x, casadi_int nrhs,
+                         const std::string& sp_lt, const std::string& lt,
+                         const std::string& d, const std::string& p,
                          const std::string& w);
 
     /** \brief Declare a function */
@@ -246,7 +265,18 @@ namespace casadi {
       AUX_DE_BOOR,
       AUX_ND_BOOR_EVAL,
       AUX_FINITE_DIFF,
-      AUX_QR
+      AUX_QR,
+      AUX_LDL,
+      AUX_NEWTON,
+      AUX_TO_DOUBLE,
+      AUX_TO_INT,
+      AUX_CAST,
+      AUX_SQ,
+      AUX_SIGN,
+      AUX_IF_ELSE,
+      AUX_PRINTF,
+      AUX_FMIN,
+      AUX_FMAX
     };
 
     /** \brief Add a built-in auxiliary function */
@@ -258,18 +288,18 @@ namespace casadi {
                            const std::vector<Sparsity>& sp_out);
 
     /** Get work vector name from index */
-    std::string work(int n, int sz) const;
+    std::string work(casadi_int n, casadi_int sz) const;
 
     /** Get work vector element from index */
-    std::string workel(int n) const;
+    std::string workel(casadi_int n) const;
 
     /** Declare an array */
-    static std::string array(const std::string& type, const std::string& name, int len,
+    static std::string array(const std::string& type, const std::string& name, casadi_int len,
                              const std::string& def=std::string());
 
-    /** \brief  Print int vector to a c file */
+    /** \brief  Print casadi_int vector to a c file */
     static void print_vector(std::ostream &s, const std::string& name,
-                             const std::vector<int>& v);
+                             const std::vector<casadi_int>& v);
 
     /** \brief  Print real vector to a c file */
     static void print_vector(std::ostream &s, const std::string& name,
@@ -301,6 +331,10 @@ namespace casadi {
     std::string printf(const std::string& str, const std::string& arg1, const std::string& arg2);
     std::string printf(const std::string& str, const std::string& arg1, const std::string& arg2,
                        const std::string& arg3);
+
+    /** \brief Print an operation to a c file */
+    std::string print_op(casadi_int op, const std::string& a0);
+    std::string print_op(casadi_int op, const std::string& a0, const std::string& a1);
   private:
 
     /// Print file header
@@ -312,11 +346,20 @@ namespace casadi {
     // Generate casadi_real definition
     void generate_casadi_real(std::ostream &s) const;
 
+    // Generate casadi_int definition
+    void generate_casadi_int(std::ostream &s) const;
+
     // Generate mex entry point
     void generate_mex(std::ostream &s) const;
 
     // Generate main entry point
     void generate_main(std::ostream &s) const;
+
+    // Generate export symbol macros
+    void generate_export_symbol(std::ostream &s) const;
+
+    // Generate import symbol macros
+    void generate_import_symbol(std::ostream &s) const;
 
     //  private:
   public:
@@ -327,6 +370,9 @@ namespace casadi {
 
     // Real-type used for the codegen
     std::string casadi_real;
+
+    // Int-type used for the codegen
+    std::string casadi_int_type;
 
     // Should we create a memory entry point?
     bool with_mem;
@@ -346,17 +392,23 @@ namespace casadi {
     // Should we generate a main (allowing evaluation from command line)
     bool main;
 
+    // Should we include mayth library?
+    bool include_math;
+
+    // Do we want to be lean on stack usage?
+    bool avoid_stack_;
+
     /** \brief Codegen scalar
      * Use the work vector for storing work vector elements of length 1
      * (typically scalar) instead of using local variables
      */
     bool codegen_scalars;
 
-    // Have a flag for exporting symbols
-    bool with_export;
+    // Have a flag for exporting/importing symbols
+    bool with_export, with_import;
 
     // Prefix symbols in DLLs?
-    std::string dll_export;
+    std::string dll_export, dll_import;
 
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;
@@ -369,8 +421,8 @@ namespace casadi {
     bool newline_;
 
     // Indentation
-    int indent_;
-    int current_indent_;
+    casadi_int indent_;
+    casadi_int current_indent_;
 
     // Names of exposed functions
     std::vector<std::string> exposed_fname;
@@ -399,17 +451,17 @@ namespace casadi {
 
     // Constants
     std::vector<std::vector<double> > double_constants_;
-    std::vector<std::vector<int> > integer_constants_;
+    std::vector<std::vector<casadi_int> > integer_constants_;
 
     // Hash a vector
     static size_t hash(const std::vector<double>& v);
-    static size_t hash(const std::vector<int>& v);
+    static size_t hash(const std::vector<casadi_int>& v);
 
     // Compare two vectors
     template<typename T>
     static bool equal(const std::vector<T>& v1, const std::vector<T>& v2) {
       if (v1.size()!=v2.size()) return false;
-      for (int j=0; j<v1.size(); ++j) {
+      for (casadi_int j=0; j<v1.size(); ++j) {
         if (v1[j]!=v2[j]) return false;
       }
       return true;

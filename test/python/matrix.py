@@ -865,7 +865,6 @@ class Matrixtests(casadiTestCase):
         #  print("ref:")
         #  c_ref.sparsity().spy()
         #  c_ref.print_dense()
-        #  a.sparsity().sanity_check()
         #  a.print_dense()
         #  raise e
 
@@ -1007,6 +1006,24 @@ class Matrixtests(casadiTestCase):
           self.assertTrue(c.nnz()>0)
 
     self.assertTrue(sum2(IM(Sparsity(1,1),1)).nnz()==0)
+
+  def test_matlab_operations(self):
+
+    data = [ np.array([[1,3],[11,17]]) , np.array([[1,3]]) ,np.array([[1],[3]]), np.array([[3]])]
+
+    for A in data:
+      B = reshape(DM(A),A.shape)
+      #self.checkarray(np.cumsum(A),cumsum(B))
+      self.checkarray(np.cumsum(A,0),cumsum(B,0))
+      self.checkarray(np.cumsum(A,1),cumsum(B,1))
+
+      #self.checkarray(np.diff(A),diff(B))
+
+      #self.checkarray(np.diff(A,1),diff(B,1))
+      #self.checkarray(np.diff(A,2),diff(B,2))
+
+      self.checkarray(np.diff(A,1,0),diff(B,1,0))
+      #self.checkarray(np.diff(A,1,1),diff(B,1,1))
 
 if __name__ == '__main__':
     unittest.main()

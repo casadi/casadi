@@ -104,7 +104,7 @@ public:
   * \param[in] m number of columnss (default 1)
   * \param[in] attribute: 'full' (default) or 'symmetric'
   */
-  MX variable(int n=1, int m=1, const std::string& attribute="full");
+  MX variable(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
 
   /** \brief Create a parameter (symbol); fixed during optimization
   *
@@ -116,7 +116,7 @@ public:
   * \param[in] m number of columnss (default 1)
   * \param[in] attribute: 'full' (default) or 'symmetric'
   */
-  MX parameter(int n=1, int m=1, const std::string& attribute="full");
+  MX parameter(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
 
   /** \brief Set objective
   *
@@ -144,6 +144,12 @@ public:
   * opti.subject_to({x*y>=1,x==3})
   * opti.subject_to( 0<=x<=1 )
   * \endverbatim
+  *
+  *
+  * Related functionalities:
+  *  - opti.lbg,opti.g,opti.ubg represent the vector of flattened constraints
+  *  - opti.debug.show_infeasibilities() may be used to inspect which constraints are violated
+  *
   */
   void subject_to(const MX& g);
   void subject_to(const std::vector<MX>& g);
@@ -231,13 +237,13 @@ public:
   MX dual(const MX& m) const;
 
   /// Number of (scalarised) decision variables
-  int nx() const;
+  casadi_int nx() const;
 
   /// Number of (scalarised) parameters
-  int np() const;
+  casadi_int np() const;
 
   /// Number of (scalarised) constraints
-  int ng() const;
+  casadi_int ng() const;
 
   /// Get all (scalarised) decision variables as a symbolic column vector
   MX x() const;
@@ -250,6 +256,10 @@ public:
 
   /// Get objective expression
   MX f() const;
+
+  /// Get all (scalarised) bounds on constraints as a column vector
+  MX lbg() const;
+  MX ubg() const;
 
   /** \brief Get all (scalarised) dual variables as a symbolic column vector
   *
@@ -362,8 +372,8 @@ public:
 
   struct IndexAbstraction {
     IndexAbstraction() : start(0), stop(0) {}
-    int start;
-    int stop;
+    casadi_int start;
+    casadi_int stop;
   };
   struct MetaCon : IndexAbstraction {
     MetaCon() :  n(1), flipped(false) {}
@@ -372,7 +382,7 @@ public:
     ConstraintType type;
     MX lb;
     MX ub;
-    int n;
+    casadi_int n;
     bool flipped;
     MX dual_canon;
     MX dual;
@@ -380,11 +390,11 @@ public:
   };
   struct MetaVar : IndexAbstraction {
     std::string attribute;
-    int n;
-    int m;
+    casadi_int n;
+    casadi_int m;
     VariableType type;
-    int count;
-    int i;
+    casadi_int count;
+    casadi_int i;
     Dict extra;
   };
 
@@ -396,7 +406,7 @@ public:
   OptiCallback(const OptiCallback& obj) {
     casadi_error("Callback objects cannot be copied");
   }
-  virtual void call(int i) {
+  virtual void call(casadi_int i) {
     uout() << "This is a simple callback at iteration" << i << std::endl;
   }
   virtual ~OptiCallback() {}
@@ -449,12 +459,14 @@ public:
   std::vector<MX> active_symvar(VariableType type) const;
   std::vector<DM> active_values(VariableType type) const;
 
-  MX x_lookup(int i) const;
-  MX g_lookup(int i) const;
+  MX x_lookup(casadi_index i) const;
+  MX g_lookup(casadi_index i) const;
 
-  std::string x_describe(int i) const;
-  std::string g_describe(int i) const;
-  std::string describe(const MX& x, int indent=0) const;
+  std::string x_describe(casadi_index i) const;
+  std::string g_describe(casadi_index i) const;
+  std::string describe(const MX& x, casadi_index indent=0) const;
+
+  void show_infeasibilities(double tol=0) const;
 
   void solve_prepare();
   DMDict solve_actual(const DMDict& args);
@@ -488,7 +500,7 @@ public:
   void assert_solved() const;
   void assert_baked() const;
 
-  int instance_number() const;
+  casadi_int instance_number() const;
 
 protected:
   OptiAdvanced() {}

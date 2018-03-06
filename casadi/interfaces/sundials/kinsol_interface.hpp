@@ -100,7 +100,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// Solve the system of equations and calculate derivatives
-    void solve(void* mem) const override;
+    int solve(void* mem) const override;
 
     // Get name of the plugin
     const char* plugin_name() const override { return "kinsol";}
@@ -112,13 +112,13 @@ namespace casadi {
     N_Vector u_scale_, f_scale_;
 
     /// Globalization strategy
-    int strategy_;
+    casadi_int strategy_;
 
     // Should KINSOL internal warning messages be ignored
     bool disable_internal_warnings_;
 
     // Maximum number of iterations
-    int max_iter_;
+    casadi_int max_iter_;
 
     // Use exact Jacobian?
     bool exact_jac_;
@@ -128,10 +128,10 @@ namespace casadi {
     LinsolType linear_solver_type_;
 
     // Bandwidth (for banded solvers)
-    int upper_bandwidth_, lower_bandwidth_;
+    casadi_int upper_bandwidth_, lower_bandwidth_;
 
     // Krylov subspace size (for iterative solvers)
-    int maxl_;
+    casadi_int maxl_;
 
     // Iterative solver
     enum IterativeSolver { GMRES, BCGSTAB, TFQMR};
@@ -166,7 +166,7 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     /** \brief Cast to memory object */
     static KinsolMemory* to_mem(void *mem) {

@@ -148,7 +148,7 @@ namespace casadi {
     alloc(fcn);
   }
 
-  int OracleFunction::
+  casadi_int OracleFunction::
   calc_function(OracleMemory* m, const std::string& fcn,
                 const double* const* arg) const {
     // Is the function monitored?
@@ -167,7 +167,7 @@ namespace casadi {
     FStats& fstats = m->fstats.at(fcn);
 
     // Number of inputs and outputs
-    int n_in = f.n_in(), n_out = f.n_out();
+    casadi_int n_in = f.n_in(), n_out = f.n_out();
 
     // Prepare stats, start timer
     fstats.tic();
@@ -175,19 +175,19 @@ namespace casadi {
     // Input buffers
     if (arg) {
       fill_n(m->arg, n_in, nullptr);
-      for (int i=0; i<n_in; ++i) m->arg[i] = *arg++;
+      for (casadi_int i=0; i<n_in; ++i) m->arg[i] = *arg++;
     }
 
     // Print inputs nonzeros
     if (monitored) {
       std::stringstream s;
       s << fcn << " input nonzeros:\n";
-      for (int i=0; i<n_in; ++i) {
+      for (casadi_int i=0; i<n_in; ++i) {
         s << " " << i << " (" << f.name_in(i) << "): ";
         if (m->arg[i]) {
           // Print nonzeros
           s << "[";
-          for (int k=0; k<f.nnz_in(i); ++k) {
+          for (casadi_int k=0; k<f.nnz_in(i); ++k) {
             if (k!=0) s << ", ";
             s << m->arg[i][k];
           }
@@ -213,12 +213,12 @@ namespace casadi {
     if (monitored) {
       std::stringstream s;
       s << fcn << " output nonzeros:\n";
-      for (int i=0; i<n_out; ++i) {
+      for (casadi_int i=0; i<n_out; ++i) {
         s << " " << i << " (" << f.name_out(i) << "): ";
         if (m->res[i]) {
           // Print nonzeros
           s << "[";
-          for (int k=0; k<f.nnz_out(i); ++k) {
+          for (casadi_int k=0; k<f.nnz_out(i); ++k) {
             if (k!=0) s << ", ";
             s << m->res[i][k];
           }
@@ -232,13 +232,13 @@ namespace casadi {
     }
 
     // Make sure not NaN or Inf
-    for (int i=0; i<n_out; ++i) {
+    for (casadi_int i=0; i<n_out; ++i) {
       if (!m->res[i]) continue;
       if (!all_of(m->res[i], m->res[i]+f.nnz_out(i), [](double v) { return isfinite(v);})) {
         std::stringstream ss;
 
         auto it = find_if(m->res[i], m->res[i]+f.nnz_out(i), [](double v) { return !isfinite(v);});
-        int k = distance(m->res[i], it);
+        casadi_int k = distance(m->res[i], it);
         bool is_nan = isnan(m->res[i][k]);
         ss << name_ << ":" << fcn << " failed: " << (is_nan? "NaN" : "Inf") <<
         " detected for output " << f.name_out(i) << ", at " << f.sparsity_out(i).repr_el(k) << ".";
@@ -297,7 +297,7 @@ namespace casadi {
 
     // Print name with a given length. Format: "%NNs "
     char namefmt[10];
-    sprint(namefmt, sizeof(namefmt), "%%%ds ", static_cast<int>(name_len));
+    sprint(namefmt, sizeof(namefmt), "%%%ds ", static_cast<casadi_int>(name_len));
 
     // Print header
     print(namefmt, "");
@@ -338,7 +338,7 @@ namespace casadi {
   }
 
   void OracleFunction::set_temp(void* mem, const double** arg, double** res,
-                            int* iw, double* w) const {
+                            casadi_int* iw, double* w) const {
     auto m = static_cast<OracleMemory*>(mem);
     m->arg = arg;
     m->res = res;

@@ -96,17 +96,17 @@ namespace casadi {
     bool has_function(const std::string& symname) const;
 
     /** \brief Does an entry exist? */
-    bool has_meta(const std::string& cmd, int ind=-1) const;
+    bool has_meta(const std::string& cmd, casadi_int ind=-1) const;
 
     /** \brief Get entry as a text */
-    std::string get_meta(const std::string& cmd, int ind=-1) const;
+    std::string get_meta(const std::string& cmd, casadi_int ind=-1) const;
 
     /// Get meta information
-    void read_meta(std::istream& file, int& offset);
+    void read_meta(std::istream& file, casadi_int& offset);
 
     /// Get an external function declaration
     void read_external(const std::string& sym, bool inlined,
-                       std::istream& file, int& offset);
+                       std::istream& file, casadi_int& offset);
 
     // Check if a function is inlined
     bool inlined(const std::string& symname) const;
@@ -118,10 +118,10 @@ namespace casadi {
     virtual bool can_have_meta() const { return true;}
 
     /** \brief Get entry as a text */
-    std::string to_text(const std::string& cmd, int ind=-1) const;
+    std::string to_text(const std::string& cmd, casadi_int ind=-1) const;
 
     /** Convert indexed command */
-    static inline std::string indexed(const std::string& cmd, int ind) {
+    static inline std::string indexed(const std::string& cmd, casadi_int ind) {
       std::stringstream ss;
       ss << cmd << "[" << ind << "]";
       return ss.str();
@@ -131,7 +131,7 @@ namespace casadi {
     std::string name_;
 
     /// Meta data
-    std::map<std::string, std::pair<int, std::string> > meta_;
+    std::map<std::string, std::pair<casadi_int, std::string> > meta_;
 
     /// External functions
     std::map<std::string, std::pair<bool, std::string> > external_;

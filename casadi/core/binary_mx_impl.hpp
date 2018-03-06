@@ -68,7 +68,7 @@ namespace casadi {
     casadi_math<MX>::der(op_, dep(0), dep(1), shared_from_this<MX>(), pd);
 
     // Propagate forward seeds
-    for (int d=0; d<fsens.size(); ++d) {
+    for (casadi_int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = pd[0]*fseed[d][0] + pd[1]*fseed[d][1];
     }
   }
@@ -81,9 +81,9 @@ namespace casadi {
     casadi_math<MX>::der(op_, dep(0), dep(1), shared_from_this<MX>(), pd);
 
     // Propagate adjoint seeds
-    for (int d=0; d<aseed.size(); ++d) {
+    for (casadi_int d=0; d<aseed.size(); ++d) {
       MX s = aseed[d][0];
-      for (int c=0; c<2; ++c) {
+      for (casadi_int c=0; c<2; ++c) {
         // Get increment of sensitivity c
         MX t = pd[c]*s;
 
@@ -102,7 +102,7 @@ namespace casadi {
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
   generate(CodeGenerator& g,
-           const std::vector<int>& arg, const std::vector<int>& res) const {
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
     // Quick return if nothing to do
     if (nnz()==0) return;
 
@@ -129,7 +129,7 @@ namespace casadi {
     if (nnz()>1) {
       // Iterate over result
       g.local("rr", "casadi_real", "*");
-      g.local("i", "int");
+      g.local("i", "casadi_int");
       g << "for (i=0, " << "rr=" << g.work(res[0], nnz());
       r = "(*rr++)";
 
@@ -156,27 +156,27 @@ namespace casadi {
     if (inplace) {
       g << casadi_math<double>::sep(op_) << "= " << y;
     } else {
-      g << " = " << casadi_math<double>::print(op_, x, y);
+      g << " = " << g.print_op(op_, x, y);
     }
     g << ";\n";
   }
 
   template<bool ScX, bool ScY>
   int BinaryMX<ScX, ScY>::
-  eval(const double** arg, double** res, int* iw, double* w) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
   }
 
   template<bool ScX, bool ScY>
   int BinaryMX<ScX, ScY>::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const {
+  eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     return eval_gen<SXElem>(arg, res, iw, w);
   }
 
   template<bool ScX, bool ScY>
   template<typename T>
   int BinaryMX<ScX, ScY>::
-  eval_gen(const T* const* arg, T* const* res, int* iw, T* w) const {
+  eval_gen(const T* const* arg, T* const* res, casadi_int* iw, T* w) const {
     // Get data
     T* output0 = res[0];
     const T* input0 = arg[0];
@@ -194,11 +194,11 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   int BinaryMX<ScX, ScY>::
-  sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     const bvec_t *a0=arg[0], *a1=arg[1];
     bvec_t *r=res[0];
-    int n=nnz();
-    for (int i=0; i<n; ++i) {
+    casadi_int n=nnz();
+    for (casadi_int i=0; i<n; ++i) {
       if (ScX && ScY)
         *r++ = *a0 | *a1;
       else if (ScX && !ScY)
@@ -213,10 +213,10 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   int BinaryMX<ScX, ScY>::
-  sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const {
+  sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     bvec_t *a0=arg[0], *a1=arg[1], *r = res[0];
-    int n=nnz();
-    for (int i=0; i<n; ++i) {
+    casadi_int n=nnz();
+    for (casadi_int i=0; i<n; ++i) {
       bvec_t s = *r;
       *r++ = 0;
       if (ScX)
@@ -232,7 +232,7 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  MX BinaryMX<ScX, ScY>::get_unary(int op) const {
+  MX BinaryMX<ScX, ScY>::get_unary(casadi_int op) const {
     //switch (op_) {
     //default: break; // no rule
     //}
@@ -242,7 +242,7 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  MX BinaryMX<ScX, ScY>::_get_binary(int op, const MX& y, bool scX, bool scY) const {
+  MX BinaryMX<ScX, ScY>::_get_binary(casadi_int op, const MX& y, bool scX, bool scY) const {
     if (!GlobalOptions::simplification_on_the_fly) return MXNode::_get_binary(op, y, scX, scY);
 
     switch (op_) {

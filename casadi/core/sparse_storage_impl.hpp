@@ -34,9 +34,9 @@ namespace casadi {
   // Implementations
 
   template<typename DataType>
-  DataType& SparseStorage<DataType>::elem(int rr, int cc) {
-    int oldsize = sparsity().nnz();
-    int ind = sparsity_.add_nz(rr, cc);
+  DataType& SparseStorage<DataType>::elem(casadi_int rr, casadi_int cc) {
+    casadi_int oldsize = sparsity().nnz();
+    casadi_int ind = sparsity_.add_nz(rr, cc);
     if (oldsize != sparsity().nnz())
       nonzeros().insert(nonzeros().begin()+ind, DataType(0));
     return nonzeros().at(ind);
@@ -62,17 +62,17 @@ namespace casadi {
   }
 
   template<typename DataType>
-  void SparseStorage<DataType>::reserve(int nnz) {
+  void SparseStorage<DataType>::reserve(casadi_int nnz) {
     reserve(nnz, sparsity_.size2());
   }
 
   template<typename DataType>
-  void SparseStorage<DataType>::reserve(int nnz, int ncol) {
+  void SparseStorage<DataType>::reserve(casadi_int nnz, casadi_int ncol) {
     nonzeros().reserve(nnz);
   }
 
   template<typename DataType>
-  void SparseStorage<DataType>::resize(int nrow, int ncol) {
+  void SparseStorage<DataType>::resize(casadi_int nrow, casadi_int ncol) {
     sparsity_.resize(nrow, ncol);
   }
 

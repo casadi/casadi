@@ -152,7 +152,7 @@ namespace casadi {
      *
      * The final generated function will have a structure similar to:
      *
-     * int fname(const casadi_real** arg, casadi_real** res, int* iw,
+     * casadi_int fname(const casadi_real** arg, casadi_real** res, casadi_int* iw,
                  casadi_real* w, void* mem) {
      *   const casadi_real *x1, *x2;
      *   casadi_real *r1, *r2;
@@ -198,29 +198,31 @@ namespace casadi {
     /// \endcond
 
     /** \brief Get the number of function inputs */
-    int n_in() const;
+    casadi_int n_in() const;
 
     /** \brief Get the number of function outputs */
-    int n_out() const;
+    casadi_int n_out() const;
 
     ///@{
     /** \brief Get input dimension */
-    int size1_in(int ind) const;
-    int size1_in(const std::string& iname) const {return size1_in(index_in(iname));}
-    int size2_in(int ind) const;
-    int size2_in(const std::string& iname) const {return size2_in(index_in(iname));}
-    std::pair<int, int> size_in(int ind) const;
-    std::pair<int, int> size_in(const std::string& iname) const {return size_in(index_in(iname));}
+    casadi_int size1_in(casadi_int ind) const;
+    casadi_int size1_in(const std::string& iname) const {return size1_in(index_in(iname));}
+    casadi_int size2_in(casadi_int ind) const;
+    casadi_int size2_in(const std::string& iname) const {return size2_in(index_in(iname));}
+    std::pair<casadi_int, casadi_int> size_in(casadi_int ind) const;
+    std::pair<casadi_int, casadi_int> size_in(const std::string& iname) const {
+      return size_in(index_in(iname));
+    }
     ///@}
 
     ///@{
     /** \brief Get output dimension */
-    int size1_out(int ind) const;
-    int size1_out(const std::string& oname) const {return size1_out(index_out(oname));}
-    int size2_out(int ind) const;
-    int size2_out(const std::string& oname) const {return size2_out(index_out(oname));}
-    std::pair<int, int> size_out(int ind) const;
-    std::pair<int, int> size_out(const std::string& oname) const {
+    casadi_int size1_out(casadi_int ind) const;
+    casadi_int size1_out(const std::string& oname) const {return size1_out(index_out(oname));}
+    casadi_int size2_out(casadi_int ind) const;
+    casadi_int size2_out(const std::string& oname) const {return size2_out(index_out(oname));}
+    std::pair<casadi_int, casadi_int> size_out(casadi_int ind) const;
+    std::pair<casadi_int, casadi_int> size_out(const std::string& oname) const {
       return size_out(index_out(oname));
     }
     ///@}
@@ -230,9 +232,9 @@ namespace casadi {
      *
      * For a particular input or for all of the inputs
      */
-    int nnz_in() const;
-    int nnz_in(int ind) const;
-    int nnz_in(const std::string& iname) const {return numel_in(index_in(iname));}
+    casadi_int nnz_in() const;
+    casadi_int nnz_in(casadi_int ind) const;
+    casadi_int nnz_in(const std::string& iname) const {return numel_in(index_in(iname));}
     ///@}
 
     ///@{
@@ -240,9 +242,9 @@ namespace casadi {
      *
      * For a particular output or for all of the outputs
      */
-    int nnz_out() const;
-    int nnz_out(int ind) const;
-    int nnz_out(const std::string& oname) const {return numel_out(index_out(oname));}
+    casadi_int nnz_out() const;
+    casadi_int nnz_out(casadi_int ind) const;
+    casadi_int nnz_out(const std::string& oname) const {return numel_out(index_out(oname));}
     ///@}
 
     ///@{
@@ -250,9 +252,9 @@ namespace casadi {
      *
      * For a particular input or for all of the inputs
      */
-    int numel_in() const;
-    int numel_in(int ind) const;
-    int numel_in(const std::string& iname) const {return numel_in(index_in(iname));}
+    casadi_int numel_in() const;
+    casadi_int numel_in(casadi_int ind) const;
+    casadi_int numel_in(const std::string& iname) const {return numel_in(index_in(iname));}
     ///@}
 
     ///@{
@@ -260,9 +262,9 @@ namespace casadi {
      *
      * For a particular output or for all of the outputs
      */
-    int numel_out() const;
-    int numel_out(int ind) const;
-    int numel_out(const std::string& oname) const {return numel_out(index_out(oname));}
+    casadi_int numel_out() const;
+    casadi_int numel_out(casadi_int ind) const;
+    casadi_int numel_out(const std::string& oname) const {return numel_out(index_out(oname));}
     ///@}
 
     /** \brief Get input scheme */
@@ -272,43 +274,43 @@ namespace casadi {
     const std::vector<std::string>& name_out() const;
 
     /** \brief Get input scheme name by index */
-    const std::string& name_in(int ind) const;
+    const std::string& name_in(casadi_int ind) const;
 
     /** \brief Get output scheme name by index */
-    const std::string& name_out(int ind) const;
+    const std::string& name_out(casadi_int ind) const;
 
     /** \brief Find the index for a string describing a particular entry of an input scheme
      *
      * example:  schemeEntry("x_opt")  -> returns  NLPSOL_X if FunctionInternal adheres to
      * SCHEME_NLPINput
      */
-    int index_in(const std::string &name) const;
+    casadi_int index_in(const std::string &name) const;
 
     /** \brief Find the index for a string describing a particular entry of an output scheme
      *
      * example:  schemeEntry("x_opt")  -> returns  NLPSOL_X if FunctionInternal adheres to
      * SCHEME_NLPINput
      */
-    int index_out(const std::string &name) const;
+    casadi_int index_out(const std::string &name) const;
 
     /** \brief Get default input value */
-    double default_in(int ind) const;
+    double default_in(casadi_int ind) const;
 
     /** \brief Get largest input value */
-    double max_in(int ind) const;
+    double max_in(casadi_int ind) const;
 
     /** \brief Get smallest input value */
-    double min_in(int ind) const;
+    double min_in(casadi_int ind) const;
 
     /** \brief Get sparsity of a given input */
     /// @{
-    const Sparsity& sparsity_in(int ind) const;
+    const Sparsity& sparsity_in(casadi_int ind) const;
     const Sparsity& sparsity_in(const std::string& iname) const;
     /// @}
 
     /** \brief Get sparsity of a given output */
     /// @{
-    const Sparsity& sparsity_out(int ind) const;
+    const Sparsity& sparsity_out(casadi_int ind) const;
     const Sparsity& sparsity_out(const std::string& iname) const;
     /// @}
 
@@ -335,7 +337,7 @@ namespace casadi {
     */
     std::vector<bool> which_depends(const std::string& s_in,
                                     const std::vector<std::string>& s_out,
-                                    int order=1, bool tr=false) const;
+                                    casadi_int order=1, bool tr=false) const;
 
     /** \brief Print dimensions of inputs and outputs */
     void print_dimensions(std::ostream &stream=casadi::uout()) const;
@@ -356,7 +358,7 @@ namespace casadi {
      * Legacy function: To be deprecated in a future version of CasADi.
      * Exists only for compatibility with Function::jacobian pre-CasADi 3.2
      */
-    Function jacobian_old(int iind, int oind) const;
+    Function jacobian_old(casadi_int iind, casadi_int oind) const;
 
     /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
      * \param iind The index of the input
@@ -364,17 +366,27 @@ namespace casadi {
      * Legacy function: To be deprecated in a future version of CasADi.
      * Exists only for compatibility with Function::hessian pre-CasADi 3.2
      */
-    Function hessian_old(int iind, int oind) const;
+    Function hessian_old(casadi_int iind, casadi_int oind) const;
 
     /** \brief Generate a Jacobian function of all the inputs elements with respect to all
      * the output elements).
      */
     Function jacobian() const;
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Alias of Function::jacobian */
-    Function fullJacobian() const {return jacobian();}
-#endif // WITH_DEPRECATED_FEATURES
+    /** \brief Calculate all Jacobian blocks
+      * Generates a function that takes all non-differentiated inputs and outputs
+      * and calculates all Jacobian blocks.
+      * Inputs that are not needed by the routine are all-zero sparse matrices
+      * with the correct dimensions. Output blocks that are not calculated,
+      * e.g. if the corresponding input or output is marked non-differentiated
+      * are also all-zero sparse.
+      * The Jacobian blocks are sorted starting by all the blocks for the first
+      * output, then all the blocks for the second output and so on.
+      * E.g. f:(x,y)->(r,s) results in the function
+      * jac_f:(x,y,r,s)->(dr_dx, dr_dy, ds_dx, ds_dy)
+      * This function is cached.
+      */
+    Function jac() const;
 
     ///@{
     /** \brief Evaluate the function symbolically or numerically  */
@@ -458,18 +470,21 @@ namespace casadi {
     ///@}
 
     /** \brief Evaluate memory-less, numerically */
-    int operator()(const double** arg, double** res, int* iw, double* w, int mem=0) const;
+    int operator()(const double** arg, double** res,
+        casadi_int* iw, double* w, casadi_int mem=0) const;
 
     /** \brief Evaluate memory-less SXElem
         Same syntax as the double version, allowing use in templated code
      */
-    int operator()(const SXElem** arg, SXElem** res, int* iw, SXElem* w, int mem=0) const;
+    int operator()(const SXElem** arg, SXElem** res,
+        casadi_int* iw, SXElem* w, casadi_int mem=0) const;
 
     /** \brief  Propagate sparsity forward */
-    int operator()(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;
+    int operator()(const bvec_t** arg, bvec_t** res,
+        casadi_int* iw, bvec_t* w, casadi_int mem=0) const;
 
     /** \brief  Propagate sparsity backward */
-    int rev(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w, int mem=0) const;
+    int rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, casadi_int mem=0) const;
 
     /** \brief Propagate sparsity backward with temporary memory allocation */
     int rev(std::vector<bvec_t*> arg, std::vector<bvec_t*> res) const;
@@ -523,17 +538,19 @@ namespace casadi {
         Set base to -1 to unroll all the way; no gains in memory efficiency here.
 
     */
-    Function mapaccum(const std::string& name, int n, const Dict& opts = Dict()) const;
-    Function mapaccum(const std::string& name, int n, int n_accum,
+    Function mapaccum(const std::string& name, casadi_int n, const Dict& opts = Dict()) const;
+    Function mapaccum(const std::string& name, casadi_int n, casadi_int n_accum,
                       const Dict& opts = Dict()) const;
-    Function mapaccum(const std::string& name, int n,
-                      const std::vector<int>& accum_in,
-                      const std::vector<int>& accum_out,
+    Function mapaccum(const std::string& name, casadi_int n,
+                      const std::vector<casadi_int>& accum_in,
+                      const std::vector<casadi_int>& accum_out,
                       const Dict& opts=Dict()) const;
-    Function mapaccum(const std::string& name, int n,
+    Function mapaccum(const std::string& name, casadi_int n,
                       const std::vector<std::string>& accum_in,
                       const std::vector<std::string>& accum_out,
                       const Dict& opts=Dict()) const;
+    Function mapaccum(casadi_int n, const Dict& opts = Dict()) const;
+    Function fold(casadi_int n, const Dict& opts = Dict()) const;
     ///@}
 
     /** \brief  Create a mapped version of this function
@@ -560,26 +577,28 @@ namespace casadi {
 
         \param parallelization Type of parallelization used: unroll|serial|openmp
     */
-    Function map(int n, const std::string& parallelization="serial") const;
+    Function map(casadi_int n, const std::string& parallelization="serial") const;
+    Function map(casadi_int n, const std::string& parallelization,
+      casadi_int max_num_threads) const;
 
     ///@{
     /** \brief Map with reduction
       A subset of the inputs are non-repeated and a subset of the outputs summed
       up.
     */
-    Function map(const std::string& name, const std::string& parallelization, int n,
-      const std::vector<int>& reduce_in,
-      const std::vector<int>& reduce_out,
+    Function map(const std::string& name, const std::string& parallelization, casadi_int n,
+      const std::vector<casadi_int>& reduce_in,
+      const std::vector<casadi_int>& reduce_out,
       const Dict& opts=Dict()) const;
-    Function map(const std::string& name, const std::string& parallelization, int n,
+    Function map(const std::string& name, const std::string& parallelization, casadi_int n,
       const std::vector<std::string>& reduce_in,
       const std::vector<std::string>& reduce_out,
       const Dict& opts=Dict()) const;
     ///@}
 
     /** \brief returns a new function with a selection of inputs/outputs of the original */
-    Function slice(const std::string& name, const std::vector<int>& order_in,
-                   const std::vector<int>& order_out, const Dict& opts=Dict()) const;
+    Function slice(const std::string& name, const std::vector<casadi_int>& order_in,
+                   const std::vector<casadi_int>& order_out, const Dict& opts=Dict()) const;
 
     /** \brief Constuct a switch function */
     static Function conditional(const std::string& name, const std::vector<Function>& f,
@@ -591,7 +610,7 @@ namespace casadi {
      */
     static Function bspline(const std::string &name,
       const std::vector< std::vector<double> >& knots, const std::vector<double>& coeffs,
-      const std::vector<int>& degree, int m=1, const Dict& opts=Dict());
+      const std::vector<casadi_int>& degree, casadi_int m=1, const Dict& opts=Dict());
 
     /** \brief Dual BSpline evaluator function
     *
@@ -600,7 +619,8 @@ namespace casadi {
     */
     static Function bspline_dual(const std::string &name,
       const std::vector< std::vector<double> >& knots, const std::vector<double>& x,
-      const std::vector<int>& degree, int m=1, bool reverse=false, const Dict& opts=Dict());
+      const std::vector<casadi_int>& degree, casadi_int m=1,
+      bool reverse=false, const Dict& opts=Dict());
 
     /** \brief Constructor (if-else) */
     static Function if_else(const std::string& name, const Function& f_true,
@@ -621,7 +641,7 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function forward(int nfwd) const;
+    Function forward(casadi_int nfwd) const;
 
     /** \brief Get a function that calculates \a nadj adjoint derivatives
      *
@@ -640,17 +660,17 @@ namespace casadi {
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
-    Function reverse(int nadj) const;
+    Function reverse(casadi_int nadj) const;
 
     ///@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
-    const Sparsity sparsity_jac(int iind, int oind,
+    const Sparsity sparsity_jac(casadi_int iind, casadi_int oind,
                                 bool compact=false, bool symmetric=false) const;
-    const Sparsity sparsity_jac(const std::string &iind, int oind=0,
+    const Sparsity sparsity_jac(const std::string &iind, casadi_int oind=0,
                                 bool compact=false, bool symmetric=false) const {
       return sparsity_jac(index_in(iind), oind, compact, symmetric);
     }
-    const Sparsity sparsity_jac(int iind, const std::string &oind,
+    const Sparsity sparsity_jac(casadi_int iind, const std::string &oind,
                                 bool compact=false, bool symmetric=false) const {
       return sparsity_jac(iind, index_out(oind), compact, symmetric);
     }
@@ -676,6 +696,14 @@ namespace casadi {
     ///@{
     void export_code(const std::string& lang,
       const std::string &fname, const Dict& options=Dict()) const;
+
+#ifndef SWIG
+    /** \brief Serialize */
+    void serialize(std::ostream &stream) const;
+#endif
+
+    /** \brief Serialize */
+    std::string serialize() const;
 
     std::string export_code(const std::string& lang, const Dict& options=Dict()) const;
 #ifndef SWIG
@@ -705,18 +733,18 @@ namespace casadi {
 #endif // SWIG
 
     /// Get all statistics obtained at the end of the last evaluate call
-    Dict stats(int mem=0) const;
+    Dict stats(casadi_int mem=0) const;
 
     ///@{
     /** \brief Get symbolic primitives equivalent to the input expressions
      * There is no guarantee that subsequent calls return unique answers
      */
-    const SX sx_in(int iind) const;
+    const SX sx_in(casadi_int iind) const;
     const SX sx_in(const std::string& iname) const {
       return sx_in(index_in(iname));
     }
     const std::vector<SX> sx_in() const;
-    const MX mx_in(int ind) const;
+    const MX mx_in(casadi_int ind) const;
     const MX mx_in(const std::string & iname) const {
       return mx_in(index_in(iname));
     }
@@ -727,12 +755,12 @@ namespace casadi {
     /** \brief Get symbolic primitives equivalent to the output expressions
     * There is no guarantee that subsequent calls return unique answers
     */
-    const SX sx_out(int oind) const;
+    const SX sx_out(casadi_int oind) const;
     const SX sx_out(const std::string& oname) const {
       return sx_out(index_out(oname));
     }
     const std::vector<SX> sx_out() const;
-    const MX mx_out(int ind) const;
+    const MX mx_out(casadi_int ind) const;
     const MX mx_out(const std::string& oname) const {
       return mx_out(index_out(oname));
     }
@@ -745,13 +773,6 @@ namespace casadi {
     /** \brief Get free variables as a string */
     std::vector<std::string> get_free() const;
 
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Use get_free instead */
-    void print_free(std::ostream &stream=casadi::uout()) const {
-      stream << get_free();
-    }
-#endif // WITH_DEPRECATED_FEATURES
-
     /** \brief Get all the free variables of the function */
     std::vector<SX> free_sx() const;
 
@@ -763,61 +784,33 @@ namespace casadi {
                          Function& SWIG_OUTPUT(vinit_fcn)) const;
 
     /** \brief Number of nodes in the algorithm */
-    int n_nodes() const;
+    casadi_int n_nodes() const;
 
     /** \brief Number of instruction in the algorithm (SXFunction/MXFunction) */
-    int n_instructions() const;
+    casadi_int n_instructions() const;
 
     /** \brief Identifier index of the instruction (SXFunction/MXFunction) */
-    int instruction_id(int k) const;
+    casadi_int instruction_id(casadi_int k) const;
 
     /** \brief Locations in the work vector for the inputs of the instruction
      * (SXFunction/MXFunction) */
-    std::vector<int> instruction_input(int k) const;
+    std::vector<casadi_int> instruction_input(casadi_int k) const;
 
     /** \brief Get the floating point output argument of an instruction (SXFunction) */
-    double instruction_constant(int k) const;
+    double instruction_constant(casadi_int k) const;
 
     /** \brief Location in the work vector for the output of the instruction
      * (SXFunction/MXFunction) */
-    std::vector<int> instruction_output(int k) const;
+    std::vector<casadi_int> instruction_output(casadi_int k) const;
 
-    //SX node_SX(int k) const;
-
-    MX instruction_MX(int k) const;
-
-
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Renamed n_instructions */
-    int getAlgorithmSize() const {return n_instructions();}
-
-    /** \brief [DEPRECATED] Use sz_w instead */
-    int getWorkSize() const {return sz_w();}
-
-    /** \brief [DEPRECATED] Renamed instruction_id */
-    int getAtomicOperation(int k) const {return instruction_id(k);}
-
-    /** \brief [DEPRECATED] Renamed instruction_index */
-    std::pair<int, int> getAtomicInput(int k) const;
-
-    /** \brief [DEPRECATED] Renamed instruction_constant */
-    double getAtomicInputReal(int k) const { return instruction_constant(k);}
-
-    /** \brief [DEPRECATED] Renamed instruction_output */
-    int getAtomicOutput(int k) const;
-#endif // WITH_DEPRECATED_FEATURES
+    /** \brief Get the MX node corresponding to an instruction (MXFunction) */
+    MX instruction_MX(casadi_int k) const;
 
     ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     bool has_spfwd() const;
     bool has_sprev() const;
     ///@}
-
-    /// \cond INTERNAL
-#ifdef WITH_DEPRECATED_FEATURES
-    /** \brief [DEPRECATED] Use has_spfwd, has_sprev */
-    bool spCanEvaluate(bool fwd) const { return fwd ? has_spfwd() : has_sprev();}
-#endif // WITH_DEPRECATED_FEATURES
 
     /** \brief Get required length of arg field */
     size_t sz_arg() const;
@@ -836,13 +829,15 @@ namespace casadi {
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
 
     /** \brief Set the (persistent) work vectors */
-    void set_work(const double**& arg, double**& res, int*& iw, double*& w, int mem=0) const;
+    void set_work(const double**& arg, double**& res,
+      casadi_int*& iw, double*& w, casadi_int mem=0) const;
 
     /** \brief Set the (temporary) work vectors */
-    void set_temp(const double** arg, double** res, int* iw, double* w, int mem=0) const;
+    void set_temp(const double** arg, double** res,
+        casadi_int* iw, double* w, casadi_int mem=0) const;
 
     /** \brief Set the (persistent and temporary) work vectors */
-    void setup(const double** arg, double** res, int* iw, double* w, int mem=0) const;
+    void setup(const double** arg, double** res, casadi_int* iw, double* w, casadi_int mem=0) const;
 
     /** \brief Call using a map */
     template<typename M>
@@ -877,21 +872,27 @@ namespace casadi {
      */
     static std::string fix_name(const std::string& name);
 
+    /** \brief Build function from serialization */
+    static Function deserialize(std::istream& istream);
+
+    /** \brief Build function from serialization */
+    static Function deserialize(const std::string& s);
+
     /// Assert that an input dimension is equal so some given value
-    void assert_size_in(int i, int nrow, int ncol) const;
+    void assert_size_in(casadi_int i, casadi_int nrow, casadi_int ncol) const;
 
     /// Assert that an output dimension is equal so some given value
-    void assert_size_out(int i, int nrow, int ncol) const;
+    void assert_size_out(casadi_int i, casadi_int nrow, casadi_int ncol) const;
 
     /// Checkout a memory object
-    int checkout() const;
+    casadi_int checkout() const;
 
     /// Release a memory object
-    void release(int mem) const;
+    void release(casadi_int mem) const;
 
 #ifndef SWIG
     /// Get memory object
-    void* memory(int ind) const;
+    void* memory(casadi_int ind) const;
 #endif // SWIG
 
     // Get a list of all functions
@@ -905,14 +906,6 @@ namespace casadi {
 
     /** Obtain information about function */
     Dict info() const;
-
-#ifdef WITH_DEPRECATED_FEATURES
-    /** Generate native code in the interfaced language for debugging */
-    void conic_debug(const std::string &filename) const;
-
-    /** Generate native code in the interfaced language for debugging */
-    void conic_debug(std::ostream &file) const;
-#endif // WITH_DEPRECATED_FEATURES
 
 #ifndef SWIG
     protected:
@@ -939,10 +932,19 @@ namespace casadi {
     static bool proceed_to(std::istream& file, const std::string& str);
 
     /// Helper function for mapaccum
-    Function mapaccum(const std::string& name, const std::vector<Function>& chain, int n_accum=1,
-                      const Dict& opts = Dict()) const;
+    Function mapaccum(const std::string& name, const std::vector<Function>& chain,
+                      casadi_int n_accum=1, const Dict& opts = Dict()) const;
+
+#ifdef WITH_EXTRA_CHECKS
+    public:
+    // How many times have we passed through
+    // operator()(const double** arg, double** res, casadi_int* iw, double* w, casadi_int mem)?
+    static thread_local casadi_int call_depth_;
+#endif
+
 
 #endif // SWIG
+
 
 
   };
