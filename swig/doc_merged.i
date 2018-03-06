@@ -37304,6 +37304,12 @@ Examples:
 
 
 
+Related functionalities: opti.lbg,opti.g,opti.ubg represent the vector of
+flattened constraints
+
+opti.debug.show_infeasibilities() may be used to inspect which constraints
+are violated
+
 >  void casadi::Opti::subject_to()
 ------------------------------------------------------------------------
 
@@ -37457,6 +37463,8 @@ Get class name.
 Interpret an expression (for internal use only)
 
 ";
+
+%feature("docstring") casadi::OptiAdvanced::show_infeasibilities "";
 
 %feature("docstring") casadi::OptiAdvanced::get_meta_con "
 
@@ -37675,6 +37683,12 @@ Examples:
   * 
 
 
+
+Related functionalities: opti.lbg,opti.g,opti.ubg represent the vector of
+flattened constraints
+
+opti.debug.show_infeasibilities() may be used to inspect which constraints
+are violated
 
 >  void casadi::Opti::subject_to()
 ------------------------------------------------------------------------

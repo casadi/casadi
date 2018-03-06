@@ -52251,6 +52251,12 @@ Examples:
 
 
 
+Related functionalities: opti.lbg,opti.g,opti.ubg represent the vector of
+flattened constraints
+
+opti.debug.show_infeasibilities() may be used to inspect which constraints
+are violated
+
 ";
 
 %feature("docstring")  casadi::Opti::subject_to(const std::vector< MX > &g)
@@ -52278,6 +52284,12 @@ Examples:
   * 
 
 
+
+Related functionalities: opti.lbg,opti.g,opti.ubg represent the vector of
+flattened constraints
+
+opti.debug.show_infeasibilities() may be used to inspect which constraints
+are violated
 
 ";
 
@@ -52452,6 +52464,11 @@ Interpret an expression (for internal use only)
 
 ";
 
+%feature("docstring")  casadi::OptiAdvanced::show_infeasibilities(double
+tol=0) const  "
+
+";
+
 %feature("docstring")  casadi::OptiAdvanced::get_meta_con(const MX &m) const
 "
 
@@ -52487,7 +52504,8 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring")  casadi::OptiAdvanced::x_lookup(casadi_int i) const  "
+%feature("docstring")  casadi::OptiAdvanced::x_lookup(casadi_index i) const
+"
 
 ";
 
@@ -52499,7 +52517,7 @@ Print representation.
 ";
 
 %feature("docstring")  casadi::OptiAdvanced::describe(const MX &x,
-casadi_int indent=0) const  "
+casadi_index indent=0) const  "
 
 ";
 
@@ -52535,8 +52553,8 @@ attribute:  'full' (default) or 'symmetric'
 
 ";
 
-%feature("docstring")  casadi::OptiAdvanced::g_describe(casadi_int i) const
-"
+%feature("docstring")  casadi::OptiAdvanced::g_describe(casadi_index i)
+const  "
 
 ";
 
@@ -52762,6 +52780,12 @@ Examples:
 
 
 
+Related functionalities: opti.lbg,opti.g,opti.ubg represent the vector of
+flattened constraints
+
+opti.debug.show_infeasibilities() may be used to inspect which constraints
+are violated
+
 ";
 
 %feature("docstring")  casadi::Opti::subject_to(const std::vector< MX > &g)
@@ -52789,6 +52813,12 @@ Examples:
   * 
 
 
+
+Related functionalities: opti.lbg,opti.g,opti.ubg represent the vector of
+flattened constraints
+
+opti.debug.show_infeasibilities() may be used to inspect which constraints
+are violated
 
 ";
 
@@ -52923,8 +52953,8 @@ type) const  "
 
 ";
 
-%feature("docstring")  casadi::OptiAdvanced::x_describe(casadi_int i) const
-"
+%feature("docstring")  casadi::OptiAdvanced::x_describe(casadi_index i)
+const  "
 
 ";
 
@@ -52993,7 +53023,8 @@ variables
 
 ";
 
-%feature("docstring")  casadi::OptiAdvanced::g_lookup(casadi_int i) const  "
+%feature("docstring")  casadi::OptiAdvanced::g_lookup(casadi_index i) const
+"
 
 ";
 
