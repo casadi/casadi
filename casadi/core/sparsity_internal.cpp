@@ -26,6 +26,7 @@
 
 #include "sparsity_internal.hpp"
 #include "casadi_misc.hpp"
+#include "global_options.hpp"
 #include <climits>
 #include <cstdlib>
 #include <cmath>
@@ -1704,13 +1705,14 @@ namespace casadi {
   }
 
   std::string SparsityInternal::repr_el(casadi_int k) const {
+    casadi_int start_index = GlobalOptions::start_index;
     std::stringstream ss;
     if (numel()!=nnz()) {
-      ss << "nonzero index " << k << " ";
+      ss << "nonzero index " << k+start_index << " ";
     }
     casadi_int r = row()[k];
     casadi_int c = get_col()[k];
-    ss << "(row " << r << ", col " << c << ")";
+    ss << "(row " << r+start_index << ", col " << c+start_index << ")";
 
     return ss.str();
   }

@@ -64,6 +64,8 @@ namespace casadi {
 
       static casadi_int max_num_dir;
 
+      static casadi_int start_index;
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }

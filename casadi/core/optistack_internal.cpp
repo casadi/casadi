@@ -25,6 +25,7 @@
 #include "optistack_internal.hpp"
 #include "nlpsol.hpp"
 #include "function_internal.hpp"
+#include "global_options.hpp"
 
 using namespace std;
 namespace casadi {
@@ -190,18 +191,20 @@ std::string OptiNode::describe(const MX& expr, casadi_int indent) const {
 std::string OptiNode::g_describe(casadi_int i) const {
   if (problem_dirty()) return baked_copy().g_describe(i);
   MX expr = g_lookup(i);
-  casadi_int local_i = i-meta_con(expr).start;
+  casadi_int local_i = i-meta_con(expr).start + GlobalOptions::start_index;
   std::string description = describe(expr);
-  description += "\nAt nonzero " + str(local_i) + ".";
+  if (expr.numel()>1)
+    description += "\nAt nonzero " + str(local_i) + ".";
   return description;
 }
 
 std::string OptiNode::x_describe(casadi_int i) const {
   if (problem_dirty()) return baked_copy().x_describe(i);
   MX symbol = x_lookup(i);
-  casadi_int local_i = i-meta(symbol).start;
+  casadi_int local_i = i-meta(symbol).start + GlobalOptions::start_index;
   std::string description = describe(symbol);
-  description += "\nAt nonzero " + str(local_i) + ".";
+  if (symbol.numel()>1)
+    description += "\nAt nonzero " + str(local_i) + ".";
   return description;
 }
 

@@ -151,6 +151,9 @@
   // Set library path
   casadi::GlobalOptions::setCasadiPath(path);
 
+  // Matlab is index-one based
+  casadi::GlobalOptions::start_index = 1;
+
   // @jgillis: please document
   mxArray *warning_rhs[] = {mxCreateString("error"),
 
@@ -2271,6 +2274,7 @@ namespace std {
 #ifdef SWIGMATLAB
 %typemap(in, doc="index", noblock=1) casadi_index {
   if (!casadi::to_val($input, &$1)) SWIG_exception_fail(SWIG_TypeError,"Failed to convert input $argnum to type ' index '.");
+  if ($1==0) SWIG_exception_fail(SWIG_TypeError,"Index starts at 1, got index '0'.");
   if ($1>=1) $1--;
 }
 #endif
