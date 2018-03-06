@@ -161,8 +161,8 @@ std::string OptiNode::describe(const MX& expr, casadi_int indent) const {
     }
   } else {
     if (has_con(expr)) {
-      std::string description = "Opti constraint of shape " + expr.dim();
-      const Dict& extra = meta(expr).extra;
+      description = "Opti constraint of shape " + expr.dim();
+      const Dict& extra = meta_con(expr).extra;
       auto it = extra.find("stacktrace");
       if (it!=extra.end()) {
         const Dict& stacktrace = it->second.as_dict();
