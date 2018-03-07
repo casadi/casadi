@@ -32,6 +32,28 @@
 using namespace std;
 
 namespace casadi {
+
+  int to_int(casadi_int rhs) {
+    casadi_assert(rhs<=std::numeric_limits<int>::max(), "Integer overflow detected.");
+    casadi_assert(rhs>=std::numeric_limits<int>::min(), "Integer overflow detected.");
+    return rhs;
+  }
+
+  std::vector<int> to_int(const std::vector<casadi_int>& rhs) {
+    std::vector<int> ret;
+    ret.reserve(rhs.size());
+    for (casadi_int e : rhs) ret.push_back(to_int(e));
+    return ret;
+  }
+
+  std::vector< std::vector<int> > to_int(
+      const std::vector< std::vector<casadi_int> >& rhs) {
+    std::vector< std::vector<int> > ret;
+    ret.reserve(rhs.size());
+    for (const std::vector<casadi_int>& e : rhs) ret.push_back(to_int(e));
+    return ret;
+  }
+
   bool all(const std::vector<bool>& v) {
     for (auto && e : v) {
       if (!e) return false;
