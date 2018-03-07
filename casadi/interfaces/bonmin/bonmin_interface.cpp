@@ -283,6 +283,27 @@ namespace casadi {
   }
 
   int BonminInterface::init_mem(void* mem) const {
+
+    auto m = static_cast<BonminMemory*>(mem);
+    m->sos_info.num = sos_num_;
+    m->sos_info.numNz = sos_num_nz_;
+    // sos_info takes ownership of passed-in pointers
+    m->sos_info.types = new char[sos_num_];
+    m->sos_info.priorities = new int[sos_num_];
+    m->sos_info.starts = new int[sos_num_ + 1];
+    m->sos_info.indices = new int[sos_num_nz_];
+    m->sos_info.weights = new double[sos_num_nz_];
+    casadi_assert_dev(sos_num_==sos1_types_.size());
+    casadi_assert_dev(sos_num_==sos1_priorities_.size());
+    casadi_assert_dev(sos_num_+1==sos1_starts_.size());
+    casadi_assert_dev(sos_num_nz_==sos1_indices_.size());
+    casadi_assert_dev(sos_num_nz_==sos1_weights_.size());
+    std::copy(sos1_types_.begin(), sos1_types_.end(), m->sos_info.types);
+    std::copy(sos1_priorities_.begin(), sos1_priorities_.end(), m->sos_info.priorities);
+    std::copy(sos1_starts_.begin(), sos1_starts_.end(), m->sos_info.starts);
+    std::copy(sos1_indices_.begin(), sos1_indices_.end(), m->sos_info.indices);
+    std::copy(sos1_weights_.begin(), sos1_weights_.end(), m->sos_info.weights);
+
     return Nlpsol::init_mem(mem);
   }
 
@@ -560,24 +581,6 @@ namespace casadi {
   }
 
   const TMINLP::SosInfo& BonminInterface::sosConstraints(BonminMemory* m) const {
-    m->sos_info.num = sos_num_;
-    m->sos_info.numNz = sos_num_nz_;
-    // sos_info takes ownership of passed-in pointers
-    m->sos_info.types = new char[sos_num_];
-    m->sos_info.priorities = new int[sos_num_];
-    m->sos_info.starts = new int[sos_num_ + 1];
-    m->sos_info.indices = new int[sos_num_nz_];
-    m->sos_info.weights = new double[sos_num_nz_];
-    casadi_assert_dev(sos_num_==sos1_types_.size());
-    casadi_assert_dev(sos_num_==sos1_priorities_.size());
-    casadi_assert_dev(sos_num_+1==sos1_starts_.size());
-    casadi_assert_dev(sos_num_nz_==sos1_indices_.size());
-    casadi_assert_dev(sos_num_nz_==sos1_weights_.size());
-    std::copy(sos1_types_.begin(), sos1_types_.end(), m->sos_info.types);
-    std::copy(sos1_priorities_.begin(), sos1_priorities_.end(), m->sos_info.priorities);
-    std::copy(sos1_starts_.begin(), sos1_starts_.end(), m->sos_info.starts);
-    std::copy(sos1_indices_.begin(), sos1_indices_.end(), m->sos_info.indices);
-    std::copy(sos1_weights_.begin(), sos1_weights_.end(), m->sos_info.weights);
     return m->sos_info;
   }
 
