@@ -2528,192 +2528,215 @@ an oracle function
 
 >List of available options
 
-+-------------------+---------------+-------------------+------------------+
-|        Id         |     Type      |    Description    |     Used in      |
-+===================+===============+===================+==================+
-| bonmin            | OT_DICT       | Options to be     | casadi::BonMinMe |
-|                   |               | passed to BONMIN  | ssageHandler     |
-+-------------------+---------------+-------------------+------------------+
-| bound_consistency | OT_BOOL       | Ensure that       | casadi::Nlpsol   |
-|                   |               | primal-dual       |                  |
-|                   |               | solution is       |                  |
-|                   |               | consistent with   |                  |
-|                   |               | the bounds        |                  |
-+-------------------+---------------+-------------------+------------------+
-| calc_f            | OT_BOOL       | Calculate 'f' in  | casadi::Nlpsol   |
-|                   |               | the Nlpsol base   |                  |
-|                   |               | class             |                  |
-+-------------------+---------------+-------------------+------------------+
-| calc_g            | OT_BOOL       | Calculate 'g' in  | casadi::Nlpsol   |
-|                   |               | the Nlpsol base   |                  |
-|                   |               | class             |                  |
-+-------------------+---------------+-------------------+------------------+
-| calc_lam_p        | OT_BOOL       | Calculate 'lam_p' | casadi::Nlpsol   |
-|                   |               | in the Nlpsol     |                  |
-|                   |               | base class        |                  |
-+-------------------+---------------+-------------------+------------------+
-| calc_lam_x        | OT_BOOL       | Calculate 'lam_x' | casadi::Nlpsol   |
-|                   |               | in the Nlpsol     |                  |
-|                   |               | base class        |                  |
-+-------------------+---------------+-------------------+------------------+
-| calc_multipliers  | OT_BOOL       | Calculate         | casadi::Nlpsol   |
-|                   |               | Lagrange          |                  |
-|                   |               | multipliers in    |                  |
-|                   |               | the Nlpsol base   |                  |
-|                   |               | class             |                  |
-+-------------------+---------------+-------------------+------------------+
-| con_integer_md    | OT_DICT       | Integer metadata  | casadi::BonMinMe |
-|                   |               | (a dictionary     | ssageHandler     |
-|                   |               | with lists of     |                  |
-|                   |               | integers) about   |                  |
-|                   |               | constraints to be |                  |
-|                   |               | passed to BONMIN  |                  |
-+-------------------+---------------+-------------------+------------------+
-| con_numeric_md    | OT_DICT       | Numeric metadata  | casadi::BonMinMe |
-|                   |               | (a dictionary     | ssageHandler     |
-|                   |               | with lists of     |                  |
-|                   |               | reals) about      |                  |
-|                   |               | constraints to be |                  |
-|                   |               | passed to BONMIN  |                  |
-+-------------------+---------------+-------------------+------------------+
-| con_string_md     | OT_DICT       | String metadata   | casadi::BonMinMe |
-|                   |               | (a dictionary     | ssageHandler     |
-|                   |               | with lists of     |                  |
-|                   |               | strings) about    |                  |
-|                   |               | constraints to be |                  |
-|                   |               | passed to BONMIN  |                  |
-+-------------------+---------------+-------------------+------------------+
-| discrete          | OT_BOOLVECTOR | Indicates which   | casadi::Nlpsol   |
-|                   |               | of the variables  |                  |
-|                   |               | are discrete,     |                  |
-|                   |               | i.e. integer-     |                  |
-|                   |               | valued            |                  |
-+-------------------+---------------+-------------------+------------------+
-| eval_errors_fatal | OT_BOOL       | When errors occur | casadi::Nlpsol   |
-|                   |               | during evaluation |                  |
-|                   |               | of f,g,...,stop   |                  |
-|                   |               | the iterations    |                  |
-+-------------------+---------------+-------------------+------------------+
-| expand            | OT_BOOL       | Replace MX with   | casadi::Nlpsol   |
-|                   |               | SX expressions in |                  |
-|                   |               | problem           |                  |
-|                   |               | formulation       |                  |
-|                   |               | [false]           |                  |
-+-------------------+---------------+-------------------+------------------+
-| grad_f            | OT_FUNCTION   | Function for      | casadi::BonMinMe |
-|                   |               | calculating the   | ssageHandler     |
-|                   |               | gradient of the   |                  |
-|                   |               | objective         |                  |
-|                   |               | (column,          |                  |
-|                   |               | autogenerated by  |                  |
-|                   |               | default)          |                  |
-+-------------------+---------------+-------------------+------------------+
-| grad_f_options    | OT_DICT       | Options for the   | casadi::BonMinMe |
-|                   |               | autogenerated     | ssageHandler     |
-|                   |               | gradient of the   |                  |
-|                   |               | objective.        |                  |
-+-------------------+---------------+-------------------+------------------+
-| hess_lag          | OT_FUNCTION   | Function for      | casadi::BonMinMe |
-|                   |               | calculating the   | ssageHandler     |
-|                   |               | Hessian of the    |                  |
-|                   |               | Lagrangian        |                  |
-|                   |               | (autogenerated by |                  |
-|                   |               | default)          |                  |
-+-------------------+---------------+-------------------+------------------+
-| hess_lag_options  | OT_DICT       | Options for the   | casadi::BonMinMe |
-|                   |               | autogenerated     | ssageHandler     |
-|                   |               | Hessian of the    |                  |
-|                   |               | Lagrangian.       |                  |
-+-------------------+---------------+-------------------+------------------+
-| ignore_check_vec  | OT_BOOL       | If set to true,   | casadi::Nlpsol   |
-|                   |               | the input shape   |                  |
-|                   |               | of F will not be  |                  |
-|                   |               | checked.          |                  |
-+-------------------+---------------+-------------------+------------------+
-| iteration_callbac | OT_FUNCTION   | A function that   | casadi::Nlpsol   |
-| k                 |               | will be called at |                  |
-|                   |               | each iteration    |                  |
-|                   |               | with the solver   |                  |
-|                   |               | as input. Check   |                  |
-|                   |               | documentation of  |                  |
-|                   |               | Callback .        |                  |
-+-------------------+---------------+-------------------+------------------+
-| iteration_callbac | OT_BOOL       | If set to true,   | casadi::Nlpsol   |
-| k_ignore_errors   |               | errors thrown by  |                  |
-|                   |               | iteration_callbac |                  |
-|                   |               | k will be         |                  |
-|                   |               | ignored.          |                  |
-+-------------------+---------------+-------------------+------------------+
-| iteration_callbac | OT_INT        | Only call the     | casadi::Nlpsol   |
-| k_step            |               | callback function |                  |
-|                   |               | every few         |                  |
-|                   |               | iterations.       |                  |
-+-------------------+---------------+-------------------+------------------+
-| jac_g             | OT_FUNCTION   | Function for      | casadi::BonMinMe |
-|                   |               | calculating the   | ssageHandler     |
-|                   |               | Jacobian of the   |                  |
-|                   |               | constraints       |                  |
-|                   |               | (autogenerated by |                  |
-|                   |               | default)          |                  |
-+-------------------+---------------+-------------------+------------------+
-| jac_g_options     | OT_DICT       | Options for the   | casadi::BonMinMe |
-|                   |               | autogenerated     | ssageHandler     |
-|                   |               | Jacobian of the   |                  |
-|                   |               | constraints.      |                  |
-+-------------------+---------------+-------------------+------------------+
-| no_nlp_grad       | OT_BOOL       | Prevent the       | casadi::Nlpsol   |
-|                   |               | creation of the   |                  |
-|                   |               | 'nlp_grad'        |                  |
-|                   |               | function          |                  |
-+-------------------+---------------+-------------------+------------------+
-| oracle_options    | OT_DICT       | Options to be     | casadi::Nlpsol   |
-|                   |               | passed to the     |                  |
-|                   |               | oracle function   |                  |
-+-------------------+---------------+-------------------+------------------+
-| pass_nonlinear_co | OT_BOOL       | Pass list of      | casadi::BonMinMe |
-| nstraints         |               | constraints       | ssageHandler     |
-|                   |               | entering          |                  |
-|                   |               | nonlinearly to    |                  |
-|                   |               | BONMIN            |                  |
-+-------------------+---------------+-------------------+------------------+
-| pass_nonlinear_va | OT_BOOL       | Pass list of      | casadi::BonMinMe |
-| riables           |               | variables         | ssageHandler     |
-|                   |               | entering          |                  |
-|                   |               | nonlinearly to    |                  |
-|                   |               | BONMIN            |                  |
-+-------------------+---------------+-------------------+------------------+
-| var_integer_md    | OT_DICT       | Integer metadata  | casadi::BonMinMe |
-|                   |               | (a dictionary     | ssageHandler     |
-|                   |               | with lists of     |                  |
-|                   |               | integers) about   |                  |
-|                   |               | variables to be   |                  |
-|                   |               | passed to BONMIN  |                  |
-+-------------------+---------------+-------------------+------------------+
-| var_numeric_md    | OT_DICT       | Numeric metadata  | casadi::BonMinMe |
-|                   |               | (a dictionary     | ssageHandler     |
-|                   |               | with lists of     |                  |
-|                   |               | reals) about      |                  |
-|                   |               | variables to be   |                  |
-|                   |               | passed to BONMIN  |                  |
-+-------------------+---------------+-------------------+------------------+
-| var_string_md     | OT_DICT       | String metadata   | casadi::BonMinMe |
-|                   |               | (a dictionary     | ssageHandler     |
-|                   |               | with lists of     |                  |
-|                   |               | strings) about    |                  |
-|                   |               | variables to be   |                  |
-|                   |               | passed to BONMIN  |                  |
-+-------------------+---------------+-------------------+------------------+
-| verbose_init      | OT_BOOL       | Print out timing  | casadi::Nlpsol   |
-|                   |               | information about |                  |
-|                   |               | the different     |                  |
-|                   |               | stages of         |                  |
-|                   |               | initialization    |                  |
-+-------------------+---------------+-------------------+------------------+
-| warn_initial_boun | OT_BOOL       | Warn if the       | casadi::Nlpsol   |
-| ds                |               | initial guess     |                  |
-|                   |               | does not satisfy  |                  |
-|                   |               | LBX and UBX       |                  |
-+-------------------+---------------+-------------------+------------------+
++------------------+------------------+------------------+-----------------+
+|        Id        |       Type       |   Description    |     Used in     |
++==================+==================+==================+=================+
+| bonmin           | OT_DICT          | Options to be    | casadi::BonMinM |
+|                  |                  | passed to BONMIN | essageHandler   |
++------------------+------------------+------------------+-----------------+
+| bound_consistenc | OT_BOOL          | Ensure that      | casadi::Nlpsol  |
+| y                |                  | primal-dual      |                 |
+|                  |                  | solution is      |                 |
+|                  |                  | consistent with  |                 |
+|                  |                  | the bounds       |                 |
++------------------+------------------+------------------+-----------------+
+| calc_f           | OT_BOOL          | Calculate 'f' in | casadi::Nlpsol  |
+|                  |                  | the Nlpsol base  |                 |
+|                  |                  | class            |                 |
++------------------+------------------+------------------+-----------------+
+| calc_g           | OT_BOOL          | Calculate 'g' in | casadi::Nlpsol  |
+|                  |                  | the Nlpsol base  |                 |
+|                  |                  | class            |                 |
++------------------+------------------+------------------+-----------------+
+| calc_lam_p       | OT_BOOL          | Calculate        | casadi::Nlpsol  |
+|                  |                  | 'lam_p' in the   |                 |
+|                  |                  | Nlpsol base      |                 |
+|                  |                  | class            |                 |
++------------------+------------------+------------------+-----------------+
+| calc_lam_x       | OT_BOOL          | Calculate        | casadi::Nlpsol  |
+|                  |                  | 'lam_x' in the   |                 |
+|                  |                  | Nlpsol base      |                 |
+|                  |                  | class            |                 |
++------------------+------------------+------------------+-----------------+
+| calc_multipliers | OT_BOOL          | Calculate        | casadi::Nlpsol  |
+|                  |                  | Lagrange         |                 |
+|                  |                  | multipliers in   |                 |
+|                  |                  | the Nlpsol base  |                 |
+|                  |                  | class            |                 |
++------------------+------------------+------------------+-----------------+
+| con_integer_md   | OT_DICT          | Integer metadata | casadi::BonMinM |
+|                  |                  | (a dictionary    | essageHandler   |
+|                  |                  | with lists of    |                 |
+|                  |                  | integers) about  |                 |
+|                  |                  | constraints to   |                 |
+|                  |                  | be passed to     |                 |
+|                  |                  | BONMIN           |                 |
++------------------+------------------+------------------+-----------------+
+| con_numeric_md   | OT_DICT          | Numeric metadata | casadi::BonMinM |
+|                  |                  | (a dictionary    | essageHandler   |
+|                  |                  | with lists of    |                 |
+|                  |                  | reals) about     |                 |
+|                  |                  | constraints to   |                 |
+|                  |                  | be passed to     |                 |
+|                  |                  | BONMIN           |                 |
++------------------+------------------+------------------+-----------------+
+| con_string_md    | OT_DICT          | String metadata  | casadi::BonMinM |
+|                  |                  | (a dictionary    | essageHandler   |
+|                  |                  | with lists of    |                 |
+|                  |                  | strings) about   |                 |
+|                  |                  | constraints to   |                 |
+|                  |                  | be passed to     |                 |
+|                  |                  | BONMIN           |                 |
++------------------+------------------+------------------+-----------------+
+| discrete         | OT_BOOLVECTOR    | Indicates which  | casadi::Nlpsol  |
+|                  |                  | of the variables |                 |
+|                  |                  | are discrete,    |                 |
+|                  |                  | i.e. integer-    |                 |
+|                  |                  | valued           |                 |
++------------------+------------------+------------------+-----------------+
+| eval_errors_fata | OT_BOOL          | When errors      | casadi::Nlpsol  |
+| l                |                  | occur during     |                 |
+|                  |                  | evaluation of    |                 |
+|                  |                  | f,g,...,stop the |                 |
+|                  |                  | iterations       |                 |
++------------------+------------------+------------------+-----------------+
+| expand           | OT_BOOL          | Replace MX with  | casadi::Nlpsol  |
+|                  |                  | SX expressions   |                 |
+|                  |                  | in problem       |                 |
+|                  |                  | formulation      |                 |
+|                  |                  | [false]          |                 |
++------------------+------------------+------------------+-----------------+
+| grad_f           | OT_FUNCTION      | Function for     | casadi::BonMinM |
+|                  |                  | calculating the  | essageHandler   |
+|                  |                  | gradient of the  |                 |
+|                  |                  | objective        |                 |
+|                  |                  | (column,         |                 |
+|                  |                  | autogenerated by |                 |
+|                  |                  | default)         |                 |
++------------------+------------------+------------------+-----------------+
+| grad_f_options   | OT_DICT          | Options for the  | casadi::BonMinM |
+|                  |                  | autogenerated    | essageHandler   |
+|                  |                  | gradient of the  |                 |
+|                  |                  | objective.       |                 |
++------------------+------------------+------------------+-----------------+
+| hess_lag         | OT_FUNCTION      | Function for     | casadi::BonMinM |
+|                  |                  | calculating the  | essageHandler   |
+|                  |                  | Hessian of the   |                 |
+|                  |                  | Lagrangian       |                 |
+|                  |                  | (autogenerated   |                 |
+|                  |                  | by default)      |                 |
++------------------+------------------+------------------+-----------------+
+| hess_lag_options | OT_DICT          | Options for the  | casadi::BonMinM |
+|                  |                  | autogenerated    | essageHandler   |
+|                  |                  | Hessian of the   |                 |
+|                  |                  | Lagrangian.      |                 |
++------------------+------------------+------------------+-----------------+
+| ignore_check_vec | OT_BOOL          | If set to true,  | casadi::Nlpsol  |
+|                  |                  | the input shape  |                 |
+|                  |                  | of F will not be |                 |
+|                  |                  | checked.         |                 |
++------------------+------------------+------------------+-----------------+
+| iteration_callba | OT_FUNCTION      | A function that  | casadi::Nlpsol  |
+| ck               |                  | will be called   |                 |
+|                  |                  | at each          |                 |
+|                  |                  | iteration with   |                 |
+|                  |                  | the solver as    |                 |
+|                  |                  | input. Check     |                 |
+|                  |                  | documentation of |                 |
+|                  |                  | Callback .       |                 |
++------------------+------------------+------------------+-----------------+
+| iteration_callba | OT_BOOL          | If set to true,  | casadi::Nlpsol  |
+| ck_ignore_errors |                  | errors thrown by |                 |
+|                  |                  | iteration_callba |                 |
+|                  |                  | ck will be       |                 |
+|                  |                  | ignored.         |                 |
++------------------+------------------+------------------+-----------------+
+| iteration_callba | OT_INT           | Only call the    | casadi::Nlpsol  |
+| ck_step          |                  | callback         |                 |
+|                  |                  | function every   |                 |
+|                  |                  | few iterations.  |                 |
++------------------+------------------+------------------+-----------------+
+| jac_g            | OT_FUNCTION      | Function for     | casadi::BonMinM |
+|                  |                  | calculating the  | essageHandler   |
+|                  |                  | Jacobian of the  |                 |
+|                  |                  | constraints      |                 |
+|                  |                  | (autogenerated   |                 |
+|                  |                  | by default)      |                 |
++------------------+------------------+------------------+-----------------+
+| jac_g_options    | OT_DICT          | Options for the  | casadi::BonMinM |
+|                  |                  | autogenerated    | essageHandler   |
+|                  |                  | Jacobian of the  |                 |
+|                  |                  | constraints.     |                 |
++------------------+------------------+------------------+-----------------+
+| no_nlp_grad      | OT_BOOL          | Prevent the      | casadi::Nlpsol  |
+|                  |                  | creation of the  |                 |
+|                  |                  | 'nlp_grad'       |                 |
+|                  |                  | function         |                 |
++------------------+------------------+------------------+-----------------+
+| oracle_options   | OT_DICT          | Options to be    | casadi::Nlpsol  |
+|                  |                  | passed to the    |                 |
+|                  |                  | oracle function  |                 |
++------------------+------------------+------------------+-----------------+
+| pass_nonlinear_c | OT_BOOL          | Pass list of     | casadi::BonMinM |
+| onstraints       |                  | constraints      | essageHandler   |
+|                  |                  | entering         |                 |
+|                  |                  | nonlinearly to   |                 |
+|                  |                  | BONMIN           |                 |
++------------------+------------------+------------------+-----------------+
+| pass_nonlinear_v | OT_BOOL          | Pass list of     | casadi::BonMinM |
+| ariables         |                  | variables        | essageHandler   |
+|                  |                  | entering         |                 |
+|                  |                  | nonlinearly to   |                 |
+|                  |                  | BONMIN           |                 |
++------------------+------------------+------------------+-----------------+
+| sos1_groups      | OT_INTVECTORVECT | Options for the  | casadi::BonMinM |
+|                  | OR               | autogenerated    | essageHandler   |
+|                  |                  | gradient of the  |                 |
+|                  |                  | objective.       |                 |
++------------------+------------------+------------------+-----------------+
+| sos1_priorities  | OT_INTVECTOR     | Options for the  | casadi::BonMinM |
+|                  |                  | autogenerated    | essageHandler   |
+|                  |                  | gradient of the  |                 |
+|                  |                  | objective.       |                 |
++------------------+------------------+------------------+-----------------+
+| sos1_weights     | OT_DOUBLEVECTORV | Options for the  | casadi::BonMinM |
+|                  | ECTOR            | autogenerated    | essageHandler   |
+|                  |                  | gradient of the  |                 |
+|                  |                  | objective.       |                 |
++------------------+------------------+------------------+-----------------+
+| var_integer_md   | OT_DICT          | Integer metadata | casadi::BonMinM |
+|                  |                  | (a dictionary    | essageHandler   |
+|                  |                  | with lists of    |                 |
+|                  |                  | integers) about  |                 |
+|                  |                  | variables to be  |                 |
+|                  |                  | passed to BONMIN |                 |
++------------------+------------------+------------------+-----------------+
+| var_numeric_md   | OT_DICT          | Numeric metadata | casadi::BonMinM |
+|                  |                  | (a dictionary    | essageHandler   |
+|                  |                  | with lists of    |                 |
+|                  |                  | reals) about     |                 |
+|                  |                  | variables to be  |                 |
+|                  |                  | passed to BONMIN |                 |
++------------------+------------------+------------------+-----------------+
+| var_string_md    | OT_DICT          | String metadata  | casadi::BonMinM |
+|                  |                  | (a dictionary    | essageHandler   |
+|                  |                  | with lists of    |                 |
+|                  |                  | strings) about   |                 |
+|                  |                  | variables to be  |                 |
+|                  |                  | passed to BONMIN |                 |
++------------------+------------------+------------------+-----------------+
+| verbose_init     | OT_BOOL          | Print out timing | casadi::Nlpsol  |
+|                  |                  | information      |                 |
+|                  |                  | about the        |                 |
+|                  |                  | different stages |                 |
+|                  |                  | of               |                 |
+|                  |                  | initialization   |                 |
++------------------+------------------+------------------+-----------------+
+| warn_initial_bou | OT_BOOL          | Warn if the      | casadi::Nlpsol  |
+| nds              |                  | initial guess    |                 |
+|                  |                  | does not satisfy |                 |
+|                  |                  | LBX and UBX      |                 |
++------------------+------------------+------------------+-----------------+
 
 Diagrams
 --------
@@ -53437,72 +53460,101 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 
 >List of available options
 
-+----------------------------+-------------+-------------------------------+
-|             Id             |    Type     |          Description          |
-+============================+=============+===============================+
-| bonmin                     | OT_DICT     | Options to be passed to       |
-|                            |             | BONMIN                        |
-+----------------------------+-------------+-------------------------------+
-| con_integer_md             | OT_DICT     | Integer metadata (a           |
-|                            |             | dictionary with lists of      |
-|                            |             | integers) about constraints   |
-|                            |             | to be passed to BONMIN        |
-+----------------------------+-------------+-------------------------------+
-| con_numeric_md             | OT_DICT     | Numeric metadata (a           |
-|                            |             | dictionary with lists of      |
-|                            |             | reals) about constraints to   |
-|                            |             | be passed to BONMIN           |
-+----------------------------+-------------+-------------------------------+
-| con_string_md              | OT_DICT     | String metadata (a dictionary |
-|                            |             | with lists of strings) about  |
-|                            |             | constraints to be passed to   |
-|                            |             | BONMIN                        |
-+----------------------------+-------------+-------------------------------+
-| grad_f                     | OT_FUNCTION | Function for calculating the  |
-|                            |             | gradient of the objective     |
-|                            |             | (column, autogenerated by     |
-|                            |             | default)                      |
-+----------------------------+-------------+-------------------------------+
-| grad_f_options             | OT_DICT     | Options for the autogenerated |
-|                            |             | gradient of the objective.    |
-+----------------------------+-------------+-------------------------------+
-| hess_lag                   | OT_FUNCTION | Function for calculating the  |
-|                            |             | Hessian of the Lagrangian     |
-|                            |             | (autogenerated by default)    |
-+----------------------------+-------------+-------------------------------+
-| hess_lag_options           | OT_DICT     | Options for the autogenerated |
-|                            |             | Hessian of the Lagrangian.    |
-+----------------------------+-------------+-------------------------------+
-| jac_g                      | OT_FUNCTION | Function for calculating the  |
-|                            |             | Jacobian of the constraints   |
-|                            |             | (autogenerated by default)    |
-+----------------------------+-------------+-------------------------------+
-| jac_g_options              | OT_DICT     | Options for the autogenerated |
-|                            |             | Jacobian of the constraints.  |
-+----------------------------+-------------+-------------------------------+
-| pass_nonlinear_constraints | OT_BOOL     | Pass list of constraints      |
-|                            |             | entering nonlinearly to       |
-|                            |             | BONMIN                        |
-+----------------------------+-------------+-------------------------------+
-| pass_nonlinear_variables   | OT_BOOL     | Pass list of variables        |
-|                            |             | entering nonlinearly to       |
-|                            |             | BONMIN                        |
-+----------------------------+-------------+-------------------------------+
-| var_integer_md             | OT_DICT     | Integer metadata (a           |
-|                            |             | dictionary with lists of      |
-|                            |             | integers) about variables to  |
-|                            |             | be passed to BONMIN           |
-+----------------------------+-------------+-------------------------------+
-| var_numeric_md             | OT_DICT     | Numeric metadata (a           |
-|                            |             | dictionary with lists of      |
-|                            |             | reals) about variables to be  |
-|                            |             | passed to BONMIN              |
-+----------------------------+-------------+-------------------------------+
-| var_string_md              | OT_DICT     | String metadata (a dictionary |
-|                            |             | with lists of strings) about  |
-|                            |             | variables to be passed to     |
-|                            |             | BONMIN                        |
-+----------------------------+-------------+-------------------------------+
++-------------------------+-----------------------+------------------------+
+|           Id            |         Type          |      Description       |
++=========================+=======================+========================+
+| bonmin                  | OT_DICT               | Options to be passed   |
+|                         |                       | to BONMIN              |
++-------------------------+-----------------------+------------------------+
+| con_integer_md          | OT_DICT               | Integer metadata (a    |
+|                         |                       | dictionary with lists  |
+|                         |                       | of integers) about     |
+|                         |                       | constraints to be      |
+|                         |                       | passed to BONMIN       |
++-------------------------+-----------------------+------------------------+
+| con_numeric_md          | OT_DICT               | Numeric metadata (a    |
+|                         |                       | dictionary with lists  |
+|                         |                       | of reals) about        |
+|                         |                       | constraints to be      |
+|                         |                       | passed to BONMIN       |
++-------------------------+-----------------------+------------------------+
+| con_string_md           | OT_DICT               | String metadata (a     |
+|                         |                       | dictionary with lists  |
+|                         |                       | of strings) about      |
+|                         |                       | constraints to be      |
+|                         |                       | passed to BONMIN       |
++-------------------------+-----------------------+------------------------+
+| grad_f                  | OT_FUNCTION           | Function for           |
+|                         |                       | calculating the        |
+|                         |                       | gradient of the        |
+|                         |                       | objective (column,     |
+|                         |                       | autogenerated by       |
+|                         |                       | default)               |
++-------------------------+-----------------------+------------------------+
+| grad_f_options          | OT_DICT               | Options for the        |
+|                         |                       | autogenerated gradient |
+|                         |                       | of the objective.      |
++-------------------------+-----------------------+------------------------+
+| hess_lag                | OT_FUNCTION           | Function for           |
+|                         |                       | calculating the        |
+|                         |                       | Hessian of the         |
+|                         |                       | Lagrangian             |
+|                         |                       | (autogenerated by      |
+|                         |                       | default)               |
++-------------------------+-----------------------+------------------------+
+| hess_lag_options        | OT_DICT               | Options for the        |
+|                         |                       | autogenerated Hessian  |
+|                         |                       | of the Lagrangian.     |
++-------------------------+-----------------------+------------------------+
+| jac_g                   | OT_FUNCTION           | Function for           |
+|                         |                       | calculating the        |
+|                         |                       | Jacobian of the        |
+|                         |                       | constraints            |
+|                         |                       | (autogenerated by      |
+|                         |                       | default)               |
++-------------------------+-----------------------+------------------------+
+| jac_g_options           | OT_DICT               | Options for the        |
+|                         |                       | autogenerated Jacobian |
+|                         |                       | of the constraints.    |
++-------------------------+-----------------------+------------------------+
+| pass_nonlinear_constrai | OT_BOOL               | Pass list of           |
+| nts                     |                       | constraints entering   |
+|                         |                       | nonlinearly to BONMIN  |
++-------------------------+-----------------------+------------------------+
+| pass_nonlinear_variable | OT_BOOL               | Pass list of variables |
+| s                       |                       | entering nonlinearly   |
+|                         |                       | to BONMIN              |
++-------------------------+-----------------------+------------------------+
+| sos1_groups             | OT_INTVECTORVECTOR    | Options for the        |
+|                         |                       | autogenerated gradient |
+|                         |                       | of the objective.      |
++-------------------------+-----------------------+------------------------+
+| sos1_priorities         | OT_INTVECTOR          | Options for the        |
+|                         |                       | autogenerated gradient |
+|                         |                       | of the objective.      |
++-------------------------+-----------------------+------------------------+
+| sos1_weights            | OT_DOUBLEVECTORVECTOR | Options for the        |
+|                         |                       | autogenerated gradient |
+|                         |                       | of the objective.      |
++-------------------------+-----------------------+------------------------+
+| var_integer_md          | OT_DICT               | Integer metadata (a    |
+|                         |                       | dictionary with lists  |
+|                         |                       | of integers) about     |
+|                         |                       | variables to be passed |
+|                         |                       | to BONMIN              |
++-------------------------+-----------------------+------------------------+
+| var_numeric_md          | OT_DICT               | Numeric metadata (a    |
+|                         |                       | dictionary with lists  |
+|                         |                       | of reals) about        |
+|                         |                       | variables to be passed |
+|                         |                       | to BONMIN              |
++-------------------------+-----------------------+------------------------+
+| var_string_md           | OT_DICT               | String metadata (a     |
+|                         |                       | dictionary with lists  |
+|                         |                       | of strings) about      |
+|                         |                       | variables to be passed |
+|                         |                       | to BONMIN              |
++-------------------------+-----------------------+------------------------+
 
 --------------------------------------------------------------------------------
 
