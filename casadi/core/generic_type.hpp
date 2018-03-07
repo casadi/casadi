@@ -47,6 +47,7 @@ namespace casadi {
     OT_INTVECTORVECTOR,
     OT_BOOLVECTOR,
     OT_DOUBLEVECTOR,
+    OT_DOUBLEVECTORVECTOR,
     OT_STRINGVECTOR,
     OT_DICT,
     OT_FUNCTION,
@@ -85,6 +86,7 @@ namespace casadi {
     GenericType(const std::vector<int>& iv);
     GenericType(const std::vector< std::vector<casadi_int> >& ivv);
     GenericType(const std::vector<double>& dv);
+    GenericType(const std::vector< std::vector<double> >& dv);
     GenericType(const std::vector<std::string>& sv);
     GenericType(const char s[]);
     GenericType(const Function& f);
@@ -117,7 +119,11 @@ namespace casadi {
     operator std::vector<casadi_int>() const { return to_int_vector();}
     operator std::vector<int>() const;
     operator std::vector<std::vector<casadi_int> >() const { return to_int_vector_vector();}
+    operator std::vector<std::vector<int> >() const;
     operator std::vector<double>() const { return to_double_vector();}
+    operator std::vector< std::vector<double> >() const {
+      return to_double_vector_vector();
+    }
     operator std::vector<std::string>() const { return to_string_vector();}
     operator const Function&() const { return as_function();}
     operator const std::vector<Function>&() const { return as_function_vector();}
@@ -143,6 +149,7 @@ namespace casadi {
     bool is_int_vector() const;
     bool is_int_vector_vector() const;
     bool is_double_vector() const;
+    bool is_double_vector_vector() const;
     bool is_bool_vector() const;
     bool is_string_vector() const;
     bool is_dict() const;
@@ -161,6 +168,7 @@ namespace casadi {
     const std::vector<casadi_int>& as_bool_vector() const;
     const std::vector<std::vector<casadi_int> >& as_int_vector_vector() const;
     const std::vector<double>& as_double_vector() const;
+    const std::vector< std::vector<double> >& as_double_vector_vector() const;
     const std::vector<std::string>& as_string_vector() const;
     const Dict& as_dict() const;
     const Function& as_function() const;
@@ -178,6 +186,7 @@ namespace casadi {
     std::vector<bool> to_bool_vector() const;
     std::vector< std::vector<casadi_int> > to_int_vector_vector() const;
     std::vector<double> to_double_vector() const;
+    std::vector< std::vector<double> > to_double_vector_vector() const;
     std::vector<std::string> to_string_vector() const;
     Dict to_dict() const;
     Function to_function() const;

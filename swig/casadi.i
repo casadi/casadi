@@ -1389,6 +1389,7 @@ namespace std {
           || to_generic<std::vector<bool> >(p, m)
           || to_generic<std::vector<std::string> >(p, m)
           || to_generic<std::vector<std::vector<casadi_int> > >(p, m)
+          || to_generic<std::vector<std::vector<double> > >(p, m)
           || to_generic<casadi::Function>(p, m)
           || to_generic<std::vector<casadi::Function> >(p, m)
           || to_generic<casadi::GenericType::Dict>(p, m)) {
@@ -1412,6 +1413,7 @@ namespace std {
       case OT_INTVECTORVECTOR: return from_tmp(a->as_int_vector_vector());
       case OT_BOOLVECTOR: return from_tmp(a->as_bool_vector());
       case OT_DOUBLEVECTOR: return from_tmp(a->as_double_vector());
+      case OT_DOUBLEVECTORVECTOR: return from_tmp(a->as_double_vector_vector());
       case OT_STRINGVECTOR: return from_tmp(a->as_string_vector());
       case OT_DICT: return from_tmp(a->as_dict());
       case OT_FUNCTION: return from_tmp(a->as_function());

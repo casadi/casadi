@@ -40,6 +40,8 @@ namespace casadi {
   typedef GenericTypeInternal<OT_INT, casadi_int> IntType;
   typedef GenericTypeInternal<OT_BOOL, bool> BoolType;
   typedef GenericTypeInternal<OT_DOUBLEVECTOR, std::vector<double> > DoubleVectorType;
+  typedef GenericTypeInternal<OT_DOUBLEVECTORVECTOR,
+                              std::vector< std::vector<double> > > DoubleVectorVectorType;
   typedef GenericTypeInternal<OT_INTVECTOR, std::vector<casadi_int> > IntVectorType;
   typedef GenericTypeInternal<OT_INTVECTORVECTOR,
                               std::vector< std::vector<casadi_int> > > IntVectorVectorType;
@@ -62,6 +64,9 @@ namespace casadi {
     case OT_INTVECTOR:
     case OT_DOUBLEVECTOR:
       return is_double_vector() || is_int_vector();
+    case OT_INTVECTORVECTOR:
+    case OT_DOUBLEVECTORVECTOR:
+      return is_double_vector_vector() || is_int_vector_vector();
     case OT_STRINGVECTOR:
       return is_string_vector() || is_string();
     default:
@@ -79,6 +84,8 @@ namespace casadi {
       return std::vector<bool>();
     case OT_DOUBLEVECTOR:
       return std::vector<double>();
+    case OT_DOUBLEVECTORVECTOR:
+      return std::vector< std::vector<double> >();
     case OT_STRINGVECTOR:
       return std::vector<std::string>();
     default:
@@ -104,6 +111,8 @@ namespace casadi {
       return "OT_BOOLVECTOR";
     case OT_DOUBLEVECTOR:
       return "OT_DOUBLEVECTOR";
+    case OT_DOUBLEVECTORVECTOR:
+      return "OT_DOUBLEVECTORVECTOR";
     case OT_STRINGVECTOR:
       return "OT_STRINGVECTOR";
     case OT_DICT:
@@ -140,6 +149,7 @@ namespace casadi {
   bool GenericType::is_empty_vector() const {
     return (is_int_vector() && to_int_vector().size()==0) ||
       (is_int_vector_vector() && to_int_vector_vector().size()==0) ||
+      (is_double_vector_vector() && to_double_vector_vector().size()==0) ||
       (is_double_vector() && to_double_vector().size()==0) ||
       (is_string_vector() && to_string_vector().size()==0) ||
       (is_bool_vector() && to_bool_vector().size()==0);
@@ -159,6 +169,10 @@ namespace casadi {
 
   bool GenericType::is_double_vector() const {
     return getType()==OT_DOUBLEVECTOR;
+  }
+
+  bool GenericType::is_double_vector_vector() const {
+    return getType()==OT_DOUBLEVECTORVECTOR;
   }
 
   bool GenericType::is_string_vector() const {
@@ -220,6 +234,10 @@ namespace casadi {
     own(new DoubleVectorType(dv));
   }
 
+  GenericType::GenericType(const vector< vector<double> >& dv) {
+    own(new DoubleVectorVectorType(dv));
+  }
+
   GenericType::GenericType(const vector<string>& sv) {
     own(new StringVectorType(sv));
   }
@@ -278,6 +296,11 @@ namespace casadi {
   const std::vector<double>& GenericType::as_double_vector() const {
     casadi_assert_dev(is_double_vector());
     return static_cast<const DoubleVectorType*>(get())->d_;
+  }
+
+  const std::vector< std::vector<double> >& GenericType::as_double_vector_vector() const {
+    casadi_assert_dev(is_double_vector_vector());
+    return static_cast<const DoubleVectorVectorType*>(get())->d_;
   }
 
   const std::vector<std::string>& GenericType::as_string_vector() const {
@@ -343,13 +366,7 @@ namespace casadi {
 
   vector<int> GenericType::to_int_type_vector() const {
     casadi_assert(is_int_vector(), "type mismatch");
-    std::vector<casadi_int> ret = as_int_vector();
-    std::vector<int> r(ret.size());
-    for (casadi_int i=0;i<ret.size();++i) {
-      casadi_assert(ret[i]<=std::numeric_limits<int>::max(), "Integer overflow detected.");
-      r[i] = ret[i];
-    }
-    return r;
+    return casadi::to_int(as_int_vector());
   }
 
   vector<casadi_int> GenericType::to_int_vector() const {
@@ -387,6 +404,19 @@ namespace casadi {
     } else {
       casadi_assert(is_double_vector(), "type mismatch");
       return as_double_vector();
+    }
+  }
+
+  vector< vector<double> > GenericType::to_double_vector_vector() const {
+    if (is_int_vector_vector()) {
+      auto v = as_int_vector_vector();
+      vector< vector<double> > ret(v.size());
+      for (casadi_int i=0;i<v.size();++i)
+        ret[i].assign(v[i].begin(), v[i].end());
+      return ret;
+    } else {
+      casadi_assert(is_double_vector_vector(), "type mismatch");
+      return as_double_vector_vector();
     }
   }
 
@@ -453,6 +483,19 @@ namespace casadi {
     if (is_int_vector_vector() && op2.is_int_vector_vector()) {
       const vector< vector<casadi_int> > &v1 = to_int_vector_vector();
       const vector< vector<casadi_int> > &v2 = op2.to_int_vector_vector();
+      if (v1.size() != v2.size()) return true;
+      for (casadi_int i=0; i<v1.size(); ++i) {
+        if (v1[i].size() != v2[i].size()) return true;
+        for (casadi_int j=0; j<v1[i].size(); ++j) {
+          if (v1[i][j] != v2[i][j]) return true;
+        }
+      }
+      return false;
+    }
+
+    if (is_double_vector_vector() && op2.is_double_vector_vector()) {
+      const vector< vector<double> > &v1 = to_double_vector_vector();
+      const vector< vector<double> > &v2 = op2.to_double_vector_vector();
       if (v1.size() != v2.size()) return true;
       for (casadi_int i=0; i<v1.size(); ++i) {
         if (v1[i].size() != v2[i].size()) return true;
