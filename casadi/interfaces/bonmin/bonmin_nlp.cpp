@@ -216,6 +216,10 @@ namespace casadi {
    return true;
  }
 
+ const Bonmin::TMINLP::SosInfo * BonminUserClass::sosConstraints() const {
+   return &solver_.sosConstraints(mem_);
+ }
+
 
 
 } // namespace casadi
