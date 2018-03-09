@@ -47,6 +47,7 @@ namespace casadi {
       der(x) = function(x, z, p, t)                  Forward ODE
       0 = fz(x, z, p, t)                  Forward algebraic equations
       der(q) = fq(x, z, p, t)                  Forward quadratures
+      roots = f_root(x, z, p, t) = 0                 Root Equations
 
       Terminal conditions at t=tf
       rx(tf)  = rx0
@@ -56,6 +57,7 @@ namespace casadi {
       der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
       0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
       der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
+      roots = f_root(x, z, p, t) = 0                    Root Equations
 
       where we assume that both the forward and backwards integrations are index-1
       (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
@@ -132,7 +134,7 @@ enum DeIn {
 /// Shortnames for DAE symbolic representation inputs
 const std::vector<std::string> DE_INPUTS = {"t", "x", "z", "p", "rx", "rz", "rp"};
 
-/// Inputs of the symbolic representation of the DAE
+/// Outputs of the symbolic representation of the DAE
 enum DeOut {
   DE_ODE,
   DE_ALG,
@@ -140,10 +142,11 @@ enum DeOut {
   DE_RODE,
   DE_RALG,
   DE_RQUAD,
+  DE_ROOT,
   DE_NUM_OUT};
 
 /// Shortnames for DAE symbolic representation outputs
-const std::vector<std::string> DE_OUTPUTS = {"ode", "alg", "quad", "rode", "ralg", "rquad"};
+const std::vector<std::string> DE_OUTPUTS = {"ode", "alg", "quad", "rode", "ralg", "rquad", "root"};
 
 /// Input arguments of an ODE/DAE function
 enum DAEInput {

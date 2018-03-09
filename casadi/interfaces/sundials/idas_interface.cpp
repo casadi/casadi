@@ -133,6 +133,7 @@ namespace casadi {
     create_function("quadF", {"x", "z", "p", "t"}, {"quad"});
     create_function("daeB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rode", "ralg"});
     create_function("quadB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rquad"});
+    create_function("root", {"x", "z", "p", "t"}, {"root"});
 
     // Get initial conditions for the state derivatives
     if (init_xdot_.empty()) {
@@ -180,6 +181,29 @@ namespace casadi {
       return flag;
     } catch(exception& e) { // non-recoverable error
       uerr() << "res failed: " << e.what() << endl;
+      return -1;
+    }
+  }
+
+  int IdasInterface::root(double t, N_Vector xz, N_Vector xzdot,
+                                double * gout, void *user_data) {
+    try {
+      auto m = to_mem(user_data);
+      auto& s = m->self;
+      *gout = nan;
+      m->arg[0] = NV_DATA_S(xz);
+      m->arg[1] = NV_DATA_S(xz)+s.nx_;
+      // TODO add xzdot support
+      m->arg[2] = m->p;
+      m->arg[3] = &t;
+      m->res[0] = gout;
+      s.calc_function(m, "root");
+      //std::cout << "finding root t: " << t << " g: " << *gout << std::endl;
+      return 0;
+    } catch(int flag) { // recoverable error
+      return flag;
+    } catch(exception& e) { // non-recoverable error
+      uerr() << "root finding failed: " << e.what() << endl;
       return -1;
     }
   }
@@ -374,6 +398,9 @@ namespace casadi {
       THROWING(IDAAdjInit, m->mem, steps_per_checkpoint_, interpType);
     }
 
+    // Initialize root function
+    THROWING(IDARootInit, m->mem, 1, root);
+
     m->first_callB = true;
     return 0;
   }
@@ -422,10 +449,18 @@ namespace casadi {
     double ttol = 1e-9;   // tolerance
     if (fabs(m->t-t)>=ttol) {
       // Integrate forward ...
+      int retval = 0;
       if (nrx_>0) { // ... with taping
-        THROWING(IDASolveF, m->mem, t, &m->t, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
+        retval = IDASolveF(m->mem, t, &m->t, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
+        //THROWING(IDASolveF, m->mem, t, &m->t, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
       } else { // ... without taping
-        THROWING(IDASolve, m->mem, t, &m->t, m->xz, m->xzdot, IDA_NORMAL);
+        retval = IDASolve(m->mem, t, &m->t, m->xz, m->xzdot, IDA_NORMAL);
+        //THROWING(IDASolve, m->mem, t, &m->t, m->xz, m->xzdot, IDA_NORMAL);
+      }
+      if (retval == IDA_ROOT_RETURN) {
+        int rootsfound = 0;
+        IDAGetRootInfo(m->mem, &rootsfound);
+        cout << "root found t: " << m->t << " val:" << rootsfound << endl;
       }
 
       // Get quadratures

@@ -93,9 +93,12 @@ Test simpleDAE(){
   // Quadrature
   SX quad = x*x + 3.0*u*u;
 
+  // Root
+  SX root = x - 0.9;
+
   // Return DAE
   Test r;
-  r.dae = decltype(r.dae){{"x", x}, {"z", z}, {"p", u}, {"ode", ode}, {"alg", alg}, {"quad", quad}};
+  r.dae = decltype(r.dae){{"x", x}, {"z", z}, {"p", u}, {"ode", ode}, {"alg", alg}, {"quad", quad}, {"root", root}};
   r.tf = 5;
   r.x0 = {1};
   r.u0 = 0.4;
@@ -148,6 +151,7 @@ int main(){
       arg = decltype(arg){{"x0", test.x0},
                           {"p", test.u0}};
       res = I(arg);
+
       vector<double> xf(res.at("xf"));
       vector<double> qf(res.at("qf"));
       cout << setw(50) << "Unperturbed solution: " << "xf  = " << xf <<  ", qf  = " << qf << endl;

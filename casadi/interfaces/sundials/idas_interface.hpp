@@ -156,6 +156,7 @@ namespace casadi {
 
     // Sundials callback functions
     static int res(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data);
+    static int root(double t, N_Vector xz, N_Vector xzdot, double * gout, void *user_data);
     static int resB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                     N_Vector rrB, void *user_data);
     static void ehfun(int error_code, const char *module, const char *function, char *msg,
