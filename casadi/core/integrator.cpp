@@ -355,13 +355,14 @@ namespace casadi {
 
     // Get output expressions
     vector<MatType> res = oracle_(arg);
-    vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
+    vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_root;
     aug_ode.push_back(vec(res.at(DE_ODE)));
     aug_alg.push_back(vec(res.at(DE_ALG)));
     aug_quad.push_back(vec(res.at(DE_QUAD)));
     aug_rode.push_back(vec(res.at(DE_RODE)));
     aug_ralg.push_back(vec(res.at(DE_RALG)));
     aug_rquad.push_back(vec(res.at(DE_RQUAD)));
+    aug_root.push_back(vec(res.at(DE_ROOT)));
 
     // Zero of time dimension
     MatType zero_t = MatType::zeros(t());
@@ -430,13 +431,14 @@ namespace casadi {
 
     // Get output expressions
     vector<MatType> res = oracle_(arg);
-    vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
+    vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_root;
     aug_ode.push_back(vec(res.at(DE_ODE)));
     aug_alg.push_back(vec(res.at(DE_ALG)));
     aug_quad.push_back(vec(res.at(DE_QUAD)));
     aug_rode.push_back(vec(res.at(DE_RODE)));
     aug_ralg.push_back(vec(res.at(DE_RALG)));
     aug_rquad.push_back(vec(res.at(DE_RQUAD)));
+    aug_root.push_back(vec(res.at(DE_ROOT)));
 
     // Zero of time dimension
     MatType zero_t = MatType::zeros(t());
@@ -1344,6 +1346,8 @@ namespace casadi {
         de_out[DE_RALG]=i.second;
       } else if (i.first=="rquad") {
         de_out[DE_RQUAD]=i.second;
+      } else if (i.first=="root") {
+        de_out[DE_ROOT]=i.second;
       } else {
         casadi_error("No such field: " + i.first);
       }
