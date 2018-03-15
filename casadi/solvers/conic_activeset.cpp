@@ -636,6 +636,32 @@ namespace casadi {
         }
       }
 
+      // Are we overconstrained?
+      if (mina<1e-12 && lam[imina]!=0.) {
+        // Maximum infeasibility from setting from setting lam[i]=0
+        i = imina;
+        double new_duerr;
+        if (i<nx_) {
+          // Set a lam_x to zero
+          new_duerr = fabs(glag[i]);
+        } else {
+          // Set a lam_a to zero
+          new_duerr = 0.;
+          for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+            casadi_int j = at_row[k];
+            new_duerr = fmax(new_duerr, fabs((glag[j]-trans_a[k]*lam[i]) + lam[j]));
+          }
+        }
+        // Remove if it can be done without increasing maximum infeasibility
+        if (new_duerr <= fmax(duerr, prerr)) {
+          sprint(msg, sizeof(msg), "Singular lam[%lld]=%.2g", imina, lam[imina]);
+          lam[imina] = 0.;
+          changed_active_set = true;
+          tau = 0.;
+          continue;
+        }
+      }
+
       if (verbose_) {
         print_matrix("QR(V)", v, sp_v_);
         print_matrix("QR(R)", r, sp_r_);
