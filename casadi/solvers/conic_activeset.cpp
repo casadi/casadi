@@ -376,8 +376,9 @@ namespace casadi {
     // Stepsize
     double tau = -1.;
 
-    // Logarithm of the determinant
-    double log_det = -1;
+    // Smallest diagonal value for the QR factorization
+    double mina = -1;
+    casadi_int imina = -1;
 
     // QP iterations
     casadi_int iter = 0;
@@ -538,15 +539,15 @@ namespace casadi {
 
       if (iter % 10 == 0) {
         // Print header
-        print("%10s %15s %15s %6s %15s %6s %10s %10s %15s %40s\n",
-              "Iteration", "fk", "|pr|", "con", "|du|", "var", "tau", "lam_min",
-              "log|det(KKT)|", "Note");
+        print("%10s %15s %15s %6s %15s %6s %15s %6s %10s %40s\n",
+              "Iteration", "fk", "|pr|", "con", "|du|", "var",
+              "min(diag(R))", "con", "tau", "Note");
       }
 
       // Print iteration progress:
-      print("%6d (%1s) %15g %15g %6d %15g %6d %10g %10g %15g %40s\n",
-            iter, primal_step ? "P" : "D", fk, prerr, iprerr, duerr, iduerr, tau,
-            lam_min, log_det, msg);
+      print("%6d (%1s) %15g %15g %6d %15g %6d %15g %6d %10g %40s\n",
+            iter, primal_step ? "P" : "D", fk, prerr, iprerr, duerr, iduerr,
+            mina, imina, tau, msg);
 
       // Successful return if still no change
       if (!changed_active_set) {
@@ -624,10 +625,15 @@ namespace casadi {
       // QR factorization
       casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
 
-      // Calculate the logarithm of the determinant
-      log_det = 0;
+      // Find the smallest diagonal entry in R and corresponding constraint
+      imina = -1;
+      mina = inf;
       for (casadi_int c=0; c<nx_+na_; ++c) {
-        log_det += log(fabs(r[r_colind[c+1]-1]));
+        double r_diag = fabs(r[r_colind[c+1]-1]);
+        if (r_diag<mina) {
+          mina = r_diag;
+          imina = pc_[c];
+        }
       }
 
       if (verbose_) {
