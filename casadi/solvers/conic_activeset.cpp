@@ -110,6 +110,10 @@ namespace casadi {
     alloc_w(nx_+na_, true); // sens
     alloc_w(nx_, true); // infeas
     alloc_w(nx_, true); // tinfeas
+    alloc_iw(nx_+na_, true); // neverzero
+    alloc_iw(nx_+na_, true); // neverupper
+    alloc_iw(nx_+na_, true); // neverlower
+    alloc_iw(nx_+na_); // allzero
 
     // Memory for numerical solution
     alloc_w(sp_v_.nnz(), true); // v
@@ -303,6 +307,10 @@ namespace casadi {
     trans_a = w; w += AT_.nnz();
     infeas = w; w += nx_;
     tinfeas = w; w += nx_;
+    casadi_int *neverzero, *neverupper, *neverlower;
+    neverzero = iw; iw += nx_+na_;
+    neverupper = iw; iw += nx_+na_;
+    neverlower = iw; iw += nx_+na_;
 
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
@@ -333,16 +341,45 @@ namespace casadi {
     casadi_set_sub(a, kkt, kkt_, nx_, nx_+na_, 0, nx_); // a
     casadi_set_sub(trans_a, kkt, kkt_, 0, nx_, nx_, nx_+na_); // a'
 
+    // Look for all-zero rows in kkt
+    const casadi_int* kkt_colind = kkt_.colind();
+    const casadi_int* kkt_row = kkt_.row();
+    for (casadi_int c=0; c<nx_+na_; ++c) iw[c] = 1;
+    for (casadi_int c=0; c<nx_+na_; ++c) {
+      for (casadi_int k=kkt_colind[c]; k<kkt_colind[c+1]; ++k) {
+        if (fabs(kkt[k])>1e-16) iw[kkt_row[k]] = 0;
+      }
+    }
+
+    // Permitted signs for lam
+    for (casadi_int c=0; c<nx_+na_; ++c) {
+      neverzero[c] = lbz[c]==ubz[c];
+      neverupper[c] = isinf(ubz[c]);
+      neverlower[c] = isinf(lbz[c]);
+      if (iw[c]) {
+        // All-zero row
+        if (c<nx_) {
+          // Inactive constraint would lead to singular KKT
+          neverzero[c] = 1;
+        } else {
+          // Active constraint would lead to singular KKT
+          neverupper[c] = neverlower[c] = 1;
+        }
+      }
+    }
+
     // Calculate g
     casadi_fill(z+nx_, na_, 0.);
     casadi_mv(a, A_, z, z+nx_, 0);
 
     // Determine initial active set
     for (i=0; i<nx_+na_; ++i) {
-      if (lbz[i]!=ubz[i]) {
+      casadi_assert(!neverzero[i] || !neverupper[i] || !neverlower[i],
+                    "No sign possible for " + str(i));
+      if (!neverzero[i]) {
         // All inequality constraints are inactive
         lam[i] = 0;
-      } else if (z[i]<=lbz[i]) {
+      } else if (neverupper[i] || z[i]<=lbz[i]) {
         // Lower bound active (including satisfied bounds)
         lam[i] = fmin(lam[i], -DMIN);
       } else {
@@ -352,8 +389,8 @@ namespace casadi {
     }
 
     // kktd sparsity
-    const casadi_int* kkt_colind = kktd_.colind();
-    const casadi_int* kkt_row = kktd_.row();
+    kkt_colind = kktd_.colind();
+    kkt_row = kktd_.row();
 
     // R sparsity
     const casadi_int* r_colind = sp_r_.colind();
@@ -461,7 +498,7 @@ namespace casadi {
           // Skip non-candidates
           if (i==iprerr || lam[i]==0.) continue;
           // Skip equality constraints, no improvement is possible
-          if (lbz[i]==ubz[i]) continue;
+          if (neverzero[i]) continue;
           // Check largest dual infeasibility resulting from setting lam[i]=0
           double new_duerr;
           if (i<nx_) {
@@ -511,7 +548,7 @@ namespace casadi {
           // Skip non-candidates
           if (lam[i]!=0. || sens[i]==0.) continue;
           // We cannot enforce an infinite bound
-          if (sens[i]>0. ? isinf(ubz[i]) : isinf(lbz[i])) continue;
+          if (sens[i]>0. ? neverupper[i] : neverlower[i]) continue;
           // How far are we from the bounds
           double slack = sens[i]>0 ? ubz[i]-z[i] : z[i]-lbz[i];
           // Check if it's the best so far
@@ -839,7 +876,7 @@ namespace casadi {
         // Accept the tau, set multiplier to zero or flip sign if equality
         if (i!=index) { // ignore if already taken care of
           changed_active_set = true;
-          lam[i] = lbz[i]!=ubz[i] ? 0 : lam[i]<0 ? DMIN : -DMIN;
+          lam[i] = !neverzero[i] ? 0 : lam[i]<0 ? DMIN : -DMIN;
           sprint(msg, sizeof(msg), "Removed %lld", i);
           dlam[i] = 0.;
         }
