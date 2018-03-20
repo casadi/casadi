@@ -177,3 +177,72 @@ void casadi_qr_solve(T1* x, casadi_int nrhs, casadi_int tr,
     x += ncol;
   }
 }
+
+// SYMBOL "qr_singular"
+// Check if QR factorization corresponds to a singular matrix
+template<typename T1>
+int casadi_qr_singular(T1* rmin, casadi_int* irmin, const T1* nz_r,
+                       const casadi_int* sp_r, const casadi_int* pc, T1 eps) {
+  // Local variables
+  T1 rd;
+  casadi_int ncol, c;
+  const casadi_int* r_colind;
+  // Extract sparsity
+  ncol = sp_r[1];
+  r_colind = sp_r + 2;
+  // Find the smallest diagonal entry
+  for (c=0; c<ncol; ++c) {
+    rd = fabs(nz_r[r_colind[c+1]-1]);
+    if (c==0 || rd < *rmin) {
+      // Accept if smallest so far
+      *rmin = rd;
+      *irmin = pc[c];
+      // Stop if smaller than eps (r entries after that are unreliable)
+      if (rd<eps) return 1;
+    }
+  }
+  // Successful return
+  return 0;
+}
+
+// SYMBOL "qr_colcomb"
+// Get a vector v such that A*v = 0 and |v| == 1
+template<typename T1>
+void casadi_qr_colcomb(T1* v, const T1* nz_r, const casadi_int* sp_r,
+                       const casadi_int* pc, casadi_int irmin) {
+  // Local variables
+  casadi_int ncol, r, c, k, crmin;
+  const casadi_int *r_colind, *r_row;
+  // Extract sparsity
+  ncol = sp_r[1];
+  r_colind = sp_r + 2;
+  r_row = r_colind + ncol + 1;
+  // Reset w
+  casadi_fill(v, ncol, 0.);
+  v[irmin] = 1.;
+  // Get c such that pc[c] == irmin
+  crmin = -1;
+  for (c=0; c<ncol; ++c) {
+    if (pc[c]==irmin) {
+      crmin = c;
+      break;
+    }
+  }
+  // Copy crmin-th column to v
+  for (k=r_colind[crmin]; k<r_colind[crmin+1]-1; ++k) {
+    v[pc[r_row[k]]] = -nz_r[k];
+  }
+  // Backward substitution
+  for (c=crmin-1; c>=0; --c) {
+    for (k=r_colind[c+1]-1; k>=r_colind[c]; --k) {
+      r=r_row[k];
+      if (r==c) {
+        v[pc[r]] /= nz_r[k];
+      } else {
+        v[pc[r]] -= nz_r[k]*v[pc[c]];
+      }
+    }
+  }
+  // Normalize v
+  casadi_scal(ncol, 1./sqrt(casadi_dot(ncol, v, v)), v);
+}
