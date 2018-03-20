@@ -113,6 +113,7 @@ namespace casadi {
     /// Implicit typecasting
     operator bool() const { return to_bool();}
     operator casadi_int() const { return to_int();}
+    operator int() const { return to_int();}
     operator double() const { return to_double();}
     operator std::string() const { return to_string();}
     operator std::vector<bool>() const { return to_bool_vector();}
