@@ -248,6 +248,31 @@ namespace casadi {
     }
   }
 
+  template<typename T1>
+  int casadi_qr_singular(T1* rmin, casadi_int* irmin, const T1* r,
+                         const casadi_int* sp_r, const casadi_int* pc, T1 eps) {
+    // Local variables
+    T1 rd;
+    casadi_int ncol, c;
+    const casadi_int* r_colind;
+    // Extract sparsity
+    ncol = sp_r[1];
+    r_colind = sp_r + 2;
+    // Find the smallest diagonal entry
+    for (c=0; c<ncol; ++c) {
+      rd = fabs(r[r_colind[c+1]-1]);
+      if (c==0 || rd < *rmin) {
+        // Accept if smallest so far
+        *rmin = rd;
+        *irmin = pc[c];
+        // Stop if smaller than eps (r entries after that are unreliable)
+        if (rd<eps) return 1;
+      }
+    }
+    // Successful return
+    return 0;
+  }
+
   int ConicActiveSet::init_mem(void* mem) const {
     //auto m = static_cast<ConicActiveSetMemory*>(mem);
     return 0;
@@ -393,7 +418,7 @@ namespace casadi {
     kkt_row = kktd_.row();
 
     // R sparsity
-    const casadi_int* r_colind = sp_r_.colind();
+    //const casadi_int* r_colind = sp_r_.colind();
     //const casadi_int* r_row = sp_r_.row();
 
     // A sparsity
@@ -662,40 +687,32 @@ namespace casadi {
       // QR factorization
       casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
 
-      // Find the smallest diagonal entry in R and corresponding constraint
-      imina = -1;
-      mina = inf;
-      for (casadi_int c=0; c<nx_+na_; ++c) {
-        double r_diag = fabs(r[r_colind[c+1]-1]);
-        if (r_diag<mina) {
-          mina = r_diag;
-          imina = pc_[c];
-        }
-      }
-
-      // Are we overconstrained?
-      if (mina<1e-12 && lam[imina]!=0.) {
-        // Maximum infeasibility from setting from setting lam[i]=0
-        i = imina;
-        double new_duerr;
-        if (i<nx_) {
-          // Set a lam_x to zero
-          new_duerr = fabs(glag[i]);
-        } else {
-          // Set a lam_a to zero
-          new_duerr = 0.;
-          for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-            casadi_int j = at_row[k];
-            new_duerr = fmax(new_duerr, fabs((glag[j]-trans_a[k]*lam[i]) + lam[j]));
+      // Handle singularity
+      if (casadi_qr_singular(&mina, &imina, r, sp_r_, get_ptr(pc_), 1e-12)) {
+        // Are we overconstrained?
+        if (lam[imina]!=0.) {
+          // Maximum infeasibility from setting from setting lam[i]=0
+          i = imina;
+          double new_duerr;
+          if (i<nx_) {
+            // Set a lam_x to zero
+            new_duerr = fabs(glag[i]);
+          } else {
+            // Set a lam_a to zero
+            new_duerr = 0.;
+            for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+              casadi_int j = at_row[k];
+              new_duerr = fmax(new_duerr, fabs((glag[j]-trans_a[k]*lam[i]) + lam[j]));
+            }
           }
-        }
-        // Remove if it can be done without increasing maximum infeasibility
-        if (new_duerr <= fmax(duerr, prerr)) {
-          sprint(msg, sizeof(msg), "Singular lam[%lld]=%.2g", imina, lam[imina]);
-          lam[imina] = 0.;
-          changed_active_set = true;
-          tau = 0.;
-          continue;
+          // Remove if it can be done without increasing maximum infeasibility
+          if (new_duerr <= fmax(duerr, prerr)) {
+            sprint(msg, sizeof(msg), "Singular lam[%lld]=%.2g", imina, lam[imina]);
+            lam[imina] = 0.;
+            changed_active_set = true;
+            tau = 0.;
+            continue;
+          }
         }
       }
 
