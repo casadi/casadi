@@ -69635,6 +69635,12 @@ casadi_int n, casadi_int alpha) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_qr_singular(T1 *rmin, casadi_int
+*irmin, const T1 *nz_r, const casadi_int *sp_r, const casadi_int *pc, T1
+eps) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::conic_options(const std::string &name) "
 
 Get all options for a plugin.
@@ -71818,6 +71824,11 @@ Get the number of QP solver outputs.
 Get the documentation string for a plugin.
 
 ";
+
+%feature("docstring")  casadi::casadi_qr_colcomb(T1 *v, const T1 *nz_r,
+const casadi_int *sp_r, const casadi_int *pc, casadi_int irmin) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_project(const T1 *x, const casadi_int
 *sp_x, T1 *y, const casadi_int *sp_y, T1 *w) "

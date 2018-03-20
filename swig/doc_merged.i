@@ -49952,6 +49952,8 @@ Check if the vector is strictly increasing.
 
 %feature("docstring") casadi::casadi_fill_casadi_int "[INTERNAL] ";
 
+%feature("docstring") casadi::casadi_qr_singular "[INTERNAL] ";
+
 %feature("docstring") casadi::conic_options "
 
 Get all options for a plugin.
@@ -51946,6 +51948,8 @@ Get the number of QP solver outputs.
 Get the documentation string for a plugin.
 
 ";
+
+%feature("docstring") casadi::casadi_qr_colcomb "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_project "[INTERNAL]  Sparse copy: y <-
 x, w work vector (length >= number of rows)
