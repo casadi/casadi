@@ -413,10 +413,10 @@ namespace casadi {
     char msg[40] = "";
 
     // No change so far
-    bool changed_active_set = true;
+    bool new_active_set = true;
 
     // Stepsize
-    double tau = -1.;
+    double tau = 0.;
 
     // Smallest diagonal value for the QR factorization
     double mina = -1;
@@ -483,17 +483,22 @@ namespace casadi {
         }
       }
 
-      // Should we try to reduce primal or dual infeasibility?
-      bool primal_step = prerr>=duerr;
-
       // Smallest nonzero lambda
       double lam_min = 0.;
       for (i=0; i<nx_+na_; ++i) {
         if (lam[i]!=0. && fabs(lam[i])<lam_min) lam_min = fabs(lam[i]);
       }
 
+      // If last step was full, try to improve primal feasibility
+      if (!new_active_set && iprerr>=0 && lam[iprerr]==0.) {
+        // Constraint is free, enforce
+        lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
+        new_active_set = true;
+        sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
+      }
+
       // Can any constraint be removed without increasing dual infeasibility?
-      if (!changed_active_set) {
+      if (!new_active_set) {
         double best = duerr;
         casadi_int index = -1;
         for (i=0; i<nx_+na_; ++i) {
@@ -523,21 +528,13 @@ namespace casadi {
         // Accept, if any
         if (index>=0) {
           lam[index] = 0.;
-          changed_active_set = true;
+          new_active_set = true;
           sprint(msg, sizeof(msg), "Removed redundant %lld", index);
         }
       }
 
-      // Can we improve primal feasibility?
-      if (!changed_active_set && iprerr>=0 && lam[iprerr]==0.) {
-        // Constraint is free, enforce
-        lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
-        changed_active_set = true;
-        sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
-      }
-
       // Can we improve dual feasibility by adding a constraint?
-      if (!changed_active_set && iduerr>=0) {
+      if (!new_active_set && iduerr>=0) {
         // Calculate the sensitivity of dual infeasibility for iduerr
         casadi_fill(sens, nx_+na_, 0.);
         sens[iduerr] = duerr_pos ? 1. : -1.;
@@ -564,7 +561,7 @@ namespace casadi {
         if (index>=0 && duerr>1e-8) {
           // Enforce
           lam[index] = sens[index]>0 ? DMIN : -DMIN;
-          changed_active_set = true;
+          new_active_set = true;
           sprint(msg, sizeof(msg), "Added %lld to reduce |du|", iprerr);
         }
       }
@@ -613,11 +610,11 @@ namespace casadi {
 
       // Print iteration progress:
       print("%6d (%1s) %15g %15g %6d %15g %6d %15g %6d %10g %40s\n",
-            iter, primal_step ? "P" : "D", fk, prerr, iprerr, duerr, iduerr,
+            iter, sing ? "S" : "F", fk, prerr, iprerr, duerr, iduerr,
             mina, imina, tau, msg);
 
       // Successful return if still no change
-      if (!changed_active_set) {
+      if (!new_active_set) {
         flag = 0;
         break;
       }
@@ -634,33 +631,7 @@ namespace casadi {
       msg[0] = '\0';
 
       // No change so far
-      changed_active_set = false;
-
-      // KKT residual
-      for (i=0; i<nx_+na_; ++i) {
-        if (lam[i]>0.) {
-          kktres[i] = z[i]-ubz[i];
-        } else if (lam[i]<0.) {
-          kktres[i] = z[i]-lbz[i];
-        } else if (i<nx_) {
-          kktres[i] = glag[i];
-        } else {
-          kktres[i] = -lam[i];
-        }
-      }
-
-      if (verbose_) {
-        print_vector("KKT residual", kktres, nx_ + na_);
-      }
-
-      // Calculate the sensitivity of dual infeasibility for iduerr
-      casadi_fill(sens, nx_+na_, 0.);
-      if (iduerr>=0) {
-        casadi_fill(sens, nx_+na_, 0.);
-        sens[iduerr] = 1.;
-        casadi_mv(a, A_, sens, sens+nx_, 0);
-        casadi_scal(nx_+na_, 1./sens[iduerr], sens);
-      }
+      new_active_set = false;
 
       // Handle singularity
       if (sing) {
@@ -713,18 +684,46 @@ namespace casadi {
         if (prindex>=0) {
           sprint(msg, sizeof(msg), "Added %lld to reduce sing", prindex);
           lam[prindex] = enforce_upper ? DMIN : -DMIN;
-          changed_active_set = true;
+          new_active_set = true;
           tau = 0.;
           continue;
         }
 
-        casadi_warning("still singular");
-
         // Temporary workaround (will not be needed when singularity handling complete)
+        casadi_warning("still singular");
         casadi_trans(kktd, kktd_, vr, kktd_, iw);
         casadi_copy(vr, kktd_.nnz(), kktd);
         casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
+      }
 
+      // KKT residual
+      for (i=0; i<nx_+na_; ++i) {
+        if (lam[i]>0.) {
+          kktres[i] = z[i]-ubz[i];
+        } else if (lam[i]<0.) {
+          kktres[i] = z[i]-lbz[i];
+        } else if (i<nx_) {
+          kktres[i] = glag[i];
+        } else {
+          kktres[i] = -lam[i];
+        }
+      }
+
+      if (verbose_) {
+        print_vector("KKT residual", kktres, nx_ + na_);
+      }
+
+      // Calculate the sensitivity of dual infeasibility for iduerr
+      casadi_fill(sens, nx_+na_, 0.);
+      if (iduerr>=0) {
+        casadi_fill(sens, nx_+na_, 0.);
+        sens[iduerr] = 1.;
+        casadi_mv(a, A_, sens, sens+nx_, 0);
+        casadi_scal(nx_+na_, 1./sens[iduerr], sens);
+      }
+
+      // Handle singularity
+      if (sing) {
         // Are we overconstrained?
         if (lam[imina]!=0.) {
           // Maximum infeasibility from setting from setting lam[i]=0
@@ -745,7 +744,7 @@ namespace casadi {
           if (new_duerr <= fmax(duerr, prerr)) {
             sprint(msg, sizeof(msg), "Singular lam[%lld]=%.2g", imina, lam[imina]);
             lam[imina] = 0.;
-            changed_active_set = true;
+            new_active_set = true;
             tau = 0.;
             continue;
           }
@@ -900,7 +899,7 @@ namespace casadi {
               found_tau = true;
               tau = tau1;
               index = -1;
-              changed_active_set = true;
+              new_active_set = true;
             }
           }
         }
@@ -922,7 +921,7 @@ namespace casadi {
         }
         // Accept the tau, set multiplier to zero or flip sign if equality
         if (i!=index) { // ignore if already taken care of
-          changed_active_set = true;
+          new_active_set = true;
           lam[i] = !neverzero[i] ? 0 : lam[i]<0 ? DMIN : -DMIN;
           sprint(msg, sizeof(msg), "Removed %lld", i);
           dlam[i] = 0.;
@@ -946,7 +945,7 @@ namespace casadi {
         // Account for sign changes
         if (i==index && s!=sign) {
           sprint(msg, sizeof(msg), "Added %lld (%lld->%lld)", i, s, sign);
-          changed_active_set = true;
+          new_active_set = true;
           s = sign;
         }
         // Take step
