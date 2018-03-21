@@ -692,7 +692,7 @@ namespace casadi {
         // Best flip so far
         casadi_int prindex = -1;
         bool enforce_upper;
-        double prmargin = 0;
+        double prmargin = -prerr;
         // Loop over potential constraints that can be flipped
         for (i=0; i<nx_+na_; ++i) {
           // If ccomb[i]==0, old column cannot be removed without decreasing rank
@@ -725,6 +725,8 @@ namespace casadi {
           tau = 0.;
           continue;
         }
+
+        casadi_warning("still singular");
 
         // Temporary workaround (will not be needed when singularity handling complete)
         casadi_trans(kktd, kktd_, vr, kktd_, iw);
