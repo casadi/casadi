@@ -566,21 +566,49 @@ namespace casadi {
           lam[index] = sens[index]>0 ? DMIN : -DMIN;
           changed_active_set = true;
           sprint(msg, sizeof(msg), "Added %lld to reduce |du|", iprerr);
-        } else if (index>=0) {
-#if 0
-          i = index;
-          print("Improvement still possible by enforcing %s bound %lld. "
-                "z=%g, lbz=%g, ubz=%g, slack=%g, sensitivity=%g.\n",
-                sens[i]>0 ? "upper": "lower", i, z[i], lbz[i], ubz[i], best, sens[i]);
-#endif
         }
       }
+
+      // Copy kkt to kktd
+      casadi_project(kkt, kkt_, kktd, kktd_, w);
+
+      // Loop over kktd entries (left two blocks of the transposed KKT)
+      for (casadi_int c=0; c<nx_; ++c) {
+        if (lam[c]!=0) {
+          // Zero out column, set diagonal entry to 1
+          for (k=kktd_colind[c]; k<kktd_colind[c+1]; ++k) {
+            kktd[k] = kktd_row[k]==c ? 1. : 0.;
+          }
+        }
+      }
+
+      // Loop over kktd entries (right two blocks of the transposed KKT)
+      for (casadi_int c=0; c<na_; ++c) {
+        if (lam[nx_+c]==0) {
+          // Zero out column, set diagonal entry to -1
+          for (k=kktd_colind[nx_+c]; k<kktd_colind[nx_+c+1]; ++k) {
+            kktd[k] = kktd_row[k]==nx_+c ? -1. : 0.;
+          }
+        }
+      }
+
+      if (verbose_) {
+        print_matrix("KKT", kktd, kktd_);
+      }
+
+      // QR factorization
+      casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
+      if (verbose_) {
+        print_matrix("QR(R)", r, sp_r_);
+      }
+      // Check singularity
+      int sing = casadi_qr_singular(&mina, &imina, r, sp_r_, get_ptr(pc_), 1e-12);
 
       if (iter % 10 == 0) {
         // Print header
         print("%10s %15s %15s %6s %15s %6s %15s %6s %10s %40s\n",
               "Iteration", "fk", "|pr|", "con", "|du|", "var",
-              "min(diag(R))", "con", "tau", "Note");
+              "min(diag(R))", "con", "last tau", "Note");
       }
 
       // Print iteration progress:
@@ -634,41 +662,8 @@ namespace casadi {
         casadi_scal(nx_+na_, 1./sens[iduerr], sens);
       }
 
-      // Copy kkt to kktd
-      casadi_project(kkt, kkt_, kktd, kktd_, w);
-
-      // Loop over kktd entries (left two blocks of the transposed KKT)
-      for (casadi_int c=0; c<nx_; ++c) {
-        if (lam[c]!=0) {
-          // Zero out column, set diagonal entry to 1
-          for (k=kktd_colind[c]; k<kktd_colind[c+1]; ++k) {
-            kktd[k] = kktd_row[k]==c ? 1. : 0.;
-          }
-        }
-      }
-
-      // Loop over kktd entries (right two blocks of the transposed KKT)
-      for (casadi_int c=0; c<na_; ++c) {
-        if (lam[nx_+c]==0) {
-          // Zero out column, set diagonal entry to -1
-          for (k=kktd_colind[nx_+c]; k<kktd_colind[nx_+c+1]; ++k) {
-            kktd[k] = kktd_row[k]==nx_+c ? -1. : 0.;
-          }
-        }
-      }
-
-      if (verbose_) {
-        print_matrix("KKT", kktd, kktd_);
-      }
-
-      // QR factorization
-      casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
-      if (verbose_) {
-        print_matrix("QR(R)", r, sp_r_);
-      }
-
       // Handle singularity
-      if (casadi_qr_singular(&mina, &imina, r, sp_r_, get_ptr(pc_), 1e-12)) {
+      if (sing) {
         // Get a linear combination of the columns in kktd
         casadi_qr_colcomb(ccomb, r, sp_r_, get_ptr(pc_), imina);
         if (verbose_) {
