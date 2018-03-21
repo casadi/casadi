@@ -209,7 +209,8 @@ namespace casadi {
   void print_matrix(const char* id, const double* x, const casadi_int* sp_x) {
     cout << id << ": ";
     Sparsity sp = Sparsity::compressed(sp_x);
-    vector<double> nz(x, x+sp.nnz());
+    vector<double> nz(sp.nnz(), 0.);
+    if (x!=0) casadi_copy(x, nz.size(), get_ptr(nz));
     DM(sp, nz).print_dense(cout, false);
     cout << endl;
   }
@@ -264,7 +265,7 @@ namespace casadi {
     }
 
     // Local variables
-    casadi_int i, flag;
+    casadi_int i, k, flag;
     double fk;
     // Get input pointers
     const double *h, *g, *a, *lba, *uba, *lbx, *ubx, *x0, *lam_x0, *lam_a0;
@@ -326,10 +327,10 @@ namespace casadi {
     casadi_copy(uba, na_, ubz+nx_);
 
     if (verbose_) {
-      print_vector("lbz(x)", lbz, nx_);
-      print_vector("ubz(x)", ubz, nx_);
-      print_vector("lbz(g)", lbz+nx_, na_);
-      print_vector("ubz(g)", ubz+nx_, na_);
+      print_vector("lbz", lbz, nx_+na_);
+      print_vector("ubz", ubz, nx_+na_);
+      print_matrix("H", h, H_);
+      print_matrix("A", a, A_);
     }
 
     // Pass initial guess
@@ -393,8 +394,8 @@ namespace casadi {
     }
 
     // kktd sparsity
-    kkt_colind = kktd_.colind();
-    kkt_row = kktd_.row();
+    const casadi_int* kktd_colind = kktd_.colind();
+    const casadi_int* kktd_row = kktd_.row();
 
     // R sparsity
     //const casadi_int* r_colind = sp_r_.colind();
@@ -643,8 +644,8 @@ namespace casadi {
       for (casadi_int c=0; c<nx_; ++c) {
         if (lam[c]!=0) {
           // Zero out column, set diagonal entry to 1
-          for (casadi_int k=kkt_colind[c]; k<kkt_colind[c+1]; ++k) {
-            kktd[k] = kkt_row[k]==c ? 1. : 0.;
+          for (k=kktd_colind[c]; k<kktd_colind[c+1]; ++k) {
+            kktd[k] = kktd_row[k]==c ? 1. : 0.;
           }
         }
       }
@@ -653,8 +654,8 @@ namespace casadi {
       for (casadi_int c=0; c<na_; ++c) {
         if (lam[nx_+c]==0) {
           // Zero out column, set diagonal entry to -1
-          for (casadi_int k=kkt_colind[nx_+c]; k<kkt_colind[nx_+c+1]; ++k) {
-            kktd[k] = kkt_row[k]==nx_+c ? -1. : 0.;
+          for (k=kktd_colind[nx_+c]; k<kktd_colind[nx_+c+1]; ++k) {
+            kktd[k] = kktd_row[k]==nx_+c ? -1. : 0.;
           }
         }
       }
@@ -687,6 +688,42 @@ namespace casadi {
         casadi_qr_colcomb(rcomb, r, sp_r_, get_ptr(pc_), imina_tr);
         if (verbose_) {
           print_vector("rcomb", rcomb, nx_+na_);
+        }
+        // Best flip so far
+        casadi_int prindex = -1;
+        bool enforce_upper;
+        double prmargin = 0;
+        // Loop over potential constraints that can be flipped
+        for (i=0; i<nx_+na_; ++i) {
+          // If ccomb[i]==0, old column cannot be removed without decreasing rank
+          if (fabs(ccomb[i])<1e-12) continue;
+          // Make sure that flipping the constraint is permitted
+          if (lam[i]==0. ? neverupper[i] && neverlower[i] : neverzero[i]) continue;
+          // dot(rcomb, kktd(:,i)-kktd_flipped(:,i))==0, rank won't increase
+          double d = i<nx_ ? rcomb[i] : -rcomb[i];
+          for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d -= kkt[k]*rcomb[kkt_row[k]];
+          if (fabs(d)<1e-12) continue;
+          // Does the variable correspond to an unenforced violated constraint?
+          if (lam[i]==0) {
+            if (z[i] + prmargin < lbz[i]) {
+              prindex = i;
+              prmargin = lbz[i]-z[i];
+              enforce_upper = false;
+            } else if (z[i] - prmargin > ubz[i]) {
+              prindex = i;
+              prmargin = z[i]-ubz[i];
+              enforce_upper = true;
+            }
+          }
+        }
+
+        // Accept, if any
+        if (prindex>=0) {
+          sprint(msg, sizeof(msg), "Added %lld to reduce sing", prindex);
+          lam[prindex] = enforce_upper ? DMIN : -DMIN;
+          changed_active_set = true;
+          tau = 0.;
+          continue;
         }
 
         // Temporary workaround (will not be needed when singularity handling complete)
