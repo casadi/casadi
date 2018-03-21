@@ -483,87 +483,12 @@ namespace casadi {
         }
       }
 
-      // Smallest nonzero lambda
-      double lam_min = 0.;
-      for (i=0; i<nx_+na_; ++i) {
-        if (lam[i]!=0. && fabs(lam[i])<lam_min) lam_min = fabs(lam[i]);
-      }
-
       // If last step was full, try to improve primal feasibility
       if (!new_active_set && iprerr>=0 && lam[iprerr]==0.) {
         // Constraint is free, enforce
         lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
         new_active_set = true;
         sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
-      }
-
-      // Can any constraint be removed without increasing dual infeasibility?
-      if (!new_active_set) {
-        double best = duerr;
-        casadi_int index = -1;
-        for (i=0; i<nx_+na_; ++i) {
-          // Skip non-candidates
-          if (i==iprerr || lam[i]==0.) continue;
-          // Skip equality constraints, no improvement is possible
-          if (neverzero[i]) continue;
-          // Check largest dual infeasibility resulting from setting lam[i]=0
-          double new_duerr;
-          if (i<nx_) {
-            // Set a lam_x to zero
-            new_duerr = fabs(glag[i]);
-          } else {
-            // Set a lam_a to zero
-            new_duerr = 0.;
-            for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-              casadi_int j = at_row[k];
-              new_duerr = fmax(new_duerr, fabs((glag[j]-trans_a[k]*lam[i]) + lam[j]));
-            }
-          }
-          // Is this the best one so far?
-          if (new_duerr<best) {
-            best = new_duerr;
-            index = i;
-          }
-        }
-        // Accept, if any
-        if (index>=0) {
-          lam[index] = 0.;
-          new_active_set = true;
-          sprint(msg, sizeof(msg), "Removed redundant %lld", index);
-        }
-      }
-
-      // Can we improve dual feasibility by adding a constraint?
-      if (!new_active_set && iduerr>=0) {
-        // Calculate the sensitivity of dual infeasibility for iduerr
-        casadi_fill(sens, nx_+na_, 0.);
-        sens[iduerr] = duerr_pos ? 1. : -1.;
-        casadi_mv(a, A_, sens, sens+nx_, 0);
-
-        // Is it possible to improve dual feasibility by adding a constraint
-        double best = 0.;
-        casadi_int index = -1;
-        for (i=0; i<nx_+na_; ++i) {
-          // Skip non-candidates
-          if (lam[i]!=0. || sens[i]==0.) continue;
-          // We cannot enforce an infinite bound
-          if (sens[i]>0. ? neverupper[i] : neverlower[i]) continue;
-          // How far are we from the bounds
-          double slack = sens[i]>0 ? ubz[i]-z[i] : z[i]-lbz[i];
-          // Check if it's the best so far
-          if (slack>best) {
-            best = slack;
-            index = i;
-          }
-        }
-
-        // Accept, if any
-        if (index>=0 && duerr>1e-8) {
-          // Enforce
-          lam[index] = sens[index]>0 ? DMIN : -DMIN;
-          new_active_set = true;
-          sprint(msg, sizeof(msg), "Added %lld to reduce |du|", iprerr);
-        }
       }
 
       // Copy kkt to kktd
