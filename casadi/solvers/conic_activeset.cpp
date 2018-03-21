@@ -427,12 +427,9 @@ namespace casadi {
     while (true) {
       // Debugging
       if (verbose_) {
-        print_vector("z(x)", z, nx_);
-        print_vector("z(g)", z+nx_, na_);
-        print_vector("lam(x)", lam, nx_);
-        print_vector("lam(a)", lam+nx_, na_);
-        print_signs("sign(lam_x)", lam, nx_);
-        print_signs("sign(lam_a)", lam+nx_, na_);
+        print_vector("z", z, nx_+na_);
+        print_vector("lam", lam, nx_+na_);
+        print_signs("sign(lam)", lam, nx_+na_);
       }
 
       // Recalculate g
