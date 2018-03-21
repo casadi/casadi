@@ -116,8 +116,7 @@ namespace casadi {
     alloc_iw(nx_+na_); // allzero
 
     // Memory for numerical solution
-    alloc_w(sp_v_.nnz(), true); // v
-    alloc_w(sp_r_.nnz(), true); // r
+    alloc_w(max(sp_v_.nnz()+sp_r_.nnz(), kktd_.nnz()), true); // either v & r or trans(kktd)
     alloc_w(nx_+na_, true); // beta
     alloc_w(2*na_+2*nx_); // casadi_qr
 
@@ -289,7 +288,7 @@ namespace casadi {
 
     // Work vectors
     double *kkt, *kktd, *z, *lam, *v, *r, *beta, *dz, *dlam, *lbz, *ubz,
-           *kktres, *glag, *sens, *trans_a, *infeas, *tinfeas;
+           *kktres, *glag, *sens, *trans_a, *infeas, *tinfeas, *vr;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     z = w; w += nx_+na_;
@@ -298,8 +297,9 @@ namespace casadi {
     lam = w; w += nx_+na_;
     dz = w; w += nx_+na_;
     dlam = w; w += nx_+na_;
-    v = w; w += sp_v_.nnz();
-    r = w; w += sp_r_.nnz();
+    vr = w; w += max(sp_v_.nnz()+sp_r_.nnz(), kktd_.nnz());
+    v = vr;
+    r = vr + sp_v_.nnz();
     beta = w; w += nx_+na_;
     kktres = w; w += nx_+na_;
     glag = w; w += nx_;
@@ -314,6 +314,10 @@ namespace casadi {
 
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
+
+    // dz, dlam will double as linear combinations when singular
+    double* ccomb = dz;
+    double* rcomb = dlam;
 
     // Bounds on z
     casadi_copy(lbx, nx_, lbz);
@@ -667,11 +671,28 @@ namespace casadi {
 
       // Handle singularity
       if (casadi_qr_singular(&mina, &imina, r, sp_r_, get_ptr(pc_), 1e-12)) {
-        // Get a linear combination of the rows
-        casadi_qr_colcomb(w, r, sp_r_, get_ptr(pc_), imina);
+        // Get a linear combination of the columns in kktd
+        casadi_qr_colcomb(ccomb, r, sp_r_, get_ptr(pc_), imina);
         if (verbose_) {
-          print_vector("Linear combination of rows in KKT", w, nx_+na_);
+          print_vector("ccomb", ccomb, nx_+na_);
         }
+        // QR factorization of the transpose
+        casadi_trans(kktd, kktd_, vr, kktd_, iw);
+        casadi_copy(vr, kktd_.nnz(), kktd);
+        casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
+        // Get a linear combination of the rows in kktd
+        double minat_tr;
+        casadi_int imina_tr;
+        casadi_qr_singular(&minat_tr, &imina_tr, r, sp_r_, get_ptr(pc_), 1e-12);
+        casadi_qr_colcomb(rcomb, r, sp_r_, get_ptr(pc_), imina_tr);
+        if (verbose_) {
+          print_vector("rcomb", rcomb, nx_+na_);
+        }
+
+        // Temporary workaround (will not be needed when singularity handling complete)
+        casadi_trans(kktd, kktd_, vr, kktd_, iw);
+        casadi_copy(vr, kktd_.nnz(), kktd);
+        casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
 
         // Are we overconstrained?
         if (lam[imina]!=0.) {
