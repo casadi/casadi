@@ -574,8 +574,28 @@ namespace casadi {
                         get_ptr(prinv_), get_ptr(pc_), w);
       }
 
+      // Calculate change in Lagrangian gradient
+      casadi_fill(dlam, nx_, 0.);
+      casadi_mv(h, H_, dz, dlam, 0); // gradient of the objective
+      casadi_mv(a, A_, dz+nx_, dlam, 1); // gradient of the Lagrangian
+
+      // Step in lam(x)
+      casadi_scal(nx_, -1., dlam);
+
+      // For inactive constraints, step is zero
+      for (i=0; i<nx_; ++i) if (lam[i]==0.) dlam[i] = 0.;
+
+      // Step in lam(g)
+      casadi_copy(dz+nx_, na_, dlam+nx_);
+
+      // Step in z(g)
+      casadi_fill(dz+nx_, na_, 0.);
+      casadi_mv(a, A_, dz, dz+nx_, 0);
+
+      // Print search direction
       if (verbose_) {
-        print_vector("Search direction", dz, nx_ + na_);
+        print_vector("dz", dz, nx_+na_);
+        print_vector("dlam", dlam, nx_+na_);
       }
 
       // Handle singularity
@@ -678,31 +698,24 @@ namespace casadi {
         casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
                         get_ptr(prinv_), get_ptr(pc_), w);
         for (i=0; i<nx_+na_; ++i) if (isnan(dz[i])) dz[i]=0.;
-      }
 
-      // Calculate change in Lagrangian gradient
-      casadi_fill(dlam, nx_, 0.);
-      casadi_mv(h, H_, dz, dlam, 0); // gradient of the objective
-      casadi_mv(a, A_, dz+nx_, dlam, 1); // gradient of the Lagrangian
+        // Calculate change in Lagrangian gradient
+        casadi_fill(dlam, nx_, 0.);
+        casadi_mv(h, H_, dz, dlam, 0); // gradient of the objective
+        casadi_mv(a, A_, dz+nx_, dlam, 1); // gradient of the Lagrangian
 
-      // Step in lam(x)
-      casadi_scal(nx_, -1., dlam);
+        // Step in lam(x)
+        casadi_scal(nx_, -1., dlam);
 
-      // For inactive constraints, step is zero
-      for (i=0; i<nx_; ++i) if (lam[i]==0.) dlam[i] = 0.;
+        // For inactive constraints, step is zero
+        for (i=0; i<nx_; ++i) if (lam[i]==0.) dlam[i] = 0.;
 
-      // Step in lam(g)
-      casadi_copy(dz+nx_, na_, dlam+nx_);
+        // Step in lam(g)
+        casadi_copy(dz+nx_, na_, dlam+nx_);
 
-      // Step in z(g)
-      casadi_fill(dz+nx_, na_, 0.);
-      casadi_mv(a, A_, dz, dz+nx_, 0);
-
-      if (verbose_) {
-        print_vector("dz(x)", dz, nx_);
-        print_vector("dz(g)", dz+nx_, na_);
-        print_vector("dlam(x)", dlam, nx_);
-        print_vector("dlam(g)", dlam+nx_, na_);
+        // Step in z(g)
+        casadi_fill(dz+nx_, na_, 0.);
+        casadi_mv(a, A_, dz, dz+nx_, 0);
       }
 
       // Get maximum step size and corresponding index and new sign
