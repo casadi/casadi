@@ -105,7 +105,6 @@ namespace casadi {
     alloc_w(nx_+na_); // casadi_project, tau memory
     alloc_w(nx_+na_, true); // dz
     alloc_w(nx_+na_, true); // dlam
-    alloc_w(nx_+na_, true); // kktres
     alloc_w(nx_, true); // glag
     alloc_w(nx_, true); // infeas
     alloc_w(nx_, true); // tinfeas
@@ -288,7 +287,7 @@ namespace casadi {
 
     // Work vectors
     double *kkt, *kktd, *z, *lam, *v, *r, *beta, *dz, *dlam, *lbz, *ubz,
-           *kktres, *glag, *trans_a, *infeas, *tinfeas, *vr;
+           *glag, *trans_a, *infeas, *tinfeas, *vr;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     z = w; w += nx_+na_;
@@ -301,7 +300,6 @@ namespace casadi {
     v = vr;
     r = vr + sp_v_.nnz();
     beta = w; w += nx_+na_;
-    kktres = w; w += nx_+na_;
     glag = w; w += nx_;
     trans_a = w; w += AT_.nnz();
     infeas = w; w += nx_;
@@ -622,18 +620,18 @@ namespace casadi {
       // KKT residual
       for (i=0; i<nx_+na_; ++i) {
         if (lam[i]>0.) {
-          kktres[i] = z[i]-ubz[i];
+          dz[i] = z[i]-ubz[i];
         } else if (lam[i]<0.) {
-          kktres[i] = z[i]-lbz[i];
+          dz[i] = z[i]-lbz[i];
         } else if (i<nx_) {
-          kktres[i] = glag[i];
+          dz[i] = glag[i];
         } else {
-          kktres[i] = -lam[i];
+          dz[i] = -lam[i];
         }
       }
 
       if (verbose_) {
-        print_vector("KKT residual", kktres, nx_ + na_);
+        print_vector("KKT residual", dz, nx_ + na_);
       }
 
       // Handle singularity
@@ -666,7 +664,6 @@ namespace casadi {
       }
 
       // Solve to get primal-dual step
-      casadi_copy(kktres, nx_+na_, dz);
       casadi_scal(nx_+na_, -1., dz);
       casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
                       get_ptr(prinv_), get_ptr(pc_), w);
