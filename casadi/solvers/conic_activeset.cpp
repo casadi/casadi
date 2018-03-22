@@ -312,10 +312,6 @@ namespace casadi {
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
 
-    // dz, dlam will double as linear combinations when singular
-    double* ccomb = dz;
-    double* rcomb = dlam;
-
     // Bounds on z
     casadi_copy(lbx, nx_, lbz);
     casadi_copy(lba, na_, lbz+nx_);
@@ -554,13 +550,36 @@ namespace casadi {
       // No change so far
       new_active_set = false;
 
-      // Handle singularity
+      // Calculate search direction
       if (sing) {
         // Get a linear combination of the columns in kktd
-        casadi_qr_colcomb(ccomb, r, sp_r_, get_ptr(pc_), imina);
-        if (verbose_) {
-          print_vector("ccomb", ccomb, nx_+na_);
+        casadi_qr_colcomb(dz, r, sp_r_, get_ptr(pc_), imina);
+      } else {
+        // KKT residual
+        for (i=0; i<nx_+na_; ++i) {
+          if (lam[i]>0.) {
+            dz[i] = z[i]-ubz[i];
+          } else if (lam[i]<0.) {
+            dz[i] = z[i]-lbz[i];
+          } else if (i<nx_) {
+            dz[i] = glag[i];
+          } else {
+            dz[i] = -lam[i];
+          }
         }
+
+        // Solve to get primal-dual step
+        casadi_scal(nx_+na_, -1., dz);
+        casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
+                        get_ptr(prinv_), get_ptr(pc_), w);
+      }
+
+      if (verbose_) {
+        print_vector("Search direction", dz, nx_ + na_);
+      }
+
+      // Handle singularity
+      if (sing) {
         // QR factorization of the transpose
         casadi_trans(kktd, kktd_, vr, kktd_, iw);
         casadi_copy(vr, kktd_.nnz(), kktd);
@@ -569,9 +588,9 @@ namespace casadi {
         double minat_tr;
         casadi_int imina_tr;
         casadi_qr_singular(&minat_tr, &imina_tr, r, sp_r_, get_ptr(pc_), 1e-12);
-        casadi_qr_colcomb(rcomb, r, sp_r_, get_ptr(pc_), imina_tr);
+        casadi_qr_colcomb(w, r, sp_r_, get_ptr(pc_), imina_tr);
         if (verbose_) {
-          print_vector("rcomb", rcomb, nx_+na_);
+          print_vector("w", w, nx_+na_);
         }
         // Best flip so far
         casadi_int prindex = -1;
@@ -579,13 +598,13 @@ namespace casadi {
         double prmargin = -prerr;
         // Loop over potential constraints that can be flipped
         for (i=0; i<nx_+na_; ++i) {
-          // If ccomb[i]==0, old column cannot be removed without decreasing rank
-          if (fabs(ccomb[i])<1e-12) continue;
+          // If dz[i]==0, old column cannot be removed without decreasing rank
+          if (fabs(dz[i])<1e-12) continue;
           // Make sure that flipping the constraint is permitted
           if (lam[i]==0. ? neverupper[i] && neverlower[i] : neverzero[i]) continue;
-          // dot(rcomb, kktd(:,i)-kktd_flipped(:,i))==0, rank won't increase
-          double d = i<nx_ ? rcomb[i] : -rcomb[i];
-          for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d -= kkt[k]*rcomb[kkt_row[k]];
+          // dot(w, kktd(:,i)-kktd_flipped(:,i))==0, rank won't increase
+          double d = i<nx_ ? w[i] : -w[i];
+          for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d -= kkt[k]*w[kkt_row[k]];
           if (fabs(d)<1e-12) continue;
           // Does the variable correspond to an unenforced violated constraint?
           if (lam[i]==0) {
@@ -610,32 +629,12 @@ namespace casadi {
           continue;
         }
 
-        // Temporary workaround (will not be needed when singularity handling complete)
+        // Legacy code:
         casadi_warning("still singular");
         casadi_trans(kktd, kktd_, vr, kktd_, iw);
         casadi_copy(vr, kktd_.nnz(), kktd);
         casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
-      }
 
-      // KKT residual
-      for (i=0; i<nx_+na_; ++i) {
-        if (lam[i]>0.) {
-          dz[i] = z[i]-ubz[i];
-        } else if (lam[i]<0.) {
-          dz[i] = z[i]-lbz[i];
-        } else if (i<nx_) {
-          dz[i] = glag[i];
-        } else {
-          dz[i] = -lam[i];
-        }
-      }
-
-      if (verbose_) {
-        print_vector("KKT residual", dz, nx_ + na_);
-      }
-
-      // Handle singularity
-      if (sing) {
         // Are we overconstrained?
         if (lam[imina]!=0.) {
           // Maximum infeasibility from setting from setting lam[i]=0
@@ -661,15 +660,25 @@ namespace casadi {
             continue;
           }
         }
+        // KKT residual
+        for (i=0; i<nx_+na_; ++i) {
+          if (lam[i]>0.) {
+            dz[i] = z[i]-ubz[i];
+          } else if (lam[i]<0.) {
+            dz[i] = z[i]-lbz[i];
+          } else if (i<nx_) {
+            dz[i] = glag[i];
+          } else {
+            dz[i] = -lam[i];
+          }
+        }
+
+        // Solve to get primal-dual step
+        casadi_scal(nx_+na_, -1., dz);
+        casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
+                        get_ptr(prinv_), get_ptr(pc_), w);
+        for (i=0; i<nx_+na_; ++i) if (isnan(dz[i])) dz[i]=0.;
       }
-
-      // Solve to get primal-dual step
-      casadi_scal(nx_+na_, -1., dz);
-      casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
-                      get_ptr(prinv_), get_ptr(pc_), w);
-
-      // Remove NaNs
-      for (i=0; i<nx_+na_; ++i) if (isnan(dz[i])) dz[i]=0.;
 
       // Calculate change in Lagrangian gradient
       casadi_fill(dlam, nx_, 0.);
