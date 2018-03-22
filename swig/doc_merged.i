@@ -31528,7 +31528,7 @@ Evaluate numerically.
 [INTERNAL] 
 Evaluate a function, overloaded.
 
->  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w) const 
+>  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, casadi_int mem=0) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate or propagate sparsities.
@@ -31751,7 +31751,7 @@ Evaluate numerically.
 [INTERNAL] 
 Evaluate a function, overloaded.
 
->  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w) const 
+>  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, casadi_int mem=0) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate or propagate sparsities.
@@ -32675,7 +32675,7 @@ Evaluate numerically.
 [INTERNAL] 
 Evaluate a function, overloaded.
 
->  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w) const 
+>  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, casadi_int mem=0) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
 Evaluate or propagate sparsities.

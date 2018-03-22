@@ -44222,7 +44222,7 @@ std::vector< M > &res) const  "
 ";
 
 %feature("docstring")  casadi::Map::eval_gen(const T **arg, T **res,
-casadi_int *iw, T *w) const  "
+casadi_int *iw, T *w, casadi_int mem=0) const  "
 
 [INTERNAL]  Evaluate or propagate sparsities.
 
@@ -44545,7 +44545,7 @@ original
 ";
 
 %feature("docstring")  casadi::Map::eval_gen(const T **arg, T **res,
-casadi_int *iw, T *w) const  "
+casadi_int *iw, T *w, casadi_int mem=0) const  "
 
 [INTERNAL]  Evaluate or propagate sparsities.
 
@@ -45925,7 +45925,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::Map::eval_gen(const T **arg, T **res,
-casadi_int *iw, T *w) const  "
+casadi_int *iw, T *w, casadi_int mem=0) const  "
 
 [INTERNAL]  Evaluate or propagate sparsities.
 
