@@ -29,6 +29,7 @@
 #include "function.hpp"
 #include <set>
 #include <stack>
+#include <mutex>
 #include "code_generator.hpp"
 #include "importer.hpp"
 #include "sparse_storage.hpp"
@@ -125,6 +126,9 @@ namespace casadi {
 
     /// Unused memory objects
     mutable std::stack<casadi_int> unused_;
+
+    /// Mutex for thread safety
+    mutable std::mutex mtx_;
   };
 
   /** \brief Internal class for Function

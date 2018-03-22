@@ -1223,6 +1223,14 @@ namespace casadi {
 #endif // WITH_EXTRA_CHECKS
 
   int Function::operator()(const double** arg, double** res,
+      casadi_int* iw, double* w) const {
+    casadi_int mem = checkout();
+    int ret = operator()(arg, res, iw, w, mem);
+    release(mem);
+    return ret;
+  }
+
+  int Function::operator()(const double** arg, double** res,
       casadi_int* iw, double* w, casadi_int mem) const {
     try {
 #ifdef WITH_EXTRA_CHECKS
