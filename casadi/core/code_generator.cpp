@@ -264,8 +264,8 @@ namespace casadi {
   }
 
   void CodeGenerator::generate_casadi_int(std::ostream &s) const {
-    s << "#ifndef CASADI_INT_TYPE\n"
-      << "#define CASADI_INT_TYPE " << this->casadi_int_type << endl
+    s << "#ifndef casadi_int\n"
+      << "#define casadi_int " << this->casadi_int_type << endl
       << "#endif\n\n";
   }
 

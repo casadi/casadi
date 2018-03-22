@@ -40,16 +40,14 @@ extern "C" {
 #define casadi_real double
 #endif
 
-#include "core/casadi_types.hpp"
-
 /* Function types corresponding to entry points in CasADi's C API */
 typedef void (*casadi_signal_t)(void);
-typedef casadi_int (*casadi_getint_t)(void);
-typedef const casadi_int* (*casadi_sparsity_t)(casadi_int i);
-typedef const char* (*casadi_name_t)(casadi_int i);
-typedef int (*casadi_work_t)(casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w);
+typedef int (*casadi_getint_t)(void);
+typedef const int* (*casadi_sparsity_t)(int i);
+typedef const char* (*casadi_name_t)(int i);
+typedef int (*casadi_work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
 typedef int (*casadi_eval_t)(const casadi_real** arg, casadi_real** res,
-                             casadi_int* iw, casadi_real* w, void* mem);
+                             int* iw, casadi_real* w, void* mem);
 
 /* Structure to hold meta information about an input or output */
 typedef struct {
@@ -58,17 +56,17 @@ typedef struct {
   int ncol;
   int nnz;
   int numel;
-  const casadi_int* colind;
-  const casadi_int* row;
+  const int* colind;
+  const int* row;
 } casadi_io;
 
 /* Decompress a sparsity pattern */
-inline void casadi_decompress(const casadi_int* sp, int* nrow, int* ncol,
+inline void casadi_decompress(const int* sp, int* nrow, int* ncol,
                               int* nnz, int* numel,
-                              const casadi_int** colind, const casadi_int** row) {
+                              const int** colind, const int** row) {
   if (sp==0) {
     /* Scalar sparsity pattern if sp is null */
-    static const casadi_int scalar_colind[2] = {0, 1};
+    static const int scalar_colind[2] = {0, 1};
     *ncol = *nrow = 1;
     *nnz = *numel = 1;
     *colind = scalar_colind;
@@ -104,10 +102,10 @@ typedef struct {
   casadi_functions* f;
 
   /* Work arrays */
-  casadi_int sz_arg, sz_res, sz_iw, sz_w;
+  int sz_arg, sz_res, sz_iw, sz_w;
   const casadi_real** arg;
   casadi_real** res;
-  casadi_int* iw;
+  int* iw;
   casadi_real* w;
   void* mem;
 
@@ -207,7 +205,7 @@ inline int casadi_alloc_arrays(casadi_mem* mem) {
   if (mem->sz_arg!=0 && mem->arg==0) return 1;
   mem->res = (casadi_real**)malloc(mem->sz_res*sizeof(casadi_real*));
   if (mem->sz_res!=0 && mem->res==0) return 1;
-  mem->iw = (casadi_int*)malloc(mem->sz_iw*sizeof(casadi_int));
+  mem->iw = (int*)malloc(mem->sz_iw*sizeof(int));
   if (mem->sz_iw!=0 && mem->iw==0) return 1;
   mem->w = (casadi_real*)malloc(mem->sz_w*sizeof(casadi_real));
   if (mem->sz_w!=0 && mem->w==0) return 1;
