@@ -107,7 +107,6 @@ namespace casadi {
     alloc_w(nx_+na_, true); // dlam
     alloc_w(nx_+na_, true); // kktres
     alloc_w(nx_, true); // glag
-    alloc_w(nx_+na_, true); // sens
     alloc_w(nx_, true); // infeas
     alloc_w(nx_, true); // tinfeas
     alloc_iw(nx_+na_, true); // neverzero
@@ -289,7 +288,7 @@ namespace casadi {
 
     // Work vectors
     double *kkt, *kktd, *z, *lam, *v, *r, *beta, *dz, *dlam, *lbz, *ubz,
-           *kktres, *glag, *sens, *trans_a, *infeas, *tinfeas, *vr;
+           *kktres, *glag, *trans_a, *infeas, *tinfeas, *vr;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     z = w; w += nx_+na_;
@@ -304,7 +303,6 @@ namespace casadi {
     beta = w; w += nx_+na_;
     kktres = w; w += nx_+na_;
     glag = w; w += nx_;
-    sens = w; w += nx_+na_;
     trans_a = w; w += AT_.nnz();
     infeas = w; w += nx_;
     tinfeas = w; w += nx_;
@@ -636,15 +634,6 @@ namespace casadi {
 
       if (verbose_) {
         print_vector("KKT residual", kktres, nx_ + na_);
-      }
-
-      // Calculate the sensitivity of dual infeasibility for iduerr
-      casadi_fill(sens, nx_+na_, 0.);
-      if (iduerr>=0) {
-        casadi_fill(sens, nx_+na_, 0.);
-        sens[iduerr] = 1.;
-        casadi_mv(a, A_, sens, sens+nx_, 0);
-        casadi_scal(nx_+na_, 1./sens[iduerr], sens);
       }
 
       // Handle singularity
