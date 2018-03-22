@@ -115,6 +115,13 @@ namespace casadi {
     casadi_int neig(const double* A, casadi_int mem=0) const;
     casadi_int rank(const double* A, casadi_int mem=0) const;
     ///@}
+
+    /// Checkout a memory object
+    casadi_int checkout() const;
+
+    /// Release a memory object
+    void release(casadi_int mem) const;
+
     #endif // SWIG
   };
 

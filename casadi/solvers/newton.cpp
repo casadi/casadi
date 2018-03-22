@@ -117,6 +117,8 @@ namespace casadi {
   int Newton::solve(void* mem) const {
     auto m = static_cast<NewtonMemory*>(mem);
 
+    casadi_int mem_linsol = linsol_.checkout();
+
     // Get the initial guess
     casadi_copy(m->iarg[iin_], n_, m->x);
 
@@ -156,8 +158,8 @@ namespace casadi {
       }
 
       // Factorize the linear solver with J
-      linsol_.nfact(m->jac);
-      linsol_.solve(m->jac, m->f, 1, false);
+      linsol_.nfact(m->jac, mem_linsol);
+      linsol_.solve(m->jac, m->f, 1, false, mem_linsol);
 
       // Check convergence again
       double abstolStep=0;
@@ -191,6 +193,8 @@ namespace casadi {
     // Store the iteration count
     if (success) m->return_status = "success";
     if (verbose_) casadi_message("Newton algorithm took " + str(m->iter) + " steps");
+
+    linsol_.release(mem_linsol);
     return 0;
   }
 

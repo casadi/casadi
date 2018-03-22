@@ -472,5 +472,17 @@ class LinearSolverTests(casadiTestCase):
       with self.assertRaises(Exception):
         solve(As,bs,Solver,options)
 
+  @memory_heavy()
+  def test_thread_safety(self):
+    x = MX.sym('x')
+    y = MX.sym('y')
+    f = Function('f', [x, y], [x ** 2 - y])
+    for Solver, options, req in lsolvers:
+      finv = rootfinder('finv', "newton", f, {"linear_solver": Solver, "linear_solver_options": options})
+
+      finv_par = finv.map(200, 'thread',4)
+      res = finv_par(numpy.ones(200), numpy.linspace(0, 10, 200))
+      self.checkarray(norm_inf(res.T-sqrt(numpy.linspace(0, 10, 200))),0, digits=5)
+
 if __name__ == '__main__':
     unittest.main()

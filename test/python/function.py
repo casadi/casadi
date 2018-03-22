@@ -1766,15 +1766,16 @@ class Functiontests(casadiTestCase):
     x = MX.sym('x')
     y = MX.sym('y')
     f = Function('f', [x, y], [x ** 2 - y])
-    finv = rootfinder('finv', 'fast_newton', f)
+    for rf in ["newton","fast_newton"]:
+      finv = rootfinder('finv', rf, f)
 
-    finv_par = finv.map(50,"unroll").map(4, 'thread',4)
-    res = finv_par(numpy.ones(200), numpy.linspace(0, 10, 200))
-    self.checkarray(norm_inf(res.T-sqrt(numpy.linspace(0, 10, 200))),0, digits=5)
+      finv_par = finv.map(50,"unroll").map(4, 'thread',4)
+      res = finv_par(numpy.ones(200), numpy.linspace(0, 10, 200))
+      self.checkarray(norm_inf(res.T-sqrt(numpy.linspace(0, 10, 200))),0, digits=5)
 
-    finv_par = finv.map(200, 'thread',4)
-    res = finv_par(numpy.ones(200), numpy.linspace(0, 10, 200))
-    self.checkarray(norm_inf(res.T-sqrt(numpy.linspace(0, 10, 200))),0, digits=5)
+      finv_par = finv.map(200, 'thread',4)
+      res = finv_par(numpy.ones(200), numpy.linspace(0, 10, 200))
+      self.checkarray(norm_inf(res.T-sqrt(numpy.linspace(0, 10, 200))),0, digits=5)
 
 if __name__ == '__main__':
     unittest.main()

@@ -202,7 +202,7 @@ namespace casadi {
 
     // Evaluate memory-less
     try {
-      f(m->arg, m->res, m->iw, m->w, 0);
+      f(m->arg, m->res, m->iw, m->w);
     } catch(exception& ex) {
       // Fatal error
       casadi_warning(name_ + ":" + fcn + " failed:" + std::string(ex.what()));

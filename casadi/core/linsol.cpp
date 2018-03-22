@@ -122,7 +122,7 @@ namespace casadi {
 
     // Perform pivoting, if required
     if (!m->is_sfact) {
-      if (sfact(A)) return 1;
+      if (sfact(A, mem)) return 1;
     }
 
     m->is_nfact = false;
@@ -158,6 +158,15 @@ namespace casadi {
     casadi_assert(m->is_nfact, "Linear system has not been factorized");
     return (*this)->solve(m, A, x, nrhs, tr);
   }
+
+  casadi_int Linsol::checkout() const {
+    return (*this)->checkout();
+  }
+
+  void Linsol::release(casadi_int mem) const {
+    (*this)->release(mem);
+  }
+
 
   bool has_linsol(const string& name) {
     return Linsol::has_plugin(name);
