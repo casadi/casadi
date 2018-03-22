@@ -448,23 +448,23 @@ namespace casadi {
       // Look for largest bound violation
       double prerr = 0.;
       casadi_int iprerr = -1;
-      //bool prerr_pos;
+      bool prerr_pos;
       for (i=0; i<nx_+na_; ++i) {
         if (z[i] > ubz[i]+prerr) {
           prerr = z[i]-ubz[i];
           iprerr = i;
-          //prerr_pos = true;
+          prerr_pos = true;
         } else if (z[i] < lbz[i]-prerr) {
           prerr = lbz[i]-z[i];
           iprerr = i;
-          //prerr_pos = false;
+          prerr_pos = false;
         }
       }
 
       // Calculate dual infeasibility
       double duerr = 0.;
       casadi_int iduerr = -1;
-      bool duerr_pos = false; // TODO(jaeandersson): have a look
+      bool duerr_pos;
       for (i=0; i<nx_; ++i) {
         infeas[i] = glag[i]+lam[i];
         double duerr_trial = fabs(infeas[i]);
@@ -598,8 +598,36 @@ namespace casadi {
         print_vector("dlam", dlam, nx_+na_);
       }
 
+      // Tangent of the dual infeasibility at tau=0
+      casadi_fill(tinfeas, nx_, 0.);
+      casadi_mv(h, H_, dz, tinfeas, 0); // A'*dlam_g + dlam_x==0 by definition
+      casadi_mv(a, A_, dlam+nx_, tinfeas, 1);
+      casadi_axpy(nx_, 1., dlam, tinfeas);
+
       // Handle singularity
       if (sing) {
+        // Is a positive and/or negative tau permitted?
+        bool pos_ok=true, neg_ok=true;
+        if (iprerr>=0. && dz[iprerr]!=0.) {
+          if (prerr_pos) {
+            if (dz[iprerr]>0.) pos_ok=false;
+            if (dz[iprerr]<0.) neg_ok=false;
+          } else {
+            if (dz[iprerr]<0.) pos_ok=false;
+            if (dz[iprerr]>0.) neg_ok=false;
+          }
+        } else if (iduerr>=0. && tinfeas[iduerr]!=0.) {
+          if (duerr_pos) {
+            if (tinfeas[iduerr]>0.) pos_ok=false;
+            if (tinfeas[iduerr]<0.) neg_ok=false;
+          } else {
+            if (tinfeas[iduerr]<0.) pos_ok=false;
+            if (tinfeas[iduerr]>0.) neg_ok=false;
+          }
+        }
+        // Both positive and negative steps are not permitted
+        casadi_assert(pos_ok || neg_ok, "Inconsistency");
+
         // QR factorization of the transpose
         casadi_trans(kktd, kktd_, vr, kktd_, iw);
         casadi_copy(vr, kktd_.nnz(), kktd);
@@ -626,8 +654,8 @@ namespace casadi {
           double d = i<nx_ ? w[i] : -w[i];
           for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d -= kkt[k]*w[kkt_row[k]];
           if (fabs(d)<1e-12) continue;
-          // Does the variable correspond to an unenforced violated constraint?
           if (lam[i]==0) {
+            // Enforce constraint?
             if (z[i] + prmargin < lbz[i]) {
               prindex = i;
               prmargin = lbz[i]-z[i];
@@ -636,7 +664,15 @@ namespace casadi {
               prindex = i;
               prmargin = z[i]-ubz[i];
               enforce_upper = true;
+            } else if (prindex<0) {
+              print("Enforce? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
+                    "dlam=%g, pos_ok=%lld, neg_ok=%lld\n",
+                    i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], pos_ok, neg_ok);
             }
+          } else if (prindex<0) {
+            print("Drop? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
+                  "dlam=%g, pos_ok=%lld, neg_ok=%lld\n",
+                  i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], pos_ok, neg_ok);
           }
         }
 
@@ -810,11 +846,6 @@ namespace casadi {
           Let us find the largest possible tau, while keeping maximum
           dual infeasibility below e.
         */
-      // Tangent of the dual infeasibility at tau=0
-      casadi_fill(tinfeas, nx_, 0.);
-      casadi_mv(h, H_, dz, tinfeas, 0); // A'*dlam_g + dlam_x==0 by definition
-      casadi_mv(a, A_, dlam+nx_, tinfeas, 1);
-      casadi_axpy(nx_, 1., dlam, tinfeas);
       // How long step can we take without exceeding e?
       double tau_k = 0.;
       for (casadi_int j=0; j<n_tau; ++j) {
