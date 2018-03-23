@@ -1067,8 +1067,8 @@ namespace casadi {
     auto m = static_cast<FixedStepMemory*>(mem);
 
     // Discrete time algebraic variable
-    m->Z = DM::zeros(F_.sparsity_in(DAE_Z));
-    m->RZ = G_.is_null() ? DM() : DM::zeros(G_.sparsity_in(RDAE_RZ));
+    m->Z.resize(F_.nnz_in(DAE_Z));
+    if (!G_.is_null()) m->RZ.resize(G_.nnz_in(RDAE_RZ));
 
     // Allocate tape if backward states are present
     if (nrx_>0) {
@@ -1133,7 +1133,7 @@ namespace casadi {
       // Tape
       if (nrx_>0) {
         casadi_copy(get_ptr(m->x), nx_, get_ptr(m->x_tape.at(m->k+1)));
-        casadi_copy(get_ptr(m->Z), m->Z.nnz(), get_ptr(m->Z_tape.at(m->k)));
+        casadi_copy(get_ptr(m->Z), m->Z.size(), get_ptr(m->Z_tape.at(m->k)));
       }
 
       // Advance time
@@ -1143,7 +1143,7 @@ namespace casadi {
 
     // Return to user TODO(@jaeandersson): interpolate
     casadi_copy(get_ptr(m->x), nx_, x);
-    casadi_copy(get_ptr(m->Z)+m->Z.nnz()-nz_, nz_, z);
+    casadi_copy(get_ptr(m->Z)+m->Z.size()-nz_, nz_, z);
     casadi_copy(get_ptr(m->q), nq_, q);
   }
 
@@ -1194,7 +1194,7 @@ namespace casadi {
 
     // Return to user TODO(@jaeandersson): interpolate
     casadi_copy(get_ptr(m->rx), nrx_, rx);
-    casadi_copy(get_ptr(m->RZ)+m->RZ.nnz()-nrz_, nrz_, rz);
+    casadi_copy(get_ptr(m->RZ)+m->RZ.size()-nrz_, nrz_, rz);
     casadi_copy(get_ptr(m->rq), nrq_, rq);
   }
 
@@ -1220,7 +1220,7 @@ namespace casadi {
     m->k = 0;
 
     // Get consistent initial conditions
-    casadi_fill(m->Z.ptr(), m->Z.nnz(), numeric_limits<double>::quiet_NaN());
+    casadi_fill(get_ptr(m->Z), m->Z.size(), numeric_limits<double>::quiet_NaN());
 
     // Add the first element in the tape
     if (nrx_>0) {
@@ -1249,7 +1249,7 @@ namespace casadi {
     m->k = nk_;
 
     // Get consistent initial conditions
-    casadi_fill(m->RZ.ptr(), m->RZ.nnz(), numeric_limits<double>::quiet_NaN());
+    casadi_fill(get_ptr(m->RZ), m->RZ.size(), numeric_limits<double>::quiet_NaN());
   }
 
   ImplicitFixedStepIntegrator::

@@ -308,7 +308,7 @@ namespace casadi {
     ImplicitFixedStepIntegrator::reset(mem, t, x, z, p);
 
     // Initial guess for Z
-    double* Z = m->Z.ptr();
+    double* Z = get_ptr(m->Z);
     for (casadi_int d=0; d<deg_; ++d) {
       casadi_copy(x, nx_, Z);
       Z += nx_;
@@ -325,7 +325,7 @@ namespace casadi {
     ImplicitFixedStepIntegrator::resetB(mem, t, rx, rz, rp);
 
     // Initial guess for RZ
-    double* RZ = m->RZ.ptr();
+    double* RZ = get_ptr(m->RZ);
     for (casadi_int d=0; d<deg_; ++d) {
       casadi_copy(rx, nrx_, RZ);
       RZ += nrx_;

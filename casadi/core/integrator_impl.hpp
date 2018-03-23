@@ -234,7 +234,7 @@ namespace casadi {
     std::vector<double> x_prev, Z_prev, q_prev, rx_prev, RZ_prev, rq_prev;
 
     /// Algebraic variables for the discrete time integration
-    DM Z, RZ;
+    std::vector<double> Z, RZ;
 
     // Tape
     std::vector<std::vector<double> > x_tape, Z_tape;
