@@ -476,13 +476,24 @@ class LinearSolverTests(casadiTestCase):
   def test_thread_safety(self):
     x = MX.sym('x')
     y = MX.sym('y')
-    f = Function('f', [x, y], [x ** 2 - y])
+
+
     for Solver, options, req in lsolvers:
+      print(Solver)
+      f = Function('f', [x, y], [x ** 2 - y])
       finv = rootfinder('finv', "newton", f, {"linear_solver": Solver, "linear_solver_options": options})
 
       finv_par = finv.map(200, 'thread',4)
       res = finv_par(numpy.ones(200), numpy.linspace(0, 10, 200))
       self.checkarray(norm_inf(res.T-sqrt(numpy.linspace(0, 10, 200))),0, digits=5)
+
+      z = solve(blockcat([[1+x,0],[0,1+y]]),vertcat(x,y), Solver, options)
+      f = Function('f',[x,y],[z])
+      f_par = f.map(200, 'thread',4)
+      res = f_par(numpy.linspace(10, 0, 200), numpy.linspace(0, 10, 200))
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
