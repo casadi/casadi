@@ -638,22 +638,39 @@ namespace casadi {
         casadi_qr_singular(&minat_tr, &imina_tr, r, sp_r_, get_ptr(pc_), 1e-12);
         casadi_qr_colcomb(w, r, sp_r_, get_ptr(pc_), imina_tr);
         if (verbose_) {
-          print_vector("w", w, nx_+na_);
+          print_vector("normal", w, nx_+na_);
         }
-        // Best flip so far
-        casadi_int prindex = -1;
-        bool enforce_upper;
-        double prmargin = -prerr;
-        // Loop over potential constraints that can be flipped
+        // Which constraints can be flipped in order to restore regularity?
+        casadi_int nflip = 0;
         for (i=0; i<nx_+na_; ++i) {
-          // If dz[i]==0, old column cannot be removed without decreasing rank
-          if (fabs(dz[i])<1e-12) continue;
+          iw[i] = 0;
+          // Check if old column cannot be removed without decreasing rank
+          if (fabs(i<nx_ ? dz[i] : dlam[i])<1e-12) continue;
           // Make sure that flipping the constraint is permitted
           if (lam[i]==0. ? neverupper[i] && neverlower[i] : neverzero[i]) continue;
           // dot(w, kktd(:,i)-kktd_flipped(:,i))==0, rank won't increase
           double d = i<nx_ ? w[i] : -w[i];
           for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d -= kkt[k]*w[kkt_row[k]];
           if (fabs(d)<1e-12) continue;
+          iw[i] = 1;
+          nflip++;
+        }
+        if (nflip==0) {
+          casadi_warning("Cannot restore feasibility");
+          flag = 1;
+          break;
+        }
+
+        if (verbose_) {
+          print_ivector("flippable", iw, nx_+na_);
+        }
+
+        // Find the best flip
+        casadi_int prindex = -1;
+        bool enforce_upper;
+        double prmargin = -prerr;
+        for (i=0; i<nx_+na_; ++i) {
+          if (!iw[i]) continue;
           if (lam[i]==0) {
             // Enforce constraint?
             if (z[i] + prmargin < lbz[i]) {
@@ -675,6 +692,8 @@ namespace casadi {
                   i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], pos_ok, neg_ok);
           }
         }
+
+
 
         // Accept, if any
         if (prindex>=0) {
