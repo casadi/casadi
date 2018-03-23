@@ -1127,7 +1127,7 @@ namespace casadi {
       casadi_copy(get_ptr(m->q), nq_, get_ptr(m->q_prev));
 
       // Take step
-      F(m->arg, m->res, m->iw, m->w, 0);
+      F(m->arg, m->res, m->iw, m->w);
       casadi_axpy(nq_, 1., get_ptr(m->q_prev), get_ptr(m->q));
 
       // Tape
@@ -1188,7 +1188,7 @@ namespace casadi {
       // Take step
       m->arg[RDAE_X] = get_ptr(m->x_tape.at(m->k));
       m->arg[RDAE_Z] = get_ptr(m->Z_tape.at(m->k));
-      G(m->arg, m->res, m->iw, m->w, 0);
+      G(m->arg, m->res, m->iw, m->w);
       casadi_axpy(nrq_, 1., get_ptr(m->rq_prev), get_ptr(m->rq));
     }
 

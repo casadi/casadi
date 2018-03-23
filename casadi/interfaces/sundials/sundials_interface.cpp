@@ -241,7 +241,18 @@ namespace casadi {
     m->rxz = N_VNew_Serial(nrx_+nrz_);
     m->rq = N_VNew_Serial(nrq_);
 
+    m->mem_linsolF = linsolF_.checkout();
+    if (!linsolB_.is_null()) m->mem_linsolB = linsolB_.checkout();
+
     return 0;
+  }
+
+  void SundialsInterface::free_mem(void *mem) const {
+    Integrator::free_mem(mem);
+    auto m = static_cast<SundialsMemory*>(mem);
+
+    linsolF_.release(m->mem_linsolF);
+    if (!linsolB_.is_null()) linsolB_.release(m->mem_linsolB);
   }
 
   void SundialsInterface::reset(IntegratorMemory* mem, double t, const double* x,
