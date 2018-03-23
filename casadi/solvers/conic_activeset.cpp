@@ -606,27 +606,9 @@ namespace casadi {
 
       // Handle singularity
       if (sing) {
-        // Is a positive and/or negative tau permitted?
-        bool pos_ok=true, neg_ok=true;
-        if (iprerr>=0. && dz[iprerr]!=0.) {
-          if (prerr_pos) {
-            if (dz[iprerr]>0.) pos_ok=false;
-            if (dz[iprerr]<0.) neg_ok=false;
-          } else {
-            if (dz[iprerr]<0.) pos_ok=false;
-            if (dz[iprerr]>0.) neg_ok=false;
-          }
-        } else if (iduerr>=0. && tinfeas[iduerr]!=0.) {
-          if (duerr_pos) {
-            if (tinfeas[iduerr]>0.) pos_ok=false;
-            if (tinfeas[iduerr]<0.) neg_ok=false;
-          } else {
-            if (tinfeas[iduerr]<0.) pos_ok=false;
-            if (tinfeas[iduerr]>0.) neg_ok=false;
-          }
-        }
-        // Both positive and negative steps are not permitted
-        casadi_assert(pos_ok || neg_ok, "Inconsistency");
+        // Change in prerr in the search direction
+        double prtau = iprerr<0 ? 0. : prerr_pos ? dz[iprerr]/prerr : -dz[iprerr]/prerr;
+        double dutau = iduerr<0 ? 0. : tinfeas[iduerr]/infeas[iduerr];
 
         // QR factorization of the transpose
         casadi_trans(kktd, kktd_, vr, kktd_, iw);
@@ -683,13 +665,14 @@ namespace casadi {
               enforce_upper = true;
             } else if (prindex<0) {
               print("Enforce? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
-                    "dlam=%g, pos_ok=%lld, neg_ok=%lld\n",
-                    i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], pos_ok, neg_ok);
+                    "dlam=%g, prtau=%g, dutau=%g\n",
+                    i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], prtau, dutau);
             }
           } else if (prindex<0) {
             print("Drop? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
-                  "dlam=%g, pos_ok=%lld, neg_ok=%lld\n",
-                  i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], pos_ok, neg_ok);
+                  "dlam=%g, prtau=%g, dutau=%g, tau=%g\n",
+                  i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], prtau, dutau,
+                  0.);
           }
         }
 
