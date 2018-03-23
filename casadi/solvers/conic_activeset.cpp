@@ -112,6 +112,7 @@ namespace casadi {
     alloc_iw(nx_+na_, true); // neverupper
     alloc_iw(nx_+na_, true); // neverlower
     alloc_iw(nx_+na_); // allzero
+    alloc_iw(nx_+na_, true); // flipme
 
     // Memory for numerical solution
     alloc_w(max(sp_v_.nnz()+sp_r_.nnz(), kktd_.nnz()), true); // either v & r or trans(kktd)
@@ -304,10 +305,11 @@ namespace casadi {
     trans_a = w; w += AT_.nnz();
     infeas = w; w += nx_;
     tinfeas = w; w += nx_;
-    casadi_int *neverzero, *neverupper, *neverlower;
+    casadi_int *neverzero, *neverupper, *neverlower, *flipme;
     neverzero = iw; iw += nx_+na_;
     neverupper = iw; iw += nx_+na_;
     neverlower = iw; iw += nx_+na_;
+    flipme = iw; iw += nx_+na_;
 
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
@@ -625,7 +627,7 @@ namespace casadi {
         // Which constraints can be flipped in order to restore regularity?
         casadi_int nflip = 0;
         for (i=0; i<nx_+na_; ++i) {
-          iw[i] = 0;
+          flipme[i] = 0;
           // Check if old column cannot be removed without decreasing rank
           if (fabs(i<nx_ ? dz[i] : dlam[i])<1e-12) continue;
           // Make sure that flipping the constraint is permitted
@@ -634,7 +636,31 @@ namespace casadi {
           double d = i<nx_ ? w[i] : -w[i];
           for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d -= kkt[k]*w[kkt_row[k]];
           if (fabs(d)<1e-12) continue;
-          iw[i] = 1;
+          // When at the bound, ensure that flipping won't increase dual error
+          if (lam[i]!=0.) {
+            bool at_bound=false, increasing;
+            if (i<nx_) {
+              // Box constraints
+              if (duerr==fabs(glag[i])) {
+                at_bound = true;
+                increasing = (glag[i]>0.) != (lam[i]>0.);
+              }
+            } else {
+              // Linear constraints, check all
+              for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+                casadi_int j = at_row[k];
+                if (duerr==fabs(infeas[j]-trans_a[k]*lam[i])) {
+                  at_bound = true;
+                  increasing = trans_a[k]!=0.
+                      && (infeas[j]>0.) != ((trans_a[k]>0.) == (lam[i]>0.));
+                  if (increasing) break;
+                }
+              }
+            }
+            // We're at the bound and setting lam[i]=0 would increase error
+            if (at_bound && increasing) continue;
+          }
+          flipme[i] = 1;
           nflip++;
         }
         if (nflip==0) {
@@ -644,7 +670,7 @@ namespace casadi {
         }
 
         if (verbose_) {
-          print_ivector("flippable", iw, nx_+na_);
+          print_ivector("flippable", flipme, nx_+na_);
         }
 
         // Find the best flip
@@ -654,7 +680,7 @@ namespace casadi {
         double prmargin = prerr;
         double best_duerr = duerr;
         for (i=0; i<nx_+na_; ++i) {
-          if (!iw[i]) continue;
+          if (!flipme[i]) continue;
           if (lam[i]==0) {
             // Enforce constraint?
             if (z[i] + prmargin < lbz[i]) {
@@ -683,38 +709,9 @@ namespace casadi {
               }
             }
             // Accept, if best so far
-            if (new_duerr<best_duerr) {
+            if (new_duerr<best_duerr || (duindex<0 && new_duerr==best_duerr)) {
               duindex = i;
               best_duerr = new_duerr;
-            } else if (duindex<0 && new_duerr==best_duerr) {
-              // Check if the error would increase without cancellatione errors
-              bool increasing = false;
-              if (i<nx_) {
-                if (new_duerr==fabs(glag[i]) && (glag[i]>0.) != (lam[i]>0.)) {
-                  increasing = true;
-                }
-              } else {
-                for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-                  casadi_int j = at_row[k];
-                  if (trans_a[k]!=0. && new_duerr==fabs(infeas[j]) &&
-                      (infeas[j]>0.) != ((trans_a[k]>0.) == (lam[i]>0.))) {
-                    increasing = true;
-                    break;
-                  }
-                }
-              }
-              // We are at the bound and error is increasing
-              if (increasing) {
-                // TODO: Search direction not allowed
-                // Still not treated
-                print("Drop (cancellation)? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
-                      "dlam=%g, prtau=%g, dutau=%g, tau=%g\n",
-                      i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], prtau, dutau,
-                      0.);
-              } else {
-                // Accept candidate
-                duindex = i;
-              }
             } else if (prindex<0) {
               // Still not treated
               print("Drop? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
