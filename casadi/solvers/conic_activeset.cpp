@@ -649,8 +649,10 @@ namespace casadi {
 
         // Find the best flip
         casadi_int prindex = -1;
+        casadi_int duindex = -1;
         bool enforce_upper;
-        double prmargin = -prerr;
+        double prmargin = prerr;
+        double best_duerr = duerr;
         for (i=0; i<nx_+na_; ++i) {
           if (!iw[i]) continue;
           if (lam[i]==0) {
@@ -664,24 +666,75 @@ namespace casadi {
               prmargin = z[i]-ubz[i];
               enforce_upper = true;
             } else if (prindex<0) {
+              // Still not treated
               print("Enforce? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
                     "dlam=%g, prtau=%g, dutau=%g\n",
                     i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], prtau, dutau);
             }
-          } else if (prindex<0) {
-            print("Drop? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
-                  "dlam=%g, prtau=%g, dutau=%g, tau=%g\n",
-                  i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], prtau, dutau,
-                  0.);
+          } else {
+            // Maximum infeasibility from setting from setting lam[i]=0
+            double new_duerr;
+            if (i<nx_) {
+              new_duerr = fabs(glag[i]);
+            } else {
+              new_duerr = 0.;
+              for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+                new_duerr = fmax(new_duerr, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
+              }
+            }
+            // Accept, if best so far
+            if (new_duerr<best_duerr) {
+              duindex = i;
+              best_duerr = new_duerr;
+            } else if (duindex<0 && new_duerr==best_duerr) {
+              // Check if the error would increase without cancellatione errors
+              bool increasing = false;
+              if (i<nx_) {
+                if (new_duerr==fabs(glag[i]) && (glag[i]>0.) != (lam[i]>0.)) {
+                  increasing = true;
+                }
+              } else {
+                for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+                  casadi_int j = at_row[k];
+                  if (trans_a[k]!=0. && new_duerr==fabs(infeas[j]) &&
+                      (infeas[j]>0.) != ((trans_a[k]>0.) == (lam[i]>0.))) {
+                    increasing = true;
+                    break;
+                  }
+                }
+              }
+              // We are at the bound and error is increasing
+              if (increasing) {
+                // TODO: Search direction not allowed
+                // Still not treated
+                print("Drop (cancellation)? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
+                      "dlam=%g, prtau=%g, dutau=%g, tau=%g\n",
+                      i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], prtau, dutau,
+                      0.);
+              } else {
+                // Accept candidate
+                duindex = i;
+              }
+            } else if (prindex<0) {
+              // Still not treated
+              print("Drop? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
+                    "dlam=%g, prtau=%g, dutau=%g, tau=%g\n",
+                    i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], prtau, dutau,
+                    0.);
+            }
           }
         }
-
-
 
         // Accept, if any
         if (prindex>=0) {
           sprint(msg, sizeof(msg), "Added %lld to reduce sing", prindex);
           lam[prindex] = enforce_upper ? DMIN : -DMIN;
+          new_active_set = true;
+          tau = 0.;
+          continue;
+        } else if (duindex>=0) {
+          sprint(msg, sizeof(msg), "Dropped %lld to reduce sing", duindex);
+          lam[duindex] = 0;
           new_active_set = true;
           tau = 0.;
           continue;
