@@ -464,14 +464,14 @@ namespace casadi {
       // Calculate dual infeasibility
       double duerr = 0.;
       casadi_int iduerr = -1;
-      bool duerr_pos;
+      //bool duerr_pos;
       for (i=0; i<nx_; ++i) {
         infeas[i] = glag[i]+lam[i];
         double duerr_trial = fabs(infeas[i]);
         if (duerr_trial>duerr) {
           duerr = duerr_trial;
           iduerr = i;
-          duerr_pos = glag[i]+lam[i]>0;
+          //duerr_pos = glag[i]+lam[i]>0;
         }
       }
 
