@@ -2901,6 +2901,10 @@ DECL M casadi_interp1d(const std::vector<double>& x, const M&v,
   return interp1d(x, v, xq, mode, equidistant);
 }
 
+DECL M casadi_soc(const M& x, const M& y) {
+  return soc(x, y);
+}
+
 DECL M casadi_cross(const M& a, const M& b, casadi_int dim = -1) {
   return cross(a, b, dim);
 }
