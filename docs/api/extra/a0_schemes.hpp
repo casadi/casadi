@@ -135,7 +135,7 @@
 */
 /** \defgroup scheme_ConicInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::ConicInput  (CONIC_NUM_IN = 10)</caption>
+<caption>Input scheme: casadi::ConicInput  (CONIC_NUM_IN = 12)</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>CONIC_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
 <tr><td>CONIC_G</td><td>g</td><td>The vector g: dense, (n x 1)</td></tr>
@@ -147,6 +147,8 @@
 <tr><td>CONIC_X0</td><td>x0</td><td>dense, (n x 1)</td></tr>
 <tr><td>CONIC_LAM_X0</td><td>lam_x0</td><td>dense</td></tr>
 <tr><td>CONIC_LAM_A0</td><td>lam_a0</td><td>dense</td></tr>
+<tr><td>CONIC_Q</td><td>q</td><td>The matrix Q: sparse symmetric, (np^2 x n)</td></tr>
+<tr><td>CONIC_P</td><td>p</td><td>The matrix P: sparse symmetric, (np x np)</td></tr>
 </table>
 */
 /** \defgroup scheme_NlpsolOutput
