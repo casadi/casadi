@@ -37,6 +37,27 @@
 namespace casadi {
 
 #ifndef SWIG
+
+template<typename T>
+class scoped_checkout {
+public:
+  scoped_checkout(const T& proto) : proto_(proto) {
+    mem = proto_.checkout();
+  }
+
+  ~scoped_checkout() {
+    proto_.release(mem);
+  }
+
+  operator casadi_int() const {
+    return mem;
+  }
+
+private:
+  casadi_int mem;
+  const T& proto_;
+};
+
   /**  \brief Range function
   * \param start
   * \param stop
