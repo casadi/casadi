@@ -401,12 +401,6 @@ namespace casadi {
     /** \brief Infinity-norm */
     inline friend MatType norm_inf(const MatType &x) { return MatType::norm_inf(x);}
 
-    /** \brief Return a row-wise summation of elements */
-    inline friend MatType sum1(const MatType &x) { return MatType::sum1(x);}
-
-    /** \brief Return a column-wise summation of elements  */
-    inline friend MatType sum2(const MatType &x) { return MatType::sum2(x);}
-
     /** \brief Returns difference (n-th order) along given axis (MATLAB convention) */
     inline friend MatType diff(const MatType &x, casadi_int n=1, casadi_int axis=-1) {
       return MatType::diff(x, n, axis);

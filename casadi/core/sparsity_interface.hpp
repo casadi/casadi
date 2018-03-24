@@ -421,6 +421,13 @@ namespace casadi {
                                   const MatType &w) {
       return diagcat(std::vector<MatType>{x, y, z, w});
     }
+
+    /** \brief Return a row-wise summation of elements */
+    inline friend MatType sum1(const MatType &x) { return MatType::sum1(x);}
+
+    /** \brief Return a column-wise summation of elements  */
+    inline friend MatType sum2(const MatType &x) { return MatType::sum2(x);}
+
 /** \@} */
   };
 #endif // SWIG

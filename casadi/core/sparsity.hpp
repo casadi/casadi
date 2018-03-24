@@ -551,6 +551,9 @@ namespace casadi {
     static Sparsity kron(const Sparsity& x, const Sparsity& b);
     static Sparsity triu(const Sparsity& x, bool includeDiagonal=true);
     static Sparsity tril(const Sparsity& x, bool includeDiagonal=true);
+
+    static Sparsity sum2(const Sparsity &x);
+    static Sparsity sum1(const Sparsity &x);
 #endif //SWIG
 
     /** \brief Enlarge matrix

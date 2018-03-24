@@ -42,16 +42,38 @@ namespace casadi {
       LBA <= A x <= UBA
       LBX <= x   <= UBX
 
+      resize(Q x, np, np) + P >= 0 (psd)
+
       with :
       H sparse (n x n) positive definite
       g dense  (n x 1)
+      A sparse (nc x n)
+      Q sparse symmetric (np^2 x n)
+      P sparse symmetric (np x nq)
 
       n: number of decision variables (x)
       nc: number of constraints (A)
+      nq: shape of psd constraint matrix
 
       \endverbatim
 
       If H is not positive-definite, the solver should throw an error.
+
+      Second-order cone constraints can be added as psd constraints
+      through a helper function 'soc':
+
+      x in R^n
+      y in R
+
+      || x ||_2 <= y
+
+        <=>
+
+      soc(x, y) psd
+
+      This can be proven with soc(x, y)=[y*I   x; x'  y]
+      using the Shur complement.
+
 
       \generalsection{Conic}
       \pluginssection{Conic}
@@ -146,6 +168,10 @@ enum ConicInput {
   CONIC_LAM_X0,
   /// dense
   CONIC_LAM_A0,
+  /// The matrix Q: sparse symmetric, (np^2 x n)
+  CONIC_Q,
+  /// The matrix P: sparse symmetric, (np x np)
+  CONIC_P,
   CONIC_NUM_IN};
 
 /// Output arguments of an QP Solver
