@@ -99,6 +99,9 @@ namespace casadi {
     /// Short name
     static std::string shortname() { return "conic";}
 
+    /** \brief Check if the function is of a particular type */
+    bool is_a(const std::string& type, bool recursive) const override;
+
     /** \brief Get default input value */
     double get_default_in(casadi_int ind) const override;
 

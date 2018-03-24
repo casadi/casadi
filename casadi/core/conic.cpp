@@ -472,4 +472,8 @@ namespace casadi {
     return Conic::plugin_options(name).info(op);
   }
 
+  bool Conic::is_a(const std::string& type, bool recursive) const {
+    return type==shortname() || (recursive && FunctionInternal::is_a(type, recursive));
+  }
+
 } // namespace casadi

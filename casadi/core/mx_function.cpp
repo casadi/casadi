@@ -1618,4 +1618,22 @@ namespace casadi {
     }
   }
 
+  Dict MXFunction::get_stats(void* mem) const {
+    Dict stats = XFunction::get_stats(mem);
+
+    Function dep;
+    for (auto&& e : algorithm_) {
+      if (e.op==OP_CALL) {
+        Function d = e.data.which_function();
+        d.disp(uout());
+        if (d.is_a("conic", true)) {
+          if (!dep.is_null()) return {};
+          dep = d;
+        }
+      }
+    }
+    if (dep.is_null()) return {};
+    return dep.stats(1);
+  }
+
 } // namespace casadi

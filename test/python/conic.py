@@ -966,6 +966,7 @@ class ConicTests(casadiTestCase):
 
       self.checkarray(res["x"],DM([-5.0147928622,-5.766930599,-8.52180472]),conic,digits=5)
 
+      self.assertTrue(solver.stats()["success"])
 
 if __name__ == '__main__':
     unittest.main()
