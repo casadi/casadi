@@ -1224,10 +1224,8 @@ namespace casadi {
 
   int Function::operator()(const double** arg, double** res,
       casadi_int* iw, double* w) const {
-    casadi_int mem = checkout();
-    int ret = operator()(arg, res, iw, w, mem);
-    release(mem);
-    return ret;
+    scoped_checkout<Function> mem(*this);
+    return operator()(arg, res, iw, w, mem);
   }
 
   int Function::operator()(const double** arg, double** res,

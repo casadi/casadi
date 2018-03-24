@@ -247,10 +247,8 @@ namespace casadi {
     // This checkout/release dance is an optimization.
     // Could also use the thread-safe variant f_(arg1, res1, iw, w)
     // in Map::eval_gen
-    casadi_int m = f_.checkout();
-    int ret = eval_gen(arg, res, iw, w, m);
-    f_.release(m);
-    return ret;
+    scoped_checkout<Function> m(f_);
+    return eval_gen(arg, res, iw, w, m);
   }
 
   MapOmp::~MapOmp() {
@@ -267,8 +265,7 @@ namespace casadi {
     casadi_int flag = 0;
 
     // Checkout memory objects
-    casadi_int* ind = iw; iw += n_;
-    for (casadi_int i=0; i<n_; ++i) ind[i] = f_.checkout();
+    std::vector< scoped_checkout<Function> > ind(n_, f_);
 
     // Evaluate in parallel
 #pragma omp parallel for reduction(||:flag)
@@ -288,8 +285,7 @@ namespace casadi {
       // Evaluation
       flag = f_(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind[i]) || flag;
     }
-    // Release memory objects
-    for (casadi_int i=0; i<n_; ++i) f_.release(ind[i]);
+
     // Return error flag
     return flag;
 #endif  // WITH_OPENMP
@@ -373,8 +369,7 @@ namespace casadi {
     return Map::eval(arg, res, iw, w, mem);
 #else // WITH_THREAD
     // Checkout memory objects
-    casadi_int* ind = iw; iw += n_;
-    for (casadi_int i=0; i<n_; ++i) ind[i] = f_.checkout();
+    std::vector< scoped_checkout<Function> > ind(n_, f_);
 
     // Allocate space for return values
     std::vector<int> ret_values(n_);
@@ -395,9 +390,6 @@ namespace casadi {
 
     // Join threads
     for (auto && th : threads) th.join();
-
-    // Release memory objects
-    for (casadi_int i=0; i<n_; ++i) f_.release(ind[i]);
 
     // Anticipate success
     int ret = 0;
