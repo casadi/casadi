@@ -265,7 +265,8 @@ namespace casadi {
     casadi_int flag = 0;
 
     // Checkout memory objects
-    std::vector< scoped_checkout<Function> > ind(n_, f_);
+    std::vector< scoped_checkout<Function> > ind; ind.reserve(n_);
+    for (casadi_int i=0; i<n_; ++i) ind.emplace_back(f_);
 
     // Evaluate in parallel
 #pragma omp parallel for reduction(||:flag)
@@ -369,7 +370,8 @@ namespace casadi {
     return Map::eval(arg, res, iw, w, mem);
 #else // WITH_THREAD
     // Checkout memory objects
-    std::vector< scoped_checkout<Function> > ind(n_, f_);
+    std::vector< scoped_checkout<Function> > ind; ind.reserve(n_);
+    for (casadi_int i=0; i<n_; ++i) ind.emplace_back(f_);
 
     // Allocate space for return values
     std::vector<int> ret_values(n_);
@@ -385,7 +387,7 @@ namespace casadi {
             casadi_int* iw, double* w, casadi_int ind, int& ret) {
               ThreadsWork(f, i, arg, res, iw, w, ind, ret);
             },
-        std::ref(f_), arg, res, iw, w, ind[i], std::ref(ret_values[i]));
+        std::ref(f_), arg, res, iw, w, casadi_int(ind[i]), std::ref(ret_values[i]));
     }
 
     // Join threads

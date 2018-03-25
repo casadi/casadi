@@ -45,8 +45,14 @@ public:
     mem = proto_.checkout();
   }
 
+  scoped_checkout(scoped_checkout&& that) : mem(that.mem), proto_(that.proto_) {
+    that.mem = -1;
+  }
+
+  scoped_checkout(const scoped_checkout& that) = delete;
+
   ~scoped_checkout() {
-    proto_.release(mem);
+    if (mem!=-1) proto_.release(mem);
   }
 
   operator casadi_int() const {
