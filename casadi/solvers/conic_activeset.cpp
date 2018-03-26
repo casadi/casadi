@@ -584,7 +584,7 @@ namespace casadi {
       // Step in lam(x)
       casadi_scal(nx_, -1., dlam);
 
-      // For inactive constraints, step is zero
+      // For inactive constraints, lam(x) step is zero
       for (i=0; i<nx_; ++i) if (lam[i]==0.) dlam[i] = 0.;
 
       // Step in lam(g)
@@ -636,6 +636,8 @@ namespace casadi {
           double d = i<nx_ ? w[i] : -w[i];
           for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d -= kkt[k]*w[kkt_row[k]];
           if (fabs(d)<1e-12) continue;
+          // Make sure that step is nonzero
+          if (lam[i]!=0. ? fabs(dlam[i])<1e-12 : fabs(dz[i])<1e-12) continue;
           // When at the bound, ensure that flipping won't increase dual error
           if (lam[i]!=0.) {
             bool at_bound=false, increasing;
