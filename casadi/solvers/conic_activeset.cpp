@@ -644,30 +644,6 @@ namespace casadi {
           double d = i<nx_ ? w[i] : -w[i];
           for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d -= kkt[k]*w[kkt_row[k]];
           if (fabs(d)<1e-12) continue;
-          // When at the bound, ensure that flipping won't increase dual error
-          if (lam[i]!=0.) {
-            bool at_bound=false, increasing;
-            if (i<nx_) {
-              // Box constraints
-              if (duerr==fabs(glag[i])) {
-                at_bound = true;
-                increasing = (glag[i]>0.) != (lam[i]>0.);
-              }
-            } else {
-              // Linear constraints, check all
-              for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-                casadi_int j = at_row[k];
-                if (duerr==fabs(infeas[j]-trans_a[k]*lam[i])) {
-                  at_bound = true;
-                  increasing = trans_a[k]!=0.
-                      && (infeas[j]>0.) != ((trans_a[k]>0.) == (lam[i]>0.));
-                  if (increasing) break;
-                }
-              }
-            }
-            // We're at the bound and setting lam[i]=0 would increase error
-            if (at_bound && increasing) continue;
-          }
           // Is constraint active?
           if (lam[i]==0.) {
             // Make sure that step is nonzero
