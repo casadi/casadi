@@ -616,7 +616,7 @@ namespace casadi {
         casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
         // Get a linear combination of the rows in kktd
         double minat_tr;
-        casadi_int imina_tr;
+        casadi_int imina_tr = 0;
         casadi_qr_singular(&minat_tr, &imina_tr, r, sp_r_, get_ptr(pc_), 1e-12);
         casadi_qr_colcomb(w, r, sp_r_, get_ptr(pc_), imina_tr);
         if (verbose_) {
