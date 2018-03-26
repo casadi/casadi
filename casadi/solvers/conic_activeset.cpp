@@ -416,6 +416,9 @@ namespace casadi {
     double mina = -1;
     casadi_int imina = -1;
 
+    // Singularity in the last iteration
+    casadi_int sing, sing_ind, sing_sign;
+
     // QP iterations
     casadi_int iter = 0;
     while (true) {
@@ -477,12 +480,22 @@ namespace casadi {
         }
       }
 
-      // If last step was full, try to improve primal feasibility
-      if (!new_active_set && iprerr>=0 && lam[iprerr]==0.) {
-        // Constraint is free, enforce
-        lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
-        new_active_set = true;
-        sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
+      // If last step was full, add constraint?
+      if (!new_active_set) {
+        if (sing) {
+          casadi_assert_dev(sing_ind>=0);
+          i = sing_ind;
+          print("Flip %lld? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, dlam=%g, tau=%g\n",
+                sing_sign, i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], tau);
+          lam[sing_ind] = sing_sign==0 ? 0. : sing_sign<0 ? -DMIN : DMIN;
+          new_active_set = true;
+          sprint(msg, sizeof(msg), "sign(lam[%lld])=%lld", sing_ind, sing_sign);
+        } else if (iprerr>=0 && lam[iprerr]==0.) {
+          // Try to improve primal feasibility
+          lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
+          new_active_set = true;
+          sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
+        }
       }
 
       // Copy kkt to kktd
@@ -518,7 +531,7 @@ namespace casadi {
         print_matrix("QR(R)", r, sp_r_);
       }
       // Check singularity
-      int sing = casadi_qr_singular(&mina, &imina, r, sp_r_, get_ptr(pc_), 1e-12);
+      sing = casadi_qr_singular(&mina, &imina, r, sp_r_, get_ptr(pc_), 1e-12);
 
       if (iter % 10 == 0) {
         // Print header
@@ -627,7 +640,7 @@ namespace casadi {
         }
         // Best flip
         double tau_test, best_tau = inf;
-        casadi_int best_ind = -1;
+        sing_ind = -1;
         // Which constraints can be flipped in order to restore regularity?
         casadi_int nflip = 0;
         for (i=0; i<nx_+na_; ++i) {
@@ -670,20 +683,32 @@ namespace casadi {
             if (!neverlower[i]) {
               tau_test = (lbz[i]-z[i])/dz[i];
               // Ensure nonincrease in max(prerr, duerr)
-              if ((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.)) continue;
-              if (fabs(tau_test)<fabs(best_tau)) {
-                best_tau = tau_test;
-                best_ind = i;
+              if (!((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.))) {
+                // Only allow removing constraints if tau_test==0
+                if (fabs(tau_test)>=1e-16) {
+                  // Check if best so far
+                  if (fabs(tau_test)<fabs(best_tau)) {
+                    best_tau = tau_test;
+                    sing_ind = i;
+                    sing_sign = -1;
+                  }
+                }
               }
             }
             // Step needed to bring z to upper bound
             if (!neverupper[i]) {
               tau_test = (ubz[i]-z[i])/dz[i];
               // Ensure nonincrease in max(prerr, duerr)
-              if ((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.)) continue;
-              if (fabs(tau_test)<fabs(best_tau)) {
-                best_tau = tau_test;
-                best_ind = i;
+              if (!((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.))) {
+                // Only allow removing constraints if tau_test==0
+                if (fabs(tau_test)>=1e-16) {
+                  // Check if best so far
+                  if (fabs(tau_test)<fabs(best_tau)) {
+                    best_tau = tau_test;
+                    sing_ind = i;
+                    sing_sign = 1;
+                  }
+                }
               }
             }
           } else {
@@ -694,9 +719,11 @@ namespace casadi {
               tau_test = -lam[i]/dlam[i];
               // Ensure nonincrease in max(prerr, duerr)
               if ((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.)) continue;
+              // Check if best so far
               if (fabs(tau_test)<fabs(best_tau)) {
                 best_tau = tau_test;
-                best_ind = i;
+                sing_ind = i;
+                sing_sign = 0;
               }
             }
           }
@@ -704,12 +731,16 @@ namespace casadi {
           nflip++;
         }
 
-        if (best_ind>=0) {
-          i = best_ind;
-          tau_test = best_tau;
-          print("Flip? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
-                "dlam=%g, prtau=%g, dutau=%g, tau_test=%g\n",
-                i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], prtau, dutau, tau_test);
+        if (sing_ind>=0) {
+          if (fabs(best_tau)<1e-12) {
+            // Zero step
+            tau = 0.;
+            continue;
+          }
+        } else {
+          casadi_warning("Cannot restore feasibility");
+          flag = 1;
+          break;
         }
 
         if (nflip==0) {
@@ -722,137 +753,10 @@ namespace casadi {
           print_ivector("flippable", flipme, nx_+na_);
         }
 
-        // Find the best flip
-        casadi_int prindex = -1;
-        casadi_int duindex = -1;
-        bool enforce_upper;
-        double prmargin = prerr;
-        double best_duerr = duerr;
-        for (i=0; i<nx_+na_; ++i) {
-          if (!flipme[i]) continue;
-          if (lam[i]==0) {
-            // Enforce constraint?
-            if (z[i] + prmargin < lbz[i]) {
-              prindex = i;
-              prmargin = lbz[i]-z[i];
-              enforce_upper = false;
-            } else if (z[i] - prmargin > ubz[i]) {
-              prindex = i;
-              prmargin = z[i]-ubz[i];
-              enforce_upper = true;
-            } else if (prindex<0) {
-              // Still not treated
-              print("Enforce? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
-                    "dlam=%g, prtau=%g, dutau=%g\n",
-                    i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], prtau, dutau);
-            }
-          } else {
-            // Maximum infeasibility from setting from setting lam[i]=0
-            double new_duerr;
-            if (i<nx_) {
-              new_duerr = fabs(glag[i]);
-            } else {
-              new_duerr = 0.;
-              for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-                new_duerr = fmax(new_duerr, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
-              }
-            }
-            // Accept, if best so far
-            if (new_duerr<best_duerr || (duindex<0 && new_duerr==best_duerr)) {
-              duindex = i;
-              best_duerr = new_duerr;
-            } else if (prindex<0) {
-              // Still not treated
-              print("Drop? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
-                    "dlam=%g, prtau=%g, dutau=%g, tau=%g\n",
-                    i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], prtau, dutau,
-                    0.);
-            }
-          }
-        }
-
-        // Accept, if any
-        if (prindex>=0) {
-          sprint(msg, sizeof(msg), "Added %lld to reduce sing", prindex);
-          lam[prindex] = enforce_upper ? DMIN : -DMIN;
-          new_active_set = true;
-          tau = 0.;
-          continue;
-        } else if (duindex>=0) {
-          sprint(msg, sizeof(msg), "Dropped %lld to reduce sing", duindex);
-          lam[duindex] = 0;
-          new_active_set = true;
-          tau = 0.;
-          continue;
-        }
-
-        // Legacy code:
-        casadi_warning("still singular");
-        casadi_trans(kktd, kktd_, vr, kktd_, iw);
-        casadi_copy(vr, kktd_.nnz(), kktd);
-        casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
-
-        // Are we overconstrained?
-        if (lam[imina]!=0.) {
-          // Maximum infeasibility from setting from setting lam[i]=0
-          i = imina;
-          double new_duerr;
-          if (i<nx_) {
-            // Set a lam_x to zero
-            new_duerr = fabs(glag[i]);
-          } else {
-            // Set a lam_a to zero
-            new_duerr = 0.;
-            for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-              casadi_int j = at_row[k];
-              new_duerr = fmax(new_duerr, fabs((glag[j]-trans_a[k]*lam[i]) + lam[j]));
-            }
-          }
-          // Remove if it can be done without increasing maximum infeasibility
-          if (new_duerr <= fmax(duerr, prerr)) {
-            sprint(msg, sizeof(msg), "Singular lam[%lld]=%.2g", imina, lam[imina]);
-            lam[imina] = 0.;
-            new_active_set = true;
-            tau = 0.;
-            continue;
-          }
-        }
-        // KKT residual
-        for (i=0; i<nx_+na_; ++i) {
-          if (lam[i]>0.) {
-            dz[i] = z[i]-ubz[i];
-          } else if (lam[i]<0.) {
-            dz[i] = z[i]-lbz[i];
-          } else if (i<nx_) {
-            dz[i] = glag[i];
-          } else {
-            dz[i] = -lam[i];
-          }
-        }
-
-        // Solve to get primal-dual step
-        casadi_scal(nx_+na_, -1., dz);
-        casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
-                        get_ptr(prinv_), get_ptr(pc_), w);
-        for (i=0; i<nx_+na_; ++i) if (isnan(dz[i])) dz[i]=0.;
-
-        // Calculate change in Lagrangian gradient
-        casadi_fill(dlam, nx_, 0.);
-        casadi_mv(h, H_, dz, dlam, 0); // gradient of the objective
-        casadi_mv(a, A_, dz+nx_, dlam, 1); // gradient of the Lagrangian
-
-        // Step in lam(x)
-        casadi_scal(nx_, -1., dlam);
-
-        // For inactive constraints, step is zero
-        for (i=0; i<nx_; ++i) if (lam[i]==0.) dlam[i] = 0.;
-
-        // Step in lam(g)
-        casadi_copy(dz+nx_, na_, dlam+nx_);
-
-        // Step in z(g)
-        casadi_fill(dz+nx_, na_, 0.);
-        casadi_mv(a, A_, dz, dz+nx_, 0);
+        // Scale step so that tau=1 is full step
+        casadi_scal(nx_+na_, best_tau, dz);
+        casadi_scal(nx_+na_, best_tau, dlam);
+        casadi_scal(nx_, best_tau, tinfeas);
       }
 
       // Get maximum step size and corresponding index and new sign
