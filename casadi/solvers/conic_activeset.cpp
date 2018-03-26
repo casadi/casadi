@@ -705,7 +705,7 @@ namespace casadi {
               }
               // We are at the bound and error is increasing
               if (increasing) {
-                // TODO: Search direction not allowed
+                // TODO(jaendersson): Search direction not allowed
                 // Still not treated
                 print("Drop (cancellation)? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
                       "dlam=%g, prtau=%g, dutau=%g, tau=%g\n",
