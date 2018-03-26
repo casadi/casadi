@@ -50,8 +50,11 @@ if has_conic("qpoases"):
 if has_conic("cplex"):
   conics.append(("cplex",{},{"quadratic": True, "dual": True, "soc": False}))
 
-if has_conic("gurobi"):
-  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True}))
+
+# No solution for licensing on travis
+
+#if has_conic("gurobi"):
+#  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
