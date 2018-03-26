@@ -608,9 +608,10 @@ namespace casadi {
 
       // Handle singularity
       if (sing) {
-        // Change in prerr in the search direction
+        // Change in err in the search direction
         double prtau = iprerr<0 ? 0. : prerr_pos ? dz[iprerr]/prerr : -dz[iprerr]/prerr;
         double dutau = iduerr<0 ? 0. : tinfeas[iduerr]/infeas[iduerr];
+        double derr = prerr>=duerr ? prtau : dutau;
 
         // QR factorization of the transpose
         casadi_trans(kktd, kktd_, vr, kktd_, iw);
@@ -624,20 +625,19 @@ namespace casadi {
         if (verbose_) {
           print_vector("normal", w, nx_+na_);
         }
+        // Best flip
+        double tau_test, best_tau = inf;
+        casadi_int best_ind = -1;
         // Which constraints can be flipped in order to restore regularity?
         casadi_int nflip = 0;
         for (i=0; i<nx_+na_; ++i) {
           flipme[i] = 0;
-          // Check if old column cannot be removed without decreasing rank
+          // Check if old column can be removed without decreasing rank
           if (fabs(i<nx_ ? dz[i] : dlam[i])<1e-12) continue;
-          // Make sure that flipping the constraint is permitted
-          if (lam[i]==0. ? neverupper[i] && neverlower[i] : neverzero[i]) continue;
-          // dot(w, kktd(:,i)-kktd_flipped(:,i))==0, rank won't increase
+          // If dot(w, kktd(:,i)-kktd_flipped(:,i))==0, rank won't increase
           double d = i<nx_ ? w[i] : -w[i];
           for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d -= kkt[k]*w[kkt_row[k]];
           if (fabs(d)<1e-12) continue;
-          // Make sure that step is nonzero
-          if (lam[i]!=0. ? fabs(dlam[i])<1e-12 : fabs(dz[i])<1e-12) continue;
           // When at the bound, ensure that flipping won't increase dual error
           if (lam[i]!=0.) {
             bool at_bound=false, increasing;
@@ -662,9 +662,56 @@ namespace casadi {
             // We're at the bound and setting lam[i]=0 would increase error
             if (at_bound && increasing) continue;
           }
+          // Is constraint active?
+          if (lam[i]==0.) {
+            // Make sure that step is nonzero
+            if (fabs(dz[i])<1e-12) continue;
+            // Step needed to bring z to lower bound
+            if (!neverlower[i]) {
+              tau_test = (lbz[i]-z[i])/dz[i];
+              // Ensure nonincrease in max(prerr, duerr)
+              if ((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.)) continue;
+              if (fabs(tau_test)<fabs(best_tau)) {
+                best_tau = tau_test;
+                best_ind = i;
+              }
+            }
+            // Step needed to bring z to upper bound
+            if (!neverupper[i]) {
+              tau_test = (ubz[i]-z[i])/dz[i];
+              // Ensure nonincrease in max(prerr, duerr)
+              if ((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.)) continue;
+              if (fabs(tau_test)<fabs(best_tau)) {
+                best_tau = tau_test;
+                best_ind = i;
+              }
+            }
+          } else {
+            // Make sure that step is nonzero
+            if (fabs(dlam[i])<1e-12) continue;
+            // Step needed to bring lam to zero
+            if (!neverzero[i]) {
+              tau_test = -lam[i]/dlam[i];
+              // Ensure nonincrease in max(prerr, duerr)
+              if ((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.)) continue;
+              if (fabs(tau_test)<fabs(best_tau)) {
+                best_tau = tau_test;
+                best_ind = i;
+              }
+            }
+          }
           flipme[i] = 1;
           nflip++;
         }
+
+        if (best_ind>=0) {
+          i = best_ind;
+          tau_test = best_tau;
+          print("Flip? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
+                "dlam=%g, prtau=%g, dutau=%g, tau_test=%g\n",
+                i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], prtau, dutau, tau_test);
+        }
+
         if (nflip==0) {
           casadi_warning("Cannot restore feasibility");
           flag = 1;
