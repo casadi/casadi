@@ -24,8 +24,21 @@
 
 #include "casadi_common.hpp"
 #include "casadi_logger.hpp"
+#include <mutex>
 
 namespace casadi {
+
+  std::mutex mutex_logger;
+
+  void Logger::WriteFunThreadSafe(const char* s, std::streamsize num, bool error) {
+    std::lock_guard<std::mutex> lock(mutex_logger);
+    writeFun(s, num, error);
+  }
+
+  void Logger::FlushThreadSafe(bool error) {
+    std::lock_guard<std::mutex> lock(mutex_logger);
+    flush(error);
+  }
 
   void (*Logger::writeFun)(const char* s, std::streamsize num, bool error) =
     Logger::writeDefault;
