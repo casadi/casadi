@@ -483,11 +483,9 @@ namespace casadi {
         if (sing) {
           casadi_assert_dev(sing_ind>=0);
           i = sing_ind;
-          print("Flip %lld? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, dlam=%g, tau=%g\n",
-                sing_sign, i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], tau);
           lam[sing_ind] = sing_sign==0 ? 0. : sing_sign<0 ? -DMIN : DMIN;
           new_active_set = true;
-          sprint(msg, sizeof(msg), "sign(lam[%lld])=%lld", sing_ind, sing_sign);
+          sprint(msg, sizeof(msg), "sign(lam[%lld]) -> %lld", sing_ind, sing_sign);
         } else if (iprerr>=0 && lam[iprerr]==0.) {
           // Try to improve primal feasibility
           lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;

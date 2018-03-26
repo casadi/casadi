@@ -129,7 +129,6 @@ class ConicTests(casadiTestCase):
       solver_in["h"]=0
 
       if 'qcqp' in str(conic): continue # Singular hessian
-      if 'activeset' in str(conic): continue # Singular hessian
 
       solver_out = solver(**solver_in)
       self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(conic))
@@ -146,6 +145,7 @@ class ConicTests(casadiTestCase):
 
       solver_in["ubx"]=5
 
+      if 'activeset' in str(conic): continue # Singular hessian
       if "worhp" in str(qp_options):
         with self.assertRaises(Exception):
           solver_out = solver(solver_in)
