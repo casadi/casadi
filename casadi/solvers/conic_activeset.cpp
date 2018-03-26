@@ -724,16 +724,17 @@ namespace casadi {
           }
         }
 
-        if (sing_ind>=0) {
-          if (fabs(best_tau)<1e-12) {
-            // Zero step
-            tau = 0.;
-            continue;
-          }
-        } else {
+        // Cannot restore feasibility
+        if (sing_ind<0) {
           casadi_warning("Cannot restore feasibility");
           flag = 1;
           break;
+        }
+
+        // Quick return?
+        if (fabs(best_tau)<1e-12) {
+          tau = 0.;
+          continue;
         }
 
         // Scale step so that tau=1 is full step
