@@ -112,7 +112,6 @@ namespace casadi {
     alloc_iw(nx_+na_, true); // neverupper
     alloc_iw(nx_+na_, true); // neverlower
     alloc_iw(nx_+na_); // allzero
-    alloc_iw(nx_+na_, true); // flipme
 
     // Memory for numerical solution
     alloc_w(max(sp_v_.nnz()+sp_r_.nnz(), kktd_.nnz()), true); // either v & r or trans(kktd)
@@ -305,11 +304,10 @@ namespace casadi {
     trans_a = w; w += AT_.nnz();
     infeas = w; w += nx_;
     tinfeas = w; w += nx_;
-    casadi_int *neverzero, *neverupper, *neverlower, *flipme;
+    casadi_int *neverzero, *neverupper, *neverlower;
     neverzero = iw; iw += nx_+na_;
     neverupper = iw; iw += nx_+na_;
     neverlower = iw; iw += nx_+na_;
-    flipme = iw; iw += nx_+na_;
 
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
@@ -641,10 +639,7 @@ namespace casadi {
         // Best flip
         double tau_test, best_tau = inf;
         sing_ind = -1;
-        // Which constraints can be flipped in order to restore regularity?
-        casadi_int nflip = 0;
         for (i=0; i<nx_+na_; ++i) {
-          flipme[i] = 0;
           // Check if old column can be removed without decreasing rank
           if (fabs(i<nx_ ? dz[i] : dlam[i])<1e-12) continue;
           // If dot(w, kktd(:,i)-kktd_flipped(:,i))==0, rank won't increase
@@ -727,8 +722,6 @@ namespace casadi {
               }
             }
           }
-          flipme[i] = 1;
-          nflip++;
         }
 
         if (sing_ind>=0) {
@@ -741,16 +734,6 @@ namespace casadi {
           casadi_warning("Cannot restore feasibility");
           flag = 1;
           break;
-        }
-
-        if (nflip==0) {
-          casadi_warning("Cannot restore feasibility");
-          flag = 1;
-          break;
-        }
-
-        if (verbose_) {
-          print_ivector("flippable", flipme, nx_+na_);
         }
 
         // Scale step so that tau=1 is full step
