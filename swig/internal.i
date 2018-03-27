@@ -148,6 +148,12 @@
 %exception  casadi::Conic::integer_support() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Conic::is_a(const std::string &type, bool recursive) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Conic::psd_support() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::ConicActiveSet::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

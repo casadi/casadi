@@ -52,6 +52,9 @@ namespace casadi {
     /// Flush buffers
     static void (*flush)(bool error);
 
+    static void WriteFunThreadSafe(const char* s, std::streamsize num, bool error);
+    static void FlushThreadSafe(bool error);
+
     /// By default, print to std::cout or std::cerr
     static void writeDefault(const char* s, std::streamsize num, bool error) {
       if (error) {
@@ -77,7 +80,7 @@ namespace casadi {
     /// Print output message
     template<bool Err> static void write(const char* s, std::streamsize num) {
       // All information
-      writeFun(s, num, Err);
+      WriteFunThreadSafe(s, num, Err);
     }
 
     /// Print log message, single character
@@ -101,7 +104,7 @@ namespace casadi {
         return num;
       }
       int sync() override {
-        flush(Err);
+        FlushThreadSafe(Err);
         return 0;
       }
     };

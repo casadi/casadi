@@ -104,6 +104,9 @@ namespace casadi {
     const Options& get_options() const override { return options_;}
     ///@}
 
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
+
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 

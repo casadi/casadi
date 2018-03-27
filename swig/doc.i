@@ -14709,10 +14709,10 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(casadi_int
+nadj, const std::vector< MatType > &v) const  "
 
-[INTERNAL]  Check if the function is of a particular type.
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
 
 ";
 
@@ -14982,10 +14982,10 @@ std::vector< M > &res) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::print(const char *fmt,...)
-const  "
+%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
+const std::string &fname) const  "
 
-[INTERNAL]  C-style formatted printing during evaluation.
+[INTERNAL]  Generate code the function.
 
 ";
 
@@ -15190,10 +15190,10 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
-const std::string &fname) const  "
+%feature("docstring")  casadi::Conic::is_a(const std::string &type, bool
+recursive) const  "
 
-[INTERNAL]  Generate code the function.
+[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -15248,13 +15248,6 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(casadi_int
-nadj, const std::vector< MatType > &v) const  "
-
-[INTERNAL]  Symbolic expressions for the adjoint seeds.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
 "
@@ -15326,6 +15319,12 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring")  casadi::Conic::psd_support() const  "
+
+[INTERNAL]  Can psd constraints be treated.
 
 ";
 
@@ -15719,6 +15718,13 @@ std::string &lang, std::ostream &stream, const Dict &options) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::print(const char *fmt,...)
+const  "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
 
 // File: classcasadi_1_1ConicActiveSet.xml
 %feature("docstring")  casadi::FunctionInternal::jit_dependencies(const
@@ -15814,6 +15820,13 @@ generated function.
 **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Propagate sparsity forward.
+
+";
+
+%feature("docstring")  casadi::Conic::is_a(const std::string &type, bool
+recursive) const  "
+
+[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -16034,10 +16047,9 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
-double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
+%feature("docstring")  casadi::ConicActiveSet::class_name() const  "
 
-[INTERNAL]  Set the (persistent) work vectors.
+[INTERNAL]  Readable name of the internal class.
 
 ";
 
@@ -16180,13 +16192,6 @@ const  "
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 [INTERNAL]  Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
-
-[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -16458,6 +16463,13 @@ iind, casadi_int oind, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
+double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
+
+[INTERNAL]  Set the (persistent) work vectors.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::forward(casadi_int nfwd)
 const  "
 
@@ -16606,9 +16618,9 @@ const casadi_int *x, casadi_int n) const  "
 
 ";
 
-%feature("docstring")  casadi::ConicActiveSet::class_name() const  "
+%feature("docstring")  casadi::Conic::psd_support() const  "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Can psd constraints be treated.
 
 ";
 
@@ -30555,19 +30567,7 @@ std::vector< M > &arg) const  "
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring")  sum2(const MatType &x) "
-
-Return a column-wise summation of elements.
-
-";
-
-%feature("docstring")  sum1(const MatType &x) "
-
-Return a row-wise summation of elements.
-
-";
-
-%feature("docstring")  mrdivide(const MatType &x, const MatType &n) "
+*/ %feature("docstring")  mrdivide(const MatType &x, const MatType &n) "
 
 Matrix divide (cf. slash '/' in MATLAB)
 
@@ -31051,6 +31051,13 @@ Calculate Jacobian.
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< MatType >::soc(const MatType
+&x, const MatType &y) "
+
+Functions called by friend functions defined here
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::is_square() const
 "
 
@@ -31095,6 +31102,24 @@ Find out which variables enter with some order.
 MatType &a, const MatType &b, casadi_int nsteps) "
 
 Matlab's linspace command.
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MatType >::soc(const MatType
+&x, const MatType &y) "
+
+Construct second-order-convex.
+
+Parameters:
+-----------
+
+x:  vector expression of size n
+
+y:  scalar expression
+
+soc(x,y) computes [y*eye(n) x; x' y]
+
+soc(x,y) positive semi definite <=> || x ||_2 <= y
 
 ";
 
@@ -47148,8 +47173,7 @@ Calculate bilinear form x^T A y.
 ";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
->::jtimes(const Matrix< Scalar > &ex, const Matrix< Scalar > &arg, const
-Matrix< Scalar > &v, bool tr=false) "
+>::mpower(const Matrix< Scalar > &x, const Matrix< Scalar > &y) "
 
 Functions called by friend functions defined here
 
@@ -47624,6 +47648,13 @@ H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
 
 ";
 
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::size2()
+const "
+
+Get the second dimension (i.e. number of columns)
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::size()
 const "
 
@@ -47639,7 +47670,8 @@ Get the size along a particular dimensions.
 ";
 
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
->::mpower(const Matrix< Scalar > &x, const Matrix< Scalar > &y) "
+>::jtimes(const Matrix< Scalar > &ex, const Matrix< Scalar > &arg, const
+Matrix< Scalar > &v, bool tr=false) "
 
 Functions called by friend functions defined here
 
@@ -47717,10 +47749,10 @@ Example usage:
 
 ";
 
-%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::size2()
-const "
+%feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::soc(const
+Matrix< Scalar > &x, const Matrix< Scalar > &y) "
 
-Get the second dimension (i.e. number of columns)
+Functions called by friend functions defined here
 
 ";
 
@@ -48961,6 +48993,13 @@ Create vector constant (also implicit type conversion)
 %feature("docstring") casadi::MX::MX(const Matrix< double > &x) "
 
 Create sparse matrix constant (also implicit type conversion)
+
+";
+
+%feature("docstring")  casadi::GenericMatrix< MX  >::soc(const MX &x, const
+MX &y) "
+
+Functions called by friend functions defined here
 
 ";
 
@@ -55528,9 +55567,9 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sz_res() const  "
+%feature("docstring")  casadi::Conic::psd_support() const  "
 
-[INTERNAL]  Get required length of res field.
+[INTERNAL]  Can psd constraints be treated.
 
 ";
 
@@ -55728,8 +55767,8 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::is_a(const std::string
-&type, bool recursive) const  "
+%feature("docstring")  casadi::Conic::is_a(const std::string &type, bool
+recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
 
@@ -55770,6 +55809,12 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 &stream) const  "
 
 [INTERNAL]  Serialize.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_res() const  "
+
+[INTERNAL]  Get required length of res field.
 
 ";
 
@@ -70756,16 +70801,35 @@ Create a QP solver Solves the following strictly convex problem:
   LBA <= A x <= UBA
   LBX <= x   <= UBX
   
+  resize(Q x, np, np) + P >= 0 (psd)
+  
   with :
   H sparse (n x n) positive definite
   g dense  (n x 1)
+  A sparse (nc x n)
+  Q sparse symmetric (np^2 x n)
+  P sparse symmetric (np x nq)
   
   n: number of decision variables (x)
   nc: number of constraints (A)
+  nq: shape of psd constraint matrix
 
 
 
 If H is not positive-definite, the solver should throw an error.
+
+Second-order cone constraints can be added as psd constraints through a
+helper function 'soc':
+
+x in R^n y in R
+
+|| x ||_2 <= y
+
+<=>
+
+soc(x, y) psd
+
+This can be proven with soc(x, y)=[y*I x; x' y] using the Shur complement.
 
 General information
 ===================
@@ -71004,7 +71068,7 @@ General information
 |                  |                 | debugging        |                  |
 +------------------+-----------------+------------------+------------------+
 
->Input scheme: casadi::ConicInput (CONIC_NUM_IN = 10)
+>Input scheme: casadi::ConicInput (CONIC_NUM_IN = 12)
 
 +--------------+--------+--------------------------------------------------+
 |  Full name   | Short  |                   Description                    |
@@ -71031,6 +71095,10 @@ General information
 | CONIC_LAM_X0 | lam_x0 | dense                                            |
 +--------------+--------+--------------------------------------------------+
 | CONIC_LAM_A0 | lam_a0 | dense                                            |
++--------------+--------+--------------------------------------------------+
+| CONIC_Q      | q      | The matrix Q: sparse symmetric, (np^2 x n)       |
++--------------+--------+--------------------------------------------------+
+| CONIC_P      | p      | The matrix P: sparse symmetric, (np x np)        |
 +--------------+--------+--------------------------------------------------+
 
 >Output scheme: casadi::ConicOutput (CONIC_NUM_OUT = 4)

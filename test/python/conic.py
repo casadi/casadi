@@ -34,30 +34,36 @@ if has_nlpsol("ipopt"):
                    "jac_d_constant":"yes",
                    "hessian_constant":"yes",
                    "tol":1e-12}
-  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True}))
+  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False}))
 
 if has_nlpsol("worhp"):
   worhp_options = {"TolOpti":1e-13}
-  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True}))
+  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True, "dual": False, "soc": False}))
 
 
 if has_conic("ooqp"):
-  conics.append(("ooqp",{},{"less_digits":1,"quadratic": True}))
+  conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False}))
 
 if has_conic("qpoases"):
-  conics.append(("qpoases",{},{"quadratic": True}))
+  conics.append(("qpoases",{},{"quadratic": True, "dual": True, "soc": False}))
 
 if has_conic("cplex"):
-  conics.append(("cplex",{},{"quadratic": True}))
+  conics.append(("cplex",{},{"quadratic": True, "dual": True, "soc": False}))
+
+
+# No solution for licensing on travis
+
+#if has_conic("gurobi"):
+#  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
 
 if has_conic("clp"):
-  conics.append(("clp",{"verbose":True},{"quadratic": False}))
+  conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False}))
 
 if has_conic("activeset"):
-  conics.append(("activeset",dict(max_iter=100),{"quadratic": True}))
+  conics.append(("activeset",dict(max_iter=100),{"quadratic": True, "dual": True, "soc": False}))
 
 print(conics)
 
@@ -106,10 +112,10 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(conic))
       self.assertAlmostEqual(solver_out["x"][1],4.0/3,max(1,6-less_digits),str(conic))
 
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([3+1.0/9,4.0/9,0]),str(conic),digits=max(1,6-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([3+1.0/9,4.0/9,0]),str(conic),digits=max(1,6-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-8-2.0/9,max(1,6-less_digits),str(conic))
 
@@ -121,10 +127,10 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][1],1,max(1,3-less_digits),str(conic))
       self.assertAlmostEqual(solver_out["cost"],-6,max(1,6-less_digits),str(conic))
 
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([2,0,0]),str(conic),digits=max(1,2-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([2,0,0]),str(conic),digits=max(1,2-less_digits))
 
       solver_in["h"]=0
 
@@ -135,10 +141,10 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][1],4.0/3,max(1,6-less_digits),str(conic))
       self.assertAlmostEqual(solver_out["cost"],-9-1.0/3,max(1,6-less_digits),str(conic))
 
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([10.0/3,4.0/3,0]),str(conic),digits=max(1,4-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([10.0/3,4.0/3,0]),str(conic),digits=max(1,4-less_digits))
 
       solver_in["lba"]=[-inf]*3 #  Upper _and_ lower
       solver_in["uba"]=[inf]*3  #  bounds infinite?
@@ -156,10 +162,10 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][1],5,max(1,6-less_digits),str(conic))
       self.assertAlmostEqual(solver_out["cost"],-40,max(1,5-less_digits),str(conic))
 
-      self.assertAlmostEqual(solver_out["lam_x"][0],2,max(1,6-less_digits),str(conic))
-      self.assertAlmostEqual(solver_out["lam_x"][1],6,max(1,6-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][0],2,max(1,6-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][1],6,max(1,6-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([0,0,0]),str(conic),digits=max(1,4-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0,0,0]),str(conic),digits=max(1,4-less_digits))
 
   @memory_heavy()
   def test_general_convex_sparse(self):
@@ -204,9 +210,9 @@ class ConicTests(casadiTestCase):
 
       self.checkarray(solver_out["x"],DM([0.873908,0.95630465,0,0,0]),str(conic),digits=max(1,6-less_digits))
 
-      self.checkarray(solver_out["lam_x"],DM([0,0,-0.339076,-10.0873907,-0.252185]),6,str(conic),digits=max(1,6-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_x"],DM([0,0,-0.339076,-10.0873907,-0.252185]),6,str(conic),digits=max(1,6-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([0,2.52184767]),str(conic),digits=max(1,6-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0,2.52184767]),str(conic),digits=max(1,6-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-6.264669320767,max(1,6-less_digits),str(conic))
 
@@ -284,10 +290,10 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],0.5,max(1,6-less_digits),str(conic))
       self.assertAlmostEqual(solver_out["x"][1],1.25,max(1,6-less_digits),str(conic))
 
-      self.assertAlmostEqual(solver_out["lam_x"][0],4.75,max(1,6-less_digits),str(conic))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][0],4.75,max(1,6-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([0,2,0]),str(conic),digits=max(1,6-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0,2,0]),str(conic),digits=max(1,6-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-7.4375,max(1,6-less_digits),str(conic))
 
@@ -312,10 +318,10 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],0.4,max(1,4-less_digits),str(conic))
       self.assertAlmostEqual(solver_out["x"][1],1.6,max(1,4-less_digits),str(conic))
 
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,5-less_digits),str(conic))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,5-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,5-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,5-less_digits),str(conic))
 
-      self.checkarray(solver_out["lam_a"],DM([3.2,0,0]),str(conic),digits=max(1,5-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([3.2,0,0]),str(conic),digits=max(1,5-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-8.4,max(1,5-less_digits),str(conic))
 
@@ -361,9 +367,9 @@ class ConicTests(casadiTestCase):
 
       self.checkarray(solver_out["x"],DM([5.5,5,-10]),str(conic),digits=max(1,4-less_digits))
 
-      if "worhp" not in str(qp_options): self.checkarray(solver_out["lam_x"],DM([0,0,-2.5]),str(conic),digits=max(1,4-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_x"],DM([0,0,-2.5]),str(conic),digits=max(1,4-less_digits))
 
-      if "worhp" not in str(qp_options): self.checkarray(solver_out["lam_a"],DM([1.5]),str(conic),digits=max(1,4-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([1.5]),str(conic),digits=max(1,4-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-38.375,max(1,5-less_digits),str(conic))
 
@@ -408,11 +414,11 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],-0.5,max(1,6-less_digits),str(conic))
       self.assertAlmostEqual(solver_out["x"][1],1,max(1,6-less_digits),str(conic))
 
-      self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
-      self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][0],0,max(1,6-less_digits),str(conic))
+      if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][1],0,max(1,6-less_digits),str(conic))
 
 
-      self.checkarray(solver_out["lam_a"],DM([3.5]),str(conic),digits=max(1,6-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([3.5]),str(conic),digits=max(1,6-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-3.375,max(1,6-less_digits),str(conic))
 
@@ -455,9 +461,9 @@ class ConicTests(casadiTestCase):
 
       self.checkarray(solver_out["x"],DM([10,8]),str(conic),digits=max(1,3-less_digits))
 
-      self.checkarray(solver_out["lam_x"],DM([0,0]),str(conic),digits=max(1,4-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_x"],DM([0,0]),str(conic),digits=max(1,4-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([]),str(conic),digits=max(1,5-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([]),str(conic),digits=max(1,5-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-34,max(1,5-less_digits),str(conic))
 
@@ -495,9 +501,9 @@ class ConicTests(casadiTestCase):
 
       self.checkarray(solver_out["x"],DM([-0.2,1.2]),str(conic),digits=max(1,3-less_digits))
 
-      self.checkarray(solver_out["lam_x"],DM([0,0]),str(conic),digits=max(1,4-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_x"],DM([0,0]),str(conic),digits=max(1,4-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([3.4]),str(conic),digits=max(1,5-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([3.4]),str(conic),digits=max(1,5-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-5.1,max(1,5-less_digits),str(conic))
 
@@ -540,7 +546,7 @@ class ConicTests(casadiTestCase):
 
       self.checkarray(solver_out["x"],x0,str(conic)+str(qp_options),digits=max(1,2-less_digits))
       self.assertAlmostEqual(solver_out["cost"][0],-0.5*mtimes([x0.T,H,x0]),max(1,3-less_digits),str(conic))
-      self.checkarray(solver_out["lam_x"],DM.zeros(N,1),str(conic),digits=max(1,4-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_x"],DM.zeros(N,1),str(conic),digits=max(1,4-less_digits))
 
   def test_redundant(self):
     self.message("Redundant constraints")
@@ -584,8 +590,8 @@ class ConicTests(casadiTestCase):
 
         self.checkarray(solver_out["x"],DM([-0.19230768069,1.6846153915,0.692307690769276]),str(conic),digits=max(1,6-less_digits))
         self.assertAlmostEqual(solver_out["cost"][0],-5.850384678537,max(1,5-less_digits),str(conic))
-        self.checkarray(solver_out["lam_x"],DM([0,0,0]),str(conic),digits=max(1,6-less_digits))
-        self.checkarray(mtimes(A.T,solver_out["lam_a"]),DM([3.876923073076,2.4384615365384965,-1]),str(conic),digits=max(1,6-less_digits))
+        if aux_options["dual"]: self.checkarray(solver_out["lam_x"],DM([0,0,0]),str(conic),digits=max(1,6-less_digits))
+        if aux_options["dual"]: self.checkarray(mtimes(A.T,solver_out["lam_a"]),DM([3.876923073076,2.4384615365384965,-1]),str(conic),digits=max(1,6-less_digits))
 
   def test_linear(self):
     H = DM(2,2)
@@ -618,9 +624,9 @@ class ConicTests(casadiTestCase):
       solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],DM([0.5,1.5]),str(conic),digits=max(1,5-less_digits))
-      self.checkarray(solver_out["lam_x"],DM([0,0]),str(conic),digits=max(1,5-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_x"],DM([0,0]),str(conic),digits=max(1,5-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([0.5,-1.5,0]),str(conic),digits=max(1,5-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0.5,-1.5,0]),str(conic),digits=max(1,5-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],2.5,max(1,5-less_digits),str(conic))
 
@@ -656,9 +662,9 @@ class ConicTests(casadiTestCase):
       solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],DM([2,3]),str(conic),digits=max(1,5-less_digits))
-      self.checkarray(solver_out["lam_x"],DM([0,-3]),str(conic),digits=max(1,5-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_x"],DM([0,-3]),str(conic),digits=max(1,5-less_digits))
 
-      self.checkarray(solver_out["lam_a"],DM([2,0,0]),str(conic),digits=max(1,5-less_digits))
+      if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([2,0,0]),str(conic),digits=max(1,5-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],7,max(1,5-less_digits),str(conic))
 
@@ -889,6 +895,81 @@ class ConicTests(casadiTestCase):
     self.checkarray(sol_ref["x"], sol["x"],digits=7)
     self.checkarray(sol_ref["lam_a"], sol["lam_a"],digits=8)
     self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
+
+
+  def test_SOCP(self):
+    x = MX.sym("x")
+    y = MX.sym("y")
+    z = MX.sym("z")
+
+
+    
+    for conic, qp_options, aux_options in conics:
+      if not aux_options["soc"]: continue 
+
+
+      #  min  2 x + y
+      #
+      #    ||  x-5 , y-7 ||_2 <= 4
+      #
+      #
+
+      h = soc(vertcat(x-5,y-7),4)
+
+      solver = casadi.qpsol("msyolver",conic,{'h':h,'x': vertcat(x,y),"f": 2*x+y},qp_options)
+      
+      res = solver()
+
+      self.checkarray(res["x"],DM([5-8/sqrt(5),7-4/sqrt(5)]),conic,digits=7)
+      self.checkarray(res["f"],10-16/sqrt(5)+7-4/sqrt(5),conic,digits=7)
+
+      #  min  2 x + y
+      #
+      #    ||  x , y ||_2 <= ax+4
+      #
+      #
+      
+      
+      a = 1.3
+
+      h = soc(vertcat(x,y),a*x+4)
+
+
+      solver = nlpsol("mysolver","ipopt",{"f":2*x+y,"x":vertcat(x,y),"g": dot(vertcat(x,y),vertcat(x,y))-(a*x+4)**2})
+      res = solver(ubg=0)
+      ref =  res["x"]
+
+      solver = casadi.qpsol("msyolver",conic,{'h':h,'x': vertcat(x,y),"f": 2*x+y},qp_options)
+      
+      res = solver()
+
+      xs = -(8*sqrt(5-a**2)+4*a**3-20*a)/(a**4-6*a**2+5)
+      ys = 4*sqrt(5-a**2)/(a**2-5)
+
+      self.checkarray(res["f"],2*xs+ys,conic,digits=5)
+      self.checkarray(res["x"],vertcat(xs,ys),conic,digits=5)
+      
+      #  min  2 x + y
+      #
+      #    ||  x-5 , y-7 ||_2 <= 4
+      #    ||  x/6 , y/5 ||_2 <= 1
+      #
+
+      h = diagcat(soc(vertcat(x-5,y-7),4),soc(vertcat(x/6,y/5),1))
+
+      solver = casadi.qpsol("msyolver",conic,{'h':h,'x': vertcat(x,y),"f": 2*x+y},qp_options)
+      
+      res = solver()
+
+      self.checkarray(res["x"],DM([1.655450403084473,4.805919456574478]),conic,digits=5)
+
+      h = diagcat(soc(vertcat(-13*x+3*y+5*z-3,-12*x+12*y-6*z-2),-12*x-6*y+5*z-12),soc(vertcat(-3*x+6*y+2*z,1*x+9*y+2*z+3,-1*x-19*y+3*z-42),-3*x+6*y-10*z+27))
+      solver = casadi.qpsol("msyolver",conic,{'h':h,'x': vertcat(x,y,z),"f": -2*x+1*y+5*z},qp_options)
+      res = solver()
+
+      self.checkarray(res["x"],DM([-5.0147928622,-5.766930599,-8.52180472]),conic,digits=5)
+
+      self.assertTrue(solver.stats()["success"])
 
 if __name__ == '__main__':
     unittest.main()

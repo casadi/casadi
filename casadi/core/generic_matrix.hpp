@@ -256,6 +256,21 @@ namespace casadi {
       return MatType::mpower(x, n);
     }
 
+    /** \brief Construct second-order-convex
+     *
+     * \param[in] x vector expression of size n
+     * \param[in] y scalar expression
+     *
+     * soc(x,y) computes [y*eye(n) x; x' y]
+     *
+     *  soc(x,y) positive semi definite
+     *        <=> || x ||_2 <= y
+     *
+     */
+    inline friend MatType soc(const MatType& x, const MatType& y) {
+      return MatType::soc(x, y);
+    }
+
     /** \brief Compute any contraction of two dense tensors, using index/einstein notation
         einstein(A, B, a, b, c) -> C
 
@@ -400,12 +415,6 @@ namespace casadi {
 
     /** \brief Infinity-norm */
     inline friend MatType norm_inf(const MatType &x) { return MatType::norm_inf(x);}
-
-    /** \brief Return a row-wise summation of elements */
-    inline friend MatType sum1(const MatType &x) { return MatType::sum1(x);}
-
-    /** \brief Return a column-wise summation of elements  */
-    inline friend MatType sum2(const MatType &x) { return MatType::sum2(x);}
 
     /** \brief Returns difference (n-th order) along given axis (MATLAB convention) */
     inline friend MatType diff(const MatType &x, casadi_int n=1, casadi_int axis=-1) {
@@ -755,6 +764,7 @@ namespace casadi {
     static MatType tangent(const MatType &ex, const MatType &arg);
     static MatType linearize(const MatType& f, const MatType& x, const MatType& x0);
     static MatType mpower(const MatType &x, const MatType &y);
+    static MatType soc(const MatType &x, const MatType &y);
     ///@}
 
 /** @} */
@@ -1229,6 +1239,20 @@ namespace casadi {
     } else {
       return MatType::mtimes(mpower(a, N-1), a);
     }
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::soc(const MatType& x,
+                                            const MatType& y) {
+    casadi_assert(y.is_scalar(), "y needs to be scalar. Got " + y.dim() + ".");
+    casadi_assert(x.is_vector(), "x needs to be a vector. Got " + x.dim() + ".");
+
+    MatType x_col = x.is_column() ? x : x.T();
+
+    x_col = x_col.nz(Slice());
+
+    casadi_int n = x_col.numel();
+    return blockcat(y*MatType::eye(n), x_col, x_col.T(), y);
   }
 
   template<typename MatType>

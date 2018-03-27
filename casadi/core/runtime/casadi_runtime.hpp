@@ -181,7 +181,7 @@ namespace casadi {
   }
 
   template <class T1>
-  class casadi_newton_mem;
+  struct casadi_newton_mem;
 
   // Newton step
   template<typename T1>

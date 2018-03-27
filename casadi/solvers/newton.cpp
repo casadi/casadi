@@ -117,7 +117,7 @@ namespace casadi {
   int Newton::solve(void* mem) const {
     auto m = static_cast<NewtonMemory*>(mem);
 
-    casadi_int mem_linsol = linsol_.checkout();
+    scoped_checkout<Linsol> mem_linsol(linsol_);
 
     // Get the initial guess
     casadi_copy(m->iarg[iin_], n_, m->x);
@@ -194,7 +194,6 @@ namespace casadi {
     if (success) m->return_status = "success";
     if (verbose_) casadi_message("Newton algorithm took " + str(m->iter) + " steps");
 
-    linsol_.release(mem_linsol);
     return 0;
   }
 

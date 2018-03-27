@@ -1573,6 +1573,14 @@ namespace casadi {
     return ret;
   }
 
+  Sparsity Sparsity::sum2(const Sparsity &x) {
+    return mtimes(x, Sparsity::dense(x.size2(), 1));
+
+  }
+  Sparsity Sparsity::sum1(const Sparsity &x) {
+    return mtimes(Sparsity::dense(1, x.size1()), x);
+  }
+
   casadi_int Sparsity::sprank(const Sparsity& x) {
     std::vector<casadi_int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
     x.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);

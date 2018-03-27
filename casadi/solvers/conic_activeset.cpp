@@ -436,7 +436,7 @@ namespace casadi {
       // Look for largest bound violation
       double prerr = 0.;
       casadi_int iprerr = -1;
-      bool prerr_pos;
+      bool prerr_pos = false; // NOTE(jaendersson): suppress used unset warning
       for (i=0; i<nx_+na_; ++i) {
         if (z[i] > ubz[i]+prerr) {
           prerr = z[i]-ubz[i];
@@ -496,7 +496,8 @@ namespace casadi {
           if (best_ind>=0) {
             i = best_ind;
             cost = best_cost;
-            print("Cand for |du|? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, dlam=%g, w=%g, cost=%g\n",
+            print("Cand for |du|? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
+                  "dlam=%g, w=%g, cost=%g\n",
                   i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], w[i], cost);
             if (true) {
               lam[best_ind] = w[best_ind]>0. ? DMIN : -DMIN;

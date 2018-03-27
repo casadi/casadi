@@ -10523,8 +10523,8 @@ of all input elements with respect to all output elements.
 
 ";
 
-%feature("docstring") casadi::Conic::is_a "[INTERNAL]  Check if the
-function is of a particular type.
+%feature("docstring") casadi::Conic::symbolicAdjSeed "[INTERNAL]  Symbolic
+expressions for the adjoint seeds.
 
 ";
 
@@ -10709,8 +10709,8 @@ scheme index by name.
 
 ";
 
-%feature("docstring") casadi::Conic::print "[INTERNAL]  C-style formatted
-printing during evaluation.
+%feature("docstring") casadi::Conic::codegen "[INTERNAL]  Generate code the
+function.
 
 ";
 
@@ -10841,8 +10841,8 @@ long enough to evaluate function.
 
 ";
 
-%feature("docstring") casadi::Conic::codegen "[INTERNAL]  Generate code the
-function.
+%feature("docstring") casadi::Conic::is_a "[INTERNAL]  Check if the
+function is of a particular type.
 
 ";
 
@@ -10876,11 +10876,6 @@ incref for dependencies.
 ";
 
 %feature("docstring") casadi::Conic::factory "[INTERNAL] ";
-
-%feature("docstring") casadi::Conic::symbolicAdjSeed "[INTERNAL]  Symbolic
-expressions for the adjoint seeds.
-
-";
 
 %feature("docstring") casadi::Conic::get_stats "[INTERNAL]  Get all
 statistics.
@@ -10934,6 +10929,11 @@ sparsity pattern, forward mode.
 
 %feature("docstring") casadi::Conic::uses_output "[INTERNAL]  Do the
 derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring") casadi::Conic::psd_support "[INTERNAL]  Can psd
+constraints be treated.
 
 ";
 
@@ -11288,6 +11288,11 @@ function in a specific language.
 
 ";
 
+%feature("docstring") casadi::Conic::print "[INTERNAL]  C-style formatted
+printing during evaluation.
+
+";
+
 
 // File: classcasadi_1_1ConicActiveSet.xml
 %feature("docstring") casadi::ConicActiveSet::jit_dependencies "[INTERNAL]
@@ -11352,6 +11357,11 @@ memory block.
 
 %feature("docstring") casadi::ConicActiveSet::sp_forward "[INTERNAL]
 Propagate sparsity forward.
+
+";
+
+%feature("docstring") casadi::ConicActiveSet::is_a "[INTERNAL]  Check if
+the function is of a particular type.
 
 ";
 
@@ -11514,8 +11524,8 @@ Get an atomic operation operator index.
 
 ";
 
-%feature("docstring") casadi::ConicActiveSet::set_work "[INTERNAL]  Set the
-(persistent) work vectors.
+%feature("docstring") casadi::ConicActiveSet::class_name "[INTERNAL]
+Readable name of the internal class.
 
 ";
 
@@ -11618,11 +11628,6 @@ Input/output sparsity.
 
 %feature("docstring") casadi::ConicActiveSet::print_dimensions "[INTERNAL]
 Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring") casadi::ConicActiveSet::is_a "[INTERNAL]  Check if
-the function is of a particular type.
 
 ";
 
@@ -11815,6 +11820,11 @@ variables (SX)
 
 ";
 
+%feature("docstring") casadi::ConicActiveSet::set_work "[INTERNAL]  Set the
+(persistent) work vectors.
+
+";
+
 %feature("docstring") casadi::ConicActiveSet::forward "[INTERNAL]  Return
 function that calculates forward derivatives forward(nfwd) returns a cached
 instance if available, and calls  Function get_forward(casadi_int nfwd) if
@@ -11922,8 +11932,8 @@ Print an integer vector
 
 ";
 
-%feature("docstring") casadi::ConicActiveSet::class_name "[INTERNAL]
-Readable name of the internal class.
+%feature("docstring") casadi::ConicActiveSet::psd_support "[INTERNAL]  Can
+psd constraints be treated.
 
 ";
 
@@ -21730,19 +21740,7 @@ Replace 0-by-0 inputs.
 in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
-*/ %feature("docstring") friendwrap_sum2 "
-
-Return a column-wise summation of elements.
-
-";
-
-%feature("docstring") friendwrap_sum1 "
-
-Return a row-wise summation of elements.
-
-";
-
-%feature("docstring") friendwrap_mrdivide "
+*/ %feature("docstring") friendwrap_mrdivide "
 
 Matrix divide (cf. slash '/' in MATLAB)
 
@@ -22171,6 +22169,12 @@ Calculate Jacobian.
 
 ";
 
+%feature("docstring") casadi::GenericMatrix::soc "
+
+Functions called by friend functions defined here
+
+";
+
 %feature("docstring") casadi::GenericMatrix::is_square "
 
 Check if the matrix expression is square.
@@ -22210,6 +22214,23 @@ Find out which variables enter with some order.
 %feature("docstring") friendwrap_linspace "
 
 Matlab's linspace command.
+
+";
+
+%feature("docstring") friendwrap_soc "
+
+Construct second-order-convex.
+
+Parameters:
+-----------
+
+x:  vector expression of size n
+
+y:  scalar expression
+
+soc(x,y) computes [y*eye(n) x; x' y]
+
+soc(x,y) positive semi definite <=> || x ||_2 <= y
 
 ";
 
@@ -33528,7 +33549,7 @@ Calculate bilinear form x^T A y.
 
 ";
 
-%feature("docstring") casadi::Matrix::jtimes "
+%feature("docstring") casadi::Matrix::mpower "
 
 Functions called by friend functions defined here
 
@@ -33869,6 +33890,12 @@ H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
 
 ";
 
+%feature("docstring") casadi::Matrix::size2 "
+
+Get the second dimension (i.e. number of columns)
+
+";
+
 %feature("docstring") casadi::Matrix::size "
 
 >  std::pair<casadi_int, casadi_int> casadi::GenericMatrix< Matrix< Scalar >  >::size() const
@@ -33883,7 +33910,7 @@ Get the size along a particular dimensions.
 
 ";
 
-%feature("docstring") casadi::Matrix::mpower "
+%feature("docstring") casadi::Matrix::jtimes "
 
 Functions called by friend functions defined here
 
@@ -33939,9 +33966,9 @@ Example usage:
 
 ";
 
-%feature("docstring") casadi::Matrix::size2 "
+%feature("docstring") casadi::Matrix::soc "
 
-Get the second dimension (i.e. number of columns)
+Functions called by friend functions defined here
 
 ";
 
@@ -34929,6 +34956,12 @@ Create vector constant (also implicit type conversion)
 ------------------------------------------------------------------------
 
 Create sparse matrix constant (also implicit type conversion)
+
+";
+
+%feature("docstring") casadi::MX::soc "
+
+Functions called by friend functions defined here
 
 ";
 
@@ -39625,8 +39658,8 @@ dimensions of inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::sz_res "[INTERNAL]  Get required
-length of res field.
+%feature("docstring") casadi::QpToNlp::psd_support "[INTERNAL]  Can psd
+constraints be treated.
 
 ";
 
@@ -39799,6 +39832,11 @@ unidirectional or bidirectional partition.
 ";
 
 %feature("docstring") casadi::QpToNlp::serialize "[INTERNAL]  Serialize.
+
+";
+
+%feature("docstring") casadi::QpToNlp::sz_res "[INTERNAL]  Get required
+length of res field.
 
 ";
 
@@ -50978,16 +51016,35 @@ Create a QP solver Solves the following strictly convex problem:
   LBA <= A x <= UBA
   LBX <= x   <= UBX
   
+  resize(Q x, np, np) + P >= 0 (psd)
+  
   with :
   H sparse (n x n) positive definite
   g dense  (n x 1)
+  A sparse (nc x n)
+  Q sparse symmetric (np^2 x n)
+  P sparse symmetric (np x nq)
   
   n: number of decision variables (x)
   nc: number of constraints (A)
+  nq: shape of psd constraint matrix
 
 
 
 If H is not positive-definite, the solver should throw an error.
+
+Second-order cone constraints can be added as psd constraints through a
+helper function 'soc':
+
+x in R^n y in R
+
+|| x ||_2 <= y
+
+<=>
+
+soc(x, y) psd
+
+This can be proven with soc(x, y)=[y*I x; x' y] using the Shur complement.
 
 General information
 ===================
@@ -51226,7 +51283,7 @@ General information
 |                  |                 | debugging        |                  |
 +------------------+-----------------+------------------+------------------+
 
->Input scheme: casadi::ConicInput (CONIC_NUM_IN = 10)
+>Input scheme: casadi::ConicInput (CONIC_NUM_IN = 12)
 
 +--------------+--------+--------------------------------------------------+
 |  Full name   | Short  |                   Description                    |
@@ -51253,6 +51310,10 @@ General information
 | CONIC_LAM_X0 | lam_x0 | dense                                            |
 +--------------+--------+--------------------------------------------------+
 | CONIC_LAM_A0 | lam_a0 | dense                                            |
++--------------+--------+--------------------------------------------------+
+| CONIC_Q      | q      | The matrix Q: sparse symmetric, (np^2 x n)       |
++--------------+--------+--------------------------------------------------+
+| CONIC_P      | p      | The matrix P: sparse symmetric, (np x np)        |
 +--------------+--------+--------------------------------------------------+
 
 >Output scheme: casadi::ConicOutput (CONIC_NUM_OUT = 4)

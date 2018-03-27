@@ -2830,6 +2830,12 @@ namespace casadi{
  DECL M casadi_repmat(const M& A, const std::pair<casadi_int, casadi_int>& rc) {
  return repmat(A, rc.first, rc.second);
  }
+ DECL M casadi_sum2(const M& x) {
+ return sum2(x);
+ }
+ DECL M casadi_sum1(const M& x) {
+ return sum1(x);
+ }
 #endif
 %enddef
 
@@ -2895,6 +2901,10 @@ DECL M casadi_interp1d(const std::vector<double>& x, const M&v,
   return interp1d(x, v, xq, mode, equidistant);
 }
 
+DECL M casadi_soc(const M& x, const M& y) {
+  return soc(x, y);
+}
+
 DECL M casadi_cross(const M& a, const M& b, casadi_int dim = -1) {
   return cross(a, b, dim);
 }
@@ -2950,14 +2960,6 @@ DECL M casadi_norm_1(const M& x) {
 
 DECL M casadi_norm_inf(const M& x) {
   return norm_inf(x);
-}
-
-DECL M casadi_sum2(const M& x) {
-  return sum2(x);
-}
-
-DECL M casadi_sum1(const M& x) {
-  return sum1(x);
 }
 
 DECL M casadi_dot(const M& x, const M& y) {
