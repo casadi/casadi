@@ -209,7 +209,7 @@ casadi_int casadi_qr_singular(T1* rmin, casadi_int* irmin, const T1* nz_r,
 // Get a vector v such that A*v = 0 and |v| == 1
 template<typename T1>
 void casadi_qr_colcomb(T1* v, const T1* nz_r, const casadi_int* sp_r,
-                       const casadi_int* pc, casadi_int irmin) {
+                       const casadi_int* pc, casadi_int irmin, casadi_int ind) {
   // Local variables
   casadi_int ncol, r, c, k, crmin;
   const casadi_int *r_colind, *r_row;
@@ -217,9 +217,6 @@ void casadi_qr_colcomb(T1* v, const T1* nz_r, const casadi_int* sp_r,
   ncol = sp_r[1];
   r_colind = sp_r + 2;
   r_row = r_colind + ncol + 1;
-  // Reset w
-  casadi_fill(v, ncol, 0.);
-  v[irmin] = 1.;
   // Get c such that pc[c] == irmin
   crmin = -1;
   for (c=0; c<ncol; ++c) {
@@ -228,8 +225,11 @@ void casadi_qr_colcomb(T1* v, const T1* nz_r, const casadi_int* sp_r,
       break;
     }
   }
+  // Reset w
+  casadi_fill(v, ncol, 0.);
+  v[pc[crmin+ind]] = 1.;
   // Copy crmin-th column to v
-  for (k=r_colind[crmin]; k<r_colind[crmin+1]-1; ++k) {
+  for (k=r_colind[crmin+ind]; k<r_colind[crmin+ind+1]-1; ++k) {
     v[pc[r_row[k]]] = -nz_r[k];
   }
   // Backward substitution

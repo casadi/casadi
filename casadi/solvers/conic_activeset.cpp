@@ -584,7 +584,7 @@ namespace casadi {
       // Calculate search direction
       if (sing) {
         // Get a linear combination of the columns in kktd
-        casadi_qr_colcomb(dz, r, sp_r_, get_ptr(pc_), imina);
+        casadi_qr_colcomb(dz, r, sp_r_, get_ptr(pc_), imina, 0);
       } else {
         // KKT residual
         for (i=0; i<nx_+na_; ++i) {
@@ -651,73 +651,82 @@ namespace casadi {
         casadi_trans(kktd, kktd_, vr, kktd_, iw);
         casadi_copy(vr, kktd_.nnz(), kktd);
         casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
-        // Get a linear combination of the rows in kktd
-        double minat_tr;
-        casadi_int imina_tr;
-        casadi_qr_singular(&minat_tr, &imina_tr, r, sp_r_, get_ptr(pc_), 1e-12);
-        casadi_qr_colcomb(w, r, sp_r_, get_ptr(pc_), imina_tr);
-        if (verbose_) {
-          print_vector("normal", w, nx_+na_);
-        }
+
         // Best flip
         double tau_test, best_tau = inf;
         sing_ind = -1;
-        for (i=0; i<nx_+na_; ++i) {
-          // Check if old column can be removed without decreasing rank
-          if (fabs(i<nx_ ? dz[i] : dlam[i])<1e-12) continue;
-          // If dot(w, kktd(:,i)-kktd_flipped(:,i))==0, rank won't increase
-          double d = i<nx_ ? w[i] : -w[i];
-          for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d -= kkt[k]*w[kkt_row[k]];
-          if (fabs(d)<1e-12) continue;
-          // Is constraint active?
-          if (lam[i]==0.) {
-            // Make sure that step is nonzero
-            if (fabs(dz[i])<1e-12) continue;
-            // Step needed to bring z to lower bound
-            if (!neverlower[i]) {
-              tau_test = (lbz[i]-z[i])/dz[i];
-              // Ensure nonincrease in max(prerr, duerr)
-              if (!((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.))) {
-                // Only allow removing constraints if tau_test==0
-                if (fabs(tau_test)>=1e-16) {
-                  // Check if best so far
-                  if (fabs(tau_test)<fabs(best_tau)) {
-                    best_tau = tau_test;
-                    sing_ind = i;
-                    sing_sign = -1;
+
+        // For all nullspace vectors
+        casadi_int nullity_tr, nulli, imina_tr;
+        double minat_tr;
+        nullity_tr = casadi_qr_singular(&minat_tr, &imina_tr, r, sp_r_,
+                                        get_ptr(pc_), 1e-12);
+        for (nulli=0; nulli<nullity_tr; ++nulli) {
+          // Get a linear combination of the rows in kktd
+          casadi_qr_colcomb(w, r, sp_r_, get_ptr(pc_), imina_tr, nulli);
+          if (verbose_) {
+            print_vector("normal", w, nx_+na_);
+          }
+          // Look for the best constraint for increasing rank
+          for (i=0; i<nx_+na_; ++i) {
+            // Check if old column can be removed without decreasing rank
+            if (fabs(i<nx_ ? dz[i] : dlam[i])<1e-12) continue;
+            // If dot(w, kktd(:,i)-kktd_flipped(:,i))==0, rank won't increase
+            double d = i<nx_ ? w[i] : -w[i];
+            for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d -= kkt[k]*w[kkt_row[k]];
+            if (fabs(d)<1e-12) {
+              continue;
+            }
+            // Is constraint active?
+            if (lam[i]==0.) {
+              // Make sure that step is nonzero
+              if (fabs(dz[i])<1e-12) continue;
+              // Step needed to bring z to lower bound
+              if (!neverlower[i]) {
+                tau_test = (lbz[i]-z[i])/dz[i];
+                // Ensure nonincrease in max(prerr, duerr)
+                if (!((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.))) {
+                  // Only allow removing constraints if tau_test==0
+                  if (fabs(tau_test)>=1e-16) {
+                    // Check if best so far
+                    if (fabs(tau_test)<fabs(best_tau)) {
+                      best_tau = tau_test;
+                      sing_ind = i;
+                      sing_sign = -1;
+                    }
                   }
                 }
               }
-            }
-            // Step needed to bring z to upper bound
-            if (!neverupper[i]) {
-              tau_test = (ubz[i]-z[i])/dz[i];
-              // Ensure nonincrease in max(prerr, duerr)
-              if (!((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.))) {
-                // Only allow removing constraints if tau_test==0
-                if (fabs(tau_test)>=1e-16) {
-                  // Check if best so far
-                  if (fabs(tau_test)<fabs(best_tau)) {
-                    best_tau = tau_test;
-                    sing_ind = i;
-                    sing_sign = 1;
+              // Step needed to bring z to upper bound
+              if (!neverupper[i]) {
+                tau_test = (ubz[i]-z[i])/dz[i];
+                // Ensure nonincrease in max(prerr, duerr)
+                if (!((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.))) {
+                  // Only allow removing constraints if tau_test==0
+                  if (fabs(tau_test)>=1e-16) {
+                    // Check if best so far
+                    if (fabs(tau_test)<fabs(best_tau)) {
+                      best_tau = tau_test;
+                      sing_ind = i;
+                      sing_sign = 1;
+                    }
                   }
                 }
               }
-            }
-          } else {
-            // Make sure that step is nonzero
-            if (fabs(dlam[i])<1e-12) continue;
-            // Step needed to bring lam to zero
-            if (!neverzero[i]) {
-              tau_test = -lam[i]/dlam[i];
-              // Ensure nonincrease in max(prerr, duerr)
-              if ((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.)) continue;
-              // Check if best so far
-              if (fabs(tau_test)<fabs(best_tau)) {
-                best_tau = tau_test;
-                sing_ind = i;
-                sing_sign = 0;
+            } else {
+              // Make sure that step is nonzero
+              if (fabs(dlam[i])<1e-12) continue;
+              // Step needed to bring lam to zero
+              if (!neverzero[i]) {
+                tau_test = -lam[i]/dlam[i];
+                // Ensure nonincrease in max(prerr, duerr)
+                if ((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.)) continue;
+                // Check if best so far
+                if (fabs(tau_test)<fabs(best_tau)) {
+                  best_tau = tau_test;
+                  sing_ind = i;
+                  sing_sign = 0;
+                }
               }
             }
           }
