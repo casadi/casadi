@@ -389,14 +389,6 @@ namespace casadi {
     const casadi_int* kktd_colind = kktd_.colind();
     const casadi_int* kktd_row = kktd_.row();
 
-    // R sparsity
-    //const casadi_int* r_colind = sp_r_.colind();
-    //const casadi_int* r_row = sp_r_.row();
-
-    // A sparsity
-    //const casadi_int* a_colind = A_.colind();
-    //const casadi_int* a_row = A_.row();
-
     // AT sparsity
     const casadi_int* at_colind = AT_.colind();
     const casadi_int* at_row = AT_.row();
@@ -420,13 +412,6 @@ namespace casadi {
     // QP iterations
     casadi_int iter = 0;
     while (true) {
-      // Debugging
-      if (verbose_) {
-        print_vector("z", z, nx_+na_);
-        print_vector("lam", lam, nx_+na_);
-        print_signs("sign(lam)", lam, nx_+na_);
-      }
-
       // Recalculate g
       casadi_fill(z+nx_, na_, 0.);
       casadi_mv(a, A_, z, z+nx_, 0);
@@ -482,16 +467,51 @@ namespace casadi {
       if (!new_active_set) {
         if (sing) {
           casadi_assert_dev(sing_ind>=0);
-          i = sing_ind;
           lam[sing_ind] = sing_sign==0 ? 0. : sing_sign<0 ? -DMIN : DMIN;
           new_active_set = true;
           sprint(msg, sizeof(msg), "sign(lam[%lld]) -> %lld", sing_ind, sing_sign);
         } else if (iprerr>=0 && lam[iprerr]==0.) {
-          // Try to improve primal feasibility
+          // Try to improve primal feasibility by adding a constraint
           lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
           new_active_set = true;
           sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
+        } else if (false /*iduerr>=0 && duerr>=1e-12*/) {
+          // We need to increase or decrease infeas[iduerr]. Sensitivity:
+          casadi_fill(w, nx_+na_, 0.);
+          w[iduerr] = duerr_pos ? -1. : 1.;
+          casadi_mv(a, A_, w, w+nx_, 0);
+          // Find the best lam[i] to make nonzero
+          casadi_int best_ind = -1;
+          double best_cost = inf, cost;
+          for (i=0; i<nx_+na_; ++i) {
+            if (lam[i]!=0.) continue; // already nonzero
+            if (fabs(w[i])<1e-16) continue; // does not influence iduerr enough
+            if (w[i]>0. ? neverupper[i] : neverlower[i]) continue;
+            cost = w[i]*(z[i] - (w[i]>0. ? ubz[i] : lbz[i]));
+            if (cost < best_cost) {
+              best_cost = cost;
+              best_ind = i;
+            }
+          }
+          if (best_ind>=0) {
+            i = best_ind;
+            cost = best_cost;
+            print("Cand for |du|? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, dlam=%g, w=%g, cost=%g\n",
+                  i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], w[i], cost);
+            if (true) {
+              lam[best_ind] = w[best_ind]>0. ? DMIN : -DMIN;
+              new_active_set = true;
+              sprint(msg, sizeof(msg), "Added %lld to reduce |du|", best_ind);
+            }
+          }
         }
+      }
+
+      // Debugging
+      if (verbose_) {
+        print_vector("z", z, nx_+na_);
+        print_vector("lam", lam, nx_+na_);
+        print_signs("sign(lam)", lam, nx_+na_);
       }
 
       // Copy kkt to kktd
@@ -531,14 +551,14 @@ namespace casadi {
 
       if (iter % 10 == 0) {
         // Print header
-        print("%10s %15s %15s %6s %15s %6s %15s %6s %10s %40s\n",
-              "Iteration", "fk", "|pr|", "con", "|du|", "var",
+        print("%5s %5s %15s %15s %6s %15s %6s %15s %6s %10s %40s\n",
+              "Iter", "Null", "fk", "|pr|", "con", "|du|", "var",
               "min(diag(R))", "con", "last tau", "Note");
       }
 
       // Print iteration progress:
-      print("%6d (%1s) %15g %15g %6d %15g %6d %15g %6d %10g %40s\n",
-            iter, sing ? "S" : "F", fk, prerr, iprerr, duerr, iduerr,
+      print("%5d %5d %15g %15g %6d %15g %6d %15g %6d %10g %40s\n",
+            iter, sing, fk, prerr, iprerr, duerr, iduerr,
             mina, imina, tau, msg);
 
       // Successful return if still no change
@@ -577,6 +597,11 @@ namespace casadi {
           } else {
             dz[i] = -lam[i];
           }
+        }
+
+        // Print search direction
+        if (verbose_) {
+          print_vector("kkt residual", dz, nx_+na_);
         }
 
         // Solve to get primal-dual step
@@ -728,7 +753,10 @@ namespace casadi {
       if (zero_step) tau = 0.;
 
       // Warning if step becomes zero
-      if (zero_step) casadi_warning("No search direction");
+      if (zero_step) {
+        casadi_warning("No search direction");
+        continue;
+      }
 
       // Check primal feasibility in the search direction
       for (i=0; i<nx_+na_ && tau>0.; ++i) {

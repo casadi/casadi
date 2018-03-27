@@ -181,8 +181,8 @@ void casadi_qr_solve(T1* x, casadi_int nrhs, casadi_int tr,
 // SYMBOL "qr_singular"
 // Check if QR factorization corresponds to a singular matrix
 template<typename T1>
-int casadi_qr_singular(T1* rmin, casadi_int* irmin, const T1* nz_r,
-                       const casadi_int* sp_r, const casadi_int* pc, T1 eps) {
+casadi_int casadi_qr_singular(T1* rmin, casadi_int* irmin, const T1* nz_r,
+                             const casadi_int* sp_r, const casadi_int* pc, T1 eps) {
   // Local variables
   T1 rd;
   casadi_int ncol, c;
@@ -198,7 +198,7 @@ int casadi_qr_singular(T1* rmin, casadi_int* irmin, const T1* nz_r,
       *rmin = rd;
       *irmin = pc[c];
       // Stop if smaller than eps (r entries after that are unreliable)
-      if (rd<eps) return 1;
+      if (rd<eps) return ncol-c;
     }
   }
   // Successful return
