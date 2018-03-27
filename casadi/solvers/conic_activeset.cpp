@@ -470,76 +470,54 @@ namespace casadi {
         sprint(msg, sizeof(msg), "sign(lam[%lld]) -> %lld", sing_ind, sing_sign);
       }
 
-      // Try to improve primal feasibility by adding a constraint
-      if (!new_active_set && iprerr>=0 && lam[iprerr]==0.) {
-        // Try to improve primal feasibility by adding a constraint
-        lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
-        new_active_set = true;
-        sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
-      }
-
-      // Try to improve dual feasibility by removing a constraint
-      if (!new_active_set && iduerr>=0) {
-        // We need to increase or decrease infeas[iduerr]. Sensitivity:
-        casadi_fill(w, nx_+na_, 0.);
-        w[iduerr] = duerr_pos ? -1. : 1.;
-        casadi_mv(a, A_, w, w+nx_, 0);
-        // Find the best lam[i] to make nonzero
-        casadi_int best_ind = -1;
-        double best_w = 0.;
-        for (i=0; i<nx_+na_; ++i) {
-          // Make sure variable influences duerr
-          if (w[i]==0.) continue;
-          // Make sure removing the constraint decreases dual infeasibility
-          if (w[i]>0. ? lam[i]>=0. : lam[i]<=0.) continue;
-          // Maximum infeasibility from setting from setting lam[i]=0
-          double new_duerr;
-          if (i<nx_) {
-            new_duerr = fabs(glag[i]);
-          } else {
-            new_duerr = 0.;
-            for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-              new_duerr = fmax(new_duerr, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
+      // Improve primal or dual feasibility
+      if (!new_active_set && (iprerr>=0 || iduerr>=0)) {
+        if (prerr>=duerr) {
+          // Try to improve primal feasibility by adding a constraint
+          if (lam[iprerr]==0.) {
+            // Try to improve primal feasibility by adding a constraint
+            lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
+            new_active_set = true;
+            sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
+          }
+        } else {
+          // Try to improve dual feasibility by removing a constraint
+          // We need to increase or decrease infeas[iduerr]. Sensitivity:
+          casadi_fill(w, nx_+na_, 0.);
+          w[iduerr] = duerr_pos ? -1. : 1.;
+          casadi_mv(a, A_, w, w+nx_, 0);
+          // Find the best lam[i] to make nonzero
+          casadi_int best_ind = -1;
+          double best_w = 0.;
+          for (i=0; i<nx_+na_; ++i) {
+            // Make sure variable influences duerr
+            if (w[i]==0.) continue;
+            // Make sure removing the constraint decreases dual infeasibility
+            if (w[i]>0. ? lam[i]>=0. : lam[i]<=0.) continue;
+            // Maximum infeasibility from setting from setting lam[i]=0
+            double new_duerr;
+            if (i<nx_) {
+              new_duerr = fabs(glag[i]);
+            } else {
+              new_duerr = 0.;
+              for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+                new_duerr = fmax(new_duerr, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
+              }
+            }
+            // Skip if duerr increases
+            if (new_duerr>duerr) continue;
+            // Check if best so far
+            if (fabs(w[i])>best_w) {
+              best_w = fabs(w[i]);
+              best_ind = i;
             }
           }
-          // Skip if duerr increases
-          if (new_duerr>duerr) continue;
-          // Check if best so far
-          if (fabs(w[i])>best_w) {
-            best_w = fabs(w[i]);
-            best_ind = i;
+          // Accept, if any
+          if (best_ind>=0) {
+            lam[best_ind] = 0.;
+            new_active_set = true;
+            sprint(msg, sizeof(msg), "Removed %lld to reduce |du|", best_ind);
           }
-        }
-        // Accept, if any
-        if (best_ind>=0) {
-          lam[best_ind] = 0.;
-          new_active_set = true;
-          sprint(msg, sizeof(msg), "Removed %lld to reduce |du|", best_ind);
-        }
-      }
-
-      // Check if any constraint is active at the wrong bound
-      if (!new_active_set) {
-        double best_viol = 0.;
-        casadi_int ibest_viol = -1;
-        for (i=0; i<nx_+na_; ++i) {
-          if (lam[i]>0.) {
-            if (lbz[i] > z[i] + best_viol) {
-              best_viol = lbz[i] - z[i];
-              ibest_viol = i;
-            }
-          } else if (lam[i]<0.) {
-            if (ubz[i] < z[i] - best_viol) {
-              best_viol = z[i] - ubz[i];
-              ibest_viol = i;
-            }
-          }
-        }
-        // Accept, if any
-        if (ibest_viol>=0) {
-          lam[ibest_viol] = 0.;
-          new_active_set = true;
-          sprint(msg, sizeof(msg), "Removed %lld at wrong bound", ibest_viol);
         }
       }
 
