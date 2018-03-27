@@ -475,35 +475,42 @@ namespace casadi {
           lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
           new_active_set = true;
           sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
-        } else if (false /*iduerr>=0 && duerr>=1e-12*/) {
+        } else if (iduerr>=0 && duerr>=1e-10) {
           // We need to increase or decrease infeas[iduerr]. Sensitivity:
           casadi_fill(w, nx_+na_, 0.);
           w[iduerr] = duerr_pos ? -1. : 1.;
           casadi_mv(a, A_, w, w+nx_, 0);
           // Find the best lam[i] to make nonzero
           casadi_int best_ind = -1;
-          double best_cost = inf, cost;
+          double best_w = 0.;
           for (i=0; i<nx_+na_; ++i) {
-            if (lam[i]!=0.) continue; // already nonzero
-            if (fabs(w[i])<1e-16) continue; // does not influence iduerr enough
-            if (w[i]>0. ? neverupper[i] : neverlower[i]) continue;
-            cost = w[i]*(z[i] - (w[i]>0. ? ubz[i] : lbz[i]));
-            if (cost < best_cost) {
-              best_cost = cost;
+            // Make sure variable influences duerr
+            if (w[i]==0.) continue;
+            // Make sure removing the constraint decreases dual infeasibility
+            if (w[i]>0. ? lam[i]>=0. : lam[i]<=0.) continue;
+            // Maximum infeasibility from setting from setting lam[i]=0
+            double new_duerr;
+            if (i<nx_) {
+              new_duerr = fabs(glag[i]);
+            } else {
+              new_duerr = 0.;
+              for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+                new_duerr = fmax(new_duerr, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
+              }
+            }
+            // Skip if duerr increases
+            if (new_duerr>duerr) continue;
+            // Check if best so far
+            if (fabs(w[i])>best_w) {
+              best_w = fabs(w[i]);
               best_ind = i;
             }
           }
+          // Accept, if any
           if (best_ind>=0) {
-            i = best_ind;
-            cost = best_cost;
-            print("Cand for |du|? i=%lld, z=%g, lbz=%g, ubz=%g, lam=%g, dz=%g, "
-                  "dlam=%g, w=%g, cost=%g\n",
-                  i, z[i], lbz[i], ubz[i], lam[i], dz[i], dlam[i], w[i], cost);
-            if (true) {
-              lam[best_ind] = w[best_ind]>0. ? DMIN : -DMIN;
-              new_active_set = true;
-              sprint(msg, sizeof(msg), "Added %lld to reduce |du|", best_ind);
-            }
+            lam[best_ind] = 0.;
+            new_active_set = true;
+            sprint(msg, sizeof(msg), "Removed %lld to reduce |du|", best_ind);
           }
         }
       }

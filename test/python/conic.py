@@ -151,7 +151,6 @@ class ConicTests(casadiTestCase):
 
       solver_in["ubx"]=5
 
-      if 'activeset' in str(conic): continue # Singular hessian
       if "worhp" in str(qp_options):
         with self.assertRaises(Exception):
           solver_out = solver(solver_in)
@@ -903,9 +902,9 @@ class ConicTests(casadiTestCase):
     z = MX.sym("z")
 
 
-    
+
     for conic, qp_options, aux_options in conics:
-      if not aux_options["soc"]: continue 
+      if not aux_options["soc"]: continue
 
 
       #  min  2 x + y
@@ -917,7 +916,7 @@ class ConicTests(casadiTestCase):
       h = soc(vertcat(x-5,y-7),4)
 
       solver = casadi.qpsol("msyolver",conic,{'h':h,'x': vertcat(x,y),"f": 2*x+y},qp_options)
-      
+
       res = solver()
 
       self.checkarray(res["x"],DM([5-8/sqrt(5),7-4/sqrt(5)]),conic,digits=7)
@@ -928,8 +927,8 @@ class ConicTests(casadiTestCase):
       #    ||  x , y ||_2 <= ax+4
       #
       #
-      
-      
+
+
       a = 1.3
 
       h = soc(vertcat(x,y),a*x+4)
@@ -940,7 +939,7 @@ class ConicTests(casadiTestCase):
       ref =  res["x"]
 
       solver = casadi.qpsol("msyolver",conic,{'h':h,'x': vertcat(x,y),"f": 2*x+y},qp_options)
-      
+
       res = solver()
 
       xs = -(8*sqrt(5-a**2)+4*a**3-20*a)/(a**4-6*a**2+5)
@@ -948,7 +947,7 @@ class ConicTests(casadiTestCase):
 
       self.checkarray(res["f"],2*xs+ys,conic,digits=5)
       self.checkarray(res["x"],vertcat(xs,ys),conic,digits=5)
-      
+
       #  min  2 x + y
       #
       #    ||  x-5 , y-7 ||_2 <= 4
@@ -958,7 +957,7 @@ class ConicTests(casadiTestCase):
       h = diagcat(soc(vertcat(x-5,y-7),4),soc(vertcat(x/6,y/5),1))
 
       solver = casadi.qpsol("msyolver",conic,{'h':h,'x': vertcat(x,y),"f": 2*x+y},qp_options)
-      
+
       res = solver()
 
       self.checkarray(res["x"],DM([1.655450403084473,4.805919456574478]),conic,digits=5)
