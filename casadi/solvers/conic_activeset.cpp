@@ -475,7 +475,7 @@ namespace casadi {
           lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
           new_active_set = true;
           sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
-        } else if (iduerr>=0 && duerr>=1e-10) {
+        } else if (iduerr>=0) {
           // We need to increase or decrease infeas[iduerr]. Sensitivity:
           casadi_fill(w, nx_+na_, 0.);
           w[iduerr] = duerr_pos ? -1. : 1.;
@@ -768,12 +768,7 @@ namespace casadi {
       for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dz[i]==0.;
       for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dlam[i]==0.;
       if (zero_step) tau = 0.;
-
-      // Warning if step becomes zero
-      if (zero_step) {
-        casadi_warning("No search direction");
-        continue;
-      }
+      if (zero_step) continue;
 
       // Check primal feasibility in the search direction
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
