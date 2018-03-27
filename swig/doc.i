@@ -71894,7 +71894,8 @@ Get the documentation string for a plugin.
 ";
 
 %feature("docstring")  casadi::casadi_qr_colcomb(T1 *v, const T1 *nz_r,
-const casadi_int *sp_r, const casadi_int *pc, casadi_int irmin) "
+const casadi_int *sp_r, const casadi_int *pc, casadi_int irmin, casadi_int
+ind) "
 
 [INTERNAL] ";
 
