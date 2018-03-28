@@ -241,7 +241,7 @@ namespace casadi {
 
     // Load environment
     casadi_int flag = GRBloadenv(&m->env, 0); // no log file
-    casadi_assert(!flag && m->env, "Failed to create GUROBI environment");
+    casadi_assert(!flag && m->env, "Failed to create GUROBI environment. Flag: "+ str(flag));
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
