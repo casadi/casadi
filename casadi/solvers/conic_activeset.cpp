@@ -406,6 +406,9 @@ namespace casadi {
     double mina = -1;
     casadi_int imina = -1;
 
+    // Primal error
+    double prerr=inf, old_prerr;
+
     // Singularity in the last iteration
     casadi_int sing, sing_ind, sing_sign;
 
@@ -434,7 +437,8 @@ namespace casadi {
       fk = casadi_bilin(h, H_, z, z)/2. + casadi_dot(nx_, z, g);
 
       // Look for largest bound violation
-      double prerr = 0.;
+      old_prerr = prerr;
+      prerr = 0.;
       casadi_int iprerr = -1;
       bool prerr_pos = false; // NOTE(jaendersson): suppress used unset warning
       for (i=0; i<nx_+na_; ++i) {
@@ -475,10 +479,17 @@ namespace casadi {
         if (prerr>=duerr) {
           // Try to improve primal feasibility by adding a constraint
           if (lam[iprerr]==0.) {
-            // Try to improve primal feasibility by adding a constraint
+            // Add the most violating constraint
             lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
             new_active_set = true;
             sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
+          } else {
+            // After a full-step, lam[iprerr] should be zero
+            if (prerr < 0.5*old_prerr) {
+              // Keep iterating while error is decreasing at a fast-linear rate
+              new_active_set = true;
+              sprint(msg, sizeof(msg), "|pr| refinement. Rate: %g", prerr/old_prerr);
+            }
           }
         } else {
           // Try to improve dual feasibility by removing a constraint
@@ -486,7 +497,7 @@ namespace casadi {
           casadi_fill(w, nx_+na_, 0.);
           w[iduerr] = duerr_pos ? -1. : 1.;
           casadi_mv(a, A_, w, w+nx_, 0);
-          // Find the best lam[i] to make nonzero
+          // Find the best lam[i] to make zero
           casadi_int best_ind = -1;
           double best_w = 0.;
           for (i=0; i<nx_+na_; ++i) {
