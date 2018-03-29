@@ -369,19 +369,31 @@ namespace casadi {
     casadi_fill(z+nx_, na_, 0.);
     casadi_mv(a, A_, z, z+nx_, 0);
 
-    // Determine initial active set
+    // Correct initial active set
     for (i=0; i<nx_+na_; ++i) {
       casadi_assert(!neverzero[i] || !neverupper[i] || !neverlower[i],
                     "No sign possible for " + str(i));
-      if (!neverzero[i]) {
-        // All inequality constraints are inactive
-        lam[i] = 0;
-      } else if (neverupper[i] || z[i]<=lbz[i]) {
-        // Lower bound active (including satisfied bounds)
-        lam[i] = fmin(lam[i], -DMIN);
+      if (false) {
+        // Use provided active set when possible
+        if (neverzero[i] && lam[i]==0.) {
+          lam[i] = neverupper[i] || z[i]-lbz[i] <= ubz[i]-z[i] ? -DMIN : DMIN;
+        } else if (neverupper[i] && lam[i]>0.) {
+          lam[i] = neverzero[i] ? -DMIN : 0.;
+        } else if (neverlower[i] && lam[i]<0.) {
+          lam[i] = neverzero[i] ? DMIN : 0.;
+        }
       } else {
-        // Upper bound active (excluding satisfied bounds)
-        lam[i] = fmax(lam[i],  DMIN);
+        // Heuristic for finding an initial active set
+        if (!neverzero[i]) {
+          // All inequality constraints are inactive
+          lam[i] = 0;
+        } else if (neverupper[i] || z[i]<=lbz[i]) {
+          // Lower bound active (including satisfied bounds)
+          lam[i] = fmin(lam[i], -DMIN);
+        } else {
+          // Upper bound active (excluding satisfied bounds)
+          lam[i] = fmax(lam[i],  DMIN);
+        }
       }
     }
 
