@@ -671,6 +671,9 @@ namespace casadi {
       casadi_fill(dz+nx_, na_, 0.);
       casadi_mv(a, A_, dz, dz+nx_, 0);
 
+      // Avoid steps that are nonzero due to numerics
+      for (i=0; i<nx_+na_; ++i) if (fabs(dz[i])<1e-14) dz[i] = 0.;
+
       // Print search direction
       if (verbose_) {
         print_vector("dz", dz, nx_+na_);
@@ -802,22 +805,40 @@ namespace casadi {
       bool zero_step = true;
       for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dz[i]==0.;
       for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dlam[i]==0.;
-      if (zero_step) tau = 0.;
-      if (zero_step) continue;
+      if (zero_step) {
+        tau = 0.;
+        continue;
+      }
+
+      // Acceptable primal error (must be non-increasing)
+      double e = fmax(prerr, 1e-10);
+
+      // Check if violation with tau=0 and not improving
+      double dz_max = 0.;
+      for (i=0; i<nx_+na_ && tau>0.; ++i) {
+        if (-dz[i]>dz_max && z[i]<=lbz[i]-e) {
+          index = i;
+          sign = -1;
+        } else if (dz[i]>dz_max && z[i]>=ubz[i]+e) {
+          index = i;
+          sign = 1;
+        }
+      }
+
+      // Accept, if any
+      if (index>=0) {
+        casadi_assert(lam[index]==0., "Not implemented");
+        tau = 0.;
+        new_active_set = true;
+        lam[index] = sign<0 ? -DMIN : DMIN;
+        sprint(msg, sizeof(msg), "Enforced %lld (%lld) for zero step", i, sign);
+        continue;
+      }
 
       // Check primal feasibility in the search direction
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
         double tau1 = tau;
-        // Acceptable primal error (must be non-increasing)
-        double e = fmax(prerr, 1e-10);
         if (dz[i]==0.) continue; // Skip zero steps
-        // Check if violation with tau=0 and not improving
-        if (dz[i]<0 ? z[i]<=lbz[i]-e : z[i]>=ubz[i]+e) {
-          tau = 0.;
-          index = i;
-          sign = dz[i]<0 ? -1 : 1;
-          break;
-        }
         // Trial primal step
         double trial_z=z[i] + tau*dz[i];
         if (dz[i]<0 && trial_z<lbz[i]-e) {
@@ -863,7 +884,7 @@ namespace casadi {
         }
       }
       // Acceptable dual error (must be non-increasing)
-      double e = fmax(duerr, 1e-10);
+      e = fmax(duerr, 1e-10);
       /* With the search direction (dz, dlam) and the restriction that when
          lam=0, it stays at zero, we have the following expressions for the
          updated step in the presence of a zero-crossing
