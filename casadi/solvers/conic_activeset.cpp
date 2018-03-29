@@ -592,6 +592,12 @@ namespace casadi {
         break;
       }
 
+      // Break if close enough to optimum
+      if (!sing && prerr<1e-12 && duerr<1e-12) {
+        flag = 0;
+        break;
+      }
+
       // Too many iterations?
       if (iter>=max_iter_) {
         casadi_warning("Maximum number of iterations reached");
