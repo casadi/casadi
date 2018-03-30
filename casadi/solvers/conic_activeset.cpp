@@ -483,7 +483,7 @@ namespace casadi {
       }
 
       // Complete regularity restoration
-      if (!new_active_set && sing) {
+      if (!new_active_set && sing && !has_feasstep) {
         lam[sing_ind] = sing_sign==0 ? 0. : sing_sign<0 ? -DMIN : DMIN;
         new_active_set = true;
         sprint(msg, sizeof(msg), "sign(lam[%lld]) -> %lld", sing_ind, sing_sign);
@@ -493,7 +493,7 @@ namespace casadi {
       bool prerr_fail = has_feasstep && sing && tau<1e-12;
 
       // Improve primal or dual feasibility
-      if (!new_active_set && (iprerr>=0 || iduerr>=0)) {
+      if (!new_active_set && !prerr_fail && (iprerr>=0 || iduerr>=0)) {
         if (prerr>=duerr) {
           // Try to improve primal feasibility by adding a constraint
           if (lam[iprerr]==0.) {
@@ -953,9 +953,7 @@ namespace casadi {
               // Smallest tau found so far
               found_tau = true;
               tau = tau1;
-              index = -1;
-              new_active_set = true;
-              sprint(msg, sizeof(msg), "Removed blocking %lld", i);
+              index = -1; // do not switch as it would increase dual infeasibility
             }
           }
         }
@@ -1000,7 +998,7 @@ namespace casadi {
         casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
         // Account for sign changes
         if (i==index && s!=sign) {
-          sprint(msg, sizeof(msg), "Added %lld (%lld->%lld)", i, s, sign);
+          sprint(msg, sizeof(msg), "Flipped %lld (%lld->%lld)", i, s, sign);
           new_active_set = true;
           s = sign;
         }
