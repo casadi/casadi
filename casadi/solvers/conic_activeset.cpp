@@ -854,20 +854,12 @@ namespace casadi {
         if (-dz[i]>dz_max && z[i]<=lbz[i]-e) {
           index = i;
           sign = -1;
+          tau = 0.;
         } else if (dz[i]>dz_max && z[i]>=ubz[i]+e) {
           index = i;
           sign = 1;
+          tau = 0.;
         }
-      }
-
-      // Accept, if any
-      if (index>=0) {
-        casadi_assert(lam[index]==0., "Not implemented");
-        tau = 0.;
-        new_active_set = true;
-        lam[index] = sign<0 ? -DMIN : DMIN;
-        sprint(msg, sizeof(msg), "Enforced %lld (%lld) for zero step", i, sign);
-        continue;
       }
 
       // Check primal feasibility in the search direction
@@ -894,28 +886,30 @@ namespace casadi {
       // Calculate and order all tau for which there is a sign change
       casadi_fill(w, nx_+na_, 1.);
       casadi_int n_tau = 0;
-      for (i=0; i<nx_+na_; ++i) {
-        if (dlam[i]==0.) continue; // Skip zero steps
-        if (lam[i]==0.) continue; // Skip inactive constraints
-        // Skip full steps
-        if (lam[i]>0 ? lam[i]>=-dlam[i] : lam[i]<=-dlam[i]) continue;
-        // Trial dual step
-        double trial_lam = lam[i] + tau*dlam[i];
-        if (lam[i]>0 ? trial_lam < -0. : trial_lam > 0.) {
-          w[i] = -lam[i]/dlam[i];
-        }
-        // Where to insert the w[i]
-        casadi_int loc;
-        for (loc=0; loc<n_tau; ++loc) {
-          if (w[i]<w[iw[loc]]) break;
-        }
-        // Insert element
-        n_tau++;
-        casadi_int next=i, tmp;
-        for (casadi_int j=loc; j<n_tau; ++j) {
-          tmp = iw[j];
-          iw[j] = next;
-          next = tmp;
+      if (tau>0) {
+        for (i=0; i<nx_+na_; ++i) {
+          if (dlam[i]==0.) continue; // Skip zero steps
+          if (lam[i]==0.) continue; // Skip inactive constraints
+          // Skip full steps
+          if (lam[i]>0 ? lam[i]>=-dlam[i] : lam[i]<=-dlam[i]) continue;
+          // Trial dual step
+          double trial_lam = lam[i] + tau*dlam[i];
+          if (lam[i]>0 ? trial_lam < -0. : trial_lam > 0.) {
+            w[i] = -lam[i]/dlam[i];
+          }
+          // Where to insert the w[i]
+          casadi_int loc;
+          for (loc=0; loc<n_tau; ++loc) {
+            if (w[i]<w[iw[loc]]) break;
+          }
+          // Insert element
+          n_tau++;
+          casadi_int next=i, tmp;
+          for (casadi_int j=loc; j<n_tau; ++j) {
+            tmp = iw[j];
+            iw[j] = next;
+            next = tmp;
+          }
         }
       }
 
@@ -971,6 +965,7 @@ namespace casadi {
         // Update infeasibility
         casadi_axpy(nx_, dtau, tinfeas, infeas);
         // Accept the tau, update sign and tinfeas
+        new_active_set = true;
         if (neverzero[i]) {
           // Sign changes sign, no change in tinfeas
           newsign[i] = lam[i]<0 ? 1 : -1;
@@ -991,40 +986,33 @@ namespace casadi {
         }
       }
 
-      // If a constraint was added
-      if (index>=0) {
-        newsign[index] = sign;
-        casadi_assert_dev(sign!=0);
-        sprint(msg, sizeof(msg), "Enforced %s bound %lld",
-               sign<0 ? "upper" : "lower", index);
-      }
-
-      // Ignore sign changes if they happen for a full step
-      if (tau==1.) index = -1;
-
       if (verbose_) {
         print("tau = %g\n", tau);
       }
 
       // Take primal step
-      casadi_axpy(nx_, tau, dz, z);
+      casadi_axpy(nx_+na_, tau, dz, z);
+      casadi_axpy(nx_+na_, tau, dlam, lam);
 
-      // Update lam carefully
+      // Update sign
       for (i=0; i<nx_+na_; ++i) {
-        // Get the current sign
-        casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
-        // Account for sign changes
-        if (s != newsign[i]) {
-          new_active_set = true;
-          s = newsign[i];
-        }
-        // Take step
-        lam[i] += tau*dlam[i];
-        // Ensure correct sign
-        switch (s) {
+        switch (newsign[i]) {
           case -1: lam[i] = fmin(lam[i], -DMIN); break;
           case  1: lam[i] = fmax(lam[i],  DMIN); break;
           case  0: lam[i] = 0.; break;
+        }
+      }
+
+      // If a constraint was added
+      if (index>=0) {
+        casadi_assert_dev(sign!=0);
+        new_active_set = true;
+        if (sign>0) {
+          lam[index] = fmax(lam[index],  DMIN);
+          sprint(msg, sizeof(msg), "Enforced upper bound %lld", index);
+        } else {
+          lam[index] = fmin(lam[index], -DMIN);
+          sprint(msg, sizeof(msg), "Enforced lower bound %lld", index);
         }
       }
     }
