@@ -111,6 +111,7 @@ namespace casadi {
     alloc_iw(nx_+na_, true); // neverzero
     alloc_iw(nx_+na_, true); // neverupper
     alloc_iw(nx_+na_, true); // neverlower
+    alloc_iw(nx_+na_, true); // newsign
     alloc_iw(nx_+na_); // allzero
 
     // Memory for numerical solution
@@ -304,10 +305,11 @@ namespace casadi {
     trans_a = w; w += AT_.nnz();
     infeas = w; w += nx_;
     tinfeas = w; w += nx_;
-    casadi_int *neverzero, *neverupper, *neverlower;
+    casadi_int *neverzero, *neverupper, *neverlower, *newsign;
     neverzero = iw; iw += nx_+na_;
     neverupper = iw; iw += nx_+na_;
     neverlower = iw; iw += nx_+na_;
+    newsign = iw; iw += nx_+na_;
 
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
@@ -915,6 +917,10 @@ namespace casadi {
           next = tmp;
         }
       }
+
+      // Get current sign
+      for (i=0; i<nx_+na_; ++i) newsign[i] = lam[i]>0. ? 1 : lam[i]<0 ? -1 : 0;
+
       // Acceptable dual error (must be non-increasing)
       e = fmax(duerr, 1e-10);
       /* With the search direction (dz, dlam) and the restriction that when
@@ -973,14 +979,16 @@ namespace casadi {
             tinfeas[at_row[k]] -= trans_a[k]*lam[i];
           }
         }
-        // Accept the tau, set multiplier to zero or flip sign if equality
-        if (i!=index) { // ignore if already taken care of
-          new_active_set = true;
-          lam[i] = !neverzero[i] ? 0 : lam[i]<0 ? DMIN : -DMIN;
-          sprint(msg, sizeof(msg), "Removed %lld", i);
-          dlam[i] = 0.;
+        // Accept the tau, update sign
+        if (neverzero[i]) {
+          newsign[i] = lam[i]<0 ? 1 : -1;
+        } else {
+          newsign[i] = 0;
         }
       }
+
+      // If a constraint was added
+      if (index>=0) newsign[index] = sign;
 
       // Ignore sign changes if they happen for a full step
       if (tau==1.) index = -1;
@@ -997,10 +1005,10 @@ namespace casadi {
         // Get the current sign
         casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
         // Account for sign changes
-        if (i==index && s!=sign) {
-          sprint(msg, sizeof(msg), "Flipped %lld (%lld->%lld)", i, s, sign);
+        if (s != newsign[i]) {
+          sprint(msg, sizeof(msg), "Flipped %lld (%lld->%lld)", i, s, newsign[i]);
           new_active_set = true;
-          s = sign;
+          s = newsign[i];
         }
         // Take step
         lam[i] += tau*dlam[i];
