@@ -493,6 +493,7 @@ namespace casadi {
 
       // Did we fail to improve primal feasibility?
       bool prerr_fail = has_feasstep && sing && tau<1e-12;
+      has_feasstep = false;
 
       // Improve primal or dual feasibility
       if (!new_active_set && !prerr_fail && (iprerr>=0 || iduerr>=0)) {
@@ -969,26 +970,34 @@ namespace casadi {
         tau_k = w[i];
         // Update infeasibility
         casadi_axpy(nx_, dtau, tinfeas, infeas);
-        // Update the infeasibility tangent for next iteration
-        if (i<nx_) {
-          // Set a lam_x to zero
-          tinfeas[i] -= lam[i];
-        } else {
-          // Set a lam_a to zero
-          for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-            tinfeas[at_row[k]] -= trans_a[k]*lam[i];
-          }
-        }
-        // Accept the tau, update sign
+        // Accept the tau, update sign and tinfeas
         if (neverzero[i]) {
+          // Sign changes sign, no change in tinfeas
           newsign[i] = lam[i]<0 ? 1 : -1;
+
         } else {
+          // Sign is zero
           newsign[i] = 0;
+          // Update the infeasibility tangent for next iteration
+          if (i<nx_) {
+            // Set a lam_x to zero
+            tinfeas[i] -= lam[i];
+          } else {
+            // Set a lam_a to zero
+            for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+              tinfeas[at_row[k]] -= trans_a[k]*lam[i];
+            }
+          }
         }
       }
 
       // If a constraint was added
-      if (index>=0) newsign[index] = sign;
+      if (index>=0) {
+        newsign[index] = sign;
+        casadi_assert_dev(sign!=0);
+        sprint(msg, sizeof(msg), "Enforced %s bound %lld",
+               sign<0 ? "upper" : "lower", index);
+      }
 
       // Ignore sign changes if they happen for a full step
       if (tau==1.) index = -1;
@@ -1006,7 +1015,6 @@ namespace casadi {
         casadi_int s = lam[i]>0. ? 1 : lam[i]<0. ? -1 : 0;
         // Account for sign changes
         if (s != newsign[i]) {
-          sprint(msg, sizeof(msg), "Flipped %lld (%lld->%lld)", i, s, newsign[i]);
           new_active_set = true;
           s = newsign[i];
         }
