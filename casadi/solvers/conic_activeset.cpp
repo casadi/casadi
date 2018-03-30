@@ -424,6 +424,9 @@ namespace casadi {
     // Singularity in the last iteration
     casadi_int sing, sing_ind, sing_sign;
 
+    // Feasibility step
+    bool has_feasstep = false;
+
     // QP iterations
     casadi_int iter = 0;
     while (true) {
@@ -486,6 +489,9 @@ namespace casadi {
         sprint(msg, sizeof(msg), "sign(lam[%lld]) -> %lld", sing_ind, sing_sign);
       }
 
+      // Did we fail to improve primal feasibility?
+      bool prerr_fail = has_feasstep && sing && tau<1e-12;
+
       // Improve primal or dual feasibility
       if (!new_active_set && (iprerr>=0 || iduerr>=0)) {
         if (prerr>=duerr) {
@@ -495,6 +501,20 @@ namespace casadi {
             lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
             new_active_set = true;
             sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
+
+            // Adding a constraint may cause infeasibility, find a feasibility
+            // restoration direction
+            casadi_fill(dz, nx_+na_, 0.);
+            dz[iprerr] = 1.;
+            casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
+                            get_ptr(prinv_), get_ptr(pc_), w);
+
+            // Scale so that a full step brings us to the bound
+            double s = (prerr_pos ? ubz[iprerr] : lbz[iprerr]) - z[iprerr];
+            casadi_scal(nx_+na_, s/dz[iprerr], dz);
+
+            // Feasibility step available
+            has_feasstep = true;
           } else {
             // After a full-step, lam[iprerr] should be zero
             if (prerr < 0.5*old_prerr) {
@@ -586,6 +606,12 @@ namespace casadi {
       // Check singularity
       sing = casadi_qr_singular(&mina, &imina, r, sp_r_, get_ptr(pc_), 1e-12);
 
+      // If a feasibility caused the infeasibility, undo and use feas direction
+      if (sing && has_feasstep) {
+        sprint(msg, sizeof(msg), "Feasibility step for %lld", iprerr);
+        lam[iprerr] = 0;
+      }
+
       if (iter % 10 == 0) {
         // Print header
         print("%5s %5s %15s %15s %6s %15s %6s %15s %6s %10s %40s\n",
@@ -610,6 +636,12 @@ namespace casadi {
         break;
       }
 
+      // Break if we tried and failed to improve primal feasibility
+      if (prerr_fail) {
+        flag = 0;
+        break;
+      }
+
       // Too many iterations?
       if (iter>=max_iter_) {
         casadi_warning("Maximum number of iterations reached");
@@ -625,10 +657,7 @@ namespace casadi {
       new_active_set = false;
 
       // Calculate search direction
-      if (sing) {
-        // Get a linear combination of the columns in kktd
-        casadi_qr_colcomb(dz, r, sp_r_, get_ptr(pc_), imina, 0);
-      } else {
+      if (!sing) {
         // KKT residual
         for (i=0; i<nx_+na_; ++i) {
           if (lam[i]>0.) {
@@ -651,6 +680,9 @@ namespace casadi {
         casadi_scal(nx_+na_, -1., dz);
         casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
                         get_ptr(prinv_), get_ptr(pc_), w);
+      } else if (!has_feasstep) {
+        // Get a linear combination of the columns in kktd
+        casadi_qr_colcomb(dz, r, sp_r_, get_ptr(pc_), imina, 0);
       }
 
       // Calculate change in Lagrangian gradient
@@ -687,7 +719,7 @@ namespace casadi {
       casadi_axpy(nx_, 1., dlam, tinfeas);
 
       // Handle singularity
-      if (sing) {
+      if (sing && !has_feasstep) {
         // Change in err in the search direction
         double prtau = iprerr<0 ? 0. : prerr_pos ? dz[iprerr]/prerr : -dz[iprerr]/prerr;
         double dutau = iduerr<0 ? 0. : tinfeas[iduerr]/infeas[iduerr];
@@ -923,6 +955,7 @@ namespace casadi {
               tau = tau1;
               index = -1;
               new_active_set = true;
+              sprint(msg, sizeof(msg), "Removed blocking %lld", i);
             }
           }
         }
