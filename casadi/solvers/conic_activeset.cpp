@@ -994,25 +994,20 @@ namespace casadi {
       casadi_axpy(nx_+na_, tau, dz, z);
       casadi_axpy(nx_+na_, tau, dlam, lam);
 
+      // If a constraint was added
+      if (index>=0) {
+        casadi_assert_dev(sign!=0);
+        new_active_set = true;
+        newsign[index] = sign;
+        sprint(msg, sizeof(msg), "Enforced %s[%lld]", sign>0 ? "ubz" : "lbz", index);
+      }
+
       // Update sign
       for (i=0; i<nx_+na_; ++i) {
         switch (newsign[i]) {
           case -1: lam[i] = fmin(lam[i], -DMIN); break;
           case  1: lam[i] = fmax(lam[i],  DMIN); break;
           case  0: lam[i] = 0.; break;
-        }
-      }
-
-      // If a constraint was added
-      if (index>=0) {
-        casadi_assert_dev(sign!=0);
-        new_active_set = true;
-        if (sign>0) {
-          lam[index] = fmax(lam[index],  DMIN);
-          sprint(msg, sizeof(msg), "Enforced upper bound %lld", index);
-        } else {
-          lam[index] = fmin(lam[index], -DMIN);
-          sprint(msg, sizeof(msg), "Enforced lower bound %lld", index);
         }
       }
     }
