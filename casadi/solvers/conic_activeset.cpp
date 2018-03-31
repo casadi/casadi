@@ -426,7 +426,7 @@ namespace casadi {
     double prerr=inf, old_prerr;
 
     // Singularity in the last iteration
-    casadi_int sing, sing_ind, sing_sign;
+    casadi_int sing;
 
     // Feasibility step
     bool has_feasstep = false;
@@ -503,13 +503,6 @@ namespace casadi {
         }
         new_active_set = true;
         index = -1;
-      }
-
-      // Complete regularity restoration
-      if (!new_active_set && sing && !has_feasstep) {
-        lam[sing_ind] = sing_sign==0 ? 0. : sing_sign<0 ? -DMIN : DMIN;
-        new_active_set = true;
-        sprint(msg, sizeof(msg), "sign(lam[%lld]) -> %lld", sing_ind, sing_sign);
       }
 
       // Did we fail to improve primal feasibility?
@@ -773,7 +766,6 @@ namespace casadi {
 
         // Best flip
         double tau_test, best_tau = inf;
-        sing_ind = -1;
 
         // For all nullspace vectors
         casadi_int nullity_tr, nulli, imina_tr;
@@ -810,8 +802,8 @@ namespace casadi {
                     // Check if best so far
                     if (fabs(tau_test)<fabs(best_tau)) {
                       best_tau = tau_test;
-                      sing_ind = i;
-                      sing_sign = -1;
+                      index = i;
+                      sign = -1;
                     }
                   }
                 }
@@ -826,8 +818,8 @@ namespace casadi {
                     // Check if best so far
                     if (fabs(tau_test)<fabs(best_tau)) {
                       best_tau = tau_test;
-                      sing_ind = i;
-                      sing_sign = 1;
+                      index = i;
+                      sign = 1;
                     }
                   }
                 }
@@ -843,8 +835,8 @@ namespace casadi {
                 // Check if best so far
                 if (fabs(tau_test)<fabs(best_tau)) {
                   best_tau = tau_test;
-                  sing_ind = i;
-                  sing_sign = 0;
+                  index = i;
+                  sign = 0;
                 }
               }
             }
@@ -852,7 +844,7 @@ namespace casadi {
         }
 
         // Cannot restore feasibility
-        if (sing_ind<0) {
+        if (index<0) {
           casadi_warning("Cannot restore feasibility");
           flag = 1;
           break;
