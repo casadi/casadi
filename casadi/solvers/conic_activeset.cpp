@@ -112,6 +112,7 @@ namespace casadi {
     alloc_iw(nx_+na_, true); // neverupper
     alloc_iw(nx_+na_, true); // neverlower
     alloc_iw(nx_+na_, true); // newsign
+    alloc_iw(nx_+na_, true); // backupset
     alloc_iw(nx_+na_); // allzero
 
     // Memory for numerical solution
@@ -305,11 +306,12 @@ namespace casadi {
     trans_a = w; w += AT_.nnz();
     infeas = w; w += nx_;
     tinfeas = w; w += nx_;
-    casadi_int *neverzero, *neverupper, *neverlower, *newsign;
+    casadi_int *neverzero, *neverupper, *neverlower, *newsign, *backupset;
     neverzero = iw; iw += nx_+na_;
     neverupper = iw; iw += nx_+na_;
     neverlower = iw; iw += nx_+na_;
     newsign = iw; iw += nx_+na_;
+    backupset = iw; iw += nx_+na_;
 
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
@@ -428,6 +430,9 @@ namespace casadi {
 
     // Feasibility step
     bool has_feasstep = false;
+
+    // Backup active set is available
+    bool has_backupset = false;
 
     // QP iterations
     casadi_int iter = 0;
@@ -606,13 +611,28 @@ namespace casadi {
       if (verbose_) {
         print_matrix("QR(R)", r, sp_r_);
       }
+
       // Check singularity
       sing = casadi_qr_singular(&mina, &imina, r, sp_r_, get_ptr(pc_), 1e-12);
 
-      // If a feasibility caused the infeasibility, undo and use feas direction
-      if (sing && has_feasstep) {
-        sprint(msg, sizeof(msg), "Feasibility step for %lld", iprerr);
-        lam[iprerr] = 0;
+      // Save or revert to known activeset
+      if (!sing) {
+        // Remember current active set
+        for (i=0; i<nx_+na_; ++i) backupset[i] = lam[i]>0. ? 1 : lam[i]<0 ? -1 : 0;
+        has_backupset = true;
+      } else if (has_backupset) {
+        // Revert to nonsingular active set
+        for (i=0; i<nx_+na_; ++i) {
+          switch (backupset[i]) {
+            case -1: lam[i] = fmin(lam[i], -DMIN); break;
+            case  1: lam[i] = fmax(lam[i],  DMIN); break;
+            case  0: lam[i] = 0.; break;
+          }
+        }
+        has_backupset = false;
+        new_active_set = false;
+        sing = 0;
+        continue;
       }
 
       if (iter % 10 == 0) {
