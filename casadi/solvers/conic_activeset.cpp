@@ -484,79 +484,86 @@ namespace casadi {
         }
       }
 
-      // Did we fail to improve primal feasibility?
-      has_feasstep = false;
-
-      // Try to improve primal feasibility
-      if (!new_active_set && iprerr>=0) {
-        // Try to improve primal feasibility by adding a constraint
-        if (lam[iprerr]==0.) {
-          // Add the most violating constraint
-          lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
-          new_active_set = true;
-          sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
-
-          // Adding a constraint may cause infeasibility, find a feasibility
-          // restoration direction
-          casadi_fill(dz, nx_+na_, 0.);
-          dz[iprerr] = 1.;
-          casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
-                          get_ptr(prinv_), get_ptr(pc_), w);
-
-          // Scale so that a full step brings us to the bound
-          double s = (prerr_pos ? ubz[iprerr] : lbz[iprerr]) - z[iprerr];
-          casadi_scal(nx_+na_, s/dz[iprerr], dz);
-
-          // Feasibility step available
-          has_feasstep = true;
-        } else {
-          // After a full-step, lam[iprerr] should be zero
-          if (prerr < 0.5*old_prerr) {
-            // Keep iterating while error is decreasing at a fast-linear rate
-            new_active_set = true;
-            sprint(msg, sizeof(msg), "|pr| refinement. Rate: %g", prerr/old_prerr);
-          }
-        }
+      // Complete regularity restoration
+      if (!new_active_set && sing && !has_feasstep) {
+        lam[sing_ind] = sing_sign==0 ? 0. : sing_sign<0 ? -DMIN : DMIN;
+        new_active_set = true;
+        sprint(msg, sizeof(msg), "sign(lam[%lld]) -> %lld", sing_ind, sing_sign);
       }
 
-      // Try to improve dual feasibility
-      if (!new_active_set && iduerr>=0) {
-        // Try to improve dual feasibility by removing a constraint
-        // We need to increase or decrease infeas[iduerr]. Sensitivity:
-        casadi_fill(w, nx_+na_, 0.);
-        w[iduerr] = duerr_pos ? -1. : 1.;
-        casadi_mv(a, A_, w, w+nx_, 0);
-        // Find the best lam[i] to make zero
-        casadi_int best_ind = -1;
-        double best_w = 0.;
-        for (i=0; i<nx_+na_; ++i) {
-          // Make sure variable influences duerr
-          if (w[i]==0.) continue;
-          // Make sure removing the constraint decreases dual infeasibility
-          if (w[i]>0. ? lam[i]>=0. : lam[i]<=0.) continue;
-          // Maximum infeasibility from setting from setting lam[i]=0
-          double new_duerr;
-          if (i<nx_) {
-            new_duerr = fabs(glag[i]);
+      // Did we fail to improve primal feasibility?
+      bool prerr_fail = has_feasstep && sing && tau<1e-12;
+      has_feasstep = false;
+
+      // Improve primal or dual feasibility
+      if (!new_active_set && !prerr_fail && (iprerr>=0 || iduerr>=0)) {
+        if (prerr>=duerr) {
+          // Try to improve primal feasibility by adding a constraint
+          if (lam[iprerr]==0.) {
+            // Add the most violating constraint
+            lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
+            new_active_set = true;
+            sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
+
+            // Adding a constraint may cause infeasibility, find a feasibility
+            // restoration direction
+            casadi_fill(dz, nx_+na_, 0.);
+            dz[iprerr] = 1.;
+            casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
+                            get_ptr(prinv_), get_ptr(pc_), w);
+
+            // Scale so that a full step brings us to the bound
+            double s = (prerr_pos ? ubz[iprerr] : lbz[iprerr]) - z[iprerr];
+            casadi_scal(nx_+na_, s/dz[iprerr], dz);
+
+            // Feasibility step available
+            has_feasstep = true;
           } else {
-            new_duerr = 0.;
-            for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-              new_duerr = fmax(new_duerr, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
+            // After a full-step, lam[iprerr] should be zero
+            if (prerr < 0.5*old_prerr) {
+              // Keep iterating while error is decreasing at a fast-linear rate
+              new_active_set = true;
+              sprint(msg, sizeof(msg), "|pr| refinement. Rate: %g", prerr/old_prerr);
             }
           }
-          // Skip if duerr increases
-          if (new_duerr>duerr) continue;
-          // Check if best so far
-          if (fabs(w[i])>best_w) {
-            best_w = fabs(w[i]);
-            best_ind = i;
+        } else {
+          // Try to improve dual feasibility by removing a constraint
+          // We need to increase or decrease infeas[iduerr]. Sensitivity:
+          casadi_fill(w, nx_+na_, 0.);
+          w[iduerr] = duerr_pos ? -1. : 1.;
+          casadi_mv(a, A_, w, w+nx_, 0);
+          // Find the best lam[i] to make zero
+          casadi_int best_ind = -1;
+          double best_w = 0.;
+          for (i=0; i<nx_+na_; ++i) {
+            // Make sure variable influences duerr
+            if (w[i]==0.) continue;
+            // Make sure removing the constraint decreases dual infeasibility
+            if (w[i]>0. ? lam[i]>=0. : lam[i]<=0.) continue;
+            // Maximum infeasibility from setting from setting lam[i]=0
+            double new_duerr;
+            if (i<nx_) {
+              new_duerr = fabs(glag[i]);
+            } else {
+              new_duerr = 0.;
+              for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+                new_duerr = fmax(new_duerr, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
+              }
+            }
+            // Skip if duerr increases
+            if (new_duerr>duerr) continue;
+            // Check if best so far
+            if (fabs(w[i])>best_w) {
+              best_w = fabs(w[i]);
+              best_ind = i;
+            }
           }
-        }
-        // Accept, if any
-        if (best_ind>=0) {
-          lam[best_ind] = 0.;
-          new_active_set = true;
-          sprint(msg, sizeof(msg), "Removed %lld to reduce |du|", best_ind);
+          // Accept, if any
+          if (best_ind>=0) {
+            lam[best_ind] = 0.;
+            new_active_set = true;
+            sprint(msg, sizeof(msg), "Removed %lld to reduce |du|", best_ind);
+          }
         }
       }
 
@@ -628,6 +635,12 @@ namespace casadi {
 
       // Break if close enough to optimum
       if (!sing && prerr<1e-12 && duerr<1e-12) {
+        flag = 0;
+        break;
+      }
+
+      // Break if we tried and failed to improve primal feasibility
+      if (prerr_fail) {
         flag = 0;
         break;
       }
@@ -807,6 +820,12 @@ namespace casadi {
           break;
         }
 
+        // Quick return?
+        if (fabs(best_tau)<1e-12) {
+          tau = 0.;
+          continue;
+        }
+
         // Scale step so that tau=1 is full step
         casadi_scal(nx_+na_, best_tau, dz);
         casadi_scal(nx_+na_, best_tau, dlam);
@@ -971,21 +990,9 @@ namespace casadi {
         print("tau = %g\n", tau);
       }
 
-      // Take step
+      // Take primal step
       casadi_axpy(nx_+na_, tau, dz, z);
       casadi_axpy(nx_+na_, tau, dlam, lam);
-
-      // If a constraint was added
-      if (index>=0) {
-        casadi_assert_dev(sign!=0);
-        new_active_set = true;
-        newsign[index] = sign;
-        sprint(msg, sizeof(msg), "Enforced %s[%lld]", sign>0 ? "ubz" : "lbz", index);
-      } else if (sing) {
-        new_active_set = true;
-        newsign[sing_ind] = sing_sign;
-        sprint(msg, sizeof(msg), "sign(lam[%lld]) -> %lld", sing_ind, sing_sign);
-      }
 
       // Update sign
       for (i=0; i<nx_+na_; ++i) {
@@ -993,6 +1000,19 @@ namespace casadi {
           case -1: lam[i] = fmin(lam[i], -DMIN); break;
           case  1: lam[i] = fmax(lam[i],  DMIN); break;
           case  0: lam[i] = 0.; break;
+        }
+      }
+
+      // If a constraint was added
+      if (index>=0) {
+        casadi_assert_dev(sign!=0);
+        new_active_set = true;
+        if (sign>0) {
+          lam[index] = fmax(lam[index],  DMIN);
+          sprint(msg, sizeof(msg), "Enforced upper bound %lld", index);
+        } else {
+          lam[index] = fmin(lam[index], -DMIN);
+          sprint(msg, sizeof(msg), "Enforced lower bound %lld", index);
         }
       }
     }
