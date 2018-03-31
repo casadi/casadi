@@ -910,13 +910,12 @@ namespace casadi {
         for (i=0; i<nx_+na_; ++i) {
           if (dlam[i]==0.) continue; // Skip zero steps
           if (lam[i]==0.) continue; // Skip inactive constraints
-          // Skip full steps
-          if (lam[i]>0 ? lam[i]>=-dlam[i] : lam[i]<=-dlam[i]) continue;
           // Trial dual step
           double trial_lam = lam[i] + tau*dlam[i];
-          if (lam[i]>0 ? trial_lam < -0. : trial_lam > 0.) {
-            w[i] = -lam[i]/dlam[i];
-          }
+          // Skip if no sign change
+          if (lam[i]>0 ? trial_lam>=0 : trial_lam<=0) continue;
+          // Location of the sign change
+          w[i] = -lam[i]/dlam[i];
           // Where to insert the w[i]
           casadi_int loc;
           for (loc=0; loc<n_tau; ++loc) {
