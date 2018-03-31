@@ -434,6 +434,9 @@ namespace casadi {
     // Backup active set is available
     bool has_backupset = false;
 
+    // Constraint to be flipped, if any
+    casadi_int sign, index=-1;
+
     // QP iterations
     casadi_int iter = 0;
     while (true) {
@@ -487,6 +490,19 @@ namespace casadi {
           iduerr = i;
           duerr_pos = glag[i]+lam[i]>0;
         }
+      }
+
+      // If a constraint was added
+      if (index>=0) {
+        if (sign==0) {
+          sprint(msg, sizeof(msg), "Dropped %s[%lld]", lam[index]>0 ? "ubz" : "lbz", index);
+          lam[index] = 0;
+        } else {
+          sprint(msg, sizeof(msg), "Enforced %s[%lld]", sign>0 ? "ubz" : "lbz", index);
+          lam[index] = sign>0 ? DMIN : -DMIN;
+        }
+        new_active_set = true;
+        index = -1;
       }
 
       // Complete regularity restoration
@@ -678,6 +694,8 @@ namespace casadi {
 
       // No change so far
       new_active_set = false;
+      sign=0;
+      index=-1;
 
       // Calculate search direction
       if (!sing) {
@@ -852,9 +870,8 @@ namespace casadi {
         casadi_scal(nx_, best_tau, tinfeas);
       }
 
-      // Get maximum step size and corresponding index and new sign
+      // Maximum step size
       tau = 1.;
-      casadi_int sign=0, index=-1;
 
       // Check if the step is nonzero
       bool zero_step = true;
@@ -1012,14 +1029,6 @@ namespace casadi {
       // Take primal step
       casadi_axpy(nx_+na_, tau, dz, z);
       casadi_axpy(nx_+na_, tau, dlam, lam);
-
-      // If a constraint was added
-      if (index>=0) {
-        casadi_assert_dev(sign!=0);
-        new_active_set = true;
-        newsign[index] = sign;
-        sprint(msg, sizeof(msg), "Enforced %s[%lld]", sign>0 ? "ubz" : "lbz", index);
-      }
 
       // Update sign
       for (i=0; i<nx_+na_; ++i) {
