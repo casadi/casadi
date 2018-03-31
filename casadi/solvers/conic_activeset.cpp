@@ -428,9 +428,6 @@ namespace casadi {
     // Singularity in the last iteration
     casadi_int sing;
 
-    // Feasibility step
-    bool has_feasstep = false;
-
     // Backup active set is available
     bool has_backupset = false;
 
@@ -492,46 +489,15 @@ namespace casadi {
         }
       }
 
-      // If a constraint was added
-      if (index>=0) {
-        if (sign==0) {
-          sprint(msg, sizeof(msg), "Dropped %s[%lld]", lam[index]>0 ? "ubz" : "lbz", index);
-          lam[index] = 0;
-        } else {
-          sprint(msg, sizeof(msg), "Enforced %s[%lld]", sign>0 ? "ubz" : "lbz", index);
-          lam[index] = sign>0 ? DMIN : -DMIN;
-        }
-        new_active_set = true;
-        index = -1;
-      }
-
-      // Did we fail to improve primal feasibility?
-      bool prerr_fail = has_feasstep && sing && tau<1e-12;
-      has_feasstep = false;
-
       // Improve primal or dual feasibility
-      if (!new_active_set && !prerr_fail && (iprerr>=0 || iduerr>=0)) {
+      if (!new_active_set && index<0 && (iprerr>=0 || iduerr>=0)) {
         if (prerr>=duerr) {
           // Try to improve primal feasibility by adding a constraint
           if (lam[iprerr]==0.) {
             // Add the most violating constraint
-            lam[iprerr] = z[iprerr]<lbz[iprerr] ? -DMIN : DMIN;
-            new_active_set = true;
+            index = iprerr;
+            sign = z[iprerr]<lbz[iprerr] ? -1 : 1;
             sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
-
-            // Adding a constraint may cause infeasibility, find a feasibility
-            // restoration direction
-            casadi_fill(dz, nx_+na_, 0.);
-            dz[iprerr] = 1.;
-            casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
-                            get_ptr(prinv_), get_ptr(pc_), w);
-
-            // Scale so that a full step brings us to the bound
-            double s = (prerr_pos ? ubz[iprerr] : lbz[iprerr]) - z[iprerr];
-            casadi_scal(nx_+na_, s/dz[iprerr], dz);
-
-            // Feasibility step available
-            has_feasstep = true;
           } else {
             // After a full-step, lam[iprerr] should be zero
             if (prerr < 0.5*old_prerr) {
@@ -574,11 +540,18 @@ namespace casadi {
           }
           // Accept, if any
           if (best_ind>=0) {
-            lam[best_ind] = 0.;
-            new_active_set = true;
+            index = best_ind;
+            sign = 0;
             sprint(msg, sizeof(msg), "Removed %lld to reduce |du|", best_ind);
           }
         }
+      }
+
+      // If a constraint was added
+      if (index>=0) {
+        lam[index] = sign==0 ? 0 : sign>0 ? DMIN : -DMIN;
+        new_active_set = true;
+        index = -1;
       }
 
       // Debugging
@@ -668,12 +641,6 @@ namespace casadi {
         break;
       }
 
-      // Break if we tried and failed to improve primal feasibility
-      if (prerr_fail) {
-        flag = 0;
-        break;
-      }
-
       // Too many iterations?
       if (iter>=max_iter_) {
         casadi_warning("Maximum number of iterations reached");
@@ -714,7 +681,7 @@ namespace casadi {
         casadi_scal(nx_+na_, -1., dz);
         casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
                         get_ptr(prinv_), get_ptr(pc_), w);
-      } else if (!has_feasstep) {
+      } else {
         // Get a linear combination of the columns in kktd
         casadi_qr_colcomb(dz, r, sp_r_, get_ptr(pc_), imina, 0);
       }
@@ -753,7 +720,7 @@ namespace casadi {
       casadi_axpy(nx_, 1., dlam, tinfeas);
 
       // Handle singularity
-      if (sing && !has_feasstep) {
+      if (sing) {
         // Change in err in the search direction
         double prtau = iprerr<0 ? 0. : prerr_pos ? dz[iprerr]/prerr : -dz[iprerr]/prerr;
         double dutau = iduerr<0 ? 0. : tinfeas[iduerr]/infeas[iduerr];
@@ -804,6 +771,7 @@ namespace casadi {
                       best_tau = tau_test;
                       index = i;
                       sign = -1;
+                      sprint(msg, sizeof(msg), "Enforced lbz[%lld] for regularity", i);
                     }
                   }
                 }
@@ -820,6 +788,7 @@ namespace casadi {
                       best_tau = tau_test;
                       index = i;
                       sign = 1;
+                      sprint(msg, sizeof(msg), "Enforced ubz[%lld] for regularity", i);
                     }
                   }
                 }
@@ -837,6 +806,8 @@ namespace casadi {
                   best_tau = tau_test;
                   index = i;
                   sign = 0;
+                  sprint(msg, sizeof(msg), "Dropped %s[%lld] for regularity",
+                         lam[i]>0 ? "lbz" : "ubz", i);
                 }
               }
             }
@@ -884,10 +855,12 @@ namespace casadi {
           index = i;
           sign = -1;
           tau = 0.;
+          sprint(msg, sizeof(msg), "Dropped lbz[%lld]", i);
         } else if (dz[i]>dz_max && z[i]>=ubz[i]+e) {
           index = i;
           sign = 1;
           tau = 0.;
+          sprint(msg, sizeof(msg), "Dropped ubz[%lld]", i);
         }
       }
 
@@ -902,11 +875,13 @@ namespace casadi {
           tau = (lbz[i]-e-z[i])/dz[i];
           index = i;
           sign = -1;
+          sprint(msg, sizeof(msg), "Dropped lbz[%lld]", i);
         } else if (dz[i]>0 && trial_z>ubz[i]+e) {
           // Trial would increase maximum infeasibility
           tau = (ubz[i]+e-z[i])/dz[i];
           index = i;
           sign = 1;
+          sprint(msg, sizeof(msg), "Dropped ubz[%lld]", i);
         }
         // Consistency check
         casadi_assert(tau<=tau1, "Inconsistent step size calculation");
@@ -983,6 +958,7 @@ namespace casadi {
               found_tau = true;
               tau = tau1;
               index = -1; // do not switch as it would increase dual infeasibility
+              msg[0] = '\0';
             }
           }
         }
