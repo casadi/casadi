@@ -574,9 +574,14 @@ namespace casadi {
                 w[kkt_row[k]] = kkt[k];
               }
             }
-            casadi_warning("Singularity about to happen");
-            // Find another constraint we can flip
+            // Find best constraint we can flip, if any
+            casadi_int best_ind=-1, best_sign;
+            double best_duerr = inf;
             for (i=0; i<nx_+na_; ++i) {
+              // Can't be the same
+              if (i==index) continue;
+              // Make sure constraint is flippable
+              if (lam[i]==0 ? neverlower[i] && neverupper[i] : neverzero[i]) continue;
               // If dz[i]!=0, column i is redundant
               if (fabs(dz[i])<1e-12) continue;
               // We want to make sure that the new, flipped column i is linearly
@@ -595,12 +600,66 @@ namespace casadi {
                 for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d += kkt[k]*w[kkt_row[k]];
                 if (fabs(d)<1e-12) continue;
               }
-              print("Candidate to resolve singularity: %lld, lam=%g\n", i, lam[i]);
+              // Dual infeasibility
+              double new_duerr;
+              casadi_int new_sign;
+              // Check if the best so far
+              if (lam[i]==0.) {
+                // Which bound is closer?
+                new_sign = lbz[i]-z[i] >= z[i]-ubz[i] ? -1 : 1;
+                // Dual error is unchanged
+                new_duerr = fabs(infeas[i]);
+              } else {
+                // Maximum infeasibility from setting from flipping the bound
+                if (i<nx_) {
+                  new_duerr = fabs(glag[i]);
+                } else {
+                  new_duerr = 0.;
+                  for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+                    new_duerr = fmax(new_duerr, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
+                  }
+                }
+                new_sign = 0;
+              }
+              // Discarded?
+              casadi_int skip_ind = -1, skip_sign;
+              double skip_duerr;
+              // Best so far?
+              if (new_duerr < best_duerr) {
+                if (best_ind>=0) {
+                  skip_ind=best_ind;
+                  skip_sign=best_sign;
+                  skip_duerr=best_duerr;
+                }
+                best_duerr = new_duerr;
+                best_ind = i;
+                best_sign = new_sign;
+              } else {
+                skip_ind = i;
+                skip_sign = new_sign;
+                skip_duerr = new_duerr;
+              }
+              // Logic can be improved, issue a warning
+              if (skip_ind>=0) {
+                print("Note: Discarded %lld to resolve singularity: "
+                      "lam=%g, z=%g, lbz=%g, ubz=%g, dz=%g, duerr=%g\n",
+                      skip_ind, lam[skip_ind], z[skip_ind],
+                      lbz[skip_ind], ubz[skip_ind], dz[skip_ind], skip_duerr);
+              }
             }
-            //print_vector("dz", dz, nx_+na_);
+
+            // Accept, if any
+            if (best_ind>=0) {
+              lam[best_ind] = best_sign==0 ? 0 : best_sign>0 ? DMIN : -DMIN;
+              sprint(msg, sizeof(msg), "%lld->%lld, %lld->%lld",
+                     index, sign, best_ind, best_sign);
+            } else {
+              print("Note: Singularity about to happen\n");
+            }
           }
         }
 
+        // Accept active set change
         lam[index] = sign==0 ? 0 : sign>0 ? DMIN : -DMIN;
         new_active_set = true;
         index = -1;
@@ -1002,15 +1061,15 @@ namespace casadi {
         double dtau = w[i] - tau_k;
         // Check if maximum dual infeasibilty gets exceeded
         bool found_tau = false;
-        for (casadi_int k=0; k<nx_ && !found_tau; ++k) {
+        for (k=0; k<nx_ && !found_tau; ++k) {
           if (fabs(infeas[k]+dtau*tinfeas[k])>e) {
             double tau1 = fmax(tau_k - dtau*(infeas[k]/tinfeas[k]), 0.);
             if (tau1<tau) {
               // Smallest tau found so far
               found_tau = true;
               tau = tau1;
+              sprint(msg, sizeof(msg), "Skipped %lld, %lld\n", index, sign);
               index = -1; // do not switch as it would increase dual infeasibility
-              msg[0] = '\0';
             }
           }
         }
@@ -1020,21 +1079,18 @@ namespace casadi {
         tau_k = w[i];
         // Update infeasibility
         casadi_axpy(nx_, dtau, tinfeas, infeas);
-        // Accept the tau, update sign and tinfeas
-        new_active_set = true;
+        // Update sign or tinfeas
         if (neverzero[i]) {
-          // Sign changes sign, no change in tinfeas
+          // lam changes sign, no change in tinfeas
           newsign[i] = lam[i]<0 ? 1 : -1;
         } else {
-          // Sign is zero
-          newsign[i] = 0;
-          // Update the infeasibility tangent for next iteration
+          // lam becomes zero, update the infeasibility tangent
           if (i<nx_) {
             // Set a lam_x to zero
             tinfeas[i] -= lam[i];
           } else {
             // Set a lam_a to zero
-            for (casadi_int k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+            for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
               tinfeas[at_row[k]] -= trans_a[k]*lam[i];
             }
           }
