@@ -730,13 +730,13 @@ namespace casadi {
 
       if (iter % 10 == 0) {
         // Print header
-        print("%5s %5s %15s %15s %6s %15s %6s %15s %6s %10s %40s\n",
+        print("%5s %5s %10s %10s %6s %10s %6s %10s %6s %10s %40s\n",
               "Iter", "Null", "fk", "|pr|", "con", "|du|", "var",
-              "min(diag(R))", "con", "last tau", "Note");
+              "mindiag(R)", "con", "last tau", "Note");
       }
 
       // Print iteration progress:
-      print("%5d %5d %15g %15g %6d %15g %6d %15g %6d %10g %40s\n",
+      print("%5d %5d %10.2g %10.2g %6d %10.2g %6d %10.2g %6d %10.2g %40s\n",
             iter, sing, fk, prerr, iprerr, duerr, iduerr,
             mina, imina, tau, msg);
 
@@ -966,12 +966,12 @@ namespace casadi {
           index = i;
           sign = -1;
           tau = 0.;
-          sprint(msg, sizeof(msg), "Dropped lbz[%lld]", i);
+          sprint(msg, sizeof(msg), "Enforcing lbz[%lld]", i);
         } else if (dz[i]>dz_max && z[i]>=ubz[i]+e) {
           index = i;
           sign = 1;
           tau = 0.;
-          sprint(msg, sizeof(msg), "Dropped ubz[%lld]", i);
+          sprint(msg, sizeof(msg), "Enforcing ubz[%lld]", i);
         }
       }
 
@@ -986,13 +986,13 @@ namespace casadi {
           tau = (lbz[i]-e-z[i])/dz[i];
           index = i;
           sign = -1;
-          sprint(msg, sizeof(msg), "Dropped lbz[%lld]", i);
+          sprint(msg, sizeof(msg), "Enforcing lbz[%lld]", i);
         } else if (dz[i]>0 && trial_z>ubz[i]+e) {
           // Trial would increase maximum infeasibility
           tau = (ubz[i]+e-z[i])/dz[i];
           index = i;
           sign = 1;
-          sprint(msg, sizeof(msg), "Dropped ubz[%lld]", i);
+          sprint(msg, sizeof(msg), "Enforcing ubz[%lld]", i);
         }
         // Consistency check
         casadi_assert(tau<=tau1, "Inconsistent step size calculation");
@@ -1068,8 +1068,10 @@ namespace casadi {
               // Smallest tau found so far
               found_tau = true;
               tau = tau1;
-              sprint(msg, sizeof(msg), "Skipped %lld, %lld\n", index, sign);
-              index = -1; // do not switch as it would increase dual infeasibility
+              sprint(msg, sizeof(msg), "Dropping %s[%lld]\n",
+                     lam[i]>0 ? "ubz" : "lbz", i);
+              index = i;
+              sign = 0;
             }
           }
         }
