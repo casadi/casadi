@@ -759,23 +759,22 @@ namespace casadi {
         // KKT residual
         for (i=0; i<nx_+na_; ++i) {
           if (lam[i]>0.) {
-            dz[i] = z[i]-ubz[i];
+            dz[i] = ubz[i]-z[i];
           } else if (lam[i]<0.) {
-            dz[i] = z[i]-lbz[i];
+            dz[i] = lbz[i]-z[i];
           } else if (i<nx_) {
-            dz[i] = glag[i];
+            dz[i] = -glag[i];
           } else {
-            dz[i] = -lam[i];
+            dz[i] = lam[i];
           }
         }
 
         // Print search direction
         if (verbose_) {
-          print_vector("kkt residual", dz, nx_+na_);
+          print_vector("neg kkt residual", dz, nx_+na_);
         }
 
         // Solve to get primal-dual step
-        casadi_scal(nx_+na_, -1., dz);
         casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
                         get_ptr(prinv_), get_ptr(pc_), w);
       } else {
