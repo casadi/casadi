@@ -549,6 +549,58 @@ namespace casadi {
 
       // If a constraint was added
       if (index>=0) {
+        // Make sure we maintain non-singularity
+        if (!sing) {
+          // New column that we're trying to add
+          casadi_fill(dz, nx_+na_, 0.);
+          if (index<nx_ ? sign!=0 : sign==0) {
+            dz[index] = 1; // sign is irrelevant
+          } else {
+            for (k=kkt_colind[index]; k<kkt_colind[index+1]; ++k) {
+              dz[kkt_row[k]] = kkt[k];
+            }
+          }
+          // Express it using the other columns
+          casadi_qr_solve(dz, 1, 0, sp_v_, v, sp_r_, r, beta,
+                          get_ptr(prinv_), get_ptr(pc_), w);
+          // If dz[index] is zero, columns are linearly dependent
+          if (fabs(dz[index])<1e-12) {
+            // Column that we're removing
+            casadi_fill(w, nx_+na_, 0.);
+            if (index<nx_ ? sign==0 : sign!=0) {
+              w[index] = 1; // sign is irrelevant
+            } else {
+              for (k=kkt_colind[index]; k<kkt_colind[index+1]; ++k) {
+                w[kkt_row[k]] = kkt[k];
+              }
+            }
+            casadi_warning("Singularity about to happen");
+            // Find another constraint we can flip
+            for (i=0; i<nx_+na_; ++i) {
+              // If dz[i]!=0, column i is redundant
+              if (fabs(dz[i])<1e-12) continue;
+              // We want to make sure that the new, flipped column i is linearly
+              // independent with other columns. We have:
+              // flipped_column[index] = dz[0]*column[0] + ... + dz[N-1]*column[N-1]
+              // We also require that flipped_column[i] isn't othogonal to
+              // (old) column[index], as this will surely lead to singularity
+              // This will not cover all cases of singularity, but many important
+              // ones. General singularity handling is done below.
+              if (i<nx_ ? lam[i]==0. : lam[i]!=0.) {
+                // Flipped column is a unit vector
+                if (fabs(w[i])<1e-12) continue;
+              } else {
+                // Flipped column is kkt(:,i)
+                double d = 0;
+                for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d += kkt[k]*w[kkt_row[k]];
+                if (fabs(d)<1e-12) continue;
+              }
+              print("Candidate to resolve singularity: %lld, lam=%g\n", i, lam[i]);
+            }
+            //print_vector("dz", dz, nx_+na_);
+          }
+        }
+
         lam[index] = sign==0 ? 0 : sign>0 ? DMIN : -DMIN;
         new_active_set = true;
         index = -1;
@@ -973,7 +1025,6 @@ namespace casadi {
         if (neverzero[i]) {
           // Sign changes sign, no change in tinfeas
           newsign[i] = lam[i]<0 ? 1 : -1;
-
         } else {
           // Sign is zero
           newsign[i] = 0;
