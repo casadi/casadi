@@ -562,7 +562,7 @@ namespace casadi {
             }
             // Find best constraint we can flip, if any
             casadi_int best_ind=-1, best_sign;
-            double best_duerr = inf;
+            double best_slack = -inf;
             for (i=0; i<nx_+na_; ++i) {
               // Can't be the same
               if (i==index) continue;
@@ -587,50 +587,43 @@ namespace casadi {
                 if (fabs(d)<1e-12) continue;
               }
               // Dual infeasibility
-              double new_duerr;
+              double new_slack;
               casadi_int new_sign;
               // Check if the best so far
               if (lam[i]==0.) {
                 // Which bound is closer?
                 new_sign = lbz[i]-z[i] >= z[i]-ubz[i] ? -1 : 1;
-                // Dual error is unchanged
-                new_duerr = fabs(infeas[i]);
+                // Better than negative slack, worse than positive slack
+                new_slack = 0;
               } else {
-                // Maximum infeasibility from setting from flipping the bound
-                if (i<nx_) {
-                  new_duerr = fabs(glag[i]);
-                } else {
-                  new_duerr = 0.;
-                  for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-                    new_duerr = fmax(new_duerr, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
-                  }
-                }
+                // Slack to the bound
+                new_slack = lam[i]>0 ? ubz[i]-z[i] : z[i]-lbz[i];
                 new_sign = 0;
               }
               // Discarded?
               casadi_int skip_ind = -1, skip_sign;
-              double skip_duerr;
+              double skip_slack;
               // Best so far?
-              if (new_duerr < best_duerr) {
+              if (new_slack > best_slack) {
                 if (best_ind>=0) {
                   skip_ind=best_ind;
                   skip_sign=best_sign;
-                  skip_duerr=best_duerr;
+                  skip_slack=best_slack;
                 }
-                best_duerr = new_duerr;
+                best_slack = new_slack;
                 best_ind = i;
                 best_sign = new_sign;
               } else {
                 skip_ind = i;
                 skip_sign = new_sign;
-                skip_duerr = new_duerr;
+                skip_slack = new_slack;
               }
               // Logic can be improved, issue a warning
               if (skip_ind>=0) {
                 print("Note: Discarded %lld to resolve singularity: "
-                      "lam=%g, z=%g, lbz=%g, ubz=%g, dz=%g, duerr=%g\n",
+                      "lam=%g, z=%g, lbz=%g, ubz=%g, dz=%g, slack=%g, sign=%lld\n",
                       skip_ind, lam[skip_ind], z[skip_ind],
-                      lbz[skip_ind], ubz[skip_ind], dz[skip_ind], skip_duerr);
+                      lbz[skip_ind], ubz[skip_ind], dz[skip_ind], skip_slack, skip_sign);
               }
             }
 
