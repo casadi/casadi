@@ -82,7 +82,7 @@ namespace casadi {
     }
 
     // Assemble KKT system sparsity
-    kkt_ = Sparsity::kkt(H_, A_, false);
+    kkt_ = Sparsity::kkt(H_, A_, false, false);
 
     // Transpose of the Jacobian
     AT_ = A_.T();
