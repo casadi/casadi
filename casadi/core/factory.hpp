@@ -84,7 +84,7 @@ namespace casadi {
     std::vector<HBlock> hess_;
 
     // Constructor
-    Factory(const Function::AuxOut& aux) : aux_(aux) {}
+    Factory(const Function::AuxOut& aux, bool verbose=false) : aux_(aux), verbose_(verbose) {}
 
     // Add an input expression
     void add_input(const std::string& s, const MatType& e);
@@ -130,6 +130,8 @@ namespace casadi {
     // Get output scheme
     std::vector<std::string> name_out() const;
 
+    // Verbose?
+    bool verbose_;
   };
 
   template<typename MatType>
@@ -246,6 +248,8 @@ namespace casadi {
   void Factory<MatType>::calculate() {
     using namespace std;
 
+    Dict all_opts = {{"verbose", verbose_}};
+
     // Dual variables
     for (auto&& e : out_) {
       in_["lam:" + e.first] = MatType::sym("lam_" + e.first, e.second.sparsity());
@@ -269,6 +273,7 @@ namespace casadi {
       }
       // Calculate directional derivatives
       Dict opts = {{"always_inline", true}};
+      opts["verbose"] = verbose_;
       try {
         sens = forward(res, arg, seed, opts);
       } catch (exception& e) {
@@ -298,6 +303,7 @@ namespace casadi {
       }
       // Calculate directional derivatives
       Dict opts = {{"always_inline", true}};
+      opts["verbose"] = verbose_;
       try {
         sens = reverse(res, arg, seed, opts);
       } catch (exception& e) {
@@ -324,7 +330,7 @@ namespace casadi {
       const MatType& ex = out_.at(b.ex);
       const MatType& arg = in_.at(b.arg);
       try {
-        out_["jac:" + b.ex + ":" + b.arg] = MatType::jacobian(ex, arg);
+        out_["jac:" + b.ex + ":" + b.arg] = MatType::jacobian(ex, arg, all_opts);
       } catch (exception& e) {
         casadi_error("Jacobian generation failed:\n" + str(e.what()));
       }

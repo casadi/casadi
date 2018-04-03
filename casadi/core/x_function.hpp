@@ -1003,8 +1003,12 @@ namespace casadi {
           const Dict& opts) const {
     using namespace std;
 
+    auto it = opts.find("verbose");
+    bool verbose = false;
+    if (it!=opts.end()) verbose = it->second;
+
     // Create an expression factory
-    Factory<MatType> f(aux);
+    Factory<MatType> f(aux, verbose);
     for (casadi_int i=0; i<in_.size(); ++i) f.add_input(name_in_[i], in_[i]);
     for (casadi_int i=0; i<out_.size(); ++i) f.add_output(name_out_[i], out_[i]);
 
