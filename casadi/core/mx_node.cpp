@@ -756,10 +756,12 @@ namespace casadi {
   }
 
   MX MXNode::get_mmin() const {
+    if (sparsity_.is_empty()) return MX();
     return MX::create(new MMin(shared_from_this<MX>()));
   }
 
   MX MXNode::get_mmax() const {
+    if (sparsity_.is_empty()) return MX();
     return MX::create(new MMax(shared_from_this<MX>()));
   }
 

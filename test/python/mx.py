@@ -2653,8 +2653,58 @@ class MXtests(casadiTestCase):
       evalf(x)
 
 
+  def test_mmin(self):
+
+    def mx_eval(f,X,x):
+      y = X.sym("y",x.sparsity())
+      return Function('f',[y],f.call([y],X is MX,False))
+
+    for X in [SX,MX]:
+      for mod in [lambda f:f, lambda f:f.expand(), lambda f: mx_eval(f,X,x)]:
+        x = X.sym("x",2,2)
+
+        f = mod(Function('f',[x],[mmin(x),mmax(x)]))
 
 
+        [mmin_res,mmax_res] = f(DM([[-2,3],[-3,5]]))
+
+        self.checkarray(mmin_res, -3)
+        self.checkarray(mmax_res, 5)
+
+        x = X.sym("x",Sparsity.lower(2))
+
+        f = mod(Function('f',[x],[mmin(x),mmax(x)]))
+
+        [mmin_res,mmax_res] = f(sparsify(DM([[-2,0],[-3,-5]])))
+
+        self.checkarray(mmin_res, -5)
+        self.checkarray(mmax_res, 0)
+
+        [mmin_res,mmax_res] = f(sparsify(DM([[2,0],[3,5]])))
+
+        self.checkarray(mmin_res, 0)
+        self.checkarray(mmax_res, 5)
+
+        x = X.sym("x",Sparsity(2,2))
+        f = mod(Function('f',[x],[mmin(x),mmax(x)]))
+        [mmin_res,mmax_res] = f(DM(2,2))
+
+        self.checkarray(mmin_res, 0)
+        self.checkarray(mmax_res, 0)
+
+        x = X.sym("x",Sparsity(2,0))
+        f = mod(Function('f',[x],[mmin(x),mmax(x)]))
+        [mmin_res,mmax_res] = f(DM(2,0))
+
+        self.assertTrue(mmin_res.is_empty())
+        self.assertTrue(mmax_res.is_empty())
+
+        x = X.sym("x",Sparsity(0,0))
+        f = mod(Function('f',[x],[mmin(x),mmax(x)]))
+        [mmin_res,mmax_res] = f(DM(0,0))
+
+        self.assertTrue(mmin_res.is_empty())
+        self.assertTrue(mmax_res.is_empty())
 
 
 if __name__ == '__main__':

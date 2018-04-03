@@ -1484,21 +1484,8 @@ namespace casadi {
   // To avoid overloaded function name conflicts
   template<typename Scalar>
   inline Matrix<Scalar> mmin_nonstatic(const Matrix<Scalar> &x) {
-    Matrix<Scalar> ret;
-    const Scalar* nz = x.ptr();
-    casadi_int nnz = x.nnz();
-    for (casadi_int i=0; i<nnz; ++i) {
-      if (i==0) {
-        if (x.sparsity().is_dense()) {
-          ret = *nz++;
-        } else {
-          ret = fmin(Scalar(0), *nz++);
-        }
-      } else {
-        ret = fmin(ret, *nz++);
-      }
-    }
-    return ret;
+    if (x.is_empty()) return Matrix<Scalar>();
+    return casadi_mmin(x.ptr(), x.nnz(), x.is_dense());
   }
 
   template<typename Scalar>
@@ -1509,21 +1496,8 @@ namespace casadi {
   // To avoid overloaded function name conflicts
   template<typename Scalar>
   inline Matrix<Scalar> mmax_nonstatic(const Matrix<Scalar> &x) {
-    Matrix<Scalar> ret;
-    const Scalar* nz = x.ptr();
-    casadi_int nnz = x.nnz();
-    for (casadi_int i=0; i<nnz; ++i) {
-      if (i==0) {
-        if (x.sparsity().is_dense()) {
-          ret = *nz++;
-        } else {
-          ret = fmax(Scalar(0), *nz++);
-        }
-      } else {
-        ret = fmax(ret, *nz++);
-      }
-    }
-    return ret;
+    if (x.is_empty()) return Matrix<Scalar>();
+    return casadi_mmax(x.ptr(), x.nnz(), x.is_dense());
   }
 
   template<typename Scalar>

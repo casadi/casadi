@@ -175,6 +175,13 @@ namespace casadi {
                             const T1* x, const casadi_int* lookup_mode, casadi_int reverse,
                             casadi_int* iw, T1* w);
 
+
+  template<typename T1>
+  T1 casadi_mmax(const T1* x, casadi_int n, casadi_int is_dense);
+
+  template<typename T1>
+  T1 casadi_mmin(const T1* x, casadi_int n, casadi_int is_dense);
+
   // Alias names
   inline void casadi_fill_casadi_int(casadi_int* x, casadi_int n, casadi_int alpha) {
     casadi_fill(x, n, alpha);
@@ -206,6 +213,7 @@ namespace casadi {
   #include "casadi_dot.hpp"
   #include "casadi_fill.hpp"
   #include "casadi_max_viol.hpp"
+  #include "casadi_minmax.hpp"
   #include "casadi_sum_viol.hpp"
   #include "casadi_mtimes.hpp"
   #include "casadi_mv.hpp"

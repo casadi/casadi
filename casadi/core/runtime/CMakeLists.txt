@@ -18,6 +18,7 @@ set(RUNTIME_SRC
   casadi_interpn_weights.hpp
   casadi_low.hpp
   casadi_max_viol.hpp
+  casadi_minmax.hpp
   casadi_mtimes.hpp
   casadi_mv.hpp
   casadi_mv_dense.hpp
