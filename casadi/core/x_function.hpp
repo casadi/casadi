@@ -312,7 +312,7 @@ namespace casadi {
         } else if (op.first=="verbose") {
           continue;
         } else {
-          casadi_error("No such Jacobian option: " + string(op.second));
+          casadi_error("No such Jacobian option: " + string(op.first));
         }
       }
 

@@ -3292,8 +3292,10 @@ namespace casadi {
         always_inline = op.second;
       } else if (op.first=="never_inline") {
         never_inline = op.second;
-      } else {
-        casadi_error("No such option: " + string(op.second));
+      } else if (op.first=="verbose") {
+        continue;
+      }  else {
+        casadi_error("No such option: " + string(op.first));
       }
     }
     // Call internal function on a temporary object
@@ -3315,8 +3317,10 @@ namespace casadi {
         always_inline = op.second;
       } else if (op.first=="never_inline") {
         never_inline = op.second;
+      } else if (op.first=="verbose") {
+        continue;
       } else {
-        casadi_error("No such option: " + string(op.second));
+        casadi_error("No such option: " + string(op.first));
       }
     }
     // Call internal function on a temporary object
