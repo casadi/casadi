@@ -1879,7 +1879,7 @@
 %exception casadi::FStats::FStats() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::Factory< MatType >::Factory(const Function::AuxOut &aux) {
+%exception casadi::Factory< MatType >::Factory(const Function::AuxOut &aux, bool verbose=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::FastNewton::FastNewton(const std::string &name, const Function &f) {

@@ -21906,7 +21906,7 @@ std::string &s) "
 [INTERNAL] ";
 
 %feature("docstring") casadi::Factory< MatType >::Factory(const
-Function::AuxOut &aux) "
+Function::AuxOut &aux, bool verbose=false) "
 
 [INTERNAL] ";
 
