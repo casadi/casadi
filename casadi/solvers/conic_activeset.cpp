@@ -953,6 +953,9 @@ namespace casadi {
         }
       }
 
+      // No step needs to be taken if tau==0
+      if (tau==0.) continue;
+
       // Check primal feasibility in the search direction
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
         double tau1 = tau;
