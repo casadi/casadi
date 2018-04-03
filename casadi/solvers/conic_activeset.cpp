@@ -412,7 +412,7 @@ namespace casadi {
     double prerr=inf, old_prerr;
 
     // Singularity in the last iteration
-    casadi_int sing;
+    casadi_int sing = 0; // set to avoid false positive warning
 
     // Backup active set is available
     bool has_backupset = false;
@@ -464,7 +464,7 @@ namespace casadi {
       // Calculate dual infeasibility
       double duerr = 0.;
       casadi_int iduerr = -1;
-      bool duerr_pos;
+      bool duerr_pos = false; // set to avoid false positive warning
       for (i=0; i<nx_; ++i) {
         infeas[i] = glag[i]+lam[i];
         double duerr_trial = fabs(infeas[i]);
