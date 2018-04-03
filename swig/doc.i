@@ -69564,6 +69564,11 @@ Get the number of integrator outputs.
 
 ";
 
+%feature("docstring")  casadi::casadi_mmax(const T1 *x, casadi_int n,
+casadi_int is_dense) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::slicot_periodic_schur(casadi_int n,
 casadi_int K, const double *a, double *t, double *z, double *dwork, double
 *eig_real, double *eig_imag, double num_zero=0) "
@@ -72692,6 +72697,11 @@ bool ind1=false) "
 Check if an index vector can be represented more efficiently as a slice.
 
 ";
+
+%feature("docstring")  casadi::casadi_mmin(const T1 *x, casadi_int n,
+casadi_int is_dense) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::is_decreasing(const std::vector< T > &v) "
 

@@ -49901,6 +49901,8 @@ Get the number of integrator outputs.
 
 ";
 
+%feature("docstring") casadi::casadi_mmax "[INTERNAL] ";
+
 %feature("docstring") casadi::slicot_periodic_schur "[INTERNAL] ";
 
 %feature("docstring") casadi::external "
@@ -52791,6 +52793,8 @@ Is the IM a Slice.
 Check if an index vector can be represented more efficiently as a slice.
 
 ";
+
+%feature("docstring") casadi::casadi_mmin "[INTERNAL] ";
 
 %feature("docstring") casadi::is_decreasing "
 
