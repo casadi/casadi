@@ -912,7 +912,7 @@ namespace casadi {
       }
 
       // Acceptable primal error (must be non-increasing)
-      double e = fmax(prerr, 1e-10);
+      double e = fmax(prerr, duerr);
 
       // Check if violation with tau=0 and not improving
       double dz_max = 0.;
@@ -956,37 +956,42 @@ namespace casadi {
         casadi_assert(tau<=tau1, "Inconsistent step size calculation");
       }
 
-      // Calculate and order all tau for which there is a sign change
-      casadi_fill(w, nx_+na_, 1.);
-      casadi_int n_tau = 0;
-      if (tau>0) {
-        for (i=0; i<nx_+na_; ++i) {
-          if (dlam[i]==0.) continue; // Skip zero steps
-          if (lam[i]==0.) continue; // Skip inactive constraints
-          // Trial dual step
-          double trial_lam = lam[i] + tau*dlam[i];
-          // Skip if no sign change
-          if (lam[i]>0 ? trial_lam>=0 : trial_lam<=0) continue;
-          // Location of the sign change
-          w[i] = -lam[i]/dlam[i];
-          // Where to insert the w[i]
-          casadi_int loc;
-          for (loc=0; loc<n_tau; ++loc) {
-            if (w[i]<w[iw[loc]]) break;
-          }
-          // Insert element
-          n_tau++;
-          casadi_int next=i, tmp;
-          for (casadi_int j=loc; j<n_tau; ++j) {
-            tmp = iw[j];
-            iw[j] = next;
-            next = tmp;
-          }
+      // Dual feasibility is piecewise linear. Start with one interval [0,tau]:
+      w[0] = tau;
+      iw[0] = -1; // no associated index
+      casadi_int n_tau = 1;
+
+      // Find the taus corresponding to lam crossing zero and insert into list
+      for (i=0; i<nx_+na_; ++i) {
+        if (dlam[i]==0.) continue; // Skip zero steps
+        if (lam[i]==0.) continue; // Skip inactive constraints
+        // Trial dual step
+        double trial_lam = lam[i] + tau*dlam[i];
+        // Skip if no sign change
+        if (lam[i]>0 ? trial_lam>=0 : trial_lam<=0) continue;
+        // Location of the sign change
+        double new_tau = -lam[i]/dlam[i];
+        // Where to insert the w[i]
+        casadi_int loc;
+        for (loc=0; loc<n_tau-1; ++loc) {
+          if (new_tau<w[loc]) break;
+        }
+        // Insert element
+        n_tau++;
+        double next_tau=new_tau, tmp_tau;
+        casadi_int next_ind=i, tmp_ind;
+        for (casadi_int j=loc; j<n_tau; ++j) {
+          tmp_tau = w[j];
+          w[j] = next_tau;
+          next_tau = tmp_tau;
+          tmp_ind = iw[j];
+          iw[j] = next_ind;
+          next_ind = tmp_ind;
         }
       }
 
       // Acceptable dual error (must be non-increasing)
-      e = fmax(duerr, 1e-10);
+      e = fmax(prerr, duerr);
       /* With the search direction (dz, dlam) and the restriction that when
          lam=0, it stays at zero, we have the following expressions for the
          updated step in the presence of a zero-crossing
@@ -1010,32 +1015,77 @@ namespace casadi {
       // How long step can we take without exceeding e?
       double tau_k = 0.;
       for (casadi_int j=0; j<n_tau; ++j) {
-        // Constraint that we're watching
-        i = iw[j];
         // Distance to the next tau (may be zero)
-        double dtau = w[i] - tau_k;
+        double dtau = w[j] - tau_k;
         // Check if maximum dual infeasibilty gets exceeded
-        bool found_tau = false;
-        for (k=0; k<nx_ && !found_tau; ++k) {
-          if (fabs(infeas[k]+dtau*tinfeas[k])>e) {
-            double tau1 = fmax(tau_k - dtau*(infeas[k]/tinfeas[k]), 0.);
+        casadi_int duerr_index = -1, duerr_sign;
+        for (k=0; k<nx_; ++k) {
+          double new_infeas = infeas[k]+dtau*tinfeas[k];
+          if (fabs(new_infeas)>e) {
+            double tau1 = fmax(0., tau_k + ((new_infeas>0 ? e : -e)-infeas[k])/tinfeas[k]);
             if (tau1<tau) {
               // Smallest tau found so far
-              found_tau = true;
+              duerr_index = k;
               tau = tau1;
-              sprint(msg, sizeof(msg), "Dropping %s[%lld]\n",
-                     lam[i]>0 ? "ubz" : "lbz", i);
-              index = i;
-              sign = 0;
+              duerr_sign = new_infeas>0 ? 1 : -1;
             }
           }
         }
-        // To not allow the active set change if e gets exceeded
-        if (found_tau) break;
-        // Continue to the next tau
-        tau_k = w[i];
+        // If allowed dual error got exceeded for some component
+        if (duerr_index>=0) {
+          // Update infeasibility
+          casadi_axpy(nx_, tau-tau_k, tinfeas, infeas);
+          // Sensitivity for infeas[duerr_index]
+          casadi_fill(w, nx_+na_, 0.);
+          w[duerr_index] = -duerr_sign;
+          casadi_mv(a, A_, w, w+nx_, 0);
+          // Find the best lam[i] to make zero
+          casadi_int best_ind = -1;
+          double best_w = 0.;
+          for (i=0; i<nx_+na_; ++i) {
+            // Make sure variable influences duerr
+            if (w[i]==0.) continue;
+            // Make sure removing the constraint decreases dual infeasibility
+            if (w[i]>0. ? lam[i]>=0. : lam[i]<=0.) continue;
+            // Maximum infeasibility from setting from setting lam[i]=0
+            double new_duerr;
+            if (i<nx_) {
+              new_duerr = fabs(infeas[i] - lam[i]);
+            } else {
+              new_duerr = 0.;
+              for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
+                new_duerr = fmax(new_duerr, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
+              }
+            }
+            // Skip if duerr increases
+            if (new_duerr>e) continue;
+            // Check if best so far
+            if (fabs(w[i])>best_w) {
+              best_w = fabs(w[i]);
+              best_ind = i;
+            }
+          }
+          // Accept, if any
+          if (best_ind>=0) {
+            index = best_ind;
+            sign = 0;
+            sprint(msg, sizeof(msg), "Dropping %s[%lld]",
+                   lam[index]>0 ? "ubz" : "lbz", index);
+          } else {
+            // No change
+            index = -1;
+            sprint(msg, sizeof(msg), "Truncated step");
+            if (tau>0) new_active_set = true; // allow another iteration
+          }
+          break;
+        }
         // Update infeasibility
         casadi_axpy(nx_, dtau, tinfeas, infeas);
+        // Continue to the next tau
+        tau_k = w[j];
+        // Get component, break if last
+        i = iw[j];
+        if (i<0) break;
         // Update sign or tinfeas
         if (!neverzero[i]) {
           // lam becomes zero, update the infeasibility tangent
