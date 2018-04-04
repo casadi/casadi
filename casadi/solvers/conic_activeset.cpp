@@ -111,7 +111,6 @@ namespace casadi {
     alloc_iw(nx_+na_, true); // neverzero
     alloc_iw(nx_+na_, true); // neverupper
     alloc_iw(nx_+na_, true); // neverlower
-    alloc_iw(nx_+na_, true); // newsign
     alloc_iw(nx_+na_); // allzero
 
     // Memory for numerical solution
@@ -305,11 +304,10 @@ namespace casadi {
     trans_a = w; w += AT_.nnz();
     infeas = w; w += nx_;
     tinfeas = w; w += nx_;
-    casadi_int *neverzero, *neverupper, *neverlower, *newsign;
+    casadi_int *neverzero, *neverupper, *neverlower;
     neverzero = iw; iw += nx_+na_;
     neverupper = iw; iw += nx_+na_;
     neverlower = iw; iw += nx_+na_;
-    newsign = iw; iw += nx_+na_;
 
     // Smallest strictly positive number
     const double DMIN = std::numeric_limits<double>::min();
@@ -987,9 +985,6 @@ namespace casadi {
         }
       }
 
-      // Get current sign
-      for (i=0; i<nx_+na_; ++i) newsign[i] = lam[i]>0. ? 1 : lam[i]<0 ? -1 : 0;
-
       // Acceptable dual error (must be non-increasing)
       e = fmax(duerr, 1e-10);
       /* With the search direction (dz, dlam) and the restriction that when
@@ -1042,10 +1037,7 @@ namespace casadi {
         // Update infeasibility
         casadi_axpy(nx_, dtau, tinfeas, infeas);
         // Update sign or tinfeas
-        if (neverzero[i]) {
-          // lam changes sign, no change in tinfeas
-          newsign[i] = lam[i]<0 ? 1 : -1;
-        } else {
+        if (!neverzero[i]) {
           // lam becomes zero, update the infeasibility tangent
           if (i<nx_) {
             // Set a lam_x to zero
@@ -1063,13 +1055,19 @@ namespace casadi {
         print("tau = %g\n", tau);
       }
 
+      // Get current sign
+      for (i=0; i<nx_+na_; ++i) iw[i] = lam[i]>0. ? 1 : lam[i]<0 ? -1 : 0;
+
       // Take primal step
       casadi_axpy(nx_+na_, tau, dz, z);
       casadi_axpy(nx_+na_, tau, dlam, lam);
 
       // Update sign
       for (i=0; i<nx_+na_; ++i) {
-        switch (newsign[i]) {
+        // Allowed certain sign changes
+        if (neverzero[i] && (iw[i]<0 ? lam[i]>0 : lam[i]<0)) iw[i]=-iw[i];
+        // Make sure correct sign
+        switch (iw[i]) {
           case -1: lam[i] = fmin(lam[i], -DMIN); break;
           case  1: lam[i] = fmax(lam[i],  DMIN); break;
           case  0: lam[i] = 0.; break;
