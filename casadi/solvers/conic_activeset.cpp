@@ -796,7 +796,8 @@ namespace casadi {
         casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
 
         // Best flip
-        double tau_test, best_tau = inf;
+        double tau_test;
+        tau = inf;
 
         // For all nullspace vectors
         casadi_int nullity_tr, nulli, imina_tr;
@@ -831,8 +832,8 @@ namespace casadi {
                   // Only allow removing constraints if tau_test==0
                   if (fabs(tau_test)>=1e-16) {
                     // Check if best so far
-                    if (fabs(tau_test)<fabs(best_tau)) {
-                      best_tau = tau_test;
+                    if (fabs(tau_test)<fabs(tau)) {
+                      tau = tau_test;
                       index = i;
                       sign = -1;
                       sprint(msg, sizeof(msg), "Enforced lbz[%lld] for regularity", i);
@@ -848,8 +849,8 @@ namespace casadi {
                   // Only allow removing constraints if tau_test==0
                   if (fabs(tau_test)>=1e-16) {
                     // Check if best so far
-                    if (fabs(tau_test)<fabs(best_tau)) {
-                      best_tau = tau_test;
+                    if (fabs(tau_test)<fabs(tau)) {
+                      tau = tau_test;
                       index = i;
                       sign = 1;
                       sprint(msg, sizeof(msg), "Enforced ubz[%lld] for regularity", i);
@@ -866,8 +867,8 @@ namespace casadi {
                 // Ensure nonincrease in max(prerr, duerr)
                 if ((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.)) continue;
                 // Check if best so far
-                if (fabs(tau_test)<fabs(best_tau)) {
-                  best_tau = tau_test;
+                if (fabs(tau_test)<fabs(tau)) {
+                  tau = tau_test;
                   index = i;
                   sign = 0;
                   sprint(msg, sizeof(msg), "Dropped %s[%lld] for regularity",
@@ -886,19 +887,22 @@ namespace casadi {
         }
 
         // Quick return?
-        if (fabs(best_tau)<1e-12) {
+        if (fabs(tau)<1e-12) {
           tau = 0.;
           continue;
         }
 
-        // Scale step so that tau=1 is full step
-        casadi_scal(nx_+na_, best_tau, dz);
-        casadi_scal(nx_+na_, best_tau, dlam);
-        casadi_scal(nx_, best_tau, tinfeas);
+        // Make sure that tau is positive
+        if (tau<0) {
+          casadi_scal(nx_+na_, -1., dz);
+          casadi_scal(nx_+na_, -1., dlam);
+          casadi_scal(nx_, -1., tinfeas);
+          tau = -tau;
+        }
+      } else {
+        // Maximum step size is one
+        tau = 1.;
       }
-
-      // Maximum step size
-      tau = 1.;
 
       // Check if the step is nonzero
       bool zero_step = true;
