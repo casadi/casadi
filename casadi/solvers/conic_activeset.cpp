@@ -911,8 +911,8 @@ namespace casadi {
         continue;
       }
 
-      // Acceptable primal error (must be non-increasing)
-      double e = fmax(prerr, duerr);
+      // Acceptable primal error
+      double e = fmax(prerr, duerr/2);
 
       // Check if violation with tau=0 and not improving
       double dz_max = 0.;
@@ -963,6 +963,9 @@ namespace casadi {
         // Consistency check
         casadi_assert(tau<=tau1, "Inconsistent step size calculation");
       }
+
+      // Acceptable dual error
+      e = fmax(prerr/2, duerr);
 
       // Dual feasibility is piecewise linear. Start with one interval [0,tau]:
       w[0] = tau;
