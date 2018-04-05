@@ -612,7 +612,7 @@ namespace casadi {
                 skip_slack = new_slack;
               }
               // Logic can be improved, issue a warning
-              if (skip_ind>=0) {
+              if (skip_ind>=0 && verbose_) {
                 print("Note: Discarded %lld to resolve singularity: "
                       "lam=%g, z=%g, lbz=%g, ubz=%g, dz=%g, slack=%g, sign=%lld\n",
                       skip_ind, lam[skip_ind], z[skip_ind],
@@ -625,7 +625,7 @@ namespace casadi {
               lam[best_ind] = best_sign==0 ? 0 : best_sign>0 ? DMIN : -DMIN;
               sprint(msg, sizeof(msg), "%lld->%lld, %lld->%lld",
                      index, sign, best_ind, best_sign);
-            } else {
+            } else if (verbose_) {
               print("Note: Singularity about to happen\n");
             }
           }
@@ -783,10 +783,57 @@ namespace casadi {
 
       // Handle singularity
       if (sing) {
-        // Change in err in the search direction
-        double prtau = iprerr<0 ? 0. : prerr_pos ? dz[iprerr]/prerr : -dz[iprerr]/prerr;
-        double dutau = iduerr<0 ? 0. : tinfeas[iduerr]/infeas[iduerr];
-        double derr = prerr>=duerr ? prtau : dutau;
+        // Change in prerr, duerr in the search direction
+        double tprerr = iprerr<0 ? 0. : prerr_pos ? dz[iprerr]/prerr : -dz[iprerr]/prerr;
+        double tduerr = iduerr<0 ? 0. : tinfeas[iduerr]/infeas[iduerr];
+
+        // Change in max(prerr, duerr) in the search direction
+        double terr;
+        bool pos_ok=true, neg_ok=true;
+        if (prerr>duerr) {
+          // |pr|>|du|
+          if (tprerr<0) {
+            neg_ok = false;
+          } else if (tprerr>0) {
+            pos_ok = false;
+          }
+          terr = tprerr;
+        } else if (prerr<duerr) {
+          // |pr|<|du|
+          if (tduerr<0) {
+            neg_ok = false;
+          } else if (tduerr>0) {
+            pos_ok = false;
+          }
+          terr = tduerr;
+        } else {
+          // |pr|==|du|
+          if ((tprerr>0 && tduerr<0) || (tprerr<0 && tduerr>0)) {
+            // |pr|==|du| cannot be decreased along the search direction
+            pos_ok = neg_ok = false;
+            terr = 0;
+          } else if (fmin(tprerr, tduerr)<0) {
+            // |pr|==|du| decreases for positive tau
+            neg_ok = false;
+            terr = fmax(tprerr, tduerr);
+          } else if (fmax(tprerr, tduerr)>0) {
+            // |pr|==|du| decreases for negative tau
+            pos_ok = false;
+            terr = fmin(tprerr, tduerr);
+          } else {
+            terr = 0;
+          }
+        }
+
+        // If primal error is dominating and constraint is active,
+        // then only allow the multiplier to become larger
+        if (prerr>=duerr && lam[iprerr]!=0 && fabs(dlam[iprerr])>1e-12) {
+          if ((lam[iprerr]>0)==(dlam[iprerr]>0)) {
+            neg_ok = false;
+          } else {
+            pos_ok = false;
+          }
+        }
 
         // QR factorization of the transpose
         casadi_trans(kktd, kktd_, vr, kktd_, iw);
@@ -826,7 +873,7 @@ namespace casadi {
               if (!neverlower[i]) {
                 tau_test = (lbz[i]-z[i])/dz[i];
                 // Ensure nonincrease in max(prerr, duerr)
-                if (!((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.))) {
+                if (!((terr>0. && tau_test>0.) || (terr<0. && tau_test<0.))) {
                   // Only allow removing constraints if tau_test==0
                   if (fabs(tau_test)>=1e-16) {
                     // Check if best so far
@@ -843,7 +890,7 @@ namespace casadi {
               if (!neverupper[i]) {
                 tau_test = (ubz[i]-z[i])/dz[i];
                 // Ensure nonincrease in max(prerr, duerr)
-                if (!((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.))) {
+                if (!((terr>0. && tau_test>0.) || (terr<0. && tau_test<0.))) {
                   // Only allow removing constraints if tau_test==0
                   if (fabs(tau_test)>=1e-16) {
                     // Check if best so far
@@ -863,7 +910,9 @@ namespace casadi {
               if (!neverzero[i]) {
                 tau_test = -lam[i]/dlam[i];
                 // Ensure nonincrease in max(prerr, duerr)
-                if ((derr>0. && tau_test>0.) || (derr<0. && tau_test<0.)) continue;
+                if ((terr>0. && tau_test>0.) || (terr<0. && tau_test<0.)) continue;
+
+                if ((tau_test>0 && !pos_ok) || (tau_test<0 && !neg_ok)) continue;
                 // Check if best so far
                 if (fabs(tau_test)<fabs(tau)) {
                   tau = tau_test;
