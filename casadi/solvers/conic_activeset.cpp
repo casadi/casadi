@@ -411,7 +411,7 @@ namespace casadi {
     casadi_int sing = 0; // set to avoid false positive warning
 
     // Constraint to be flipped, if any
-    casadi_int sign, index=-1;
+    casadi_int sign=0, index=-1;
 
     // QP iterations
     casadi_int iter = 0;
@@ -554,7 +554,7 @@ namespace casadi {
               }
             }
             // Find best constraint we can flip, if any
-            casadi_int best_ind=-1, best_sign;
+            casadi_int best_ind=-1, best_sign=0;
             double best_slack = -inf;
             for (i=0; i<nx_+na_; ++i) {
               // Can't be the same
