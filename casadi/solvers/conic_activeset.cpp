@@ -426,7 +426,7 @@ namespace casadi {
     h_row = (h_colind = m->sp_h+2) + m->nx + 1;
     // Reset kkt_i to zero
     casadi_fill(kkt_i, m->nz, 0.);
-    // Copy row of KKT to kkt_i
+    // Copy column of KKT to kkt_i
     if (i<m->nx) {
       if (sign==0) {
         for (k=h_colind[i]; k<h_colind[i+1]; ++k) kkt_i[h_row[k]] = m->nz_h[k];
@@ -443,6 +443,38 @@ namespace casadi {
         }
       }
     }
+  }
+
+  template<typename T1>
+  T1 casadi_qp_kkt_dot(casadi_qp_mem<T1>* m, const T1* v, casadi_int i, casadi_int sign) {
+    // Local variables
+    casadi_int k;
+    const casadi_int *h_colind, *h_row, *a_colind, *a_row, *at_colind, *at_row;
+    T1 d;
+    // Extract sparsities
+    a_row = (a_colind = m->sp_a+2) + m->nx + 1;
+    at_row = (at_colind = m->sp_at+2) + m->na + 1;
+    h_row = (h_colind = m->sp_h+2) + m->nx + 1;
+    // Scalar product with the desired column
+    if (i<m->nx) {
+      if (sign==0) {
+        d = 0.;
+        for (k=h_colind[i]; k<h_colind[i+1]; ++k) d += v[h_row[k]] * m->nz_h[k];
+        for (k=a_colind[i]; k<a_colind[i+1]; ++k) d += v[m->nx+a_row[k]] * m->nz_a[k];
+      } else {
+        d = v[i];
+      }
+    } else {
+      if (sign==0) {
+        d = -v[i];
+      } else {
+        d = 0.;
+        for (k=at_colind[i-m->nx]; k<at_colind[i-m->nx+1]; ++k) {
+          d += v[at_row[k]] * m->nz_at[k];
+        }
+      }
+    }
+    return d;
   }
 
   int ConicActiveSet::init_mem(void* mem) const {
@@ -669,15 +701,7 @@ namespace casadi {
               // (old) column[index], as this will surely lead to singularity
               // This will not cover all cases of singularity, but many important
               // ones. General singularity handling is done below.
-              if (i<nx_ ? lam[i]==0. : lam[i]!=0.) {
-                // Flipped column is a unit vector
-                if (fabs(w[i])<1e-12) continue;
-              } else {
-                // Flipped column is kkt(:,i)
-                double d = 0;
-                for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d += kkt[k]*w[kkt_row[k]];
-                if (fabs(d)<1e-12) continue;
-              }
+              if (fabs(casadi_qp_kkt_dot(&qp_m, w, i, lam[i]==0.)) < 1e-12) continue;
               // Dual infeasibility
               double new_slack;
               casadi_int new_sign;
