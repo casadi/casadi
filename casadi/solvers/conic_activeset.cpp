@@ -473,6 +473,22 @@ namespace casadi {
     return d;
   }
 
+  template<typename T1>
+  void casadi_qp_kkt_residual(casadi_qp_mem<T1>* m, T1* r) {
+    casadi_int i;
+    for (i=0; i<m->nz; ++i) {
+      if (m->lam[i]>0.) {
+        r[i] = m->ubz[i]-m->z[i];
+      } else if (m->lam[i]<0.) {
+        r[i] = m->lbz[i]-m->z[i];
+      } else if (i<m->nx) {
+        r[i] = m->lam[i]-m->infeas[i];
+      } else {
+        r[i] = m->lam[i];
+      }
+    }
+  }
+
   int ConicActiveSet::init_mem(void* mem) const {
     //auto m = static_cast<ConicActiveSetMemory*>(mem);
     return 0;
@@ -808,29 +824,16 @@ namespace casadi {
 
       // Calculate search direction
       if (!sing) {
-        // KKT residual
-        for (i=0; i<nx_+na_; ++i) {
-          if (lam[i]>0.) {
-            dz[i] = ubz[i]-z[i];
-          } else if (lam[i]<0.) {
-            dz[i] = lbz[i]-z[i];
-          } else if (i<nx_) {
-            dz[i] = lam[i]-infeas[i];
-          } else {
-            dz[i] = lam[i];
-          }
-        }
-
-        // Print search direction
+        // Negative KKT residual
+        casadi_qp_kkt_residual(&qp_m, dz);
         if (verbose_) {
-          print_vector("neg kkt residual", dz, nx_+na_);
+          print_vector("Negative KKT residual", dz, nx_+na_);
         }
-
         // Solve to get primal-dual step
         casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
                         get_ptr(prinv_), get_ptr(pc_), w);
       } else {
-        // Get a linear combination of the columns in kkt
+        // Get a linear combination of the columns in KKT
         casadi_qr_colcomb(dz, r, sp_r_, get_ptr(pc_), imina, 0);
       }
 
