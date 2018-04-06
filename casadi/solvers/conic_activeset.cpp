@@ -249,8 +249,12 @@ namespace casadi {
   struct casadi_qp_mem {
     // Dimensions
     casadi_int nx, na, nz;
+    // Sparsity patterns
+    const casadi_int *sp_a, *sp_h, *sp_at;
     // Vectors
-    T1 *z, *lbz, *ubz, *infeas;
+    T1 *z, *lbz, *ubz, *infeas, *lam, *w;
+    // Matrices
+    const T1 *nz_a, *nz_at, *nz_h;
     // Message buffer
     char msg[40];
   };
@@ -298,6 +302,76 @@ namespace casadi {
     va_start(args, fmt);
     n = vsnprintf(m->msg, sizeof(m->msg), fmt, args);
     va_end(args);
+  }
+
+  template<typename T1>
+  casadi_int casadi_qp_pr_index(casadi_qp_mem<T1>* m, casadi_int* sign,
+                                casadi_int ipr, T1 pr, T1 old_pr) {
+    // Try to improve primal feasibility by adding a constraint
+    if (m->lam[ipr]==0.) {
+      // Add the most violating constraint
+      *sign = m->z[ipr]<m->lbz[ipr] ? -1 : 1;
+      casadi_qp_print(m, "Added %lld to reduce |pr|", ipr);
+      return ipr;
+    } else {
+      // After a full-step, lam[ipr] should be zero
+      if (pr < 0.5*old_pr) {
+        // Keep iterating while error is decreasing at a fast-linear rate
+        casadi_qp_print(m, "|pr| refinement. Rate: %g", pr/old_pr);
+        return -2;
+      }
+    }
+    return -1;
+  }
+
+  template<typename T1>
+  casadi_int casadi_qp_du_index(casadi_qp_mem<T1>* m, casadi_int* sign,
+                                casadi_int idu, T1 du) {
+    // Try to improve dual feasibility by removing a constraint
+    // Local variables
+    casadi_int best_ind, i, k;
+    T1 best_w, new_du;
+    const casadi_int *at_colind, *at_row;
+    // AT sparsity
+    at_colind = m->sp_at + 2;
+    at_row = at_colind + m->na + 1;
+    // We need to increase or decrease infeas[idu]. Sensitivity:
+    casadi_fill(m->w, m->nz, 0.);
+    m->w[idu] = m->infeas[idu]>0 ? -1. : 1.;
+    casadi_mv(m->nz_a, m->sp_a, m->w, m->w+m->nx, 0);
+    // Find the best lam[i] to make zero
+    best_ind = -1;
+    best_w = 0.;
+    for (i=0; i<m->nz; ++i) {
+      // Make sure variable influences du
+      if (m->w[i]==0.) continue;
+      // Make sure removing the constraint decreases dual infeasibility
+      if (m->w[i]>0. ? m->lam[i]>=0. : m->lam[i]<=0.) continue;
+      // Maximum infeasibility from setting from setting lam[i]=0
+      if (i<m->nx) {
+        new_du = fabs(m->infeas[i]-m->lam[i]);
+      } else {
+        new_du = 0.;
+        for (k=at_colind[i-m->nx]; k<at_colind[i-m->nx+1]; ++k) {
+          new_du = fmax(new_du, fabs(m->infeas[at_row[k]]-m->nz_at[k]*m->lam[i]));
+        }
+      }
+      // Skip if du increases
+      if (new_du>du) continue;
+      // Check if best so far
+      if (fabs(m->w[i])>best_w) {
+        best_w = fabs(m->w[i]);
+        best_ind = i;
+      }
+    }
+    // Accept, if any
+    if (best_ind>=0) {
+      *sign = 0;
+      casadi_qp_print(m, "Removed %lld to reduce |du|", best_ind);
+      return best_ind;
+    } else {
+      return -1;
+    }
   }
 
   int ConicActiveSet::init_mem(void* mem) const {
@@ -450,9 +524,18 @@ namespace casadi {
     qp_m.na = na_;
     qp_m.nz = nx_+na_;
     qp_m.z = z;
+    qp_m.lam = lam;
     qp_m.lbz = lbz;
     qp_m.ubz = ubz;
     qp_m.infeas = infeas;
+    qp_m.w = w;
+    // Sparsity patterns
+    qp_m.sp_a = A_;
+    qp_m.sp_h = H_;
+    qp_m.sp_at = AT_;
+    qp_m.nz_a = a;
+    qp_m.nz_at = trans_a;
+    qp_m.nz_h = h;
 
     // Stepsize
     double tau = 0.;
@@ -504,58 +587,9 @@ namespace casadi {
       // Improve primal or dual feasibility
       if (index==-1 && (ipr>=0 || idu>=0)) {
         if (pr>=du) {
-          // Try to improve primal feasibility by adding a constraint
-          if (lam[ipr]==0.) {
-            // Add the most violating constraint
-            index = ipr;
-            sign = z[ipr]<lbz[ipr] ? -1 : 1;
-            casadi_qp_print(&qp_m, "Added %lld to reduce |pr|", ipr);
-          } else {
-            // After a full-step, lam[ipr] should be zero
-            if (pr < 0.5*old_pr) {
-              // Keep iterating while error is decreasing at a fast-linear rate
-              index = -2;
-              casadi_qp_print(&qp_m, "|pr| refinement. Rate: %g", pr/old_pr);
-            }
-          }
+          index = casadi_qp_pr_index(&qp_m, &sign, ipr, pr, old_pr);
         } else {
-          // Try to improve dual feasibility by removing a constraint
-          // We need to increase or decrease infeas[idu]. Sensitivity:
-          casadi_fill(w, nx_+na_, 0.);
-          w[idu] = infeas[idu]>0 ? -1. : 1.;
-          casadi_mv(a, A_, w, w+nx_, 0);
-          // Find the best lam[i] to make zero
-          casadi_int best_ind = -1;
-          double best_w = 0.;
-          for (i=0; i<nx_+na_; ++i) {
-            // Make sure variable influences du
-            if (w[i]==0.) continue;
-            // Make sure removing the constraint decreases dual infeasibility
-            if (w[i]>0. ? lam[i]>=0. : lam[i]<=0.) continue;
-            // Maximum infeasibility from setting from setting lam[i]=0
-            double new_du;
-            if (i<nx_) {
-              new_du = fabs(infeas[i]-lam[i]);
-            } else {
-              new_du = 0.;
-              for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-                new_du = fmax(new_du, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
-              }
-            }
-            // Skip if du increases
-            if (new_du>du) continue;
-            // Check if best so far
-            if (fabs(w[i])>best_w) {
-              best_w = fabs(w[i]);
-              best_ind = i;
-            }
-          }
-          // Accept, if any
-          if (best_ind>=0) {
-            index = best_ind;
-            sign = 0;
-            casadi_qp_print(&qp_m, "Removed %lld to reduce |du|", best_ind);
-          }
+          index = casadi_qp_du_index(&qp_m, &sign, idu, du);
         }
       }
 
