@@ -253,6 +253,8 @@ namespace casadi {
     // Matrices
     const T1 *nz_a, *nz_at, *nz_h;
     T1 *nz_kkt;
+    // Smallest nonzero number
+    T1 DMIN;
     // Message buffer
     char msg[40];
   };
@@ -642,6 +644,30 @@ namespace casadi {
     return tau;
   }
 
+  template<typename T1>
+  void casadi_qp_step(casadi_qp_mem<T1>* m, T1* dz, T1* dlam, T1 tau) {
+    // Local variables
+    casadi_int i;
+    // Get current sign
+    for (i=0; i<m->nz; ++i) m->iw[i] = m->lam[i]>0. ? 1 : m->lam[i]<0 ? -1 : 0;
+    // Take primal-dual step
+    casadi_axpy(m->nz, tau, dz, m->z);
+    casadi_axpy(m->nz, tau, dlam, m->lam);
+    // Update sign
+    for (i=0; i<m->nz; ++i) {
+      // Allow sign changes for certain components
+      if (m->neverzero[i] && (m->iw[i]<0 ? m->lam[i]>0 : m->lam[i]<0)) {
+        m->iw[i]=-m->iw[i];
+      }
+      // Ensure correct sign
+      switch (m->iw[i]) {
+        case -1: m->lam[i] = fmin(m->lam[i], -m->DMIN); break;
+        case  1: m->lam[i] = fmax(m->lam[i],  m->DMIN); break;
+        case  0: m->lam[i] = 0.; break;
+      }
+    }
+  }
+
   int ConicActiveSet::init_mem(void* mem) const {
     //auto m = static_cast<ConicActiveSetMemory*>(mem);
     return 0;
@@ -774,6 +800,7 @@ namespace casadi {
     qp_m.nz_at = trans_a;
     qp_m.nz_h = h;
     qp_m.nz_kkt = kkt;
+    qp_m.DMIN = DMIN;
 
     // Stepsize
     double tau = 0.;
@@ -1216,20 +1243,7 @@ namespace casadi {
       tau = casadi_qp_dual_blocking(&qp_m, e, dlam, tau, &du_index, &du_sign);
 
       // Take primal-dual step, avoiding accidental sign changes for lam
-      // Get current sign
-      for (i=0; i<nx_+na_; ++i) iw[i] = lam[i]>0. ? 1 : lam[i]<0 ? -1 : 0;
-      // Take primal-dual step
-      casadi_axpy(nx_+na_, tau, dz, z);
-      casadi_axpy(nx_+na_, tau, dlam, lam);
-      // Ensure correct sign
-      for (i=0; i<nx_+na_; ++i) {
-        if (neverzero[i] && (iw[i]<0 ? lam[i]>0 : lam[i]<0)) iw[i]=-iw[i];
-        switch (iw[i]) {
-          case -1: lam[i] = fmin(lam[i], -DMIN); break;
-          case  1: lam[i] = fmax(lam[i],  DMIN); break;
-          case  0: lam[i] = 0.; break;
-        }
-      }
+      casadi_qp_step(&qp_m, dz, dlam, tau);
 
       // If allowed dual error got exceeded for some component
       if (du_index>=0) {
