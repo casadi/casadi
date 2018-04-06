@@ -81,21 +81,17 @@ namespace casadi {
       }
     }
 
-    // Assemble KKT system sparsity
-    kkt_ = Sparsity::kkt(H_, A_, false, false);
-
     // Transpose of the Jacobian
     AT_ = A_.T();
 
-    // KKT with diagonal
-    kktd_ = kkt_ + Sparsity::diag(nx_ + na_);
+    // Assemble KKT system sparsity
+    kkt_ = Sparsity::kkt(H_, A_, true, true);
 
     // Symbolic QR factorization
-    kktd_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
+    kkt_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
 
     // Allocate memory
     alloc_w(kkt_.nnz(), true); // kkt
-    alloc_w(kktd_.nnz(), true); // kktd
     alloc_w(nx_+na_, true); // z=[xk,gk]
     alloc_w(nx_+na_, true); // lbz
     alloc_w(nx_+na_, true); // ubz
@@ -113,7 +109,7 @@ namespace casadi {
     alloc_iw(nx_+na_); // allzero
 
     // Memory for numerical solution
-    alloc_w(max(sp_v_.nnz()+sp_r_.nnz(), kktd_.nnz()), true); // either v & r or trans(kktd)
+    alloc_w(max(sp_v_.nnz()+sp_r_.nnz(), kkt_.nnz()), true); // either v & r or trans(kkt)
     alloc_w(nx_+na_, true); // beta
     alloc_w(2*na_+2*nx_); // casadi_qr
 
@@ -517,17 +513,16 @@ namespace casadi {
     lam_x = res[CONIC_LAM_X];
 
     // Work vectors
-    double *kkt, *kktd, *z, *lam, *v, *r, *beta, *dz, *dlam, *lbz, *ubz,
+    double *kkt, *z, *lam, *v, *r, *beta, *dz, *dlam, *lbz, *ubz,
            *trans_a, *infeas, *tinfeas, *vr;
     kkt = w; w += kkt_.nnz();
-    kktd = w; w += kktd_.nnz();
     z = w; w += nx_+na_;
     lbz = w; w += nx_+na_;
     ubz = w; w += nx_+na_;
     lam = w; w += nx_+na_;
     dz = w; w += nx_+na_;
     dlam = w; w += nx_+na_;
-    vr = w; w += max(sp_v_.nnz()+sp_r_.nnz(), kktd_.nnz());
+    vr = w; w += max(sp_v_.nnz()+sp_r_.nnz(), kkt_.nnz());
     v = vr;
     r = vr + sp_v_.nnz();
     beta = w; w += nx_+na_;
@@ -581,15 +576,6 @@ namespace casadi {
     // Transpose A
     casadi_trans(a, A_, trans_a, AT_, iw);
 
-    // Assemble the KKT matrix
-    casadi_set_sub(h, kkt, kkt_, 0, nx_, 0, nx_); // h
-    casadi_set_sub(a, kkt, kkt_, nx_, nx_+na_, 0, nx_); // a
-    casadi_set_sub(trans_a, kkt, kkt_, 0, nx_, nx_, nx_+na_); // a'
-
-    // KKT sparsity
-    const casadi_int* kkt_colind = kkt_.colind();
-    const casadi_int* kkt_row = kkt_.row();
-
     // AT sparsity
     const casadi_int* at_colind = AT_.colind();
     const casadi_int* at_row = AT_.row();
@@ -609,11 +595,11 @@ namespace casadi {
     qp_m.sp_a = A_;
     qp_m.sp_h = H_;
     qp_m.sp_at = AT_;
-    qp_m.sp_kkt = kktd_;
+    qp_m.sp_kkt = kkt_;
     qp_m.nz_a = a;
     qp_m.nz_at = trans_a;
     qp_m.nz_h = h;
-    qp_m.nz_kkt = kktd;
+    qp_m.nz_kkt = kkt;
 
     // Stepsize
     double tau = 0.;
@@ -769,11 +755,11 @@ namespace casadi {
       // Construct the KKT matrix
       casadi_qp_kkt(&qp_m);
       if (verbose_) {
-        print_matrix("KKT", kktd, kktd_);
+        print_matrix("KKT", kkt, kkt_);
       }
 
       // QR factorization
-      casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
+      casadi_qr(kkt_, kkt, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
       if (verbose_) {
         print_matrix("QR(R)", r, sp_r_);
       }
@@ -844,7 +830,7 @@ namespace casadi {
         casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
                         get_ptr(prinv_), get_ptr(pc_), w);
       } else {
-        // Get a linear combination of the columns in kktd
+        // Get a linear combination of the columns in kkt
         casadi_qr_colcomb(dz, r, sp_r_, get_ptr(pc_), imina, 0);
       }
 
@@ -937,9 +923,9 @@ namespace casadi {
         }
 
         // QR factorization of the transpose
-        casadi_trans(kktd, kktd_, vr, kktd_, iw);
-        casadi_copy(vr, kktd_.nnz(), kktd);
-        casadi_qr(kktd_, kktd, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
+        casadi_trans(kkt, kkt_, vr, kkt_, iw);
+        casadi_copy(vr, kkt_.nnz(), kkt);
+        casadi_qr(kkt_, kkt, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
 
         // Best flip
         double tau_test;
@@ -951,7 +937,7 @@ namespace casadi {
         nullity_tr = casadi_qr_singular(&minat_tr, &imina_tr, r, sp_r_,
                                         get_ptr(pc_), 1e-12);
         for (nulli=0; nulli<nullity_tr; ++nulli) {
-          // Get a linear combination of the rows in kktd
+          // Get a linear combination of the rows in kkt
           casadi_qr_colcomb(w, r, sp_r_, get_ptr(pc_), imina_tr, nulli);
           if (verbose_) {
             print_vector("normal", w, nx_+na_);
@@ -960,12 +946,9 @@ namespace casadi {
           for (i=0; i<nx_+na_; ++i) {
             // Check if old column can be removed without decreasing rank
             if (fabs(i<nx_ ? dz[i] : dlam[i])<1e-12) continue;
-            // If dot(w, kktd(:,i)-kktd_flipped(:,i))==0, rank won't increase
-            double d = i<nx_ ? w[i] : -w[i];
-            for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) d -= kkt[k]*w[kkt_row[k]];
-            if (fabs(d)<1e-12) {
-              continue;
-            }
+            // If dot(w, kkt(i)-kkt_flipped(i))==0, rank won't increase
+            if (fabs(casadi_qp_kkt_dot(&qp_m, w, i, sign)
+                     - casadi_qp_kkt_dot(&qp_m, w, i, !sign))<1e-12) continue;
             // Is constraint active?
             if (lam[i]==0.) {
               // Make sure that step is nonzero
