@@ -105,7 +105,6 @@ namespace casadi {
     alloc_w(nx_+na_); // casadi_project, tau memory
     alloc_w(nx_+na_, true); // dz
     alloc_w(nx_+na_, true); // dlam
-    alloc_w(nx_, true); // glag
     alloc_w(nx_, true); // infeas
     alloc_w(nx_, true); // tinfeas
     alloc_iw(nx_+na_, true); // neverzero
@@ -324,7 +323,7 @@ namespace casadi {
 
     // Work vectors
     double *kkt, *kktd, *z, *lam, *v, *r, *beta, *dz, *dlam, *lbz, *ubz,
-           *glag, *trans_a, *infeas, *tinfeas, *vr;
+           *trans_a, *infeas, *tinfeas, *vr;
     kkt = w; w += kkt_.nnz();
     kktd = w; w += kktd_.nnz();
     z = w; w += nx_+na_;
@@ -337,7 +336,6 @@ namespace casadi {
     v = vr;
     r = vr + sp_v_.nnz();
     beta = w; w += nx_+na_;
-    glag = w; w += nx_;
     trans_a = w; w += AT_.nnz();
     infeas = w; w += nx_;
     tinfeas = w; w += nx_;
@@ -431,9 +429,6 @@ namespace casadi {
     // Message buffer
     char msg[40] = "";
 
-    // No change so far
-    bool new_active_set = true;
-
     // Stepsize
     double tau = 0.;
 
@@ -449,32 +444,32 @@ namespace casadi {
     casadi_int sing = 0; // set to avoid false positive warning
 
     // Constraint to be flipped, if any
-    casadi_int sign=0, index=-1;
+    casadi_int sign=0, index=-2;
 
     // QP iterations
     casadi_int iter = 0;
     while (true) {
+      // Calculate f
+      fk = casadi_bilin(h, H_, z, z)/2. + casadi_dot(nx_, z, g);
+
       // Calculate g
       casadi_fill(z+nx_, na_, 0.);
       casadi_mv(a, A_, z, z+nx_, 0);
 
-      // Evaluate gradient of the Lagrangian and constraint functions
-      casadi_copy(g, nx_, glag);
-      casadi_mv(h, H_, z, glag, 0); // gradient of the objective
-      casadi_mv(a, A_, lam+nx_, glag, 1); // gradient of the Lagrangian
+      // Calculate gradient of the Lagrangian
+      casadi_copy(g, nx_, infeas);
+      casadi_mv(h, H_, z, infeas, 0);
+      casadi_mv(a, A_, lam+nx_, infeas, 1);
 
       // Calculate lam(x) without changing the sign, dual infeasibility
       for (i=0; i<nx_; ++i) {
         if (lam[i]>0) {
-          lam[i] = fmax(-glag[i], DMIN);
+          lam[i] = fmax(-infeas[i], DMIN);
         } else if (lam[i]<0) {
-          lam[i] = fmin(-glag[i], -DMIN);
+          lam[i] = fmin(-infeas[i], -DMIN);
         }
-        infeas[i] = glag[i]+lam[i];
+        infeas[i] += lam[i];
       }
-
-      // Calculate cost
-      fk = casadi_bilin(h, H_, z, z)/2. + casadi_dot(nx_, z, g);
 
       // Calculate primal and dual error
       old_pr = pr;
@@ -482,7 +477,7 @@ namespace casadi {
       du = casadi_qp_du(&idu, nx_, infeas);
 
       // Improve primal or dual feasibility
-      if (!new_active_set && index<0 && (ipr>=0 || idu>=0)) {
+      if (index==-1 && (ipr>=0 || idu>=0)) {
         if (pr>=du) {
           // Try to improve primal feasibility by adding a constraint
           if (lam[ipr]==0.) {
@@ -494,7 +489,7 @@ namespace casadi {
             // After a full-step, lam[ipr] should be zero
             if (pr < 0.5*old_pr) {
               // Keep iterating while error is decreasing at a fast-linear rate
-              new_active_set = true;
+              index = -2;
               sprint(msg, sizeof(msg), "|pr| refinement. Rate: %g", pr/old_pr);
             }
           }
@@ -515,7 +510,7 @@ namespace casadi {
             // Maximum infeasibility from setting from setting lam[i]=0
             double new_du;
             if (i<nx_) {
-              new_du = fabs(glag[i]);
+              new_du = fabs(infeas[i]-lam[i]);
             } else {
               new_du = 0.;
               for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
@@ -646,8 +641,7 @@ namespace casadi {
 
         // Accept active set change
         lam[index] = sign==0 ? 0 : sign>0 ? DMIN : -DMIN;
-        new_active_set = true;
-        index = -1;
+        index = -2;
       }
 
       // Debugging
@@ -706,7 +700,7 @@ namespace casadi {
             mina, imina, tau, msg);
 
       // Successful return if still no change
-      if (!new_active_set) {
+      if (index==-1) {
         flag = 0;
         break;
       }
@@ -729,7 +723,6 @@ namespace casadi {
       msg[0] = '\0';
 
       // No change so far
-      new_active_set = false;
       sign=0;
       index=-1;
 
@@ -742,7 +735,7 @@ namespace casadi {
           } else if (lam[i]<0.) {
             dz[i] = lbz[i]-z[i];
           } else if (i<nx_) {
-            dz[i] = -glag[i];
+            dz[i] = lam[i]-infeas[i];
           } else {
             dz[i] = lam[i];
           }
@@ -1159,9 +1152,12 @@ namespace casadi {
           casadi_assert_dev(index>=0);
           if (sign==0) {
             casadi_warning("Logic not implemented");
-            index = -1;
             sprint(msg, sizeof(msg), "Truncated step");
-            if (tau>0) new_active_set = true; // allow another iteration
+            if (tau>0) {
+              index = -2;
+            } else {
+              index = -1;
+            }
           }
         } else {
           // Sensitivity for infeas[du_index]
