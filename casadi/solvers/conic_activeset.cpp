@@ -490,8 +490,8 @@ namespace casadi {
   }
 
   template<typename T1>
-  int casadi_qp_zero_step(casadi_qp_mem<T1>* m, T1* dz, casadi_int* index,
-                          casadi_int* sign, T1 e) {
+  int casadi_qp_zero_blocking(casadi_qp_mem<T1>* m, T1 e, T1* dz,
+                              casadi_int* index, casadi_int* sign) {
     // Local variables
     T1 dz_max;
     casadi_int i;
@@ -511,6 +511,35 @@ namespace casadi {
       }
     }
     return ret;
+  }
+
+  template<typename T1>
+  T1 casadi_qp_primal_blocking(casadi_qp_mem<T1>* m, T1 e, T1* dz, T1 tau,
+                               casadi_int* index, casadi_int* sign) {
+    // Local variables
+    casadi_int i;
+    T1 trial_z;
+    // Loop over all primal variables
+    for (i=0; i<m->nz; ++i) {
+      if (dz[i]==0.) continue; // Skip zero steps
+      // Trial primal step
+      trial_z=m->z[i] + tau*dz[i];
+      if (dz[i]<0 && trial_z<m->lbz[i]-e) {
+        // Trial would increase maximum infeasibility
+        tau = (m->lbz[i]-e-m->z[i])/dz[i];
+        if (index) *index = i;
+        if (sign) *sign = -1;
+        casadi_qp_print(m, "Enforcing lbz[%lld]", i);
+      } else if (dz[i]>0 && trial_z>m->ubz[i]+e) {
+        // Trial would increase maximum infeasibility
+        tau = (m->ubz[i]+e-m->z[i])/dz[i];
+        if (index) *index = i;
+        if (sign) *sign = 1;
+        casadi_qp_print(m, "Enforcing ubz[%lld]", i);
+      }
+      if (tau<=0) return tau;
+    }
+    return tau;
   }
 
   int ConicActiveSet::init_mem(void* mem) const {
@@ -1065,37 +1094,15 @@ namespace casadi {
       double e = fmax(pr, du/2);
 
       // Check if violation with tau=0 and not improving
-      if (casadi_qp_zero_step(&qp_m, dz, sing ? 0 : &index, sing ? 0 : &sign, e)) {
+      if (casadi_qp_zero_blocking(&qp_m, e, dz,
+                                  sing ? 0 : &index, sing ? 0 : &sign)) {
         tau = 0.;
         continue;
       }
 
       // Check primal feasibility in the search direction
-      for (i=0; i<nx_+na_ && tau>0.; ++i) {
-        double tau1 = tau;
-        if (dz[i]==0.) continue; // Skip zero steps
-        // Trial primal step
-        double trial_z=z[i] + tau*dz[i];
-        if (dz[i]<0 && trial_z<lbz[i]-e) {
-          // Trial would increase maximum infeasibility
-          tau = (lbz[i]-e-z[i])/dz[i];
-          if (!sing) {
-            index = i;
-            sign = -1;
-            casadi_qp_print(&qp_m, "Enforcing lbz[%lld]", i);
-          }
-        } else if (dz[i]>0 && trial_z>ubz[i]+e) {
-          // Trial would increase maximum infeasibility
-          tau = (ubz[i]+e-z[i])/dz[i];
-          if (!sing) {
-            index = i;
-            sign = 1;
-            casadi_qp_print(&qp_m, "Enforcing ubz[%lld]", i);
-          }
-        }
-        // Consistency check
-        casadi_assert(tau<=tau1, "Inconsistent step size calculation");
-      }
+      tau = casadi_qp_primal_blocking(&qp_m, e, dz, tau,
+                                      sing ? 0 : &index, sing ? 0 : &sign);
 
       // Acceptable dual error
       e = fmax(pr/2, du);
