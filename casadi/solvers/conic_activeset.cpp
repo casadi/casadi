@@ -246,6 +246,43 @@ namespace casadi {
     }
   }
 
+  template<typename T1>
+  T1 casadi_qp_pr(casadi_int* ipr, casadi_int nz,
+                  const T1* z, const T1* lbz, const T1* ubz) {
+    // Calculate largest constraint violation
+    casadi_int i;
+    T1 pr = 0;
+    *ipr = -1;
+    for (i=0; i<nz; ++i) {
+      if (z[i] > ubz[i]+pr) {
+        pr = z[i]-ubz[i];
+        *ipr = i;
+      } else if (z[i] < lbz[i]-pr) {
+        pr = lbz[i]-z[i];
+        *ipr = i;
+      }
+    }
+    return pr;
+  }
+
+  template<typename T1>
+  T1 casadi_qp_du(casadi_int* idu, casadi_int nx, const T1* infeas) {
+    // Calculate largest constraint violation
+    casadi_int i;
+    T1 du = 0;
+    *idu = -1;
+    for (i=0; i<nx; ++i) {
+      if (infeas[i] > du) {
+        du = infeas[i];
+        *idu = i;
+      } else if (infeas[i] < -du) {
+        du = -infeas[i];
+        *idu = i;
+      }
+    }
+    return du;
+  }
+
   int ConicActiveSet::init_mem(void* mem) const {
     //auto m = static_cast<ConicActiveSetMemory*>(mem);
     return 0;
@@ -404,8 +441,9 @@ namespace casadi {
     double mina = -1;
     casadi_int imina = -1;
 
-    // Primal error
-    double prerr=inf, old_prerr;
+    // Primal and dual error, corresponding index
+    double pr=inf, old_pr, du;
+    casadi_int ipr, idu;
 
     // Singularity in the last iteration
     casadi_int sing = 0; // set to avoid false positive warning
@@ -416,7 +454,7 @@ namespace casadi {
     // QP iterations
     casadi_int iter = 0;
     while (true) {
-      // Recalculate g
+      // Calculate g
       casadi_fill(z+nx_, na_, 0.);
       casadi_mv(a, A_, z, z+nx_, 0);
 
@@ -425,92 +463,67 @@ namespace casadi {
       casadi_mv(h, H_, z, glag, 0); // gradient of the objective
       casadi_mv(a, A_, lam+nx_, glag, 1); // gradient of the Lagrangian
 
-      // Recalculate lam(x), without changing the sign
+      // Calculate lam(x) without changing the sign, dual infeasibility
       for (i=0; i<nx_; ++i) {
         if (lam[i]>0) {
           lam[i] = fmax(-glag[i], DMIN);
         } else if (lam[i]<0) {
           lam[i] = fmin(-glag[i], -DMIN);
         }
+        infeas[i] = glag[i]+lam[i];
       }
 
       // Calculate cost
       fk = casadi_bilin(h, H_, z, z)/2. + casadi_dot(nx_, z, g);
 
-      // Look for largest bound violation
-      old_prerr = prerr;
-      prerr = 0.;
-      casadi_int iprerr = -1;
-      bool prerr_pos = false; // NOTE(jaendersson): suppress used unset warning
-      for (i=0; i<nx_+na_; ++i) {
-        if (z[i] > ubz[i]+prerr) {
-          prerr = z[i]-ubz[i];
-          iprerr = i;
-          prerr_pos = true;
-        } else if (z[i] < lbz[i]-prerr) {
-          prerr = lbz[i]-z[i];
-          iprerr = i;
-          prerr_pos = false;
-        }
-      }
-
-      // Calculate dual infeasibility
-      double duerr = 0.;
-      casadi_int iduerr = -1;
-      bool duerr_pos = false; // set to avoid false positive warning
-      for (i=0; i<nx_; ++i) {
-        infeas[i] = glag[i]+lam[i];
-        double duerr_trial = fabs(infeas[i]);
-        if (duerr_trial>duerr) {
-          duerr = duerr_trial;
-          iduerr = i;
-          duerr_pos = glag[i]+lam[i]>0;
-        }
-      }
+      // Calculate primal and dual error
+      old_pr = pr;
+      pr = casadi_qp_pr(&ipr, nx_+na_, z, lbz, ubz);
+      du = casadi_qp_du(&idu, nx_, infeas);
 
       // Improve primal or dual feasibility
-      if (!new_active_set && index<0 && (iprerr>=0 || iduerr>=0)) {
-        if (prerr>=duerr) {
+      if (!new_active_set && index<0 && (ipr>=0 || idu>=0)) {
+        if (pr>=du) {
           // Try to improve primal feasibility by adding a constraint
-          if (lam[iprerr]==0.) {
+          if (lam[ipr]==0.) {
             // Add the most violating constraint
-            index = iprerr;
-            sign = z[iprerr]<lbz[iprerr] ? -1 : 1;
-            sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", iprerr);
+            index = ipr;
+            sign = z[ipr]<lbz[ipr] ? -1 : 1;
+            sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", ipr);
           } else {
-            // After a full-step, lam[iprerr] should be zero
-            if (prerr < 0.5*old_prerr) {
+            // After a full-step, lam[ipr] should be zero
+            if (pr < 0.5*old_pr) {
               // Keep iterating while error is decreasing at a fast-linear rate
               new_active_set = true;
-              sprint(msg, sizeof(msg), "|pr| refinement. Rate: %g", prerr/old_prerr);
+              sprint(msg, sizeof(msg), "|pr| refinement. Rate: %g", pr/old_pr);
             }
           }
         } else {
           // Try to improve dual feasibility by removing a constraint
-          // We need to increase or decrease infeas[iduerr]. Sensitivity:
+          // We need to increase or decrease infeas[idu]. Sensitivity:
           casadi_fill(w, nx_+na_, 0.);
-          w[iduerr] = duerr_pos ? -1. : 1.;
+          w[idu] = infeas[idu]>0 ? -1. : 1.;
           casadi_mv(a, A_, w, w+nx_, 0);
           // Find the best lam[i] to make zero
           casadi_int best_ind = -1;
           double best_w = 0.;
           for (i=0; i<nx_+na_; ++i) {
-            // Make sure variable influences duerr
+            // Make sure variable influences du
             if (w[i]==0.) continue;
             // Make sure removing the constraint decreases dual infeasibility
             if (w[i]>0. ? lam[i]>=0. : lam[i]<=0.) continue;
             // Maximum infeasibility from setting from setting lam[i]=0
-            double new_duerr;
+            double new_du;
             if (i<nx_) {
-              new_duerr = fabs(glag[i]);
+              new_du = fabs(glag[i]);
             } else {
-              new_duerr = 0.;
+              new_du = 0.;
               for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-                new_duerr = fmax(new_duerr, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
+                new_du = fmax(new_du, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
               }
             }
-            // Skip if duerr increases
-            if (new_duerr>duerr) continue;
+            // Skip if du increases
+            if (new_du>du) continue;
             // Check if best so far
             if (fabs(w[i])>best_w) {
               best_w = fabs(w[i]);
@@ -689,7 +702,7 @@ namespace casadi {
 
       // Print iteration progress:
       print("%5d %5d %10.2g %10.2g %6d %10.2g %6d %10.2g %6d %10.2g %40s\n",
-            iter, sing, fk, prerr, iprerr, duerr, iduerr,
+            iter, sing, fk, pr, ipr, du, idu,
             mina, imina, tau, msg);
 
       // Successful return if still no change
@@ -699,7 +712,7 @@ namespace casadi {
       }
 
       // Break if close enough to optimum
-      if (!sing && prerr<1e-12 && duerr<1e-12) {
+      if (!sing && pr<1e-12 && du<1e-12) {
         flag = 0;
         break;
       }
@@ -783,43 +796,44 @@ namespace casadi {
 
       // Handle singularity
       if (sing) {
-        // Change in prerr, duerr in the search direction
-        double tprerr = iprerr<0 ? 0. : prerr_pos ? dz[iprerr]/prerr : -dz[iprerr]/prerr;
-        double tduerr = iduerr<0 ? 0. : tinfeas[iduerr]/infeas[iduerr];
+        // Change in pr, du in the search direction
+        double tpr, tdu;
+        tpr = ipr<0 ? 0. : z[ipr]>ubz[ipr] ? dz[ipr]/pr : -dz[ipr]/pr;
+        tdu = idu<0 ? 0. : tinfeas[idu]/infeas[idu];
 
-        // Change in max(prerr, duerr) in the search direction
+        // Change in max(pr, du) in the search direction
         double terr;
         bool pos_ok=true, neg_ok=true;
-        if (prerr>duerr) {
+        if (pr>du) {
           // |pr|>|du|
-          if (tprerr<0) {
+          if (tpr<0) {
             neg_ok = false;
-          } else if (tprerr>0) {
+          } else if (tpr>0) {
             pos_ok = false;
           }
-          terr = tprerr;
-        } else if (prerr<duerr) {
+          terr = tpr;
+        } else if (pr<du) {
           // |pr|<|du|
-          if (tduerr<0) {
+          if (tdu<0) {
             neg_ok = false;
-          } else if (tduerr>0) {
+          } else if (tdu>0) {
             pos_ok = false;
           }
-          terr = tduerr;
+          terr = tdu;
         } else {
           // |pr|==|du|
-          if ((tprerr>0 && tduerr<0) || (tprerr<0 && tduerr>0)) {
+          if ((tpr>0 && tdu<0) || (tpr<0 && tdu>0)) {
             // |pr|==|du| cannot be decreased along the search direction
             pos_ok = neg_ok = false;
             terr = 0;
-          } else if (fmin(tprerr, tduerr)<0) {
+          } else if (fmin(tpr, tdu)<0) {
             // |pr|==|du| decreases for positive tau
             neg_ok = false;
-            terr = fmax(tprerr, tduerr);
-          } else if (fmax(tprerr, tduerr)>0) {
+            terr = fmax(tpr, tdu);
+          } else if (fmax(tpr, tdu)>0) {
             // |pr|==|du| decreases for negative tau
             pos_ok = false;
-            terr = fmin(tprerr, tduerr);
+            terr = fmin(tpr, tdu);
           } else {
             terr = 0;
           }
@@ -827,8 +841,8 @@ namespace casadi {
 
         // If primal error is dominating and constraint is active,
         // then only allow the multiplier to become larger
-        if (prerr>=duerr && lam[iprerr]!=0 && fabs(dlam[iprerr])>1e-12) {
-          if ((lam[iprerr]>0)==(dlam[iprerr]>0)) {
+        if (pr>=du && lam[ipr]!=0 && fabs(dlam[ipr])>1e-12) {
+          if ((lam[ipr]>0)==(dlam[ipr]>0)) {
             neg_ok = false;
           } else {
             pos_ok = false;
@@ -872,7 +886,7 @@ namespace casadi {
               // Step needed to bring z to lower bound
               if (!neverlower[i]) {
                 tau_test = (lbz[i]-z[i])/dz[i];
-                // Ensure nonincrease in max(prerr, duerr)
+                // Ensure nonincrease in max(pr, du)
                 if (!((terr>0. && tau_test>0.) || (terr<0. && tau_test<0.))) {
                   // Only allow removing constraints if tau_test==0
                   if (fabs(tau_test)>=1e-16) {
@@ -889,7 +903,7 @@ namespace casadi {
               // Step needed to bring z to upper bound
               if (!neverupper[i]) {
                 tau_test = (ubz[i]-z[i])/dz[i];
-                // Ensure nonincrease in max(prerr, duerr)
+                // Ensure nonincrease in max(pr, du)
                 if (!((terr>0. && tau_test>0.) || (terr<0. && tau_test<0.))) {
                   // Only allow removing constraints if tau_test==0
                   if (fabs(tau_test)>=1e-16) {
@@ -909,7 +923,7 @@ namespace casadi {
               // Step needed to bring lam to zero
               if (!neverzero[i]) {
                 tau_test = -lam[i]/dlam[i];
-                // Ensure nonincrease in max(prerr, duerr)
+                // Ensure nonincrease in max(pr, du)
                 if ((terr>0. && tau_test>0.) || (terr<0. && tau_test<0.)) continue;
 
                 if ((tau_test>0 && !pos_ok) || (tau_test<0 && !neg_ok)) continue;
@@ -961,7 +975,7 @@ namespace casadi {
       }
 
       // Acceptable primal error
-      double e = fmax(prerr, duerr/2);
+      double e = fmax(pr, du/2);
 
       // Check if violation with tau=0 and not improving
       double dz_max = 0.;
@@ -1014,7 +1028,7 @@ namespace casadi {
       }
 
       // Acceptable dual error
-      e = fmax(prerr/2, duerr);
+      e = fmax(pr/2, du);
 
       // Dual feasibility is piecewise linear. Start with one interval [0,tau]:
       w[0] = tau;
@@ -1072,29 +1086,29 @@ namespace casadi {
         */
       // How long step can we take without exceeding e?
       double tau_k = 0.;
-      casadi_int duerr_index, duerr_sign;
+      casadi_int du_index, du_sign;
       for (casadi_int j=0; j<n_tau; ++j) {
         // Distance to the next tau (may be zero)
         double dtau = w[j] - tau_k;
         // Check if maximum dual infeasibilty gets exceeded
-        duerr_index = -1;
-        duerr_sign = 0;
+        du_index = -1;
+        du_sign = 0;
         for (k=0; k<nx_; ++k) {
           double new_infeas = infeas[k]+dtau*tinfeas[k];
           if (fabs(new_infeas)>e) {
             double tau1 = fmax(0., tau_k + ((new_infeas>0 ? e : -e)-infeas[k])/tinfeas[k]);
             if (tau1<tau) {
               // Smallest tau found so far
-              duerr_index = k;
+              du_index = k;
               tau = tau1;
-              duerr_sign = new_infeas>0 ? 1 : -1;
+              du_sign = new_infeas>0 ? 1 : -1;
             }
           }
         }
         // Update infeasibility
         casadi_axpy(nx_, fmin(tau-tau_k, dtau), tinfeas, infeas);
         // Stop here if dual blocking constraint
-        if (duerr_index>=0) break;
+        if (du_index>=0) break;
         // Continue to the next tau
         tau_k = w[j];
         // Get component, break if last
@@ -1139,7 +1153,7 @@ namespace casadi {
       }
 
       // If allowed dual error got exceeded for some component
-      if (duerr_index>=0) {
+      if (du_index>=0) {
         if (sing) {
           // Try to restore singularity, if possible
           casadi_assert_dev(index>=0);
@@ -1150,30 +1164,30 @@ namespace casadi {
             if (tau>0) new_active_set = true; // allow another iteration
           }
         } else {
-          // Sensitivity for infeas[duerr_index]
+          // Sensitivity for infeas[du_index]
           casadi_fill(w, nx_+na_, 0.);
-          w[duerr_index] = -duerr_sign;
+          w[du_index] = -du_sign;
           casadi_mv(a, A_, w, w+nx_, 0);
           // Find the best lam[i] to make zero
           casadi_int best_ind = -1;
           double best_w = 0.;
           for (i=0; i<nx_+na_; ++i) {
-            // Make sure variable influences duerr
+            // Make sure variable influences du
             if (w[i]==0.) continue;
             // Make sure removing the constraint decreases dual infeasibility
             if (w[i]>0. ? lam[i]>=0. : lam[i]<=0.) continue;
             // Maximum infeasibility from setting from setting lam[i]=0
-            double new_duerr;
+            double new_du;
             if (i<nx_) {
-              new_duerr = fabs(infeas[i] - lam[i]);
+              new_du = fabs(infeas[i] - lam[i]);
             } else {
-              new_duerr = 0.;
+              new_du = 0.;
               for (k=at_colind[i-nx_]; k<at_colind[i-nx_+1]; ++k) {
-                new_duerr = fmax(new_duerr, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
+                new_du = fmax(new_du, fabs(infeas[at_row[k]]-trans_a[k]*lam[i]));
               }
             }
-            // Skip if duerr increases
-            if (new_duerr>e) continue;
+            // Skip if du increases
+            if (new_du>e) continue;
             // Check if best so far
             if (fabs(w[i])>best_w) {
               best_w = fabs(w[i]);
