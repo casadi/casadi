@@ -497,50 +497,15 @@ namespace casadi {
     casadi_copy(lam_x0, nx_, lam);
     casadi_copy(lam_a0, na_, lam+nx_);
 
-    // Transpose A
-    casadi_trans(a, A_, trans_a, AT_, iw);
-
-    // Assemble the KKT matrix
-    casadi_set_sub(h, kkt, kkt_, 0, nx_, 0, nx_); // h
-    casadi_set_sub(a, kkt, kkt_, nx_, nx_+na_, 0, nx_); // a
-    casadi_set_sub(trans_a, kkt, kkt_, 0, nx_, nx_, nx_+na_); // a'
-
-    // Look for all-zero rows in kkt
-    const casadi_int* kkt_colind = kkt_.colind();
-    const casadi_int* kkt_row = kkt_.row();
-    for (casadi_int c=0; c<nx_+na_; ++c) iw[c] = 1;
-    for (casadi_int c=0; c<nx_+na_; ++c) {
-      for (casadi_int k=kkt_colind[c]; k<kkt_colind[c+1]; ++k) {
-        if (fabs(kkt[k])>1e-16) iw[kkt_row[k]] = 0;
-      }
-    }
-
-    // Permitted signs for lam
-    for (casadi_int c=0; c<nx_+na_; ++c) {
-      neverzero[c] = lbz[c]==ubz[c];
-      neverupper[c] = isinf(ubz[c]);
-      neverlower[c] = isinf(lbz[c]);
-      if (iw[c]) {
-        // All-zero row
-        if (c<nx_) {
-          // Inactive constraint would lead to singular KKT
-          neverzero[c] = 1;
-        } else {
-          // Active constraint would lead to singular KKT
-          neverupper[c] = neverlower[c] = 1;
-        }
-      }
-    }
-
-    // Calculate g
-    casadi_fill(z+nx_, na_, 0.);
-    casadi_mv(a, A_, z, z+nx_, 0);
-
-    // Correct initial active set
+    // Correct lam if needed, determine permitted signs
     for (i=0; i<nx_+na_; ++i) {
+      // Permitted signs for lam
+      neverzero[i] = lbz[i]==ubz[i];
+      neverupper[i] = isinf(ubz[i]);
+      neverlower[i] = isinf(lbz[i]);
       casadi_assert(!neverzero[i] || !neverupper[i] || !neverlower[i],
                     "No sign possible for " + str(i));
-      // Use provided active set when possible
+      // Correct initial active set if required
       if (neverzero[i] && lam[i]==0.) {
         lam[i] = neverupper[i] || z[i]-lbz[i] <= ubz[i]-z[i] ? -DMIN : DMIN;
       } else if (neverupper[i] && lam[i]>0.) {
@@ -549,6 +514,18 @@ namespace casadi {
         lam[i] = neverzero[i] ? DMIN : 0.;
       }
     }
+
+    // Transpose A
+    casadi_trans(a, A_, trans_a, AT_, iw);
+
+    // Assemble the KKT matrix
+    casadi_set_sub(h, kkt, kkt_, 0, nx_, 0, nx_); // h
+    casadi_set_sub(a, kkt, kkt_, nx_, nx_+na_, 0, nx_); // a
+    casadi_set_sub(trans_a, kkt, kkt_, 0, nx_, nx_, nx_+na_); // a'
+
+    // KKT sparsity
+    const casadi_int* kkt_colind = kkt_.colind();
+    const casadi_int* kkt_row = kkt_.row();
 
     // AT sparsity
     const casadi_int* at_colind = AT_.colind();
