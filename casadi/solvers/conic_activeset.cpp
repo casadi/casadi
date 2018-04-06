@@ -246,18 +246,27 @@ namespace casadi {
   }
 
   template<typename T1>
-  T1 casadi_qp_pr(casadi_int* ipr, casadi_int nz,
-                  const T1* z, const T1* lbz, const T1* ubz) {
+  struct casadi_qp_mem {
+    // Dimensions
+    casadi_int nx, na, nz;
+    // Vectors
+    T1 *z, *lbz, *ubz, *infeas;
+    // Message buffer
+    char msg[40];
+  };
+
+  template<typename T1>
+  T1 casadi_qp_pr(casadi_qp_mem<T1>* m, casadi_int* ipr) {
     // Calculate largest constraint violation
     casadi_int i;
     T1 pr = 0;
     *ipr = -1;
-    for (i=0; i<nz; ++i) {
-      if (z[i] > ubz[i]+pr) {
-        pr = z[i]-ubz[i];
+    for (i=0; i<m->nz; ++i) {
+      if (m->z[i] > m->ubz[i]+pr) {
+        pr = m->z[i]-m->ubz[i];
         *ipr = i;
-      } else if (z[i] < lbz[i]-pr) {
-        pr = lbz[i]-z[i];
+      } else if (m->z[i] < m->lbz[i]-pr) {
+        pr = m->lbz[i]-m->z[i];
         *ipr = i;
       }
     }
@@ -265,21 +274,30 @@ namespace casadi {
   }
 
   template<typename T1>
-  T1 casadi_qp_du(casadi_int* idu, casadi_int nx, const T1* infeas) {
+  T1 casadi_qp_du(casadi_qp_mem<T1>* m, casadi_int* idu) {
     // Calculate largest constraint violation
     casadi_int i;
     T1 du = 0;
     *idu = -1;
-    for (i=0; i<nx; ++i) {
-      if (infeas[i] > du) {
-        du = infeas[i];
+    for (i=0; i<m->nx; ++i) {
+      if (m->infeas[i] > du) {
+        du = m->infeas[i];
         *idu = i;
-      } else if (infeas[i] < -du) {
-        du = -infeas[i];
+      } else if (m->infeas[i] < -du) {
+        du = -m->infeas[i];
         *idu = i;
       }
     }
     return du;
+  }
+
+  template<typename T1>
+  void casadi_qp_print(casadi_qp_mem<T1>* m, const char* fmt, ...) {
+    casadi_int n;
+    va_list args;
+    va_start(args, fmt);
+    n = vsnprintf(m->msg, sizeof(m->msg), fmt, args);
+    va_end(args);
   }
 
   int ConicActiveSet::init_mem(void* mem) const {
@@ -426,8 +444,15 @@ namespace casadi {
     const casadi_int* at_colind = AT_.colind();
     const casadi_int* at_row = AT_.row();
 
-    // Message buffer
-    char msg[40] = "";
+    // Setup memory structure
+    casadi_qp_mem<double> qp_m;
+    qp_m.nx = nx_;
+    qp_m.na = na_;
+    qp_m.nz = nx_+na_;
+    qp_m.z = z;
+    qp_m.lbz = lbz;
+    qp_m.ubz = ubz;
+    qp_m.infeas = infeas;
 
     // Stepsize
     double tau = 0.;
@@ -473,8 +498,8 @@ namespace casadi {
 
       // Calculate primal and dual error
       old_pr = pr;
-      pr = casadi_qp_pr(&ipr, nx_+na_, z, lbz, ubz);
-      du = casadi_qp_du(&idu, nx_, infeas);
+      pr = casadi_qp_pr(&qp_m, &ipr);
+      du = casadi_qp_du(&qp_m, &idu);
 
       // Improve primal or dual feasibility
       if (index==-1 && (ipr>=0 || idu>=0)) {
@@ -484,13 +509,13 @@ namespace casadi {
             // Add the most violating constraint
             index = ipr;
             sign = z[ipr]<lbz[ipr] ? -1 : 1;
-            sprint(msg, sizeof(msg), "Added %lld to reduce |pr|", ipr);
+            casadi_qp_print(&qp_m, "Added %lld to reduce |pr|", ipr);
           } else {
             // After a full-step, lam[ipr] should be zero
             if (pr < 0.5*old_pr) {
               // Keep iterating while error is decreasing at a fast-linear rate
               index = -2;
-              sprint(msg, sizeof(msg), "|pr| refinement. Rate: %g", pr/old_pr);
+              casadi_qp_print(&qp_m, "|pr| refinement. Rate: %g", pr/old_pr);
             }
           }
         } else {
@@ -529,7 +554,7 @@ namespace casadi {
           if (best_ind>=0) {
             index = best_ind;
             sign = 0;
-            sprint(msg, sizeof(msg), "Removed %lld to reduce |du|", best_ind);
+            casadi_qp_print(&qp_m, "Removed %lld to reduce |du|", best_ind);
           }
         }
       }
@@ -631,7 +656,7 @@ namespace casadi {
             // Accept, if any
             if (best_ind>=0) {
               lam[best_ind] = best_sign==0 ? 0 : best_sign>0 ? DMIN : -DMIN;
-              sprint(msg, sizeof(msg), "%lld->%lld, %lld->%lld",
+              casadi_qp_print(&qp_m, "%lld->%lld, %lld->%lld",
                      index, sign, best_ind, best_sign);
             } else if (verbose_) {
               print("Note: Singularity about to happen\n");
@@ -697,7 +722,7 @@ namespace casadi {
       // Print iteration progress:
       print("%5d %5d %10.2g %10.2g %6d %10.2g %6d %10.2g %6d %10.2g %40s\n",
             iter, sing, fk, pr, ipr, du, idu,
-            mina, imina, tau, msg);
+            mina, imina, tau, qp_m.msg);
 
       // Successful return if still no change
       if (index==-1) {
@@ -720,7 +745,7 @@ namespace casadi {
 
       // Start new iteration
       iter++;
-      msg[0] = '\0';
+      qp_m.msg[0] = '\0';
 
       // No change so far
       sign=0;
@@ -888,7 +913,7 @@ namespace casadi {
                       tau = tau_test;
                       index = i;
                       sign = -1;
-                      sprint(msg, sizeof(msg), "Enforced lbz[%lld] for regularity", i);
+                      casadi_qp_print(&qp_m, "Enforced lbz[%lld] for regularity", i);
                     }
                   }
                 }
@@ -905,7 +930,7 @@ namespace casadi {
                       tau = tau_test;
                       index = i;
                       sign = 1;
-                      sprint(msg, sizeof(msg), "Enforced ubz[%lld] for regularity", i);
+                      casadi_qp_print(&qp_m, "Enforced ubz[%lld] for regularity", i);
                     }
                   }
                 }
@@ -925,7 +950,7 @@ namespace casadi {
                   tau = tau_test;
                   index = i;
                   sign = 0;
-                  sprint(msg, sizeof(msg), "Dropped %s[%lld] for regularity",
+                  casadi_qp_print(&qp_m, "Dropped %s[%lld] for regularity",
                          lam[i]>0 ? "lbz" : "ubz", i);
                 }
               }
@@ -978,14 +1003,14 @@ namespace casadi {
           if (!sing) {
             index = i;
             sign = -1;
-            sprint(msg, sizeof(msg), "Enforcing lbz[%lld]", i);
+            casadi_qp_print(&qp_m, "Enforcing lbz[%lld]", i);
           }
         } else if (dz[i]>dz_max && z[i]>=ubz[i]+e) {
           tau = 0.;
           if (!sing) {
             index = i;
             sign = 1;
-            sprint(msg, sizeof(msg), "Enforcing ubz[%lld]", i);
+            casadi_qp_print(&qp_m, "Enforcing ubz[%lld]", i);
           }
         }
       }
@@ -1005,7 +1030,7 @@ namespace casadi {
           if (!sing) {
             index = i;
             sign = -1;
-            sprint(msg, sizeof(msg), "Enforcing lbz[%lld]", i);
+            casadi_qp_print(&qp_m, "Enforcing lbz[%lld]", i);
           }
         } else if (dz[i]>0 && trial_z>ubz[i]+e) {
           // Trial would increase maximum infeasibility
@@ -1013,7 +1038,7 @@ namespace casadi {
           if (!sing) {
             index = i;
             sign = 1;
-            sprint(msg, sizeof(msg), "Enforcing ubz[%lld]", i);
+            casadi_qp_print(&qp_m, "Enforcing ubz[%lld]", i);
           }
         }
         // Consistency check
@@ -1152,7 +1177,7 @@ namespace casadi {
           casadi_assert_dev(index>=0);
           if (sign==0) {
             casadi_warning("Logic not implemented");
-            sprint(msg, sizeof(msg), "Truncated step");
+            casadi_qp_print(&qp_m, "Truncated step");
             if (tau>0) {
               index = -2;
             } else {
@@ -1194,7 +1219,7 @@ namespace casadi {
           if (best_ind>=0) {
             index = best_ind;
             sign = 0;
-            sprint(msg, sizeof(msg), "Dropping %s[%lld]",
+            casadi_qp_print(&qp_m, "Dropping %s[%lld]",
                    lam[index]>0 ? "ubz" : "lbz", index);
           } else {
             // No change to the active set
