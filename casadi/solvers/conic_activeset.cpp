@@ -297,10 +297,9 @@ namespace casadi {
 
   template<typename T1>
   void casadi_qp_print(casadi_qp_mem<T1>* m, const char* fmt, ...) {
-    casadi_int n;
     va_list args;
     va_start(args, fmt);
-    n = vsnprintf(m->msg, sizeof(m->msg), fmt, args);
+    vsnprintf(m->msg, sizeof(m->msg), fmt, args);
     va_end(args);
   }
 
