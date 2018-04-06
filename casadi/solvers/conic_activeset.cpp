@@ -1012,20 +1012,14 @@ namespace casadi {
             }
           }
         }
-
         // Cannot restore feasibility
         if (index<0) {
           casadi_warning("Cannot restore feasibility");
           flag = 1;
           break;
         }
-
-        // Quick return?
-        if (fabs(tau)<1e-12) {
-          tau = 0.;
-          continue;
-        }
-
+        // Quick return if tau is zero
+        if (tau==0) continue;
         // Make sure that tau is positive
         if (tau<0) {
           casadi_scal(nx_+na_, -1., dz);
@@ -1036,15 +1030,11 @@ namespace casadi {
       } else {
         // Maximum step size is one
         tau = 1.;
-      }
-
-      // Check if the step is nonzero
-      bool zero_step = true;
-      for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dz[i]==0.;
-      for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dlam[i]==0.;
-      if (zero_step) {
-        tau = 0.;
-        continue;
+        // Quick return if stepsize is zero
+        bool zero_step = true;
+        for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dz[i]==0.;
+        for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dlam[i]==0.;
+        if (zero_step) continue;
       }
 
       // Acceptable primal error
