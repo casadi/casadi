@@ -380,7 +380,7 @@ namespace casadi {
     casadi_int i, k;
     const casadi_int *h_colind, *h_row, *a_colind, *a_row, *at_colind, *at_row,
                      *kkt_colind, *kkt_row;
-    // Sparsities
+    // Extract sparsities
     a_row = (a_colind = m->sp_a+2) + m->nx + 1;
     at_row = (at_colind = m->sp_at+2) + m->na + 1;
     h_row = (h_colind = m->sp_h+2) + m->nx + 1;
@@ -410,6 +410,37 @@ namespace casadi {
       for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) {
         m->nz_kkt[k] = m->w[kkt_row[k]];
         m->w[kkt_row[k]] = 0;
+      }
+    }
+  }
+
+  template<typename T1>
+  void casadi_qp_kkt_column(casadi_qp_mem<T1>* m, T1* kkt_i, casadi_int i,
+                            casadi_int sign) {
+    // Local variables
+    casadi_int k;
+    const casadi_int *h_colind, *h_row, *a_colind, *a_row, *at_colind, *at_row;
+    // Extract sparsities
+    a_row = (a_colind = m->sp_a+2) + m->nx + 1;
+    at_row = (at_colind = m->sp_at+2) + m->na + 1;
+    h_row = (h_colind = m->sp_h+2) + m->nx + 1;
+    // Reset kkt_i to zero
+    casadi_fill(kkt_i, m->nz, 0.);
+    // Copy row of KKT to kkt_i
+    if (i<m->nx) {
+      if (sign==0) {
+        for (k=h_colind[i]; k<h_colind[i+1]; ++k) kkt_i[h_row[k]] = m->nz_h[k];
+        for (k=a_colind[i]; k<a_colind[i+1]; ++k) kkt_i[m->nx+a_row[k]] = m->nz_a[k];
+      } else {
+        kkt_i[i] = 1.;
+      }
+    } else {
+      if (sign==0) {
+        kkt_i[i] = -1.;
+      } else {
+        for (k=at_colind[i-m->nx]; k<at_colind[i-m->nx+1]; ++k) {
+          kkt_i[at_row[k]] = m->nz_at[k];
+        }
       }
     }
   }
@@ -610,31 +641,17 @@ namespace casadi {
 
       // If a constraint was added
       if (index>=0) {
-        // Make sure we maintain non-singularity
+        // Try to maintain non-singularity of possible
         if (!sing) {
           // New column that we're trying to add
-          casadi_fill(dz, nx_+na_, 0.);
-          if (index<nx_ ? sign!=0 : sign==0) {
-            dz[index] = 1; // sign is irrelevant
-          } else {
-            for (k=kkt_colind[index]; k<kkt_colind[index+1]; ++k) {
-              dz[kkt_row[k]] = kkt[k];
-            }
-          }
+          casadi_qp_kkt_column(&qp_m, dz, index, sign);
           // Express it using the other columns
           casadi_qr_solve(dz, 1, 0, sp_v_, v, sp_r_, r, beta,
                           get_ptr(prinv_), get_ptr(pc_), w);
           // If dz[index] is zero, columns are linearly dependent
           if (fabs(dz[index])<1e-12) {
             // Column that we're removing
-            casadi_fill(w, nx_+na_, 0.);
-            if (index<nx_ ? sign==0 : sign!=0) {
-              w[index] = 1; // sign is irrelevant
-            } else {
-              for (k=kkt_colind[index]; k<kkt_colind[index+1]; ++k) {
-                w[kkt_row[k]] = kkt[k];
-              }
-            }
+            casadi_qp_kkt_column(&qp_m, w, index, !sign);
             // Find best constraint we can flip, if any
             casadi_int best_ind=-1, best_sign=0;
             double best_slack = -inf;
