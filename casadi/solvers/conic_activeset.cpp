@@ -1078,6 +1078,7 @@ namespace casadi {
         double dtau = w[j] - tau_k;
         // Check if maximum dual infeasibilty gets exceeded
         duerr_index = -1;
+        duerr_sign = 0;
         for (k=0; k<nx_; ++k) {
           double new_infeas = infeas[k]+dtau*tinfeas[k];
           if (fabs(new_infeas)>e) {
