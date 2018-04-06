@@ -489,6 +489,30 @@ namespace casadi {
     }
   }
 
+  template<typename T1>
+  int casadi_qp_zero_step(casadi_qp_mem<T1>* m, T1* dz, casadi_int* index,
+                          casadi_int* sign, T1 e) {
+    // Local variables
+    T1 dz_max;
+    casadi_int i;
+    int ret = 0;
+    dz_max = 0.;
+    for (i=0; i<m->nz; ++i) {
+      if (-dz[i]>dz_max && m->z[i]<=m->lbz[i]-e) {
+        ret = 1;
+        if (index) *index = i;
+        if (sign) *sign = -1;
+        casadi_qp_print(m, "lbz[%lld] violated at 0", i);
+      } else if (dz[i]>dz_max && m->z[i]>=m->ubz[i]+e) {
+        ret = 1;
+        if (index) *index = i;
+        if (sign) *sign = 1;
+        casadi_qp_print(m, "ubz[%lld] violated at 0", i);
+      }
+    }
+    return ret;
+  }
+
   int ConicActiveSet::init_mem(void* mem) const {
     //auto m = static_cast<ConicActiveSetMemory*>(mem);
     return 0;
@@ -1041,27 +1065,10 @@ namespace casadi {
       double e = fmax(pr, du/2);
 
       // Check if violation with tau=0 and not improving
-      double dz_max = 0.;
-      for (i=0; i<nx_+na_ && tau>0.; ++i) {
-        if (-dz[i]>dz_max && z[i]<=lbz[i]-e) {
-          tau = 0.;
-          if (!sing) {
-            index = i;
-            sign = -1;
-            casadi_qp_print(&qp_m, "Enforcing lbz[%lld]", i);
-          }
-        } else if (dz[i]>dz_max && z[i]>=ubz[i]+e) {
-          tau = 0.;
-          if (!sing) {
-            index = i;
-            sign = 1;
-            casadi_qp_print(&qp_m, "Enforcing ubz[%lld]", i);
-          }
-        }
+      if (casadi_qp_zero_step(&qp_m, dz, sing ? 0 : &index, sing ? 0 : &sign, e)) {
+        tau = 0.;
+        continue;
       }
-
-      // No step needs to be taken if tau==0
-      if (tau==0.) continue;
 
       // Check primal feasibility in the search direction
       for (i=0; i<nx_+na_ && tau>0.; ++i) {
