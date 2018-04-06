@@ -250,11 +250,12 @@ namespace casadi {
     // Dimensions
     casadi_int nx, na, nz;
     // Sparsity patterns
-    const casadi_int *sp_a, *sp_h, *sp_at;
+    const casadi_int *sp_a, *sp_h, *sp_at, *sp_kkt;
     // Vectors
     T1 *z, *lbz, *ubz, *infeas, *lam, *w;
     // Matrices
     const T1 *nz_a, *nz_at, *nz_h;
+    T1 *nz_kkt;
     // Message buffer
     char msg[40];
   };
@@ -370,6 +371,46 @@ namespace casadi {
       return best_ind;
     } else {
       return -1;
+    }
+  }
+
+  template<typename T1>
+  void casadi_qp_kkt(casadi_qp_mem<T1>* m) {
+    // Local variables
+    casadi_int i, k;
+    const casadi_int *h_colind, *h_row, *a_colind, *a_row, *at_colind, *at_row,
+                     *kkt_colind, *kkt_row;
+    // Sparsities
+    a_row = (a_colind = m->sp_a+2) + m->nx + 1;
+    at_row = (at_colind = m->sp_at+2) + m->na + 1;
+    h_row = (h_colind = m->sp_h+2) + m->nx + 1;
+    kkt_row = (kkt_colind = m->sp_kkt+2) + m->nz + 1;
+    // Reset w to zero
+    casadi_fill(m->w, m->nz, 0.);
+    // Loop over rows of the (transposed) KKT
+    for (i=0; i<m->nz; ++i) {
+      // Copy row of KKT to w
+      if (i<m->nx) {
+        if (m->lam[i]==0) {
+          for (k=h_colind[i]; k<h_colind[i+1]; ++k) m->w[h_row[k]] = m->nz_h[k];
+          for (k=a_colind[i]; k<a_colind[i+1]; ++k) m->w[m->nx+a_row[k]] = m->nz_a[k];
+        } else {
+          m->w[i] = 1.;
+        }
+      } else {
+        if (m->lam[i]==0) {
+          m->w[i] = -1.;
+        } else {
+          for (k=at_colind[i-m->nx]; k<at_colind[i-m->nx+1]; ++k) {
+            m->w[at_row[k]] = m->nz_at[k];
+          }
+        }
+      }
+      // Copy row to KKT, zero out w
+      for (k=kkt_colind[i]; k<kkt_colind[i+1]; ++k) {
+        m->nz_kkt[k] = m->w[kkt_row[k]];
+        m->w[kkt_row[k]] = 0;
+      }
     }
   }
 
@@ -509,10 +550,6 @@ namespace casadi {
       }
     }
 
-    // kktd sparsity
-    const casadi_int* kktd_colind = kktd_.colind();
-    const casadi_int* kktd_row = kktd_.row();
-
     // AT sparsity
     const casadi_int* at_colind = AT_.colind();
     const casadi_int* at_row = AT_.row();
@@ -532,9 +569,11 @@ namespace casadi {
     qp_m.sp_a = A_;
     qp_m.sp_h = H_;
     qp_m.sp_at = AT_;
+    qp_m.sp_kkt = kktd_;
     qp_m.nz_a = a;
     qp_m.nz_at = trans_a;
     qp_m.nz_h = h;
+    qp_m.nz_kkt = kktd;
 
     // Stepsize
     double tau = 0.;
@@ -709,29 +748,8 @@ namespace casadi {
         print_signs("sign(lam)", lam, nx_+na_);
       }
 
-      // Copy kkt to kktd
-      casadi_project(kkt, kkt_, kktd, kktd_, w);
-
-      // Loop over kktd entries (left two blocks of the transposed KKT)
-      for (casadi_int c=0; c<nx_; ++c) {
-        if (lam[c]!=0) {
-          // Zero out column, set diagonal entry to 1
-          for (k=kktd_colind[c]; k<kktd_colind[c+1]; ++k) {
-            kktd[k] = kktd_row[k]==c ? 1. : 0.;
-          }
-        }
-      }
-
-      // Loop over kktd entries (right two blocks of the transposed KKT)
-      for (casadi_int c=0; c<na_; ++c) {
-        if (lam[nx_+c]==0) {
-          // Zero out column, set diagonal entry to -1
-          for (k=kktd_colind[nx_+c]; k<kktd_colind[nx_+c+1]; ++k) {
-            kktd[k] = kktd_row[k]==nx_+c ? -1. : 0.;
-          }
-        }
-      }
-
+      // Construct the KKT matrix
+      casadi_qp_kkt(&qp_m);
       if (verbose_) {
         print_matrix("KKT", kktd, kktd_);
       }
