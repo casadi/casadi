@@ -270,7 +270,7 @@ namespace casadi {
     // Smallest nonzero number
     T1 DMIN;
     // Message buffer
-    char msg[64];
+    char msg[40];
     // Print iterations
     int print_iter;
   };
@@ -988,13 +988,13 @@ namespace casadi {
       // Print iteration progress:
       if (print_iter_) {
         if (iter % 10 == 0) {
-          print("%5s %5s %10s %10s %6s %10s %6s %10s %6s %10s %40s\n",
-                "Iter", "Null", "fk", "|pr|", "con", "|du|", "var",
-                "mindiag(R)", "con", "last tau", "Note");
+          print("%5s %5s %10s %10s %6s %10s %6s %10s %10s %40s\n",
+                "Iter", "Sing", "fk", "|pr|", "con", "|du|", "var",
+                "mindiag(R)", "last tau", "Note");
         }
-        print("%5d %5d %10.2g %10.2g %6d %10.2g %6d %10.2g %6d %10.2g %64s\n",
+        print("%5d %5d %10.2g %10.2g %6d %10.2g %6d %10.2g %10.2g %40s\n",
               iter, sing, fk, pr, ipr, du, idu,
-              mina, imina, tau, qp_m.msg);
+              mina, tau, qp_m.msg);
       }
 
       // Successful return if still no change
