@@ -648,11 +648,11 @@ namespace casadi {
         // lam becomes zero, update the infeasibility tangent
         if (i<m->nx) {
           // Set a lam_x to zero
-          m->tinfeas[i] -= m->lam[i];
+          m->tinfeas[i] -= dlam[i];
         } else {
           // Set a lam_a to zero
           for (k=at_colind[i-m->nx]; k<at_colind[i-m->nx+1]; ++k) {
-            m->tinfeas[at_row[k]] -= m->nz_at[k]*m->lam[i];
+            m->tinfeas[at_row[k]] -= m->nz_at[k]*dlam[i];
           }
         }
       }
