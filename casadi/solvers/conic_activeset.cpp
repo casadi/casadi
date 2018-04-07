@@ -60,7 +60,13 @@ namespace casadi {
         "Maximum number of iterations [1000]."}},
       {"tol",
        {OT_DOUBLE,
-        "Tolerance [1e-8]."}}
+        "Tolerance [1e-8]."}},
+      {"print_header",
+       {OT_BOOL,
+        "Print header [true]."}},
+      {"print_iter",
+       {OT_BOOL,
+        "Print iterations [true]."}}
      }
   };
 
@@ -71,6 +77,8 @@ namespace casadi {
     // Default options
     max_iter_ = 1000;
     tol_ = 1e-8;
+    print_iter_ = true;
+    print_header_ = true;
 
     // Read user options
     for (auto&& op : opts) {
@@ -78,6 +86,10 @@ namespace casadi {
         max_iter_ = op.second;
       } else if (op.first=="tol") {
         tol_ = op.second;
+      } else if (op.first=="print_iter") {
+        print_iter_ = op.second;
+      } else if (op.first=="print_header") {
+        print_header_ = op.second;
       }
     }
 
@@ -113,12 +125,14 @@ namespace casadi {
     alloc_w(nx_+na_, true); // beta
     alloc_w(2*na_+2*nx_); // casadi_qr
 
-    // Print summary
-    print("-------------------------------------------\n");
-    print("This is casadi::ConicActiveSet.\n");
-    print("Number of variables:                       %9d\n", nx_);
-    print("Number of constraints:                     %9d\n", na_);
-    print("Work in progress!\n");
+    if (print_header_) {
+      // Print summary
+      print("-------------------------------------------\n");
+      print("This is casadi::ConicActiveSet.\n");
+      print("Number of variables:                       %9d\n", nx_);
+      print("Number of constraints:                     %9d\n", na_);
+      print("Work in progress!\n");
+    }
   }
 
   template<typename T1>
@@ -256,7 +270,9 @@ namespace casadi {
     // Smallest nonzero number
     T1 DMIN;
     // Message buffer
-    char msg[40];
+    char msg[64];
+    // Print iterations
+    int print_iter;
   };
 
   template<typename T1>
@@ -296,7 +312,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  void casadi_qp_print(casadi_qp_mem<T1>* m, const char* fmt, ...) {
+  void casadi_qp_log(casadi_qp_mem<T1>* m, const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
     vsnprintf(m->msg, sizeof(m->msg), fmt, args);
@@ -310,13 +326,13 @@ namespace casadi {
     if (m->lam[ipr]==0.) {
       // Add the most violating constraint
       *sign = m->z[ipr]<m->lbz[ipr] ? -1 : 1;
-      casadi_qp_print(m, "Added %lld to reduce |pr|", ipr);
+      casadi_qp_log(m, "Added %lld to reduce |pr|", ipr);
       return ipr;
     } else {
       // After a full-step, lam[ipr] should be zero
       if (pr < 0.5*old_pr) {
         // Keep iterating while error is decreasing at a fast-linear rate
-        casadi_qp_print(m, "|pr| refinement. Rate: %g", pr/old_pr);
+        casadi_qp_log(m, "|pr| refinement. Rate: %g", pr/old_pr);
         return -2;
       }
     }
@@ -366,7 +382,7 @@ namespace casadi {
     // Accept, if any
     if (best_ind>=0) {
       *sign = 0;
-      casadi_qp_print(m, "Removed %lld to reduce |du|", best_ind);
+      casadi_qp_log(m, "Removed %lld to reduce |du|", best_ind);
       return best_ind;
     } else {
       return -1;
@@ -505,12 +521,12 @@ namespace casadi {
         ret = 1;
         if (index) *index = i;
         if (sign) *sign = -1;
-        casadi_qp_print(m, "lbz[%lld] violated at 0", i);
+        casadi_qp_log(m, "lbz[%lld] violated at 0", i);
       } else if (dz[i]>dz_max && m->z[i]>=m->ubz[i]+e) {
         ret = 1;
         if (index) *index = i;
         if (sign) *sign = 1;
-        casadi_qp_print(m, "ubz[%lld] violated at 0", i);
+        casadi_qp_log(m, "ubz[%lld] violated at 0", i);
       }
     }
     return ret;
@@ -532,13 +548,13 @@ namespace casadi {
         tau = (m->lbz[i]-e-m->z[i])/dz[i];
         if (index) *index = i;
         if (sign) *sign = -1;
-        casadi_qp_print(m, "Enforcing lbz[%lld]", i);
+        casadi_qp_log(m, "Enforcing lbz[%lld]", i);
       } else if (dz[i]>0 && trial_z>m->ubz[i]+e) {
         // Trial would increase maximum infeasibility
         tau = (m->ubz[i]+e-m->z[i])/dz[i];
         if (index) *index = i;
         if (sign) *sign = 1;
-        casadi_qp_print(m, "Enforcing ubz[%lld]", i);
+        casadi_qp_log(m, "Enforcing ubz[%lld]", i);
       }
       if (tau<=0) return tau;
     }
@@ -801,7 +817,7 @@ namespace casadi {
     qp_m.nz_h = h;
     qp_m.nz_kkt = kkt;
     qp_m.DMIN = DMIN;
-    qp_m.msg[0] = '\0';
+    qp_m.print_iter = print_iter_;
 
     // Stepsize
     double tau = 0.;
@@ -934,8 +950,8 @@ namespace casadi {
             // Accept, if any
             if (best_ind>=0) {
               lam[best_ind] = best_sign==0 ? 0 : best_sign>0 ? DMIN : -DMIN;
-              casadi_qp_print(&qp_m, "%lld->%lld, %lld->%lld",
-                     index, sign, best_ind, best_sign);
+              casadi_qp_log(&qp_m, "%lld->%lld, %lld->%lld",
+                            index, sign, best_ind, best_sign);
             } else if (verbose_) {
               print("Note: Singularity about to happen\n");
             }
@@ -969,17 +985,17 @@ namespace casadi {
       // Check singularity
       sing = casadi_qr_singular(&mina, &imina, r, sp_r_, get_ptr(pc_), 1e-12);
 
-      if (iter % 10 == 0) {
-        // Print header
-        print("%5s %5s %10s %10s %6s %10s %6s %10s %6s %10s %40s\n",
-              "Iter", "Null", "fk", "|pr|", "con", "|du|", "var",
-              "mindiag(R)", "con", "last tau", "Note");
-      }
-
       // Print iteration progress:
-      print("%5d %5d %10.2g %10.2g %6d %10.2g %6d %10.2g %6d %10.2g %40s\n",
-            iter, sing, fk, pr, ipr, du, idu,
-            mina, imina, tau, qp_m.msg);
+      if (print_iter_) {
+        if (iter % 10 == 0) {
+          print("%5s %5s %10s %10s %6s %10s %6s %10s %6s %10s %40s\n",
+                "Iter", "Null", "fk", "|pr|", "con", "|du|", "var",
+                "mindiag(R)", "con", "last tau", "Note");
+        }
+        print("%5d %5d %10.2g %10.2g %6d %10.2g %6d %10.2g %6d %10.2g %64s\n",
+              iter, sing, fk, pr, ipr, du, idu,
+              mina, imina, tau, qp_m.msg);
+      }
 
       // Successful return if still no change
       if (index==-1) {
@@ -1154,7 +1170,7 @@ namespace casadi {
                       tau = tau_test;
                       index = i;
                       sign = -1;
-                      casadi_qp_print(&qp_m, "Enforced lbz[%lld] for regularity", i);
+                      casadi_qp_log(&qp_m, "Enforced lbz[%lld] for regularity", i);
                     }
                   }
                 }
@@ -1171,7 +1187,7 @@ namespace casadi {
                       tau = tau_test;
                       index = i;
                       sign = 1;
-                      casadi_qp_print(&qp_m, "Enforced ubz[%lld] for regularity", i);
+                      casadi_qp_log(&qp_m, "Enforced ubz[%lld] for regularity", i);
                     }
                   }
                 }
@@ -1191,7 +1207,7 @@ namespace casadi {
                   tau = tau_test;
                   index = i;
                   sign = 0;
-                  casadi_qp_print(&qp_m, "Dropped %s[%lld] for regularity",
+                  casadi_qp_log(&qp_m, "Dropped %s[%lld] for regularity",
                          lam[i]>0 ? "lbz" : "ubz", i);
                 }
               }
@@ -1253,7 +1269,7 @@ namespace casadi {
           casadi_assert_dev(index>=0);
           if (sign==0) {
             casadi_warning("Logic not implemented");
-            casadi_qp_print(&qp_m, "Truncated step");
+            casadi_qp_log(&qp_m, "Truncated step");
             if (tau>0) {
               index = -2;
             } else {
@@ -1295,7 +1311,7 @@ namespace casadi {
           if (best_ind>=0) {
             index = best_ind;
             sign = 0;
-            casadi_qp_print(&qp_m, "Dropping %s[%lld]",
+            casadi_qp_log(&qp_m, "Dropping %s[%lld]",
                    lam[index]>0 ? "ubz" : "lbz", index);
           } else {
             // No change to the active set
