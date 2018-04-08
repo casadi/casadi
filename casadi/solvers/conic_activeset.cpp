@@ -867,7 +867,7 @@ namespace casadi {
       du = casadi_qp_du(&qp_m, &idu);
 
       // Improve primal or dual feasibility
-      if (index==-1 && (ipr>=0 || idu>=0)) {
+      if (index==-1 && tau>1e-16 && (ipr>=0 || idu>=0)) {
         if (pr>=du) {
           index = casadi_qp_pr_index(&qp_m, &sign, ipr, pr, old_pr);
         } else {
