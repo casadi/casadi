@@ -340,16 +340,33 @@ namespace casadi {
   }
 
   template<typename T1>
-  casadi_int casadi_qp_du_index(casadi_qp_mem<T1>* m, casadi_int* sign,
-                                casadi_int idu, T1 du) {
-    // Try to improve dual feasibility by removing a constraint
+  T1 casadi_qp_du_check(casadi_qp_mem<T1>* m, casadi_int i) {
     // Local variables
-    casadi_int best_ind, i, k;
-    T1 best_w, new_du;
+    casadi_int k;
+    T1 new_du;
     const casadi_int *at_colind, *at_row;
     // AT sparsity
     at_colind = m->sp_at + 2;
     at_row = at_colind + m->na + 1;
+    // Maximum infeasibility from setting from setting lam[i]=0
+    if (i<m->nx) {
+      new_du = fabs(m->infeas[i]-m->lam[i]);
+    } else {
+      new_du = 0.;
+      for (k=at_colind[i-m->nx]; k<at_colind[i-m->nx+1]; ++k) {
+        new_du = fmax(new_du, fabs(m->infeas[at_row[k]]-m->nz_at[k]*m->lam[i]));
+      }
+    }
+    return new_du;
+  }
+
+  template<typename T1>
+  casadi_int casadi_qp_du_index(casadi_qp_mem<T1>* m, casadi_int* sign,
+                                casadi_int idu, T1 du) {
+    // Try to improve dual feasibility by removing a constraint
+    // Local variables
+    casadi_int best_ind, i;
+    T1 best_w;
     // We need to increase or decrease infeas[idu]. Sensitivity:
     casadi_fill(m->w, m->nz, 0.);
     m->w[idu] = m->infeas[idu]>0 ? -1. : 1.;
@@ -362,17 +379,8 @@ namespace casadi {
       if (m->w[i]==0.) continue;
       // Make sure removing the constraint decreases dual infeasibility
       if (m->w[i]>0. ? m->lam[i]>=0. : m->lam[i]<=0.) continue;
-      // Maximum infeasibility from setting from setting lam[i]=0
-      if (i<m->nx) {
-        new_du = fabs(m->infeas[i]-m->lam[i]);
-      } else {
-        new_du = 0.;
-        for (k=at_colind[i-m->nx]; k<at_colind[i-m->nx+1]; ++k) {
-          new_du = fmax(new_du, fabs(m->infeas[at_row[k]]-m->nz_at[k]*m->lam[i]));
-        }
-      }
-      // Skip if du increases
-      if (new_du>du) continue;
+      // Skip if maximum infeasibility increases
+      if (casadi_qp_du_check(m, i)>du) continue;
       // Check if best so far
       if (fabs(m->w[i])>best_w) {
         best_w = fabs(m->w[i]);
@@ -601,24 +609,23 @@ namespace casadi {
   }
 
   template<typename T1>
-  void casadi_qp_dual_blocking(casadi_qp_mem<T1>* m, T1 e, T1* dlam, T1* tau,
-                               casadi_int *du_index) {
+  casadi_int casadi_qp_dual_blocking(casadi_qp_mem<T1>* m, T1 e, T1* dlam, T1* tau) {
     // Local variables
-    casadi_int i, n_tau, j, k, blocking_tau;
+    casadi_int i, n_tau, j, k, du_index;
     T1 tau_k, dtau, new_infeas, tau1;
     const casadi_int *at_colind, *at_row;
     // Extract sparsities
     at_row = (at_colind = m->sp_at+2) + m->na + 1;
     // Dual feasibility is piecewise linear in tau. Get the intervals:
     n_tau = casadi_qp_dual_breakpoints(m, m->w, m->iw, e, dlam, *tau);
+    // No dual blocking yet
+    du_index = -1;
     // How long step can we take without exceeding e?
     tau_k = 0.;
     for (j=0; j<n_tau; ++j) {
       // Distance to the next tau (may be zero)
       dtau = m->w[j] - tau_k;
       // Check if maximum dual infeasibilty gets exceeded
-      if (du_index) *du_index = -1;
-      blocking_tau = 0;
       for (k=0; k<m->nx; ++k) {
         new_infeas = m->infeas[k]+dtau*m->tinfeas[k];
         if (fabs(new_infeas)>e) {
@@ -626,15 +633,14 @@ namespace casadi {
           if (tau1 < *tau) {
             // Smallest tau found so far
             *tau = tau1;
-            if (du_index) *du_index = k;
-            blocking_tau = 1;
+            du_index = k;
           }
         }
       }
       // Update infeasibility
       casadi_axpy(m->nx, fmin(*tau - tau_k, dtau), m->tinfeas, m->infeas);
       // Stop here if dual blocking constraint
-      if (blocking_tau) break;
+      if (du_index>=0) return du_index;
       // Continue to the next tau
       tau_k = m->w[j];
       // Get component, break if last
@@ -654,6 +660,7 @@ namespace casadi {
         }
       }
     }
+    return du_index;
   }
 
   template<typename T1>
@@ -697,7 +704,8 @@ namespace casadi {
     }
 
     // Local variables
-    casadi_int i, flag;
+    int flag;
+    casadi_int i, du_index;
     double fk;
     // Get input pointers
     const double *h, *g, *a, *lba, *uba, *lbx, *ubx, *x0, *lam_x0, *lam_a0;
@@ -826,7 +834,7 @@ namespace casadi {
     casadi_int sing = 0; // set to avoid false positive warning
 
     // Constraint to be flipped, if any
-    casadi_int sign=0, index=-2, du_index;
+    casadi_int sign=0, index=-2;
 
     // QP iterations
     casadi_int iter = 0;
@@ -1241,7 +1249,7 @@ namespace casadi {
         continue;
       }
 
-      // Find largest possible step without violated acceptable primal error
+      // Find largest possible step without violating acceptable primal error
       casadi_qp_primal_blocking(&qp_m, e, dz, &tau,
                                 sing ? 0 : &index, sing ? 0 : &sign);
 
@@ -1249,25 +1257,17 @@ namespace casadi {
       e = fmax(pr/2, du);
 
       // Find largest possible step without violated acceptable dual error
-      casadi_qp_dual_blocking(&qp_m, e, dlam, &tau, &du_index);
+      du_index = casadi_qp_dual_blocking(&qp_m, e, dlam, &tau);
 
       // Take primal-dual step, avoiding accidental sign changes for lam
       casadi_qp_step(&qp_m, dz, dlam, tau);
 
-      // If allowed dual error got exceeded for some component
-      if (du_index>=0) {
-        if (sing) {
-          // Try to restore singularity, if possible
-          casadi_assert_dev(index>=0);
-          if (sign==0) {
-            casadi_warning("Logic not implemented");
-            casadi_qp_log(&qp_m, "Truncated step");
-            if (tau>0) {
-              index = -2;
-            } else {
-              index = -1;
-            }
-          }
+      // Make sure that the constraint can be enforced without increasing |du|
+      if (du_index>=0 && index>=0 && sing==0) {
+        if (casadi_qp_du_check(&qp_m, index)>e) {
+          // Dual infeasibility would increase, skip
+          casadi_qp_log(&qp_m, "Truncated step");
+          index = -1;
         }
       }
     }
