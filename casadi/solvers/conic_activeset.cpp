@@ -916,6 +916,8 @@ namespace casadi {
                 // Better than negative slack, worse than positive slack
                 new_slack = 0;
               } else {
+                // Skip if flipping would result in too large |du|
+                if (casadi_qp_du_check(&qp_m, i)>fmax(pr, du)) continue;
                 // Slack to the bound
                 new_slack = lam[i]>0 ? ubz[i]-z[i] : z[i]-lbz[i];
                 new_sign = 0;
