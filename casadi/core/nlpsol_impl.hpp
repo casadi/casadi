@@ -50,6 +50,9 @@ namespace casadi {
 
     // number of iterations
     casadi_int n_iter;
+
+    // Success?
+    bool success;
   };
 
   /** \brief NLP solver storage class
@@ -75,6 +78,9 @@ namespace casadi {
 
     /// Execute the callback function only after this amount of iterations
     casadi_int callback_step_;
+
+    /// Throw an exception on failure?
+    bool error_on_fail_;
 
     ///@{
     /** \brief Options */
@@ -160,6 +166,9 @@ namespace casadi {
 
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const override {return true;}
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     ///@{
     /** \brief Generate a function that calculates forward mode derivatives */

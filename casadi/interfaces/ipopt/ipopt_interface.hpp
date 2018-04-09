@@ -80,7 +80,6 @@ namespace casadi {
       obj, alpha_pr, alpha_du;
     std::vector<int> ls_trials;
     const char* return_status;
-    bool success;
     int iter_count;
 
     // Meta-data

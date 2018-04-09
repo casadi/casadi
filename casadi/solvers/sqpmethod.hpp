@@ -75,7 +75,6 @@ namespace casadi {
 
     /// Last return status
     const char* return_status;
-    bool success;
 
     /// Iteration count
     int iter_count;

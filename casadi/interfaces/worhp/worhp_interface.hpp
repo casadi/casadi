@@ -66,7 +66,6 @@ namespace casadi {
     double alpha_pr;
     casadi_int return_code;
     const char* return_status;
-    bool success;
 
     bool init_;
 

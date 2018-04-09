@@ -108,6 +108,9 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
+
   protected:
     /// Maximum number of Newton iterations
     casadi_int max_iter_;
@@ -120,6 +123,8 @@ namespace casadi {
 
     /// If true, each iteration will be printed
     bool print_iteration_;
+
+    bool error_on_;
 
     /// Print iteration header
     void printIteration(std::ostream &stream) const;

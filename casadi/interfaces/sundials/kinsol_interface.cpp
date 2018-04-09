@@ -270,7 +270,8 @@ namespace casadi {
 
     // Solve the nonlinear system of equations
     int flag = KINSol(m->mem, m->u, strategy_, u_scale_, f_scale_);
-    if (flag<KIN_SUCCESS) kinsol_error("KINSol", flag);
+    m->success = flag>= KIN_SUCCESS;
+    if (flag<KIN_SUCCESS) kinsol_error("KINSol", flag, error_on_fail_);
 
     // Warn if not successful return
     if (verbose_) {
@@ -671,8 +672,10 @@ namespace casadi {
     }
     ss << "Consult KINSOL documentation for more information.";
     if (fatal) {
-      casadi_error(ss.str());
-        } else {
+      casadi_error("nlpsol process failed. "
+                   "Set 'error_on_fail' option to false to ignore this error. "
+                   + ss.str());
+    } else {
       casadi_warning(ss.str());
     }
   }

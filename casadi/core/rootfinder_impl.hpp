@@ -40,6 +40,9 @@ namespace casadi {
 
     // Outputs
     double** ires;
+
+    // Success?
+    bool success;
   };
 
   /// Internal class
@@ -94,6 +97,9 @@ namespace casadi {
 
     // Solve the NLP
     virtual int solve(void* mem) const = 0;
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     /** \brief  Propagate sparsity forward */
     int sp_forward(const bvec_t** arg, bvec_t** res,
@@ -153,6 +159,9 @@ namespace casadi {
 
     /// Indices of the input and output that correspond to the actual root-finding
     casadi_int iin_, iout_;
+
+    /// Throw an exception on failure?
+    bool error_on_fail_;
 
     // Creator function for internal class
     typedef Rootfinder* (*Creator)(const std::string& name, const Function& oracle);

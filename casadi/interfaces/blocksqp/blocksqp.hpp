@@ -134,8 +134,6 @@ namespace casadi {
 
     std::vector<int> colind, row;
 
-    bool success;
-
     // Temporary memory
     double* jac;
   };
@@ -168,9 +166,6 @@ namespace casadi {
 
     // Initialize the solver
     void init(const Dict& opts) override;
-
-    /// Get all statistics
-    Dict get_stats(void* mem) const override;
 
     /** \brief Create memory block */
     void* alloc_mem() const override { return new BlocksqpMemory();}
