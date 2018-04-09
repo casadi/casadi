@@ -963,6 +963,8 @@ namespace casadi {
         // Accept active set change
         lam[index] = sign==0 ? 0 : sign>0 ? DMIN : -DMIN;
         index = -2;
+        // Recalculate primal and dual infeasibility
+        continue;
       }
 
       // Debugging
@@ -1001,12 +1003,6 @@ namespace casadi {
 
       // Successful return if still no change
       if (index==-1) {
-        flag = 0;
-        break;
-      }
-
-      // Break if close enough to optimum
-      if (!sing && pr<1e-12 && du<1e-12) {
         flag = 0;
         break;
       }
