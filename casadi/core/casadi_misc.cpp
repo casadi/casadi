@@ -31,6 +31,7 @@
 #else // HAVE_MKSTEMPS
 #ifdef _WIN32
 #include <random>
+#include <io.h>
 #include <share.h>
 #include <sys/stat.h>
 #include <fcntl.h>
