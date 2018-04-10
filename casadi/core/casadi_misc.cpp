@@ -241,7 +241,7 @@ namespace casadi {
 int simple_mkstemps(const std::string& prefix, const std::string& suffix, std::string &result) {
     // Characters available for inventing filenames
     std::string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-    int char_size = chars.size();
+    int char_size = static_cast<int>(chars.size());
 
     // How many tries do we allow?
     casadi_int max_tries = std::numeric_limits<int>::max();
