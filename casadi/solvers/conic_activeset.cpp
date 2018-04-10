@@ -926,30 +926,11 @@ namespace casadi {
                 new_slack = lam[i]>0 ? ubz[i]-z[i] : z[i]-lbz[i];
                 new_sign = 0;
               }
-              // Discarded?
-              casadi_int skip_ind = -1, skip_sign;
-              double skip_slack;
               // Best so far?
               if (new_slack > best_slack) {
-                if (best_ind>=0) {
-                  skip_ind=best_ind;
-                  skip_sign=best_sign;
-                  skip_slack=best_slack;
-                }
                 best_slack = new_slack;
                 best_ind = i;
                 best_sign = new_sign;
-              } else {
-                skip_ind = i;
-                skip_sign = new_sign;
-                skip_slack = new_slack;
-              }
-              // Logic can be improved, issue a warning
-              if (skip_ind>=0 && verbose_) {
-                print("Note: Discarded %lld to resolve singularity: "
-                      "lam=%g, z=%g, lbz=%g, ubz=%g, dz=%g, slack=%g, sign=%lld\n",
-                      skip_ind, lam[skip_ind], z[skip_ind],
-                      lbz[skip_ind], ubz[skip_ind], dz[skip_ind], skip_slack, skip_sign);
               }
             }
 
