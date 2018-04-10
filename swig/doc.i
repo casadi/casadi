@@ -2250,6 +2250,13 @@ Dennis Janka, Joel Andersson
 |                   |               | regarded as       |                  |
 |                   |               | numerically zero  |                  |
 +-------------------+---------------+-------------------+------------------+
+| error_on_fail     | OT_BOOL       | When the          | casadi::Nlpsol   |
+|                   |               | numerical process |                  |
+|                   |               | returns           |                  |
+|                   |               | unsuccessfully,   |                  |
+|                   |               | raise an error    |                  |
+|                   |               | (default false).  |                  |
++-------------------+---------------+-------------------+------------------+
 | eta               | OT_DOUBLE     | Filter line       | casadi::Blocksqp |
 |                   |               | search parameter, |                  |
 |                   |               | cf. IPOPT paper   |                  |
@@ -3226,7 +3233,7 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::Blocksqp::get_stats(void *mem) const  "
+%feature("docstring")  casadi::Nlpsol::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -3536,6 +3543,13 @@ const  "
 |                  |                  | are discrete,    |                 |
 |                  |                  | i.e. integer-    |                 |
 |                  |                  | valued           |                 |
++------------------+------------------+------------------+-----------------+
+| error_on_fail    | OT_BOOL          | When the         | casadi::Nlpsol  |
+|                  |                  | numerical        |                 |
+|                  |                  | process returns  |                 |
+|                  |                  | unsuccessfully,  |                 |
+|                  |                  | raise an error   |                 |
+|                  |                  | (default false). |                 |
 +------------------+------------------+------------------+-----------------+
 | eval_errors_fata | OT_BOOL          | When errors      | casadi::Nlpsol  |
 | l                |                  | occur during     |                 |
@@ -22296,6 +22310,13 @@ Joris Gillis
 |                   |              | > 0.0, -2: ui <   |                   |
 |                   |              | 0.0.              |                   |
 +-------------------+--------------+-------------------+-------------------+
+| error_on_fail     | OT_BOOL      | When the          | casadi::Rootfinde |
+|                   |              | numerical process | r                 |
+|                   |              | returns           |                   |
+|                   |              | unsuccessfully,   |                   |
+|                   |              | raise an error    |                   |
+|                   |              | (default false).  |                   |
++-------------------+--------------+-------------------+-------------------+
 | implicit_input    | OT_INT       | Index of the      | casadi::Rootfinde |
 |                   |              | input that        | r                 |
 |                   |              | corresponds to    |                   |
@@ -33358,6 +33379,13 @@ Joris Gillis
 |                   |              | ui <= 0.0, 2: ui  |                   |
 |                   |              | > 0.0, -2: ui <   |                   |
 |                   |              | 0.0.              |                   |
++-------------------+--------------+-------------------+-------------------+
+| error_on_fail     | OT_BOOL      | When the          | casadi::Rootfinde |
+|                   |              | numerical process | r                 |
+|                   |              | returns           |                   |
+|                   |              | unsuccessfully,   |                   |
+|                   |              | raise an error    |                   |
+|                   |              | (default false).  |                   |
 +-------------------+--------------+-------------------+-------------------+
 | implicit_input    | OT_INT       | Index of the      | casadi::Rootfinde |
 |                   |              | input that        | r                 |
@@ -49695,6 +49723,13 @@ Joris Gillis
 |                   |              | > 0.0, -2: ui <   |                   |
 |                   |              | 0.0.              |                   |
 +-------------------+--------------+-------------------+-------------------+
+| error_on_fail     | OT_BOOL      | When the          | casadi::Rootfinde |
+|                   |              | numerical process | r                 |
+|                   |              | returns           |                   |
+|                   |              | unsuccessfully,   |                   |
+|                   |              | raise an error    |                   |
+|                   |              | (default false).  |                   |
++-------------------+--------------+-------------------+-------------------+
 | implicit_input    | OT_INT       | Index of the      | casadi::Rootfinde |
 |                   |              | input that        | r                 |
 |                   |              | corresponds to    |                   |
@@ -50128,7 +50163,7 @@ casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::get_stats(void *mem) const  "
+%feature("docstring")  casadi::Newton::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -51360,6 +51395,13 @@ Joel Andersson
 |                  |                 | i.e. integer-    |                  |
 |                  |                 | valued           |                  |
 +------------------+-----------------+------------------+------------------+
+| error_on_fail    | OT_BOOL         | When the         | casadi::Nlpsol   |
+|                  |                 | numerical        |                  |
+|                  |                 | process returns  |                  |
+|                  |                 | unsuccessfully,  |                  |
+|                  |                 | raise an error   |                  |
+|                  |                 | (default false). |                  |
++------------------+-----------------+------------------+------------------+
 | eval_errors_fata | OT_BOOL         | When errors      | casadi::Nlpsol   |
 | l                |                 | occur during     |                  |
 |                  |                 | evaluation of    |                  |
@@ -51673,7 +51715,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::get_stats(void *mem) const  "
+%feature("docstring")  casadi::Nlpsol::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -56783,6 +56825,13 @@ Internal class.
 |                  |                 | 0.0, -2: ui <    |                  |
 |                  |                 | 0.0.             |                  |
 +------------------+-----------------+------------------+------------------+
+| error_on_fail    | OT_BOOL         | When the         | casadi::Rootfind |
+|                  |                 | numerical        | er               |
+|                  |                 | process returns  |                  |
+|                  |                 | unsuccessfully,  |                  |
+|                  |                 | raise an error   |                  |
+|                  |                 | (default false). |                  |
++------------------+-----------------+------------------+------------------+
 | implicit_input   | OT_INT          | Index of the     | casadi::Rootfind |
 |                  |                 | input that       | er               |
 |                  |                 | corresponds to   |                  |
@@ -57205,7 +57254,7 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::get_stats(void *mem) const  "
+%feature("docstring")  casadi::Rootfinder::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -60210,6 +60259,13 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |                   |                 | are discrete,     |                |
 |                   |                 | i.e. integer-     |                |
 |                   |                 | valued            |                |
++-------------------+-----------------+-------------------+----------------+
+| error_on_fail     | OT_BOOL         | When the          | casadi::Nlpsol |
+|                   |                 | numerical process |                |
+|                   |                 | returns           |                |
+|                   |                 | unsuccessfully,   |                |
+|                   |                 | raise an error    |                |
+|                   |                 | (default false).  |                |
 +-------------------+-----------------+-------------------+----------------+
 | eval_errors_fatal | OT_BOOL         | When errors occur | casadi::Nlpsol |
 |                   |                 | during evaluation |                |
@@ -66296,6 +66352,13 @@ A textbook SQPMethod
 |                   |               | i.e. integer-     |                  |
 |                   |               | valued            |                  |
 +-------------------+---------------+-------------------+------------------+
+| error_on_fail     | OT_BOOL       | When the          | casadi::Nlpsol   |
+|                   |               | numerical process |                  |
+|                   |               | returns           |                  |
+|                   |               | unsuccessfully,   |                  |
+|                   |               | raise an error    |                  |
+|                   |               | (default false).  |                  |
++-------------------+---------------+-------------------+------------------+
 | eval_errors_fatal | OT_BOOL       | When errors occur | casadi::Nlpsol   |
 |                   |               | during evaluation |                  |
 |                   |               | of f,g,...,stop   |                  |
@@ -69911,6 +69974,13 @@ General information
 |                  |                 | 0.0, -2: ui <    |                  |
 |                  |                 | 0.0.             |                  |
 +------------------+-----------------+------------------+------------------+
+| error_on_fail    | OT_BOOL         | When the         | casadi::Rootfind |
+|                  |                 | numerical        | er               |
+|                  |                 | process returns  |                  |
+|                  |                 | unsuccessfully,  |                  |
+|                  |                 | raise an error   |                  |
+|                  |                 | (default false). |                  |
++------------------+-----------------+------------------+------------------+
 | implicit_input   | OT_INT          | Index of the     | casadi::Rootfind |
 |                  |                 | input that       | er               |
 |                  |                 | corresponds to   |                  |
@@ -73149,6 +73219,13 @@ General information
 |                  |                 | are discrete,    |                  |
 |                  |                 | i.e. integer-    |                  |
 |                  |                 | valued           |                  |
++------------------+-----------------+------------------+------------------+
+| error_on_fail    | OT_BOOL         | When the         | casadi::Nlpsol   |
+|                  |                 | numerical        |                  |
+|                  |                 | process returns  |                  |
+|                  |                 | unsuccessfully,  |                  |
+|                  |                 | raise an error   |                  |
+|                  |                 | (default false). |                  |
 +------------------+-----------------+------------------+------------------+
 | eval_errors_fata | OT_BOOL         | When errors      | casadi::Nlpsol   |
 | l                |                 | occur during     |                  |
