@@ -251,17 +251,16 @@ namespace casadi {
     casadi_int nx, na, nz;
     // Sparsity patterns
     const casadi_int *sp_a, *sp_h, *sp_at, *sp_kkt;
+    // QP data
+    const T1 *nz_a, *nz_h, *g;
     // Vectors
     T1 *z, *lbz, *ubz, *infeas, *tinfeas, *lam, *w, *dz, *dlam;
     casadi_int *iw, *neverzero, *neverlower, *neverupper;
-    // Matrices
-    const T1 *nz_a, *nz_at, *nz_h;
-    T1 *nz_kkt;
     // QR factorization
     const casadi_int *prinv, *pc, *sp_v, *sp_r;
-    T1 *beta, *nz_v, *nz_r;
+    T1 *nz_at, *nz_kkt, *beta, *nz_v, *nz_r;
     // Smallest nonzero number
-    T1 DMIN;
+    T1 dmin;
     // Message buffer
     char msg[40];
     // Print iterations
@@ -677,8 +676,8 @@ namespace casadi {
       }
       // Ensure correct sign
       switch (m->iw[i]) {
-        case -1: m->lam[i] = fmin(m->lam[i], -m->DMIN); break;
-        case  1: m->lam[i] = fmax(m->lam[i],  m->DMIN); break;
+        case -1: m->lam[i] = fmin(m->lam[i], -m->dmin); break;
+        case  1: m->lam[i] = fmax(m->lam[i],  m->dmin); break;
         case  0: m->lam[i] = 0.; break;
       }
     }
@@ -789,6 +788,34 @@ namespace casadi {
     casadi_mv(m->nz_h, m->sp_h, m->dz, m->tinfeas, 0);
     casadi_mv(m->nz_a, m->sp_a, m->dlam+m->nx, m->tinfeas, 1);
     casadi_axpy(m->nx, 1., m->dlam, m->tinfeas);
+  }
+
+  template<typename T1>
+  void casadi_qp_calc_dependent(casadi_qp_mem<T1>* m) {
+    // Local variables
+    casadi_int i;
+    // Calculate f
+    m->f = casadi_bilin(m->nz_h, m->sp_h, m->z, m->z)/2.
+         + casadi_dot(m->nx, m->z, m->g);
+    // Calculate z[nx:]
+    casadi_fill(m->z+m->nx, m->na, 0.);
+    casadi_mv(m->nz_a, m->sp_a, m->z, m->z+m->nx, 0);
+    // Calculate gradient of the Lagrangian
+    casadi_copy(m->g, m->nx, m->infeas);
+    casadi_mv(m->nz_h, m->sp_h, m->z, m->infeas, 0);
+    casadi_mv(m->nz_a, m->sp_a, m->lam+m->nx, m->infeas, 1);
+    // Calculate lam[:nx] without changing the sign, dual infeasibility
+    for (i=0; i<m->nx; ++i) {
+      if (m->lam[i]>0) {
+        m->lam[i] = fmax(-m->infeas[i], m->dmin);
+      } else if (m->lam[i]<0) {
+        m->lam[i] = fmin(-m->infeas[i], -m->dmin);
+      }
+      m->infeas[i] += m->lam[i];
+    }
+    // Calculate primal and dual error
+    casadi_qp_pr(m);
+    casadi_qp_du(m);
   }
 
   int ConicActiveSet::init_mem(void* mem) const {
@@ -918,6 +945,7 @@ namespace casadi {
     qp_m.sp_at = AT_;
     qp_m.sp_kkt = kkt_;
     // Matrix nonzeros
+    qp_m.g = g;
     qp_m.nz_a = a;
     qp_m.nz_at = trans_a;
     qp_m.nz_h = h;
@@ -931,7 +959,7 @@ namespace casadi {
     qp_m.prinv = get_ptr(prinv_);
     qp_m.pc = get_ptr(pc_);
     // Misc
-    qp_m.DMIN = DMIN;
+    qp_m.dmin = DMIN;
     qp_m.print_iter = print_iter_;
     qp_m.msg[0] = '\0';
     qp_m.tau = 0.;
@@ -943,27 +971,8 @@ namespace casadi {
     // Acceptable error
     double e;
     while (true) {
-      // Calculate f
-      qp_m.f = casadi_bilin(h, H_, z, z)/2. + casadi_dot(nx_, z, g);
-      // Calculate g
-      casadi_fill(z+nx_, na_, 0.);
-      casadi_mv(a, A_, z, z+nx_, 0);
-      // Calculate gradient of the Lagrangian
-      casadi_copy(g, nx_, infeas);
-      casadi_mv(h, H_, z, infeas, 0);
-      casadi_mv(a, A_, lam+nx_, infeas, 1);
-      // Calculate lam(x) without changing the sign, dual infeasibility
-      for (i=0; i<nx_; ++i) {
-        if (lam[i]>0) {
-          lam[i] = fmax(-infeas[i], DMIN);
-        } else if (lam[i]<0) {
-          lam[i] = fmin(-infeas[i], -DMIN);
-        }
-        infeas[i] += lam[i];
-      }
-      // Calculate primal and dual error
-      casadi_qp_pr(&qp_m);
-      casadi_qp_du(&qp_m);
+      // Calculate dependent quantities
+      casadi_qp_calc_dependent(&qp_m);
 
       // Improve primal or dual feasibility
       if (index==-1 && qp_m.tau>1e-16 && (qp_m.ipr>=0 || qp_m.idu>=0)) {
