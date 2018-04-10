@@ -1025,5 +1025,16 @@ class Matrixtests(casadiTestCase):
       self.checkarray(np.diff(A,1,0),diff(B,1,0))
       #self.checkarray(np.diff(A,1,1),diff(B,1,1))
 
+
+  def test_singular_repmat(self):
+    for X in [DM, SX, MX, Sparsity]:
+      for n_b in [0,2]:
+        for m_b in [0,2]:
+          b = X(n_b, m_b)
+
+          for n in [0,3]:
+            for m in [0,3]:
+              self.assertEqual(repmat(b, n, m).shape,(n_b * n, m_b * m))
+
 if __name__ == '__main__':
     unittest.main()
