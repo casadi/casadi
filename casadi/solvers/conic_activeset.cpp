@@ -758,16 +758,15 @@ namespace casadi {
   }
 
   template<typename T1>
-  int casadi_qp_calc_tau(casadi_qp_mem<T1>* m, casadi_int* r_index, casadi_int* r_sign) {
+  int casadi_qp_scale_step(casadi_qp_mem<T1>* m, casadi_int* r_index, casadi_int* r_sign) {
     // Local variables
-    T1 tpr, tdu, terr, tau_test, minat_tr;
+    T1 tpr, tdu, terr, tau_test, minat_tr, tau;
     int pos_ok, neg_ok;
     casadi_int nnz_kkt, nullity_tr, nulli, imina_tr, i;
     // Reset r_index, r_sign, quick return if non-singular
     *r_index = -1;
     *r_sign = 0;
     if (!m->sing) {
-      m->tau = 1.;
       return 0;
     }
     // Change in pr, du in the search direction
@@ -827,7 +826,7 @@ namespace casadi {
     casadi_qr(m->sp_kkt, m->nz_kkt, m->w, m->sp_v, m->nz_v, m->sp_r, m->nz_r,
               m->beta, m->prinv, m->pc);
     // Best flip
-    m->tau = m->inf;
+    tau = m->inf;
     // For all nullspace vectors
     nullity_tr = casadi_qr_singular(&minat_tr, &imina_tr, m->nz_r, m->sp_r,
                                     m->pc, 1e-12);
@@ -853,8 +852,8 @@ namespace casadi {
               // Only allow removing constraints if tau_test==0
               if (fabs(tau_test)>=1e-16) {
                 // Check if best so far
-                if (fabs(tau_test)<fabs(m->tau)) {
-                  m->tau = tau_test;
+                if (fabs(tau_test)<fabs(tau)) {
+                  tau = tau_test;
                   *r_index = i;
                   *r_sign = -1;
                   casadi_qp_log(m, "Enforced lbz[%lld] for regularity", i);
@@ -870,8 +869,8 @@ namespace casadi {
               // Only allow removing constraints if tau_test==0
               if (fabs(tau_test)>=1e-16) {
                 // Check if best so far
-                if (fabs(tau_test)<fabs(m->tau)) {
-                  m->tau = tau_test;
+                if (fabs(tau_test)<fabs(tau)) {
+                  tau = tau_test;
                   *r_index = i;
                   *r_sign = 1;
                   casadi_qp_log(m, "Enforced ubz[%lld] for regularity", i);
@@ -890,8 +889,8 @@ namespace casadi {
             // Make sure direction is permitted
             if ((tau_test>0 && !pos_ok) || (tau_test<0 && !neg_ok)) continue;
             // Check if best so far
-            if (fabs(tau_test)<fabs(m->tau)) {
-              m->tau = tau_test;
+            if (fabs(tau_test)<fabs(tau)) {
+              tau = tau_test;
               *r_index = i;
               *r_sign = 0;
               casadi_qp_log(m, "Dropped %s[%lld] for regularity",
@@ -903,13 +902,10 @@ namespace casadi {
     }
     // Can we restore feasibility?
     if (*r_index<0) return 1;
-    // Make sure that tau is nonnegative
-    if (m->tau<0) {
-      casadi_scal(m->nz, -1., m->dz);
-      casadi_scal(m->nz, -1., m->dlam);
-      casadi_scal(m->nx, -1., m->tinfeas);
-      m->tau = -m->tau;
-    }
+    // Scale step so that that tau=1 corresponds to a full step
+    casadi_scal(m->nz, tau, m->dz);
+    casadi_scal(m->nz, tau, m->dlam);
+    casadi_scal(m->nx, tau, m->tinfeas);
     return 0;
   }
 
@@ -949,7 +945,7 @@ namespace casadi {
     casadi_mv(m->nz_a, m->sp_a, m->dlam+m->nx, m->tinfeas, 1);
     casadi_axpy(m->nx, 1., m->dlam, m->tinfeas);
     // Calculate step length
-    return casadi_qp_calc_tau(m, r_index, r_sign);
+    return casadi_qp_scale_step(m, r_index, r_sign);
   }
 
   template<typename T1>
@@ -1210,8 +1206,7 @@ namespace casadi {
       qp_m.msg[0] = '\0';
 
       // No change so far
-      sign=0;
-      index=-1;
+      sign=0, index=-1;
 
       // Calculate search direction
       if (casadi_qp_calc_step(&qp_m, &r_index, &r_sign)) {
@@ -1226,6 +1221,7 @@ namespace casadi {
       }
 
       // Find largest possible step without violating acceptable primal error
+      qp_m.tau = 1.;
       e = fmax(qp_m.pr, qp_m.du/du_to_pr_); // Acceptable primal error
       casadi_qp_primal_blocking(&qp_m, e, &index, &sign);
 
