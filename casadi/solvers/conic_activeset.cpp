@@ -1011,7 +1011,7 @@ namespace casadi {
 
     // Local variables
     int flag;
-    casadi_int i, r_index, r_sign;
+    casadi_int i;
     // Get input pointers
     const double *h, *g, *a, *lba, *uba, *lbx, *ubx, *x0, *lam_x0, *lam_a0;
     h = arg[CONIC_H];
@@ -1142,28 +1142,33 @@ namespace casadi {
     qp_m.sing = 0; // set to avoid false positive warning
     qp_m.du_to_pr = du_to_pr_;
     // Constraint to be flipped, if any
-    casadi_int sign=0, index=-2;
+    casadi_int index=-2, sign=0, r_index=-2, r_sign=0;
+    double e;
     // QP iterations
     casadi_int iter = 0;
-    // Acceptable error
-    double e;
     while (true) {
       // Calculate dependent quantities
       casadi_qp_calc_dependent(&qp_m);
-
-      // Improve primal or dual feasibility
-      if (index==-1 && qp_m.tau>1e-16 && (qp_m.ipr>=0 || qp_m.idu>=0)) {
+      // acceptable dual error
+      e = fmax(du_to_pr_*qp_m.pr, qp_m.du);
+      // Make active set change
+      if (r_index>=0 && (r_sign!=0 || casadi_qp_du_check(&qp_m, r_index)<=e)) {
+        // Try to restore regularity
+        index = r_index;
+        sign = r_sign;
+        casadi_qp_log(&qp_m, "%lld->%lld for regularity", index, sign);
+      } else if (index==-1 && qp_m.tau>1e-16 && (qp_m.ipr>=0 || qp_m.idu>=0)) {
         if (du_to_pr_*qp_m.pr >= qp_m.du) {
+          // Try to improve primal feasibility
           index = casadi_qp_pr_index(&qp_m, &sign);
         } else {
+          // Try to improve dual feasibility
           index = casadi_qp_du_index(&qp_m, &sign);
         }
       }
-
       // If a constraint was added
       if (index>=0) {
         // Try to maintain non-singularity if possible
-        e = fmax(du_to_pr_*qp_m.pr, qp_m.du); // acceptable error
         if (!qp_m.sing && casadi_qp_flip_check(&qp_m, index, sign, &r_index, &r_sign, e)) {
           if (r_index>=0) {
             // Also flip r_index to avoid singularity
@@ -1175,9 +1180,8 @@ namespace casadi {
           }
         }
         lam[index] = sign==0 ? 0 : sign>0 ? DMIN : -DMIN;
-        index = -2;
         // Recalculate primal and dual infeasibility
-        continue;
+        casadi_qp_calc_dependent(&qp_m);
       }
 
       // Debugging
@@ -1236,13 +1240,6 @@ namespace casadi {
 
       // Line search in the calculated direction
       casadi_qp_linesearch(&qp_m, &index, &sign);
-
-      // Check if singular restoration index can be imposed
-      if (r_index>=0 && (r_sign!=0 || casadi_qp_du_check(&qp_m, r_index)<=e)) {
-        index = r_index;
-        sign = r_sign;
-        casadi_qp_log(&qp_m, "%lld->%lld for regularity", index, sign);
-      }
     }
 
     // Calculate optimal cost
