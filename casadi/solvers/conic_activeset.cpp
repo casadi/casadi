@@ -949,6 +949,24 @@ namespace casadi {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
 
+    // Setup memory structure
+    casadi_qp_mem<double> qp_m;
+    qp_m.du_to_pr = du_to_pr_;
+    qp_m.print_iter = print_iter_;
+    qp_m.dmin = std::numeric_limits<double>::min();
+    qp_m.inf = inf;
+    qp_m.nx = nx_;
+    qp_m.na = na_;
+    qp_m.nz = nx_+na_;
+    qp_m.sp_a = A_;
+    qp_m.sp_h = H_;
+    qp_m.sp_at = AT_;
+    qp_m.sp_kkt = kkt_;
+    qp_m.sp_v = sp_v_;
+    qp_m.sp_r = sp_r_;
+    qp_m.prinv = get_ptr(prinv_);
+    qp_m.pc = get_ptr(pc_);
+
     // Local variables
     int flag;
     casadi_int i;
@@ -994,9 +1012,6 @@ namespace casadi {
     neverupper = iw; iw += nx_+na_;
     neverlower = iw; iw += nx_+na_;
 
-    // Smallest strictly positive number
-    const double DMIN = std::numeric_limits<double>::min();
-
     // Bounds on z
     casadi_copy(lbx, nx_, lbz);
     casadi_copy(lba, na_, lbz+nx_);
@@ -1018,22 +1033,16 @@ namespace casadi {
                     "No sign possible for " + str(i));
       // Correct initial active set if required
       if (neverzero[i] && lam[i]==0.) {
-        lam[i] = neverupper[i] || z[i]-lbz[i] <= ubz[i]-z[i] ? -DMIN : DMIN;
+        lam[i] = neverupper[i] || z[i]-lbz[i] <= ubz[i]-z[i] ? -qp_m.dmin : qp_m.dmin;
       } else if (neverupper[i] && lam[i]>0.) {
-        lam[i] = neverzero[i] ? -DMIN : 0.;
+        lam[i] = neverzero[i] ? -qp_m.dmin : 0.;
       } else if (neverlower[i] && lam[i]<0.) {
-        lam[i] = neverzero[i] ? DMIN : 0.;
+        lam[i] = neverzero[i] ? qp_m.dmin : 0.;
       }
     }
-
     // Transpose A
     casadi_trans(a, A_, trans_a, AT_, iw);
-
-    // Setup memory structure
-    casadi_qp_mem<double> qp_m;
-    qp_m.nx = nx_;
-    qp_m.na = na_;
-    qp_m.nz = nx_+na_;
+    qp_m.msg[0] = '\0';
     qp_m.z = z;
     qp_m.lam = lam;
     qp_m.lbz = lbz;
@@ -1047,11 +1056,6 @@ namespace casadi {
     qp_m.neverzero = neverzero;
     qp_m.neverlower = neverlower;
     qp_m.neverupper = neverupper;
-    // Sparsity patterns
-    qp_m.sp_a = A_;
-    qp_m.sp_h = H_;
-    qp_m.sp_at = AT_;
-    qp_m.sp_kkt = kkt_;
     // Matrix nonzeros
     qp_m.g = g;
     qp_m.nz_a = a;
@@ -1061,19 +1065,10 @@ namespace casadi {
     // QR factorization
     qp_m.nz_v = v;
     qp_m.nz_r = r;
-    qp_m.sp_v = sp_v_;
-    qp_m.sp_r = sp_r_;
     qp_m.beta = beta;
-    qp_m.prinv = get_ptr(prinv_);
-    qp_m.pc = get_ptr(pc_);
     // Misc
-    qp_m.dmin = DMIN;
-    qp_m.inf = inf;
-    qp_m.print_iter = print_iter_;
-    qp_m.msg[0] = '\0';
     qp_m.tau = 0.;
     qp_m.sing = 0; // set to avoid false positive warning
-    qp_m.du_to_pr = du_to_pr_;
     // Constraint to be flipped, if any
     casadi_int index=-2, sign=0, r_index=-2, r_sign=0;
     // QP iterations
