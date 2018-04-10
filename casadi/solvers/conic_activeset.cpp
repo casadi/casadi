@@ -1123,7 +1123,7 @@ namespace casadi {
 
         // If primal error is dominating and constraint is active,
         // then only allow the multiplier to become larger
-        if (pr>=du && lam[ipr]!=0 && fabs(dlam[ipr])>1e-12) {
+        if (du_to_pr_*pr>=du && lam[ipr]!=0 && fabs(dlam[ipr])>1e-12) {
           if ((lam[ipr]>0)==(dlam[ipr]>0)) {
             neg_ok = false;
           } else {
