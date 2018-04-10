@@ -976,6 +976,23 @@ namespace casadi {
     casadi_qp_du(m);
   }
 
+  template<typename T1>
+  void casadi_qp_linesearch(casadi_qp_mem<T1>* m, casadi_int* index, casadi_int* sign) {
+    // Start with a full step and no active set change
+    *sign=0;
+    *index=-1;
+    m->tau = 1.;
+    // Find largest possible step without exceeding acceptable |pr|
+    casadi_qp_primal_blocking(m, fmax(m->pr, m->du/m->du_to_pr), index, sign);
+    // Find largest possible step without exceeding acceptable |du|
+    if (casadi_qp_dual_blocking(m, fmax(m->pr*m->du_to_pr, m->du))>=0) {
+      *index = -1;
+      *sign=0;
+    }
+    // Take primal-dual step, avoiding accidental sign changes for lam
+    casadi_qp_take_step(m);
+  }
+
   int ConicActiveSet::init_mem(void* mem) const {
     //auto m = static_cast<ConicActiveSetMemory*>(mem);
     return 0;
@@ -1205,9 +1222,6 @@ namespace casadi {
       iter++;
       qp_m.msg[0] = '\0';
 
-      // No change so far
-      sign=0, index=-1;
-
       // Calculate search direction
       if (casadi_qp_calc_step(&qp_m, &r_index, &r_sign)) {
         casadi_warning("Failed to calculate search direction");
@@ -1220,17 +1234,8 @@ namespace casadi {
         print_vector("dlam", dlam, nx_+na_);
       }
 
-      // Find largest possible step without violating acceptable primal error
-      qp_m.tau = 1.;
-      e = fmax(qp_m.pr, qp_m.du/du_to_pr_); // Acceptable primal error
-      casadi_qp_primal_blocking(&qp_m, e, &index, &sign);
-
-      // Find largest possible step without violated acceptable dual error
-      e = fmax(qp_m.pr*du_to_pr_, qp_m.du); // Acceptable dual error
-      if (casadi_qp_dual_blocking(&qp_m, e)>=0) index = -1;
-
-      // Take primal-dual step, avoiding accidental sign changes for lam
-      casadi_qp_take_step(&qp_m);
+      // Line search in the calculated direction
+      casadi_qp_linesearch(&qp_m, &index, &sign);
 
       // Check if singular restoration index can be imposed
       if (r_index>=0 && (r_sign!=0 || casadi_qp_du_check(&qp_m, r_index)<=e)) {
