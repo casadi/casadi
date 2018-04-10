@@ -552,6 +552,11 @@ namespace casadi {
     // Local variables
     casadi_int i;
     T1 trial_z;
+    // Check if violation with tau=0 and not improving
+    if (casadi_qp_zero_blocking(m, e, dz, index, sign)) {
+      *tau = 0.;
+      return;
+    }
     // Loop over all primal variables
     for (i=0; i<m->nz; ++i) {
       if (dz[i]==0.) continue; // Skip zero steps
@@ -1246,22 +1251,12 @@ namespace casadi {
         if (zero_step) continue;
       }
 
-      // Acceptable primal error
-      double e = fmax(pr, du/du_to_pr_);
-
-      // Check if violation with tau=0 and not improving
-      if (casadi_qp_zero_blocking(&qp_m, e, dz, &index, &sign)) {
-        tau = 0.;
-        continue;
-      }
-
       // Find largest possible step without violating acceptable primal error
+      double e = fmax(pr, du/du_to_pr_); // Acceptable primal error
       casadi_qp_primal_blocking(&qp_m, e, dz, &tau, &index, &sign);
 
-      // Acceptable dual error
-      e = fmax(pr*du_to_pr_, du);
-
       // Find largest possible step without violated acceptable dual error
+      e = fmax(pr*du_to_pr_, du); // Acceptable dual error
       if (casadi_qp_dual_blocking(&qp_m, e, dlam, &tau)>=0) index = -1;
 
       // Take primal-dual step, avoiding accidental sign changes for lam
