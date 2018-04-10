@@ -119,6 +119,7 @@ namespace casadi {
     casadi_int max_iter_;
     double tol_;
     bool print_iter_, print_header_;
+    double du_to_pr_;
     ///@}
 
   };
