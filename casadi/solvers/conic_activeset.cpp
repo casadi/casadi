@@ -142,108 +142,6 @@ namespace casadi {
   }
 
   template<typename T1>
-  void casadi_set_sub(const T1* y, T1* x, const casadi_int* sp_x,
-                      casadi_int rbeg, casadi_int rend,
-                      casadi_int cbeg, casadi_int cend) {
-    // Local variables
-    casadi_int r, c, k;
-    // Get sparsities
-    casadi_int ncol=sp_x[1];
-    const casadi_int *colind=sp_x+2, *row=sp_x+2+ncol+1;
-    // Set elements in subblock
-    for (c=cbeg; c<cend; ++c) {
-      for (k=colind[c]; k<colind[c+1] && (r=row[k])<rend; ++k) {
-        if (r>=rbeg) x[k] = *y++;
-      }
-    }
-  }
-
-  template<typename T1>
-  void casadi_fill_sub(T1 y, T1* x, const casadi_int* sp_x,
-                      casadi_int rbeg, casadi_int rend,
-                      casadi_int cbeg, casadi_int cend) {
-    // Local variables
-    casadi_int r, c, k;
-    // Get sparsities
-    casadi_int ncol=sp_x[1];
-    const casadi_int *colind=sp_x+2, *row=sp_x+2+ncol+1;
-    // Set elements in subblock
-    for (c=cbeg; c<cend; ++c) {
-      for (k=colind[c]; k<colind[c+1] && (r=row[k])<rend; ++k) {
-        if (r>=rbeg) x[k] = y;
-      }
-    }
-  }
-
-  template<typename T1>
-  void casadi_row_scal(T1* x, const casadi_int* sp_x, const T1* d) {
-    // Local variables
-    casadi_int c, k;
-    // Get sparsities
-    casadi_int ncol=sp_x[1];
-    const casadi_int *colind=sp_x+2, *row=sp_x+2+ncol+1;
-    // Scale entries
-    for (c=0; c<ncol; ++c) {
-      for (k=colind[c]; k<colind[c+1]; ++k) {
-        x[k] *= d[row[k]];
-      }
-    }
-  }
-
-  void ConicActiveSet::
-  print_vector(const char* id, const double* x, casadi_int n) const {
-    print("%s: [", id);
-    for (casadi_int i=0; i<n; ++i) {
-      if (i!=0) print(", ");
-      print("%g", x[i]);
-    }
-    print("]\n");
-  }
-
-  void ConicActiveSet::
-  print_ivector(const char* id, const casadi_int* x, casadi_int n) const {
-    print("%s: [", id);
-    for (casadi_int i=0; i<n; ++i) {
-      if (i!=0) print(", ");
-      print("%lld", x[i]);
-    }
-    print("]\n");
-  }
-
-  template<typename T1>
-  void casadi_col_scal(T1* x, const casadi_int* sp_x, const T1* d) {
-    // Local variables
-    casadi_int c, k;
-    // Get sparsities
-    casadi_int ncol=sp_x[1];
-    const casadi_int *colind=sp_x+2;
-    // Scale entries
-    for (c=0; c<ncol; ++c) {
-      for (k=colind[c]; k<colind[c+1]; ++k) {
-        x[k] *= d[c];
-      }
-    }
-  }
-
-  template<typename T1>
-  void casadi_add_diag(T1* x, const casadi_int* sp_x, const T1* d) {
-    // Local variables
-    casadi_int c, k;
-    // Get sparsities
-    casadi_int ncol=sp_x[1];
-    const casadi_int *colind=sp_x+2, *row=sp_x+2+ncol+1;
-    // Add to diagonal entry
-    for (c=0; c<ncol; ++c) {
-      for (k=colind[c]; k<colind[c+1]; ++k) {
-        if (row[k]==c) {
-          x[k] += d[c];
-          break;
-        }
-      }
-    }
-  }
-
-  template<typename T1>
   struct casadi_qp_mem {
     // Cost
     T1 f;
@@ -1105,13 +1003,6 @@ namespace casadi {
     casadi_copy(ubx, nx_, ubz);
     casadi_copy(uba, na_, ubz+nx_);
 
-    if (verbose_) {
-      print_vector("lbz", lbz, nx_+na_);
-      print_vector("ubz", ubz, nx_+na_);
-      print_vector("nz_h", h, H_.nnz());
-      print_vector("nz_a", a, A_.nnz());
-    }
-
     // Pass initial guess
     casadi_copy(x0, nx_, z);
     casadi_copy(lam_x0, nx_, lam);
@@ -1192,20 +1083,8 @@ namespace casadi {
       casadi_qp_calc_dependent(&qp_m);
       // Make an active set change
       casadi_qp_flip(&qp_m, &index, &sign, r_index, r_sign);
-
-      // Debugging
-      if (verbose_) {
-        print_vector("z", z, nx_+na_);
-        print_vector("lam", lam, nx_+na_);
-      }
-
       // Form and factorize the KKT system
       casadi_qp_factorize(&qp_m);
-      if (verbose_) {
-        print_vector("nz_kkt", kkt, kkt_.nnz());
-        print_vector("nz_r", r, sp_r_.nnz());
-      }
-
       // Print iteration progress:
       if (print_iter_) {
         if (iter % 10 == 0) {
@@ -1216,37 +1095,26 @@ namespace casadi {
         print("%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %40s\n",
               iter, qp_m.sing, qp_m.f, qp_m.pr, qp_m.ipr, qp_m.du, qp_m.idu,
               qp_m.mina, qp_m.imina, qp_m.tau, qp_m.msg);
+        qp_m.msg[0] = '\0';
       }
-
       // Successful return if still no change
       if (index==-1) {
         flag = 0;
         break;
       }
-
       // Too many iterations?
-      if (iter>=max_iter_) {
+      if (++iter>max_iter_) {
         casadi_warning("Maximum number of iterations reached");
         flag = 1;
         break;
       }
-
       // Start new iteration
-      iter++;
-      qp_m.msg[0] = '\0';
-
       // Calculate search direction
       if (casadi_qp_calc_step(&qp_m, &r_index, &r_sign)) {
         casadi_warning("Failed to calculate search direction");
         flag = 1;
         break;
       }
-
-      if (verbose_) {
-        print_vector("dz", dz, nx_+na_);
-        print_vector("dlam", dlam, nx_+na_);
-      }
-
       // Line search in the calculated direction
       casadi_qp_linesearch(&qp_m, &index, &sign);
     }

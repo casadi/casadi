@@ -86,17 +86,12 @@ namespace casadi {
     const Options& get_options() const override { return options_;}
     ///@}
 
-    /** \brief  Initialize */
+    /** \brief Initialize */
     void init(const Dict& opts) override;
 
+    /** \brief Solve the QP */
     int eval(const double** arg, double** res,
              casadi_int* iw, double* w, void* mem) const override;
-
-    /** Print a vector */
-    void print_vector(const char* id, const double* x, casadi_int n) const;
-
-    /** Print an integer vector */
-    void print_ivector(const char* id, const casadi_int* x, casadi_int n) const;
 
     /// A documentation string
     static const std::string meta_doc;
