@@ -245,6 +245,8 @@ namespace casadi {
 
   template<typename T1>
   struct casadi_qp_mem {
+    // Cost
+    T1 f;
     // Dimensions
     casadi_int nx, na, nz;
     // Sparsity patterns
@@ -264,42 +266,50 @@ namespace casadi {
     char msg[40];
     // Print iterations
     int print_iter;
+    // Stepsize
+    T1 tau;
+    // Singularity
+    casadi_int sing;
+    // Smallest diagonal value for the QR factorization
+    T1 mina;
+    casadi_int imina;
+    // Primal and dual error, corresponding index
+    T1 pr, du;
+    casadi_int ipr, idu;
   };
 
   template<typename T1>
-  T1 casadi_qp_pr(casadi_qp_mem<T1>* m, casadi_int* ipr) {
+  void casadi_qp_pr(casadi_qp_mem<T1>* m) {
     // Calculate largest constraint violation
     casadi_int i;
-    T1 pr = 0;
-    *ipr = -1;
+    m->pr = 0;
+    m->ipr = -1;
     for (i=0; i<m->nz; ++i) {
-      if (m->z[i] > m->ubz[i]+pr) {
-        pr = m->z[i]-m->ubz[i];
-        *ipr = i;
-      } else if (m->z[i] < m->lbz[i]-pr) {
-        pr = m->lbz[i]-m->z[i];
-        *ipr = i;
+      if (m->z[i] > m->ubz[i]+m->pr) {
+        m->pr = m->z[i]-m->ubz[i];
+        m->ipr = i;
+      } else if (m->z[i] < m->lbz[i]-m->pr) {
+        m->pr = m->lbz[i]-m->z[i];
+        m->ipr = i;
       }
     }
-    return pr;
   }
 
   template<typename T1>
-  T1 casadi_qp_du(casadi_qp_mem<T1>* m, casadi_int* idu) {
+  void casadi_qp_du(casadi_qp_mem<T1>* m) {
     // Calculate largest constraint violation
     casadi_int i;
-    T1 du = 0;
-    *idu = -1;
+    m->du = 0;
+    m->idu = -1;
     for (i=0; i<m->nx; ++i) {
-      if (m->infeas[i] > du) {
-        du = m->infeas[i];
-        *idu = i;
-      } else if (m->infeas[i] < -du) {
-        du = -m->infeas[i];
-        *idu = i;
+      if (m->infeas[i] > m->du) {
+        m->du = m->infeas[i];
+        m->idu = i;
+      } else if (m->infeas[i] < -m->du) {
+        m->du = -m->infeas[i];
+        m->idu = i;
       }
     }
-    return du;
   }
 
   template<typename T1>
@@ -311,14 +321,13 @@ namespace casadi {
   }
 
   template<typename T1>
-  casadi_int casadi_qp_pr_index(casadi_qp_mem<T1>* m, casadi_int* sign,
-                                casadi_int ipr, T1 pr) {
+  casadi_int casadi_qp_pr_index(casadi_qp_mem<T1>* m, casadi_int* sign) {
     // Try to improve primal feasibility by adding a constraint
-    if (m->lam[ipr]==0.) {
+    if (m->lam[m->ipr]==0.) {
       // Add the most violating constraint
-      *sign = m->z[ipr]<m->lbz[ipr] ? -1 : 1;
-      casadi_qp_log(m, "Added %lld to reduce |pr|", ipr);
-      return ipr;
+      *sign = m->z[m->ipr]<m->lbz[m->ipr] ? -1 : 1;
+      casadi_qp_log(m, "Added %lld to reduce |pr|", m->ipr);
+      return m->ipr;
     }
     return -1;
   }
@@ -345,15 +354,14 @@ namespace casadi {
   }
 
   template<typename T1>
-  casadi_int casadi_qp_du_index(casadi_qp_mem<T1>* m, casadi_int* sign,
-                                casadi_int idu, T1 du) {
+  casadi_int casadi_qp_du_index(casadi_qp_mem<T1>* m, casadi_int* sign) {
     // Try to improve dual feasibility by removing a constraint
     // Local variables
     casadi_int best_ind, i;
     T1 best_w;
     // We need to increase or decrease infeas[idu]. Sensitivity:
     casadi_fill(m->w, m->nz, 0.);
-    m->w[idu] = m->infeas[idu]>0 ? -1. : 1.;
+    m->w[m->idu] = m->infeas[m->idu]>0 ? -1. : 1.;
     casadi_mv(m->nz_a, m->sp_a, m->w, m->w+m->nx, 0);
     // Find the best lam[i] to make zero
     best_ind = -1;
@@ -364,7 +372,7 @@ namespace casadi {
       // Make sure removing the constraint decreases dual infeasibility
       if (m->w[i]>0. ? m->lam[i]>=0. : m->lam[i]<=0.) continue;
       // Skip if maximum infeasibility increases
-      if (casadi_qp_du_check(m, i)>du) continue;
+      if (casadi_qp_du_check(m, i)>m->du) continue;
       // Check if best so far
       if (fabs(m->w[i])>best_w) {
         best_w = fabs(m->w[i]);
@@ -525,35 +533,35 @@ namespace casadi {
   }
 
   template<typename T1>
-  void casadi_qp_primal_blocking(casadi_qp_mem<T1>* m, T1 e, T1* tau,
+  void casadi_qp_primal_blocking(casadi_qp_mem<T1>* m, T1 e,
                                  casadi_int* index, casadi_int* sign) {
     // Local variables
     casadi_int i;
     T1 trial_z;
     // Check if violation with tau=0 and not improving
     if (casadi_qp_zero_blocking(m, e, index, sign)) {
-      *tau = 0.;
+      m->tau = 0.;
       return;
     }
     // Loop over all primal variables
     for (i=0; i<m->nz; ++i) {
       if (m->dz[i]==0.) continue; // Skip zero steps
       // Trial primal step
-      trial_z=m->z[i] + *tau*m->dz[i];
+      trial_z=m->z[i] + m->tau*m->dz[i];
       if (m->dz[i]<0 && trial_z<m->lbz[i]-e) {
         // Trial would increase maximum infeasibility
-        *tau = (m->lbz[i]-e-m->z[i])/m->dz[i];
+        m->tau = (m->lbz[i]-e-m->z[i])/m->dz[i];
         if (index) *index = m->lam[i]<0. ? -1 : i;
         if (sign) *sign = -1;
         casadi_qp_log(m, "Enforcing lbz[%lld]", i);
       } else if (m->dz[i]>0 && trial_z>m->ubz[i]+e) {
         // Trial would increase maximum infeasibility
-        *tau = (m->ubz[i]+e-m->z[i])/m->dz[i];
+        m->tau = (m->ubz[i]+e-m->z[i])/m->dz[i];
         if (index) *index = m->lam[i]>0. ? -1 : i;
         if (sign) *sign = 1;
         casadi_qp_log(m, "Enforcing ubz[%lld]", i);
       }
-      if (*tau<=0) return;
+      if (m->tau<=0) return;
     }
   }
 
@@ -598,7 +606,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  casadi_int casadi_qp_dual_blocking(casadi_qp_mem<T1>* m, T1 e, T1* tau) {
+  casadi_int casadi_qp_dual_blocking(casadi_qp_mem<T1>* m, T1 e) {
     // Local variables
     casadi_int i, n_tau, j, k, du_index;
     T1 tau_k, dtau, new_infeas, tau1;
@@ -606,7 +614,7 @@ namespace casadi {
     // Extract sparsities
     at_row = (at_colind = m->sp_at+2) + m->na + 1;
     // Dual feasibility is piecewise linear in tau. Get the intervals:
-    n_tau = casadi_qp_dual_breakpoints(m, m->w, m->iw, e, *tau);
+    n_tau = casadi_qp_dual_breakpoints(m, m->w, m->iw, e, m->tau);
     // No dual blocking yet
     du_index = -1;
     // How long step can we take without exceeding e?
@@ -619,15 +627,15 @@ namespace casadi {
         new_infeas = m->infeas[k]+dtau*m->tinfeas[k];
         if (fabs(new_infeas)>e) {
           tau1 = fmax(0., tau_k + ((new_infeas>0 ? e : -e)-m->infeas[k])/m->tinfeas[k]);
-          if (tau1 < *tau) {
+          if (tau1 < m->tau) {
             // Smallest tau found so far
-            *tau = tau1;
+            m->tau = tau1;
             du_index = k;
           }
         }
       }
       // Update infeasibility
-      casadi_axpy(m->nx, fmin(*tau - tau_k, dtau), m->tinfeas, m->infeas);
+      casadi_axpy(m->nx, fmin(m->tau - tau_k, dtau), m->tinfeas, m->infeas);
       // Stop here if dual blocking constraint
       if (du_index>=0) return du_index;
       // Continue to the next tau
@@ -653,14 +661,14 @@ namespace casadi {
   }
 
   template<typename T1>
-  void casadi_qp_take_step(casadi_qp_mem<T1>* m, T1 tau) {
+  void casadi_qp_take_step(casadi_qp_mem<T1>* m) {
     // Local variables
     casadi_int i;
     // Get current sign
     for (i=0; i<m->nz; ++i) m->iw[i] = m->lam[i]>0. ? 1 : m->lam[i]<0 ? -1 : 0;
     // Take primal-dual step
-    casadi_axpy(m->nz, tau, m->dz, m->z);
-    casadi_axpy(m->nz, tau, m->dlam, m->lam);
+    casadi_axpy(m->nz, m->tau, m->dz, m->z);
+    casadi_axpy(m->nz, m->tau, m->dlam, m->lam);
     // Update sign
     for (i=0; i<m->nz; ++i) {
       // Allow sign changes for certain components
@@ -736,22 +744,22 @@ namespace casadi {
   }
 
   template<typename T1>
-  casadi_int casadi_qp_factorize(casadi_qp_mem<T1>* m, T1 *mina, casadi_int* imina) {
+  void casadi_qp_factorize(casadi_qp_mem<T1>* m) {
     // Construct the KKT matrix
     casadi_qp_kkt(m);
     // QR factorization
     casadi_qr(m->sp_kkt, m->nz_kkt, m->w, m->sp_v, m->nz_v, m->sp_r,
               m->nz_r, m->beta, m->prinv, m->pc);
     // Check singularity
-    return casadi_qr_singular(mina, imina, m->nz_r, m->sp_r, m->pc, 1e-12);
+    m->sing = casadi_qr_singular(&m->mina, &m->imina, m->nz_r, m->sp_r, m->pc, 1e-12);
   }
 
   template<typename T1>
-  void casadi_qp_calc_step(casadi_qp_mem<T1>* m, casadi_int sing, casadi_int imina) {
+  void casadi_qp_calc_step(casadi_qp_mem<T1>* m) {
     // Local variables
     casadi_int i;
     // Calculate step in z[:nx] and lam[nx:]
-    if (!sing) {
+    if (!m->sing) {
       // Negative KKT residual
       casadi_qp_kkt_residual(m, m->dz);
       // Solve to get primal-dual step
@@ -759,7 +767,7 @@ namespace casadi {
                       m->prinv, m->pc, m->w);
     } else {
       // Get a linear combination of the columns in KKT
-      casadi_qr_colcomb(m->dz, m->nz_r, m->sp_r, m->pc, imina, 0);
+      casadi_qr_colcomb(m->dz, m->nz_r, m->sp_r, m->pc, m->imina, 0);
     }
     // Calculate change in Lagrangian gradient
     casadi_fill(m->dlam, m->nx, 0.);
@@ -802,7 +810,6 @@ namespace casadi {
     // Local variables
     int flag;
     casadi_int i, r_index, r_sign;
-    double fk;
     // Get input pointers
     const double *h, *g, *a, *lba, *uba, *lbx, *ubx, *x0, *lam_x0, *lam_a0;
     h = arg[CONIC_H];
@@ -927,39 +934,24 @@ namespace casadi {
     qp_m.DMIN = DMIN;
     qp_m.print_iter = print_iter_;
     qp_m.msg[0] = '\0';
-
-    // Stepsize
-    double tau = 0.;
-
-    // Smallest diagonal value for the QR factorization
-    double mina = -1;
-    casadi_int imina = -1;
-
-    // Primal and dual error, corresponding index
-    double pr=inf, du, e;
-    casadi_int ipr, idu;
-
-    // Singularity in the last iteration
-    casadi_int sing = 0; // set to avoid false positive warning
-
+    qp_m.tau = 0.;
+    qp_m.sing = 0; // set to avoid false positive warning
     // Constraint to be flipped, if any
     casadi_int sign=0, index=-2;
-
     // QP iterations
     casadi_int iter = 0;
+    // Acceptable error
+    double e;
     while (true) {
       // Calculate f
-      fk = casadi_bilin(h, H_, z, z)/2. + casadi_dot(nx_, z, g);
-
+      qp_m.f = casadi_bilin(h, H_, z, z)/2. + casadi_dot(nx_, z, g);
       // Calculate g
       casadi_fill(z+nx_, na_, 0.);
       casadi_mv(a, A_, z, z+nx_, 0);
-
       // Calculate gradient of the Lagrangian
       casadi_copy(g, nx_, infeas);
       casadi_mv(h, H_, z, infeas, 0);
       casadi_mv(a, A_, lam+nx_, infeas, 1);
-
       // Calculate lam(x) without changing the sign, dual infeasibility
       for (i=0; i<nx_; ++i) {
         if (lam[i]>0) {
@@ -969,25 +961,24 @@ namespace casadi {
         }
         infeas[i] += lam[i];
       }
-
       // Calculate primal and dual error
-      pr = casadi_qp_pr(&qp_m, &ipr);
-      du = casadi_qp_du(&qp_m, &idu);
+      casadi_qp_pr(&qp_m);
+      casadi_qp_du(&qp_m);
 
       // Improve primal or dual feasibility
-      if (index==-1 && tau>1e-16 && (ipr>=0 || idu>=0)) {
-        if (du_to_pr_*pr >= du) {
-          index = casadi_qp_pr_index(&qp_m, &sign, ipr, pr);
+      if (index==-1 && qp_m.tau>1e-16 && (qp_m.ipr>=0 || qp_m.idu>=0)) {
+        if (du_to_pr_*qp_m.pr >= qp_m.du) {
+          index = casadi_qp_pr_index(&qp_m, &sign);
         } else {
-          index = casadi_qp_du_index(&qp_m, &sign, idu, du);
+          index = casadi_qp_du_index(&qp_m, &sign);
         }
       }
 
       // If a constraint was added
       if (index>=0) {
         // Try to maintain non-singularity if possible
-        e = fmax(du_to_pr_*pr, du); // acceptable error
-        if (!sing && casadi_qp_flip_check(&qp_m, index, sign, &r_index, &r_sign, e)) {
+        e = fmax(du_to_pr_*qp_m.pr, qp_m.du); // acceptable error
+        if (!qp_m.sing && casadi_qp_flip_check(&qp_m, index, sign, &r_index, &r_sign, e)) {
           if (r_index>=0) {
             // Also flip r_index to avoid singularity
             lam[r_index] = r_sign==0 ? 0 : r_sign>0 ? DMIN : -DMIN;
@@ -1010,7 +1001,7 @@ namespace casadi {
       }
 
       // Form and factorize the KKT system
-      sing = casadi_qp_factorize(&qp_m, &mina, &imina);
+      casadi_qp_factorize(&qp_m);
       if (verbose_) {
         print_vector("nz_kkt", kkt, kkt_.nnz());
         print_vector("nz_r", r, sp_r_.nnz());
@@ -1024,8 +1015,8 @@ namespace casadi {
                 "min_R", "con", "last_tau", "Note");
         }
         print("%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %40s\n",
-              iter, sing, fk, pr, ipr, du, idu,
-              mina, imina, tau, qp_m.msg);
+              iter, qp_m.sing, qp_m.f, qp_m.pr, qp_m.ipr, qp_m.du, qp_m.idu,
+              qp_m.mina, qp_m.imina, qp_m.tau, qp_m.msg);
       }
 
       // Successful return if still no change
@@ -1050,7 +1041,7 @@ namespace casadi {
       index=-1;
 
       // Calculate search direction
-      casadi_qp_calc_step(&qp_m, sing, imina);
+      casadi_qp_calc_step(&qp_m);
       if (verbose_) {
         print_vector("dz", dz, nx_+na_);
         print_vector("dlam", dlam, nx_+na_);
@@ -1059,16 +1050,18 @@ namespace casadi {
       // Handle singularity
       r_index = -1;
       r_sign = 0;
-      if (sing) {
+      if (qp_m.sing) {
         // Change in pr, du in the search direction
         double tpr, tdu;
-        tpr = ipr<0 ? 0. : z[ipr]>ubz[ipr] ? dz[ipr]/pr : -dz[ipr]/pr;
-        tdu = idu<0 ? 0. : tinfeas[idu]/infeas[idu];
+        tpr = qp_m.ipr<0 ? 0.
+                         : z[qp_m.ipr]>ubz[qp_m.ipr] ? dz[qp_m.ipr]/qp_m.pr
+                                                     : -dz[qp_m.ipr]/qp_m.pr;
+        tdu = qp_m.idu<0 ? 0. : tinfeas[qp_m.idu]/infeas[qp_m.idu];
 
         // Change in max(pr, du) in the search direction
         double terr;
         bool pos_ok=true, neg_ok=true;
-        if (pr>du) {
+        if (qp_m.pr>qp_m.du) {
           // |pr|>|du|
           if (tpr<0) {
             neg_ok = false;
@@ -1076,7 +1069,7 @@ namespace casadi {
             pos_ok = false;
           }
           terr = tpr;
-        } else if (pr<du) {
+        } else if (qp_m.pr<qp_m.du) {
           // |pr|<|du|
           if (tdu<0) {
             neg_ok = false;
@@ -1105,8 +1098,8 @@ namespace casadi {
 
         // If primal error is dominating and constraint is active,
         // then only allow the multiplier to become larger
-        if (du_to_pr_*pr>=du && lam[ipr]!=0 && fabs(dlam[ipr])>1e-12) {
-          if ((lam[ipr]>0)==(dlam[ipr]>0)) {
+        if (du_to_pr_*qp_m.pr>=qp_m.du && lam[qp_m.ipr]!=0 && fabs(dlam[qp_m.ipr])>1e-12) {
+          if ((lam[qp_m.ipr]>0)==(dlam[qp_m.ipr]>0)) {
             neg_ok = false;
           } else {
             pos_ok = false;
@@ -1120,7 +1113,7 @@ namespace casadi {
 
         // Best flip
         double tau_test;
-        tau = inf;
+        qp_m.tau = inf;
 
         // For all nullspace vectors
         casadi_int nullity_tr, nulli, imina_tr;
@@ -1152,8 +1145,8 @@ namespace casadi {
                   // Only allow removing constraints if tau_test==0
                   if (fabs(tau_test)>=1e-16) {
                     // Check if best so far
-                    if (fabs(tau_test)<fabs(tau)) {
-                      tau = tau_test;
+                    if (fabs(tau_test)<fabs(qp_m.tau)) {
+                      qp_m.tau = tau_test;
                       r_index = i;
                       r_sign = -1;
                       casadi_qp_log(&qp_m, "Enforced lbz[%lld] for regularity", i);
@@ -1169,8 +1162,8 @@ namespace casadi {
                   // Only allow removing constraints if tau_test==0
                   if (fabs(tau_test)>=1e-16) {
                     // Check if best so far
-                    if (fabs(tau_test)<fabs(tau)) {
-                      tau = tau_test;
+                    if (fabs(tau_test)<fabs(qp_m.tau)) {
+                      qp_m.tau = tau_test;
                       r_index = i;
                       r_sign = 1;
                       casadi_qp_log(&qp_m, "Enforced ubz[%lld] for regularity", i);
@@ -1189,8 +1182,8 @@ namespace casadi {
 
                 if ((tau_test>0 && !pos_ok) || (tau_test<0 && !neg_ok)) continue;
                 // Check if best so far
-                if (fabs(tau_test)<fabs(tau)) {
-                  tau = tau_test;
+                if (fabs(tau_test)<fabs(qp_m.tau)) {
+                  qp_m.tau = tau_test;
                   r_index = i;
                   r_sign = 0;
                   casadi_qp_log(&qp_m, "Dropped %s[%lld] for regularity",
@@ -1207,17 +1200,17 @@ namespace casadi {
           break;
         }
         // Quick return if tau is zero
-        if (tau==0) continue;
+        if (qp_m.tau==0) continue;
         // Make sure that tau is positive
-        if (tau<0) {
+        if (qp_m.tau<0) {
           casadi_scal(nx_+na_, -1., dz);
           casadi_scal(nx_+na_, -1., dlam);
           casadi_scal(nx_, -1., tinfeas);
-          tau = -tau;
+          qp_m.tau = -qp_m.tau;
         }
       } else {
         // Maximum step size is one
-        tau = 1.;
+        qp_m.tau = 1.;
         // Quick return if stepsize is zero
         bool zero_step = true;
         for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dz[i]==0.;
@@ -1226,15 +1219,15 @@ namespace casadi {
       }
 
       // Find largest possible step without violating acceptable primal error
-      e = fmax(pr, du/du_to_pr_); // Acceptable primal error
-      casadi_qp_primal_blocking(&qp_m, e, &tau, &index, &sign);
+      e = fmax(qp_m.pr, qp_m.du/du_to_pr_); // Acceptable primal error
+      casadi_qp_primal_blocking(&qp_m, e, &index, &sign);
 
       // Find largest possible step without violated acceptable dual error
-      e = fmax(pr*du_to_pr_, du); // Acceptable dual error
-      if (casadi_qp_dual_blocking(&qp_m, e, &tau)>=0) index = -1;
+      e = fmax(qp_m.pr*du_to_pr_, qp_m.du); // Acceptable dual error
+      if (casadi_qp_dual_blocking(&qp_m, e)>=0) index = -1;
 
       // Take primal-dual step, avoiding accidental sign changes for lam
-      casadi_qp_take_step(&qp_m, tau);
+      casadi_qp_take_step(&qp_m);
 
       // Check if singular restoration index can be imposed
       if (r_index>=0 && (r_sign!=0 || casadi_qp_du_check(&qp_m, r_index)<=e)) {
@@ -1245,7 +1238,7 @@ namespace casadi {
     }
 
     // Calculate optimal cost
-    if (f) *f = fk;
+    if (f) *f = qp_m.f;
 
     // Get solution
     casadi_copy(z, nx_, x);
