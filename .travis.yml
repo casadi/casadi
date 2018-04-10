@@ -272,7 +272,7 @@ matrix:
         - mkdir build
         - pushd build
         - echo $casadi_build_flags
-        - bash -c "cmake $casadi_build_flags -DWITH_WERROR=ON -DWITH_PYTHON=ON -DWITH_JSON=ON .."
+        - bash -c "cmake $casadi_build_flags -DWITH_WERROR=ON -DWITH_PYTHON=ON -DWITH_JSON=ON -DWITH_EXTRA_CHECKS=OFF .."
 
         - #cmake $casadi_build_flags -DPYTHON_LIBRARY=$CMAKE_PYTHON_LIBRARY -DPYTHON_INCLUDE_DIR=$CMAKE_PYTHON_INCLUDE_DIR -DWITH_PYTHON=ON -DCMAKE_INSTALL_PREFIX=../python_install -DPYTHON_PREFIX=../python_install ..
         - osx_rpath
@@ -284,7 +284,7 @@ matrix:
         - otool -l /Users/travis/miniconda2/envs/condaenv_build/lib/python2.7/site-packages/casadi/_casadi.so
         - echo $DYLD_LIBRARY_PATH
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        - pushd test && make unittests_py || remote_access && popd
+        - pushd test && make unittests_py && popd
 
     - compiler: gcc
       os: linux
