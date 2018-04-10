@@ -1220,11 +1220,6 @@ namespace casadi {
       } else {
         // Maximum step size is one
         qp_m.tau = 1.;
-        // Quick return if stepsize is zero
-        bool zero_step = true;
-        for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dz[i]==0.;
-        for (i=0; i<nx_+na_ && zero_step; ++i) zero_step = dlam[i]==0.;
-        if (zero_step) continue;
       }
 
       // Find largest possible step without violating acceptable primal error
