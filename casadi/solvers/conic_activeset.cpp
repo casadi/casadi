@@ -554,13 +554,13 @@ namespace casadi {
       if (dz[i]<0 && trial_z<m->lbz[i]-e) {
         // Trial would increase maximum infeasibility
         *tau = (m->lbz[i]-e-m->z[i])/dz[i];
-        if (index) *index = i;
+        if (index) *index = m->lam[i]<0. ? -1 : i;
         if (sign) *sign = -1;
         casadi_qp_log(m, "Enforcing lbz[%lld]", i);
       } else if (dz[i]>0 && trial_z>m->ubz[i]+e) {
         // Trial would increase maximum infeasibility
         *tau = (m->ubz[i]+e-m->z[i])/dz[i];
-        if (index) *index = i;
+        if (index) *index = m->lam[i]>0. ? -1 : i;
         if (sign) *sign = 1;
         casadi_qp_log(m, "Enforcing ubz[%lld]", i);
       }
