@@ -818,6 +818,7 @@ namespace casadi {
     qp_m.nz_kkt = kkt;
     qp_m.DMIN = DMIN;
     qp_m.print_iter = print_iter_;
+    qp_m.msg[0] = '\0';
 
     // Stepsize
     double tau = 0.;
