@@ -263,6 +263,8 @@ namespace casadi {
     T1 dmin;
     // Infinity
     T1 inf;
+    // Dual to primal error
+    T1 du_to_pr;
     // Message buffer
     char msg[40];
     // Print iterations
@@ -756,45 +758,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  void casadi_qp_calc_step(casadi_qp_mem<T1>* m) {
-    // Local variables
-    casadi_int i;
-    // Calculate step in z[:nx] and lam[nx:]
-    if (!m->sing) {
-      // Negative KKT residual
-      casadi_qp_kkt_residual(m, m->dz);
-      // Solve to get primal-dual step
-      casadi_qr_solve(m->dz, 1, 1, m->sp_v, m->nz_v, m->sp_r, m->nz_r, m->beta,
-                      m->prinv, m->pc, m->w);
-    } else {
-      // Get a linear combination of the columns in KKT
-      casadi_qr_colcomb(m->dz, m->nz_r, m->sp_r, m->pc, m->imina, 0);
-    }
-    // Calculate change in Lagrangian gradient
-    casadi_fill(m->dlam, m->nx, 0.);
-    casadi_mv(m->nz_h, m->sp_h, m->dz, m->dlam, 0); // gradient of the objective
-    casadi_mv(m->nz_a, m->sp_a, m->dz+m->nx, m->dlam, 1); // gradient of the Lagrangian
-    // Step in lam[:nx]
-    casadi_scal(m->nx, -1., m->dlam);
-    // For inactive constraints, lam(x) step is zero
-    for (i=0; i<m->nx; ++i) if (m->lam[i]==0.) m->dlam[i] = 0.;
-    // Step in lam[nx:]
-    casadi_copy(m->dz+m->nx, m->na, m->dlam+m->nx);
-    // Step in z[nx:]
-    casadi_fill(m->dz+m->nx, m->na, 0.);
-    casadi_mv(m->nz_a, m->sp_a, m->dz, m->dz+m->nx, 0);
-    // Avoid steps that are nonzero due to numerics
-    for (i=0; i<m->nz; ++i) if (fabs(m->dz[i])<1e-14) m->dz[i] = 0.;
-    // Tangent of the dual infeasibility at tau=0
-    casadi_fill(m->tinfeas, m->nx, 0.);
-    casadi_mv(m->nz_h, m->sp_h, m->dz, m->tinfeas, 0);
-    casadi_mv(m->nz_a, m->sp_a, m->dlam+m->nx, m->tinfeas, 1);
-    casadi_axpy(m->nx, 1., m->dlam, m->tinfeas);
-  }
-
-  template<typename T1>
-  int casadi_qp_calc_tau(casadi_qp_mem<T1>* m, casadi_int* r_index, casadi_int* r_sign,
-                         T1 du_to_pr) {
+  int casadi_qp_calc_tau(casadi_qp_mem<T1>* m, casadi_int* r_index, casadi_int* r_sign) {
     // Local variables
     T1 tpr, tdu, terr, tau_test, minat_tr;
     int pos_ok, neg_ok;
@@ -849,7 +813,7 @@ namespace casadi {
     }
     // If primal error is dominating and constraint is active,
     // then only allow the multiplier to become larger
-    if (du_to_pr*m->pr>=m->du && m->lam[m->ipr]!=0 && fabs(m->dlam[m->ipr])>1e-12) {
+    if (m->du_to_pr*m->pr>=m->du && m->lam[m->ipr]!=0 && fabs(m->dlam[m->ipr])>1e-12) {
       if ((m->lam[m->ipr]>0)==(m->dlam[m->ipr]>0)) {
         neg_ok = 0;
       } else {
@@ -947,6 +911,45 @@ namespace casadi {
       m->tau = -m->tau;
     }
     return 0;
+  }
+
+  template<typename T1>
+  int casadi_qp_calc_step(casadi_qp_mem<T1>* m, casadi_int* r_index, casadi_int* r_sign) {
+    // Local variables
+    casadi_int i;
+    // Calculate step in z[:nx] and lam[nx:]
+    if (!m->sing) {
+      // Negative KKT residual
+      casadi_qp_kkt_residual(m, m->dz);
+      // Solve to get primal-dual step
+      casadi_qr_solve(m->dz, 1, 1, m->sp_v, m->nz_v, m->sp_r, m->nz_r, m->beta,
+                      m->prinv, m->pc, m->w);
+    } else {
+      // Get a linear combination of the columns in KKT
+      casadi_qr_colcomb(m->dz, m->nz_r, m->sp_r, m->pc, m->imina, 0);
+    }
+    // Calculate change in Lagrangian gradient
+    casadi_fill(m->dlam, m->nx, 0.);
+    casadi_mv(m->nz_h, m->sp_h, m->dz, m->dlam, 0); // gradient of the objective
+    casadi_mv(m->nz_a, m->sp_a, m->dz+m->nx, m->dlam, 1); // gradient of the Lagrangian
+    // Step in lam[:nx]
+    casadi_scal(m->nx, -1., m->dlam);
+    // For inactive constraints, lam(x) step is zero
+    for (i=0; i<m->nx; ++i) if (m->lam[i]==0.) m->dlam[i] = 0.;
+    // Step in lam[nx:]
+    casadi_copy(m->dz+m->nx, m->na, m->dlam+m->nx);
+    // Step in z[nx:]
+    casadi_fill(m->dz+m->nx, m->na, 0.);
+    casadi_mv(m->nz_a, m->sp_a, m->dz, m->dz+m->nx, 0);
+    // Avoid steps that are nonzero due to numerics
+    for (i=0; i<m->nz; ++i) if (fabs(m->dz[i])<1e-14) m->dz[i] = 0.;
+    // Tangent of the dual infeasibility at tau=0
+    casadi_fill(m->tinfeas, m->nx, 0.);
+    casadi_mv(m->nz_h, m->sp_h, m->dz, m->tinfeas, 0);
+    casadi_mv(m->nz_a, m->sp_a, m->dlam+m->nx, m->tinfeas, 1);
+    casadi_axpy(m->nx, 1., m->dlam, m->tinfeas);
+    // Calculate step length
+    return casadi_qp_calc_tau(m, r_index, r_sign);
   }
 
   template<typename T1>
@@ -1124,6 +1127,7 @@ namespace casadi {
     qp_m.msg[0] = '\0';
     qp_m.tau = 0.;
     qp_m.sing = 0; // set to avoid false positive warning
+    qp_m.du_to_pr = du_to_pr_;
     // Constraint to be flipped, if any
     casadi_int sign=0, index=-2;
     // QP iterations
@@ -1210,17 +1214,15 @@ namespace casadi {
       index=-1;
 
       // Calculate search direction
-      casadi_qp_calc_step(&qp_m);
+      if (casadi_qp_calc_step(&qp_m, &r_index, &r_sign)) {
+        casadi_warning("Failed to calculate search direction");
+        flag = 1;
+        break;
+      }
+
       if (verbose_) {
         print_vector("dz", dz, nx_+na_);
         print_vector("dlam", dlam, nx_+na_);
-      }
-
-      // Calculate step length
-      if (casadi_qp_calc_tau(&qp_m, &r_index, &r_sign, du_to_pr_)) {
-        casadi_warning("Cannot restore feasibility");
-        flag = 1;
-        break;
       }
 
       // Find largest possible step without violating acceptable primal error
