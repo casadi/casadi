@@ -327,20 +327,13 @@ namespace casadi {
 
   template<typename T1>
   casadi_int casadi_qp_pr_index(casadi_qp_mem<T1>* m, casadi_int* sign,
-                                casadi_int ipr, T1 pr, T1 old_pr) {
+                                casadi_int ipr, T1 pr) {
     // Try to improve primal feasibility by adding a constraint
     if (m->lam[ipr]==0.) {
       // Add the most violating constraint
       *sign = m->z[ipr]<m->lbz[ipr] ? -1 : 1;
       casadi_qp_log(m, "Added %lld to reduce |pr|", ipr);
       return ipr;
-    } else {
-      // After a full-step, lam[ipr] should be zero
-      if (pr < 0.5*old_pr) {
-        // Keep iterating while error is decreasing at a fast-linear rate
-        casadi_qp_log(m, "|pr| refinement. Rate: %g", pr/old_pr);
-        return -2;
-      }
     }
     return -1;
   }
@@ -839,7 +832,7 @@ namespace casadi {
     casadi_int imina = -1;
 
     // Primal and dual error, corresponding index
-    double pr=inf, old_pr, du;
+    double pr=inf, du;
     casadi_int ipr, idu;
 
     // Singularity in the last iteration
@@ -874,14 +867,13 @@ namespace casadi {
       }
 
       // Calculate primal and dual error
-      old_pr = pr;
       pr = casadi_qp_pr(&qp_m, &ipr);
       du = casadi_qp_du(&qp_m, &idu);
 
       // Improve primal or dual feasibility
       if (index==-1 && tau>1e-16 && (ipr>=0 || idu>=0)) {
         if (du_to_pr_*pr >= du) {
-          index = casadi_qp_pr_index(&qp_m, &sign, ipr, pr, old_pr);
+          index = casadi_qp_pr_index(&qp_m, &sign, ipr, pr);
         } else {
           index = casadi_qp_du_index(&qp_m, &sign, idu, du);
         }
