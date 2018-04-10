@@ -28,7 +28,16 @@
 #include "casadi_misc.hpp"
 #ifdef HAVE_MKSTEMPS
 #include <unistd.h>
-#endif
+#else // HAVE_MKSTEMPS
+#ifdef _WIN32
+#include <random>
+#include <share.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <chrono>
+#endif //_WIN32
+#endif // HAVE_MKSTEMPS
 using namespace std;
 
 namespace casadi {
@@ -227,6 +236,41 @@ namespace casadi {
     return ss.str();
   }
 
+#if !defined(HAVE_MKSTEMPS) && defined(_WIN32)
+int simple_mkstemps(const std::string& prefix, const std::string& suffix, std::string &result) {
+    // Characters available for inventing filenames
+    std::string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+    int char_size = chars.size();
+
+    // How many tries do we allow?
+    casadi_int max_tries = std::numeric_limits<int>::max();
+
+    // How long should the ID be to cover all tries?
+    double max_tries_d = static_cast<double>(max_tries);
+    double char_size_d = static_cast<double>(char_size);
+    int id_size = lround(ceil(log(max_tries_d)/log(char_size_d)));
+
+    // Random number generator
+    std::default_random_engine rng(std::chrono::system_clock::now().time_since_epoch().count());
+    std::uniform_int_distribution<> r(0, char_size-1);
+
+    for (casadi_int i=0;i<max_tries;++i) {
+      result = prefix;
+      for (casadi_int j=0;j<id_size;++j) {
+        result += chars.at(r(rng));
+      }
+      result += suffix;
+
+      int fd = _sopen(result.c_str(),
+        _O_BINARY | _O_CREAT | _O_EXCL | _O_RDWR, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+      // Could add _O_TEMPORARY, but then no possiblity of !cleanup_
+
+      if (fd != -1) return fd;
+      if (fd == -1 && errno != EEXIST) return -1;
+    }
+  }
+#endif
+
   std::string temporary_file(const std::string& prefix, const std::string& suffix) {
     #ifdef HAVE_MKSTEMPS
     // Preferred solution
@@ -236,8 +280,16 @@ namespace casadi {
     }
     return ret;
     #else // HAVE_MKSTEMPS
+    #ifdef _WIN32
+    std::string ret;
+    if (simple_mkstemps(prefix, suffix, ret)==-1) {
+      casadi_error("Failed to create temporary file: '" + ret + "'");
+    }
+    return ret;
+    #else // _WIN32
     // Fallback, may result in deprecation warnings
     return prefix + string(tmpnam(nullptr)) + suffix;
+    #endif // _WIN32
     #endif // HAVE_MKSTEMPS
   }
 
