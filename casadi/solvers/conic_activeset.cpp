@@ -61,6 +61,9 @@ namespace casadi {
       {"tol",
        {OT_DOUBLE,
         "Tolerance [1e-8]."}},
+      {"du_to_pr",
+       {OT_DOUBLE,
+        "How much larger dual than primal error is acceptable [1000]"}},
       {"print_header",
        {OT_BOOL,
         "Print header [true]."}},
@@ -79,6 +82,7 @@ namespace casadi {
     tol_ = 1e-8;
     print_iter_ = true;
     print_header_ = true;
+    du_to_pr_ = 1000.;
 
     // Read user options
     for (auto&& op : opts) {
@@ -90,6 +94,8 @@ namespace casadi {
         print_iter_ = op.second;
       } else if (op.first=="print_header") {
         print_header_ = op.second;
+      } else if (op.first=="du_to_pr") {
+        du_to_pr_ = op.second;
       }
     }
 
@@ -869,7 +875,7 @@ namespace casadi {
 
       // Improve primal or dual feasibility
       if (index==-1 && tau>1e-16 && (ipr>=0 || idu>=0)) {
-        if (pr>=du) {
+        if (du_to_pr_*pr >= du) {
           index = casadi_qp_pr_index(&qp_m, &sign, ipr, pr, old_pr);
         } else {
           index = casadi_qp_du_index(&qp_m, &sign, idu, du);
@@ -917,8 +923,8 @@ namespace casadi {
                 // Better than negative slack, worse than positive slack
                 new_slack = 0;
               } else {
-                // Skip if flipping would result in too large |du|
-                if (casadi_qp_du_check(&qp_m, i)>fmax(pr, du)) continue;
+                // Commented out: Skip if flipping would result in too large |du|
+                //if (casadi_qp_du_check(&qp_m, i)>fmax(pr, du)) continue;
                 // Slack to the bound
                 new_slack = lam[i]>0 ? ubz[i]-z[i] : z[i]-lbz[i];
                 new_sign = 0;
@@ -1241,7 +1247,7 @@ namespace casadi {
       }
 
       // Acceptable primal error
-      double e = fmax(pr, du/2);
+      double e = fmax(pr, du/du_to_pr_);
 
       // Check if violation with tau=0 and not improving
       if (casadi_qp_zero_blocking(&qp_m, e, dz, &index, &sign)) {
@@ -1253,7 +1259,7 @@ namespace casadi {
       casadi_qp_primal_blocking(&qp_m, e, dz, &tau, &index, &sign);
 
       // Acceptable dual error
-      e = fmax(pr/2, du);
+      e = fmax(pr*du_to_pr_, du);
 
       // Find largest possible step without violated acceptable dual error
       if (casadi_qp_dual_blocking(&qp_m, e, dlam, &tau)>=0) index = -1;
