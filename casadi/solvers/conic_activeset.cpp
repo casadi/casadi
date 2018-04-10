@@ -993,6 +993,48 @@ namespace casadi {
     casadi_qp_take_step(m);
   }
 
+  template<typename T1>
+  void casadi_qp_flip(casadi_qp_mem<T1>* m, casadi_int *index, casadi_int *sign,
+                                            casadi_int r_index, casadi_int r_sign) {
+    // Local variables
+    T1 e;
+    // acceptable dual error
+    e = fmax(m->du_to_pr*m->pr, m->du);
+    // Try to restore regularity if possible
+    if (r_index>=0 && (r_sign!=0 || casadi_qp_du_check(m, r_index)<=e)) {
+      *index = r_index;
+      *sign = r_sign;
+      casadi_qp_log(m, "%lld->%lld for regularity", *index, *sign);
+    }
+    // Improve primal or dual feasibility
+    if (*index==-1 && m->tau>1e-16 && (m->ipr>=0 || m->idu>=0)) {
+      if (m->du_to_pr*m->pr >= m->du) {
+        // Try to improve primal feasibility
+        *index = casadi_qp_pr_index(m, sign);
+      } else {
+        // Try to improve dual feasibility
+        *index = casadi_qp_du_index(m, sign);
+      }
+    }
+    // If a constraint was added
+    if (*index>=0) {
+      // Try to maintain non-singularity if possible
+      if (!m->sing && casadi_qp_flip_check(m, *index, *sign, &r_index, &r_sign, e)) {
+        if (r_index>=0) {
+          // Also flip r_index to avoid singularity
+          m->lam[r_index] = r_sign==0 ? 0 : r_sign>0 ? m->dmin : -m->dmin;
+          casadi_qp_log(m, "%lld->%lld, %lld->%lld", *index, *sign, r_index, r_sign);
+        }
+      }
+      m->lam[*index] = *sign==0 ? 0 : *sign>0 ? m->dmin : -m->dmin;
+      // Recalculate primal and dual infeasibility
+      casadi_qp_calc_dependent(m);
+      // Reset index
+      *index=-2;
+    }
+  }
+
+
   int ConicActiveSet::init_mem(void* mem) const {
     //auto m = static_cast<ConicActiveSetMemory*>(mem);
     return 0;
@@ -1143,46 +1185,13 @@ namespace casadi {
     qp_m.du_to_pr = du_to_pr_;
     // Constraint to be flipped, if any
     casadi_int index=-2, sign=0, r_index=-2, r_sign=0;
-    double e;
     // QP iterations
     casadi_int iter = 0;
     while (true) {
       // Calculate dependent quantities
       casadi_qp_calc_dependent(&qp_m);
-      // acceptable dual error
-      e = fmax(du_to_pr_*qp_m.pr, qp_m.du);
-      // Make active set change
-      if (r_index>=0 && (r_sign!=0 || casadi_qp_du_check(&qp_m, r_index)<=e)) {
-        // Try to restore regularity
-        index = r_index;
-        sign = r_sign;
-        casadi_qp_log(&qp_m, "%lld->%lld for regularity", index, sign);
-      } else if (index==-1 && qp_m.tau>1e-16 && (qp_m.ipr>=0 || qp_m.idu>=0)) {
-        if (du_to_pr_*qp_m.pr >= qp_m.du) {
-          // Try to improve primal feasibility
-          index = casadi_qp_pr_index(&qp_m, &sign);
-        } else {
-          // Try to improve dual feasibility
-          index = casadi_qp_du_index(&qp_m, &sign);
-        }
-      }
-      // If a constraint was added
-      if (index>=0) {
-        // Try to maintain non-singularity if possible
-        if (!qp_m.sing && casadi_qp_flip_check(&qp_m, index, sign, &r_index, &r_sign, e)) {
-          if (r_index>=0) {
-            // Also flip r_index to avoid singularity
-            lam[r_index] = r_sign==0 ? 0 : r_sign>0 ? DMIN : -DMIN;
-            casadi_qp_log(&qp_m, "%lld->%lld, %lld->%lld",
-                          index, sign, r_index, r_sign);
-          } else if (verbose_) {
-            print("Note: Singularity about to happen\n");
-          }
-        }
-        lam[index] = sign==0 ? 0 : sign>0 ? DMIN : -DMIN;
-        // Recalculate primal and dual infeasibility
-        casadi_qp_calc_dependent(&qp_m);
-      }
+      // Make an active set change
+      casadi_qp_flip(&qp_m, &index, &sign, r_index, r_sign);
 
       // Debugging
       if (verbose_) {
