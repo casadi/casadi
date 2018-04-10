@@ -142,7 +142,8 @@ namespace casadi {
   typedef void (*free_mem_t)(void* mem);
   typedef int (*work_t)(casadi_int* sz_arg, casadi_int* sz_res,
     casadi_int* sz_iw, casadi_int* sz_w);
-  typedef int (*eval_t)(const double** arg, double** res, casadi_int* iw, double* w, void* mem);
+  typedef int (*eval_t)(const double** arg, double** res,
+                        casadi_int* iw, double* w, void* mem);
   ///@}
 
   /// String representation, any type
