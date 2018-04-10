@@ -28,7 +28,7 @@ from types import *
 from helpers import *
 
 conics = []
-'''
+
 if has_nlpsol("ipopt"):
   ipopt_options = {"fixed_variable_treatment":"relax_bounds",
                    "jac_c_constant":"yes",
@@ -62,7 +62,7 @@ if has_conic("cplex"):
 
 if has_conic("clp"):
   conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False}))
-'''
+
 if has_conic("activeset"):
   conics.append(("activeset",dict(max_iter=20),{"quadratic": True, "dual": True, "soc": False}))
 
