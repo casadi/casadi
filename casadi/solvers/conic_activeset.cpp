@@ -210,24 +210,6 @@ namespace casadi {
     print("]\n");
   }
 
-  void ConicActiveSet::
-  print_signs(const char* id, const double* x, casadi_int n) const {
-    print("%s: [", id);
-    for (casadi_int i=0; i<n; ++i) {
-      print(x[i]==0 ? "0" : x[i]>0 ? "+" : "-");
-    }
-    print("]\n");
-  }
-
-  void print_matrix(const char* id, const double* x, const casadi_int* sp_x) {
-    cout << id << ": ";
-    Sparsity sp = Sparsity::compressed(sp_x);
-    vector<double> nz(sp.nnz(), 0.);
-    if (x!=0) casadi_copy(x, nz.size(), get_ptr(nz));
-    DM(sp, nz).print_dense(cout, false);
-    cout << endl;
-  }
-
   template<typename T1>
   void casadi_col_scal(T1* x, const casadi_int* sp_x, const T1* d) {
     // Local variables
@@ -749,9 +731,19 @@ namespace casadi {
         *r_sign = new_sign;
       }
     }
-
     // Accept, if any
     return *r_index>=0 ? 0 : 1;
+  }
+
+  template<typename T1>
+  casadi_int casadi_qp_factorize(casadi_qp_mem<T1>* m, T1 *mina, casadi_int* imina) {
+    // Construct the KKT matrix
+    casadi_qp_kkt(m);
+    // QR factorization
+    casadi_qr(m->sp_kkt, m->nz_kkt, m->w, m->sp_v, m->nz_v, m->sp_r,
+              m->nz_r, m->beta, m->prinv, m->pc);
+    // Check singularity
+    return casadi_qr_singular(mina, imina, m->nz_r, m->sp_r, m->pc, 1e-12);
   }
 
   int ConicActiveSet::init_mem(void* mem) const {
@@ -828,8 +820,8 @@ namespace casadi {
     if (verbose_) {
       print_vector("lbz", lbz, nx_+na_);
       print_vector("ubz", ubz, nx_+na_);
-      print_matrix("H", h, H_);
-      print_matrix("A", a, A_);
+      print_vector("nz_h", h, H_.nnz());
+      print_vector("nz_a", a, A_.nnz());
     }
 
     // Pass initial guess
@@ -978,34 +970,25 @@ namespace casadi {
       if (verbose_) {
         print_vector("z", z, nx_+na_);
         print_vector("lam", lam, nx_+na_);
-        print_signs("sign(lam)", lam, nx_+na_);
       }
 
-      // Construct the KKT matrix
-      casadi_qp_kkt(&qp_m);
+      // Form and factorize the KKT system
+      sing = casadi_qp_factorize(&qp_m, &mina, &imina);
       if (verbose_) {
-        print_matrix("KKT", kkt, kkt_);
+        print_vector("nz_kkt", kkt, kkt_.nnz());
+        print_vector("nz_r", r, sp_r_.nnz());
       }
-
-      // QR factorization
-      casadi_qr(kkt_, kkt, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
-      if (verbose_) {
-        print_matrix("QR(R)", r, sp_r_);
-      }
-
-      // Check singularity
-      sing = casadi_qr_singular(&mina, &imina, r, sp_r_, get_ptr(pc_), 1e-12);
 
       // Print iteration progress:
       if (print_iter_) {
         if (iter % 10 == 0) {
-          print("%5s %5s %10s %10s %6s %10s %6s %10s %10s %40s\n",
+          print("%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %40s\n",
                 "Iter", "Sing", "fk", "|pr|", "con", "|du|", "var",
-                "mindiag(R)", "last tau", "Note");
+                "min_R", "con", "last_tau", "Note");
         }
-        print("%5d %5d %10.2g %10.2g %6d %10.2g %6d %10.2g %10.2g %40s\n",
+        print("%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %40s\n",
               iter, sing, fk, pr, ipr, du, idu,
-              mina, tau, qp_m.msg);
+              mina, imina, tau, qp_m.msg);
       }
 
       // Successful return if still no change
