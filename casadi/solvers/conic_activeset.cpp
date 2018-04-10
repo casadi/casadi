@@ -261,6 +261,8 @@ namespace casadi {
     T1 *nz_at, *nz_kkt, *beta, *nz_v, *nz_r;
     // Smallest nonzero number
     T1 dmin;
+    // Infinity
+    T1 inf;
     // Message buffer
     char msg[40];
     // Print iterations
@@ -791,6 +793,163 @@ namespace casadi {
   }
 
   template<typename T1>
+  int casadi_qp_calc_tau(casadi_qp_mem<T1>* m, casadi_int* r_index, casadi_int* r_sign,
+                         T1 du_to_pr) {
+    // Local variables
+    T1 tpr, tdu, terr, tau_test, minat_tr;
+    int pos_ok, neg_ok;
+    casadi_int nnz_kkt, nullity_tr, nulli, imina_tr, i;
+    // Reset r_index, r_sign, quick return if non-singular
+    *r_index = -1;
+    *r_sign = 0;
+    if (!m->sing) {
+      m->tau = 1.;
+      return 0;
+    }
+    // Change in pr, du in the search direction
+    tpr = m->ipr<0 ? 0.
+                   : m->z[m->ipr]>m->ubz[m->ipr] ? m->dz[m->ipr]/m->pr
+                                                 : -m->dz[m->ipr]/m->pr;
+    tdu = m->idu<0 ? 0. : m->tinfeas[m->idu]/m->infeas[m->idu];
+    // Change in max(pr, du) in the search direction
+    pos_ok=1, neg_ok=1;
+    if (m->pr>m->du) {
+      // |pr|>|du|
+      if (tpr<0) {
+        neg_ok = 0;
+      } else if (tpr>0) {
+        pos_ok = 0;
+      }
+      terr = tpr;
+    } else if (m->pr<m->du) {
+      // |pr|<|du|
+      if (tdu<0) {
+        neg_ok = 0;
+      } else if (tdu>0) {
+        pos_ok = 0;
+      }
+      terr = tdu;
+    } else {
+      // |pr|==|du|
+      if ((tpr>0 && tdu<0) || (tpr<0 && tdu>0)) {
+        // |pr|==|du| cannot be decreased along the search direction
+        pos_ok = neg_ok = 0;
+        terr = 0;
+      } else if (fmin(tpr, tdu)<0) {
+        // |pr|==|du| decreases for positive tau
+        neg_ok = 0;
+        terr = fmax(tpr, tdu);
+      } else if (fmax(tpr, tdu)>0) {
+        // |pr|==|du| decreases for negative tau
+        pos_ok = 0;
+        terr = fmin(tpr, tdu);
+      } else {
+        terr = 0;
+      }
+    }
+    // If primal error is dominating and constraint is active,
+    // then only allow the multiplier to become larger
+    if (du_to_pr*m->pr>=m->du && m->lam[m->ipr]!=0 && fabs(m->dlam[m->ipr])>1e-12) {
+      if ((m->lam[m->ipr]>0)==(m->dlam[m->ipr]>0)) {
+        neg_ok = 0;
+      } else {
+        pos_ok = 0;
+      }
+    }
+    // QR factorization of the transpose
+    casadi_trans(m->nz_kkt, m->sp_kkt, m->nz_v, m->sp_kkt, m->iw);
+    nnz_kkt = m->sp_kkt[2+m->nz]; // kkt_colind[nz]
+    casadi_copy(m->nz_v, nnz_kkt, m->nz_kkt);
+    casadi_qr(m->sp_kkt, m->nz_kkt, m->w, m->sp_v, m->nz_v, m->sp_r, m->nz_r,
+              m->beta, m->prinv, m->pc);
+    // Best flip
+    m->tau = m->inf;
+    // For all nullspace vectors
+    nullity_tr = casadi_qr_singular(&minat_tr, &imina_tr, m->nz_r, m->sp_r,
+                                    m->pc, 1e-12);
+    for (nulli=0; nulli<nullity_tr; ++nulli) {
+      // Get a linear combination of the rows in kkt
+      casadi_qr_colcomb(m->w, m->nz_r, m->sp_r, m->pc, imina_tr, nulli);
+      // Look for the best constraint for increasing rank
+      for (i=0; i<m->nz; ++i) {
+        // Check if old column can be removed without decreasing rank
+        if (fabs(i<m->nx ? m->dz[i] : m->dlam[i])<1e-12) continue;
+        // If dot(w, kkt(i)-kkt_flipped(i))==0, rank won't increase
+        if (fabs(casadi_qp_kkt_dot(m, m->w, i, 0)
+                 - casadi_qp_kkt_dot(m, m->w, i, 1))<1e-12) continue;
+        // Is constraint active?
+        if (m->lam[i]==0.) {
+          // Make sure that step is nonzero
+          if (fabs(m->dz[i])<1e-12) continue;
+          // Step needed to bring z to lower bound
+          if (!m->neverlower[i]) {
+            tau_test = (m->lbz[i]-m->z[i])/m->dz[i];
+            // Ensure nonincrease in max(pr, du)
+            if (!((terr>0. && tau_test>0.) || (terr<0. && tau_test<0.))) {
+              // Only allow removing constraints if tau_test==0
+              if (fabs(tau_test)>=1e-16) {
+                // Check if best so far
+                if (fabs(tau_test)<fabs(m->tau)) {
+                  m->tau = tau_test;
+                  *r_index = i;
+                  *r_sign = -1;
+                  casadi_qp_log(m, "Enforced lbz[%lld] for regularity", i);
+                }
+              }
+            }
+          }
+          // Step needed to bring z to upper bound
+          if (!m->neverupper[i]) {
+            tau_test = (m->ubz[i]-m->z[i])/m->dz[i];
+            // Ensure nonincrease in max(pr, du)
+            if (!((terr>0. && tau_test>0.) || (terr<0. && tau_test<0.))) {
+              // Only allow removing constraints if tau_test==0
+              if (fabs(tau_test)>=1e-16) {
+                // Check if best so far
+                if (fabs(tau_test)<fabs(m->tau)) {
+                  m->tau = tau_test;
+                  *r_index = i;
+                  *r_sign = 1;
+                  casadi_qp_log(m, "Enforced ubz[%lld] for regularity", i);
+                }
+              }
+            }
+          }
+        } else {
+          // Make sure that step is nonzero
+          if (fabs(m->dlam[i])<1e-12) continue;
+          // Step needed to bring lam to zero
+          if (!m->neverzero[i]) {
+            tau_test = -m->lam[i]/m->dlam[i];
+            // Ensure nonincrease in max(pr, du)
+            if ((terr>0. && tau_test>0.) || (terr<0. && tau_test<0.)) continue;
+            // Make sure direction is permitted
+            if ((tau_test>0 && !pos_ok) || (tau_test<0 && !neg_ok)) continue;
+            // Check if best so far
+            if (fabs(tau_test)<fabs(m->tau)) {
+              m->tau = tau_test;
+              *r_index = i;
+              *r_sign = 0;
+              casadi_qp_log(m, "Dropped %s[%lld] for regularity",
+                     m->lam[i]>0 ? "lbz" : "ubz", i);
+            }
+          }
+        }
+      }
+    }
+    // Can we restore feasibility?
+    if (*r_index<0) return 1;
+    // Make sure that tau is nonnegative
+    if (m->tau<0) {
+      casadi_scal(m->nz, -1., m->dz);
+      casadi_scal(m->nz, -1., m->dlam);
+      casadi_scal(m->nx, -1., m->tinfeas);
+      m->tau = -m->tau;
+    }
+    return 0;
+  }
+
+  template<typename T1>
   void casadi_qp_calc_dependent(casadi_qp_mem<T1>* m) {
     // Local variables
     casadi_int i;
@@ -960,6 +1119,7 @@ namespace casadi {
     qp_m.pc = get_ptr(pc_);
     // Misc
     qp_m.dmin = DMIN;
+    qp_m.inf = inf;
     qp_m.print_iter = print_iter_;
     qp_m.msg[0] = '\0';
     qp_m.tau = 0.;
@@ -1056,170 +1216,11 @@ namespace casadi {
         print_vector("dlam", dlam, nx_+na_);
       }
 
-      // Handle singularity
-      r_index = -1;
-      r_sign = 0;
-      if (qp_m.sing) {
-        // Change in pr, du in the search direction
-        double tpr, tdu;
-        tpr = qp_m.ipr<0 ? 0.
-                         : z[qp_m.ipr]>ubz[qp_m.ipr] ? dz[qp_m.ipr]/qp_m.pr
-                                                     : -dz[qp_m.ipr]/qp_m.pr;
-        tdu = qp_m.idu<0 ? 0. : tinfeas[qp_m.idu]/infeas[qp_m.idu];
-
-        // Change in max(pr, du) in the search direction
-        double terr;
-        bool pos_ok=true, neg_ok=true;
-        if (qp_m.pr>qp_m.du) {
-          // |pr|>|du|
-          if (tpr<0) {
-            neg_ok = false;
-          } else if (tpr>0) {
-            pos_ok = false;
-          }
-          terr = tpr;
-        } else if (qp_m.pr<qp_m.du) {
-          // |pr|<|du|
-          if (tdu<0) {
-            neg_ok = false;
-          } else if (tdu>0) {
-            pos_ok = false;
-          }
-          terr = tdu;
-        } else {
-          // |pr|==|du|
-          if ((tpr>0 && tdu<0) || (tpr<0 && tdu>0)) {
-            // |pr|==|du| cannot be decreased along the search direction
-            pos_ok = neg_ok = false;
-            terr = 0;
-          } else if (fmin(tpr, tdu)<0) {
-            // |pr|==|du| decreases for positive tau
-            neg_ok = false;
-            terr = fmax(tpr, tdu);
-          } else if (fmax(tpr, tdu)>0) {
-            // |pr|==|du| decreases for negative tau
-            pos_ok = false;
-            terr = fmin(tpr, tdu);
-          } else {
-            terr = 0;
-          }
-        }
-
-        // If primal error is dominating and constraint is active,
-        // then only allow the multiplier to become larger
-        if (du_to_pr_*qp_m.pr>=qp_m.du && lam[qp_m.ipr]!=0 && fabs(dlam[qp_m.ipr])>1e-12) {
-          if ((lam[qp_m.ipr]>0)==(dlam[qp_m.ipr]>0)) {
-            neg_ok = false;
-          } else {
-            pos_ok = false;
-          }
-        }
-
-        // QR factorization of the transpose
-        casadi_trans(kkt, kkt_, vr, kkt_, iw);
-        casadi_copy(vr, kkt_.nnz(), kkt);
-        casadi_qr(kkt_, kkt, w, sp_v_, v, sp_r_, r, beta, get_ptr(prinv_), get_ptr(pc_));
-
-        // Best flip
-        double tau_test;
-        qp_m.tau = inf;
-
-        // For all nullspace vectors
-        casadi_int nullity_tr, nulli, imina_tr;
-        double minat_tr;
-        nullity_tr = casadi_qr_singular(&minat_tr, &imina_tr, r, sp_r_,
-                                        get_ptr(pc_), 1e-12);
-        for (nulli=0; nulli<nullity_tr; ++nulli) {
-          // Get a linear combination of the rows in kkt
-          casadi_qr_colcomb(w, r, sp_r_, get_ptr(pc_), imina_tr, nulli);
-          if (verbose_) {
-            print_vector("normal", w, nx_+na_);
-          }
-          // Look for the best constraint for increasing rank
-          for (i=0; i<nx_+na_; ++i) {
-            // Check if old column can be removed without decreasing rank
-            if (fabs(i<nx_ ? dz[i] : dlam[i])<1e-12) continue;
-            // If dot(w, kkt(i)-kkt_flipped(i))==0, rank won't increase
-            if (fabs(casadi_qp_kkt_dot(&qp_m, w, i, sign)
-                     - casadi_qp_kkt_dot(&qp_m, w, i, !sign))<1e-12) continue;
-            // Is constraint active?
-            if (lam[i]==0.) {
-              // Make sure that step is nonzero
-              if (fabs(dz[i])<1e-12) continue;
-              // Step needed to bring z to lower bound
-              if (!neverlower[i]) {
-                tau_test = (lbz[i]-z[i])/dz[i];
-                // Ensure nonincrease in max(pr, du)
-                if (!((terr>0. && tau_test>0.) || (terr<0. && tau_test<0.))) {
-                  // Only allow removing constraints if tau_test==0
-                  if (fabs(tau_test)>=1e-16) {
-                    // Check if best so far
-                    if (fabs(tau_test)<fabs(qp_m.tau)) {
-                      qp_m.tau = tau_test;
-                      r_index = i;
-                      r_sign = -1;
-                      casadi_qp_log(&qp_m, "Enforced lbz[%lld] for regularity", i);
-                    }
-                  }
-                }
-              }
-              // Step needed to bring z to upper bound
-              if (!neverupper[i]) {
-                tau_test = (ubz[i]-z[i])/dz[i];
-                // Ensure nonincrease in max(pr, du)
-                if (!((terr>0. && tau_test>0.) || (terr<0. && tau_test<0.))) {
-                  // Only allow removing constraints if tau_test==0
-                  if (fabs(tau_test)>=1e-16) {
-                    // Check if best so far
-                    if (fabs(tau_test)<fabs(qp_m.tau)) {
-                      qp_m.tau = tau_test;
-                      r_index = i;
-                      r_sign = 1;
-                      casadi_qp_log(&qp_m, "Enforced ubz[%lld] for regularity", i);
-                    }
-                  }
-                }
-              }
-            } else {
-              // Make sure that step is nonzero
-              if (fabs(dlam[i])<1e-12) continue;
-              // Step needed to bring lam to zero
-              if (!neverzero[i]) {
-                tau_test = -lam[i]/dlam[i];
-                // Ensure nonincrease in max(pr, du)
-                if ((terr>0. && tau_test>0.) || (terr<0. && tau_test<0.)) continue;
-
-                if ((tau_test>0 && !pos_ok) || (tau_test<0 && !neg_ok)) continue;
-                // Check if best so far
-                if (fabs(tau_test)<fabs(qp_m.tau)) {
-                  qp_m.tau = tau_test;
-                  r_index = i;
-                  r_sign = 0;
-                  casadi_qp_log(&qp_m, "Dropped %s[%lld] for regularity",
-                         lam[i]>0 ? "lbz" : "ubz", i);
-                }
-              }
-            }
-          }
-        }
-        // Cannot restore feasibility
-        if (r_index<0) {
-          casadi_warning("Cannot restore feasibility");
-          flag = 1;
-          break;
-        }
-        // Quick return if tau is zero
-        if (qp_m.tau==0) continue;
-        // Make sure that tau is positive
-        if (qp_m.tau<0) {
-          casadi_scal(nx_+na_, -1., dz);
-          casadi_scal(nx_+na_, -1., dlam);
-          casadi_scal(nx_, -1., tinfeas);
-          qp_m.tau = -qp_m.tau;
-        }
-      } else {
-        // Maximum step size is one
-        qp_m.tau = 1.;
+      // Calculate step length
+      if (casadi_qp_calc_tau(&qp_m, &r_index, &r_sign, du_to_pr_)) {
+        casadi_warning("Cannot restore feasibility");
+        flag = 1;
+        break;
       }
 
       // Find largest possible step without violating acceptable primal error
