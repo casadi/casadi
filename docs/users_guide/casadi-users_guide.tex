@@ -1984,6 +1984,77 @@ a useful option is \verb|with_header|, which controls the creation of a header f
 containing declarations of the functions with external linkage, i.e. the API of
 the generated code, described in Section~\ref{sec:c_api} below.
 
+\section{Options code generator}
+In the previous section a simple code generation example was given with the 2 options main and mex enabled. The Casadi code generation supports more then 2 options. Tables table~\ref{tbl:options Casadi 3.2}, table~\ref{tbl:options Casadi 3.3} and table~\ref{tbl:options Casadi 3.4} contain the available options of the last 3 minor Casadi versions, and there default value. It is possible to request the version at run time with the function \verb|casadi.CasadiMeta.version();|. This way different options can be passed to the generator depending upon the version of Casadi installed.
+
+\begin{center}
+	\begin{table}
+		\begin{tabular}{| l | l |}
+			\hline
+			Option name & Default value \\
+			\hline
+			verbose & true\\ 
+			mex & false\\
+			cpp & false\\
+			main & false\\
+			casadi\_real & "double"\\
+			casadi\_int\_type & CASADI\_INT\_TYPE\_STR\\
+			codegen\_scalars & false\\
+			with\_header & false\\
+			with\_mem & false\\
+			with\_export & true\\
+			with\_import & false\\
+			include\_math & true\
+			\hline
+		\end{tabular}
+		\label{tbl:options Casadi 3.4}
+		\caption{options Casadi 3.4}
+	\end{table}
+\end{center}
+
+\begin{center}
+	\begin{table}
+		\begin{tabular}{| l | l |}
+			\hline
+			Option name & Default value \\
+			\hline
+			verbose & true\\
+			mex & false\\
+			cpp & false\\
+			main & false\\
+			casadi\_real & "double"\\
+			codegen\_scalars & false\\
+			with\_header & false\\
+			with\_mem & false\\
+			with\_export & true\\
+			\hline
+		\end{tabular}
+		\label{tbl:options Casadi 3.3}
+		\caption{options Casadi 3.3}
+	\end{table}
+\end{center}
+
+\begin{center}
+	\begin{table}
+		\begin{tabular}{| l | l |}
+			\hline
+			Option name & Default value \\
+			\hline
+			verbose & true\\
+			mex & false\\
+			cpp & false\\
+			main & false\\
+			real\_t & "double"\\
+			codegen\_scalars & false\\
+			with\_header & false\\
+			with\_mem & false\\
+			\hline
+		\end{tabular}
+		\label{tbl:options Casadi 3.2}
+		\caption{options Casadi 3.2}
+	\end{table}
+\end{center}
+
 \section{Using the generated code} \label{sec:using_codegen}
 The generated C code can be used in a number of different ways:
 \begin{itemize}
