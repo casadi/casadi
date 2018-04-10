@@ -273,6 +273,9 @@ namespace casadi {
     // Matrices
     const T1 *nz_a, *nz_at, *nz_h;
     T1 *nz_kkt;
+    // QR factorization
+    const casadi_int *prinv, *pc, *sp_v, *sp_r;
+    T1 *beta, *nz_v, *nz_r;
     // Smallest nonzero number
     T1 DMIN;
     // Message buffer
@@ -327,20 +330,13 @@ namespace casadi {
 
   template<typename T1>
   casadi_int casadi_qp_pr_index(casadi_qp_mem<T1>* m, casadi_int* sign,
-                                casadi_int ipr, T1 pr, T1 old_pr) {
+                                casadi_int ipr, T1 pr) {
     // Try to improve primal feasibility by adding a constraint
     if (m->lam[ipr]==0.) {
       // Add the most violating constraint
       *sign = m->z[ipr]<m->lbz[ipr] ? -1 : 1;
       casadi_qp_log(m, "Added %lld to reduce |pr|", ipr);
       return ipr;
-    } else {
-      // After a full-step, lam[ipr] should be zero
-      if (pr < 0.5*old_pr) {
-        // Keep iterating while error is decreasing at a fast-linear rate
-        casadi_qp_log(m, "|pr| refinement. Rate: %g", pr/old_pr);
-        return -2;
-      }
     }
     return -1;
   }
@@ -552,6 +548,11 @@ namespace casadi {
     // Local variables
     casadi_int i;
     T1 trial_z;
+    // Check if violation with tau=0 and not improving
+    if (casadi_qp_zero_blocking(m, e, dz, index, sign)) {
+      *tau = 0.;
+      return;
+    }
     // Loop over all primal variables
     for (i=0; i<m->nz; ++i) {
       if (dz[i]==0.) continue; // Skip zero steps
@@ -693,6 +694,66 @@ namespace casadi {
     }
   }
 
+  template<typename T1>
+  int casadi_qp_flip_check(casadi_qp_mem<T1>* m, casadi_int index, casadi_int sign,
+                           casadi_int* r_index, casadi_int* r_sign, T1 e, T1* dz) {
+    // Local variables
+    casadi_int new_sign, i;
+    T1 best_slack, new_slack;
+    // New column that we're trying to add
+    casadi_qp_kkt_column(m, dz, index, sign);
+    // Express it using the other columns
+    casadi_qr_solve(dz, 1, 0, m->sp_v, m->nz_v, m->sp_r, m->nz_r, m->beta,
+                    m->prinv, m->pc, m->w);
+    // Quick return if columns are linearly independent
+    if (fabs(dz[index])>=1e-12) return 0;
+    // Column that we're removing
+    casadi_qp_kkt_column(m, m->w, index, !sign);
+    // Find best constraint we can flip, if any
+    *r_index=-1;
+    *r_sign=0;
+    best_slack = -inf;
+    for (i=0; i<m->nz; ++i) {
+      // Can't be the same
+      if (i==index) continue;
+      // Make sure constraint is flippable
+      if (m->lam[i]==0 ? m->neverlower[i] && m->neverupper[i] : m->neverzero[i]) continue;
+      // If dz[i]!=0, column i is redundant
+      if (fabs(dz[i])<1e-12) continue;
+      // We want to make sure that the new, flipped column i is linearly
+      // independent with other columns. We have:
+      // flipped_column[index] = dz[0]*column[0] + ... + dz[N-1]*column[N-1]
+      // We also require that flipped_column[i] isn't othogonal to
+      // (old) column[index], as this will surely lead to singularity
+      // This will not cover all cases of singularity, but many important
+      // ones. General singularity handling is done below.
+      if (fabs(casadi_qp_kkt_dot(m, m->w, i, m->lam[i]==0.)) < 1e-12) continue;
+      // Dual infeasibility
+      // Check if the best so far
+      if (m->lam[i]==0.) {
+        // Which bound is closer?
+        new_sign = m->lbz[i]-m->z[i] >= m->z[i]-m->ubz[i] ? -1 : 1;
+        // Better than negative slack, worse than positive slack
+        new_slack = 0;
+      } else {
+        // Skip if flipping would result in too large |du|
+        if (casadi_qp_du_check(m, i)>e) continue;
+        // Slack to the bound
+        new_slack = m->lam[i]>0 ? m->ubz[i]-m->z[i] : m->z[i]-m->lbz[i];
+        new_sign = 0;
+      }
+      // Best so far?
+      if (new_slack > best_slack) {
+        best_slack = new_slack;
+        *r_index = i;
+        *r_sign = new_sign;
+      }
+    }
+
+    // Accept, if any
+    return *r_index>=0 ? 0 : 1;
+  }
+
   int ConicActiveSet::init_mem(void* mem) const {
     //auto m = static_cast<ConicActiveSetMemory*>(mem);
     return 0;
@@ -818,10 +879,20 @@ namespace casadi {
     qp_m.sp_h = H_;
     qp_m.sp_at = AT_;
     qp_m.sp_kkt = kkt_;
+    // Matrix nonzeros
     qp_m.nz_a = a;
     qp_m.nz_at = trans_a;
     qp_m.nz_h = h;
     qp_m.nz_kkt = kkt;
+    // QR factorization
+    qp_m.nz_v = v;
+    qp_m.nz_r = r;
+    qp_m.sp_v = sp_v_;
+    qp_m.sp_r = sp_r_;
+    qp_m.beta = beta;
+    qp_m.prinv = get_ptr(prinv_);
+    qp_m.pc = get_ptr(pc_);
+    // Misc
     qp_m.DMIN = DMIN;
     qp_m.print_iter = print_iter_;
     qp_m.msg[0] = '\0';
@@ -834,7 +905,7 @@ namespace casadi {
     casadi_int imina = -1;
 
     // Primal and dual error, corresponding index
-    double pr=inf, old_pr, du;
+    double pr=inf, du, e;
     casadi_int ipr, idu;
 
     // Singularity in the last iteration
@@ -869,14 +940,13 @@ namespace casadi {
       }
 
       // Calculate primal and dual error
-      old_pr = pr;
       pr = casadi_qp_pr(&qp_m, &ipr);
       du = casadi_qp_du(&qp_m, &idu);
 
       // Improve primal or dual feasibility
       if (index==-1 && tau>1e-16 && (ipr>=0 || idu>=0)) {
         if (du_to_pr_*pr >= du) {
-          index = casadi_qp_pr_index(&qp_m, &sign, ipr, pr, old_pr);
+          index = casadi_qp_pr_index(&qp_m, &sign, ipr, pr);
         } else {
           index = casadi_qp_du_index(&qp_m, &sign, idu, du);
         }
@@ -885,89 +955,17 @@ namespace casadi {
       // If a constraint was added
       if (index>=0) {
         // Try to maintain non-singularity of possible
-        if (!sing) {
-          // New column that we're trying to add
-          casadi_qp_kkt_column(&qp_m, dz, index, sign);
-          // Express it using the other columns
-          casadi_qr_solve(dz, 1, 0, sp_v_, v, sp_r_, r, beta,
-                          get_ptr(prinv_), get_ptr(pc_), w);
-          // If dz[index] is zero, columns are linearly dependent
-          if (fabs(dz[index])<1e-12) {
-            // Column that we're removing
-            casadi_qp_kkt_column(&qp_m, w, index, !sign);
-            // Find best constraint we can flip, if any
-            casadi_int best_ind=-1, best_sign=0;
-            double best_slack = -inf;
-            for (i=0; i<nx_+na_; ++i) {
-              // Can't be the same
-              if (i==index) continue;
-              // Make sure constraint is flippable
-              if (lam[i]==0 ? neverlower[i] && neverupper[i] : neverzero[i]) continue;
-              // If dz[i]!=0, column i is redundant
-              if (fabs(dz[i])<1e-12) continue;
-              // We want to make sure that the new, flipped column i is linearly
-              // independent with other columns. We have:
-              // flipped_column[index] = dz[0]*column[0] + ... + dz[N-1]*column[N-1]
-              // We also require that flipped_column[i] isn't othogonal to
-              // (old) column[index], as this will surely lead to singularity
-              // This will not cover all cases of singularity, but many important
-              // ones. General singularity handling is done below.
-              if (fabs(casadi_qp_kkt_dot(&qp_m, w, i, lam[i]==0.)) < 1e-12) continue;
-              // Dual infeasibility
-              double new_slack;
-              casadi_int new_sign;
-              // Check if the best so far
-              if (lam[i]==0.) {
-                // Which bound is closer?
-                new_sign = lbz[i]-z[i] >= z[i]-ubz[i] ? -1 : 1;
-                // Better than negative slack, worse than positive slack
-                new_slack = 0;
-              } else {
-                // Commented out: Skip if flipping would result in too large |du|
-                //if (casadi_qp_du_check(&qp_m, i)>fmax(pr, du)) continue;
-                // Slack to the bound
-                new_slack = lam[i]>0 ? ubz[i]-z[i] : z[i]-lbz[i];
-                new_sign = 0;
-              }
-              // Discarded?
-              casadi_int skip_ind = -1, skip_sign;
-              double skip_slack;
-              // Best so far?
-              if (new_slack > best_slack) {
-                if (best_ind>=0) {
-                  skip_ind=best_ind;
-                  skip_sign=best_sign;
-                  skip_slack=best_slack;
-                }
-                best_slack = new_slack;
-                best_ind = i;
-                best_sign = new_sign;
-              } else {
-                skip_ind = i;
-                skip_sign = new_sign;
-                skip_slack = new_slack;
-              }
-              // Logic can be improved, issue a warning
-              if (skip_ind>=0 && verbose_) {
-                print("Note: Discarded %lld to resolve singularity: "
-                      "lam=%g, z=%g, lbz=%g, ubz=%g, dz=%g, slack=%g, sign=%lld\n",
-                      skip_ind, lam[skip_ind], z[skip_ind],
-                      lbz[skip_ind], ubz[skip_ind], dz[skip_ind], skip_slack, skip_sign);
-              }
-            }
-
-            // Accept, if any
-            if (best_ind>=0) {
-              lam[best_ind] = best_sign==0 ? 0 : best_sign>0 ? DMIN : -DMIN;
-              casadi_qp_log(&qp_m, "%lld->%lld, %lld->%lld",
-                            index, sign, best_ind, best_sign);
-            } else if (verbose_) {
-              print("Note: Singularity about to happen\n");
-            }
+        e = fmax(du_to_pr_*pr, du); // acceptable error
+        if (!sing && casadi_qp_flip_check(&qp_m, index, sign, &r_index, &r_sign, e, dz)) {
+          if (r_index>=0) {
+            // Also flip r_index to avoid singularity
+            lam[r_index] = r_sign==0 ? 0 : r_sign>0 ? DMIN : -DMIN;
+            casadi_qp_log(&qp_m, "%lld->%lld, %lld->%lld",
+                          index, sign, r_index, r_sign);
+          } else if (verbose_) {
+            print("Note: Singularity about to happen\n");
           }
         }
-
-        // Accept active set change
         lam[index] = sign==0 ? 0 : sign>0 ? DMIN : -DMIN;
         index = -2;
         // Recalculate primal and dual infeasibility
@@ -1126,7 +1124,7 @@ namespace casadi {
 
         // If primal error is dominating and constraint is active,
         // then only allow the multiplier to become larger
-        if (pr>=du && lam[ipr]!=0 && fabs(dlam[ipr])>1e-12) {
+        if (du_to_pr_*pr>=du && lam[ipr]!=0 && fabs(dlam[ipr])>1e-12) {
           if ((lam[ipr]>0)==(dlam[ipr]>0)) {
             neg_ok = false;
           } else {
@@ -1246,22 +1244,12 @@ namespace casadi {
         if (zero_step) continue;
       }
 
-      // Acceptable primal error
-      double e = fmax(pr, du/du_to_pr_);
-
-      // Check if violation with tau=0 and not improving
-      if (casadi_qp_zero_blocking(&qp_m, e, dz, &index, &sign)) {
-        tau = 0.;
-        continue;
-      }
-
       // Find largest possible step without violating acceptable primal error
+      e = fmax(pr, du/du_to_pr_); // Acceptable primal error
       casadi_qp_primal_blocking(&qp_m, e, dz, &tau, &index, &sign);
 
-      // Acceptable dual error
-      e = fmax(pr*du_to_pr_, du);
-
       // Find largest possible step without violated acceptable dual error
+      e = fmax(pr*du_to_pr_, du); // Acceptable dual error
       if (casadi_qp_dual_blocking(&qp_m, e, dlam, &tau)>=0) index = -1;
 
       // Take primal-dual step, avoiding accidental sign changes for lam
