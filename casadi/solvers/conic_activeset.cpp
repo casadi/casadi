@@ -653,7 +653,7 @@ namespace casadi {
   }
 
   template<typename T1>
-  void casadi_qp_step(casadi_qp_mem<T1>* m, T1 tau) {
+  void casadi_qp_take_step(casadi_qp_mem<T1>* m, T1 tau) {
     // Local variables
     casadi_int i;
     // Get current sign
@@ -744,6 +744,43 @@ namespace casadi {
               m->nz_r, m->beta, m->prinv, m->pc);
     // Check singularity
     return casadi_qr_singular(mina, imina, m->nz_r, m->sp_r, m->pc, 1e-12);
+  }
+
+  template<typename T1>
+  void casadi_qp_calc_step(casadi_qp_mem<T1>* m, casadi_int sing, casadi_int imina) {
+    // Local variables
+    casadi_int i;
+    // Calculate step in z[:nx] and lam[nx:]
+    if (!sing) {
+      // Negative KKT residual
+      casadi_qp_kkt_residual(m, m->dz);
+      // Solve to get primal-dual step
+      casadi_qr_solve(m->dz, 1, 1, m->sp_v, m->nz_v, m->sp_r, m->nz_r, m->beta,
+                      m->prinv, m->pc, m->w);
+    } else {
+      // Get a linear combination of the columns in KKT
+      casadi_qr_colcomb(m->dz, m->nz_r, m->sp_r, m->pc, imina, 0);
+    }
+    // Calculate change in Lagrangian gradient
+    casadi_fill(m->dlam, m->nx, 0.);
+    casadi_mv(m->nz_h, m->sp_h, m->dz, m->dlam, 0); // gradient of the objective
+    casadi_mv(m->nz_a, m->sp_a, m->dz+m->nx, m->dlam, 1); // gradient of the Lagrangian
+    // Step in lam[:nx]
+    casadi_scal(m->nx, -1., m->dlam);
+    // For inactive constraints, lam(x) step is zero
+    for (i=0; i<m->nx; ++i) if (m->lam[i]==0.) m->dlam[i] = 0.;
+    // Step in lam[nx:]
+    casadi_copy(m->dz+m->nx, m->na, m->dlam+m->nx);
+    // Step in z[nx:]
+    casadi_fill(m->dz+m->nx, m->na, 0.);
+    casadi_mv(m->nz_a, m->sp_a, m->dz, m->dz+m->nx, 0);
+    // Avoid steps that are nonzero due to numerics
+    for (i=0; i<m->nz; ++i) if (fabs(m->dz[i])<1e-14) m->dz[i] = 0.;
+    // Tangent of the dual infeasibility at tau=0
+    casadi_fill(m->tinfeas, m->nx, 0.);
+    casadi_mv(m->nz_h, m->sp_h, m->dz, m->tinfeas, 0);
+    casadi_mv(m->nz_a, m->sp_a, m->dlam+m->nx, m->tinfeas, 1);
+    casadi_axpy(m->nx, 1., m->dlam, m->tinfeas);
   }
 
   int ConicActiveSet::init_mem(void* mem) const {
@@ -1013,60 +1050,16 @@ namespace casadi {
       index=-1;
 
       // Calculate search direction
-      if (!sing) {
-        // Negative KKT residual
-        casadi_qp_kkt_residual(&qp_m, dz);
-        if (verbose_) {
-          print_vector("Negative KKT residual", dz, nx_+na_);
-        }
-        // Solve to get primal-dual step
-        casadi_qr_solve(dz, 1, 1, sp_v_, v, sp_r_, r, beta,
-                        get_ptr(prinv_), get_ptr(pc_), w);
-      } else {
-        // Get a linear combination of the columns in KKT
-        casadi_qr_colcomb(dz, r, sp_r_, get_ptr(pc_), imina, 0);
-      }
-
-      // Calculate change in Lagrangian gradient
-      casadi_fill(dlam, nx_, 0.);
-      casadi_mv(h, H_, dz, dlam, 0); // gradient of the objective
-      casadi_mv(a, A_, dz+nx_, dlam, 1); // gradient of the Lagrangian
-
-      // Step in lam(x)
-      casadi_scal(nx_, -1., dlam);
-
-      // For inactive constraints, lam(x) step is zero
-      for (i=0; i<nx_; ++i) if (lam[i]==0.) dlam[i] = 0.;
-
-      // Step in lam(g)
-      casadi_copy(dz+nx_, na_, dlam+nx_);
-
-      // Step in z(g)
-      casadi_fill(dz+nx_, na_, 0.);
-      casadi_mv(a, A_, dz, dz+nx_, 0);
-
-      // Avoid steps that are nonzero due to numerics
-      for (i=0; i<nx_+na_; ++i) if (fabs(dz[i])<1e-14) dz[i] = 0.;
-
-      // Print search direction
+      casadi_qp_calc_step(&qp_m, sing, imina);
       if (verbose_) {
         print_vector("dz", dz, nx_+na_);
         print_vector("dlam", dlam, nx_+na_);
       }
 
-      // Tangent of the dual infeasibility at tau=0
-      casadi_fill(tinfeas, nx_, 0.);
-      casadi_mv(h, H_, dz, tinfeas, 0); // A'*dlam_g + dlam_x==0 by definition
-      casadi_mv(a, A_, dlam+nx_, tinfeas, 1);
-      casadi_axpy(nx_, 1., dlam, tinfeas);
-
       // Handle singularity
       r_index = -1;
       r_sign = 0;
       if (sing) {
-        //
-
-
         // Change in pr, du in the search direction
         double tpr, tdu;
         tpr = ipr<0 ? 0. : z[ipr]>ubz[ipr] ? dz[ipr]/pr : -dz[ipr]/pr;
@@ -1241,7 +1234,7 @@ namespace casadi {
       if (casadi_qp_dual_blocking(&qp_m, e, &tau)>=0) index = -1;
 
       // Take primal-dual step, avoiding accidental sign changes for lam
-      casadi_qp_step(&qp_m, tau);
+      casadi_qp_take_step(&qp_m, tau);
 
       // Check if singular restoration index can be imposed
       if (r_index>=0 && (r_sign!=0 || casadi_qp_du_check(&qp_m, r_index)<=e)) {
