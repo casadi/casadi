@@ -377,7 +377,7 @@ namespace casadi {
   GenericType::operator std::vector<int>() const {
     std::vector<int> ret;
     std::vector<casadi_int> source = to_int_vector();
-    return to_int(source);
+    return casadi::to_int(source);
   }
 
   vector<bool> GenericType::to_bool_vector() const {
