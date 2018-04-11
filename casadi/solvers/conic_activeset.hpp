@@ -39,6 +39,51 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  template<typename T1>
+  struct casadi_qp_prob {
+    // Dimensions
+    casadi_int nx, na, nz;
+    // Smallest nonzero number
+    T1 dmin;
+    // Infinity
+    T1 inf;
+    // Dual to primal error
+    T1 du_to_pr;
+    // Print iterations
+    int print_iter;
+    // Sparsity patterns
+    const casadi_int *sp_a, *sp_h, *sp_at, *sp_kkt;
+    // Symbolic QR factorization
+    const casadi_int *prinv, *pc, *sp_v, *sp_r;
+  };
+
+  template<typename T1>
+  struct casadi_qp_data {
+    // Problem structure
+    const casadi_qp_prob<T1>* prob;
+    // Cost
+    T1 f;
+    // QP data
+    const T1 *nz_a, *nz_h, *g;
+    // Vectors
+    T1 *z, *lbz, *ubz, *infeas, *tinfeas, *lam, *w, *dz, *dlam;
+    casadi_int *iw, *neverzero, *neverlower, *neverupper;
+    // Numeric QR factorization
+    T1 *nz_at, *nz_kkt, *beta, *nz_v, *nz_r;
+    // Message buffer
+    char msg[40];
+    // Stepsize
+    T1 tau;
+    // Singularity
+    casadi_int sing;
+    // Smallest diagonal value for the QR factorization
+    T1 mina;
+    casadi_int imina;
+    // Primal and dual error, corresponding index
+    T1 pr, du;
+    casadi_int ipr, idu;
+  };
+
   struct CASADI_CONIC_ACTIVESET_EXPORT ConicActiveSetMemory : public ConicMemory {
   };
 
@@ -95,7 +140,8 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
-
+    // Memory structure
+    casadi_qp_prob<double> p_;
     // A transpose sparsity
     Sparsity AT_;
 
