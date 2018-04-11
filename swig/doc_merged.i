@@ -11434,11 +11434,6 @@ absolute tolerance.
 
 ";
 
-%feature("docstring") casadi::ConicActiveSet::print_vector "[INTERNAL]
-Print a vector
-
-";
-
 %feature("docstring") casadi::ConicActiveSet::replace_arg "[INTERNAL]
 Replace 0-by-0 inputs.
 
@@ -11959,11 +11954,6 @@ Options.
 
 ";
 
-%feature("docstring") casadi::ConicActiveSet::print_ivector "[INTERNAL]
-Print an integer vector
-
-";
-
 %feature("docstring") casadi::ConicActiveSet::psd_support "[INTERNAL]  Can
 psd constraints be treated.
 
@@ -12055,11 +12045,6 @@ function, overloaded.
 
 ";
 
-%feature("docstring") casadi::ConicActiveSet::print_signs "[INTERNAL]
-Print signs for a vector
-
-";
-
 %feature("docstring") casadi::ConicActiveSet::sx_out "[INTERNAL]  Get
 function input(s) and output(s)
 
@@ -12114,8 +12099,8 @@ generate the function.
 
 ";
 
-%feature("docstring") casadi::ConicActiveSet::eval "[INTERNAL]  Evaluate
-numerically.
+%feature("docstring") casadi::ConicActiveSet::eval "[INTERNAL]   Solve the
+QP.
 
 ";
 
@@ -49656,6 +49641,8 @@ Get type info for a particular option.
 
 %feature("docstring") casadi::temporary_file "";
 
+%feature("docstring") casadi::casadi_qp_pr_index "[INTERNAL] ";
+
 %feature("docstring") casadi::load_expm "
 
 Explicitly load a plugin dynamically.
@@ -49674,9 +49661,11 @@ Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A.
 [INTERNAL] 
 ";
 
+%feature("docstring") casadi::casadi_qp_kkt_residual "[INTERNAL] ";
+
 %feature("docstring") casadi::dense_mul_nt_stride "[INTERNAL] ";
 
-%feature("docstring") casadi::dense_mul_tn "[INTERNAL] ";
+%feature("docstring") casadi::casadi_lb_eig "[INTERNAL] ";
 
 %feature("docstring") casadi::dense_mul_nn_stride "[INTERNAL] ";
 
@@ -50036,11 +50025,17 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
+%feature("docstring") casadi::casadi_qp_factorize "[INTERNAL] ";
+
 %feature("docstring") casadi::load_integrator "
 
 Explicitly load a plugin dynamically.
 
 ";
+
+%feature("docstring") casadi::casadi_qp_dual_blocking "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_work "[INTERNAL] ";
 
 %feature("docstring") casadi::expm_n_out "
 
@@ -50073,6 +50068,8 @@ Check if the vector is strictly increasing.
 
 %feature("docstring") casadi::casadi_fill_casadi_int "[INTERNAL] ";
 
+%feature("docstring") casadi::dense_copy_stride "[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qr_singular "[INTERNAL] ";
 
 %feature("docstring") casadi::conic_options "
@@ -50088,6 +50085,8 @@ Explicitly load a plugin dynamically.
 ";
 
 %feature("docstring") casadi::casadi_interpn_grad "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_calc_step "[INTERNAL] ";
 
 %feature("docstring") casadi::has_interpolant "
 
@@ -50105,11 +50104,15 @@ Generate native code in the interfaced language for debugging
 
 ";
 
+%feature("docstring") casadi::casadi_qp_flip_check "[INTERNAL] ";
+
 %feature("docstring") casadi::nlpsol_options "
 
 Get all options for a plugin.
 
 ";
+
+%feature("docstring") casadi::casadi_qp_take_step "[INTERNAL] ";
 
 %feature("docstring") casadi::einstein_eval "";
 
@@ -50120,6 +50123,8 @@ Get all options for a plugin.
 Get documentation for a particular option.
 
 ";
+
+%feature("docstring") casadi::casadi_qp_zero_blocking "[INTERNAL] ";
 
 %feature("docstring") casadi::check_exposed "[INTERNAL] ";
 
@@ -50448,6 +50453,8 @@ Joel Andersson
 
 ";
 
+%feature("docstring") casadi::casadi_qp_du "[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_ldl "[INTERNAL] ";
 
 %feature("docstring") casadi::dple_n_in "
@@ -50476,7 +50483,9 @@ Construct from an index vector (requires is_slice(v) to be true)
 
 ";
 
-%feature("docstring") casadi::dense_copy_stride "[INTERNAL] ";
+%feature("docstring") casadi::casadi_qp_du_index "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_dual_breakpoints "[INTERNAL] ";
 
 %feature("docstring") casadi::doc_linsol "
 
@@ -51061,6 +51070,8 @@ Get documentation for a particular option.
 ";
 
 %feature("docstring") casadi::replace_mat "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_primal_blocking "[INTERNAL] ";
 
 %feature("docstring") casadi::dense_mul_nn "[INTERNAL] ";
 
@@ -51848,6 +51859,10 @@ Joel Andersson
 
 ";
 
+%feature("docstring") casadi::casadi_qp_reset "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_pr "[INTERNAL] ";
+
 %feature("docstring") casadi::doc_conic "
 
 Get the documentation string for a plugin.
@@ -51924,6 +51939,8 @@ Get all options for a plugin.
 violation.
 
 ";
+
+%feature("docstring") casadi::casadi_qp_linesearch "[INTERNAL] ";
 
 %feature("docstring") casadi::collocation_interpolators "
 
@@ -52016,6 +52033,8 @@ Checks if array does not contain NaN or Inf.
 Get documentation for a particular option.
 
 ";
+
+%feature("docstring") casadi::dense_mul_tn "[INTERNAL] ";
 
 %feature("docstring") casadi::hash_value "
 
@@ -52113,6 +52132,8 @@ Get the documentation string for a plugin.
 x, w work vector (length >= number of rows)
 
 ";
+
+%feature("docstring") casadi::casadi_qp_calc_dependent "[INTERNAL] ";
 
 %feature("docstring") casadi::interpolant "
 
@@ -52506,6 +52527,8 @@ linear
 Joel Andersson
 
 ";
+
+%feature("docstring") casadi::casadi_bfgs "[INTERNAL] ";
 
 %feature("docstring") casadi::rootfinder_in "
 
@@ -52925,13 +52948,15 @@ Explicitly load a plugin dynamically.
 
 ";
 
+%feature("docstring") casadi::casadi_qp_du_check "[INTERNAL] ";
+
 %feature("docstring") casadi::rootfinder_option_type "
 
 Get type info for a particular option.
 
 ";
 
-%feature("docstring") casadi::casadi_lb_eig "[INTERNAL] ";
+%feature("docstring") casadi::casadi_qp_kkt_column "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_smoothing_diff "[INTERNAL] ";
 
@@ -52965,6 +52990,10 @@ return.
 ";
 
 %feature("docstring") casadi::dense_kron_stride "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_kkt "[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_flip "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_qr_trs "[INTERNAL] ";
 
@@ -53044,6 +53073,8 @@ Get output scheme name by index.
 
 ";
 
+%feature("docstring") casadi::casadi_qp_kkt_dot "[INTERNAL] ";
+
 %feature("docstring") casadi::is_strictly_monotone "
 
 Check if the vector is strictly monotone.
@@ -53072,6 +53103,8 @@ N:  Number of integrator steps
 order:  Order of interpolating polynomials
 
 ";
+
+%feature("docstring") casadi::casadi_qp_init "[INTERNAL] ";
 
 %feature("docstring") casadi::nlpsol_in "
 
@@ -53155,7 +53188,7 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring") casadi::casadi_bfgs "[INTERNAL] ";
+%feature("docstring") casadi::casadi_qp_log "[INTERNAL] ";
 
 %feature("docstring") casadi::dple_in "
 
@@ -54044,6 +54077,8 @@ iwork:  A integer work vector that you must allocate Minimum size:
 y.size1()+x.size2()+1
 
 ";
+
+%feature("docstring") casadi::casadi_qp_scale_step "[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_qr_mv "[INTERNAL] ";
 
