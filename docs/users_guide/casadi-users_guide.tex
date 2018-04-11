@@ -1745,9 +1745,9 @@ We offer some special constructs that improve on this complexity.
 
 \subsection{Map}
 
-Suppose you are interested in computing a function $f : \mathbb{R}^{n} \rightarrow \mathbb{R}^{m}$ repeatedly on all columns of a matrix $X \in \mathbb{R}^{n \times N}$, and aggregating all results in a result matrix $Y \in \mathbb{R}^{m \times N}$: 
+Suppose you are interested in computing a function $f : \mathbb{R}^{n} \rightarrow \mathbb{R}^{m}$ repeatedly on all columns of a matrix $X \in \mathbb{R}^{n \times N}$, and aggregating all results in a result matrix $Y \in \mathbb{R}^{m \times N}$:
 
-\begin{minipage}[t]{0.5\textwidth} 
+\begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 # Python
 ys = []
@@ -1772,7 +1772,7 @@ F = Function('f',{X},{Y});
 
 The aggregate function $F : \mathbb{R}^{n \times N} \rightarrow \mathbb{R}^{m \times N}$ can be obtained with the \texttt{map} construct:
 
-\begin{minipage}[t]{0.5\textwidth} 
+\begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 # Python
 F = f.map(N)
@@ -1787,7 +1787,7 @@ F = f.map(N);
 
 \CasADi can be instructed to parallelize when $F$ gets evaluated. In the following example, we dedicate 4 threads for the \texttt{map} task.
 
-\begin{minipage}[t]{0.5\textwidth} 
+\begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 # Python
 F = f.map(N,"thread",4)
@@ -1807,7 +1807,7 @@ The \texttt{map} operation exhibits constant graph size and initialization time.
 \subsection{Fold}
 
 In case each for-loop iteration depends on the result from the previous iteration, the \texttt{fold} construct applies. In the following, the \texttt{x} variable acts as an accumulater that is initialized by $x_0 \in \mathbb{R}^{n}$:
-\begin{minipage}[t]{0.5\textwidth} 
+\begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 # Python
 x = x0
@@ -1831,7 +1831,7 @@ F = Function('f',{x0},{x});
 For a given function $f : \mathbb{R}^{n} \rightarrow \mathbb{R}^{n}$, the result function $F : \mathbb{R}^{n} \rightarrow \mathbb{R}^{n}$ can be obtained with the \texttt{fold} construct:
 
 
-\begin{minipage}[t]{0.5\textwidth} 
+\begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
 # Python
 F = f.fold(N)
@@ -1983,6 +1983,26 @@ If you plan to link directly against the generated code in some C/C++ applicatio
 a useful option is \verb|with_header|, which controls the creation of a header file
 containing declarations of the functions with external linkage, i.e. the API of
 the generated code, described in Section~\ref{sec:c_api} below.
+
+Here is a list of available options for the \texttt{CodeGenerator} class:
+\begin{center}
+  \scriptsize
+  \begin{tabular}{| p{2.0cm} | p{2.0cm} | p{10.0cm} | }
+    \hline
+    Option & Default value & Description \\
+    \hline
+    \texttt{verbose} & true & Include comments in generated code \\
+    \texttt{mex} & false & Generate an MATLAB/Octave MEX entry point \\
+    \texttt{cpp} & false & Generated code is C++ instead of C \\
+    \texttt{main} & false & Generate a command line interface \\
+    \texttt{casadi\_real} & \texttt{double} & Floating point type \\
+    \texttt{casadi\_int} & \texttt{long long int} & Integer type \\
+    \texttt{with\_header} & false & Generate a header file \\
+    \texttt{with\_mem} & false & Generate a simplified C API \\
+    \texttt{indent} & 2 & Number of spaces per indentation level \\
+    \hline
+  \end{tabular}
+\end{center}
 
 \section{Using the generated code} \label{sec:using_codegen}
 The generated C code can be used in a number of different ways:
