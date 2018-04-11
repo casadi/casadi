@@ -29,6 +29,39 @@
 using namespace std;
 namespace casadi {
 
+  template<typename T1>
+  void casadi_qp_work(casadi_qp_prob<T1>* p, casadi_int* sz_w, casadi_int* sz_iw) {
+    // Local variables
+    casadi_int nnz_a, nnz_kkt, nnz_v, nnz_r;
+    // Get matrix number of nonzeros
+    nnz_a = p->sp_a[2+p->sp_a[1]];
+    nnz_kkt = p->sp_kkt[2+p->sp_kkt[1]];
+    nnz_v = p->sp_v[2+p->sp_v[1]];
+    nnz_r = p->sp_r[2+p->sp_r[1]];
+    // Reset sz_w, sz_iw
+    *sz_w = *sz_iw = 0;
+    // Temporary work vectors
+    *sz_w = max(*sz_w, p->nz); // casadi_project, tau memory
+    *sz_iw = max(*sz_iw, p->nz); // casadi_trans, tau type, allzero
+    *sz_w = max(*sz_w, 2*p->nz); // casadi_qr
+    // Persistent work vectors
+    *sz_w += nnz_kkt; // kkt
+    *sz_w += p->nz; // z=[xk,gk]
+    *sz_w += p->nz; // lbz
+    *sz_w += p->nz; // ubz
+    *sz_w += p->nz; // lam
+    *sz_w += nnz_a; // trans(a)
+    *sz_w += p->nz; // dz
+    *sz_w += p->nz; // dlam
+    *sz_w += p->nx; // infeas
+    *sz_w += p->nx; // tinfeas
+    *sz_iw += p->nz; // neverzero
+    *sz_iw += p->nz; // neverupper
+    *sz_iw += p->nz; // neverlower
+    *sz_w += max(nnz_v + nnz_r, nnz_kkt); // either v & r or trans(kkt)
+    *sz_w += p->nz; // beta
+  }
+
   extern "C"
   int CASADI_CONIC_ACTIVESET_EXPORT
   casadi_register_conic_activeset(Conic::Plugin* plugin) {
@@ -126,27 +159,10 @@ namespace casadi {
     p_.nz = nx_+na_;
 
     // Allocate memory
-    alloc_w(kkt_.nnz(), true); // kkt
-    alloc_w(nx_+na_, true); // z=[xk,gk]
-    alloc_w(nx_+na_, true); // lbz
-    alloc_w(nx_+na_, true); // ubz
-    alloc_w(nx_+na_, true); // lam
-    alloc_w(AT_.nnz(), true); // trans_a
-    alloc_iw(nx_+na_); // casadi_trans, tau type
-    alloc_w(nx_+na_); // casadi_project, tau memory
-    alloc_w(nx_+na_, true); // dz
-    alloc_w(nx_+na_, true); // dlam
-    alloc_w(nx_, true); // infeas
-    alloc_w(nx_, true); // tinfeas
-    alloc_iw(nx_+na_, true); // neverzero
-    alloc_iw(nx_+na_, true); // neverupper
-    alloc_iw(nx_+na_, true); // neverlower
-    alloc_iw(nx_+na_); // allzero
-
-    // Memory for numerical solution
-    alloc_w(max(sp_v_.nnz()+sp_r_.nnz(), kkt_.nnz()), true); // either v & r or trans(kkt)
-    alloc_w(nx_+na_, true); // beta
-    alloc_w(2*na_+2*nx_); // casadi_qr
+    casadi_int sz_w, sz_iw;
+    casadi_qp_work(&p_, &sz_w, &sz_iw);
+    alloc_w(sz_w, true);
+    alloc_iw(sz_iw, true);
 
     if (print_header_) {
       // Print summary
