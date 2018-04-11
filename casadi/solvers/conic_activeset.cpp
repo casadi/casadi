@@ -93,10 +93,34 @@ namespace casadi {
   }
 
   template<typename T1>
-  void casadi_qp_reset(casadi_qp_data<T1>* d) {
+  int casadi_qp_reset(casadi_qp_data<T1>* d) {
+    // Local variables
+    casadi_int i;
+    const casadi_qp_prob<T1>* p = d->prob;
+    // Reset variables corresponding to previous iteration
     d->msg[0] = '\0';
     d->tau = 0.;
     d->sing = 0;
+    // Correct lam if needed, determine permitted signs
+    for (i=0; i<p->nz; ++i) {
+      // Permitted signs for lam
+      d->neverzero[i] = d->lbz[i]==d->ubz[i];
+      d->neverupper[i] = isinf(d->ubz[i]);
+      d->neverlower[i] = isinf(d->lbz[i]);
+      if (d->neverzero[i] && d->neverupper[i] && d->neverlower[i]) return 1;
+      // Correct initial active set if required
+      if (d->neverzero[i] && d->lam[i]==0.) {
+        d->lam[i] = d->neverupper[i]
+                  || d->z[i]-d->lbz[i] <= d->ubz[i]-d->z[i] ? -p->dmin : p->dmin;
+      } else if (d->neverupper[i] && d->lam[i]>0.) {
+        d->lam[i] = d->neverzero[i] ? -p->dmin : 0.;
+      } else if (d->neverlower[i] && d->lam[i]<0.) {
+        d->lam[i] = d->neverzero[i] ? p->dmin : 0.;
+      }
+    }
+    // Transpose A
+    casadi_trans(d->nz_a, p->sp_a, d->nz_at, p->sp_at, d->iw);
+    return 0;
   }
 
   extern "C"
@@ -985,7 +1009,6 @@ namespace casadi {
     }
   }
 
-
   int ConicActiveSet::init_mem(void* mem) const {
     //auto m = static_cast<ConicActiveSetMemory*>(mem);
     return 0;
@@ -994,56 +1017,32 @@ namespace casadi {
   int ConicActiveSet::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<ConicActiveSetMemory*>(mem);
-
-    // Statistics
+    // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
-
+    // Check inputs
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
-
-    // Setup memory structure
+    // Setup data structure
     casadi_qp_data<double> d;
     d.prob = &p_;
     d.nz_h = arg[CONIC_H];
     d.g = arg[CONIC_G];
     d.nz_a = arg[CONIC_A];
     casadi_qp_init(&d, iw, w);
-    // Set bounds on z
+    // Pass bounds on z
     casadi_copy(arg[CONIC_LBX], nx_, d.lbz);
     casadi_copy(arg[CONIC_LBA], na_, d.lbz+nx_);
     casadi_copy(arg[CONIC_UBX], nx_, d.ubz);
     casadi_copy(arg[CONIC_UBA], na_, d.ubz+nx_);
-    // Set initial guess
+    // Pass initial guess
     casadi_copy(arg[CONIC_X0], nx_, d.z);
     casadi_copy(arg[CONIC_LAM_X0], nx_, d.lam);
     casadi_copy(arg[CONIC_LAM_A0], na_, d.lam+nx_);
     // Reset solver
-    casadi_qp_reset(&d);
-
-    // Local variables
+    if (casadi_qp_reset(&d)) return 1;
+    // Return flag
     int flag;
-    casadi_int i;
-
-    // Correct lam if needed, determine permitted signs
-    for (i=0; i<nx_+na_; ++i) {
-      // Permitted signs for lam
-      d.neverzero[i] = d.lbz[i]==d.ubz[i];
-      d.neverupper[i] = isinf(d.ubz[i]);
-      d.neverlower[i] = isinf(d.lbz[i]);
-      casadi_assert(!d.neverzero[i] || !d.neverupper[i] || !d.neverlower[i],
-                    "No sign possible for " + str(i));
-      // Correct initial active set if required
-      if (d.neverzero[i] && d.lam[i]==0.) {
-        d.lam[i] = d.neverupper[i] || d.z[i]-d.lbz[i] <= d.ubz[i]-d.z[i] ? -p_.dmin : p_.dmin;
-      } else if (d.neverupper[i] && d.lam[i]>0.) {
-        d.lam[i] = d.neverzero[i] ? -p_.dmin : 0.;
-      } else if (d.neverlower[i] && d.lam[i]<0.) {
-        d.lam[i] = d.neverzero[i] ? p_.dmin : 0.;
-      }
-    }
-    // Transpose A
-    casadi_trans(d.nz_a, A_, d.nz_at, AT_, d.iw);
     // Constraint to be flipped, if any
     casadi_int index=-2, sign=0, r_index=-2, r_sign=0;
     // QP iterations
@@ -1078,7 +1077,6 @@ namespace casadi {
         flag = 1;
         break;
       }
-      // Start new iteration
       // Calculate search direction
       if (casadi_qp_calc_step(&d, &r_index, &r_sign)) {
         casadi_warning("Failed to calculate search direction");
@@ -1088,13 +1086,11 @@ namespace casadi {
       // Line search in the calculated direction
       casadi_qp_linesearch(&d, &index, &sign);
     }
-
     // Get solution
     casadi_copy(&d.f, 1, res[CONIC_COST]);
     casadi_copy(d.z, nx_, res[CONIC_X]);
     casadi_copy(d.lam, nx_, res[CONIC_LAM_X]);
     casadi_copy(d.lam+nx_, na_, res[CONIC_LAM_A]);
-
     return flag;
   }
 
