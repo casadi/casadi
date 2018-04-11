@@ -1651,6 +1651,13 @@ Dennis Janka, Joel Andersson
 |                   |               | regarded as       |                  |
 |                   |               | numerically zero  |                  |
 +-------------------+---------------+-------------------+------------------+
+| error_on_fail     | OT_BOOL       | When the          | casadi::Nlpsol   |
+|                   |               | numerical process |                  |
+|                   |               | returns           |                  |
+|                   |               | unsuccessfully,   |                  |
+|                   |               | raise an error    |                  |
+|                   |               | (default false).  |                  |
++-------------------+---------------+-------------------+------------------+
 | eta               | OT_DOUBLE     | Filter line       | casadi::Blocksqp |
 |                   |               | search parameter, |                  |
 |                   |               | cf. IPOPT paper   |                  |
@@ -2593,6 +2600,13 @@ an oracle function
 |                  |                  | are discrete,    |                 |
 |                  |                  | i.e. integer-    |                 |
 |                  |                  | valued           |                 |
++------------------+------------------+------------------+-----------------+
+| error_on_fail    | OT_BOOL          | When the         | casadi::Nlpsol  |
+|                  |                  | numerical        |                 |
+|                  |                  | process returns  |                 |
+|                  |                  | unsuccessfully,  |                 |
+|                  |                  | raise an error   |                 |
+|                  |                  | (default false). |                 |
 +------------------+------------------+------------------+-----------------+
 | eval_errors_fata | OT_BOOL          | When errors      | casadi::Nlpsol  |
 | l                |                  | occur during     |                 |
@@ -16081,6 +16095,13 @@ Joris Gillis
 |                   |              | > 0.0, -2: ui <   |                   |
 |                   |              | 0.0.              |                   |
 +-------------------+--------------+-------------------+-------------------+
+| error_on_fail     | OT_BOOL      | When the          | casadi::Rootfinde |
+|                   |              | numerical process | r                 |
+|                   |              | returns           |                   |
+|                   |              | unsuccessfully,   |                   |
+|                   |              | raise an error    |                   |
+|                   |              | (default false).  |                   |
++-------------------+--------------+-------------------+-------------------+
 | implicit_input    | OT_INT       | Index of the      | casadi::Rootfinde |
 |                   |              | input that        | r                 |
 |                   |              | corresponds to    |                   |
@@ -23709,6 +23730,13 @@ Joris Gillis
 |                   |              | ui <= 0.0, 2: ui  |                   |
 |                   |              | > 0.0, -2: ui <   |                   |
 |                   |              | 0.0.              |                   |
++-------------------+--------------+-------------------+-------------------+
+| error_on_fail     | OT_BOOL      | When the          | casadi::Rootfinde |
+|                   |              | numerical process | r                 |
+|                   |              | returns           |                   |
+|                   |              | unsuccessfully,   |                   |
+|                   |              | raise an error    |                   |
+|                   |              | (default false).  |                   |
 +-------------------+--------------+-------------------+-------------------+
 | implicit_input    | OT_INT       | Index of the      | casadi::Rootfinde |
 |                   |              | input that        | r                 |
@@ -35489,6 +35517,13 @@ Joris Gillis
 |                   |              | > 0.0, -2: ui <   |                   |
 |                   |              | 0.0.              |                   |
 +-------------------+--------------+-------------------+-------------------+
+| error_on_fail     | OT_BOOL      | When the          | casadi::Rootfinde |
+|                   |              | numerical process | r                 |
+|                   |              | returns           |                   |
+|                   |              | unsuccessfully,   |                   |
+|                   |              | raise an error    |                   |
+|                   |              | (default false).  |                   |
++-------------------+--------------+-------------------+-------------------+
 | implicit_input    | OT_INT       | Index of the      | casadi::Rootfinde |
 |                   |              | input that        | r                 |
 |                   |              | corresponds to    |                   |
@@ -36621,6 +36656,13 @@ Joel Andersson
 |                  |                 | are discrete,    |                  |
 |                  |                 | i.e. integer-    |                  |
 |                  |                 | valued           |                  |
++------------------+-----------------+------------------+------------------+
+| error_on_fail    | OT_BOOL         | When the         | casadi::Nlpsol   |
+|                  |                 | numerical        |                  |
+|                  |                 | process returns  |                  |
+|                  |                 | unsuccessfully,  |                  |
+|                  |                 | raise an error   |                  |
+|                  |                 | (default false). |                  |
 +------------------+-----------------+------------------+------------------+
 | eval_errors_fata | OT_BOOL         | When errors      | casadi::Nlpsol   |
 | l                |                 | occur during     |                  |
@@ -40502,6 +40544,13 @@ Internal class.
 |                  |                 | 0.0, -2: ui <    |                  |
 |                  |                 | 0.0.             |                  |
 +------------------+-----------------+------------------+------------------+
+| error_on_fail    | OT_BOOL         | When the         | casadi::Rootfind |
+|                  |                 | numerical        | er               |
+|                  |                 | process returns  |                  |
+|                  |                 | unsuccessfully,  |                  |
+|                  |                 | raise an error   |                  |
+|                  |                 | (default false). |                  |
++------------------+-----------------+------------------+------------------+
 | implicit_input   | OT_INT          | Index of the     | casadi::Rootfind |
 |                  |                 | input that       | er               |
 |                  |                 | corresponds to   |                  |
@@ -42832,6 +42881,13 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |                   |                 | are discrete,     |                |
 |                   |                 | i.e. integer-     |                |
 |                   |                 | valued            |                |
++-------------------+-----------------+-------------------+----------------+
+| error_on_fail     | OT_BOOL         | When the          | casadi::Nlpsol |
+|                   |                 | numerical process |                |
+|                   |                 | returns           |                |
+|                   |                 | unsuccessfully,   |                |
+|                   |                 | raise an error    |                |
+|                   |                 | (default false).  |                |
 +-------------------+-----------------+-------------------+----------------+
 | eval_errors_fatal | OT_BOOL         | When errors occur | casadi::Nlpsol |
 |                   |                 | during evaluation |                |
@@ -47429,6 +47485,13 @@ A textbook SQPMethod
 |                   |               | i.e. integer-     |                  |
 |                   |               | valued            |                  |
 +-------------------+---------------+-------------------+------------------+
+| error_on_fail     | OT_BOOL       | When the          | casadi::Nlpsol   |
+|                   |               | numerical process |                  |
+|                   |               | returns           |                  |
+|                   |               | unsuccessfully,   |                  |
+|                   |               | raise an error    |                  |
+|                   |               | (default false).  |                  |
++-------------------+---------------+-------------------+------------------+
 | eval_errors_fatal | OT_BOOL       | When errors occur | casadi::Nlpsol   |
 |                   |               | during evaluation |                  |
 |                   |               | of f,g,...,stop   |                  |
@@ -50164,6 +50227,13 @@ General information
 |                  |                 | 0.0, 2: ui >     |                  |
 |                  |                 | 0.0, -2: ui <    |                  |
 |                  |                 | 0.0.             |                  |
++------------------+-----------------+------------------+------------------+
+| error_on_fail    | OT_BOOL         | When the         | casadi::Rootfind |
+|                  |                 | numerical        | er               |
+|                  |                 | process returns  |                  |
+|                  |                 | unsuccessfully,  |                  |
+|                  |                 | raise an error   |                  |
+|                  |                 | (default false). |                  |
 +------------------+-----------------+------------------+------------------+
 | implicit_input   | OT_INT          | Index of the     | casadi::Rootfind |
 |                  |                 | input that       | er               |
@@ -53184,6 +53254,13 @@ General information
 |                  |                 | are discrete,    |                  |
 |                  |                 | i.e. integer-    |                  |
 |                  |                 | valued           |                  |
++------------------+-----------------+------------------+------------------+
+| error_on_fail    | OT_BOOL         | When the         | casadi::Nlpsol   |
+|                  |                 | numerical        |                  |
+|                  |                 | process returns  |                  |
+|                  |                 | unsuccessfully,  |                  |
+|                  |                 | raise an error   |                  |
+|                  |                 | (default false). |                  |
 +------------------+-----------------+------------------+------------------+
 | eval_errors_fata | OT_BOOL         | When errors      | casadi::Nlpsol   |
 | l                |                 | occur during     |                  |

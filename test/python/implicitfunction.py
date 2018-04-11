@@ -272,6 +272,7 @@ class ImplicitFunctiontests(casadiTestCase):
     a = SX.sym("a")
     f = Function("f", [x,a],[tan(x)-a,sqrt(a)*x**2 ])
     for Solver, options, features in solvers:
+      print(Solver)
       options2 = dict(options)
       options2["ad_weight_sp"] = 1
       solver=rootfinder("solver", Solver, f, options2)
@@ -284,6 +285,24 @@ class ImplicitFunctiontests(casadiTestCase):
     x = SX.sym("x",2)
     a = SX.sym("a",2)
     f = Function("f", [x,a],[tan(x)-a,sqrt(a)*x**2 ])
+
+  def test_no_success(self):
+
+    x=SX.sym("x")
+    y=SX.sym("y")
+
+    for Solver, options, features in solvers:
+      opts = dict(options)
+      if Solver=="kinsol": opts["error_on_fail"] = False # has different default
+      solver = rootfinder("solver",Solver,{'x':vertcat(x,y), 'g':vertcat(sin(x)-2,sin(y)-2)},opts)
+      solver(x=0)
+      self.assertFalse(solver.stats()["success"])
+
+      opts = dict(options)
+      opts["error_on_fail"] = True
+      solver = rootfinder("solver",Solver,{'x':vertcat(x,y), 'g':vertcat(sin(x)-2,sin(y)-2)},opts)
+      with self.assertInException("process"):
+        solver(x=0)
 
 if __name__ == '__main__':
     unittest.main()

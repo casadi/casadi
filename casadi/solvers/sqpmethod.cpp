@@ -300,9 +300,6 @@ namespace casadi {
   int Sqpmethod::solve(void* mem) const {
     auto m = static_cast<SqpmethodMemory*>(mem);
 
-    // Problem has not been solved at this point
-    m->success = false;
-
     // Number of SQP iterations
     m->iter_count = 0;
 
@@ -586,7 +583,6 @@ namespace casadi {
     auto m = static_cast<SqpmethodMemory*>(mem);
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter_count;
-    stats["success"] = m->success;
     return stats;
   }
 } // namespace casadi

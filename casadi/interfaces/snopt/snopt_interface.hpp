@@ -66,7 +66,6 @@ namespace casadi {
     static std::vector<SnoptMemory*> mempool;
     int memind;
 
-    bool success;
     int return_status;
 
     /// Constructor

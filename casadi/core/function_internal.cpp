@@ -1541,10 +1541,10 @@ namespace casadi {
   }
 
   void assert_read(std::istream &stream, const std::string& s) {
-    int n = s.size();
+    casadi_int n = s.size();
     char c;
     std::stringstream ss;
-    for (int i=0;i<n;++i) {
+    for (casadi_int i=0;i<n;++i) {
       stream >> c;
       ss << c;
     }
@@ -1838,7 +1838,7 @@ namespace casadi {
     codegen_sparsities(g);
 
     // Determine work vector size
-    int sz_w_codegen = sz_w();
+    casadi_int sz_w_codegen = sz_w();
     if (is_a("SXFunction", true) && !g.avoid_stack()) sz_w_codegen = 0;
 
     // Function that returns work vector lengths

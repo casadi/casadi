@@ -1032,16 +1032,20 @@ class NLPtests(casadiTestCase):
       with self.assertInException("[p] are free"):
         solver = nlpsol("solver",Solver,{"x":x,"f":(x-p)**2}, solver_options)
 
-  @requires_nlpsol("ipopt")
   def test_no_success(self):
 
     x=SX.sym("x")
     y=SX.sym("y")
 
     f = (1-x)**2+100*(y-x**2)**2
-    solver = nlpsol("solver","ipopt",{'x':vertcat(x,y), 'f':f,'g':x+y},{"ipopt.max_iter":0})
-    solver(x0=0)
-    self.assertFalse(solver.stats()["success"])
+    for Solver, solver_options in solvers:
+      solver = nlpsol("solver","ipopt",{'x':vertcat(x,y), 'f':f,'g':vertcat(x+1,x-2)})
+      solver(x0=0,lbg=0,ubg=0)
+      self.assertFalse(solver.stats()["success"])
+
+      solver = nlpsol("solver","ipopt",{'x':vertcat(x,y), 'f':f,'g':vertcat(x+1,x-2)},{"error_on_fail":True})
+      with self.assertInException("process"):
+        solver(x0=0,lbg=0,ubg=0)
     
 
   @requires_nlpsol("ipopt")

@@ -151,9 +151,6 @@ namespace casadi {
   int KnitroInterface::solve(void* mem) const {
     auto m = static_cast<KnitroMemory*>(mem);
 
-    // Problem has not been solved at this point
-    m->success = false;
-
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert_dev(m->kc==0);
     m->kc = KTR_new_puts(casadi_KTR_puts, 0);
@@ -421,7 +418,6 @@ namespace casadi {
     Dict stats = Nlpsol::get_stats(mem);
     auto m = static_cast<KnitroMemory*>(mem);
     stats["return_status"] = m->return_status;
-    stats["success"] = m->success;
 
     return stats;
   }

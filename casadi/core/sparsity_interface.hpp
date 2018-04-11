@@ -442,7 +442,10 @@ namespace casadi {
   template<typename MatType>
   MatType SparsityInterface<MatType>::repmat(const MatType& x, casadi_int n, casadi_int m) {
     MatType allrows = vertcat(std::vector<MatType>(n, x));
-    return horzcat(std::vector<MatType>(m, allrows));
+    if (n==0) allrows = MatType(0, x.size2());
+    MatType ret = horzcat(std::vector<MatType>(m, allrows));
+    if (m==0) ret = MatType(allrows.size1(), 0);
+    return ret;
   }
 
   template<typename MatType>

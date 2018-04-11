@@ -292,7 +292,6 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     snProblem prob;
 
     // Problem has not been solved at this point
-    m->success = false;
     m->return_status = -1;
 
     // Evaluate gradF and jacG at initial value
@@ -551,7 +550,6 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     auto m = static_cast<SnoptMemory*>(mem);
     stats["return_status"] = formatStatus(m->return_status);
     stats["secondary_return_status"] = formatSecondaryStatus(m->return_status);
-    stats["success"] = m->success;
 
     return stats;
   }

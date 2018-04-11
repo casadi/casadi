@@ -1749,8 +1749,12 @@ namespace casadi {
   }
 
   MX MX::repmat(const MX& x, casadi_int n, casadi_int m) {
-    if (n==0 || m==0) {
+    if (n==0 && m==0) {
       return MX();
+    } else if (n==0) {
+      return MX(0, x.size2()*m);
+    } else if (m==0) {
+      return MX(x.size1()*n, 0);
     } else if (n==1 && m==1) {
       return x;
     } else {

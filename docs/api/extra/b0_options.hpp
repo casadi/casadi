@@ -12,6 +12,7 @@
 <tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
@@ -48,6 +49,7 @@
 <tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
@@ -262,6 +264,7 @@
 <tr><td>delta_h0</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eps</td><td>OT_DOUBLE</td><td>Values smaller than this are regarded as numerically zero</td><td>casadi::Blocksqp</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
@@ -400,6 +403,7 @@
 <tr><td>delta_h0</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eps</td><td>OT_DOUBLE</td><td>Values smaller than this are regarded as numerically zero</td><td>casadi::Blocksqp</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
@@ -474,6 +478,7 @@
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to BONMIN</td><td>casadi::BonMinMessageHandler</td></tr>
 <tr><td>con_string_md</td><td>OT_DICT</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to BONMIN</td><td>casadi::BonMinMessageHandler</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::BonMinMessageHandler</td></tr>
@@ -519,6 +524,7 @@
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to BONMIN</td><td>casadi::BonminInterface</td></tr>
 <tr><td>con_string_md</td><td>OT_DICT</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to BONMIN</td><td>casadi::BonminInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::BonminInterface</td></tr>
@@ -589,6 +595,7 @@
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to BONMIN</td><td>casadi::BonminInterface</td></tr>
 <tr><td>con_string_md</td><td>OT_DICT</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to BONMIN</td><td>casadi::BonminInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::BonminInterface</td></tr>
@@ -1166,6 +1173,7 @@
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance on ||g||__inf)</td><td>casadi::FastNewton</td></tr>
 <tr><td>abstolStep</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance on step size</td><td>casadi::FastNewton</td></tr>
 <tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
@@ -1195,6 +1203,7 @@
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance on ||g||__inf)</td><td>casadi::FastNewton</td></tr>
 <tr><td>abstolStep</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance on step size</td><td>casadi::FastNewton</td></tr>
 <tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
@@ -1644,6 +1653,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
@@ -1671,6 +1681,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
@@ -1825,6 +1836,7 @@
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_string_md</td><td>OT_DICT</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::IpoptInterface</td></tr>
@@ -1881,6 +1893,7 @@
 <tr><td>con_numeric_md</td><td>OT_DICT</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>con_string_md</td><td>OT_DICT</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT</td><td>casadi::IpoptInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::IpoptInterface</td></tr>
@@ -1946,6 +1959,7 @@
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable KINSOL internal warning messages</td><td>casadi::KinsolInterface</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Rootfinder</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>f_scale</td><td>OT_DOUBLEVECTOR</td><td>Equation scaling factors</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
@@ -1997,6 +2011,7 @@
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable KINSOL internal warning messages</td><td>casadi::KinsolInterface</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Rootfinder</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>f_scale</td><td>OT_DOUBLEVECTOR</td><td>Equation scaling factors</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
@@ -2032,6 +2047,7 @@
 <tr><td>contype</td><td>OT_INTVECTOR</td><td>Type of constraint</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>detect_linear_constraints</td><td>OT_BOOL</td><td>Detect type of constraints</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
@@ -2072,6 +2088,7 @@
 <tr><td>contype</td><td>OT_INTVECTOR</td><td>Type of constraint</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>detect_linear_constraints</td><td>OT_BOOL</td><td>Detect type of constraints</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
@@ -2318,6 +2335,7 @@
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance on max(|F|)</td><td>casadi::Newton</td></tr>
 <tr><td>abstolStep</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance on step size</td><td>casadi::Newton</td></tr>
 <tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
@@ -2349,6 +2367,7 @@
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance on max(|F|)</td><td>casadi::Newton</td></tr>
 <tr><td>abstolStep</td><td>OT_DOUBLE</td><td>Stopping criterion tolerance on step size</td><td>casadi::Newton</td></tr>
 <tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
@@ -2373,6 +2392,7 @@
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>common_options</td><td>OT_DICT</td><td>Options for auto-generated functions</td><td>casadi::OracleFunction</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
@@ -2402,6 +2422,7 @@
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>common_options</td><td>OT_DICT</td><td>Options for auto-generated functions</td><td>casadi::OracleFunction</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
@@ -2702,6 +2723,7 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>common_options</td><td>OT_DICT</td><td>Options for auto-generated functions</td><td>casadi::OracleFunction</td></tr>
 <tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
@@ -2720,6 +2742,7 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>common_options</td><td>OT_DICT</td><td>Options for auto-generated functions</td><td>casadi::OracleFunction</td></tr>
 <tr><td>constraints</td><td>OT_INTVECTOR</td><td>Constrain the unknowns. 0 (default): no constraint on ui, 1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::Rootfinder</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_input</td><td>OT_INT</td><td>Index of the input that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>implicit_output</td><td>OT_INT</td><td>Index of the output that corresponds to the actual root-finding</td><td>casadi::Rootfinder</td></tr>
 <tr><td>jacobian_function</td><td>OT_FUNCTION</td><td>Function object for calculating the Jacobian (autogenerated by default)</td><td>casadi::Rootfinder</td></tr>
@@ -2782,6 +2805,7 @@
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::Scpgen</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>gauss-newton|exact</td><td>casadi::Scpgen</td></tr>
@@ -2856,6 +2880,7 @@
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>codegen</td><td>OT_BOOL</td><td>C-code generation</td><td>casadi::Scpgen</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>gauss-newton|exact</td><td>casadi::Scpgen</td></tr>
@@ -3043,6 +3068,7 @@
 <tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
@@ -3081,6 +3107,7 @@
 <tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
@@ -3111,6 +3138,7 @@
 <tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td><td>casadi::Sqpmethod</td></tr>
@@ -3177,6 +3205,7 @@
 <tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>hessian_approximation</td><td>OT_STRING</td><td>limited-memory|exact</td><td>casadi::Sqpmethod</td></tr>
@@ -3368,6 +3397,7 @@
 <tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>
@@ -3404,6 +3434,7 @@
 <tr><td>calc_lam_x</td><td>OT_BOOL</td><td>Calculate 'lam_x' in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>calc_multipliers</td><td>OT_BOOL</td><td>Calculate Lagrange multipliers in the Nlpsol base class</td><td>casadi::Nlpsol</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Nlpsol</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Nlpsol</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Nlpsol</td></tr>
 <tr><td>ignore_check_vec</td><td>OT_BOOL</td><td>If set to true, the input shape of F will not be checked.</td><td>casadi::Nlpsol</td></tr>

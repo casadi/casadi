@@ -194,6 +194,8 @@ namespace casadi {
     if (success) m->return_status = "success";
     if (verbose_) casadi_message("Newton algorithm took " + str(m->iter) + " steps");
 
+    m->success = success;
+
     return 0;
   }
 
@@ -222,6 +224,14 @@ namespace casadi {
     m->return_status = 0;
     m->iter = 0;
     return 0;
+  }
+
+  Dict Newton::get_stats(void* mem) const {
+    Dict stats = Rootfinder::get_stats(mem);
+    auto m = static_cast<NewtonMemory*>(mem);
+    stats["return_status"] = m->return_status;
+    stats["iter_count"] = m->iter;
+    return stats;
   }
 
 } // namespace casadi
