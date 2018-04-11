@@ -28,7 +28,9 @@
 
 #include "casadi/core/conic_impl.hpp"
 #include <casadi/solvers/casadi_conic_activeset_export.h>
-
+namespace casadi {
+#include "casadi/core/runtime/casadi_qp.hpp"
+} // namespace casadi
 
 /** \defgroup plugin_Conic_activeset
  Solve QPs using an active-set method
