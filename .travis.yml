@@ -235,6 +235,11 @@ matrix:
         - sudo apt-get update -qq
         #- sudo echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
         - sudo apt-get install python-pyparsing libhunspell-dev default-jdk -y
+        - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+        - sudo add-apt-repository "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main"
+        - sudo apt-get update
+        - sudo apt-get install clang-tidy-5.0 clang-5.0 -y
+        - sudo ln -s /usr/bin/clang-tidy-5.0 /usr/bin/clang-tidy
         - sudo pip install hunspell
         - wget https://www.languagetool.org/download/LanguageTool-2.7.zip
         - unzip LanguageTool-2.7.zip
@@ -242,8 +247,9 @@ matrix:
         - export languagetool="$mypwd/LanguageTool-2.7"
         - mkdir build
         - pushd build
-        - bash -c "cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_SPELL=ON -DWITH_LINT=ON .."
+        - bash -c "cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_SPELL=ON -DWITH_LINT=ON -DWITH_CLANG_TIDY=ON .."
         - make lint
+        - make clang-tidy
         - export languagetool="$mypwd/LanguageTool-2.7" make spell
         - popd && pushd misc && python autogencode.py && popd
         - sh /home/travis/build/testbot/helpers/acommit.sh "automatic code generation"

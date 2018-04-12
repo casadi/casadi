@@ -737,6 +737,18 @@ if(WITH_SPELL)
   include(SpellCheck REQUIRED)
 endif()
 
+option(WITH_CLANG_TIDY "Compile with support for clang-tidy" OFF)
+if(WITH_CLANG_TIDY)
+  include(ClangTidy REQUIRED)
+  set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+  if(WITH_EXTRA_WARNINGS)
+    # -Wall leaks into clang-tidy (through compile_commands.json)
+    # silently overruling the 'Checks' field.
+    # These warnings come from external_packages
+    set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Wno-overloaded-virtual -Wno-deprecated-register")
+  endif()
+endif()
+
 include(embed_resources)
 include(GenerateExportHeader)
 
