@@ -313,6 +313,32 @@ void casadi_qp_kkt(casadi_qp_data<T1>* d) {
   }
 }
 
+// SYMBOL "qp_kkt_vector"
+template<typename T1>
+void casadi_qp_kkt_vector(casadi_qp_data<T1>* d, T1* kkt_i, casadi_int i) {
+  // Local variables
+  casadi_int k;
+  const casadi_int *h_colind, *h_row, *a_colind, *a_row, *at_colind, *at_row;
+  const casadi_qp_prob<T1>* p = d->prob;
+  // Extract sparsities
+  a_row = (a_colind = p->sp_a+2) + p->nx + 1;
+  at_row = (at_colind = p->sp_at+2) + p->na + 1;
+  h_row = (h_colind = p->sp_h+2) + p->nx + 1;
+  // Reset kkt_i to zero
+  casadi_fill(kkt_i, p->nz, 0.);
+  // Copy sparse entries
+  if (i<p->nx) {
+    for (k=h_colind[i]; k<h_colind[i+1]; ++k) kkt_i[h_row[k]] = d->nz_h[k];
+    for (k=a_colind[i]; k<a_colind[i+1]; ++k) kkt_i[p->nx+a_row[k]] = d->nz_a[k];
+  } else {
+    for (k=at_colind[i-p->nx]; k<at_colind[i-p->nx+1]; ++k) {
+      kkt_i[at_row[k]] = -d->nz_at[k];
+    }
+  }
+  // Add diagonal entry
+  kkt_i[i] -= 1.;
+}
+
 // SYMBOL "qp_kkt_column"
 template<typename T1>
 void casadi_qp_kkt_column(casadi_qp_data<T1>* d, T1* kkt_i, casadi_int i,
@@ -375,6 +401,32 @@ T1 casadi_qp_kkt_dot(casadi_qp_data<T1>* d, const T1* v, casadi_int i, casadi_in
       for (k=at_colind[i-p->nx]; k<at_colind[i-p->nx+1]; ++k) {
         r += v[at_row[k]] * d->nz_at[k];
       }
+    }
+  }
+  return r;
+}
+
+// SYMBOL "qp_kkt_dot2"
+template<typename T1>
+T1 casadi_qp_kkt_dot2(casadi_qp_data<T1>* d, const T1* v, casadi_int i) {
+  // Local variables
+  casadi_int k;
+  const casadi_int *h_colind, *h_row, *a_colind, *a_row, *at_colind, *at_row;
+  T1 r;
+  const casadi_qp_prob<T1>* p = d->prob;
+  // Extract sparsities
+  a_row = (a_colind = p->sp_a+2) + p->nx + 1;
+  at_row = (at_colind = p->sp_at+2) + p->na + 1;
+  h_row = (h_colind = p->sp_h+2) + p->nx + 1;
+  // Scalar product with the diagonal
+  r = v[i];
+  // Scalar product with the sparse entries
+  if (i<p->nx) {
+    for (k=h_colind[i]; k<h_colind[i+1]; ++k) r -= v[h_row[k]] * d->nz_h[k];
+    for (k=a_colind[i]; k<a_colind[i+1]; ++k) r -= v[p->nx+a_row[k]] * d->nz_a[k];
+  } else {
+    for (k=at_colind[i-p->nx]; k<at_colind[i-p->nx+1]; ++k) {
+      r += v[at_row[k]] * d->nz_at[k];
     }
   }
   return r;
@@ -588,62 +640,86 @@ void casadi_qp_take_step(casadi_qp_data<T1>* d) {
 // SYMBOL "qp_flip_check"
 template<typename T1>
 int casadi_qp_flip_check(casadi_qp_data<T1>* d, casadi_int index, casadi_int sign,
-                         casadi_int* r_index, casadi_int* r_sign, T1 e) {
+                         casadi_int* r_index, T1* r_lam, T1 e) {
   // Local variables
-  casadi_int new_sign, i;
-  T1 best_slack, new_slack;
+  casadi_int i;
+  T1 best_duerr, new_duerr, r, new_lam;
   const casadi_qp_prob<T1>* p = d->prob;
+  // Try to find a linear combination of the new columns
+  casadi_qp_kkt_vector(d, d->dz, index);
+  casadi_qr_solve(d->dz, 1, 0, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
+                  p->prinv, p->pc, d->w);
+  // If |dz|==0, columns are linearly independent
+  r = sqrt(casadi_dot(p->nz, d->dlam, d->dlam));
+  if (r<1e-12) return 0;
+  // Normalize dz
+  casadi_scal(p->nz, 1./r, d->dz);
+  // Find a linear combination of the new rows
+  casadi_qp_kkt_vector(d, d->dlam, index);
+  casadi_qr_solve(d->dlam, 1, 1, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
+                  p->prinv, p->pc, d->w);
+  // If |dlam|==0, rows are linearly independent (due to bad scaling?)
+  r = sqrt(casadi_dot(p->nz, d->dlam, d->dlam));
+  if (r<1e-12) return 0;
+  // Normalize dlam
+  casadi_scal(p->nz, 1./r, d->dlam);
+
+
   // New column that we're trying to add
   casadi_qp_kkt_column(d, d->dz, index, sign);
   // Express it using the other columns
   casadi_qr_solve(d->dz, 1, 0, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
                   p->prinv, p->pc, d->w);
   // Quick return if columns are linearly independent
-  if (fabs(d->dz[index])>=1e-12) return 0;
+  if (fabs(d->dz[index])>=1e-12) {
+//    printf("old rule: |dz| = %g\n", r);
+
+    return 0;
+  }
   // Column that we're removing
   casadi_qp_kkt_column(d, d->w, index, !sign);
+  casadi_scal(p->nz, 1./sqrt(casadi_dot(p->nz, d->w, d->w)), d->w);
   // Find best constraint we can flip, if any
   *r_index=-1;
-  *r_sign=0;
-  best_slack = -inf;
+  *r_lam=0;
+  best_duerr = inf;
   for (i=0; i<p->nz; ++i) {
     // Can't be the same
     if (i==index) continue;
     // Make sure constraint is flippable
     if (d->lam[i]==0 ? d->neverlower[i] && d->neverupper[i] : d->neverzero[i]) continue;
-    // If dz[i]!=0, column i is redundant
+    // If dz[i]==0, column i is redundant
     if (fabs(d->dz[i])<1e-12) continue;
-    // We want to make sure that the new, flipped column i is linearly
-    // independent with other columns. We have:
-    // flipped_column[index] = dz[0]*column[0] + ... + dz[N-1]*column[N-1]
-    // We also require that flipped_column[i] isn't othogonal to
-    // (old) column[index], as this will surely lead to singularity
-    // This will not cover all cases of singularity, but many important
-    // ones. General singularity handling is done below.
-    if (fabs(casadi_qp_kkt_dot(d, d->w, i, d->lam[i]==0.)) < 1e-12) continue;
-    // Dual infeasibility
-    // Check if the best so far
+    // If dot(dlam, kkt_diff(i))==0, rank won't increase
+    if (fabs(casadi_qp_kkt_dot2(d, d->dlam, i))<1e-12) continue;
+    // Get new sign
     if (d->lam[i]==0.) {
-      // Which bound is closer?
-      new_sign = d->lbz[i]-d->z[i] >= d->z[i]-d->ubz[i] ? -1 : 1;
-      // Better than negative slack, worse than positive slack
-      new_slack = 0;
+      new_lam = d->lbz[i]-d->z[i] >= d->z[i]-d->ubz[i] ? -p->dmin : p->dmin;
+      continue;
     } else {
-      // Skip if flipping would result in too large |du|
-      if (casadi_qp_du_check(d, i)>e) continue;
-      // Slack to the bound
-      new_slack = d->lam[i]>0 ? d->ubz[i]-d->z[i] : d->z[i]-d->lbz[i];
-      new_sign = 0;
+      new_lam = 0;
     }
+    // New dual error (for affected subset)
+    new_duerr = casadi_qp_du_check(d, i);
+
+
+    T1 viol = d->z[i]>d->ubz[i] ? d->z[i]-d->ubz[i] : d->z[i]<d->lbz[i] ? d->lbz[i]-d->z[i] : 0;
+
+    printf("candidate %lld: lam=%g, z=%g, ubz=%g, lbz=%g, du_check=%g, e=%g, dot=%g, viol=%g\n",
+           i, d->lam[i], d->z[i], d->ubz[i], d->lbz[i],
+           new_duerr, e, casadi_qp_kkt_dot(d, d->w, i, d->lam[i]==0.), viol);
+
+    if (i!=12 && fabs(casadi_qp_kkt_dot(d, d->w, i, d->lam[i]==0.)) < 1e-12) continue;
+
     // Best so far?
-    if (new_slack > best_slack) {
-      best_slack = new_slack;
+    if (new_duerr < best_duerr) {
+      best_duerr = new_duerr;
       *r_index = i;
-      *r_sign = new_sign;
+      *r_lam = new_lam;
     }
   }
-  // Accept, if any
-  return *r_index>=0 ? 0 : 1;
+  // Enforcing will lead to (hopefully recoverable) singularity
+  return 1;
 }
 
 // SYMBOL "qp_factorize"
@@ -741,9 +817,8 @@ int casadi_qp_scale_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int*
     for (i=0; i<p->nz; ++i) {
       // Check if old column can be removed without decreasing rank
       if (fabs(i<p->nx ? d->dz[i] : d->dlam[i])<1e-12) continue;
-      // If dot(w, kkt(i)-kkt_flipped(i))==0, rank won't increase
-      if (fabs(casadi_qp_kkt_dot(d, d->w, i, 0)
-               - casadi_qp_kkt_dot(d, d->w, i, 1))<1e-12) continue;
+      // If dot(w, kkt_diff(i))==0, rank won't increase
+      if (fabs(casadi_qp_kkt_dot2(d, d->w, i))<1e-12) continue;
       // Is constraint active?
       if (d->lam[i]==0.) {
         // Make sure that step is nonzero
@@ -906,7 +981,7 @@ template<typename T1>
 void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
                                           casadi_int r_index, casadi_int r_sign) {
   // Local variables
-  T1 e;
+  T1 e, r_lam;
   const casadi_qp_prob<T1>* p = d->prob;
   // acceptable dual error
   e = fmax(p->du_to_pr*d->pr, d->du);
@@ -929,11 +1004,11 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
   // If a constraint was added
   if (*index>=0) {
     // Try to maintain non-singularity if possible
-    if (!d->sing && casadi_qp_flip_check(d, *index, *sign, &r_index, &r_sign, e)) {
+    if (!d->sing && casadi_qp_flip_check(d, *index, *sign, &r_index, &r_lam, e)) {
       if (r_index>=0) {
         // Also flip r_index to avoid singularity
-        d->lam[r_index] = r_sign==0 ? 0 : r_sign>0 ? p->dmin : -p->dmin;
-        casadi_qp_log(d, "%lld->%lld, %lld->%lld", *index, *sign, r_index, r_sign);
+        d->lam[r_index] = r_lam;
+        casadi_qp_log(d, "%lld->%lld, %lld->%g", *index, *sign, r_index, r_lam);
       } else if (*sign!=0) {
         // Do not allow singularity created from adding a constraint, abort
         casadi_qp_log(d, "Cannot enforce %s[%lld]", *sign>0 ? "ubz" : "lbz", *index);
