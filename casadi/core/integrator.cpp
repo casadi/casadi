@@ -541,7 +541,7 @@ namespace casadi {
     if (nq_>0 && res[INTEGRATOR_QF]) {
       arg1[DE_X] = tmp_x;
       arg1[DE_Z] = tmp_z;
-      res1[DE_ODE] = res1[DE_ALG] = 0;
+      res1[DE_ODE] = res1[DE_ALG] = nullptr;
       res1[DE_QUAD] = res[INTEGRATOR_QF];
       if (oracle_(arg1, res1, iw, w, 0)) return 1;
     }
@@ -577,7 +577,7 @@ namespace casadi {
       if (nrq_>0 && res[INTEGRATOR_RQF]) {
         arg1[DE_RX] = tmp_rx;
         arg1[DE_RZ] = tmp_rz;
-        res1[DE_RODE] = res1[DE_RALG] = 0;
+        res1[DE_RODE] = res1[DE_RALG] = nullptr;
         res1[DE_RQUAD] = res[INTEGRATOR_RQF];
         if (oracle_(arg1, res1, iw, w, 0)) return 1;
       }
@@ -665,9 +665,9 @@ namespace casadi {
       // Indirect dependency via g
       res1[DE_RODE] = tmp_rx;
       res1[DE_RALG] = tmp_rz;
-      res1[DE_RQUAD] = 0;
+      res1[DE_RQUAD] = nullptr;
       arg1[DE_RX] = rx0;
-      arg1[DE_RZ] = 0; // arg[INTEGRATOR_RZ0] is a guess, no dependency
+      arg1[DE_RZ] = nullptr; // arg[INTEGRATOR_RZ0] is a guess, no dependency
       if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
     }
 
@@ -693,9 +693,9 @@ namespace casadi {
     // Indirect dependency through f
     res1[DE_ODE] = tmp_x;
     res1[DE_ALG] = tmp_z;
-    res1[DE_QUAD] = 0;
+    res1[DE_QUAD] = nullptr;
     arg1[DE_X] = x0;
-    arg1[DE_Z] = 0; // arg[INTEGRATOR_Z0] is a guess, no dependency
+    arg1[DE_Z] = nullptr; // arg[INTEGRATOR_Z0] is a guess, no dependency
     if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
     return 0;
   }

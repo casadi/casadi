@@ -598,7 +598,7 @@ namespace casadi {
   template<typename T>
   T* get_ptr(std::vector<T> &v) {
     if (v.empty())
-      return 0;
+      return nullptr;
     else
       return &v.front();
   }
@@ -606,7 +606,7 @@ namespace casadi {
   template<typename T>
   const T* get_ptr(const std::vector<T> &v) {
     if (v.empty())
-      return 0;
+      return nullptr;
     else
       return &v.front();
   }

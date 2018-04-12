@@ -1522,7 +1522,7 @@ namespace casadi {
     case OP_LIFT:           return "lift";
     case OP_EINSTEIN:       return "einstein";
     }
-    return 0;
+    return nullptr;
   }
 
   template<typename T>

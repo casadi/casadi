@@ -357,8 +357,8 @@ namespace casadi {
 
   /** \brief Helper class to direct messages to uout()
   *
-  * IPOPT has the concept of a Jorunal/Journalist
-  * BOONMIN and CBC do not.
+  * IPOPT has the concept of a Journal/Journalist
+  * BONMIN and CBC do not.
   */
   class BonMinMessageHandler : public CoinMessageHandler {
   public:
@@ -372,7 +372,7 @@ namespace casadi {
     BonMinMessageHandler(const BonMinMessageHandler &other): CoinMessageHandler(other) {}
     BonMinMessageHandler(const CoinMessageHandler &other): CoinMessageHandler(other) {}
     BonMinMessageHandler & operator=(const BonMinMessageHandler &rhs) {
-      BonMinMessageHandler::operator=(rhs);
+      CoinMessageHandler::operator=(rhs);
       return *this;
     }
     CoinMessageHandler* clone() const override {
@@ -519,7 +519,7 @@ namespace casadi {
           m->arg[NLPSOL_X] = x;
           m->arg[NLPSOL_F] = &obj_value;
           m->arg[NLPSOL_G] = g;
-          m->arg[NLPSOL_LAM_P] = 0;
+          m->arg[NLPSOL_LAM_P] = nullptr;
           m->arg[NLPSOL_LAM_X] = m->lam_x;
           m->arg[NLPSOL_LAM_G] = m->lam_g;
         }

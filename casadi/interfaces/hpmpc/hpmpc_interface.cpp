@@ -259,7 +259,7 @@ namespace casadi {
     hpmpc_d_ip_ocp_hard_tv_work_space_size_bytes = (Work_size)dlsym(handle, work_size_name.c_str());
 #endif // _WIN32
 
-    casadi_assert(hpmpc_d_ip_ocp_hard_tv_work_space_size_bytes!=0,
+    casadi_assert(hpmpc_d_ip_ocp_hard_tv_work_space_size_bytes!=nullptr,
       "HPMPC interface: symbol \"" + work_size_name + "\" found in " + searchpath + ".");
 
     std::string ocp_solve_name = "fortran_order_d_ip_ocp_hard_tv";
@@ -275,7 +275,7 @@ namespace casadi {
     fortran_order_d_ip_ocp_hard_tv = (Ocp_solve)dlsym(handle, ocp_solve_name.c_str());
 #endif // _WIN32
 
-    casadi_assert(fortran_order_d_ip_ocp_hard_tv!=0,
+    casadi_assert(fortran_order_d_ip_ocp_hard_tv!=nullptr,
       "HPMPC interface: symbol \"" + ocp_solve_name + "\" found in " + searchpath + ".");
 #endif
 

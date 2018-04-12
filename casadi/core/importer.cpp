@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   bool Importer::test_cast(const SharedObjectInternal* ptr) {
-    return dynamic_cast<const ImporterInternal*>(ptr)!=0;
+    return dynamic_cast<const ImporterInternal*>(ptr)!=nullptr;
   }
 
   bool Importer::has_plugin(const std::string& name) {

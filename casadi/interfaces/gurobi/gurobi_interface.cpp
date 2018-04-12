@@ -240,7 +240,7 @@ namespace casadi {
     auto m = static_cast<GurobiMemory*>(mem);
 
     // Load environment
-    casadi_int flag = GRBloadenv(&m->env, 0); // no log file
+    casadi_int flag = GRBloadenv(&m->env, nullptr); // no log file
     casadi_assert(!flag && m->env, "Failed to create GUROBI environment. Flag: "+ str(flag));
 
     m->fstats["preprocessing"]  = FStats();
@@ -325,9 +325,10 @@ namespace casadi {
     int *ind2=reinterpret_cast<int*>(iw); iw+=nx_;
 
     // Greate an empty model
-    GRBmodel *model = 0;
+    GRBmodel *model = nullptr;
     try {
-      casadi_int flag = GRBnewmodel(m->env, &model, name_.c_str(), 0, 0, 0, 0, 0, 0);
+      casadi_int flag = GRBnewmodel(m->env, &model, name_.c_str(), 0,
+        nullptr, nullptr, nullptr, nullptr, nullptr);
       casadi_assert(!flag, GRBgeterrormsg(m->env));
 
       // Add variables
@@ -351,17 +352,18 @@ namespace casadi {
         }
 
         // Pass to model
-        flag = GRBaddvar(model, 0, 0, 0, g ? g[i] : 0., lb, ub, vtype, 0);
+        flag = GRBaddvar(model, 0, nullptr, nullptr, g ? g[i] : 0., lb, ub, vtype, nullptr);
         casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
 
       // Add helper variables for SOCP
       for (casadi_int i=0;i<r_.size()-1;++i) {
         for (casadi_int k=0;k<r_[i+1]-r_[i]-1;++k) {
-          flag = GRBaddvar(model, 0, 0, 0, 0, -GRB_INFINITY, GRB_INFINITY, GRB_CONTINUOUS, 0);
+          flag = GRBaddvar(model, 0, nullptr, nullptr, 0, -GRB_INFINITY, GRB_INFINITY,
+                           GRB_CONTINUOUS, nullptr);
           casadi_assert(!flag, GRBgeterrormsg(m->env));
         }
-        flag = GRBaddvar(model, 0, 0, 0, 0, 0, GRB_INFINITY, GRB_CONTINUOUS, 0);
+        flag = GRBaddvar(model, 0, nullptr, nullptr, 0, 0, GRB_INFINITY, GRB_CONTINUOUS, nullptr);
         casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
 
@@ -418,21 +420,21 @@ namespace casadi {
             // Neither upper or lower bounds, skip
           } else {
             // Only upper bound
-            flag = GRBaddconstr(model, numnz, ind, val, GRB_LESS_EQUAL, ub, 0);
+            flag = GRBaddconstr(model, numnz, ind, val, GRB_LESS_EQUAL, ub, nullptr);
             casadi_assert(!flag, GRBgeterrormsg(m->env));
           }
         } else {
           if (isinf(ub)) {
             // Only lower bound
-            flag = GRBaddconstr(model, numnz, ind, val, GRB_GREATER_EQUAL, lb, 0);
+            flag = GRBaddconstr(model, numnz, ind, val, GRB_GREATER_EQUAL, lb, nullptr);
             casadi_assert(!flag, GRBgeterrormsg(m->env));
           } else if (lb==ub) {
             // Upper and lower bounds equal
-            flag = GRBaddconstr(model, numnz, ind, val, GRB_EQUAL, lb, 0);
+            flag = GRBaddconstr(model, numnz, ind, val, GRB_EQUAL, lb, nullptr);
             casadi_assert(!flag, GRBgeterrormsg(m->env));
           } else {
             // Both upper and lower bounds
-            flag = GRBaddrangeconstr(model, numnz, ind, val, lb, ub, 0);
+            flag = GRBaddrangeconstr(model, numnz, ind, val, lb, ub, nullptr);
             casadi_assert(!flag, GRBgeterrormsg(m->env));
           }
         }
@@ -461,7 +463,7 @@ namespace casadi {
         // Get bound
         double bound = map_P_[i]==-1 ? 0 : -p[map_P_[i]];
 
-        flag = GRBaddconstr(model, numnz, ind, val, GRB_EQUAL, bound, 0);
+        flag = GRBaddconstr(model, numnz, ind, val, GRB_EQUAL, bound, nullptr);
         casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
 
@@ -566,7 +568,7 @@ namespace casadi {
   }
 
   GurobiMemory::GurobiMemory() {
-    this->env = 0;
+    this->env = nullptr;
   }
 
   GurobiMemory::~GurobiMemory() {

@@ -424,7 +424,7 @@ namespace casadi {
       }
     } else if (ScY && !operation_checker<F0XChecker>(op)) {
       bool grow = true;
-      if (y->op()==OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==0) {
+      if (y->op()==OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==nullptr) {
         double ret;
         casadi_math<double>::fun(op, 0, y.nnz()>0 ? y->to_double() : 0, ret);
         grow = ret!=0;
@@ -462,7 +462,7 @@ namespace casadi {
 
     // Constant folding
     // NOTE: ugly, should use a function instead of a cast
-    if (y->op()==OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==0) {
+    if (y->op()==OP_CONST && dynamic_cast<const ConstantDM*>(y.get())==nullptr) {
       double y_value = y.nnz()>0 ? y->to_double() : 0;
       double ret;
       casadi_math<double>::fun(op, nnz()> 0.0 ? to_double(): 0, y_value, ret);

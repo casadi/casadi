@@ -36,7 +36,7 @@ namespace casadi {
   template class SparseStorage<WeakRef>;
 
   SharedObject::SharedObject() {
-    node = 0;
+    node = nullptr;
   }
 
   SharedObject::SharedObject(const SharedObject& ref) {
@@ -76,7 +76,7 @@ namespace casadi {
   }
 
   bool SharedObject::is_null() const {
-    return node==0;
+    return node==nullptr;
   }
 
   void SharedObject::count_up() {
@@ -92,7 +92,7 @@ namespace casadi {
 #endif // WITH_EXTRA_CHECKS
     if (node && --node->count == 0) {
       delete node;
-      node = 0;
+      node = nullptr;
     }
   }
 
@@ -140,7 +140,7 @@ namespace casadi {
   }
 
   bool WeakRef::alive() const {
-    return !is_null() && (*this)->raw_ != 0;
+    return !is_null() && (*this)->raw_ != nullptr;
   }
 
   SharedObject WeakRef::shared() {
@@ -168,7 +168,7 @@ namespace casadi {
   }
 
   void WeakRef::kill() {
-    (*this)->raw_ = 0;
+    (*this)->raw_ = nullptr;
   }
 
 } // namespace casadi

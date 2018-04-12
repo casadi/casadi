@@ -96,7 +96,7 @@ void OptiNode::callback_class(OptiCallback* callback) {
 }
 
 void OptiNode::callback_class() {
-  user_callback_ = 0;
+  user_callback_ = nullptr;
 }
 
 bool OptiNode::has_callback_class() const {
@@ -236,7 +236,7 @@ MX OptiNode::g_lookup(casadi_int i) const {
 OptiNode::OptiNode() : count_(0), count_var_(0), count_par_(0), count_dual_(0) {
   f_ = 0;
   instance_number_ = instance_count_++;
-  user_callback_ = 0;
+  user_callback_ = nullptr;
   store_initial_[OPTI_VAR] = {};
   store_initial_[OPTI_PAR] = {};
   store_initial_[OPTI_DUAL_G] = {};

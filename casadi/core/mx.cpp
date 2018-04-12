@@ -114,7 +114,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::createMultipleOutput(MXNode* node) {
-    casadi_assert_dev(dynamic_cast<MultipleOutput*>(node)!=0);
+    casadi_assert_dev(dynamic_cast<MultipleOutput*>(node)!=nullptr);
     MX x =  MX::create(node);
     std::vector<MX> ret(x->nout());
     for (casadi_int i=0; i<ret.size(); ++i) {
@@ -716,7 +716,7 @@ namespace casadi {
   }
 
   bool MX::is_norm() const {
-    return dynamic_cast<const Norm*>(get())!=0;
+    return dynamic_cast<const Norm*>(get())!=nullptr;
   }
 
   MX::operator double() const {
@@ -903,7 +903,7 @@ namespace casadi {
   }
 
   bool MX::test_cast(const SharedObjectInternal* ptr) {
-    return dynamic_cast<const MXNode*>(ptr)!=0;
+    return dynamic_cast<const MXNode*>(ptr)!=nullptr;
   }
 
   // Helper function

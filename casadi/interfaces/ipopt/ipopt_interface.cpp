@@ -406,7 +406,7 @@ namespace casadi {
           m->arg[NLPSOL_X] = x;
           m->arg[NLPSOL_F] = &obj_value;
           m->arg[NLPSOL_G] = g;
-          m->arg[NLPSOL_LAM_P] = 0;
+          m->arg[NLPSOL_LAM_P] = nullptr;
           m->arg[NLPSOL_LAM_X] = m->lam_x;
           m->arg[NLPSOL_LAM_G] = m->lam_g;
         }
@@ -576,19 +576,19 @@ namespace casadi {
   }
 
   IpoptMemory::IpoptMemory() {
-    this->app = 0;
-    this->userclass = 0;
+    this->app = nullptr;
+    this->userclass = nullptr;
     this->return_status = "Unset";
   }
 
   IpoptMemory::~IpoptMemory() {
     // Free Ipopt application instance (or rather, the smart pointer holding it)
-    if (this->app != 0) {
+    if (this->app != nullptr) {
       delete static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(this->app);
     }
 
     // Free Ipopt user class (or rather, the smart pointer holding it)
-    if (this->userclass != 0) {
+    if (this->userclass != nullptr) {
       delete static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(this->userclass);
     }
   }

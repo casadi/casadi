@@ -88,7 +88,7 @@ namespace casadi {
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, casadi_int depth) const override {
-      return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication*>(node)!=0;
+      return sameOpAndDeps(node, depth) && dynamic_cast<const Multiplication*>(node)!=nullptr;
     }
 
     /** \brief Get required length of w field */

@@ -131,7 +131,7 @@ namespace casadi {
 
     // Create CVodes memory block
     m->mem = CVodeCreate(lmm_, iter_);
-    casadi_assert(m->mem!=0, "CVodeCreate: Creation failed");
+    casadi_assert(m->mem!=nullptr, "CVodeCreate: Creation failed");
 
     // Set error handler function
     THROWING(CVodeSetErrHandlerFn, m->mem, ehfun, m);
@@ -727,7 +727,7 @@ namespace casadi {
       //cvB_mem = ca_mem->ca_bckpbCrt;
 
       // Get FORWARD solution from interpolation.
-      flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, NULL);
+      flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
       if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
 
       // Call the preconditioner setup function (which sets up the linear solver)
@@ -763,7 +763,7 @@ namespace casadi {
 
       // Call the preconditioner solve function (which solves the linear system)
       if (psolve(t, x, xdot, b, b, gamma, delta,
-                 lr, static_cast<void*>(m), 0)) return 1;
+                 lr, static_cast<void*>(m), nullptr)) return 1;
 
       return 0;
     } catch(int flag) { // recoverable error
@@ -793,7 +793,7 @@ namespace casadi {
       //cvB_mem = ca_mem->ca_bckpbCrt;
 
       // Get FORWARD solution from interpolation.
-      flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, NULL);
+      flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
       if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
 
 
@@ -806,7 +806,7 @@ namespace casadi {
 
       // Call the preconditioner solve function (which solves the linear system)
       if (psolveB(t, ca_mem->ca_ytmp, x, xdot, b, b, gamma, delta, lr,
-                  static_cast<void*>(m), 0)) return 1;
+                  static_cast<void*>(m), nullptr)) return 1;
 
       return 0;
     } catch(int flag) { // recoverable error
@@ -843,7 +843,7 @@ namespace casadi {
   }
 
   CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {
-    this->mem = 0;
+    this->mem = nullptr;
 
     // Reset checkpoints counter
     this->ncheck = 0;

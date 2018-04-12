@@ -35,8 +35,8 @@ namespace casadi {
 template<class T>
 class null_ptr_on_copy {
 public:
-  null_ptr_on_copy<T>() : ptr_(0) {}
-  null_ptr_on_copy<T>(const null_ptr_on_copy<T>& rhs) : ptr_(0) {}
+  null_ptr_on_copy<T>() : ptr_(nullptr) {}
+  null_ptr_on_copy<T>(const null_ptr_on_copy<T>& rhs) : ptr_(nullptr) {}
   void operator=(T* ptr) { ptr_ = ptr; }
   T* operator->() { return ptr_; }
   operator bool() const { return ptr_; }

@@ -92,7 +92,7 @@ namespace casadi {
       typename Derived::Exposed exposed;
       const Options* options;
       // Constructor
-      Plugin() : creator(0), name(0), doc(0), version(0), options(0) {}
+      Plugin() : creator(nullptr), name(nullptr), doc(nullptr), version(0), options(nullptr) {}
     };
 
     // Plugin registration function
@@ -154,7 +154,7 @@ namespace casadi {
   template<class Derived>
   const Options& PluginInterface<Derived>::plugin_options(const std::string& pname) {
     const Options *op = getPlugin(pname).options;
-    casadi_assert(op!=0, "Plugin \"" + pname + "\" does not support options");
+    casadi_assert(op!=nullptr, "Plugin \"" + pname + "\" does not support options");
     return *op;
   }
 
@@ -205,7 +205,7 @@ namespace casadi {
     char* pLIBDIR;
     pLIBDIR = getenv("CASADIPATH");
 
-    if (pLIBDIR!=0) {
+    if (pLIBDIR!=nullptr) {
       std::stringstream casadipaths(pLIBDIR);
       std::string casadipath;
       while (std::getline(casadipaths, casadipath, pathsep)) {
@@ -244,7 +244,7 @@ namespace casadi {
 #ifdef _WIN32
     HINSTANCE handle = 0;
 #else // _WIN32
-    void * handle = 0;
+    void * handle = nullptr;
 #endif
 
     // Alocate a handle pointer
@@ -289,7 +289,7 @@ namespace casadi {
 
     resultpath = searchpath;
 
-    casadi_assert(handle!=0, errors.str());
+    casadi_assert(handle!=nullptr, errors.str());
 
     return handle;
 
@@ -328,7 +328,7 @@ namespace casadi {
     // Load creator
     reg = (RegFcn)dlsym(handle, regName.c_str());
 #endif // _WIN32
-    casadi_assert(reg!=0,
+    casadi_assert(reg!=nullptr,
       "PluginInterface::load_plugin: no \"" + regName + "\" found in " + searchpath + ".");
 
     // Create a temporary struct

@@ -297,10 +297,10 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     // Evaluate gradF and jacG at initial value
     m->arg[0] = m->x;
     m->arg[1] = m->p;
-    m->res[0] = 0;
+    m->res[0] = nullptr;
     m->res[1] = m->jac_gk;
     calc_function(m, "nlp_jac_g");
-    m->res[0] = 0;
+    m->res[0] = nullptr;
     m->res[1] = m->jac_fk;
     calc_function(m, "nlp_jac_f");
 

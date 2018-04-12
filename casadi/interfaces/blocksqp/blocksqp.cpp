@@ -555,7 +555,7 @@ namespace casadi {
         m->hess2[b] = w; w += dim_[b]*dim_[b];
       }
     } else {
-      m->hess2 = 0;
+      m->hess2 = nullptr;
     }
   }
 
@@ -603,7 +603,7 @@ namespace casadi {
 
     // Free existing memory, if any
     if (m->qp) delete m->qp;
-    m->qp = 0;
+    m->qp = nullptr;
     if (schur_) {
       m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
                                           m->qpoases_mem,
@@ -1500,7 +1500,7 @@ namespace casadi {
       m->hess[b][i+i*dim] = ini_hess_diag_;
 
     // If we maintain 2 Hessians, also reset the second one
-    if (m->hess2 != 0) {
+    if (m->hess2 != nullptr) {
       casadi_fill(m->hess2[b], dim*dim, 0.);
       for (casadi_int i=0; i<dim; i++)
         m->hess2[b][i+i*dim] = ini_hess_diag_;
@@ -2002,7 +2002,7 @@ namespace casadi {
     // Setup QProblem data
     if (matricesChanged) {
       if (m->A) delete m->A;
-      m->A = 0;
+      m->A = nullptr;
       copy_vector(Asp_.colind(), m->colind);
       copy_vector(Asp_.row(), m->row);
       int* jacIndRow = get_ptr(m->row);
@@ -2061,7 +2061,7 @@ namespace casadi {
           // Convert block-Hessian to sparse format
           convertHessian(m);
           if (m->H) delete m->H;
-          m->H = 0;
+          m->H = nullptr;
           m->H = new qpOASES::SymSparseMat(nx_, nx_,
                                            m->hessIndRow, m->hessIndCol,
                                            m->hess_lag);
@@ -2484,10 +2484,10 @@ namespace casadi {
   }
 
   BlocksqpMemory::BlocksqpMemory() {
-    qpoases_mem = 0;
-    H = 0;
-    A = 0;
-    qp = 0;
+    qpoases_mem = nullptr;
+    H = nullptr;
+    A = nullptr;
+    qp = nullptr;
   }
 
   BlocksqpMemory::~BlocksqpMemory() {

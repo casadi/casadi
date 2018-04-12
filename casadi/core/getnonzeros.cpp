@@ -528,7 +528,7 @@ namespace casadi {
 
     // Check if same node
     const GetNonzerosVector* n = dynamic_cast<const GetNonzerosVector*>(node);
-    if (n==0) return false;
+    if (n==nullptr) return false;
 
     // Check sparsity
     if (this->sparsity()!=node->sparsity()) return false;
@@ -546,7 +546,7 @@ namespace casadi {
 
     // Check if same node
     const GetNonzerosSlice* n = dynamic_cast<const GetNonzerosSlice*>(node);
-    if (n==0) return false;
+    if (n==nullptr) return false;
 
     // Check sparsity
     if (this->sparsity()!=node->sparsity()) return false;
@@ -563,7 +563,7 @@ namespace casadi {
 
     // Check if same node
     const GetNonzerosSlice2* n = dynamic_cast<const GetNonzerosSlice2*>(node);
-    if (n==0) return false;
+    if (n==nullptr) return false;
 
     // Check sparsity
     if (this->sparsity()!=node->sparsity()) return false;

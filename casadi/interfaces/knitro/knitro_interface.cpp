@@ -152,9 +152,9 @@ namespace casadi {
     auto m = static_cast<KnitroMemory*>(mem);
 
     // Allocate KNITRO memory block (move back to init!)
-    casadi_assert_dev(m->kc==0);
-    m->kc = KTR_new_puts(casadi_KTR_puts, 0);
-    casadi_assert_dev(m->kc!=0);
+    casadi_assert_dev(m->kc==nullptr);
+    m->kc = KTR_new_puts(casadi_KTR_puts, nullptr);
+    casadi_assert_dev(m->kc!=nullptr);
     casadi_int status;
 
     // Jacobian sparsity
@@ -238,14 +238,14 @@ namespace casadi {
                            objFnType, get_ptr(vtype), m->wlbx, m->wubx,
                            ng_, get_ptr(contype_), get_ptr(ftype),
                            m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
-                           nnzH, get_ptr(Hrow), get_ptr(Hcol), m->x, 0);
+                           nnzH, get_ptr(Hrow), get_ptr(Hcol), m->x, nullptr);
       casadi_assert(status==0, "KTR_mip_init_problem failed");
     } else {
       status =
       KTR_init_problem(m->kc, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
                        m->wlbx, m->wubx, ng_, get_ptr(contype_),
                        m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
-                       nnzH, get_ptr(Hrow), get_ptr(Hcol), m->x, 0); // initial lambda
+                       nnzH, get_ptr(Hrow), get_ptr(Hcol), m->x, nullptr); // initial lambda
       casadi_assert(status==0, "KTR_init_problem failed");
     }
 
@@ -269,12 +269,12 @@ namespace casadi {
     if (mi_) {
       status =
       KTR_mip_solve(m->kc, m->x, get_ptr(lambda), 0, &f,
-                    0, 0, 0, 0, 0, static_cast<void*>(m));
+                    nullptr, nullptr, nullptr, nullptr, nullptr, static_cast<void*>(m));
 
     } else {
       status =
       KTR_solve(m->kc, m->x, get_ptr(lambda), 0, &f,
-                0, 0, 0, 0, 0, static_cast<void*>(m));
+                nullptr, nullptr, nullptr, nullptr, nullptr, static_cast<void*>(m));
     }
     m->return_status = return_codes(status);
     m->success = status==KTR_RC_OPTIMAL_OR_SATISFACTORY ||
@@ -291,14 +291,14 @@ namespace casadi {
     if (m->g) {
       m->arg[0] = m->x;
       m->arg[1] = m->p;
-      m->res[0] = 0;
+      m->res[0] = nullptr;
       m->res[1] = m->g;
       calc_function(m, "nlp_fg");
     }
 
     // Free memory (move to destructor!)
     KTR_free(&m->kc);
-    m->kc = 0;
+    m->kc = nullptr;
     return 0;
   }
 
@@ -411,7 +411,7 @@ namespace casadi {
     case KTR_RC_DERIV_CHECK_TERMINATE: return "KTR_RC_DERIV_CHECK_TERMINATE";
     case KTR_RC_INTERNAL_ERROR: return "KTR_RC_INTERNAL_ERROR";
     }
-    return 0;
+    return nullptr;
   }
 
   Dict KnitroInterface::get_stats(void* mem) const {
@@ -423,7 +423,7 @@ namespace casadi {
   }
 
   KnitroMemory::KnitroMemory(const KnitroInterface& self) : self(self) {
-    this->kc = 0;
+    this->kc = nullptr;
   }
 
   KnitroMemory::~KnitroMemory() {

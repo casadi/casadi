@@ -209,11 +209,11 @@ namespace casadi {
     if (external_.find(symname)!=external_.end()) return true;
 
     // Convert to a dummy function pointer
-    return const_cast<ImporterInternal*>(this)->get_function(symname)!=0;
+    return const_cast<ImporterInternal*>(this)->get_function(symname)!=nullptr;
   }
 
   DllLibrary::DllLibrary(const std::string& bin_name)
-    : ImporterInternal(bin_name), handle_(0) {
+    : ImporterInternal(bin_name), handle_(nullptr) {
 #ifdef WITH_DL
 #ifdef _WIN32
     handle_ = LoadLibrary(TEXT(name_.c_str()));
@@ -222,7 +222,7 @@ namespace casadi {
       "Error code (WIN32): " + str(GetLastError()));
 #else // _WIN32
     handle_ = dlopen(name_.c_str(), RTLD_LAZY);
-    casadi_assert(handle_!=0,
+    casadi_assert(handle_!=nullptr,
       "CommonExternal: Cannot open \"" + name_ + "\". "
       "Error code: " + str(dlerror()));
     // reset error
@@ -251,7 +251,7 @@ namespace casadi {
 #else // _WIN32
     signal_t fcnPtr = (signal_t)dlsym(handle_, sym.c_str());
     if (dlerror()) {
-      fcnPtr=0;
+      fcnPtr=nullptr;
       dlerror(); // Reset error flags
     }
     return fcnPtr;

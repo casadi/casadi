@@ -548,9 +548,9 @@ namespace casadi {
       if (verbose_) {
         uout() << "Starting compilation"  << endl;
       }
-      time_t time1 = time(0);
+      time_t time1 = time(nullptr);
       compiler_ = Importer(cname, compilerplugin_, jit_options_);
-      time_t time2 = time(0);
+      time_t time2 = time(nullptr);
       double comp_time = difftime(time2, time1);
       if (verbose_) {
         uout() << "Compilation completed after " << comp_time << " s."  << endl;
@@ -816,7 +816,7 @@ namespace casadi {
     m->reg = 0;
 
     // Reset iteration message
-    m->iteration_note = 0;
+    m->iteration_note = nullptr;
 
     // MAIN OPTIMZATION LOOP
     while (true) {
@@ -974,7 +974,7 @@ namespace casadi {
     // Print note
     if (m->iteration_note) {
       stream << "   " << m->iteration_note;
-      m->iteration_note = 0;
+      m->iteration_note = nullptr;
     }
 
     stream.unsetf(std::ios::floatfield);
@@ -1038,7 +1038,7 @@ namespace casadi {
       m->arg[v_[i].res_var] = m->lifted_mem[i].x;
     }
     if (!gauss_newton_) {
-      m->arg[res_g_lam_] = 0; // Non-lifted dual variables
+      m->arg[res_g_lam_] = nullptr; // Non-lifted dual variables
       for (size_t i=0; i<v_.size(); ++i) { // Lifted dual variables
         m->arg[v_[i].res_lam] = m->lifted_mem[i].lam;
       }
@@ -1076,7 +1076,7 @@ namespace casadi {
       m->arg[v_[i].mod_var] = m->lifted_mem[i].res;
     }
     if (!gauss_newton_) {
-      m->arg[mod_g_lam_] = 0; // Dual steps/variables
+      m->arg[mod_g_lam_] = nullptr; // Dual steps/variables
       for (size_t i=0; i<v_.size(); ++i) {
         m->arg[v_[i].mod_lam] = m->lifted_mem[i].resL;
       }

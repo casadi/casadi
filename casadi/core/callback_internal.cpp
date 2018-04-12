@@ -74,13 +74,13 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     // Initialize this
-    casadi_assert(self_!=0, "Callback object has been deleted");
+    casadi_assert(self_!=nullptr, "Callback object has been deleted");
     self_->init();
   }
 
   void CallbackInternal::finalize(const Dict& opts) {
     // Finalize this
-    casadi_assert(self_!=0, "Callback object has been deleted");
+    casadi_assert(self_!=nullptr, "Callback object has been deleted");
     self_->finalize();
 
     // Finalize the base classes
@@ -89,7 +89,7 @@ namespace casadi {
 
   int CallbackInternal::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    TRY_CALL(eval, self_, arg, res, iw, w, 0);
+    TRY_CALL(eval, self_, arg, res, iw, w, nullptr);
   }
 
   int CallbackInternal::

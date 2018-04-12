@@ -45,7 +45,7 @@ namespace casadi {
 
   Callback::~Callback() {
     // Make sure that this object isn't used after its deletion
-    if (!is_null()) get<CallbackInternal>()->self_ = 0;
+    if (!is_null()) get<CallbackInternal>()->self_ = nullptr;
   }
 
   std::vector<DM> Callback::eval(const std::vector<DM>& arg) const {

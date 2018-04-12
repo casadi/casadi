@@ -86,7 +86,7 @@ namespace casadi {
 
   int Ma27Interface::nfact(void* mem, const double* A) const {
     auto m = static_cast<Ma27Memory*>(mem);
-    casadi_assert_dev(A!=0);
+    casadi_assert_dev(A!=nullptr);
 
     // Get sparsity
     const casadi_int ncol = this->ncol();

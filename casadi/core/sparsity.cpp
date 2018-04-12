@@ -46,7 +46,7 @@ namespace casadi {
   public:
     EmptySparsity() {
       const casadi_int colind[1] = {0};
-      own(new SparsityInternal(0, 0, colind, 0));
+      own(new SparsityInternal(0, 0, colind, nullptr));
     }
   };
 
@@ -104,7 +104,7 @@ namespace casadi {
       const casadi_int* colind, const casadi_int* row, bool order_rows) {
     casadi_assert_dev(nrow>=0);
     casadi_assert_dev(ncol>=0);
-    if (colind==0 || colind[ncol]==nrow*ncol) {
+    if (colind==nullptr || colind[ncol]==nrow*ncol) {
       *this = dense(nrow, ncol);
     } else {
       vector<casadi_int> colindv(colind, colind+ncol+1);
@@ -122,7 +122,7 @@ namespace casadi {
   }
 
   bool Sparsity::test_cast(const SharedObjectInternal* ptr) {
-    return dynamic_cast<const SparsityInternal*>(ptr)!=0;
+    return dynamic_cast<const SparsityInternal*>(ptr)!=nullptr;
   }
 
   casadi_int Sparsity::size1() const {
@@ -1287,7 +1287,7 @@ namespace casadi {
   }
 
   Sparsity Sparsity::compressed(const casadi_int* v, bool order_rows) {
-    casadi_assert_dev(v!=0);
+    casadi_assert_dev(v!=nullptr);
 
     // Get sparsity pattern
     casadi_int nrow = v[0];

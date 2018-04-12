@@ -399,7 +399,7 @@ namespace casadi {
             m->arg[NLPSOL_X] = m->worhp_o.X;
             m->arg[NLPSOL_F] = &m->worhp_o.F;
             m->arg[NLPSOL_G] = m->worhp_o.G;
-            m->arg[NLPSOL_LAM_P] = 0;
+            m->arg[NLPSOL_LAM_P] = nullptr;
             m->arg[NLPSOL_LAM_X] = m->worhp_o.Lambda;
             m->arg[NLPSOL_LAM_G] = m->worhp_o.Mu;
 
@@ -444,7 +444,7 @@ namespace casadi {
       if (GetUserAction(&m->worhp_c, evalDF)) {
         m->arg[0] = m->worhp_o.X;
         m->arg[1] = m->p;
-        m->res[0] = 0;
+        m->res[0] = nullptr;
         m->res[1] = m->worhp_w.DF.val;
         calc_function(m, "nlp_grad_f");
         casadi_scal(nx_, m->worhp_w.ScaleObj, m->worhp_w.DF.val);
@@ -454,7 +454,7 @@ namespace casadi {
       if (GetUserAction(&m->worhp_c, evalDG)) {
         m->arg[0] = m->worhp_o.X;
         m->arg[1] = m->p;
-        m->res[0] = 0;
+        m->res[0] = nullptr;
         m->res[1] = m->worhp_w.DG.val;
         calc_function(m, "nlp_jac_g");
         DoneUserAction(&m->worhp_c, evalDG);

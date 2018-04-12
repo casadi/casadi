@@ -354,7 +354,7 @@ namespace casadi {
       }
 
       // Callback function
-      if (callback(m, m->x, &m->f, m->g, m->lam_x, m->lam_g, 0)) {
+      if (callback(m, m->x, &m->f, m->g, m->lam_x, m->lam_g, nullptr)) {
         print("WARNING(sqpmethod): Aborted by callback...\n");
         m->return_status = "User_Requested_Stop";
         break;

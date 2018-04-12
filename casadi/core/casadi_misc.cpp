@@ -213,7 +213,7 @@ namespace casadi {
 
   bvec_t* get_bvec_t(std::vector<double>& v) {
     if (v.empty()) {
-      return 0;
+      return nullptr;
     } else {
       return reinterpret_cast<bvec_t*>(&v.front());
     }
@@ -222,7 +222,7 @@ namespace casadi {
   /// Get an pointer of sets of booleans from a double vector
   const bvec_t* get_bvec_t(const std::vector<double>& v) {
     if (v.empty()) {
-      return 0;
+      return nullptr;
     } else {
       return reinterpret_cast<const bvec_t*>(&v.front());
     }

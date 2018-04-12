@@ -404,7 +404,7 @@ namespace casadi {
         casadi_int nnz=e.data.nnz();
         casadi_int i=e.data->ind();
         casadi_int nz_offset=e.data->offset();
-        if (arg[i]==0) {
+        if (arg[i]==nullptr) {
           fill(w1, w1+nnz, 0);
         } else {
           copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
@@ -419,9 +419,9 @@ namespace casadi {
       } else {
         // Point pointers to the data corresponding to the element
         for (casadi_int i=0; i<e.arg.size(); ++i)
-          arg1[i] = e.arg[i]>=0 ? w+workloc_[e.arg[i]] : 0;
+          arg1[i] = e.arg[i]>=0 ? w+workloc_[e.arg[i]] : nullptr;
         for (casadi_int i=0; i<e.res.size(); ++i)
-          res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : 0;
+          res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : nullptr;
 
         // Evaluate
         if (e.data->eval(arg1, res1, iw, w)) return 1;
@@ -497,7 +497,7 @@ namespace casadi {
         casadi_int nz_offset=e.data->offset();
         const bvec_t* argi = arg[i];
         bvec_t* w1 = w + workloc_[e.res.front()];
-        if (argi!=0) {
+        if (argi!=nullptr) {
           copy(argi+nz_offset, argi+nz_offset+nnz, w1);
         } else {
           fill_n(w1, nnz, 0);
@@ -509,13 +509,13 @@ namespace casadi {
         casadi_int nz_offset=e.data->offset();
         bvec_t* resi = res[i];
         bvec_t* w1 = w + workloc_[e.arg.front()];
-        if (resi!=0) copy(w1, w1+nnz, resi+nz_offset);
+        if (resi!=nullptr) copy(w1, w1+nnz, resi+nz_offset);
       } else {
         // Point pointers to the data corresponding to the element
         for (casadi_int i=0; i<e.arg.size(); ++i)
-          arg1[i] = e.arg[i]>=0 ? w+workloc_[e.arg[i]] : 0;
+          arg1[i] = e.arg[i]>=0 ? w+workloc_[e.arg[i]] : nullptr;
         for (casadi_int i=0; i<e.res.size(); ++i)
-          res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : 0;
+          res1[i] = e.res[i]>=0 ? w+workloc_[e.res[i]] : nullptr;
 
         // Propagate sparsity forwards
         if (e.data->sp_forward(arg1, res1, iw, w)) return 1;
@@ -541,16 +541,16 @@ namespace casadi {
         casadi_int nz_offset=it->data->offset();
         bvec_t* argi = arg[i];
         bvec_t* w1 = w + workloc_[it->res.front()];
-        if (argi!=0) for (casadi_int k=0; k<nnz; ++k) argi[nz_offset+k] |= w1[k];
+        if (argi!=nullptr) for (casadi_int k=0; k<nnz; ++k) argi[nz_offset+k] |= w1[k];
         fill_n(w1, nnz, 0);
       } else if (it->op==OP_OUTPUT) {
         // Pass output seeds
         casadi_int nnz=it->data.dep().nnz();
         casadi_int i=it->data->ind();
         casadi_int nz_offset=it->data->offset();
-        bvec_t* resi = res[i] ? res[i] + nz_offset : 0;
+        bvec_t* resi = res[i] ? res[i] + nz_offset : nullptr;
         bvec_t* w1 = w + workloc_[it->arg.front()];
-        if (resi!=0) {
+        if (resi!=nullptr) {
           for (casadi_int k=0; k<nnz; ++k) w1[k] |= resi[k];
           fill_n(resi, nnz, 0);
 
@@ -558,9 +558,9 @@ namespace casadi {
       } else {
         // Point pointers to the data corresponding to the element
         for (casadi_int i=0; i<it->arg.size(); ++i)
-          arg1[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : 0;
+          arg1[i] = it->arg[i]>=0 ? w+workloc_[it->arg[i]] : nullptr;
         for (casadi_int i=0; i<it->res.size(); ++i)
-          res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : 0;
+          res1[i] = it->res[i]>=0 ? w+workloc_[it->res[i]] : nullptr;
 
         // Propagate sparsity backwards
         if (it->data->sp_reverse(arg1, res1, iw, w)) return 1;
@@ -1013,7 +1013,7 @@ namespace casadi {
         casadi_int nnz=a.data.nnz();
         casadi_int i=a.data->ind();
         casadi_int nz_offset=a.data->offset();
-        if (arg[i]==0) {
+        if (arg[i]==nullptr) {
           std::fill(w1, w1+nnz, 0);
         } else {
           std::copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
@@ -1030,9 +1030,9 @@ namespace casadi {
       } else {
         // Point pointers to the data corresponding to the element
         for (casadi_int i=0; i<a.arg.size(); ++i)
-          argp[i] = a.arg[i]>=0 ? w+workloc_[a.arg[i]] : 0;
+          argp[i] = a.arg[i]>=0 ? w+workloc_[a.arg[i]] : nullptr;
         for (casadi_int i=0; i<a.res.size(); ++i)
-          resp[i] = a.res[i]>=0 ? w+workloc_[a.res[i]] : 0;
+          resp[i] = a.res[i]>=0 ? w+workloc_[a.res[i]] : nullptr;
 
         // Evaluate
         if (a.data->eval_sx(get_ptr(argp), get_ptr(resp), iw, w)) return 1;

@@ -90,7 +90,7 @@ namespace casadi {
     const char* plugin_name() const override { return "none";}
 
     /// Get a function pointer for numerical evaluation
-    virtual signal_t get_function(const std::string& symname) { return 0;}
+    virtual signal_t get_function(const std::string& symname) { return nullptr;}
 
     /// Get a function pointer for numerical evaluation
     bool has_function(const std::string& symname) const;

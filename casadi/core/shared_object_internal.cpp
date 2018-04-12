@@ -29,7 +29,7 @@ namespace casadi {
 
   SharedObjectInternal::SharedObjectInternal(const SharedObjectInternal& node) {
     count = 0; // reference counter is _not_ copied
-    weak_ref_ = 0; // nor will they have the same weak references
+    weak_ref_ = nullptr; // nor will they have the same weak references
   }
 
   SharedObjectInternal& SharedObjectInternal::operator=(const SharedObjectInternal& node) {
@@ -39,7 +39,7 @@ namespace casadi {
 
   SharedObjectInternal::SharedObjectInternal() {
     count = 0;
-    weak_ref_ = 0;
+    weak_ref_ = nullptr;
   }
 
   SharedObjectInternal::~SharedObjectInternal() {
@@ -50,7 +50,7 @@ namespace casadi {
                    "Possible cause: Circular dependency in user code." << std::endl;
     }
     #endif // WITH_REFCOUNT_WARNINGS
-    if (weak_ref_!=0) {
+    if (weak_ref_!=nullptr) {
       weak_ref_->kill();
       delete weak_ref_;
     }
@@ -61,7 +61,7 @@ namespace casadi {
   }
 
   WeakRef* SharedObjectInternal::weak() {
-    if (weak_ref_==0) {
+    if (weak_ref_==nullptr) {
       weak_ref_ = new WeakRef(this);
     }
     return weak_ref_;
@@ -74,7 +74,7 @@ namespace casadi {
   }
 
   void WeakRefInternal::disp(std::ostream& stream, bool more) const {
-    if (raw_==0) {
+    if (raw_==nullptr) {
       stream << "NULL";
     } else {
       raw_->disp(stream, more);

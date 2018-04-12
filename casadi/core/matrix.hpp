@@ -855,8 +855,8 @@ namespace casadi {
 
     ///@{
     /// Get a pointer to the data
-    Scalar* ptr() { return nonzeros_.empty() ? 0 : &nonzeros_.front(); }
-    const Scalar* ptr() const { return nonzeros_.empty() ? 0 : &nonzeros_.front(); }
+    Scalar* ptr() { return nonzeros_.empty() ? nullptr : &nonzeros_.front(); }
+    const Scalar* ptr() const { return nonzeros_.empty() ? nullptr : &nonzeros_.front(); }
     friend inline Scalar* get_ptr(Matrix<Scalar>& v) { return v.ptr(); }
     friend inline const Scalar* get_ptr(const Matrix<Scalar>& v) { return v.ptr(); }
     ///@}

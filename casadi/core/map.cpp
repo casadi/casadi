@@ -351,13 +351,13 @@ namespace casadi {
     // Input buffers
     const double** arg1 = arg + n_in + i*sz_arg;
     for (casadi_int j=0; j<n_in; ++j) {
-      arg1[j] = arg[j] ? arg[j] + i*f.nnz_in(j) : 0;
+      arg1[j] = arg[j] ? arg[j] + i*f.nnz_in(j) : nullptr;
     }
 
     // Output buffers
     double** res1 = res + n_out + i*sz_res;
     for (casadi_int j=0; j<n_out; ++j) {
-      res1[j] = res[j] ? res[j] + i*f.nnz_out(j) : 0;
+      res1[j] = res[j] ? res[j] + i*f.nnz_out(j) : nullptr;
     }
 
     ret = f(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind);

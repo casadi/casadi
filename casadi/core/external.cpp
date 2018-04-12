@@ -116,7 +116,7 @@ namespace casadi {
     if (get_name_in_) {
       // Use function pointer
       const char* n = get_name_in_(i);
-      casadi_assert(n!=0, "Error querying input name");
+      casadi_assert(n!=nullptr, "Error querying input name");
       return n;
     } else if (li_.has_meta(name_ + "_NAME_IN", i)) {
       // Read meta
@@ -131,7 +131,7 @@ namespace casadi {
     if (get_name_out_) {
       // Use function pointer
       const char* n = get_name_out_(i);
-      casadi_assert(n!=0, "Error querying output name");
+      casadi_assert(n!=nullptr, "Error querying output name");
       return n;
     } else if (li_.has_meta(name_ + "_NAME_OUT", i)) {
       // Read meta

@@ -55,7 +55,7 @@ namespace casadi {
     for (casadi_int i=0; i<nx; ++i) {
       casadi_int nz_first = offset_[i];
       casadi_int nz_last = offset_[i+1];
-      if (res[i]!=0) {
+      if (res[i]!=nullptr) {
         copy(arg[0]+nz_first, arg[0]+nz_last, res[i]);
       }
     }
@@ -65,7 +65,7 @@ namespace casadi {
   int Split::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     casadi_int nx = offset_.size()-1;
     for (casadi_int i=0; i<nx; ++i) {
-      if (res[i]!=0) {
+      if (res[i]!=nullptr) {
         const bvec_t *arg_ptr = arg[0] + offset_[i];
         casadi_int n_i = sparsity(i).nnz();
         bvec_t *res_i_ptr = res[i];
@@ -80,7 +80,7 @@ namespace casadi {
   int Split::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     casadi_int nx = offset_.size()-1;
     for (casadi_int i=0; i<nx; ++i) {
-      if (res[i]!=0) {
+      if (res[i]!=nullptr) {
         bvec_t *arg_ptr = arg[0] + offset_[i];
         casadi_int n_i = sparsity(i).nnz();
         bvec_t *res_i_ptr = res[i];

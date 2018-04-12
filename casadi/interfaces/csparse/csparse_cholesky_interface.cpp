@@ -69,8 +69,8 @@ namespace casadi {
     if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<CsparseCholMemory*>(mem);
 
-    m->L = 0;
-    m->S = 0;
+    m->L = nullptr;
+    m->S = nullptr;
     m->A.nzmax = this->nnz();  // maximum number of entries
     m->A.m = this->nrow(); // number of columns
     m->A.n = this->ncol(); // number of rows
@@ -82,7 +82,7 @@ namespace casadi {
     m->A.p = get_ptr(m->colind); // row pointers (size n+1)
     // or row indices (size nzmax)
     m->A.i = get_ptr(m->row); // column indices, size nzmax
-    m->A.x = 0; // numerical values, size nzmax
+    m->A.x = nullptr; // numerical values, size nzmax
     m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-row
 
     // Temporary
@@ -119,7 +119,7 @@ namespace casadi {
 
     if (m->L) cs_nfree(m->L);
     m->L = cs_chol(&m->A, m->S) ;                 // numeric Cholesky factorization
-    casadi_assert_dev(m->L!=0);
+    casadi_assert_dev(m->L!=nullptr);
     return 0;
   }
 
@@ -127,7 +127,7 @@ namespace casadi {
   solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
     auto m = static_cast<CsparseCholMemory*>(mem);
 
-    casadi_assert_dev(m->L!=0);
+    casadi_assert_dev(m->L!=nullptr);
 
     double *t = &m->temp.front();
     for (casadi_int k=0; k<nrhs; ++k) {

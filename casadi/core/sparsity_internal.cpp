@@ -167,7 +167,7 @@ namespace casadi {
     casadi_int ncol = *tr_sp++, nrow = *tr_sp++;
     const casadi_int *rowind=tr_sp, *col=tr_sp+nrow+1;
     casadi_int i, j, k, J, p, q, jleaf, *maxfirst, *prevleaf,
-      *ancestor, *head=0, *next=0, *first;
+      *ancestor, *head=nullptr, *next=nullptr, *first;
     // Work vectors
     ancestor=w; w+=ncol;
     maxfirst=w; w+=ncol;
@@ -452,7 +452,7 @@ namespace casadi {
   SparsityInternal::
   SparsityInternal(casadi_int nrow, casadi_int ncol,
       const casadi_int* colind, const casadi_int* row) :
-    sp_(2 + ncol+1 + colind[ncol]), btf_(0) {
+    sp_(2 + ncol+1 + colind[ncol]), btf_(nullptr) {
     sp_[0] = nrow;
     sp_[1] = ncol;
     std::copy(colind, colind+ncol+1, sp_.begin()+2);

@@ -63,7 +63,7 @@ namespace casadi {
       0.66212671170190451342, 0.80668571635029517886, 0.91801555366331766272,
       0.98408011975381259884 };
   const long double* legendre_points[] =
-    { 0, legendre_points1, legendre_points2, legendre_points3, legendre_points4,
+    { nullptr, legendre_points1, legendre_points2, legendre_points3, legendre_points4,
       legendre_points5, legendre_points6, legendre_points7, legendre_points8, legendre_points9};
 
   // Radau collocation points
@@ -98,7 +98,7 @@ namespace casadi {
       0.71317524285556954666, 0.85563374295785443735, 0.95536604471003006012,
       1.00000000000000000000 };
   const long double* radau_points[] =
-    { 0, radau_points1, radau_points2, radau_points3, radau_points4, radau_points5,
+    { nullptr, radau_points1, radau_points2, radau_points3, radau_points4, radau_points5,
       radau_points6, radau_points7, radau_points8, radau_points9};
 
   template<typename RealT>

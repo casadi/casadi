@@ -79,7 +79,7 @@ class BinarySX : public SXNode {
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const SXNode* node, casadi_int depth) const override {
       const BinarySX* n = dynamic_cast<const BinarySX*>(node);
-      if (n==0) return false;
+      if (n==nullptr) return false;
       if (n->op_ != op_) return false;
       if (SXElem::is_equal(n->dep0_, dep0_, depth-1)
           && SXElem::is_equal(n->dep1_, dep1_, depth-1)) return true;

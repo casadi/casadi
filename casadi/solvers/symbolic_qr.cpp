@@ -195,9 +195,9 @@ namespace casadi {
                                   casadi_int* iw, SXElem* w, void* mem,
                                   bool tr, casadi_int nrhs) const {
     //auto m = static_cast<SymbolicQrMemory*>(mem);
-    casadi_assert_dev(arg[0]!=0);
-    casadi_assert_dev(arg[1]!=0);
-    casadi_assert_dev(res[0]!=0);
+    casadi_assert_dev(arg[0]!=nullptr);
+    casadi_assert_dev(arg[1]!=nullptr);
+    casadi_assert_dev(res[0]!=nullptr);
 
     // Get A and factorize it
     SX A = SX::zeros(sp_);

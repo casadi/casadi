@@ -364,7 +364,7 @@ namespace casadi {
     // Maxiumum number of working set changes
     int nWSR = max_nWSR_;
     double cputime = max_cputime_;
-    double *cputime_ptr = cputime<=0 ? 0 : &cputime;
+    double *cputime_ptr = cputime<=0 ? nullptr : &cputime;
 
     // Get the arguments to call qpOASES with
     double* g=w; w += nx_;
@@ -832,9 +832,9 @@ namespace casadi {
   }
 
   QpoasesMemory::QpoasesMemory() {
-    this->qp = 0;
-    this->h = 0;
-    this->a = 0;
+    this->qp = nullptr;
+    this->h = nullptr;
+    this->a = nullptr;
   }
 
   QpoasesMemory::~QpoasesMemory() {
@@ -845,7 +845,7 @@ namespace casadi {
 
   int QpoasesInterface::
   qpoases_init(void* mem, int dim, int nnz, const int* row, const int* col) {
-    casadi_assert_dev(mem!=0);
+    casadi_assert_dev(mem!=nullptr);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Get sparsity pattern in sparse triplet format
@@ -879,7 +879,7 @@ namespace casadi {
   }
 
   int QpoasesInterface::qpoases_sfact(void* mem, const double* vals) {
-    casadi_assert_dev(mem!=0);
+    casadi_assert_dev(mem!=nullptr);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Get nonzero elements (entire elements)
@@ -893,7 +893,7 @@ namespace casadi {
 
   int QpoasesInterface::
   qpoases_nfact(void* mem, const double* vals, int* neig, int* rank) {
-    casadi_assert_dev(mem!=0);
+    casadi_assert_dev(mem!=nullptr);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Get nonzero elements (entire elements)
@@ -912,7 +912,7 @@ namespace casadi {
   }
 
   int QpoasesInterface::qpoases_solve(void* mem, int nrhs, double* rhs) {
-    casadi_assert_dev(mem!=0);
+    casadi_assert_dev(mem!=nullptr);
     QpoasesMemory* m = static_cast<QpoasesMemory*>(mem);
 
     // Pass to linear solver

@@ -95,7 +95,7 @@ namespace casadi {
   bool IpoptUserClass::eval_grad_f(Index n, const Number* x, bool new_x, Number* grad_f) {
     mem_->arg[0] = x;
     mem_->arg[1] = mem_->p;
-    mem_->res[0] = 0;
+    mem_->res[0] = nullptr;
     mem_->res[1] = grad_f;
     return solver_.calc_function(mem_, "nlp_grad_f")==0;
   }
@@ -116,7 +116,7 @@ namespace casadi {
       // Evaluate numerically
       mem_->arg[0] = x;
       mem_->arg[1] = mem_->p;
-      mem_->res[0] = 0;
+      mem_->res[0] = nullptr;
       mem_->res[1] = values;
       return solver_.calc_function(mem_, "nlp_jac_g")==0;
     } else {

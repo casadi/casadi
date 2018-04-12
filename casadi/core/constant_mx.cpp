@@ -201,7 +201,7 @@ namespace casadi {
   bool ConstantDM::is_equal(const MXNode* node, casadi_int depth) const {
     // Check if same node
     const ConstantDM* n = dynamic_cast<const ConstantDM*>(node);
-    if (n==0) return false;
+    if (n==nullptr) return false;
 
     // Check sparsity
     if (this->sparsity()!=node->sparsity()) return false;

@@ -356,9 +356,9 @@ namespace casadi {
     // Propagate dependencies through the function
     const bvec_t** arg1 = arg+n_in_;
     copy(arg, arg+n_in_, arg1);
-    arg1[iin_] = 0;
+    arg1[iin_] = nullptr;
     bvec_t** res1 = res+n_out_;
-    fill_n(res1, n_out_, static_cast<bvec_t*>(0));
+    fill_n(res1, n_out_, static_cast<bvec_t*>(nullptr));
     res1[iout_] = tmp1;
     oracle_(arg1, res1, iw, w, 0);
 
@@ -371,7 +371,7 @@ namespace casadi {
     if (n_out_>1) {
       arg1[iin_] = tmp2;
       copy(res, res+n_out_, res1);
-      res1[iout_] = 0;
+      res1[iout_] = nullptr;
       oracle_(arg1, res1, iw, w, 0);
     }
     return 0;
@@ -393,7 +393,7 @@ namespace casadi {
     // Propagate dependencies from auxiliary outputs to z
     bvec_t** res1 = res+n_out_;
     copy(res, res+n_out_, res1);
-    res1[iout_] = 0;
+    res1[iout_] = nullptr;
     bvec_t** arg1 = arg+n_in_;
     copy(arg, arg+n_in_, arg1);
     arg1[iin_] = tmp1;
@@ -406,9 +406,9 @@ namespace casadi {
     sp_jac_.spsolve(tmp2, tmp1, true);
 
     // Propagate dependencies through the function
-    for (casadi_int i=0; i<n_out_; ++i) res1[i] = 0;
+    for (casadi_int i=0; i<n_out_; ++i) res1[i] = nullptr;
     res1[iout_] = tmp2;
-    arg1[iin_] = 0; // just a guess
+    arg1[iin_] = nullptr; // just a guess
     if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
     return 0;
   }

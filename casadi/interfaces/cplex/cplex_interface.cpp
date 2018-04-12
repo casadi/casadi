@@ -143,9 +143,9 @@ namespace casadi {
 
     // Start CPLEX
     int status;
-    casadi_assert_dev(m->env==0);
+    casadi_assert_dev(m->env==nullptr);
     m->env = CPXXopenCPLEX(&status);
-    if (m->env==0) {
+    if (m->env==nullptr) {
       char errmsg[CPXMESSAGEBUFSIZE];
       CPXXgeterrorstring(m->env, status, errmsg);
       casadi_error(string("Cannot initialize CPLEX environment: ") + errmsg);
@@ -256,9 +256,9 @@ namespace casadi {
               std::minus<casadi_int>());
 
     // Create problem object
-    casadi_assert_dev(m->lp==0);
+    casadi_assert_dev(m->lp==nullptr);
     m->lp = CPXXcreateprob(m->env, &status, "QP from CasADi");
-    casadi_assert(m->lp!=0, "CPXXcreateprob failed");
+    casadi_assert(m->lp!=nullptr, "CPXXcreateprob failed");
 
     m->a_colind.resize(A_.size2()+1);
     m->a_row.resize(A_.nnz());
@@ -395,11 +395,13 @@ namespace casadi {
     // Warm-starting if possible
     if (qp_method_ != 0 && qp_method_ != 4 && m->is_warm) {
       // TODO(Joel): Initialize slacks and dual variables of bound constraints
-      if (CPXXcopystart(m->env, m->lp, get_ptr(m->cstat), get_ptr(m->rstat), x, 0, 0, lam_x)) {
+      if (CPXXcopystart(m->env, m->lp, get_ptr(m->cstat), get_ptr(m->rstat), x,
+           nullptr, nullptr, lam_x)) {
         casadi_error("CPXXcopystart failed");
       }
     } else {
-      if (CPXXcopystart(m->env, m->lp, 0, 0, x, 0, 0, lam_x)) {
+      if (CPXXcopystart(m->env, m->lp, nullptr, nullptr, x,
+           nullptr, nullptr, lam_x)) {
         casadi_error("CPXXcopystart failed");
       }
     }
@@ -535,8 +537,8 @@ namespace casadi {
     this->is_warm = false;
 
     // Set pointer to zero to avoid deleting a nonexisting instance
-    this->env = 0;
-    this->lp = 0;
+    this->env = nullptr;
+    this->lp = nullptr;
   }
 
   CplexMemory::~CplexMemory() {
@@ -544,21 +546,21 @@ namespace casadi {
     casadi_int status;
 
     // Only free if Cplex problem if it has been allocated
-    if (this->lp!=0) {
+    if (this->lp!=nullptr) {
       status = CPXXfreeprob(this->env, &this->lp);
       if (status!=0) {
         uerr() << "CPXXfreeprob failed, error code " << status << ".\n";
       }
-      this->lp = 0;
+      this->lp = nullptr;
     }
 
     // Closing down license
-    if (this->env!=0) {
+    if (this->env!=nullptr) {
       status = CPXXcloseCPLEX(&this->env);
       if (status!=0) {
         uerr() << "CPXXcloseCPLEX failed, error code " << status << ".\n";
       }
-      this->env = 0;
+      this->env = nullptr;
     }
   }
 

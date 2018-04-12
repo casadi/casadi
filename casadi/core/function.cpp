@@ -343,7 +343,7 @@ namespace casadi {
 
   vector<const double*> Function::buf_in(Function::MapArg arg) const {
     // Return value (RVO)
-    vector<const double*> ret(sz_arg(), 0);
+    vector<const double*> ret(sz_arg(), nullptr);
 
     // Read inputs
     for (auto i=arg.begin(); i!=arg.end(); ++i) {
@@ -357,7 +357,7 @@ namespace casadi {
 
   vector<double*> Function::buf_out(Function::MapRes res) const {
     // Return value (RVO)
-    vector<double*> ret(sz_res(), 0);
+    vector<double*> ret(sz_res(), nullptr);
 
     // Read outputs
     for (auto i=res.begin(); i!=res.end(); ++i) {
@@ -371,7 +371,7 @@ namespace casadi {
 
   vector<double*> Function::buf_out(Function::MPrRes res) const {
     // Return value (RVO)
-    vector<double*> ret(sz_res(), 0);
+    vector<double*> ret(sz_res(), nullptr);
 
     // Read outputs
     for (auto i=res.begin(); i!=res.end(); ++i) {
@@ -823,7 +823,7 @@ namespace casadi {
   }
 
   bool Function::test_cast(const SharedObjectInternal* ptr) {
-    return dynamic_cast<const FunctionInternal*>(ptr)!=0;
+    return dynamic_cast<const FunctionInternal*>(ptr)!=nullptr;
   }
 
   Dict Function::stats(casadi_int mem) const {

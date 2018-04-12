@@ -109,7 +109,7 @@ namespace casadi {
     void* memory(casadi_int ind) const;
 
     /** \brief Create memory block */
-    virtual void* alloc_mem() const {return 0;}
+    virtual void* alloc_mem() const {return nullptr;}
 
     /** \brief Initalize memory block */
     virtual int init_mem(void* mem) const { return 0;}

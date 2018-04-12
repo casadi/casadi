@@ -73,13 +73,13 @@ namespace casadi {
     ad_weight_sp_ = 0.49; // Forward when tie
     jac_penalty_ = 2;
     max_num_dir_ = GlobalOptions::getMaxNumDir();
-    user_data_ = 0;
+    user_data_ = nullptr;
     regularity_check_ = false;
     inputs_check_ = true;
     jit_ = false;
     compilerplugin_ = "clang";
     print_time_ = true;
-    eval_ = 0;
+    eval_ = nullptr;
     has_refcount_ = false;
     enable_forward_ = true;
     enable_reverse_ = true;
@@ -97,7 +97,7 @@ namespace casadi {
 
   ProtoFunction::~ProtoFunction() {
     for (void* m : mem_) {
-      if (m!=0) casadi_warning("Memory object has not been properly freed");
+      if (m!=nullptr) casadi_warning("Memory object has not been properly freed");
     }
     mem_.clear();
   }
@@ -384,7 +384,7 @@ namespace casadi {
         if (verbose_) casadi_message("Compiling function '" + name_ + "' done.");
         // Try to load
         eval_ = (eval_t)compiler_.get_function(name_);
-        casadi_assert(eval_!=0, "Cannot load JIT'ed function.");
+        casadi_assert(eval_!=nullptr, "Cannot load JIT'ed function.");
       } else {
         // Just jit dependencies
         jit_dependencies(jit_name);
@@ -540,8 +540,8 @@ namespace casadi {
     casadi_int nz_out = nnz_out(oind);
 
     // Evaluation buffers
-    vector<typename JacSparsityTraits<fwd>::arg_t> arg(sz_arg(), 0);
-    vector<bvec_t*> res(sz_res(), 0);
+    vector<typename JacSparsityTraits<fwd>::arg_t> arg(sz_arg(), nullptr);
+    vector<bvec_t*> res(sz_res(), nullptr);
     vector<casadi_int> iw(sz_iw());
     vector<bvec_t> w(sz_w(), 0);
 
@@ -648,8 +648,8 @@ namespace casadi {
     casadi_assert_dev(nz==nnz_out(oind));
 
     // Evaluation buffers
-    vector<const bvec_t*> arg(sz_arg(), 0);
-    vector<bvec_t*> res(sz_res(), 0);
+    vector<const bvec_t*> arg(sz_arg(), nullptr);
+    vector<bvec_t*> res(sz_res(), nullptr);
     vector<casadi_int> iw(sz_iw());
     vector<bvec_t> w(sz_w());
 
@@ -796,7 +796,7 @@ namespace casadi {
             lookup(duplicates.sparsity()) = -bvec_size;
 
             // Propagate the dependencies
-            sp_forward(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), 0);
+            sp_forward(get_ptr(arg), get_ptr(res), get_ptr(iw), get_ptr(w), nullptr);
 
             // Temporary bit work vector
             bvec_t spsens;
@@ -880,10 +880,10 @@ namespace casadi {
     vector<bvec_t> s_out(nz_out, 0);
 
     // Evaluation buffers
-    vector<const bvec_t*> arg_fwd(sz_arg(), 0);
-    vector<bvec_t*> arg_adj(sz_arg(), 0);
+    vector<const bvec_t*> arg_fwd(sz_arg(), nullptr);
+    vector<bvec_t*> arg_adj(sz_arg(), nullptr);
     arg_fwd[iind] = arg_adj[iind] = get_ptr(s_in);
-    vector<bvec_t*> res(sz_res(), 0);
+    vector<bvec_t*> res(sz_res(), nullptr);
     res[oind] = get_ptr(s_out);
     vector<casadi_int> iw(sz_iw());
     vector<bvec_t> w(sz_w());
@@ -2031,7 +2031,7 @@ namespace casadi {
     // Loop over outputs
     for (casadi_int oind=0; oind<n_out_; ++oind) {
       // Skip if nothing to assign
-      if (res[oind]==0 || nnz_out(oind)==0) continue;
+      if (res[oind]==nullptr || nnz_out(oind)==0) continue;
 
       // Clear result
       casadi_fill(res[oind], nnz_out(oind), bvec_t(0));
@@ -2039,7 +2039,7 @@ namespace casadi {
       // Loop over inputs
       for (casadi_int iind=0; iind<n_in_; ++iind) {
         // Skip if no seeds
-        if (arg[iind]==0 || nnz_in(iind)==0) continue;
+        if (arg[iind]==nullptr || nnz_in(iind)==0) continue;
 
         // Get the sparsity of the Jacobian block
         Sparsity sp = sparsity_jac(iind, oind, true, false);
@@ -2063,12 +2063,12 @@ namespace casadi {
     // Loop over outputs
     for (casadi_int oind=0; oind<n_out_; ++oind) {
       // Skip if nothing to assign
-      if (res[oind]==0 || nnz_out(oind)==0) continue;
+      if (res[oind]==nullptr || nnz_out(oind)==0) continue;
 
       // Loop over inputs
       for (casadi_int iind=0; iind<n_in_; ++iind) {
         // Skip if no seeds
-        if (arg[iind]==0 || nnz_in(iind)==0) continue;
+        if (arg[iind]==nullptr || nnz_in(iind)==0) continue;
 
         // Get the sparsity of the Jacobian block
         Sparsity sp = sparsity_jac(iind, oind, true, false);
@@ -2601,7 +2601,7 @@ namespace casadi {
 
   void ProtoFunction::clear_mem() {
     for (auto&& i : mem_) {
-      if (i!=0) free_mem(i);
+      if (i!=nullptr) free_mem(i);
     }
     mem_.clear();
   }
@@ -2846,7 +2846,7 @@ namespace casadi {
     // Static & dynamic buffers
     char buf[256];
     size_t buf_sz = sizeof(buf);
-    char* buf_dyn = 0;
+    char* buf_dyn = nullptr;
     // Try to print with a small buffer
     casadi_int n = vsnprintf(buf, buf_sz, fmt, args);
     // Need a larger buffer?

@@ -47,7 +47,7 @@ namespace casadi {
   }
 
   bool Linsol::test_cast(const SharedObjectInternal* ptr) {
-    return dynamic_cast<const LinsolInternal*>(ptr)!=0;
+    return dynamic_cast<const LinsolInternal*>(ptr)!=nullptr;
   }
 
   bool Linsol::has_plugin(const std::string& name) {
@@ -97,7 +97,7 @@ namespace casadi {
   }
 
   int Linsol::sfact(const double* A, casadi_int mem) const {
-    if (A==0) return 1;
+    if (A==nullptr) return 1;
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
     // Factorization will be needed after this step
@@ -117,7 +117,7 @@ namespace casadi {
   }
 
   int Linsol::nfact(const double* A, casadi_int mem) const {
-    if (A==0) return 1;
+    if (A==nullptr) return 1;
     auto m = static_cast<LinsolMemory*>((*this)->memory(mem));
 
     // Perform pivoting, if required

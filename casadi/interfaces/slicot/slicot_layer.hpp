@@ -28,14 +28,14 @@
 
 namespace casadi {
   int slicot_mb03vd(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, double * tau,
-                     int ldtau, double * dwork=0);
+                     int ldtau, double * dwork=nullptr);
 
   int slicot_mb03vy(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2,
-                     const double * tau, int ldtau, double * dwork=0, int ldwork=0);
+                     const double * tau, int ldtau, double * dwork=nullptr, int ldwork=0);
 
   int slicot_mb03wd(char job, char compz, int n, int p, int ilo, int ihi, int iloz, int ihiz,
                      double *h, int ldh1, int ldh2, double* z, int ldz1, int ldz2, double* wr,
-                     double *wi, double * dwork=0, int ldwork=0);
+                     double *wi, double * dwork=nullptr, int ldwork=0);
 
   int slicot_mb05nd(int n, double delta, const double* a, int lda,
                      double* ex, int ldex, double * exint, int ldexin,

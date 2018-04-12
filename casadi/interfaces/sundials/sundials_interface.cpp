@@ -206,7 +206,7 @@ namespace casadi {
         J = getJ(backward);
       } else {
         SundialsInterface* d = derivative_of_.get<SundialsInterface>();
-        casadi_assert_dev(d!=0);
+        casadi_assert_dev(d!=nullptr);
         if (d->ns_==0) {
           J = d->get_function(backward ? "jacB" : "jacF");
         } else {
@@ -291,10 +291,10 @@ namespace casadi {
   }
 
   SundialsMemory::SundialsMemory() {
-    this->xz  = 0;
-    this->q = 0;
-    this->rxz = 0;
-    this->rq = 0;
+    this->xz  = nullptr;
+    this->q = nullptr;
+    this->rxz = nullptr;
+    this->rq = nullptr;
     this->first_callB = true;
   }
 

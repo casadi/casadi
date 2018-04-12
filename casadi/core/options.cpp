@@ -43,7 +43,7 @@ namespace casadi {
     if (it!=entries.end()) {
       return &it->second;
     } else {
-      return 0;
+      return nullptr;
     }
   }
 
@@ -234,7 +234,7 @@ namespace casadi {
       const Options::Entry* entry = find(op.first);
 
       // Informative error message if option does not exist
-      if (entry==0) {
+      if (entry==nullptr) {
         stringstream ss;
         ss << "Unknown option: " << op.first << endl;
         ss << endl;
@@ -264,7 +264,7 @@ namespace casadi {
 
   void Options::print_one(const std::string &name, std::ostream &stream) const {
     const Options::Entry* entry = find(name);
-    if (entry!=0) {
+    if (entry!=nullptr) {
       entry->disp(name, stream);
     } else {
       stream << "  \"" << name << "\" does not exist.";
@@ -279,13 +279,13 @@ namespace casadi {
 
   std::string Options::type(const std::string& name) const {
     const Options::Entry* entry = find(name);
-    casadi_assert(entry!=0, "Option \"" + name + "\" does not exist");
+    casadi_assert(entry!=nullptr, "Option \"" + name + "\" does not exist");
     return GenericType::get_type_description(entry->type);
   }
 
   std::string Options::info(const std::string& name) const {
     const Options::Entry* entry = find(name);
-    casadi_assert(entry!=0, "Option \"" + name + "\" does not exist");
+    casadi_assert(entry!=nullptr, "Option \"" + name + "\" does not exist");
     return entry->description;
   }
 

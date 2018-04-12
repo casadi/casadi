@@ -57,7 +57,7 @@ namespace casadi {
 
   ShellCompiler::ShellCompiler(const std::string& name) :
     ImporterInternal(name) {
-      handle_ = 0;
+      handle_ = nullptr;
   }
 
   ShellCompiler::~ShellCompiler() {
@@ -230,7 +230,7 @@ namespace casadi {
       "CommonExternal: Cannot open function: " + bin_name_ + ". error code: " +
       STRING(GetLastError()));
 #else // _WIN32
-    casadi_assert(handle_!=0,
+    casadi_assert(handle_!=nullptr,
       "CommonExternal: Cannot open function: " + bin_name_ + ". error code: " +
       str(dlerror()));
 #endif // _WIN32
@@ -242,7 +242,7 @@ namespace casadi {
 #else // _WIN32
     signal_t fcnPtr = reinterpret_cast<signal_t>(dlsym(handle_, symname.c_str()));
     if (dlerror()) {
-      fcnPtr=0;
+      fcnPtr=nullptr;
       dlerror(); // Reset error flags
     }
     return fcnPtr;

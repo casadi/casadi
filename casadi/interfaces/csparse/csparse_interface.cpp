@@ -67,8 +67,8 @@ namespace casadi {
     if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<CsparseMemory*>(mem);
 
-    m->N = 0;
-    m->S = 0;
+    m->N = nullptr;
+    m->S = nullptr;
     m->A.nzmax = this->nnz();  // maximum number of entries
     m->A.m = this->nrow(); // number of rows
     m->A.n = this->ncol(); // number of columns
@@ -78,7 +78,7 @@ namespace casadi {
     copy_vector(this->row(), m->row);
     m->A.p = get_ptr(m->colind); // row pointers (size n+1)
     m->A.i = get_ptr(m->row); // row pointers (size n+1)
-    m->A.x = 0; // numerical values, size nzmax
+    m->A.x = nullptr; // numerical values, size nzmax
     m->A.nz = -1; // of entries in triplet matrix, -1 for compressed-column
 
     // Temporary
@@ -123,7 +123,7 @@ namespace casadi {
 
     if (m->N) cs_nfree(m->N);
     m->N = cs_lu(&m->A, m->S, tol) ;                 // numeric LU factorization
-    if (m->N==0) {
+    if (m->N==nullptr) {
       DM temp(sp_, vector<double>(A, A+nnz()));
       temp = sparsify(temp);
       if (temp.sparsity().is_singular()) {
@@ -149,21 +149,21 @@ namespace casadi {
         throw CasadiException(ss.str());
       }
     }
-    casadi_assert_dev(m->N!=0);
+    casadi_assert_dev(m->N!=nullptr);
     return 0;
   }
 
   int CsparseInterface::solve(void* mem, const double* A, double* x,
       casadi_int nrhs, bool tr) const {
     auto m = static_cast<CsparseMemory*>(mem);
-    casadi_assert_dev(m->N!=0);
+    casadi_assert_dev(m->N!=nullptr);
 
     double *t = &m->temp_.front();
 
     for (casadi_int k=0; k<nrhs; ++k) {
       if (tr) {
         cs_pvec(m->S->q, x, t, m->A.n) ;       // t = P2*b
-        casadi_assert_dev(m->N->U!=0);
+        casadi_assert_dev(m->N->U!=nullptr);
         cs_utsolve(m->N->U, t) ;              // t = U'\t
         cs_ltsolve(m->N->L, t) ;              // t = L'\t
         cs_pvec(m->N->pinv, t, x, m->A.n) ;    // x = P1*t
