@@ -605,7 +605,10 @@ int casadi_qp_flip_check(casadi_qp_data<T1>* d, casadi_int index, casadi_int sig
     if (fabs(d->dz[i])<1e-12) continue;
     // If dot(dlam, kkt_diff(i))==0, rank won't increase
     if (fabs(casadi_qp_kkt_dot(d, d->dlam, i))<1e-12) continue;
-    // Are we adding or removing?
+    // Never drop a violated constraint
+    if (d->lam[i]>0 && d->z[i]>d->ubz[i]) continue;
+    if (d->lam[i]<0 && d->z[i]<d->lbz[i]) continue;
+    // Check if best so far
     if (d->lam[i]==0) {
       // Check sensitivity for positive lam[i], larger is better
       if (!d->neverupper[i] && (test=-d->sens[i]) < best) {
