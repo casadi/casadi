@@ -137,6 +137,11 @@ namespace casadi {
       print("This is casadi::ConicActiveSet.\n");
       print("Number of variables:                       %9d\n", nx_);
       print("Number of constraints:                     %9d\n", na_);
+      print("Number of nonzeros in H:                   %9d\n", H_.nnz());
+      print("Number of nonzeros in A:                   %9d\n", A_.nnz());
+      print("Number of nonzeros in KKT:                 %9d\n", kkt_.nnz());
+      print("Number of nonzeros in QR(V):               %9d\n", sp_v_.nnz());
+      print("Number of nonzeros in QR(R):               %9d\n", sp_r_.nnz());
       print("Work in progress!\n");
     }
   }
