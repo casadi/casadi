@@ -51,6 +51,7 @@ void casadi_qp_work(casadi_qp_prob<T1>* p, casadi_int* sz_iw, casadi_int* sz_w) 
   *sz_w += p->nz; // dlam
   *sz_w += p->nx; // infeas
   *sz_w += p->nx; // tinfeas
+  *sz_w += p->nz; // sens
   *sz_iw += p->nz; // neverzero
   *sz_iw += p->nz; // neverupper
   *sz_iw += p->nz; // neverlower
@@ -68,7 +69,7 @@ struct casadi_qp_data {
   // QP data
   const T1 *nz_a, *nz_h, *g;
   // Vectors
-  T1 *z, *lbz, *ubz, *infeas, *tinfeas, *lam, *w, *dz, *dlam;
+  T1 *z, *lbz, *ubz, *infeas, *tinfeas, *sens, *lam, *w, *dz, *dlam;
   casadi_int *iw, *neverzero, *neverlower, *neverupper;
   // Numeric QR factorization
   T1 *nz_at, *nz_kkt, *beta, *nz_v, *nz_r;
@@ -111,6 +112,7 @@ void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int* iw, T1* w) {
   d->nz_at = w; w += nnz_a;
   d->infeas = w; w += p->nx;
   d->tinfeas = w; w += p->nx;
+  d->sens = w; w += p->nz;
   d->neverzero = iw; iw += p->nz;
   d->neverupper = iw; iw += p->nz;
   d->neverlower = iw; iw += p->nz;
@@ -239,25 +241,21 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign) {
   // Try to improve dual feasibility by removing a constraint
   // Local variables
   casadi_int best_ind, i;
-  T1 best_w;
+  T1 best_sens;
   const casadi_qp_prob<T1>* p = d->prob;
-  // We need to increase or decrease infeas[idu]. Sensitivity:
-  casadi_fill(d->w, p->nz, 0.);
-  d->w[d->idu] = d->infeas[d->idu]>0 ? -1. : 1.;
-  casadi_mv(d->nz_a, p->sp_a, d->w, d->w+p->nx, 0);
   // Find the best lam[i] to make zero
   best_ind = -1;
-  best_w = 0.;
+  best_sens = 0.;
   for (i=0; i<p->nz; ++i) {
     // Make sure variable influences du
-    if (d->w[i]==0.) continue;
+    if (d->sens[i]==0.) continue;
     // Make sure removing the constraint decreases dual infeasibility
-    if (d->w[i]>0. ? d->lam[i]>=0. : d->lam[i]<=0.) continue;
+    if (d->sens[i]>0. ? d->lam[i]>=0. : d->lam[i]<=0.) continue;
     // Skip if maximum infeasibility increases
     if (casadi_qp_du_check(d, i)>d->du) continue;
     // Check if best so far
-    if (fabs(d->w[i])>best_w) {
-      best_w = fabs(d->w[i]);
+    if (fabs(d->sens[i])>best_sens) {
+      best_sens = fabs(d->sens[i]);
       best_ind = i;
     }
   }
@@ -957,6 +955,10 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
   // Calculate primal and dual error
   casadi_qp_pr(d);
   casadi_qp_du(d);
+  // Sensitivity in decreasing |du|
+  casadi_fill(d->sens, p->nz, 0.);
+  d->sens[d->idu] = d->infeas[d->idu]>0 ? -1. : 1.;
+  casadi_mv(d->nz_a, p->sp_a, d->sens, d->sens+p->nx, 0);
 }
 
 template<typename T1>
