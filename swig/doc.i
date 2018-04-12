@@ -3449,7 +3449,7 @@ std::vector< std::string > &s_out, const Function::AuxOut
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -13422,7 +13422,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -22641,7 +22641,7 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -24750,7 +24750,7 @@ persistent=false) "
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -32903,7 +32903,7 @@ problem)
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -33712,7 +33712,7 @@ std::vector< M > &res) const  "
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -34737,7 +34737,7 @@ multiplying.
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -49521,7 +49521,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -51243,7 +51243,7 @@ std::vector< M > &arg) const  "
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -53980,7 +53980,7 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -56223,7 +56223,7 @@ std::vector< M > &arg) const  "
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -58653,7 +58653,7 @@ elements.
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -60016,7 +60016,7 @@ k) const  "
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -67206,7 +67206,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
-*m, const std::string &fcn, const double *const *arg=0) const  "
+*m, const std::string &fcn, const double *const *arg=nullptr) const  "
 
 [INTERNAL] ";
 
@@ -69281,11 +69281,6 @@ const std::string &suffix) "
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_pr_index(casadi_qp_data< T1 > *d,
-casadi_int *sign) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::load_expm(const std::string &name) "
 
 Explicitly load a plugin dynamically.
@@ -69305,19 +69300,14 @@ T1 alpha, const T1 *x, const T1 *y) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_qp_kkt_residual(casadi_qp_data< T1 >
-*d, T1 *r) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::dense_mul_nt_stride(casadi_int n, casadi_int
 m, casadi_int l, const double *A, const double *B, double *C, casadi_int
 strideA, casadi_int strideB, casadi_int strideC) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_lb_eig(const casadi_int *sp_h, const
-T1 *h) "
+%feature("docstring")  casadi::dense_mul_tn(casadi_int n, casadi_int m,
+casadi_int l, const double *A, const double *B, double *C) "
 
 [INTERNAL] ";
 
@@ -69704,26 +69694,11 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_factorize(casadi_qp_data< T1 > *d)
-"
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::load_integrator(const std::string &name) "
 
 Explicitly load a plugin dynamically.
 
 ";
-
-%feature("docstring")  casadi::casadi_qp_dual_blocking(casadi_qp_data< T1 >
-*d, T1 e) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_qp_work(casadi_qp_prob< T1 > *p,
-casadi_int *sz_iw, casadi_int *sz_w) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::expm_n_out() "
 
@@ -69770,11 +69745,6 @@ casadi_int n, casadi_int alpha) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::dense_copy_stride(casadi_int n, casadi_int m,
-const double *A, double *B, casadi_int strideA, casadi_int strideB) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::casadi_qr_singular(T1 *rmin, casadi_int
 *irmin, const T1 *nz_r, const casadi_int *sp_r, const casadi_int *pc, T1
 eps) "
@@ -69805,11 +69775,6 @@ ndim, const T1 *grid, const casadi_int *offset, const T1 *values, const T1
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_qp_calc_step(casadi_qp_data< T1 > *d,
-casadi_int *r_index, casadi_int *r_sign) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::has_interpolant(const std::string &name) "
 
 Check if a particular plugin is available.
@@ -69837,22 +69802,11 @@ inc_x, T1 *y, casadi_int inc_y) "
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_flip_check(casadi_qp_data< T1 > *d,
-casadi_int index, casadi_int sign, casadi_int *r_index, casadi_int *r_sign,
-T1 e) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::nlpsol_options(const std::string &name) "
 
 Get all options for a plugin.
 
 ";
-
-%feature("docstring")  casadi::casadi_qp_take_step(casadi_qp_data< T1 > *d)
-"
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::einstein_eval(casadi_int n_iter, const
 std::vector< casadi_int > &iter_dims, const std::vector< casadi_int >
@@ -69871,11 +69825,6 @@ const std::string &op) "
 Get documentation for a particular option.
 
 ";
-
-%feature("docstring")  casadi::casadi_qp_zero_blocking(casadi_qp_data< T1 >
-*d, T1 e, casadi_int *index, casadi_int *sign) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::check_exposed(T t) "
 
@@ -70234,10 +70183,6 @@ std::string &solver, const Function &f, const Dict &opts=Dict()) "
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_du(casadi_qp_data< T1 > *d) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::casadi_ldl(const casadi_int *sp_a, const T1
 *a, const casadi_int *sp_lt, T1 *lt, T1 *d, const casadi_int *p, T1 *w) "
 
@@ -70268,13 +70213,8 @@ Construct from an index vector (requires is_slice(v) to be true)
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_du_index(casadi_qp_data< T1 > *d,
-casadi_int *sign) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_qp_dual_breakpoints(casadi_qp_data< T1
-> *d, T1 *tau_list, casadi_int *ind_list, T1 e, T1 tau) "
+%feature("docstring")  casadi::dense_copy_stride(casadi_int n, casadi_int m,
+const double *A, double *B, casadi_int strideA, casadi_int strideB) "
 
 [INTERNAL] ";
 
@@ -70339,7 +70279,7 @@ Duplicates are treated by looking up last occurrence
 
 %feature("docstring")  casadi::slicot_mb03vy(int n, int p, int ilo, int ihi,
 double *a, int lda1, int lda2, const double *tau, int ldtau, double
-*dwork=0, int ldwork=0) "
+*dwork=nullptr, int ldwork=0) "
 
 ";
 
@@ -70878,11 +70818,6 @@ Get documentation for a particular option.
 
 %feature("docstring")  casadi::replace_mat(const M &arg, const Sparsity
 &inp) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_qp_primal_blocking(casadi_qp_data< T1
-> *d, T1 e, casadi_int *index, casadi_int *sign) "
 
 [INTERNAL] ";
 
@@ -71680,14 +71615,6 @@ Joel Andersson
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_reset(casadi_qp_data< T1 > *d) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_qp_pr(casadi_qp_data< T1 > *d) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::doc_conic(const std::string &name) "
 
 Get the documentation string for a plugin.
@@ -71773,8 +71700,8 @@ const std::vector< T > &mat) "
 
 %feature("docstring")  casadi::slicot_mb03wd(char job, char compz, int n,
 int p, int ilo, int ihi, int iloz, int ihiz, double *h, int ldh1, int ldh2,
-double *z, int ldz1, int ldz2, double *wr, double *wi, double *dwork=0, int
-ldwork=0) "
+double *z, int ldz1, int ldz2, double *wr, double *wi, double
+*dwork=nullptr, int ldwork=0) "
 
 ";
 
@@ -71784,11 +71711,6 @@ const T1 *lb, const T1 *ub) "
 [INTERNAL]  Largest bound violation.
 
 ";
-
-%feature("docstring")  casadi::casadi_qp_linesearch(casadi_qp_data< T1 > *d,
-casadi_int *index, casadi_int *sign) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::collocation_interpolators(const std::vector<
 double > &tau_root, std::vector< std::vector< double > > &output_C,
@@ -71896,11 +71818,6 @@ Get documentation for a particular option.
 
 ";
 
-%feature("docstring")  casadi::dense_mul_tn(casadi_int n, casadi_int m,
-casadi_int l, const double *A, const double *B, double *C) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::hash_value(T v) "
 
 Hash value of an integer.
@@ -71976,7 +71893,8 @@ casadi_int m) "
 ";
 
 %feature("docstring")  casadi::slicot_mb03vd(int n, int p, int ilo, int ihi,
-double *a, int lda1, int lda2, double *tau, int ldtau, double *dwork=0) "
+double *a, int lda1, int lda2, double *tau, int ldtau, double
+*dwork=nullptr) "
 
 ";
 
@@ -72067,11 +71985,6 @@ ind) "
 [INTERNAL]  Sparse copy: y <- x, w work vector (length >= number of rows)
 
 ";
-
-%feature("docstring")  casadi::casadi_qp_calc_dependent(casadi_qp_data< T1 >
-*d) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::interpolant(const std::string &name, const
 std::string &solver, const std::vector< std::vector< double > > &grid, const
@@ -72467,11 +72380,6 @@ linear
 Joel Andersson
 
 ";
-
-%feature("docstring")  casadi::casadi_bfgs(const casadi_int *sp_h, T1 *h,
-const T1 *dx, const T1 *glag, const T1 *glag_old, T1 *w) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::rootfinder_in() "
 
@@ -72916,11 +72824,6 @@ Explicitly load a plugin dynamically.
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_du_check(casadi_qp_data< T1 > *d,
-casadi_int i) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::rootfinder_option_type(const std::string
 &name, const std::string &op) "
 
@@ -72928,8 +72831,8 @@ Get type info for a particular option.
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_kkt_column(casadi_qp_data< T1 > *d,
-T1 *kkt_i, casadi_int i, casadi_int sign) "
+%feature("docstring")  casadi::casadi_lb_eig(const casadi_int *sp_h, const
+T1 *h) "
 
 [INTERNAL] ";
 
@@ -72978,16 +72881,6 @@ Explicitly load a plugin dynamically.
 %feature("docstring")  casadi::dense_kron_stride(casadi_int n, casadi_int m,
 const double *A, const double *B, double *C, casadi_int strideA, casadi_int
 strideB, casadi_int strideC) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_qp_kkt(casadi_qp_data< T1 > *d) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_qp_flip(casadi_qp_data< T1 > *d,
-casadi_int *index, casadi_int *sign, casadi_int r_index, casadi_int r_sign)
-"
 
 [INTERNAL] ";
 
@@ -73081,11 +72974,6 @@ Get output scheme name by index.
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_kkt_dot(casadi_qp_data< T1 > *d,
-const T1 *v, casadi_int i, casadi_int sign) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::is_strictly_monotone(const std::vector< T >
 &v) "
 
@@ -73116,11 +73004,6 @@ N:  Number of integrator steps
 order:  Order of interpolating polynomials
 
 ";
-
-%feature("docstring")  casadi::casadi_qp_init(casadi_qp_data< T1 > *d,
-casadi_int *iw, T1 *w) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::nlpsol_in() "
 
@@ -73212,8 +73095,8 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_log(casadi_qp_data< T1 > *d, const
-char *fmt,...) "
+%feature("docstring")  casadi::casadi_bfgs(const casadi_int *sp_h, T1 *h,
+const T1 *dx, const T1 *glag, const T1 *glag_old, T1 *w) "
 
 [INTERNAL] ";
 
@@ -74129,11 +74012,6 @@ iwork:  A integer work vector that you must allocate Minimum size:
 y.size1()+x.size2()+1
 
 ";
-
-%feature("docstring")  casadi::casadi_qp_scale_step(casadi_qp_data< T1 > *d,
-casadi_int *r_index, casadi_int *r_sign) "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_qr_mv(const casadi_int *sp_v, const T1
 *v, const T1 *beta, T1 *x, casadi_int tr) "
