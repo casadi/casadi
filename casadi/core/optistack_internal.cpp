@@ -588,8 +588,8 @@ void OptiNode::bake() {
   nlp_["f"] = f_;
 
   offset = 0;
-  for (casadi_int i=0;i<g_.size();++i) {
-    MetaCon& r = meta_con(g_[i]);
+  for (const auto & g : g_) {
+    MetaCon& r = meta_con(g);
     MetaVar& r2 = meta(r.dual_canon);
     symbol_active_[r2.count] = true;
 

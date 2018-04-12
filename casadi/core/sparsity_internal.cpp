@@ -1886,9 +1886,9 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || has_negative(rr)) {
       std::vector<casadi_int> rr_mod = rr;
-      for (vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
-        if (ind1) (*i)--;
-        if (*i<0) *i += numel();
+      for (casadi_int & r : rr_mod) {
+        if (ind1) r--;
+        if (r<0) r += numel();
       }
       return _erase(rr_mod, false, mapping); // Call recursively
     }
@@ -1971,17 +1971,17 @@ namespace casadi {
         || !is_nondecreasing(rr) || !is_nondecreasing(cc)) {
       // Create substitute rr
       std::vector<casadi_int> rr_mod = rr;
-      for (vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
-        if (ind1) (*i)--;
-        if (*i<0) *i += size1();
+      for (casadi_int & r : rr_mod) {
+        if (ind1) r--;
+        if (r<0) r += size1();
       }
       std::sort(rr_mod.begin(), rr_mod.end());
 
       // Create substitute cc
       std::vector<casadi_int> cc_mod = cc;
-      for (vector<casadi_int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
-        if (ind1) (*i)--;
-        if (*i<0) *i += size2();
+      for (casadi_int & c : cc_mod) {
+        if (ind1) c--;
+        if (c<0) c += size2();
       }
       std::sort(cc_mod.begin(), cc_mod.end());
 
@@ -2112,13 +2112,13 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || has_negative(rr)) {
       std::vector<casadi_int> rr_mod = rr;
-      for (vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
-        casadi_assert(!(ind1 && (*i)<=0),
-          "Matlab is 1-based, but requested index " + str(*i) +  ". "
+      for (casadi_int & r : rr_mod) {
+        casadi_assert(!(ind1 && r<=0),
+          "Matlab is 1-based, but requested index " + str(r) +  ". "
           "Note that negative slices are disabled in the Matlab interface. "
           "Possibly you may want to use 'end'.");
-        if (ind1) (*i)--;
-        if (*i<0) *i += numel();
+        if (ind1) r--;
+        if (r<0) r += numel();
       }
       return sub(rr_mod, sp, mapping, false); // Call recursively
     }
@@ -2153,18 +2153,18 @@ namespace casadi {
 
     // Handle index-1, negative indices in rr
     std::vector<casadi_int> tmp = rr;
-    for (vector<casadi_int>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
-      if (ind1) (*i)--;
-      if (*i<0) *i += size1();
+    for (casadi_int & t : tmp) {
+      if (ind1) t--;
+      if (t<0) t += size1();
     }
     std::vector<casadi_int> rr_sorted, rr_sorted_index;
     sort(tmp, rr_sorted, rr_sorted_index, false);
 
     // Handle index-1, negative indices in cc
     tmp = cc;
-    for (vector<casadi_int>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
-      if (ind1) (*i)--;
-      if (*i<0) *i += size2();
+    for (casadi_int & t : tmp) {
+      if (ind1) t--;
+      if (t<0) t += size2();
     }
     std::vector<casadi_int> cc_sorted, cc_sorted_index;
     sort(tmp, cc_sorted, cc_sorted_index, false);
@@ -2206,8 +2206,7 @@ namespace casadi {
       } else {
         // Loop over rr
         casadi_int el = colind[it];
-        for (casadi_int j=0; j<rr_sorted.size(); ++j) {
-          casadi_int jt=rr_sorted[j];
+        for (casadi_int jt : rr_sorted) {
           // Continue to the non-zero element
           while (el<colind[it+1] && row[el]<jt) el++;
           // Add the non-zero element, if there was an element in the location exists
@@ -2506,9 +2505,9 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || has_negative(cc)) {
       std::vector<casadi_int> cc_mod = cc;
-      for (vector<casadi_int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
-        if (ind1) (*i)--;
-        if (*i<0) *i += ncol;
+      for (casadi_int & c : cc_mod) {
+        if (ind1) c--;
+        if (c<0) c += ncol;
       }
       return _enlargeColumns(ncol, cc_mod, false); // Call recursively
     }
@@ -2546,9 +2545,9 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || has_negative(rr)) {
       std::vector<casadi_int> rr_mod = rr;
-      for (vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
-        if (ind1) (*i)--;
-        if (*i<0) *i += nrow;
+      for (casadi_int & r : rr_mod) {
+        if (ind1) r--;
+        if (r<0) r += nrow;
       }
       return _enlargeRows(nrow, rr_mod, false); // Call recursively
     }
@@ -2916,8 +2915,8 @@ namespace casadi {
     vector<casadi_int> ret_colind(forbiddenColors.size()+1, 0), ret_row;
 
     // Get the number of rows for each col
-    for (casadi_int i=0; i<color.size(); ++i) {
-      ret_colind[color[i]+1]++;
+    for (casadi_int c : color) {
+      ret_colind[c+1]++;
     }
 
     // Cumsum
@@ -3170,8 +3169,8 @@ namespace casadi {
     vector<casadi_int> ret_colind(forbiddenColors.size()+1, 0), ret_row;
 
     // Get the number of rows for each col
-    for (casadi_int i=0; i<color.size(); ++i) {
-      ret_colind[color[i]+1]++;
+    for (casadi_int c : color) {
+      ret_colind[c+1]++;
     }
 
     // Cumsum

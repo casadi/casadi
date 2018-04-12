@@ -100,8 +100,8 @@ namespace casadi {
   }
 
   Polynomial& Polynomial::operator/=(casadi_real d) {
-    for (vector<casadi_real>::iterator it=p_.begin(); it!=p_.end(); ++it) {
-      *it /= d;
+    for (double & it : p_) {
+      it /= d;
     }
     return *this;
   }

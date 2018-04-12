@@ -54,8 +54,8 @@ namespace casadi {
 
   void Find::ad_forward(const std::vector<std::vector<MX> >& fseed,
                      std::vector<std::vector<MX> >& fsens) const {
-    for (casadi_int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = 0;
+    for (auto & fsen : fsens) {
+      fsen[0] = 0;
     }
   }
 

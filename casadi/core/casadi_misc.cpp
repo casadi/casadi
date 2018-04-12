@@ -85,8 +85,8 @@ namespace casadi {
     casadi_int nret = (stop-start)/step + ((stop-start)%step!=0);
     std::vector<casadi_int> ret(nret);
     casadi_int ind = start;
-    for (std::vector<casadi_int>::iterator it=ret.begin(); it!=ret.end(); ++it) {
-      *it = ind;
+    for (casadi_int & it : ret) {
+      it = ind;
       ind += step;
     }
     return ret;
@@ -115,8 +115,8 @@ namespace casadi {
     std::vector<casadi_int> lookup(size, 0);
     std::vector<casadi_int> ret;
 
-    for (casadi_int i=0;i<v.size();i++) {
-      lookup[v[i]] = 1;
+    for (casadi_int i : v) {
+      lookup[i] = 1;
     }
 
     for (casadi_int i=0;i<size;i++) {

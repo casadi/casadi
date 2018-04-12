@@ -1,1 +1,1 @@
-Checks: "-*,modernize-use-nullptr"
+Checks: "-*,modernize-use-nullptr,modernize-loop-convert"

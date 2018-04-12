@@ -323,11 +323,11 @@ namespace casadi {
     new_row.reserve(sz+rrsz);
     new_col.reserve(sz+rrsz);
     nz.reserve(rrsz);
-    for (std::vector<casadi_int>::iterator i=nz.begin(); i!=nz.end(); ++i) {
-      if (ind1) (*i)--;
-      if (*i<0) *i += nel;
-      new_row.push_back(*i % sz1);
-      new_col.push_back(*i / sz1);
+    for (casadi_int & k : nz) {
+      if (ind1) k--;
+      if (k<0) k += nel;
+      new_row.push_back(k % sz1);
+      new_col.push_back(k / sz1);
     }
     Sparsity sp = Sparsity::triplet(sz1, sz2, new_row, new_col);
 
@@ -944,10 +944,10 @@ namespace casadi {
         ret = trim_empty(x, true);
         casadi_int s = 0;
         casadi_int nrow = 0;
-        for (casadi_int i=0;i<ret.size();++i) {
-          s+= ret[i].size2();
-          casadi_assert_dev(nrow==0 || nrow==ret[i].size1());
-          nrow = ret[i].size1();
+        for (auto & e : ret) {
+          s+= e.size2();
+          casadi_assert_dev(nrow==0 || nrow==e.size1());
+          nrow = e.size1();
         }
         return MX::zeros(nrow, s);
       } else {
@@ -970,9 +970,9 @@ namespace casadi {
         ret = trim_empty(x, true);
         casadi_int s1 = 0;
         casadi_int s2 = 0;
-        for (casadi_int i=0;i<ret.size();++i) {
-          s1+= ret[i].size1();
-          s2+= ret[i].size2();
+        for (auto & e : ret) {
+          s1+= e.size1();
+          s2+= e.size2();
         }
         return MX::zeros(s1, s2);
       } else {
@@ -1005,10 +1005,10 @@ namespace casadi {
         ret = trim_empty(x, true);
         casadi_int s = 0;
         casadi_int ncol = 0;
-        for (casadi_int i=0;i<ret.size();++i) {
-          s+= ret[i].size1();
-          casadi_assert_dev(ncol==0 || ret[i].size2()==ncol);
-          ncol = ret[i].size2();
+        for (auto & e : ret) {
+          s+= e.size1();
+          casadi_assert_dev(ncol==0 || e.size2()==ncol);
+          ncol = e.size2();
         }
         return MX::zeros(s, ncol);
       } else {
@@ -1017,7 +1017,7 @@ namespace casadi {
     } else if (!x.front().is_column()) {
       // Vertcat operation only supports vectors, rewrite using horzcat
       vector<MX> xT = x;
-      for (vector<MX>::iterator i=xT.begin(); i!=xT.end(); ++i) *i = i->T();
+      for (auto & e : xT) e = e.T();
       return horzcat(xT).T();
     } else {
       return x.front()->get_vertcat(x);
@@ -1486,12 +1486,12 @@ namespace casadi {
         case OP_PARAMETER:
           break;
         default: // Unary operation, binary operation or output
-          for (casadi_int c=0; c<it->arg.size(); ++c) {
-            if (usecount[it->arg[c]]==0) {
-              usecount[it->arg[c]]=1;
-            } else if (usecount[it->arg[c]]==1) {
-              replace.push_back(origin[it->arg[c]]);
-              usecount[it->arg[c]]=-1; // Extracted, do not extract again
+          for (casadi_int c : it->arg) {
+            if (usecount[c]==0) {
+              usecount[c]=1;
+            } else if (usecount[c]==1) {
+              replace.push_back(origin[c]);
+              usecount[c]=-1; // Extracted, do not extract again
             }
           }
         }
@@ -1808,8 +1808,8 @@ namespace casadi {
     temp({get_ptr(t_in)}, {get_ptr(t_out)});
 
     // Loop over results
-    for (casadi_int i=0; i<t_out.size(); ++i) {
-      if (t_out[i]) return true;
+    for (bvec_t t : t_out) {
+      if (t) return true;
     }
 
     return false;

@@ -250,10 +250,10 @@ namespace casadi {
       // Lagrange multipliers corresponding to the definition of the dependent variables
       stringstream ss;
       casadi_int i=0;
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+      for (auto & e : v_) {
         ss.str(string());
         ss << "lam_x" << i++;
-        it->v_lam = MX::sym(ss.str(), it->v.sparsity());
+        e.v_lam = MX::sym(ss.str(), e.v.sparsity());
       }
 
       // Lagrange multipliers for the nonlinear constraints
@@ -268,8 +268,8 @@ namespace casadi {
       vector<vector<MX> > aseed(1), asens(1);
       aseed[0].push_back(1.0);
       aseed[0].push_back(g_lam);
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        aseed[0].push_back(it->v_lam);
+      for (auto & e : v_) {
+        aseed[0].push_back(e.v_lam);
       }
       vdef_fcn->call_reverse(vdef_in, vdef_out, aseed, asens, true, false);
       i=0;
@@ -280,10 +280,10 @@ namespace casadi {
       p_defL = asens[0].at(i++);
       if (p_defL.is_null()) p_defL = MX::zeros(p.sparsity()); // Needed?
 
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        it->v_defL = asens[0].at(i++);
-        if (it->v_defL.is_null()) {
-          it->v_defL = MX::zeros(it->v.sparsity());
+      for (auto & e : v_) {
+        e.v_defL = asens[0].at(i++);
+        if (e.v_defL.is_null()) {
+          e.v_defL = MX::zeros(e.v.sparsity());
         }
       }
 
@@ -299,13 +299,13 @@ namespace casadi {
     casadi_int n=0;
     res_fcn_in.push_back(x);             res_x_ = n++;
     res_fcn_in.push_back(p);             res_p_ = n++;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      res_fcn_in.push_back(it->v);        it->res_var = n++;
+    for (auto & e : v_) {
+      res_fcn_in.push_back(e.v);         e.res_var = n++;
     }
     if (!gauss_newton_) {
       res_fcn_in.push_back(g_lam);        res_g_lam_ = n++;
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        res_fcn_in.push_back(it->v_lam);  it->res_lam = n++;
+      for (auto & e : v_) {
+        res_fcn_in.push_back(e.v_lam);    e.res_lam = n++;
       }
     }
 
@@ -316,13 +316,13 @@ namespace casadi {
     res_fcn_out.push_back(gL_defL);                        res_gl_ = n++;
     res_fcn_out.push_back(vdef_out[1]);                    res_g_ = n++;
     res_fcn_out.push_back(p_defL);                         res_p_d_ = n++;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      res_fcn_out.push_back(it->v_def - it->v);             it->res_d = n++;
+    for (auto & e : v_) {
+      res_fcn_out.push_back(e.v_def - e.v);                e.res_d = n++;
     }
 
     if (!gauss_newton_) {
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        res_fcn_out.push_back(it->v_defL - it->v_lam);     it->res_lam_d = n++;
+      for (auto & e : v_) {
+        res_fcn_out.push_back(e.v_defL - e.v_lam);         e.res_lam_d = n++;
       }
     }
 
@@ -335,29 +335,29 @@ namespace casadi {
     // Declare difference vector d and substitute out p and v
     stringstream ss;
     casadi_int i=0;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+    for (auto & e : v_) {
       ss.str(string());
       ss << "d" << i++;
-      it->d = MX::sym(ss.str(), it->v.sparsity());
-      it->d_def = it->v_def - it->d;
+      e.d = MX::sym(ss.str(), e.v.sparsity());
+      e.d_def = e.v_def - e.d;
     }
 
     // Declare difference vector lam_d and substitute out lam
     if (!gauss_newton_) {
       casadi_int i=0;
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+      for (auto & e : v_) {
         ss.str(string());
         ss << "d_lam" << i++;
-        it->d_lam = MX::sym(ss.str(), it->v.sparsity());
-        it->d_defL = it->v_defL - it->d_lam;
+        e.d_lam = MX::sym(ss.str(), e.v.sparsity());
+        e.d_defL = e.v_defL - e.d_lam;
       }
     }
 
     // Variables to be substituted and their definitions
     vector<MX> svar, sdef;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      svar.push_back(it->v);
-      sdef.push_back(it->d_def);
+    for (auto & e : v_) {
+      svar.push_back(e.v);
+      sdef.push_back(e.d_def);
     }
     if (!gauss_newton_) {
       for (vector<Var>::reverse_iterator it=v_.rbegin(); it!=v_.rend(); ++it) {
@@ -374,8 +374,8 @@ namespace casadi {
 
     substitute_inplace(svar, sdef, ex, false);
     i=0;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      it->d_def = sdef[i++];
+    for (auto & e : v_) {
+      e.d_def = sdef[i++];
     }
     if (!gauss_newton_) {
       for (vector<Var>::reverse_iterator it=v_.rbegin(); it!=v_.rend(); ++it) {
@@ -393,8 +393,8 @@ namespace casadi {
     n=0;
     mfcn_in.push_back(p);                               mod_p_ = n++;
     mfcn_in.push_back(x);                               mod_x_ = n++;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      mfcn_in.push_back(it->d);                          it->mod_var = n++;
+    for (auto & e : v_) {
+      mfcn_in.push_back(e.d);                           e.mod_var = n++;
     }
 
     // Modified function outputs
@@ -406,8 +406,8 @@ namespace casadi {
     if (!gauss_newton_) {
       n = mfcn_in.size();
       mfcn_in.push_back(g_lam);                          mod_g_lam_ = n++;
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        mfcn_in.push_back(it->d_lam);                    it->mod_lam = n++;
+      for (auto & e : v_) {
+        mfcn_in.push_back(e.d_lam);                      e.mod_lam = n++;
       }
     }
 
@@ -437,10 +437,10 @@ namespace casadi {
 
     // Definition of intermediate variables
     n = mfcn_out.size();
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      mfcn_out.push_back(it->d_def);         it->mod_def = n++;
+    for (auto & e : v_) {
+      mfcn_out.push_back(e.d_def);          e.mod_def = n++;
       if (!gauss_newton_) {
-        mfcn_out.push_back(it->d_defL);      it->mod_defL = n++;
+        mfcn_out.push_back(e.d_defL);       e.mod_defL = n++;
       }
     }
 
@@ -452,10 +452,10 @@ namespace casadi {
 
     // Linearization in the d-direction (see Equation (2.12) in Alberspeyer2010)
     fill(mfcn_fwdSeed[0].begin(), mfcn_fwdSeed[0].end(), MX());
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      mfcn_fwdSeed[0][it->mod_var] = it->d;
+    for (auto & e : v_) {
+      mfcn_fwdSeed[0][e.mod_var] = e.d;
       if (!gauss_newton_) {
-        mfcn_fwdSeed[0][it->mod_lam] = it->d_lam;
+        mfcn_fwdSeed[0][e.mod_lam] = e.d_lam;
       }
     }
     mfcn->call_forward(mfcn_in, mfcn_out, mfcn_fwdSeed, mfcn_fwdSens, true, false);
@@ -487,13 +487,13 @@ namespace casadi {
     // Interpret the Jacobian-vector multiplication as a forward directional derivative
     fill(mfcn_fwdSeed[0].begin(), mfcn_fwdSeed[0].end(), MX());
     mfcn_fwdSeed[0][mod_x_] = du;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      mfcn_fwdSeed[0][it->mod_var] = -it->d;
+    for (auto & e : v_) {
+      mfcn_fwdSeed[0][e.mod_var] = -e.d;
     }
     if (!gauss_newton_) {
       mfcn_fwdSeed[0][mod_g_lam_] = g_dlam;
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        mfcn_fwdSeed[0][it->mod_lam] = -it->d_lam;
+      for (auto & e : v_) {
+        mfcn_fwdSeed[0][e.mod_lam] = -e.d_lam;
       }
     }
     mfcn->call_forward(mfcn_in, mfcn_out, mfcn_fwdSeed, mfcn_fwdSens, true, false);
@@ -508,13 +508,13 @@ namespace casadi {
     // Step expansion function outputs
     vector<MX> exp_fcn_out;
     n=0;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      exp_fcn_out.push_back(mfcn_fwdSens[0][it->mod_def]); it->exp_def = n++;
+    for (auto & e : v_) {
+      exp_fcn_out.push_back(mfcn_fwdSens[0][e.mod_def]); e.exp_def = n++;
     }
 
     if (!gauss_newton_) {
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        exp_fcn_out.push_back(mfcn_fwdSens[0][it->mod_defL]); it->exp_defL = n++;
+      for (auto & e : v_) {
+        exp_fcn_out.push_back(mfcn_fwdSens[0][e.mod_defL]); e.exp_defL = n++;
       }
     }
 
@@ -639,8 +639,8 @@ namespace casadi {
     }
 
     // Allocate memory, lifted problem
-    for (casadi_int i=0; i<v_.size(); ++i) {
-      casadi_int n = v_[i].n;
+    for (auto & e : v_) {
+      casadi_int n = e.n;
       alloc_w(n, true); // dx
       alloc_w(n, true); // x0
       alloc_w(n, true); // x
@@ -937,8 +937,8 @@ namespace casadi {
     stream << ' ';
 
     // Print variables
-    for (vector<casadi_int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
-      stream << setw(9) << name_x_.at(*i);
+    for (casadi_int i : print_x_) {
+      stream << setw(9) << name_x_.at(i);
     }
 
     stream << endl;
@@ -967,8 +967,8 @@ namespace casadi {
     stream << (ls_success ? ' ' : 'F');
 
     // Print variables
-    for (vector<casadi_int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
-      stream << setw(9) << setprecision(4) << m->x[*i];
+    for (casadi_int i : print_x_) {
+      stream << setw(9) << setprecision(4) << m->x[i];
     }
 
     // Print note

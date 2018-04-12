@@ -179,9 +179,9 @@ namespace casadi {
         }
 
         // Increase the reference count of the dependencies
-        for (casadi_int c=0; c<ae.arg.size(); ++c) {
-          if (ae.arg[c]>=0) {
-            refcount[ae.arg[c]]++;
+        for (casadi_int c : ae.arg) {
+          if (c>=0) {
+            refcount[c]++;
           }
         }
 
@@ -328,15 +328,15 @@ namespace casadi {
     alloc_w(sz_w);
 
     // Reset the temporary variables
-    for (casadi_int i=0; i<nodes.size(); ++i) {
-      if (nodes[i]) {
-        nodes[i]->temp = 0;
+    for (auto & node : nodes) {
+      if (node) {
+        node->temp = 0;
       }
     }
 
     // Now mark each input's place in the algorithm
-    for (auto it=symb_loc.begin(); it!=symb_loc.end(); ++it) {
-      it->second->temp = it->first+1;
+    for (auto & it : symb_loc) {
+      it.second->temp = it.first+1;
     }
 
     // Add input instructions, loop over inputs
@@ -360,14 +360,14 @@ namespace casadi {
 
     // Locate free variables
     free_vars_.clear();
-    for (auto it=symb_loc.begin(); it!=symb_loc.end(); ++it) {
-      casadi_int i = it->second->temp-1;
+    for (auto & it : symb_loc) {
+      casadi_int i = it.second->temp-1;
       if (i>=0) {
         // Save to list of free parameters
-        free_vars_.push_back(MX::create(it->second));
+        free_vars_.push_back(MX::create(it.second));
 
         // Remove marker
-        it->second->temp=0;
+        it.second->temp=0;
       }
     }
 

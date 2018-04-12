@@ -173,23 +173,23 @@ namespace casadi {
 
     // Read the system includes (C or C++)
     vector<pair<string, bool> > system_include = getIncludes("system_includes.txt", jit_include);
-    for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
-      compInst.getHeaderSearchOpts().AddPath(i->first,
-                                             clang::frontend::System, i->second, false);
+    for (auto & i : system_include) {
+      compInst.getHeaderSearchOpts().AddPath(i.first,
+                                             clang::frontend::System, i.second, false);
     }
 
     // Read the system includes (C only)
     system_include = getIncludes("csystem_includes.txt", jit_include);
-    for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
-      compInst.getHeaderSearchOpts().AddPath(i->first,
-                                             clang::frontend::CSystem, i->second, false);
+    for (auto & i : system_include) {
+      compInst.getHeaderSearchOpts().AddPath(i.first,
+                                             clang::frontend::CSystem, i.second, false);
     }
 
     // Read the system includes (C++ only)
     system_include = getIncludes("cxxsystem_includes.txt", jit_include);
-    for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
-      compInst.getHeaderSearchOpts().AddPath(i->first,
-                                             clang::frontend::CXXSystem, i->second, false);
+    for (auto & i : system_include) {
+      compInst.getHeaderSearchOpts().AddPath(i.first,
+                                             clang::frontend::CXXSystem, i.second, false);
     }
 
 #ifdef _WIN32

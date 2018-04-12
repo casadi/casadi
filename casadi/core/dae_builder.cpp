@@ -481,8 +481,8 @@ namespace casadi {
 
     if (!this->dae.empty()) {
       stream << "Fully-implicit differential-algebraic equations" << endl;
-      for (casadi_int k=0; k<this->dae.size(); ++k) {
-        stream << "  0 == " << this->dae[k] << endl;
+      for (const auto & e : this->dae) {
+        stream << "  0 == " << e << endl;
       }
     }
 
@@ -509,8 +509,8 @@ namespace casadi {
 
     if (!this->init.empty()) {
       stream << "Initial equations" << endl;
-      for (casadi_int k=0; k<this->init.size(); ++k) {
-        stream << "  0 == " << str(this->init[k]) << endl;
+      for (const auto & e : this->init) {
+        stream << "  0 == " << str(e) << endl;
       }
     }
 
@@ -534,9 +534,9 @@ namespace casadi {
 
     // Gather variables and expressions to replace
     vector<MX> v_id, v_rep;
-    for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
-      if (it->second.nominal!=1) {
-        Variable& v=it->second;
+    for (auto & it : varmap_) {
+      if (it.second.nominal!=1) {
+        Variable& v=it.second;
         casadi_assert_dev(v.nominal!=0);
         v.min /= v.nominal;
         v.max /= v.nominal;
@@ -574,12 +574,12 @@ namespace casadi {
     for (casadi_int i=0; i<this->q.size(); ++i) this->quad[i] = *it++ / nominal(this->q[i]);
     for (casadi_int i=0; i<this->d.size(); ++i) this->ddef[i] = *it++ / nominal(this->d[i]);
     for (casadi_int i=0; i<this->y.size(); ++i) this->ydef[i] = *it++ / nominal(this->y[i]);
-    for (casadi_int i=0; i<this->init.size(); ++i) this->init[i] = *it++;
+    for (auto & e : this->init) e = *it++;
     casadi_assert_dev(it==ex.end());
 
     // Nominal value is 1 after scaling
-    for (VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
-      it->second.nominal=1;
+    for (auto & it : varmap_) {
+      it.second.nominal=1;
     }
   }
 
@@ -650,7 +650,7 @@ namespace casadi {
     for (casadi_int i=0; i<this->z.size(); ++i) this->alg[i] = *it++;
     for (casadi_int i=0; i<this->q.size(); ++i) this->quad[i] = *it++;
     for (casadi_int i=0; i<this->y.size(); ++i) this->ydef[i] = *it++;
-    for (casadi_int i=0; i<this->init.size(); ++i) this->init[i] = *it++;
+    for (auto & e : this->init) e = *it++;
     casadi_assert_dev(it==ex.end());
   }
 
@@ -1091,13 +1091,13 @@ namespace casadi {
     }
 
     // Control
-    for (casadi_int i=0; i<this->u.size(); ++i) {
-      casadi_assert(this->u[i].is_symbolic(), "Non-symbolic control u");
+    for (const auto & u : this->u) {
+      casadi_assert(u.is_symbolic(), "Non-symbolic control u");
     }
 
     // Parameter
-    for (casadi_int i=0; i<this->p.size(); ++i) {
-      casadi_assert(this->p[i].is_symbolic(), "Non-symbolic parameter p");
+    for (const auto & p : this->p) {
+      casadi_assert(p.is_symbolic(), "Non-symbolic parameter p");
     }
   }
 
@@ -1586,8 +1586,8 @@ namespace casadi {
 
     // Make sure name is valid
     casadi_assert(!name.empty(), "DaeBuilder::add_lc: \"name\" is empty");
-    for (string::const_iterator i=name.begin(); i!=name.end(); ++i) {
-      casadi_assert(isalnum(*i),
+    for (char c : name) {
+      casadi_assert(isalnum(c),
                             "DaeBuilder::add_lc: \"name\" must be alphanumeric");
     }
 
@@ -1599,13 +1599,13 @@ namespace casadi {
     // Get indices of outputs
     std::vector<DaeBuilderOut> f_out_enum(f_out.size());
     std::vector<bool> in_use(DAE_BUILDER_NUM_OUT, false);
-    for (casadi_int i=0; i<f_out.size(); ++i) {
-      DaeBuilderOut oind = enum_out(f_out[i]);
+    for (const auto & s : f_out) {
+      DaeBuilderOut oind = enum_out(s);
       casadi_assert(oind!=DAE_BUILDER_NUM_OUT,
-        "DaeBuilder::add_lc: No output expression " + f_out[i] + ". "
+        "DaeBuilder::add_lc: No output expression " + s + ". "
         "Valid expressions are " + name_out());
       casadi_assert(!in_use[oind],
-        "DaeBuilder::add_lc: Duplicate expression " + f_out[i]);
+        "DaeBuilder::add_lc: Duplicate expression " + s);
       in_use[oind] = true;
 
       // Add linear combination of expressions
@@ -1817,8 +1817,7 @@ namespace casadi {
     }
 
     // For all linear combinations
-    for (std::map<std::string, MX>::const_iterator lin_comb_it=lin_comb_.begin();
-         lin_comb_it!=lin_comb_.end(); ++lin_comb_it) {
+    for (const auto & lin_comb_it : lin_comb_) {
       // Determine which Hessian blocks to generate
       wanted.resize(DAE_BUILDER_NUM_IN);
       fill(wanted.begin(), wanted.end(), vector<casadi_int>(DAE_BUILDER_NUM_IN, -1));
@@ -1839,7 +1838,7 @@ namespace casadi {
         size_t pos1 = so.find('_', pos+1);
         if (pos1>=so.size()) continue;
         s = so.substr(pos+1, pos1-pos-1);
-        if (s!=lin_comb_it->first) continue;
+        if (s!=lin_comb_it.first) continue;
 
         // Get first derivative
         pos = so.find('_', pos1+1);
@@ -1898,11 +1897,11 @@ namespace casadi {
           vector<vector<MX> > H_all;
           if (symmetric) {
             vector<MX> arg=input(ib1);
-            MX H = hessian(lin_comb_it->second, vertcat(arg));
+            MX H = hessian(lin_comb_it.second, vertcat(arg));
             H_all = blocksplit(H, offset(arg), offset(arg));
           } else {
             vector<MX> arg1=input(ib1), arg2=input(ib2);
-            MX g = gradient(lin_comb_it->second, vertcat(arg1));
+            MX g = gradient(lin_comb_it.second, vertcat(arg1));
             MX J = jacobian(g, vertcat(arg2));
             H_all = blocksplit(J, offset(arg1), offset(arg2));
           }

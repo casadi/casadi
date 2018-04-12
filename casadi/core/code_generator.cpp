@@ -327,8 +327,8 @@ namespace casadi {
 
     // Create a buffer
     size_t buf_len = 0;
-    for (casadi_int i=0; i<exposed_fname.size(); ++i) {
-      buf_len = std::max(buf_len, exposed_fname[i].size());
+    for (const auto & fname : exposed_fname) {
+      buf_len = std::max(buf_len, fname.size());
     }
     s << "  char buf[" << (buf_len+1) << "];\n";
 
@@ -338,17 +338,17 @@ namespace casadi {
     // Create switch
     s << "  if (!buf_ok) {\n"
       << "    /* name error */\n";
-    for (casadi_int i=0; i<exposed_fname.size(); ++i) {
-      s << "  } else if (strcmp(buf, \"" << exposed_fname[i] << "\")==0) {\n"
-        << "    mex_" << exposed_fname[i] << "(resc, resv, argc, argv);\n"
+    for (const auto & fname : exposed_fname) {
+      s << "  } else if (strcmp(buf, \"" << fname << "\")==0) {\n"
+        << "    mex_" << fname << "(resc, resv, argc, argv);\n"
         << "    return;\n";
     }
     s << "  }\n";
 
     // Error
     s << "  mexErrMsgTxt(\"First input should be a command string. Possible values:";
-    for (casadi_int i=0; i<exposed_fname.size(); ++i) {
-      s << " '" << exposed_fname[i] << "'";
+    for (const auto & fname : exposed_fname) {
+      s << " '" << fname << "'";
     }
     s << "\");\n";
 
@@ -363,16 +363,16 @@ namespace casadi {
     // Create switch
     s << "  if (argc<2) {\n"
       << "    /* name error */\n";
-    for (casadi_int i=0; i<exposed_fname.size(); ++i) {
-      s << "  } else if (strcmp(argv[1], \"" << exposed_fname[i] << "\")==0) {\n"
-        << "    return main_" << exposed_fname[i] << "(argc-2, argv+2);\n";
+    for (const auto & fname : exposed_fname) {
+      s << "  } else if (strcmp(argv[1], \"" << fname << "\")==0) {\n"
+        << "    return main_" << fname << "(argc-2, argv+2);\n";
     }
     s << "  }\n";
 
     // Error
     s << "  fprintf(stderr, \"First input should be a command string. Possible values:";
-    for (casadi_int i=0; i<exposed_fname.size(); ++i) {
-      s << " '" << exposed_fname[i] << "'";
+    for (const auto & fname : exposed_fname) {
+      s << " '" << fname << "'";
     }
     s << "\\n\");\n";
 
@@ -1029,7 +1029,7 @@ namespace casadi {
     add_auxiliary(AUX_PRINTF);
     stringstream s;
     s << "CASADI_PRINTF(\"" << str << "\"";
-    for (casadi_int i=0; i<arg.size(); ++i) s << ", " << arg[i];
+    for (const auto & e : arg) s << ", " << e;
     s << ");";
     return s.str();
   }

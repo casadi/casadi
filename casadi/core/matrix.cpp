@@ -348,11 +348,11 @@ namespace casadi {
     new_row.reserve(sz+rrsz);
     new_col.reserve(sz+rrsz);
     nz.reserve(rrsz);
-    for (std::vector<casadi_int>::iterator i=nz.begin(); i!=nz.end(); ++i) {
-      if (ind1) (*i)--;
-      if (*i<0) *i += nel;
-      new_row.push_back(*i % sz1);
-      new_col.push_back(*i / sz1);
+    for (casadi_int & k : nz) {
+      if (ind1) k--;
+      if (k<0) k += nel;
+      new_row.push_back(k % sz1);
+      new_col.push_back(k / sz1);
     }
     Sparsity sp = Sparsity::triplet(sz1, sz2, new_row, new_col);
 
@@ -2752,9 +2752,9 @@ namespace casadi {
 
       // Make a copy of the string and modify it as to remove the special characters
       string modname = name;
-      for (string::iterator it=modname.begin(); it!=modname.end(); ++it) {
-        switch (*it) {
-        case '(': case ')': case '[': case ']': case '{': case '}': case ',': case ';': *it = ' ';
+      for (char & c : modname) {
+        switch (c) {
+        case '(': case ')': case '[': case ']': case '{': case '}': case ',': case ';': c = ' ';
         }
       }
 
@@ -2964,7 +2964,7 @@ namespace casadi {
               f = terms[ind1];
               w = weights[ind1];
             }
-            for (casadi_int i=0; i<w.size(); ++i) w[i] *= fac;
+            for (double & e : w) e *= fac;
 
           } else { // if addition or subtraction
             if (node->op() == OP_ADD) {          // Addition: join both sums
@@ -2974,7 +2974,7 @@ namespace casadi {
               f = terms[ind1];      f.insert(f.end(), terms[ind2].begin(), terms[ind2].end());
               w = weights[ind1];
               w.reserve(f.size());
-              for (casadi_int i=0; i<weights[ind2].size(); ++i) w.push_back(-weights[ind2][i]);
+              for (double w2 : weights[ind2]) w.push_back(-w2);
             }
             // Eliminate multiple elements
             vector<double> w_new; w_new.reserve(w.size());   // weights
@@ -3252,8 +3252,8 @@ namespace casadi {
     temp({get_ptr(t_in)}, {get_ptr(t_out)});
 
     // Loop over results
-    for (casadi_int i=0; i<t_out.size(); ++i) {
-      if (t_out[i]) return true;
+    for (bvec_t i : t_out) {
+      if (i) return true;
     }
 
     return false;
@@ -3537,8 +3537,8 @@ namespace casadi {
     }
 
     // Unmark the expressions
-    for (vector<SXElem>::iterator it=marked.begin(); it!=marked.end(); ++it) {
-      it->set_temp(0);
+    for (auto & it : marked) {
+      it.set_temp(0);
     }
 
     // Save v, vdef

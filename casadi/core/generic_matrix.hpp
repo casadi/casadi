@@ -1006,9 +1006,9 @@ namespace casadi {
 
     // Number of nonzeros in to-be composed matrix
     casadi_int nnz = 0;
-    for (casadi_int i=0;i<xq.size();++i) {
-      // Obtain index corresponding to xq[i]
-      double ind = index_interp1d(x, xq[i], equidistant);
+    for (double q : xq) {
+      // Obtain index corresponding to q
+      double ind = index_interp1d(x, q, equidistant);
 
       if (mode_floor) ind = floor(ind);
       if (mode_ceil) ind = ceil(ind);

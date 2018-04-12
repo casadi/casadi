@@ -360,10 +360,10 @@ namespace casadi {
     vector<double*> ret(sz_res(), nullptr);
 
     // Read outputs
-    for (auto i=res.begin(); i!=res.end(); ++i) {
-      casadi_int ind = index_out(i->first);
-      i->second.resize(nnz_out(ind));
-      ret[ind] = get_ptr(i->second);
+    for (auto & r : res) {
+      casadi_int ind = index_out(r.first);
+      r.second.resize(nnz_out(ind));
+      ret[ind] = get_ptr(r.second);
     }
 
     return ret;

@@ -1069,12 +1069,12 @@ namespace casadi {
     std::vector<casadi_int> all_rows, all_cols;
     all_rows.reserve(row.size()*col.size());
     all_cols.reserve(row.size()*col.size());
-    for (std::vector<casadi_int>::const_iterator c_it=col.begin(); c_it!=col.end(); ++c_it) {
-      casadi_assert(*c_it>=0 && *c_it<ncol, "Sparsity::rowcol: Column index out of bounds");
-      for (std::vector<casadi_int>::const_iterator r_it=row.begin(); r_it!=row.end(); ++r_it) {
-        casadi_assert(*r_it>=0 && *r_it<nrow, "Sparsity::rowcol: Row index out of bounds");
-        all_rows.push_back(*r_it);
-        all_cols.push_back(*c_it);
+    for (casadi_int c : col) {
+      casadi_assert(c>=0 && c<ncol, "Sparsity::rowcol: Column index out of bounds");
+      for (casadi_int r : row) {
+        casadi_assert(r>=0 && r<nrow, "Sparsity::rowcol: Row index out of bounds");
+        all_rows.push_back(r);
+        all_cols.push_back(c);
       }
     }
     return Sparsity::triplet(nrow, ncol, all_rows, all_cols);
@@ -1140,9 +1140,7 @@ namespace casadi {
     std::vector<casadi_int>& rowcount = mapping1; // reuse memory
     rowcount.resize(nrow+1);
     fill(rowcount.begin(), rowcount.end(), 0);
-    for (std::vector<casadi_int>::const_iterator it=row.begin(); it!=row.end(); ++it) {
-      rowcount[*it+1]++;
-    }
+    for (casadi_int r : row) rowcount[r+1]++;
 
     // Cumsum to get index offset for each row
     for (casadi_int i=0; i<nrow; ++i) {
@@ -1325,7 +1323,7 @@ namespace casadi {
 
     // Count total nnz
     casadi_int nnz_total = 0;
-    for (casadi_int i=0; i<sp.size(); ++i) nnz_total += sp[i].nnz();
+    for (const auto & e : sp) nnz_total += e.nnz();
 
     // Construct from vectors (triplet format)
     vector<casadi_int> ret_row, ret_col;
@@ -1337,12 +1335,12 @@ namespace casadi {
       ret_nrow = sp[i].size1();
 
     // Append all patterns
-    for (vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
+    for (const auto & e : sp) {
       // Get sparsity pattern
-      casadi_int sp_nrow = i->size1();
-      casadi_int sp_ncol = i->size2();
-      const casadi_int* sp_colind = i->colind();
-      const casadi_int* sp_row = i->row();
+      casadi_int sp_nrow = e.size1();
+      casadi_int sp_ncol = e.size2();
+      const casadi_int* sp_colind = e.colind();
+      const casadi_int* sp_row = e.row();
       casadi_assert(sp_nrow==ret_nrow || sp_nrow==0,
                             "Sparsity::horzcat: Mismatching number of rows");
 
@@ -1411,7 +1409,7 @@ namespace casadi {
 
     // Count total nnz
     casadi_int nnz_total = 0;
-    for (casadi_int i=0; i<sp.size(); ++i) nnz_total += sp[i].nnz();
+    for (const auto & e : sp) nnz_total += e.nnz();
 
     // Construct from vectors (triplet format)
     vector<casadi_int> ret_row, ret_col;
@@ -1423,12 +1421,12 @@ namespace casadi {
       ret_ncol = sp[i].size2();
 
     // Append all patterns
-    for (vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
+    for (const auto & e : sp) {
       // Get sparsity pattern
-      casadi_int sp_nrow = i->size1();
-      casadi_int sp_ncol = i->size2();
-      const casadi_int* sp_colind = i->colind();
-      const casadi_int* sp_row = i->row();
+      casadi_int sp_nrow = e.size1();
+      casadi_int sp_ncol = e.size2();
+      const casadi_int* sp_colind = e.colind();
+      const casadi_int* sp_row = e.row();
       casadi_assert(sp_ncol==ret_ncol || sp_ncol==0,
                             "Sparsity::vertcat: Mismatching number of columns");
 
@@ -1454,20 +1452,20 @@ namespace casadi {
     std::vector<casadi_int> row;
 
     casadi_int nz = 0;
-    for (casadi_int i=0;i<v.size();++i) {
-      const casadi_int* colind_ = v[i].colind();
-      casadi_int ncol = v[i].size2();
-      const casadi_int* row_ = v[i].row();
-      casadi_int sz = v[i].nnz();
+    for (const auto & e : v) {
+      const casadi_int* colind_ = e.colind();
+      casadi_int ncol = e.size2();
+      const casadi_int* row_ = e.row();
+      casadi_int sz = e.nnz();
       for (casadi_int k=1; k<ncol+1; ++k) {
         colind.push_back(colind_[k]+nz);
       }
       for (casadi_int k=0; k<sz; ++k) {
         row.push_back(row_[k]+m);
       }
-      n+= v[i].size2();
-      m+= v[i].size1();
-      nz+= v[i].nnz();
+      n+= e.size2();
+      m+= e.size1();
+      nz+= e.nnz();
     }
 
     return Sparsity(m, n, colind, row);
@@ -1525,16 +1523,14 @@ namespace casadi {
   std::vector<Sparsity> Sparsity::vertsplit(const Sparsity& x,
       const std::vector<casadi_int>& offset) {
     std::vector<Sparsity> ret = horzsplit(x.T(), offset);
-    for (std::vector<Sparsity>::iterator it=ret.begin(); it!=ret.end(); ++it) {
-      *it = it->T();
-    }
+    for (auto & e : ret) e = e.T();
     return ret;
   }
 
   Sparsity Sparsity::blockcat(const std::vector< std::vector< Sparsity > > &v) {
     std::vector< Sparsity > ret;
-    for (casadi_int i=0; i<v.size(); ++i)
-      ret.push_back(horzcat(v[i]));
+    for (const auto & e : v)
+      ret.push_back(horzcat(e));
     return vertcat(ret);
   }
 

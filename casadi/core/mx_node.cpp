@@ -69,23 +69,23 @@ namespace casadi {
   MXNode::~MXNode() {
 
     // Start destruction method if any of the dependencies has dependencies
-    for (vector<MX>::iterator cc=dep_.begin(); cc!=dep_.end(); ++cc) {
+    for (auto & cc : dep_) {
       // Skip if constant
-      if (cc->is_constant()) continue;
+      if (cc.is_constant()) continue;
 
       // Check if there are other "owners" of the node
-      if (cc->getCount()!= 1) {
+      if (cc.getCount()!= 1) {
 
         // Replace with a 0-by-0 matrix
-        *cc = MX();
+        cc = MX();
 
       } else {
         // Stack of expressions to be deleted
         std::stack<MX> deletion_stack;
 
         // Move the child to the deletion stack
-        deletion_stack.push(*cc);
-        *cc = MX();
+        deletion_stack.push(cc);
+        cc = MX();
 
         // Process stack
         while (!deletion_stack.empty()) {
@@ -815,9 +815,7 @@ namespace casadi {
     if (is_zero()) {
       vector<MX> ret =
           MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(), output_offset));
-      for (casadi_int i=0;i<ret.size();++i) {
-        ret[i]=MX::zeros(ret[i].sparsity());
-      }
+      for (auto & e : ret) e = MX::zeros(e.sparsity());
       return ret;
     }
     vector<MX> ret =
@@ -866,9 +864,7 @@ namespace casadi {
     if (is_zero()) {
       vector<MX> ret =
           MX::createMultipleOutput(new Diagsplit(shared_from_this<MX>(), offset1, offset2));
-      for (casadi_int i=0;i<ret.size();++i) {
-        ret[i]=MX::zeros(ret[i].sparsity());
-      }
+      for (auto & e : ret) e = MX::zeros(e.sparsity());
       return ret;
     }
     vector<MX> ret =
@@ -881,9 +877,7 @@ namespace casadi {
     if (is_zero()) {
       vector<MX> ret =
           MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(), output_offset));
-      for (casadi_int i=0;i<ret.size();++i) {
-        ret[i]=MX::zeros(ret[i].sparsity());
-      }
+      for (auto & e : ret) e = MX::zeros(e.sparsity());
       return ret;
     }
     vector<MX> ret =

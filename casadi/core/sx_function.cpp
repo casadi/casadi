@@ -254,8 +254,7 @@ namespace casadi {
     // Sort the nodes by type
     constants_.clear();
     operations_.clear();
-    for (vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
-      SXNode* t = *it;
+    for (auto t : nodes) {
       if (t) {
         if (t->is_constant())
           constants_.push_back(SXElem::create(t));
@@ -282,10 +281,8 @@ namespace casadi {
     // Get the sequence of instructions for the virtual machine
     algorithm_.resize(0);
     algorithm_.reserve(nodes.size());
-    for (vector<SXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it) {
+    for (auto n : nodes) {
       // Current node
-      SXNode* n = *it;
-
       // New element in the algorithm
       AlgEl ae;
 
@@ -404,15 +401,15 @@ namespace casadi {
     alloc_w(worksize_);
 
     // Reset the temporary variables
-    for (casadi_int i=0; i<nodes.size(); ++i) {
-      if (nodes[i]) {
-        nodes[i]->temp = 0;
+    for (auto & node : nodes) {
+      if (node) {
+        node->temp = 0;
       }
     }
 
     // Now mark each input's place in the algorithm
-    for (auto it=symb_loc.begin(); it!=symb_loc.end(); ++it) {
-      it->second->temp = it->first+1;
+    for (auto & it : symb_loc) {
+      it.second->temp = it.first+1;
     }
 
     // Add input instructions

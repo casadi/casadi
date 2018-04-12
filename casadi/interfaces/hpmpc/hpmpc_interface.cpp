@@ -637,17 +637,17 @@ namespace casadi {
     }
 
     // replace infinities
-    for (casadi_int i=0;i<m->lb.size();++i) {
-      if (m->lb[i]==-std::numeric_limits<double>::infinity()) m->lb[i] = -inf_;
+    for (double & b : m->lb) {
+      if (b==-std::numeric_limits<double>::infinity()) b = -inf_;
     }
-    for (casadi_int i=0;i<m->ub.size();++i) {
-      if (m->ub[i]==std::numeric_limits<double>::infinity()) m->ub[i] = inf_;
+    for (double & b : m->ub) {
+      if (b==std::numeric_limits<double>::infinity()) b = inf_;
     }
-    for (casadi_int i=0;i<m->lg.size();++i) {
-      if (m->lg[i]==-std::numeric_limits<double>::infinity()) m->lg[i] = -inf_;
+    for (double & b : m->lg) {
+      if (b==-std::numeric_limits<double>::infinity()) b = -inf_;
     }
-    for (casadi_int i=0;i<m->ug.size();++i) {
-      if (m->ug[i]==std::numeric_limits<double>::infinity()) m->ug[i] = inf_;
+    for (double & b : m->ug) {
+      if (b==std::numeric_limits<double>::infinity()) b = inf_;
     }
 
     m->fstats.at("preprocessing").toc();

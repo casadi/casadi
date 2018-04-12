@@ -134,13 +134,13 @@ namespace casadi {
   bool CASADI_EXPORT is_slice(const std::vector<casadi_int>& v, bool ind1) {
     // Always false if negative numbers or non-increasing
     casadi_int last_v = -1;
-    for (casadi_int i=0; i<v.size(); ++i) {
-      casadi_assert(!(ind1 && v[i]<=0),
-        "Matlab is 1-based, but requested index " + str(v[i]) + ". "
+    for (casadi_int i : v) {
+      casadi_assert(!(ind1 && i<=0),
+        "Matlab is 1-based, but requested index " + str(i) + ". "
         "Note that negative slices are disabled in the Matlab interface. "
         "Possibly you may want to use 'end'.");
-      if (v[i]-ind1<=last_v) return false;
-      last_v = v[i]-ind1;
+      if (i-ind1<=last_v) return false;
+      last_v = i-ind1;
     }
 
     // Always true if less than 2 elements
@@ -169,9 +169,9 @@ namespace casadi {
 
     // Always false if negative numbers or non-increasing
     casadi_int last_v = -1;
-    for (casadi_int i=0; i<v.size(); ++i) {
-      if (v[i]<=last_v) return false;
-      last_v = v[i];
+    for (casadi_int i : v) {
+      if (i<=last_v) return false;
+      last_v = i;
     }
 
     // Get the slices

@@ -109,8 +109,8 @@ namespace casadi {
       stream << string(indent+2, ' ') << "Text: " << text_ << endl;
 
     // Print attributes
-    for (map<string, string>::const_iterator it=attributes_.begin(); it != attributes_.end(); ++it)
-      stream << string(indent+2, ' ') << "attribute " << it->first << " = " << it->second << endl;
+    for (const auto & attribute : attributes_)
+      stream << string(indent+2, ' ') << "attribute " << attribute.first << " = " << attribute.second << endl;
 
     // Print Children
     for (casadi_int i=0; i<size(); ++i) {

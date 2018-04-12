@@ -167,12 +167,12 @@ namespace casadi {
 
     // Filter out ignored entries and check if there is anything to add at all
     bool elements_to_add = false;
-    for (vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-      if (*k>=0) {
-        if (nz[*k]>=0) {
+    for (casadi_int & k : r_nz) {
+      if (k>=0) {
+        if (nz[k]>=0) {
           elements_to_add = true;
         } else {
-          *k = -1;
+          k = -1;
         }
       }
     }
@@ -186,8 +186,8 @@ namespace casadi {
     res[0].sparsity().get_nz(r_ind);
 
     // Enlarge the sparsity pattern of the arguments if not all assignments fit
-    for (vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-      if (*k>=0 && nz[*k]>=0 && r_ind[nz[*k]]<0) {
+    for (casadi_int k : r_nz) {
+      if (k>=0 && nz[k]>=0 && r_ind[nz[k]]<0) {
 
         // Create a new pattern which includes both the the previous seed
         // and the addition/assignment
@@ -203,9 +203,9 @@ namespace casadi {
     }
 
     // Have r_nz point to locations in the result instead of the output
-    for (vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-      if (*k>=0) {
-        *k = r_ind[nz[*k]];
+    for (casadi_int & k : r_nz) {
+      if (k>=0) {
+        k = r_ind[nz[k]];
       }
     }
 
@@ -335,12 +335,12 @@ namespace casadi {
 
         // Filter out ignored entries and check if there is anything to add at all
         bool elements_to_add = false;
-        for (vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-          if (*k>=0) {
-            if (nz[*k]>=0) {
+        for (casadi_int & k : r_nz) {
+          if (k>=0) {
+            if (nz[k]>=0) {
               elements_to_add = true;
             } else {
-              *k = -1;
+              k = -1;
             }
           }
         }
@@ -354,8 +354,8 @@ namespace casadi {
         res.sparsity().get_nz(r_ind);
 
         // Enlarge the sparsity pattern of the arguments if not all assignments fit
-        for (vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-          if (*k>=0 && nz[*k]>=0 && r_ind[nz[*k]]<0) {
+        for (casadi_int & k : r_nz) {
+          if (k>=0 && nz[k]>=0 && r_ind[nz[k]]<0) {
 
             // Create a new pattern which includes both the the previous seed
             // and the addition/assignment
@@ -371,9 +371,9 @@ namespace casadi {
         }
 
         // Have r_nz point to locations in the result instead of the output
-        for (vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
-          if (*k>=0) {
-            *k = r_ind[nz[*k]];
+        for (casadi_int & k : r_nz) {
+          if (k>=0) {
+            k = r_ind[nz[k]];
           }
         }
 
