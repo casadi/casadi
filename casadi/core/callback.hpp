@@ -54,7 +54,7 @@ namespace casadi {
     Callback();
 
     /** \brief Copy constructor (throws an error) */
-    Callback(const Callback& obj);
+    Callback(const Callback& obj) = delete;
 
     /** \brief  Destructor */
     virtual ~Callback();

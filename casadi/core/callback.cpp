@@ -31,10 +31,6 @@ namespace casadi {
   Callback::Callback() {
   }
 
-  Callback::Callback(const Callback& obj) : Function() {
-    casadi_error("Callback objects cannot be copied");
-  }
-
   void Callback::construct(const std::string& name, const Dict& opts) {
     if (!is_null()) {
       casadi_error("Cannot create '" + name + "': Internal class already created");
