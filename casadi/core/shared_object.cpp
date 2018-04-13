@@ -118,9 +118,7 @@ namespace casadi {
   }
 
   void SharedObject::swap(SharedObject& other) {
-    SharedObject temp = *this;
-    *this = other;
-    other = temp;
+    std::swap(node, other.node);
   }
 
   casadi_int SharedObject::getCount() const {
