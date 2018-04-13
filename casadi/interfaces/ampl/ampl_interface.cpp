@@ -233,7 +233,7 @@ namespace casadi {
     }
 
     // k segments, cumulative column count in jac_g
-    const casadi_int *colind = jac_g.colind(), *row = jac_g.row();
+    const casadi_int *colind = jac_g.colind(), *row;
     nl_init_ << "k" << (nx_-1) << "\n";
     for (casadi_int i=1; i<nx_; ++i) nl_init_ << colind[i] << "\n";
 

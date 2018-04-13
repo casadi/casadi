@@ -24,6 +24,7 @@
 
 
 #include "switch.hpp"
+#include "exception.hpp"
 
 using namespace std;
 
@@ -347,6 +348,8 @@ namespace casadi {
         for (casadi_int i=0; i<n_out_; ++i) {
           if (res[i]) {
             for (casadi_int j=0; j<nnz_out(i); ++j) {
+              // When res_temp is a null ptr, res[i] is too.
+              // NOLINTNEXTLINE(clang-analyzer-core.NonNullParamChecker)
               res[i][j] = if_else(cond, res_temp[i][j], res[i][j]);
             }
           }

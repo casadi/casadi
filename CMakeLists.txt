@@ -221,6 +221,15 @@ option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
 option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
 option(SWIG_EXPORT "Export SWIG" OFF)
 option(SWIG_IMPORT "Export SWIG" OFF)
+option(WITH_ASSERT "Use assertions (in Debug mode)" OFF)
+
+if(WITH_ASSERT)
+  find_path(ASSERT_INCLUDE assert.h)
+  if(NOT ASSERT_INCLUDE)
+    message(FATAL_ERROR "Could not find assert.h")
+  endif()
+  add_definitions(-DWITH_ASSERT)
+endif()
 
 # enabling OpenMP support if requested
 option(WITH_OPENMP "Compile with parallelization support" OFF)
@@ -245,7 +254,6 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
   endif()
 endif()
-
 
 # OpenCL
 option(WITH_OPENCL "Compile with OpenCL support (experimental)" OFF)

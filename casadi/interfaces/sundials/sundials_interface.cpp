@@ -248,11 +248,11 @@ namespace casadi {
   }
 
   void SundialsInterface::free_mem(void *mem) const {
-    Integrator::free_mem(mem);
     auto m = static_cast<SundialsMemory*>(mem);
 
     linsolF_.release(m->mem_linsolF);
     if (!linsolB_.is_null()) linsolB_.release(m->mem_linsolB);
+    Integrator::free_mem(mem);
   }
 
   void SundialsInterface::reset(IntegratorMemory* mem, double t, const double* x,

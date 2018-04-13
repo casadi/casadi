@@ -251,7 +251,7 @@ namespace casadi {
     casadi_copy(arg[CONIC_UBA], na_, uba);
     double* H=w; w += nnz_in(CONIC_H);
     casadi_copy(arg[CONIC_H], nnz_in(CONIC_H), H);
-    double* A=w; w += nnz_in(CONIC_A);
+    double* A=w; w += nnz_in(CONIC_A);  // NOLINT(clang-analyzer-deadcode.DeadStores)
     casadi_copy(arg[CONIC_A], nnz_in(CONIC_A), A);
 
     copy_vector(A_.colind(), m->colind);

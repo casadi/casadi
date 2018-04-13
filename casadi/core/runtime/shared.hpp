@@ -217,9 +217,9 @@ casadi_int einstein_process(const T& A, const T& B, const T& C,
       casadi_int sub = i;
       for (casadi_int j=0;j<n-3;++j) {
         casadi_int ind = sub % ptr_iter_dims[j];
-        a+= ptr_strides_a[j]*ind;
-        b+= ptr_strides_b[j]*ind;
-        c+= ptr_strides_c[j]*ind;
+        a+= ptr_strides_a[j]*ind; // NOLINT(clang-analyzer-core.NullDereference)
+        b+= ptr_strides_b[j]*ind; // NOLINT(clang-analyzer-core.NullDereference)
+        c+= ptr_strides_c[j]*ind; // NOLINT(clang-analyzer-core.NullDereference)
         sub/= ptr_iter_dims[j];
       }
 

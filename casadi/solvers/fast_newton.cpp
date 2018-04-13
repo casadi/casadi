@@ -189,7 +189,7 @@ namespace casadi {
     g << "m.lin_w = w+" + str(w_offset) + ";\n"; w_offset+=sp_jac_.size1()+sp_jac_.size2();
     g << "m.lin_v = w+" + str(w_offset) + ";\n"; w_offset+=sp_v_.nnz();
     g << "m.lin_r = w+" + str(w_offset) + ";\n"; w_offset+=sp_r_.nnz();
-    g << "m.lin_beta = w+" + str(w_offset) + ";\n"; w_offset+=sp_jac_.size2();
+    g << "m.lin_beta = w+" + str(w_offset) + ";\n";  // w_offset+=sp_jac_.size2();
 
     std::string jac_f_z = g.add_dependency(get_function("jac_f_z"));
 

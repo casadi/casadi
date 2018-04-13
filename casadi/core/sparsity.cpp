@@ -1648,8 +1648,8 @@ namespace casadi {
         for (casadi_int kk = kk_start; kk < kk_end; kk++) {
           casadi_int k = Bj[kk];
           sums[k] = true;
-          if (next[k] == -1) {
-            next[k] = head;
+          if (next[k] == -1) {  // NOLINT(clang-analyzer-core.NullDereference), because k<n_col
+            next[k] = head;  // NOLINT(clang-analyzer-core.NullDereference), because k<n_col
             head  = k;
             length++;
           }

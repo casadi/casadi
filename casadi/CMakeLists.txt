@@ -1,3 +1,7 @@
+if(WITH_ASSERT)
+  include_directories(SYSTEM ${ASSERT_INCLUDE})
+endif()
+
 # Turn a runtime file into a file with strings
 macro(CASADI_STRINGIFY STRFILE)
   # Start with an empty file
@@ -60,9 +64,11 @@ macro(casadi_library name)
   endif()
 
   if(WITH_CLANG_TIDY)
-    add_clang_tidy_target(${name} "${ARGN}")
-    set_property(GLOBAL APPEND PROPERTY CLANG_TIDY_TARGETS  "clang_tidy_${name}")
-    set_property(GLOBAL APPEND PROPERTY CLANG_TIDY_FIX_TARGETS  "clang_tidy_fix_${name}")
+    if(NOT ${name} STREQUAL "casadi_nlpsol_blocksqp")
+      add_clang_tidy_target(${name} "${ARGN}")
+      set_property(GLOBAL APPEND PROPERTY CLANG_TIDY_TARGETS  "clang_tidy_${name}")
+      set_property(GLOBAL APPEND PROPERTY CLANG_TIDY_FIX_TARGETS  "clang_tidy_fix_${name}")
+    endif()
   endif()
 
   if(WITH_SPELL)

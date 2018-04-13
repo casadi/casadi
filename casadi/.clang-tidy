@@ -1,1 +1,5 @@
-Checks: "-*,modernize-use-nullptr,modernize-loop-convert,bugprone-*"
+Checks: "-*,modernize-use-nullptr,modernize-loop-convert,bugprone-*,hicpp-multiway-paths-covered,clang-analyzer-*"
+
+CheckOptions:
+  - key:             readability-braces-around-statements.ShortStatementLines
+    value:           '2'

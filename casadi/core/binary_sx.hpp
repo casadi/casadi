@@ -51,7 +51,11 @@ class BinarySX : public SXNode {
         // Evaluate constant
         double dep0_val(dep0);
         double dep1_val(dep1);
-        double ret_val;
+
+        // ::fun does not provide a complete cover over all ops
+        // Could result in undefined ret_val
+        // Could make fun return 1 in fallthrough case, but more expensive?
+        double ret_val = std::numeric_limits<double>::quiet_NaN();
         casadi_math<double>::fun(op, dep0_val, dep1_val, ret_val);
         return ret_val;
       } else {

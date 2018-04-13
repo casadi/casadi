@@ -1234,7 +1234,7 @@ namespace casadi {
     if (N==0) return MatType::eye(a.size1());
     if (N==1) return a;
     if (N % 2 == 0) {
-      MatType h = mpower(a, N/2);
+      MatType h = mpower(a, static_cast<casadi_int>(N/2));
       return MatType::mtimes(h, h);
     } else {
       return MatType::mtimes(mpower(a, N-1), a);

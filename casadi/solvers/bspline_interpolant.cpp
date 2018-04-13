@@ -203,6 +203,8 @@ namespace casadi {
       case ALG_SMOOTH_LINEAR:
         {
           casadi_int n_dim = degree_.size();
+          casadi_assert(n_dim>=1, "n_dim may not be 0.");
+
           // Linear fit
           Function linear = interpolant("linear", "linear", grid, values_);
 

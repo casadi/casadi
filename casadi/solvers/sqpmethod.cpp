@@ -489,6 +489,7 @@ namespace casadi {
           // Calculating merit-function in candidate
           l1_infeas = std::fmax(casadi_max_viol(nx_, m->x_cand, m->lbx, m->ubx),
                                 casadi_max_viol(ng_, m->g_cand, m->lbg, m->ubg));
+          // NOLINTNEXTLINE(clang-analyzer-core.UndefinedBinaryOperatorResult)
           L1merit_cand = fk_cand + m->sigma * l1_infeas;
           if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
             break;

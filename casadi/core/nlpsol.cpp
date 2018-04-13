@@ -461,7 +461,7 @@ namespace casadi {
     for (casadi_int i=0; i<nx_; ++i) {
       double lb = m->lbx ? m->lbx[i] : 0;
       double ub = m->ubx ? m->ubx[i] : 0;
-      double x0 = m->x[i];
+      double x0 = m->x[i];  // NOLINT(clang-analyzer-core.NullDereference)
       casadi_assert(lb <= ub && lb!=inf && ub!=-inf,
           "Ill-posed problem detected: "
           "LBX[" + str(i) + "] <= UBX[" + str(i) + "] was violated. "

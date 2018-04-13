@@ -320,9 +320,9 @@ namespace casadi {
       *lam_x=res[CONIC_LAM_X];
 
     // Temporary memory
-    double *val=w; w+=indval_size_;
+    double *val=w; w+=indval_size_;  // NOLINT(clang-analyzer-deadcode.DeadStores)
     int *ind=reinterpret_cast<int*>(iw); iw+=indval_size_;
-    int *ind2=reinterpret_cast<int*>(iw); iw+=nx_;
+    int *ind2=reinterpret_cast<int*>(iw); iw+=nx_;  // NOLINT(clang-analyzer-deadcode.DeadStores)
 
     // Greate an empty model
     GRBmodel *model = nullptr;
@@ -483,7 +483,6 @@ namespace casadi {
         casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
 
-      flag = 0;
       for (auto && op : opts_) {
         int ret = GRBgetparamtype(m->env, op.first.c_str());
         switch (ret) {

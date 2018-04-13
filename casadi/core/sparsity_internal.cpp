@@ -110,7 +110,7 @@ namespace casadi {
     casadi_int *head, *next, *stack;
     head=w; w+=n;
     next=w; w+=n;
-    stack=w; w+=n;
+    stack=w; w+=n; // NOLINT(clang-analyzer-deadcode.DeadStores)
     // Empty linked lists
     for (j=0; j<n; ++j) head[j] = -1;
     // Traverse nodes in reverse order
@@ -174,7 +174,7 @@ namespace casadi {
     prevleaf=w; w+=ncol;
     first=w; w+=ncol;
     head=w; w+=ncol+1;
-    next=w; w+=nrow;
+    next=w; w+=nrow; // NOLINT(clang-analyzer-deadcode.DeadStores)
     // Find first [j]
     for (k=0; k<ncol; ++k) first[k]=-1;
     for (k=0; k<ncol; ++k) {
@@ -241,7 +241,7 @@ namespace casadi {
     casadi_int *next=w; w+=nrow;
     casadi_int *head=w; w+=ncol;
     casadi_int *tail=w; w+=ncol;
-    casadi_int *nque=w; w+=ncol;
+    casadi_int *nque=w; w+=ncol; // NOLINT(clang-analyzer-deadcode.DeadStores)
     // Local variables
     casadi_int r, c, k, pa;
     // Clear queue
@@ -388,7 +388,7 @@ namespace casadi {
     // Local variables
     casadi_int r, c, k;
     // Work vectors
-    casadi_int* visited=w; w+=n;
+    casadi_int* visited=w; w+=n; // NOLINT(clang-analyzer-deadcode.DeadStores)
     // Loop over columns
     for (c=0; c<n; ++c) {
       // L(c,:) pattern: all nodes reachable in etree from nz in A(0:c-1,c)
@@ -423,7 +423,7 @@ namespace casadi {
     casadi_int n = sp[0];
     const casadi_int *colind = sp+2, *row = sp+n+3;
     // Work vectors
-    casadi_int *visited=w; w+=n;
+    casadi_int *visited=w; w+=n; // NOLINT(clang-analyzer-deadcode.DeadStores)
     // Local variables
     casadi_int r, c, k;
     // Compute nonzero pattern of kth row of L
@@ -2629,6 +2629,8 @@ namespace casadi {
 
         // Element number
         casadi_int k_ret = j+i*size1();
+
+        assert(nrow>0); // For clang-analyzer-core.NonNullParamChecker
 
         // Col and row in the new matrix
         casadi_int i_ret = k_ret/nrow;

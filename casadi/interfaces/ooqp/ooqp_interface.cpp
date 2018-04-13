@@ -198,7 +198,7 @@ namespace casadi {
     int* x_index_ = reinterpret_cast<int*>(iw); iw += nx_;
     int* c_index_ = reinterpret_cast<int*>(iw); iw += na_;
     double* p_ = w; w += nx_;
-    double* AT = w; w += nA_;
+    double* AT = w; w += nA_;  // NOLINT(clang-analyzer-deadcode.DeadStores)
 
     // Parameter contribution to the objective
     double objParam = 0;
@@ -354,7 +354,7 @@ namespace casadi {
     casadi_fill(pi_, na_, 0.);
 
     // Solve the QP
-    double objectiveValue;
+    double objectiveValue = casadi::nan;
 
     int ierr;
     if (false) { // Use C interface

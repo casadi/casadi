@@ -120,7 +120,7 @@ namespace casadi {
     if (conlim > 0) ctol = 1/conlim;
     double anorm = 0;
     double acond = 0;
-    double dampsq = damp*damp;
+    //double dampsq = damp*damp;
     double ddnorm = 0;
     double res2 = 0;
     double xnorm = 0;
@@ -133,7 +133,7 @@ namespace casadi {
     double *v = w;  w+= n_; fill_n(v, n_, 0.0);
     double *xx = w; w+= n_; fill_n(xx, n_, 0.0);
     double *ww = w; w+= n_; fill_n(v, n_, 0.0);
-    double *dk = w; w+= n_;
+    double *dk = w; w+= n_;  // NOLINT(clang-analyzer-deadcode.DeadStores)
 
     double alpha = 0;
     double beta = casadi_norm_2(m_, u);
@@ -152,11 +152,11 @@ namespace casadi {
     double rhobar = alpha;
     double phibar = beta;
     double bnorm = beta;
-    double rnorm = beta;
+    double rnorm; // = beta;
     //double r1norm = rnorm;
     //double r2norm = rnorm;
 
-    double arnorm = alpha * beta;
+    double arnorm; // = alpha * beta;
 
 
   //  uout() << "   Itn      x[0]       r1norm     r2norm "
@@ -228,9 +228,9 @@ namespace casadi {
       rnorm = sqrt(res1+res2);
       arnorm = alpha*fabs(tau);
 
-      double r1sq = rnorm*rnorm - dampsq * xxnorm;
-      double r1norm = sqrt(fabs(r1sq));
-      if (r1sq < 0) r1norm = -r1norm;
+      //double r1sq = rnorm*rnorm - dampsq * xxnorm;
+      //double r1norm = sqrt(fabs(r1sq));
+      //if (r1sq < 0) r1norm = -r1norm;
       //double r2norm = rnorm;
 
       double test1 = rnorm / bnorm;

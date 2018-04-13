@@ -335,7 +335,7 @@ namespace casadi {
     casadi_copy(arg[CONIC_LAM_X0], nx_, lam_x);
 
     // Temporaries
-    double* lam_a=w; w += na_;
+    double* lam_a=w; w += na_;  // NOLINT(clang-analyzer-deadcode.DeadStores)
 
     // We change method in crossover
     if (m->is_warm && qp_method_ == 7) {

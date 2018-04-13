@@ -466,7 +466,7 @@ namespace casadi {
 
     // Get the dual solution
     if (res[CONIC_LAM_X] || res[CONIC_LAM_A]) {
-      double* dual=w; w += nx_+na_;
+      double* dual=w; w += nx_+na_;  // NOLINT(clang-analyzer-deadcode.DeadStores)
       m->qp->getDualSolution(dual);
       casadi_scal(nx_+na_, -1., dual);
       casadi_copy(dual, nx_, res[CONIC_LAM_X]);

@@ -2832,6 +2832,7 @@ namespace casadi {
     va_list args;
     va_start(args, fmt);
     // Print to buffer
+    // NOLINTNEXTLINE(clang-analyzer-valist.Uninitialized)
     casadi_int n = vsnprintf(buf, buf_sz, fmt, args);
     // Cleanup
     va_end(args);
@@ -2848,6 +2849,7 @@ namespace casadi {
     size_t buf_sz = sizeof(buf);
     char* buf_dyn = nullptr;
     // Try to print with a small buffer
+    // NOLINTNEXTLINE(clang-analyzer-valist.Uninitialized)
     casadi_int n = vsnprintf(buf, buf_sz, fmt, args);
     // Need a larger buffer?
     if (n>static_cast<casadi_int>(buf_sz)) {

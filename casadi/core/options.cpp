@@ -192,17 +192,23 @@ namespace casadi {
 
       // Process options
       for (auto&& op : opts) {
+        bool dotpos_found = false;
+
         // Find the dot if any
         string::size_type dotpos = op.first.find('.'), dotpos_end;
         if (dotpos==string::npos) {
           dotpos = op.first.find("__");
-          if (dotpos!=string::npos) dotpos_end = dotpos+2;
+          if (dotpos!=string::npos) {
+            dotpos_end = dotpos+2;
+            dotpos_found = true;
+          }
         } else {
           dotpos_end = dotpos+1;
+          dotpos_found = true;
         }
 
         // Flush last sub-dictionary
-        if (!sname.empty() && (dotpos==string::npos
+        if (!sname.empty() && (!dotpos_found
                                || op.first.compare(0, dotpos, sname)!=0)) {
           ret[sname] = sopts;
           sname.clear();
@@ -210,8 +216,9 @@ namespace casadi {
         }
 
         // Add to dictionary
-        if (dotpos != string::npos) {
+        if (dotpos_found) {
           sname = op.first.substr(0, dotpos);
+          // NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage)
           sopts[op.first.substr(dotpos_end)] = op.second;
         } else {
           ret[op.first] = op.second;

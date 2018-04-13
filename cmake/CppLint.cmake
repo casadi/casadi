@@ -42,6 +42,9 @@ set(STYLE_FILTER ${STYLE_FILTER}-runtime/references,)
 set(STYLE_FILTER ${STYLE_FILTER}-runtime/int,)
 set(STYLE_FILTER ${STYLE_FILTER}-runtime/explicit,)
 
+# We no longer have a single linter program
+set(STYLE_FILTER ${STYLE_FILTER}-readability/nolint,)
+
 # THESE SHOW LEGITAMITE WARNINGS WHICH SHOULD BE FIXED:
 set(STYLE_FILTER ${STYLE_FILTER}-runtime/printf,)
 

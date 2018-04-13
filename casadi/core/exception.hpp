@@ -38,6 +38,14 @@
 
 #include <casadi/core/casadi_export.h>
 
+#ifdef WITH_ASSERT
+#include <cassert>
+#else
+#ifndef assert
+#define assert(ignore)((void) 0)
+#endif // assert
+#endif
+
 namespace casadi {
 
 /** \brief  Casadi exception class

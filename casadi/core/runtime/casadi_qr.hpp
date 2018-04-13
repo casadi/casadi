@@ -17,8 +17,8 @@ T1 casadi_house(T1* x, T1* beta, casadi_int n) {
   x0_nonpos = x0<=0;
   // C-REPLACE "if_else" "casadi_if_else"
   x[0] = if_else(sigma_is_zero, 1,
-                 if_else(x0_nonpos, x0-s, -sigma/(x0+s)));
-  *beta = if_else(sigma_is_zero, 2*x0_nonpos, -1/(s*x[0]));
+                 if_else(x0_nonpos, x0-s, -sigma/(x0+s))); // NOLINT(bugprone-integer-division)
+  *beta = if_else(sigma_is_zero, 2*x0_nonpos, -1.0/(s*x[0]));
   return s;
 }
 

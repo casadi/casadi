@@ -329,7 +329,7 @@ namespace casadi {
             } else if (nn%2 == 1) { // odd power
               return x*pow(x, nn-1);
             } else { // even power
-              SXElem rt = pow(x, nn/2);
+              SXElem rt = pow(x, static_cast<casadi_int>(nn/2));
               return rt*rt;
             }
           } else if (y->to_double()==0.5) {
