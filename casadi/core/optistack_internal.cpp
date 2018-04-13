@@ -33,7 +33,7 @@ namespace casadi {
 class InternalOptiCallback : public FunctionInternal {
   public:
 
-  InternalOptiCallback(OptiNode& sol) : FunctionInternal(class_name()), sol_(sol) {}
+  InternalOptiCallback(OptiNode& sol) : FunctionInternal("InternalOptiCallback"), sol_(sol) {}
 
   ~InternalOptiCallback() override {}
 
