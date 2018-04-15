@@ -159,7 +159,7 @@ namespace casadi {
 #ifndef SWIG
     /// \cond CLUTTER
     /**  @{  */
-    /** \brief Accessed by friend functions */
+    /** \brief Functions called by friend functions defined here */
     static MatType interp1d(const std::vector<double>& x, const MatType &v,
          const std::vector<double>& xq, const std::string& mode, bool equidistant);
     static casadi_int sprank(const MatType &x) { return Sparsity::sprank(x.sparsity());}

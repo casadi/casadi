@@ -32,6 +32,14 @@ import re
 import lxml.etree as ET
 import pydot
 
+expression_tools = set()
+
+for r in open("../../../swig/casadi.i","r"):
+  if "casadi_" in r:
+    m = re.search("casadi_(\w+)", r)
+    if m:
+      expression_tools.add(m.group(1))
+
 aliases = {}
 for line in file('../Doxyfile.in','r'):
   if line.startswith('ALIASES'):
@@ -461,18 +469,34 @@ class Doxy2SWIG_X(Doxy2SWIG):
              grouped_dict[total] = ([origin],pieces)
              grouped_list.append(grouped_dict[total])
           if not self.merge:
-            self.add_text_original(["%feature(\"docstring\") ", fix_signature(swigname if len(swigname)>0 else k), " \"\n\n"]+pieces+["\";\n","\n"])
+            target = fix_signature(swigname if len(swigname)>0 else k)
+            self.doc_target(target, pieces)
             
         if self.merge:
+          target = fix_signature(k)
+          
           if len(grouped_list)==1:
-            self.add_text_original(["%feature(\"docstring\") ", fix_signature(k), " \"\n"]+grouped_list[0][1]+["\";\n","\n"])
+            self.doc_target(target, grouped_list[0][1])
           else:
-            self.add_text_original(["%feature(\"docstring\") ",fix_signature(k) , " \"\n"])
+            pieces = []
             for (origin,pieces) in grouped_list:
               if len(u"".join(pieces).rstrip())>0:
-                self.add_text_original(["\n"]+["\n>  " + o.replace('"',r'\"') + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
-            self.add_text_original(["\";\n","\n"])
-  
+                pieces+=["\n"]+["\n>  " + o.replace('"',r'\"') + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"]
+            pieces+=["\";\n","\n"]
+            self.doc_target(target, pieces)
+
+
+  def doc_target(self,target,content,correction=True):
+    if len("".join(content).strip()) > 0: 
+      self.add_text_original(["%feature(\"docstring\") ", target, " \"\n\n"]+content+["\";\n","\n"])
+    if not correction: return
+    m = re.search(r"\b(\w+)\(",target)
+    if m:
+      if m.group(1) in expression_tools:
+        
+        content = [c.replace("[INTERNAL]","") for c in content]
+        content = [re.sub("Functions called by friend functions defined (here|for \w+)\.?","",c) for c in content]
+        self.doc_target("casadi::casadi_" + m.group(1), content,correction=False)
 
 def convert(input, output,  include_function_definition=True, quiet=False,internal=None,deprecated=None,merge=False,groupdoc=None):
     p = Doxy2SWIG_X(input, include_function_definition, quiet,internal=internal,deprecated=deprecated,merge=merge,groupdoc=groupdoc)
