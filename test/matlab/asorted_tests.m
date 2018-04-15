@@ -482,3 +482,10 @@ c = casadi.blockcat({1 2 3})
 assert(norm(size(c)-[1 3])==0)
 c = casadi.blockcat({1;2;3})
 assert(norm(size(c)-[3 1])==0)
+
+
+if ~is_octave
+  msg = help('MX/repsum');
+  assert(~isempty(strfind(msg,'Given a repeated matrix, computes the sum of repeated parts.')))
+end
+

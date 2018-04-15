@@ -2706,6 +2706,8 @@ class MXtests(casadiTestCase):
         self.assertTrue(mmin_res.is_empty())
         self.assertTrue(mmax_res.is_empty())
 
+  def test_doc_expression_tools(self):
+    self.assertTrue("Given a repeated matrix, computes the sum of repeated parts." in repsum.__doc__)
 
 if __name__ == '__main__':
     unittest.main()
