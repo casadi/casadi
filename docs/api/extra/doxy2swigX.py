@@ -395,7 +395,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
         grouped_list = []
         grouped_dict = {}
         
-        def fix_signature(a): return a.replace("override","")
+        def fix_signature(a): return re.sub(" *?= *?delete *?$","", a.replace("override",""))
         
         for (origin,pieces) in v:
           origin_nostatic = origin.replace("static ","")
