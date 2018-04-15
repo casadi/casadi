@@ -1,5 +1,7 @@
 import casadi.*
 
+MX(2,1)
+
 % SX stuff
 x = SX.sym('x');
 y = SX.sym('y');
