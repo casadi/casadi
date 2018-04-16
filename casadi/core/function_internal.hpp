@@ -34,13 +34,13 @@
 #include "sparse_storage.hpp"
 #include "options.hpp"
 #include "shared_object_internal.hpp"
-#ifdef WITH_THREAD
-#ifdef WITH_THREAD_MINGW
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
 #include <mingw.mutex.h>
-#else // WITH_THREAD_MINGW
+#else // CASADI_WITH_THREAD_MINGW
 #include <mutex>
-#endif // WITH_THREAD_MINGW
-#endif //WITH_THREAD
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
 
 // This macro is for documentation purposes
 #define INPUTSCHEME(name)
@@ -133,10 +133,10 @@ namespace casadi {
     /// Unused memory objects
     mutable std::stack<casadi_int> unused_;
 
-#ifdef WITH_THREAD
+#ifdef CASADI_WITH_THREAD
     /// Mutex for thread safety
     mutable std::mutex mtx_;
-#endif // WITH_THREAD
+#endif // CASADI_WITH_THREAD
   };
 
   /** \brief Internal class for Function

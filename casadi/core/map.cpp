@@ -25,13 +25,13 @@
 
 #include "map.hpp"
 
-#ifdef WITH_THREAD
-#ifdef WITH_THREAD_MINGW
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
 #include <mingw.thread.h>
-#else // WITH_THREAD_MINGW
+#else // CASADI_WITH_THREAD_MINGW
 #include <thread>
-#endif // WITH_THREAD_MINGW
-#endif // WITH_THREAD
+#endif // CASADI_WITH_THREAD_MINGW
+#endif // CASADI_WITH_THREAD
 
 using namespace std;
 
@@ -366,9 +366,9 @@ namespace casadi {
   int MapThread::eval(const double** arg, double** res, casadi_int* iw, double* w,
       void* mem) const {
 
-#ifndef WITH_THREAD
+#ifndef CASADI_WITH_THREAD
     return Map::eval(arg, res, iw, w, mem);
-#else // WITH_THREAD
+#else // CASADI_WITH_THREAD
     // Checkout memory objects
     std::vector< scoped_checkout<Function> > ind; ind.reserve(n_);
     for (casadi_int i=0; i<n_; ++i) ind.emplace_back(f_);
@@ -400,7 +400,7 @@ namespace casadi {
     for (int e : ret_values) ret = ret || e;
 
     return ret;
-#endif // WITH_THREAD
+#endif // CASADI_WITH_THREAD
   }
 
   void MapThread::codegen_body(CodeGenerator& g) const {

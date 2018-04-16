@@ -2658,16 +2658,16 @@ namespace casadi {
   }
 
   void* ProtoFunction::memory(casadi_int ind) const {
-#ifdef WITH_THREAD
+#ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
-#endif //WITH_THREAD
+#endif //CASADI_WITH_THREAD
     return mem_.at(ind);
   }
 
   casadi_int ProtoFunction::checkout() const {
-#ifdef WITH_THREAD
+#ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
-#endif //WITH_THREAD
+#endif //CASADI_WITH_THREAD
     if (unused_.empty()) {
       // Allocate a new memory object
       void* m = alloc_mem();
@@ -2685,9 +2685,9 @@ namespace casadi {
   }
 
   void ProtoFunction::release(casadi_int mem) const {
-#ifdef WITH_THREAD
+#ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
-#endif //WITH_THREAD
+#endif //CASADI_WITH_THREAD
     unused_.push(mem);
   }
 
