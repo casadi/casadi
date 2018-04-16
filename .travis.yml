@@ -250,6 +250,7 @@ matrix:
         - pushd build
         - bash -c "cmake $casadi_build_flags -DWITH_SLICOT=OFF -DWITH_SPELL=ON -DWITH_LINT=ON -DWITH_CLANG_TIDY=ON -DWITH_ASSERT=ON .."
         - make lint
+        - cat /home/travis/build/casadi/casadi/build/compile_commands.json
         - make clang-tidy VERBOSE=1
         - export languagetool="$mypwd/LanguageTool-2.7" make spell
         - popd && pushd misc && python autogencode.py && popd
