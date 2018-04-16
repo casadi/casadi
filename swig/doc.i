@@ -81,6 +81,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size1_out(casadi_int ind)
 const  "
 
@@ -446,6 +452,12 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -1034,6 +1046,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size2_in(casadi_int ind)
 const  "
 
@@ -1188,6 +1217,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
 
@@ -1251,6 +1288,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -1811,6 +1856,12 @@ std::string &fname) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -2740,6 +2791,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
 bool persistent=false) "
 
@@ -2912,6 +2971,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::Nlpsol::get_default_in(casadi_int ind) const
 "
 
@@ -2959,6 +3024,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -3218,6 +3300,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -3936,6 +4026,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::numel_in() const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -4138,6 +4234,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -4376,6 +4489,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::BSpline::init(const Dict &opts)  "
 
 Initialize.
@@ -4506,6 +4627,12 @@ elements.
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -4710,6 +4837,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -5241,13 +5376,6 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring") casadi::BSpline::BSpline(const std::string &name,
-const std::vector< double > &knots, const std::vector< casadi_int > &offset,
-const std::vector< double > &coeffs, const std::vector< casadi_int >
-&degree, casadi_int m) "
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_gen(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -5719,6 +5847,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sx_in(casadi_int ind) const
 "
 
@@ -5770,6 +5904,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -5908,6 +6059,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::info() const  "
 
 [INTERNAL]  Obtain information about function
@@ -5994,6 +6153,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -6429,12 +6596,6 @@ casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::BSplineCommon(const std::string
-&name, const std::vector< double > &knots, const std::vector< casadi_int >
-&offset, const std::vector< casadi_int > &degree, casadi_int m) "
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_min_in(casadi_int ind)
 const  "
 
@@ -6461,6 +6622,12 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -6814,6 +6981,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::signature(const std::string
 &fname) const  "
 
@@ -6860,6 +7035,12 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -7214,6 +7395,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -7628,6 +7815,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
@@ -7840,13 +8035,6 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 "
 
 [INTERNAL] ";
-
-%feature("docstring") casadi::BSplineDual::BSplineDual(const std::string
-&name, const std::vector< double > &knots, const std::vector< casadi_int >
-&offset, const std::vector< double > &x, const std::vector< casadi_int >
-&degree, casadi_int m, bool reverse) "
-
-";
 
 %feature("docstring")
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
@@ -8123,6 +8311,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
 &g) const  "
 
@@ -8233,6 +8438,12 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -8367,6 +8578,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -8514,6 +8733,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -9049,6 +9274,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_gen(const double
 **arg, double **res, casadi_int *iw, double *w, void *mem) const  "
 
@@ -9177,6 +9419,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -9606,6 +9856,25 @@ returned.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
 %feature("docstring")  casadi::Callback::get_name_in(casadi_int i) "
 
 Get the sparsity of an input This function is called during construction.
@@ -9628,6 +9897,12 @@ Get required length of arg field.
 %feature("docstring")  casadi::Function::slice(const std::string &name,
 const std::vector< casadi_int > &order_in, const std::vector< casadi_int >
 &order_out, const Dict &opts=Dict()) const  "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
 
 returns a new function with a selection of inputs/outputs of the original
 
@@ -9664,11 +9939,6 @@ iind:  The index of the input
 oind:  The index of the output Legacy function: To be deprecated in a future
 version of CasADi. Exists only for compatibility with Function::hessian pre-
 CasADi 3.2
-
-";
-
-%feature("docstring")  casadi::Function::has_function(const std::string
-&fname) const  "
 
 ";
 
@@ -9753,6 +10023,23 @@ For a particular input or for all of the inputs
 ";
 
 %feature("docstring")  casadi::Function::forward(casadi_int nfwd) const  "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_in inputs
+correspond to forward seeds, stacked horizontally The n_out outputs
+correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
 
 Get a function that calculates nfwd forward derivatives.
 
@@ -9866,6 +10153,13 @@ the output elements).
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
 %feature("docstring")  casadi::Function::n_nodes() const  "
 
 Number of nodes in the algorithm.
@@ -9962,6 +10256,19 @@ Is the class able to propagate seeds through the algorithm?
 %feature("docstring")  casadi::Function::which_depends(const std::string
 &s_in, const std::vector< std::string > &s_out, casadi_int order=1, bool
 tr=false) const  "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
 
 Which variables enter with some order.
 
@@ -10397,12 +10704,6 @@ Get the MX node corresponding to an instruction ( MXFunction)
 
 ";
 
-%feature("docstring")  casadi::Function::factory(const std::string &name,
-const std::vector< std::string > &s_in, const std::vector< std::string >
-&s_out, const AuxOut &aux=AuxOut(), const Dict &opts=Dict()) const  "
-
-";
-
 %feature("docstring")  casadi::Function::sz_res() const  "
 
 Get required length of res field.
@@ -10486,10 +10787,24 @@ the outputs summed up.
 
 ";
 
+%feature("docstring") casadi::casadi_map "
+
+Map with reduction A subset of the inputs are non-repeated and a subset of
+the outputs summed up.
+
+";
+
 %feature("docstring")  casadi::Function::map(const std::string &name, const
 std::string &parallelization, casadi_int n, const std::vector< std::string >
 &reduce_in, const std::vector< std::string > &reduce_out, const Dict
 &opts=Dict()) const  "
+
+Map with reduction A subset of the inputs are non-repeated and a subset of
+the outputs summed up.
+
+";
+
+%feature("docstring") casadi::casadi_map "
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
@@ -10536,8 +10851,42 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
-%feature("docstring")  casadi::Function::map(casadi_int n, const std::string
-&parallelization, casadi_int max_num_threads) const  "
+%feature("docstring") casadi::casadi_map "
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapped version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          A: horzcat([a0, a1, ..., a_(N-1)])
+          P: horzcat([p0, p1, ..., p_(N-1)])
+          S: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
@@ -10863,8 +11212,20 @@ Expand a function to SX.
 
 ";
 
+%feature("docstring") casadi::casadi_expand "
+
+Expand a function to SX.
+
+";
+
 %feature("docstring")  casadi::Function::expand(const std::string &name,
 const Dict &opts=Dict()) const  "
+
+Expand a function to SX.
+
+";
+
+%feature("docstring") casadi::casadi_expand "
 
 Expand a function to SX.
 
@@ -10978,15 +11339,6 @@ Get output dimension.
 
 ";
 
-%feature("docstring")  casadi::Function::get_function() const  "
-
-";
-
-%feature("docstring")  casadi::Function::get_function(const std::string
-&name) const  "
-
-";
-
 %feature("docstring")  casadi::Callback::get_name_out(casadi_int i) "
 
 Get the sparsity of an output This function is called during construction.
@@ -11095,6 +11447,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -11832,6 +12192,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring") casadi::CentralDiff::CentralDiff(const std::string
 &name, casadi_int n) "
 
@@ -11971,6 +12337,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -12362,6 +12745,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FiniteDiff::init(const Dict &opts)  "
 
 [INTERNAL]  Initialize.
@@ -12509,6 +12898,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -12820,6 +13217,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -13189,6 +13592,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -13408,6 +13828,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -13546,6 +13972,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -14153,6 +14587,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::export_code(const
 std::string &lang, std::ostream &stream, const Dict &options) const  "
 
@@ -14403,6 +14845,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -14553,6 +15012,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -14713,6 +15178,12 @@ const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -14957,6 +15428,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -15709,6 +16188,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_forward(casadi_int
 nfwd) const  "
 
@@ -15939,6 +16426,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jac() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -16147,6 +16640,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -16501,6 +17011,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -16878,6 +17396,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::signature(const std::string
 &fname) const  "
 
@@ -16905,6 +17429,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -17145,8 +17677,20 @@ Get the lower bound by name.
 
 ";
 
+%feature("docstring") casadi::casadi_min "
+
+Get the lower bound by name.
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::min(const MX &var, bool
 normalized=false) const  "
+
+Get the lower bound(s) by expression.
+
+";
+
+%feature("docstring") casadi::casadi_min "
 
 Get the lower bound(s) by expression.
 
@@ -17179,8 +17723,20 @@ Get the upper bound by name.
 
 ";
 
+%feature("docstring") casadi::casadi_max "
+
+Get the upper bound by name.
+
+";
+
 %feature("docstring")  casadi::DaeBuilder::max(const MX &var, bool
 normalized=false) const  "
+
+Get the upper bound(s) by expression.
+
+";
+
+%feature("docstring") casadi::casadi_max "
 
 Get the upper bound(s) by expression.
 
@@ -17910,6 +18466,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getJacSparsity(casadi_int
 iind, casadi_int oind, bool symmetric) const  "
 
@@ -18309,6 +18873,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_dm(const std::vector<
 DM > &arg) const  "
 
@@ -18688,6 +19269,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
 &g) const  "
 
@@ -18949,6 +19536,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchical(casadi_int iind,
 casadi_int oind) const  "
@@ -19204,6 +19799,12 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -19597,6 +20198,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
 
 [INTERNAL]  Get absolute tolerance.
@@ -19661,6 +20270,12 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -19884,6 +20499,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
 
@@ -19977,6 +20609,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -20653,6 +21293,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
 
 [INTERNAL]  Readable name of the internal class.
@@ -20704,6 +21350,12 @@ always_inline, bool never_inline) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -21181,6 +21833,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
@@ -21269,6 +21929,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
 "
 
@@ -21301,6 +21969,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -21782,6 +22456,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
 
 [INTERNAL]  Get absolute tolerance.
@@ -21995,6 +22686,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_dm(const std::vector<
 DM > &arg) const  "
 
@@ -22090,6 +22787,12 @@ const  "
 %feature("docstring")  casadi::FastNewton::solve(void *mem) const  "
 
 [INTERNAL]   Solve the system of equations and calculate derivatives.
+
+";
+
+%feature("docstring") casadi::casadi_solve "
+
+Solve the system of equations and calculate derivatives.
 
 ";
 
@@ -22526,6 +23229,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(casadi_int
 nadj, const std::vector< MatType > &v) const  "
 
@@ -22735,6 +23446,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -22768,6 +23487,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -23057,6 +23782,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -23815,6 +24557,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_reverse(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &aseed, std::vector< std::vector< MX > > &asens, bool
@@ -24121,6 +24871,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -24438,6 +25194,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_jac(const std::string
 &name, const std::vector< std::string > &inames, const std::vector<
 std::string > &onames, const Dict &opts) const  "
@@ -24560,6 +25333,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -24597,6 +25378,12 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -25100,6 +25887,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::memory(casadi_int ind) const
 "
 
@@ -25166,6 +25959,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -25345,6 +26146,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::generate_dependencies(const
 std::string &fname, const Dict &opts) const  "
 
@@ -25403,6 +26212,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -26014,6 +26840,12 @@ const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -26858,6 +27690,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sprint(char *buf, size_t
 buf_sz, const char *fmt,...) const  "
 
@@ -26905,6 +27743,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -27303,6 +28158,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::ForwardDiff::has_forward(casadi_int nfwd)
 const  "
 
@@ -27382,6 +28245,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -27638,6 +28509,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::ForwardDiff::n_pert() const  "
 
 [INTERNAL] ";
@@ -27742,6 +28619,13 @@ Name of the function.
 ";
 
 %feature("docstring")  casadi::Function::jacobian() const  "
+
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
@@ -28313,15 +29197,6 @@ For a particular input or for all of the inputs
 
 ";
 
-%feature("docstring")  casadi::Function::get_function() const  "
-
-";
-
-%feature("docstring")  casadi::Function::get_function(const std::string
-&name) const  "
-
-";
-
 %feature("docstring")  casadi::Function::serialize() const  "
 
 Serialize.
@@ -28341,6 +29216,23 @@ Is a null pointer?
 ";
 
 %feature("docstring")  casadi::Function::forward(casadi_int nfwd) const  "
+
+Get a function that calculates nfwd forward derivatives.
+
+Returns a function with n_in + n_out + n_in inputs and nfwd outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_in inputs
+correspond to forward seeds, stacked horizontally The n_out outputs
+correspond to forward sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
 
 Get a function that calculates nfwd forward derivatives.
 
@@ -28486,6 +29378,12 @@ returns a new function with a selection of inputs/outputs of the original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::Function::mapsum(const std::vector< MX >
 &arg, const std::string &parallelization="serial") const  "
 
@@ -28563,12 +29461,6 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring")  casadi::Function::factory(const std::string &name,
-const std::vector< std::string > &s_in, const std::vector< std::string >
-&s_out, const AuxOut &aux=AuxOut(), const Dict &opts=Dict()) const  "
-
-";
-
 %feature("docstring")  casadi::Function::checkout() const  "
 
 Checkout a memory object.
@@ -28608,10 +29500,24 @@ the outputs summed up.
 
 ";
 
+%feature("docstring") casadi::casadi_map "
+
+Map with reduction A subset of the inputs are non-repeated and a subset of
+the outputs summed up.
+
+";
+
 %feature("docstring")  casadi::Function::map(const std::string &name, const
 std::string &parallelization, casadi_int n, const std::vector< std::string >
 &reduce_in, const std::vector< std::string > &reduce_out, const Dict
 &opts=Dict()) const  "
+
+Map with reduction A subset of the inputs are non-repeated and a subset of
+the outputs summed up.
+
+";
+
+%feature("docstring") casadi::casadi_map "
 
 Map with reduction A subset of the inputs are non-repeated and a subset of
 the outputs summed up.
@@ -28658,8 +29564,42 @@ parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
-%feature("docstring")  casadi::Function::map(casadi_int n, const std::string
-&parallelization, casadi_int max_num_threads) const  "
+%feature("docstring") casadi::casadi_map "
+
+Create a mapped version of this function.
+
+Suppose the function has a signature of:
+
+::
+
+     f: (a, p) -> ( s )
+  
+
+
+
+The the mapped version has the signature:
+
+::
+
+     F: (A, P) -> (S )
+  
+      with
+          A: horzcat([a0, a1, ..., a_(N-1)])
+          P: horzcat([p0, p1, ..., p_(N-1)])
+          S: horzcat([s0, s1, ..., s_(N-1)])
+      and
+          s0 <- f(a0, p0)
+          s1 <- f(a1, p1)
+          ...
+          s_(N-1) <- f(a_(N-1), p_(N-1))
+  
+
+
+
+Parameters:
+-----------
+
+parallelization:  Type of parallelization used: unroll|serial|openmp
 
 ";
 
@@ -28747,6 +29687,25 @@ guarantee that subsequent calls return unique answers.
 ";
 
 %feature("docstring")  casadi::Function::reverse(casadi_int nadj) const  "
+
+Get a function that calculates nadj adjoint derivatives.
+
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
+
+(n_in = n_in(), n_out = n_out())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
 
 Get a function that calculates nadj adjoint derivatives.
 
@@ -29226,6 +30185,19 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::Function::jit(const std::string &name, const
 std::string &body, const std::vector< std::string > &name_in, const
 std::vector< std::string > &name_out, const Dict &opts=Dict()) "
@@ -29353,6 +30325,12 @@ Expand a function to SX.
 
 ";
 
+%feature("docstring") casadi::casadi_expand "
+
+Expand a function to SX.
+
+";
+
 %feature("docstring")  casadi::Function::expand(const std::string &name,
 const Dict &opts=Dict()) const  "
 
@@ -29360,8 +30338,9 @@ Expand a function to SX.
 
 ";
 
-%feature("docstring")  casadi::Function::has_function(const std::string
-&fname) const  "
+%feature("docstring") casadi::casadi_expand "
+
+Expand a function to SX.
 
 ";
 
@@ -29654,6 +30633,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::oracle() const  "
 
 [INTERNAL]  Get oracle.
@@ -29892,6 +30877,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
 bool persistent=false) "
 
@@ -30089,6 +31082,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::signature(const std::string
 &fname) const  "
 
@@ -30143,6 +31142,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -30351,6 +31358,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -30591,8 +31615,22 @@ Matrix divide (cf. slash '/' in MATLAB)
 
 ";
 
+%feature("docstring") casadi::casadi_mrdivide "
+
+Matrix divide (cf. slash '/' in MATLAB)
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::linear_coeff(const
 MatType &expr, const MatType &var, MatType &A, MatType &b) "
+
+Recognizes linear form in vector expression.
+
+A x + b
+
+";
+
+%feature("docstring") casadi::casadi_linear_coeff "
 
 Recognizes linear form in vector expression.
 
@@ -30607,6 +31645,12 @@ Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
 
 ";
 
+%feature("docstring") casadi::casadi_if_else "
+
+Branching on MX nodes Ternary operator, \"cond ? if_true : if_false\".
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::tril2symm(const
 MatType &a) "
 
@@ -30614,7 +31658,19 @@ Convert a lower triangular matrix to a symmetric one.
 
 ";
 
+%feature("docstring") casadi::casadi_tril2symm "
+
+Convert a lower triangular matrix to a symmetric one.
+
+";
+
 %feature("docstring")  det(const MatType &A) "
+
+Matrix determinant (experimental)
+
+";
+
+%feature("docstring") casadi::casadi_det "
 
 Matrix determinant (experimental)
 
@@ -30628,6 +31684,22 @@ Get get the number of non-zeros on the diagonal.
 
 %feature("docstring")  conditional(const MatType &ind, const std::vector<
 MatType > &x, const MatType &x_default, bool short_circuit=false) "
+
+Create a switch.
+
+If the condition
+
+Parameters:
+-----------
+
+ind:  evaluates to the integer k, where 0<=k<f.size(), then x[k] will be
+returned, otherwise
+
+x_default:  will be returned.
+
+";
+
+%feature("docstring") casadi::casadi_conditional "
 
 Create a switch.
 
@@ -30657,8 +31729,31 @@ pinv(A) = (A'A)^(-1) A'
 
 ";
 
+%feature("docstring") casadi::casadi_pinv "
+
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1<size2), mul(A, pinv(A)) is unity.
+
+pinv(A)' = (AA')^(-1) A
+
+If the matrix A is slender (size1>size2), mul(pinv(A), A) is unity.
+
+pinv(A) = (A'A)^(-1) A'
+
+";
+
 %feature("docstring")  pinv(const MatType &A, const std::string &lsolver,
 const Dict &dict=Dict()) "
+
+Computes the Moore-Penrose pseudo-inverse.
+
+If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
+matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
+
+";
+
+%feature("docstring") casadi::casadi_pinv "
 
 Computes the Moore-Penrose pseudo-inverse.
 
@@ -30694,8 +31789,41 @@ blocks.
 
 ";
 
+%feature("docstring") casadi::casadi_solve "
+
+Solve a system of equations: A*x = b The solve routine works similar to
+Matlab's backslash when A is square and nonsingular. The algorithm used is
+the following:
+
+A simple forward or backward substitution if A is upper or lower triangular
+
+If the linear system is at most 3-by-3, form the inverse via minor expansion
+and multiply
+
+Permute the variables and equations as to get a (structurally) nonzero
+diagonal, then perform a QR factorization without pivoting and solve the
+factorized system.
+
+Note 1: If there are entries of the linear system known to be zero, these
+will be removed. Elements that are very small, or will evaluate to be zero,
+can still cause numerical errors, due to the lack of pivoting (which is not
+possible since cannot compare the size of entries)
+
+Note 2: When permuting the linear system, a BLT (block lower triangular)
+transformation is formed. Only the permutation part of this is however used.
+An improvement would be to solve block-by-block if there are multiple BLT
+blocks.
+
+";
+
 %feature("docstring")  solve(const MatType &A, const MatType &b, const
 std::string &lsolver, const Dict &dict=Dict()) "
+
+Solve a system of equations: A*x = b.
+
+";
+
+%feature("docstring") casadi::casadi_solve "
 
 Solve a system of equations: A*x = b.
 
@@ -30704,6 +31832,15 @@ Solve a system of equations: A*x = b.
 %feature("docstring")  casadi::GenericMatrix< MatType >::interp1d(const
 std::vector< double > &x, const MatType &v, const std::vector< double > &xq,
 const std::string &mode, bool equidistant=false) "
+
+Performs 1d linear interpolation.
+
+The data-points to be interpolated are given as (x[i], v[i]). xq[j] is used
+as interplating value
+
+";
+
+%feature("docstring") casadi::casadi_interp1d "
 
 Performs 1d linear interpolation.
 
@@ -30725,8 +31862,20 @@ Get a string representation for a binary MatType, using custom arguments.
 
 ";
 
+%feature("docstring") casadi::casadi_print_operator "
+
+Get a string representation for a binary MatType, using custom arguments.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::linearize(const
 MatType &f, const MatType &x, const MatType &x0) "
+
+Linearize an expression.
+
+";
+
+%feature("docstring") casadi::casadi_linearize "
 
 Linearize an expression.
 
@@ -30739,6 +31888,12 @@ Calculate Jacobian.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Calculate Jacobian.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::is_dense() const  "
 
 Check if the matrix expression is dense.
@@ -30746,6 +31901,12 @@ Check if the matrix expression is dense.
 ";
 
 %feature("docstring")  cumsum(const MatType &x, casadi_int axis=-1) "
+
+Returns cumulative sum along given axis (MATLAB convention)
+
+";
+
+%feature("docstring") casadi::casadi_cumsum "
 
 Returns cumulative sum along given axis (MATLAB convention)
 
@@ -30765,6 +31926,12 @@ Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 ";
 
+%feature("docstring") casadi::casadi_rank1 "
+
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::gradient(const
 MatType &ex, const MatType &arg) "
 
@@ -30778,16 +31945,19 @@ Count number of nodes
 
 ";
 
-%feature("docstring")  hessian(const MatType &ex, const MatType &arg) "
-
-";
-
-%feature("docstring")  hessian(const MatType &ex, const MatType &arg,
-MatType &output_g) "
-
-";
-
 %feature("docstring")  nullspace(const MatType &A) "
+
+Computes the nullspace of a matrix A.
+
+Finds Z m-by-(m-n) such that AZ = 0 with A n-by-m with m > n
+
+Assumes A is full rank
+
+Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
+
+";
+
+%feature("docstring") casadi::casadi_nullspace "
 
 Computes the nullspace of a matrix A.
 
@@ -30809,7 +31979,21 @@ expressions piggyback.
 
 ";
 
+%feature("docstring") casadi::casadi_substitute_inplace "
+
+Inplace substitution with piggyback expressions Substitute variables v out
+of the expressions vdef sequentially, as well as out of a number of other
+expressions piggyback.
+
+";
+
 %feature("docstring")  mmax(const MatType &x) "
+
+Largest element in a matrix.
+
+";
+
+%feature("docstring") casadi::casadi_mmax "
 
 Largest element in a matrix.
 
@@ -30834,6 +32018,12 @@ Smallest element in a matrix.
 
 ";
 
+%feature("docstring") casadi::casadi_mmin "
+
+Smallest element in a matrix.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::is_column() const
 "
 
@@ -30848,6 +32038,12 @@ Generate a skew symmetric matrix from a 3-vector.
 
 ";
 
+%feature("docstring") casadi::casadi_skew "
+
+Generate a skew symmetric matrix from a 3-vector.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::is_tril() const  "
 
 Check if the matrix is lower triangular.
@@ -30856,6 +32052,12 @@ Check if the matrix is lower triangular.
 
 %feature("docstring")  casadi::GenericMatrix< MatType >::diff(const MatType
 &x, casadi_int n=1, casadi_int axis=-1) "
+
+Returns difference (n-th order) along given axis (MATLAB convention)
+
+";
+
+%feature("docstring") casadi::casadi_diff "
 
 Returns difference (n-th order) along given axis (MATLAB convention)
 
@@ -30881,7 +32083,19 @@ Calculate Jacobian.
 
 ";
 
+%feature("docstring") casadi::casadi_gradient "
+
+Calculate Jacobian.
+
+";
+
 %feature("docstring")  unite(const MatType &A, const MatType &B) "
+
+Unite two matrices no overlapping sparsity.
+
+";
+
+%feature("docstring") casadi::casadi_unite "
 
 Unite two matrices no overlapping sparsity.
 
@@ -30901,8 +32115,20 @@ Matrix inverse.
 
 ";
 
+%feature("docstring") casadi::casadi_inv "
+
+Matrix inverse.
+
+";
+
 %feature("docstring")  inv(const MatType &A, const std::string &lsolver,
 const Dict &options=Dict()) "
+
+Matrix inverse.
+
+";
+
+%feature("docstring") casadi::casadi_inv "
 
 Matrix inverse.
 
@@ -30926,7 +32152,19 @@ Get the second dimension (i.e. number of columns)
 
 ";
 
+%feature("docstring") casadi::casadi_norm_1 "
+
+1-norm
+
+";
+
 %feature("docstring")  norm_2(const MatType &x) "
+
+2-norm
+
+";
+
+%feature("docstring") casadi::casadi_norm_2 "
 
 2-norm
 
@@ -30940,7 +32178,21 @@ Forward directional derivative.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Forward directional derivative.
+
+";
+
 %feature("docstring")  diag(const MatType &A) "
+
+Get the diagonal of a matrix or construct a diagonal When the input is
+square, the diagonal elements are returned. If the input is vector- like, a
+diagonal matrix is constructed with it.
+
+";
+
+%feature("docstring") casadi::casadi_diag "
 
 Get the diagonal of a matrix or construct a diagonal When the input is
 square, the diagonal elements are returned. If the input is vector- like, a
@@ -30950,6 +32202,13 @@ diagonal matrix is constructed with it.
 
 %feature("docstring")  project(const MatType &A, const Sparsity &sp, bool
 intersect=false) "
+
+Create a new matrix with a given sparsity pattern but with the nonzeros
+taken from an existing matrix.
+
+";
+
+%feature("docstring") casadi::casadi_project "
 
 Create a new matrix with a given sparsity pattern but with the nonzeros
 taken from an existing matrix.
@@ -30967,8 +32226,24 @@ more efficient if the complete Jacobian is not needed and v has few rows.
 
 ";
 
+%feature("docstring") casadi::casadi_jtimes "
+
+Calculate the Jacobian and multiply by a vector from the right This is
+equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
+tr set to false and true respectively. If contrast to these expressions, it
+will use directional derivatives which is typically (but not necessarily)
+more efficient if the complete Jacobian is not needed and v has few rows.
+
+";
+
 %feature("docstring")  substitute(const MatType &ex, const MatType &v, const
 MatType &vdef) "
+
+Substitute variable v with expression vdef in an expression ex.
+
+";
+
+%feature("docstring") casadi::casadi_substitute "
 
 Substitute variable v with expression vdef in an expression ex.
 
@@ -30981,6 +32256,12 @@ Substitute variable var with expression expr in multiple expressions.
 
 ";
 
+%feature("docstring") casadi::casadi_substitute "
+
+Substitute variable var with expression expr in multiple expressions.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::bilin(const MatType
 &A, const MatType &x, const MatType &y) "
 
@@ -30988,7 +32269,19 @@ Calculate bilinear form x^T A y.
 
 ";
 
+%feature("docstring") casadi::casadi_bilin "
+
+Calculate bilinear form x^T A y.
+
+";
+
 %feature("docstring")  mldivide(const MatType &x, const MatType &n) "
+
+Matrix divide (cf. backslash '\\\\' in MATLAB)
+
+";
+
+%feature("docstring") casadi::casadi_mldivide "
 
 Matrix divide (cf. backslash '\\\\' in MATLAB)
 
@@ -31008,9 +32301,21 @@ Matlab's cross command.
 
 ";
 
+%feature("docstring") casadi::casadi_cross "
+
+Matlab's cross command.
+
+";
+
 %feature("docstring")  shared(std::vector< MatType > &ex, std::vector<
 MatType > &v, std::vector< MatType > &vdef, const std::string
 &v_prefix="v_", const std::string &v_suffix="") "
+
+Extract shared subexpressions from an set of expressions.
+
+";
+
+%feature("docstring") casadi::casadi_shared "
 
 Extract shared subexpressions from an set of expressions.
 
@@ -31024,8 +32329,23 @@ Extract shared subexpressions from an set of expressions.
 
 ";
 
+%feature("docstring") casadi::casadi_shared "
+
+Extract shared subexpressions from an set of expressions.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::is_linear(const
 MatType &expr, const MatType &var) "
+
+Is expr linear in var?
+
+False negatives are possible (an expression may not be recognised as linear
+while it really is), false positives not.
+
+";
+
+%feature("docstring") casadi::casadi_is_linear "
 
 Is expr linear in var?
 
@@ -31055,6 +32375,12 @@ Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 ";
 
+%feature("docstring") casadi::casadi_rank1 "
+
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::inv_skew(const
 MatType &a) "
 
@@ -31062,8 +32388,20 @@ Generate the 3-vector progenitor of a skew symmetric matrix.
 
 ";
 
+%feature("docstring") casadi::casadi_inv_skew "
+
+Generate the 3-vector progenitor of a skew symmetric matrix.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::tangent(const
 MatType &ex, const MatType &arg) "
+
+Calculate Jacobian.
+
+";
+
+%feature("docstring") casadi::casadi_tangent "
 
 Calculate Jacobian.
 
@@ -31090,6 +32428,12 @@ Calculate bilinear form x^T A y.
 
 ";
 
+%feature("docstring") casadi::casadi_bilin "
+
+Calculate bilinear form x^T A y.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::jtimes(const
 MatType &ex, const MatType &arg, const MatType &v, bool tr=false) "
 
@@ -31098,6 +32442,12 @@ Functions called by friend functions defined here
 ";
 
 %feature("docstring")  simplify(const MatType &x) "
+
+Simplify an expression.
+
+";
+
+%feature("docstring") casadi::casadi_simplify "
 
 Simplify an expression.
 
@@ -31116,6 +32466,12 @@ Find out which variables enter with some order.
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Find out which variables enter with some order.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::linspace(const
 MatType &a, const MatType &b, casadi_int nsteps) "
 
@@ -31123,8 +32479,31 @@ Matlab's linspace command.
 
 ";
 
+%feature("docstring") casadi::casadi_linspace "
+
+Matlab's linspace command.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::soc(const MatType
 &x, const MatType &y) "
+
+Construct second-order-convex.
+
+Parameters:
+-----------
+
+x:  vector expression of size n
+
+y:  scalar expression
+
+soc(x,y) computes [y*eye(n) x; x' y]
+
+soc(x,y) positive semi definite <=> || x ||_2 <= y
+
+";
+
+%feature("docstring") casadi::casadi_soc "
 
 Construct second-order-convex.
 
@@ -31210,6 +32589,15 @@ quadratic while it really is), false positives not.
 
 ";
 
+%feature("docstring") casadi::casadi_is_quadratic "
+
+Is expr quadratic in var?
+
+False negatives are possible (an expression may not be recognised as
+quadratic while it really is), false positives not.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::row(casadi_int el)
 const  "
 
@@ -31218,6 +32606,12 @@ Get the sparsity pattern. See the Sparsity class for details.
 ";
 
 %feature("docstring")  inv_minor(const MatType &A) "
+
+Matrix inverse (experimental)
+
+";
+
+%feature("docstring") casadi::casadi_inv_minor "
 
 Matrix inverse (experimental)
 
@@ -31236,7 +32630,19 @@ Get the sparsity pattern.
 
 ";
 
+%feature("docstring") casadi::casadi_sparsity "
+
+Get the sparsity pattern.
+
+";
+
 %feature("docstring")  norm_inf(const MatType &x) "
+
+Infinity-norm.
+
+";
+
+%feature("docstring") casadi::casadi_norm_inf "
 
 Infinity-norm.
 
@@ -31255,11 +32661,34 @@ Matrix trace.
 
 ";
 
+%feature("docstring") casadi::casadi_trace "
+
+Matrix trace.
+
+";
+
 %feature("docstring")  einstein(const MatType &A, const MatType &B, const
 MatType &C, const std::vector< casadi_int > &dim_a, const std::vector<
 casadi_int > &dim_b, const std::vector< casadi_int > &dim_c, const
 std::vector< casadi_int > &a, const std::vector< casadi_int > &b, const
 std::vector< casadi_int > &c) "
+
+Compute any contraction of two dense tensors, using index/einstein notation
+einstein(A, B, a, b, c) -> C.
+
+Given two tensors, A and B, computes a third tensor C such that:
+
+C_c = A_a * B_b
+
+With a, b, c representing einstein indices. Instead of the classical index
+labels i,j,k,... we employ -1,-2,-3,...
+
+A, B, C are represented as CasADi vectors, with dim_a, dim_b, dim_c
+indictating theire tensorial dimensions.
+
+";
+
+%feature("docstring") casadi::casadi_einstein "
 
 Compute any contraction of two dense tensors, using index/einstein notation
 einstein(A, B, a, b, c) -> C.
@@ -31288,6 +32717,15 @@ as interplating value
 
 ";
 
+%feature("docstring") casadi::casadi_einstein "
+
+Performs 1d linear interpolation.
+
+The data-points to be interpolated are given as (x[i], v[i]). xq[j] is used
+as interplating value
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::repsum(const
 MatType &A, casadi_int n, casadi_int m=1) "
 
@@ -31295,7 +32733,19 @@ Given a repeated matrix, computes the sum of repeated parts.
 
 ";
 
+%feature("docstring") casadi::casadi_repsum "
+
+Given a repeated matrix, computes the sum of repeated parts.
+
+";
+
 %feature("docstring")  dot(const MatType &x, const MatType &y) "
+
+Inner product of two matrices with x and y matrices of the same dimension.
+
+";
+
+%feature("docstring") casadi::casadi_dot "
 
 Inner product of two matrices with x and y matrices of the same dimension.
 
@@ -31347,8 +32797,20 @@ Evaluate a polynomial with coefficients p in x.
 
 ";
 
+%feature("docstring") casadi::casadi_polyval "
+
+Evaluate a polynomial with coefficients p in x.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType >::triu2symm(const
 MatType &a) "
+
+Convert a upper triangular matrix to a symmetric one.
+
+";
+
+%feature("docstring") casadi::casadi_triu2symm "
 
 Convert a upper triangular matrix to a symmetric one.
 
@@ -31360,7 +32822,22 @@ Check if expression depends on the argument The argument must be symbolic.
 
 ";
 
+%feature("docstring") casadi::casadi_depends_on "
+
+Check if expression depends on the argument The argument must be symbolic.
+
+";
+
 %feature("docstring")  symvar(const MatType &x) "
+
+Get all symbols contained in the supplied expression Get all symbols on
+which the supplied expression depends.
+
+See:  SXFunction::getFree(), MXFunction::getFree()
+
+";
+
+%feature("docstring") casadi::casadi_symvar "
 
 Get all symbols contained in the supplied expression Get all symbols on
 which the supplied expression depends.
@@ -31383,13 +32860,31 @@ Matrix power x^n.
 
 ";
 
+%feature("docstring") casadi::casadi_mpower "
+
+Matrix power x^n.
+
+";
+
 %feature("docstring")  norm_fro(const MatType &x) "
 
 Frobenius norm.
 
 ";
 
+%feature("docstring") casadi::casadi_norm_fro "
+
+Frobenius norm.
+
+";
+
 %feature("docstring")  sumsqr(const MatType &x) "
+
+Calculate sum of squares: sum_ij X_ij^2.
+
+";
+
+%feature("docstring") casadi::casadi_sumsqr "
 
 Calculate sum of squares: sum_ij X_ij^2.
 
@@ -31427,6 +32922,12 @@ Reverse directional derivative.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Reverse directional derivative.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MatType
 >::quadratic_coeff(const MatType &expr, const MatType &var, MatType &A,
 MatType &b, MatType &c) "
@@ -31439,11 +32940,13 @@ e = 0.5*bilin(A,x,x)+dot(b,x)+c
 
 ";
 
-%feature("docstring")  expm_const(const MatType &A, const MatType &t) "
+%feature("docstring") casadi::casadi_quadratic_coeff "
 
-";
+Recognizes quadratic form in scalar expression.
 
-%feature("docstring")  expm(const MatType &A) "
+1/2*x' A x + b' x + c
+
+e = 0.5*bilin(A,x,x)+dot(b,x)+c
 
 ";
 
@@ -31459,7 +32962,19 @@ Make the matrix dense if not already.
 
 ";
 
+%feature("docstring") casadi::casadi_densify "
+
+Make the matrix dense if not already.
+
+";
+
 %feature("docstring")  densify(const MatType &x, const MatType &val) "
+
+Make the matrix dense and assign nonzeros to a value.
+
+";
+
+%feature("docstring") casadi::casadi_densify "
 
 Make the matrix dense and assign nonzeros to a value.
 
@@ -31838,6 +33353,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
 "
 
@@ -32127,6 +33650,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -32511,6 +34040,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::OracleFunction::oracle() const  "
 
 [INTERNAL]  Get oracle.
@@ -32739,6 +34285,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -32988,6 +34542,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::numel_out(casadi_int ind)
 const  "
 
@@ -33100,6 +34660,12 @@ std::vector< M > &arg) const  "
 %feature("docstring")  casadi::ImplicitToNlp::solve(void *mem) const  "
 
 [INTERNAL]   Solve the system of equations and calculate derivatives.
+
+";
+
+%feature("docstring") casadi::casadi_solve "
+
+Solve the system of equations and calculate derivatives.
 
 ";
 
@@ -33859,6 +35425,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_max_in(casadi_int ind)
 const  "
 
@@ -33973,6 +35545,12 @@ bool persistent=false) "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -34103,6 +35681,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::instruction_MX(casadi_int
 k) const  "
 
@@ -34166,6 +35752,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::export_code(const
 std::string &lang, std::ostream &stream, const Dict &options) const  "
 
@@ -34178,6 +35772,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -34520,11 +36131,6 @@ Query plugin name.
 
 ";
 
-%feature("docstring")  casadi::Importer::has_function(const std::string
-&symname) const  "
-
-";
-
 %feature("docstring") casadi::Importer::Importer() "
 
 Default constructor.
@@ -34681,6 +36287,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::factory(const std::string
 &name, const std::vector< std::string > &s_in, const std::vector<
 std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
@@ -34803,6 +36415,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -35385,6 +37005,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_work(size_t &sz_arg,
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
@@ -35654,6 +37282,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
 
 [INTERNAL]  Finalize initialization.
@@ -35828,6 +37462,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -36281,6 +37932,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_jacobian_sparsity()
 const  "
 
@@ -36642,6 +38301,12 @@ std::vector< M > &arg) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -37026,6 +38691,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size_out(casadi_int ind)
 const  "
 
@@ -37042,11 +38713,36 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::which_depends(const
 std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -38224,6 +39920,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
 double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
@@ -38435,6 +40139,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -38651,6 +40363,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -38685,6 +40403,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -38848,6 +40583,12 @@ std::vector< M > &arg) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -39976,6 +41717,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -40299,6 +42046,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_jac(const std::string
 &name, const std::vector< std::string > &inames, const std::vector<
 std::string > &onames, const Dict &opts) const  "
@@ -40321,6 +42085,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -40588,6 +42360,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -41050,6 +42830,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::fwdViaJac(casadi_int nfwd)
 const  "
 
@@ -41438,6 +43224,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_name_in(casadi_int i) "
 
 [INTERNAL]  Names of function input and outputs.
@@ -41587,6 +43381,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_sparsity_in(casadi_int
 i) "
 
@@ -41625,6 +43427,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -41956,6 +43775,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::index_out(const std::string
 &name) const  "
 
@@ -42144,6 +43969,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -42421,8 +44252,20 @@ Solve linear system of equations
 
 ";
 
+%feature("docstring") casadi::casadi_solve "
+
+Solve linear system of equations
+
+";
+
 %feature("docstring")  casadi::Linsol::solve(const MX &A, const MX &B, bool
 tr=false) const  "
+
+Solve linear system of equations
+
+";
+
+%feature("docstring") casadi::casadi_solve "
 
 Solve linear system of equations
 
@@ -42675,6 +44518,12 @@ Query plugin name.
 ";
 
 %feature("docstring")  casadi::Linsol::sparsity() const  "
+
+Get linear system sparsity.
+
+";
+
+%feature("docstring") casadi::casadi_sparsity "
 
 Get linear system sparsity.
 
@@ -43321,6 +45170,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call(const std::vector< M >
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
@@ -43499,6 +45354,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
 [INTERNAL]  Get free variables (SX)
@@ -43534,6 +45406,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::check_arg(const
 std::vector< M > &arg) const  "
 
@@ -43553,6 +45431,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -44192,6 +46078,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_jacobian_sparsity()
 const  "
 
@@ -44570,6 +46464,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -44976,6 +46876,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jit_dependencies(const
 std::string &fname) "
 
@@ -45114,6 +47031,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -45438,6 +47363,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::fwdViaJac(casadi_int nfwd)
 const  "
 
@@ -45584,6 +47517,12 @@ std::string &fname) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -46040,6 +47979,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::is_a(const std::string
 &type, bool recursive) const  "
 
@@ -46168,6 +48113,12 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -46638,6 +48589,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
 [INTERNAL]  Get required length of res field.
@@ -46650,6 +48618,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -46686,6 +48662,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -46807,8 +48791,20 @@ Get the (i,j) minor matrix.
 
 ";
 
+%feature("docstring") casadi::casadi_minor "
+
+Get the (i,j) minor matrix.
+
+";
+
 %feature("docstring")  expand(const Matrix< Scalar > &ex, Matrix< Scalar >
 &weights, Matrix< Scalar > &terms) "
+
+Expand the expression as a weighted sum (with constant weights)
+
+";
+
+%feature("docstring") casadi::casadi_expand "
 
 Expand the expression as a weighted sum (with constant weights)
 
@@ -46831,9 +48827,36 @@ Do Taylor expansions until the aggregated order of a term is equal to
 
 ";
 
+%feature("docstring") casadi::casadi_mtaylor "
+
+multivariate Taylor series expansion
+
+Do Taylor expansions until the aggregated order of a term is equal to
+'order'. The aggregated order of $x^n y^m$ equals $n+m$.
+
+";
+
 %feature("docstring")  mtaylor(const Matrix< Scalar > &ex, const Matrix<
 Scalar > &x, const Matrix< Scalar > &a, casadi_int order, const std::vector<
 casadi_int > &order_contributions) "
+
+multivariate Taylor series expansion
+
+Do Taylor expansions until the aggregated order of a term is equal to
+'order'. The aggregated order of $x^n y^m$ equals $n+m$.
+
+The argument order_contributions can denote how match each variable
+contributes to the aggregated order. If x=[x, y] and order_contributions=[1,
+2], then the aggregated order of $x^n y^m$ equals $1n+2m$.
+
+Example usage
+
+$ \\\\sin(b+a)+\\\\cos(b+a)(x-a)+\\\\cos(b+a)(y-b) $ $ y+x-(x^3+3y x^2+3 y^2
+x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
+
+";
+
+%feature("docstring") casadi::casadi_mtaylor "
 
 multivariate Taylor series expansion
 
@@ -46979,6 +49002,15 @@ triangle function
 
 ";
 
+%feature("docstring") casadi::casadi_triangle "
+
+triangle function
+
+\\\\[ \\\\begin {cases} \\\\Lambda(x) = 0 & |x| >= 1 \\\\\\\\ \\\\Lambda(x)
+= 1-|x| & |x| < 1 \\\\end {cases} \\\\]
+
+";
+
 %feature("docstring")  casadi::Matrix< T >::export_code(const std::string
 &lang, std::ostream &stream=casadi::uout(), const Dict &options=Dict())
 const  "
@@ -47008,26 +49040,23 @@ Matrix adjoint.
 
 ";
 
-%feature("docstring")  casadi::Matrix< T >::triplet(const std::vector<
-casadi_int > &row, const std::vector< casadi_int > &col, const Matrix<
-Scalar > &d) "
+%feature("docstring") casadi::casadi_adj "
 
-";
-
-%feature("docstring")  casadi::Matrix< T >::triplet(const std::vector<
-casadi_int > &row, const std::vector< casadi_int > &col, const Matrix<
-Scalar > &d, casadi_int nrow, casadi_int ncol) "
-
-";
-
-%feature("docstring")  casadi::Matrix< T >::triplet(const std::vector<
-casadi_int > &row, const std::vector< casadi_int > &col, const Matrix<
-Scalar > &d, const std::pair< casadi_int, casadi_int > &rc) "
+Matrix adjoint.
 
 ";
 
 %feature("docstring")  qr(const Matrix< Scalar > &A, Matrix< Scalar > &Q,
 Matrix< Scalar > &R) "
+
+QR factorization using the modified Gram-Schmidt algorithm More stable than
+the classical Gram-Schmidt, but may break down if the rows of A are nearly
+linearly dependent See J. Demmel: Applied Numerical Linear Algebra
+(algorithm 3.1.). Note that in SWIG, Q and R are returned by value.
+
+";
+
+%feature("docstring") casadi::casadi_qr "
 
 QR factorization using the modified Gram-Schmidt algorithm More stable than
 the classical Gram-Schmidt, but may break down if the rows of A are nearly
@@ -47074,6 +49103,12 @@ Solve using a sparse QR factorization.
 
 ";
 
+%feature("docstring") casadi::casadi_qr_solve "
+
+Solve using a sparse QR factorization.
+
+";
+
 %feature("docstring")  casadi::Matrix< T >::set_precision(casadi_int
 precision) "
 
@@ -47091,6 +49126,12 @@ Check if the matrix is lower triangular.
 
 %feature("docstring")  norm_inf_mul(const Matrix< Scalar > &x, const Matrix<
 Scalar > &y) "
+
+Inf-norm of a Matrix-Matrix product.
+
+";
+
+%feature("docstring") casadi::casadi_norm_inf_mul "
 
 Inf-norm of a Matrix-Matrix product.
 
@@ -47124,6 +49165,12 @@ Check if the matrix is upper triangular.
 ";
 
 %feature("docstring")  all(const Matrix< Scalar > &x) "
+
+Returns true only if every element in the matrix is true.
+
+";
+
+%feature("docstring") casadi::casadi_all "
 
 Returns true only if every element in the matrix is true.
 
@@ -47176,6 +49223,12 @@ Get the sparsity pattern.
 
 ";
 
+%feature("docstring") casadi::casadi_sparsity "
+
+Get the sparsity pattern.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >  >::get_row()
 const "
 
@@ -47192,6 +49245,12 @@ Get an owning reference to the sparsity pattern.
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
 >::bilin(const Matrix< Scalar > &A, const Matrix< Scalar > &x, const Matrix<
 Scalar > &y) "
+
+Calculate bilinear form x^T A y.
+
+";
+
+%feature("docstring") casadi::casadi_bilin "
 
 Calculate bilinear form x^T A y.
 
@@ -47245,13 +49304,15 @@ Returns true only if any element in the matrix is true.
 
 ";
 
-%feature("docstring")  casadi::SX::is_smooth() const  "
+%feature("docstring") casadi::casadi_any "
 
-[INTERNAL]  Check if smooth.
+Returns true only if any element in the matrix is true.
 
 ";
 
-%feature("docstring")  casadi::Matrix< T >::clear() "
+%feature("docstring")  casadi::SX::is_smooth() const  "
+
+[INTERNAL]  Check if smooth.
 
 ";
 
@@ -47269,6 +49330,15 @@ check if the matrix is -1 (note that false negative answers are possible)
 ";
 
 %feature("docstring")  poly_roots(const Matrix< Scalar > &p) "
+
+Attempts to find the roots of a polynomial.
+
+This will only work for polynomials up to order 3 It is assumed that the
+roots are real.
+
+";
+
+%feature("docstring") casadi::casadi_poly_roots "
 
 Attempts to find the roots of a polynomial.
 
@@ -47311,16 +49381,14 @@ Get the number of non-zeros in the lower triangular half.
 
 ";
 
-%feature("docstring")  casadi::Matrix< T >::reserve(casadi_int nnz) "
-
-";
-
-%feature("docstring")  casadi::Matrix< T >::reserve(casadi_int nnz,
-casadi_int ncol) "
-
-";
-
 %feature("docstring")  eig_symbolic(const Matrix< Scalar > &m) "
+
+Attempts to find the eigenvalues of a symbolic matrix This will only work
+for up to 3x3 matrices.
+
+";
+
+%feature("docstring") casadi::casadi_eig_symbolic "
 
 Attempts to find the eigenvalues of a symbolic matrix This will only work
 for up to 3x3 matrices.
@@ -47389,6 +49457,17 @@ Also called: slope function
 
 ";
 
+%feature("docstring") casadi::casadi_ramp "
+
+ramp function
+
+\\\\[ \\\\begin {cases} R(x) = 0 & x <= 1 \\\\\\\\ R(x) = x & x > 1 \\\\\\\\
+\\\\end {cases} \\\\]
+
+Also called: slope function
+
+";
+
 %feature("docstring")  casadi::Matrix< T >::print_vector(std::ostream
 &stream, bool truncate=true) const  "
 
@@ -47417,11 +49496,6 @@ one.
 
 Create a dense matrix or a matrix with specified sparsity with all entries
 one.
-
-";
-
-%feature("docstring")  casadi::Matrix< T >::resize(casadi_int nrow,
-casadi_int ncol) "
 
 ";
 
@@ -47479,6 +49553,12 @@ zero.
 %feature("docstring")  casadi::GenericMatrix< Matrix< Scalar >
 >::rank1(const Matrix< Scalar > &A, const Matrix< Scalar > &alpha, const
 Matrix< Scalar > &x, const Matrix< Scalar > &y) "
+
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
+
+";
+
+%feature("docstring") casadi::casadi_rank1 "
 
 Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
@@ -47578,6 +49658,14 @@ An error is raised when the expression contains symbols
 
 ";
 
+%feature("docstring") casadi::casadi_evalf "
+
+Evaluates the expression numerically.
+
+An error is raised when the expression contains symbols
+
+";
+
 %feature("docstring")  casadi::SX::is_leaf() const  "
 
 [INTERNAL]  Check if SX is a leaf of the SX graph.
@@ -47592,8 +49680,20 @@ Make a matrix sparse by removing numerical zeros.
 
 ";
 
+%feature("docstring") casadi::casadi_sparsify "
+
+Make a matrix sparse by removing numerical zeros.
+
+";
+
 %feature("docstring")  cofactor(const Matrix< Scalar > &x, casadi_int i,
 casadi_int j) "
+
+Get the (i,j) cofactor matrix.
+
+";
+
+%feature("docstring") casadi::casadi_cofactor "
 
 Get the (i,j) cofactor matrix.
 
@@ -47615,6 +49715,14 @@ Print dense matrix-stype.
 
 %feature("docstring")  ldl(const Matrix< Scalar > &A, Matrix< Scalar > &D,
 Matrix< Scalar > &LT, std::vector< casadi_int > &p, bool amd=true) "
+
+Sparse LDL^T factorization Returns D and the strictly upper triangular
+entries of L^T I.e. ones on the diagonal are ignored. Only guarenteed to
+work for positive definite matrices.
+
+";
+
+%feature("docstring") casadi::casadi_ldl "
 
 Sparse LDL^T factorization Returns D and the strictly upper triangular
 entries of L^T I.e. ones on the diagonal are ignored. Only guarenteed to
@@ -47665,6 +49773,15 @@ matrices can return true if all non-zero elements are symbolic.
 ";
 
 %feature("docstring")  heaviside(const Matrix< Scalar > &x) "
+
+Heaviside function.
+
+\\\\[ \\\\begin {cases} H(x) = 0 & x<0 \\\\\\\\ H(x) = 1/2 & x=0 \\\\\\\\
+H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
+
+";
+
+%feature("docstring") casadi::casadi_heaviside "
 
 Heaviside function.
 
@@ -47753,8 +49870,48 @@ Example usage:
 
 ";
 
+%feature("docstring") casadi::casadi_taylor "
+
+univariate Taylor series expansion
+
+Calculate the Taylor expansion of expression 'ex' up to order 'order' with
+respect to variable 'x' around the point 'a'
+
+$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac
+{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
+
+Example usage:
+
+::
+
+>>   x
+
+
+
+";
+
 %feature("docstring")  taylor(const Matrix< Scalar > &ex, const Matrix<
 Scalar > &x) "
+
+univariate Taylor series expansion
+
+Calculate the Taylor expansion of expression 'ex' up to order 'order' with
+respect to variable 'x' around the point 'a'
+
+$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac
+{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
+
+Example usage:
+
+::
+
+>>   x
+
+
+
+";
+
+%feature("docstring") casadi::casadi_taylor "
 
 univariate Taylor series expansion
 
@@ -47845,8 +50002,16 @@ x:  Scalar symbol that the polynomial is build up with
 
 ";
 
-%feature("docstring")  casadi::Matrix< T >::printme(const Matrix< Scalar >
-&y) const  "
+%feature("docstring") casadi::casadi_poly_coeff "
+
+extracts polynomial coefficients from an expression
+
+Parameters:
+-----------
+
+ex:  Scalar expression that represents a polynomial
+
+x:  Scalar symbol that the polynomial is build up with
 
 ";
 
@@ -47858,9 +50023,21 @@ Integrate f from a to b using Gaussian quadrature with n points.
 
 ";
 
+%feature("docstring") casadi::casadi_gauss_quadrature "
+
+Integrate f from a to b using Gaussian quadrature with n points.
+
+";
+
 %feature("docstring")  gauss_quadrature(const Matrix< Scalar > &f, const
 Matrix< Scalar > &x, const Matrix< Scalar > &a, const Matrix< Scalar > &b,
 casadi_int order, const Matrix< Scalar > &w) "
+
+Matrix adjoint.
+
+";
+
+%feature("docstring") casadi::casadi_gauss_quadrature "
 
 Matrix adjoint.
 
@@ -47883,8 +50060,34 @@ Linear Systems.
 
 ";
 
+%feature("docstring") casadi::casadi_qr_sparse "
+
+Sparse direct QR factorization See T. Davis: Direct Methods for Sparse
+Linear Systems.
+
+";
+
 %feature("docstring")  pw_const(const Matrix< Scalar > &t, const Matrix<
 Scalar > &tval, const Matrix< Scalar > &val) "
+
+Create a piecewise constant function Create a piecewise constant function
+with n=val.size() intervals.
+
+Inputs:
+
+Parameters:
+-----------
+
+t:  a scalar variable (e.g. time)
+
+tval:  vector with the discrete values of t at the interval transitions
+(length n-1)
+
+val:  vector with the value of the function for each interval (length n)
+
+";
+
+%feature("docstring") casadi::casadi_pw_const "
 
 Create a piecewise constant function Create a piecewise constant function
 with n=val.size() intervals.
@@ -47928,6 +50131,18 @@ false.
 
 %feature("docstring")  pw_lin(const Matrix< Scalar > &t, const Matrix<
 Scalar > &tval, const Matrix< Scalar > &val) "
+
+t a scalar variable (e.g. time)
+
+Create a piecewise linear function Create a piecewise linear function:
+
+Inputs: tval vector with the the discrete values of t (monotonically
+increasing) val vector with the corresponding function values (same length
+as tval)
+
+";
+
+%feature("docstring") casadi::casadi_pw_lin "
 
 t a scalar variable (e.g. time)
 
@@ -48016,7 +50231,26 @@ Obtain a Cholesky factorisation of a matrix Performs and LDL transformation
 
 ";
 
+%feature("docstring") casadi::casadi_chol "
+
+Obtain a Cholesky factorisation of a matrix Performs and LDL transformation
+[L,D] = ldl(A) and returns diag(sqrt(D))*L'.
+
+";
+
 %feature("docstring")  rectangle(const Matrix< Scalar > &x) "
+
+rectangle function
+
+\\\\[ \\\\begin {cases} \\\\Pi(x) = 1 & |x| < 1/2 \\\\\\\\ \\\\Pi(x) = 1/2 &
+|x| = 1/2 \\\\\\\\ \\\\Pi(x) = 0 & |x| > 1/2 \\\\\\\\ \\\\end {cases} \\\\]
+
+Also called: gate function, block function, band function, pulse function,
+window function
+
+";
+
+%feature("docstring") casadi::casadi_rectangle "
 
 rectangle function
 
@@ -48066,6 +50300,12 @@ Implementation of Matrix::get_nonzeros (in public API)
 %feature("docstring")  ldl_solve(const Matrix< Scalar > &b, const Matrix<
 Scalar > &D, const Matrix< Scalar > &LT, const std::vector< casadi_int > &p)
 "
+
+Solve using a sparse LDL^T factorization.
+
+";
+
+%feature("docstring") casadi::casadi_ldl_solve "
 
 Solve using a sparse LDL^T factorization.
 
@@ -48180,6 +50420,12 @@ Inverse node.
 
 ";
 
+%feature("docstring") casadi::casadi_inv_node "
+
+Inverse node.
+
+";
+
 %feature("docstring") casadi::MX "
 
 MX - Matrix expression.
@@ -48287,26 +50533,6 @@ Set a submatrix, single argument
 
 ";
 
-%feature("docstring")  casadi::MX::set(const MX &m, bool ind1, const Slice
-&rr, const Slice &cc) "
-
-";
-
-%feature("docstring")  casadi::MX::set(const MX &m, bool ind1, const Slice
-&rr, const Matrix< casadi_int > &cc) "
-
-";
-
-%feature("docstring")  casadi::MX::set(const MX &m, bool ind1, const Matrix<
-casadi_int > &rr, const Slice &cc) "
-
-";
-
-%feature("docstring")  casadi::MX::set(const MX &m, bool ind1, const Matrix<
-casadi_int > &rr, const Matrix< casadi_int > &cc) "
-
-";
-
 %feature("docstring")  casadi::MX::is_valid_input() const  "
 
 Check if matrix can be used to define function inputs. Valid inputs for
@@ -48322,6 +50548,12 @@ Create nodes by their ID.
 ";
 
 %feature("docstring")  casadi::GenericMatrix< MX  >::sparsity() const "
+
+Get the sparsity pattern.
+
+";
+
+%feature("docstring") casadi::casadi_sparsity "
 
 Get the sparsity pattern.
 
@@ -48509,9 +50741,27 @@ it at which expansion should stop.
 
 ";
 
+%feature("docstring") casadi::casadi_matrix_expand "
+
+Expand MX graph to SXFunction call.
+
+Expand the given expression e, optionally supplying expressions contained in
+it at which expansion should stop.
+
+";
+
 %feature("docstring")  matrix_expand(const std::vector< MX > &e, const
 std::vector< MX > &boundary=std::vector< MX >(), const Dict &options=Dict())
 "
+
+Expand MX graph to SXFunction call.
+
+Expand the given expression e, optionally supplying expressions contained in
+it at which expansion should stop.
+
+";
+
+%feature("docstring") casadi::casadi_matrix_expand "
 
 Expand MX graph to SXFunction call.
 
@@ -48590,6 +50840,12 @@ Find first nonzero If failed, returns the number of rows.
 
 ";
 
+%feature("docstring") casadi::casadi_find "
+
+Find first nonzero If failed, returns the number of rows.
+
+";
+
 %feature("docstring")  casadi::MX::is_minus_one() const  "
 
 check if zero (note that false negative answers are possible)
@@ -48604,8 +50860,22 @@ vdef in an expression ex, preserving nodes.
 
 ";
 
+%feature("docstring") casadi::casadi_graph_substitute "
+
+Substitute single expression in graph Substitute variable v with expression
+vdef in an expression ex, preserving nodes.
+
+";
+
 %feature("docstring")  graph_substitute(const std::vector< MX > &ex, const
 std::vector< MX > &v, const std::vector< MX > &vdef) "
+
+Substitute multiple expressions in graph Substitute variable var with
+expression expr in multiple expressions, preserving nodes.
+
+";
+
+%feature("docstring") casadi::casadi_graph_substitute "
 
 Substitute multiple expressions in graph Substitute variable var with
 expression expr in multiple expressions, preserving nodes.
@@ -48675,6 +50945,14 @@ An error is raised when the expression contains symbols
 
 ";
 
+%feature("docstring") casadi::casadi_evalf "
+
+Evaluates the expression numerically.
+
+An error is raised when the expression contains symbols
+
+";
+
 %feature("docstring")  casadi::MX::is_zero() const  "
 
 check if zero (note that false negative answers are possible)
@@ -48710,10 +50988,6 @@ Transpose the matrix.
 %feature("docstring")  casadi::GenericMatrix< MX  >::is_vector() const "
 
 Check if the matrix is a row or column vector.
-
-";
-
-%feature("docstring")  casadi::MX::printme(const MX &y) const  "
 
 ";
 
@@ -48926,10 +51200,38 @@ above example, we would have: a {-1, -3} b {-3, -2} c {-1 -2}
 
 ";
 
+%feature("docstring") casadi::casadi_einstein "
+
+Computes an einstein dense tensor contraction.
+
+Computes the product: C_c = A_a + B_b where a b c are index/einstein
+notation in an encoded form
+
+For example, an matrix-matrix product may be written as: C_ij = A_ik B_kj
+
+The encoded form uses strictly negative numbers to indicate labels. For the
+above example, we would have: a {-1, -3} b {-3, -2} c {-1 -2}
+
+";
+
 %feature("docstring")  casadi::MX::einstein(const MX &A, const MX &B, const
 std::vector< casadi_int > &dim_a, const std::vector< casadi_int > &dim_b,
 const std::vector< casadi_int > &dim_c, const std::vector< casadi_int > &a,
 const std::vector< casadi_int > &b, const std::vector< casadi_int > &c) "
+
+Computes an einstein dense tensor contraction.
+
+Computes the product: C_c = A_a + B_b where a b c are index/einstein
+notation in an encoded form
+
+For example, an matrix-matrix product may be written as: C_ij = A_ik B_kj
+
+The encoded form uses strictly negative numbers to indicate labels. For the
+above example, we would have: a {-1, -3} b {-3, -2} c {-1 -2}
+
+";
+
+%feature("docstring") casadi::casadi_einstein "
 
 Computes an einstein dense tensor contraction.
 
@@ -49035,8 +51337,20 @@ Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 
 ";
 
+%feature("docstring") casadi::casadi_rank1 "
+
+Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
+
+";
+
 %feature("docstring")  casadi::GenericMatrix< MX  >::bilin(const MX &A,
 const MX &x, const MX &y) "
+
+Calculate bilinear form x^T A y.
+
+";
+
+%feature("docstring") casadi::casadi_bilin "
 
 Calculate bilinear form x^T A y.
 
@@ -49263,6 +51577,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
@@ -49354,6 +51674,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
 "
 
@@ -49422,6 +51748,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::OracleFunction::has_function(const
 std::string &fname) const  "
 
@@ -49433,6 +51776,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -50070,6 +52421,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchical(casadi_int iind,
 casadi_int oind) const  "
@@ -50469,6 +52828,12 @@ const  "
 %feature("docstring")  casadi::Newton::solve(void *mem) const  "
 
 [INTERNAL]   Solve the system of equations and calculate derivatives.
+
+";
+
+%feature("docstring") casadi::casadi_solve "
+
+Solve the system of equations and calculate derivatives.
 
 ";
 
@@ -50889,6 +53254,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -51218,6 +53591,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size_in(casadi_int ind)
 const  "
 
@@ -51489,6 +53868,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sx_in(casadi_int ind) const
 "
 
@@ -51507,6 +53892,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -51549,6 +53951,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -52071,6 +54481,12 @@ Crunch the numbers; solve the problem.
 
 ";
 
+%feature("docstring") casadi::casadi_solve "
+
+Crunch the numbers; solve the problem.
+
+";
+
 %feature("docstring")  casadi::Opti::x() const  "
 
 Get all (scalarised) decision variables as a symbolic column vector.
@@ -52162,10 +54578,6 @@ Number of (scalarised) constraints.
 %feature("docstring") casadi::Opti::Opti() "
 
 Create Opti Context.
-
-";
-
-%feature("docstring")  casadi::Opti::value_parameters() const  "
 
 ";
 
@@ -52321,6 +54733,15 @@ update the original.
 
 ";
 
+%feature("docstring") casadi::casadi_copy "
+
+Get a copy of the.
+
+The copy is effectively a deep copy: Updating the state of the copy does not
+update the original.
+
+";
+
 %feature("docstring")  casadi::SharedObject::class_name() const  "
 
 Get class name.
@@ -52433,12 +54854,26 @@ update the original.
 
 ";
 
-%feature("docstring")  casadi::Opti::ubg() const  "
+%feature("docstring")  casadi::Opti::solver(const std::string &solver, const
+Dict &plugin_options=Dict(), const Dict &solver_options=Dict()) "
+
+Set a solver.
+
+Parameters:
+-----------
+
+solver:  any of the nlpsol plugins can be used here In practice, not all
+nlpsol plugins may be supported yet
+
+options:  passed on to nlpsol plugin No stability can be guaranteed about
+this part of the API
+
+options:  to be passed to nlpsol solver No stability can be guaranteed about
+this part of the API
 
 ";
 
-%feature("docstring")  casadi::Opti::solver(const std::string &solver, const
-Dict &plugin_options=Dict(), const Dict &solver_options=Dict()) "
+%feature("docstring") casadi::casadi_solver "
 
 Set a solver.
 
@@ -52487,17 +54922,8 @@ constraints
 
 ";
 
-%feature("docstring")  casadi::Opti::update_user_dict(const std::vector< MX
-> &m, const Dict &meta) "
-
-";
-
 
 // File: classcasadi_1_1OptiAdvanced.xml
-%feature("docstring")  casadi::OptiAdvanced::assert_empty() const  "
-
-";
-
 %feature("docstring")  casadi::Opti::dual(const MX &m) const  "
 
 get the dual variable
@@ -52527,11 +54953,6 @@ attribute:  'full' (default) or 'symmetric'
 
 ";
 
-%feature("docstring")  casadi::OptiAdvanced::mark_problem_dirty(bool
-flag=true) "
-
-";
-
 %feature("docstring")  casadi::Opti::lam_g() const  "
 
 Get all (scalarised) dual variables as a symbolic column vector.
@@ -52548,10 +54969,6 @@ Useful for obtaining the Lagrange Hessian:
 
 ";
 
-%feature("docstring")  casadi::OptiAdvanced::assert_solved() const  "
-
-";
-
 %feature("docstring")  casadi::SharedObject::class_name() const  "
 
 Get class name.
@@ -52562,11 +54979,6 @@ Get class name.
 const  "
 
 Interpret an expression (for internal use only)
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::show_infeasibilities(double
-tol=0) const  "
 
 ";
 
@@ -52584,14 +54996,6 @@ Set meta-data of an expression.
 
 ";
 
-%feature("docstring")  casadi::OptiAdvanced::instance_number() const  "
-
-";
-
-%feature("docstring")  casadi::Opti::ubg() const  "
-
-";
-
 %feature("docstring")  casadi::Opti::user_dict(const MX &m) const  "
 
 Get user data.
@@ -52605,25 +55009,10 @@ point to any node, \"0\" is returned.
 
 ";
 
-%feature("docstring")  casadi::OptiAdvanced::x_lookup(casadi_index i) const
-"
-
-";
-
 %feature("docstring")  casadi::Opti::disp(std::ostream &stream, bool
 more=false) const  "
 
 Print representation.
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::describe(const MX &x,
-casadi_index indent=0) const  "
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::solve_actual(const DMDict
-&args) "
 
 ";
 
@@ -52654,19 +55043,6 @@ attribute:  'full' (default) or 'symmetric'
 
 ";
 
-%feature("docstring")  casadi::OptiAdvanced::g_describe(casadi_index i)
-const  "
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::problem_dirty() const  "
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::arg() const  "
-
-";
-
 %feature("docstring")  casadi::Opti::value_variables() const  "
 
 get assignment expressions for latest values
@@ -52674,6 +55050,12 @@ get assignment expressions for latest values
 ";
 
 %feature("docstring")  casadi::Opti::solve() "
+
+Crunch the numbers; solve the problem.
+
+";
+
+%feature("docstring") casadi::casadi_solve "
 
 Crunch the numbers; solve the problem.
 
@@ -52688,13 +55070,18 @@ update the original.
 
 ";
 
+%feature("docstring") casadi::casadi_copy "
+
+Get a copy of the.
+
+The copy is effectively a deep copy: Updating the state of the copy does not
+update the original.
+
+";
+
 %feature("docstring") casadi::OptiAdvanced "
 
 C++ includes: optistack.hpp ";
-
-%feature("docstring")  casadi::OptiAdvanced::solved() const  "
-
-";
 
 %feature("docstring")  casadi::Opti::value(const MX &x, const std::vector<
 MX > &values=std::vector< MX >()) const  "
@@ -52758,11 +55145,6 @@ constraints
 
 ";
 
-%feature("docstring")  casadi::Opti::update_user_dict(const std::vector< MX
-> &m, const Dict &meta) "
-
-";
-
 %feature("docstring")  casadi::Opti::set_initial(const MX &x, const DM &v) "
 
 Set initial guess for decision variables
@@ -52821,19 +55203,6 @@ Get string representation.
 
 ";
 
-%feature("docstring")  casadi::Opti::value_parameters() const  "
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::solver_dirty() const  "
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::mark_solver_dirty(bool
-flag=true) "
-
-";
-
 %feature("docstring")  casadi::Opti::lbg() const  "
 
 Get all (scalarised) bounds on constraints as a column vector.
@@ -52843,10 +55212,6 @@ Get all (scalarised) bounds on constraints as a column vector.
 %feature("docstring")  casadi::Opti::ng() const  "
 
 Number of (scalarised) constraints.
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::objective() const  "
 
 ";
 
@@ -52947,10 +55312,6 @@ Number of (scalarised) decision variables.
 
 ";
 
-%feature("docstring") casadi::OptiAdvanced::OptiAdvanced(const Opti &x) "
-
-";
-
 %feature("docstring")  casadi::Opti::set_value(const MX &x, const DM &v) "
 
 Set value of parameter.
@@ -52965,14 +55326,6 @@ Each parameter must be given a value before 'solve' can be called
 Set value of parameter.
 
 Each parameter must be given a value before 'solve' can be called
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::res(const DMDict &res) "
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::res() const  "
 
 ";
 
@@ -52995,14 +55348,6 @@ update the original.
 
 ";
 
-%feature("docstring")  casadi::OptiAdvanced::solve_prepare() "
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::baked_copy() const  "
-
-";
-
 %feature("docstring")  casadi::Opti::np() const  "
 
 Number of (scalarised) parameters.
@@ -53018,7 +55363,25 @@ calls used to create the variables
 
 ";
 
+%feature("docstring") casadi::casadi_symvar "
+
+Get symbols present in expression.
+
+Returned vector is ordered according to the order of variable()/parameter()
+calls used to create the variables
+
+";
+
 %feature("docstring")  casadi::OptiAdvanced::symvar(const MX &expr) const  "
+
+Get symbols present in expression.
+
+Returned vector is ordered according to the order of variable()/parameter()
+calls used to create the variables
+
+";
+
+%feature("docstring") casadi::casadi_symvar "
 
 Get symbols present in expression.
 
@@ -53037,6 +55400,15 @@ calls used to create the variables
 
 ";
 
+%feature("docstring") casadi::casadi_symvar "
+
+Get symbols present in expression.
+
+Returned vector is ordered according to the order of variable()/parameter()
+calls used to create the variables
+
+";
+
 %feature("docstring")  casadi::Opti::advanced() const  "
 
 Get a copy with advanced functionality.
@@ -53046,16 +55418,6 @@ stability
 
 The copy is effectively a deep copy: Updating the state of the copy does not
 update the original.
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::active_values(VariableType
-type) const  "
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::x_describe(casadi_index i)
-const  "
 
 ";
 
@@ -53093,26 +55455,9 @@ guaranteed about this part of the API.
 
 ";
 
-%feature("docstring")  casadi::OptiAdvanced::constraints() const  "
-
-";
-
 %feature("docstring")  casadi::OptiAdvanced::bake() "
 
 Fix the structure of the optimization problem.
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::assert_active_symbol(const MX
-&m) const  "
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::mark_solved(bool flag=true) "
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::assert_baked() const  "
 
 ";
 
@@ -53121,11 +55466,6 @@ const  "
 
 return true if expression is only dependant on Opti parameters, not
 variables
-
-";
-
-%feature("docstring")  casadi::OptiAdvanced::g_lookup(casadi_index i) const
-"
 
 ";
 
@@ -53154,8 +55494,21 @@ this part of the API
 
 ";
 
-%feature("docstring")  casadi::OptiAdvanced::active_symvar(VariableType
-type) const  "
+%feature("docstring") casadi::casadi_solver "
+
+Set a solver.
+
+Parameters:
+-----------
+
+solver:  any of the nlpsol plugins can be used here In practice, not all
+nlpsol plugins may be supported yet
+
+options:  passed on to nlpsol plugin No stability can be guaranteed about
+this part of the API
+
+options:  to be passed to nlpsol solver No stability can be guaranteed about
+this part of the API
 
 ";
 
@@ -53176,26 +55529,9 @@ Get all (scalarised) decision variables as a symbolic column vector.
 
 
 // File: classcasadi_1_1OptiCallback.xml
-%feature("docstring") casadi::OptiCallback::~OptiCallback "
-
-";
-
 %feature("docstring") casadi::OptiCallback "
 
 C++ includes: optistack.hpp ";
-
-%feature("docstring")  casadi::OptiCallback::call(casadi_int i) "
-
-";
-
-%feature("docstring") casadi::OptiCallback::OptiCallback() "
-
-";
-
-%feature("docstring") casadi::OptiCallback::OptiCallback(const OptiCallback
-&obj) "
-
-";
 
 
 // File: classcasadi_1_1OptiSol.xml
@@ -53205,25 +55541,12 @@ get assignment expressions for the optimal solution
 
 ";
 
-%feature("docstring")  casadi::OptiSol::get_str(bool more=false) const  "
-
-";
-
 %feature("docstring")  casadi::OptiSol::stats() const  "
 
 Get statistics.
 
 nlpsol stats are passed as-is. No stability can be guaranteed about this
 part of the API
-
-";
-
-%feature("docstring")  casadi::OptiSol::type_name() const  "
-
-";
-
-%feature("docstring")  casadi::OptiSol::disp(std::ostream &stream, bool
-more=false) const  "
 
 ";
 
@@ -53272,14 +55595,6 @@ Parameters:
 
 values:  Optional assignment expressions (e.g. x==3) to overrule the current
 value
-
-";
-
-%feature("docstring")  casadi::OptiSol::value_parameters() const  "
-
-";
-
-%feature("docstring")  casadi::OptiSol::opti() const  "
 
 ";
 
@@ -53859,6 +56174,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
 &g) const  "
 
@@ -53873,6 +56196,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -53949,6 +56280,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -54453,6 +56790,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::OracleFunction::print_fstats(const
 OracleMemory *m) const  "
 
@@ -54540,6 +56894,12 @@ std::vector< M > &arg) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -55364,6 +57724,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::mx_out(casadi_int ind)
 const  "
 
@@ -55467,6 +57835,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
 [INTERNAL]  Does the function have free variables.
@@ -55541,6 +57915,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -55624,6 +58006,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -55933,6 +58332,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(casadi_int
 nadj, const std::vector< MatType > &v) const  "
 
@@ -56178,6 +58583,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
@@ -56343,6 +58754,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::fwd_seed(casadi_int nfwd)
 const  "
 
@@ -56382,6 +58801,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::index_out(const std::string
 &name) const  "
 
@@ -56395,6 +58820,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -56922,6 +59355,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -57758,6 +60208,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_jac(const std::string
 &name, const std::vector< std::string > &inames, const std::vector<
 std::string > &onames, const Dict &opts) const  "
@@ -58091,6 +60549,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
 [INTERNAL]  Get free variables ( MX)
@@ -58224,6 +60690,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sparsity_jac(casadi_int
 iind, casadi_int oind, bool compact, bool symmetric) const  "
 
@@ -58337,6 +60820,12 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -58486,6 +60975,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -59252,6 +61747,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::Scpgen::set_work(void *mem, const double
 **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
@@ -59551,6 +62054,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::Scpgen::solve_qp(ScpgenMemory *m) const  "
 
 [INTERNAL] ";
@@ -59659,6 +62168,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
@@ -59704,10 +62221,33 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -60822,8 +63362,20 @@ Get a vector of indices.
 
 ";
 
+%feature("docstring") casadi::casadi_all "
+
+Get a vector of indices.
+
+";
+
 %feature("docstring")  casadi::Slice::all(const Slice &outer, casadi_int
 len) const  "
+
+Get a vector of indices (nested slice)
+
+";
+
+%feature("docstring") casadi::casadi_all "
 
 Get a vector of indices (nested slice)
 
@@ -60845,21 +63397,6 @@ A single element (explicit to avoid ambiguity with IM overload.
 stop, casadi_int step=1) "
 
 A slice.
-
-";
-
-%feature("docstring") casadi::Slice::Slice(int start, int stop, int step=1)
-"
-
-";
-
-%feature("docstring") casadi::Slice::Slice(int start, casadi_int stop, int
-step=1) "
-
-";
-
-%feature("docstring") casadi::Slice::Slice(casadi_int start, int stop, int
-step=1) "
 
 ";
 
@@ -61157,6 +63694,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -61792,6 +64346,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
 const  "
 
@@ -61842,6 +64402,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -61947,6 +64515,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(casadi_int
 nadj, const std::vector< MatType > &v) const  "
 
@@ -62019,6 +64595,12 @@ persistent=false) "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -62668,6 +65250,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
 [INTERNAL]  Get required length of w field.
@@ -62981,6 +65571,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::all_scalar() const  "
 
 [INTERNAL]  Are all inputs and outputs scalar.
@@ -63091,6 +65687,12 @@ std::string &fname) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -63226,6 +65828,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::instruction_MX(casadi_int
 k) const  "
 
@@ -63306,6 +65916,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -63711,6 +66338,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jac() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -63783,6 +66418,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::numel_in() const  "
 
 [INTERNAL]  Number of input/output elements.
@@ -63816,6 +66468,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -64188,6 +66848,12 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -64734,6 +67400,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
@@ -64900,6 +67572,12 @@ nrow, casadi_int ncol) "
 "
 
 [INTERNAL]  Const access the sparsity - reference to data member.
+
+";
+
+%feature("docstring") casadi::casadi_sparsity "
+
+Const access the sparsity - reference to data member.
 
 ";
 
@@ -65096,13 +67774,19 @@ work under the GNU LGPL.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::is_vector() const  "
+%feature("docstring") casadi::casadi_qr_sparse "
 
-Check if the pattern is a row or column vector.
+Symbolic QR factorization Returns the sparsity pattern of V (compact
+representation of Q) and R as well as vectors needed for the numerical
+factorization and solution. The implementation is a modified version of
+CSparse Copyright(c) Timothy A. Davis, 2006-2009 Licensed as a derivative
+work under the GNU LGPL.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::hash() const  "
+%feature("docstring")  casadi::Sparsity::is_vector() const  "
+
+Check if the pattern is a row or column vector.
 
 ";
 
@@ -65121,6 +67805,18 @@ Print a description of the object.
 ";
 
 %feature("docstring")  casadi::Sparsity::find(bool ind1=false) const  "
+
+Get the location of all non-zero elements as they would appear in a Dense
+matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
+zeros.
+
+k = A.find() A[k] will contain the elements of A that are non-zero in B
+
+Inverse of nonzeros.
+
+";
+
+%feature("docstring") casadi::casadi_find "
 
 Get the location of all non-zero elements as they would appear in a Dense
 matrix A : DenseMatrix 4 x 3 B : SparseMatrix 4 x 3 , 5 structural non-
@@ -65228,6 +67924,12 @@ Union of two sparsity patterns.
 
 ";
 
+%feature("docstring") casadi::casadi_unite "
+
+Union of two sparsity patterns.
+
+";
+
 %feature("docstring")  casadi::Sparsity::is_transpose(const Sparsity &y)
 const  "
 
@@ -65256,6 +67958,15 @@ Append another sparsity patten horizontally.
 
 %feature("docstring")  casadi::Sparsity::ldl(std::vector< casadi_int >
 &output_p, bool amd=true) const  "
+
+Symbolic LDL factorization Returns the sparsity pattern of L^T.
+
+The implementation is a modified version of LDL Copyright(c) Timothy A.
+Davis, 2005-2013 Licensed as a derivative work under the GNU LGPL
+
+";
+
+%feature("docstring") casadi::casadi_ldl "
 
 Symbolic LDL factorization Returns the sparsity pattern of L^T.
 
@@ -65359,6 +68070,12 @@ Create diagonal sparsity pattern.
 
 ";
 
+%feature("docstring") casadi::casadi_diag "
+
+Create diagonal sparsity pattern.
+
+";
+
 %feature("docstring")  casadi::Sparsity::diag(casadi_int nrow, casadi_int
 ncol) "
 
@@ -65366,8 +68083,20 @@ Create diagonal sparsity pattern.
 
 ";
 
+%feature("docstring") casadi::casadi_diag "
+
+Create diagonal sparsity pattern.
+
+";
+
 %feature("docstring")  casadi::Sparsity::diag(const std::pair< casadi_int,
 casadi_int > &rc) "
+
+Create diagonal sparsity pattern.
+
+";
+
+%feature("docstring") casadi::casadi_diag "
 
 Create diagonal sparsity pattern.
 
@@ -65524,6 +68253,18 @@ matrix
 
 ";
 
+%feature("docstring") casadi::casadi_transpose "
+
+Transpose the matrix and get the reordering of the non-zero entries.
+
+Parameters:
+-----------
+
+mapping:  the non-zeros of the original matrix for each non-zero of the new
+matrix
+
+";
+
 %feature("docstring")  casadi::Sparsity::pmult(const std::vector< casadi_int
 > &p, bool permute_rows=true, bool permute_columns=true, bool
 invert_permutation=false) const  "
@@ -65556,17 +68297,6 @@ Timothy A. Davis, 2006-2009 Licensed as a derivative work under the GNU LGPL
 %feature("docstring")  casadi::SharedObject::class_name() const  "
 
 Get class name.
-
-";
-
-%feature("docstring")  casadi::Sparsity::is_equal(const Sparsity &y) const
-"
-
-";
-
-%feature("docstring")  casadi::Sparsity::is_equal(casadi_int nrow,
-casadi_int ncol, const std::vector< casadi_int > &colind, const std::vector<
-casadi_int > &row) const  "
 
 ";
 
@@ -66828,6 +69558,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::Nlpsol::callback(void *mem, const double *x,
 const double *f, const double *g, const double *lam_x, const double *lam_g,
 const double *lam_p) const  "
@@ -66884,6 +69622,23 @@ std::string &s_in, const std::vector< std::string > &s_out, casadi_int
 order, bool tr=false) const  "
 
 [INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
 
 Parameters:
 -----------
@@ -66962,6 +69717,12 @@ std::vector< std::vector< M > > &aseed) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
 
 ";
 
@@ -67100,6 +69861,14 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
 
 ";
 
@@ -67307,6 +70076,12 @@ original
 
 ";
 
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
+
+";
+
 %feature("docstring") casadi::Sqpmethod::Sqpmethod(const std::string &name,
 const Function &nlp) "
 
@@ -67392,19 +70167,11 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 C++ includes: casadi_logger.hpp ";
 
-%feature("docstring") casadi::Logger::Stream< Err >::Stream() "
-
-";
-
 
 // File: classcasadi_1_1Logger_1_1Streambuf.xml
 %feature("docstring") casadi::Logger::Streambuf "
 
 C++ includes: casadi_logger.hpp ";
-
-%feature("docstring") casadi::Logger::Streambuf< Err >::Streambuf() "
-
-";
 
 
 // File: classcasadi_1_1SubAssign.xml
@@ -67453,6 +70220,12 @@ casadi_int > &order_out, const Dict &opts) const  "
 
 [INTERNAL]  returns a new function with a selection of inputs/outputs of the
 original
+
+";
+
+%feature("docstring") casadi::casadi_slice "
+
+returns a new function with a selection of inputs/outputs of the original
 
 ";
 
@@ -67976,6 +70749,23 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::casadi_which_depends "
+
+Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sp_forward(const bvec_t
 **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 
@@ -68368,6 +71158,14 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::casadi_reverse "
+
+Return function that calculates adjoint derivatives reverse(nadj) returns a
+cached instance if available, and calls  Function get_reverse(casadi_int
+nadj) if no cached version is available.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_jac(const std::string
 &name, const std::vector< std::string > &inames, const std::vector<
 std::string > &onames, const Dict &opts) const  "
@@ -68538,6 +71336,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::casadi_jacobian "
+
+Return Jacobian of all input elements with respect to all output elements.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
 bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 
@@ -68556,6 +71360,14 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::casadi_forward "
+
+Return function that calculates forward derivatives forward(nfwd) returns a
+cached instance if available, and calls  Function get_forward(casadi_int
+nfwd) if no cached version is available.
 
 ";
 
@@ -69113,6 +71925,12 @@ Get a shared (owning) reference.
 
 ";
 
+%feature("docstring") casadi::casadi_shared "
+
+Get a shared (owning) reference.
+
+";
+
 %feature("docstring") casadi::WeakRef::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
@@ -69191,14 +72009,6 @@ Get string representation.
 
 ";
 
-%feature("docstring") casadi::XmlFile::XmlFile() "
-
-";
-
-%feature("docstring") casadi::XmlFile::XmlFile(const std::string &name) "
-
-";
-
 %feature("docstring") casadi::XmlFile::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
@@ -69222,10 +72032,6 @@ Is a null pointer?
 more=false) const  "
 
 Print a description of the object.
-
-";
-
-%feature("docstring") casadi::XmlFile::~XmlFile "
 
 ";
 
@@ -69276,11 +72082,6 @@ Get type info for a particular option.
 
 ";
 
-%feature("docstring")  casadi::temporary_file(const std::string &prefix,
-const std::string &suffix) "
-
-";
-
 %feature("docstring")  casadi::load_expm(const std::string &name) "
 
 Explicitly load a plugin dynamically.
@@ -69316,10 +72117,6 @@ m, casadi_int l, const double *A, const double *B, double *C, casadi_int
 strideA, casadi_int strideB, casadi_int strideC) "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::is_zero(const T &x) "
-
-";
 
 %feature("docstring")  casadi::dple_out() "
 
@@ -69731,15 +72528,6 @@ Check if the vector is strictly increasing.
 
 ";
 
-%feature("docstring")  casadi::Contraction(const T &a, const T &b, T &r) "
-
-";
-
-%feature("docstring")  casadi::Contraction(const bvec_t &a, const bvec_t &b,
-bvec_t &r) "
-
-";
-
 %feature("docstring")  casadi::casadi_fill_casadi_int(casadi_int *x,
 casadi_int n, casadi_int alpha) "
 
@@ -69805,17 +72593,6 @@ inc_x, T1 *y, casadi_int inc_y) "
 %feature("docstring")  casadi::nlpsol_options(const std::string &name) "
 
 Get all options for a plugin.
-
-";
-
-%feature("docstring")  casadi::einstein_eval(casadi_int n_iter, const
-std::vector< casadi_int > &iter_dims, const std::vector< casadi_int >
-&strides_a, const std::vector< casadi_int > &strides_b, const std::vector<
-casadi_int > &strides_c, const T *a_in, const T *b_in, T *c_in) "
-
-";
-
-%feature("docstring")  casadi::uerr() "
 
 ";
 
@@ -69896,11 +72673,6 @@ ncol, const std::vector< casadi_int > &colind, const std::vector< casadi_int
 > &row) "
 
 Hash a sparsity pattern.
-
-";
-
-%feature("docstring")  casadi::hash_sparsity(casadi_int nrow, casadi_int
-ncol, const casadi_int *colind, const casadi_int *row) "
 
 ";
 
@@ -70173,16 +72945,6 @@ Joel Andersson
 
 ";
 
-%feature("docstring")  casadi::rootfinder(const std::string &name, const
-std::string &solver, const MXDict &rfp, const Dict &opts=Dict()) "
-
-";
-
-%feature("docstring")  casadi::rootfinder(const std::string &name, const
-std::string &solver, const Function &f, const Dict &opts=Dict()) "
-
-";
-
 %feature("docstring")  casadi::casadi_ldl(const casadi_int *sp_a, const T1
 *a, const casadi_int *sp_lt, T1 *lt, T1 *d, const casadi_int *p, T1 *w) "
 
@@ -70272,17 +73034,6 @@ Duplicates are treated by looking up last occurrence
 
 ";
 
-%feature("docstring")  casadi::lookupvector(const std::vector< casadi_int >
-&v) "
-
-";
-
-%feature("docstring")  casadi::slicot_mb03vy(int n, int p, int ilo, int ihi,
-double *a, int lda1, int lda2, const double *tau, int ldtau, double
-*dwork=nullptr, int ldwork=0) "
-
-";
-
 %feature("docstring")  casadi::doc_dple(const std::string &name) "
 
 Get the documentation string for a plugin.
@@ -70312,14 +73063,6 @@ Generate a hash value incrementally (function taken from boost)
 %feature("docstring")  casadi::rootfinder_n_in() "
 
 Number of rootfinder inputs.
-
-";
-
-%feature("docstring")  casadi::trim_path(const std::string &full_path) "
-
-";
-
-%feature("docstring")  casadi::uout() "
 
 ";
 
@@ -70783,11 +73526,6 @@ The method is still under development
 
 
 Joel Andersson
-
-";
-
-%feature("docstring")  casadi::integrator(const std::string &name, const
-std::string &solver, const MXDict &dae, const Dict &opts=Dict()) "
 
 ";
 
@@ -71698,13 +74436,6 @@ const std::vector< T > &mat) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::slicot_mb03wd(char job, char compz, int n,
-int p, int ilo, int ihi, int iloz, int ihiz, double *h, int ldh1, int ldh2,
-double *z, int ldz1, int ldz2, double *wr, double *wi, double
-*dwork=nullptr, int ldwork=0) "
-
-";
-
 %feature("docstring")  casadi::casadi_max_viol(casadi_int n, const T1 *x,
 const T1 *lb, const T1 *ub) "
 
@@ -71892,12 +74623,6 @@ casadi_int m) "
 
 ";
 
-%feature("docstring")  casadi::slicot_mb03vd(int n, int p, int ilo, int ihi,
-double *a, int lda1, int lda2, double *tau, int ldtau, double
-*dwork=nullptr) "
-
-";
-
 %feature("docstring")  casadi::nlpsol_default_in(casadi_int ind) "
 
 Default input for an NLP solver.
@@ -71907,16 +74632,6 @@ Default input for an NLP solver.
 %feature("docstring")  casadi::nlpsol_default_in() "
 
 Default input for an NLP solver.
-
-";
-
-%feature("docstring")  casadi::einstein_process(const T &A, const T &B,
-const T &C, const std::vector< casadi_int > &dim_a, const std::vector<
-casadi_int > &dim_b, const std::vector< casadi_int > &dim_c, const
-std::vector< casadi_int > &a, const std::vector< casadi_int > &b, const
-std::vector< casadi_int > &c, std::vector< casadi_int > &iter_dims,
-std::vector< casadi_int > &strides_a, std::vector< casadi_int > &strides_b,
-std::vector< casadi_int > &strides_c) "
 
 ";
 
@@ -71939,12 +74654,6 @@ value
 
 ";
 
-%feature("docstring")  casadi::slicot_mb05nd(int n, double delta, const
-double *a, int lda, double *ex, int ldex, double *exint, int ldexin, double
-tol, int *iwork, double *dwork, int ldwork) "
-
-";
-
 %feature("docstring")  casadi::casadi_ldl_trs(const casadi_int *sp_r, const
 T1 *nz_r, T1 *x, casadi_int tr) "
 
@@ -71953,11 +74662,6 @@ T1 *nz_r, T1 *x, casadi_int tr) "
 %feature("docstring")  casadi::has_rootfinder(const std::string &name) "
 
 Check if a particular plugin is available.
-
-";
-
-%feature("docstring")  casadi::index_interp1d(const std::vector< double >
-&x, double xq, bool equidistant=false) "
 
 ";
 
@@ -72745,21 +75449,6 @@ Joris Gillis
 
 ";
 
-%feature("docstring")  casadi::dplesol(const MX &A, const MX &V, const
-std::string &solver, const Dict &opts=Dict()) "
-
-";
-
-%feature("docstring")  casadi::dplesol(const MXVector &A, const MXVector &V,
-const std::string &solver, const Dict &opts=Dict()) "
-
-";
-
-%feature("docstring")  casadi::dplesol(const DMVector &A, const DMVector &V,
-const std::string &solver, const Dict &opts=Dict()) "
-
-";
-
 %feature("docstring")  casadi::is_slice(const IM &x, bool ind1=false) "
 
 Is the IM a Slice.
@@ -72800,10 +75489,6 @@ Get the documentation string for a plugin.
 T1 *y) "
 
 [INTERNAL]  Inner product.
-
-";
-
-%feature("docstring")  casadi::message_prefix(std::ostream &stream) "
 
 ";
 
@@ -73076,16 +75761,6 @@ Get NLP solver input scheme name by index.
 %feature("docstring")  casadi::conic_n_in() "
 
 Get the number of QP solver inputs.
-
-";
-
-%feature("docstring")  casadi::qpsol(const std::string &name, const
-std::string &solver, const SXDict &qp, const Dict &opts=Dict()) "
-
-";
-
-%feature("docstring")  casadi::qpsol(const std::string &name, const
-std::string &solver, const MXDict &qp, const Dict &opts=Dict()) "
 
 ";
 
@@ -73968,26 +76643,6 @@ A textbook SQPMethod
 
 
 Joel Andersson
-
-";
-
-%feature("docstring")  casadi::nlpsol(const std::string &name, const
-std::string &solver, const MXDict &nlp, const Dict &opts=Dict()) "
-
-";
-
-%feature("docstring")  casadi::nlpsol(const std::string &name, const
-std::string &solver, const std::string &fname, const Dict &opts=Dict()) "
-
-";
-
-%feature("docstring")  casadi::nlpsol(const std::string &name, const
-std::string &solver, const Importer &compiler, const Dict &opts=Dict()) "
-
-";
-
-%feature("docstring")  casadi::nlpsol(const std::string &name, const
-std::string &solver, const NlpBuilder &nl, const Dict &opts=Dict()) "
 
 ";
 
