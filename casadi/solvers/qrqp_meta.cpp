@@ -23,9 +23,9 @@
  */
 
 
-      #include "conic_activeset.hpp"
+      #include "qrqp.hpp"
       #include <string>
 
-      const std::string casadi::ConicActiveSet::meta_doc=
+      const std::string casadi::Qrqp::meta_doc=
       "\n"
 ;

@@ -23,63 +23,63 @@
  */
 
 
-#ifndef CASADI_CONIC_ACTIVESET_HPP
-#define CASADI_CONIC_ACTIVESET_HPP
+#ifndef CASADI_QRQP_HPP
+#define CASADI_QRQP_HPP
 
 #include "casadi/core/conic_impl.hpp"
-#include <casadi/solvers/casadi_conic_activeset_export.h>
+#include <casadi/solvers/casadi_conic_qrqp_export.h>
 namespace casadi {
 #include "casadi/core/runtime/casadi_qp.hpp"
 } // namespace casadi
 
-/** \defgroup plugin_Conic_activeset
+/** \defgroup plugin_Conic_qrqp
  Solve QPs using an active-set method
 */
 
-/** \pluginsection{Conic,activeset} */
+/** \pluginsection{Conic,qrqp} */
 
 /// \cond INTERNAL
 namespace casadi {
-  struct CASADI_CONIC_ACTIVESET_EXPORT ConicActiveSetMemory : public ConicMemory {
+  struct CASADI_CONIC_QRQP_EXPORT QrqpMemory : public ConicMemory {
   };
 
-  /** \brief \pluginbrief{Conic,activeset}
+  /** \brief \pluginbrief{Conic,qrqp}
 
       @copydoc Conic_doc
-      @copydoc plugin_Conic_activeset
+      @copydoc plugin_Conic_qrqp
 
       \author Joel Andersson
       \date 2018
   */
-  class CASADI_CONIC_ACTIVESET_EXPORT ConicActiveSet : public Conic {
+  class CASADI_CONIC_QRQP_EXPORT Qrqp : public Conic {
   public:
     /** \brief  Create a new Solver */
-    explicit ConicActiveSet(const std::string& name,
-                     const std::map<std::string, Sparsity> &st);
+    explicit Qrqp(const std::string& name,
+                  const std::map<std::string, Sparsity> &st);
 
     /** \brief  Create a new QP Solver */
     static Conic* creator(const std::string& name,
                           const std::map<std::string, Sparsity>& st) {
-      return new ConicActiveSet(name, st);
+      return new Qrqp(name, st);
     }
 
     /** \brief  Destructor */
-    ~ConicActiveSet() override;
+    ~Qrqp() override;
 
     // Get name of the plugin
     const char* plugin_name() const override { return "as";}
 
     // Get name of the class
-    std::string class_name() const override { return "ConicActiveSet";}
+    std::string class_name() const override { return "Qrqp";}
 
     /** \brief Create memory block */
-    void* alloc_mem() const override { return new ConicActiveSetMemory();}
+    void* alloc_mem() const override { return new QrqpMemory();}
 
     /** \brief Initalize memory block */
     int init_mem(void* mem) const override;
 
     /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<ConicActiveSetMemory*>(mem);}
+    void free_mem(void *mem) const override { delete static_cast<QrqpMemory*>(mem);}
 
     ///@{
     /** \brief Options */
@@ -113,4 +113,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_CONIC_ACTIVESET_HPP
+#endif // CASADI_QRQP_HPP

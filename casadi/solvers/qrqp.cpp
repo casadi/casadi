@@ -23,37 +23,37 @@
  */
 
 
-#include "conic_activeset.hpp"
+#include "qrqp.hpp"
 #include "casadi/core/nlpsol.hpp"
 
 using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_CONIC_ACTIVESET_EXPORT
-  casadi_register_conic_activeset(Conic::Plugin* plugin) {
-    plugin->creator = ConicActiveSet::creator;
-    plugin->name = "activeset";
-    plugin->doc = ConicActiveSet::meta_doc.c_str();
+  int CASADI_CONIC_QRQP_EXPORT
+  casadi_register_conic_qrqp(Conic::Plugin* plugin) {
+    plugin->creator = Qrqp::creator;
+    plugin->name = "qrqp";
+    plugin->doc = Qrqp::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
-    plugin->options = &ConicActiveSet::options_;
+    plugin->options = &Qrqp::options_;
     return 0;
   }
 
   extern "C"
-  void CASADI_CONIC_ACTIVESET_EXPORT casadi_load_conic_activeset() {
-    Conic::registerPlugin(casadi_register_conic_activeset);
+  void CASADI_CONIC_QRQP_EXPORT casadi_load_conic_qrqp() {
+    Conic::registerPlugin(casadi_register_conic_qrqp);
   }
 
-  ConicActiveSet::ConicActiveSet(const std::string& name, const std::map<std::string, Sparsity> &st)
+  Qrqp::Qrqp(const std::string& name, const std::map<std::string, Sparsity> &st)
     : Conic(name, st) {
   }
 
-  ConicActiveSet::~ConicActiveSet() {
+  Qrqp::~Qrqp() {
     clear_mem();
   }
 
-  Options ConicActiveSet::options_
+  Options Qrqp::options_
   = {{&Conic::options_},
      {{"max_iter",
        {OT_INT,
@@ -73,7 +73,7 @@ namespace casadi {
      }
   };
 
-  void ConicActiveSet::init(const Dict& opts) {
+  void Qrqp::init(const Dict& opts) {
     // Initialize the base classes
     Conic::init(opts);
 
@@ -134,7 +134,7 @@ namespace casadi {
     if (print_header_) {
       // Print summary
       print("-------------------------------------------\n");
-      print("This is casadi::ConicActiveSet.\n");
+      print("This is QRQP.\n");
       print("Number of variables:                       %9d\n", nx_);
       print("Number of constraints:                     %9d\n", na_);
       print("Number of nonzeros in H:                   %9d\n", H_.nnz());
@@ -146,14 +146,14 @@ namespace casadi {
     }
   }
 
-  int ConicActiveSet::init_mem(void* mem) const {
-    //auto m = static_cast<ConicActiveSetMemory*>(mem);
+  int Qrqp::init_mem(void* mem) const {
+    //auto m = static_cast<QrqpMemory*>(mem);
     return 0;
   }
 
-  int ConicActiveSet::
+  int Qrqp::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    auto m = static_cast<ConicActiveSetMemory*>(mem);
+    auto m = static_cast<QrqpMemory*>(mem);
     // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
     // Check inputs
