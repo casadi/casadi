@@ -63,8 +63,8 @@ if has_conic("cplex"):
 if has_conic("clp"):
   conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False}))
 
-if has_conic("activeset"):
-  conics.append(("activeset",dict(max_iter=20),{"quadratic": True, "dual": True, "soc": False}))
+if has_conic("qrqp"):
+  conics.append(("qrqp",dict(max_iter=20),{"quadratic": True, "dual": True, "soc": False}))
 
 print(conics)
 
@@ -106,7 +106,7 @@ class ConicTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
       try:
-          if conic!="activeset": self.assertTrue(solver.stats()["success"])
+          if conic!="qrqp": self.assertTrue(solver.stats()["success"])
       except:
           raise Exception(str(conic))
 
