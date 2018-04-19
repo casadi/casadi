@@ -252,17 +252,6 @@ endif()
 # enabling Threads support if requested
 option(WITH_THREAD "Compile with parallelization support" OFF)
 option(WITH_THREAD_MINGW "For MINGW, use mingw-std-threads" OFF)
-if(WITH_THREAD)
-  add_definitions(-DCASADI_WITH_THREAD)
-endif()
-if(MINGW AND WITH_THREAD_MINGW)
-  add_definitions(-DCASADI_WITH_THREAD_MINGW)
-else()
-  if(WITH_THREAD)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-  endif()
-endif()
-
 
 # OpenCL
 option(WITH_OPENCL "Compile with OpenCL support (experimental)" OFF)

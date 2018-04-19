@@ -3,6 +3,17 @@ cmake_minimum_required(VERSION 2.8.6)
 # Create runtime
 add_subdirectory(runtime)
 
+if(WITH_THREAD)
+  add_definitions(-DCASADI_WITH_THREAD)
+endif()
+if(MINGW AND WITH_THREAD_MINGW)
+  add_definitions(-DCASADI_WITH_THREAD_MINGW)
+else()
+  if(WITH_THREAD)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+  endif()
+endif()
+
 set(CASADI_PUBLIC
   # MISC
   casadi_limits.hpp
