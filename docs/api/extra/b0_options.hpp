@@ -823,49 +823,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::ConicActiveSet
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
-<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
-<tr><td>du_to_pr</td><td>OT_DOUBLE</td><td>How much larger dual than primal error is acceptable [1000]</td><td>casadi::ConicActiveSet</td></tr>
-<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td><td>casadi::ConicActiveSet</td></tr>
-<tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::ConicActiveSet</td></tr>
-<tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td><td>casadi::ConicActiveSet</td></tr>
-<tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance [1e-8].</td><td>casadi::ConicActiveSet</td></tr>
-</table>
-*/
-/// \endcond
-/** \addtogroup plugin_Conic_activeset
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Description</th></tr>
-<tr><td>du_to_pr</td><td>OT_DOUBLE</td><td>How much larger dual than primal error is acceptable [1000]</td></tr>
-<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td></tr>
-<tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td></tr>
-<tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td></tr>
-<tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance [1e-8].</td></tr>
-</table>
-*/
-/** \addtogroup general_ConicActiveSet
-\n
-\par
-<a name='options'></a><table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
-<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
-<tr><td>du_to_pr</td><td>OT_DOUBLE</td><td>How much larger dual than primal error is acceptable [1000]</td><td>casadi::ConicActiveSet</td></tr>
-<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td><td>casadi::ConicActiveSet</td></tr>
-<tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::ConicActiveSet</td></tr>
-<tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td><td>casadi::ConicActiveSet</td></tr>
-<tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance [1e-8].</td><td>casadi::ConicActiveSet</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::CplexInterface
 \n
 \par
@@ -2712,6 +2669,49 @@
 <tr><td>schur</td><td>OT_BOOL</td><td>Use Schur Complement Approach [false]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>sparse</td><td>OT_BOOL</td><td>Formulate the QP using sparse matrices. [false]</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>terminationTolerance</td><td>OT_DOUBLE</td><td>Relative termination tolerance to stop homotopy.</td><td>casadi::QpoasesInterface</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class casadi::Qrqp
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>du_to_pr</td><td>OT_DOUBLE</td><td>How much larger dual than primal error is acceptable [1000]</td><td>casadi::Qrqp</td></tr>
+<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td><td>casadi::Qrqp</td></tr>
+<tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Qrqp</td></tr>
+<tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td><td>casadi::Qrqp</td></tr>
+<tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance [1e-8].</td><td>casadi::Qrqp</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_Conic_qrqp
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>du_to_pr</td><td>OT_DOUBLE</td><td>How much larger dual than primal error is acceptable [1000]</td></tr>
+<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td></tr>
+<tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td></tr>
+<tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td></tr>
+<tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance [1e-8].</td></tr>
+</table>
+*/
+/** \addtogroup general_Qrqp
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>du_to_pr</td><td>OT_DOUBLE</td><td>How much larger dual than primal error is acceptable [1000]</td><td>casadi::Qrqp</td></tr>
+<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td><td>casadi::Qrqp</td></tr>
+<tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Qrqp</td></tr>
+<tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td><td>casadi::Qrqp</td></tr>
+<tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance [1e-8].</td><td>casadi::Qrqp</td></tr>
 </table>
 */
 /// \cond INTERNAL
