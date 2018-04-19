@@ -138,7 +138,9 @@ if(CXX11FLAG)
 endif()
 
 # Check if mkstemps is available
-if(NOT WIN32)
+if(WIN32)
+  add_definitions(-DHAVE_SIMPLE_MKSTEMPS)
+else()
   file(WRITE ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
       "#include <cstdlib>\n"
       "#include <unistd.h>\n"
@@ -149,12 +151,27 @@ if(NOT WIN32)
       "}\n")
   try_compile(HAVE_MKSTEMPS ${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
               OUTPUT_VARIABLE HAVE_MKSTEMPS_OUTPUT)
+  file(WRITE ${CMAKE_BINARY_DIR}/simple_mkstemps_test.cxx
+      "#include <sys/stat.h>\n"
+      "#include <fcntl.h>\n"
+      "#include <errno.h>\n"
+      "int main() {\n"
+      "  int fd = open(\"test.c\", O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);\n"
+      "}\n")
+  try_compile(HAVE_SIMPLE_MKSTEMPS ${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/simple_mkstemps_test.cxx
+              OUTPUT_VARIABLE HAVE_SIMPLE_MKSTEMPS_OUTPUT)
   if(HAVE_MKSTEMPS)
     add_definitions(-DHAVE_MKSTEMPS)
   else()
-    message(WARNING "mkstemp is not available, falling back on tmpnam. "
-                    "Test compilation returned the following:\n"
-                    "${HAVE_MKSTEMPS_OUTPUT}")
+    if(HAVE_SIMPLE_MKSTEMPS)
+      add_definitions(-DHAVE_SIMPLE_MKSTEMPS)
+    else()
+      message(WARNING "mkstemp is not available, falling back on tmpnam. "
+                      "Test compilation returned the following:\n"
+                      "${HAVE_MKSTEMPS_OUTPUT}"
+                      "Test compilation returned the following:\n"
+                      "${HAVE_SIMPLE_MKSTEMPS_OUTPUT}")
+   endif()
   endif()
 endif()
 
