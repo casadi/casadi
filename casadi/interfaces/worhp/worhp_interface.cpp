@@ -150,24 +150,36 @@ namespace casadi {
     SetWorhpPrint(&worhp_disp);
 
     WorhpPreInit(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
+    m->worhp_o.initialised = false;
+    m->worhp_w.initialised = false;
+    m->worhp_p.initialised = false;
+    m->worhp_c.initialised = false;
 
     // Initialize parameters to default values
     int status;
     InitParams(&status, &m->worhp_p);
+    casadi_assert(status==0, "Problem in Worhp InitParams. Status: " + str(status));
+
 
     // Pass boolean parameters
     for (auto&& op : bool_opts_) {
-      WorhpSetBoolParam(&m->worhp_p, op.first.c_str(), op.second);
+      casadi_assert(
+        WorhpSetBoolParam(&m->worhp_p, op.first.c_str(), op.second),
+        "Problem setting boolean Worhp parameter " + op.first);
     }
 
     // Pass double parameters
     for (auto&& op : double_opts_) {
-      WorhpSetDoubleParam(&m->worhp_p, op.first.c_str(), op.second);
+      casadi_assert(
+        WorhpSetDoubleParam(&m->worhp_p, op.first.c_str(), op.second),
+        "Problem setting double Worhp parameter " + op.first);
     }
 
     // Pass integer parameters
     for (auto&& op : int_opts_) {
-      WorhpSetIntParam(&m->worhp_p, op.first.c_str(), op.second);
+      casadi_assert(
+        WorhpSetIntParam(&m->worhp_p, op.first.c_str(), op.second),
+        "Problem setting integer Worhp parameter " + op.first);
     }
 
     // Pass qp parameters

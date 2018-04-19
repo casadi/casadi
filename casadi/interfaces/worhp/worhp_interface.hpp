@@ -29,11 +29,6 @@
 #include "casadi/core/nlpsol_impl.hpp"
 #include <casadi/interfaces/worhp/casadi_nlpsol_worhp_export.h>
 
-// GCC_VERSION is defined in 'worhp.h'
-#ifdef GCC_VERSION
-#undef GCC_VERSION
-#endif
-
 // Workaround for Clang, but should not be a problem for other compilers, #771
 #define _Bool bool
 
@@ -44,7 +39,7 @@
 /**\defgroup plugin_Nlpsol_worhp
  WORHP interface
 
- Designed for Worhp 1.10
+ Designed for Worhp 1.12
 
 */
 /** \pluginsection{Nlpsol,worhp} **/
