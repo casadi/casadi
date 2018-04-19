@@ -29,15 +29,17 @@
 #ifdef HAVE_MKSTEMPS
 #include <unistd.h>
 #else // HAVE_MKSTEMPS
+#ifdef HAVE_SIMPLE_MKSTEMPS
 #ifdef _WIN32
-#include <random>
 #include <io.h>
 #include <share.h>
+#endif
+#include <random>
+#include <chrono>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <chrono>
-#endif //_WIN32
+#endif // HAVE_SIMPLE_MKSTEMPS
 #endif // HAVE_MKSTEMPS
 using namespace std;
 
@@ -237,7 +239,7 @@ namespace casadi {
     return ss.str();
   }
 
-#if !defined(HAVE_MKSTEMPS) && defined(_WIN32)
+#ifdef HAVE_SIMPLE_MKSTEMPS
 int simple_mkstemps(const std::string& prefix, const std::string& suffix, std::string &result) {
     // Characters available for inventing filenames
     std::string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -262,15 +264,18 @@ int simple_mkstemps(const std::string& prefix, const std::string& suffix, std::s
       }
       result += suffix;
 
+#ifdef _WIN32
       int fd = _sopen(result.c_str(),
         _O_BINARY | _O_CREAT | _O_EXCL | _O_RDWR, _SH_DENYNO, _S_IREAD | _S_IWRITE);
       // Could add _O_TEMPORARY, but then no possiblity of !cleanup_
-
+#else
+      int fd = open(result.c_str(), O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
+#endif
       if (fd != -1) return fd;
       if (fd == -1 && errno != EEXIST) return -1;
     }
   }
-#endif
+#endif // HAVE_SIMPLE_MKSTEMPS
 
   std::string temporary_file(const std::string& prefix, const std::string& suffix) {
     #ifdef HAVE_MKSTEMPS
@@ -281,16 +286,16 @@ int simple_mkstemps(const std::string& prefix, const std::string& suffix, std::s
     }
     return ret;
     #else // HAVE_MKSTEMPS
-    #ifdef _WIN32
+    #ifdef HAVE_SIMPLE_MKSTEMPS
     std::string ret;
     if (simple_mkstemps(prefix, suffix, ret)==-1) {
       casadi_error("Failed to create temporary file: '" + ret + "'");
     }
     return ret;
-    #else // _WIN32
+    #else // HAVE_SIMPLE_MKSTEMPS
     // Fallback, may result in deprecation warnings
     return prefix + string(tmpnam(nullptr)) + suffix;
-    #endif // _WIN32
+    #endif // HAVE_SIMPLE_MKSTEMPS
     #endif // HAVE_MKSTEMPS
   }
 
