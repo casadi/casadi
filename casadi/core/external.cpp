@@ -39,7 +39,7 @@ namespace casadi {
   }
 
   Function external(const string& name, const Dict& opts) {
-    return external(name, "./" + name + ".so", opts);
+    return external(name, "./" + name + SHARED_LIBRARY_SUFFIX, opts);
   }
 
   Function external(const string& name, const string& bin_name,
