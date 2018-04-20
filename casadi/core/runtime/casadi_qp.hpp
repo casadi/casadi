@@ -725,7 +725,7 @@ int casadi_qp_scale_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int*
                                   p->pc, 1e-12);
   for (nulli=0; nulli<nullity_tr; ++nulli) {
     // Get a linear combination of the rows in kkt
-    casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, imina_tr, nulli);
+    casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, nulli);
     // Look for the best constraint for increasing rank
     for (i=0; i<p->nz; ++i) {
       // Check if old column can be removed without decreasing rank
@@ -816,7 +816,7 @@ int casadi_qp_calc_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* 
                     p->prinv, p->pc, d->w);
   } else {
     // Get a linear combination of the columns in KKT
-    casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, d->imina, 0);
+    casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, 0);
   }
   // Calculate change in Lagrangian gradient
   casadi_fill(d->dlam, p->nx, 0.);

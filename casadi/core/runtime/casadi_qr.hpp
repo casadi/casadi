@@ -3,22 +3,22 @@
 // Householder reflection
 // Ref: Chapter 5, Direct Methods for Sparse Linear Systems by Tim Davis
 template<typename T1>
-T1 casadi_house(T1* x, T1* beta, casadi_int n) {
+T1 casadi_house(T1* v, T1* beta, casadi_int nv) {
   // Local variable
   casadi_int i;
-  T1 x0, sigma, s, sigma_is_zero, x0_nonpos;
+  T1 v0, sigma, s, sigma_is_zero, v0_nonpos;
   // Calculate norm
-  x0 = x[0]; // Save x0 (overwritten below)
+  v0 = v[0]; // Save v0 (overwritten below)
   sigma=0;
-  for (i=1; i<n; ++i) sigma += x[i]*x[i];
-  s = sqrt(x0*x0 + sigma); // s = norm(x)
+  for (i=1; i<nv; ++i) sigma += v[i]*v[i];
+  s = sqrt(v0*v0 + sigma); // s = norm(v)
   // Calculate consistently with symbolic datatypes (SXElem)
   sigma_is_zero = sigma==0;
-  x0_nonpos = x0<=0;
+  v0_nonpos = v0<=0;
   // C-REPLACE "if_else" "casadi_if_else"
-  x[0] = if_else(sigma_is_zero, 1,
-                 if_else(x0_nonpos, x0-s, -sigma/(x0+s)));
-  *beta = if_else(sigma_is_zero, 2*x0_nonpos, -1/(s*x[0]));
+  v[0] = if_else(sigma_is_zero, 1,
+                 if_else(v0_nonpos, v0-s, -sigma/(v0+s)));
+  *beta = if_else(sigma_is_zero, 2*v0_nonpos, -1/(s*v[0]));
   return s;
 }
 
@@ -185,59 +185,64 @@ casadi_int casadi_qr_singular(T1* rmin, casadi_int* irmin, const T1* nz_r,
                              const casadi_int* sp_r, const casadi_int* pc, T1 eps) {
   // Local variables
   T1 rd;
-  casadi_int ncol, c;
+  casadi_int ncol, c, nullity;
   const casadi_int* r_colind;
+  // Nullity
+  nullity = 0;
   // Extract sparsity
   ncol = sp_r[1];
   r_colind = sp_r + 2;
   // Find the smallest diagonal entry
   for (c=0; c<ncol; ++c) {
     rd = fabs(nz_r[r_colind[c+1]-1]);
+    // Increase nullity if smaller than eps
+    if (rd<eps) nullity++;
+    // Check if smallest so far
     if (c==0 || rd < *rmin) {
-      // Accept if smallest so far
       *rmin = rd;
       *irmin = pc[c];
-      // Stop if smaller than eps (r entries after that are unreliable)
-      if (rd<eps) return ncol-c;
     }
   }
   // Successful return
-  return 0;
+  return nullity;
 }
 
 // SYMBOL "qr_colcomb"
 // Get a vector v such that A*v = 0 and |v| == 1
 template<typename T1>
 void casadi_qr_colcomb(T1* v, const T1* nz_r, const casadi_int* sp_r,
-                       const casadi_int* pc, casadi_int irmin, casadi_int ind) {
+                       const casadi_int* pc, T1 eps, casadi_int ind) {
   // Local variables
-  casadi_int ncol, r, c, k, crmin;
+  casadi_int ncol, r, c, k;
   const casadi_int *r_colind, *r_row;
   // Extract sparsity
   ncol = sp_r[1];
   r_colind = sp_r + 2;
   r_row = r_colind + ncol + 1;
-  // Get c such that pc[c] == irmin
-  crmin = -1;
+  // Find the ind-th diagonal which is smaller than eps, overwrite ind with c
   for (c=0; c<ncol; ++c) {
-    if (pc[c]==irmin) {
-      crmin = c;
+    if (fabs(nz_r[r_colind[c+1]-1])<eps && 0==ind--) {
+      ind = c;
       break;
     }
   }
   // Reset w
   casadi_fill(v, ncol, 0.);
-  v[pc[crmin+ind]] = 1.;
-  // Copy crmin-th column to v
-  for (k=r_colind[crmin+ind]; k<r_colind[crmin+ind+1]-1; ++k) {
+  v[pc[ind]] = 1.;
+  // Copy ind-th column to v
+  for (k=r_colind[ind]; k<r_colind[ind+1]-1; ++k) {
     v[pc[r_row[k]]] = -nz_r[k];
   }
   // Backward substitution
-  for (c=crmin-1; c>=0; --c) {
+  for (c=ind-1; c>=0; --c) {
     for (k=r_colind[c+1]-1; k>=r_colind[c]; --k) {
       r=r_row[k];
       if (r==c) {
-        v[pc[r]] /= nz_r[k];
+        if (fabs(nz_r[k])<eps) {
+          v[pc[r]] = 0;
+        } else {
+          v[pc[r]] /= nz_r[k];
+        }
       } else {
         v[pc[r]] -= nz_r[k]*v[pc[c]];
       }
