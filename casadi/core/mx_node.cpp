@@ -703,7 +703,13 @@ namespace casadi {
   }
 
   MX MXNode::get_find() const {
-    return MX::create(new Find(shared_from_this<MX>()));
+    MX x = shared_from_this<MX>();
+    casadi_assert(x.is_vector(), "Argument must be vector, got " + x.dim() + ".");
+    if (x.is_column()) {
+      return MX::create(new Find(shared_from_this<MX>()));
+    } else {
+      return find(x.T());
+    }
   }
 
   MX MXNode::get_det() const {
