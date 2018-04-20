@@ -70,6 +70,11 @@ namespace casadi {
     // Call the init method of the base class
     Nlpsol::init(opts);
 
+    if (CheckWorhpVersion(WORHP_MAJOR, WORHP_MINOR, WORHP_PATCH)) {
+      casadi_warning("Worhp incompatibility. Interface was compiled for Worhp " +
+        str(WORHP_MAJOR) + "." + str(WORHP_MINOR) + "." + std::string(WORHP_PATCH));
+    }
+
     // Default options
     Dict worhp_opts;
 
