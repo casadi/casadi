@@ -184,7 +184,7 @@ template<typename T1>
 casadi_int casadi_qr_singular(T1* rmin, casadi_int* irmin, const T1* nz_r,
                              const casadi_int* sp_r, const casadi_int* pc, T1 eps) {
   // Local variables
-  T1 rd;
+  T1 rd, rd_min;
   casadi_int ncol, c, nullity;
   const casadi_int* r_colind;
   // Nullity
@@ -198,12 +198,13 @@ casadi_int casadi_qr_singular(T1* rmin, casadi_int* irmin, const T1* nz_r,
     // Increase nullity if smaller than eps
     if (rd<eps) nullity++;
     // Check if smallest so far
-    if (c==0 || rd < *rmin) {
-      *rmin = rd;
-      *irmin = pc[c];
+    if (c==0 || rd < rd_min) {
+      rd_min = rd;
+      if (rmin) *rmin = rd;
+      if (irmin) *irmin = pc[c];
     }
   }
-  // Successful return
+  // Return number of zero-ish eigenvalues
   return nullity;
 }
 

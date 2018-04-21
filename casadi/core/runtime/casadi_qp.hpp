@@ -677,30 +677,30 @@ void casadi_qp_expand_step(casadi_qp_data<T1>* d) {
 }
 
 // SYMBOL "qp_singular_step"
+// C-REPLACE "static_cast<T1*>(0)" "0"
 template<typename T1>
 int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
   // Local variables
-  T1 tau_test, minat_tr, tau;
-  casadi_int nnz_kkt, nullity_tr, nulli, imina_tr, i;
+  T1 tau_test, tau;
+  casadi_int nnz_kkt, nk, k, i;
   const casadi_qp_prob<T1>* p = d->prob;
   // Get a linear combination of the columns in KKT
   casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, 0);
-  // Have step in dz[:nx] and dlam[nx:]. Calculate complete dz and dlam
-  casadi_qp_expand_step(d);
   // QR factorization of the transpose
   casadi_trans(d->nz_kkt, p->sp_kkt, d->nz_v, p->sp_kkt, d->iw);
   nnz_kkt = p->sp_kkt[2+p->nz]; // kkt_colind[nz]
   casadi_copy(d->nz_v, nnz_kkt, d->nz_kkt);
   casadi_qr(p->sp_kkt, d->nz_kkt, d->w, p->sp_v, d->nz_v, p->sp_r, d->nz_r,
             d->beta, p->prinv, p->pc);
+  // Have step in dz[:nx] and dlam[nx:]. Calculate complete dz and dlam
+  casadi_qp_expand_step(d);
   // Best flip
   tau = p->inf;
   // For all nullspace vectors
-  nullity_tr = casadi_qr_singular(&minat_tr, &imina_tr, d->nz_r, p->sp_r,
-                                  p->pc, 1e-12);
-  for (nulli=0; nulli<nullity_tr; ++nulli) {
+  nk = casadi_qr_singular(static_cast<T1*>(0), 0, d->nz_r, p->sp_r, p->pc, 1e-12);
+  for (k=0; k<nk; ++k) {
     // Get a linear combination of the rows in kkt
-    casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, nulli);
+    casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, k);
     // Look for the best constraint for increasing rank
     for (i=0; i<p->nz; ++i) {
       // Check if old column can be removed without decreasing rank
