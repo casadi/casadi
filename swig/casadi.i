@@ -96,7 +96,7 @@
   namespace casadi {
     // Redirect printout to mexPrintf
     static void mexlogger(const char* s, std::streamsize num, bool error) {
-      mexPrintf("%.*s", static_cast<casadi_int>(num), s);
+      mexPrintf("%.*s", static_cast<int>(num), s);
     }
 
 #ifdef HAVE_OCTAVE
