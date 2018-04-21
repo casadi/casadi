@@ -684,6 +684,8 @@ namespace casadi {
     }
     ///@}
 
+    void foobar() const;
+
     /** \brief Export / Generate C code for the function */
     std::string generate(const std::string& fname, const Dict& opts=Dict()) const;
 
