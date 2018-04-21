@@ -680,57 +680,13 @@ void casadi_qp_expand_step(casadi_qp_data<T1>* d) {
 template<typename T1>
 int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
   // Local variables
-  T1 tpr, tdu, tau_test, minat_tr, tau;
-  int pos_ok, neg_ok;
+  T1 tau_test, minat_tr, tau;
   casadi_int nnz_kkt, nullity_tr, nulli, imina_tr, i;
   const casadi_qp_prob<T1>* p = d->prob;
   // Get a linear combination of the columns in KKT
   casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, 0);
   // Have step in dz[:nx] and dlam[nx:]. Calculate complete dz and dlam
   casadi_qp_expand_step(d);
-  // Change in pr, du in the search direction
-  tpr = d->ipr<0 ? 0.
-                 : d->z[d->ipr]>d->ubz[d->ipr] ? d->dz[d->ipr]/d->pr
-                                               : -d->dz[d->ipr]/d->pr;
-  tdu = d->idu<0 ? 0. : d->tinfeas[d->idu]/d->infeas[d->idu];
-  // Change in max(pr, du) in the search direction
-  pos_ok=1, neg_ok=1;
-  if (d->pr>d->du) {
-    // |pr|>|du|
-    if (tpr<0) {
-      neg_ok = 0;
-    } else if (tpr>0) {
-      pos_ok = 0;
-    }
-  } else if (d->pr<d->du) {
-    // |pr|<|du|
-    if (tdu<0) {
-      neg_ok = 0;
-    } else if (tdu>0) {
-      pos_ok = 0;
-    }
-  } else {
-    // |pr|==|du|
-    if ((tpr>0 && tdu<0) || (tpr<0 && tdu>0)) {
-      // |pr|==|du| cannot be decreased along the search direction
-      pos_ok = neg_ok = 0;
-    } else if (fmin(tpr, tdu)<0) {
-      // |pr|==|du| decreases for positive tau
-      neg_ok = 0;
-    } else if (fmax(tpr, tdu)>0) {
-      // |pr|==|du| decreases for negative tau
-      pos_ok = 0;
-    }
-  }
-  // If primal error is dominating and constraint is active,
-  // then only allow the multiplier to become larger
-  if (p->du_to_pr*d->pr>=d->du && d->lam[d->ipr]!=0 && fabs(d->dlam[d->ipr])>1e-12) {
-    if ((d->lam[d->ipr]>0)==(d->dlam[d->ipr]>0)) {
-      neg_ok = 0;
-    } else {
-      pos_ok = 0;
-    }
-  }
   // QR factorization of the transpose
   casadi_trans(d->nz_kkt, p->sp_kkt, d->nz_v, p->sp_kkt, d->iw);
   nnz_kkt = p->sp_kkt[2+p->nz]; // kkt_colind[nz]
@@ -789,8 +745,6 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         // Step needed to bring lam to zero
         if (!d->neverzero[i]) {
           tau_test = -d->lam[i]/d->dlam[i];
-          // Make sure direction is permitted
-          if ((tau_test>0 && !pos_ok) || (tau_test<0 && !neg_ok)) continue;
           // Check if best so far
           if (fabs(tau_test)<fabs(tau)) {
             tau = tau_test;
