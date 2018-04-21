@@ -2666,7 +2666,7 @@ namespace casadi{
 #ifdef SWIGMATLAB
   %matlabcode %{
     function s = repr(self)
-      s = [s.type_name() '(' self.str() ')'];
+      s = [self.type_name() '(' self.str() ')'];
     end
   %}
 #endif // SWIGMATLAB
