@@ -991,7 +991,7 @@ namespace casadi {
     (*this)->print_options(stream);
   }
 
-  void foobar() const {
+  void Function::foobar() const {
     std::ofstream stream("test.txt");
     stream << "test" << std::endl;
   }
