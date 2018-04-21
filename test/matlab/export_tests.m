@@ -34,8 +34,8 @@ g = {g{:}, 1./x};
 
 
 args = symvar(veccat(g{:}));
-f_mx = Function('f',args,g);
-f_sx = f_mx.expand();
+f_mx = Function('f_mx_exported',args,g);
+f_sx = expand(Function('f_sx_exported',args,g));
 
 f_mx.export_code('matlab','f_mx_exported.m')
 f_sx.export_code('matlab','f_sx_exported.m')
@@ -84,7 +84,7 @@ linsol = Linsol('solver', 'lapackqr', x.sparsity())
 r = linsol.solve(x,y,false)
 rt = linsol.solve(x,y,true)
 
-f_mx = Function('f',args,{inv_node(x), inv_node(y), det(x), det(y),x\y,r,rt});
+f_mx = Function('f_mx_exported',args,{inv_node(x), inv_node(y), det(x), det(y),x\y,r,rt});
 f_mx.disp(true)
 f_mx.export_code('matlab','f_mx_exported.m')
 clear f_mx_exported
