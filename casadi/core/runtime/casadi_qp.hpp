@@ -648,20 +648,46 @@ void casadi_qp_factorize(casadi_qp_data<T1>* d) {
   d->sing = casadi_qr_singular(&d->mina, &d->imina, d->nz_r, p->sp_r, p->pc, 1e-12);
 }
 
-// SYMBOL "qp_scale_step"
+// SYMBOL "qp_expand_step"
 template<typename T1>
-int casadi_qp_scale_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
+void casadi_qp_expand_step(casadi_qp_data<T1>* d) {
+  // Local variables
+  casadi_int i;
+  const casadi_qp_prob<T1>* p = d->prob;
+  // Calculate change in Lagrangian gradient
+  casadi_fill(d->dlam, p->nx, 0.);
+  casadi_mv(d->nz_h, p->sp_h, d->dz, d->dlam, 0); // gradient of the objective
+  casadi_mv(d->nz_a, p->sp_a, d->dz+p->nx, d->dlam, 1); // gradient of the Lagrangian
+  // Step in lam[:nx]
+  casadi_scal(p->nx, -1., d->dlam);
+  // For inactive constraints, lam(x) step is zero
+  for (i=0; i<p->nx; ++i) if (d->lam[i]==0.) d->dlam[i] = 0.;
+  // Step in lam[nx:]
+  casadi_copy(d->dz+p->nx, p->na, d->dlam+p->nx);
+  // Step in z[nx:]
+  casadi_fill(d->dz+p->nx, p->na, 0.);
+  casadi_mv(d->nz_a, p->sp_a, d->dz, d->dz+p->nx, 0);
+  // Avoid steps that are nonzero due to numerics
+  for (i=0; i<p->nz; ++i) if (fabs(d->dz[i])<1e-14) d->dz[i] = 0.;
+  // Tangent of the dual infeasibility at tau=0
+  casadi_fill(d->tinfeas, p->nx, 0.);
+  casadi_mv(d->nz_h, p->sp_h, d->dz, d->tinfeas, 0);
+  casadi_mv(d->nz_a, p->sp_a, d->dlam+p->nx, d->tinfeas, 1);
+  casadi_axpy(p->nx, 1., d->dlam, d->tinfeas);
+}
+
+// SYMBOL "qp_singular_step"
+template<typename T1>
+int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
   // Local variables
   T1 tpr, tdu, terr, tau_test, minat_tr, tau;
   int pos_ok, neg_ok;
   casadi_int nnz_kkt, nullity_tr, nulli, imina_tr, i;
   const casadi_qp_prob<T1>* p = d->prob;
-  // Reset r_index, r_sign, quick return if non-singular
-  *r_index = -1;
-  *r_sign = 0;
-  if (!d->sing) {
-    return 0;
-  }
+  // Get a linear combination of the columns in KKT
+  casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, 0);
+  // Have step in dz[:nx] and dlam[nx:]. Calculate complete dz and dlam
+  casadi_qp_expand_step(d);
   // Change in pr, du in the search direction
   tpr = d->ipr<0 ? 0.
                  : d->z[d->ipr]>d->ubz[d->ipr] ? d->dz[d->ipr]/d->pr
@@ -805,41 +831,21 @@ int casadi_qp_scale_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int*
 template<typename T1>
 int casadi_qp_calc_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
   // Local variables
-  casadi_int i;
   const casadi_qp_prob<T1>* p = d->prob;
-  // Calculate step in z[:nx] and lam[nx:]
-  if (!d->sing) {
-    // Negative KKT residual
-    casadi_qp_kkt_residual(d, d->dz);
-    // Solve to get primal-dual step
-    casadi_qr_solve(d->dz, 1, 1, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
-                    p->prinv, p->pc, d->w);
-  } else {
-    // Get a linear combination of the columns in KKT
-    casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, 0);
-  }
-  // Calculate change in Lagrangian gradient
-  casadi_fill(d->dlam, p->nx, 0.);
-  casadi_mv(d->nz_h, p->sp_h, d->dz, d->dlam, 0); // gradient of the objective
-  casadi_mv(d->nz_a, p->sp_a, d->dz+p->nx, d->dlam, 1); // gradient of the Lagrangian
-  // Step in lam[:nx]
-  casadi_scal(p->nx, -1., d->dlam);
-  // For inactive constraints, lam(x) step is zero
-  for (i=0; i<p->nx; ++i) if (d->lam[i]==0.) d->dlam[i] = 0.;
-  // Step in lam[nx:]
-  casadi_copy(d->dz+p->nx, p->na, d->dlam+p->nx);
-  // Step in z[nx:]
-  casadi_fill(d->dz+p->nx, p->na, 0.);
-  casadi_mv(d->nz_a, p->sp_a, d->dz, d->dz+p->nx, 0);
-  // Avoid steps that are nonzero due to numerics
-  for (i=0; i<p->nz; ++i) if (fabs(d->dz[i])<1e-14) d->dz[i] = 0.;
-  // Tangent of the dual infeasibility at tau=0
-  casadi_fill(d->tinfeas, p->nx, 0.);
-  casadi_mv(d->nz_h, p->sp_h, d->dz, d->tinfeas, 0);
-  casadi_mv(d->nz_a, p->sp_a, d->dlam+p->nx, d->tinfeas, 1);
-  casadi_axpy(p->nx, 1., d->dlam, d->tinfeas);
-  // Calculate step length
-  return casadi_qp_scale_step(d, r_index, r_sign);
+  // Reset returns
+  *r_index = -1;
+  *r_sign = 0;
+  // Handle singularity
+  if (d->sing) return casadi_qp_singular_step(d, r_index, r_sign);
+  // Negative KKT residual
+  casadi_qp_kkt_residual(d, d->dz);
+  // Solve to get step in z[:nx] and lam[nx:]
+  casadi_qr_solve(d->dz, 1, 1, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
+                  p->prinv, p->pc, d->w);
+  // Have step in dz[:nx] and dlam[nx:]. Calculate complete dz and dlam
+  casadi_qp_expand_step(d);
+  // Successful return
+  return 0;
 }
 
 // SYMBOL "qp_calc_dependent"
