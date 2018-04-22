@@ -692,8 +692,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   casadi_copy(d->nz_v, nnz_kkt, d->nz_kkt);
   casadi_qr(p->sp_kkt, d->nz_kkt, d->w, p->sp_v, d->nz_v, p->sp_r, d->nz_r,
             d->beta, p->prinv, p->pc);
-  // Have step in dz[:nx] and dlam[nx:]. Calculate complete dz and dlam
-  casadi_qp_expand_step(d);
+  // Which constraints are not part of the linear combination
+  for (i=0; i<p->nz; ++i) d->iw[i] = fabs(d->dz[i])<1e-12;
   // Best flip
   tau = p->inf;
   // For all nullspace vectors
@@ -701,12 +701,12 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   for (k=0; k<nk; ++k) {
     // Get a linear combination of the rows in kkt
     casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, k);
+    // Have step in dz[:nx] and dlam[nx:]. Calculate complete dz and dlam
+    casadi_qp_expand_step(d);
     // Look for the best constraint for increasing rank
     for (i=0; i<p->nz; ++i) {
-      // Check if old column can be removed without decreasing rank
-      if (fabs(i<p->nx ? d->dz[i] : d->dlam[i])<1e-12) continue;
-      // If dot(w, kkt_diff(i))==0, rank won't increase
-      if (fabs(casadi_qp_kkt_dot(d, d->w, i))<1e-12) continue;
+      // Rank increase criteria
+      if (d->iw[i] || fabs(casadi_qp_kkt_dot(d, d->w, i))<1e-12) continue;
       // Is constraint active?
       if (d->lam[i]==0.) {
         // Make sure that step is nonzero
