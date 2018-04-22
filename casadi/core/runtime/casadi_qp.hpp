@@ -703,61 +703,81 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   // For all nullspace vectors
   nk = casadi_qr_singular(static_cast<T1*>(0), 0, d->nz_r, p->sp_r, p->pc, 1e-12);
   for (k=0; k<nk; ++k) {
+    // Local variables
+    int pos_ok, neg_ok;
     // Get a linear combination of the rows in kkt
     casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, k);
+    // Which constraints can be flipped in order to increase rank?
+    for (i=0; i<p->nz; ++i) {
+      d->iw[i] = d->lincomb[i] && fabs(casadi_qp_kkt_dot(d, d->w, i))>=1e-12;
+    }
     // Calculate step, dz and dlam
     casadi_copy(d->w, p->nz, d->dz);
     casadi_qp_expand_step(d);
-    // Look for the best constraint for increasing rank
-    for (i=0; i<p->nz; ++i) {
-      // Rank increase criteria
-      if (d->lincomb[i]==0 || fabs(casadi_qp_kkt_dot(d, d->w, i))<1e-12) continue;
-      // Is constraint active?
-      if (d->lam[i]==0.) {
-        // Make sure that step is nonzero
-        if (fabs(d->dz[i])<1e-12) continue;
-        // Step needed to bring z to lower bound
-        if (!d->neverlower[i]) {
-          tau_test = (d->lbz[i]-d->z[i])/d->dz[i];
-          // Only allow removing constraints if tau_test==0
-          if (fabs(tau_test)>=1e-16) {
-            // Check if best so far
-            if (fabs(tau_test)<fabs(tau)) {
-              tau = tau_test;
-              *r_index = i;
-              *r_sign = -1;
-              casadi_qp_log(d, "Enforced lbz[%lld] for regularity", i);
-            }
-          }
-        }
-        // Step needed to bring z to upper bound
-        if (!d->neverupper[i]) {
-          tau_test = (d->ubz[i]-d->z[i])/d->dz[i];
-          // Only allow removing constraints if tau_test==0
-          if (fabs(tau_test)>=1e-16) {
-            // Check if best so far
-            if (fabs(tau_test)<fabs(tau)) {
-              tau = tau_test;
-              *r_index = i;
-              *r_sign = 1;
-              casadi_qp_log(d, "Enforced ubz[%lld] for regularity", i);
-            }
-          }
+    // Check if primal or dual error is dominating
+    pos_ok = neg_ok = 1;
+    if (p->du_to_pr*d->pr >= d->du) {
+      // Make sure that primal error doesn't increase in the search direction
+      if (d->z[d->ipr]>d->ubz[d->ipr]) {
+        // Upper bound violated, make sure volation doesn't increase
+        if (d->dz[d->ipr]>0) {
+          pos_ok = 0;
+        } else if (d->dz[d->ipr]<0) {
+          neg_ok = 0;
         }
       } else {
-        // Make sure that step is nonzero
-        if (fabs(d->dlam[i])<1e-12) continue;
-        // Step needed to bring lam to zero
-        if (!d->neverzero[i]) {
-          tau_test = -d->lam[i]/d->dlam[i];
-          // Check if best so far
-          if (fabs(tau_test)<fabs(tau)) {
-            tau = tau_test;
-            *r_index = i;
-            *r_sign = 0;
-            casadi_qp_log(d, "Dropped %s[%lld] for regularity",
-                   d->lam[i]>0 ? "lbz" : "ubz", i);
-          }
+        // Lower bound violated, make sure volation doesn't increase
+        if (d->dz[d->ipr]>0) {
+          neg_ok = 0;
+        } else if (d->dz[d->ipr]<0) {
+          pos_ok = 0;
+        }
+      }
+    } else {
+      // Make sure dual infeasibility doesn't increase in the search direction
+      if (d->infeas[d->idu]>0) {
+        if (d->tinfeas[d->idu]>0) pos_ok = 0;
+      } else {
+        if (d->tinfeas[d->idu]<0) neg_ok = 0;
+      }
+    }
+    // Can we enforce a lower bound?
+    for (i=0; i<p->nz; ++i) {
+      if (d->iw[i] && d->lam[i]==0. && !d->neverlower[i] && fabs(d->dz[i])>=1e-12) {
+        if ((d->lbz[i]>d->z[i])==(d->dz[i]>0) ? !pos_ok : !neg_ok) continue;
+        tau_test = (d->lbz[i]-d->z[i])/d->dz[i];
+        if (fabs(tau_test)>=1e-16 && fabs(tau_test)<fabs(tau)) {
+          tau = tau_test;
+          *r_index = i;
+          *r_sign = -1;
+          casadi_qp_log(d, "Enforced lbz[%lld] for regularity", i);
+        }
+      }
+    }
+    // Can we enforce an upper bound?
+    for (i=0; i<p->nz; ++i) {
+      if (d->iw[i] && d->lam[i]==0. && !d->neverupper[i] && fabs(d->dz[i])>=1e-12) {
+        if ((d->ubz[i]>d->z[i])==(d->dz[i]>0) ? !pos_ok : !neg_ok) continue;
+        tau_test = (d->ubz[i]-d->z[i])/d->dz[i];
+        if (fabs(tau_test)>=1e-16 && fabs(tau_test)<fabs(tau)) {
+          tau = tau_test;
+          *r_index = i;
+          *r_sign = 1;
+          casadi_qp_log(d, "Enforced ubz[%lld] for regularity", i);
+        }
+      }
+    }
+    // Can we drop a constraint?
+    for (i=0; i<p->nz; ++i) {
+      if (d->iw[i] && d->lam[i]!=0. && !d->neverzero[i] && fabs(d->dlam[i])>=1e-12) {
+        if ((d->lam[i]>0)==(d->dlam[i]>0) ? !neg_ok : !pos_ok) continue;
+        tau_test = -d->lam[i]/d->dlam[i];
+        // Check if best so far
+        if (fabs(tau_test)>=1e-16 && fabs(tau_test)<fabs(tau)) {
+          tau = tau_test;
+          *r_index = i;
+          *r_sign = 0;
+          casadi_qp_log(d, "Dropped %s[%lld] for regularity", d->lam[i]>0 ? "lbz" : "ubz", i);
         }
       }
     }
@@ -830,15 +850,18 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
 
 template<typename T1>
 void casadi_qp_linesearch(casadi_qp_data<T1>* d, casadi_int* index, casadi_int* sign) {
+  T1 e;
   const casadi_qp_prob<T1>* p = d->prob;
   // Start with a full step and no active set change
   *sign=0;
   *index=-1;
   d->tau = 1.;
   // Find largest possible step without exceeding acceptable |pr|
-  casadi_qp_primal_blocking(d, fmax(d->pr, d->du/p->du_to_pr), index, sign);
+  e = d->sing ? 0 : fmax(d->pr, d->du/p->du_to_pr);
+  casadi_qp_primal_blocking(d, e, index, sign);
   // Find largest possible step without exceeding acceptable |du|
-  if (casadi_qp_dual_blocking(d, fmax(d->pr*p->du_to_pr, d->du))>=0) {
+  e = d->sing ? 0 : fmax(d->pr*p->du_to_pr, d->du);
+  if (casadi_qp_dual_blocking(d, e)>=0) {
     *index = -1;
     *sign=0;
   }
