@@ -756,6 +756,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         }
       }
     }
+    // Break at first possible direction
+    if (*r_index>=0) break;
   }
   // Can we restore feasibility?
   if (*r_index<0) return 1;
