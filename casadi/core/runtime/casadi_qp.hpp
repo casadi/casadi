@@ -55,6 +55,7 @@ void casadi_qp_work(casadi_qp_prob<T1>* p, casadi_int* sz_iw, casadi_int* sz_w) 
   *sz_iw += p->nz; // neverzero
   *sz_iw += p->nz; // neverupper
   *sz_iw += p->nz; // neverlower
+  *sz_iw += p->nz; // lincomb
   *sz_w += std::max(nnz_v+nnz_r, nnz_kkt); // [v,r] or trans(kkt)
   *sz_w += p->nz; // beta
 }
@@ -70,7 +71,7 @@ struct casadi_qp_data {
   const T1 *nz_a, *nz_h, *g;
   // Vectors
   T1 *z, *lbz, *ubz, *infeas, *tinfeas, *sens, *lam, *w, *dz, *dlam;
-  casadi_int *iw, *neverzero, *neverlower, *neverupper;
+  casadi_int *iw, *neverzero, *neverlower, *neverupper, *lincomb;
   // Numeric QR factorization
   T1 *nz_at, *nz_kkt, *beta, *nz_v, *nz_r;
   // Message buffer
@@ -116,6 +117,7 @@ void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int* iw, T1* w) {
   d->neverzero = iw; iw += p->nz;
   d->neverupper = iw; iw += p->nz;
   d->neverlower = iw; iw += p->nz;
+  d->lincomb = iw; iw += p->nz;
   d->w = w;
   d->iw = iw;
 }
@@ -684,16 +686,18 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   T1 tau_test, tau;
   casadi_int nnz_kkt, nk, k, i;
   const casadi_qp_prob<T1>* p = d->prob;
-  // Get a linear combination of the columns in KKT
-  casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, 0);
+  // Find the columns that take part in any linear combination
+  for (i=0; i<p->nz; ++i) d->lincomb[i]=0;
+  for (k=0; k<d->sing; ++k) {
+    casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, k);
+    for (i=0; i<p->nz; ++i) if (fabs(d->w[i])>=1e-12) d->lincomb[i]++;
+  }
   // QR factorization of the transpose
   casadi_trans(d->nz_kkt, p->sp_kkt, d->nz_v, p->sp_kkt, d->iw);
   nnz_kkt = p->sp_kkt[2+p->nz]; // kkt_colind[nz]
   casadi_copy(d->nz_v, nnz_kkt, d->nz_kkt);
   casadi_qr(p->sp_kkt, d->nz_kkt, d->w, p->sp_v, d->nz_v, p->sp_r, d->nz_r,
             d->beta, p->prinv, p->pc);
-  // Which constraints are not part of the linear combination
-  for (i=0; i<p->nz; ++i) d->iw[i] = fabs(d->dz[i])<1e-12;
   // Best flip
   tau = p->inf;
   // For all nullspace vectors
@@ -701,12 +705,13 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   for (k=0; k<nk; ++k) {
     // Get a linear combination of the rows in kkt
     casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, k);
-    // Have step in dz[:nx] and dlam[nx:]. Calculate complete dz and dlam
+    // Calculate step, dz and dlam
+    casadi_copy(d->w, p->nz, d->dz);
     casadi_qp_expand_step(d);
     // Look for the best constraint for increasing rank
     for (i=0; i<p->nz; ++i) {
       // Rank increase criteria
-      if (d->iw[i] || fabs(casadi_qp_kkt_dot(d, d->w, i))<1e-12) continue;
+      if (d->lincomb[i]==0 || fabs(casadi_qp_kkt_dot(d, d->w, i))<1e-12) continue;
       // Is constraint active?
       if (d->lam[i]==0.) {
         // Make sure that step is nonzero
