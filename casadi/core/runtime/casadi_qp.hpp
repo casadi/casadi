@@ -725,12 +725,28 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         } else if (d->dz[d->ipr]<0) {
           neg_ok = 0;
         }
+        // If enforced, only allow the multiplier to become larger in magnitude
+        if (d->lam[d->ipr]>0) {
+          if (d->dlam[d->ipr]>0) {
+            neg_ok = 0;
+          } else if (d->dlam[d->ipr]<0) {
+            pos_ok = 0;
+          }
+        }
       } else {
         // Lower bound violated, make sure volation doesn't increase
         if (d->dz[d->ipr]>0) {
           neg_ok = 0;
         } else if (d->dz[d->ipr]<0) {
           pos_ok = 0;
+        }
+        // If enforced, only allow the multiplier to become larger in magnitude
+        if (d->lam[d->ipr]<0) {
+          if (d->dlam[d->ipr]<0) {
+            neg_ok = 0;
+          } else if (d->dlam[d->ipr]>0) {
+            pos_ok = 0;
+          }
         }
       }
     } else {
