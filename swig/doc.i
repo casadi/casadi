@@ -74187,7 +74187,8 @@ x) "
 
 ";
 
-%feature("docstring")  casadi::casadi_house(T1 *x, T1 *beta, casadi_int n) "
+%feature("docstring")  casadi::casadi_house(T1 *v, T1 *beta, casadi_int nv)
+"
 
 [INTERNAL] ";
 
@@ -74303,8 +74304,7 @@ Get the documentation string for a plugin.
 ";
 
 %feature("docstring")  casadi::casadi_qr_colcomb(T1 *v, const T1 *nz_r,
-const casadi_int *sp_r, const casadi_int *pc, casadi_int irmin, casadi_int
-ind) "
+const casadi_int *sp_r, const casadi_int *pc, T1 eps, casadi_int ind) "
 
 [INTERNAL] ";
 
