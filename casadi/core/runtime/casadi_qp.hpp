@@ -704,7 +704,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   nk = casadi_qr_singular(static_cast<T1*>(0), 0, d->nz_r, p->sp_r, p->pc, 1e-12);
   for (k=0; k<nk; ++k) {
     // Local variables
-    T1 tau_min, tau_max, s;
+    T1 tau_min, tau_max;
     // Get a linear combination of the rows in kkt
     casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, k);
     // Which constraints can be flipped in order to increase rank?
@@ -728,6 +728,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         }
         // If enforced, do not allow multiplier to cross zero
         if (d->lam[d->ipr]>0) {
+          d->iw[d->ipr] = 0;
           if (d->dlam[d->ipr]>0) {
             tau_min = -d->lam[d->ipr]/d->dlam[d->ipr];
           } else if (d->dlam[d->ipr]<0) {
@@ -743,6 +744,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         }
         // If enforced, do not allow multiplier to cross zero
         if (d->lam[d->ipr]<0) {
+          d->iw[d->ipr] = 0;
           if (d->dlam[d->ipr]<0) {
             tau_min = -d->lam[d->ipr]/d->dlam[d->ipr];
           } else if (d->dlam[d->ipr]>0) {
@@ -786,12 +788,12 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     }
     // Can we drop a constraint?
     for (i=0; i<p->nz; ++i) {
-      if (d->iw[i] && d->lam[i]!=0. && !d->neverzero[i] && (s=fabs(d->dlam[i]))>=1e-12) {
-        tau_test = -d->lam[i]*(s/d->dlam[i]); // scaling factor since lam can be close do DMIN
-        if (tau_test<s*tau_min || tau_test>s*tau_max) continue;
+      if (d->iw[i] && d->lam[i]!=0. && !d->neverzero[i] && fabs(d->dlam[i])>=1e-12) {
+        tau_test = -d->lam[i]/d->dlam[i]; // scaling factor since lam can be close do DMIN
+        if (tau_test<tau_min || tau_test>tau_max) continue;
         // Check if best so far
-        if (fabs(tau_test)>=s*1e-16 && fabs(tau_test)<s*fabs(tau)) {
-          tau = tau_test/s;
+        if (fabs(tau_test)<fabs(tau)) {
+          tau = tau_test;
           *r_index = i;
           *r_sign = 0;
           casadi_qp_log(d, "Dropped %s[%lld] for regularity", d->lam[i]>0 ? "lbz" : "ubz", i);
