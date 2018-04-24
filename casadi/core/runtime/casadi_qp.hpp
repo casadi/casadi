@@ -899,7 +899,11 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
     *index = r_index;
     *sign = r_sign;
     casadi_qp_log(d, "%lld->%lld for regularity", *index, *sign);
+  }  else if (r_index>=0 && d->tau>1e-16) {
+    // Allow another regularity step
+    *index=-2;
   }
+
   // Improve primal or dual feasibility
   if (*index==-1 && d->tau>1e-16 && (d->ipr>=0 || d->idu>=0)) {
     if (p->du_to_pr*d->pr >= d->du) {
