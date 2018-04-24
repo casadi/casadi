@@ -626,7 +626,7 @@ int casadi_qp_flip_check(casadi_qp_data<T1>* d, casadi_int index, casadi_int sig
       }
     } else {
       // Check new dual error for affected subset from setting lam[i]=0
-      if ((test=casadi_qp_du_check(d, i)) < best) {
+      if ((test=casadi_qp_du_check(d, i)) < best && test<e) {
         best = test;
         *r_index = i;
         *r_sign = 0;
@@ -726,12 +726,12 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         } else if (d->dz[d->ipr]<0) {
           tau_min = 0;
         }
-        // If enforced, only allow the multiplier to become larger in magnitude
+        // If enforced, do not allow multiplier to cross zero
         if (d->lam[d->ipr]>0) {
           if (d->dlam[d->ipr]>0) {
-            tau_min = 0;
+            tau_min = -d->lam[d->ipr]/d->dlam[d->ipr];
           } else if (d->dlam[d->ipr]<0) {
-            tau_max = 0;
+            tau_max = -d->lam[d->ipr]/d->dlam[d->ipr];
           }
         }
       } else {
@@ -741,12 +741,12 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         } else if (d->dz[d->ipr]<0) {
           tau_max = 0;
         }
-        // If enforced, only allow the multiplier to become larger in magnitude
+        // If enforced, do not allow multiplier to cross zero
         if (d->lam[d->ipr]<0) {
           if (d->dlam[d->ipr]<0) {
-            tau_min = 0;
+            tau_min = -d->lam[d->ipr]/d->dlam[d->ipr];
           } else if (d->dlam[d->ipr]>0) {
-            tau_max = 0;
+            tau_max = -d->lam[d->ipr]/d->dlam[d->ipr];
           }
         }
       }
@@ -789,7 +789,6 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
       if (d->iw[i] && d->lam[i]!=0. && !d->neverzero[i] && (s=fabs(d->dlam[i]))>=1e-12) {
         tau_test = -d->lam[i]*(s/d->dlam[i]); // scaling factor since lam can be close do DMIN
         if (tau_test<s*tau_min || tau_test>s*tau_max) continue;
-
         // Check if best so far
         if (fabs(tau_test)>=s*1e-16 && fabs(tau_test)<s*fabs(tau)) {
           tau = tau_test/s;
@@ -875,10 +874,10 @@ void casadi_qp_linesearch(casadi_qp_data<T1>* d, casadi_int* index, casadi_int* 
   *index=-1;
   d->tau = 1.;
   // Find largest possible step without exceeding acceptable |pr|
-  e = d->sing ? 0 : fmax(d->pr, d->du/p->du_to_pr);
+  e = fmax(d->pr, d->du/p->du_to_pr);
   casadi_qp_primal_blocking(d, e, index, sign);
   // Find largest possible step without exceeding acceptable |du|
-  e = d->sing ? 0 : fmax(d->pr*p->du_to_pr, d->du);
+  e = fmax(d->pr*p->du_to_pr, d->du);
   if (casadi_qp_dual_blocking(d, e)>=0) {
     *index = -1;
     *sign=0;
@@ -919,11 +918,6 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
         // Also flip r_index to avoid singularity
         d->lam[r_index] = r_sign==0 ? 0 : r_sign>0 ? p->dmin : -p->dmin;
         casadi_qp_log(d, "%lld->%lld, %lld->%lld", *index, *sign, r_index, r_sign);
-      } else if (*sign!=0) {
-        // Do not allow singularity created from adding a constraint, abort
-        casadi_qp_log(d, "Cannot enforce %s[%lld]", *sign>0 ? "ubz" : "lbz", *index);
-        *index = -1;
-        return;
       }
     }
     d->lam[*index] = *sign==0 ? 0 : *sign>0 ? p->dmin : -p->dmin;
