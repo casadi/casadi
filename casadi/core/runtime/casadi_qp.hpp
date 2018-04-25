@@ -237,6 +237,31 @@ T1 casadi_qp_du_check(casadi_qp_data<T1>* d, casadi_int i) {
   return new_du;
 }
 
+// SYMBOL "qp_du_free"
+template<typename T1>
+int casadi_qp_du_free(casadi_qp_data<T1>* d, casadi_int i, int upper, T1 e) {
+  // Local variables
+  casadi_int k;
+  const casadi_int *at_colind, *at_row;
+  const casadi_qp_prob<T1>* p = d->prob;
+  // AT sparsity
+  at_colind = p->sp_at + 2;
+  at_row = at_colind + p->na + 1;
+  // Maximum infeasibility from setting from setting lam[i]=0
+  if (i<p->nx) {
+    return upper ? fabs(d->infeas[i]-e)>=1e-16 : fabs(d->infeas[i]+e)>=1e-16;
+  } else {
+    for (k=at_colind[i-p->nx]; k<at_colind[i-p->nx+1]; ++k) {
+      int upper_k;
+      if (d->nz_at[k]==0 || fabs(d->infeas[at_row[k]])+1e-16 < e) continue;
+      upper_k = d->nz_at[k]>0 ? upper : !upper;
+      if (upper_k && fabs(d->infeas[at_row[k]]-e)<1e-16) return 0;
+      if (!upper_k && fabs(d->infeas[at_row[k]]+e)<1e-16) return 0;
+    }
+    return 1;
+  }
+}
+
 // SYMBOL "qp_du_index"
 template<typename T1>
 casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign) {
@@ -683,7 +708,7 @@ void casadi_qp_expand_step(casadi_qp_data<T1>* d) {
 template<typename T1>
 int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
   // Local variables
-  T1 tau_test, tau;
+  T1 tau_test, tau, e;
   casadi_int nnz_kkt, nk, k, i;
   const casadi_qp_prob<T1>* p = d->prob;
   // Find the columns that take part in any linear combination
@@ -698,6 +723,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   casadi_copy(d->nz_v, nnz_kkt, d->nz_kkt);
   casadi_qr(p->sp_kkt, d->nz_kkt, d->w, p->sp_v, d->nz_v, p->sp_r, d->nz_r,
             d->beta, p->prinv, p->pc);
+  // Acceptable dual error
+  e = fmax(d->pr*p->du_to_pr, d->du);
   // Best flip
   tau = p->inf;
   // For all nullspace vectors
@@ -763,9 +790,10 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     // Can we enforce a lower bound?
     for (i=0; i<p->nz; ++i) {
       if (d->iw[i] && d->lam[i]==0. && !d->neverlower[i] && fabs(d->dz[i])>=1e-12) {
+        if (!casadi_qp_du_free(d, i, 0, e)) continue;
         tau_test = (d->lbz[i]-d->z[i])/d->dz[i];
         if (tau_test<tau_min || tau_test>tau_max) continue;
-        if (fabs(tau_test)>=1e-16 && fabs(tau_test)<fabs(tau)) {
+        if (fabs(tau_test)<fabs(tau)) {
           tau = tau_test;
           *r_index = i;
           *r_sign = -1;
@@ -776,9 +804,10 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     // Can we enforce an upper bound?
     for (i=0; i<p->nz; ++i) {
       if (d->iw[i] && d->lam[i]==0. && !d->neverupper[i] && fabs(d->dz[i])>=1e-12) {
+        if (!casadi_qp_du_free(d, i, 1, e)) continue;
         tau_test = (d->ubz[i]-d->z[i])/d->dz[i];
         if (tau_test<tau_min || tau_test>tau_max) continue;
-        if (fabs(tau_test)>=1e-16 && fabs(tau_test)<fabs(tau)) {
+        if (fabs(tau_test)<fabs(tau)) {
           tau = tau_test;
           *r_index = i;
           *r_sign = 1;
