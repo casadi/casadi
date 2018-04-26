@@ -65,7 +65,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Finalize the object creation */
-    void finalize(const Dict& opts) override;
+    void finalize() override;
 
     /** \brief  Evaluate numerically, work vectors given */
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;

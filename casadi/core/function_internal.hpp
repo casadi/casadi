@@ -97,7 +97,7 @@ namespace casadi {
         This function, which visits the class hierarchy in reverse order is run after
         init() has been completed.
     */
-    virtual void finalize(const Dict& opts);
+    virtual void finalize();
 
     /// Checkout a memory object
     casadi_int checkout() const;
@@ -165,7 +165,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Finalize the object creation */
-    void finalize(const Dict& opts) override;
+    void finalize() override;
 
     /** \brief Get a public class instance */
     Function self() const { return shared_from_this<Function>();}

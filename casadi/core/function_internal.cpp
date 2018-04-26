@@ -125,7 +125,7 @@ namespace casadi {
 
     // Revisit class hierarchy in reverse order
     try {
-      finalize(opts);
+      finalize();
     } catch (exception& e) {
       casadi_error("Error calling " + class_name() + "::finalize for '" + name_ + "':\n"
         + string(e.what()));
@@ -371,7 +371,7 @@ namespace casadi {
     return "o" + str(i);
   }
 
-  void FunctionInternal::finalize(const Dict& opts) {
+  void FunctionInternal::finalize() {
     if (jit_) {
       string jit_name = "jit_tmp";
       if (has_codegen()) {
@@ -391,10 +391,10 @@ namespace casadi {
       }
     }
     // Finalize base classes
-    ProtoFunction::finalize(opts);
+    ProtoFunction::finalize();
   }
 
-  void ProtoFunction::finalize(const Dict& opts) {
+  void ProtoFunction::finalize() {
     // Create memory object
     casadi_int mem = checkout();
     casadi_assert_dev(mem==0);

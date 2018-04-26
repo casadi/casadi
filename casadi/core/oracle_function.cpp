@@ -71,23 +71,17 @@ namespace casadi {
             " Type mismatch for entry '" + i.first+ "': "
             " got type " + i.second.get_description() + ".");
         }
+      } else if (op.first=="monitor") {
+        monitor_ = op.second;
       }
     }
   }
 
-  void OracleFunction::finalize(const Dict& opts) {
-    // Default options
-    vector<string> monitor;
+  void OracleFunction::finalize() {
 
-    // Read options
-    for (auto&& op : opts) {
-      if (op.first=="monitor") {
-        monitor = op.second;
-      }
-    }
 
     // Set corresponding monitors
-    for (const string& fname : monitor) {
+    for (const string& fname : monitor_) {
       auto it = all_functions_.find(fname);
       if (it==all_functions_.end()) {
         casadi_warning("Ignoring monitor '" + fname + "'."
@@ -106,7 +100,7 @@ namespace casadi {
     }
 
     // Recursive call
-    FunctionInternal::finalize(opts);
+    FunctionInternal::finalize();
   }
 
   Function OracleFunction::create_function(const std::string& fname,
