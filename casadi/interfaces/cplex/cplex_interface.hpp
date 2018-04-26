@@ -27,7 +27,7 @@
 
 #include "casadi/core/conic_impl.hpp"
 #include <casadi/interfaces/cplex/casadi_conic_cplex_export.h>
-#include "ilcplex/cplex.h"
+#include "ilcplex/cplexx.h"
 
 #include <string>
 
@@ -47,7 +47,7 @@ namespace casadi {
     bool is_warm;
 
     /// Nature of problem (always minimization)
-    int objsen;
+    casadi_int objsen;
 
     /// Determines relation >,<, = in the linear constraints
     std::vector<char> sense;
@@ -73,6 +73,13 @@ namespace casadi {
     /// CPLEX environment
     CPXENVptr env;
     CPXLPptr lp;
+
+    std::vector<CPXDIM> a_row, h_row;
+    std::vector<CPXNNZ> a_colind, h_colind;
+
+
+    int return_status;
+    bool success;
 
     /// Constructor
     CplexMemory();
@@ -129,21 +136,24 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<CplexMemory*>(mem);}
 
     // Solve the QP
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /// Can discrete variables be treated
     bool integer_support() const override { return true;}
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     /// All CPLEX options
     Dict opts_;
 
     ///@{
     /// Options
-    int qp_method_;
+    casadi_int qp_method_;
     bool dump_to_file_;
     std::string dump_filename_;
     double tol_;
-    int dep_check_;
+    casadi_int dep_check_;
     bool warm_start_;
     ///@}
 

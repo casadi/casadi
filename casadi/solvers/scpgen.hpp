@@ -29,8 +29,6 @@
 #include "casadi/core/nlpsol_impl.hpp"
 #include <casadi/solvers/casadi_nlpsol_scpgen_export.h>
 
-#include <deque>
-
 /** \defgroup plugin_Nlpsol_scpgen
    A structure-exploiting sequential quadratic programming
      (to be come sequential convex programming) method for nonlinear programming.
@@ -43,15 +41,12 @@
 namespace casadi {
 
   struct CASADI_NLPSOL_SCPGEN_EXPORT ScpgenMemory : public NlpsolMemory {
-    // Current objective value
-    double fk;
-
     // Work vectors, nonlifted problem
-    double *xk, *gk, *dxk, *lam_xk, *dlam_xk, *lam_gk, *dlam_gk, *gfk, *gL, *b_gn;
+    double *gk, *dxk, *lam_xk, *dlam_xk, *dlam_gk, *gfk, *gL, *b_gn;
 
     // Memory for lifted variables
     struct VarMem {
-      int n;
+      casadi_int n;
       double *dx, *x0, *x, *lam, *dlam;
       double *res, *resL;
     };
@@ -79,14 +74,14 @@ namespace casadi {
     double *qp_lbx, *qp_ubx, *qp_lba, *qp_uba;
 
     // Linesearch parameters
-    std::vector<double> merit_mem;
-    int merit_ind;
+    double* merit_mem;
+    casadi_int merit_ind;
 
     // Timers
     double t_eval_mat, t_eval_res, t_eval_vec, t_eval_exp, t_solve_qp, t_mainloop;
 
     // Current iteration
-    int iter_count;
+    casadi_int iter_count;
   };
 
   /**  \brief \pluginbrief{Nlpsol,scpgen}
@@ -136,10 +131,10 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     // Solve the NLP
-    void solve(void* mem) const override;
+    int solve(void* mem) const override;
 
     // Calculate the L1-norm of the primal infeasibility
     double primalInfeasibility(ScpgenMemory* m) const;
@@ -151,9 +146,9 @@ namespace casadi {
     void printIteration(ScpgenMemory* m, std::ostream &stream) const;
 
     // Print iteration
-    void printIteration(ScpgenMemory* m, std::ostream &stream, int iter, double obj,
+    void printIteration(ScpgenMemory* m, std::ostream &stream, casadi_int iter, double obj,
                         double pr_inf, double du_inf,
-                        double reg, int ls_trials, bool ls_success) const;
+                        double reg, casadi_int ls_trials, bool ls_success) const;
 
     // Evaluate the matrices in the condensed QP
     void eval_mat(ScpgenMemory* m) const;
@@ -171,7 +166,7 @@ namespace casadi {
     void solve_qp(ScpgenMemory* m) const;
 
     // Perform the line-search to take the step
-    void line_search(ScpgenMemory* m, int& ls_iter, bool& ls_success) const;
+    void line_search(ScpgenMemory* m, casadi_int& ls_iter, bool& ls_success) const;
 
     // Evaluate the step expansion
     void eval_exp(ScpgenMemory* m) const;
@@ -183,10 +178,10 @@ namespace casadi {
     bool gauss_newton_;
 
     /// maximum number of sqp iterations
-    int max_iter_;
+    casadi_int max_iter_;
 
     /// Memory size of L-BFGS method
-    int lbfgs_memory_;
+    casadi_int lbfgs_memory_;
 
     /// Tolerance on primal infeasibility
     double tol_pr_;
@@ -207,8 +202,8 @@ namespace casadi {
     ///@{
     double c1_;
     double beta_;
-    int max_iter_ls_;
-    int merit_memsize_;
+    casadi_int max_iter_ls_;
+    casadi_int merit_memsize_;
     double merit_start_;
     ///@}
 
@@ -222,7 +217,7 @@ namespace casadi {
     bool regularize_;
 
     // Number of gauss_newton equations
-    int ngn_;
+    casadi_int ngn_;
 
     // Options
     double reg_threshold_;
@@ -238,33 +233,33 @@ namespace casadi {
 
     // Function to calculate the matrices in the reduced QP
     Function mat_fcn_;
-    int mat_jac_, mat_hes_;
+    casadi_int mat_jac_, mat_hes_;
 
     /// Quadratic approximation
     Function vec_fcn_;
-    int vec_gf_, vec_g_;
+    casadi_int vec_gf_, vec_g_;
 
     /// Step expansion
     Function exp_fcn_;
 
     // Residual function io indices
-    int res_x_, res_p_, res_g_lam_, res_p_lam_, res_p_d_;
-    int res_f_, res_gl_, res_g_;
+    casadi_int res_x_, res_p_, res_g_lam_, res_p_lam_, res_p_d_;
+    casadi_int res_f_, res_gl_, res_g_;
 
     // Modifier function io indices
-    int mod_x_, mod_p_, mod_g_lam_;
-    int mod_f_, mod_gl_, mod_g_;
-    int mod_du_, mod_dlam_g_;
+    casadi_int mod_x_, mod_p_, mod_g_lam_;
+    casadi_int mod_f_, mod_gl_, mod_g_;
+    casadi_int mod_du_, mod_dlam_g_;
 
     struct Var {
-      int n;
+      casadi_int n;
       MX v, v_def, v_lam, v_defL;
       MX d, d_def, d_lam, d_defL;
 
       // Indices of function inputs and outputs
-      int res_var, res_lam, res_d, res_lam_d;
-      int mod_var, mod_lam, mod_def, mod_defL;
-      int exp_def, exp_defL;
+      casadi_int res_var, res_lam, res_d, res_lam_d;
+      casadi_int mod_var, mod_lam, mod_def, mod_defL;
+      casadi_int exp_def, exp_defL;
     };
 
     std::vector<Var> v_;
@@ -273,7 +268,7 @@ namespace casadi {
     std::vector<std::string> name_x_;
 
     // Components to print
-    std::vector<int> print_x_;
+    std::vector<casadi_int> print_x_;
 
     // QP sparsity
     Sparsity spH_, spA_, spL_;

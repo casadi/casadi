@@ -57,7 +57,7 @@ namespace casadi {
 
   ShellCompiler::ShellCompiler(const std::string& name) :
     ImporterInternal(name) {
-      handle_ = 0;
+      handle_ = nullptr;
   }
 
   ShellCompiler::~ShellCompiler() {
@@ -121,17 +121,27 @@ namespace casadi {
     ImporterInternal::init(opts);
 
     // Default options
-    string compiler = "gcc";
+
     cleanup_ = true;
 
-    string linker = "gcc";
-    string compiler_setup = "-fPIC -c";
-    string linker_setup = "-shared";
     vector<string> compiler_flags;
     vector<string> linker_flags;
 
+#ifdef _WIN32
+    string compiler = "cl.exe";
+    string linker = "link.exe";
+    string compiler_setup = "/c";
+    string linker_setup = "/DLL";
+    std::string compiler_output_flag = "/Fo";
+    std::string linker_output_flag = "/out:";
+#else
+    string compiler = "gcc";
+    string linker = "gcc";
+    string compiler_setup = "-fPIC -c";
+    string linker_setup = "-shared";
     std::string compiler_output_flag = "-o ";
     std::string linker_output_flag = "-o ";
+#endif
 
     // Read options
     for (auto&& op : opts) {
@@ -220,7 +230,7 @@ namespace casadi {
       "CommonExternal: Cannot open function: " + bin_name_ + ". error code: " +
       STRING(GetLastError()));
 #else // _WIN32
-    casadi_assert(handle_!=0,
+    casadi_assert(handle_!=nullptr,
       "CommonExternal: Cannot open function: " + bin_name_ + ". error code: " +
       str(dlerror()));
 #endif // _WIN32
@@ -232,7 +242,7 @@ namespace casadi {
 #else // _WIN32
     signal_t fcnPtr = reinterpret_cast<signal_t>(dlsym(handle_, symname.c_str()));
     if (dlerror()) {
-      fcnPtr=0;
+      fcnPtr=nullptr;
       dlerror(); // Reset error flags
     }
     return fcnPtr;

@@ -191,8 +191,8 @@ namespace casadi {
     // Throw error
     static void cvodes_error(const char* module, int flag);
 
-    int lmm_; // linear multistep method
-    int iter_; // nonlinear solver iteration
+    casadi_int lmm_; // linear multistep method
+    casadi_int iter_; // nonlinear solver iteration
   };
 
 } // namespace casadi

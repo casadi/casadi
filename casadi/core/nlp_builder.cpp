@@ -65,9 +65,9 @@ namespace casadi {
     if (verbose_) casadi_message("Reading file \"" + filename + "\"");
 
     // Read the header of the NL-file (first 10 lines)
-    const int header_sz = 10;
+    const casadi_int header_sz = 10;
     vector<string> header(header_sz);
-    for (int k=0; k<header_sz; ++k) {
+    for (casadi_int k=0; k<header_sz; ++k) {
       getline(s_, header[k]);
     }
 
@@ -127,32 +127,32 @@ namespace casadi {
 
     //D. M. Gay and M. Hill, 'Hooking Your Solver to AMPL' October, 1997.
     // continuous in an objective and in a constraint
-    for (int j=0; j<nlvb_-nlvbi_; ++j) nlp_.discrete.push_back(false);
+    for (casadi_int j=0; j<nlvb_-nlvbi_; ++j) nlp_.discrete.push_back(false);
 
     // integer in an objective and in a constraint
-    for (int j=0; j<nlvbi_; ++j) nlp_.discrete.push_back(true);
+    for (casadi_int j=0; j<nlvbi_; ++j) nlp_.discrete.push_back(true);
 
     // continuous just in constraints
-    for (int j=0; j<nlvc_ - (nlvb_ + nlvci_); ++j) nlp_.discrete.push_back(false);
+    for (casadi_int j=0; j<nlvc_ - (nlvb_ + nlvci_); ++j) nlp_.discrete.push_back(false);
 
     // integer just in constraints
-    for (int j=0; j<nlvci_; ++j) nlp_.discrete.push_back(true);
+    for (casadi_int j=0; j<nlvci_; ++j) nlp_.discrete.push_back(true);
 
     // continuous just in objectives
-    for (int j=0; j<nlvo_ - (nlvc_ + nlvoi_); ++j) nlp_.discrete.push_back(false);
+    for (casadi_int j=0; j<nlvo_ - (nlvc_ + nlvoi_); ++j) nlp_.discrete.push_back(false);
 
     // integer just in objectives
-    for (int j=0; j < nlvoi_; ++j) nlp_.discrete.push_back(true);
+    for (casadi_int j=0; j < nlvoi_; ++j) nlp_.discrete.push_back(true);
 
     // linear
-    int max_nlvc_nlvo = (nlvc_ < nlvo_) ? nlvo_ : nlvc_;
-    for (int j=0; j<n_var_-(max_nlvc_nlvo+niv_+nbv_); ++j) nlp_.discrete.push_back(false);
+    casadi_int max_nlvc_nlvo = (nlvc_ < nlvo_) ? nlvo_ : nlvc_;
+    for (casadi_int j=0; j<n_var_-(max_nlvc_nlvo+niv_+nbv_); ++j) nlp_.discrete.push_back(false);
 
     // binary
-    for (int j = 0; j<nbv_; ++j) nlp_.discrete.push_back(true);
+    for (casadi_int j = 0; j<nbv_; ++j) nlp_.discrete.push_back(true);
 
     // other integer
-    for (int j = 0; j<niv_; ++j) nlp_.discrete.push_back(true);
+    for (casadi_int j = 0; j<niv_; ++j) nlp_.discrete.push_back(true);
 
     casadi_assert(nlp_.discrete.size()==n_var_,
       "Number of variables in the header don't match");
@@ -251,7 +251,7 @@ namespace casadi {
       case 'l':
 
       // Read the short number
-      d = read_long();
+      d = static_cast<double>(read_long());
 
       // Return an expression containing the number
       return d;
@@ -604,7 +604,7 @@ namespace casadi {
 
   void NlImporter::b_segment() {
     // For all variable
-    for (int i=0; i<n_var_; ++i) {
+    for (casadi_int i=0; i<n_var_; ++i) {
 
       // Read constraint type
       char c_type = read_char();
@@ -651,7 +651,7 @@ namespace casadi {
 
   void NlImporter::k_segment() {
     // Get row offsets
-    vector<int> rowind(n_var_+1);
+    vector<casadi_int> rowind(n_var_+1);
 
     // Get the number of offsets
     int k = read_int();

@@ -1,0 +1,16 @@
+=== Supplemental material for
+CasADi A software framework for nonlinear optimization and optimal control
+Joel A.E. Andersson, Joris Gillis, Greg Horn, James B. Rawlings, Moritz Diehl
+Accepted for publication in Mathematical Programming Computation on March 3, 2018
+ ===
+
+
+This directory contain runable scripts that appear in the paper. The scripts
+are available for Python and MATLAB, and have been tested for CasADi 3.2, 3.3
+3.4. To run the scripts, first install CasADi as described on
+
+http://install.casadi.org
+
+The Python scripts ex1.py, ex2.py, ex3.py and ex4.py and their MATLAB counterparts
+ex1.m, ex2.m, ex3.m and ex4.m correspond to Section 6.1, 6.2, 6.3 and 6.4
+of the paper.

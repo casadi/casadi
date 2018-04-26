@@ -38,18 +38,20 @@ namespace casadi {
   template<> bool SX::is_symbolic() const;
   template<> bool SX::is_valid_input() const;
   template<> bool SX::has_duplicates() const;
+  template<> bool SX::is_op(casadi_int op) const;
+  template<> casadi_int SX::op() const;
   template<> void SX::reset_input() const;
-  template<> SX SX::dep(int ch) const;
-  template<> int SX::n_dep() const;
+  template<> SX SX::dep(casadi_int ch) const;
+  template<> casadi_int SX::n_dep() const;
   template<> std::string SX::name() const;
-  template<> void SX::set_max_depth(int eq_depth);
-  template<> int SX::get_max_depth();
-  template<> size_t SX::element_hash() const;
+  template<> void SX::set_max_depth(casadi_int eq_depth);
+  template<> casadi_int SX::get_max_depth();
+  template<> casadi_int SX::element_hash() const;
   template<> void SX::expand(const SX& f, SX& weights, SX& terms);
   template<> SX SX::pw_const(const SX& t, const SX& tval, const SX& val);
   template<> SX SX::pw_lin(const SX& t, const SX &tval, const SX &val);
   template<> SX SX::gauss_quadrature(const SX& f, const SX &x, const SX &a,
-                                     const SX &b, int order,
+                                     const SX &b, casadi_int order,
                                      const SX& w);
   template<> SX SX::simplify(const SX& x);
   template<> SX SX::substitute(const SX& ex, const SX& v, const SX& vdef);
@@ -71,12 +73,13 @@ namespace casadi {
   template<> std::vector<std::vector<SX> >
   SX::reverse(const std::vector<SX> &ex, const std::vector<SX> &arg,
           const std::vector<std::vector<SX> > &v, const Dict& opts);
-  template<> std::vector<bool> SX::which_depends(const SX &expr, const SX &var, int order, bool tr);
-  template<> SX SX::taylor(const SX& f, const SX& x, const SX& a, int order);
-  template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order);
-  template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, int order,
-                            const std::vector<int>& order_contributions);
-  template<> int SX::n_nodes(const SX& x);
+  template<> std::vector<bool> SX::which_depends(const SX &expr, const SX &var,
+                                                  casadi_int order, bool tr);
+  template<> SX SX::taylor(const SX& f, const SX& x, const SX& a, casadi_int order);
+  template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, casadi_int order);
+  template<> SX SX::mtaylor(const SX& f, const SX& x, const SX& a, casadi_int order,
+                            const std::vector<casadi_int>& order_contributions);
+  template<> casadi_int SX::n_nodes(const SX& x);
   template<> std::string
   SX::print_operator(const SX& x, const std::vector<std::string>& args);
   template<> void SX::shared(std::vector<SX >& ex,
@@ -96,7 +99,7 @@ namespace casadi {
   // Templates instantiated in matrix.cpp
 #ifndef CASADI_MATRIX_CPP
   extern template class Matrix<double>;
-  extern template class Matrix<int>;
+  extern template class Matrix<casadi_int>;
   extern template class Matrix<SXElem>;
 #endif // CASADI_MATRIX_CPP
 } // namespace casadi

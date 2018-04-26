@@ -24,6 +24,7 @@
 
 #include "optistack_internal.hpp"
 #include "exception.hpp"
+#include "global_options.hpp"
 
 using namespace std;
 namespace casadi {
@@ -49,7 +50,7 @@ Opti::Opti() {
   own(OptiNode::create());
 }
 
-MX Opti::variable(int n, int m, const std::string& attribute) {
+MX Opti::variable(casadi_int n, casadi_int m, const std::string& attribute) {
   try {
     return (*this)->variable(n, m, attribute);
   } catch (exception& e) {
@@ -72,7 +73,7 @@ Opti Opti::create(OptiNode* node) {
   return Opti(node);
 }
 
-MX Opti::parameter(int n, int m, const std::string& attribute) {
+MX Opti::parameter(casadi_int n, casadi_int m, const std::string& attribute) {
   try {
     return (*this)->parameter(n, m, attribute);
   } catch (exception& e) {
@@ -232,7 +233,7 @@ MX Opti::dual(const MX& m) const {
   }
 }
 
-int Opti::nx() const {
+casadi_int Opti::nx() const {
   try {
     return (*this)->nx();
   } catch (exception& e) {
@@ -240,7 +241,7 @@ int Opti::nx() const {
   }
 }
 
-int Opti::np() const {
+casadi_int Opti::np() const {
   try {
     return (*this)->np();
   } catch (exception& e) {
@@ -248,7 +249,7 @@ int Opti::np() const {
   }
 }
 
-int Opti::ng() const {
+casadi_int Opti::ng() const {
   try {
     return (*this)->ng();
   } catch (exception& e) {
@@ -287,6 +288,23 @@ MX Opti::f() const {
     THROW_ERROR("f", e.what());
   }
 }
+
+MX Opti::lbg() const {
+  try {
+    return (*this)->lbg();
+  } catch (exception& e) {
+    THROW_ERROR("lbg", e.what());
+  }
+}
+
+MX Opti::ubg() const {
+  try {
+    return (*this)->ubg();
+  } catch (exception& e) {
+    THROW_ERROR("ubg", e.what());
+  }
+}
+
 
 MX Opti::lam_g() const {
   try {
@@ -444,7 +462,7 @@ std::vector<DM> OptiAdvanced::active_values(VariableType type) const {
   }
 }
 
-MX OptiAdvanced::x_lookup(int i) const {
+MX OptiAdvanced::x_lookup(casadi_int i) const {
   try {
     return (*this)->x_lookup(i);
   } catch (exception& e) {
@@ -452,7 +470,7 @@ MX OptiAdvanced::x_lookup(int i) const {
   }
 }
 
-MX OptiAdvanced::g_lookup(int i) const {
+MX OptiAdvanced::g_lookup(casadi_int i) const {
   try {
     return (*this)->g_lookup(i);
   } catch (exception& e) {
@@ -460,25 +478,43 @@ MX OptiAdvanced::g_lookup(int i) const {
   }
 }
 
-std::string OptiAdvanced::x_describe(int i) const {
+std::string OptiAdvanced::x_describe(casadi_int i) const {
   try {
     return (*this)->x_describe(i);
   } catch (exception& e) {
     THROW_ERROR("x_describe", e.what());
   }
 }
-std::string OptiAdvanced::g_describe(int i) const {
+std::string OptiAdvanced::g_describe(casadi_int i) const {
   try {
     return (*this)->g_describe(i);
   } catch (exception& e) {
     THROW_ERROR("g_describe", e.what());
   }
 }
-std::string OptiAdvanced::describe(const MX& x, int indent) const {
+std::string OptiAdvanced::describe(const MX& x, casadi_int indent) const {
   try {
     return (*this)->describe(x, indent);
   } catch (exception& e) {
     THROW_ERROR("describe", e.what());
+  }
+}
+
+void OptiAdvanced::show_infeasibilities(double tol) const {
+  std::vector<double> g_ = value(g()).get_elements();
+  std::vector<double> lbg_ = value(lbg()).get_elements();
+  std::vector<double> ubg_ = value(ubg()).get_elements();
+
+  uout() << "Violated constraints (tol " << tol << "), in order of declaration:" << std::endl;
+  for (casadi_int i=0;i<g_.size();++i) {
+    double err = std::max(g_[i]-ubg_[i], lbg_[i]-g_[i]);
+    if (err>=tol) {
+      uout() << "------- i = " << i+GlobalOptions::start_index;
+      uout() << "/" << g_.size() << " ------ " << std::endl;
+      uout() << lbg_[i] << " <= " << g_[i] << " <= " << ubg_[i];
+      uout() << " (viol " << err << ")" << std::endl;
+      uout() << g_describe(i) << std::endl;
+    }
   }
 }
 
@@ -514,6 +550,14 @@ void OptiAdvanced::res(const DMDict& res) {
   }
 }
 
+DMDict OptiAdvanced::res() const {
+  try {
+    return (*this)->res();
+  } catch (exception& e) {
+    THROW_ERROR("res", e.what());
+  }
+}
+
 std::vector<MX> OptiAdvanced::constraints() const {
   try {
     return (*this)->constraints();
@@ -541,7 +585,7 @@ void OptiAdvanced::assert_empty() const {
   }
 }
 
-int OptiAdvanced::instance_number() const {
+casadi_int OptiAdvanced::instance_number() const {
   try {
     return (*this)->instance_number();
   } catch (exception& e) {

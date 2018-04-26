@@ -63,9 +63,9 @@ namespace casadi {
     ret.setName(n->Value());
 
     // Save attributes
-    int type = n->Type();
+    casadi_int type = n->Type();
     if (type == TiXmlNode::TINYXML_ELEMENT) {
-      if (n->ToElement()!=0) {
+      if (n->ToElement()!=nullptr) {
         for (TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute();
              pAttrib;
              pAttrib=pAttrib->Next()) {
@@ -79,16 +79,16 @@ namespace casadi {
     }
 
     // Count the number of children
-    int num_children = 0;
-    for (TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling()) {
+    casadi_int num_children = 0;
+    for (TiXmlNode* child = n->FirstChild(); child != nullptr; child= child->NextSibling()) {
       num_children++;
     }
     ret.children_.reserve(num_children);
 
     // add children
-    int ch = 0;
-    for (TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling(), ++ch) {
-      int childtype = child->Type();
+    casadi_int ch = 0;
+    for (TiXmlNode* child = n->FirstChild(); child != nullptr; child= child->NextSibling(), ++ch) {
+      casadi_int childtype = child->Type();
 
       if (childtype == TiXmlNode::TINYXML_ELEMENT) {
         XmlNode newnode = addNode(child);

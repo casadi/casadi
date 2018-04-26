@@ -57,9 +57,10 @@ namespace casadi {
   LinearInterpolant::
   LinearInterpolant(const string& name,
                     const std::vector<double>& grid,
-                    const std::vector<int>& offset,
-                    const vector<double>& values)
-                    : Interpolant(name, grid, offset, values) {
+                    const std::vector<casadi_int>& offset,
+                    const vector<double>& values,
+                    casadi_int m)
+                    : Interpolant(name, grid, offset, values, m) {
   }
 
   LinearInterpolant::~LinearInterpolant() {
@@ -69,36 +70,7 @@ namespace casadi {
     // Call the base class initializer
     Interpolant::init(opts);
 
-    lookup_mode_ = std::vector<int>(offset_.size()-1, 0);
-
-    std::vector<std::string> lookup_mode;
-
-    // Read options
-    for (auto&& op : opts) {
-      if (op.first=="lookup_mode") {
-        lookup_mode = op.second;
-      }
-    }
-
-    if (!lookup_mode.empty()) {
-      casadi_assert_dev(lookup_mode.size()==offset_.size()-1);
-      for (int i=0;i<offset_.size()-1;++i) {
-        if (lookup_mode[i]=="linear") {
-          lookup_mode_[i] = 0;
-        } else if (lookup_mode[i]=="exact") {
-          lookup_mode_[i] = 1;
-          std::vector<double> grid(
-              grid_.begin()+offset_[i],
-              grid_.begin()+offset_[i+1]);
-          casadi_assert_dev(is_increasing(grid) && is_equally_spaced(grid));
-        } else {
-          casadi_error("Unknown lookup_mode option '" + lookup_mode[i] + ". "
-                       "Allowed values: linear, exact.");
-        }
-      }
-    }
-
-
+    lookup_mode_ = Interpolant::interpret_lookup_mode(lookup_modes_, grid_, offset_);
 
     // Needed by casadi_interpn
     alloc_w(ndim_, true);
@@ -106,18 +78,18 @@ namespace casadi {
   }
 
   int LinearInterpolant::
-  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     if (res[0]) {
-      res[0][0] = casadi_interpn(ndim_, get_ptr(grid_), get_ptr(offset_),
-                                 get_ptr(values_), arg[0], get_ptr(lookup_mode_), iw, w);
+      casadi_interpn(res[0], ndim_, get_ptr(grid_), get_ptr(offset_),
+                     get_ptr(values_), arg[0], get_ptr(lookup_mode_), m_, iw, w);
     }
     return 0;
   }
 
   void LinearInterpolant::codegen_body(CodeGenerator& g) const {
     g << "  if (res[0]) {\n"
-      << "    res[0][0] = " << g.interpn(ndim_, g.constant(grid_), g.constant(offset_),
-      g.constant(values_), "arg[0]", g.constant(lookup_mode_), "iw", "w") << "\n"
+      << "    " << g.interpn("res[0]", ndim_, g.constant(grid_), g.constant(offset_),
+      g.constant(values_), "arg[0]", g.constant(lookup_mode_), m_,  "iw", "w") << "\n"
       << "  }\n";
   }
 
@@ -132,21 +104,35 @@ namespace casadi {
     return ret;
   }
 
+  Function LinearInterpolantJac::
+  get_jacobian(const std::string& name,
+                  const std::vector<std::string>& inames,
+                  const std::vector<std::string>& onames,
+                  const Dict& opts) const {
+    std::vector<MX> args = mx_in();
+    std::vector<MX> res(n_out_);
+    for (casadi_int i=0;i<n_out_;++i)
+      res[i] = DM(size1_out(i), size2_out(i));
+    Function f("f", args, res);
+
+    return f->get_jacobian(name, inames, onames, Dict());
+  }
+
   void LinearInterpolantJac::init(const Dict& opts) {
     // Call the base class initializer
     FunctionInternal::init(opts);
 
     // Needed by casadi_interpn
     auto m = derivative_of_.get<LinearInterpolant>();
-    alloc_w(2*m->ndim_, true);
+    alloc_w(2*m->ndim_ + m->m_, true);
     alloc_iw(2*m->ndim_, true);
   }
 
   int LinearInterpolantJac::
-  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = derivative_of_.get<LinearInterpolant>();
     casadi_interpn_grad(res[0], m->ndim_, get_ptr(m->grid_), get_ptr(m->offset_),
-                        get_ptr(m->values_), arg[0], get_ptr(m->lookup_mode_), iw, w);
+                        get_ptr(m->values_), arg[0], get_ptr(m->lookup_mode_), m->m_, iw, w);
     return 0;
   }
 
@@ -157,7 +143,7 @@ namespace casadi {
 
     g << "  " << g.interpn_grad("res[0]", m->ndim_,
       g.constant(m->grid_), g.constant(m->offset_), g.constant(m->values_),
-      "arg[0]", g.constant(m->lookup_mode_), "iw", "w") << "\n";
+      "arg[0]", g.constant(m->lookup_mode_), m->m_, "iw", "w") << "\n";
   }
 
 } // namespace casadi

@@ -78,14 +78,13 @@ lbg = []
 ubg = []
 
 # "Lift" initial conditions
-X0 = MX.sym('X0', 2)
-w += [X0]
+Xk = MX.sym('X0', 2)
+w += [Xk]
 lbw += [0, 1]
 ubw += [0, 1]
 w0 += [0, 1]
 
 # Formulate the NLP
-Xk = MX([0, 1])
 for k in range(N):
     # New NLP variable for the control
     Uk = MX.sym('U_' + str(k))

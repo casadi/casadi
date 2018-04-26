@@ -54,7 +54,7 @@ namespace casadi {
   }
 
   bool Importer::test_cast(const SharedObjectInternal* ptr) {
-    return dynamic_cast<const ImporterInternal*>(ptr)!=0;
+    return dynamic_cast<const ImporterInternal*>(ptr)!=nullptr;
   }
 
   bool Importer::has_plugin(const std::string& name) {
@@ -81,11 +81,11 @@ namespace casadi {
     return (*this)->get_function(symname);
   }
 
-  bool Importer::has_meta(const std::string& cmd, int ind) const {
+  bool Importer::has_meta(const std::string& cmd, casadi_int ind) const {
     return (*this)->has_meta(cmd, ind);
   }
 
-  std::string Importer::get_meta(const std::string& cmd, int ind) const {
+  std::string Importer::get_meta(const std::string& cmd, casadi_int ind) const {
     return (*this)->get_meta(cmd, ind);
   }
 

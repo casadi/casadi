@@ -188,6 +188,10 @@ class TestSuite:
       if m:
         self.skipfiles+=m.group(1).split(' ')
         okay = True
+      m = re.search('-skipdirs=(.*)', arg)
+      if m:
+        self.skipdirs+=m.group(1).split(' ')
+        okay = True
       m = re.search('-memcheck', arg)
       if m:
         self.memcheck = True
@@ -223,7 +227,7 @@ class TestSuite:
   def test(self,dir,fn,commands):
     self.stats['numtests']+=1
     print(("%02d. " % self.stats['numtests']) + fn)
-    t0 = time.clock()
+    t0 = time.time()
 
     p=Popen(self.command(dir,fn,self.passoptions),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
 
@@ -248,7 +252,7 @@ class TestSuite:
     except:
       pass
     alarm(0) # Remove alarm
-    t = time.clock() - t0
+    t = time.time() - t0
     if self.custom_stdout is not None:
       stdoutdata = self.custom_stdout(dir,fn)
     

@@ -57,14 +57,14 @@ namespace casadi {
 
     /// @{
     /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(int i) override;
-    Sparsity get_sparsity_out(int i) override;
+    Sparsity get_sparsity_in(casadi_int i) override;
+    Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     ///@{
     /** \brief Names of function input and outputs */
-    std::string get_name_in(int i) override { return conic_in(i);}
-    std::string get_name_out(int i) override { return conic_out(i);}
+    std::string get_name_in(casadi_int i) override { return conic_in(i);}
+    std::string get_name_out(casadi_int i) override { return conic_out(i);}
     /// @}
 
     ///@{
@@ -99,11 +99,17 @@ namespace casadi {
     /// Short name
     static std::string shortname() { return "conic";}
 
+    /** \brief Check if the function is of a particular type */
+    bool is_a(const std::string& type, bool recursive) const override;
+
     /** \brief Get default input value */
-    double get_default_in(int ind) const override;
+    double get_default_in(casadi_int ind) const override;
 
     /// Can discrete variables be treated
     virtual bool integer_support() const { return false;}
+
+    /// Can psd constraints be treated
+    virtual bool psd_support() const { return false;}
 
     /// Print statistics
     void print_fstats(const ConicMemory* m) const;
@@ -113,13 +119,16 @@ namespace casadi {
     std::vector<bool> discrete_;
 
     /// Problem structure
-    Sparsity H_, A_;
+    Sparsity H_, A_, Q_, P_;
 
     /// Number of decision variables
-    int nx_;
+    casadi_int nx_;
 
     /// The number of constraints (counting both equality and inequality) == A.size1()
-    int na_;
+    casadi_int na_;
+
+    /// The shape of psd constraint matrix
+    casadi_int np_;
   };
 
 

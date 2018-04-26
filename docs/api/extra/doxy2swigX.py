@@ -32,6 +32,14 @@ import re
 import lxml.etree as ET
 import pydot
 
+expression_tools = set()
+
+for r in open("../../../swig/casadi.i","r"):
+  if "casadi_" in r:
+    m = re.search("casadi_(\w+)", r)
+    if m:
+      expression_tools.add(m.group(1))
+
 aliases = {}
 for line in file('../Doxyfile.in','r'):
   if line.startswith('ALIASES'):
@@ -327,11 +335,9 @@ class Doxy2SWIG_X(Doxy2SWIG):
                  kind in ['variable', 'typedef']:
               return
 
-          try:
-            defn = first['definition'].firstChild.data + first['argsstring'].firstChild.data
-          except:
-            return
-          target = ""
+
+         
+            
           anc = node.parentNode.parentNode
           if cdef_kind in ('file', 'namespace'):
               ns_node = anc.getElementsByTagName('innernamespace')
@@ -346,10 +352,17 @@ class Doxy2SWIG_X(Doxy2SWIG):
               # Get the full function name.
               anc_node = anc.getElementsByTagName('compoundname')
               cname = anc_node[0].firstChild.data
-              if kind=="friend":
-                target = "friendwrap_" + name
-              else:
-                target = '%s::%s'%(cname, name)
+              target = '%s::%s'%(cname, name)
+
+          definition = first['definition'].firstChild.data
+          #definition of friends is missing parent class
+          if not re.search("::~?\w+(<[ \w]+>)?$",definition):
+            print "repair", definition
+            definition = " ".join(definition.split(" ")[:-1]+[target])
+          try:
+            defn = definition + first['argsstring'].firstChild.data
+          except:
+            return
               
           self.start_docstring(target,defn)
           for n in node.childNodes:
@@ -394,6 +407,8 @@ class Doxy2SWIG_X(Doxy2SWIG):
         # Group together
         grouped_list = []
         grouped_dict = {}
+        
+        def fix_signature(a): return re.sub(" *?= *?delete *?$","", a.replace("override",""))
         
         for (origin,pieces) in v:
           origin_nostatic = origin.replace("static ","")
@@ -459,18 +474,48 @@ class Doxy2SWIG_X(Doxy2SWIG):
              grouped_dict[total] = ([origin],pieces)
              grouped_list.append(grouped_dict[total])
           if not self.merge:
-            self.add_text_original(["%feature(\"docstring\") ", swigname if len(swigname)>0 else k, " \"\n\n"]+pieces+["\";\n","\n"])
+            target = fix_signature(swigname if len(swigname)>0 else k)
+            self.doc_target(target, pieces)
             
         if self.merge:
+          target = fix_signature(k)
+          
           if len(grouped_list)==1:
-            self.add_text_original(["%feature(\"docstring\") ", k, " \"\n"]+grouped_list[0][1]+["\";\n","\n"])
+            self.doc_target(target, grouped_list[0][1])
           else:
-            self.add_text_original(["%feature(\"docstring\") ",k , " \"\n"])
+            pieces = []
             for (origin,pieces) in grouped_list:
               if len(u"".join(pieces).rstrip())>0:
-                self.add_text_original(["\n"]+["\n>  " + o.replace('"',r'\"') + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
-            self.add_text_original(["\";\n","\n"])
-  
+                pieces+=["\n"]+["\n>  " + o.replace('"',r'\"') + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"]
+            pieces+=["\";\n","\n"]
+            self.doc_target(target, pieces)
+
+
+  def doc_target(self,target,content,correction=True):
+    if len("".join(content).strip()) > 0: 
+      self.add_text_original(["%feature(\"docstring\") ", target, " \"\n\n"]+content+["\";\n","\n"])
+    if not correction: return
+  def doc_target(self,target,content,correction=True):
+    labels = ["SparsityInterface","Matrix","GenericMatrix","GenericExpression"]
+    for label in labels:
+      target = re.sub(r"\b" + label + " *<[\w ]+>",label+"Common", target)
+    for label in labels:
+      target = re.sub(r"\b" + label + r"\b",label+"Common", target)
+     
+
+    if len("".join(content).strip()) > 0: 
+      self.add_text_original(["%feature(\"docstring\") ", target, " \"\n\n"]+content+["\";\n","\n"])
+    if not correction or "Internal" in target or "::" not in target: return
+    m = re.search(r"\b(\w+)\(",target)
+    if m:
+      if m.group(1) in expression_tools:
+        
+        content = [c.replace("[INTERNAL]","") for c in content]
+        content = [re.sub("Functions called by friend functions defined (here|for \w+)\.?","",c) for c in content]
+        self.doc_target("casadi::casadi_" + m.group(1), content,correction=False)
+        target = target.split("(")[0]
+        target = "::".join(target.split("::")[:-1])
+        self.doc_target(target + "::casadi_" + m.group(1), content,correction=False)
 
 def convert(input, output,  include_function_definition=True, quiet=False,internal=None,deprecated=None,merge=False,groupdoc=None):
     p = Doxy2SWIG_X(input, include_function_definition, quiet,internal=internal,deprecated=deprecated,merge=merge,groupdoc=groupdoc)

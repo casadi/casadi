@@ -76,31 +76,31 @@ namespace casadi {
   public:
 
     /** \brief Get the number of (structural) non-zero elements */
-    int nnz() const;
+    casadi_int nnz() const;
 
     /** \brief Get the number of non-zeros in the lower triangular half */
-    int nnz_lower() const;
+    casadi_int nnz_lower() const;
 
     /** \brief Get the number of non-zeros in the upper triangular half */
-    int nnz_upper() const;
+    casadi_int nnz_upper() const;
 
     /** \brief Get get the number of non-zeros on the diagonal */
-    int nnz_diag() const;
+    casadi_int nnz_diag() const;
 
     /** \brief Get the number of elements */
-    int numel() const;
+    casadi_int numel() const;
 
     /** \brief Get the first dimension (i.e. number of rows) */
-    int size1() const;
+    casadi_int size1() const;
 
     /** \brief Get the number of rows, Octave-style syntax */
-    int rows() const {return size1();}
+    casadi_int rows() const {return size1();}
 
     /** \brief Get the second dimension (i.e. number of columns) */
-    int size2() const;
+    casadi_int size2() const;
 
     /** \brief Get the number of columns, Octave-style syntax */
-    int columns() const {return size2();}
+    casadi_int columns() const {return size2();}
 
     /** \brief Get string representation of dimensions.
         The representation is e.g. "4x5" or  "4x5,10nz"
@@ -108,10 +108,10 @@ namespace casadi {
     std::string dim(bool with_nz=false) const;
 
     /** \brief  Get the shape */
-    std::pair<int, int> size() const;
+    std::pair<casadi_int, casadi_int> size() const;
 
     /** \brief  Get the size along a particular dimensions */
-    int size(int axis) const;
+    casadi_int size(casadi_int axis) const;
 
     /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero
      * (or optionally both dimensions) */
@@ -143,14 +143,14 @@ namespace casadi {
 
     ///@{
     /** \brief Get the sparsity pattern. See the Sparsity class for details. */
-    std::vector<int> get_row() const { return sparsity().get_row(); }
-    std::vector<int> get_colind() const { return sparsity().get_colind(); }
+    std::vector<casadi_int> get_row() const { return sparsity().get_row(); }
+    std::vector<casadi_int> get_colind() const { return sparsity().get_colind(); }
 #ifndef SWIG
-    const int* row() const { return sparsity().row(); }
-    const int* colind() const { return sparsity().colind(); }
+    const casadi_int* row() const { return sparsity().row(); }
+    const casadi_int* colind() const { return sparsity().colind(); }
 #endif
-    int row(int el) const { return sparsity().row(el); }
-    int colind(int col) const { return sparsity().colind(col); }
+    casadi_int row(casadi_int el) const { return sparsity().row(el); }
+    casadi_int colind(casadi_int col) const { return sparsity().colind(col); }
     ///@}
 
     /** \brief Get the sparsity pattern */
@@ -159,11 +159,11 @@ namespace casadi {
 #ifndef SWIG
     /// \cond CLUTTER
     /**  @{  */
-    /** \brief Accessed by friend functions */
+    /** \brief Functions called by friend functions defined here */
     static MatType interp1d(const std::vector<double>& x, const MatType &v,
          const std::vector<double>& xq, const std::string& mode, bool equidistant);
-    static int sprank(const MatType &x) { return Sparsity::sprank(x.sparsity());}
-    static int norm_0_mul(const MatType &x, const MatType &y) {
+    static casadi_int sprank(const MatType &x) { return Sparsity::sprank(x.sparsity());}
+    static casadi_int norm_0_mul(const MatType &x, const MatType &y) {
       return Sparsity::norm_0_mul(x.sparsity(), y.sparsity());
     }
     static MatType tril(const MatType &x, bool includeDiagonal=true) {
@@ -172,14 +172,22 @@ namespace casadi {
     static MatType triu(const MatType &x, bool includeDiagonal=true) {
       return project(x, Sparsity::triu(x.sparsity(), includeDiagonal));
     }
-    static MatType sum_square(const MatType &x) { return dot(x, x);}
-    static MatType linspace(const MatType &a, const MatType &b, int nsteps);
-    static MatType cross(const MatType &a, const MatType &b, int dim=-1);
+    static MatType sumsqr(const MatType &x) { return dot(x, x);}
+    static MatType linspace(const MatType &a, const MatType &b, casadi_int nsteps);
+    static MatType cross(const MatType &a, const MatType &b, casadi_int dim=-1);
     static MatType skew(const MatType &a);
     static MatType inv_skew(const MatType &a);
     static MatType tril2symm(const MatType &x);
     static MatType triu2symm(const MatType &x);
-    static MatType repsum(const MatType &x, int n, int m=1);
+    static MatType repsum(const MatType &x, casadi_int n, casadi_int m=1);
+    static MatType diff(const MatType &x, casadi_int n=1, casadi_int axis=-1);
+
+    static bool is_linear(const MatType &expr, const MatType &var);
+    static bool is_quadratic(const MatType &expr, const MatType &var);
+    static void quadratic_coeff(const MatType &expr, const MatType &var,
+        MatType& A, MatType& b, MatType& c);
+    static void linear_coeff(const MatType &expr, const MatType &var,
+        MatType& A, MatType& b);
     /** @}  */
     /// \endcond
 
@@ -248,6 +256,21 @@ namespace casadi {
       return MatType::mpower(x, n);
     }
 
+    /** \brief Construct second-order-convex
+     *
+     * \param[in] x vector expression of size n
+     * \param[in] y scalar expression
+     *
+     * soc(x,y) computes [y*eye(n) x; x' y]
+     *
+     *  soc(x,y) positive semi definite
+     *        <=> || x ||_2 <= y
+     *
+     */
+    inline friend MatType soc(const MatType& x, const MatType& y) {
+      return MatType::soc(x, y);
+    }
+
     /** \brief Compute any contraction of two dense tensors, using index/einstein notation
         einstein(A, B, a, b, c) -> C
 
@@ -264,15 +287,19 @@ namespace casadi {
     ///@{
     inline friend MatType
       einstein(const MatType &A, const MatType &B, const MatType &C,
-        const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
-        const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+        const std::vector<casadi_int>& dim_a, const std::vector<casadi_int>& dim_b,
+        const std::vector<casadi_int>& dim_c,
+        const std::vector<casadi_int>& a, const std::vector<casadi_int>& b,
+        const std::vector<casadi_int>& c) {
       return MatType::einstein(A, B, C, dim_a, dim_b, dim_c, a, b, c);
     }
 
     inline friend MatType
       einstein(const MatType &A, const MatType &B,
-        const std::vector<int>& dim_a, const std::vector<int>& dim_b, const std::vector<int>& dim_c,
-        const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+        const std::vector<casadi_int>& dim_a, const std::vector<casadi_int>& dim_b,
+        const std::vector<casadi_int>& dim_c,
+        const std::vector<casadi_int>& a, const std::vector<casadi_int>& b,
+        const std::vector<casadi_int>& c) {
       return MatType::einstein(A, B, dim_a, dim_b, dim_c, a, b, c);
     }
     ///@}
@@ -318,21 +345,21 @@ namespace casadi {
                          const MatType& x, const MatType& y);
     ///@}
 
-    /** \brief Calculate some of squares: sum_ij X_ij^2
+    /** \brief Calculate sum of squares: sum_ij X_ij^2
      */
-    inline friend MatType sum_square(const MatType &x) {
-      return MatType::sum_square(x);
+    inline friend MatType sumsqr(const MatType &x) {
+      return MatType::sumsqr(x);
     }
 
     /** \brief Matlab's \c linspace command
      */
-    inline friend MatType linspace(const MatType &a, const MatType &b, int nsteps) {
+    inline friend MatType linspace(const MatType &a, const MatType &b, casadi_int nsteps) {
       return MatType::linspace(a, b, nsteps);
     }
 
     /** \brief Matlab's \c cross command
      */
-    inline friend MatType cross(const MatType &a, const MatType &b, int dim = -1) {
+    inline friend MatType cross(const MatType &a, const MatType &b, casadi_int dim = -1) {
       return MatType::cross(a, b, dim);
     }
 
@@ -389,11 +416,15 @@ namespace casadi {
     /** \brief Infinity-norm */
     inline friend MatType norm_inf(const MatType &x) { return MatType::norm_inf(x);}
 
-    /** \brief Return a row-wise summation of elements */
-    inline friend MatType sum1(const MatType &x) { return MatType::sum1(x);}
+    /** \brief Returns difference (n-th order) along given axis (MATLAB convention) */
+    inline friend MatType diff(const MatType &x, casadi_int n=1, casadi_int axis=-1) {
+      return MatType::diff(x, n, axis);
+    }
 
-    /** \brief Return a column-wise summation of elements */
-    inline friend MatType sum2(const MatType &x) { return MatType::sum2(x);}
+    /** \brief Returns cumulative sum along given axis (MATLAB convention) */
+    inline friend MatType cumsum(const MatType &x, casadi_int axis=-1) {
+      return MatType::cumsum(x, axis);
+    }
 
     /** \brief Inner product of two matrices
         with x and y matrices of the same dimension
@@ -625,12 +656,52 @@ namespace casadi {
 
     /** \brief Find out which variables enter with some order */
     inline friend std::vector<bool> which_depends(const MatType &expr, const MatType &var,
-        int order, bool tr) {
+        casadi_int order, bool tr) {
       return MatType::which_depends(expr, var, order, tr);
     }
 
+    /** \brief Is expr linear in var?
+    *
+    * False negatives are possible
+    * (an expression may not be recognised as linear while it really is),
+    * false positives not.
+    */
+    inline friend bool is_linear(const MatType &expr, const MatType &var) {
+      return MatType::is_linear(expr, var);
+    }
+
+    /** \brief Is expr quadratic in var?
+    *
+    * False negatives are possible
+    * (an expression may not be recognised as quadratic while it really is),
+    * false positives not.
+    */
+    inline friend bool is_quadratic(const MatType &expr, const MatType &var) {
+      return MatType::is_quadratic(expr, var);
+    }
+
+    /** \brief Recognizes quadratic form in scalar expression
+    *
+    * 1/2*x' A x + b' x + c
+    *
+    * e = 0.5*bilin(A,x,x)+dot(b,x)+c
+    */
+    inline friend void quadratic_coeff(const MatType &expr, const MatType &var,
+        MatType& A, MatType& b, MatType& c) {
+      MatType::quadratic_coeff(expr, var, A, b, c);
+    }
+
+    /** \brief Recognizes linear form in vector expression
+    *
+    * A x + b
+    */
+    inline friend void linear_coeff(const MatType &expr, const MatType &var,
+        MatType& A, MatType& b) {
+      MatType::linear_coeff(expr, var, A, b);
+    }
+
     /** Count number of nodes */
-    inline friend int n_nodes(const MatType& A) {
+    inline friend casadi_int n_nodes(const MatType& A) {
       return MatType::n_nodes(A);
     }
 
@@ -667,7 +738,7 @@ namespace casadi {
 
     /** \brief Given a repeated matrix, computes the sum of repeated parts
      */
-    inline friend MatType repsum(const MatType &A, int n, int m=1) {
+    inline friend MatType repsum(const MatType &A, casadi_int n, casadi_int m=1) {
       return MatType::repsum(A, n, m);
     }
 
@@ -693,6 +764,7 @@ namespace casadi {
     static MatType tangent(const MatType &ex, const MatType &arg);
     static MatType linearize(const MatType& f, const MatType& x, const MatType& x0);
     static MatType mpower(const MatType &x, const MatType &y);
+    static MatType soc(const MatType &x, const MatType &y);
     ///@}
 
 /** @} */
@@ -706,12 +778,12 @@ namespace casadi {
     ///@{
 
     /** \brief Create an nrow-by-ncol symbolic primitive */
-    static MatType sym(const std::string& name, int nrow=1, int ncol=1) {
+    static MatType sym(const std::string& name, casadi_int nrow=1, casadi_int ncol=1) {
       return sym(name, Sparsity::dense(nrow, ncol));
     }
 
     /** \brief  Construct a symbolic primitive with given dimensions */
-    static MatType sym(const std::string& name, const std::pair<int, int> &rc) {
+    static MatType sym(const std::string& name, const std::pair<casadi_int, casadi_int> &rc) {
       return sym(name, rc.first, rc.second);
     }
 
@@ -722,91 +794,104 @@ namespace casadi {
 
     /** \brief Create a vector of length p with with matrices
      * with symbolic primitives of given sparsity */
-    static std::vector<MatType > sym(const std::string& name, const Sparsity& sp, int p);
+    static std::vector<MatType > sym(const std::string& name, const Sparsity& sp, casadi_int p);
 
     /** \brief Create a vector of length p with nrow-by-ncol symbolic primitives */
-    static std::vector<MatType > sym(const std::string& name, int nrow, int ncol, int p) {
+    static std::vector<MatType > sym(const std::string& name, casadi_int nrow,
+        casadi_int ncol, casadi_int p) {
       return sym(name, Sparsity::dense(nrow, ncol), p);
     }
 
     /** \brief Create a vector of length r of vectors of length p with
      * symbolic primitives with given sparsity*/
     static std::vector<std::vector<MatType> >
-      sym(const std::string& name, const Sparsity& sp, int p, int r);
+      sym(const std::string& name, const Sparsity& sp, casadi_int p, casadi_int r);
 
     /** \brief Create a vector of length r of vectors of length p
      * with nrow-by-ncol symbolic primitives */
     static std::vector<std::vector<MatType> >
-      sym(const std::string& name, int nrow, int ncol, int p, int r) {
+      sym(const std::string& name, casadi_int nrow, casadi_int ncol, casadi_int p, casadi_int r) {
       return sym(name, Sparsity::dense(nrow, ncol), p, r);
     }
     ///@}
 
     ///@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries zero */
-    static MatType zeros(int nrow=1, int ncol=1) { return zeros(Sparsity::dense(nrow, ncol)); }
+    static MatType zeros(casadi_int nrow=1, casadi_int ncol=1) {
+      return zeros(Sparsity::dense(nrow, ncol));
+    }
     static MatType zeros(const Sparsity& sp) { return MatType(sp, 0, false);}
-    static MatType zeros(const std::pair<int, int>& rc) { return zeros(rc.first, rc.second);}
+    static MatType zeros(const std::pair<casadi_int, casadi_int>& rc) {
+      return zeros(rc.first, rc.second);
+    }
     ///@}
 
     ///@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries one */
-    static MatType ones(int nrow=1, int ncol=1) { return ones(Sparsity::dense(nrow, ncol)); }
+    static MatType ones(casadi_int nrow=1, casadi_int ncol=1) {
+      return ones(Sparsity::dense(nrow, ncol));
+    }
     static MatType ones(const Sparsity& sp) { return MatType(sp, 1, false);}
-    static MatType ones(const std::pair<int, int>& rc) { return ones(rc.first, rc.second);}
+    static MatType ones(const std::pair<casadi_int, casadi_int>& rc) {
+      return ones(rc.first, rc.second);
+    }
     ///@}
   };
 
+  // Throw informative error message
+  #define CASADI_THROW_ERROR(FNAME, WHAT) \
+  throw CasadiException("Error in " + MatType::type_name() \
+    + "::" FNAME " at " + CASADI_WHERE + ":\n" + std::string(WHAT));
+
 #ifndef SWIG
   // Implementations
-
   template<typename MatType>
   const Sparsity& GenericMatrix<MatType>::sparsity() const {
     return self().sparsity();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::nnz() const {
+  casadi_int GenericMatrix<MatType>::nnz() const {
     return sparsity().nnz();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::nnz_lower() const {
+  casadi_int GenericMatrix<MatType>::nnz_lower() const {
     return sparsity().nnz_lower();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::nnz_upper() const {
+  casadi_int GenericMatrix<MatType>::nnz_upper() const {
     return sparsity().nnz_upper();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::nnz_diag() const {
+  casadi_int GenericMatrix<MatType>::nnz_diag() const {
     return sparsity().nnz_diag();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::numel() const {
+  casadi_int GenericMatrix<MatType>::numel() const {
     return sparsity().numel();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::size1() const {
+  casadi_int GenericMatrix<MatType>::size1() const {
     return sparsity().size1();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::size2() const {
+  casadi_int GenericMatrix<MatType>::size2() const {
     return sparsity().size2();
   }
 
   template<typename MatType>
-  std::pair<int, int> GenericMatrix<MatType>::size() const {
+  std::pair<casadi_int, casadi_int> GenericMatrix<MatType>::size() const {
     return sparsity().size();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::size(int axis) const {
+  casadi_int GenericMatrix<MatType>::size(casadi_int axis) const {
     return sparsity().size(axis);
   }
 
@@ -824,10 +909,10 @@ namespace casadi {
 
   template<typename MatType>
   std::vector<MatType> GenericMatrix<MatType>::sym(const std::string& name,
-                                                   const Sparsity& sp, int p) {
+                                                   const Sparsity& sp, casadi_int p) {
     std::vector<MatType> ret(p);
     std::stringstream ss;
-    for (int k=0; k<p; ++k) {
+    for (casadi_int k=0; k<p; ++k) {
       ss.str("");
       ss << name << k;
       ret[k] = sym(ss.str(), sp);
@@ -837,9 +922,10 @@ namespace casadi {
 
   template<typename MatType>
   std::vector<std::vector<MatType> > GenericMatrix<MatType>::sym(const std::string& name,
-                                                                 const Sparsity& sp, int p, int r) {
+                                                                  const Sparsity& sp, casadi_int p,
+                                                                  casadi_int r) {
     std::vector<std::vector<MatType> > ret(r);
-    for (int k=0; k<r; ++k) {
+    for (casadi_int k=0; k<r; ++k) {
       std::stringstream ss;
       ss << name << "_" << k;
       ret[k] = sym(ss.str(), sp, p);
@@ -848,12 +934,12 @@ namespace casadi {
   }
 
   template<typename MatType>
-  MatType GenericMatrix<MatType>::linspace(const MatType& a, const MatType& b, int nsteps) {
+  MatType GenericMatrix<MatType>::linspace(const MatType& a, const MatType& b, casadi_int nsteps) {
     std::vector<MatType> ret(nsteps);
     ret[0] = a;
-    MatType step = (b-a)/(nsteps-1);
+    MatType step = (b-a)/static_cast<MatType>(nsteps-1);
 
-    for (int i=1; i<nsteps-1; ++i)
+    for (casadi_int i=1; i<nsteps-1; ++i)
       ret[i] = ret[i-1] + step;
 
     ret[nsteps-1] = b;
@@ -861,7 +947,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  MatType GenericMatrix<MatType>::cross(const MatType& a, const MatType& b, int dim) {
+  MatType GenericMatrix<MatType>::cross(const MatType& a, const MatType& b, casadi_int dim) {
     casadi_assert(a.size1()==b.size1() && a.size2()==b.size2(),
       "cross(a, b): Inconsistent dimensions. Dimension of a ("
       + a.dim() + " ) must equal that of b (" + b.dim() + ").");
@@ -915,12 +1001,12 @@ namespace casadi {
 
     // Vectors to compose a sparse matrix
     std::vector<double> val;
-    std::vector<int> colind(1, 0);
-    std::vector<int> row;
+    std::vector<casadi_int> colind(1, 0);
+    std::vector<casadi_int> row;
 
     // Number of nonzeros in to-be composed matrix
-    int nnz = 0;
-    for (int i=0;i<xq.size();++i) {
+    casadi_int nnz = 0;
+    for (casadi_int i=0;i<xq.size();++i) {
       // Obtain index corresponding to xq[i]
       double ind = index_interp1d(x, xq[i], equidistant);
 
@@ -930,7 +1016,7 @@ namespace casadi {
       // Split into integer and fractional part
       double int_partd;
       double frac_part = modf(ind, &int_partd);
-      int int_part = static_cast<int>(int_partd);
+      casadi_int int_part = static_cast<casadi_int>(int_partd);
 
       if (frac_part==0) {
          // Create a single entry
@@ -986,14 +1072,14 @@ namespace casadi {
   }
 
   template<typename MatType>
-  MatType GenericMatrix<MatType>::repsum(const MatType& x, int n, int m) {
+  MatType GenericMatrix<MatType>::repsum(const MatType& x, casadi_int n, casadi_int m) {
     casadi_assert_dev(x.size1() % n==0);
     casadi_assert_dev(x.size2() % m==0);
     std::vector< std::vector< MatType> > s =
       blocksplit(x, x.size1()/n, x.size2()/m);
     MatType sum = 0;
-    for (int i=0;i<s.size();++i) {
-      for (int j=0;j<s[i].size();++j) {
+    for (casadi_int i=0;i<s.size();++i) {
+      for (casadi_int j=0;j<s[i].size();++j) {
         sum = sum + s[i][j];
       }
     }
@@ -1061,43 +1147,61 @@ namespace casadi {
   template<typename MatType>
   MatType GenericMatrix<MatType>::jtimes(const MatType &ex, const MatType &arg,
                                          const MatType &v, bool tr) {
-    if (ex.is_empty() || arg.is_empty()) {
-      MatType J = MatType::zeros(ex.numel(), arg.numel());
-      if (tr) J = J.T();
-      return MatType::mtimes(J, v);
+    try {
+      // Assert consistent input dimensions
+      if (tr) {
+        casadi_assert(v.size1() == ex.size1() && v.size2() % ex.size2() == 0,
+                      "'v' has inconsistent dimensions");
+      } else {
+        casadi_assert(v.size1() == arg.size1() && v.size2() % arg.size2() == 0,
+                      "'v' has inconsistent dimensions");
+      }
+
+      // Quick return if no seeds
+      if (v.is_empty()) return MatType(tr ? arg.size1() : ex.size1(), 0);
+
+      // Split up the seed into its components
+      std::vector<MatType> w = horzsplit(v, tr ? ex.size2() : arg.size2());
+
+      // Seeds as a vector of vectors
+      std::vector<std::vector<MatType> > ww(w.size());
+      for (casadi_int i=0; i<w.size(); ++i) ww[i] = {w[i]};
+
+      // Calculate directional derivatives
+      if (tr) {
+        ww = reverse({ex}, {arg}, ww);
+      } else {
+        ww = forward({ex}, {arg}, ww);
+      }
+
+      // Get results
+      for (casadi_int i=0; i<w.size(); ++i) w[i] = ww[i][0];
+      return horzcat(w);
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("jtimes", e.what());
     }
-
-    // Seeds as a vector of vectors
-    int seed_dim = tr ? ex.size2() : arg.size2();
-    casadi_assert_dev(v.size2() % seed_dim == 0);
-    std::vector<MatType> w = horzsplit(v, seed_dim);
-    std::vector<std::vector<MatType> > ww(w.size(), std::vector<MatType>(1));
-    for (int i=0; i<w.size(); ++i) ww[i][0] = w[i];
-
-    // Calculate directional derivatives
-    if (tr) {
-      ww = reverse({ex}, {arg}, ww);
-    } else {
-      ww = forward({ex}, {arg}, ww);
-    }
-
-    // Get results
-    for (int i=0; i<w.size(); ++i) w[i] = ww[i][0];
-    return horzcat(w);
   }
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::gradient(const MatType &ex, const MatType &arg) {
-    casadi_assert(ex.is_scalar(),
-                          "'gradient' only defined for scalar outputs: Use 'jacobian' instead.");
-    return project(jtimes(ex, arg, MatType::ones(ex.sparsity()), true), arg.sparsity());
+    try {
+      casadi_assert(ex.is_scalar(),
+                    "'gradient' only defined for scalar outputs: Use 'jacobian' instead.");
+      return project(jtimes(ex, arg, MatType::ones(ex.sparsity()), true), arg.sparsity());
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("gradient", e.what());
+    }
   }
 
   template<typename MatType>
   MatType GenericMatrix<MatType>::tangent(const MatType &ex, const MatType &arg) {
-    casadi_assert(arg.is_scalar(),
-                          "'tangent' only defined for scalar inputs: Use 'jacobian' instead.");
-    return project(jtimes(ex, arg, MatType::ones(arg.sparsity()), false), ex.sparsity());
+    try {
+      casadi_assert(arg.is_scalar(),
+                    "'tangent' only defined for scalar inputs: Use 'jacobian' instead.");
+      return project(jtimes(ex, arg, MatType::ones(arg.sparsity()), false), ex.sparsity());
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("tangent", e.what());
+    }
   }
 
   template<typename MatType>
@@ -1123,7 +1227,8 @@ namespace casadi {
     casadi_assert(a.is_square() && b.is_constant() && b.is_scalar(),
       "Not Implemented");
     double bv = static_cast<double>(b);
-    int N = bv;
+    casadi_int N = static_cast<casadi_int>(bv);
+    casadi_assert(bv-static_cast<double>(N)==0, "mpower only defined for integer powers.");
     casadi_assert(bv==N, "Not Implemented");
     if (N<0) return inv(mpower(a, -N));
     if (N==0) return MatType::eye(a.size1());
@@ -1136,7 +1241,79 @@ namespace casadi {
     }
   }
 
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::soc(const MatType& x,
+                                            const MatType& y) {
+    casadi_assert(y.is_scalar(), "y needs to be scalar. Got " + y.dim() + ".");
+    casadi_assert(x.is_vector(), "x needs to be a vector. Got " + x.dim() + ".");
 
+    MatType x_col = x.is_column() ? x : x.T();
+
+    x_col = x_col.nz(Slice());
+
+    casadi_int n = x_col.numel();
+    return blockcat(y*MatType::eye(n), x_col, x_col.T(), y);
+  }
+
+  template<typename MatType>
+  bool GenericMatrix<MatType>::is_linear(const MatType &expr, const MatType &var) {
+    return !any(MatType::which_depends(expr, var, 2, true));
+  }
+
+  template<typename MatType>
+  bool GenericMatrix<MatType>::is_quadratic(const MatType &expr, const MatType &var) {
+    return is_linear(jacobian(expr, var), var);
+  }
+
+  template<typename MatType>
+  void GenericMatrix<MatType>::quadratic_coeff(const MatType &expr, const MatType &var,
+          MatType& A, MatType& b, MatType& c) {
+    casadi_assert(expr.is_scalar(), "'quadratic_coeff' only defined for scalar expressions.");
+    A = hessian(expr, var);
+    casadi_assert(!depends_on(A, var), "'quadratic_coeff' called on non-quadratic expression.");
+    //auto res = substitute(std::vector<MatType>{jacobian(expr, var).T(), expr}, {var}, {0});
+    b = substitute(jacobian(expr, var), var, 0).T();
+    c = substitute(expr, var, 0);
+  }
+
+  template<typename MatType>
+  void GenericMatrix<MatType>::linear_coeff(const MatType &expr, const MatType &var,
+          MatType& A, MatType& b) {
+    casadi_assert(expr.is_vector(), "'linear_coeff' only defined for vector expressions.");
+    casadi_assert(is_linear(expr, var), "'linear_coeff' called on non-linear expression.");
+    A = substitute(jacobian(expr, var), var, 0);
+    b = vec(substitute(expr, var, 0));
+  }
+
+  template<typename MatType>
+  MatType GenericMatrix<MatType>::diff(const MatType& x, casadi_int n, casadi_int axis) {
+    casadi_assert(axis==-1 || axis==0 || axis==1, "Axis argument invalid");
+    casadi_assert(n>=1, "n argument invalid");
+
+    MatType ret = x;
+    for (casadi_int i=0;i<n;++i) {
+      // Matlab's special case
+      if (axis==-1 && ret.is_scalar()) return MatType();
+
+      casadi_int local_axis = (axis==-1) ? ret.is_row() : axis;
+      if (local_axis==0) {
+        if (ret.size1()<=1) {
+          ret = MatType::zeros(0, ret.size2());
+        } else {
+          ret = ret(Slice(1, ret.size1()), Slice())-ret(Slice(0, ret.size1()-1), Slice());
+        }
+      } else {
+        if (ret.size2()<=1) {
+          ret = MatType::zeros(ret.size1(), 0);
+        } else {
+          ret = ret(Slice(), Slice(1, ret.size2()))-ret(Slice(), Slice(0, ret.size2()-1));
+        }
+      }
+    }
+    return ret;
+  }
+
+#undef CASADI_THROW_ERROR
 
 } // namespace casadi
 

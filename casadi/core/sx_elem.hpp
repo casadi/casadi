@@ -124,8 +124,8 @@ namespace casadi {
     /// \endcond
 
     /** \brief  Perform operations by ID */
-    static SXElem binary(int op, const SXElem& x, const SXElem& y);
-    static SXElem unary(int op, const SXElem& x);
+    static SXElem binary(casadi_int op, const SXElem& x, const SXElem& y);
+    static SXElem unary(casadi_int op, const SXElem& x);
 
     /** \brief Check the truth value of this node
      * Introduced to catch bool(x) situations in python
@@ -150,32 +150,32 @@ namespace casadi {
     bool is_inf() const;
     bool is_minus_inf() const;
     const std::string& name() const;
-    int op() const;
-    bool is_op(int op) const;
+    casadi_int op() const;
+    bool is_op(casadi_int op) const;
 
     /// Checks if expression does not contain NaN or Inf
     bool is_regular() const;
 
     /** \brief Check if a value is always nonnegative (false negatives are allowed) */
     bool is_nonnegative() const;
-    SXElem dep(int ch=0) const;
+    SXElem dep(casadi_int ch=0) const;
 
     /// Type conversion to double
     explicit operator double() const;
 
-    /// Type conversion to int
-    explicit operator int() const;
+    /// Type conversion to casadi_int
+    explicit operator casadi_int() const;
 
     /** \brief Check if the node is the sum of two equal expressions */
     bool is_doubled() const;
 
     /** \brief Get the number of dependencies of a binary SXElem */
-    int n_dep() const;
+    casadi_int n_dep() const;
 
     /** \brief Returns a number that is unique for a given SXNode.
      * If the SXElem does not point to any node, 0 is returned.
      */
-    size_t __hash__() const;
+    casadi_int __hash__() const;
 
     /** \brief  Negation */
     SXElem operator-() const;
@@ -184,7 +184,7 @@ namespace casadi {
     SXElem inv() const;
 
     /** \brief Check equality up to a given depth */
-    static bool is_equal(const SXElem& x, const SXElem& y, int depth=0);
+    static bool is_equal(const SXElem& x, const SXElem& y, casadi_int depth=0);
 
     /// \cond INTERNAL
     /// Get the temporary variable
@@ -201,7 +201,7 @@ namespace casadi {
 
     /** \brief Assign to another expression, if a duplicate.
      * Check for equality up to a given depth */
-    void assignIfDuplicate(const SXElem& scalar, int depth=1);
+    void assignIfDuplicate(const SXElem& scalar, casadi_int depth=1);
 
     /** \brief Assign the node to something, without invoking the deletion of the node,
      * if the count reaches 0 */
@@ -224,7 +224,7 @@ namespace casadi {
   class CASADI_EXPORT casadi_limits<SXElem>{
   public:
     static bool is_zero(const SXElem& val);
-    static bool is_equal(const SXElem& x, const SXElem& y, int depth);
+    static bool is_equal(const SXElem& x, const SXElem& y, casadi_int depth);
     static bool is_almost_zero(const SXElem& val, double tol);
     static bool is_one(const SXElem& val);
     static bool is_minus_one(const SXElem& val);

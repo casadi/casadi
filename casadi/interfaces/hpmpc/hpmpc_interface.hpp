@@ -160,16 +160,16 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<HpmpcMemory*>(mem);}
 
     /** \brief  Evaluate numerically */
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /** \brief Helper function */
-    static void mproject(double factor, const double* x, const int* sp_x,
-                         double* y, const int* sp_y, double* w);
+    static void mproject(double factor, const double* x, const casadi_int* sp_x,
+                         double* y, const casadi_int* sp_y, double* w);
 
     /** Dense transfer: y(y_sp).nonzeros() <- x(x_sp).nonzeros()
      (length >= max(number of rows, nnz)) */
-    static void dense_transfer(double factor, const double* x, const int* sp_x, double* y,
-                               const int* sp_y, double* w);
+    static void dense_transfer(double factor, const double* x, const casadi_int* sp_x, double* y,
+                               const casadi_int* sp_y, double* w);
 
     /// A documentation string
     static const std::string meta_doc;
@@ -189,13 +189,14 @@ namespace casadi {
   protected:
 
     struct Block {
-      int offset_r;
-      int offset_c;
-      int rows;
-      int cols;
+      casadi_int offset_r;
+      casadi_int offset_c;
+      casadi_int rows;
+      casadi_int cols;
     };
 
-    static Sparsity blocksparsity(int rows, int cols, const std::vector<Block>& b, bool eye=false);
+    static Sparsity blocksparsity(casadi_int rows, casadi_int cols,
+                                   const std::vector<Block>& b, bool eye=false);
     static void blockptr(std::vector<double *>& vs, std::vector<double>& v,
       const std::vector<Block>& blocks, bool eye=false);
     Sparsity Asp_, Bsp_, Csp_, Dsp_, Isp_, Rsp_, Ssp_, Qsp_, bsp_, lugsp_, usp_, xsp_;
@@ -209,17 +210,17 @@ namespace casadi {
     std::vector< Block > lam_ul_blocks, lam_xl_blocks, lam_uu_blocks, lam_xu_blocks, lam_cl_blocks;
     std::vector< Block > lam_cu_blocks, A_blocks, B_blocks, C_blocks, D_blocks, I_blocks;
 
-    std::vector<int> nxs_;
-    std::vector<int> nus_;
-    std::vector<int> ngs_;
-    int N_;
-    int print_level_;
+    std::vector<casadi_int> nxs_;
+    std::vector<casadi_int> nus_;
+    std::vector<casadi_int> ngs_;
+    casadi_int N_;
+    casadi_int print_level_;
 
     bool warm_start_;
     double inf_;
 
     double mu0_; // max element in cost function as estimate of max multiplier
-    int max_iter_; // maximum number of iterations
+    casadi_int max_iter_; // maximum number of iterations
     double tol_; // tolerance in the duality measure
 
     std::string blasfeo_target_;

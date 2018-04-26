@@ -54,8 +54,9 @@ namespace casadi {
     // Constructor
     BSplineInterpolant(const std::string& name,
                       const std::vector<double>& grid,
-                      const std::vector<int>& offset,
-                      const std::vector<double>& values);
+                      const std::vector<casadi_int>& offset,
+                      const std::vector<double>& values,
+                      casadi_int m);
 
     // Destructor
     ~BSplineInterpolant() override;
@@ -69,16 +70,17 @@ namespace casadi {
     /** \brief  Create a new Interpolant */
     static Interpolant* creator(const std::string& name,
                                 const std::vector<double>& grid,
-                                const std::vector<int>& offset,
-                                const std::vector<double>& values) {
-      return new BSplineInterpolant(name, grid, offset, values);
+                                const std::vector<casadi_int>& offset,
+                                const std::vector<double>& values,
+                                casadi_int m) {
+      return new BSplineInterpolant(name, grid, offset, values, m);
     }
 
     // Initialize
     void init(const Dict& opts) override;
 
     /// Evaluate numerically
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     ///@{
     /** \brief Full Jacobian */
@@ -105,13 +107,20 @@ namespace casadi {
     ///@}
 
     /// Degree of the spline
-    std::vector<int> degree_;
+    std::vector<casadi_int> degree_;
 
     /// Linear solvere
     std::string linear_solver_;
 
     // Spline Function
     Function S_;
+
+    enum FittingAlgorithm {ALG_NOT_A_KNOT, ALG_SMOOTH_LINEAR};
+    FittingAlgorithm algorithm_;
+    double smooth_linear_frac_;
+
+    static std::vector<double> greville_points(const std::vector<double>& x, casadi_int degree);
+
   };
 
 

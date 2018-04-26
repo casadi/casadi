@@ -68,10 +68,10 @@ namespace casadi {
     }
 
     /** \brief  Get a reference to a child by its index */
-    const XmlNode& operator[](int i) const;
+    const XmlNode& operator[](casadi_int i) const;
 
     /** \brief  Get a reference to a child by its index */
-    XmlNode& operator[](int i);
+    XmlNode& operator[](casadi_int i);
 
     /** \brief  Get a reference to a child by its name */
     const XmlNode& operator[](const std::string& childname) const;
@@ -86,7 +86,7 @@ namespace casadi {
     bool hasAttribute(const std::string& attribute_name) const;
 
     /** \brief  Get the number of children */
-    int size() const;
+    casadi_int size() const;
 
     /** \brief  Get the name of the node */
     const std::string& name() const;
@@ -111,7 +111,7 @@ namespace casadi {
     static void readString(const std::string& str, bool& val);
 
     /** \brief  Read the integer value of a string */
-    static void readString(const std::string& str, int& val);
+    static void readString(const std::string& str, casadi_int& val);
 
     /** \brief  Read the double value of a string */
     static void readString(const std::string& str, double& val);
@@ -119,11 +119,11 @@ namespace casadi {
     CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream,
                                                        const XmlNode& node);
 
-    void dump(std::ostream &stream, int indent=0) const;
+    void dump(std::ostream &stream, casadi_int indent=0) const;
 
     std::map<std::string, std::string>  attributes_;
     std::vector<XmlNode>                children_;
-    std::map<std::string, int>           child_indices_; // the index of the children
+    std::map<std::string, casadi_int>           child_indices_; // the index of the children
     // sorted by their name
 
     std::string name_;

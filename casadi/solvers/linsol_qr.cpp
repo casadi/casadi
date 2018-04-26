@@ -45,105 +45,79 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_qr);
   }
 
-  LinsolQr::LinsolQr(const std::string& name)
-    : LinsolInternal(name) {
+  LinsolQr::LinsolQr(const std::string& name, const Sparsity& sp)
+    : LinsolInternal(name, sp) {
   }
 
   LinsolQr::~LinsolQr() {
     clear_mem();
   }
 
-  LinsolQrMemory::~LinsolQrMemory() {
-  }
-
   void LinsolQr::init(const Dict& opts) {
     // Call the init method of the base class
     LinsolInternal::init(opts);
+
+    // Symbolic factorization
+    sp_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
   }
 
   int LinsolQr::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void LinsolQr::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
+    if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<LinsolQrMemory*>(mem);
-
-    // Dimensions
-    int size1 = m->nrow(), size2 = m->ncol();
-
-    // Allocate memory
-    m->leftmost.resize(size1);
-    m->parent.resize(size2);
-    m->pinv.resize(size1 + size2);
-    m->iw.resize(size1 + 7*size2 + 1);
-
-    // Initialize QP solve
-    int nrow_ext, v_nnz, r_nnz;
-    Sparsity Asp = Sparsity::compressed(m->sparsity);
-    casadi_qr_init(get_ptr(m->sparsity), Asp.T(),
-                   get_ptr(m->leftmost), get_ptr(m->parent), get_ptr(m->pinv),
-                   &nrow_ext, &v_nnz, &r_nnz, get_ptr(m->iw));
-
-    // Calculate sparsities
-    m->sp_v.resize(2 + size2 + 1 + v_nnz);
-    m->sp_r.resize(2 + size2 + 1 + r_nnz);
-    casadi_qr_sparsities(get_ptr(m->sparsity), nrow_ext, get_ptr(m->sp_v), get_ptr(m->sp_r),
-                         get_ptr(m->leftmost), get_ptr(m->parent), get_ptr(m->pinv),
-                         get_ptr(m->iw));
 
     // Memory for numerical solution
-    m->nz_v.resize(v_nnz);
-    m->nz_r.resize(r_nnz);
-    m->beta.resize(size2);
-    m->w.resize(nrow_ext);
-    m->y.resize(nrow_ext);
+    m->v.resize(sp_v_.nnz());
+    m->r.resize(sp_r_.nnz());
+    m->beta.resize(ncol());
+    m->w.resize(nrow() + ncol());
+    return 0;
   }
 
-  void LinsolQr::pivoting(void* mem, const double* A) const {
-    LinsolInternal::pivoting(mem, A);
-    //auto m = static_cast<LinsolQrMemory*>(mem);
-   }
-
-  void LinsolQr::factorize(void* mem, const double* A) const {
-    auto m = static_cast<LinsolQrMemory*>(mem);
-    casadi_qr(get_ptr(m->sparsity), A, get_ptr(m->iw), get_ptr(m->w),
-              get_ptr(m->sp_v), get_ptr(m->nz_v), get_ptr(m->sp_r), get_ptr(m->nz_r),
-              get_ptr(m->beta), get_ptr(m->leftmost), get_ptr(m->parent), get_ptr(m->pinv));
+  int LinsolQr::sfact(void* mem, const double* A) const {
+    return 0;
   }
 
-  void LinsolQr::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int LinsolQr::nfact(void* mem, const double* A) const {
     auto m = static_cast<LinsolQrMemory*>(mem);
-    int nrow_ext = m->y.size();
-    int ncol = m->ncol();
+    casadi_qr(sp_, A, get_ptr(m->w),
+              sp_v_, get_ptr(m->v), sp_r_, get_ptr(m->r),
+              get_ptr(m->beta), get_ptr(prinv_), get_ptr(pc_));
+    return 0;
+  }
 
-    for (int k=0; k<nrhs; ++k) {
-      if (tr) {
-        // ('P'Q R)' x = R'Q'P x = b <-> x = P' Q R' \ b
-        // Copy to y
-        casadi_copy(x, ncol, get_ptr(m->y));
-        //  Solve for R'
-        casadi_qr_trs(get_ptr(m->sp_r), get_ptr(m->nz_r), get_ptr(m->y), 1);
-        // Multiply by Q
-        casadi_qr_mv(get_ptr(m->sp_v), get_ptr(m->nz_v), get_ptr(m->beta),
-                     get_ptr(m->y), 0);
-        // Multiply by P'
-        for (int c=0; c<ncol; ++c) x[c] = m->y.at(m->pinv.at(c));
-      } else {
-        //P'Q R x = b <-> x = R \ Q' P b
-        // Multiply with P
-        casadi_fill(get_ptr(m->y), nrow_ext, 0.);
-        for (int c=0; c<ncol; ++c) m->y.at(m->pinv.at(c)) = x[c];
-        // Multiply with Q'
-        casadi_qr_mv(get_ptr(m->sp_v), get_ptr(m->nz_v), get_ptr(m->beta),
-                     get_ptr(m->y), 1);
-        //  Solve for R
-        casadi_qr_trs(get_ptr(m->sp_r), get_ptr(m->nz_r), get_ptr(m->y), 0);
-        // Copy to x
-        casadi_copy(get_ptr(m->y), ncol, x);
-      }
-      x += ncol;
-    }
+  int LinsolQr::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
+    auto m = static_cast<LinsolQrMemory*>(mem);
+    casadi_qr_solve(x, nrhs, tr,
+                    sp_v_, get_ptr(m->v), sp_r_, get_ptr(m->r),
+                    get_ptr(m->beta), get_ptr(prinv_), get_ptr(pc_), get_ptr(m->w));
+    return 0;
+  }
+
+  void LinsolQr::generate(CodeGenerator& g, const std::string& A, const std::string& x,
+                          casadi_int nrhs, bool tr) const {
+    // Codegen the integer vectors
+    string prinv = g.constant(prinv_);
+    string pc = g.constant(pc_);
+    string sp = g.sparsity(sp_);
+    string sp_v = g.sparsity(sp_v_);
+    string sp_r = g.sparsity(sp_r_);
+
+    // Place in block to avoid conflicts caused by local variables
+    g << "{\n";
+    g.comment("FIXME(@jaeandersson): Memory allocation can be avoided");
+    g << "casadi_real v[" << sp_v_.nnz() << "], "
+         "r[" << sp_r_.nnz() << "], "
+         "beta[" << ncol() << "], "
+         "w[" << nrow() + ncol() << "];\n";
+
+    // Factorize
+    g << g.qr(sp, A, "w", sp_v, "v", sp_r, "r", "beta", prinv, pc) << "\n";
+
+    // Solve
+    g << g.qr_solve(x, nrhs, tr, sp_v, "v", sp_r, "r", "beta", prinv, pc, "w") << "\n";
+
+    // End of block
+    g << "}\n";
   }
 
 } // namespace casadi

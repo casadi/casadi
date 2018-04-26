@@ -29,23 +29,17 @@ Demonstration on how the algorithm of an SX function can be accessed and its ope
 from casadi import *
 import numpy
 
+# Create a function
 a = SX.sym('a')
 b = SX.sym('b',2)
-
-# Input expressions
-input_ex = [a,b]
+f = Function("f", [a,b], [2*a + b], ['a', 'b'], ['r'])
 
 # Input values of the same dimensions as the above
-input_val = [numpy.array([2.0]),numpy.array([3.0,4.0])]
-
-# Output expressions
-output_ex = [2*a + b]
+input_val = [numpy.array([2.0]),\
+             numpy.array([3.0,4.0])]
 
 # Output values to be calculated of the same dimensions as the above
 output_val = [numpy.zeros(2)]
-
-# Create a function
-f = Function("f", input_ex,output_ex)
 
 # Work vector
 work = numpy.zeros(f.sz_w())
@@ -55,7 +49,6 @@ for k in range(f.n_instructions()):
 
   # Get the atomic operation
   op = f.instruction_id(k)
-  
   o = f.instruction_output(k)
   i = f.instruction_input(k)
 
@@ -79,6 +72,6 @@ for k in range(f.n_instructions()):
       print('Unknown operation: ', op)
 
 print('------')
-print("Evaluated function: ")
-print(output_ex, ' = ', output_val, ' <->', f(*input_val))
-print('where ', input_ex, ' = ', input_val)
+print('Evaluated ' + str(f))
+print('Expected: ', f.call(input_val))
+print('Got:      ', output_val)

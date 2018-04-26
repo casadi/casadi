@@ -58,16 +58,6 @@ namespace casadi {
     return n->generateNativeCode(file);
   }
 
-#ifdef WITH_DEPRECATED_FEATURES
-  void Function::conic_debug(const string &filename) const {
-    casadi::conic_debug(*this, filename);
-  }
-
-  void Function::conic_debug(ostream &file) const {
-    casadi::conic_debug(*this, file);
-  }
-#endif // WITH_DEPRECATED_FEATURES
-
   vector<string> conic_in() {
     vector<string> ret(conic_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=conic_in(i);
@@ -80,11 +70,13 @@ namespace casadi {
     return ret;
   }
 
-  string conic_in(int ind) {
+  string conic_in(casadi_int ind) {
     switch (static_cast<ConicInput>(ind)) {
     case CONIC_H:      return "h";
     case CONIC_G:      return "g";
     case CONIC_A:      return "a";
+    case CONIC_Q:      return "q";
+    case CONIC_P:      return "p";
     case CONIC_LBA:    return "lba";
     case CONIC_UBA:    return "uba";
     case CONIC_LBX:    return "lbx";
@@ -97,7 +89,7 @@ namespace casadi {
     return string();
   }
 
-  string conic_out(int ind) {
+  string conic_out(casadi_int ind) {
     switch (static_cast<ConicOutput>(ind)) {
     case CONIC_X:     return "x";
     case CONIC_COST:  return "cost";
@@ -108,11 +100,11 @@ namespace casadi {
     return string();
   }
 
-  int conic_n_in() {
+  casadi_int conic_n_in() {
     return CONIC_NUM_IN;
   }
 
-  int conic_n_out() {
+  casadi_int conic_n_out() {
     return CONIC_NUM_OUT;
   }
 
@@ -122,7 +114,8 @@ namespace casadi {
     // We have: minimize    f(x) = 1/2 * x' H x + c'x
     //          subject to  lbx <= x <= ubx
     //                      lbg <= g(x) = A x + b <= ubg
-    M x, p, f, g;
+    //                      h(x) >=0 (psd)
+    M x, p, f, g, h;
     for (auto&& i : qp) {
       if (i.first=="x") {
         x = i.second;
@@ -132,6 +125,8 @@ namespace casadi {
         f = i.second;
       } else if (i.first=="g") {
         g = i.second;
+      } else if (i.first=="h") {
+        h = i.second;
       } else {
         casadi_error("No such field: " + i.first);
       }
@@ -150,6 +145,9 @@ namespace casadi {
     casadi_assert(x.is_dense() && x.is_vector(),
       "Expected a dense vector 'x', but got " + x.dim() + ".");
 
+    casadi_assert(h.is_square(),
+      "Expected a symmetric matrix 'h', but got " + h.dim() + ".");
+
     if (g.is_empty(true)) g = M(0, 1); // workaround
 
     // Gradient of the objective: gf == Hx + g
@@ -167,8 +165,14 @@ namespace casadi {
     // Identify the linear term in the constraints
     M A = M::jacobian(g, x);
 
+    // Identify the constant term in the psd constraints
+    M P = substitute(h, x, M::zeros(x.sparsity()));
+
+    // Identify the linear term in the psd constraints
+    M Q = M::jacobian(h, x);
+
     // Create a function for calculating the required matrices vectors
-    Function prob(name + "_qp", {x, p}, {H, c, A, b});
+    Function prob(name + "_qp", {x, p}, {H, c, A, b, Q, P});
 
     // Make sure that the problem is sound
     casadi_assert(!prob.has_free(), "Cannot create '" + prob.name() + "' "
@@ -176,7 +180,8 @@ namespace casadi {
 
     // Create the QP solver
     Function conic_f = conic(name + "_qpsol", solver,
-                             {{"h", H.sparsity()}, {"a", A.sparsity()}}, opts);
+                             {{"h", H.sparsity()}, {"a", A.sparsity()},
+                              {"p", P.sparsity()}, {"q", Q.sparsity()}}, opts);
 
     // Create an MXFunction with the right signature
     vector<MX> ret_in(NLPSOL_NUM_IN);
@@ -201,6 +206,8 @@ namespace casadi {
     w[CONIC_H] = v.at(0);
     w[CONIC_G] = v.at(1);
     w[CONIC_A] = v.at(2);
+    w[CONIC_Q] = v.at(4);
+    w[CONIC_P] = v.at(5);
     w[CONIC_LBX] = ret_in[NLPSOL_LBX];
     w[CONIC_UBX] = ret_in[NLPSOL_UBX];
     w[CONIC_LBA] = ret_in[NLPSOL_LBG] - v.at(3);
@@ -235,11 +242,17 @@ namespace casadi {
   // Constructor
   Conic::Conic(const std::string& name, const std::map<std::string, Sparsity> &st)
     : FunctionInternal(name) {
+
+    P_ = Sparsity(0, 0);
     for (auto i=st.begin(); i!=st.end(); ++i) {
       if (i->first=="a") {
         A_ = i->second;
       } else if (i->first=="h") {
         H_ = i->second;
+      } else if (i->first=="q") {
+        Q_ = i->second;
+      } else if (i->first=="p") {
+        P_ = i->second;
       } else {
         casadi_error("Unrecognized field in QP structure: " + str(i->first));
       }
@@ -271,10 +284,44 @@ namespace casadi {
     nx_ = A_.size2();
     na_ = A_.size1();
 
+    // Check psd constraints (linear part)
+    if (Q_.is_null()) {
+      Q_ = Sparsity(0, 0);
+      np_ = 0;
+    } else {
+      casadi_assert(Q_.size2()==nx_,
+        "Got incompatible dimensions.\n"
+        "Q: " + Q_.dim() +
+        "We need the product Qx to exist.");
+      np_ = sqrt(Q_.size1());
+      casadi_assert(np_*np_==Q_.size1(),
+        "Got incompatible dimensions.\n"
+        "Q: " + Q_.dim() +
+        "We need Q.size1() to have an integer square root.");
+
+      Sparsity qsum = reshape(sum2(Q_), np_, np_);
+
+      casadi_assert(qsum.is_symmetric(),
+        "Got incompatible dimensions.");
+    }
+
+    // Check psd constraints (constant part)
+    if (P_.is_null()) P_ = Sparsity(np_, np_);
+
+    casadi_assert(P_.is_symmetric(),
+      "Got incompatible dimensions.\n"
+      "P: " + P_.dim() +
+      "We need P square & symmetric.");
+
+    casadi_assert(P_.size1()==np_,
+      "Got incompatible dimensions.\n"
+      "P: " + P_.dim() +
+      "We need P " + str(np_) + "-by-" + str(np_) + ".");
+
     print_time_ = false;
   }
 
-  Sparsity Conic::get_sparsity_in(int i) {
+  Sparsity Conic::get_sparsity_in(casadi_int i) {
     switch (static_cast<ConicInput>(i)) {
     case CONIC_X0:
     case CONIC_G:
@@ -282,6 +329,10 @@ namespace casadi {
     case CONIC_UBX:
     case CONIC_LAM_X0:
       return get_sparsity_out(CONIC_X);
+    case CONIC_Q:
+      return Q_;
+    case CONIC_P:
+      return P_;
     case CONIC_LBA:
     case CONIC_UBA:
     case CONIC_LAM_A0:
@@ -295,7 +346,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  Sparsity Conic::get_sparsity_out(int i) {
+  Sparsity Conic::get_sparsity_out(casadi_int i) {
     switch (static_cast<ConicOutput>(i)) {
     case CONIC_COST:
       return Sparsity::scalar();
@@ -336,6 +387,10 @@ namespace casadi {
                               "Discrete variables require a solver with integer support");
       }
     }
+
+    casadi_assert(np_==0 || psd_support(),
+      "Selected solver does not support psd constraints.");
+
   }
 
   Conic::~Conic() {
@@ -343,14 +398,14 @@ namespace casadi {
 
   void Conic::check_inputs(const double* lbx, const double* ubx,
                           const double* lba, const double* uba) const {
-    for (int i=0; i<nx_; ++i) {
+    for (casadi_int i=0; i<nx_; ++i) {
       double lb = lbx ? lbx[i] : 0., ub = ubx ? ubx[i] : 0.;
       casadi_assert(lb <= ub && lb!=inf && ub!=-inf,
         "Ill-posed problem detected: "
         "LBX[" + str(i) + "] <= UBX[" + str(i) + "] was violated. "
         "Got LBX[" + str(i) + "]=" + str(lb) + " and UBX[" + str(i) + "] = " + str(ub) + ".");
     }
-    for (int i=0; i<na_; ++i) {
+    for (casadi_int i=0; i<na_; ++i) {
       double lb = lba ? lba[i] : 0., ub = uba ? uba[i] : 0.;
       casadi_assert(lb <= ub && lb!=inf && ub!=-inf,
         "Ill-posed problem detected: "
@@ -367,7 +422,7 @@ namespace casadi {
 
   const std::string Conic::infix_ = "conic";
 
-  double Conic::get_default_in(int ind) const {
+  double Conic::get_default_in(casadi_int ind) const {
     switch (ind) {
     case CONIC_LBX:
     case CONIC_LBA:
@@ -389,7 +444,7 @@ namespace casadi {
 
     // Print name with a given length. Format: "%NNs "
     char namefmt[10];
-    sprint(namefmt, sizeof(namefmt), "%%%ds ", static_cast<int>(name_len));
+    sprint(namefmt, sizeof(namefmt), "%%%ds ", static_cast<casadi_int>(name_len));
 
     // Print header
     print(namefmt, "");
@@ -415,6 +470,10 @@ namespace casadi {
 
   std::string conic_option_info(const std::string& name, const std::string& op) {
     return Conic::plugin_options(name).info(op);
+  }
+
+  bool Conic::is_a(const std::string& type, bool recursive) const {
+    return type==shortname() || (recursive && FunctionInternal::is_a(type, recursive));
   }
 
 } // namespace casadi

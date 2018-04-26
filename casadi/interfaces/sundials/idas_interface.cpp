@@ -261,7 +261,7 @@ namespace casadi {
 
     // Create IDAS memory block
     m->mem = IDACreate();
-    casadi_assert(m->mem!=0, "IDACreate: Creation failed");
+    casadi_assert(m->mem!=nullptr, "IDACreate: Creation failed");
 
     // Set error handler function
     THROWING(IDASetErrHandlerFn, m->mem, ehfun, m);
@@ -662,7 +662,8 @@ namespace casadi {
       }
 
       // Solve for undifferentiated right-hand-side, save to output
-      s.linsolF_.solve(m->v1, 1);
+      if (s.linsolF_.solve(m->jac, m->v1, 1, false, m->mem_linsolF))
+        casadi_error("'jac' solve failed");
       vx = NV_DATA_S(zvec); // possibly different from rvec
       vz = vx + s.nx_;
       casadi_copy(m->v1, s.nx1_, vx);
@@ -696,7 +697,9 @@ namespace casadi {
         }
 
         // Solve for sensitivity right-hand-sides
-        s.linsolF_.solve(m->v1 + s.nx1_ + s.nz1_, s.ns_);
+        if (s.linsolF_.solve(m->jac, m->v1 + s.nx1_ + s.nz1_, s.ns_, false, m->mem_linsolF)) {
+          casadi_error("'jac' solve failed");
+        }
 
         // Save to output, reordered
         v_it = m->v1 + s.nx1_ + s.nz1_;
@@ -737,7 +740,8 @@ namespace casadi {
       }
 
       // Solve for undifferentiated right-hand-side, save to output
-      s.linsolB_.solve(m->v1, 1);
+      if (s.linsolB_.solve(m->jacB, m->v1, 1, false, m->mem_linsolB))
+        casadi_error("'jacB' solve failed");
       vx = NV_DATA_S(zvecB); // possibly different from rvecB
       vz = vx + s.nrx_;
       casadi_copy(m->v1, s.nrx1_, vx);
@@ -776,7 +780,9 @@ namespace casadi {
         }
 
         // Solve for sensitivity right-hand-sides
-        s.linsolB_.solve(m->v1 + s.nrx1_ + s.nrz1_, s.ns_);
+        if (s.linsolB_.solve(m->jacB, m->v1 + s.nrx1_ + s.nrz1_, s.ns_, false, m->mem_linsolB)) {
+          casadi_error("'jacB' solve failed");
+        }
 
         // Save to output, reordered
         v_it = m->v1 + s.nrx1_ + s.nrz1_;
@@ -809,10 +815,10 @@ namespace casadi {
       m->arg[3] = m->p;
       m->arg[4] = &cj;
       m->res[0] = m->jac;
-      s.calc_function(m, "jacF");
+      if (s.calc_function(m, "jacF")) casadi_error("Calculating Jacobian failed");
 
       // Factorize the linear system
-      s.linsolF_.factorize(m->jac);
+      if (s.linsolF_.nfact(m->jac, m->mem_linsolF)) casadi_error("Linear solve failed");
 
       return 0;
     } catch(int flag) { // recoverable error
@@ -839,10 +845,10 @@ namespace casadi {
       m->arg[6] = m->p;
       m->arg[7] = &cj;
       m->res[0] = m->jacB;
-      s.calc_function(m, "jacB");
+      if (s.calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
 
       // Factorize the linear system
-      s.linsolB_.factorize(m->jacB);
+      if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) casadi_error("'jacB' factorization failed");
 
       return 0;
     } catch(int flag) { // recoverable error
@@ -862,7 +868,7 @@ namespace casadi {
     double cj = IDA_mem->ida_cj;
 
     // Call the preconditioner setup function (which sets up the linear solver)
-    if (psetup(t, xz, xzdot, 0, cj, IDA_mem->ida_lmem,
+    if (psetup(t, xz, xzdot, nullptr, cj, IDA_mem->ida_lmem,
       vtemp1, vtemp1, vtemp3)) return 1;
 
     return 0;
@@ -889,12 +895,12 @@ namespace casadi {
       // Get FORWARD solution from interpolation.
       if (IDAADJ_mem->ia_noInterp==FALSE) {
         int flag = IDAADJ_mem->ia_getY(IDA_mem, t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp,
-                                   NULL, NULL);
+                                   nullptr, nullptr);
         if (flag != IDA_SUCCESS) casadi_error("Could not interpolate forward states");
       }
       // Call the preconditioner setup function (which sets up the linear solver)
       if (psetupB(t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp,
-        xzB, xzdotB, 0, cj, static_cast<void*>(m), vtemp1B, vtemp1B, vtemp3B)) return 1;
+        xzB, xzdotB, nullptr, cj, static_cast<void*>(m), vtemp1B, vtemp1B, vtemp3B)) return 1;
 
       return 0;
     } catch(int flag) { // recoverable error
@@ -922,7 +928,7 @@ namespace casadi {
 
       // Call the preconditioner solve function (which solves the linear system)
       if (psolve(t, xz, xzdot, rr, b, b, cj,
-        delta, static_cast<void*>(m), 0)) return 1;
+        delta, static_cast<void*>(m), nullptr)) return 1;
 
       // Scale the correction to account for change in cj
       if (s.cj_scaling_) {
@@ -962,7 +968,7 @@ namespace casadi {
       // Get FORWARD solution from interpolation.
       if (IDAADJ_mem->ia_noInterp==FALSE) {
         flag = IDAADJ_mem->ia_getY(IDA_mem, t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp,
-                                   NULL, NULL);
+                                   nullptr, nullptr);
         if (flag != IDA_SUCCESS) casadi_error("Could not interpolate forward states");
       }
 
@@ -971,7 +977,7 @@ namespace casadi {
 
       // Call the preconditioner solve function (which solves the linear system)
       if (psolveB(t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp, xzB, xzdotB,
-        rrB, b, b, cj, delta, static_cast<void*>(m), 0)) return 1;
+        rrB, b, b, cj, delta, static_cast<void*>(m), nullptr)) return 1;
 
       // Scale the correction to account for change in cj
       if (s.cj_scaling_) {
@@ -1020,9 +1026,9 @@ namespace casadi {
   }
 
   IdasMemory::IdasMemory(const IdasInterface& s) : self(s) {
-    this->mem = 0;
-    this->xzdot = 0;
-    this->rxzdot = 0;
+    this->mem = nullptr;
+    this->xzdot = nullptr;
+    this->rxzdot = nullptr;
 
     // Reset checkpoints counter
     this->ncheck = 0;

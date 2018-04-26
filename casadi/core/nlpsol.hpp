@@ -101,24 +101,24 @@ namespace casadi {
   * @copydoc scheme_NlpsolInput
   * \endif
   */
-  CASADI_EXPORT std::string nlpsol_in(int ind);
+  CASADI_EXPORT std::string nlpsol_in(casadi_int ind);
 
   /** \brief Get output scheme name by index
   * \if EXPANDED
   * @copydoc scheme_NlpsolOutput
   * \endif
   */
-  CASADI_EXPORT std::string nlpsol_out(int ind);
+  CASADI_EXPORT std::string nlpsol_out(casadi_int ind);
 
   /** \brief Number of NLP solver inputs */
-  CASADI_EXPORT int nlpsol_n_in();
+  CASADI_EXPORT casadi_int nlpsol_n_in();
 
   /** \brief Number of NLP solver outputs */
-  CASADI_EXPORT int nlpsol_n_out();
+  CASADI_EXPORT casadi_int nlpsol_n_out();
 
   ///@{
   /** \brief Default input for an NLP solver */
-  CASADI_EXPORT double nlpsol_default_in(int ind);
+  CASADI_EXPORT double nlpsol_default_in(casadi_int ind);
   CASADI_EXPORT std::vector<double> nlpsol_default_in();
   ///@}
 

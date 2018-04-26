@@ -106,7 +106,7 @@ namespace casadi {
   }
 
  void Newton::set_work(void* mem, const double**& arg, double**& res,
-                       int*& iw, double*& w) const {
+                       casadi_int*& iw, double*& w) const {
      Rootfinder::set_work(mem, arg, res, iw, w);
      auto m = static_cast<NewtonMemory*>(mem);
      m->x = w; w += n_;
@@ -114,8 +114,10 @@ namespace casadi {
      m->jac = w; w += sp_jac_.nnz();
   }
 
-  void Newton::solve(void* mem) const {
+  int Newton::solve(void* mem) const {
     auto m = static_cast<NewtonMemory*>(mem);
+
+    scoped_checkout<Linsol> mem_linsol(linsol_);
 
     // Get the initial guess
     casadi_copy(m->iarg[iin_], n_, m->x);
@@ -146,7 +148,7 @@ namespace casadi {
       // Check convergence
       double abstol = 0;
       if (abstol_ != numeric_limits<double>::infinity()) {
-        for (int i=0; i<n_; ++i) {
+        for (casadi_int i=0; i<n_; ++i) {
           abstol = max(abstol, fabs(m->f[i]));
         }
         if (abstol <= abstol_) {
@@ -156,13 +158,13 @@ namespace casadi {
       }
 
       // Factorize the linear solver with J
-      linsol_.factorize(m->jac);
-      linsol_.solve(m->f, 1, false);
+      linsol_.nfact(m->jac, mem_linsol);
+      linsol_.solve(m->jac, m->f, 1, false, mem_linsol);
 
       // Check convergence again
       double abstolStep=0;
       if (numeric_limits<double>::infinity() != abstolStep_) {
-        for (int i=0; i<n_; ++i) {
+        for (casadi_int i=0; i<n_; ++i) {
           abstolStep = max(abstolStep, fabs(m->f[i]));
         }
         if (abstolStep <= abstolStep_) {
@@ -191,6 +193,10 @@ namespace casadi {
     // Store the iteration count
     if (success) m->return_status = "success";
     if (verbose_) casadi_message("Newton algorithm took " + str(m->iter) + " steps");
+
+    m->success = success;
+
+    return 0;
   }
 
   void Newton::printIteration(std::ostream &stream) const {
@@ -201,7 +207,7 @@ namespace casadi {
     stream.unsetf(std::ios::floatfield);
   }
 
-  void Newton::printIteration(std::ostream &stream, int iter,
+  void Newton::printIteration(std::ostream &stream, casadi_int iter,
                               double abstol, double abstolStep) const {
     stream << setw(5) << iter;
     stream << setw(10) << scientific << setprecision(2) << abstol;
@@ -215,9 +221,17 @@ namespace casadi {
   int Newton::init_mem(void* mem) const {
     if (Rootfinder::init_mem(mem)) return 1;
     auto m = static_cast<NewtonMemory*>(mem);
-    m->return_status = 0;
+    m->return_status = nullptr;
     m->iter = 0;
     return 0;
+  }
+
+  Dict Newton::get_stats(void* mem) const {
+    Dict stats = Rootfinder::get_stats(mem);
+    auto m = static_cast<NewtonMemory*>(mem);
+    stats["return_status"] = m->return_status;
+    stats["iter_count"] = m->iter;
+    return stats;
   }
 
 } // namespace casadi

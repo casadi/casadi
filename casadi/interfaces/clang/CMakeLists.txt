@@ -10,11 +10,6 @@ casadi_plugin(Importer clang
 
 casadi_plugin_link_libraries(Importer clang ${CLANG_LIBRARIES})
 
-if(MINGW)
-  find_library(SHLWAPI libshlwapi /usr/${PREFIX}/lib)
-  casadi_plugin_link_libraries(Importer clang ${SHLWAPI})
-endif()
-
 # Get resource directory
 file(COPY ${CLANG_LLVM_LIB_DIR}/clang DESTINATION ${LIBRARY_OUTPUT_PATH}/casadi/jit)
 

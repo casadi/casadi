@@ -53,19 +53,19 @@ namespace casadi {
     TRY_CALL(get_n_out, self_);
   }
 
-  Sparsity CallbackInternal::get_sparsity_in(int i) {
+  Sparsity CallbackInternal::get_sparsity_in(casadi_int i) {
     TRY_CALL(get_sparsity_in, self_, i);
   }
 
-  Sparsity CallbackInternal::get_sparsity_out(int i) {
+  Sparsity CallbackInternal::get_sparsity_out(casadi_int i) {
     TRY_CALL(get_sparsity_out, self_, i);
   }
 
-  std::string CallbackInternal::get_name_in(int i) {
+  std::string CallbackInternal::get_name_in(casadi_int i) {
     TRY_CALL(get_name_in, self_, i);
   }
 
-  std::string CallbackInternal::get_name_out(int i) {
+  std::string CallbackInternal::get_name_out(casadi_int i) {
     TRY_CALL(get_name_out, self_, i);
   }
 
@@ -74,13 +74,13 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     // Initialize this
-    casadi_assert(self_!=0, "Callback object has been deleted");
+    casadi_assert(self_!=nullptr, "Callback object has been deleted");
     self_->init();
   }
 
   void CallbackInternal::finalize(const Dict& opts) {
     // Finalize this
-    casadi_assert(self_!=0, "Callback object has been deleted");
+    casadi_assert(self_!=nullptr, "Callback object has been deleted");
     self_->finalize();
 
     // Finalize the base classes
@@ -88,12 +88,12 @@ namespace casadi {
   }
 
   int CallbackInternal::
-  eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
-    TRY_CALL(eval, self_, arg, res, iw, w, 0);
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    TRY_CALL(eval, self_, arg, res, iw, w, nullptr);
   }
 
   int CallbackInternal::
-  eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const {
+  eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem) const {
     TRY_CALL(eval_sx, self_, arg, res, iw, w, mem);
   }
 
@@ -118,24 +118,24 @@ namespace casadi {
   }
 
   Function CallbackInternal::
-  get_forward(int nfwd, const std::string& name,
+  get_forward(casadi_int nfwd, const std::string& name,
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames, const Dict& opts) const {
     TRY_CALL(get_forward, self_, nfwd, name, inames, onames, opts);
   }
 
-  bool CallbackInternal::has_forward(int nfwd) const {
+  bool CallbackInternal::has_forward(casadi_int nfwd) const {
     TRY_CALL(has_forward, self_, nfwd);
   }
 
   Function CallbackInternal::
-  get_reverse(int nadj, const std::string& name,
+  get_reverse(casadi_int nadj, const std::string& name,
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames, const Dict& opts) const {
     TRY_CALL(get_reverse, self_, nadj, name, inames, onames, opts);
   }
 
-  bool CallbackInternal::has_reverse(int nadj) const {
+  bool CallbackInternal::has_reverse(casadi_int nadj) const {
     TRY_CALL(has_reverse, self_, nadj);
   }
 } // namespace casadi

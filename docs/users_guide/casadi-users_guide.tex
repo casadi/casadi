@@ -1035,6 +1035,8 @@ gradient(dot(A,A),A)
 print(gradient(dot(A,A),A))
 \end{pytexoutput}
 
+Note that, unlike \verb|jacobian|, \verb|gradient| always returns a dense vector.
+
 Hessians, and as a by-product gradients, are obtained as follows:
 
 \begin{minipage}[t]{0.5\textwidth}
@@ -1733,6 +1735,122 @@ x_opt = r['x']
 print('x_opt: ', x_opt)
 \end{pytexoutput}
 
+\section{For-loop equivalents} \label{sec:forloop}
+
+When modeling using expression graphs in \CasADi, it is a common pattern to use of for-loop constructs of the host language (C++/Python/Matlab).
+
+The graph size will grow linearly with the loop size $N$, and so will the construction time of the expression graph and the initialization time of functions using that expression.
+
+We offer some special constructs that improve on this complexity.
+
+\subsection{Map}
+
+Suppose you are interested in computing a function $f : \mathbb{R}^{n} \rightarrow \mathbb{R}^{m}$ repeatedly on all columns of a matrix $X \in \mathbb{R}^{n \times N}$, and aggregating all results in a result matrix $Y \in \mathbb{R}^{m \times N}$:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+ys = []
+for i in range(N):
+  ys.append(f(X[:,i]))
+
+Y = hcat(ys)
+F = Function('f',[X],[Y])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+ys = {};
+for i=1:N
+  ys = {ys{:} f(X(:,i))};
+end
+Y = hcat(ys);
+F = Function('f',{X},{Y});
+\end{lstlisting}
+\end{minipage}
+
+The aggregate function $F : \mathbb{R}^{n \times N} \rightarrow \mathbb{R}^{m \times N}$ can be obtained with the \texttt{map} construct:
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+F = f.map(N)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+F = f.map(N);
+\end{lstlisting}
+\end{minipage}
+
+\CasADi can be instructed to parallelize when $F$ gets evaluated. In the following example, we dedicate 4 threads for the \texttt{map} task.
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+F = f.map(N,"thread",4)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+F = f.map(N,'thread',4);
+\end{lstlisting}
+\end{minipage}
+
+The \texttt{map} operation supports primitive functions $f$ with multiple inputs/outputs which can also be matrices. Aggregation will always happen horizontally.
+
+The \texttt{map} operation exhibits constant graph size and initialization time.
+
+\subsection{Fold}
+
+In case each for-loop iteration depends on the result from the previous iteration, the \texttt{fold} construct applies. In the following, the \texttt{x} variable acts as an accumulater that is initialized by $x_0 \in \mathbb{R}^{n}$:
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+x = x0
+for i in range(N):
+  x = f(x)
+
+F = Function('f',[x0],[x])
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+x = x0;
+for i=1:N
+  x = f(x);
+end
+F = Function('f',{x0},{x});
+\end{lstlisting}
+\end{minipage}
+
+For a given function $f : \mathbb{R}^{n} \rightarrow \mathbb{R}^{n}$, the result function $F : \mathbb{R}^{n} \rightarrow \mathbb{R}^{n}$ can be obtained with the \texttt{fold} construct:
+
+
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Python]
+# Python
+F = f.fold(N)
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+\begin{lstlisting}[language=Matlab]
+% MATLAB/Octave
+F = f.fold(N);
+\end{lstlisting}
+\end{minipage}
+
+In case intermediate accumulator values are desired as output ($\mathbb{R}^{n} \rightarrow \mathbb{R}^{n \times N}$), use \texttt{mapaccum} instead of \texttt{fold}.
+
+The \texttt{fold}/\texttt{mapaccum} operation supports primitive functions $f$ with multiple inputs/outputs which can also be matrices.
+The first input and output are used for accumulating, while the remainder inputs are read column-wise over the iterations.
+
+The \texttt{map}/\texttt{mapaccum} operation exhibits a graph size and initialization time that scales logarithmically with $N$.
+
 \chapter{Generating C-code}
 
 The numerical evaluation of function objects in \CasADi normally takes place in \emph{virtual machines},
@@ -1866,6 +1984,26 @@ a useful option is \verb|with_header|, which controls the creation of a header f
 containing declarations of the functions with external linkage, i.e. the API of
 the generated code, described in Section~\ref{sec:c_api} below.
 
+Here is a list of available options for the \texttt{CodeGenerator} class:
+\begin{center}
+  \scriptsize
+  \begin{tabular}{| p{2.0cm} | p{2.0cm} | p{10.0cm} | }
+    \hline
+    Option & Default value & Description \\
+    \hline
+    \texttt{verbose} & true & Include comments in generated code \\
+    \texttt{mex} & false & Generate an MATLAB/Octave MEX entry point \\
+    \texttt{cpp} & false & Generated code is C++ instead of C \\
+    \texttt{main} & false & Generate a command line interface \\
+    \texttt{casadi\_real} & \texttt{double} & Floating point type \\
+    \texttt{casadi\_int} & \texttt{long long int} & Integer type \\
+    \texttt{with\_header} & false & Generate a header file \\
+    \texttt{with\_mem} & false & Generate a simplified C API \\
+    \texttt{indent} & 2 & Number of spaces per indentation level \\
+    \hline
+  \end{tabular}
+\end{center}
+
 \section{Using the generated code} \label{sec:using_codegen}
 The generated C code can be used in a number of different ways:
 \begin{itemize}
@@ -1925,8 +2063,7 @@ We can also rely on \CasADi performing the compilation \emph{just-in-time}
 using \CasADi's \texttt{Importer} class. This is a plugin class, which at the
 time of writing had two supported plugins, namely \verb|'clang'|, which invokes
 the \emph{LLVM/Clang} compiler framework (distributed with \CasADi), and \verb|'shell'|,
-which invokes the system compiler via the command line. The latter is only
-available on Linux/OS X:
+which invokes the system compiler via the command line:
 
 \begin{minipage}[t]{0.5\textwidth}
 \begin{lstlisting}[language=Python]
@@ -2051,18 +2188,18 @@ when the counter hits zero, a deallocation -- if any -- takes place.
 
 \subsection*{Number of inputs and outputs}
 \begin{lstlisting}[language=C]
-int fname_n_in(void);
-int fname_n_out(void);
+casadi_int fname_n_in(void);
+casadi_int fname_n_out(void);
 \end{lstlisting}
 
 The number of function inputs and outputs can be obtained by calling the
 \verb|fname_n_in| and \verb|fname_n_out| functions, respectively. These functions
-take no inputs and return the number of input or outputs.
+take no inputs and return the number of input or outputs (\verb|casadi_int| is an alias for \verb|long long int|).
 
 \subsection*{Names of inputs and outputs}
 \begin{lstlisting}[language=C]
-const char* fname_name_in(int ind);
-const char* fname_name_out(int ind);
+const char* fname_name_in(casadi_int ind);
+const char* fname_name_out(casadi_int ind);
 \end{lstlisting}
 
 The functions \verb|fname_name_in| and \verb|fname_name_out| return the name
@@ -2073,14 +2210,14 @@ pointer.
 
 \subsection*{Sparsity patterns of inputs and outputs}
 \begin{lstlisting}[language=C]
-const int* fname_sparsity_in(int ind);
-const int* fname_sparsity_out(int ind);
+const casadi_int* fname_sparsity_in(casadi_int ind);
+const casadi_int* fname_sparsity_out(casadi_int ind);
 \end{lstlisting}
 
 The sparsity pattern for a given input or output is obtained by calling
 \verb|fname_sparsity_in| and \verb|fname_sparsity_out|, respectively.
 These functions take the input or output index and return a pointer to a field
-of constant integers (\verb|const int*|). This is a compact representation
+of constant integers (\verb|const casadi_int*|). This is a compact representation
 of the \emph{compressed column storage} (CCS) format that \CasADi uses,
 cf. Section~\ref{sec:sparsity_class}.
 The integer field pointed to is structured as follows:
@@ -2129,13 +2266,13 @@ Frees a memory object. Returns 0 upon successful return;
 
 \subsection*{Work vectors}
 \begin{lstlisting}[language=C]
-int fname_work(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
+int fname_work(casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w);
 \end{lstlisting}
 
 To allow the evaluation to be performed efficiently with a small memory
 footprint, the user is expected to pass four work arrays. The function
 \verb|fname_work| returns the length of these arrays, which have entries
-of type \verb|const double*|, \verb|double*|, \verb|int| and \verb|double|,
+of type \verb|const double*|, \verb|double*|, \verb|casadi_int| and \verb|double|,
 respectively.
 
 The return value of the function is nonzero upon failure.
@@ -2143,7 +2280,7 @@ The return value of the function is nonzero upon failure.
 \subsection*{Numerical evaluation}
 \begin{lstlisting}[language=C]
 int fname(const double** arg, double** res,
-          int* iw, double* w, void* mem);
+          casadi_int* iw, double* w, void* mem);
 \end{lstlisting}
 
 Finally, the function \verb|fname|, performs the actual evaluation. It takes
@@ -2335,8 +2472,8 @@ public:
   ~MyCallback() override {}
 
   // Number of inputs and outputs
-  int get_n_in() override { return 1;}
-  int get_n_out() override { return 1;}
+  casadi_int get_n_in() override { return 1;}
+  casadi_int get_n_out() override { return 1;}
 
   // Initialize the object
   void init override() {
@@ -2745,7 +2882,7 @@ In the following, we will outline the legacy approach, using
 \python{parse_fmi}.
 
 \subsection*{Legacy import of a \texttt{modelDescription.xml} file}
-To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/tested/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} and \htmladdnormallink{cstr.cpp}{https://github.com/casadi/casadi/blob/tested/examples/cplusplus/cstr.cpp} in \CasADi's example collection.
+To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/master/docs/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} in \CasADi's example collection.
 
 Assuming that the Modelica/Optimica model \texttt{ModelicaClass.ModelicaModel} is defined in the files \texttt{file1.mo} and \texttt{file2.mop}, the Python compile command is:
 \begin{lstlisting}[language=Python]
@@ -2911,7 +3048,7 @@ with $T=10$.
 In \CasADi's examples collection\footnote{You can obtain this collection as an archive named \texttt{examples\_pack.zip} in \CasADi's \htmladdnormallink{download area}{http://files.casadi.org}}, you find codes for solving optimal control problems using a variety of different methods.
 
 In the following, we will discuss three of the most important methods, namely
-\emph{direct single shooting}, \emph{direct collocation} and \emph{direct collocation}.
+\emph{direct single shooting}, \emph{direct multiple shooting} and \emph{direct collocation}.
 
 \section{Direct single-shooting}
 
@@ -3223,6 +3360,7 @@ After setting up the problem, you may call the solve method, which constructs a 
 \begin{lstlisting}[language=Python]
 sol = opti.solve()
 \end{lstlisting}
+The call will fail with an error if the solver fails to convergence. You may still inspect the non-converged solution (see Section 'extra').
 
 You may call \python{solve} any number of times. You will always get an immutable copy of the problem specification and its solution.
 Consecutively calling \python{solve} will not help the convergence of the problem.
@@ -3232,6 +3370,13 @@ To warm start a solver, you need to explicitly transfer the solution of one prob
 sol1 = opti.solve()
 opti.set_initial(sol1.value_variables())
 sol2 = opti.solve()
+\end{lstlisting}
+
+In order to initialize the dual variables, e.g. when solving a set of similar optimization problems, you can use the following syntax:
+\begin{lstlisting}[language=Python]
+sol = opti.solve()
+lam_g0 = sol.value(opti.lam_g)
+opti.set_initial(opti.lam_g, lam_g0)
 \end{lstlisting}
 
 \paragraph{Numerical value at the solution}
@@ -3292,6 +3437,17 @@ opti.debug.value(x)
 Related, you may inspect the value of an expression, at the initial guess that you supplied to the solver:\\
 \begin{lstlisting}[language=Python]
 opti.debug.value(x,opti.initial())
+\end{lstlisting}
+
+In case the solver stops due to problem infeasibility, you may identify the problematic constraints with:
+\begin{lstlisting}[language=Python]
+opti.debug.show_infeasibilities()
+\end{lstlisting}
+
+In case the solver reports NaN/Inf at a certain location, you may find out which constraint or variable is to blame by looking at its description:
+\begin{lstlisting}[language=Python]
+opti.debug.x_describe(index)
+opti.debug.g_describe(index)
 \end{lstlisting}
 
 You may specify a callback function; it will be called at each iteration of the solver, with the current iteration number as argument.

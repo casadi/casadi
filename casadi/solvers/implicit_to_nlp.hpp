@@ -39,8 +39,6 @@ namespace casadi {
   // Memory
   struct CASADI_ROOTFINDER_NLPSOL_EXPORT ImplicitToNlpMemory
     : public RootfinderMemory {
-    /// Stats
-    Dict solver_stats;
 
     // Bounds
     double *lbx, *ubx;
@@ -94,13 +92,16 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     /// Solve the system of equations and calculate derivatives
-    void solve(void* mem) const override;
+    int solve(void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     /// NLP solver
     Function solver_;

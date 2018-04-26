@@ -1012,5 +1012,29 @@ class Integrationtests(casadiTestCase):
       r = [0] + collocation_points(k,"legendre")
       self.assertEqual(len(r),k+1)
 
+
+  @memory_heavy()
+  def test_thread_safety(self):
+    x = MX.sym('x')
+    rx = MX.sym('rx')
+    t = MX.sym('t')
+    p = MX.sym('p')
+    for Integrator, features, options in integrators:
+      intg = integrator("Integrator",Integrator,{"x":x,"ode":-x}, options)
+
+      intg_par = intg.map(40, 'thread',4)
+      res = intg_par(x0=numpy.linspace(0, 10, 40))
+      self.checkarray(norm_inf(res["xf"].T-exp(-1)*numpy.linspace(0, 10, 40)),0, digits=5)
+
+      if Integrator=="cvodes": continue
+      if Integrator=="idas": continue
+
+      intg = integrator("Integrator",Integrator,{"x":x,"rx":rx,"ode":-x,"rode": rx}, options)
+
+      intg_par = intg.map(40, 'thread',2)
+      res = intg_par(rx0=numpy.linspace(0, 10, 40), x0=numpy.linspace(0, 10, 40))
+      self.checkarray(norm_inf(res["xf"].T-exp(-1)*numpy.linspace(0, 10, 40)),0, digits=5)
+      self.checkarray(norm_inf(res["rxf"].T-exp(1)*numpy.linspace(0, 10, 40)),0, digits=5)
+
 if __name__ == '__main__':
     unittest.main()

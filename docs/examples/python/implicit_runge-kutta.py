@@ -116,7 +116,7 @@ vfcn = Function('vfcn', [V, X0, P], [V_eq])
 vfcn_sx = vfcn.expand()
 
 # Create a implicit function instance to solve the system of equations
-ifcn = rootfinder('ifcn', 'newton', vfcn_sx, {'linear_solver':'csparse'})
+ifcn = rootfinder('ifcn', 'newton', vfcn_sx)
 V = ifcn(MX(),X0,P)
 X = [X0 if r==0 else V[(r-1)*nx:r*nx] for r in range(d+1)]
 

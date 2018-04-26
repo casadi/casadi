@@ -2,17 +2,18 @@ cmake_minimum_required(VERSION 2.8.6)
 project(casadi C CXX)
 
 set(CASADI_MAJOR_VERSION 3)
-set(CASADI_MINOR_VERSION 2)
-set(CASADI_PATCH_VERSION 0)
+set(CASADI_MINOR_VERSION 4)
+set(CASADI_PATCH_VERSION 1)
 set(CASADI_IS_RELEASE 0)
 
 set(CASADI_VERSION ${CASADI_MAJOR_VERSION}.${CASADI_MINOR_VERSION}.${CASADI_PATCH_VERSION})
 if(NOT CASADI_IS_RELEASE)
   set(CASADI_VERSION "${CASADI_VERSION}+")
 endif()
+set(CASADI_VERSION "${CASADI_VERSION}")
 set(PACKAGE_NAME "CasADi")
 set(PACKAGE_VERSION ${CASADI_VERSION})
-set(PACKAGE_SO_VERSION "3.3")
+set(PACKAGE_SO_VERSION "3.5")
 set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
 set(PACKAGE_AUTHOR "Joel Andersson and Joris Gillis")
 set(PACKAGE_MAINTAINER "Joel Andersson and Joris Gillis")
@@ -52,8 +53,8 @@ if(NOT COMMAND add_feature_info)
 endif()
 
 # Default build type is Release
-if(NOT DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type (default Release)" FORCE)
 endif()
 
 ########################################################################
@@ -62,11 +63,12 @@ endif()
 option(FORTRAN_REQUIRED "Make fortran a required dependency" OFF)
 
 # http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(language_support)
 workaround_9220(Fortran Fortran_language_works)
 if(FORTRAN_REQUIRED)
   enable_language(Fortran)
+  set(Fortran_language_works ON)
 else()
   if(Fortran_language_works)
     enable_language(Fortran OPTIONAL)
@@ -136,7 +138,9 @@ if(CXX11FLAG)
 endif()
 
 # Check if mkstemps is available
-if(NOT WIN32)
+if(WIN32)
+  add_definitions(-DHAVE_SIMPLE_MKSTEMPS)
+else()
   file(WRITE ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
       "#include <cstdlib>\n"
       "#include <unistd.h>\n"
@@ -147,12 +151,27 @@ if(NOT WIN32)
       "}\n")
   try_compile(HAVE_MKSTEMPS ${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/mkstemps_test.cxx
               OUTPUT_VARIABLE HAVE_MKSTEMPS_OUTPUT)
+  file(WRITE ${CMAKE_BINARY_DIR}/simple_mkstemps_test.cxx
+      "#include <sys/stat.h>\n"
+      "#include <fcntl.h>\n"
+      "#include <errno.h>\n"
+      "int main() {\n"
+      "  int fd = open(\"test.c\", O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);\n"
+      "}\n")
+  try_compile(HAVE_SIMPLE_MKSTEMPS ${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/simple_mkstemps_test.cxx
+              OUTPUT_VARIABLE HAVE_SIMPLE_MKSTEMPS_OUTPUT)
   if(HAVE_MKSTEMPS)
     add_definitions(-DHAVE_MKSTEMPS)
   else()
-    message(WARNING "mkstemp is not available, falling back on tmpnam. "
-                    "Test compilation returned the following:\n"
-                    "${HAVE_MKSTEMPS_OUTPUT}")
+    if(HAVE_SIMPLE_MKSTEMPS)
+      add_definitions(-DHAVE_SIMPLE_MKSTEMPS)
+    else()
+      message(WARNING "mkstemp is not available, falling back on tmpnam. "
+                      "Test compilation returned the following:\n"
+                      "${HAVE_MKSTEMPS_OUTPUT}"
+                      "Test compilation returned the following:\n"
+                      "${HAVE_SIMPLE_MKSTEMPS_OUTPUT}")
+   endif()
   endif()
 endif()
 
@@ -230,6 +249,21 @@ if(WITH_OPENMP)
   endif()
 endif()
 
+# enabling Threads support if requested
+option(WITH_THREAD "Compile with parallelization support" OFF)
+option(WITH_THREAD_MINGW "For MINGW, use mingw-std-threads" OFF)
+if(WITH_THREAD)
+  add_definitions(-DCASADI_WITH_THREAD)
+endif()
+if(MINGW AND WITH_THREAD_MINGW)
+  add_definitions(-DCASADI_WITH_THREAD_MINGW)
+else()
+  if(WITH_THREAD)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+  endif()
+endif()
+
+
 # OpenCL
 option(WITH_OPENCL "Compile with OpenCL support (experimental)" OFF)
 if(WITH_OPENCL)
@@ -272,6 +306,16 @@ else()
   set(DEF_BIN_PREFIX bin)
   set(DEF_CMAKE_PREFIX lib/cmake/casadi)
   set(DEF_PYTHON_PREFIX python)
+  if (WITH_PYTHON)
+    set(PYTHON_VERSION_REQ "")
+    if (WITH_PYTHON3)
+      set(PYTHON_VERSION_REQ "3")
+    endif()
+    find_package(PythonInterp ${PYTHON_VERSION_REQ} REQUIRED)
+    execute_process ( COMMAND ${PYTHON_EXECUTABLE} -c "from __future__ import print_function; from distutils.sysconfig import get_python_lib; print(get_python_lib())"
+      OUTPUT_VARIABLE PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
+    set(DEF_PYTHON_PREFIX ${PYTHON_SITE_PACKAGES})
+  endif()
   set(DEF_MATLAB_PREFIX matlab)
   set(DEF_INCLUDE_PREFIX include)
 endif()
@@ -330,8 +374,8 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(EXTRA_CASADI_C_FLAGS "-Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-value")
   endif()
   if(WITH_WERROR)
-    set(EXTRA_CASADI_CXX_FLAGS "-Werror")
-    set(EXTRA_CASADI_C_FLAGS "-Werror")
+    set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Werror")
+    set(EXTRA_CASADI_C_FLAGS "${EXTRA_CASADI_C_FLAGS} -Werror")
   endif()
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -340,8 +384,8 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(EXTRA_CASADI_C_FLAGS "-Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-unused-function -Wno-unused-value")
   endif()
   if(WITH_WERROR)
-    set(EXTRA_CASADI_CXX_FLAGS "-Werror")
-    set(EXTRA_CASADI_C_FLAGS "-Werror")
+    set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Werror")
+    set(EXTRA_CASADI_C_FLAGS "${EXTRA_CASADI_C_FLAGS} -Werror")
   endif()
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
@@ -350,13 +394,21 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
     set(EXTRA_CASADI_C_FLAGS "-Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-unused-but-set-variable -Wno-unused-function -Wno-unused-value")
   endif()
   if(WITH_WERROR)
-    set(EXTRA_CASADI_CXX_FLAGS "-Werror")
-    set(EXTRA_CASADI_C_FLAGS "-Werror")
+    set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Werror")
+    set(EXTRA_CASADI_C_FLAGS "${EXTRA_CASADI_C_FLAGS} -Werror")
   endif()
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   # I don't know the MSVC warnings, so do nothing for now
 endif()
+#######################################################################
+############################### Extra runtime checks ##################
+#######################################################################
+option(WITH_EXTRA_CHECKS "Compile in extra runtime checks (for developers)" OFF)
+if(WITH_EXTRA_CHECKS)
+   add_definitions(-DWITH_EXTRA_CHECKS)
+endif()
+
 
 #######################################################################
 ############################# -fPIC ###################################
@@ -423,7 +475,7 @@ option(WITH_SUNDIALS "Compile the interface to Sundials" ON)
 if(WITH_SUNDIALS)
   if(WITH_BUILD_SUNDIALS)
     # build the included sundials
-    set(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/casadi-sundials)
+    set(SUNDIALS_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/casadi-sundials)
     set(SUNDIALS_LIBRARIES casadi_sundials)
   else()
     # try to find system sundials
@@ -439,7 +491,7 @@ option(WITH_CSPARSE "Compile the interface to CSparse" ON)
 if(WITH_CSPARSE)
   if(WITH_BUILD_CSPARSE)
     # build the included csparse
-    set(CSPARSE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/CSparse/Include)
+    set(CSPARSE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/CSparse/Include)
     set(CSPARSE_LIBRARIES casadi_csparse)
   else()
     # try to find system csparse
@@ -453,8 +505,8 @@ option(WITH_BLASFEO "Compile the interface to BLASFEO" OFF)
 option(WITH_BUILD_BLASFEO "Compile the the included source code for BLASFEO" ON)
 if(WITH_BLASFEO)
   if(WITH_BUILD_BLASFEO)
-    if(EXISTS ${CMAKE_SOURCE_DIR}/external_packages/blasfeo/src/include)
-      set(BLASFEO_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/blasfeo/src/include)
+    if(EXISTS ${PROJECT_SOURCE_DIR}/external_packages/blasfeo/src/include)
+      set(BLASFEO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/blasfeo/src/include)
       set(BLASFEO_LIBRARIES)
     else()
       message(FATAL_ERROR "Blasfeo directory not found. If you want blasfeo, do git submodule init; git submodule update.")
@@ -475,8 +527,8 @@ if(WITH_HPMPC)
     message(FATAL_ERROR "WITH_HPMPC requires WITH_BLASFEO")
   endif()
   if(WITH_BUILD_HPMPC)
-    if(EXISTS ${CMAKE_SOURCE_DIR}/external_packages/hpmpc/src/include)
-      set(HPMPC_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/hpmpc/src/include)
+    if(EXISTS ${PROJECT_SOURCE_DIR}/external_packages/hpmpc/src/include)
+      set(HPMPC_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/hpmpc/src/include)
       set(HPMPC_LIBRARIES)
       set(HPMPC_DLOPEN ON)
     else()
@@ -496,7 +548,7 @@ option(WITH_TINYXML "Compile the interface to TinyXML" ON)
 if(WITH_TINYXML)
   if(WITH_BUILD_TINYXML)
     # build the included tinyxml
-    set(TINYXML_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/tinyxml-2.6.2)
+    set(TINYXML_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/tinyxml-2.6.2)
     set(TINYXML_LIBRARIES casadi_tinyxml)
   else()
     # try to find system tinyxml
@@ -511,7 +563,7 @@ option(WITH_DSDP "Compile the interface to DSDP" OFF)
 if(WITH_DSDP)
   if(WITH_BUILD_DSDP)
     # build the included dsdp
-    set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
+    set(DSDP_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/DSDP/include)
     set(DSDP_LIBRARIES casadi_dsdp)
   else()
     # try to find system dsdp
@@ -543,7 +595,7 @@ if(WITH_QPOASES)
   if (NOT WITH_LAPACK)
      message(FATAL_ERROR "WITH_QPOASES requires WITH_LAPACK.")
   endif()
-  set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
+  set(QPOASES_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/qpOASES/include)
   set(QPOASES_LIBRARIES casadi_qpoases)
 endif()
 add_feature_info(qpoases-interface WITH_QPOASES "Interface to the active-set QP solver qpOASES.")
@@ -596,9 +648,19 @@ add_feature_info(clp-interface WITH_CLP "Interface to the LP solver CLP.")
 # SNOPT: An SQP method
 option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)
 option(WITH_SNOPT_FORCE_DUMMY "Compile the SNOPT interface against a dummy library (for Debian distribution; breaks normal SNOPT build)" OFF)
-if(WITH_SNOPT AND NOT WITH_SNOPT_FORCE_DUMMY)
-  find_package(SNOPT REQUIRED)
+option(WITH_BUILD_SNOPT_INTERFACE "Use the SNOPT C-interface shipped with casadi" ON)
+if(WITH_SNOPT)
+  if(NOT WITH_SNOPT_FORCE_DUMMY)
+    find_package(SNOPT REQUIRED)
+  endif()
+  if(WITH_BUILD_SNOPT_INTERFACE)
+    set(SNOPT_INTERFACE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/snopt-interface/include)
+    set(SNOPT_INTERFACE_LIBRARIES casadi_snopt_interface)
+  else()
+    find_package(SNOPT_INTERFACE REQUIRED)
+  endif()
 endif()
+add_feature_info(snopt-interface WITH_SNOPT "Interface to the NLP solver SNOPT.")
 
 # HSL: Sparse direct linear solvers
 option(WITH_HSL "Enable HSL interface" OFF)
@@ -635,11 +697,14 @@ add_feature_info(sqic-interface WITH_SQIC "Interface to the QP solver SQIC.")
 option(WITH_AMPL "Compile the interface to AMPL" OFF)
 add_feature_info(ampl-interface WITH_AMPL "Interface to the AMPL solver library.")
 
-# @jgillis: What it this for?
+# Slicot: used for expm, dple
 option(WITH_SLICOT "Enable SLICOT interface" OFF)
 if(WITH_SLICOT)
   if (NOT Fortran_language_works)
     message(FATAL_ERROR "SLICOT requires Fortran support.")
+  endif()
+  if (NOT WITH_LAPACK)
+     message(FATAL_ERROR "WITH_SLICOT requires WITH_LAPACK.")
   endif()
   find_package(SLICOT REQUIRED)
 endif()
@@ -689,6 +754,18 @@ if(WITH_SPELL)
   include(SpellCheck REQUIRED)
 endif()
 
+option(WITH_CLANG_TIDY "Compile with support for clang-tidy" OFF)
+if(WITH_CLANG_TIDY)
+  include(ClangTidy REQUIRED)
+  set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+  if(WITH_EXTRA_WARNINGS)
+    # -Wall leaks into clang-tidy (through compile_commands.json)
+    # silently overruling the 'Checks' field.
+    # These warnings come from external_packages
+    set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Wno-overloaded-virtual -Wno-deprecated-register")
+  endif()
+endif()
+
 include(embed_resources)
 include(GenerateExportHeader)
 
@@ -712,9 +789,9 @@ endif()
 option(WITH_DOC "Enable documentation generation" OFF)
 if(WITH_DOC)
   set(DOXYFILE_LATEX "NO")
-  set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/docs/api)
-  set(DOXYFILE_OUTPUT_DIR  ${CMAKE_SOURCE_DIR}/docs/api)
-  set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/casadi)
+  set(DOXYFILE_IN_DIR ${PROJECT_SOURCE_DIR}/docs/api)
+  set(DOXYFILE_OUTPUT_DIR  ${PROJECT_SOURCE_DIR}/docs/api)
+  set(DOXYFILE_SOURCE_DIR ${PROJECT_SOURCE_DIR}/casadi)
   include(UseDoxygen OPTIONAL)
   add_custom_target(tutor)
 endif()
@@ -768,4 +845,8 @@ install(FILES
   DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
 
 # Install the export set for use with the install-tree
-install(EXPORT casadi-targets DESTINATION "${DEF_CMAKE_PREFIX}" COMPONENT dev)
+install(EXPORT casadi-targets DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
+
+set(CPACK_PACKAGE_CONTACT "casadi-users@googlegroups.com")
+set(CPACK_PACKAGE_VERSION ${PACKAGE_VERSION_FULL})
+include(CPack)

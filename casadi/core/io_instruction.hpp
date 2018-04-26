@@ -36,16 +36,16 @@ namespace casadi {
   class CASADI_EXPORT IOInstruction : public MXNode {
   protected:
     // Input/output index
-    int ind_;
+    casadi_int ind_;
 
     // Segment number
-    int segment_;
+    casadi_int segment_;
 
     // Nonzero offset
-    int offset_;
+    casadi_int offset_;
 
     // Constructor (called from derived classes)
-    IOInstruction(int ind, int segment, int offset)
+    IOInstruction(casadi_int ind, casadi_int segment, casadi_int offset)
       : ind_(ind), segment_(segment), offset_(offset) {}
 
   public:
@@ -53,13 +53,13 @@ namespace casadi {
     ~IOInstruction() override {}
 
     // Get IO index
-    int ind() const override { return ind_;}
+    casadi_int ind() const override { return ind_;}
 
     // Get IO segment
-    int segment() const override { return segment_;}
+    casadi_int segment() const override { return segment_;}
 
     // Get IO offset
-    int offset() const override { return offset_;}
+    casadi_int offset() const override { return offset_;}
 
     /** Obtain information about node */
     Dict info() const override;
@@ -69,20 +69,21 @@ namespace casadi {
   class CASADI_EXPORT Input : public IOInstruction {
   public:
     // Constructor (called from derived classes)
-    Input(const Sparsity& sp, int ind, int segment, int offset);
+    Input(const Sparsity& sp, casadi_int ind, casadi_int segment, casadi_int offset);
 
     /// Destructor
     ~Input() override {}
 
     /** \brief Get the operation */
-    int op() const override { return OP_INPUT;}
+    casadi_int op() const override { return OP_INPUT;}
 
     /** \brief  Print expression */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
-                  const std::vector<int>& arg, const std::vector<int>& res) const override;
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
 
   };
 
@@ -90,23 +91,24 @@ namespace casadi {
   class CASADI_EXPORT Output : public IOInstruction {
   public:
     // Constructor (called from derived classes)
-    Output(const MX& x, int ind, int segment, int offset);
+    Output(const MX& x, casadi_int ind, casadi_int segment, casadi_int offset);
 
     /// Destructor
     ~Output() override {}
 
     /** \brief  Number of outputs */
-    int nout() const override { return 0;}
+    casadi_int nout() const override { return 0;}
 
     /** \brief Get the operation */
-    int op() const override { return OP_OUTPUT;}
+    casadi_int op() const override { return OP_OUTPUT;}
 
     /** \brief  Print expression */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
-                  const std::vector<int>& arg, const std::vector<int>& res) const override;
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
   };
 
 

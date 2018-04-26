@@ -45,8 +45,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_lapackqr);
   }
 
-  LapackQr::LapackQr(const std::string& name) :
-    LinsolInternal(name) {
+  LapackQr::LapackQr(const std::string& name, const Sparsity& sp) :
+    LinsolInternal(name, sp) {
   }
 
   LapackQr::~LapackQr() {
@@ -76,54 +76,55 @@ namespace casadi {
   }
 
   int LapackQr::init_mem(void* mem) const {
-    return LinsolInternal::init_mem(mem);
-  }
-
-  void LapackQr::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
+    if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<LapackQrMemory*>(mem);
-    m->mat.resize(m->ncol() * m->ncol());
-    m->tau.resize(m->ncol());
-    m->work.resize(max(max_nrhs_, m->ncol())*10);
+    m->mat.resize(ncol() * ncol());
+    m->tau.resize(ncol());
+    m->work.resize(max(max_nrhs_, ncol())*10);
+    return 0;
   }
 
-  void LapackQr::factorize(void* mem, const double* A) const {
+  int LapackQr::nfact(void* mem, const double* A) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Dimensions
-    //int nrow = this->nrow();
-    int ncol = m->ncol();
+    //casadi_int nrow = this->nrow();
+    int ncol = this->ncol();
 
     // Get the elements of the matrix, dense format
-    casadi_densify(A, get_ptr(m->sparsity), get_ptr(m->mat), false);
+    casadi_densify(A, sp_, get_ptr(m->mat), false);
 
     // Factorize the matrix
     int info = -100;
     int lwork = m->work.size();
     dgeqrf_(&ncol, &ncol, get_ptr(m->mat), &ncol, get_ptr(m->tau),
             get_ptr(m->work), &lwork, &info);
-    casadi_assert(info == 0,
-      "LapackQr::prepare: dgeqrf_ failed to factorize the Jacobian. Info: " + str(info) + ".");
+    if (info) {
+      if (verbose_) casadi_warning("dgeqrf_ failed: Info: " + str(info));
+      return 1;
+    }
+    return 0;
   }
 
-  void LapackQr::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int LapackQr::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Solve up to max_nrhs rhs at a time
-    int offset = 0;
+    casadi_int offset = 0;
     while (nrhs>0) {
-      _solve(m, x+offset, min(max_nrhs_, nrhs), tr);
+      if (solve_batch(m, A, x+offset, min(max_nrhs_, nrhs), tr)) return 1;
       nrhs-= max_nrhs_;
-      offset+= max_nrhs_*m->nrow();
+      offset+= max_nrhs_*nrow();
     }
+    return 0;
   }
 
-  void LapackQr::_solve(void* mem, double* x, int nrhs, bool tr) const {
+  int LapackQr::solve_batch(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
     auto m = static_cast<LapackQrMemory*>(mem);
 
     // Dimensions
-    //int nrow = this->nrow();
-    int ncol = m->ncol();
+    //casadi_int nrow = this->nrow();
+    int ncol = this->ncol();
 
     // Properties of R
     char uploR = 'U';
@@ -138,15 +139,17 @@ namespace casadi {
     int k = m->tau.size(); // minimum of ncol and nrow
     int lwork = m->work.size();
 
+    int n_rhs = nrhs;
+
     if (tr) {
 
       // Solve for transpose(R)
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &n_rhs, &alphaR,
              get_ptr(m->mat), &ncol, x, &ncol);
 
       // Multiply by Q
       int info = 100;
-      dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
+      dormqr_(&sideQ, &transQ, &ncol, &n_rhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
               &ncol, get_ptr(m->work), &lwork, &info);
       casadi_assert(info == 0,
         "LapackQr::solve: dormqr_ A failed to solve the linear system. Info: " + str(info) + ".");
@@ -154,15 +157,16 @@ namespace casadi {
 
       // Multiply by transpose(Q)
       int info = 100;
-      dormqr_(&sideQ, &transQ, &ncol, &nrhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
+      dormqr_(&sideQ, &transQ, &ncol, &n_rhs, &k, get_ptr(m->mat), &ncol, get_ptr(m->tau), x,
               &ncol, get_ptr(m->work), &lwork, &info);
       casadi_assert(info == 0,
         "LapackQr::solve: dormqr_ B failed to solve the linear system. Info: " + str(info) + ".");
 
       // Solve for R
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &nrhs, &alphaR,
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol, &n_rhs, &alphaR,
              get_ptr(m->mat), &ncol, x, &ncol);
     }
+    return 0;
   }
 
 } // namespace casadi

@@ -59,10 +59,10 @@ namespace casadi {
   ClangCompiler::ClangCompiler(const std::string& name) :
     ImporterInternal(name) {
 
-    myerr_ = 0;
-    executionEngine_ = 0;
-    context_ = 0;
-    act_ = 0;
+    myerr_ = nullptr;
+    executionEngine_ = nullptr;
+    context_ = nullptr;
+    act_ = nullptr;
   }
 
   ClangCompiler::~ClangCompiler() {
@@ -243,7 +243,7 @@ namespace casadi {
     if (f) {
       return reinterpret_cast<signal_t>(executionEngine_->getPointerToFunction(f));
     } else {
-      return 0;
+      return nullptr;
     }
   }
 

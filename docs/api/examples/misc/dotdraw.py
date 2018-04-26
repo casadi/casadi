@@ -47,7 +47,7 @@ y = MX.sym("y",Sparsity.lower(2))
 
 z = MX.sym("z",4,2)
 
-zz = x+y
+zz = x+y+6
 
 dotdraw(zz)
 

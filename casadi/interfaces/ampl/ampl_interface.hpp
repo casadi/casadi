@@ -86,10 +86,10 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     // Solve the NLP
-    void solve(void* mem) const override;
+    int solve(void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;

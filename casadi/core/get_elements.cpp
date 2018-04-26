@@ -40,20 +40,20 @@ namespace casadi {
   }
 
   int GetElements::
-  eval(const double** arg, double** res, int* iw, double* w) const {
+  eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     // Get input and output arguments
     const double* ind = arg[0];
     const double* x = arg[1];
     double* ret = res[0];
     // Dimensions
-    int nnz = dep(0).nnz();
-    int max_ind = dep(1).nnz();
+    casadi_int nnz = dep(0).nnz();
+    casadi_int max_ind = dep(1).nnz();
     // If not in-place, copy
     if (ind != ret) casadi_copy(ind, nnz, ret);
     // Get elements
-    for (int i=0; i<nnz; ++i) {
+    for (casadi_int i=0; i<nnz; ++i) {
       // Get index
-      int index = static_cast<int>(*ret);
+      casadi_int index = static_cast<casadi_int>(*ret);
       // Make assignment if in bounds, else NaN
       *ret++ = index>=0 && index<max_ind ? x[index] : nan;
     }

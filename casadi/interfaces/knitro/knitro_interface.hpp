@@ -49,10 +49,11 @@ namespace casadi {
     KTR_context_ptr kc;
 
     // Inputs
-    double *wx, *wlbx, *wubx, *wlbg, *wubg;
+    double *wlbx, *wubx, *wlbg, *wubg;
 
     // Stats
     const char* return_status;
+    bool success;
 
     /// Constructor
     KnitroMemory(const KnitroInterface& self);
@@ -67,10 +68,6 @@ namespace casadi {
   */
   class CASADI_NLPSOL_KNITRO_EXPORT KnitroInterface : public Nlpsol {
   public:
-    // NLP functions
-    Function fg_fcn_;
-    Function gf_jg_fcn_;
-    Function hess_l_fcn_;
     Sparsity jacg_sp_;
     Sparsity hesslag_sp_;
 
@@ -108,16 +105,17 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     // Solve the NLP
-    void solve(void* mem) const override;
+    int solve(void* mem) const override;
 
     /// Can discrete variables be treated
     bool integer_support() const override { return true;}
 
     // KNITRO callback wrapper
-    static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ,
+    static int callback(const int evalRequestCode,
+                        const int n, const int m, const int nnzJ,
                         const int nnzH, const double * const x, const double * const lambda,
                         double * const obj, double * const c, double * const objGrad,
                         double * const jac, double * const hessian,
@@ -125,6 +123,9 @@ namespace casadi {
 
     // KNITRO return codes
     static const char* return_codes(int flag);
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     // KNITRO options
     Dict opts_;

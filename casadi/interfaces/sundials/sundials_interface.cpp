@@ -86,7 +86,7 @@ namespace casadi {
         "Type of interpolation for the adjoint sensitivities"}},
       {"linear_solver",
        {OT_STRING,
-        "A custom linear solver creator function [default: csparse]"}},
+        "A custom linear solver creator function [default: qr]"}},
       {"linear_solver_options",
        {OT_DICT,
         "Options to be passed to the linear solver"}},
@@ -120,7 +120,7 @@ namespace casadi {
     stop_at_end_ = true;
     use_precon_ = true;
     max_krylov_ = 10;
-    linear_solver_ = "csparse";
+    linear_solver_ = "qr";
     string newton_scheme = "direct";
     quad_err_con_ = false;
     string interpolation_type = "hermite";
@@ -206,7 +206,7 @@ namespace casadi {
         J = getJ(backward);
       } else {
         SundialsInterface* d = derivative_of_.get<SundialsInterface>();
-        casadi_assert_dev(d!=0);
+        casadi_assert_dev(d!=nullptr);
         if (d->ns_==0) {
           J = d->get_function(backward ? "jacB" : "jacF");
         } else {
@@ -223,9 +223,11 @@ namespace casadi {
     alloc_w(2*max(nx_+nz_, nrx_+nrz_), true); // v1, v2
 
     // Allocate linear solvers
-    linsolF_ = Linsol("linsolF", linear_solver_, linear_solver_options_);
+    linsolF_ = Linsol("linsolF", linear_solver_,
+      get_function("jacF").sparsity_out(0), linear_solver_options_);
     if (nrx_>0) {
-      linsolB_ = Linsol("linsolB", linear_solver_, linear_solver_options_);
+      linsolB_ = Linsol("linsolB", linear_solver_,
+        get_function("jacB").sparsity_out(0), linear_solver_options_);
     }
   }
 
@@ -239,12 +241,18 @@ namespace casadi {
     m->rxz = N_VNew_Serial(nrx_+nrz_);
     m->rq = N_VNew_Serial(nrq_);
 
-    // Reset linear solvers
-    linsolF_.reset(get_function("jacF").sparsity_out(0));
-    if (nrx_>0) {
-      linsolB_.reset(get_function("jacB").sparsity_out(0));
-    }
+    m->mem_linsolF = linsolF_.checkout();
+    if (!linsolB_.is_null()) m->mem_linsolB = linsolB_.checkout();
+
     return 0;
+  }
+
+  void SundialsInterface::free_mem(void *mem) const {
+    Integrator::free_mem(mem);
+    auto m = static_cast<SundialsMemory*>(mem);
+
+    linsolF_.release(m->mem_linsolF);
+    if (!linsolB_.is_null()) linsolB_.release(m->mem_linsolB);
   }
 
   void SundialsInterface::reset(IntegratorMemory* mem, double t, const double* x,
@@ -283,10 +291,10 @@ namespace casadi {
   }
 
   SundialsMemory::SundialsMemory() {
-    this->xz  = 0;
-    this->q = 0;
-    this->rxz = 0;
-    this->rq = 0;
+    this->xz  = nullptr;
+    this->q = nullptr;
+    this->rxz = nullptr;
+    this->rq = nullptr;
     this->first_callB = true;
   }
 
@@ -302,32 +310,32 @@ namespace casadi {
     auto m = static_cast<SundialsMemory*>(mem);
 
     // Counters, forward problem
-    stats["nsteps"] = static_cast<int>(m->nsteps);
-    stats["nfevals"] = static_cast<int>(m->nfevals);
-    stats["nlinsetups"] = static_cast<int>(m->nlinsetups);
-    stats["netfails"] = static_cast<int>(m->netfails);
+    stats["nsteps"] = static_cast<casadi_int>(m->nsteps);
+    stats["nfevals"] = static_cast<casadi_int>(m->nfevals);
+    stats["nlinsetups"] = static_cast<casadi_int>(m->nlinsetups);
+    stats["netfails"] = static_cast<casadi_int>(m->netfails);
     stats["qlast"] = m->qlast;
     stats["qcur"] = m->qcur;
     stats["hinused"] = m->hinused;
     stats["hlast"] = m->hlast;
     stats["hcur"] = m->hcur;
     stats["tcur"] = m->tcur;
-    stats["nniters"] = static_cast<int>(m->nniters);
-    stats["nncfails"] = static_cast<int>(m->nncfails);
+    stats["nniters"] = static_cast<casadi_int>(m->nniters);
+    stats["nncfails"] = static_cast<casadi_int>(m->nncfails);
 
     // Counters, backward problem
-    stats["nstepsB"] = static_cast<int>(m->nstepsB);
-    stats["nfevalsB"] = static_cast<int>(m->nfevalsB);
-    stats["nlinsetupsB"] = static_cast<int>(m->nlinsetupsB);
-    stats["netfailsB"] = static_cast<int>(m->netfailsB);
+    stats["nstepsB"] = static_cast<casadi_int>(m->nstepsB);
+    stats["nfevalsB"] = static_cast<casadi_int>(m->nfevalsB);
+    stats["nlinsetupsB"] = static_cast<casadi_int>(m->nlinsetupsB);
+    stats["netfailsB"] = static_cast<casadi_int>(m->netfailsB);
     stats["qlastB"] = m->qlastB;
     stats["qcurB"] = m->qcurB;
     stats["hinusedB"] = m->hinusedB;
     stats["hlastB"] = m->hlastB;
     stats["hcurB"] = m->hcurB;
     stats["tcurB"] = m->tcurB;
-    stats["nnitersB"] = static_cast<int>(m->nnitersB);
-    stats["nncfailsB"] = static_cast<int>(m->nncfailsB);
+    stats["nnitersB"] = static_cast<casadi_int>(m->nnitersB);
+    stats["nncfailsB"] = static_cast<casadi_int>(m->nncfailsB);
     return stats;
   }
 
@@ -365,7 +373,7 @@ namespace casadi {
   }
 
   void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
+                                casadi_int*& iw, double*& w) const {
     auto m = static_cast<SundialsMemory*>(mem);
 
     // Set work in base classes

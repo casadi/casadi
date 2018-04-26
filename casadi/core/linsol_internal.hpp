@@ -35,40 +35,30 @@
 namespace casadi {
 
   struct CASADI_EXPORT LinsolMemory {
-    // Sparsity pattern (allowed to change)
-    std::vector<int> sparsity;
-
     // Current state of factorization
-    bool is_pivoted, is_factorized;
-
-    /// Get sparsity pattern
-    int nrow() const { return sparsity[0];}
-    int ncol() const { return sparsity[1];}
-    const int* colind() const { return &sparsity[2];}
-    const int* row() const { return colind() + ncol() + 1;}
-    int nnz() const { return colind()[ncol()];}
+    bool is_sfact, is_nfact;
 
     // Constructor
-    LinsolMemory() : is_pivoted(false), is_factorized(false) {}
+    LinsolMemory() : is_sfact(false), is_nfact(false) {}
   };
 
   /** Internal class
       @copydoc Linsol_doc
   */
   class CASADI_EXPORT LinsolInternal
-    : public FunctionInternal, public PluginInterface<LinsolInternal> {
+    : public ProtoFunction, public PluginInterface<LinsolInternal> {
   public:
     /// Constructor
-    LinsolInternal(const std::string& name);
+    LinsolInternal(const std::string& name, const Sparsity& sp);
 
     /// Destructor
     ~LinsolInternal() override;
 
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    size_t get_n_in() override { return 0;}
-    size_t get_n_out() override { return 0;}
-    ///@}
+    /** \brief Display object */
+    void disp(std::ostream& stream, bool more) const override;
+
+    /** \brief  Print more */
+    virtual void disp_more(std::ostream& stream) const {}
 
     /// Initialize
     void init(const Dict& opts) override;
@@ -83,38 +73,42 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<LinsolMemory*>(mem);}
 
     /// Evaluate SX, possibly transposed
-    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
-                               bool tr, int nrhs) const;
+    virtual void linsol_eval_sx(const SXElem** arg, SXElem** res,
+                                casadi_int* iw, SXElem* w, void* mem,
+                                bool tr, casadi_int nrhs) const;
 
-    /// Solve Cholesky
-    virtual void solve_cholesky(void* mem, double* x, int nrhs, bool tr) const;
+#if 0
+    // (Re)factorize the system
+    casadi_int factorize(void* mem, const double* A) const;
 
-    // Set sparsity pattern
-    virtual void reset(void* mem, const int* sp) const;
+    // Needs symbolic factorization
+    virtual bool needs_sfact(void* mem, const double* A) const;
 
-    // Symbolic factorization - partial pivoting (optional)
-    virtual void pivoting(void* mem, const double* A) const {}
+    // Needs numeric factorization
+    virtual bool needs_nfact(void* mem, const double* A) const;
+#endif
 
-    /// Factorize the linear system
-    virtual void factorize(void* mem, const double* A) const;
+    // Symbolic factorization
+    virtual int sfact(void* mem, const double* A) const { return 0;}
+
+    /// Numeric factorization
+    virtual int nfact(void* mem, const double* A) const;
 
     // Solve numerically
-    virtual void solve(void* mem, double* x, int nrhs, bool tr) const;
-
-    /// Sparsity pattern of the cholesky factors
-    virtual Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const;
-
-    /// Get Cholesky factor
-    virtual DM linsol_cholesky(void* mem, bool tr) const;
+    virtual int solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const;
 
     /// Number of negative eigenvalues
-    virtual int neig(void* mem) const;
+    virtual casadi_int neig(void* mem, const double* A) const;
 
     /// Matrix rank
-    virtual int rank(void* mem) const;
+    virtual casadi_int rank(void* mem, const double* A) const;
+
+    /// Generate C code
+    virtual void generate(CodeGenerator& g, const std::string& A, const std::string& x,
+                          casadi_int nrhs, bool tr) const;
 
     // Creator function for internal class
-    typedef LinsolInternal* (*Creator)(const std::string& name);
+    typedef LinsolInternal* (*Creator)(const std::string& name, const Sparsity& sp);
 
     // No static functions exposed
     struct Exposed{ };
@@ -127,6 +121,16 @@ namespace casadi {
 
     // Get name of the plugin
     const char* plugin_name() const override = 0;
+
+    /// Get sparsity pattern
+    casadi_int nrow() const { return sp_.size1();}
+    casadi_int ncol() const { return sp_.size2();}
+    const casadi_int* colind() const { return sp_.colind();}
+    const casadi_int* row() const { return sp_.row();}
+    casadi_int nnz() const { return sp_.nnz();}
+
+    // Sparsity pattern of the linear system
+    Sparsity sp_;
   };
 
 } // namespace casadi

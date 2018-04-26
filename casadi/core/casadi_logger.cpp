@@ -22,10 +22,36 @@
  *
  */
 
-
+#include "casadi_common.hpp"
 #include "casadi_logger.hpp"
 
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
+
 namespace casadi {
+
+#ifdef CASADI_WITH_THREAD
+  std::mutex mutex_logger;
+#endif //CASADI_WITH_THREAD
+
+  void Logger::WriteFunThreadSafe(const char* s, std::streamsize num, bool error) {
+#ifdef CASADI_WITH_THREAD
+    std::lock_guard<std::mutex> lock(mutex_logger);
+#endif //CASADI_WITH_THREAD
+    writeFun(s, num, error);
+  }
+
+  void Logger::FlushThreadSafe(bool error) {
+#ifdef CASADI_WITH_THREAD
+    std::lock_guard<std::mutex> lock(mutex_logger);
+#endif //CASADI_WITH_THREAD
+    flush(error);
+  }
 
   void (*Logger::writeFun)(const char* s, std::streamsize num, bool error) =
     Logger::writeDefault;

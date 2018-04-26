@@ -76,10 +76,13 @@ namespace casadi {
     const Options& get_options() const override { return options_;}
     ///@}
 
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
+
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;

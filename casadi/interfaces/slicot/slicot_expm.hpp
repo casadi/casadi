@@ -106,10 +106,10 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     /** \brief  Evaluate numerically */
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -117,9 +117,10 @@ namespace casadi {
 
   private:
 
-    int n_;
+    casadi_int n_;
 
-
+    /// Has the plugin been loaded already?
+    static bool has_loaded_;
   };
 
 } // namespace casadi

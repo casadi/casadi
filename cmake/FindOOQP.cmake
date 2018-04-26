@@ -4,21 +4,6 @@ QpGenData.h
 HINTS $ENV{OOQP}/include/ooqp /usr/local/include/ooqp/
 )
 
-# Dependent packages, BLAS and HSL
-set(OOQP_LIBRARIES)
-find_package(BLAS QUIET)
-if(BLAS_FOUND)
-  set(OOQP_LIBRARIES ${OOQP_LIBRARIES} ${BLAS_LIBRARIES})
-else()
-  message(STATUS "OOQP requires BLAS")
-endif()
-find_package(HSL QUIET)
-if(HSL_FOUND)
-  set(OOQP_LIBRARIES ${OOQP_LIBRARIES} ${HSL_LIBRARIES})
-else()
-  message(STATUS "OOQP requires HSL")
-endif()
-
 if(OOQP_INCLUDE_DIR)
   set(OOQP_FOUND_INCLUDE TRUE)
   set(OOQP_INCLUDE_DIRS
@@ -33,6 +18,7 @@ set(OOQP_LIBS_LIST
   ooqpgensparse ooqpsparse ooqpgondzio ooqpbase
 )
 
+set(OOQP_LIBRARIES)
 set(OOQP_FOUND_LIBS TRUE)
 foreach(LIB ${OOQP_LIBS_LIST})
   find_library(OOQP_LIB_${LIB}
@@ -44,6 +30,20 @@ foreach(LIB ${OOQP_LIBS_LIST})
     set(OOQP_FOUND_LIBS FALSE)
   endif()
 endforeach()
+
+# Dependent packages, BLAS and HSL
+find_package(BLAS QUIET)
+if(BLAS_FOUND)
+  set(OOQP_LIBRARIES ${OOQP_LIBRARIES} ${BLAS_LIBRARIES})
+else()
+  message(STATUS "OOQP requires BLAS")
+endif()
+find_package(HSL QUIET)
+if(HSL_FOUND)
+  set(OOQP_LIBRARIES ${OOQP_LIBRARIES} ${HSL_LIBRARIES})
+else()
+  message(STATUS "OOQP requires HSL")
+endif()
 
 # print OOQP_LIBRARIES
 if(OOQP_FOUND_LIBS)

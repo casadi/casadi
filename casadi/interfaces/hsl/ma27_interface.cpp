@@ -46,8 +46,8 @@ namespace casadi {
     LinsolInternal::registerPlugin(casadi_register_linsol_ma27);
   }
 
-  Ma27Interface::Ma27Interface(const std::string& name)
-    : LinsolInternal(name) {
+  Ma27Interface::Ma27Interface(const std::string& name, const Sparsity& sp)
+    : LinsolInternal(name, sp) {
   }
 
   Ma27Interface::~Ma27Interface() {
@@ -60,14 +60,6 @@ namespace casadi {
 
   }
 
-  void Ma27Interface::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
-    //auto m = static_cast<Ma27Memory*>(mem);
-
-    // Set work in base classes
-    LinsolInternal::set_work(mem, arg, res, iw, w);
-  }
-
   int Ma27Interface::init_mem(void* mem) const {
     if (LinsolInternal::init_mem(mem)) return 1;
     auto m = static_cast<Ma27Memory*>(mem);
@@ -77,16 +69,10 @@ namespace casadi {
     m->icntl[0] = 0;       // Suppress error messages
     m->icntl[1] = 0;       // Suppress diagnostic messages
     m->cntl[0] = 1e-8;     // Set pivot tolerance
-    return 0;
-  }
-
-  void Ma27Interface::reset(void* mem, const int* sp) const {
-    LinsolInternal::reset(mem, sp);
-    auto m = static_cast<Ma27Memory*>(mem);
 
     // Dynamically resized work vectors
-    int N = m->ncol();
-    int nnz = m->colind()[N];
+    casadi_int N = this->ncol();
+    casadi_int nnz = this->nnz();
     double liw_factor = 2;
     m->iw.resize(ceil(liw_factor * (2*nnz+3*N+1)));
     double la_factor = 2;
@@ -95,22 +81,23 @@ namespace casadi {
     m->jcn.resize(nnz);
     m->iw1.resize(2*N);
     m->ikeep.resize(3*N);
+    return 0;
   }
 
-  void Ma27Interface::factorize(void* mem, const double* A) const {
+  int Ma27Interface::nfact(void* mem, const double* A) const {
     auto m = static_cast<Ma27Memory*>(mem);
-    casadi_assert_dev(A!=0);
+    casadi_assert_dev(A!=nullptr);
 
     // Get sparsity
-    const int ncol = m->ncol();
-    const int* colind = m->colind();
-    const int* row = m->row();
+    const casadi_int ncol = this->ncol();
+    const casadi_int* colind = this->colind();
+    const casadi_int* row = this->row();
 
     // Get actual nonzeros
     int nnz=0;
-    for (int cc=0; cc<ncol; ++cc) {
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
-        int rr=row[el];
+    for (casadi_int cc=0; cc<ncol; ++cc) {
+      for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
+        casadi_int rr=row[el];
         if (rr>cc) continue; // only upper triangular part
         if (A[el]!=0) {
           m->nz[nnz] = A[el];
@@ -123,7 +110,7 @@ namespace casadi {
     m->nnz = nnz;
 
     // Order of the matrix
-    int N = m->ncol();
+    int N = this->ncol();
 
     // Symbolic factorization (MA27AD)
     int LIW = m->iw.size();
@@ -134,18 +121,18 @@ namespace casadi {
             get_ptr(m->ikeep), get_ptr(m->iw1), &m->nsteps, &iflag, m->icntl, m->cntl,
             info, &ops);
     iflag = info[0];   // Information flag
-    int ierror = info[1];  // Error flag
-    //int nrlnec = info[4];  // recommended value for la
-    int nirnec = info[5];  // recommended value for liw
+    casadi_int ierror = info[1];  // Error flag
+    //casadi_int nrlnec = info[4];  // recommended value for la
+    casadi_int nirnec = info[5];  // recommended value for liw
     casadi_assert(iflag==0,
       "ma27ad_ returns iflag = " + str(iflag) + " with ierror = " + str(ierror));
 
     // Allocate more memory?
     double la_init_factor = 20.0; // This could be an option.
-    int la_min = ceil(la_init_factor * nirnec);
+    casadi_int la_min = ceil(la_init_factor * nirnec);
     if (la_min > m->nz.size()) m->nz.resize(la_min);
     double liw_init_factor = 5.0; // This could be an option.
-    int liw_min = ceil(liw_init_factor * nirnec);
+    casadi_int liw_min = ceil(liw_init_factor * nirnec);
     if (liw_min > m->iw.size()) m->iw.resize(liw_min);
 
     // Numerical factorization (MA27BD)
@@ -171,30 +158,34 @@ namespace casadi {
 
     // Real work array
     if (m->w.size() < m->maxfrt) m->w.resize(m->maxfrt);
+    return 0;
   }
 
-  int Ma27Interface::neig(void* mem) const {
+  casadi_int Ma27Interface::neig(void* mem, const double* A) const {
     auto m = static_cast<Ma27Memory*>(mem);
+    casadi_assert_dev(m->is_nfact);
     return m->neig;
   }
 
-  int Ma27Interface::rank(void* mem) const {
+  casadi_int Ma27Interface::rank(void* mem, const double* A) const {
     auto m = static_cast<Ma27Memory*>(mem);
+    casadi_assert_dev(m->is_nfact);
     return m->rank;
   }
 
-  void Ma27Interface::solve(void* mem, double* x, int nrhs, bool tr) const {
+  int Ma27Interface::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
     auto m = static_cast<Ma27Memory*>(mem);
 
     // Solve for each right-hand-side
-    int N = m->ncol();
+    int N = this->ncol();
     int LA = m->nz.size();
     int LIW = m->iw.size();
-    for (int k=0; k<nrhs; ++k) {
+    for (casadi_int k=0; k<nrhs; ++k) {
       ma27cd_(&N, get_ptr(m->nz), &LA, get_ptr(m->iw), &LIW, get_ptr(m->w),
               &m->maxfrt, x, get_ptr(m->iw1), &m->nsteps, m->icntl, m->cntl);
       x += N;
     }
+    return 0;
   }
 
   Ma27Memory::Ma27Memory() {

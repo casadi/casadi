@@ -61,7 +61,7 @@ namespace casadi {
   class CASADI_LINSOL_LSQR_EXPORT Lsqr : public LinsolInternal {
   public:
     // Constructor
-    Lsqr(const std::string& name);
+    Lsqr(const std::string& name, const Sparsity& sp);
 
     // Destructor
     ~Lsqr() override;
@@ -73,18 +73,9 @@ namespace casadi {
     std::string class_name() const override { return "Lsqr";}
 
     /** \brief  Create a new Linsol */
-    static LinsolInternal* creator(const std::string& name) {
-      return new Lsqr(name);
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new Lsqr(name, sp);
     }
-
-    ///@{
-    /** \brief Options */
-    static Options options_;
-    const Options& get_options() const override { return options_;}
-    ///@}
-
-    // Initialize
-    void init(const Dict& opts) override;
 
     /** \brief Create memory block */
     void* alloc_mem() const override { return new LsqrMemory();}
@@ -95,20 +86,14 @@ namespace casadi {
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<LsqrMemory*>(mem);}
 
-    // Set sparsity pattern
-    void reset(void* mem, const int* sp) const override;
-
     // Factorize the linear system
-    void factorize(void* mem, const double* A) const override;
+    int nfact(void* mem, const double* A) const override;
 
     // Solve the linear system
-    void solve(void* mem, double* x, int nrhs, bool tr) const override;
+    int solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const override;
 
     /// A documentation string
     static const std::string meta_doc;
-
-    // Generated function options
-    Dict fopts_;
   };
 
 } // namespace casadi

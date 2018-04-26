@@ -48,6 +48,7 @@ link.close()
 # Write a compiler script
 myflags=''
 mydefines=''
+myincludes=''
 
 flags = file(topdir+builddir+makedir+'flags.make','r')
 for l in flags:
@@ -57,8 +58,10 @@ for l in flags:
   m = re.search("CXX_DEFINES = (.*)",l)
   if m:
     mydefines = m.group(1)
-    
-compiler = linker.split(' ')[0] + ' ' + myflags + mydefines + ' -o "$1.o" -c "$1.%s"' % cextension
+  m = re.search("CXX_INCLUDES = (.*)",l)
+  if m:
+    myincludes = m.group(1)
+compiler = linker.split(' ')[0] + ' ' + myflags +" "+ mydefines +" "+ myincludes+ ' -o "$1.o" -c "$1.%s"' % cextension
 flags.close()
 compilerscript = file('compiler.sh','w')
 compilerscript.write('#!/bin/bash\n')

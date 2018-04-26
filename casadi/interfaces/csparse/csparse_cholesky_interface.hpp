@@ -54,6 +54,10 @@ namespace casadi {
 
     // Temporary
     std::vector<double> temp;
+
+    std::vector<int> colind;
+    std::vector<int> row;
+
   };
 
   /** \brief \pluginbrief{Linsol,csparsecholesky}
@@ -67,11 +71,11 @@ namespace casadi {
   CSparseCholeskyInterface : public LinsolInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseCholeskyInterface(const std::string& name);
+    CSparseCholeskyInterface(const std::string& name, const Sparsity& sp);
 
     /** \brief  Create a new LinsolInternal */
-    static LinsolInternal* creator(const std::string& name) {
-      return new CSparseCholeskyInterface(name);
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new CSparseCholeskyInterface(name, sp);
     }
 
     // Destructor
@@ -89,26 +93,14 @@ namespace casadi {
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<CsparseCholMemory*>(mem);}
 
-    // Set sparsity pattern
-    void reset(void* mem, const int* sp) const override;
-
     // Symbolic factorization
-    void pivoting(void* mem, const double* A) const override;
+    int sfact(void* mem, const double* A) const override;
 
     // Factorize the linear system
-    void factorize(void* mem, const double* A) const override;
+    int nfact(void* mem, const double* A) const override;
 
     // Solve the linear system
-    void solve(void* mem, double* x, int nrhs, bool tr) const override;
-
-    // Solve the system of equations <tt>Lx = b</tt>
-    void solve_cholesky(void* mem, double* x, int nrhs, bool tr) const override;
-
-    /// Obtain a symbolic Cholesky factorization
-    Sparsity linsol_cholesky_sparsity(void* mem, bool tr) const override;
-
-    /// Obtain a numeric Cholesky factorization
-    DM linsol_cholesky(void* mem, bool tr) const override;
+    int solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const override;
 
     /// A documentation string
     static const std::string meta_doc;

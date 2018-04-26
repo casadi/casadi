@@ -58,9 +58,9 @@ namespace casadi {
     /// Default constructor
     Linsol();
 
-    /// Importer factory
+    /// Constructor
     explicit Linsol(const std::string& name, const std::string& solver,
-                    const Dict& opts=Dict());
+                    const Sparsity& sp, const Dict& opts=Dict());
 
     /// Access functions of the node
     LinsolInternal* operator->();
@@ -81,50 +81,48 @@ namespace casadi {
     /// Query plugin name
     std::string plugin_name() const;
 
-    /// Solve numerically
+    /// Get linear system sparsity
+    const Sparsity& sparsity() const;
+
+    /// Symbolic factorization of the linear system, e.g. selecting pivots
+    void sfact(const DM& A) const;
+
+    /// Numeric factorization of the linear system
+    void nfact(const DM& A) const;
+
+    ///@{
+    /// Solve linear system of equations
     DM solve(const DM& A, const DM& B, bool tr=false) const;
-
-    /// Create a solve node
     MX solve(const MX& A, const MX& B, bool tr=false) const;
-
-#ifndef SWIG
-    // Set sparsity pattern
-    void reset(const int* sp) const;
-
-    // Select pivots
-    void pivoting(const double* A) const;
-
-    // Factorize linear system of equations
-    void factorize(const double* A) const;
-
-    // Solve factorized linear system of equations
-    void solve(double* x, int nrhs=1, bool tr=false) const;
-
-    /** \brief Solve the system of equations <tt>Lx = b</tt>
-        Only when a Cholesky factorization is available
-    */
-    void solve_cholesky(double* x, int nrhs, bool tr) const;
-#endif // SWIG
-
-    /** \brief Obtain a symbolic Cholesky factorization
-        Only for Cholesky solvers
-    */
-    Sparsity cholesky_sparsity(bool tr=false) const;
-
-    /** \brief Obtain a numeric Cholesky factorization
-        Only for Cholesky solvers
-     */
-    DM cholesky(bool tr=false) const;
+    ///@}
 
     /** \brief Number of negative eigenvalues
       * Not available for all solvers
       */
-    int neig() const;
+    casadi_int neig(const DM& A) const;
 
     /** \brief Matrix rank
       * Not available for all solvers
       */
-    int rank() const;
+    casadi_int rank(const DM& A) const;
+
+    #ifndef SWIG
+    ///@{
+    /// Low-level API
+    int sfact(const double* A, casadi_int mem=0) const;
+    int nfact(const double* A, casadi_int mem=0) const;
+    int solve(const double* A, double* x, casadi_int nrhs=1, bool tr=false, casadi_int mem=0) const;
+    casadi_int neig(const double* A, casadi_int mem=0) const;
+    casadi_int rank(const double* A, casadi_int mem=0) const;
+    ///@}
+
+    /// Checkout a memory object
+    casadi_int checkout() const;
+
+    /// Release a memory object
+    void release(casadi_int mem) const;
+
+    #endif // SWIG
   };
 
   /// Check if a particular plugin is available

@@ -30,6 +30,8 @@ using namespace std;
 namespace casadi {
 
   Determinant::Determinant(const MX& x) {
+    casadi_assert(x.is_square(), "Dimension mismatch. Matrix must be square, "
+      "but got " + x.dim() + " instead.");
     set_dep(x);
     set_sparsity(Sparsity::dense(1, 1));
   }
@@ -47,7 +49,7 @@ namespace casadi {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();
     MX trans_inv_X = inv(X).T();
-    for (int d=0; d<fsens.size(); ++d) {
+    for (casadi_int d=0; d<fsens.size(); ++d) {
       fsens[d][0] = det_X * dot(trans_inv_X, fseed[d][0]);
     }
   }
@@ -57,7 +59,7 @@ namespace casadi {
     const MX& X = dep();
     MX det_X = shared_from_this<MX>();
     MX trans_inv_X = inv(X).T();
-    for (int d=0; d<aseed.size(); ++d) {
+    for (casadi_int d=0; d<aseed.size(); ++d) {
       asens[d][0] += aseed[d][0]*det_X * trans_inv_X;
     }
   }

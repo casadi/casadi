@@ -49,7 +49,7 @@ namespace casadi {
     stop_wall = high_resolution_clock::now();
 
     // Process them
-    t_proc += (stop_proc - start_proc) / static_cast<double>(CLOCKS_PER_SEC);
+    t_proc += static_cast<double>(stop_proc - start_proc) / static_cast<double>(CLOCKS_PER_SEC);
     t_wall += duration<double>(stop_wall - start_wall).count();
 
     n_call +=1;

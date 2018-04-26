@@ -47,6 +47,9 @@ namespace casadi {
     // Gurobi environment
     GRBenv *env;
 
+    int return_status;
+    bool success;
+
     /// Constructor
     GurobiMemory();
 
@@ -100,16 +103,41 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<GurobiMemory*>(mem);}
 
     /// Solve the QP
-    int eval(const double** arg, double** res, int* iw, double* w, void* mem) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /// Can discrete variables be treated
     bool integer_support() const override { return true;}
 
+    /// Can psd constraints be treated
+    bool psd_support() const override { return true;}
+
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
+
     // Variable types
     std::vector<char> vtype_;
+
+    /// Gurobi options
+    Dict opts_;
+
+    // Block partition vector for SOCP (block i runs from r_[i] to r_[i+1])
+    std::vector<casadi_int> r_;
+
+    // Tranpose of A, and corresponding mapping
+    Sparsity AT_;
+    std::vector<casadi_int> A_mapping_;
+
+    // Aggregate SOCP helper constraints (lhs)
+    IM map_Q_;
+
+    // Aggregate SOCP helper constraints (rhs)
+    std::vector<casadi_int> map_P_;
+
+    // Maximum size of ind/val vectors
+    casadi_int indval_size_;
   };
 
 } // namespace casadi

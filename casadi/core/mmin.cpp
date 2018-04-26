@@ -46,4 +46,39 @@ namespace casadi {
     return "max(" + arg.at(0) + ")";
   }
 
+  int MMin::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (!res[0]) return 0;
+    res[0][0] = casadi_mmin(arg[0], dep(0).nnz(), dep(0).is_dense());
+    return 0;
+  }
+
+  int MMax::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (!res[0]) return 0;
+    res[0][0] = casadi_mmax(arg[0], dep(0).nnz(), dep(0).is_dense());
+
+    return 0;
+  }
+
+  int MMin::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    if (!res[0]) return 0;
+    res[0][0] = casadi_mmin(arg[0], dep(0).nnz(), dep(0).is_dense());
+
+    return 0;
+  }
+
+  int MMax::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    if (!res[0]) return 0;
+    res[0][0] = casadi_mmax(arg[0], dep(0).nnz(), dep(0).is_dense());
+
+    return 0;
+  }
+
+  void MMin::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+    res[0] = mmin(arg[0]);
+  }
+
+  void MMax::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+    res[0] = mmax(arg[0]);
+  }
+
 } // namespace casadi

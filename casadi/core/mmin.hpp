@@ -49,7 +49,17 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_MMIN;}
+    casadi_int op() const override { return OP_MMIN;}
+
+    /** \brief  Evaluate numerically */
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+    /** \brief  Evaluate symbolically (SX) */
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+
+    /** \brief  Evaluate symbolically (MX) */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+
   };
 
   /** \brief Matrix maximum
@@ -70,7 +80,17 @@ namespace casadi {
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_MMAX;}
+    casadi_int op() const override { return OP_MMAX;}
+
+    /** \brief  Evaluate numerically */
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
+
+    /** \brief  Evaluate symbolically (SX) */
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
+
+    /** \brief  Evaluate symbolically (MX) */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
+
   };
 
 } // namespace casadi

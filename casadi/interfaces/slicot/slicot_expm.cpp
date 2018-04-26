@@ -62,7 +62,14 @@ namespace casadi {
     clear_mem();
   }
 
+  bool SlicotExpm::has_loaded_ = false;
+
   void SlicotExpm::init(const Dict& opts) {
+
+    if (!has_loaded_) {
+      has_loaded_ = true;
+      casadi_warning("Loaded plugin with GPL license.");
+    }
 
     Expm::init(opts);
 
@@ -76,7 +83,7 @@ namespace casadi {
 
 
   void SlicotExpm::set_work(void* mem, const double**& arg, double**& res,
-                                int*& iw, double*& w) const {
+                                casadi_int*& iw, double*& w) const {
     auto m = static_cast<SlicotExpmMemory*>(mem);
 
     // Set work in base classes
@@ -85,7 +92,7 @@ namespace casadi {
     m->A = w; w += n_*n_;
     m->H = w; w += n_*n_;
     m->dwork = w;
-    m->iwork = iw;
+    m->iwork = reinterpret_cast<int*>(iw);
   }
 
 
@@ -94,7 +101,8 @@ namespace casadi {
     return Expm::init_mem(mem);
   }
 
-  int SlicotExpm::eval(const double** arg, double** res, int* iw, double* w, void* mem) const {
+  int SlicotExpm::eval(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<SlicotExpmMemory*>(mem);
 
     setup(mem, arg, res, iw, w);
@@ -102,7 +110,7 @@ namespace casadi {
     double tol = 1e-8;
     int ret = slicot_mb05nd(n_, arg[1][0], arg[0], n_, m->A, n_, m->H, n_,
       tol, m->iwork, m->dwork, 2*n_*n_);
-
+    casadi_assert(ret==0, "Slicot mb05nd failed with status " + str(ret) + ".");
     if (res[0]) std::copy(m->A, m->A+n_*n_, res[0]);
     return 0;
   }

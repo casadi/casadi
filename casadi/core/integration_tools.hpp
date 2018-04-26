@@ -36,10 +36,11 @@ namespace casadi {
   \param scheme  'radau' or 'legendre'
   **/
   CASADI_EXPORT
-    std::vector<double> collocation_points(int order, const std::string& scheme="radau");
+    std::vector<double> collocation_points(casadi_int order, const std::string& scheme="radau");
 #ifndef SWIG
   CASADI_EXPORT
-    std::vector<long double> collocation_pointsL(int order, const std::string& scheme="radau");
+    std::vector<long double> collocation_pointsL(casadi_int order,
+      const std::string& scheme="radau");
 #endif // SWIG
   ///@}
 
@@ -72,7 +73,7 @@ namespace casadi {
    * \param N     Number of integrator steps
    * \param order Order of interpolating polynomials
    */
-  CASADI_EXPORT Function simpleRK(Function f, int N=10, int order=4);
+  CASADI_EXPORT Function simpleRK(Function f, casadi_int N=10, casadi_int order=4);
 
   /** \brief Construct an implicit Runge-Kutta integrator using a collocation scheme
    * The constructed function has three inputs,
@@ -87,9 +88,10 @@ namespace casadi {
    * \param solver_options Options to be passed to the solver plugin
   */
   CASADI_EXPORT
-  Function simpleIRK(Function f, int N=10, int order=4, const std::string& scheme="radau",
-                       const std::string& solver="newton",
-                       const Dict& solver_options = Dict());
+  Function simpleIRK(Function f, casadi_int N=10, casadi_int order=4,
+                      const std::string& scheme="radau",
+                      const std::string& solver="newton",
+                      const Dict& solver_options = Dict());
 
   /** \brief Simplified wrapper for the Integrator class
    * Constructs an integrator using the same syntax as simpleRK and simpleIRK.

@@ -71,7 +71,7 @@ namespace casadi {
     static double word_distance(const std::string &a, const std::string &b);
 
     /** \brief Get the best suggestions for a misspelled word */
-    std::vector<std::string> suggestions(const std::string& word, int amount=5) const;
+    std::vector<std::string> suggestions(const std::string& word, casadi_int amount=5) const;
 
     /** \brief Find best matches */
     void best_matches(const std::string& word,

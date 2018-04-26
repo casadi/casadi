@@ -57,29 +57,30 @@ namespace casadi {
                          std::vector<std::vector<MX> >& asens) const override;
 
     /// Evaluate the function numerically
-    int eval(const double** arg, double** res, int* iw, double* w) const override;
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /// Evaluate the function symbolically (SX)
-    int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w) const override;
+    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
     /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, int* iw, bvec_t* w) const override;
+    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /** \brief Generate code for the operation */
     void generate(CodeGenerator& g,
-                          const std::vector<int>& arg, const std::vector<int>& res) const override;
+                          const std::vector<casadi_int>& arg,
+                          const std::vector<casadi_int>& res) const override;
 
     /** \brief  Print expression */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /** \brief Get the operation */
-    int op() const override { return OP_MONITOR;}
+    casadi_int op() const override { return OP_MONITOR;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    int n_inplace() const override { return 1;}
+    casadi_int n_inplace() const override { return 1;}
 
   private:
     std::string comment_;

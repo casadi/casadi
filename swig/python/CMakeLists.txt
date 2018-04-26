@@ -95,7 +95,7 @@ else()
   set(CASADI_PYTHON_LIBRARY_SUFFIX ${CMAKE_SHARED_MODULE_SUFFIX})
 endif()
 
-if(APPLE AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if(APPLE AND ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"))
   set_target_properties(_casadi PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
 endif()
 

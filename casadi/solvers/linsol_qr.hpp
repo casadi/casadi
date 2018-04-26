@@ -38,12 +38,7 @@
 
 namespace casadi {
   struct CASADI_LINSOL_QR_EXPORT LinsolQrMemory : public LinsolMemory {
-    // Destructor
-    ~LinsolQrMemory();
-
-    std::vector<int> parent, pinv, leftmost, iw;
-    std::vector<int> sp_v, sp_r;
-    std::vector<double> nz_v, nz_r, beta, w, y;
+    std::vector<double> v, r, beta, w;
   };
 
   /** \brief \pluginbrief{LinsolInternal,qr}
@@ -54,11 +49,11 @@ namespace casadi {
   public:
 
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    LinsolQr(const std::string& name);
+    LinsolQr(const std::string& name, const Sparsity& sp);
 
     /** \brief  Create a new LinsolInternal */
-    static LinsolInternal* creator(const std::string& name) {
-      return new LinsolQr(name);
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new LinsolQr(name, sp);
     }
 
     // Destructor
@@ -76,26 +71,31 @@ namespace casadi {
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<LinsolQrMemory*>(mem);}
 
-    // Set sparsity pattern
-    void reset(void* mem, const int* sp) const override;
-
     // Symbolic factorization
-    void pivoting(void* mem, const double* A) const override;
+    int nfact(void* mem, const double* A) const override;
 
     // Factorize the linear system
-    void factorize(void* mem, const double* A) const override;
+    int sfact(void* mem, const double* A) const override;
 
     // Solve the linear system
-    void solve(void* mem, double* x, int nrhs, bool tr) const override;
+    int solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const override;
 
-    /// A documentation string
-    static const std::string meta_doc;
+    /// Generate C code
+    void generate(CodeGenerator& g, const std::string& A, const std::string& x,
+                  casadi_int nrhs, bool tr) const override;
 
     // Get name of the plugin
     const char* plugin_name() const override { return "qr";}
 
     // Get name of the class
     std::string class_name() const override { return "LinsolQr";}
+
+    /// A documentation string
+    static const std::string meta_doc;
+
+    /// Symbolic factorization
+    std::vector<casadi_int> prinv_, pc_;
+    Sparsity sp_v_, sp_r_;
   };
 
 } // namespace casadi

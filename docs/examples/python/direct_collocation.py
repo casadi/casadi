@@ -97,15 +97,14 @@ x_plot = []
 u_plot = []
 
 # "Lift" initial conditions
-X0 = ca.MX.sym('X0', 2)
-w.append(X0)
+Xk = ca.MX.sym('X0', 2)
+w.append(Xk)
 lbw.append([0, 1])
 ubw.append([0, 1])
 w0.append([0, 1])
-x_plot.append(X0)
+x_plot.append(Xk)
 
 # Formulate the NLP
-Xk = ca.MX([0, 1])
 for k in range(N):
     # New NLP variable for the control
     Uk = ca.MX.sym('U_' + str(k))

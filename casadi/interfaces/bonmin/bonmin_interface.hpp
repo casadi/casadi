@@ -70,18 +70,17 @@
 namespace casadi {
 
   struct CASADI_NLPSOL_BONMIN_EXPORT BonminMemory : public NlpsolMemory {
-    // Current solution
-    double *xk, lam_fk, *lam_gk, *lam_xk;
-
     // Current calculated quantities
-    double fk, *gk, *grad_fk, *jac_gk, *hess_lk, *grad_lk;
+    double *gk, *grad_fk, *jac_gk, *hess_lk, *grad_lk;
 
     // Stats
     std::vector<double> inf_pr, inf_du, mu, d_norm, regularization_size,
       obj, alpha_pr, alpha_du;
-    std::vector<int> ls_trials;
+    std::vector<casadi_int> ls_trials;
     const char* return_status;
-    int iter_count;
+    casadi_int iter_count;
+
+    Bonmin::TMINLP::SosInfo sos_info;
 
     /// Constructor
     BonminMemory();
@@ -138,10 +137,10 @@ namespace casadi {
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
-                          int*& iw, double*& w) const override;
+                          casadi_int*& iw, double*& w) const override;
 
     // Solve the NLP
-    void solve(void* mem) const override;
+    int solve(void* mem) const override;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -167,6 +166,7 @@ namespace casadi {
                                double inf_pr, double inf_du, double mu, double d_norm,
                                double regularization_size, double alpha_du, double alpha_pr,
                                int ls_trials, bool full_callback) const;
+    const Bonmin::TMINLP::SosInfo& sosConstraints(BonminMemory* m) const;
 
     /// Can discrete variables be treated
     bool integer_support() const override { return true;}
@@ -174,9 +174,20 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// Sos constraints information
+    std::vector<double> sos1_weights_;
+    std::vector<int> sos1_indices_;
+    std::vector<int> sos1_priorities_;
+    std::vector<int> sos1_starts_;
+    std::vector<char> sos1_types_;
+    casadi_int sos_num_;
+    casadi_int sos_num_nz_;
+
     // Options
     bool pass_nonlinear_variables_;
+    bool pass_nonlinear_constraints_;
     std::vector<bool> nl_ex_;
+    std::vector<bool> nl_g_;
     Dict var_string_md_, var_integer_md_, var_numeric_md_,
       con_string_md_, con_integer_md_, con_numeric_md_;
   };

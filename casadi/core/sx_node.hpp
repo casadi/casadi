@@ -60,7 +60,7 @@ namespace casadi {
     virtual bool is_integer() const { return false; }
     virtual bool is_symbolic() const { return false; }
     virtual bool is_zero() const { return false; }
-    virtual bool is_op(int op) const { return false; }
+    virtual bool is_op(casadi_int op) const { return false; }
     virtual bool is_almost_zero(double tol) const { return false; }
     virtual bool is_one() const { return false; }
     virtual bool is_minus_one() const { return false; }
@@ -72,7 +72,7 @@ namespace casadi {
     ///@{
     /** \brief  Get value of a constant node */
     virtual double to_double() const;  // only works for constant nodes
-    virtual int to_int() const;  // only works for integer nodes
+    virtual casadi_int to_int() const;  // only works for integer nodes
     ///@}
 
     // get the name
@@ -82,19 +82,19 @@ namespace casadi {
     virtual std::string class_name() const = 0;
 
     /** \brief get the operation */
-    virtual int op() const=0;
+    virtual casadi_int op() const=0;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool is_equal(const SXNode* node, int depth) const;
+    virtual bool is_equal(const SXNode* node, casadi_int depth) const;
 
     /** \brief  Number of dependencies */
-    virtual int n_dep() const { return 0;}
+    virtual casadi_int n_dep() const { return 0;}
 
     /** \brief  get the reference of a child */
-    virtual const SXElem& dep(int i) const;
+    virtual const SXElem& dep(casadi_int i) const;
 
     /** \brief  get the reference of a child */
-    virtual SXElem& dep(int i);
+    virtual SXElem& dep(casadi_int i);
 
     /** \brief  Check if smooth */
     virtual bool is_smooth() const { return true; }
@@ -103,10 +103,10 @@ namespace casadi {
     virtual void disp(std::ostream& stream, bool more) const;
 
     /** \brief Find out which nodes can be inlined */
-    void can_inline(std::map<const SXNode*, int>& nodeind) const;
+    void can_inline(std::map<const SXNode*, casadi_int>& nodeind) const;
 
     /** \brief Print compact */
-    std::string print_compact(std::map<const SXNode*, int>& nodeind,
+    std::string print_compact(std::map<const SXNode*, casadi_int>& nodeind,
                              std::vector<std::string>& intermed) const;
 
     /** \brief  Print expression */
@@ -118,8 +118,11 @@ namespace casadi {
     // Mark by flipping the sign of the temporary and decreasing by one
     void mark() const;
 
+    /** \brief Non-recursive delete */
+    static void safe_delete(SXNode* node);
+
     // Depth when checking equalities
-    static int eq_depth_;
+    static casadi_int eq_depth_;
 
     /** Temporary variables to be used in user algorithms like sorting,
         the user is responsible of making sure that use is thread-safe

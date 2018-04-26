@@ -50,7 +50,7 @@ namespace casadi {
     virtual ~SharedObjectInternal() = 0;
 
     /// Get the reference count
-    int getCount() const;
+    casadi_int getCount() const;
 
     /// Readable name of the internal class
     virtual std::string class_name() const = 0;
@@ -83,7 +83,7 @@ namespace casadi {
 
   private:
     /// Number of references pointing to the object
-    unsigned int count;
+    casadi_int count;
 
     /// Weak pointer (non-owning) object for the object
     WeakRef* weak_ref_;

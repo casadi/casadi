@@ -131,7 +131,7 @@ namespace casadi {
 
     // Create CVodes memory block
     m->mem = CVodeCreate(lmm_, iter_);
-    casadi_assert(m->mem!=0, "CVodeCreate: Creation failed");
+    casadi_assert(m->mem!=nullptr, "CVodeCreate: Creation failed");
 
     // Set error handler function
     THROWING(CVodeSetErrHandlerFn, m->mem, ehfun, m);
@@ -168,7 +168,7 @@ namespace casadi {
       cv_mem->cv_setupNonNull = TRUE;
     } else {
       // Iterative scheme
-      int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
+      casadi_int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
       switch (newton_scheme_) {
       case SD_DIRECT: casadi_assert_dev(0);
       case SD_GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
@@ -196,7 +196,7 @@ namespace casadi {
 
     // Initialize adjoint sensitivities
     if (nrx_>0) {
-      int interpType = interp_==SD_HERMITE ? CV_HERMITE : CV_POLYNOMIAL;
+      casadi_int interpType = interp_==SD_HERMITE ? CV_HERMITE : CV_POLYNOMIAL;
       THROWING(CVodeAdjInit, m->mem, steps_per_checkpoint_, interpType);
     }
 
@@ -316,7 +316,7 @@ namespace casadi {
         cvB_mem->cv_mem->cv_setupNonNull = TRUE;
       } else {
         // Iterative scheme
-        int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
+        casadi_int pretype = use_precon_ ? PREC_LEFT : PREC_NONE;
         switch (newton_scheme_) {
         case SD_DIRECT: casadi_assert_dev(0);
         case SD_GMRES: THROWING(CVSpgmrB, m->mem, m->whichB, pretype, max_krylov_); break;
@@ -475,7 +475,7 @@ namespace casadi {
       m->res[0] = NV_DATA_S(Jv);
       s.calc_function(m, "jtimesF");
       return 0;
-    } catch(int flag) { // recoverable error
+    } catch(casadi_int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
       uerr() << "jtimes failed: " << e.what() << endl;
@@ -524,7 +524,8 @@ namespace casadi {
       casadi_copy(v, s.nx_, m->v1);
 
       // Solve for undifferentiated right-hand-side, save to output
-      s.linsolF_.solve(m->v1, 1);
+      if (s.linsolF_.solve(m->jac, m->v1, 1, false, m->mem_linsolF))
+        casadi_error("Linear system solve failed");
       v = NV_DATA_S(z); // possibly different from r
       casadi_copy(m->v1, s.nx1_, v);
 
@@ -546,7 +547,8 @@ namespace casadi {
         }
 
         // Solve for sensitivity right-hand-sides
-        s.linsolF_.solve(m->v1 + s.nx1_, s.ns_);
+        if (s.linsolF_.solve(m->jac, m->v1 + s.nx1_, s.ns_, false, m->mem_linsolF))
+          casadi_error("Linear solve failed");
 
         // Save to output, reordered
         casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
@@ -573,7 +575,8 @@ namespace casadi {
       casadi_copy(v, s.nrx_, m->v1);
 
       // Solve for undifferentiated right-hand-side, save to output
-      s.linsolB_.solve(m->v1, 1);
+      if (s.linsolB_.solve(m->jacB, m->v1, 1, false, m->mem_linsolB))
+        casadi_error("Linear solve failed");
       v = NV_DATA_S(zvecB); // possibly different from rvecB
       casadi_copy(m->v1, s.nrx1_, v);
 
@@ -597,7 +600,9 @@ namespace casadi {
         }
 
         // Solve for sensitivity right-hand-sides
-        s.linsolB_.solve(m->v1 + s.nx1_, s.ns_);
+        if (s.linsolB_.solve(m->jacB, m->v1 + s.nx1_, s.ns_, false, m->mem_linsolB)) {
+          casadi_error("Linear solve failed");
+        }
 
         // Save to output, reordered
         casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
@@ -629,10 +634,10 @@ namespace casadi {
       m->arg[3] = &d1;
       m->arg[4] = &d2;
       m->res[0] = m->jac;
-      s.calc_function(m, "jacF");
+      if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
 
       // Prepare the solution of the linear system (e.g. factorize)
-      s.linsolF_.factorize(m->jac);
+      if (s.linsolF_.nfact(m->jac, m->mem_linsolF)) casadi_error("'jacF' factorization failed");
 
       return 0;
     } catch(int flag) { // recoverable error
@@ -662,10 +667,10 @@ namespace casadi {
       m->arg[5] = &gammaB;
       m->arg[6] = &one;
       m->res[0] = m->jacB;
-      s.calc_function(m, "jacB");
+      if (s.calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
 
       // Prepare the solution of the linear system (e.g. factorize)
-      s.linsolB_.factorize(m->jacB);
+      if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) casadi_error("'jacB' factorization failed");
 
       return 0;
     } catch(int flag) { // recoverable error
@@ -722,7 +727,7 @@ namespace casadi {
       //cvB_mem = ca_mem->ca_bckpbCrt;
 
       // Get FORWARD solution from interpolation.
-      flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, NULL);
+      flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
       if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
 
       // Call the preconditioner setup function (which sets up the linear solver)
@@ -754,11 +759,11 @@ namespace casadi {
       double delta = 0.0;
 
       // Left/right preconditioner
-      int lr = 1;
+      casadi_int lr = 1;
 
       // Call the preconditioner solve function (which solves the linear system)
       if (psolve(t, x, xdot, b, b, gamma, delta,
-                 lr, static_cast<void*>(m), 0)) return 1;
+                 lr, static_cast<void*>(m), nullptr)) return 1;
 
       return 0;
     } catch(int flag) { // recoverable error
@@ -788,7 +793,7 @@ namespace casadi {
       //cvB_mem = ca_mem->ca_bckpbCrt;
 
       // Get FORWARD solution from interpolation.
-      flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, NULL);
+      flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
       if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
 
 
@@ -801,7 +806,7 @@ namespace casadi {
 
       // Call the preconditioner solve function (which solves the linear system)
       if (psolveB(t, ca_mem->ca_ytmp, x, xdot, b, b, gamma, delta, lr,
-                  static_cast<void*>(m), 0)) return 1;
+                  static_cast<void*>(m), nullptr)) return 1;
 
       return 0;
     } catch(int flag) { // recoverable error
@@ -838,7 +843,7 @@ namespace casadi {
   }
 
   CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {
-    this->mem = 0;
+    this->mem = nullptr;
 
     // Reset checkpoints counter
     this->ncheck = 0;

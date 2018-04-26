@@ -117,10 +117,10 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Does a meta entry exist? */
-    bool has_meta(const std::string& cmd, int ind=-1) const;
+    bool has_meta(const std::string& cmd, casadi_int ind=-1) const;
 
     /** \brief Get entry as a text */
-    std::string get_meta(const std::string& cmd, int ind=-1) const;
+    std::string get_meta(const std::string& cmd, casadi_int ind=-1) const;
 
     /// Check if a function is inlined
     bool inlined(const std::string& symname) const;
@@ -130,7 +130,7 @@ namespace casadi {
 
 #ifndef SWIG
     /** Convert indexed command */
-    static inline std::string indexed(const std::string& cmd, int ind) {
+    static inline std::string indexed(const std::string& cmd, casadi_int ind) {
       std::stringstream ss;
       ss << cmd << "[" << ind << "]";
       return ss.str();
@@ -138,30 +138,30 @@ namespace casadi {
 
     /** \brief Convert to a type */
     template<typename T>
-    T to(const std::string& cmd, int ind=-1) const {
+    T to(const std::string& cmd, casadi_int ind=-1) const {
       return text2type<T>(get_meta(cmd, ind));
     }
 
     /** \brief Get entry as a string */
-    std::string meta_string(const std::string& cmd, int ind=-1) const {
+    std::string meta_string(const std::string& cmd, casadi_int ind=-1) const {
       return to<std::string>(cmd, ind);
     }
 
     /** \brief Get entry as a vector */
     template<typename T>
-    std::vector<T> meta_vector(const std::string& cmd, int ind=-1) const {
+    std::vector<T> meta_vector(const std::string& cmd, casadi_int ind=-1) const {
       return text2vector<T>(get_meta(cmd, ind));
     }
 
     /** \brief Get entry as a set */
     template<typename T>
-    std::set<T> meta_set(const std::string& cmd, int ind=-1) const {
+    std::set<T> meta_set(const std::string& cmd, casadi_int ind=-1) const {
       return text2set<T>(get_meta(cmd, ind));
     }
 
     /** \brief Get entry as an integer */
-    int meta_int(const std::string& cmd, int ind=-1) const {
-      return to<int>(cmd, ind);
+    casadi_int meta_int(const std::string& cmd, casadi_int ind=-1) const {
+      return to<casadi_int>(cmd, ind);
     }
 #endif // SWIG
   };

@@ -24,6 +24,9 @@
 
 #include "shared_object_internal.hpp"
 #include "sparse_storage_impl.hpp"
+#ifdef WITH_EXTRA_CHECKS
+#include "function.hpp"
+#endif // WITH_EXTRA_CHECKS
 #include <typeinfo>
 
 using namespace std;
@@ -33,7 +36,7 @@ namespace casadi {
   template class SparseStorage<WeakRef>;
 
   SharedObject::SharedObject() {
-    node = 0;
+    node = nullptr;
   }
 
   SharedObject::SharedObject(const SharedObject& ref) {
@@ -73,17 +76,23 @@ namespace casadi {
   }
 
   bool SharedObject::is_null() const {
-    return node==0;
+    return node==nullptr;
   }
 
   void SharedObject::count_up() {
+#ifdef WITH_EXTRA_CHECKS
+    casadi_assert_dev(Function::call_depth_==0);
+#endif // WITH_EXTRA_CHECKS
     if (node) node->count++;
   }
 
   void SharedObject::count_down() {
+#ifdef WITH_EXTRA_CHECKS
+    casadi_assert_dev(Function::call_depth_==0);
+#endif // WITH_EXTRA_CHECKS
     if (node && --node->count == 0) {
       delete node;
-      node = 0;
+      node = nullptr;
     }
   }
 
@@ -114,7 +123,7 @@ namespace casadi {
     other = temp;
   }
 
-  int SharedObject::getCount() const {
+  casadi_int SharedObject::getCount() const {
     return (*this)->getCount();
   }
 
@@ -122,8 +131,8 @@ namespace casadi {
     return (*this)->weak();
   }
 
-  size_t SharedObject::__hash__() const {
-    return reinterpret_cast<size_t>(get());
+  casadi_int SharedObject::__hash__() const {
+    return reinterpret_cast<casadi_int>(get());
   }
 
   WeakRef::WeakRef(int dummy) {
@@ -131,7 +140,7 @@ namespace casadi {
   }
 
   bool WeakRef::alive() const {
-    return !is_null() && (*this)->raw_ != 0;
+    return !is_null() && (*this)->raw_ != nullptr;
   }
 
   SharedObject WeakRef::shared() {
@@ -159,7 +168,7 @@ namespace casadi {
   }
 
   void WeakRef::kill() {
-    (*this)->raw_ = 0;
+    (*this)->raw_ = nullptr;
   }
 
 } // namespace casadi

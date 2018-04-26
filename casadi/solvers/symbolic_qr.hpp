@@ -45,13 +45,10 @@ namespace casadi {
 
   /** \brief Memory for SymbolicQR  */
   struct CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQrMemory : public LinsolMemory {
-    // Functions for factorization and (optionally transposed) solve
-    Function factorize, solve, solveT;
-
     // Work vectors
     std::vector<const double*> arg;
     std::vector<double*> res;
-    std::vector<int> iw;
+    std::vector<casadi_int> iw;
     std::vector<double> w;
 
     // Allocate memory for a function
@@ -71,7 +68,7 @@ namespace casadi {
   class CASADI_LINSOL_SYMBOLICQR_EXPORT SymbolicQr : public LinsolInternal {
   public:
     // Constructor
-    SymbolicQr(const std::string& name);
+    SymbolicQr(const std::string& name, const Sparsity& sp);
 
     // Destructor
     ~SymbolicQr() override;
@@ -83,8 +80,8 @@ namespace casadi {
     std::string class_name() const override { return "SymbolicQr";}
 
     /** \brief  Create a new Linsol */
-    static LinsolInternal* creator(const std::string& name) {
-      return new SymbolicQr(name);
+    static LinsolInternal* creator(const std::string& name, const Sparsity& sp) {
+      return new SymbolicQr(name, sp);
     }
 
     ///@{
@@ -105,21 +102,21 @@ namespace casadi {
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<SymbolicQrMemory*>(mem);}
 
-    // Set sparsity pattern
-    void reset(void* mem, const int* sp) const override;
-
     // Factorize the linear system
-    void factorize(void* mem, const double* A) const override;
+    int nfact(void* mem, const double* A) const override;
 
     // Solve the linear system
-    void solve(void* mem, double* x, int nrhs, bool tr) const override;
+    int solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const override;
 
     /** \brief Evaluate symbolically (SX) */
-    void linsol_eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem,
-                        bool tr, int nrhs) const override;
+    void linsol_eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem,
+                        bool tr, casadi_int nrhs) const override;
 
     /// A documentation string
     static const std::string meta_doc;
+
+    // Functions for factorization and (optionally transposed) solve
+    Function factorize_, solve_, solveT_;
 
     // Generated function options
     Dict fopts_;

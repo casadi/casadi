@@ -74,12 +74,13 @@ def nice_stdout():
 @contextlib.contextmanager
 def capture_stdout():
     import sys
-    from io import StringIO
+    try:
+      from cStringIO import StringIO
+    except:
+      from io import StringIO
     oldout,olderr = sys.stdout, sys.stderr
     try:
         out=[StringIO(), StringIO()]
-        sys.stdout.flush()
-        sys.stderr.flush()
         sys.stdout,sys.stderr = out
         yield out
     finally:

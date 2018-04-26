@@ -87,39 +87,40 @@ namespace casadi {
 
 #ifndef SWIG
     /** \brief Evaluate numerically, work vectors given */
-    virtual int eval(const double** arg, double** res, int* iw, double* w, void* mem) const;
-    virtual int eval_sx(const SXElem** arg, SXElem** res, int* iw, SXElem* w, void* mem) const;
+    virtual int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
+    virtual int eval_sx(const SXElem** arg, SXElem** res,
+                        casadi_int* iw, SXElem* w, void* mem) const;
 #endif // SWIG
 
    /** \brief Get the number of inputs
      * This function is called during construction.
      */
-    virtual int get_n_in();
+    virtual casadi_int get_n_in();
 
     /** \brief Get the number of outputs
      * This function is called during construction.
      */
-    virtual int get_n_out();
+    virtual casadi_int get_n_out();
 
     /** \brief Get the sparsity of an input
      * This function is called during construction.
      */
-    virtual Sparsity get_sparsity_in(int i);
+    virtual Sparsity get_sparsity_in(casadi_int i);
 
     /** \brief Get the sparsity of an output
      * This function is called during construction.
      */
-    virtual Sparsity get_sparsity_out(int i);
+    virtual Sparsity get_sparsity_out(casadi_int i);
 
     /** \brief Get the sparsity of an input
      * This function is called during construction.
      */
-    virtual std::string get_name_in(int i);
+    virtual std::string get_name_in(casadi_int i);
 
     /** \brief Get the sparsity of an output
      * This function is called during construction.
      */
-    virtual std::string get_name_out(int i);
+    virtual std::string get_name_out(casadi_int i);
 
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     virtual bool uses_output() const;
@@ -136,11 +137,11 @@ namespace casadi {
     ///@{
     /** \brief Return function that calculates forward derivatives
      *    forward(nfwd) returns a cached instance if available,
-     *    and calls <tt>Function get_forward(int nfwd)</tt>
+     *    and calls <tt>Function get_forward(casadi_int nfwd)</tt>
      *    if no cached version is available.
      */
-    virtual bool has_forward(int nfwd) const;
-    virtual Function get_forward(int nfwd, const std::string& name,
+    virtual bool has_forward(casadi_int nfwd) const;
+    virtual Function get_forward(casadi_int nfwd, const std::string& name,
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;
@@ -149,11 +150,11 @@ namespace casadi {
     ///@{
     /** \brief Return function that calculates adjoint derivatives
      *    reverse(nadj) returns a cached instance if available,
-     *    and calls <tt>Function get_reverse(int nadj)</tt>
+     *    and calls <tt>Function get_reverse(casadi_int nadj)</tt>
      *    if no cached version is available.
      */
-    virtual bool has_reverse(int nadj) const;
-    virtual Function get_reverse(int nadj, const std::string& name,
+    virtual bool has_reverse(casadi_int nadj) const;
+    virtual Function get_reverse(casadi_int nadj, const std::string& name,
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;

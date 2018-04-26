@@ -115,8 +115,8 @@ namespace casadi {
   bool get_variables_types(Index n, VariableType* var_types) override;
   bool get_variables_linearity(Index n, Ipopt::TNLP::LinearityType* var_types) override;
   bool get_constraints_linearity(Index m, Ipopt::TNLP::LinearityType* const_types) override;
-  const SosInfo * sosConstraints() const override {return 0;}
-  const BranchingInfo* branchingInfo() const override {return 0;}
+  const SosInfo * sosConstraints() const override;
+  const BranchingInfo* branchingInfo() const override {return nullptr;}
 
   private:
     BonminUserClass(const BonminUserClass&);

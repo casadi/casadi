@@ -66,8 +66,8 @@ namespace casadi {
   KinsolInterface::KinsolInterface(const std::string& name, const Function& f)
     : Rootfinder(name, f) {
 
-    u_scale_ = 0;
-    f_scale_ = 0;
+    u_scale_ = nullptr;
+    f_scale_ = nullptr;
 
     // Default options
     exact_jac_ = true;
@@ -248,7 +248,7 @@ namespace casadi {
   }
 
   void KinsolInterface::set_work(void* mem, const double**& arg, double**& res,
-                        int*& iw, double*& w) const {
+                        casadi_int*& iw, double*& w) const {
       Rootfinder::set_work(mem, arg, res, iw, w);
       auto m = static_cast<KinsolMemory*>(mem);
       m->jac = w; w += sp_jac_.nnz();
@@ -262,7 +262,7 @@ namespace casadi {
     alloc(jtimes_);
   }
 
-  void KinsolInterface::solve(void* mem) const {
+  int KinsolInterface::solve(void* mem) const {
     auto m = static_cast<KinsolMemory*>(mem);
 
     // Get the initial guess
@@ -270,7 +270,8 @@ namespace casadi {
 
     // Solve the nonlinear system of equations
     int flag = KINSol(m->mem, m->u, strategy_, u_scale_, f_scale_);
-    if (flag<KIN_SUCCESS) kinsol_error("KINSol", flag);
+    m->success = flag>= KIN_SUCCESS;
+    if (flag<KIN_SUCCESS) kinsol_error("KINSol", flag, error_on_fail_);
 
     // Warn if not successful return
     if (verbose_) {
@@ -286,9 +287,10 @@ namespace casadi {
       copy_n(m->iarg, n_in_, m->arg);
       m->arg[iin_] = NV_DATA_S(m->u);
       copy_n(m->ires, n_out_, m->res);
-      m->res[iout_] = 0;
+      m->res[iout_] = nullptr;
       oracle_(m->arg, m->res, m->iw, m->w, 0);
     }
+    return 0;
   }
 
   void KinsolInterface::func(KinsolMemory& m, N_Vector u, N_Vector fval) const {
@@ -355,16 +357,16 @@ namespace casadi {
     calc_function(&m, "jac_f_z");
 
     // Get sparsity and non-zero elements
-    const int* colind = sp_jac_.colind();
-    int ncol = sp_jac_.size2();
-    const int* row = sp_jac_.row();
+    const casadi_int* colind = sp_jac_.colind();
+    casadi_int ncol = sp_jac_.size2();
+    const casadi_int* row = sp_jac_.row();
 
     // Loop over columns
-    for (int cc=0; cc<ncol; ++cc) {
+    for (casadi_int cc=0; cc<ncol; ++cc) {
       // Loop over non-zero entries
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+      for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
         // Get row
-        int rr = row[el];
+        casadi_int rr = row[el];
 
         // Set the element
         DENSE_ELEM(J, rr, cc) = m.jac[el];
@@ -396,16 +398,16 @@ namespace casadi {
     calc_function(&m, "jac_f_z");
 
     // Get sparsity and non-zero elements
-    const int* colind = sp_jac_.colind();
-    int ncol = sp_jac_.size2();
-    const int* row = sp_jac_.row();
+    const casadi_int* colind = sp_jac_.colind();
+    casadi_int ncol = sp_jac_.size2();
+    const casadi_int* row = sp_jac_.row();
 
     // Loop over cols
-    for (int cc=0; cc<ncol; ++cc) {
+    for (casadi_int cc=0; cc<ncol; ++cc) {
       // Loop over non-zero entries
-      for (int el=colind[cc]; el<colind[cc+1]; ++el) {
+      for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
         // Get row
-        int rr = row[el];
+        casadi_int rr = row[el];
 
         // Set the element
         if (rr-cc>=-mupper && rr-cc<=mlower) {
@@ -460,7 +462,7 @@ namespace casadi {
     m.arg[iin_] = NV_DATA_S(u);
     fill_n(m.res, n_out_+1, nullptr);
     m.res[0] = m.jac;
-    calc_function(&m, "jac_f_z");
+    if (calc_function(&m, "jac_f_z")) casadi_error("Jacobian calculation failed");
 
     // Get sparsity and non-zero elements
     //const int* colind = sp_jac_.colind();
@@ -468,7 +470,7 @@ namespace casadi {
     //const int* row = sp_jac_.row();
 
     // Factorize the linear system
-    linsol_.factorize(m.jac);
+    if (linsol_.nfact(m.jac)) casadi_error("'nfact' failed");
   }
 
   int KinsolInterface::psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval,
@@ -487,7 +489,7 @@ namespace casadi {
   void KinsolInterface::psolve(KinsolMemory& m, N_Vector u, N_Vector uscale, N_Vector fval,
                             N_Vector fscale, N_Vector v, N_Vector tmp) const {
     // Solve the factorized system
-    linsol_.solve(NV_DATA_S(v));
+    if (linsol_.solve(m.jac, NV_DATA_S(v))) casadi_error("'solve' failed");
   }
 
   int KinsolInterface::lsetup(KINMem kin_mem) {
@@ -655,12 +657,12 @@ namespace casadi {
       break;
     default:
       id = "N/A";
-      msg = 0;
+      msg = nullptr;
     }
 
     // Construct message
     stringstream ss;
-    if (msg==0) {
+    if (msg==nullptr) {
       ss << "Unknown " << (fatal? "error" : "warning") <<" (" << flag << ")"
         " from module \"" << module << "\".";
     } else {
@@ -670,15 +672,17 @@ namespace casadi {
     }
     ss << "Consult KINSOL documentation for more information.";
     if (fatal) {
-      casadi_error(ss.str());
-        } else {
+      casadi_error("nlpsol process failed. "
+                   "Set 'error_on_fail' option to false to ignore this error. "
+                   + ss.str());
+    } else {
       casadi_warning(ss.str());
     }
   }
 
   KinsolMemory::KinsolMemory(const KinsolInterface& s) : self(s) {
-    this->u = 0;
-    this->mem = 0;
+    this->u = nullptr;
+    this->mem = nullptr;
   }
 
   KinsolMemory::~KinsolMemory() {

@@ -33,6 +33,9 @@ namespace casadi {
 
   std::string GlobalOptions::casadipath = "";
 
-  int GlobalOptions::max_num_dir = 64;
+  casadi_int GlobalOptions::max_num_dir = 64;
+
+  // By default, use zero-based indexing
+  casadi_int GlobalOptions::start_index = 0;
 
 } // namespace casadi
