@@ -65,7 +65,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Finalize the object creation */
-    void finalize(const Dict& opts) override;
+    void finalize() override;
 
     ///@{
     /** \brief Evaluate with DM matrices (NOTE: eval not defined) */

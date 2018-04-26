@@ -72,6 +72,9 @@ namespace casadi {
 
     // All NLP functions
     std::map<std::string, RegFun> all_functions_;
+
+    // Active monitors
+    std::vector<std::string> monitor_;
   public:
     /** \brief  Constructor */
     OracleFunction(const std::string& name, const Function& oracle);
@@ -89,7 +92,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// Finalize initialization
-    void finalize(const Dict& opts) override;
+    void finalize() override;
 
     /** \brief Get oracle */
     const Function& oracle() const override { return oracle_;}
