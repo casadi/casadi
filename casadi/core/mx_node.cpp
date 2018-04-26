@@ -407,11 +407,11 @@ namespace casadi {
     MX x = shared_from_this<MX>();
 
     casadi_assert(y.size2()==z.size2(),
-      "Dimension error. Got y=" + str(y.size2()) + " and z=" + z.dim() + ".");
+      "Dimension error x.mac(z). Got y=" + str(y.size2()) + " and z=" + z.dim() + ".");
     casadi_assert(x.size1()==z.size1(),
-      "Dimension error. Got x=" + x.dim() + " and z=" + z.dim() + ".");
+      "Dimension error x.mac(z). Got x=" + x.dim() + " and z=" + z.dim() + ".");
     casadi_assert(y.size1()==x.size2(),
-      "Dimension error. Got y=" + str(y.size1()) + " and x" + x.dim() + ".");
+      "Dimension error x.mac(z). Got y=" + str(y.size1()) + " and x" + x.dim() + ".");
     if (x.is_dense() && y.is_dense() && z.is_dense()) {
       return MX::create(new DenseMultiplication(z, x, y));
     } else {
