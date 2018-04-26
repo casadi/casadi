@@ -193,7 +193,7 @@ namespace casadi {
     ~MapThread() override;
 
     /** \brief Get type name */
-    std::string class_name() const override {return "MapThreads";}
+    std::string class_name() const override {return "MapThread";}
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
