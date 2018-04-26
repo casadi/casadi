@@ -62,6 +62,7 @@ set(CASADI_PUBLIC
   variable.hpp
   dae_builder.hpp
   optistack.hpp
+  serializer.hpp
 
   # User include class with the most essential includes
   core.hpp
@@ -168,6 +169,7 @@ set(CASADI_INTERNAL
   variable.cpp
   dae_builder.cpp
   optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
+  serializer.cpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp

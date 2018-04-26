@@ -25,6 +25,7 @@
 
 #include "getnonzeros.hpp"
 #include "casadi_misc.hpp"
+#include "serializer.hpp"
 
 using namespace std;
 
@@ -574,5 +575,52 @@ namespace casadi {
     return true;
   }
 
+  void GetNonzerosVector::serialize_node(Serializer& s) const {
+    s.pack("GetNonzeros::type", 'a');
+    s.pack("GetNonzerosVector::nonzeros", nz_);
+  }
+
+  MX GetNonzerosVector::deserialize_more(DeSerializer& s, const MXNode::Info& e) {
+    std::vector<casadi_int> nz;
+    s.unpack("GetNonzerosVector::nonzeros", nz);
+    return MX::create(new GetNonzerosVector(e.sp, e.deps[0], nz));
+  }
+
+  void GetNonzerosSlice::serialize_node(Serializer& s) const {
+    s.pack("GetNonzeros::type", 'b');
+    s.pack("GetNonzerosSlice::slice", s_);
+  }
+
+  MX GetNonzerosSlice::deserialize_more(DeSerializer& s, const MXNode::Info& e) {
+    Slice sl;
+    s.unpack("GetNonzerosSlice::slice", sl);
+    return MX::create(new GetNonzerosSlice(e.sp, e.deps[0], sl));
+  }
+
+  void GetNonzerosSlice2::serialize_node(Serializer& s) const {
+    s.pack("GetNonzeros::type", 'c');
+    s.pack("GetNonzerosSlice2::inner", inner_);
+    s.pack("GetNonzerosSlice2::outer", outer_);
+  }
+
+  MX GetNonzerosSlice2::deserialize_more(DeSerializer& s, const MXNode::Info& e) {
+    Slice inner, outer;
+    s.unpack("GetNonzerosVector2::inner", inner);
+    s.unpack("GetNonzerosVector2::outer", outer);
+    return MX::create(new GetNonzerosSlice2(e.sp, e.deps[0], inner, outer));
+  }
+
+  MX GetNonzeros::deserialize(DeSerializer& s) {
+    MXNode::Info e;
+    MXNode::deserialize(s, e);
+    char t;
+    s.unpack("GetNonzeros::type", t);
+    switch (t) {
+      case 'a': return GetNonzerosVector::deserialize_more(s, e);
+      case 'b': return GetNonzerosSlice::deserialize_more(s, e);
+      case 'c': return GetNonzerosSlice2::deserialize_more(s, e);
+      default: casadi_assert_dev(false);
+    }
+  }
 
 } // namespace casadi

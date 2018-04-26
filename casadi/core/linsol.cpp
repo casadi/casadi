@@ -180,4 +180,13 @@ namespace casadi {
     return Linsol::doc(name);
   }
 
+  void Linsol::serialize(Serializer &s) const {
+    // TODO(jgillis): I don't get why LinsolInternal:: this is necessary
+    return (*this)->LinsolInternal::serialize(s);
+  }
+
+  Linsol Linsol::deserialize(DeSerializer& s) {
+    return LinsolInternal::deserialize(s);
+  }
+
 } // namespace casadi

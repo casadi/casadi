@@ -63,6 +63,7 @@ namespace casadi {
     /** \brief  Check if a multiple output node */
     bool has_output() const override {return true;}
 
+    explicit MultipleOutput(const MXNode::Info& info) : MXNode(info) {}
   };
 
   class CASADI_EXPORT OutputNode : public MXNode {
@@ -97,6 +98,12 @@ namespace casadi {
 
     /** \brief  Output index */
     casadi_int oind_;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
   };
 
 } // namespace casadi

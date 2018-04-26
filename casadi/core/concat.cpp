@@ -376,4 +376,24 @@ namespace casadi {
     }
   }
 
+  void Concat::serialize_node(Serializer& s) const {
+  }
+
+  MX Horzcat::deserialize(DeSerializer& s) {
+    MXNode::Info e;
+    MXNode::deserialize(s, e);
+    return MX::create(new Horzcat(e.deps));
+  }
+
+  MX Vertcat::deserialize(DeSerializer& s) {
+    MXNode::Info e;
+    MXNode::deserialize(s, e);
+    return MX::create(new Vertcat(e.deps));
+  }
+
+  MX Diagcat::deserialize(DeSerializer& s) {
+    MXNode::Info e;
+    MXNode::deserialize(s, e);
+    return MX::create(new Diagcat(e.deps));
+  }
 } // namespace casadi

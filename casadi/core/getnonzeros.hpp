@@ -75,6 +75,9 @@ namespace casadi {
 
     /// Get the nonzeros of matrix
     MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
   };
 
   class CASADI_EXPORT GetNonzerosVector : public GetNonzeros {
@@ -121,6 +124,12 @@ namespace casadi {
 
     /// Operation sequence
     std::vector<casadi_int> nz_;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize_more(DeSerializer& s, const MXNode::Info& e);
   };
 
   // Specialization of the above when nz_ is a Slice
@@ -168,6 +177,12 @@ namespace casadi {
 
     // Data member
     Slice s_;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize_more(DeSerializer& s, const MXNode::Info& e);
   };
 
   // Specialization of the above when nz_ is a nested Slice
@@ -216,6 +231,12 @@ namespace casadi {
 
     // Data members
     Slice inner_, outer_;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize_more(DeSerializer& s, const MXNode::Info& e);
   };
 
 

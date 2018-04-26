@@ -90,6 +90,12 @@ namespace casadi {
     /** \brief Reset the marker for an input expression */
     void reset_input() const override;
 
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
+
   protected:
     // Name of the variable
     std::string name_;

@@ -26,6 +26,7 @@
 #include "multiple_output.hpp"
 #include "function_internal.hpp"
 #include "casadi_misc.hpp"
+#include "serializer.hpp"
 
 using namespace std;
 
@@ -54,6 +55,18 @@ namespace casadi {
 
   std::string OutputNode::disp(const std::vector<std::string>& arg) const {
     return arg.at(0) + "{" + str(oind_) + "}";
+  }
+
+  void OutputNode::serialize_node(Serializer& s) const {
+    s.pack("OutputNode::oind", oind_);
+  }
+
+  MX OutputNode::deserialize(DeSerializer& s) {
+    MXNode::Info e;
+    MXNode::deserialize(s, e);
+    casadi_int oind;
+    s.unpack("OutputNode::oind", oind);
+    return MX::create(new OutputNode(e.deps[0], oind));
   }
 
 } // namespace casadi

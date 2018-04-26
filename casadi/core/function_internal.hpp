@@ -120,6 +120,17 @@ namespace casadi {
     /** \brief Clear all memory (called from destructor) */
     void clear_mem();
 
+    struct Info  {
+      std::string name;
+      bool verbose;
+    };
+
+    explicit ProtoFunction(const Info& e) : name_(e.name), verbose_(e.verbose) {}
+
+    virtual void serialize(Serializer &s) const;
+
+    static void deserialize(DeSerializer& s, Info& e);
+
   protected:
     /// Name
     std::string name_;
@@ -472,17 +483,10 @@ namespace casadi {
       std::ostream &stream, const Dict& options) const;
 
     /** \brief Serialize */
-    virtual void serialize(std::ostream &stream) const;
+    void serialize(Serializer &s) const override;
 
-    /** \brief Serialize function header */
-    void serialize_header(std::ostream &stream) const;
-
-    /** \brief Build function from serialization */
-    static void deserialize_header(std::istream& stream,
-        std::string& name,
-        std::vector<Sparsity>& sp_in, std::vector<Sparsity>& sp_out,
-        std::vector<std::string>& names_in, std::vector<std::string>& names_out,
-        casadi_int& sz_w, casadi_int& sz_iw);
+    /** \brief Serialize */
+    virtual void serialize_function(Serializer &s) const;
 
     /** \brief Display object */
     void disp(std::ostream& stream, bool more) const override;
@@ -795,6 +799,49 @@ namespace casadi {
     template<typename MatType>
     std::vector<std::vector<MatType> >
     symbolicAdjSeed(casadi_int nadj, const std::vector<MatType>& v) const;
+
+    struct Info  {
+      ProtoFunction::Info proto;
+      std::vector<Sparsity> sp_in;
+      std::vector<Sparsity> sp_out;
+      std::vector<std::string> name_in;
+      std::vector<std::string> name_out;
+
+      bool jit;
+
+      bool has_refcount;
+
+      Function derivative_of;
+
+      double jac_penalty;
+
+      bool enable_forward, enable_reverse, enable_jacobian, enable_fd;
+
+      double ad_weight, ad_weight_sp;
+
+      casadi_int max_num_dir;
+
+      bool regularity_check;
+
+      bool inputs_check;
+
+      bool print_time;
+
+      double fd_step;
+
+      std::string fd_method;
+
+      casadi_int sz_arg_per, sz_res_per, sz_iw_per, sz_w_per;
+      casadi_int sz_arg_tmp, sz_res_tmp, sz_iw_tmp, sz_w_tmp;
+
+    };
+
+    /** \brief Info Constructor */
+    FunctionInternal(const Info& e);
+
+    static void deserialize(DeSerializer& s, Info& e);
+
+    static std::map<std::string, Function (*)(DeSerializer&)> deserialize_map;
 
   protected:
     /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization */

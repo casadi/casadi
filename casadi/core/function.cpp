@@ -33,6 +33,7 @@
 #include "nlpsol.hpp"
 #include "conic.hpp"
 #include "jit_function.hpp"
+#include "serializer.hpp"
 
 #include <typeinfo>
 #include <fstream>
@@ -1031,7 +1032,29 @@ namespace casadi {
   }
 
   void Function::serialize(std::ostream &stream) const {
-    return (*this)->serialize(stream);
+    Serializer s(stream);
+    return serialize(s);
+  }
+
+  void Function::serialize(Serializer &s) const {
+    if (is_null()) {
+      s.pack("Function::class_name", std::string("null"));
+    } else {
+      s.pack("Function::class_name", (*this)->class_name());
+      (*this)->serialize(s);
+    }
+  }
+
+  Function Function::deserialize(DeSerializer& s) {
+    std::string class_name;
+    s.unpack("Function::class_name", class_name);
+    if (class_name=="null") return Function();
+    auto it = FunctionInternal::deserialize_map.find(class_name);
+    if (it==FunctionInternal::deserialize_map.end()) {
+      casadi_error("Not implemented.");
+    } else {
+      return it->second(s);
+    }
   }
 
   std::string Function::export_code(const std::string& lang, const Dict& options) const {
@@ -1077,15 +1100,8 @@ namespace casadi {
   }
 
   Function Function::deserialize(std::istream& stream) {
-    char type;
-    stream >> type;
-    switch (type) {
-      case 'S':
-        return SXFunction::deserialize(stream);
-      default:
-        casadi_error("Not implemented");
-    }
-    return Function();
+    DeSerializer s(stream);
+    return deserialize(s);
   }
 
   Function Function::deserialize(const std::string& s) {

@@ -192,6 +192,15 @@ namespace casadi {
     Sparsity get_sparsity_out(casadi_int i) override { return out_.at(i).sparsity();}
     /// @}
 
+    struct Info  {
+      FunctionInternal::Info function;
+      std::vector<MatType> in;
+      std::vector<MatType> out;
+    };
+
+    /** \brief  Info Constructor  */
+    explicit XFunction(const Info& e);
+
     // Data members (all public)
 
     /** \brief  Inputs of the function (needed for symbolic calculations) */
@@ -224,6 +233,10 @@ namespace casadi {
       name_out_ = name_out;
     }
   }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  XFunction<DerivedType, MatType, NodeType>::
+  XFunction(const Info& e) : FunctionInternal(e.function), in_(e.in),  out_(e.out) { }
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>::init(const Dict& opts) {

@@ -28,6 +28,7 @@
 #include "global_options.hpp"
 #include "casadi_interrupt.hpp"
 #include "io_instruction.hpp"
+#include "serializer.hpp"
 
 #include <stack>
 #include <typeinfo>
@@ -47,6 +48,12 @@ namespace casadi {
                          const std::vector<std::string>& name_in,
                          const std::vector<std::string>& name_out) :
     XFunction<MXFunction, MX, MXNode>(name, inputv, outputv, name_in, name_out) {
+  }
+
+  MXFunction::MXFunction(const Info& e) :
+    XFunction<MXFunction, MX, MXNode>(e.xfunction),
+    algorithm_(e.algorithm), workloc_(e.workloc), free_vars_(e.free_vars),
+    default_in_(e.default_in)  {
   }
 
   MXFunction::~MXFunction() {
@@ -1634,6 +1641,51 @@ namespace casadi {
     }
     if (dep.is_null()) return {};
     return dep.stats(1);
+  }
+
+  void MXFunction::serialize_function(Serializer &s) const {
+    s.pack("MXFunction::n_instr", casadi_int(algorithm_.size()));
+
+    // Loop over algorithm
+    for (const auto& e : algorithm_) {
+      s.pack("MXFunction::alg::data", e.data);
+      s.pack("MXFunction::alg::arg", e.arg);
+      s.pack("MXFunction::alg::res", e.res);
+    }
+
+    s.pack("MXFunction::workloc", workloc_);
+    s.pack("MXFunction::free_vars", free_vars_);
+    s.pack("MXFunction::default_in", default_in_);
+
+    s.pack(in_);
+    s.pack(out_);
+  }
+
+  Function MXFunction::deserialize(DeSerializer& s) {
+    Info info;
+    FunctionInternal::deserialize(s, info.xfunction.function);
+    casadi_int n_instructions;
+    s.unpack("MXFunction::n_instr", n_instructions);
+    info.algorithm.resize(n_instructions);
+    for (casadi_int k=0;k<n_instructions;++k) {
+      AlgEl& e = info.algorithm[k];
+      s.unpack("MXFunction::alg::data", e.data);
+      e.op = e.data.op();
+      s.unpack("MXFunction::alg::arg", e.arg);
+      s.unpack("MXFunction::alg::res", e.res);
+    }
+
+    s.unpack("MXFunction::workloc", info.workloc);
+    s.unpack("MXFunction::free_vars", info.free_vars);
+    s.unpack("MXFunction::default_in", info.default_in);
+
+    s.unpack(info.xfunction.in);
+    s.unpack(info.xfunction.out);
+
+    Function ret;
+    ret.own(new MXFunction(info));
+    ret->finalize();
+    return ret;
   }
 
 } // namespace casadi

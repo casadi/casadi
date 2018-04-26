@@ -36,6 +36,12 @@ namespace casadi {
     set_sparsity(Sparsity::dense(1, 1));
   }
 
+  MX Determinant::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return MX::create(new Determinant(info.deps[0]));
+  }
+
   std::string Determinant::disp(const std::vector<std::string>& arg) const {
     return "det(" + arg.at(0) + ")";
   }

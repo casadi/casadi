@@ -25,6 +25,7 @@
 
 #include "slice.hpp"
 #include "casadi_misc.hpp"
+#include "serializer.hpp"
 
 using namespace std;
 namespace casadi {
@@ -250,6 +251,21 @@ namespace casadi {
       else              outer.stop--;
     } while (outer.stop % outer.step!=0);
     return make_pair(inner, outer);
+  }
+
+
+  void Slice::serialize(Serializer& s) const {
+    s.pack("Slice::start", start);
+    s.pack("Slice::stop", stop);
+    s.pack("Slice::step", step);
+  }
+
+  Slice Slice::deserialize(DeSerializer& s) {
+    casadi_int start, stop, step;
+    s.unpack("Slice::start", start);
+    s.unpack("Slice::stop", stop);
+    s.unpack("Slice::step", step);
+    return Slice(start, stop, step);
   }
 
 } // namespace casadi

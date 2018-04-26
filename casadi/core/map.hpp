@@ -133,7 +133,24 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override { return {{"f", f_}, {"n", n_}}; }
 
+    struct Info {
+      FunctionInternal::Info function;
+      Function f;
+      casadi_int n;
+    };
+
+    /** \brief Serialize */
+    void serialize_function(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static Function deserialize(DeSerializer& s);
+
+    /** \brief Deserialize into MX */
+    static void deserialize(DeSerializer& s, Info& e);
+
   protected:
+    explicit Map(const Info& e);
+
     // Constructor (protected, use create function)
     Map(const std::string& name, const Function& f, casadi_int n);
 
@@ -153,7 +170,7 @@ namespace casadi {
   */
   class CASADI_EXPORT MapOmp : public Map {
     friend class Map;
-  protected:
+  public:
     // Constructor (protected, use create function in Map)
     MapOmp(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
 
@@ -174,6 +191,12 @@ namespace casadi {
 
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override;
+
+    /** \brief Deserialize into MX */
+    static Function deserialize(DeSerializer& s);
+
+  protected:
+    explicit MapOmp(const Map::Info& e) : Map(e) {}
   };
 
   /** A map Evaluate in parallel using std::thread
@@ -185,7 +208,7 @@ namespace casadi {
   */
   class CASADI_EXPORT MapThread : public Map {
     friend class Map;
-  protected:
+  public:
     // Constructor (protected, use create function in Map)
     MapThread(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
 
@@ -206,6 +229,12 @@ namespace casadi {
 
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override;
+
+    /** \brief Deserialize into MX */
+    static Function deserialize(DeSerializer& s);
+
+  protected:
+    explicit MapThread(const Map::Info& e) : Map(e) {}
   };
 
 } // namespace casadi

@@ -144,6 +144,12 @@ namespace casadi {
       << " *rr += ss[k*" << nrow_x << "]**tt++;\n";
   }
 
+  MX Multiplication::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return info.deps[1]->get_mac(info.deps[2], info.deps[0]);
+  }
+
 } // namespace casadi
 
 #endif // CASADI_MULTIPLICATION_CPP

@@ -24,6 +24,7 @@
 
 
 #include "transpose.hpp"
+#include "serializer.hpp"
 
 using namespace std;
 
@@ -32,6 +33,33 @@ namespace casadi {
   Transpose::Transpose(const MX& x) {
     set_dep(x);
     set_sparsity(x.sparsity().T());
+  }
+
+  Transpose::Transpose(const MXNode::Info& info) : MXNode(info) {
+  }
+
+  DenseTranspose::DenseTranspose(const MXNode::Info& info) : Transpose(info) {
+  }
+
+  void Transpose::serialize_node(Serializer& s) const {
+    s.pack("Transpose::type", 's');
+  }
+
+  void DenseTranspose::serialize_node(Serializer& s) const {
+    s.pack("Transpose::type", 'd');
+  }
+
+  MX Transpose::deserialize(DeSerializer& s) {
+    MXNode::Info e;
+    MXNode::deserialize(s, e);
+    char t;
+    s.unpack("Transpose::type", t);
+    if (t=='s') {
+      return MX::create(new Transpose(e));
+    } else if (t=='d') {
+      return MX::create(new DenseTranspose(e));
+    }
+    casadi_assert_dev(false);
   }
 
   int Transpose::eval(const double** arg, double** res, casadi_int* iw, double* w) const {

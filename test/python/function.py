@@ -1679,7 +1679,7 @@ class Functiontests(casadiTestCase):
     self.check_codegen(f,inputs=[np.random.random((3,3))], opts={"avoid_stack": True})
   
 
-  def test_sx_serialize(self):
+  def test_serialize(self):
     x = SX.sym("x")
     y = x+3
     z = sin(y)
@@ -1721,15 +1721,36 @@ class Functiontests(casadiTestCase):
 
     f = Function('f',[x],[p])
 
-    with self.assertInException("Cannot serialize SXFunction with free parameters"):
-      pickle.loads(pickle.dumps(f))
+    #SXFunction with free parameters
+    pickle.loads(pickle.dumps(f))
 
 
     x = MX.sym("x")
     f = Function('f',[x],[x**2])
 
-    with self.assertInException("'serialize' not defined for MXFunction"):
-      pickle.loads(pickle.dumps(f))
+    fs = pickle.loads(pickle.dumps(f))
+    self.checkfunction(f,fs,inputs=[3.7],hessian=False)
+
+
+    x = MX.sym("x")
+    y = MX.sym("y",2)
+
+    w = if_else(x, atan2(3*norm_fro(y)*y,x), x-y, True)
+    z = sin(2*x)*w[0]+1
+    g = Function("g",[x,y],[w-x])
+    gmap = g.map(2, "thread", 2)
+    gmapsx = gmap.expand()
+
+    q = gmap(horzcat(2*x,x-y[1]),horzcat(z+y,cos(z+y)))+1/gmapsx(horzcat(2*x,x-y[1]),horzcat(z+y,cos(z+y)))
+
+    q = solve(q,2*y,"lapackqr")
+    q+= bilin(DM([[1,3],[7,8]]),q,2*q)
+    
+    f = Function("f",[x,y],[q+1,jacobian(q, vertcat(x, y))])
+
+    fs = pickle.loads(pickle.dumps(f))
+    self.checkfunction(f,fs,inputs=[1.1, vertcat(2.7,3)],hessian=False)
+
 
   def test_string(self):
     x=MX.sym("x")
@@ -1776,6 +1797,8 @@ class Functiontests(casadiTestCase):
       finv_par = finv.map(200, 'thread',4)
       res = finv_par(numpy.ones(200), numpy.linspace(0, 10, 200))
       self.checkarray(norm_inf(res.T-sqrt(numpy.linspace(0, 10, 200))),0, digits=5)
+
+
 
 if __name__ == '__main__':
     unittest.main()

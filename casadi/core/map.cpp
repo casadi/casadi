@@ -24,6 +24,7 @@
 
 
 #include "map.hpp"
+#include "serializer.hpp"
 
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
@@ -53,6 +54,48 @@ namespace casadi {
 
   Map::Map(const std::string& name, const Function& f, casadi_int n)
     : FunctionInternal(name), f_(f), n_(n) {
+  }
+
+  Map::Map(const Info& e)
+    : FunctionInternal(e.function), f_(e.f), n_(e.n) {
+  }
+
+  void Map::serialize_function(Serializer &s) const {
+    s.pack("Map::f", f_);
+    s.pack("Map::n", n_);
+  }
+
+  void Map::deserialize(DeSerializer& s, Info& e) {
+    FunctionInternal::deserialize(s, e.function);
+    s.unpack("Map::f", e.f);
+    s.unpack("Map::n", e.n);
+  }
+
+  Function Map::deserialize(DeSerializer& s) {
+    Info info;
+    deserialize(s, info);
+    Function ret;
+    ret.own(new Map(info));
+    ret->finalize();
+    return ret;
+  }
+
+  Function MapOmp::deserialize(DeSerializer& s) {
+    Info info;
+    Map::deserialize(s, info);
+    Function ret;
+    ret.own(new MapOmp(info));
+    ret->finalize();
+    return ret;
+  }
+
+  Function MapThread::deserialize(DeSerializer& s) {
+    Info info;
+    Map::deserialize(s, info);
+    Function ret;
+    ret.own(new MapThread(info));
+    ret->finalize();
+    return ret;
   }
 
   Map::~Map() {

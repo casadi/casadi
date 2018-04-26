@@ -89,6 +89,10 @@ namespace casadi {
 
     /** \brief Reset the marker for an input expression */
     void reset_input() const override;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
   };
 
 
@@ -130,6 +134,9 @@ namespace casadi {
 
     /** \brief Get offsets for split */
     std::vector<casadi_int> off() const;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
   };
 
   /** \brief Vertical concatenation of vectors
@@ -170,6 +177,9 @@ namespace casadi {
 
     /** \brief Get offsets for split */
     std::vector<casadi_int> off() const;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
   };
 
   /** \brief Diagonal concatenation of matrices
@@ -210,6 +220,9 @@ namespace casadi {
 
     /** \brief Get offsets for split */
     std::pair<std::vector<casadi_int>, std::vector<casadi_int> > off() const;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
   };
 
 } // namespace casadi

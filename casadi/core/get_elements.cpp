@@ -39,6 +39,12 @@ namespace casadi {
     set_dep(ind, x);
   }
 
+  MX GetElements::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return MX::create(new GetElements(info.deps[0], info.deps[1]));
+  }
+
   int GetElements::
   eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     // Get input and output arguments

@@ -99,6 +99,13 @@ namespace casadi {
 
     /// Linear Solver (may be shared between multiple nodes)
     Linsol linsol_;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
+
   };
 
 

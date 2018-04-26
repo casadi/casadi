@@ -62,5 +62,6 @@
 #include "dae_builder.hpp"
 #include "xml_file.hpp"
 #include "optistack.hpp"
+#include "serializer.hpp"
 
 #endif // CASADI_CORE_HPP

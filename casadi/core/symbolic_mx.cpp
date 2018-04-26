@@ -25,6 +25,7 @@
 
 #include "symbolic_mx.hpp"
 #include "casadi_misc.hpp"
+#include "serializer.hpp"
 
 using namespace std;
 
@@ -87,6 +88,18 @@ namespace casadi {
 
   void SymbolicMX::reset_input() const {
     this->temp = 0;
+  }
+
+  void SymbolicMX::serialize_node(Serializer& s) const {
+    s.pack("SymbolicMX::name", name_);
+  }
+
+  MX SymbolicMX::deserialize(DeSerializer& s) {
+    MXNode::Info d;
+    MXNode::deserialize(s, d);
+    std::string name;
+    s.unpack("SymbolicMX::name", name);
+    return MX::sym(name, d.sp);
   }
 
 } // namespace casadi

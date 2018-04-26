@@ -76,9 +76,24 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override;
 
+    struct Info {
+      MXNode::Info node;
+      std::vector<casadi_int> offset;
+      std::vector<Sparsity> output_sparsity;
+    };
+
     // Sparsity pattern of the outputs
     std::vector<casadi_int> offset_;
     std::vector<Sparsity> output_sparsity_;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static void deserialize(DeSerializer& s, Info& e);
+
+  protected:
+    explicit Split(const Info& info);
   };
 
   /** \brief Horizontal split, x -> x0, x1, ...
@@ -114,6 +129,11 @@ namespace casadi {
     /// Create a horizontal concatenation node
     MX get_horzcat(const std::vector<MX>& x) const override;
 
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
+
+  protected:
+    explicit Horzsplit(const Info& info) : Split(info) {}
   };
 
   /** \brief Diag split, x -> x0, x1, ...
@@ -149,6 +169,11 @@ namespace casadi {
 
     /// Create a diagonal concatenation node
     MX get_diagcat(const std::vector<MX>& x) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
+
+    explicit Diagsplit(const Info& info) : Split(info) {}
   };
 
   /** \brief Vertical split of vectors, x -> x0, x1, ...
@@ -183,6 +208,11 @@ namespace casadi {
 
     /// Create a vertical concatenation node (vectors only)
     MX get_vertcat(const std::vector<MX>& x) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
+
+    explicit Vertsplit(const Info& info) : Split(info) {}
   };
 
 } // namespace casadi

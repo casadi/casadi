@@ -36,6 +36,12 @@ namespace casadi {
     set_sparsity(Sparsity::dense(x.size1(), x.size2()));
   }
 
+  MX Inverse::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return MX::create(new Inverse(info.deps[0]));
+  }
+
   std::string Inverse::disp(const std::vector<std::string>& arg) const {
     return "inv(" + arg.at(0) + ")";
   }

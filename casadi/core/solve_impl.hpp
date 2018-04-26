@@ -269,6 +269,23 @@ namespace casadi {
     linsol_->generate(g, "ss", "rr", nrhs, Tr);
   }
 
+  template<bool Tr>
+  void Solve<Tr>::serialize_node(Serializer& s) const {
+    s.pack("Solve::Tr", Tr);
+    s.pack("Solve::Linsol", linsol_);
+  }
+
+  template<bool Tr>
+  MX Solve<Tr>::deserialize(DeSerializer& s) {
+    MXNode::Info e;
+    MXNode::deserialize(s, e);
+    bool tr;
+    s.unpack("Solve::Tr", tr);
+    Linsol linsol;
+    s.unpack("Solve::Linsol", linsol);
+    return MX::create(new Solve(e.deps[0], e.deps[1], linsol));
+  }
+
 } // namespace casadi
 
 #endif // CASADI_SOLVE_IMPL_HPP

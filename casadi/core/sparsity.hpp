@@ -36,10 +36,19 @@
 #include <list>
 #include <limits>
 #include <unordered_map>
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
 
 namespace casadi {
   // Forward declaration
   class SparsityInternal;
+  class Serializer;
+  class DeSerializer;
 
   #ifndef SWIG
     /** \brief Compact representation of a sparsity pattern */
@@ -124,6 +133,8 @@ namespace casadi {
     using B::diagsplit;
     using B::vertsplit;
     using B::mtimes;
+
+    SparsityInternal* get() const;
 #endif
 
     /** \brief Create a scalar sparsity pattern **/
@@ -357,6 +368,10 @@ namespace casadi {
 
     /** \brief Build Sparsity from serialization */
     static Sparsity deserialize(const std::string& s);
+
+    void serialize(Serializer& s) const;
+
+    static Sparsity deserialize(DeSerializer& s);
 
 #ifndef SWIG
     /** \brief Get a reference to row-vector,
@@ -899,6 +914,11 @@ namespace casadi {
     /// Construct a sparsity pattern from vectors, reuse cached pattern if possible
     void assign_cached(casadi_int nrow, casadi_int ncol,
                         const casadi_int* colind, const casadi_int* row, bool order_rows=false);
+
+    #ifdef CASADI_WITH_THREAD
+    /// Mutex for thread safety (parfor serialization/deserialization)
+     static std::mutex mtx_;
+    #endif // CASADI_WITH_THREAD
 
 #endif //SWIG
   };

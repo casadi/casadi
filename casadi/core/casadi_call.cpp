@@ -26,6 +26,7 @@
 #include "casadi_call.hpp"
 #include "function_internal.hpp"
 #include "casadi_misc.hpp"
+#include "serializer.hpp"
 
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
 throw CasadiException("Error in Call::" FNAME " for '" + fcn_.name() + "' "\
@@ -217,6 +218,18 @@ namespace casadi {
 
   std::vector<MX> Call::create(const Function& fcn, const std::vector<MX>& arg) {
     return MX::createMultipleOutput(new Call(fcn, arg));
+  }
+
+  void Call::serialize_node(Serializer& s) const {
+    s.pack("Call::fcn", fcn_);
+  }
+
+  MX Call::deserialize(DeSerializer& s) {
+    MXNode::Info d;
+    MXNode::deserialize(s, d);
+    Function f;
+    s.unpack("Call::fcn", f);
+    return MX::create(new Call(f, d.deps));
   }
 
 } // namespace casadi
