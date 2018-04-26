@@ -593,6 +593,14 @@ namespace casadi {
     }
   }
 
+  void SXElem::serialize(Serializer& s) const {
+    return (*this)->serialize(s);
+  }
+
+  SXElem SXElem::deserialize(DeSerializer& s) {
+    return SXNode::deserialize(s);
+  }
+
 } // namespace casadi
 
 using namespace casadi;

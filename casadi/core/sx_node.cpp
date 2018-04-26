@@ -24,6 +24,12 @@
 
 
 #include "sx_node.hpp"
+#include "serializer.hpp"
+#include "unary_sx.hpp"
+#include "binary_sx.hpp"
+#include "constant_sx.hpp"
+#include "symbolic_sx.hpp"
+
 #include <limits>
 #include <stack>
 
@@ -191,5 +197,39 @@ namespace casadi {
   }
 
   casadi_int SXNode::eq_depth_ = 1;
+
+  void SXNode::serialize_node(Serializer& s) const {
+    casadi_error("'serialize_node' not defined for class " + class_name());
+  }
+
+  void SXNode::serialize(Serializer& s) const {
+    s.pack("SXNode::op", op());
+    serialize_node(s);
+  }
+
+  SXElem SXNode::deserialize(DeSerializer& s) {
+    casadi_int op;
+    s.unpack("SXNode::op", op);
+
+    if (casadi_math<MX>::is_binary(op)) {
+      return BinarySX::deserialize(s, op);
+    } else if (casadi_math<MX>::is_unary(op)) {
+      return UnarySX::deserialize(s, op);
+    }
+
+    auto it = SXNode::deserialize_map.find(op);
+    if (it==SXNode::deserialize_map.end()) {
+      casadi_error("Not implemented op " + str(casadi_int(op)));
+    } else {
+      return it->second(s);
+    }
+  }
+
+
+  // Note: binary/unary operations are ommitted here
+  std::map<casadi_int, SXElem (*)(DeSerializer&)> SXNode::deserialize_map = {
+    {OP_PARAMETER, SymbolicSX::deserialize},
+    {OP_CONST, ConstantSX::deserialize}};
+
 
 } // namespace casadi

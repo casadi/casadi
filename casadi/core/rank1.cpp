@@ -27,6 +27,12 @@
 using namespace std;
 namespace casadi {
 
+  MX Rank1::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return MX::create(new Rank1(info.deps[0], info.deps[1], info.deps[2], info.deps[3]));
+  }
+
   Rank1::Rank1(const MX& A, const MX& alpha, const MX& x, const MX& y) {
     set_dep({A, alpha, x, y});
     set_sparsity(A.sparsity());

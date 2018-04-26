@@ -36,6 +36,8 @@ namespace casadi {
   /** \brief  Forward declaration */
   class MXNode;
   class Function;
+  class Serializer;
+  class DeSerializer;
 
   /** \brief MX - Matrix expression
 
@@ -274,6 +276,9 @@ namespace casadi {
 
     /** Obtain information about node */
     Dict info() const;
+
+    void serialize(Serializer& s) const;
+    static MX deserialize(DeSerializer& s);
 
     /// \cond INTERNAL
     /// Get the temporary variable

@@ -97,5 +97,13 @@ namespace casadi {
                            g.work(res.front(), nnz()), sparsity(), "w") << "\n";
   }
 
+  void Project::serialize_node(Serializer& s) const {
+  }
+
+  MX Project::deserialize(DeSerializer& s) {
+    MXNode::Info d;
+    MXNode::deserialize(s, d);
+    return MX::create(new Project(d.deps[0], d.sp));
+  }
 
 } // namespace casadi

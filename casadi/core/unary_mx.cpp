@@ -190,4 +190,13 @@ namespace casadi {
     return MXNode::_get_binary(op, y, scX, scY);
   }
 
+  void UnaryMX::serialize_node(Serializer& s) const {
+  }
+
+  MX UnaryMX::deserialize(DeSerializer& s) {
+    MXNode::Info d;
+    MXNode::deserialize(s, d);
+    return d.deps[0]->MXNode::get_unary(d.op);
+  }
+
 } // namespace casadi

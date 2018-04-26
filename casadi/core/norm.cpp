@@ -92,4 +92,28 @@ namespace casadi {
     return "||" + arg.at(0) + "||_inf";
   }
 
+  MX NormF::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return MX::create(new NormF(info.deps[0]));
+  }
+
+  MX Norm1::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return MX::create(new Norm1(info.deps[0]));
+  }
+
+  MX Norm2::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return MX::create(new Norm2(info.deps[0]));
+  }
+
+  MX NormInf::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return MX::create(new NormInf(info.deps[0]));
+  }
+
 } // namespace casadi

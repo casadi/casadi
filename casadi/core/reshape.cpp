@@ -36,6 +36,12 @@ namespace casadi {
     set_sparsity(sp);
   }
 
+  MX Reshape::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return MX::create(new Reshape(info.deps[0], info.sp));
+  }
+
   int Reshape::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
   }

@@ -27,6 +27,7 @@
 #include "sx_node.hpp"
 #include "linsol.hpp"
 #include "expm.hpp"
+#include "serializer.hpp"
 #include <chrono>
 
 using namespace std;
@@ -2664,6 +2665,47 @@ namespace casadi {
     casadi_error("'rand' not defined for " + type_name());
   }
 
+  template<typename Scalar>
+  std::string Matrix<Scalar>::serialize() const {
+    std::stringstream ss;
+    serialize(ss);
+    return ss.str();
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::serialize(Serializer& s) const {
+    s.pack("Matrix::sparsity", sparsity());
+    s.pack("Matrix::nonzeros", nonzeros());
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::deserialize(DeSerializer& s) {
+    Sparsity sp;
+    s.unpack("Matrix::sparsity", sp);
+    std::vector<Scalar> nz;
+    s.unpack("Matrix::nonzeros", nz);
+    return Matrix<Scalar>(sp, nz, false);
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::serialize(std::ostream &stream) const {
+    Serializer s(stream);
+    serialize(s);
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::deserialize(std::istream &stream) {
+    DeSerializer s(stream);
+    return Matrix<Scalar>::deserialize(s);
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::deserialize(const std::string& s) {
+    std::stringstream ss;
+    ss << s;
+    return deserialize(ss);
+  }
+
   // Template specializations
   template<>
   CASADI_EXPORT Matrix<double> Matrix<double>::
@@ -3828,48 +3870,17 @@ namespace casadi {
   Dict DM::info() const {
     return {{"sparsity", sparsity().info()}, {"data", nonzeros()}};
   }
-
-  template<>
-  DM DM::from_info(const Dict& info) {
-    Sparsity sp = Sparsity::from_info(info.at("sparsity"));
-    std::vector<double> data = info.at("data");
-    return DM(sp, data);
-  }
-
   template<>
   Dict IM::info() const {
     return {{"sparsity", sparsity().info()}, {"data", nonzeros()}};
   }
-
-  template<>
-  IM IM::from_info(const Dict& info) {
-    Sparsity sp = Sparsity::from_info(info.at("sparsity"));
-    std::vector<casadi_int> data = info.at("data");
-    return IM(sp, data);
-  }
-
   template<>
   Dict SX::info() const {
     return {{"function", Function("f", std::vector<SX>{}, std::vector<SX>{*this})}};
   }
-
-  template<>
-  SX SX::from_info(const Dict& info) {
-    casadi_error("Not implemented");
-    return SX();
-  }
-
   template<>
   void DM::to_file(const std::string& filename, const std::string& format_hint) const {
-    std::string format = format_hint;
-    if (format_hint=="") {
-      std::string extension = filename.substr(filename.rfind(".")+1);
-      if (extension=="mtx") {
-        format = "mtx";
-      } else {
-        casadi_error("Could not detect format from extension '" + extension + "'");
-      }
-    }
+    std::string format = Sparsity::file_format(filename, format_hint);
     std::ofstream out(filename);
     if (format=="mtx") {
       out << std::scientific << std::setprecision(15);

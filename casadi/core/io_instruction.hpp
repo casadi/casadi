@@ -63,6 +63,8 @@ namespace casadi {
 
     /** Obtain information about node */
     Dict info() const override;
+
+    void serialize_node(Serializer& s) const override;
   };
 
   /** \brief Input instruction  */
@@ -84,6 +86,9 @@ namespace casadi {
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
 
   };
 
@@ -109,6 +114,9 @@ namespace casadi {
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
+
+    static MX deserialize(DeSerializer& s);
+
   };
 
 

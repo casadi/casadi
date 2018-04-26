@@ -33,6 +33,7 @@
 #include "mx_function.hpp"
 #include "linsol.hpp"
 #include "expm.hpp"
+#include "serializer.hpp"
 
 // Throw informative error message
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
@@ -741,6 +742,14 @@ namespace casadi {
 
   Dict MX::info() const {
     return (*this)->info();
+  }
+
+  void MX::serialize(Serializer& s) const {
+    return (*this)->serialize(s);
+  }
+
+  MX MX::deserialize(DeSerializer& s) {
+    return MXNode::deserialize(s);
   }
 
   bool MX::is_equal(const MX& x, const MX& y, casadi_int depth) {

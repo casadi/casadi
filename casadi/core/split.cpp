@@ -26,10 +26,46 @@
 #include "split.hpp"
 #include "casadi_misc.hpp"
 #include "global_options.hpp"
+#include "serializer.hpp"
 
 using namespace std;
 
 namespace casadi {
+
+  Split::Split(const Info& info) :
+    MultipleOutput(info.node),
+    offset_(info.offset),
+    output_sparsity_(info.output_sparsity) {
+  }
+
+  void Split::deserialize(DeSerializer& s, Info& e) {
+    MXNode::deserialize(s, e.node);
+    s.unpack("Split::offset", e.offset);
+    s.unpack("Split::output_sparsity", e.output_sparsity);
+  }
+
+  void Split::serialize_node(Serializer& s) const {
+    s.pack("Split::offset", offset_);
+    s.pack("Split::output_sparsity", output_sparsity_);
+  }
+
+  MX Horzsplit::deserialize(DeSerializer& s) {
+    Split::Info e;
+    Split::deserialize(s, e);
+    return MX::create(new Horzsplit(e));
+  }
+
+  MX Vertsplit::deserialize(DeSerializer& s) {
+    Split::Info e;
+    Split::deserialize(s, e);
+    return MX::create(new Vertsplit(e));
+  }
+
+  MX Diagsplit::deserialize(DeSerializer& s) {
+    Split::Info e;
+    Split::deserialize(s, e);
+    return MX::create(new Vertsplit(e));
+  }
 
   Split::Split(const MX& x, const std::vector<casadi_int>& offset) : offset_(offset) {
     set_dep(x);

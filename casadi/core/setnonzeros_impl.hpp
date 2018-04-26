@@ -28,6 +28,7 @@
 
 #include "setnonzeros.hpp"
 #include "casadi_misc.hpp"
+#include "serializer.hpp"
 
 /// \cond INTERNAL
 
@@ -893,6 +894,61 @@ namespace casadi {
       << " for (tt=rr+" << inner_.start << "; tt!=rr+" << inner_.stop
       << "; tt+=" << inner_.step << ")"
       << " *tt " << (Add?"+=":"=") << " *ss++;\n";
+  }
+
+  template<bool Add>
+  void SetNonzerosVector<Add>::serialize_node(Serializer& s) const {
+    s.pack("SetNonzeros::type", 'a');
+    s.pack("SetNonzerosVector::nonzeros", nz_);
+  }
+
+  template<bool Add>
+  MX SetNonzerosVector<Add>::deserialize_more(DeSerializer& s, const MXNode::Info& e) {
+    std::vector<casadi_int> nz;
+    s.unpack("SetNonzerosVector::nonzeros", nz);
+    return MX::create(new SetNonzerosVector<Add>(e.deps[0], e.deps[1], nz));
+  }
+
+  template<bool Add>
+  void SetNonzerosSlice<Add>::serialize_node(Serializer& s) const {
+    s.pack("SetNonzeros::type", 'b');
+    s.pack("SetNonzerosSlice::slice", s_);
+  }
+
+  template<bool Add>
+  MX SetNonzerosSlice<Add>::deserialize_more(DeSerializer& s, const MXNode::Info& e) {
+    Slice sl;
+    s.unpack("SetNonzerosSlice::slice", sl);
+    return MX::create(new SetNonzerosSlice<Add>(e.deps[0], e.deps[1], sl));
+  }
+
+  template<bool Add>
+  void SetNonzerosSlice2<Add>::serialize_node(Serializer& s) const {
+    s.pack("SetNonzeros::type", 'c');
+    s.pack("SetNonzerosSlice2::inner", inner_);
+    s.pack("SetNonzerosSlice2::outer", outer_);
+  }
+
+  template<bool Add>
+  MX SetNonzerosSlice2<Add>::deserialize_more(DeSerializer& s, const MXNode::Info& e) {
+    Slice inner, outer;
+    s.unpack("SetNonzerosVector2::inner", inner);
+    s.unpack("SetNonzerosVector2::outer", outer);
+    return MX::create(new SetNonzerosSlice2<Add>(e.deps[0], e.deps[1], inner, outer));
+  }
+
+  template<bool Add>
+  MX SetNonzeros<Add>::deserialize(DeSerializer& s) {
+    MXNode::Info e;
+    MXNode::deserialize(s, e);
+    char t;
+    s.unpack("SetNonzeros::type", t);
+    switch (t) {
+      case 'a': return SetNonzerosVector<Add>::deserialize_more(s, e);
+      case 'b': return SetNonzerosSlice<Add>::deserialize_more(s, e);
+      case 'c': return SetNonzerosSlice2<Add>::deserialize_more(s, e);
+      default: casadi_assert_dev(false);
+    }
   }
 
 } // namespace casadi

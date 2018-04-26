@@ -129,4 +129,11 @@ namespace casadi {
                  g.work(arg[2], dep(2).nnz())) << ";\n";
   }
 
+  MX Bilin::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return MX::create(new Bilin(info.deps[0], info.deps[1], info.deps[2]));
+  }
+
+
 } // namespace casadi

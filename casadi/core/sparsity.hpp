@@ -40,6 +40,8 @@
 namespace casadi {
   // Forward declaration
   class SparsityInternal;
+  class Serializer;
+  class DeSerializer;
 
   #ifndef SWIG
     /** \brief Compact representation of a sparsity pattern */
@@ -124,6 +126,8 @@ namespace casadi {
     using B::diagsplit;
     using B::vertsplit;
     using B::mtimes;
+
+    SparsityInternal* get() const;
 #endif
 
     /** \brief Create a scalar sparsity pattern **/
@@ -337,9 +341,6 @@ namespace casadi {
     /** Obtain information about sparsity */
     Dict info() const;
 
-    /** Construct instance from info */
-    static Sparsity from_info(const Dict& info);
-
     /** Export sparsity pattern to file
     *
     * Supported formats:
@@ -362,6 +363,10 @@ namespace casadi {
 
     /** \brief Build Sparsity from serialization */
     static Sparsity deserialize(const std::string& s);
+
+    void serialize(Serializer& s) const;
+
+    static Sparsity deserialize(DeSerializer& s);
 
 #ifndef SWIG
     /** \brief Get a reference to row-vector,

@@ -27,6 +27,7 @@
 #define UNARY_SX_HPP
 
 #include "sx_node.hpp"
+#include "serializer.hpp"
 
 /// \cond INTERNAL
 
@@ -96,6 +97,16 @@ class UnarySX : public SXNode {
 
     /** \brief  The dependencies of the node */
     SXElem dep_;
+
+    void serialize_node(Serializer& s) const override {
+      s.pack("UnarySX::dep", dep_);
+    }
+
+    static SXElem deserialize(DeSerializer& s, casadi_int op) {
+      SXElem dep;
+      s.unpack("UnarySX::dep", dep);
+      return create(op, dep);
+    }
 };
 
 } // namespace casadi

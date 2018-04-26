@@ -215,6 +215,10 @@ namespace casadi {
     friend inline SXElem if_else(const SXElem& x, const SXElem& y, const SXElem& z) {
       return if_else_zero(x, y) + if_else_zero(!x, z);
     }
+
+    void serialize(Serializer& s) const;
+
+    static SXElem deserialize(DeSerializer& s);
   private:
     /// Pointer to node (SXElem is only a reference class)
     SXNode* node;

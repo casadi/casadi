@@ -182,6 +182,26 @@ class CASADI_EXPORT SXFunction :
   /// Default input values
   std::vector<double> default_in_;
 
+
+  struct Info  {
+    XFunction<SXFunction, Matrix<SXElem>, SXNode>::Info xfunction;
+    std::vector<AlgEl> algorithm;
+    casadi_int worksize;
+    std::vector<SXElem> free_vars;
+    std::vector<SXElem> operations;
+    std::vector<SXElem> constants;
+    std::vector<double> default_in;
+  };
+
+  /** \brief Constructor */
+  explicit SXFunction(const Info & e);
+
+  /** \brief Serialize */
+  void serialize_function(Serializer &s) const override;
+
+  /** \brief Deserialize into MX */
+  static Function deserialize(DeSerializer& s);
+
   ///@{
   /** \brief Options */
   static Options options_;
@@ -216,12 +236,6 @@ class CASADI_EXPORT SXFunction :
   /** \brief Export function in a specific language */
   void export_code_body(const std::string& lang,
     std::ostream &stream, const Dict& options) const override;
-
-  /** \brief Serialize */
-  void serialize(std::ostream &stream) const override;
-
-  /** \brief Build function from serialization */
-  static Function deserialize(std::istream &stream);
 
   /// With just-in-time compilation using OpenCL
   bool just_in_time_opencl_;

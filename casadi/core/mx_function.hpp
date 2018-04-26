@@ -77,6 +77,17 @@ namespace casadi {
     /// Default input values
     std::vector<double> default_in_;
 
+    struct Info  {
+      XFunction<MXFunction, MX, MXNode>::Info xfunction;
+      std::vector<AlgEl> algorithm;
+      std::vector<casadi_int> workloc;
+      std::vector<MX> free_vars;
+      std::vector<double> default_in;
+    };
+
+    /** \brief Constructor */
+    explicit MXFunction(const Info & e);
+
     /** \brief Constructor */
     MXFunction(const std::string& name,
       const std::vector<MX>& input, const std::vector<MX>& output,
@@ -121,6 +132,12 @@ namespace casadi {
 
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override;
+
+    /** \brief Serialize */
+    void serialize_function(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static Function deserialize(DeSerializer& s);
 
     /** \brief Extract the residual function G and the modified function Z out of an expression
      * (see Albersmeyer2010 paper) */

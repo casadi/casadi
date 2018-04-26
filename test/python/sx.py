@@ -1038,7 +1038,8 @@ class SXtests(casadiTestCase):
   def test_large_hessian(self):
     import pickle
 
-    A = pickle.load(open("../data/apoa1-2.pkl","r"))
+    A = Sparsity.from_file("../data/apoa1-2.mtx")
+
 
     H = DM(A,list(range(A.nnz())))
     H = H + H.T

@@ -2687,10 +2687,10 @@ namespace casadi{
 %extend Sparsity {
   %pythoncode %{
     def __setstate__(self, state):
-        self.__init__(Sparsity.from_info(state))
+        self.__init__(Sparsity.deserialize(state["serialization"]))
 
     def __getstate__(self):
-        return self.info()
+        return {"serialization": self.serialize()}
   %}
 }
 
@@ -3550,10 +3550,10 @@ namespace casadi{
 
   %pythoncode %{
     def __setstate__(self, state):
-        self.__init__(self.from_info(state))
+        self.__init__(IM.deserialize(state["serialization"]))
 
     def __getstate__(self):
-        return self.info()
+        return {"serialization": self.serialize()}
   %}
 }
 
@@ -3561,10 +3561,10 @@ namespace casadi{
 
   %pythoncode %{
     def __setstate__(self, state):
-        self.__init__(self.from_info(state))
+        self.__init__(DM.deserialize(state["serialization"]))
 
     def __getstate__(self):
-        return self.info()
+        return {"serialization": self.serialize()}
   %}
 
 }
@@ -3594,15 +3594,25 @@ namespace casadi{
 
   %matlabcode %{
      function s = saveobj(obj)
-        s = obj.info();
+        try
+            s.serialization = obj.serialize();
+        catch exception
+            warning(['Serializing of CasADi IM failed:' getReport(exception) ]);
+            s = struct;
+        end
      end
   %}
   %matlabcode_static %{
      function obj = loadobj(s)
-        if isstruct(s)
-           obj = casadi.IM.from_info(s);
-        else
-           obj = s;
+        try
+          if isstruct(s)
+             obj = casadi.IM.deserialize(s.serialization);
+          else
+             obj = s;
+          end
+        catch exception
+            warning(['Serializing of CasADi IM failed:' getReport(exception) ]);
+            s = struct;
         end
      end
   %}
@@ -3612,15 +3622,25 @@ namespace casadi{
 
   %matlabcode %{
      function s = saveobj(obj)
-        s = obj.info();
+        try
+            s.serialization = obj.serialize();
+        catch exception
+            warning(['Serializing of CasADi DM failed:' getReport(exception) ]);
+            s = struct;
+        end
      end
   %}
   %matlabcode_static %{
      function obj = loadobj(s)
-        if isstruct(s)
-           obj = casadi.DM.from_info(s);
-        else
-           obj = s;
+        try
+          if isstruct(s)
+             obj = casadi.DM.deserialize(s.serialization);
+          else
+             obj = s;
+          end
+        catch exception
+            warning(['Serializing of CasADi DM failed:' getReport(exception) ]);
+            s = struct;
         end
      end
   %}
@@ -3629,15 +3649,25 @@ namespace casadi{
 %extend Sparsity {
   %matlabcode %{
      function s = saveobj(obj)
-        s = obj.info();
+        try
+            s.serialization = obj.serialize();
+        catch exception
+            warning(['Serializing of CasADi Sparsity failed:' getReport(exception) ]);
+            s = struct;
+        end
      end
   %}
   %matlabcode_static %{
      function obj = loadobj(s)
-        if isstruct(s)
-           obj = casadi.Sparsity.from_info(s);
-        else
-           obj = s;
+        try
+          if isstruct(s)
+             obj = casadi.Sparsity.deserialize(s.serialization);
+          else
+             obj = s;
+          end
+        catch exception
+            warning(['Serializing of CasADi Sparsity failed:' getReport(exception) ]);
+            s = struct;
         end
      end
   %}
@@ -3648,29 +3678,8 @@ namespace casadi{
 
   %matlabcode %{
      function s = saveobj(obj)
-       try
-            if is_a(obj,'SXFunction')
-              s = struct;
-              s.serialization = obj.serialize();
-            else
-              s = struct;
-              s.code = obj.export_code('matlab');
-              s.sparsity_in = cell(obj.n_in, 1);
-              s.name_in = cell(obj.n_in, 1);
-              for i=1:obj.n_in
-                s.sparsity_in{i} = obj.sparsity_in(i-1);
-                s.name_in{i} = obj.name_in(i-1);
-              end
-              s.sparsity_out = cell(obj.n_out, 1);
-              s.name_out = cell(obj.n_out, 1);
-              for i=1:obj.n_out
-                s.sparsity_out{i} = obj.sparsity_out(i-1);
-                s.name_out{i} = obj.name_out(i-1);
-              end
-              s.type = obj.class_name();
-              s.name = obj.name;
-              warning('Serializing of CasADi Functions is still experimental');
-            end
+        try
+            s.serialization = obj.serialize();
         catch exception
             warning(['Serializing of CasADi Function failed:' getReport(exception) ]);
             s = struct;
@@ -3681,33 +3690,7 @@ namespace casadi{
      function obj = loadobj(s)
         try
           if isstruct(s)
-             if isfield(s,'serialization')
-               obj = casadi.Function.deserialize(s.serialization);
-               return;
-             elseif ~isfield(s,'code')
-               warning('Not supported');
-               obj = casadi.Function();
-               return;
-             end
-             warning('Serializing of CasADi Functions is still experimental');
-             args_in = cell(length(s.sparsity_in),1);
-             for i=1:numel(args_in)
-               if strcmp(s.type,'MXFunction')
-                 args_in{i} = casadi.MX.sym(s.name_in{i}, s.sparsity_in{i});
-               else
-                 args_in{i} = casadi.SX.sym(s.name_in{i}, s.sparsity_in{i});
-               end
-             end
-
-             alphabet= 'a':'z';
-             filename = ['temp_' alphabet(randi(length(alphabet),1,20))];
-             f = fopen([filename '.m'],'w');
-             fprintf(f, s.code);
-             fclose(f);
-             clear(filename)
-             [args_out{1:length(s.sparsity_out)}] = feval(filename, args_in{:});
-             delete([filename '.m'])
-             obj = casadi.Function(s.name, args_in, args_out, s.name_in, s.name_out);
+             obj = casadi.Function.deserialize(s.serialization);
           else
              obj = s;
           end

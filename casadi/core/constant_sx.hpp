@@ -27,6 +27,7 @@
 #define CASADI_CONSTANT_SX_HPP
 
 #include "sx_node.hpp"
+#include "serializer.hpp"
 #include <cassert>
 
 /// \cond INTERNAL
@@ -63,6 +64,16 @@ casadi_int op() const override { return OP_CONST;}
 bool is_equal(const SXNode* node, casadi_int depth) const override {
   const ConstantSX* n = dynamic_cast<const ConstantSX*>(node);
   return n && n->to_double()==to_double();
+}
+
+void serialize_node(Serializer& s) const override {
+  s.pack("ConstantSX::val", to_double());
+}
+
+static SXElem deserialize(DeSerializer& s) {
+  double val;
+  s.unpack("ConstantSX::val", val);
+  return SXElem(val);
 }
 
 protected:

@@ -72,6 +72,12 @@ namespace casadi {
     void generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res) const override;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override {}
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
   };
 
 } // namespace casadi

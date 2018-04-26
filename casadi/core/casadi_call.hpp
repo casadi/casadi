@@ -118,6 +118,12 @@ namespace casadi {
     /** \brief Get required length of w field */
     size_t sz_w() const override;
 
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
+
   protected:
     /** \brief  Constructor (should not be used directly) */
     explicit Call(const Function& fcn, const std::vector<MX>& arg);

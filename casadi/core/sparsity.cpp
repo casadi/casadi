@@ -28,6 +28,7 @@
 #include "matrix.hpp"
 #include "casadi_misc.hpp"
 #include "sparse_storage_impl.hpp"
+#include "serializer.hpp"
 #include <climits>
 
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
@@ -1772,25 +1773,6 @@ namespace casadi {
     return {{"nrow", size1()}, {"ncol", size2()}, {"colind", get_colind()}, {"row", get_row()}};
   }
 
-  Sparsity Sparsity::from_info(const Dict& info) {
-    auto it = info.find("nrow");
-    if (it==info.end()) return Sparsity();
-    casadi_int nrow = info.at("nrow");
-    casadi_int ncol = info.at("ncol");
-    std::vector<casadi_int> row, colind;
-    if (info.at("row").is_int_vector()) {
-      row = info.at("row");
-    } else {
-      row.push_back(info.at("row"));
-    }
-    if (info.at("colind").is_int_vector()) {
-      colind = info.at("colind");
-    } else {
-      colind.push_back(info.at("colind"));
-    }
-    return Sparsity(nrow, ncol, colind, row);
-  }
-
   std::set<std::string> Sparsity::file_formats = {"mtx"};
 
   std::string Sparsity::file_format(const std::string& filename, const std::string& format_hint) {
@@ -1881,37 +1863,31 @@ namespace casadi {
   }
 
   void Sparsity::serialize(std::ostream &stream) const {
-    casadi_int size1=this->size1(), size2=this->size2(), nnz=this->nnz();
-    const casadi_int *colind = this->colind(), *row = this->row();
-    stream << "sp";
-    stream << size1 << "x" << size2;
-    stream << "n" << nnz;
-    for (int i=0; i<nnz; ++i)
-      stream << ":" << row[i];
-    for (int i=0; i<size2+1; ++i)
-      stream << ":" << colind[i];
-    stream << "s";
+    Serializer s(stream);
+    serialize(s);
   }
 
   Sparsity Sparsity::deserialize(std::istream &stream) {
-    char ch;
-    stream >> ch;
-    stream >> ch;
-    casadi_int nrow, ncol, nnz;
-    stream >> nrow; stream >> ch;
-    stream >> ncol; stream >> ch;
-    stream >> nnz;
-    std::vector<casadi_int> row(nnz), colind(ncol+1);
-    for (int i=0; i<nnz; ++i) {
-      stream >> ch;
-      stream >> row[i];
+    DeSerializer s(stream);
+    return Sparsity::deserialize(s);
+  }
+
+  void Sparsity::serialize(Serializer& s) const {
+    if (is_null()) {
+      s.pack("SparsityInternal::compressed", std::vector<casadi_int>{});
+    } else {
+      s.pack("SparsityInternal::compressed", compress());
     }
-    for (int i=0; i<ncol+1; ++i) {
-      stream >> ch;
-      stream >> colind[i];
+  }
+
+  Sparsity Sparsity::deserialize(DeSerializer& s) {
+    std::vector<casadi_int> i;
+    s.unpack("SparsityInternal::compressed", i);
+    if (i.size()==0) {
+      return Sparsity();
+    } else {
+      return Sparsity::compressed(i);
     }
-    stream >> ch;
-    return Sparsity(nrow, ncol, colind, row);
   }
 
   std::string Sparsity::serialize() const {
@@ -1924,5 +1900,9 @@ namespace casadi {
     std::stringstream ss;
     ss << s;
     return deserialize(ss);
+  }
+
+  SparsityInternal* Sparsity::get() const {
+    return static_cast<SparsityInternal*>(SharedObject::get());
   }
 } // namespace casadi

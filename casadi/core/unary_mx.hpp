@@ -94,6 +94,12 @@ namespace casadi {
       return sameOpAndDeps(node, depth);
     }
 
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
+
     //! \brief operation
     Operation op_;
   };

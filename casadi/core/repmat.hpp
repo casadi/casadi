@@ -86,6 +86,12 @@ namespace casadi {
     casadi_int op() const override { return OP_HORZREPMAT;}
 
     casadi_int n_;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
   };
 
   /** \brief Horizontal repsum
@@ -140,6 +146,12 @@ namespace casadi {
     casadi_int op() const override { return OP_HORZREPSUM;}
 
     casadi_int n_;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
   };
 
 } // namespace casadi

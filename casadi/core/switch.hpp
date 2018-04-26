@@ -110,9 +110,24 @@ namespace casadi {
     // Sparsity projection needed?
     bool project_in_, project_out_;
 
+    struct Info {
+      FunctionInternal::Info function;
+      std::vector<Function> f;
+      Function f_def;
+      bool project_in, project_out;
+    };
+
+    /** \brief Serialize */
+    void serialize_function(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static Function deserialize(DeSerializer& s);
+
     /** Obtain information about node */
     Dict info() const override;
 
+  protected:
+    explicit Switch(const Info& e);
   };
 
 } // namespace casadi

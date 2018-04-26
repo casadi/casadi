@@ -1062,9 +1062,23 @@ namespace casadi {
 
     /** Obtain information about sparsity */
     Dict info() const;
+    #ifndef SWIG
+        /** \brief Serialize */
+        void serialize(std::ostream &stream) const;
+    #endif
 
-    /** Construct instance from info */
-    static Matrix from_info(const Dict& info);
+    /** \brief Serialize */
+    std::string serialize() const;
+
+    /** \brief Build Sparsity from serialization */
+    static Matrix<Scalar> deserialize(std::istream& istream);
+
+    /** \brief Build Sparsity from serialization */
+    static Matrix<Scalar> deserialize(const std::string& s);
+
+    void serialize(Serializer& s) const;
+
+    static Matrix<Scalar> deserialize(DeSerializer& s);
 
     /** Export numerical matrix to file
     *

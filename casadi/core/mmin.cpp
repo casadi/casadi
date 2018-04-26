@@ -81,4 +81,16 @@ namespace casadi {
     res[0] = mmax(arg[0]);
   }
 
+  MX MMin::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return MX::create(new MMin(info.deps[0]));
+  }
+
+  MX MMax::deserialize(DeSerializer& s) {
+    MXNode::Info info;
+    MXNode::deserialize(s, info);
+    return MX::create(new MMax(info.deps[0]));
+  }
+
 } // namespace casadi

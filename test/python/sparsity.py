@@ -547,5 +547,13 @@ class Sparsitytests(casadiTestCase):
     self.checkarray(A,B)
     self.assertFalse(np.any(D[[e for e,k in zip(z,zres) if k==-1]]))    
 
+  def test_serialize(self):
+    for a in [Sparsity(), Sparsity.dense(4,5), Sparsity.lower(5)]:
+      b = Sparsity.deserialize(a.serialize())
+      if a.is_null():
+        self.assertTrue(b.is_null())
+      else:
+        self.checkarray(IM(a,1),IM(b,1))
+
 if __name__ == '__main__':
     unittest.main()

@@ -79,6 +79,8 @@ namespace casadi {
     /// Can the operation be performed inplace (i.e. overwrite the result)
     casadi_int n_inplace() const override { return 1;}
 
+    /** \brief Deserialize into MX */
+    static MX deserialize(DeSerializer& s);
   };
 
 
@@ -131,6 +133,12 @@ namespace casadi {
 
     /// Operation sequence
     std::vector<casadi_int> nz_;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize_more(DeSerializer& s, const MXNode::Info& e);
   };
 
   // Specialization of the above when nz_ is a Slice
@@ -179,6 +187,12 @@ namespace casadi {
 
     // Data member
     Slice s_;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize_more(DeSerializer& s, const MXNode::Info& e);
   };
 
   // Specialization of the above when nz_ is a nested Slice
@@ -229,6 +243,12 @@ namespace casadi {
 
     // Data members
     Slice inner_, outer_;
+
+    /** \brief Serialize specific part of node  */
+    void serialize_node(Serializer& s) const override;
+
+    /** \brief Deserialize into MX */
+    static MX deserialize_more(DeSerializer& s, const MXNode::Info& e);
   };
 
 } // namespace casadi
