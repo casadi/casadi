@@ -290,7 +290,7 @@ namespace casadi {
       AlgEl ae;
 
       // Get operation
-      ae.op = n==nullptr ? static_cast<casadi_int>(OP_OUTPUT) : n->op();
+      ae.op = n==nullptr ? static_cast<int>(OP_OUTPUT) : static_cast<int>(n->op());
 
       // Get instruction
       switch (ae.op) {
