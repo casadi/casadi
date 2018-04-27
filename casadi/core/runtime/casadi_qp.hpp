@@ -934,7 +934,7 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
   }
 
   // Improve primal or dual feasibility
-  if (*index==-1 && d->tau>1e-16 && (d->ipr>=0 || d->idu>=0)) {
+  if (*index==-1 && (d->ipr>=0 || d->idu>=0)) {
     if (p->du_to_pr*d->pr >= d->du) {
       // Try to improve primal feasibility
       *index = casadi_qp_pr_index(d, sign);
