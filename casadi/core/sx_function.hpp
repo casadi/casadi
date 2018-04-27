@@ -33,7 +33,7 @@
 namespace casadi {
   /** \brief  An atomic operation for the SXElem virtual machine */
   struct ScalarAtomic {
-    casadi_int op;     /// Operator index
+    int op;     /// Operator index
     int i0;
     union {
       double d;
