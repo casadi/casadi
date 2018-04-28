@@ -293,8 +293,13 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign) {
   }
   // Accept, if any
   if (best_ind>=0) {
-    *sign = 0;
-    casadi_qp_log(d, "Removed %lld to reduce |du|", best_ind);
+    if (d->neverzero[best_ind]) {
+      *sign = d->lam[best_ind]>0. ? -1 : 1;
+      casadi_qp_log(d, "Flipped %lld to reduce |du|", best_ind);
+    } else {
+      *sign = 0;
+      casadi_qp_log(d, "Removed %lld to reduce |du|", best_ind);
+    }
     return best_ind;
   } else {
     return -1;
