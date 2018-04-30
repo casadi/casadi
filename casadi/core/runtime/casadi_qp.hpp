@@ -283,6 +283,8 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign) {
     if (d->sens[i]==0.) continue;
     // Make sure removing the constraint decreases dual infeasibility
     if (d->sens[i]>0. ? d->lam[i]>=0. : d->lam[i]<=0.) continue;
+    // Skip if variable cannot be zero
+    if (d->neverzero[i]) continue;
     // Skip if maximum infeasibility increases
     if (casadi_qp_du_check(d, i)>d->du) continue;
     // Check if best so far
@@ -293,13 +295,8 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign) {
   }
   // Accept, if any
   if (best_ind>=0) {
-    if (d->neverzero[best_ind]) {
-      *sign = d->lam[best_ind]>0. ? -1 : 1;
-      casadi_qp_log(d, "Flipped %lld to reduce |du|", best_ind);
-    } else {
-      *sign = 0;
-      casadi_qp_log(d, "Removed %lld to reduce |du|", best_ind);
-    }
+    *sign = 0;
+    casadi_qp_log(d, "Removed %lld to reduce |du|", best_ind);
     return best_ind;
   } else {
     return -1;
@@ -874,6 +871,7 @@ template<typename T1>
 void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
   // Local variables
   casadi_int i;
+  T1 r;
   const casadi_qp_prob<T1>* p = d->prob;
   // Calculate f
   d->f = casadi_bilin(d->nz_h, p->sp_h, d->z, d->z)/2.
@@ -885,13 +883,26 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
   casadi_copy(d->g, p->nx, d->infeas);
   casadi_mv(d->nz_h, p->sp_h, d->z, d->infeas, 0);
   casadi_mv(d->nz_a, p->sp_a, d->lam+p->nx, d->infeas, 1);
-  // Calculate lam[:nx] without changing the sign, dual infeasibility
+  // Calculate lam[:nx] without changing the sign accidentally, dual infeasibility
   for (i=0; i<p->nx; ++i) {
+    // No change if zero
+    if (d->lam[i]==0) continue;
+    // lam[i] with no sign restrictions
+    r = -d->infeas[i];
     if (d->lam[i]>0) {
-      d->lam[i] = fmax(-d->infeas[i], p->dmin);
-    } else if (d->lam[i]<0) {
-      d->lam[i] = fmin(-d->infeas[i], -p->dmin);
+      if (d->neverzero[i] && !d->neverlower[i]) {
+        d->lam[i] = r==0 ? p->dmin : r; // keep sign if r==0
+      } else {
+        d->lam[i] = fmax(r, p->dmin); // no sign change
+      }
+    } else {
+      if (d->neverzero[i] && !d->neverupper[i]) {
+        d->lam[i] = r==0 ? -p->dmin : r; // keep sign if r==0
+      } else {
+        d->lam[i] = fmin(r, -p->dmin); // no sign change
+      }
     }
+    // Update dual infeasibility
     d->infeas[i] += d->lam[i];
   }
   // Calculate primal and dual error
