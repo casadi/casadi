@@ -342,7 +342,9 @@ namespace casadi {
     * Supported formats:
     *   - .mtx   Matrix Market
     */
-    void to_file(const std::string& filename, const std::string& format="") const;
+    void to_file(const std::string& filename, const std::string& format_hint="") const;
+
+    static Sparsity from_file(const std::string& filename, const std::string& format_hint="");
 
 #ifndef SWIG
     /** \brief Serialize */
@@ -890,8 +892,10 @@ namespace casadi {
     template<typename T>
     void bor(T* data, const T* val_data, const Sparsity& val_sp) const;
 
-
+    static std::string file_format(const std::string& filename, const std::string& format_hint);
+    static std::set<std::string> file_formats;
   private:
+
     /// Construct a sparsity pattern from vectors, reuse cached pattern if possible
     void assign_cached(casadi_int nrow, casadi_int ncol, const std::vector<casadi_int>& colind,
                       const std::vector<casadi_int>& row, bool order_rows=false);
