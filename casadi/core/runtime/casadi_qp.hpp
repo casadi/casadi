@@ -210,8 +210,10 @@ casadi_int casadi_qp_pr_index(casadi_qp_data<T1>* d, casadi_int* sign) {
     *sign = d->z[d->ipr]<d->lbz[d->ipr] ? -1 : 1;
     casadi_qp_log(d, "Added %lld to reduce |pr|", d->ipr);
     return d->ipr;
+  } else {
+    // Try to remove blocking constraints
+    return casadi_qp_du_index(d, sign, d->ipr);
   }
-  return -1;
 }
 
 // SYMBOL "qp_du_check"
@@ -269,7 +271,7 @@ int casadi_qp_du_free(casadi_qp_data<T1>* d, casadi_int i, int upper) {
 
 // SYMBOL "qp_du_index"
 template<typename T1>
-casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign) {
+casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign, casadi_int skip) {
   // Try to improve dual feasibility by removing a constraint
   // Local variables
   casadi_int best_ind, i;
@@ -277,14 +279,14 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign) {
   const casadi_qp_prob<T1>* p = d->prob;
   // Find the best lam[i] to make zero
   best_ind = -1;
-  best_sens = 0.;
+  best_sens = -1;
   for (i=0; i<p->nz; ++i) {
-    // Make sure variable influences du
-    if (d->sens[i]==0.) continue;
-    // Make sure removing the constraint decreases dual infeasibility
-    if (d->sens[i]>0. ? d->lam[i]>=0. : d->lam[i]<=0.) continue;
-    // Skip if variable cannot be zero
-    if (d->neverzero[i]) continue;
+    // Should the index be avoided?
+    if (i==skip) continue;
+    // Make sure that it's a constraint that can be removed
+    if (d->lam[i]==0 || d->neverzero[i]) continue;
+    // If variable influences du, make sure sign is right
+    if (d->lam[i]>0. ? d->sens[i]>0. : d->sens[i]<0.) continue;
     // Skip if maximum infeasibility increases
     if (casadi_qp_du_check(d, i)>d->du) continue;
     // Check if best so far
@@ -948,7 +950,7 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
       *index = casadi_qp_pr_index(d, sign);
     } else {
       // Try to improve dual feasibility
-      *index = casadi_qp_du_index(d, sign);
+      *index = casadi_qp_du_index(d, sign, -1);
     }
   }
   // If a constraint was added
