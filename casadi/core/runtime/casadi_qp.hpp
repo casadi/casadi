@@ -961,6 +961,10 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
         // Also flip r_index to avoid singularity
         d->lam[r_index] = r_sign==0 ? 0 : r_sign>0 ? p->dmin : -p->dmin;
         casadi_qp_log(d, "%lld->%lld, %lld->%lld", *index, *sign, r_index, r_sign);
+      } else if (*sign==0 && d->sens[*index]==0.) {
+        // Abort: Not worth it to sacrifice regularity
+        *index = -1;
+        return;
       }
     }
     d->lam[*index] = *sign==0 ? 0 : *sign>0 ? p->dmin : -p->dmin;
