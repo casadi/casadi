@@ -79,7 +79,6 @@ namespace casadi {
 
     // Default options
     max_iter_ = 1000;
-    tol_ = 1e-8;
     print_iter_ = true;
     print_header_ = true;
     du_to_pr_ = 1000.;
@@ -88,8 +87,6 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="max_iter") {
         max_iter_ = op.second;
-      } else if (op.first=="tol") {
-        tol_ = op.second;
       } else if (op.first=="print_iter") {
         print_iter_ = op.second;
       } else if (op.first=="print_header") {
@@ -134,7 +131,7 @@ namespace casadi {
     if (print_header_) {
       // Print summary
       print("-------------------------------------------\n");
-      print("This is QRQP.\n");
+      print("This is casadi::QRQP\n");
       print("Number of variables:                       %9d\n", nx_);
       print("Number of constraints:                     %9d\n", na_);
       print("Number of nonzeros in H:                   %9d\n", H_.nnz());
@@ -142,7 +139,6 @@ namespace casadi {
       print("Number of nonzeros in KKT:                 %9d\n", kkt_.nnz());
       print("Number of nonzeros in QR(V):               %9d\n", sp_v_.nnz());
       print("Number of nonzeros in QR(R):               %9d\n", sp_r_.nnz());
-      print("Work in progress!\n");
     }
   }
 
