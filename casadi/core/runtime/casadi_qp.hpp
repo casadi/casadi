@@ -903,8 +903,10 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
   d->edu = fmax(d->du, 0.5*p->du_to_pr*d->pr);
   // Sensitivity in decreasing |du|
   casadi_fill(d->sens, p->nz, 0.);
-  d->sens[d->idu] = d->infeas[d->idu]>0 ? -1. : 1.;
-  casadi_mv(d->nz_a, p->sp_a, d->sens, d->sens+p->nx, 0);
+  if (d->idu>=0) {
+    d->sens[d->idu] = d->infeas[d->idu]>0 ? -1. : 1.;
+    casadi_mv(d->nz_a, p->sp_a, d->sens, d->sens+p->nx, 0);
+  }
 }
 
 template<typename T1>
