@@ -479,6 +479,17 @@ class Sparsitytests(casadiTestCase):
 
     self.assertTrue(DM(J.sparsity_out(0))[:X.nnz(),:].sparsity()==Sparsity.diag(100))
 
+  def test_jacsparsityHierarchicalSymm(self):
+    GlobalOptions.setHierarchicalSparsity(False)
+    sp = Sparsity.banded(8406/2,2)
+
+    x = MX.sym("x",sp.size1())
+
+    H = bilin(MX.ones(sp),x,x)
+    sp2 = hessian(H,x)[0].sparsity()
+    self.assertTrue(sp==sp2)
+
+
   def test_rowcol(self):
     n = 3
 

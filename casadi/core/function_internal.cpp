@@ -725,10 +725,16 @@ namespace casadi {
       std::vector<casadi_int> lookup_row;
       std::vector<casadi_int> lookup_value;
 
+      // The maximum number of fine blocks contained in one coarse block
+      casadi_int n_fine_blocks_max = 0;
+      for (casadi_int i=0;i<coarse.size()-1;++i) {
+        casadi_int del = fine_lookup[coarse[i+1]]-fine_lookup[coarse[i]];
+        n_fine_blocks_max = std::max(n_fine_blocks_max, del);
+      }
+
       // Loop over all coarse seed directions from the coloring
       for (casadi_int csd=0; csd<D.size2(); ++csd) {
-        // The maximum number of fine blocks contained in one coarse block
-        casadi_int n_fine_blocks_max = fine_lookup[coarse[1]]-fine_lookup[coarse[0]];
+
 
         casadi_int fci_offset = 0;
         casadi_int fci_cap = bvec_size-bvec_i;
@@ -1020,12 +1026,16 @@ namespace casadi {
       std::vector<casadi_int> lookup_row;
       std::vector<casadi_int> lookup_value;
 
+
+      // The maximum number of fine blocks contained in one coarse block
+      casadi_int n_fine_blocks_max = 0;
+      for (casadi_int i=0;i<coarse_row.size()-1;++i) {
+        casadi_int del = fine_row_lookup[coarse_row[i+1]]-fine_row_lookup[coarse_row[i]];
+        n_fine_blocks_max = std::max(n_fine_blocks_max, del);
+      }
+
       // Loop over all coarse seed directions from the coloring
       for (casadi_int csd=0; csd<D.size2(); ++csd) {
-
-        // The maximum number of fine blocks contained in one coarse block
-        casadi_int n_fine_blocks_max =
-          fine_row_lookup[coarse_row[1]]-fine_row_lookup[coarse_row[0]];
 
         casadi_int fci_offset = 0;
         casadi_int fci_cap = bvec_size-bvec_i;
