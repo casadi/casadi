@@ -57313,10 +57313,10 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")
+casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
-[INTERNAL]  Get all statistics.
+[INTERNAL]  Codegen incref for dependencies.
 
 ";
 
@@ -57376,10 +57376,9 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
+%feature("docstring")  casadi::Qrqp::get_stats(void *mem) const  "
 
-[INTERNAL]  Codegen incref for dependencies.
+[INTERNAL]  Get all statistics.
 
 ";
 
