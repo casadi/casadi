@@ -479,9 +479,10 @@ class Sparsitytests(casadiTestCase):
 
     self.assertTrue(DM(J.sparsity_out(0))[:X.nnz(),:].sparsity()==Sparsity.diag(100))
 
+  @memory_heavy()
   def test_jacsparsityHierarchicalSymm(self):
     GlobalOptions.setHierarchicalSparsity(False)
-    sp = Sparsity.banded(8406/2,2)
+    sp = Sparsity.banded(4129,1)
 
     x = MX.sym("x",sp.size1())
 
