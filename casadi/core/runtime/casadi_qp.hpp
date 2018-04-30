@@ -417,28 +417,18 @@ void casadi_qp_kkt_residual(casadi_qp_data<T1>* d, T1* r) {
 
 // SYMBOL "qp_zero_blocking"
 template<typename T1>
-int casadi_qp_zero_blocking(casadi_qp_data<T1>* d, casadi_int* index, casadi_int* sign) {
+int casadi_qp_zero_blocking(casadi_qp_data<T1>* d) {
   // Local variables
-  T1 dz_max;
   casadi_int i;
-  int ret;
   const casadi_qp_prob<T1>* p = d->prob;
-  ret = 0;
-  dz_max = 0.;
   for (i=0; i<p->nz; ++i) {
-    if (-d->dz[i]>dz_max && d->z[i]<=d->lbz[i]-d->epr) {
-      ret = 1;
-      if (index) *index = i;
-      if (sign) *sign = -1;
-      casadi_qp_log(d, "lbz[%lld] violated at 0", i);
-    } else if (d->dz[i]>dz_max && d->z[i]>=d->ubz[i]+d->epr) {
-      ret = 1;
-      if (index) *index = i;
-      if (sign) *sign = 1;
-      casadi_qp_log(d, "ubz[%lld] violated at 0", i);
+    if (d->dz[i]<0 && d->z[i]<=d->lbz[i]-d->epr) {
+      return 1;
+    } else if (d->dz[i]>0 && d->z[i]>=d->ubz[i]+d->epr) {
+      return 1;
     }
   }
-  return ret;
+  return 0;
 }
 
 // SYMBOL "qp_primal_blocking"
@@ -450,7 +440,7 @@ void casadi_qp_primal_blocking(casadi_qp_data<T1>* d,
   T1 trial_z;
   const casadi_qp_prob<T1>* p = d->prob;
   // Check if violation with tau=0 and not improving
-  if (casadi_qp_zero_blocking(d, index, sign)) {
+  if (casadi_qp_zero_blocking(d)) {
     d->tau = 0.;
     return;
   }
