@@ -106,7 +106,7 @@ class ConicTests(casadiTestCase):
 
       solver_out = solver(**solver_in)
       try:
-          if conic!="qrqp": self.assertTrue(solver.stats()["success"])
+          self.assertTrue(solver.stats()["success"])
       except:
           raise Exception(str(conic))
 

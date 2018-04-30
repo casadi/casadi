@@ -143,7 +143,9 @@ namespace casadi {
   }
 
   int Qrqp::init_mem(void* mem) const {
-    //auto m = static_cast<QrqpMemory*>(mem);
+    auto m = static_cast<QrqpMemory*>(mem);
+    m->return_status = "";
+    m->success = false;
     return 0;
   }
 
@@ -201,18 +203,19 @@ namespace casadi {
       }
       // Successful return if still no change
       if (index==-1) {
+        m->return_status = "success";
         flag = 0;
         break;
       }
       // Too many iterations?
       if (++iter>max_iter_) {
-        casadi_warning("Maximum number of iterations reached");
+        m->return_status = "Maximum number of iterations reached";
         flag = 1;
         break;
       }
       // Calculate search direction
       if (casadi_qp_calc_step(&d, &r_index, &r_sign)) {
-        casadi_warning("Failed to calculate search direction");
+        m->return_status = "Failed to calculate search direction";
         flag = 1;
         break;
       }
@@ -224,7 +227,18 @@ namespace casadi {
     casadi_copy(d.z, nx_, res[CONIC_X]);
     casadi_copy(d.lam, nx_, res[CONIC_LAM_X]);
     casadi_copy(d.lam+nx_, na_, res[CONIC_LAM_A]);
-    return flag;
+    // Return
+    if (verbose_) casadi_warning(m->return_status);
+    m->success = flag ? false : true;
+    return 0;
+  }
+
+  Dict Qrqp::get_stats(void* mem) const {
+    Dict stats = Conic::get_stats(mem);
+    auto m = static_cast<QrqpMemory*>(mem);
+    stats["return_status"] = m->return_status;
+    stats["success"] = m->success;
+    return stats;
   }
 
 } // namespace casadi

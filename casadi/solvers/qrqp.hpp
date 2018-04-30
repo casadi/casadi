@@ -41,6 +41,8 @@ namespace casadi {
 /// \cond INTERNAL
 namespace casadi {
   struct CASADI_CONIC_QRQP_EXPORT QrqpMemory : public ConicMemory {
+    const char* return_status;
+    bool success;
   };
 
   /** \brief \pluginbrief{Conic,qrqp}
@@ -93,6 +95,9 @@ namespace casadi {
     /** \brief Solve the QP */
     int eval(const double** arg, double** res,
              casadi_int* iw, double* w, void* mem) const override;
+
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;
