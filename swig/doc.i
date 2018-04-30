@@ -67546,7 +67546,7 @@ Create a sparse matrix with all structural zeros.
 ";
 
 %feature("docstring")  casadi::Sparsity::to_file(const std::string
-&filename, const std::string &format="") const  "
+&filename, const std::string &format_hint="") const  "
 
 Export sparsity pattern to file
 
