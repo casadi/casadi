@@ -1179,8 +1179,7 @@ namespace casadi {
     // Check if we are able to propagate dependencies through the function
     if (has_spfwd() || has_sprev()) {
       Sparsity sp;
-      if (nnz_in(iind)>3*bvec_size && nnz_out(oind)>3*bvec_size &&
-            GlobalOptions::hierarchical_sparsity) {
+      if (true) {
         if (symmetric) {
           sp = getJacSparsityHierarchicalSymm(iind, oind);
         } else {
