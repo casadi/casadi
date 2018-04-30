@@ -177,7 +177,7 @@ namespace casadi {
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;
     // Return flag
-    int flag;
+    int flag = 0;
     // Constraint to be flipped, if any
     casadi_int index=-2, sign=0, r_index=-2, r_sign=0;
     // QP iterations
@@ -189,6 +189,15 @@ namespace casadi {
       casadi_qp_flip(&d, &index, &sign, r_index, r_sign);
       // Form and factorize the KKT system
       casadi_qp_factorize(&d);
+      // Termination message
+      if (index==-1) {
+        casadi_qp_log(&d, "QP converged");
+        m->return_status = "success";
+      } else if (iter>=max_iter_) {
+        casadi_qp_log(&d, "QP terminated: max iter");
+        m->return_status = "Maximum number of iterations reached";
+        flag = 1;
+      }
       // Print iteration progress:
       if (print_iter_) {
         if (iter % 10 == 0) {
@@ -201,20 +210,13 @@ namespace casadi {
               d.mina, d.imina, d.tau, d.msg);
         d.msg[0] = '\0';
       }
-      // Successful return if still no change
-      if (index==-1) {
-        m->return_status = "success";
-        flag = 0;
-        break;
-      }
-      // Too many iterations?
-      if (++iter>max_iter_) {
-        m->return_status = "Maximum number of iterations reached";
-        flag = 1;
-        break;
-      }
+      // Terminate loop?
+      if (index==-1 || flag!=0) break;
+      // Start a new iteration
+      iter++;
       // Calculate search direction
       if (casadi_qp_calc_step(&d, &r_index, &r_sign)) {
+        if (print_iter_) print("QP terminated: No search direction\n");
         m->return_status = "Failed to calculate search direction";
         flag = 1;
         break;
