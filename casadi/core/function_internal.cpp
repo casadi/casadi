@@ -1176,6 +1176,10 @@ namespace casadi {
 
   Sparsity FunctionInternal::getJacSparsity(casadi_int iind, casadi_int oind,
       bool symmetric) const {
+    // Empty case
+    if (nnz_out(oind)==0 || nnz_out(iind)==0)
+      return Sparsity::dense(nnz_out(oind), nnz_in(iind));
+
     // Check if we are able to propagate dependencies through the function
     if (has_spfwd() || has_sprev()) {
       Sparsity sp;
