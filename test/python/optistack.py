@@ -82,6 +82,22 @@ class OptiStacktests(inherit_from):
       self.assertEqual(sol.opti.ng,2)
       self.assertEqual(sol.opti.np,0)
       
+    def test_subject_to_list(self):
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      
+      opti.minimize((x-y**2)**2)
+      opti.subject_to([x+y>=1,z+x>=1])
+      
+      opti.solver('ipopt')
+      sol = opti.solve()
+
+      self.assertEqual(sol.opti.nx,3)
+      self.assertEqual(sol.opti.ng,2)
+      self.assertEqual(sol.opti.np,0)
+      
     def test_sol_opti(self):
       opti = Opti()
       x = opti.variable()
