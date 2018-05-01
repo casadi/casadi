@@ -4263,7 +4263,7 @@ make_property(casadi::Opti, casadi_solver);
         frame = sys._getframe(1)
         meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
         ret = self._subject_to(*args)
-        self.update_user_dict(args, meta)
+        self.update_user_dict(args[0], meta)
         return ret
     %}
   }
