@@ -725,10 +725,16 @@ namespace casadi {
       std::vector<casadi_int> lookup_row;
       std::vector<casadi_int> lookup_value;
 
+      // The maximum number of fine blocks contained in one coarse block
+      casadi_int n_fine_blocks_max = 0;
+      for (casadi_int i=0;i<coarse.size()-1;++i) {
+        casadi_int del = fine_lookup[coarse[i+1]]-fine_lookup[coarse[i]];
+        n_fine_blocks_max = std::max(n_fine_blocks_max, del);
+      }
+
       // Loop over all coarse seed directions from the coloring
       for (casadi_int csd=0; csd<D.size2(); ++csd) {
-        // The maximum number of fine blocks contained in one coarse block
-        casadi_int n_fine_blocks_max = fine_lookup[coarse[1]]-fine_lookup[coarse[0]];
+
 
         casadi_int fci_offset = 0;
         casadi_int fci_cap = bvec_size-bvec_i;
@@ -1020,12 +1026,16 @@ namespace casadi {
       std::vector<casadi_int> lookup_row;
       std::vector<casadi_int> lookup_value;
 
+
+      // The maximum number of fine blocks contained in one coarse block
+      casadi_int n_fine_blocks_max = 0;
+      for (casadi_int i=0;i<coarse_row.size()-1;++i) {
+        casadi_int del = fine_row_lookup[coarse_row[i+1]]-fine_row_lookup[coarse_row[i]];
+        n_fine_blocks_max = std::max(n_fine_blocks_max, del);
+      }
+
       // Loop over all coarse seed directions from the coloring
       for (casadi_int csd=0; csd<D.size2(); ++csd) {
-
-        // The maximum number of fine blocks contained in one coarse block
-        casadi_int n_fine_blocks_max =
-          fine_row_lookup[coarse_row[1]]-fine_row_lookup[coarse_row[0]];
 
         casadi_int fci_offset = 0;
         casadi_int fci_cap = bvec_size-bvec_i;
@@ -2538,14 +2548,14 @@ namespace casadi {
   FunctionInternal::mapsum_mx(const std::vector<MX > &x,
                               const std::string& parallelization) {
     if (x.empty()) return x;
-
     // Check number of arguments
     casadi_assert(x.size()==n_in_, "mapsum_mx: Wrong number of arguments");
-
+    // Number of parallel calls
+    casadi_int npar = 1;
     // Check/replace arguments
     std::vector<MX> x_mod(x.size());
     for (casadi_int i=0; i<n_in_; ++i) {
-      if (check_mat(x[i].sparsity(), sparsity_in_[i])) {
+      if (check_mat(x[i].sparsity(), sparsity_in_[i], npar)) {
         // Matching arguments according to normal function call rules
         x_mod[i] = replace_mat(x[i], sparsity_in_[i]);
       } else if (x[i].size1()==size1_in(i) && x[i].size2() % size2_in(i)==0) {
@@ -2575,7 +2585,7 @@ namespace casadi {
     return ms(x_mod);
   }
 
-  bool FunctionInternal::check_mat(const Sparsity& arg, const Sparsity& inp) {
+  bool FunctionInternal::check_mat(const Sparsity& arg, const Sparsity& inp, casadi_int& npar) {
     // Matching dimensions
     if (arg.size()==inp.size()) return true;
     // Calling with empty matrix - set all to zero
@@ -2583,8 +2593,10 @@ namespace casadi {
     // Calling with a scalar - set all
     if (arg.is_scalar()) return true;
     // Vectors that are transposes of each other
-    if (inp.size2()==arg.size1() && inp.size1()==arg.size2()
-        && (arg.is_column() || inp.is_column())) return true;
+    if (arg.is_vector() && inp.size()==make_pair(arg.size2(), arg.size1())) return true;
+    // Horizontal repmat
+    if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
+        && inp.size2()%arg.size2()==0) return true;
     // No match
     return false;
   }

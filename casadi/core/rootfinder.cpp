@@ -132,7 +132,7 @@ namespace casadi {
     }
 
     // Create oracle
-    return Function("rfp", rfp_in, rfp_out, RFP_INPUTS, RFP_OUTPUTS, oracle_options);
+    return Function("rfp", rfp_in, rfp_out, {"x0", "p"}, {"x"}, oracle_options);
   }
 
   Function rootfinder(const std::string& name, const std::string& solver,

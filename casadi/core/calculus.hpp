@@ -1087,6 +1087,12 @@ namespace casadi {
     /** \brief Evaluate the function and the derivative function */
     static inline void derF(unsigned char op, const T& x, const T& y, T& f, T* d);
 
+    /** \brief Is binary operation? */
+    static inline bool is_binary(unsigned char op);
+
+    /** \brief Is unary operation? */
+    static inline bool is_unary(unsigned char op);
+
     /** \brief Number of dependencies */
     static inline casadi_int ndeps(unsigned char op);
 
@@ -1388,40 +1394,89 @@ namespace casadi {
         }
   }
 
+  #define CASADI_MATH_BINARY_BUILTIN              \
+    case OP_ADD:                                  \
+    case OP_SUB:                                  \
+    case OP_MUL:                                  \
+    case OP_DIV:                                  \
+    case OP_POW:                                  \
+    case OP_CONSTPOW:                             \
+    case OP_LT:                                   \
+    case OP_LE:                                   \
+    case OP_EQ:                                   \
+    case OP_NE:                                   \
+    case OP_AND:                                  \
+    case OP_OR:                                   \
+    case OP_IF_ELSE_ZERO:                         \
+    case OP_COPYSIGN:                             \
+    case OP_FMOD:                                 \
+    case OP_FMIN:                                 \
+    case OP_FMAX:                                 \
+    case OP_ATAN2:                                \
+    case OP_PRINTME:                              \
+    case OP_LIFT:
+
+  #define CASADI_MATH_UNARY_BUILTIN              \
+    case OP_ASSIGN:                              \
+    case OP_NEG:                                 \
+    case OP_EXP:                                 \
+    case OP_LOG:                                 \
+    case OP_SQRT:                                \
+    case OP_SQ:                                  \
+    case OP_TWICE:                               \
+    case OP_SIN:                                 \
+    case OP_COS:                                 \
+    case OP_TAN:                                 \
+    case OP_ASIN:                                \
+    case OP_ACOS:                                \
+    case OP_ATAN:                                \
+    case OP_FLOOR:                               \
+    case OP_CEIL:                                \
+    case OP_NOT:                                 \
+    case OP_ERF:                                 \
+    case OP_FABS:                                \
+    case OP_SIGN:                                \
+    case OP_INV:                                 \
+    case OP_SINH:                                \
+    case OP_COSH:                                \
+    case OP_TANH:                                \
+    case OP_ASINH:                               \
+    case OP_ACOSH:                               \
+    case OP_ATANH:                               \
+    case OP_ERFINV:
+
+  template<typename T>
+  bool casadi_math<T>::is_binary(unsigned char op) {
+    switch (op) {
+      CASADI_MATH_BINARY_BUILTIN
+      return true;
+    default:
+      return false;
+    }
+  }
+
+  template<typename T>
+  bool casadi_math<T>::is_unary(unsigned char op) {
+    switch (op) {
+      CASADI_MATH_UNARY_BUILTIN
+      return true;
+    default:
+      return false;
+    }
+  }
+
   template<typename T>
   inline casadi_int casadi_math<T>::ndeps(unsigned char op) {
-#define CASADI_MATH_BINARY_BUILTIN              \
-    case OP_ADD:                                \
-  case OP_SUB:                                  \
-  case OP_MUL:                                  \
-  case OP_DIV:                                  \
-  case OP_POW:                                  \
-  case OP_CONSTPOW:                             \
-  case OP_LT:                                   \
-  case OP_LE:                                   \
-  case OP_EQ:                                   \
-  case OP_NE:                                   \
-  case OP_AND:                                  \
-  case OP_OR:                                   \
-  case OP_IF_ELSE_ZERO:                         \
-  case OP_COPYSIGN:                             \
-  case OP_FMOD:                                 \
-  case OP_FMIN:                                 \
-  case OP_FMAX:                                 \
-  case OP_ATAN2:                                \
-  case OP_PRINTME:                              \
-  case OP_LIFT:
-
     switch (op) {
-  case OP_CONST:
-  case OP_PARAMETER:
-  case OP_INPUT:
-    return 0;
-    CASADI_MATH_BINARY_BUILTIN
-      return 2;
-  default:
-    return 1;
-  }
+      case OP_CONST:
+      case OP_PARAMETER:
+      case OP_INPUT:
+        return 0;
+        CASADI_MATH_BINARY_BUILTIN
+          return 2;
+      default:
+        return 1;
+    }
   }
 
   template<typename T>

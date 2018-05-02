@@ -79,7 +79,6 @@ namespace casadi {
 
     // Default options
     max_iter_ = 1000;
-    tol_ = 1e-8;
     print_iter_ = true;
     print_header_ = true;
     du_to_pr_ = 1000.;
@@ -88,8 +87,6 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="max_iter") {
         max_iter_ = op.second;
-      } else if (op.first=="tol") {
-        tol_ = op.second;
       } else if (op.first=="print_iter") {
         print_iter_ = op.second;
       } else if (op.first=="print_header") {
@@ -134,7 +131,7 @@ namespace casadi {
     if (print_header_) {
       // Print summary
       print("-------------------------------------------\n");
-      print("This is QRQP.\n");
+      print("This is casadi::QRQP\n");
       print("Number of variables:                       %9d\n", nx_);
       print("Number of constraints:                     %9d\n", na_);
       print("Number of nonzeros in H:                   %9d\n", H_.nnz());
@@ -142,12 +139,13 @@ namespace casadi {
       print("Number of nonzeros in KKT:                 %9d\n", kkt_.nnz());
       print("Number of nonzeros in QR(V):               %9d\n", sp_v_.nnz());
       print("Number of nonzeros in QR(R):               %9d\n", sp_r_.nnz());
-      print("Work in progress!\n");
     }
   }
 
   int Qrqp::init_mem(void* mem) const {
-    //auto m = static_cast<QrqpMemory*>(mem);
+    auto m = static_cast<QrqpMemory*>(mem);
+    m->return_status = "";
+    m->success = false;
     return 0;
   }
 
@@ -179,7 +177,7 @@ namespace casadi {
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;
     // Return flag
-    int flag;
+    int flag = 0;
     // Constraint to be flipped, if any
     casadi_int index=-2, sign=0, r_index=-2, r_sign=0;
     // QP iterations
@@ -191,6 +189,15 @@ namespace casadi {
       casadi_qp_flip(&d, &index, &sign, r_index, r_sign);
       // Form and factorize the KKT system
       casadi_qp_factorize(&d);
+      // Termination message
+      if (index==-1) {
+        casadi_qp_log(&d, "QP converged");
+        m->return_status = "success";
+      } else if (iter>=max_iter_) {
+        casadi_qp_log(&d, "QP terminated: max iter");
+        m->return_status = "Maximum number of iterations reached";
+        flag = 1;
+      }
       // Print iteration progress:
       if (print_iter_) {
         if (iter % 10 == 0) {
@@ -203,20 +210,14 @@ namespace casadi {
               d.mina, d.imina, d.tau, d.msg);
         d.msg[0] = '\0';
       }
-      // Successful return if still no change
-      if (index==-1) {
-        flag = 0;
-        break;
-      }
-      // Too many iterations?
-      if (++iter>max_iter_) {
-        casadi_warning("Maximum number of iterations reached");
-        flag = 1;
-        break;
-      }
+      // Terminate loop?
+      if (index==-1 || flag!=0) break;
+      // Start a new iteration
+      iter++;
       // Calculate search direction
       if (casadi_qp_calc_step(&d, &r_index, &r_sign)) {
-        casadi_warning("Failed to calculate search direction");
+        if (print_iter_) print("QP terminated: No search direction\n");
+        m->return_status = "Failed to calculate search direction";
         flag = 1;
         break;
       }
@@ -228,7 +229,18 @@ namespace casadi {
     casadi_copy(d.z, nx_, res[CONIC_X]);
     casadi_copy(d.lam, nx_, res[CONIC_LAM_X]);
     casadi_copy(d.lam+nx_, na_, res[CONIC_LAM_A]);
-    return flag;
+    // Return
+    if (verbose_) casadi_warning(m->return_status);
+    m->success = flag ? false : true;
+    return 0;
+  }
+
+  Dict Qrqp::get_stats(void* mem) const {
+    Dict stats = Conic::get_stats(mem);
+    auto m = static_cast<QrqpMemory*>(mem);
+    stats["return_status"] = m->return_status;
+    stats["success"] = m->success;
+    return stats;
   }
 
 } // namespace casadi

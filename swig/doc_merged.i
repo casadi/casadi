@@ -45239,9 +45239,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::Qrqp::get_stats "
+%feature("docstring") casadi::Qrqp::codegen_incref "
 
-[INTERNAL]  Get all statistics.
+[INTERNAL]  Codegen incref for dependencies.
 
 ";
 
@@ -45294,9 +45294,9 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::Qrqp::codegen_incref "
+%feature("docstring") casadi::Qrqp::get_stats "
 
-[INTERNAL]  Codegen incref for dependencies.
+[INTERNAL]  Get all statistics.
 
 ";
 

@@ -246,7 +246,7 @@ namespace casadi {
                bool always_inline, bool never_inline) const;
 
     /** Helper function */
-    static bool check_mat(const Sparsity& arg, const Sparsity& inp);
+    static bool check_mat(const Sparsity& arg, const Sparsity& inp, casadi_int& npar);
 
     /** \brief Check if input arguments have correct length and dimensions
      */
@@ -967,10 +967,11 @@ namespace casadi {
   void FunctionInternal::check_arg(const std::vector<M>& arg) const {
     casadi_assert(arg.size()==n_in_, "Incorrect number of inputs: Expected "
                           + str(n_in_) + ", got " + str(arg.size()));
+    casadi_int npar = 1;
     for (casadi_int i=0; i<n_in_; ++i) {
-      casadi_assert(check_mat(arg[i].sparsity(), sparsity_in(i)),
-                            "Input " + str(i) + " (" + name_in_[i] + ") has mismatching shape. "
-                            "Expected " + str(size_in(i)) + ", got " + str(arg[i].size()));
+      casadi_assert(check_mat(arg[i].sparsity(), sparsity_in(i), npar),
+                    "Input " + str(i) + " (" + name_in_[i] + ") has mismatching shape. "
+                    "Expected " + str(size_in(i)) + ", got " + str(arg[i].size()));
     }
   }
 
@@ -978,10 +979,11 @@ namespace casadi {
   void FunctionInternal::check_res(const std::vector<M>& res) const {
     casadi_assert(res.size()==n_out_, "Incorrect number of outputs: Expected "
                           + str(n_out_) + ", got " + str(res.size()));
+    casadi_int npar = 1;
     for (casadi_int i=0; i<n_out_; ++i) {
-      casadi_assert(check_mat(res[i].sparsity(), sparsity_out(i)),
-                            "Output " + str(i) + " (" + name_out_[i] + ") has mismatching shape. "
-                            "Expected " + str(size_out(i)) + ", got " + str(res[i].size()));
+      casadi_assert(check_mat(res[i].sparsity(), sparsity_out(i), npar),
+                    "Output " + str(i) + " (" + name_out_[i] + ") has mismatching shape. "
+                    "Expected " + str(size_out(i)) + ", got " + str(res[i].size()));
     }
   }
 
@@ -1014,11 +1016,16 @@ namespace casadi {
     } else if (arg.is_scalar()) {
       // Scalar assign means set all
       return M(inp, arg);
-    } else {
-      // Assign vector with transposing
-      casadi_assert_dev(arg.size1()==inp.size2() && arg.size2()==inp.size1()
-                    && (arg.is_column() || inp.is_column()));
+    } else if (arg.is_vector() && inp.size()==std::make_pair(arg.size2(), arg.size1())) {
+      // Transpose vector
       return arg.T();
+    } else if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
+               && inp.size2()%arg.size2()==0) {
+      // Repmat argument
+      return repmat(arg, 1, inp.size2()/arg.size2());
+    } else {
+      // Not possible
+      casadi_assert_dev(0);
     }
   }
 
