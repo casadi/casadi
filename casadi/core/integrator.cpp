@@ -339,7 +339,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  map<string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
+  std::map<string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
     if (verbose_) casadi_message(name_ + "::aug_fwd");
 
     // Get input expressions
@@ -396,7 +396,7 @@ namespace casadi {
     }
 
     // Construct return object
-    map<string, MatType> ret;
+    std::map<string, MatType> ret;
     ret["t"] = aug_t;
     ret["x"] = horzcat(aug_x);
     ret["z"] = horzcat(aug_z);
@@ -414,7 +414,7 @@ namespace casadi {
   }
 
   template<typename MatType>
-  map<string, MatType> Integrator::aug_adj(casadi_int nadj) const {
+  std::map<string, MatType> Integrator::aug_adj(casadi_int nadj) const {
     if (verbose_) casadi_message(name_ + "::aug_adj");
 
     // Get input expressions
@@ -470,7 +470,7 @@ namespace casadi {
     }
 
     // Construct return object
-    map<string, MatType> ret;
+    std::map<string, MatType> ret;
     ret["t"] = aug_t;
     ret["x"] = vertcat(aug_x);
     ret["z"] = vertcat(aug_z);
