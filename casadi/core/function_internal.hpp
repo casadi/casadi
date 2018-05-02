@@ -431,6 +431,12 @@ namespace casadi {
     /** \brief Wrap in an Function instance consisting of only one MX call */
     Function wrap() const;
 
+    /** \brief Get function in cache */
+    bool incache(const std::string& fname, Function& f) const;
+
+    /** \brief Save function to cache */
+    void tocache(const Function& f) const;
+
     /** \brief Generate code the function */
     void codegen(CodeGenerator& g, const std::string& fname) const;
 
@@ -723,6 +729,9 @@ namespace casadi {
     /** \brief Reference counting in codegen? */
     bool has_refcount_;
 
+    /// Function cache
+    mutable std::map<std::string, WeakRef> cache_;
+
     /// Cache for functions to evaluate directional derivatives
     mutable std::vector<WeakRef> forward_, reverse_;
 
@@ -737,9 +746,6 @@ namespace casadi {
 
     /// If the function is the derivative of another function
     Function derivative_of_;
-
-    /// Wrapper function for indirect derivative calculation
-    mutable WeakRef wrap_;
 
     /// User-set field
     void* user_data_;

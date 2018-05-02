@@ -462,11 +462,32 @@ namespace casadi {
     }
   }
 
-  Function FunctionInternal::wrap() const {
-    if (wrap_.alive()) {
-      // Return cached Jacobian
-      return shared_cast<Function>(wrap_.shared());
+  bool FunctionInternal::incache(const std::string& fname, Function& f) const {
+    auto it = cache_.find(fname);
+    if (it!=cache_.end() && it->second.alive()) {
+      f = shared_cast<Function>(it->second.shared());
+      return true;
     } else {
+      return false;
+    }
+  }
+
+  void FunctionInternal::tocache(const Function& f) const {
+    // Add to cache
+    cache_.insert(make_pair(f.name(), f));
+    // Remove a lost reference, if any, to prevent uncontrolled growth
+    for (auto it = cache_.begin(); it!=cache_.end(); ++it) {
+      if (!it->second.alive()) {
+        cache_.erase(it);
+        break; // just one dead reference is enough
+      }
+    }
+  }
+
+  Function FunctionInternal::wrap() const {
+    Function ret;
+    string f = "wrap_" + name_;
+    if (!incache(f, ret)) {
       // Options
       Dict opts;
       opts["derivative_of"] = derivative_of_;
@@ -479,12 +500,10 @@ namespace casadi {
       // Wrap the function
       vector<MX> arg = mx_in();
       vector<MX> res = self()(arg);
-      Function ret(name_ + "_wrap", arg, res, name_in_, name_out_, opts);
-
-      // Cache it for reuse and return
-      wrap_ = ret;
-      return ret;
+      ret = Function(f, arg, res, name_in_, name_out_, opts);
+      tocache(ret);
     }
+    return ret;
   }
 
   std::vector<MX> FunctionInternal::symbolic_output(const std::vector<MX>& arg) const {
