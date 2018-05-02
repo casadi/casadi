@@ -84,7 +84,7 @@ namespace casadi {
     std::vector<HBlock> hess_;
 
     // Constructor
-    Factory(const Function::AuxOut& aux, bool verbose=false) : aux_(aux), verbose_(verbose) {}
+    Factory(const Function::AuxOut& aux, const Dict& opts = Dict()) : aux_(aux), options_(opts) {}
 
     // Add an input expression
     void add_input(const std::string& s, const MatType& e);
@@ -130,8 +130,8 @@ namespace casadi {
     // Get output scheme
     std::vector<std::string> name_out() const;
 
-    // Verbose?
-    bool verbose_;
+    // Options
+    Dict options_;
   };
 
   template<typename MatType>
@@ -248,7 +248,7 @@ namespace casadi {
   void Factory<MatType>::calculate() {
     using namespace std;
 
-    Dict all_opts = {{"verbose", verbose_}};
+    Dict all_opts = options_;
 
     // Dual variables
     for (auto&& e : out_) {
@@ -272,8 +272,8 @@ namespace casadi {
         res.push_back(out_[s]);
       }
       // Calculate directional derivatives
-      Dict opts = {{"always_inline", true}};
-      opts["verbose"] = verbose_;
+      Dict opts = options_;
+      opts["always_inline"] = true;
       try {
         sens = forward(res, arg, seed, opts);
       } catch (exception& e) {
@@ -302,8 +302,8 @@ namespace casadi {
         in_["adj:" + s] = seed[0].back();
       }
       // Calculate directional derivatives
-      Dict opts = {{"always_inline", true}};
-      opts["verbose"] = verbose_;
+      Dict opts = options_;
+      opts["always_inline"] = true;
       try {
         sens = reverse(res, arg, seed, opts);
       } catch (exception& e) {
@@ -341,7 +341,7 @@ namespace casadi {
       const MatType& ex = out_.at(b.ex);
       const MatType& arg = in_.at(b.arg);
       try {
-        out_["grad:" + b.ex + ":" + b.arg] = project(gradient(ex, arg), arg.sparsity());
+        out_["grad:" + b.ex + ":" + b.arg] = project(gradient(ex, arg, all_opts), arg.sparsity());
       } catch (exception& e) {
         casadi_error("Gradient generation failed:\n" + str(e.what()));
       }
@@ -354,7 +354,7 @@ namespace casadi {
       const MatType& arg1 = in_.at(b.arg1);
       //const MatType& arg2 = in_.at(b.arg2);
       try {
-        out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = triu(hessian(ex, arg1));
+        out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = triu(hessian(ex, arg1, all_opts));
       } catch (exception& e) {
         casadi_error("Hessian generation failed:\n" + str(e.what()));
       }

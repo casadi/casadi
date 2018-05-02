@@ -2449,7 +2449,8 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::hessian(const Matrix<Scalar> &f,
-                                             const Matrix<Scalar> &x) {
+                                             const Matrix<Scalar> &x,
+                                            const Dict& opts) {
     casadi_error("'hessian' not defined for " + type_name());
     return Matrix<Scalar>();
   }
@@ -2457,7 +2458,8 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::hessian(const Matrix<Scalar> &f,
                                              const Matrix<Scalar> &x,
-                                             Matrix<Scalar> &g) {
+                                             Matrix<Scalar> &g,
+                                             const Dict& opts) {
     casadi_error("'hessian' not defined for " + type_name());
     return Matrix<Scalar>();
   }
@@ -3261,23 +3263,33 @@ namespace casadi {
 
   template<>
   SX SX::jacobian(const SX &f, const SX &x, const Dict& opts) {
-    // Propagate verbose option to helper function
+    // Filter out jacobian-specific options
     Dict h_opts;
-    if (opts.count("verbose")) h_opts["verbose"] = opts.at("verbose");
+    Dict J_opts;
+    std::set<std::string> filter = {"compact", "symmetric", "allow_forward", "allow_reverse"};
+    for (auto&& op : opts) {
+      if (filter.find(op.first)==filter.end()) {
+        h_opts[op.first] = op.second;
+      } else {
+        J_opts[op.first] = op.second;
+      }
+    }
     Function h("jac_helper", {x}, {f}, h_opts);
-    return h.get<SXFunction>()->jac(0, 0, opts);
+    return h.get<SXFunction>()->jac(0, 0, J_opts);
   }
 
   template<>
-  SX SX::hessian(const SX &ex, const SX &arg) {
+  SX SX::hessian(const SX &ex, const SX &arg, const Dict& opts) {
     SX g;
-    return hessian(ex, arg, g);
+    return hessian(ex, arg, g, opts);
   }
 
   template<>
-  SX SX::hessian(const SX &ex, const SX &arg, SX &g) {
-    g = gradient(ex, arg);
-    return jacobian(g, arg, {{"symmetric", true}});
+  SX SX::hessian(const SX &ex, const SX &arg, SX &g, const Dict& opts) {
+    g = gradient(ex, arg, opts);
+    Dict h_opts = opts;
+    h_opts["symmetric"] = true;
+    return jacobian(g, arg, h_opts);
   }
 
   template<>
@@ -3285,6 +3297,7 @@ namespace casadi {
   SX::forward(const std::vector<SX> &ex, const std::vector<SX> &arg,
           const std::vector<std::vector<SX> > &v, const Dict& opts) {
     // Read options
+    Dict temp_ops;
     bool always_inline = false;
     bool never_inline = false;
     for (auto&& op : opts) {
@@ -3292,14 +3305,12 @@ namespace casadi {
         always_inline = op.second;
       } else if (op.first=="never_inline") {
         never_inline = op.second;
-      } else if (op.first=="verbose") {
-        continue;
-      }  else {
-        casadi_error("No such option: " + string(op.first));
+      } else {
+        temp_ops[op.first] = op.second;
       }
     }
     // Call internal function on a temporary object
-    Function temp("forward_temp", arg, ex);
+    Function temp("forward_temp", arg, ex, temp_ops);
     std::vector<std::vector<SX> > ret;
     temp->call_forward(arg, ex, v, ret, always_inline, never_inline);
     return ret;
@@ -3310,6 +3321,7 @@ namespace casadi {
   SX::reverse(const std::vector<SX> &ex, const std::vector<SX> &arg,
           const std::vector<std::vector<SX> > &v, const Dict& opts) {
     // Read options
+    Dict temp_ops;
     bool always_inline = false;
     bool never_inline = false;
     for (auto&& op : opts) {
@@ -3317,14 +3329,12 @@ namespace casadi {
         always_inline = op.second;
       } else if (op.first=="never_inline") {
         never_inline = op.second;
-      } else if (op.first=="verbose") {
-        continue;
       } else {
-        casadi_error("No such option: " + string(op.first));
+        temp_ops[op.first] = op.second;
       }
     }
     // Call internal function on a temporary object
-    Function temp("reverse_temp", arg, ex);
+    Function temp("reverse_temp", arg, ex, temp_ops);
     std::vector<std::vector<SX> > ret;
     temp->call_reverse(arg, ex, v, ret, always_inline, never_inline);
     return ret;

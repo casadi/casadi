@@ -309,8 +309,6 @@ namespace casadi {
           allow_forward = op.second;
         } else if (op.first=="allow_reverse") {
           allow_reverse = op.second;
-        } else if (op.first=="verbose") {
-          continue;
         } else {
           casadi_error("No such Jacobian option: " + string(op.first));
         }
@@ -1003,12 +1001,8 @@ namespace casadi {
           const Dict& opts) const {
     using namespace std;
 
-    auto it = opts.find("verbose");
-    bool verbose = false;
-    if (it!=opts.end()) verbose = it->second;
-
     // Create an expression factory
-    Factory<MatType> f(aux, verbose);
+    Factory<MatType> f(aux, opts);
     for (casadi_int i=0; i<in_.size(); ++i) f.add_input(name_in_[i], in_[i]);
     for (casadi_int i=0; i<out_.size(); ++i) f.add_output(name_out_[i], out_[i]);
 

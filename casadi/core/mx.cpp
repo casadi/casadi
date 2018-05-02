@@ -1595,25 +1595,36 @@ namespace casadi {
 
   MX MX::jacobian(const MX &f, const MX &x, const Dict& opts) {
     try {
-      // Propagate verbose option to helper function
+      // Filter out jacobian-specific options
       Dict h_opts;
-      if (opts.count("verbose")) h_opts["verbose"] = opts.at("verbose");
+      Dict J_opts;
+      std::set<std::string> filter = {"compact", "symmetric", "allow_forward", "allow_reverse"};
+      for (auto&& op : opts) {
+        if (filter.find(op.first)==filter.end()) {
+          h_opts[op.first] = op.second;
+        } else {
+          J_opts[op.first] = op.second;
+        }
+      }
+
       Function h("helper_jacobian_MX", {x}, {f}, h_opts);
-      return h.get<MXFunction>()->jac(0, 0, opts);
+      return h.get<MXFunction>()->jac(0, 0, J_opts);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("jacobian", e.what());
     }
   }
 
-  MX MX::hessian(const MX& f, const MX& x) {
+  MX MX::hessian(const MX& f, const MX& x, const Dict& opts) {
     MX g;
-    return hessian(f, x, g);
+    return hessian(f, x, g, opts);
   }
 
-  MX MX::hessian(const MX& f, const MX& x, MX &g) {
+  MX MX::hessian(const MX& f, const MX& x, MX &g, const Dict& opts) {
     try {
-      g = gradient(f, x);
-      return jacobian(g, x, {{"symmetric", true}});
+      g = gradient(f, x, opts);
+      Dict h_opts = opts;
+      h_opts["symmetric"] = true;
+      return jacobian(g, x, h_opts);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("hessian", e.what());
     }
@@ -1624,6 +1635,7 @@ namespace casadi {
               const std::vector<MX> &arg,
               const std::vector<std::vector<MX> > &v, const Dict& opts) {
     try {
+      Dict temp_ops;
       // Read options
       bool always_inline = true;
       bool never_inline = false;
@@ -1632,14 +1644,12 @@ namespace casadi {
           always_inline = op.second;
         } else if (op.first=="never_inline") {
           never_inline = op.second;
-        } else if (op.first=="verbose") {
-          continue;
         } else {
-          casadi_error("No such option: " + string(op.first));
+          temp_ops[op.first] = op.second;
         }
       }
       // Call internal function on a temporary object
-      Function temp("forward_temp", arg, ex);
+      Function temp("forward_temp", arg, ex, temp_ops);
       std::vector<std::vector<MX> > ret;
       temp->call_forward(arg, ex, v, ret, always_inline, never_inline);
       return ret;
@@ -1653,6 +1663,7 @@ namespace casadi {
               const std::vector<MX> &arg,
               const std::vector<std::vector<MX> > &v, const Dict& opts) {
     try {
+      Dict temp_ops;
       // Read options
       bool always_inline = true;
       bool never_inline = false;
@@ -1661,14 +1672,13 @@ namespace casadi {
           always_inline = op.second;
         } else if (op.first=="never_inline") {
           never_inline = op.second;
-        } else if (op.first=="verbose") {
-          continue;
         } else {
-          casadi_error("No such option: " + string(op.first));
+          temp_ops[op.first] = op.second;
         }
       }
+
       // Call internal function on a temporary object
-      Function temp("reverse_temp", arg, ex);
+      Function temp("reverse_temp", arg, ex, temp_ops);
       std::vector<std::vector<MX> > ret;
       temp->call_reverse(arg, ex, v, ret, always_inline, never_inline);
       return ret;
