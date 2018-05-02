@@ -27,7 +27,6 @@
 #include "casadi_misc.hpp"
 #include "sx_function.hpp"
 #include "mx_function.hpp"
-#include "map.hpp"
 #include "switch.hpp"
 #include "bspline.hpp"
 #include "nlpsol.hpp"
@@ -654,11 +653,10 @@ namespace casadi {
         res[i] = horzcat(tmp);
       }
       // Construct function
-      return Function(name() + "_" + str(n), arg, res,
-                      name_in(), name_out());
+      return Function(name() + "_" + str(n), arg, res, name_in(), name_out());
     } else {
-      // Create Map object
-      return Map::create(parallelization, *this, n);
+      // Generate/retrieve potentially cached map
+      return (*this)->map(n, parallelization);
     }
   }
 

@@ -708,6 +708,9 @@ namespace casadi {
     /** Obtain information about function */
     virtual Dict info() const;
 
+    /** \brief Generate/retrieve cached serial map */
+    Function map(casadi_int n, const std::string& parallelization) const;
+
     /// Number of inputs and outputs
     size_t n_in_, n_out_;
 

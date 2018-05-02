@@ -29,6 +29,7 @@
 #include "global_options.hpp"
 #include "external.hpp"
 #include "finite_differences.hpp"
+#include "map.hpp"
 
 #include <typeinfo>
 #include <cctype>
@@ -484,6 +485,25 @@ namespace casadi {
     }
   }
 
+  Function FunctionInternal::map(casadi_int n, const std::string& parallelization) const {
+    Function f;
+    if (parallelization=="serial") {
+      // Serial maps are cached
+      string fname = "map" + str(n) + "_" + name_;
+      if (!incache(fname, f)) {
+        // Create new serial map
+        f = Map::create(parallelization, self(), n);
+        casadi_assert_dev(f.name()==fname);
+        // Save in cache
+        tocache(f);
+      }
+    } else {
+      // Non-serial maps are not cached
+      f = Map::create(parallelization, self(), n);
+    }
+    return f;
+  }
+
   Function FunctionInternal::wrap() const {
     Function f;
     string fname = "wrap_" + name_;
@@ -491,16 +511,14 @@ namespace casadi {
       // Options
       Dict opts;
       opts["derivative_of"] = derivative_of_;
-
-      // Propagate AD parameters
       opts["ad_weight"] = ad_weight();
       opts["ad_weight_sp"] = sp_weight();
       opts["max_num_dir"] = max_num_dir_;
-
       // Wrap the function
       vector<MX> arg = mx_in();
       vector<MX> res = self()(arg);
       f = Function(fname, arg, res, name_in_, name_out_, opts);
+      // Save in cache
       tocache(f);
     }
     return f;

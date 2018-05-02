@@ -560,12 +560,12 @@ namespace casadi {
   }
 
   bool IpoptInterface::
-  get_var_con_metadata(map<string, vector<string> >& var_string_md,
-                       map<string, vector<int> >& var_integer_md,
-                       map<string, vector<double> >& var_numeric_md,
-                       map<string, vector<string> >& con_string_md,
-                       map<string, vector<int> >& con_integer_md,
-                       map<string, vector<double> >& con_numeric_md) const {
+  get_var_con_metadata(std::map<string, vector<string> >& var_string_md,
+                       std::map<string, vector<int> >& var_integer_md,
+                       std::map<string, vector<double> >& var_numeric_md,
+                       std::map<string, vector<string> >& con_string_md,
+                       std::map<string, vector<int> >& con_integer_md,
+                       std::map<string, vector<double> >& con_numeric_md) const {
     for (auto&& op : var_string_md_) var_string_md[op.first] = op.second;
     for (auto&& op : var_integer_md_) var_integer_md[op.first] = op.second;
     for (auto&& op : var_numeric_md_) var_numeric_md[op.first] = op.second;

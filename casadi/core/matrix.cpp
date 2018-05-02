@@ -2901,7 +2901,7 @@ namespace casadi {
     // Terms, weights and indices of the nodes that are already expanded
     vector<vector<SXNode*> > terms;
     vector<vector<double> > weights;
-    map<SXNode*, casadi_int> indices;
+    std::map<SXNode*, casadi_int> indices;
 
     // Stack of nodes that are not yet expanded
     stack<SXNode*> to_be_expanded;
@@ -2979,11 +2979,11 @@ namespace casadi {
             // Eliminate multiple elements
             vector<double> w_new; w_new.reserve(w.size());   // weights
             vector<SXNode*> f_new;  f_new.reserve(f.size());   // terms
-            map<SXNode*, casadi_int> f_ind; // index in f_new
+            std::map<SXNode*, casadi_int> f_ind; // index in f_new
 
             for (casadi_int i=0; i<w.size(); i++) {
               // Try to locate the node
-              map<SXNode*, casadi_int>::iterator it = f_ind.find(f[i]);
+              auto it = f_ind.find(f[i]);
               if (it == f_ind.end()) { // if the term wasn't found
                 w_new.push_back(w[i]);
                 f_new.push_back(f[i]);
@@ -3685,7 +3685,7 @@ namespace casadi {
   void SX::print_split(vector<string>& nz,
                       vector<string>& inter) const {
     // Find out which noded can be inlined
-    map<const SXNode*, casadi_int> nodeind;
+    std::map<const SXNode*, casadi_int> nodeind;
     for (auto&& i : nonzeros_) i->can_inline(nodeind);
 
     // Print expression
