@@ -1485,63 +1485,44 @@ namespace casadi {
 
   Function FunctionInternal::reverse(casadi_int nadj) const {
     casadi_assert_dev(nadj>=0);
-
     // Used wrapped function if reverse not available
     if (!enable_reverse_) {
       // Derivative information must be available
-      casadi_assert(has_derivative(),
-                            "Derivatives cannot be calculated for " + name_);
+      casadi_assert(has_derivative(), "Derivatives cannot be calculated for " + name_);
       return wrap().reverse(nadj);
     }
-
-    // Check if there are enough adjoint directions allocated
-    if (nadj>=reverse_.size()) {
-      reverse_.resize(nadj+1);
+    // Retrieve/generate cached
+    Function f;
+    string fname = "adj" + str(nadj) + "_" + name_;
+    if (!incache(fname, f)) {
+      // Names of inputs
+      std::vector<std::string> inames;
+      casadi_int i;
+      for (i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
+      for (i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
+      for (i=0; i<n_out_; ++i) inames.push_back("adj_" + name_out_[i]);
+      // Names of outputs
+      std::vector<std::string> onames;
+      for (casadi_int i=0; i<n_in_; ++i) onames.push_back("adj_" + name_in_[i]);
+      // Options
+      Dict opts;
+      opts["max_num_dir"] = max_num_dir_;
+      opts["derivative_of"] = self();
+      // Generate derivative function
+      casadi_assert_dev(enable_reverse_);
+      f = get_reverse(nadj, fname, inames, onames, opts);
+      // Consistency check for inputs
+      casadi_assert_dev(f.n_in()==n_in_ + n_out_ + n_out_);
+      casadi_int ind=0;
+      for (i=0; i<n_in_; ++i) f.assert_size_in(ind++, size1_in(i), size2_in(i));
+      for (i=0; i<n_out_; ++i) f.assert_size_in(ind++, size1_out(i), size2_out(i));
+      for (i=0; i<n_out_; ++i) f.assert_size_in(ind++, size1_out(i), nadj*size2_out(i));
+      // Consistency check for outputs
+      casadi_assert_dev(f.n_out()==n_in_);
+      for (i=0; i<n_in_; ++i) f.assert_size_out(i, size1_in(i), nadj*size2_in(i));
+      tocache(f);
     }
-
-    // Quick return if cached
-    if (reverse_[nadj].alive()) {
-      return shared_cast<Function>(reverse_[nadj].shared());
-    }
-
-    // Give it a suitable name
-    string name = "adj" + str(nadj) + "_" + name_;
-
-    // Names of inputs
-    std::vector<std::string> inames;
-    for (casadi_int i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
-    for (casadi_int i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
-    for (casadi_int i=0; i<n_out_; ++i) inames.push_back("adj_" + name_out_[i]);
-
-    // Names of outputs
-    std::vector<std::string> onames;
-    for (casadi_int i=0; i<n_in_; ++i) onames.push_back("adj_" + name_in_[i]);
-
-    // Options
-    Dict opts;
-    opts["max_num_dir"] = max_num_dir_;
-    opts["derivative_of"] = self();
-
-    // Generate derivative function
-    casadi_assert_dev(enable_reverse_);
-    Function ret = get_reverse(nadj, name, inames, onames, opts);
-
-    // Consistency check for inputs
-    casadi_assert_dev(ret.n_in()==n_in_ + n_out_ + n_out_);
-    casadi_int ind=0;
-    for (casadi_int i=0; i<n_in_; ++i) ret.assert_size_in(ind++, size1_in(i), size2_in(i));
-    for (casadi_int i=0; i<n_out_; ++i) ret.assert_size_in(ind++, size1_out(i), size2_out(i));
-    for (casadi_int i=0; i<n_out_; ++i) ret.assert_size_in(ind++, size1_out(i), nadj*size2_out(i));
-
-    // Consistency check for outputs
-    casadi_assert_dev(ret.n_out()==n_in_);
-    for (casadi_int i=0; i<n_in_; ++i) ret.assert_size_out(i, size1_in(i), nadj*size2_in(i));
-
-    // Save to cache
-    reverse_[nadj] = ret;
-
-    // Return generated function
-    return ret;
+    return f;
   }
 
   Function FunctionInternal::
