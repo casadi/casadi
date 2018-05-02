@@ -239,6 +239,14 @@ namespace casadi {
     return ss.str();
   }
 
+  bool startswith(const std::string& s, const std::string& p) {
+    if (p.size()>s.size()) return false;
+    for (casadi_int i=0;i<p.size();++i) {
+      if (s[i]!=p[i]) return false;
+    }
+    return true;
+  }
+
 #ifdef HAVE_SIMPLE_MKSTEMPS
 int simple_mkstemps(const std::string& prefix, const std::string& suffix, std::string &result) {
     // Characters available for inventing filenames

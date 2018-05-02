@@ -221,10 +221,28 @@ namespace casadi {
     // Get all options available in (s)IPOPT
     auto regops = (*app)->RegOptions()->RegisteredOptionsList();
 
+    Dict options = Options::sanitize(opts_);
+    // Replace resto group with prefixes
+    auto it = options.find("resto");
+    if (it!=options.end()) {
+      Dict resto_options = it->second;
+      options.erase(it);
+      for (auto&& op : resto_options) {
+        options["resto." + op.first] = op.second;
+      }
+    }
+
     // Pass all the options to ipopt
-    for (auto&& op : opts_) {
+    for (auto&& op : options) {
+
+      // There might be options with a resto prefix.
+      std::string option_name = op.first;
+      if (startswith(option_name, "resto.")) {
+        option_name = option_name.substr(6);
+      }
+
       // Find the option
-      auto regops_it = regops.find(op.first);
+      auto regops_it = regops.find(option_name);
       if (regops_it==regops.end()) {
         casadi_error("No such IPOPT option: " + op.first);
       }

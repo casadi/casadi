@@ -79,6 +79,8 @@ private:
 
   CASADI_EXPORT std::string join(const std::vector<std::string>& l, const std::string& delim=",");
 
+  /// Checsks if s starts with p
+  CASADI_EXPORT bool startswith(const std::string& s, const std::string& p);
   /**  \brief Range function
   * \param stop
   *
