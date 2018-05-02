@@ -1407,80 +1407,61 @@ namespace casadi {
 
   Function FunctionInternal::forward(casadi_int nfwd) const {
     casadi_assert_dev(nfwd>=0);
-
     // Used wrapped function if forward not available
     if (!enable_forward_ && !enable_fd_) {
       // Derivative information must be available
-      casadi_assert(has_derivative(),
-                            "Derivatives cannot be calculated for " + name_);
+      casadi_assert(has_derivative(), "Derivatives cannot be calculated for " + name_);
       return wrap().forward(nfwd);
     }
-
-    // Check if there are enough forward directions allocated
-    if (nfwd>=forward_.size()) {
-      forward_.resize(nfwd+1);
-    }
-
-    // Quick return if cached
-    if (forward_[nfwd].alive()) {
-      return shared_cast<Function>(forward_[nfwd].shared());
-    }
-
-    // Give it a suitable name
-    string name = "fwd" + str(nfwd) + "_" + name_;
-
-    // Names of inputs
-    std::vector<std::string> inames;
-    for (casadi_int i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
-    for (casadi_int i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
-    for (casadi_int i=0; i<n_in_; ++i) inames.push_back("fwd_" + name_in_[i]);
-
-    // Names of outputs
-    std::vector<std::string> onames;
-    for (casadi_int i=0; i<n_out_; ++i) onames.push_back("fwd_" + name_out_[i]);
-
-    // Options
-    Dict opts;
-    if (!enable_forward_) opts = fd_options_;
-    opts["max_num_dir"] = max_num_dir_;
-    opts["derivative_of"] = self();
-
-    // Generate derivative function
-    casadi_assert_dev(enable_forward_ || enable_fd_);
-    Function ret;
-    if (enable_forward_) {
-      ret = get_forward(nfwd, name, inames, onames, opts);
-    } else {
-      // Get FD method
-      if (fd_method_.empty() || fd_method_=="central") {
-        ret = Function::create(new CentralDiff(name, nfwd), opts);
-      } else if (fd_method_=="forward") {
-        ret = Function::create(new ForwardDiff(name, nfwd), opts);
-      } else if (fd_method_=="backward") {
-        ret = Function::create(new BackwardDiff(name, nfwd), opts);
-      } else if (fd_method_=="smoothing") {
-        ret = Function::create(new Smoothing(name, nfwd), opts);
+    // Retrieve/generate cached
+    Function f;
+    string fname = "fwd" + str(nfwd) + "_" + name_;
+    if (!incache(fname, f)) {
+      casadi_int i;
+      // Names of inputs
+      std::vector<std::string> inames;
+      for (i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
+      for (i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
+      for (i=0; i<n_in_; ++i) inames.push_back("fwd_" + name_in_[i]);
+      // Names of outputs
+      std::vector<std::string> onames;
+      for (i=0; i<n_out_; ++i) onames.push_back("fwd_" + name_out_[i]);
+      // Options
+      Dict opts;
+      if (!enable_forward_) opts = fd_options_;
+      opts["max_num_dir"] = max_num_dir_;
+      opts["derivative_of"] = self();
+      // Generate derivative function
+      casadi_assert_dev(enable_forward_ || enable_fd_);
+      if (enable_forward_) {
+        f = get_forward(nfwd, fname, inames, onames, opts);
       } else {
-        casadi_error("Unknown 'fd_method': " + fd_method_);
+        // Get FD method
+        if (fd_method_.empty() || fd_method_=="central") {
+          f = Function::create(new CentralDiff(fname, nfwd), opts);
+        } else if (fd_method_=="forward") {
+          f = Function::create(new ForwardDiff(fname, nfwd), opts);
+        } else if (fd_method_=="backward") {
+          f = Function::create(new BackwardDiff(fname, nfwd), opts);
+        } else if (fd_method_=="smoothing") {
+          f = Function::create(new Smoothing(fname, nfwd), opts);
+        } else {
+          casadi_error("Unknown 'fd_method': " + fd_method_);
+        }
       }
+      // Consistency check for inputs
+      casadi_assert_dev(f.n_in()==n_in_ + n_out_ + n_in_);
+      casadi_int ind=0;
+      for (i=0; i<n_in_; ++i) f.assert_size_in(ind++, size1_in(i), size2_in(i));
+      for (i=0; i<n_out_; ++i) f.assert_size_in(ind++, size1_out(i), size2_out(i));
+      for (i=0; i<n_in_; ++i) f.assert_size_in(ind++, size1_in(i), nfwd*size2_in(i));
+      // Consistency check for outputs
+      casadi_assert_dev(f.n_out()==n_out_);
+      for (i=0; i<n_out_; ++i) f.assert_size_out(i, size1_out(i), nfwd*size2_out(i));
+      // Save to cache
+      tocache(f);
     }
-
-    // Consistency check for inputs
-    casadi_assert_dev(ret.n_in()==n_in_ + n_out_ + n_in_);
-    casadi_int ind=0;
-    for (casadi_int i=0; i<n_in_; ++i) ret.assert_size_in(ind++, size1_in(i), size2_in(i));
-    for (casadi_int i=0; i<n_out_; ++i) ret.assert_size_in(ind++, size1_out(i), size2_out(i));
-    for (casadi_int i=0; i<n_in_; ++i) ret.assert_size_in(ind++, size1_in(i), nfwd*size2_in(i));
-
-    // Consistency check for outputs
-    casadi_assert_dev(ret.n_out()==n_out_);
-    for (casadi_int i=0; i<n_out_; ++i) ret.assert_size_out(i, size1_out(i), nfwd*size2_out(i));
-
-    // Save to cache
-    forward_[nfwd] = ret;
-
-    // Return generated function
-    return ret;
+    return f;
   }
 
   Function FunctionInternal::reverse(casadi_int nadj) const {
@@ -1495,9 +1476,9 @@ namespace casadi {
     Function f;
     string fname = "adj" + str(nadj) + "_" + name_;
     if (!incache(fname, f)) {
+      casadi_int i;
       // Names of inputs
       std::vector<std::string> inames;
-      casadi_int i;
       for (i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
       for (i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
       for (i=0; i<n_out_; ++i) inames.push_back("adj_" + name_out_[i]);
@@ -1520,6 +1501,7 @@ namespace casadi {
       // Consistency check for outputs
       casadi_assert_dev(f.n_out()==n_in_);
       for (i=0; i<n_in_; ++i) f.assert_size_out(i, size1_in(i), nadj*size2_in(i));
+      // Save to cache
       tocache(f);
     }
     return f;
