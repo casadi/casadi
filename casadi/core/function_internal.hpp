@@ -735,9 +735,6 @@ namespace casadi {
     /// Cache for functions to evaluate directional derivatives
     mutable std::vector<WeakRef> forward_, reverse_;
 
-    /// Cache for full Jacobian (new)
-    mutable WeakRef jac_;
-
     /// Cache for full Jacobian
     mutable WeakRef jacobian_;
 

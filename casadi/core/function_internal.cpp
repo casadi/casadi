@@ -485,9 +485,9 @@ namespace casadi {
   }
 
   Function FunctionInternal::wrap() const {
-    Function ret;
-    string f = "wrap_" + name_;
-    if (!incache(f, ret)) {
+    Function f;
+    string fname = "wrap_" + name_;
+    if (!incache(fname, f)) {
       // Options
       Dict opts;
       opts["derivative_of"] = derivative_of_;
@@ -500,10 +500,10 @@ namespace casadi {
       // Wrap the function
       vector<MX> arg = mx_in();
       vector<MX> res = self()(arg);
-      ret = Function(f, arg, res, name_in_, name_out_, opts);
-      tocache(ret);
+      f = Function(fname, arg, res, name_in_, name_out_, opts);
+      tocache(f);
     }
-    return ret;
+    return f;
   }
 
   std::vector<MX> FunctionInternal::symbolic_output(const std::vector<MX>& arg) const {
@@ -1681,43 +1681,39 @@ namespace casadi {
                     "Derivatives cannot be calculated for " + name_);
       return wrap().jac();
     }
+    // Retrieve/generate cached
+    Function f;
+    string fname = "JAC_" + name_;
+    if (!incache(fname, f)) {
+      // Names of inputs
+      std::vector<std::string> inames = name_in_;
+      inames.insert(inames.end(), name_out_.begin(), name_out_.end());
 
-    // Quick return if cached
-    if (jac_.alive()) return shared_cast<Function>(jac_.shared());
-
-    // Give it a suitable name
-    string name = "JAC_" + name_;
-
-    // Names of inputs
-    std::vector<std::string> inames = name_in_;
-    inames.insert(inames.end(), name_out_.begin(), name_out_.end());
-
-    // Names of outputs
-    std::vector<std::string> onames;
-    onames.reserve(n_in_*n_out_);
-    for (size_t oind=0; oind<n_out_; ++oind) {
-      for (size_t iind=0; iind<n_in_; ++iind) {
-        onames.push_back("D" + name_out_[oind] + "D" + name_in_[iind]);
+      // Names of outputs
+      std::vector<std::string> onames;
+      onames.reserve(n_in_*n_out_);
+      for (size_t oind=0; oind<n_out_; ++oind) {
+        for (size_t iind=0; iind<n_in_; ++iind) {
+          onames.push_back("D" + name_out_[oind] + "D" + name_in_[iind]);
+        }
       }
+
+      // Options
+      Dict opts;
+      opts["derivative_of"] = self();
+
+      // Generate derivative function
+      casadi_assert_dev(enable_jacobian_);
+      f = get_jac(fname, inames, onames, opts);
+
+      // Consistency check
+      casadi_assert(f.n_in()==inames.size(),
+                    "Return function has wrong number of inputs");
+      casadi_assert(f.n_out()==onames.size(),
+                    "Return function has wrong number of outputs");
+      tocache(f);
     }
-
-    // Options
-    Dict opts;
-    opts["derivative_of"] = self();
-
-    // Generate derivative function
-    casadi_assert_dev(enable_jacobian_);
-    Function ret = get_jac(name, inames, onames, opts);
-
-    // Consistency check
-    casadi_assert(ret.n_in()==inames.size(),
-                  "Return function has wrong number of inputs");
-    casadi_assert(ret.n_out()==onames.size(),
-                  "Return function has wrong number of outputs");
-
-    // Cache it for reuse and return
-    jac_ = ret;
-    return ret;
+    return f;
   }
 
   Function FunctionInternal::jacobian() const {
