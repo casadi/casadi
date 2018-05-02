@@ -2548,14 +2548,14 @@ namespace casadi {
   FunctionInternal::mapsum_mx(const std::vector<MX > &x,
                               const std::string& parallelization) {
     if (x.empty()) return x;
-
     // Check number of arguments
     casadi_assert(x.size()==n_in_, "mapsum_mx: Wrong number of arguments");
-
+    // Number of parallel calls
+    casadi_int npar = 1;
     // Check/replace arguments
     std::vector<MX> x_mod(x.size());
     for (casadi_int i=0; i<n_in_; ++i) {
-      if (check_mat(x[i].sparsity(), sparsity_in_[i])) {
+      if (check_mat(x[i].sparsity(), sparsity_in_[i], npar)) {
         // Matching arguments according to normal function call rules
         x_mod[i] = replace_mat(x[i], sparsity_in_[i]);
       } else if (x[i].size1()==size1_in(i) && x[i].size2() % size2_in(i)==0) {
@@ -2585,7 +2585,7 @@ namespace casadi {
     return ms(x_mod);
   }
 
-  bool FunctionInternal::check_mat(const Sparsity& arg, const Sparsity& inp) {
+  bool FunctionInternal::check_mat(const Sparsity& arg, const Sparsity& inp, casadi_int& npar) {
     // Matching dimensions
     if (arg.size()==inp.size()) return true;
     // Calling with empty matrix - set all to zero
@@ -2593,8 +2593,10 @@ namespace casadi {
     // Calling with a scalar - set all
     if (arg.is_scalar()) return true;
     // Vectors that are transposes of each other
-    if (inp.size2()==arg.size1() && inp.size1()==arg.size2()
-        && (arg.is_column() || inp.is_column())) return true;
+    if (arg.is_vector() && inp.size()==make_pair(arg.size2(), arg.size1())) return true;
+    // Horizontal repmat
+    if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
+        && inp.size2()%arg.size2()==0) return true;
     // No match
     return false;
   }
