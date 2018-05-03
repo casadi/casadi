@@ -2393,6 +2393,8 @@ namespace casadi {
     // Make sure number of nonzeros are consistent
     casadi_int nnz = colind[size2], y_nnz = y_colind[y_size2];
     if (nnz!=n*y_nnz) return false;
+    // Quick return if dense
+    if (y_nnz==y_size1*y_size2) return true;
     // Offset
     casadi_int offset = 0;
     // Skip the initial zero
