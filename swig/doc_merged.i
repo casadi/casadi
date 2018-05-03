@@ -173,9 +173,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::BackwardDiff::index_in "
+%feature("docstring") casadi::BackwardDiff::tocache "
 
-[INTERNAL]  Get input scheme index by name.
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -332,7 +332,12 @@ structure recognition.
 
 %feature("docstring") casadi::BackwardDiff::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -343,6 +348,12 @@ structure recognition.
 %feature("docstring") casadi::BackwardDiff::serialize "
 
 [INTERNAL]  Serialize.
+
+";
+
+%feature("docstring") casadi::BackwardDiff::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -956,6 +967,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring") casadi::BackwardDiff::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
 %feature("docstring") casadi::BackwardDiff::print_options "
 
 [INTERNAL]  Print list of options.
@@ -1159,6 +1176,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::BackwardDiff::index_in "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
 %feature("docstring") casadi::BackwardDiff::has_spfwd "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -1216,7 +1239,12 @@ multiplying.
 
 %feature("docstring") casadi::BackwardDiff::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -1556,9 +1584,9 @@ classes.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::getCount "
+%feature("docstring") casadi::Blocksqp::incache "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -2289,7 +2317,12 @@ iterate.
 
 %feature("docstring") casadi::Blocksqp::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -2368,6 +2401,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::Blocksqp::sz_iw "
 
 [INTERNAL]  Get required length of iw field.
@@ -2379,6 +2418,12 @@ propagation.
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::Blocksqp::getCount "
+
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -2490,6 +2535,12 @@ Evaluate a function, overloaded.
 %feature("docstring") casadi::Blocksqp::replace_arg "
 
 [INTERNAL]  Replace 0-by-0 inputs.
+
+";
+
+%feature("docstring") casadi::Blocksqp::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -2614,7 +2665,12 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::Blocksqp::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -3331,7 +3387,12 @@ casadi::BonminUserClass::get_list_of_nonlinear_variables "
 
 %feature("docstring") casadi::BSpline::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -3380,6 +3441,12 @@ Generate a function that calculates nadj adjoint derivatives.
 %feature("docstring") casadi::BSpline::get_options "
 
 Options.
+
+";
+
+%feature("docstring") casadi::BSpline::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -3607,6 +3674,12 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::BSpline::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::BSpline::n_instructions "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -3699,7 +3772,12 @@ Sparsities of function inputs and outputs.
 
 %feature("docstring") casadi::BSpline::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -3824,6 +3902,12 @@ Generate a function that calculates nadj adjoint derivatives.
 %feature("docstring") casadi::BSpline::generate_lifted "
 
 [INTERNAL]  Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring") casadi::BSpline::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -5076,7 +5160,12 @@ elements.
 
 %feature("docstring") casadi::BSplineCommon::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -5242,6 +5331,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::size_out "
 
 [INTERNAL]  Input/output dimensions.
@@ -5296,9 +5391,15 @@ elements.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::index_in "
+%feature("docstring") casadi::BSplineCommon::incache "
 
-[INTERNAL]  Get input scheme index by name.
+[INTERNAL]  Get function in cache.
+
+";
+
+%feature("docstring") casadi::BSplineCommon::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -5543,6 +5644,12 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::index_in "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::fwd_seed "
 
 [INTERNAL]  Symbolic expressions for the forward seeds.
@@ -5625,7 +5732,12 @@ elements.
 
 %feature("docstring") casadi::BSplineCommon::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -5769,6 +5881,12 @@ propagation.
 %feature("docstring") casadi::BSplineDual::construct "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::BSplineDual::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -5944,7 +6062,12 @@ classes.
 
 %feature("docstring") casadi::BSplineDual::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -6608,6 +6731,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::BSplineDual::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::BSplineDual::adjViaJac "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
@@ -6666,6 +6795,12 @@ Generate a function that calculates nadj adjoint derivatives.
 %feature("docstring") casadi::BSplineDual::free_mx "
 
 [INTERNAL]  Get free variables ( MX)
+
+";
+
+%feature("docstring") casadi::BSplineDual::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -6819,7 +6954,12 @@ Readable name of the internal class.
 
 %feature("docstring") casadi::BSplineDual::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -7142,6 +7282,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::check_res "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
@@ -7210,7 +7356,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 %feature("docstring") casadi::BSplineInterpolant::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -7717,7 +7868,12 @@ elements.
 
 %feature("docstring") casadi::BSplineInterpolant::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -7762,6 +7918,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 Evaluate a function, overloaded.
 
 ";
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -7969,6 +8131,12 @@ classes.
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -9223,6 +9391,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::CentralDiff::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
 %feature("docstring") casadi::CentralDiff::has_function "
 
 [INTERNAL] ";
@@ -9729,13 +9903,24 @@ elements.
 
 %feature("docstring") casadi::CentralDiff::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
 %feature("docstring") casadi::CentralDiff::finalize "
 
 [INTERNAL]  Finalize the object creation.
+
+";
+
+%feature("docstring") casadi::CentralDiff::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -10125,6 +10310,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::CentralDiff::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::CentralDiff::instruction_constant "
 
 [INTERNAL]  Get the floating point output argument of an atomic operation.
@@ -10207,7 +10398,12 @@ generated function.
 
 %feature("docstring") casadi::CentralDiff::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -10963,6 +11159,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Collocation::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
 %feature("docstring") casadi::Collocation::print_dimensions "
 
 [INTERNAL]  Print dimensions of inputs and outputs.
@@ -11212,6 +11414,12 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::Collocation::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::Collocation::init_mem "
 
 [INTERNAL]  Initalize memory block.
@@ -11421,7 +11629,12 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::Collocation::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -11654,7 +11867,12 @@ elements.
 
 %feature("docstring") casadi::Collocation::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -11763,6 +11981,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::Collocation::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::Collocation::getJacSparsityGen "
 
 [INTERNAL]  Get the sparsity pattern, forward mode.
@@ -11776,7 +12000,12 @@ multiplying.
 // File: classcasadi_1_1Conic.xml
 %feature("docstring") casadi::Conic::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -12223,7 +12452,12 @@ constructor), this class should invoke this function when initialized.
 
 %feature("docstring") casadi::Conic::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -12282,6 +12516,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::Conic::Conic "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::Conic::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
 
 %feature("docstring") casadi::Conic::check_arg "
 
@@ -12492,6 +12732,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::Conic::print_dimensions "
 
 [INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Conic::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -13011,6 +13257,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::Conic::get_jacobian_sparsity "
 
 [INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::Conic::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -14114,7 +14366,12 @@ C++ includes: dple_impl.hpp ";
 
 %feature("docstring") casadi::Dple::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -14407,6 +14664,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Dple::alloc_arg "
+
+[INTERNAL]  Ensure required length of arg field.
+
+";
+
 %feature("docstring") casadi::Dple::has_jacobian "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -14567,9 +14830,9 @@ propagation.
 
 ";
 
-%feature("docstring") casadi::Dple::alloc_arg "
+%feature("docstring") casadi::Dple::incache "
 
-[INTERNAL]  Ensure required length of arg field.
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -14694,7 +14957,12 @@ elements.
 
 %feature("docstring") casadi::Dple::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -14764,6 +15032,12 @@ structure recognition.
 %feature("docstring") casadi::Dple::codegen "
 
 [INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring") casadi::Dple::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -14859,6 +15133,12 @@ constructor), this class should invoke this function when initialized.
 %feature("docstring") casadi::Dple::codegen_name "
 
 [INTERNAL]  Get name in codegen.
+
+";
+
+%feature("docstring") casadi::Dple::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -15002,6 +15282,12 @@ elements.
 %feature("docstring") casadi::Expm::has_free "
 
 [INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring") casadi::Expm::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -15533,7 +15819,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::Expm::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -15545,7 +15836,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::Expm::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -15570,6 +15866,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::Expm::codegen "
 
 [INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring") casadi::Expm::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -16079,6 +16381,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Expm::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::Expm::sp_forward "
 
 [INTERNAL]  Propagate sparsity forward.
@@ -16311,6 +16619,12 @@ classes.
 
 ";
 
+%feature("docstring") casadi::External::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::External::class_name "
 
 [INTERNAL]  Get type name.
@@ -16382,6 +16696,12 @@ elements.
 %feature("docstring") casadi::External::checkout "
 
 [INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring") casadi::External::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -16495,7 +16815,12 @@ elements.
 
 %feature("docstring") casadi::External::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -16816,6 +17141,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::External::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
 %feature("docstring") casadi::External::sz_w "
 
 [INTERNAL]  Get required length of w field.
@@ -16924,7 +17255,12 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::External::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -17337,6 +17673,12 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::FastNewton::getCount "
+
+[INTERNAL]  Get the reference count.
+
+";
+
 %feature("docstring") casadi::FastNewton::set_function "
 
 [INTERNAL]  Register the function for evaluation and statistics gathering
@@ -17376,6 +17718,12 @@ structure recognition.
 %feature("docstring") casadi::FastNewton::has_spfwd "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::FastNewton::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -17585,9 +17933,9 @@ C++ includes: fast_newton.hpp ";
 
 ";
 
-%feature("docstring") casadi::FastNewton::getCount "
+%feature("docstring") casadi::FastNewton::map "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -17815,7 +18163,12 @@ propagation.
 
 %feature("docstring") casadi::FastNewton::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -17896,6 +18249,12 @@ propagation.
 %feature("docstring") casadi::FastNewton::generate_lifted "
 
 [INTERNAL]  Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring") casadi::FastNewton::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -18136,7 +18495,12 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::FastNewton::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -18701,9 +19065,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::FiniteDiff::weak "
+%feature("docstring") casadi::FiniteDiff::incache "
 
-[INTERNAL]  Get a weak reference to the object.
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -18920,6 +19284,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::FiniteDiff::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::FiniteDiff::size2_in "
 
 [INTERNAL]  Input/output dimensions.
@@ -19049,7 +19419,12 @@ propagation.
 
 %feature("docstring") casadi::FiniteDiff::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -19152,7 +19527,12 @@ original
 
 %feature("docstring") casadi::FiniteDiff::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -19206,6 +19586,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::FiniteDiff::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::FiniteDiff::alloc_iw "
 
 [INTERNAL]  Ensure required length of iw field.
@@ -19247,6 +19633,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::FiniteDiff::get_reltol "
 
 [INTERNAL]  Get relative tolerance.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::weak "
+
+[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -19741,9 +20133,9 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::get_partition "
+%feature("docstring") casadi::FixedStepIntegrator::tocache "
 
-[INTERNAL]  Get the unidirectional or bidirectional partition.
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -19873,6 +20265,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::sx_out "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -19893,7 +20291,12 @@ multiplying.
 
 %feature("docstring") casadi::FixedStepIntegrator::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -20113,6 +20516,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::FixedStepIntegrator::has_codegen "
 
 [INTERNAL]  Is codegen supported?
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -20529,6 +20938,12 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::get_partition "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::codegen_body "
 
 [INTERNAL]  Generate code for the function body.
@@ -20696,7 +21111,12 @@ elements.
 
 %feature("docstring") casadi::FixedStepIntegrator::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -20863,9 +21283,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::serialize_header "
+%feature("docstring") casadi::ForwardDiff::incache "
 
-[INTERNAL]  Serialize function header.
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -20955,7 +21375,12 @@ multiplying.
 
 %feature("docstring") casadi::ForwardDiff::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -21129,6 +21554,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::ForwardDiff::mx_in "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ForwardDiff::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -21553,6 +21984,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::ForwardDiff::serialize_header "
+
+[INTERNAL]  Serialize function header.
+
+";
+
 %feature("docstring") casadi::ForwardDiff::instruction_id "
 
 [INTERNAL]  Get an atomic operation operator index.
@@ -21580,6 +22017,12 @@ elements.
 %feature("docstring") casadi::ForwardDiff::disp_more "
 
 [INTERNAL]  Print more.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -22070,7 +22513,12 @@ elements.
 
 %feature("docstring") casadi::ForwardDiff::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -23122,6 +23570,12 @@ Get default input value.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::GenericExternal::index_in "
 
 [INTERNAL]  Get input scheme index by name.
@@ -23203,7 +23657,12 @@ elements.
 
 %feature("docstring") casadi::GenericExternal::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -23358,7 +23817,12 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::GenericExternal::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -23460,6 +23924,12 @@ classes.
 %feature("docstring") casadi::GenericExternal::sp_reverse "
 
 [INTERNAL]  Propagate sparsity backwards.
+
+";
+
+%feature("docstring") casadi::GenericExternal::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -23761,6 +24231,12 @@ multiplying.
 %feature("docstring") casadi::GenericExternal::alloc_w "
 
 [INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring") casadi::GenericExternal::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -25006,7 +25482,12 @@ propagation.
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -25749,7 +26230,12 @@ casadi::ImplicitFixedStepIntegrator::generate_dependencies "
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -25838,6 +26324,12 @@ casadi::ImplicitFixedStepIntegrator::getAdaptorSolverName "
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::call_reverse "
 
 [INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -25993,6 +26485,12 @@ classes.
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::size_out "
 
 [INTERNAL]  Input/output dimensions.
@@ -26093,6 +26591,12 @@ problem)
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -26221,7 +26725,12 @@ casadi::ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator "
 
 %feature("docstring") casadi::ImplicitToNlp::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -26672,6 +27181,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::check_res "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
@@ -26832,7 +27347,12 @@ original
 
 %feature("docstring") casadi::ImplicitToNlp::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -26967,9 +27487,15 @@ generated function.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::codegen_decref "
+%feature("docstring") casadi::ImplicitToNlp::incache "
 
-[INTERNAL]  Codegen decref for dependencies.
+[INTERNAL]  Get function in cache.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -27051,6 +27577,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::ImplicitToNlp::codegen "
 
 [INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::codegen_decref "
+
+[INTERNAL]  Codegen decref for dependencies.
 
 ";
 
@@ -27481,7 +28013,12 @@ Check if a function is inlined.
 
 %feature("docstring") casadi::Integrator::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -27539,6 +28076,12 @@ elements.
 %feature("docstring") casadi::Integrator::x "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::Integrator::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
 
 %feature("docstring") casadi::Integrator::eval_sx "
 
@@ -28196,7 +28739,12 @@ elements.
 
 %feature("docstring") casadi::Integrator::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -28327,6 +28875,12 @@ elements.
 %feature("docstring") casadi::Integrator::sparsity_out "
 
 [INTERNAL]  Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::Integrator::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -28475,6 +29029,12 @@ propagation.
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring") casadi::Integrator::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -28647,6 +29207,12 @@ structure recognition.
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::Interpolant::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -29043,7 +29609,12 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::Interpolant::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -29207,6 +29778,12 @@ elements.
 %feature("docstring") casadi::Interpolant::eval "
 
 [INTERNAL]  Evaluate numerically.
+
+";
+
+%feature("docstring") casadi::Interpolant::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
 
 ";
 
@@ -29644,6 +30221,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Interpolant::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::Interpolant::~Interpolant "
 
 [INTERNAL]  Destructor.
@@ -29817,9 +30400,9 @@ elements.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Interpolant::construct "
+%feature("docstring") casadi::Interpolant::incache "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -29840,7 +30423,12 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::Interpolant::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -30534,6 +31122,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::JitFunction::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::JitFunction::mapsum_mx "
 
 [INTERNAL]  Parallel evaluation.
@@ -30820,6 +31414,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::JitFunction::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
 %feature("docstring") casadi::JitFunction::sparsity_jac "
 
 [INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
@@ -30835,6 +31435,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::JitFunction::matching_res "
 
 [INTERNAL]  Check if output arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::JitFunction::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -30990,7 +31596,12 @@ generated function.
 
 %feature("docstring") casadi::JitFunction::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -31119,7 +31730,12 @@ elements.
 
 %feature("docstring") casadi::JitFunction::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -32095,9 +32711,9 @@ C++ includes: lapack_qr.hpp ";
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::is_a "
+%feature("docstring") casadi::LinearInterpolant::incache "
 
-[INTERNAL]  Check if the function is of a particular type.
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -32195,7 +32811,12 @@ propagation.
 
 %feature("docstring") casadi::LinearInterpolant::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -32433,6 +33054,12 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::construct "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
@@ -32484,6 +33111,12 @@ Evaluate a function, overloaded.
 %feature("docstring") casadi::LinearInterpolant::init "
 
 [INTERNAL]  Initialize.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -32577,7 +33210,12 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::LinearInterpolant::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -32749,6 +33387,12 @@ structure recognition for symmetric Jacobians
 
 [INTERNAL]  Forward mode AD, virtual functions overloaded in derived
 classes.
+
+";
+
+%feature("docstring") casadi::LinearInterpolant::is_a "
+
+[INTERNAL]  Check if the function is of a particular type.
 
 ";
 
@@ -33112,6 +33756,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::size_out "
 
 [INTERNAL]  Input/output dimensions.
@@ -33232,7 +33882,12 @@ multiplying.
 
 %feature("docstring") casadi::LinearInterpolantJac::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -33705,6 +34360,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolantJac::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::LinearInterpolantJac::sx_out "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -33870,6 +34531,12 @@ C++ includes: linear_interpolant.hpp ";
 %feature("docstring") casadi::LinearInterpolantJac::has_free "
 
 [INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -34039,7 +34706,12 @@ elements.
 
 %feature("docstring") casadi::LinearInterpolantJac::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -35263,6 +35935,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Map::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::Map::codegen_body "
 
 [INTERNAL]  Generate code for the body of the C function.
@@ -35337,7 +36015,12 @@ propagation.
 
 %feature("docstring") casadi::Map::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -35427,9 +36110,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Map::construct "
+%feature("docstring") casadi::Map::incache "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -35824,6 +36507,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Map::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::Map::info "
 
 [INTERNAL]  Obtain information about node
@@ -35832,7 +36521,12 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::Map::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -35912,6 +36606,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Map::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
 %feature("docstring") casadi::Map::jac "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -35922,1892 +36622,6 @@ elements.
 %feature("docstring") casadi::Map::print_option "
 
 [INTERNAL]  Print all information there is to know about a certain option.
-
-";
-
-
-// File: classcasadi_1_1MapOmp.xml
-%feature("docstring") casadi::MapOmp::set_work "
-
-[INTERNAL]  Set the (persistent) work vectors.
-
-";
-
-%feature("docstring") casadi::MapOmp::symbolic_output "
-
-[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::generate_lifted "
-
-[INTERNAL]  Extract the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring") casadi::MapOmp::getAdaptorSolverName "
-
-[INTERNAL]  Obtain solver name from Adaptor.
-
-";
-
-%feature("docstring") casadi::MapOmp::disp "
-
-[INTERNAL]  Display object.
-
-";
-
-%feature("docstring") casadi::MapOmp::sz_w "
-
-[INTERNAL]  Get required length of w field.
-
-";
-
-%feature("docstring") casadi::MapOmp::index_in "
-
-[INTERNAL]  Get input scheme index by name.
-
-";
-
-%feature("docstring") casadi::MapOmp::getCount "
-
-[INTERNAL]  Get the reference count.
-
-";
-
-%feature("docstring") casadi::MapOmp::getJacSparsityGen "
-
-[INTERNAL]  Get the sparsity pattern, forward mode.
-
-";
-
-%feature("docstring") casadi::MapOmp::free_mx "
-
-[INTERNAL]  Get free variables ( MX)
-
-";
-
-%feature("docstring") casadi::MapOmp::has_reverse "
-
-[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
-
-";
-
-%feature("docstring") casadi::MapOmp::sparsity_in "
-
-[INTERNAL]  Input/output sparsity.
-
-";
-
-%feature("docstring") casadi::MapOmp::has_jac "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
-%feature("docstring") casadi::MapOmp::codegen_meta "
-
-[INTERNAL]  Generate meta-information allowing a user to evaluate a
-generated function.
-
-";
-
-%feature("docstring") casadi::MapOmp::slice "
-
-[INTERNAL]  returns a new function with a selection of inputs/outputs of the
-original
-
-";
-
-%feature("docstring") casadi::MapOmp::eval_gen "
-
-[INTERNAL]  Evaluate or propagate sparsities.
-
->  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, casadi_int mem=0) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Evaluate or propagate sparsities.
-
-";
-
-";
-
-%feature("docstring") casadi::MapOmp::factory "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::MapOmp::matching_res "
-
-[INTERNAL]  Check if output arguments that needs to be replaced.
-
-";
-
-%feature("docstring") casadi::MapOmp::alloc_arg "
-
-[INTERNAL]  Ensure required length of arg field.
-
-";
-
-%feature("docstring") casadi::MapOmp::getJacSparsityHierarchicalSymm "
-
-[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition for symmetric Jacobians
-
-";
-
-%feature("docstring") casadi::MapOmp::get_forward "
-
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
-
-";
-
-%feature("docstring") casadi::MapOmp::print_dimensions "
-
-[INTERNAL]  Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::sx_out "
-
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::MapOmp::numel_out "
-
-[INTERNAL]  Number of input/output elements.
-
-";
-
-%feature("docstring") casadi::MapOmp::check_arg "
-
-[INTERNAL]  Check if input arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::MapOmp::getJacSparsityHierarchical "
-
-[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition.
-
-";
-
-%feature("docstring") casadi::MapOmp::instruction_input "
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring") casadi::MapOmp::n_nodes "
-
-[INTERNAL]  Number of nodes in the algorithm.
-
-";
-
-%feature("docstring") casadi::MapOmp::weak "
-
-[INTERNAL]  Get a weak reference to the object.
-
-";
-
-%feature("docstring") casadi::MapOmp::replace_fseed "
-
-[INTERNAL]  Replace 0-by-0 forward seeds.
-
-";
-
-%feature("docstring") casadi::MapOmp::sp_reverse "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
-%feature("docstring") casadi::MapOmp::eval_mx "
-
-[INTERNAL]  Evaluate with symbolic matrices.
-
-";
-
-%feature("docstring") casadi::MapOmp::free_sx "
-
-[INTERNAL]  Get free variables (SX)
-
-";
-
-%feature("docstring") casadi::MapOmp::get_free "
-
-[INTERNAL]  Print free variables.
-
-";
-
-%feature("docstring") casadi::MapOmp::mapsum_mx "
-
-[INTERNAL]  Parallel evaluation.
-
-";
-
-%feature("docstring") casadi::MapOmp::print_option "
-
-[INTERNAL]  Print all information there is to know about a certain option.
-
-";
-
-%feature("docstring") casadi::MapOmp::alloc "
-
-[INTERNAL]  Ensure work vectors long enough to evaluate function.
-
-";
-
-%feature("docstring") casadi::MapOmp::replace_aseed "
-
-[INTERNAL]  Replace 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring") casadi::MapOmp::nnz_out "
-
-[INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::MapOmp::codegen_incref "
-
-[INTERNAL]  Codegen incref for dependencies.
-
-";
-
-%feature("docstring") casadi::MapOmp::checkout "
-
-[INTERNAL]  Checkout a memory object.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_n_in "
-
-[INTERNAL]  Number of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::nnz_in "
-
-[INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::MapOmp::generate_dependencies "
-
-[INTERNAL]  Export / Generate C code for the dependency function.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_abstol "
-
-[INTERNAL]  Get absolute tolerance.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_n_out "
-
-[INTERNAL]  Number of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::call_gen "
-
-[INTERNAL]   Call a function, overloaded.
-
-";
-
-%feature("docstring") casadi::MapOmp::serialize "
-
-[INTERNAL]  Serialize.
-
-";
-
-%feature("docstring") casadi::MapOmp::sp_weight "
-
-[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
-propagation.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_default_in "
-
-[INTERNAL]  Get default input value.
-
-";
-
-%feature("docstring") casadi::MapOmp::mx_in "
-
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::MapOmp::print_options "
-
-[INTERNAL]  Print list of options.
-
-";
-
-%feature("docstring") casadi::MapOmp::finalize "
-
-[INTERNAL]  Finalize the object creation.
-
-";
-
-%feature("docstring") casadi::MapOmp::symbolicAdjSeed "
-
-[INTERNAL]  Symbolic expressions for the adjoint seeds.
-
-";
-
-%feature("docstring") casadi::MapOmp::instruction_id "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
-%feature("docstring") casadi::MapOmp::codegen_name "
-
-[INTERNAL]  Get name in codegen.
-
-";
-
-%feature("docstring") casadi::MapOmp::instruction_MX "
-
-[INTERNAL]  get MX expression associated with instruction
-
-";
-
-%feature("docstring") casadi::MapOmp::disp_more "
-
-[INTERNAL]  Print more.
-
-";
-
-%feature("docstring") casadi::MapOmp::instruction_output "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_partition "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
-%feature("docstring") casadi::MapOmp::sz_arg "
-
-[INTERNAL]  Get required length of arg field.
-
-";
-
-%feature("docstring") casadi::MapOmp::check_res "
-
-[INTERNAL]  Check if output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::MapOmp::which_depends "
-
-[INTERNAL]  Which variables enter with some order.
-
-Parameters:
------------
-
-s_in:   Input name
-
-s_out:   Output name(s)
-
-order:  Only 1 (linear) and 2 (nonlinear) allowed
-
-tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring") casadi::MapOmp::jit_dependencies "
-
-[INTERNAL]  Jit dependencies.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_max_in "
-
-[INTERNAL]  Get largest input value.
-
-";
-
-%feature("docstring") casadi::MapOmp::matching_arg "
-
-[INTERNAL]  Check if input arguments that needs to be replaced.
-
-";
-
-%feature("docstring") casadi::MapOmp::sx_in "
-
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::MapOmp::self "
-
-[INTERNAL]  Get a public class instance.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_jacobian_sparsity "
-
-[INTERNAL]  Get Jacobian sparsity.
-
-";
-
-%feature("docstring") casadi::MapOmp::adjViaJac "
-
-[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
-multiplying.
-
-";
-
-%feature("docstring") casadi::MapOmp::fwd_seed "
-
-[INTERNAL]  Symbolic expressions for the forward seeds.
-
-";
-
-%feature("docstring") casadi::MapOmp::size1_out "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::MapOmp::codegen_declarations "
-
-[INTERNAL]  Generate code for the declarations of the C function.
-
-";
-
-%feature("docstring") casadi::MapOmp::codegen "
-
-[INTERNAL]  Generate code the function.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_jac "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
-%feature("docstring") casadi::MapOmp::jac "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
-%feature("docstring") casadi::MapOmp::has_jacobian "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
-%feature("docstring") casadi::MapOmp::memory "
-
-[INTERNAL]  Memory objects.
-
-";
-
-%feature("docstring") casadi::MapOmp::wrap "
-
-[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
-
-";
-
-%feature("docstring") casadi::MapOmp::uses_output "
-
-[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring") casadi::MapOmp::alloc_iw "
-
-[INTERNAL]  Ensure required length of iw field.
-
-";
-
-%feature("docstring") casadi::MapOmp::forward "
-
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(casadi_int nfwd) if no cached version is available.
-
-";
-
-%feature("docstring") casadi::MapOmp::oracle "
-
-[INTERNAL]  Get oracle.
-
-";
-
-%feature("docstring") casadi::MapOmp::sparsity_out "
-
-[INTERNAL]  Input/output sparsity.
-
-";
-
-%feature("docstring") casadi::MapOmp::has_codegen "
-
-[INTERNAL]  Is codegen supported?
-
-";
-
-%feature("docstring") casadi::MapOmp::all_scalar "
-
-[INTERNAL]  Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_sparsity_out "
-
-[INTERNAL]  Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::sz_iw "
-
-[INTERNAL]  Get required length of iw field.
-
-";
-
-%feature("docstring") casadi::MapOmp::call_reverse "
-
-[INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
-
-";
-
-%feature("docstring") casadi::MapOmp "
-
-[INTERNAL]  A map Evaluate in parallel using OpenMP Note: Do not use this
-class with much more than the intended number of threads for the parallel
-evaluation as it will cause excessive memory use.
-
-Joel Andersson
-
-C++ includes: map.hpp ";
-
-%feature("docstring") casadi::MapOmp::getJacSparsity "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring") casadi::MapOmp::mx_out "
-
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::MapOmp::size1_in "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::MapOmp::size_in "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::MapOmp::definition "
-
-[INTERNAL]  Get function signature: name:(inputs)->(outputs)
-
-";
-
-%feature("docstring") casadi::MapOmp::alloc_res "
-
-[INTERNAL]  Ensure required length of res field.
-
-";
-
-%feature("docstring") casadi::MapOmp::serialize_header "
-
-[INTERNAL]  Serialize function header.
-
-";
-
-%feature("docstring") casadi::MapOmp::codegen_decref "
-
-[INTERNAL]  Codegen decref for dependencies.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_sparsity_in "
-
-[INTERNAL]  Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_name_in "
-
-[INTERNAL]  Names of function input and outputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_min_in "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_stats "
-
-[INTERNAL]  Get all statistics.
-
-";
-
-%feature("docstring") casadi::MapOmp::instruction_constant "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::MapOmp::sz_res "
-
-[INTERNAL]  Get required length of res field.
-
-";
-
-%feature("docstring") casadi::MapOmp::has_free "
-
-[INTERNAL]  Does the function have free variables.
-
-";
-
-%feature("docstring") casadi::MapOmp::codegen_sparsities "
-
-[INTERNAL]  Codegen sparsities.
-
-";
-
-%feature("docstring") casadi::MapOmp::init_mem "
-
-[INTERNAL]  Initalize memory block.
-
-";
-
-%feature("docstring") casadi::MapOmp::free_mem "
-
-[INTERNAL]  Free memory block.
-
-";
-
-%feature("docstring") casadi::MapOmp::size_out "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::MapOmp::ad_weight "
-
-[INTERNAL]  Weighting factor for chosing forward/reverse mode.
-
-";
-
-%feature("docstring") casadi::MapOmp::set_temp "
-
-[INTERNAL]  Set the (temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::MapOmp::replace_res "
-
-[INTERNAL]  Replace 0-by-0 outputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::sprint "
-
-[INTERNAL]  C-style formatted printing to string.
-
-";
-
-%feature("docstring") casadi::MapOmp::call_forward "
-
-[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
-classes.
-
-";
-
-%feature("docstring") casadi::MapOmp::n_instructions "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
-%feature("docstring") casadi::MapOmp::info "
-
-[INTERNAL]  Obtain information about node
-
-";
-
-%feature("docstring") casadi::MapOmp::size2_in "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::MapOmp::setup "
-
-[INTERNAL]  Set the (persistent and temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::MapOmp::signature "
-
-[INTERNAL]  Code generate the function.
-
-";
-
-%feature("docstring") casadi::MapOmp::sz_work "
-
-[INTERNAL]  Get number of temporary variables needed.
-
-";
-
-%feature("docstring") casadi::MapOmp::has_sprev "
-
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::MapOmp::get_jacobian "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_name_out "
-
-[INTERNAL]  Names of function input and outputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::sparsity_jac "
-
-[INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring") casadi::MapOmp::reverse "
-
-[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(casadi_int nadj) if no cached version is available.
-
-";
-
-%feature("docstring") casadi::MapOmp::fwdViaJac "
-
-[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
-multiplying.
-
-";
-
-%feature("docstring") casadi::MapOmp::size2_out "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::MapOmp::has_spfwd "
-
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::MapOmp::index_out "
-
-[INTERNAL]  Get output scheme index by name.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_function "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::MapOmp::construct "
-
-[INTERNAL]  Construct Prepares the function for evaluation.
-
-";
-
-%feature("docstring") casadi::MapOmp::export_code "
-
-[INTERNAL]  Export function in a specific language.
-
-";
-
-%feature("docstring") casadi::MapOmp::alloc_mem "
-
-[INTERNAL]  Create memory block.
-
-";
-
-%feature("docstring") casadi::MapOmp::numel_in "
-
-[INTERNAL]  Number of input/output elements.
-
-";
-
-%feature("docstring") casadi::MapOmp::has_forward "
-
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
-
-";
-
-%feature("docstring") casadi::MapOmp::is_a "
-
-[INTERNAL]  Check if the function is of a particular type.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_reverse "
-
-[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
-
-";
-
-%feature("docstring") casadi::MapOmp::eval_dm "
-
-[INTERNAL]  Evaluate with DM matrices.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_options "
-
-[INTERNAL]  Options.
-
-";
-
-%feature("docstring") casadi::MapOmp::replace_arg "
-
-[INTERNAL]  Replace 0-by-0 inputs.
-
-";
-
-%feature("docstring") casadi::MapOmp::has_derivative "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
-%feature("docstring") casadi::MapOmp::alloc_w "
-
-[INTERNAL]  Ensure required length of w field.
-
-";
-
-%feature("docstring") casadi::MapOmp::has_function "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::MapOmp::sp_forward "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
-%feature("docstring") casadi::MapOmp::release "
-
-[INTERNAL]  Release a memory object.
-
-";
-
-%feature("docstring") casadi::MapOmp::jacobian "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
-%feature("docstring") casadi::MapOmp::clear_mem "
-
-[INTERNAL]  Clear all memory (called from destructor)
-
-";
-
-%feature("docstring") casadi::MapOmp::eval_sx "
-
-[INTERNAL]  evaluate symbolically while also propagating directional
-derivatives
-
-";
-
-%feature("docstring") casadi::MapOmp::call "
-
-[INTERNAL]   Call a function, templated.
-
-";
-
-%feature("docstring") casadi::MapOmp::get_reltol "
-
-[INTERNAL]  Get relative tolerance.
-
-";
-
-%feature("docstring") casadi::MapOmp::print "
-
-[INTERNAL]  C-style formatted printing during evaluation.
-
-";
-
-
-// File: classcasadi_1_1MapThread.xml
-%feature("docstring") casadi::MapThread::size1_in "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::MapThread::get_sparsity_out "
-
-[INTERNAL]  Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::MapThread::adjViaJac "
-
-[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
-multiplying.
-
-";
-
-%feature("docstring") casadi::MapThread::release "
-
-[INTERNAL]  Release a memory object.
-
-";
-
-%feature("docstring") casadi::MapThread::has_function "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::MapThread::all_scalar "
-
-[INTERNAL]  Are all inputs and outputs scalar.
-
-";
-
-%feature("docstring") casadi::MapThread::sz_iw "
-
-[INTERNAL]  Get required length of iw field.
-
-";
-
-%feature("docstring") casadi::MapThread::factory "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::MapThread::sz_work "
-
-[INTERNAL]  Get number of temporary variables needed.
-
-";
-
-%feature("docstring") casadi::MapThread::get_jacobian_sparsity "
-
-[INTERNAL]  Get Jacobian sparsity.
-
-";
-
-%feature("docstring") casadi::MapThread::alloc_res "
-
-[INTERNAL]  Ensure required length of res field.
-
-";
-
-%feature("docstring") casadi::MapThread::print_option "
-
-[INTERNAL]  Print all information there is to know about a certain option.
-
-";
-
-%feature("docstring") casadi::MapThread::sp_reverse "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
-%feature("docstring") casadi::MapThread::export_code "
-
-[INTERNAL]  Export function in a specific language.
-
-";
-
-%feature("docstring") casadi::MapThread::wrap "
-
-[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
-
-";
-
-%feature("docstring") casadi::MapThread "
-
-[INTERNAL]  A map Evaluate in parallel using std::thread Note: Do not use
-this class with much more than the intended number of threads for the
-parallel evaluation as it will cause excessive memory use.
-
-Joris Gillis
-
-C++ includes: map.hpp ";
-
-%feature("docstring") casadi::MapThread::codegen_sparsities "
-
-[INTERNAL]  Codegen sparsities.
-
-";
-
-%feature("docstring") casadi::MapThread::set_temp "
-
-[INTERNAL]  Set the (temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::MapThread::symbolicAdjSeed "
-
-[INTERNAL]  Symbolic expressions for the adjoint seeds.
-
-";
-
-%feature("docstring") casadi::MapThread::finalize "
-
-[INTERNAL]  Finalize the object creation.
-
-";
-
-%feature("docstring") casadi::MapThread::serialize "
-
-[INTERNAL]  Serialize.
-
-";
-
-%feature("docstring") casadi::MapThread::disp "
-
-[INTERNAL]  Display object.
-
-";
-
-%feature("docstring") casadi::MapThread::replace_res "
-
-[INTERNAL]  Replace 0-by-0 outputs.
-
-";
-
-%feature("docstring") casadi::MapThread::get_jacobian "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
-%feature("docstring") casadi::MapThread::alloc_arg "
-
-[INTERNAL]  Ensure required length of arg field.
-
-";
-
-%feature("docstring") casadi::MapThread::sparsity_jac "
-
-[INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring") casadi::MapThread::instruction_MX "
-
-[INTERNAL]  get MX expression associated with instruction
-
-";
-
-%feature("docstring") casadi::MapThread::get_stats "
-
-[INTERNAL]  Get all statistics.
-
-";
-
-%feature("docstring") casadi::MapThread::codegen "
-
-[INTERNAL]  Generate code the function.
-
-";
-
-%feature("docstring") casadi::MapThread::jac "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
-%feature("docstring") casadi::MapThread::fwdViaJac "
-
-[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
-multiplying.
-
-";
-
-%feature("docstring") casadi::MapThread::sz_arg "
-
-[INTERNAL]  Get required length of arg field.
-
-";
-
-%feature("docstring") casadi::MapThread::alloc_w "
-
-[INTERNAL]  Ensure required length of w field.
-
-";
-
-%feature("docstring") casadi::MapThread::call_reverse "
-
-[INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
-
-";
-
-%feature("docstring") casadi::MapThread::codegen_name "
-
-[INTERNAL]  Get name in codegen.
-
-";
-
-%feature("docstring") casadi::MapThread::eval_mx "
-
-[INTERNAL]  Evaluate with symbolic matrices.
-
-";
-
-%feature("docstring") casadi::MapThread::free_sx "
-
-[INTERNAL]  Get free variables (SX)
-
-";
-
-%feature("docstring") casadi::MapThread::has_jacobian "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
-%feature("docstring") casadi::MapThread::fwd_seed "
-
-[INTERNAL]  Symbolic expressions for the forward seeds.
-
-";
-
-%feature("docstring") casadi::MapThread::instruction_input "
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring") casadi::MapThread::checkout "
-
-[INTERNAL]  Checkout a memory object.
-
-";
-
-%feature("docstring") casadi::MapThread::sp_weight "
-
-[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
-propagation.
-
-";
-
-%feature("docstring") casadi::MapThread::jit_dependencies "
-
-[INTERNAL]  Jit dependencies.
-
-";
-
-%feature("docstring") casadi::MapThread::set_work "
-
-[INTERNAL]  Set the (persistent) work vectors.
-
-";
-
-%feature("docstring") casadi::MapThread::numel_out "
-
-[INTERNAL]  Number of input/output elements.
-
-";
-
-%feature("docstring") casadi::MapThread::eval_gen "
-
-[INTERNAL]  Evaluate or propagate sparsities.
-
->  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, casadi_int mem=0) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Evaluate or propagate sparsities.
-
-";
-
-";
-
-%feature("docstring") casadi::MapThread::get_partition "
-
-[INTERNAL]  Get the unidirectional or bidirectional partition.
-
-";
-
-%feature("docstring") casadi::MapThread::get_max_in "
-
-[INTERNAL]  Get largest input value.
-
-";
-
-%feature("docstring") casadi::MapThread::index_in "
-
-[INTERNAL]  Get input scheme index by name.
-
-";
-
-%feature("docstring") casadi::MapThread::size_in "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::MapThread::get_min_in "
-
-[INTERNAL]  Get smallest input value.
-
-";
-
-%feature("docstring") casadi::MapThread::check_res "
-
-[INTERNAL]  Check if output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::MapThread::replace_aseed "
-
-[INTERNAL]  Replace 0-by-0 reverse seeds.
-
-";
-
-%feature("docstring") casadi::MapThread::slice "
-
-[INTERNAL]  returns a new function with a selection of inputs/outputs of the
-original
-
-";
-
-%feature("docstring") casadi::MapThread::is_a "
-
-[INTERNAL]  Check if the function is of a particular type.
-
-";
-
-%feature("docstring") casadi::MapThread::has_jac "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
-%feature("docstring") casadi::MapThread::get_jac "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
-%feature("docstring") casadi::MapThread::replace_fseed "
-
-[INTERNAL]  Replace 0-by-0 forward seeds.
-
-";
-
-%feature("docstring") casadi::MapThread::get_default_in "
-
-[INTERNAL]  Get default input value.
-
-";
-
-%feature("docstring") casadi::MapThread::print_options "
-
-[INTERNAL]  Print list of options.
-
-";
-
-%feature("docstring") casadi::MapThread::has_derivative "
-
-[INTERNAL]  Can derivatives be calculated in any way?
-
-";
-
-%feature("docstring") casadi::MapThread::free_mem "
-
-[INTERNAL]  Free memory block.
-
-";
-
-%feature("docstring") casadi::MapThread::getCount "
-
-[INTERNAL]  Get the reference count.
-
-";
-
-%feature("docstring") casadi::MapThread::eval_sx "
-
-[INTERNAL]  evaluate symbolically while also propagating directional
-derivatives
-
-";
-
-%feature("docstring") casadi::MapThread::sprint "
-
-[INTERNAL]  C-style formatted printing to string.
-
-";
-
-%feature("docstring") casadi::MapThread::codegen_declarations "
-
-[INTERNAL]  Generate code for the declarations of the C function.
-
-";
-
-%feature("docstring") casadi::MapThread::alloc_mem "
-
-[INTERNAL]  Create memory block.
-
-";
-
-%feature("docstring") casadi::MapThread::instruction_constant "
-
-[INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::MapThread::disp_more "
-
-[INTERNAL]  Print more.
-
-";
-
-%feature("docstring") casadi::MapThread::size2_in "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::MapThread::has_free "
-
-[INTERNAL]  Does the function have free variables.
-
-";
-
-%feature("docstring") casadi::MapThread::get_reverse "
-
-[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
-
-";
-
-%feature("docstring") casadi::MapThread::jacobian "
-
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
-
-";
-
-%feature("docstring") casadi::MapThread::sx_in "
-
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::MapThread::sz_w "
-
-[INTERNAL]  Get required length of w field.
-
-";
-
-%feature("docstring") casadi::MapThread::codegen_meta "
-
-[INTERNAL]  Generate meta-information allowing a user to evaluate a
-generated function.
-
-";
-
-%feature("docstring") casadi::MapThread::setup "
-
-[INTERNAL]  Set the (persistent and temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::MapThread::print "
-
-[INTERNAL]  C-style formatted printing during evaluation.
-
-";
-
-%feature("docstring") casadi::MapThread::generate_lifted "
-
-[INTERNAL]  Extract the functions needed for the Lifted Newton method.
-
-";
-
-%feature("docstring") casadi::MapThread::mx_in "
-
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::MapThread::uses_output "
-
-[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
-
-";
-
-%feature("docstring") casadi::MapThread::has_sprev "
-
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::MapThread::nnz_in "
-
-[INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::MapThread::get_reltol "
-
-[INTERNAL]  Get relative tolerance.
-
-";
-
-%feature("docstring") casadi::MapThread::instruction_id "
-
-[INTERNAL]  Get an atomic operation operator index.
-
-";
-
-%feature("docstring") casadi::MapThread::symbolic_output "
-
-[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring") casadi::MapThread::size1_out "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::MapThread::call_forward "
-
-[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
-classes.
-
-";
-
-%feature("docstring") casadi::MapThread::generate_dependencies "
-
-[INTERNAL]  Export / Generate C code for the dependency function.
-
-";
-
-%feature("docstring") casadi::MapThread::index_out "
-
-[INTERNAL]  Get output scheme index by name.
-
-";
-
-%feature("docstring") casadi::MapThread::get_function "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::MapThread::getJacSparsityGen "
-
-[INTERNAL]  Get the sparsity pattern, forward mode.
-
-";
-
-%feature("docstring") casadi::MapThread::sparsity_in "
-
-[INTERNAL]  Input/output sparsity.
-
-";
-
-%feature("docstring") casadi::MapThread::get_sparsity_in "
-
-[INTERNAL]  Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::MapThread::getJacSparsityHierarchicalSymm "
-
-[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition for symmetric Jacobians
-
-";
-
-%feature("docstring") casadi::MapThread::serialize_header "
-
-[INTERNAL]  Serialize function header.
-
-";
-
-%feature("docstring") casadi::MapThread::get_free "
-
-[INTERNAL]  Print free variables.
-
-";
-
-%feature("docstring") casadi::MapThread::alloc_iw "
-
-[INTERNAL]  Ensure required length of iw field.
-
-";
-
-%feature("docstring") casadi::MapThread::get_forward "
-
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
-
-";
-
-%feature("docstring") casadi::MapThread::getJacSparsityHierarchical "
-
-[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition.
-
-";
-
-%feature("docstring") casadi::MapThread::sp_forward "
-
-[INTERNAL]  Propagate sparsity forward.
-
-";
-
-%feature("docstring") casadi::MapThread::sx_out "
-
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::MapThread::sparsity_out "
-
-[INTERNAL]  Input/output sparsity.
-
-";
-
-%feature("docstring") casadi::MapThread::get_abstol "
-
-[INTERNAL]  Get absolute tolerance.
-
-";
-
-%feature("docstring") casadi::MapThread::weak "
-
-[INTERNAL]  Get a weak reference to the object.
-
-";
-
-%feature("docstring") casadi::MapThread::check_arg "
-
-[INTERNAL]  Check if input arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::MapThread::ad_weight "
-
-[INTERNAL]  Weighting factor for chosing forward/reverse mode.
-
-";
-
-%feature("docstring") casadi::MapThread::replace_arg "
-
-[INTERNAL]  Replace 0-by-0 inputs.
-
-";
-
-%feature("docstring") casadi::MapThread::get_n_in "
-
-[INTERNAL]  Number of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::MapThread::size_out "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::MapThread::definition "
-
-[INTERNAL]  Get function signature: name:(inputs)->(outputs)
-
-";
-
-%feature("docstring") casadi::MapThread::signature "
-
-[INTERNAL]  Code generate the function.
-
-";
-
-%feature("docstring") casadi::MapThread::getJacSparsity "
-
-[INTERNAL]  Generate the sparsity of a Jacobian block.
-
-";
-
-%feature("docstring") casadi::MapThread::eval_dm "
-
-[INTERNAL]  Evaluate with DM matrices.
-
-";
-
-%feature("docstring") casadi::MapThread::print_dimensions "
-
-[INTERNAL]  Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring") casadi::MapThread::n_instructions "
-
-[INTERNAL]  Get the number of atomic operations.
-
-";
-
-%feature("docstring") casadi::MapThread::codegen_decref "
-
-[INTERNAL]  Codegen decref for dependencies.
-
-";
-
-%feature("docstring") casadi::MapThread::alloc "
-
-[INTERNAL]  Ensure work vectors long enough to evaluate function.
-
-";
-
-%feature("docstring") casadi::MapThread::construct "
-
-[INTERNAL]  Construct Prepares the function for evaluation.
-
-";
-
-%feature("docstring") casadi::MapThread::get_options "
-
-[INTERNAL]  Options.
-
-";
-
-%feature("docstring") casadi::MapThread::call "
-
-[INTERNAL]   Call a function, templated.
-
-";
-
-%feature("docstring") casadi::MapThread::info "
-
-[INTERNAL]  Obtain information about node
-
-";
-
-%feature("docstring") casadi::MapThread::size2_out "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::MapThread::call_gen "
-
-[INTERNAL]   Call a function, overloaded.
-
-";
-
-%feature("docstring") casadi::MapThread::matching_arg "
-
-[INTERNAL]  Check if input arguments that needs to be replaced.
-
-";
-
-%feature("docstring") casadi::MapThread::get_name_out "
-
-[INTERNAL]  Names of function input and outputs.
-
-";
-
-%feature("docstring") casadi::MapThread::numel_in "
-
-[INTERNAL]  Number of input/output elements.
-
-";
-
-%feature("docstring") casadi::MapThread::get_n_out "
-
-[INTERNAL]  Number of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::MapThread::matching_res "
-
-[INTERNAL]  Check if output arguments that needs to be replaced.
-
-";
-
-%feature("docstring") casadi::MapThread::getAdaptorSolverName "
-
-[INTERNAL]  Obtain solver name from Adaptor.
-
-";
-
-%feature("docstring") casadi::MapThread::has_forward "
-
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
-
-";
-
-%feature("docstring") casadi::MapThread::which_depends "
-
-[INTERNAL]  Which variables enter with some order.
-
-Parameters:
------------
-
-s_in:   Input name
-
-s_out:   Output name(s)
-
-order:  Only 1 (linear) and 2 (nonlinear) allowed
-
-tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring") casadi::MapThread::sz_res "
-
-[INTERNAL]  Get required length of res field.
-
-";
-
-%feature("docstring") casadi::MapThread::forward "
-
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(casadi_int nfwd) if no cached version is available.
-
-";
-
-%feature("docstring") casadi::MapThread::codegen_incref "
-
-[INTERNAL]  Codegen incref for dependencies.
-
-";
-
-%feature("docstring") casadi::MapThread::instruction_output "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::MapThread::mx_out "
-
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::MapThread::reverse "
-
-[INTERNAL]  Return function that calculates adjoint derivatives
-reverse(nadj) returns a cached instance if available, and calls  Function
-get_reverse(casadi_int nadj) if no cached version is available.
-
-";
-
-%feature("docstring") casadi::MapThread::has_reverse "
-
-[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
-
-";
-
-%feature("docstring") casadi::MapThread::init_mem "
-
-[INTERNAL]  Initalize memory block.
-
-";
-
-%feature("docstring") casadi::MapThread::nnz_out "
-
-[INTERNAL]  Number of input/output nonzeros.
-
-";
-
-%feature("docstring") casadi::MapThread::free_mx "
-
-[INTERNAL]  Get free variables ( MX)
-
-";
-
-%feature("docstring") casadi::MapThread::oracle "
-
-[INTERNAL]  Get oracle.
-
-";
-
-%feature("docstring") casadi::MapThread::memory "
-
-[INTERNAL]  Memory objects.
-
-";
-
-%feature("docstring") casadi::MapThread::has_spfwd "
-
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::MapThread::self "
-
-[INTERNAL]  Get a public class instance.
-
-";
-
-%feature("docstring") casadi::MapThread::get_name_in "
-
-[INTERNAL]  Names of function input and outputs.
-
-";
-
-%feature("docstring") casadi::MapThread::mapsum_mx "
-
-[INTERNAL]  Parallel evaluation.
-
-";
-
-%feature("docstring") casadi::MapThread::has_codegen "
-
-[INTERNAL]  Is codegen supported?
-
-";
-
-%feature("docstring") casadi::MapThread::n_nodes "
-
-[INTERNAL]  Number of nodes in the algorithm.
-
-";
-
-%feature("docstring") casadi::MapThread::clear_mem "
-
-[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -39550,9 +38364,9 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 ";
 
-%feature("docstring") casadi::Newton::definition "
+%feature("docstring") casadi::Newton::tocache "
 
-[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -39564,7 +38378,12 @@ Check if the matrix is a row vector (i.e. size1()==1)
 
 %feature("docstring") casadi::Newton::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -39666,6 +38485,12 @@ elements.
 %feature("docstring") casadi::Newton::export_code "
 
 [INTERNAL]  Export function in a specific language.
+
+";
+
+%feature("docstring") casadi::Newton::definition "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
 
 ";
 
@@ -39787,6 +38612,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Newton::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
 %feature("docstring") casadi::Newton::alloc_iw "
 
 [INTERNAL]  Ensure required length of iw field.
@@ -39902,7 +38733,12 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::Newton::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -40418,6 +39254,12 @@ elements.
 %feature("docstring") casadi::Newton::get_name_out "
 
 [INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring") casadi::Newton::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -40970,6 +39812,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::Nlpsol::getJacSparsityHierarchical "
 
 [INTERNAL]  A flavor of getJacSparsity that does hierarchical block
@@ -41113,7 +39961,12 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::Nlpsol::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -41600,6 +40453,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::Nlpsol::index_in "
 
 [INTERNAL]  Get input scheme index by name.
@@ -41722,7 +40581,12 @@ propagation.
 
 %feature("docstring") casadi::Nlpsol::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -41816,6 +40680,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Nlpsol::get_partition "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
 %feature("docstring") casadi::Nlpsol::construct "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
@@ -41849,9 +40719,9 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::get_partition "
+%feature("docstring") casadi::Nlpsol::incache "
 
-[INTERNAL]  Get the unidirectional or bidirectional partition.
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -41893,6 +40763,977 @@ C++ includes: nonzeros.hpp ";
 
 
 // File: classcasadi_1_1NormInf.xml
+
+
+// File: classcasadi_1_1OmpMap.xml
+%feature("docstring") casadi::OmpMap::disp_more "
+
+[INTERNAL]  Print more.
+
+";
+
+%feature("docstring") casadi::OmpMap::uses_output "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring") casadi::OmpMap::getJacSparsityGen "
+
+[INTERNAL]  Get the sparsity pattern, forward mode.
+
+";
+
+%feature("docstring") casadi::OmpMap::sx_in "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::OmpMap::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_n_out "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::OmpMap::index_in "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
+%feature("docstring") casadi::OmpMap::getJacSparsityHierarchicalSymm "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring") casadi::OmpMap::replace_fseed "
+
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
+
+%feature("docstring") casadi::OmpMap::sz_work "
+
+[INTERNAL]  Get number of temporary variables needed.
+
+";
+
+%feature("docstring") casadi::OmpMap::size_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::OmpMap::sp_weight "
+
+[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
+propagation.
+
+";
+
+%feature("docstring") casadi::OmpMap::adjViaJac "
+
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+";
+
+%feature("docstring") casadi::OmpMap::eval_sx "
+
+[INTERNAL]  evaluate symbolically while also propagating directional
+derivatives
+
+";
+
+%feature("docstring") casadi::OmpMap::wrap "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::OmpMap::fwdViaJac "
+
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+";
+
+%feature("docstring") casadi::OmpMap::size1_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::OmpMap::has_spfwd "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::OmpMap::getJacSparsity "
+
+[INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::OmpMap::eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring") casadi::OmpMap::which_depends "
+
+[INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::OmpMap::call_forward "
+
+[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
+classes.
+
+";
+
+%feature("docstring") casadi::OmpMap::alloc "
+
+[INTERNAL]  Ensure work vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::OmpMap::alloc_w "
+
+[INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring") casadi::OmpMap::init_mem "
+
+[INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring") casadi::OmpMap::alloc_arg "
+
+[INTERNAL]  Ensure required length of arg field.
+
+";
+
+%feature("docstring") casadi::OmpMap::disp "
+
+[INTERNAL]  Display object.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_function "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::OmpMap::export_code "
+
+[INTERNAL]  Export function in a specific language.
+
+";
+
+%feature("docstring") casadi::OmpMap::is_a "
+
+[INTERNAL]  Check if the function is of a particular type.
+
+";
+
+%feature("docstring") casadi::OmpMap::has_jac "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::OmpMap::definition "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::OmpMap::codegen_declarations "
+
+[INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::OmpMap::signature "
+
+[INTERNAL]  Code generate the function.
+
+";
+
+%feature("docstring") casadi::OmpMap::sp_reverse "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
+%feature("docstring") casadi::OmpMap::replace_arg "
+
+[INTERNAL]  Replace 0-by-0 inputs.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_name_in "
+
+[INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_min_in "
+
+[INTERNAL]  Get smallest input value.
+
+";
+
+%feature("docstring") casadi::OmpMap::jac "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::OmpMap::generate_lifted "
+
+[INTERNAL]  Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring") casadi::OmpMap::serialize "
+
+[INTERNAL]  Serialize.
+
+";
+
+%feature("docstring") casadi::OmpMap::codegen_decref "
+
+[INTERNAL]  Codegen decref for dependencies.
+
+";
+
+%feature("docstring") casadi::OmpMap::numel_in "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::OmpMap::mapsum_mx "
+
+[INTERNAL]  Parallel evaluation.
+
+";
+
+%feature("docstring") casadi::OmpMap::codegen_meta "
+
+[INTERNAL]  Generate meta-information allowing a user to evaluate a
+generated function.
+
+";
+
+%feature("docstring") casadi::OmpMap::codegen_sparsities "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
+%feature("docstring") casadi::OmpMap::codegen_incref "
+
+[INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::OmpMap::sx_out "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::OmpMap::get_max_in "
+
+[INTERNAL]  Get largest input value.
+
+";
+
+%feature("docstring") casadi::OmpMap::symbolic_output "
+
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::OmpMap::has_codegen "
+
+[INTERNAL]  Is codegen supported?
+
+";
+
+%feature("docstring") casadi::OmpMap::get_partition "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::OmpMap::has_forward "
+
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+
+";
+
+%feature("docstring") casadi::OmpMap::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::OmpMap::has_derivative "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
+%feature("docstring") casadi::OmpMap::get_jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::OmpMap::instruction_input "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_reverse "
+
+[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring") casadi::OmpMap::print "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
+%feature("docstring") casadi::OmpMap::symbolicAdjSeed "
+
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring") casadi::OmpMap::factory "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::OmpMap::alloc_iw "
+
+[INTERNAL]  Ensure required length of iw field.
+
+";
+
+%feature("docstring") casadi::OmpMap::finalize "
+
+[INTERNAL]  Finalize the object creation.
+
+";
+
+%feature("docstring") casadi::OmpMap::call "
+
+[INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring") casadi::OmpMap::print_option "
+
+[INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_options "
+
+[INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::OmpMap::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
+%feature("docstring") casadi::OmpMap::sparsity_jac "
+
+[INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::OmpMap::sz_arg "
+
+[INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring") casadi::OmpMap::instruction_id "
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::OmpMap::forward "
+
+[INTERNAL]  Return function that calculates forward derivatives
+forward(nfwd) returns a cached instance if available, and calls  Function
+get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::OmpMap::size1_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_sparsity_out "
+
+[INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::OmpMap "
+
+[INTERNAL]  A map Evaluate in parallel using OpenMP Note: Do not use this
+class with much more than the intended number of threads for the parallel
+evaluation as it will cause excessive memory use.
+
+Joel Andersson
+
+C++ includes: map.hpp ";
+
+%feature("docstring") casadi::OmpMap::sp_forward "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
+%feature("docstring") casadi::OmpMap::alloc_res "
+
+[INTERNAL]  Ensure required length of res field.
+
+";
+
+%feature("docstring") casadi::OmpMap::free_mx "
+
+[INTERNAL]  Get free variables ( MX)
+
+";
+
+%feature("docstring") casadi::OmpMap::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
+%feature("docstring") casadi::OmpMap::sz_iw "
+
+[INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring") casadi::OmpMap::size_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::OmpMap::has_sprev "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::OmpMap::generate_dependencies "
+
+[INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_reltol "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
+%feature("docstring") casadi::OmpMap::replace_res "
+
+[INTERNAL]  Replace 0-by-0 outputs.
+
+";
+
+%feature("docstring") casadi::OmpMap::jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::OmpMap::mx_out "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::OmpMap::getCount "
+
+[INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_default_in "
+
+[INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring") casadi::OmpMap::free_mem "
+
+[INTERNAL]  Free memory block.
+
+";
+
+%feature("docstring") casadi::OmpMap::print_options "
+
+[INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring") casadi::OmpMap::codegen "
+
+[INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring") casadi::OmpMap::matching_arg "
+
+[INTERNAL]  Check if input arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::OmpMap::has_reverse "
+
+[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring") casadi::OmpMap::eval_gen "
+
+[INTERNAL]  Evaluate or propagate sparsities.
+
+>  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, casadi_int mem=0) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate or propagate sparsities.
+
+";
+
+";
+
+%feature("docstring") casadi::OmpMap::jit_dependencies "
+
+[INTERNAL]  Jit dependencies.
+
+";
+
+%feature("docstring") casadi::OmpMap::nnz_in "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_stats "
+
+[INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring") casadi::OmpMap::matching_res "
+
+[INTERNAL]  Check if output arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_jac "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::OmpMap::release "
+
+[INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring") casadi::OmpMap::fwd_seed "
+
+[INTERNAL]  Symbolic expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::OmpMap::call_gen "
+
+[INTERNAL]   Call a function, overloaded.
+
+";
+
+%feature("docstring") casadi::OmpMap::checkout "
+
+[INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring") casadi::OmpMap::weak "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring") casadi::OmpMap::instruction_constant "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::OmpMap::replace_aseed "
+
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
+
+%feature("docstring") casadi::OmpMap::has_free "
+
+[INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring") casadi::OmpMap::print_dimensions "
+
+[INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::OmpMap::self "
+
+[INTERNAL]  Get a public class instance.
+
+";
+
+%feature("docstring") casadi::OmpMap::sparsity_in "
+
+[INTERNAL]  Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::OmpMap::getAdaptorSolverName "
+
+[INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring") casadi::OmpMap::memory "
+
+[INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_sparsity_in "
+
+[INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::OmpMap::size2_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::OmpMap::check_res "
+
+[INTERNAL]  Check if output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::OmpMap::getJacSparsityHierarchical "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
+
+";
+
+%feature("docstring") casadi::OmpMap::sz_w "
+
+[INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring") casadi::OmpMap::reverse "
+
+[INTERNAL]  Return function that calculates adjoint derivatives
+reverse(nadj) returns a cached instance if available, and calls  Function
+get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_free "
+
+[INTERNAL]  Print free variables.
+
+";
+
+%feature("docstring") casadi::OmpMap::has_jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::OmpMap::index_out "
+
+[INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring") casadi::OmpMap::codegen_name "
+
+[INTERNAL]  Get name in codegen.
+
+";
+
+%feature("docstring") casadi::OmpMap::sparsity_out "
+
+[INTERNAL]  Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::OmpMap::set_work "
+
+[INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::OmpMap::has_function "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::OmpMap::slice "
+
+[INTERNAL]  returns a new function with a selection of inputs/outputs of the
+original
+
+";
+
+%feature("docstring") casadi::OmpMap::free_sx "
+
+[INTERNAL]  Get free variables (SX)
+
+";
+
+%feature("docstring") casadi::OmpMap::instruction_MX "
+
+[INTERNAL]  get MX expression associated with instruction
+
+";
+
+%feature("docstring") casadi::OmpMap::oracle "
+
+[INTERNAL]  Get oracle.
+
+";
+
+%feature("docstring") casadi::OmpMap::mx_in "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::OmpMap::n_instructions "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
+%feature("docstring") casadi::OmpMap::eval_mx "
+
+[INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::OmpMap::size2_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::OmpMap::instruction_output "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_abstol "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
+%feature("docstring") casadi::OmpMap::set_temp "
+
+[INTERNAL]  Set the (temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_name_out "
+
+[INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_n_in "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::OmpMap::all_scalar "
+
+[INTERNAL]  Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::OmpMap::n_nodes "
+
+[INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::OmpMap::call_reverse "
+
+[INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::OmpMap::clear_mem "
+
+[INTERNAL]  Clear all memory (called from destructor)
+
+";
+
+%feature("docstring") casadi::OmpMap::setup "
+
+[INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::OmpMap::ad_weight "
+
+[INTERNAL]  Weighting factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring") casadi::OmpMap::numel_out "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::OmpMap::info "
+
+[INTERNAL]  Obtain information about node
+
+";
+
+%feature("docstring") casadi::OmpMap::check_arg "
+
+[INTERNAL]  Check if input arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::OmpMap::sz_res "
+
+[INTERNAL]  Get required length of res field.
+
+";
+
+%feature("docstring") casadi::OmpMap::sprint "
+
+[INTERNAL]  C-style formatted printing to string.
+
+";
+
+%feature("docstring") casadi::OmpMap::serialize_header "
+
+[INTERNAL]  Serialize function header.
+
+";
+
+%feature("docstring") casadi::OmpMap::nnz_out "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::OmpMap::get_forward "
+
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+
+";
+
+%feature("docstring") casadi::OmpMap::alloc_mem "
+
+[INTERNAL]  Create memory block.
+
+";
 
 
 // File: classcasadi_1_1OneSX.xml
@@ -42770,6 +42611,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::get_sparsity_out "
+
+[INTERNAL]  Get sparsity of a given output.
+
+";
+
 %feature("docstring") casadi::OracleFunction::symbolic_output "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
@@ -42959,9 +42806,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::codegen_incref "
+%feature("docstring") casadi::OracleFunction::tocache "
 
-[INTERNAL]  Codegen incref for dependencies.
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -43060,6 +42907,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::OracleFunction::codegen_incref "
+
+[INTERNAL]  Codegen incref for dependencies.
+
+";
+
 %feature("docstring") casadi::OracleFunction::size_out "
 
 [INTERNAL]  Input/output dimensions.
@@ -43115,6 +42968,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::OracleFunction::is_a "
 
 [INTERNAL]  Check if the function is of a particular type.
@@ -43139,9 +42998,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::OracleFunction::disp "
+%feature("docstring") casadi::OracleFunction::incache "
 
-[INTERNAL]  Display object.
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -43174,7 +43033,12 @@ multiplying.
 
 %feature("docstring") casadi::OracleFunction::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -43665,9 +43529,9 @@ C++ includes: oracle_function.hpp ";
 
 ";
 
-%feature("docstring") casadi::OracleFunction::get_sparsity_out "
+%feature("docstring") casadi::OracleFunction::disp "
 
-[INTERNAL]  Get sparsity of a given output.
+[INTERNAL]  Display object.
 
 ";
 
@@ -43792,7 +43656,12 @@ elements.
 
 %feature("docstring") casadi::OracleFunction::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -44177,6 +44046,12 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::QpToNlp::sp_forward "
 
 [INTERNAL]  Propagate sparsity forward.
@@ -44409,7 +44284,12 @@ elements.
 
 %feature("docstring") casadi::QpToNlp::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -44618,6 +44498,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::QpToNlp::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -44974,6 +44860,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::QpToNlp::has_forward "
 
 [INTERNAL]  Return function that calculates forward derivatives
@@ -45014,7 +44906,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 %feature("docstring") casadi::QpToNlp::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -45156,6 +45053,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::Qrqp::definition "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::Qrqp::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -45373,7 +45276,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::Qrqp::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -45391,7 +45299,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::Qrqp::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -45504,6 +45417,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::Qrqp::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -45950,6 +45869,12 @@ original
 
 ";
 
+%feature("docstring") casadi::Qrqp::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
 %feature("docstring") casadi::Qrqp::print_fstats "
 
 [INTERNAL]  Print statistics.
@@ -46255,7 +46180,12 @@ original
 
 %feature("docstring") casadi::Rootfinder::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -46427,7 +46357,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 %feature("docstring") casadi::Rootfinder::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -46540,9 +46475,15 @@ elements.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Rootfinder::weak "
+%feature("docstring") casadi::Rootfinder::incache "
 
-[INTERNAL]  Get a weak reference to the object.
+[INTERNAL]  Get function in cache.
+
+";
+
+%feature("docstring") casadi::Rootfinder::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -46908,6 +46849,12 @@ elements.
 %feature("docstring") casadi::Rootfinder::export_code "
 
 [INTERNAL]  Export function in a specific language.
+
+";
+
+%feature("docstring") casadi::Rootfinder::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -47282,6 +47229,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::weak "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
 %feature("docstring") casadi::Rootfinder::free_mx "
 
 [INTERNAL]  Get free variables ( MX)
@@ -47425,6 +47378,12 @@ elements.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::RungeKutta::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::RungeKutta::disp "
 
 [INTERNAL]  Display object.
@@ -47476,6 +47435,12 @@ elements.
 %feature("docstring") casadi::RungeKutta::getCount "
 
 [INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring") casadi::RungeKutta::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -47616,6 +47581,12 @@ problem)
 %feature("docstring") casadi::RungeKutta::size1_out "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::RungeKutta::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -48082,7 +48053,12 @@ elements.
 
 %feature("docstring") casadi::RungeKutta::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -48201,7 +48177,12 @@ original
 
 %feature("docstring") casadi::RungeKutta::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -48437,7 +48418,12 @@ Evaluate a function, overloaded.
 // File: classcasadi_1_1Scpgen.xml
 %feature("docstring") casadi::Scpgen::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -48531,7 +48517,12 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::Scpgen::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -48637,6 +48628,12 @@ multiplying.
 %feature("docstring") casadi::Scpgen::oracle "
 
 [INTERNAL]  Get oracle.
+
+";
+
+%feature("docstring") casadi::Scpgen::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -49227,6 +49224,12 @@ classes.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::Scpgen::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::Scpgen::info "
 
 [INTERNAL]  Obtain information about function
@@ -49767,6 +49770,12 @@ C++ includes: scpgen.hpp ";
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::Scpgen::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::Scpgen::printIteration "
 
 [INTERNAL] ";
@@ -50243,7 +50252,12 @@ multiplying.
 
 %feature("docstring") casadi::SlicotDple::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -50433,9 +50447,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::SlicotDple::construct "
+%feature("docstring") casadi::SlicotDple::incache "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -50710,7 +50724,12 @@ structure recognition.
 
 %feature("docstring") casadi::SlicotDple::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -50759,6 +50778,12 @@ structure recognition.
 %feature("docstring") casadi::SlicotDple::get_sparsity_in "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::SlicotDple::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
 
 ";
 
@@ -51122,9 +51147,21 @@ elements.
 
 ";
 
+%feature("docstring") casadi::SlicotDple::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::SlicotDple::all_scalar "
 
 [INTERNAL]  Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::SlicotDple::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -51547,6 +51584,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::SlicotExpm "
 
 [INTERNAL]  'slicot' plugin for Expm
@@ -51608,6 +51651,12 @@ C++ includes: slicot_expm.hpp ";
 %feature("docstring") casadi::SlicotExpm::info "
 
 [INTERNAL]  Obtain information about function
+
+";
+
+%feature("docstring") casadi::SlicotExpm::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -51933,6 +51982,12 @@ original
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::alloc_iw "
 
 [INTERNAL]  Ensure required length of iw field.
@@ -51941,7 +51996,12 @@ original
 
 %feature("docstring") casadi::SlicotExpm::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -51953,7 +52013,12 @@ original
 
 %feature("docstring") casadi::SlicotExpm::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -52537,7 +52602,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 %feature("docstring") casadi::Smoothing::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -52610,6 +52680,12 @@ elements.
 %feature("docstring") casadi::Smoothing::get_n_out "
 
 [INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Smoothing::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -52983,7 +53059,12 @@ elements.
 
 %feature("docstring") casadi::Smoothing::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -53345,6 +53426,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::Smoothing::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
 %feature("docstring") casadi::Smoothing::has_spfwd "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -53388,6 +53475,12 @@ multiplying.
 %feature("docstring") casadi::Smoothing::export_code "
 
 [INTERNAL]  Export function in a specific language.
+
+";
+
+%feature("docstring") casadi::Smoothing::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -53801,6 +53894,12 @@ Supported formats: .mtx Matrix Market
 %feature("docstring") casadi::Sparsity::colind "
 
 Get a reference to the colindex of column cc (see class description)
+
+";
+
+%feature("docstring") casadi::Sparsity::is_stacked "
+
+Check if pattern is horizontal repeat of another.
 
 ";
 
@@ -54508,6 +54607,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::codegen_body "
+
+[INTERNAL]  Generate code for the function body.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::serialize_header "
 
 [INTERNAL]  Serialize function header.
@@ -54552,6 +54657,12 @@ Evaluate a function, overloaded.
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
 
 ";
 
@@ -55139,7 +55250,12 @@ multiplying.
 
 %feature("docstring") casadi::Sqpmethod::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -55242,9 +55358,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::codegen_body "
+%feature("docstring") casadi::Sqpmethod::incache "
 
-[INTERNAL]  Generate code for the function body.
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -55319,7 +55435,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::Sqpmethod::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -55568,6 +55689,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::sp_forward "
 
 [INTERNAL]  Propagate sparsity forward.
@@ -55795,7 +55922,12 @@ elements.
 
 %feature("docstring") casadi::Switch::replace_aseed "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -55885,6 +56017,12 @@ elements.
 %feature("docstring") casadi::Switch::get_max_in "
 
 [INTERNAL]  Get largest input value.
+
+";
+
+%feature("docstring") casadi::Switch::tocache "
+
+[INTERNAL]  Save function to cache.
 
 ";
 
@@ -56357,6 +56495,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Switch::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring") casadi::Switch::has_sprev "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -56412,7 +56556,12 @@ derivatives
 
 %feature("docstring") casadi::Switch::replace_fseed "
 
-[INTERNAL]  Replace 0-by-0 forward seeds.
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -56635,6 +56784,12 @@ elements.
 %feature("docstring") casadi::Switch::sz_w "
 
 [INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring") casadi::Switch::incache "
+
+[INTERNAL]  Get function in cache.
 
 ";
 
@@ -57148,6 +57303,977 @@ class hierarchy in reverse order is run after init() has been completed.
 
 
 // File: classcasadi_1_1SymbolicSX.xml
+
+
+// File: classcasadi_1_1ThreadMap.xml
+%feature("docstring") casadi::ThreadMap::symbolicAdjSeed "
+
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring") casadi::ThreadMap::serialize "
+
+[INTERNAL]  Serialize.
+
+";
+
+%feature("docstring") casadi::ThreadMap::disp "
+
+[INTERNAL]  Display object.
+
+";
+
+%feature("docstring") casadi::ThreadMap::getJacSparsityGen "
+
+[INTERNAL]  Get the sparsity pattern, forward mode.
+
+";
+
+%feature("docstring") casadi::ThreadMap::sparsity_in "
+
+[INTERNAL]  Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_sparsity_in "
+
+[INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ThreadMap::sparsity_jac "
+
+[INTERNAL]  Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::ThreadMap::memory "
+
+[INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring") casadi::ThreadMap::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::ThreadMap::finalize "
+
+[INTERNAL]  Finalize the object creation.
+
+";
+
+%feature("docstring") casadi::ThreadMap::jac "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::ThreadMap::sx_out "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ThreadMap::tocache "
+
+[INTERNAL]  Save function to cache.
+
+";
+
+%feature("docstring") casadi::ThreadMap::sz_arg "
+
+[INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring") casadi::ThreadMap::mapsum_mx "
+
+[INTERNAL]  Parallel evaluation.
+
+";
+
+%feature("docstring") casadi::ThreadMap::check_arg "
+
+[INTERNAL]  Check if input arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::ThreadMap::size2_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ThreadMap::replace_arg "
+
+[INTERNAL]  Replace 0-by-0 inputs.
+
+";
+
+%feature("docstring") casadi::ThreadMap::codegen_name "
+
+[INTERNAL]  Get name in codegen.
+
+";
+
+%feature("docstring") casadi::ThreadMap::eval_mx "
+
+[INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::ThreadMap::free_sx "
+
+[INTERNAL]  Get free variables (SX)
+
+";
+
+%feature("docstring") casadi::ThreadMap::has_jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::ThreadMap::size_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ThreadMap::instruction_input "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::ThreadMap::signature "
+
+[INTERNAL]  Code generate the function.
+
+";
+
+%feature("docstring") casadi::ThreadMap::codegen_incref "
+
+[INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::ThreadMap::checkout "
+
+[INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring") casadi::ThreadMap::getJacSparsityHierarchicalSymm "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring") casadi::ThreadMap::eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring") casadi::ThreadMap::print_dimensions "
+
+[INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ThreadMap::eval_gen "
+
+[INTERNAL]  Evaluate or propagate sparsities.
+
+>  int casadi::Map::eval_gen(const T **arg, T **res, casadi_int *iw, T *w, casadi_int mem=0) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Evaluate or propagate sparsities.
+
+";
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_partition "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::ThreadMap::serialize_header "
+
+[INTERNAL]  Serialize function header.
+
+";
+
+%feature("docstring") casadi::ThreadMap::alloc "
+
+[INTERNAL]  Ensure work vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::ThreadMap::set_temp "
+
+[INTERNAL]  Set the (temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_options "
+
+[INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_max_in "
+
+[INTERNAL]  Get largest input value.
+
+";
+
+%feature("docstring") casadi::ThreadMap::info "
+
+[INTERNAL]  Obtain information about node
+
+";
+
+%feature("docstring") casadi::ThreadMap::call_gen "
+
+[INTERNAL]   Call a function, overloaded.
+
+";
+
+%feature("docstring") casadi::ThreadMap::check_res "
+
+[INTERNAL]  Check if output arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::ThreadMap::slice "
+
+[INTERNAL]  returns a new function with a selection of inputs/outputs of the
+original
+
+";
+
+%feature("docstring") casadi::ThreadMap::matching_res "
+
+[INTERNAL]  Check if output arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::ThreadMap::has_forward "
+
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+
+";
+
+%feature("docstring") casadi::ThreadMap::which_depends "
+
+[INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::ThreadMap::fwdViaJac "
+
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+";
+
+%feature("docstring") casadi::ThreadMap::sz_res "
+
+[INTERNAL]  Get required length of res field.
+
+";
+
+%feature("docstring") casadi::ThreadMap::instruction_output "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::ThreadMap::alloc_mem "
+
+[INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring") casadi::ThreadMap::reverse "
+
+[INTERNAL]  Return function that calculates adjoint derivatives
+reverse(nadj) returns a cached instance if available, and calls  Function
+get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_default_in "
+
+[INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring") casadi::ThreadMap::has_reverse "
+
+[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring") casadi::ThreadMap::has_derivative "
+
+[INTERNAL]  Can derivatives be calculated in any way?
+
+";
+
+%feature("docstring") casadi::ThreadMap::getCount "
+
+[INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring") casadi::ThreadMap::nnz_out "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_free "
+
+[INTERNAL]  Print free variables.
+
+";
+
+%feature("docstring") casadi::ThreadMap::eval_sx "
+
+[INTERNAL]  evaluate symbolically while also propagating directional
+derivatives
+
+";
+
+%feature("docstring") casadi::ThreadMap::oracle "
+
+[INTERNAL]  Get oracle.
+
+";
+
+%feature("docstring") casadi::ThreadMap::has_spfwd "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::ThreadMap::codegen_declarations "
+
+[INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_name_in "
+
+[INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring") casadi::ThreadMap::call "
+
+[INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring") casadi::ThreadMap::map "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
+%feature("docstring") casadi::ThreadMap::has_free "
+
+[INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_reverse "
+
+[INTERNAL]  Generate a function that calculates nadj adjoint derivatives.
+
+";
+
+%feature("docstring") casadi::ThreadMap::sp_forward "
+
+[INTERNAL]  Propagate sparsity forward.
+
+";
+
+%feature("docstring") casadi::ThreadMap::jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::ThreadMap::sx_in "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_min_in "
+
+[INTERNAL]  Get smallest input value.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_sparsity_out "
+
+[INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ThreadMap::codegen_meta "
+
+[INTERNAL]  Generate meta-information allowing a user to evaluate a
+generated function.
+
+";
+
+%feature("docstring") casadi::ThreadMap::all_scalar "
+
+[INTERNAL]  Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::ThreadMap::replace_res "
+
+[INTERNAL]  Replace 0-by-0 outputs.
+
+";
+
+%feature("docstring") casadi::ThreadMap::generate_lifted "
+
+[INTERNAL]  Extract the functions needed for the Lifted Newton method.
+
+";
+
+%feature("docstring") casadi::ThreadMap::instruction_MX "
+
+[INTERNAL]  get MX expression associated with instruction
+
+";
+
+%feature("docstring") casadi::ThreadMap::has_sprev "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::ThreadMap::size2_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ThreadMap::nnz_in "
+
+[INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::ThreadMap::sp_reverse "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
+%feature("docstring") casadi::ThreadMap::export_code "
+
+[INTERNAL]  Export function in a specific language.
+
+";
+
+%feature("docstring") casadi::ThreadMap::instruction_id "
+
+[INTERNAL]  Get an atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::ThreadMap::wrap "
+
+[INTERNAL]  Wrap in an Function instance consisting of only one MX call.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_name_out "
+
+[INTERNAL]  Names of function input and outputs.
+
+";
+
+%feature("docstring") casadi::ThreadMap::call_forward "
+
+[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
+classes.
+
+";
+
+%feature("docstring") casadi::ThreadMap::generate_dependencies "
+
+[INTERNAL]  Export / Generate C code for the dependency function.
+
+";
+
+%feature("docstring") casadi::ThreadMap::index_out "
+
+[INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring") casadi::ThreadMap::is_a "
+
+[INTERNAL]  Check if the function is of a particular type.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_function "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::ThreadMap::mx_in "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ThreadMap::sz_iw "
+
+[INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::ThreadMap::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
+%feature("docstring") casadi::ThreadMap::alloc_iw "
+
+[INTERNAL]  Ensure required length of iw field.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_stats "
+
+[INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_forward "
+
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
+
+";
+
+%feature("docstring") casadi::ThreadMap::getJacSparsityHierarchical "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition.
+
+";
+
+%feature("docstring") casadi::ThreadMap::codegen "
+
+[INTERNAL]  Generate code the function.
+
+";
+
+%feature("docstring") casadi::ThreadMap::sparsity_out "
+
+[INTERNAL]  Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_abstol "
+
+[INTERNAL]  Get absolute tolerance.
+
+";
+
+%feature("docstring") casadi::ThreadMap::alloc_w "
+
+[INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring") casadi::ThreadMap::call_reverse "
+
+[INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring") casadi::ThreadMap::weak "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring") casadi::ThreadMap::ad_weight "
+
+[INTERNAL]  Weighting factor for chosing forward/reverse mode.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_n_in "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ThreadMap::disp_more "
+
+[INTERNAL]  Print more.
+
+";
+
+%feature("docstring") casadi::ThreadMap::size1_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ThreadMap::fwd_seed "
+
+[INTERNAL]  Symbolic expressions for the forward seeds.
+
+";
+
+%feature("docstring") casadi::ThreadMap::definition "
+
+[INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::ThreadMap::sp_weight "
+
+[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
+propagation.
+
+";
+
+%feature("docstring") casadi::ThreadMap::init_mem "
+
+[INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring") casadi::ThreadMap::set_work "
+
+[INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring") casadi::ThreadMap::numel_out "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::ThreadMap::n_instructions "
+
+[INTERNAL]  Get the number of atomic operations.
+
+";
+
+%feature("docstring") casadi::ThreadMap::codegen_decref "
+
+[INTERNAL]  Codegen decref for dependencies.
+
+";
+
+%feature("docstring") casadi::ThreadMap::size1_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_jac "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::ThreadMap::instruction_constant "
+
+[INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::ThreadMap::index_in "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
+%feature("docstring") casadi::ThreadMap::size_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ThreadMap::replace_fseed "
+
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_reltol "
+
+[INTERNAL]  Get relative tolerance.
+
+";
+
+%feature("docstring") casadi::ThreadMap::matching_arg "
+
+[INTERNAL]  Check if input arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::ThreadMap::getAdaptorSolverName "
+
+[INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring") casadi::ThreadMap::has_jac "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
+%feature("docstring") casadi::ThreadMap::forward "
+
+[INTERNAL]  Return function that calculates forward derivatives
+forward(nfwd) returns a cached instance if available, and calls  Function
+get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::ThreadMap::replace_aseed "
+
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
+
+%feature("docstring") casadi::ThreadMap::mx_out "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::ThreadMap::print_options "
+
+[INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring") casadi::ThreadMap::free_mem "
+
+[INTERNAL]  Free memory block.
+
+";
+
+%feature("docstring") casadi::ThreadMap::free_mx "
+
+[INTERNAL]  Get free variables ( MX)
+
+";
+
+%feature("docstring") casadi::ThreadMap::get_n_out "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::ThreadMap::sprint "
+
+[INTERNAL]  C-style formatted printing to string.
+
+";
+
+%feature("docstring") casadi::ThreadMap::self "
+
+[INTERNAL]  Get a public class instance.
+
+";
+
+%feature("docstring") casadi::ThreadMap::has_codegen "
+
+[INTERNAL]  Is codegen supported?
+
+";
+
+%feature("docstring") casadi::ThreadMap::numel_in "
+
+[INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::ThreadMap::n_nodes "
+
+[INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::ThreadMap::clear_mem "
+
+[INTERNAL]  Clear all memory (called from destructor)
+
+";
+
+%feature("docstring") casadi::ThreadMap::sz_w "
+
+[INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring") casadi::ThreadMap::has_function "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::ThreadMap::adjViaJac "
+
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+";
+
+%feature("docstring") casadi::ThreadMap::release "
+
+[INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring") casadi::ThreadMap::setup "
+
+[INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::ThreadMap::print "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
+%feature("docstring") casadi::ThreadMap::alloc_arg "
+
+[INTERNAL]  Ensure required length of arg field.
+
+";
+
+%feature("docstring") casadi::ThreadMap::uses_output "
+
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+
+";
+
+%feature("docstring") casadi::ThreadMap::factory "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::ThreadMap::sz_work "
+
+[INTERNAL]  Get number of temporary variables needed.
+
+";
+
+%feature("docstring") casadi::ThreadMap::alloc_res "
+
+[INTERNAL]  Ensure required length of res field.
+
+";
+
+%feature("docstring") casadi::ThreadMap::print_option "
+
+[INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::ThreadMap::symbolic_output "
+
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::ThreadMap::getJacSparsity "
+
+[INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::ThreadMap "
+
+[INTERNAL]  A map Evaluate in parallel using std::thread Note: Do not use
+this class with much more than the intended number of threads for the
+parallel evaluation as it will cause excessive memory use.
+
+Joris Gillis
+
+C++ includes: map.hpp ";
+
+%feature("docstring") casadi::ThreadMap::codegen_sparsities "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
+%feature("docstring") casadi::ThreadMap::jit_dependencies "
+
+[INTERNAL]  Jit dependencies.
+
+";
 
 
 // File: classcasadi_1_1Transpose.xml

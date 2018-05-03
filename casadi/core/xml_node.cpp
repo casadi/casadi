@@ -36,7 +36,7 @@ namespace casadi {
   }
 
   bool XmlNode::hasAttribute(const string& attribute_name) const {
-    map<string, string>::const_iterator it = attributes_.find(attribute_name);
+    auto it = attributes_.find(attribute_name);
     return it!=attributes_.end();
   }
 
@@ -51,13 +51,13 @@ namespace casadi {
   }
 
   bool XmlNode::hasChild(const string& childname) const {
-    map<string, casadi_int>::const_iterator it = child_indices_.find(childname);
+    auto it = child_indices_.find(childname);
     return it!=child_indices_.end();
   }
 
   XmlNode& XmlNode::operator[](const string& childname) {
     // Find the child
-    map<string, casadi_int>::const_iterator it = child_indices_.find(childname);
+    auto it = child_indices_.find(childname);
 
     // check that the child was indeed found
     if (it == child_indices_.end()) {
@@ -109,7 +109,7 @@ namespace casadi {
       stream << string(indent+2, ' ') << "Text: " << text_ << endl;
 
     // Print attributes
-    for (map<string, string>::const_iterator it=attributes_.begin(); it != attributes_.end(); ++it)
+    for (auto it=attributes_.begin(); it != attributes_.end(); ++it)
       stream << string(indent+2, ' ') << "attribute " << it->first << " = " << it->second << endl;
 
     // Print Children

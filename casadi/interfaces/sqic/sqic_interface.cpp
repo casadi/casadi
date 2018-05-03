@@ -158,17 +158,17 @@ namespace casadi {
 
   }
 
-  map<casadi_int, string> SqicInterface::calc_flagmap() {
-    map<casadi_int, string> f;
+  std::map<casadi_int, string> SqicInterface::calc_flagmap() {
+    std::map<casadi_int, string> f;
 
     return f;
   }
 
-  map<casadi_int, string> SqicInterface::flagmap = SqicInterface::calc_flagmap();
+  std::map<casadi_int, string> SqicInterface::flagmap = SqicInterface::calc_flagmap();
 
   void SqicInterface::sqic_error(const string& module, casadi_int flag) {
     // Find the error
-    map<casadi_int, string>::const_iterator it = flagmap.find(flag);
+    std::map<casadi_int, string>::const_iterator it = flagmap.find(flag);
 
     stringstream ss;
     if (it == flagmap.end()) {

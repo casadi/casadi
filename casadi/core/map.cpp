@@ -39,13 +39,13 @@ namespace casadi {
 
   Function Map::create(const std::string& parallelization, const Function& f, casadi_int n) {
     // Create instance of the right class
-    string name = f.name() + "_" + str(n);
+    string suffix = str(n) + "_" + f.name();
     if (parallelization == "serial") {
-      return Function::create(new Map(name, f, n), Dict());
+      return Function::create(new Map("map" + suffix, f, n), Dict());
     } else if (parallelization== "openmp") {
-      return Function::create(new MapOmp(name, f, n), Dict());
+      return Function::create(new OmpMap("ompmap" + suffix, f, n), Dict());
     } else if (parallelization== "thread") {
-      return Function::create(new MapThread(name, f, n), Dict());
+      return Function::create(new ThreadMap("threadmap" + suffix, f, n), Dict());
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }
@@ -251,10 +251,10 @@ namespace casadi {
     return eval_gen(arg, res, iw, w, m);
   }
 
-  MapOmp::~MapOmp() {
+  OmpMap::~OmpMap() {
   }
 
-  int MapOmp::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  int OmpMap::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
 #ifndef WITH_OPENMP
     return Map::eval(arg, res, iw, w, mem);
 #else // WITH_OPENMP
@@ -292,7 +292,7 @@ namespace casadi {
 #endif  // WITH_OPENMP
   }
 
-  void MapOmp::codegen_body(CodeGenerator& g) const {
+  void OmpMap::codegen_body(CodeGenerator& g) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
     g << "casadi_int i;\n"
@@ -317,7 +317,7 @@ namespace casadi {
       << "if (flag) return 1;\n";
   }
 
-  void MapOmp::init(const Dict& opts) {
+  void OmpMap::init(const Dict& opts) {
     // Call the initialization method of the base class
     Map::init(opts);
 
@@ -332,7 +332,7 @@ namespace casadi {
   }
 
 
-  MapThread::~MapThread() {
+  ThreadMap::~ThreadMap() {
   }
 
   void ThreadsWork(const Function& f, casadi_int i,
@@ -363,7 +363,7 @@ namespace casadi {
     ret = f(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind);
   }
 
-  int MapThread::eval(const double** arg, double** res, casadi_int* iw, double* w,
+  int ThreadMap::eval(const double** arg, double** res, casadi_int* iw, double* w,
       void* mem) const {
 
 #ifndef CASADI_WITH_THREAD
@@ -403,11 +403,11 @@ namespace casadi {
 #endif // CASADI_WITH_THREAD
   }
 
-  void MapThread::codegen_body(CodeGenerator& g) const {
+  void ThreadMap::codegen_body(CodeGenerator& g) const {
     Map::codegen_body(g);
   }
 
-  void MapThread::init(const Dict& opts) {
+  void ThreadMap::init(const Dict& opts) {
     // Call the initialization method of the base class
     Map::init(opts);
 

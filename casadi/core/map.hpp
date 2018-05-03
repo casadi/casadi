@@ -151,17 +151,17 @@ namespace casadi {
       \author Joel Andersson
       \date 2015
   */
-  class CASADI_EXPORT MapOmp : public Map {
+  class CASADI_EXPORT OmpMap : public Map {
     friend class Map;
   protected:
     // Constructor (protected, use create function in Map)
-    MapOmp(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
+    OmpMap(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
 
     /** \brief  Destructor */
-    ~MapOmp() override;
+    ~OmpMap() override;
 
     /** \brief Get type name */
-    std::string class_name() const override {return "MapOmp";}
+    std::string class_name() const override {return "OmpMap";}
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
@@ -183,17 +183,17 @@ namespace casadi {
       \author Joris Gillis
       \date 2018
   */
-  class CASADI_EXPORT MapThread : public Map {
+  class CASADI_EXPORT ThreadMap : public Map {
     friend class Map;
   protected:
     // Constructor (protected, use create function in Map)
-    MapThread(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
+    ThreadMap(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
 
     /** \brief  Destructor */
-    ~MapThread() override;
+    ~ThreadMap() override;
 
     /** \brief Get type name */
-    std::string class_name() const override {return "MapThread";}
+    std::string class_name() const override {return "ThreadMap";}
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
