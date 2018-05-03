@@ -2881,4 +2881,36 @@ namespace casadi {
     casadi_assert(n>=0, "Print failure while processing '" + string(fmt) + "'");
   }
 
+  void FunctionInternal::
+  call_gen(const MXVector& arg, MXVector& res, casadi_int npar,
+           bool always_inline, bool never_inline) const {
+    if (npar==1) {
+      eval_mx(arg, res, always_inline, never_inline);
+    } else {
+      // Split it up arguments
+      std::vector<std::vector<MX>> v(npar, arg);
+      std::vector<MX> t;
+      for (int i=0; i<n_in_; ++i) {
+        if (arg[i].size2()!=size2_in(i)) {
+          t = horzsplit(arg[i], size2_in(i));
+          casadi_assert_dev(t.size()==npar);
+          for (int p=0; p<npar; ++p) v[p][i] = t[p];
+        }
+      }
+      // Unroll the loop
+      for (int p=0; p<npar; ++p) {
+        eval_mx(v[p], t, always_inline, never_inline);
+        v[p] = t;
+      }
+      // Concatenate results
+      t.resize(npar);
+      res.resize(n_out_);
+      for (int i=0; i<n_out_; ++i) {
+        for (int p=0; p<npar; ++p) t[p] = v[p][i];
+        res[i] = horzcat(t);
+      }
+    }
+  }
+
+
 } // namespace casadi

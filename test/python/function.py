@@ -1785,7 +1785,14 @@ class Functiontests(casadiTestCase):
       r2 = f(2, DM([3,4]))
       r3 = f(3, DM([3,4]))
       r_all = f(DM([[1,2,3]]), DM([3,4]))
-      self.checkarray(r_all, horzcat(r1,r2,r3), "Mapped evaluation")
+      self.checkarray(r_all, horzcat(r1,r2,r3), "Mapped evaluation (DM)")
+
+      z = MX.sym("z", 1, 3);
+      rz = f(z, DM([3,4]))
+      F = Function('F', [z], [rz]);
+      r_mx = F(DM([[1,2,3]]))
+      self.checkarray(r_all, r_mx, "Mapped evaluation (MX)")
+
 
 if __name__ == '__main__':
     unittest.main()

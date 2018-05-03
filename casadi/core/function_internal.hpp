@@ -232,10 +232,7 @@ namespace casadi {
     ///@{
     /** \brief Call a function, overloaded */
     void call_gen(const MXVector& arg, MXVector& res, casadi_int npar,
-                  bool always_inline, bool never_inline) const {
-      casadi_assert_dev(npar==1);
-      eval_mx(arg, res, always_inline, never_inline);
-    }
+                  bool always_inline, bool never_inline) const;
 
     template<typename D>
     void call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
