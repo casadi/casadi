@@ -928,11 +928,21 @@ namespace casadi {
     casadi_assert(!never_inline, "Call-nodes only possible in MX expressions");
     casadi_assert_dev(arg.size()==n_in_);
 
+    // Which arguments require mapped evaluation
+    std::vector<bool> mapped(n_in_);
+    for (casadi_int i=0; i<n_in_; ++i) {
+      mapped[i] = arg[i].size2()!=size2_in(i);
+    }
+
     // Check if matching input sparsity
     std::vector<bool> matching(n_in_);
     bool any_mismatch = false;
     for (casadi_int i=0; i<n_in_; ++i) {
-      matching[i] = arg[i].sparsity().is_stacked(sparsity_in(i), npar);
+      if (mapped[i]) {
+        matching[i] = arg[i].sparsity().is_stacked(sparsity_in(i), npar);
+      } else {
+        matching[i] = arg[i].sparsity()==sparsity_in(i);
+      }
       any_mismatch = any_mismatch || !matching[i];
     }
 
@@ -940,7 +950,13 @@ namespace casadi {
     if (any_mismatch) {
       std::vector<Matrix<D> > arg2(arg);
       for (casadi_int i=0; i<n_in_; ++i) {
-        if (!matching[i]) arg2[i] = project(arg2[i], repmat(sparsity_in(i), 1, npar));
+        if (!matching[i]) {
+          if (mapped[i]) {
+            arg2[i] = project(arg2[i], repmat(sparsity_in(i), 1, npar));
+          } else {
+            arg2[i] = project(arg2[i], sparsity_in(i));
+          }
+        }
       }
       return call_gen(arg2, res, npar, always_inline, never_inline);
     }
@@ -974,7 +990,7 @@ namespace casadi {
       }
       // Update offsets
       if (p==npar-1) break;
-      for (casadi_int i=0; i<n_in_; ++i) argp[i] += nnz_in(i);
+      for (casadi_int i=0; i<n_in_; ++i) if (mapped[i]) argp[i] += nnz_in(i);
       for (casadi_int i=0; i<n_out_; ++i) resp[i] += nnz_out(i);
     }
   }
@@ -1006,7 +1022,7 @@ namespace casadi {
     check_arg(arg, npar);
     for (casadi_int i=0; i<n_in_; ++i) {
       if (arg.at(i).size1()!=size1_in(i)) return false;
-      if (arg.at(i).size2()!=npar*size2_in(i)) return false;
+      if (arg.at(i).size2()!=size2_in(i) && arg.at(i).size2()!=npar*size2_in(i)) return false;
     }
     return true;
   }
@@ -1016,7 +1032,7 @@ namespace casadi {
     check_res(res, npar);
     for (casadi_int i=0; i<n_out_; ++i) {
       if (res.at(i).size1()!=size1_out(i)) return false;
-      if (res.at(i).size2()!=npar*size2_out(i)) return false;
+      if (res.at(i).size2()!=size2_out(i) && res.at(i).size2()!=npar*size2_out(i)) return false;
     }
     return true;
   }
@@ -1025,19 +1041,23 @@ namespace casadi {
   M replace_mat(const M& arg, const Sparsity& inp, casadi_int npar) {
     if (arg.size()==inp.size()) {
       // Matching dimensions already
-      return repmat(arg, 1, npar);
+      return arg;
     } else if (arg.is_empty()) {
       // Empty matrix means set zero
-      return repmat(M(inp.size()), 1, npar);
+      return M(inp.size());
     } else if (arg.is_scalar()) {
       // Scalar assign means set all
-      return repmat(M(inp, arg), 1, npar);
+      return M(inp, arg);
     } else if (arg.is_vector() && inp.size()==std::make_pair(arg.size2(), arg.size1())) {
       // Transpose vector
-      return repmat(arg.T(), 1, npar);
+      return arg.T();
+    } else if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
+               && inp.size2()%arg.size2()==0) {
+      // Horizontal repmat
+      return repmat(arg, 1, inp.size2()/arg.size2());
     } else {
-      // Repmat argument
-      return repmat(arg, 1, (npar*inp.size2())/arg.size2());
+      // Multiple evaluation
+      return arg;
     }
   }
 
