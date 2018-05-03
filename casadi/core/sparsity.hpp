@@ -255,6 +255,9 @@ namespace casadi {
     /// Check if two sparsity patterns are difference
     bool operator!=(const Sparsity& y) const {return !is_equal(y);}
 
+    /// Check if pattern is horizontal repeat of another
+    bool is_stacked(const Sparsity& y, casadi_int n) const;
+
 #ifndef SWIG
     /** \brief Implicit or explicit type conversion to C representation
         In the C runtime, sparsity patterns are represented as a "const casadi_int*".

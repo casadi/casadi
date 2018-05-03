@@ -524,9 +524,11 @@ namespace casadi {
     if (nfwd==0) return;
 
     // Check if seeds need to have dimensions corrected
+    casadi_int npar = 1;
     for (auto&& r : fseed) {
-      if (!matching_arg(r)) {
-        return ad_forward(replace_fseed(fseed), fsens);
+      if (!matching_arg(r, npar)) {
+        casadi_assert_dev(npar==1);
+        return ad_forward(replace_fseed(fseed, npar), fsens);
       }
     }
 
@@ -617,9 +619,11 @@ namespace casadi {
     if (nadj==0) return;
 
     // Check if seeds need to have dimensions corrected
+    casadi_int npar = 1;
     for (auto&& r : aseed) {
-      if (!matching_res(r)) {
-        return ad_reverse(replace_aseed(aseed), asens);
+      if (!matching_res(r, npar)) {
+        casadi_assert_dev(npar==1);
+        return ad_reverse(replace_aseed(aseed, npar), asens);
       }
     }
 

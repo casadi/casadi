@@ -507,6 +507,9 @@ namespace casadi {
     bool is_equal(casadi_int y_nrow, casadi_int y_ncol,
                   const casadi_int* y_colind, const casadi_int* y_row) const;
 
+    /// Check if pattern is repeated
+    bool is_stacked(const Sparsity& y, casadi_int n) const;
+
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
     Sparsity _enlargeRows(casadi_int nrow, const std::vector<casadi_int>& rr, bool ind1) const;
 

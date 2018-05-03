@@ -123,6 +123,9 @@ if (!(x)) casadi_error("Assertion \"" CASADI_STR(x) "\" failed:\n"\
 // This assertion if for internal errors caused by bugs in CasADi
 #define casadi_assert_dev(x) casadi_assert(x, "Notify the CasADi developers.")
 
+// This assertion if for internal errors caused by bugs in CasADi
+#define casadi_report() casadi_error("Notify the CasADi developers.")
+
 // Issue a warning, including location in the source code
 #define casadi_warning(msg) \
   casadi::message_prefix(casadi::uerr()) \
