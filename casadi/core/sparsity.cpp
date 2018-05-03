@@ -411,6 +411,10 @@ namespace casadi {
     return x->_mtimes(y);
   }
 
+  bool Sparsity::is_stacked(const Sparsity& y, casadi_int n) const {
+    return (*this)->is_stacked(y, n);
+  }
+
   bool Sparsity::is_equal(const Sparsity& y) const {
     return (*this)->is_equal(y);
   }

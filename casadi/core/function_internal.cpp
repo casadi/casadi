@@ -2207,9 +2207,10 @@ namespace casadi {
     if (nfwd==0) return;
 
     // Check if seeds need to have dimensions corrected
+    casadi_int npar = 1;
     for (auto&& r : fseed) {
-      if (!matching_arg(r)) {
-        return FunctionInternal::call_forward(arg, res, replace_fseed(fseed),
+      if (!matching_arg(r, npar)) {
+        return FunctionInternal::call_forward(arg, res, replace_fseed(fseed, npar),
                                             fsens, always_inline, never_inline);
       }
     }
@@ -2310,9 +2311,10 @@ namespace casadi {
     if (nadj==0) return;
 
     // Check if seeds need to have dimensions corrected
+    casadi_int npar = 1;
     for (auto&& r : aseed) {
-      if (!matching_res(r)) {
-        return FunctionInternal::call_reverse(arg, res, replace_aseed(aseed),
+      if (!matching_res(r, npar)) {
+        return FunctionInternal::call_reverse(arg, res, replace_aseed(aseed, npar),
                                             asens, always_inline, never_inline);
       }
     }
@@ -2552,14 +2554,11 @@ namespace casadi {
     std::vector<MX> x_mod(x.size());
     for (casadi_int i=0; i<n_in_; ++i) {
       if (check_mat(x[i].sparsity(), sparsity_in_[i], npar)) {
-        // Matching arguments according to normal function call rules
-        x_mod[i] = replace_mat(x[i], sparsity_in_[i]);
-      } else if (x[i].size1()==size1_in(i) && x[i].size2() % size2_in(i)==0) {
-        // Matching horzcat dimensions
-        x_mod[i] = x[i];
+        x_mod[i] = replace_mat(x[i], sparsity_in_[i], npar);
       } else {
         // Mismatching sparsity: The following will throw an error message
-        check_arg(x);
+        npar = 0;
+        check_arg(x, npar);
       }
     }
 
@@ -2593,6 +2592,16 @@ namespace casadi {
     // Horizontal repmat
     if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
         && inp.size2()%arg.size2()==0) return true;
+    // Evaluate with multiple arguments
+    if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
+        && arg.size2()%inp.size2()==0) {
+      if (npar==arg.size2()/inp.size2()) {
+        return true;
+      } else if (npar==1) {
+        npar=arg.size2()/inp.size2();
+        return true;
+      }
+    }
     // No match
     return false;
   }
