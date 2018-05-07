@@ -234,10 +234,8 @@ namespace casadi {
     alloc_w(nx_, true); // gf_
 
     // Bounds of the QP
-    alloc_w(ng_, true); // qp_LBA
-    alloc_w(ng_, true); // qp_UBA
-    alloc_w(nx_, true); // qp_LBX
-    alloc_w(nx_, true); // qp_UBX
+    alloc_w(nx_+ng_, true); // lbdz
+    alloc_w(nx_+ng_, true); // ubdz
 
     // QP solution
     alloc_w(nx_, true); // dx_
@@ -275,10 +273,8 @@ namespace casadi {
     m->gf = w; w += nx_;
 
     // Bounds of the QP
-    m->qp_LBA = w; w += ng_;
-    m->qp_UBA = w; w += ng_;
-    m->qp_LBX = w; w += nx_;
-    m->qp_UBX = w; w += nx_;
+    m->lbdz = w; w += nx_ + ng_;
+    m->ubdz = w; w += nx_ + ng_;
 
     // QP solution
     m->dx = w; w += nx_;
@@ -407,21 +403,21 @@ namespace casadi {
       }
 
       // Formulate the QP
-      casadi_copy(m->lbx, nx_, m->qp_LBX);
-      casadi_axpy(nx_, -1., m->x, m->qp_LBX);
-      casadi_copy(m->ubx, nx_, m->qp_UBX);
-      casadi_axpy(nx_, -1., m->x, m->qp_UBX);
-      casadi_copy(m->lbg, ng_, m->qp_LBA);
-      casadi_axpy(ng_, -1., m->g, m->qp_LBA);
-      casadi_copy(m->ubg, ng_, m->qp_UBA);
-      casadi_axpy(ng_, -1., m->g, m->qp_UBA);
+      casadi_copy(m->lbx, nx_, m->lbdz);
+      casadi_axpy(nx_, -1., m->x, m->lbdz);
+      casadi_copy(m->ubx, nx_, m->ubdz);
+      casadi_axpy(nx_, -1., m->x, m->ubdz);
+      casadi_copy(m->lbg, ng_, m->lbdz + nx_);
+      casadi_axpy(ng_, -1., m->g, m->lbdz + nx_);
+      casadi_copy(m->ubg, ng_, m->ubdz + nx_);
+      casadi_axpy(ng_, -1., m->g, m->ubdz + nx_);
 
       // Increase counter
       m->iter_count++;
 
       // Solve the QP
-      solve_QP(m, m->Bk, m->gf, m->qp_LBX, m->qp_UBX, m->Jk, m->qp_LBA,
-               m->qp_UBA, m->dx, m->qp_DUAL_X, m->qp_DUAL_A);
+      solve_QP(m, m->Bk, m->gf, m->lbdz, m->ubdz, m->Jk,
+               m->dx, m->qp_DUAL_X, m->qp_DUAL_A);
 
       // Detecting indefiniteness
       double gain = casadi_bilin(m->Bk, Hsp_, m->dx, m->dx);
@@ -553,19 +549,19 @@ namespace casadi {
   }
 
   void Qrsqp::solve_QP(QrsqpMemory* m, const double* H, const double* g,
-                           const double* lbx, const double* ubx,
-                           const double* A, const double* lbA, const double* ubA,
+                           const double* lbdz, const double* ubdz,
+                           const double* A,
                            double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const {
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
     m->arg[CONIC_H] = H;
     m->arg[CONIC_G] = g;
     m->arg[CONIC_X0] = x_opt;
-    m->arg[CONIC_LBX] = lbx;
-    m->arg[CONIC_UBX] = ubx;
+    m->arg[CONIC_LBX] = lbdz;
+    m->arg[CONIC_UBX] = ubdz;
     m->arg[CONIC_A] = A;
-    m->arg[CONIC_LBA] = lbA;
-    m->arg[CONIC_UBA] = ubA;
+    m->arg[CONIC_LBA] = lbdz + nx_;
+    m->arg[CONIC_UBA] = ubdz + nx_;
 
     // Outputs
     fill_n(m->res, qpsol_.n_out(), nullptr);

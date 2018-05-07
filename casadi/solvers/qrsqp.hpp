@@ -52,7 +52,7 @@ namespace casadi {
     double *gf;
 
     // Bounds of the QP
-    double *qp_LBA, *qp_UBA, *qp_LBX, *qp_UBX;
+    double *lbdz, *ubdz;
 
     // QP solution
     double *dx, *qp_DUAL_X, *qp_DUAL_A;
@@ -176,7 +176,7 @@ namespace casadi {
     // Solve the QP subproblem
     virtual void solve_QP(QrsqpMemory* m, const double* H, const double* g,
                           const double* lbx, const double* ubx,
-                          const double* A, const double* lbA, const double* ubA,
+                          const double* A,
                           double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const;
 
     /// A documentation string
