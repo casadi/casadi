@@ -239,8 +239,7 @@ namespace casadi {
 
     // QP solution
     alloc_w(nx_, true); // dx_
-    alloc_w(nx_, true); // qp_DUAL_X_
-    alloc_w(ng_, true); // qp_DUAL_A_
+    alloc_w(nx_+ng_, true); // dlam
 
     // Hessian approximation
     alloc_w(Hsp_.nnz(), true); // Bk_
@@ -278,8 +277,7 @@ namespace casadi {
 
     // QP solution
     m->dx = w; w += nx_;
-    m->qp_DUAL_X = w; w += nx_;
-    m->qp_DUAL_A = w; w += ng_;
+    m->dlam = w; w += nx_ + ng_;
 
     // Hessian approximation
     m->Bk = w; w += Hsp_.nnz();
@@ -416,8 +414,7 @@ namespace casadi {
       m->iter_count++;
 
       // Solve the QP
-      solve_QP(m, m->Bk, m->gf, m->lbdz, m->ubdz, m->Jk,
-               m->dx, m->qp_DUAL_X, m->qp_DUAL_A);
+      solve_QP(m, m->Bk, m->gf, m->lbdz, m->ubdz, m->Jk, m->dx, m->dlam);
 
       // Detecting indefiniteness
       double gain = casadi_bilin(m->Bk, Hsp_, m->dx, m->dx);
@@ -426,8 +423,7 @@ namespace casadi {
       }
 
       // Calculate penalty parameter of merit function
-      m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_, m->qp_DUAL_X));
-      m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(ng_, m->qp_DUAL_A));
+      m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_ + ng_, m->dlam));
 
       // Calculate L1-merit function in the actual iterate
       double l1_infeas = std::fmax(casadi_max_viol(nx_, m->x, m->lbx, m->ubx),
@@ -502,16 +498,15 @@ namespace casadi {
 
         // Candidate accepted, update dual variables
         casadi_scal(ng_, 1-t, m->lam_g);
-        casadi_axpy(ng_, t, m->qp_DUAL_A, m->lam_g);
+        casadi_axpy(ng_, t, m->dlam + nx_, m->lam_g);
         casadi_scal(nx_, 1-t, m->lam_x);
-        casadi_axpy(nx_, t, m->qp_DUAL_X, m->lam_x);
-
+        casadi_axpy(nx_, t, m->dlam, m->lam_x);
         casadi_scal(nx_, t, m->dx);
 
       } else {
         // Full step
-        casadi_copy(m->qp_DUAL_A, ng_, m->lam_g);
-        casadi_copy(m->qp_DUAL_X, nx_, m->lam_x);
+        casadi_copy(m->dlam, nx_, m->lam_x);
+        casadi_copy(m->dlam + nx_, ng_, m->lam_g);
       }
 
       // Take step
@@ -550,8 +545,7 @@ namespace casadi {
 
   void Qrsqp::solve_QP(QrsqpMemory* m, const double* H, const double* g,
                            const double* lbdz, const double* ubdz,
-                           const double* A,
-                           double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const {
+                           const double* A, double* x_opt, double* dlam) const {
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
     m->arg[CONIC_H] = H;
@@ -566,8 +560,8 @@ namespace casadi {
     // Outputs
     fill_n(m->res, qpsol_.n_out(), nullptr);
     m->res[CONIC_X] = x_opt;
-    m->res[CONIC_LAM_X] = lambda_x_opt;
-    m->res[CONIC_LAM_A] = lambda_A_opt;
+    m->res[CONIC_LAM_X] = dlam;
+    m->res[CONIC_LAM_A] = dlam + nx_;
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);
