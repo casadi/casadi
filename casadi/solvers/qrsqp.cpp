@@ -238,7 +238,7 @@ namespace casadi {
     alloc_w(nx_+ng_, true); // ubdz
 
     // QP solution
-    alloc_w(nx_, true); // dx_
+    alloc_w(nx_+ng_, true); // dz
     alloc_w(nx_+ng_, true); // dlam
 
     // Hessian approximation
@@ -276,7 +276,7 @@ namespace casadi {
     m->ubdz = w; w += nx_ + ng_;
 
     // QP solution
-    m->dx = w; w += nx_;
+    m->dz = w; w += nx_ + ng_;
     m->dlam = w; w += nx_ + ng_;
 
     // Hessian approximation
@@ -338,7 +338,7 @@ namespace casadi {
       double gLag_norminf = casadi_norm_inf(nx_, m->gLag);
 
       // inf-norm of step
-      double dx_norminf = casadi_norm_inf(nx_, m->dx);
+      double dx_norminf = casadi_norm_inf(nx_, m->dz);
 
       // Printing information about the actual iterate
       if (print_iteration_) {
@@ -397,7 +397,7 @@ namespace casadi {
         // Update BFGS
         if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, m->Bk);
         // Update the Hessian approximation
-        casadi_bfgs(Hsp_, m->Bk, m->dx, m->gLag, m->gLag_old, m->w);
+        casadi_bfgs(Hsp_, m->Bk, m->dz, m->gLag, m->gLag_old, m->w);
       }
 
       // Formulate the QP
@@ -414,10 +414,12 @@ namespace casadi {
       m->iter_count++;
 
       // Solve the QP
-      solve_QP(m, m->Bk, m->gf, m->lbdz, m->ubdz, m->Jk, m->dx, m->dlam);
+      solve_QP(m, m->Bk, m->gf, m->lbdz, m->ubdz, m->Jk, m->dz, m->dlam);
+      casadi_fill(m->dz+nx_, ng_, 1.);
+      casadi_mv(m->Jk, Asp_, m->dz, m->dz+nx_, 0);
 
       // Detecting indefiniteness
-      double gain = casadi_bilin(m->Bk, Hsp_, m->dx, m->dx);
+      double gain = casadi_bilin(m->Bk, Hsp_, m->dz, m->dz);
       if (gain < 0) {
         print("WARNING(qrsqp): Indefinite Hessian detected\n");
       }
@@ -430,7 +432,7 @@ namespace casadi {
                                    casadi_max_viol(ng_, m->g, m->lbg, m->ubg));
 
       // Right-hand side of Armijo condition
-      double F_sens = casadi_dot(nx_, m->dx, m->gf);
+      double F_sens = casadi_dot(nx_, m->dz, m->gf);
       double L1dir = F_sens - m->sigma * l1_infeas;
       double L1merit = m->f + m->sigma * l1_infeas;
 
@@ -465,7 +467,7 @@ namespace casadi {
 
           // Candidate step
           casadi_copy(m->x, nx_, m->x_cand);
-          casadi_axpy(nx_, t, m->dx, m->x_cand);
+          casadi_axpy(nx_, t, m->dz, m->x_cand);
 
           // Evaluating objective and constraints
           m->arg[0] = m->x_cand;
@@ -501,7 +503,7 @@ namespace casadi {
         casadi_axpy(ng_, t, m->dlam + nx_, m->lam_g);
         casadi_scal(nx_, 1-t, m->lam_x);
         casadi_axpy(nx_, t, m->dlam, m->lam_x);
-        casadi_scal(nx_, t, m->dx);
+        casadi_scal(nx_, t, m->dz);
 
       } else {
         // Full step
@@ -510,7 +512,7 @@ namespace casadi {
       }
 
       // Take step
-      casadi_axpy(nx_, 1., m->dx, m->x);
+      casadi_axpy(nx_, 1., m->dz, m->x);
 
       if (!exact_hessian_) {
         // Evaluate the gradient of the Lagrangian with the old x but new lam_g (for BFGS)

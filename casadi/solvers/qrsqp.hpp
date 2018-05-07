@@ -55,7 +55,7 @@ namespace casadi {
     double *lbdz, *ubdz;
 
     // QP solution
-    double *dx, *dlam;
+    double *dz, *dlam;
 
     // Current Jacobian
     double *Jk;
