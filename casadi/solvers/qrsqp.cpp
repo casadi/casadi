@@ -404,6 +404,11 @@ namespace casadi {
       casadi_copy(m->ubg, ng_, m->ubdz + nx_);
       casadi_axpy(ng_, -1., m->g, m->ubdz + nx_);
 
+      // Intitial guess
+      casadi_copy(m->lam_x, nx_, m->dlam);
+      casadi_copy(m->lam_g, ng_, m->dlam + nx_);
+      casadi_fill(m->dz, nx_, 0.);
+
       // Increase counter
       m->iter_count++;
 
@@ -547,6 +552,8 @@ namespace casadi {
     m->arg[CONIC_H] = H;
     m->arg[CONIC_G] = g;
     m->arg[CONIC_X0] = x_opt;
+    m->arg[CONIC_LAM_X0] = dlam;
+    m->arg[CONIC_LAM_A0] = dlam + nx_;
     m->arg[CONIC_LBX] = lbdz;
     m->arg[CONIC_UBX] = ubdz;
     m->arg[CONIC_A] = A;
