@@ -368,7 +368,8 @@ namespace casadi {
 
       // Checking convergence criteria
       if (m->iter_count >= min_iter_ && pr_inf < tol_pr_ && gLag_norminf < tol_du_) {
-        if (print_status_) print("MESSAGE(sqpmethod): Convergence achieved after %d iterations\n", m->iter_count);
+        if (print_status_)
+          print("MESSAGE(sqpmethod): Convergence achieved after %d iterations\n", m->iter_count);
         m->return_status = "Solve_Succeeded";
         m->success = true;
         break;
