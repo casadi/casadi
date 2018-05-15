@@ -109,6 +109,9 @@ namespace casadi {
       {"print_iteration",
        {OT_BOOL,
         "Print the iterations"}},
+      {"print_status",
+       {OT_BOOL,
+        "Print a status message after solving"}},
       {"min_step_size",
        {OT_DOUBLE,
         "The size (inf-norm) of the step size should not become smaller than this."}},
@@ -136,6 +139,7 @@ namespace casadi {
     Dict qpsol_options;
     print_header_ = true;
     print_iteration_ = true;
+    print_status_ = true;
 
     // Read user options
     for (auto&& op : opts) {
@@ -171,6 +175,8 @@ namespace casadi {
         print_header_ = op.second;
       } else if (op.first=="print_iteration") {
         print_iteration_ = op.second;
+      } else if (op.first=="print_status") {
+        print_status_ = op.second;
       }
     }
 
@@ -355,27 +361,27 @@ namespace casadi {
 
       // Callback function
       if (callback(m, m->x, &m->f, m->g, m->lam_x, m->lam_g, nullptr)) {
-        print("WARNING(sqpmethod): Aborted by callback...\n");
+        if (print_status_) print("WARNING(sqpmethod): Aborted by callback...\n");
         m->return_status = "User_Requested_Stop";
         break;
       }
 
       // Checking convergence criteria
       if (m->iter_count >= min_iter_ && pr_inf < tol_pr_ && gLag_norminf < tol_du_) {
-        print("MESSAGE(sqpmethod): Convergence achieved after %d iterations\n", m->iter_count);
+        if (print_status_) print("MESSAGE(sqpmethod): Convergence achieved after %d iterations\n", m->iter_count);
         m->return_status = "Solve_Succeeded";
         m->success = true;
         break;
       }
 
       if (m->iter_count >= max_iter_) {
-        print("MESSAGE(sqpmethod): Maximum number of iterations reached.\n");
+        if (print_status_) print("MESSAGE(sqpmethod): Maximum number of iterations reached.\n");
         m->return_status = "Maximum_Iterations_Exceeded";
         break;
       }
 
       if (m->iter_count >= 1 && m->iter_count >= min_iter_ && dx_norminf <= min_step_size_) {
-        print("MESSAGE(sqpmethod): Search direction becomes too small without "
+        if (print_status_) print("MESSAGE(sqpmethod): Search direction becomes too small without "
               "convergence criteria being met.\n");
         m->return_status = "Search_Direction_Becomes_Too_Small";
         break;
@@ -431,7 +437,7 @@ namespace casadi {
       // Detecting indefiniteness
       double gain = casadi_bilin(m->Bk, Hsp_, m->dx, m->dx);
       if (gain < 0) {
-        print("WARNING(sqpmethod): Indefinite Hessian detected\n");
+        if (print_status_) print("WARNING(sqpmethod): Indefinite Hessian detected\n");
       }
 
       // Calculate penalty parameter of merit function
