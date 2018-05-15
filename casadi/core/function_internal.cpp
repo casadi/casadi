@@ -2840,7 +2840,7 @@ namespace casadi {
     }
   }
 
-  void FunctionInternal::sprint(char* buf, size_t buf_sz, const char* fmt, ...) const {
+  void ProtoFunction::sprint(char* buf, size_t buf_sz, const char* fmt, ...) const {
     // Variable number of arguments
     va_list args;
     va_start(args, fmt);
@@ -2852,7 +2852,7 @@ namespace casadi {
     casadi_assert(n>=0 && n<buf_sz, "Print failure while processing '" + string(fmt) + "'");
   }
 
-  void FunctionInternal::print(const char* fmt, ...) const {
+  void ProtoFunction::print(const char* fmt, ...) const {
     // Variable number of arguments
     va_list args;
     va_start(args, fmt);

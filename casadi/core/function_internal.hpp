@@ -120,6 +120,12 @@ namespace casadi {
     /** \brief Clear all memory (called from destructor) */
     void clear_mem();
 
+    /** \brief C-style formatted printing during evaluation */
+    void print(const char* fmt, ...) const;
+
+    /** \brief C-style formatted printing to string */
+    void sprint(char* buf, size_t buf_sz, const char* fmt, ...) const;
+
   protected:
     /// Name
     std::string name_;
@@ -492,12 +498,6 @@ namespace casadi {
 
     /** \brief  Print more */
     virtual void disp_more(std::ostream& stream) const {}
-
-    /** \brief C-style formatted printing during evaluation */
-    void print(const char* fmt, ...) const;
-
-    /** \brief C-style formatted printing to string */
-    void sprint(char* buf, size_t buf_sz, const char* fmt, ...) const;
 
     /** \brief Get function signature: name:(inputs)->(outputs) */
     std::string definition() const;

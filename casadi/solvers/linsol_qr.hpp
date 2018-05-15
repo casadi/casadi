@@ -62,6 +62,12 @@ namespace casadi {
     // Initialize the solver
     void init(const Dict& opts) override;
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
+
     /** \brief Create memory block */
     void* alloc_mem() const override { return new LinsolQrMemory();}
 
@@ -96,6 +102,7 @@ namespace casadi {
     /// Symbolic factorization
     std::vector<casadi_int> prinv_, pc_;
     Sparsity sp_v_, sp_r_;
+    double eps_;
   };
 
 } // namespace casadi
