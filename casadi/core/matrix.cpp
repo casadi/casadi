@@ -808,6 +808,27 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  void Matrix<Scalar>::print_scalar(std::ostream &stream, const Scalar& e) {
+    std::streamsize precision = stream.precision();
+    std::streamsize width = stream.width();
+    std::ios_base::fmtflags flags = stream.flags();
+
+    stream.precision(stream_precision_);
+    stream.width(stream_width_);
+    if (stream_scientific_) {
+      stream.setf(std::ios::scientific);
+    } else {
+      stream.unsetf(std::ios::scientific);
+    }
+    stream << e;
+    stream << std::flush;
+
+    stream.precision(precision);
+    stream.width(width);
+    stream.flags(flags);
+  }
+
+  template<typename Scalar>
   void Matrix<Scalar>::disp(std::ostream& stream, bool more) const {
     if (is_empty()) {
       stream << "[]";
