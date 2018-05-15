@@ -68755,6 +68755,8 @@ A textbook SQPMethod
 +-----------------------+-----------+--------------------------------------+
 | print_iteration       | OT_BOOL   | Print the iterations                 |
 +-----------------------+-----------+--------------------------------------+
+| print_status          | OT_BOOL   | Print a status message after solving |
++-----------------------+-----------+--------------------------------------+
 | qpsol                 | OT_STRING | The QP solver to be used by the SQP  |
 |                       |           | method [qpoases]                     |
 +-----------------------+-----------+--------------------------------------+
@@ -68904,6 +68906,10 @@ A textbook SQPMethod
 +-------------------+---------------+-------------------+------------------+
 | print_iteration   | OT_BOOL       | Print the         | casadi::Sqpmetho |
 |                   |               | iterations        | d                |
++-------------------+---------------+-------------------+------------------+
+| print_status      | OT_BOOL       | Print a status    | casadi::Sqpmetho |
+|                   |               | message after     | d                |
+|                   |               | solving           |                  |
 +-------------------+---------------+-------------------+------------------+
 | qpsol             | OT_STRING     | The QP solver to  | casadi::Sqpmetho |
 |                   |               | be used by the    | d                |
@@ -77532,6 +77538,8 @@ A textbook SQPMethod
 |                       |           | statistics                           |
 +-----------------------+-----------+--------------------------------------+
 | print_iteration       | OT_BOOL   | Print the iterations                 |
++-----------------------+-----------+--------------------------------------+
+| print_status          | OT_BOOL   | Print a status message after solving |
 +-----------------------+-----------+--------------------------------------+
 | qpsol                 | OT_STRING | The QP solver to be used by the SQP  |
 |                       |           | method [qpoases]                     |
