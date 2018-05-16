@@ -99,8 +99,7 @@ for k in range(N):
 
 # Create an NLP solver
 prob = {'f': J, 'x': vertcat(*w), 'g': vertcat(*g)}
-opts = dict(qpsol='qrqp', max_iter=2, max_iter_ls=10)
-solver = nlpsol('solver', 'sqpmethod', prob, opts);
+solver = nlpsol('solver', 'ipopt', prob)
 
 # Solve the NLP
 sol = solver(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
