@@ -67,7 +67,7 @@ namespace casadi {
                           std::vector<std::vector<MX> >& fsens) const {
     casadi_int nfwd = fsens.size();
     for (casadi_int d=0; d<nfwd; ++d) {
-      fsens[d][0] = project(fseed[d][0], sparsity(), true);
+      fsens[d][0] = project(fseed[d][0], sparsity() * dep().sparsity(), true);
     }
   }
 
