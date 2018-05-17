@@ -188,13 +188,13 @@ namespace casadi {
     return Function("F", {x0, p, h}, {xf}, {"x0", "p", "h"}, {"xf"});
   }
 
-  void collocation_interpolators(const std::vector<double> & tau_root,
+  void collocation_interpolators(const std::vector<double> & tau,
                                 std::vector< std::vector<double> > &C, std::vector< double > &D) {
     // Find the degree of the interpolation
-    casadi_int deg = tau_root.size();
+    casadi_int deg = tau.size();
 
     // Include zero
-    std::vector<double> etau_root = tau_root;
+    std::vector<double> etau_root = tau;
     etau_root.insert(etau_root.begin(), 0);
 
     // Allocate storage space for resulting coefficients
