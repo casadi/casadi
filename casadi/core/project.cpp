@@ -75,7 +75,7 @@ namespace casadi {
                           std::vector<std::vector<MX> >& asens) const {
     casadi_int nadj = aseed.size();
     for (casadi_int d=0; d<nadj; ++d) {
-      asens[d][0] += project(aseed[d][0], dep().sparsity(), true);
+      asens[d][0] += project(aseed[d][0], sparsity() * dep().sparsity(), true);
     }
   }
 
