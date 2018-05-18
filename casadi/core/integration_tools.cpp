@@ -205,7 +205,7 @@ namespace casadi {
     D.resize(deg+1);
 
     // Collocation point
-    SX tau = SX::sym("tau");
+    SX tau_sym = SX::sym("tau");
 
     // For all collocation points
     for (casadi_int j=0; j<deg+1; ++j) {
@@ -213,11 +213,11 @@ namespace casadi {
       SX L = 1;
       for (casadi_int j2=0; j2<deg+1; ++j2) {
         if (j2 != j) {
-          L *= (tau-etau_root[j2])/(etau_root[j]-etau_root[j2]);
+          L *= (tau_sym-etau_root[j2])/(etau_root[j]-etau_root[j2]);
         }
       }
 
-      Function lfcn("lfcn", {tau}, {L});
+      Function lfcn("lfcn", {tau_sym}, {L});
 
       // Evaluate the polynomial at the final time to get the
       // coefficients of the continuity equation
@@ -225,7 +225,7 @@ namespace casadi {
 
       // Evaluate the time derivative of the polynomial at all collocation points to
       // get the coefficients of the continuity equation
-      Function tfcn("tfcn", {tau}, {tangent(L, tau)});
+      Function tfcn("tfcn", {tau_sym}, {tangent(L, tau_sym)});
       for (casadi_int j2=0; j2<deg+1; ++j2) {
         C[j2][j] =  tfcn(vector<DM>{etau_root[j2]}).at(0)->front();
       }
