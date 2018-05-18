@@ -111,7 +111,7 @@ namespace casadi {
     void set_function(const Function& fcn) { set_function(fcn, fcn.name()); }
 
     // Calculate an oracle function
-    casadi_int calc_function(OracleMemory* m, const std::string& fcn,
+    int calc_function(OracleMemory* m, const std::string& fcn,
                       const double* const* arg=nullptr) const;
 
     // Get list of dependency functions

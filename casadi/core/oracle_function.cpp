@@ -148,7 +148,7 @@ namespace casadi {
     alloc(fcn);
   }
 
-  casadi_int OracleFunction::
+  int OracleFunction::
   calc_function(OracleMemory* m, const std::string& fcn,
                 const double* const* arg) const {
     // Is the function monitored?
