@@ -67,8 +67,11 @@ namespace casadi {
     /** \brief Finalize the object creation */
     void finalize(const Dict& opts) override;
 
-    /** \brief Evaluate with DM matrices */
+    ///@{
+    /** \brief Evaluate with DM matrices (NOTE: eval not defined) */
     std::vector<DM> eval_dm(const std::vector<DM>& arg) const override;
+    bool has_eval_dm() const override { return true;}
+    ///@}
 
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const override;

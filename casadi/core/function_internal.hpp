@@ -222,8 +222,11 @@ namespace casadi {
     virtual void eval_mx(const MXVector& arg, MXVector& res,
                          bool always_inline, bool never_inline) const;
 
+    ///@{
     /** \brief Evaluate with DM matrices */
     virtual std::vector<DM> eval_dm(const std::vector<DM>& arg) const;
+    virtual bool has_eval_dm() const { return false;}
+    ///@}
 
     ///@{
     /** \brief Evaluate a function, overloaded */
@@ -806,9 +809,6 @@ namespace casadi {
 
     /** \brief Temporary memory inside a function */
     size_t sz_arg_tmp_, sz_res_tmp_, sz_iw_tmp_, sz_w_tmp_;
-
-    /** \brief Fall back to eval_DM */
-    int eval_fallback(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
   };
 
   // Template implementations

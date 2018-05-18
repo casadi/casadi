@@ -1415,7 +1415,7 @@ namespace casadi {
   }
 
   std::vector<DM> FunctionInternal::eval_dm(const std::vector<DM>& arg) const {
-    casadi_error("'eval', 'eval_dm' not defined for " + class_name());
+    casadi_error("'eval_dm' not defined for " + class_name());
   }
 
   int FunctionInternal::
@@ -2779,64 +2779,45 @@ namespace casadi {
   }
 
   int FunctionInternal::
-  eval_fallback(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    // As a fallback, redirect to (the less efficient) eval_dm
-
-    // Allocate input matrices
-    std::vector<DM> argv(n_in_);
-    for (casadi_int i=0; i<n_in_; ++i) {
-      argv[i] = DM(sparsity_in_[i]);
-      casadi_copy(arg[i], argv[i].nnz(), argv[i].ptr());
-    }
-
-    // Try to evaluate using eval_dm
-    try {
-      std::vector<DM> resv = eval_dm(argv);
-
-      // Check number of outputs
-      casadi_assert(resv.size()==n_out_,
-        "Expected " + str(n_out_) + " outputs, got " + str(resv.size()) + ".");
-
-      // Get outputs
-      for (casadi_int i=0; i<n_out_; ++i) {
-        if (resv[i].sparsity()!=sparsity_out_[i]) {
-          if (resv[i].size()==size_out(i)) {
-            resv[i] = project(resv[i], sparsity_out_[i]);
-          } else {
-            casadi_error("Shape mismatch for output " + str(i) + ": got " + resv[i].dim() + ", "
-                         "expected " + sparsity_out_[i].dim() + ".");
-          }
-        }
-        if (res[i]) casadi_copy(resv[i].ptr(), resv[i].nnz(), res[i]);
-      }
-    } catch (KeyboardInterruptException&) {
-      throw;
-    } catch (exception& e) {
-      casadi_error("Failed to evaluate 'eval_dm' for " + name_ + ":\n" + e.what());
-      return 1;
-    }
-
-    // Successful return
-    return 0;
-  }
-
-  int FunctionInternal::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-#ifdef WITH_EXTRA_CHECKS
-    casadi_int call_depth = Function::call_depth_;
-    Function::call_depth_ = 0;
-#endif // WITH_EXTRA_CHECKS
-    try {
-      int ret = eval_fallback(arg, res, iw, w, mem);
-#ifdef WITH_EXTRA_CHECKS
-      Function::call_depth_ = call_depth;
-#endif // WITH_EXTRA_CHECKS
-      return ret;
-    } catch (exception&) {
-#ifdef WITH_EXTRA_CHECKS
-      Function::call_depth_ = call_depth;
-#endif
-      throw;
+    if (has_eval_dm()) {
+      // Evaluate via eval_dm (less efficient)
+      try {
+        // Allocate input matrices
+        std::vector<DM> argv(n_in_);
+        for (casadi_int i=0; i<n_in_; ++i) {
+          argv[i] = DM(sparsity_in_[i]);
+          casadi_copy(arg[i], argv[i].nnz(), argv[i].ptr());
+        }
+
+        // Try to evaluate using eval_dm
+        std::vector<DM> resv = eval_dm(argv);
+
+        // Check number of outputs
+        casadi_assert(resv.size()==n_out_,
+          "Expected " + str(n_out_) + " outputs, got " + str(resv.size()) + ".");
+
+        // Get outputs
+        for (casadi_int i=0; i<n_out_; ++i) {
+          if (resv[i].sparsity()!=sparsity_out_[i]) {
+            if (resv[i].size()==size_out(i)) {
+              resv[i] = project(resv[i], sparsity_out_[i]);
+            } else {
+              casadi_error("Shape mismatch for output " + str(i) + ": got " + resv[i].dim() + ", "
+                           "expected " + sparsity_out_[i].dim() + ".");
+            }
+          }
+          if (res[i]) casadi_copy(resv[i].ptr(), resv[i].nnz(), res[i]);
+        }
+      } catch (KeyboardInterruptException&) {
+        throw;
+      } catch (exception& e) {
+        casadi_error("Failed to evaluate 'eval_dm' for " + name_ + ":\n" + e.what());
+      }
+      // Successful return
+      return 0;
+    } else {
+      casadi_error("'eval' not defined for " + class_name());
     }
   }
 

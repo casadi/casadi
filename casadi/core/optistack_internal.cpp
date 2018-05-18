@@ -63,6 +63,9 @@ class InternalOptiCallback : public FunctionInternal {
 
   void reset() { i=0; }
 
+  // eval_dm has been defined instead of eval
+  bool has_eval_dm() const override { return true;}
+
   /// Evaluate the function numerically
   std::vector<DM> eval_dm(const std::vector<DM>& arg) const override {
     DMDict r;
