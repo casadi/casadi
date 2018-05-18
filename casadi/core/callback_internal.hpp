@@ -67,13 +67,6 @@ namespace casadi {
     /** \brief Finalize the object creation */
     void finalize(const Dict& opts) override;
 
-    /** \brief  Evaluate numerically, work vectors given */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
-
-    /** \brief  Evaluate symbolically, work vectors given */
-    int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw,
-                SXElem* w, void* mem) const override;
-
     /** \brief Evaluate with DM matrices */
     std::vector<DM> eval_dm(const std::vector<DM>& arg) const override;
 

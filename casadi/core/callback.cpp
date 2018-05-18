@@ -52,15 +52,6 @@ namespace casadi {
     return (*this)->FunctionInternal::eval_dm(arg);
   }
 
-  int Callback::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    return (*this)->FunctionInternal::eval(arg, res, iw, w, mem);
-  }
-
-  int Callback::eval_sx(const SXElem** arg, SXElem** res,
-      casadi_int* iw, SXElem* w, void* mem) const {
-    return (*this)->FunctionInternal::eval_sx(arg, res, iw, w, mem);
-  }
-
   casadi_int Callback::get_n_in() {
     return (*this)->FunctionInternal::get_n_in();
   }
@@ -123,22 +114,6 @@ namespace casadi {
 
   bool Callback::has_reverse(casadi_int nadj) const {
     return (*this)->FunctionInternal::has_reverse(nadj);
-  }
-
-  void Callback::alloc_w(size_t sz_w, bool persist) {
-    return (*this)->alloc_w(sz_w, persist);
-  }
-
-  void Callback::alloc_iw(size_t sz_iw, bool persist) {
-    return (*this)->alloc_iw(sz_iw, persist);
-  }
-
-  void Callback::alloc_arg(size_t sz_arg, bool persist) {
-    return (*this)->alloc_arg(sz_arg, persist);
-  }
-
-  void Callback::alloc_res(size_t sz_res, bool persist) {
-    return (*this)->alloc_res(sz_res, persist);
   }
 
 } // namespace casadi

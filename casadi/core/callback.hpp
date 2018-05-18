@@ -85,13 +85,6 @@ namespace casadi {
     /** \brief Evaluate numerically, temporary matrices and work vectors */
     virtual std::vector<DM> eval(const std::vector<DM>& arg) const;
 
-#ifndef SWIG
-    /** \brief Evaluate numerically, work vectors given */
-    virtual int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
-    virtual int eval_sx(const SXElem** arg, SXElem** res,
-                        casadi_int* iw, SXElem* w, void* mem) const;
-#endif // SWIG
-
    /** \brief Get the number of inputs
      * This function is called during construction.
      */
@@ -158,14 +151,6 @@ namespace casadi {
                                  const std::vector<std::string>& inames,
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;
-    ///@}
-
-    ///@{
-    /** \brief Allocate work vectors */
-    void alloc_w(size_t sz_w, bool persist=false);
-    void alloc_iw(size_t sz_iw, bool persist=false);
-    void alloc_arg(size_t sz_arg, bool persist=false);
-    void alloc_res(size_t sz_res, bool persist=false);
     ///@}
   };
 
