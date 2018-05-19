@@ -60032,27 +60032,43 @@ Get all options for a plugin.
 
 Obtain collocation interpolating matrices.
 
+A collocation method poses a polynomial Pi that interpolates exactly through
+an initial state (0,X_0) and helper states at collocation points
+(tau_j,X(j)).
+
+This function computes the linear mapping between dPi/dt and coefficients
+Z=[X_0 X].
+
 Parameters:
 -----------
 
-tau_root:  location of collocation points, as obtained from
-collocation_points
+tau:  location of collocation points, as obtained from collocation_points
 
-output_C:  interpolating coefficients to obtain derivatives Length: order+1,
-order + 1
+output_C:  interpolating coefficients to obtain derivatives. Length:
+order+1, order+1
 
 
 
 ::
 
-dX/dt @collPoint(j) ~ Sum_i C[j][i]*X@collPoint(i)
+dPi/dt @Z_j = (1/h) Sum_i C[j][i]*Z_i,
 
 
+
+with h the length of the integration interval.
 
 Parameters:
 -----------
 
-output_D:  interpolating coefficients to obtain end state Length: order+1
+output_D:  interpolating coefficients to obtain end state. Length: order+1
+
+
+
+::
+
+Pi @X_f = Sum_i D[i]*Z_i
+
+
 
 ";
 
