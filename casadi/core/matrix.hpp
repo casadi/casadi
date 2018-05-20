@@ -821,6 +821,11 @@ namespace casadi {
     /// Print sparse matrix style
     void print_sparse(std::ostream &stream, bool truncate=true) const;
 
+#ifndef SWIG
+    /// Print scalar
+    static void print_scalar(std::ostream &stream, const Scalar& e);
+#endif
+
     void clear();
     void resize(casadi_int nrow, casadi_int ncol);
     void reserve(casadi_int nnz);

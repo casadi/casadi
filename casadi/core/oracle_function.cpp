@@ -189,7 +189,7 @@ namespace casadi {
           s << "[";
           for (casadi_int k=0; k<f.nnz_in(i); ++k) {
             if (k!=0) s << ", ";
-            s << m->arg[i][k];
+            DM::print_scalar(s, m->arg[i][k]);
           }
           s << "]\n";
         } else {
@@ -220,7 +220,7 @@ namespace casadi {
           s << "[";
           for (casadi_int k=0; k<f.nnz_out(i); ++k) {
             if (k!=0) s << ", ";
-            s << m->res[i][k];
+            DM::print_scalar(s, m->res[i][k]);
           }
           s << "]\n";
         } else {

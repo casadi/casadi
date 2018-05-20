@@ -152,7 +152,7 @@ namespace casadi {
     ///@}
 
     // Print options
-    bool print_header_, print_iteration_;
+    bool print_header_, print_iteration_, print_status_;
 
     // Hessian sparsity
     Sparsity Hsp_;

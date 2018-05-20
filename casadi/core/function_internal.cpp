@@ -2850,7 +2850,7 @@ namespace casadi {
       n = vsnprintf(buf_dyn, buf_sz, fmt, args);
     }
     // Print buffer content
-    if (n>=0) uout() << (buf_dyn ? buf_dyn : buf);
+    if (n>=0) uout() << (buf_dyn ? buf_dyn : buf) << std::flush;
     // Cleanup
     if (buf_dyn) delete[] buf_dyn;
     va_end(args);
