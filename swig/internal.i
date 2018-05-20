@@ -631,6 +631,9 @@
 %exception  casadi::FunctionInternal::has_derivative() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::has_eval_dm() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::has_forward(casadi_int nfwd) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

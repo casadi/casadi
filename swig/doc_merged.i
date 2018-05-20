@@ -1278,6 +1278,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::BackwardDiff::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::BackwardDiff::get_min_in "
 
 [INTERNAL]  Get smallest input value.
@@ -2376,6 +2382,12 @@ iterate.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::Blocksqp::eval "
 
 [INTERNAL]  Evaluate numerically.
@@ -2773,11 +2785,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::eval_dm "
+%feature("docstring") casadi::Blocksqp::calc_function "
 
-[INTERNAL]  Evaluate with DM matrices.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::Blocksqp::definition "
 
@@ -3014,9 +3024,11 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Blocksqp::calc_function "
+%feature("docstring") casadi::Blocksqp::eval_dm "
 
-[INTERNAL] ";
+[INTERNAL]  Evaluate with DM matrices.
+
+";
 
 %feature("docstring") casadi::Blocksqp::monitored "
 
@@ -4564,6 +4576,12 @@ Destructor.
 
 ";
 
+%feature("docstring") casadi::BSpline::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::BSpline::sparsity_in "
 
 [INTERNAL]  Input/output sparsity.
@@ -5204,6 +5222,12 @@ Number of function inputs and outputs.
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::BSplineCommon::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -6047,12 +6071,6 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::BSplineDual::eval_dm "
-
-[INTERNAL]  Evaluate with DM matrices.
-
-";
-
 %feature("docstring") casadi::BSplineDual::call_forward "
 
 [INTERNAL]  Forward mode AD, virtual functions overloaded in derived
@@ -6254,6 +6272,12 @@ elements.
 %feature("docstring") casadi::BSplineDual::codegen_incref "
 
 [INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::BSplineDual::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -6922,9 +6946,9 @@ Readable name of the internal class.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::size2_out "
+%feature("docstring") casadi::BSplineDual::eval_dm "
 
-[INTERNAL]  Input/output dimensions.
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -7065,6 +7089,12 @@ Propagate sparsity forward.
 
 ";
 
+%feature("docstring") casadi::BSplineDual::size2_out "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
 %feature("docstring") casadi::BSplineDual::get_n_out "
 
 Number of function inputs and outputs.
@@ -7181,9 +7211,9 @@ Generate a function that calculates nfwd forward derivatives.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::get_sparsity_in "
+%feature("docstring") casadi::BSplineInterpolant::eval_dm "
 
-[INTERNAL]  Sparsities of function inputs and outputs.
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -7400,6 +7430,12 @@ structure recognition.
 %feature("docstring") casadi::BSplineInterpolant::get_options "
 
 [INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::BSplineInterpolant::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -7625,9 +7661,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::BSplineInterpolant::eval_dm "
+%feature("docstring") casadi::BSplineInterpolant::get_sparsity_in "
 
-[INTERNAL]  Evaluate with DM matrices.
+[INTERNAL]  Sparsities of function inputs and outputs.
 
 ";
 
@@ -8311,22 +8347,16 @@ Get input dimension.
 
 ";
 
-%feature("docstring") casadi::Callback::reverse "
+%feature("docstring") casadi::Callback::Callback "
 
-Get a function that calculates nadj adjoint derivatives.
+Copy constructor (throws an error)
 
-Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
-first n_in inputs correspond to nondifferentiated inputs. The next n_out
-inputs correspond to nondifferentiated outputs. and the last n_out inputs
-correspond to adjoint seeds, stacked horizontally The n_in outputs
-correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
-n_out = n_out())
+>  casadi::Callback::Callback(const Callback &obj)
+------------------------------------------------------------------------
 
-(n_in = n_in(), n_out = n_out())
+Copy constructor (throws an error)
 
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned.
+";
 
 ";
 
@@ -8534,16 +8564,22 @@ Checkout a memory object.
 
 ";
 
-%feature("docstring") casadi::Callback::Callback "
+%feature("docstring") casadi::Callback::reverse "
 
-Copy constructor (throws an error)
+Get a function that calculates nadj adjoint derivatives.
 
->  casadi::Callback::Callback(const Callback &obj)
-------------------------------------------------------------------------
+Returns a function with n_in + n_out + n_out inputs and n_in outputs. The
+first n_in inputs correspond to nondifferentiated inputs. The next n_out
+inputs correspond to nondifferentiated outputs. and the last n_out inputs
+correspond to adjoint seeds, stacked horizontally The n_in outputs
+correspond to adjoint sensitivities, stacked horizontally. * (n_in = n_in(),
+n_out = n_out())
 
-Copy constructor (throws an error)
+(n_in = n_in(), n_out = n_out())
 
-";
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned.
 
 ";
 
@@ -8754,12 +8790,6 @@ Set base to -1 to unroll all the way; no gains in memory efficiency here.
 
 ";
 
-%feature("docstring") casadi::Callback::alloc_w "
-
-Allocate work vectors.
-
-";
-
 %feature("docstring") casadi::Callback::serialize "
 
 Serialize.
@@ -8861,12 +8891,6 @@ Does the function have free variables.
 
 ";
 
-%feature("docstring") casadi::Callback::alloc_res "
-
-Allocate work vectors.
-
-";
-
 %feature("docstring") casadi::Callback::assert_size_in "
 
 Assert that an input dimension is equal so some given value.
@@ -8924,18 +8948,6 @@ Get required length of res field.
 %feature("docstring") casadi::Callback::get_jacobian "
 
 Return Jacobian of all input elements with respect to all output elements.
-
-";
-
-%feature("docstring") casadi::Callback::alloc_iw "
-
-Allocate work vectors.
-
-";
-
-%feature("docstring") casadi::Callback::alloc_arg "
-
-Allocate work vectors.
 
 ";
 
@@ -9332,6 +9344,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::CentralDiff::get_forward "
 
 [INTERNAL]  Second order derivatives.
+
+";
+
+%feature("docstring") casadi::CentralDiff::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -11189,6 +11207,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Collocation::sparsity_in "
+
+[INTERNAL]  Input/output sparsity.
+
+";
+
 %feature("docstring") casadi::Collocation::free_sx "
 
 [INTERNAL]  Get free variables (SX)
@@ -11322,9 +11346,9 @@ problem)
 
 ";
 
-%feature("docstring") casadi::Collocation::sparsity_in "
+%feature("docstring") casadi::Collocation::has_eval_dm "
 
-[INTERNAL]  Input/output sparsity.
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -12063,9 +12087,12 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Conic::sx_out "
+%feature("docstring") casadi::Conic::init "
 
-[INTERNAL]  Get function input(s) and output(s)
+[INTERNAL]  Initialize Initialize and make the object ready for setting
+arguments and evaluation. This method is typically called after setting
+options but before evaluating. If passed to another class (in the
+constructor), this class should invoke this function when initialized.
 
 ";
 
@@ -12081,9 +12108,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Conic::get_n_in "
+%feature("docstring") casadi::Conic::numel_out "
 
-[INTERNAL]  Number of function inputs and outputs.
+[INTERNAL]  Number of input/output elements.
 
 ";
 
@@ -12375,12 +12402,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Conic::init "
+%feature("docstring") casadi::Conic::sx_out "
 
-[INTERNAL]  Initialize Initialize and make the object ready for setting
-arguments and evaluation. This method is typically called after setting
-options but before evaluating. If passed to another class (in the
-constructor), this class should invoke this function when initialized.
+[INTERNAL]  Get function input(s) and output(s)
 
 ";
 
@@ -12604,6 +12628,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Conic::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::Conic::codegen "
 
 [INTERNAL]  Generate code the function.
@@ -12705,9 +12735,9 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::Conic::numel_out "
+%feature("docstring") casadi::Conic::get_n_in "
 
-[INTERNAL]  Number of input/output elements.
+[INTERNAL]  Number of function inputs and outputs.
 
 ";
 
@@ -15004,6 +15034,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Dple::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::Dple::getJacSparsityHierarchical "
 
 [INTERNAL]  A flavor of getJacSparsity that does hierarchical block
@@ -15288,6 +15324,17 @@ elements.
 %feature("docstring") casadi::Expm::incache "
 
 [INTERNAL]  Get function in cache.
+
+";
+
+%feature("docstring") casadi::Expm::replace_aseed "
+
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -15817,14 +15864,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::Expm::replace_aseed "
+%feature("docstring") casadi::Expm::has_eval_dm "
 
-[INTERNAL]
-
->  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-";
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -16830,6 +16872,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::External::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::External::factory "
 
 [INTERNAL] ";
@@ -17673,9 +17721,9 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::FastNewton::getCount "
+%feature("docstring") casadi::FastNewton::has_eval_dm "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -18365,6 +18413,12 @@ original
 %feature("docstring") casadi::FastNewton::instruction_constant "
 
 [INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::FastNewton::getCount "
+
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -19092,6 +19146,12 @@ elements.
 %feature("docstring") casadi::FiniteDiff::n_instructions "
 
 [INTERNAL]  Get the number of atomic operations.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -20001,6 +20061,12 @@ elements.
 %feature("docstring") casadi::FixedStepIntegrator::alloc_iw "
 
 [INTERNAL]  Ensure required length of iw field.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -21319,9 +21385,10 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::all_scalar "
+%feature("docstring") casadi::ForwardDiff::call_forward "
 
-[INTERNAL]  Are all inputs and outputs scalar.
+[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
+classes.
 
 ";
 
@@ -21560,6 +21627,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::ForwardDiff::map "
 
 [INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -22189,10 +22262,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::ForwardDiff::call_forward "
+%feature("docstring") casadi::ForwardDiff::all_scalar "
 
-[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
-classes.
+[INTERNAL]  Are all inputs and outputs scalar.
 
 ";
 
@@ -23915,9 +23987,9 @@ classes.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::call_reverse "
+%feature("docstring") casadi::GenericExternal::get_sparsity_in "
 
-[INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
+[INTERNAL]  Retreive sparsities.
 
 ";
 
@@ -24078,6 +24150,12 @@ propagation.
 %feature("docstring") casadi::GenericExternal::mx_in "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::GenericExternal::eval "
+
+[INTERNAL]  Evaluate numerically.
 
 ";
 
@@ -24421,9 +24499,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::get_sparsity_in "
+%feature("docstring") casadi::GenericExternal::call_reverse "
 
-[INTERNAL]  Retreive sparsities.
+[INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
 
 ";
 
@@ -24467,9 +24545,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::eval "
+%feature("docstring") casadi::GenericExternal::has_eval_dm "
 
-[INTERNAL]  Evaluate numerically.
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -26523,6 +26601,12 @@ problem)
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::calc_function "
 
 [INTERNAL] ";
@@ -26687,9 +26771,20 @@ casadi::ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator "
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::nnz_in "
+%feature("docstring") casadi::ImplicitToNlp::which_depends "
 
-[INTERNAL]  Number of input/output nonzeros.
+[INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
@@ -27016,6 +27111,12 @@ C++ includes: implicit_to_nlp.hpp ";
 %feature("docstring") casadi::ImplicitToNlp::replace_arg "
 
 [INTERNAL]  Replace 0-by-0 inputs.
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -27613,20 +27714,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::which_depends "
+%feature("docstring") casadi::ImplicitToNlp::nnz_in "
 
-[INTERNAL]  Which variables enter with some order.
-
-Parameters:
------------
-
-s_in:   Input name
-
-s_out:   Output name(s)
-
-order:  Only 1 (linear) and 2 (nonlinear) allowed
-
-tr:  Flip the relationship. Return which expressions contain the variables
+[INTERNAL]  Number of input/output nonzeros.
 
 ";
 
@@ -28223,11 +28313,9 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Integrator::alloc_w "
+%feature("docstring") casadi::Integrator::monitored "
 
-[INTERNAL]  Ensure required length of w field.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::Integrator::init_mem "
 
@@ -28375,10 +28463,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Integrator::has_jac "
+%feature("docstring") casadi::Integrator::has_eval_dm "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -28814,9 +28901,10 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Integrator::size1_out "
+%feature("docstring") casadi::Integrator::has_jac "
 
-[INTERNAL]  Input/output dimensions.
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
 
 ";
 
@@ -28997,6 +29085,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Integrator::alloc_w "
+
+[INTERNAL]  Ensure required length of w field.
+
+";
+
 %feature("docstring") casadi::Integrator::get_function "
 
 [INTERNAL] ";
@@ -29123,9 +29217,11 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::Integrator::monitored "
+%feature("docstring") casadi::Integrator::size1_out "
 
-[INTERNAL] ";
+[INTERNAL]  Input/output dimensions.
+
+";
 
 %feature("docstring") casadi::Integrator::rz "
 
@@ -29735,6 +29831,12 @@ elements.
 %feature("docstring") casadi::Interpolant::call "
 
 [INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring") casadi::Interpolant::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -31643,6 +31745,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::JitFunction::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::JitFunction::codegen_declarations "
 
 [INTERNAL]  Generate code for the declarations of the C function.
@@ -32850,6 +32958,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::symbolic_output "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
@@ -32941,9 +33055,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::get_jacobian_sparsity "
+%feature("docstring") casadi::LinearInterpolant::ad_weight "
 
-[INTERNAL]  Get Jacobian sparsity.
+[INTERNAL]  Weighting factor for chosing forward/reverse mode.
 
 ";
 
@@ -33237,9 +33351,9 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolant::ad_weight "
+%feature("docstring") casadi::LinearInterpolant::get_jacobian_sparsity "
 
-[INTERNAL]  Weighting factor for chosing forward/reverse mode.
+[INTERNAL]  Get Jacobian sparsity.
 
 ";
 
@@ -34326,10 +34440,9 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::jac "
+%feature("docstring") casadi::LinearInterpolantJac::getJacSparsity "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -34369,6 +34482,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::LinearInterpolantJac::setup "
 
 [INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -34710,9 +34829,10 @@ elements.
 
 ";
 
-%feature("docstring") casadi::LinearInterpolantJac::getJacSparsity "
+%feature("docstring") casadi::LinearInterpolantJac::jac "
 
-[INTERNAL]  Generate the sparsity of a Jacobian block.
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
 
 ";
 
@@ -35774,9 +35894,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Map::numel_in "
+%feature("docstring") casadi::Map::has_eval_dm "
 
-[INTERNAL]  Number of input/output elements.
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -36291,6 +36411,12 @@ elements.
 %feature("docstring") casadi::Map::~Map "
 
 [INTERNAL]  Destructor.
+
+";
+
+%feature("docstring") casadi::Map::numel_in "
+
+[INTERNAL]  Number of input/output elements.
 
 ";
 
@@ -38534,6 +38660,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Newton::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::Newton::get_free "
 
 [INTERNAL]  Print free variables.
@@ -39716,9 +39848,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::replace_arg "
+%feature("docstring") casadi::Nlpsol::instruction_input "
 
-[INTERNAL]  Replace 0-by-0 inputs.
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
 
 ";
 
@@ -39818,10 +39950,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::get_jacobian "
+%feature("docstring") casadi::Nlpsol::replace_arg "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  Replace 0-by-0 inputs.
 
 ";
 
@@ -40152,15 +40283,16 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::self "
+%feature("docstring") casadi::Nlpsol::get_jacobian "
 
-[INTERNAL]  Get a public class instance.
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::generate_lifted "
+%feature("docstring") casadi::Nlpsol::self "
 
-[INTERNAL]  Extract the functions needed for the Lifted Newton method.
+[INTERNAL]  Get a public class instance.
 
 ";
 
@@ -40177,12 +40309,6 @@ multiplying.
 %feature("docstring") casadi::Nlpsol::solve "
 
 [INTERNAL] ";
-
-%feature("docstring") casadi::Nlpsol::instruction_input "
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
 
 %feature("docstring") casadi::Nlpsol::jacobian "
 
@@ -40206,6 +40332,12 @@ elements.
 %feature("docstring") casadi::Nlpsol::expand "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::Nlpsol::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
 
 %feature("docstring") casadi::Nlpsol::matching_res "
 
@@ -40765,6 +40897,12 @@ propagation.
 %feature("docstring") casadi::Nlpsol::get_partition "
 
 [INTERNAL]  Get the unidirectional or bidirectional partition.
+
+";
+
+%feature("docstring") casadi::Nlpsol::generate_lifted "
+
+[INTERNAL]  Extract the functions needed for the Lifted Newton method.
 
 ";
 
@@ -41509,9 +41647,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::OmpMap::weak "
+%feature("docstring") casadi::OmpMap::has_eval_dm "
 
-[INTERNAL]  Get a weak reference to the object.
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -41655,9 +41793,9 @@ original
 
 ";
 
-%feature("docstring") casadi::OmpMap::free_sx "
+%feature("docstring") casadi::OmpMap::ad_weight "
 
-[INTERNAL]  Get free variables (SX)
+[INTERNAL]  Weighting factor for chosing forward/reverse mode.
 
 ";
 
@@ -41757,9 +41895,9 @@ original
 
 ";
 
-%feature("docstring") casadi::OmpMap::ad_weight "
+%feature("docstring") casadi::OmpMap::free_sx "
 
-[INTERNAL]  Weighting factor for chosing forward/reverse mode.
+[INTERNAL]  Get free variables (SX)
 
 ";
 
@@ -41796,6 +41934,12 @@ original
 %feature("docstring") casadi::OmpMap::serialize_header "
 
 [INTERNAL]  Serialize function header.
+
+";
+
+%feature("docstring") casadi::OmpMap::weak "
+
+[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -43101,6 +43245,12 @@ multiplying.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::OracleFunction::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::OracleFunction::create_function "
 
 [INTERNAL]  Create an oracle function
@@ -44346,9 +44496,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::index_in "
+%feature("docstring") casadi::QpToNlp::has_eval_dm "
 
-[INTERNAL]  Get input scheme index by name.
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -44845,6 +44995,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::QpToNlp::sz_res "
 
 [INTERNAL]  Get required length of res field.
+
+";
+
+%feature("docstring") casadi::QpToNlp::index_in "
+
+[INTERNAL]  Get input scheme index by name.
 
 ";
 
@@ -45356,14 +45512,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::Qrqp::replace_aseed "
+%feature("docstring") casadi::Qrqp::has_eval_dm "
 
-[INTERNAL]
-
->  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-";
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -45621,6 +45772,17 @@ elements.
 %feature("docstring") casadi::Qrqp::n_nodes "
 
 [INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring") casadi::Qrqp::replace_aseed "
+
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_aseed(const std::vector< std::vector< M > > &aseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
 
 ";
 
@@ -46271,9 +46433,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Qrsqp::get_sparsity_in "
+%feature("docstring") casadi::Qrsqp::eval_dm "
 
-[INTERNAL]  Sparsities of function inputs and outputs.
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -46789,6 +46951,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::Qrsqp::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::Qrsqp::call_reverse "
 
 [INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
@@ -46925,9 +47093,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::Qrsqp::eval_dm "
+%feature("docstring") casadi::Qrsqp::get_sparsity_in "
 
-[INTERNAL]  Evaluate with DM matrices.
+[INTERNAL]  Sparsities of function inputs and outputs.
 
 ";
 
@@ -46968,9 +47136,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Qrsqp::sparsity_out "
+%feature("docstring") casadi::Qrsqp::generate_dependencies "
 
-[INTERNAL]  Input/output sparsity.
+[INTERNAL]  Export / Generate C code for the generated functions.
 
 ";
 
@@ -47330,9 +47498,9 @@ propagation.
 
 ";
 
-%feature("docstring") casadi::Qrsqp::generate_dependencies "
+%feature("docstring") casadi::Qrsqp::sparsity_out "
 
-[INTERNAL]  Export / Generate C code for the generated functions.
+[INTERNAL]  Input/output sparsity.
 
 ";
 
@@ -47773,12 +47941,6 @@ Parameters:
 -----------
 
 f:   Function mapping from (n+1) inputs to 1 output.
-
-";
-
-%feature("docstring") casadi::Rootfinder::get_forward "
-
-[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -48333,6 +48495,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::Rootfinder::serialize_header "
 
 [INTERNAL]  Serialize function header.
@@ -48342,6 +48510,12 @@ elements.
 %feature("docstring") casadi::Rootfinder::checkout "
 
 [INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring") casadi::Rootfinder::eval_mx "
+
+[INTERNAL]  Evaluate with symbolic matrices.
 
 ";
 
@@ -48456,9 +48630,9 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::eval_mx "
+%feature("docstring") casadi::Rootfinder::get_forward "
 
-[INTERNAL]  Evaluate with symbolic matrices.
+[INTERNAL]  Generate a function that calculates nfwd forward derivatives.
 
 ";
 
@@ -48995,6 +49169,12 @@ elements.
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::RungeKutta::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -50774,6 +50954,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Scpgen::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::Scpgen::has_derivative "
 
 [INTERNAL]  Can derivatives be calculated in any way?
@@ -51954,9 +52140,9 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::SlicotDple::get_max_in "
+%feature("docstring") casadi::SlicotDple::has_eval_dm "
 
-[INTERNAL]  Get largest input value.
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -52557,6 +52743,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::SlicotDple::self "
 
 [INTERNAL]  Get a public class instance.
+
+";
+
+%feature("docstring") casadi::SlicotDple::get_max_in "
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -53285,6 +53477,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::SlicotExpm::has_spfwd "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -53957,7 +54155,7 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Smoothing::has_err "
+%feature("docstring") casadi::Smoothing::has_function "
 
 [INTERNAL] ";
 
@@ -54266,7 +54464,7 @@ classes.
 
 ";
 
-%feature("docstring") casadi::Smoothing::has_function "
+%feature("docstring") casadi::Smoothing::has_err "
 
 [INTERNAL] ";
 
@@ -54558,6 +54756,12 @@ elements.
 %feature("docstring") casadi::Smoothing::get_stats "
 
 [INTERNAL]  Get all statistics.
+
+";
+
+%feature("docstring") casadi::Smoothing::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -56006,9 +56210,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::check_res "
+%feature("docstring") casadi::Sqpmethod::check_inputs "
 
-[INTERNAL]  Check if output arguments have correct length and dimensions.
+[INTERNAL]  Check if the inputs correspond to a well-posed problem.
 
 ";
 
@@ -56030,9 +56234,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::check_inputs "
+%feature("docstring") casadi::Sqpmethod::mx_out "
 
-[INTERNAL]  Check if the inputs correspond to a well-posed problem.
+[INTERNAL]  Get function input(s) and output(s)
 
 ";
 
@@ -56079,9 +56283,10 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::jit_dependencies "
+%feature("docstring") casadi::Sqpmethod::jac "
 
-[INTERNAL]  JIT for dependencies.
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
 
 ";
 
@@ -56170,6 +56375,8 @@ A textbook SQPMethod
 |                       |           | statistics                           |
 +-----------------------+-----------+--------------------------------------+
 | print_iteration       | OT_BOOL   | Print the iterations                 |
++-----------------------+-----------+--------------------------------------+
+| print_status          | OT_BOOL   | Print a status message after solving |
 +-----------------------+-----------+--------------------------------------+
 | qpsol                 | OT_STRING | The QP solver to be used by the SQP  |
 |                       |           | method [qpoases]                     |
@@ -56320,6 +56527,10 @@ A textbook SQPMethod
 +-------------------+---------------+-------------------+------------------+
 | print_iteration   | OT_BOOL       | Print the         | casadi::Sqpmetho |
 |                   |               | iterations        | d                |
++-------------------+---------------+-------------------+------------------+
+| print_status      | OT_BOOL       | Print a status    | casadi::Sqpmetho |
+|                   |               | message after     | d                |
+|                   |               | solving           |                  |
 +-------------------+---------------+-------------------+------------------+
 | qpsol             | OT_STRING     | The QP solver to  | casadi::Sqpmetho |
 |                   |               | be used by the    | d                |
@@ -56483,16 +56694,15 @@ Print iteration.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::jac "
+%feature("docstring") casadi::Sqpmethod::jit_dependencies "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  JIT for dependencies.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::mx_out "
+%feature("docstring") casadi::Sqpmethod::sparsity_out "
 
-[INTERNAL]  Get function input(s) and output(s)
+[INTERNAL]  Input/output sparsity.
 
 ";
 
@@ -56573,6 +56783,12 @@ structure recognition for symmetric Jacobians
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -56957,12 +57173,6 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::sparsity_out "
-
-[INTERNAL]  Input/output sparsity.
-
-";
-
 %feature("docstring") casadi::Sqpmethod::kkt "
 
 [INTERNAL] ";
@@ -57116,6 +57326,12 @@ original
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::check_res "
+
+[INTERNAL]  Check if output arguments have correct length and dimensions.
 
 ";
 
@@ -57487,6 +57703,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::Switch::replace_arg "
+
+[INTERNAL]  Replace 0-by-0 inputs.
+
+";
+
 %feature("docstring") casadi::Switch::~Switch "
 
 [INTERNAL]  Destructor.
@@ -57660,9 +57882,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::Switch::replace_arg "
+%feature("docstring") casadi::Switch::mx_out "
 
-[INTERNAL]  Replace 0-by-0 inputs.
+[INTERNAL]  Get function input(s) and output(s)
 
 ";
 
@@ -57805,6 +58027,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::Switch::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::Switch::signature "
 
 [INTERNAL]  Code generate the function.
@@ -57902,12 +58130,6 @@ derivatives
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
-
-";
-
-%feature("docstring") casadi::Switch::mx_out "
-
-[INTERNAL]  Get function input(s) and output(s)
 
 ";
 
@@ -58822,10 +59044,10 @@ elements.
 
 ";
 
-%feature("docstring") casadi::ThreadMap::getJacSparsityHierarchicalSymm "
+%feature("docstring") casadi::ThreadMap::get_jacobian "
 
-[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition for symmetric Jacobians
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
 
 ";
 
@@ -59093,6 +59315,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::ThreadMap::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
 %feature("docstring") casadi::ThreadMap::get_sparsity_out "
 
 [INTERNAL]  Sparsities of function inputs and outputs.
@@ -59225,10 +59453,10 @@ classes.
 
 ";
 
-%feature("docstring") casadi::ThreadMap::get_jacobian "
+%feature("docstring") casadi::ThreadMap::getJacSparsityHierarchicalSymm "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
 
 ";
 
@@ -61378,27 +61606,43 @@ Get all options for a plugin.
 
 Obtain collocation interpolating matrices.
 
+A collocation method poses a polynomial Pi that interpolates exactly through
+an initial state (0,X_0) and helper states at collocation points
+(tau_j,X(j)).
+
+This function computes the linear mapping between dPi/dt and coefficients
+Z=[X_0 X].
+
 Parameters:
 -----------
 
-tau_root:  location of collocation points, as obtained from
-collocation_points
+tau:  location of collocation points, as obtained from collocation_points
 
-output_C:  interpolating coefficients to obtain derivatives Length: order+1,
-order + 1
+output_C:  interpolating coefficients to obtain derivatives. Length:
+order+1, order+1
 
 
 
 ::
 
-dX/dt @collPoint(j) ~ Sum_i C[j][i]*X@collPoint(i)
+dPi/dt @Z_j = (1/h) Sum_i C[j][i]*Z_i,
 
 
+
+with h the length of the integration interval.
 
 Parameters:
 -----------
 
-output_D:  interpolating coefficients to obtain end state Length: order+1
+output_D:  interpolating coefficients to obtain end state. Length: order+1
+
+
+
+::
+
+Pi @X_f = Sum_i D[i]*Z_i
+
+
 
 ";
 
