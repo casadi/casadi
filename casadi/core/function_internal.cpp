@@ -2594,13 +2594,9 @@ namespace casadi {
         && inp.size2()%arg.size2()==0) return true;
     // Evaluate with multiple arguments
     if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
-        && arg.size2()%inp.size2()==0) {
-      if (npar==arg.size2()/inp.size2()) {
-        return true;
-      } else if (npar==1) {
-        npar=arg.size2()/inp.size2();
-        return true;
-      }
+        && arg.size2()%(npar*inp.size2())==0) {
+      npar *= arg.size2()/(npar*inp.size2());
+      return true;
     }
     // No match
     return false;
@@ -2873,7 +2869,7 @@ namespace casadi {
       n = vsnprintf(buf_dyn, buf_sz, fmt, args);
     }
     // Print buffer content
-    if (n>=0) uout() << (buf_dyn ? buf_dyn : buf);
+    if (n>=0) uout() << (buf_dyn ? buf_dyn : buf) << std::flush;
     // Cleanup
     if (buf_dyn) delete[] buf_dyn;
     va_end(args);

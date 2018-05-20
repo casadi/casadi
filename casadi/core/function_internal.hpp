@@ -997,9 +997,19 @@ namespace casadi {
     casadi_assert(arg.size()==n_in_, "Incorrect number of inputs: Expected "
                           + str(n_in_) + ", got " + str(arg.size()));
     for (casadi_int i=0; i<n_in_; ++i) {
-      casadi_assert(check_mat(arg[i].sparsity(), sparsity_in(i), npar),
-                    "Input " + str(i) + " (" + name_in_[i] + ") has mismatching shape. "
-                    "Expected " + str(size_in(i)) + ", got " + str(arg[i].size()));
+      if (!check_mat(arg[i].sparsity(), sparsity_in(i), npar)) {
+        // Dimensions
+        std::string d_arg = str(arg[i].size1()) + "-by-" + str(arg[i].size2());
+        std::string d_in = str(size1_in(i)) + "-by-" + str(size2_in(i));
+        casadi_error("Input " + str(i) + " (" + name_in_[i] + ") has mismatching shape. "
+                     "Got " + d_arg + ". Allowed dimensions, in general, are:\n"
+                     " - The input dimension N-by-M (here " + d_in + ")\n"
+                     " - A scalar, i.e. 1-by-1\n"
+                     " - M-by-N if N=1 or M=1 (i.e. a transposed vector)\n"
+                     " - N-by-M1 if K*M1=M for some K (argument repeated horizontally)\n"
+                     " - N-by-P*M, indicating evaluation with multiple arguments (P must be a "
+                     "multiple of " + str(npar) + " for consistency with previous inputs)");
+      }
     }
   }
 
@@ -1054,7 +1064,7 @@ namespace casadi {
       return repmat(arg, 1, inp.size2()/arg.size2());
     } else {
       // Multiple evaluation
-      return arg;
+      return repmat(arg, 1, (npar*inp.size2())/arg.size2());
     }
   }
 

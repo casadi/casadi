@@ -45,19 +45,32 @@ namespace casadi {
   ///@}
 
   /** \brief Obtain collocation interpolating matrices
-  \param tau_root  location of collocation points, as obtained from collocation_points
-  \param[out] output_C interpolating coefficients to obtain derivatives
-      Length: order+1, order + 1
+  
+  A collocation method poses a polynomial Pi that interpolates exactly through
+  an initial state (0,X_0) and helper states at collocation points (tau_j,X@collPoint(j)).
+
+  This function computes the linear mapping between dPi/dt and coefficients Z=[X_0 X@collPoints].
+
+  \param tau  location of collocation points, as obtained from collocation_points
+  \param[out] output_C interpolating coefficients to obtain derivatives.
+      Length: order+1, order+1
 
     \verbatim
-      dX/dt @collPoint(j) ~ Sum_i C[j][i]*X@collPoint(i)
+      dPi/dt @Z_j = (1/h) Sum_i C[j][i]*Z_i,
     \endverbatim
 
-  \param[out] output_D interpolating coefficients to obtain end state
+    with h the length of the integration interval.
+
+  \param[out] output_D interpolating coefficients to obtain end state.
       Length: order+1
+
+    \verbatim
+      Pi @X_f = Sum_i D[i]*Z_i
+    \endverbatim
+
   */
   CASADI_EXPORT void
-  collocation_interpolators(const std::vector<double> & tau_root,
+  collocation_interpolators(const std::vector<double> & tau,
                             std::vector< std::vector<double> > &SWIG_OUTPUT(C),
                             std::vector< double > &SWIG_OUTPUT(D));
 
