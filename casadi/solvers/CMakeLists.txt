@@ -57,6 +57,10 @@ casadi_plugin(Linsol lsqr
 casadi_plugin(Nlpsol sqpmethod
   sqpmethod.hpp sqpmethod.cpp sqpmethod_meta.cpp)
 
+# Dummy -  A dummy NLP implementation
+casadi_plugin(Nlpsol dummy
+  dummy.hpp dummy.cpp dummy_meta.cpp)
+
 # SCPgen -  An implementation of Lifted Newton SQP
 casadi_plugin(Nlpsol scpgen
   scpgen.hpp scpgen.cpp scpgen_meta.cpp)

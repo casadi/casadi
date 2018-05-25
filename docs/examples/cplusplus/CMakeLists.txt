@@ -23,6 +23,10 @@ if(WITH_IPOPT)
   target_link_libraries(rosenbrock casadi)
 endif()
 
+# Dummy problem
+add_executable(dummy dummy.cpp)
+target_link_libraries(dummy casadi)
+
 # Rocket using Ipopt
 if(WITH_IPOPT)
   add_executable(rocket_ipopt rocket_ipopt.cpp)
