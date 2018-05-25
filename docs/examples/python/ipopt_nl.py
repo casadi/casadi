@@ -42,10 +42,8 @@ nl.import_nl("../nl_files/hs107.nl",{"verbose":False})
 # NLP solver options
 opts = {}
 opts["expand"] = True
-# opts["max_iter"] = 10
 # opts["verbose"] = True
-# opts["linear_solver"] = "ma57"
-# opts["hessian_approximation"] = "limited-memory"
+# opts["ipopt"] = dict(max_iter=10, linear_solver="ma57", hessian_approximation="limited-memory")
 
 # Create an NLP solver
 nlpsol = nlpsol("nlpsol", "ipopt", nl, opts)
