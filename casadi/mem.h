@@ -67,9 +67,9 @@ typedef struct {
 } casadi_io;
 
 /* Decompress a sparsity pattern */
-inline void casadi_decompress(const int* sp, int* nrow, int* ncol,
-                              int* nnz, int* numel,
-                              const int** colind, const int** row) {
+inline void casadi_decompress(const casadi_int* sp, casadi_int* nrow, casadi_int* ncol,
+                              casadi_int* nnz, casadi_int* numel,
+                              const casadi_int** colind, const casadi_int** row) {
   if (sp==0) {
     /* Scalar sparsity pattern if sp is null */
     static const casadi_int scalar_colind[2] = {0, 1};
