@@ -66,6 +66,7 @@ namespace casadi {
       @copydoc Conic_doc
       @copydoc plugin_Conic_clp
 
+
       \author Attila Kozma, Joel Andersson
       \date 2012
   */
@@ -125,6 +126,8 @@ namespace casadi {
     // Conversion of string to enum for options
     static std::map<std::string, ClpIntParam> param_map_int;
     static std::map<std::string, ClpDblParam> param_map_double;
+    static std::map<std::string, ClpSolve::SolveType> param_map_solvetype;
+    static std::map<std::string, ClpSolve::PresolveType> param_map_presolvetype;
 
   };
 } // end namespace casadi

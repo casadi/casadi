@@ -44,6 +44,7 @@ namespace casadi {
     Conic::registerPlugin(casadi_register_conic_clp);
   }
 
+
   ClpInterface::ClpInterface(const std::string& name,
                              const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
@@ -53,7 +54,15 @@ namespace casadi {
   = {{&Conic::options_},
      {{"clp",
        {OT_DICT,
-        "Options to be passed to CLP. Check CLP's ClpParameters.hpp. eg. 'PrimalTolerance'."}},
+        "Options to be passed to CLP. "
+        "A first set of options can be found in ClpParameters.hpp. eg. 'PrimalTolerance'. "
+        "There are other options in additions. "
+        "'AutomaticScaling' (bool) is recognised. "
+        "'initial_solve' (default off) activates the use of Clp's initialSolve. "
+        "'initial_solve_options' takes a dictionary with following keys (see ClpSolve.hpp): "
+        " SolveType (string), PresolveType (string), "
+        " NumberPasses, SpecialOptions (intvectorvector), IndependentOptions (intvectorvector)."
+        }}
      }
    };
 
@@ -92,6 +101,25 @@ namespace casadi {
     {"MaxWallSeconds", ClpMaxWallSeconds},
     {"PresolveTolerance", ClpPresolveTolerance}
   };
+
+  std::map<std::string, ClpSolve::SolveType> ClpInterface::param_map_solvetype =  {
+    {"useDual", ClpSolve::useDual},
+    {"usePrimal", ClpSolve::usePrimal},
+    {"usePrimalorSprint", ClpSolve::usePrimal},
+    {"useBarrier", ClpSolve::useBarrier},
+    {"useBarrierNoCross", ClpSolve::useBarrierNoCross},
+    {"automatic", ClpSolve::automatic},
+    {"tryDantzigWolfe", ClpSolve::tryDantzigWolfe},
+    {"tryBenders", ClpSolve::tryBenders},
+  };
+
+  std::map<std::string, ClpSolve::PresolveType> ClpInterface::param_map_presolvetype =  {
+    {"presolveOn", ClpSolve::presolveOn},
+    {"presolveOff", ClpSolve::presolveOff},
+    {"presolveNumber", ClpSolve::presolveNumber},
+    {"presolveNumberCost", ClpSolve::presolveNumberCost}
+  };
+
 
   inline std::string return_secondary_status_string(int status) {
     switch (status) {
@@ -286,20 +314,29 @@ namespace casadi {
     // Create model
     ClpSimplex model;
 
+    bool initial_solve = false;
+    Dict initial_solve_options;
+
     // Read options
     for (auto&& op : opts_) {
+      // Check for double params
       auto it = param_map_double.find(op.first);
       if (it!=param_map_double.end()) {
         casadi_assert(model.setDblParam(it->second, op.second.to_double()),
           "Error setting option '" + op.first + "'.");
         continue;
       }
+      // Check for integer params
       auto it2 = param_map_int.find(op.first);
       if (it2!=param_map_int.end()) {
         casadi_assert(model.setIntParam(it2->second, op.second.to_int()),
           "Error setting option '" + op.first + "'.");
       } else if (op.first=="AutomaticScaling") {
         model.setAutomaticScaling(op.second.to_bool());
+      } else if (op.first=="initial_solve") {
+        initial_solve = op.second.to_bool();
+      } else if (op.first=="initial_solve_options") {
+        initial_solve_options = op.second.to_dict();
       } else {
         casadi_error("Unknown option '" + op.first + "'.");
       }
@@ -314,8 +351,61 @@ namespace casadi {
     m->fstats.at("preprocessing").toc();
     m->fstats.at("solver").tic();
 
-    // Solve the problem using the primal simplex algorithm
-    model.primal();
+    if (initial_solve) {
+      ClpSolve solvectl;
+      int numberPasses = -1;
+      ClpSolve::SolveType solveType = ClpSolve::automatic;
+      ClpSolve::PresolveType presolveType = ClpSolve::presolveOn;
+      std::vector< std::vector<int> > specialOptions;
+      std::vector< std::vector<int> > independentOptions;
+
+      for (auto&& op : initial_solve_options) {
+        if (op.first=="SolveType") {
+          auto it = param_map_solvetype.find(op.second.to_string());
+          casadi_assert(it!=param_map_solvetype.end(),
+            "SolveType ' " + op.second.to_string() + "' not recognised.");
+          solveType = it->second;
+        } else if (op.first=="PresolveType") {
+          auto it = param_map_presolvetype.find(op.second);
+          casadi_assert(it!=param_map_presolvetype.end(),
+            "PresolveType ' " + op.second.to_string() + "' not recognised.");
+          presolveType = it->second;
+        } else if (op.first=="NumberPasses") {
+          numberPasses = op.second.to_int();
+        } else if (op.first=="SpecialOptions") {
+          specialOptions = to_int(op.second.to_int_vector_vector());
+        } else if (op.first=="IndependentOptions") {
+          independentOptions = to_int(op.second.to_int_vector_vector());
+        } else {
+          casadi_error("Option not recognised: '" + op.first + "'");
+        }
+      }
+      solvectl.setSolveType(solveType);
+      solvectl.setPresolveType(presolveType, numberPasses);
+
+      // Read special options
+      for (auto const& v : specialOptions) {
+        if (v.size()==2) {
+          solvectl.setSpecialOption(v[0], v[1]);
+        } else if (v.size()==3) {
+          solvectl.setSpecialOption(v[0], v[1], v[2]);
+        } else {
+          casadi_error("SpecialOptions entries must be of length 2 or 3.");
+        }
+      }
+      // Read independent options
+      for (auto const& v : independentOptions) {
+        if (v.size()==2) {
+          solvectl.setIndependentOption(v[0], v[1]);
+        } else {
+          casadi_error("SpecialOptions entries must be of length 2.");
+        }
+      }
+      model.initialSolve(solvectl);
+    } else {
+      // Solve the problem using the primal simplex algorithm
+      model.primal();
+    }
 
     m->fstats.at("solver").toc();
     m->fstats.at("postprocessing").tic();
