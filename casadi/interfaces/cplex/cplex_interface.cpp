@@ -380,11 +380,15 @@ namespace casadi {
       casadi_error("CPXXcopylp failed");
     }
 
-    // Preparing coefficient matrix Q
-    const CPXNNZ* qmatbeg = get_ptr(m->h_colind);
-    const CPXDIM* qmatind = get_ptr(m->h_row);
-    const double* qmatval = H;
-    if (CPXXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
+    if (nnz_in(CONIC_H) > 0) {
+      // Preparing coefficient matrix Q
+      const CPXNNZ* qmatbeg = get_ptr(m->h_colind);
+      const CPXDIM* qmatind = get_ptr(m->h_row);
+      const double* qmatval = H;
+      printf("Vals: %p, %p, %p, %p, %p, %p\n", m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval);
+      if (CPXXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
+        casadi_error("CPXXcopyquad failed");
+      }
     }
 
     if (dump_to_file_) {
