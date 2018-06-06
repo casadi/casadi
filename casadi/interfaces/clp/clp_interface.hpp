@@ -90,6 +90,12 @@ namespace casadi {
     // Get name of the class
     std::string class_name() const override { return "ClpInterface";}
 
+    ///@{
+    /** \brief Options */
+    static Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
+
     // Initialize the solver
     void init(const Dict& opts) override;
 
@@ -110,6 +116,15 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /// All CLP options
+    Dict opts_;
+
+
+  private:
+    // Conversion of string to enum for options
+    static std::map<std::string, ClpIntParam> param_map_int;
+    static std::map<std::string, ClpDblParam> param_map_double;
 
   };
 } // end namespace casadi

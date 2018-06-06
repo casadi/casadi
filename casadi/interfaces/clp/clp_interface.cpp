@@ -49,6 +49,13 @@ namespace casadi {
     : Conic(name, st) {
   }
 
+  Options ClpInterface::options_
+  = {{&Conic::options_},
+     {{"clp",
+       {OT_DICT,
+        "Options to be passed to CLP. Check CLP's ClpParameters.hpp. eg. 'PrimalTolerance'."}},
+     }
+   };
 
   inline std::string return_status_string(int status) {
     switch (status) {
@@ -69,6 +76,22 @@ namespace casadi {
     }
   }
 
+  std::map<std::string, ClpIntParam> ClpInterface::param_map_int =  {
+    {"MaxNumIteration", ClpMaxNumIteration},
+    {"MaxNumIterationHotStart", ClpMaxNumIterationHotStart},
+    {"NameDiscipline", ClpMaxNumIteration},
+  };
+
+  std::map<std::string, ClpDblParam> ClpInterface::param_map_double =  {
+    {"DualObjectiveLimit", ClpDualObjectiveLimit},
+    {"PrimalObjectiveLimit", ClpPrimalObjectiveLimit},
+    {"DualTolerance", ClpDualTolerance},
+    {"PrimalTolerance", ClpPrimalTolerance},
+    {"ObjOffset", ClpObjOffset},
+    {"MaxSeconds", ClpMaxSeconds},
+    {"MaxWallSeconds", ClpMaxWallSeconds},
+    {"PresolveTolerance", ClpPresolveTolerance}
+  };
 
   inline std::string return_secondary_status_string(int status) {
     switch (status) {
@@ -192,8 +215,11 @@ namespace casadi {
     casadi_assert(H_.nnz()==0, "Not an LP");
 
     // Read options
-    //for (auto&& op : opts) {
-    //}
+    for (auto&& op : opts) {
+      if (op.first=="clp") {
+        opts_ = op.second;
+      }
+    }
 
     // Allocate work vectors
     alloc_w(nx_, true); // g
@@ -259,6 +285,26 @@ namespace casadi {
 
     // Create model
     ClpSimplex model;
+
+    // Read options
+    for (auto&& op : opts_) {
+      auto it = param_map_double.find(op.first);
+      if (it!=param_map_double.end()) {
+        casadi_assert(model.setDblParam(it->second, op.second.to_double()),
+          "Error setting option '" + op.first + "'.");
+        continue;
+      }
+      auto it2 = param_map_int.find(op.first);
+      if (it2!=param_map_int.end()) {
+        casadi_assert(model.setIntParam(it2->second, op.second.to_int()),
+          "Error setting option '" + op.first + "'.");
+      } else if (op.first=="AutomaticScaling") {
+        model.setAutomaticScaling(op.second.to_bool());
+      } else {
+        casadi_error("Unknown option '" + op.first + "'.");
+      }
+    }
+
     model.loadProblem(A_.size2(), A_.size1(), get_ptr(m->colind), get_ptr(m->row), A,
                       lbx, ubx, g, lba, uba, nullptr);
 
