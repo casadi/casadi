@@ -391,7 +391,6 @@ namespace casadi {
       const CPXNNZ* qmatbeg = get_ptr(m->h_colind);
       const CPXDIM* qmatind = get_ptr(m->h_row);
       const double* qmatval = H;
-      printf("Vals: %p, %p, %p, %p, %p, %p\n", m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval);
       if (CPXXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
         casadi_error("CPXXcopyquad failed");
       }
