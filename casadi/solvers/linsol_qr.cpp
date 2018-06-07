@@ -108,7 +108,7 @@ namespace casadi {
         print("First singular R entry: %g<%g, corresponding to row %lld\n", rmin, eps_, irmin);
         casadi_qr_colcomb(get_ptr(m->w), get_ptr(m->r), sp_r_, get_ptr(pc_), eps_, 0);
         print("Linear combination of columns:\n[");
-        for (casadi_int k=0; k<ncol(); ++k) print(k==0 ? "%g": ", %g", m->w[k]);
+        for (casadi_int k=0; k<ncol(); ++k) print(k==0 ? "%g" : ", %g", m->w[k]);
         print("]\n");
       }
       return 1;
