@@ -280,12 +280,18 @@ namespace casadi {
   inline std::string return_status_string(int status) {
     switch (status) {
     case CPX_STAT_OPTIMAL:
+    case CPXMIP_OPTIMAL:
       return "Optimal solution found";
+    case CPXMIP_OPTIMAL_TOL:
+      return "Optimal solution within tolerance found";
     case CPX_STAT_UNBOUNDED:
+    case CPXMIP_UNBOUNDED:
       return "Model is unbounded";
     case CPX_STAT_INForUNBD:
+    case CPXMIP_INForUNBD:
       return "Model is infeasible or unbounded";
     case CPX_STAT_OPTIMAL_INFEAS:
+    case CPXMIP_OPTIMAL_INFEAS:
       return "Optimal solution is available but with infeasibilities";
     case CPX_STAT_NUM_BEST:
       return "Solution available, but not proved optimal due to numeric difficulties";
@@ -293,7 +299,7 @@ namespace casadi {
       return "Solution satisfies first-order optimality conditions, "
              "but is not necessarily globally optimal";
     default:
-      return "unknown";
+      return "unknown status: " + std::to_string(status);
     }
   }
 
@@ -380,11 +386,15 @@ namespace casadi {
       casadi_error("CPXXcopylp failed");
     }
 
-    // Preparing coefficient matrix Q
-    const CPXNNZ* qmatbeg = get_ptr(m->h_colind);
-    const CPXDIM* qmatind = get_ptr(m->h_row);
-    const double* qmatval = H;
-    if (CPXXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
+    if (nnz_in(CONIC_H) > 0) {
+      // Preparing coefficient matrix Q
+      const CPXNNZ* qmatbeg = get_ptr(m->h_colind);
+      const CPXDIM* qmatind = get_ptr(m->h_row);
+      const double* qmatval = H;
+      printf("Vals: %p, %p, %p, %p, %p, %p\n", m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval);
+      if (CPXXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
+        casadi_error("CPXXcopyquad failed");
+      }
     }
 
     if (dump_to_file_) {
@@ -497,7 +507,10 @@ namespace casadi {
     casadi_scal(nx_, -1., lam_x);
 
     m->return_status = CPXXgetstat(m->env, m->lp);
-    m->success = m->return_status==CPX_STAT_OPTIMAL || m->return_status==CPX_STAT_FIRSTORDER;
+    m->success  = m->return_status==CPX_STAT_OPTIMAL;
+    m->success |= m->return_status==CPX_STAT_FIRSTORDER;
+    m->success |= m->return_status==CPXMIP_OPTIMAL;
+    m->success |= m->return_status==CPXMIP_OPTIMAL_TOL;
 
     if (verbose_) casadi_message("CPLEX return status: " + return_status_string(m->return_status));
 
