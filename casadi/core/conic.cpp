@@ -476,4 +476,135 @@ namespace casadi {
     return type==shortname() || (recursive && FunctionInternal::is_a(type, recursive));
   }
 
+  void Conic::sdp_to_socp_init(SDPToSOCPMem& mem) const {
+
+    Sparsity qsum = reshape(sum2(Q_), np_, np_);
+
+    // Block detection
+    Sparsity aggregate = qsum+P_;
+
+    std::vector<casadi_int> p;
+    casadi_int nb = aggregate.scc(p, mem.r);
+
+    std::string pattern_message = "Pattern not recognised";
+
+    casadi_assert(p==range(p.size()), pattern_message);
+
+    const casadi_int* row = aggregate.row();
+    const casadi_int* colind = aggregate.colind();
+
+    // Check fishbone-structure
+    for (casadi_int i=0;i<nb;++i) {
+      casadi_int block_size = mem.r[i+1]-mem.r[i];
+      // number of nonzeros in column mem.r[i+1]-1
+      casadi_int nz = colind[mem.r[i+1]]-colind[mem.r[i+1]-1];
+      // Last column of block should be dense
+      casadi_assert(nz==block_size, pattern_message);
+      for (casadi_int k=0;k<block_size-1;++k) {
+        casadi_assert(colind[mem.r[i]+k+1]-colind[mem.r[i]+k], pattern_message);
+        casadi_assert(*(row++)==k+mem.r[i], pattern_message);
+        casadi_assert(*(row++)==mem.r[i]+block_size-1, pattern_message);
+      }
+
+      for (casadi_int k=0;k<block_size;++k)
+        casadi_assert(*(row++)==k+mem.r[i], pattern_message);
+    }
+
+    /**
+      general soc constraints:
+      ||Ax + b ||_2 <= c'x + d
+
+      Need to represent as
+      X'X <= Z'Z
+
+      with X and Z helper variables and
+      Ax  + b = X
+      c'x + d = Z
+
+      [A;c'] x - [X;Z] = [b;d]
+
+      we look for the vertical concatenation of these constraints for all blocks:
+
+      Q(map_Q) [x;X1;Z1;X2;Z2;...] = P.nz(map_P)
+
+    */
+
+    /*
+
+    Aggregate pattern:
+
+    x (x)
+     x(x)
+    xx(x)
+       x (x)
+        x(x)
+       xx(x)
+
+    We are interested in the parts in parenthesis (target).
+
+    Find out which rows in Q correspond to those targets
+    */
+
+    // Lookup vector for target start and end
+    std::vector<casadi_int> target_start(nb), target_stop(nb);
+    for (casadi_int i=0;i<nb;++i) {
+      target_start[i] = (mem.r[i+1]-1)*aggregate.size1()+mem.r[i];
+      target_stop[i] = target_start[i]+mem.r[i+1]-mem.r[i];
+    }
+
+    // Collect the nonzero indices in Q that that correspond to the target area
+    std::vector<casadi_int> q_nz;
+    // Triplet form for map_Q sparsity
+    std::vector<casadi_int> q_row, q_col;
+
+    // Loop over Q's columns (decision variables)
+    for (casadi_int j=0; j<Q_.size2(); ++j) {
+      casadi_int block_index = 0;
+      // Loop over Q's rows
+      for (casadi_int k=Q_.colind(j); k<Q_.colind(j+1); ++k) {
+        casadi_int i = Q_.row(k);
+
+        // Increment block_index if i runs ahead
+        while (i>target_stop[block_index] && block_index<nb-1) block_index++;
+
+        if (i>=target_start[block_index] && i<target_stop[block_index]) {
+          // Got a nonzero in the target region
+          q_nz.push_back(k);
+          q_row.push_back(mem.r[block_index]+i-target_start[block_index]);
+          q_col.push_back(j);
+        }
+      }
+    }
+
+    mem.map_Q = IM::triplet(q_row, q_col, q_nz, mem.r[nb], nx_);
+
+    // Add the [X1;Z1;X2;Z2;...] part
+    mem.map_Q = horzcat(mem.map_Q, -IM::eye(mem.r[nb])).T();
+
+    // Get maximum nonzero count of any column
+    casadi_int max_nnz = 0;
+    for (casadi_int i=0;i<mem.map_Q.size2();++i) {
+      max_nnz = std::max(max_nnz, mem.map_Q.colind(i+1)-mem.map_Q.colind(i));
+    }
+
+    // ind/val size needs to cover max nonzero count
+    mem.indval_size = std::max(nx_, max_nnz);
+
+    // Collect the indices for the P target area
+    mem.map_P.resize(mem.r[nb], -1);
+    for (casadi_int i=0;i<nb;++i) {
+      for (casadi_int k=P_.colind(mem.r[i+1]-1); k<P_.colind(mem.r[i+1]); ++k) {
+        casadi_int r = P_.row(k);
+        mem.map_P[r] = k;
+      }
+    }
+
+    // ind/val size needs to cover blocksize
+    for (casadi_int i=0;i<nb;++i)
+      mem.indval_size = std::max(mem.indval_size, mem.r[i+1]-mem.r[i]);
+
+    // Get the transpose and mapping
+    mem.AT = A_.transpose(mem.A_mapping);
+  }
+
 } // namespace casadi
