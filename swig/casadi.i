@@ -322,12 +322,12 @@ def DM_from_csc(m, check_only=True):
 %feature("customdoc:proto:constructor:style_group", MNAME "($in)");
 
 %feature("customdoc:protoline", "    $proto");
-%feature("customdoc:protoline:style_overview", "  $proto\n    $brief");
+%feature("customdoc:protoline:style_overview", "  $proto");
 %feature("customdoc:protoline:nobrief:style_overview", "  $proto");
 
-%feature("customdoc:protoline:style_group", "> $proto");
+%feature("customdoc:protoline:style_group", "  $proto");
 
-%feature("customdoc:group", "$group------------------------------------------------------------------------\n$main\n");
+%feature("customdoc:group", "\n.......\n\n::\n\n$group\n$main\n\n.............\n\n");
 
 // append works for strings
 
@@ -2251,6 +2251,8 @@ namespace std {
 %casadi_template(LL LL "DM" LR LR, PREC_DMVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
 %casadi_template(LDICT("DM"), PREC_DM, std::map<std::string, casadi::Matrix<double> >)
 %casadi_typemaps("IM", PREC_IM, casadi::Matrix<casadi_int>)
+// Without CASADI_INT_TYPE, you get SwigValueWrapper
+// With it, docstrings are screwed
 %casadi_template(LL "IM" LR, PREC_IMVector, std::vector< casadi::Matrix<CASADI_INT_TYPE> >)
 %casadi_template(LL LL "IM" LR LR, PREC_IMVectorVector, std::vector<std::vector< casadi::Matrix<CASADI_INT_TYPE> > >)
 %casadi_typemaps("GenericType", PREC_GENERICTYPE, casadi::GenericType)
@@ -3068,12 +3070,12 @@ DECL M casadi_hessian(const M& ex, const M& arg, M& OUTPUT1) {
   return hessian(ex, arg, OUTPUT1);
 }
 
-DECL void casadi_quadratic_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3) {
-  quadratic_coeff(ex, arg, OUTPUT1, OUTPUT2, OUTPUT3);
+DECL void casadi_quadratic_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3, bool check=false) {
+  quadratic_coeff(ex, arg, OUTPUT1, OUTPUT2, OUTPUT3, check);
 }
 
-DECL void casadi_linear_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2) {
-  linear_coeff(ex, arg, OUTPUT1, OUTPUT2);
+DECL void casadi_linear_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2, bool check=false) {
+  linear_coeff(ex, arg, OUTPUT1, OUTPUT2, check);
 }
 
 DECL casadi_int casadi_n_nodes(const M& A) {

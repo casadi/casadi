@@ -185,9 +185,9 @@ namespace casadi {
     static bool is_linear(const MatType &expr, const MatType &var);
     static bool is_quadratic(const MatType &expr, const MatType &var);
     static void quadratic_coeff(const MatType &expr, const MatType &var,
-        MatType& A, MatType& b, MatType& c);
+        MatType& A, MatType& b, MatType& c, bool check);
     static void linear_coeff(const MatType &expr, const MatType &var,
-        MatType& A, MatType& b);
+        MatType& A, MatType& b, bool check);
     /** @}  */
     /// \endcond
 
@@ -685,19 +685,25 @@ namespace casadi {
     * 1/2*x' A x + b' x + c
     *
     * e = 0.5*bilin(A,x,x)+dot(b,x)+c
+    *
+    * \param check[in] When true (default), A is checked to be independent of x.
+    *                  Provided to deal with false positive dependency checks.
     */
     inline friend void quadratic_coeff(const MatType &expr, const MatType &var,
-        MatType& A, MatType& b, MatType& c) {
-      MatType::quadratic_coeff(expr, var, A, b, c);
+        MatType& A, MatType& b, MatType& c, bool check=true) {
+      MatType::quadratic_coeff(expr, var, A, b, c, check);
     }
 
     /** \brief Recognizes linear form in vector expression
     *
     * A x + b
+    *
+    * \param check[in] When true (default)m, A is checked to be independent of x.
+    *                  Provided to deal with false positive dependency checks.
     */
     inline friend void linear_coeff(const MatType &expr, const MatType &var,
-        MatType& A, MatType& b) {
-      MatType::linear_coeff(expr, var, A, b);
+        MatType& A, MatType& b, bool check=true) {
+      MatType::linear_coeff(expr, var, A, b, check);
     }
 
     /** Count number of nodes */
@@ -1262,25 +1268,26 @@ namespace casadi {
 
   template<typename MatType>
   bool GenericMatrix<MatType>::is_quadratic(const MatType &expr, const MatType &var) {
-    return is_linear(jacobian(expr, var), var);
+    return is_linear(gradient(expr, var), var);
   }
 
   template<typename MatType>
   void GenericMatrix<MatType>::quadratic_coeff(const MatType &expr, const MatType &var,
-          MatType& A, MatType& b, MatType& c) {
+          MatType& A, MatType& b, MatType& c, bool check) {
     casadi_assert(expr.is_scalar(), "'quadratic_coeff' only defined for scalar expressions.");
     A = hessian(expr, var);
-    casadi_assert(!depends_on(A, var), "'quadratic_coeff' called on non-quadratic expression.");
-    //auto res = substitute(std::vector<MatType>{jacobian(expr, var).T(), expr}, {var}, {0});
     b = substitute(jacobian(expr, var), var, 0).T();
+    if (check)
+      casadi_assert(!depends_on(A, var), "'quadratic_coeff' called on non-quadratic expression.");
     c = substitute(expr, var, 0);
   }
 
   template<typename MatType>
   void GenericMatrix<MatType>::linear_coeff(const MatType &expr, const MatType &var,
-          MatType& A, MatType& b) {
+          MatType& A, MatType& b, bool check) {
     casadi_assert(expr.is_vector(), "'linear_coeff' only defined for vector expressions.");
-    casadi_assert(is_linear(expr, var), "'linear_coeff' called on non-linear expression.");
+    if (check)
+      casadi_assert(is_linear(expr, var), "'linear_coeff' called on non-linear expression.");
     A = substitute(jacobian(expr, var), var, 0);
     b = vec(substitute(expr, var, 0));
   }
