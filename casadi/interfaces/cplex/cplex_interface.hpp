@@ -81,6 +81,9 @@ namespace casadi {
     std::vector<CPXDIM> socp_qind, socp_lind, socp_row;
     std::vector<double> socp_qval, socp_lbound, socp_lval, socp_lbx;
 
+    std::vector<CPXDIM> linind, quadrow, quadcol;
+
+    std::vector<double> quadval;
 
     int return_status;
     bool success;

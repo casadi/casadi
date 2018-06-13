@@ -267,6 +267,10 @@ namespace casadi {
     m->a_row.resize(A_.nnz());
     m->h_colind.resize(H_.size2()+1);
     m->h_row.resize(H_.nnz());
+    m->linind.resize(F_.nnz());
+    m->quadrow.resize(max_nnz_w_);
+    m->quadcol.resize(max_nnz_w_);
+    m->quadval.resize(max_nnz_w_);
 
     const SDPToSOCPMem& sm = sdp_to_socp_mem_;
 
@@ -278,6 +282,7 @@ namespace casadi {
     m->socp_row.resize(sm.map_Q.nnz());
     m->socp_lbx.resize(sm.r.back());
 
+    copy_vector(F_.row(), m->linind);
     copy_vector(A_.colind(), m->a_colind);
     copy_vector(A_.row(), m->a_row);
     copy_vector(H_.colind(), m->h_colind);
@@ -356,6 +361,10 @@ namespace casadi {
     casadi_copy(arg[CONIC_X0], nx_, x);
     double* lam_x=w; w += nx_;
     casadi_copy(arg[CONIC_LAM_X0], nx_, lam_x);
+
+    const double *q_w=arg[CONIC_W],
+                  *q_f=arg[CONIC_F],
+                  *q_r=arg[CONIC_R];
 
     // Temporaries
     double* lam_a=w; w += na_;
@@ -480,6 +489,39 @@ namespace casadi {
     // =================
     // END SOCP BLOCK
     // =================
+
+    // Loop over quadratic constraints
+    for (int i=0;i<nq_;++i) {
+      casadi_int F_start = F_.colind()[i];
+      casadi_int F_stop = F_.colind()[i+1];
+
+      casadi_int numlnz = F_stop-F_start;
+
+
+      const Sparsity& W = W_[i];
+      const casadi_int* colind = W.colind();
+      const casadi_int* row = W.row();
+
+      CPXDIM* qrow = get_ptr(m->quadrow);
+      CPXDIM* qcol = get_ptr(m->quadcol);
+      double* qval = get_ptr(m->quadval);
+
+      for (casadi_int c=0;c<W.size2();++c) {
+        for (casadi_int k=colind[c];k<colind[c+1];++k) {
+          qrow[k] = row[k];
+          qcol[k] = c;
+          qval[k] = 0.5*q_w[k];
+        }
+      }
+      q_w += W.nnz();
+
+      // Set quadratic constraints
+      if (CPXXaddqconstr(m->env, m->lp, numlnz, W.nnz(), -q_r[i], 'L',
+        get_ptr(m->linind)+F_start, q_f+F_start,
+        qrow, qcol, qval, nullptr)) {
+          casadi_error("CPXXaddqconstr failed");
+        }
+    }
 
     if (dump_to_file_) {
       CPXXwriteprob(m->env, m->lp, dump_filename_.c_str(), "LP");

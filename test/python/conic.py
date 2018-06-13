@@ -49,7 +49,7 @@ if has_conic("qpoases"):
   conics.append(("qpoases",{},{"quadratic": True, "dual": True, "soc": False, "qc": False}))
 
 if has_conic("cplex"):
-  conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True, "qc": False}))
+  conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True, "qc": True}))
 
 # No solution for licensing on travis
 
