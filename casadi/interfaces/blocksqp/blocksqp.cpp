@@ -105,6 +105,9 @@ namespace casadi {
       {"warmstart",
        {OT_BOOL,
         "Use warmstarting"}},
+      {"qp_init",
+       {OT_BOOL,
+        "Use warmstarting"}},
       {"max_it_qp",
        {OT_INT,
         "Maximum number of QP iterations per SQP iteration"}},
@@ -212,7 +215,16 @@ namespace casadi {
         "Lower bound on objective function [-inf]"}},
       {"obj_up",
        {OT_DOUBLE,
-        "Upper bound on objective function [inf]"}}
+        "Upper bound on objective function [inf]"}},
+      {"rho",
+       {OT_DOUBLE,
+        "Feasibility restoration phase parameter"}},
+      {"zeta",
+       {OT_DOUBLE,
+        "Feasibility restoration phase parameter"}},
+      {"print_maxit_reached",
+       {OT_BOOL,
+        "Print error when maximum number of SQP iterations reached"}}
      }
   };
 
@@ -273,6 +285,10 @@ namespace casadi {
     eta_ = 1.0e-4;
     obj_lo_ = -inf;
     obj_up_ = inf;
+    rho_ = 1.0e3;
+    zeta_ = 1.0e-3;
+    print_maxit_reached_ = true;
+    qp_init_ = true;
 
     // Read user options
     for (auto&& op : opts) {
@@ -310,6 +326,8 @@ namespace casadi {
         max_iter_ = op.second;
       } else if (op.first=="warmstart") {
         warmstart_ = op.second;
+      } else if (op.first=="qp_init") {
+        qp_init_ = op.second;
       } else if (op.first=="max_it_qp") {
         max_it_qp_ = op.second;
       } else if (op.first=="block_hess") {
@@ -382,6 +400,12 @@ namespace casadi {
         obj_lo_ = op.second;
       } else if (op.first=="obj_up") {
         obj_up_ = op.second;
+      } else if (op.first=="rho") {
+        rho_ = op.second;
+      } else if (op.first=="zeta") {
+        zeta_ = op.second;
+      } else if (op.first=="print_maxit_reached") {
+        print_maxit_reached_ = op.second;
       }
     }
 
@@ -399,6 +423,46 @@ namespace casadi {
              "Using BFGS updates instead.\n");
       hess_update_ = 2;
       hess_scaling_ = fallback_scaling_;
+    }
+
+    // Setup feasibility restoration phase
+    if(restore_feas_) {
+      // get orignal nlp
+      Function nlp = oracle_;
+      vector<MX> resv;
+      vector<MX> argv = nlp.mx_in();
+
+      // build fesibility restoration phase nlp
+      MX p = MX::sym("p",nlp.size1_in("x"));
+      MX s = MX::sym("s",nlp.size1_out("g"));
+
+      MX d = fmin(1.0,1.0/abs(p)) * (argv.at(0) - p);
+      MX f_rp = 0.5 * rho_ * dot(s,s) + zeta_/2.0 * dot(d,d);
+      MX g_rp = nlp(argv).at(1) - s;
+
+      MXDict nlp_rp = {{"x", MX::vertcat({argv.at(0),s})},
+	               {"p", MX::vertcat({argv.at(1),p})},
+                       {"f", f_rp},
+                       {"g", g_rp}};
+
+      // Set options for the SQP method for the restoration problem
+      Dict solver_options;
+      solver_options["globalization"] = true;
+      solver_options["which_second_derv"] = 0;
+      solver_options["restore_feas"] = false;
+      solver_options["hess_update"] = 2;
+      solver_options["hess_lim_mem"] = 1;
+      solver_options["hess_scaling"] = 2;
+      solver_options["opttol"] = opttol_;
+      solver_options["nlinfeastol"] = nlinfeastol_;
+      solver_options["max_iter"] = 1;
+      solver_options["print_time"] = false;
+      solver_options["print_header"] = false;
+      solver_options["print_iteration"] = false;
+      solver_options["print_maxit_reached"] = false;
+
+      // Create and initialize solver for the restoration problem
+      rp_solver_ = nlpsol("rpsolver", "blocksqp", nlp_rp, solver_options);
     }
 
     // Setup NLP functions
@@ -454,6 +518,10 @@ namespace casadi {
       nnz_H_ += dim_[i]*dim_[i];
     }
 
+    create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+                    {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+    exact_hess_lag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
+
     if (verbose_) casadi_message(str(nblocks_) + " blocks of max size " + str(max_size) + ".");
 
     // Allocate a QP solver
@@ -492,6 +560,7 @@ namespace casadi {
     alloc_res(nblocks_*n_hess, true);
     alloc_w(n_hess*nnz_H_, true);
     alloc_iw(nnz_H_ + (nx_+1) + nx_, true); // hessIndRow
+    alloc_w(exact_hess_lag_sp_.nnz(), true); // exact_hess_lag
   }
 
   int Blocksqp::init_mem(void* mem) const {
@@ -504,6 +573,7 @@ namespace casadi {
       m->qpoases_mem->linsol_plugin = linsol_plugin_;
     }
 
+    m->qp = nullptr;
     m->colind.resize(Asp_.size2()+1);
     m->row.resize(Asp_.nnz());
     return 0;
@@ -557,6 +627,8 @@ namespace casadi {
     } else {
       m->hess2 = nullptr;
     }
+
+    m->exact_hess_lag = w; w += exact_hess_lag_sp_.nnz();
   }
 
   int Blocksqp::solve(void* mem) const {
@@ -602,21 +674,28 @@ namespace casadi {
     reset_sqp(m);
 
     // Free existing memory, if any
-    if (m->qp) delete m->qp;
-    m->qp = nullptr;
-    if (schur_) {
-      m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
-                                          m->qpoases_mem,
-                                          QpoasesInterface::qpoases_init,
-                                          QpoasesInterface::qpoases_sfact,
-                                          QpoasesInterface::qpoases_nfact,
-                                          QpoasesInterface::qpoases_solve);
-    } else {
-      m->qp = new qpOASES::SQProblem(nx_, ng_);
+    if (qp_init_) {
+      if (m->qp) delete m->qp;
+      m->qp = nullptr;
+    }
+    if (!m->qp) {
+      if (schur_) {
+        m->qp = new qpOASES::SQProblemSchur(nx_, ng_, qpOASES::HST_UNKNOWN, 50,
+                                            m->qpoases_mem,
+                                            QpoasesInterface::qpoases_init,
+                                            QpoasesInterface::qpoases_sfact,
+                                            QpoasesInterface::qpoases_nfact,
+                                            QpoasesInterface::qpoases_solve);
+      } else {
+        m->qp = new qpOASES::SQProblem(nx_, ng_);
+      }
     }
 
     // Print header and information about the algorithmic parameters
     if (print_header_) printInfo(m);
+
+    // Statistics
+    for (auto&& s : m->fstats) s.second.reset();
 
     // Open output files
     initStats(m);
@@ -637,8 +716,9 @@ namespace casadi {
     ret = run(m, max_iter_, warmstart_);
 
     m->success = ret==0;
+    m->ret_ = ret;
 
-    if (ret==1) print("***WARNING: Maximum number of iterations reached\n");
+    if (ret==1 && print_maxit_reached_) print("***WARNING: Maximum number of iterations reached\n");
 
     // Get optimal cost
     m->f = m->obj;
@@ -838,7 +918,7 @@ namespace casadi {
       } else if (hess_update_ < 4 && hess_lim_mem_) {
         calcHessianUpdateLimitedMemory(m, hess_update_, hess_scaling_);
       } else if (hess_update_ == 4) {
-        casadi_error("Not implemented");
+        calcHessianUpdateExact(m);
       }
 
       // If limited memory updates  are used, set pointers deltaXi and
@@ -1342,8 +1422,194 @@ namespace casadi {
     // No Feasibility restoration phase
     if (!restore_feas_) return -1;
 
-    casadi_error("not implemented");
-    return 0;
+    m->nRestPhaseCalls++;
+
+    casadi_int ret, info;
+    casadi_int maxRestIt = 100;
+    casadi_int warmStart;
+    double cNormTrial, objTrial, lStpNorm;
+
+
+    // Create Input for the minimum norm NLP
+    DMDict solver_in;
+
+    // The reference point is the starting value for the restoration phase
+    vector<double> in_x0(m->x,m->x+nx_);
+
+    // Initialize slack variables such that the constraints are feasible
+    for(casadi_int i=0; i<ng_; i++) {
+      if(m->gk[i] <= m->lbg[i])
+        in_x0.push_back(m->gk[i] - m->lbg[i]);
+      else if(m->gk[i] > m->ubg[i])
+        in_x0.push_back(m->gk[i] - m->ubg[i]);
+      else
+        in_x0.push_back(0.0);
+    }
+
+    // Add current iterate xk to parameter p
+    vector<double> in_p(m->p,m->p+np_);
+    vector<double> in_p2(m->x,m->x+nx_);
+    in_p.insert(in_p.end(), in_p2.begin(), in_p2.end());
+
+    // Set bounds for variables
+    vector<double> in_lbx(m->lbx,m->lbx+nx_);
+    vector<double> in_ubx(m->ubx,m->ubx+nx_);
+    for(casadi_int i=0; i<ng_; i++) {
+      in_lbx.push_back(-inf);
+      in_ubx.push_back(inf);
+    }
+
+    // Set bounds for constraints
+    vector<double> in_lbg(m->lbg,m->lbg+ng_);
+    vector<double> in_ubg(m->ubg,m->ubg+ng_);
+
+    solver_in["x0"] = in_x0;
+    solver_in["p"] = in_p;
+    solver_in["lbx"] = in_lbx;
+    solver_in["ubx"] = in_ubx;
+    solver_in["lbg"] = in_lbg;
+    solver_in["ubg"] = in_ubg;
+
+      /*
+
+        Consider the following simple call:
+        auto solver_out = rp_solver_(solver_in);
+
+        This call in fact allocates memory,
+        calls a memory-less eval(),
+        and clears up the memory again.
+
+        Since we want to access the memory later on,
+        we need to unravel the simple call into its parts,
+        and avoid the memory cleanup
+
+      */
+
+    // perform first iteration for the minimum norm NLP
+
+    // Get the number of inputs and outputs
+    int n_in = rp_solver_.n_in();
+    int n_out = rp_solver_.n_out();
+
+    // Get default inputs
+    vector<DM> arg_v(n_in);
+    for (casadi_int i=0; i<arg_v.size(); i++)
+      arg_v[i] = DM::repmat(rp_solver_.default_in(i), rp_solver_.size1_in(i), 1);
+
+    // Assign provided inputs
+    for (auto&& e : solver_in) arg_v.at(rp_solver_.index_in(e.first)) = e.second;
+
+    // Check sparsities
+    for (casadi_int i=0; i<arg_v.size(); i++)
+      casadi_assert_dev(arg_v[i].sparsity()==rp_solver_.sparsity_in(i));
+
+    // Allocate results
+    std::vector<DM> res(n_out);
+    for (casadi_int i=0; i<n_out; i++) {
+      if (res[i].sparsity()!=rp_solver_.sparsity_out(i))
+        res[i] = DM::zeros(rp_solver_.sparsity_out(i));
+    }
+
+    // Allocate temporary memory if needed
+    std::vector<casadi_int> iw_tmp(rp_solver_.sz_iw());
+    std::vector<double> w_tmp(rp_solver_.sz_w());
+
+    // Get pointers to input arguments
+    std::vector<const double*> argp(rp_solver_.sz_arg());
+    for (casadi_int i=0; i<n_in; ++i) argp[i] = get_ptr(arg_v[i]);
+
+    // Get pointers to output arguments
+    std::vector<double*> resp(rp_solver_.sz_res());
+    for (casadi_int i=0; i<n_out; i++) resp[i] = get_ptr(res[i]);
+
+    void* mem2 = rp_solver_.memory(0);
+
+    // perform The m
+    rp_solver_->eval(get_ptr(argp), get_ptr(resp), get_ptr(iw_tmp), get_ptr(w_tmp), mem2);
+
+    // Get BlocksqpMemory and Blocksqp from restoration phase
+    auto m2 = static_cast<BlocksqpMemory*>(mem2);
+    const Blocksqp* bp = static_cast<const Blocksqp*>(rp_solver_.get());
+    ret = m2->ret_;
+
+    warmStart = 1;
+    for(casadi_int it=0; it<maxRestIt; it++) {
+      // One iteration for minimum norm NLP
+      if(it > 0)
+        ret = bp->run(m2,1,warmStart);
+
+      // If restMethod yields error, stop restoration phase
+      if(ret == -1)
+        break;
+
+      // Get new xi from the restoration phase
+      for(casadi_int i=0; i<nx_; i++)
+        m->trial_xk[i] = m2->x[i];
+
+      // Compute objective at trial point
+      info = evaluate(m, m->trial_xk, &objTrial, m->gk);
+      m->nFunCalls++;
+      cNormTrial = lInfConstraintNorm(m, m->trial_xk, m->gk);
+      if( info != 0 || objTrial < obj_lo_ || objTrial > obj_up_ || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
+        continue;
+
+      // Is this iterate acceptable for the filter?
+      if(!pairInFilter(m, cNormTrial, objTrial)) {
+        // success
+        print("Found a point acceptable for the filter.\n");
+        ret = 0;
+        break;
+      }
+
+      // If minimum norm NLP has converged, declare local infeasibility
+        if(m2->tol < opttol_ && m2->cNormS < nlinfeastol_) {
+          ret = 1;
+          break;
+        }
+    }
+
+    // Success or locally infeasible
+    if(ret == 0 || ret == 1) {
+        // Store the infinity norm of the multiplier step
+        m->lambdaStepNorm = 0.0;
+        // Compute restoration step
+        for(casadi_int k=0; k<nx_; k++) {
+            m->dxk[k] = m->x[k];
+
+            m->x[k] = m->trial_xk[k];
+
+            // Store lInf norm of dual step
+            if((lStpNorm = fabs(m2->lam_xk[k] - m->lam_xk[k])) > m->lambdaStepNorm)
+                m->lambdaStepNorm = lStpNorm;
+            m->lam_xk[k] = m2->lam_xk[k];
+            m->lam_qp[k] = m2->lam_qp[k];
+
+            m->dxk[k] -= m->x[k];
+        }
+        for(casadi_int k=0; k<ng_; k++) {
+            // skip the dual variables for the slack variables in the restoration problem
+            if((lStpNorm = fabs(m2->lam_gk[k] - m->lam_gk[k])) > m->lambdaStepNorm)
+                m->lambdaStepNorm = lStpNorm;
+            m->lam_gk[k] = m2->lam_gk[k];
+            m->lam_qp[k] = m2->lam_qp[nx_+ng_+k];
+        }
+        m->alpha = 1.0;
+        m->nSOCS = 0;
+
+        // reset reduced step counter
+        m->reducedStepCount = 0;
+
+        // reset Hessian and limited memory information
+        resetHessian(m);
+    }
+
+    if(ret == 1) {
+        if(print_iteration_) printProgress(m);
+        updateStats(m);
+        print("The problem seems to be locally infeasible. Infeasibilities minimized.\n");
+    }
+
+    return ret;
   }
 
 
@@ -1811,6 +2077,42 @@ namespace casadi {
 
 
   void Blocksqp::
+  calcHessianUpdateExact(BlocksqpMemory* m) const {
+    // compute exact hessian
+    (void)evaluate(m, m->exact_hess_lag);
+
+    // assign exact hessian to blocks
+    const casadi_int* col = exact_hess_lag_sp_.colind();
+    const casadi_int* row = exact_hess_lag_sp_.row();
+    casadi_int s,dim;
+
+    for(casadi_int k=0; k<nblocks_; k++) {
+      s = blocks_[k];
+      dim = dim_[k];
+      for(casadi_int i=0; i<dim; i++)
+        m->hess[k][i + i*dim] = 0.0;  // Set diagonal to 0 (may have been 1 because of CalcInitialHessian)
+      for(casadi_int j=0; j<dim; j++) {
+        for(casadi_int i=col[j+s]; i<col[j+1+s]; i++) {
+          m->hess[k][row[i]-row[col[s]] + j*dim] = m->exact_hess_lag[i];
+          if(row[i]-row[col[s]] < j)
+            m->hess[k][j + (row[i]-row[col[s]])*dim] = m->exact_hess_lag[i];
+        }
+      }
+    }
+
+    // Prepare to compute fallback update as well
+    m->hess = m->hess2;
+    if(fallback_update_ == 2 && !hess_lim_mem_)
+        calcHessianUpdate(m, fallback_update_, fallback_scaling_);
+    else if (fallback_update_ == 0)
+        calcInitialHessian(m);  // Set fallback as Identity
+
+    // Reset pointer
+    m->hess = m->hess1;
+  }
+
+
+  void Blocksqp::
   calcBFGS(BlocksqpMemory* m, const double* gamma,
     const double* delta, casadi_int b) const {
     casadi_int dim = dim_[b];
@@ -1987,7 +2289,7 @@ namespace casadi {
     bool matricesChanged) const {
     casadi_int maxQP, l;
     if (globalization_ &&
-        hess_update_ == 1 &&
+        (hess_update_ == 1 || hess_update_ == 4) &&
         matricesChanged &&
         m->itCount > 1) {
         maxQP = max_conv_qp_ + 1;
@@ -2480,6 +2782,22 @@ namespace casadi {
     m->res[0] = f; // f
     m->res[1] = g; // g
     calc_function(m, "nlp_fg");
+    return 0;
+  }
+
+  casadi_int Blocksqp::
+  evaluate(BlocksqpMemory* m,
+           double *exact_hess_lag) const {
+    double ones[nx_];
+    for(casadi_int i=0; i<nx_; ++i) ones[i] = 1.0;
+    double minus_lam_gk[ng_];
+    for(casadi_int i=0; i<ng_; ++i) minus_lam_gk[i] = -m->lam_gk[i]; // Langrange function in blocksqp is L = f - lambdaT * g, whereas + in casadi
+    m->arg[0] = m->x; // x
+    m->arg[1] = m->p; // p
+    m->arg[2] = ones; // lam:f
+    m->arg[3] = minus_lam_gk; // lam:g
+    m->res[0] = exact_hess_lag; // hess:gamma:x:x
+    calc_function(m, "nlp_hess_l");
     return 0;
   }
 
