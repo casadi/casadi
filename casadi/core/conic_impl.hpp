@@ -119,7 +119,8 @@ namespace casadi {
     std::vector<bool> discrete_;
 
     /// Problem structure
-    Sparsity H_, A_, Q_, P_;
+    Sparsity H_, A_, Q_, P_, F_;
+    std::vector<Sparsity> W_;
 
     /// Number of decision variables
     casadi_int nx_;

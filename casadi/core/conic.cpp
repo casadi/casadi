@@ -77,6 +77,9 @@ namespace casadi {
     case CONIC_A:      return "a";
     case CONIC_Q:      return "q";
     case CONIC_P:      return "p";
+    case CONIC_W:      return "w";
+    case CONIC_F:      return "f";
+    case CONIC_R:      return "r";
     case CONIC_LBA:    return "lba";
     case CONIC_UBA:    return "uba";
     case CONIC_LBX:    return "lbx";
@@ -111,11 +114,8 @@ namespace casadi {
   template<typename M>
   Function qpsol_nlp(const std::string& name, const std::string& solver,
                      const std::map<std::string, M>& qp, const Dict& opts) {
-    // We have: minimize    f(x) = 1/2 * x' H x + c'x
-    //          subject to  lbx <= x <= ubx
-    //                      lbg <= g(x) = A x + b <= ubg
-    //                      h(x) >=0 (psd)
-    M x, p, f, g, h;
+
+    M x, p, f, g, h, q;
     for (auto&& i : qp) {
       if (i.first=="x") {
         x = i.second;
@@ -127,6 +127,8 @@ namespace casadi {
         g = i.second;
       } else if (i.first=="h") {
         h = i.second;
+      } else if (i.first=="q") {
+        q = i.second;
       } else {
         casadi_error("No such field: " + i.first);
       }
@@ -134,6 +136,7 @@ namespace casadi {
 
     if (f.is_empty()) f = 0;
     if (g.is_empty()) g = M(0, 1);
+    if (q.is_empty()) q = M(0, 1);
 
     // Dimension checks
     casadi_assert(g.is_dense() && g.is_vector(),
@@ -147,6 +150,11 @@ namespace casadi {
 
     casadi_assert(h.is_square(),
       "Expected a symmetric matrix 'h', but got " + h.dim() + ".");
+
+    casadi_assert(x.is_dense() && q.is_vector(),
+      "Expected a dense vector 'q', but got " + q.dim() + ".");
+
+    if (q.is_row()) q = q.T();
 
     if (g.is_empty(true)) g = M(0, 1); // workaround
 
@@ -171,8 +179,18 @@ namespace casadi {
     // Identify the linear term in the psd constraints
     M Q = M::jacobian(h, x);
 
+    // Get quadratic coefficients for q(x)
+    std::vector<M> qs = vertsplit(q, 1);
+    std::vector<M> Ws(qs.size()), Fs(qs.size()), rs(qs.size());
+    for (int i=0;i<qs.size();++i)
+      quadratic_coeff(qs[i], x, Ws[i], Fs[i], rs[i], false);
+
+    M W = horzcat(Ws);
+    M F = horzcat(Fs);
+    M r = vertcat(rs);
+
     // Create a function for calculating the required matrices vectors
-    Function prob(name + "_qp", {x, p}, {H, c, A, b, Q, P});
+    Function prob(name + "_qp", {x, p}, {H, c, A, b, Q, P, W, F, r});
 
     // Make sure that the problem is sound
     casadi_assert(!prob.has_free(), "Cannot create '" + prob.name() + "' "
@@ -181,7 +199,8 @@ namespace casadi {
     // Create the QP solver
     Function conic_f = conic(name + "_qpsol", solver,
                              {{"h", H.sparsity()}, {"a", A.sparsity()},
-                              {"p", P.sparsity()}, {"q", Q.sparsity()}}, opts);
+                              {"p", P.sparsity()}, {"q", Q.sparsity()},
+                              {"w", W.sparsity()}, {"f", F.sparsity()}}, opts);
 
     // Create an MXFunction with the right signature
     vector<MX> ret_in(NLPSOL_NUM_IN);
@@ -208,6 +227,9 @@ namespace casadi {
     w[CONIC_A] = v.at(2);
     w[CONIC_Q] = v.at(4);
     w[CONIC_P] = v.at(5);
+    w[CONIC_W] = v.at(6);
+    w[CONIC_F] = v.at(7);
+    w[CONIC_R] = v.at(8);
     w[CONIC_LBX] = ret_in[NLPSOL_LBX];
     w[CONIC_UBX] = ret_in[NLPSOL_UBX];
     w[CONIC_LBA] = ret_in[NLPSOL_LBG] - v.at(3);
@@ -215,6 +237,7 @@ namespace casadi {
     w[CONIC_X0] = ret_in[NLPSOL_X0];
     w[CONIC_LAM_X0] = ret_in[NLPSOL_LAM_X0];
     w[CONIC_LAM_A0] = ret_in[NLPSOL_LAM_G0];
+
     w = conic_f(w);
 
     // Get expressions for the solution
@@ -243,6 +266,8 @@ namespace casadi {
   Conic::Conic(const std::string& name, const std::map<std::string, Sparsity> &st)
     : FunctionInternal(name) {
 
+    Sparsity W;
+
     P_ = Sparsity(0, 0);
     for (auto i=st.begin(); i!=st.end(); ++i) {
       if (i->first=="a") {
@@ -253,6 +278,10 @@ namespace casadi {
         Q_ = i->second;
       } else if (i->first=="p") {
         P_ = i->second;
+      } else if (i->first=="w") {
+        W = i->second;
+      } else if (i->first=="f") {
+        F_ = i->second;
       } else {
         casadi_error("Unrecognized field in QP structure: " + str(i->first));
       }
@@ -291,12 +320,12 @@ namespace casadi {
     } else {
       casadi_assert(Q_.size2()==nx_,
         "Got incompatible dimensions.\n"
-        "Q: " + Q_.dim() +
+        "Q: " + Q_.dim() + ". " +
         "We need the product Qx to exist.");
       np_ = sqrt(Q_.size1());
       casadi_assert(np_*np_==Q_.size1(),
         "Got incompatible dimensions.\n"
-        "Q: " + Q_.dim() +
+        "Q: " + Q_.dim() + ". " +
         "We need Q.size1() to have an integer square root.");
 
       Sparsity qsum = reshape(sum2(Q_), np_, np_);
@@ -310,13 +339,37 @@ namespace casadi {
 
     casadi_assert(P_.is_symmetric(),
       "Got incompatible dimensions.\n"
-      "P: " + P_.dim() +
+      "P: " + P_.dim() + ". " +
       "We need P square & symmetric.");
 
     casadi_assert(P_.size1()==np_,
       "Got incompatible dimensions.\n"
-      "P: " + P_.dim() +
+      "P: " + P_.dim() + ". " +
       "We need P " + str(np_) + "-by-" + str(np_) + ".");
+
+    if (W.is_null() || W.is_empty(true)) W = Sparsity(nx_, 0);
+    if (F_.is_null() || F_.is_empty(true)) F_ = Sparsity(nx_, 0);
+
+    nq_ = F_.size2();
+
+    casadi_assert(F_.size1()==nx_,
+        "Got incompatible dimensions.\n"
+        "F: " + F_.dim() + ". " +
+        "We need F " + str(nx_) + "-by-*.");
+
+    max_nnz_w_ = 0;
+
+    W_ = horzsplit(W, nx_);
+    for (const auto& s : W_) {
+      casadi_assert(s.is_symmetric(),
+        "W must be symmetric.");
+      casadi_assert(s.size1()==nx_ && s.size2()==nx_,
+        "Got incompatible dimensions.\n"
+        "W: " + s.dim() + ". " +
+        "We need W " + str(nx_) + "-by-" + str(nx_) + ".");
+
+      max_nnz_w_ = std::max(max_nnz_w_, s.nnz());
+    }
 
     print_time_ = false;
   }
@@ -333,6 +386,12 @@ namespace casadi {
       return Q_;
     case CONIC_P:
       return P_;
+    case CONIC_W:
+      return horzcat(W_);
+    case CONIC_F:
+      return F_;
+    case CONIC_R:
+      return Sparsity::dense(F_.size2(), 1);
     case CONIC_LBA:
     case CONIC_UBA:
     case CONIC_LAM_A0:

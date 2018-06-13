@@ -35,36 +35,35 @@ if has_nlpsol("ipopt"):
                    "jac_d_constant":"yes",
                    "hessian_constant":"yes",
                    "tol":1e-12}
-  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False}))
+  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False, "qc": False}))
 
 if has_nlpsol("worhp"):
   worhp_options = {"TolOpti":1e-13}
-  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True, "dual": False, "soc": False}))
+  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True, "dual": False, "soc": False, "qc": False}))
 
 
 if has_conic("ooqp"):
-  conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False}))
+  conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False, "qc": False}))
 
 if has_conic("qpoases"):
-  conics.append(("qpoases",{},{"quadratic": True, "dual": True, "soc": False}))
+  conics.append(("qpoases",{},{"quadratic": True, "dual": True, "soc": False, "qc": False}))
 
 if has_conic("cplex"):
-  conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True}))
-
+  conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True, "qc": False}))
 
 # No solution for licensing on travis
 
-#if has_conic("gurobi"):
-#  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True}))
+if has_conic("gurobi"):
+  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True, "qc": True}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
 
 if has_conic("clp"):
-  conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False}))
+  conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "qc": False}))
 
 if has_conic("qrqp"):
-  conics.append(("qrqp",dict(max_iter=20),{"quadratic": True, "dual": True, "soc": False}))
+  conics.append(("qrqp",dict(max_iter=20),{"quadratic": True, "dual": True, "soc": False, "qc": False}))
 
 print(conics)
 
@@ -970,6 +969,30 @@ class ConicTests(casadiTestCase):
       self.checkarray(res["x"],DM([-5.0147928622,-5.766930599,-8.52180472]),conic,digits=4)
 
       self.assertTrue(solver.stats()["success"])
+
+
+  def test_QC(self):
+
+    x = SX.sym("x",2)
+
+    q1 = 0.5*bilin(DM([[7,0.1],[0.1,4]]),x,x) + dot(DM([2,3]),x) - 3
+    q2 = 0.5*bilin(sparsify(DM([[9.2,0],[0,20]])),x,x) + dot(sparsify(DM([0,-1])),x)
+
+    for q in [q1,q2,vertcat(q1,q2)]:
+
+      for conic, qp_options, aux_options in conics:
+        if not aux_options["qc"]: continue
+
+
+        solver = casadi.qpsol("msyolver",conic,{"f":dot(DM([1,2]),x),"x":x,"q": q},qp_options)
+
+        res = solver()["x"]
+
+        solver = nlpsol("mysolver","ipopt",{"f":dot(DM([1,2]),x),"x":x,"g": q})
+        ref =  solver(ubg=0)["x"]
+
+        self.checkarray(res,ref,conic,digits=5)
+
 
 if __name__ == '__main__':
     unittest.main()

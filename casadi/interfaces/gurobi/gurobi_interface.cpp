@@ -107,8 +107,13 @@ namespace casadi {
 
     // Temporary memory
     alloc_w(sdp_to_socp_mem_.indval_size, true); // val
+    alloc_w(nx_, true); // lval
+    alloc_w(max_nnz_w_, true); // qval
     alloc_iw(sdp_to_socp_mem_.indval_size, true); // ind
     alloc_iw(nx_, true); // ind2
+    alloc_iw(nx_, true); // lind
+    alloc_iw(max_nnz_w_, true); // qrow
+    alloc_iw(max_nnz_w_, true); // qcol
   }
 
   int GurobiInterface::init_mem(void* mem) const {
@@ -185,7 +190,10 @@ namespace casadi {
       *lbx=arg[CONIC_LBX],
       *ubx=arg[CONIC_UBX],
       *p=arg[CONIC_P],
-      *q=arg[CONIC_Q];
+      *q=arg[CONIC_Q],
+      *wv=arg[CONIC_W],
+      *f=arg[CONIC_F],
+      *r=arg[CONIC_R];
       //*x0=arg[CONIC_X0],
       //*lam_x0=arg[CONIC_LAM_X0];
 
@@ -197,8 +205,14 @@ namespace casadi {
 
     // Temporary memory
     double *val=w; w+=sm.indval_size;
+    double *lval=w; w+=nx_;
+    double *qval=w; w+=max_nnz_w_;
+
     int *ind=reinterpret_cast<int*>(iw); iw+=sm.indval_size;
     int *ind2=reinterpret_cast<int*>(iw); iw+=nx_;
+    int *lind=reinterpret_cast<int*>(iw); iw+=nx_;
+    int *qrow=reinterpret_cast<int*>(iw); iw+=max_nnz_w_;
+    int *qcol=reinterpret_cast<int*>(iw); iw+=max_nnz_w_;
 
     // Greate an empty model
     GRBmodel *model = nullptr;
@@ -359,6 +373,34 @@ namespace casadi {
           block_size, ind, ind, val,
           GRB_LESS_EQUAL, 0, nullptr);
         casadi_assert(!flag, GRBgeterrormsg(m->env));
+      }
+
+      // Loop over quadratic constraints
+      for (int i=0;i<nq_;++i) {
+        casadi_int F_start = F_.colind()[i];
+        casadi_int F_stop = F_.colind()[i+1];
+
+        int numlnz = F_stop-F_start;
+        std::copy(F_.row()+F_start, F_.row()+F_stop, lind);
+        std::copy(f+F_start, f+F_stop, lval);
+
+        const Sparsity& W = W_[i];
+        const casadi_int* colind = W.colind();
+        const casadi_int* row = W.row();
+
+        for (casadi_int c=0;c<W.size2();++c) {
+          for (casadi_int k=colind[c];k<colind[c+1];++k) {
+            qrow[k] = row[k];
+            qcol[k] = c;
+            qval[k] = 0.5*wv[k];
+          }
+        }
+        wv += W.nnz();
+
+        // Set quadratic constraints
+        flag = GRBaddqconstr(model, numlnz, lind, lval,
+            W.nnz(), qrow, qcol, qval,
+            GRB_LESS_EQUAL, -r[i], nullptr);
       }
 
       flag = 0;

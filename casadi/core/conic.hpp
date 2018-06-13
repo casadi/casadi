@@ -42,14 +42,17 @@ namespace casadi {
       LBA <= A x <= UBA
       LBX <= x   <= UBX
 
-      resize(Q x, np, np) + P >= 0 (psd)
+      resize(Q x, nq, nq) + P >= 0 (psd)
+
+
+      1/2 x' W  x +  F'x  + r  <= 0 (quadratic constraints)
 
       with :
       H sparse (n x n) positive definite
       g dense  (n x 1)
       A sparse (nc x n)
-      Q sparse symmetric (np^2 x n)
-      P sparse symmetric (np x nq)
+      Q sparse symmetric (nq^2 x n)
+      P sparse symmetric (nq x nq)
 
       n: number of decision variables (x)
       nc: number of constraints (A)
@@ -94,6 +97,19 @@ namespace casadi {
   ///@{
   CASADI_EXPORT Function conic(const std::string& name, const std::string& solver,
                                const SpDict& qp, const Dict& opts=Dict());
+
+  /** High-level interface for conic problems
+   * 
+    \verbatim
+      We have: minimize    f(x) = 1/2 * x' H x + c'x
+               subject to  lbx <= x <= ubx
+                            lbg <= g(x) = A x + b <= ubg
+                            h(x) >=0 (psd)    -- h square symm, linear in x
+                            q(x) <=0          -- q vector, semidefinite quadratic in x
+
+      \endverbatim
+   * 
+  */
   CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
                                const SXDict& qp, const Dict& opts=Dict());
   CASADI_EXPORT Function qpsol(const std::string& name, const std::string& solver,
@@ -168,10 +184,13 @@ enum ConicInput {
   CONIC_LAM_X0,
   /// dense
   CONIC_LAM_A0,
-  /// The matrix Q: sparse symmetric, (np^2 x n)
+  /// The matrix Q: sparse symmetric, (nq^2 x n)
   CONIC_Q,
-  /// The matrix P: sparse symmetric, (np x np)
+  /// The matrix P: sparse symmetric, (nq x nq)
   CONIC_P,
+  CONIC_W,
+  CONIC_F,
+  CONIC_R,
   CONIC_NUM_IN};
 
 /// Output arguments of an QP Solver
