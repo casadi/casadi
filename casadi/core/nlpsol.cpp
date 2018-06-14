@@ -247,10 +247,7 @@ namespace casadi {
 
   Options Nlpsol::options_
   = {{&OracleFunction::options_},
-     {{"expand",
-       {OT_BOOL,
-        "Replace MX with SX expressions in problem formulation [false]"}},
-      {"iteration_callback",
+     {{"iteration_callback",
        {OT_FUNCTION,
         "A function that will be called at each iteration with the solver as input. "
         "Check documentation of Callback."}},
@@ -311,14 +308,9 @@ namespace casadi {
     // Call the initialization method of the base class
     OracleFunction::init(opts);
 
-    // Default options
-    bool expand = false;
-
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="expand") {
-        expand = op.second;
-      } else if (op.first=="iteration_callback") {
+      if (op.first=="iteration_callback") {
         fcallback_ = op.second;
       } else if (op.first=="iteration_callback_step") {
         callback_step_ = op.second;
@@ -354,9 +346,6 @@ namespace casadi {
       calc_lam_x_ = true;
       calc_lam_p_ = true;
     }
-
-    // Replace MX oracle with SX oracle?
-    if (expand) oracle_ = oracle_.expand();
 
     // Get dimensions
     nx_ = nnz_out(NLPSOL_X);

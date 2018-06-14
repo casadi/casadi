@@ -42,7 +42,10 @@ namespace casadi {
 
   Options OracleFunction::options_
   = {{&FunctionInternal::options_},
-     {{"monitor",
+     {{"expand",
+       {OT_BOOL,
+        "Replace MX with SX expressions in problem formulation [false]"}},
+      {"monitor",
        {OT_STRINGVECTOR,
         "Set of user problem functions to be monitored"}},
       {"common_options",
@@ -59,9 +62,14 @@ namespace casadi {
 
     FunctionInternal::init(opts);
 
+    // Default options
+    bool expand = false;
+
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="common_options") {
+      if (op.first=="expand") {
+        expand = op.second;
+      } else if (op.first=="common_options") {
         common_options_ = op.second;
       } else if (op.first=="specific_options") {
         specific_options_ = op.second;
@@ -75,6 +83,10 @@ namespace casadi {
         monitor_ = op.second;
       }
     }
+
+    // Replace MX oracle with SX oracle?
+    if (expand) oracle_ = oracle_.expand();
+
   }
 
   void OracleFunction::finalize() {
