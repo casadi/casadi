@@ -697,6 +697,37 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::ClpInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>clp</td><td>OT_DICT</td><td>Options to be passed to CLP. A first set of options can be found in ClpParameters.hpp. eg. 'PrimalTolerance'. There are other options in additions. 'AutomaticScaling' (bool) is recognised. 'initial_solve' (default off) activates the use of Clp's initialSolve. 'initial_solve_options' takes a dictionary with following keys (see ClpSolve.hpp):  SolveType (string), PresolveType (string),  NumberPasses, SpecialOptions (intvectorvector), IndependentOptions (intvectorvector).</td><td>casadi::ClpInterface</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+</table>
+*/
+/// \endcond
+/** \addtogroup plugin_Conic_clp
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th></tr>
+<tr><td>clp</td><td>OT_DICT</td><td>Options to be passed to CLP. A first set of options can be found in ClpParameters.hpp. eg. 'PrimalTolerance'. There are other options in additions. 'AutomaticScaling' (bool) is recognised. 'initial_solve' (default off) activates the use of Clp's initialSolve. 'initial_solve_options' takes a dictionary with following keys (see ClpSolve.hpp):  SolveType (string), PresolveType (string),  NumberPasses, SpecialOptions (intvectorvector), IndependentOptions (intvectorvector).</td></tr>
+</table>
+*/
+/** \addtogroup general_ClpInterface
+\n
+\par
+<a name='options'></a><table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>clp</td><td>OT_DICT</td><td>Options to be passed to CLP. A first set of options can be found in ClpParameters.hpp. eg. 'PrimalTolerance'. There are other options in additions. 'AutomaticScaling' (bool) is recognised. 'initial_solve' (default off) activates the use of Clp's initialSolve. 'initial_solve_options' takes a dictionary with following keys (see ClpSolve.hpp):  SolveType (string), PresolveType (string),  NumberPasses, SpecialOptions (intvectorvector), IndependentOptions (intvectorvector).</td><td>casadi::ClpInterface</td></tr>
+<tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+</table>
+*/
+/// \cond INTERNAL
 /** \class casadi::Collocation
 \n
 \par
