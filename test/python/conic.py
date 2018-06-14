@@ -906,6 +906,8 @@ class ConicTests(casadiTestCase):
     for conic, qp_options, aux_options in conics:
       if not aux_options["soc"]: continue
 
+      qp_options = dict(qp_options)
+      qp_options["expand"] = True
 
       #  min  2 x + y
       #
@@ -982,6 +984,9 @@ class ConicTests(casadiTestCase):
 
       for conic, qp_options, aux_options in conics:
         if not aux_options["qc"]: continue
+
+        qp_options = dict(qp_options)
+        qp_options["expand"] = True
 
 
         solver = casadi.qpsol("msyolver",conic,{"f":dot(DM([1,2]),x),"x":x,"q": q},qp_options)

@@ -114,6 +114,28 @@ namespace casadi {
   template<typename M>
   Function qpsol_nlp(const std::string& name, const std::string& solver,
                      const std::map<std::string, M>& qp, const Dict& opts) {
+    // We have: minimize    f(x) = 1/2 * x' H x + c'x
+    //          subject to  lbx <= x <= ubx
+    //                      lbg <= g(x) = A x + b <= ubg
+    //                      h(x) >=0 (psd)
+
+    // Extract 'expand' option
+    Dict opt = opts;
+    auto it = opt.find("expand");
+    bool expand = false;
+    if (it!=opt.end()) {
+      expand = it->second;
+      opt.erase(it);
+    }
+    if (expand && M::type_name()=="MX") {
+      Function f = Function("f", qp, {"x", "p"}, {"f", "g", "h", "q"});
+      std::vector<SX> arg = f.sx_in();
+      std::vector<SX> res = f(arg);
+      SXDict qp_mod;
+      for (casadi_int i=0;i<f.n_in();++i) qp_mod[f.name_in(i)] = arg[i];
+      for (casadi_int i=0;i<f.n_out();++i) qp_mod[f.name_out(i)] = res[i];
+      return qpsol_nlp(name, solver, qp_mod, opt);
+    }
 
     M x, p, f, g, h, q;
     for (auto&& i : qp) {
@@ -200,7 +222,7 @@ namespace casadi {
     Function conic_f = conic(name + "_qpsol", solver,
                              {{"h", H.sparsity()}, {"a", A.sparsity()},
                               {"p", P.sparsity()}, {"q", Q.sparsity()},
-                              {"w", W.sparsity()}, {"f", F.sparsity()}}, opts);
+                              {"w", W.sparsity()}, {"f", F.sparsity()}}, opt);
 
     // Create an MXFunction with the right signature
     vector<MX> ret_in(NLPSOL_NUM_IN);
