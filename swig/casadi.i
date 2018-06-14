@@ -3070,11 +3070,11 @@ DECL M casadi_hessian(const M& ex, const M& arg, M& OUTPUT1) {
   return hessian(ex, arg, OUTPUT1);
 }
 
-DECL void casadi_quadratic_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3, bool check=false) {
+DECL void casadi_quadratic_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3, bool check=true) {
   quadratic_coeff(ex, arg, OUTPUT1, OUTPUT2, OUTPUT3, check);
 }
 
-DECL void casadi_linear_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2, bool check=false) {
+DECL void casadi_linear_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2, bool check=true) {
   linear_coeff(ex, arg, OUTPUT1, OUTPUT2, check);
 }
 
