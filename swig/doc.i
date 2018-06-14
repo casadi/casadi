@@ -81,6 +81,13 @@ original
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::map(casadi_int n, const
+std::string &parallelization) const  "
+
+[INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size1_out(casadi_int ind)
 const  "
 
@@ -311,13 +318,6 @@ const  "
 ";
 
 %feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
-%feature("docstring")
 casadi::FunctionInternal::getJacSparsityHierarchicalSymm(casadi_int iind,
 casadi_int oind) const  "
 
@@ -400,17 +400,17 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::map(casadi_int n, const
-std::string &parallelization) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
 
-[INTERNAL]  Generate/retrieve cached serial map.
+[INTERNAL]  Serialize.
 
 ";
 
@@ -1166,8 +1166,7 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -1608,7 +1607,7 @@ casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -1753,13 +1752,6 @@ bool more) const  "
 buf_sz, const char *fmt,...) const  "
 
 [INTERNAL]  C-style formatted printing to string.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -3126,8 +3118,8 @@ const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -3192,6 +3184,13 @@ const  "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -3531,6 +3530,11 @@ DM > &arg) const  "
 
 %feature("docstring")  casadi::OracleFunction::monitored(const std::string
 &name) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::PluginInterface< Nlpsol
+>::serialize_plugin(Serializer &s) const "
 
 [INTERNAL] ";
 
@@ -4089,8 +4093,7 @@ Readable name of the internal class.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -4340,6 +4343,13 @@ Sparsities of function inputs and outputs.
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size_in(casadi_int ind)
 const  "
 
@@ -4405,13 +4415,6 @@ std::vector< std::vector< M >> &fseed, casadi_int npar) const  "
 std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
 
 %feature("docstring")  casadi::FunctionInternal::has_sprev() const  "
 
@@ -4783,8 +4786,8 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -6168,8 +6171,8 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -6201,6 +6204,13 @@ const  "
 casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 
 [INTERNAL]  Get the floating point output argument of an atomic operation.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -6548,13 +6558,6 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::definition() const  "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
@@ -6668,8 +6671,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -6937,8 +6939,7 @@ Generate code for the declarations of the C function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -7179,8 +7180,8 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -7797,13 +7798,6 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_max_in(casadi_int ind)
 const  "
 
@@ -7977,6 +7971,13 @@ iind, casadi_int oind, bool symmetric) const  "
 casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen decref for dependencies.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -8484,8 +8485,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -8663,8 +8664,7 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -8996,13 +8996,6 @@ bool more) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_default_in(casadi_int
 ind) const  "
 
@@ -9193,6 +9186,13 @@ elements.
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
 [INTERNAL]  Get required length of arg field.
@@ -9223,6 +9223,11 @@ const  "
 [INTERNAL]  Names of function input and outputs.
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Interpolant
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::which_depends(const
 std::string &s_in, const std::vector< std::string > &s_out, casadi_int
@@ -11514,8 +11519,8 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -12285,8 +12290,7 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -12496,13 +12500,6 @@ const  "
 ";
 
 %feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
-%feature("docstring")
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen incref for dependencies.
@@ -12661,6 +12658,13 @@ const std::string &fname) const  "
 bool persistent=false) "
 
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -13022,9 +13026,28 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::ClangCompiler::init(const Dict &opts)  "
+%feature("docstring")  casadi::ImporterInternal::can_have_meta() const  "
 
-[INTERNAL]  Initialize.
+[INTERNAL]  Can meta information be read?
+
+";
+
+%feature("docstring")  casadi::ImporterInternal::inlined(const std::string
+&symname) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ClangCompiler::get_function(const std::string
+&symname)  "
+
+[INTERNAL]  Get a function pointer for numerical evaluation.
+
+";
+
+%feature("docstring")  casadi::ImporterInternal::construct(const Dict &opts)
+"
+
+[INTERNAL]  Construct Prepares the function for evaluation.
 
 ";
 
@@ -13039,25 +13062,6 @@ std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
 bool more) const  "
 
 [INTERNAL]  Print.
-
-";
-
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
-
-[INTERNAL]  Get a weak reference to the object.
-
-";
-
-%feature("docstring")  casadi::ClangCompiler::get_options() const  "
-
-[INTERNAL]  Options.
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::has_meta(const std::string
-&cmd, casadi_int ind=-1) const  "
-
-[INTERNAL]  Does an entry exist?
 
 ";
 
@@ -13108,37 +13112,29 @@ Diagrams
 
 C++ includes: clang_compiler.hpp ";
 
-%feature("docstring")  casadi::ImporterInternal::to_text(const std::string
-&cmd, casadi_int ind=-1) const  "
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
 
-[INTERNAL]  Get entry as a text.
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::get_meta(const std::string
-&cmd, casadi_int ind=-1) const  "
-
-[INTERNAL]  Get entry as a text.
+[INTERNAL]  Get a weak reference to the object.
 
 ";
 
-%feature("docstring")  casadi::ImporterInternal::can_have_meta() const  "
+%feature("docstring") casadi::ClangCompiler::~ClangCompiler "
 
-[INTERNAL]  Can meta information be read?
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::construct(const Dict &opts)
-"
-
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  Destructor.
 
 ";
 
-%feature("docstring")  casadi::ImporterInternal::inlined(const std::string
-&symname) const  "
+%feature("docstring")  casadi::ClangCompiler::plugin_name() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get name of plugin.
+
+";
+
+%feature("docstring")  casadi::ClangCompiler::get_options() const  "
+
+[INTERNAL]  Options.
+
+";
 
 %feature("docstring")  casadi::ImporterInternal::read_meta(std::istream
 &file, casadi_int &offset) "
@@ -13147,9 +13143,29 @@ C++ includes: clang_compiler.hpp ";
 
 ";
 
+%feature("docstring")  casadi::ImporterInternal::to_text(const std::string
+&cmd, casadi_int ind=-1) const  "
+
+[INTERNAL]  Get entry as a text.
+
+";
+
 %feature("docstring")  casadi::ClangCompiler::class_name() const  "
 
 [INTERNAL]  Get type name.
+
+";
+
+%feature("docstring")  casadi::ImporterInternal::has_meta(const std::string
+&cmd, casadi_int ind=-1) const  "
+
+[INTERNAL]  Does an entry exist?
+
+";
+
+%feature("docstring")  casadi::ClangCompiler::init(const Dict &opts)  "
+
+[INTERNAL]  Initialize.
 
 ";
 
@@ -13160,28 +13176,21 @@ C++ includes: clang_compiler.hpp ";
 
 ";
 
-%feature("docstring")  casadi::ClangCompiler::get_function(const std::string
-&symname)  "
+%feature("docstring")  casadi::PluginInterface< ImporterInternal
+>::serialize_plugin(Serializer &s) const "
 
-[INTERNAL]  Get a function pointer for numerical evaluation.
+[INTERNAL] ";
 
-";
+%feature("docstring")  casadi::ImporterInternal::get_meta(const std::string
+&cmd, casadi_int ind=-1) const  "
 
-%feature("docstring") casadi::ClangCompiler::~ClangCompiler "
-
-[INTERNAL]  Destructor.
+[INTERNAL]  Get entry as a text.
 
 ";
 
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
 [INTERNAL]  Get the reference count.
-
-";
-
-%feature("docstring")  casadi::ClangCompiler::plugin_name() const  "
-
-[INTERNAL]  Get name of plugin.
 
 ";
 
@@ -13546,13 +13555,6 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::Collocation::setupFG()  "
 
 [INTERNAL]  Setup F and G.
@@ -13712,8 +13714,8 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -13948,6 +13950,11 @@ std::vector< M > &arg, casadi_int &npar) const  "
 [INTERNAL]  Can derivatives be calculated in any way?
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Integrator
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Integrator::sp_jac_dae() "
 
@@ -14387,7 +14394,14 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -14999,8 +15013,7 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -15026,6 +15039,11 @@ std::string &name, std::ostream &stream) const  "
 [INTERNAL]  Print all information there is to know about a certain option.
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Conic
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::sparsity_jac(casadi_int
 iind, casadi_int oind, bool compact, bool symmetric) const  "
@@ -15263,8 +15281,8 @@ std::vector< M > &res, casadi_int &npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -15341,13 +15359,6 @@ nadj) const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -15683,6 +15694,13 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 std::string &parallelization) const  "
 
 [INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -16941,6 +16959,16 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1DenseTranspose.xml
 
 
+// File: classcasadi_1_1DeSerializer.xml
+%feature("docstring") casadi::DeSerializer "
+
+Helper class for Serialization.
+
+Joris Gillis
+
+C++ includes: serializer.hpp ";
+
+
 // File: classcasadi_1_1Determinant.xml
 
 
@@ -16951,10 +16979,9 @@ Add an ordinary differential equation.
 
 
 // File: classcasadi_1_1DllLibrary.xml
-%feature("docstring")  casadi::ImporterInternal::construct(const Dict &opts)
-"
+%feature("docstring")  casadi::ImporterInternal::plugin_name() const  "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  Queery plugin name.
 
 ";
 
@@ -16963,6 +16990,45 @@ Add an ordinary differential equation.
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring")  casadi::DllLibrary::get_function(const std::string
+&symname)  "
+
+[INTERNAL]  Get a function pointer for numerical evaluation.
+
+";
+
+%feature("docstring")  casadi::ImporterInternal::get_options() const  "
+
+[INTERNAL]  Options.
+
+";
+
+%feature("docstring")  casadi::ImporterInternal::to_text(const std::string
+&cmd, casadi_int ind=-1) const  "
+
+[INTERNAL]  Get entry as a text.
+
+";
+
+%feature("docstring")  casadi::ImporterInternal::get_meta(const std::string
+&cmd, casadi_int ind=-1) const  "
+
+[INTERNAL]  Get entry as a text.
+
+";
+
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
 %feature("docstring")  casadi::ImporterInternal::disp(std::ostream &stream,
 bool more) const  "
 
@@ -16970,9 +17036,24 @@ bool more) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+%feature("docstring")  casadi::ImporterInternal::body(const std::string
+&symname) const  "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Get the function body, if inlined.
+
+";
+
+%feature("docstring")  casadi::ImporterInternal::has_function(const
+std::string &symname) const  "
+
+[INTERNAL]  Get a function pointer for numerical evaluation.
+
+";
+
+%feature("docstring")  casadi::ImporterInternal::construct(const Dict &opts)
+"
+
+[INTERNAL]  Construct Prepares the function for evaluation.
 
 ";
 
@@ -16998,62 +17079,10 @@ Diagrams
 
 C++ includes: importer_internal.hpp ";
 
-%feature("docstring")  casadi::DllLibrary::get_function(const std::string
-&symname)  "
-
-[INTERNAL]  Get a function pointer for numerical evaluation.
-
-";
-
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
-
-[INTERNAL]  Get a weak reference to the object.
-
-";
-
-%feature("docstring")  casadi::DllLibrary::can_have_meta() const  "
-
-[INTERNAL]  Can meta information be read?
-
-";
-
 %feature("docstring")  casadi::ImporterInternal::read_meta(std::istream
 &file, casadi_int &offset) "
 
 [INTERNAL]  Get meta information.
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::get_options() const  "
-
-[INTERNAL]  Options.
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::plugin_name() const  "
-
-[INTERNAL]  Queery plugin name.
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::to_text(const std::string
-&cmd, casadi_int ind=-1) const  "
-
-[INTERNAL]  Get entry as a text.
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::get_meta(const std::string
-&cmd, casadi_int ind=-1) const  "
-
-[INTERNAL]  Get entry as a text.
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::read_external(const
-std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
-
-[INTERNAL]  Get an external function declaration.
 
 ";
 
@@ -17073,10 +17102,21 @@ std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ImporterInternal::body(const std::string
-&symname) const  "
+%feature("docstring")  casadi::PluginInterface< ImporterInternal
+>::serialize_plugin(Serializer &s) const "
 
-[INTERNAL]  Get the function body, if inlined.
+[INTERNAL] ";
+
+%feature("docstring")  casadi::DllLibrary::can_have_meta() const  "
+
+[INTERNAL]  Can meta information be read?
+
+";
+
+%feature("docstring")  casadi::ImporterInternal::read_external(const
+std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
+
+[INTERNAL]  Get an external function declaration.
 
 ";
 
@@ -17084,13 +17124,6 @@ std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
 &symname) const  "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::ImporterInternal::has_function(const
-std::string &symname) const  "
-
-[INTERNAL]  Get a function pointer for numerical evaluation.
-
-";
 
 %feature("docstring")  casadi::ImporterInternal::has_meta(const std::string
 &cmd, casadi_int ind=-1) const  "
@@ -17521,6 +17554,11 @@ SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 
 ";
 
+%feature("docstring")  casadi::PluginInterface< Dple
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::print_options(std::ostream
 &stream) const  "
 
@@ -17838,6 +17876,13 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
 [INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -18329,8 +18374,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -18463,8 +18507,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -18474,13 +18518,6 @@ const  "
 std::vector< M > &arg, casadi_int &npar) const  "
 
 [INTERNAL]  Check if input arguments that needs to be replaced.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -18656,8 +18693,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -18736,10 +18772,10 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
-&stream) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
 
-[INTERNAL]  Print more.
+[INTERNAL]  Serialize.
 
 ";
 
@@ -19432,8 +19468,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -19740,10 +19776,10 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::FunctionInternal::disp_more(std::ostream
+&stream) const  "
 
-[INTERNAL]  Release a memory object.
+[INTERNAL]  Print more.
 
 ";
 
@@ -19796,10 +19832,10 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
+%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
+"
 
-[INTERNAL]  Serialize function header.
+[INTERNAL]  Release a memory object.
 
 ";
 
@@ -20015,6 +20051,11 @@ casadi_int > &order_out, const Dict &opts) const  "
 original
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Expm
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
 
@@ -20383,8 +20424,8 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -20726,13 +20767,6 @@ k) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_gen(const MXVector
 &arg, MXVector &res, casadi_int npar, bool always_inline, bool never_inline)
 const  "
@@ -21071,8 +21105,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -21189,6 +21222,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::info() const  "
+
+[INTERNAL]  Obtain information about function
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen(CodeGenerator &g,
 const std::string &fname) const  "
 
@@ -21228,9 +21267,10 @@ SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::info() const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
 
-[INTERNAL]  Obtain information about function
+[INTERNAL]  Serialize.
 
 ";
 
@@ -21426,13 +21466,6 @@ bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::print_option(const
 std::string &name, std::ostream &stream) const  "
 
@@ -21516,6 +21549,13 @@ Solve the system of equations and calculate derivatives.
 iind, casadi_int oind, bool symmetric) const  "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -22014,7 +22054,7 @@ CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -22074,6 +22114,11 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 %feature("docstring")  casadi::OracleFunction::calc_function(OracleMemory
 *m, const std::string &fcn, const double *const *arg=nullptr) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::PluginInterface< Rootfinder
+>::serialize_plugin(Serializer &s) const "
 
 [INTERNAL] ";
 
@@ -22574,8 +22619,8 @@ std::vector< M > &res, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -23112,6 +23157,13 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
 bool persistent=false) "
 
@@ -23187,8 +23239,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -23365,8 +23417,7 @@ ind) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -23726,13 +23777,6 @@ always_inline, bool never_inline) const  "
 %feature("docstring")  casadi::FunctionInternal::has_sprev() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -24316,6 +24360,11 @@ const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::PluginInterface< Integrator
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::get_max_in(casadi_int ind)
 const  "
 
@@ -24491,6 +24540,13 @@ elements.
 const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -24803,7 +24859,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -25163,8 +25219,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -25275,13 +25331,6 @@ const  "
 std::vector< M > &res, casadi_int &npar) const  "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -25698,8 +25747,8 @@ const  "
 
 
 // File: classcasadi_1_1ForwardDiff.xml
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -25907,6 +25956,13 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 %feature("docstring")  casadi::FunctionInternal::n_nodes() const  "
 
 [INTERNAL]  Number of nodes in the algorithm.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -26574,13 +26630,6 @@ const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::instruction_id(casadi_int
 k) const  "
 
@@ -26877,8 +26926,7 @@ casadi::FiniteDiff::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -29364,8 +29412,8 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -29754,13 +29802,6 @@ const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::instruction_id(casadi_int
 k) const  "
 
@@ -29875,8 +29916,7 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -30050,6 +30090,13 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 const  "
 
 [INTERNAL]  Generate code for the body of the C function.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -31120,13 +31167,20 @@ Check if the matrix is a column vector (i.e. size2()==1)
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::quadratic_coeff(const
-MatType &expr, const MatType &var, MatType &A, MatType &b, MatType &c) "
+MatType &expr, const MatType &var, MatType &A, MatType &b, MatType &c, bool
+check=true) "
 
 Recognizes quadratic form in scalar expression.
 
 1/2*x' A x + b' x + c
 
 e = 0.5*bilin(A,x,x)+dot(b,x)+c
+
+Parameters:
+-----------
+
+check[in]:  When true (default), A is checked to be independent of x.
+Provided to deal with false positive dependency checks.
 
 ";
 
@@ -31138,6 +31192,12 @@ Recognizes quadratic form in scalar expression.
 
 e = 0.5*bilin(A,x,x)+dot(b,x)+c
 
+Parameters:
+-----------
+
+check[in]:  When true (default), A is checked to be independent of x.
+Provided to deal with false positive dependency checks.
+
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::casadi_quadratic_coeff "
@@ -31147,6 +31207,12 @@ Recognizes quadratic form in scalar expression.
 1/2*x' A x + b' x + c
 
 e = 0.5*bilin(A,x,x)+dot(b,x)+c
+
+Parameters:
+-----------
+
+check[in]:  When true (default), A is checked to be independent of x.
+Provided to deal with false positive dependency checks.
 
 ";
 
@@ -31614,11 +31680,18 @@ Get the number of elements.
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::linear_coeff(const
-MatType &expr, const MatType &var, MatType &A, MatType &b) "
+MatType &expr, const MatType &var, MatType &A, MatType &b, bool check=true)
+"
 
 Recognizes linear form in vector expression.
 
 A x + b
+
+Parameters:
+-----------
+
+check[in]:  When true (default)m, A is checked to be independent of x.
+Provided to deal with false positive dependency checks.
 
 ";
 
@@ -31628,6 +31701,12 @@ Recognizes linear form in vector expression.
 
 A x + b
 
+Parameters:
+-----------
+
+check[in]:  When true (default)m, A is checked to be independent of x.
+Provided to deal with false positive dependency checks.
+
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::casadi_linear_coeff "
@@ -31635,6 +31714,12 @@ A x + b
 Recognizes linear form in vector expression.
 
 A x + b
+
+Parameters:
+-----------
+
+check[in]:  When true (default)m, A is checked to be independent of x.
+Provided to deal with false positive dependency checks.
 
 ";
 
@@ -33041,15 +33126,8 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -33108,7 +33186,7 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -33389,6 +33467,11 @@ order:  Only 1 (linear) and 2 (nonlinear) allowed
 tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Integrator
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::OracleFunction::oracle() const  "
 
@@ -33693,6 +33776,13 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 const  "
 
 [INTERNAL]  Get largest input value.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -34007,6 +34097,11 @@ std::vector< M > &arg, casadi_int &npar) const  "
 [INTERNAL]  Check if output arguments that needs to be replaced.
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Rootfinder
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::ImplicitToNlp::solve(void *mem) const  "
 
@@ -34342,6 +34437,13 @@ Diagrams
 
 C++ includes: implicit_to_nlp.hpp ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::Rootfinder::has_reverse(casadi_int nadj)
 const  "
 
@@ -34457,8 +34559,8 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -34969,7 +35071,7 @@ std::string &name) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -35036,13 +35138,6 @@ const  "
 casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen sparsities.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -35544,10 +35639,9 @@ std::vector< M > &arg, casadi_int &npar) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
 
-[INTERNAL]  Serialize function header.
+[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -35562,12 +35656,6 @@ const  "
 buf_sz, const char *fmt,...) const  "
 
 [INTERNAL]  C-style formatted printing to string.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
-
-[INTERNAL]  Get required length of arg field.
 
 ";
 
@@ -36039,6 +36127,13 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_default_in(casadi_int
 ind) const  "
 
@@ -36170,8 +36265,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -36197,6 +36292,11 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 [INTERNAL]  Set the work vectors.
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Integrator
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")
 casadi::FunctionInternal::instruction_output(casadi_int k) const  "
@@ -36632,7 +36732,7 @@ original
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -37129,6 +37229,13 @@ generated function.
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sx_out(casadi_int ind)
 const  "
 
@@ -37202,8 +37309,7 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -37481,8 +37587,8 @@ std::string &fname) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -37533,13 +37639,6 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -38412,6 +38511,11 @@ const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::PluginInterface< Interpolant
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::incache(const std::string
 &fname, Function &f) const  "
 
@@ -39186,8 +39290,8 @@ ind) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -39280,6 +39384,13 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 &fname) const  "
 
 [INTERNAL]  Code generate the function.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -39669,13 +39780,6 @@ k) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::call_forward(const
 std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
 std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
@@ -40044,8 +40148,7 @@ std::string > &onames, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -40152,6 +40255,13 @@ double *x, casadi_int nrhs, bool tr) const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::LinsolInternal::serialize(Serializer &s)
+const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::LapackLu::init(const Dict &opts)  "
 
 [INTERNAL]  Initialize the solver.
@@ -40239,7 +40349,7 @@ bool more) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::finalize(const Dict &opts) "
+%feature("docstring")  casadi::ProtoFunction::finalize() "
 
 [INTERNAL]  Finalize the object creation This function, which visits the
 class hierarchy in reverse order is run after init() has been completed.
@@ -40276,6 +40386,11 @@ class hierarchy in reverse order is run after init() has been completed.
 ";
 
 %feature("docstring")  casadi::LinsolInternal::nnz() const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::PluginInterface< LinsolInternal
+>::serialize_plugin(Serializer &s) const "
 
 [INTERNAL] ";
 
@@ -40638,7 +40753,7 @@ bool more) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::finalize(const Dict &opts) "
+%feature("docstring")  casadi::ProtoFunction::finalize() "
 
 [INTERNAL]  Finalize the object creation This function, which visits the
 class hierarchy in reverse order is run after init() has been completed.
@@ -40674,6 +40789,11 @@ class hierarchy in reverse order is run after init() has been completed.
 ";
 
 %feature("docstring")  casadi::LinsolInternal::nnz() const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::PluginInterface< LinsolInternal
+>::serialize_plugin(Serializer &s) const "
 
 [INTERNAL] ";
 
@@ -41015,6 +41135,13 @@ double *x, casadi_int nrhs, bool tr) const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::LinsolInternal::serialize(Serializer &s)
+const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring") casadi::LapackQr::~LapackQr "
 
 [INTERNAL] ";
@@ -41169,6 +41296,13 @@ std::vector< MX > &arg, const std::string &parallelization) "
 %feature("docstring")  casadi::FunctionInternal::mx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -41731,8 +41865,8 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -41834,13 +41968,6 @@ const  "
 %feature("docstring")  casadi::Interpolant::get_n_out()  "
 
 [INTERNAL]  Number of function inputs and outputs.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -42019,8 +42146,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -42207,6 +42333,11 @@ const  "
 [INTERNAL]  Symbolic expressions for the forward seeds.
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Interpolant
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::LinearInterpolant::get_options() const  "
 
@@ -42687,8 +42818,8 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -42922,6 +43053,13 @@ casadi::LinearInterpolantJac::LinearInterpolantJac(const std::string &name)
 "
 
 [INTERNAL]  Constructor.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -43368,13 +43506,6 @@ const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
 [INTERNAL]  Get required length of iw field.
@@ -43443,8 +43574,7 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -43945,6 +44075,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::LinsolInternal::serialize(Serializer &s)
+const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::LinsolLdl::class_name() const  "
 
 [INTERNAL]  Readable name of the internal class.
@@ -44042,7 +44179,7 @@ std::string &A, const std::string &x, casadi_int nrhs, bool tr) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::finalize(const Dict &opts) "
+%feature("docstring")  casadi::ProtoFunction::finalize() "
 
 [INTERNAL]  Finalize the object creation This function, which visits the
 class hierarchy in reverse order is run after init() has been completed.
@@ -44069,6 +44206,11 @@ const  "
 
 %feature("docstring")  casadi::LinsolLdl::solve(void *mem, const double *A,
 double *x, casadi_int nrhs, bool tr) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::PluginInterface< LinsolInternal
+>::serialize_plugin(Serializer &s) const "
 
 [INTERNAL] ";
 
@@ -44187,7 +44329,7 @@ buf_sz, const char *fmt,...) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::finalize(const Dict &opts) "
+%feature("docstring")  casadi::ProtoFunction::finalize() "
 
 [INTERNAL]  Finalize the object creation This function, which visits the
 class hierarchy in reverse order is run after init() has been completed.
@@ -44234,11 +44376,23 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
+%feature("docstring")  casadi::PluginInterface< LinsolInternal
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::LinsolInternal::linsol_eval_sx(const SXElem
 **arg, SXElem **res, casadi_int *iw, SXElem *w, void *mem, bool tr,
 casadi_int nrhs) const  "
 
 [INTERNAL]  Evaluate SX, possibly transposed.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::serialize(Serializer &s)
+const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -44399,9 +44553,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+%feature("docstring")  casadi::LinsolInternal::serialize(Serializer &s)
+const  "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Serialize.
 
 ";
 
@@ -44468,7 +44623,13 @@ casadi_int nrhs) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::finalize(const Dict &opts) "
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::finalize() "
 
 [INTERNAL]  Finalize the object creation This function, which visits the
 class hierarchy in reverse order is run after init() has been completed.
@@ -44481,6 +44642,11 @@ bool more) const  "
 [INTERNAL]  Display object.
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< LinsolInternal
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Lsqr "
 
@@ -44820,6 +44986,13 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::Map::serialize_function(Serializer &s) const
+"
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -45420,8 +45593,7 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -45684,13 +45856,6 @@ const  "
 ";
 
 %feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
-%feature("docstring")
 casadi::FunctionInternal::getJacSparsityGen(casadi_int iind, casadi_int
 oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 
@@ -45723,8 +45888,8 @@ std::string &fname) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -47130,6 +47295,12 @@ Functions called by friend functions defined here
 %feature("docstring")  casadi::GenericMatrixCommon::size1() const "
 
 Get the first dimension (i.e. number of rows)
+
+";
+
+%feature("docstring")  casadi::MatrixCommon::serialize() const  "
+
+Serialize.
 
 ";
 
@@ -49872,13 +50043,6 @@ classes.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::index_out(const std::string
 &name) const  "
 
@@ -50121,10 +50285,22 @@ DM > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::PluginInterface< Rootfinder
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::sz_work(size_t &sz_arg,
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 [INTERNAL]  Get number of temporary variables needed.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -50185,8 +50361,8 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -50236,7 +50412,7 @@ Solve the system of equations and calculate derivatives.
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -50582,7 +50758,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -51063,8 +51239,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -51310,6 +51486,13 @@ std::vector< M > &arg, casadi_int &npar) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
 &g) const  "
 
@@ -51480,13 +51663,6 @@ const  "
 %feature("docstring")  casadi::Nlpsol::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -51681,6 +51857,11 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
+%feature("docstring")  casadi::PluginInterface< Nlpsol
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::Nlpsol::init(const Dict &opts)  "
 
 [INTERNAL]  Initialize.
@@ -51806,6 +51987,13 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 
 ";
 
+%feature("docstring")  casadi::Map::serialize_function(Serializer &s) const
+"
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::Map::get_n_out()  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -51839,6 +52027,12 @@ std::vector< std::vector< M >> &fseed, casadi_int npar) const  "
 std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::has_free() const  "
+
+[INTERNAL]  Does the function have free variables.
+
+";
 
 %feature("docstring")  casadi::FunctionInternal::sz_work(size_t &sz_arg,
 size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
@@ -51883,11 +52077,9 @@ derivatives
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::fwdViaJac(casadi_int nfwd)
-const  "
+%feature("docstring")  casadi::OmpMap::parallelization() const  "
 
-[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
-multiplying.
+[INTERNAL]  Type of parallellization.
 
 ";
 
@@ -51957,12 +52149,10 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
-bool persistent=false) "
+%feature("docstring") casadi::OmpMap::OmpMap(const std::string &name, const
+Function &f, casadi_int n) "
 
-[INTERNAL]  Ensure work vectors long enough to evaluate function.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
 persistent=false) "
@@ -51981,6 +52171,12 @@ persistent=false) "
 bool persistent=false) "
 
 [INTERNAL]  Ensure required length of arg field.
+
+";
+
+%feature("docstring") casadi::OmpMap::~OmpMap "
+
+[INTERNAL]  Destructor.
 
 ";
 
@@ -52034,6 +52230,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::replace_res(const
+std::vector< M > &res, casadi_int npar) const  "
+
+[INTERNAL]  Replace 0-by-0 outputs.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::signature(const std::string
 &fname) const  "
 
@@ -52075,6 +52278,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
+bool persistent=false) "
+
+[INTERNAL]  Ensure work vectors long enough to evaluate function.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::generate_lifted(Function
 &vdef_fcn, Function &vinit_fcn) const  "
 
@@ -52082,8 +52292,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -52249,8 +52459,14 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::OmpMap::eval(const double **arg, double
+**res, casadi_int *iw, double *w, void *mem) const  "
+
+[INTERNAL]  Evaluate the function numerically.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -52356,9 +52572,9 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::free_mx() const  "
+%feature("docstring")  casadi::Map::get_n_in()  "
 
-[INTERNAL]  Get free variables ( MX)
+[INTERNAL]  Number of function inputs and outputs.
 
 ";
 
@@ -52382,6 +52598,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::OmpMap::codegen_body(CodeGenerator &g) const
+"
+
+[INTERNAL]  Generate code for the body of the C function.
+
+";
+
 %feature("docstring")  casadi::Map::has_sprev() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -52401,10 +52624,9 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::replace_res(const
-std::vector< M > &res, casadi_int npar) const  "
+%feature("docstring")  casadi::OmpMap::init(const Dict &opts)  "
 
-[INTERNAL]  Replace 0-by-0 outputs.
+[INTERNAL]  Initialize.
 
 ";
 
@@ -52605,9 +52827,11 @@ std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::has_free() const  "
+%feature("docstring")  casadi::FunctionInternal::fwdViaJac(casadi_int nfwd)
+const  "
 
-[INTERNAL]  Does the function have free variables.
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
 
 ";
 
@@ -52822,9 +53046,9 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::Map::get_n_in()  "
+%feature("docstring")  casadi::FunctionInternal::free_mx() const  "
 
-[INTERNAL]  Number of function inputs and outputs.
+[INTERNAL]  Get free variables ( MX)
 
 ";
 
@@ -52916,13 +53140,6 @@ buf_sz, const char *fmt,...) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
@@ -52939,6 +53156,12 @@ casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
 const  "
 
 [INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring")  casadi::OmpMap::class_name() const  "
+
+[INTERNAL]  Get type name.
 
 ";
 
@@ -54445,8 +54668,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -54606,13 +54829,6 @@ const  "
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]  Evaluate with symbolic matrices.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -54929,6 +55145,13 @@ const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
 [INTERNAL]  Weighting factor for chosing forward/reverse mode.
@@ -55088,7 +55311,7 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -56008,6 +56231,13 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::matching_res(const
 std::vector< M > &arg, casadi_int &npar) const  "
 
@@ -56044,13 +56274,6 @@ const  "
 casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 
 [INTERNAL]  Get the floating point output argument of an atomic operation.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -56869,6 +57092,11 @@ const std::map< std::string, Sparsity > &st) "
 
 ";
 
+%feature("docstring")  casadi::PluginInterface< Conic
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::get_max_in(casadi_int ind)
 const  "
 
@@ -56893,8 +57121,8 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -57119,8 +57347,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -57251,13 +57478,6 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -57504,6 +57724,11 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::PluginInterface< Conic
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
@@ -57642,6 +57867,13 @@ const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::check_res(const
 std::vector< M > &res, casadi_int &npar) const  "
 
@@ -57702,8 +57934,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -58342,8 +58574,7 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -58564,6 +58795,13 @@ SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -58862,8 +59100,8 @@ std::string &fname) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -59203,7 +59441,7 @@ std::vector< MX > &arg, const std::string &parallelization) "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -59243,13 +59481,6 @@ always_inline, bool never_inline) const  "
 nadj, const std::vector< MatType > &v) const  "
 
 [INTERNAL]  Symbolic expressions for the adjoint seeds.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -59312,6 +59543,11 @@ k) const  "
 [INTERNAL]  get MX expression associated with instruction
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Nlpsol
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::ad_weight() const  "
 
@@ -60474,8 +60710,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -60648,6 +60884,11 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::PluginInterface< Rootfinder
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
@@ -60794,7 +61035,7 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -61091,13 +61332,6 @@ std::vector< M > &arg, casadi_int &npar) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::ProtoFunction::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
@@ -61202,6 +61436,13 @@ casadi_int oind) const  "
 
 [INTERNAL]  A flavor of getJacSparsity that does hierarchical block
 structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -61482,7 +61723,7 @@ ind) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -61579,6 +61820,11 @@ nadj, const std::vector< MatType > &v) const  "
 [INTERNAL]  Symbolic expressions for the adjoint seeds.
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Integrator
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Integrator::setStopTime(IntegratorMemory
 *mem, double tf) const  "
@@ -61847,13 +62093,6 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 ";
 
 %feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
-%feature("docstring")
 casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 
 [INTERNAL]  Get the (integer) input arguments of an atomic operation.
@@ -61950,8 +62189,8 @@ iind, casadi_int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -62632,6 +62871,13 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::Integrator::get_reverse(casadi_int nadj,
 const std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
@@ -63116,7 +63362,7 @@ casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -63595,6 +63841,11 @@ const double *lam_p) const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::PluginInterface< Nlpsol
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::has_sprev() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -63724,8 +63975,8 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -63817,12 +64068,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::info() const  "
-
-[INTERNAL]  Obtain information about function
-
-";
-
 %feature("docstring")  casadi::OracleFunction::print_fstats(const
 OracleMemory *m) const  "
 
@@ -63860,9 +64105,15 @@ ind) const  "
 ";
 
 %feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
 
-[INTERNAL]  Serialize function header.
+[INTERNAL]  Serialize.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::info() const  "
+
+[INTERNAL]  Obtain information about function
 
 ";
 
@@ -64422,6 +64673,29 @@ du_inf, double reg, casadi_int ls_trials, bool ls_success) const  "
 [INTERNAL] ";
 
 
+// File: classcasadi_1_1Serializer.xml
+%feature("docstring") casadi::Serializer::Serializer(std::ostream &out,
+const Dict &opts=Dict()) "
+
+Constructor.
+
+";
+
+%feature("docstring") casadi::Serializer "
+
+Helper class for Serialization.
+
+Joris Gillis
+
+C++ includes: serializer.hpp ";
+
+%feature("docstring")  casadi::Serializer::add(const Function &f) "
+
+Add a function.
+
+";
+
+
 // File: classcasadi_1_1SetNonzeros.xml
 
 
@@ -64523,6 +64797,31 @@ std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring") casadi::ShellCompiler::~ShellCompiler "
+
+[INTERNAL]  Destructor.
+
+";
+
+%feature("docstring")  casadi::ImporterInternal::disp(std::ostream &stream,
+bool more) const  "
+
+[INTERNAL]  Print.
+
+";
+
+%feature("docstring")  casadi::ShellCompiler::plugin_name() const  "
+
+[INTERNAL]  Get name of plugin.
+
+";
+
 %feature("docstring")  casadi::ImporterInternal::construct(const Dict &opts)
 "
 
@@ -64537,21 +64836,9 @@ std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
 
 ";
 
-%feature("docstring")  casadi::ShellCompiler::class_name() const  "
-
-[INTERNAL]  Get type name.
-
-";
-
 %feature("docstring")  casadi::ShellCompiler::get_options() const  "
 
 [INTERNAL]  Options.
-
-";
-
-%feature("docstring") casadi::ShellCompiler::~ShellCompiler "
-
-[INTERNAL]  Destructor.
 
 ";
 
@@ -64565,6 +64852,18 @@ std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
 %feature("docstring")  casadi::ShellCompiler::init(const Dict &opts)  "
 
 [INTERNAL]  Initialize.
+
+";
+
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring")  casadi::ShellCompiler::class_name() const  "
+
+[INTERNAL]  Get type name.
 
 ";
 
@@ -64582,15 +64881,22 @@ std::string &symname) const  "
 
 ";
 
-%feature("docstring")  casadi::ImporterInternal::inlined(const std::string
+%feature("docstring")  casadi::ImporterInternal::body(const std::string
 &symname) const  "
+
+[INTERNAL]  Get the function body, if inlined.
+
+";
+
+%feature("docstring")  casadi::PluginInterface< ImporterInternal
+>::serialize_plugin(Serializer &s) const "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ImporterInternal::read_meta(std::istream
-&file, casadi_int &offset) "
+%feature("docstring")  casadi::ImporterInternal::has_meta(const std::string
+&cmd, casadi_int ind=-1) const  "
 
-[INTERNAL]  Get meta information.
+[INTERNAL]  Does an entry exist?
 
 ";
 
@@ -64713,23 +65019,10 @@ Diagrams
 
 C++ includes: shell_compiler.hpp ";
 
-%feature("docstring")  casadi::ImporterInternal::disp(std::ostream &stream,
-bool more) const  "
+%feature("docstring")  casadi::ImporterInternal::read_meta(std::istream
+&file, casadi_int &offset) "
 
-[INTERNAL]  Print.
-
-";
-
-%feature("docstring")  casadi::ImporterInternal::body(const std::string
-&symname) const  "
-
-[INTERNAL]  Get the function body, if inlined.
-
-";
-
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
-
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Get meta information.
 
 ";
 
@@ -64739,24 +65032,10 @@ bool more) const  "
 
 ";
 
-%feature("docstring")  casadi::ImporterInternal::has_meta(const std::string
-&cmd, casadi_int ind=-1) const  "
+%feature("docstring")  casadi::ImporterInternal::inlined(const std::string
+&symname) const  "
 
-[INTERNAL]  Does an entry exist?
-
-";
-
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
-
-[INTERNAL]  Get a weak reference to the object.
-
-";
-
-%feature("docstring")  casadi::ShellCompiler::plugin_name() const  "
-
-[INTERNAL]  Get name of plugin.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::ShellCompiler::ShellCompiler(const std::string
 &name) "
@@ -65390,13 +65669,6 @@ const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_eval_dm() const  "
 
 [INTERNAL]  Evaluate with DM matrices.
@@ -65529,12 +65801,17 @@ std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Dple
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")
 casadi::FunctionInternal::instruction_input(casadi_int k) const  "
@@ -65943,8 +66220,7 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -65990,6 +66266,13 @@ bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 [INTERNAL]  Set the (persistent) work vectors.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -66552,10 +66835,16 @@ casadi_int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -66594,13 +66883,6 @@ C++ includes: slicot_expm.hpp ";
 const  "
 
 [INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -67075,6 +67357,11 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::PluginInterface< Expm
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::FunctionInternal::replace_fseed(const
 std::vector< std::vector< M >> &fseed, casadi_int npar) const  "
 
@@ -67338,8 +67625,8 @@ const std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -68069,6 +68356,13 @@ std::string &fname) "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
 double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
@@ -68339,8 +68633,7 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -68513,8 +68806,8 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -68537,13 +68830,6 @@ const  "
 %feature("docstring")  casadi::FunctionInternal::get_free() const  "
 
 [INTERNAL]  Print free variables.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -70240,6 +70526,13 @@ const  "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::serialize_function(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::self() const  "
 
 [INTERNAL]  Get a public class instance.
@@ -70272,13 +70565,6 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 &g) const  "
 
 [INTERNAL]  Generate code for the function body.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
 
 ";
 
@@ -71019,8 +71305,8 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -71033,7 +71319,7 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::finalize(const Dict &opts)  "
+%feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
 
@@ -71235,6 +71521,11 @@ iind, casadi_int oind, bool symmetric) const  "
 [INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< Nlpsol
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::replace_aseed(const
 std::vector< std::vector< M >> &aseed, casadi_int npar) const  "
@@ -71998,8 +72289,7 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -72304,6 +72594,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::Switch::serialize_function(Serializer &s)
+const  "
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::getJacSparsityGen(casadi_int iind, casadi_int
 oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
@@ -72560,13 +72857,6 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_function() const  "
 
 [INTERNAL] ";
@@ -72696,8 +72986,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
@@ -72971,6 +73261,11 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 [INTERNAL]  Number of negative eigenvalues.
 
 ";
+
+%feature("docstring")  casadi::PluginInterface< LinsolInternal
+>::serialize_plugin(Serializer &s) const "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::SymbolicQr::class_name() const  "
 
@@ -73343,10 +73638,17 @@ bool more) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::finalize(const Dict &opts) "
+%feature("docstring")  casadi::ProtoFunction::finalize() "
 
 [INTERNAL]  Finalize the object creation This function, which visits the
 class hierarchy in reverse order is run after init() has been completed.
+
+";
+
+%feature("docstring")  casadi::LinsolInternal::serialize(Serializer &s)
+const  "
+
+[INTERNAL]  Serialize.
 
 ";
 
@@ -73432,17 +73734,16 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(std::ostream
-&stream) const  "
+%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
-bool more) const  "
+%feature("docstring")  casadi::ThreadMap::class_name() const  "
 
-[INTERNAL]  Display object.
+[INTERNAL]  Get type name.
 
 ";
 
@@ -73487,8 +73788,7 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize(const Dict &opts)
-"
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
 [INTERNAL]  Finalize the object creation.
 
@@ -73518,6 +73818,13 @@ const  "
 const  "
 
 [INTERNAL]  Save function to cache.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::disp(std::ostream &stream,
+bool more) const  "
+
+[INTERNAL]  Display object.
 
 ";
 
@@ -73555,12 +73862,10 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen_name(const
-CodeGenerator &g) const  "
+%feature("docstring") casadi::ThreadMap::ThreadMap(const std::string &name,
+const Function &f, casadi_int n) "
 
-[INTERNAL]  Get name in codegen.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
@@ -73675,13 +73980,6 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::serialize_header(std::ostream &stream) const  "
-
-[INTERNAL]  Serialize function header.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::alloc(const Function &f,
 bool persistent=false) "
 
@@ -73715,6 +74013,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ThreadMap::parallelization() const  "
+
+[INTERNAL]  Type of parallellization.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_gen(const MXVector
 &arg, MXVector &res, casadi_int npar, bool always_inline, bool never_inline)
 const  "
@@ -73738,12 +74042,9 @@ std::vector< M > &res, casadi_int &npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::slice(const std::string
-&name, const std::vector< casadi_int > &order_in, const std::vector<
-casadi_int > &order_out, const Dict &opts) const  "
+%feature("docstring")  casadi::Map::get_name_out(casadi_int i)  "
 
-[INTERNAL]  returns a new function with a selection of inputs/outputs of the
-original
+[INTERNAL]  Names of function input and outputs.
 
 ";
 
@@ -73815,9 +74116,9 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::Map::get_default_in(casadi_int ind) const  "
+%feature("docstring")  casadi::ThreadMap::init(const Dict &opts)  "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Initialize.
 
 ";
 
@@ -73827,11 +74128,17 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+%feature("docstring")  casadi::FunctionInternal::replace_aseed(const
+std::vector< std::vector< M >> &aseed, casadi_int npar) const  "
 
-[INTERNAL]  Can derivatives be calculated in any way?
+[INTERNAL]  Replace 0-by-0 reverse seeds.
 
 ";
+
+%feature("docstring")  casadi::FunctionInternal::replace_aseed(const
+std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
@@ -73993,6 +74300,13 @@ std::vector< M > &res, casadi_int npar) const  "
 
 ";
 
+%feature("docstring")  casadi::ThreadMap::eval(const double **arg, double
+**res, casadi_int *iw, double *w, void *mem) const  "
+
+[INTERNAL]  Evaluate the function numerically.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::instruction_MX(casadi_int
 k) const  "
 
@@ -74060,9 +74374,12 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::Map::get_name_out(casadi_int i)  "
+%feature("docstring")  casadi::FunctionInternal::slice(const std::string
+&name, const std::vector< casadi_int > &order_in, const std::vector<
+casadi_int > &order_out, const Dict &opts) const  "
 
-[INTERNAL]  Names of function input and outputs.
+[INTERNAL]  returns a new function with a selection of inputs/outputs of the
+original
 
 ";
 
@@ -74093,6 +74410,13 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
+%feature("docstring")  casadi::Map::serialize_function(Serializer &s) const
+"
+
+[INTERNAL]  Serialize.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::index_out(const std::string
 &name) const  "
 
@@ -74104,6 +74428,13 @@ std::string &fname, const Dict &opts) const  "
 &type, bool recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
+
+";
+
+%feature("docstring")  casadi::ThreadMap::codegen_body(CodeGenerator &g)
+const  "
+
+[INTERNAL]  Generate code for the body of the C function.
 
 ";
 
@@ -74272,16 +74603,29 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
+%feature("docstring")  casadi::FunctionInternal::getJacSparsity(casadi_int
+iind, casadi_int oind, bool symmetric) const  "
 
-[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
-propagation.
+[INTERNAL]  Generate the sparsity of a Jacobian block.
+
+";
+
+%feature("docstring") casadi::ThreadMap::~ThreadMap "
+
+[INTERNAL]  Destructor.
 
 ";
 
 %feature("docstring")  casadi::ProtoFunction::init_mem(void *mem) const  "
 
 [INTERNAL]  Initalize memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_name(const
+CodeGenerator &g) const  "
+
+[INTERNAL]  Get name in codegen.
 
 ";
 
@@ -74373,6 +74717,12 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 ";
 
+%feature("docstring")  casadi::Map::get_default_in(casadi_int ind) const  "
+
+[INTERNAL]  Get default input value.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::matching_arg(const
 std::vector< M > &arg, casadi_int &npar) const  "
 
@@ -74403,17 +74753,11 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::replace_aseed(const
-std::vector< std::vector< M >> &aseed, casadi_int npar) const  "
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
 
-[INTERNAL]  Replace 0-by-0 reverse seeds.
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
-
-%feature("docstring")  casadi::FunctionInternal::replace_aseed(const
-std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
-
-[INTERNAL] ";
 
 %feature("docstring")  casadi::FunctionInternal::mx_out(casadi_int ind)
 const  "
@@ -74585,10 +74929,10 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getJacSparsity(casadi_int
-iind, casadi_int oind, bool symmetric) const  "
+%feature("docstring")  casadi::FunctionInternal::sp_weight() const  "
 
-[INTERNAL]  Generate the sparsity of a Jacobian block.
+[INTERNAL]  Weighting factor for chosing forward/reverse mode, sparsity
+propagation.
 
 ";
 
@@ -76339,14 +76683,17 @@ Create a QP solver Solves the following strictly convex problem:
   LBA <= A x <= UBA
   LBX <= x   <= UBX
   
-  resize(Q x, np, np) + P >= 0 (psd)
+  resize(Q x, nq, nq) + P >= 0 (psd)
+  
+  
+  1/2 x' W  x +  F'x  + r  <= 0 (quadratic constraints)
   
   with :
   H sparse (n x n) positive definite
   g dense  (n x 1)
   A sparse (nc x n)
-  Q sparse symmetric (np^2 x n)
-  P sparse symmetric (np x nq)
+  Q sparse symmetric (nq^2 x n)
+  P sparse symmetric (nq x nq)
   
   n: number of decision variables (x)
   nc: number of constraints (A)
@@ -76606,7 +76953,7 @@ General information
 |                  |                 | debugging        |                  |
 +------------------+-----------------+------------------+------------------+
 
->Input scheme: casadi::ConicInput (CONIC_NUM_IN = 12)
+>Input scheme: casadi::ConicInput (CONIC_NUM_IN = 15)
 
 +--------------+--------+--------------------------------------------------+
 |  Full name   | Short  |                   Description                    |
@@ -76634,9 +76981,9 @@ General information
 +--------------+--------+--------------------------------------------------+
 | CONIC_LAM_A0 | lam_a0 | dense                                            |
 +--------------+--------+--------------------------------------------------+
-| CONIC_Q      | q      | The matrix Q: sparse symmetric, (np^2 x n)       |
+| CONIC_Q      | q      | The matrix Q: sparse symmetric, (nq^2 x n)       |
 +--------------+--------+--------------------------------------------------+
-| CONIC_P      | p      | The matrix P: sparse symmetric, (np x np)        |
+| CONIC_P      | p      | The matrix P: sparse symmetric, (nq x nq)        |
 +--------------+--------+--------------------------------------------------+
 
 >Output scheme: casadi::ConicOutput (CONIC_NUM_OUT = 4)
@@ -76692,9 +77039,23 @@ clp
 
 Interface to Clp solver for sparse Quadratic Programs
 
+>List of available options
+
++-----+---------+----------------------------------------------------------+
+| Id  |  Type   |                       Description                        |
++=====+=========+==========================================================+
+| clp | OT_DICT | Options to be passed to CLP. A first set of options can  |
+|     |         | be found in ClpParameters.hpp. eg. 'PrimalTolerance'.    |
+|     |         | There are other options in additions. 'AutomaticScaling' |
+|     |         | (bool) is recognised. 'initial_solve' (default off)      |
+|     |         | activates the use of Clp's initialSolve.                 |
+|     |         | 'initial_solve_options' takes a dictionary with          |
+|     |         | following keys (see ClpSolve.hpp): SolveType (string),   |
+|     |         | PresolveType (string), NumberPasses, SpecialOptions      |
+|     |         | (intvectorvector), IndependentOptions (intvectorvector). |
++-----+---------+----------------------------------------------------------+
+
 --------------------------------------------------------------------------------
-
-
 
 
 
@@ -78505,6 +78866,25 @@ Get NLP solver input scheme name by index.
 %feature("docstring")  casadi::conic_n_in() "
 
 Get the number of QP solver inputs.
+
+";
+
+%feature("docstring")  casadi::qpsol(const std::string &name, const
+std::string &solver, const SXDict &qp, const Dict &opts=Dict()) "
+
+High-level interface for conic problems
+
+
+
+::
+
+    We have: minimize    f(x) = 1/2 * x' H x + c'x
+             subject to  lbx <= x <= ubx
+                          lbg <= g(x) = A x + b <= ubg
+                          h(x) >=0 (psd)    -- h square symm, linear in x
+                          q(x) <=0          -- q vector, semidefinite quadratic in x
+
+
 
 ";
 
