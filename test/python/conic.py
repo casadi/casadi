@@ -49,7 +49,7 @@ if has_conic("qpoases"):
   conics.append(("qpoases",{},{"quadratic": True, "dual": True, "soc": False}))
 
 if has_conic("cplex"):
-  conics.append(("cplex",{},{"quadratic": True, "dual": True, "soc": False}))
+  conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True}))
 
 
 # No solution for licensing on travis
@@ -967,7 +967,7 @@ class ConicTests(casadiTestCase):
       solver = casadi.qpsol("msyolver",conic,{'h':h,'x': vertcat(x,y,z),"f": -2*x+1*y+5*z},qp_options)
       res = solver()
 
-      self.checkarray(res["x"],DM([-5.0147928622,-5.766930599,-8.52180472]),conic,digits=5)
+      self.checkarray(res["x"],DM([-5.0147928622,-5.766930599,-8.52180472]),conic,digits=4)
 
       self.assertTrue(solver.stats()["success"])
 

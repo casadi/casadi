@@ -124,6 +124,9 @@ namespace casadi {
       }
     }
 
+    // Initialize SDP to SOCP memory
+    sdp_to_socp_init(sdp_to_socp_mem_);
+
     // Allocate work vectors
     alloc_w(nx_, true); // g
     alloc_w(nx_, true); // lbx
@@ -265,10 +268,23 @@ namespace casadi {
     m->h_colind.resize(H_.size2()+1);
     m->h_row.resize(H_.nnz());
 
+    const SDPToSOCPMem& sm = sdp_to_socp_mem_;
+
+    m->socp_qind.resize(sm.indval_size);
+    m->socp_qval.resize(sm.indval_size);
+    m->socp_lbound.resize(sm.map_Q.size2());
+    m->socp_lval.resize(sm.map_Q.nnz());
+    m->socp_colind.resize(sm.map_Q.size2()+1);
+    m->socp_row.resize(sm.map_Q.nnz());
+    m->socp_lbx.resize(sm.r.back());
+
     copy_vector(A_.colind(), m->a_colind);
     copy_vector(A_.row(), m->a_row);
     copy_vector(H_.colind(), m->h_colind);
     copy_vector(H_.row(), m->h_row);
+
+    copy_vector(sm.map_Q.sparsity().colind(), m->socp_colind);
+    copy_vector(sm.map_Q.sparsity().row(), m->socp_row);
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
@@ -306,6 +322,7 @@ namespace casadi {
   int CplexInterface::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<CplexMemory*>(mem);
+    const SDPToSOCPMem& sm = sdp_to_socp_mem_;
 
     // Statistics
     for (auto&& s : m->fstats) s.second.reset();
@@ -395,6 +412,74 @@ namespace casadi {
         casadi_error("CPXXcopyquad failed");
       }
     }
+
+    // =================
+    // BEGIN SOCP BLOCK
+    // =================
+
+    // Prepare lower bounds for helper variables for SOCP
+    casadi_int j=0;
+    for (casadi_int i=0;i<sm.r.size()-1;++i) {
+      for (casadi_int k=0;k<sm.r[i+1]-sm.r[i]-1;++k) {
+        m->socp_lbx[j++] = -inf;
+      }
+      m->socp_lbx[j++] = 0;
+    }
+
+    // Add helper variables for SOCP
+    if (CPXXnewcols(m->env, m->lp, sm.r.back(), nullptr, get_ptr(m->socp_lbx), nullptr, nullptr, nullptr)) {
+      casadi_error("CPXXnewcols failed");
+    }
+
+    // SOCP helper constraints
+    const Sparsity& sp = sm.map_Q.sparsity();
+    const casadi_int* colind = sp.colind();
+    const casadi_int* row = sp.row();
+    const casadi_int* data = sm.map_Q.ptr();
+
+    const double* p = arg[CONIC_P];
+    const double* q = arg[CONIC_Q];
+
+    casadi_int numnz = 0;
+    // Loop over columns
+    for (casadi_int i=0; i<sp.size2(); ++i) {
+      m->socp_lbound[i] = sm.map_P[i]==-1 ? 0 : -p[sm.map_P[i]];
+      // Loop over rows
+      for (casadi_int k=colind[i]; k<colind[i+1]; ++k) {
+        casadi_int j = row[k];
+        m->socp_lval[numnz] = (q && j<nx_) ? q[data[k]] : -1;
+        numnz++;
+      }
+    }
+
+    // Adding SOCP helper constraints
+    if (CPXXaddrows(m->env, m->lp, 0, sp.size2(), sp.nnz(), get_ptr(m->socp_lbound), nullptr,
+                    get_ptr(m->socp_colind), get_ptr(m->socp_row), get_ptr(m->socp_lval),
+                    nullptr, nullptr)) {
+      casadi_error("CPXXaddrows failed");
+    }
+
+    // Loop over blocks
+    for (casadi_int i=0; i<sm.r.size()-1; ++i) {
+      casadi_int block_size = sm.r[i+1]-sm.r[i];
+
+      // Indicate x'x - y^2 <= 0
+      for (casadi_int j=0;j<block_size;++j) {
+        m->socp_qind[j] = nx_ + sm.r[i] + j;
+        m->socp_qval[j] = j<block_size-1 ? 1 : -1;
+      }
+
+      if (CPXXaddqconstr(m->env, m->lp, 0, block_size,
+                          0, 'L', nullptr, nullptr,
+                          get_ptr(m->socp_qind), get_ptr(m->socp_qind), get_ptr(m->socp_qval),
+                          nullptr)) {
+        casadi_error("CPXXaddqconstr failed");
+      }
+    }
+
+    // =================
+    // END SOCP BLOCK
+    // =================
 
     if (dump_to_file_) {
       CPXXwriteprob(m->env, m->lp, dump_filename_.c_str(), "LP");
