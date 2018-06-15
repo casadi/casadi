@@ -34,12 +34,50 @@
 using namespace std;
 namespace casadi {
 
-    DeSerializer::DeSerializer(std::istream& in_s) : in(in_s) {
+    static casadi_int serialization_protocol_version = 1;
+    static casadi_int serialization_check = 123456789012345;
+
+    DeSerializer::DeSerializer(std::istream& in_s) : in(in_s), debug_(false) {
+
+      // Sanity check
+      casadi_int check;
+      unpack(check);
+      casadi_assert(check==serialization_check,
+        "DeSerializer sanity check failed. "
+        "Expected " + str(serialization_check) + ", but got " + str(check) + ".");
+
+      // API version check
+      casadi_int v;
+      unpack(v);
+      casadi_assert(v==serialization_protocol_version,
+        "Serialization protocol is not compatible. "
+        "Got version " + str(v) + ", while " + str(serialization_protocol_version) + " was expected.");
+
+      bool debug;
+      unpack(debug);
+      debug_ = debug;
 
     }
 
-    Serializer::Serializer(std::ostream& out_s, const Dict& /*opts*/) : out(out_s) {
+    Serializer::Serializer(std::ostream& out_s, const Dict& opts) : out(out_s), debug_(false) {
+      // Sanity check
+      pack(serialization_check);
+      // API version check
+      pack(casadi_int(serialization_protocol_version));
 
+      bool debug = false;
+
+      // Read options
+      for (auto&& op : opts) {
+        if (op.first=="debug") {
+          debug = op.second;
+        } else {
+          casadi_error("Unknown option: '" + op.first + "'.");
+        }
+      }
+
+      pack(debug);
+      debug_ = debug;
     }
 
     casadi_int Serializer::add(const Function& f) {
@@ -54,13 +92,15 @@ namespace casadi {
     }
 
     void Serializer::decorate(char e) {
-      pack(e);
+      if (debug_) pack(e);
     }
 
     void DeSerializer::assert_decoration(char e) {
-      char t;
-      unpack(t);
-      casadi_assert(t==e, "Serializer error '" + str(e) + "' vs '" + str(t) + "'.");
+      if (debug_) {
+        char t;
+        unpack(t);
+        casadi_assert(t==e, "Serializer error '" + str(e) + "' vs '" + str(t) + "'.");
+      }
     }
 
     void DeSerializer::unpack(casadi_int& e) {

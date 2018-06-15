@@ -1023,14 +1023,14 @@ namespace casadi {
     return (*this)->export_code(lang, stream, options);
   }
 
-  std::string Function::serialize() const {
+  std::string Function::serialize(const Dict& opts) const {
     std::stringstream ss;
-    serialize(ss);
+    serialize(ss, opts);
     return ss.str();
   }
 
-  void Function::serialize(std::ostream &stream) const {
-    Serializer s(stream);
+  void Function::serialize(std::ostream &stream, const Dict& opts) const {
+    Serializer s(stream, opts);
     return serialize(s);
   }
 
