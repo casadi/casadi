@@ -81,14 +81,13 @@ namespace casadi {
 
     template <class T>
     void unpack(const std::string& descr, T& e) {
+#ifndef NDEBUG
       std::string d;
       unpack(d);
-      //uout() << "unpack started: " << descr << std::endl;
       casadi_assert(d==descr, "Mismatch: '" + descr + "' expected, got '" + d + "'.");
+#endif // NDEBUG
       unpack(e);
-      //uout() << "unpack: " << descr << ": " << e << std::endl;
     }
-
 
     template <class T, class M>
     void shared_unpack(T& e, M& cache) {
@@ -164,10 +163,10 @@ namespace casadi {
 
     template <class T>
     void pack(const std::string& descr, const T& e) {
-      //uout() << "  pack started: " << descr << std::endl;
+#ifndef NDEBUG
       pack(descr);
+#endif // NDEBUG
       pack(e);
-      //uout() << "  pack: " << descr << ": " << e << std::endl;
     }
 
     void decorate(char e);

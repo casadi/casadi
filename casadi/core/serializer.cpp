@@ -54,13 +54,17 @@ namespace casadi {
     }
 
     void Serializer::decorate(char e) {
+#ifndef NDEBUG
       pack(e);
+#endif // NDEBUG
     }
 
     void DeSerializer::assert_decoration(char e) {
+#ifndef NDEBUG
       char t;
       unpack(t);
       casadi_assert(t==e, "Serializer error '" + str(e) + "' vs '" + str(t) + "'.");
+#endif // NDEBUG
     }
 
     void DeSerializer::unpack(casadi_int& e) {
