@@ -10526,7 +10526,8 @@ Set base to -1 to unroll all the way; no gains in memory efficiency here.
 
 ";
 
-%feature("docstring")  casadi::Function::serialize() const  "
+%feature("docstring")  casadi::Function::serialize(const Dict &opts=Dict())
+const  "
 
 Serialize.
 
@@ -27928,7 +27929,8 @@ For a particular input or for all of the inputs
 
 ";
 
-%feature("docstring")  casadi::Function::serialize() const  "
+%feature("docstring")  casadi::Function::serialize(const Dict &opts=Dict())
+const  "
 
 Serialize.
 
