@@ -1982,12 +1982,6 @@ Dennis Janka, Joel Andersson
 |                   |               | of f,g,...,stop   |                  |
 |                   |               | the iterations    |                  |
 +-------------------+---------------+-------------------+------------------+
-| expand            | OT_BOOL       | Replace MX with   | casadi::Nlpsol   |
-|                   |               | SX expressions in |                  |
-|                   |               | problem           |                  |
-|                   |               | formulation       |                  |
-|                   |               | [false]           |                  |
-+-------------------+---------------+-------------------+------------------+
 | fallback_scaling  | OT_INT        | If indefinite     | casadi::Blocksqp |
 |                   |               | update is used,   |                  |
 |                   |               | the type of       |                  |
@@ -3134,12 +3128,6 @@ elements.
 |                  |                  | evaluation of    |                 |
 |                  |                  | f,g,...,stop the |                 |
 |                  |                  | iterations       |                 |
-+------------------+------------------+------------------+-----------------+
-| expand           | OT_BOOL          | Replace MX with  | casadi::Nlpsol  |
-|                  |                  | SX expressions   |                 |
-|                  |                  | in problem       |                 |
-|                  |                  | formulation      |                 |
-|                  |                  | [false]          |                 |
 +------------------+------------------+------------------+-----------------+
 | grad_f           | OT_FUNCTION      | Function for     | casadi::BonMinM |
 |                  |                  | calculating the  | essageHandler   |
@@ -40617,8 +40605,8 @@ Joel Andersson
 |                  |                 | f,g,...,stop the |                  |
 |                  |                 | iterations       |                  |
 +------------------+-----------------+------------------+------------------+
-| expand           | OT_BOOL         | Replace MX with  | casadi::Nlpsol   |
-|                  |                 | SX expressions   |                  |
+| expand           | OT_BOOL         | Replace MX with  | casadi::OracleFu |
+|                  |                 | SX expressions   | nction           |
 |                  |                 | in problem       |                  |
 |                  |                 | formulation      |                  |
 |                  |                 | [false]          |                  |
@@ -43809,6 +43797,12 @@ Joel Andersson
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
+| expand           | OT_BOOL         | Replace MX with  | casadi::OracleFu |
+|                  |                 | SX expressions   | nction           |
+|                  |                 | in problem       |                  |
+|                  |                 | formulation      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
 | fd_method        | OT_STRING       | Method for       | casadi::Function |
 |                  |                 | finite           | Internal         |
 |                  |                 | differencing     |                  |
@@ -46919,12 +46913,6 @@ A textbook SQPMethod
 |                    |               | of f,g,...,stop    |                |
 |                    |               | the iterations     |                |
 +--------------------+---------------+--------------------+----------------+
-| expand             | OT_BOOL       | Replace MX with SX | casadi::Nlpsol |
-|                    |               | expressions in     |                |
-|                    |               | problem            |                |
-|                    |               | formulation        |                |
-|                    |               | [false]            |                |
-+--------------------+---------------+--------------------+----------------+
 | hessian_approximat | OT_STRING     | limited-           | casadi::Qrsqp  |
 | ion                |               | memory|exact       |                |
 +--------------------+---------------+--------------------+----------------+
@@ -48383,6 +48371,12 @@ Internal class.
 |                  |                 | unsuccessfully,  |                  |
 |                  |                 | raise an error   |                  |
 |                  |                 | (default false). |                  |
++------------------+-----------------+------------------+------------------+
+| expand           | OT_BOOL         | Replace MX with  | casadi::OracleFu |
+|                  |                 | SX expressions   | nction           |
+|                  |                 | in problem       |                  |
+|                  |                 | formulation      |                  |
+|                  |                 | [false]          |                  |
 +------------------+-----------------+------------------+------------------+
 | implicit_input   | OT_INT          | Index of the     | casadi::Rootfind |
 |                  |                 | input that       | er               |
@@ -51344,12 +51338,6 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |                   |                 | during evaluation |                |
 |                   |                 | of f,g,...,stop   |                |
 |                   |                 | the iterations    |                |
-+-------------------+-----------------+-------------------+----------------+
-| expand            | OT_BOOL         | Replace MX with   | casadi::Nlpsol |
-|                   |                 | SX expressions in |                |
-|                   |                 | problem           |                |
-|                   |                 | formulation       |                |
-|                   |                 | [false]           |                |
 +-------------------+-----------------+-------------------+----------------+
 | hessian_approxima | OT_STRING       | gauss-            | casadi::Scpgen |
 | tion              |                 | newton|exact      |                |
@@ -56699,12 +56687,6 @@ A textbook SQPMethod
 |                   |               | during evaluation |                  |
 |                   |               | of f,g,...,stop   |                  |
 |                   |               | the iterations    |                  |
-+-------------------+---------------+-------------------+------------------+
-| expand            | OT_BOOL       | Replace MX with   | casadi::Nlpsol   |
-|                   |               | SX expressions in |                  |
-|                   |               | problem           |                  |
-|                   |               | formulation       |                  |
-|                   |               | [false]           |                  |
 +-------------------+---------------+-------------------+------------------+
 | hessian_approxima | OT_STRING     | limited-          | casadi::Sqpmetho |
 | tion              |               | memory|exact      | d                |
