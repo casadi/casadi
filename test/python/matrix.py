@@ -1043,5 +1043,13 @@ class Matrixtests(casadiTestCase):
         b = M.deserialize(a.serialize())
         self.checkarray(a,b)
 
+  def test_iterable(self):
+    a = DM([1,2,3])
+    b = list(iter(a.nz))
+    self.checkarray(a,DM(b))
+
+    with self.assertInException("CasADi matrices are not iterable"):
+      iter(a)
+
 if __name__ == '__main__':
     unittest.main()
