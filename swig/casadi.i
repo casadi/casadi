@@ -2468,6 +2468,11 @@ class NZproxy:
 
   def __len__(self):
     return self.matrix.nnz()
+
+  def __iter__(self):
+    for i in range(len(self)):
+      yield self[i]
+
 %}
 
 %define %matrix_helpers(Type)
@@ -2488,6 +2493,12 @@ class NZproxy:
             if s[1] is None: raise TypeError("Cannot slice with None")
             return self.get(False, s[0], s[1])
           return self.get(False, s)
+
+    def __iter__(self):
+      raise Exception("""CasADi matrices are not iterable by design.
+                      Did you mean to iterate over m.nz, with m IM/DM/SX?
+                      Did you mean to iterate over horzsplit(m,1)/vertsplit(m,1) with m IM/DM/SX/MX?
+                      """)
 
     def __setitem__(self,s,val):
           if isinstance(s,tuple) and len(s)==2:

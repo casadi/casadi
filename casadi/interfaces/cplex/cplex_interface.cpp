@@ -436,7 +436,8 @@ namespace casadi {
     }
 
     // Add helper variables for SOCP
-    if (CPXXnewcols(m->env, m->lp, sm.r.back(), nullptr, get_ptr(m->socp_lbx), nullptr, nullptr, nullptr)) {
+    if (CPXXnewcols(m->env, m->lp, sm.r.back(), nullptr,
+        get_ptr(m->socp_lbx), nullptr, nullptr, nullptr)) {
       casadi_error("CPXXnewcols failed");
     }
 

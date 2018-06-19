@@ -704,14 +704,14 @@ namespace casadi {
 
 #ifndef SWIG
     /** \brief Serialize */
-    void serialize(std::ostream &stream) const;
+    void serialize(std::ostream &stream, const Dict& opts=Dict()) const;
 
     /** \brief Serialize */
     void serialize(Serializer &s) const;
 #endif
 
     /** \brief Serialize */
-    std::string serialize() const;
+    std::string serialize(const Dict& opts=Dict()) const;
 
     std::string export_code(const std::string& lang, const Dict& options=Dict()) const;
 #ifndef SWIG

@@ -81,14 +81,13 @@ namespace casadi {
 
     template <class T>
     void unpack(const std::string& descr, T& e) {
-      std::string d;
-      unpack(d);
-      //uout() << "unpack started: " << descr << std::endl;
-      casadi_assert(d==descr, "Mismatch: '" + descr + "' expected, got '" + d + "'.");
+      if (debug_) {
+        std::string d;
+        unpack(d);
+        casadi_assert(d==descr, "Mismatch: '" + descr + "' expected, got '" + d + "'.");
+      }
       unpack(e);
-      //uout() << "unpack: " << descr << ": " << e << std::endl;
     }
-
 
     template <class T, class M>
     void shared_unpack(T& e, M& cache) {
@@ -121,6 +120,8 @@ namespace casadi {
     std::vector<SXElem> sx_nodes;
     std::vector<Sparsity> sparsities;
     std::vector<Linsol> linsols;
+
+    bool debug_;
   };
 
 
@@ -164,10 +165,8 @@ namespace casadi {
 
     template <class T>
     void pack(const std::string& descr, const T& e) {
-      //uout() << "  pack started: " << descr << std::endl;
-      pack(descr);
+      if (debug_) pack(descr);
       pack(e);
-      //uout() << "  pack: " << descr << ": " << e << std::endl;
     }
 
     void decorate(char e);
@@ -197,6 +196,8 @@ namespace casadi {
     std::map<SharedObjectInternal*, casadi_int> linsols_;
 
     std::ostream& out;
+
+    bool debug_;
 
   };
 
