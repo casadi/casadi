@@ -1981,6 +1981,13 @@ double *xk, double *f, double *g) const  "
 
 ";
 
+%feature("docstring")  casadi::Blocksqp::evaluate(BlocksqpMemory *m, double
+*exact_hess_lag) const  "
+
+[INTERNAL]  Evaluate exact hessian of Lagrangian.
+
+";
+
 %feature("docstring")  casadi::Nlpsol::check_inputs(void *mem) const  "
 
 [INTERNAL]  Check if the inputs correspond to a well-posed problem.
@@ -2181,6 +2188,11 @@ Dennis Janka, Joel Andersson
 +----------------------------+-----------+---------------------------------+
 | print_iteration            | OT_BOOL   | Print SQP iterations            |
 +----------------------------+-----------+---------------------------------+
+| print_maxit_reached        | OT_BOOL   | Print error when maximum number |
+|                            |           | of SQP iterations reached       |
++----------------------------+-----------+---------------------------------+
+| qp_init                    | OT_BOOL   | Use warmstarting                |
++----------------------------+-----------+---------------------------------+
 | qpsol                      | OT_STRING | The QP solver to be used by the |
 |                            |           | SQP method                      |
 +----------------------------+-----------+---------------------------------+
@@ -2189,6 +2201,9 @@ Dennis Janka, Joel Andersson
 +----------------------------+-----------+---------------------------------+
 | restore_feas               | OT_BOOL   | Use feasibility restoration     |
 |                            |           | phase                           |
++----------------------------+-----------+---------------------------------+
+| rho                        | OT_DOUBLE | Feasibility restoration phase   |
+|                            |           | parameter                       |
 +----------------------------+-----------+---------------------------------+
 | s_f                        | OT_DOUBLE | Filter line search parameter,   |
 |                            |           | cf. IPOPT paper                 |
@@ -2213,6 +2228,9 @@ Dennis Janka, Joel Andersson
 | which_second_derv          | OT_INT    | For which block should second   |
 |                            |           | derivatives be provided by the  |
 |                            |           | user                            |
++----------------------------+-----------+---------------------------------+
+| zeta                       | OT_DOUBLE | Feasibility restoration phase   |
+|                            |           | parameter                       |
 +----------------------------+-----------+---------------------------------+
 
 >List of available options
@@ -2456,6 +2474,13 @@ Dennis Janka, Joel Andersson
 | print_iteration   | OT_BOOL       | Print SQP         | casadi::Blocksqp |
 |                   |               | iterations        |                  |
 +-------------------+---------------+-------------------+------------------+
+| print_maxit_reach | OT_BOOL       | Print error when  | casadi::Blocksqp |
+| ed                |               | maximum number of |                  |
+|                   |               | SQP iterations    |                  |
+|                   |               | reached           |                  |
++-------------------+---------------+-------------------+------------------+
+| qp_init           | OT_BOOL       | Use warmstarting  | casadi::Blocksqp |
++-------------------+---------------+-------------------+------------------+
 | qpsol             | OT_STRING     | The QP solver to  | casadi::Blocksqp |
 |                   |               | be used by the    |                  |
 |                   |               | SQP method        |                  |
@@ -2466,6 +2491,10 @@ Dennis Janka, Joel Andersson
 +-------------------+---------------+-------------------+------------------+
 | restore_feas      | OT_BOOL       | Use feasibility   | casadi::Blocksqp |
 |                   |               | restoration phase |                  |
++-------------------+---------------+-------------------+------------------+
+| rho               | OT_DOUBLE     | Feasibility       | casadi::Blocksqp |
+|                   |               | restoration phase |                  |
+|                   |               | parameter         |                  |
 +-------------------+---------------+-------------------+------------------+
 | s_f               | OT_DOUBLE     | Filter line       | casadi::Blocksqp |
 |                   |               | search parameter, |                  |
@@ -2509,6 +2538,10 @@ Dennis Janka, Joel Andersson
 |                   |               | derivatives be    |                  |
 |                   |               | provided by the   |                  |
 |                   |               | user              |                  |
++-------------------+---------------+-------------------+------------------+
+| zeta              | OT_DOUBLE     | Feasibility       | casadi::Blocksqp |
+|                   |               | restoration phase |                  |
+|                   |               | parameter         |                  |
 +-------------------+---------------+-------------------+------------------+
 
 Diagrams
@@ -3051,6 +3084,11 @@ maxIt, casadi_int warmStart=0) const  "
 [INTERNAL]  Get free variables (SX)
 
 ";
+
+%feature("docstring")
+casadi::Blocksqp::calcHessianUpdateExact(BlocksqpMemory *m) const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::Blocksqp::reduceSOCStepsize(BlocksqpMemory
 *m, double *alphaSOC) const  "
@@ -79279,6 +79317,11 @@ Dennis Janka, Joel Andersson
 +----------------------------+-----------+---------------------------------+
 | print_iteration            | OT_BOOL   | Print SQP iterations            |
 +----------------------------+-----------+---------------------------------+
+| print_maxit_reached        | OT_BOOL   | Print error when maximum number |
+|                            |           | of SQP iterations reached       |
++----------------------------+-----------+---------------------------------+
+| qp_init                    | OT_BOOL   | Use warmstarting                |
++----------------------------+-----------+---------------------------------+
 | qpsol                      | OT_STRING | The QP solver to be used by the |
 |                            |           | SQP method                      |
 +----------------------------+-----------+---------------------------------+
@@ -79287,6 +79330,9 @@ Dennis Janka, Joel Andersson
 +----------------------------+-----------+---------------------------------+
 | restore_feas               | OT_BOOL   | Use feasibility restoration     |
 |                            |           | phase                           |
++----------------------------+-----------+---------------------------------+
+| rho                        | OT_DOUBLE | Feasibility restoration phase   |
+|                            |           | parameter                       |
 +----------------------------+-----------+---------------------------------+
 | s_f                        | OT_DOUBLE | Filter line search parameter,   |
 |                            |           | cf. IPOPT paper                 |
@@ -79311,6 +79357,9 @@ Dennis Janka, Joel Andersson
 | which_second_derv          | OT_INT    | For which block should second   |
 |                            |           | derivatives be provided by the  |
 |                            |           | user                            |
++----------------------------+-----------+---------------------------------+
+| zeta                       | OT_DOUBLE | Feasibility restoration phase   |
+|                            |           | parameter                       |
 +----------------------------+-----------+---------------------------------+
 
 --------------------------------------------------------------------------------

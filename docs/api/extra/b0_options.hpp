@@ -303,9 +303,12 @@
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print solver header at startup</td><td>casadi::Blocksqp</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print SQP iterations</td><td>casadi::Blocksqp</td></tr>
+<tr><td>print_maxit_reached</td><td>OT_BOOL</td><td>Print error when maximum number of SQP iterations reached</td><td>casadi::Blocksqp</td></tr>
+<tr><td>qp_init</td><td>OT_BOOL</td><td>Use warmstarting</td><td>casadi::Blocksqp</td></tr>
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Blocksqp</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Blocksqp</td></tr>
 <tr><td>restore_feas</td><td>OT_BOOL</td><td>Use feasibility restoration phase</td><td>casadi::Blocksqp</td></tr>
+<tr><td>rho</td><td>OT_DOUBLE</td><td>Feasibility restoration phase parameter</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td><td>casadi::Blocksqp</td></tr>
@@ -316,6 +319,7 @@
 <tr><td>warmstart</td><td>OT_BOOL</td><td>Use warmstarting</td><td>casadi::Blocksqp</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 <tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td><td>casadi::Blocksqp</td></tr>
+<tr><td>zeta</td><td>OT_DOUBLE</td><td>Feasibility restoration phase parameter</td><td>casadi::Blocksqp</td></tr>
 </table>
 */
 /// \endcond
@@ -366,9 +370,12 @@
 <tr><td>opttol</td><td>OT_DOUBLE</td><td>Optimality tolerance</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print solver header at startup</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print SQP iterations</td></tr>
+<tr><td>print_maxit_reached</td><td>OT_BOOL</td><td>Print error when maximum number of SQP iterations reached</td></tr>
+<tr><td>qp_init</td><td>OT_BOOL</td><td>Use warmstarting</td></tr>
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td></tr>
 <tr><td>restore_feas</td><td>OT_BOOL</td><td>Use feasibility restoration phase</td></tr>
+<tr><td>rho</td><td>OT_DOUBLE</td><td>Feasibility restoration phase parameter</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td></tr>
@@ -377,6 +384,7 @@
 <tr><td>theta_min</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td></tr>
 <tr><td>warmstart</td><td>OT_BOOL</td><td>Use warmstarting</td></tr>
 <tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td></tr>
+<tr><td>zeta</td><td>OT_DOUBLE</td><td>Feasibility restoration phase parameter</td></tr>
 </table>
 */
 /** \addtogroup general_Blocksqp
@@ -441,9 +449,12 @@
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print solver header at startup</td><td>casadi::Blocksqp</td></tr>
 <tr><td>print_iteration</td><td>OT_BOOL</td><td>Print SQP iterations</td><td>casadi::Blocksqp</td></tr>
+<tr><td>print_maxit_reached</td><td>OT_BOOL</td><td>Print error when maximum number of SQP iterations reached</td><td>casadi::Blocksqp</td></tr>
+<tr><td>qp_init</td><td>OT_BOOL</td><td>Use warmstarting</td><td>casadi::Blocksqp</td></tr>
 <tr><td>qpsol</td><td>OT_STRING</td><td>The QP solver to be used by the SQP method</td><td>casadi::Blocksqp</td></tr>
 <tr><td>qpsol_options</td><td>OT_DICT</td><td>Options to be passed to the QP solver</td><td>casadi::Blocksqp</td></tr>
 <tr><td>restore_feas</td><td>OT_BOOL</td><td>Use feasibility restoration phase</td><td>casadi::Blocksqp</td></tr>
+<tr><td>rho</td><td>OT_DOUBLE</td><td>Feasibility restoration phase parameter</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_f</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>s_theta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>schur</td><td>OT_BOOL</td><td>Use qpOASES Schur compliment approach</td><td>casadi::Blocksqp</td></tr>
@@ -454,6 +465,7 @@
 <tr><td>warmstart</td><td>OT_BOOL</td><td>Use warmstarting</td><td>casadi::Blocksqp</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOL</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::Nlpsol</td></tr>
 <tr><td>which_second_derv</td><td>OT_INT</td><td>For which block should second derivatives be provided by the user</td><td>casadi::Blocksqp</td></tr>
+<tr><td>zeta</td><td>OT_DOUBLE</td><td>Feasibility restoration phase parameter</td><td>casadi::Blocksqp</td></tr>
 </table>
 */
 /// \cond INTERNAL
