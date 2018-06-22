@@ -34,7 +34,7 @@
 using namespace std;
 namespace casadi {
 
-    static casadi_int serialization_protocol_version = 1;
+    static casadi_int serialization_protocol_version = 2;
     static casadi_int serialization_check = 123456789012345;
 
     DeSerializer::DeSerializer(std::istream& in_s) : in(in_s), debug_(false) {
@@ -118,6 +118,22 @@ namespace casadi {
       int64_t n = e;
       const char* c = reinterpret_cast<const char*>(&n);
       for (int j=0;j<8;++j) pack(c[j]);
+    }
+
+    void Serializer::pack(size_t e) {
+      decorate('K');
+      uint64_t n = e;
+      const char* c = reinterpret_cast<const char*>(&n);
+      for (int j=0;j<8;++j) pack(c[j]);
+    }
+
+    void DeSerializer::unpack(size_t& e) {
+      assert_decoration('K');
+      uint64_t n;
+      char* c = reinterpret_cast<char*>(&n);
+
+      for (int j=0;j<8;++j) unpack(c[j]);
+      e = n;
     }
 
     void DeSerializer::unpack(int& e) {

@@ -1419,6 +1419,44 @@ class SXtests(casadiTestCase):
     self.checkarray(evalf(y),5)
     with self.assertInException("since variables [x] are free"):
       evalf(x)
+  
+
+  def test_call_fun(self):
+
+    A = sparsify(DM([[1,0,1],[0,0,6],[0,8,9]]))
+
+    x = SX.sym("x",3)
+    y = SX.sym("y")
+    z = SX.sym("z")
+    w = mtimes(A*sqrt(z),sin(x*y))
+
+    f = Function('f',[x,y,z],[(x*y*z)[:2],w])
+
+    args = [x/y,10*z,y*z]
+
+    v = f(*args)
+    v2 = vertcat(*args).call_fun(f)
+    F1 = Function('F',[x,y,z],[sin(v[0]*y-args[-1]),cos(mtimes(v[1],v[0].T)/y)])
+    F2 = Function('F',[x,y,z],[sin(v2[:2]*y-args[-1]),cos(mtimes(v2[2:],v2[:2].T)/y)])
+
+    self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+
+    self.check_serialize(F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+    self.check_codegen(F2,inputs=[[0.1,1.7,2.3],1.13,0.11],opts={"avoid_stack":True})
+
+    F1 = Function('F',[x,y,z],F1(2*x,3*y,4*z))
+    F2 = Function('F',[x,y,z],F2(2*x,3*y,4*z))
+
+    self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+
+    F1 = Function('F',[x,y,z],F1(x,3*y,4*z))
+    F2 = Function('F',[x,y,z],F2(x,3*y,4*z))
+
+    self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+
+
+
+ 
 
 
 if __name__ == '__main__':

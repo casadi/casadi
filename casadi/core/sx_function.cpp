@@ -30,8 +30,11 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <bitset>
 #include "casadi_misc.hpp"
 #include "sx_node.hpp"
+#include "output_sx.hpp"
+#include "call_sx.hpp"
 #include "casadi_common.hpp"
 #include "sparsity_internal.hpp"
 #include "global_options.hpp"
@@ -42,6 +45,15 @@ namespace casadi {
 
   using namespace std;
 
+
+  SXFunction::CallInfo::Node::Node(const Function& fun) : f(fun) {
+    n_dep = f.nnz_in(); n_out = f.nnz_out();
+    dep.resize(n_dep); out.resize(n_out, -1); out_sx.resize(n_out, 0);
+    f_n_in = f.n_in(); f_n_out = f.n_out();
+    f_nnz_in.resize(f_n_in); f_nnz_out.resize(f_n_out);
+    for (casadi_int i=0;i<f_n_in;++i) f_nnz_in[i] = f.nnz_in(i);
+    for (casadi_int i=0;i<f_n_out;++i) f_nnz_out[i] = f.nnz_out(i);
+  }
 
   SXFunction::SXFunction(const std::string& name,
                          const vector<SX >& inputv,
@@ -82,6 +94,34 @@ namespace casadi {
       case OP_CONST: w[e.i0] = e.d; break;
       case OP_INPUT: w[e.i0] = arg[e.i1]==nullptr ? 0 : arg[e.i1][e.i2]; break;
       case OP_OUTPUT: if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1]; break;
+      case OP_CALL:
+        {
+          const double** call_arg = arg + n_in_;
+          double** call_res       = res + n_out_;
+          casadi_int* call_iw     = iw;
+          double* call_w          = w + worksize_;
+          double* call_w_arg      = call_w + call_.sz_w;
+          double* call_w_res      = call_w_arg + call_.sz_w_arg;
+
+          auto& m = call_.nodes[e.i1];
+          double* ptr_w = call_w_arg;
+          for (casadi_int i=0;i<m.f_n_in;++i) {
+            call_arg[i] = ptr_w;
+            ptr_w+=m.f_nnz_in[i];
+          }
+          ptr_w = call_w_res;
+          for (casadi_int i=0;i<m.f_n_out;++i) {
+            call_res[i] = ptr_w;
+            ptr_w+=m.f_nnz_out[i];
+          }
+          for (casadi_int i=0;i<m.n_dep;++i) call_w_arg[i] = w[m.dep[i]];
+          // TODO(jgillis): should we do a checkout upfront?
+          m.f(call_arg, call_res, call_iw, call_w);
+          for (casadi_int i=0;i<m.n_out;++i) {
+            if (m.out[i]>=0) w[m.out[i]] = call_w_res[i];
+          }
+        }
+      break;
       default:
         casadi_error("Unknown operation" + str(e.op));
       }
@@ -111,6 +151,20 @@ namespace casadi {
       stream << endl;
       if (a.op==OP_OUTPUT) {
         stream << "output[" << a.i0 << "][" << a.i2 << "] = @" << a.i1;
+      } else if (a.op==OP_CALL) {
+        auto& m = call_.nodes.at(a.i1);
+        stream << "[";
+        for (casadi_int i=0;i<m.n_out;++i) {
+          stream << "@" << m.out[i];
+          if (i < m.n_out-1) stream << ",";
+        }
+        stream << "] = ";
+        stream << m.f.name() << "(";
+        for (casadi_int i=0;i<m.n_dep;++i) {
+          stream << "@" << m.dep[i];
+          if (i < m.n_dep-1) stream << ",";
+        }
+        stream << ")";
       } else {
         stream << "@" << a.i0 << " = ";
         if (a.op==OP_INPUT) {
@@ -147,6 +201,11 @@ namespace casadi {
       casadi_error("Code generation is not possible since variables "
                    + str(free_vars_) + " are free.");
     }
+
+    // Generate code for the call nodes
+    for (auto&& m : call_.nodes) {
+      g.add_dependency(m.f);
+    }
   }
 
   void SXFunction::codegen_body(CodeGenerator& g) const {
@@ -155,7 +214,35 @@ namespace casadi {
     for (auto&& a : algorithm_) {
       if (a.op==OP_OUTPUT) {
         g << "if (res[" << a.i0 << "]!=0) "
-          << "res["<< a.i0 << "][" << a.i2 << "]=" << g.sx_work(a.i1);
+          << "res["<< a.i0 << "][" << a.i2 << "]=" << g.sx_work(a.i1) << ";\n";
+      } else if (a.op==OP_CALL) {
+        auto& m = call_.nodes[a.i1];
+
+        // Collect input arguments
+        casadi_int offset = worksize_+call_.sz_w;
+        for (casadi_int i=0; i<m.f_n_in; ++i) {
+          g << "arg[" << n_in_+i << "]=" << "w+" + str(i+offset) << ";\n";
+          offset += m.f_nnz_in[i];
+        }
+
+        offset = worksize_+call_.sz_w+call_.sz_w_arg;
+        // Collect output arguments
+        for (casadi_int i=0; i<m.f_n_out; ++i) {
+          g << "res[" << n_out_+i << "]=" << "w+" + str(i+offset) << ";\n";
+          offset += m.f_nnz_out[i];
+        }
+        for (casadi_int i=0;i<m.n_dep;++i) {
+          g << "w["+str(i+worksize_+call_.sz_w) + "] = " << g.sx_work(m.dep[i]) << ";\n";
+        }
+        // Call function
+        g << "if (";
+        g << g(m.f, "arg+"+str(n_in_), "res+"+str(n_out_), "iw", "w+" + str(worksize_));
+        g << ") return 1;\n";
+        for (casadi_int i=0;i<m.n_out;++i) {
+          if (m.out[i]>=0)
+            g << g.sx_work(m.out[i]) << " = ";
+            g << "w[" + str(i+worksize_+call_.sz_w+call_.sz_w_arg) + "];\n";
+        }
       } else {
 
         // Where to store the result
@@ -172,8 +259,8 @@ namespace casadi {
           if (ndep==1) g << g.print_op(a.op, g.sx_work(a.i1));
           if (ndep==2) g << g.print_op(a.op, g.sx_work(a.i1), g.sx_work(a.i2));
         }
+        g  << ";\n";
       }
-      g  << ";\n";
     }
   }
 
@@ -260,7 +347,7 @@ namespace casadi {
       if (t) {
         if (t->is_constant())
           constants_.push_back(SXElem::create(t));
-        else if (!t->is_symbolic())
+        else if (!t->is_symbolic() && t->op()>=0)
           operations_.push_back(SXElem::create(t));
       }
     }
@@ -283,7 +370,13 @@ namespace casadi {
     // Get the sequence of instructions for the virtual machine
     algorithm_.resize(0);
     algorithm_.reserve(nodes.size());
+
+    // Mapping of node index (cfr. temp) to algorithm index
+    std::vector<int> alg_index;
+    alg_index.reserve(nodes.size());
+
     for (vector<SXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it) {
+
       // Current node
       SXNode* n = *it;
 
@@ -292,6 +385,10 @@ namespace casadi {
 
       // Get operation
       ae.op = n==nullptr ? static_cast<int>(OP_OUTPUT) : static_cast<int>(n->op());
+
+      // Default dependencies
+      int* dep = &ae.i1;
+      casadi_int ndeps = ae.op == -1 ? 1 : casadi_math<double>::ndeps(ae.op);
 
       // Get instruction
       switch (ae.op) {
@@ -323,21 +420,57 @@ namespace casadi {
           }
         }
         break;
+      case OP_CALL: // Call node
+        {
+          ae.i0 = n->temp;
+
+          // Reserve memory for call node
+          ae.i1 = call_.nodes.size();
+
+          const Function& f = static_cast<const CallSX*>(n)->f_;
+          call_.nodes.emplace_back(f);
+          auto& m = call_.nodes.at(ae.i1);
+
+          call_.sz_arg = std::max(call_.sz_arg, f.sz_arg());
+          call_.sz_res = std::max(call_.sz_res, f.sz_res());
+          call_.sz_iw  = std::max(call_.sz_iw, f.sz_iw());
+          call_.sz_w   = std::max(call_.sz_w, f.sz_w());
+          call_.sz_w_arg   = std::max(call_.sz_w_arg, static_cast<size_t>(f.nnz_in()));
+          call_.sz_w_res   = std::max(call_.sz_w_res,  static_cast<size_t>(f.nnz_out()));
+
+          dep = get_ptr(m.dep);
+          ndeps = m.n_dep;
+          for (casadi_int i=0; i<ndeps; ++i) {
+            dep[i] = n->dep(i).get()->temp;
+          }
+        }
+        break;
+      case -1: // Output extraction node
+        {
+          dep = &algorithm_.at(alg_index.at(n->dep(0).get()->temp)).i1;
+          int oind = static_cast<OutputSX*>(n)->oind_;
+          casadi_assert(call_.nodes.at(dep[0]).out.at(oind)==-1, "Duplicate");
+          call_.nodes.at(dep[0]).out.at(oind) = n->temp;
+          call_.nodes.at(dep[0]).out_sx.at(oind) = SXElem(n, false);
+        }
+        break;
       default:       // Unary or binary operation
         ae.i0 = n->temp;
         ae.i1 = n->dep(0).get()->temp;
         ae.i2 = n->dep(1).get()->temp;
       }
 
-      // Number of dependencies
-      casadi_int ndeps = casadi_math<double>::ndeps(ae.op);
-
       // Increase count of dependencies
       for (casadi_int c=0; c<ndeps; ++c) {
-        refcount.at(c==0 ? ae.i1 : ae.i2)++;
+        refcount.at(dep[c])++;
       }
+
+      // Amend node index to algorithm index mapping
+      alg_index.push_back(algorithm_.size());
+
       // Add to algorithm
-      algorithm_.push_back(ae);
+      if (ae.op>=0) algorithm_.push_back(ae);
+
     }
 
     // Place in the work vector for each of the nodes in the tree (overwrites the reference counter)
@@ -352,36 +485,48 @@ namespace casadi {
     // Find a place in the work vector for the operation
     for (auto&& a : algorithm_) {
 
-      // Number of dependencies
+      // Default dependencies
+      int* dep = &a.i1;
       casadi_int ndeps = casadi_math<double>::ndeps(a.op);
+
+      // Default outputs
+      int* out = &a.i0;
+      casadi_int nout = 1;
+
+      if (a.op==OP_CALL) { // Call node overrides these defaults
+        auto& e = call_.nodes.at(a.i1);
+        ndeps = e.n_dep;
+        dep = get_ptr(e.dep);
+        nout= e.n_out;
+        out = get_ptr(e.out);
+      }
 
       // decrease reference count of children
       // reverse order so that the first argument will end up at the top of the stack
       for (casadi_int c=ndeps-1; c>=0; --c) {
-        casadi_int ch_ind = c==0 ? a.i1 : a.i2;
+        casadi_int ch_ind = dep[c];
         casadi_int remaining = --refcount.at(ch_ind);
         if (remaining==0) unused.push(place[ch_ind]);
       }
 
       // Find a place to store the variable
       if (a.op!=OP_OUTPUT) {
-        if (live_variables && !unused.empty()) {
-          // Try to reuse a variable from the stack if possible (last in, first out)
-          a.i0 = place[a.i0] = unused.top();
-          unused.pop();
-        } else {
-          // Allocate a new variable
-          a.i0 = place[a.i0] = worksize++;
+        for (casadi_int c=0; c<nout; ++c) {
+          if (out[c]<0) continue;
+          if (live_variables && !unused.empty()) {
+            // Try to reuse a variable from the stack if possible (last in, first out)
+            out[c] = place[out[c]] = unused.top();
+            unused.pop();
+          } else {
+            // Allocate a new variable
+            out[c] = place[out[c]] = worksize++;
+          }
         }
       }
 
       // Save the location of the children
       for (casadi_int c=0; c<ndeps; ++c) {
-        if (c==0) {
-          a.i1 = place[a.i1];
-        } else {
-          a.i2 = place[a.i2];
-        }
+        dep[c] = place[dep[c]];
       }
 
       // If binary, make sure that the second argument is the same as the first one
@@ -404,6 +549,11 @@ namespace casadi {
 
     // Allocate work vectors (symbolic/numeric)
     alloc_w(worksize_);
+
+    alloc_arg(call_.sz_arg, true);
+    alloc_res(call_.sz_res, true);
+    alloc_iw(call_.sz_iw, true);
+    alloc_w(call_.sz_w+call_.sz_w_arg+call_.sz_w_res, true);
 
     // Reset the temporary variables
     for (casadi_int i=0; i<nodes.size(); ++i) {
@@ -492,6 +642,33 @@ namespace casadi {
         break;
       case OP_PARAMETER:
         w[a.i0] = *p_it++; break;
+      case OP_CALL:
+        {
+          auto& m = call_.nodes.at(a.i1);
+          const SXElem& orig = *b_it++;
+          std::vector<SXElem> deps(m.n_dep);
+          bool identical = true;
+
+          std::vector<SXElem> ret;
+          for (casadi_int i=0;i<m.n_dep;++i) {
+            identical &= SXElem::is_equal(w[m.dep.at(i)], orig->dep(i), 2);
+          }
+          if (identical) {
+            ret = OutputSX::split(orig, m.n_out);
+            for (casadi_int i=0;i<m.n_out;++i) {
+              if (!m.out_sx.at(i).is_constant()) {
+                ret[i] = m.out_sx.at(i);
+              }
+            }
+          } else {
+            for (casadi_int i=0;i<m.n_dep;++i) deps[i] = w[m.dep[i]];
+            ret = SXElem::call_fun(m.f, deps);
+          }
+          for (casadi_int i=0;i<m.n_out;++i) {
+            if (m.out[i]>=0) w[m.out[i]] = ret[i];
+          }
+        }
+        break;
       default:
         {
           // Evaluate the function to a temporary value
@@ -578,6 +755,8 @@ namespace casadi {
           const SXElem& f=*b_it++;
           switch (e.op) {
             CASADI_MATH_DER_BUILTIN(f->dep(0), f->dep(1), f, it1++->d)
+            case OP_CALL:
+              it1++->d[0] = f;
           }
         }
       }
@@ -599,6 +778,30 @@ namespace casadi {
         case OP_CONST:
         case OP_PARAMETER:
           w[a.i0] = 0;
+          break;
+        case OP_CALL:
+          {
+            auto& m = call_.nodes.at(a.i1);
+            CallSX* e = static_cast<CallSX*>(it2->d[0].get());
+            Function ff = m.f.forward(1);
+            std::vector<SXElem> deps;
+            // Add nominal input SXElem
+            for (casadi_int i=0;i<m.n_dep;++i) {
+              deps.push_back(e->dep(i));
+            }
+            //for (casadi_int i=0;i<m.n_out;++i) {
+            //  deps.push_back(w[m.out[i]]);
+            //}
+            for (casadi_int i=0;i<m.n_dep;++i) {
+              deps.push_back(w[m.dep[i]]);
+            }
+            std::vector<SXElem> ret = SXElem::call_fun(ff, deps);
+            // Set resulting dot variables
+            for (casadi_int i=0;i<m.n_out;++i) {
+              if (m.out[i]>=0) w[m.out[i]] = ret[i];
+            }
+          }
+          it2++;
           break;
           CASADI_MATH_BINARY_BUILTIN // Binary operation
             w[a.i0] = it2->d[0] * w[a.i1] + it2->d[1] * w[a.i2];it2++;break;
@@ -680,6 +883,8 @@ namespace casadi {
           const SXElem& f=*b_it++;
           switch (a.op) {
             CASADI_MATH_DER_BUILTIN(f->dep(0), f->dep(1), f, it1++->d)
+            case OP_CALL:
+              it1++->d[0] = f;
           }
         }
       }
@@ -706,6 +911,35 @@ namespace casadi {
         case OP_CONST:
         case OP_PARAMETER:
           w[it->i0] = 0;
+          break;
+        case OP_CALL:
+          {
+            auto& m = call_.nodes.at(it->i1);
+            CallSX* e = static_cast<CallSX*>(it2->d[0].get());
+            Function fr = m.f.reverse(1);
+            std::vector<SXElem> deps;
+            // Add nominal input SXElem
+            for (casadi_int i=0;i<m.n_dep;++i) {
+              deps.push_back(e->dep(i));
+            }
+            //for (casadi_int i=0;i<m.n_out;++i) {
+            //  deps.push_back(w[m.out[i]]);
+            //}
+            for (casadi_int i=0;i<m.n_out;++i) {
+              if (m.out[i]>=0) {
+                deps.push_back(w[m.out[i]]);
+                w[m.out[i]] = 0;
+              } else {
+                deps.push_back(0);
+              }
+            }
+            std::vector<SXElem> ret = SXElem::call_fun(fr, deps);
+            // Set resulting dot variables
+            for (casadi_int i=0;i<m.n_dep;++i) {
+              w[m.dep[i]] += ret[i];
+            }
+          }
+          it2++;
           break;
           CASADI_MATH_BINARY_BUILTIN // Binary operation
             seed = w[it->i0];
@@ -738,6 +972,33 @@ namespace casadi {
       case OP_OUTPUT:
         if (res[e.i0]!=nullptr) res[e.i0][e.i2] = w[e.i1];
         break;
+      case OP_CALL:
+        {
+          const bvec_t** call_arg = arg + n_in_;
+          bvec_t** call_res       = res + n_out_;
+          casadi_int* call_iw     = iw;
+          bvec_t* call_w          = w + worksize_;
+          bvec_t* call_w_arg      = call_w + call_.sz_w;
+          bvec_t* call_w_res      = call_w_arg + call_.sz_w_arg;
+
+          auto& m = call_.nodes[e.i1];
+          bvec_t* ptr_w = call_w_arg;
+          for (casadi_int i=0;i<m.f_n_in;++i) {
+            call_arg[i] = ptr_w;
+            ptr_w+=m.f_nnz_in[i];
+          }
+          ptr_w = call_w_res;
+          for (casadi_int i=0;i<m.f_n_out;++i) {
+            call_res[i] = ptr_w;
+            ptr_w+=m.f_nnz_out[i];
+          }
+          for (casadi_int i=0;i<m.n_dep;++i) call_w_arg[i] = w[m.dep[i]];
+          m.f(call_arg, call_res, call_iw, call_w);
+          for (casadi_int i=0;i<m.n_out;++i) {
+            if (m.out[i]>=0) w[m.out[i]] = call_w_res[i];
+          }
+        }
+        break;
       default: // Unary or binary operation
         w[e.i0] = w[e.i1] | w[e.i2]; break;
       }
@@ -768,6 +1029,39 @@ namespace casadi {
         if (res[it->i0]!=nullptr) {
           w[it->i1] |= res[it->i0][it->i2];
           res[it->i0][it->i2] = 0;
+        }
+        break;
+      case OP_CALL:
+        {
+          bvec_t** call_arg = arg + n_in_;
+          bvec_t** call_res       = res + n_out_;
+          casadi_int* call_iw     = iw;
+          bvec_t* call_w          = w + worksize_;
+          bvec_t* call_w_arg      = call_w + call_.sz_w;
+          bvec_t* call_w_res      = call_w_arg + call_.sz_w_arg;
+
+          auto& m = call_.nodes[it->i1];
+          bvec_t* ptr_w = call_w_arg;
+          for (casadi_int i=0;i<m.f_n_in;++i) {
+            call_arg[i] = ptr_w;
+            ptr_w+=m.f_nnz_in[i];
+          }
+          ptr_w = call_w_res;
+          for (casadi_int i=0;i<m.f_n_out;++i) {
+            call_res[i] = ptr_w;
+            ptr_w+=m.f_nnz_out[i];
+          }
+
+          fill_n(call_w_arg, m.n_dep, 0);
+          for (casadi_int i=0;i<m.n_out;++i) {
+            call_w_res[i] = (m.out[i]>=0) ? w[m.out[i]] : 0;
+          }
+          m.f.rev(call_arg, call_res, call_iw, call_w);
+
+          for (casadi_int i=0;i<m.n_out;++i) {
+            if (m.out[i]>=0) w[m.out[i]] = 0;
+          }
+          for (casadi_int i=0;i<m.n_dep;++i) w[m.dep[i]] |= call_w_arg[i];
         }
         break;
       default: // Unary or binary operation
@@ -915,7 +1209,7 @@ namespace casadi {
     XFunction<SXFunction, SX, SXNode>(e.xfunction),
     algorithm_(e.algorithm), worksize_(e.worksize),
     free_vars_(e.free_vars), operations_(e.operations),
-    constants_(e.constants), default_in_(e.default_in) {
+    constants_(e.constants), default_in_(e.default_in), call_(e.call) {
 
     // Default (persistent) options
     just_in_time_opencl_ = false;
@@ -931,6 +1225,22 @@ namespace casadi {
     s.pack("SXFunction::operations", operations_);
     s.pack("SXFunction::constants", constants_);
     s.pack("SXFunction::default_in", default_in_);
+
+    s.pack("SXFunction::call_sz_arg", call_.sz_arg);
+    s.pack("SXFunction::call_sz_res", call_.sz_res);
+    s.pack("SXFunction::call_sz_iw", call_.sz_iw);
+    s.pack("SXFunction::call_sz_w", call_.sz_w);
+    s.pack("SXFunction::call_sz_arg", call_.sz_w_arg);
+    s.pack("SXFunction::call_sz_res", call_.sz_w_res);
+
+    s.pack("SXFunction::call_nodes_size", call_.nodes.size());
+    // Loop over nodes
+    for (const auto& n : call_.nodes) {
+      s.pack("SXFunction::call_nodes_f", n.f);
+      s.pack("SXFunction::call_nodes_dep", n.dep);
+      s.pack("SXFunction::call_nodes_out", n.out);
+      s.pack("SXFunction::call_nodes_out_sx", n.out_sx);
+    }
 
     // Loop over algorithm
     for (const auto& e : algorithm_) {
@@ -955,6 +1265,28 @@ namespace casadi {
     s.unpack("SXFunction::operations", info.operations);
     s.unpack("SXFunction::constants", info.constants);
     s.unpack("SXFunction::default_in", info.default_in);
+
+    s.unpack("SXFunction::call_sz_arg", info.call.sz_arg);
+    s.unpack("SXFunction::call_sz_res", info.call.sz_res);
+    s.unpack("SXFunction::call_sz_iw", info.call.sz_iw);
+    s.unpack("SXFunction::call_sz_w", info.call.sz_w);
+    s.unpack("SXFunction::call_sz_arg", info.call.sz_w_arg);
+    s.unpack("SXFunction::call_sz_res", info.call.sz_w_res);
+
+    size_t nodes_size;
+    s.unpack("SXFunction::call_nodes_size", nodes_size);
+    info.call.nodes.reserve(nodes_size);
+
+    // Loop over nodes
+    for (casadi_int k=0;k<nodes_size;++k) {
+      Function f;
+      s.unpack("SXFunction::call_nodes_f", f);
+      info.call.nodes.emplace_back(f);
+      auto& e = info.call.nodes[k];
+      s.unpack("SXFunction::call_nodes_dep", e.dep);
+      s.unpack("SXFunction::call_nodes_out", e.out);
+      s.unpack("SXFunction::call_nodes_out_sx", e.out_sx);
+    }
 
     info.algorithm.resize(n_instructions);
     for (casadi_int k=0;k<n_instructions;++k) {

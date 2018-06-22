@@ -809,6 +809,7 @@ namespace casadi {
                  const std::vector<std::string>& onames,
                  const Dict& opts) const {
     try {
+      uout() << "get_jacobian:" << sp_weight() << std::endl;
       // Temporary single-input, single-output function FIXME(@jaeandersson)
       Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
                    {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});

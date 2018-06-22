@@ -1005,6 +1005,12 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::call_fun(const Function& f) const {
+    casadi_error("Not implemented");
+    //return binary(OP_PRINTME, *this, y);
+  }
+
+  template<typename Scalar>
   void Matrix<Scalar>::erase(const std::vector<casadi_int>& rr,
       const std::vector<casadi_int>& cc, bool ind1) {
     // Erase from sparsity pattern
@@ -3742,6 +3748,13 @@ namespace casadi {
     }
 
     return vertcat(ret);
+  }
+
+
+  template<>
+  SX SX::call_fun(const Function& f) const {
+    std::vector<SXElem> r = SXElem::call_fun(f, nonzeros());
+    return SX(r);
   }
 
   template<>

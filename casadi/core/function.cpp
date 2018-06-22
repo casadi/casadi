@@ -1113,7 +1113,7 @@ namespace casadi {
 
   Function Function::load(const std::string& s) {
     std::ifstream stream(s, ios_base::binary | std::ios::in);
-    if ((stream.rdstate() & std::ifstream::failbit) == 0) {
+    if ((stream.rdstate() & std::ifstream::failbit) != 0) {
       casadi_error("Could not open file '" + s + "'.");
     }
     return deserialize(stream);

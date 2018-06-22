@@ -64,6 +64,7 @@ namespace casadi {
     void unpack(int& e);
     void unpack(bool& e);
     void unpack(casadi_int& e);
+    void unpack(size_t& e);
     void unpack(std::string& e);
     void unpack(double& e);
     void unpack(char& e);
@@ -153,6 +154,7 @@ namespace casadi {
     void pack(int e);
     void pack(bool e);
     void pack(casadi_int e);
+    void pack(size_t e);
     void pack(double e);
     void pack(const std::string& e);
     void pack(char e);

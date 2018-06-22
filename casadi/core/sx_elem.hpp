@@ -126,6 +126,7 @@ namespace casadi {
     /** \brief  Perform operations by ID */
     static SXElem binary(casadi_int op, const SXElem& x, const SXElem& y);
     static SXElem unary(casadi_int op, const SXElem& x);
+    static std::vector<SXElem> call_fun(const Function& f, const std::vector<SXElem>& deps);
 
     /** \brief Check the truth value of this node
      * Introduced to catch bool(x) situations in python

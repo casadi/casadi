@@ -1474,6 +1474,8 @@ namespace casadi {
         return 0;
         CASADI_MATH_BINARY_BUILTIN
           return 2;
+      case OP_CALL:
+        return -1;
       default:
         return 1;
     }

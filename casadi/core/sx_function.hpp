@@ -182,6 +182,31 @@ class CASADI_EXPORT SXFunction :
   /// Default input values
   std::vector<double> default_in_;
 
+  /// Metadata for call nodes
+  struct CallInfo {
+    // Maximum memory requirements across all call nodes
+    size_t sz_arg = 0, sz_res = 0, sz_iw = 0, sz_w = 0;
+    size_t sz_w_arg = 0, sz_w_res = 0;
+
+    // call node information that won't fit into AlgEl
+    struct Node {
+      Node(const Function& fun);
+      Function f;
+      std::vector<int> dep;
+      std::vector<int> out;
+
+      // Following fields are redundant but will increase eval speed
+      casadi_int n_dep;
+      casadi_int n_out;
+      casadi_int f_n_in;
+      casadi_int f_n_out;
+      std::vector<int> f_nnz_in;
+      std::vector<int> f_nnz_out;
+
+      std::vector<SXElem> out_sx;
+    };
+    std::vector<Node> nodes;
+  } call_;
 
   struct Info  {
     XFunction<SXFunction, Matrix<SXElem>, SXNode>::Info xfunction;
@@ -191,6 +216,7 @@ class CASADI_EXPORT SXFunction :
     std::vector<SXElem> operations;
     std::vector<SXElem> constants;
     std::vector<double> default_in;
+    CallInfo call;
   };
 
   /** \brief Constructor */
