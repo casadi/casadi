@@ -34,6 +34,7 @@
 #include "sx_function.hpp"
 #include "map.hpp"
 #include "switch.hpp"
+#include "interpolant_impl.hpp"
 
 #include <typeinfo>
 #include <cctype>
@@ -1551,10 +1552,6 @@ namespace casadi {
     casadi_error("'export_code' not defined for " + class_name());
   }
 
-  void FunctionInternal::serialize_function(Serializer&s) const {
-    casadi_error("'serialize_function' not defined for " + class_name());
-  }
-
   void assert_read(std::istream &stream, const std::string& s) {
     casadi_int n = s.size();
     char c;
@@ -2847,6 +2844,17 @@ namespace casadi {
     s.unpack("ProtoFunction::verbose", e.verbose);
   }
 
+  void FunctionInternal::serialize_header(Serializer &s) const {
+    s.pack("Function::class_name", class_name());
+    serialize(s);
+  }
+
+
+  void FunctionInternal::serialize_plugin(Serializer &s, const std::string& base_class_name) const {
+    s.pack("Function::plugin::base_class_name", base_class_name);
+    s.pack("Function::plugin::class_name", class_name());
+  }
+
   void FunctionInternal::serialize(Serializer& s) const {
     ProtoFunction::serialize(s);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
@@ -2890,8 +2898,6 @@ namespace casadi {
     s.pack(casadi_int(sz_res_tmp_));
     s.pack(casadi_int(sz_iw_tmp_));
     s.pack(casadi_int(sz_w_tmp_));
-
-    serialize_function(s);
   }
 
   void FunctionInternal::deserialize(DeSerializer& s, Info& e) {
@@ -2979,7 +2985,7 @@ namespace casadi {
   std::map<std::string, Function (*)(DeSerializer&)> FunctionInternal::deserialize_map = {
     {"MXFunction", MXFunction::deserialize},
     {"SXFunction", SXFunction::deserialize},
-    {"Map", Map::deserialize},
+    {"Interpolant", Interpolant::deserialize},
     {"ThreadMap", ThreadMap::deserialize},
     {"OmpMap", OmpMap::deserialize},
     {"Switch", Switch::deserialize}

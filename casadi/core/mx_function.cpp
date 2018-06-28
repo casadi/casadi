@@ -1646,7 +1646,8 @@ namespace casadi {
     return dep.stats(1);
   }
 
-  void MXFunction::serialize_function(Serializer &s) const {
+  void MXFunction::serialize(Serializer &s) const {
+    FunctionInternal::serialize(s);
     s.pack("MXFunction::n_instr", casadi_int(algorithm_.size()));
 
     // Loop over algorithm

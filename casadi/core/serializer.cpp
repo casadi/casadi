@@ -51,7 +51,8 @@ namespace casadi {
       unpack(v);
       casadi_assert(v==serialization_protocol_version,
         "Serialization protocol is not compatible. "
-        "Got version " + str(v) + ", while " + str(serialization_protocol_version) + " was expected.");
+        "Got version " + str(v) + ", while " +
+        str(serialization_protocol_version) + " was expected.");
 
       bool debug;
       unpack(debug);

@@ -990,6 +990,7 @@ class Functiontests(casadiTestCase):
     for a,r in pairs:
       self.checkarray(J(a).T, r)
       self.check_codegen(J,inputs=[a])
+      self.check_serialize(J,[a])
 
   def test_1d_interpolant_uniform(self):
     grid = [[0, 1, 2]]
@@ -1633,6 +1634,7 @@ class Functiontests(casadiTestCase):
 
     self.checkfunction(LUT,LUT_sep, inputs=[0.2,0.333])
     self.check_codegen(LUT,inputs=[0.2,0.333])
+    self.check_serialize(LUT,inputs=[0.2,0.333])
 
   def test_2d_bspline_multiout(self):
     np.random.seed(0)

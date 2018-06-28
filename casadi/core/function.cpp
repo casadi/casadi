@@ -1023,6 +1023,12 @@ namespace casadi {
     return (*this)->export_code(lang, stream, options);
   }
 
+
+  void Function::save(const std::string &fname, const Dict& opts) const {
+    std::ofstream stream(fname, ios_base::binary | std::ios::out);
+    serialize(stream, opts);
+  }
+
   std::string Function::serialize(const Dict& opts) const {
     std::stringstream ss;
     serialize(ss, opts);
@@ -1049,7 +1055,10 @@ namespace casadi {
     if (class_name=="null") return Function();
     auto it = FunctionInternal::deserialize_map.find(class_name);
     if (it==FunctionInternal::deserialize_map.end()) {
-      casadi_error("Not implemented.");
+      std::string plugin_base;
+      s.unpack("Function::plugin::base_class_name", plugin_base);
+      it = FunctionInternal::deserialize_map.find(plugin_base);
+      return it->second(s);
     } else {
       return it->second(s);
     }
@@ -1100,6 +1109,14 @@ namespace casadi {
   Function Function::deserialize(std::istream& stream) {
     DeSerializer s(stream);
     return deserialize(s);
+  }
+
+  Function Function::load(const std::string& s) {
+    std::ifstream stream(s, ios_base::binary | std::ios::in);
+    if ((stream.rdstate() & std::ifstream::failbit) == 0) {
+      casadi_error("Could not open file '" + s + "'.");
+    }
+    return deserialize(stream);
   }
 
   Function Function::deserialize(const std::string& s) {

@@ -493,11 +493,12 @@ namespace casadi {
     virtual void export_code(const std::string& lang,
       std::ostream &stream, const Dict& options) const;
 
-    /** \brief Serialize */
-    void serialize(Serializer &s) const override;
+    virtual void serialize_header(Serializer &s) const;
+
+    void serialize_plugin(Serializer &s, const std::string& base_class_name) const;
 
     /** \brief Serialize */
-    virtual void serialize_function(Serializer &s) const;
+    void serialize(Serializer &s) const override;
 
     /** \brief Display object */
     void disp(std::ostream& stream, bool more) const override;

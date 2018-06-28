@@ -38,7 +38,8 @@ namespace casadi {
     casadi_assert_dev(!f_.empty());
   }
 
-  void Switch::serialize_function(Serializer &s) const {
+  void Switch::serialize(Serializer &s) const {
+    FunctionInternal::serialize(s);
     s.pack("Switch::f", f_);
     s.pack("Switch::f_def", f_def_);
     s.pack("Switch::project_in", project_in_);

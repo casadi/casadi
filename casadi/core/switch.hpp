@@ -118,7 +118,7 @@ namespace casadi {
     };
 
     /** \brief Serialize */
-    void serialize_function(Serializer &s) const override;
+    void serialize(Serializer &s) const override;
 
     /** \brief Deserialize into MX */
     static Function deserialize(DeSerializer& s);

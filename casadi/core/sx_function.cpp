@@ -922,7 +922,8 @@ namespace casadi {
     just_in_time_sparsity_ = false;
   }
 
-  void SXFunction::serialize_function(Serializer &s) const {
+  void SXFunction::serialize(Serializer &s) const {
+    FunctionInternal::serialize(s);
     s.pack("SXFunction::n_instr", casadi_int(algorithm_.size()));
 
     s.pack("SXFunction::worksize", casadi_int(worksize_));

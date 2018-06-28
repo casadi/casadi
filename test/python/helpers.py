@@ -537,6 +537,20 @@ class casadiTestCase(unittest.TestCase):
           self.checkarray(Fout[i],Fout2[i])
 
 
+  def check_serialize(self,F,inputs=None):
+      F2 = Function.deserialize(F.serialize({"debug":True}))
+
+      Fout = F.call(inputs)
+      Fout2 = F2.call(inputs)
+
+      if isinstance(inputs, dict):
+        self.assertEqual(F.name_out(), F2.name_out())
+        for k in F.name_out():
+          self.checkarray(Fout[k],Fout2[k])
+      else:
+        for i in range(F.n_out()):
+          self.checkarray(Fout[i],Fout2[i])
+
 class run_only(object):
   def __init__(self, args):
     self.args = []

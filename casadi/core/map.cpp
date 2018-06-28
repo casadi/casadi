@@ -60,7 +60,8 @@ namespace casadi {
     : FunctionInternal(e.function), f_(e.f), n_(e.n) {
   }
 
-  void Map::serialize_function(Serializer &s) const {
+  void Map::serialize(Serializer &s) const {
+    FunctionInternal::serialize(s);
     s.pack("Map::f", f_);
     s.pack("Map::n", n_);
   }

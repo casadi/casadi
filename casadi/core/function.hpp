@@ -712,6 +712,7 @@ namespace casadi {
 
     /** \brief Serialize */
     std::string serialize(const Dict& opts=Dict()) const;
+    void save(const std::string &fname, const Dict& opts=Dict()) const;
 
     std::string export_code(const std::string& lang, const Dict& options=Dict()) const;
 #ifndef SWIG
@@ -885,6 +886,9 @@ namespace casadi {
 
     /** \brief Build function from serialization */
     static Function deserialize(const std::string& s);
+
+    /** \brief Build function from serialization */
+    static Function load(const std::string& filename);
 
     /** \brief Build function from serialization */
     static Function deserialize(DeSerializer& s);

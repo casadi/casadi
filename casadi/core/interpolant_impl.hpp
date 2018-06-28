@@ -50,6 +50,9 @@ namespace casadi {
     /// Destructor
     ~Interpolant() override;
 
+    /** \brief Get type name */
+    std::string class_name() const override {return "Interpolant";}
+
     ///@{
     /** \brief Number of function inputs and outputs */
     size_t get_n_in() override { return 1;}
@@ -118,6 +121,32 @@ namespace casadi {
 
     // Lookup modes
     std::vector<std::string> lookup_modes_;
+
+    struct Info  {
+      FunctionInternal::Info function;
+      casadi_int ndim;
+      casadi_int m;
+      std::vector<double> grid;
+      std::vector<casadi_int> offset;
+      std::vector<double> values;
+      std::vector<std::string> lookup_modes;
+    };
+
+    /** \brief Serialize */
+    void serialize(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static Function deserialize(DeSerializer& s);
+
+    /** \brief Deserialize into MX */
+    static void deserialize(DeSerializer& s, Info& e);
+
+  protected:
+
+    /** \brief Constructor */
+    explicit Interpolant(const Info & e);
+
+
   };
 
 } // namespace casadi
