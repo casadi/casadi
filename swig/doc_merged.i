@@ -62033,9 +62033,11 @@ Get integrator input scheme name by index.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::casadi_qr_solve "
+%feature("docstring") casadi::casadi_kron "
 
-[INTERNAL] ";
+[INTERNAL]  Calculates Calculates nonzeros of kronecker product
+
+";
 
 %feature("docstring") casadi::nlpsol_option_info "
 
@@ -62602,6 +62604,10 @@ Get the documentation string for a plugin.
 [INTERNAL]  Inner product.
 
 ";
+
+%feature("docstring") casadi::casadi_qr_solve "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_de_boor "
 

@@ -77802,12 +77802,12 @@ const casadi_int *sp_lt, const T1 *lt, const T1 *d, const casadi_int *p, T1
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_qr_solve(T1 *x, casadi_int nrhs,
-casadi_int tr, const casadi_int *sp_v, const T1 *v, const casadi_int *sp_r,
-const T1 *r, const T1 *beta, const casadi_int *prinv, const casadi_int *pc,
-T1 *w) "
+%feature("docstring")  casadi::casadi_kron(const T1 *a, const casadi_int
+*sp_a, const T1 *b, const casadi_int *sp_b, T1 *r) "
 
-[INTERNAL] ";
+[INTERNAL]  Calculates Calculates nonzeros of kronecker product
+
+";
 
 %feature("docstring")  casadi::nlpsol_option_info(const std::string &name,
 const std::string &op) "
@@ -78758,6 +78758,13 @@ T1 *y) "
 [INTERNAL]  Inner product.
 
 ";
+
+%feature("docstring")  casadi::casadi_qr_solve(T1 *x, casadi_int nrhs,
+casadi_int tr, const casadi_int *sp_v, const T1 *v, const casadi_int *sp_r,
+const T1 *r, const T1 *beta, const casadi_int *prinv, const casadi_int *pc,
+T1 *w) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_de_boor(T1 x, const T1 *knots,
 casadi_int n_knots, casadi_int degree, T1 *boor) "
