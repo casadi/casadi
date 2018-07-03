@@ -2226,38 +2226,10 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::kron(const Matrix<Scalar>& a, const Matrix<Scalar>& b) {
-    Sparsity sp_ret = Sparsity::kron(a.sparsity(), b.sparsity());
-
-    casadi_int a_ncol = a.size2();
-    casadi_int b_ncol = b.size2();
-    const casadi_int* a_colind = a.colind();
-    //const casadi_int* a_row = a.row();
-    const casadi_int* b_colind = b.colind();
-    //const casadi_int* b_row = b.row();
-
     std::vector<Scalar> ret(a.nnz()*b.nnz());
-    Scalar* ret_ptr = get_ptr(ret);
+    casadi_kron(get_ptr(a), a.sparsity(), get_ptr(b), b.sparsity(), get_ptr(ret));
 
-    casadi_int k=0;
-
-    const Scalar* v_a = get_ptr(a);
-    const Scalar* v_b = get_ptr(b);
-
-    // Loop over the columns
-    for (casadi_int a_cc=0; a_cc<a_ncol; ++a_cc) {
-      // Loop over the columns
-      for (casadi_int b_cc=0; b_cc<b_ncol; ++b_cc) {
-        // Loop over existing nonzeros
-        for (casadi_int a_el=a_colind[a_cc]; a_el<a_colind[a_cc+1]; ++a_el) {
-          Scalar a_v = v_a[a_el];
-          // Loop over existing nonzeros
-          for (casadi_int b_el=b_colind[b_cc]; b_el<b_colind[b_cc+1]; ++b_el) {
-            Scalar b_v = v_b[b_el];
-            ret_ptr[k++] = a_v*b_v;
-          }
-        }
-      }
-    }
+    Sparsity sp_ret = Sparsity::kron(a.sparsity(), b.sparsity());
     return Matrix<Scalar>(sp_ret, ret, false);
   }
 

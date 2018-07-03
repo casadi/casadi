@@ -123,6 +123,10 @@ namespace casadi {
   template<typename T1>
   T1 casadi_bilin(const T1* A, const casadi_int* sp_A, const T1* x, const T1* y);
 
+  /** Calculates Calculates nonzeros of kronecker product */
+  template<typename T1>
+  void casadi_kron(const T1* a, const casadi_int* sp_a, const T1* b, const casadi_int* sp_b, T1* r);
+
   /// Adds a multiple alpha/2 of the outer product mul(x, trans(x)) to A
   template<typename T1>
   void casadi_rank1(T1* A, const casadi_int* sp_A, T1 alpha, const T1* x);
@@ -211,6 +215,7 @@ namespace casadi {
   #include "casadi_iamax.hpp"
   #include "casadi_axpy.hpp"
   #include "casadi_dot.hpp"
+  #include "casadi_kron.hpp"
   #include "casadi_fill.hpp"
   #include "casadi_max_viol.hpp"
   #include "casadi_minmax.hpp"
