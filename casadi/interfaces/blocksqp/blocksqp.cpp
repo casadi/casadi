@@ -426,22 +426,22 @@ namespace casadi {
     }
 
     // Setup feasibility restoration phase
-    if(restore_feas_) {
+    if (restore_feas_) {
       // get orignal nlp
       Function nlp = oracle_;
       vector<MX> resv;
       vector<MX> argv = nlp.mx_in();
 
       // build fesibility restoration phase nlp
-      MX p = MX::sym("p",nlp.size1_in("x"));
-      MX s = MX::sym("s",nlp.size1_out("g"));
+      MX p = MX::sym("p", nlp.size1_in("x"));
+      MX s = MX::sym("s", nlp.size1_out("g"));
 
-      MX d = fmin(1.0,1.0/abs(p)) * (argv.at(0) - p);
-      MX f_rp = 0.5 * rho_ * dot(s,s) + zeta_/2.0 * dot(d,d);
+      MX d = fmin(1.0, 1.0/abs(p)) * (argv.at(0) - p);
+      MX f_rp = 0.5 * rho_ * dot(s, s) + zeta_/2.0 * dot(d, d);
       MX g_rp = nlp(argv).at(1) - s;
 
-      MXDict nlp_rp = {{"x", MX::vertcat({argv.at(0),s})},
-	               {"p", MX::vertcat({argv.at(1),p})},
+      MXDict nlp_rp = {{"x", MX::vertcat({argv.at(0), s})},
+                       {"p", MX::vertcat({argv.at(1), p})},
                        {"f", f_rp},
                        {"g", g_rp}};
 
@@ -1434,34 +1434,34 @@ namespace casadi {
     DMDict solver_in;
 
     // The reference point is the starting value for the restoration phase
-    vector<double> in_x0(m->x,m->x+nx_);
+    vector<double> in_x0(m->x, m->x+nx_);
 
     // Initialize slack variables such that the constraints are feasible
-    for(casadi_int i=0; i<ng_; i++) {
-      if(m->gk[i] <= m->lbg[i])
+    for (casadi_int i=0; i<ng_; i++) {
+      if (m->gk[i] <= m->lbg[i])
         in_x0.push_back(m->gk[i] - m->lbg[i]);
-      else if(m->gk[i] > m->ubg[i])
+      else if (m->gk[i] > m->ubg[i])
         in_x0.push_back(m->gk[i] - m->ubg[i]);
       else
         in_x0.push_back(0.0);
     }
 
     // Add current iterate xk to parameter p
-    vector<double> in_p(m->p,m->p+np_);
-    vector<double> in_p2(m->x,m->x+nx_);
+    vector<double> in_p(m->p, m->p+np_);
+    vector<double> in_p2(m->x, m->x+nx_);
     in_p.insert(in_p.end(), in_p2.begin(), in_p2.end());
 
     // Set bounds for variables
-    vector<double> in_lbx(m->lbx,m->lbx+nx_);
-    vector<double> in_ubx(m->ubx,m->ubx+nx_);
-    for(casadi_int i=0; i<ng_; i++) {
+    vector<double> in_lbx(m->lbx, m->lbx+nx_);
+    vector<double> in_ubx(m->ubx, m->ubx+nx_);
+    for (casadi_int i=0; i<ng_; i++) {
       in_lbx.push_back(-inf);
       in_ubx.push_back(inf);
     }
 
     // Set bounds for constraints
-    vector<double> in_lbg(m->lbg,m->lbg+ng_);
-    vector<double> in_ubg(m->ubg,m->ubg+ng_);
+    vector<double> in_lbg(m->lbg, m->lbg+ng_);
+    vector<double> in_ubg(m->ubg, m->ubg+ng_);
 
     solver_in["x0"] = in_x0;
     solver_in["p"] = in_p;
@@ -1533,28 +1533,29 @@ namespace casadi {
     ret = m2->ret_;
 
     warmStart = 1;
-    for(casadi_int it=0; it<maxRestIt; it++) {
+    for (casadi_int it=0; it<maxRestIt; it++) {
       // One iteration for minimum norm NLP
-      if(it > 0)
-        ret = bp->run(m2,1,warmStart);
+      if (it > 0)
+        ret = bp->run(m2, 1, warmStart);
 
       // If restMethod yields error, stop restoration phase
-      if(ret == -1)
+      if (ret == -1)
         break;
 
       // Get new xi from the restoration phase
-      for(casadi_int i=0; i<nx_; i++)
+      for (casadi_int i=0; i<nx_; i++)
         m->trial_xk[i] = m2->x[i];
 
       // Compute objective at trial point
       info = evaluate(m, m->trial_xk, &objTrial, m->gk);
       m->nFunCalls++;
       cNormTrial = lInfConstraintNorm(m, m->trial_xk, m->gk);
-      if( info != 0 || objTrial < obj_lo_ || objTrial > obj_up_ || !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
+      if ( info != 0 || objTrial < obj_lo_ || objTrial > obj_up_ ||
+          !(objTrial == objTrial) || !(cNormTrial == cNormTrial) )
         continue;
 
       // Is this iterate acceptable for the filter?
-      if(!pairInFilter(m, cNormTrial, objTrial)) {
+      if (!pairInFilter(m, cNormTrial, objTrial)) {
         // success
         print("Found a point acceptable for the filter.\n");
         ret = 0;
@@ -1562,33 +1563,33 @@ namespace casadi {
       }
 
       // If minimum norm NLP has converged, declare local infeasibility
-        if(m2->tol < opttol_ && m2->cNormS < nlinfeastol_) {
+        if (m2->tol < opttol_ && m2->cNormS < nlinfeastol_) {
           ret = 1;
           break;
         }
     }
 
     // Success or locally infeasible
-    if(ret == 0 || ret == 1) {
+    if (ret == 0 || ret == 1) {
         // Store the infinity norm of the multiplier step
         m->lambdaStepNorm = 0.0;
         // Compute restoration step
-        for(casadi_int k=0; k<nx_; k++) {
+        for (casadi_int k=0; k<nx_; k++) {
             m->dxk[k] = m->x[k];
 
             m->x[k] = m->trial_xk[k];
 
             // Store lInf norm of dual step
-            if((lStpNorm = fabs(m2->lam_xk[k] - m->lam_xk[k])) > m->lambdaStepNorm)
+            if ((lStpNorm = fabs(m2->lam_xk[k] - m->lam_xk[k])) > m->lambdaStepNorm)
                 m->lambdaStepNorm = lStpNorm;
             m->lam_xk[k] = m2->lam_xk[k];
             m->lam_qp[k] = m2->lam_qp[k];
 
             m->dxk[k] -= m->x[k];
         }
-        for(casadi_int k=0; k<ng_; k++) {
+        for (casadi_int k=0; k<ng_; k++) {
             // skip the dual variables for the slack variables in the restoration problem
-            if((lStpNorm = fabs(m2->lam_gk[k] - m->lam_gk[k])) > m->lambdaStepNorm)
+            if ((lStpNorm = fabs(m2->lam_gk[k] - m->lam_gk[k])) > m->lambdaStepNorm)
                 m->lambdaStepNorm = lStpNorm;
             m->lam_gk[k] = m2->lam_gk[k];
             m->lam_qp[k] = m2->lam_qp[nx_+ng_+k];
@@ -1603,8 +1604,8 @@ namespace casadi {
         resetHessian(m);
     }
 
-    if(ret == 1) {
-        if(print_iteration_) printProgress(m);
+    if (ret == 1) {
+        if (print_iteration_) printProgress(m);
         updateStats(m);
         print("The problem seems to be locally infeasible. Infeasibilities minimized.\n");
     }
@@ -2084,17 +2085,18 @@ namespace casadi {
     // assign exact hessian to blocks
     const casadi_int* col = exact_hess_lag_sp_.colind();
     const casadi_int* row = exact_hess_lag_sp_.row();
-    casadi_int s,dim;
+    casadi_int s, dim;
 
-    for(casadi_int k=0; k<nblocks_; k++) {
+    for (casadi_int k=0; k<nblocks_; k++) {
       s = blocks_[k];
       dim = dim_[k];
-      for(casadi_int i=0; i<dim; i++)
-        m->hess[k][i + i*dim] = 0.0;  // Set diagonal to 0 (may have been 1 because of CalcInitialHessian)
-      for(casadi_int j=0; j<dim; j++) {
-        for(casadi_int i=col[j+s]; i<col[j+1+s]; i++) {
+      for (casadi_int i=0; i<dim; i++)
+        // Set diagonal to 0 (may have been 1 because of CalcInitialHessian)
+        m->hess[k][i + i*dim] = 0.0;
+      for (casadi_int j=0; j<dim; j++) {
+        for (casadi_int i=col[j+s]; i<col[j+1+s]; i++) {
           m->hess[k][row[i]-row[col[s]] + j*dim] = m->exact_hess_lag[i];
-          if(row[i]-row[col[s]] < j)
+          if (row[i]-row[col[s]] < j)
             m->hess[k][j + (row[i]-row[col[s]])*dim] = m->exact_hess_lag[i];
         }
       }
@@ -2102,7 +2104,7 @@ namespace casadi {
 
     // Prepare to compute fallback update as well
     m->hess = m->hess2;
-    if(fallback_update_ == 2 && !hess_lim_mem_)
+    if (fallback_update_ == 2 && !hess_lim_mem_)
         calcHessianUpdate(m, fallback_update_, fallback_scaling_);
     else if (fallback_update_ == 0)
         calcInitialHessian(m);  // Set fallback as Identity
@@ -2788,14 +2790,17 @@ namespace casadi {
   casadi_int Blocksqp::
   evaluate(BlocksqpMemory* m,
            double *exact_hess_lag) const {
-    double ones[nx_];
-    for(casadi_int i=0; i<nx_; ++i) ones[i] = 1.0;
-    double minus_lam_gk[ng_];
-    for(casadi_int i=0; i<ng_; ++i) minus_lam_gk[i] = -m->lam_gk[i]; // Langrange function in blocksqp is L = f - lambdaT * g, whereas + in casadi
+    static std::vector<double> ones;
+    ones.resize(nx_);
+    for (casadi_int i=0; i<nx_; ++i) ones[i] = 1.0;
+    static std::vector<double> minus_lam_gk;
+    minus_lam_gk.resize(ng_);
+    // Langrange function in blocksqp is L = f - lambdaT * g, whereas + in casadi
+    for (casadi_int i=0; i<ng_; ++i) minus_lam_gk[i] = -m->lam_gk[i];
     m->arg[0] = m->x; // x
     m->arg[1] = m->p; // p
-    m->arg[2] = ones; // lam:f
-    m->arg[3] = minus_lam_gk; // lam:g
+    m->arg[2] = get_ptr(ones); // lam:f
+    m->arg[3] = get_ptr(minus_lam_gk); // lam:g
     m->res[0] = exact_hess_lag; // hess:gamma:x:x
     calc_function(m, "nlp_hess_l");
     return 0;
