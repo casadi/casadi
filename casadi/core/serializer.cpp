@@ -29,6 +29,7 @@
 #include "function_internal.hpp"
 #include "slice.hpp"
 #include "linsol.hpp"
+#include "generic_type.hpp"
 #include <iomanip>
 
 using namespace std;
@@ -118,6 +119,22 @@ namespace casadi {
       int64_t n = e;
       const char* c = reinterpret_cast<const char*>(&n);
       for (int j=0;j<8;++j) pack(c[j]);
+    }
+
+    void Serializer::pack(size_t e) {
+      decorate('K');
+      uint64_t n = e;
+      const char* c = reinterpret_cast<const char*>(&n);
+      for (int j=0;j<8;++j) pack(c[j]);
+    }
+
+    void DeSerializer::unpack(size_t& e) {
+      assert_decoration('K');
+      uint64_t n;
+      char* c = reinterpret_cast<char*>(&n);
+
+      for (int j=0;j<8;++j) unpack(c[j]);
+      e = n;
     }
 
     void DeSerializer::unpack(int& e) {
@@ -233,6 +250,16 @@ namespace casadi {
       shared_unpack(e, linsols);
     }
 
+    void Serializer::pack(const GenericType& e) {
+      decorate('G');
+      shared_pack(e, generic_types_);
+    }
+
+    void DeSerializer::unpack(GenericType& e) {
+      assert_decoration('G');
+      shared_unpack(e, generic_types);
+    }
+
     void Serializer::pack(const Slice& e) {
       decorate('S');
       e.serialize(*this);
@@ -252,5 +279,21 @@ namespace casadi {
       assert_decoration('E');
       shared_unpack(e, sx_nodes);
     }
+
+  template<>
+  void DeSerializer::unpack(std::vector<bool>& e) {
+    char t;
+    unpack(t);
+    casadi_assert_dev(t=='V');
+    casadi_int s;
+    unpack(s);
+    e.resize(s);
+    for (casadi_int i=0;i<s;++i) {
+      bool b;
+      unpack(b);
+      e[i] = b;
+    }
+  }
+
 
 } // namespace casadi

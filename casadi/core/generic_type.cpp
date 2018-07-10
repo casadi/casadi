@@ -26,6 +26,7 @@
 #include "generic_type_internal.hpp"
 #include "casadi_misc.hpp"
 #include "exception.hpp"
+#include "serializer.hpp"
 #include <cmath>
 
 #include "function.hpp"
@@ -530,4 +531,59 @@ namespace casadi {
     }
   }
 
+  void GenericType::serialize(Serializer& s) const {
+    s.pack("GenericType::type", static_cast<int>(getType()));
+    static_cast<const GenericTypeBase*>(get())->serialize(s);
+  }
+
+  GenericType GenericType::deserialize(DeSerializer& s) {
+    int itype;
+    s.unpack("GenericType::type", itype);
+    TypeID type = static_cast<TypeID>(itype);
+    switch (type) {
+      case OT_STRING:
+        return StringType::deserialize(s);
+      case OT_DOUBLE:
+        return DoubleType::deserialize(s);
+      case OT_INT:
+        return IntType::deserialize(s);
+      case OT_BOOL:
+        return BoolType::deserialize(s);
+      case OT_DOUBLEVECTOR:
+        return DoubleVectorType::deserialize(s);
+      case OT_DOUBLEVECTORVECTOR:
+        return DoubleVectorVectorType::deserialize(s);
+      case OT_INTVECTOR:
+        return IntVectorType::deserialize(s);
+      case OT_INTVECTORVECTOR:
+        return IntVectorVectorType::deserialize(s);
+      case OT_STRINGVECTOR:
+        return StringVectorType::deserialize(s);
+      case OT_FUNCTION:
+        return FunctionType::deserialize(s);
+      case OT_FUNCTIONVECTOR:
+        return FunctionVectorType::deserialize(s);
+      case OT_DICT:
+        return DictType::deserialize(s);
+      default:
+        casadi_error("Not implemented");
+    }
+  }
+
+
+  typedef GenericTypeInternal<OT_STRING, std::string> StringType;
+  typedef GenericTypeInternal<OT_DOUBLE, double> DoubleType;
+  typedef GenericTypeInternal<OT_INT, casadi_int> IntType;
+  typedef GenericTypeInternal<OT_BOOL, bool> BoolType;
+  typedef GenericTypeInternal<OT_DOUBLEVECTOR, std::vector<double> > DoubleVectorType;
+  typedef GenericTypeInternal<OT_DOUBLEVECTORVECTOR,
+                              std::vector< std::vector<double> > > DoubleVectorVectorType;
+  typedef GenericTypeInternal<OT_INTVECTOR, std::vector<casadi_int> > IntVectorType;
+  typedef GenericTypeInternal<OT_INTVECTORVECTOR,
+                              std::vector< std::vector<casadi_int> > > IntVectorVectorType;
+  typedef GenericTypeInternal<OT_STRINGVECTOR, std::vector<std::string> > StringVectorType;
+  typedef GenericTypeInternal<OT_FUNCTION, Function> FunctionType;
+  typedef GenericTypeInternal<OT_FUNCTIONVECTOR, std::vector<Function> > FunctionVectorType;
+  typedef GenericTypeInternal<OT_DICT, Dict> DictType;
+  typedef GenericTypeInternal<OT_VOIDPTR, void*> VoidPointerType;
 } // namespace casadi

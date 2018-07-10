@@ -33,7 +33,8 @@
 #include <vector>
 
 namespace casadi {
-
+  class Serializer;
+  class DeSerializer;
 #if !(defined(SWIG) && !defined(SWIGXML))
 
   /** \brief  Types of options */
@@ -200,6 +201,11 @@ namespace casadi {
     bool operator==(const GenericType& op2) const;
     bool operator!=(const GenericType& op2) const;
 #endif // SWIG
+
+    void serialize(Serializer& s) const;
+
+    /** \brief Deserialize into slice */
+    static GenericType deserialize(DeSerializer& s);
   };
 
   /// C++ equivalent of Python's dict or MATLAB's struct

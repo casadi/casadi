@@ -44,6 +44,8 @@ namespace casadi {
   class MXNode;
   class SXElem;
   class SXNode;
+  class GenericType;
+  class GenericTypeBase;
   /** \brief Helper class for Serialization
       \author Joris Gillis
       \date 2018
@@ -60,10 +62,12 @@ namespace casadi {
       e = Matrix<T>::deserialize(*this);
     }
     void unpack(Function& e);
+    void unpack(GenericType& e);
     void unpack(Slice& e);
     void unpack(int& e);
     void unpack(bool& e);
     void unpack(casadi_int& e);
+    void unpack(size_t& e);
     void unpack(std::string& e);
     void unpack(double& e);
     void unpack(char& e);
@@ -75,9 +79,25 @@ namespace casadi {
       casadi_int s;
       unpack(s);
       e.resize(s);
-      for (auto & i : e) unpack(i);
+      for (T& i : e) unpack(i);
     }
 
+    template <class K, class V>
+    void unpack(std::map<K, V>& e) {
+      char t;
+      unpack(t);
+      casadi_assert_dev(t=='D');
+      casadi_int s;
+      unpack(s);
+      e.clear();
+      for (casadi_int i=0;i<s;++i) {
+        K k;
+        V v;
+        unpack(k);
+        unpack(v);
+        e[k] = v;
+      }
+    }
 
     template <class T>
     void unpack(const std::string& descr, T& e) {
@@ -120,6 +140,7 @@ namespace casadi {
     std::vector<SXElem> sx_nodes;
     std::vector<Sparsity> sparsities;
     std::vector<Linsol> linsols;
+    std::vector<GenericType> generic_types;
 
     bool debug_;
   };
@@ -150,9 +171,11 @@ namespace casadi {
     }
     void pack(const Function& e);
     void pack(const Slice& e);
+    void pack(const GenericType& e);
     void pack(int e);
     void pack(bool e);
     void pack(casadi_int e);
+    void pack(size_t e);
     void pack(double e);
     void pack(const std::string& e);
     void pack(char e);
@@ -160,7 +183,16 @@ namespace casadi {
     void pack(const std::vector<T>& e) {
       pack('V');
       pack(casadi_int(e.size()));
-      for (const auto & i : e) pack(i);
+      for (const T & i : e) pack(i);
+    }
+    template <class K, class V>
+    void pack(const std::map<K, V>& e) {
+      pack('D');
+      pack(casadi_int(e.size()));
+      for (const auto & i : e) {
+        pack(i.first);
+        pack(i.second);
+      }
     }
 
     template <class T>
@@ -194,12 +226,16 @@ namespace casadi {
     std::map<SXNode*, casadi_int> SX_nodes_;
     std::map<SparsityInternal*, casadi_int> sparsities_;
     std::map<SharedObjectInternal*, casadi_int> linsols_;
+    std::map<SharedObjectInternal*, casadi_int> generic_types_;
 
     std::ostream& out;
 
     bool debug_;
 
   };
+
+  template <>
+  void DeSerializer::unpack(std::vector<bool>& e);
 
 
 } // namespace casadi
