@@ -225,7 +225,6 @@ namespace casadi {
   }
 
   void Interpolant::deserialize(DeSerializer& s, Info& e) {
-    uout() << "void Interpolant::deserialize(DeSerializer& s, Info& e) {" << std::endl;
     FunctionInternal::deserialize(s, e.function);
 
     Interpolant::Info interp;
@@ -238,7 +237,6 @@ namespace casadi {
   }
 
   Function Interpolant::deserialize(DeSerializer& s) {
-    uout() << "Function Interpolant::deserialize(DeSerializer& s) " << std::endl;
     return PluginInterface<Interpolant>::deserialize(s);
   }
 
