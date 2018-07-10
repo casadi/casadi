@@ -2278,7 +2278,7 @@ C++ includes: blocksqp.hpp ";
 
 %feature("docstring") casadi::Blocksqp::class_name "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Get type name.
 
 ";
 
@@ -18340,6 +18340,12 @@ propagation.
 
 ";
 
+%feature("docstring") casadi::FastNewton::getAdaptorSolverName "
+
+[INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
 %feature("docstring") casadi::FastNewton::sz_iw "
 
 [INTERNAL]  Get required length of iw field.
@@ -18444,9 +18450,9 @@ original
 
 ";
 
-%feature("docstring") casadi::FastNewton::jit_dependencies "
+%feature("docstring") casadi::FastNewton::serialize "
 
-[INTERNAL]  JIT for dependencies.
+[INTERNAL]  Serialize.
 
 ";
 
@@ -18541,9 +18547,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::FastNewton::getAdaptorSolverName "
+%feature("docstring") casadi::FastNewton::uses_output "
 
-[INTERNAL]  Obtain solver name from Adaptor.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -18718,9 +18724,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::FastNewton::serialize "
+%feature("docstring") casadi::FastNewton::jit_dependencies "
 
-[INTERNAL]  Serialize.
+[INTERNAL]  JIT for dependencies.
 
 ";
 
@@ -18800,12 +18806,6 @@ elements.
 %feature("docstring") casadi::FastNewton::sx_in "
 
 [INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::FastNewton::uses_output "
-
-[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -25494,6 +25494,10 @@ C++ includes: generic_type.hpp ";
 ";
 
 %feature("docstring") casadi::GenericTypeBase::getType "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::GenericTypeBase::serialize "
 
 [INTERNAL] ";
 
@@ -40075,9 +40079,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::get_sparsity_out "
+%feature("docstring") casadi::Nlpsol::print_fstats "
 
-[INTERNAL]  Sparsities of function inputs and outputs.
+[INTERNAL]  Print statistics.
 
 ";
 
@@ -40142,9 +40146,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Nlpsol::print_fstats "
+%feature("docstring") casadi::Nlpsol::get_sparsity_out "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  Sparsities of function inputs and outputs.
 
 ";
 
@@ -40374,9 +40378,9 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::Nlpsol::free_sx "
+%feature("docstring") casadi::Nlpsol::serialize "
 
-[INTERNAL]  Get free variables (SX)
+[INTERNAL]  Serialize.
 
 ";
 
@@ -40550,12 +40554,6 @@ elements.
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
-
-";
-
-%feature("docstring") casadi::Nlpsol::serialize "
-
-[INTERNAL]  Serialize.
 
 ";
 
@@ -40872,7 +40870,7 @@ propagation.
 
 %feature("docstring") casadi::Nlpsol::class_name "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Get type name.
 
 ";
 
@@ -40990,6 +40988,12 @@ propagation.
 %feature("docstring") casadi::Nlpsol::instruction_id "
 
 [INTERNAL]  Get an atomic operation operator index.
+
+";
+
+%feature("docstring") casadi::Nlpsol::free_sx "
+
+[INTERNAL]  Get free variables (SX)
 
 ";
 
@@ -47770,7 +47774,7 @@ elements.
 
 %feature("docstring") casadi::Qrsqp::class_name "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Get type name.
 
 ";
 
@@ -50709,7 +50713,7 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::Scpgen::class_name "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Get type name.
 
 ";
 
@@ -56598,6 +56602,409 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::get_default_in "
+
+[INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::get_free "
+
+[INTERNAL]  Print free variables.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::sz_arg "
+
+[INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::index_out "
+
+[INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::weak "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::free_mx "
+
+[INTERNAL]  Get free variables ( MX)
+
+";
+
+%feature("docstring") casadi::Sqpmethod::index_in "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::sp_reverse "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::get_options "
+
+[INTERNAL]  Options.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::has_sprev "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring") casadi::Sqpmethod::symbolicAdjSeed "
+
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::get_forward "
+
+[INTERNAL]  Generate a function that calculates forward mode derivatives.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::alloc_mem "
+
+[INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::eval_mx "
+
+[INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::codegen_meta "
+
+[INTERNAL]  Generate meta-information allowing a user to evaluate a
+generated function.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::mapsum_mx "
+
+[INTERNAL]  Parallel evaluation.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::print_iteration "
+
+[INTERNAL]  Print iteration.
+
+>  void casadi::Sqpmethod::print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf, double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Print iteration.
+
+";
+
+";
+
+%feature("docstring") casadi::Sqpmethod::get_function "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Sqpmethod::get_sparsity_in "
+
+[INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::jit_dependencies "
+
+[INTERNAL]  JIT for dependencies.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::sparsity_out "
+
+[INTERNAL]  Input/output sparsity.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::instruction_output "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::set_function "
+
+[INTERNAL]  Register the function for evaluation and statistics gathering
+
+";
+
+%feature("docstring") casadi::Sqpmethod::has_forward "
+
+[INTERNAL]  Generate a function that calculates forward mode derivatives.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::call "
+
+[INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::sz_iw "
+
+[INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::alloc_w "
+
+[INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::replace_res "
+
+[INTERNAL]  Replace 0-by-0 outputs.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::serialize "
+
+[INTERNAL]  Serialize.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::setup "
+
+[INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::size_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::getJacSparsityHierarchicalSymm "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring") casadi::Sqpmethod::codegen_decref "
+
+[INTERNAL]  Codegen decref for dependencies.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::fwdViaJac "
+
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::has_eval_dm "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::check_arg "
+
+[INTERNAL]  Check if input arguments have correct length and dimensions.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::setOptionsFromFile "
+
+[INTERNAL]  Read options from parameter xml.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::replace_fseed "
+
+[INTERNAL]
+
+>  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
+
+%feature("docstring") casadi::Sqpmethod::get_jacobian_sparsity "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::symbolic_output "
+
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::finalize "
+
+[INTERNAL]  Finalize initialization.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::mx_in "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring") casadi::Sqpmethod::has_function "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Sqpmethod::print "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::size1_in "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::matching_arg "
+
+[INTERNAL]  Check if input arguments that needs to be replaced.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::call_forward "
+
+[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
+classes.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::free_sx "
+
+[INTERNAL]  Get free variables (SX)
+
+";
+
+%feature("docstring") casadi::Sqpmethod::forward "
+
+[INTERNAL]  Return function that calculates forward derivatives
+forward(nfwd) returns a cached instance if available, and calls  Function
+get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::callback "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Sqpmethod::alloc_res "
+
+[INTERNAL]  Ensure required length of res field.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::print_dimensions "
+
+[INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::codegen_sparsities "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::solve "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Sqpmethod::get_n_out "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::instruction_input "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::which_depends "
+
+[INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::Sqpmethod::sz_w "
+
+[INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::solve_QP "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Sqpmethod::instruction_MX "
+
+[INTERNAL]  get MX expression associated with instruction
+
+";
+
+%feature("docstring") casadi::Sqpmethod::codegen_declarations "
+
+[INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring") casadi::Sqpmethod::info "
+
+[INTERNAL]  Obtain information about function
+
+";
+
 %feature("docstring") casadi::Sqpmethod "
 
 'sqpmethod' plugin for Nlpsol
@@ -56828,409 +57235,6 @@ Diagrams
 
 
 C++ includes: sqpmethod.hpp ";
-
-%feature("docstring") casadi::Sqpmethod::get_free "
-
-[INTERNAL]  Print free variables.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::eval_dm "
-
-[INTERNAL]  Evaluate with DM matrices.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::sz_arg "
-
-[INTERNAL]  Get required length of arg field.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::index_out "
-
-[INTERNAL]  Get output scheme index by name.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::weak "
-
-[INTERNAL]  Get a weak reference to the object.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::free_mx "
-
-[INTERNAL]  Get free variables ( MX)
-
-";
-
-%feature("docstring") casadi::Sqpmethod::index_in "
-
-[INTERNAL]  Get input scheme index by name.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::sp_reverse "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::get_options "
-
-[INTERNAL]  Options.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::has_sprev "
-
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring") casadi::Sqpmethod::symbolicAdjSeed "
-
-[INTERNAL]  Symbolic expressions for the adjoint seeds.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::get_forward "
-
-[INTERNAL]  Generate a function that calculates forward mode derivatives.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::alloc_mem "
-
-[INTERNAL]  Create memory block.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::eval_mx "
-
-[INTERNAL]  Evaluate with symbolic matrices.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::codegen_meta "
-
-[INTERNAL]  Generate meta-information allowing a user to evaluate a
-generated function.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::mapsum_mx "
-
-[INTERNAL]  Parallel evaluation.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::print_iteration "
-
-[INTERNAL]  Print iteration.
-
->  void casadi::Sqpmethod::print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf, double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Print iteration.
-
-";
-
-";
-
-%feature("docstring") casadi::Sqpmethod::get_function "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::Sqpmethod::get_sparsity_in "
-
-[INTERNAL]  Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::jit_dependencies "
-
-[INTERNAL]  JIT for dependencies.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::sparsity_out "
-
-[INTERNAL]  Input/output sparsity.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::instruction_output "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::set_function "
-
-[INTERNAL]  Register the function for evaluation and statistics gathering
-
-";
-
-%feature("docstring") casadi::Sqpmethod::has_forward "
-
-[INTERNAL]  Generate a function that calculates forward mode derivatives.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::call "
-
-[INTERNAL]   Call a function, templated.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::sz_iw "
-
-[INTERNAL]  Get required length of iw field.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::alloc_w "
-
-[INTERNAL]  Ensure required length of w field.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::replace_res "
-
-[INTERNAL]  Replace 0-by-0 outputs.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::get_jacobian_sparsity "
-
-[INTERNAL]  Get Jacobian sparsity.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::setup "
-
-[INTERNAL]  Set the (persistent and temporary) work vectors.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::size_in "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::getJacSparsityHierarchicalSymm "
-
-[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition for symmetric Jacobians
-
-";
-
-%feature("docstring") casadi::Sqpmethod::codegen_decref "
-
-[INTERNAL]  Codegen decref for dependencies.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::fwdViaJac "
-
-[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
-multiplying.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::has_eval_dm "
-
-[INTERNAL]  Evaluate with DM matrices.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::check_arg "
-
-[INTERNAL]  Check if input arguments have correct length and dimensions.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::setOptionsFromFile "
-
-[INTERNAL]  Read options from parameter xml.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::replace_fseed "
-
-[INTERNAL]
-
->  std::vector<std::vector<M> > casadi::FunctionInternal::replace_fseed(const std::vector< std::vector< M > > &fseed, casadi_int npar) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-";
-
-";
-
-%feature("docstring") casadi::Sqpmethod::serialize "
-
-[INTERNAL]  Serialize.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::symbolic_output "
-
-[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::finalize "
-
-[INTERNAL]  Finalize initialization.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::mx_in "
-
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring") casadi::Sqpmethod::has_function "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::Sqpmethod::print "
-
-[INTERNAL]  C-style formatted printing during evaluation.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::size1_in "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::matching_arg "
-
-[INTERNAL]  Check if input arguments that needs to be replaced.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::call_forward "
-
-[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
-classes.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::free_sx "
-
-[INTERNAL]  Get free variables (SX)
-
-";
-
-%feature("docstring") casadi::Sqpmethod::forward "
-
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(casadi_int nfwd) if no cached version is available.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::callback "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::Sqpmethod::alloc_res "
-
-[INTERNAL]  Ensure required length of res field.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::print_dimensions "
-
-[INTERNAL]  Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::codegen_sparsities "
-
-[INTERNAL]  Codegen sparsities.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::solve "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::Sqpmethod::get_n_out "
-
-[INTERNAL]  Number of function inputs and outputs.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::incache "
-
-[INTERNAL]  Get function in cache.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::instruction_input "
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::which_depends "
-
-[INTERNAL]  Which variables enter with some order.
-
-Parameters:
------------
-
-s_in:   Input name
-
-s_out:   Output name(s)
-
-order:  Only 1 (linear) and 2 (nonlinear) allowed
-
-tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring") casadi::Sqpmethod::sz_w "
-
-[INTERNAL]  Get required length of w field.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::solve_QP "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::Sqpmethod::instruction_MX "
-
-[INTERNAL]  get MX expression associated with instruction
-
-";
-
-%feature("docstring") casadi::Sqpmethod::codegen_declarations "
-
-[INTERNAL]  Generate code for the declarations of the C function.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::info "
-
-[INTERNAL]  Obtain information about function
-
-";
-
-%feature("docstring") casadi::Sqpmethod::get_default_in "
-
-[INTERNAL]  Get default input value.
-
-";
 
 %feature("docstring") casadi::Sqpmethod::clear_mem "
 
@@ -57571,7 +57575,7 @@ original
 
 %feature("docstring") casadi::Sqpmethod::class_name "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Get type name.
 
 ";
 

@@ -2611,7 +2611,7 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 
 %feature("docstring")  casadi::Blocksqp::class_name() const  "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Get type name.
 
 ";
 
@@ -3158,8 +3158,7 @@ const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
-const  "
+%feature("docstring")  casadi::Nlpsol::serialize(Serializer &s) const  "
 
 [INTERNAL]  Serialize.
 
@@ -13776,7 +13775,7 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+%feature("docstring")  casadi::OracleFunction::serialize(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize.
@@ -22220,6 +22219,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
+const  "
+
+[INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
 [INTERNAL]  Get required length of iw field.
@@ -22363,10 +22369,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::jit_dependencies(const
-std::string &fname)  "
+%feature("docstring")  casadi::OracleFunction::serialize(Serializer &s)
+const  "
 
-[INTERNAL]  JIT for dependencies.
+[INTERNAL]  Serialize.
 
 ";
 
@@ -22488,10 +22494,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::getAdaptorSolverName()
-const  "
+%feature("docstring")  casadi::Rootfinder::uses_output() const  "
 
-[INTERNAL]  Obtain solver name from Adaptor.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -22694,10 +22699,10 @@ std::vector< M > &res, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
-const  "
+%feature("docstring")  casadi::OracleFunction::jit_dependencies(const
+std::string &fname)  "
 
-[INTERNAL]  Serialize.
+[INTERNAL]  JIT for dependencies.
 
 ";
 
@@ -22806,12 +22811,6 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 %feature("docstring")  casadi::FunctionInternal::sx_in() const  "
 
 [INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::Rootfinder::uses_output() const  "
-
-[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -25295,7 +25294,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+%feature("docstring")  casadi::OracleFunction::serialize(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize.
@@ -32584,6 +32583,11 @@ C++ includes: generic_type.hpp ";
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::GenericTypeBase::serialize(Serializer &s)
+const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::SharedObjectInternal::disp(std::ostream
 &stream, bool more) const  "
 
@@ -33228,7 +33232,7 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+%feature("docstring")  casadi::OracleFunction::serialize(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize.
@@ -34647,7 +34651,7 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+%feature("docstring")  casadi::OracleFunction::serialize(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize.
@@ -36366,7 +36370,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+%feature("docstring")  casadi::OracleFunction::serialize(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize.
@@ -50484,7 +50488,7 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+%feature("docstring")  casadi::OracleFunction::serialize(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize.
@@ -50792,9 +50796,10 @@ iind, casadi_int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::get_sparsity_out(casadi_int i)  "
+%feature("docstring")  casadi::OracleFunction::print_fstats(const
+OracleMemory *m) const  "
 
-[INTERNAL]  Sparsities of function inputs and outputs.
+[INTERNAL]  Print statistics.
 
 ";
 
@@ -50867,10 +50872,9 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::print_fstats(const
-OracleMemory *m) const  "
+%feature("docstring")  casadi::Nlpsol::get_sparsity_out(casadi_int i)  "
 
-[INTERNAL]  Print statistics.
+[INTERNAL]  Sparsities of function inputs and outputs.
 
 ";
 
@@ -51150,9 +51154,9 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::free_sx() const  "
+%feature("docstring")  casadi::Nlpsol::serialize(Serializer &s) const  "
 
-[INTERNAL]  Get free variables (SX)
+[INTERNAL]  Serialize.
 
 ";
 
@@ -51359,13 +51363,6 @@ std::string > &onames, const Dict &opts) const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
-const  "
-
-[INTERNAL]  Serialize.
 
 ";
 
@@ -51731,9 +51728,9 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
+%feature("docstring")  casadi::Nlpsol::class_name() const  "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Get type name.
 
 ";
 
@@ -51862,6 +51859,12 @@ SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 k) const  "
 
 [INTERNAL]  Get an atomic operation operator index.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::free_sx() const  "
+
+[INTERNAL]  Get free variables (SX)
 
 ";
 
@@ -54796,7 +54799,7 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+%feature("docstring")  casadi::OracleFunction::serialize(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize.
@@ -59236,8 +59239,7 @@ std::string &fname) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
-const  "
+%feature("docstring")  casadi::Nlpsol::serialize(Serializer &s) const  "
 
 [INTERNAL]  Serialize.
 
@@ -60306,7 +60308,7 @@ elements.
 
 %feature("docstring")  casadi::Qrsqp::class_name() const  "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Get type name.
 
 ";
 
@@ -60850,7 +60852,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+%feature("docstring")  casadi::OracleFunction::serialize(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize.
@@ -62348,7 +62350,7 @@ iind, casadi_int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
+%feature("docstring")  casadi::OracleFunction::serialize(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize.
@@ -63885,7 +63887,7 @@ const  "
 
 %feature("docstring")  casadi::Scpgen::class_name() const  "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Get type name.
 
 ";
 
@@ -64132,8 +64134,7 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
-const  "
+%feature("docstring")  casadi::Nlpsol::serialize(Serializer &s) const  "
 
 [INTERNAL]  Serialize.
 
@@ -70943,6 +70944,490 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::Nlpsol::get_default_in(casadi_int ind) const
+"
+
+[INTERNAL]  Get default input value.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_free() const  "
+
+[INTERNAL]  Print free variables.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::eval_dm(const std::vector<
+DM > &arg) const  "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
+
+[INTERNAL]  Get required length of arg field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::index_out(const std::string
+&name) const  "
+
+[INTERNAL]  Get output scheme index by name.
+
+";
+
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::free_mx() const  "
+
+[INTERNAL]  Get free variables ( MX)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
+&name) const  "
+
+[INTERNAL]  Get input scheme index by name.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
+%feature("docstring")  casadi::Sqpmethod::get_options() const  "
+
+[INTERNAL]  Options.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_sprev() const  "
+
+[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(casadi_int
+nadj, const std::vector< MatType > &v) const  "
+
+[INTERNAL]  Symbolic expressions for the adjoint seeds.
+
+";
+
+%feature("docstring")  casadi::Nlpsol::get_forward(casadi_int nfwd, const
+std::string &name, const std::vector< std::string > &inames, const
+std::vector< std::string > &onames, const Dict &opts) const  "
+
+[INTERNAL]  Generate a function that calculates forward mode derivatives.
+
+";
+
+%feature("docstring")  casadi::Sqpmethod::alloc_mem() const  "
+
+[INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
+&arg, MXVector &res, bool always_inline, bool never_inline) const  "
+
+[INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
+&g) const  "
+
+[INTERNAL]  Generate meta-information allowing a user to evaluate a
+generated function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::mapsum_mx(const
+std::vector< MX > &arg, const std::string &parallelization) "
+
+[INTERNAL]  Parallel evaluation.
+
+";
+
+%feature("docstring")  casadi::Sqpmethod::print_iteration() const  "
+
+[INTERNAL]  Print iteration header.
+
+";
+
+%feature("docstring")  casadi::Sqpmethod::print_iteration(casadi_int iter,
+double obj, double pr_inf, double du_inf, double dx_norm, double reg,
+casadi_int ls_trials, bool ls_success) const  "
+
+[INTERNAL]  Print iteration.
+
+";
+
+%feature("docstring")  casadi::OracleFunction::get_function() const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::OracleFunction::get_function(const
+std::string &name) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::Nlpsol::get_sparsity_in(casadi_int i)  "
+
+[INTERNAL]  Sparsities of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::OracleFunction::jit_dependencies(const
+std::string &fname)  "
+
+[INTERNAL]  JIT for dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sparsity_out(casadi_int
+ind) const  "
+
+[INTERNAL]  Input/output sparsity.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::instruction_output(casadi_int k) const  "
+
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::OracleFunction::set_function(const Function
+&fcn, const std::string &fname, bool jit=false) "
+
+[INTERNAL]  Register the function for evaluation and statistics gathering
+
+";
+
+%feature("docstring")  casadi::OracleFunction::set_function(const Function
+&fcn) "
+
+[INTERNAL]  Register the function for evaluation and statistics gathering
+
+";
+
+%feature("docstring")  casadi::Nlpsol::has_forward(casadi_int nfwd) const  "
+
+[INTERNAL]  Generate a function that calculates forward mode derivatives.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::call(const std::vector< M >
+&arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
+
+[INTERNAL]   Call a function, templated.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
+
+[INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
+persistent=false) "
+
+[INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::replace_res(const
+std::vector< M > &res, casadi_int npar) const  "
+
+[INTERNAL]  Replace 0-by-0 outputs.
+
+";
+
+%feature("docstring")  casadi::Nlpsol::serialize(Serializer &s) const  "
+
+[INTERNAL]  Serialize.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
+double **arg, double **res, casadi_int *iw, double *w) const  "
+
+[INTERNAL]  Set the (persistent and temporary) work vectors.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::size_in(casadi_int ind)
+const  "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::getJacSparsityHierarchicalSymm(casadi_int iind,
+casadi_int oind) const  "
+
+[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
+structure recognition for symmetric Jacobians
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen decref for dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::fwdViaJac(casadi_int nfwd)
+const  "
+
+[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
+multiplying.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_eval_dm() const  "
+
+[INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::check_arg(const
+std::vector< M > &arg, casadi_int &npar) const  "
+
+[INTERNAL]  Check if input arguments have correct length and dimensions.
+
+";
+
+%feature("docstring")  casadi::Nlpsol::setOptionsFromFile(const std::string
+&file) "
+
+[INTERNAL]  Read options from parameter xml.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::replace_fseed(const
+std::vector< std::vector< M >> &fseed, casadi_int npar) const  "
+
+[INTERNAL]  Replace 0-by-0 forward seeds.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::replace_fseed(const
+std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::get_jacobian_sparsity()
+const  "
+
+[INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
+std::vector< MX > &arg) const  "
+
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring")  casadi::OracleFunction::finalize()  "
+
+[INTERNAL]  Finalize initialization.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::mx_in(casadi_int ind) const
+"
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::mx_in() const  "
+
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::OracleFunction::has_function(const
+std::string &fname) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ProtoFunction::print(const char *fmt,...)
+const  "
+
+[INTERNAL]  C-style formatted printing during evaluation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::size1_in(casadi_int ind)
+const  "
+
+[INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::matching_arg(const
+std::vector< M > &arg, casadi_int &npar) const  "
+
+[INTERNAL]  Check if input arguments that needs to be replaced.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::call_forward(const
+std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
+std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
+always_inline, bool never_inline) const  "
+
+[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
+classes.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::call_forward(const
+std::vector< SX > &arg, const std::vector< SX > &res, const std::vector<
+std::vector< SX > > &fseed, std::vector< std::vector< SX > > &fsens, bool
+always_inline, bool never_inline) const  "
+
+[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
+classes.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::free_sx() const  "
+
+[INTERNAL]  Get free variables (SX)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::forward(casadi_int nfwd)
+const  "
+
+[INTERNAL]  Return function that calculates forward derivatives
+forward(nfwd) returns a cached instance if available, and calls  Function
+get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::Nlpsol::callback(void *mem, const double *x,
+const double *f, const double *g, const double *lam_x, const double *lam_g,
+const double *lam_p) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
+bool persistent=false) "
+
+[INTERNAL]  Ensure required length of res field.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
+
+[INTERNAL]  Print dimensions of inputs and outputs.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
+
+[INTERNAL]  Codegen sparsities.
+
+";
+
+%feature("docstring")  casadi::Sqpmethod::solve(void *mem) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::Nlpsol::get_n_out()  "
+
+[INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::incache(const std::string
+&fname, Function &f) const  "
+
+[INTERNAL]  Get function in cache.
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::instruction_input(casadi_int k) const  "
+
+[INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::which_depends(const
+std::string &s_in, const std::vector< std::string > &s_out, casadi_int
+order, bool tr=false) const  "
+
+[INTERNAL]  Which variables enter with some order.
+
+Parameters:
+-----------
+
+s_in:   Input name
+
+s_out:   Output name(s)
+
+order:  Only 1 (linear) and 2 (nonlinear) allowed
+
+tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
+
+[INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring")  casadi::Sqpmethod::solve_QP(SqpmethodMemory *m, const
+double *H, const double *g, const double *lbx, const double *ubx, const
+double *A, const double *lbA, const double *ubA, double *x_opt, double
+*lambda_x_opt, double *lambda_A_opt) const  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::instruction_MX(casadi_int
+k) const  "
+
+[INTERNAL]  get MX expression associated with instruction
+
+";
+
+%feature("docstring")
+casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
+
+[INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::info() const  "
+
+[INTERNAL]  Obtain information about function
+
+";
+
 %feature("docstring") casadi::Sqpmethod "
 
 'sqpmethod' plugin for Nlpsol
@@ -71173,491 +71658,6 @@ Diagrams
 
 
 C++ includes: sqpmethod.hpp ";
-
-%feature("docstring")  casadi::FunctionInternal::get_free() const  "
-
-[INTERNAL]  Print free variables.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_dm(const std::vector<
-DM > &arg) const  "
-
-[INTERNAL]  Evaluate with DM matrices.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sz_arg() const  "
-
-[INTERNAL]  Get required length of arg field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::index_out(const std::string
-&name) const  "
-
-[INTERNAL]  Get output scheme index by name.
-
-";
-
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
-
-[INTERNAL]  Get a weak reference to the object.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::free_mx() const  "
-
-[INTERNAL]  Get free variables ( MX)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::index_in(const std::string
-&name) const  "
-
-[INTERNAL]  Get input scheme index by name.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
-bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
-
-[INTERNAL]  Propagate sparsity backwards.
-
-";
-
-%feature("docstring")  casadi::Sqpmethod::get_options() const  "
-
-[INTERNAL]  Options.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::has_sprev() const  "
-
-[INTERNAL]  Is the class able to propagate seeds through the algorithm?
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::symbolicAdjSeed(casadi_int
-nadj, const std::vector< MatType > &v) const  "
-
-[INTERNAL]  Symbolic expressions for the adjoint seeds.
-
-";
-
-%feature("docstring")  casadi::Nlpsol::get_forward(casadi_int nfwd, const
-std::string &name, const std::vector< std::string > &inames, const
-std::vector< std::string > &onames, const Dict &opts) const  "
-
-[INTERNAL]  Generate a function that calculates forward mode derivatives.
-
-";
-
-%feature("docstring")  casadi::Sqpmethod::alloc_mem() const  "
-
-[INTERNAL]  Create memory block.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
-&arg, MXVector &res, bool always_inline, bool never_inline) const  "
-
-[INTERNAL]  Evaluate with symbolic matrices.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::codegen_meta(CodeGenerator
-&g) const  "
-
-[INTERNAL]  Generate meta-information allowing a user to evaluate a
-generated function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::mapsum_mx(const
-std::vector< MX > &arg, const std::string &parallelization) "
-
-[INTERNAL]  Parallel evaluation.
-
-";
-
-%feature("docstring")  casadi::Sqpmethod::print_iteration() const  "
-
-[INTERNAL]  Print iteration header.
-
-";
-
-%feature("docstring")  casadi::Sqpmethod::print_iteration(casadi_int iter,
-double obj, double pr_inf, double du_inf, double dx_norm, double reg,
-casadi_int ls_trials, bool ls_success) const  "
-
-[INTERNAL]  Print iteration.
-
-";
-
-%feature("docstring")  casadi::OracleFunction::get_function() const  "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::OracleFunction::get_function(const
-std::string &name) const  "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Nlpsol::get_sparsity_in(casadi_int i)  "
-
-[INTERNAL]  Sparsities of function inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::OracleFunction::jit_dependencies(const
-std::string &fname)  "
-
-[INTERNAL]  JIT for dependencies.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sparsity_out(casadi_int
-ind) const  "
-
-[INTERNAL]  Input/output sparsity.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::instruction_output(casadi_int k) const  "
-
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::OracleFunction::set_function(const Function
-&fcn, const std::string &fname, bool jit=false) "
-
-[INTERNAL]  Register the function for evaluation and statistics gathering
-
-";
-
-%feature("docstring")  casadi::OracleFunction::set_function(const Function
-&fcn) "
-
-[INTERNAL]  Register the function for evaluation and statistics gathering
-
-";
-
-%feature("docstring")  casadi::Nlpsol::has_forward(casadi_int nfwd) const  "
-
-[INTERNAL]  Generate a function that calculates forward mode derivatives.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::call(const std::vector< M >
-&arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
-
-[INTERNAL]   Call a function, templated.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
-
-[INTERNAL]  Get required length of iw field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
-persistent=false) "
-
-[INTERNAL]  Ensure required length of w field.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::replace_res(const
-std::vector< M > &res, casadi_int npar) const  "
-
-[INTERNAL]  Replace 0-by-0 outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::get_jacobian_sparsity()
-const  "
-
-[INTERNAL]  Get Jacobian sparsity.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::setup(void *mem, const
-double **arg, double **res, casadi_int *iw, double *w) const  "
-
-[INTERNAL]  Set the (persistent and temporary) work vectors.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::size_in(casadi_int ind)
-const  "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::getJacSparsityHierarchicalSymm(casadi_int iind,
-casadi_int oind) const  "
-
-[INTERNAL]  A flavor of getJacSparsity that does hierarchical block
-structure recognition for symmetric Jacobians
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
-
-[INTERNAL]  Codegen decref for dependencies.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::fwdViaJac(casadi_int nfwd)
-const  "
-
-[INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
-multiplying.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::has_eval_dm() const  "
-
-[INTERNAL]  Evaluate with DM matrices.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::check_arg(const
-std::vector< M > &arg, casadi_int &npar) const  "
-
-[INTERNAL]  Check if input arguments have correct length and dimensions.
-
-";
-
-%feature("docstring")  casadi::Nlpsol::setOptionsFromFile(const std::string
-&file) "
-
-[INTERNAL]  Read options from parameter xml.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::replace_fseed(const
-std::vector< std::vector< M >> &fseed, casadi_int npar) const  "
-
-[INTERNAL]  Replace 0-by-0 forward seeds.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::replace_fseed(const
-std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::serialize(Serializer &s)
-const  "
-
-[INTERNAL]  Serialize.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
-std::vector< MX > &arg) const  "
-
-[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
-
-%feature("docstring")  casadi::OracleFunction::finalize()  "
-
-[INTERNAL]  Finalize initialization.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::mx_in(casadi_int ind) const
-"
-
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::mx_in() const  "
-
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::OracleFunction::has_function(const
-std::string &fname) const  "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::ProtoFunction::print(const char *fmt,...)
-const  "
-
-[INTERNAL]  C-style formatted printing during evaluation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::size1_in(casadi_int ind)
-const  "
-
-[INTERNAL]  Input/output dimensions.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::matching_arg(const
-std::vector< M > &arg, casadi_int &npar) const  "
-
-[INTERNAL]  Check if input arguments that needs to be replaced.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::call_forward(const
-std::vector< MX > &arg, const std::vector< MX > &res, const std::vector<
-std::vector< MX > > &fseed, std::vector< std::vector< MX > > &fsens, bool
-always_inline, bool never_inline) const  "
-
-[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
-classes.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::call_forward(const
-std::vector< SX > &arg, const std::vector< SX > &res, const std::vector<
-std::vector< SX > > &fseed, std::vector< std::vector< SX > > &fsens, bool
-always_inline, bool never_inline) const  "
-
-[INTERNAL]  Forward mode AD, virtual functions overloaded in derived
-classes.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::free_sx() const  "
-
-[INTERNAL]  Get free variables (SX)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::forward(casadi_int nfwd)
-const  "
-
-[INTERNAL]  Return function that calculates forward derivatives
-forward(nfwd) returns a cached instance if available, and calls  Function
-get_forward(casadi_int nfwd) if no cached version is available.
-
-";
-
-%feature("docstring")  casadi::Nlpsol::callback(void *mem, const double *x,
-const double *f, const double *g, const double *lam_x, const double *lam_g,
-const double *lam_p) const  "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::alloc_res(size_t sz_res,
-bool persistent=false) "
-
-[INTERNAL]  Ensure required length of res field.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
-
-[INTERNAL]  Print dimensions of inputs and outputs.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
-
-[INTERNAL]  Codegen sparsities.
-
-";
-
-%feature("docstring")  casadi::Sqpmethod::solve(void *mem) const  "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::Nlpsol::get_n_out()  "
-
-[INTERNAL]  Number of function inputs and outputs.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::incache(const std::string
-&fname, Function &f) const  "
-
-[INTERNAL]  Get function in cache.
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::instruction_input(casadi_int k) const  "
-
-[INTERNAL]  Get the (integer) input arguments of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::which_depends(const
-std::string &s_in, const std::vector< std::string > &s_out, casadi_int
-order, bool tr=false) const  "
-
-[INTERNAL]  Which variables enter with some order.
-
-Parameters:
------------
-
-s_in:   Input name
-
-s_out:   Output name(s)
-
-order:  Only 1 (linear) and 2 (nonlinear) allowed
-
-tr:  Flip the relationship. Return which expressions contain the variables
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::sz_w() const  "
-
-[INTERNAL]  Get required length of w field.
-
-";
-
-%feature("docstring")  casadi::Sqpmethod::solve_QP(SqpmethodMemory *m, const
-double *H, const double *g, const double *lbx, const double *ubx, const
-double *A, const double *lbA, const double *ubA, double *x_opt, double
-*lambda_x_opt, double *lambda_A_opt) const  "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::FunctionInternal::instruction_MX(casadi_int
-k) const  "
-
-[INTERNAL]  get MX expression associated with instruction
-
-";
-
-%feature("docstring")
-casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
-
-[INTERNAL]  Generate code for the declarations of the C function.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::info() const  "
-
-[INTERNAL]  Obtain information about function
-
-";
-
-%feature("docstring")  casadi::Nlpsol::get_default_in(casadi_int ind) const
-"
-
-[INTERNAL]  Get default input value.
-
-";
 
 %feature("docstring")  casadi::ProtoFunction::clear_mem() "
 
@@ -72064,7 +72064,7 @@ k) const  "
 
 %feature("docstring")  casadi::Sqpmethod::class_name() const  "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  Get type name.
 
 ";
 

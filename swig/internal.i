@@ -1039,6 +1039,9 @@
 %exception  casadi::GenericTypeBase::getType() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericTypeBase::serialize(Serializer &s) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::ImplicitFixedStepIntegrator::getExplicit() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1627,6 +1630,9 @@
 %exception  casadi::Nlpsol::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Nlpsol::class_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Nlpsol::disp_more(std::ostream &stream) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1676,6 +1682,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Nlpsol::kkt() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Nlpsol::serialize(Serializer &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Nlpsol::setOptionsFromFile(const std::string &file) {
@@ -1733,6 +1742,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OracleFunction::oracle() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::OracleFunction::serialize(Serializer &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OracleFunction::set_function(const Function &fcn) {
