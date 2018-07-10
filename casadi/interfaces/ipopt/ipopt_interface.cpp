@@ -48,6 +48,7 @@ namespace casadi {
     plugin->doc = IpoptInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &IpoptInterface::options_;
+    plugin->deserialize_map = &IpoptInterface::deserialize_map;
     return 0;
   }
 
@@ -630,5 +631,53 @@ namespace casadi {
     }
     return stats;
   }
+
+  FunctionInternal* IpoptInterface::deserialize(DeSerializer& s) {
+    Info info;
+    Nlpsol::deserialize(s, info.nlpsol);
+
+    s.unpack("IpoptInterface::jacg_sp", info.jacg_sp);
+    s.unpack("IpoptInterface::hesslag_sp", info.hesslag_sp);
+    s.unpack("IpoptInterface::exact_hessian", info.exact_hessian);
+    s.unpack("IpoptInterface::opts", info.opts);
+    s.unpack("IpoptInterface::pass_nonlinear_variables", info.pass_nonlinear_variables);
+    s.unpack("IpoptInterface::nl_ex", info.nl_ex);
+    s.unpack("IpoptInterface::var_string_md", info.var_string_md);
+    s.unpack("IpoptInterface::var_integer_md", info.var_integer_md);
+    s.unpack("IpoptInterface::var_numeric_md", info.var_numeric_md);
+    s.unpack("IpoptInterface::con_string_md", info.con_string_md);
+    s.unpack("IpoptInterface::con_integer_md", info.con_integer_md);
+    s.unpack("IpoptInterface::con_numeric_md", info.con_numeric_md);
+    return new IpoptInterface(info);
+  }
+
+  void IpoptInterface::serialize(Serializer &s) const {
+    Nlpsol::serialize(s);
+    s.pack("IpoptInterface::jacg_sp", jacg_sp_);
+    s.pack("IpoptInterface::hesslag_sp", hesslag_sp_);
+    s.pack("IpoptInterface::exact_hessian", exact_hessian_);
+    s.pack("IpoptInterface::opts", opts_);
+    s.pack("IpoptInterface::pass_nonlinear_variables", pass_nonlinear_variables_);
+    s.pack("IpoptInterface::nl_ex", nl_ex_);
+    s.pack("IpoptInterface::var_string_md", var_string_md_);
+    s.pack("IpoptInterface::var_integer_md", var_integer_md_);
+    s.pack("IpoptInterface::var_numeric_md", var_numeric_md_);
+    s.pack("IpoptInterface::con_string_md", con_string_md_);
+    s.pack("IpoptInterface::con_integer_md", con_integer_md_);
+    s.pack("IpoptInterface::con_numeric_md", con_numeric_md_);
+  }
+
+  IpoptInterface::IpoptInterface(const IpoptInterface::Info& e) : Nlpsol(e.nlpsol),
+    jacg_sp_(e.jacg_sp), hesslag_sp_(e.hesslag_sp),
+    exact_hessian_(e.exact_hessian),
+    opts_(e.opts), pass_nonlinear_variables_(e.pass_nonlinear_variables),
+    nl_ex_(e.nl_ex), var_string_md_(e.var_string_md),
+    var_integer_md_(e.var_integer_md), var_numeric_md_(e.var_numeric_md),
+    con_string_md_(e.con_string_md), con_integer_md_(e.con_integer_md),
+    con_numeric_md_(e.con_numeric_md) { }
+
+  DeserializeMap IpoptInterface::deserialize_map = {
+    {"IpoptInterface", IpoptInterface::deserialize},
+  };
 
 } // namespace casadi

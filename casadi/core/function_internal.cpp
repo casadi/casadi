@@ -35,6 +35,7 @@
 #include "map.hpp"
 #include "switch.hpp"
 #include "interpolant_impl.hpp"
+#include "nlpsol_impl.hpp"
 
 #include <typeinfo>
 #include <cctype>
@@ -2986,6 +2987,7 @@ namespace casadi {
     {"MXFunction", MXFunction::deserialize},
     {"SXFunction", SXFunction::deserialize},
     {"Interpolant", Interpolant::deserialize},
+    {"Nlpsol", Nlpsol::deserialize},
     {"ThreadMap", ThreadMap::deserialize},
     {"OmpMap", OmpMap::deserialize},
     {"Switch", Switch::deserialize}

@@ -25,6 +25,7 @@
 
 #include "oracle_function.hpp"
 #include "external.hpp"
+#include "serializer.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -381,5 +382,49 @@ namespace casadi {
     return all_functions_.find(fname) != all_functions_.end();
   }
 
+
+  void OracleFunction::serialize(Serializer &s) const {
+    FunctionInternal::serialize(s);
+
+    s.pack("OracleFunction::oracle", oracle_);
+    s.pack("OracleFunction::common_options", common_options_);
+    s.pack("OracleFunction::specific_options", specific_options_);
+    s.pack("OracleFunction::all_functions::size", all_functions_.size());
+    for (auto &e : all_functions_) {
+      s.pack("OracleFunction::all_functions::key", e.first);
+      s.pack("OracleFunction::all_functions::value::f", e.second.f);
+      s.pack("OracleFunction::all_functions::value::jit", e.second.jit);
+      s.pack("OracleFunction::all_functions::value::monitored", e.second.monitored);
+    }
+    s.pack("OracleFunction::monitor", monitor_);
+  }
+
+  void OracleFunction::deserialize(DeSerializer& s, Info& e) {
+    FunctionInternal::deserialize(s, e.function);
+
+    s.unpack("OracleFunction::oracle", e.oracle);
+    s.unpack("OracleFunction::common_options", e.common_options);
+    s.unpack("OracleFunction::specific_options", e.specific_options);
+    size_t size;
+
+    s.unpack("OracleFunction::all_functions::size", size);
+    for (casadi_int i=0;i<size;++i) {
+      std::string key;
+      s.unpack("OracleFunction::all_functions::key", key);
+      RegFun r;
+      s.unpack("OracleFunction::all_functions::value::f", r.f);
+      s.unpack("OracleFunction::all_functions::value::jit", r.jit);
+      s.unpack("OracleFunction::all_functions::value::monitored", r.monitored);
+      e.all_functions[key] = r;
+    }
+    s.unpack("OracleFunction::monitor", e.monitor);
+  }
+
+  OracleFunction::OracleFunction(const Info & e) :
+      FunctionInternal(e.function),
+      oracle_(e.oracle), common_options_(e.common_options),
+      specific_options_(e.specific_options), all_functions_(e.all_functions),
+      monitor_(e.monitor) {
+  }
 
 } // namespace casadi

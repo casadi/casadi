@@ -75,6 +75,7 @@ namespace casadi {
 
     // Active monitors
     std::vector<std::string> monitor_;
+
   public:
     /** \brief  Constructor */
     OracleFunction(const std::string& name, const Function& oracle);
@@ -153,6 +154,30 @@ namespace casadi {
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
+
+    struct Info  {
+      FunctionInternal::Info function;
+      Function oracle;
+      Dict common_options;
+      Dict specific_options;
+      std::map<std::string, RegFun> all_functions;
+      std::vector<std::string> monitor;
+    };
+
+    /** \brief Serialize */
+    void serialize(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static Function deserialize(DeSerializer& s);
+
+    /** \brief Deserialize into MX */
+    static void deserialize(DeSerializer& s, Info& e);
+
+  protected:
+
+    /** \brief Constructor */
+    explicit OracleFunction(const Info & e);
+
   };
 
 } // namespace casadi

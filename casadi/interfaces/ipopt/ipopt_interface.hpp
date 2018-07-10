@@ -190,6 +190,34 @@ namespace casadi {
     std::vector<bool> nl_ex_;
     Dict var_string_md_, var_integer_md_, var_numeric_md_,
       con_string_md_, con_integer_md_, con_numeric_md_;
+
+
+    struct Info {
+      Nlpsol::Info nlpsol;
+      Sparsity jacg_sp;
+      Sparsity hesslag_sp;
+      bool exact_hessian;
+      Dict opts;
+
+      bool pass_nonlinear_variables;
+      std::vector<bool> nl_ex;
+      Dict var_string_md;
+      Dict var_integer_md;
+      Dict var_numeric_md;
+      Dict con_string_md;
+      Dict con_integer_md;
+      Dict con_numeric_md;
+    };
+
+    void serialize(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static FunctionInternal* deserialize(DeSerializer& s);
+
+    static DeserializeMap deserialize_map;
+
+  protected:
+      explicit IpoptInterface(const IpoptInterface::Info& e);
   };
 
 } // namespace casadi
