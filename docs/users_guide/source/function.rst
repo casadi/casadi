@@ -86,7 +86,7 @@ Naming inputs and outputs is preferred for a number of reasons:
 
 * No need to remember the number or order of arguments
 * Inputs or outputs that are absent can be left unset
-* More readable and less error prone syntax. E.g. ``f.jacobian('x','q')`` instead of ``f.jacobian(0,1)``.
+* More readable and less error prone syntax.
 
 For ``Function`` instances -- to be encountered later -- that are *not* created directly from expressions,
 the inputs and outputs are named automatically.
