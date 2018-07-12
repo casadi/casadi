@@ -18,6 +18,10 @@ if(WITH_QPOASES)
   add_subdirectory(qpoases)
 endif()
 
+if(WITH_PANOC)
+  add_subdirectory(panoc)
+endif()
+
 if(WITH_KNITRO)
   add_subdirectory(knitro)
 endif()

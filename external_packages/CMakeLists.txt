@@ -29,3 +29,7 @@ endif()
 if(WITH_BLASFEO AND WITH_BUILD_BLASFEO)
   add_subdirectory(blasfeo)
 endif()
+
+if(WITH_PANOC)
+  add_subdirectory(PANOC)
+endif()
