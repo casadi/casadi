@@ -138,6 +138,11 @@ if (WITH_QPOASES)
   target_link_libraries(lowlevel_qp casadi)
 endif()
 
+if (WITH_PANOC)
+  add_executable(panoc panoc.cpp)
+  target_link_libraries(panoc casadi)
+endif()
+
 if(WITH_BLOCKSQP)
   add_executable(test_blocksqp test_blocksqp.cpp)
   target_link_libraries(test_blocksqp casadi)
