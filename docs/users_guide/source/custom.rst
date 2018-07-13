@@ -58,9 +58,10 @@ The derived class consists of the following parts:
 * A number of *virtual* functions, all optional, that can be overloaded in order to get the desired behavior. This includes the number of inputs and outputs using ``get_n_in`` and ``get_n_out``, their names using ``get_name_in`` and ``get_name_out`` and their sparsity patterns ``get_sparsity_in`` and ``get_sparsity_out``.
 * An optional ``init`` function called duing the object construction.
 * A function for numerical evaluation.
-* Optional functions for derivatives. You can choose to supply a full Jacobian (``has_jacobian``, ``get_jacobian``), or choose to supply forward/reverse sensitivities (``has_forward``, ``get_forward``,  ``has_reverse``, ``get_reverse``).
+* Optional functions for derivatives. You can choose to work with finite differences (``enable_fd``), supply a full Jacobian (``has_jacobian``, ``get_jacobian``), or choose to supply forward/reverse sensitivities (``has_forward``, ``get_forward``,  ``has_reverse``, ``get_reverse``).
 
 For a complete list of functions, see the C++ API documentation for |Callback|.
+Also see the ``callback.py`` example.
 
 The usage from the different languages are described in the following.
 
