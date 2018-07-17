@@ -35361,6 +35361,10 @@ Interface to the JIT compiler SHELL
 |                      |                 | 'flag' option is the prefered   |
 |                      |                 | way to set custom flags.        |
 +----------------------+-----------------+---------------------------------+
+| extra_suffixes       | OT_STRINGVECTOR | List of suffixes for extra      |
+|                      |                 | files that the compiler may     |
+|                      |                 | generate. Default: None         |
++----------------------+-----------------+---------------------------------+
 | flags                | OT_STRINGVECTOR | Compile flags for the JIT       |
 |                      |                 | compiler. Default: None         |
 +----------------------+-----------------+---------------------------------+
@@ -62859,6 +62863,10 @@ Joel Andersson  Interface to the JIT compiler SHELL
 |                      |                 | 'flag' option is the prefered   |
 |                      |                 | way to set custom flags.        |
 +----------------------+-----------------+---------------------------------+
+| extra_suffixes       | OT_STRINGVECTOR | List of suffixes for extra      |
+|                      |                 | files that the compiler may     |
+|                      |                 | generate. Default: None         |
++----------------------+-----------------+---------------------------------+
 | flags                | OT_STRINGVECTOR | Compile flags for the JIT       |
 |                      |                 | compiler. Default: None         |
 +----------------------+-----------------+---------------------------------+
@@ -62908,6 +62916,13 @@ Joel Andersson  Interface to the JIT compiler SHELL
 |                  |                 | the prefered way |                  |
 |                  |                 | to set custom    |                  |
 |                  |                 | flags.           |                  |
++------------------+-----------------+------------------+------------------+
+| extra_suffixes   | OT_STRINGVECTOR | List of suffixes | casadi::ShellCom |
+|                  |                 | for extra files  | piler            |
+|                  |                 | that the         |                  |
+|                  |                 | compiler may     |                  |
+|                  |                 | generate.        |                  |
+|                  |                 | Default: None    |                  |
 +------------------+-----------------+------------------+------------------+
 | flags            | OT_STRINGVECTOR | Compile flags    | casadi::ShellCom |
 |                  |                 | for the JIT      | piler            |
