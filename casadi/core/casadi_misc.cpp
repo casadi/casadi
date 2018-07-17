@@ -248,7 +248,7 @@ namespace casadi {
   }
 
 #ifdef HAVE_SIMPLE_MKSTEMPS
-int simple_mkstemps(const std::string& prefix, const std::string& suffix, std::string &result) {
+int simple_mkstemps_fd(const std::string& prefix, const std::string& suffix, std::string &result) {
     // Characters available for inventing filenames
     std::string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
     int char_size = static_cast<int>(chars.size());
@@ -283,6 +283,20 @@ int simple_mkstemps(const std::string& prefix, const std::string& suffix, std::s
       if (fd == -1 && errno != EEXIST) return -1;
     }
   }
+std::string simple_mkstemps(const std::string& prefix, const std::string& suffix) {
+  std::string ret;
+  int fd = simple_mkstemps_fd(prefix, suffix, ret);
+  if (fd==-1) {
+    casadi_error("Failed to create temporary file: '" + ret + "'");
+  } else {
+#ifdef _WIN32
+      _close(fd);
+#else
+      close(fd);
+#endif
+  }
+  return ret;
+}
 #endif // HAVE_SIMPLE_MKSTEMPS
 
   std::string temporary_file(const std::string& prefix, const std::string& suffix) {
@@ -295,11 +309,7 @@ int simple_mkstemps(const std::string& prefix, const std::string& suffix, std::s
     return ret;
     #else // HAVE_MKSTEMPS
     #ifdef HAVE_SIMPLE_MKSTEMPS
-    std::string ret;
-    if (simple_mkstemps(prefix, suffix, ret)==-1) {
-      casadi_error("Failed to create temporary file: '" + ret + "'");
-    }
-    return ret;
+    return simple_mkstemps(prefix, suffix);
     #else // HAVE_SIMPLE_MKSTEMPS
     // Fallback, may result in deprecation warnings
     return prefix + string(tmpnam(nullptr)) + suffix;
