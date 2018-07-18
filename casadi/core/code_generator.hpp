@@ -266,6 +266,7 @@ namespace casadi {
       AUX_ND_BOOR_EVAL,
       AUX_FINITE_DIFF,
       AUX_QR,
+      AUX_QP,
       AUX_LDL,
       AUX_NEWTON,
       AUX_TO_DOUBLE,
@@ -276,7 +277,9 @@ namespace casadi {
       AUX_IF_ELSE,
       AUX_PRINTF,
       AUX_FMIN,
-      AUX_FMAX
+      AUX_FMAX,
+      AUX_MIN,
+      AUX_MAX
     };
 
     /** \brief Add a built-in auxiliary function */

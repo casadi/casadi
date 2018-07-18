@@ -779,6 +779,22 @@ namespace casadi {
       add_auxiliary(AUX_FILL);
       this->auxiliaries << sanitize_source(casadi_qr_str, inst);
       break;
+    case AUX_QP:
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_QR);
+      add_auxiliary(AUX_MAX);
+      add_auxiliary(AUX_FMIN);
+      add_auxiliary(AUX_FMAX);
+      add_auxiliary(AUX_TRANS);
+      add_auxiliary(AUX_AXPY);
+      add_auxiliary(AUX_MV);
+      add_auxiliary(AUX_BILIN);
+      add_include("stdarg.h");
+      add_include("stdio.h");
+      add_include("math.h");
+
+      this->auxiliaries << sanitize_source(casadi_qp_str, inst);
+      break;
     case AUX_LDL:
       this->auxiliaries << sanitize_source(casadi_ldl_str, inst);
       break;
@@ -848,6 +864,16 @@ namespace casadi {
                         << "#else\n"
                         << "  return fmax(x, y);\n"
                         << "#endif\n"
+                        << "}\n\n";
+      break;
+    case AUX_MIN:
+      this->auxiliaries << "casadi_int casadi_min(casadi_int x, casadi_int y) {\n"
+                        << "  return x>y ? x : y;\n"
+                        << "}\n\n";
+      break;
+    case AUX_MAX:
+      this->auxiliaries << "casadi_int casadi_max(casadi_int x, casadi_int y) {\n"
+                        << "  return x>y ? x : y;\n"
                         << "}\n\n";
       break;
     }

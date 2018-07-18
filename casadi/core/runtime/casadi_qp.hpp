@@ -201,21 +201,6 @@ void casadi_qp_log(casadi_qp_data<T1>* d, const char* fmt, ...) {
   va_end(args);
 }
 
-// SYMBOL "qp_pr_index"
-template<typename T1>
-casadi_int casadi_qp_pr_index(casadi_qp_data<T1>* d, casadi_int* sign) {
-  // Try to improve primal feasibility by adding a constraint
-  if (d->lam[d->ipr]==0.) {
-    // Add the most violating constraint
-    *sign = d->z[d->ipr]<d->lbz[d->ipr] ? -1 : 1;
-    casadi_qp_log(d, "Added %lld to reduce |pr|", d->ipr);
-    return d->ipr;
-  } else {
-    // Try to remove blocking constraints
-    return casadi_qp_du_index(d, sign, d->ipr);
-  }
-}
-
 // SYMBOL "qp_du_check"
 template<typename T1>
 T1 casadi_qp_du_check(casadi_qp_data<T1>* d, casadi_int i) {
@@ -302,6 +287,21 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign, casadi_in
     return best_ind;
   } else {
     return -1;
+  }
+}
+
+// SYMBOL "qp_pr_index"
+template<typename T1>
+casadi_int casadi_qp_pr_index(casadi_qp_data<T1>* d, casadi_int* sign) {
+  // Try to improve primal feasibility by adding a constraint
+  if (d->lam[d->ipr]==0.) {
+    // Add the most violating constraint
+    *sign = d->z[d->ipr]<d->lbz[d->ipr] ? -1 : 1;
+    casadi_qp_log(d, "Added %lld to reduce |pr|", d->ipr);
+    return d->ipr;
+  } else {
+    // Try to remove blocking constraints
+    return casadi_qp_du_index(d, sign, d->ipr);
   }
 }
 
@@ -620,7 +620,7 @@ int casadi_qp_flip_check(casadi_qp_data<T1>* d, casadi_int index, casadi_int sig
   // Find best constraint we can flip, if any
   *r_index=-1;
   *r_sign=0;
-  best = inf;
+  best = p->inf;
   for (i=0; i<p->nz; ++i) {
     // Can't be the same
     if (i==index) continue;

@@ -235,6 +235,106 @@ namespace casadi {
     return 0;
   }
 
+
+  void Qrqp::codegen_body(CodeGenerator& g) const {
+    g.add_auxiliary(CodeGenerator::AUX_QP);
+    g.local("d", "struct casadi_qp_data");
+    g.local("p", "struct casadi_qp_prob");
+
+        // Setup memory structure
+    g << "p.du_to_pr = " << du_to_pr_ << ";\n";
+    g << "p.print_iter = " << print_iter_ << ";\n";
+    g << "p.sp_a = " << g.sparsity(A_) << ";\n";
+    g << "p.sp_h = " << g.sparsity(H_) << ";\n";
+    g << "p.sp_at = " << g.sparsity(AT_) << ";\n";
+    g << "p.sp_kkt = " << g.sparsity(kkt_) << ";\n";
+    g << "p.sp_v = " << g.sparsity(sp_v_) << ";\n";
+    g << "p.sp_r = " << g.sparsity(sp_r_) << ";\n";
+    g << "p.prinv = " << g.constant(prinv_) << ";\n";
+    g << "p.pc =  " << g.constant(pc_) << ";\n";
+
+    // TODO(jgillis): find a type-agnostic way
+    g << "p.dmin = " << p_.dmin << ";\n";
+    g << "p.inf = INFINITY;\n";
+    g << "p.nx = " << nx_ << ";\n";
+    g << "p.na = " << na_ << ";\n";
+    g << "p.nz = " << nx_+na_ << ";\n";
+
+    g << "d.prob = &p;\n";
+    g << "d.nz_h = arg[" << CONIC_H << "];\n";
+    g << "d.g = arg[" << CONIC_G << "];\n";
+    g << "d.nz_a = arg[" << CONIC_A << "];\n";
+    g << "casadi_qp_init(&d, iw, w);\n";
+
+    g.comment("Pass bounds on z");
+    g << g.copy("arg[" + str(CONIC_LBX)+ "]", nx_, "d.lbz") << "\n";
+    g << g.copy("arg[" + str(CONIC_LBA)+ "]", na_, "d.lbz+" + str(nx_)) << "\n";
+    g << g.copy("arg[" + str(CONIC_UBX)+ "]", nx_, "d.ubz") << "\n";
+    g << g.copy("arg[" + str(CONIC_UBA)+ "]", na_, "d.ubz+" + str(nx_)) << "\n";
+
+    g.comment("Pass initial guess");
+    g << g.copy("arg[" + str(CONIC_X0)+ "]", nx_, "d.z") << "\n";
+    g << g.copy("arg[" + str(CONIC_LAM_X0)+ "]", nx_, "d.lam") << "\n";
+    g << g.copy("arg[" + str(CONIC_LAM_A0)+ "]", na_, "d.lam+" + str(nx_)) << "\n";
+
+    g.comment("Reset solver");
+    g << "if (casadi_qp_reset(&d)) return 1;\n";
+
+    g.local("flag", "int");
+    g << "flag = 0;\n";
+
+    g.comment("Constraint to be flipped, if any");
+    g.local("index", "casadi_int");
+    g.local("sign", "casadi_int");
+    g.local("r_index", "casadi_int");
+    g.local("r_sign", "casadi_int");
+    g << "index = -2;sign=0;r_index=-2;r_sign=0;\n";
+
+    g.comment("QP iterations");
+
+    g.local("iter", "casadi_int");
+    g << "iter = 0;\n";
+    g << "while (1) {\n";
+
+    g.comment("Calculate dependent quantities");
+    g << "casadi_qp_calc_dependent(&d);\n";
+
+    g.comment("Make an active set change");
+    g << "casadi_qp_flip(&d, &index, &sign, r_index, r_sign);\n";
+
+    g.comment("Form and factorize the KKT system");
+    g << "casadi_qp_factorize(&d);\n";
+
+    g.comment("Termination message");
+    g << "  if (iter>=" << max_iter_ << ") {\n";
+    g << "    flag = 1;\n";
+    g << "  }\n";
+
+    g.comment("Terminate loop?");
+    g << "  if (index==-1 || flag!=0) break;\n";
+
+    g.comment("Start a new iteration");
+    g << "  iter++;\n";
+    g.comment("Start a new iteration");
+    // Calculate search direction
+    g << "  if (casadi_qp_calc_step(&d, &r_index, &r_sign)) {\n";
+    g << "    flag = 1;\n";
+    g << "    break;\n";
+    g << "}\n";
+
+    g.comment("Line search in the calculated direction");
+    g << "  casadi_qp_linesearch(&d, &index, &sign);\n";
+    g << "}\n";
+
+    g.comment("Get solution");
+    g << g.copy("&d.f", 1, "res[" + str(CONIC_COST) + "]") << "\n";
+    g << g.copy("d.z", nx_, "res[" + str(CONIC_X) + "]") << "\n";
+    g << g.copy("d.lam", nx_, "res[" + str(CONIC_LAM_X) + "]") << "\n";
+    g << g.copy("d.lam+"+str(nx_), na_, "res[" + str(CONIC_LAM_A) + "]") << "\n";
+
+    g << "return flag;\n";
+  }
+
   Dict Qrqp::get_stats(void* mem) const {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<QrqpMemory*>(mem);

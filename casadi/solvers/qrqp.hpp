@@ -28,9 +28,6 @@
 
 #include "casadi/core/conic_impl.hpp"
 #include <casadi/solvers/casadi_conic_qrqp_export.h>
-namespace casadi {
-#include "casadi/core/runtime/casadi_qp.hpp"
-} // namespace casadi
 
 /** \defgroup plugin_Conic_qrqp
  Solve QPs using an active-set method
@@ -98,6 +95,9 @@ namespace casadi {
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
+
+    /** \brief Generate code for the function body */
+    void codegen_body(CodeGenerator& g) const override;
 
     /// A documentation string
     static const std::string meta_doc;
