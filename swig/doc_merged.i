@@ -28079,6 +28079,10 @@ Interface to the JIT compiler SHELL
 |                      |                 | 'flag' option is the prefered   |
 |                      |                 | way to set custom flags.        |
 +----------------------+-----------------+---------------------------------+
+| extra_suffixes       | OT_STRINGVECTOR | List of suffixes for extra      |
+|                      |                 | files that the compiler may     |
+|                      |                 | generate. Default: None         |
++----------------------+-----------------+---------------------------------+
 | flags                | OT_STRINGVECTOR | Compile flags for the JIT       |
 |                      |                 | compiler. Default: None         |
 +----------------------+-----------------+---------------------------------+
@@ -46154,9 +46158,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Qrqp::codegen_body "
+%feature("docstring") casadi::Qrqp::instruction_MX "
 
-[INTERNAL]  Generate code for the function body.
+[INTERNAL]  get MX expression associated with instruction
 
 ";
 
@@ -46526,9 +46530,9 @@ classes.
 
 ";
 
-%feature("docstring") casadi::Qrqp::instruction_MX "
+%feature("docstring") casadi::Qrqp::codegen_body "
 
-[INTERNAL]  get MX expression associated with instruction
+[INTERNAL]  Generate code for the function body.
 
 ";
 
@@ -51781,6 +51785,10 @@ Joel Andersson  Interface to the JIT compiler SHELL
 |                      |                 | 'flag' option is the prefered   |
 |                      |                 | way to set custom flags.        |
 +----------------------+-----------------+---------------------------------+
+| extra_suffixes       | OT_STRINGVECTOR | List of suffixes for extra      |
+|                      |                 | files that the compiler may     |
+|                      |                 | generate. Default: None         |
++----------------------+-----------------+---------------------------------+
 | flags                | OT_STRINGVECTOR | Compile flags for the JIT       |
 |                      |                 | compiler. Default: None         |
 +----------------------+-----------------+---------------------------------+
@@ -51830,6 +51838,13 @@ Joel Andersson  Interface to the JIT compiler SHELL
 |                  |                 | the prefered way |                  |
 |                  |                 | to set custom    |                  |
 |                  |                 | flags.           |                  |
++------------------+-----------------+------------------+------------------+
+| extra_suffixes   | OT_STRINGVECTOR | List of suffixes | casadi::ShellCom |
+|                  |                 | for extra files  | piler            |
+|                  |                 | that the         |                  |
+|                  |                 | compiler may     |                  |
+|                  |                 | generate.        |                  |
+|                  |                 | Default: None    |                  |
 +------------------+-----------------+------------------+------------------+
 | flags            | OT_STRINGVECTOR | Compile flags    | casadi::ShellCom |
 |                  |                 | for the JIT      | piler            |
@@ -60347,6 +60362,10 @@ Get type info for a particular option.
 
 ";
 
+%feature("docstring") casadi::casadi_qp_pr_index "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::load_expm "
 
 Explicitly load a plugin dynamically.
@@ -60363,6 +60382,10 @@ Explicitly load a plugin dynamically.
 ";
 
 ";
+
+%feature("docstring") casadi::casadi_qp_kkt_residual "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::dense_mul_nt_stride "
 
@@ -60732,11 +60755,23 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
+%feature("docstring") casadi::casadi_qp_factorize "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::load_integrator "
 
 Explicitly load a plugin dynamically.
 
 ";
+
+%feature("docstring") casadi::casadi_qp_dual_blocking "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_work "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::expm_n_out "
 
@@ -60772,6 +60807,10 @@ Check if the vector is strictly increasing.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::dense_copy_stride "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qr_singular "
 
 [INTERNAL] ";
@@ -60789,6 +60828,10 @@ Explicitly load a plugin dynamically.
 ";
 
 %feature("docstring") casadi::casadi_interpn_grad "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_calc_step "
 
 [INTERNAL] ";
 
@@ -60810,17 +60853,29 @@ Generate native code in the interfaced language for debugging
 
 ";
 
+%feature("docstring") casadi::casadi_qp_flip_check "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::nlpsol_options "
 
 Get all options for a plugin.
 
 ";
 
+%feature("docstring") casadi::casadi_qp_take_step "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::conic_option_info "
 
 Get documentation for a particular option.
 
 ";
+
+%feature("docstring") casadi::casadi_qp_zero_blocking "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::check_exposed "
 
@@ -60894,6 +60949,10 @@ slices.
 
 ";
 
+%feature("docstring") casadi::casadi_qp_du "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_ldl "
 
 [INTERNAL] ";
@@ -60923,7 +60982,11 @@ Construct from an index vector (requires is_slice(v) to be true)
 
 ";
 
-%feature("docstring") casadi::dense_copy_stride "
+%feature("docstring") casadi::casadi_qp_du_index "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_dual_breakpoints "
 
 [INTERNAL] ";
 
@@ -61044,6 +61107,10 @@ Get documentation for a particular option.
 ";
 
 %feature("docstring") casadi::replace_mat "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_primal_blocking "
 
 [INTERNAL] ";
 
@@ -61851,6 +61918,14 @@ Joel Andersson
 
 ";
 
+%feature("docstring") casadi::casadi_qp_reset "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_pr "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::doc_conic "
 
 Get the documentation string for a plugin.
@@ -61933,6 +62008,10 @@ Get all options for a plugin.
 
 ";
 
+%feature("docstring") casadi::casadi_qp_linesearch "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::collocation_interpolators "
 
 Obtain collocation interpolating matrices.
@@ -62001,6 +62080,10 @@ Explicitly load a plugin dynamically.
 
 ";
 
+%feature("docstring") casadi::casadi_qp_expand_step "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::integrator_in "
 
 Get integrator input scheme name by index.
@@ -62037,6 +62120,10 @@ Get integrator input scheme name by index.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::casadi_qp_singular_step "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_kron "
 
 [INTERNAL]  Calculates Calculates nonzeros of kronecker product
@@ -62048,6 +62135,10 @@ Get integrator input scheme name by index.
 Get documentation for a particular option.
 
 ";
+
+%feature("docstring") casadi::casadi_qp_kkt_vector "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::hash_value "
 
@@ -62157,6 +62248,10 @@ Get the documentation string for a plugin.
 [INTERNAL]  Sparse copy: y <- x, w work vector (length >= number of rows)
 
 ";
+
+%feature("docstring") casadi::casadi_qp_calc_dependent "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::interpolant "
 
@@ -62551,6 +62646,10 @@ Joel Andersson
 
 ";
 
+%feature("docstring") casadi::casadi_bfgs "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::rootfinder_in "
 
 Get rootfinder input scheme name by index.
@@ -62629,6 +62728,10 @@ Explicitly load a plugin dynamically.
 
 ";
 
+%feature("docstring") casadi::casadi_qp_du_check "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::rootfinder_option_type "
 
 Get type info for a particular option.
@@ -62681,6 +62784,14 @@ Explicitly load a plugin dynamically.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::casadi_qp_kkt "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_flip "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qr_trs "
 
 [INTERNAL] ";
@@ -62702,6 +62813,10 @@ Explicitly load a plugin dynamically.
 ";
 
 %feature("docstring") casadi::casadi_nd_boor_eval "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_du_free "
 
 [INTERNAL] ";
 
@@ -62766,6 +62881,10 @@ Get output scheme name by index.
 
 ";
 
+%feature("docstring") casadi::casadi_qp_kkt_dot "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::is_strictly_monotone "
 
 Check if the vector is strictly monotone.
@@ -62794,6 +62913,10 @@ N:  Number of integrator steps
 order:  Order of interpolating polynomials
 
 ";
+
+%feature("docstring") casadi::casadi_qp_init "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::nlpsol_in "
 
@@ -62876,7 +62999,7 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring") casadi::casadi_bfgs "
+%feature("docstring") casadi::casadi_qp_log "
 
 [INTERNAL] ";
 

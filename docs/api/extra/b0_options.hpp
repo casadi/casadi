@@ -3092,6 +3092,7 @@
 <tr><td>compiler_flags</td><td>OT_STRINGVECTOR</td><td>Alias for 'compiler_flags'</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>compiler_output_flag</td><td>OT_STRING</td><td>Compiler flag to denote object output. Default: '-o '</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>compiler_setup</td><td>OT_STRING</td><td>Compiler setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>extra_suffixes</td><td>OT_STRINGVECTOR</td><td>List of suffixes for extra files that the compiler may generate. Default: None</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>folder</td><td>OT_STRING</td><td>Folder to put temporary objects in.</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>linker</td><td>OT_STRING</td><td>Linker command</td><td>casadi::ShellCompiler</td></tr>
@@ -3113,6 +3114,7 @@
 <tr><td>compiler_flags</td><td>OT_STRINGVECTOR</td><td>Alias for 'compiler_flags'</td></tr>
 <tr><td>compiler_output_flag</td><td>OT_STRING</td><td>Compiler flag to denote object output. Default: '-o '</td></tr>
 <tr><td>compiler_setup</td><td>OT_STRING</td><td>Compiler setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td></tr>
+<tr><td>extra_suffixes</td><td>OT_STRINGVECTOR</td><td>List of suffixes for extra files that the compiler may generate. Default: None</td></tr>
 <tr><td>flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td></tr>
 <tr><td>folder</td><td>OT_STRING</td><td>Folder to put temporary objects in.</td></tr>
 <tr><td>linker</td><td>OT_STRING</td><td>Linker command</td></tr>
@@ -3132,6 +3134,7 @@
 <tr><td>compiler_flags</td><td>OT_STRINGVECTOR</td><td>Alias for 'compiler_flags'</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>compiler_output_flag</td><td>OT_STRING</td><td>Compiler flag to denote object output. Default: '-o '</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>compiler_setup</td><td>OT_STRING</td><td>Compiler setup command. Intended to be fixed. The 'flag' option is the prefered way to set custom flags.</td><td>casadi::ShellCompiler</td></tr>
+<tr><td>extra_suffixes</td><td>OT_STRINGVECTOR</td><td>List of suffixes for extra files that the compiler may generate. Default: None</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>flags</td><td>OT_STRINGVECTOR</td><td>Compile flags for the JIT compiler. Default: None</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>folder</td><td>OT_STRING</td><td>Folder to put temporary objects in.</td><td>casadi::ShellCompiler</td></tr>
 <tr><td>linker</td><td>OT_STRING</td><td>Linker command</td><td>casadi::ShellCompiler</td></tr>

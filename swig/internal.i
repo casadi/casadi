@@ -1843,6 +1843,9 @@
 %exception  casadi::Qrqp::class_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Qrqp::codegen_body(CodeGenerator &g) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Qrqp::get_options() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

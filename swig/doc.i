@@ -35649,6 +35649,10 @@ Interface to the JIT compiler SHELL
 |                      |                 | 'flag' option is the prefered   |
 |                      |                 | way to set custom flags.        |
 +----------------------+-----------------+---------------------------------+
+| extra_suffixes       | OT_STRINGVECTOR | List of suffixes for extra      |
+|                      |                 | files that the compiler may     |
+|                      |                 | generate. Default: None         |
++----------------------+-----------------+---------------------------------+
 | flags                | OT_STRINGVECTOR | Compile flags for the JIT       |
 |                      |                 | compiler. Default: None         |
 +----------------------+-----------------+---------------------------------+
@@ -58388,10 +58392,10 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::codegen_body(CodeGenerator
-&g) const  "
+%feature("docstring")  casadi::FunctionInternal::instruction_MX(casadi_int
+k) const  "
 
-[INTERNAL]  Generate code for the function body.
+[INTERNAL]  get MX expression associated with instruction
 
 ";
 
@@ -58839,10 +58843,9 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::instruction_MX(casadi_int
-k) const  "
+%feature("docstring")  casadi::Qrqp::codegen_body(CodeGenerator &g) const  "
 
-[INTERNAL]  get MX expression associated with instruction
+[INTERNAL]  Generate code for the function body.
 
 ";
 
@@ -65076,6 +65079,10 @@ Joel Andersson  Interface to the JIT compiler SHELL
 |                      |                 | 'flag' option is the prefered   |
 |                      |                 | way to set custom flags.        |
 +----------------------+-----------------+---------------------------------+
+| extra_suffixes       | OT_STRINGVECTOR | List of suffixes for extra      |
+|                      |                 | files that the compiler may     |
+|                      |                 | generate. Default: None         |
++----------------------+-----------------+---------------------------------+
 | flags                | OT_STRINGVECTOR | Compile flags for the JIT       |
 |                      |                 | compiler. Default: None         |
 +----------------------+-----------------+---------------------------------+
@@ -65125,6 +65132,13 @@ Joel Andersson  Interface to the JIT compiler SHELL
 |                  |                 | the prefered way |                  |
 |                  |                 | to set custom    |                  |
 |                  |                 | flags.           |                  |
++------------------+-----------------+------------------+------------------+
+| extra_suffixes   | OT_STRINGVECTOR | List of suffixes | casadi::ShellCom |
+|                  |                 | for extra files  | piler            |
+|                  |                 | that the         |                  |
+|                  |                 | compiler may     |                  |
+|                  |                 | generate.        |                  |
+|                  |                 | Default: None    |                  |
 +------------------+-----------------+------------------+------------------+
 | flags            | OT_STRINGVECTOR | Compile flags    | casadi::ShellCom |
 |                  |                 | for the JIT      | piler            |
@@ -75313,6 +75327,11 @@ Get type info for a particular option.
 
 ";
 
+%feature("docstring")  casadi::casadi_qp_pr_index(casadi_qp_data< T1 > *d,
+casadi_int *sign) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::load_expm(const std::string &name) "
 
 Explicitly load a plugin dynamically.
@@ -75329,6 +75348,11 @@ A.
 
 %feature("docstring")  casadi::casadi_rank1(T1 *A, const casadi_int *sp_A,
 T1 alpha, const T1 *x, const T1 *y) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_kkt_residual(casadi_qp_data< T1 >
+*d, T1 *r) "
 
 [INTERNAL] ";
 
@@ -75722,11 +75746,26 @@ Check if for each element of v holds: lower <= v_i < upper.
 
 ";
 
+%feature("docstring")  casadi::casadi_qp_factorize(casadi_qp_data< T1 > *d)
+"
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::load_integrator(const std::string &name) "
 
 Explicitly load a plugin dynamically.
 
 ";
+
+%feature("docstring")  casadi::casadi_qp_dual_blocking(casadi_qp_data< T1 >
+*d) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_work(casadi_qp_prob< T1 > *p,
+casadi_int *sz_iw, casadi_int *sz_w) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::expm_n_out() "
 
@@ -75764,6 +75803,11 @@ casadi_int n, casadi_int alpha) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::dense_copy_stride(casadi_int n, casadi_int m,
+const double *A, double *B, casadi_int strideA, casadi_int strideB) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_qr_singular(T1 *rmin, casadi_int
 *irmin, const T1 *nz_r, const casadi_int *sp_r, const casadi_int *pc, T1
 eps) "
@@ -75794,6 +75838,11 @@ ndim, const T1 *grid, const casadi_int *offset, const T1 *values, const T1
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_qp_calc_step(casadi_qp_data< T1 > *d,
+casadi_int *r_index, casadi_int *r_sign) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::has_interpolant(const std::string &name) "
 
 Check if a particular plugin is available.
@@ -75821,11 +75870,22 @@ inc_x, T1 *y, casadi_int inc_y) "
 
 ";
 
+%feature("docstring")  casadi::casadi_qp_flip_check(casadi_qp_data< T1 > *d,
+casadi_int index, casadi_int sign, casadi_int *r_index, casadi_int *r_sign)
+"
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::nlpsol_options(const std::string &name) "
 
 Get all options for a plugin.
 
 ";
+
+%feature("docstring")  casadi::casadi_qp_take_step(casadi_qp_data< T1 > *d)
+"
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::conic_option_info(const std::string &name,
 const std::string &op) "
@@ -75833,6 +75893,11 @@ const std::string &op) "
 Get documentation for a particular option.
 
 ";
+
+%feature("docstring")  casadi::casadi_qp_zero_blocking(casadi_qp_data< T1 >
+*d) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::check_exposed(T t) "
 
@@ -76182,6 +76247,10 @@ Joel Andersson
 
 ";
 
+%feature("docstring")  casadi::casadi_qp_du(casadi_qp_data< T1 > *d) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_ldl(const casadi_int *sp_a, const T1
 *a, const casadi_int *sp_lt, T1 *lt, T1 *d, const casadi_int *p, T1 *w) "
 
@@ -76212,8 +76281,13 @@ Construct from an index vector (requires is_slice(v) to be true)
 
 ";
 
-%feature("docstring")  casadi::dense_copy_stride(casadi_int n, casadi_int m,
-const double *A, double *B, casadi_int strideA, casadi_int strideB) "
+%feature("docstring")  casadi::casadi_qp_du_index(casadi_qp_data< T1 > *d,
+casadi_int *sign, casadi_int skip) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_dual_breakpoints(casadi_qp_data< T1
+> *d, T1 *tau_list, casadi_int *ind_list, T1 tau) "
 
 [INTERNAL] ";
 
@@ -76793,6 +76867,11 @@ Get documentation for a particular option.
 
 %feature("docstring")  casadi::replace_mat(const M &arg, const Sparsity
 &inp, casadi_int npar) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_primal_blocking(casadi_qp_data< T1
+> *d, casadi_int *index, casadi_int *sign) "
 
 [INTERNAL] ";
 
@@ -77604,6 +77683,14 @@ Joel Andersson
 
 ";
 
+%feature("docstring")  casadi::casadi_qp_reset(casadi_qp_data< T1 > *d) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_pr(casadi_qp_data< T1 > *d) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::doc_conic(const std::string &name) "
 
 Get the documentation string for a plugin.
@@ -77694,6 +77781,11 @@ const T1 *lb, const T1 *ub) "
 
 ";
 
+%feature("docstring")  casadi::casadi_qp_linesearch(casadi_qp_data< T1 > *d,
+casadi_int *index, casadi_int *sign) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::collocation_interpolators(const std::vector<
 double > &tau, std::vector< std::vector< double > > &output_C, std::vector<
 double > &output_D) "
@@ -77764,6 +77856,11 @@ Explicitly load a plugin dynamically.
 
 ";
 
+%feature("docstring")  casadi::casadi_qp_expand_step(casadi_qp_data< T1 >
+*d) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::integrator_in() "
 
 Get input scheme of integrators.
@@ -77802,6 +77899,11 @@ const casadi_int *sp_lt, const T1 *lt, const T1 *d, const casadi_int *p, T1
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_qp_singular_step(casadi_qp_data< T1 >
+*d, casadi_int *r_index, casadi_int *r_sign) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_kron(const T1 *a, const casadi_int
 *sp_a, const T1 *b, const casadi_int *sp_b, T1 *r) "
 
@@ -77815,6 +77917,11 @@ const std::string &op) "
 Get documentation for a particular option.
 
 ";
+
+%feature("docstring")  casadi::casadi_qp_kkt_vector(casadi_qp_data< T1 > *d,
+T1 *kkt_i, casadi_int i) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::hash_value(T v) "
 
@@ -77956,6 +78063,11 @@ const casadi_int *sp_r, const casadi_int *pc, T1 eps, casadi_int ind) "
 [INTERNAL]  Sparse copy: y <- x, w work vector (length >= number of rows)
 
 ";
+
+%feature("docstring")  casadi::casadi_qp_calc_dependent(casadi_qp_data< T1 >
+*d) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::interpolant(const std::string &name, const
 std::string &solver, const std::vector< std::vector< double > > &grid, const
@@ -78351,6 +78463,11 @@ linear
 Joel Andersson
 
 ";
+
+%feature("docstring")  casadi::casadi_bfgs(const casadi_int *sp_h, T1 *h,
+const T1 *dx, const T1 *glag, const T1 *glag_old, T1 *w) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::rootfinder_in() "
 
@@ -78783,6 +78900,11 @@ Explicitly load a plugin dynamically.
 
 ";
 
+%feature("docstring")  casadi::casadi_qp_du_check(casadi_qp_data< T1 > *d,
+casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::rootfinder_option_type(const std::string
 &name, const std::string &op) "
 
@@ -78843,6 +78965,16 @@ strideB, casadi_int strideC) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_qp_kkt(casadi_qp_data< T1 > *d) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_flip(casadi_qp_data< T1 > *d,
+casadi_int *index, casadi_int *sign, casadi_int r_index, casadi_int r_sign)
+"
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_qr_trs(const casadi_int *sp_r, const
 T1 *nz_r, T1 *x, casadi_int tr) "
 
@@ -78870,6 +79002,11 @@ T1 *nz_r, T1 *x, casadi_int tr) "
 n_dims, const T1 *knots, const casadi_int *offset, const casadi_int *degree,
 const casadi_int *strides, const T1 *c, casadi_int m, const T1 *x, const
 casadi_int *lookup_mode, casadi_int reverse, casadi_int *iw, T1 *w) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_du_free(casadi_qp_data< T1 > *d,
+casadi_int i, int upper) "
 
 [INTERNAL] ";
 
@@ -78933,6 +79070,11 @@ Get output scheme name by index.
 
 ";
 
+%feature("docstring")  casadi::casadi_qp_kkt_dot(casadi_qp_data< T1 > *d,
+const T1 *v, casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::is_strictly_monotone(const std::vector< T >
 &v) "
 
@@ -78963,6 +79105,11 @@ N:  Number of integrator steps
 order:  Order of interpolating polynomials
 
 ";
+
+%feature("docstring")  casadi::casadi_qp_init(casadi_qp_data< T1 > *d,
+casadi_int *iw, T1 *w) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::nlpsol_in() "
 
@@ -79044,8 +79191,8 @@ Get the documentation string for a plugin.
 
 ";
 
-%feature("docstring")  casadi::casadi_bfgs(const casadi_int *sp_h, T1 *h,
-const T1 *dx, const T1 *glag, const T1 *glag_old, T1 *w) "
+%feature("docstring")  casadi::casadi_qp_log(casadi_qp_data< T1 > *d, const
+char *fmt,...) "
 
 [INTERNAL] ";
 
