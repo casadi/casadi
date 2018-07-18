@@ -142,7 +142,7 @@ namespace casadi {
     string linker_setup = "/DLL";
     std::string compiler_output_flag = "/Fo";
     std::string linker_output_flag = "/out:";
-    extra_suffixes_ = {".exp",".lib"};
+    extra_suffixes_ = {".exp", ".lib"};
 #else
     string compiler = "gcc";
     string linker = "gcc";
