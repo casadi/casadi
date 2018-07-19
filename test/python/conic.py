@@ -70,6 +70,51 @@ print(conics)
 
 class ConicTests(casadiTestCase):
 
+  def test_general_unconstrained(self):
+    H = sparsify(DM([[1,0],[0,1]]))
+    G = DM([-0.7,-2.3])
+    A =  DM.zeros(0,2)
+
+    LBA = DM.zeros(0,1)
+    UBA = DM.zeros(0,1)
+
+    LBX = DM([-inf]*2)
+    UBX = DM([inf]*2)
+
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+
+    for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
+      self.message("general_convex: " + str(conic))
+
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+
+      try:
+        less_digits=aux_options["less_digits"]
+      except:
+        less_digits=0
+
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
+
+      solver_out = solver(**solver_in)
+      try:
+          self.assertTrue(solver.stats()["success"])
+      except:
+          raise Exception(str(conic))
+
+      self.assertAlmostEqual(solver_out["x"][0],0.7,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["x"][1],2.3,max(1,6-less_digits),str(conic))
+
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
+
   def test_general_convex_dense(self):
     self.message("Convex dense QP with solvers: " + str([conic for conic,options,aux_options in conics]))
     H = DM([[1,-1],[-1,2]])
@@ -299,6 +344,8 @@ class ConicTests(casadiTestCase):
 
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0,2,0]),str(conic),digits=max(1,6-less_digits))
 
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
       self.assertAlmostEqual(solver_out["cost"][0],-7.4375,max(1,6-less_digits),str(conic))
 
       A =  DM([[1, 1],[-1, 2],[2, 1]])
@@ -329,6 +376,8 @@ class ConicTests(casadiTestCase):
 
       self.assertAlmostEqual(solver_out["cost"][0],-8.4,max(1,5-less_digits),str(conic))
 
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
   @memory_heavy()
   def test_degenerate_hessian(self):
     self.message("Degenerate hessian")
@@ -377,6 +426,8 @@ class ConicTests(casadiTestCase):
 
       self.assertAlmostEqual(solver_out["cost"][0],-38.375,max(1,5-less_digits),str(conic))
 
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
 
   def test_no_inequality(self):
     self.message("No inequalities present")
@@ -471,6 +522,9 @@ class ConicTests(casadiTestCase):
 
       self.assertAlmostEqual(solver_out["cost"][0],-34,max(1,5-less_digits),str(conic))
 
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
+
   def test_standard_form(self):
     H = DM([[1,-1],[-1,2]])
     G = DM([-2,-6])
@@ -510,6 +564,9 @@ class ConicTests(casadiTestCase):
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([3.4]),str(conic),digits=max(1,5-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-5.1,max(1,5-less_digits),str(conic))
+
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
 
   @memory_heavy()
   def test_badscaling(self):
@@ -633,6 +690,9 @@ class ConicTests(casadiTestCase):
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0.5,-1.5,0]),str(conic),digits=max(1,5-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],2.5,max(1,5-less_digits),str(conic))
+
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
 
   def test_linear2(self):
     H = DM(2,2)
