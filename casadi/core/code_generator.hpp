@@ -228,6 +228,25 @@ namespace casadi {
                          const std::string& d, const std::string& p,
                          const std::string& w);
 
+    /** \brief fmax */
+    std::string fmax(const std::string& x, const std::string& y);
+
+    /** \brief fmin */
+    std::string fmin(const std::string& x, const std::string& y);
+
+    /** \brief norm_inf */
+    std::string norm_inf(casadi_int n, const std::string& x);
+
+    /** \brief max_viol */
+    std::string max_viol(casadi_int n, const std::string& x,
+      const std::string& lb, const std::string& ub);
+
+    /** \brief lb_eig */
+    std::string lb_eig(const Sparsity& sp_h, const std::string& h);
+
+    /** \brief regularize */
+    std::string regularize(const Sparsity& sp_h, const std::string& h, const std::string& reg);
+
     /** \brief Declare a function */
     std::string declare(std::string s);
 
@@ -278,8 +297,11 @@ namespace casadi {
       AUX_PRINTF,
       AUX_FMIN,
       AUX_FMAX,
+      AUX_FABS,
       AUX_MIN,
-      AUX_MAX
+      AUX_MAX,
+      AUX_MAX_VIOL,
+      AUX_REGULARIZE
     };
 
     /** \brief Add a built-in auxiliary function */

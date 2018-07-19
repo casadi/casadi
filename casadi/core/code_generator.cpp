@@ -805,6 +805,13 @@ namespace casadi {
       add_auxiliary(AUX_QR);
       this->auxiliaries << sanitize_source(casadi_newton_str, inst);
       break;
+    case AUX_MAX_VIOL:
+      this->auxiliaries << sanitize_source(casadi_max_viol_str, inst);
+      break;
+    case AUX_REGULARIZE:
+      add_auxiliary(AUX_FABS);
+      add_auxiliary(AUX_FMIN);
+      this->auxiliaries << sanitize_source(casadi_regularize_str, inst);
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
                         << "(" << (this->cpp ? "static_cast<double>(x)" : "(double) x") << ")\n\n";
@@ -863,6 +870,17 @@ namespace casadi {
                         << "  return x>y ? x : y;\n"
                         << "#else\n"
                         << "  return fmax(x, y);\n"
+                        << "#endif\n"
+                        << "}\n\n";
+      break;
+    case AUX_FABS:
+      shorthand("fabs");
+      this->auxiliaries << "casadi_real casadi_fabs(casadi_real x) {\n"
+                        << "/* Pre-c99 compatibility */\n"
+                        << "#if __STDC_VERSION__ < 199901L\n"
+                        << "  return x>0 ? x : -x;\n"
+                        << "#else\n"
+                        << "  return fabs(x);\n"
                         << "#endif\n"
                         << "}\n\n";
       break;
@@ -1362,6 +1380,42 @@ namespace casadi {
     add_auxiliary(CodeGenerator::AUX_LDL);
     return "casadi_ldl_solve(" + x + ", " + str(nrhs) + ", " + sp_lt + ", "
            + lt + ", " + d + ", " + p + ", " + w + ");";
+  }
+
+  std::string CodeGenerator::
+  fmax(const std::string& x, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_FMAX);
+    return "casadi_fmax(" + x + ", " + y + ");";
+  }
+
+  std::string CodeGenerator::
+  fmin(const std::string& x, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_FMIN);
+    return "casadi_fmin(" + x + ", " + y + ");";
+  }
+
+  std::string CodeGenerator::
+  max_viol(casadi_int n, const std::string& x, const std::string& lb, const std::string& ub) {
+    add_auxiliary(CodeGenerator::AUX_MAX_VIOL);
+    return "casadi_max_viol(" + str(n) + ", " + x+ ", " + lb + ", " + ub + ")";
+  }
+
+  std::string CodeGenerator::
+  norm_inf(casadi_int n, const std::string& x) {
+    add_auxiliary(CodeGenerator::AUX_NORM_INF);
+    return "casadi_norm_inf(" + str(n) + ", " + x + ");";
+  }
+
+  std::string CodeGenerator::
+  lb_eig(const Sparsity& sp_h, const std::string& h) {
+    add_auxiliary(CodeGenerator::AUX_REGULARIZE);
+    return "casadi_lb_eig(" + sparsity(sp_h) + ", " + h + ");";
+  }
+
+  std::string CodeGenerator::
+  regularize(const Sparsity& sp_h, const std::string& h, const std::string& reg) {
+    add_auxiliary(CodeGenerator::AUX_REGULARIZE);
+    return "casadi_regularize(" + sparsity(sp_h) + ", " + h + ", " + reg + ");";
   }
 
 } // namespace casadi
