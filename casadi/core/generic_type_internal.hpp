@@ -51,7 +51,7 @@ namespace casadi {
     void disp(std::ostream& stream, bool more) const override { stream << d_; }
     TypeID getType() const override { return ID;}
     T d_;
-    void serialize(Serializer& s) const {
+    void serialize(Serializer& s) const override {
       s.pack("GenericType::d", d_);
     }
     static GenericType deserialize(DeSerializer& s) {
