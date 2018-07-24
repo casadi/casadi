@@ -223,6 +223,7 @@ namespace casadi {
       }
       // Line search in the calculated direction
       casadi_qp_linesearch(&d, &index, &sign);
+      InterruptHandler::check();
     }
     // Get solution
     casadi_copy(&d.f, 1, res[CONIC_COST]);
