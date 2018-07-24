@@ -104,10 +104,15 @@
     static void mexflush(bool error) {
     }
 #else
+    // Undocumented matlab feature
+    extern "C" bool utIsInterruptPending(void);
+    extern "C" void utSetInterruptPending(bool);
+
     // Flush the command window buffer (needed in gui mode)
     static void mexflush(bool error) {
-      mexEvalString("drawnow('update');");
-      mexEvalString("pause(0.0001);");
+      if (mexEvalString("drawnow('update');pause(0.0001);")) {
+        utSetInterruptPending(true);
+      }
     }
 #endif
 
