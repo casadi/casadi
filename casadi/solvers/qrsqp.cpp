@@ -327,8 +327,8 @@ namespace casadi {
       // Primal infeasability
       double pr_inf = casadi_max_viol(nx_+ng_, m->z, m->lbz, m->ubz);
 
-      // inf-norm of lagrange gradient
-      double gLag_norminf = casadi_norm_inf(nx_, m->gLag);
+      // inf-norm of Lagrange gradient
+      double du_inf = casadi_norm_inf(nx_, m->gLag);
 
       // inf-norm of step
       double dx_norminf = casadi_norm_inf(nx_, m->dz);
@@ -336,19 +336,19 @@ namespace casadi {
       // Printing information about the actual iterate
       if (print_iteration_) {
         if (m->iter_count % 10 == 0) print_iteration();
-        print_iteration(m->iter_count, m->f, pr_inf, gLag_norminf, dx_norminf,
+        print_iteration(m->iter_count, m->f, pr_inf, du_inf, dx_norminf,
                         m->reg, ls_iter, ls_success);
       }
 
       // Callback function
-      if (callback(m, m->z, &m->f, m->z + nx_, m->lam, m->lam + nx_, nullptr)) {
+      if (callback(m)) {
         print("WARNING(qrsqp): Aborted by callback...\n");
         m->return_status = "User_Requested_Stop";
         break;
       }
 
       // Checking convergence criteria
-      if (m->iter_count >= min_iter_ && pr_inf < tol_pr_ && gLag_norminf < tol_du_) {
+      if (m->iter_count >= min_iter_ && pr_inf < tol_pr_ && du_inf < tol_du_) {
         print("MESSAGE(qrsqp): Convergence achieved after %d iterations\n", m->iter_count);
         m->return_status = "Solve_Succeeded";
         m->success = true;

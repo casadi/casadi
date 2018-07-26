@@ -912,19 +912,16 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  int Nlpsol::
-  callback(void* mem, const double* x, const double* f, const double* g,
-           const double* lam_x, const double* lam_g, const double* lam_p) const {
-    auto m = static_cast<NlpsolMemory*>(mem);
+  int Nlpsol::callback(NlpsolMemory* m) const {
     // Quick return if no callback function
     if (fcallback_.is_null()) return 0;
     // Callback inputs
     fill_n(m->arg, fcallback_.n_in(), nullptr);
-    m->arg[NLPSOL_X] = x;
-    m->arg[NLPSOL_F] = f;
-    m->arg[NLPSOL_G] = g;
-    m->arg[NLPSOL_LAM_G] = lam_g;
-    m->arg[NLPSOL_LAM_X] = lam_x;
+    m->arg[NLPSOL_X] = m->z;
+    m->arg[NLPSOL_F] = &m->f;
+    m->arg[NLPSOL_G] = m->z + nx_;
+    m->arg[NLPSOL_LAM_G] = m->lam + nx_;
+    m->arg[NLPSOL_LAM_X] = m->lam;
 
     // Callback outputs
     fill_n(m->res, fcallback_.n_out(), nullptr);

@@ -219,8 +219,7 @@ namespace casadi {
     ///@}
 
     // Call the callback function
-    int callback(void* mem, const double* x, const double* f, const double* g,
-                 const double* lam_x, const double* lam_g, const double* lam_p) const;
+    int callback(NlpsolMemory* m) const;
 
     // Get KKT function
     Function kkt() const;
