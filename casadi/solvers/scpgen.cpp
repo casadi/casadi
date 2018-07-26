@@ -628,7 +628,6 @@ namespace casadi {
 
     // Allocate memory, nonlfted problem
     alloc_w(nx_, true); // dxk_
-    alloc_w(nx_, true); // lam_xk_
     alloc_w(nx_+ng_, true); // dlam
     alloc_w(nx_, true); // gfk_
     alloc_w(nx_, true); // gL_
@@ -702,7 +701,6 @@ namespace casadi {
 
     // Get work vectors, nonlifted problem
     m->dxk = w; w += nx_;
-    m->lam_xk = w; w += nx_;
     m->dlam = w; w += nx_ + ng_;
     m->gfk = w; w += nx_;
     m->gL = w; w += nx_;
@@ -768,7 +766,6 @@ namespace casadi {
     }
 
     // Reset dual guess
-    casadi_fill(m->lam_xk, nx_, 0.);
     casadi_fill(m->dlam, nx_+ng_, 0.);
     if (!gauss_newton_) {
       for (auto&& v : m->lifted_mem) {
@@ -875,9 +872,6 @@ namespace casadi {
 
     // Store optimal value
     uout() << "optimal cost = " << m->f << endl;
-
-    // Save results to outputs
-    casadi_copy(m->lam_xk, nx_, m->lam);
 
     // Write timers
     if (print_time_) {
@@ -1003,7 +997,7 @@ namespace casadi {
 
     // Calculate the gradient of the lagrangian
     casadi_copy(m->gfk, nx_, m->gL);
-    casadi_axpy(nx_, 1., m->lam_xk, m->gL);
+    casadi_axpy(nx_, 1., m->lam, m->gL);
     casadi_mv(m->qpA, spA_, m->lam + nx_, m->gL, true);
 
     double time2 = clock();
@@ -1155,8 +1149,7 @@ namespace casadi {
     m->sigma = std::max(merit_start_, 1.01*casadi_norm_inf(nx_+ng_, m->dlam));
 
     // Calculate step in multipliers
-    casadi_axpy(nx_, -1., m->lam_xk, m->dlam);
-    casadi_axpy(ng_, -1., m->lam + nx_, m->dlam + nx_);
+    casadi_axpy(nx_ + ng_, -1., m->lam, m->dlam);
 
     double time2 = clock();
     m->t_solve_qp += (time2-time1)/CLOCKS_PER_SEC;
@@ -1211,8 +1204,7 @@ namespace casadi {
       for (auto&& v : m->lifted_mem) casadi_axpy(v.n, dt, v.dx, v.x);
 
       // Take the dual step
-      casadi_axpy(ng_, dt, m->dlam + nx_, m->lam + nx_);
-      casadi_axpy(nx_, dt, m->dlam, m->lam_xk);
+      casadi_axpy(nx_+ng_, dt, m->dlam, m->lam);
       if (!gauss_newton_) {
         for (auto&& v : m->lifted_mem) casadi_axpy(v.n, dt, v.dlam, v.lam);
       }
