@@ -396,6 +396,8 @@ namespace casadi {
     // Allocate work vectors
     alloc_w(nx_ + ng_, true); // z
     alloc_w(nx_ + ng_, true); // lam
+    alloc_w(nx_ + ng_, true); // lbz
+    alloc_w(nx_ + ng_, true); // ubz
     alloc_w(np_, true); // lam_p
 
     if (!fcallback_.is_null()) {
@@ -452,8 +454,8 @@ namespace casadi {
 
     // Detect ill-posed problems (simple bounds)
     for (casadi_int i=0; i<nx_; ++i) {
-      double lb = m->lbx ? m->lbx[i] : 0;
-      double ub = m->ubx ? m->ubx[i] : 0;
+      double lb = m->lbz[i];
+      double ub = m->ubz[i];
       double x0 = m->z[i];
       casadi_assert(lb <= ub && lb!=inf && ub!=-inf,
           "Ill-posed problem detected: "
@@ -469,8 +471,8 @@ namespace casadi {
 
     // Detect ill-posed problems (nonlinear bounds)
     for (casadi_int i=0; i<ng_; ++i) {
-      double lb = m->lbg ? m->lbg[i] : 0;
-      double ub = m->ubg ? m->ubg[i] : 0;
+      double lb = m->lbz[nx_ + i];
+      double ub = m->ubz[nx_ + i];
       casadi_assert(lb <= ub && lb!=inf && ub!=-inf,
         "Ill-posed problem detected: "
         "LBG[" + str(i) + "] <= UBG[" + str(i) + "] was violated. "
@@ -499,28 +501,26 @@ namespace casadi {
     casadi_error("setOptionsFromFile not defined for class " + class_name());
   }
 
-  void Nlpsol::bound_consistency(casadi_int n, double* x, double* lam,
-                                 const double* lbx, const double* ubx) {
-    // NOTE: Move to C runtime?
-    casadi_assert(x!=nullptr && lam!=nullptr, "Need x, lam");
+  void Nlpsol::bound_consistency(casadi_int n, double* z, double* lam,
+                                 const double* lbz, const double* ubz) {
+    casadi_assert_dev(z!=0);
+    casadi_assert_dev(lam!=0);
+    casadi_assert_dev(lbz!=0);
+    casadi_assert_dev(ubz!=0);
     // Local variables
     casadi_int i;
-    double lb, ub;
     // Loop over variables
     for (i=0; i<n; ++i) {
-      // Get bounds
-      lb = lbx ? lbx[i] : 0.;
-      ub = ubx ? ubx[i] : 0.;
       // Make sure bounds are respected
-      x[i] = std::fmin(std::fmax(x[i], lb), ub);
+      z[i] = std::fmin(std::fmax(z[i], lbz[i]), ubz[i]);
       // Adjust multipliers
-      if (std::isinf(lb) && std::isinf(ub)) {
+      if (std::isinf(lbz[i]) && std::isinf(ubz[i])) {
         // Both multipliers are infinite
         lam[i] = 0.;
-      } else if (std::isinf(lb) || x[i] - lb > ub - x[i]) {
+      } else if (std::isinf(lbz[i]) || z[i] - lbz[i] > ubz[i] - z[i]) {
         // Infinite lower bound or closer to upper bound than lower bound
         lam[i] = std::fmax(0., lam[i]);
-      } else if (std::isinf(ub) || x[i] - lb < ub - x[i]) {
+      } else if (std::isinf(ubz[i]) || z[i] - lbz[i] < ubz[i] - z[i]) {
         // Infinite upper bound or closer to lower bound than upper bound
         lam[i] = std::fmin(0., lam[i]);
       }
@@ -536,10 +536,10 @@ namespace casadi {
 
     // Bounds, given parameter values
     m->p = arg[NLPSOL_P];
-    m->lbx = arg[NLPSOL_LBX];
-    m->ubx = arg[NLPSOL_UBX];
-    m->lbg = arg[NLPSOL_LBG];
-    m->ubg = arg[NLPSOL_UBG];
+    const double *lbx = arg[NLPSOL_LBX];
+    const double *ubx = arg[NLPSOL_UBX];
+    const double *lbg = arg[NLPSOL_LBG];
+    const double *ubg = arg[NLPSOL_UBG];
 
     // Get input pointers
     const double *x0 = arg[NLPSOL_X0];
@@ -571,6 +571,12 @@ namespace casadi {
     m->f = nan;
     casadi_fill(m->z + nx_, ng_, nan);
 
+    // Get bounds
+    casadi_copy(lbx, nx_, m->lbz);
+    casadi_copy(lbg, ng_, m->lbz + nx_);
+    casadi_copy(ubx, nx_, m->ubz);
+    casadi_copy(ubg, ng_, m->ubz + nx_);
+
     // Check the provided inputs
     check_inputs(m);
 
@@ -597,8 +603,7 @@ namespace casadi {
 
     // Make sure that an optimal solution is consistant with bounds
     if (bound_consistency_ && !flag) {
-      bound_consistency(nx_, m->z, m->lam, m->lbx, m->ubx);
-      bound_consistency(ng_, m->z+nx_, m->lam + nx_, m->lbg, m->ubg);
+      bound_consistency(nx_+ng_, m->z, m->lam, m->lbz, m->ubz);
     }
 
     // Get optimal solution
@@ -628,6 +633,8 @@ namespace casadi {
 
     // Allocate memory
     m->z = w; w += nx_ + ng_;
+    m->lbz = w; w += nx_ + ng_;
+    m->ubz = w; w += nx_ + ng_;
     m->lam = w; w += nx_ + ng_;
     m->lam_p = w; w += np_;
   }

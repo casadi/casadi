@@ -1143,8 +1143,8 @@ namespace casadi {
     // Update bounds on linearized constraints for the next SOC QP:
     // That is different from the update for the first SOC QP!
     for (casadi_int i=0; i<ng_; i++) {
-      double lbg = m->lbg ? m->lbg[i] : 0;
-      double ubg = m->ubg ? m->ubg[i] : 0;
+      double lbg = m->lbz[i + nx_];
+      double ubg = m->ubz[i + nx_];
       if (lbg != inf) {
         m->lba_qp[i] = *alphaSOC * m->lba_qp[i] - m->gk[i];
       } else {
@@ -1438,10 +1438,10 @@ namespace casadi {
 
     // Initialize slack variables such that the constraints are feasible
     for (casadi_int i=0; i<ng_; i++) {
-      if (m->gk[i] <= m->lbg[i])
-        in_x0.push_back(m->gk[i] - m->lbg[i]);
-      else if (m->gk[i] > m->ubg[i])
-        in_x0.push_back(m->gk[i] - m->ubg[i]);
+      if (m->gk[i] <= m->lbz[i+nx_])
+        in_x0.push_back(m->gk[i] - m->lbz[i+nx_]);
+      else if (m->gk[i] > m->ubz[i+nx_])
+        in_x0.push_back(m->gk[i] - m->ubz[i+nx_]);
       else
         in_x0.push_back(0.0);
     }
@@ -1452,16 +1452,16 @@ namespace casadi {
     in_p.insert(in_p.end(), in_p2.begin(), in_p2.end());
 
     // Set bounds for variables
-    vector<double> in_lbx(m->lbx, m->lbx+nx_);
-    vector<double> in_ubx(m->ubx, m->ubx+nx_);
+    vector<double> in_lbx(m->lbz, m->lbz+nx_);
+    vector<double> in_ubx(m->ubz, m->ubz+nx_);
     for (casadi_int i=0; i<ng_; i++) {
       in_lbx.push_back(-inf);
       in_ubx.push_back(inf);
     }
 
     // Set bounds for constraints
-    vector<double> in_lbg(m->lbg, m->lbg+ng_);
-    vector<double> in_ubg(m->ubg, m->ubg+ng_);
+    vector<double> in_lbg(m->lbz+nx_, m->lbz+nx_+ng_);
+    vector<double> in_ubg(m->ubz+nx_, m->ubz+nx_+ng_);
 
     solver_in["x0"] = in_x0;
     solver_in["p"] = in_p;
@@ -2500,14 +2500,14 @@ namespace casadi {
   void Blocksqp::updateStepBounds(BlocksqpMemory* m, bool soc) const {
     // Bounds on step
     for (casadi_int i=0; i<nx_; i++) {
-      double lbx = m->lbx ? m->lbx[i] : 0;
+      double lbx = m->lbz[i];
       if (lbx != inf) {
         m->lbx_qp[i] = lbx - m->z[i];
       } else {
         m->lbx_qp[i] = inf;
       }
 
-      double ubx = m->ubx ? m->ubx[i] : 0;
+      double ubx = m->ubz[i];
       if (ubx != inf) {
         m->ubx_qp[i] = ubx - m->z[i];
       } else {
@@ -2517,7 +2517,7 @@ namespace casadi {
 
     // Bounds on linearized constraints
     for (casadi_int i=0; i<ng_; i++) {
-      double lbg = m->lbg ? m->lbg[i] : 0;
+      double lbg = m->lbz[i+nx_];
       if (lbg != inf) {
         m->lba_qp[i] = lbg - m->gk[i];
         if (soc) m->lba_qp[i] += m->jac_times_dxk[i];
@@ -2525,7 +2525,7 @@ namespace casadi {
         m->lba_qp[i] = inf;
       }
 
-      double ubg = m->ubg ? m->ubg[i] : 0;
+      double ubg = m->ubz[i+nx_];
       if (ubg != inf) {
         m->uba_qp[i] = ubg - m->gk[i];
         if (soc) m->uba_qp[i] += m->jac_times_dxk[i];
@@ -2822,8 +2822,8 @@ namespace casadi {
 
   double Blocksqp::
   lInfConstraintNorm(BlocksqpMemory* m, const double* xk, const double* g) const {
-    return fmax(casadi_max_viol(nx_, xk, m->lbx, m->ubx),
-                casadi_max_viol(ng_, g, m->lbg, m->ubg));
+    return fmax(casadi_max_viol(nx_, xk, m->lbz, m->ubz),
+                casadi_max_viol(ng_, g, m->lbz+nx_, m->ubz+nx_));
   }
 
 } // namespace casadi

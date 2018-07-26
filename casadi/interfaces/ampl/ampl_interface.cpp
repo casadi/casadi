@@ -293,8 +293,8 @@ namespace casadi {
     // Add constraint bounds
     nl << "r\n";
     for (casadi_int i=0; i<ng_; ++i) {
-      double lbg = m->lbg ? m->lbg[i] : 0;
-      double ubg = m->ubg ? m->ubg[i] : 0;
+      double lbg = m->lbz[i+nx_];
+      double ubg = m->ubz[i+nx_];
       if (isinf(lbg)) {
         if (isinf(ubg)) { // no constraint
           nl << "3\n";
@@ -315,8 +315,8 @@ namespace casadi {
     // Add variable bounds
     nl << "b\n";
     for (casadi_int i=0; i<nx_; ++i) {
-      double lbx = m->lbx ? m->lbx[i] : 0;
-      double ubx = m->ubx ? m->ubx[i] : 0;
+      double lbx = m->lbz[i];
+      double ubx = m->ubz[i];
       if (isinf(lbx)) {
         if (isinf(ubx)) { // no constraint
           nl << "3\n";

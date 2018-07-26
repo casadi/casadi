@@ -331,8 +331,7 @@ namespace casadi {
       casadi_axpy(nx_, 1., m->lam, m->gLag);
 
       // Primal infeasability
-      double pr_inf = std::fmax(casadi_max_viol(nx_, m->z, m->lbx, m->ubx),
-                                casadi_max_viol(ng_, m->z + nx_, m->lbg, m->ubg));
+      double pr_inf = casadi_max_viol(nx_+ng_, m->z, m->lbz, m->ubz);
 
       // inf-norm of lagrange gradient
       double gLag_norminf = casadi_norm_inf(nx_, m->gLag);
@@ -402,18 +401,13 @@ namespace casadi {
       }
 
       // Formulate the QP
-      casadi_copy(m->lbx, nx_, m->lbdz);
-      casadi_axpy(nx_, -1., m->z, m->lbdz);
-      casadi_copy(m->ubx, nx_, m->ubdz);
-      casadi_axpy(nx_, -1., m->z, m->ubdz);
-      casadi_copy(m->lbg, ng_, m->lbdz + nx_);
-      casadi_axpy(ng_, -1., m->z + nx_, m->lbdz + nx_);
-      casadi_copy(m->ubg, ng_, m->ubdz + nx_);
-      casadi_axpy(ng_, -1., m->z + nx_, m->ubdz + nx_);
+      casadi_copy(m->lbz, nx_+ng_, m->lbdz);
+      casadi_axpy(nx_+ng_, -1., m->z, m->lbdz);
+      casadi_copy(m->ubz, nx_+ng_, m->ubdz);
+      casadi_axpy(nx_+ng_, -1., m->z, m->ubdz);
 
       // Intitial guess
-      casadi_copy(m->lam, nx_, m->dlam);
-      casadi_copy(m->lam + nx_, ng_, m->dlam + nx_);
+      casadi_copy(m->lam, nx_+ng_, m->dlam);
       casadi_fill(m->dx, nx_, 0.);
 
       // Increase counter
@@ -433,8 +427,7 @@ namespace casadi {
       m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_+ng_, m->dlam));
 
       // Calculate L1-merit function in the actual iterate
-      double l1_infeas = std::fmax(casadi_max_viol(nx_, m->z, m->lbx, m->ubx),
-                                   casadi_max_viol(ng_, m->z + nx_, m->lbg, m->ubg));
+      double l1_infeas = casadi_max_viol(nx_+ng_, m->z, m->lbz, m->ubz);
 
       // Right-hand side of Armijo condition
       double F_sens = casadi_dot(nx_, m->dx, m->gf);
@@ -486,8 +479,7 @@ namespace casadi {
           }
 
           // Calculating merit-function in candidate
-          l1_infeas = std::fmax(casadi_max_viol(nx_, m->z_cand, m->lbx, m->ubx),
-                                casadi_max_viol(ng_, m->z_cand + nx_, m->lbg, m->ubg));
+          l1_infeas = casadi_max_viol(nx_+ng_, m->z_cand, m->lbz, m->ubz);
           L1merit_cand = fk_cand + m->sigma * l1_infeas;
           if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
             break;

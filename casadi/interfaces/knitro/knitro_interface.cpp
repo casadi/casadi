@@ -209,10 +209,10 @@ namespace casadi {
     }
 
     // "Correct" upper and lower bounds
-    casadi_copy(m->lbx, nx_, m->wlbx);
-    casadi_copy(m->ubx, nx_, m->wubx);
-    casadi_copy(m->lbg, ng_, m->wlbg);
-    casadi_copy(m->ubg, ng_, m->wubg);
+    casadi_copy(m->lbz, nx_, m->wlbx);
+    casadi_copy(m->ubz, nx_, m->wubx);
+    casadi_copy(m->lbz+nx_, ng_, m->wlbg);
+    casadi_copy(m->ubz+nx_, ng_, m->wubg);
     for (casadi_int i=0; i<nx_; ++i) if (isinf(m->wlbx[i])) m->wlbx[i] = -KTR_INFBOUND;
     for (casadi_int i=0; i<nx_; ++i) if (isinf(m->wubx[i])) m->wubx[i] =  KTR_INFBOUND;
     for (casadi_int i=0; i<ng_; ++i) if (isinf(m->wlbg[i])) m->wlbg[i] = -KTR_INFBOUND;

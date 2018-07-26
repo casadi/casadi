@@ -342,10 +342,8 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     prob.iu = &m->memind;
 
     // Pass bounds
-    casadi_copy(m->lbx, nx_, get_ptr(m->bl));
-    casadi_copy(m->ubx, nx_, get_ptr(m->bu));
-    casadi_copy(m->lbg, ng_, get_ptr(m->bl) + nx_);
-    casadi_copy(m->ubg, ng_, get_ptr(m->bu) + nx_);
+    casadi_copy(m->lbz, nx_+ng_, get_ptr(m->bl));
+    casadi_copy(m->ubz, nx_+ng_, get_ptr(m->bu));
 
     for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bl[i])) m->bl[i] = -inf_;
     for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bu[i])) m->bu[i] = inf_;

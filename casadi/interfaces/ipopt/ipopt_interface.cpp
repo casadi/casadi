@@ -487,10 +487,10 @@ namespace casadi {
   get_bounds_info(IpoptMemory* m, double* x_l, double* x_u,
                   double* g_l, double* g_u) const {
     try {
-      casadi_copy(m->lbx, nx_, x_l);
-      casadi_copy(m->ubx, nx_, x_u);
-      casadi_copy(m->lbg, ng_, g_l);
-      casadi_copy(m->ubg, ng_, g_u);
+      casadi_copy(m->lbz, nx_, x_l);
+      casadi_copy(m->ubz, nx_, x_u);
+      casadi_copy(m->lbz+nx_, ng_, g_l);
+      casadi_copy(m->ubz+nx_, ng_, g_u);
       return true;
     } catch(exception& ex) {
       uerr() << "get_bounds_info failed: " << ex.what() << endl;

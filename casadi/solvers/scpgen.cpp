@@ -907,16 +907,12 @@ namespace casadi {
   double Scpgen::primalInfeasibility(ScpgenMemory* m) const {
     // L1-norm of the primal infeasibility
     double pr_inf = 0;
-
     // Simple bounds
-    pr_inf += casadi_sum_viol(nx_, m->z, m->lbx, m->ubx);
-
+    pr_inf += casadi_sum_viol(nx_, m->z, m->lbz, m->ubz);
     // Lifted variables
     for (auto&& v : m->lifted_mem) pr_inf += casadi_norm_1(v.n, v.res);
-
     // Nonlinear bounds
-    pr_inf += casadi_sum_viol(ng_, m->gk, m->lbg, m->ubg);
-
+    pr_inf += casadi_sum_viol(ng_, m->gk, m->lbz+nx_, m->ubz+nx_);
     return pr_inf;
   }
 
@@ -1141,10 +1137,10 @@ namespace casadi {
     double time1 = clock();
 
     // Get bounds on step
-    casadi_copy(m->lbx, nx_, m->qp_lbx);
-    casadi_copy(m->ubx, nx_, m->qp_ubx);
-    casadi_copy(m->lbg, ng_, m->qp_lba);
-    casadi_copy(m->ubg, ng_, m->qp_uba);
+    casadi_copy(m->lbz, nx_, m->qp_lbx);
+    casadi_copy(m->ubz, nx_, m->qp_ubx);
+    casadi_copy(m->lbz+nx_, ng_, m->qp_lba);
+    casadi_copy(m->ubz+nx_, ng_, m->qp_uba);
     casadi_axpy(nx_, -1., m->z, m->qp_lbx);
     casadi_axpy(nx_, -1., m->z, m->qp_ubx);
     casadi_axpy(ng_, -1., m->qpB, m->qp_lba);
