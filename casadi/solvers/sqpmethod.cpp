@@ -227,14 +227,11 @@ namespace casadi {
     }
 
     // Current linearization point
-    alloc_w(nx_, true); // x_cand_
+    alloc_w(nx_ + ng_, true); // z_cand
 
     // Lagrange gradient in the next iterate
     alloc_w(nx_, true); // gLag_
     alloc_w(nx_, true); // gLag_old_
-
-    // Constraint function value
-    alloc_w(ng_, true); // g_cand_
 
     // Gradient of the objective
     alloc_w(nx_, true); // gf_
@@ -265,14 +262,11 @@ namespace casadi {
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Current linearization point
-    m->x_cand = w; w += nx_;
+    m->z_cand = w; w += nx_ + ng_;
 
     // Lagrange gradient in the next iterate
     m->gLag = w; w += nx_;
     m->gLag_old = w; w += nx_;
-
-    // Constraint function value
-    m->g_cand = w; w += ng_;
 
     // Gradient of the objective
     m->gf = w; w += nx_;
@@ -477,14 +471,14 @@ namespace casadi {
           ls_iter++;
 
           // Candidate step
-          casadi_copy(m->x, nx_, m->x_cand);
-          casadi_axpy(nx_, t, m->dx, m->x_cand);
+          casadi_copy(m->x, nx_, m->z_cand);
+          casadi_axpy(nx_, t, m->dx, m->z_cand);
 
           // Evaluating objective and constraints
-          m->arg[0] = m->x_cand;
+          m->arg[0] = m->z_cand;
           m->arg[1] = m->p;
           m->res[0] = &fk_cand;
-          m->res[1] = m->g_cand;
+          m->res[1] = m->z_cand + nx_;
           if (calc_function(m, "nlp_fg")) {
             // line-search failed, skip iteration
             t = beta_ * t;
@@ -492,8 +486,8 @@ namespace casadi {
           }
 
           // Calculating merit-function in candidate
-          l1_infeas = std::fmax(casadi_max_viol(nx_, m->x_cand, m->lbx, m->ubx),
-                                casadi_max_viol(ng_, m->g_cand, m->lbg, m->ubg));
+          l1_infeas = std::fmax(casadi_max_viol(nx_, m->z_cand, m->lbx, m->ubx),
+                                casadi_max_viol(ng_, m->z_cand + nx_, m->lbg, m->ubg));
           L1merit_cand = fk_cand + m->sigma * l1_infeas;
           if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
             break;

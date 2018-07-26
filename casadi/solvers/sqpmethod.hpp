@@ -40,13 +40,10 @@ namespace casadi {
 
   struct CASADI_NLPSOL_SQPMETHOD_EXPORT SqpmethodMemory : public NlpsolMemory {
     /// Current and previous linearization point and candidate
-    double *x_cand;
+    double *z_cand;
 
     /// Lagrange gradient in the next iterate
     double *gLag, *gLag_old;
-
-    /// Constraint function value
-    double *g_cand;
 
     /// Gradient of the objective function
     double *gf;
