@@ -90,6 +90,7 @@ namespace casadi {
     bool calc_multipliers_;
     bool calc_lam_x_, calc_lam_p_, calc_f_, calc_g_;
     bool bound_consistency_;
+    double min_lam_;
     bool no_nlp_grad_;
     std::vector<bool> discrete_;
     ///@}
@@ -117,6 +118,7 @@ namespace casadi {
       bool calc_f;
       bool calc_g;
       bool bound_consistency;
+      double min_lam;
       bool no_nlp_grad;
       std::vector<bool> discrete;
       bool mi;

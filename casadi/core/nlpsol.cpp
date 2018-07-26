@@ -200,6 +200,7 @@ namespace casadi {
     print_time_ = true;
     calc_multipliers_ = false;
     bound_consistency_ = true;
+    min_lam_ = 0;
     calc_lam_x_ = calc_f_ = calc_g_ = false;
     calc_lam_p_ = true;
     no_nlp_grad_ = false;
@@ -295,6 +296,9 @@ namespace casadi {
       {"bound_consistency",
        {OT_BOOL,
         "Ensure that primal-dual solution is consistent with the bounds"}},
+      {"min_lam",
+       {OT_DOUBLE,
+        "Minimum allowed multiplier value"}},
       {"oracle_options",
        {OT_DICT,
         "Options to be passed to the oracle function"}},
@@ -336,6 +340,8 @@ namespace casadi {
         no_nlp_grad_ = op.second;
       } else if (op.first=="bound_consistency") {
         bound_consistency_ = op.second;
+      } else if (op.first=="min_lam") {
+        min_lam_ = op.second;
       } else if (op.first=="error_on_fail") {
         error_on_fail_ = op.second;
       }
@@ -701,14 +707,14 @@ namespace casadi {
     MX HL = HJ_res.at(1);
 
     // Active set (assumed known and given by the multiplier signs)
-    MX ubIx = lam_x>0;
-    MX lbIx = lam_x<0;
-    MX bIx = lam_x!=0;
-    MX iIx = lam_x==0;
-    MX ubIg = lam_g>0;
-    MX lbIg = lam_g<0;
-    MX bIg = lam_g!=0;
-    MX iIg = lam_g==0;
+    MX ubIx = lam_x > min_lam_;
+    MX lbIx = lam_x < -min_lam_;
+    MX bIx = ubIx + lbIx;
+    MX iIx = 1-bIx;
+    MX ubIg = lam_g > min_lam_;
+    MX lbIg = lam_g < -min_lam_;
+    MX bIg = ubIg + lbIg;
+    MX iIg = 1-bIg;
 
     // KKT matrix
     MX H_11 = mtimes(diag(iIx), HL) + diag(bIx);
@@ -825,14 +831,14 @@ namespace casadi {
     MX HL = HJ_res.at(1);
 
     // Active set (assumed known and given by the multiplier signs)
-    MX ubIx = lam_x>0;
-    MX lbIx = lam_x<0;
-    MX bIx = lam_x!=0;
-    MX iIx = lam_x==0;
-    MX ubIg = lam_g>0;
-    MX lbIg = lam_g<0;
-    MX bIg = lam_g!=0;
-    MX iIg = lam_g==0;
+    MX ubIx = lam_x > min_lam_;
+    MX lbIx = lam_x < -min_lam_;
+    MX bIx = ubIx + lbIx;
+    MX iIx = 1-bIx;
+    MX ubIg = lam_g > min_lam_;
+    MX lbIg = lam_g < -min_lam_;
+    MX bIg = ubIg + lbIg;
+    MX iIg = 1-bIg;
 
     // KKT matrix
     MX H_11 = mtimes(diag(iIx), HL) + diag(bIx);
@@ -973,6 +979,7 @@ namespace casadi {
     s.pack("Nlpsol::calc_f", calc_f_);
     s.pack("Nlpsol::calc_g", calc_g_);
     s.pack("Nlpsol::bound_consistency", bound_consistency_);
+    s.pack("Nlpsol::min_lam", min_lam_);
     s.pack("Nlpsol::no_nlp_grad", no_nlp_grad_);
     s.pack("Nlpsol::discrete", discrete_);
     s.pack("Nlpsol::mi", mi_);
@@ -996,6 +1003,7 @@ namespace casadi {
     s.unpack("Nlpsol::calc_f", e.calc_f);
     s.unpack("Nlpsol::calc_g", e.calc_g);
     s.unpack("Nlpsol::bound_consistency", e.bound_consistency);
+    s.unpack("Nlpsol::min_lam", e.min_lam);
     s.unpack("Nlpsol::no_nlp_grad", e.no_nlp_grad);
     s.unpack("Nlpsol::discrete", e.discrete);
     s.unpack("Nlpsol::mi", e.mi);
