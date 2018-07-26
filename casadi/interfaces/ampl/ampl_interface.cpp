@@ -390,8 +390,8 @@ namespace casadi {
     // Get the dual solution
     for (casadi_int i=0; i<ng_; ++i) {
       istringstream s(sol_lines.at(sol_lines.size()-ng_-nx_+i-1));
-      s >> m->lam_g[i];
-      m->lam_g[i] *= -1;
+      s >> m->lam[i+nx_];
+      m->lam[i+nx_] *= -1;
     }
 
     // Close and delete .sol file

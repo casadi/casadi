@@ -43,7 +43,7 @@ namespace casadi {
     double *z;
 
     // Current dual solution
-    double *lam_g, *lam_x, *lam_p;
+    double *lam, *lam_p;
 
     // Outputs
     double f;

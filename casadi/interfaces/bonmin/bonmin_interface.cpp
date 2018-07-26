@@ -497,9 +497,9 @@ namespace casadi {
         if (full_callback) {
           casadi_copy(x, nx_, m->z);
           for (casadi_int i=0; i<nx_; ++i) {
-            m->lam_x[i] = z_U[i]-z_L[i];
+            m->lam[i] = z_U[i]-z_L[i];
           }
-          casadi_copy(lambda, ng_, m->lam_g);
+          casadi_copy(lambda, ng_, m->lam + nx_);
           casadi_copy(g, ng_, m->gk);
         } else {
           if (iter==0) {
@@ -520,8 +520,8 @@ namespace casadi {
           m->arg[NLPSOL_F] = &obj_value;
           m->arg[NLPSOL_G] = g;
           m->arg[NLPSOL_LAM_P] = nullptr;
-          m->arg[NLPSOL_LAM_X] = m->lam_x;
-          m->arg[NLPSOL_LAM_G] = m->lam_g;
+          m->arg[NLPSOL_LAM_X] = m->lam;
+          m->arg[NLPSOL_LAM_G] = m->lam + nx_;
         }
 
         // Outputs
@@ -559,8 +559,7 @@ namespace casadi {
       m->f = obj_value;
 
       // Dual solution not calculated
-      casadi_fill(m->lam_x, nx_, nan);
-      casadi_fill(m->lam_g, ng_, nan);
+      casadi_fill(m->lam, nx_ + ng_, nan);
 
       // Get the constraints
       casadi_fill(m->gk, ng_, nan);
@@ -609,14 +608,14 @@ namespace casadi {
       // Initialize dual variables (simple bounds)
       if (init_z) {
         for (casadi_int i=0; i<nx_; ++i) {
-          z_L[i] = max(0., -m->lam_x[i]);
-          z_U[i] = max(0., m->lam_x[i]);
+          z_L[i] = max(0., -m->lam[i]);
+          z_U[i] = max(0., m->lam[i]);
         }
       }
 
       // Initialize dual variables (nonlinear bounds)
       if (init_lambda) {
-        casadi_copy(m->lam_g, ng_, lambda);
+        casadi_copy(m->lam + nx_, ng_, lambda);
       }
 
       return true;

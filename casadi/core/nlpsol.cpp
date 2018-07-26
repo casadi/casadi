@@ -394,11 +394,9 @@ namespace casadi {
     }
 
     // Allocate work vectors
-    alloc_w(nx_, true); // x
-    alloc_w(nx_, true); // lam_x
-    alloc_w(ng_, true); // lam_g
+    alloc_w(nx_ + ng_, true); // z
+    alloc_w(nx_ + ng_, true); // lam
     alloc_w(np_, true); // lam_p
-    alloc_w(ng_, true); // g
 
     if (!fcallback_.is_null()) {
       // Consistency checks
@@ -563,8 +561,8 @@ namespace casadi {
 
     // Set initial guess
     casadi_copy(x0, nx_, m->z);
-    casadi_copy(lam_x0, nx_, m->lam_x);
-    casadi_copy(lam_g0, ng_, m->lam_g);
+    casadi_copy(lam_x0, nx_, m->lam);
+    casadi_copy(lam_g0, ng_, m->lam + nx_);
 
     // Set multipliers to nan
     casadi_fill(m->lam_p, np_, nan);
@@ -585,29 +583,29 @@ namespace casadi {
       m->arg[0] = m->z;
       m->arg[1] = m->p;
       m->arg[2] = &lam_f;
-      m->arg[3] = m->lam_g;
+      m->arg[3] = m->lam + nx_;
       m->res[0] = calc_f_ ? &m->f : nullptr;
       m->res[1] = calc_g_ ? m->z + nx_ : nullptr;
-      m->res[2] = calc_lam_x_ ? m->lam_x : nullptr;
+      m->res[2] = calc_lam_x_ ? m->lam : nullptr;
       m->res[3] = calc_lam_p_ ? m->lam_p : nullptr;
       if (calc_function(m, "nlp_grad")) {
         casadi_warning("Failed to calculate multipliers");
       }
-      if (calc_lam_x_) casadi_scal(nx_, -1., m->lam_x);
+      if (calc_lam_x_) casadi_scal(nx_, -1., m->lam);
       if (calc_lam_p_) casadi_scal(np_, -1., m->lam_p);
     }
 
     // Make sure that an optimal solution is consistant with bounds
     if (bound_consistency_ && !flag) {
-      bound_consistency(nx_, m->z, m->lam_x, m->lbx, m->ubx);
-      bound_consistency(ng_, m->z+nx_, m->lam_g, m->lbg, m->ubg);
+      bound_consistency(nx_, m->z, m->lam, m->lbx, m->ubx);
+      bound_consistency(ng_, m->z+nx_, m->lam + nx_, m->lbg, m->ubg);
     }
 
     // Get optimal solution
     casadi_copy(m->z, nx_, x);
     casadi_copy(m->z + nx_, ng_, g);
-    casadi_copy(m->lam_x, nx_, lam_x);
-    casadi_copy(m->lam_g, ng_, lam_g);
+    casadi_copy(m->lam, nx_, lam_x);
+    casadi_copy(m->lam + nx_, ng_, lam_g);
     casadi_copy(m->lam_p, np_, lam_p);
     casadi_copy(&m->f, 1, f);
 
@@ -630,8 +628,7 @@ namespace casadi {
 
     // Allocate memory
     m->z = w; w += nx_ + ng_;
-    m->lam_x = w; w += nx_;
-    m->lam_g = w; w += ng_;
+    m->lam = w; w += nx_ + ng_;
     m->lam_p = w; w += np_;
   }
 

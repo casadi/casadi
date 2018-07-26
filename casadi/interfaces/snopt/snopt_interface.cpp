@@ -355,7 +355,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     casadi_fill(get_ptr(m->xx) + nx_, ng_, 0.);
 
     // Initialize multipliers
-    casadi_copy(m->lam_g, ng_, get_ptr(m->pi));
+    casadi_copy(m->lam + nx_, ng_, get_ptr(m->pi));
 
     // Set up Jacobian matrix
     copy_vector(A_structure_.colind(), m->locJ);
@@ -420,8 +420,8 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     casadi_copy(get_ptr(m->xx), nx_, m->z);
 
     // Get dual solution
-    casadi_copy(get_ptr(m->rc), nx_, m->lam_x);
-    casadi_copy(get_ptr(m->rc)+nx_, ng_, m->lam_g);
+    casadi_copy(get_ptr(m->rc), nx_, m->lam);
+    casadi_copy(get_ptr(m->rc)+nx_, ng_, m->lam + nx_);
 
     // Copy optimal constraint values to output
     casadi_copy(m->gk, ng_, m->z + nx_);

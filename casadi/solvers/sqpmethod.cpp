@@ -327,8 +327,8 @@ namespace casadi {
 
       // Evaluate the gradient of the Lagrangian
       casadi_copy(m->gf, nx_, m->gLag);
-      casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag, true);
-      casadi_axpy(nx_, 1., m->lam_x, m->gLag);
+      casadi_mv(m->Jk, Asp_, m->lam+nx_, m->gLag, true);
+      casadi_axpy(nx_, 1., m->lam, m->gLag);
 
       // Primal infeasability
       double pr_inf = std::fmax(casadi_max_viol(nx_, m->z, m->lbx, m->ubx),
@@ -348,7 +348,7 @@ namespace casadi {
       }
 
       // Callback function
-      if (callback(m, m->z, &m->f, m->z + nx_, m->lam_x, m->lam_g, nullptr)) {
+      if (callback(m, m->z, &m->f, m->z + nx_, m->lam, m->lam+nx_, nullptr)) {
         if (print_status_) print("WARNING(sqpmethod): Aborted by callback...\n");
         m->return_status = "User_Requested_Stop";
         break;
@@ -381,7 +381,7 @@ namespace casadi {
         m->arg[0] = m->z;
         m->arg[1] = m->p;
         m->arg[2] = &one;
-        m->arg[3] = m->lam_g;
+        m->arg[3] = m->lam + nx_;
         m->res[0] = m->Bk;
         if (calc_function(m, "nlp_hess_l")) return 1;
 
@@ -412,8 +412,8 @@ namespace casadi {
       casadi_axpy(ng_, -1., m->z + nx_, m->ubdz + nx_);
 
       // Intitial guess
-      casadi_copy(m->lam_x, nx_, m->dlam);
-      casadi_copy(m->lam_g, ng_, m->dlam + nx_);
+      casadi_copy(m->lam, nx_, m->dlam);
+      casadi_copy(m->lam + nx_, ng_, m->dlam + nx_);
       casadi_fill(m->dx, nx_, 0.);
 
       // Increase counter
@@ -504,27 +504,24 @@ namespace casadi {
         }
 
         // Candidate accepted, update dual variables
-        casadi_scal(ng_, 1-t, m->lam_g);
-        casadi_axpy(ng_, t, m->dlam + nx_, m->lam_g);
-        casadi_scal(nx_, 1-t, m->lam_x);
-        casadi_axpy(nx_, t, m->dlam, m->lam_x);
+        casadi_scal(nx_ + ng_, 1-t, m->lam);
+        casadi_axpy(nx_+ng_, t, m->dlam, m->lam);
 
         casadi_scal(nx_, t, m->dx);
 
       } else {
         // Full step
-        casadi_copy(m->dlam + nx_, ng_, m->lam_g);
-        casadi_copy(m->dlam, nx_, m->lam_x);
+        casadi_copy(m->dlam, nx_ + ng_, m->lam);
       }
 
       // Take step
       casadi_axpy(nx_, 1., m->dx, m->z);
 
       if (!exact_hessian_) {
-        // Evaluate the gradient of the Lagrangian with the old x but new lam_g (for BFGS)
+        // Evaluate the gradient of the Lagrangian with the old x but new lam (for BFGS)
         casadi_copy(m->gf, nx_, m->gLag_old);
-        casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag_old, true);
-        casadi_axpy(nx_, 1., m->lam_x, m->gLag_old);
+        casadi_mv(m->Jk, Asp_, m->lam+nx_, m->gLag_old, true);
+        casadi_axpy(nx_, 1., m->lam, m->gLag_old);
       }
     }
 

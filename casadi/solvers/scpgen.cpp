@@ -886,7 +886,7 @@ namespace casadi {
     uout() << "optimal cost = " << m->f << endl;
 
     // Save results to outputs
-    casadi_copy(m->lam_xk, nx_, m->lam_x);
+    casadi_copy(m->lam_xk, nx_, m->lam);
     casadi_copy(m->gk, ng_, m->z + nx_);
 
     // Write timers
@@ -993,7 +993,7 @@ namespace casadi {
       m->arg[v_[i].mod_var] = m->lifted_mem[i].res;
     }
     if (!gauss_newton_) { // Dual steps/variables
-      m->arg[mod_g_lam_] = m->lam_g;
+      m->arg[mod_g_lam_] = m->lam + nx_;
       for (size_t i=0; i<v_.size(); ++i) {
         m->arg[v_[i].mod_lam] = m->lifted_mem[i].resL;
       }
@@ -1020,7 +1020,7 @@ namespace casadi {
     // Calculate the gradient of the lagrangian
     casadi_copy(m->gfk, nx_, m->gL);
     casadi_axpy(nx_, 1., m->lam_xk, m->gL);
-    casadi_mv(m->qpA, spA_, m->lam_g, m->gL, true);
+    casadi_mv(m->qpA, spA_, m->lam + nx_, m->gL, true);
 
     double time2 = clock();
     m->t_eval_mat += (time2-time1)/CLOCKS_PER_SEC;
@@ -1176,7 +1176,7 @@ namespace casadi {
 
     // Calculate step in multipliers
     casadi_axpy(nx_, -1., m->lam_xk, m->dlam_xk);
-    casadi_axpy(ng_, -1., m->lam_g, m->dlam_gk);
+    casadi_axpy(ng_, -1., m->lam + nx_, m->dlam_gk);
 
     double time2 = clock();
     m->t_solve_qp += (time2-time1)/CLOCKS_PER_SEC;
@@ -1231,7 +1231,7 @@ namespace casadi {
       for (auto&& v : m->lifted_mem) casadi_axpy(v.n, dt, v.dx, v.x);
 
       // Take the dual step
-      casadi_axpy(ng_, dt, m->dlam_gk, m->lam_g);
+      casadi_axpy(ng_, dt, m->dlam_gk, m->lam + nx_);
       casadi_axpy(nx_, dt, m->dlam_xk, m->lam_xk);
       if (!gauss_newton_) {
         for (auto&& v : m->lifted_mem) casadi_axpy(v.n, dt, v.dlam, v.lam);
@@ -1289,7 +1289,7 @@ namespace casadi {
     }
     if (!gauss_newton_) {
       m->arg[mod_dlam_g_] = m->dlam_gk; // Dual variables
-      m->arg[mod_g_lam_] = m->lam_g; // Dual step
+      m->arg[mod_g_lam_] = m->lam + nx_; // Dual step
       for (size_t i=0; i<v_.size(); ++i) {
         m->arg[v_[i].mod_lam] = m->lifted_mem[i].resL;
       }

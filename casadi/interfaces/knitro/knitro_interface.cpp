@@ -281,8 +281,8 @@ namespace casadi {
                  status==KTR_RC_NEAR_OPT;
 
     // Output dual solution
-    casadi_copy(get_ptr(lambda), ng_, m->lam_g);
-    casadi_copy(get_ptr(lambda)+ng_, nx_, m->lam_x);
+    casadi_copy(get_ptr(lambda), ng_, m->lam + nx_);
+    casadi_copy(get_ptr(lambda)+ng_, nx_, m->lam);
 
     // Output optimal cost
     m->f = f;

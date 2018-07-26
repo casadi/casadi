@@ -705,9 +705,9 @@ namespace casadi {
     initializeFilter(m);
 
     // Primal-dual initial guess
-    casadi_copy(m->lam_x, nx_, m->lam_xk);
+    casadi_copy(m->lam, nx_, m->lam_xk);
     casadi_scal(nx_, -1., m->lam_xk);
-    casadi_copy(m->lam_g, ng_, m->lam_gk);
+    casadi_copy(m->lam + nx_, ng_, m->lam_gk);
     casadi_scal(ng_, -1., m->lam_gk);
 
     casadi_copy(m->lam_xk, nx_, m->lam_qp);
@@ -725,13 +725,13 @@ namespace casadi {
     // Get constraints at solution
     casadi_copy(m->gk, ng_, m->z + nx_);
     // Get dual solution (simple bounds)
-    if (m->lam_x) {
-      casadi_copy(m->lam_xk, nx_, m->lam_x);
-      casadi_scal(nx_, -1., m->lam_x);
+    if (m->lam) {
+      casadi_copy(m->lam_xk, nx_, m->lam);
+      casadi_scal(nx_, -1., m->lam);
     }
     // Get dual solution (nonlinear bounds)
-    casadi_copy(m->lam_gk, ng_, m->lam_g);
-    casadi_scal(ng_, -1., m->lam_g);
+    casadi_copy(m->lam_gk, ng_, m->lam + nx_);
+    casadi_scal(ng_, -1., m->lam + nx_);
     return 0;
   }
 
