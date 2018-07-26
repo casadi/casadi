@@ -627,7 +627,6 @@ namespace casadi {
     }
 
     // Allocate memory, nonlfted problem
-    alloc_w(ng_, true); // gk_
     alloc_w(nx_, true); // dxk_
     alloc_w(nx_, true); // lam_xk_
     alloc_w(nx_+ng_, true); // dlam
@@ -702,7 +701,6 @@ namespace casadi {
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Get work vectors, nonlifted problem
-    m->gk = w; w += ng_;
     m->dxk = w; w += nx_;
     m->lam_xk = w; w += nx_;
     m->dlam = w; w += nx_ + ng_;
@@ -880,7 +878,6 @@ namespace casadi {
 
     // Save results to outputs
     casadi_copy(m->lam_xk, nx_, m->lam);
-    casadi_copy(m->gk, ng_, m->z + nx_);
 
     // Write timers
     if (print_time_) {
@@ -900,12 +897,10 @@ namespace casadi {
   double Scpgen::primalInfeasibility(ScpgenMemory* m) const {
     // L1-norm of the primal infeasibility
     double pr_inf = 0;
-    // Simple bounds
-    pr_inf += casadi_sum_viol(nx_, m->z, m->lbz, m->ubz);
+    // Inequality constraint violations
+    pr_inf += casadi_sum_viol(nx_+ng_, m->z, m->lbz, m->ubz);
     // Lifted variables
     for (auto&& v : m->lifted_mem) pr_inf += casadi_norm_1(v.n, v.res);
-    // Nonlinear bounds
-    pr_inf += casadi_sum_viol(ng_, m->gk, m->lbz+nx_, m->ubz+nx_);
     return pr_inf;
   }
 
@@ -1037,7 +1032,7 @@ namespace casadi {
     fill_n(m->res, res_fcn_.n_out(), nullptr);
     m->res[res_f_] = &m->f; // Objective
     m->res[res_gl_] = gauss_newton_ ? m->b_gn : m->gfk; // Objective gradient
-    m->res[res_g_] = m->gk; // Constraints
+    m->res[res_g_] = m->z + nx_; // Constraints
     for (size_t i=0; i<v_.size(); ++i) {
       m->res[v_[i].res_d] = m->lifted_mem[i].res;
       if (!gauss_newton_) {
@@ -1081,7 +1076,7 @@ namespace casadi {
 
     // Linear offset in the reduced QP
     casadi_scal(ng_, -1., m->qpB);
-    casadi_axpy(ng_, 1., m->gk, m->qpB);
+    casadi_axpy(ng_, 1., m->z + nx_, m->qpB);
 
     // Gradient of the objective in the reduced QP
     if (gauss_newton_) {
