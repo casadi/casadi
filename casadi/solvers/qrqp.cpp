@@ -69,7 +69,10 @@ namespace casadi {
         "Print header [true]."}},
       {"print_iter",
        {OT_BOOL,
-        "Print iterations [true]."}}
+        "Print iterations [true]."}},
+      {"min_lam",
+       {OT_DOUBLE,
+        "Smallest multiplier treated as inactive for the initial active set [0]."}}
      }
   };
 
@@ -82,6 +85,7 @@ namespace casadi {
     print_iter_ = true;
     print_header_ = true;
     du_to_pr_ = 1000.;
+    min_lam_ = 0.;
 
     // Read user options
     for (auto&& op : opts) {
@@ -93,6 +97,8 @@ namespace casadi {
         print_header_ = op.second;
       } else if (op.first=="du_to_pr") {
         du_to_pr_ = op.second;
+      } else if (op.first=="min_lam") {
+        min_lam_ = op.second;
       }
     }
 
@@ -107,6 +113,7 @@ namespace casadi {
 
     // Setup memory structure
     p_.du_to_pr = du_to_pr_;
+    p_.min_lam = min_lam_;
     p_.print_iter = print_iter_;
     p_.sp_a = A_;
     p_.sp_h = H_;
@@ -243,6 +250,7 @@ namespace casadi {
 
         // Setup memory structure
     g << "p.du_to_pr = " << du_to_pr_ << ";\n";
+    g << "p.min_lam = " << min_lam_ << ";\n";
     g << "p.print_iter = " << print_iter_ << ";\n";
     g << "p.sp_a = " << g.sparsity(A_) << ";\n";
     g << "p.sp_h = " << g.sparsity(H_) << ";\n";
