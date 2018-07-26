@@ -317,11 +317,11 @@ namespace casadi {
     // MAIN OPTIMIZATION LOOP
     while (true) {
       // Evaluate f, g and first order derivative information
-      m->arg[0] = m->x;
+      m->arg[0] = m->z;
       m->arg[1] = m->p;
       m->res[0] = &m->f;
       m->res[1] = m->gf;
-      m->res[2] = m->g;
+      m->res[2] = m->z + nx_;
       m->res[3] = m->Jk;
       if (calc_function(m, "nlp_jac_fg")) return 1;
 
@@ -331,8 +331,8 @@ namespace casadi {
       casadi_axpy(nx_, 1., m->lam_x, m->gLag);
 
       // Primal infeasability
-      double pr_inf = std::fmax(casadi_max_viol(nx_, m->x, m->lbx, m->ubx),
-                                casadi_max_viol(ng_, m->g, m->lbg, m->ubg));
+      double pr_inf = std::fmax(casadi_max_viol(nx_, m->z, m->lbx, m->ubx),
+                                casadi_max_viol(ng_, m->z + nx_, m->lbg, m->ubg));
 
       // inf-norm of lagrange gradient
       double gLag_norminf = casadi_norm_inf(nx_, m->gLag);
@@ -348,7 +348,7 @@ namespace casadi {
       }
 
       // Callback function
-      if (callback(m, m->x, &m->f, m->g, m->lam_x, m->lam_g, nullptr)) {
+      if (callback(m, m->z, &m->f, m->z + nx_, m->lam_x, m->lam_g, nullptr)) {
         if (print_status_) print("WARNING(sqpmethod): Aborted by callback...\n");
         m->return_status = "User_Requested_Stop";
         break;
@@ -378,7 +378,7 @@ namespace casadi {
 
       if (exact_hessian_) {
         // Update/reset exact Hessian
-        m->arg[0] = m->x;
+        m->arg[0] = m->z;
         m->arg[1] = m->p;
         m->arg[2] = &one;
         m->arg[3] = m->lam_g;
@@ -403,13 +403,13 @@ namespace casadi {
 
       // Formulate the QP
       casadi_copy(m->lbx, nx_, m->lbdz);
-      casadi_axpy(nx_, -1., m->x, m->lbdz);
+      casadi_axpy(nx_, -1., m->z, m->lbdz);
       casadi_copy(m->ubx, nx_, m->ubdz);
-      casadi_axpy(nx_, -1., m->x, m->ubdz);
+      casadi_axpy(nx_, -1., m->z, m->ubdz);
       casadi_copy(m->lbg, ng_, m->lbdz + nx_);
-      casadi_axpy(ng_, -1., m->g, m->lbdz + nx_);
+      casadi_axpy(ng_, -1., m->z + nx_, m->lbdz + nx_);
       casadi_copy(m->ubg, ng_, m->ubdz + nx_);
-      casadi_axpy(ng_, -1., m->g, m->ubdz + nx_);
+      casadi_axpy(ng_, -1., m->z + nx_, m->ubdz + nx_);
 
       // Intitial guess
       casadi_copy(m->lam_x, nx_, m->dlam);
@@ -433,8 +433,8 @@ namespace casadi {
       m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_+ng_, m->dlam));
 
       // Calculate L1-merit function in the actual iterate
-      double l1_infeas = std::fmax(casadi_max_viol(nx_, m->x, m->lbx, m->ubx),
-                                   casadi_max_viol(ng_, m->g, m->lbg, m->ubg));
+      double l1_infeas = std::fmax(casadi_max_viol(nx_, m->z, m->lbx, m->ubx),
+                                   casadi_max_viol(ng_, m->z + nx_, m->lbg, m->ubg));
 
       // Right-hand side of Armijo condition
       double F_sens = casadi_dot(nx_, m->dx, m->gf);
@@ -471,7 +471,7 @@ namespace casadi {
           ls_iter++;
 
           // Candidate step
-          casadi_copy(m->x, nx_, m->z_cand);
+          casadi_copy(m->z, nx_, m->z_cand);
           casadi_axpy(nx_, t, m->dx, m->z_cand);
 
           // Evaluating objective and constraints
@@ -518,7 +518,7 @@ namespace casadi {
       }
 
       // Take step
-      casadi_axpy(nx_, 1., m->dx, m->x);
+      casadi_axpy(nx_, 1., m->dx, m->z);
 
       if (!exact_hessian_) {
         // Evaluate the gradient of the Lagrangian with the old x but new lam_g (for BFGS)

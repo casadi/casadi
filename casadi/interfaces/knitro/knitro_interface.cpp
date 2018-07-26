@@ -238,14 +238,14 @@ namespace casadi {
                            objFnType, get_ptr(vtype), m->wlbx, m->wubx,
                            ng_, get_ptr(contype_), get_ptr(ftype),
                            m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
-                           nnzH, get_ptr(Hrow), get_ptr(Hcol), m->x, nullptr);
+                           nnzH, get_ptr(Hrow), get_ptr(Hcol), m->z, nullptr);
       casadi_assert(status==0, "KTR_mip_init_problem failed");
     } else {
       status =
       KTR_init_problem(m->kc, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
                        m->wlbx, m->wubx, ng_, get_ptr(contype_),
                        m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
-                       nnzH, get_ptr(Hrow), get_ptr(Hcol), m->x, nullptr); // initial lambda
+                       nnzH, get_ptr(Hrow), get_ptr(Hcol), m->z, nullptr); // initial lambda
       casadi_assert(status==0, "KTR_init_problem failed");
     }
 
@@ -268,12 +268,12 @@ namespace casadi {
     double f;
     if (mi_) {
       status =
-      KTR_mip_solve(m->kc, m->x, get_ptr(lambda), 0, &f,
+      KTR_mip_solve(m->kc, m->z, get_ptr(lambda), 0, &f,
                     nullptr, nullptr, nullptr, nullptr, nullptr, static_cast<void*>(m));
 
     } else {
       status =
-      KTR_solve(m->kc, m->x, get_ptr(lambda), 0, &f,
+      KTR_solve(m->kc, m->z, get_ptr(lambda), 0, &f,
                 nullptr, nullptr, nullptr, nullptr, nullptr, static_cast<void*>(m));
     }
     m->return_status = return_codes(status);
@@ -288,11 +288,11 @@ namespace casadi {
     m->f = f;
 
     // Calculate constraints
-    if (m->g) {
-      m->arg[0] = m->x;
+    if (ng_>0) {
+      m->arg[0] = m->z;
       m->arg[1] = m->p;
       m->res[0] = nullptr;
-      m->res[1] = m->g;
+      m->res[1] = m->z + nx_;
       calc_function(m, "nlp_fg");
     }
 

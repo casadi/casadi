@@ -763,7 +763,7 @@ namespace casadi {
     if (v_.size()>0) {
       // Initialize lifted variables using the generated function
       fill_n(m->arg, vinit_fcn_.n_in(), nullptr);
-      m->arg[0] = m->x;
+      m->arg[0] = m->z;
       m->arg[1] = m->p;
       fill_n(m->res, vinit_fcn_.n_out(), nullptr);
       for (casadi_int i=0; i<v_.size(); ++i) {
@@ -887,7 +887,7 @@ namespace casadi {
 
     // Save results to outputs
     casadi_copy(m->lam_xk, nx_, m->lam_x);
-    casadi_copy(m->gk, ng_, m->g);
+    casadi_copy(m->gk, ng_, m->z + nx_);
 
     // Write timers
     if (print_time_) {
@@ -909,7 +909,7 @@ namespace casadi {
     double pr_inf = 0;
 
     // Simple bounds
-    pr_inf += casadi_sum_viol(nx_, m->x, m->lbx, m->ubx);
+    pr_inf += casadi_sum_viol(nx_, m->z, m->lbx, m->ubx);
 
     // Lifted variables
     for (auto&& v : m->lifted_mem) pr_inf += casadi_norm_1(v.n, v.res);
@@ -968,7 +968,7 @@ namespace casadi {
 
     // Print variables
     for (vector<casadi_int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
-      stream << setw(9) << setprecision(4) << m->x[*i];
+      stream << setw(9) << setprecision(4) << m->z[*i];
     }
 
     // Print note
@@ -988,7 +988,7 @@ namespace casadi {
     // Inputs
     fill_n(m->arg, mat_fcn_.n_in(), nullptr);
     m->arg[mod_p_] = m->p; // Parameters
-    m->arg[mod_x_] = m->x; // Primal step/variables
+    m->arg[mod_x_] = m->z; // Primal step/variables
     for (size_t i=0; i<v_.size(); ++i) {
       m->arg[v_[i].mod_var] = m->lifted_mem[i].res;
     }
@@ -1033,7 +1033,7 @@ namespace casadi {
     // Inputs
     fill_n(m->arg, res_fcn_.n_in(), nullptr);
     m->arg[res_p_] = m->p; // Parameters
-    m->arg[res_x_] = m->x; // Non-lifted primal variables
+    m->arg[res_x_] = m->z; // Non-lifted primal variables
     for (size_t i=0; i<v_.size(); ++i) { // Lifted primal variables
       m->arg[v_[i].res_var] = m->lifted_mem[i].x;
     }
@@ -1071,7 +1071,7 @@ namespace casadi {
     // Inputs
     fill_n(m->arg, vec_fcn_.n_in(), nullptr);
     m->arg[mod_p_] = m->p; // Parameters
-    m->arg[mod_x_] = m->x; // Primal step/variables
+    m->arg[mod_x_] = m->z; // Primal step/variables
     for (size_t i=0; i<v_.size(); ++i) {
       m->arg[v_[i].mod_var] = m->lifted_mem[i].res;
     }
@@ -1145,8 +1145,8 @@ namespace casadi {
     casadi_copy(m->ubx, nx_, m->qp_ubx);
     casadi_copy(m->lbg, ng_, m->qp_lba);
     casadi_copy(m->ubg, ng_, m->qp_uba);
-    casadi_axpy(nx_, -1., m->x, m->qp_lbx);
-    casadi_axpy(nx_, -1., m->x, m->qp_ubx);
+    casadi_axpy(nx_, -1., m->z, m->qp_lbx);
+    casadi_axpy(nx_, -1., m->z, m->qp_ubx);
     casadi_axpy(ng_, -1., m->qpB, m->qp_lba);
     casadi_axpy(ng_, -1., m->qpB, m->qp_uba);
 
@@ -1227,7 +1227,7 @@ namespace casadi {
     while (true) {
       // Take the primal step
       double dt = t-t_prev;
-      casadi_axpy(nx_, dt, m->dxk, m->x);
+      casadi_axpy(nx_, dt, m->dxk, m->z);
       for (auto&& v : m->lifted_mem) casadi_axpy(v.n, dt, v.dx, v.x);
 
       // Take the dual step
@@ -1283,7 +1283,7 @@ namespace casadi {
     fill_n(m->arg, exp_fcn_.n_in(), nullptr);
     m->arg[mod_p_] = m->p; // Parameter
     m->arg[mod_du_] = m->dxk; // Primal step
-    m->arg[mod_x_] = m->x; // Primal variables
+    m->arg[mod_x_] = m->z; // Primal variables
     for (size_t i=0; i<v_.size(); ++i) {
       m->arg[v_[i].mod_var] = m->lifted_mem[i].res;
     }

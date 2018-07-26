@@ -286,7 +286,7 @@ namespace casadi {
     // Primal intial guess
     nl << "x" << nx_ << "\n";
     for (casadi_int i=0; i<nx_; ++i) {
-      nl << i << " " << m->x[i] << "\n";
+      nl << i << " " << m->z[i] << "\n";
     }
 
 
@@ -384,7 +384,7 @@ namespace casadi {
     // Get the primal solution
     for (casadi_int i=0; i<nx_; ++i) {
       istringstream s(sol_lines.at(sol_lines.size()-nx_+i-1));
-      s >> m->x[i];
+      s >> m->z[i + nx_];
     }
 
     // Get the dual solution

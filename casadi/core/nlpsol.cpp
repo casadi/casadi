@@ -456,7 +456,7 @@ namespace casadi {
     for (casadi_int i=0; i<nx_; ++i) {
       double lb = m->lbx ? m->lbx[i] : 0;
       double ub = m->ubx ? m->ubx[i] : 0;
-      double x0 = m->x[i];
+      double x0 = m->z[i];
       casadi_assert(lb <= ub && lb!=inf && ub!=-inf,
           "Ill-posed problem detected: "
           "LBX[" + str(i) + "] <= UBX[" + str(i) + "] was violated. "
@@ -562,7 +562,7 @@ namespace casadi {
     setup(m, arg, res, iw, w);
 
     // Set initial guess
-    casadi_copy(x0, nx_, m->x);
+    casadi_copy(x0, nx_, m->z);
     casadi_copy(lam_x0, nx_, m->lam_x);
     casadi_copy(lam_g0, ng_, m->lam_g);
 
@@ -571,7 +571,7 @@ namespace casadi {
 
     // Reset f, g
     m->f = nan;
-    casadi_fill(m->g, ng_, nan);
+    casadi_fill(m->z + nx_, ng_, nan);
 
     // Check the provided inputs
     check_inputs(m);
@@ -582,12 +582,12 @@ namespace casadi {
     // Calculate multiplers
     if ((calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) && !flag) {
       const double lam_f = 1.;
-      m->arg[0] = m->x;
+      m->arg[0] = m->z;
       m->arg[1] = m->p;
       m->arg[2] = &lam_f;
       m->arg[3] = m->lam_g;
       m->res[0] = calc_f_ ? &m->f : nullptr;
-      m->res[1] = calc_g_ ? m->g : nullptr;
+      m->res[1] = calc_g_ ? m->z + nx_ : nullptr;
       m->res[2] = calc_lam_x_ ? m->lam_x : nullptr;
       m->res[3] = calc_lam_p_ ? m->lam_p : nullptr;
       if (calc_function(m, "nlp_grad")) {
@@ -599,17 +599,17 @@ namespace casadi {
 
     // Make sure that an optimal solution is consistant with bounds
     if (bound_consistency_ && !flag) {
-      bound_consistency(nx_, m->x, m->lam_x, m->lbx, m->ubx);
-      bound_consistency(ng_, m->g, m->lam_g, m->lbg, m->ubg);
+      bound_consistency(nx_, m->z, m->lam_x, m->lbx, m->ubx);
+      bound_consistency(ng_, m->z+nx_, m->lam_g, m->lbg, m->ubg);
     }
 
     // Get optimal solution
-    casadi_copy(m->x, nx_, x);
+    casadi_copy(m->z, nx_, x);
+    casadi_copy(m->z + nx_, ng_, g);
     casadi_copy(m->lam_x, nx_, lam_x);
     casadi_copy(m->lam_g, ng_, lam_g);
     casadi_copy(m->lam_p, np_, lam_p);
     casadi_copy(&m->f, 1, f);
-    casadi_copy(m->g, ng_, g);
 
     // Finalize/print statistics
     m->fstats.at(name_).toc();
@@ -629,11 +629,10 @@ namespace casadi {
     m->success = false;
 
     // Allocate memory
-    m->x = w; w += nx_;
+    m->z = w; w += nx_ + ng_;
     m->lam_x = w; w += nx_;
     m->lam_g = w; w += ng_;
     m->lam_p = w; w += np_;
-    m->g = w; w += ng_;
   }
 
   std::vector<std::string> nlpsol_options(const std::string& name) {

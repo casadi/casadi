@@ -40,13 +40,13 @@ namespace casadi {
     const double *lbx, *ubx, *lbg, *ubg, *p;
 
     // Current primal solution
-    double *x;
+    double *z;
 
     // Current dual solution
     double *lam_g, *lam_x, *lam_p;
 
     // Outputs
-    double f, *g;
+    double f;
 
     // number of iterations
     casadi_int n_iter;

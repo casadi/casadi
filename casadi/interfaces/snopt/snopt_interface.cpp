@@ -295,7 +295,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     m->return_status = -1;
 
     // Evaluate gradF and jacG at initial value
-    m->arg[0] = m->x;
+    m->arg[0] = m->z;
     m->arg[1] = m->p;
     m->res[0] = nullptr;
     m->res[1] = m->jac_gk;
@@ -351,7 +351,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bu[i])) m->bu[i] = inf_;
     // Initialize states and slack
     casadi_fill(get_ptr(m->hs), ng_ + nx_, 0);
-    casadi_copy(m->x, nx_, get_ptr(m->xx));
+    casadi_copy(m->z, nx_, get_ptr(m->xx));
     casadi_fill(get_ptr(m->xx) + nx_, ng_, 0.);
 
     // Initialize multipliers
@@ -417,14 +417,14 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     casadi_scal(nx_ + ng_, -1., get_ptr(m->rc));
 
     // Get primal solution
-    casadi_copy(get_ptr(m->xx), nx_, m->x);
+    casadi_copy(get_ptr(m->xx), nx_, m->z);
 
     // Get dual solution
     casadi_copy(get_ptr(m->rc), nx_, m->lam_x);
     casadi_copy(get_ptr(m->rc)+nx_, ng_, m->lam_g);
 
     // Copy optimal constraint values to output
-    casadi_copy(m->gk, ng_, m->g);
+    casadi_copy(m->gk, ng_, m->z + nx_);
 
     // Free memory
     deleteSNOPT(&prob);

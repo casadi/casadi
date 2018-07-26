@@ -376,7 +376,7 @@ namespace casadi {
                  || status==Feasible_Point_Found;
 
     // Save results to outputs
-    casadi_copy(m->gk, ng_, m->g);
+    casadi_copy(m->gk, ng_, m->z + nx_);
 
     return 0;
   }
@@ -401,7 +401,7 @@ namespace casadi {
       if (!fcallback_.is_null()) {
         m->fstats.at("callback_fun").tic();
         if (full_callback) {
-          casadi_copy(x, nx_, m->x);
+          casadi_copy(x, nx_, m->z);
           for (casadi_int i=0; i<nx_; ++i) {
             m->lam_x[i] = z_U[i]-z_L[i];
           }
@@ -459,7 +459,7 @@ namespace casadi {
                     int iter_count) const {
     try {
       // Get primal solution
-      casadi_copy(x, nx_, m->x);
+      casadi_copy(x, nx_, m->z);
 
       // Get optimal cost
       m->f = obj_value;
@@ -505,7 +505,7 @@ namespace casadi {
     try {
       // Initialize primal variables
       if (init_x) {
-        casadi_copy(m->x, nx_, x);
+        casadi_copy(m->z, nx_, x);
       }
 
       // Initialize dual variables (simple bounds)
