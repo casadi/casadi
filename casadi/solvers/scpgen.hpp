@@ -43,7 +43,6 @@ namespace casadi {
   struct CASADI_NLPSOL_SCPGEN_EXPORT ScpgenMemory : public NlpsolMemory {
     // Work vectors, nonlifted problem
     double *gk, *dxk, *lam_xk, *dlam_xk, *dlam_gk, *gfk, *gL, *b_gn;
-
     // Memory for lifted variables
     struct VarMem {
       casadi_int n;
@@ -51,35 +50,25 @@ namespace casadi {
       double *res, *resL;
     };
     std::vector<VarMem> lifted_mem;
-
     // Penalty parameter of merit function
     double sigma;
-
     // 1-norm of last primal step
     double pr_step;
-
     // 1-norm of last dual step
     double du_step;
-
     // Regularization
     double reg;
-
     // Message applying to a particular iteration
     const char* iteration_note;
-
     // QP
     double *qpH, *qpA, *qpB, *qpL, *qpG, *qpH_times_du;
-
     // QP solver
-    double *qp_lbx, *qp_ubx, *qp_lba, *qp_uba;
-
+    double *lbdz, *ubdz;
     // Linesearch parameters
     double* merit_mem;
     casadi_int merit_ind;
-
     // Timers
     double t_eval_mat, t_eval_res, t_eval_vec, t_eval_exp, t_solve_qp, t_mainloop;
-
     // Current iteration
     casadi_int iter_count;
   };

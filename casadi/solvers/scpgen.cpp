@@ -665,10 +665,8 @@ namespace casadi {
     }
 
     // QP solver
-    alloc_w(nx_, true); // qp_lbx_
-    alloc_w(nx_, true); // qp_ubx_
-    alloc_w(ng_, true); // qp_lba_
-    alloc_w(ng_, true); // qp_uba_
+    alloc_w(nx_+ng_, true); // lbdz
+    alloc_w(nx_+ng_, true); // ubdz
 
     // Line-search memory
     alloc_w(merit_memsize_, true);
@@ -742,10 +740,8 @@ namespace casadi {
     m->qpH_times_du = w; w += nx_;
 
     // QP solver
-    m->qp_lbx = w; w += nx_;
-    m->qp_ubx = w; w += nx_;
-    m->qp_lba = w; w += ng_;
-    m->qp_uba = w; w += ng_;
+    m->lbdz = w; w += nx_+ng_;
+    m->ubdz = w; w += nx_+ng_;
 
     // merit_mem
     m->merit_mem = w; w += merit_memsize_;
@@ -1137,24 +1133,22 @@ namespace casadi {
     double time1 = clock();
 
     // Get bounds on step
-    casadi_copy(m->lbz, nx_, m->qp_lbx);
-    casadi_copy(m->ubz, nx_, m->qp_ubx);
-    casadi_copy(m->lbz+nx_, ng_, m->qp_lba);
-    casadi_copy(m->ubz+nx_, ng_, m->qp_uba);
-    casadi_axpy(nx_, -1., m->z, m->qp_lbx);
-    casadi_axpy(nx_, -1., m->z, m->qp_ubx);
-    casadi_axpy(ng_, -1., m->qpB, m->qp_lba);
-    casadi_axpy(ng_, -1., m->qpB, m->qp_uba);
+    casadi_copy(m->lbz, nx_+ng_, m->lbdz);
+    casadi_copy(m->ubz, nx_+ng_, m->ubdz);
+    casadi_axpy(nx_, -1., m->z, m->lbdz);
+    casadi_axpy(nx_, -1., m->z, m->ubdz);
+    casadi_axpy(ng_, -1., m->qpB, m->lbdz + nx_);
+    casadi_axpy(ng_, -1., m->qpB, m->ubdz + nx_);
 
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
     m->arg[CONIC_H] = m->qpH;
     m->arg[CONIC_G] = m->gfk;
     m->arg[CONIC_A] = m->qpA;
-    m->arg[CONIC_LBX] = m->qp_lbx;
-    m->arg[CONIC_UBX] = m->qp_ubx;
-    m->arg[CONIC_LBA] = m->qp_lba;
-    m->arg[CONIC_UBA] = m->qp_uba;
+    m->arg[CONIC_LBX] = m->lbdz;
+    m->arg[CONIC_UBX] = m->ubdz;
+    m->arg[CONIC_LBA] = m->lbdz + nx_;
+    m->arg[CONIC_UBA] = m->ubdz + nx_;
 
     // Outputs
     fill_n(m->res, qpsol_.n_out(), nullptr);
