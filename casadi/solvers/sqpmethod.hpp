@@ -55,7 +55,7 @@ namespace casadi {
     double *lbdz, *ubdz;
 
     // QP solution
-    double *dx, *qp_DUAL_X, *qp_DUAL_A;
+    double *dx, *dlam;
 
     // Current Jacobian
     double *Jk;
@@ -177,7 +177,7 @@ namespace casadi {
     virtual void solve_QP(SqpmethodMemory* m, const double* H, const double* g,
                           const double* lbz, const double* ubz,
                           const double* A,
-                          double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const;
+                          double* x_opt, double* dlam) const;
 
     /// A documentation string
     static const std::string meta_doc;
