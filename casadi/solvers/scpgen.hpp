@@ -42,7 +42,7 @@ namespace casadi {
 
   struct CASADI_NLPSOL_SCPGEN_EXPORT ScpgenMemory : public NlpsolMemory {
     // Work vectors, nonlifted problem
-    double *gk, *dxk, *lam_xk, *dlam_xk, *dlam_gk, *gfk, *gL, *b_gn;
+    double *gk, *dxk, *lam_xk, *dlam, *gfk, *gL, *b_gn;
     // Memory for lifted variables
     struct VarMem {
       casadi_int n;

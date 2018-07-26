@@ -630,8 +630,7 @@ namespace casadi {
     alloc_w(ng_, true); // gk_
     alloc_w(nx_, true); // dxk_
     alloc_w(nx_, true); // lam_xk_
-    alloc_w(nx_, true); // dlam_xk_
-    alloc_w(ng_, true); // dlam_gk_
+    alloc_w(nx_+ng_, true); // dlam
     alloc_w(nx_, true); // gfk_
     alloc_w(nx_, true); // gL_
     if (gauss_newton_) {
@@ -706,8 +705,7 @@ namespace casadi {
     m->gk = w; w += ng_;
     m->dxk = w; w += nx_;
     m->lam_xk = w; w += nx_;
-    m->dlam_xk = w; w += nx_;
-    m->dlam_gk = w; w += ng_;
+    m->dlam = w; w += nx_ + ng_;
     m->gfk = w; w += nx_;
     m->gL = w; w += nx_;
     if (gauss_newton_) {
@@ -772,9 +770,8 @@ namespace casadi {
     }
 
     // Reset dual guess
-    casadi_fill(m->dlam_gk, ng_, 0.);
     casadi_fill(m->lam_xk, nx_, 0.);
-    casadi_fill(m->dlam_xk, nx_, 0.);
+    casadi_fill(m->dlam, nx_+ng_, 0.);
     if (!gauss_newton_) {
       for (auto&& v : m->lifted_mem) {
         casadi_fill(v.lam, v.n, 0.);
@@ -1153,20 +1150,18 @@ namespace casadi {
     // Outputs
     fill_n(m->res, qpsol_.n_out(), nullptr);
     m->res[CONIC_X] = m->dxk; // Condensed primal step
-    m->res[CONIC_LAM_X] = m->dlam_xk; // Multipliers (simple bounds)
-    m->res[CONIC_LAM_A] = m->dlam_gk; // Multipliers (linear bounds)
+    m->res[CONIC_LAM_X] = m->dlam; // Multipliers (simple bounds)
+    m->res[CONIC_LAM_A] = m->dlam + nx_; // Multipliers (linear bounds)
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);
 
     // Calculate penalty parameter of merit function
-    m->sigma = merit_start_;
-    m->sigma = std::max(m->sigma, 1.01*casadi_norm_inf(nx_, m->dlam_xk));
-    m->sigma = std::max(m->sigma, 1.01*casadi_norm_inf(ng_, m->dlam_gk));
+    m->sigma = std::max(merit_start_, 1.01*casadi_norm_inf(nx_+ng_, m->dlam));
 
     // Calculate step in multipliers
-    casadi_axpy(nx_, -1., m->lam_xk, m->dlam_xk);
-    casadi_axpy(ng_, -1., m->lam + nx_, m->dlam_gk);
+    casadi_axpy(nx_, -1., m->lam_xk, m->dlam);
+    casadi_axpy(ng_, -1., m->lam + nx_, m->dlam + nx_);
 
     double time2 = clock();
     m->t_solve_qp += (time2-time1)/CLOCKS_PER_SEC;
@@ -1221,8 +1216,8 @@ namespace casadi {
       for (auto&& v : m->lifted_mem) casadi_axpy(v.n, dt, v.dx, v.x);
 
       // Take the dual step
-      casadi_axpy(ng_, dt, m->dlam_gk, m->lam + nx_);
-      casadi_axpy(nx_, dt, m->dlam_xk, m->lam_xk);
+      casadi_axpy(ng_, dt, m->dlam + nx_, m->lam + nx_);
+      casadi_axpy(nx_, dt, m->dlam, m->lam_xk);
       if (!gauss_newton_) {
         for (auto&& v : m->lifted_mem) casadi_axpy(v.n, dt, v.dlam, v.lam);
       }
@@ -1260,7 +1255,7 @@ namespace casadi {
     m->pr_step *= t;
 
     // Calculate the dual step-size
-    m->du_step = casadi_norm_1(ng_, m->dlam_gk) + casadi_norm_1(nx_, m->dlam_xk);
+    m->du_step = casadi_norm_1(ng_, m->dlam +nx_) + casadi_norm_1(nx_, m->dlam);
     for (auto&& v : m->lifted_mem) m->du_step += casadi_norm_1(v.n, v.dlam);
     m->du_step *= t;
   }
@@ -1278,7 +1273,7 @@ namespace casadi {
       m->arg[v_[i].mod_var] = m->lifted_mem[i].res;
     }
     if (!gauss_newton_) {
-      m->arg[mod_dlam_g_] = m->dlam_gk; // Dual variables
+      m->arg[mod_dlam_g_] = m->dlam + nx_; // Dual variables
       m->arg[mod_g_lam_] = m->lam + nx_; // Dual step
       for (size_t i=0; i<v_.size(); ++i) {
         m->arg[v_[i].mod_lam] = m->lifted_mem[i].resL;
