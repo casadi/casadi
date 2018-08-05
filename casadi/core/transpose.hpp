@@ -100,13 +100,13 @@ namespace casadi {
     }
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
+    void serialize_header(Serializer& s) const override;
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s);
 
   protected:
-    explicit Transpose(const MXNode::Info& info);
+    explicit Transpose(DeSerializer& s) : MXNode(s) {}
   };
 
   /** \brief Matrix transpose (dense)
@@ -147,9 +147,9 @@ namespace casadi {
     size_t sz_iw() const override { return 0;}
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
+    void serialize_header(Serializer& s) const override;
 
-    explicit DenseTranspose(const MXNode::Info& info);
+    explicit DenseTranspose(DeSerializer& s) : Transpose(s) {}
   };
 
 

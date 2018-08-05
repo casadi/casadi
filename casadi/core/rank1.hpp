@@ -87,11 +87,11 @@ namespace casadi {
     /** \brief Get the operation */
     casadi_int op() const override { return OP_RANK1;}
 
-    /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override {}
-
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new Rank1(s); }
+
+    protected:
+      explicit Rank1(DeSerializer& s) : MXNode(s) {}
 
   };
 

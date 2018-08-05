@@ -45,8 +45,8 @@ namespace casadi {
     /** \brief  Destructor */
     ~Norm() override {}
 
-    /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override {}
+  protected:
+    explicit Norm(DeSerializer& s) : MXNode(s) {}
   };
 
   /** \brief Represents a Frobenius norm
@@ -95,7 +95,10 @@ namespace casadi {
     casadi_int op() const override { return OP_NORMF;}
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new NormF(s); }
+
+  protected:
+    explicit NormF(DeSerializer& s) : Norm(s) {}
   };
 
   /** \brief Represents a 2-norm (spectral norm)
@@ -118,7 +121,10 @@ namespace casadi {
     casadi_int op() const override { return OP_NORM2;}
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new Norm2(s); }
+
+  protected:
+    explicit Norm2(DeSerializer& s) : Norm(s) {}
   };
 
   /** \brief 1-norm
@@ -141,7 +147,10 @@ namespace casadi {
     casadi_int op() const override { return OP_NORM1;}
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new Norm1(s); }
+
+  protected:
+    explicit Norm1(DeSerializer& s) : Norm(s) {}
   };
 
   /** \brief Represents an infinity-norm operation on a MX
@@ -164,7 +173,10 @@ namespace casadi {
     casadi_int op() const override { return OP_NORMINF;}
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new NormInf(s); }
+
+  protected:
+    explicit NormInf(DeSerializer& s) : Norm(s) {}
   };
 
 } // namespace casadi

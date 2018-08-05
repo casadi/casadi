@@ -95,13 +95,17 @@ namespace casadi {
     }
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
+    void serialize_body(Serializer& s) const override;
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new UnaryMX(s); }
 
     //! \brief operation
     Operation op_;
+
+  protected:
+    explicit UnaryMX(DeSerializer& s);
+
   };
 
 } // namespace casadi

@@ -60,11 +60,10 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override {}
-
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new MMin(s); }
+  protected:
+    explicit MMin(DeSerializer& s) : MXNode(s) {}
   };
 
   /** \brief Matrix maximum
@@ -96,11 +95,10 @@ namespace casadi {
     /** \brief  Evaluate symbolically (MX) */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override {}
-
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new MMax(s); }
+  protected:
+    explicit MMax(DeSerializer& s) : MXNode(s) {}
   };
 
 } // namespace casadi

@@ -190,28 +190,22 @@ namespace casadi {
       << "  }\n";
   }
 
-  void HorzRepmat::serialize_node(Serializer& s) const {
+  void HorzRepmat::serialize_body(Serializer& s) const {
+    MXNode::serialize_body(s);
     s.pack("HorzRepmat::n", n_);
   }
 
-  void HorzRepsum::serialize_node(Serializer& s) const {
-    s.pack("HorzRepmat::n", n_);
+  void HorzRepsum::serialize_body(Serializer& s) const {
+    MXNode::serialize_body(s);
+    s.pack("HorzRepsum::n", n_);
   }
 
-  MX HorzRepmat::deserialize(DeSerializer& s) {
-    MXNode::Info info;
-    MXNode::deserialize(s, info);
-    casadi_int n;
-    s.unpack("HorzRepmat::n", n);
-    return MX::create(new HorzRepmat(info.deps[0], n));
+  HorzRepmat::HorzRepmat(DeSerializer& s) : MXNode(s) {
+    s.unpack("HorzRepmat::n", n_);
   }
 
-  MX HorzRepsum::deserialize(DeSerializer& s) {
-    MXNode::Info info;
-    MXNode::deserialize(s, info);
-    casadi_int n;
-    s.unpack("HorzRepsum::n", n);
-    return MX::create(new HorzRepsum(info.deps[0], n));
+  HorzRepsum::HorzRepsum(DeSerializer& s) : MXNode(s) {
+    s.unpack("HorzRepsum::n", n_);
   }
 
 } // namespace casadi

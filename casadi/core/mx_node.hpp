@@ -180,16 +180,25 @@ namespace casadi {
 
     void serialize(Serializer& s) const;
 
-    virtual void serialize_node(Serializer& s) const;
+    /**
+     * 
+     * 
+     */
+    virtual void serialize_body(Serializer& s) const;
 
-    struct Info  {
-      Sparsity sp;
-      std::vector<MX> deps;
-      casadi_int op;
-    };
+    /** \brief 
+     * 
+     * Information needed to unambiguously find the (lowest level sub)class,
+     * such that its deserializing constructor can be called.
+     */
+    virtual void serialize_header(Serializer& s) const;
 
-    static void deserialize(DeSerializer& s, Info& e);
-    static MX deserialize(DeSerializer& s);
+    /**
+     * 
+     * Uses the information encoded with serialize_header to unambiguously find the (lowest level sub)class,
+     * and calls its deserializing constructor.
+     */
+    static MXNode* deserialize(DeSerializer& s);
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     static bool is_equal(const MXNode* x, const MXNode* y, casadi_int depth);
@@ -434,10 +443,10 @@ namespace casadi {
     /** \brief Propagate sparsities backwards through a copy operation */
     static void copy_rev(bvec_t* arg, bvec_t* res, casadi_int len);
 
-    static std::map<casadi_int, MX (*)(DeSerializer&)> deserialize_map;
+    static std::map<casadi_int, MXNode* (*)(DeSerializer&)> deserialize_map;
 
   protected:
-    explicit MXNode(const Info& e);
+    explicit MXNode(DeSerializer& s);
   };
 
   /// \endcond

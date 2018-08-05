@@ -61,11 +61,11 @@ namespace casadi {
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override {}
-
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new GetElements(s); }
+
+  protected:
+    explicit GetElements(DeSerializer& s) : MXNode(s) {}
   };
 
 } // namespace casadi

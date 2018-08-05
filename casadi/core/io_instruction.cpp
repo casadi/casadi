@@ -92,36 +92,17 @@ namespace casadi {
     return ret;
   }
 
-  void IOInstruction::serialize_node(Serializer& s) const {
+  void IOInstruction::serialize_body(Serializer& s) const {
+    MXNode::serialize_body(s);
     s.pack("IOInstruction::ind", ind_);
     s.pack("IOInstruction::segment", segment_);
     s.pack("IOInstruction::offset", offset_);
   }
 
-  MX Input::deserialize(DeSerializer& s) {
-    MXNode::Info d;
-    MXNode::deserialize(s, d);
-
-    casadi_int ind, segment, offset;
-    s.unpack("IOInstruction::ind", ind);
-    s.unpack("IOInstruction::segment", segment);
-    s.unpack("IOInstruction::offset", offset);
-    MX r;
-    r.own(new Input(d.sp, ind, segment, offset));
-    return r;
-  }
-
-  MX Output::deserialize(DeSerializer& s) {
-    MXNode::Info d;
-    MXNode::deserialize(s, d);
-
-    casadi_int ind, segment, offset;
-    s.unpack("IOInstruction::ind", ind);
-    s.unpack("IOInstruction::segment", segment);
-    s.unpack("IOInstruction::offset", offset);
-    MX r;
-    r.own(new Output(d.deps[0], ind, segment, offset));
-    return r;
+  IOInstruction::IOInstruction(DeSerializer& s) : MXNode(s) {
+    s.unpack("IOInstruction::ind", ind_);
+    s.unpack("IOInstruction::segment", segment_);
+    s.unpack("IOInstruction::offset", offset_);
   }
 
 } // namespace casadi

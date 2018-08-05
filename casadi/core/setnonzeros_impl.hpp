@@ -897,56 +897,66 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::serialize_node(Serializer& s) const {
-    s.pack("SetNonzeros::type", 'a');
+  void SetNonzerosVector<Add>::serialize_body(Serializer& s) const {
+    MXNode::serialize_body(s);
     s.pack("SetNonzerosVector::nonzeros", nz_);
   }
 
   template<bool Add>
-  MX SetNonzerosVector<Add>::deserialize_more(DeSerializer& s, const MXNode::Info& e) {
-    std::vector<casadi_int> nz;
-    s.unpack("SetNonzerosVector::nonzeros", nz);
-    return MX::create(new SetNonzerosVector<Add>(e.deps[0], e.deps[1], nz));
+  SetNonzerosVector<Add>::SetNonzerosVector(DeSerializer& s) : SetNonzeros<Add>(s) {
+    s.unpack("SetNonzerosVector::nonzeros", nz_);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::serialize_node(Serializer& s) const {
-    s.pack("SetNonzeros::type", 'b');
+  void SetNonzerosVector<Add>::serialize_header(Serializer& s) const {
+    MXNode::serialize_header(s);
+    s.pack("SetNonzeros::type", 'a');
+  }
+
+  template<bool Add>
+  void SetNonzerosSlice<Add>::serialize_body(Serializer& s) const {
+    MXNode::serialize_body(s);
     s.pack("SetNonzerosSlice::slice", s_);
   }
 
   template<bool Add>
-  MX SetNonzerosSlice<Add>::deserialize_more(DeSerializer& s, const MXNode::Info& e) {
-    Slice sl;
-    s.unpack("SetNonzerosSlice::slice", sl);
-    return MX::create(new SetNonzerosSlice<Add>(e.deps[0], e.deps[1], sl));
+  SetNonzerosSlice<Add>::SetNonzerosSlice(DeSerializer& s) : SetNonzeros<Add>(s) {
+    s.unpack("SetNonzerosSlice::slice", s_);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::serialize_node(Serializer& s) const {
-    s.pack("SetNonzeros::type", 'c');
+  void SetNonzerosSlice<Add>::serialize_header(Serializer& s) const {
+    MXNode::serialize_header(s);
+    s.pack("SetNonzeros::type", 'b');
+  }
+
+  template<bool Add>
+  void SetNonzerosSlice2<Add>::serialize_body(Serializer& s) const {
+    MXNode::serialize_body(s);
     s.pack("SetNonzerosSlice2::inner", inner_);
     s.pack("SetNonzerosSlice2::outer", outer_);
   }
 
   template<bool Add>
-  MX SetNonzerosSlice2<Add>::deserialize_more(DeSerializer& s, const MXNode::Info& e) {
-    Slice inner, outer;
-    s.unpack("SetNonzerosVector2::inner", inner);
-    s.unpack("SetNonzerosVector2::outer", outer);
-    return MX::create(new SetNonzerosSlice2<Add>(e.deps[0], e.deps[1], inner, outer));
+  SetNonzerosSlice2<Add>::SetNonzerosSlice2(DeSerializer& s) : SetNonzeros<Add>(s) {
+    s.unpack("SetNonzerosVector2::inner", inner_);
+    s.unpack("SetNonzerosVector2::outer", outer_);
   }
 
   template<bool Add>
-  MX SetNonzeros<Add>::deserialize(DeSerializer& s) {
-    MXNode::Info e;
-    MXNode::deserialize(s, e);
+  void SetNonzerosSlice2<Add>::serialize_header(Serializer& s) const {
+    MXNode::serialize_header(s);
+    s.pack("SetNonzeros::type", 'c');
+  }
+
+  template<bool Add>
+  MXNode* SetNonzeros<Add>::deserialize(DeSerializer& s) {
     char t;
     s.unpack("SetNonzeros::type", t);
     switch (t) {
-      case 'a': return SetNonzerosVector<Add>::deserialize_more(s, e);
-      case 'b': return SetNonzerosSlice<Add>::deserialize_more(s, e);
-      case 'c': return SetNonzerosSlice2<Add>::deserialize_more(s, e);
+      case 'a': return new SetNonzerosVector<Add>(s);
+      case 'b': return new SetNonzerosSlice<Add>(s);
+      case 'c': return new SetNonzerosSlice2<Add>(s);
       default: casadi_assert_dev(false);
     }
   }

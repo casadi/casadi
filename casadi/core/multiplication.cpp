@@ -29,6 +29,7 @@
 #include "multiplication.hpp"
 #include "casadi_misc.hpp"
 #include "function_internal.hpp"
+#include "serializer.hpp"
 
 using namespace std;
 
@@ -144,10 +145,25 @@ namespace casadi {
       << " *rr += ss[k*" << nrow_x << "]**tt++;\n";
   }
 
-  MX Multiplication::deserialize(DeSerializer& s) {
-    MXNode::Info info;
-    MXNode::deserialize(s, info);
-    return info.deps[1]->get_mac(info.deps[2], info.deps[0]);
+  void Multiplication::serialize_header(Serializer& s) const {
+    MXNode::serialize_header(s);
+    s.pack("Multiplication::dense", false);
+  }
+
+  void DenseMultiplication::serialize_header(Serializer& s) const {
+    MXNode::serialize_header(s);
+    s.pack("Multiplication::dense", true);
+  }
+
+  MXNode* Multiplication::deserialize(DeSerializer& s) {
+    bool dense;
+    s.unpack("Multiplication::dense", dense);
+    if (dense) {
+      return new DenseMultiplication(s);
+    } else {
+      return new Multiplication(s);
+    }
+
   }
 
 } // namespace casadi

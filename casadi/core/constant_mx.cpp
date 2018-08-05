@@ -247,18 +247,68 @@ namespace casadi {
     return MX::zeros(sp);
   }
 
-  void ConstantMX::serialize_node(Serializer& s) const {
+  void ConstantDM::serialize_header(Serializer& s) const {
+    MXNode::serialize_header(s);
+    s.pack("ConstantMX::type", 'a');
+  }
+
+  void ConstantDM::serialize_body(Serializer& s) const {
+    MXNode::serialize_body(s);
     DM v = get_DM();
     s.pack("ConstantMX::nonzeros", v.nonzeros());
   }
 
-  MX ConstantMX::deserialize(DeSerializer& s) {
-    MXNode::Info d;
-    MXNode::deserialize(s, d);
+  ConstantDM::ConstantDM(DeSerializer& s) : ConstantMX(s) {
     std::vector<double> v;
     s.unpack("ConstantMX::nonzeros", v);
-    return DM(d.sp, v);
+    x_ = DM(sparsity_, v);
   }
+
+  void ZeroByZero::serialize_header(Serializer& s) const {
+    MXNode::serialize_header(s);
+    s.pack("ConstantMX::type", 'z');
+  }
+
+  void ZeroByZero::serialize_body(Serializer& s) const {
+   // No need to serialize body at all. All info is in header.
+  }
+
+  MXNode* ConstantMX::deserialize(DeSerializer& s) {
+    char t;
+    s.unpack("ConstantMX::type", t);
+    switch (t) {
+      case 'a':    return new ConstantDM(s);
+      case 'z':    return ZeroByZero::getInstance();
+      case 'D':
+        return new Constant<RuntimeConst<double> >(s, RuntimeConst<double>::deserialize(s));
+      case 'I':
+        return new Constant<RuntimeConst<casadi_int> >(s,
+                      RuntimeConst<casadi_int>::deserialize(s));
+      case '0':
+        return new Constant<CompiletimeConst<0> >(s, CompiletimeConst<0>::deserialize(s));
+      case '1':
+        return new Constant<CompiletimeConst<1> >(s, CompiletimeConst<1>::deserialize(s));
+      case 'm':
+        return new Constant<CompiletimeConst<(-1)> >(s, CompiletimeConst<(-1)>::deserialize(s));
+      default:
+        casadi_error("Error deserializing");
+    }
+  }
+
+  template<>
+  char RuntimeConst<casadi_int>::type_char = 'I';
+
+  template<>
+  char RuntimeConst<double>::type_char = 'D';
+
+  template<>
+  char CompiletimeConst<0>::type_char = '0';
+
+  template<>
+  char CompiletimeConst<(-1)>::type_char = 'm';
+
+  template<>
+  char CompiletimeConst<1>::type_char = '1';
 
   ///
 

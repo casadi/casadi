@@ -57,16 +57,13 @@ namespace casadi {
     return arg.at(0) + "{" + str(oind_) + "}";
   }
 
-  void OutputNode::serialize_node(Serializer& s) const {
+  void OutputNode::serialize_body(Serializer& s) const {
+    MXNode::serialize_body(s);
     s.pack("OutputNode::oind", oind_);
   }
 
-  MX OutputNode::deserialize(DeSerializer& s) {
-    MXNode::Info e;
-    MXNode::deserialize(s, e);
-    casadi_int oind;
-    s.unpack("OutputNode::oind", oind);
-    return MX::create(new OutputNode(e.deps[0], oind));
+  OutputNode::OutputNode(DeSerializer& s) : MXNode(s) {
+    s.unpack("OutputNode::oind", oind_);
   }
 
 } // namespace casadi

@@ -220,16 +220,13 @@ namespace casadi {
     return MX::createMultipleOutput(new Call(fcn, arg));
   }
 
-  void Call::serialize_node(Serializer& s) const {
+  void Call::serialize_body(Serializer& s) const {
+    MultipleOutput::serialize_body(s);
     s.pack("Call::fcn", fcn_);
   }
 
-  MX Call::deserialize(DeSerializer& s) {
-    MXNode::Info d;
-    MXNode::deserialize(s, d);
-    Function f;
-    s.unpack("Call::fcn", f);
-    return MX::create(new Call(f, d.deps));
+  Call::Call(DeSerializer& s) : MultipleOutput(s) {
+    s.unpack("Call::fcn", fcn_);
   }
 
 } // namespace casadi

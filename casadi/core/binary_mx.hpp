@@ -89,10 +89,11 @@ namespace casadi {
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
+    void serialize_body(Serializer& s) const override;
+    void serialize_header(Serializer& s) const override;
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s);
 
     /// Get a unary operation
     MX get_unary(casadi_int op) const override;
@@ -120,6 +121,8 @@ namespace casadi {
 
     //! \brief Operation
     Operation op_;
+
+    explicit BinaryMX(DeSerializer& s);
 
   };
 

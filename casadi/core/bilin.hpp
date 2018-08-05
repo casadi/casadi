@@ -84,11 +84,11 @@ namespace casadi {
     /** \brief Get the operation */
     casadi_int op() const override { return OP_BILIN;}
 
-    /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override {}
-
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new Bilin(s); }
+
+    protected:
+      explicit Bilin(DeSerializer& s) : MXNode(s) {}
   };
 
 

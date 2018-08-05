@@ -73,11 +73,6 @@ namespace casadi {
     temp = 0;
   }
 
-  MXNode::MXNode(const Info& e) {
-    temp = 0;
-    dep_ = e.deps;
-    sparsity_ = e.sp;
-  }
 
   MXNode::~MXNode() {
 
@@ -415,33 +410,30 @@ namespace casadi {
     return Dict();
   }
 
-  void MXNode::serialize_node(Serializer& s) const {
-    casadi_error("'serialize_node' not defined for class " + class_name());
+  void MXNode::serialize(Serializer& s) const {
+    serialize_header(s);
+    serialize_body(s);
   }
 
-  void MXNode::serialize(Serializer& s) const {
-    //casadi_int i = op();
-    //uout() << i << std::endl;
-    //casadi_assert_dev(i<255 && i>=0);
-    s.pack("MXNode::op", op());
-    s.pack("MXNode::op2", op());
+  void MXNode::serialize_body(Serializer& s) const {
     s.pack("MXNode::deps", dep_);
     s.pack("MXNode::sp", sparsity_);
-    serialize_node(s);
   }
 
-  void MXNode::deserialize(DeSerializer& s, Info& e) {
-    s.unpack("MXNode::op2", e.op);
-    s.unpack("MXNode::deps", e.deps);
-    s.unpack("MXNode::sp", e.sp);
+  void MXNode::serialize_header(Serializer& s) const {
+    s.pack("MXNode::op", static_cast<int>(op()));
   }
 
-  MX MXNode::deserialize(DeSerializer& s) {
-    //char i;
-    //s.unpack("MXNode::op", i);
-    //unsigned char op = i;
+  MXNode::MXNode(DeSerializer& s) {
+    temp = 0;
 
-    casadi_int op;
+    s.unpack("MXNode::deps", dep_);
+    s.unpack("MXNode::sp", sparsity_);
+  }
+
+
+  MXNode* MXNode::deserialize(DeSerializer& s) {
+    int op;
     s.unpack("MXNode::op", op);
 
     if (casadi_math<MX>::is_binary(op)) {
@@ -998,8 +990,8 @@ namespace casadi {
   }
 
 
-  // Note: binary/unary operations are ommitted here
-  std::map<casadi_int, MX (*)(DeSerializer&)> MXNode::deserialize_map = {
+  // Note: binary/unary operations are omitted here
+  std::map<casadi_int, MXNode* (*)(DeSerializer&)> MXNode::deserialize_map = {
     {OP_INPUT, Input::deserialize},
     {OP_OUTPUT, Output::deserialize},
     {OP_PARAMETER, SymbolicMX::deserialize},
@@ -1030,7 +1022,7 @@ namespace casadi {
     {OP_GET_ELEMENTS, GetElements::deserialize},
     // OP_ADD_ELEMENTS
     {OP_PROJECT, Project::deserialize},
-    // OP_ASSERTION
+    {OP_ASSERTION, Assertion::deserialize},
     // OP_MONITOR
     {OP_NORM1, Norm1::deserialize},
     {OP_NORM2, Norm2::deserialize},

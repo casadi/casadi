@@ -118,11 +118,10 @@ namespace casadi {
     /** \brief Reset the marker for an input expression */
     void reset_input() const override;
 
-    /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override {}
-
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new Reshape(s); }
+  protected:
+    explicit Reshape(DeSerializer& s) : MXNode(s) {}
   };
 
 } // namespace casadi

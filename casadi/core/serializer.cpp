@@ -35,7 +35,7 @@
 using namespace std;
 namespace casadi {
 
-    static casadi_int serialization_protocol_version = 1;
+    static casadi_int serialization_protocol_version = 2;
     static casadi_int serialization_check = 123456789012345;
 
     DeSerializer::DeSerializer(std::istream& in_s) : in(in_s), debug_(false) {

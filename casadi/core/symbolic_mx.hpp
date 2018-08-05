@@ -91,12 +91,14 @@ namespace casadi {
     void reset_input() const override;
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
+    void serialize_body(Serializer& s) const override;
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new SymbolicMX(s); }
 
   protected:
+    explicit SymbolicMX(DeSerializer& s);
+
     // Name of the variable
     std::string name_;
   };

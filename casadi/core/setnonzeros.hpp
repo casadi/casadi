@@ -80,7 +80,10 @@ namespace casadi {
     casadi_int n_inplace() const override { return 1;}
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s);
+
+  protected:
+    explicit SetNonzeros(DeSerializer& s) : MXNode(s) {}
   };
 
 
@@ -135,10 +138,10 @@ namespace casadi {
     std::vector<casadi_int> nz_;
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
+    void serialize_body(Serializer& s) const override;
+    void serialize_header(Serializer& s) const override;
 
-    /** \brief Deserialize into MX */
-    static MX deserialize_more(DeSerializer& s, const MXNode::Info& e);
+    explicit SetNonzerosVector(DeSerializer& s);
   };
 
   // Specialization of the above when nz_ is a Slice
@@ -189,10 +192,10 @@ namespace casadi {
     Slice s_;
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
+    void serialize_body(Serializer& s) const override;
+    void serialize_header(Serializer& s) const override;
 
-    /** \brief Deserialize into MX */
-    static MX deserialize_more(DeSerializer& s, const MXNode::Info& e);
+    explicit SetNonzerosSlice(DeSerializer& s);
   };
 
   // Specialization of the above when nz_ is a nested Slice
@@ -245,10 +248,10 @@ namespace casadi {
     Slice inner_, outer_;
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
+    void serialize_body(Serializer& s) const override;
+    void serialize_header(Serializer& s) const override;
 
-    /** \brief Deserialize into MX */
-    static MX deserialize_more(DeSerializer& s, const MXNode::Info& e);
+    explicit SetNonzerosSlice2(DeSerializer& s);
   };
 
 } // namespace casadi

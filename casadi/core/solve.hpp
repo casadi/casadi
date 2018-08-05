@@ -101,11 +101,13 @@ namespace casadi {
     Linsol linsol_;
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
+    void serialize_body(Serializer& s) const override;
+    void serialize_header(Serializer& s) const override;
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s);
 
+    explicit Solve(DeSerializer& s);
   };
 
 

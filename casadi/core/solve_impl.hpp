@@ -270,20 +270,32 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::serialize_node(Serializer& s) const {
-    s.pack("Solve::Tr", Tr);
+  void Solve<Tr>::serialize_body(Serializer& s) const {
+    MXNode::serialize_body(s);
     s.pack("Solve::Linsol", linsol_);
   }
 
   template<bool Tr>
-  MX Solve<Tr>::deserialize(DeSerializer& s) {
-    MXNode::Info e;
-    MXNode::deserialize(s, e);
+  void Solve<Tr>::serialize_header(Serializer& s) const {
+    MXNode::serialize_header(s);
+    s.pack("Solve::Tr", Tr);
+  }
+
+  template<bool Tr>
+  Solve<Tr>::Solve(DeSerializer& s) : MXNode(s) {
+    s.unpack("Solve::Linsol", linsol_);
+  }
+
+  template<bool Tr>
+  MXNode* Solve<Tr>::deserialize(DeSerializer& s) {
     bool tr;
     s.unpack("Solve::Tr", tr);
-    Linsol linsol;
-    s.unpack("Solve::Linsol", linsol);
-    return MX::create(new Solve(e.deps[0], e.deps[1], linsol));
+
+    if (tr) {
+      return new Solve<true>(s);
+    } else {
+      return new Solve<false>(s);
+    }
   }
 
 } // namespace casadi

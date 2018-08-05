@@ -101,10 +101,4 @@ namespace casadi {
       << ";\n";
   }
 
-  MX Dot::deserialize(DeSerializer& s) {
-    MXNode::Info e;
-    MXNode::deserialize(s, e);
-    return MX::create(new Dot(e.deps[0], e.deps[1]));
-  }
-
 } // namespace casadi

@@ -88,10 +88,13 @@ namespace casadi {
     casadi_int n_;
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
+    void serialize_body(Serializer& s) const override;
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new HorzRepmat(s); }
+
+  protected:
+    explicit HorzRepmat(DeSerializer& s);
   };
 
   /** \brief Horizontal repsum
@@ -148,10 +151,13 @@ namespace casadi {
     casadi_int n_;
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
+    void serialize_body(Serializer& s) const override;
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new HorzRepsum(s); }
+
+  protected:
+    explicit HorzRepsum(DeSerializer& s);
   };
 
 } // namespace casadi

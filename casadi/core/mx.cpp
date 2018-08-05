@@ -749,7 +749,7 @@ namespace casadi {
   }
 
   MX MX::deserialize(DeSerializer& s) {
-    return MXNode::deserialize(s);
+    return MX::create(MXNode::deserialize(s));
   }
 
   bool MX::is_equal(const MX& x, const MX& y, casadi_int depth) {

@@ -119,14 +119,15 @@ namespace casadi {
     size_t sz_w() const override;
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
+    void serialize_body(Serializer& s) const override;
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new Call(s); }
 
   protected:
     /** \brief  Constructor (should not be used directly) */
     explicit Call(const Function& fcn, const std::vector<MX>& arg);
+    explicit Call(DeSerializer& s);
 
     // Function to be evaluated
     Function fcn_;

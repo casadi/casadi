@@ -575,50 +575,57 @@ namespace casadi {
     return true;
   }
 
-  void GetNonzerosVector::serialize_node(Serializer& s) const {
-    s.pack("GetNonzeros::type", 'a');
+  void GetNonzerosVector::serialize_body(Serializer& s) const {
+    GetNonzeros::serialize_body(s);
     s.pack("GetNonzerosVector::nonzeros", nz_);
   }
 
-  MX GetNonzerosVector::deserialize_more(DeSerializer& s, const MXNode::Info& e) {
-    std::vector<casadi_int> nz;
-    s.unpack("GetNonzerosVector::nonzeros", nz);
-    return MX::create(new GetNonzerosVector(e.sp, e.deps[0], nz));
+  void GetNonzerosVector::serialize_header(Serializer& s) const {
+    GetNonzeros::serialize_header(s);
+    s.pack("GetNonzeros::type", 'a');
   }
 
-  void GetNonzerosSlice::serialize_node(Serializer& s) const {
-    s.pack("GetNonzeros::type", 'b');
+  GetNonzerosVector::GetNonzerosVector(DeSerializer& s) : GetNonzeros(s) {
+    s.unpack("GetNonzerosVector::nonzeros", nz_);
+  }
+
+  void GetNonzerosSlice::serialize_body(Serializer& s) const {
+    GetNonzeros::serialize_body(s);
     s.pack("GetNonzerosSlice::slice", s_);
   }
 
-  MX GetNonzerosSlice::deserialize_more(DeSerializer& s, const MXNode::Info& e) {
-    Slice sl;
-    s.unpack("GetNonzerosSlice::slice", sl);
-    return MX::create(new GetNonzerosSlice(e.sp, e.deps[0], sl));
+  void GetNonzerosSlice::serialize_header(Serializer& s) const {
+    GetNonzeros::serialize_header(s);
+    s.pack("GetNonzeros::type", 'b');
   }
 
-  void GetNonzerosSlice2::serialize_node(Serializer& s) const {
-    s.pack("GetNonzeros::type", 'c');
+  GetNonzerosSlice::GetNonzerosSlice(DeSerializer& s) : GetNonzeros(s) {
+    s.unpack("GetNonzerosSlice::slice", s_);
+  }
+
+  void GetNonzerosSlice2::serialize_body(Serializer& s) const {
+    GetNonzeros::serialize_body(s);
     s.pack("GetNonzerosSlice2::inner", inner_);
     s.pack("GetNonzerosSlice2::outer", outer_);
   }
 
-  MX GetNonzerosSlice2::deserialize_more(DeSerializer& s, const MXNode::Info& e) {
-    Slice inner, outer;
-    s.unpack("GetNonzerosVector2::inner", inner);
-    s.unpack("GetNonzerosVector2::outer", outer);
-    return MX::create(new GetNonzerosSlice2(e.sp, e.deps[0], inner, outer));
+  void GetNonzerosSlice2::serialize_header(Serializer& s) const {
+    GetNonzeros::serialize_header(s);
+    s.pack("GetNonzeros::type", 'c');
   }
 
-  MX GetNonzeros::deserialize(DeSerializer& s) {
-    MXNode::Info e;
-    MXNode::deserialize(s, e);
+  GetNonzerosSlice2::GetNonzerosSlice2(DeSerializer& s) : GetNonzeros(s) {
+    s.unpack("GetNonzerosVector2::inner", inner_);
+    s.unpack("GetNonzerosVector2::outer", outer_);
+  }
+
+  MXNode* GetNonzeros::deserialize(DeSerializer& s) {
     char t;
     s.unpack("GetNonzeros::type", t);
     switch (t) {
-      case 'a': return GetNonzerosVector::deserialize_more(s, e);
-      case 'b': return GetNonzerosSlice::deserialize_more(s, e);
-      case 'c': return GetNonzerosSlice2::deserialize_more(s, e);
+      case 'a': return new GetNonzerosVector(s);
+      case 'b': return new GetNonzerosSlice(s);
+      case 'c': return new GetNonzerosSlice2(s);
       default: casadi_assert_dev(false);
     }
   }

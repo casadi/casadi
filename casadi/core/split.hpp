@@ -76,24 +76,15 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override;
 
-    struct Info {
-      MXNode::Info node;
-      std::vector<casadi_int> offset;
-      std::vector<Sparsity> output_sparsity;
-    };
-
     // Sparsity pattern of the outputs
     std::vector<casadi_int> offset_;
     std::vector<Sparsity> output_sparsity_;
 
     /** \brief Serialize specific part of node  */
-    void serialize_node(Serializer& s) const override;
-
-    /** \brief Deserialize into MX */
-    static void deserialize(DeSerializer& s, Info& e);
+    void serialize_body(Serializer& s) const override;
 
   protected:
-    explicit Split(const Info& info);
+    explicit Split(DeSerializer& s);
   };
 
   /** \brief Horizontal split, x -> x0, x1, ...
@@ -130,10 +121,10 @@ namespace casadi {
     MX get_horzcat(const std::vector<MX>& x) const override;
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new Horzsplit(s); }
 
   protected:
-    explicit Horzsplit(const Info& info) : Split(info) {}
+    explicit Horzsplit(DeSerializer& s) : Split(s) {}
   };
 
   /** \brief Diag split, x -> x0, x1, ...
@@ -171,9 +162,10 @@ namespace casadi {
     MX get_diagcat(const std::vector<MX>& x) const override;
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new Diagsplit(s); }
 
-    explicit Diagsplit(const Info& info) : Split(info) {}
+  protected:
+    explicit Diagsplit(DeSerializer& s) : Split(s) {}
   };
 
   /** \brief Vertical split of vectors, x -> x0, x1, ...
@@ -210,9 +202,10 @@ namespace casadi {
     MX get_vertcat(const std::vector<MX>& x) const override;
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new Vertsplit(s); }
 
-    explicit Vertsplit(const Info& info) : Split(info) {}
+  protected:
+    explicit Vertsplit(DeSerializer& s) : Split(s) {}
   };
 
 } // namespace casadi

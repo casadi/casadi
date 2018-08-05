@@ -91,9 +91,4 @@ namespace casadi {
     }
   }
 
-  MX Find::deserialize(DeSerializer& s) {
-    MXNode::Info d;
-    MXNode::deserialize(s, d);
-    return MX::create(new Find(d.deps[0]));
-  }
 } // namespace casadi

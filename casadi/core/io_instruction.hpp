@@ -64,7 +64,10 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override;
 
-    void serialize_node(Serializer& s) const override;
+    void serialize_body(Serializer& s) const override;
+
+  protected:
+    explicit IOInstruction(DeSerializer&s);
   };
 
   /** \brief Input instruction  */
@@ -88,8 +91,10 @@ namespace casadi {
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Deserialize into MX */
-    static MX deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeSerializer& s) { return new Input(s); }
 
+  protected:
+    explicit Input(DeSerializer&s) : IOInstruction(s) {}
   };
 
   /** \brief Input instruction  */
@@ -115,8 +120,9 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
-    static MX deserialize(DeSerializer& s);
-
+    static MXNode* deserialize(DeSerializer& s) { return new Output(s); }
+  protected:
+    explicit Output(DeSerializer&s) : IOInstruction(s) {}
   };
 
 

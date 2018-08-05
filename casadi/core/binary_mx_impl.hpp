@@ -263,7 +263,14 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::serialize_node(Serializer& s) const {
+  void BinaryMX<ScX, ScY>::serialize_body(Serializer& s) const {
+    MXNode::serialize_body(s);
+    s.pack("BinaryMX::op", static_cast<int>(op_));
+  }
+
+  template<bool ScX, bool ScY>
+  void BinaryMX<ScX, ScY>::serialize_header(Serializer& s) const {
+    MXNode::serialize_header(s);
     char type_x = ScX;
     char type_y = ScY;
     char type = type_x | (type_y << 1);
@@ -271,16 +278,27 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  MX BinaryMX<ScX, ScY>::deserialize(DeSerializer& s) {
-    MXNode::Info d;
-    MXNode::deserialize(s, d);
+  MXNode* BinaryMX<ScX, ScY>::deserialize(DeSerializer& s) {
     char t;
     s.unpack("BinaryMX::scalar_flags", t);
     bool scX = t & 1;
     bool scY = t & 2;
-    return d.deps[0]->MXNode::_get_binary(d.op, d.deps[1], scX, scY);
+
+    if (scX) {
+      if (scY) return new BinaryMX<true, true>(s);
+      return new BinaryMX<true, false>(s);
+    } else {
+      if (scY) return new BinaryMX<false, true>(s);
+      return new BinaryMX<false, false>(s);
+    }
   }
 
+  template<bool ScX, bool ScY>
+  BinaryMX<ScX, ScY>::BinaryMX(DeSerializer& s) : MXNode(s) {
+    int op;
+    s.unpack("BinaryMX::op", op);
+    op_ = Operation(op);
+  }
 
 } // namespace casadi
 
