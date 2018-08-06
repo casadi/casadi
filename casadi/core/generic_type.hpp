@@ -103,6 +103,13 @@ namespace casadi {
     static std::string get_type_description(TypeID type);
 #endif
 
+    /// \cond INTERNAL
+#ifndef SWIG
+    /** \brief  Create from node */
+    static GenericType create(SharedObjectInternal* node);
+#endif // SWIG
+    /// \endcond
+
     /// Get a description of the object's type
     std::string get_description() const { return get_type_description(getType()); }
 

@@ -570,6 +570,12 @@ namespace casadi {
     }
   }
 
+  GenericType GenericType::create(SharedObjectInternal* node) {
+    GenericType ret;
+    ret.own(node);
+    return ret;
+  }
+
 
   typedef GenericTypeInternal<OT_STRING, std::string> StringType;
   typedef GenericTypeInternal<OT_DOUBLE, double> DoubleType;

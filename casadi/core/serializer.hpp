@@ -26,26 +26,18 @@
 #ifndef CASADI_SERIALIZER_HPP
 #define CASADI_SERIALIZER_HPP
 
-
-#include "function.hpp"
-#include "linsol.hpp"
 #include <sstream>
-#include <map>
+#include <unordered_map>
 #include <set>
 
 namespace casadi {
   class Slice;
   class Linsol;
   class Sparsity;
-  class SparsityInternal;
   class Function;
-  class FunctionInternal;
   class MX;
-  class MXNode;
   class SXElem;
-  class SXNode;
   class GenericType;
-  class GenericTypeBase;
   /** \brief Helper class for Serialization
       \author Joris Gillis
       \date 2018
@@ -73,9 +65,7 @@ namespace casadi {
     void unpack(char& e);
     template <class T>
     void unpack(std::vector<T>& e) {
-      char t;
-      unpack(t);
-      casadi_assert_dev(t=='V');
+      assert_decoration('V');
       casadi_int s;
       unpack(s);
       e.resize(s);
@@ -84,9 +74,7 @@ namespace casadi {
 
     template <class K, class V>
     void unpack(std::map<K, V>& e) {
-      char t;
-      unpack(t);
-      casadi_assert_dev(t=='D');
+      assert_decoration('D');
       casadi_int s;
       unpack(s);
       e.clear();
@@ -110,19 +98,19 @@ namespace casadi {
     }
 
     template <class T, class M>
-    void shared_unpack(T& e, M& cache) {
+    void shared_unpack(T& e) {
       char i;
       unpack("Shared::flag", i);
       switch (i) {
         case 'd': // definition
           e = T::deserialize(*this);
-          cache.push_back(e);
+          nodes.push_back(e.get());
           break;
         case 'r': // reference
           {
             casadi_int k;
             unpack("Shared::reference", k);
-            e = cache.at(k);
+            e = T::create(static_cast<M*>(nodes.at(k)));
           }
           break;
         default:
@@ -132,20 +120,11 @@ namespace casadi {
 
     void assert_decoration(char e);
 
-
   private:
+    std::vector<void*> nodes;
     std::istream& in;
-    std::vector<MX> nodes;
-    std::vector<Function> functions;
-    std::vector<SXElem> sx_nodes;
-    std::vector<Sparsity> sparsities;
-    std::vector<Linsol> linsols;
-    std::vector<GenericType> generic_types;
-
     bool debug_;
   };
-
-
 
   /** \brief Helper class for Serialization
 
@@ -157,9 +136,6 @@ namespace casadi {
   public:
     /// Constructor
     Serializer(std::ostream& out, const Dict& opts = Dict());
-
-    /// Add a function
-    casadi_int add(const Function& f);
 
     void pack(const Sparsity& e);
     void pack(const MX& e);
@@ -181,13 +157,13 @@ namespace casadi {
     void pack(char e);
     template <class T>
     void pack(const std::vector<T>& e) {
-      pack('V');
+      decorate('V');
       pack(casadi_int(e.size()));
       for (const T & i : e) pack(i);
     }
     template <class K, class V>
     void pack(const std::map<K, V>& e) {
-      pack('D');
+      decorate('D');
       pack(casadi_int(e.size()));
       for (const auto & i : e) {
         pack(i.first);
@@ -203,15 +179,15 @@ namespace casadi {
 
     void decorate(char e);
 
-    template <class T, class M>
-    void shared_pack(const T& e, M& map) {
-      auto it = map.find(e.get());
-      if (it==map.end()) {
+    template <class T>
+    void shared_pack(const T& e) {
+      auto it = shared_map_.find(e.get());
+      if (it==shared_map_.end()) {
         // Not found
         pack("Shared::flag", 'd'); // definition
         e.serialize(*this);
-        casadi_int r = map.size();
-        map[e.get()] = r;
+        casadi_int r = shared_map_.size();
+        shared_map_[e.get()] = r;
       } else {
         pack("Shared::flag", 'r'); // reference
         pack("Shared::reference", it->second);
@@ -219,19 +195,9 @@ namespace casadi {
     }
 
   private:
-    std::vector<Function> added_functions_;
-
-    std::map<MXNode*, casadi_int> MX_nodes_;
-    std::map<FunctionInternal*, casadi_int> functions_;
-    std::map<SXNode*, casadi_int> SX_nodes_;
-    std::map<SparsityInternal*, casadi_int> sparsities_;
-    std::map<SharedObjectInternal*, casadi_int> linsols_;
-    std::map<SharedObjectInternal*, casadi_int> generic_types_;
-
+    std::unordered_map<void*, casadi_int> shared_map_;
     std::ostream& out;
-
     bool debug_;
-
   };
 
   template <>

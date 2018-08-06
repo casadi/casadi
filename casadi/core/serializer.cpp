@@ -25,8 +25,6 @@
 
 #include "function.hpp"
 #include "serializer.hpp"
-
-#include "function_internal.hpp"
 #include "slice.hpp"
 #include "linsol.hpp"
 #include "generic_type.hpp"
@@ -35,7 +33,7 @@
 using namespace std;
 namespace casadi {
 
-    static casadi_int serialization_protocol_version = 2;
+    static casadi_int serialization_protocol_version = 3;
     static casadi_int serialization_check = 123456789012345;
 
     DeSerializer::DeSerializer(std::istream& in_s) : in(in_s), debug_(false) {
@@ -80,17 +78,6 @@ namespace casadi {
 
       pack(debug);
       debug_ = debug;
-    }
-
-    casadi_int Serializer::add(const Function& f) {
-      // Quick return if already added
-      for (auto&& e : added_functions_) if (e==f) return 0;
-
-      added_functions_.push_back(f);
-
-      f.serialize(*this);
-
-      return 0;
     }
 
     void Serializer::decorate(char e) {
@@ -212,52 +199,52 @@ namespace casadi {
 
     void Serializer::pack(const Sparsity& e) {
       decorate('S');
-      shared_pack(e, sparsities_);
+      shared_pack(e);
     }
 
     void DeSerializer::unpack(Sparsity& e) {
       assert_decoration('S');
-      shared_unpack(e, sparsities);
+      shared_unpack<Sparsity, SparsityInternal>(e);
     }
 
     void Serializer::pack(const MX& e) {
       decorate('X');
-      shared_pack(e, MX_nodes_);
+      shared_pack(e);
     }
 
     void DeSerializer::unpack(MX& e) {
       assert_decoration('X');
-      shared_unpack(e, nodes);
+      shared_unpack<MX, MXNode>(e);
     }
 
     void Serializer::pack(const Function& e) {
       decorate('X');
-      shared_pack(e, functions_);
+      shared_pack(e);
     }
 
     void DeSerializer::unpack(Function& e) {
       assert_decoration('X');
-      shared_unpack(e, functions);
+      shared_unpack<Function, FunctionInternal>(e);
     }
 
     void Serializer::pack(const Linsol& e) {
       decorate('L');
-      shared_pack(e, linsols_);
+      shared_pack(e);
     }
 
     void DeSerializer::unpack(Linsol& e) {
       assert_decoration('L');
-      shared_unpack(e, linsols);
+      shared_unpack<Linsol, LinsolInternal>(e);
     }
 
     void Serializer::pack(const GenericType& e) {
       decorate('G');
-      shared_pack(e, generic_types_);
+      shared_pack(e);
     }
 
     void DeSerializer::unpack(GenericType& e) {
       assert_decoration('G');
-      shared_unpack(e, generic_types);
+      shared_unpack<GenericType, SharedObjectInternal>(e);
     }
 
     void Serializer::pack(const Slice& e) {
@@ -272,12 +259,12 @@ namespace casadi {
 
     void Serializer::pack(const SXElem& e) {
       decorate('E');
-      shared_pack(e, SX_nodes_);
+      shared_pack(e);
     }
 
     void DeSerializer::unpack(SXElem& e) {
       assert_decoration('E');
-      shared_unpack(e, sx_nodes);
+      shared_unpack<SXElem, SXNode>(e);
     }
 
   template<>

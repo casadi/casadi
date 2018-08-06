@@ -192,4 +192,10 @@ namespace casadi {
     return linsol;
   }
 
+  Linsol Linsol::create(LinsolInternal* node) {
+    Linsol ret;
+    ret.own(node);
+    return ret;
+  }
+
 } // namespace casadi
