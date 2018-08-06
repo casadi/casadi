@@ -371,8 +371,8 @@ inline SXNode* ConstantSX_deserialize(DeSerializer& s) {
     }
     case 'i': {
       int value;
-      if (value==2) return casadi_limits<SXElem>::two.get();
       s.unpack("ConstantSX::value", value);
+      if (value==2) return casadi_limits<SXElem>::two.get();
       return IntegerSX::create(value);
     }
     case 'n': return casadi_limits<SXElem>::nan.get();
