@@ -2835,29 +2835,22 @@ namespace casadi {
     }
   }
 
-  void ProtoFunction::serialize(Serializer& s) const {
+  void ProtoFunction::serialize_body(Serializer& s) const {
     s.pack("ProtoFunction::name", name_);
     s.pack("ProtoFunction::verbose", verbose_);
   }
 
-  void ProtoFunction::deserialize(DeSerializer& s, Info& e) {
-    s.unpack("ProtoFunction::name", e.name);
-    s.unpack("ProtoFunction::verbose", e.verbose);
+  ProtoFunction::ProtoFunction(DeSerializer& s) {
+    s.unpack("ProtoFunction::name", name_);
+    s.unpack("ProtoFunction::verbose", verbose_);
   }
 
   void FunctionInternal::serialize_header(Serializer &s) const {
-    s.pack("Function::class_name", class_name());
-    serialize(s);
+    s.pack("FunctionInternal::base_function", serialize_base_function());
   }
 
-
-  void FunctionInternal::serialize_plugin(Serializer &s, const std::string& base_class_name) const {
-    s.pack("Function::plugin::base_class_name", base_class_name);
-    s.pack("Function::plugin::class_name", class_name());
-  }
-
-  void FunctionInternal::serialize(Serializer& s) const {
-    ProtoFunction::serialize(s);
+  void FunctionInternal::serialize_body(Serializer& s) const {
+    ProtoFunction::serialize_body(s);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
     s.pack("FunctionInternal::sp_out", sparsity_out_);
     s.pack("FunctionInternal::name_in", name_in_);
@@ -2891,106 +2884,91 @@ namespace casadi {
 
     s.pack(fd_method_);
 
-    s.pack(casadi_int(sz_arg_per_));
-    s.pack(casadi_int(sz_res_per_));
-    s.pack(casadi_int(sz_iw_per_));
-    s.pack(casadi_int(sz_w_per_));
-    s.pack(casadi_int(sz_arg_tmp_));
-    s.pack(casadi_int(sz_res_tmp_));
-    s.pack(casadi_int(sz_iw_tmp_));
-    s.pack(casadi_int(sz_w_tmp_));
+    s.pack(sz_arg_per_);
+    s.pack(sz_res_per_);
+    s.pack(sz_iw_per_);
+    s.pack(sz_w_per_);
+    s.pack(sz_arg_tmp_);
+    s.pack(sz_res_tmp_);
+    s.pack(sz_iw_tmp_);
+    s.pack(sz_w_tmp_);
   }
 
-  void FunctionInternal::deserialize(DeSerializer& s, Info& e) {
-    ProtoFunction::deserialize(s, e.proto);
-    s.unpack("FunctionInternal::sp_in", e.sp_in);
-    s.unpack("FunctionInternal::sp_out", e.sp_out);
-    s.unpack("FunctionInternal::name_in", e.name_in);
-    s.unpack("FunctionInternal::name_out", e.name_out);
+  FunctionInternal::FunctionInternal(DeSerializer& s) : ProtoFunction(s) {
+    s.unpack("FunctionInternal::sp_in", sparsity_in_);
+    s.unpack("FunctionInternal::sp_out", sparsity_out_);
+    s.unpack("FunctionInternal::name_in", name_in_);
+    s.unpack("FunctionInternal::name_out", name_out_);
 
-    s.unpack(e.jit);
+    s.unpack(jit_);
 
-    s.unpack("FunctionInternal::has_refcount", e.has_refcount);
+    s.unpack("FunctionInternal::has_refcount", has_refcount_);
 
-    s.unpack("FunctionInternal::derivative_of", e.derivative_of);
+    s.unpack("FunctionInternal::derivative_of", derivative_of_);
 
-    s.unpack(e.jac_penalty);
+    s.unpack(jac_penalty_);
 
-    s.unpack(e.enable_forward);
-    s.unpack(e.enable_reverse);
-    s.unpack(e.enable_jacobian);
-    s.unpack(e.enable_fd);
+    s.unpack(enable_forward_);
+    s.unpack(enable_reverse_);
+    s.unpack(enable_jacobian_);
+    s.unpack(enable_fd_);
 
-    s.unpack(e.ad_weight);
-    s.unpack(e.ad_weight_sp);
+    s.unpack(ad_weight_);
+    s.unpack(ad_weight_sp_);
 
-    s.unpack(e.max_num_dir);
+    s.unpack(max_num_dir_);
 
-    s.unpack(e.regularity_check);
+    s.unpack(regularity_check_);
 
-    s.unpack(e.inputs_check);
+    s.unpack(inputs_check_);
 
-    s.unpack(e.print_time);
+    s.unpack(print_time_);
 
-    s.unpack(e.fd_step);
+    s.unpack(fd_step_);
 
-    s.unpack(e.fd_method);
+    s.unpack(fd_method_);
 
-    s.unpack(e.sz_arg_per);
-    s.unpack(e.sz_res_per);
-    s.unpack(e.sz_iw_per);
-    s.unpack(e.sz_w_per);
-    s.unpack(e.sz_arg_tmp);
-    s.unpack(e.sz_res_tmp);
-    s.unpack(e.sz_iw_tmp);
-    s.unpack(e.sz_w_tmp);
-  }
+    s.unpack(sz_arg_per_);
+    s.unpack(sz_res_per_);
+    s.unpack(sz_iw_per_);
+    s.unpack(sz_w_per_);
+    s.unpack(sz_arg_tmp_);
+    s.unpack(sz_res_tmp_);
+    s.unpack(sz_iw_tmp_);
+    s.unpack(sz_w_tmp_);
 
-  FunctionInternal::FunctionInternal(const Info& e) : ProtoFunction(e.proto),
-    n_in_(e.sp_in.size()), n_out_(e.sp_out.size()),
-    sparsity_in_(e.sp_in), sparsity_out_(e.sp_out),
-    name_in_(e.name_in), name_out_(e.name_out),
-    jit_(e.jit),
-    eval_(nullptr),
-    has_refcount_(e.has_refcount),
-    derivative_of_(e.derivative_of),
-    jac_penalty_(e.jac_penalty),
-    enable_forward_(e.enable_forward),
-    enable_reverse_(e.enable_reverse),
-    enable_jacobian_(e.enable_jacobian),
-    enable_fd_(e.enable_fd),
-    ad_weight_(e.ad_weight),
-    ad_weight_sp_(e.ad_weight_sp),
-    max_num_dir_(e.max_num_dir),
-    regularity_check_(e.regularity_check),
-    inputs_check_(e.inputs_check),
-    print_time_(e.print_time),
-    fd_step_(e.fd_step),
-    fd_method_(e.fd_method),
-
-    sz_arg_per_(e.sz_arg_per),
-    sz_res_per_(e.sz_res_per),
-    sz_iw_per_(e.sz_iw_per),
-    sz_w_per_(e.sz_w_per),
-    sz_arg_tmp_(e.sz_arg_tmp),
-    sz_res_tmp_(e.sz_res_tmp),
-    sz_iw_tmp_(e.sz_iw_tmp),
-    sz_w_tmp_(e.sz_w_tmp) {
-
-
-      jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
+    n_in_ = sparsity_in_.size();
+    n_out_ = sparsity_out_.size();
+    eval_ = nullptr;
+    jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
 
   }
 
+  void ProtoFunction::serialize(Serializer& s) const {
+    serialize_header(s);
+    serialize_body(s);
+  }
 
-  std::map<std::string, Function (*)(DeSerializer&)> FunctionInternal::deserialize_map = {
+  Function FunctionInternal::deserialize(DeSerializer& s) {
+    std::string base_function;
+    s.unpack("FunctionInternal::base_function", base_function);
+    auto it = FunctionInternal::deserialize_map.find(base_function);
+    casadi_assert(it!=FunctionInternal::deserialize_map.end(),
+      "FunctionInternal::deserialize: not found '" + base_function + "'");
+
+    Function ret;
+    ret.own(it->second(s));
+    ret->finalize();
+    return ret;
+  }
+
+  std::map<std::string, ProtoFunction* (*)(DeSerializer&)> FunctionInternal::deserialize_map = {
     {"MXFunction", MXFunction::deserialize},
     {"SXFunction", SXFunction::deserialize},
     {"Interpolant", Interpolant::deserialize},
-    {"Nlpsol", Nlpsol::deserialize},
-    {"ThreadMap", ThreadMap::deserialize},
-    {"OmpMap", OmpMap::deserialize},
-    {"Switch", Switch::deserialize}
+    {"Switch", Switch::deserialize},
+    {"Map", Map::deserialize},
+    {"Nlpsol", Nlpsol::deserialize}
   };
 
 } // namespace casadi

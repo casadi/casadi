@@ -76,8 +76,7 @@ namespace casadi {
     return t;
   }
 
-  typedef std::map<std::string, FunctionInternal* (*)(DeSerializer&)> DeserializeMap;
-
+  typedef ProtoFunction* (*Deserialize)(DeSerializer&);
 
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson
@@ -96,10 +95,10 @@ namespace casadi {
       int version;
       typename Derived::Exposed exposed;
       const Options* options;
-      const DeserializeMap* deserialize_map;
+      Deserialize deserialize;
       // Constructor
       Plugin() : creator(nullptr), name(nullptr), doc(nullptr), version(0),
-                  options(nullptr), deserialize_map(nullptr) {}
+                  options(nullptr), deserialize(nullptr) {}
     };
 
     // Plugin registration function
@@ -112,7 +111,7 @@ namespace casadi {
     static const Options& plugin_options(const std::string& pname);
 
     /// Get the plugin deserialize_map
-    static const DeserializeMap& plugin_deserialize_map(const std::string& pname);
+    static Deserialize plugin_deserialize(const std::string& pname);
 
     /// Instantiate a Plugin struct from a factory function
     static Plugin pluginFromRegFcn(RegFcn regfcn);
@@ -140,36 +139,17 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const = 0;
 
-    // For compatibility with linsol
-    struct Info {
-      std::string plugin_name;
-    };
-
     // Serialize the plugin name
-    void serialize_plugin(Serializer& s) const {
+    void serialize_header(Serializer& s) const {
       s.pack("PluginInterface::plugin_name", std::string(plugin_name()));
     }
 
-    // For compatibility with linsol
-    static void deserialize(DeSerializer& s, Info& info) {
-      s.unpack("PluginInterface::plugin_name", info.plugin_name);
-    }
-
     // Construct Function from serialization
-    static Function deserialize(DeSerializer& s) {
+    static ProtoFunction* deserialize(DeSerializer& s) {
       std::string class_name, plugin_name;
-      s.unpack("Function::plugin::class_name", class_name);
-
       s.unpack("PluginInterface::plugin_name", plugin_name);
-
-      auto & map = plugin_deserialize_map(plugin_name);
-      auto it = map.find(class_name);
-      casadi_assert(it!=map.end(), "Plugin class '" + class_name + "' not found.");
-
-      Function ret;
-      ret.own(it->second(s));
-      ret->finalize();
-      return ret;
+      Deserialize deserialize = plugin_deserialize(plugin_name);
+      return deserialize(s);
     }
 
   };
@@ -202,10 +182,10 @@ namespace casadi {
   }
 
   template<class Derived>
-  const DeserializeMap& PluginInterface<Derived>::plugin_deserialize_map(const std::string& pname) {
-    const DeserializeMap *m = getPlugin(pname).deserialize_map;
-    casadi_assert(m, "Plugin \"" + pname + "\" does not support deserialize_map");
-    return *m;
+  Deserialize PluginInterface<Derived>::plugin_deserialize(const std::string& pname) {
+    Deserialize m = getPlugin(pname).deserialize;
+    casadi_assert(m, "Plugin \"" + pname + "\" does not support deserialize");
+    return m;
   }
 
   template<class Derived>

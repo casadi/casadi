@@ -1042,26 +1042,18 @@ namespace casadi {
 
   void Function::serialize(Serializer &s) const {
     if (is_null()) {
-      s.pack("Function::class_name", std::string("null"));
+      s.pack("Function::null", true);
     } else {
-      s.pack("Function::class_name", (*this)->class_name());
+      s.pack("Function::null", false);
       (*this)->serialize(s);
     }
   }
 
   Function Function::deserialize(DeSerializer& s) {
-    std::string class_name;
-    s.unpack("Function::class_name", class_name);
-    if (class_name=="null") return Function();
-    auto it = FunctionInternal::deserialize_map.find(class_name);
-    if (it==FunctionInternal::deserialize_map.end()) {
-      std::string plugin_base;
-      s.unpack("Function::plugin::base_class_name", plugin_base);
-      it = FunctionInternal::deserialize_map.find(plugin_base);
-      return it->second(s);
-    } else {
-      return it->second(s);
-    }
+    bool is_null;
+    s.unpack("Function::null", is_null);
+    if (is_null) return Function();
+    return FunctionInternal::deserialize(s);
   }
 
   std::string Function::export_code(const std::string& lang, const Dict& options) const {

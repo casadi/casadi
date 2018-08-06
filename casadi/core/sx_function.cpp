@@ -911,22 +911,37 @@ namespace casadi {
 
   }
 
-  SXFunction::SXFunction(const Info& e) :
-    XFunction<SXFunction, SX, SXNode>(e.xfunction),
-    algorithm_(e.algorithm), worksize_(e.worksize),
-    free_vars_(e.free_vars), operations_(e.operations),
-    constants_(e.constants), default_in_(e.default_in) {
+  SXFunction::SXFunction(DeSerializer& s) :
+    XFunction<SXFunction, SX, SXNode>(s) {
+
+    size_t n_instructions;
+    s.unpack("SXFunction::n_instr", n_instructions);
+
+    s.unpack("SXFunction::worksize", worksize_);
+    s.unpack("SXFunction::free_vars", free_vars_);
+    s.unpack("SXFunction::operations", operations_);
+    s.unpack("SXFunction::constants", constants_);
+    s.unpack("SXFunction::default_in", default_in_);
+
+    algorithm_.resize(n_instructions);
+    for (casadi_int k=0;k<n_instructions;++k) {
+      AlgEl& e = algorithm_[k];
+      s.unpack("SXFunction::ScalarAtomic::op", e.op);
+      s.unpack("SXFunction::ScalarAtomic::i0", e.i0);
+      s.unpack("SXFunction::ScalarAtomic::i1", e.i1);
+      s.unpack("SXFunction::ScalarAtomic::i2", e.i2);
+    }
 
     // Default (persistent) options
     just_in_time_opencl_ = false;
     just_in_time_sparsity_ = false;
   }
 
-  void SXFunction::serialize(Serializer &s) const {
-    FunctionInternal::serialize(s);
-    s.pack("SXFunction::n_instr", casadi_int(algorithm_.size()));
+  void SXFunction::serialize_body(Serializer &s) const {
+    XFunction<SXFunction, SX, SXNode>::serialize_body(s);
+    s.pack("SXFunction::n_instr", algorithm_.size());
 
-    s.pack("SXFunction::worksize", casadi_int(worksize_));
+    s.pack("SXFunction::worksize", worksize_);
     s.pack("SXFunction::free_vars", free_vars_);
     s.pack("SXFunction::operations", operations_);
     s.pack("SXFunction::constants", constants_);
@@ -939,39 +954,10 @@ namespace casadi {
       s.pack("SXFunction::ScalarAtomic::i1", e.i1);
       s.pack("SXFunction::ScalarAtomic::i2", e.i2);
     }
-
-    s.pack(in_);
-    s.pack(out_);
   }
 
-  Function SXFunction::deserialize(DeSerializer& s) {
-    Info info;
-    FunctionInternal::deserialize(s, info.xfunction.function);
-    casadi_int n_instructions;
-    s.unpack("SXFunction::n_instr", n_instructions);
-
-    s.unpack("SXFunction::worksize", info.worksize);
-    s.unpack("SXFunction::free_vars", info.free_vars);
-    s.unpack("SXFunction::operations", info.operations);
-    s.unpack("SXFunction::constants", info.constants);
-    s.unpack("SXFunction::default_in", info.default_in);
-
-    info.algorithm.resize(n_instructions);
-    for (casadi_int k=0;k<n_instructions;++k) {
-      AlgEl& e = info.algorithm[k];
-      s.unpack("SXFunction::ScalarAtomic::op", e.op);
-      s.unpack("SXFunction::ScalarAtomic::i0", e.i0);
-      s.unpack("SXFunction::ScalarAtomic::i1", e.i1);
-      s.unpack("SXFunction::ScalarAtomic::i2", e.i2);
-    }
-
-    s.unpack(info.xfunction.in);
-    s.unpack(info.xfunction.out);
-
-    Function ret;
-    ret.own(new SXFunction(info));
-    ret->finalize();
-    return ret;
+  ProtoFunction* SXFunction::deserialize(DeSerializer& s) {
+    return new SXFunction(s);
   }
 
 } // namespace casadi

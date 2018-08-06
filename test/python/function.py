@@ -905,7 +905,7 @@ class Functiontests(casadiTestCase):
     for a,r in pairs:
       self.assertTrue(same(F(a), r))
       self.check_codegen(F,inputs=[a])
-
+      self.check_serialize(F,[a])
 
     X = MX.sym("x")
 
@@ -926,6 +926,7 @@ class Functiontests(casadiTestCase):
     for a,r in pairs:
       self.assertTrue(same(J(a), r))
       self.check_codegen(J,inputs=[a])
+      self.check_serialize(J,[a])
 
   def test_2d_interpolant(self):
     grid = [[0, 1, 4, 5],
@@ -1682,7 +1683,7 @@ class Functiontests(casadiTestCase):
 
 
   def test_serialize(self):
-    for opts in [{},{"debug":True}]:
+    for opts in [{"debug":True},{}]:
       x = SX.sym("x")
       y = x+3
       z = sin(y)
@@ -1716,43 +1717,43 @@ class Functiontests(casadiTestCase):
       self.checkfunction(f,fs,inputs=[3.7,np.array([[1,0,0],[2,3,0],[4,5,6]])],hessian=False)
 
 
-    fs = pickle.loads(pickle.dumps(f))
-    self.checkfunction(f,fs,inputs=[3.7,np.array([[1,0,0],[2,3,0],[4,5,6]])],hessian=False)
+      fs = Function.deserialize(f.serialize(opts))
+      self.checkfunction(f,fs,inputs=[3.7,np.array([[1,0,0],[2,3,0],[4,5,6]])],hessian=False)
 
-    x = SX.sym("x")
-    p = SX.sym("p")
+      x = SX.sym("x")
+      p = SX.sym("p")
 
-    f = Function('f',[x],[p])
+      f = Function('f',[x],[p])
 
-    #SXFunction with free parameters
-    pickle.loads(pickle.dumps(f))
-
-
-    x = MX.sym("x")
-    f = Function('f',[x],[x**2])
-
-    fs = pickle.loads(pickle.dumps(f))
-    self.checkfunction(f,fs,inputs=[3.7],hessian=False)
+      #SXFunction with free parameters
+      pickle.loads(pickle.dumps(f))
 
 
-    x = MX.sym("x")
-    y = MX.sym("y",2)
+      x = MX.sym("x")
+      f = Function('f',[x],[x**2])
 
-    w = if_else(x, atan2(3*norm_fro(y)*y,x), x-y, True)
-    z = sin(2*x)*w[0]+1
-    g = Function("g",[x,y],[w-x])
-    gmap = g.map(2, "thread", 2)
-    gmapsx = gmap.expand()
+      fs = Function.deserialize(f.serialize(opts))
+      self.checkfunction(f,fs,inputs=[3.7],hessian=False)
 
-    q = gmap(horzcat(2*x,x-y[1]),horzcat(z+y,cos(z+y)))+1/gmapsx(horzcat(2*x,x-y[1]),repmat(z+y,1,2))
 
-    q = solve(q,2*y,"lapackqr")
-    q+= bilin(DM([[1,3],[7,8]]),q,2*q)
-    
-    f = Function("f",[x,y],[q+1,jacobian(q, vertcat(x, y))])
+      x = MX.sym("x")
+      y = MX.sym("y",2)
 
-    fs = pickle.loads(pickle.dumps(f))
-    self.checkfunction(f,fs,inputs=[1.1, vertcat(2.7,3)],hessian=False)
+      w = if_else(x, atan2(3*norm_fro(y)*y,x), x-y, True)
+      z = sin(2*x)*w[0]+1
+      g = Function("g",[x,y],[w-x])
+      gmap = g.map(2, "thread", 2)
+      gmapsx = gmap.expand()
+
+      q = gmap(horzcat(2*x,x-y[1]),horzcat(z+y,cos(z+y)))+1/gmapsx(horzcat(2*x,x-y[1]),repmat(z+y,1,2))
+
+      q = solve(q,2*y,"lapackqr")
+      q+= bilin(DM([[1,3],[7,8]]),q,2*q)
+      
+      f = Function("f",[x,y],[q+1,jacobian(q, vertcat(x, y))])
+
+      fs = Function.deserialize(f.serialize(opts))
+      self.checkfunction(f,fs,inputs=[1.1, vertcat(2.7,3)],hessian=False)
 
 
   def test_string(self):

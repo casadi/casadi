@@ -210,11 +210,8 @@ namespace casadi {
     return ret;
   }
 
-  void Interpolant::serialize(Serializer &s) const {
-    FunctionInternal::serialize_plugin(s, "Interpolant");
-    PluginInterface<Interpolant>::serialize_plugin(s);
-
-    FunctionInternal::serialize(s);
+  void Interpolant::serialize_body(Serializer &s) const {
+    FunctionInternal::serialize_body(s);
 
     s.pack("Interpolant::ndim", ndim_);
     s.pack("Interpolant::m", m_);
@@ -224,26 +221,22 @@ namespace casadi {
     s.pack("Interpolant::lookup_modes", lookup_modes_);
   }
 
-  void Interpolant::deserialize(DeSerializer& s, Info& e) {
-    FunctionInternal::deserialize(s, e.function);
-
-    Interpolant::Info interp;
-    s.unpack("Interpolant::ndim", e.ndim);
-    s.unpack("Interpolant::m", e.m);
-    s.unpack("Interpolant::grid", e.grid);
-    s.unpack("Interpolant::offset", e.offset);
-    s.unpack("Interpolant::values", e.values);
-    s.unpack("Interpolant::lookup_modes", e.lookup_modes);
+  void Interpolant::serialize_header(Serializer &s) const {
+    FunctionInternal::serialize_header(s);
+    PluginInterface<Interpolant>::serialize_header(s);
   }
 
-  Function Interpolant::deserialize(DeSerializer& s) {
+  ProtoFunction* Interpolant::deserialize(DeSerializer& s) {
     return PluginInterface<Interpolant>::deserialize(s);
   }
 
-  Interpolant::Interpolant(const Info & e) :
-      FunctionInternal(e.function),
-      ndim_(e.ndim), m_(e.m), grid_(e.grid), offset_(e.offset),
-      values_(e.values), lookup_modes_(e.lookup_modes)  {
+  Interpolant::Interpolant(DeSerializer & s) : FunctionInternal(s) {
+    s.unpack("Interpolant::ndim", ndim_);
+    s.unpack("Interpolant::m", m_);
+    s.unpack("Interpolant::grid", grid_);
+    s.unpack("Interpolant::offset", offset_);
+    s.unpack("Interpolant::values", values_);
+    s.unpack("Interpolant::lookup_modes", lookup_modes_);
   }
 
 } // namespace casadi

@@ -29,6 +29,7 @@
 #include <stack>
 #include "function_internal.hpp"
 #include "factory.hpp"
+#include "serializer.hpp"
 
 // To reuse variables we need to be able to sort by sparsity pattern
 #include <unordered_map>
@@ -192,14 +193,9 @@ namespace casadi {
     Sparsity get_sparsity_out(casadi_int i) override { return out_.at(i).sparsity();}
     /// @}
 
-    struct Info  {
-      FunctionInternal::Info function;
-      std::vector<MatType> in;
-      std::vector<MatType> out;
-    };
-
     /** \brief  Info Constructor  */
-    explicit XFunction(const Info& e);
+    explicit XFunction(DeSerializer& s);
+    void serialize_body(Serializer &s) const override;
 
     // Data members (all public)
 
@@ -236,7 +232,18 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   XFunction<DerivedType, MatType, NodeType>::
-  XFunction(const Info& e) : FunctionInternal(e.function), in_(e.in),  out_(e.out) { }
+  XFunction(DeSerializer& s) : FunctionInternal(s) {
+    s.unpack("XFunction::in", in_);
+    s.unpack("XFunction::out", out_);
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>::
+  serialize_body(Serializer& s) const {
+    FunctionInternal::serialize_body(s);
+    s.pack("XFunction::in", in_);
+    s.pack("XFunction::out", out_);
+  }
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>::init(const Dict& opts) {

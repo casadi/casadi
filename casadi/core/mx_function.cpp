@@ -50,12 +50,6 @@ namespace casadi {
     XFunction<MXFunction, MX, MXNode>(name, inputv, outputv, name_in, name_out) {
   }
 
-  MXFunction::MXFunction(const Info& e) :
-    XFunction<MXFunction, MX, MXNode>(e.xfunction),
-    algorithm_(e.algorithm), workloc_(e.workloc), free_vars_(e.free_vars),
-    default_in_(e.default_in)  {
-  }
-
   MXFunction::~MXFunction() {
   }
 
@@ -1646,8 +1640,8 @@ namespace casadi {
     return dep.stats(1);
   }
 
-  void MXFunction::serialize(Serializer &s) const {
-    FunctionInternal::serialize(s);
+  void MXFunction::serialize_body(Serializer &s) const {
+    XFunction<MXFunction, MX, MXNode>::serialize_body(s);
     s.pack("MXFunction::n_instr", casadi_int(algorithm_.size()));
 
     // Loop over algorithm
@@ -1660,36 +1654,28 @@ namespace casadi {
     s.pack("MXFunction::workloc", workloc_);
     s.pack("MXFunction::free_vars", free_vars_);
     s.pack("MXFunction::default_in", default_in_);
-
-    s.pack(in_);
-    s.pack(out_);
   }
 
-  Function MXFunction::deserialize(DeSerializer& s) {
-    Info info;
-    FunctionInternal::deserialize(s, info.xfunction.function);
+
+  MXFunction::MXFunction(DeSerializer& s) : XFunction<MXFunction, MX, MXNode>(s) {
     casadi_int n_instructions;
     s.unpack("MXFunction::n_instr", n_instructions);
-    info.algorithm.resize(n_instructions);
+    algorithm_.resize(n_instructions);
     for (casadi_int k=0;k<n_instructions;++k) {
-      AlgEl& e = info.algorithm[k];
+      AlgEl& e = algorithm_[k];
       s.unpack("MXFunction::alg::data", e.data);
       e.op = e.data.op();
       s.unpack("MXFunction::alg::arg", e.arg);
       s.unpack("MXFunction::alg::res", e.res);
     }
 
-    s.unpack("MXFunction::workloc", info.workloc);
-    s.unpack("MXFunction::free_vars", info.free_vars);
-    s.unpack("MXFunction::default_in", info.default_in);
+    s.unpack("MXFunction::workloc", workloc_);
+    s.unpack("MXFunction::free_vars", free_vars_);
+    s.unpack("MXFunction::default_in", default_in_);
+  }
 
-    s.unpack(info.xfunction.in);
-    s.unpack(info.xfunction.out);
-
-    Function ret;
-    ret.own(new MXFunction(info));
-    ret->finalize();
-    return ret;
+  ProtoFunction* MXFunction::deserialize(DeSerializer& s) {
+    return new MXFunction(s);
   }
 
 } // namespace casadi

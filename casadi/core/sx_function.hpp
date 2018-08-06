@@ -182,25 +182,14 @@ class CASADI_EXPORT SXFunction :
   /// Default input values
   std::vector<double> default_in_;
 
-
-  struct Info  {
-    XFunction<SXFunction, Matrix<SXElem>, SXNode>::Info xfunction;
-    std::vector<AlgEl> algorithm;
-    casadi_int worksize;
-    std::vector<SXElem> free_vars;
-    std::vector<SXElem> operations;
-    std::vector<SXElem> constants;
-    std::vector<double> default_in;
-  };
-
   /** \brief Constructor */
-  explicit SXFunction(const Info & e);
+  explicit SXFunction(DeSerializer& s);
 
   /** \brief Serialize */
-  void serialize(Serializer &s) const override;
+  void serialize_body(Serializer &s) const override;
 
   /** \brief Deserialize into MX */
-  static Function deserialize(DeSerializer& s);
+  static ProtoFunction* deserialize(DeSerializer& s);
 
   ///@{
   /** \brief Options */

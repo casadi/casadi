@@ -122,6 +122,15 @@ namespace casadi {
 
     // Maximum number of right-hand-sides
     casadi_int max_nrhs_;
+
+    // Serialize a disambiguated ProtoFunction
+    void serialize_body(Serializer &s) const override;
+
+    // Deserialize a ProtoFunction
+    static ProtoFunction* deserialize(DeSerializer& s) { return new LapackQr(s); }
+
+  protected:
+    explicit LapackQr(DeSerializer& e);
   };
 
 } // namespace casadi

@@ -38,31 +38,19 @@ namespace casadi {
     casadi_assert_dev(!f_.empty());
   }
 
-  void Switch::serialize(Serializer &s) const {
-    FunctionInternal::serialize(s);
+  void Switch::serialize_body(Serializer &s) const {
+    FunctionInternal::serialize_body(s);
     s.pack("Switch::f", f_);
     s.pack("Switch::f_def", f_def_);
     s.pack("Switch::project_in", project_in_);
     s.pack("Switch::project_out", project_out_);
   }
 
-  Function Switch::deserialize(DeSerializer& s) {
-    Info info;
-    FunctionInternal::deserialize(s, info.function);
-    s.unpack("Switch::f", info.f);
-    s.unpack("Switch::f_def", info.f_def);
-    s.unpack("Switch::project_in", info.project_in);
-    s.unpack("Switch::project_out", info.project_out);
-    Function ret;
-    ret.own(new Switch(info));
-    ret->finalize();
-    return ret;
-  }
-
-  Switch::Switch(const Info& e) :  FunctionInternal(e.function),
-      f_(e.f), f_def_(e.f_def),
-      project_in_(e.project_in), project_out_(e.project_out) {
-
+  Switch::Switch(DeSerializer& s) : FunctionInternal(s) {
+    s.unpack("Switch::f", f_);
+    s.unpack("Switch::f_def", f_def_);
+    s.unpack("Switch::project_in", project_in_);
+    s.unpack("Switch::project_out", project_out_);
   }
 
   Switch::~Switch() {

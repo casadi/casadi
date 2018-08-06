@@ -951,12 +951,8 @@ namespace casadi {
   }
 
 
-
-  void Nlpsol::serialize(Serializer &s) const {
-    FunctionInternal::serialize_plugin(s, "Nlpsol");
-    PluginInterface<Nlpsol>::serialize_plugin(s);
-
-    OracleFunction::serialize(s);
+  void Nlpsol::serialize_body(Serializer &s) const {
+    OracleFunction::serialize_body(s);
 
     s.pack("Nlpsol::nx", nx_);
     s.pack("Nlpsol::ng", ng_);
@@ -978,44 +974,34 @@ namespace casadi {
     s.pack("Nlpsol::mi", mi_);
   }
 
-  void Nlpsol::deserialize(DeSerializer& s, Info& e) {
-    OracleFunction::deserialize(s, e.oracle_function);
-
-    s.unpack("Nlpsol::nx", e.nx);
-    s.unpack("Nlpsol::ng", e.ng);
-    s.unpack("Nlpsol::np", e.np);
-    s.unpack("Nlpsol::fcallback", e.fcallback);
-    s.unpack("Nlpsol::callback_step", e.callback_step);
-    s.unpack("Nlpsol::error_on_fail", e.error_on_fail);
-    s.unpack("Nlpsol::eval_errors_fatal", e.eval_errors_fatal);
-    s.unpack("Nlpsol::warn_initial_bounds", e.warn_initial_bounds);
-    s.unpack("Nlpsol::iteration_callback_ignore_errors", e.iteration_callback_ignore_errors);
-    s.unpack("Nlpsol::calc_multipliers", e.calc_multipliers);
-    s.unpack("Nlpsol::calc_lam_x", e.calc_lam_x);
-    s.unpack("Nlpsol::calc_lam_p", e.calc_lam_p);
-    s.unpack("Nlpsol::calc_f", e.calc_f);
-    s.unpack("Nlpsol::calc_g", e.calc_g);
-    s.unpack("Nlpsol::bound_consistency", e.bound_consistency);
-    s.unpack("Nlpsol::no_nlp_grad", e.no_nlp_grad);
-    s.unpack("Nlpsol::discrete", e.discrete);
-    s.unpack("Nlpsol::mi", e.mi);
+  void Nlpsol::serialize_header(Serializer &s) const {
+    OracleFunction::serialize_header(s);
+    PluginInterface<Nlpsol>::serialize_header(s);
   }
 
-  Function Nlpsol::deserialize(DeSerializer& s) {
+  ProtoFunction* Nlpsol::deserialize(DeSerializer& s) {
     return PluginInterface<Nlpsol>::deserialize(s);
   }
 
-  Nlpsol::Nlpsol(const Info & e) :
-      OracleFunction(e.oracle_function),
-      nx_(e.nx), ng_(e.ng), np_(e.np),
-      fcallback_(e.fcallback), callback_step_(e.callback_step),
-      error_on_fail_(e.error_on_fail), eval_errors_fatal_(e.eval_errors_fatal),
-      warn_initial_bounds_(e.warn_initial_bounds),
-      iteration_callback_ignore_errors_(e.iteration_callback_ignore_errors),
-      calc_multipliers_(e.calc_multipliers), calc_lam_x_(e.calc_lam_x),
-      calc_lam_p_(e.calc_lam_p), calc_f_(e.calc_f), calc_g_(e.calc_g),
-      bound_consistency_(e.bound_consistency), discrete_(e.discrete),
-      mi_(e.mi) {
+  Nlpsol::Nlpsol(DeSerializer & s) : OracleFunction(s) {
+    s.unpack("Nlpsol::nx", nx_);
+    s.unpack("Nlpsol::ng", ng_);
+    s.unpack("Nlpsol::np", np_);
+    s.unpack("Nlpsol::fcallback", fcallback_);
+    s.unpack("Nlpsol::callback_step", callback_step_);
+    s.unpack("Nlpsol::error_on_fail", error_on_fail_);
+    s.unpack("Nlpsol::eval_errors_fatal", eval_errors_fatal_);
+    s.unpack("Nlpsol::warn_initial_bounds", warn_initial_bounds_);
+    s.unpack("Nlpsol::iteration_callback_ignore_errors", iteration_callback_ignore_errors_);
+    s.unpack("Nlpsol::calc_multipliers", calc_multipliers_);
+    s.unpack("Nlpsol::calc_lam_x", calc_lam_x_);
+    s.unpack("Nlpsol::calc_lam_p", calc_lam_p_);
+    s.unpack("Nlpsol::calc_f", calc_f_);
+    s.unpack("Nlpsol::calc_g", calc_g_);
+    s.unpack("Nlpsol::bound_consistency", bound_consistency_);
+    s.unpack("Nlpsol::no_nlp_grad", no_nlp_grad_);
+    s.unpack("Nlpsol::discrete", discrete_);
+    s.unpack("Nlpsol::mi", mi_);
   }
 
 } // namespace casadi

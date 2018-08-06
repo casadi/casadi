@@ -111,25 +111,23 @@ namespace casadi {
 
   const std::string LinsolInternal::infix_ = "linsol";
 
-  void LinsolInternal::serialize(Serializer &s) const {
-    ProtoFunction::serialize(s);
-    PluginInterface<LinsolInternal>::serialize_plugin(s);
-    s.pack("LinsolInternal::sp", sp_);
-    //Dict opts;
-    //PluginInterface<LinsolInternal>::serialize_options(s, opts);
+
+  void LinsolInternal::serialize_header(Serializer &s) const {
+    ProtoFunction::serialize_header(s);
+    PluginInterface<LinsolInternal>::serialize_header(s);
   }
 
-  Linsol LinsolInternal::deserialize(DeSerializer& s) {
-    ProtoFunction::Info proto;
-    ProtoFunction::deserialize(s, proto);
-    PluginInterface<LinsolInternal>::Info plugin;
-    PluginInterface<LinsolInternal>::deserialize(s, plugin);
+  void LinsolInternal::serialize_body(Serializer &s) const {
+    ProtoFunction::serialize_body(s);
+    s.pack("LinsolInternal::sp", sp_);
+  }
 
-//    Dict ops = PluginInterface<LinsolInternal>::deserialize_options();
+  LinsolInternal::LinsolInternal(DeSerializer& s) : ProtoFunction(s) {
+    s.unpack("LinsolInternal::sp", sp_);
+  }
 
-    Sparsity sp;
-    s.unpack("LinsolInternal::sp", sp);
-    return Linsol(proto.name, plugin.plugin_name, sp);
+  ProtoFunction* LinsolInternal::deserialize(DeSerializer& s) {
+    return PluginInterface<LinsolInternal>::deserialize(s);
   }
 
 } // namespace casadi

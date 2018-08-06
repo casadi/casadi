@@ -383,8 +383,8 @@ namespace casadi {
   }
 
 
-  void OracleFunction::serialize(Serializer &s) const {
-    FunctionInternal::serialize(s);
+  void OracleFunction::serialize_body(Serializer &s) const {
+    FunctionInternal::serialize_body(s);
 
     s.pack("OracleFunction::oracle", oracle_);
     s.pack("OracleFunction::common_options", common_options_);
@@ -399,12 +399,10 @@ namespace casadi {
     s.pack("OracleFunction::monitor", monitor_);
   }
 
-  void OracleFunction::deserialize(DeSerializer& s, Info& e) {
-    FunctionInternal::deserialize(s, e.function);
-
-    s.unpack("OracleFunction::oracle", e.oracle);
-    s.unpack("OracleFunction::common_options", e.common_options);
-    s.unpack("OracleFunction::specific_options", e.specific_options);
+  OracleFunction::OracleFunction(DeSerializer& s) : FunctionInternal(s) {
+    s.unpack("OracleFunction::oracle", oracle_);
+    s.unpack("OracleFunction::common_options", common_options_);
+    s.unpack("OracleFunction::specific_options", specific_options_);
     size_t size;
 
     s.unpack("OracleFunction::all_functions::size", size);
@@ -415,16 +413,9 @@ namespace casadi {
       s.unpack("OracleFunction::all_functions::value::f", r.f);
       s.unpack("OracleFunction::all_functions::value::jit", r.jit);
       s.unpack("OracleFunction::all_functions::value::monitored", r.monitored);
-      e.all_functions[key] = r;
+      all_functions_[key] = r;
     }
-    s.unpack("OracleFunction::monitor", e.monitor);
-  }
-
-  OracleFunction::OracleFunction(const Info & e) :
-      FunctionInternal(e.function),
-      oracle_(e.oracle), common_options_(e.common_options),
-      specific_options_(e.specific_options), all_functions_(e.all_functions),
-      monitor_(e.monitor) {
+    s.unpack("OracleFunction::monitor", monitor_);
   }
 
 } // namespace casadi

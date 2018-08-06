@@ -130,13 +130,17 @@ namespace casadi {
     casadi_int nnz() const { return sp_.nnz();}
 
     /** \brief Serialize */
-    void serialize(Serializer &s) const override;
+    void serialize_header(Serializer &s) const override;
+    void serialize_body(Serializer &s) const override;
 
     /** \brief Build function from serialization */
-    static Linsol deserialize(DeSerializer& s);
+    static ProtoFunction* deserialize(DeSerializer& s);
 
     // Sparsity pattern of the linear system
     Sparsity sp_;
+
+  protected:
+    explicit LinsolInternal(DeSerializer& s);
   };
 
 } // namespace casadi

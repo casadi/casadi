@@ -546,10 +546,10 @@ class casadiTestCase(unittest.TestCase):
       if isinstance(inputs, dict):
         self.assertEqual(F.name_out(), F2.name_out())
         for k in F.name_out():
-          self.checkarray(Fout[k],Fout2[k])
+          self.checkarray(Fout[k],Fout2[k],digits=16)
       else:
         for i in range(F.n_out()):
-          self.checkarray(Fout[i],Fout2[i])
+          self.checkarray(Fout[i],Fout2[i],digits=16)
 
 class run_only(object):
   def __init__(self, args):

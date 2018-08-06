@@ -133,23 +133,16 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override { return {{"f", f_}, {"n", n_}}; }
 
-    struct Info {
-      FunctionInternal::Info function;
-      Function f;
-      casadi_int n;
-    };
-
     /** \brief Serialize */
-    void serialize(Serializer &s) const override;
+    void serialize_body(Serializer &s) const override;
+    void serialize_header(Serializer &s) const override;
 
+    std::string serialize_base_function() const { return "Map"; }
     /** \brief Deserialize into MX */
-    static Function deserialize(DeSerializer& s);
-
-    /** \brief Deserialize into MX */
-    static void deserialize(DeSerializer& s, Info& e);
+    static ProtoFunction* deserialize(DeSerializer& s);
 
   protected:
-    explicit Map(const Info& e);
+    explicit Map(DeSerializer& s);
 
     // Constructor (protected, use create function)
     Map(const std::string& name, const Function& f, casadi_int n);
@@ -192,11 +185,8 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override;
 
-    /** \brief Deserialize into MX */
-    static Function deserialize(DeSerializer& s);
-
   protected:
-    explicit OmpMap(const Map::Info& e) : Map(e) {}
+    explicit OmpMap(DeSerializer& s) : Map(s) {}
   };
 
   /** A map Evaluate in parallel using std::thread
@@ -230,11 +220,8 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override;
 
-    /** \brief Deserialize into MX */
-    static Function deserialize(DeSerializer& s);
-
   protected:
-    explicit ThreadMap(const Map::Info& e) : Map(e) {}
+    explicit ThreadMap(DeSerializer& s) : Map(s) {}
   };
 
 } // namespace casadi

@@ -100,36 +100,14 @@ namespace casadi {
     /// Cache for KKT function
     mutable WeakRef kkt_;
 
-    struct Info  {
-      OracleFunction::Info oracle_function;
-      casadi_int nx;
-      casadi_int ng;
-      casadi_int np;
-      Function fcallback;
-      casadi_int callback_step;
-      bool error_on_fail;
-      bool eval_errors_fatal;
-      bool warn_initial_bounds;
-      bool iteration_callback_ignore_errors;
-      bool calc_multipliers;
-      bool calc_lam_x;
-      bool calc_lam_p;
-      bool calc_f;
-      bool calc_g;
-      bool bound_consistency;
-      bool no_nlp_grad;
-      std::vector<bool> discrete;
-      bool mi;
-    };
-
     /** \brief Serialize */
-    void serialize(Serializer &s) const override;
+    void serialize_body(Serializer &s) const override;
+    void serialize_header(Serializer &s) const override;
 
     /** \brief Deserialize into MX */
-    static Function deserialize(DeSerializer& s);
+    static ProtoFunction* deserialize(DeSerializer& s);
 
-    /** \brief Deserialize into MX */
-    static void deserialize(DeSerializer& s, Info& e);
+    std::string serialize_base_function() const { return "Nlpsol"; }
 
     /// Constructor
     Nlpsol(const std::string& name, const Function& oracle);
@@ -267,7 +245,7 @@ namespace casadi {
                                     const Dict& opts);
 
   protected:
-    explicit Nlpsol(const Nlpsol::Info& e);
+    explicit Nlpsol(DeSerializer& s);
   };
 
 } // namespace casadi

@@ -56,47 +56,34 @@ namespace casadi {
     : FunctionInternal(name), f_(f), n_(n) {
   }
 
-  Map::Map(const Info& e)
-    : FunctionInternal(e.function), f_(e.f), n_(e.n) {
-  }
-
-  void Map::serialize(Serializer &s) const {
-    FunctionInternal::serialize(s);
+  void Map::serialize_body(Serializer &s) const {
+    FunctionInternal::serialize_body(s);
     s.pack("Map::f", f_);
     s.pack("Map::n", n_);
   }
 
-  void Map::deserialize(DeSerializer& s, Info& e) {
-    FunctionInternal::deserialize(s, e.function);
-    s.unpack("Map::f", e.f);
-    s.unpack("Map::n", e.n);
+  void Map::serialize_header(Serializer &s) const {
+    FunctionInternal::serialize_header(s);
+    s.pack("Map::class_name", class_name());
   }
 
-  Function Map::deserialize(DeSerializer& s) {
-    Info info;
-    deserialize(s, info);
-    Function ret;
-    ret.own(new Map(info));
-    ret->finalize();
-    return ret;
+  Map::Map(DeSerializer& s) : FunctionInternal(s) {
+    s.unpack("Map::f", f_);
+    s.unpack("Map::n", n_);
   }
 
-  Function OmpMap::deserialize(DeSerializer& s) {
-    Info info;
-    Map::deserialize(s, info);
-    Function ret;
-    ret.own(new OmpMap(info));
-    ret->finalize();
-    return ret;
-  }
-
-  Function ThreadMap::deserialize(DeSerializer& s) {
-    Info info;
-    Map::deserialize(s, info);
-    Function ret;
-    ret.own(new ThreadMap(info));
-    ret->finalize();
-    return ret;
+  ProtoFunction* Map::deserialize(DeSerializer& s) {
+    std::string class_name;
+    s.unpack("Map::class_name", class_name);
+    if (class_name=="Map") {
+      return new Map(s);
+    } else if (class_name=="OmpMap") {
+      return new OmpMap(s);
+    } else if (class_name=="ThreadMap") {
+      return new ThreadMap(s);
+    } else {
+      casadi_error("class name '" + class_name + "' unknown.");
+    }
   }
 
   Map::~Map() {

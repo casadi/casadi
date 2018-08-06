@@ -36,7 +36,7 @@ namespace casadi {
     plugin->doc = LinearInterpolant::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &LinearInterpolant::options_;
-    plugin->deserialize_map = &LinearInterpolant::deserialize_map;
+    plugin->deserialize = &LinearInterpolant::deserialize;
     return 0;
   }
 
@@ -62,10 +62,6 @@ namespace casadi {
                     const vector<double>& values,
                     casadi_int m)
                     : Interpolant(name, grid, offset, values, m) {
-  }
-
-  LinearInterpolant::LinearInterpolant(const LinearInterpolant::Info& e) :
-      Interpolant(e.interpolant), lookup_mode_(e.lookup_mode) {
   }
 
   LinearInterpolant::~LinearInterpolant() {
@@ -151,35 +147,37 @@ namespace casadi {
       "arg[0]", g.constant(m->lookup_mode_), m->m_, "iw", "w") << "\n";
   }
 
-  FunctionInternal* LinearInterpolant::deserialize(DeSerializer& s) {
-    Info info;
-    Interpolant::deserialize(s, info.interpolant);
-    s.unpack("LinearInterpolant::lookup_mode", info.lookup_mode);
-    return new LinearInterpolant(info);
+
+  LinearInterpolant::LinearInterpolant(DeSerializer& s) : Interpolant(s) {
+    s.unpack("LinearInterpolant::lookup_mode", lookup_mode_);
   }
 
-  void LinearInterpolant::serialize(Serializer &s) const {
-    Interpolant::serialize(s);
+  ProtoFunction* LinearInterpolant::deserialize(DeSerializer& s) {
+    char type;
+    s.unpack("LinearInterpolant::type", type);
+    switch (type) {
+      case 'f': return new LinearInterpolant(s);
+      case 'j': return new LinearInterpolantJac(s);
+      default:
+        casadi_error("LinearInterpolant::deserialize error");
+    }
+  }
+
+  void LinearInterpolant::serialize_body(Serializer &s) const {
+    Interpolant::serialize_body(s);
     s.pack("LinearInterpolant::lookup_mode", lookup_mode_);
   }
 
-  FunctionInternal* LinearInterpolantJac::deserialize(DeSerializer& s) {
-    Info info;
-    FunctionInternal::deserialize(s, info.function);
-    return new LinearInterpolantJac(info);
+  void LinearInterpolant::serialize_header(Serializer &s) const {
+    Interpolant::serialize_header(s);
+    s.pack("LinearInterpolant::type", 'f');
   }
 
-  void LinearInterpolantJac::serialize(Serializer &s) const {
-    FunctionInternal::serialize_plugin(s, "Interpolant");
+  void LinearInterpolantJac::serialize_header(Serializer &s) const {
+    FunctionInternal::serialize_header(s);
     auto m = derivative_of_.get<LinearInterpolant>();
-    m->PluginInterface<Interpolant>::serialize_plugin(s);
-
-    FunctionInternal::serialize(s);
+    m->PluginInterface<Interpolant>::serialize_header(s);
+    s.pack("LinearInterpolant::type", 'j');
   }
-
-  DeserializeMap LinearInterpolant::deserialize_map = {
-    {"LinearInterpolant", LinearInterpolant::deserialize},
-    {"LinearInterpolantJac", LinearInterpolantJac::deserialize},
-  };
 
 } // namespace casadi

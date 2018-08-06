@@ -186,7 +186,10 @@ namespace casadi {
   }
 
   Linsol Linsol::deserialize(DeSerializer& s) {
-    return LinsolInternal::deserialize(s);
+    Linsol linsol;
+    linsol.own(LinsolInternal::deserialize(s));
+    linsol->finalize();
+    return linsol;
   }
 
 } // namespace casadi

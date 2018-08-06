@@ -103,22 +103,16 @@ namespace casadi {
     const Options& get_options() const override { return options_;}
     ///@}
 
-    struct Info {
-      Interpolant::Info interpolant;
-      std::vector<casadi_int> lookup_mode;
-    };
-
-    void serialize(Serializer &s) const override;
+    void serialize_body(Serializer &s) const override;
+    void serialize_header(Serializer &s) const override;
 
     /** \brief Deserialize into MX */
-    static FunctionInternal* deserialize(DeSerializer& s);
+    static ProtoFunction* deserialize(DeSerializer& s);
 
     std::vector<casadi_int> lookup_mode_;
 
-    static DeserializeMap deserialize_map;
-
     protected:
-      explicit LinearInterpolant(const LinearInterpolant::Info& e);
+      explicit LinearInterpolant(DeSerializer& e);
   };
 
   /** First order derivatives */
@@ -154,17 +148,11 @@ namespace casadi {
                                       const Dict& opts) const override;
     ///@}
 
-    struct Info {
-      FunctionInternal::Info function;
-    };
+    void serialize_header(Serializer &s) const override;
 
-    void serialize(Serializer &s) const override;
+    std::string serialize_base_function() const override { return "Interpolant"; }
 
-    /** \brief Deserialize into MX */
-    static FunctionInternal* deserialize(DeSerializer& s);
-
-    protected:
-      explicit LinearInterpolantJac(const Info& e) : FunctionInternal(e.function) {}
+    explicit LinearInterpolantJac(DeSerializer& s) : FunctionInternal(s) {}
   };
 
 } // namespace casadi
