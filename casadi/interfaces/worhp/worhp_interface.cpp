@@ -356,25 +356,23 @@ namespace casadi {
   int WorhpInterface::solve(void* mem) const {
     auto m = static_cast<WorhpMemory*>(mem);
 
-    if (m->lbg && m->ubg) {
-      for (casadi_int i=0; i<ng_; ++i) {
-        casadi_assert(!(m->lbg[i]==-inf && m->ubg[i] == inf),
+    for (casadi_int i=0; i<ng_; ++i) {
+        casadi_assert(!(m->lbz[nx_+i]==-inf && m->ubz[nx_+i] == inf),
                         "WorhpInterface::evaluate: Worhp cannot handle the case when both "
                         "LBG and UBG are infinite."
                         "You have that case at non-zero " + str(i)+ "."
                         "Reformulate your problem eliminating the corresponding constraint.");
-      }
     }
 
     // Pass inputs to WORHP data structures
-    casadi_copy(m->x, nx_, m->worhp_o.X);
-    casadi_copy(m->lbx, nx_, m->worhp_o.XL);
-    casadi_copy(m->ubx, nx_, m->worhp_o.XU);
-    casadi_copy(m->lam_x, nx_, m->worhp_o.Lambda);
+    casadi_copy(m->z, nx_, m->worhp_o.X);
+    casadi_copy(m->lbz, nx_, m->worhp_o.XL);
+    casadi_copy(m->ubz, nx_, m->worhp_o.XU);
+    casadi_copy(m->lam, nx_, m->worhp_o.Lambda);
     if (m->worhp_o.m>0) {
-      casadi_copy(m->lam_g, ng_, m->worhp_o.Mu);
-      casadi_copy(m->lbg, ng_, m->worhp_o.GL);
-      casadi_copy(m->ubg, ng_, m->worhp_o.GU);
+      casadi_copy(m->lam+nx_, ng_, m->worhp_o.Mu);
+      casadi_copy(m->lbz+nx_, ng_, m->worhp_o.GL);
+      casadi_copy(m->ubz+nx_, ng_, m->worhp_o.GU);
     }
 
     // Replace infinite bounds with m->worhp_p.Infty
@@ -513,10 +511,10 @@ namespace casadi {
     }
 
     // Copy outputs
-    casadi_copy(m->worhp_o.X, nx_, m->x);
-    casadi_copy(m->worhp_o.G, ng_, m->g);
-    casadi_copy(m->worhp_o.Lambda, nx_, m->lam_x);
-    casadi_copy(m->worhp_o.Mu, ng_, m->lam_g);
+    casadi_copy(m->worhp_o.X, nx_, m->z);
+    casadi_copy(m->worhp_o.G, ng_, m->z+nx_);
+    casadi_copy(m->worhp_o.Lambda, nx_, m->lam);
+    casadi_copy(m->worhp_o.Mu, ng_, m->lam+nx_);
 
     StatusMsg(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
 
