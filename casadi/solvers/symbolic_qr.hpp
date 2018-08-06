@@ -120,6 +120,16 @@ namespace casadi {
 
     // Generated function options
     Dict fopts_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new SymbolicQr(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit SymbolicQr(DeSerializer& e);
   };
 
 } // namespace casadi

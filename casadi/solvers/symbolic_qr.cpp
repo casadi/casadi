@@ -40,6 +40,7 @@ namespace casadi {
     plugin->doc = SymbolicQr::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &SymbolicQr::options_;
+    plugin->deserialize = &SymbolicQr::deserialize;
     return 0;
   }
 
@@ -224,6 +225,21 @@ namespace casadi {
     res.resize(max(res.size(), f.sz_res()));
     iw.resize(max(iw.size(), f.sz_iw()));
     w.resize(max(w.size(), f.sz_w()));
+  }
+
+  SymbolicQr::SymbolicQr(DeSerializer& s) : LinsolInternal(s) {
+    s.unpack("SymbolicQr::factorize", factorize_);
+    s.unpack("SymbolicQr::solve", solve_);
+    s.unpack("SymbolicQr::solveT", solveT_);
+    s.unpack("SymbolicQr::fopts", fopts_);
+  }
+
+  void SymbolicQr::serialize_body(Serializer &s) const {
+    LinsolInternal::serialize_body(s);
+    s.pack("SymbolicQr::factorize", factorize_);
+    s.pack("SymbolicQr::solve", solve_);
+    s.pack("SymbolicQr::solveT", solveT_);
+    s.pack("SymbolicQr::fopts", fopts_);
   }
 
 } // namespace casadi

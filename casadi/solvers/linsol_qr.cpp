@@ -37,6 +37,7 @@ namespace casadi {
     plugin->doc = LinsolQr::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &LinsolQr::options_;
+    plugin->deserialize = &LinsolQr::deserialize;
     return 0;
   }
 
@@ -150,6 +151,23 @@ namespace casadi {
 
     // End of block
     g << "}\n";
+  }
+
+  LinsolQr::LinsolQr(DeSerializer& s) : LinsolInternal(s) {
+    s.unpack("LinsolQr::prinv", prinv_);
+    s.unpack("LinsolQr::pc", pc_);
+    s.unpack("LinsolQr::sp_v", sp_v_);
+    s.unpack("LinsolQr::sp_r", sp_r_);
+    s.unpack("LinsolQr::eps", eps_);
+  }
+
+  void LinsolQr::serialize_body(Serializer &s) const {
+    LinsolInternal::serialize_body(s);
+    s.pack("LinsolQr::prinv", prinv_);
+    s.pack("LinsolQr::pc", pc_);
+    s.pack("LinsolQr::sp_v", sp_v_);
+    s.pack("LinsolQr::sp_r", sp_r_);
+    s.pack("LinsolQr::eps", eps_);
   }
 
 } // namespace casadi

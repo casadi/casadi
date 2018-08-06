@@ -37,6 +37,7 @@ namespace casadi {
     plugin->doc = LapackLu::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &LapackLu::options_;
+    plugin->deserialize = &LapackLu::deserialize;
     return 0;
   }
 
@@ -186,6 +187,17 @@ namespace casadi {
             x[i+rhs*nrow] *= m->c[i];
     }
     return 0;
+  }
+
+  LapackLu::LapackLu(DeSerializer& s) : LinsolInternal(s) {
+    s.unpack("LapackLu::equilibriate", equilibriate_);
+    s.unpack("LapackLu::allow_equilibration_failure", allow_equilibration_failure_);
+  }
+
+  void LapackLu::serialize_body(Serializer &s) const {
+    LinsolInternal::serialize_body(s);
+    s.pack("LapackLu::equilibriate", equilibriate_);
+    s.pack("LapackLu::allow_equilibration_failure", allow_equilibration_failure_);
   }
 
 } // namespace casadi

@@ -37,6 +37,7 @@ namespace casadi {
     plugin->doc = LinsolLdl::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &LinsolLdl::options_;
+    plugin->deserialize = &LinsolLdl::deserialize;
     return 0;
   }
 
@@ -133,6 +134,17 @@ namespace casadi {
 
     // End of block
     g << "}\n";
+  }
+
+  LinsolLdl::LinsolLdl(DeSerializer& s) : LinsolInternal(s) {
+    s.unpack("LinsolLdl::p", p_);
+    s.unpack("LinsolLdl::sp_Lt", sp_Lt_);
+  }
+
+  void LinsolLdl::serialize_body(Serializer &s) const {
+    LinsolInternal::serialize_body(s);
+    s.pack("LinsolLdl::p", p_);
+    s.pack("LinsolLdl::sp_Lt", sp_Lt_);
   }
 
 } // namespace casadi

@@ -130,7 +130,8 @@ namespace casadi {
     static ProtoFunction* deserialize(DeSerializer& s) { return new LapackQr(s); }
 
   protected:
-    explicit LapackQr(DeSerializer& e);
+    /** \brief Deserializing constructor */
+    explicit LapackQr(DeSerializer& s);
   };
 
 } // namespace casadi

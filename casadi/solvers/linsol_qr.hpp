@@ -103,6 +103,16 @@ namespace casadi {
     std::vector<casadi_int> prinv_, pc_;
     Sparsity sp_v_, sp_r_;
     double eps_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new LinsolQr(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit LinsolQr(DeSerializer& e);
   };
 
 } // namespace casadi
