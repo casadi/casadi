@@ -1279,6 +1279,9 @@
 %exception  casadi::LapackLu::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::LapackLu::serialize_body(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::LapackQr::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1399,6 +1402,9 @@
 %exception  casadi::LinsolLdl::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::LinsolLdl::serialize_body(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::LinsolQr::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1415,6 +1421,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinsolQr::plugin_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::LinsolQr::serialize_body(Serializer &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Lsqr::alloc_mem() const override {
@@ -2231,6 +2240,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SymbolicQr::plugin_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SymbolicQr::serialize_body(Serializer &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ThreadMap::class_name() const override {

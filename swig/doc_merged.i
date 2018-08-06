@@ -35978,9 +35978,11 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring") casadi::LinsolQr::colind "
+%feature("docstring") casadi::LinsolQr::nfact "
 
-[INTERNAL] ";
+[INTERNAL]  Numeric factorization.
+
+";
 
 %feature("docstring") casadi::LinsolQr::serialize_base_function "
 
@@ -36050,11 +36052,9 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring") casadi::LinsolQr::nfact "
+%feature("docstring") casadi::LinsolQr::colind "
 
-[INTERNAL]  Numeric factorization.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::LinsolQr::init_mem "
 

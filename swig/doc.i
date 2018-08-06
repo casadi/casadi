@@ -40830,8 +40830,8 @@ double *x, casadi_int nrhs, bool tr) const  "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::LapackLu::serialize_body(Serializer &s) const
+"
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -44653,7 +44653,7 @@ buf_sz, const char *fmt,...) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::LinsolInternal::serialize_body(Serializer &s)
+%feature("docstring")  casadi::LinsolLdl::serialize_body(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize an object without type information.
@@ -44919,8 +44919,8 @@ C++ includes: linsol_qr.hpp ";
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::LinsolQr::serialize_body(Serializer &s) const
+"
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -44983,9 +44983,12 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::colind() const  "
+%feature("docstring")  casadi::LinsolQr::nfact(void *mem, const double *A)
+const  "
 
-[INTERNAL] ";
+[INTERNAL]  Numeric factorization.
+
+";
 
 %feature("docstring")  casadi::ProtoFunction::serialize_base_function()
 const  "
@@ -45064,12 +45067,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::LinsolQr::nfact(void *mem, const double *A)
-const  "
+%feature("docstring")  casadi::LinsolInternal::colind() const  "
 
-[INTERNAL]  Numeric factorization.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::LinsolQr::init_mem(void *mem) const  "
 
@@ -74636,7 +74636,7 @@ const std::string &A, const std::string &x, casadi_int nrhs, bool tr) const
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::serialize_body(Serializer &s)
+%feature("docstring")  casadi::SymbolicQr::serialize_body(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize an object without type information.
