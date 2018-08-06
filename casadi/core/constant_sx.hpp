@@ -31,6 +31,8 @@
 #include <cassert>
 
 /// \cond INTERNAL
+class OneSX;
+
 
 // Cashing of constants requires a map
 #include <unordered_map>
@@ -64,16 +66,6 @@ casadi_int op() const override { return OP_CONST;}
 bool is_equal(const SXNode* node, casadi_int depth) const override {
   const ConstantSX* n = dynamic_cast<const ConstantSX*>(node);
   return n && n->to_double()==to_double();
-}
-
-void serialize_node(Serializer& s) const override {
-  s.pack("ConstantSX::val", to_double());
-}
-
-static SXElem deserialize(DeSerializer& s) {
-  double val;
-  s.unpack("ConstantSX::val", val);
-  return SXElem(val);
 }
 
 protected:
@@ -135,6 +127,11 @@ class RealtypeSX : public ConstantSX {
 
     bool is_almost_zero(double tol) const override { return fabs(value)<=tol; }
 
+    void serialize_node(Serializer& s) const override {
+      s.pack("ConstantSX::type", 'r');
+      s.pack("ConstantSX::value", value);
+    }
+
   protected:
     /** \brief Hash map of all constants currently allocated
      * (storage is allocated for it in sx_element.cpp) */
@@ -195,6 +192,11 @@ class IntegerSX : public ConstantSX {
     /** \brief  Properties */
     bool is_integer() const override { return true; }
 
+    void serialize_node(Serializer& s) const override {
+      s.pack("ConstantSX::type", 'i');
+      s.pack("ConstantSX::value", value);
+    }
+
   protected:
 
     /** \brief Hash map of all constants currently allocated
@@ -227,6 +229,10 @@ public:
   bool is_zero() const override { return true; }
   bool is_almost_zero(double tol) const override { return true; }
   ///@}
+
+  void serialize_node(Serializer& s) const override {
+    s.pack("ConstantSX::type", '0');
+  }
 };
 
 
@@ -247,6 +253,10 @@ public:
   /** \brief  Properties */
   bool is_integer() const override { return true; }
   bool is_one() const override { return true; }
+
+  void serialize_node(Serializer& s) const override {
+    s.pack("ConstantSX::type", '1');
+  }
 
 };
 
@@ -273,6 +283,10 @@ public:
   bool is_minus_one() const override { return true; }
   ///@}
 
+  void serialize_node(Serializer& s) const override {
+    s.pack("ConstantSX::type", 'm');
+  }
+
 };
 
 
@@ -291,6 +305,10 @@ public:
 
   /** \brief  Properties */
   bool is_inf() const override { return true; }
+
+  void serialize_node(Serializer& s) const override {
+    s.pack("ConstantSX::type", 'F');
+  }
 
 };
 
@@ -311,6 +329,10 @@ public:
   /** \brief  Properties */
   bool is_minus_inf() const override { return true; }
 
+  void serialize_node(Serializer& s) const override {
+    s.pack("ConstantSX::type", 'f');
+  }
+
 };
 
 
@@ -330,7 +352,36 @@ public:
   /** \brief  Properties */
   bool is_nan() const override { return true; }
 
+  void serialize_node(Serializer& s) const override {
+    s.pack("ConstantSX::type", 'n');
+  }
+
 };
+
+inline SXNode* ConstantSX_deserialize(DeSerializer& s) {
+  char type;
+  s.unpack("ConstantSX::type", type);
+  switch (type) {
+    case '1': return new OneSX();
+    case '0': return new ZeroSX();
+    case 'r': {
+      double value;
+      s.unpack("ConstantSX::value", value);
+      return RealtypeSX::create(value);
+    }
+    case 'i': {
+      int value;
+      s.unpack("ConstantSX::value", value);
+      return IntegerSX::create(value);
+    }
+    case 'n': return new NanSX();
+    case 'f': return new MinusInfSX();
+    case 'F': return new InfSX();
+    case 'm': return new MinusOneSX();
+    default: casadi_error("ConstantSX::deserialize error");
+  }
+}
+
 
 } // namespace casadi
 /// \endcond

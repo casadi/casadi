@@ -207,7 +207,7 @@ namespace casadi {
     serialize_node(s);
   }
 
-  SXElem SXNode::deserialize(DeSerializer& s) {
+  SXNode* SXNode::deserialize(DeSerializer& s) {
     casadi_int op;
     s.unpack("SXNode::op", op);
 
@@ -227,9 +227,9 @@ namespace casadi {
 
 
   // Note: binary/unary operations are ommitted here
-  std::map<casadi_int, SXElem (*)(DeSerializer&)> SXNode::deserialize_map = {
+  std::map<casadi_int, SXNode* (*)(DeSerializer&)> SXNode::deserialize_map = {
     {OP_PARAMETER, SymbolicSX::deserialize},
-    {OP_CONST, ConstantSX::deserialize}};
+    {OP_CONST, ConstantSX_deserialize}};
 
 
 } // namespace casadi

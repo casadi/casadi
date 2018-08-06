@@ -137,9 +137,9 @@ namespace casadi {
 
     virtual void serialize_node(Serializer& s) const;
 
-    static SXElem deserialize(DeSerializer& s);
+    static SXNode* deserialize(DeSerializer& s);
 
-    static std::map<casadi_int, SXElem (*)(DeSerializer&)> deserialize_map;
+    static std::map<casadi_int, SXNode* (*)(DeSerializer&)> deserialize_map;
 
 
   };

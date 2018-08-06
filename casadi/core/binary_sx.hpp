@@ -115,11 +115,11 @@ class BinarySX : public SXNode {
       s.pack("UnarySX::dep1", dep1_);
     }
 
-    static SXElem deserialize(DeSerializer& s, casadi_int op) {
+    static SXNode* deserialize(DeSerializer& s, casadi_int op) {
       SXElem dep0, dep1;
       s.unpack("UnarySX::dep0", dep0);
       s.unpack("UnarySX::dep1", dep1);
-      return create(op, dep0, dep1);
+      return new BinarySX(op, dep0, dep1);
     }
 };
 

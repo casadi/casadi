@@ -598,7 +598,7 @@ namespace casadi {
   }
 
   SXElem SXElem::deserialize(DeSerializer& s) {
-    return SXNode::deserialize(s);
+    return SXElem::create(SXNode::deserialize(s));
   }
 
 } // namespace casadi

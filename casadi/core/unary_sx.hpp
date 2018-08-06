@@ -102,10 +102,10 @@ class UnarySX : public SXNode {
       s.pack("UnarySX::dep", dep_);
     }
 
-    static SXElem deserialize(DeSerializer& s, casadi_int op) {
+    static SXNode* deserialize(DeSerializer& s, casadi_int op) {
       SXElem dep;
       s.unpack("UnarySX::dep", dep);
-      return create(op, dep);
+      return new UnarySX(op, dep);
     }
 };
 

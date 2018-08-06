@@ -66,10 +66,10 @@ public:
     s.pack("SymbolicSX::name", name_);
   }
 
-  static SXElem deserialize(DeSerializer& s) {
+  static SXNode* deserialize(DeSerializer& s) {
     std::string name;
     s.unpack("SymbolicSX::name", name);
-    return SXElem::sym(name);
+    return new SymbolicSX(name);
   }
 };
 
