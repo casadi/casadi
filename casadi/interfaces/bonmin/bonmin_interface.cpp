@@ -470,7 +470,7 @@ namespace casadi {
     }
 
     // Save results to outputs
-    casadi_copy(m->gk, ng_, m->g);
+    casadi_copy(m->gk, ng_, m->z + nx_);
     return 0;
   }
 
@@ -495,11 +495,11 @@ namespace casadi {
       if (!fcallback_.is_null()) {
         m->fstats.at("callback_fun").tic();
         if (full_callback) {
-          casadi_copy(x, nx_, m->x);
+          casadi_copy(x, nx_, m->z);
           for (casadi_int i=0; i<nx_; ++i) {
-            m->lam_x[i] = z_U[i]-z_L[i];
+            m->lam[i] = z_U[i]-z_L[i];
           }
-          casadi_copy(lambda, ng_, m->lam_g);
+          casadi_copy(lambda, ng_, m->lam + nx_);
           casadi_copy(g, ng_, m->gk);
         } else {
           if (iter==0) {
@@ -520,8 +520,8 @@ namespace casadi {
           m->arg[NLPSOL_F] = &obj_value;
           m->arg[NLPSOL_G] = g;
           m->arg[NLPSOL_LAM_P] = nullptr;
-          m->arg[NLPSOL_LAM_X] = m->lam_x;
-          m->arg[NLPSOL_LAM_G] = m->lam_g;
+          m->arg[NLPSOL_LAM_X] = m->lam;
+          m->arg[NLPSOL_LAM_G] = m->lam + nx_;
         }
 
         // Outputs
@@ -553,14 +553,13 @@ namespace casadi {
       const double* x, double obj_value) const {
     try {
       // Get primal solution
-      casadi_copy(x, nx_, m->x);
+      casadi_copy(x, nx_, m->z);
 
       // Get optimal cost
       m->f = obj_value;
 
       // Dual solution not calculated
-      casadi_fill(m->lam_x, nx_, nan);
-      casadi_fill(m->lam_g, ng_, nan);
+      casadi_fill(m->lam, nx_ + ng_, nan);
 
       // Get the constraints
       casadi_fill(m->gk, ng_, nan);
@@ -585,10 +584,10 @@ namespace casadi {
   get_bounds_info(BonminMemory* m, double* x_l, double* x_u,
                   double* g_l, double* g_u) const {
     try {
-      casadi_copy(m->lbx, nx_, x_l);
-      casadi_copy(m->ubx, nx_, x_u);
-      casadi_copy(m->lbg, ng_, g_l);
-      casadi_copy(m->ubg, ng_, g_u);
+      casadi_copy(m->lbz, nx_, x_l);
+      casadi_copy(m->ubz, nx_, x_u);
+      casadi_copy(m->lbz+nx_, ng_, g_l);
+      casadi_copy(m->ubz+nx_, ng_, g_u);
       return true;
     } catch(exception& ex) {
       uerr() << "get_bounds_info failed: " << ex.what() << endl;
@@ -603,20 +602,20 @@ namespace casadi {
     try {
       // Initialize primal variables
       if (init_x) {
-        casadi_copy(m->x, nx_, x);
+        casadi_copy(m->z, nx_, x);
       }
 
       // Initialize dual variables (simple bounds)
       if (init_z) {
         for (casadi_int i=0; i<nx_; ++i) {
-          z_L[i] = max(0., -m->lam_x[i]);
-          z_U[i] = max(0., m->lam_x[i]);
+          z_L[i] = max(0., -m->lam[i]);
+          z_U[i] = max(0., m->lam[i]);
         }
       }
 
       // Initialize dual variables (nonlinear bounds)
       if (init_lambda) {
-        casadi_copy(m->lam_g, ng_, lambda);
+        casadi_copy(m->lam + nx_, ng_, lambda);
       }
 
       return true;

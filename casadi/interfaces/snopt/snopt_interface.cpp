@@ -295,7 +295,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     m->return_status = -1;
 
     // Evaluate gradF and jacG at initial value
-    m->arg[0] = m->x;
+    m->arg[0] = m->z;
     m->arg[1] = m->p;
     m->res[0] = nullptr;
     m->res[1] = m->jac_gk;
@@ -342,20 +342,18 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     prob.iu = &m->memind;
 
     // Pass bounds
-    casadi_copy(m->lbx, nx_, get_ptr(m->bl));
-    casadi_copy(m->ubx, nx_, get_ptr(m->bu));
-    casadi_copy(m->lbg, ng_, get_ptr(m->bl) + nx_);
-    casadi_copy(m->ubg, ng_, get_ptr(m->bu) + nx_);
+    casadi_copy(m->lbz, nx_+ng_, get_ptr(m->bl));
+    casadi_copy(m->ubz, nx_+ng_, get_ptr(m->bu));
 
     for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bl[i])) m->bl[i] = -inf_;
     for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bu[i])) m->bu[i] = inf_;
     // Initialize states and slack
     casadi_fill(get_ptr(m->hs), ng_ + nx_, 0);
-    casadi_copy(m->x, nx_, get_ptr(m->xx));
+    casadi_copy(m->z, nx_, get_ptr(m->xx));
     casadi_fill(get_ptr(m->xx) + nx_, ng_, 0.);
 
     // Initialize multipliers
-    casadi_copy(m->lam_g, ng_, get_ptr(m->pi));
+    casadi_copy(m->lam + nx_, ng_, get_ptr(m->pi));
 
     // Set up Jacobian matrix
     copy_vector(A_structure_.colind(), m->locJ);
@@ -417,14 +415,14 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     casadi_scal(nx_ + ng_, -1., get_ptr(m->rc));
 
     // Get primal solution
-    casadi_copy(get_ptr(m->xx), nx_, m->x);
+    casadi_copy(get_ptr(m->xx), nx_, m->z);
 
     // Get dual solution
-    casadi_copy(get_ptr(m->rc), nx_, m->lam_x);
-    casadi_copy(get_ptr(m->rc)+nx_, ng_, m->lam_g);
+    casadi_copy(get_ptr(m->rc), nx_, m->lam);
+    casadi_copy(get_ptr(m->rc)+nx_, ng_, m->lam + nx_);
 
     // Copy optimal constraint values to output
-    casadi_copy(m->gk, ng_, m->g);
+    casadi_copy(m->gk, ng_, m->z + nx_);
 
     // Free memory
     deleteSNOPT(&prob);

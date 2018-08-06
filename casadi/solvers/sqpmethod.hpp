@@ -40,22 +40,19 @@ namespace casadi {
 
   struct CASADI_NLPSOL_SQPMETHOD_EXPORT SqpmethodMemory : public NlpsolMemory {
     /// Current and previous linearization point and candidate
-    double *x_cand;
+    double *z_cand;
 
     /// Lagrange gradient in the next iterate
     double *gLag, *gLag_old;
-
-    /// Constraint function value
-    double *g_cand;
 
     /// Gradient of the objective function
     double *gf;
 
     // Bounds of the QP
-    double *qp_LBA, *qp_UBA, *qp_LBX, *qp_UBX;
+    double *lbdz, *ubdz;
 
     // QP solution
-    double *dx, *qp_DUAL_X, *qp_DUAL_A;
+    double *dx, *dlam;
 
     // Current Jacobian
     double *Jk;
@@ -175,9 +172,9 @@ namespace casadi {
 
     // Solve the QP subproblem
     virtual void solve_QP(SqpmethodMemory* m, const double* H, const double* g,
-                          const double* lbx, const double* ubx,
-                          const double* A, const double* lbA, const double* ubA,
-                          double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const;
+                          const double* lbz, const double* ubz,
+                          const double* A,
+                          double* x_opt, double* dlam) const;
 
     /// A documentation string
     static const std::string meta_doc;

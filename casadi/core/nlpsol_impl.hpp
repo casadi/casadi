@@ -36,21 +36,18 @@ namespace casadi {
 
   /** \brief Integrator memory */
   struct CASADI_EXPORT NlpsolMemory : public OracleMemory {
-    // Bounds, given parameter values
-    const double *lbx, *ubx, *lbg, *ubg, *p;
-
+    // Variable bounds
+    double *lbz, *ubz;
+    // Parameter values
+    const double *p;
     // Current primal solution
-    double *x;
-
+    double *z;
     // Current dual solution
-    double *lam_g, *lam_x, *lam_p;
-
+    double *lam, *lam_p;
     // Outputs
-    double f, *g;
-
+    double f;
     // number of iterations
     casadi_int n_iter;
-
     // Success?
     bool success;
   };
@@ -90,6 +87,7 @@ namespace casadi {
     bool calc_multipliers_;
     bool calc_lam_x_, calc_lam_p_, calc_f_, calc_g_;
     bool bound_consistency_;
+    double min_lam_;
     bool no_nlp_grad_;
     std::vector<bool> discrete_;
     ///@}
@@ -200,15 +198,14 @@ namespace casadi {
     ///@}
 
     // Call the callback function
-    int callback(void* mem, const double* x, const double* f, const double* g,
-                 const double* lam_x, const double* lam_g, const double* lam_p) const;
+    int callback(NlpsolMemory* m) const;
 
     // Get KKT function
     Function kkt() const;
 
     // Make sure primal-dual solution is consistent with bounds
-    static void bound_consistency(casadi_int n, double* x, double* lam,
-                                  const double* lbx, const double* ubx);
+    static void bound_consistency(casadi_int n, double* z, double* lam,
+                                  const double* lbz, const double* ubz);
 
     // Creator function for internal class
     typedef Nlpsol* (*Creator)(const std::string& name, const Function& oracle);

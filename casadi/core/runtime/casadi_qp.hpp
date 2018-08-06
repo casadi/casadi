@@ -21,6 +21,8 @@ struct casadi_qp_prob {
   const casadi_int *sp_a, *sp_h, *sp_at, *sp_kkt;
   // Symbolic QR factorization
   const casadi_int *prinv, *pc, *sp_v, *sp_r;
+  // Smallest multiplier treated as inactive for the initial active set
+  T1 min_lam;
 };
 // C-REPLACE "casadi_qp_prob<T1>" "struct casadi_qp_prob"
 
@@ -139,7 +141,9 @@ int casadi_qp_reset(casadi_qp_data<T1>* d) {
     d->neverupper[i] = isinf(d->ubz[i]);
     d->neverlower[i] = isinf(d->lbz[i]);
     if (d->neverzero[i] && d->neverupper[i] && d->neverlower[i]) return 1;
-    // Correct initial active set if required
+    // Small enough lambdas are treated as inactive
+    if (!d->neverzero[i] && fabs(d->lam[i])<p->min_lam) d->lam[i] = 0.;
+    // Prevent illegal active sets
     if (d->neverzero[i] && d->lam[i]==0.) {
       d->lam[i] = d->neverupper[i]
                 || d->z[i]-d->lbz[i] <= d->ubz[i]-d->z[i] ? -p->dmin : p->dmin;

@@ -227,28 +227,22 @@ namespace casadi {
     }
 
     // Current linearization point
-    alloc_w(nx_, true); // x_cand_
+    alloc_w(nx_ + ng_, true); // z_cand
 
     // Lagrange gradient in the next iterate
     alloc_w(nx_, true); // gLag_
     alloc_w(nx_, true); // gLag_old_
 
-    // Constraint function value
-    alloc_w(ng_, true); // g_cand_
-
     // Gradient of the objective
     alloc_w(nx_, true); // gf_
 
     // Bounds of the QP
-    alloc_w(ng_, true); // qp_LBA
-    alloc_w(ng_, true); // qp_UBA
-    alloc_w(nx_, true); // qp_LBX
-    alloc_w(nx_, true); // qp_UBX
+    alloc_w(nx_+ng_, true); // lbdz
+    alloc_w(nx_+ng_, true); // ubdz
 
     // QP solution
     alloc_w(nx_, true); // dx_
-    alloc_w(nx_, true); // qp_DUAL_X_
-    alloc_w(ng_, true); // qp_DUAL_A_
+    alloc_w(nx_+ng_, true); // dlam
 
     // Hessian approximation
     alloc_w(Hsp_.nnz(), true); // Bk_
@@ -268,28 +262,22 @@ namespace casadi {
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     // Current linearization point
-    m->x_cand = w; w += nx_;
+    m->z_cand = w; w += nx_ + ng_;
 
     // Lagrange gradient in the next iterate
     m->gLag = w; w += nx_;
     m->gLag_old = w; w += nx_;
 
-    // Constraint function value
-    m->g_cand = w; w += ng_;
-
     // Gradient of the objective
     m->gf = w; w += nx_;
 
     // Bounds of the QP
-    m->qp_LBA = w; w += ng_;
-    m->qp_UBA = w; w += ng_;
-    m->qp_LBX = w; w += nx_;
-    m->qp_UBX = w; w += nx_;
+    m->lbdz = w; w += nx_ + ng_;
+    m->ubdz = w; w += nx_ + ng_;
 
     // QP solution
     m->dx = w; w += nx_;
-    m->qp_DUAL_X = w; w += nx_;
-    m->qp_DUAL_A = w; w += ng_;
+    m->dlam = w; w += nx_ + ng_;
 
     // Hessian approximation
     m->Bk = w; w += Hsp_.nnz();
@@ -329,25 +317,24 @@ namespace casadi {
     // MAIN OPTIMIZATION LOOP
     while (true) {
       // Evaluate f, g and first order derivative information
-      m->arg[0] = m->x;
+      m->arg[0] = m->z;
       m->arg[1] = m->p;
       m->res[0] = &m->f;
       m->res[1] = m->gf;
-      m->res[2] = m->g;
+      m->res[2] = m->z + nx_;
       m->res[3] = m->Jk;
       if (calc_function(m, "nlp_jac_fg")) return 1;
 
       // Evaluate the gradient of the Lagrangian
       casadi_copy(m->gf, nx_, m->gLag);
-      casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag, true);
-      casadi_axpy(nx_, 1., m->lam_x, m->gLag);
+      casadi_mv(m->Jk, Asp_, m->lam+nx_, m->gLag, true);
+      casadi_axpy(nx_, 1., m->lam, m->gLag);
 
       // Primal infeasability
-      double pr_inf = std::fmax(casadi_max_viol(nx_, m->x, m->lbx, m->ubx),
-                                casadi_max_viol(ng_, m->g, m->lbg, m->ubg));
+      double pr_inf = casadi_max_viol(nx_+ng_, m->z, m->lbz, m->ubz);
 
-      // inf-norm of lagrange gradient
-      double gLag_norminf = casadi_norm_inf(nx_, m->gLag);
+      // inf-norm of Lagrange gradient
+      double du_inf = casadi_norm_inf(nx_, m->gLag);
 
       // inf-norm of step
       double dx_norminf = casadi_norm_inf(nx_, m->dx);
@@ -355,19 +342,19 @@ namespace casadi {
       // Printing information about the actual iterate
       if (print_iteration_) {
         if (m->iter_count % 10 == 0) print_iteration();
-        print_iteration(m->iter_count, m->f, pr_inf, gLag_norminf, dx_norminf,
+        print_iteration(m->iter_count, m->f, pr_inf, du_inf, dx_norminf,
                         m->reg, ls_iter, ls_success);
       }
 
       // Callback function
-      if (callback(m, m->x, &m->f, m->g, m->lam_x, m->lam_g, nullptr)) {
+      if (callback(m)) {
         if (print_status_) print("WARNING(sqpmethod): Aborted by callback...\n");
         m->return_status = "User_Requested_Stop";
         break;
       }
 
       // Checking convergence criteria
-      if (m->iter_count >= min_iter_ && pr_inf < tol_pr_ && gLag_norminf < tol_du_) {
+      if (m->iter_count >= min_iter_ && pr_inf < tol_pr_ && du_inf < tol_du_) {
         if (print_status_)
           print("MESSAGE(sqpmethod): Convergence achieved after %d iterations\n", m->iter_count);
         m->return_status = "Solve_Succeeded";
@@ -390,10 +377,10 @@ namespace casadi {
 
       if (exact_hessian_) {
         // Update/reset exact Hessian
-        m->arg[0] = m->x;
+        m->arg[0] = m->z;
         m->arg[1] = m->p;
         m->arg[2] = &one;
-        m->arg[3] = m->lam_g;
+        m->arg[3] = m->lam + nx_;
         m->res[0] = m->Bk;
         if (calc_function(m, "nlp_hess_l")) return 1;
 
@@ -414,26 +401,21 @@ namespace casadi {
       }
 
       // Formulate the QP
-      casadi_copy(m->lbx, nx_, m->qp_LBX);
-      casadi_axpy(nx_, -1., m->x, m->qp_LBX);
-      casadi_copy(m->ubx, nx_, m->qp_UBX);
-      casadi_axpy(nx_, -1., m->x, m->qp_UBX);
-      casadi_copy(m->lbg, ng_, m->qp_LBA);
-      casadi_axpy(ng_, -1., m->g, m->qp_LBA);
-      casadi_copy(m->ubg, ng_, m->qp_UBA);
-      casadi_axpy(ng_, -1., m->g, m->qp_UBA);
+      casadi_copy(m->lbz, nx_+ng_, m->lbdz);
+      casadi_axpy(nx_+ng_, -1., m->z, m->lbdz);
+      casadi_copy(m->ubz, nx_+ng_, m->ubdz);
+      casadi_axpy(nx_+ng_, -1., m->z, m->ubdz);
 
       // Intitial guess
-      casadi_copy(m->lam_x, nx_, m->qp_DUAL_X);
-      casadi_copy(m->lam_g, ng_, m->qp_DUAL_A);
+      casadi_copy(m->lam, nx_+ng_, m->dlam);
       casadi_fill(m->dx, nx_, 0.);
 
       // Increase counter
       m->iter_count++;
 
       // Solve the QP
-      solve_QP(m, m->Bk, m->gf, m->qp_LBX, m->qp_UBX, m->Jk, m->qp_LBA,
-               m->qp_UBA, m->dx, m->qp_DUAL_X, m->qp_DUAL_A);
+      solve_QP(m, m->Bk, m->gf, m->lbdz, m->ubdz, m->Jk,
+               m->dx, m->dlam);
 
       // Detecting indefiniteness
       double gain = casadi_bilin(m->Bk, Hsp_, m->dx, m->dx);
@@ -442,12 +424,10 @@ namespace casadi {
       }
 
       // Calculate penalty parameter of merit function
-      m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_, m->qp_DUAL_X));
-      m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(ng_, m->qp_DUAL_A));
+      m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_+ng_, m->dlam));
 
       // Calculate L1-merit function in the actual iterate
-      double l1_infeas = std::fmax(casadi_max_viol(nx_, m->x, m->lbx, m->ubx),
-                                   casadi_max_viol(ng_, m->g, m->lbg, m->ubg));
+      double l1_infeas = casadi_max_viol(nx_+ng_, m->z, m->lbz, m->ubz);
 
       // Right-hand side of Armijo condition
       double F_sens = casadi_dot(nx_, m->dx, m->gf);
@@ -484,14 +464,14 @@ namespace casadi {
           ls_iter++;
 
           // Candidate step
-          casadi_copy(m->x, nx_, m->x_cand);
-          casadi_axpy(nx_, t, m->dx, m->x_cand);
+          casadi_copy(m->z, nx_, m->z_cand);
+          casadi_axpy(nx_, t, m->dx, m->z_cand);
 
           // Evaluating objective and constraints
-          m->arg[0] = m->x_cand;
+          m->arg[0] = m->z_cand;
           m->arg[1] = m->p;
           m->res[0] = &fk_cand;
-          m->res[1] = m->g_cand;
+          m->res[1] = m->z_cand + nx_;
           if (calc_function(m, "nlp_fg")) {
             // line-search failed, skip iteration
             t = beta_ * t;
@@ -499,8 +479,7 @@ namespace casadi {
           }
 
           // Calculating merit-function in candidate
-          l1_infeas = std::fmax(casadi_max_viol(nx_, m->x_cand, m->lbx, m->ubx),
-                                casadi_max_viol(ng_, m->g_cand, m->lbg, m->ubg));
+          l1_infeas = casadi_max_viol(nx_+ng_, m->z_cand, m->lbz, m->ubz);
           L1merit_cand = fk_cand + m->sigma * l1_infeas;
           if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
             break;
@@ -517,27 +496,24 @@ namespace casadi {
         }
 
         // Candidate accepted, update dual variables
-        casadi_scal(ng_, 1-t, m->lam_g);
-        casadi_axpy(ng_, t, m->qp_DUAL_A, m->lam_g);
-        casadi_scal(nx_, 1-t, m->lam_x);
-        casadi_axpy(nx_, t, m->qp_DUAL_X, m->lam_x);
+        casadi_scal(nx_ + ng_, 1-t, m->lam);
+        casadi_axpy(nx_+ng_, t, m->dlam, m->lam);
 
         casadi_scal(nx_, t, m->dx);
 
       } else {
         // Full step
-        casadi_copy(m->qp_DUAL_A, ng_, m->lam_g);
-        casadi_copy(m->qp_DUAL_X, nx_, m->lam_x);
+        casadi_copy(m->dlam, nx_ + ng_, m->lam);
       }
 
       // Take step
-      casadi_axpy(nx_, 1., m->dx, m->x);
+      casadi_axpy(nx_, 1., m->dx, m->z);
 
       if (!exact_hessian_) {
-        // Evaluate the gradient of the Lagrangian with the old x but new lam_g (for BFGS)
+        // Evaluate the gradient of the Lagrangian with the old x but new lam (for BFGS)
         casadi_copy(m->gf, nx_, m->gLag_old);
-        casadi_mv(m->Jk, Asp_, m->lam_g, m->gLag_old, true);
-        casadi_axpy(nx_, 1., m->lam_x, m->gLag_old);
+        casadi_mv(m->Jk, Asp_, m->lam+nx_, m->gLag_old, true);
+        casadi_axpy(nx_, 1., m->lam, m->gLag_old);
       }
     }
 
@@ -565,27 +541,26 @@ namespace casadi {
   }
 
   void Sqpmethod::solve_QP(SqpmethodMemory* m, const double* H, const double* g,
-                           const double* lbx, const double* ubx,
-                           const double* A, const double* lbA, const double* ubA,
-                           double* x_opt, double* lambda_x_opt, double* lambda_A_opt) const {
+                           const double* lbdz, const double* ubdz, const double* A,
+                           double* x_opt, double* dlam) const {
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
     m->arg[CONIC_H] = H;
     m->arg[CONIC_G] = g;
     m->arg[CONIC_X0] = x_opt;
-    m->arg[CONIC_LAM_X0] = lambda_x_opt;
-    m->arg[CONIC_LAM_A0] = lambda_A_opt;
-    m->arg[CONIC_LBX] = lbx;
-    m->arg[CONIC_UBX] = ubx;
+    m->arg[CONIC_LAM_X0] = dlam;
+    m->arg[CONIC_LAM_A0] = dlam + nx_;
+    m->arg[CONIC_LBX] = lbdz;
+    m->arg[CONIC_UBX] = ubdz;
     m->arg[CONIC_A] = A;
-    m->arg[CONIC_LBA] = lbA;
-    m->arg[CONIC_UBA] = ubA;
+    m->arg[CONIC_LBA] = lbdz+nx_;
+    m->arg[CONIC_UBA] = ubdz+nx_;
 
     // Outputs
     fill_n(m->res, qpsol_.n_out(), nullptr);
     m->res[CONIC_X] = x_opt;
-    m->res[CONIC_LAM_X] = lambda_x_opt;
-    m->res[CONIC_LAM_A] = lambda_A_opt;
+    m->res[CONIC_LAM_X] = dlam;
+    m->res[CONIC_LAM_A] = dlam + nx_;
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);

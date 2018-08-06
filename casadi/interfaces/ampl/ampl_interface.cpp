@@ -286,15 +286,15 @@ namespace casadi {
     // Primal intial guess
     nl << "x" << nx_ << "\n";
     for (casadi_int i=0; i<nx_; ++i) {
-      nl << i << " " << m->x[i] << "\n";
+      nl << i << " " << m->z[i] << "\n";
     }
 
 
     // Add constraint bounds
     nl << "r\n";
     for (casadi_int i=0; i<ng_; ++i) {
-      double lbg = m->lbg ? m->lbg[i] : 0;
-      double ubg = m->ubg ? m->ubg[i] : 0;
+      double lbg = m->lbz[i+nx_];
+      double ubg = m->ubz[i+nx_];
       if (isinf(lbg)) {
         if (isinf(ubg)) { // no constraint
           nl << "3\n";
@@ -315,8 +315,8 @@ namespace casadi {
     // Add variable bounds
     nl << "b\n";
     for (casadi_int i=0; i<nx_; ++i) {
-      double lbx = m->lbx ? m->lbx[i] : 0;
-      double ubx = m->ubx ? m->ubx[i] : 0;
+      double lbx = m->lbz[i];
+      double ubx = m->ubz[i];
       if (isinf(lbx)) {
         if (isinf(ubx)) { // no constraint
           nl << "3\n";
@@ -384,14 +384,14 @@ namespace casadi {
     // Get the primal solution
     for (casadi_int i=0; i<nx_; ++i) {
       istringstream s(sol_lines.at(sol_lines.size()-nx_+i-1));
-      s >> m->x[i];
+      s >> m->z[i + nx_];
     }
 
     // Get the dual solution
     for (casadi_int i=0; i<ng_; ++i) {
       istringstream s(sol_lines.at(sol_lines.size()-ng_-nx_+i-1));
-      s >> m->lam_g[i];
-      m->lam_g[i] *= -1;
+      s >> m->lam[i+nx_];
+      m->lam[i+nx_] *= -1;
     }
 
     // Close and delete .sol file
