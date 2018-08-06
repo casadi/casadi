@@ -362,8 +362,8 @@ inline SXNode* ConstantSX_deserialize(DeSerializer& s) {
   char type;
   s.unpack("ConstantSX::type", type);
   switch (type) {
-    case '1': return new OneSX();
-    case '0': return new ZeroSX();
+    case '1': return casadi_limits<SXElem>::one.get();
+    case '0': return casadi_limits<SXElem>::zero.get();
     case 'r': {
       double value;
       s.unpack("ConstantSX::value", value);
@@ -371,17 +371,17 @@ inline SXNode* ConstantSX_deserialize(DeSerializer& s) {
     }
     case 'i': {
       int value;
+      if (value==2) return casadi_limits<SXElem>::two.get();
       s.unpack("ConstantSX::value", value);
       return IntegerSX::create(value);
     }
-    case 'n': return new NanSX();
-    case 'f': return new MinusInfSX();
-    case 'F': return new InfSX();
-    case 'm': return new MinusOneSX();
+    case 'n': return casadi_limits<SXElem>::nan.get();
+    case 'f': return casadi_limits<SXElem>::minus_inf.get();
+    case 'F': return casadi_limits<SXElem>::inf.get();
+    case 'm': return casadi_limits<SXElem>::minus_one.get();
     default: casadi_error("ConstantSX::deserialize error");
   }
 }
-
 
 } // namespace casadi
 /// \endcond

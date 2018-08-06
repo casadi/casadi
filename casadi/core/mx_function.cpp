@@ -1642,7 +1642,7 @@ namespace casadi {
 
   void MXFunction::serialize_body(Serializer &s) const {
     XFunction<MXFunction, MX, MXNode>::serialize_body(s);
-    s.pack("MXFunction::n_instr", casadi_int(algorithm_.size()));
+    s.pack("MXFunction::n_instr", algorithm_.size());
 
     // Loop over algorithm
     for (const auto& e : algorithm_) {
@@ -1658,7 +1658,7 @@ namespace casadi {
 
 
   MXFunction::MXFunction(DeSerializer& s) : XFunction<MXFunction, MX, MXNode>(s) {
-    casadi_int n_instructions;
+    size_t n_instructions;
     s.unpack("MXFunction::n_instr", n_instructions);
     algorithm_.resize(n_instructions);
     for (casadi_int k=0;k<n_instructions;++k) {
