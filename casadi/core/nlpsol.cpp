@@ -976,7 +976,6 @@ namespace casadi {
     s.pack("Nlpsol::calc_g", calc_g_);
     s.pack("Nlpsol::min_lam", min_lam_);
     s.pack("Nlpsol::bound_consistency", bound_consistency_);
-    s.pack("Nlpsol::min_lam", min_lam_);
     s.pack("Nlpsol::no_nlp_grad", no_nlp_grad_);
     s.pack("Nlpsol::discrete", discrete_);
     s.pack("Nlpsol::mi", mi_);
