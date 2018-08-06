@@ -908,8 +908,8 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::serialize_header(Serializer& s) const {
-    MXNode::serialize_header(s);
+  void SetNonzerosVector<Add>::serialize_type(Serializer& s) const {
+    MXNode::serialize_type(s);
     s.pack("SetNonzeros::type", 'a');
   }
 
@@ -925,8 +925,8 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::serialize_header(Serializer& s) const {
-    MXNode::serialize_header(s);
+  void SetNonzerosSlice<Add>::serialize_type(Serializer& s) const {
+    MXNode::serialize_type(s);
     s.pack("SetNonzeros::type", 'b');
   }
 
@@ -944,8 +944,8 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::serialize_header(Serializer& s) const {
-    MXNode::serialize_header(s);
+  void SetNonzerosSlice2<Add>::serialize_type(Serializer& s) const {
+    MXNode::serialize_type(s);
     s.pack("SetNonzeros::type", 'c');
   }
 

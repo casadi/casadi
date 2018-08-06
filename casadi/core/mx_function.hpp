@@ -78,9 +78,6 @@ namespace casadi {
     std::vector<double> default_in_;
 
     /** \brief Constructor */
-    explicit MXFunction(DeSerializer& s);
-
-    /** \brief Constructor */
     MXFunction(const std::string& name,
       const std::vector<MX>& input, const std::vector<MX>& output,
       const std::vector<std::string>& name_in,
@@ -125,10 +122,10 @@ namespace casadi {
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override;
 
-    /** \brief Serialize */
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer &s) const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeSerializer& s);
 
     /** \brief Extract the residual function G and the modified function Z out of an expression
@@ -212,6 +209,10 @@ namespace casadi {
 
     /// Substitute inplace, internal implementation
     void substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit MXFunction(DeSerializer& s);
   };
 
 } // namespace casadi

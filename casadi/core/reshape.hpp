@@ -118,9 +118,10 @@ namespace casadi {
     /** \brief Reset the marker for an input expression */
     void reset_input() const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Reshape(s); }
   protected:
+    /** \brief Deserializing constructor */
     explicit Reshape(DeSerializer& s) : MXNode(s) {}
   };
 

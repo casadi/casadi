@@ -182,13 +182,10 @@ class CASADI_EXPORT SXFunction :
   /// Default input values
   std::vector<double> default_in_;
 
-  /** \brief Constructor */
-  explicit SXFunction(DeSerializer& s);
-
-  /** \brief Serialize */
+    /** \brief Serialize an object without type information */
   void serialize_body(Serializer &s) const override;
 
-  /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
   static ProtoFunction* deserialize(DeSerializer& s);
 
   ///@{
@@ -231,6 +228,10 @@ class CASADI_EXPORT SXFunction :
 
   /// With just-in-time compilation for the sparsity propagation
   bool just_in_time_sparsity_;
+
+protected:
+  /** \brief Deserializing constructor */
+  explicit SXFunction(DeSerializer& s);
 };
 
 

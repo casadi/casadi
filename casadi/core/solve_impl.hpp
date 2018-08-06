@@ -276,8 +276,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  void Solve<Tr>::serialize_header(Serializer& s) const {
-    MXNode::serialize_header(s);
+  void Solve<Tr>::serialize_type(Serializer& s) const {
+    MXNode::serialize_type(s);
     s.pack("Solve::Tr", Tr);
   }
 

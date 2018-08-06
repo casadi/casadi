@@ -178,24 +178,22 @@ namespace casadi {
     /** Obtain information about node */
     virtual Dict info() const;
 
+    /** \brief Serialize an object */
     void serialize(Serializer& s) const;
 
-    /**
-     * 
-     * 
-     */
+    /** \brief Serialize an object without type information */
     virtual void serialize_body(Serializer& s) const;
 
-    /** \brief 
+    /** \brief Serialize type information
      * 
      * Information needed to unambiguously find the (lowest level sub)class,
      * such that its deserializing constructor can be called.
      */
-    virtual void serialize_header(Serializer& s) const;
+    virtual void serialize_type(Serializer& s) const;
 
-    /**
+    /** \brief Deserialize with type disambiguation
      * 
-     * Uses the information encoded with serialize_header to unambiguously find the (lowest level sub)class,
+     * Uses the information encoded with serialize_type to unambiguously find the (lowest level sub)class,
      * and calls its deserializing constructor.
      */
     static MXNode* deserialize(DeSerializer& s);
@@ -446,6 +444,7 @@ namespace casadi {
     static std::map<casadi_int, MXNode* (*)(DeSerializer&)> deserialize_map;
 
   protected:
+    /** \brief Deserializing constructor */
     explicit MXNode(DeSerializer& s);
   };
 

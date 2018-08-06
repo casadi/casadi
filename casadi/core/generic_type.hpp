@@ -209,9 +209,10 @@ namespace casadi {
     bool operator!=(const GenericType& op2) const;
 #endif // SWIG
 
+    /** \brief Serialize an object */
     void serialize(Serializer& s) const;
 
-    /** \brief Deserialize into slice */
+    /** \brief Deserialize with type disambiguation */
     static GenericType deserialize(DeSerializer& s);
   };
 

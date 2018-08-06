@@ -216,6 +216,7 @@ namespace casadi {
       return if_else_zero(x, y) + if_else_zero(!x, z);
     }
 
+    /** \brief Serialize an object */
     void serialize(Serializer& s) const;
 
     static SXElem deserialize(DeSerializer& s);

@@ -277,7 +277,10 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const;
 
+    /** \brief Serialize an object */
     void serialize(Serializer& s) const;
+
+    /** \brief Deserialize with type disambiguation */
     static MX deserialize(DeSerializer& s);
 
     /// \cond INTERNAL

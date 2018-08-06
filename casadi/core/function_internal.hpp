@@ -126,17 +126,23 @@ namespace casadi {
     /** \brief C-style formatted printing to string */
     void sprint(char* buf, size_t buf_sz, const char* fmt, ...) const;
 
-    explicit ProtoFunction(DeSerializer& s);
-
+    /** \brief Serialize an object */
     void serialize(Serializer &s) const;
-    virtual void serialize_body(Serializer &s) const;
-    virtual void serialize_header(Serializer &s) const {}
 
+    /** \brief Serialize an object without type information */
+    virtual void serialize_body(Serializer &s) const;
+    /** \brief Serialize type information */
+    virtual void serialize_type(Serializer &s) const {}
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
     virtual std::string serialize_base_function() const {
       return class_name();
     }
 
   protected:
+    /** \brief Deserializing constructor */
+    explicit ProtoFunction(DeSerializer& s);
+
     /// Name
     std::string name_;
 
@@ -493,7 +499,10 @@ namespace casadi {
     virtual void export_code(const std::string& lang,
       std::ostream &stream, const Dict& options) const;
 
-    void serialize_header(Serializer &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer &s) const override;
+
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer &s) const override;
 
     /** \brief Display object */
@@ -799,9 +808,10 @@ namespace casadi {
     std::vector<std::vector<MatType> >
     symbolicAdjSeed(casadi_int nadj, const std::vector<MatType>& v) const;
 
-    /** \brief Info Constructor */
-    FunctionInternal(DeSerializer& e);
+    /** \brief Deserializing constructor */
+    explicit FunctionInternal(DeSerializer& e);
 
+    /** \brief Deserialize with type disambiguation */
     static Function deserialize(DeSerializer& s);
 
     static std::map<std::string, ProtoFunction* (*)(DeSerializer&)> deserialize_map;

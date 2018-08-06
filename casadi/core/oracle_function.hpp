@@ -155,10 +155,11 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
-    /** \brief Serialize */
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer &s) const override;
 
   protected:
+    /** \brief Deserializing constructor */
     explicit OracleFunction(DeSerializer& s);
 
   };

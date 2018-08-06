@@ -131,10 +131,10 @@ namespace casadi {
     /// Release a memory object
     void release(casadi_int mem) const;
 
-    /** \brief Serialize */
+    /** \brief Serialize an object */
     void serialize(Serializer &s) const;
 
-    /** \brief Build function from serialization */
+    /** \brief Deserialize with type disambiguation */
     static Linsol deserialize(DeSerializer& s);
 
     #endif // SWIG

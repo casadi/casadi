@@ -63,11 +63,12 @@ namespace casadi {
     /** \brief Get the operation */
     casadi_int op() const override { return OP_DETERMINANT;}
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Determinant(s); }
 
-    protected:
-      explicit Determinant(DeSerializer& s) : MXNode(s) {}
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Determinant(DeSerializer& s) : MXNode(s) {}
 
   };
 

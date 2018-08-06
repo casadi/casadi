@@ -168,15 +168,15 @@ namespace casadi {
     s.pack("LinearInterpolant::lookup_mode", lookup_mode_);
   }
 
-  void LinearInterpolant::serialize_header(Serializer &s) const {
-    Interpolant::serialize_header(s);
+  void LinearInterpolant::serialize_type(Serializer &s) const {
+    Interpolant::serialize_type(s);
     s.pack("LinearInterpolant::type", 'f');
   }
 
-  void LinearInterpolantJac::serialize_header(Serializer &s) const {
-    FunctionInternal::serialize_header(s);
+  void LinearInterpolantJac::serialize_type(Serializer &s) const {
+    FunctionInternal::serialize_type(s);
     auto m = derivative_of_.get<LinearInterpolant>();
-    m->PluginInterface<Interpolant>::serialize_header(s);
+    m->PluginInterface<Interpolant>::serialize_type(s);
     s.pack("LinearInterpolant::type", 'j');
   }
 

@@ -411,7 +411,7 @@ namespace casadi {
   }
 
   void MXNode::serialize(Serializer& s) const {
-    serialize_header(s);
+    serialize_type(s);
     serialize_body(s);
   }
 
@@ -420,7 +420,7 @@ namespace casadi {
     s.pack("MXNode::sp", sparsity_);
   }
 
-  void MXNode::serialize_header(Serializer& s) const {
+  void MXNode::serialize_type(Serializer& s) const {
     s.pack("MXNode::op", static_cast<int>(op()));
   }
 

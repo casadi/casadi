@@ -64,9 +64,11 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override;
 
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer& s) const override;
 
   protected:
+    /** \brief Deserializing constructor */
     explicit IOInstruction(DeSerializer&s);
   };
 
@@ -90,10 +92,11 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Input(s); }
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Input(DeSerializer&s) : IOInstruction(s) {}
   };
 
@@ -120,8 +123,10 @@ namespace casadi {
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Output(s); }
   protected:
+    /** \brief Deserializing constructor */
     explicit Output(DeSerializer&s) : IOInstruction(s) {}
   };
 

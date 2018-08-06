@@ -91,6 +91,7 @@ namespace casadi {
     void reset_input() const override;
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Concat(DeSerializer& s) : MXNode(s) {}
   };
 
@@ -134,9 +135,10 @@ namespace casadi {
     /** \brief Get offsets for split */
     std::vector<casadi_int> off() const;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Horzcat(s); }
   protected:
+    /** \brief Deserializing constructor */
     explicit Horzcat(DeSerializer& s) : Concat(s) {}
   };
 
@@ -179,10 +181,11 @@ namespace casadi {
     /** \brief Get offsets for split */
     std::vector<casadi_int> off() const;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Vertcat(s); }
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Vertcat(DeSerializer& s) : Concat(s) {}
   };
 
@@ -225,10 +228,11 @@ namespace casadi {
     /** \brief Get offsets for split */
     std::pair<std::vector<casadi_int>, std::vector<casadi_int> > off() const;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Diagcat(s); }
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Diagcat(DeSerializer& s) : Concat(s) {}
   };
 

@@ -123,10 +123,10 @@ namespace casadi {
     // Maximum number of right-hand-sides
     casadi_int max_nrhs_;
 
-    // Serialize a disambiguated ProtoFunction
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer &s) const override;
 
-    // Deserialize a ProtoFunction
+    /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeSerializer& s) { return new LapackQr(s); }
 
   protected:

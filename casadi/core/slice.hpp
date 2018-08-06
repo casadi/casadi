@@ -102,9 +102,10 @@ namespace casadi {
       return {{"start", start}, {"stop", stop}, {"step", step}};
     }
 
+    /** \brief Serialize an object */
     void serialize(Serializer& s) const;
 
-    /** \brief Deserialize into slice */
+    /** \brief Deserialize without type information */
     static Slice deserialize(DeSerializer& s);
   };
 

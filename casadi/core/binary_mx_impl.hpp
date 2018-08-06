@@ -269,8 +269,8 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::serialize_header(Serializer& s) const {
-    MXNode::serialize_header(s);
+  void BinaryMX<ScX, ScY>::serialize_type(Serializer& s) const {
+    MXNode::serialize_type(s);
     char type_x = ScX;
     char type_y = ScY;
     char type = type_x | (type_y << 1);

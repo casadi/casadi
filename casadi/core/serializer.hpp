@@ -44,7 +44,15 @@ namespace casadi {
   */
   class CASADI_EXPORT DeSerializer {
   public:
+    /// Constructor
     DeSerializer(std::istream &in_s);
+
+    //@{
+    /** \brief Reconstruct an object from the input stream
+    *
+    * If the reference is not of the same type as the object encoded in the stream.
+    * an error will be raised.
+    */
     void unpack(Sparsity& e);
     void unpack(MX& e);
     void unpack(SXElem& e);
@@ -96,7 +104,14 @@ namespace casadi {
       }
       unpack(e);
     }
+    //@}
 
+  private:
+
+    /* \brief Unpacks a shared object
+    * 
+    * Also treats SXNode, which is not actually a SharedObjectInternal
+    */
     template <class T, class M>
     void shared_unpack(T& e) {
       char i;
@@ -118,11 +133,17 @@ namespace casadi {
       }
     }
 
+    /** \brief Primitive typecheck during deserialization
+     *
+     * No-op unless in debug mode
+     */
     void assert_decoration(char e);
 
-  private:
+    /// Collection of all shared pointer deserialized so far
     std::vector<void*> nodes;
+    /// Input stream
     std::istream& in;
+    /// Debug mode?
     bool debug_;
   };
 
@@ -137,6 +158,8 @@ namespace casadi {
     /// Constructor
     Serializer(std::ostream& out, const Dict& opts = Dict());
 
+    // @{
+    /** \brief Serializes an object to the output stream  */
     void pack(const Sparsity& e);
     void pack(const MX& e);
     void pack(const SXElem& e);
@@ -176,9 +199,19 @@ namespace casadi {
       if (debug_) pack(descr);
       pack(e);
     }
+    //@}
 
+  private:
+    /** \brief Insert information for a primitive typecheck during deserialization
+     *
+     * No-op unless in debug mode
+     */
     void decorate(char e);
 
+    /* \brief Packs a shared object
+    * 
+    * Also treats SXNode, which is not actually a SharedObjectInternal
+    */
     template <class T>
     void shared_pack(const T& e) {
       auto it = shared_map_.find(e.get());
@@ -194,9 +227,11 @@ namespace casadi {
       }
     }
 
-  private:
+    /// Mapping from shared pointers to running counter
     std::unordered_map<void*, casadi_int> shared_map_;
+    /// Output stream
     std::ostream& out;
+    /// Debug mode?
     bool debug_;
   };
 

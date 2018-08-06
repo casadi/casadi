@@ -133,15 +133,19 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override { return {{"f", f_}, {"n", n_}}; }
 
-    /** \brief Serialize */
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer &s) const override;
-    void serialize_header(Serializer &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer &s) const override;
 
+    /** \brief String used to identify the immediate FunctionInternal subclass */
     std::string serialize_base_function() const { return "Map"; }
-    /** \brief Deserialize into MX */
+
+    /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeSerializer& s);
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Map(DeSerializer& s);
 
     // Constructor (protected, use create function)
@@ -186,6 +190,7 @@ namespace casadi {
     void codegen_body(CodeGenerator& g) const override;
 
   protected:
+    /** \brief Deserializing constructor */
     explicit OmpMap(DeSerializer& s) : Map(s) {}
   };
 
@@ -221,6 +226,7 @@ namespace casadi {
     void codegen_body(CodeGenerator& g) const override;
 
   protected:
+    /** \brief Deserializing constructor */
     explicit ThreadMap(DeSerializer& s) : Map(s) {}
   };
 

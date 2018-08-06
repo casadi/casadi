@@ -126,9 +126,10 @@ namespace casadi {
     /** \brief Reset the marker for an input expression */
     void reset_input() const override {}
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize with type disambiguation */
     static MXNode* deserialize(DeSerializer& s);
 
+    /** \brief Deserializing constructor */
     explicit ConstantMX(DeSerializer& s) : MXNode(s) {}
   };
 
@@ -183,10 +184,12 @@ namespace casadi {
     /** \brief  data member */
     Matrix<double> x_;
 
-    /** \brief Serialize specific part of node  */
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer& s) const override;
-    void serialize_header(Serializer& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer& s) const override;
 
+    /** \brief Deserializing constructor */
     explicit ConstantDM(DeSerializer& s);
   };
 
@@ -267,7 +270,8 @@ namespace casadi {
     }
 
     /** \brief Serialize specific part of node  */
-    void serialize_header(Serializer& s) const override;
+    void serialize_type(Serializer& s) const override;
+    /** \brief Serialize type information */
     void serialize_body(Serializer& s) const override;
 
   };
@@ -279,7 +283,7 @@ namespace casadi {
     RuntimeConst() {}
     RuntimeConst(T v) : value(v) {}
     static char type_char;
-    void serialize_header(Serializer& s) const {
+    void serialize_type(Serializer& s) const {
       s.pack("Constant::value", value);
     }
     static RuntimeConst deserialize(DeSerializer& s) {
@@ -302,7 +306,7 @@ namespace casadi {
   struct CompiletimeConst {
     static const int value = v;
     static char type_char;
-    void serialize_header(Serializer& s) const {}
+    void serialize_type(Serializer& s) const {}
     static CompiletimeConst deserialize(DeSerializer& s) {
       return CompiletimeConst();
     }
@@ -326,6 +330,7 @@ namespace casadi {
     /** \brief  Constructor */
     explicit Constant(const Sparsity& sp, Value v = Value()) : ConstantMX(sp), v_(v) {}
 
+    /** \brief Deserializing constructor */
     explicit Constant(DeSerializer& s, const Value& v);
 
     /// Destructor
@@ -392,17 +397,19 @@ namespace casadi {
     /** \brief Check if two nodes are equivalent up to a given depth */
     bool is_equal(const MXNode* node, casadi_int depth) const override;
 
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer& s) const override;
-    void serialize_header(Serializer& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer& s) const override;
 
     Value v_;
   };
 
   template<typename Value>
-  void Constant<Value>::serialize_header(Serializer& s) const {
-    MXNode::serialize_header(s);
+  void Constant<Value>::serialize_type(Serializer& s) const {
+    MXNode::serialize_type(s);
     s.pack("ConstantMX::type", Value::type_char);
-    v_.serialize_header(s);
+    v_.serialize_type(s);
   }
 
   template<typename Value>

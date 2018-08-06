@@ -139,12 +139,12 @@ namespace casadi {
     // Get name of the plugin
     virtual const char* plugin_name() const = 0;
 
-    // Serialize the plugin name
-    void serialize_header(Serializer& s) const {
+    /** \brief Serialize type information */
+    void serialize_type(Serializer& s) const {
       s.pack("PluginInterface::plugin_name", std::string(plugin_name()));
     }
 
-    // Construct Function from serialization
+    /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeSerializer& s) {
       std::string class_name, plugin_name;
       s.unpack("PluginInterface::plugin_name", plugin_name);

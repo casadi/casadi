@@ -133,6 +133,7 @@ namespace casadi {
     // Reference counter -- counts the number of parents of the node
     unsigned int count;
 
+    /** \brief Serialize an object */
     void serialize(Serializer& s) const;
 
     virtual void serialize_node(Serializer& s) const;

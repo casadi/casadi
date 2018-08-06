@@ -145,13 +145,13 @@ namespace casadi {
       << " *rr += ss[k*" << nrow_x << "]**tt++;\n";
   }
 
-  void Multiplication::serialize_header(Serializer& s) const {
-    MXNode::serialize_header(s);
+  void Multiplication::serialize_type(Serializer& s) const {
+    MXNode::serialize_type(s);
     s.pack("Multiplication::dense", false);
   }
 
-  void DenseMultiplication::serialize_header(Serializer& s) const {
-    MXNode::serialize_header(s);
+  void DenseMultiplication::serialize_type(Serializer& s) const {
+    MXNode::serialize_type(s);
     s.pack("Multiplication::dense", true);
   }
 

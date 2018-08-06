@@ -110,16 +110,17 @@ namespace casadi {
     // Sparsity projection needed?
     bool project_in_, project_out_;
 
-    /** \brief Serialize */
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer &s) const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static ProtoFunction* deserialize(DeSerializer& s) { return new Switch(s); }
 
     /** Obtain information about node */
     Dict info() const override;
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Switch(DeSerializer& s);
   };
 

@@ -87,7 +87,7 @@ namespace casadi {
     /** \brief Get the operation */
     casadi_int op() const override { return OP_RANK1;}
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Rank1(s); }
 
     protected:

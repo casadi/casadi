@@ -80,10 +80,11 @@ namespace casadi {
     std::vector<casadi_int> offset_;
     std::vector<Sparsity> output_sparsity_;
 
-    /** \brief Serialize specific part of node  */
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer& s) const override;
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Split(DeSerializer& s);
   };
 
@@ -120,10 +121,11 @@ namespace casadi {
     /// Create a horizontal concatenation node
     MX get_horzcat(const std::vector<MX>& x) const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Horzsplit(s); }
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Horzsplit(DeSerializer& s) : Split(s) {}
   };
 
@@ -161,10 +163,11 @@ namespace casadi {
     /// Create a diagonal concatenation node
     MX get_diagcat(const std::vector<MX>& x) const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Diagsplit(s); }
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Diagsplit(DeSerializer& s) : Split(s) {}
   };
 
@@ -201,10 +204,11 @@ namespace casadi {
     /// Create a vertical concatenation node (vectors only)
     MX get_vertcat(const std::vector<MX>& x) const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Vertsplit(s); }
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Vertsplit(DeSerializer& s) : Split(s) {}
   };
 

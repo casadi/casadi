@@ -706,7 +706,7 @@ namespace casadi {
     /** \brief Serialize */
     void serialize(std::ostream &stream, const Dict& opts=Dict()) const;
 
-    /** \brief Serialize */
+    /** \brief Serialize an object */
     void serialize(Serializer &s) const;
 #endif
 

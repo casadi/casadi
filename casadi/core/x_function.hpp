@@ -193,8 +193,9 @@ namespace casadi {
     Sparsity get_sparsity_out(casadi_int i) override { return out_.at(i).sparsity();}
     /// @}
 
-    /** \brief  Info Constructor  */
+    /** \brief Deserializing constructor */
     explicit XFunction(DeSerializer& s);
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer &s) const override;
 
     // Data members (all public)

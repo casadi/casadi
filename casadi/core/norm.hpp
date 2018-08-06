@@ -46,6 +46,7 @@ namespace casadi {
     ~Norm() override {}
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Norm(DeSerializer& s) : MXNode(s) {}
   };
 
@@ -94,10 +95,11 @@ namespace casadi {
     /** \brief Get the operation */
     casadi_int op() const override { return OP_NORMF;}
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new NormF(s); }
 
   protected:
+    /** \brief Deserializing constructor */
     explicit NormF(DeSerializer& s) : Norm(s) {}
   };
 
@@ -120,10 +122,11 @@ namespace casadi {
     /** \brief Get the operation */
     casadi_int op() const override { return OP_NORM2;}
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Norm2(s); }
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Norm2(DeSerializer& s) : Norm(s) {}
   };
 
@@ -135,7 +138,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    Norm1(const MX& x) : Norm(x) {}
+    explicit Norm1(const MX& x) : Norm(x) {}
 
     /** \brief  Destructor */
     ~Norm1() override {}
@@ -146,10 +149,11 @@ namespace casadi {
     /** \brief Get the operation */
     casadi_int op() const override { return OP_NORM1;}
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Norm1(s); }
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Norm1(DeSerializer& s) : Norm(s) {}
   };
 
@@ -161,7 +165,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    NormInf(const MX& x) : Norm(x) {}
+    explicit NormInf(const MX& x) : Norm(x) {}
 
     /** \brief  Destructor */
     ~NormInf() override {}
@@ -172,10 +176,11 @@ namespace casadi {
     /** \brief Get the operation */
     casadi_int op() const override { return OP_NORMINF;}
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new NormInf(s); }
 
   protected:
+    /** \brief Deserializing constructor */
     explicit NormInf(DeSerializer& s) : Norm(s) {}
   };
 

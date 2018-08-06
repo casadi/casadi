@@ -63,11 +63,12 @@ namespace casadi {
     /** \brief Get the operation */
     casadi_int op() const override { return OP_INVERSE;}
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s) { return new Inverse(s); }
 
-    protected:
-      explicit Inverse(DeSerializer& s) : MXNode(s) {}
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Inverse(DeSerializer& s) : MXNode(s) {}
   };
 
 

@@ -76,10 +76,11 @@ namespace casadi {
     /// Get the nonzeros of matrix
     MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize without type information */
     static MXNode* deserialize(DeSerializer& s);
 
   protected:
+    /** \brief Deserializing constructor */
     explicit GetNonzeros(DeSerializer& s) : MXNode(s) {}
   };
 
@@ -128,10 +129,12 @@ namespace casadi {
     /// Operation sequence
     std::vector<casadi_int> nz_;
 
-    /** \brief Serialize specific part of node  */
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer& s) const override;
-    void serialize_header(Serializer& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer& s) const override;
 
+    /** \brief Deserializing constructor */
     explicit GetNonzerosVector(DeSerializer& s);
   };
 
@@ -181,10 +184,12 @@ namespace casadi {
     // Data member
     Slice s_;
 
-    /** \brief Serialize specific part of node  */
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer& s) const override;
-    void serialize_header(Serializer& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer& s) const override;
 
+    /** \brief Deserializing constructor */
     explicit GetNonzerosSlice(DeSerializer& s);
   };
 
@@ -235,10 +240,12 @@ namespace casadi {
     // Data members
     Slice inner_, outer_;
 
-    /** \brief Serialize specific part of node  */
+    /** \brief Serialize an object without type information */
     void serialize_body(Serializer& s) const override;
-    void serialize_header(Serializer& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer& s) const override;
 
+    /** \brief Deserializing constructor */
     explicit GetNonzerosSlice2(DeSerializer& s);
   };
 

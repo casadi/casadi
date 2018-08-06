@@ -95,13 +95,14 @@ namespace casadi {
     size_t sz_w() const override { return sparsity().size1();}
 
     /** \brief Serialize specific part of node  */
-    void serialize_header(Serializer& s) const override;
+    void serialize_type(Serializer& s) const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize with type disambiguation */
     static MXNode* deserialize(DeSerializer& s);
 
-    protected:
-      explicit Multiplication(DeSerializer& s) : MXNode(s) {}
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Multiplication(DeSerializer& s) : MXNode(s) {}
   };
 
 
@@ -126,8 +127,9 @@ namespace casadi {
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Serialize specific part of node  */
-    void serialize_header(Serializer& s) const override;
+    void serialize_type(Serializer& s) const override;
 
+    /** \brief Deserializing constructor */
     explicit DenseMultiplication(DeSerializer& s) : Multiplication(s) {}
   };
 

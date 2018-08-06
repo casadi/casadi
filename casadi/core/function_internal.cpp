@@ -2845,7 +2845,7 @@ namespace casadi {
     s.unpack("ProtoFunction::verbose", verbose_);
   }
 
-  void FunctionInternal::serialize_header(Serializer &s) const {
+  void FunctionInternal::serialize_type(Serializer &s) const {
     s.pack("FunctionInternal::base_function", serialize_base_function());
   }
 
@@ -2945,7 +2945,7 @@ namespace casadi {
   }
 
   void ProtoFunction::serialize(Serializer& s) const {
-    serialize_header(s);
+    serialize_type(s);
     serialize_body(s);
   }
 
@@ -2962,6 +2962,9 @@ namespace casadi {
     return ret;
   }
 
+  /*
+  * Keys are given by serialize_base_function()
+  */
   std::map<std::string, ProtoFunction* (*)(DeSerializer&)> FunctionInternal::deserialize_map = {
     {"MXFunction", MXFunction::deserialize},
     {"SXFunction", SXFunction::deserialize},

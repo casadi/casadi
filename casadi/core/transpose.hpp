@@ -99,13 +99,14 @@ namespace casadi {
       return sameOpAndDeps(node, depth);
     }
 
-    /** \brief Serialize specific part of node  */
-    void serialize_header(Serializer& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer& s) const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize with type disambiguation */
     static MXNode* deserialize(DeSerializer& s);
 
   protected:
+    /** \brief Deserializing constructor */
     explicit Transpose(DeSerializer& s) : MXNode(s) {}
   };
 
@@ -146,9 +147,10 @@ namespace casadi {
     /** \brief Get required length of iw field */
     size_t sz_iw() const override { return 0;}
 
-    /** \brief Serialize specific part of node  */
-    void serialize_header(Serializer& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer& s) const override;
 
+    /** \brief Deserializing constructor */
     explicit DenseTranspose(DeSerializer& s) : Transpose(s) {}
   };
 

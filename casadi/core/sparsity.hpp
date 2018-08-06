@@ -364,8 +364,10 @@ namespace casadi {
     /** \brief Build Sparsity from serialization */
     static Sparsity deserialize(const std::string& s);
 
+    /** \brief Serialize an object */
     void serialize(Serializer& s) const;
 
+    /** \brief Deserialize */
     static Sparsity deserialize(DeSerializer& s);
 
 #ifndef SWIG

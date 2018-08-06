@@ -247,8 +247,8 @@ namespace casadi {
     return MX::zeros(sp);
   }
 
-  void ConstantDM::serialize_header(Serializer& s) const {
-    MXNode::serialize_header(s);
+  void ConstantDM::serialize_type(Serializer& s) const {
+    MXNode::serialize_type(s);
     s.pack("ConstantMX::type", 'a');
   }
 
@@ -264,8 +264,8 @@ namespace casadi {
     x_ = DM(sparsity_, v);
   }
 
-  void ZeroByZero::serialize_header(Serializer& s) const {
-    MXNode::serialize_header(s);
+  void ZeroByZero::serialize_type(Serializer& s) const {
+    MXNode::serialize_type(s);
     s.pack("ConstantMX::type", 'z');
   }
 

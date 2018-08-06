@@ -62,8 +62,8 @@ namespace casadi {
     s.pack("Map::n", n_);
   }
 
-  void Map::serialize_header(Serializer &s) const {
-    FunctionInternal::serialize_header(s);
+  void Map::serialize_type(Serializer &s) const {
+    FunctionInternal::serialize_type(s);
     s.pack("Map::class_name", class_name());
   }
 

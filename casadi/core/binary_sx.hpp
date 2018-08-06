@@ -115,6 +115,7 @@ class BinarySX : public SXNode {
       s.pack("UnarySX::dep1", dep1_);
     }
 
+    /** \brief Deserialize without type information */
     static SXNode* deserialize(DeSerializer& s, casadi_int op) {
       SXElem dep0, dep1;
       s.unpack("UnarySX::dep0", dep0);

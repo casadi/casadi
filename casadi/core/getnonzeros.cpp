@@ -580,8 +580,8 @@ namespace casadi {
     s.pack("GetNonzerosVector::nonzeros", nz_);
   }
 
-  void GetNonzerosVector::serialize_header(Serializer& s) const {
-    GetNonzeros::serialize_header(s);
+  void GetNonzerosVector::serialize_type(Serializer& s) const {
+    GetNonzeros::serialize_type(s);
     s.pack("GetNonzeros::type", 'a');
   }
 
@@ -594,8 +594,8 @@ namespace casadi {
     s.pack("GetNonzerosSlice::slice", s_);
   }
 
-  void GetNonzerosSlice::serialize_header(Serializer& s) const {
-    GetNonzeros::serialize_header(s);
+  void GetNonzerosSlice::serialize_type(Serializer& s) const {
+    GetNonzeros::serialize_type(s);
     s.pack("GetNonzeros::type", 'b');
   }
 
@@ -609,8 +609,8 @@ namespace casadi {
     s.pack("GetNonzerosSlice2::outer", outer_);
   }
 
-  void GetNonzerosSlice2::serialize_header(Serializer& s) const {
-    GetNonzeros::serialize_header(s);
+  void GetNonzerosSlice2::serialize_type(Serializer& s) const {
+    GetNonzeros::serialize_type(s);
     s.pack("GetNonzeros::type", 'c');
   }
 

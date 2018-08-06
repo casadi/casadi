@@ -974,9 +974,9 @@ namespace casadi {
     s.pack("Nlpsol::mi", mi_);
   }
 
-  void Nlpsol::serialize_header(Serializer &s) const {
-    OracleFunction::serialize_header(s);
-    PluginInterface<Nlpsol>::serialize_header(s);
+  void Nlpsol::serialize_type(Serializer &s) const {
+    OracleFunction::serialize_type(s);
+    PluginInterface<Nlpsol>::serialize_type(s);
   }
 
   ProtoFunction* Nlpsol::deserialize(DeSerializer& s) {

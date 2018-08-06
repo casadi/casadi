@@ -35,13 +35,13 @@ namespace casadi {
     set_sparsity(x.sparsity().T());
   }
 
-  void Transpose::serialize_header(Serializer& s) const {
-    MXNode::serialize_header(s);
+  void Transpose::serialize_type(Serializer& s) const {
+    MXNode::serialize_type(s);
     s.pack("Transpose::dense", false);
   }
 
-  void DenseTranspose::serialize_header(Serializer& s) const {
-    MXNode::serialize_header(s);
+  void DenseTranspose::serialize_type(Serializer& s) const {
+    MXNode::serialize_type(s);
     s.pack("Transpose::dense", true);
   }
 

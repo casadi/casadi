@@ -221,9 +221,9 @@ namespace casadi {
     s.pack("Interpolant::lookup_modes", lookup_modes_);
   }
 
-  void Interpolant::serialize_header(Serializer &s) const {
-    FunctionInternal::serialize_header(s);
-    PluginInterface<Interpolant>::serialize_header(s);
+  void Interpolant::serialize_type(Serializer &s) const {
+    FunctionInternal::serialize_type(s);
+    PluginInterface<Interpolant>::serialize_type(s);
   }
 
   ProtoFunction* Interpolant::deserialize(DeSerializer& s) {
