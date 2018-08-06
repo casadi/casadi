@@ -503,10 +503,10 @@ namespace casadi {
 
   void Nlpsol::bound_consistency(casadi_int n, double* z, double* lam,
                                  const double* lbz, const double* ubz) {
-    casadi_assert_dev(z!=0);
-    casadi_assert_dev(lam!=0);
-    casadi_assert_dev(lbz!=0);
-    casadi_assert_dev(ubz!=0);
+    casadi_assert_dev(z!=nullptr);
+    casadi_assert_dev(lam!=nullptr);
+    casadi_assert_dev(lbz!=nullptr);
+    casadi_assert_dev(ubz!=nullptr);
     // Local variables
     casadi_int i;
     // Loop over variables
