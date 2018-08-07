@@ -1629,7 +1629,6 @@ namespace casadi {
     for (auto&& e : algorithm_) {
       if (e.op==OP_CALL) {
         Function d = e.data.which_function();
-        d.disp(uout());
         if (d.is_a("conic", true)) {
           if (!dep.is_null()) return {};
           dep = d;
