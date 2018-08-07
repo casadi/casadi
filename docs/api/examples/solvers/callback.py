@@ -98,8 +98,7 @@ class MyCallback(Callback):
     self.y_sols.append(float(sol[1]))
     subplot(111)
     if hasattr(self,'lines'):
-      self.lines[0].set_xdata(self.x_sols)
-      self.lines[0].set_ydata(self.y_sols)
+      self.lines[0].set_data(self.x_sols,self.y_sols)
     else:
       self.lines = plot(self.x_sols,self.y_sols,'or-')
 
