@@ -33,6 +33,8 @@
 #ifdef _WIN32
 #include <io.h>
 #include <share.h>
+#else
+#include <unistd.h>
 #endif
 #include <random>
 #include <chrono>
