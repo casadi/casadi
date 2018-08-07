@@ -90,6 +90,7 @@ matrix:
         - pip install pydot2 lxml
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
+        - remote_access
         - pushd test && make trunktesterbot_no_unittests_py && popd
         - pushd test && make unittests_py_slow && popd
         - pushd build && make json && popd
