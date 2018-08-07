@@ -236,7 +236,7 @@ namespace casadi {
   };
 
   template <>
-  void DeSerializer::unpack(std::vector<bool>& e);
+  CASADI_EXPORT void DeSerializer::unpack(std::vector<bool>& e);
 
 
 } // namespace casadi
