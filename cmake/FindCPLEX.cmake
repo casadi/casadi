@@ -68,7 +68,7 @@
 
 FIND_PATH(CPLEX_INCLUDE_DIR
   ilcplex/cplex.h
-  HINTS ${CPLEX_ROOT_DIR}/cplex/include
+  HINTS ${CPLEX_ROOT_DIR}/cplex/include ${CPLEX_ROOT_DIR}/include
   PATHS ENV C_INCLUDE_PATH
         ENV C_PLUS_INCLUDE_PATH
         ENV INCLUDE_PATH
@@ -85,6 +85,13 @@ if(WITH_CPLEX_SHARED)
         ${CPLEX_ROOT_DIR}/cplex/bin/x86-64_osx #osx 
         ${CPLEX_ROOT_DIR}/cplex/bin/x86-64_darwin #osx 
         ${CPLEX_ROOT_DIR}/cplex/bin/x64_win64 #windows
+        ${CPLEX_ROOT_DIR}/bin/${CPLEX_WIN_PLATFORM} #windows
+        ${CPLEX_ROOT_DIR}/bin/x86-64_debian4.0_4.1 #unix
+        ${CPLEX_ROOT_DIR}/bin/x86-64_sles10_4.1 #unix 
+        ${CPLEX_ROOT_DIR}/bin/x86-64_linux #unix 
+        ${CPLEX_ROOT_DIR}/bin/x86-64_osx #osx 
+        ${CPLEX_ROOT_DIR}/bin/x86-64_darwin #osx 
+        ${CPLEX_ROOT_DIR}/bin/x64_win64 #windows
   PATHS ENV LIBRARY_PATH #unix
         ENV LD_LIBRARY_PATH #unix
   )

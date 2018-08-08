@@ -3,7 +3,7 @@ project(casadi C CXX)
 
 set(CASADI_MAJOR_VERSION 3)
 set(CASADI_MINOR_VERSION 4)
-set(CASADI_PATCH_VERSION 4)
+set(CASADI_PATCH_VERSION 5)
 set(CASADI_IS_RELEASE 1)
 
 set(CASADI_VERSION ${CASADI_MAJOR_VERSION}.${CASADI_MINOR_VERSION}.${CASADI_PATCH_VERSION})
@@ -585,6 +585,9 @@ add_feature_info(clang-interface WITH_CLANG "Interface to the Clang JIT compiler
 option(WITH_LAPACK "Compile the interface to LAPACK" ${WITH_LAPACK_DEF})
 if(WITH_LAPACK)
   find_package(LAPACK REQUIRED)
+  if(DEFINED ENV{CASADI_EXTRA_LIBRARIES_LAPACK})
+    set(LAPACK_LIBRARIES ${LAPACK_LIBRARIES} $ENV{CASADI_EXTRA_LIBRARIES_LAPACK})
+  endif()
 endif()
 add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
 

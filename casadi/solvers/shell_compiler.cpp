@@ -71,6 +71,10 @@ namespace casadi {
     if (cleanup_) {
       if (remove(bin_name_.c_str())) casadi_warning("Failed to remove " + bin_name_);
       if (remove(obj_name_.c_str())) casadi_warning("Failed to remove " + obj_name_);
+      for (const std::string& s : extra_suffixes_) {
+        std::string name = base_name_+s;
+        remove(name.c_str());
+      }
     }
   }
 
@@ -112,7 +116,10 @@ namespace casadi {
        "Compiler flag to denote object output. Default: '-o '"}},
       {"linker_output_flag",
        {OT_STRING,
-       "Linker flag to denote shared library output. Default: '-o '"}}
+       "Linker flag to denote shared library output. Default: '-o '"}},
+      {"extra_suffixes",
+       {OT_STRINGVECTOR,
+       "List of suffixes for extra files that the compiler may generate. Default: None"}}
      }
   };
 
@@ -126,6 +133,7 @@ namespace casadi {
 
     vector<string> compiler_flags;
     vector<string> linker_flags;
+    string suffix = OBJECT_FILE_SUFFIX;
 
 #ifdef _WIN32
     string compiler = "cl.exe";
@@ -134,6 +142,7 @@ namespace casadi {
     string linker_setup = "/DLL";
     std::string compiler_output_flag = "/Fo";
     std::string linker_output_flag = "/out:";
+    extra_suffixes_ = {".exp", ".lib"};
 #else
     string compiler = "gcc";
     string linker = "gcc";
@@ -163,12 +172,16 @@ namespace casadi {
         compiler_output_flag = op.second.to_string();
       } else if (op.first=="linker_output_flag") {
         linker_output_flag = op.second.to_string();
+      } else if (op.first=="extra_suffixes") {
+        extra_suffixes_ = op.second.to_string_vector();
       }
     }
 
     // Name of temporary file
-    obj_name_ = temporary_file("tmp_casadi_compiler_shell", OBJECT_FILE_SUFFIX);
-    bin_name_ = temporary_file("tmp_casadi_compiler_shell", SHARED_LIBRARY_SUFFIX);
+    obj_name_ = temporary_file("tmp_casadi_compiler_shell", suffix);
+    base_name_ = std::string(obj_name_.begin(), obj_name_.begin()+obj_name_.size()-suffix.size());
+    bin_name_ = base_name_+SHARED_LIBRARY_SUFFIX;
+
 
 #ifndef _WIN32
     // Have relative paths start with ./

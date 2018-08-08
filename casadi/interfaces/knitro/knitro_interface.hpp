@@ -53,7 +53,6 @@ namespace casadi {
 
     // Stats
     const char* return_status;
-    bool success;
 
     /// Constructor
     KnitroMemory(const KnitroInterface& self);
