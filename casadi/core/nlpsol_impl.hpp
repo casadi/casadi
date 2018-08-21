@@ -107,7 +107,7 @@ namespace casadi {
     static ProtoFunction* deserialize(DeSerializer& s);
 
     /** \brief String used to identify the immediate FunctionInternal subclass */
-    std::string serialize_base_function() const { return "Nlpsol"; }
+    std::string serialize_base_function() const override { return "Nlpsol"; }
 
     /// Constructor
     Nlpsol(const std::string& name, const Function& oracle);

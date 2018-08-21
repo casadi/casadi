@@ -139,7 +139,7 @@ namespace casadi {
     void serialize_type(Serializer &s) const override;
 
     /** \brief String used to identify the immediate FunctionInternal subclass */
-    std::string serialize_base_function() const { return "Map"; }
+    std::string serialize_base_function() const override { return "Map"; }
 
     /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeSerializer& s);
