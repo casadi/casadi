@@ -1531,7 +1531,7 @@
 %exception  casadi::Map::parallelization() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Map::serialize_base_function() const  {
+%exception  casadi::Map::serialize_base_function() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Map::serialize_body(Serializer &s) const override {
@@ -1717,7 +1717,7 @@
 %exception  casadi::Nlpsol::kkt() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Nlpsol::serialize_base_function() const  {
+%exception  casadi::Nlpsol::serialize_base_function() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Nlpsol::serialize_body(Serializer &s) const override {
