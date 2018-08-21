@@ -551,6 +551,17 @@ class casadiTestCase(unittest.TestCase):
         for i in range(F.n_out()):
           self.checkarray(Fout[i],Fout2[i],digits=16)
 
+  def check_pure(self,F,inputs=None):
+      Fout = F.call(inputs)
+      Fout2 = F.call(inputs)
+
+      if isinstance(inputs, dict):
+        for k in F.name_out():
+          self.checkarray(Fout[k],Fout2[k],digits=16)
+      else:
+        for i in range(F.n_out()):
+          self.checkarray(Fout[i],Fout2[i],digits=16)
+
 class run_only(object):
   def __init__(self, args):
     self.args = []

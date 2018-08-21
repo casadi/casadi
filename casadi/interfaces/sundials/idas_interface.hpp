@@ -204,7 +204,7 @@ namespace casadi {
     std::vector<double> abstolv_;
     double first_time_;
 
-    //  Initial values for \p xdot and \p z
+    //  Initial values for \p xdot
     std::vector<double> init_xdot_;
   };
 

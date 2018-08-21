@@ -335,6 +335,7 @@ class Integrationtests(casadiTestCase):
                   integrator_in[k]=v
 
               self.checkfunction(integrator,fs,inputs=integrator_in,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
+              self.check_pure(integrator,inputs=integrator_in)
 
 
 

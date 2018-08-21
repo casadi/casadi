@@ -387,7 +387,9 @@ namespace casadi {
     SundialsInterface::reset(mem, t, _x, _z, _p);
 
     // Re-initialize
+    N_VConst(0.0, m->xzdot);
     copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->xzdot));
+
     THROWING(IDAReInit, m->mem, grid_.front(), m->xz, m->xzdot);
 
     // Re-initialize quadratures
@@ -455,6 +457,9 @@ namespace casadi {
 
     // Reset the base classes
     SundialsInterface::resetB(mem, t, rx, rz, rp);
+
+    // Reset initial guess
+    N_VConst(0.0, m->rxzdot);
 
     if (m->first_callB) {
       // Create backward problem
