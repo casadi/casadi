@@ -64,6 +64,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
       refsol = Function("refsol", [x],[solve(A_,b_), mtimes(C_,solve(A_,b_))])
       self.checkfunction(solver,refsol,inputs=[0],digits=10)
+      if "newton" in Solver: self.check_serialize(solver,inputs=[0])
       if "codegen" in features: self.check_codegen(solver,inputs=[0])
 
       A = SX.sym("A",2,2)
@@ -76,6 +77,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
       refsol = Function("refsol", [x,A,b],[solve(A,b)])
       self.checkfunction(solver,refsol,inputs=solver_in,digits=10)
+      if "newton" in Solver: self.check_serialize(solver,inputs=solver_in)
       if "codegen" in features: self.check_codegen(solver,inputs=solver_in)
 
       A = SX.sym("A",2,2)
@@ -94,6 +96,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
           refsol = Function("refsol", [x,A,b],[solve(A,b),mtimes(C_,solve(A,b))])
           self.checkfunction(solver,refsol,inputs=solver_in,digits=10)
+          if "newton" in Solver: self.check_serialize(solver,inputs=solver_in)
       if "codegen" in features: self.check_codegen(solver,inputs=solver_in)
 
   def test_missing_symbols(self):

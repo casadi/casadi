@@ -52,7 +52,7 @@ try:
 except:
   pass
 
-integrators.append(("collocation",["dae","ode"],{"rootfinder":"kinsol","number_of_finite_elements": 18}))
+integrators.append(("collocation",["dae","ode"],{"rootfinder":"newton","number_of_finite_elements": 18}))
 
 integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000}))
 
@@ -336,6 +336,7 @@ class Integrationtests(casadiTestCase):
 
               self.checkfunction(integrator,fs,inputs=integrator_in,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
               self.check_pure(integrator,inputs=integrator_in)
+              self.check_serialize(integrator,inputs=integrator_in)
 
 
 
@@ -361,12 +362,12 @@ class Integrationtests(casadiTestCase):
           dout_ = copy.copy(dout)
           rdin_ = copy.copy(rdin)
           rdout_ = copy.copy(rdout)
-          z = SX.sym("x", din_["x"].shape)
+          z = SX.sym("z", din_["x"].shape)
           din_["z"] = z
           dout_["ode"] = z
           dout_["alg"] = ( dout["ode"] - z) * (-0.8)
           if len(rdin_)>0:
-            rz = SX.sym("rx", rdin_["rx"].shape)
+            rz = SX.sym("rz", rdin_["rx"].shape)
             rdin_["rz"] = rz
             rdin_["z"] = z
             rdout_["ode"] = rz
@@ -483,6 +484,7 @@ class Integrationtests(casadiTestCase):
 
             self.checkfunction(integrator,fs,inputs=integrator_in,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
 
+            if "idas" not in Integrator and "kinsol" not in str(opts): self.check_serialize(integrator,inputs=integrator_in)
 
   def setUp(self):
     # Reference solution is x0 e^((t^3-t0^3)/(3 p))

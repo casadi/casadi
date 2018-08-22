@@ -206,6 +206,16 @@ namespace casadi {
 
     //  Initial values for \p xdot
     std::vector<double> init_xdot_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new IdasInterface(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit IdasInterface(DeSerializer& s);
   };
 
 } // namespace casadi

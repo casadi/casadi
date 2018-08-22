@@ -111,7 +111,16 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new Newton(s); }
+
   protected:
+    /** \brief Deserializing constructor */
+    explicit Newton(DeSerializer& s);
+
     /// Maximum number of Newton iterations
     casadi_int max_iter_;
 

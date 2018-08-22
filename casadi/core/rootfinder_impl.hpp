@@ -182,6 +182,21 @@ namespace casadi {
     template<typename XType>
       static Function create_oracle(const std::map<std::string, XType>& d,
                                     const Dict& opts);
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s);
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const { return "Rootfinder"; }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Rootfinder(DeSerializer& s);
   };
 
 

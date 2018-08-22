@@ -541,4 +541,33 @@ namespace casadi {
     return stats;
   }
 
+  void Rootfinder::serialize_body(Serializer &s) const {
+    OracleFunction::serialize_body(s);
+
+    s.pack("Rootfinder::n", n_);
+    s.pack("Rootfinder::linsol", linsol_);
+    s.pack("Rootfinder::sp_jac", sp_jac_);
+    s.pack("Rootfinder::u_c", u_c_);
+    s.pack("Rootfinder::iin", iin_);
+    s.pack("Rootfinder::iout", iout_);
+  }
+
+  void Rootfinder::serialize_type(Serializer &s) const {
+    OracleFunction::serialize_type(s);
+    PluginInterface<Rootfinder>::serialize_type(s);
+  }
+
+  ProtoFunction* Rootfinder::deserialize(DeSerializer& s) {
+    return PluginInterface<Rootfinder>::deserialize(s);
+  }
+
+  Rootfinder::Rootfinder(DeSerializer & s) : OracleFunction(s) {
+    s.unpack("Rootfinder::n", n_);
+    s.unpack("Rootfinder::linsol", linsol_);
+    s.unpack("Rootfinder::sp_jac", sp_jac_);
+    s.unpack("Rootfinder::u_c", u_c_);
+    s.unpack("Rootfinder::iin", iin_);
+    s.unpack("Rootfinder::iout", iout_);
+  }
+
 } // namespace casadi

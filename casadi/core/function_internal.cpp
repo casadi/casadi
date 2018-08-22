@@ -32,10 +32,12 @@
 #include "serializer.hpp"
 #include "mx_function.hpp"
 #include "sx_function.hpp"
+#include "rootfinder_impl.hpp"
 #include "map.hpp"
 #include "switch.hpp"
 #include "interpolant_impl.hpp"
 #include "nlpsol_impl.hpp"
+#include "integrator_impl.hpp"
 
 #include <typeinfo>
 #include <cctype>
@@ -2971,7 +2973,9 @@ namespace casadi {
     {"Interpolant", Interpolant::deserialize},
     {"Switch", Switch::deserialize},
     {"Map", Map::deserialize},
-    {"Nlpsol", Nlpsol::deserialize}
+    {"Nlpsol", Nlpsol::deserialize},
+    {"Rootfinder", Rootfinder::deserialize},
+    {"Integrator", Integrator::deserialize},
   };
 
 } // namespace casadi

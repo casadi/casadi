@@ -37,6 +37,7 @@ namespace casadi {
     plugin->doc = Newton::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &Newton::options_;
+    plugin->deserialize = &Newton::deserialize;
     return 0;
   }
 
@@ -232,6 +233,24 @@ namespace casadi {
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter;
     return stats;
+  }
+
+
+  Newton::Newton(DeSerializer& s) : Rootfinder(s) {
+    s.unpack("Newton::max_iter", max_iter_);
+    s.unpack("Newton::abstol", abstol_);
+    s.unpack("Newton::abstolStep", abstolStep_);
+    s.unpack("Newton::print_iteration_", print_iteration_);
+    s.unpack("Newton::error_on_", error_on_);
+  }
+
+  void Newton::serialize_body(Serializer &s) const {
+    Rootfinder::serialize_body(s);
+    s.pack("Newton::max_iter", max_iter_);
+    s.pack("Newton::abstol", abstol_);
+    s.pack("Newton::abstolStep", abstolStep_);
+    s.pack("Newton::print_iteration_", print_iteration_);
+    s.pack("Newton::error_on_", error_on_);
   }
 
 } // namespace casadi

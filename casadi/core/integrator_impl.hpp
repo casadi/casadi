@@ -218,6 +218,22 @@ namespace casadi {
     template<typename XType>
       static Function map2oracle(const std::string& name,
         const std::map<std::string, XType>& d, const Dict& opts=Dict());
+
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s);
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const { return "Integrator"; }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Integrator(DeSerializer& s);
   };
 
   struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
@@ -303,6 +319,13 @@ namespace casadi {
 
     /// Number of algebraic variables for the discrete time integration
     casadi_int nZ_, nRZ_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit FixedStepIntegrator(DeSerializer& s);
   };
 
   class CASADI_EXPORT ImplicitFixedStepIntegrator : public FixedStepIntegrator {
@@ -331,6 +354,13 @@ namespace casadi {
 
     // Implicit function solver
     Function rootfinder_, backward_rootfinder_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit ImplicitFixedStepIntegrator(DeSerializer& s);
   };
 
 } // namespace casadi

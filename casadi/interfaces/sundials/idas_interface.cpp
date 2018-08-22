@@ -41,6 +41,7 @@ namespace casadi {
     plugin->doc = IdasInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &IdasInterface::options_;
+    plugin->deserialize = &IdasInterface::deserialize;
     return 0;
   }
 
@@ -1043,6 +1044,29 @@ namespace casadi {
     if (this->mem) IDAFree(&this->mem);
     if (this->xzdot) N_VDestroy_Serial(this->xzdot);
     if (this->rxzdot) N_VDestroy_Serial(this->rxzdot);
+  }
+
+  IdasInterface::IdasInterface(DeSerializer& s) : SundialsInterface(s) {
+    s.unpack("IdasInterface::cj_scaling", cj_scaling_);
+    s.unpack("IdasInterface::calc_ic", calc_ic_);
+    s.unpack("IdasInterface::calc_icB", calc_icB_);
+    s.unpack("IdasInterface::suppress_algebraic", suppress_algebraic_);
+    s.unpack("IdasInterface::max_step_size", max_step_size_);
+    s.unpack("IdasInterface::abstolv", abstolv_);
+    s.unpack("IdasInterface::first_time", first_time_);
+    s.unpack("IdasInterface::init_xdot", init_xdot_);
+  }
+
+  void IdasInterface::serialize_body(Serializer &s) const {
+    SundialsInterface::serialize_body(s);
+    s.pack("IdasInterface::cj_scaling", cj_scaling_);
+    s.pack("IdasInterface::calc_ic", calc_ic_);
+    s.pack("IdasInterface::calc_icB", calc_icB_);
+    s.pack("IdasInterface::suppress_algebraic", suppress_algebraic_);
+    s.pack("IdasInterface::max_step_size", max_step_size_);
+    s.pack("IdasInterface::abstolv", abstolv_);
+    s.pack("IdasInterface::first_time", first_time_);
+    s.pack("IdasInterface::init_xdot", init_xdot_);
   }
 
 } // namespace casadi

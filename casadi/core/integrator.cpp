@@ -1394,4 +1394,109 @@ namespace casadi {
     return Function(name, de_in, de_out, DE_INPUTS, DE_OUTPUTS, opts);
   }
 
+  void Integrator::serialize_body(Serializer &s) const {
+    OracleFunction::serialize_body(s);
+
+    s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
+    s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
+    s.pack("Integrator::nx", nx_);
+    s.pack("Integrator::nz", nz_);
+    s.pack("Integrator::nq", nq_);
+    s.pack("Integrator::nx1", nx1_);
+    s.pack("Integrator::nz1", nz1_);
+    s.pack("Integrator::nq1", nq1_);
+    s.pack("Integrator::nrx", nrx_);
+    s.pack("Integrator::nrz", nrz_);
+    s.pack("Integrator::nrq", nrq_);
+    s.pack("Integrator::nrx1", nrx1_);
+    s.pack("Integrator::nrz1", nrz1_);
+    s.pack("Integrator::nrq1", nrq1_);
+    s.pack("Integrator::np", np_);
+    s.pack("Integrator::nrp", nrp_);
+    s.pack("Integrator::np1", np1_);
+    s.pack("Integrator::nrp1", nrp1_);
+    s.pack("Integrator::ns", ns_);
+    s.pack("Integrator::grid", grid_);
+    s.pack("Integrator::ngrid", ngrid_);
+    s.pack("Integrator::augmented_options", augmented_options_);
+    s.pack("Integrator::opts", opts_);
+    s.pack("Integrator::onestep", onestep_);
+    s.pack("Integrator::print_stats", print_stats_);
+    s.pack("Integrator::output_t0", output_t0_);
+    s.pack("Integrator::ntout", ntout_);
+  }
+
+  void Integrator::serialize_type(Serializer &s) const {
+    OracleFunction::serialize_type(s);
+    PluginInterface<Integrator>::serialize_type(s);
+  }
+
+  ProtoFunction* Integrator::deserialize(DeSerializer& s) {
+    return PluginInterface<Integrator>::deserialize(s);
+  }
+
+  Integrator::Integrator(DeSerializer & s) : OracleFunction(s) {
+    s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
+    s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
+    s.unpack("Integrator::nx", nx_);
+    s.unpack("Integrator::nz", nz_);
+    s.unpack("Integrator::nq", nq_);
+    s.unpack("Integrator::nx1", nx1_);
+    s.unpack("Integrator::nz1", nz1_);
+    s.unpack("Integrator::nq1", nq1_);
+    s.unpack("Integrator::nrx", nrx_);
+    s.unpack("Integrator::nrz", nrz_);
+    s.unpack("Integrator::nrq", nrq_);
+    s.unpack("Integrator::nrx1", nrx1_);
+    s.unpack("Integrator::nrz1", nrz1_);
+    s.unpack("Integrator::nrq1", nrq1_);
+    s.unpack("Integrator::np", np_);
+    s.unpack("Integrator::nrp", nrp_);
+    s.unpack("Integrator::np1", np1_);
+    s.unpack("Integrator::nrp1", nrp1_);
+    s.unpack("Integrator::ns", ns_);
+    s.unpack("Integrator::grid", grid_);
+    s.unpack("Integrator::ngrid", ngrid_);
+    s.unpack("Integrator::augmented_options", augmented_options_);
+    s.unpack("Integrator::opts", opts_);
+    s.unpack("Integrator::onestep", onestep_);
+    s.unpack("Integrator::print_stats", print_stats_);
+    s.unpack("Integrator::output_t0", output_t0_);
+    s.unpack("Integrator::ntout", ntout_);
+  }
+
+
+  void FixedStepIntegrator::serialize_body(Serializer &s) const {
+    Integrator::serialize_body(s);
+
+    s.pack("FixedStepIntegrator::F", F_);
+    s.pack("FixedStepIntegrator::G", G_);
+    s.pack("FixedStepIntegrator::nk", nk_);
+    s.pack("FixedStepIntegrator::h", h_);
+    s.pack("FixedStepIntegrator::nZ", nZ_);
+    s.pack("FixedStepIntegrator::nRZ", nRZ_);
+  }
+
+  FixedStepIntegrator::FixedStepIntegrator(DeSerializer & s) : Integrator(s) {
+    s.unpack("FixedStepIntegrator::F", F_);
+    s.unpack("FixedStepIntegrator::G", G_);
+    s.unpack("FixedStepIntegrator::nk", nk_);
+    s.unpack("FixedStepIntegrator::h", h_);
+    s.unpack("FixedStepIntegrator::nZ", nZ_);
+    s.unpack("FixedStepIntegrator::nRZ", nRZ_);
+  }
+
+  void ImplicitFixedStepIntegrator::serialize_body(Serializer &s) const {
+    FixedStepIntegrator::serialize_body(s);
+
+    s.pack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
+    s.pack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);
+  }
+
+  ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(DeSerializer & s) :
+      FixedStepIntegrator(s) {
+    s.unpack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
+    s.unpack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);
+  }
+
 } // namespace casadi

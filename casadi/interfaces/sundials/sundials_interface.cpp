@@ -390,4 +390,62 @@ namespace casadi {
     }
   }
 
+  SundialsInterface::SundialsInterface(DeSerializer& s) : Integrator(s) {
+    s.unpack("SundialsInterface::abstol", abstol_);
+    s.unpack("SundialsInterface::reltol", reltol_);
+    s.unpack("SundialsInterface::max_num_steps", max_num_steps_);
+    s.unpack("SundialsInterface::stop_at_end", stop_at_end_);
+    s.unpack("SundialsInterface::quad_err_con", quad_err_con_);
+    s.unpack("SundialsInterface::steps_per_checkpoint", steps_per_checkpoint_);
+    s.unpack("SundialsInterface::disable_internal_warnings", disable_internal_warnings_);
+    s.unpack("SundialsInterface::max_multistep_order", max_multistep_order_);
+    s.unpack("SundialsInterface::linear_solver", linear_solver_);
+
+    s.unpack("SundialsInterface::linear_solver_options", linear_solver_options_);
+    s.unpack("SundialsInterface::max_krylov", max_krylov_);
+    s.unpack("SundialsInterface::use_precon", use_precon_);
+    s.unpack("SundialsInterface::second_order_correction", second_order_correction_);
+    s.unpack("SundialsInterface::step0", step0_);
+    s.unpack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
+    s.unpack("SundialsInterface::max_order", max_order_);
+
+    s.unpack("SundialsInterface::linsolF", linsolF_);
+    s.unpack("SundialsInterface::linsolB", linsolB_);
+
+    int newton_scheme;
+    s.unpack("SundialsInterface::newton_scheme", newton_scheme);
+    newton_scheme_ = static_cast<NewtonScheme>(newton_scheme);
+
+    int interp;
+    s.unpack("SundialsInterface::interp", interp);
+    interp_ = static_cast<InterpType>(interp);
+  }
+
+  void SundialsInterface::serialize_body(Serializer &s) const {
+    Integrator::serialize_body(s);
+    s.pack("SundialsInterface::abstol", abstol_);
+    s.pack("SundialsInterface::reltol", reltol_);
+    s.pack("SundialsInterface::max_num_steps", max_num_steps_);
+    s.pack("SundialsInterface::stop_at_end", stop_at_end_);
+    s.pack("SundialsInterface::quad_err_con", quad_err_con_);
+    s.pack("SundialsInterface::steps_per_checkpoint", steps_per_checkpoint_);
+    s.pack("SundialsInterface::disable_internal_warnings", disable_internal_warnings_);
+    s.pack("SundialsInterface::max_multistep_order", max_multistep_order_);
+    s.pack("SundialsInterface::linear_solver", linear_solver_);
+
+    s.pack("SundialsInterface::linear_solver_options", linear_solver_options_);
+    s.pack("SundialsInterface::max_krylov", max_krylov_);
+    s.pack("SundialsInterface::use_precon", use_precon_);
+    s.pack("SundialsInterface::second_order_correction", second_order_correction_);
+    s.pack("SundialsInterface::step0", step0_);
+    s.pack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
+    s.pack("SundialsInterface::max_order", max_order_);
+
+    s.pack("SundialsInterface::linsolF", linsolF_);
+    s.pack("SundialsInterface::linsolB", linsolB_);
+
+    s.pack("SundialsInterface::newton_scheme", static_cast<int>(newton_scheme_));
+    s.pack("SundialsInterface::interp", static_cast<int>(interp_));
+  }
+
 } // namespace casadi

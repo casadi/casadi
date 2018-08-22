@@ -40,6 +40,7 @@ namespace casadi {
     plugin->doc = CvodesInterface::meta_doc.c_str();;
     plugin->version = CASADI_VERSION;
     plugin->options = &CvodesInterface::options_;
+    plugin->deserialize = &CvodesInterface::deserialize;
     return 0;
   }
 
@@ -851,6 +852,17 @@ namespace casadi {
 
   CvodesMemory::~CvodesMemory() {
     if (this->mem) CVodeFree(&this->mem);
+  }
+
+  CvodesInterface::CvodesInterface(DeSerializer& s) : SundialsInterface(s) {
+    s.unpack("CvodesInterface::lmm", lmm_);
+    s.unpack("CvodesInterface::iter", iter_);
+  }
+
+  void CvodesInterface::serialize_body(Serializer &s) const {
+    SundialsInterface::serialize_body(s);
+    s.pack("CvodesInterface::lmm", lmm_);
+    s.pack("CvodesInterface::iter", iter_);
   }
 
 } // namespace casadi

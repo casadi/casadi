@@ -108,6 +108,15 @@ namespace casadi {
 
     /// Continuous time dynamics
     Function f_, g_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new Collocation(s); }
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Collocation(DeSerializer& s);
   };
 
 } // namespace casadi

@@ -167,7 +167,7 @@ namespace casadi {
     // Supported interpolations in Sundials
     enum InterpType {SD_POLYNOMIAL, SD_HERMITE} interp_;
 
-    /// Linear solver data (dense)
+    /// Linear solver data (dense) -- what is this?
     struct LinSolDataDense {};
 
     /** \brief Set the (persistent) work vectors */
@@ -183,6 +183,13 @@ namespace casadi {
       std::vector<double> tmp(NV_DATA_S(v), NV_DATA_S(v)+NV_LENGTH_S(v));
       uout() << id << " = " << tmp << std::endl;
     }
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit SundialsInterface(DeSerializer& s);
   };
 
   // Check if N_Vector is regular
