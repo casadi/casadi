@@ -192,7 +192,7 @@ namespace casadi {
     static ProtoFunction* deserialize(DeSerializer& s);
 
     /** \brief String used to identify the immediate FunctionInternal subclass */
-    std::string serialize_base_function() const { return "Rootfinder"; }
+    std::string serialize_base_function() const override { return "Rootfinder"; }
 
   protected:
     /** \brief Deserializing constructor */

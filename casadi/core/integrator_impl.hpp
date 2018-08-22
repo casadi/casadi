@@ -229,7 +229,7 @@ namespace casadi {
     static ProtoFunction* deserialize(DeSerializer& s);
 
     /** \brief String used to identify the immediate FunctionInternal subclass */
-    std::string serialize_base_function() const { return "Integrator"; }
+    std::string serialize_base_function() const override { return "Integrator"; }
 
   protected:
     /** \brief Deserializing constructor */
