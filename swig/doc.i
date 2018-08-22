@@ -13467,15 +13467,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
-
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Integrator
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::Integrator::serialize_type(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -13919,7 +13912,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::serialize_body(Serializer &s)
+%feature("docstring")  casadi::Collocation::serialize_body(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize an object without type information.
@@ -14120,8 +14113,8 @@ problem)
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring")  casadi::Integrator::serialize_base_function() const
+"
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
@@ -22392,8 +22385,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring")  casadi::Rootfinder::serialize_base_function() const
+"
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
@@ -22852,15 +22845,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
-
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Rootfinder
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::Rootfinder::serialize_type(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -23079,7 +23065,7 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::serialize_body(Serializer &s)
+%feature("docstring")  casadi::FastNewton::serialize_body(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize an object without type information.
@@ -24769,8 +24755,8 @@ const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::OracleFunction::serialize_body(Serializer &s)
-const  "
+%feature("docstring")
+casadi::FixedStepIntegrator::serialize_body(Serializer &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -24902,9 +24888,10 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::info() const  "
+%feature("docstring")  casadi::Integrator::serialize_base_function() const
+"
 
-[INTERNAL]  Obtain information about function
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -25251,6 +25238,12 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::info() const  "
+
+[INTERNAL]  Obtain information about function
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::nnz_out() const  "
 
 [INTERNAL]  Number of input/output nonzeros.
@@ -25264,15 +25257,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
-
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Integrator
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::Integrator::serialize_type(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -25532,13 +25518,6 @@ Diagrams
 
 
 C++ includes: integrator_impl.hpp ";
-
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
-
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
-
-";
 
 %feature("docstring")  casadi::Integrator::aug_adj(casadi_int nadj) const  "
 
@@ -33474,8 +33453,8 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::serialize_body(Serializer &s)
-const  "
+%feature("docstring")
+casadi::ImplicitFixedStepIntegrator::serialize_body(Serializer &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -33598,13 +33577,6 @@ const  "
 casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
 [INTERNAL]  Get the (integer) output argument of an atomic operation.
-
-";
-
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
-
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -34411,15 +34383,8 @@ bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
-
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Integrator
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::Integrator::serialize_type(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -34509,10 +34474,10 @@ std::vector< std::string > &s_out, const Function::AuxOut
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
-bool persistent=false) "
+%feature("docstring")  casadi::Integrator::serialize_base_function() const
+"
 
-[INTERNAL]  Ensure required length of arg field.
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -34521,6 +34486,13 @@ casadi::ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(const
 std::string &name, const Function &dae) "
 
 [INTERNAL]  Constructor.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::alloc_arg(size_t sz_arg,
+bool persistent=false) "
+
+[INTERNAL]  Ensure required length of arg field.
 
 ";
 
@@ -34969,10 +34941,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::jit_dependencies(const
-std::string &fname)  "
+%feature("docstring")  casadi::FunctionInternal::size2_out(casadi_int ind)
+const  "
 
-[INTERNAL]  JIT for dependencies.
+[INTERNAL]  Input/output dimensions.
 
 ";
 
@@ -35197,20 +35169,6 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
-
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Rootfinder
->::serialize_type(Serializer &s) const "
-
-[INTERNAL]  Serialize type information.
-
-";
-
 %feature("docstring")  casadi::ProtoFunction::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
@@ -35291,6 +35249,13 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 ";
 
+%feature("docstring")  casadi::OracleFunction::jit_dependencies(const
+std::string &fname)  "
+
+[INTERNAL]  JIT for dependencies.
+
+";
+
 %feature("docstring")  casadi::ImplicitToNlp::plugin_name() const  "
 
 [INTERNAL] ";
@@ -35302,7 +35267,7 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::serialize_body(Serializer &s)
+%feature("docstring")  casadi::Rootfinder::serialize_body(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize an object without type information.
@@ -35415,8 +35380,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring")  casadi::Rootfinder::serialize_base_function() const
+"
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
@@ -35548,10 +35513,10 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::size2_out(casadi_int ind)
+%feature("docstring")  casadi::Rootfinder::serialize_type(Serializer &s)
 const  "
 
-[INTERNAL]  Input/output dimensions.
+[INTERNAL]  Serialize type information.
 
 ";
 
@@ -36488,7 +36453,7 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::serialize_body(Serializer &s)
+%feature("docstring")  casadi::Integrator::serialize_body(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize an object without type information.
@@ -36604,15 +36569,8 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
-
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Integrator
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::Integrator::serialize_type(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -36625,10 +36583,10 @@ double t, double *x, double *z, double *q) const  "
 
 ";
 
-%feature("docstring")  casadi::Integrator::retreat(IntegratorMemory *mem,
-double t, double *rx, double *rz, double *rq) const  "
+%feature("docstring")  casadi::Integrator::serialize_base_function() const
+"
 
-[INTERNAL]  Retreat solution in time.
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -36775,6 +36733,13 @@ const  "
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
 [INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring")  casadi::Integrator::retreat(IntegratorMemory *mem,
+double t, double *rx, double *rz, double *rq) const  "
+
+[INTERNAL]  Retreat solution in time.
 
 ";
 
@@ -37283,13 +37248,6 @@ const  "
 **arg, bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 
 [INTERNAL]  Evaluate a function, overloaded.
-
-";
-
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
-
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -50044,15 +50002,15 @@ casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring")  casadi::Rootfinder::serialize_base_function() const
+"
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::Newton::serialize_body(Serializer &s) const
+"
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -50139,15 +50097,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
-
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Rootfinder
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::Rootfinder::serialize_type(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -61098,9 +61049,10 @@ std::vector< M > &res, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+%feature("docstring")  casadi::OracleFunction::set_temp(void *mem, const
+double **arg, double **res, casadi_int *iw, double *w) const  "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Set the work vectors.
 
 ";
 
@@ -61118,7 +61070,7 @@ std::vector< M > &arg, casadi_int &npar) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::serialize_body(Serializer &s)
+%feature("docstring")  casadi::Rootfinder::serialize_body(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize an object without type information.
@@ -61385,10 +61337,11 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::PluginInterface< Rootfinder  >::plugin_name()
-const  "
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get the reference count.
+
+";
 
 %feature("docstring")  casadi::Rootfinder::get_name_out(casadi_int i)  "
 
@@ -61421,15 +61374,8 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
-
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Rootfinder
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::Rootfinder::serialize_type(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -61626,6 +61572,11 @@ never_inline) const  "
 
 ";
 
+%feature("docstring")  casadi::PluginInterface< Rootfinder  >::plugin_name()
+const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::Rootfinder::has_sprev() const  "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -61646,10 +61597,9 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
-std::vector< MX > &arg) const  "
+%feature("docstring")  casadi::Rootfinder::init_mem(void *mem) const  "
 
-[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+[INTERNAL]  Initalize memory block.
 
 ";
 
@@ -62003,12 +61953,6 @@ std::string &fname)  "
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::init_mem(void *mem) const  "
-
-[INTERNAL]  Initalize memory block.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::getJacSparsity(casadi_int
 iind, casadi_int oind, bool symmetric) const  "
 
@@ -62042,8 +61986,8 @@ never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring")  casadi::Rootfinder::serialize_base_function() const
+"
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
@@ -62319,10 +62263,10 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::set_temp(void *mem, const
-double **arg, double **res, casadi_int *iw, double *w) const  "
+%feature("docstring")  casadi::FunctionInternal::symbolic_output(const
+std::vector< MX > &arg) const  "
 
-[INTERNAL]  Set the work vectors.
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
 
 ";
 
@@ -62466,10 +62410,10 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::generate_dependencies(const
-std::string &fname, const Dict &opts) const  "
+%feature("docstring")  casadi::Integrator::serialize_base_function() const
+"
 
-[INTERNAL]  Export / Generate C code for the generated functions.
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -62664,10 +62608,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -62848,7 +62791,7 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::serialize_body(Serializer &s)
+%feature("docstring")  casadi::RungeKutta::serialize_body(Serializer &s)
 const  "
 
 [INTERNAL]  Serialize an object without type information.
@@ -63638,12 +63581,6 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
-
-[INTERNAL]  Get the reference count.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -63651,15 +63588,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
-
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Integrator
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::Integrator::serialize_type(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -63742,6 +63672,13 @@ const  "
 %feature("docstring")  casadi::RungeKutta::init(const Dict &opts)  "
 
 [INTERNAL]  Initialize stage.
+
+";
+
+%feature("docstring")  casadi::OracleFunction::generate_dependencies(const
+std::string &fname, const Dict &opts) const  "
+
+[INTERNAL]  Export / Generate C code for the generated functions.
 
 ";
 

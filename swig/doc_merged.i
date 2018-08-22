@@ -20485,9 +20485,9 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::info "
+%feature("docstring") casadi::FixedStepIntegrator::serialize_base_function "
 
-[INTERNAL]  Obtain information about function
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -20763,6 +20763,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::info "
+
+[INTERNAL]  Obtain information about function
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::nnz_out "
 
 [INTERNAL]  Number of input/output nonzeros.
@@ -21009,12 +21015,6 @@ Diagrams
 
 
 C++ includes: integrator_impl.hpp ";
-
-%feature("docstring") casadi::FixedStepIntegrator::serialize_base_function "
-
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
-
-";
 
 %feature("docstring") casadi::FixedStepIntegrator::aug_adj "
 
@@ -26254,13 +26254,6 @@ casadi::ImplicitFixedStepIntegrator::instruction_output "
 
 ";
 
-%feature("docstring")
-casadi::ImplicitFixedStepIntegrator::serialize_base_function "
-
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
-
-";
-
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::serialize "
 
 [INTERNAL]  Serialize an object.
@@ -27014,9 +27007,10 @@ elements.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::alloc_arg "
+%feature("docstring")
+casadi::ImplicitFixedStepIntegrator::serialize_base_function "
 
-[INTERNAL]  Ensure required length of arg field.
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -27024,6 +27018,12 @@ elements.
 casadi::ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator "
 
 [INTERNAL]  Constructor.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::alloc_arg "
+
+[INTERNAL]  Ensure required length of arg field.
 
 ";
 
@@ -27372,9 +27372,9 @@ C++ includes: implicit_to_nlp.hpp ";
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::jit_dependencies "
+%feature("docstring") casadi::ImplicitToNlp::size2_out "
 
-[INTERNAL]  JIT for dependencies.
+[INTERNAL]  Input/output dimensions.
 
 ";
 
@@ -27568,12 +27568,6 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::serialize_type "
-
-[INTERNAL]  Serialize type information.
-
-";
-
 %feature("docstring") casadi::ImplicitToNlp::checkout "
 
 [INTERNAL]  Checkout a memory object.
@@ -27643,6 +27637,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::ImplicitToNlp::definition "
 
 [INTERNAL]  Get function signature: name:(inputs)->(outputs)
+
+";
+
+%feature("docstring") casadi::ImplicitToNlp::jit_dependencies "
+
+[INTERNAL]  JIT for dependencies.
 
 ";
 
@@ -27872,9 +27872,9 @@ generated function.
 
 ";
 
-%feature("docstring") casadi::ImplicitToNlp::size2_out "
+%feature("docstring") casadi::ImplicitToNlp::serialize_type "
 
-[INTERNAL]  Input/output dimensions.
+[INTERNAL]  Serialize type information.
 
 ";
 
@@ -28779,9 +28779,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Integrator::retreat "
+%feature("docstring") casadi::Integrator::serialize_base_function "
 
-[INTERNAL]  Retreat solution in time.
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -28920,6 +28920,12 @@ C++ includes: integrator_impl.hpp ";
 %feature("docstring") casadi::Integrator::eval_mx "
 
 [INTERNAL]  Evaluate with symbolic matrices.
+
+";
+
+%feature("docstring") casadi::Integrator::retreat "
+
+[INTERNAL]  Retreat solution in time.
 
 ";
 
@@ -29349,12 +29355,6 @@ original
 Evaluate a function, overloaded.
 
 ";
-
-";
-
-%feature("docstring") casadi::Integrator::serialize_base_function "
-
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -48349,9 +48349,9 @@ original
 
 ";
 
-%feature("docstring") casadi::Rootfinder::getCount "
+%feature("docstring") casadi::Rootfinder::set_temp "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Set the work vectors.
 
 ";
 
@@ -48577,9 +48577,11 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::plugin_name "
+%feature("docstring") casadi::Rootfinder::getCount "
 
-[INTERNAL] ";
+[INTERNAL]  Get the reference count.
+
+";
 
 %feature("docstring") casadi::Rootfinder::get_name_out "
 
@@ -48776,6 +48778,10 @@ elements.
 
 ";
 
+%feature("docstring") casadi::Rootfinder::plugin_name "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Rootfinder::has_sprev "
 
 [INTERNAL]  Is the class able to propagate seeds through the algorithm?
@@ -48794,9 +48800,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::symbolic_output "
+%feature("docstring") casadi::Rootfinder::init_mem "
 
-[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+[INTERNAL]  Initalize memory block.
 
 ";
 
@@ -49099,12 +49105,6 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::init_mem "
-
-[INTERNAL]  Initalize memory block.
-
-";
-
 %feature("docstring") casadi::Rootfinder::getJacSparsity "
 
 [INTERNAL]  Generate the sparsity of a Jacobian block.
@@ -49357,9 +49357,9 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::Rootfinder::set_temp "
+%feature("docstring") casadi::Rootfinder::symbolic_output "
 
-[INTERNAL]  Set the work vectors.
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
 
 ";
 
@@ -49480,9 +49480,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::generate_dependencies "
+%feature("docstring") casadi::RungeKutta::serialize_base_function "
 
-[INTERNAL]  Export / Generate C code for the generated functions.
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -49649,9 +49649,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::serialize_base_function "
+%feature("docstring") casadi::RungeKutta::getCount "
 
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -50452,12 +50452,6 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::getCount "
-
-[INTERNAL]  Get the reference count.
-
-";
-
 %feature("docstring") casadi::RungeKutta::has_jacobian "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
@@ -50539,6 +50533,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::RungeKutta::init "
 
 [INTERNAL]  Initialize stage.
+
+";
+
+%feature("docstring") casadi::RungeKutta::generate_dependencies "
+
+[INTERNAL]  Export / Generate C code for the generated functions.
 
 ";
 

@@ -112,6 +112,9 @@
 %exception  casadi::Collocation::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Collocation::serialize_body(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Collocation::setupFG() override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -343,6 +346,9 @@
 %exception  casadi::FastNewton::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FastNewton::serialize_body(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FiniteDiff::codegen_body(CodeGenerator &g) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -395,6 +401,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FixedStepIntegrator::init(const Dict &opts) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FixedStepIntegrator::serialize_body(Serializer &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FixedStepIntegrator::setupFG() {
@@ -1054,6 +1063,9 @@
 %exception  casadi::ImplicitFixedStepIntegrator::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::ImplicitFixedStepIntegrator::serialize_body(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::ImplicitToNlp::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1178,6 +1190,15 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::rz() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Integrator::serialize_base_function() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Integrator::serialize_body(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Integrator::serialize_type(Serializer &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::sp_jac_dae() {
@@ -1660,6 +1681,9 @@
 %exception  casadi::Newton::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Newton::serialize_body(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Nlpsol::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1816,9 +1840,6 @@
 %exception  casadi::PluginInterface< Integrator  >::plugin_name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::PluginInterface< Integrator  >::serialize_type(Serializer &s) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::PluginInterface< Interpolant  >::plugin_name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1826,9 +1847,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::PluginInterface< Rootfinder  >::plugin_name() const  {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::PluginInterface< Rootfinder  >::serialize_type(Serializer &s) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ProtoFunction::alloc_mem() const  {
@@ -1963,6 +1981,15 @@
 %exception  casadi::Rootfinder::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Rootfinder::serialize_base_function() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Rootfinder::serialize_body(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Rootfinder::serialize_type(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Rootfinder::uses_output() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1973,6 +2000,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::RungeKutta::plugin_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::RungeKutta::serialize_body(Serializer &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::RungeKutta::setupFG() override {
