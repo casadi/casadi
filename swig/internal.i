@@ -1192,7 +1192,7 @@
 %exception  casadi::Integrator::rz() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Integrator::serialize_base_function() const  {
+%exception  casadi::Integrator::serialize_base_function() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::serialize_body(Serializer &s) const override {
@@ -1981,7 +1981,7 @@
 %exception  casadi::Rootfinder::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Rootfinder::serialize_base_function() const  {
+%exception  casadi::Rootfinder::serialize_base_function() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Rootfinder::serialize_body(Serializer &s) const override {
