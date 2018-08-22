@@ -193,6 +193,7 @@ matrix:
         - sudo apt-get install clang-6.0
         - export CC=clang-6.0
         - export CXX=clang++-6.0
+        - export CXXFLAGS=-Wno-deprecated-register
         - mkdir build
         - pushd build
         - bash -c "cmake $casadi_build_flags -DWITH_WERROR=ON -DWITH_SLICOT=OFF -DWITH_PYTHON=ON -DWITH_JSON=ON .."
