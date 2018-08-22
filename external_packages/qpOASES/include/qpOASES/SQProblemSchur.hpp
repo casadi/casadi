@@ -439,6 +439,8 @@ class SQProblemSchur : public SQProblem
         returnValue stepCalcDeltayFx(   int_t nFR, int_t nFX, int_t nAC, int_t* FX_idx, const real_t* const delta_g,
                                         real_t* const delta_xFX, real_t* const delta_xFR, real_t* const delta_yAC, real_t* const delta_yFX);
 
+        using SQProblem::setupAuxiliaryQP; // explicitly hides the parent's virtual function [-Werror,-Woverloaded-virtual]
+
     /*
      *  PROTECTED MEMBER VARIABLES
      */
