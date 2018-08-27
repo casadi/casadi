@@ -456,6 +456,9 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::resetB");
     auto m = to_mem(mem);
 
+    // Reset initial guess
+    N_VConst(0.0, m->rxz);
+
     // Reset the base classes
     SundialsInterface::resetB(mem, t, rx, rz, rp);
 
