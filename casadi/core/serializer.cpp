@@ -269,9 +269,7 @@ namespace casadi {
 
   template<>
   void DeSerializer::unpack(std::vector<bool>& e) {
-    char t;
-    unpack(t);
-    casadi_assert_dev(t=='V');
+    assert_decoration('V');
     casadi_int s;
     unpack(s);
     e.resize(s);
