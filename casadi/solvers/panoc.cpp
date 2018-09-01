@@ -172,6 +172,8 @@ namespace casadi {
     this->tolerance=0.001;
     this->constraints_weight=100.;
 
+    // extended_problem.problem.proxg // is configured by init call
+    // extended_problem.problem.cost_gradient_function // is configured by init call
     extended_problem.max_loops=this->outer_iterations;
     extended_problem.problem.dimension=2;
     extended_problem.problem.solver_params.tolerance=this->tolerance;
