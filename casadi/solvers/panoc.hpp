@@ -101,12 +101,17 @@ namespace casadi {
     int inner_iterations;
     double tolerance;
     double constraints_weight;
+    
 
     // Variables that are not changed during solve()
     Sparsity J_;
 
     /// A documentation string
     static const std::string meta_doc;
+
+    int constraints(const double* x,double* out);
+    int constraints_forward_diff(const double* x,const double* y,double* out);
+    double rosen_cost_gradient(const double* input,double* gradient);
 
   };
 
