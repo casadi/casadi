@@ -13178,6 +13178,10 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::ImporterInternal::finalize() "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::ImporterInternal::read_external(const
 std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
 
@@ -13257,6 +13261,11 @@ C++ includes: clang_compiler.hpp ";
 
 ";
 
+%feature("docstring")  casadi::ImporterInternal::serialize_body(Serializer
+&s) const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::ClangCompiler::get_options() const  "
 
 [INTERNAL]  Options.
@@ -13283,12 +13292,10 @@ C++ includes: clang_compiler.hpp ";
 
 ";
 
-%feature("docstring")  casadi::PluginInterface< ImporterInternal
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::ImporterInternal::serialize_type(Serializer
+&s) const  "
 
-[INTERNAL]  Serialize type information.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::ImporterInternal::has_meta(const std::string
 &cmd, casadi_int ind=-1) const  "
@@ -13302,6 +13309,11 @@ C++ includes: clang_compiler.hpp ";
 [INTERNAL]  Initialize.
 
 ";
+
+%feature("docstring")  casadi::ImporterInternal::serialize(Serializer &s)
+const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::ImporterInternal::body(const std::string
 &symname) const  "
@@ -17168,6 +17180,15 @@ stream. an error will be raised.
 
 ";
 
+%feature("docstring")  casadi::DeSerializer::unpack(Importer &e) "
+
+Reconstruct an object from the input stream.
+
+If the reference is not of the same type as the object encoded in the
+stream. an error will be raised.
+
+";
+
 %feature("docstring")  casadi::DeSerializer::unpack(GenericType &e) "
 
 Reconstruct an object from the input stream.
@@ -17267,6 +17288,15 @@ stream. an error will be raised.
 
 ";
 
+%feature("docstring")  casadi::DeSerializer::unpack(std::pair< A, B > &e) "
+
+Reconstruct an object from the input stream.
+
+If the reference is not of the same type as the object encoded in the
+stream. an error will be raised.
+
+";
+
 %feature("docstring")  casadi::DeSerializer::unpack(const std::string
 &descr, T &e) "
 
@@ -17314,6 +17344,10 @@ C++ includes: serializer.hpp ";
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::DllLibrary::init_handle() "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
 [INTERNAL]  Get the reference count.
@@ -17340,16 +17374,16 @@ C++ includes: serializer.hpp ";
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::weak() "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
 %feature("docstring")  casadi::ImporterInternal::get_meta(const std::string
 &cmd, casadi_int ind=-1) const  "
 
 [INTERNAL]  Get entry as a text.
-
-";
-
-%feature("docstring")  casadi::SharedObjectInternal::weak() "
-
-[INTERNAL]  Get a weak reference to the object.
 
 ";
 
@@ -17359,6 +17393,11 @@ bool more) const  "
 [INTERNAL]  Print.
 
 ";
+
+%feature("docstring")  casadi::ImporterInternal::serialize_body(Serializer
+&s) const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::ImporterInternal::body(const std::string
 &symname) const  "
@@ -17426,6 +17465,15 @@ C++ includes: importer_internal.hpp ";
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::DllLibrary::finalize()  "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ImporterInternal::serialize(Serializer &s)
+const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::DllLibrary::can_have_meta() const  "
 
 [INTERNAL]  Can meta information be read?
@@ -17444,12 +17492,10 @@ std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::PluginInterface< ImporterInternal
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::ImporterInternal::serialize_type(Serializer
+&s) const  "
 
-[INTERNAL]  Serialize type information.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::ImporterInternal::has_meta(const std::string
 &cmd, casadi_int ind=-1) const  "
@@ -20597,8 +20643,7 @@ classes.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring")  casadi::External::serialize_base_function() const  "
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
@@ -21009,9 +21054,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+%feature("docstring")  casadi::External::init_external() "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Initialize members that are unique.
 
 ";
 
@@ -21324,6 +21369,12 @@ const  "
 %feature("docstring")  casadi::External::has_jacobian() const  "
 
 [INTERNAL]  Full Jacobian.
+
+";
+
+%feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
+
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -21646,8 +21697,8 @@ SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")  casadi::External::serialize_body(Serializer &s) const
+"
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -29716,13 +29767,6 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::GenericExternal::get_sparsity_out(casadi_int
-i)  "
-
-[INTERNAL]  Retreive sparsities.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
 
 [INTERNAL]  Get relative tolerance.
@@ -29885,6 +29929,13 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 &stream) const  "
 
 [INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_max_in(casadi_int ind)
+const  "
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -30106,6 +30157,13 @@ std::string &name, const Importer &li) "
 
 ";
 
+%feature("docstring") casadi::GenericExternal::GenericExternal(DeSerializer
+&s) "
+
+[INTERNAL]  Deserializing constructor.
+
+";
+
 %feature("docstring")  casadi::GenericExternal::get_sparsity_in(casadi_int
 i)  "
 
@@ -30113,10 +30171,9 @@ i)  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
-bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
+%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
-[INTERNAL]  Propagate sparsity backwards.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -30255,10 +30312,17 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
+%feature("docstring")  casadi::GenericExternal::serialize_type(Serializer
 &s) const  "
 
 [INTERNAL]  Serialize type information.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::sp_reverse(bvec_t **arg,
+bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
+
+[INTERNAL]  Propagate sparsity backwards.
 
 ";
 
@@ -30336,8 +30400,7 @@ std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring")  casadi::External::serialize_base_function() const  "
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
@@ -30364,10 +30427,9 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_max_in(casadi_int ind)
-const  "
+%feature("docstring")  casadi::GenericExternal::init_external()  "
 
-[INTERNAL]  Get largest input value.
+[INTERNAL]  Initialize members that are unique.
 
 ";
 
@@ -30451,8 +30513,8 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")  casadi::External::serialize_body(Serializer &s) const
+"
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -30789,9 +30851,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::uses_output() const  "
+%feature("docstring")  casadi::GenericExternal::get_sparsity_out(casadi_int
+i)  "
 
-[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+[INTERNAL]  Retreive sparsities.
 
 ";
 
@@ -35911,10 +35974,9 @@ Get class name.
 
 ";
 
-%feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
-&stream=casadi::uout()) const  "
+%feature("docstring")  casadi::Importer::serialize(Serializer &s) const  "
 
-[INTERNAL]  Print the pointer to the internal class
+Serialize an object.
 
 ";
 
@@ -36075,6 +36137,13 @@ Is a null pointer?
 casadi_int ind=-1) const  "
 
 Get entry as a text.
+
+";
+
+%feature("docstring")  casadi::SharedObject::print_ptr(std::ostream
+&stream=casadi::uout()) const  "
+
+[INTERNAL]  Print the pointer to the internal class
 
 ";
 
@@ -65470,6 +65539,12 @@ Serializes an object to the output stream.
 
 ";
 
+%feature("docstring")  casadi::Serializer::pack(const Importer &e) "
+
+Serializes an object to the output stream.
+
+";
+
 %feature("docstring")  casadi::Serializer::pack(const Slice &e) "
 
 Serializes an object to the output stream.
@@ -65531,6 +65606,13 @@ Serializes an object to the output stream.
 ";
 
 %feature("docstring")  casadi::Serializer::pack(const std::map< K, V > &e) "
+
+Serializes an object to the output stream.
+
+";
+
+%feature("docstring")  casadi::Serializer::pack(const std::pair< A, B > &e)
+"
 
 Serializes an object to the output stream.
 
@@ -65672,6 +65754,15 @@ std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
 
 ";
 
+%feature("docstring")  casadi::ImporterInternal::finalize() "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::ImporterInternal::serialize_body(Serializer
+&s) const  "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::ImporterInternal::disp(std::ostream &stream,
 bool more) const  "
 
@@ -65679,12 +65770,10 @@ bool more) const  "
 
 ";
 
-%feature("docstring")  casadi::PluginInterface< ImporterInternal
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::ImporterInternal::serialize_type(Serializer
+&s) const  "
 
-[INTERNAL]  Serialize type information.
-
-";
+[INTERNAL] ";
 
 %feature("docstring")  casadi::ShellCompiler::plugin_name() const  "
 
@@ -65724,6 +65813,11 @@ bool more) const  "
 [INTERNAL]  Initialize.
 
 ";
+
+%feature("docstring")  casadi::ImporterInternal::serialize(Serializer &s)
+const  "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 

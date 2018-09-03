@@ -166,7 +166,13 @@
 %exception  casadi::DllLibrary::class_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DllLibrary::finalize() override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DllLibrary::get_function(const std::string &symname) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DllLibrary::init_handle() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Dple::get_forward(casadi_int nfwd, const std::string &name, const std::vector< std::string > &inames, const std::vector< std::string > &onames, const Dict &opts) const override {
@@ -281,6 +287,15 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::External::init(const Dict &opts) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::External::init_external() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::External::serialize_base_function() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::External::serialize_body(Serializer &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FStats::reset() {
@@ -898,6 +913,12 @@
 %exception  casadi::GenericExternal::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericExternal::init_external() override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericExternal::serialize_type(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericMatrix::conditional(const MatType &ind, const std::vector< MatType > &x, const MatType &x_default, bool short_circuit=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1093,6 +1114,9 @@
 %exception  casadi::ImporterInternal::disp(std::ostream &stream, bool more) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::ImporterInternal::finalize() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::ImporterInternal::get_meta(const std::string &cmd, casadi_int ind=-1) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1118,6 +1142,15 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ImporterInternal::read_meta(std::istream &file, casadi_int &offset) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ImporterInternal::serialize(Serializer &s) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ImporterInternal::serialize_body(Serializer &s) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::ImporterInternal::serialize_type(Serializer &s) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ImporterInternal::to_text(const std::string &cmd, casadi_int ind=-1) const  {
@@ -1834,9 +1867,6 @@
 %exception  casadi::PluginInterface< Expm  >::serialize_type(Serializer &s) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::PluginInterface< ImporterInternal  >::serialize_type(Serializer &s) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::PluginInterface< Integrator  >::plugin_name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2354,6 +2384,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::ForwardDiff::ForwardDiff(const std::string &name, casadi_int n) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::GenericExternal::GenericExternal(DeSerializer &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::GenericExternal::GenericExternal(const std::string &name, const Importer &li) {

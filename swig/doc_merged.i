@@ -10675,6 +10675,10 @@ elements.
 
 ";
 
+%feature("docstring") casadi::ClangCompiler::finalize "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::ClangCompiler::read_external "
 
 [INTERNAL]  Get an external function declaration.
@@ -10752,6 +10756,10 @@ C++ includes: clang_compiler.hpp ";
 
 ";
 
+%feature("docstring") casadi::ClangCompiler::serialize_body "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::ClangCompiler::get_options "
 
 [INTERNAL]  Options.
@@ -10778,9 +10786,7 @@ C++ includes: clang_compiler.hpp ";
 
 %feature("docstring") casadi::ClangCompiler::serialize_type "
 
-[INTERNAL]  Serialize type information.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::ClangCompiler::has_meta "
 
@@ -10793,6 +10799,10 @@ C++ includes: clang_compiler.hpp ";
 [INTERNAL]  Initialize.
 
 ";
+
+%feature("docstring") casadi::ClangCompiler::serialize "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::ClangCompiler::body "
 
@@ -14072,6 +14082,10 @@ C++ includes: serializer.hpp ";
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::DllLibrary::init_handle "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::DllLibrary::getCount "
 
 [INTERNAL]  Get the reference count.
@@ -14096,15 +14110,15 @@ C++ includes: serializer.hpp ";
 
 ";
 
-%feature("docstring") casadi::DllLibrary::get_meta "
-
-[INTERNAL]  Get entry as a text.
-
-";
-
 %feature("docstring") casadi::DllLibrary::weak "
 
 [INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring") casadi::DllLibrary::get_meta "
+
+[INTERNAL]  Get entry as a text.
 
 ";
 
@@ -14113,6 +14127,10 @@ C++ includes: serializer.hpp ";
 [INTERNAL]  Print.
 
 ";
+
+%feature("docstring") casadi::DllLibrary::serialize_body "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::DllLibrary::body "
 
@@ -14176,6 +14194,14 @@ C++ includes: importer_internal.hpp ";
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::DllLibrary::finalize "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::DllLibrary::serialize "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::DllLibrary::can_have_meta "
 
 [INTERNAL]  Can meta information be read?
@@ -14194,9 +14220,7 @@ C++ includes: importer_internal.hpp ";
 
 %feature("docstring") casadi::DllLibrary::serialize_type "
 
-[INTERNAL]  Serialize type information.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::DllLibrary::has_meta "
 
@@ -17210,9 +17234,9 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::External::getCount "
+%feature("docstring") casadi::External::init_external "
 
-[INTERNAL]  Get the reference count.
+[INTERNAL]  Initialize members that are unique.
 
 ";
 
@@ -17475,6 +17499,12 @@ structure recognition.
 %feature("docstring") casadi::External::has_jacobian "
 
 [INTERNAL]  Full Jacobian.
+
+";
+
+%feature("docstring") casadi::External::getCount "
+
+[INTERNAL]  Get the reference count.
 
 ";
 
@@ -23938,12 +23968,6 @@ Get default input value.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::get_sparsity_out "
-
-[INTERNAL]  Retreive sparsities.
-
-";
-
 %feature("docstring") casadi::GenericExternal::get_reltol "
 
 [INTERNAL]  Get relative tolerance.
@@ -24079,6 +24103,12 @@ elements.
 %feature("docstring") casadi::GenericExternal::print_options "
 
 [INTERNAL]  Print list of options.
+
+";
+
+%feature("docstring") casadi::GenericExternal::get_max_in "
+
+[INTERNAL]  Get largest input value.
 
 ";
 
@@ -24249,7 +24279,14 @@ classes.
 
 %feature("docstring") casadi::GenericExternal::GenericExternal "
 
-[INTERNAL]  Constructor.
+[INTERNAL]  Deserializing constructor.
+
+>  casadi::GenericExternal::GenericExternal(DeSerializer &s)
+------------------------------------------------------------------------
+[INTERNAL] 
+Deserializing constructor.
+
+";
 
 ";
 
@@ -24259,9 +24296,9 @@ classes.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::sp_reverse "
+%feature("docstring") casadi::GenericExternal::uses_output "
 
-[INTERNAL]  Propagate sparsity backwards.
+[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
 
 ";
 
@@ -24382,6 +24419,12 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::GenericExternal::sp_reverse "
+
+[INTERNAL]  Propagate sparsity backwards.
+
+";
+
 %feature("docstring") casadi::GenericExternal::eval_dm "
 
 [INTERNAL]  Evaluate with DM matrices.
@@ -24466,9 +24509,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::get_max_in "
+%feature("docstring") casadi::GenericExternal::init_external "
 
-[INTERNAL]  Get largest input value.
+[INTERNAL]  Initialize members that are unique.
 
 ";
 
@@ -24829,9 +24872,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::uses_output "
+%feature("docstring") casadi::GenericExternal::get_sparsity_out "
 
-[INTERNAL]  Do the derivative functions need nondifferentiated outputs?
+[INTERNAL]  Retreive sparsities.
 
 ";
 
@@ -28196,9 +28239,9 @@ Get class name.
 
 ";
 
-%feature("docstring") casadi::Importer::print_ptr "
+%feature("docstring") casadi::Importer::serialize "
 
-[INTERNAL]  Print the pointer to the internal class
+Serialize an object.
 
 ";
 
@@ -28356,6 +28399,12 @@ Is a null pointer?
 %feature("docstring") casadi::Importer::get_meta "
 
 Get entry as a text.
+
+";
+
+%feature("docstring") casadi::Importer::print_ptr "
+
+[INTERNAL]  Print the pointer to the internal class
 
 ";
 
@@ -52162,6 +52211,14 @@ point to any node, \"0\" is returned.
 
 ";
 
+%feature("docstring") casadi::ShellCompiler::finalize "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::ShellCompiler::serialize_body "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::ShellCompiler::disp "
 
 [INTERNAL]  Print.
@@ -52170,9 +52227,7 @@ point to any node, \"0\" is returned.
 
 %feature("docstring") casadi::ShellCompiler::serialize_type "
 
-[INTERNAL]  Serialize type information.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::ShellCompiler::plugin_name "
 
@@ -52209,6 +52264,10 @@ point to any node, \"0\" is returned.
 [INTERNAL]  Initialize.
 
 ";
+
+%feature("docstring") casadi::ShellCompiler::serialize "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::ShellCompiler::getCount "
 
