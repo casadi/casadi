@@ -25,6 +25,7 @@
 
 #include "external_impl.hpp"
 #include "casadi_misc.hpp"
+#include "serializer.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -50,17 +51,21 @@ namespace casadi {
   External::External(const std::string& name, const Importer& li)
     : FunctionInternal(name), li_(li) {
 
+    External::init_external();
+  }
+
+  void External::init_external() {
     // Increasing/decreasing reference counter
     incref_ = (signal_t)li_.get_function(name_ + "_incref");
     decref_ = (signal_t)li_.get_function(name_ + "_decref");
 
     // Getting number of inputs and outputs
-    get_n_in_ = (getint_t)li_.get_function(name + "_n_in");
-    get_n_out_ = (getint_t)li_.get_function(name + "_n_out");
+    get_n_in_ = (getint_t)li_.get_function(name_ + "_n_in");
+    get_n_out_ = (getint_t)li_.get_function(name_ + "_n_out");
 
     // Getting names of inputs and outputs
-    get_name_in_ = (name_t)li_.get_function(name + "_name_in");
-    get_name_out_ = (name_t)li_.get_function(name + "_name_out");
+    get_name_in_ = (name_t)li_.get_function(name_ + "_name_in");
+    get_name_out_ = (name_t)li_.get_function(name_ + "_name_out");
 
     // Work vector sizes
     work_ = (work_t)li_.get_function(name_ + "_work");
@@ -72,9 +77,14 @@ namespace casadi {
   GenericExternal::GenericExternal(const std::string& name, const Importer& li)
     : External(name, li) {
 
+    GenericExternal::init_external();
+  }
+
+  void GenericExternal::init_external() {
+
     // Functions for retrieving sparsities of inputs and outputs
-    get_sparsity_in_ = (sparsity_t)li_.get_function(name + "_sparsity_in");
-    get_sparsity_out_ = (sparsity_t)li_.get_function(name + "_sparsity_out");
+    get_sparsity_in_ = (sparsity_t)li_.get_function(name_ + "_sparsity_in");
+    get_sparsity_out_ = (sparsity_t)li_.get_function(name_ + "_sparsity_out");
 
     // Memory allocation functions
     alloc_mem_ = (alloc_mem_t)li_.get_function(name_ + "_alloc_mem");
@@ -348,4 +358,40 @@ namespace casadi {
     return ret;
   }
 
+  void External::serialize_body(Serializer &s) const {
+    FunctionInternal::serialize_body(s);
+
+    s.pack("External::int_data", int_data_);
+    s.pack("External::real_data", real_data_);
+    s.pack("External::string_data", string_data_);
+    s.pack("External::li", li_);
+  }
+
+  ProtoFunction* External::deserialize(DeSerializer& s) {
+    char type;
+    s.unpack("External::type", type);
+    switch (type) {
+      case 'g': return new GenericExternal(s);
+      default:
+        casadi_error("External::deserialize error");
+    }
+  }
+
+  void GenericExternal::serialize_type(Serializer &s) const {
+    FunctionInternal::serialize_type(s);
+    s.pack("External::type", 'g');
+  }
+
+  External::External(DeSerializer & s) : FunctionInternal(s) {
+    s.unpack("External::int_data", int_data_);
+    s.unpack("External::real_data", real_data_);
+    s.unpack("External::string_data", string_data_);
+    s.unpack("External::li", li_);
+
+    External::init_external();
+  }
+
+  GenericExternal::GenericExternal(DeSerializer& s) : External(s) {
+    GenericExternal::init_external();
+  }
 } // namespace casadi

@@ -904,7 +904,7 @@ class Functiontests(casadiTestCase):
 
     for a,r in pairs:
       self.assertTrue(same(F(a), r))
-      self.check_codegen(F,inputs=[a])
+      self.check_codegen(F,inputs=[a],check_serialize=True)
       self.check_serialize(F,[a])
 
     X = MX.sym("x")

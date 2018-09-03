@@ -38,6 +38,7 @@
 #include "interpolant_impl.hpp"
 #include "nlpsol_impl.hpp"
 #include "integrator_impl.hpp"
+#include "external_impl.hpp"
 
 #include <typeinfo>
 #include <cctype>
@@ -2976,6 +2977,7 @@ namespace casadi {
     {"Nlpsol", Nlpsol::deserialize},
     {"Rootfinder", Rootfinder::deserialize},
     {"Integrator", Integrator::deserialize},
+    {"External", External::deserialize},
   };
 
 } // namespace casadi

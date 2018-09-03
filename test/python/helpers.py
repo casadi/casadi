@@ -515,7 +515,7 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89"):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",check_serialize=False):
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
@@ -535,6 +535,9 @@ class casadiTestCase(unittest.TestCase):
       else:
         for i in range(F.n_out()):
           self.checkarray(Fout[i],Fout2[i])
+
+      if self.check_serialize:
+        self.check_serialize(F2,inputs=inputs)
 
 
   def check_serialize(self,F,inputs=None):

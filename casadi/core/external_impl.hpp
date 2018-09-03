@@ -87,6 +87,9 @@ namespace casadi {
     /** \brief Get type name */
     std::string class_name() const override { return "External";}
 
+    /** \brief Initialize members that are unique */
+    virtual void init_external();
+
     /// Initialize
     void init(const Dict& opts) override;
 
@@ -134,6 +137,19 @@ namespace casadi {
                                      const std::vector<std::string>& onames,
                                      const Dict& opts) const override;
     ///@}
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s);
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "External"; }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit External(DeSerializer& s);
   };
 
   class CASADI_EXPORT GenericExternal : public External {
@@ -152,6 +168,9 @@ namespace casadi {
     /** \brief  Destructor */
     ~GenericExternal() override { this->clear_mem();}
 
+    /** \brief Initialize members that are unique */
+    void init_external() override;
+
     /// Initialize
     void init(const Dict& opts) override;
 
@@ -169,6 +188,13 @@ namespace casadi {
 
     /** \brief Free memory block */
     void free_mem(void *mem) const override;
+
+    /** \brief Serialize type information */
+    void serialize_type(Serializer &s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit GenericExternal(DeSerializer& s);
+
   };
 
 

@@ -27,6 +27,7 @@
 #include "serializer.hpp"
 #include "slice.hpp"
 #include "linsol.hpp"
+#include "importer.hpp"
 #include "generic_type.hpp"
 #include <iomanip>
 
@@ -88,7 +89,7 @@ namespace casadi {
       if (debug_) {
         char t;
         unpack(t);
-        casadi_assert(t==e, "Serializer error '" + str(e) + "' vs '" + str(t) + "'.");
+        casadi_assert(t==e, "DeSerializer error '" + str(e) + "' vs '" + str(t) + "'.");
       }
     }
 
@@ -225,6 +226,16 @@ namespace casadi {
     void DeSerializer::unpack(Function& e) {
       assert_decoration('X');
       shared_unpack<Function, FunctionInternal>(e);
+    }
+
+    void Serializer::pack(const Importer& e) {
+      decorate('M');
+      shared_pack(e);
+    }
+
+    void DeSerializer::unpack(Importer& e) {
+      assert_decoration('M');
+      shared_unpack<Importer, ImporterInternal>(e);
     }
 
     void Serializer::pack(const Linsol& e) {

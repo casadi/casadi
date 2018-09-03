@@ -38,6 +38,7 @@ namespace casadi {
   class MX;
   class SXElem;
   class GenericType;
+  class Importer;
   /** \brief Helper class for Serialization
       \author Joris Gillis
       \date 2018
@@ -62,6 +63,7 @@ namespace casadi {
       e = Matrix<T>::deserialize(*this);
     }
     void unpack(Function& e);
+    void unpack(Importer& e);
     void unpack(GenericType& e);
     void unpack(Slice& e);
     void unpack(int& e);
@@ -93,6 +95,13 @@ namespace casadi {
         unpack(v);
         e[k] = v;
       }
+    }
+
+    template <class A, class B>
+    void unpack(std::pair<A, B>& e) {
+      assert_decoration('p');
+      unpack(e.first);
+      unpack(e.second);
     }
 
     template <class T>
@@ -169,6 +178,7 @@ namespace casadi {
       e.serialize(*this);
     }
     void pack(const Function& e);
+    void pack(const Importer& e);
     void pack(const Slice& e);
     void pack(const GenericType& e);
     void pack(int e);
@@ -193,7 +203,12 @@ namespace casadi {
         pack(i.second);
       }
     }
-
+    template <class A, class B>
+    void pack(const std::pair<A, B>& e) {
+      decorate('p');
+      pack(e.first);
+      pack(e.second);
+    }
     template <class T>
     void pack(const std::string& descr, const T& e) {
       if (debug_) pack(descr);
