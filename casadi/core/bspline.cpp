@@ -481,4 +481,78 @@ namespace casadi {
       return 0;
     }
 
+
+  void BSplineCommon::serialize_body(Serializer &s) const {
+    FunctionInternal::serialize_body(s);
+
+    s.pack("BSplineCommon::sp_jac_dae", lookup_mode_);
+    s.pack("BSplineCommon::knots", knots_);
+    s.pack("BSplineCommon::offset", offset_);
+    s.pack("BSplineCommon::degree", degree_);
+    s.pack("BSplineCommon::strides", strides_);
+    s.pack("BSplineCommon::coeffs_dims", coeffs_dims_);
+    s.pack("BSplineCommon::coeffs_size", coeffs_size_);
+    s.pack("BSplineCommon::m", m_);
+  }
+
+  BSplineCommon::BSplineCommon(DeSerializer& s) : FunctionInternal(s) {
+    s.unpack("BSplineCommon::sp_jac_dae", lookup_mode_);
+    s.unpack("BSplineCommon::knots", knots_);
+    s.unpack("BSplineCommon::offset", offset_);
+    s.unpack("BSplineCommon::degree", degree_);
+    s.unpack("BSplineCommon::strides", strides_);
+    s.unpack("BSplineCommon::coeffs_dims", coeffs_dims_);
+    s.unpack("BSplineCommon::coeffs_size", coeffs_size_);
+    s.unpack("BSplineCommon::m", m_);
+  }
+
+  void BSplineCommon::serialize_type(Serializer &s) const {
+    FunctionInternal::serialize_type(s);
+  }
+
+  void BSpline::serialize_type(Serializer &s) const {
+    BSplineCommon::serialize_type(s);
+    s.pack("BSplineCommon::type", 'p');
+  }
+
+  void BSplineDual::serialize_type(Serializer &s) const {
+    BSplineCommon::serialize_type(s);
+    s.pack("BSplineCommon::type", 'd');
+  }
+
+  ProtoFunction* BSplineCommon::deserialize(DeSerializer& s) {
+    char type;
+    s.unpack("BSplineCommon::type", type);
+    switch (type) {
+      case 'p': return new BSpline(s);
+      case 'd': return new BSplineDual(s);
+      default:
+        casadi_error("BSplineCommon::deserialize error");
+    }
+  }
+
+  void BSpline::serialize_body(Serializer &s) const {
+    BSplineCommon::serialize_body(s);
+
+    s.pack("BSpline::coeffs", coeffs_);
+  }
+
+  BSpline::BSpline(DeSerializer& s) : BSplineCommon(s) {
+    s.unpack("BSpline::coeffs", coeffs_);
+  }
+
+  void BSplineDual::serialize_body(Serializer &s) const {
+    BSplineCommon::serialize_body(s);
+
+    s.pack("BSplineDual::x", x_);
+    s.pack("BSplineDual::reverse", reverse_);
+    s.pack("BSplineDual::N", N_);
+  }
+
+  BSplineDual::BSplineDual(DeSerializer& s) : BSplineCommon(s) {
+    s.unpack("BSplineDual::x", x_);
+    s.unpack("BSplineDual::reverse", reverse_);
+    s.unpack("BSplineDual::N", N_);
+  }
+
 } // namespace casadi

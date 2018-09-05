@@ -1062,6 +1062,7 @@ class Functiontests(casadiTestCase):
     LUTH = LUT.hessian_old(0, 0)
 
     self.check_codegen(LUT, [vertcat(0.2,0.3)])
+    self.check_serialize(LUT, [vertcat(0.2,0.3)])
     #scipy.interpolate.interpn(d_knots, data, [0.2,0.3], method='splinef2d')
 
     interp = scipy.interpolate.RectBivariateSpline(d_knots[0], d_knots[1], data)
@@ -1673,6 +1674,7 @@ class Functiontests(casadiTestCase):
 
     self.checkfunction(LUT,LUT_sep, inputs=[0.2,0.333])
     self.check_codegen(LUT,inputs=[0.2,0.333])
+    self.check_serialize(LUT,inputs=[0.2,0.333])
 
   def test_codegen_avoid_stack(self):
     x = SX.sym("x",3,3)

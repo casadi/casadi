@@ -67,6 +67,21 @@ namespace casadi {
     std::vector<casadi_int> coeffs_dims_;
     casadi_int coeffs_size_;
     casadi_int m_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s);
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "BSpline"; }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit BSplineCommon(DeSerializer& s);
   };
 
   class BSpline : public BSplineCommon {
@@ -132,6 +147,18 @@ namespace casadi {
     std::string class_name() const override { return "BSpline"; }
 
     std::vector<double> coeffs_;
+
+    /** \brief Serialize type information */
+    void serialize_type(Serializer &s) const override;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new BSpline(s); }
+
+    /** \brief Deserializing constructor */
+    explicit BSpline(DeSerializer& s);
 
   private:
     std::vector<double> derivative_coeff(casadi_int i) const;
@@ -216,6 +243,18 @@ namespace casadi {
     std::vector<double> x_;
     bool reverse_;
     casadi_int N_;
+
+    /** \brief Serialize type information */
+    void serialize_type(Serializer &s) const override;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new BSplineDual(s); }
+
+    /** \brief Deserializing constructor */
+    explicit BSplineDual(DeSerializer& s);
   };
 
 } // namespace casadi

@@ -39,6 +39,7 @@
 #include "nlpsol_impl.hpp"
 #include "integrator_impl.hpp"
 #include "external_impl.hpp"
+#include "bspline.hpp"
 
 #include <typeinfo>
 #include <cctype>
@@ -2978,6 +2979,7 @@ namespace casadi {
     {"Rootfinder", Rootfinder::deserialize},
     {"Integrator", Integrator::deserialize},
     {"External", External::deserialize},
+    {"BSpline", BSplineCommon::deserialize},
   };
 
 } // namespace casadi

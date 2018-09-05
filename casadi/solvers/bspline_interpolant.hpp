@@ -121,6 +121,14 @@ namespace casadi {
 
     static std::vector<double> greville_points(const std::vector<double>& x, casadi_int degree);
 
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new BSplineInterpolant(s); }
+
+  protected:
+     /** \brief Deserializing constructor */
+    explicit BSplineInterpolant(DeSerializer& e);
   };
 
 
