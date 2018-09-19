@@ -4797,10 +4797,10 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")  casadi::BSpline::serialize_type(Serializer &s) const
+"
 
-[INTERNAL]  Serialize type information.
+Serialize type information.
 
 ";
 
@@ -5355,10 +5355,9 @@ Destructor.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring") casadi::BSpline::BSpline(DeSerializer &s) "
 
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+Deserializing constructor.
 
 ";
 
@@ -5368,10 +5367,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")  casadi::BSpline::serialize_body(Serializer &s) const
+"
 
-[INTERNAL]  Serialize an object without type information.
+Serialize an object without type information.
 
 ";
 
@@ -5420,6 +5419,13 @@ std::vector< M > &arg, casadi_int &npar) const  "
 casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen sparsities.
+
+";
+
+%feature("docstring")  casadi::BSplineCommon::serialize_base_function()
+const  "
+
+String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -5988,10 +5994,10 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")  casadi::BSplineCommon::serialize_body(Serializer &s)
+const  "
 
-[INTERNAL]  Serialize an object without type information.
+Serialize an object without type information.
 
 ";
 
@@ -6219,10 +6225,10 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")  casadi::BSplineCommon::serialize_type(Serializer &s)
+const  "
 
-[INTERNAL]  Serialize type information.
+Serialize type information.
 
 ";
 
@@ -6673,10 +6679,10 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
+%feature("docstring")  casadi::BSplineCommon::serialize_base_function()
 const  "
 
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -7177,13 +7183,6 @@ std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
-
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
-
-";
-
 %feature("docstring")  casadi::FunctionInternal::instruction_id(casadi_int
 k) const  "
 
@@ -7425,16 +7424,10 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::mx_out(casadi_int ind)
+%feature("docstring")  casadi::BSplineCommon::serialize_base_function()
 const  "
 
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::mx_out() const  "
-
-[INTERNAL]  Get function input(s) and output(s)
+String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -7476,10 +7469,10 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")  casadi::BSplineDual::serialize_body(Serializer &s)
+const  "
 
-[INTERNAL]  Serialize an object without type information.
+Serialize an object without type information.
 
 ";
 
@@ -7513,6 +7506,12 @@ Evaluate numerically, work vectors given.
 "
 
 [INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -7924,9 +7923,16 @@ std::vector< M > &arg, casadi_int &npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::oracle() const  "
+%feature("docstring")  casadi::FunctionInternal::mx_out(casadi_int ind)
+const  "
 
-[INTERNAL]  Get oracle.
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::mx_out() const  "
+
+[INTERNAL]  Get function input(s) and output(s)
 
 ";
 
@@ -7986,9 +7992,9 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+%feature("docstring")  casadi::FunctionInternal::oracle() const  "
 
-[INTERNAL]  Get relative tolerance.
+[INTERNAL]  Get oracle.
 
 ";
 
@@ -8041,10 +8047,10 @@ Generate code for the body of the C function.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")  casadi::BSplineDual::serialize_type(Serializer &s)
+const  "
 
-[INTERNAL]  Serialize type information.
+Serialize type information.
 
 ";
 
@@ -8101,6 +8107,12 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::BSplineDual::BSplineDual(DeSerializer &s) "
+
+Deserializing constructor.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
@@ -8111,6 +8123,12 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
 [INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_reltol() const  "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -8145,9 +8163,10 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_derivative() const  "
+%feature("docstring")  casadi::FunctionInternal::replace_res(const
+std::vector< M > &res, casadi_int npar) const  "
 
-[INTERNAL]  Can derivatives be calculated in any way?
+[INTERNAL]  Replace 0-by-0 outputs.
 
 ";
 
@@ -8401,13 +8420,6 @@ const std::string &name, const std::vector< std::string > &inames, const
 std::vector< std::string > &onames, const Dict &opts) const  "
 
 Generate a function that calculates nfwd forward derivatives.
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::replace_res(const
-std::vector< M > &res, casadi_int npar) const  "
-
-[INTERNAL]  Replace 0-by-0 outputs.
 
 ";
 
@@ -8741,8 +8753,8 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::Interpolant::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::BSplineInterpolant::serialize_body(Serializer
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 

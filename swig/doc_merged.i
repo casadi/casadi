@@ -4121,7 +4121,7 @@ propagation.
 
 %feature("docstring") casadi::BSpline::serialize_type "
 
-[INTERNAL]  Serialize type information.
+Serialize type information.
 
 ";
 
@@ -4624,9 +4624,16 @@ Destructor.
 
 ";
 
-%feature("docstring") casadi::BSpline::serialize_base_function "
+%feature("docstring") casadi::BSpline::BSpline "
 
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+Deserializing constructor.
+
+>  casadi::BSpline::BSpline(DeSerializer &s)
+------------------------------------------------------------------------
+
+Deserializing constructor.
+
+";
 
 ";
 
@@ -4638,7 +4645,7 @@ Destructor.
 
 %feature("docstring") casadi::BSpline::serialize_body "
 
-[INTERNAL]  Serialize an object without type information.
+Serialize an object without type information.
 
 ";
 
@@ -4681,6 +4688,12 @@ Destructor.
 %feature("docstring") casadi::BSpline::codegen_sparsities "
 
 [INTERNAL]  Codegen sparsities.
+
+";
+
+%feature("docstring") casadi::BSpline::serialize_base_function "
+
+String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -5199,7 +5212,7 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::BSplineCommon::serialize_body "
 
-[INTERNAL]  Serialize an object without type information.
+Serialize an object without type information.
 
 ";
 
@@ -5386,7 +5399,7 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 %feature("docstring") casadi::BSplineCommon::serialize_type "
 
-[INTERNAL]  Serialize type information.
+Serialize type information.
 
 ";
 
@@ -5761,7 +5774,7 @@ elements.
 
 %feature("docstring") casadi::BSplineCommon::serialize_base_function "
 
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -6167,12 +6180,6 @@ classes.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::serialize_base_function "
-
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
-
-";
-
 %feature("docstring") casadi::BSplineDual::instruction_id "
 
 [INTERNAL]  Get an atomic operation operator index.
@@ -6365,9 +6372,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::mx_out "
+%feature("docstring") casadi::BSplineDual::serialize_base_function "
 
-[INTERNAL]  Get function input(s) and output(s)
+String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -6406,7 +6413,7 @@ elements.
 
 %feature("docstring") casadi::BSplineDual::serialize_body "
 
-[INTERNAL]  Serialize an object without type information.
+Serialize an object without type information.
 
 ";
 
@@ -6437,6 +6444,12 @@ Evaluate numerically, work vectors given.
 %feature("docstring") casadi::BSplineDual::release "
 
 [INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring") casadi::BSplineDual::has_derivative "
+
+[INTERNAL]  Can derivatives be calculated in any way?
 
 ";
 
@@ -6827,9 +6840,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::oracle "
+%feature("docstring") casadi::BSplineDual::mx_out "
 
-[INTERNAL]  Get oracle.
+[INTERNAL]  Get function input(s) and output(s)
 
 ";
 
@@ -6882,9 +6895,9 @@ Is the class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::BSplineDual::get_reltol "
+%feature("docstring") casadi::BSplineDual::oracle "
 
-[INTERNAL]  Get relative tolerance.
+[INTERNAL]  Get oracle.
 
 ";
 
@@ -6932,7 +6945,7 @@ Generate code for the body of the C function.
 
 %feature("docstring") casadi::BSplineDual::serialize_type "
 
-[INTERNAL]  Serialize type information.
+Serialize type information.
 
 ";
 
@@ -6982,6 +6995,19 @@ Is the class able to propagate seeds through the algorithm?
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::BSplineDual::BSplineDual "
+
+Deserializing constructor.
+
+>  casadi::BSplineDual::BSplineDual(DeSerializer &s)
+------------------------------------------------------------------------
+
+Deserializing constructor.
+
+";
+
+";
+
 %feature("docstring") casadi::BSplineDual::print_dimensions "
 
 [INTERNAL]  Print dimensions of inputs and outputs.
@@ -6991,6 +7017,12 @@ Is the class able to propagate seeds through the algorithm?
 %feature("docstring") casadi::BSplineDual::sz_iw "
 
 [INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring") casadi::BSplineDual::get_reltol "
+
+[INTERNAL]  Get relative tolerance.
 
 ";
 
@@ -7012,9 +7044,9 @@ Readable name of the internal class.
 
 ";
 
-%feature("docstring") casadi::BSplineDual::has_derivative "
+%feature("docstring") casadi::BSplineDual::replace_res "
 
-[INTERNAL]  Can derivatives be calculated in any way?
+[INTERNAL]  Replace 0-by-0 outputs.
 
 ";
 
@@ -7224,12 +7256,6 @@ generated function.
 %feature("docstring") casadi::BSplineDual::get_forward "
 
 Generate a function that calculates nfwd forward derivatives.
-
-";
-
-%feature("docstring") casadi::BSplineDual::replace_res "
-
-[INTERNAL]  Replace 0-by-0 outputs.
 
 ";
 

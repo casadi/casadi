@@ -22,6 +22,9 @@
 %exception  casadi::BSplineInterpolant::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::BSplineInterpolant::serialize_body(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::BackwardDiff::calc_stepsize(double abstol) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
