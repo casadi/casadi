@@ -913,6 +913,12 @@ const  "
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -5219,6 +5225,12 @@ buf_sz, const char *fmt,...) const  "
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -5796,6 +5808,12 @@ Base class for BSpline evaluators
 |                  |                 | compiler to      | Internal         |
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
@@ -7747,6 +7765,12 @@ Generate a function that calculates nfwd forward derivatives.
 |                  |                 | compiler to      | Internal         |
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
@@ -12215,6 +12239,12 @@ std::vector< M > &res, casadi_int npar) const  "
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -16340,6 +16370,12 @@ Internal class.
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -17848,6 +17884,12 @@ Internal class.
 |                  |                 | compiler to      | Internal         |
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
@@ -20106,6 +20148,12 @@ Internal class.
 |                  |                 | compiler to      | Internal         |
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
@@ -23464,6 +23512,12 @@ const  "
 |                  |                 | compiler to      | Internal         |
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
@@ -26864,6 +26918,12 @@ std::string &parallelization) const  "
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -29238,6 +29298,12 @@ member functions. Joel Andersson >List of available options
 |                  |                 | compiler to      | Internal         |
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
@@ -38615,6 +38681,12 @@ Internal class
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -39635,6 +39707,12 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 |                  |                 | compiler to      | Internal         |
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
@@ -41219,6 +41297,12 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -41613,6 +41697,12 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | compiler to      | Internal         |
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
@@ -56319,6 +56409,12 @@ Joel Andersson
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -68959,6 +69055,12 @@ Andersson
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -74599,6 +74701,12 @@ Joel Andersson
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -76502,6 +76610,12 @@ General information
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -78065,6 +78179,12 @@ General information
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -79246,6 +79366,12 @@ General information
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
@@ -79628,6 +79754,12 @@ General information
 |                  |                 | compiler to      | Internal         |
 |                  |                 | speed up the     |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
+|                  |                 | temporary source | Internal         |
+|                  |                 | file that jit    |                  |
+|                  |                 | creates.         |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
