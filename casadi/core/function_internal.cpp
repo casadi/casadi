@@ -89,6 +89,7 @@ namespace casadi {
     regularity_check_ = false;
     inputs_check_ = true;
     jit_ = false;
+    jit_cleanup_ = true;
     compilerplugin_ = "clang";
     print_time_ = true;
     eval_ = nullptr;
@@ -115,6 +116,10 @@ namespace casadi {
   }
 
   FunctionInternal::~FunctionInternal() {
+    if (jit_cleanup_ && jit_) {
+      std::string jit_name = jit_name_ + ".c";
+      if (remove(jit_name.c_str())) casadi_warning("Failed to remove " + jit_name);
+    }
   }
 
   void ProtoFunction::construct(const Dict& opts) {
@@ -201,6 +206,9 @@ namespace casadi {
       {"jit",
        {OT_BOOL,
         "Use just-in-time compiler to speed up the evaluation"}},
+      {"jit_cleanup",
+       {OT_BOOL,
+        "Cleanup up the temporary source file that jit creates. Default: true"}},
       {"compiler",
        {OT_STRING,
         "Just-in-time compiler plugin to be used."}},
@@ -280,6 +288,8 @@ namespace casadi {
         casadi_warning("Deprecated option: \"output_scheme\" set via constructor");
       } else if (op.first=="jit") {
         jit_ = op.second;
+      } else if (op.first=="jit_cleanup") {
+        jit_cleanup_ = op.second;
       } else if (op.first=="compiler") {
         compilerplugin_ = op.second.to_string();
       } else if (op.first=="jit_options") {
@@ -385,11 +395,13 @@ namespace casadi {
 
   void FunctionInternal::finalize() {
     if (jit_) {
-      string jit_name = "jit_tmp";
+      jit_name_ = temporary_file("jit_tmp", ".c");
+      jit_name_ = std::string(jit_name_.begin(), jit_name_.begin()+jit_name_.size()-2);
+      //jit_name_ = "jit_tmp";
       if (has_codegen()) {
         if (verbose_) casadi_message("Codegenerating function '" + name_ + "'.");
         // JIT everything
-        CodeGenerator gen(jit_name);
+        CodeGenerator gen(jit_name_);
         gen.add(self());
         if (verbose_) casadi_message("Compiling function '" + name_ + "'..");
         compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
@@ -399,7 +411,7 @@ namespace casadi {
         casadi_assert(eval_!=nullptr, "Cannot load JIT'ed function.");
       } else {
         // Just jit dependencies
-        jit_dependencies(jit_name);
+        jit_dependencies(jit_name_);
       }
     }
     // Finalize base classes
@@ -2860,42 +2872,43 @@ namespace casadi {
     s.pack("FunctionInternal::name_in", name_in_);
     s.pack("FunctionInternal::name_out", name_out_);
 
-    s.pack(jit_);
+    s.pack("FunctionInternal::jit", jit_);
+    s.pack("FunctionInternal::jit_cleanup", jit_cleanup_);
 
     s.pack("FunctionInternal::has_refcount", has_refcount_);
 
     s.pack("FunctionInternal::derivative_of", derivative_of_);
 
-    s.pack(jac_penalty_);
+    s.pack("FunctionInternal::jac_penalty", jac_penalty_);
 
-    s.pack(enable_forward_);
-    s.pack(enable_reverse_);
-    s.pack(enable_jacobian_);
-    s.pack(enable_fd_);
+    s.pack("FunctionInternal::enable_forward", enable_forward_);
+    s.pack("FunctionInternal::enable_reverse", enable_reverse_);
+    s.pack("FunctionInternal::enable_jacobian", enable_jacobian_);
+    s.pack("FunctionInternal::enable_fd", enable_fd_);
 
-    s.pack(ad_weight_);
-    s.pack(ad_weight_sp_);
+    s.pack("FunctionInternal::ad_weight", ad_weight_);
+    s.pack("FunctionInternal::ad_weight_sp", ad_weight_sp_);
 
-    s.pack(max_num_dir_);
+    s.pack("FunctionInternal::max_num_dir", max_num_dir_);
 
-    s.pack(regularity_check_);
+    s.pack("FunctionInternal::regularity_check", regularity_check_);
 
-    s.pack(inputs_check_);
+    s.pack("FunctionInternal::inputs_check", inputs_check_);
 
-    s.pack(print_time_);
+    s.pack("FunctionInternal::print_time", print_time_);
 
-    s.pack(fd_step_);
+    s.pack("FunctionInternal::fd_step", fd_step_);
 
-    s.pack(fd_method_);
+    s.pack("FunctionInternal::fd_method", fd_method_);
 
-    s.pack(sz_arg_per_);
-    s.pack(sz_res_per_);
-    s.pack(sz_iw_per_);
-    s.pack(sz_w_per_);
-    s.pack(sz_arg_tmp_);
-    s.pack(sz_res_tmp_);
-    s.pack(sz_iw_tmp_);
-    s.pack(sz_w_tmp_);
+    s.pack("FunctionInternal::sz_arg_per", sz_arg_per_);
+    s.pack("FunctionInternal::sz_res_per", sz_res_per_);
+    s.pack("FunctionInternal::sz_iw_per", sz_iw_per_);
+    s.pack("FunctionInternal::sz_w_per", sz_w_per_);
+    s.pack("FunctionInternal::sz_arg_tmp", sz_arg_tmp_);
+    s.pack("FunctionInternal::sz_res_tmp", sz_res_tmp_);
+    s.pack("FunctionInternal::sz_iw_tmp", sz_iw_tmp_);
+    s.pack("FunctionInternal::sz_w_tmp", sz_w_tmp_);
   }
 
   FunctionInternal::FunctionInternal(DeSerializer& s) : ProtoFunction(s) {
@@ -2904,42 +2917,43 @@ namespace casadi {
     s.unpack("FunctionInternal::name_in", name_in_);
     s.unpack("FunctionInternal::name_out", name_out_);
 
-    s.unpack(jit_);
+    s.unpack("FunctionInternal::jit", jit_);
+    s.unpack("FunctionInternal::jit_cleanup", jit_cleanup_);
 
     s.unpack("FunctionInternal::has_refcount", has_refcount_);
 
     s.unpack("FunctionInternal::derivative_of", derivative_of_);
 
-    s.unpack(jac_penalty_);
+    s.unpack("FunctionInternal::jac_penalty", jac_penalty_);
 
-    s.unpack(enable_forward_);
-    s.unpack(enable_reverse_);
-    s.unpack(enable_jacobian_);
-    s.unpack(enable_fd_);
+    s.unpack("FunctionInternal::enable_forward", enable_forward_);
+    s.unpack("FunctionInternal::enable_reverse", enable_reverse_);
+    s.unpack("FunctionInternal::enable_jacobian", enable_jacobian_);
+    s.unpack("FunctionInternal::enable_fd", enable_fd_);
 
-    s.unpack(ad_weight_);
-    s.unpack(ad_weight_sp_);
+    s.unpack("FunctionInternal::ad_weight", ad_weight_);
+    s.unpack("FunctionInternal::ad_weight_sp", ad_weight_sp_);
 
-    s.unpack(max_num_dir_);
+    s.unpack("FunctionInternal::max_num_dir", max_num_dir_);
 
-    s.unpack(regularity_check_);
+    s.unpack("FunctionInternal::regularity_check", regularity_check_);
 
-    s.unpack(inputs_check_);
+    s.unpack("FunctionInternal::inputs_check", inputs_check_);
 
-    s.unpack(print_time_);
+    s.unpack("FunctionInternal::print_time", print_time_);
 
-    s.unpack(fd_step_);
+    s.unpack("FunctionInternal::fd_step", fd_step_);
 
-    s.unpack(fd_method_);
+    s.unpack("FunctionInternal::fd_method", fd_method_);
 
-    s.unpack(sz_arg_per_);
-    s.unpack(sz_res_per_);
-    s.unpack(sz_iw_per_);
-    s.unpack(sz_w_per_);
-    s.unpack(sz_arg_tmp_);
-    s.unpack(sz_res_tmp_);
-    s.unpack(sz_iw_tmp_);
-    s.unpack(sz_w_tmp_);
+    s.unpack("FunctionInternal::sz_arg_per", sz_arg_per_);
+    s.unpack("FunctionInternal::sz_res_per", sz_res_per_);
+    s.unpack("FunctionInternal::sz_iw_per", sz_iw_per_);
+    s.unpack("FunctionInternal::sz_w_per", sz_w_per_);
+    s.unpack("FunctionInternal::sz_arg_tmp", sz_arg_tmp_);
+    s.unpack("FunctionInternal::sz_res_tmp", sz_res_tmp_);
+    s.unpack("FunctionInternal::sz_iw_tmp", sz_iw_tmp_);
+    s.unpack("FunctionInternal::sz_w_tmp", sz_w_tmp_);
 
     n_in_ = sparsity_in_.size();
     n_out_ = sparsity_out_.size();

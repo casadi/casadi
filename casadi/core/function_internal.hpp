@@ -732,6 +732,12 @@ namespace casadi {
     /** \brief  Use just-in-time compiler */
     bool jit_;
 
+    /** \brief  Cleanup jit source file */
+    bool jit_cleanup_;
+
+    /** \brief  Name if jit source file */
+    std::string jit_name_;
+
     /** \brief Numerical evaluation redirected to a C function */
     eval_t eval_;
 
