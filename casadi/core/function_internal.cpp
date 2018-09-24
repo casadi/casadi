@@ -1930,7 +1930,7 @@ namespace casadi {
       g << "casadi_int j;\n"
         << "casadi_real* a = w;\n"
         << "for (j=0; j<" << nnz_in() << "; ++j) "
-        << "scanf(\"%lf\", a++);\n";
+        << "scanf(\"%lg\", a++);\n";
 
       // Call the function
       g << "casadi_int flag = " << name_ << "(arg, res, iw, w+" << off << ", 0);\n"
