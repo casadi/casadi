@@ -64,8 +64,8 @@ def nice_stdout():
       yield
   finally:
       os.dup2(backup, 1)
-      os.write(w,"x")
-      sys.stdout.write(os.read(r,2**20)[:-1])
+      os.write(w,"x".encode('ascii'))
+      sys.stdout.write(os.read(r,2**20)[:-1].decode('ascii'))
       os.close(r)
       os.close(w)
       os.close(backup)

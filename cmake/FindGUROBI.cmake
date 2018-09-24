@@ -25,12 +25,13 @@ find_library( GUROBI_LIBRARY
               NAMES gurobi
               gurobi65
               gurobi70
+	      gurobi80
               PATHS "$ENV{GUROBI_HOME}/lib" 
                     "/Library/gurobi650/mac64/lib"
                     "C:\\libs\\gurobi650\\lib"
               )
 
-
+      message("Damn: ${GUROBI_LIBRARY}")
 set(GUROBI_INCLUDE_DIRS "${GUROBI_INCLUDE_DIR}" )
 set(GUROBI_LIBRARIES "${GUROBI_LIBRARY}" )
 
