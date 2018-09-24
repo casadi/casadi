@@ -308,6 +308,8 @@ namespace casadi {
       AUX_FINITE_DIFF,
       AUX_QR,
       AUX_QP,
+      AUX_NLP,
+      AUX_SQPMETHOD,
       AUX_LDL,
       AUX_NEWTON,
       AUX_TO_DOUBLE,

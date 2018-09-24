@@ -36,16 +36,8 @@ namespace casadi {
 
   /** \brief Integrator memory */
   struct CASADI_EXPORT NlpsolMemory : public OracleMemory {
-    // Variable bounds
-    double *lbz, *ubz;
-    // Parameter values
-    const double *p;
-    // Current primal solution
-    double *z;
-    // Current dual solution
-    double *lam, *lam_p;
-    // Outputs
-    double f;
+    // Problem data structure
+    casadi_nlpsol_data<double> d_nlp;
     // number of iterations
     casadi_int n_iter;
     // Success?
@@ -63,6 +55,10 @@ namespace casadi {
   class CASADI_EXPORT
   Nlpsol : public OracleFunction, public PluginInterface<Nlpsol> {
   public:
+
+    // Memory structure
+    casadi_nlpsol_prob<double> p_nlp_;
+
     /// Number of variables
     casadi_int nx_;
 
@@ -175,6 +171,9 @@ namespace casadi {
     // Solve the NLP
     virtual int solve(void* mem) const = 0;
 
+    /** \brief Generate code for the function body */
+    void codegen_body(CodeGenerator& g) const override;
+
     /** \brief Do the derivative functions need nondifferentiated outputs? */
     bool uses_output() const override {return true;}
 
@@ -248,6 +247,8 @@ namespace casadi {
   protected:
     /** \brief Deserializing constructor */
     explicit Nlpsol(DeserializingStream& s);
+  private:
+    void set_nlpsol_prob();
   };
 
 } // namespace casadi

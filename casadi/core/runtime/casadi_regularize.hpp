@@ -1,4 +1,7 @@
 // NOLINT(legal/copyright)
+
+// C-REPLACE "fmin" "casadi_fmin"
+
 // SYMBOL "lb_eig"
 // Use Gershgorin to finds upper and lower bounds on the eigenvalues
 template<typename T1>
@@ -20,14 +23,14 @@ double casadi_lb_eig(const casadi_int* sp_h, const T1* h) {
       if (row[k]==c) {
         center = h[k];
       } else {
-        radius += std::fabs(h[k]);
+        radius += fabs(h[k]);
       }
     }
     // Update the eigenvalue estimates
     if (c==0) {
       lb_eig = center - radius;
     } else {
-      lb_eig = std::fmin(lb_eig, center - radius);
+      lb_eig = fmin(lb_eig, center - radius);
     }
   }
   return lb_eig;

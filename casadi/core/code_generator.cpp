@@ -823,6 +823,14 @@ namespace casadi {
 
       this->auxiliaries << sanitize_source(casadi_qp_str, inst);
       break;
+    case AUX_NLP:
+      this->auxiliaries << sanitize_source(casadi_nlp_str, inst);
+      break;
+    case AUX_SQPMETHOD:
+      add_auxiliary(AUX_QP);
+      add_auxiliary(AUX_NLP);
+      this->auxiliaries << sanitize_source(casadi_sqpmethod_str, inst);
+      break;
     case AUX_LDL:
       this->auxiliaries << sanitize_source(casadi_ldl_str, inst);
       break;
@@ -1515,7 +1523,7 @@ namespace casadi {
   std::string CodeGenerator::
   lb_eig(const Sparsity& sp_h, const std::string& h) {
     add_auxiliary(CodeGenerator::AUX_REGULARIZE);
-    return "casadi_lb_eig(" + sparsity(sp_h) + ", " + h + ");";
+    return "casadi_lb_eig(" + sparsity(sp_h) + ", " + h + ")";
   }
 
   std::string CodeGenerator::

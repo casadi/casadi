@@ -356,9 +356,10 @@ namespace casadi {
 
   int WorhpInterface::solve(void* mem) const {
     auto m = static_cast<WorhpMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
 
     for (casadi_int i=0; i<ng_; ++i) {
-        casadi_assert(!(m->lbz[nx_+i]==-inf && m->ubz[nx_+i] == inf),
+        casadi_assert(!(d_nlp->lbz[nx_+i]==-inf && d_nlp->ubz[nx_+i] == inf),
                         "WorhpInterface::evaluate: Worhp cannot handle the case when both "
                         "LBG and UBG are infinite."
                         "You have that case at non-zero " + str(i)+ "."
@@ -366,14 +367,14 @@ namespace casadi {
     }
 
     // Pass inputs to WORHP data structures
-    casadi_copy(m->z, nx_, m->worhp_o.X);
-    casadi_copy(m->lbz, nx_, m->worhp_o.XL);
-    casadi_copy(m->ubz, nx_, m->worhp_o.XU);
-    casadi_copy(m->lam, nx_, m->worhp_o.Lambda);
+    casadi_copy(d_nlp->z, nx_, m->worhp_o.X);
+    casadi_copy(d_nlp->lbz, nx_, m->worhp_o.XL);
+    casadi_copy(d_nlp->ubz, nx_, m->worhp_o.XU);
+    casadi_copy(d_nlp->lam, nx_, m->worhp_o.Lambda);
     if (m->worhp_o.m>0) {
-      casadi_copy(m->lam+nx_, ng_, m->worhp_o.Mu);
-      casadi_copy(m->lbz+nx_, ng_, m->worhp_o.GL);
-      casadi_copy(m->ubz+nx_, ng_, m->worhp_o.GU);
+      casadi_copy(d_nlp->lam+nx_, ng_, m->worhp_o.Mu);
+      casadi_copy(d_nlp->lbz+nx_, ng_, m->worhp_o.GL);
+      casadi_copy(d_nlp->ubz+nx_, ng_, m->worhp_o.GU);
     }
 
     // Replace infinite bounds with m->worhp_p.Infty
@@ -441,17 +442,17 @@ namespace casadi {
 
       if (GetUserAction(&m->worhp_c, evalF)) {
         m->arg[0] = m->worhp_o.X;
-        m->arg[1] = m->p;
+        m->arg[1] = d_nlp->p;
         m->res[0] = &m->worhp_o.F;
         calc_function(m, "nlp_f");
-        m->f = m->worhp_o.F; // Store cost, before scaling
+        d_nlp->f = m->worhp_o.F; // Store cost, before scaling
         m->worhp_o.F *= m->worhp_w.ScaleObj;
         DoneUserAction(&m->worhp_c, evalF);
       }
 
       if (GetUserAction(&m->worhp_c, evalG)) {
         m->arg[0] = m->worhp_o.X;
-        m->arg[1] = m->p;
+        m->arg[1] = d_nlp->p;
         m->res[0] = m->worhp_o.G;
         calc_function(m, "nlp_g");
         DoneUserAction(&m->worhp_c, evalG);
@@ -459,7 +460,7 @@ namespace casadi {
 
       if (GetUserAction(&m->worhp_c, evalDF)) {
         m->arg[0] = m->worhp_o.X;
-        m->arg[1] = m->p;
+        m->arg[1] = d_nlp->p;
         m->res[0] = nullptr;
         m->res[1] = m->worhp_w.DF.val;
         calc_function(m, "nlp_grad_f");
@@ -469,7 +470,7 @@ namespace casadi {
 
       if (GetUserAction(&m->worhp_c, evalDG)) {
         m->arg[0] = m->worhp_o.X;
-        m->arg[1] = m->p;
+        m->arg[1] = d_nlp->p;
         m->res[0] = nullptr;
         m->res[1] = m->worhp_w.DG.val;
         calc_function(m, "nlp_jac_g");
@@ -478,7 +479,7 @@ namespace casadi {
 
       if (GetUserAction(&m->worhp_c, evalHM)) {
         m->arg[0] = m->worhp_o.X;
-        m->arg[1] = m->p;
+        m->arg[1] = d_nlp->p;
         m->arg[2] = &m->worhp_w.ScaleObj;
         m->arg[3] = m->worhp_o.Mu;
         m->res[0] = m->worhp_w.HM.val;
@@ -512,10 +513,10 @@ namespace casadi {
     }
 
     // Copy outputs
-    casadi_copy(m->worhp_o.X, nx_, m->z);
-    casadi_copy(m->worhp_o.G, ng_, m->z+nx_);
-    casadi_copy(m->worhp_o.Lambda, nx_, m->lam);
-    casadi_copy(m->worhp_o.Mu, ng_, m->lam+nx_);
+    casadi_copy(m->worhp_o.X, nx_, d_nlp->z);
+    casadi_copy(m->worhp_o.G, ng_, d_nlp->z+nx_);
+    casadi_copy(m->worhp_o.Lambda, nx_, d_nlp->lam);
+    casadi_copy(m->worhp_o.Mu, ng_, d_nlp->lam+nx_);
 
     StatusMsg(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
 

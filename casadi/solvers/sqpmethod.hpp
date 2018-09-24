@@ -39,37 +39,15 @@
 namespace casadi {
 
   struct CASADI_NLPSOL_SQPMETHOD_EXPORT SqpmethodMemory : public NlpsolMemory {
-    /// Current and previous linearization point and candidate
-    double *z_cand;
-
-    /// Lagrange gradient in the next iterate
-    double *gLag, *gLag_old;
-
-    /// Gradient of the objective function
-    double *gf;
-
-    // Bounds of the QP
-    double *lbdz, *ubdz;
-
-    // QP solution
-    double *dx, *dlam;
-
-    // Current Jacobian
-    double *Jk;
-
-    /// Current Hessian approximation
-    double *Bk;
-
+    // Problem data structure
+    casadi_sqpmethod_data<double> d;
     /// Hessian regularization
     double reg;
 
     /// Linesearch parameters
     double sigma;
 
-    // Storage for merit function
-    double* merit_mem;
-    size_t merit_ind;
-
+    casadi_int merit_ind;
     /// Last return status
     const char* return_status;
 
@@ -122,6 +100,9 @@ namespace casadi {
     // Solve the NLP
     int solve(void* mem) const override;
 
+    // Memory structure
+    casadi_sqpmethod_prob<double> p_;
+
     /// QP solver for the subproblems
     Function qpsol_;
 
@@ -160,6 +141,12 @@ namespace casadi {
     /// Regularization
     bool regularize_;
 
+    /** \brief Generate code for the function body */
+    void codegen_body(CodeGenerator& g) const override;
+
+    /** \brief Generate code for the declarations of the C function */
+    void codegen_declarations(CodeGenerator& g) const override;
+
     /// Access Conic
     const Function getConic() const { return qpsol_;}
 
@@ -176,6 +163,12 @@ namespace casadi {
                           const double* A,
                           double* x_opt, double* dlam) const;
 
+
+    // Solve the QP subproblem
+    void codegen_qp_solve(CodeGenerator& cg, const std::string& H, const std::string& g,
+              const std::string& lbdz, const std::string& ubdz,
+              const std::string& A, const std::string& x_opt, const std::string& dlam) const;
+
     /// A documentation string
     static const std::string meta_doc;
 
@@ -189,6 +182,9 @@ namespace casadi {
   protected:
     /** \brief Deserializing constructor */
     explicit Sqpmethod(DeserializingStream& s);
+
+  private:
+    void set_sqpmethod_prob();
   };
 
 } // namespace casadi

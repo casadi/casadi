@@ -531,10 +531,10 @@ class casadiTestCase(unittest.TestCase):
       if isinstance(inputs, dict):
         self.assertEqual(F.name_out(), F2.name_out())
         for k in F.name_out():
-          self.checkarray(Fout[k],Fout2[k])
+          self.checkarray(Fout[k],Fout2[k],digits=15)
       else:
         for i in range(F.n_out()):
-          self.checkarray(Fout[i],Fout2[i])
+          self.checkarray(Fout[i],Fout2[i],digits=15)
 
       if self.check_serialize:
         self.check_serialize(F2,inputs=inputs)

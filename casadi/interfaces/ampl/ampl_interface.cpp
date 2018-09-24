@@ -276,6 +276,7 @@ namespace casadi {
 
   int AmplInterface::solve(void* mem) const {
     auto m = static_cast<AmplInterfaceMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
 
     // Create .nl file and add preamble
     std::string nlname = temporary_file("casadi_ampl_tmp", ".nl");
@@ -286,15 +287,15 @@ namespace casadi {
     // Primal intial guess
     nl << "x" << nx_ << "\n";
     for (casadi_int i=0; i<nx_; ++i) {
-      nl << i << " " << m->z[i] << "\n";
+      nl << i << " " << d_nlp->z[i] << "\n";
     }
 
 
     // Add constraint bounds
     nl << "r\n";
     for (casadi_int i=0; i<ng_; ++i) {
-      double lbg = m->lbz[i+nx_];
-      double ubg = m->ubz[i+nx_];
+      double lbg = d_nlp->lbz[i+nx_];
+      double ubg = d_nlp->ubz[i+nx_];
       if (isinf(lbg)) {
         if (isinf(ubg)) { // no constraint
           nl << "3\n";
@@ -315,8 +316,8 @@ namespace casadi {
     // Add variable bounds
     nl << "b\n";
     for (casadi_int i=0; i<nx_; ++i) {
-      double lbx = m->lbz[i];
-      double ubx = m->ubz[i];
+      double lbx = d_nlp->lbz[i];
+      double ubx = d_nlp->ubz[i];
       if (isinf(lbx)) {
         if (isinf(ubx)) { // no constraint
           nl << "3\n";
@@ -384,14 +385,14 @@ namespace casadi {
     // Get the primal solution
     for (casadi_int i=0; i<nx_; ++i) {
       istringstream s(sol_lines.at(sol_lines.size()-nx_+i-1));
-      s >> m->z[i + nx_];
+      s >> d_nlp->z[i + nx_];
     }
 
     // Get the dual solution
     for (casadi_int i=0; i<ng_; ++i) {
       istringstream s(sol_lines.at(sol_lines.size()-ng_-nx_+i-1));
-      s >> m->lam[i+nx_];
-      m->lam[i+nx_] *= -1;
+      s >> d_nlp->lam[i+nx_];
+      d_nlp->lam[i+nx_] *= -1;
     }
 
     // Close and delete .sol file
