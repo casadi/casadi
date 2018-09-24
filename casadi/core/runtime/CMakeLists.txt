@@ -21,6 +21,8 @@ set(RUNTIME_SRC
   casadi_max_viol.hpp
   casadi_minmax.hpp
   casadi_mtimes.hpp
+  casadi_vfmin.hpp
+  casadi_vfmax.hpp
   casadi_mv.hpp
   casadi_mv_dense.hpp
   casadi_nd_boor_eval.hpp
@@ -43,6 +45,7 @@ set(RUNTIME_SRC
   casadi_bfgs.hpp
   casadi_regularize.hpp
   casadi_newton.hpp
+  casadi_bound_consistency.hpp  
 )
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 

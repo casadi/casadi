@@ -836,10 +836,22 @@ namespace casadi {
     case AUX_MAX_VIOL:
       this->auxiliaries << sanitize_source(casadi_max_viol_str, inst);
       break;
+    case AUX_VFMIN:
+      this->auxiliaries << sanitize_source(casadi_vfmin_str, inst);
+      break;
+    case AUX_VFMAX:
+      this->auxiliaries << sanitize_source(casadi_vfmax_str, inst);
+      break;
     case AUX_REGULARIZE:
       add_auxiliary(AUX_FABS);
       add_auxiliary(AUX_FMIN);
       this->auxiliaries << sanitize_source(casadi_regularize_str, inst);
+      break;
+    case AUX_BOUNDS_CONSISTENCY:
+      add_auxiliary(AUX_ISINF);
+      add_auxiliary(AUX_FMAX);
+      add_auxiliary(AUX_FMIN);
+      this->auxiliaries << sanitize_source(casadi_bound_consistency_str, inst);
       break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
@@ -913,9 +925,20 @@ namespace casadi {
                         << "#endif\n"
                         << "}\n\n";
       break;
+    case AUX_ISINF:
+      shorthand("isinf");
+      this->auxiliaries << "casadi_real casadi_isinf(casadi_real x) {\n"
+                        << "/* Pre-c99 compatibility */\n"
+                        << "#if __STDC_VERSION__ < 199901L\n"
+                        << "  return x== INFINITY || x==-INFINITY;\n"
+                        << "#else\n"
+                        << "  return isinf(x);\n"
+                        << "#endif\n"
+                        << "}\n\n";
+      break;
     case AUX_MIN:
       this->auxiliaries << "casadi_int casadi_min(casadi_int x, casadi_int y) {\n"
-                        << "  return x>y ? x : y;\n"
+                        << "  return x>y ? y : x;\n"
                         << "}\n\n";
       break;
     case AUX_MAX:
@@ -1441,6 +1464,43 @@ namespace casadi {
   }
 
   std::string CodeGenerator::
+  vfmax(const std::string& x, casadi_int n, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_VFMAX);
+    return "casadi_vfmax(" + x + ", " + str(n) + ", " + y + ");";
+  }
+
+  std::string CodeGenerator::
+  vfmin(const std::string& x, casadi_int n, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_VFMIN);
+    return "casadi_vfmin(" + x + ", " + str(n) + ", " + y + ");";
+  }
+
+  std::string CodeGenerator::
+  vfmax(const std::string& x, const std::string& n, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_VFMAX);
+    return "casadi_vfmax(" + x + ", " + n + ", " + y + ");";
+  }
+
+  std::string CodeGenerator::
+  vfmin(const std::string& x, const std::string& n, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_VFMIN);
+    return "casadi_vfmin(" + x + ", " + n + ", " + y + ");";
+  }
+
+  std::string CodeGenerator::
+  max(const std::string& x, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_MAX);
+    return "casadi_max(" + x + ", " + y + ")";
+  }
+
+  std::string CodeGenerator::
+  min(const std::string& x, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_MIN);
+    return "casadi_min(" + x + ", " + y + ")";
+  }
+
+
+  std::string CodeGenerator::
   max_viol(casadi_int n, const std::string& x, const std::string& lb, const std::string& ub) {
     add_auxiliary(CodeGenerator::AUX_MAX_VIOL);
     return "casadi_max_viol(" + str(n) + ", " + x+ ", " + lb + ", " + ub + ")";
@@ -1449,7 +1509,7 @@ namespace casadi {
   std::string CodeGenerator::
   norm_inf(casadi_int n, const std::string& x) {
     add_auxiliary(CodeGenerator::AUX_NORM_INF);
-    return "casadi_norm_inf(" + str(n) + ", " + x + ");";
+    return "casadi_norm_inf(" + str(n) + ", " + x + ")";
   }
 
   std::string CodeGenerator::
@@ -1463,5 +1523,14 @@ namespace casadi {
     add_auxiliary(CodeGenerator::AUX_REGULARIZE);
     return "casadi_regularize(" + sparsity(sp_h) + ", " + h + ", " + reg + ");";
   }
+
+  std::string CodeGenerator::
+  bound_consistency(casadi_int n, const std::string& x,
+    const std::string& lam, const std::string& lbx, const std::string& ubx) {
+      add_auxiliary(CodeGenerator::AUX_BOUNDS_CONSISTENCY);
+      return "casadi_bound_consistency(" + str(n) + ", " + x + ", " + lam +
+             ", " + lbx + ", " + ubx + ")";
+    }
+
 
 } // namespace casadi

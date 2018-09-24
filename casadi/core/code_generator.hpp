@@ -234,12 +234,34 @@ namespace casadi {
     /** \brief fmin */
     std::string fmin(const std::string& x, const std::string& y);
 
+    /** \brief vfmax */
+    std::string vfmax(const std::string& x, casadi_int n, const std::string& y);
+
+    /** \brief vfmin */
+    std::string vfmin(const std::string& x, casadi_int n, const std::string& y);
+
+    /** \brief vfmax */
+    std::string vfmax(const std::string& x, const std::string& n, const std::string& y);
+
+    /** \brief vfmin */
+    std::string vfmin(const std::string& x, const std::string& n, const std::string& y);
+
+    /** \brief max */
+    std::string max(const std::string& x, const std::string& y);
+
+    /** \brief min */
+    std::string min(const std::string& x, const std::string& y);
+
     /** \brief norm_inf */
     std::string norm_inf(casadi_int n, const std::string& x);
 
     /** \brief max_viol */
     std::string max_viol(casadi_int n, const std::string& x,
       const std::string& lb, const std::string& ub);
+
+    /** \brief bound_consistency */
+    std::string bound_consistency(casadi_int n, const std::string& x,
+      const std::string& lam, const std::string& lbx, const std::string& ubx);
 
     /** \brief lb_eig */
     std::string lb_eig(const Sparsity& sp_h, const std::string& h);
@@ -300,10 +322,14 @@ namespace casadi {
       AUX_FABS,
       AUX_MIN,
       AUX_MAX,
+      AUX_VFMIN,
+      AUX_VFMAX,
       AUX_MAX_VIOL,
       AUX_REGULARIZE,
       AUX_INF,
-      AUX_REAL_MIN
+      AUX_REAL_MIN,
+      AUX_ISINF,
+      AUX_BOUNDS_CONSISTENCY
     };
 
     /** \brief Add a built-in auxiliary function */
