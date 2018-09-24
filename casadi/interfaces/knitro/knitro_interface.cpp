@@ -150,6 +150,7 @@ namespace casadi {
 
   int KnitroInterface::solve(void* mem) const {
     auto m = static_cast<KnitroMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
 
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert_dev(m->kc==nullptr);
@@ -209,10 +210,10 @@ namespace casadi {
     }
 
     // "Correct" upper and lower bounds
-    casadi_copy(m->lbz, nx_, m->wlbx);
-    casadi_copy(m->ubz, nx_, m->wubx);
-    casadi_copy(m->lbz+nx_, ng_, m->wlbg);
-    casadi_copy(m->ubz+nx_, ng_, m->wubg);
+    casadi_copy(d_nlp->lbz, nx_, m->wlbx);
+    casadi_copy(d_nlp->ubz, nx_, m->wubx);
+    casadi_copy(d_nlp->lbz+nx_, ng_, m->wlbg);
+    casadi_copy(d_nlp->ubz+nx_, ng_, m->wubg);
     for (casadi_int i=0; i<nx_; ++i) if (isinf(m->wlbx[i])) m->wlbx[i] = -KTR_INFBOUND;
     for (casadi_int i=0; i<nx_; ++i) if (isinf(m->wubx[i])) m->wubx[i] =  KTR_INFBOUND;
     for (casadi_int i=0; i<ng_; ++i) if (isinf(m->wlbg[i])) m->wlbg[i] = -KTR_INFBOUND;
@@ -238,14 +239,14 @@ namespace casadi {
                            objFnType, get_ptr(vtype), m->wlbx, m->wubx,
                            ng_, get_ptr(contype_), get_ptr(ftype),
                            m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
-                           nnzH, get_ptr(Hrow), get_ptr(Hcol), m->z, nullptr);
+                           nnzH, get_ptr(Hrow), get_ptr(Hcol), d_nlp->z, nullptr);
       casadi_assert(status==0, "KTR_mip_init_problem failed");
     } else {
       status =
       KTR_init_problem(m->kc, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
                        m->wlbx, m->wubx, ng_, get_ptr(contype_),
                        m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
-                       nnzH, get_ptr(Hrow), get_ptr(Hcol), m->z, nullptr); // initial lambda
+                       nnzH, get_ptr(Hrow), get_ptr(Hcol), d_nlp->z, nullptr); // initial lambda
       casadi_assert(status==0, "KTR_init_problem failed");
     }
 
@@ -268,12 +269,12 @@ namespace casadi {
     double f;
     if (mi_) {
       status =
-      KTR_mip_solve(m->kc, m->z, get_ptr(lambda), 0, &f,
+      KTR_mip_solve(m->kc, d_nlp->z, get_ptr(lambda), 0, &f,
                     nullptr, nullptr, nullptr, nullptr, nullptr, static_cast<void*>(m));
 
     } else {
       status =
-      KTR_solve(m->kc, m->z, get_ptr(lambda), 0, &f,
+      KTR_solve(m->kc, d_nlp->z, get_ptr(lambda), 0, &f,
                 nullptr, nullptr, nullptr, nullptr, nullptr, static_cast<void*>(m));
     }
     m->return_status = return_codes(status);
@@ -288,18 +289,18 @@ namespace casadi {
       m->unified_return_status = SOLVER_RET_LIMITED;
 
     // Output dual solution
-    casadi_copy(get_ptr(lambda), ng_, m->lam + nx_);
-    casadi_copy(get_ptr(lambda)+ng_, nx_, m->lam);
+    casadi_copy(get_ptr(lambda), ng_, d_nlp->lam + nx_);
+    casadi_copy(get_ptr(lambda)+ng_, nx_, d_nlp->lam);
 
     // Output optimal cost
-    m->f = f;
+    d_nlp->f = f;
 
     // Calculate constraints
     if (ng_>0) {
-      m->arg[0] = m->z;
-      m->arg[1] = m->p;
+      m->arg[0] = d_nlp->z;
+      m->arg[1] = d_nlp->p;
       m->res[0] = nullptr;
-      m->res[1] = m->z + nx_;
+      m->res[1] = d_nlp->z + nx_;
       calc_function(m, "nlp_fg");
     }
 
@@ -319,19 +320,19 @@ namespace casadi {
     try {
       // Get a pointer to the calling object
       auto m = static_cast<KnitroMemory*>(userParams);
-
+      auto d_nlp = &m->d_nlp;
       // Direct to the correct function
       switch (evalRequestCode) {
       case KTR_RC_EVALFC:
       m->arg[0] = x;
-      m->arg[1] = m->p;
+      m->arg[1] = d_nlp->p;
       m->res[0] = obj;
       m->res[1] = c;
       m->self.calc_function(m, "nlp_fg");
       break;
       case KTR_RC_EVALGA:
       m->arg[0] = x;
-      m->arg[1] = m->p;
+      m->arg[1] = d_nlp->p;
       m->res[0] = objGrad;
       m->res[1] = jac;
       m->self.calc_function(m, "nlp_gf_jg");
@@ -340,7 +341,7 @@ namespace casadi {
         {
           double sigma = 1.;
           m->arg[0] = x;
-          m->arg[1] = m->p;
+          m->arg[1] = d_nlp->p;
           m->arg[2] = &sigma;
           m->arg[3] = lambda;
           m->res[0] = hessian;

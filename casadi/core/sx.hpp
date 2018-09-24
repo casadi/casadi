@@ -90,8 +90,9 @@ namespace casadi {
   template<> SX SX::poly_coeff(const SX& f, const SX& x);
   template<> SX SX::poly_roots(const SX& p);
   template<> SX SX::eig_symbolic(const SX& m);
-  template<> void SX::print_split(std::vector<std::string>& nz,
-                                 std::vector<std::string>& inter) const;
+  template<> void SX::print_split(casadi_int nnz, const SXElem* nonzeros,
+                                std::vector<std::string>& nz,
+                                std::vector<std::string>& inter);
 
   template<> std::vector<SX> SX::get_input(const Function& f);
   template<> std::vector<SX> SX::get_free(const Function& f);

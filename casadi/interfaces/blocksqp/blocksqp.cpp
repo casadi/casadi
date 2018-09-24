@@ -634,6 +634,7 @@ namespace casadi {
 
   int Blocksqp::solve(void* mem) const {
     auto m = static_cast<BlocksqpMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
 
     casadi_int ret = 0;
 
@@ -706,9 +707,9 @@ namespace casadi {
     initializeFilter(m);
 
     // Primal-dual initial guess
-    casadi_copy(m->lam, nx_, m->lam_xk);
+    casadi_copy(d_nlp->lam, nx_, m->lam_xk);
     casadi_scal(nx_, -1., m->lam_xk);
-    casadi_copy(m->lam + nx_, ng_, m->lam_gk);
+    casadi_copy(d_nlp->lam + nx_, ng_, m->lam_gk);
     casadi_scal(ng_, -1., m->lam_gk);
 
     casadi_copy(m->lam_xk, nx_, m->lam_qp);
@@ -726,17 +727,17 @@ namespace casadi {
 
 
     // Get optimal cost
-    m->f = m->obj;
+    d_nlp->f = m->obj;
     // Get constraints at solution
-    casadi_copy(m->gk, ng_, m->z + nx_);
+    casadi_copy(m->gk, ng_, d_nlp->z + nx_);
     // Get dual solution (simple bounds)
-    if (m->lam) {
-      casadi_copy(m->lam_xk, nx_, m->lam);
-      casadi_scal(nx_, -1., m->lam);
+    if (d_nlp->lam) {
+      casadi_copy(m->lam_xk, nx_, d_nlp->lam);
+      casadi_scal(nx_, -1., d_nlp->lam);
     }
     // Get dual solution (nonlinear bounds)
-    casadi_copy(m->lam_gk, ng_, m->lam + nx_);
-    casadi_scal(ng_, -1., m->lam + nx_);
+    casadi_copy(m->lam_gk, ng_, d_nlp->lam + nx_);
+    casadi_scal(ng_, -1., d_nlp->lam + nx_);
     return 0;
   }
 
@@ -990,6 +991,7 @@ namespace casadi {
    * ||constrViolation||_infty / (1 + ||xi||_infty) <= TOL
    */
   bool Blocksqp::calcOptTol(BlocksqpMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     // scaled norm of Lagrangian gradient
     calcLagrangeGradient(m, m->grad_lagk, 0);
     m->gradNorm = casadi_norm_inf(nx_, m->grad_lagk);
@@ -997,8 +999,8 @@ namespace casadi {
                                    casadi_norm_inf(ng_, m->lam_gk)));
 
     // norm of constraint violation
-    m->cNorm  = lInfConstraintNorm(m, m->z, m->gk);
-    m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(nx_, m->z));
+    m->cNorm  = lInfConstraintNorm(m, d_nlp->z, m->gk);
+    m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(nx_, d_nlp->z));
 
     if (m->tol <= opttol_ && m->cNormS <= nlinfeastol_)
       return true;
@@ -1104,6 +1106,7 @@ namespace casadi {
   void Blocksqp::
   acceptStep(BlocksqpMemory* m, const double* deltaXi,
     const double* lambdaQP, double alpha, casadi_int nSOCS) const {
+    auto d_nlp = &m->d_nlp;
     double lStpNorm;
 
     // Current alpha
@@ -1112,7 +1115,7 @@ namespace casadi {
 
     // Set new x by accepting the current trial step
     for (casadi_int k=0; k<nx_; k++) {
-      m->z[k] = m->trial_xk[k];
+      d_nlp->z[k] = m->trial_xk[k];
       m->dxk[k] = alpha * deltaXi[k];
     }
 
@@ -1145,11 +1148,12 @@ namespace casadi {
 
   void Blocksqp::
   reduceSOCStepsize(BlocksqpMemory* m, double *alphaSOC) const {
+    auto d_nlp = &m->d_nlp;
     // Update bounds on linearized constraints for the next SOC QP:
     // That is different from the update for the first SOC QP!
     for (casadi_int i=0; i<ng_; i++) {
-      double lbg = m->lbz[i + nx_];
-      double ubg = m->ubz[i + nx_];
+      double lbg = d_nlp->lbz[i + nx_];
+      double ubg = d_nlp->ubz[i + nx_];
       if (lbg != inf) {
         m->lba_qp[i] = *alphaSOC * m->lba_qp[i] - m->gk[i];
       } else {
@@ -1172,6 +1176,7 @@ namespace casadi {
    * lambda = lambdaQP
    */
   casadi_int Blocksqp::fullstep(BlocksqpMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     double alpha;
     double objTrial, cNormTrial;
 
@@ -1180,7 +1185,7 @@ namespace casadi {
     for (casadi_int k=0; k<10; k++) {
       // Compute new trial point
       for (casadi_int i=0; i<nx_; i++)
-        m->trial_xk[i] = m->z[i] + alpha * m->dxk[i];
+        m->trial_xk[i] = d_nlp->z[i] + alpha * m->dxk[i];
 
       // Compute problem functions at trial point
       casadi_int info = evaluate(m, m->trial_xk, &objTrial, m->gk);
@@ -1209,18 +1214,19 @@ namespace casadi {
    *
    */
   casadi_int Blocksqp::filterLineSearch(BlocksqpMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     double alpha = 1.0;
     double cNormTrial=0, objTrial, dfTdeltaXi=0;
 
     // Compute ||constr(xi)|| at old point
-    double cNorm = lInfConstraintNorm(m, m->z, m->gk);
+    double cNorm = lInfConstraintNorm(m, d_nlp->z, m->gk);
 
     // Backtracking line search
     casadi_int k;
     for (k=0; k<max_line_search_; k++) {
       // Compute new trial point
       for (casadi_int i=0; i<nx_; i++)
-        m->trial_xk[i] = m->z[i] + alpha * m->dxk[i];
+        m->trial_xk[i] = d_nlp->z[i] + alpha * m->dxk[i];
 
       // Compute grad(f)^T * deltaXi
       dfTdeltaXi = 0.0;
@@ -1324,6 +1330,7 @@ namespace casadi {
   bool Blocksqp::
   secondOrderCorrection(BlocksqpMemory* m, double cNorm, double cNormTrial,
     double dfTdeltaXi, bool swCond, casadi_int it) const {
+    auto d_nlp = &m->d_nlp;
 
     // Perform SOC only on the first iteration of backtracking line search
     if (it > 0) return false;
@@ -1356,7 +1363,7 @@ namespace casadi {
 
       // Set new SOC trial point
       for (casadi_int i=0; i<nx_; i++) {
-        m->trial_xk[i] = m->z[i] + deltaXiSOC[i];
+        m->trial_xk[i] = d_nlp->z[i] + deltaXiSOC[i];
       }
 
       // Compute objective and ||constr(trialXiSOC)||_1 at SOC trial point
@@ -1424,6 +1431,7 @@ namespace casadi {
    * "The dreaded restoration phase" -- Nick Gould
    */
   casadi_int Blocksqp::feasibilityRestorationPhase(BlocksqpMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     // No Feasibility restoration phase
     if (!restore_feas_) return -1;
 
@@ -1439,34 +1447,34 @@ namespace casadi {
     DMDict solver_in;
 
     // The reference point is the starting value for the restoration phase
-    vector<double> in_x0(m->z, m->z+nx_);
+    vector<double> in_x0(d_nlp->z, d_nlp->z+nx_);
 
     // Initialize slack variables such that the constraints are feasible
     for (casadi_int i=0; i<ng_; i++) {
-      if (m->gk[i] <= m->lbz[i+nx_])
-        in_x0.push_back(m->gk[i] - m->lbz[i+nx_]);
-      else if (m->gk[i] > m->ubz[i+nx_])
-        in_x0.push_back(m->gk[i] - m->ubz[i+nx_]);
+      if (m->gk[i] <= d_nlp->lbz[i+nx_])
+        in_x0.push_back(m->gk[i] - d_nlp->lbz[i+nx_]);
+      else if (m->gk[i] > d_nlp->ubz[i+nx_])
+        in_x0.push_back(m->gk[i] - d_nlp->ubz[i+nx_]);
       else
         in_x0.push_back(0.0);
     }
 
     // Add current iterate xk to parameter p
-    vector<double> in_p(m->p, m->p+np_);
-    vector<double> in_p2(m->z, m->z+nx_);
+    vector<double> in_p(d_nlp->p, d_nlp->p+np_);
+    vector<double> in_p2(d_nlp->z, d_nlp->z+nx_);
     in_p.insert(in_p.end(), in_p2.begin(), in_p2.end());
 
     // Set bounds for variables
-    vector<double> in_lbx(m->lbz, m->lbz+nx_);
-    vector<double> in_ubx(m->ubz, m->ubz+nx_);
+    vector<double> in_lbx(d_nlp->lbz, d_nlp->lbz+nx_);
+    vector<double> in_ubx(d_nlp->ubz, d_nlp->ubz+nx_);
     for (casadi_int i=0; i<ng_; i++) {
       in_lbx.push_back(-inf);
       in_ubx.push_back(inf);
     }
 
     // Set bounds for constraints
-    vector<double> in_lbg(m->lbz+nx_, m->lbz+nx_+ng_);
-    vector<double> in_ubg(m->ubz+nx_, m->ubz+nx_+ng_);
+    vector<double> in_lbg(d_nlp->lbz+nx_, d_nlp->lbz+nx_+ng_);
+    vector<double> in_ubg(d_nlp->ubz+nx_, d_nlp->ubz+nx_+ng_);
 
     solver_in["x0"] = in_x0;
     solver_in["p"] = in_p;
@@ -1549,7 +1557,7 @@ namespace casadi {
 
       // Get new xi from the restoration phase
       for (casadi_int i=0; i<nx_; i++)
-        m->trial_xk[i] = m2->z[i];
+        m->trial_xk[i] = m2->d_nlp.z[i];
 
       // Compute objective at trial point
       info = evaluate(m, m->trial_xk, &objTrial, m->gk);
@@ -1580,9 +1588,9 @@ namespace casadi {
         m->lambdaStepNorm = 0.0;
         // Compute restoration step
         for (casadi_int k=0; k<nx_; k++) {
-            m->dxk[k] = m->z[k];
+            m->dxk[k] = d_nlp->z[k];
 
-            m->z[k] = m->trial_xk[k];
+            d_nlp->z[k] = m->trial_xk[k];
 
             // Store lInf norm of dual step
             if ((lStpNorm = fabs(m2->lam_xk[k] - m->lam_xk[k])) > m->lambdaStepNorm)
@@ -1590,7 +1598,7 @@ namespace casadi {
             m->lam_xk[k] = m2->lam_xk[k];
             m->lam_qp[k] = m2->lam_qp[k];
 
-            m->dxk[k] -= m->z[k];
+            m->dxk[k] -= d_nlp->z[k];
         }
         for (casadi_int k=0; k<ng_; k++) {
             // skip the dual variables for the slack variables in the restoration problem
@@ -1625,13 +1633,14 @@ namespace casadi {
    * iteration with the current controls and measurement weights q and w
    */
   casadi_int Blocksqp::feasibilityRestorationHeuristic(BlocksqpMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     m->nRestHeurCalls++;
 
     // Call problem specific heuristic to reduce constraint violation.
     // For shooting methods that means setting consistent values for
     // shooting nodes by one forward integration.
     for (casadi_int k=0; k<nx_; k++) // input: last successful step
-      m->trial_xk[k] = m->z[k];
+      m->trial_xk[k] = d_nlp->z[k];
 
     // FIXME(@jaeandersson) Not implemented
     return -1;
@@ -1642,12 +1651,13 @@ namespace casadi {
    * If the line search fails, check if the full step reduces the KKT error by a factor kappaF.
    */
   casadi_int Blocksqp::kktErrorReduction(BlocksqpMemory* m) const {
+    auto d_nlp = &m->d_nlp;
     casadi_int info = 0;
     double objTrial, cNormTrial, trialGradNorm, trialTol;
 
     // Compute new trial point
     for (casadi_int i=0; i<nx_; i++)
-      m->trial_xk[i] = m->z[i] + m->dxk[i];
+      m->trial_xk[i] = d_nlp->z[i] + m->dxk[i];
 
     // Compute objective and ||constr(trial_xk)|| at trial point
     std::vector<double> trialConstr(ng_, 0.);
@@ -2503,18 +2513,19 @@ namespace casadi {
    * trust region box radius
    */
   void Blocksqp::updateStepBounds(BlocksqpMemory* m, bool soc) const {
+    auto d_nlp = &m->d_nlp;
     // Bounds on step
     for (casadi_int i=0; i<nx_; i++) {
-      double lbx = m->lbz[i];
+      double lbx = d_nlp->lbz[i];
       if (lbx != inf) {
-        m->lbx_qp[i] = lbx - m->z[i];
+        m->lbx_qp[i] = lbx - d_nlp->z[i];
       } else {
         m->lbx_qp[i] = inf;
       }
 
-      double ubx = m->ubz[i];
+      double ubx = d_nlp->ubz[i];
       if (ubx != inf) {
-        m->ubx_qp[i] = ubx - m->z[i];
+        m->ubx_qp[i] = ubx - d_nlp->z[i];
       } else {
         m->ubx_qp[i] = inf;
       }
@@ -2522,7 +2533,7 @@ namespace casadi {
 
     // Bounds on linearized constraints
     for (casadi_int i=0; i<ng_; i++) {
-      double lbg = m->lbz[i+nx_];
+      double lbg = d_nlp->lbz[i+nx_];
       if (lbg != inf) {
         m->lba_qp[i] = lbg - m->gk[i];
         if (soc) m->lba_qp[i] += m->jac_times_dxk[i];
@@ -2530,7 +2541,7 @@ namespace casadi {
         m->lba_qp[i] = inf;
       }
 
-      double ubg = m->ubz[i+nx_];
+      double ubg = d_nlp->ubz[i+nx_];
       if (ubg != inf) {
         m->uba_qp[i] = ubg - m->gk[i];
         if (soc) m->uba_qp[i] += m->jac_times_dxk[i];
@@ -2771,8 +2782,9 @@ namespace casadi {
   evaluate(BlocksqpMemory* m,
            double *f, double *g,
            double *grad_f, double *jac_g) const {
-    m->arg[0] = m->z; // x
-    m->arg[1] = m->p; // p
+    auto d_nlp = &m->d_nlp;
+    m->arg[0] = d_nlp->z; // x
+    m->arg[1] = d_nlp->p; // p
     m->res[0] = f; // f
     m->res[1] = g; // g
     m->res[2] = grad_f; // grad:f:x
@@ -2784,8 +2796,9 @@ namespace casadi {
   casadi_int Blocksqp::
   evaluate(BlocksqpMemory* m, const double *xk, double *f,
            double *g) const {
+    auto d_nlp = &m->d_nlp;
     m->arg[0] = xk; // x
-    m->arg[1] = m->p; // p
+    m->arg[1] = d_nlp->p; // p
     m->res[0] = f; // f
     m->res[1] = g; // g
     calc_function(m, "nlp_fg");
@@ -2795,6 +2808,7 @@ namespace casadi {
   casadi_int Blocksqp::
   evaluate(BlocksqpMemory* m,
            double *exact_hess_lag) const {
+    auto d_nlp = &m->d_nlp;
     static std::vector<double> ones;
     ones.resize(nx_);
     for (casadi_int i=0; i<nx_; ++i) ones[i] = 1.0;
@@ -2802,8 +2816,8 @@ namespace casadi {
     minus_lam_gk.resize(ng_);
     // Langrange function in blocksqp is L = f - lambdaT * g, whereas + in casadi
     for (casadi_int i=0; i<ng_; ++i) minus_lam_gk[i] = -m->lam_gk[i];
-    m->arg[0] = m->z; // x
-    m->arg[1] = m->p; // p
+    m->arg[0] = d_nlp->z; // x
+    m->arg[1] = d_nlp->p; // p
     m->arg[2] = get_ptr(ones); // lam:f
     m->arg[3] = get_ptr(minus_lam_gk); // lam:g
     m->res[0] = exact_hess_lag; // hess:gamma:x:x
@@ -2827,8 +2841,9 @@ namespace casadi {
 
   double Blocksqp::
   lInfConstraintNorm(BlocksqpMemory* m, const double* xk, const double* g) const {
-    return fmax(casadi_max_viol(nx_, xk, m->lbz, m->ubz),
-                casadi_max_viol(ng_, g, m->lbz+nx_, m->ubz+nx_));
+    auto d_nlp = &m->d_nlp;
+    return fmax(casadi_max_viol(nx_, xk, d_nlp->lbz, d_nlp->ubz),
+                casadi_max_viol(ng_, g, d_nlp->lbz+nx_, d_nlp->ubz+nx_));
   }
 
 

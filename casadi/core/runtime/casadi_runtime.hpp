@@ -255,6 +255,8 @@ namespace casadi {
   #include "casadi_ldl.hpp"
   #include "casadi_qr.hpp"
   #include "casadi_qp.hpp"
+  #include "casadi_nlp.hpp"
+  #include "casadi_sqpmethod.hpp"
   #include "casadi_bfgs.hpp"
   #include "casadi_regularize.hpp"
   #include "casadi_newton.hpp"

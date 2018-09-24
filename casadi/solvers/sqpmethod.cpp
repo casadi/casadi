@@ -185,7 +185,7 @@ namespace casadi {
     exact_hessian_ = hessian_approximation =="exact";
 
     // Get/generate required functions
-    create_function("nlp_fg", {"x", "p"}, {"f", "g"});
+    if (max_iter_ls_) create_function("nlp_fg", {"x", "p"}, {"f", "g"});
     // First order derivative information
     Function jac_g_fcn = create_function("nlp_jac_fg", {"x", "p"},
                                         {"f", "grad:f:x", "g", "jac:g:x"});
@@ -227,32 +227,21 @@ namespace casadi {
       print("\n");
     }
 
-    // Current linearization point
-    alloc_w(nx_ + ng_, true); // z_cand
 
-    // Lagrange gradient in the next iterate
-    alloc_w(nx_, true); // gLag_
-    alloc_w(nx_, true); // gLag_old_
+    set_sqpmethod_prob();
+    // Allocate memory
+    casadi_int sz_w, sz_iw;
+    casadi_sqpmethod_work(&p_, &sz_iw, &sz_w);
+    alloc_iw(sz_iw, true);
+    alloc_w(sz_w, true);
+  }
 
-    // Gradient of the objective
-    alloc_w(nx_, true); // gf_
-
-    // Bounds of the QP
-    alloc_w(nx_+ng_, true); // lbdz
-    alloc_w(nx_+ng_, true); // ubdz
-
-    // QP solution
-    alloc_w(nx_, true); // dx_
-    alloc_w(nx_+ng_, true); // dlam
-
-    // Hessian approximation
-    alloc_w(Hsp_.nnz(), true); // Bk_
-
-    // Jacobian
-    alloc_w(Asp_.nnz(), true); // Jk_
-
-    // Line-search memory
-    alloc_w(merit_memsize_, true);
+  void Sqpmethod::set_sqpmethod_prob() {
+    p_.sp_h = Hsp_;
+    p_.sp_a = Asp_;
+    p_.merit_memsize = merit_memsize_;
+    p_.max_iter_ls = max_iter_ls_;
+    p_.nlp = &p_nlp_;
   }
 
   void Sqpmethod::set_work(void* mem, const double**& arg, double**& res,
@@ -262,38 +251,16 @@ namespace casadi {
     // Set work in base classes
     Nlpsol::set_work(mem, arg, res, iw, w);
 
-    // Current linearization point
-    m->z_cand = w; w += nx_ + ng_;
-
-    // Lagrange gradient in the next iterate
-    m->gLag = w; w += nx_;
-    m->gLag_old = w; w += nx_;
-
-    // Gradient of the objective
-    m->gf = w; w += nx_;
-
-    // Bounds of the QP
-    m->lbdz = w; w += nx_ + ng_;
-    m->ubdz = w; w += nx_ + ng_;
-
-    // QP solution
-    m->dx = w; w += nx_;
-    m->dlam = w; w += nx_ + ng_;
-
-    // Hessian approximation
-    m->Bk = w; w += Hsp_.nnz();
-
-    // Jacobian
-    m->Jk = w; w += Asp_.nnz();
-
-    // merit_mem
-    m->merit_mem = w; w += merit_memsize_;
+    m->d.prob = &p_;
+    casadi_sqpmethod_init(&m->d, &iw, &w);
 
     m->iter_count = -1;
   }
 
-  int Sqpmethod::solve(void* mem) const {
+int Sqpmethod::solve(void* mem) const {
     auto m = static_cast<SqpmethodMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
+    auto d = &m->d;
 
     // Number of SQP iterations
     m->iter_count = 0;
@@ -315,35 +282,37 @@ namespace casadi {
     // For seeds
     const double one = 1.;
 
+    casadi_fill(d->dx, nx_, 0.);
+
     // MAIN OPTIMIZATION LOOP
     while (true) {
       // Evaluate f, g and first order derivative information
-      m->arg[0] = m->z;
-      m->arg[1] = m->p;
-      m->res[0] = &m->f;
-      m->res[1] = m->gf;
-      m->res[2] = m->z + nx_;
-      m->res[3] = m->Jk;
+      m->arg[0] = d_nlp->z;
+      m->arg[1] = d_nlp->p;
+      m->res[0] = &d_nlp->f;
+      m->res[1] = d->gf;
+      m->res[2] = d_nlp->z + nx_;
+      m->res[3] = d->Jk;
       if (calc_function(m, "nlp_jac_fg")) return 1;
 
       // Evaluate the gradient of the Lagrangian
-      casadi_copy(m->gf, nx_, m->gLag);
-      casadi_mv(m->Jk, Asp_, m->lam+nx_, m->gLag, true);
-      casadi_axpy(nx_, 1., m->lam, m->gLag);
+      casadi_copy(d->gf, nx_, d->gLag);
+      casadi_mv(d->Jk, Asp_, d_nlp->lam+nx_, d->gLag, true);
+      casadi_axpy(nx_, 1., d_nlp->lam, d->gLag);
 
       // Primal infeasability
-      double pr_inf = casadi_max_viol(nx_+ng_, m->z, m->lbz, m->ubz);
+      double pr_inf = casadi_max_viol(nx_+ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz);
 
       // inf-norm of Lagrange gradient
-      double du_inf = casadi_norm_inf(nx_, m->gLag);
+      double du_inf = casadi_norm_inf(nx_, d->gLag);
 
       // inf-norm of step
-      double dx_norminf = casadi_norm_inf(nx_, m->dx);
+      double dx_norminf = casadi_norm_inf(nx_, d->dx);
 
       // Printing information about the actual iterate
       if (print_iteration_) {
         if (m->iter_count % 10 == 0) print_iteration();
-        print_iteration(m->iter_count, m->f, pr_inf, du_inf, dx_norminf,
+        print_iteration(m->iter_count, d_nlp->f, pr_inf, du_inf, dx_norminf,
                         m->reg, ls_iter, ls_success);
       }
 
@@ -379,71 +348,50 @@ namespace casadi {
 
       if (exact_hessian_) {
         // Update/reset exact Hessian
-        m->arg[0] = m->z;
-        m->arg[1] = m->p;
+        m->arg[0] = d_nlp->z;
+        m->arg[1] = d_nlp->p;
         m->arg[2] = &one;
-        m->arg[3] = m->lam + nx_;
-        m->res[0] = m->Bk;
+        m->arg[3] = d_nlp->lam + nx_;
+        m->res[0] = d->Bk;
         if (calc_function(m, "nlp_hess_l")) return 1;
 
         // Determing regularization parameter with Gershgorin theorem
         if (regularize_) {
-          m->reg = std::fmin(0, -casadi_lb_eig(Hsp_, m->Bk));
-          if (m->reg > 0) casadi_regularize(Hsp_, m->Bk, m->reg);
+          m->reg = std::fmin(0, -casadi_lb_eig(Hsp_, d->Bk));
+          if (m->reg > 0) casadi_regularize(Hsp_, d->Bk, m->reg);
         }
       } else if (m->iter_count==0) {
         // Initialize BFGS
-        casadi_fill(m->Bk, Hsp_.nnz(), 1.);
-        casadi_bfgs_reset(Hsp_, m->Bk);
+        casadi_fill(d->Bk, Hsp_.nnz(), 1.);
+        casadi_bfgs_reset(Hsp_, d->Bk);
       } else {
         // Update BFGS
-        if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, m->Bk);
+        if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
         // Update the Hessian approximation
-        casadi_bfgs(Hsp_, m->Bk, m->dx, m->gLag, m->gLag_old, m->w);
+        casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
       }
 
       // Formulate the QP
-      casadi_copy(m->lbz, nx_+ng_, m->lbdz);
-      casadi_axpy(nx_+ng_, -1., m->z, m->lbdz);
-      casadi_copy(m->ubz, nx_+ng_, m->ubdz);
-      casadi_axpy(nx_+ng_, -1., m->z, m->ubdz);
+      casadi_copy(d_nlp->lbz, nx_+ng_, d->lbdz);
+      casadi_axpy(nx_+ng_, -1., d_nlp->z, d->lbdz);
+      casadi_copy(d_nlp->ubz, nx_+ng_, d->ubdz);
+      casadi_axpy(nx_+ng_, -1., d_nlp->z, d->ubdz);
 
-      // Intitial guess
-      casadi_copy(m->lam, nx_+ng_, m->dlam);
-      casadi_fill(m->dx, nx_, 0.);
+      // Initial guess
+      casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);
+      casadi_fill(d->dx, nx_, 0.);
 
       // Increase counter
       m->iter_count++;
 
       // Solve the QP
-      solve_QP(m, m->Bk, m->gf, m->lbdz, m->ubdz, m->Jk,
-               m->dx, m->dlam);
+      solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
+               d->dx, d->dlam);
 
       // Detecting indefiniteness
-      double gain = casadi_bilin(m->Bk, Hsp_, m->dx, m->dx);
+      double gain = casadi_bilin(d->Bk, Hsp_, d->dx, d->dx);
       if (gain < 0) {
         if (print_status_) print("WARNING(sqpmethod): Indefinite Hessian detected\n");
-      }
-
-      // Calculate penalty parameter of merit function
-      m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_+ng_, m->dlam));
-
-      // Calculate L1-merit function in the actual iterate
-      double l1_infeas = casadi_max_viol(nx_+ng_, m->z, m->lbz, m->ubz);
-
-      // Right-hand side of Armijo condition
-      double F_sens = casadi_dot(nx_, m->dx, m->gf);
-      double L1dir = F_sens - m->sigma * l1_infeas;
-      double L1merit = m->f + m->sigma * l1_infeas;
-
-      // Storing the actual merit function value in a list
-      m->merit_mem[m->merit_ind] = L1merit;
-      ++m->merit_ind %= merit_memsize_;
-
-      // Calculating maximal merit function value so far
-      double meritmax = m->merit_mem[0];
-      for (size_t i=1; i<merit_memsize_ && i<m->iter_count; ++i) {
-        if (meritmax < m->merit_mem[i]) meritmax = m->merit_mem[i];
       }
 
       // Stepsize
@@ -460,20 +408,36 @@ namespace casadi {
       if (verbose_) print("Starting line-search\n");
       if (max_iter_ls_>0) { // max_iter_ls_== 0 disables line-search
 
+        // Calculate penalty parameter of merit function
+        m->sigma = std::fmax(m->sigma, 1.01*casadi_norm_inf(nx_+ng_, d->dlam));
+        // Calculate L1-merit function in the actual iterate
+        double l1_infeas = casadi_max_viol(nx_+ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz);
+        // Right-hand side of Armijo condition
+        double F_sens = casadi_dot(nx_, d->dx, d->gf);
+        double L1dir = F_sens - m->sigma * l1_infeas;
+        double L1merit = d_nlp->f + m->sigma * l1_infeas;
+        // Storing the actual merit function value in a list
+        d->merit_mem[m->merit_ind] = L1merit;
+        m->merit_ind++;
+        m->merit_ind %= merit_memsize_;
+        // Calculating maximal merit function value so far
+        double meritmax = casadi_vfmax(d->merit_mem+1,
+          std::min(merit_memsize_, static_cast<casadi_int>(m->iter_count))-1, d->merit_mem[0]);
+
         // Line-search loop
         while (true) {
           // Increase counter
           ls_iter++;
 
           // Candidate step
-          casadi_copy(m->z, nx_, m->z_cand);
-          casadi_axpy(nx_, t, m->dx, m->z_cand);
+          casadi_copy(d_nlp->z, nx_, d->z_cand);
+          casadi_axpy(nx_, t, d->dx, d->z_cand);
 
           // Evaluating objective and constraints
-          m->arg[0] = m->z_cand;
-          m->arg[1] = m->p;
+          m->arg[0] = d->z_cand;
+          m->arg[1] = d_nlp->p;
           m->res[0] = &fk_cand;
-          m->res[1] = m->z_cand + nx_;
+          m->res[1] = d->z_cand + nx_;
           if (calc_function(m, "nlp_fg")) {
             // line-search failed, skip iteration
             t = beta_ * t;
@@ -481,7 +445,7 @@ namespace casadi {
           }
 
           // Calculating merit-function in candidate
-          l1_infeas = casadi_max_viol(nx_+ng_, m->z_cand, m->lbz, m->ubz);
+          l1_infeas = casadi_max_viol(nx_+ng_, d->z_cand, d_nlp->lbz, d_nlp->ubz);
           L1merit_cand = fk_cand + m->sigma * l1_infeas;
           if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
             break;
@@ -498,24 +462,24 @@ namespace casadi {
         }
 
         // Candidate accepted, update dual variables
-        casadi_scal(nx_ + ng_, 1-t, m->lam);
-        casadi_axpy(nx_+ng_, t, m->dlam, m->lam);
+        casadi_scal(nx_ + ng_, 1-t, d_nlp->lam);
+        casadi_axpy(nx_ + ng_, t, d->dlam, d_nlp->lam);
 
-        casadi_scal(nx_, t, m->dx);
+        casadi_scal(nx_, t, d->dx);
 
       } else {
         // Full step
-        casadi_copy(m->dlam, nx_ + ng_, m->lam);
+        casadi_copy(d->dlam, nx_ + ng_, d_nlp->lam);
       }
 
       // Take step
-      casadi_axpy(nx_, 1., m->dx, m->z);
+      casadi_axpy(nx_, 1., d->dx, d_nlp->z);
 
       if (!exact_hessian_) {
         // Evaluate the gradient of the Lagrangian with the old x but new lam (for BFGS)
-        casadi_copy(m->gf, nx_, m->gLag_old);
-        casadi_mv(m->Jk, Asp_, m->lam+nx_, m->gLag_old, true);
-        casadi_axpy(nx_, 1., m->lam, m->gLag_old);
+        casadi_copy(d->gf, nx_, d->gLag_old);
+        casadi_mv(d->Jk, Asp_, d_nlp->lam+nx_, d->gLag_old, true);
+        casadi_axpy(nx_, 1., d_nlp->lam, d->gLag_old);
       }
     }
 
@@ -569,6 +533,247 @@ namespace casadi {
     if (verbose_) print("QP solved\n");
   }
 
+void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
+    if (max_iter_ls_) g.add_dependency(get_function("nlp_fg"));
+    g.add_dependency(get_function("nlp_jac_fg"));
+    if (exact_hessian_) g.add_dependency(get_function("nlp_hess_l"));
+    if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
+      g.add_dependency(get_function("nlp_grad"));
+    g.add_dependency(qpsol_);
+  }
+
+  void Sqpmethod::codegen_body(CodeGenerator& g) const {
+    g.add_auxiliary(CodeGenerator::AUX_SQPMETHOD);
+    Nlpsol::codegen_body(g);
+    // From nlpsol
+    g.local("m_p", "const casadi_real", "*");
+    g.init_local("m_p", "arg[" + str(NLPSOL_P) + "]");
+    g.local("m_f", "casadi_real");
+    g << g.copy("arg[" + str(NLPSOL_X0) + "]", nx_, "d_nlp.z") << "\n";
+    g << g.copy("arg[" + str(NLPSOL_LAM_X0) + "]", nx_, "d_nlp.lam") << "\n";
+    g << g.copy("arg[" + str(NLPSOL_LAM_G0) + "]", ng_, "d_nlp.lam+"+str(nx_)) << "\n";
+    g << g.copy("arg[" + str(NLPSOL_LBX) + "]", nx_, "d_nlp.lbz") << "\n";
+    g << g.copy("arg[" + str(NLPSOL_LBG) + "]", ng_, "d_nlp.lbz+"+str(nx_)) << "\n";
+    g << g.copy("arg[" + str(NLPSOL_UBX) + "]", nx_, "d_nlp.ubz") << "\n";
+    g << g.copy("arg[" + str(NLPSOL_UBG) + "]", ng_, "d_nlp.ubz+"+str(nx_)) << "\n";
+    casadi_assert(exact_hessian_, "Codegen implemented for exact Hessian only.");
+
+    g.local("d", "struct casadi_sqpmethod_data");
+    g.local("p", "struct casadi_sqpmethod_prob");
+
+    g << "d.prob = &p;\n";
+
+    g << "p.sp_h = " << g.sparsity(Hsp_) << ";\n";
+    g << "p.sp_a = " << g.sparsity(Asp_) << ";\n";
+    g << "p.merit_memsize = " << merit_memsize_ << ";\n";
+    g << "p.max_iter_ls = " << max_iter_ls_ << ";\n";
+    g << "p.nlp = &p_nlp;\n";
+    g << "casadi_sqpmethod_init(&d, &iw, &w);\n";
+
+    g.local("m_w", "casadi_real", "*");
+    g << "m_w = w;\n";
+    g.local("m_iw", "casadi_int", "*");
+    g << "m_iw = iw;\n";
+    g.local("m_arg", "const casadi_real", "**");
+    g.init_local("m_arg", "arg+" + str(NLPSOL_NUM_IN));
+    g.local("m_res", "casadi_real", "**");
+    g.init_local("m_res", "res+" + str(NLPSOL_NUM_OUT));
+    g.local("iter_count", "casadi_int");
+    g.init_local("iter_count", "0");
+    if (regularize_) {
+      g.local("reg", "casadi_real");
+      g.init_local("reg", "0");
+    }
+    if (max_iter_ls_) {
+      g.local("merit_ind", "casadi_int");
+      g.init_local("merit_ind", "0");
+      g.local("sigma", "casadi_real");
+      g.init_local("sigma", "0.0");
+      g.local("ls_iter", "casadi_int");
+      g.init_local("ls_iter", "0");
+      //g.local("ls_success", "casadi_int");
+      //g.init_local("ls_success", "1");
+      g.local("t", "casadi_real");
+      g.init_local("t", "0.0");
+    }
+    g.local("one", "const casadi_real");
+    g.init_local("one", "1");
+    g << g.fill("d.dx", nx_, "0.0") << "\n";
+    g.comment("MAIN OPTIMIZATION LOOP");
+    g << "while (1) {\n";
+    g.comment("Evaluate f, g and first order derivative information");
+    g << "m_arg[0] = d_nlp.z;\n";
+    g << "m_arg[1] = m_p;\n";
+    g << "m_res[0] = &m_f;\n";
+    g << "m_res[1] = d.gf;\n";
+    g << "m_res[2] = d_nlp.z+" + str(nx_) + ";\n";
+    g << "m_res[3] = d.Jk;\n";
+    std::string nlp_jac_fg = g.add_dependency(get_function("nlp_jac_fg"));
+    g << nlp_jac_fg + "(m_arg, m_res, m_iw, m_w, 0);\n";
+    g.comment("Evaluate the gradient of the Lagrangian");
+    g << g.copy("d.gf", nx_, "d.gLag") << "\n";
+    g << g.mv("d.Jk", Asp_, "d_nlp.lam+"+str(nx_), "d.gLag", true) << "\n";
+    g << g.axpy(nx_, "1.0", "d_nlp.lam", "d.gLag") << "\n";
+    g.comment("Primal infeasability");
+    g.local("pr_inf", "casadi_real");
+    g << "pr_inf = " << g.max_viol(nx_+ng_, "d_nlp.z", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+    g.comment("inf-norm of lagrange gradient");
+    g.local("du_inf", "casadi_real");
+    g << "du_inf = " << g.norm_inf(nx_, "d.gLag") << ";\n";
+    g.comment("inf-norm of step");
+    g.local("dx_norminf", "casadi_real");
+    g << "dx_norminf = " << g.norm_inf(nx_, "d.dx") << ";\n";
+    g.comment("Checking convergence criteria");
+    g << "if (iter_count >= " << min_iter_ << " && pr_inf < " << tol_pr_ <<
+          " && du_inf < " << tol_du_ << ") break;\n";
+    g << "if (iter_count >= " << max_iter_ << ") break;\n";
+    g << "if (iter_count >= 1 && iter_count >= " << min_iter_ << " && dx_norminf <= " <<
+          min_step_size_ << ") break;\n";
+    g.comment("Update/reset exact Hessian");
+    g << "m_arg[0] = d_nlp.z;\n";
+    g << "m_arg[1] = m_p;\n";
+    g << "m_arg[2] = &one;\n";
+    g << "m_arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
+    g << "m_res[0] = d.Bk;\n";
+    std::string nlp_hess_l = g.add_dependency(get_function("nlp_hess_l"));
+    g << nlp_hess_l + "(m_arg, m_res, m_iw, m_w, 0);\n";
+    g.comment("Determing regularization parameter with Gershgorin theorem");
+    if (regularize_) {
+      g << "reg = " << g.fmin("0", "-" + g.lb_eig(Hsp_, "d.Bk")) << "\n";
+      g << "if (reg>0) " << g.regularize(Hsp_, "d.Bk", "reg") << "\n";
+    }
+    g.comment("Formulate the QP");
+    g << g.copy("d_nlp.lbz", nx_+ng_, "d.lbdz") << "\n";
+    g << g.axpy(nx_+ng_, "-1.0", "d_nlp.z", "d.lbdz") << "\n";
+    g << g.copy("d_nlp.ubz", nx_+ng_, "d.ubdz") << "\n";
+    g << g.axpy(nx_+ng_, "-1.0", "d_nlp.z", "d.ubdz") << "\n";
+    g.comment("Initial guess");
+    g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";
+    g << g.fill("d.dx", nx_, "0.0") << "\n";
+    g.comment("Increase counter");
+    g << "iter_count++;\n";
+    g.comment("Solve the QP");
+    codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+    if (max_iter_ls_) {
+      g.comment("Detecting indefiniteness");
+      g.comment("Calculate penalty parameter of merit function");
+      g << "sigma = " << g.fmax("sigma", "(1.01*" + g.norm_inf(nx_+ng_, "d.dlam")+")") << "\n";
+      g.comment("Calculate L1-merit function in the actual iterate");
+      g.local("l1_infeas", "casadi_real");
+      g << "l1_infeas = " << g.max_viol(nx_+ng_, "d_nlp.z", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+      g.comment("Right-hand side of Armijo condition");
+      g.local("F_sens", "casadi_real");
+      g << "F_sens = " << g.dot(nx_, "d.dx", "d.gf") << ";\n";
+      g.local("L1dir", "casadi_real");
+      g << "L1dir = F_sens - sigma * l1_infeas;\n";
+      g.local("L1merit", "casadi_real");
+      g << "L1merit = m_f + sigma * l1_infeas;\n";
+      g.comment("Storing the actual merit function value in a list");
+      g << "d.merit_mem[merit_ind] = L1merit;\n";
+      g << "merit_ind++;\n";
+      g << "merit_ind %= " << merit_memsize_ << ";\n";
+      g.comment("Calculating maximal merit function value so far");
+      g.local("meritmax", "casadi_real");
+      g << "meritmax = " << g.vfmax("d.merit_mem+1", g.min(str(merit_memsize_),
+           "iter_count")+"-1", "d.merit_mem[0]") << "\n";
+      g.comment("Stepsize");
+      g << "t = 1.0;\n";
+      g.local("fk_cand", "casadi_real");
+      g.comment("Merit function value in candidate");
+      g.local("L1merit_cand", "casadi_real");
+      g << "L1merit_cand = 0.0;\n";
+      g.comment("Reset line-search counter, success marker");
+      g << "ls_iter = 0;\n";
+      //g << "ls_success = 1;\n";
+      g.comment("Line-search loop");
+      g << "while (1) {\n";
+      g.comment(" Increase counter");
+      g << "ls_iter++;\n";
+      g.comment("Candidate step");
+      g << g.copy("d_nlp.z", nx_, "d.z_cand") << "\n";
+      g << g.axpy(nx_, "t", "d.dx", "d.z_cand") << "\n";
+      g.comment("Evaluating objective and constraints");
+      g << "m_arg[0] = d.z_cand;\n;";
+      g << "m_arg[1] = m_p;\n;";
+      g << "m_res[0] = &fk_cand;\n;";
+      g << "m_res[1] = d.z_cand+" + str(nx_) + ";\n;";
+      std::string nlp_fg = g.add_dependency(get_function("nlp_fg"));
+      g << "if (" << nlp_fg << "(m_arg, m_res, m_iw, m_w, 0)) {\n";
+      g.comment("line-search failed, skip iteration");
+      g << " t = " << beta_ << "* t;\n";
+      g << "continue;\n";
+      g << "}\n";
+      g.comment("Calculating merit-function in candidate");
+      g << "l1_infeas = " << g.max_viol(nx_+ng_, "d.z_cand", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+      g << "L1merit_cand = fk_cand + sigma * l1_infeas;\n";
+      g << "if (L1merit_cand <= meritmax + t * " << c1_ << "* L1dir) {\n";
+      g << "break;\n";
+      g << "}\n";
+      g.comment("Line-search not successful, but we accept it.");
+      g << "if (ls_iter == " << max_iter_ls_ << ") {\n";
+      //g << "ls_success = 0;\n";
+      g << "break;\n";
+      g << "}\n";
+      g.comment("Backtracking");
+      g << "t = " << beta_ << "* t;\n";
+      g << "}\n";
+      g.comment("Candidate accepted, update dual variables");
+      g << g.scal(nx_+ng_, "1-t", "d_nlp.lam") << "\n";
+      g << g.axpy(nx_+ng_, "t", "d.dlam", "d_nlp.lam") << "\n";
+      g << g.scal(nx_, "t", "d.dx") << "\n";
+    } else {
+      g.comment("Full step");
+      g << g.copy("d.dlam", nx_ + ng_, "d_nlp.lam") << "\n";
+    }
+    g.comment("Take step");
+    g << g.axpy(nx_, "1.0", "d.dx", "d_nlp.z") << "\n";
+    g << "}\n";
+    if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) {
+      g << "m_arg[0] = d_nlp.z;\n";
+      g << "m_arg[1] = m_p;\n";
+      g << "m_arg[2] = &one;\n";
+      g << "m_arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
+      g << "m_res[0] = " << (calc_f_ ? "&m_f" : "0") << ";\n";
+      g << "m_res[1] = " << (calc_g_ ? "d_nlp.z+" + str(nx_) : "0") << ";\n";
+      g << "m_res[2] = " << (calc_lam_x_ ? "d_nlp.lam+" + str(nx_) : "0") << ";\n";
+      g << "m_res[3] = " << (calc_lam_p_ ? "d_nlp.lam_p" : "0") << ";\n";
+      std::string nlp_grad = g.add_dependency(get_function("nlp_grad"));
+      g << nlp_grad << "(m_arg, m_res, m_iw, m_w, 0);\n";
+      if (calc_lam_x_) g << g.scal(nx_, "-1.0", "d_nlp.lam") << "\n";
+      if (calc_lam_p_) g << g.scal(np_, "-1.0", "d_nlp.lam_p") << "\n";
+    }
+    if (bound_consistency_) {
+      g << g.bound_consistency(nx_+ng_, "d_nlp.z", "d_nlp.lam", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+    }
+    g << g.copy("d_nlp.z", nx_, "res[" + str(NLPSOL_X) + "]") << "\n";
+    g << g.copy("d_nlp.z+" + str(nx_), ng_, "res[" + str(NLPSOL_G) + "]") << "\n";
+    g << g.copy("d_nlp.lam", nx_, "res[" + str(NLPSOL_LAM_X) + "]") << "\n";
+    g << g.copy("d_nlp.lam+"+str(nx_), ng_, "res[" + str(NLPSOL_LAM_G) + "]") << "\n";
+    g << g.copy("d_nlp.lam_p", np_, "res[" + str(NLPSOL_LAM_P) + "]") << "\n";
+    g << g.copy("&m_f", 1, "res[" + str(NLPSOL_F) + "]") << "\n";
+  }
+  void Sqpmethod::codegen_qp_solve(CodeGenerator& cg, const std::string&  H, const std::string& g,
+              const std::string&  lbdz, const std::string& ubdz,
+              const std::string&  A, const std::string& x_opt, const std::string&  dlam) const {
+    for (casadi_int i=0;i<qpsol_.n_in();++i) cg << "m_arg[" << i << "] = 0;\n";
+    cg << "m_arg[" << CONIC_H << "] = " << H << ";\n";
+    cg << "m_arg[" << CONIC_G << "] = " << g << ";\n";
+    cg << "m_arg[" << CONIC_X0 << "] = " << x_opt << ";\n";
+    cg << "m_arg[" << CONIC_LAM_X0 << "] = " << dlam << ";\n";
+    cg << "m_arg[" << CONIC_LAM_A0 << "] = " << dlam << "+" << nx_ << ";\n";
+    cg << "m_arg[" << CONIC_LBX << "] = " << lbdz << ";\n";
+    cg << "m_arg[" << CONIC_UBX << "] = " << ubdz << ";\n";
+    cg << "m_arg[" << CONIC_A << "] = " << A << ";\n";
+    cg << "m_arg[" << CONIC_LBA << "] = " << lbdz << "+" << nx_ << ";\n";
+    cg << "m_arg[" << CONIC_UBA << "] = " << ubdz << "+" << nx_ << ";\n";
+    for (casadi_int i=0;i<qpsol_.n_out();++i) cg << "m_res[" << i << "] = 0;\n";
+    cg << "m_res[" << CONIC_X << "] = " << x_opt << ";\n";
+    cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
+    cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
+    std::string qpsol = cg.add_dependency(qpsol_);
+    cg << qpsol << "(m_arg, m_res, m_iw, m_w, 0);\n";
+  }
+
   Dict Sqpmethod::get_stats(void* mem) const {
     Dict stats = Nlpsol::get_stats(mem);
     auto m = static_cast<SqpmethodMemory*>(mem);
@@ -597,6 +802,7 @@ namespace casadi {
     s.unpack("Sqpmethod::Hsp", Hsp_);
     s.unpack("Sqpmethod::Asp", Asp_);
     s.unpack("Sqpmethod::regularize", regularize_);
+    set_sqpmethod_prob();
   }
 
   void Sqpmethod::serialize_body(SerializingStream &s) const {

@@ -289,6 +289,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
 
   int SnoptInterface::solve(void* mem) const {
     auto m = static_cast<SnoptMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
 
     // Memory object
     snProblem prob;
@@ -297,8 +298,8 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     m->return_status = -1;
 
     // Evaluate gradF and jacG at initial value
-    m->arg[0] = m->z;
-    m->arg[1] = m->p;
+    m->arg[0] = d_nlp->z;
+    m->arg[1] = d_nlp->p;
     m->res[0] = nullptr;
     m->res[1] = m->jac_gk;
     calc_function(m, "nlp_jac_g");
@@ -342,18 +343,18 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     prob.iu = &m->memind;
 
     // Pass bounds
-    casadi_copy(m->lbz, nx_+ng_, get_ptr(m->bl));
-    casadi_copy(m->ubz, nx_+ng_, get_ptr(m->bu));
+    casadi_copy(d_nlp->lbz, nx_+ng_, get_ptr(m->bl));
+    casadi_copy(d_nlp->ubz, nx_+ng_, get_ptr(m->bu));
 
     for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bl[i])) m->bl[i] = -inf_;
     for (casadi_int i=0; i<nx_+ng_; ++i) if (isinf(m->bu[i])) m->bu[i] = inf_;
     // Initialize states and slack
     casadi_fill(get_ptr(m->hs), ng_ + nx_, 0);
-    casadi_copy(m->z, nx_, get_ptr(m->xx));
+    casadi_copy(d_nlp->z, nx_, get_ptr(m->xx));
     casadi_fill(get_ptr(m->xx) + nx_, ng_, 0.);
 
     // Initialize multipliers
-    casadi_copy(m->lam + nx_, ng_, get_ptr(m->pi));
+    casadi_copy(d_nlp->lam + nx_, ng_, get_ptr(m->pi));
 
     // Set up Jacobian matrix
     copy_vector(A_structure_.colind(), m->locJ);
@@ -403,7 +404,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
                                     get_ptr(m->valJ), get_ptr(m->indJ), get_ptr(m->locJ),
                                     get_ptr(m->bl), get_ptr(m->bu), get_ptr(m->hs),
                                     get_ptr(m->xx), get_ptr(m->pi), get_ptr(m->rc),
-                                    &m->f, &nS, &nInf, &sInf);
+                                    &d_nlp->f, &nS, &nInf, &sInf);
     m->success = info<10;
     m->return_status = info;
     casadi_assert(99 != info, "snopt problem set up improperly");
@@ -416,14 +417,14 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     casadi_scal(nx_ + ng_, -1., get_ptr(m->rc));
 
     // Get primal solution
-    casadi_copy(get_ptr(m->xx), nx_, m->z);
+    casadi_copy(get_ptr(m->xx), nx_, d_nlp->z);
 
     // Get dual solution
-    casadi_copy(get_ptr(m->rc), nx_, m->lam);
-    casadi_copy(get_ptr(m->rc)+nx_, ng_, m->lam + nx_);
+    casadi_copy(get_ptr(m->rc), nx_, d_nlp->lam);
+    casadi_copy(get_ptr(m->rc)+nx_, ng_, d_nlp->lam + nx_);
 
     // Copy optimal constraint values to output
-    casadi_copy(m->gk, ng_, m->z + nx_);
+    casadi_copy(m->gk, ng_, d_nlp->z + nx_);
 
     // Free memory
     deleteSNOPT(&prob);
@@ -436,7 +437,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
           int nState, char* cu, int lencu, int* iu, int leniu, double* ru,
           int lenru) const {
     try {
-
+      auto d_nlp = &m->d_nlp;
       casadi_assert(nnCon_ == nnCon, "Con " + str(nnCon_) + " <-> " + str(nnCon));
       casadi_assert(nnObj_ == nnObj, "Obj " + str(nnObj_) + " <-> " + str(nnObj));
       casadi_assert(nnJac_ == nnJac, "Jac " + str(nnJac_) + " <-> " + str(nnJac));
@@ -448,7 +449,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
       // Evaluate gradF with the linear variables put to zero
       const double** arg = m->arg;
       *arg++ = m->xk2;
-      *arg++ = m->p;
+      *arg++ = d_nlp->p;
       double** res = m->res;
       *res++ = fObj;
       *res++ = m->jac_fk;
@@ -474,7 +475,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
         // Evaluate jacG with the linear variabes put to zero
         const double** arg = m->arg;
         *arg++ = m->xk2;
-        *arg++ = m->p;
+        *arg++ = d_nlp->p;
         double** res = m->res;
         *res++ = m->gk;
         *res++ = m->jac_gk;

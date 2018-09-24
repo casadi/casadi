@@ -93,7 +93,7 @@ struct casadi_qp_data {
 
 // SYMBOL "qp_init"
 template<typename T1>
-void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int* iw, T1* w) {
+void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int** iw, T1** w) {
   // Local variables
   casadi_int nnz_a, nnz_kkt, nnz_v, nnz_r;
   const casadi_qp_prob<T1>* p = d->prob;
@@ -102,27 +102,26 @@ void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int* iw, T1* w) {
   nnz_kkt = p->sp_kkt[2+p->sp_kkt[1]];
   nnz_v = p->sp_v[2+p->sp_v[1]];
   nnz_r = p->sp_r[2+p->sp_r[1]];
-  d->nz_kkt = w; w += nnz_kkt;
-  d->z = w; w += p->nz;
-  d->lbz = w; w += p->nz;
-  d->ubz = w; w += p->nz;
-  d->lam = w; w += p->nz;
-  d->dz = w; w += p->nz;
-  d->dlam = w; w += p->nz;
-  d->nz_v = w; w += std::max(nnz_v+nnz_r, nnz_kkt);
+  d->nz_kkt = *w; *w += nnz_kkt;
+  d->z = *w; *w += p->nz;
+  d->lbz = *w; *w += p->nz;
+  d->ubz = *w; *w += p->nz;
+  d->lam = *w; *w += p->nz;
+  d->dz = *w; *w += p->nz;
+  d->dlam = *w; *w += p->nz;
+  d->nz_v = *w; *w += std::max(nnz_v+nnz_r, nnz_kkt);
   d->nz_r = d->nz_v + nnz_v;
-  d->beta = w; w += p->nz;
-  d->nz_at = w; w += nnz_a;
-  d->infeas = w; w += p->nx;
-  d->tinfeas = w; w += p->nx;
-  d->sens = w; w += p->nz;
-  d->neverzero = iw; iw += p->nz;
-  d->neverupper = iw; iw += p->nz;
-  d->neverlower = iw; iw += p->nz;
-  d->lincomb = iw; iw += p->nz;
-  d->w = w;
-  d->iw = iw;
-  d->verbose = 1;
+  d->beta = *w; *w += p->nz;
+  d->nz_at = *w; *w += nnz_a;
+  d->infeas = *w; *w += p->nx;
+  d->tinfeas = *w; *w += p->nx;
+  d->sens = *w; *w += p->nz;
+  d->neverzero = *iw; *iw += p->nz;
+  d->neverupper = *iw; *iw += p->nz;
+  d->neverlower = *iw; *iw += p->nz;
+  d->lincomb = *iw; *iw += p->nz;
+  d->w = *w;
+  d->iw = *iw;
 }
 
 // SYMBOL "qp_reset"
