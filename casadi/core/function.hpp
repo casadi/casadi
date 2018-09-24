@@ -694,6 +694,12 @@ namespace casadi {
     /** \brief Export / Generate C code for the dependency function */
     std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict()) const;
 
+    /** \brief Export an input file that can be passed to generate C code with a main */
+    /// @{
+    void generate_input(const std::string& fname, const DMDict& arg);
+    void generate_input(const std::string& fname, const std::vector<DM>& arg);
+    /// @}
+
     /** \brief Export function in specific language
      *
      * Only allowed for (a subset of) SX/MX Functions

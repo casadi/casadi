@@ -1013,6 +1013,51 @@ namespace casadi {
     return (*this)->generate_dependencies(fname, opts);
   }
 
+  void Function::generate_input(const std::string& fname, const std::vector<DM>& arg) {
+    casadi_assert(n_in()==arg.size(), "Mismatching number of inputs. "
+                               "Expected " + str(n_in()) + ", got "
+                               + str(arg.size()) + ".");
+    // Set up output stream
+    std::ofstream of(fname);
+    of << std::setprecision(17) << std::scientific;
+
+    // Encode each input
+    for (casadi_int i=0; i<n_in(); ++i) {
+      const std::vector<double>& v = arg[i].nonzeros();
+      if (arg[i].is_scalar(true)) {
+        // Copy scalar input
+        for (casadi_int k=0;k<nnz_in(i);++k) {
+          of << v[0] << " ";
+        }
+      } else if (v.size()==nnz_in(i)) {
+        // Output non-scalar input verbatim
+        for (casadi_int k=0;k<nnz_in(i);++k) {
+          of << v[k] << " ";
+        }
+      } else {
+        casadi_error("Dimension mismatch: Expected " +
+                     sparsity_in(i).dim(true) +
+                     ", got nonzeros " + str(v.size()) + ".");
+      }
+    }
+  }
+
+  void Function::generate_input(const std::string& fname, const DMDict& arg) {
+    // Get default inputs
+    vector<DM> arg_v(n_in());
+    for (casadi_int i=0; i<arg_v.size(); ++i) {
+      arg_v[i] = default_in(i);
+    }
+
+    // Assign provided inputs
+    for (auto&& e : arg) {
+      arg_v.at(index_in(e.first)) = e.second;
+    }
+
+    // Relay to vector argument variant
+    generate_input(fname, arg_v);
+  }
+
   void Function::export_code(const std::string& lang,
       std::ostream &stream, const Dict& options) const {
     return (*this)->export_code(lang, stream, options);
