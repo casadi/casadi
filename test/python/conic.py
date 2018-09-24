@@ -741,6 +741,28 @@ class ConicTests(casadiTestCase):
 
       self.assertAlmostEqual(solver_out["cost"][0],7,max(1,5-less_digits),str(conic))
 
+  def test_overconstrained(self):
+    x=SX.sym("x")
+    qp={'x':x, 'f':(x-1)**2, 'g':vertcat(*[x,x,x])}
+
+    for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
+      self.message(str(conic))
+      d= dict(qp_options)
+      solver = qpsol("mysolver", conic, qp, d)
+      solver_in = {}
+      solver_in["lbx"]=[-10]
+      solver_in["ubx"]=[10]
+      solver_in["lbg"]=[-10, -10, -10]
+      solver_in["ubg"]=[10, 10, 10]
+      solver_in["x0"]=[0]
+      solver_out = solver(**solver_in)
+      self.assertAlmostEqual(solver_out["f"][0],0,9,str(conic) )
+      self.assertAlmostEqual(solver_out["x"][0],1,5,str(conic))
+
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
+
   @requires_conic("hpmpc")
   @requires_conic("qpoases")
   def test_hpmpc(self):

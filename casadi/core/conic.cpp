@@ -178,6 +178,9 @@ namespace casadi {
     // Identify the quadratic term in the objective
     M H = M::jacobian(gf, x, {{"symmetric", true}});
 
+    // Identify constant term in the objective
+    Function r("constant_qp", {x, p}, {substitute(f, x, M::zeros(x.sparsity()))});
+
     // Identify the constant term in the constraints
     M b = substitute(g, x, M::zeros(x.sparsity()));
 
@@ -214,10 +217,13 @@ namespace casadi {
     ret_in[NLPSOL_LAM_G0] = MX::sym("lam_g0", g.sparsity());
     vector<MX> ret_out(NLPSOL_NUM_OUT);
 
-    // Get expressions for the QP matrices and vectors
+
     vector<MX> v(NL_NUM_IN);
     v[NL_X] = ret_in[NLPSOL_X0];
     v[NL_P] = ret_in[NLPSOL_P];
+    // Evaluate constant part of objective
+    MX rv = r(v)[0];
+    // Get expressions for the QP matrices and vectors
     v = prob(v);
 
     // Call the QP solver
@@ -238,7 +244,7 @@ namespace casadi {
 
     // Get expressions for the solution
     ret_out[NLPSOL_X] = reshape(w[CONIC_X], x.size());
-    ret_out[NLPSOL_F] = w[CONIC_COST];
+    ret_out[NLPSOL_F] = rv + w[CONIC_COST];
     ret_out[NLPSOL_G] = reshape(mtimes(v.at(2), w[CONIC_X]), g.size()) + v.at(3);
     ret_out[NLPSOL_LAM_X] = reshape(w[CONIC_LAM_X], x.size());
     ret_out[NLPSOL_LAM_G] = reshape(w[CONIC_LAM_A], g.size());
