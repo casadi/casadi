@@ -190,6 +190,7 @@ namespace casadi {
     casadi_copy(arg[CONIC_UBA], na_, d.ubz+nx_);
     // Pass initial guess
     casadi_copy(arg[CONIC_X0], nx_, d.z);
+    casadi_fill(d.z+nx_, na_, nan);
     casadi_copy(arg[CONIC_LAM_X0], nx_, d.lam);
     casadi_copy(arg[CONIC_LAM_A0], na_, d.lam+nx_);
     // Reset solver
@@ -294,6 +295,7 @@ namespace casadi {
 
     g.comment("Pass initial guess");
     g << g.copy("arg[" + str(CONIC_X0)+ "]", nx_, "d.z") << "\n";
+    g << g.fill("d.z+"+str(nx_), na_, "NAN") << "\n";
     g << g.copy("arg[" + str(CONIC_LAM_X0)+ "]", nx_, "d.lam") << "\n";
     g << g.copy("arg[" + str(CONIC_LAM_A0)+ "]", na_, "d.lam+" + str(nx_)) << "\n";
 
