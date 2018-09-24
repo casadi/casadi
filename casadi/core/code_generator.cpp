@@ -398,6 +398,8 @@ namespace casadi {
     for (casadi_int i=0; i<exposed_fname.size(); ++i) {
       s << " '" << exposed_fname[i] << "'";
     }
+    s << "\\n";
+    s << "Note: you may use function.generate_input to create a command string.";
     s << "\\n\");\n";
 
     // End main
