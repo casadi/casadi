@@ -921,6 +921,8 @@ class Integrationtests(casadiTestCase):
 
     self.checkarray(qeJ_out,Jr,"jacobian of Nonlin ODE")
 
+    self.check_thread_safety(qeJ,inputs=[A, p0])
+
     qeJf=Function("qeJf", [q0,par],[vec(qeJ(q0,par))])
 
     H=qeJf.jacobian_old(0,0)
@@ -1029,8 +1031,6 @@ class Integrationtests(casadiTestCase):
       res = intg_par(x0=numpy.linspace(0, 10, 40))
       self.checkarray(norm_inf(res["xf"].T-exp(-1)*numpy.linspace(0, 10, 40)),0, digits=5)
 
-      if Integrator=="cvodes": continue
-      if Integrator=="idas": continue
 
       intg = integrator("Integrator",Integrator,{"x":x,"rx":rx,"ode":-x,"rode": rx}, options)
 

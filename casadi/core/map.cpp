@@ -349,6 +349,10 @@ namespace casadi {
   }
 
   void OmpMap::init(const Dict& opts) {
+#ifndef CASADI_WITH_THREAD
+    casadi_warning("CasADi was not compiled with WITH_THREAD=ON. "
+                   "Falling back to serial evaluation.");
+#endif // CASADI_WITH_THREAD
     // Call the initialization method of the base class
     Map::init(opts);
 
@@ -439,6 +443,10 @@ namespace casadi {
   }
 
   void ThreadMap::init(const Dict& opts) {
+#ifndef CASADI_WITH_THREAD
+    casadi_warning("CasADi was not compiled with WITH_THREAD=ON. "
+                   "Falling back to serial evaluation.");
+#endif // CASADI_WITH_THREAD
     // Call the initialization method of the base class
     Map::init(opts);
 

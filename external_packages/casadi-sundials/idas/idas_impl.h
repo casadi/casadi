@@ -742,6 +742,8 @@ struct IDAadjMemRec {
   /* Workspace for wrapper functions */
   N_Vector ia_yyTmp, ia_ypTmp;
   N_Vector *ia_yySTmp, *ia_ypSTmp;
+
+  long int ilast;
     
 };
 

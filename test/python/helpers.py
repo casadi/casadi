@@ -539,6 +539,12 @@ class casadiTestCase(unittest.TestCase):
       if self.check_serialize:
         self.check_serialize(F2,inputs=inputs)
 
+  def check_thread_safety(self,F,inputs=None,N=20):
+    
+    FP = F.map(N, 'thread',2)
+    FS = F.map(N, 'thread')
+    self.checkfunction_light(FP, FS, inputs)
+
 
   def check_serialize(self,F,inputs=None):
       F2 = Function.deserialize(F.serialize({"debug":True}))

@@ -3118,7 +3118,7 @@ static int IDAAfindIndex(IDAMem ida_mem, realtype t,
 {
   IDAadjMem IDAADJ_mem;
   IDAMem IDA_mem;
-  static long int ilast;
+  long int ilast;
   DtpntMem *dt_mem;
   int sign;
   booleantype to_left, to_right;
@@ -3137,6 +3137,8 @@ static int IDAAfindIndex(IDAMem ida_mem, realtype t,
     ilast     = np-1;
     *newpoint = TRUE;
     newData   = FALSE;
+  } else {
+    ilast     = IDAADJ_mem->ilast;
   }
 
   /* Search for indx starting from ilast */
@@ -3163,6 +3165,7 @@ static int IDAAfindIndex(IDAMem ida_mem, realtype t,
     if ( *indx == 0 ) {
       /* t is beyond leftmost limit. Is it too far? */  
       if ( SUNRabs(t - dt_mem[0]->t) > FUZZ_FACTOR * uround ) {
+          IDAADJ_mem->ilast = ilast;
         return(IDA_GETY_BADT);
       }
     }
@@ -3186,6 +3189,8 @@ static int IDAAfindIndex(IDAMem ida_mem, realtype t,
     *indx = ilast;
 
   }
+
+  IDAADJ_mem->ilast = ilast;
   return(IDA_SUCCESS);
 }
 
