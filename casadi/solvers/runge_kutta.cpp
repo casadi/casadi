@@ -203,14 +203,14 @@ namespace casadi {
   }
 
   RungeKutta::RungeKutta(DeSerializer& s) : FixedStepIntegrator(s) {
-    s.unpack("Collocation::f", f_);
-    s.unpack("Collocation::g", g_);
+    s.unpack("RungeKutta::f", f_);
+    s.unpack("RungeKutta::g", g_);
   }
 
   void RungeKutta::serialize_body(Serializer &s) const {
     FixedStepIntegrator::serialize_body(s);
-    s.pack("Collocation::f", f_);
-    s.pack("Collocation::g", g_);
+    s.pack("RungeKutta::f", f_);
+    s.pack("RungeKutta::g", g_);
   }
 
 } // namespace casadi
