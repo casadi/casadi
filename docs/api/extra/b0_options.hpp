@@ -761,6 +761,8 @@
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>simplify_options</td><td>OT_DICT</td><td>Any options to pass to simplified form Function constructor</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 </table>
@@ -782,6 +784,8 @@
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td></tr>
+<tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td></tr>
+<tr><td>simplify_options</td><td>OT_DICT</td><td>Any options to pass to simplified form Function constructor</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td></tr>
 </table>
@@ -802,6 +806,8 @@
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>simplify_options</td><td>OT_DICT</td><td>Any options to pass to simplified form Function constructor</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 </table>
@@ -1281,6 +1287,8 @@
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>simplify_options</td><td>OT_DICT</td><td>Any options to pass to simplified form Function constructor</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::FixedStepIntegrator</td></tr>
@@ -1303,6 +1311,8 @@
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>simplify_options</td><td>OT_DICT</td><td>Any options to pass to simplified form Function constructor</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::FixedStepIntegrator</td></tr>
@@ -1633,6 +1643,8 @@
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>simplify_options</td><td>OT_DICT</td><td>Any options to pass to simplified form Function constructor</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
@@ -1655,6 +1667,8 @@
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>simplify_options</td><td>OT_DICT</td><td>Any options to pass to simplified form Function constructor</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
@@ -1743,6 +1757,8 @@
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::Integrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
+<tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td><td>casadi::Integrator</td></tr>
+<tr><td>simplify_options</td><td>OT_DICT</td><td>Any options to pass to simplified form Function constructor</td><td>casadi::Integrator</td></tr>
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
@@ -1765,6 +1781,8 @@
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::Integrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
+<tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td><td>casadi::Integrator</td></tr>
+<tr><td>simplify_options</td><td>OT_DICT</td><td>Any options to pass to simplified form Function constructor</td><td>casadi::Integrator</td></tr>
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>End of the time horizon</td><td>casadi::Integrator</td></tr>
@@ -3486,6 +3504,8 @@
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
 <tr><td>second_order_correction</td><td>OT_BOOL</td><td>Second order correction in the augmented system Jacobian [true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td><td>casadi::Integrator</td></tr>
+<tr><td>simplify_options</td><td>OT_DICT</td><td>Any options to pass to simplified form Function constructor</td><td>casadi::Integrator</td></tr>
 <tr><td>step0</td><td>OT_DOUBLE</td><td>initial step size [default: 0/estimated]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
@@ -3525,6 +3545,8 @@
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
 <tr><td>second_order_correction</td><td>OT_BOOL</td><td>Second order correction in the augmented system Jacobian [true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>Sensitivity method: SIMULTANEOUS|staggered</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td><td>casadi::Integrator</td></tr>
+<tr><td>simplify_options</td><td>OT_DICT</td><td>Any options to pass to simplified form Function constructor</td><td>casadi::Integrator</td></tr>
 <tr><td>step0</td><td>OT_DOUBLE</td><td>initial step size [default: 0/estimated]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INT</td><td>Number of steps between two consecutive checkpoints</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>

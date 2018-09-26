@@ -11050,9 +11050,9 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::Collocation::aug_adj "
+%feature("docstring") casadi::Collocation::Collocation "
 
-[INTERNAL]  Generate a augmented DAE system with nadj adjoint sensitivities.
+[INTERNAL]  Constructor.
 
 ";
 
@@ -11280,6 +11280,12 @@ classes.
 
 ";
 
+%feature("docstring") casadi::Collocation::create_advanced "
+
+[INTERNAL]  Helper for a more powerful 'integrator' factory
+
+";
+
 %feature("docstring") casadi::Collocation::codegen_sparsities "
 
 [INTERNAL]  Codegen sparsities.
@@ -11413,9 +11419,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Collocation::Collocation "
+%feature("docstring") casadi::Collocation::aug_adj "
 
-[INTERNAL]  Constructor.
+[INTERNAL]  Generate a augmented DAE system with nadj adjoint sensitivities.
 
 ";
 
@@ -11966,6 +11972,14 @@ The method is still under development
 | rootfinder_options        | OT_DICT         | Options to be passed to    |
 |                           |                 | the NLP Solver             |
 +---------------------------+-----------------+----------------------------+
+| simplify                  | OT_BOOL         | Implement as MX  Function  |
+|                           |                 | (codegeneratable/serializa |
+|                           |                 | ble) default: false        |
++---------------------------+-----------------+----------------------------+
+| simplify_options          | OT_DICT         | Any options to pass to     |
+|                           |                 | simplified form Function   |
+|                           |                 | constructor                |
++---------------------------+-----------------+----------------------------+
 | t0                        | OT_DOUBLE       | Beginning of the time      |
 |                           |                 | horizon                    |
 +---------------------------+-----------------+----------------------------+
@@ -12023,6 +12037,18 @@ Joel Andersson
 | rootfinder_optio | OT_DICT         | Options to be    | casadi::Implicit |
 | ns               |                 | passed to the    | FixedStepIntegra |
 |                  |                 | NLP Solver       | tor              |
++------------------+-----------------+------------------+------------------+
+| simplify         | OT_BOOL         | Implement as MX  | casadi::Implicit |
+|                  |                 | Function (codege | FixedStepIntegra |
+|                  |                 | neratable/serial | tor              |
+|                  |                 | izable) default: |                  |
+|                  |                 | false            |                  |
++------------------+-----------------+------------------+------------------+
+| simplify_options | OT_DICT         | Any options to   | casadi::Implicit |
+|                  |                 | pass to          | FixedStepIntegra |
+|                  |                 | simplified form  | tor              |
+|                  |                 | Function         |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | t0               | OT_DOUBLE       | Beginning of the | casadi::Implicit |
 |                  |                 | time horizon     | FixedStepIntegra |
@@ -20716,9 +20742,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::set_function "
+%feature("docstring") casadi::FixedStepIntegrator::create_advanced "
 
-[INTERNAL]  Register the function for evaluation and statistics gathering
+[INTERNAL]  Helper for a more powerful 'integrator' factory
 
 ";
 
@@ -21101,6 +21127,18 @@ elements.
 | rootfinder_optio | OT_DICT         | Options to be    | casadi::FixedSte |
 | ns               |                 | passed to the    | pIntegrator      |
 |                  |                 | NLP Solver       |                  |
++------------------+-----------------+------------------+------------------+
+| simplify         | OT_BOOL         | Implement as MX  | casadi::FixedSte |
+|                  |                 | Function (codege | pIntegrator      |
+|                  |                 | neratable/serial |                  |
+|                  |                 | izable) default: |                  |
+|                  |                 | false            |                  |
++------------------+-----------------+------------------+------------------+
+| simplify_options | OT_DICT         | Any options to   | casadi::FixedSte |
+|                  |                 | pass to          | pIntegrator      |
+|                  |                 | simplified form  |                  |
+|                  |                 | Function         |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | specific_options | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | specific auto-   | nction           |
@@ -21591,6 +21629,12 @@ elements.
 %feature("docstring") casadi::FixedStepIntegrator::alloc_mem "
 
 [INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring") casadi::FixedStepIntegrator::set_function "
+
+[INTERNAL]  Register the function for evaluation and statistics gathering
 
 ";
 
@@ -26246,6 +26290,18 @@ casadi::ImplicitFixedStepIntegrator::instruction_constant "
 | ns               |                 | passed to the    | FixedStepIntegra |
 |                  |                 | NLP Solver       | tor              |
 +------------------+-----------------+------------------+------------------+
+| simplify         | OT_BOOL         | Implement as MX  | casadi::Implicit |
+|                  |                 | Function (codege | FixedStepIntegra |
+|                  |                 | neratable/serial | tor              |
+|                  |                 | izable) default: |                  |
+|                  |                 | false            |                  |
++------------------+-----------------+------------------+------------------+
+| simplify_options | OT_DICT         | Any options to   | casadi::Implicit |
+|                  |                 | pass to          | FixedStepIntegra |
+|                  |                 | simplified form  | tor              |
+|                  |                 | Function         |                  |
+|                  |                 | constructor      |                  |
++------------------+-----------------+------------------+------------------+
 | specific_options | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | specific auto-   | nction           |
 |                  |                 | generated        |                  |
@@ -26344,6 +26400,12 @@ casadi::ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator "
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::all_scalar "
 
 [INTERNAL]  Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::create_advanced "
+
+[INTERNAL]  Helper for a more powerful 'integrator' factory
 
 ";
 
@@ -29010,6 +29072,18 @@ Joel Andersson
 | ns               |                 | passed to the    | or               |
 |                  |                 | NLP Solver       |                  |
 +------------------+-----------------+------------------+------------------+
+| simplify         | OT_BOOL         | Implement as MX  | casadi::Integrat |
+|                  |                 | Function (codege | or               |
+|                  |                 | neratable/serial |                  |
+|                  |                 | izable) default: |                  |
+|                  |                 | false            |                  |
++------------------+-----------------+------------------+------------------+
+| simplify_options | OT_DICT         | Any options to   | casadi::Integrat |
+|                  |                 | pass to          | or               |
+|                  |                 | simplified form  |                  |
+|                  |                 | Function         |                  |
+|                  |                 | constructor      |                  |
++------------------+-----------------+------------------+------------------+
 | specific_options | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | specific auto-   | nction           |
 |                  |                 | generated        |                  |
@@ -29253,6 +29327,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::Integrator::construct "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring") casadi::Integrator::create_advanced "
+
+[INTERNAL]  Helper for a more powerful 'integrator' factory
 
 ";
 
@@ -49759,6 +49839,12 @@ elements.
 %feature("docstring") casadi::RungeKutta::memory "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring") casadi::RungeKutta::create_advanced "
+
+[INTERNAL]  Helper for a more powerful 'integrator' factory
 
 ";
 

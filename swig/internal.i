@@ -409,6 +409,9 @@
 %exception  casadi::FixedStepIntegrator::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FixedStepIntegrator::create_advanced(const Dict &opts) override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FixedStepIntegrator::getExplicit() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1163,6 +1166,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::aug_fwd(casadi_int nfwd) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Integrator::create_advanced(const Dict &opts) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::getDerivativeOptions(bool fwd) const  {

@@ -13587,9 +13587,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Integrator::aug_adj(casadi_int nadj) const  "
+%feature("docstring") casadi::Collocation::Collocation(const std::string
+&name, const Function &dae) "
 
-[INTERNAL]  Generate a augmented DAE system with nadj adjoint sensitivities.
+[INTERNAL]  Constructor.
 
 ";
 
@@ -13863,6 +13864,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FixedStepIntegrator::create_advanced(const
+Dict &opts)  "
+
+[INTERNAL]  Helper for a more powerful 'integrator' factory
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
@@ -14014,10 +14022,9 @@ const  "
 
 ";
 
-%feature("docstring") casadi::Collocation::Collocation(const std::string
-&name, const Function &dae) "
+%feature("docstring")  casadi::Integrator::aug_adj(casadi_int nadj) const  "
 
-[INTERNAL]  Constructor.
+[INTERNAL]  Generate a augmented DAE system with nadj adjoint sensitivities.
 
 ";
 
@@ -14690,6 +14697,14 @@ The method is still under development
 | rootfinder_options        | OT_DICT         | Options to be passed to    |
 |                           |                 | the NLP Solver             |
 +---------------------------+-----------------+----------------------------+
+| simplify                  | OT_BOOL         | Implement as MX  Function  |
+|                           |                 | (codegeneratable/serializa |
+|                           |                 | ble) default: false        |
++---------------------------+-----------------+----------------------------+
+| simplify_options          | OT_DICT         | Any options to pass to     |
+|                           |                 | simplified form Function   |
+|                           |                 | constructor                |
++---------------------------+-----------------+----------------------------+
 | t0                        | OT_DOUBLE       | Beginning of the time      |
 |                           |                 | horizon                    |
 +---------------------------+-----------------+----------------------------+
@@ -14747,6 +14762,18 @@ Joel Andersson
 | rootfinder_optio | OT_DICT         | Options to be    | casadi::Implicit |
 | ns               |                 | passed to the    | FixedStepIntegra |
 |                  |                 | NLP Solver       | tor              |
++------------------+-----------------+------------------+------------------+
+| simplify         | OT_BOOL         | Implement as MX  | casadi::Implicit |
+|                  |                 | Function (codege | FixedStepIntegra |
+|                  |                 | neratable/serial | tor              |
+|                  |                 | izable) default: |                  |
+|                  |                 | false            |                  |
++------------------+-----------------+------------------+------------------+
+| simplify_options | OT_DICT         | Any options to   | casadi::Implicit |
+|                  |                 | pass to          | FixedStepIntegra |
+|                  |                 | simplified form  | tor              |
+|                  |                 | Function         |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | t0               | OT_DOUBLE       | Beginning of the | casadi::Implicit |
 |                  |                 | time horizon     | FixedStepIntegra |
@@ -25147,17 +25174,10 @@ std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::OracleFunction::set_function(const Function
-&fcn, const std::string &fname, bool jit=false) "
+%feature("docstring")  casadi::FixedStepIntegrator::create_advanced(const
+Dict &opts)  "
 
-[INTERNAL]  Register the function for evaluation and statistics gathering
-
-";
-
-%feature("docstring")  casadi::OracleFunction::set_function(const Function
-&fcn) "
-
-[INTERNAL]  Register the function for evaluation and statistics gathering
+[INTERNAL]  Helper for a more powerful 'integrator' factory
 
 ";
 
@@ -25611,6 +25631,18 @@ const  "
 | rootfinder_optio | OT_DICT         | Options to be    | casadi::FixedSte |
 | ns               |                 | passed to the    | pIntegrator      |
 |                  |                 | NLP Solver       |                  |
++------------------+-----------------+------------------+------------------+
+| simplify         | OT_BOOL         | Implement as MX  | casadi::FixedSte |
+|                  |                 | Function (codege | pIntegrator      |
+|                  |                 | neratable/serial |                  |
+|                  |                 | izable) default: |                  |
+|                  |                 | false            |                  |
++------------------+-----------------+------------------+------------------+
+| simplify_options | OT_DICT         | Any options to   | casadi::FixedSte |
+|                  |                 | pass to          | pIntegrator      |
+|                  |                 | simplified form  |                  |
+|                  |                 | Function         |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | specific_options | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | specific auto-   | nction           |
@@ -26208,6 +26240,20 @@ bool persistent=false) "
 %feature("docstring")  casadi::FixedStepIntegrator::alloc_mem() const  "
 
 [INTERNAL]  Create memory block.
+
+";
+
+%feature("docstring")  casadi::OracleFunction::set_function(const Function
+&fcn, const std::string &fname, bool jit=false) "
+
+[INTERNAL]  Register the function for evaluation and statistics gathering
+
+";
+
+%feature("docstring")  casadi::OracleFunction::set_function(const Function
+&fcn) "
+
+[INTERNAL]  Register the function for evaluation and statistics gathering
 
 ";
 
@@ -33561,6 +33607,18 @@ std::vector< M > &arg, casadi_int &npar) const  "
 | ns               |                 | passed to the    | FixedStepIntegra |
 |                  |                 | NLP Solver       | tor              |
 +------------------+-----------------+------------------+------------------+
+| simplify         | OT_BOOL         | Implement as MX  | casadi::Implicit |
+|                  |                 | Function (codege | FixedStepIntegra |
+|                  |                 | neratable/serial | tor              |
+|                  |                 | izable) default: |                  |
+|                  |                 | false            |                  |
++------------------+-----------------+------------------+------------------+
+| simplify_options | OT_DICT         | Any options to   | casadi::Implicit |
+|                  |                 | pass to          | FixedStepIntegra |
+|                  |                 | simplified form  | tor              |
+|                  |                 | Function         |                  |
+|                  |                 | constructor      |                  |
++------------------+-----------------+------------------+------------------+
 | specific_options | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | specific auto-   | nction           |
 |                  |                 | generated        |                  |
@@ -33663,6 +33721,13 @@ bool more) const  "
 %feature("docstring")  casadi::FunctionInternal::all_scalar() const  "
 
 [INTERNAL]  Are all inputs and outputs scalar.
+
+";
+
+%feature("docstring")  casadi::FixedStepIntegrator::create_advanced(const
+Dict &opts)  "
+
+[INTERNAL]  Helper for a more powerful 'integrator' factory
 
 ";
 
@@ -36825,6 +36890,18 @@ Joel Andersson
 | ns               |                 | passed to the    | or               |
 |                  |                 | NLP Solver       |                  |
 +------------------+-----------------+------------------+------------------+
+| simplify         | OT_BOOL         | Implement as MX  | casadi::Integrat |
+|                  |                 | Function (codege | or               |
+|                  |                 | neratable/serial |                  |
+|                  |                 | izable) default: |                  |
+|                  |                 | false            |                  |
++------------------+-----------------+------------------+------------------+
+| simplify_options | OT_DICT         | Any options to   | casadi::Integrat |
+|                  |                 | pass to          | or               |
+|                  |                 | simplified form  |                  |
+|                  |                 | Function         |                  |
+|                  |                 | constructor      |                  |
++------------------+-----------------+------------------+------------------+
 | specific_options | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | specific auto-   | nction           |
 |                  |                 | generated        |                  |
@@ -37106,6 +37183,13 @@ const  "
 %feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
 
 [INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
+%feature("docstring")  casadi::Integrator::create_advanced(const Dict &opts)
+"
+
+[INTERNAL]  Helper for a more powerful 'integrator' factory
 
 ";
 
@@ -62714,6 +62798,13 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FixedStepIntegrator::create_advanced(const
+Dict &opts)  "
+
+[INTERNAL]  Helper for a more powerful 'integrator' factory
+
+";
+
 %feature("docstring")  casadi::OracleFunction::expand() "
 
 [INTERNAL] ";
@@ -77500,6 +77591,18 @@ General information
 | ns               |                 | passed to the    | or               |
 |                  |                 | NLP Solver       |                  |
 +------------------+-----------------+------------------+------------------+
+| simplify         | OT_BOOL         | Implement as MX  | casadi::Integrat |
+|                  |                 | Function (codege | or               |
+|                  |                 | neratable/serial |                  |
+|                  |                 | izable) default: |                  |
+|                  |                 | false            |                  |
++------------------+-----------------+------------------+------------------+
+| simplify_options | OT_DICT         | Any options to   | casadi::Integrat |
+|                  |                 | pass to          | or               |
+|                  |                 | simplified form  |                  |
+|                  |                 | Function         |                  |
+|                  |                 | constructor      |                  |
++------------------+-----------------+------------------+------------------+
 | specific_options | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | specific auto-   | nction           |
 |                  |                 | generated        |                  |
@@ -77834,6 +77937,14 @@ The method is still under development
 +---------------------------+-----------------+----------------------------+
 | rootfinder_options        | OT_DICT         | Options to be passed to    |
 |                           |                 | the NLP Solver             |
++---------------------------+-----------------+----------------------------+
+| simplify                  | OT_BOOL         | Implement as MX  Function  |
+|                           |                 | (codegeneratable/serializa |
+|                           |                 | ble) default: false        |
++---------------------------+-----------------+----------------------------+
+| simplify_options          | OT_DICT         | Any options to pass to     |
+|                           |                 | simplified form Function   |
+|                           |                 | constructor                |
 +---------------------------+-----------------+----------------------------+
 | t0                        | OT_DOUBLE       | Beginning of the time      |
 |                           |                 | horizon                    |
