@@ -56,6 +56,11 @@ integrators.append(("collocation",["dae","ode"],{"rootfinder":"newton","number_o
 
 integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000}))
 
+integrators.append(("collocation",["dae","ode"],{"rootfinder":"newton","number_of_finite_elements": 18,"simplify":True,"rootfinder":"fast_newton"}))
+
+integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000,"simplify":True}))
+
+
 print("Will test these integrators:")
 for cl, t, options in integrators:
   print(cl, " : ", t)
@@ -347,7 +352,7 @@ class Integrationtests(casadiTestCase):
 
     num=self.num
     tstart = SX.sym("tstart")
-    tend = SX.sym("tstart")
+    tend = SX.sym("tend")
 
 
     for Integrator, features, options in integrators:

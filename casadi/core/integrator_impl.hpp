@@ -83,6 +83,9 @@ namespace casadi {
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
+    /** Helper for a more powerful 'integrator' factory */
+    virtual Function create_advanced(const Dict& opts);
+
     /** \brief Reset the forward problem */
     virtual void reset(IntegratorMemory* mem, double t,
                        const double* x, const double* z, const double* p) const = 0;
@@ -273,6 +276,9 @@ namespace casadi {
 
     /// Initialize stage
     void init(const Dict& opts) override;
+
+    /** Helper for a more powerful 'integrator' factory */
+    Function create_advanced(const Dict& opts) override;
 
     /** \brief Create memory block */
     void* alloc_mem() const override { return new FixedStepMemory();}

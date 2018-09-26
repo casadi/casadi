@@ -57,7 +57,8 @@ namespace casadi {
     if (dae.has_free()) {
       casadi_error("Cannot create '" + name + "' since " + str(dae.get_free()) + " are free.");
     }
-    return Function::create(Integrator::getPlugin(solver).creator(name, dae), opts);
+    Integrator* intg = Integrator::getPlugin(solver).creator(name, dae);
+    return intg->create_advanced(opts);
   }
 
   vector<string> integrator_in() {
@@ -145,6 +146,10 @@ namespace casadi {
     case INTEGRATOR_NUM_OUT: break;
     }
     return Sparsity();
+  }
+
+  Function Integrator::create_advanced(const Dict& opts) {
+    return Function::create(this, opts);
   }
 
   int Integrator::
@@ -1035,9 +1040,65 @@ namespace casadi {
   = {{&Integrator::options_},
      {{"number_of_finite_elements",
        {OT_INT,
-        "Number of finite elements"}}
-     }
+        "Number of finite elements"}},
+      {"simplify",
+        {OT_BOOL,
+        "Implement as MX Function (codegeneratable/serializable) default: false"}},
+      {"simplify_options",
+        {OT_DICT,
+        "Any options to pass to simplified form Function constructor"}}
+      }
   };
+
+
+  Function FixedStepIntegrator::create_advanced(const Dict& opts) {
+    Function temp = Function::create(this, opts);
+
+    // Check if we need to simplify
+    bool simplify = false;
+    auto it = opts.find("simplify");
+    if (it!=opts.end()) simplify = it->second;
+
+    if (simplify && nrx_==0 && grid_.size()==2) {
+      // Retrieve explicit simulation step (one finite element)
+      Function F = getExplicit();
+
+      // Create symbols
+      std::vector<MX> F_in = F.mx_in();
+
+      // Prepare return Function inputs
+      std::vector<MX> intg_in(INTEGRATOR_NUM_IN);
+      intg_in[INTEGRATOR_X0] = F_in[DAE_X];
+      intg_in[INTEGRATOR_P] = F_in[DAE_P];
+      intg_in[INTEGRATOR_Z0] = F_in[DAE_Z];
+
+      // Prepare return Function outputs
+      std::vector<MX> intg_out(INTEGRATOR_NUM_OUT);
+      F_in[DAE_T] = grid_[0];
+
+      std::vector<MX> F_out;
+      // Loop over finite elements
+      for (casadi_int k=0;k<nk_;++k) {
+        F_out = F(F_in);
+        F_in[DAE_X] = F_out[DAE_ODE];
+        F_in[DAE_Z] = F_out[DAE_ALG];
+        intg_out[INTEGRATOR_QF] = k==0? F_out[DAE_QUAD] : intg_out[INTEGRATOR_QF]+F_out[DAE_QUAD];
+        F_in[DAE_T] += h_;
+      }
+
+      intg_out[INTEGRATOR_XF] = F_out[DAE_ODE];
+      intg_out[INTEGRATOR_ZF] = F_out[DAE_ALG];
+
+      // Extract options for Function constructor
+      Dict opts;
+      auto it = opts.find("simplify_options");
+      if (it!=opts.end()) opts = it->second;
+
+      return Function(temp.name(), intg_in, intg_out, integrator_in(), integrator_out(), opts);
+    } else {
+      return temp;
+    }
+  }
 
   void FixedStepIntegrator::init(const Dict& opts) {
     // Call the base class init
