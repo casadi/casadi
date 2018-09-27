@@ -1918,6 +1918,9 @@
 %exception  casadi::ProtoFunction::serialize_base_function() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::QpToNlp::alloc_mem() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::QpToNlp::class_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

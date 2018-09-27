@@ -42870,6 +42870,15 @@ update the original.
 
 ";
 
+%feature("docstring") casadi::Opti::solve_limited "
+
+Crunch the numbers; solve the problem.
+
+Allows the solver to return without error when an iteration or time limit is
+reached
+
+";
+
 %feature("docstring") casadi::Opti::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
@@ -42999,6 +43008,11 @@ Number of (scalarised) constraints.
 %feature("docstring") casadi::Opti::Opti "
 
 Create Opti Context.
+
+Parameters:
+-----------
+
+problem_type:  of optimization 'nlp' or 'conic' (default nlp)
 
 ";
 
@@ -43550,6 +43564,15 @@ Is a null pointer?
 
 Get return status of solver passed as-is from nlpsol No stability can be
 guaranteed about this part of the API.
+
+";
+
+%feature("docstring") casadi::OptiAdvanced::solve_limited "
+
+Crunch the numbers; solve the problem.
+
+Allows the solver to return without error when an iteration or time limit is
+reached
 
 ";
 

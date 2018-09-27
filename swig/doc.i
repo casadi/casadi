@@ -15442,8 +15442,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
-double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
+%feature("docstring")  casadi::Conic::set_work(void *mem, const double
+**&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 [INTERNAL]  Set the (persistent) work vectors.
 
@@ -16019,8 +16019,7 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::get_stats(void *mem) const
-"
+%feature("docstring")  casadi::Conic::get_stats(void *mem) const  "
 
 [INTERNAL]  Get all statistics.
 
@@ -16456,7 +16455,7 @@ C++ includes: conic_impl.hpp ";
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::init_mem(void *mem) const  "
+%feature("docstring")  casadi::Conic::init_mem(void *mem) const  "
 
 [INTERNAL]  Initalize memory block.
 
@@ -54143,6 +54142,15 @@ update the original.
 
 ";
 
+%feature("docstring")  casadi::Opti::solve_limited() "
+
+Crunch the numbers; solve the problem.
+
+Allows the solver to return without error when an iteration or time limit is
+reached
+
+";
+
 %feature("docstring") casadi::Opti::__hash__ "
 
 Returns a number that is unique for a given Node. If the Object does not
@@ -54315,9 +54323,15 @@ Number of (scalarised) constraints.
 
 ";
 
-%feature("docstring") casadi::Opti::Opti() "
+%feature("docstring") casadi::Opti::Opti(const std::string
+&problem_type="nlp") "
 
 Create Opti Context.
+
+Parameters:
+-----------
+
+problem_type:  of optimization 'nlp' or 'conic' (default nlp)
 
 ";
 
@@ -55261,6 +55275,15 @@ Is a null pointer?
 
 Get return status of solver passed as-is from nlpsol No stability can be
 guaranteed about this part of the API.
+
+";
+
+%feature("docstring")  casadi::Opti::solve_limited() "
+
+Crunch the numbers; solve the problem.
+
+Allows the solver to return without error when an iteration or time limit is
+reached
 
 ";
 
@@ -57209,7 +57232,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::alloc_mem() const  "
+%feature("docstring")  casadi::QpToNlp::alloc_mem() const  "
 
 [INTERNAL]  Create memory block.
 
@@ -57311,7 +57334,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::init_mem(void *mem) const  "
+%feature("docstring")  casadi::Conic::init_mem(void *mem) const  "
 
 [INTERNAL]  Initalize memory block.
 
@@ -57869,8 +57892,8 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
-double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
+%feature("docstring")  casadi::Conic::set_work(void *mem, const double
+**&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 [INTERNAL]  Set the (persistent) work vectors.
 
@@ -59630,8 +59653,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::set_work(void *mem, const
-double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
+%feature("docstring")  casadi::Conic::set_work(void *mem, const double
+**&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 [INTERNAL]  Set the (persistent) work vectors.
 
