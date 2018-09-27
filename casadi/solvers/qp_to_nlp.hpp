@@ -70,6 +70,9 @@ namespace casadi {
     // Get name of the class
     std::string class_name() const override { return "QpToNlp";}
 
+    /** \brief Create memory block */
+    void* alloc_mem() const override { return new ConicMemory();}
+
     ///@{
     /** \brief Options */
     static Options options_;

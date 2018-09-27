@@ -354,7 +354,6 @@ namespace casadi {
     m->fstats.at("preprocessing").tic();
 
     // Problem has not been solved at this point
-    m->success = false;
     m->return_status = -1;
 
     if (inputs_check_) {
@@ -451,6 +450,9 @@ namespace casadi {
 
     m->return_status = flag;
     m->success = flag==qpOASES::SUCCESSFUL_RETURN;
+    if (flag==qpOASES::RET_MAX_NWSR_REACHED) {
+      m->success = SOLVER_RET_LIMITED;
+    }
 
     if (verbose_) casadi_message("qpOASES return status: " + getErrorMessage(m->return_status));
 
@@ -925,7 +927,6 @@ namespace casadi {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<QpoasesMemory*>(mem);
     stats["return_status"] = getErrorMessage(m->return_status);
-    stats["success"] = m->success;
     return stats;
   }
 

@@ -365,6 +365,7 @@ namespace casadi {
       if (m->iter_count >= max_iter_) {
         if (print_status_) print("MESSAGE(sqpmethod): Maximum number of iterations reached.\n");
         m->return_status = "Maximum_Iterations_Exceeded";
+        m->unified_return_status = SOLVER_RET_LIMITED;
         break;
       }
 

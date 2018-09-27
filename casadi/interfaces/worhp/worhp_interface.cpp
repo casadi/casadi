@@ -521,6 +521,8 @@ namespace casadi {
     m->return_code = m->worhp_c.status;
     m->return_status = return_codes(m->worhp_c.status);
     m->success = m->return_code > TerminateSuccess;
+    if (m->return_code==MaxCalls || m->return_code==MaxCalls || m->return_code==Timeout)
+      m->unified_return_status = SOLVER_RET_LIMITED;
     return 0;
   }
 

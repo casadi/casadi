@@ -48,7 +48,6 @@ namespace casadi {
     GRBenv *env;
 
     int return_status;
-    bool success;
 
     /// Constructor
     GurobiMemory();

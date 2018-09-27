@@ -272,6 +272,7 @@ namespace casadi {
     int flag = KINSol(m->mem, m->u, strategy_, u_scale_, f_scale_);
     m->success = flag>= KIN_SUCCESS;
     if (flag<KIN_SUCCESS) kinsol_error("KINSol", flag, error_on_fail_);
+    if (flag==KIN_MAXITER_REACHED) m->unified_return_status = SOLVER_RET_LIMITED;
 
     // Warn if not successful return
     if (verbose_) {

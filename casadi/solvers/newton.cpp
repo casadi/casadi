@@ -131,6 +131,7 @@ namespace casadi {
       if (m->iter >= max_iter_) {
         if (verbose_) casadi_message("Max iterations reached.");
         m->return_status = "max_iteration_reached";
+        m->unified_return_status = SOLVER_RET_LIMITED;
         success = false;
         break;
       }

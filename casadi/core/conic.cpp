@@ -412,6 +412,30 @@ namespace casadi {
 
   }
 
+  /** \brief Initalize memory block */
+  int Conic::init_mem(void* mem) const {
+    if (FunctionInternal::init_mem(mem)) return 1;
+
+    auto m = static_cast<ConicMemory*>(mem);
+
+    // Problem has not been solved at this point
+    m->success = false;
+    m->unified_return_status = SOLVER_RET_UNKNOWN;
+
+    return 0;
+  }
+
+  /** \brief Set the (persistent) work vectors */
+  void Conic::set_work(void* mem, const double**& arg, double**& res,
+                          casadi_int*& iw, double*& w) const {
+
+    auto m = static_cast<ConicMemory*>(mem);
+
+    // Problem has not been solved at this point
+    m->success = false;
+    m->unified_return_status = SOLVER_RET_UNKNOWN;
+  }
+
   Conic::~Conic() {
   }
 
@@ -624,6 +648,14 @@ namespace casadi {
 
     // Get the transpose and mapping
     mem.AT = A_.transpose(mem.A_mapping);
+  }
+
+  Dict Conic::get_stats(void* mem) const {
+    Dict stats = FunctionInternal::get_stats(mem);
+    auto m = static_cast<ConicMemory*>(mem);
+    stats["success"] = m->success;
+    stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
+    return stats;
   }
 
 } // namespace casadi

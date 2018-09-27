@@ -330,7 +330,6 @@ namespace casadi {
     m->fstats.at("preprocessing").tic();
 
     // Problem has not been solved at this point
-    m->success = false;
     m->return_status = -1;
 
     if (inputs_check_) {
@@ -625,7 +624,6 @@ namespace casadi {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<CplexMemory*>(mem);
     stats["return_status"] = return_status_string(m->return_status);
-    stats["success"] = m->success;
     return stats;
   }
 

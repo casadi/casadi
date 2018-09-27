@@ -201,6 +201,7 @@ namespace casadi {
     void* nlpsol_mem = solver_.memory(0);
     auto nlpsol_m = static_cast<NlpsolMemory*>(nlpsol_mem);
     m->success = nlpsol_m->success;
+    m->unified_return_status = nlpsol_m->unified_return_status;
 
     return 0;
   }

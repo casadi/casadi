@@ -374,6 +374,7 @@ namespace casadi {
     m->return_status = return_status_string(status);
     m->success = status==Solve_Succeeded || status==Solved_To_Acceptable_Level
                  || status==Feasible_Point_Found;
+    if (status==Maximum_Iterations_Exceeded) m->unified_return_status = SOLVER_RET_LIMITED;
 
     // Save results to outputs
     casadi_copy(m->gk, ng_, m->z + nx_);

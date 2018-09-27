@@ -407,6 +407,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     m->success = info<10;
     m->return_status = info;
     casadi_assert(99 != info, "snopt problem set up improperly");
+    if (info/10==3) m->unified_return_status = SOLVER_RET_LIMITED;
 
     if (verbose_) casadi_message("SNOPT return status: " + formatStatus(m->return_status) +
                                  ":" + formatSecondaryStatus(m->return_status));

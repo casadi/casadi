@@ -97,7 +97,7 @@ public:
   /// @}
 
   /// Crunch the numbers; solve the problem
-  OptiSol solve();
+  OptiSol solve(bool accept_limit);
 
   /// @{
   /// Obtain value of expression at the current value
@@ -117,7 +117,7 @@ public:
   /// Get return status of solver
   std::string return_status() const;
   /// Did the solver return successfully?
-  bool return_success() const;
+  bool return_success(bool accept_limit) const;
 
   /// Get the underlying CasADi solver of the Opti stack
   Function casadi_solver() const;

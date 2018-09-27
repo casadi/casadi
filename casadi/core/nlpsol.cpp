@@ -438,6 +438,7 @@ namespace casadi {
     m->add_stat(name_);
     m->add_stat("callback_fun");
     m->success = false;
+    m->unified_return_status = SOLVER_RET_UNKNOWN;
     return 0;
   }
 
@@ -630,6 +631,7 @@ namespace casadi {
 
     // Problem has not been solved at this point
     m->success = false;
+    m->unified_return_status = SOLVER_RET_UNKNOWN;
 
     // Allocate memory
     m->z = w; w += nx_ + ng_;
@@ -953,6 +955,7 @@ namespace casadi {
     Dict stats = OracleFunction::get_stats(mem);
     auto m = static_cast<NlpsolMemory*>(mem);
     stats["success"] = m->success;
+    stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
     return stats;
   }
 

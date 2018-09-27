@@ -50,6 +50,8 @@ namespace casadi {
     casadi_int n_iter;
     // Success?
     bool success;
+    // Return status
+    FunctionInternal::UnifiedReturnStatus unified_return_status;
   };
 
   /** \brief NLP solver storage class

@@ -196,6 +196,13 @@ public:
   /// Crunch the numbers; solve the problem
   OptiSol solve();
 
+  /** \brief Crunch the numbers; solve the problem
+   * 
+   * Allows the solver to return without error when
+   * an iteration or time limit is reached
+   */
+  OptiSol solve_limited();
+
   /// @{
   /** Obtain value of expression at the current value
   *

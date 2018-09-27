@@ -152,7 +152,6 @@ namespace casadi {
   int Qrqp::init_mem(void* mem) const {
     auto m = static_cast<QrqpMemory*>(mem);
     m->return_status = "";
-    m->success = false;
     return 0;
   }
 
@@ -203,6 +202,7 @@ namespace casadi {
       } else if (iter>=max_iter_) {
         casadi_qp_log(&d, "QP terminated: max iter");
         m->return_status = "Maximum number of iterations reached";
+        m->unified_return_status = SOLVER_RET_LIMITED;
         flag = 1;
       }
       // Print iteration progress:
@@ -348,7 +348,6 @@ namespace casadi {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<QrqpMemory*>(mem);
     stats["return_status"] = m->return_status;
-    stats["success"] = m->success;
     return stats;
   }
 

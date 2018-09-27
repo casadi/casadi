@@ -37,6 +37,12 @@ namespace casadi {
   struct CASADI_EXPORT ConicMemory {
     // Function specific statistics
     std::map<std::string, FStats> fstats;
+
+    // Success?
+    bool success;
+
+    // Return status
+    FunctionInternal::UnifiedReturnStatus unified_return_status;
   };
 
   /// Internal class
@@ -76,6 +82,13 @@ namespace casadi {
     // Initialize
     void init(const Dict& opts) override;
 
+    /** \brief Initalize memory block */
+    int init_mem(void* mem) const override;
+
+    /** \brief Set the (persistent) work vectors */
+    void set_work(void* mem, const double**& arg, double**& res,
+                          casadi_int*& iw, double*& w) const override;
+
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void check_inputs(const double* lbx, const double* ubx,
                              const double* lba, const double* uba) const;
@@ -114,6 +127,8 @@ namespace casadi {
     /// Print statistics
     void print_fstats(const ConicMemory* m) const;
 
+    /// Get all statistics
+    Dict get_stats(void* mem) const override;
   protected:
     /// Options
     std::vector<bool> discrete_;

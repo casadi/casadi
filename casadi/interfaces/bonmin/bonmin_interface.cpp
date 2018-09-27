@@ -570,7 +570,7 @@ namespace casadi {
       // Interpret return code
       m->return_status = return_status_string(status);
       m->success = status==Bonmin::TMINLP::SUCCESS;
-
+      if (status==Bonmin::TMINLP::LIMIT_EXCEEDED) m->unified_return_status = SOLVER_RET_LIMITED;
     } catch(exception& ex) {
       uerr() << "finalize_solution failed: " << ex.what() << endl;
     }

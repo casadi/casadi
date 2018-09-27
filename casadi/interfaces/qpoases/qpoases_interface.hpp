@@ -76,7 +76,6 @@ namespace casadi {
     std::vector<double> nz;
 
     int return_status;
-    bool success;
 
     /// Constructor
     QpoasesMemory();

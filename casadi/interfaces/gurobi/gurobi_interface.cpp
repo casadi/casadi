@@ -169,7 +169,6 @@ namespace casadi {
     m->fstats.at("preprocessing").tic();
 
     // Problem has not been solved at this point
-    m->success = false;
     m->return_status = -1;
 
     if (inputs_check_) {
@@ -406,6 +405,9 @@ namespace casadi {
 
       m->return_status = optimstatus;
       m->success = optimstatus==GRB_OPTIMAL;
+      if (optimstatus==GRB_ITERATION_LIMIT || optimstatus==GRB_TIME_LIMIT
+          || optimstatus==GRB_NODE_LIMIT || optimstatus==GRB_SOLUTION_LIMIT)
+        m->unified_return_status = SOLVER_RET_LIMITED;
 
       // Get the objective value, if requested
       if (cost) {
@@ -441,7 +443,6 @@ namespace casadi {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<GurobiMemory*>(mem);
     stats["return_status"] = return_status_string(m->return_status);
-    stats["success"] = m->success;
     return stats;
   }
 

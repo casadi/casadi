@@ -81,9 +81,7 @@ namespace casadi {
     std::vector<CPXDIM> socp_qind, socp_lind, socp_row;
     std::vector<double> socp_qval, socp_lbound, socp_lval, socp_lbx;
 
-
     int return_status;
-    bool success;
 
     /// Constructor
     CplexMemory();

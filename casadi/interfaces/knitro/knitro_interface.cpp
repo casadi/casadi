@@ -279,6 +279,13 @@ namespace casadi {
     m->return_status = return_codes(status);
     m->success = status==KTR_RC_OPTIMAL_OR_SATISFACTORY ||
                  status==KTR_RC_NEAR_OPT;
+    if (status==KTR_RC_ITER_LIMIT_FEAS  ||
+        status==KTR_RC_TIME_LIMIT_FEAS  ||
+        status==KTR_RC_FEVAL_LIMIT_FEAS ||
+        status==KTR_RC_ITER_LIMIT_INFEAS  ||
+        status==KTR_RC_TIME_LIMIT_INFEAS  ||
+        status==KTR_RC_FEVAL_LIMIT_INFEAS)
+      m->unified_return_status = SOLVER_RET_LIMITED;
 
     // Output dual solution
     casadi_copy(get_ptr(lambda), ng_, m->lam + nx_);

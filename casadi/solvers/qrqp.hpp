@@ -39,7 +39,6 @@
 namespace casadi {
   struct CASADI_CONIC_QRQP_EXPORT QrqpMemory : public ConicMemory {
     const char* return_status;
-    bool success;
   };
 
   /** \brief \pluginbrief{Conic,qrqp}

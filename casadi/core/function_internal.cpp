@@ -2851,6 +2851,13 @@ namespace casadi {
     }
   }
 
+  std::string FunctionInternal::string_from_UnifiedReturnStatus(UnifiedReturnStatus status) {
+    switch (status) {
+      case SOLVER_RET_LIMITED:  return "SOLVER_RET_LIMITED";
+      default: return "SOLVER_RET_UNKNOWN";
+    }
+  }
+
   void ProtoFunction::serialize_body(Serializer& s) const {
     s.pack("ProtoFunction::name", name_);
     s.pack("ProtoFunction::verbose", verbose_);

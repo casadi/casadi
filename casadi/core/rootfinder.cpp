@@ -258,7 +258,13 @@ namespace casadi {
 
   int Rootfinder::init_mem(void* mem) const {
     if (OracleFunction::init_mem(mem)) return 1;
-    //auto m = static_cast<RootfinderMemory*>(mem);
+
+    auto m = static_cast<RootfinderMemory*>(mem);
+
+    // Problem has not been solved at this point
+    m->success = false;
+    m->unified_return_status = SOLVER_RET_UNKNOWN;
+
     return 0;
   }
 
@@ -283,6 +289,7 @@ namespace casadi {
 
     // Problem has not been solved at this point
     m->success = false;
+    m->unified_return_status = SOLVER_RET_UNKNOWN;
 
     // Get input pointers
     m->iarg = arg;
@@ -538,6 +545,7 @@ namespace casadi {
     Dict stats = OracleFunction::get_stats(mem);
     auto m = static_cast<RootfinderMemory*>(mem);
     stats["success"] = m->success;
+    stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
     return stats;
   }
 

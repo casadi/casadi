@@ -718,7 +718,11 @@ namespace casadi {
     m->success = ret==0;
     m->ret_ = ret;
 
-    if (ret==1 && print_maxit_reached_) print("***WARNING: Maximum number of iterations reached\n");
+    if (ret==1) {
+      if (print_maxit_reached_) print("***WARNING: Maximum number of iterations reached\n");
+      m->unified_return_status = SOLVER_RET_LIMITED;
+    }
+
 
     // Get optimal cost
     m->f = m->obj;

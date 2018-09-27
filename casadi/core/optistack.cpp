@@ -154,7 +154,15 @@ void Opti::set_value(const std::vector<MX>& assignments) {
 
 OptiSol Opti::solve() {
   try {
-    return (*this)->solve();
+    return (*this)->solve(false);
+  } catch (exception& e) {
+    THROW_ERROR("solve", e.what());
+  }
+}
+
+OptiSol Opti::solve_limited() {
+  try {
+    return (*this)->solve(true);
   } catch (exception& e) {
     THROW_ERROR("solve", e.what());
   }

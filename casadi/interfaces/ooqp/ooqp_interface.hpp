@@ -80,6 +80,9 @@ namespace casadi {
     /// Solve the QP
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
+    /** \brief Create memory block */
+    void* alloc_mem() const override { return new ConicMemory();}
+
     /// Throw error
     static const char* errFlag(int flag);
 
@@ -112,7 +115,6 @@ namespace casadi {
     static const std::string meta_doc;
 
     mutable int return_status_;
-    mutable bool success_;
 
   };
 

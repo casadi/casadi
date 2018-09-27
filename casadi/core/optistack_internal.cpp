@@ -389,16 +389,21 @@ std::string OptiNode::return_status() const {
   return "unknown";
 }
 
-bool OptiNode::return_success() const {
+bool OptiNode::return_success(bool accept_limit) const {
   Dict mystats;
   try {
     mystats = stats();
   } catch (...) {
     //
   }
-  if (mystats.find("success")!=mystats.end())
-    return mystats.at("success");
-  return false;
+  bool success = false;
+  if (mystats.find("success")!=mystats.end()) success = mystats.at("success");
+  if (!accept_limit) return success;
+
+  bool limited = false;
+  if (mystats.find("unified_return_status")!=mystats.end())
+    limited = mystats.at("unified_return_status")=="SOLVER_RET_LIMITED";
+  return success || limited;
 }
 
 Function OptiNode::casadi_solver() const {
@@ -910,7 +915,7 @@ bool OptiNode::old_callback() const {
   return !cb->associated_with(this);
 }
 // Solve the problem
-OptiSol OptiNode::solve() {
+OptiSol OptiNode::solve(bool accept_limit) {
 
   if (problem_dirty()) {
     bake();
@@ -951,7 +956,7 @@ OptiSol OptiNode::solve() {
 
   std::string ret = return_status();
 
-  casadi_assert(return_success(),
+  casadi_assert(return_success(accept_limit),
     "Solver failed. You may use opti.debug.value to investigate the latest values of variables."
     " return_status is '" + ret + "'");
 

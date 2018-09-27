@@ -163,6 +163,7 @@ namespace casadi {
     casadi_copy(M->x, n_, m->ires[iout_]);
 
     m->success = m->return_status>0;
+    if (m->return_status==0) m->unified_return_status = SOLVER_RET_LIMITED;
 
     return 0;
   }
