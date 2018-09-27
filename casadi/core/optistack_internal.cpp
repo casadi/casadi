@@ -24,6 +24,7 @@
 
 #include "optistack_internal.hpp"
 #include "nlpsol.hpp"
+#include "conic.hpp"
 #include "function_internal.hpp"
 #include "global_options.hpp"
 
@@ -89,8 +90,8 @@ class InternalOptiCallback : public FunctionInternal {
     mutable casadi_int i;
 };
 
-OptiNode* OptiNode::create() {
-return new OptiNode();
+OptiNode* OptiNode::create(const std::string& problem_type) {
+return new OptiNode(problem_type);
 }
 
 
@@ -236,7 +237,8 @@ MX OptiNode::g_lookup(casadi_int i) const {
   return MX();
 }
 
-OptiNode::OptiNode() : count_(0), count_var_(0), count_par_(0), count_dual_(0) {
+OptiNode::OptiNode(const std::string& problem_type) :
+    count_(0), count_var_(0), count_par_(0), count_dual_(0) {
   f_ = 0;
   instance_number_ = instance_count_++;
   user_callback_ = nullptr;
@@ -245,6 +247,10 @@ OptiNode::OptiNode() : count_(0), count_var_(0), count_par_(0), count_dual_(0) {
   store_initial_[OPTI_DUAL_G] = {};
   store_latest_[OPTI_VAR] = {};
   store_latest_[OPTI_DUAL_G] = {};
+  casadi_assert(problem_type=="nlp" || problem_type=="conic",
+    "Specified problem type '" + problem_type + "'unknown. "
+    "Choose 'nlp' (default) or 'conic'.");
+  problem_type_ = problem_type;
   mark_problem_dirty();
 }
 
@@ -932,7 +938,11 @@ OptiSol OptiNode::solve() {
       "You must call 'solver' on the Opti stack to select a solver. "
       "Suggestion: opti.solver('ipopt')");
 
-    solver_ = nlpsol("solver", solver_name_, nlp_, opts);
+    if (problem_type_=="conic") {
+      solver_ = qpsol("solver", solver_name_, nlp_, opts);
+    } else {
+      solver_ = nlpsol("solver", solver_name_, nlp_, opts);
+    }
     mark_solver_dirty(false);
   }
 

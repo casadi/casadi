@@ -47,6 +47,21 @@ if has_nlpsol("ipopt"):
 
 class OptiStacktests(inherit_from):
 
+    def test_conic(self):
+      opti = Opti('conic')
+      x = opti.variable(2)
+      opti.minimize(dot(x,x))
+      opti.subject_to(x[0]>=2)
+      opti.subject_to(x[1]>=3)
+      opti.solver('qrqp')
+
+      sol = opti.solve()
+      self.checkarray(sol.value(x),vertcat(2,3))
+
+      with self.assertInException("conic"):
+        Opti('foo')
+
+
     def test_lookup(self):
       opti = Opti()
       x = opti.variable(2)

@@ -91,8 +91,10 @@ class CASADI_EXPORT Opti
 public:
 
   /** \brief Create Opti Context
+   * 
+   * \param[in] problem_type of optimization 'nlp' or 'conic' (default nlp)
   */
-  Opti();
+  Opti(const std::string& problem_type="nlp");
 
   /** \brief Create a decision variable (symbol)
   *
