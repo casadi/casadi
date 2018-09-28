@@ -12949,9 +12949,9 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring") casadi::Conic::size2_out "
+%feature("docstring") casadi::Conic::serialize_type "
 
-[INTERNAL]  Input/output dimensions.
+[INTERNAL]  Serialize type information.
 
 ";
 
@@ -13183,9 +13183,9 @@ structure recognition.
 
 ";
 
-%feature("docstring") casadi::Conic::serialize_type "
+%feature("docstring") casadi::Conic::size2_out "
 
-[INTERNAL]  Serialize type information.
+[INTERNAL]  Input/output dimensions.
 
 ";
 
@@ -45533,9 +45533,9 @@ C++ includes: qp_to_nlp.hpp ";
 
 ";
 
-%feature("docstring") casadi::QpToNlp::construct "
+%feature("docstring") casadi::QpToNlp::serialize_base_function "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -45654,6 +45654,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 %feature("docstring") casadi::QpToNlp::print_fstats "
 
 [INTERNAL]  Print statistics.
+
+";
+
+%feature("docstring") casadi::QpToNlp::construct "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
 
 ";
 
@@ -46162,12 +46168,6 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
-
-";
-
-%feature("docstring") casadi::QpToNlp::serialize_base_function "
-
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 

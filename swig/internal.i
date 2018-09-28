@@ -46,6 +46,9 @@
 %exception  casadi::Blocksqp::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Blocksqp::serialize_body(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::BonminUserClass::branchingInfo() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -158,6 +161,15 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Conic::psd_support() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Conic::serialize_base_function() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Conic::serialize_body(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Conic::serialize_type(Serializer &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ConstantSX_deserialize(DeSerializer &s) {
@@ -1861,9 +1873,6 @@
 %exception  casadi::PluginInterface< Conic  >::plugin_name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::PluginInterface< Conic  >::serialize_type(Serializer &s) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::PluginInterface< Dple  >::plugin_name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1933,6 +1942,9 @@
 %exception  casadi::QpToNlp::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::QpToNlp::serialize_body(Serializer &s) const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Qrqp::alloc_mem() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -1949,6 +1961,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Qrqp::plugin_name() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Qrqp::serialize_body(Serializer &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Qrsqp::alloc_mem() const override {
@@ -2249,6 +2264,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Sqpmethod::print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf, double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Sqpmethod::serialize_body(Serializer &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Switch::class_name() const override {

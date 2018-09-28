@@ -2746,7 +2746,7 @@ double cNorm, double obj) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Nlpsol::serialize_body(Serializer &s) const
+%feature("docstring")  casadi::Blocksqp::serialize_body(Serializer &s) const
 "
 
 [INTERNAL]  Serialize an object without type information.
@@ -15549,8 +15549,7 @@ std::vector< M > &arg, casadi_int &npar) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring")  casadi::Conic::serialize_base_function() const  "
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
@@ -15672,8 +15671,7 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")  casadi::Conic::serialize_body(Serializer &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -15857,10 +15855,9 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::size2_out(casadi_int ind)
-const  "
+%feature("docstring")  casadi::Conic::serialize_type(Serializer &s) const  "
 
-[INTERNAL]  Input/output dimensions.
+[INTERNAL]  Serialize type information.
 
 ";
 
@@ -16131,17 +16128,10 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")  casadi::FunctionInternal::size2_out(casadi_int ind)
+const  "
 
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Conic
->::serialize_type(Serializer &s) const "
-
-[INTERNAL]  Serialize type information.
+[INTERNAL]  Input/output dimensions.
 
 ";
 
@@ -57672,9 +57662,9 @@ C++ includes: qp_to_nlp.hpp ";
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+%feature("docstring")  casadi::Conic::serialize_base_function() const  "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -57816,6 +57806,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
 %feature("docstring")  casadi::QpToNlp::plugin_name() const  "
 
 [INTERNAL] ";
@@ -57826,8 +57822,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")  casadi::QpToNlp::serialize_body(Serializer &s) const
+"
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -57991,15 +57987,7 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
-
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Conic
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::Conic::serialize_type(Serializer &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -58138,7 +58126,7 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::free_mem(void *mem) const  "
+%feature("docstring")  casadi::QpToNlp::free_mem(void *mem) const  "
 
 [INTERNAL]  Free memory block.
 
@@ -58416,13 +58404,6 @@ const  "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
-
-";
-
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
-
-[INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
 ";
 
@@ -58899,8 +58880,7 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")  casadi::Qrqp::serialize_body(Serializer &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -59053,8 +59033,7 @@ std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize_base_function()
-const  "
+%feature("docstring")  casadi::Conic::serialize_base_function() const  "
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
 
@@ -59762,15 +59741,7 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
-
-[INTERNAL]  Serialize type information.
-
-";
-
-%feature("docstring")  casadi::PluginInterface< Conic
->::serialize_type(Serializer &s) const "
+%feature("docstring")  casadi::Conic::serialize_type(Serializer &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -72861,8 +72832,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::Sqpmethod::serialize_body(Serializer &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
