@@ -150,6 +150,7 @@ namespace casadi {
   }
 
   int Qrqp::init_mem(void* mem) const {
+    if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<QrqpMemory*>(mem);
     m->return_status = "";
     return 0;

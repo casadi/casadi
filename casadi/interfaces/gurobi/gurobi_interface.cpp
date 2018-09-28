@@ -112,6 +112,7 @@ namespace casadi {
   }
 
   int GurobiInterface::init_mem(void* mem) const {
+    if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<GurobiMemory*>(mem);
 
     // Load environment

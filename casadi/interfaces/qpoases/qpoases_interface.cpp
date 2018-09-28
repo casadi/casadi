@@ -313,6 +313,7 @@ namespace casadi {
   }
 
   int QpoasesInterface::init_mem(void* mem) const {
+    if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<QpoasesMemory*>(mem);
     m->called_once = false;
 
@@ -451,7 +452,7 @@ namespace casadi {
     m->return_status = flag;
     m->success = flag==qpOASES::SUCCESSFUL_RETURN;
     if (flag==qpOASES::RET_MAX_NWSR_REACHED) {
-      m->success = SOLVER_RET_LIMITED;
+      m->unified_return_status = SOLVER_RET_LIMITED;
     }
 
     if (verbose_) casadi_message("qpOASES return status: " + getErrorMessage(m->return_status));
