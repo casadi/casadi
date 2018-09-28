@@ -172,6 +172,14 @@ namespace casadi {
     /// SDP to SOCP conversion memory
     SDPToSOCPMem sdp_to_socp_mem_;
 
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new CplexInterface(s); }
+
+  protected:
+     /** \brief Deserializing constructor */
+    explicit CplexInterface(DeSerializer& e);
   };
 } // end namespace casadi
 /// \endcond

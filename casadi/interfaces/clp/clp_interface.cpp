@@ -36,6 +36,7 @@ namespace casadi {
     plugin->doc = ClpInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &ClpInterface::options_;
+    plugin->deserialize = &ClpInterface::deserialize;
     return 0;
   }
 
@@ -464,6 +465,16 @@ namespace casadi {
     stats["return_status"] = return_status_string(m->return_status);
     stats["secondary_return_status"] = return_secondary_status_string(m->secondary_return_status);
     return stats;
+  }
+
+  ClpInterface::ClpInterface(DeSerializer& s) : Conic(s) {
+    s.unpack("ClpInterface::opts", opts_);
+  }
+
+  void ClpInterface::serialize_body(Serializer &s) const {
+    Conic::serialize_body(s);
+
+    s.pack("ClpInterface::opts", opts_);
   }
 
 } // end namespace casadi

@@ -45,8 +45,10 @@ if has_nlpsol("worhp"):
 if has_conic("ooqp"):
   conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False, "codegen": False}))
 
+
 if has_conic("qpoases"):
   conics.append(("qpoases",{},{"quadratic": True, "dual": True, "soc": False, "codegen": False}))
+
 
 if has_conic("cplex"):
   conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True, "codegen": False}))
@@ -55,7 +57,7 @@ if has_conic("cplex"):
 # No solution for licensing on travis
 
 #if has_conic("gurobi"):
-#  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True}))
+#  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True, "codegen": False}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
@@ -66,7 +68,9 @@ if has_conic("clp"):
 if has_conic("qrqp"):
   conics.append(("qrqp",dict(max_iter=20),{"quadratic": True, "dual": True, "soc": False, "codegen": True}))
 
+
 print(conics)
+
 
 class ConicTests(casadiTestCase):
 
@@ -114,6 +118,8 @@ class ConicTests(casadiTestCase):
 
       if aux_options["codegen"]:
         self.check_codegen(solver,solver_in,std="c99")
+
+      self.check_serialize(solver,solver_in)
 
   def test_general_convex_dense(self):
     self.message("Convex dense QP with solvers: " + str([conic for conic,options,aux_options in conics]))
@@ -211,6 +217,7 @@ class ConicTests(casadiTestCase):
       if aux_options["dual"]: self.assertAlmostEqual(solver_out["lam_x"][1],6,max(1,6-less_digits),str(conic))
 
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0,0,0]),str(conic),digits=max(1,4-less_digits))
+
 
   def test_general_convex_sparse(self):
     self.message("Convex sparse QP with solvers: " + str([conic for conic,options,aux_options in conics]))
@@ -682,6 +689,7 @@ class ConicTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
+      self.check_serialize(solver,solver_in)
       solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],DM([0.5,1.5]),str(conic),digits=max(1,5-less_digits))
@@ -693,6 +701,7 @@ class ConicTests(casadiTestCase):
 
       if aux_options["codegen"]:
         self.check_codegen(solver,solver_in,std="c99")
+
 
   def test_linear2(self):
     H = DM(2,2)

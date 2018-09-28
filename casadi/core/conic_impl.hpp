@@ -145,12 +145,6 @@ namespace casadi {
     /// The shape of psd constraint matrix
     casadi_int np_;
 
-    /// The number of quadratic constraints
-    casadi_int nq_;
-
-    /// Number of nonzeros in w
-    casadi_int max_nnz_w_;
-
     /// SDP to SOCP conversion memory
     struct SDPToSOCPMem {
       // Block partition vector for SOCP (block i runs from r[i] to r[i+1])
@@ -173,6 +167,24 @@ namespace casadi {
     /// SDP to SOCP conversion initialization
     void sdp_to_socp_init(SDPToSOCPMem& m) const;
 
+    void serialize(Serializer &s, const SDPToSOCPMem& m) const;
+    void deserialize(DeSerializer &s, SDPToSOCPMem& m);
+
+  public:
+      /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(Serializer &s) const override;
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "Conic"; }
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeSerializer& s);
+
+  protected:
+
+    /** \brief Deserializing constructor */
+    explicit Conic(DeSerializer& s);
   };
 
 

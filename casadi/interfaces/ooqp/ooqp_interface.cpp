@@ -46,6 +46,7 @@ namespace casadi {
     plugin->doc = OoqpInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &OoqpInterface::options_;
+    plugin->deserialize = &OoqpInterface::deserialize;
     return 0;
   }
 
@@ -60,6 +61,7 @@ namespace casadi {
   }
 
   OoqpInterface::~OoqpInterface() {
+    clear_mem();
   }
 
   Options OoqpInterface::options_
@@ -146,8 +148,8 @@ namespace casadi {
   int OoqpInterface::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
 
-    auto m = static_cast<ConicMemory*>(mem);
-    return_status_ = -1;
+    auto m = static_cast<OoqpMemory*>(mem);
+    m->return_status = -1;
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
@@ -411,7 +413,7 @@ namespace casadi {
       }
     }
 
-    return_status_ = ierr;
+    m->return_status = ierr;
     m->success = ierr==SUCCESSFUL_TERMINATION;
     if (ierr==MAX_ITS_EXCEEDED) m->unified_return_status = SOLVER_RET_LIMITED;
     if (ierr>0) {
@@ -490,7 +492,9 @@ namespace casadi {
 
   Dict OoqpInterface::get_stats(void* mem) const {
     Dict stats = Conic::get_stats(mem);
-    stats["return_status"] = return_status_;
+
+    auto m = static_cast<OoqpMemory*>(mem);
+    stats["return_status"] = m->return_status;
     return stats;
   }
 
@@ -510,5 +514,25 @@ namespace casadi {
     return ss.str();
   }
 
+  OoqpInterface::OoqpInterface(DeSerializer& s) : Conic(s) {
+    s.unpack("OoqpInterface::spAT", spAT_);
+    s.unpack("OoqpInterface::nQ", nQ_);
+    s.unpack("OoqpInterface::nH", nH_);
+    s.unpack("OoqpInterface::nA", nA_);
+    s.unpack("OoqpInterface::print_level", print_level_);
+    s.unpack("OoqpInterface::mutol", mutol_);
+    s.unpack("OoqpInterface::artol", artol_);
+  }
+
+  void OoqpInterface::serialize_body(Serializer &s) const {
+    Conic::serialize_body(s);
+    s.pack("OoqpInterface::spAT", spAT_);
+    s.pack("OoqpInterface::nQ", nQ_);
+    s.pack("OoqpInterface::nH", nH_);
+    s.pack("OoqpInterface::nA", nA_);
+    s.pack("OoqpInterface::print_level", print_level_);
+    s.pack("OoqpInterface::mutol", mutol_);
+    s.pack("OoqpInterface::artol", artol_);
+  }
 
 } // namespace casadi

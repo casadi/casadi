@@ -40,6 +40,7 @@ namespace casadi {
     plugin->doc = QpoasesInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &QpoasesInterface::options_;
+    plugin->deserialize = &QpoasesInterface::deserialize;
     return 0;
   }
 
@@ -929,6 +930,134 @@ namespace casadi {
     auto m = static_cast<QpoasesMemory*>(mem);
     stats["return_status"] = getErrorMessage(m->return_status);
     return stats;
+  }
+
+  QpoasesInterface::QpoasesInterface(DeSerializer& s) : Conic(s) {
+    s.unpack("QpoasesInterface::max_nWSR", max_nWSR_);
+    s.unpack("QpoasesInterface::max_cputime", max_cputime_);
+    casadi_int hess;
+    s.unpack("QpoasesInterface::hess", hess);
+    hess_ = static_cast<qpOASES::HessianType>(hess);
+    s.unpack("QpoasesInterface::sparse", sparse_);
+    s.unpack("QpoasesInterface::schur", schur_);
+    s.unpack("QpoasesInterface::max_schur", max_schur_);
+    s.unpack("QpoasesInterface::linsol_plugin", linsol_plugin_);
+    ops_.setToDefault();
+    casadi_int print_level;
+    s.unpack("QpoasesInterface::ops::printLevel", print_level);
+
+    bool enableRamping;
+    s.unpack("QpoasesInterface::ops::enableRamping", enableRamping);
+    ops_.enableRamping = to_BooleanType(enableRamping);
+
+
+    bool enableFarBounds;
+    s.unpack("QpoasesInterface::ops::enableFarBounds", enableFarBounds);
+    ops_.enableFarBounds = to_BooleanType(enableFarBounds);
+
+
+    bool enableFlippingBounds;
+    s.unpack("QpoasesInterface::ops::enableFlippingBounds", enableFlippingBounds);
+    ops_.enableFlippingBounds = to_BooleanType(enableFlippingBounds);
+
+
+    bool enableRegularisation;
+    s.unpack("QpoasesInterface::ops::enableRegularisation", enableRegularisation);
+    ops_.enableRegularisation = to_BooleanType(enableRegularisation);
+
+
+    bool enableFullLITests;
+    s.unpack("QpoasesInterface::ops::enableFullLITests", enableFullLITests);
+    ops_.enableFullLITests = to_BooleanType(enableFullLITests);
+
+
+    bool enableNZCTests;
+    s.unpack("QpoasesInterface::ops::enableNZCTests", enableNZCTests);
+    ops_.enableNZCTests = to_BooleanType(enableNZCTests);
+
+
+    s.unpack("QpoasesInterface::ops::enableDriftCorrection", ops_.enableDriftCorrection);
+    s.unpack("QpoasesInterface::ops::enableCholeskyRefactorisation",
+      ops_.enableCholeskyRefactorisation);
+
+
+    bool enableEqualities;
+    s.unpack("QpoasesInterface::ops::enableEqualities", enableEqualities);
+    ops_.enableEqualities = to_BooleanType(enableEqualities);
+
+    s.unpack("QpoasesInterface::ops::terminationTolerance", ops_.terminationTolerance);
+    s.unpack("QpoasesInterface::ops::boundTolerance", ops_.boundTolerance);
+    s.unpack("QpoasesInterface::ops::boundRelaxation", ops_.boundRelaxation);
+    s.unpack("QpoasesInterface::ops::epsNum", ops_.epsNum);
+    s.unpack("QpoasesInterface::ops::epsDen", ops_.epsDen);
+    s.unpack("QpoasesInterface::ops::maxPrimalJump", ops_.maxPrimalJump);
+    s.unpack("QpoasesInterface::ops::maxDualJump", ops_.maxDualJump);
+    s.unpack("QpoasesInterface::ops::initialRamping", ops_.initialRamping);
+    s.unpack("QpoasesInterface::ops::finalRamping", ops_.finalRamping);
+    s.unpack("QpoasesInterface::ops::initialFarBounds", ops_.initialFarBounds);
+    s.unpack("QpoasesInterface::ops::growFarBounds", ops_.growFarBounds);
+    std::string initialStatusBounds;
+    s.unpack("QpoasesInterface::ops::initialStatusBounds", initialStatusBounds);
+    ops_.initialStatusBounds = to_SubjectToStatus(initialStatusBounds);
+    s.unpack("QpoasesInterface::ops::epsFlipping", ops_.epsFlipping);
+    s.unpack("QpoasesInterface::ops::numRegularisationSteps", ops_.numRegularisationSteps);
+    s.unpack("QpoasesInterface::ops::epsRegularisation", ops_.epsRegularisation);
+    s.unpack("QpoasesInterface::ops::numRefinementSteps", ops_.numRefinementSteps);
+    s.unpack("QpoasesInterface::ops::epsIterRef", ops_.epsIterRef);
+    s.unpack("QpoasesInterface::ops::epsLITests", ops_.epsLITests);
+    s.unpack("QpoasesInterface::ops::epsNZCTests", ops_.epsNZCTests);
+    bool enableInertiaCorrection;
+    s.unpack("QpoasesInterface::ops::enableInertiaCorrection", enableInertiaCorrection);
+    ops_.enableInertiaCorrection = to_BooleanType(enableInertiaCorrection);
+  }
+
+  void QpoasesInterface::serialize_body(Serializer &s) const {
+    Conic::serialize_body(s);
+    s.pack("QpoasesInterface::max_nWSR", max_nWSR_);
+    s.pack("QpoasesInterface::max_cputime", max_cputime_);
+    s.pack("QpoasesInterface::hess", static_cast<casadi_int>(hess_));
+    s.pack("QpoasesInterface::sparse", sparse_);
+    s.pack("QpoasesInterface::schur", schur_);
+    s.pack("QpoasesInterface::max_schur", max_schur_);
+    s.pack("QpoasesInterface::linsol_plugin", linsol_plugin_);
+    s.pack("QpoasesInterface::ops::printLevel", static_cast<casadi_int>(ops_.printLevel));
+    s.pack("QpoasesInterface::ops::enableRamping", from_BooleanType(ops_.enableRamping));
+    s.pack("QpoasesInterface::ops::enableFarBounds",
+      from_BooleanType(ops_.enableFarBounds));
+    s.pack("QpoasesInterface::ops::enableFlippingBounds",
+      from_BooleanType(ops_.enableFlippingBounds));
+    s.pack("QpoasesInterface::ops::enableRegularisation",
+      from_BooleanType(ops_.enableRegularisation));
+    s.pack("QpoasesInterface::ops::enableFullLITests",
+      from_BooleanType(ops_.enableFullLITests));
+    s.pack("QpoasesInterface::ops::enableNZCTests", from_BooleanType(ops_.enableNZCTests));
+    s.pack("QpoasesInterface::ops::enableDriftCorrection", ops_.enableDriftCorrection);
+    s.pack("QpoasesInterface::ops::enableCholeskyRefactorisation",
+      ops_.enableCholeskyRefactorisation);
+    s.pack("QpoasesInterface::ops::enableEqualities", from_BooleanType(ops_.enableEqualities));
+    s.pack("QpoasesInterface::ops::terminationTolerance", ops_.terminationTolerance);
+    s.pack("QpoasesInterface::ops::boundTolerance", ops_.boundTolerance);
+    s.pack("QpoasesInterface::ops::boundRelaxation", ops_.boundRelaxation);
+    s.pack("QpoasesInterface::ops::epsNum", ops_.epsNum);
+    s.pack("QpoasesInterface::ops::epsDen", ops_.epsDen);
+    s.pack("QpoasesInterface::ops::maxPrimalJump", ops_.maxPrimalJump);
+    s.pack("QpoasesInterface::ops::maxDualJump", ops_.maxDualJump);
+    s.pack("QpoasesInterface::ops::initialRamping", ops_.initialRamping);
+    s.pack("QpoasesInterface::ops::finalRamping", ops_.finalRamping);
+    s.pack("QpoasesInterface::ops::initialFarBounds", ops_.initialFarBounds);
+    s.pack("QpoasesInterface::ops::growFarBounds", ops_.growFarBounds);
+    s.pack("QpoasesInterface::ops::initialStatusBounds",
+      from_SubjectToStatus(ops_.initialStatusBounds));
+    s.pack("QpoasesInterface::ops::epsFlipping", ops_.epsFlipping);
+    s.pack("QpoasesInterface::ops::numRegularisationSteps", ops_.numRegularisationSteps);
+    s.pack("QpoasesInterface::ops::epsRegularisation", ops_.epsRegularisation);
+    s.pack("QpoasesInterface::ops::numRefinementSteps", ops_.numRefinementSteps);
+    s.pack("QpoasesInterface::ops::epsIterRef", ops_.epsIterRef);
+    s.pack("QpoasesInterface::ops::epsLITests", ops_.epsLITests);
+    s.pack("QpoasesInterface::ops::epsNZCTests", ops_.epsNZCTests);
+    s.pack("QpoasesInterface::ops::enableInertiaCorrection",
+      from_BooleanType(ops_.enableInertiaCorrection));
+
   }
 
 } // namespace casadi

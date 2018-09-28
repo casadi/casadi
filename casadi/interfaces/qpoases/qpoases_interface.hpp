@@ -159,7 +159,16 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new QpoasesInterface(s); }
+
   protected:
+    /** \brief Deserializing constructor */
+    explicit QpoasesInterface(DeSerializer& s);
 
     ///@{
     /// Convert between qpOASES types and standard types

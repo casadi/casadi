@@ -37,6 +37,7 @@
 #include "switch.hpp"
 #include "interpolant_impl.hpp"
 #include "nlpsol_impl.hpp"
+#include "conic_impl.hpp"
 #include "integrator_impl.hpp"
 #include "external_impl.hpp"
 #include "bspline.hpp"
@@ -3001,6 +3002,7 @@ namespace casadi {
     {"Integrator", Integrator::deserialize},
     {"External", External::deserialize},
     {"BSpline", BSplineCommon::deserialize},
+    {"Conic", Conic::deserialize},
   };
 
 } // namespace casadi

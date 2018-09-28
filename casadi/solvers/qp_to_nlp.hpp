@@ -73,6 +73,9 @@ namespace casadi {
     /** \brief Create memory block */
     void* alloc_mem() const override { return new ConicMemory();}
 
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<ConicMemory*>(mem);}
+
     ///@{
     /** \brief Options */
     static Options options_;
@@ -92,6 +95,15 @@ namespace casadi {
 
     /// Solve with
     Function solver_;
+
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new QpToNlp(s); }
+
+  protected:
+     /** \brief Deserializing constructor */
+    explicit QpToNlp(DeSerializer& e);
   };
 
 } // namespace casadi

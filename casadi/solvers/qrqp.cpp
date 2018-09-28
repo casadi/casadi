@@ -37,6 +37,7 @@ namespace casadi {
     plugin->doc = Qrqp::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &Qrqp::options_;
+    plugin->deserialize = &Qrqp::deserialize;
     return 0;
   }
 
@@ -112,22 +113,7 @@ namespace casadi {
     kkt_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
 
     // Setup memory structure
-    p_.du_to_pr = du_to_pr_;
-    p_.min_lam = min_lam_;
-    p_.print_iter = print_iter_;
-    p_.sp_a = A_;
-    p_.sp_h = H_;
-    p_.sp_at = AT_;
-    p_.sp_kkt = kkt_;
-    p_.sp_v = sp_v_;
-    p_.sp_r = sp_r_;
-    p_.prinv = get_ptr(prinv_);
-    p_.pc = get_ptr(pc_);
-    p_.dmin = std::numeric_limits<double>::min();
-    p_.inf = inf;
-    p_.nx = nx_;
-    p_.na = na_;
-    p_.nz = nx_+na_;
+    set_qp_prob();
 
     // Allocate memory
     casadi_int sz_w, sz_iw;
@@ -147,6 +133,25 @@ namespace casadi {
       print("Number of nonzeros in QR(V):               %9d\n", sp_v_.nnz());
       print("Number of nonzeros in QR(R):               %9d\n", sp_r_.nnz());
     }
+  }
+
+  void Qrqp::set_qp_prob() {
+    p_.du_to_pr = du_to_pr_;
+    p_.min_lam = min_lam_;
+    p_.print_iter = print_iter_;
+    p_.sp_a = A_;
+    p_.sp_h = H_;
+    p_.sp_at = AT_;
+    p_.sp_kkt = kkt_;
+    p_.sp_v = sp_v_;
+    p_.sp_r = sp_r_;
+    p_.prinv = get_ptr(prinv_);
+    p_.pc = get_ptr(pc_);
+    p_.dmin = std::numeric_limits<double>::min();
+    p_.inf = inf;
+    p_.nx = nx_;
+    p_.na = na_;
+    p_.nz = nx_+na_;
   }
 
   int Qrqp::init_mem(void* mem) const {
@@ -350,6 +355,37 @@ namespace casadi {
     auto m = static_cast<QrqpMemory*>(mem);
     stats["return_status"] = m->return_status;
     return stats;
+  }
+
+  Qrqp::Qrqp(DeSerializer& s) : Conic(s) {
+    s.unpack("Qrqp::AT", AT_);
+    s.unpack("Qrqp::kkt", kkt_);
+    s.unpack("Qrqp::sp_v", sp_v_);
+    s.unpack("Qrqp::sp_r", sp_r_);
+    s.unpack("Qrqp::prinv", prinv_);
+    s.unpack("Qrqp::pc", pc_);
+    s.unpack("Qrqp::max_iter", max_iter_);
+    s.unpack("Qrqp::print_iter", print_iter_);
+    s.unpack("Qrqp::print_header", print_header_);
+    s.unpack("Qrqp::du_to_pr", du_to_pr_);
+    s.unpack("Qrqp::min_lam", min_lam_);
+    set_qp_prob();
+  }
+
+  void Qrqp::serialize_body(Serializer &s) const {
+    Conic::serialize_body(s);
+
+    s.pack("Qrqp::AT", AT_);
+    s.pack("Qrqp::kkt", kkt_);
+    s.pack("Qrqp::sp_v", sp_v_);
+    s.pack("Qrqp::sp_r", sp_r_);
+    s.pack("Qrqp::prinv", prinv_);
+    s.pack("Qrqp::pc", pc_);
+    s.pack("Qrqp::max_iter", max_iter_);
+    s.pack("Qrqp::print_iter", print_iter_);
+    s.pack("Qrqp::print_header", print_header_);
+    s.pack("Qrqp::du_to_pr", du_to_pr_);
+    s.pack("Qrqp::min_lam", min_lam_);
   }
 
 } // namespace casadi

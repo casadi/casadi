@@ -38,6 +38,7 @@ namespace casadi {
     plugin->doc = Blocksqp::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &Blocksqp::options_;
+    plugin->deserialize = &Blocksqp::deserialize;
     return 0;
   }
 
@@ -2828,6 +2829,139 @@ namespace casadi {
   lInfConstraintNorm(BlocksqpMemory* m, const double* xk, const double* g) const {
     return fmax(casadi_max_viol(nx_, xk, m->lbz, m->ubz),
                 casadi_max_viol(ng_, g, m->lbz+nx_, m->ubz+nx_));
+  }
+
+
+  Blocksqp::Blocksqp(DeSerializer& s) : Nlpsol(s) {
+    s.unpack("Blocksqp::nblocks", nblocks_);
+    s.unpack("Blocksqp::blocks", blocks_);
+    s.unpack("Blocksqp::dim", dim_);
+    s.unpack("Blocksqp::nnz_H", nnz_H_);
+    s.unpack("Blocksqp::Asp", Asp_);
+    s.unpack("Blocksqp::Hsp", Hsp_);
+    s.unpack("Blocksqp::exact_hess_lag_sp_", exact_hess_lag_sp_);
+    s.unpack("Blocksqp::linsol_plugin", linsol_plugin_);
+    s.unpack("Blocksqp::print_header", print_header_);
+    s.unpack("Blocksqp::print_iteration", print_iteration_);
+    s.unpack("Blocksqp::eps", eps_);
+    s.unpack("Blocksqp::opttol", opttol_);
+    s.unpack("Blocksqp::nlinfeastol", nlinfeastol_);
+    s.unpack("Blocksqp::schur", schur_);
+    s.unpack("Blocksqp::globalization", globalization_);
+    s.unpack("Blocksqp::restore_feas", restore_feas_);
+    s.unpack("Blocksqp::max_line_search", max_line_search_);
+    s.unpack("Blocksqp::max_consec_reduced_steps", max_consec_reduced_steps_);
+    s.unpack("Blocksqp::max_consec_skipped_updates", max_consec_skipped_updates_);
+    s.unpack("Blocksqp::max_it_qp", max_it_qp_);
+    s.unpack("Blocksqp::max_iter", max_iter_);
+    s.unpack("Blocksqp::warmstart", warmstart_);
+    s.unpack("Blocksqp::qp_init", qp_init_);
+    s.unpack("Blocksqp::block_hess", block_hess_);
+    s.unpack("Blocksqp::hess_scaling", hess_scaling_);
+    s.unpack("Blocksqp::fallback_scaling", fallback_scaling_);
+    s.unpack("Blocksqp::max_time_qp", max_time_qp_);
+    s.unpack("Blocksqp::ini_hess_diag", ini_hess_diag_);
+    s.unpack("Blocksqp::col_eps", col_eps_);
+    s.unpack("Blocksqp::col_tau1", col_tau1_);
+    s.unpack("Blocksqp::col_tau2", col_tau2_);
+    s.unpack("Blocksqp::hess_damp", hess_damp_);
+    s.unpack("Blocksqp::hess_damp_fac", hess_damp_fac_);
+    s.unpack("Blocksqp::hess_update", hess_update_);
+    s.unpack("Blocksqp::fallback_update", fallback_update_);
+    s.unpack("Blocksqp::hess_lim_mem", hess_lim_mem_);
+    s.unpack("Blocksqp::hess_memsize", hess_memsize_);
+    s.unpack("Blocksqp::which_second_derv", which_second_derv_);
+    s.unpack("Blocksqp::skip_first_globalization", skip_first_globalization_);
+    s.unpack("Blocksqp::conv_strategy", conv_strategy_);
+    s.unpack("Blocksqp::max_conv_qp", max_conv_qp_);
+    s.unpack("Blocksqp::max_soc_iter", max_soc_iter_);
+    s.unpack("Blocksqp::gamma_theta", gamma_theta_);
+    s.unpack("Blocksqp::gamma_f", gamma_f_);
+    s.unpack("Blocksqp::kappa_soc", kappa_soc_);
+    s.unpack("Blocksqp::kappa_f", kappa_f_);
+    s.unpack("Blocksqp::theta_max", theta_max_);
+    s.unpack("Blocksqp::theta_min", theta_min_);
+    s.unpack("Blocksqp::delta", delta_);
+    s.unpack("Blocksqp::s_theta", s_theta_);
+    s.unpack("Blocksqp::s_f", s_f_);
+    s.unpack("Blocksqp::kappa_minus", kappa_minus_);
+    s.unpack("Blocksqp::kappa_plus", kappa_plus_);
+    s.unpack("Blocksqp::kappa_plus_max", kappa_plus_max_);
+    s.unpack("Blocksqp::delta_h0", delta_h0_);
+    s.unpack("Blocksqp::eta", eta_);
+    s.unpack("Blocksqp::obj_lo", obj_lo_);
+    s.unpack("Blocksqp::obj_up", obj_up_);
+    s.unpack("Blocksqp::rho", rho_);
+    s.unpack("Blocksqp::zeta", zeta_);
+    s.unpack("Blocksqp::rp_solver", rp_solver_);
+    s.unpack("Blocksqp::print_maxit_reached", print_maxit_reached_);
+
+  }
+
+  void Blocksqp::serialize_body(Serializer &s) const {
+    Nlpsol::serialize_body(s);
+    s.pack("Blocksqp::nblocks", nblocks_);
+    s.pack("Blocksqp::blocks", blocks_);
+    s.pack("Blocksqp::dim", dim_);
+    s.pack("Blocksqp::nnz_H", nnz_H_);
+    s.pack("Blocksqp::Asp", Asp_);
+    s.pack("Blocksqp::Hsp", Hsp_);
+    s.pack("Blocksqp::exact_hess_lag_sp_", exact_hess_lag_sp_);
+    s.pack("Blocksqp::linsol_plugin", linsol_plugin_);
+    s.pack("Blocksqp::print_header", print_header_);
+    s.pack("Blocksqp::print_iteration", print_iteration_);
+    s.pack("Blocksqp::eps", eps_);
+    s.pack("Blocksqp::opttol", opttol_);
+    s.pack("Blocksqp::nlinfeastol", nlinfeastol_);
+    s.pack("Blocksqp::schur", schur_);
+    s.pack("Blocksqp::globalization", globalization_);
+    s.pack("Blocksqp::restore_feas", restore_feas_);
+    s.pack("Blocksqp::max_line_search", max_line_search_);
+    s.pack("Blocksqp::max_consec_reduced_steps", max_consec_reduced_steps_);
+    s.pack("Blocksqp::max_consec_skipped_updates", max_consec_skipped_updates_);
+    s.pack("Blocksqp::max_it_qp", max_it_qp_);
+    s.pack("Blocksqp::max_iter", max_iter_);
+    s.pack("Blocksqp::warmstart", warmstart_);
+    s.pack("Blocksqp::qp_init", qp_init_);
+    s.pack("Blocksqp::block_hess", block_hess_);
+    s.pack("Blocksqp::hess_scaling", hess_scaling_);
+    s.pack("Blocksqp::fallback_scaling", fallback_scaling_);
+    s.pack("Blocksqp::max_time_qp", max_time_qp_);
+    s.pack("Blocksqp::ini_hess_diag", ini_hess_diag_);
+    s.pack("Blocksqp::col_eps", col_eps_);
+    s.pack("Blocksqp::col_tau1", col_tau1_);
+    s.pack("Blocksqp::col_tau2", col_tau2_);
+    s.pack("Blocksqp::hess_damp", hess_damp_);
+    s.pack("Blocksqp::hess_damp_fac", hess_damp_fac_);
+    s.pack("Blocksqp::hess_update", hess_update_);
+    s.pack("Blocksqp::fallback_update", fallback_update_);
+    s.pack("Blocksqp::hess_lim_mem", hess_lim_mem_);
+    s.pack("Blocksqp::hess_memsize", hess_memsize_);
+    s.pack("Blocksqp::which_second_derv", which_second_derv_);
+    s.pack("Blocksqp::skip_first_globalization", skip_first_globalization_);
+    s.pack("Blocksqp::conv_strategy", conv_strategy_);
+    s.pack("Blocksqp::max_conv_qp", max_conv_qp_);
+    s.pack("Blocksqp::max_soc_iter", max_soc_iter_);
+    s.pack("Blocksqp::gamma_theta", gamma_theta_);
+    s.pack("Blocksqp::gamma_f", gamma_f_);
+    s.pack("Blocksqp::kappa_soc", kappa_soc_);
+    s.pack("Blocksqp::kappa_f", kappa_f_);
+    s.pack("Blocksqp::theta_max", theta_max_);
+    s.pack("Blocksqp::theta_min", theta_min_);
+    s.pack("Blocksqp::delta", delta_);
+    s.pack("Blocksqp::s_theta", s_theta_);
+    s.pack("Blocksqp::s_f", s_f_);
+    s.pack("Blocksqp::kappa_minus", kappa_minus_);
+    s.pack("Blocksqp::kappa_plus", kappa_plus_);
+    s.pack("Blocksqp::kappa_plus_max", kappa_plus_max_);
+    s.pack("Blocksqp::delta_h0", delta_h0_);
+    s.pack("Blocksqp::eta", eta_);
+    s.pack("Blocksqp::obj_lo", obj_lo_);
+    s.pack("Blocksqp::obj_up", obj_up_);
+    s.pack("Blocksqp::rho", rho_);
+    s.pack("Blocksqp::zeta", zeta_);
+    s.pack("Blocksqp::rp_solver", rp_solver_);
+    s.pack("Blocksqp::print_maxit_reached", print_maxit_reached_);
   }
 
 } // namespace casadi

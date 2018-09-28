@@ -41,6 +41,7 @@ namespace casadi {
     plugin->doc = WorhpInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &WorhpInterface::options_;
+    plugin->deserialize = &WorhpInterface::deserialize;
     return 0;
   }
 
@@ -122,15 +123,15 @@ namespace casadi {
     }
 
     // Setup NLP functions
-    f_fcn_ = create_function("nlp_f", {"x", "p"}, {"f"});
-    g_fcn_ = create_function("nlp_g", {"x", "p"}, {"g"});
-    grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
-    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
-    jacg_sp_ = jac_g_fcn_.sparsity_out(1);
-    hess_l_fcn_ = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+    create_function("nlp_f", {"x", "p"}, {"f"});
+    create_function("nlp_g", {"x", "p"}, {"g"});
+    create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
+    Function jac_g_fcn = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
+    Function hess_l_fcn = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
                                   {"transpose:hess:gamma:x:x"},
                                   {{"gamma", {"f", "g"}}});
-    hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
+    jacg_sp_ = jac_g_fcn.sparsity_out(1);
+    hesslag_sp_ = hess_l_fcn.sparsity_out(0);
 
     // Temporary vectors
     alloc_w(nx_); // for fetching diagonal entries form Hessian
@@ -588,6 +589,25 @@ namespace casadi {
     auto m = static_cast<WorhpMemory*>(mem);
     stats["return_status"] = m->return_status;
     return stats;
+  }
+
+  WorhpInterface::WorhpInterface(DeSerializer& s) : Nlpsol(s) {
+    s.unpack("WorhpInterface::jacg_sp", jacg_sp_);
+    s.unpack("WorhpInterface::hesslag_sp", hesslag_sp_);
+    s.unpack("WorhpInterface::bool_opts", bool_opts_);
+    s.unpack("WorhpInterface::int_opts", int_opts_);
+    s.unpack("WorhpInterface::double_opts", double_opts_);
+    s.unpack("WorhpInterface::qp_opts", qp_opts_);
+  }
+
+  void WorhpInterface::serialize_body(Serializer &s) const {
+    Nlpsol::serialize_body(s);
+    s.pack("WorhpInterface::jacg_sp", jacg_sp_);
+    s.pack("WorhpInterface::hesslag_sp", hesslag_sp_);
+    s.pack("WorhpInterface::bool_opts", bool_opts_);
+    s.pack("WorhpInterface::int_opts", int_opts_);
+    s.pack("WorhpInterface::double_opts", double_opts_);
+    s.pack("WorhpInterface::qp_opts", qp_opts_);
   }
 
 } // namespace casadi

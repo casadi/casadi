@@ -658,4 +658,54 @@ namespace casadi {
     return stats;
   }
 
+  void Conic::serialize(Serializer &s, const SDPToSOCPMem& m) const {
+    s.pack("Conic::SDPToSOCPMem::r", m.r);
+    s.pack("Conic::SDPToSOCPMem::AT", m.AT);
+    s.pack("Conic::SDPToSOCPMem::A_mapping", m.A_mapping);
+    s.pack("Conic::SDPToSOCPMem::map_Q", m.map_Q);
+    s.pack("Conic::SDPToSOCPMem::map_P", m.map_P);
+    s.pack("Conic::SDPToSOCPMem::indval_size", m.indval_size);
+  }
+  void Conic::deserialize(DeSerializer &s, SDPToSOCPMem& m) {
+    s.unpack("Conic::SDPToSOCPMem::r", m.r);
+    s.unpack("Conic::SDPToSOCPMem::AT", m.AT);
+    s.unpack("Conic::SDPToSOCPMem::A_mapping", m.A_mapping);
+    s.unpack("Conic::SDPToSOCPMem::map_Q", m.map_Q);
+    s.unpack("Conic::SDPToSOCPMem::map_P", m.map_P);
+    s.unpack("Conic::SDPToSOCPMem::indval_size", m.indval_size);
+  }
+
+  void Conic::serialize_body(Serializer &s) const {
+    FunctionInternal::serialize_body(s);
+
+    s.pack("Conic::discrete", discrete_);
+    s.pack("Conic::H", H_);
+    s.pack("Conic::A", A_);
+    s.pack("Conic::Q", Q_);
+    s.pack("Conic::P", P_);
+    s.pack("Conic::nx", nx_);
+    s.pack("Conic::na", na_);
+    s.pack("Conic::np", np_);
+  }
+
+  void Conic::serialize_type(Serializer &s) const {
+    FunctionInternal::serialize_type(s);
+    PluginInterface<Conic>::serialize_type(s);
+  }
+
+  ProtoFunction* Conic::deserialize(DeSerializer& s) {
+    return PluginInterface<Conic>::deserialize(s);
+  }
+
+  Conic::Conic(DeSerializer & s) : FunctionInternal(s) {
+    s.unpack("Conic::discrete", discrete_);
+    s.unpack("Conic::H", H_);
+    s.unpack("Conic::A", A_);
+    s.unpack("Conic::Q", Q_);
+    s.unpack("Conic::P", P_);
+    s.unpack("Conic::nx", nx_);
+    s.unpack("Conic::na", na_);
+    s.unpack("Conic::np", np_);
+  }
+
 } // namespace casadi

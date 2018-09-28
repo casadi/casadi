@@ -46,6 +46,7 @@ namespace casadi {
     plugin->doc = Sqpmethod::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &Sqpmethod::options_;
+    plugin->deserialize = &Sqpmethod::deserialize;
     return 0;
   }
 
@@ -574,5 +575,50 @@ namespace casadi {
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter_count;
     return stats;
+  }
+
+  Sqpmethod::Sqpmethod(DeSerializer& s) : Nlpsol(s) {
+    s.unpack("Sqpmethod::qpsol", qpsol_);
+    s.unpack("Sqpmethod::exact_hessian", exact_hessian_);
+    s.unpack("Sqpmethod::max_iter", max_iter_);
+    s.unpack("Sqpmethod::min_iter", min_iter_);
+    s.unpack("Sqpmethod::lbfgs_memory", lbfgs_memory_);
+    s.unpack("Sqpmethod::tol_pr_", tol_pr_);
+    s.unpack("Sqpmethod::tol_du_", tol_du_);
+    s.unpack("Sqpmethod::min_step_size_", min_step_size_);
+    s.unpack("Sqpmethod::c1", c1_);
+    s.unpack("Sqpmethod::beta", beta_);
+    s.unpack("Sqpmethod::max_iter_ls_", max_iter_ls_);
+    s.unpack("Sqpmethod::merit_memsize_", merit_memsize_);
+    s.unpack("Sqpmethod::beta", beta_);
+    s.unpack("Sqpmethod::print_header", print_header_);
+    s.unpack("Sqpmethod::print_iteration", print_iteration_);
+    s.unpack("Sqpmethod::print_status", print_status_);
+    s.unpack("Sqpmethod::Hsp", Hsp_);
+    s.unpack("Sqpmethod::Asp", Asp_);
+    s.unpack("Sqpmethod::regularize", regularize_);
+  }
+
+  void Sqpmethod::serialize_body(Serializer &s) const {
+    Nlpsol::serialize_body(s);
+    s.pack("Sqpmethod::qpsol", qpsol_);
+    s.pack("Sqpmethod::exact_hessian", exact_hessian_);
+    s.pack("Sqpmethod::max_iter", max_iter_);
+    s.pack("Sqpmethod::min_iter", min_iter_);
+    s.pack("Sqpmethod::lbfgs_memory", lbfgs_memory_);
+    s.pack("Sqpmethod::tol_pr_", tol_pr_);
+    s.pack("Sqpmethod::tol_du_", tol_du_);
+    s.pack("Sqpmethod::min_step_size_", min_step_size_);
+    s.pack("Sqpmethod::c1", c1_);
+    s.pack("Sqpmethod::beta", beta_);
+    s.pack("Sqpmethod::max_iter_ls_", max_iter_ls_);
+    s.pack("Sqpmethod::merit_memsize_", merit_memsize_);
+    s.pack("Sqpmethod::beta", beta_);
+    s.pack("Sqpmethod::print_header", print_header_);
+    s.pack("Sqpmethod::print_iteration", print_iteration_);
+    s.pack("Sqpmethod::print_status", print_status_);
+    s.pack("Sqpmethod::Hsp", Hsp_);
+    s.pack("Sqpmethod::Asp", Asp_);
+    s.pack("Sqpmethod::regularize", regularize_);
   }
 } // namespace casadi

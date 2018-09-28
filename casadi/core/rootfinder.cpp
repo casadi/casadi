@@ -150,8 +150,7 @@ namespace casadi {
     // Default options
     iin_ = 0;
     iout_ = 0;
-    // TODO(jgillis): remove hack in new release -- need uniform default.
-    error_on_fail_ = name=="kinsol" ? true : false;
+    error_on_fail_ = false;
   }
 
   Rootfinder::~Rootfinder() {
@@ -558,6 +557,7 @@ namespace casadi {
     s.pack("Rootfinder::u_c", u_c_);
     s.pack("Rootfinder::iin", iin_);
     s.pack("Rootfinder::iout", iout_);
+    s.pack("Rootfinder::error_on_fail", error_on_fail_);
   }
 
   void Rootfinder::serialize_type(Serializer &s) const {
@@ -576,6 +576,7 @@ namespace casadi {
     s.unpack("Rootfinder::u_c", u_c_);
     s.unpack("Rootfinder::iin", iin_);
     s.unpack("Rootfinder::iout", iout_);
+    s.unpack("Rootfinder::error_on_fail", error_on_fail_);
   }
 
 } // namespace casadi

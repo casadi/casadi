@@ -47,6 +47,7 @@ namespace casadi {
     plugin->doc = BonminInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &BonminInterface::options_;
+    plugin->deserialize = &BonminInterface::deserialize;
     return 0;
   }
 
@@ -688,6 +689,61 @@ namespace casadi {
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter_count;
     return stats;
+  }
+
+  BonminInterface::BonminInterface(DeSerializer& s) : Nlpsol(s) {
+    s.unpack("BonminInterface::jacg_sp", jacg_sp_);
+    s.unpack("BonminInterface::hesslag_sp", hesslag_sp_);
+    s.unpack("BonminInterface::exact_hessian", exact_hessian_);
+    s.unpack("BonminInterface::opts", opts_);
+
+    s.unpack("BonminInterface::sos1_weights", sos1_weights_);
+    s.unpack("BonminInterface::sos1_indices", sos1_indices_);
+    s.unpack("BonminInterface::sos1_priorities", sos1_priorities_);
+    s.unpack("BonminInterface::sos1_starts", sos1_starts_);
+    s.unpack("BonminInterface::sos1_types", sos1_types_);
+    s.unpack("BonminInterface::sos1_types", sos1_types_);
+    s.unpack("BonminInterface::sos_num", sos_num_);
+    s.unpack("BonminInterface::sos_num_nz", sos_num_nz_);
+
+    s.unpack("BonminInterface::pass_nonlinear_variables", pass_nonlinear_variables_);
+    s.unpack("BonminInterface::pass_nonlinear_constraints", pass_nonlinear_constraints_);
+    s.unpack("BonminInterface::nl_ex", nl_ex_);
+    s.unpack("BonminInterface::nl_g", nl_g_);
+    s.unpack("BonminInterface::var_string_md", var_string_md_);
+    s.unpack("BonminInterface::var_integer_md", var_integer_md_);
+    s.unpack("BonminInterface::var_numeric_md", var_numeric_md_);
+    s.unpack("BonminInterface::con_string_md", con_string_md_);
+    s.unpack("BonminInterface::con_integer_md", con_integer_md_);
+    s.unpack("BonminInterface::con_numeric_md", con_numeric_md_);
+  }
+
+  void BonminInterface::serialize_body(Serializer &s) const {
+    Nlpsol::serialize_body(s);
+    s.pack("BonminInterface::jacg_sp", jacg_sp_);
+    s.pack("BonminInterface::hesslag_sp", hesslag_sp_);
+    s.pack("BonminInterface::exact_hessian", exact_hessian_);
+    s.pack("BonminInterface::opts", opts_);
+
+    s.pack("BonminInterface::sos1_weights", sos1_weights_);
+    s.pack("BonminInterface::sos1_indices", sos1_indices_);
+    s.pack("BonminInterface::sos1_priorities", sos1_priorities_);
+    s.pack("BonminInterface::sos1_starts", sos1_starts_);
+    s.pack("BonminInterface::sos1_types", sos1_types_);
+    s.pack("BonminInterface::sos1_types", sos1_types_);
+    s.pack("BonminInterface::sos_num", sos_num_);
+    s.pack("BonminInterface::sos_num_nz", sos_num_nz_);
+
+    s.pack("BonminInterface::pass_nonlinear_variables", pass_nonlinear_variables_);
+    s.pack("BonminInterface::pass_nonlinear_constraints", pass_nonlinear_constraints_);
+    s.pack("BonminInterface::nl_ex", nl_ex_);
+    s.pack("BonminInterface::nl_g", nl_g_);
+    s.pack("BonminInterface::var_string_md", var_string_md_);
+    s.pack("BonminInterface::var_integer_md", var_integer_md_);
+    s.pack("BonminInterface::var_numeric_md", var_numeric_md_);
+    s.pack("BonminInterface::con_string_md", con_string_md_);
+    s.pack("BonminInterface::con_integer_md", con_integer_md_);
+    s.pack("BonminInterface::con_numeric_md", con_numeric_md_);
   }
 
 } // namespace casadi

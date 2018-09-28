@@ -41,6 +41,10 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  struct CASADI_CONIC_OOQP_EXPORT OoqpMemory : public ConicMemory {
+    int return_status;
+  };
+
   /** \brief \pluginbrief{Conic,ooqp}
 
       @copydoc Conic_doc
@@ -81,7 +85,10 @@ namespace casadi {
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
     /** \brief Create memory block */
-    void* alloc_mem() const override { return new ConicMemory();}
+    void* alloc_mem() const override { return new OoqpMemory();}
+
+    /** \brief Free memory block */
+    void free_mem(void *mem) const override { delete static_cast<OoqpMemory*>(mem);}
 
     /// Throw error
     static const char* errFlag(int flag);
@@ -114,8 +121,15 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
-    mutable int return_status_;
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
 
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new OoqpInterface(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit OoqpInterface(DeSerializer& s);
   };
 
 } // namespace casadi

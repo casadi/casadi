@@ -78,11 +78,6 @@ namespace casadi {
   class CASADI_NLPSOL_WORHP_EXPORT WorhpInterface : public Nlpsol {
   public:
     // NLP functions
-    Function f_fcn_;
-    Function g_fcn_;
-    Function grad_f_fcn_;
-    Function jac_g_fcn_;
-    Function hess_l_fcn_;
     Sparsity jacg_sp_;
     Sparsity hesslag_sp_;
 
@@ -145,6 +140,16 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new WorhpInterface(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit WorhpInterface(DeSerializer& s);
   };
 
 } // namespace casadi

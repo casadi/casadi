@@ -82,12 +82,7 @@ namespace casadi {
   class CASADI_NLPSOL_SNOPT_EXPORT SnoptInterface : public Nlpsol {
   public:
     // NLP functions
-    Function f_fcn_;
-    Function g_fcn_;
-    Function jac_g_fcn_;
-    Function jac_f_fcn_;
-    Function gf_jg_fcn_;
-    Function hess_l_fcn_;
+    Sparsity jacf_sp_;
     Sparsity jacg_sp_;
 
     // Constructor
@@ -174,6 +169,17 @@ namespace casadi {
     casadi_int Cold_;
 
     double inf_;
+
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new SnoptInterface(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit SnoptInterface(DeSerializer& s);
 
   private:
       // options

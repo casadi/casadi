@@ -42,6 +42,7 @@ namespace casadi {
     plugin->doc = CplexInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &CplexInterface::options_;
+    plugin->deserialize = &CplexInterface::deserialize;
     return 0;
   }
 
@@ -661,6 +662,30 @@ namespace casadi {
     }
   }
 
+  CplexInterface::CplexInterface(DeSerializer& s) : Conic(s) {
+    s.unpack("CplexInterface::opts", opts_);
+    s.unpack("CplexInterface::qp_method", qp_method_);
+    s.unpack("CplexInterface::dump_to_file", dump_to_file_);
+    s.unpack("CplexInterface::tol", tol_);
+    s.unpack("CplexInterface::dep_check", dep_check_);
+    s.unpack("CplexInterface::warm_start", warm_start_);
+    s.unpack("CplexInterface::mip", mip_);
+    s.unpack("CplexInterface::ctype", ctype_);
+    Conic::deserialize(s, sdp_to_socp_mem_);
+  }
 
+  void CplexInterface::serialize_body(Serializer &s) const {
+    Conic::serialize_body(s);
+
+    s.pack("CplexInterface::opts", opts_);
+    s.pack("CplexInterface::qp_method", qp_method_);
+    s.pack("CplexInterface::dump_to_file", dump_to_file_);
+    s.pack("CplexInterface::tol", tol_);
+    s.pack("CplexInterface::dep_check", dep_check_);
+    s.pack("CplexInterface::warm_start", warm_start_);
+    s.pack("CplexInterface::mip", mip_);
+    s.pack("CplexInterface::ctype", ctype_);
+    Conic::serialize(s, sdp_to_socp_mem_);
+  }
 
 } // end namespace casadi

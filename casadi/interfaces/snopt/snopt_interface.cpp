@@ -42,6 +42,7 @@ namespace casadi {
     plugin->doc = SnoptInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &SnoptInterface::options_;
+    plugin->deserialize = &SnoptInterface::deserialize;
     return 0;
   }
 
@@ -103,9 +104,12 @@ namespace casadi {
     }
 
     // Get/generate required functions
-    jac_f_fcn_ = create_function("nlp_jac_f", {"x", "p"}, {"f", "jac:f:x"});
-    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
-    jacg_sp_ = jac_g_fcn_.sparsity_out(1);
+    Function jac_f_fcn = create_function("nlp_jac_f", {"x", "p"}, {"f", "jac:f:x"});
+    casadi_assert_dev(!jac_f_fcn.is_null());
+    Function jac_g_fcn = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
+    casadi_assert_dev(!jac_g_fcn.is_null());
+    jacg_sp_ = jac_g_fcn.sparsity_out(1);
+    jacf_sp_ = jac_f_fcn.sparsity_out(1);
 
     // prepare the mapping for constraints
     nnJac_ = nx_;
@@ -123,12 +127,10 @@ namespace casadi {
     //  "0" is to be interpreted not as an index but as a literal zero
 
     IM mapping_jacG  = IM(0, nx_);
-    IM mapping_gradF = IM(jac_f_fcn_.sparsity_out(1),
-                          range(-1, -1-jac_f_fcn_.nnz_out(1), -1));
+    IM mapping_gradF = IM(jacf_sp_,
+                          range(-1, -1-jacf_sp_.nnz(), -1));
 
-    if (!jac_g_fcn_.is_null()) {
-      mapping_jacG = IM(jacg_sp_, range(1, jacg_sp_.nnz()+1));
-    }
+    mapping_jacG = IM(jacg_sp_, range(1, jacg_sp_.nnz()+1));
 
     // First, remap jacG
     A_structure_ = mapping_jacG;
@@ -173,7 +175,7 @@ namespace casadi {
     alloc_w(ng_, true); // lam_gk_
     alloc_w(nx_, true); // lam_xk_
     alloc_w(ng_, true); // gk_
-    alloc_w(jac_f_fcn_.nnz_out(1), true); // jac_fk_
+    alloc_w(jacf_sp_.nnz(), true); // jac_fk_
     if (!jacg_sp_.is_null()) {
       alloc_w(jacg_sp_.nnz(), true); // jac_gk_
     }
@@ -279,7 +281,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     m->lam_gk = w; w += ng_;
     m->lam_xk = w; w += nx_;
     m->gk = w; w += ng_;
-    m->jac_fk = w; w += jac_f_fcn_.nnz_out(1);
+    m->jac_fk = w; w += jacf_sp_.nnz();
     if (!jacg_sp_.is_null()) {
       m->jac_gk = w; w += jacg_sp_.nnz();
     }
@@ -326,8 +328,6 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     casadi_assert_dev(n > 0);
     casadi_assert_dev(nea > 0);
     casadi_assert_dev(A_structure_.nnz() == nea);
-
-    casadi_assert_dev(!jac_f_fcn_.is_null());
 
     // snInit must be called first.
     //   9, 6 are print and summary unit numbers (for Fortran).
@@ -456,15 +456,15 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
 
       // provide nonlinear part of objective gradient to SNOPT
       for (casadi_int k = 0; k < nnObj; ++k) {
-        casadi_int el = jac_f_fcn_.sparsity_out(1).colind(k);
-        if (jac_f_fcn_.sparsity_out(1).colind(k+1) > el) {
+        casadi_int el = jacf_sp_.colind(k);
+        if (jacf_sp_.colind(k+1) > el) {
           gObj[k] = m->jac_fk[el];
         } else {
           gObj[k] = 0;
         }
       }
 
-      if (!jac_g_fcn_.is_null()) {
+      {
         // Get reduced decision variables
         casadi_fill(m->xk2, nx_, 0.);
         for (casadi_int k = 0; k < nnJac; ++k) {
@@ -555,4 +555,43 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
 
   std::vector<SnoptMemory*> SnoptMemory::mempool;
 
+
+  SnoptInterface::SnoptInterface(DeSerializer& s) : Nlpsol(s) {
+    s.unpack("SnoptInterface::jacf_sp", jacf_sp_);
+    s.unpack("SnoptInterface::jacg_sp", jacg_sp_);
+    s.unpack("SnoptInterface::exact_hessian", exact_hessian_);
+    s.unpack("SnoptInterface::nnJac", nnJac_);
+    s.unpack("SnoptInterface::nnObj", nnObj_);
+    s.unpack("SnoptInterface::nnCon", nnCon_);
+    s.unpack("SnoptInterface::A_structure", A_structure_);
+    s.unpack("SnoptInterface::m", m_);
+    s.unpack("SnoptInterface::iObj", iObj_);
+
+    s.unpack("SnoptInterface::jacF_row", jacF_row_);
+    s.unpack("SnoptInterface::dummyrow", dummyrow_);
+    s.unpack("SnoptInterface::Cold_", Cold_);
+    s.unpack("SnoptInterface::inf", inf_);
+
+    s.unpack("SnoptInterface::opts", opts_);
+  }
+
+  void SnoptInterface::serialize_body(Serializer &s) const {
+    Nlpsol::serialize_body(s);
+    s.pack("SnoptInterface::jacf_sp", jacf_sp_);
+    s.pack("SnoptInterface::jacg_sp", jacg_sp_);
+    s.pack("SnoptInterface::exact_hessian", exact_hessian_);
+    s.pack("SnoptInterface::nnJac", nnJac_);
+    s.pack("SnoptInterface::nnObj", nnObj_);
+    s.pack("SnoptInterface::nnCon", nnCon_);
+    s.pack("SnoptInterface::A_structure", A_structure_);
+    s.pack("SnoptInterface::m", m_);
+    s.pack("SnoptInterface::iObj", iObj_);
+
+    s.pack("SnoptInterface::jacF_row", jacF_row_);
+    s.pack("SnoptInterface::dummyrow", dummyrow_);
+    s.pack("SnoptInterface::Cold_", Cold_);
+    s.pack("SnoptInterface::inf", inf_);
+
+    s.pack("SnoptInterface::opts", opts_);
+  }
 }  // namespace casadi

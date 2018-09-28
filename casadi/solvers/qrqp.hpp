@@ -65,7 +65,7 @@ namespace casadi {
     ~Qrqp() override;
 
     // Get name of the plugin
-    const char* plugin_name() const override { return "as";}
+    const char* plugin_name() const override { return "qrqp";}
 
     // Get name of the class
     std::string class_name() const override { return "Qrqp";}
@@ -113,6 +113,18 @@ namespace casadi {
     double du_to_pr_;
     double min_lam_;
     ///@}
+
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new Qrqp(s); }
+
+  protected:
+     /** \brief Deserializing constructor */
+    explicit Qrqp(DeSerializer& e);
+
+  private:
+    void set_qp_prob();
   };
 
 } // namespace casadi

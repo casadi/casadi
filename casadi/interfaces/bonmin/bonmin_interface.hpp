@@ -190,6 +190,16 @@ namespace casadi {
     std::vector<bool> nl_g_;
     Dict var_string_md_, var_integer_md_, var_numeric_md_,
       con_string_md_, con_integer_md_, con_numeric_md_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new BonminInterface(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit BonminInterface(DeSerializer& s);
   };
 
 } // namespace casadi

@@ -395,6 +395,16 @@ namespace casadi {
     double zeta_;  // Regularization factor for second part of objective
     Function rp_solver_;  // restoration phase Solver
     bool print_maxit_reached_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(Serializer &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeSerializer& s) { return new Blocksqp(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Blocksqp(DeSerializer& s);
   };
 
 } // namespace casadi
