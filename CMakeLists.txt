@@ -233,6 +233,7 @@ endif()
 ############################################################
 ################# Misc options #############################
 ############################################################
+option(INSTALL_INTERNAL_HEADERS "Install all headers" OFF)
 option(ENABLE_EXPORT_ALL "Export all symbols to a shared library" OFF)
 option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
 option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)

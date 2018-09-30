@@ -209,3 +209,8 @@ endif()
 install(FILES ${CASADI_PUBLIC} ${CMAKE_CURRENT_BINARY_DIR}/casadi_export.h
   DESTINATION ${INCLUDE_PREFIX}/casadi/core
 )
+if(INSTALL_INTERNAL_HEADERS)
+  install(FILES ${CASADI_INTERNAL}
+    DESTINATION ${INCLUDE_PREFIX}/casadi/core
+  )
+endif()
