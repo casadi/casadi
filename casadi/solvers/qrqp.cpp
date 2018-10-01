@@ -90,6 +90,7 @@ namespace casadi {
     print_header_ = true;
     du_to_pr_ = 1000.;
     min_lam_ = 0.;
+    print_info_ = true;
 
     // Read user options
     for (auto&& op : opts) {
