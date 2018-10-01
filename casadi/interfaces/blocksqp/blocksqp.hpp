@@ -397,14 +397,14 @@ namespace casadi {
     bool print_maxit_reached_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new Blocksqp(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Blocksqp(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Blocksqp(DeSerializer& s);
+    explicit Blocksqp(DeserializingStream& s);
   };
 
 } // namespace casadi

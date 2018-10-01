@@ -104,18 +104,18 @@ namespace casadi {
     ///@}
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
     /** \brief Serialize type information */
-    void serialize_type(Serializer &s) const override;
+    void serialize_type(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s);
+    static ProtoFunction* deserialize(DeserializingStream& s);
 
     std::vector<casadi_int> lookup_mode_;
 
   protected:
      /** \brief Deserializing constructor */
-    explicit LinearInterpolant(DeSerializer& e);
+    explicit LinearInterpolant(DeserializingStream& e);
   };
 
   /** First order derivatives */
@@ -152,13 +152,13 @@ namespace casadi {
     ///@}
 
     /** \brief Serialize type information */
-    void serialize_type(Serializer &s) const override;
+    void serialize_type(SerializingStream &s) const override;
 
     /** \brief String used to identify the immediate FunctionInternal subclass */
     std::string serialize_base_function() const override { return "Interpolant"; }
 
     /** \brief Deserializing constructor */
-    explicit LinearInterpolantJac(DeSerializer& s) : FunctionInternal(s) {}
+    explicit LinearInterpolantJac(DeserializingStream& s) : FunctionInternal(s) {}
   };
 
 } // namespace casadi

@@ -1049,7 +1049,7 @@ namespace casadi {
     if (this->rxzdot) N_VDestroy_Serial(this->rxzdot);
   }
 
-  IdasInterface::IdasInterface(DeSerializer& s) : SundialsInterface(s) {
+  IdasInterface::IdasInterface(DeserializingStream& s) : SundialsInterface(s) {
     s.unpack("IdasInterface::cj_scaling", cj_scaling_);
     s.unpack("IdasInterface::calc_ic", calc_ic_);
     s.unpack("IdasInterface::calc_icB", calc_icB_);
@@ -1060,7 +1060,7 @@ namespace casadi {
     s.unpack("IdasInterface::init_xdot", init_xdot_);
   }
 
-  void IdasInterface::serialize_body(Serializer &s) const {
+  void IdasInterface::serialize_body(SerializingStream &s) const {
     SundialsInterface::serialize_body(s);
     s.pack("IdasInterface::cj_scaling", cj_scaling_);
     s.pack("IdasInterface::calc_ic", calc_ic_);

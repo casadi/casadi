@@ -35,8 +35,8 @@ namespace casadi {
 #ifndef SWIG
   /** Forward declaration of internal class */
   class FunctionInternal;
-  class Serializer;
-  class DeSerializer;
+  class SerializingStream;
+  class DeserializingStream;
 #endif // SWIG
 
   /** \brief Function object
@@ -707,7 +707,7 @@ namespace casadi {
     void serialize(std::ostream &stream, const Dict& opts=Dict()) const;
 
     /** \brief Serialize an object */
-    void serialize(Serializer &s) const;
+    void serialize(SerializingStream &s) const;
 #endif
 
     /** \brief Serialize */
@@ -891,7 +891,7 @@ namespace casadi {
     static Function load(const std::string& filename);
 
     /** \brief Build function from serialization */
-    static Function deserialize(DeSerializer& s);
+    static Function deserialize(DeserializingStream& s);
 
     /// Assert that an input dimension is equal so some given value
     void assert_size_in(casadi_int i, casadi_int nrow, casadi_int ncol) const;

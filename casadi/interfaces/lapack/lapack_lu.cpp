@@ -189,12 +189,12 @@ namespace casadi {
     return 0;
   }
 
-  LapackLu::LapackLu(DeSerializer& s) : LinsolInternal(s) {
+  LapackLu::LapackLu(DeserializingStream& s) : LinsolInternal(s) {
     s.unpack("LapackLu::equilibriate", equilibriate_);
     s.unpack("LapackLu::allow_equilibration_failure", allow_equilibration_failure_);
   }
 
-  void LapackLu::serialize_body(Serializer &s) const {
+  void LapackLu::serialize_body(SerializingStream &s) const {
     LinsolInternal::serialize_body(s);
     s.pack("LapackLu::equilibriate", equilibriate_);
     s.pack("LapackLu::allow_equilibration_failure", allow_equilibration_failure_);

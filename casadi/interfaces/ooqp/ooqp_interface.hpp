@@ -122,14 +122,14 @@ namespace casadi {
     static const std::string meta_doc;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new OoqpInterface(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new OoqpInterface(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit OoqpInterface(DeSerializer& s);
+    explicit OoqpInterface(DeserializingStream& s);
   };
 
 } // namespace casadi

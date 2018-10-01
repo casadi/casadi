@@ -159,11 +159,11 @@ namespace casadi {
     std::string class_name() const override { return "Ma27Interface";}
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new Ma27Interface(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Ma27Interface(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Ma27Interface(DeSerializer& s) : LinsolInternal(s) {}
+    explicit Ma27Interface(DeserializingStream& s) : LinsolInternal(s) {}
   };
 
 } // namespace casadi

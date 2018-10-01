@@ -28,7 +28,7 @@
 
 #include "setnonzeros.hpp"
 #include "casadi_misc.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 /// \cond INTERNAL
 
@@ -897,60 +897,60 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::serialize_body(Serializer& s) const {
+  void SetNonzerosVector<Add>::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
     s.pack("SetNonzerosVector::nonzeros", nz_);
   }
 
   template<bool Add>
-  SetNonzerosVector<Add>::SetNonzerosVector(DeSerializer& s) : SetNonzeros<Add>(s) {
+  SetNonzerosVector<Add>::SetNonzerosVector(DeserializingStream& s) : SetNonzeros<Add>(s) {
     s.unpack("SetNonzerosVector::nonzeros", nz_);
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::serialize_type(Serializer& s) const {
+  void SetNonzerosVector<Add>::serialize_type(SerializingStream& s) const {
     MXNode::serialize_type(s);
     s.pack("SetNonzeros::type", 'a');
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::serialize_body(Serializer& s) const {
+  void SetNonzerosSlice<Add>::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
     s.pack("SetNonzerosSlice::slice", s_);
   }
 
   template<bool Add>
-  SetNonzerosSlice<Add>::SetNonzerosSlice(DeSerializer& s) : SetNonzeros<Add>(s) {
+  SetNonzerosSlice<Add>::SetNonzerosSlice(DeserializingStream& s) : SetNonzeros<Add>(s) {
     s.unpack("SetNonzerosSlice::slice", s_);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::serialize_type(Serializer& s) const {
+  void SetNonzerosSlice<Add>::serialize_type(SerializingStream& s) const {
     MXNode::serialize_type(s);
     s.pack("SetNonzeros::type", 'b');
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::serialize_body(Serializer& s) const {
+  void SetNonzerosSlice2<Add>::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
     s.pack("SetNonzerosSlice2::inner", inner_);
     s.pack("SetNonzerosSlice2::outer", outer_);
   }
 
   template<bool Add>
-  SetNonzerosSlice2<Add>::SetNonzerosSlice2(DeSerializer& s) : SetNonzeros<Add>(s) {
+  SetNonzerosSlice2<Add>::SetNonzerosSlice2(DeserializingStream& s) : SetNonzeros<Add>(s) {
     s.unpack("SetNonzerosVector2::inner", inner_);
     s.unpack("SetNonzerosVector2::outer", outer_);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::serialize_type(Serializer& s) const {
+  void SetNonzerosSlice2<Add>::serialize_type(SerializingStream& s) const {
     MXNode::serialize_type(s);
     s.pack("SetNonzeros::type", 'c');
   }
 
   template<bool Add>
-  MXNode* SetNonzeros<Add>::deserialize(DeSerializer& s) {
+  MXNode* SetNonzeros<Add>::deserialize(DeserializingStream& s) {
     char t;
     s.unpack("SetNonzeros::type", t);
     switch (t) {

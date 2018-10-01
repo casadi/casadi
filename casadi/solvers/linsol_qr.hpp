@@ -105,14 +105,14 @@ namespace casadi {
     double eps_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new LinsolQr(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new LinsolQr(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit LinsolQr(DeSerializer& e);
+    explicit LinsolQr(DeserializingStream& e);
   };
 
 } // namespace casadi

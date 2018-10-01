@@ -62,11 +62,11 @@ public:
     return name_;
   }
 
-  void serialize_node(Serializer& s) const override {
+  void serialize_node(SerializingStream& s) const override {
     s.pack("SymbolicSX::name", name_);
   }
 
-  static SXNode* deserialize(DeSerializer& s) {
+  static SXNode* deserialize(DeserializingStream& s) {
     std::string name;
     s.unpack("SymbolicSX::name", name);
     return new SymbolicSX(name);

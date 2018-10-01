@@ -217,9 +217,9 @@ namespace casadi {
     }
 
     /** \brief Serialize an object */
-    void serialize(Serializer& s) const;
+    void serialize(SerializingStream& s) const;
 
-    static SXElem deserialize(DeSerializer& s);
+    static SXElem deserialize(DeserializingStream& s);
   private:
     /// Pointer to node (SXElem is only a reference class)
     SXNode* node;

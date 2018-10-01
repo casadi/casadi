@@ -136,12 +136,12 @@ namespace casadi {
     g << "}\n";
   }
 
-  LinsolLdl::LinsolLdl(DeSerializer& s) : LinsolInternal(s) {
+  LinsolLdl::LinsolLdl(DeserializingStream& s) : LinsolInternal(s) {
     s.unpack("LinsolLdl::p", p_);
     s.unpack("LinsolLdl::sp_Lt", sp_Lt_);
   }
 
-  void LinsolLdl::serialize_body(Serializer &s) const {
+  void LinsolLdl::serialize_body(SerializingStream &s) const {
     LinsolInternal::serialize_body(s);
     s.pack("LinsolLdl::p", p_);
     s.pack("LinsolLdl::sp_Lt", sp_Lt_);

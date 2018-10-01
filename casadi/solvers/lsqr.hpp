@@ -96,11 +96,11 @@ namespace casadi {
     static const std::string meta_doc;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new Lsqr(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Lsqr(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Lsqr(DeSerializer& s) : LinsolInternal(s) {}
+    explicit Lsqr(DeserializingStream& s) : LinsolInternal(s) {}
   };
 
 } // namespace casadi

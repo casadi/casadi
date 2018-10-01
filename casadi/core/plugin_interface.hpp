@@ -25,7 +25,7 @@
 
 #include "function_internal.hpp"
 #include "global_options.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 #include <stdlib.h>
 
@@ -76,7 +76,7 @@ namespace casadi {
     return t;
   }
 
-  typedef ProtoFunction* (*Deserialize)(DeSerializer&);
+  typedef ProtoFunction* (*Deserialize)(DeserializingStream&);
 
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson
@@ -140,12 +140,12 @@ namespace casadi {
     virtual const char* plugin_name() const = 0;
 
     /** \brief Serialize type information */
-    void serialize_type(Serializer& s) const {
+    void serialize_type(SerializingStream& s) const {
       s.pack("PluginInterface::plugin_name", std::string(plugin_name()));
     }
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s) {
+    static ProtoFunction* deserialize(DeserializingStream& s) {
       std::string class_name, plugin_name;
       s.unpack("PluginInterface::plugin_name", plugin_name);
       Deserialize deserialize = plugin_deserialize(plugin_name);

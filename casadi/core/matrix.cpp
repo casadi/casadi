@@ -27,7 +27,7 @@
 #include "sx_node.hpp"
 #include "linsol.hpp"
 #include "expm.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 #include <chrono>
 
 using namespace std;
@@ -2645,13 +2645,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  void Matrix<Scalar>::serialize(Serializer& s) const {
+  void Matrix<Scalar>::serialize(SerializingStream& s) const {
     s.pack("Matrix::sparsity", sparsity());
     s.pack("Matrix::nonzeros", nonzeros());
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::deserialize(DeSerializer& s) {
+  Matrix<Scalar> Matrix<Scalar>::deserialize(DeserializingStream& s) {
     Sparsity sp;
     s.unpack("Matrix::sparsity", sp);
     std::vector<Scalar> nz;
@@ -2661,13 +2661,13 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::serialize(std::ostream &stream) const {
-    Serializer s(stream);
+    SerializingStream s(stream);
     serialize(s);
   }
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::deserialize(std::istream &stream) {
-    DeSerializer s(stream);
+    DeserializingStream s(stream);
     return Matrix<Scalar>::deserialize(s);
   }
 

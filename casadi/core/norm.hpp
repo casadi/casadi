@@ -47,7 +47,7 @@ namespace casadi {
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Norm(DeSerializer& s) : MXNode(s) {}
+    explicit Norm(DeserializingStream& s) : MXNode(s) {}
   };
 
   /** \brief Represents a Frobenius norm
@@ -96,11 +96,11 @@ namespace casadi {
     casadi_int op() const override { return OP_NORMF;}
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new NormF(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new NormF(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit NormF(DeSerializer& s) : Norm(s) {}
+    explicit NormF(DeserializingStream& s) : Norm(s) {}
   };
 
   /** \brief Represents a 2-norm (spectral norm)
@@ -123,11 +123,11 @@ namespace casadi {
     casadi_int op() const override { return OP_NORM2;}
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Norm2(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Norm2(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Norm2(DeSerializer& s) : Norm(s) {}
+    explicit Norm2(DeserializingStream& s) : Norm(s) {}
   };
 
   /** \brief 1-norm
@@ -150,11 +150,11 @@ namespace casadi {
     casadi_int op() const override { return OP_NORM1;}
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Norm1(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Norm1(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Norm1(DeSerializer& s) : Norm(s) {}
+    explicit Norm1(DeserializingStream& s) : Norm(s) {}
   };
 
   /** \brief Represents an infinity-norm operation on a MX
@@ -177,11 +177,11 @@ namespace casadi {
     casadi_int op() const override { return OP_NORMINF;}
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new NormInf(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new NormInf(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit NormInf(DeSerializer& s) : Norm(s) {}
+    explicit NormInf(DeserializingStream& s) : Norm(s) {}
   };
 
 } // namespace casadi

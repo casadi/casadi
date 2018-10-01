@@ -101,15 +101,15 @@ namespace casadi {
     Linsol linsol_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer& s) const override;
+    void serialize_body(SerializingStream& s) const override;
     /** \brief Serialize type information */
-    void serialize_type(Serializer& s) const override;
+    void serialize_type(SerializingStream& s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static MXNode* deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeserializingStream& s);
 
     /** \brief Deserializing constructor */
-    explicit Solve(DeSerializer& s);
+    explicit Solve(DeserializingStream& s);
   };
 
 

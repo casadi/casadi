@@ -33,7 +33,7 @@
 #include "mx_function.hpp"
 #include "linsol.hpp"
 #include "expm.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 // Throw informative error message
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
@@ -744,11 +744,11 @@ namespace casadi {
     return (*this)->info();
   }
 
-  void MX::serialize(Serializer& s) const {
+  void MX::serialize(SerializingStream& s) const {
     return (*this)->serialize(s);
   }
 
-  MX MX::deserialize(DeSerializer& s) {
+  MX MX::deserialize(DeserializingStream& s) {
     return MX::create(MXNode::deserialize(s));
   }
 

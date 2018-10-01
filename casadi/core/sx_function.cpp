@@ -36,7 +36,7 @@
 #include "sparsity_internal.hpp"
 #include "global_options.hpp"
 #include "casadi_interrupt.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 namespace casadi {
 
@@ -911,7 +911,7 @@ namespace casadi {
 
   }
 
-  SXFunction::SXFunction(DeSerializer& s) :
+  SXFunction::SXFunction(DeserializingStream& s) :
     XFunction<SXFunction, SX, SXNode>(s) {
 
     size_t n_instructions;
@@ -935,9 +935,11 @@ namespace casadi {
     // Default (persistent) options
     just_in_time_opencl_ = false;
     just_in_time_sparsity_ = false;
+
+    XFunction<SXFunction, SX, SXNode>::delayed_deserialize_members(s);
   }
 
-  void SXFunction::serialize_body(Serializer &s) const {
+  void SXFunction::serialize_body(SerializingStream &s) const {
     XFunction<SXFunction, SX, SXNode>::serialize_body(s);
     s.pack("SXFunction::n_instr", algorithm_.size());
 
@@ -954,9 +956,11 @@ namespace casadi {
       s.pack("SXFunction::ScalarAtomic::i1", e.i1);
       s.pack("SXFunction::ScalarAtomic::i2", e.i2);
     }
+
+    XFunction<SXFunction, SX, SXNode>::delayed_serialize_members(s);
   }
 
-  ProtoFunction* SXFunction::deserialize(DeSerializer& s) {
+  ProtoFunction* SXFunction::deserialize(DeserializingStream& s) {
     return new SXFunction(s);
   }
 

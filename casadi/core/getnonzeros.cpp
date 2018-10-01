@@ -25,7 +25,7 @@
 
 #include "getnonzeros.hpp"
 #include "casadi_misc.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -575,51 +575,51 @@ namespace casadi {
     return true;
   }
 
-  void GetNonzerosVector::serialize_body(Serializer& s) const {
+  void GetNonzerosVector::serialize_body(SerializingStream& s) const {
     GetNonzeros::serialize_body(s);
     s.pack("GetNonzerosVector::nonzeros", nz_);
   }
 
-  void GetNonzerosVector::serialize_type(Serializer& s) const {
+  void GetNonzerosVector::serialize_type(SerializingStream& s) const {
     GetNonzeros::serialize_type(s);
     s.pack("GetNonzeros::type", 'a');
   }
 
-  GetNonzerosVector::GetNonzerosVector(DeSerializer& s) : GetNonzeros(s) {
+  GetNonzerosVector::GetNonzerosVector(DeserializingStream& s) : GetNonzeros(s) {
     s.unpack("GetNonzerosVector::nonzeros", nz_);
   }
 
-  void GetNonzerosSlice::serialize_body(Serializer& s) const {
+  void GetNonzerosSlice::serialize_body(SerializingStream& s) const {
     GetNonzeros::serialize_body(s);
     s.pack("GetNonzerosSlice::slice", s_);
   }
 
-  void GetNonzerosSlice::serialize_type(Serializer& s) const {
+  void GetNonzerosSlice::serialize_type(SerializingStream& s) const {
     GetNonzeros::serialize_type(s);
     s.pack("GetNonzeros::type", 'b');
   }
 
-  GetNonzerosSlice::GetNonzerosSlice(DeSerializer& s) : GetNonzeros(s) {
+  GetNonzerosSlice::GetNonzerosSlice(DeserializingStream& s) : GetNonzeros(s) {
     s.unpack("GetNonzerosSlice::slice", s_);
   }
 
-  void GetNonzerosSlice2::serialize_body(Serializer& s) const {
+  void GetNonzerosSlice2::serialize_body(SerializingStream& s) const {
     GetNonzeros::serialize_body(s);
     s.pack("GetNonzerosSlice2::inner", inner_);
     s.pack("GetNonzerosSlice2::outer", outer_);
   }
 
-  void GetNonzerosSlice2::serialize_type(Serializer& s) const {
+  void GetNonzerosSlice2::serialize_type(SerializingStream& s) const {
     GetNonzeros::serialize_type(s);
     s.pack("GetNonzeros::type", 'c');
   }
 
-  GetNonzerosSlice2::GetNonzerosSlice2(DeSerializer& s) : GetNonzeros(s) {
+  GetNonzerosSlice2::GetNonzerosSlice2(DeserializingStream& s) : GetNonzeros(s) {
     s.unpack("GetNonzerosVector2::inner", inner_);
     s.unpack("GetNonzerosVector2::outer", outer_);
   }
 
-  MXNode* GetNonzeros::deserialize(DeSerializer& s) {
+  MXNode* GetNonzeros::deserialize(DeserializingStream& s) {
     char t;
     s.unpack("GetNonzeros::type", t);
     switch (t) {

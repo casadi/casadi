@@ -127,12 +127,12 @@ namespace casadi {
     void sprint(char* buf, size_t buf_sz, const char* fmt, ...) const;
 
     /** \brief Serialize an object */
-    void serialize(Serializer &s) const;
+    void serialize(SerializingStream &s) const;
 
     /** \brief Serialize an object without type information */
-    virtual void serialize_body(Serializer &s) const;
+    virtual void serialize_body(SerializingStream &s) const;
     /** \brief Serialize type information */
-    virtual void serialize_type(Serializer &s) const {}
+    virtual void serialize_type(SerializingStream &s) const {}
 
     /** \brief String used to identify the immediate FunctionInternal subclass */
     virtual std::string serialize_base_function() const {
@@ -141,7 +141,7 @@ namespace casadi {
 
   protected:
     /** \brief Deserializing constructor */
-    explicit ProtoFunction(DeSerializer& s);
+    explicit ProtoFunction(DeserializingStream& s);
 
     /// Name
     std::string name_;
@@ -500,10 +500,10 @@ namespace casadi {
       std::ostream &stream, const Dict& options) const;
 
     /** \brief Serialize type information */
-    void serialize_type(Serializer &s) const override;
+    void serialize_type(SerializingStream &s) const override;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Display object */
     void disp(std::ostream& stream, bool more) const override;
@@ -823,12 +823,12 @@ namespace casadi {
     static std::string string_from_UnifiedReturnStatus(UnifiedReturnStatus status);
 
     /** \brief Deserializing constructor */
-    explicit FunctionInternal(DeSerializer& e);
+    explicit FunctionInternal(DeserializingStream& e);
 
     /** \brief Deserialize with type disambiguation */
-    static Function deserialize(DeSerializer& s);
+    static Function deserialize(DeserializingStream& s);
 
-    static std::map<std::string, ProtoFunction* (*)(DeSerializer&)> deserialize_map;
+    static std::map<std::string, ProtoFunction* (*)(DeserializingStream&)> deserialize_map;
 
   protected:
     /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization */

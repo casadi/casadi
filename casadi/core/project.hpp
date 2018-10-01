@@ -85,11 +85,11 @@ namespace casadi {
     size_t sz_w() const override { return size1();}
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Project(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Project(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Project(DeSerializer& s) : MXNode(s) {}
+    explicit Project(DeserializingStream& s) : MXNode(s) {}
 
   };
 

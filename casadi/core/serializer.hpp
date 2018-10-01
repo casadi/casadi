@@ -29,8 +29,10 @@
 #include <sstream>
 #include <unordered_map>
 #include <set>
+#include <memory>
 
 namespace casadi {
+
   class Slice;
   class Linsol;
   class Sparsity;
@@ -39,220 +41,183 @@ namespace casadi {
   class SXElem;
   class GenericType;
   class Importer;
-  /** \brief Helper class for Serialization
-      \author Joris Gillis
-      \date 2018
-  */
-  class CASADI_EXPORT DeSerializer {
+
+
+
+  class CASADI_EXPORT SerializerBase {
   public:
-    /// Constructor
-    DeSerializer(std::istream &in_s);
-
-    //@{
-    /** \brief Reconstruct an object from the input stream
-    *
-    * If the reference is not of the same type as the object encoded in the stream.
-    * an error will be raised.
-    */
-    void unpack(Sparsity& e);
-    void unpack(MX& e);
-    void unpack(SXElem& e);
-    void unpack(Linsol& e);
-    template <class T>
-    void unpack(Matrix<T>& e) {
-      e = Matrix<T>::deserialize(*this);
-    }
-    void unpack(Function& e);
-    void unpack(Importer& e);
-    void unpack(GenericType& e);
-    void unpack(Slice& e);
-    void unpack(int& e);
-    void unpack(bool& e);
-    void unpack(casadi_int& e);
-    void unpack(size_t& e);
-    void unpack(std::string& e);
-    void unpack(double& e);
-    void unpack(char& e);
-    template <class T>
-    void unpack(std::vector<T>& e) {
-      assert_decoration('V');
-      casadi_int s;
-      unpack(s);
-      e.resize(s);
-      for (T& i : e) unpack(i);
-    }
-
-    template <class K, class V>
-    void unpack(std::map<K, V>& e) {
-      assert_decoration('D');
-      casadi_int s;
-      unpack(s);
-      e.clear();
-      for (casadi_int i=0;i<s;++i) {
-        K k;
-        V v;
-        unpack(k);
-        unpack(v);
-        e[k] = v;
-      }
-    }
-
-    template <class A, class B>
-    void unpack(std::pair<A, B>& e) {
-      assert_decoration('p');
-      unpack(e.first);
-      unpack(e.second);
-    }
-
-    template <class T>
-    void unpack(const std::string& descr, T& e) {
-      if (debug_) {
-        std::string d;
-        unpack(d);
-        casadi_assert(d==descr, "Mismatch: '" + descr + "' expected, got '" + d + "'.");
-      }
-      unpack(e);
-    }
-    //@}
-
-  private:
-
-    /* \brief Unpacks a shared object
-    * 
-    * Also treats SXNode, which is not actually a SharedObjectInternal
-    */
-    template <class T, class M>
-    void shared_unpack(T& e) {
-      char i;
-      unpack("Shared::flag", i);
-      switch (i) {
-        case 'd': // definition
-          e = T::deserialize(*this);
-          nodes.push_back(e.get());
-          break;
-        case 'r': // reference
-          {
-            casadi_int k;
-            unpack("Shared::reference", k);
-            e = T::create(static_cast<M*>(nodes.at(k)));
-          }
-          break;
-        default:
-          casadi_assert_dev(false);
-      }
-    }
-
-    /** \brief Primitive typecheck during deserialization
-     *
-     * No-op unless in debug mode
-     */
-    void assert_decoration(char e);
-
-    /// Collection of all shared pointer deserialized so far
-    std::vector<void*> nodes;
-    /// Input stream
-    std::istream& in;
-    /// Debug mode?
-    bool debug_;
-  };
-
-  /** \brief Helper class for Serialization
-
-
-      \author Joris Gillis
-      \date 2018
-  */
-  class CASADI_EXPORT Serializer {
-  public:
-    /// Constructor
-    Serializer(std::ostream& out, const Dict& opts = Dict());
-
-    // @{
-    /** \brief Serializes an object to the output stream  */
+#ifndef SWIG
+    SerializerBase(std::unique_ptr<std::ostream> stream, const Dict& opts = Dict());
+#endif // SWIG
+    ~SerializerBase();
     void pack(const Sparsity& e);
     void pack(const MX& e);
-    void pack(const SXElem& e);
+    void pack(const Matrix<casadi_int>& e);
+    void pack(const Matrix<double>& e);
+    void pack(const Matrix<SXElem>& e);
     void pack(const Linsol& e);
-    template <class T>
-    void pack(const Matrix<T>& e) {
-      e.serialize(*this);
-    }
     void pack(const Function& e);
-    void pack(const Importer& e);
-    void pack(const Slice& e);
     void pack(const GenericType& e);
-    void pack(int e);
-    void pack(bool e);
-    void pack(casadi_int e);
-    void pack(size_t e);
-    void pack(double e);
+    void pack(const casadi_int& e);
+    void pack(const double& e);
     void pack(const std::string& e);
-    void pack(char e);
-    template <class T>
-    void pack(const std::vector<T>& e) {
-      decorate('V');
-      pack(casadi_int(e.size()));
-      for (const T & i : e) pack(i);
-    }
-    template <class K, class V>
-    void pack(const std::map<K, V>& e) {
-      decorate('D');
-      pack(casadi_int(e.size()));
-      for (const auto & i : e) {
-        pack(i.first);
-        pack(i.second);
-      }
-    }
-    template <class A, class B>
-    void pack(const std::pair<A, B>& e) {
-      decorate('p');
-      pack(e.first);
-      pack(e.second);
-    }
-    template <class T>
-    void pack(const std::string& descr, const T& e) {
-      if (debug_) pack(descr);
-      pack(e);
-    }
-    //@}
+    void pack(const std::vector<Sparsity>& e);
+    void pack(const std::vector<MX>& e);
+    void pack(const std::vector< Matrix<casadi_int> >& e);
+    void pack(const std::vector< Matrix<double> >& e);
+    void pack(const std::vector< Matrix<SXElem> >& e);
+    void pack(const std::vector<Linsol>& e);
+    void pack(const std::vector<Function>& e);
+    void pack(const std::vector<GenericType>& e);
+    void pack(const std::vector<casadi_int>& e);
+    void pack(const std::vector<double>& e);
+    void pack(const std::vector<std::string>& e);
 
-  private:
-    /** \brief Insert information for a primitive typecheck during deserialization
-     *
-     * No-op unless in debug mode
-     */
-    void decorate(char e);
 
-    /* \brief Packs a shared object
-    * 
-    * Also treats SXNode, which is not actually a SharedObjectInternal
-    */
-    template <class T>
-    void shared_pack(const T& e) {
-      auto it = shared_map_.find(e.get());
-      if (it==shared_map_.end()) {
-        // Not found
-        pack("Shared::flag", 'd'); // definition
-        e.serialize(*this);
-        casadi_int r = shared_map_.size();
-        shared_map_[e.get()] = r;
-      } else {
-        pack("Shared::flag", 'r'); // reference
-        pack("Shared::reference", it->second);
-      }
-    }
 
-    /// Mapping from shared pointers to running counter
-    std::unordered_map<void*, casadi_int> shared_map_;
-    /// Output stream
-    std::ostream& out;
-    /// Debug mode?
-    bool debug_;
+    enum SerializationType {
+      SERIALIZED_SPARSITY=0,
+      SERIALIZED_MX,
+      SERIALIZED_IM,
+      SERIALIZED_DM,
+      SERIALIZED_SX,
+      SERIALIZED_LINSOL,
+      SERIALIZED_FUNCTION,
+      SERIALIZED_GENERICTYPE,
+      SERIALIZED_INT,
+      SERIALIZED_DOUBLE,
+      SERIALIZED_STRING,
+      SERIALIZED_SPARSITY_VECTOR,
+      SERIALIZED_MX_VECTOR,
+      SERIALIZED_IM_VECTOR,
+      SERIALIZED_DM_VECTOR,
+      SERIALIZED_SX_VECTOR,
+      SERIALIZED_LINSOL_VECTOR,
+      SERIALIZED_FUNCTION_VECTOR,
+      SERIALIZED_GENERICTYPE_VECTOR,
+      SERIALIZED_INT_VECTOR,
+      SERIALIZED_DOUBLE_VECTOR,
+      SERIALIZED_STRING_VECTOR,
+    };
+
+    static std::string type_to_string(SerializationType type);
+
+  protected:
+    SerializingStream& serializer();
+    std::unique_ptr<std::ostream> stream_;
+    std::unique_ptr<SerializingStream> serializer_;
   };
 
-  template <>
-  CASADI_EXPORT void DeSerializer::unpack(std::vector<bool>& e);
+  class CASADI_EXPORT DeserializerBase {
+  public:
+#ifndef SWIG
+    DeserializerBase(std::unique_ptr<std::istream> stream);
+#endif // SWIG
+    ~DeserializerBase();
+    SerializerBase::SerializationType pop_type();
+    Sparsity unpack_sparsity();
+    MX unpack_mx();
+    Matrix<double> unpack_dm();
+    Matrix<casadi_int> unpack_im();
+    Matrix<SXElem> unpack_sx();
+    Linsol unpack_linsol();
+    Function unpack_function();
+    GenericType unpack_generictype();
+    casadi_int unpack_int();
+    double unpack_double();
+    std::string unpack_string();
+    std::vector<Sparsity> unpack_sparsity_vector();
+    std::vector<MX> unpack_mx_vector();
+    std::vector< Matrix<casadi_int> > unpack_im_vector();
+    std::vector< Matrix<double> > unpack_dm_vector();
+    std::vector< Matrix<SXElem> > unpack_sx_vector();
+    std::vector<Linsol> unpack_linsol_vector();
+    std::vector<Function> unpack_function_vector();
+    std::vector<GenericType> unpack_generictype_vector();
+    std::vector<casadi_int> unpack_int_vector();
+    std::vector<double> unpack_double_vector();
+    std::vector<std::string> unpack_string_vector();
+  protected:
+    DeserializingStream& deserializer();
+    std::unique_ptr<std::istream> stream_;
+    std::unique_ptr<DeserializingStream> deserializer_;
+  };
 
+  class CASADI_EXPORT StringSerializer : public SerializerBase {
+  public:
+    /** \brief Advanced serialization of CasADi objects
+     * 
+     * This class is intended for advanced users that want to circumvent the restrictions
+     * of standard pickling/matlab save load, ie no raw SX/MX symbols allowed.
+     * 
+     * \example
+     * x = SX.sym('x');
+     * s = StringSerializer();
+     * s.pack(x);
+     * s.pack(sin(x));
+     * 
+     * data = s.encode();
+     * 
+     * s = StringDeserializer(data);
+     * a = s.unpack();
+     * b = s.unpack();
+     * \endexample
+     * 
+     * Note:
+     *  Saving SX/MX objects individually has a substantial overhead
+     *  (both time and length of encoded string).
+     *  You are encouraged to use the vector/list variants of 'save' for SX/MX to reduce
+     *  the overhead.
+     * 
+     * 
+     * \seealso Function::save, Function::serialize, StringDeserializer, FileSerializer
+     * 
+     */
+    StringSerializer(const Dict& opts = Dict());
+    ~StringSerializer();
+
+    /** \brief Returns a string that holds the serialized objects
+     * 
+     * As a side effect, this method clears the internal buffer
+    */
+    std::string encode();
+  };
+
+  class CASADI_EXPORT FileSerializer : public SerializerBase {
+  public:
+    /** \brief Advanced serialization of CasADi objects
+     * 
+     * \seealso StringSerializer, FileDeserializer
+     */
+    FileSerializer(const std::string& fname, const Dict& opts = Dict());
+    ~FileSerializer();
+  };
+
+  class CASADI_EXPORT StringDeserializer : public DeserializerBase {
+  public:
+
+    /** \brief Advanced deserialization of CasADi objects
+     * 
+     * \seealso StringDeserializer
+     */
+    StringDeserializer(const std::string& string);
+    ~StringDeserializer();
+
+
+    /** \brief Sets the string to deserialize objects from
+    */
+    void decode(const std::string& string);
+  };
+
+  class CASADI_EXPORT FileDeserializer : public DeserializerBase {
+  public:
+     /** \brief Advanced deserialization of CasADi objects
+     * 
+     * \seealso FileSerializer
+     */
+    FileDeserializer(const std::string& fname);
+    ~FileDeserializer();
+  };
 
 } // namespace casadi
 

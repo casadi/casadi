@@ -77,11 +77,11 @@ namespace casadi {
     MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s);
+    static MXNode* deserialize(DeserializingStream& s);
 
   protected:
     /** \brief Deserializing constructor */
-    explicit GetNonzeros(DeSerializer& s) : MXNode(s) {}
+    explicit GetNonzeros(DeserializingStream& s) : MXNode(s) {}
   };
 
   class CASADI_EXPORT GetNonzerosVector : public GetNonzeros {
@@ -130,12 +130,12 @@ namespace casadi {
     std::vector<casadi_int> nz_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer& s) const override;
+    void serialize_body(SerializingStream& s) const override;
     /** \brief Serialize type information */
-    void serialize_type(Serializer& s) const override;
+    void serialize_type(SerializingStream& s) const override;
 
     /** \brief Deserializing constructor */
-    explicit GetNonzerosVector(DeSerializer& s);
+    explicit GetNonzerosVector(DeserializingStream& s);
   };
 
   // Specialization of the above when nz_ is a Slice
@@ -185,12 +185,12 @@ namespace casadi {
     Slice s_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer& s) const override;
+    void serialize_body(SerializingStream& s) const override;
     /** \brief Serialize type information */
-    void serialize_type(Serializer& s) const override;
+    void serialize_type(SerializingStream& s) const override;
 
     /** \brief Deserializing constructor */
-    explicit GetNonzerosSlice(DeSerializer& s);
+    explicit GetNonzerosSlice(DeserializingStream& s);
   };
 
   // Specialization of the above when nz_ is a nested Slice
@@ -241,12 +241,12 @@ namespace casadi {
     Slice inner_, outer_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer& s) const override;
+    void serialize_body(SerializingStream& s) const override;
     /** \brief Serialize type information */
-    void serialize_type(Serializer& s) const override;
+    void serialize_type(SerializingStream& s) const override;
 
     /** \brief Deserializing constructor */
-    explicit GetNonzerosSlice2(DeSerializer& s);
+    explicit GetNonzerosSlice2(DeserializingStream& s);
   };
 
 

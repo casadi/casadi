@@ -31,7 +31,7 @@
 #include <sstream>
 #include "casadi_misc.hpp"
 #include "global_options.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -263,13 +263,13 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::serialize_body(Serializer& s) const {
+  void BinaryMX<ScX, ScY>::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
     s.pack("BinaryMX::op", static_cast<int>(op_));
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX, ScY>::serialize_type(Serializer& s) const {
+  void BinaryMX<ScX, ScY>::serialize_type(SerializingStream& s) const {
     MXNode::serialize_type(s);
     char type_x = ScX;
     char type_y = ScY;
@@ -278,7 +278,7 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  MXNode* BinaryMX<ScX, ScY>::deserialize(DeSerializer& s) {
+  MXNode* BinaryMX<ScX, ScY>::deserialize(DeserializingStream& s) {
     char t;
     s.unpack("BinaryMX::scalar_flags", t);
     bool scX = t & 1;
@@ -294,7 +294,7 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
-  BinaryMX<ScX, ScY>::BinaryMX(DeSerializer& s) : MXNode(s) {
+  BinaryMX<ScX, ScY>::BinaryMX(DeserializingStream& s) : MXNode(s) {
     int op;
     s.unpack("BinaryMX::op", op);
     op_ = Operation(op);

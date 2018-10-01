@@ -114,14 +114,14 @@ namespace casadi {
     void codegen_declarations(CodeGenerator& g) const override;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new FastNewton(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new FastNewton(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit FastNewton(DeSerializer& s);
+    explicit FastNewton(DeserializingStream& s);
 
     /// Maximum number of Newton iterations
     casadi_int max_iter_;

@@ -88,10 +88,10 @@ namespace casadi {
     casadi_int op() const override { return OP_RANK1;}
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Rank1(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Rank1(s); }
 
     protected:
-      explicit Rank1(DeSerializer& s) : MXNode(s) {}
+      explicit Rank1(DeserializingStream& s) : MXNode(s) {}
 
   };
 

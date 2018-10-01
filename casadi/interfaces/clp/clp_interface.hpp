@@ -120,14 +120,14 @@ namespace casadi {
     /// All CLP options
     Dict opts_;
 
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new ClpInterface(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new ClpInterface(s); }
 
   protected:
      /** \brief Deserializing constructor */
-    explicit ClpInterface(DeSerializer& e);
+    explicit ClpInterface(DeserializingStream& e);
 
   private:
     // Conversion of string to enum for options

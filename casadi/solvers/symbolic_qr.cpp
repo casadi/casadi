@@ -227,14 +227,14 @@ namespace casadi {
     w.resize(max(w.size(), f.sz_w()));
   }
 
-  SymbolicQr::SymbolicQr(DeSerializer& s) : LinsolInternal(s) {
+  SymbolicQr::SymbolicQr(DeserializingStream& s) : LinsolInternal(s) {
     s.unpack("SymbolicQr::factorize", factorize_);
     s.unpack("SymbolicQr::solve", solve_);
     s.unpack("SymbolicQr::solveT", solveT_);
     s.unpack("SymbolicQr::fopts", fopts_);
   }
 
-  void SymbolicQr::serialize_body(Serializer &s) const {
+  void SymbolicQr::serialize_body(SerializingStream &s) const {
     LinsolInternal::serialize_body(s);
     s.pack("SymbolicQr::factorize", factorize_);
     s.pack("SymbolicQr::solve", solve_);

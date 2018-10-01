@@ -27,7 +27,7 @@
 #define UNARY_SX_HPP
 
 #include "sx_node.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 /// \cond INTERNAL
 
@@ -98,11 +98,11 @@ class UnarySX : public SXNode {
     /** \brief  The dependencies of the node */
     SXElem dep_;
 
-    void serialize_node(Serializer& s) const override {
+    void serialize_node(SerializingStream& s) const override {
       s.pack("UnarySX::dep", dep_);
     }
 
-    static SXNode* deserialize(DeSerializer& s, casadi_int op) {
+    static SXNode* deserialize(DeserializingStream& s, casadi_int op) {
       SXElem dep;
       s.unpack("UnarySX::dep", dep);
       return new UnarySX(op, dep);

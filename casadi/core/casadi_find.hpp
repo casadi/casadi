@@ -74,11 +74,11 @@ namespace casadi {
                           const std::vector<casadi_int>& res) const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Find(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Find(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Find(DeSerializer& s) : MXNode(s) { }
+    explicit Find(DeserializingStream& s) : MXNode(s) { }
   };
 
 } // namespace casadi

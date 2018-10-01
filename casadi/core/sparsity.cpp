@@ -28,7 +28,7 @@
 #include "matrix.hpp"
 #include "casadi_misc.hpp"
 #include "sparse_storage_impl.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 #include <climits>
 
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
@@ -1863,16 +1863,16 @@ namespace casadi {
   }
 
   void Sparsity::serialize(std::ostream &stream) const {
-    Serializer s(stream);
+    SerializingStream s(stream);
     serialize(s);
   }
 
   Sparsity Sparsity::deserialize(std::istream &stream) {
-    DeSerializer s(stream);
+    DeserializingStream s(stream);
     return Sparsity::deserialize(s);
   }
 
-  void Sparsity::serialize(Serializer& s) const {
+  void Sparsity::serialize(SerializingStream& s) const {
     if (is_null()) {
       s.pack("SparsityInternal::compressed", std::vector<casadi_int>{});
     } else {
@@ -1880,7 +1880,7 @@ namespace casadi {
     }
   }
 
-  Sparsity Sparsity::deserialize(DeSerializer& s) {
+  Sparsity Sparsity::deserialize(DeserializingStream& s) {
     std::vector<casadi_int> i;
     s.unpack("SparsityInternal::compressed", i);
     if (i.size()==0) {

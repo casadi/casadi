@@ -932,7 +932,7 @@ namespace casadi {
     return stats;
   }
 
-  QpoasesInterface::QpoasesInterface(DeSerializer& s) : Conic(s) {
+  QpoasesInterface::QpoasesInterface(DeserializingStream& s) : Conic(s) {
     s.unpack("QpoasesInterface::max_nWSR", max_nWSR_);
     s.unpack("QpoasesInterface::max_cputime", max_cputime_);
     casadi_int hess;
@@ -1011,7 +1011,7 @@ namespace casadi {
     ops_.enableInertiaCorrection = to_BooleanType(enableInertiaCorrection);
   }
 
-  void QpoasesInterface::serialize_body(Serializer &s) const {
+  void QpoasesInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
     s.pack("QpoasesInterface::max_nWSR", max_nWSR_);
     s.pack("QpoasesInterface::max_cputime", max_cputime_);

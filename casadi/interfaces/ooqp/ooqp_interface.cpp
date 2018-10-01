@@ -514,7 +514,7 @@ namespace casadi {
     return ss.str();
   }
 
-  OoqpInterface::OoqpInterface(DeSerializer& s) : Conic(s) {
+  OoqpInterface::OoqpInterface(DeserializingStream& s) : Conic(s) {
     s.unpack("OoqpInterface::spAT", spAT_);
     s.unpack("OoqpInterface::nQ", nQ_);
     s.unpack("OoqpInterface::nH", nH_);
@@ -524,7 +524,7 @@ namespace casadi {
     s.unpack("OoqpInterface::artol", artol_);
   }
 
-  void OoqpInterface::serialize_body(Serializer &s) const {
+  void OoqpInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
     s.pack("OoqpInterface::spAT", spAT_);
     s.pack("OoqpInterface::nQ", nQ_);

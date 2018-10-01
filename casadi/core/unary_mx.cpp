@@ -28,7 +28,7 @@
 #include <sstream>
 #include "casadi_misc.hpp"
 #include "global_options.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -191,12 +191,12 @@ namespace casadi {
     return MXNode::_get_binary(op, y, scX, scY);
   }
 
-  void UnaryMX::serialize_body(Serializer& s) const {
+  void UnaryMX::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
     s.pack("UnaryMX::op", static_cast<int>(op_));
   }
 
-  UnaryMX::UnaryMX(DeSerializer& s) : MXNode(s) {
+  UnaryMX::UnaryMX(DeserializingStream& s) : MXNode(s) {
     int op;
     s.unpack("UnaryMX::op", op);
     op_ = Operation(op);

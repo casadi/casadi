@@ -118,14 +118,14 @@ namespace casadi {
     static const std::string meta_doc;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new LapackLu(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new LapackLu(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit LapackLu(DeSerializer& s);
+    explicit LapackLu(DeserializingStream& s);
 
     /// Equilibrate?
     bool equilibriate_;

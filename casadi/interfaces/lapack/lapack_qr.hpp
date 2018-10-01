@@ -124,14 +124,14 @@ namespace casadi {
     casadi_int max_nrhs_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new LapackQr(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new LapackQr(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit LapackQr(DeSerializer& s);
+    explicit LapackQr(DeserializingStream& s);
   };
 
 } // namespace casadi

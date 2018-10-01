@@ -467,11 +467,11 @@ namespace casadi {
     return stats;
   }
 
-  ClpInterface::ClpInterface(DeSerializer& s) : Conic(s) {
+  ClpInterface::ClpInterface(DeserializingStream& s) : Conic(s) {
     s.unpack("ClpInterface::opts", opts_);
   }
 
-  void ClpInterface::serialize_body(Serializer &s) const {
+  void ClpInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
 
     s.pack("ClpInterface::opts", opts_);

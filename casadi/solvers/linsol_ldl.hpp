@@ -104,14 +104,14 @@ namespace casadi {
     Sparsity sp_Lt_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new LinsolLdl(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new LinsolLdl(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit LinsolLdl(DeSerializer& e);
+    explicit LinsolLdl(DeserializingStream& e);
   };
 
 } // namespace casadi

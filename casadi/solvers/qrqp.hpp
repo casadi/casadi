@@ -114,14 +114,14 @@ namespace casadi {
     double min_lam_;
     ///@}
 
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new Qrqp(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Qrqp(s); }
 
   protected:
      /** \brief Deserializing constructor */
-    explicit Qrqp(DeSerializer& e);
+    explicit Qrqp(DeserializingStream& e);
 
   private:
     void set_qp_prob();

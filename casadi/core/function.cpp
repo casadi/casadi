@@ -32,7 +32,7 @@
 #include "nlpsol.hpp"
 #include "conic.hpp"
 #include "jit_function.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 #include <typeinfo>
 #include <fstream>
@@ -1037,11 +1037,11 @@ namespace casadi {
   }
 
   void Function::serialize(std::ostream &stream, const Dict& opts) const {
-    Serializer s(stream, opts);
+    SerializingStream s(stream, opts);
     return serialize(s);
   }
 
-  void Function::serialize(Serializer &s) const {
+  void Function::serialize(SerializingStream &s) const {
     if (is_null()) {
       s.pack("Function::null", true);
     } else {
@@ -1050,7 +1050,7 @@ namespace casadi {
     }
   }
 
-  Function Function::deserialize(DeSerializer& s) {
+  Function Function::deserialize(DeserializingStream& s) {
     bool is_null;
     s.unpack("Function::null", is_null);
     if (is_null) return Function();
@@ -1100,13 +1100,13 @@ namespace casadi {
   }
 
   Function Function::deserialize(std::istream& stream) {
-    DeSerializer s(stream);
+    DeserializingStream s(stream);
     return deserialize(s);
   }
 
   Function Function::load(const std::string& s) {
     std::ifstream stream(s, ios_base::binary | std::ios::in);
-    if ((stream.rdstate() & std::ifstream::failbit) == 0) {
+    if ((stream.rdstate() & std::ifstream::failbit) != 0) {
       casadi_error("Could not open file '" + s + "'.");
     }
     return deserialize(stream);

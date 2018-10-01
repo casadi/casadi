@@ -61,7 +61,7 @@
 #include "solve_impl.hpp"
 #include "binary_mx_impl.hpp"
 
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 #include <typeinfo>
 
@@ -410,21 +410,21 @@ namespace casadi {
     return Dict();
   }
 
-  void MXNode::serialize(Serializer& s) const {
+  void MXNode::serialize(SerializingStream& s) const {
     serialize_type(s);
     serialize_body(s);
   }
 
-  void MXNode::serialize_body(Serializer& s) const {
+  void MXNode::serialize_body(SerializingStream& s) const {
     s.pack("MXNode::deps", dep_);
     s.pack("MXNode::sp", sparsity_);
   }
 
-  void MXNode::serialize_type(Serializer& s) const {
+  void MXNode::serialize_type(SerializingStream& s) const {
     s.pack("MXNode::op", static_cast<int>(op()));
   }
 
-  MXNode::MXNode(DeSerializer& s) {
+  MXNode::MXNode(DeserializingStream& s) {
     temp = 0;
 
     s.unpack("MXNode::deps", dep_);
@@ -432,7 +432,7 @@ namespace casadi {
   }
 
 
-  MXNode* MXNode::deserialize(DeSerializer& s) {
+  MXNode* MXNode::deserialize(DeserializingStream& s) {
     int op;
     s.unpack("MXNode::op", op);
 
@@ -991,7 +991,7 @@ namespace casadi {
 
 
   // Note: binary/unary operations are omitted here
-  std::map<casadi_int, MXNode* (*)(DeSerializer&)> MXNode::deserialize_map = {
+  std::map<casadi_int, MXNode* (*)(DeserializingStream&)> MXNode::deserialize_map = {
     {OP_INPUT, Input::deserialize},
     {OP_OUTPUT, Output::deserialize},
     {OP_PARAMETER, SymbolicMX::deserialize},

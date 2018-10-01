@@ -62,11 +62,11 @@ namespace casadi {
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new GetElements(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new GetElements(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit GetElements(DeSerializer& s) : MXNode(s) {}
+    explicit GetElements(DeserializingStream& s) : MXNode(s) {}
   };
 
 } // namespace casadi

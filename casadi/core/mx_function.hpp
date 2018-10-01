@@ -123,10 +123,10 @@ namespace casadi {
     void codegen_body(CodeGenerator& g) const override;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s);
+    static ProtoFunction* deserialize(DeserializingStream& s);
 
     /** \brief Extract the residual function G and the modified function Z out of an expression
      * (see Albersmeyer2010 paper) */
@@ -212,7 +212,7 @@ namespace casadi {
 
   protected:
     /** \brief Deserializing constructor */
-    explicit MXFunction(DeSerializer& s);
+    explicit MXFunction(DeserializingStream& s);
   };
 
 } // namespace casadi

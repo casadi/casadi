@@ -83,14 +83,14 @@ namespace casadi {
     casadi_int n_inplace() const override { return 1;}
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer& s) const override;
+    void serialize_body(SerializingStream& s) const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Assertion(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Assertion(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Assertion(DeSerializer& s);
+    explicit Assertion(DeserializingStream& s);
 
   private:
     std::string fail_message_;

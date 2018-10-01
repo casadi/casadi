@@ -111,17 +111,17 @@ namespace casadi {
     bool project_in_, project_out_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize without type information */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new Switch(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Switch(s); }
 
     /** Obtain information about node */
     Dict info() const override;
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Switch(DeSerializer& s);
+    explicit Switch(DeserializingStream& s);
   };
 
 } // namespace casadi

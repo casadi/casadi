@@ -691,7 +691,7 @@ namespace casadi {
     return stats;
   }
 
-  BonminInterface::BonminInterface(DeSerializer& s) : Nlpsol(s) {
+  BonminInterface::BonminInterface(DeserializingStream& s) : Nlpsol(s) {
     s.unpack("BonminInterface::jacg_sp", jacg_sp_);
     s.unpack("BonminInterface::hesslag_sp", hesslag_sp_);
     s.unpack("BonminInterface::exact_hessian", exact_hessian_);
@@ -718,7 +718,7 @@ namespace casadi {
     s.unpack("BonminInterface::con_numeric_md", con_numeric_md_);
   }
 
-  void BonminInterface::serialize_body(Serializer &s) const {
+  void BonminInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
     s.pack("BonminInterface::jacg_sp", jacg_sp_);
     s.pack("BonminInterface::hesslag_sp", hesslag_sp_);

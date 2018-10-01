@@ -92,7 +92,7 @@ namespace casadi {
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Concat(DeSerializer& s) : MXNode(s) {}
+    explicit Concat(DeserializingStream& s) : MXNode(s) {}
   };
 
 
@@ -136,10 +136,10 @@ namespace casadi {
     std::vector<casadi_int> off() const;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Horzcat(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Horzcat(s); }
   protected:
     /** \brief Deserializing constructor */
-    explicit Horzcat(DeSerializer& s) : Concat(s) {}
+    explicit Horzcat(DeserializingStream& s) : Concat(s) {}
   };
 
   /** \brief Vertical concatenation of vectors
@@ -182,11 +182,11 @@ namespace casadi {
     std::vector<casadi_int> off() const;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Vertcat(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Vertcat(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Vertcat(DeSerializer& s) : Concat(s) {}
+    explicit Vertcat(DeserializingStream& s) : Concat(s) {}
   };
 
   /** \brief Diagonal concatenation of matrices
@@ -229,11 +229,11 @@ namespace casadi {
     std::pair<std::vector<casadi_int>, std::vector<casadi_int> > off() const;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Diagcat(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Diagcat(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Diagcat(DeSerializer& s) : Concat(s) {}
+    explicit Diagcat(DeserializingStream& s) : Concat(s) {}
   };
 
 } // namespace casadi

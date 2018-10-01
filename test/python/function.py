@@ -1757,6 +1757,18 @@ class Functiontests(casadiTestCase):
       fs = Function.deserialize(f.serialize(opts))
       self.checkfunction(f,fs,inputs=[1.1, vertcat(2.7,3)],hessian=False)
 
+  @memory_heavy()
+  def test_serialize_recursion_limit(self):
+      for X in [SX,MX]:
+        x = X.sym("x")
+
+        y = x 
+        for i in range(10000):
+          y = sin(y)
+
+        f = Function('foo',[x],[y])
+        Function.deserialize(f.serialize())
+
 
   def test_string(self):
     x=MX.sym("x")

@@ -633,7 +633,7 @@ namespace casadi {
     return stats;
   }
 
-  IpoptInterface::IpoptInterface(DeSerializer& s) : Nlpsol(s) {
+  IpoptInterface::IpoptInterface(DeserializingStream& s) : Nlpsol(s) {
     s.unpack("IpoptInterface::jacg_sp", jacg_sp_);
     s.unpack("IpoptInterface::hesslag_sp", hesslag_sp_);
     s.unpack("IpoptInterface::exact_hessian", exact_hessian_);
@@ -648,7 +648,7 @@ namespace casadi {
     s.unpack("IpoptInterface::con_numeric_md", con_numeric_md_);
   }
 
-  void IpoptInterface::serialize_body(Serializer &s) const {
+  void IpoptInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
     s.pack("IpoptInterface::jacg_sp", jacg_sp_);
     s.pack("IpoptInterface::hesslag_sp", hesslag_sp_);

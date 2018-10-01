@@ -167,24 +167,24 @@ namespace casadi {
     /// SDP to SOCP conversion initialization
     void sdp_to_socp_init(SDPToSOCPMem& m) const;
 
-    void serialize(Serializer &s, const SDPToSOCPMem& m) const;
-    void deserialize(DeSerializer &s, SDPToSOCPMem& m);
+    void serialize(SerializingStream &s, const SDPToSOCPMem& m) const;
+    void deserialize(DeserializingStream &s, SDPToSOCPMem& m);
 
   public:
       /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
     /** \brief Serialize type information */
-    void serialize_type(Serializer &s) const override;
+    void serialize_type(SerializingStream &s) const override;
 
     /** \brief String used to identify the immediate FunctionInternal subclass */
     std::string serialize_base_function() const override { return "Conic"; }
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s);
+    static ProtoFunction* deserialize(DeserializingStream& s);
 
   protected:
 
     /** \brief Deserializing constructor */
-    explicit Conic(DeSerializer& s);
+    explicit Conic(DeserializingStream& s);
   };
 
 

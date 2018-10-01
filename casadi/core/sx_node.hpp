@@ -134,13 +134,13 @@ namespace casadi {
     unsigned int count;
 
     /** \brief Serialize an object */
-    void serialize(Serializer& s) const;
+    void serialize(SerializingStream& s) const;
 
-    virtual void serialize_node(Serializer& s) const;
+    virtual void serialize_node(SerializingStream& s) const;
 
-    static SXNode* deserialize(DeSerializer& s);
+    static SXNode* deserialize(DeserializingStream& s);
 
-    static std::map<casadi_int, SXNode* (*)(DeSerializer&)> deserialize_map;
+    static std::map<casadi_int, SXNode* (*)(DeserializingStream&)> deserialize_map;
 
 
   };

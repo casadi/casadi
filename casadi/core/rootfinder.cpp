@@ -548,7 +548,7 @@ namespace casadi {
     return stats;
   }
 
-  void Rootfinder::serialize_body(Serializer &s) const {
+  void Rootfinder::serialize_body(SerializingStream &s) const {
     OracleFunction::serialize_body(s);
 
     s.pack("Rootfinder::n", n_);
@@ -560,16 +560,16 @@ namespace casadi {
     s.pack("Rootfinder::error_on_fail", error_on_fail_);
   }
 
-  void Rootfinder::serialize_type(Serializer &s) const {
+  void Rootfinder::serialize_type(SerializingStream &s) const {
     OracleFunction::serialize_type(s);
     PluginInterface<Rootfinder>::serialize_type(s);
   }
 
-  ProtoFunction* Rootfinder::deserialize(DeSerializer& s) {
+  ProtoFunction* Rootfinder::deserialize(DeserializingStream& s) {
     return PluginInterface<Rootfinder>::deserialize(s);
   }
 
-  Rootfinder::Rootfinder(DeSerializer & s) : OracleFunction(s) {
+  Rootfinder::Rootfinder(DeserializingStream & s) : OracleFunction(s) {
     s.unpack("Rootfinder::n", n_);
     s.unpack("Rootfinder::linsol", linsol_);
     s.unpack("Rootfinder::sp_jac", sp_jac_);

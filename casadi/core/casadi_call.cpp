@@ -26,7 +26,7 @@
 #include "casadi_call.hpp"
 #include "function_internal.hpp"
 #include "casadi_misc.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
 throw CasadiException("Error in Call::" FNAME " for '" + fcn_.name() + "' "\
@@ -220,12 +220,12 @@ namespace casadi {
     return MX::createMultipleOutput(new Call(fcn, arg));
   }
 
-  void Call::serialize_body(Serializer& s) const {
+  void Call::serialize_body(SerializingStream& s) const {
     MultipleOutput::serialize_body(s);
     s.pack("Call::fcn", fcn_);
   }
 
-  Call::Call(DeSerializer& s) : MultipleOutput(s) {
+  Call::Call(DeserializingStream& s) : MultipleOutput(s) {
     s.unpack("Call::fcn", fcn_);
   }
 

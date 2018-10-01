@@ -960,7 +960,7 @@ namespace casadi {
   }
 
 
-  void Nlpsol::serialize_body(Serializer &s) const {
+  void Nlpsol::serialize_body(SerializingStream &s) const {
     OracleFunction::serialize_body(s);
 
     s.pack("Nlpsol::nx", nx_);
@@ -984,16 +984,16 @@ namespace casadi {
     s.pack("Nlpsol::mi", mi_);
   }
 
-  void Nlpsol::serialize_type(Serializer &s) const {
+  void Nlpsol::serialize_type(SerializingStream &s) const {
     OracleFunction::serialize_type(s);
     PluginInterface<Nlpsol>::serialize_type(s);
   }
 
-  ProtoFunction* Nlpsol::deserialize(DeSerializer& s) {
+  ProtoFunction* Nlpsol::deserialize(DeserializingStream& s) {
     return PluginInterface<Nlpsol>::deserialize(s);
   }
 
-  Nlpsol::Nlpsol(DeSerializer & s) : OracleFunction(s) {
+  Nlpsol::Nlpsol(DeserializingStream & s) : OracleFunction(s) {
     s.unpack("Nlpsol::nx", nx_);
     s.unpack("Nlpsol::ng", ng_);
     s.unpack("Nlpsol::np", np_);

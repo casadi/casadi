@@ -25,7 +25,7 @@
 
 #include "external_impl.hpp"
 #include "casadi_misc.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -358,7 +358,7 @@ namespace casadi {
     return ret;
   }
 
-  void External::serialize_body(Serializer &s) const {
+  void External::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
     s.pack("External::int_data", int_data_);
@@ -367,7 +367,7 @@ namespace casadi {
     s.pack("External::li", li_);
   }
 
-  ProtoFunction* External::deserialize(DeSerializer& s) {
+  ProtoFunction* External::deserialize(DeserializingStream& s) {
     char type;
     s.unpack("External::type", type);
     switch (type) {
@@ -377,12 +377,12 @@ namespace casadi {
     }
   }
 
-  void GenericExternal::serialize_type(Serializer &s) const {
+  void GenericExternal::serialize_type(SerializingStream &s) const {
     FunctionInternal::serialize_type(s);
     s.pack("External::type", 'g');
   }
 
-  External::External(DeSerializer & s) : FunctionInternal(s) {
+  External::External(DeserializingStream & s) : FunctionInternal(s) {
     s.unpack("External::int_data", int_data_);
     s.unpack("External::real_data", real_data_);
     s.unpack("External::string_data", string_data_);
@@ -391,7 +391,7 @@ namespace casadi {
     External::init_external();
   }
 
-  GenericExternal::GenericExternal(DeSerializer& s) : External(s) {
+  GenericExternal::GenericExternal(DeserializingStream& s) : External(s) {
     GenericExternal::init_external();
   }
 } // namespace casadi

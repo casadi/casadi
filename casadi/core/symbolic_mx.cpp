@@ -25,7 +25,7 @@
 
 #include "symbolic_mx.hpp"
 #include "casadi_misc.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -90,12 +90,12 @@ namespace casadi {
     this->temp = 0;
   }
 
-  void SymbolicMX::serialize_body(Serializer& s) const {
+  void SymbolicMX::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
     s.pack("SymbolicMX::name", name_);
   }
 
-  SymbolicMX::SymbolicMX(DeSerializer& s) : MXNode(s) {
+  SymbolicMX::SymbolicMX(DeserializingStream& s) : MXNode(s) {
     s.unpack("SymbolicMX::name", name_);
   }
 

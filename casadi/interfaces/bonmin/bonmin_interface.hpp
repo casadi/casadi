@@ -192,14 +192,14 @@ namespace casadi {
       con_string_md_, con_integer_md_, con_numeric_md_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new BonminInterface(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new BonminInterface(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit BonminInterface(DeSerializer& s);
+    explicit BonminInterface(DeserializingStream& s);
   };
 
 } // namespace casadi

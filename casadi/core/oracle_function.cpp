@@ -25,7 +25,7 @@
 
 #include "oracle_function.hpp"
 #include "external.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -383,7 +383,7 @@ namespace casadi {
   }
 
 
-  void OracleFunction::serialize_body(Serializer &s) const {
+  void OracleFunction::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
     s.pack("OracleFunction::oracle", oracle_);
@@ -399,7 +399,7 @@ namespace casadi {
     s.pack("OracleFunction::monitor", monitor_);
   }
 
-  OracleFunction::OracleFunction(DeSerializer& s) : FunctionInternal(s) {
+  OracleFunction::OracleFunction(DeserializingStream& s) : FunctionInternal(s) {
     s.unpack("OracleFunction::oracle", oracle_);
     s.unpack("OracleFunction::common_options", common_options_);
     s.unpack("OracleFunction::specific_options", specific_options_);

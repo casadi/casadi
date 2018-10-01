@@ -26,7 +26,7 @@
 #include "generic_type_internal.hpp"
 #include "casadi_misc.hpp"
 #include "exception.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 #include <cmath>
 
 #include "function.hpp"
@@ -531,12 +531,12 @@ namespace casadi {
     }
   }
 
-  void GenericType::serialize(Serializer& s) const {
+  void GenericType::serialize(SerializingStream& s) const {
     s.pack("GenericType::type", static_cast<int>(getType()));
     static_cast<const GenericTypeBase*>(get())->serialize(s);
   }
 
-  GenericType GenericType::deserialize(DeSerializer& s) {
+  GenericType GenericType::deserialize(DeserializingStream& s) {
     int itype;
     s.unpack("GenericType::type", itype);
     TypeID type = static_cast<TypeID>(itype);

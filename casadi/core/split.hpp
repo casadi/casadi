@@ -81,11 +81,11 @@ namespace casadi {
     std::vector<Sparsity> output_sparsity_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer& s) const override;
+    void serialize_body(SerializingStream& s) const override;
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Split(DeSerializer& s);
+    explicit Split(DeserializingStream& s);
   };
 
   /** \brief Horizontal split, x -> x0, x1, ...
@@ -122,11 +122,11 @@ namespace casadi {
     MX get_horzcat(const std::vector<MX>& x) const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Horzsplit(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Horzsplit(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Horzsplit(DeSerializer& s) : Split(s) {}
+    explicit Horzsplit(DeserializingStream& s) : Split(s) {}
   };
 
   /** \brief Diag split, x -> x0, x1, ...
@@ -164,11 +164,11 @@ namespace casadi {
     MX get_diagcat(const std::vector<MX>& x) const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Diagsplit(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Diagsplit(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Diagsplit(DeSerializer& s) : Split(s) {}
+    explicit Diagsplit(DeserializingStream& s) : Split(s) {}
   };
 
   /** \brief Vertical split of vectors, x -> x0, x1, ...
@@ -205,11 +205,11 @@ namespace casadi {
     MX get_vertcat(const std::vector<MX>& x) const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Vertsplit(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Vertsplit(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Vertsplit(DeSerializer& s) : Split(s) {}
+    explicit Vertsplit(DeserializingStream& s) : Split(s) {}
   };
 
 } // namespace casadi

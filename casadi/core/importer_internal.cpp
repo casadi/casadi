@@ -293,28 +293,28 @@ namespace casadi {
     return it->second.second;
   }
 
-  void ImporterInternal::serialize(Serializer& s) const {
+  void ImporterInternal::serialize(SerializingStream& s) const {
     serialize_type(s);
     serialize_body(s);
   }
 
-  void ImporterInternal::serialize_type(Serializer& s) const {
+  void ImporterInternal::serialize_type(SerializingStream& s) const {
     s.pack("ImporterInternal::type", class_name());
   }
 
-  void ImporterInternal::serialize_body(Serializer& s) const {
+  void ImporterInternal::serialize_body(SerializingStream& s) const {
     s.pack("ImporterInternal::name", name_);
     s.pack("ImporterInternal::meta", meta_);
     s.pack("ImporterInternal::external", external_);
   }
 
-  ImporterInternal::ImporterInternal(DeSerializer& s) {
+  ImporterInternal::ImporterInternal(DeserializingStream& s) {
     s.unpack("ImporterInternal::name", name_);
     s.unpack("ImporterInternal::meta", meta_);
     s.unpack("ImporterInternal::external", external_);
   }
 
-  ImporterInternal* ImporterInternal::deserialize(DeSerializer& s) {
+  ImporterInternal* ImporterInternal::deserialize(DeserializingStream& s) {
     std::string class_name;
     s.unpack("ImporterInternal::type", class_name);
     if (class_name=="DllLibrary") {
@@ -324,7 +324,7 @@ namespace casadi {
     }
   }
 
-  ImporterInternal* DllLibrary::deserialize(DeSerializer& s) {
+  ImporterInternal* DllLibrary::deserialize(DeserializingStream& s) {
     DllLibrary* ret = new DllLibrary(s);
     ret->finalize();
     return ret;

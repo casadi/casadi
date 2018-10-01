@@ -141,15 +141,15 @@ namespace casadi {
     /** \brief  Verbose -- for debugging purposes */
     bool verbose_;
 
-    void serialize(Serializer& s) const;
+    void serialize(SerializingStream& s) const;
 
-    virtual void serialize_type(Serializer& s) const;
-    virtual void serialize_body(Serializer& s) const;
+    virtual void serialize_type(SerializingStream& s) const;
+    virtual void serialize_body(SerializingStream& s) const;
 
-    static ImporterInternal* deserialize(DeSerializer& s);
+    static ImporterInternal* deserialize(DeserializingStream& s);
 
   protected:
-    explicit ImporterInternal(DeSerializer& s);
+    explicit ImporterInternal(DeserializingStream& s);
   };
 
   /** \brief Dynamically linked library
@@ -186,10 +186,10 @@ namespace casadi {
     /// Can meta information be read?
     bool can_have_meta() const override { return false;}
 
-    static ImporterInternal* deserialize(DeSerializer& s);
+    static ImporterInternal* deserialize(DeserializingStream& s);
 
   protected:
-    explicit DllLibrary(DeSerializer& s) : ImporterInternal(s) {}
+    explicit DllLibrary(DeserializingStream& s) : ImporterInternal(s) {}
   };
 
 } // namespace casadi

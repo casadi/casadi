@@ -24,7 +24,7 @@
 
 
 #include "switch.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -38,7 +38,7 @@ namespace casadi {
     casadi_assert_dev(!f_.empty());
   }
 
-  void Switch::serialize_body(Serializer &s) const {
+  void Switch::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
     s.pack("Switch::f", f_);
     s.pack("Switch::f_def", f_def_);
@@ -46,7 +46,7 @@ namespace casadi {
     s.pack("Switch::project_out", project_out_);
   }
 
-  Switch::Switch(DeSerializer& s) : FunctionInternal(s) {
+  Switch::Switch(DeserializingStream& s) : FunctionInternal(s) {
     s.unpack("Switch::f", f_);
     s.unpack("Switch::f_def", f_def_);
     s.unpack("Switch::project_in", project_in_);

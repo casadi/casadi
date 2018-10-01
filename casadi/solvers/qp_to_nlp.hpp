@@ -96,14 +96,14 @@ namespace casadi {
     /// Solve with
     Function solver_;
 
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new QpToNlp(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new QpToNlp(s); }
 
   protected:
      /** \brief Deserializing constructor */
-    explicit QpToNlp(DeSerializer& e);
+    explicit QpToNlp(DeserializingStream& e);
   };
 
 } // namespace casadi

@@ -65,11 +65,11 @@ namespace casadi {
     Dict info() const override;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer& s) const override;
+    void serialize_body(SerializingStream& s) const override;
 
   protected:
     /** \brief Deserializing constructor */
-    explicit IOInstruction(DeSerializer&s);
+    explicit IOInstruction(DeserializingStream&s);
   };
 
   /** \brief Input instruction  */
@@ -93,11 +93,11 @@ namespace casadi {
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Input(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Input(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Input(DeSerializer&s) : IOInstruction(s) {}
+    explicit Input(DeserializingStream&s) : IOInstruction(s) {}
   };
 
   /** \brief Input instruction  */
@@ -124,10 +124,10 @@ namespace casadi {
                   const std::vector<casadi_int>& res) const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Output(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Output(s); }
   protected:
     /** \brief Deserializing constructor */
-    explicit Output(DeSerializer&s) : IOInstruction(s) {}
+    explicit Output(DeserializingStream&s) : IOInstruction(s) {}
   };
 
 

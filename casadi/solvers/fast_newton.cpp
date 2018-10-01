@@ -253,7 +253,7 @@ namespace casadi {
   }
 
 
-  FastNewton::FastNewton(DeSerializer& s) : Rootfinder(s) {
+  FastNewton::FastNewton(DeserializingStream& s) : Rootfinder(s) {
     s.unpack("Newton::max_iter", max_iter_);
     s.unpack("Newton::abstol", abstol_);
     s.unpack("Newton::abstolStep", abstolStep_);
@@ -264,7 +264,7 @@ namespace casadi {
     s.unpack("Newton::pc", pc_);
   }
 
-  void FastNewton::serialize_body(Serializer &s) const {
+  void FastNewton::serialize_body(SerializingStream &s) const {
     Rootfinder::serialize_body(s);
     s.pack("Newton::max_iter", max_iter_);
     s.pack("Newton::abstol", abstol_);

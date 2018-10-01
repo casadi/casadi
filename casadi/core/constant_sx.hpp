@@ -27,7 +27,7 @@
 #define CASADI_CONSTANT_SX_HPP
 
 #include "sx_node.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 #include <cassert>
 
 /// \cond INTERNAL
@@ -127,7 +127,7 @@ class RealtypeSX : public ConstantSX {
 
     bool is_almost_zero(double tol) const override { return fabs(value)<=tol; }
 
-    void serialize_node(Serializer& s) const override {
+    void serialize_node(SerializingStream& s) const override {
       s.pack("ConstantSX::type", 'r');
       s.pack("ConstantSX::value", value);
     }
@@ -192,7 +192,7 @@ class IntegerSX : public ConstantSX {
     /** \brief  Properties */
     bool is_integer() const override { return true; }
 
-    void serialize_node(Serializer& s) const override {
+    void serialize_node(SerializingStream& s) const override {
       s.pack("ConstantSX::type", 'i');
       s.pack("ConstantSX::value", value);
     }
@@ -230,7 +230,7 @@ public:
   bool is_almost_zero(double tol) const override { return true; }
   ///@}
 
-  void serialize_node(Serializer& s) const override {
+  void serialize_node(SerializingStream& s) const override {
     s.pack("ConstantSX::type", '0');
   }
 };
@@ -254,7 +254,7 @@ public:
   bool is_integer() const override { return true; }
   bool is_one() const override { return true; }
 
-  void serialize_node(Serializer& s) const override {
+  void serialize_node(SerializingStream& s) const override {
     s.pack("ConstantSX::type", '1');
   }
 
@@ -283,7 +283,7 @@ public:
   bool is_minus_one() const override { return true; }
   ///@}
 
-  void serialize_node(Serializer& s) const override {
+  void serialize_node(SerializingStream& s) const override {
     s.pack("ConstantSX::type", 'm');
   }
 
@@ -306,7 +306,7 @@ public:
   /** \brief  Properties */
   bool is_inf() const override { return true; }
 
-  void serialize_node(Serializer& s) const override {
+  void serialize_node(SerializingStream& s) const override {
     s.pack("ConstantSX::type", 'F');
   }
 
@@ -329,7 +329,7 @@ public:
   /** \brief  Properties */
   bool is_minus_inf() const override { return true; }
 
-  void serialize_node(Serializer& s) const override {
+  void serialize_node(SerializingStream& s) const override {
     s.pack("ConstantSX::type", 'f');
   }
 
@@ -352,13 +352,13 @@ public:
   /** \brief  Properties */
   bool is_nan() const override { return true; }
 
-  void serialize_node(Serializer& s) const override {
+  void serialize_node(SerializingStream& s) const override {
     s.pack("ConstantSX::type", 'n');
   }
 
 };
 
-inline SXNode* ConstantSX_deserialize(DeSerializer& s) {
+inline SXNode* ConstantSX_deserialize(DeserializingStream& s) {
   char type;
   s.unpack("ConstantSX::type", type);
   switch (type) {

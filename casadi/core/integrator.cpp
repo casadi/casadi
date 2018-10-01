@@ -1455,7 +1455,7 @@ namespace casadi {
     return Function(name, de_in, de_out, DE_INPUTS, DE_OUTPUTS, opts);
   }
 
-  void Integrator::serialize_body(Serializer &s) const {
+  void Integrator::serialize_body(SerializingStream &s) const {
     OracleFunction::serialize_body(s);
 
     s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
@@ -1487,16 +1487,16 @@ namespace casadi {
     s.pack("Integrator::ntout", ntout_);
   }
 
-  void Integrator::serialize_type(Serializer &s) const {
+  void Integrator::serialize_type(SerializingStream &s) const {
     OracleFunction::serialize_type(s);
     PluginInterface<Integrator>::serialize_type(s);
   }
 
-  ProtoFunction* Integrator::deserialize(DeSerializer& s) {
+  ProtoFunction* Integrator::deserialize(DeserializingStream& s) {
     return PluginInterface<Integrator>::deserialize(s);
   }
 
-  Integrator::Integrator(DeSerializer & s) : OracleFunction(s) {
+  Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
     s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
     s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
     s.unpack("Integrator::nx", nx_);
@@ -1527,7 +1527,7 @@ namespace casadi {
   }
 
 
-  void FixedStepIntegrator::serialize_body(Serializer &s) const {
+  void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
     Integrator::serialize_body(s);
 
     s.pack("FixedStepIntegrator::F", F_);
@@ -1538,7 +1538,7 @@ namespace casadi {
     s.pack("FixedStepIntegrator::nRZ", nRZ_);
   }
 
-  FixedStepIntegrator::FixedStepIntegrator(DeSerializer & s) : Integrator(s) {
+  FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s) {
     s.unpack("FixedStepIntegrator::F", F_);
     s.unpack("FixedStepIntegrator::G", G_);
     s.unpack("FixedStepIntegrator::nk", nk_);
@@ -1547,14 +1547,14 @@ namespace casadi {
     s.unpack("FixedStepIntegrator::nRZ", nRZ_);
   }
 
-  void ImplicitFixedStepIntegrator::serialize_body(Serializer &s) const {
+  void ImplicitFixedStepIntegrator::serialize_body(SerializingStream &s) const {
     FixedStepIntegrator::serialize_body(s);
 
     s.pack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
     s.pack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);
   }
 
-  ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(DeSerializer & s) :
+  ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(DeserializingStream & s) :
       FixedStepIntegrator(s) {
     s.unpack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
     s.unpack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);

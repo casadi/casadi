@@ -4178,6 +4178,51 @@ namespace casadi {
 %include <casadi/core/dae_builder.hpp>
 %include <casadi/core/xml_file.hpp>
 
+%feature("copyctor", "0") casadi::SerializerBase;
+%feature("copyctor", "0") casadi::DeserializerBase;
+%feature("copyctor", "0") casadi::StringSerializer;
+%feature("copyctor", "0") casadi::StringDeserializer;
+%feature("copyctor", "0") casadi::FileSerializer;
+%feature("copyctor", "0") casadi::FileDeserializer;
+%nodefaultctor casadi::SerializerBase;
+%nodefaultctor casadi::DeserializerBase;
+
+#ifdef SWIGPYTHON
+%rename("%(regex:/(unpack_\w+)/_\\1/)s", regextarget=1, fullname=1) "casadi::DeserializerBase::(unpack_\w+)";
+%rename("_pop_type") casadi::DeserializerBase::pop_type;
+%rename("%(regex:/(SERIALIZED_\w+)/_\\1/)s", regextarget=1, fullname=1) "casadi::SerializerBase::SERIALIZED_\w+";
+#endif // SWIG_PYTHON
+
+
+#ifdef SWIGMATLAB
+%rename("%(regex:/(unpack_\w+)/internal_\\1/)s", regextarget=1, fullname=1) "casadi::DeserializerBase::(unpack_\w+)";
+%rename("internal_pop_type") casadi::DeserializerBase::pop_type;
+%rename("%(regex:/(SERIALIZED_\w+)/internal_\\1/)s", regextarget=1, fullname=1) "casadi::SerializerBase::SERIALIZED_\w+";
+#endif // SWIG_PYTHON
+
+%include <casadi/core/serializer.hpp>
+
+#ifdef SWIGPYTHON
+%extend casadi::DeserializerBase {
+  %pythoncode %{
+    def unpack(self):
+      type = SerializerBase.type_to_string(self._pop_type())
+      f = getattr(self, "_unpack_"+type)
+      return f()
+  %}
+}
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+%extend casadi::DeserializerBase {
+  %matlabcode %{
+    function out = unpack(self)
+      type = casadi.SerializerBase.type_to_string(self.internal_pop_type);
+      out = self.(['internal_unpack_' type]);
+    end
+  %}
+}
+#endif // SWIGMATLAB
+
 %feature("director") casadi::OptiCallback;
 
 // Return-by-value

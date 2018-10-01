@@ -181,14 +181,14 @@ namespace casadi {
 
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new Sqpmethod(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Sqpmethod(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Sqpmethod(DeSerializer& s);
+    explicit Sqpmethod(DeserializingStream& s);
   };
 
 } // namespace casadi

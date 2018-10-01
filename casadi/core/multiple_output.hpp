@@ -65,7 +65,7 @@ namespace casadi {
 
   protected:
     /** \brief Deserializing constructor */
-    explicit MultipleOutput(DeSerializer& s) : MXNode(s) {}
+    explicit MultipleOutput(DeserializingStream& s) : MXNode(s) {}
   };
 
   class CASADI_EXPORT OutputNode : public MXNode {
@@ -102,14 +102,14 @@ namespace casadi {
     casadi_int oind_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer& s) const override;
+    void serialize_body(SerializingStream& s) const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new OutputNode(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new OutputNode(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit OutputNode(DeSerializer& s);
+    explicit OutputNode(DeserializingStream& s);
   };
 
 } // namespace casadi

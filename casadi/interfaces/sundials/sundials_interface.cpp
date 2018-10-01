@@ -390,7 +390,7 @@ namespace casadi {
     }
   }
 
-  SundialsInterface::SundialsInterface(DeSerializer& s) : Integrator(s) {
+  SundialsInterface::SundialsInterface(DeserializingStream& s) : Integrator(s) {
     s.unpack("SundialsInterface::abstol", abstol_);
     s.unpack("SundialsInterface::reltol", reltol_);
     s.unpack("SundialsInterface::max_num_steps", max_num_steps_);
@@ -421,7 +421,7 @@ namespace casadi {
     interp_ = static_cast<InterpType>(interp);
   }
 
-  void SundialsInterface::serialize_body(Serializer &s) const {
+  void SundialsInterface::serialize_body(SerializingStream &s) const {
     Integrator::serialize_body(s);
     s.pack("SundialsInterface::abstol", abstol_);
     s.pack("SundialsInterface::reltol", reltol_);

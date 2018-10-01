@@ -28,7 +28,7 @@
 #include "global_options.hpp"
 #include "casadi_interrupt.hpp"
 #include "io_instruction.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 #include <stack>
 #include <typeinfo>
@@ -1640,7 +1640,7 @@ namespace casadi {
     return dep.stats(1);
   }
 
-  void MXFunction::serialize_body(Serializer &s) const {
+  void MXFunction::serialize_body(SerializingStream &s) const {
     XFunction<MXFunction, MX, MXNode>::serialize_body(s);
     s.pack("MXFunction::n_instr", algorithm_.size());
 
@@ -1654,10 +1654,13 @@ namespace casadi {
     s.pack("MXFunction::workloc", workloc_);
     s.pack("MXFunction::free_vars", free_vars_);
     s.pack("MXFunction::default_in", default_in_);
+
+
+    XFunction<MXFunction, MX, MXNode>::delayed_serialize_members(s);
   }
 
 
-  MXFunction::MXFunction(DeSerializer& s) : XFunction<MXFunction, MX, MXNode>(s) {
+  MXFunction::MXFunction(DeserializingStream& s) : XFunction<MXFunction, MX, MXNode>(s) {
     size_t n_instructions;
     s.unpack("MXFunction::n_instr", n_instructions);
     algorithm_.resize(n_instructions);
@@ -1672,9 +1675,11 @@ namespace casadi {
     s.unpack("MXFunction::workloc", workloc_);
     s.unpack("MXFunction::free_vars", free_vars_);
     s.unpack("MXFunction::default_in", default_in_);
+
+    XFunction<MXFunction, MX, MXNode>::delayed_deserialize_members(s);
   }
 
-  ProtoFunction* MXFunction::deserialize(DeSerializer& s) {
+  ProtoFunction* MXFunction::deserialize(DeserializingStream& s) {
     return new MXFunction(s);
   }
 

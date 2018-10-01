@@ -139,17 +139,17 @@ namespace casadi {
     ///@}
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeSerializer& s);
+    static ProtoFunction* deserialize(DeserializingStream& s);
 
     /** \brief String used to identify the immediate FunctionInternal subclass */
     std::string serialize_base_function() const override { return "External"; }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit External(DeSerializer& s);
+    explicit External(DeserializingStream& s);
   };
 
   class CASADI_EXPORT GenericExternal : public External {
@@ -190,10 +190,10 @@ namespace casadi {
     void free_mem(void *mem) const override;
 
     /** \brief Serialize type information */
-    void serialize_type(Serializer &s) const override;
+    void serialize_type(SerializingStream &s) const override;
 
     /** \brief Deserializing constructor */
-    explicit GenericExternal(DeSerializer& s);
+    explicit GenericExternal(DeserializingStream& s);
 
   };
 

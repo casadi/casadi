@@ -33,8 +33,8 @@
 #include <vector>
 
 namespace casadi {
-  class Serializer;
-  class DeSerializer;
+  class SerializingStream;
+  class DeserializingStream;
 #if !(defined(SWIG) && !defined(SWIGXML))
 
   /** \brief  Types of options */
@@ -210,10 +210,10 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Serialize an object */
-    void serialize(Serializer& s) const;
+    void serialize(SerializingStream& s) const;
 
     /** \brief Deserialize with type disambiguation */
-    static GenericType deserialize(DeSerializer& s);
+    static GenericType deserialize(DeserializingStream& s);
   };
 
   /// C++ equivalent of Python's dict or MATLAB's struct

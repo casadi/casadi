@@ -24,7 +24,7 @@
 
 
 #include "io_instruction.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -92,14 +92,14 @@ namespace casadi {
     return ret;
   }
 
-  void IOInstruction::serialize_body(Serializer& s) const {
+  void IOInstruction::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
     s.pack("IOInstruction::ind", ind_);
     s.pack("IOInstruction::segment", segment_);
     s.pack("IOInstruction::offset", offset_);
   }
 
-  IOInstruction::IOInstruction(DeSerializer& s) : MXNode(s) {
+  IOInstruction::IOInstruction(DeserializingStream& s) : MXNode(s) {
     s.unpack("IOInstruction::ind", ind_);
     s.unpack("IOInstruction::segment", segment_);
     s.unpack("IOInstruction::offset", offset_);

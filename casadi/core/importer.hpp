@@ -176,10 +176,10 @@ namespace casadi {
 #endif // SWIG
 
     /** \brief Serialize an object */
-    void serialize(Serializer &s) const;
+    void serialize(SerializingStream &s) const;
 
     /** \brief Deserialize with type disambiguation */
-    static Importer deserialize(DeSerializer& s);
+    static Importer deserialize(DeserializingStream& s);
   };
 
 } // namespace casadi

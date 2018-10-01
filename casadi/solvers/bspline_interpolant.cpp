@@ -308,7 +308,7 @@ namespace casadi {
     return S_->get_jacobian(name, inames, onames, opts);
   }
 
-  BSplineInterpolant::BSplineInterpolant(DeSerializer& s) : Interpolant(s) {
+  BSplineInterpolant::BSplineInterpolant(DeserializingStream& s) : Interpolant(s) {
     s.unpack("BSplineInterpolant::degree", degree_);
     s.unpack("BSplineInterpolant::linear_solver", linear_solver_);
     s.unpack("BSplineInterpolant::s", S_);
@@ -318,7 +318,7 @@ namespace casadi {
     s.unpack("BSplineInterpolant::smooth_linear_frac", smooth_linear_frac_);
   }
 
-  void BSplineInterpolant::serialize_body(Serializer &s) const {
+  void BSplineInterpolant::serialize_body(SerializingStream &s) const {
     Interpolant::serialize_body(s);
 
     s.pack("BSplineInterpolant::degree", degree_);

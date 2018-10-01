@@ -357,7 +357,7 @@ namespace casadi {
     return stats;
   }
 
-  Qrqp::Qrqp(DeSerializer& s) : Conic(s) {
+  Qrqp::Qrqp(DeserializingStream& s) : Conic(s) {
     s.unpack("Qrqp::AT", AT_);
     s.unpack("Qrqp::kkt", kkt_);
     s.unpack("Qrqp::sp_v", sp_v_);
@@ -372,7 +372,7 @@ namespace casadi {
     set_qp_prob();
   }
 
-  void Qrqp::serialize_body(Serializer &s) const {
+  void Qrqp::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
 
     s.pack("Qrqp::AT", AT_);

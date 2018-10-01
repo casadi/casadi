@@ -183,10 +183,10 @@ class CASADI_EXPORT SXFunction :
   std::vector<double> default_in_;
 
     /** \brief Serialize an object without type information */
-  void serialize_body(Serializer &s) const override;
+  void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize without type information */
-  static ProtoFunction* deserialize(DeSerializer& s);
+  static ProtoFunction* deserialize(DeserializingStream& s);
 
   ///@{
   /** \brief Options */
@@ -231,7 +231,7 @@ class CASADI_EXPORT SXFunction :
 
 protected:
   /** \brief Deserializing constructor */
-  explicit SXFunction(DeSerializer& s);
+  explicit SXFunction(DeserializingStream& s);
 };
 
 

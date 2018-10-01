@@ -25,7 +25,7 @@
 
 #include "slice.hpp"
 #include "casadi_misc.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 namespace casadi {
@@ -254,13 +254,13 @@ namespace casadi {
   }
 
 
-  void Slice::serialize(Serializer& s) const {
+  void Slice::serialize(SerializingStream& s) const {
     s.pack("Slice::start", start);
     s.pack("Slice::stop", stop);
     s.pack("Slice::step", step);
   }
 
-  Slice Slice::deserialize(DeSerializer& s) {
+  Slice Slice::deserialize(DeserializingStream& s) {
     casadi_int start, stop, step;
     s.unpack("Slice::start", start);
     s.unpack("Slice::stop", stop);

@@ -119,10 +119,10 @@ namespace casadi {
     void reset_input() const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Reshape(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Reshape(s); }
   protected:
     /** \brief Deserializing constructor */
-    explicit Reshape(DeSerializer& s) : MXNode(s) {}
+    explicit Reshape(DeserializingStream& s) : MXNode(s) {}
   };
 
 } // namespace casadi

@@ -658,7 +658,7 @@ namespace casadi {
     return stats;
   }
 
-  void Conic::serialize(Serializer &s, const SDPToSOCPMem& m) const {
+  void Conic::serialize(SerializingStream &s, const SDPToSOCPMem& m) const {
     s.pack("Conic::SDPToSOCPMem::r", m.r);
     s.pack("Conic::SDPToSOCPMem::AT", m.AT);
     s.pack("Conic::SDPToSOCPMem::A_mapping", m.A_mapping);
@@ -666,7 +666,7 @@ namespace casadi {
     s.pack("Conic::SDPToSOCPMem::map_P", m.map_P);
     s.pack("Conic::SDPToSOCPMem::indval_size", m.indval_size);
   }
-  void Conic::deserialize(DeSerializer &s, SDPToSOCPMem& m) {
+  void Conic::deserialize(DeserializingStream &s, SDPToSOCPMem& m) {
     s.unpack("Conic::SDPToSOCPMem::r", m.r);
     s.unpack("Conic::SDPToSOCPMem::AT", m.AT);
     s.unpack("Conic::SDPToSOCPMem::A_mapping", m.A_mapping);
@@ -675,7 +675,7 @@ namespace casadi {
     s.unpack("Conic::SDPToSOCPMem::indval_size", m.indval_size);
   }
 
-  void Conic::serialize_body(Serializer &s) const {
+  void Conic::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
     s.pack("Conic::discrete", discrete_);
@@ -688,16 +688,16 @@ namespace casadi {
     s.pack("Conic::np", np_);
   }
 
-  void Conic::serialize_type(Serializer &s) const {
+  void Conic::serialize_type(SerializingStream &s) const {
     FunctionInternal::serialize_type(s);
     PluginInterface<Conic>::serialize_type(s);
   }
 
-  ProtoFunction* Conic::deserialize(DeSerializer& s) {
+  ProtoFunction* Conic::deserialize(DeserializingStream& s) {
     return PluginInterface<Conic>::deserialize(s);
   }
 
-  Conic::Conic(DeSerializer & s) : FunctionInternal(s) {
+  Conic::Conic(DeserializingStream & s) : FunctionInternal(s) {
     s.unpack("Conic::discrete", discrete_);
     s.unpack("Conic::H", H_);
     s.unpack("Conic::A", A_);

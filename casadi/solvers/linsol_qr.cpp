@@ -153,7 +153,7 @@ namespace casadi {
     g << "}\n";
   }
 
-  LinsolQr::LinsolQr(DeSerializer& s) : LinsolInternal(s) {
+  LinsolQr::LinsolQr(DeserializingStream& s) : LinsolInternal(s) {
     s.unpack("LinsolQr::prinv", prinv_);
     s.unpack("LinsolQr::pc", pc_);
     s.unpack("LinsolQr::sp_v", sp_v_);
@@ -161,7 +161,7 @@ namespace casadi {
     s.unpack("LinsolQr::eps", eps_);
   }
 
-  void LinsolQr::serialize_body(Serializer &s) const {
+  void LinsolQr::serialize_body(SerializingStream &s) const {
     LinsolInternal::serialize_body(s);
     s.pack("LinsolQr::prinv", prinv_);
     s.pack("LinsolQr::pc", pc_);

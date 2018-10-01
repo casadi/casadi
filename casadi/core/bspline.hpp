@@ -69,19 +69,19 @@ namespace casadi {
     casadi_int m_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
     /** \brief Serialize type information */
-    void serialize_type(Serializer &s) const override;
+    void serialize_type(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeSerializer& s);
+    static ProtoFunction* deserialize(DeserializingStream& s);
 
     /** \brief String used to identify the immediate FunctionInternal subclass */
     std::string serialize_base_function() const override { return "BSpline"; }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit BSplineCommon(DeSerializer& s);
+    explicit BSplineCommon(DeserializingStream& s);
   };
 
   class BSpline : public BSplineCommon {
@@ -149,16 +149,16 @@ namespace casadi {
     std::vector<double> coeffs_;
 
     /** \brief Serialize type information */
-    void serialize_type(Serializer &s) const override;
+    void serialize_type(SerializingStream &s) const override;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new BSpline(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new BSpline(s); }
 
     /** \brief Deserializing constructor */
-    explicit BSpline(DeSerializer& s);
+    explicit BSpline(DeserializingStream& s);
 
   private:
     std::vector<double> derivative_coeff(casadi_int i) const;
@@ -245,16 +245,16 @@ namespace casadi {
     casadi_int N_;
 
     /** \brief Serialize type information */
-    void serialize_type(Serializer &s) const override;
+    void serialize_type(SerializingStream &s) const override;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new BSplineDual(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new BSplineDual(s); }
 
     /** \brief Deserializing constructor */
-    explicit BSplineDual(DeSerializer& s);
+    explicit BSplineDual(DeserializingStream& s);
   };
 
 } // namespace casadi

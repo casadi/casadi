@@ -97,11 +97,11 @@ namespace casadi {
     return (*this)->body(symname);
   }
 
-  void Importer::serialize(Serializer &s) const {
+  void Importer::serialize(SerializingStream &s) const {
     return (*this)->serialize(s);
   }
 
-  Importer Importer::deserialize(DeSerializer& s) {
+  Importer Importer::deserialize(DeserializingStream& s) {
     return Importer::create(ImporterInternal::deserialize(s));
   }
 

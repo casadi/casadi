@@ -185,11 +185,11 @@ namespace casadi {
     }
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
   protected:
     /** \brief Deserializing constructor */
-    explicit SundialsInterface(DeSerializer& s);
+    explicit SundialsInterface(DeserializingStream& s);
   };
 
   // Check if N_Vector is regular

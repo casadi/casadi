@@ -148,11 +148,11 @@ namespace casadi {
   }
 
 
-  LinearInterpolant::LinearInterpolant(DeSerializer& s) : Interpolant(s) {
+  LinearInterpolant::LinearInterpolant(DeserializingStream& s) : Interpolant(s) {
     s.unpack("LinearInterpolant::lookup_mode", lookup_mode_);
   }
 
-  ProtoFunction* LinearInterpolant::deserialize(DeSerializer& s) {
+  ProtoFunction* LinearInterpolant::deserialize(DeserializingStream& s) {
     char type;
     s.unpack("LinearInterpolant::type", type);
     switch (type) {
@@ -163,17 +163,17 @@ namespace casadi {
     }
   }
 
-  void LinearInterpolant::serialize_body(Serializer &s) const {
+  void LinearInterpolant::serialize_body(SerializingStream &s) const {
     Interpolant::serialize_body(s);
     s.pack("LinearInterpolant::lookup_mode", lookup_mode_);
   }
 
-  void LinearInterpolant::serialize_type(Serializer &s) const {
+  void LinearInterpolant::serialize_type(SerializingStream &s) const {
     Interpolant::serialize_type(s);
     s.pack("LinearInterpolant::type", 'f');
   }
 
-  void LinearInterpolantJac::serialize_type(Serializer &s) const {
+  void LinearInterpolantJac::serialize_type(SerializingStream &s) const {
     FunctionInternal::serialize_type(s);
     auto m = derivative_of_.get<LinearInterpolant>();
     m->PluginInterface<Interpolant>::serialize_type(s);

@@ -106,11 +106,11 @@ namespace casadi {
     std::string class_name() const override { return "CsparseInterface";}
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new CsparseInterface(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new CsparseInterface(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit CsparseInterface(DeSerializer& s) : LinsolInternal(s) {}
+    explicit CsparseInterface(DeserializingStream& s) : LinsolInternal(s) {}
   };
 
 } // namespace casadi

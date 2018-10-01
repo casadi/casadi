@@ -482,7 +482,7 @@ namespace casadi {
     }
 
 
-  void BSplineCommon::serialize_body(Serializer &s) const {
+  void BSplineCommon::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
     s.pack("BSplineCommon::sp_jac_dae", lookup_mode_);
@@ -495,7 +495,7 @@ namespace casadi {
     s.pack("BSplineCommon::m", m_);
   }
 
-  BSplineCommon::BSplineCommon(DeSerializer& s) : FunctionInternal(s) {
+  BSplineCommon::BSplineCommon(DeserializingStream& s) : FunctionInternal(s) {
     s.unpack("BSplineCommon::sp_jac_dae", lookup_mode_);
     s.unpack("BSplineCommon::knots", knots_);
     s.unpack("BSplineCommon::offset", offset_);
@@ -506,21 +506,21 @@ namespace casadi {
     s.unpack("BSplineCommon::m", m_);
   }
 
-  void BSplineCommon::serialize_type(Serializer &s) const {
+  void BSplineCommon::serialize_type(SerializingStream &s) const {
     FunctionInternal::serialize_type(s);
   }
 
-  void BSpline::serialize_type(Serializer &s) const {
+  void BSpline::serialize_type(SerializingStream &s) const {
     BSplineCommon::serialize_type(s);
     s.pack("BSplineCommon::type", 'p');
   }
 
-  void BSplineDual::serialize_type(Serializer &s) const {
+  void BSplineDual::serialize_type(SerializingStream &s) const {
     BSplineCommon::serialize_type(s);
     s.pack("BSplineCommon::type", 'd');
   }
 
-  ProtoFunction* BSplineCommon::deserialize(DeSerializer& s) {
+  ProtoFunction* BSplineCommon::deserialize(DeserializingStream& s) {
     char type;
     s.unpack("BSplineCommon::type", type);
     switch (type) {
@@ -531,17 +531,17 @@ namespace casadi {
     }
   }
 
-  void BSpline::serialize_body(Serializer &s) const {
+  void BSpline::serialize_body(SerializingStream &s) const {
     BSplineCommon::serialize_body(s);
 
     s.pack("BSpline::coeffs", coeffs_);
   }
 
-  BSpline::BSpline(DeSerializer& s) : BSplineCommon(s) {
+  BSpline::BSpline(DeserializingStream& s) : BSplineCommon(s) {
     s.unpack("BSpline::coeffs", coeffs_);
   }
 
-  void BSplineDual::serialize_body(Serializer &s) const {
+  void BSplineDual::serialize_body(SerializingStream &s) const {
     BSplineCommon::serialize_body(s);
 
     s.pack("BSplineDual::x", x_);
@@ -549,7 +549,7 @@ namespace casadi {
     s.pack("BSplineDual::N", N_);
   }
 
-  BSplineDual::BSplineDual(DeSerializer& s) : BSplineCommon(s) {
+  BSplineDual::BSplineDual(DeserializingStream& s) : BSplineCommon(s) {
     s.unpack("BSplineDual::x", x_);
     s.unpack("BSplineDual::reverse", reverse_);
     s.unpack("BSplineDual::N", N_);

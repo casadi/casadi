@@ -29,7 +29,7 @@
 #include "global_options.hpp"
 #include "external.hpp"
 #include "finite_differences.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 #include "mx_function.hpp"
 #include "sx_function.hpp"
 #include "rootfinder_impl.hpp"
@@ -2859,21 +2859,21 @@ namespace casadi {
     }
   }
 
-  void ProtoFunction::serialize_body(Serializer& s) const {
+  void ProtoFunction::serialize_body(SerializingStream& s) const {
     s.pack("ProtoFunction::name", name_);
     s.pack("ProtoFunction::verbose", verbose_);
   }
 
-  ProtoFunction::ProtoFunction(DeSerializer& s) {
+  ProtoFunction::ProtoFunction(DeserializingStream& s) {
     s.unpack("ProtoFunction::name", name_);
     s.unpack("ProtoFunction::verbose", verbose_);
   }
 
-  void FunctionInternal::serialize_type(Serializer &s) const {
+  void FunctionInternal::serialize_type(SerializingStream &s) const {
     s.pack("FunctionInternal::base_function", serialize_base_function());
   }
 
-  void FunctionInternal::serialize_body(Serializer& s) const {
+  void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
     s.pack("FunctionInternal::sp_out", sparsity_out_);
@@ -2919,7 +2919,7 @@ namespace casadi {
     s.pack("FunctionInternal::sz_w_tmp", sz_w_tmp_);
   }
 
-  FunctionInternal::FunctionInternal(DeSerializer& s) : ProtoFunction(s) {
+  FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
     s.unpack("FunctionInternal::sp_out", sparsity_out_);
     s.unpack("FunctionInternal::name_in", name_in_);
@@ -2970,12 +2970,12 @@ namespace casadi {
 
   }
 
-  void ProtoFunction::serialize(Serializer& s) const {
+  void ProtoFunction::serialize(SerializingStream& s) const {
     serialize_type(s);
     serialize_body(s);
   }
 
-  Function FunctionInternal::deserialize(DeSerializer& s) {
+  Function FunctionInternal::deserialize(DeserializingStream& s) {
     std::string base_function;
     s.unpack("FunctionInternal::base_function", base_function);
     auto it = FunctionInternal::deserialize_map.find(base_function);
@@ -2991,7 +2991,8 @@ namespace casadi {
   /*
   * Keys are given by serialize_base_function()
   */
-  std::map<std::string, ProtoFunction* (*)(DeSerializer&)> FunctionInternal::deserialize_map = {
+  std::map<std::string, ProtoFunction* (*)(DeserializingStream&)>
+      FunctionInternal::deserialize_map = {
     {"MXFunction", MXFunction::deserialize},
     {"SXFunction", SXFunction::deserialize},
     {"Interpolant", Interpolant::deserialize},

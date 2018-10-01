@@ -24,7 +24,7 @@
 
 
 #include "transpose.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -35,17 +35,17 @@ namespace casadi {
     set_sparsity(x.sparsity().T());
   }
 
-  void Transpose::serialize_type(Serializer& s) const {
+  void Transpose::serialize_type(SerializingStream& s) const {
     MXNode::serialize_type(s);
     s.pack("Transpose::dense", false);
   }
 
-  void DenseTranspose::serialize_type(Serializer& s) const {
+  void DenseTranspose::serialize_type(SerializingStream& s) const {
     MXNode::serialize_type(s);
     s.pack("Transpose::dense", true);
   }
 
-  MXNode* Transpose::deserialize(DeSerializer& s) {
+  MXNode* Transpose::deserialize(DeserializingStream& s) {
     bool t;
     s.unpack("Transpose::dense", t);
     if (t) {

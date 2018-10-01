@@ -170,11 +170,11 @@ namespace casadi {
     return 0;
   }
 
-  LapackQr::LapackQr(DeSerializer& s) : LinsolInternal(s) {
+  LapackQr::LapackQr(DeserializingStream& s) : LinsolInternal(s) {
     s.unpack("LapackQr::max_nrhs", max_nrhs_);
   }
 
-  void LapackQr::serialize_body(Serializer &s) const {
+  void LapackQr::serialize_body(SerializingStream &s) const {
     LinsolInternal::serialize_body(s);
     s.pack("LapackQr::max_nrhs", max_nrhs_);
   }

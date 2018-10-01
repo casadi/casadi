@@ -456,13 +456,13 @@ namespace casadi {
     if (this->env) GRBfreeenv(this->env);
   }
 
-  GurobiInterface::GurobiInterface(DeSerializer& s) : Conic(s) {
+  GurobiInterface::GurobiInterface(DeserializingStream& s) : Conic(s) {
     s.unpack("GurobiInterface::vtype", vtype_);
     s.unpack("GurobiInterface::opts", opts_);
     Conic::deserialize(s, sdp_to_socp_mem_);
   }
 
-  void GurobiInterface::serialize_body(Serializer &s) const {
+  void GurobiInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
 
     s.pack("GurobiInterface::vtype", vtype_);

@@ -854,12 +854,12 @@ namespace casadi {
     if (this->mem) CVodeFree(&this->mem);
   }
 
-  CvodesInterface::CvodesInterface(DeSerializer& s) : SundialsInterface(s) {
+  CvodesInterface::CvodesInterface(DeserializingStream& s) : SundialsInterface(s) {
     s.unpack("CvodesInterface::lmm", lmm_);
     s.unpack("CvodesInterface::iter", iter_);
   }
 
-  void CvodesInterface::serialize_body(Serializer &s) const {
+  void CvodesInterface::serialize_body(SerializingStream &s) const {
     SundialsInterface::serialize_body(s);
     s.pack("CvodesInterface::lmm", lmm_);
     s.pack("CvodesInterface::iter", iter_);

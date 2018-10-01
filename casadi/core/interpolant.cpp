@@ -210,7 +210,7 @@ namespace casadi {
     return ret;
   }
 
-  void Interpolant::serialize_body(Serializer &s) const {
+  void Interpolant::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
     s.pack("Interpolant::ndim", ndim_);
@@ -221,16 +221,16 @@ namespace casadi {
     s.pack("Interpolant::lookup_modes", lookup_modes_);
   }
 
-  void Interpolant::serialize_type(Serializer &s) const {
+  void Interpolant::serialize_type(SerializingStream &s) const {
     FunctionInternal::serialize_type(s);
     PluginInterface<Interpolant>::serialize_type(s);
   }
 
-  ProtoFunction* Interpolant::deserialize(DeSerializer& s) {
+  ProtoFunction* Interpolant::deserialize(DeserializingStream& s) {
     return PluginInterface<Interpolant>::deserialize(s);
   }
 
-  Interpolant::Interpolant(DeSerializer & s) : FunctionInternal(s) {
+  Interpolant::Interpolant(DeserializingStream & s) : FunctionInternal(s) {
     s.unpack("Interpolant::ndim", ndim_);
     s.unpack("Interpolant::m", m_);
     s.unpack("Interpolant::grid", grid_);

@@ -25,6 +25,7 @@
 
 #include "function.hpp"
 #include "serializer.hpp"
+#include "serializing_stream.hpp"
 #include "slice.hpp"
 #include "linsol.hpp"
 #include "importer.hpp"
@@ -34,262 +35,156 @@
 using namespace std;
 namespace casadi {
 
-    static casadi_int serialization_protocol_version = 3;
-    static casadi_int serialization_check = 123456789012345;
-
-    DeSerializer::DeSerializer(std::istream& in_s) : in(in_s), debug_(false) {
-
-      // Sanity check
-      casadi_int check;
-      unpack(check);
-      casadi_assert(check==serialization_check,
-        "DeSerializer sanity check failed. "
-        "Expected " + str(serialization_check) + ", but got " + str(check) + ".");
-
-      // API version check
-      casadi_int v;
-      unpack(v);
-      casadi_assert(v==serialization_protocol_version,
-        "Serialization protocol is not compatible. "
-        "Got version " + str(v) + ", while " +
-        str(serialization_protocol_version) + " was expected.");
-
-      bool debug;
-      unpack(debug);
-      debug_ = debug;
-
+    StringSerializer::StringSerializer(const Dict& opts) :
+        SerializerBase(std::unique_ptr<std::ostream>(new std::stringstream()), opts) {
     }
 
-    Serializer::Serializer(std::ostream& out_s, const Dict& opts) : out(out_s), debug_(false) {
-      // Sanity check
-      pack(serialization_check);
-      // API version check
-      pack(casadi_int(serialization_protocol_version));
-
-      bool debug = false;
-
-      // Read options
-      for (auto&& op : opts) {
-        if (op.first=="debug") {
-          debug = op.second;
-        } else {
-          casadi_error("Unknown option: '" + op.first + "'.");
-        }
-      }
-
-      pack(debug);
-      debug_ = debug;
-    }
-
-    void Serializer::decorate(char e) {
-      if (debug_) pack(e);
-    }
-
-    void DeSerializer::assert_decoration(char e) {
-      if (debug_) {
-        char t;
-        unpack(t);
-        casadi_assert(t==e, "DeSerializer error '" + str(e) + "' vs '" + str(t) + "'.");
+    FileSerializer::FileSerializer(const std::string& fname, const Dict& opts) :
+        SerializerBase(
+          std::unique_ptr<std::ostream>(
+            new std::ofstream(fname, ios_base::binary | std::ios::out)),
+          opts) {
+      if ((stream_->rdstate() & std::ifstream::failbit) != 0) {
+        casadi_error("Could not open file '" + fname + "' for writing.");
       }
     }
 
-    void DeSerializer::unpack(casadi_int& e) {
-      assert_decoration('J');
-      int64_t n;
-      char* c = reinterpret_cast<char*>(&n);
-
-      for (int j=0;j<8;++j) unpack(c[j]);
-      e = n;
+    SerializerBase::SerializerBase(std::unique_ptr<std::ostream> stream, const Dict& opts) :
+        stream_(std::move(stream)),
+        serializer_(new SerializingStream(*stream_.get(), opts)) {
     }
 
-    void Serializer::pack(casadi_int e) {
-      decorate('J');
-      int64_t n = e;
-      const char* c = reinterpret_cast<const char*>(&n);
-      for (int j=0;j<8;++j) pack(c[j]);
+    std::string SerializerBase::type_to_string(SerializationType type) {
+      switch (type) {
+        case SERIALIZED_SPARSITY: return "sparsity";
+        case SERIALIZED_MX: return "mx";
+        case SERIALIZED_IM: return "im";
+        case SERIALIZED_DM: return "dm";
+        case SERIALIZED_SX: return "sx";
+        case SERIALIZED_LINSOL: return "linsol";
+        case SERIALIZED_FUNCTION: return "function";
+        case SERIALIZED_GENERICTYPE: return "generictype";
+        case SERIALIZED_INT: return "int";
+        case SERIALIZED_DOUBLE: return "double";
+        case SERIALIZED_STRING: return "string";
+        case SERIALIZED_SPARSITY_VECTOR: return "sparsity_vector";
+        case SERIALIZED_MX_VECTOR: return "mx_vector";
+        case SERIALIZED_IM_VECTOR: return "im_vector";
+        case SERIALIZED_DM_VECTOR: return "dm_vector";
+        case SERIALIZED_SX_VECTOR: return "sx_vector";
+        case SERIALIZED_LINSOL_VECTOR: return "linsol_vector";
+        case SERIALIZED_FUNCTION_VECTOR: return "function_vector";
+        case SERIALIZED_GENERICTYPE_VECTOR: return "generictype_vector";
+        case SERIALIZED_INT_VECTOR: return "int_vector";
+        case SERIALIZED_DOUBLE_VECTOR: return "double_vector";
+        case SERIALIZED_STRING_VECTOR: return "string_vector";
+        default: casadi_error("Unknown type" + str(type));
+      }
     }
 
-    void Serializer::pack(size_t e) {
-      decorate('K');
-      uint64_t n = e;
-      const char* c = reinterpret_cast<const char*>(&n);
-      for (int j=0;j<8;++j) pack(c[j]);
+    FileSerializer::~FileSerializer() {
     }
 
-    void DeSerializer::unpack(size_t& e) {
-      assert_decoration('K');
-      uint64_t n;
-      char* c = reinterpret_cast<char*>(&n);
-
-      for (int j=0;j<8;++j) unpack(c[j]);
-      e = n;
+    std::string StringSerializer::encode() {
+      std::string ret = static_cast<std::stringstream*>(stream_.get())->str();
+      static_cast<std::stringstream*>(stream_.get())->str("");
+      stream_->clear();
+      return ret;
+    }
+    void StringDeserializer::decode(const std::string& string) {
+      casadi_assert(stream_->peek()==char_traits<char>::eof(),
+        "StringDeserializer::decode does not apply: current string not fully consumed yet.");
+      static_cast<std::stringstream*>(stream_.get())->str(string);
+      stream_->clear(); // reset error flags
     }
 
-    void DeSerializer::unpack(int& e) {
-      assert_decoration('i');
-      int32_t n;
-      char* c = reinterpret_cast<char*>(&n);
+    SerializerBase::~SerializerBase() { }
+    StringSerializer::~StringSerializer() { }
 
-      for (int j=0;j<4;++j) unpack(c[j]);
-      e = n;
+    DeserializerBase::DeserializerBase(std::unique_ptr<std::istream> stream) :
+      stream_(std::move(stream)),
+      deserializer_(new DeserializingStream(*stream_.get())) {
     }
 
-    void Serializer::pack(int e) {
-      decorate('i');
-      int32_t n = e;
-      const char* c = reinterpret_cast<const char*>(&n);
-      for (int j=0;j<4;++j) pack(c[j]);
+    FileDeserializer::FileDeserializer(const std::string& fname) :
+        DeserializerBase(std::unique_ptr<std::istream>(
+          new std::ifstream(fname, ios_base::binary | std::ios::in))) {
+      if ((stream_->rdstate() & std::ifstream::failbit) != 0) {
+        casadi_error("Could not open file '" + fname + "' for reading.");
+      }
     }
 
-    void DeSerializer::unpack(bool& e) {
-      assert_decoration('b');
-      char n;
-      unpack(n);
-      e = n;
+    StringDeserializer::StringDeserializer(const std::string& string) :
+        DeserializerBase(std::unique_ptr<std::istream>(
+          new std::stringstream(string))) {
     }
 
-    void Serializer::pack(bool e) {
-      decorate('b');
-      pack(static_cast<char>(e));
+    DeserializerBase::~DeserializerBase() { }
+    StringDeserializer::~StringDeserializer() { }
+    FileDeserializer::~FileDeserializer() { }
+
+    SerializingStream& SerializerBase::serializer() {
+      return *serializer_.get();
     }
 
-    void DeSerializer::unpack(char& e) {
-      unsigned char ref = 'a';
-      in.get(e);
-      char t;
-      in.get(t);
-      e = (reinterpret_cast<unsigned char&>(e)-ref) +
-          ((reinterpret_cast<unsigned char&>(t)-ref) << 4);
+    DeserializingStream& DeserializerBase::deserializer() {
+      casadi_assert(stream_->peek()!=char_traits<char>::eof(),
+        "Deserializer reached end of stream. Nothing left to unpack.");
+      return *deserializer_.get();
     }
 
-    void Serializer::pack(char e) {
-      unsigned char ref = 'a';
-      // Note: outputstreams work neatly with std::hex,
-      // but inputstreams don't
-      out.put(ref + (reinterpret_cast<unsigned char&>(e) % 16));
-      out.put(ref + (reinterpret_cast<unsigned char&>(e) >> 4));
+    SerializerBase::SerializationType DeserializerBase::pop_type() {
+      char type;
+      deserializer().unpack(type);
+      return static_cast<SerializerBase::SerializationType>(type);
     }
 
-    void Serializer::pack(const std::string& e) {
-      decorate('s');
-      int s = e.size();
-      pack(s);
-      const char* c = e.c_str();
-      for (int j=0;j<s;++j) pack(c[j]);
+#define SERIALIZEX(TYPE, Type, type, arg) \
+    void SerializerBase::pack(const Type& e) { \
+      serializer().pack(static_cast<char>(SERIALIZED_ ## TYPE));\
+      serializer().pack(Function("temp", {}, arg)); \
+      serializer().pack(e); \
+    } \
+    \
+    Type DeserializerBase::unpack_ ## type() { \
+      Function f; \
+      deserializer().unpack(f);\
+      Type ret;\
+      deserializer().unpack(ret);\
+      return ret;\
     }
 
-    void DeSerializer::unpack(std::string& e) {
-      assert_decoration('s');
-      int s;
-      unpack(s);
-      e.resize(s);
-      for (int j=0;j<s;++j) unpack(e[j]);
+#define SERIALIZEX_ALL(TYPE, Type, type)\
+  SERIALIZEX(TYPE, Type, type, {e})\
+  SERIALIZEX(TYPE ## _VECTOR, std::vector< Type >, type ## _vector, e)
+
+SERIALIZEX_ALL(MX, MX, mx)
+SERIALIZEX_ALL(SX, SX, sx)
+
+#define SERIALIZE(TYPE, Type, type) \
+    void SerializerBase::pack(const Type& e) { \
+      serializer().pack(static_cast<char>(SERIALIZED_ ## TYPE));\
+      serializer().pack(e); \
+    } \
+    \
+    Type DeserializerBase::unpack_ ## type() { \
+      Type ret;\
+      deserializer().unpack(ret);\
+      return ret;\
     }
 
-    void DeSerializer::unpack(double& e) {
-      assert_decoration('d');
-      char* c = reinterpret_cast<char*>(&e);
-      for (int j=0;j<8;++j) unpack(c[j]);
-    }
+#define SERIALIZE_ALL(TYPE, Type, type)\
+  SERIALIZE(TYPE, Type, type)\
+  SERIALIZE(TYPE ## _VECTOR, std::vector< Type >, type ## _vector)
 
-    void Serializer::pack(double e) {
-      decorate('d');
-      const char* c = reinterpret_cast<const char*>(&e);
-      for (int j=0;j<8;++j) pack(c[j]);
-    }
-
-    void Serializer::pack(const Sparsity& e) {
-      decorate('S');
-      shared_pack(e);
-    }
-
-    void DeSerializer::unpack(Sparsity& e) {
-      assert_decoration('S');
-      shared_unpack<Sparsity, SparsityInternal>(e);
-    }
-
-    void Serializer::pack(const MX& e) {
-      decorate('X');
-      shared_pack(e);
-    }
-
-    void DeSerializer::unpack(MX& e) {
-      assert_decoration('X');
-      shared_unpack<MX, MXNode>(e);
-    }
-
-    void Serializer::pack(const Function& e) {
-      decorate('X');
-      shared_pack(e);
-    }
-
-    void DeSerializer::unpack(Function& e) {
-      assert_decoration('X');
-      shared_unpack<Function, FunctionInternal>(e);
-    }
-
-    void Serializer::pack(const Importer& e) {
-      decorate('M');
-      shared_pack(e);
-    }
-
-    void DeSerializer::unpack(Importer& e) {
-      assert_decoration('M');
-      shared_unpack<Importer, ImporterInternal>(e);
-    }
-
-    void Serializer::pack(const Linsol& e) {
-      decorate('L');
-      shared_pack(e);
-    }
-
-    void DeSerializer::unpack(Linsol& e) {
-      assert_decoration('L');
-      shared_unpack<Linsol, LinsolInternal>(e);
-    }
-
-    void Serializer::pack(const GenericType& e) {
-      decorate('G');
-      shared_pack(e);
-    }
-
-    void DeSerializer::unpack(GenericType& e) {
-      assert_decoration('G');
-      shared_unpack<GenericType, SharedObjectInternal>(e);
-    }
-
-    void Serializer::pack(const Slice& e) {
-      decorate('S');
-      e.serialize(*this);
-    }
-
-    void DeSerializer::unpack(Slice& e) {
-      assert_decoration('S');
-      e = Slice::deserialize(*this);
-    }
-
-    void Serializer::pack(const SXElem& e) {
-      decorate('E');
-      shared_pack(e);
-    }
-
-    void DeSerializer::unpack(SXElem& e) {
-      assert_decoration('E');
-      shared_unpack<SXElem, SXNode>(e);
-    }
-
-  template<>
-  void DeSerializer::unpack(std::vector<bool>& e) {
-    assert_decoration('V');
-    casadi_int s;
-    unpack(s);
-    e.resize(s);
-    for (casadi_int i=0;i<s;++i) {
-      bool b;
-      unpack(b);
-      e[i] = b;
-    }
-  }
-
+SERIALIZE_ALL(SPARSITY, Sparsity, sparsity)
+SERIALIZE_ALL(DM, DM, dm)
+SERIALIZE_ALL(IM, IM, im)
+SERIALIZE_ALL(LINSOL, Linsol, linsol)
+SERIALIZE_ALL(FUNCTION, Function, function)
+SERIALIZE_ALL(GENERICTYPE, GenericType, generictype)
+SERIALIZE_ALL(INT, casadi_int, int)
+SERIALIZE_ALL(DOUBLE, double, double)
+SERIALIZE_ALL(STRING, std::string , string)
 
 } // namespace casadi

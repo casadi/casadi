@@ -1077,9 +1077,9 @@ namespace casadi {
     static Matrix<Scalar> deserialize(const std::string& s);
 
     /** \brief Serialize an object */
-    void serialize(Serializer& s) const;
+    void serialize(SerializingStream& s) const;
 
-    static Matrix<Scalar> deserialize(DeSerializer& s);
+    static Matrix<Scalar> deserialize(DeserializingStream& s);
 
     /** Export numerical matrix to file
     *

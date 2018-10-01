@@ -40,8 +40,8 @@
 namespace casadi {
   // Forward declaration
   class SparsityInternal;
-  class Serializer;
-  class DeSerializer;
+  class SerializingStream;
+  class DeserializingStream;
 
   #ifndef SWIG
     /** \brief Compact representation of a sparsity pattern */
@@ -365,10 +365,10 @@ namespace casadi {
     static Sparsity deserialize(const std::string& s);
 
     /** \brief Serialize an object */
-    void serialize(Serializer& s) const;
+    void serialize(SerializingStream& s) const;
 
     /** \brief Deserialize */
-    static Sparsity deserialize(DeSerializer& s);
+    static Sparsity deserialize(DeserializingStream& s);
 
 #ifndef SWIG
     /** \brief Get a reference to row-vector,

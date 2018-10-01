@@ -662,7 +662,7 @@ namespace casadi {
     }
   }
 
-  CplexInterface::CplexInterface(DeSerializer& s) : Conic(s) {
+  CplexInterface::CplexInterface(DeserializingStream& s) : Conic(s) {
     s.unpack("CplexInterface::opts", opts_);
     s.unpack("CplexInterface::qp_method", qp_method_);
     s.unpack("CplexInterface::dump_to_file", dump_to_file_);
@@ -674,7 +674,7 @@ namespace casadi {
     Conic::deserialize(s, sdp_to_socp_mem_);
   }
 
-  void CplexInterface::serialize_body(Serializer &s) const {
+  void CplexInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
 
     s.pack("CplexInterface::opts", opts_);

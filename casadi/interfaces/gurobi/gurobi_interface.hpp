@@ -125,14 +125,14 @@ namespace casadi {
     /// SDP to SOCP conversion memory
     SDPToSOCPMem sdp_to_socp_mem_;
 
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new GurobiInterface(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new GurobiInterface(s); }
 
   protected:
      /** \brief Deserializing constructor */
-    explicit GurobiInterface(DeSerializer& e);
+    explicit GurobiInterface(DeserializingStream& e);
   };
 
 } // namespace casadi

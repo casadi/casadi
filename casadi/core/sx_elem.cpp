@@ -593,11 +593,11 @@ namespace casadi {
     }
   }
 
-  void SXElem::serialize(Serializer& s) const {
+  void SXElem::serialize(SerializingStream& s) const {
     return (*this)->serialize(s);
   }
 
-  SXElem SXElem::deserialize(DeSerializer& s) {
+  SXElem SXElem::deserialize(DeserializingStream& s) {
     return SXElem::create(SXNode::deserialize(s));
   }
 

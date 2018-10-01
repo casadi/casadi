@@ -208,14 +208,14 @@ namespace casadi {
     std::vector<double> init_xdot_;
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeSerializer& s) { return new IdasInterface(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new IdasInterface(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit IdasInterface(DeSerializer& s);
+    explicit IdasInterface(DeserializingStream& s);
   };
 
 } // namespace casadi

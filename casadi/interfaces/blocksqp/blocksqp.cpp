@@ -2832,7 +2832,7 @@ namespace casadi {
   }
 
 
-  Blocksqp::Blocksqp(DeSerializer& s) : Nlpsol(s) {
+  Blocksqp::Blocksqp(DeserializingStream& s) : Nlpsol(s) {
     s.unpack("Blocksqp::nblocks", nblocks_);
     s.unpack("Blocksqp::blocks", blocks_);
     s.unpack("Blocksqp::dim", dim_);
@@ -2898,7 +2898,7 @@ namespace casadi {
 
   }
 
-  void Blocksqp::serialize_body(Serializer &s) const {
+  void Blocksqp::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
     s.pack("Blocksqp::nblocks", nblocks_);
     s.pack("Blocksqp::blocks", blocks_);

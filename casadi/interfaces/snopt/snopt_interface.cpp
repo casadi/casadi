@@ -556,7 +556,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
   std::vector<SnoptMemory*> SnoptMemory::mempool;
 
 
-  SnoptInterface::SnoptInterface(DeSerializer& s) : Nlpsol(s) {
+  SnoptInterface::SnoptInterface(DeserializingStream& s) : Nlpsol(s) {
     s.unpack("SnoptInterface::jacf_sp", jacf_sp_);
     s.unpack("SnoptInterface::jacg_sp", jacg_sp_);
     s.unpack("SnoptInterface::exact_hessian", exact_hessian_);
@@ -575,7 +575,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
     s.unpack("SnoptInterface::opts", opts_);
   }
 
-  void SnoptInterface::serialize_body(Serializer &s) const {
+  void SnoptInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
     s.pack("SnoptInterface::jacf_sp", jacf_sp_);
     s.pack("SnoptInterface::jacg_sp", jacg_sp_);

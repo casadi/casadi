@@ -24,7 +24,7 @@
 
 
 #include "assertion.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -114,12 +114,12 @@ namespace casadi {
     }
   }
 
-  void Assertion::serialize_body(Serializer& s) const {
+  void Assertion::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
     s.pack("Assertion::fail_message", fail_message_);
   }
 
-  Assertion::Assertion(DeSerializer& s) : MXNode(s) {
+  Assertion::Assertion(DeserializingStream& s) : MXNode(s) {
     s.unpack("Assertion::fail_message", fail_message_);
   }
 

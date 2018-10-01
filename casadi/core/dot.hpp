@@ -85,11 +85,11 @@ namespace casadi {
     casadi_int op() const override { return OP_DOT;}
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new Dot(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new Dot(s); }
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Dot(DeSerializer& s) : MXNode(s) {}
+    explicit Dot(DeserializingStream& s) : MXNode(s) {}
 
   };
 

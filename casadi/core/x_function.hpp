@@ -29,7 +29,7 @@
 #include <stack>
 #include "function_internal.hpp"
 #include "factory.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 // To reuse variables we need to be able to sort by sparsity pattern
 #include <unordered_map>
@@ -194,9 +194,19 @@ namespace casadi {
     /// @}
 
     /** \brief Deserializing constructor */
-    explicit XFunction(DeSerializer& s);
+    explicit XFunction(DeserializingStream& s);
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief  Helper functions to avoid recursion limit
+     *
+     * The out member is problematic to de/serialize before the sorted algorithm
+     * has a chance of laying out the expression graph efficiently
+    */
+    //@{
+    void delayed_serialize_members(SerializingStream &s) const;
+    void delayed_deserialize_members(DeserializingStream &s);
+    //@}
 
     // Data members (all public)
 
@@ -233,17 +243,29 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   XFunction<DerivedType, MatType, NodeType>::
-  XFunction(DeSerializer& s) : FunctionInternal(s) {
+  XFunction(DeserializingStream& s) : FunctionInternal(s) {
     s.unpack("XFunction::in", in_);
+    // 'out' member needs to be delayed
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>::
+  delayed_deserialize_members(DeserializingStream& s) {
     s.unpack("XFunction::out", out_);
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>::
-  serialize_body(Serializer& s) const {
+  delayed_serialize_members(SerializingStream& s) const {
+    s.pack("XFunction::out", out_);
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>::
+  serialize_body(SerializingStream& s) const {
     FunctionInternal::serialize_body(s);
     s.pack("XFunction::in", in_);
-    s.pack("XFunction::out", out_);
+    // 'out' member needs to be delayed
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>

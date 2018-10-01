@@ -134,19 +134,19 @@ namespace casadi {
     Dict info() const override { return {{"f", f_}, {"n", n_}}; }
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer &s) const override;
+    void serialize_body(SerializingStream &s) const override;
     /** \brief Serialize type information */
-    void serialize_type(Serializer &s) const override;
+    void serialize_type(SerializingStream &s) const override;
 
     /** \brief String used to identify the immediate FunctionInternal subclass */
     std::string serialize_base_function() const override { return "Map"; }
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeSerializer& s);
+    static ProtoFunction* deserialize(DeserializingStream& s);
 
   protected:
     /** \brief Deserializing constructor */
-    explicit Map(DeSerializer& s);
+    explicit Map(DeserializingStream& s);
 
     // Constructor (protected, use create function)
     Map(const std::string& name, const Function& f, casadi_int n);
@@ -191,7 +191,7 @@ namespace casadi {
 
   protected:
     /** \brief Deserializing constructor */
-    explicit OmpMap(DeSerializer& s) : Map(s) {}
+    explicit OmpMap(DeserializingStream& s) : Map(s) {}
   };
 
   /** A map Evaluate in parallel using std::thread
@@ -227,7 +227,7 @@ namespace casadi {
 
   protected:
     /** \brief Deserializing constructor */
-    explicit ThreadMap(DeSerializer& s) : Map(s) {}
+    explicit ThreadMap(DeserializingStream& s) : Map(s) {}
   };
 
 } // namespace casadi

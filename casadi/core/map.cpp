@@ -24,7 +24,7 @@
 
 
 #include "map.hpp"
-#include "serializer.hpp"
+#include "serializing_stream.hpp"
 
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
@@ -56,23 +56,23 @@ namespace casadi {
     : FunctionInternal(name), f_(f), n_(n) {
   }
 
-  void Map::serialize_body(Serializer &s) const {
+  void Map::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
     s.pack("Map::f", f_);
     s.pack("Map::n", n_);
   }
 
-  void Map::serialize_type(Serializer &s) const {
+  void Map::serialize_type(SerializingStream &s) const {
     FunctionInternal::serialize_type(s);
     s.pack("Map::class_name", class_name());
   }
 
-  Map::Map(DeSerializer& s) : FunctionInternal(s) {
+  Map::Map(DeserializingStream& s) : FunctionInternal(s) {
     s.unpack("Map::f", f_);
     s.unpack("Map::n", n_);
   }
 
-  ProtoFunction* Map::deserialize(DeSerializer& s) {
+  ProtoFunction* Map::deserialize(DeserializingStream& s) {
     std::string class_name;
     s.unpack("Map::class_name", class_name);
     if (class_name=="Map") {

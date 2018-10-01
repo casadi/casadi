@@ -95,17 +95,17 @@ namespace casadi {
     }
 
     /** \brief Serialize an object without type information */
-    void serialize_body(Serializer& s) const override;
+    void serialize_body(SerializingStream& s) const override;
 
     /** \brief Deserialize without type information */
-    static MXNode* deserialize(DeSerializer& s) { return new UnaryMX(s); }
+    static MXNode* deserialize(DeserializingStream& s) { return new UnaryMX(s); }
 
     //! \brief operation
     Operation op_;
 
   protected:
     /** \brief Deserializing constructor */
-    explicit UnaryMX(DeSerializer& s);
+    explicit UnaryMX(DeserializingStream& s);
 
   };
 

@@ -169,7 +169,7 @@ set(CASADI_INTERNAL
   variable.cpp
   dae_builder.cpp
   optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
-  serializer.cpp
+  serializer.cpp              serializing_stream.cpp               serializing_stream.hpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp

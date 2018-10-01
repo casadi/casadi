@@ -577,7 +577,7 @@ namespace casadi {
     return stats;
   }
 
-  Sqpmethod::Sqpmethod(DeSerializer& s) : Nlpsol(s) {
+  Sqpmethod::Sqpmethod(DeserializingStream& s) : Nlpsol(s) {
     s.unpack("Sqpmethod::qpsol", qpsol_);
     s.unpack("Sqpmethod::exact_hessian", exact_hessian_);
     s.unpack("Sqpmethod::max_iter", max_iter_);
@@ -599,7 +599,7 @@ namespace casadi {
     s.unpack("Sqpmethod::regularize", regularize_);
   }
 
-  void Sqpmethod::serialize_body(Serializer &s) const {
+  void Sqpmethod::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
     s.pack("Sqpmethod::qpsol", qpsol_);
     s.pack("Sqpmethod::exact_hessian", exact_hessian_);
