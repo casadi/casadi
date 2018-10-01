@@ -371,6 +371,7 @@ namespace casadi {
     s.unpack("Qrqp::max_iter", max_iter_);
     s.unpack("Qrqp::print_iter", print_iter_);
     s.unpack("Qrqp::print_header", print_header_);
+    s.unpack("Qrqp::print_info", print_info_);
     s.unpack("Qrqp::du_to_pr", du_to_pr_);
     s.unpack("Qrqp::min_lam", min_lam_);
     set_qp_prob();
@@ -388,6 +389,7 @@ namespace casadi {
     s.pack("Qrqp::max_iter", max_iter_);
     s.pack("Qrqp::print_iter", print_iter_);
     s.pack("Qrqp::print_header", print_header_);
+    s.pack("Qrqp::print_info", print_info_);
     s.pack("Qrqp::du_to_pr", du_to_pr_);
     s.pack("Qrqp::min_lam", min_lam_);
   }
