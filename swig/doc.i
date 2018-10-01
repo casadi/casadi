@@ -346,8 +346,8 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -400,8 +400,8 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -1240,8 +1240,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -2746,8 +2746,8 @@ double cNorm, double obj) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Blocksqp::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::Blocksqp::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -3184,8 +3184,8 @@ const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -3285,8 +3285,8 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::serialize_type(Serializer &s) const
-"
+%feature("docstring")  casadi::Nlpsol::serialize_type(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -4803,8 +4803,8 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::BSpline::serialize_type(Serializer &s) const
-"
+%feature("docstring")  casadi::BSpline::serialize_type(SerializingStream &s)
+const  "
 
 Serialize type information.
 
@@ -4844,8 +4844,8 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -5367,7 +5367,7 @@ Destructor.
 
 ";
 
-%feature("docstring") casadi::BSpline::BSpline(DeSerializer &s) "
+%feature("docstring") casadi::BSpline::BSpline(DeserializingStream &s) "
 
 Deserializing constructor.
 
@@ -5379,8 +5379,8 @@ Deserializing constructor.
 
 ";
 
-%feature("docstring")  casadi::BSpline::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::BSpline::serialize_body(SerializingStream &s)
+const  "
 
 Serialize an object without type information.
 
@@ -6012,8 +6012,8 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::BSplineCommon::serialize_body(Serializer &s)
-const  "
+%feature("docstring")
+casadi::BSplineCommon::serialize_body(SerializingStream &s) const  "
 
 Serialize an object without type information.
 
@@ -6243,8 +6243,8 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::BSplineCommon::serialize_type(Serializer &s)
-const  "
+%feature("docstring")
+casadi::BSplineCommon::serialize_type(SerializingStream &s) const  "
 
 Serialize type information.
 
@@ -6275,8 +6275,8 @@ Serialize type information.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -7284,8 +7284,8 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -7487,8 +7487,8 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::BSplineDual::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::BSplineDual::serialize_body(SerializingStream
+&s) const  "
 
 Serialize an object without type information.
 
@@ -8071,8 +8071,8 @@ Generate code for the body of the C function.
 
 ";
 
-%feature("docstring")  casadi::BSplineDual::serialize_type(Serializer &s)
-const  "
+%feature("docstring")  casadi::BSplineDual::serialize_type(SerializingStream
+&s) const  "
 
 Serialize type information.
 
@@ -8131,7 +8131,8 @@ std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::BSplineDual::BSplineDual(DeSerializer &s) "
+%feature("docstring") casadi::BSplineDual::BSplineDual(DeserializingStream
+&s) "
 
 Deserializing constructor.
 
@@ -8615,8 +8616,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -8777,8 +8778,8 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::BSplineInterpolant::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::BSplineInterpolant::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -9615,8 +9616,8 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::Interpolant::serialize_type(Serializer &s)
-const  "
+%feature("docstring")  casadi::Interpolant::serialize_type(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -11808,8 +11809,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -12451,8 +12452,8 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -12939,8 +12940,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -13303,8 +13304,8 @@ C++ includes: clang_compiler.hpp ";
 
 ";
 
-%feature("docstring")  casadi::ImporterInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::ImporterInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL] ";
 
@@ -13334,8 +13335,8 @@ C++ includes: clang_compiler.hpp ";
 
 ";
 
-%feature("docstring")  casadi::ImporterInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::ImporterInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL] ";
 
@@ -13352,8 +13353,8 @@ C++ includes: clang_compiler.hpp ";
 
 ";
 
-%feature("docstring")  casadi::ImporterInternal::serialize(Serializer &s)
-const  "
+%feature("docstring")  casadi::ImporterInternal::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL] ";
 
@@ -13521,8 +13522,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Integrator::serialize_type(Serializer &s)
-const  "
+%feature("docstring")  casadi::Integrator::serialize_type(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -13912,8 +13913,8 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -13974,8 +13975,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Collocation::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::Collocation::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -15495,8 +15496,8 @@ std::vector< M > &res, casadi_int &npar) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -15671,7 +15672,8 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::Conic::serialize_body(Serializer &s) const  "
+%feature("docstring")  casadi::Conic::serialize_body(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -15855,7 +15857,8 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::Conic::serialize_type(Serializer &s) const  "
+%feature("docstring")  casadi::Conic::serialize_type(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -17189,8 +17192,21 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1DenseTranspose.xml
 
 
-// File: classcasadi_1_1DeSerializer.xml
-%feature("docstring")  casadi::DeSerializer::unpack(Sparsity &e) "
+// File: classcasadi_1_1DeserializerBase.xml
+%feature("docstring") casadi::DeserializerBase "
+
+C++ includes: serializer.hpp ";
+
+
+// File: classcasadi_1_1DeserializingStream.xml
+%feature("docstring")
+casadi::DeserializingStream::DeserializingStream(std::istream &in_s) "
+
+Constructor.
+
+";
+
+%feature("docstring")  casadi::DeserializingStream::unpack(Sparsity &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17199,7 +17215,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(MX &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(MX &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17208,7 +17224,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(SXElem &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(SXElem &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17217,7 +17233,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(Linsol &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(Linsol &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17226,7 +17242,8 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(MatrixCommon &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(MatrixCommon &e)
+"
 
 Reconstruct an object from the input stream.
 
@@ -17235,7 +17252,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(Function &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(Function &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17244,7 +17261,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(Importer &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(Importer &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17253,7 +17270,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(GenericType &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(GenericType &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17262,7 +17279,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(Slice &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(Slice &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17271,7 +17288,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(int &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(int &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17280,7 +17297,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(bool &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(bool &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17289,7 +17306,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(casadi_int &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(casadi_int &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17298,7 +17315,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(size_t &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(size_t &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17307,7 +17324,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(std::string &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(std::string &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17316,7 +17333,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(double &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(double &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17325,7 +17342,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(char &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(char &e) "
 
 Reconstruct an object from the input stream.
 
@@ -17334,7 +17351,8 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(std::vector< T > &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(std::vector< T >
+&e) "
 
 Reconstruct an object from the input stream.
 
@@ -17343,7 +17361,8 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(std::map< K, V > &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(std::map< K, V >
+&e) "
 
 Reconstruct an object from the input stream.
 
@@ -17352,7 +17371,8 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(std::pair< A, B > &e) "
+%feature("docstring")  casadi::DeserializingStream::unpack(std::pair< A, B >
+&e) "
 
 Reconstruct an object from the input stream.
 
@@ -17361,7 +17381,7 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring")  casadi::DeSerializer::unpack(const std::string
+%feature("docstring")  casadi::DeserializingStream::unpack(const std::string
 &descr, T &e) "
 
 Reconstruct an object from the input stream.
@@ -17371,20 +17391,13 @@ stream. an error will be raised.
 
 ";
 
-%feature("docstring") casadi::DeSerializer::DeSerializer(std::istream &in_s)
-"
-
-Constructor.
-
-";
-
-%feature("docstring") casadi::DeSerializer "
+%feature("docstring") casadi::DeserializingStream "
 
 Helper class for Serialization.
 
 Joris Gillis
 
-C++ includes: serializer.hpp ";
+C++ includes: serializing_stream.hpp ";
 
 
 // File: classcasadi_1_1Determinant.xml
@@ -17458,8 +17471,8 @@ bool more) const  "
 
 ";
 
-%feature("docstring")  casadi::ImporterInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::ImporterInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL] ";
 
@@ -17533,8 +17546,8 @@ C++ includes: importer_internal.hpp ";
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ImporterInternal::serialize(Serializer &s)
-const  "
+%feature("docstring")  casadi::ImporterInternal::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL] ";
 
@@ -17556,8 +17569,8 @@ std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ImporterInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::ImporterInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL] ";
 
@@ -18157,8 +18170,8 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -18951,8 +18964,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -18998,15 +19011,15 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
 ";
 
 %feature("docstring")  casadi::PluginInterface< Dple
->::serialize_type(Serializer &s) const "
+>::serialize_type(SerializingStream &s) const "
 
 [INTERNAL]  Serialize type information.
 
@@ -19264,8 +19277,8 @@ ind) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -19933,8 +19946,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -20254,15 +20267,15 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
 ";
 
 %feature("docstring")  casadi::PluginInterface< Expm
->::serialize_type(Serializer &s) const "
+>::serialize_type(SerializingStream &s) const "
 
 [INTERNAL]  Serialize type information.
 
@@ -20910,8 +20923,8 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -20977,8 +20990,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -21773,8 +21786,8 @@ SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::External::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::External::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -22622,8 +22635,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -22972,8 +22985,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::serialize_type(Serializer &s)
-const  "
+%feature("docstring")  casadi::Rootfinder::serialize_type(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -23192,8 +23205,8 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::FastNewton::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::FastNewton::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -23267,6 +23280,36 @@ std::vector< std::string > &s_out, const Function::AuxOut
 &aux=Function::AuxOut()) "
 
 [INTERNAL]  Create an oracle function
+
+";
+
+
+// File: classcasadi_1_1FileDeserializer.xml
+%feature("docstring") casadi::FileDeserializer::FileDeserializer(const
+std::string &fname) "
+
+Advanced deserialization of CasADi objects.
+
+FileSerializer
+
+";
+
+%feature("docstring") casadi::FileDeserializer "
+
+C++ includes: serializer.hpp ";
+
+
+// File: classcasadi_1_1FileSerializer.xml
+%feature("docstring") casadi::FileSerializer "
+
+C++ includes: serializer.hpp ";
+
+%feature("docstring") casadi::FileSerializer::FileSerializer(const
+std::string &fname, const Dict &opts=Dict()) "
+
+Advanced serialization of CasADi objects.
+
+StringSerializer, FileDeserializer
 
 ";
 
@@ -23638,8 +23681,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -23753,8 +23796,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -24240,8 +24283,8 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -24889,7 +24932,7 @@ const  "
 [INTERNAL] ";
 
 %feature("docstring")
-casadi::FixedStepIntegrator::serialize_body(Serializer &s) const  "
+casadi::FixedStepIntegrator::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -25314,8 +25357,8 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -25383,8 +25426,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Integrator::serialize_type(Serializer &s)
-const  "
+%feature("docstring")  casadi::Integrator::serialize_type(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -26303,8 +26346,8 @@ const  "
 
 
 // File: classcasadi_1_1ForwardDiff.xml
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -27097,8 +27140,8 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -27532,8 +27575,8 @@ casadi::FiniteDiff::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -29997,8 +30040,8 @@ std::vector< MX > &arg) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -30270,8 +30313,8 @@ std::string &name, const Importer &li) "
 
 ";
 
-%feature("docstring") casadi::GenericExternal::GenericExternal(DeSerializer
-&s) "
+%feature("docstring")
+casadi::GenericExternal::GenericExternal(DeserializingStream &s) "
 
 [INTERNAL]  Deserializing constructor.
 
@@ -30425,8 +30468,8 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::GenericExternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::GenericExternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -30626,8 +30669,8 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::External::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::External::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -33074,8 +33117,8 @@ one.
 
 
 // File: classcasadi_1_1GenericType.xml
-%feature("docstring")  casadi::GenericType::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::GenericType::serialize(SerializingStream &s)
+const  "
 
 Serialize an object.
 
@@ -33112,8 +33155,8 @@ C++ includes: generic_type.hpp ";
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::GenericTypeBase::serialize(Serializer &s)
-const  "
+%feature("docstring")  casadi::GenericTypeBase::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL] ";
 
@@ -33642,7 +33685,8 @@ bool persistent=false) "
 ";
 
 %feature("docstring")
-casadi::ImplicitFixedStepIntegrator::serialize_body(Serializer &s) const  "
+casadi::ImplicitFixedStepIntegrator::serialize_body(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -33775,8 +33819,8 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -34578,8 +34622,8 @@ bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 
 ";
 
-%feature("docstring")  casadi::Integrator::serialize_type(Serializer &s)
-const  "
+%feature("docstring")  casadi::Integrator::serialize_type(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -35212,8 +35256,8 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -35462,8 +35506,8 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::Rootfinder::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -35708,8 +35752,8 @@ generated function.
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::serialize_type(Serializer &s)
-const  "
+%feature("docstring")  casadi::Rootfinder::serialize_type(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -36106,7 +36150,8 @@ Get class name.
 
 ";
 
-%feature("docstring")  casadi::Importer::serialize(Serializer &s) const  "
+%feature("docstring")  casadi::Importer::serialize(SerializingStream &s)
+const  "
 
 Serialize an object.
 
@@ -36654,8 +36699,8 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::Integrator::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::Integrator::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -36770,8 +36815,8 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::Integrator::serialize_type(Serializer &s)
-const  "
+%feature("docstring")  casadi::Integrator::serialize_type(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -36968,8 +37013,8 @@ double t, double *rx, double *rz, double *rq) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -37832,8 +37877,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Interpolant::serialize_type(Serializer &s)
-const  "
+%feature("docstring")  casadi::Interpolant::serialize_type(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -38152,8 +38197,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Interpolant::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::Interpolant::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -38902,8 +38947,8 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -40023,8 +40068,8 @@ ind) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -40113,8 +40158,8 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -40867,8 +40912,8 @@ i) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -40995,8 +41040,8 @@ double *x, casadi_int nrhs, bool tr) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -41020,8 +41065,8 @@ double *x, casadi_int nrhs, bool tr) const  "
 
 ";
 
-%feature("docstring")  casadi::LapackLu::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::LapackLu::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -41143,8 +41188,8 @@ class hierarchy in reverse order is run after init() has been completed.
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::LinsolInternal::serialize_type(Serializer &s)
-const  "
+%feature("docstring")
+casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -41554,8 +41599,8 @@ class hierarchy in reverse order is run after init() has been completed.
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::LinsolInternal::serialize_type(Serializer &s)
-const  "
+%feature("docstring")
+casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -41912,8 +41957,8 @@ double *x, casadi_int nrhs, bool tr) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -41939,8 +41984,8 @@ double *x, casadi_int nrhs, bool tr) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::LapackQr::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::LapackQr::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -42063,8 +42108,8 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::LinearInterpolant::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::LinearInterpolant::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -42656,8 +42701,8 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -42972,8 +43017,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::LinearInterpolant::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::LinearInterpolant::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -43618,8 +43663,8 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -43793,7 +43838,7 @@ std::vector< M > &res, casadi_int npar) const  "
 ";
 
 %feature("docstring")
-casadi::LinearInterpolantJac::serialize_type(Serializer &s) const  "
+casadi::LinearInterpolantJac::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -43857,7 +43902,7 @@ casadi::LinearInterpolantJac::LinearInterpolantJac(const std::string &name)
 ";
 
 %feature("docstring")
-casadi::LinearInterpolantJac::LinearInterpolantJac(DeSerializer &s) "
+casadi::LinearInterpolantJac::LinearInterpolantJac(DeserializingStream &s) "
 
 [INTERNAL]  Deserializing constructor.
 
@@ -44387,8 +44432,8 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -44855,8 +44900,8 @@ buf_sz, const char *fmt,...) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::LinsolLdl::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::LinsolLdl::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -44896,8 +44941,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -44950,8 +44995,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::serialize_type(Serializer &s)
-const  "
+%feature("docstring")
+casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -45121,8 +45166,8 @@ C++ includes: linsol_qr.hpp ";
 
 ";
 
-%feature("docstring")  casadi::LinsolQr::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::LinsolQr::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -45216,8 +45261,8 @@ const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::LinsolInternal::serialize_type(Serializer &s)
-const  "
+%feature("docstring")
+casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -45238,8 +45283,8 @@ casadi_int nrhs) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -45399,8 +45444,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -45454,8 +45499,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::serialize_type(Serializer &s)
-const  "
+%feature("docstring")
+casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -45552,8 +45597,8 @@ buf_sz, const char *fmt,...) const  "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::serialize_body(Serializer &s)
-const  "
+%feature("docstring")
+casadi::LinsolInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -46270,7 +46315,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Map::serialize_type(Serializer &s) const  "
+%feature("docstring")  casadi::Map::serialize_type(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -46640,7 +46686,8 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 ";
 
-%feature("docstring")  casadi::Map::serialize_body(Serializer &s) const  "
+%feature("docstring")  casadi::Map::serialize_body(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -46761,8 +46808,8 @@ std::string &fname) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -48177,8 +48224,8 @@ Serialize.
 
 ";
 
-%feature("docstring")  casadi::MatrixCommon::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::MatrixCommon::serialize(SerializingStream &s)
+const  "
 
 Serialize an object.
 
@@ -49494,7 +49541,7 @@ Functions called by friend functions defined here
 
 ";
 
-%feature("docstring")  casadi::MX::serialize(Serializer &s) const  "
+%feature("docstring")  casadi::MX::serialize(SerializingStream &s) const  "
 
 Serialize an object.
 
@@ -50253,8 +50300,8 @@ casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::Newton::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::Newton::serialize_body(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -50341,8 +50388,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::serialize_type(Serializer &s)
-const  "
+%feature("docstring")  casadi::Rootfinder::serialize_type(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -51256,8 +51303,8 @@ always_inline, bool never_inline) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -51463,8 +51510,8 @@ std::string &name) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Nlpsol::serialize_type(Serializer &s) const
-"
+%feature("docstring")  casadi::Nlpsol::serialize_type(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -51847,8 +51894,8 @@ const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Nlpsol::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::Nlpsol::serialize_body(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -52152,8 +52199,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -53264,7 +53311,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Map::serialize_body(Serializer &s) const  "
+%feature("docstring")  casadi::Map::serialize_body(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -53571,8 +53619,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -53683,7 +53731,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Map::serialize_type(Serializer &s) const  "
+%feature("docstring")  casadi::Map::serialize_type(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -56078,8 +56127,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::OracleFunction::serialize_body(Serializer &s)
-const  "
+%feature("docstring")
+casadi::OracleFunction::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -56839,8 +56888,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -56872,8 +56921,8 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -57822,8 +57871,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::QpToNlp::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::QpToNlp::serialize_body(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -57987,7 +58036,8 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::Conic::serialize_type(Serializer &s) const  "
+%feature("docstring")  casadi::Conic::serialize_type(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -58093,8 +58143,8 @@ symmetric, bool allow_forward, bool allow_reverse) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -58880,7 +58930,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Qrqp::serialize_body(Serializer &s) const  "
+%feature("docstring")  casadi::Qrqp::serialize_body(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -58900,8 +58951,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -59351,6 +59402,8 @@ Solve QPs using an active-set method
 +--------------+-----------+-----------------------------------------------+
 | print_header | OT_BOOL   | Print header [true].                          |
 +--------------+-----------+-----------------------------------------------+
+| print_info   | OT_BOOL   | Print info [true].                            |
++--------------+-----------+-----------------------------------------------+
 | print_iter   | OT_BOOL   | Print iterations [true].                      |
 +--------------+-----------+-----------------------------------------------+
 | tol          | OT_DOUBLE | Tolerance [1e-8].                             |
@@ -59380,6 +59433,8 @@ Joel Andersson
 |              |               | [0].                      |               |
 +--------------+---------------+---------------------------+---------------+
 | print_header | OT_BOOL       | Print header [true].      | casadi::Qrqp  |
++--------------+---------------+---------------------------+---------------+
+| print_info   | OT_BOOL       | Print info [true].        | casadi::Qrqp  |
 +--------------+---------------+---------------------------+---------------+
 | print_iter   | OT_BOOL       | Print iterations [true].  | casadi::Qrqp  |
 +--------------+---------------+---------------------------+---------------+
@@ -59741,7 +59796,8 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::Conic::serialize_type(Serializer &s) const  "
+%feature("docstring")  casadi::Conic::serialize_type(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -59942,8 +59998,8 @@ std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Nlpsol::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::Nlpsol::serialize_body(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -60711,8 +60767,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -60922,8 +60978,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::serialize_type(Serializer &s) const
-"
+%feature("docstring")  casadi::Nlpsol::serialize_type(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -61325,8 +61381,8 @@ std::vector< M > &arg, casadi_int &npar) const  "
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::Rootfinder::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -61629,8 +61685,8 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::Rootfinder::serialize_type(Serializer &s)
-const  "
+%feature("docstring")  casadi::Rootfinder::serialize_type(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -61714,8 +61770,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -63053,8 +63109,8 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::RungeKutta::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::RungeKutta::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -63201,8 +63257,8 @@ iind, casadi_int oind, bool symmetric) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -63850,8 +63906,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::Integrator::serialize_type(Serializer &s)
-const  "
+%feature("docstring")  casadi::Integrator::serialize_type(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -64635,8 +64691,8 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::Nlpsol::serialize_body(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -64933,8 +64989,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::serialize_type(Serializer &s) const
-"
+%feature("docstring")  casadi::Nlpsol::serialize_type(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -65007,8 +65063,8 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -65695,139 +65751,151 @@ du_inf, double reg, casadi_int ls_trials, bool ls_success) const  "
 [INTERNAL] ";
 
 
-// File: classcasadi_1_1Serializer.xml
-%feature("docstring")  casadi::Serializer::pack(const Sparsity &e) "
+// File: classcasadi_1_1SerializerBase.xml
+%feature("docstring") casadi::SerializerBase "
+
+C++ includes: serializer.hpp ";
+
+
+// File: classcasadi_1_1SerializingStream.xml
+%feature("docstring")  casadi::SerializingStream::pack(const Sparsity &e) "
 
 Serializes an object to the output stream.
 
 ";
 
-%feature("docstring")  casadi::Serializer::pack(const MX &e) "
+%feature("docstring")  casadi::SerializingStream::pack(const MX &e) "
 
 Serializes an object to the output stream.
 
 ";
 
-%feature("docstring")  casadi::Serializer::pack(const SXElem &e) "
+%feature("docstring")  casadi::SerializingStream::pack(const SXElem &e) "
 
 Serializes an object to the output stream.
 
 ";
 
-%feature("docstring")  casadi::Serializer::pack(const Linsol &e) "
+%feature("docstring")  casadi::SerializingStream::pack(const Linsol &e) "
 
 Serializes an object to the output stream.
 
 ";
 
-%feature("docstring")  casadi::Serializer::pack(const MatrixCommon &e) "
+%feature("docstring")  casadi::SerializingStream::pack(const MatrixCommon
+&e) "
 
 Serializes an object to the output stream.
 
 ";
 
-%feature("docstring")  casadi::Serializer::pack(const Function &e) "
+%feature("docstring")  casadi::SerializingStream::pack(const Function &e) "
 
 Serializes an object to the output stream.
 
 ";
 
-%feature("docstring")  casadi::Serializer::pack(const Importer &e) "
+%feature("docstring")  casadi::SerializingStream::pack(const Importer &e) "
 
 Serializes an object to the output stream.
 
 ";
 
-%feature("docstring")  casadi::Serializer::pack(const Slice &e) "
+%feature("docstring")  casadi::SerializingStream::pack(const Slice &e) "
 
 Serializes an object to the output stream.
 
 ";
 
-%feature("docstring")  casadi::Serializer::pack(const GenericType &e) "
-
-Serializes an object to the output stream.
-
-";
-
-%feature("docstring")  casadi::Serializer::pack(int e) "
-
-Serializes an object to the output stream.
-
-";
-
-%feature("docstring")  casadi::Serializer::pack(bool e) "
-
-Serializes an object to the output stream.
-
-";
-
-%feature("docstring")  casadi::Serializer::pack(casadi_int e) "
-
-Serializes an object to the output stream.
-
-";
-
-%feature("docstring")  casadi::Serializer::pack(size_t e) "
-
-Serializes an object to the output stream.
-
-";
-
-%feature("docstring")  casadi::Serializer::pack(double e) "
-
-Serializes an object to the output stream.
-
-";
-
-%feature("docstring")  casadi::Serializer::pack(const std::string &e) "
-
-Serializes an object to the output stream.
-
-";
-
-%feature("docstring")  casadi::Serializer::pack(char e) "
-
-Serializes an object to the output stream.
-
-";
-
-%feature("docstring")  casadi::Serializer::pack(const std::vector< T > &e) "
-
-Serializes an object to the output stream.
-
-";
-
-%feature("docstring")  casadi::Serializer::pack(const std::map< K, V > &e) "
-
-Serializes an object to the output stream.
-
-";
-
-%feature("docstring")  casadi::Serializer::pack(const std::pair< A, B > &e)
+%feature("docstring")  casadi::SerializingStream::pack(const GenericType &e)
 "
 
 Serializes an object to the output stream.
 
 ";
 
-%feature("docstring")  casadi::Serializer::pack(const std::string &descr,
-const T &e) "
+%feature("docstring")  casadi::SerializingStream::pack(int e) "
 
 Serializes an object to the output stream.
 
 ";
 
-%feature("docstring") casadi::Serializer "
+%feature("docstring")  casadi::SerializingStream::pack(bool e) "
+
+Serializes an object to the output stream.
+
+";
+
+%feature("docstring")  casadi::SerializingStream::pack(casadi_int e) "
+
+Serializes an object to the output stream.
+
+";
+
+%feature("docstring")  casadi::SerializingStream::pack(size_t e) "
+
+Serializes an object to the output stream.
+
+";
+
+%feature("docstring")  casadi::SerializingStream::pack(double e) "
+
+Serializes an object to the output stream.
+
+";
+
+%feature("docstring")  casadi::SerializingStream::pack(const std::string &e)
+"
+
+Serializes an object to the output stream.
+
+";
+
+%feature("docstring")  casadi::SerializingStream::pack(char e) "
+
+Serializes an object to the output stream.
+
+";
+
+%feature("docstring")  casadi::SerializingStream::pack(const std::vector< T
+> &e) "
+
+Serializes an object to the output stream.
+
+";
+
+%feature("docstring")  casadi::SerializingStream::pack(const std::map< K, V
+> &e) "
+
+Serializes an object to the output stream.
+
+";
+
+%feature("docstring")  casadi::SerializingStream::pack(const std::pair< A, B
+> &e) "
+
+Serializes an object to the output stream.
+
+";
+
+%feature("docstring")  casadi::SerializingStream::pack(const std::string
+&descr, const T &e) "
+
+Serializes an object to the output stream.
+
+";
+
+%feature("docstring") casadi::SerializingStream "
 
 Helper class for Serialization.
 
 Joris Gillis
 
-C++ includes: serializer.hpp ";
+C++ includes: serializing_stream.hpp ";
 
-%feature("docstring") casadi::Serializer::Serializer(std::ostream &out,
-const Dict &opts=Dict()) "
+%feature("docstring")
+casadi::SerializingStream::SerializingStream(std::ostream &out, const Dict
+&opts=Dict()) "
 
 Constructor.
 
@@ -65951,8 +66019,8 @@ std::string &sym, bool inlined, std::istream &file, casadi_int &offset) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ImporterInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::ImporterInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL] ";
 
@@ -65963,8 +66031,8 @@ bool more) const  "
 
 ";
 
-%feature("docstring")  casadi::ImporterInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::ImporterInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL] ";
 
@@ -66007,8 +66075,8 @@ bool more) const  "
 
 ";
 
-%feature("docstring")  casadi::ImporterInternal::serialize(Serializer &s)
-const  "
+%feature("docstring")  casadi::ImporterInternal::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL] ";
 
@@ -66215,7 +66283,8 @@ Is the slice a scalar.
 
 ";
 
-%feature("docstring")  casadi::Slice::serialize(Serializer &s) const  "
+%feature("docstring")  casadi::Slice::serialize(SerializingStream &s) const
+"
 
 Serialize an object.
 
@@ -66566,15 +66635,15 @@ casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
 ";
 
 %feature("docstring")  casadi::PluginInterface< Dple
->::serialize_type(Serializer &s) const "
+>::serialize_type(SerializingStream &s) const "
 
 [INTERNAL]  Serialize type information.
 
@@ -66594,8 +66663,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -66931,8 +67000,8 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -68114,15 +68183,15 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
 ";
 
 %feature("docstring")  casadi::PluginInterface< Expm
->::serialize_type(Serializer &s) const "
+>::serialize_type(SerializingStream &s) const "
 
 [INTERNAL]  Serialize type information.
 
@@ -68435,8 +68504,8 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -68826,8 +68895,8 @@ const std::string &fname) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -69679,8 +69748,8 @@ bool more) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -69862,8 +69931,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_body(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_body(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -70027,8 +70096,8 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -71140,7 +71209,8 @@ Serialize.
 
 ";
 
-%feature("docstring")  casadi::Sparsity::serialize(Serializer &s) const  "
+%feature("docstring")  casadi::Sparsity::serialize(SerializingStream &s)
+const  "
 
 Serialize an object.
 
@@ -72295,8 +72365,8 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -72832,8 +72902,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Sqpmethod::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::Sqpmethod::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -73062,8 +73132,8 @@ std::string &fname, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::Nlpsol::serialize_type(Serializer &s) const
-"
+%feature("docstring")  casadi::Nlpsol::serialize_type(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -73214,6 +73284,42 @@ C++ includes: casadi_logger.hpp ";
 %feature("docstring") casadi::Logger::Streambuf "
 
 C++ includes: casadi_logger.hpp ";
+
+
+// File: classcasadi_1_1StringDeserializer.xml
+%feature("docstring") casadi::StringDeserializer "
+
+C++ includes: serializer.hpp ";
+
+%feature("docstring") casadi::StringDeserializer::StringDeserializer(const
+std::string &string) "
+
+Advanced deserialization of CasADi objects.
+
+StringDeserializer
+
+";
+
+%feature("docstring")  casadi::StringDeserializer::decode(const std::string
+&string) "
+
+Sets the string to deserialize objects from.
+
+";
+
+
+// File: classcasadi_1_1StringSerializer.xml
+%feature("docstring")  casadi::StringSerializer::encode() "
+
+Returns a string that holds the serialized objects.
+
+As a side effect, this method clears the internal buffer
+
+";
+
+%feature("docstring") casadi::StringSerializer "
+
+C++ includes: serializer.hpp ";
 
 
 // File: classcasadi_1_1SubAssign.xml
@@ -73491,8 +73597,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::Switch::serialize_body(Serializer &s) const
-"
+%feature("docstring")  casadi::Switch::serialize_body(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -73982,8 +74088,8 @@ propagation.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::serialize_type(Serializer
-&s) const  "
+%feature("docstring")
+casadi::FunctionInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -74222,8 +74328,8 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -74872,8 +74978,8 @@ const std::string &A, const std::string &x, casadi_int nrhs, bool tr) const
 
 ";
 
-%feature("docstring")  casadi::SymbolicQr::serialize_body(Serializer &s)
-const  "
+%feature("docstring")  casadi::SymbolicQr::serialize_body(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -74903,8 +75009,8 @@ class hierarchy in reverse order is run after init() has been completed.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -74950,8 +75056,8 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::LinsolInternal::serialize_type(Serializer &s)
-const  "
+%feature("docstring")
+casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -74999,8 +75105,8 @@ nadj, const std::vector< MatType > &v) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(Serializer &s) const
-"
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
 
 [INTERNAL]  Serialize an object.
 
@@ -75099,7 +75205,8 @@ bool more) const  "
 
 ";
 
-%feature("docstring")  casadi::Map::serialize_body(Serializer &s) const  "
+%feature("docstring")  casadi::Map::serialize_body(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize an object without type information.
 
@@ -75511,7 +75618,8 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 ";
 
-%feature("docstring")  casadi::Map::serialize_type(Serializer &s) const  "
+%feature("docstring")  casadi::Map::serialize_type(SerializingStream &s)
+const  "
 
 [INTERNAL]  Serialize type information.
 
@@ -78808,6 +78916,8 @@ Solve QPs using an active-set method
 +--------------+-----------+-----------------------------------------------+
 | print_header | OT_BOOL   | Print header [true].                          |
 +--------------+-----------+-----------------------------------------------+
+| print_info   | OT_BOOL   | Print info [true].                            |
++--------------+-----------+-----------------------------------------------+
 | print_iter   | OT_BOOL   | Print iterations [true].                      |
 +--------------+-----------+-----------------------------------------------+
 | tol          | OT_DOUBLE | Tolerance [1e-8].                             |
@@ -78994,7 +79104,8 @@ Explicitly load a plugin dynamically.
 
 ";
 
-%feature("docstring")  casadi::ConstantSX_deserialize(DeSerializer &s) "
+%feature("docstring")  casadi::ConstantSX_deserialize(DeserializingStream
+&s) "
 
 [INTERNAL] ";
 

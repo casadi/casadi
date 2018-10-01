@@ -22,7 +22,7 @@
 %exception  casadi::BSplineInterpolant::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::BSplineInterpolant::serialize_body(Serializer &s) const override {
+%exception  casadi::BSplineInterpolant::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::BackwardDiff::calc_stepsize(double abstol) const override {
@@ -46,7 +46,7 @@
 %exception  casadi::Blocksqp::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Blocksqp::serialize_body(Serializer &s) const override {
+%exception  casadi::Blocksqp::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::BonminUserClass::branchingInfo() const override {
@@ -118,7 +118,7 @@
 %exception  casadi::Collocation::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Collocation::serialize_body(Serializer &s) const override {
+%exception  casadi::Collocation::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Collocation::setupFG() override {
@@ -166,13 +166,13 @@
 %exception  casadi::Conic::serialize_base_function() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Conic::serialize_body(Serializer &s) const override {
+%exception  casadi::Conic::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Conic::serialize_type(Serializer &s) const override {
+%exception  casadi::Conic::serialize_type(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ConstantSX_deserialize(DeSerializer &s) {
+%exception  casadi::ConstantSX_deserialize(DeserializingStream &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DllLibrary::can_have_meta() const override {
@@ -310,7 +310,7 @@
 %exception  casadi::External::serialize_base_function() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::External::serialize_body(Serializer &s) const override {
+%exception  casadi::External::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FStats::reset() {
@@ -376,7 +376,7 @@
 %exception  casadi::FastNewton::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FastNewton::serialize_body(Serializer &s) const override {
+%exception  casadi::FastNewton::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FiniteDiff::codegen_body(CodeGenerator &g) const override {
@@ -436,7 +436,7 @@
 %exception  casadi::FixedStepIntegrator::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FixedStepIntegrator::serialize_body(Serializer &s) const override {
+%exception  casadi::FixedStepIntegrator::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FixedStepIntegrator::setupFG() {
@@ -832,10 +832,10 @@
 %exception  casadi::FunctionInternal::self() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::serialize_body(Serializer &s) const override {
+%exception  casadi::FunctionInternal::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::FunctionInternal::serialize_type(Serializer &s) const override {
+%exception  casadi::FunctionInternal::serialize_type(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::signature(const std::string &fname) const  {
@@ -934,7 +934,7 @@
 %exception  casadi::GenericExternal::init_external() override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericExternal::serialize_type(Serializer &s) const override {
+%exception  casadi::GenericExternal::serialize_type(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix::conditional(const MatType &ind, const std::vector< MatType > &x, const MatType &x_default, bool short_circuit=false) {
@@ -1087,7 +1087,7 @@
 %exception  casadi::GenericTypeBase::getType() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericTypeBase::serialize(Serializer &s) const  {
+%exception  casadi::GenericTypeBase::serialize(SerializingStream &s) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ImplicitFixedStepIntegrator::getExplicit() const override {
@@ -1102,7 +1102,7 @@
 %exception  casadi::ImplicitFixedStepIntegrator::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ImplicitFixedStepIntegrator::serialize_body(Serializer &s) const override {
+%exception  casadi::ImplicitFixedStepIntegrator::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ImplicitToNlp::alloc_mem() const override {
@@ -1162,13 +1162,13 @@
 %exception  casadi::ImporterInternal::read_meta(std::istream &file, casadi_int &offset) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ImporterInternal::serialize(Serializer &s) const  {
+%exception  casadi::ImporterInternal::serialize(SerializingStream &s) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ImporterInternal::serialize_body(Serializer &s) const  {
+%exception  casadi::ImporterInternal::serialize_body(SerializingStream &s) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ImporterInternal::serialize_type(Serializer &s) const  {
+%exception  casadi::ImporterInternal::serialize_type(SerializingStream &s) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ImporterInternal::to_text(const std::string &cmd, casadi_int ind=-1) const  {
@@ -1249,10 +1249,10 @@
 %exception  casadi::Integrator::serialize_base_function() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Integrator::serialize_body(Serializer &s) const override {
+%exception  casadi::Integrator::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Integrator::serialize_type(Serializer &s) const override {
+%exception  casadi::Integrator::serialize_type(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Integrator::sp_jac_dae() {
@@ -1300,10 +1300,10 @@
 %exception  casadi::Interpolant::serialize_base_function() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Interpolant::serialize_body(Serializer &s) const override {
+%exception  casadi::Interpolant::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Interpolant::serialize_type(Serializer &s) const override {
+%exception  casadi::Interpolant::serialize_type(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::IpoptUserClass::finalize_metadata(Index n, const StringMetaDataMapType &var_string_md, const IntegerMetaDataMapType &var_integer_md, const NumericMetaDataMapType &var_numeric_md, Index m, const StringMetaDataMapType &con_string_md, const IntegerMetaDataMapType &con_integer_md, const NumericMetaDataMapType &con_numeric_md) override {
@@ -1354,7 +1354,7 @@
 %exception  casadi::LapackLu::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LapackLu::serialize_body(Serializer &s) const override {
+%exception  casadi::LapackLu::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LapackQr::alloc_mem() const override {
@@ -1372,7 +1372,7 @@
 %exception  casadi::LapackQr::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LapackQr::serialize_body(Serializer &s) const override {
+%exception  casadi::LapackQr::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinearInterpolant::class_name() const override {
@@ -1399,10 +1399,10 @@
 %exception  casadi::LinearInterpolant::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinearInterpolant::serialize_body(Serializer &s) const override {
+%exception  casadi::LinearInterpolant::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinearInterpolant::serialize_type(Serializer &s) const override {
+%exception  casadi::LinearInterpolant::serialize_type(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinearInterpolantJac::class_name() const override {
@@ -1426,7 +1426,7 @@
 %exception  casadi::LinearInterpolantJac::serialize_base_function() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinearInterpolantJac::serialize_type(Serializer &s) const override {
+%exception  casadi::LinearInterpolantJac::serialize_type(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinsolInternal::colind() const  {
@@ -1456,10 +1456,10 @@
 %exception  casadi::LinsolInternal::row() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinsolInternal::serialize_body(Serializer &s) const override {
+%exception  casadi::LinsolInternal::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinsolInternal::serialize_type(Serializer &s) const override {
+%exception  casadi::LinsolInternal::serialize_type(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinsolLdl::alloc_mem() const override {
@@ -1477,7 +1477,7 @@
 %exception  casadi::LinsolLdl::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinsolLdl::serialize_body(Serializer &s) const override {
+%exception  casadi::LinsolLdl::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::LinsolQr::alloc_mem() const override {
@@ -1498,7 +1498,7 @@
 %exception  casadi::LinsolQr::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::LinsolQr::serialize_body(Serializer &s) const override {
+%exception  casadi::LinsolQr::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Lsqr::alloc_mem() const override {
@@ -1609,10 +1609,10 @@
 %exception  casadi::Map::serialize_base_function() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Map::serialize_body(Serializer &s) const override {
+%exception  casadi::Map::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Map::serialize_type(Serializer &s) const override {
+%exception  casadi::Map::serialize_type(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix::adj(const Matrix< Scalar > &A) {
@@ -1735,7 +1735,7 @@
 %exception  casadi::Newton::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Newton::serialize_body(Serializer &s) const override {
+%exception  casadi::Newton::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Nlpsol::alloc_mem() const override {
@@ -1798,10 +1798,10 @@
 %exception  casadi::Nlpsol::serialize_base_function() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Nlpsol::serialize_body(Serializer &s) const override {
+%exception  casadi::Nlpsol::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Nlpsol::serialize_type(Serializer &s) const override {
+%exception  casadi::Nlpsol::serialize_type(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Nlpsol::setOptionsFromFile(const std::string &file) {
@@ -1861,7 +1861,7 @@
 %exception  casadi::OracleFunction::oracle() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::OracleFunction::serialize_body(Serializer &s) const override {
+%exception  casadi::OracleFunction::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OracleFunction::set_function(const Function &fcn) {
@@ -1876,13 +1876,13 @@
 %exception  casadi::PluginInterface< Dple  >::plugin_name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::PluginInterface< Dple  >::serialize_type(Serializer &s) const {
+%exception  casadi::PluginInterface< Dple  >::serialize_type(SerializingStream &s) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::PluginInterface< Expm  >::plugin_name() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::PluginInterface< Expm  >::serialize_type(Serializer &s) const {
+%exception  casadi::PluginInterface< Expm  >::serialize_type(SerializingStream &s) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::PluginInterface< Integrator  >::plugin_name() const  {
@@ -1921,7 +1921,7 @@
 %exception  casadi::ProtoFunction::release(casadi_int mem) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::ProtoFunction::serialize(Serializer &s) const  {
+%exception  casadi::ProtoFunction::serialize(SerializingStream &s) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ProtoFunction::serialize_base_function() const  {
@@ -1942,7 +1942,7 @@
 %exception  casadi::QpToNlp::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::QpToNlp::serialize_body(Serializer &s) const override {
+%exception  casadi::QpToNlp::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Qrqp::alloc_mem() const override {
@@ -1963,7 +1963,7 @@
 %exception  casadi::Qrqp::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Qrqp::serialize_body(Serializer &s) const override {
+%exception  casadi::Qrqp::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Qrsqp::alloc_mem() const override {
@@ -2041,10 +2041,10 @@
 %exception  casadi::Rootfinder::serialize_base_function() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Rootfinder::serialize_body(Serializer &s) const override {
+%exception  casadi::Rootfinder::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Rootfinder::serialize_type(Serializer &s) const override {
+%exception  casadi::Rootfinder::serialize_type(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Rootfinder::uses_output() const override {
@@ -2059,7 +2059,7 @@
 %exception  casadi::RungeKutta::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::RungeKutta::serialize_body(Serializer &s) const override {
+%exception  casadi::RungeKutta::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::RungeKutta::setupFG() override {
@@ -2266,7 +2266,7 @@
 %exception  casadi::Sqpmethod::print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf, double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Sqpmethod::serialize_body(Serializer &s) const override {
+%exception  casadi::Sqpmethod::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Switch::class_name() const override {
@@ -2314,7 +2314,7 @@
 %exception  casadi::Switch::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Switch::serialize_body(Serializer &s) const override {
+%exception  casadi::Switch::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SymbolicQr::alloc_mem() const override {
@@ -2332,7 +2332,7 @@
 %exception  casadi::SymbolicQr::plugin_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SymbolicQr::serialize_body(Serializer &s) const override {
+%exception  casadi::SymbolicQr::serialize_body(SerializingStream &s) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::ThreadMap::class_name() const override {
@@ -2416,7 +2416,7 @@
 %exception casadi::ForwardDiff::ForwardDiff(const std::string &name, casadi_int n) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::GenericExternal::GenericExternal(DeSerializer &s) {
+%exception casadi::GenericExternal::GenericExternal(DeserializingStream &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::GenericExternal::GenericExternal(const std::string &name, const Importer &li) {
@@ -2446,7 +2446,7 @@
 %exception casadi::LinearInterpolant::LinearInterpolant(const std::string &name, const std::vector< double > &grid, const std::vector< casadi_int > &offset, const std::vector< double > &values, casadi_int m) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::LinearInterpolantJac::LinearInterpolantJac(DeSerializer &s) {
+%exception casadi::LinearInterpolantJac::LinearInterpolantJac(DeserializingStream &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::LinearInterpolantJac::LinearInterpolantJac(const std::string &name) {

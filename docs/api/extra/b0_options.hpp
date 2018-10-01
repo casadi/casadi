@@ -2801,6 +2801,7 @@
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td><td>casadi::Qrqp</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Smallest multiplier treated as inactive for the initial active set [0].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Qrqp</td></tr>
+<tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance [1e-8].</td><td>casadi::Qrqp</td></tr>
 </table>
@@ -2816,6 +2817,7 @@
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Smallest multiplier treated as inactive for the initial active set [0].</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td></tr>
+<tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td></tr>
 <tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance [1e-8].</td></tr>
 </table>
@@ -2831,6 +2833,7 @@
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td><td>casadi::Qrqp</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Smallest multiplier treated as inactive for the initial active set [0].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Qrqp</td></tr>
+<tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance [1e-8].</td><td>casadi::Qrqp</td></tr>
 </table>

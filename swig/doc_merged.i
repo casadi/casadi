@@ -4640,7 +4640,7 @@ Destructor.
 
 Deserializing constructor.
 
->  casadi::BSpline::BSpline(DeSerializer &s)
+>  casadi::BSpline::BSpline(DeserializingStream &s)
 ------------------------------------------------------------------------
 
 Deserializing constructor.
@@ -7023,7 +7023,7 @@ Is the class able to propagate seeds through the algorithm?
 
 Deserializing constructor.
 
->  casadi::BSplineDual::BSplineDual(DeSerializer &s)
+>  casadi::BSplineDual::BSplineDual(DeserializingStream &s)
 ------------------------------------------------------------------------
 
 Deserializing constructor.
@@ -14128,26 +14128,32 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1DenseTranspose.xml
 
 
-// File: classcasadi_1_1DeSerializer.xml
-%feature("docstring") casadi::DeSerializer::unpack "
+// File: classcasadi_1_1DeserializerBase.xml
+%feature("docstring") casadi::DeserializerBase "
 
-";
+C++ includes: serializer.hpp ";
 
-";
 
-%feature("docstring") casadi::DeSerializer::DeSerializer "
+// File: classcasadi_1_1DeserializingStream.xml
+%feature("docstring") casadi::DeserializingStream::DeserializingStream "
 
 Constructor.
 
 ";
 
-%feature("docstring") casadi::DeSerializer "
+%feature("docstring") casadi::DeserializingStream::unpack "
+
+";
+
+";
+
+%feature("docstring") casadi::DeserializingStream "
 
 Helper class for Serialization.
 
 Joris Gillis
 
-C++ includes: serializer.hpp ";
+C++ includes: serializing_stream.hpp ";
 
 
 // File: classcasadi_1_1Determinant.xml
@@ -19106,6 +19112,34 @@ elements.
 %feature("docstring") casadi::FastNewton::create_function "
 
 [INTERNAL]  Create an oracle function
+
+";
+
+
+// File: classcasadi_1_1FileDeserializer.xml
+%feature("docstring") casadi::FileDeserializer::FileDeserializer "
+
+Advanced deserialization of CasADi objects.
+
+FileSerializer
+
+";
+
+%feature("docstring") casadi::FileDeserializer "
+
+C++ includes: serializer.hpp ";
+
+
+// File: classcasadi_1_1FileSerializer.xml
+%feature("docstring") casadi::FileSerializer "
+
+C++ includes: serializer.hpp ";
+
+%feature("docstring") casadi::FileSerializer::FileSerializer "
+
+Advanced serialization of CasADi objects.
+
+StringSerializer, FileDeserializer
 
 ";
 
@@ -24417,7 +24451,7 @@ classes.
 
 [INTERNAL]  Deserializing constructor.
 
->  casadi::GenericExternal::GenericExternal(DeSerializer &s)
+>  casadi::GenericExternal::GenericExternal(DeserializingStream &s)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Deserializing constructor.
@@ -35061,7 +35095,7 @@ classes.
 
 [INTERNAL]  Deserializing constructor.
 
->  casadi::LinearInterpolantJac::LinearInterpolantJac(DeSerializer &s)
+>  casadi::LinearInterpolantJac::LinearInterpolantJac(DeserializingStream &s)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Deserializing constructor.
@@ -38297,7 +38331,7 @@ Get the first dimension (i.e. number of rows)
 
 Serialize an object.
 
->  void casadi::Matrix< T >::serialize(Serializer &s) const 
+>  void casadi::Matrix< T >::serialize(SerializingStream &s) const 
 ------------------------------------------------------------------------
 
 Serialize an object.
@@ -46972,6 +47006,8 @@ Solve QPs using an active-set method
 +--------------+-----------+-----------------------------------------------+
 | print_header | OT_BOOL   | Print header [true].                          |
 +--------------+-----------+-----------------------------------------------+
+| print_info   | OT_BOOL   | Print info [true].                            |
++--------------+-----------+-----------------------------------------------+
 | print_iter   | OT_BOOL   | Print iterations [true].                      |
 +--------------+-----------+-----------------------------------------------+
 | tol          | OT_DOUBLE | Tolerance [1e-8].                             |
@@ -47001,6 +47037,8 @@ Joel Andersson
 |              |               | [0].                      |               |
 +--------------+---------------+---------------------------+---------------+
 | print_header | OT_BOOL       | Print header [true].      | casadi::Qrqp  |
++--------------+---------------+---------------------------+---------------+
+| print_info   | OT_BOOL       | Print info [true].        | casadi::Qrqp  |
 +--------------+---------------+---------------------------+---------------+
 | print_iter   | OT_BOOL       | Print iterations [true].  | casadi::Qrqp  |
 +--------------+---------------+---------------------------+---------------+
@@ -52311,22 +52349,28 @@ C++ includes: scpgen.hpp ";
 [INTERNAL] ";
 
 
-// File: classcasadi_1_1Serializer.xml
-%feature("docstring") casadi::Serializer::pack "
+// File: classcasadi_1_1SerializerBase.xml
+%feature("docstring") casadi::SerializerBase "
+
+C++ includes: serializer.hpp ";
+
+
+// File: classcasadi_1_1SerializingStream.xml
+%feature("docstring") casadi::SerializingStream::pack "
 
 Serializes an object to the output stream.
 
 ";
 
-%feature("docstring") casadi::Serializer "
+%feature("docstring") casadi::SerializingStream "
 
 Helper class for Serialization.
 
 Joris Gillis
 
-C++ includes: serializer.hpp ";
+C++ includes: serializing_stream.hpp ";
 
-%feature("docstring") casadi::Serializer::Serializer "
+%feature("docstring") casadi::SerializingStream::SerializingStream "
 
 Constructor.
 
@@ -56704,7 +56748,7 @@ Get the sparsity in compressed row storage (CRS) format.
 
 Serialize an object.
 
->  void casadi::Sparsity::serialize(Serializer &s) const 
+>  void casadi::Sparsity::serialize(SerializingStream &s) const 
 ------------------------------------------------------------------------
 
 Serialize an object.
@@ -58496,6 +58540,40 @@ C++ includes: casadi_logger.hpp ";
 %feature("docstring") casadi::Logger::Streambuf "
 
 C++ includes: casadi_logger.hpp ";
+
+
+// File: classcasadi_1_1StringDeserializer.xml
+%feature("docstring") casadi::StringDeserializer "
+
+C++ includes: serializer.hpp ";
+
+%feature("docstring") casadi::StringDeserializer::StringDeserializer "
+
+Advanced deserialization of CasADi objects.
+
+StringDeserializer
+
+";
+
+%feature("docstring") casadi::StringDeserializer::decode "
+
+Sets the string to deserialize objects from.
+
+";
+
+
+// File: classcasadi_1_1StringSerializer.xml
+%feature("docstring") casadi::StringSerializer::encode "
+
+Returns a string that holds the serialized objects.
+
+As a side effect, this method clears the internal buffer
+
+";
+
+%feature("docstring") casadi::StringSerializer "
+
+C++ includes: serializer.hpp ";
 
 
 // File: classcasadi_1_1SubAssign.xml
@@ -62798,6 +62876,8 @@ Solve QPs using an active-set method
 |              |           | the initial active set [0].                   |
 +--------------+-----------+-----------------------------------------------+
 | print_header | OT_BOOL   | Print header [true].                          |
++--------------+-----------+-----------------------------------------------+
+| print_info   | OT_BOOL   | Print info [true].                            |
 +--------------+-----------+-----------------------------------------------+
 | print_iter   | OT_BOOL   | Print iterations [true].                      |
 +--------------+-----------+-----------------------------------------------+
