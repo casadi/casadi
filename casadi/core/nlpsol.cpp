@@ -685,7 +685,8 @@ namespace casadi {
 
     // Initial guesses not used for derivative calculations
     for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
-      arg[i] = MX::sym(arg[i].name(), Sparsity(arg[i].size()));
+      std::string name = arg[i].is_symbolic() ? arg[i].name() : "temp";
+      arg[i] = MX::sym(name, Sparsity(arg[i].size()));
     }
 
     // Optimal solution
@@ -809,7 +810,8 @@ namespace casadi {
 
     // Initial guesses not used for derivative calculations
     for (NlpsolInput i : {NLPSOL_X0, NLPSOL_LAM_X0, NLPSOL_LAM_G0}) {
-      arg[i] = MX::sym(arg[i].name(), Sparsity(arg[i].size()));
+      std::string name = arg[i].is_symbolic() ? arg[i].name() : "temp";
+      arg[i] = MX::sym(name, Sparsity(arg[i].size()));
     }
 
     // Optimal solution

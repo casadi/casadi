@@ -1419,6 +1419,27 @@ class NLPtests(casadiTestCase):
       self.checkarray(solver_out["x"],DM([0]),digits=7)
       if "bonmin" not in str(Solver): self.checkarray(solver_out["lam_x"],DM([0]),digits=7)
 
+  def test_nlp_sensitivity(self):
+
+    x = MX.sym("x")
+    p = MX.sym("p")
+
+    nlp = {"x":x,"p":p,"f":(sin(x)-p**2)**2,"g":x}
+
+    for Solver, solver_options, features in solvers:
+      if "ipopt" in str(solver_options): continue
+
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+
+      z = solver(p=p,x0=x,lbg=0)["x"]
+
+      z2 = asin(p**2)
+
+      f = Function('f',[x,p],[z,jacobian(z,p)])
+      f2 = Function('f',[x,p],[z2,jacobian(z2,p)])
+
+      self.checkfunction_light(f,f2,[0,0.5],digits=6)
+
 if __name__ == '__main__':
     unittest.main()
     print(solvers)
