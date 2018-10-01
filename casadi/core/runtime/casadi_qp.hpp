@@ -139,8 +139,8 @@ int casadi_qp_reset(casadi_qp_data<T1>* d) {
   for (i=0; i<p->nz; ++i) {
     // Permitted signs for lam
     d->neverzero[i] = d->lbz[i]==d->ubz[i];
-    d->neverupper[i] = isinf(d->ubz[i]);
-    d->neverlower[i] = isinf(d->lbz[i]);
+    d->neverupper[i] = d->ubz[i]==p->inf;
+    d->neverlower[i] = d->lbz[i]==-p->inf;
     if (d->neverzero[i] && d->neverupper[i] && d->neverlower[i]) return 1;
     // Small enough lambdas are treated as inactive
     if (!d->neverzero[i] && fabs(d->lam[i])<p->min_lam) d->lam[i] = 0.;

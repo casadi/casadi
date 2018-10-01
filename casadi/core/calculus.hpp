@@ -272,7 +272,7 @@ namespace casadi {
   inline double printme(double x, double y) {
     std::ios::fmtflags f(uout().flags());
     uout() << "|> " << y << " : ";
-    uout() << std::setprecision(16) << std::scientific;
+    uout() << std::setprecision(std::numeric_limits<double>::digits10 + 1) << std::scientific;
     uout() << x << std::endl;
     uout().flags(f);
     return x;

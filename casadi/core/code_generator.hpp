@@ -301,7 +301,9 @@ namespace casadi {
       AUX_MIN,
       AUX_MAX,
       AUX_MAX_VIOL,
-      AUX_REGULARIZE
+      AUX_REGULARIZE,
+      AUX_INF,
+      AUX_REAL_MIN
     };
 
     /** \brief Add a built-in auxiliary function */
@@ -425,6 +427,8 @@ namespace casadi {
 
     // Do we want to be lean on stack usage?
     bool avoid_stack_;
+
+    std::string infinity, real_min;
 
     /** \brief Codegen scalar
      * Use the work vector for storing work vector elements of length 1

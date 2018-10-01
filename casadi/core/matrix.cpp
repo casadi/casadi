@@ -3855,7 +3855,7 @@ namespace casadi {
     std::string format = Sparsity::file_format(filename, format_hint);
     std::ofstream out(filename);
     if (format=="mtx") {
-      out << std::scientific << std::setprecision(15);
+      out << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
       out << "%%MatrixMarket matrix coordinate real general" << std::endl;
       out << size1() << " " << size2() << " " << nnz() << std::endl;
       std::vector<casadi_int> row = sparsity().get_row();

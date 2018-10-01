@@ -272,9 +272,8 @@ namespace casadi {
     g << "p.prinv = " << g.constant(prinv_) << ";\n";
     g << "p.pc =  " << g.constant(pc_) << ";\n";
 
-    // TODO(jgillis): find a type-agnostic way
-    g << "p.dmin = " << p_.dmin << ";\n";
-    g << "p.inf = INFINITY;\n";
+    g << "p.dmin = casadi_real_min;\n";
+    g << "p.inf = casadi_inf;\n";
     g << "p.nx = " << nx_ << ";\n";
     g << "p.na = " << na_ << ";\n";
     g << "p.nz = " << nx_+na_ << ";\n";

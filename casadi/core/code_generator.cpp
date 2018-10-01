@@ -47,6 +47,8 @@ namespace casadi {
     this->with_export = true;
     this->with_import = false;
     this->include_math = true;
+    this->infinity = "INFINITY";
+    this->real_min = "";
     avoid_stack_ = false;
     indent_ = 2;
 
@@ -78,6 +80,10 @@ namespace casadi {
         this->with_import = e.second;
       } else if (e.first=="include_math") {
         this->include_math = e.second;
+      } else if (e.first=="infinity") {
+        this->infinity = e.second.to_string();
+      } else if (e.first=="real_min") {
+        this->real_min = e.second.to_string();
       } else if (e.first=="indent") {
         indent_ = e.second;
         casadi_assert_dev(indent_>=0);
@@ -85,6 +91,21 @@ namespace casadi {
         avoid_stack_ = e.second;
       } else {
         casadi_error("Unrecongnized option: " + str(e.first));
+      }
+    }
+
+    // If real_min is not specified, make an educated guess
+    if (this->real_min.empty()) {
+      std::stringstream ss;
+      ss << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+      if (casadi_real=="float") {
+        ss << std::numeric_limits<float>::min();
+        this->real_min = ss.str();
+      } else if (casadi_real=="double") {
+        ss << std::numeric_limits<double>::min();
+        this->real_min = ss.str();
+      } else {
+        this->real_min = "<NOT SPECIFIED>";
       }
     }
 
@@ -792,6 +813,8 @@ namespace casadi {
       add_auxiliary(AUX_AXPY);
       add_auxiliary(AUX_MV);
       add_auxiliary(AUX_BILIN);
+      add_auxiliary(AUX_INF);
+      add_auxiliary(AUX_REAL_MIN);
       add_include("stdarg.h");
       add_include("stdio.h");
       add_include("math.h");
@@ -897,6 +920,16 @@ namespace casadi {
       this->auxiliaries << "casadi_int casadi_max(casadi_int x, casadi_int y) {\n"
                         << "  return x>y ? x : y;\n"
                         << "}\n\n";
+      break;
+    case AUX_INF:
+      this->auxiliaries << "#ifndef casadi_inf\n"
+                        << "  #define casadi_inf " << this->infinity << "\n"
+                        << "#endif\n\n";
+      break;
+    case AUX_REAL_MIN:
+      this->auxiliaries << "#ifndef casadi_real_min\n"
+                        << "  #define casadi_real_min " << this->real_min << "\n"
+                        << "#endif\n\n";
       break;
     }
   }
