@@ -411,10 +411,10 @@ namespace casadi {
 
     // Prefix internal symbols to avoid symbol collisions
     s << "/* How to prefix internal symbols */\n"
-      << "#ifdef CODEGEN_PREFIX\n"
-      << "  #define NAMESPACE_CONCAT(NS, ID) _NAMESPACE_CONCAT(NS, ID)\n"
-      << "  #define _NAMESPACE_CONCAT(NS, ID) NS ## ID\n"
-      << "  #define CASADI_PREFIX(ID) NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)\n"
+      << "#ifdef CASADI_CODEGEN_PREFIX\n"
+      << "  #define CASADI_NAMESPACE_CONCAT(NS, ID) _CASADI_NAMESPACE_CONCAT(NS, ID)\n"
+      << "  #define _CASADI_NAMESPACE_CONCAT(NS, ID) NS ## ID\n"
+      << "  #define CASADI_PREFIX(ID) CASADI_NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)\n"
       << "#else\n"
       << "  #define CASADI_PREFIX(ID) " << this->name << "_ ## ID\n"
       << "#endif\n\n";
