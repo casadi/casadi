@@ -76,7 +76,7 @@ namespace casadi {
 
 
     enum SerializationType {
-      SERIALIZED_SPARSITY=0,
+      SERIALIZED_SPARSITY,
       SERIALIZED_MX,
       SERIALIZED_IM,
       SERIALIZED_DM,
