@@ -109,7 +109,7 @@ namespace casadi {
     ///@{
     // Options
     casadi_int max_iter_;
-    bool print_iter_, print_header_;
+    bool print_iter_, print_header_, print_info_;
     double du_to_pr_;
     double min_lam_;
     ///@}

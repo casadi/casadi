@@ -35,6 +35,7 @@ namespace casadi {
   CodeGenerator::CodeGenerator(const string& name, const Dict& opts) {
     // Default options
     this->verbose = true;
+    this->verbose_runtime = false;
     this->mex = false;
     this->cpp = false;
     this->main = false;
@@ -53,6 +54,8 @@ namespace casadi {
     for (auto&& e : opts) {
       if (e.first=="verbose") {
         this->verbose = e.second;
+      } else if (e.first=="verbose_runtime") {
+        this->verbose_runtime = e.second;
       } else if (e.first=="mex") {
         this->mex = e.second;
       } else if (e.first=="cpp") {
@@ -1280,6 +1283,13 @@ namespace casadi {
         string sub = line.substr(n1+1, n2-n1-1);
         // Add to replacements
         rep.push_back(make_pair(key, sub));
+        continue;
+      }
+
+      // If line starts with "// C-VERBOSE", skip the next line
+      if (!verbose_runtime && line.find("// C-VERBOSE") != string::npos) {
+        // Ignore next line
+        std::getline(stream, line);
         continue;
       }
 

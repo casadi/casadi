@@ -71,6 +71,9 @@ namespace casadi {
       {"print_iter",
        {OT_BOOL,
         "Print iterations [true]."}},
+      {"print_info",
+       {OT_BOOL,
+        "Print info [true]."}},
       {"min_lam",
        {OT_DOUBLE,
         "Smallest multiplier treated as inactive for the initial active set [0]."}}
@@ -96,6 +99,8 @@ namespace casadi {
         print_iter_ = op.second;
       } else if (op.first=="print_header") {
         print_header_ = op.second;
+      } else if (op.first=="print_info") {
+        print_info_ = op.second;
       } else if (op.first=="du_to_pr") {
         du_to_pr_ = op.second;
       } else if (op.first=="min_lam") {
@@ -138,7 +143,6 @@ namespace casadi {
   void Qrqp::set_qp_prob() {
     p_.du_to_pr = du_to_pr_;
     p_.min_lam = min_lam_;
-    p_.print_iter = print_iter_;
     p_.sp_a = A_;
     p_.sp_h = H_;
     p_.sp_at = AT_;
@@ -177,6 +181,7 @@ namespace casadi {
     d.g = arg[CONIC_G];
     d.nz_a = arg[CONIC_A];
     casadi_qp_init(&d, iw, w);
+    d.verbose = print_info_ ? 1 : 0;
     // Pass bounds on z
     casadi_copy(arg[CONIC_LBX], nx_, d.lbz);
     casadi_copy(arg[CONIC_LBA], na_, d.lbz+nx_);
@@ -258,7 +263,6 @@ namespace casadi {
         // Setup memory structure
     g << "p.du_to_pr = " << du_to_pr_ << ";\n";
     g << "p.min_lam = " << min_lam_ << ";\n";
-    g << "p.print_iter = " << print_iter_ << ";\n";
     g << "p.sp_a = " << g.sparsity(A_) << ";\n";
     g << "p.sp_h = " << g.sparsity(H_) << ";\n";
     g << "p.sp_at = " << g.sparsity(AT_) << ";\n";
@@ -280,6 +284,7 @@ namespace casadi {
     g << "d.g = arg[" << CONIC_G << "];\n";
     g << "d.nz_a = arg[" << CONIC_A << "];\n";
     g << "casadi_qp_init(&d, iw, w);\n";
+    g << "d.verbose = " << (print_info_ ? 1 : 0) << ";\n";
 
     g.comment("Pass bounds on z");
     g << g.copy("arg[" + str(CONIC_LBX)+ "]", nx_, "d.lbz") << "\n";

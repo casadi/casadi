@@ -15,8 +15,6 @@ struct casadi_qp_prob {
   T1 inf;
   // Dual to primal error
   T1 du_to_pr;
-  // Print iterations
-  int print_iter;
   // Sparsity patterns
   const casadi_int *sp_a, *sp_h, *sp_at, *sp_kkt;
   // Symbolic QR factorization
@@ -88,6 +86,8 @@ struct casadi_qp_data {
   // Primal and dual error, corresponding index
   T1 pr, du, epr, edu;
   casadi_int ipr, idu;
+  // Verbose
+  int verbose;
 };
 // C-REPLACE "casadi_qp_data<T1>" "struct casadi_qp_data"
 
@@ -122,6 +122,7 @@ void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int* iw, T1* w) {
   d->lincomb = iw; iw += p->nz;
   d->w = w;
   d->iw = iw;
+  d->verbose = 1;
 }
 
 // SYMBOL "qp_reset"
@@ -196,13 +197,25 @@ void casadi_qp_du(casadi_qp_data<T1>* d) {
   }
 }
 
+// C-VERBOSE
 // SYMBOL "qp_log"
+// C-VERBOSE
 template<typename T1>
+// C-VERBOSE
 void casadi_qp_log(casadi_qp_data<T1>* d, const char* fmt, ...) {
-  va_list args;
-  va_start(args, fmt);
-  vsnprintf(d->msg, sizeof(d->msg), fmt, args);
-  va_end(args);
+// C-VERBOSE
+  if (d->verbose) {
+// C-VERBOSE
+    va_list args;
+// C-VERBOSE
+    va_start(args, fmt);
+// C-VERBOSE
+    vsnprintf(d->msg, sizeof(d->msg), fmt, args);
+// C-VERBOSE
+    va_end(args);
+// C-VERBOSE
+  }
+// C-VERBOSE
 }
 
 // SYMBOL "qp_du_check"
@@ -287,6 +300,7 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign, casadi_in
   // Accept, if any
   if (best_ind>=0) {
     *sign = 0;
+    // C-VERBOSE
     casadi_qp_log(d, "Removed %lld to reduce |du|", best_ind);
     return best_ind;
   } else {
@@ -301,6 +315,7 @@ casadi_int casadi_qp_pr_index(casadi_qp_data<T1>* d, casadi_int* sign) {
   if (d->lam[d->ipr]==0.) {
     // Add the most violating constraint
     *sign = d->z[d->ipr]<d->lbz[d->ipr] ? -1 : 1;
+    // C-VERBOSE
     casadi_qp_log(d, "Added %lld to reduce |pr|", d->ipr);
     return d->ipr;
   } else {
@@ -460,12 +475,14 @@ void casadi_qp_primal_blocking(casadi_qp_data<T1>* d,
       d->tau = (d->lbz[i]-d->epr-d->z[i])/d->dz[i];
       if (index) *index = d->lam[i]<0. ? -1 : i;
       if (sign) *sign = -1;
+      // C-VERBOSE
       casadi_qp_log(d, "Enforcing lbz[%lld]", i);
     } else if (d->dz[i]>0 && trial_z>d->ubz[i]+d->epr) {
       // Trial would increase maximum infeasibility
       d->tau = (d->ubz[i]+d->epr-d->z[i])/d->dz[i];
       if (index) *index = d->lam[i]>0. ? -1 : i;
       if (sign) *sign = 1;
+      // C-VERBOSE
       casadi_qp_log(d, "Enforcing ubz[%lld]", i);
     }
     if (d->tau<=0) return;
@@ -797,6 +814,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           tau = tau_test;
           *r_index = i;
           *r_sign = -1;
+          // C-VERBOSE
           casadi_qp_log(d, "Enforced lbz[%lld] for regularity", i);
         }
       }
@@ -811,6 +829,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           tau = tau_test;
           *r_index = i;
           *r_sign = 1;
+          // C-VERBOSE
           casadi_qp_log(d, "Enforced ubz[%lld] for regularity", i);
         }
       }
@@ -825,6 +844,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           tau = tau_test;
           *r_index = i;
           *r_sign = 0;
+          // C-VERBOSE
           casadi_qp_log(d, "Dropped %s[%lld] for regularity", d->lam[i]>0 ? "lbz" : "ubz", i);
         }
       }
@@ -941,6 +961,7 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
   if (r_index>=0 && (r_sign!=0 || casadi_qp_du_check(d, r_index)<=d->edu)) {
     *index = r_index;
     *sign = r_sign;
+    // C-VERBOSE
     casadi_qp_log(d, "%lld->%lld for regularity", *index, *sign);
   }  else if (r_index>=0 && d->tau>1e-16) {
     // Allow another regularity step
@@ -964,6 +985,7 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
       if (r_index>=0) {
         // Also flip r_index to avoid singularity
         d->lam[r_index] = r_sign==0 ? 0 : r_sign>0 ? p->dmin : -p->dmin;
+        // C-VERBOSE
         casadi_qp_log(d, "%lld->%lld, %lld->%lld", *index, *sign, r_index, r_sign);
       } else if (*sign==0 && d->sens[*index]==0.) {
         // Abort: Not worth it to sacrifice regularity

@@ -411,6 +411,9 @@ namespace casadi {
     // Verbose codegen?
     bool verbose;
 
+    // Verbose runtime?
+    bool verbose_runtime;
+
     // Are we generating C++?
     bool cpp;
 
