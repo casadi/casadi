@@ -1063,6 +1063,8 @@ namespace casadi {
       // Retrieve explicit simulation step (one finite element)
       Function F = getExplicit();
 
+      MX z0 = MX::sym("z0", sparsity_in(INTEGRATOR_Z0));
+
       // Create symbols
       std::vector<MX> F_in = F.mx_in();
 
@@ -1070,7 +1072,8 @@ namespace casadi {
       std::vector<MX> intg_in(INTEGRATOR_NUM_IN);
       intg_in[INTEGRATOR_X0] = F_in[DAE_X];
       intg_in[INTEGRATOR_P] = F_in[DAE_P];
-      intg_in[INTEGRATOR_Z0] = F_in[DAE_Z];
+      intg_in[INTEGRATOR_Z0] = z0;
+      F_in[DAE_Z] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
 
       // Prepare return Function outputs
       std::vector<MX> intg_out(INTEGRATOR_NUM_OUT);
@@ -1080,6 +1083,7 @@ namespace casadi {
       // Loop over finite elements
       for (casadi_int k=0;k<nk_;++k) {
         F_out = F(F_in);
+
         F_in[DAE_X] = F_out[DAE_ODE];
         F_in[DAE_Z] = F_out[DAE_ALG];
         intg_out[INTEGRATOR_QF] = k==0? F_out[DAE_QUAD] : intg_out[INTEGRATOR_QF]+F_out[DAE_QUAD];
@@ -1087,7 +1091,7 @@ namespace casadi {
       }
 
       intg_out[INTEGRATOR_XF] = F_out[DAE_ODE];
-      intg_out[INTEGRATOR_ZF] = F_out[DAE_ALG];
+      intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[DAE_ALG]);
 
       // Extract options for Function constructor
       Dict opts;
