@@ -40,6 +40,7 @@ namespace casadi {
     plugin->doc = KnitroInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &KnitroInterface::options_;
+    plugin->deserialize = &KnitroInterface::deserialize;
     return 0;
   }
 
@@ -328,14 +329,14 @@ namespace casadi {
       m->arg[1] = d_nlp->p;
       m->res[0] = obj;
       m->res[1] = c;
-      m->self.calc_function(m, "nlp_fg");
+      if (m->self.calc_function(m, "nlp_fg")) return KTR_RC_EVAL_ERR;
       break;
       case KTR_RC_EVALGA:
       m->arg[0] = x;
       m->arg[1] = d_nlp->p;
       m->res[0] = objGrad;
       m->res[1] = jac;
-      m->self.calc_function(m, "nlp_gf_jg");
+      if (m->self.calc_function(m, "nlp_gf_jg")) return KTR_RC_EVAL_ERR;
       break;
       case KTR_RC_EVALH:
         {
@@ -428,6 +429,21 @@ namespace casadi {
     stats["return_status"] = m->return_status;
 
     return stats;
+  }
+
+  KnitroInterface::KnitroInterface(DeserializingStream& s) : Nlpsol(s) {
+    s.unpack("KnitroInterface::contype", contype_);
+    s.unpack("KnitroInterface::opts", opts_);
+    s.unpack("KnitroInterface::jacg_sp", jacg_sp_);
+    s.unpack("KnitroInterface::hesslag_sp", hesslag_sp_);
+  }
+
+  void KnitroInterface::serialize_body(SerializingStream &s) const {
+    Nlpsol::serialize_body(s);
+    s.pack("KnitroInterface::contype", contype_);
+    s.pack("KnitroInterface::opts", opts_);
+    s.pack("KnitroInterface::jacg_sp", jacg_sp_);
+    s.pack("KnitroInterface::hesslag_sp", hesslag_sp_);
   }
 
   KnitroMemory::KnitroMemory(const KnitroInterface& self) : self(self) {

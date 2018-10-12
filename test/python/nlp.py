@@ -66,14 +66,12 @@ if has_nlpsol("bonmin"):
   solvers.append(("bonmin",{},{"discrete"}))
 
 print(solvers)
-"""
+
 try:
   load_nlpsol("knitro")
-  solvers.append(("knitro",{}))
-  print "Will test knitro"
+  solvers.append(("knitro",{"knitro":{"feastol":1e-8,"opttol":1e-8}},set()))
 except:
   pass
-"""
 
 class NLPtests(casadiTestCase):
   def test_iteration_interrupt(self):
