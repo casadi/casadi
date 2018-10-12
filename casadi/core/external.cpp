@@ -361,6 +361,7 @@ namespace casadi {
   void External::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
+    s.version("External", 1);
     s.pack("External::int_data", int_data_);
     s.pack("External::real_data", real_data_);
     s.pack("External::string_data", string_data_);
@@ -368,9 +369,9 @@ namespace casadi {
   }
 
   ProtoFunction* External::deserialize(DeserializingStream& s) {
-    s.version("External", 1);
+    s.version("GenericExternal", 1);
     char type;
-    s.unpack("External::type", type);
+    s.unpack("GenericExternal::type", type);
     switch (type) {
       case 'g': return new GenericExternal(s);
       default:
@@ -380,11 +381,12 @@ namespace casadi {
 
   void GenericExternal::serialize_type(SerializingStream &s) const {
     FunctionInternal::serialize_type(s);
-    s.pack("External::type", 'g');
-    s.version("External", 1);
+    s.version("GenericExternal", 1);
+    s.pack("GenericExternal::type", 'g');
   }
 
   External::External(DeserializingStream & s) : FunctionInternal(s) {
+    s.version("External", 1);
     s.unpack("External::int_data", int_data_);
     s.unpack("External::real_data", real_data_);
     s.unpack("External::string_data", string_data_);
