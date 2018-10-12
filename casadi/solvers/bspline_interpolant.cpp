@@ -45,7 +45,7 @@ namespace casadi {
     Interpolant::registerPlugin(casadi_register_interpolant_bspline);
   }
 
-  Options BSplineInterpolant::options_
+  const Options BSplineInterpolant::options_
   = {{&Interpolant::options_},
       {{"degree",
        {OT_INTVECTOR,

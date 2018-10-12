@@ -55,7 +55,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options FastNewton::options_
+  const Options FastNewton::options_
   = {{&Rootfinder::options_},
      {{"abstol",
        {OT_DOUBLE,

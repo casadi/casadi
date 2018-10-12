@@ -26,10 +26,10 @@
 #ifndef CASADI_MX_FUNCTION_HPP
 #define CASADI_MX_FUNCTION_HPP
 
-#include <set>
-#include <map>
-#include <vector>
 #include <iostream>
+#include <map>
+#include <set>
+#include <vector>
 
 #include "x_function.hpp"
 #include "mx_node.hpp"
@@ -100,7 +100,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 

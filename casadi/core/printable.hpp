@@ -27,9 +27,9 @@
 #define CASADI_PRINTABLE_HPP
 
 #include <iostream>
-#include <string>
 #include <sstream>
 #include <streambuf>
+#include <string>
 #include <vector>
 
 #include "casadi_common.hpp"

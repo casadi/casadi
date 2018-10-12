@@ -38,7 +38,7 @@ namespace casadi {
   */
   struct CASADI_EXPORT Options {
     // Base classes, whose options are also valid for the derived class
-    std::vector<Options*> bases;
+    std::vector<const Options*> bases;
 
     // Information for a particular options entry
     struct Entry {

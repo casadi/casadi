@@ -111,7 +111,7 @@ namespace casadi {
 
   protected:
     /** \brief Deserializing constructor */
-    explicit LinsolLdl(DeserializingStream& e);
+    explicit LinsolLdl(DeserializingStream& s);
   };
 
 } // namespace casadi

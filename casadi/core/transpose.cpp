@@ -41,7 +41,7 @@ namespace casadi {
   }
 
   void DenseTranspose::serialize_type(SerializingStream& s) const {
-    MXNode::serialize_type(s);
+    MXNode::serialize_type(s); // NOLINT
     s.pack("Transpose::dense", true);
   }
 

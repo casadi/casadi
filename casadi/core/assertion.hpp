@@ -40,7 +40,7 @@ namespace casadi {
   public:
 
     /// Constructor
-    Assertion(const MX& x, const MX& y, const std::string & s);
+    Assertion(const MX& x, const MX& y, const std::string & fail_message);
 
     /// Destructor
     ~Assertion() override {}

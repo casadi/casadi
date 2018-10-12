@@ -58,7 +58,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options LapackLu::options_
+  const Options LapackLu::options_
   = {{&FunctionInternal::options_},
      {{"equilibration",
        {OT_BOOL,

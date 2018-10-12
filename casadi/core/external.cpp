@@ -27,8 +27,8 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 
 namespace casadi {

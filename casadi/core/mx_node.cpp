@@ -524,7 +524,7 @@ namespace casadi {
 
 
   MX MXNode::get_nzadd(const MX& y, const vector<casadi_int>& nz) const {
-    if (nz.size()==0 || is_zero()) {
+    if (nz.empty() || is_zero()) {
       return y;
     } else {
       return SetNonzeros<true>::create(y, shared_from_this<MX>(), nz);

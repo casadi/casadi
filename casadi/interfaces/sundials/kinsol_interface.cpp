@@ -86,7 +86,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options KinsolInterface::options_
+  const Options KinsolInterface::options_
   = {{&Rootfinder::options_},
      {{"max_iter",
        {OT_INT,

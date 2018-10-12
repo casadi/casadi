@@ -47,7 +47,7 @@ namespace casadi {
   }
 
   const XmlNode& XmlNode::operator[](casadi_int i) const {
-    return const_cast<XmlNode*>(this)->operator[](i);
+    return const_cast<XmlNode*>(this)->operator[](i); // NOLINT
   }
 
   bool XmlNode::hasChild(const string& childname) const {
@@ -69,7 +69,7 @@ namespace casadi {
   }
 
   const XmlNode& XmlNode::operator[](const string& childname) const {
-    return const_cast<XmlNode*>(this)->operator[](childname);
+    return const_cast<XmlNode*>(this)->operator[](childname); // NOLINT
   }
 
   void XmlNode::set_attribute(const string& attribute_name, const string& attribute) {
@@ -120,7 +120,7 @@ namespace casadi {
   }
 
   bool XmlNode::checkName(const string& str) const {
-    return name_.compare(str) == 0;
+    return name_ == str;
   }
 
   void XmlNode::readString(const std::string& str, std::string& val) {
@@ -128,9 +128,9 @@ namespace casadi {
   }
 
   void XmlNode::readString(const std::string& str, bool& val) {
-    if (str.compare("true")==0)
+    if (str=="true")
       val = true;
-    else if (str.compare("false")==0)
+    else if (str=="false")
       val = false;
     else
       throw CasadiException("XML argument not true or false");

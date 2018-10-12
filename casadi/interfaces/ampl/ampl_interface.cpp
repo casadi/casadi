@@ -56,7 +56,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options AmplInterface::options_
+  const Options AmplInterface::options_
   = {{&Nlpsol::options_},
      {{"solver",
        {OT_STRING,
@@ -173,10 +173,10 @@ namespace casadi {
       // Get the operation indices
       std::vector<casadi_int> o = F.instruction_output(k);
       casadi_int o0=-1, o1=-1, i0=-1, i1=-1;
-      if (o.size()>0) o0 = o[0];
+      if (!o.empty()) o0 = o[0];
       if (o.size()>1) o1 = o[1];
       std::vector<casadi_int> i = F.instruction_input(k);
-      if (i.size()>0) i0 = i[0];
+      if (!i.empty()) i0 = i[0];
       if (i.size()>1) i1 = i[1];
       switch (op) {
         case OP_CONST:

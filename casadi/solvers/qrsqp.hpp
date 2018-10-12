@@ -99,7 +99,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -168,11 +168,11 @@ namespace casadi {
 
     /// Print iteration
     void print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf,
-                         double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const;
+                         double dx_norm, double rg, casadi_int ls_trials, bool ls_success) const;
 
     // Solve the QP subproblem
     virtual void solve_QP(QrsqpMemory* m, const double* H, const double* g,
-                          const double* lbx, const double* ubx,
+                          const double* lbdz, const double* ubdz,
                           const double* A, double* x_opt, double* dlam) const;
 
     /// A documentation string

@@ -34,9 +34,9 @@
 #include "jit_function.hpp"
 #include "serializing_stream.hpp"
 
-#include <typeinfo>
-#include <fstream>
 #include <cctype>
+#include <fstream>
+#include <typeinfo>
 
 using namespace std;
 
@@ -437,7 +437,7 @@ namespace casadi {
     Function base = mapaccum(N, opts);
     std::vector<MX> base_in = base.mx_in();
     std::vector<MX> out = base(base_in);
-    out[0] = out[0](Slice(), range((N-1)*size2_out(0), N*size2_out(0)));
+    out[0] = out[0](Slice(), range((N-1)*size2_out(0), N*size2_out(0))); // NOLINT
     return Function("fold_"+name(), base_in, out, name_in(), name_out(), opts);
   }
   Function Function::mapaccum(casadi_int N, const Dict& opts) const {
@@ -613,7 +613,7 @@ namespace casadi {
       for (casadi_int i=0;i<n_in();++i) {
         MX arg = MX::sym("arg", repmat(sparsity_in(i), 1, n));
         ret_in.push_back(arg);
-        MX last_arg = arg(Slice(), range((n-1)*size2_in(i), n*size2_in(i)));
+        MX last_arg = arg(Slice(), range((n-1)*size2_in(i), n*size2_in(i))); // NOLINT
         base_in.push_back(horzcat(arg, repmat(last_arg, 1, rem)));
       }
       std::vector<MX> ret_out = base(base_in);
@@ -1122,7 +1122,7 @@ namespace casadi {
 
     // Check if keyword
     for (const char* kw : {"null", "jac", "hess"}) {
-      if (name.compare(kw)==0) return false;
+      if (name==kw) return false;
     }
 
     // Make sure that the first character is a letter
@@ -1149,10 +1149,10 @@ namespace casadi {
     return deserialize(s);
   }
 
-  Function Function::load(const std::string& s) {
-    std::ifstream stream(s, ios_base::binary | std::ios::in);
+  Function Function::load(const std::string& filename) {
+    std::ifstream stream(filename, ios_base::binary | std::ios::in);
     if ((stream.rdstate() & std::ifstream::failbit) != 0) {
-      casadi_error("Could not open file '" + s + "'.");
+      casadi_error("Could not open file '" + filename + "'.");
     }
     return deserialize(stream);
   }
@@ -1192,7 +1192,7 @@ namespace casadi {
 
     // If name became a keyword, append 1
     for (const char* kw : {"null", "jac", "hess"}) {
-      if (ss.str().compare(kw)==0) ss << "1";
+      if (ss.str()==kw) ss << "1";
     }
 
     return ss.str();
@@ -1336,17 +1336,17 @@ namespace casadi {
     }
   }
 
-  const SX Function::sx_in(casadi_int ind) const {
+  const SX Function::sx_in(casadi_int iind) const {
     try {
-      return (*this)->sx_in(ind);
+      return (*this)->sx_in(iind);
     } catch (exception& e) {
       THROW_ERROR("sx_in", e.what());
     }
   }
 
-  const SX Function::sx_out(casadi_int ind) const {
+  const SX Function::sx_out(casadi_int oind) const {
     try {
-      return (*this)->sx_out(ind);
+      return (*this)->sx_out(oind);
     } catch (exception& e) {
       THROW_ERROR("sx_out", e.what());
     }

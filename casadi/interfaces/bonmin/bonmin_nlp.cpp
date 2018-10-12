@@ -133,8 +133,7 @@ namespace casadi {
       mem_->arg[2] = &obj_factor;
       mem_->arg[3] = lambda;
       mem_->res[0] = values;
-      if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
-      return true;
+      return !solver_.calc_function(mem_, "nlp_hess_l");
     } else {
       // Get the sparsity pattern
       casadi_int ncol = solver_.hesslag_sp_.size2();

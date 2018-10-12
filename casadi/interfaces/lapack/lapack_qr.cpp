@@ -54,7 +54,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options LapackQr::options_
+  const Options LapackQr::options_
   = {{&FunctionInternal::options_},
      {{"max_nrhs",
        {OT_INT,

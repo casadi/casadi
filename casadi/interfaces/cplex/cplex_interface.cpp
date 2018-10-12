@@ -56,7 +56,7 @@ namespace casadi {
     : Conic(name, st) {
   }
 
-  Options CplexInterface::options_
+  const Options CplexInterface::options_
   = {{&Conic::options_},
      {{"cplex",
        {OT_DICT,

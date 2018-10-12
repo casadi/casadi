@@ -92,7 +92,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -127,7 +127,7 @@ namespace casadi {
 
   protected:
      /** \brief Deserializing constructor */
-    explicit ClpInterface(DeserializingStream& e);
+    explicit ClpInterface(DeserializingStream& s);
 
   private:
     // Conversion of string to enum for options

@@ -45,7 +45,7 @@ namespace casadi {
     Interpolant::registerPlugin(casadi_register_interpolant_linear);
   }
 
-  Options LinearInterpolant::options_
+  const Options LinearInterpolant::options_
   = {{&Interpolant::options_},
      {{"lookup_mode",
        {OT_STRINGVECTOR,

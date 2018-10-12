@@ -163,7 +163,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -204,7 +204,7 @@ namespace casadi {
     /// Compute gradient of Lagrangian function (sparse version)
     void calcLagrangeGradient(BlocksqpMemory* m,
       const double* lam_x, const double* lam_g,
-      const double* grad_f, double *jacNz,
+      const double* grad_f, const double *jacNz,
       double *grad_lag, casadi_int flag) const;
 
     /// Overloaded function for convenience, uses current variables of SQPiterate vars

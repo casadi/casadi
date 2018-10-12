@@ -163,7 +163,7 @@ namespace casadi {
 
         // What to store
         if (a.op==OP_CONST) {
-          g << g.constant(a.d);
+          g << CodeGenerator::constant(a.d);
         } else if (a.op==OP_INPUT) {
           g << "arg[" << a.i1 << "] ? arg[" << a.i1 << "][" << a.i2 << "] : 0";
         } else {
@@ -177,7 +177,7 @@ namespace casadi {
     }
   }
 
-  Options SXFunction::options_
+  const Options SXFunction::options_
   = {{&FunctionInternal::options_},
      {{"default_in",
        {OT_DOUBLEVECTOR,
@@ -827,7 +827,7 @@ namespace casadi {
     }
 
     // Construct indent string
-    std::string indent = "";
+    std::string indent;
     for (casadi_int i=0;i<indent_level;++i) {
       indent += "  ";
     }

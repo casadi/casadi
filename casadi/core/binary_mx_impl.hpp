@@ -27,11 +27,11 @@
 #define CASADI_BINARY_MX_IMPL_HPP
 
 #include "binary_mx.hpp"
-#include <vector>
-#include <sstream>
 #include "casadi_misc.hpp"
 #include "global_options.hpp"
 #include "serializing_stream.hpp"
+#include <sstream>
+#include <vector>
 
 using namespace std;
 

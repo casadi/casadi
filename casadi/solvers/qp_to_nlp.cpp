@@ -54,7 +54,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options QpToNlp::options_
+  const Options QpToNlp::options_
   = {{&Conic::options_},
      {{"nlpsol",
        {OT_STRING,

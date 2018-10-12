@@ -26,10 +26,10 @@
 #ifndef CASADI_SERIALIZER_HPP
 #define CASADI_SERIALIZER_HPP
 
+#include <memory>
+#include <set>
 #include <sstream>
 #include <unordered_map>
-#include <set>
-#include <memory>
 
 namespace casadi {
 

@@ -26,9 +26,9 @@
 #ifndef CASADI_SERIALIZING_STREAM_HPP
 #define CASADI_SERIALIZING_STREAM_HPP
 
+#include <set>
 #include <sstream>
 #include <unordered_map>
-#include <set>
 
 namespace casadi {
   class Slice;

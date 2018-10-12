@@ -96,7 +96,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -155,7 +155,7 @@ namespace casadi {
     bool second_order_correction_;
     double step0_;
     double nonlin_conv_coeff_;
-    double max_order_;
+    casadi_int max_order_;
     ///@}
 
     /// Linear solver

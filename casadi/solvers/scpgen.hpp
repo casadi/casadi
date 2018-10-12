@@ -99,7 +99,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -137,7 +137,7 @@ namespace casadi {
     // Print iteration
     void printIteration(ScpgenMemory* m, std::ostream &stream, casadi_int iter, double obj,
                         double pr_inf, double du_inf,
-                        double reg, casadi_int ls_trials, bool ls_success) const;
+                        double rg, casadi_int ls_trials, bool ls_success) const;
 
     // Evaluate the matrices in the condensed QP
     void eval_mat(ScpgenMemory* m) const;

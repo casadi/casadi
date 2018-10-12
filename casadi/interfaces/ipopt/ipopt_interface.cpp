@@ -65,7 +65,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options IpoptInterface::options_
+  const Options IpoptInterface::options_
   = {{&Nlpsol::options_},
      {{"pass_nonlinear_variables",
        {OT_BOOL,
@@ -623,7 +623,7 @@ namespace casadi {
     auto m = static_cast<IpoptMemory*>(mem);
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter_count;
-    if (m->inf_pr.size()>0) {
+    if (!m->inf_pr.empty()) {
       Dict iterations;
       iterations["inf_pr"] = m->inf_pr;
       iterations["inf_du"] = m->inf_du;

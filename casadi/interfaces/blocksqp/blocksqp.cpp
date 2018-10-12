@@ -56,7 +56,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options Blocksqp::options_
+  const Options Blocksqp::options_
   = {{&Nlpsol::options_},
      {{"qpsol",
        {OT_STRING,
@@ -677,7 +677,7 @@ namespace casadi {
 
     // Free existing memory, if any
     if (qp_init_) {
-      if (m->qp) delete m->qp;
+      delete m->qp;
       m->qp = nullptr;
     }
     if (!m->qp) {
@@ -948,7 +948,7 @@ namespace casadi {
   void Blocksqp::
   calcLagrangeGradient(BlocksqpMemory* m,
     const double* lam_x, const double* lam_g,
-    const double* grad_f, double *jacNz,
+    const double* grad_f, const double *jacNz,
     double* grad_lag, casadi_int flag) const {
 
     // Objective gradient
@@ -1002,10 +1002,7 @@ namespace casadi {
     m->cNorm  = lInfConstraintNorm(m, d_nlp->z, m->gk);
     m->cNormS = m->cNorm /(1.0 + casadi_norm_inf(nx_, d_nlp->z));
 
-    if (m->tol <= opttol_ && m->cNormS <= nlinfeastol_)
-      return true;
-    else
-      return false;
+    return m->tol <= opttol_ && m->cNormS <= nlinfeastol_;
   }
 
   void Blocksqp::printInfo(BlocksqpMemory* m) const {
@@ -2320,7 +2317,7 @@ namespace casadi {
 
     // Setup QProblem data
     if (matricesChanged) {
-      if (m->A) delete m->A;
+      delete m->A;
       m->A = nullptr;
       copy_vector(Asp_.colind(), m->colind);
       copy_vector(Asp_.row(), m->row);
@@ -2350,7 +2347,7 @@ namespace casadi {
 
     // Other variables for qpOASES
     double cpuTime = matricesChanged ? max_time_qp_ : 0.1*max_time_qp_;
-    int maxIt = matricesChanged ? max_it_qp_ : 0.1*max_it_qp_;
+    int maxIt = matricesChanged ? max_it_qp_ : static_cast<int>(0.1*max_it_qp_);
     qpOASES::SolutionAnalysis solAna;
     qpOASES::returnValue ret = qpOASES::RET_INFO_UNDEFINED;
 
@@ -2379,7 +2376,7 @@ namespace casadi {
         if (matricesChanged) {
           // Convert block-Hessian to sparse format
           convertHessian(m);
-          if (m->H) delete m->H;
+          delete m->H;
           m->H = nullptr;
           m->H = new qpOASES::SymSparseMat(nx_, nx_,
                                            m->hessIndRow, m->hessIndCol,
@@ -2406,7 +2403,7 @@ namespace casadi {
               }
           } else {
             // Second order correction: H and A do not change
-            maxIt = 0.1*max_it_qp_;
+            maxIt = static_cast<int>(0.1*max_it_qp_);
             cpuTime = 0.1*max_time_qp_;
             ret = m->qp->hotstart(g, lb, lu, lbA, luA, maxIt, &cpuTime);
           }
@@ -2459,7 +2456,7 @@ namespace casadi {
     // Print qpOASES error code, if any
     if (ret != qpOASES::SUCCESSFUL_RETURN && matricesChanged)
       print("***WARNING: qpOASES error message: \"%s\"\n",
-              qpOASES::getGlobalMessageHandler()->getErrorCodeMessage(ret));
+              qpOASES::MessageHandling::getErrorCodeMessage(ret));
 
     // Point Hessian again to the first Hessian
     m->hess = m->hess1;
@@ -2833,10 +2830,10 @@ namespace casadi {
   }
 
   BlocksqpMemory::~BlocksqpMemory() {
-    if (qpoases_mem) delete qpoases_mem;
-    if (H) delete H;
-    if (A) delete A;
-    if (qp) delete qp;
+    delete qpoases_mem;
+    delete H;
+    delete A;
+    delete qp;
   }
 
   double Blocksqp::

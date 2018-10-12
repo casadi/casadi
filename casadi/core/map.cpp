@@ -198,7 +198,7 @@ namespace casadi {
           }
         }
       }
-      *it = (*it)(Slice(), ind);
+      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Get output expressions
@@ -216,7 +216,7 @@ namespace casadi {
           }
         }
       }
-      *it = (*it)(Slice(), ind);
+      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Construct return function
@@ -249,7 +249,7 @@ namespace casadi {
           }
         }
       }
-      *it = (*it)(Slice(), ind);
+      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Get output expressions
@@ -267,7 +267,7 @@ namespace casadi {
           }
         }
       }
-      *it = (*it)(Slice(), ind);
+      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Construct return function

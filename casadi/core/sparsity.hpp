@@ -359,7 +359,7 @@ namespace casadi {
     std::string serialize() const;
 
     /** \brief Build Sparsity from serialization */
-    static Sparsity deserialize(std::istream& istream);
+    static Sparsity deserialize(std::istream& stream);
 
     /** \brief Build Sparsity from serialization */
     static Sparsity deserialize(const std::string& s);
@@ -488,10 +488,10 @@ namespace casadi {
         the second bit indicates if the second argument is nonzero (note that none of,
         one of or both of the arguments can be nonzero) */
 #ifndef SWIG
-    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero,
+    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
                             std::vector<unsigned char>& mapping) const;
 #endif // SWIG
-    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
+    Sparsity combine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const;
     /// @}
 
     /// @{
@@ -547,9 +547,9 @@ namespace casadi {
     static Sparsity blockcat(const std::vector< std::vector< Sparsity > > &v);
     static Sparsity diagcat(const std::vector< Sparsity > &v);
     static std::vector<Sparsity>
-      horzsplit(const Sparsity& x, const std::vector<casadi_int>& output_offset);
+      horzsplit(const Sparsity& x, const std::vector<casadi_int>& offset);
     static std::vector<Sparsity>
-      vertsplit(const Sparsity& x, const std::vector<casadi_int>& output_offset);
+      vertsplit(const Sparsity& x, const std::vector<casadi_int>& offset);
     static std::vector<Sparsity>
       diagsplit(const Sparsity& x,
                 const std::vector<casadi_int>& offset1,
@@ -559,8 +559,8 @@ namespace casadi {
     static Sparsity reshape(const Sparsity& x, casadi_int nrow, casadi_int ncol);
     static Sparsity reshape(const Sparsity& x, const Sparsity& sp);
     static casadi_int sprank(const Sparsity& x);
-    static casadi_int norm_0_mul(const Sparsity& x, const Sparsity& B);
-    static Sparsity kron(const Sparsity& x, const Sparsity& b);
+    static casadi_int norm_0_mul(const Sparsity& x, const Sparsity& A);
+    static Sparsity kron(const Sparsity& a, const Sparsity& b);
     static Sparsity triu(const Sparsity& x, bool includeDiagonal=true);
     static Sparsity tril(const Sparsity& x, bool includeDiagonal=true);
 

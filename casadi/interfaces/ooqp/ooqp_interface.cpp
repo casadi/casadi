@@ -64,7 +64,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options OoqpInterface::options_
+  const Options OoqpInterface::options_
   = {{&Conic::options_},
      {{"print_level",
        {OT_INT,
@@ -356,7 +356,7 @@ namespace casadi {
     double objectiveValue;
 
     int ierr;
-    if (false) { // Use C interface
+    if (false) { // Use C interface NOLINT
       // TODO(jgillis): Change to conicvehb, see OOQP users guide
       qpsolvesp(c_, nx,
                 irowQ_,  nnzQ, jcolQ_, dQ_,

@@ -26,19 +26,19 @@
 #ifndef CASADI_COMMON_HPP
 #define CASADI_COMMON_HPP
 
-#include <cmath>
-#include <climits>
-#include <limits>
-#include <vector>
-#include <set>
-#include <map>
-#include <utility>
-#include <sstream>
-#include <iostream>
-#include <string>
-#include <fstream>
 #include <algorithm>
+#include <climits>
+#include <cmath>
+#include <fstream>
+#include <iostream>
 #include <iterator>
+#include <limits>
+#include <map>
+#include <set>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #ifdef SWIG
 #define SWIG_IF_ELSE(is_swig, not_swig) is_swig

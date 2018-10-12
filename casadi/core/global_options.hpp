@@ -26,11 +26,11 @@
 #ifndef CASADI_GLOBAL_OPTIONS_HPP
 #define CASADI_GLOBAL_OPTIONS_HPP
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-#include <casadi/core/casadi_export.h>
 #include "casadi/core/casadi_common.hpp"
+#include <casadi/core/casadi_export.h>
 
 namespace casadi {
 

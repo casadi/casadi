@@ -26,8 +26,8 @@
 #include "jit_function.hpp"
 #include "casadi_misc.hpp"
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 
 namespace casadi {
@@ -51,7 +51,7 @@ namespace casadi {
     enable_fd_ = true; // override default
   }
 
-  Options JitFunction::options_
+  const Options JitFunction::options_
   = {{&FunctionInternal::options_},
      {{"buffered",
       {OT_BOOL,

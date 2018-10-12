@@ -104,7 +104,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -140,7 +140,7 @@ namespace casadi {
     std::string formatSecondaryStatus(int status) const;
 
     void userfun(SnoptMemory* m, int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
-                 double* x, double* fObj, double*gObj, double* fCon, double* gCon,
+                 const double* x, double* fObj, double*gObj, double* fCon, double* gCon,
                  int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru) const;
 
     casadi_int nnJac_;
@@ -152,10 +152,10 @@ namespace casadi {
     casadi_int m_;
     casadi_int iObj_;
 
-    static void userfunPtr(int * mode, int* nnObj, int * nnCon, int *nJac, int *nnL, int * neJac,
-                           double *x, double *fObj, double *gObj, double * fCon, double* gCon,
-                           int* nState, char* cu, int* lencu, int* iu, int* leniu,
-                           double* ru, int *lenru);
+    static void userfunPtr(int * mode, int* nnObj, int * nnCon, int *nJac, int *nnL, int * neJac, // NOLINT
+                           double *x, double *fObj, double *gObj, double * fCon, double* gCon, // NOLINT
+                           int* nState, char* cu, int* lencu, int* iu, int* leniu, // NOLINT
+                           double* ru, int *lenru); // NOLINT
 
     // Matrix A has a linear objective row
     bool jacF_row_;

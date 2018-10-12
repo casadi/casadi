@@ -148,12 +148,12 @@ namespace casadi {
   }
 
   bool GenericType::is_empty_vector() const {
-    return (is_int_vector() && to_int_vector().size()==0) ||
-      (is_int_vector_vector() && to_int_vector_vector().size()==0) ||
-      (is_double_vector_vector() && to_double_vector_vector().size()==0) ||
-      (is_double_vector() && to_double_vector().size()==0) ||
-      (is_string_vector() && to_string_vector().size()==0) ||
-      (is_bool_vector() && to_bool_vector().size()==0);
+    return (is_int_vector() && to_int_vector().empty()) ||
+      (is_int_vector_vector() && to_int_vector_vector().empty()) ||
+      (is_double_vector_vector() && to_double_vector_vector().empty()) ||
+      (is_double_vector() && to_double_vector().empty()) ||
+      (is_string_vector() && to_string_vector().empty()) ||
+      (is_bool_vector() && to_bool_vector().empty());
   }
 
   bool GenericType::is_int_vector() const {
@@ -451,7 +451,7 @@ namespace casadi {
 
   bool GenericType::operator!=(const GenericType& op2) const {
     if (is_string() && op2.is_string()) {
-      return to_string().compare(op2.to_string()) != 0;
+      return to_string() != op2.to_string();
     }
 
     if (is_int() && op2.is_int()) {

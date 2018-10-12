@@ -58,7 +58,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options KnitroInterface::options_
+  const Options KnitroInterface::options_
   = {{&Nlpsol::options_},
      {{"knitro",
        {OT_DICT,

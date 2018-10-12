@@ -151,7 +151,7 @@ namespace casadi {
   }
 
   void DenseMultiplication::serialize_type(SerializingStream& s) const {
-    MXNode::serialize_type(s);
+    MXNode::serialize_type(s); // NOLINT
     s.pack("Multiplication::dense", true);
   }
 

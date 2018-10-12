@@ -81,7 +81,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -121,7 +121,7 @@ namespace casadi {
 
   protected:
      /** \brief Deserializing constructor */
-    explicit Qrqp(DeserializingStream& e);
+    explicit Qrqp(DeserializingStream& s);
 
   private:
     void set_qp_prob();

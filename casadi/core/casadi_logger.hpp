@@ -28,9 +28,9 @@
 
 #include <casadi/core/casadi_export.h>
 
-#include <iostream>
-#include <fstream>
 #include <cstdarg>
+#include <fstream>
+#include <iostream>
 
 namespace casadi {
   /**

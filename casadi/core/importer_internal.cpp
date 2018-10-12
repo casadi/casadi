@@ -42,7 +42,7 @@ namespace casadi {
 
   const std::string ImporterInternal::infix_ = "importer";
 
-  Options ImporterInternal::options_
+  const Options ImporterInternal::options_
   = {{},
      {{"verbose",
        {OT_BOOL,

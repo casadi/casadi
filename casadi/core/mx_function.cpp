@@ -53,7 +53,7 @@ namespace casadi {
   MXFunction::~MXFunction() {
   }
 
-  Options MXFunction::options_
+  const Options MXFunction::options_
   = {{&FunctionInternal::options_},
      {{"default_in",
        {OT_DOUBLEVECTOR,
@@ -1326,7 +1326,7 @@ namespace casadi {
     }
 
     // Construct indent string
-    std::string indent = "";
+    std::string indent;
     for (casadi_int i=0;i<indent_level;++i) {
       indent += "  ";
     }

@@ -156,7 +156,7 @@ namespace casadi {
   Rootfinder::~Rootfinder() {
   }
 
-  Options Rootfinder::options_
+  const Options Rootfinder::options_
   = {{&OracleFunction::options_},
      {{"linear_solver",
        {OT_STRING,

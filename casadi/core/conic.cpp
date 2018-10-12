@@ -318,7 +318,7 @@ namespace casadi {
         "Got incompatible dimensions.\n"
         "Q: " + Q_.dim() +
         "We need the product Qx to exist.");
-      np_ = sqrt(Q_.size1());
+      np_ = static_cast<casadi_int>(sqrt(static_cast<double>(Q_.size1())));
       casadi_assert(np_*np_==Q_.size1(),
         "Got incompatible dimensions.\n"
         "Q: " + Q_.dim() +
@@ -385,7 +385,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  Options Conic::options_
+  const Options Conic::options_
   = {{&FunctionInternal::options_},
      {{"discrete",
        {OT_BOOLVECTOR,

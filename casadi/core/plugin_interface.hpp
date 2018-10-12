@@ -302,7 +302,7 @@ namespace casadi {
       handle = LoadLibrary(TEXT(lib.c_str()));
       SetDllDirectory(NULL);
 #else // _WIN32
-      std::string libname = searchpath.size()==0 ? lib : searchpath + filesep + lib;
+      std::string libname = searchpath.empty() ? lib : searchpath + filesep + lib;
       handle = dlopen(libname.c_str(), flag);
 #endif // _WIN32
       if (handle) {

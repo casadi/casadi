@@ -58,7 +58,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options IdasInterface::options_
+  const Options IdasInterface::options_
   = {{&SundialsInterface::options_},
      {{"suppress_algebraic",
        {OT_BOOL,
@@ -290,13 +290,13 @@ namespace casadi {
     THROWING(IDASetMaxStep, m->mem, max_step_size_);
 
     // Initial step size
-    if (step0_) THROWING(IDASetInitStep, m->mem, step0_);
+    if (step0_!=0) THROWING(IDASetInitStep, m->mem, step0_);
 
     // Maximum order of method
     if (max_order_) THROWING(IDASetMaxOrd, m->mem, max_order_);
 
     // Coeff. in the nonlinear convergence test
-    if (nonlin_conv_coeff_) THROWING(IDASetNonlinConvCoef, m->mem, nonlin_conv_coeff_);
+    if (nonlin_conv_coeff_!=0) THROWING(IDASetNonlinConvCoef, m->mem, nonlin_conv_coeff_);
 
     if (!abstolv_.empty()) {
       // Vector absolute tolerances
@@ -565,7 +565,7 @@ namespace casadi {
     char* flagname = IDAGetReturnFlagName(flag);
     stringstream ss;
     ss << module << " returned \"" << flagname << "\". Consult IDAS documentation.";
-    free(flagname);
+    free(flagname); // NOLINT
     casadi_error(ss.str());
   }
 
@@ -1008,7 +1008,7 @@ namespace casadi {
   template<typename MatType>
   Function IdasInterface::getJ(bool backward) const {
     vector<MatType> a = MatType::get_input(oracle_);
-    vector<MatType> r = const_cast<Function&>(oracle_)(a);
+    vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
     MatType cj = MatType::sym("cj");
 
     // Get the Jacobian in the Newton iteration

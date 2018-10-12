@@ -58,7 +58,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options WorhpInterface::options_
+  const Options WorhpInterface::options_
   = {{&Nlpsol::options_},
      {{"worhp",
        {OT_DICT,
@@ -89,7 +89,7 @@ namespace casadi {
     // Sort Worhp options
     casadi_int nopts = WorhpGetParamCount();
     for (auto&& op : worhp_opts) {
-      if (op.first.compare("qp")==0) {
+      if (op.first=="qp") {
         qp_opts_ = op.second;
         continue;
       }
@@ -100,7 +100,7 @@ namespace casadi {
         // Get name in WORHP
         const char* name = WorhpGetParamName(ind);
         // Break if matching name
-        if (op.first.compare(name)==0) break;
+        if (op.first==name) break;
       }
       if (ind>nopts) casadi_error("No such Worhp option: " + op.first);
 
@@ -293,7 +293,7 @@ namespace casadi {
       m->worhp_w.DG.nnz = 0;
     }
 
-    if (true /*m->worhp_w.HM.NeedStructure*/) { // not initialized
+    if (true /*m->worhp_w.HM.NeedStructure*/) { // not initialized // NOLINT
       m->worhp_w.HM.nnz = nx_ + hesslag_sp_.nnz_lower(true);
     } else {
       m->worhp_w.HM.nnz = 0;

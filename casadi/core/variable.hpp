@@ -26,8 +26,8 @@
 #ifndef CASADI_VARIABLE_HPP
 #define CASADI_VARIABLE_HPP
 
-#include <iostream>
 #include "mx.hpp"
+#include <iostream>
 
 namespace casadi {
 

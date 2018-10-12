@@ -31,7 +31,7 @@ namespace casadi {
   Callback::Callback() {
   }
 
-  Callback::Callback(const Callback& obj) : Function() {
+  Callback::Callback(const Callback& obj) : Function() { // NOLINT
     casadi_error("Callback objects cannot be copied");
   }
 
@@ -44,8 +44,12 @@ namespace casadi {
   }
 
   Callback::~Callback() {
-    // Make sure that this object isn't used after its deletion
+    try {
+      // Make sure that this object isn't used after its deletion
     if (!is_null()) get<CallbackInternal>()->self_ = nullptr;
+    } catch (...) {
+      casadi_warning("Problem in Callback destructor");
+    }
   }
 
   std::vector<DM> Callback::eval(const std::vector<DM>& arg) const {

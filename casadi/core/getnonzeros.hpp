@@ -48,7 +48,7 @@ namespace casadi {
     ///@}
 
     /// Constructor
-    GetNonzeros(const Sparsity& sp, const MX& x);
+    GetNonzeros(const Sparsity& sp, const MX& y);
 
     /// Destructor
     ~GetNonzeros() override {}

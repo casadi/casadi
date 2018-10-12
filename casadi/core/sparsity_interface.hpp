@@ -530,7 +530,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType SparsityInterface<MatType>::mtimes(const std::vector<MatType> &args) {
-    casadi_assert(args.size()>=1,
+    casadi_assert(!args.empty(),
                           "mul(std::vector<MatType> &args): "
                           "supplied list must not be empty.");
     MatType ret = args[0];

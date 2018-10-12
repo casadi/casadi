@@ -34,9 +34,9 @@
 #include "generic_expression.hpp"
 #include "printable.hpp"
 
-#include <vector>
-#include <typeinfo>
 #include <random>
+#include <typeinfo>
+#include <vector>
 
 namespace casadi {
 
@@ -826,7 +826,7 @@ namespace casadi {
     static void print_scalar(std::ostream &stream, const Scalar& e);
 
     /// Print scalar
-    static void print_sparse(std::ostream &stream, const Sparsity& sp, const Scalar* e,
+    static void print_sparse(std::ostream &stream, const Sparsity& sp, const Scalar* nonzeros,
       bool truncate=true);
 
     /// Get strings corresponding to the nonzeros and the interdependencies
@@ -917,7 +917,7 @@ namespace casadi {
     ///@}
 
     /** \brief  create an n-by-n identity matrix */
-    static Matrix<Scalar> eye(casadi_int ncol);
+    static Matrix<Scalar> eye(casadi_int n);
 
     /** \brief Returns a number that is unique for a given symbolic scalar
      *
@@ -1083,7 +1083,7 @@ namespace casadi {
     std::string serialize() const;
 
     /** \brief Build Sparsity from serialization */
-    static Matrix<Scalar> deserialize(std::istream& istream);
+    static Matrix<Scalar> deserialize(std::istream& stream);
 
     /** \brief Build Sparsity from serialization */
     static Matrix<Scalar> deserialize(const std::string& s);

@@ -63,7 +63,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options Sqpmethod::options_
+  const Options Sqpmethod::options_
   = {{&Nlpsol::options_},
      {{"qpsol",
        {OT_STRING,

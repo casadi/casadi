@@ -53,7 +53,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options HpmpcInterface::options_
+  const Options HpmpcInterface::options_
   = {{&Conic::options_},
      {{"N",
        {OT_INT,
@@ -228,12 +228,12 @@ namespace casadi {
     casadi_assert_dev(nu.size()==N_);
     casadi_assert_dev(ng.size()==N_+1);
 
-    casadi_assert(nx_ == std::accumulate(nx.begin(), nx.end(), 0) +
+    casadi_assert(nx_ == std::accumulate(nx.begin(), nx.end(), 0) + // NOLINT
       std::accumulate(nu.begin(), nu.end(), 0),
       "sum(nx)+sum(nu) = must equal total size of variables (" + str(nx_) + "). "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", "
       "nu " + str(nu) + ", ng " + str(ng) + ".");
-    casadi_assert(na_ == std::accumulate(nx.begin()+1, nx.end(), 0) +
+    casadi_assert(na_ == std::accumulate(nx.begin()+1, nx.end(), 0) + // NOLINT
       std::accumulate(ng.begin(), ng.end(), 0),
       "sum(nx+1)+sum(ng) = must equal total size of constraints (" + str(na_) + "). "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", "
@@ -431,15 +431,15 @@ namespace casadi {
     lam_clsp_ = blocksparsity(offset, 1, lam_cl_blocks);
     lam_cusp_ = blocksparsity(offset, 1, lam_cu_blocks);
 
-    pisp_ = Sparsity::dense(std::accumulate(nx.begin()+1, nx.end(), 0), 1);
+    pisp_ = Sparsity::dense(std::accumulate(nx.begin()+1, nx.end(), 0), 1);  // NOLINT
 
     total = lam_ulsp_ + lam_uusp_ + lam_xlsp_ + lam_xusp_ + lam_clsp_ + lam_cusp_;
     casadi_assert_dev(total.nnz() == lam_ulsp_.nnz() + lam_uusp_.nnz() + lam_xlsp_.nnz() +
       lam_xusp_.nnz() + lam_clsp_.nnz() + lam_cusp_.nnz());
     casadi_assert_dev(total.nnz() == offset);
 
-    theirs_Xsp_ = Sparsity::dense(std::accumulate(nx.begin(), nx.end(), 0), 1);
-    theirs_Usp_ = Sparsity::dense(std::accumulate(nu.begin(), nu.end(), 0), 1);
+    theirs_Xsp_ = Sparsity::dense(std::accumulate(nx.begin(), nx.end(), 0), 1);  // NOLINT
+    theirs_Usp_ = Sparsity::dense(std::accumulate(nu.begin(), nu.end(), 0), 1);  // NOLINT
 
   }
 

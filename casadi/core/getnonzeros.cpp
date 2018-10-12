@@ -33,7 +33,7 @@ namespace casadi {
 
   MX GetNonzeros::create(const Sparsity& sp, const MX& x, const std::vector<casadi_int>& nz) {
     // No elements at all
-    if (nz.size()==0) return MX::zeros(sp);
+    if (nz.empty()) return MX::zeros(sp);
     // Simplify to slice
     if (is_slice(nz)) return create(sp, x, to_slice(nz));
     // Simplify to slice2
@@ -274,7 +274,7 @@ namespace casadi {
     for (casadi_int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1];
 
     // Create a sparsity pattern from vectors
-    if (r_nz.size()==0) {
+    if (r_nz.empty()) {
       res[0] = MX(osp.size());
     } else {
       Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);
@@ -315,7 +315,7 @@ namespace casadi {
       MX& res = fsens[d][0];
 
       if (arg.sparsity()==isp) { // Matching sparsity
-        if (nz.size()==0) {
+        if (nz.empty()) {
           res = MX(osp.size());
         } else {
           res = arg->get_nzref(osp, nz);
@@ -366,7 +366,7 @@ namespace casadi {
         for (casadi_int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1];
 
         // Create a sparsity pattern from vectors
-        if (r_nz.size()==0) {
+        if (r_nz.empty()) {
           res = MX(osp.size());
         } else {
           Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);

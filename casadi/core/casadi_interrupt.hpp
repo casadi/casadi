@@ -26,11 +26,11 @@
 #ifndef CASADI_INTERRUPT_HPP
 #define CASADI_INTERRUPT_HPP
 
-#include <casadi/core/casadi_export.h>
 #include "exception.hpp"
+#include <casadi/core/casadi_export.h>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 namespace casadi {
 

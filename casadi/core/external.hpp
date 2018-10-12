@@ -45,7 +45,7 @@ namespace casadi {
   /** \brief  Load a just-in-time compiled external function
    * File name given
    */
-  CASADI_EXPORT Function external(const std::string& name, const Importer& compiler,
+  CASADI_EXPORT Function external(const std::string& name, const Importer& li,
                                   const Dict& opts=Dict());
 
 } // namespace casadi

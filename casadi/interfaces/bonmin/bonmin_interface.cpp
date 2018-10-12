@@ -64,7 +64,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options BonminInterface::options_
+  const Options BonminInterface::options_
   = {{&Nlpsol::options_},
      {{"pass_nonlinear_variables",
        {OT_BOOL,
@@ -349,7 +349,7 @@ namespace casadi {
     } else {
       ss << e.fileName() << ":" << e.lineNumber() << " method " << e.methodName()
          << " : assertion \'" << e.message() <<"\' failed.";
-      if (e.className()!="")
+      if (!e.className().empty())
         ss <<"Possible reason: "<< e.className();
     }
     return ss.str();
@@ -363,7 +363,7 @@ namespace casadi {
   */
   class BonMinMessageHandler : public CoinMessageHandler {
   public:
-    BonMinMessageHandler(): CoinMessageHandler() { }
+    BonMinMessageHandler() { }
     /// Core of the class: the method that directs the messages
     int print() override {
       uout() << messageBuffer_ << std::endl;
@@ -461,14 +461,12 @@ namespace casadi {
     // Initialize
     bonmin.initialize(GetRawPtr(tminlp));
 
-    if (true) {
-      // Branch-and-bound
-      try {
-        Bab bb;
-        bb(bonmin);
-      } catch (CoinError& e) {
-        casadi_error("CoinError occured: " + to_str(e));
-      }
+    // Branch-and-bound
+    try {
+      Bab bb;
+      bb(bonmin);
+    } catch (CoinError& e) {
+      casadi_error("CoinError occured: " + to_str(e));
     }
 
     // Save results to outputs

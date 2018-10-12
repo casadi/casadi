@@ -212,7 +212,7 @@ namespace casadi {
     return 0;
   }
 
-  Options Integrator::options_
+  const Options Integrator::options_
   = {{&OracleFunction::options_},
      {{"expand",
        {OT_BOOL,
@@ -1036,7 +1036,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options FixedStepIntegrator::options_
+  const Options FixedStepIntegrator::options_
   = {{&Integrator::options_},
      {{"number_of_finite_elements",
        {OT_INT,
@@ -1325,7 +1325,7 @@ namespace casadi {
   ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator() {
   }
 
-  Options ImplicitFixedStepIntegrator::options_
+  const Options ImplicitFixedStepIntegrator::options_
   = {{&FixedStepIntegrator::options_},
      {{"rootfinder",
        {OT_STRING,

@@ -26,15 +26,15 @@
 #ifndef CASADI_EXCEPTION_HPP
 #define CASADI_EXCEPTION_HPP
 
+#include <chrono>
+#include <ctime>
 #include <exception>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <iostream>
-#include <stdexcept>
-#include <ctime>
-#include <iomanip>
-#include <chrono>
 
 #include <casadi/core/casadi_export.h>
 

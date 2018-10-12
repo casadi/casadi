@@ -27,8 +27,8 @@
 #include "external.hpp"
 #include "serializing_stream.hpp"
 
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 using namespace std;
 
@@ -41,7 +41,7 @@ namespace casadi {
   OracleFunction::~OracleFunction() {
   }
 
-  Options OracleFunction::options_
+  const Options OracleFunction::options_
   = {{&FunctionInternal::options_},
      {{"expand",
        {OT_BOOL,

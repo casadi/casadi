@@ -555,7 +555,7 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
     */
     Dict stats() const;
 
-    Opti opti() const { return optistack_; }
+    Opti opti() const { return optistack_; } // NOLINT(cppcoreguidelines-slicing)
 
   protected:
     OptiSol(const Opti& opti);

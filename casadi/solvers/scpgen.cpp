@@ -59,7 +59,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options Scpgen::options_
+  const Options Scpgen::options_
   = {{&Nlpsol::options_},
      {{"qpsol",
        {OT_STRING,
@@ -751,7 +751,7 @@ namespace casadi {
     auto m = static_cast<ScpgenMemory*>(mem);
     auto d_nlp = &m->d_nlp;
 
-    if (v_.size()>0) {
+    if (!v_.empty()) {
       // Initialize lifted variables using the generated function
       fill_n(m->arg, vinit_fcn_.n_in(), nullptr);
       m->arg[0] = d_nlp->z;

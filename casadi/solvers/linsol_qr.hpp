@@ -64,7 +64,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -112,7 +112,7 @@ namespace casadi {
 
   protected:
     /** \brief Deserializing constructor */
-    explicit LinsolQr(DeserializingStream& e);
+    explicit LinsolQr(DeserializingStream& s);
   };
 
 } // namespace casadi

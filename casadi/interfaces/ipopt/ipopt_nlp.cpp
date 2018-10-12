@@ -46,11 +46,11 @@ namespace casadi {
 
   IpoptUserClass::~IpoptUserClass() {
 #ifdef WITH_IPOPT_CALLBACK
-    if (x_) delete [] x_;
-    if (g_) delete [] g_;
-    if (z_U_) delete [] z_U_;
-    if (z_L_) delete [] z_L_;
-    if (lambda_) delete [] lambda_;
+    delete [] x_;
+    delete [] g_;
+    delete [] z_U_;
+    delete [] z_L_;
+    delete [] lambda_;
 #endif // WITH_IPOPT_CALLBACK
   }
 
@@ -149,8 +149,7 @@ namespace casadi {
       mem_->arg[2] = &obj_factor;
       mem_->arg[3] = lambda;
       mem_->res[0] = values;
-      if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
-      return true;
+      return !solver_.calc_function(mem_, "nlp_hess_l");
     } else {
       // Get the sparsity pattern
       casadi_int ncol = solver_.hesslag_sp_.size2();

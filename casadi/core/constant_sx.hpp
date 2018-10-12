@@ -31,8 +31,6 @@
 #include <cassert>
 
 /// \cond INTERNAL
-class OneSX;
-
 
 // Cashing of constants requires a map
 #include <unordered_map>

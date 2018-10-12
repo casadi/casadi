@@ -174,7 +174,7 @@ std::string OptiNode::describe(const MX& expr, casadi_int indent) const {
       }
     } else {
       std::vector<MX> s = symvar(expr);
-      if (s.size()==0) {
+      if (s.empty()) {
         description+= "Constant epxression.";
       } else {
         description+= "General expression, dependent on " + str(s.size()) + " symbols:";
@@ -939,7 +939,7 @@ OptiSol OptiNode::solve(bool accept_limit) {
       opts["iteration_callback"] = callback_;
     }
 
-    casadi_assert(solver_name_!="",
+    casadi_assert(!solver_name_.empty(),
       "You must call 'solver' on the Opti stack to select a solver. "
       "Suggestion: opti.solver('ipopt')");
 
@@ -1143,7 +1143,7 @@ void OptiNode::set_value_internal(const MX& x, const DM& v) {
 
   // Purge empty rows
   std::vector<casadi_int> filled_rows = sum2(J).get_row();
-  J = J(filled_rows, all);
+  J = J(filled_rows, all); // NOLINT(cppcoreguidelines-slicing)
 
   // Get rows and columns of the mapping
   std::vector<casadi_int> row, col;

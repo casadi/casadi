@@ -59,7 +59,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options SnoptInterface::options_
+  const Options SnoptInterface::options_
   = {{&Nlpsol::options_},
      {{"snopt",
        {OT_DICT,
@@ -138,7 +138,7 @@ namespace casadi {
     m_ = ng_;
 
     // Construct the linear objective row
-    IM d = mapping_gradF(Slice(0), Slice());
+    IM d = mapping_gradF(Slice(0), Slice()); // NOLINT(cppcoreguidelines-slicing)
 
     std::vector<casadi_int> ii = mapping_gradF.sparsity().get_col();
     for (casadi_int j = 0; j < nnObj_; ++j) {
@@ -433,7 +433,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
 
   void SnoptInterface::
   userfun(SnoptMemory* m, int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
-          double* x, double* fObj, double*gObj, double* fCon, double* gCon,
+          const double* x, double* fObj, double*gObj, double* fCon, double* gCon,
           int nState, char* cu, int lencu, int* iu, int leniu, double* ru,
           int lenru) const {
     try {
@@ -510,11 +510,11 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
   }
 
   void SnoptInterface::
-  userfunPtr(int * mode, int* nnObj, int * nnCon, int *nJac,
-             int *nnL, int * neJac, double *x, double *fObj,
-             double *gObj, double * fCon, double* gCon,
-             int* nState, char* cu, int* lencu, int* iu,
-             int* leniu, double* ru, int *lenru) {
+  userfunPtr(int * mode, int* nnObj, int * nnCon, int *nJac, // NOLINT
+             int *nnL, int * neJac, double *x, double *fObj, // NOLINT
+             double *gObj, double * fCon, double* gCon, // NOLINT
+             int* nState, char* cu, int* lencu, int* iu, // NOLINT
+             int* leniu, double* ru, int *lenru) { // NOLINT
     auto m = SnoptMemory::mempool.at(iu[0]);
     m->self.userfun(m, mode, *nnObj, *nnCon, *nJac, *nnL, *neJac,
                    x, fObj, gObj, fCon, gCon, *nState,

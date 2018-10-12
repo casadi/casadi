@@ -33,7 +33,7 @@
 using namespace std;
 namespace casadi {
 
-  Options BSplineCommon::options_
+  const Options BSplineCommon::options_
   = {{&FunctionInternal::options_},
       {{"lookup_mode",
         {OT_STRINGVECTOR,
@@ -250,7 +250,7 @@ namespace casadi {
       std::vector<casadi_int> order = range(n_dims+1);
       std::swap(order.back(), order[i+1]);
       std::vector<casadi_int> mapping = tensor_permute_mapping(coeffs_dims_, order);
-      DM coeff_matrix = DM(coeffs_).nz(mapping);
+      DM coeff_matrix = DM(coeffs_).nz(mapping); // NOLINT(cppcoreguidelines-slicing)
 
       // Cast as matrix
       coeff_matrix = reshape(coeff_matrix, -1, T.size2());
@@ -260,7 +260,7 @@ namespace casadi {
 
       // Bring axis i back to the original place
       mapping = tensor_permute_mapping(permute(coeffs_dims_new, order), order);
-      coeff_matrix = coeff_matrix.nz(mapping);
+      coeff_matrix = coeff_matrix.nz(mapping); // NOLINT(cppcoreguidelines-slicing)
 
       // Return the flat vector
       return coeff_matrix.nonzeros();

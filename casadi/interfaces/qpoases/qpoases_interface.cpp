@@ -68,7 +68,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options QpoasesInterface::options_
+  const Options QpoasesInterface::options_
   = {{&Conic::options_},
      {{"sparse",
        {OT_BOOL,
@@ -322,7 +322,7 @@ namespace casadi {
     m->linsol_plugin = linsol_plugin_;
 
     // Create qpOASES instance
-    if (m->qp) delete m->qp;
+    delete m->qp;
     if (schur_) {
       m->sqp = new qpOASES::SQProblemSchur(nx_, na_, hess_, max_schur_,
         mem, qpoases_init, qpoases_sfact, qpoases_nfact, qpoases_solve);
@@ -386,7 +386,7 @@ namespace casadi {
       copy_vector(H_.row(), m->h_row);
       double* h=w; w += H_.nnz();
       casadi_copy(arg[CONIC_H], H_.nnz(), h);
-      if (m->h) delete m->h;
+      delete m->h;
       m->h = new qpOASES::SymSparseMat(H_.size1(), H_.size2(),
         get_ptr(m->h_row), get_ptr(m->h_colind), h);
       m->h->createDiagInfo();
@@ -396,7 +396,7 @@ namespace casadi {
       copy_vector(A_.row(), m->a_row);
       double* a=w; w += A_.nnz();
       casadi_copy(arg[CONIC_A], A_.nnz(), a);
-      if (m->a) delete m->a;
+      delete m->a;
       m->a = new qpOASES::SparseMatrix(A_.size1(), A_.size2(),
         get_ptr(m->a_row), get_ptr(m->a_colind), a);
 
@@ -839,9 +839,9 @@ namespace casadi {
   }
 
   QpoasesMemory::~QpoasesMemory() {
-    if (this->qp) delete this->qp;
-    if (this->h) delete this->h;
-    if (this->a) delete this->a;
+    delete this->qp;
+    delete this->h;
+    delete this->a;
   }
 
   int QpoasesInterface::

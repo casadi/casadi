@@ -51,7 +51,7 @@ namespace casadi {
 
     SerializerBase::SerializerBase(std::unique_ptr<std::ostream> stream, const Dict& opts) :
         stream_(std::move(stream)),
-        serializer_(new SerializingStream(*stream_.get(), opts)) {
+        serializer_(new SerializingStream(*stream_, opts)) {
     }
 
     std::string SerializerBase::type_to_string(SerializationType type) {
@@ -103,7 +103,7 @@ namespace casadi {
 
     DeserializerBase::DeserializerBase(std::unique_ptr<std::istream> stream) :
       stream_(std::move(stream)),
-      deserializer_(new DeserializingStream(*stream_.get())) {
+      deserializer_(new DeserializingStream(*stream_)) {
     }
 
     FileDeserializer::FileDeserializer(const std::string& fname) :
@@ -124,13 +124,13 @@ namespace casadi {
     FileDeserializer::~FileDeserializer() { }
 
     SerializingStream& SerializerBase::serializer() {
-      return *serializer_.get();
+      return *serializer_;
     }
 
     DeserializingStream& DeserializerBase::deserializer() {
       casadi_assert(stream_->peek()!=char_traits<char>::eof(),
         "Deserializer reached end of stream. Nothing left to unpack.");
-      return *deserializer_.get();
+      return *deserializer_;
     }
 
     SerializerBase::SerializationType DeserializerBase::pop_type() {

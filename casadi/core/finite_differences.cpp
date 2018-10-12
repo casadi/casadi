@@ -36,7 +36,7 @@ namespace casadi {
   FiniteDiff::~FiniteDiff() {
   }
 
-  Options FiniteDiff::options_
+  const Options FiniteDiff::options_
   = {{&FunctionInternal::options_},
      {{"second_order_stepsize",
        {OT_DOUBLE,

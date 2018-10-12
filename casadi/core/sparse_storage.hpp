@@ -26,10 +26,10 @@
 #ifndef CASADI_SPARSE_STORAGE_HPP
 #define CASADI_SPARSE_STORAGE_HPP
 
-#include <vector>
-#include <typeinfo>
 #include "exception.hpp"
 #include "sparsity.hpp"
+#include <typeinfo>
+#include <vector>
 
 /// \cond INTERNAL
 

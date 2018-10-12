@@ -215,7 +215,7 @@ namespace casadi {
         for (k=0, ss=A+i*LDA, tt=B+j*LDB; k<K; ++k) \
           *rr += *ss++**tt++;
 
-  // Template function implementations
+ // Template function implementations
   #include "casadi_copy.hpp"
   #include "casadi_swap.hpp"
   #include "casadi_project.hpp"

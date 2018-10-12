@@ -51,7 +51,7 @@ namespace casadi {
     : Conic(name, st) {
   }
 
-  Options ClpInterface::options_
+  const Options ClpInterface::options_
   = {{&Conic::options_},
      {{"clp",
        {OT_DICT,

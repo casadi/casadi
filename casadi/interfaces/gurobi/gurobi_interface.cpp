@@ -55,7 +55,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options GurobiInterface::options_
+  const Options GurobiInterface::options_
   = {{&Conic::options_},
      {{"vtype",
        {OT_STRINGVECTOR,

@@ -1240,7 +1240,7 @@ namespace casadi {
     if (N==0) return MatType::eye(a.size1());
     if (N==1) return a;
     if (N % 2 == 0) {
-      MatType h = mpower(a, N/2);
+      MatType h = mpower(a, N/2); // NOLINT
       return MatType::mtimes(h, h);
     } else {
       return MatType::mtimes(mpower(a, N-1), a);
@@ -1255,7 +1255,7 @@ namespace casadi {
 
     MatType x_col = x.is_column() ? x : x.T();
 
-    x_col = x_col.nz(Slice());
+    x_col = x_col.nz(Slice()); // NOLINT
 
     casadi_int n = x_col.numel();
     return blockcat(y*MatType::eye(n), x_col, x_col.T(), y);

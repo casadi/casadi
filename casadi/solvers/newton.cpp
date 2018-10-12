@@ -54,7 +54,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options Newton::options_
+  const Options Newton::options_
   = {{&Rootfinder::options_},
      {{"abstol",
        {OT_DOUBLE,

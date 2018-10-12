@@ -34,11 +34,11 @@
 #include "generic_expression.hpp"
 
 /** \brief  C/C++ */
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <limits>
 #include <cmath>
+#include <iostream>
+#include <limits>
+#include <sstream>
+#include <string>
 #include <vector>
 
 namespace casadi {

@@ -26,8 +26,8 @@
 
 #include "code_generator.hpp"
 #include "function_internal.hpp"
-#include <iomanip>
 #include <casadi_runtime_str.h>
+#include <iomanip>
 
 using namespace std;
 namespace casadi {

@@ -27,9 +27,9 @@
 #define CASADI_CODE_GENERATOR_HPP
 
 #include "function.hpp"
-#include <sstream>
 #include <map>
 #include <set>
+#include <sstream>
 
 namespace casadi {
 

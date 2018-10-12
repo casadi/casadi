@@ -54,7 +54,7 @@ namespace casadi {
   Collocation::~Collocation() {
   }
 
-  Options Collocation::options_
+  const Options Collocation::options_
   = {{&ImplicitFixedStepIntegrator::options_},
      {{"interpolation_order",
        {OT_INT,

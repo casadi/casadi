@@ -246,7 +246,7 @@ namespace casadi {
     return Sparsity();
   }
 
-  Options Nlpsol::options_
+  const Options Nlpsol::options_
   = {{&OracleFunction::options_},
      {{"iteration_callback",
        {OT_FUNCTION,

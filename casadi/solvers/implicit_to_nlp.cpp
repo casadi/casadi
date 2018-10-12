@@ -54,7 +54,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options ImplicitToNlp::options_
+  const Options ImplicitToNlp::options_
   = {{&Rootfinder::options_},
      {{"nlpsol",
        {OT_STRING,

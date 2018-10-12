@@ -40,7 +40,7 @@ namespace casadi {
   SundialsInterface::~SundialsInterface() {
   }
 
-  Options SundialsInterface::options_
+  const Options SundialsInterface::options_
   = {{&Integrator::options_},
      {{"max_num_steps",
        {OT_INT,
@@ -208,7 +208,7 @@ namespace casadi {
         SundialsInterface* d = derivative_of_.get<SundialsInterface>();
         casadi_assert_dev(d!=nullptr);
         if (d->ns_==0) {
-          J = d->get_function(backward ? "jacB" : "jacF");
+          J = backward ? d->get_function("jacB") : d->get_function("jacF");
         } else {
           J = d->getJ(backward);
         }

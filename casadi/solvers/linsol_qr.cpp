@@ -54,7 +54,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options LinsolQr::options_
+  const Options LinsolQr::options_
   = {{&LinsolInternal::options_},
      {{"eps",
        {OT_DOUBLE,
@@ -104,7 +104,7 @@ namespace casadi {
     casadi_int irmin, nullity;
     nullity = casadi_qr_singular(&rmin, &irmin, get_ptr(m->r), sp_r_, get_ptr(pc_), eps_);
     if (nullity) {
-      if (true || verbose_) {
+      if (verbose_) {
         print("Singularity detected: Rank %lld<%lld\n", ncol()-nullity, ncol());
         print("First singular R entry: %g<%g, corresponding to row %lld\n", rmin, eps_, irmin);
         casadi_qr_colcomb(get_ptr(m->w), get_ptr(m->r), sp_r_, get_ptr(pc_), eps_, 0);

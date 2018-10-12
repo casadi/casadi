@@ -86,7 +86,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -113,12 +113,12 @@ namespace casadi {
     bool integer_support() const override { return true;}
 
     // KNITRO callback wrapper
-    static int callback(const int evalRequestCode,
-                        const int n, const int m, const int nnzJ,
-                        const int nnzH, const double * const x, const double * const lambda,
-                        double * const obj, double * const c, double * const objGrad,
-                        double * const jac, double * const hessian,
-                        double * const hessVector, void *userParams);
+    static int callback(const int evalRequestCode, // NOLINT
+                        const int n, const int m, const int nnzJ, // NOLINT
+                        const int nnzH, const double * const x, const double * const lambda, // NOLINT
+                        double * const obj, double * const c, double * const objGrad, // NOLINT
+                        double * const jac, double * const hessian, // NOLINT
+                        double * const hessVector, void *userParams); // NOLINT
 
     // KNITRO return codes
     static const char* return_codes(int flag);

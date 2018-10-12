@@ -24,11 +24,11 @@
 
 
 #include "unary_mx.hpp"
-#include <vector>
-#include <sstream>
 #include "casadi_misc.hpp"
 #include "global_options.hpp"
 #include "serializing_stream.hpp"
+#include <sstream>
+#include <vector>
 
 using namespace std;
 
