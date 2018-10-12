@@ -49,6 +49,9 @@ namespace casadi {
       {"monitor",
        {OT_STRINGVECTOR,
         "Set of user problem functions to be monitored"}},
+      {"show_eval_warnings",
+       {OT_BOOL,
+        "Show warnings generated from function evaluations [true]"}},
       {"common_options",
        {OT_DICT,
         "Options for auto-generated functions"}},
@@ -66,6 +69,8 @@ namespace casadi {
     // Default options
     bool expand = false;
 
+    show_eval_warnings_ = true;
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="expand") {
@@ -82,6 +87,8 @@ namespace casadi {
         }
       } else if (op.first=="monitor") {
         monitor_ = op.second;
+      } else if (op.first=="show_eval_warnings") {
+        show_eval_warnings_ = op.second;
       }
     }
 
@@ -212,7 +219,9 @@ namespace casadi {
       f(m->arg, m->res, m->iw, m->w);
     } catch(exception& ex) {
       // Fatal error
-      casadi_warning(name_ + ":" + fcn + " failed:" + std::string(ex.what()));
+      if (show_eval_warnings_) {
+        casadi_warning(name_ + ":" + fcn + " failed:" + std::string(ex.what()));
+      }
       return 1;
     }
 
@@ -253,7 +262,7 @@ namespace casadi {
         if (regularity_check_) {
           casadi_error(ss.str());
         } else {
-          casadi_warning(ss.str());
+          if (show_eval_warnings_) casadi_warning(ss.str());
         }
         return -1;
       }
@@ -389,6 +398,7 @@ namespace casadi {
     s.pack("OracleFunction::oracle", oracle_);
     s.pack("OracleFunction::common_options", common_options_);
     s.pack("OracleFunction::specific_options", specific_options_);
+    s.pack("OracleFunction::show_eval_warnings", show_eval_warnings_);
     s.pack("OracleFunction::all_functions::size", all_functions_.size());
     for (auto &e : all_functions_) {
       s.pack("OracleFunction::all_functions::key", e.first);
@@ -403,6 +413,7 @@ namespace casadi {
     s.unpack("OracleFunction::oracle", oracle_);
     s.unpack("OracleFunction::common_options", common_options_);
     s.unpack("OracleFunction::specific_options", specific_options_);
+    s.unpack("OracleFunction::show_eval_warnings", show_eval_warnings_);
     size_t size;
 
     s.unpack("OracleFunction::all_functions::size", size);
