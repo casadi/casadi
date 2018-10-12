@@ -1410,6 +1410,10 @@ multiplying.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::Blocksqp::has_function "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Blocksqp::mx_out "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -1560,9 +1564,11 @@ multiplying.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Blocksqp::has_function "
+%feature("docstring") casadi::Blocksqp::codegen_body "
 
-[INTERNAL] ";
+[INTERNAL]  Generate code for the function body.
+
+";
 
 %feature("docstring") casadi::Blocksqp::fullstep "
 
@@ -2266,12 +2272,6 @@ C++ includes: blocksqp.hpp ";
 %feature("docstring") casadi::Blocksqp::kktErrorReduction "
 
 [INTERNAL] ";
-
-%feature("docstring") casadi::Blocksqp::codegen_body "
-
-[INTERNAL]  Generate code for the function body.
-
-";
 
 %feature("docstring") casadi::Blocksqp::check_arg "
 
@@ -8944,6 +8944,12 @@ Set base to -1 to unroll all the way; no gains in memory efficiency here.
 
 ";
 
+%feature("docstring") casadi::Callback::generate_input "
+
+Export an input file that can be passed to generate C code with a main.
+
+";
+
 %feature("docstring") casadi::Callback::serialize "
 
 Serialize.
@@ -11104,6 +11110,10 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::Collocation::algebraic_state_init "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Collocation::self "
 
 [INTERNAL]  Get a public class instance.
@@ -11794,6 +11804,10 @@ generated function.
 
 ";
 
+%feature("docstring") casadi::Collocation::algebraic_state_output "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Collocation::numel_in "
 
 [INTERNAL]  Number of input/output elements.
@@ -12420,7 +12434,7 @@ elements.
 
 %feature("docstring") casadi::Conic::eval "
 
-[INTERNAL]  Evaluate numerically.
+[INTERNAL]   Solve the QP.
 
 ";
 
@@ -13457,6 +13471,10 @@ Internal class.
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
++------------------+-----------------+------------------+------------------+
+| print_problem    | OT_BOOL         | Print a numeric  | casadi::Conic    |
+|                  |                 | description of   |                  |
+|                  |                 | the problem      |                  |
 +------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
@@ -21013,6 +21031,10 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::algebraic_state_init "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::FixedStepIntegrator::init "
 
 [INTERNAL]  Initialize stage.
@@ -21161,6 +21183,12 @@ elements.
 | rootfinder_optio | OT_DICT         | Options to be    | casadi::FixedSte |
 | ns               |                 | passed to the    | pIntegrator      |
 |                  |                 | NLP Solver       |                  |
++------------------+-----------------+------------------+------------------+
+| show_eval_warnin | OT_BOOL         | Show warnings    | casadi::OracleFu |
+| gs               |                 | generated from   | nction           |
+|                  |                 | function         |                  |
+|                  |                 | evaluations      |                  |
+|                  |                 | [true]           |                  |
 +------------------+-----------------+------------------+------------------+
 | simplify         | OT_BOOL         | Implement as MX  | casadi::FixedSte |
 |                  |                 | Function (codege | pIntegrator      |
@@ -21511,6 +21539,10 @@ elements.
 [INTERNAL]  Clear all memory (called from destructor)
 
 ";
+
+%feature("docstring") casadi::FixedStepIntegrator::algebraic_state_output "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::FixedStepIntegrator::definition "
 
@@ -23526,6 +23558,12 @@ adheres to SCHEME_NLPINput
 %feature("docstring") casadi::Function::checkout "
 
 Checkout a memory object.
+
+";
+
+%feature("docstring") casadi::Function::generate_input "
+
+Export an input file that can be passed to generate C code with a main.
 
 ";
 
@@ -26251,6 +26289,12 @@ casadi::ImplicitFixedStepIntegrator::instruction_constant "
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::weak "
+
+[INTERNAL]  Get a weak reference to the object.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::matching_res "
 
 [INTERNAL]  Check if output arguments that needs to be replaced.
@@ -26324,6 +26368,12 @@ casadi::ImplicitFixedStepIntegrator::instruction_constant "
 | ns               |                 | passed to the    | FixedStepIntegra |
 |                  |                 | NLP Solver       | tor              |
 +------------------+-----------------+------------------+------------------+
+| show_eval_warnin | OT_BOOL         | Show warnings    | casadi::OracleFu |
+| gs               |                 | generated from   | nction           |
+|                  |                 | function         |                  |
+|                  |                 | evaluations      |                  |
+|                  |                 | [true]           |                  |
++------------------+-----------------+------------------+------------------+
 | simplify         | OT_BOOL         | Implement as MX  | casadi::Implicit |
 |                  |                 | Function (codege | FixedStepIntegra |
 |                  |                 | neratable/serial | tor              |
@@ -26374,9 +26424,9 @@ C++ includes: integrator_impl.hpp ";
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::weak "
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::symbolic_output "
 
-[INTERNAL]  Get a weak reference to the object.
+[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
 
 ";
 
@@ -26504,6 +26554,11 @@ casadi::ImplicitFixedStepIntegrator::instruction_output "
 
 ";
 
+%feature("docstring")
+casadi::ImplicitFixedStepIntegrator::algebraic_state_init "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::sx_in "
 
 [INTERNAL]  Get function input(s) and output(s)
@@ -26516,9 +26571,10 @@ casadi::ImplicitFixedStepIntegrator::instruction_output "
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::get_n_out "
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::sp_jac_dae "
 
-[INTERNAL]  Number of function inputs and outputs.
+[INTERNAL]  Create sparsity pattern of the extended Jacobian (forward
+problem)
 
 ";
 
@@ -26900,11 +26956,10 @@ elements.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::symbolic_output "
+%feature("docstring")
+casadi::ImplicitFixedStepIntegrator::algebraic_state_output "
 
-[INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
-
-";
+[INTERNAL] ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::mapsum_mx "
 
@@ -27105,10 +27160,9 @@ classes.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::sp_jac_dae "
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::get_n_out "
 
-[INTERNAL]  Create sparsity pattern of the extended Jacobian (forward
-problem)
+[INTERNAL]  Number of function inputs and outputs.
 
 ";
 
@@ -28979,9 +29033,9 @@ problem)
 
 ";
 
-%feature("docstring") casadi::Integrator::getJacSparsity "
+%feature("docstring") casadi::Integrator::advance "
 
-[INTERNAL]  Generate the sparsity of a Jacobian block.
+[INTERNAL]  Advance solution in time.
 
 ";
 
@@ -29010,9 +29064,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::Integrator::advance "
+%feature("docstring") casadi::Integrator::getJacSparsity "
 
-[INTERNAL]  Advance solution in time.
+[INTERNAL]  Generate the sparsity of a Jacobian block.
 
 ";
 
@@ -29105,6 +29159,12 @@ Joel Andersson
 | rootfinder_optio | OT_DICT         | Options to be    | casadi::Integrat |
 | ns               |                 | passed to the    | or               |
 |                  |                 | NLP Solver       |                  |
++------------------+-----------------+------------------+------------------+
+| show_eval_warnin | OT_BOOL         | Show warnings    | casadi::OracleFu |
+| gs               |                 | generated from   | nction           |
+|                  |                 | function         |                  |
+|                  |                 | evaluations      |                  |
+|                  |                 | [true]           |                  |
 +------------------+-----------------+------------------+------------------+
 | simplify         | OT_BOOL         | Implement as MX  | casadi::Integrat |
 |                  |                 | Function (codege | or               |
@@ -29394,6 +29454,14 @@ get_forward(casadi_int nfwd) if no cached version is available.
 elements.
 
 ";
+
+%feature("docstring") casadi::Integrator::algebraic_state_output "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::Integrator::algebraic_state_init "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::Integrator::replace_res "
 
@@ -37824,8 +37892,7 @@ Create a matrix with uniformly distributed random numbers.
 
 %feature("docstring") casadi::MatrixCommon::print_split "
 
-[INTERNAL]  Get strings corresponding to the nonzeros and the
-interdependencies.
+Get strings corresponding to the nonzeros and the interdependencies.
 
 ";
 
@@ -39863,6 +39930,8 @@ Implements simple newton iterations to solve an implicit function.
 +-----------------+-----------+--------------------------------------------+
 | abstolStep      | OT_DOUBLE | Stopping criterion tolerance on step size  |
 +-----------------+-----------+--------------------------------------------+
+| line_search     | OT_BOOL   | Enable line-search (default: true)         |
++-----------------+-----------+--------------------------------------------+
 | max_iter        | OT_INT    | Maximum number of Newton iterations to     |
 |                 |           | perform before returning.                  |
 +-----------------+-----------+--------------------------------------------+
@@ -39919,6 +39988,10 @@ Joris Gillis
 |                   |              | the Jacobian      |                   |
 |                   |              | (autogenerated by |                   |
 |                   |              | default)          |                   |
++-------------------+--------------+-------------------+-------------------+
+| line_search       | OT_BOOL      | Enable line-      | casadi::Newton    |
+|                   |              | search (default:  |                   |
+|                   |              | true)             |                   |
 +-------------------+--------------+-------------------+-------------------+
 | linear_solver     | OT_STRING    | User-defined      | casadi::Rootfinde |
 |                   |              | linear solver     | r                 |
@@ -41377,6 +41450,12 @@ Joel Andersson
 | oracle_options   | OT_DICT         | Options to be    | casadi::Nlpsol   |
 |                  |                 | passed to the    |                  |
 |                  |                 | oracle function  |                  |
++------------------+-----------------+------------------+------------------+
+| show_eval_warnin | OT_BOOL         | Show warnings    | casadi::OracleFu |
+| gs               |                 | generated from   | nction           |
+|                  |                 | function         |                  |
+|                  |                 | evaluations      |                  |
+|                  |                 | [true]           |                  |
 +------------------+-----------------+------------------+------------------+
 | specific_options | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | specific auto-   | nction           |
@@ -44659,6 +44738,12 @@ Joel Andersson
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
 +------------------+-----------------+------------------+------------------+
+| show_eval_warnin | OT_BOOL         | Show warnings    | casadi::OracleFu |
+| gs               |                 | generated from   | nction           |
+|                  |                 | function         |                  |
+|                  |                 | evaluations      |                  |
+|                  |                 | [true]           |                  |
++------------------+-----------------+------------------+------------------+
 | specific_options | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | specific auto-   | nction           |
 |                  |                 | generated        |                  |
@@ -45378,7 +45463,7 @@ elements.
 
 %feature("docstring") casadi::QpToNlp::eval "
 
-[INTERNAL]  Evaluate numerically.
+[INTERNAL]   Solve the QP.
 
 ";
 
@@ -45552,6 +45637,10 @@ Joris Gillis
 +----------------+---------------+-----------------------+-----------------+
 | nlpsol_options | OT_DICT       | Options to be passed  | casadi::QpToNlp |
 |                |               | to solver.            |                 |
++----------------+---------------+-----------------------+-----------------+
+| print_problem  | OT_BOOL       | Print a numeric       | casadi::Conic   |
+|                |               | description of the    |                 |
+|                |               | problem               |                 |
 +----------------+---------------+-----------------------+-----------------+
 
 Diagrams
@@ -47017,33 +47106,37 @@ Joel Andersson
 
 >List of available options
 
-+--------------+---------------+---------------------------+---------------+
-|      Id      |     Type      |        Description        |    Used in    |
-+==============+===============+===========================+===============+
-| discrete     | OT_BOOLVECTOR | Indicates which of the    | casadi::Conic |
-|              |               | variables are discrete,   |               |
-|              |               | i.e. integer-valued       |               |
-+--------------+---------------+---------------------------+---------------+
-| du_to_pr     | OT_DOUBLE     | How much larger dual than | casadi::Qrqp  |
-|              |               | primal error is           |               |
-|              |               | acceptable [1000]         |               |
-+--------------+---------------+---------------------------+---------------+
-| max_iter     | OT_INT        | Maximum number of         | casadi::Qrqp  |
-|              |               | iterations [1000].        |               |
-+--------------+---------------+---------------------------+---------------+
-| min_lam      | OT_DOUBLE     | Smallest multiplier       | casadi::Qrqp  |
-|              |               | treated as inactive for   |               |
-|              |               | the initial active set    |               |
-|              |               | [0].                      |               |
-+--------------+---------------+---------------------------+---------------+
-| print_header | OT_BOOL       | Print header [true].      | casadi::Qrqp  |
-+--------------+---------------+---------------------------+---------------+
-| print_info   | OT_BOOL       | Print info [true].        | casadi::Qrqp  |
-+--------------+---------------+---------------------------+---------------+
-| print_iter   | OT_BOOL       | Print iterations [true].  | casadi::Qrqp  |
-+--------------+---------------+---------------------------+---------------+
-| tol          | OT_DOUBLE     | Tolerance [1e-8].         | casadi::Qrqp  |
-+--------------+---------------+---------------------------+---------------+
++---------------+---------------+--------------------------+---------------+
+|      Id       |     Type      |       Description        |    Used in    |
++===============+===============+==========================+===============+
+| discrete      | OT_BOOLVECTOR | Indicates which of the   | casadi::Conic |
+|               |               | variables are discrete,  |               |
+|               |               | i.e. integer-valued      |               |
++---------------+---------------+--------------------------+---------------+
+| du_to_pr      | OT_DOUBLE     | How much larger dual     | casadi::Qrqp  |
+|               |               | than primal error is     |               |
+|               |               | acceptable [1000]        |               |
++---------------+---------------+--------------------------+---------------+
+| max_iter      | OT_INT        | Maximum number of        | casadi::Qrqp  |
+|               |               | iterations [1000].       |               |
++---------------+---------------+--------------------------+---------------+
+| min_lam       | OT_DOUBLE     | Smallest multiplier      | casadi::Qrqp  |
+|               |               | treated as inactive for  |               |
+|               |               | the initial active set   |               |
+|               |               | [0].                     |               |
++---------------+---------------+--------------------------+---------------+
+| print_header  | OT_BOOL       | Print header [true].     | casadi::Qrqp  |
++---------------+---------------+--------------------------+---------------+
+| print_info    | OT_BOOL       | Print info [true].       | casadi::Qrqp  |
++---------------+---------------+--------------------------+---------------+
+| print_iter    | OT_BOOL       | Print iterations [true]. | casadi::Qrqp  |
++---------------+---------------+--------------------------+---------------+
+| print_problem | OT_BOOL       | Print a numeric          | casadi::Conic |
+|               |               | description of the       |               |
+|               |               | problem                  |               |
++---------------+---------------+--------------------------+---------------+
+| tol           | OT_DOUBLE     | Tolerance [1e-8].        | casadi::Qrqp  |
++---------------+---------------+--------------------------+---------------+
 
 Diagrams
 --------
@@ -49235,6 +49328,12 @@ Internal class.
 |                  |                 | functions to be  |                  |
 |                  |                 | monitored        |                  |
 +------------------+-----------------+------------------+------------------+
+| show_eval_warnin | OT_BOOL         | Show warnings    | casadi::OracleFu |
+| gs               |                 | generated from   | nction           |
+|                  |                 | function         |                  |
+|                  |                 | evaluations      |                  |
+|                  |                 | [true]           |                  |
++------------------+-----------------+------------------+------------------+
 | specific_options | OT_DICT         | Options for      | casadi::OracleFu |
 |                  |                 | specific auto-   | nction           |
 |                  |                 | generated        |                  |
@@ -50293,6 +50392,10 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::RungeKutta::algebraic_state_output "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::RungeKutta::setupFG "
 
 [INTERNAL]  Setup F and G.
@@ -50798,6 +50901,10 @@ elements.
 [INTERNAL]  Get a weak reference to the object.
 
 ";
+
+%feature("docstring") casadi::RungeKutta::algebraic_state_init "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::RungeKutta::getJacSparsityHierarchicalSymm "
 
@@ -57284,6 +57391,10 @@ elements (i, j) with j>=i.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::codegen_qp_solve "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::Sqpmethod::set_temp "
 
 [INTERNAL]  Set the work vectors.
@@ -57300,12 +57411,6 @@ propagation.
 %feature("docstring") casadi::Sqpmethod::getJacSparsityGen "
 
 [INTERNAL]  Get the sparsity pattern, forward mode.
-
-";
-
-%feature("docstring") casadi::Sqpmethod::codegen_body "
-
-[INTERNAL]  Generate code for the function body.
 
 ";
 
@@ -57461,6 +57566,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::incache "
+
+[INTERNAL]  Get function in cache.
+
+";
+
 %feature("docstring") casadi::Sqpmethod::get_reverse "
 
 [INTERNAL]  Generate a function that calculates reverse mode derivatives.
@@ -57586,16 +57697,9 @@ generated function.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::print_iteration "
+%feature("docstring") casadi::Sqpmethod::init_mem "
 
-[INTERNAL]  Print iteration.
-
->  void casadi::Sqpmethod::print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf, double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Print iteration.
-
-";
+[INTERNAL]  Initalize memory block.
 
 ";
 
@@ -57829,9 +57933,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::incache "
+%feature("docstring") casadi::Sqpmethod::codegen_body "
 
-[INTERNAL]  Get function in cache.
+[INTERNAL]  Generate code for the function body.
 
 ";
 
@@ -58292,9 +58396,16 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::Sqpmethod::init_mem "
+%feature("docstring") casadi::Sqpmethod::print_iteration "
 
-[INTERNAL]  Initalize memory block.
+[INTERNAL]  Print iteration.
+
+>  void casadi::Sqpmethod::print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf, double dx_norm, double reg, casadi_int ls_trials, bool ls_success) const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Print iteration.
+
+";
 
 ";
 
@@ -61340,6 +61451,10 @@ Explicitly load a plugin dynamically.
 
 ";
 
+%feature("docstring") casadi::casadi_nlpsol_work "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qp_kkt_residual "
 
 [INTERNAL] ";
@@ -61932,6 +62047,10 @@ Check if the vector has negative entries.
 
 ";
 
+%feature("docstring") casadi::casadi_vfmin "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::to_slice "
 
 Construct from an index vector (requires is_slice(v) to be true)
@@ -61958,6 +62077,10 @@ Construct from an index vector (requires is_slice(v) to be true)
 Get the documentation string for a plugin.
 
 ";
+
+%feature("docstring") casadi::getcopy "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::expm_n_in "
 
@@ -62009,6 +62132,10 @@ Get the documentation string for a plugin.
 
 ";
 
+%feature("docstring") casadi::casadi_nlpsol_init "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::hash_combine "
 
 Generate a hash value incrementally, array.
@@ -62028,11 +62155,19 @@ Number of rootfinder inputs.
 
 ";
 
+%feature("docstring") casadi::casadi_sqpmethod_init "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::has_integrator "
 
 Check if a particular plugin is available.
 
 ";
+
+%feature("docstring") casadi::casadi_bound_consistency "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_central_diff "
 
@@ -62374,6 +62509,10 @@ General information
 +------------------+-----------------+------------------+------------------+
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
++------------------+-----------------+------------------+------------------+
+| print_problem    | OT_BOOL         | Print a numeric  | casadi::Conic    |
+|                  |                 | description of   |                  |
+|                  |                 | the problem      |                  |
 +------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
@@ -63086,7 +63225,7 @@ Get integrator input scheme name by index.
 
 ";
 
-%feature("docstring") casadi::getcopy "
+%feature("docstring") casadi::casadi_vfmax "
 
 [INTERNAL] ";
 
@@ -63228,6 +63367,10 @@ Get the documentation string for a plugin.
 ";
 
 %feature("docstring") casadi::casadi_qp_calc_dependent "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_sqpmethod_work "
 
 [INTERNAL] ";
 
