@@ -939,8 +939,8 @@ namespace casadi {
 
   template<bool Add>
   SetNonzerosSlice2<Add>::SetNonzerosSlice2(DeserializingStream& s) : SetNonzeros<Add>(s) {
-    s.unpack("SetNonzerosVector2::inner", inner_);
-    s.unpack("SetNonzerosVector2::outer", outer_);
+    s.unpack("SetNonzerosSlice2::inner", inner_);
+    s.unpack("SetNonzerosSlice2::outer", outer_);
   }
 
   template<bool Add>
