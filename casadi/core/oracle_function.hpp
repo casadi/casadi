@@ -63,6 +63,9 @@ namespace casadi {
     Dict common_options_;
     Dict specific_options_;
 
+    /// Show evaluation warnings
+    bool show_eval_warnings_;
+
     // Information about one function
     struct RegFun {
       Function f;
