@@ -168,13 +168,10 @@ namespace casadi {
 
   int Qrqp::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    Conic::eval(arg, res, iw, w, mem);
     auto m = static_cast<QrqpMemory*>(mem);
     // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
-    // Check inputs
-    if (inputs_check_) {
-      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
-    }
     // Setup data structure
     casadi_qp_data<double> d;
     d.prob = &p_;

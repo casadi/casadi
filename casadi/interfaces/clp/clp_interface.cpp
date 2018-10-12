@@ -277,6 +277,7 @@ namespace casadi {
 
   int ClpInterface::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    Conic::eval(arg, res, iw, w, mem);
     auto m = static_cast<ClpMemory*>(mem);
 
     // Problem has not been solved at this point
@@ -286,10 +287,6 @@ namespace casadi {
     // Statistics
     for (auto&& s : m->fstats) s.second.reset();
     m->fstats.at("preprocessing").tic();
-
-    if (inputs_check_) {
-      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
-    }
 
     // Get inputs
     double* g=w; w += nx_;

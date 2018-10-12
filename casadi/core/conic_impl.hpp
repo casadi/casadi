@@ -79,6 +79,9 @@ namespace casadi {
     const Options& get_options() const override { return options_;}
     ///@}
 
+    /// Solve the QP
+    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+
     // Initialize
     void init(const Dict& opts) override;
 
@@ -132,6 +135,7 @@ namespace casadi {
   protected:
     /// Options
     std::vector<bool> discrete_;
+    bool print_problem_;
 
     /// Problem structure
     Sparsity H_, A_, Q_, P_;

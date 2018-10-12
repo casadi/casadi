@@ -162,6 +162,7 @@ namespace casadi {
 
   int GurobiInterface::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    Conic::eval(arg, res, iw, w, mem);
     auto m = static_cast<GurobiMemory*>(mem);
     const SDPToSOCPMem& sm = sdp_to_socp_mem_;
 
