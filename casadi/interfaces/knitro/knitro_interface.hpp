@@ -134,6 +134,17 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new KnitroInterface(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit KnitroInterface(DeserializingStream& s);
+
   };
 
 } // namespace casadi
