@@ -306,5 +306,17 @@ class ImplicitFunctiontests(casadiTestCase):
       with self.assertInException("process"):
         solver(x0=0)
 
+  def test_loop(self):
+    x=SX.sym("x")
+    for Solver, options, features in solvers:
+      solver = rootfinder("solver",Solver,{"x":x,"g":x**3-2*x+2},options)
+      if Solver=="kinsol": continue
+      if Solver=="nlpsol": continue
+      if Solver=="fast_newton": continue
+      print(Solver)
+      res = solver(x0=0)["x"]
+      self.checkarray(res,-1.7692923542386)
+
+
 if __name__ == '__main__':
     unittest.main()

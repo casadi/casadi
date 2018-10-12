@@ -45,6 +45,10 @@ namespace casadi {
     double* x;
     // Current residual
     double* f;
+    // Current guess
+    double* x_trial;
+    // Current residual
+    double* f_trial;
     // Current Jacobian
     double* jac;
     // Return status
@@ -133,14 +137,19 @@ namespace casadi {
     /// If true, each iteration will be printed
     bool print_iteration_;
 
+    /// If true, each iteration will be printed
+    casadi_int print_iteration_interval_;
+
     bool error_on_;
+
+    bool line_search_;
 
     /// Print iteration header
     void printIteration(std::ostream &stream) const;
 
     /// Print iteration
     void printIteration(std::ostream &stream, casadi_int iter,
-                        double abstol, double abstolStep) const;
+                        double abstol, double abstolStep, double alpha) const;
   };
 
 } // namespace casadi
