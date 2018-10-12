@@ -712,6 +712,7 @@ namespace casadi {
   void Conic::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
+    s.version("Conic", 1);
     s.pack("Conic::discrete", discrete_);
     s.pack("Conic::print_problem", print_problem_);
     s.pack("Conic::H", H_);
@@ -733,6 +734,7 @@ namespace casadi {
   }
 
   Conic::Conic(DeserializingStream & s) : FunctionInternal(s) {
+    s.version("Conic", 1);
     s.unpack("Conic::discrete", discrete_);
     s.unpack("Conic::print_problem", print_problem_);
     s.unpack("Conic::H", H_);

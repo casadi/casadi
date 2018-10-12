@@ -913,7 +913,7 @@ namespace casadi {
 
   SXFunction::SXFunction(DeserializingStream& s) :
     XFunction<SXFunction, SX, SXNode>(s) {
-
+    s.version("SXFunction", 1);
     size_t n_instructions;
     s.unpack("SXFunction::n_instr", n_instructions);
 
@@ -941,6 +941,7 @@ namespace casadi {
 
   void SXFunction::serialize_body(SerializingStream &s) const {
     XFunction<SXFunction, SX, SXNode>::serialize_body(s);
+    s.version("SXFunction", 1);
     s.pack("SXFunction::n_instr", algorithm_.size());
 
     s.pack("SXFunction::worksize", worksize_);

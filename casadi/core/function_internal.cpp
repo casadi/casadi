@@ -2860,11 +2860,13 @@ namespace casadi {
   }
 
   void ProtoFunction::serialize_body(SerializingStream& s) const {
+    s.version("ProtoFunction", 1);
     s.pack("ProtoFunction::name", name_);
     s.pack("ProtoFunction::verbose", verbose_);
   }
 
   ProtoFunction::ProtoFunction(DeserializingStream& s) {
+    s.version("ProtoFunction", 1);
     s.unpack("ProtoFunction::name", name_);
     s.unpack("ProtoFunction::verbose", verbose_);
   }
@@ -2875,6 +2877,7 @@ namespace casadi {
 
   void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
+    s.version("FunctionInternal", 1);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
     s.pack("FunctionInternal::sp_out", sparsity_out_);
     s.pack("FunctionInternal::name_in", name_in_);
@@ -2920,6 +2923,7 @@ namespace casadi {
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
+    s.version("FunctionInternal", 1);
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
     s.unpack("FunctionInternal::sp_out", sparsity_out_);
     s.unpack("FunctionInternal::name_in", name_in_);

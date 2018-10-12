@@ -783,6 +783,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
   }
 
   Sqpmethod::Sqpmethod(DeserializingStream& s) : Nlpsol(s) {
+    s.version("Sqpmethod", 1);
     s.unpack("Sqpmethod::qpsol", qpsol_);
     s.unpack("Sqpmethod::exact_hessian", exact_hessian_);
     s.unpack("Sqpmethod::max_iter", max_iter_);
@@ -807,6 +808,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
 
   void Sqpmethod::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
+    s.version("Sqpmethod", 1);
     s.pack("Sqpmethod::qpsol", qpsol_);
     s.pack("Sqpmethod::exact_hessian", exact_hessian_);
     s.pack("Sqpmethod::max_iter", max_iter_);

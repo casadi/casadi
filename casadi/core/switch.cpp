@@ -40,6 +40,7 @@ namespace casadi {
 
   void Switch::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
+    s.version("Switch", 1);
     s.pack("Switch::f", f_);
     s.pack("Switch::f_def", f_def_);
     s.pack("Switch::project_in", project_in_);
@@ -47,6 +48,7 @@ namespace casadi {
   }
 
   Switch::Switch(DeserializingStream& s) : FunctionInternal(s) {
+    s.version("Switch", 1);
     s.unpack("Switch::f", f_);
     s.unpack("Switch::f_def", f_def_);
     s.unpack("Switch::project_in", project_in_);

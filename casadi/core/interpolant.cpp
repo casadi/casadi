@@ -212,7 +212,7 @@ namespace casadi {
 
   void Interpolant::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
-
+    s.version("Interpolant", 1);
     s.pack("Interpolant::ndim", ndim_);
     s.pack("Interpolant::m", m_);
     s.pack("Interpolant::grid", grid_);
@@ -231,6 +231,7 @@ namespace casadi {
   }
 
   Interpolant::Interpolant(DeserializingStream & s) : FunctionInternal(s) {
+    s.version("Interpolant", 1);
     s.unpack("Interpolant::ndim", ndim_);
     s.unpack("Interpolant::m", m_);
     s.unpack("Interpolant::grid", grid_);

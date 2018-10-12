@@ -855,12 +855,14 @@ namespace casadi {
   }
 
   CvodesInterface::CvodesInterface(DeserializingStream& s) : SundialsInterface(s) {
+    s.version("CvodesInterface", 1);
     s.unpack("CvodesInterface::lmm", lmm_);
     s.unpack("CvodesInterface::iter", iter_);
   }
 
   void CvodesInterface::serialize_body(SerializingStream &s) const {
     SundialsInterface::serialize_body(s);
+    s.version("CvodesInterface", 1);
     s.pack("CvodesInterface::lmm", lmm_);
     s.pack("CvodesInterface::iter", iter_);
   }

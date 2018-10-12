@@ -309,6 +309,7 @@ namespace casadi {
   }
 
   BSplineInterpolant::BSplineInterpolant(DeserializingStream& s) : Interpolant(s) {
+    s.version("BSplineInterpolant", 1);
     s.unpack("BSplineInterpolant::degree", degree_);
     s.unpack("BSplineInterpolant::linear_solver", linear_solver_);
     s.unpack("BSplineInterpolant::s", S_);
@@ -321,6 +322,7 @@ namespace casadi {
   void BSplineInterpolant::serialize_body(SerializingStream &s) const {
     Interpolant::serialize_body(s);
 
+    s.version("BSplineInterpolant", 1);
     s.pack("BSplineInterpolant::degree", degree_);
     s.pack("BSplineInterpolant::linear_solver", linear_solver_);
     s.pack("BSplineInterpolant::s", S_);

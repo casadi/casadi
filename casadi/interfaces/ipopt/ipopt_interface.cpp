@@ -639,6 +639,7 @@ namespace casadi {
   }
 
   IpoptInterface::IpoptInterface(DeserializingStream& s) : Nlpsol(s) {
+    s.version("IpoptInterface", 1);
     s.unpack("IpoptInterface::jacg_sp", jacg_sp_);
     s.unpack("IpoptInterface::hesslag_sp", hesslag_sp_);
     s.unpack("IpoptInterface::exact_hessian", exact_hessian_);
@@ -655,6 +656,7 @@ namespace casadi {
 
   void IpoptInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
+    s.version("IpoptInterface", 1);
     s.pack("IpoptInterface::jacg_sp", jacg_sp_);
     s.pack("IpoptInterface::hesslag_sp", hesslag_sp_);
     s.pack("IpoptInterface::exact_hessian", exact_hessian_);

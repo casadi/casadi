@@ -985,6 +985,7 @@ namespace casadi {
   void Nlpsol::serialize_body(SerializingStream &s) const {
     OracleFunction::serialize_body(s);
 
+    s.version("Nlpsol", 1);
     s.pack("Nlpsol::nx", nx_);
     s.pack("Nlpsol::ng", ng_);
     s.pack("Nlpsol::np", np_);
@@ -1016,6 +1017,7 @@ namespace casadi {
   }
 
   Nlpsol::Nlpsol(DeserializingStream & s) : OracleFunction(s) {
+    s.version("Nlpsol", 1);
     s.unpack("Nlpsol::nx", nx_);
     s.unpack("Nlpsol::ng", ng_);
     s.unpack("Nlpsol::np", np_);

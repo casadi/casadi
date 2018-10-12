@@ -432,6 +432,7 @@ namespace casadi {
   }
 
   KnitroInterface::KnitroInterface(DeserializingStream& s) : Nlpsol(s) {
+    s.version("KnitroInterface", 1);
     s.unpack("KnitroInterface::contype", contype_);
     s.unpack("KnitroInterface::opts", opts_);
     s.unpack("KnitroInterface::jacg_sp", jacg_sp_);
@@ -440,6 +441,7 @@ namespace casadi {
 
   void KnitroInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
+    s.version("KnitroInterface", 1);
     s.pack("KnitroInterface::contype", contype_);
     s.pack("KnitroInterface::opts", opts_);
     s.pack("KnitroInterface::jacg_sp", jacg_sp_);

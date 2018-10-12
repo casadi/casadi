@@ -930,6 +930,7 @@ namespace casadi {
   }
 
   QpoasesInterface::QpoasesInterface(DeserializingStream& s) : Conic(s) {
+    s.version("QpoasesInterface", 1);
     s.unpack("QpoasesInterface::max_nWSR", max_nWSR_);
     s.unpack("QpoasesInterface::max_cputime", max_cputime_);
     casadi_int hess;
@@ -1010,6 +1011,7 @@ namespace casadi {
 
   void QpoasesInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
+    s.version("QpoasesInterface", 1);
     s.pack("QpoasesInterface::max_nWSR", max_nWSR_);
     s.pack("QpoasesInterface::max_cputime", max_cputime_);
     s.pack("QpoasesInterface::hess", static_cast<casadi_int>(hess_));

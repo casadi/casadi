@@ -362,6 +362,7 @@ namespace casadi {
   }
 
   Qrqp::Qrqp(DeserializingStream& s) : Conic(s) {
+    s.version("Qrqp", 1);
     s.unpack("Qrqp::AT", AT_);
     s.unpack("Qrqp::kkt", kkt_);
     s.unpack("Qrqp::sp_v", sp_v_);
@@ -380,6 +381,7 @@ namespace casadi {
   void Qrqp::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
 
+    s.version("Qrqp", 1);
     s.pack("Qrqp::AT", AT_);
     s.pack("Qrqp::kkt", kkt_);
     s.pack("Qrqp::sp_v", sp_v_);

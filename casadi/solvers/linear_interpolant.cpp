@@ -153,6 +153,7 @@ namespace casadi {
   }
 
   ProtoFunction* LinearInterpolant::deserialize(DeserializingStream& s) {
+    s.version("LinearInterpolant", 1);
     char type;
     s.unpack("LinearInterpolant::type", type);
     switch (type) {
@@ -170,6 +171,7 @@ namespace casadi {
 
   void LinearInterpolant::serialize_type(SerializingStream &s) const {
     Interpolant::serialize_type(s);
+    s.version("LinearInterpolant", 1);
     s.pack("LinearInterpolant::type", 'f');
   }
 
@@ -177,6 +179,7 @@ namespace casadi {
     FunctionInternal::serialize_type(s);
     auto m = derivative_of_.get<LinearInterpolant>();
     m->PluginInterface<Interpolant>::serialize_type(s);
+    s.version("LinearInterpolant", 1);
     s.pack("LinearInterpolant::type", 'j');
   }
 

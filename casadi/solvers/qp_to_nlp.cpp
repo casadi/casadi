@@ -196,12 +196,14 @@ namespace casadi {
   }
 
   QpToNlp::QpToNlp(DeserializingStream& s) : Conic(s) {
+    s.version("QpToNlp", 1);
     s.unpack("QpToNlp::solver", solver_);
   }
 
   void QpToNlp::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
 
+    s.version("QpToNlp", 1);
     s.pack("QpToNlp::solver", solver_);
   }
 

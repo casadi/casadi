@@ -395,6 +395,7 @@ namespace casadi {
   void OracleFunction::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
+    s.version("OracleFunction", 1);
     s.pack("OracleFunction::oracle", oracle_);
     s.pack("OracleFunction::common_options", common_options_);
     s.pack("OracleFunction::specific_options", specific_options_);
@@ -410,6 +411,8 @@ namespace casadi {
   }
 
   OracleFunction::OracleFunction(DeserializingStream& s) : FunctionInternal(s) {
+
+    s.version("OracleFunction", 1);
     s.unpack("OracleFunction::oracle", oracle_);
     s.unpack("OracleFunction::common_options", common_options_);
     s.unpack("OracleFunction::specific_options", specific_options_);

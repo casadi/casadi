@@ -116,6 +116,8 @@ namespace casadi {
     }
     //@}
 
+    void version(const std::string& name, int v);
+
   private:
 
     /* \brief Unpacks a shared object
@@ -217,6 +219,7 @@ namespace casadi {
     }
     //@}
 
+    void version(const std::string& name, int v);
   private:
     /** \brief Insert information for a primitive typecheck during deserialization
      *

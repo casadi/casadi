@@ -228,6 +228,7 @@ namespace casadi {
   }
 
   SymbolicQr::SymbolicQr(DeserializingStream& s) : LinsolInternal(s) {
+    s.version("SymbolicQr", 1);
     s.unpack("SymbolicQr::factorize", factorize_);
     s.unpack("SymbolicQr::solve", solve_);
     s.unpack("SymbolicQr::solveT", solveT_);
@@ -236,6 +237,7 @@ namespace casadi {
 
   void SymbolicQr::serialize_body(SerializingStream &s) const {
     LinsolInternal::serialize_body(s);
+    s.version("SymbolicQr", 1);
     s.pack("SymbolicQr::factorize", factorize_);
     s.pack("SymbolicQr::solve", solve_);
     s.pack("SymbolicQr::solveT", solveT_);

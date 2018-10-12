@@ -558,6 +558,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
 
 
   SnoptInterface::SnoptInterface(DeserializingStream& s) : Nlpsol(s) {
+    s.version("SnoptInterface", 1);
     s.unpack("SnoptInterface::jacf_sp", jacf_sp_);
     s.unpack("SnoptInterface::jacg_sp", jacg_sp_);
     s.unpack("SnoptInterface::exact_hessian", exact_hessian_);
@@ -578,6 +579,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
 
   void SnoptInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
+    s.version("SnoptInterface", 1);
     s.pack("SnoptInterface::jacf_sp", jacf_sp_);
     s.pack("SnoptInterface::jacg_sp", jacg_sp_);
     s.pack("SnoptInterface::exact_hessian", exact_hessian_);

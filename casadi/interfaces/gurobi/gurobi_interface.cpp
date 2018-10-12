@@ -458,6 +458,7 @@ namespace casadi {
   }
 
   GurobiInterface::GurobiInterface(DeserializingStream& s) : Conic(s) {
+    s.version("GurobiInterface", 1);
     s.unpack("GurobiInterface::vtype", vtype_);
     s.unpack("GurobiInterface::opts", opts_);
     Conic::deserialize(s, sdp_to_socp_mem_);
@@ -465,7 +466,7 @@ namespace casadi {
 
   void GurobiInterface::serialize_body(SerializingStream &s) const {
     Conic::serialize_body(s);
-
+    s.version("GurobiInterface", 1);
     s.pack("GurobiInterface::vtype", vtype_);
     s.pack("GurobiInterface::opts", opts_);
     Conic::serialize(s, sdp_to_socp_mem_);

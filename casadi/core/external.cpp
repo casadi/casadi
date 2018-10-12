@@ -368,6 +368,7 @@ namespace casadi {
   }
 
   ProtoFunction* External::deserialize(DeserializingStream& s) {
+    s.version("External", 1);
     char type;
     s.unpack("External::type", type);
     switch (type) {
@@ -380,6 +381,7 @@ namespace casadi {
   void GenericExternal::serialize_type(SerializingStream &s) const {
     FunctionInternal::serialize_type(s);
     s.pack("External::type", 'g');
+    s.version("External", 1);
   }
 
   External::External(DeserializingStream & s) : FunctionInternal(s) {

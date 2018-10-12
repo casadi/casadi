@@ -593,6 +593,7 @@ namespace casadi {
   }
 
   WorhpInterface::WorhpInterface(DeserializingStream& s) : Nlpsol(s) {
+    s.version("WorhpInterface", 1);
     s.unpack("WorhpInterface::jacg_sp", jacg_sp_);
     s.unpack("WorhpInterface::hesslag_sp", hesslag_sp_);
     s.unpack("WorhpInterface::bool_opts", bool_opts_);
@@ -603,6 +604,7 @@ namespace casadi {
 
   void WorhpInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
+    s.version("WorhpInterface", 1);
     s.pack("WorhpInterface::jacg_sp", jacg_sp_);
     s.pack("WorhpInterface::hesslag_sp", hesslag_sp_);
     s.pack("WorhpInterface::bool_opts", bool_opts_);

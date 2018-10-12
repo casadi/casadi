@@ -284,6 +284,7 @@ namespace casadi {
 
 
   Newton::Newton(DeserializingStream& s) : Rootfinder(s) {
+    s.version("Newton", 1);
     s.unpack("Newton::max_iter", max_iter_);
     s.unpack("Newton::abstol", abstol_);
     s.unpack("Newton::abstolStep", abstolStep_);
@@ -294,6 +295,7 @@ namespace casadi {
 
   void Newton::serialize_body(SerializingStream &s) const {
     Rootfinder::serialize_body(s);
+    s.version("Newton", 1);
     s.pack("Newton::max_iter", max_iter_);
     s.pack("Newton::abstol", abstol_);
     s.pack("Newton::abstolStep", abstolStep_);

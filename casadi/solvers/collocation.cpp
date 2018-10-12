@@ -344,6 +344,7 @@ namespace casadi {
   }
 
   Collocation::Collocation(DeserializingStream& s) : ImplicitFixedStepIntegrator(s) {
+    s.version("Collocation", 1);
     s.unpack("Collocation::deg", deg_);
     s.unpack("Collocation::collocation_scheme", collocation_scheme_);
     s.unpack("Collocation::f", f_);
@@ -352,6 +353,7 @@ namespace casadi {
 
   void Collocation::serialize_body(SerializingStream &s) const {
     ImplicitFixedStepIntegrator::serialize_body(s);
+    s.version("Collocation", 1);
     s.pack("Collocation::deg", deg_);
     s.pack("Collocation::collocation_scheme", collocation_scheme_);
     s.pack("Collocation::f", f_);

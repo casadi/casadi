@@ -303,12 +303,14 @@ namespace casadi {
   }
 
   void ImporterInternal::serialize_body(SerializingStream& s) const {
+    s.version("ImporterInternal", 1);
     s.pack("ImporterInternal::name", name_);
     s.pack("ImporterInternal::meta", meta_);
     s.pack("ImporterInternal::external", external_);
   }
 
   ImporterInternal::ImporterInternal(DeserializingStream& s) {
+    s.version("ImporterInternal", 1);
     s.unpack("ImporterInternal::name", name_);
     s.unpack("ImporterInternal::meta", meta_);
     s.unpack("ImporterInternal::external", external_);

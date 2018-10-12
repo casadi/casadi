@@ -1462,6 +1462,7 @@ namespace casadi {
   void Integrator::serialize_body(SerializingStream &s) const {
     OracleFunction::serialize_body(s);
 
+    s.version("Integrator", 1);
     s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
     s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
     s.pack("Integrator::nx", nx_);
@@ -1501,6 +1502,7 @@ namespace casadi {
   }
 
   Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
+    s.version("Integrator", 1);
     s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
     s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
     s.unpack("Integrator::nx", nx_);
@@ -1534,6 +1536,7 @@ namespace casadi {
   void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
     Integrator::serialize_body(s);
 
+    s.version("FixedStepIntegrator", 1);
     s.pack("FixedStepIntegrator::F", F_);
     s.pack("FixedStepIntegrator::G", G_);
     s.pack("FixedStepIntegrator::nk", nk_);
@@ -1543,6 +1546,7 @@ namespace casadi {
   }
 
   FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s) {
+    s.version("FixedStepIntegrator", 1);
     s.unpack("FixedStepIntegrator::F", F_);
     s.unpack("FixedStepIntegrator::G", G_);
     s.unpack("FixedStepIntegrator::nk", nk_);
@@ -1554,12 +1558,14 @@ namespace casadi {
   void ImplicitFixedStepIntegrator::serialize_body(SerializingStream &s) const {
     FixedStepIntegrator::serialize_body(s);
 
+    s.version("ImplicitFixedStepIntegrator", 1);
     s.pack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
     s.pack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);
   }
 
   ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(DeserializingStream & s) :
       FixedStepIntegrator(s) {
+    s.version("ImplicitFixedStepIntegrator", 1);
     s.unpack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
     s.unpack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);
   }

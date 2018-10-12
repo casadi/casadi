@@ -244,6 +244,7 @@ namespace casadi {
   template<typename DerivedType, typename MatType, typename NodeType>
   XFunction<DerivedType, MatType, NodeType>::
   XFunction(DeserializingStream& s) : FunctionInternal(s) {
+    s.version("XFunction", 1);
     s.unpack("XFunction::in", in_);
     // 'out' member needs to be delayed
   }
@@ -264,6 +265,7 @@ namespace casadi {
   void XFunction<DerivedType, MatType, NodeType>::
   serialize_body(SerializingStream& s) const {
     FunctionInternal::serialize_body(s);
+    s.version("XFunction", 1);
     s.pack("XFunction::in", in_);
     // 'out' member needs to be delayed
   }
