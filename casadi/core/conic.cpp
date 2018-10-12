@@ -484,6 +484,14 @@ namespace casadi {
     }
   }
 
+  int Conic::
+  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    if (inputs_check_) {
+      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
+    }
+    return 0;
+  }
+
   void Conic::print_fstats(const ConicMemory* m) const {
     // Length of the name being printed
     size_t name_len=0;

@@ -348,6 +348,7 @@ namespace casadi {
 
   int QpoasesInterface::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    Conic::eval(arg, res, iw, w, mem);
     auto m = static_cast<QpoasesMemory*>(mem);
 
     // Statistics
@@ -357,10 +358,6 @@ namespace casadi {
 
     // Problem has not been solved at this point
     m->return_status = -1;
-
-    if (inputs_check_) {
-      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
-    }
 
     // Maxiumum number of working set changes
     int nWSR = max_nWSR_;
