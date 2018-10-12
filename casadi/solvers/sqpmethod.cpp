@@ -639,7 +639,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << nlp_hess_l + "(m_arg, m_res, m_iw, m_w, 0);\n";
     g.comment("Determing regularization parameter with Gershgorin theorem");
     if (regularize_) {
-      g << "reg = " << g.fmin(0, "-" + g.lb_eig(Hsp_, "d.Bk")) << "\n";
+      g << "reg = " << g.fmin("0", "-" + g.lb_eig(Hsp_, "d.Bk")) << "\n";
       g << "if (reg>0) " << g.regularize(Hsp_, "d.Bk", "reg") << "\n";
     }
     g.comment("Formulate the QP");
