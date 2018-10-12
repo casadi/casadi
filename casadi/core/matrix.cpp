@@ -661,9 +661,119 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::print_dense(std::ostream &stream, bool truncate) const {
+    print_dense(stream, sparsity(), ptr(), truncate);
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::print_sparse(std::ostream &stream, bool truncate) const {
+    print_sparse(stream, sparsity(), ptr(), truncate);
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::print_split(std::vector<std::string>& nz,
+                                    std::vector<std::string>& inter) const {
+
+    print_split(nnz(), ptr(), nz, inter);
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::print_scalar(std::ostream &stream, const Scalar& e) {
+    std::streamsize precision = stream.precision();
+    std::streamsize width = stream.width();
+    std::ios_base::fmtflags flags = stream.flags();
+
+    stream.precision(stream_precision_);
+    stream.width(stream_width_);
+    if (stream_scientific_) {
+      stream.setf(std::ios::scientific);
+    } else {
+      stream.unsetf(std::ios::scientific);
+    }
+    stream << e;
+    stream << std::flush;
+
+    stream.precision(precision);
+    stream.width(width);
+    stream.flags(flags);
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::print_split(casadi_int nnz, const Scalar* nonzeros,
+                                    std::vector<std::string>& nz,
+                                    std::vector<std::string>& inter) {
+    nz.resize(nnz);
+    inter.resize(0);
+
+    // Temporary
+    std::stringstream ss;
+    ss.precision(stream_precision_);
+    ss.width(stream_width_);
+    if (stream_scientific_) {
+      ss.setf(std::ios::scientific);
+    } else {
+      ss.unsetf(std::ios::scientific);
+    }
+
+    // Print nonzeros
+    for (casadi_int i=0; i<nz.size(); ++i) {
+      ss.str(std::string());
+      ss << nonzeros[i];
+      nz[i] = ss.str();
+    }
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::print_sparse(std::ostream &stream, const Sparsity& sp,
+      const Scalar* nonzeros, bool truncate) {
+    // Access data structures
+    casadi_int size1 = sp.size1();
+    casadi_int size2 = sp.size2();
+    const casadi_int* colind = sp.colind();
+    const casadi_int* row = sp.row();
+    casadi_int nnz = sp.nnz();
+
+    // Quick return if all zero sparse
+    if (nnz==0) {
+      stream << "all zero sparse: " << size1 << "-by-" << size2 << std::flush;
+      return;
+    }
+
+    // Print header
+    stream << "sparse: " << size1 << "-by-" << size2 << ", " << nnz << " nnz";
+
     // Get components
     std::vector<std::string> nz, inter;
-    print_split(nz, inter);
+    print_split(nnz, nonzeros, nz, inter);
+
+    // Print intermediate expressions
+    for (casadi_int i=0; i<inter.size(); ++i)
+      stream << std::endl << " @" << (i+1) << "=" << inter[i] << ",";
+    inter.clear();
+
+    // No need to truncate if less than 1000 nonzeros
+    const casadi_int max_nnz = 1000;
+    if (truncate && nnz<=max_nnz) truncate=false;
+
+    // Print nonzeros
+    for (casadi_int cc=0; cc<size2; ++cc) {
+      for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
+        if (truncate && el>=3 && el<nnz-3) {
+          if (el==3) stream << std::endl << " ...";
+        } else {
+          stream << std::endl << " (" << row[el] << ", " << cc << ") -> " << nz.at(el);
+          InterruptHandler::check();
+        }
+      }
+    }
+    stream << std::flush;
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::print_dense(std::ostream &stream, const Sparsity& sp,
+      const Scalar* nonzeros, bool truncate) {
+    // Get components
+    std::vector<std::string> nz, inter;
+    print_split(sp.nnz(), nonzeros, nz, inter);
 
     // Print intermediate expressions
     for (casadi_int i=0; i<inter.size(); ++i)
@@ -671,10 +781,10 @@ namespace casadi {
     inter.clear();
 
     // Access data structures
-    casadi_int size1 = this->size1();
-    casadi_int size2 = this->size2();
-    const casadi_int* colind = this->colind();
-    const casadi_int* row = this->row();
+    casadi_int size1 = sp.size1();
+    casadi_int size2 = sp.size2();
+    const casadi_int* colind = sp.colind();
+    const casadi_int* row = sp.row();
 
     // No need to truncate if less than 1000 entries
     const casadi_int max_numel = 1000;
@@ -737,96 +847,6 @@ namespace casadi {
       }
     }
     stream << std::flush;
-  }
-
-  template<typename Scalar>
-  void Matrix<Scalar>::print_sparse(std::ostream &stream, bool truncate) const {
-    // Access data structures
-    casadi_int size1 = this->size1();
-    casadi_int size2 = this->size2();
-    const casadi_int* colind = this->colind();
-    const casadi_int* row = this->row();
-    casadi_int nnz = this->nnz();
-
-    // Quick return if all zero sparse
-    if (nnz==0) {
-      stream << "all zero sparse: " << size1 << "-by-" << size2 << std::flush;
-      return;
-    }
-
-    // Print header
-    stream << "sparse: " << size1 << "-by-" << size2 << ", " << nnz << " nnz";
-
-    // Get components
-    std::vector<std::string> nz, inter;
-    print_split(nz, inter);
-
-    // Print intermediate expressions
-    for (casadi_int i=0; i<inter.size(); ++i)
-      stream << std::endl << " @" << (i+1) << "=" << inter[i] << ",";
-    inter.clear();
-
-    // No need to truncate if less than 1000 nonzeros
-    const casadi_int max_nnz = 1000;
-    if (truncate && nnz<=max_nnz) truncate=false;
-
-    // Print nonzeros
-    for (casadi_int cc=0; cc<size2; ++cc) {
-      for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
-        if (truncate && el>=3 && el<nnz-3) {
-          if (el==3) stream << std::endl << " ...";
-        } else {
-          stream << std::endl << " (" << row[el] << ", " << cc << ") -> " << nz.at(el);
-          InterruptHandler::check();
-        }
-      }
-    }
-    stream << std::flush;
-  }
-
-  template<typename Scalar>
-  void Matrix<Scalar>::print_split(std::vector<std::string>& nz,
-                                    std::vector<std::string>& inter) const {
-    nz.resize(nnz());
-    inter.resize(0);
-
-    // Temporary
-    std::stringstream ss;
-    ss.precision(stream_precision_);
-    ss.width(stream_width_);
-    if (stream_scientific_) {
-      ss.setf(std::ios::scientific);
-    } else {
-      ss.unsetf(std::ios::scientific);
-    }
-
-    // Print nonzeros
-    for (casadi_int i=0; i<nz.size(); ++i) {
-      ss.str(std::string());
-      ss << nonzeros().at(i);
-      nz[i] = ss.str();
-    }
-  }
-
-  template<typename Scalar>
-  void Matrix<Scalar>::print_scalar(std::ostream &stream, const Scalar& e) {
-    std::streamsize precision = stream.precision();
-    std::streamsize width = stream.width();
-    std::ios_base::fmtflags flags = stream.flags();
-
-    stream.precision(stream_precision_);
-    stream.width(stream_width_);
-    if (stream_scientific_) {
-      stream.setf(std::ios::scientific);
-    } else {
-      stream.unsetf(std::ios::scientific);
-    }
-    stream << e;
-    stream << std::flush;
-
-    stream.precision(precision);
-    stream.width(width);
-    stream.flags(flags);
   }
 
   template<typename Scalar>
@@ -3717,17 +3737,17 @@ namespace casadi {
   }
 
   template<>
-  void SX::print_split(vector<string>& nz,
-                      vector<string>& inter) const {
+  void SX::print_split(casadi_int nnz, const SXElem* nonzeros, vector<string>& nz,
+                      vector<string>& inter) {
     // Find out which noded can be inlined
     std::map<const SXNode*, casadi_int> nodeind;
-    for (auto&& i : nonzeros_) i->can_inline(nodeind);
+    for (casadi_int i=0; i<nnz; ++i) nonzeros[i]->can_inline(nodeind);
 
     // Print expression
     nz.resize(0);
-    nz.reserve(nnz());
+    nz.reserve(nnz);
     inter.resize(0);
-    for (auto&& i : nonzeros_) nz.push_back(i->print_compact(nodeind, inter));
+    for (casadi_int i=0; i<nnz; ++i) nz.push_back(nonzeros[i]->print_compact(nodeind, inter));
   }
 
   template<> vector<SX> SX::get_input(const Function& f) {

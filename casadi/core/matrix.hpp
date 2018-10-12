@@ -824,6 +824,18 @@ namespace casadi {
 #ifndef SWIG
     /// Print scalar
     static void print_scalar(std::ostream &stream, const Scalar& e);
+
+    /// Print scalar
+    static void print_sparse(std::ostream &stream, const Sparsity& sp, const Scalar* e,
+      bool truncate=true);
+
+    /// Get strings corresponding to the nonzeros and the interdependencies
+    static void print_split(casadi_int nnz, const Scalar* nonzeros, std::vector<std::string>& nz,
+                    std::vector<std::string>& inter);
+
+    /// Print dense matrix-stype
+    static void print_dense(std::ostream &stream,  const Sparsity& sp, const Scalar* nonzeros,
+      bool truncate=true);
 #endif
 
     void clear();
