@@ -83,6 +83,14 @@ namespace casadi {
     ImplicitFixedStepIntegrator::init(opts);
   }
 
+  MX Collocation::algebraic_state_init(const MX& x0, const MX& z0) const {
+    MX ret = vertcat(x0, z0);
+    return repmat(ret, deg_);
+  }
+  MX Collocation::algebraic_state_output(const MX& Z) const {
+    return Z(Slice(Z.size1()-nz_, Z.size1()));
+  }
+
   void Collocation::setupFG() {
     f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
     g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},

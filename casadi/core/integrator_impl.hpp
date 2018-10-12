@@ -86,6 +86,9 @@ namespace casadi {
     /** Helper for a more powerful 'integrator' factory */
     virtual Function create_advanced(const Dict& opts);
 
+    virtual MX algebraic_state_init(const MX& x0, const MX& z0) const { return z0; }
+    virtual MX algebraic_state_output(const MX& Z) const { return Z; }
+
     /** \brief Reset the forward problem */
     virtual void reset(IntegratorMemory* mem, double t,
                        const double* x, const double* z, const double* p) const = 0;

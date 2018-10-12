@@ -97,6 +97,9 @@ namespace casadi {
     void resetB(IntegratorMemory* mem, double t, const double* rx,
                         const double* rz, const double* rp) const override;
 
+    MX algebraic_state_init(const MX& x0, const MX& z0) const override;
+    MX algebraic_state_output(const MX& Z) const override;
+
     // Interpolation order
     casadi_int deg_;
 
