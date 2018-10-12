@@ -150,7 +150,7 @@ namespace casadi {
     // Default options
     iin_ = 0;
     iout_ = 0;
-    error_on_fail_ = false;
+    error_on_fail_ = true;
   }
 
   Rootfinder::~Rootfinder() {

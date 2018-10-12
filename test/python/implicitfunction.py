@@ -296,13 +296,12 @@ class ImplicitFunctiontests(casadiTestCase):
 
     for Solver, options, features in solvers:
       opts = dict(options)
-      if Solver=="kinsol": opts["error_on_fail"] = False # has different default
+      opts["error_on_fail"] = False
       solver = rootfinder("solver",Solver,{'x':vertcat(x,y), 'g':vertcat(sin(x)-2,sin(y)-2)},opts)
       solver(x0=0)
       self.assertFalse(solver.stats()["success"])
 
       opts = dict(options)
-      opts["error_on_fail"] = True
       solver = rootfinder("solver",Solver,{'x':vertcat(x,y), 'g':vertcat(sin(x)-2,sin(y)-2)},opts)
       with self.assertInException("process"):
         solver(x0=0)
