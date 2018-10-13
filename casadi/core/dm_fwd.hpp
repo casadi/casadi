@@ -22,48 +22,18 @@
  *
  */
 
+#ifndef CASADI_DM_FWD_HPP
+#define CASADI_DM_FWD_HPP
+#include "matrix_fwd.hpp"
+#include <vector>
+#include <map>
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+namespace casadi {
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
+  typedef Matrix<double> DM;
+  typedef std::vector<DM> DMVector;
+  typedef std::vector<DMVector> DMVectorVector;
+  typedef std::map<std::string, DM> DMDict;
+} // namespace casadi
 
-// Generic tools
-#include "polynomial.hpp"
-#include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
-
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
-
-// Matrix expressions
-#include "mx.hpp"
-
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
-
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_builder.hpp"
-#include "variable.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
-
-#endif // CASADI_CORE_HPP
+#endif // CASADI_DM_FWD_HPP

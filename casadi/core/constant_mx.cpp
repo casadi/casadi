@@ -295,21 +295,6 @@ namespace casadi {
     }
   }
 
-  template<>
-  char RuntimeConst<casadi_int>::type_char = 'I';
-
-  template<>
-  char RuntimeConst<double>::type_char = 'D';
-
-  template<>
-  char CompiletimeConst<0>::type_char = '0';
-
-  template<>
-  char CompiletimeConst<(-1)>::type_char = 'm';
-
-  template<>
-  char CompiletimeConst<1>::type_char = '1';
-
   ///
 
 

@@ -30,8 +30,9 @@
 #include "printable.hpp"
 #include "exception.hpp"
 #include "casadi_limits.hpp"
-#include "matrix.hpp"
+#include "matrix_fwd.hpp"
 #include "generic_expression.hpp"
+#include "serializing_stream.hpp"
 
 /** \brief  C/C++ */
 #include <cmath>
@@ -250,16 +251,6 @@ namespace casadi {
 
 #endif // SWIG
 /// \endcond
-
-  ///@{
-  /// Readability typedefs
-  typedef Matrix<SXElem> SX;
-  typedef std::vector<SX> SXVector;
-  typedef std::initializer_list<SX> SXIList;
-  typedef std::vector<SXVector> SXVectorVector;
-  typedef std::map<std::string, SX> SXDict;
-  ///@}
-
 
 } // namespace casadi
 

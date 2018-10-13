@@ -26,7 +26,10 @@
 #ifndef CASADI_MX_HPP
 #define CASADI_MX_HPP
 #include "shared_object.hpp"
-#include "matrix.hpp"
+#include "matrix_fwd.hpp"
+#include "sx_fwd.hpp"
+#include "dm.hpp"
+#include "generic_matrix.hpp"
 #include "generic_expression.hpp"
 #include "generic_type.hpp"
 #include "printable.hpp"

@@ -972,7 +972,6 @@ namespace casadi {
 
 } // namespace casadi
 
-#include "sx.hpp"
 #include "casadi_interrupt.hpp"
 #include "runtime/shared.hpp"
 

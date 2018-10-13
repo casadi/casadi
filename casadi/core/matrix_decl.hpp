@@ -23,12 +23,12 @@
  */
 
 
-#ifndef CASADI_MATRIX_HPP
-#define CASADI_MATRIX_HPP
+#ifndef CASADI_MATRIX_DECL_HPP
+#define CASADI_MATRIX_DECL_HPP
 
+#include "matrix_fwd.hpp"
 #include "exception.hpp"
 #include "casadi_limits.hpp"
-#include "casadi_misc.hpp"
 #include "runtime/casadi_runtime.hpp"
 #include "generic_matrix.hpp"
 #include "generic_expression.hpp"
@@ -1129,21 +1129,6 @@ namespace casadi {
 #endif // SWIG
   };
 
-  ///@{
-  /// Readability typedefs
-  typedef Matrix<casadi_int> IM;
-  typedef Matrix<double> DM;
-  typedef std::vector<DM> DMVector;
-  typedef std::vector<DMVector> DMVectorVector;
-  typedef std::map<std::string, DM> DMDict;
-  ///@}
-
-  /// Is the IM a Slice
-  bool CASADI_EXPORT is_slice(const IM& x, bool ind1=false);
-
-  ///  Convert IM to Slice
-  Slice CASADI_EXPORT to_slice(const IM& x, bool ind1=false);
-
   /// Implementation of Matrix::get_nonzeros (in public API)
   template<typename Scalar>
   template<typename A>
@@ -1174,4 +1159,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // CASADI_MATRIX_HPP
+#endif // CASADI_MATRIX_DECL_HPP

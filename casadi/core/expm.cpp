@@ -24,7 +24,6 @@
 
 
 #include "expm_impl.hpp"
-#include "matrix.hpp"
 #include "sparsity_interface.hpp"
 #include <typeinfo>
 

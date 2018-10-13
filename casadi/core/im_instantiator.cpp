@@ -22,48 +22,34 @@
  *
  */
 
+#define CASADI_IM_INSTANTIATOR_CPP
+#include "matrix_impl.hpp"
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+using namespace std;
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
+namespace casadi {
 
-// Generic tools
-#include "polynomial.hpp"
-#include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
+  bool CASADI_EXPORT is_slice(const IM& x, bool ind1) {
+    return x.is_scalar() || (x.is_column() && x.is_dense() && is_slice(x.nonzeros(), ind1));
+  }
 
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
+  Slice CASADI_EXPORT to_slice(const IM& x, bool ind1) {
+    return x.is_scalar() ? Slice(x.scalar(), ind1) : to_slice(x.nonzeros(), ind1);
+  }
 
-// Matrix expressions
-#include "mx.hpp"
+  template<>
+  Dict CASADI_EXPORT IM::info() const {
+    return {{"sparsity", sparsity().info()}, {"data", nonzeros()}};
+  }
+  template<>
+  void CASADI_EXPORT IM::to_file(const std::string& filename,
+      const std::string& format_hint) const {
+    casadi_error("Not implemented");
+  }
 
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
+  // Instantiate templates
+  template class casadi_limits<casadi_int>;
+  template class CASADI_EXPORT Matrix<casadi_int>;
 
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_builder.hpp"
-#include "variable.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
 
-#endif // CASADI_CORE_HPP
+} // namespace casadi

@@ -30,6 +30,7 @@
 #include "function_internal.hpp"
 #include "plugin_interface.hpp"
 #include "timing.hpp"
+#include "im.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

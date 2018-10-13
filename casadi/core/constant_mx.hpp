@@ -282,7 +282,7 @@ namespace casadi {
     const T value;
     RuntimeConst() {}
     RuntimeConst(T v) : value(v) {}
-    static char type_char;
+    static char type_char();
     void serialize_type(SerializingStream& s) const {
       s.pack("Constant::value", value);
     }
@@ -294,18 +294,18 @@ namespace casadi {
   };
 
   template<typename T>
-  char RuntimeConst<T>::type_char = 'u';
+  inline char RuntimeConst<T>::type_char() { return 'u'; }
 
   template<>
-  char RuntimeConst<casadi_int>::type_char;
+  inline char RuntimeConst<casadi_int>::type_char() { return 'I'; }
 
   template<>
-  char RuntimeConst<double>::type_char;
+  inline char RuntimeConst<double>::type_char() { return 'D'; }
 
   template<int v>
   struct CompiletimeConst {
     static const int value = v;
-    static char type_char;
+    static char type_char();
     void serialize_type(SerializingStream& s) const {}
     static CompiletimeConst deserialize(DeserializingStream& s) {
       return CompiletimeConst();
@@ -313,14 +313,14 @@ namespace casadi {
   };
 
   template<int v>
-  char CompiletimeConst<v>::type_char = 'u';
+  inline char CompiletimeConst<v>::type_char() { return 'u'; }
 
   template<>
-  char CompiletimeConst<0>::type_char;
+  inline char CompiletimeConst<0>::type_char() { return '0'; }
   template<>
-  char CompiletimeConst<(-1)>::type_char;
+  inline char CompiletimeConst<(-1)>::type_char() { return 'm'; }
   template<>
-  char CompiletimeConst<1>::type_char;
+  inline char CompiletimeConst<1>::type_char() { return '1'; }
 
   /// A constant with all entries identical
   template<typename Value>
@@ -408,7 +408,7 @@ namespace casadi {
   template<typename Value>
   void Constant<Value>::serialize_type(SerializingStream& s) const {
     MXNode::serialize_type(s);
-    s.pack("ConstantMX::type", Value::type_char);
+    s.pack("ConstantMX::type", Value::type_char());
     v_.serialize_type(s);
   }
 

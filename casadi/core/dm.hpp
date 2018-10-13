@@ -22,48 +22,55 @@
  *
  */
 
+#ifndef CASADI_DM_HPP
+#define CASADI_DM_HPP
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+#include "dm_fwd.hpp"
+#include "matrix_decl.hpp"
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
+namespace casadi {
 
-// Generic tools
-#include "polynomial.hpp"
-#include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
 
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
+  template<>
+  DM DM::
+  solve(const DM& A, const DM& b,
+        const std::string& lsolver, const Dict& dict);
 
-// Matrix expressions
-#include "mx.hpp"
+  template<>
+  DM DM::
+  inv(const DM& A,
+        const std::string& lsolver, const Dict& dict);
+  template<>
+  DM DM::
+  pinv(const DM& A, const std::string& lsolver,
+       const Dict& dict);
 
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
+  template<>
+  DM DM::
+  rand(const Sparsity& sp); // NOLINT(runtime/threadsafe_fn)
 
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_builder.hpp"
-#include "variable.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
+  template<>
+  DM DM::
+  expm(const DM& A);
 
-#endif // CASADI_CORE_HPP
+  template<>
+  DM DM::
+  expm_const(const DM& A, const DM& t);
+
+  template<> void DM::export_code(const std::string& lang,
+       std::ostream &stream, const Dict& options) const;
+
+  template<>
+  Dict DM::info() const;
+
+  template<>
+  void DM::to_file(const std::string& filename,
+    const std::string& format_hint) const;
+
+#ifndef CASADI_DM_INSTANTIATOR_CPP
+  extern template class Matrix<double>;
+#endif // CASADI_DM_INSTANTIATOR_CPP
+
+} // namespace casadi
+
+#endif // CASADI_DM_HPP

@@ -3,5 +3,6 @@ branches:
     - /.*travis.*/
 
 build_script:
+  - set CXXFLAGS="-D_CRT_SECURE_NO_WARNINGS"
   - cmake "-GVisual Studio 12 Win64" -H. -B_builds
   - cmake --build _builds --config "Debug"

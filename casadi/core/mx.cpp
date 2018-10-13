@@ -34,6 +34,7 @@
 #include "linsol.hpp"
 #include "expm.hpp"
 #include "serializing_stream.hpp"
+#include "im.hpp"
 
 // Throw informative error message
 #define CASADI_THROW_ERROR(FNAME, WHAT) \

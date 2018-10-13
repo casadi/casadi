@@ -29,6 +29,7 @@
 #include "slice.hpp"
 #include "linsol.hpp"
 #include "importer.hpp"
+#include "im.hpp"
 #include "generic_type.hpp"
 #include <iomanip>
 
@@ -139,10 +140,10 @@ namespace casadi {
       return static_cast<SerializerBase::SerializationType>(type);
     }
 
-#define SERIALIZEX(TYPE, Type, type, arg) \
+#define SERIALIZEX(TYPE, BaseType, Type, type, arg) \
     void SerializerBase::pack(const Type& e) { \
       serializer().pack(static_cast<char>(SERIALIZED_ ## TYPE));\
-      serializer().pack(Function("temp", {}, arg)); \
+      serializer().pack(Function("temp", std::vector< BaseType >{}, arg)); \
       serializer().pack(e); \
     } \
     \
@@ -155,8 +156,8 @@ namespace casadi {
     }
 
 #define SERIALIZEX_ALL(TYPE, Type, type)\
-  SERIALIZEX(TYPE, Type, type, {e})\
-  SERIALIZEX(TYPE ## _VECTOR, std::vector< Type >, type ## _vector, e)
+  SERIALIZEX(TYPE, Type, Type, type, {e})\
+  SERIALIZEX(TYPE ## _VECTOR, Type, std::vector< Type >, type ## _vector, e)
 
 SERIALIZEX_ALL(MX, MX, mx)
 SERIALIZEX_ALL(SX, SX, sx)

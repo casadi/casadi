@@ -3413,8 +3413,12 @@ casadi_graph_substitute(const std::vector< M > &ex,
 %define MX_ALL(DECL, FLAG)
 MX_FUN(DECL, (FLAG | IS_MX), MX)
 %enddef
+%include <casadi/core/matrix_fwd.hpp>
+%include <casadi/core/matrix_decl.hpp>
+%include <casadi/core/dm_fwd.hpp>
+%include <casadi/core/im_fwd.hpp>
+%include <casadi/core/sx_fwd.hpp>
 
-%include <casadi/core/matrix.hpp>
 
 %template(DM) casadi::Matrix<double>;
 %extend casadi::Matrix<double> {

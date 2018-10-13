@@ -39,6 +39,7 @@ namespace casadi {
   class SXElem;
   class GenericType;
   class Importer;
+  typedef std::map<std::string, GenericType> Dict;
 
   /** \brief Helper class for Serialization
       \author Joris Gillis
@@ -168,7 +169,8 @@ namespace casadi {
   class CASADI_EXPORT SerializingStream {
   public:
     /// Constructor
-    SerializingStream(std::ostream& out, const Dict& opts = Dict());
+    SerializingStream(std::ostream& out);
+    SerializingStream(std::ostream& out, const Dict& opts);
 
     // @{
     /** \brief Serializes an object to the output stream  */

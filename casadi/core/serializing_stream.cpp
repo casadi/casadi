@@ -60,6 +60,10 @@ namespace casadi {
 
     }
 
+    SerializingStream::SerializingStream(std::ostream& out_s) :
+      SerializingStream(out_s, Dict()) {
+    }
+
     SerializingStream::SerializingStream(std::ostream& out_s, const Dict& opts) :
         out(out_s), debug_(false) {
       // Sanity check

@@ -23,47 +23,15 @@
  */
 
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+#ifndef CASADI_MATRIX_FWD_HPP
+#define CASADI_MATRIX_FWD_HPP
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
-
-// Generic tools
-#include "polynomial.hpp"
 #include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
 
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
+namespace casadi {
+  template<typename Scalar>
+  class Matrix;
 
-// Matrix expressions
-#include "mx.hpp"
+} // namespace casadi
 
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
-
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_builder.hpp"
-#include "variable.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
-
-#endif // CASADI_CORE_HPP
+#endif // CASADI_MATRIX_FWD_HPP
