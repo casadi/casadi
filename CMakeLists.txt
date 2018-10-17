@@ -19,6 +19,31 @@ set(PACKAGE_AUTHOR "Joel Andersson and Joris Gillis")
 set(PACKAGE_MAINTAINER "Joel Andersson and Joris Gillis")
 set(PACKAGE_URL "http://casadi.org")
 
+############################################################
+####################### Policies ###########################
+############################################################
+# Enforce cmake2.4+ style behaviour for
+# mixed filename/full path linker directives
+cmake_policy(SET CMP0003 NEW)
+
+# cmake_policy propagation rules
+if(POLICY CMP0011)
+cmake_policy(SET CMP0011 OLD)
+endif()
+
+# cmake_policy avoid escaping in add_definitions
+cmake_policy(SET CMP0005 OLD)
+
+# cmake_policy use MACOSX_RPATH=ON by default
+if(POLICY CMP0042)
+  cmake_policy(SET CMP0042 NEW)
+endif()
+
+# cmake_policy how to interpret string arguments
+if(POLICY CMP0054)
+  cmake_policy(SET CMP0054 NEW)
+endif()
+
 #############################################################
 ########################## Version ##########################
 #############################################################
@@ -118,6 +143,7 @@ if(CXX11FLAG)
     add_definitions(-DHAS_COPYSIGN)
   endif()
 
+
   try_compile(HAS_ERF
     ${CMAKE_BINARY_DIR}
     ${CMAKE_MODULE_PATH}/check_erf.cpp
@@ -176,31 +202,6 @@ else()
 endif()
 
 ############################################################
-####################### Policies ###########################
-############################################################
-# Enforce cmake2.4+ style behaviour for
-# mixed filename/full path linker directives
-cmake_policy(SET CMP0003 NEW)
-
-# cmake_policy propagation rules
-if(POLICY CMP0011)
-cmake_policy(SET CMP0011 OLD)
-endif()
-
-# cmake_policy avoid escaping in add_definitions
-cmake_policy(SET CMP0005 OLD)
-
-# cmake_policy use MACOSX_RPATH=ON by default
-if(POLICY CMP0042)
-  cmake_policy(SET CMP0042 NEW)
-endif()
-
-# cmake_policy how to interpret string arguments
-if(POLICY CMP0054)
-  cmake_policy(SET CMP0054 NEW)
-endif()
-
-############################################################
 ####################### macports python ####################
 ############################################################
 # find the macports python libs if they exist
@@ -229,6 +230,16 @@ else()
   set(WITH_BLOCKSQP_DEF OFF)
   set(WITH_IPOPT_DEF OFF)
 endif()
+
+#####################################################
+######################### swig ######################
+#####################################################
+option(WITH_PYTHON "Compile the Python front-end" OFF)
+option(WITH_MATLAB "Compile the MATLAB front-end" OFF)
+option(WITH_OCTAVE "Compile the Octave front-end (experimental)" OFF)
+option(WITH_JSON "Compile the JSON front-end" OFF)
+option(WITH_OCTAVE_IMPORT "[DEPRECATED] Copy import.m file to install directory" OFF)
+option(WITH_PYTHON3 "Use Python 3.*" OFF)
 
 ############################################################
 ################# Misc options #############################
@@ -289,6 +300,12 @@ endif()
 
 # Have an so version?
 option(WITH_SO_VERSION "Use an so version for the library (version suffix) when applicable" ON)
+
+set(WITH_COPYSIGN_UNDEF_DEFAULT OFF)
+if(WITH_PYTHON AND MSVC)
+  set(WITH_COPYSIGN_UNDEF_DEFAULT OFF)
+endif()
+option(WITH_COPYSIGN_UNDEF "On Windows, in Python.h #defines copysign to be _copysign. This option inserts an #undef" WITH_COPYSIGN_UNDEF_DEFAULT)
 
 ############################################################
 ################# Installation location ####################
@@ -735,14 +752,8 @@ else()
 endif()
 
 #####################################################
-######################### swig ######################
+###################### swig #########################
 #####################################################
-option(WITH_PYTHON "Compile the Python front-end" OFF)
-option(WITH_MATLAB "Compile the MATLAB front-end" OFF)
-option(WITH_OCTAVE "Compile the Octave front-end (experimental)" OFF)
-option(WITH_JSON "Compile the JSON front-end" OFF)
-option(WITH_OCTAVE_IMPORT "[DEPRECATED] Copy import.m file to install directory" OFF)
-option(WITH_PYTHON3 "Use Python 3.*" OFF)
 option(WITH_EXTENDING_CASADI "Compile a demonstration that shows how a project that depends on CasADi can be implemented." OFF)
 if(WITH_PYTHON OR WITH_MATLAB OR WITH_OCTAVE OR WITH_JSON)
   add_subdirectory(swig)

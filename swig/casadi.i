@@ -25,7 +25,15 @@
 
 %module(package="casadi",directors=1) casadi
 
- // Include all public CasADi C++
+#ifdef CASADI_WITH_COPYSIGN_UNDEF
+%{
+#ifdef copysign
+#undef copysign
+#endif
+%}
+#endif // CASADI_WITH_COPYSIGN_UNDEF
+
+// Include all public CasADi C++
 %{
 #include <casadi/casadi.hpp>
 #include <casadi/core/casadi_interrupt.hpp>
