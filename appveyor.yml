@@ -19,13 +19,13 @@ build_script:
   - set PYTHON_VERSION=3.7
   - set PYTHONVERSION=37
   - set MINICONDA=C:\Miniconda-x64
-  - git clone https://github.com/casadi/testbot.git
-  - cd testbot && call recipes\setup.bat && cd ..
+  #- git clone https://github.com/casadi/testbot.git
+  #- cd testbot && call recipes\setup.bat && cd ..
   - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
   - conda config --set always_yes yes --set changeps1 no
   - conda create -n test python=%PYTHON_VERSION% numpy requests
   - activate test
-  - set PYTHONPATH=%PYTHONPATH%;C:\projects\binaries\testbot\helpers
+  #- set PYTHONPATH=%PYTHONPATH%;C:\projects\binaries\testbot\helpers
   #- call testbot/fetch_common.bat
   - echo %arch%
   - echo %APPVEYOR_BUILD_WORKER_IMAGE%
