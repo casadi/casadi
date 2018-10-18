@@ -43,3 +43,6 @@ build_script:
   - echo %generator%
   - cmake -DWITH_PYTHON=ON -DWITH_PYTHON3=ON "-GVisual Studio %vsver% %vsyear%%arch%" -H. -B_builds
   - cmake --build _builds
+  - cmake --build _builds install
+  - cd test/python
+  - python alltests.py
