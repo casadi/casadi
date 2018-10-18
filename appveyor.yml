@@ -3,7 +3,7 @@ branches:
     - /.*travis.*/
 
 image:
-- Visual Studio 2013
+#- Visual Studio 2013
 - Visual Studio 2015
 - Visual Studio 2017
 
@@ -14,6 +14,19 @@ configuration:
 build_script:
   - set arch= Win64
   - set bitness=64
+  - set BITNESS=64
+  - set PYTHON_ARCH=64
+  - set PYTHON_VERSION=3.7
+  - set PYTHONVERSION=37
+  - set MINICONDA=C:\Miniconda-x64
+  - git clone https://github.com/casadi/testbot.git
+  - cd testbot && call recipes\setup.bat && cd ..
+  - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+  - conda config --set always_yes yes --set changeps1 no
+  - conda create -n test python=%PYTHON_VERSION% numpy requests
+  - activate test
+  - set PYTHONPATH=%PYTHONPATH%;C:\projects\binaries\testbot\helpers
+  - call testbot/fetch_common.bat
   - echo %arch%
   - echo %APPVEYOR_BUILD_WORKER_IMAGE%
   - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2017" ( set vsver=15)
@@ -27,5 +40,5 @@ build_script:
   - set CXXFLAGS="-D_CRT_SECURE_NO_WARNINGS"
   - set generator="-GVisual Studio %vsver% %vsyear%%arch%"
   - echo %generator%
-  - cmake "-GVisual Studio %vsver% %vsyear%%arch%" -H. -B_builds
+  - cmake -DWITH_PYTHON=ON -DWITH_PYTHON3=ON "-GVisual Studio %vsver% %vsyear%%arch%" -H. -B_builds
   - cmake --build _builds
