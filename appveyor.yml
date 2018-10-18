@@ -8,7 +8,6 @@ image:
 - Visual Studio 2017
 
 configuration:
-- Debug
 - Release
 
 build_script:
