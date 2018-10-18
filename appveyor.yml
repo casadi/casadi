@@ -25,6 +25,7 @@ build_script:
   - conda config --set always_yes yes --set changeps1 no
   - conda create -n test python=%PYTHON_VERSION% numpy requests
   - activate test
+  - cinst -y --no-progress swig
   #- set PYTHONPATH=%PYTHONPATH%;C:\projects\binaries\testbot\helpers
   #- call testbot/fetch_common.bat
   - echo %arch%
