@@ -26,7 +26,7 @@ build_script:
   - conda create -n test python=%PYTHON_VERSION% numpy requests
   - activate test
   - set PYTHONPATH=%PYTHONPATH%;C:\projects\binaries\testbot\helpers
-  - call testbot/fetch_common.bat
+  #- call testbot/fetch_common.bat
   - echo %arch%
   - echo %APPVEYOR_BUILD_WORKER_IMAGE%
   - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2017" ( set vsver=15)
