@@ -40,7 +40,7 @@ build_script:
   - set CXXFLAGS="-D_CRT_SECURE_NO_WARNINGS"
   - set generator="-GVisual Studio %vsver% %vsyear%%arch%"
   - echo %generator%
-  - cmake -DWITH_PYTHON=ON -DWITH_PYTHON3=ON "-GVisual Studio %vsver% %vsyear%%arch%" -H. -B_builds
+  - cmake -DCMAKE_BUILD_TYPE=Release -DWITH_PYTHON=ON -DWITH_PYTHON3=ON "-GVisual Studio %vsver% %vsyear%%arch%" -H. -B_builds
   - cmake --build _builds
   - cmake --build _builds install
   - cd test/python
