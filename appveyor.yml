@@ -41,7 +41,6 @@ build_script:
   - set generator="-GVisual Studio %vsver% %vsyear%%arch%"
   - echo %generator%
   - cmake -DCMAKE_BUILD_TYPE=Release -DWITH_PYTHON=ON -DWITH_PYTHON3=ON "-GVisual Studio %vsver% %vsyear%%arch%" -H. -B_builds
-  - cmake --build _builds
-  - cmake --build _builds install
+  - cmake --config Release --build _builds --target install
   - cd test/python
   - python alltests.py
