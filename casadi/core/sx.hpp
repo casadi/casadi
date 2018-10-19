@@ -115,9 +115,9 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   template<>
   SX SX::jacobian(const SX &f, const SX &x, const Dict& opts);
   template<>
-  SX SX::hessian(const SX &ex, const SX &arg, SX &g);
+  SX SX::hessian(const SX &ex, const SX &arg, SX &g, const Dict& opts);
   template<>
-  SX SX::hessian(const SX &ex, const SX &arg);
+  SX SX::hessian(const SX &ex, const SX &arg, const Dict& opts);
 
   template<>
   std::vector<std::vector<SX> >

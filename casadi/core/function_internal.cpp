@@ -247,7 +247,13 @@ namespace casadi {
         "Print numerical values of inputs [default: false]"}},
       {"print_out",
        {OT_BOOL,
-        "Print numerical values of outputs [default: false]"}}
+        "Print numerical values of outputs [default: false]"}},
+      {"forward_options",
+       {OT_DICT,
+        "Options to be passed to a forward mode constructor"}},
+      {"reverse_options",
+       {OT_DICT,
+        "Options to be passed to a reverse mode constructor"}}
      }
   };
 
@@ -288,6 +294,8 @@ namespace casadi {
     opts["fd_method"] = fd_method_;
     opts["print_in"] = print_in_;
     opts["print_out"] = print_out_;
+    opts["forward_options"] = forward_options_;
+    opts["reverse_options"] = reverse_options_;
     return opts;
   }
 
@@ -348,6 +356,10 @@ namespace casadi {
         print_in_ = op.second;
       } else if (op.first=="print_out") {
         print_out_ = op.second;
+      } else if (op.first=="forward_options") {
+        forward_options_ = op.second;
+      } else if (op.first=="reverse_options") {
+        reverse_options_ = op.second;
       }
     }
 
@@ -1526,9 +1538,8 @@ namespace casadi {
       std::vector<std::string> onames;
       for (i=0; i<n_out_; ++i) onames.push_back("fwd_" + name_out_[i]);
       // Options
-      Dict opts;
+      Dict opts = combine(forward_options_, generate_options());
       if (!enable_forward_) opts = fd_options_;
-      opts["max_num_dir"] = max_num_dir_;
       opts["derivative_of"] = self();
       // Generate derivative function
       casadi_assert_dev(enable_forward_ || enable_fd_);
@@ -1585,8 +1596,7 @@ namespace casadi {
       std::vector<std::string> onames;
       for (casadi_int i=0; i<n_in_; ++i) onames.push_back("adj_" + name_in_[i]);
       // Options
-      Dict opts;
-      opts["max_num_dir"] = max_num_dir_;
+      Dict opts = combine(reverse_options_, generate_options());
       opts["derivative_of"] = self();
       // Generate derivative function
       casadi_assert_dev(enable_reverse_);
@@ -2994,6 +3004,8 @@ namespace casadi {
     s.pack("FunctionInternal::fd_method", fd_method_);
     s.pack("FunctionInternal::print_in", print_in_);
     s.pack("FunctionInternal::print_out", print_out_);
+    s.pack("FunctionInternal::forward_options", forward_options_);
+    s.pack("FunctionInternal::reverse_options", reverse_options_);
 
     s.pack("FunctionInternal::sz_arg_per", sz_arg_per_);
     s.pack("FunctionInternal::sz_res_per", sz_res_per_);
@@ -3046,6 +3058,8 @@ namespace casadi {
     s.unpack("FunctionInternal::fd_method", fd_method_);
     s.unpack("FunctionInternal::print_in", print_in_);
     s.unpack("FunctionInternal::print_out", print_out_);
+    s.unpack("FunctionInternal::forward_options", forward_options_);
+    s.unpack("FunctionInternal::reverse_options", reverse_options_);
 
     s.unpack("FunctionInternal::sz_arg_per", sz_arg_per_);
     s.unpack("FunctionInternal::sz_res_per", sz_res_per_);

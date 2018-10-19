@@ -2467,7 +2467,8 @@ namespace casadi {
 
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::hessian(const Matrix<Scalar> &f,
-                                             const Matrix<Scalar> &x) {
+                                             const Matrix<Scalar> &x,
+                                             const Dict& opts) {
     casadi_error("'hessian' not defined for " + type_name());
     return Matrix<Scalar>();
   }
@@ -2475,7 +2476,8 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::hessian(const Matrix<Scalar> &f,
                                              const Matrix<Scalar> &x,
-                                             Matrix<Scalar> &g) {
+                                             Matrix<Scalar> &g,
+                                              const Dict& opts) {
     casadi_error("'hessian' not defined for " + type_name());
     return Matrix<Scalar>();
   }

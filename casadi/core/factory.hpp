@@ -84,7 +84,7 @@ namespace casadi {
     std::vector<HBlock> hess_;
 
     // Constructor
-    Factory(const Function::AuxOut& aux, bool verbose=false) : aux_(aux), verbose_(verbose) {}
+    Factory(const Function::AuxOut& aux) : aux_(aux) {}
 
     // Add an input expression
     void add_input(const std::string& s, const MatType& e);
@@ -99,7 +99,7 @@ namespace casadi {
     std::string request_output(const std::string& s);
 
     // Calculate requested outputs
-    void calculate();
+    void calculate(const Dict& opts = Dict());
 
     // Retrieve an input
     MatType get_input(const std::string& s);
@@ -129,9 +129,6 @@ namespace casadi {
 
     // Get output scheme
     std::vector<std::string> name_out() const;
-
-    // Verbose?
-    bool verbose_;
   };
 
   template<typename MatType>
@@ -245,10 +242,8 @@ namespace casadi {
   }
 
   template<typename MatType>
-  void Factory<MatType>::calculate() {
+  void Factory<MatType>::calculate(const Dict& opts) {
     using namespace std;
-
-    Dict all_opts = {{"verbose", verbose_}};
 
     // Dual variables
     for (auto&& e : out_) {
@@ -272,10 +267,10 @@ namespace casadi {
         res.push_back(out_[s]);
       }
       // Calculate directional derivatives
-      Dict opts = {{"always_inline", true}};
-      opts["verbose"] = verbose_;
+      Dict local_opts = opts;
+      local_opts["always_inline"] = true;
       try {
-        sens = forward(res, arg, seed, opts);
+        sens = forward(res, arg, seed, local_opts);
       } catch (exception& e) {
         casadi_error("Forward mode AD failed:\n" + str(e.what()));
       }
@@ -302,10 +297,10 @@ namespace casadi {
         in_["adj:" + s] = seed[0].back();
       }
       // Calculate directional derivatives
-      Dict opts = {{"always_inline", true}};
-      opts["verbose"] = verbose_;
+      Dict local_opts;
+      local_opts["always_inline"] = true;
       try {
-        sens = reverse(res, arg, seed, opts);
+        sens = reverse(res, arg, seed, local_opts);
       } catch (exception& e) {
         casadi_error("Reverse mode AD failed:\n" + str(e.what()));
       }
@@ -330,7 +325,7 @@ namespace casadi {
       const MatType& ex = out_.at(b.ex);
       const MatType& arg = in_.at(b.arg);
       try {
-        out_["jac:" + b.ex + ":" + b.arg] = MatType::jacobian(ex, arg, all_opts);
+        out_["jac:" + b.ex + ":" + b.arg] = MatType::jacobian(ex, arg, opts);
       } catch (exception& e) {
         casadi_error("Jacobian generation failed:\n" + str(e.what()));
       }
@@ -341,7 +336,7 @@ namespace casadi {
       const MatType& ex = out_.at(b.ex);
       const MatType& arg = in_.at(b.arg);
       try {
-        out_["grad:" + b.ex + ":" + b.arg] = project(gradient(ex, arg), arg.sparsity());
+        out_["grad:" + b.ex + ":" + b.arg] = project(gradient(ex, arg, opts), arg.sparsity());
       } catch (exception& e) {
         casadi_error("Gradient generation failed:\n" + str(e.what()));
       }
@@ -354,7 +349,7 @@ namespace casadi {
       const MatType& arg1 = in_.at(b.arg1);
       //const MatType& arg2 = in_.at(b.arg2);
       try {
-        out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = triu(hessian(ex, arg1));
+        out_["hess:" + b.ex + ":" + b.arg1 + ":" + b.arg2] = triu(hessian(ex, arg1, opts));
       } catch (exception& e) {
         casadi_error("Hessian generation failed:\n" + str(e.what()));
       }
