@@ -803,7 +803,7 @@ namespace casadi {
             const Dict& opts) const {
     try {
       // Temporary single-input, single-output function FIXME(@jaeandersson)
-      Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
+      Function tmp("flattened_" + name, {veccat(in_)}, {veccat(out_)},
                    {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
 
       // Jacobian expression
@@ -841,9 +841,9 @@ namespace casadi {
                  const std::vector<std::string>& onames,
                  const Dict& opts) const {
     try {
+      Dict tmp_options = generate_options();
       // Temporary single-input, single-output function FIXME(@jaeandersson)
-      Function tmp("tmp", {veccat(in_)}, {veccat(out_)},
-                   {{"ad_weight", ad_weight()}, {"ad_weight_sp", sp_weight()}});
+      Function tmp("flattened_" + name, {veccat(in_)}, {veccat(out_)}, tmp_options);
 
       // Jacobian expression
       MatType J = tmp.get<DerivedType>()->jac(0, 0, Dict());
@@ -1049,12 +1049,14 @@ namespace casadi {
           const Dict& opts) const {
     using namespace std;
 
-    auto it = opts.find("verbose");
-    bool verbose = false;
-    if (it!=opts.end()) verbose = it->second;
+    Dict f_options;
+    f_options["helper_options"] = generate_options();
+    for (auto && opt : opts) {
+      f_options[opt.first] = opt.second;
+    }
 
     // Create an expression factory
-    Factory<MatType> f(aux, verbose);
+    Factory<MatType> f(aux);
     for (casadi_int i=0; i<in_.size(); ++i) f.add_input(name_in_[i], in_[i]);
     for (casadi_int i=0; i<out_.size(); ++i) f.add_output(name_out_[i], out_[i]);
 
@@ -1079,7 +1081,10 @@ namespace casadi {
     }
 
     // Calculate expressions
-    f.calculate();
+    f.calculate(f_options);
+
+    Dict h_opts;
+    Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
 
     // Get input expressions
     vector<MatType> ret_in;
@@ -1092,7 +1097,7 @@ namespace casadi {
     for (const string& s : s_out) ret_out.push_back(f.get_output(s));
 
     // Create function and return
-    Function ret(name, ret_in, ret_out, ret_iname, ret_oname, opts);
+    Function ret(name, ret_in, ret_out, ret_iname, ret_oname, opts_remainder);
     if (ret.has_free()) {
       // Substitute free variables with zeros
       // We assume that the free variables are caused by false positive dependencies
@@ -1100,7 +1105,7 @@ namespace casadi {
       vector<MatType> free_sub = free_in;
       for (auto&& e : free_sub) e = MatType::zeros(e.sparsity());
       ret_out = substitute(ret_out, free_in, free_sub);
-      ret = Function(name, ret_in, ret_out, ret_iname, ret_oname, opts);
+      ret = Function(name, ret_in, ret_out, ret_iname, ret_oname, opts_remainder);
     }
     return ret;
   }

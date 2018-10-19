@@ -1455,27 +1455,49 @@ class Functiontests(casadiTestCase):
         solver = nlpsol("solver","ipopt",nlp)
       self.assertTrue("nlp_f" not in out[0])
       with capture_stdout() as out:
-        solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":True}})
+        solver = nlpsol("solver","ipopt",nlp,{"common_options":{"helper_options" : {"verbose":True}}})
+      print(out[0])
       self.assertTrue("nlp_f" in out[0])
       with capture_stdout() as out:
-        solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_f" : {"verbose":True}}})
+        solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_f" : {"helper_options" : {"verbose":True}}}})
       self.assertTrue("nlp_f" in out[0])
       with capture_stdout() as out:
-        solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":True},"specific_options":{ "nlp_f" : {"verbose":False}}})
+        solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":True},"specific_options":{ "nlp_f" : {"helper_options" : {"verbose":False}}}})
       self.assertTrue("nlp_f" not in out[0])
       with capture_stdout() as out:
-        solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":False},"specific_options":{ "nlp_f" : {"verbose":True}}})
+        solver = nlpsol("solver","ipopt",nlp,{"common_options":{"verbose":False},"specific_options":{ "nlp_f" : {"helper_options" : {"verbose":True}}}})
       self.assertTrue("nlp_f" in out[0])
 
       with capture_stdout() as out:
         solver = nlpsol("solver","ipopt",nlp)
       self.assertTrue(len(out[1])==0)
       with capture_stdout() as out:
-        solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : {"verbose":True}}})
+        solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : {"helper_options" : {"verbose":True}}}})
       self.assertTrue("Ignoring" + out[1])
       self.assertTrue("nlp_g" in out[1])
       with self.assertRaises(Exception):
         solver = nlpsol("solver","ipopt",nlp,{"specific_options":{ "nlp_foo" : 3}})
+
+
+  @requires_nlpsol("ipopt")
+  def test_oracle_options(self):
+    DM.set_precision(16)
+
+    N = 5
+    x = MX.sym("x",N,1)
+
+    options = {}
+    options["ipopt"] = {"hessian_approximation":"limited-memory"}
+    options["oracle_options"] = {"enable_fd":True,"enable_forward":False,"enable_reverse":False,"print_in":True,"fd_method":"central"}
+
+    solver = nlpsol("solver","ipopt",{"x":x,"f":dot(x,x)},options)
+
+    with capture_stdout() as out:
+      solver(x0=1)
+
+
+    self.assertTrue("[[1]," in out[0])
+
 
   @requires_expm("slicot")
   @memory_heavy()
@@ -1839,7 +1861,30 @@ class Functiontests(casadiTestCase):
 
       f = Function('f',[x,y,z],[x,y,z],["x","y","z"],["a","b","c"],{"default_in": [1,2,3]})
       self.check_codegen(f,{"x":5,"z":3})
+
+  def test_factory_inherit_options(self):
+      x = MX.sym("x",5)
       
+
+      for op in ["grad:f:x","jac:f:x","hess:f:x:x"]:
+        f = Function("f",[x],[dot(x,x)],["x"],["f"],{"verbose": True})
+
+        with capture_stdout() as out:
+          fgrad = f.factory("fgrad",["x"],[op])
+
+        self.assertTrue("::init" in out[0])
+
+
+        f = Function("f",[x],[dot(x,x)],["x"],["f"],{"enable_fd":True,"enable_forward":False,"enable_reverse":False,"print_in":True,"fd_method":"central","fd_options":{"h": 1e-7,"h_iter":False}})
+
+        fgrad = f.factory("fgrad",["x"],[op])
+
+        with capture_stdout() as out:
+          fgrad(0)
+
+        self.assertTrue("[[-1e-07]," in out[0])
+        self.assertTrue("[[1e-07]," in out[0])
+
 
 if __name__ == '__main__':
     unittest.main()

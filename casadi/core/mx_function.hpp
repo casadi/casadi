@@ -77,6 +77,9 @@ namespace casadi {
     /// Default input values
     std::vector<double> default_in_;
 
+    /// These options should not be serialized since only used in init
+    bool live_variables_;
+
     /** \brief Constructor */
     MXFunction(const std::string& name,
       const std::vector<MX>& input, const std::vector<MX>& output,
@@ -106,6 +109,9 @@ namespace casadi {
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
+
+    /// Reconstruct options dict
+    virtual Dict generate_options() const;
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;

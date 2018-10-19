@@ -219,6 +219,24 @@ namespace casadi {
   /// C++ equivalent of Python's dict or MATLAB's struct
   typedef GenericType::Dict Dict;
 
+  template<class T>
+  T get_from_dict(const Dict& d, const std::string& key, const T& default_value) {
+    auto it = d.find(key);
+    if (it==d.end()) return default_value;
+    return it->second;
+  }
+
+template<class T>
+  T extract_from_dict(const Dict& d, const std::string& key, T& value) {
+    Dict ret = d;
+    auto it = ret.find(key);
+    if (it!=ret.end()) {
+        value = it->second;
+        ret.erase(it);
+    }
+    return ret;
+  }
+
 } // namespace casadi
 
 

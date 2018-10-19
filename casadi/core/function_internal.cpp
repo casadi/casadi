@@ -272,6 +272,37 @@ namespace casadi {
     }
   }
 
+  Dict ProtoFunction::generate_options() const {
+    Dict opts;
+    opts["verbose"] = verbose_;
+    return opts;
+  }
+
+  Dict FunctionInternal::generate_options() const {
+    Dict opts = ProtoFunction::generate_options();
+    opts["jac_penalty"] = jac_penalty_;
+    opts["user_data"] = user_data_;
+    opts["inputs_check"] = inputs_check_;
+    opts["jit"] = jit_;
+    opts["jit_cleanup"] = jit_cleanup_;
+    opts["compiler"] = compilerplugin_;
+    opts["jit_options"] = jit_options_;
+    opts["derivative_of"] = derivative_of_;
+    opts["ad_weight"] = ad_weight_;
+    opts["ad_weight_sp"] = ad_weight_sp_;
+    opts["max_num_dir"] = max_num_dir_;
+    opts["print_time"] = print_time_;
+    opts["enable_forward"] = enable_forward_;
+    opts["enable_reverse"] = enable_reverse_;
+    opts["enable_jacobian"] = enable_jacobian_;
+    opts["enable_fd"] = enable_fd_;
+    opts["fd_options"] = fd_options_;
+    opts["fd_method"] = fd_method_;
+    opts["print_in"] = print_in_;
+    opts["print_out"] = print_out_;
+    return opts;
+  }
+
   void FunctionInternal::init(const Dict& opts) {
     // Call the initialization method of the base class
     ProtoFunction::init(opts);

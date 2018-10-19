@@ -570,43 +570,46 @@ namespace casadi {
   SX CASADI_EXPORT SX::jacobian(const SX &f, const SX &x, const Dict& opts) {
     // Propagate verbose option to helper function
     Dict h_opts;
-    if (opts.count("verbose")) h_opts["verbose"] = opts.at("verbose");
+    Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
     Function h("jac_helper", {x}, {f}, h_opts);
-    return h.get<SXFunction>()->jac(0, 0, opts);
+    return h.get<SXFunction>()->jac(0, 0, opts_remainder);
   }
 
   template<>
-  SX CASADI_EXPORT SX::hessian(const SX &ex, const SX &arg, SX &g) {
+  SX CASADI_EXPORT SX::hessian(const SX &ex, const SX &arg, SX &g, const Dict& opts) {
+    Dict all_opts = opts;
+    if (!opts.count("symmetric")) all_opts["symmetric"] = true;
     g = gradient(ex, arg);
-    return jacobian(g, arg, {{"symmetric", true}});
+    return jacobian(g, arg, all_opts);
   }
 
   template<>
-  SX CASADI_EXPORT SX::hessian(const SX &ex, const SX &arg) {
+  SX CASADI_EXPORT SX::hessian(const SX &ex, const SX &arg, const Dict& opts) {
     SX g;
-    return hessian(ex, arg, g);
+    return hessian(ex, arg, g, opts);
   }
 
   template<>
   std::vector<std::vector<SX> > CASADI_EXPORT
   SX::forward(const std::vector<SX> &ex, const std::vector<SX> &arg,
           const std::vector<std::vector<SX> > &v, const Dict& opts) {
+
+    Dict h_opts;
+    Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
     // Read options
     bool always_inline = false;
     bool never_inline = false;
-    for (auto&& op : opts) {
+    for (auto&& op : opts_remainder) {
       if (op.first=="always_inline") {
         always_inline = op.second;
       } else if (op.first=="never_inline") {
         never_inline = op.second;
-      } else if (op.first=="verbose") {
-        continue;
-      }  else {
+      } else {
         casadi_error("No such option: " + string(op.first));
       }
     }
     // Call internal function on a temporary object
-    Function temp("forward_temp", arg, ex);
+    Function temp("forward_temp", arg, ex, h_opts);
     std::vector<std::vector<SX> > ret;
     temp->call_forward(arg, ex, v, ret, always_inline, never_inline);
     return ret;
@@ -616,22 +619,24 @@ namespace casadi {
   std::vector<std::vector<SX> > CASADI_EXPORT
   SX::reverse(const std::vector<SX> &ex, const std::vector<SX> &arg,
           const std::vector<std::vector<SX> > &v, const Dict& opts) {
+
+    Dict h_opts;
+    Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+
     // Read options
     bool always_inline = false;
     bool never_inline = false;
-    for (auto&& op : opts) {
+    for (auto&& op : opts_remainder) {
       if (op.first=="always_inline") {
         always_inline = op.second;
       } else if (op.first=="never_inline") {
         never_inline = op.second;
-      } else if (op.first=="verbose") {
-        continue;
       } else {
         casadi_error("No such option: " + string(op.first));
       }
     }
     // Call internal function on a temporary object
-    Function temp("reverse_temp", arg, ex);
+    Function temp("reverse_temp", arg, ex, h_opts);
     std::vector<std::vector<SX> > ret;
     temp->call_reverse(arg, ex, v, ret, always_inline, never_inline);
     return ret;

@@ -195,20 +195,29 @@ namespace casadi {
      }
   };
 
+  Dict SXFunction::generate_options() const {
+    Dict opts = FunctionInternal::generate_options();
+    //opts["default_in"] = default_in_;
+    opts["live_variables"] = live_variables_;
+    opts["just_in_time_sparsity"] = just_in_time_sparsity_;
+    opts["just_in_time_opencl"] = just_in_time_opencl_;
+    return opts;
+  }
+
   void SXFunction::init(const Dict& opts) {
     // Call the init function of the base class
     XFunction<SXFunction, SX, SXNode>::init(opts);
     if (verbose_) casadi_message(name_ + "::init");
 
     // Default (temporary) options
-    bool live_variables = true;
+    live_variables_ = true;
 
     // Read options
     for (auto&& op : opts) {
       if (op.first=="default_in") {
         default_in_ = op.second;
       } else if (op.first=="live_variables") {
-        live_variables = op.second;
+        live_variables_ = op.second;
       } else if (op.first=="just_in_time_opencl") {
         just_in_time_opencl_ = op.second;
       } else if (op.first=="just_in_time_sparsity") {
@@ -365,7 +374,7 @@ namespace casadi {
 
       // Find a place to store the variable
       if (a.op!=OP_OUTPUT) {
-        if (live_variables && !unused.empty()) {
+        if (live_variables_ && !unused.empty()) {
           // Try to reuse a variable from the stack if possible (last in, first out)
           a.i0 = place[a.i0] = unused.top();
           unused.pop();
@@ -394,7 +403,7 @@ namespace casadi {
     worksize_ = worksize;
 
     if (verbose_) {
-      if (live_variables) {
+      if (live_variables_) {
         casadi_message("Using live variables: work array is " + str(worksize_)
          + " instead of " + str(nodes.size()));
       } else {
