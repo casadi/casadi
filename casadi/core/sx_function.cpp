@@ -464,6 +464,42 @@ namespace casadi {
     if (verbose_) casadi_message(str(algorithm_.size()) + " elementary operations");
   }
 
+  SX SXFunction::instructions_sx() const {
+    std::vector<SXElem> ret(algorithm_.size(), casadi_limits<SXElem>::nan);
+
+    vector<SXElem>::iterator it=ret.begin();
+
+    // Iterator to the binary operations
+    vector<SXElem>::const_iterator b_it = operations_.begin();
+
+    // Iterator to stack of constants
+    vector<SXElem>::const_iterator c_it = constants_.begin();
+
+    // Iterator to free variables
+    vector<SXElem>::const_iterator p_it = free_vars_.begin();
+
+    // Evaluate algorithm
+    if (verbose_) casadi_message("Evaluating algorithm forward");
+    for (auto&& a : algorithm_) {
+      switch (a.op) {
+      case OP_INPUT:
+      case OP_OUTPUT:
+        it++;
+        break;
+      case OP_CONST:
+        *it++ = *c_it++;
+        break;
+      case OP_PARAMETER:
+        *it++ = *p_it++;
+        break;
+      default:
+        *it++ = *b_it++;
+      }
+    }
+    casadi_assert(it==ret.end(), "Dimension mismacth");
+    return ret;
+  }
+
   int SXFunction::
   eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem) const {
     if (verbose_) casadi_message(name_ + "::eval_sx");

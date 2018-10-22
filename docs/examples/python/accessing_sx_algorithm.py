@@ -75,3 +75,6 @@ print('------')
 print('Evaluated ' + str(f))
 print('Expected: ', f.call(input_val))
 print('Got:      ', output_val)
+
+
+print f.instructions_SX()

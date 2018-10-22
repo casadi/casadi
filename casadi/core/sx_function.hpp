@@ -216,6 +216,9 @@ class CASADI_EXPORT SXFunction :
                                    const std::vector<std::string>& onames,
                                    const Dict& opts) const override;
 
+  /** *\brief get SX expression associated with instructions */
+  SX instructions_sx() const override;
+
   /** \brief Get default input value */
   double get_default_in(casadi_int ind) const override { return default_in_.at(ind);}
 

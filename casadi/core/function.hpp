@@ -821,6 +821,13 @@ namespace casadi {
     /** \brief Get the MX node corresponding to an instruction (MXFunction) */
     MX instruction_MX(casadi_int k) const;
 
+    /** \brief Get the SX node corresponding to all instructions (SXFunction)
+     *
+     * Note: input and output instructions have no SX representation.
+     * This method returns nan for those instructions.
+    */
+    SX instructions_sx() const;
+
     ///@{
     /** \brief  Is the class able to propagate seeds through the algorithm? */
     bool has_spfwd() const;

@@ -450,6 +450,9 @@ namespace casadi {
     /** *\brief get MX expression associated with instruction */
     virtual MX instruction_MX(casadi_int k) const;
 
+    /** *\brief get SX expression associated with instructions */
+    virtual SX instructions_sx() const;
+
     /** \brief Wrap in an Function instance consisting of only one MX call */
     Function wrap() const;
 

@@ -1440,6 +1440,14 @@ namespace casadi {
     }
   }
 
+  SX Function::instructions_sx() const {
+    try {
+      return (*this)->instructions_sx();
+    } catch (exception& e) {
+      THROW_ERROR("instructions_sx", e.what());
+    }
+  }
+
   casadi_int Function::instruction_id(casadi_int k) const {
     try {
       return (*this)->instruction_id(k);

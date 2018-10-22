@@ -2501,6 +2501,10 @@ namespace casadi {
     casadi_error("'instruction_MX' not defined for " + class_name());
   }
 
+  SX FunctionInternal::instructions_sx() const {
+    casadi_error("'instructions_sx' not defined for " + class_name());
+  }
+
   casadi_int FunctionInternal::n_nodes() const {
     casadi_error("'n_nodes' not defined for " + class_name());
   }
