@@ -736,6 +736,9 @@
 %exception  casadi::FunctionInternal::instruction_output(casadi_int k) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionInternal::instructions_sx() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::FunctionInternal::is_a(const std::string &type, bool recursive) const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

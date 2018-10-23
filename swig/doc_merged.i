@@ -741,6 +741,11 @@ elements.
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
 +------------------+-----------------+------------------+------------------+
+| h                | OT_DOUBLE       | Step size        | casadi::Backward |
+|                  |                 | [default:        | Diff             |
+|                  |                 | computed from    |                  |
+|                  |                 | abstol]          |                  |
++------------------+-----------------+------------------+------------------+
 | h_iter           | OT_INT          | Number of        | casadi::Backward |
 |                  |                 | iterations to    | Diff             |
 |                  |                 | improve on the   |                  |
@@ -1052,6 +1057,12 @@ tr:  Flip the relationship. Return which expressions contain the variables
 %feature("docstring") casadi::BackwardDiff::print_option "
 
 [INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::BackwardDiff::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -2597,6 +2608,12 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::Blocksqp::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::Blocksqp::tocache "
 
 [INTERNAL]  Save function to cache.
@@ -3468,9 +3485,9 @@ Sparsities of function inputs and outputs.
 
 ";
 
-%feature("docstring") casadi::BSpline::generate_dependencies "
+%feature("docstring") casadi::BSpline::instructions_sx "
 
-[INTERNAL]  Export / Generate C code for the dependency function.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -3542,6 +3559,12 @@ original
 %feature("docstring") casadi::BSpline::numel_in "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring") casadi::BSpline::generate_dependencies "
+
+[INTERNAL]  Export / Generate C code for the dependency function.
 
 ";
 
@@ -5181,6 +5204,12 @@ original
 
 ";
 
+%feature("docstring") casadi::BSplineCommon::class_name "
+
+[INTERNAL]  Readable name of the internal class.
+
+";
+
 %feature("docstring") casadi::BSplineCommon::export_code "
 
 [INTERNAL]  Export function in a specific language.
@@ -5705,9 +5734,9 @@ generated function.
 
 ";
 
-%feature("docstring") casadi::BSplineCommon::class_name "
+%feature("docstring") casadi::BSplineCommon::instructions_sx "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -6223,6 +6252,12 @@ classes.
 %feature("docstring") casadi::BSplineDual::sz_w "
 
 [INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring") casadi::BSplineDual::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -8397,6 +8432,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::BSplineInterpolant::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::BSplineInterpolant::has_reverse "
 
 [INTERNAL]  Return function that calculates adjoint derivatives
@@ -9051,6 +9092,15 @@ Does the function have free variables.
 
 ";
 
+%feature("docstring") casadi::Callback::instructions_sx "
+
+Get the SX node corresponding to all instructions ( SXFunction)
+
+Note: input and output instructions have no SX representation. This method
+returns nan for those instructions.
+
+";
+
 %feature("docstring") casadi::Callback::assert_size_in "
 
 Assert that an input dimension is equal so some given value.
@@ -9690,9 +9740,9 @@ classes.
 
 ";
 
-%feature("docstring") casadi::CentralDiff::index_out "
+%feature("docstring") casadi::CentralDiff::instructions_sx "
 
-[INTERNAL]  Get output scheme index by name.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -9844,6 +9894,11 @@ classes.
 |                  |                 | Statistics are   |                  |
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| h                | OT_DOUBLE       | Step size        | casadi::CentralD |
+|                  |                 | [default:        | iff              |
+|                  |                 | computed from    |                  |
+|                  |                 | abstol]          |                  |
 +------------------+-----------------+------------------+------------------+
 | h_iter           | OT_INT          | Number of        | casadi::CentralD |
 |                  |                 | iterations to    | iff              |
@@ -10387,6 +10442,12 @@ elements.
 %feature("docstring") casadi::CentralDiff::~CentralDiff "
 
 [INTERNAL]  Destructor.
+
+";
+
+%feature("docstring") casadi::CentralDiff::index_out "
+
+[INTERNAL]  Get output scheme index by name.
 
 ";
 
@@ -11697,9 +11758,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::Collocation::sprint "
+%feature("docstring") casadi::Collocation::instructions_sx "
 
-[INTERNAL]  C-style formatted printing to string.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -11847,6 +11908,12 @@ generated function.
 %feature("docstring") casadi::Collocation::symbolic_output "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::Collocation::sprint "
+
+[INTERNAL]  C-style formatted printing to string.
 
 ";
 
@@ -13139,6 +13206,12 @@ elements.
 %feature("docstring") casadi::Conic::has_free "
 
 [INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring") casadi::Conic::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -15375,6 +15448,12 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::Dple::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::Dple::matching_res "
 
 [INTERNAL]  Check if output arguments that needs to be replaced.
@@ -15870,9 +15949,9 @@ multiplying.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::Expm::init_mem "
+%feature("docstring") casadi::Expm::instructions_sx "
 
-[INTERNAL]  Initalize memory block.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -16675,6 +16754,12 @@ elements.
 %feature("docstring") casadi::Expm::serialize_base_function "
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+
+";
+
+%feature("docstring") casadi::Expm::init_mem "
+
+[INTERNAL]  Initalize memory block.
 
 ";
 
@@ -17766,6 +17851,12 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::External::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::External::clear_mem "
 
 [INTERNAL]  Clear all memory (called from destructor)
@@ -18136,6 +18227,12 @@ structure recognition.
 %feature("docstring") casadi::FastNewton::checkout "
 
 [INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring") casadi::FastNewton::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -19349,6 +19446,11 @@ StringSerializer, FileDeserializer
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
 +------------------+-----------------+------------------+------------------+
+| h                | OT_DOUBLE       | Step size        | casadi::FiniteDi |
+|                  |                 | [default:        | ff               |
+|                  |                 | computed from    |                  |
+|                  |                 | abstol]          |                  |
++------------------+-----------------+------------------+------------------+
 | h_iter           | OT_INT          | Number of        | casadi::FiniteDi |
 |                  |                 | iterations to    | ff               |
 |                  |                 | improve on the   |                  |
@@ -19848,6 +19950,12 @@ propagation.
 %feature("docstring") casadi::FiniteDiff::nnz_out "
 
 [INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring") casadi::FiniteDiff::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -21716,6 +21824,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::FixedStepIntegrator::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::FixedStepIntegrator::plugin_name "
 
 [INTERNAL] ";
@@ -22257,6 +22371,11 @@ structure recognition for symmetric Jacobians
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
 +------------------+-----------------+------------------+------------------+
+| h                | OT_DOUBLE       | Step size        | casadi::ForwardD |
+|                  |                 | [default:        | iff              |
+|                  |                 | computed from    |                  |
+|                  |                 | abstol]          |                  |
++------------------+-----------------+------------------+------------------+
 | h_iter           | OT_INT          | Number of        | casadi::ForwardD |
 |                  |                 | iterations to    | iff              |
 |                  |                 | improve on the   |                  |
@@ -22422,6 +22541,12 @@ original
 %feature("docstring") casadi::ForwardDiff::codegen_incref "
 
 [INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::ForwardDiff::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -23607,6 +23732,15 @@ Get input dimension.
 
 ";
 
+%feature("docstring") casadi::Function::instructions_sx "
+
+Get the SX node corresponding to all instructions ( SXFunction)
+
+Note: input and output instructions have no SX representation. This method
+returns nan for those instructions.
+
+";
+
 %feature("docstring") casadi::Function::sz_iw "
 
 Get required length of iw field.
@@ -24479,9 +24613,9 @@ classes.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::info "
+%feature("docstring") casadi::GenericExternal::instructions_sx "
 
-[INTERNAL]  Obtain information about function
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -24982,6 +25116,12 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring") casadi::GenericExternal::info "
+
+[INTERNAL]  Obtain information about function
 
 ";
 
@@ -26064,6 +26204,12 @@ multiplying.
 
 ";
 
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::serialize "
+
+[INTERNAL]  Serialize an object.
+
+";
+
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::instruction_input
 "
 
@@ -26535,9 +26681,9 @@ casadi::ImplicitFixedStepIntegrator::instruction_output "
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::serialize "
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::instructions_sx "
 
-[INTERNAL]  Serialize an object.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -27853,6 +27999,12 @@ structure recognition.
 
 ";
 
+%feature("docstring") casadi::ImplicitToNlp::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::ImplicitToNlp::checkout "
 
 [INTERNAL]  Checkout a memory object.
@@ -28963,6 +29115,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::Integrator::get_abstol "
 
 [INTERNAL]  Get absolute tolerance.
+
+";
+
+%feature("docstring") casadi::Integrator::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -30081,6 +30239,12 @@ generated function.
 %feature("docstring") casadi::Interpolant::symbolic_output "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring") casadi::Interpolant::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -31920,6 +32084,12 @@ structure recognition for symmetric Jacobians
 %feature("docstring") casadi::JitFunction::map "
 
 [INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
+%feature("docstring") casadi::JitFunction::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -34266,6 +34436,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::LinearInterpolant::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::LinearInterpolant::get_n_out "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -35659,6 +35835,12 @@ elements.
 %feature("docstring") casadi::LinearInterpolantJac::print_option "
 
 [INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
+%feature("docstring") casadi::LinearInterpolantJac::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -37470,6 +37652,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::Map::get_jacobian_sparsity "
 
 [INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring") casadi::Map::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -40557,6 +40745,12 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::Newton::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::Newton::has_forward "
 
 [INTERNAL]  Generate a function that calculates nfwd forward derivatives.
@@ -40978,6 +41172,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 %feature("docstring") casadi::Nlpsol::export_code "
 
 [INTERNAL]  Export function in a specific language.
+
+";
+
+%feature("docstring") casadi::Nlpsol::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -42873,6 +43073,12 @@ original
 
 ";
 
+%feature("docstring") casadi::OmpMap::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::OmpMap::clear_mem "
 
 [INTERNAL]  Clear all memory (called from destructor)
@@ -44497,6 +44703,12 @@ elements.
 
 ";
 
+%feature("docstring") casadi::OracleFunction::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::OracleFunction::call "
 
 [INTERNAL]   Call a function, templated.
@@ -45606,6 +45818,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::codegen_declarations "
+
+[INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
 %feature("docstring") casadi::QpToNlp::factory "
 
 [INTERNAL] ";
@@ -46189,9 +46407,9 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
-%feature("docstring") casadi::QpToNlp::codegen_declarations "
+%feature("docstring") casadi::QpToNlp::instructions_sx "
 
-[INTERNAL]  Generate code for the declarations of the C function.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -47410,6 +47628,12 @@ classes.
 
 ";
 
+%feature("docstring") casadi::Qrqp::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::Qrqp::call_gen "
 
 [INTERNAL]   Call a function, overloaded.
@@ -47594,6 +47818,12 @@ elements.
 ------------------------------------------------------------------------
 [INTERNAL] 
 ";
+
+";
+
+%feature("docstring") casadi::Qrsqp::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -48781,6 +49011,12 @@ original
 %feature("docstring") casadi::Rootfinder::serialize_body "
 
 [INTERNAL]  Serialize an object without type information.
+
+";
+
+%feature("docstring") casadi::Rootfinder::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -50843,9 +51079,9 @@ multiplying.
 
 ";
 
-%feature("docstring") casadi::RungeKutta::get_default_in "
+%feature("docstring") casadi::RungeKutta::instructions_sx "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -50905,6 +51141,12 @@ elements.
 %feature("docstring") casadi::RungeKutta::weak "
 
 [INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring") casadi::RungeKutta::get_default_in "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -51836,6 +52078,12 @@ multiplying.
 %feature("docstring") casadi::Scpgen::codegen_incref "
 
 [INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring") casadi::Scpgen::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -52919,6 +53167,12 @@ Get string representation.
 
 
 // File: classcasadi_1_1SlicotDple.xml
+%feature("docstring") casadi::SlicotDple::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::SlicotDple::get_name_out "
 
 [INTERNAL]  Names of function input and outputs.
@@ -54615,6 +54869,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring") casadi::SlicotExpm::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::SlicotExpm::release "
 
 [INTERNAL]  Release a memory object.
@@ -55232,6 +55492,11 @@ Andersson
 |                  |                 | Statistics are   |                  |
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| h                | OT_DOUBLE       | Step size        | casadi::Smoothin |
+|                  |                 | [default:        | g                |
+|                  |                 | computed from    |                  |
+|                  |                 | abstol]          |                  |
 +------------------+-----------------+------------------+------------------+
 | h_iter           | OT_INT          | Number of        | casadi::Smoothin |
 |                  |                 | iterations to    | g                |
@@ -56314,6 +56579,12 @@ original
 %feature("docstring") casadi::Smoothing::get_abstol "
 
 [INTERNAL]  Get absolute tolerance.
+
+";
+
+%feature("docstring") casadi::Smoothing::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -57917,6 +58188,12 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Sqpmethod::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring") casadi::Sqpmethod::print_dimensions "
 
 [INTERNAL]  Print dimensions of inputs and outputs.
@@ -59126,6 +59403,12 @@ multiplying.
 %feature("docstring") casadi::Switch::sz_iw "
 
 [INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring") casadi::Switch::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -60753,6 +61036,12 @@ generated function.
 %feature("docstring") casadi::ThreadMap::size2_out "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring") casadi::ThreadMap::instructions_sx "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 

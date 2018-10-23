@@ -850,6 +850,11 @@ const  "
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
 +------------------+-----------------+------------------+------------------+
+| h                | OT_DOUBLE       | Step size        | casadi::Backward |
+|                  |                 | [default:        | Diff             |
+|                  |                 | computed from    |                  |
+|                  |                 | abstol]          |                  |
++------------------+-----------------+------------------+------------------+
 | h_iter           | OT_INT          | Number of        | casadi::Backward |
 |                  |                 | iterations to    | Diff             |
 |                  |                 | improve on the   |                  |
@@ -1201,6 +1206,12 @@ const  "
 std::string &name, std::ostream &stream) const  "
 
 [INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -3001,6 +3012,12 @@ std::vector< M > &arg, casadi_int npar) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::tocache(const Function &f)
 const  "
 
@@ -4004,10 +4021,9 @@ Sparsities of function inputs and outputs.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
-std::string &fname, const Dict &opts) const  "
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
 
-[INTERNAL]  Export / Generate C code for the dependency function.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -4096,6 +4112,13 @@ original
 const  "
 
 [INTERNAL]  Number of input/output elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_dependencies(const
+std::string &fname, const Dict &opts) const  "
+
+[INTERNAL]  Export / Generate C code for the dependency function.
 
 ";
 
@@ -5958,6 +5981,12 @@ std::vector< M > &res, casadi_int &npar) const  "
 
 ";
 
+%feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
+
+[INTERNAL]  Readable name of the internal class.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::export_code(const
 std::string &lang, std::ostream &stream, const Dict &options) const  "
 
@@ -6594,9 +6623,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::SharedObjectInternal::class_name() const  "
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
 
-[INTERNAL]  Readable name of the internal class.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -7229,6 +7258,12 @@ std::string &fname) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_w() const  "
 
 [INTERNAL]  Get required length of w field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -9776,6 +9811,12 @@ structure recognition for symmetric Jacobians
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::has_reverse(casadi_int
 nadj) const  "
 
@@ -10831,6 +10872,15 @@ Get input scheme name by index.
 %feature("docstring")  casadi::Function::has_free() const  "
 
 Does the function have free variables.
+
+";
+
+%feature("docstring")  casadi::Function::instructions_sx() const  "
+
+Get the SX node corresponding to all instructions ( SXFunction)
+
+Note: input and output instructions have no SX representation. This method
+returns nan for those instructions.
 
 ";
 
@@ -12035,10 +12085,9 @@ std::vector< M > &res, casadi_int npar) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::index_out(const std::string
-&name) const  "
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
 
-[INTERNAL]  Get output scheme index by name.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -12190,6 +12239,11 @@ std::vector< M > &res, casadi_int npar) const  "
 |                  |                 | Statistics are   |                  |
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| h                | OT_DOUBLE       | Step size        | casadi::CentralD |
+|                  |                 | [default:        | iff              |
+|                  |                 | computed from    |                  |
+|                  |                 | abstol]          |                  |
 +------------------+-----------------+------------------+------------------+
 | h_iter           | OT_INT          | Number of        | casadi::CentralD |
 |                  |                 | iterations to    | iff              |
@@ -12828,6 +12882,13 @@ const std::string &fname) const  "
 %feature("docstring") casadi::CentralDiff::~CentralDiff "
 
 [INTERNAL]  Destructor.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::index_out(const std::string
+&name) const  "
+
+[INTERNAL]  Get output scheme index by name.
 
 ";
 
@@ -14370,10 +14431,9 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::sprint(char *buf, size_t
-buf_sz, const char *fmt,...) const  "
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
 
-[INTERNAL]  C-style formatted printing to string.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -14562,6 +14622,13 @@ const  "
 std::vector< MX > &arg) const  "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::sprint(char *buf, size_t
+buf_sz, const char *fmt,...) const  "
+
+[INTERNAL]  C-style formatted printing to string.
 
 ";
 
@@ -16090,6 +16157,12 @@ bvec_t **res, casadi_int *iw, bvec_t *w, void *mem) const  "
 %feature("docstring")  casadi::FunctionInternal::has_free() const  "
 
 [INTERNAL]  Does the function have free variables.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -18798,6 +18871,12 @@ casadi::FunctionInternal::instruction_constant(casadi_int k) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::matching_res(const
 std::vector< M > &arg, casadi_int &npar) const  "
 
@@ -19390,9 +19469,9 @@ std::string &name) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::init_mem(void *mem) const  "
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
 
-[INTERNAL]  Initalize memory block.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -20348,6 +20427,12 @@ CodeGenerator &g) const  "
 const  "
 
 [INTERNAL]  String used to identify the immediate FunctionInternal subclass.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::init_mem(void *mem) const  "
+
+[INTERNAL]  Initalize memory block.
 
 ";
 
@@ -21671,6 +21756,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::clear_mem() "
 
 [INTERNAL]  Clear all memory (called from destructor)
@@ -22115,6 +22206,12 @@ std::vector< M > &arg, casadi_int &npar) const  "
 %feature("docstring")  casadi::ProtoFunction::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -23537,6 +23634,11 @@ const  "
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
 +------------------+-----------------+------------------+------------------+
+| h                | OT_DOUBLE       | Step size        | casadi::FiniteDi |
+|                  |                 | [default:        | ff               |
+|                  |                 | computed from    |                  |
+|                  |                 | abstol]          |                  |
++------------------+-----------------+------------------+------------------+
 | h_iter           | OT_INT          | Number of        | casadi::FiniteDi |
 |                  |                 | iterations to    | ff               |
 |                  |                 | improve on the   |                  |
@@ -24127,6 +24229,12 @@ const  "
 const  "
 
 [INTERNAL]  Number of input/output nonzeros.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -26347,6 +26455,12 @@ casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::PluginInterface< Integrator  >::plugin_name()
 const  "
 
@@ -26977,6 +27091,11 @@ std::string &parallelization) const  "
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
 +------------------+-----------------+------------------+------------------+
+| h                | OT_DOUBLE       | Step size        | casadi::ForwardD |
+|                  |                 | [default:        | iff              |
+|                  |                 | computed from    |                  |
+|                  |                 | abstol]          |                  |
++------------------+-----------------+------------------+------------------+
 | h_iter           | OT_INT          | Number of        | casadi::ForwardD |
 |                  |                 | iterations to    | iff              |
 |                  |                 | improve on the   |                  |
@@ -27146,6 +27265,12 @@ buf_sz, const char *fmt,...) const  "
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -29135,6 +29260,15 @@ Get input dimension.
 
 ";
 
+%feature("docstring")  casadi::Function::instructions_sx() const  "
+
+Get the SX node corresponding to all instructions ( SXFunction)
+
+Note: input and output instructions have no SX representation. This method
+returns nan for those instructions.
+
+";
+
 %feature("docstring")  casadi::Function::sz_iw() const  "
 
 Get required length of iw field.
@@ -30358,9 +30492,9 @@ casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::info() const  "
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
 
-[INTERNAL]  Obtain information about function
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -30949,6 +31083,12 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::info() const  "
+
+[INTERNAL]  Obtain information about function
 
 ";
 
@@ -33350,6 +33490,13 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
+&s) const  "
+
+[INTERNAL]  Serialize an object.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 
@@ -33890,10 +34037,9 @@ casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::serialize(SerializingStream
-&s) const  "
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
 
-[INTERNAL]  Serialize an object.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -35482,6 +35628,12 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::checkout() const  "
 
 [INTERNAL]  Checkout a memory object.
@@ -36770,6 +36922,12 @@ k) const  "
 %feature("docstring")  casadi::FunctionInternal::get_abstol() const  "
 
 [INTERNAL]  Get absolute tolerance.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -38112,6 +38270,12 @@ bool persistent=false) "
 std::vector< MX > &arg) const  "
 
 [INTERNAL]  Get a vector of symbolic variables corresponding to the outputs.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -40203,6 +40367,12 @@ bool persistent=false) "
 std::string &parallelization) const  "
 
 [INTERNAL]  Generate/retrieve cached serial map.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -42891,6 +43061,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::Interpolant::get_n_out()  "
 
 [INTERNAL]  Number of function inputs and outputs.
@@ -44572,6 +44748,12 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 std::string &name, std::ostream &stream) const  "
 
 [INTERNAL]  Print all information there is to know about a certain option.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -46659,6 +46841,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 const  "
 
 [INTERNAL]  Get Jacobian sparsity.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -51363,6 +51551,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::Rootfinder::has_forward(casadi_int nfwd)
 const  "
 
@@ -51881,6 +52075,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 std::string &lang, std::ostream &stream, const Dict &options) const  "
 
 [INTERNAL]  Export function in a specific language.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -54139,6 +54339,12 @@ std::vector< SX > > &aseed, std::vector< std::vector< SX > > &asens, bool
 always_inline, bool never_inline) const  "
 
 [INTERNAL]  Reverse mode, virtual functions overloaded in derived classes.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -56440,6 +56646,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call(const std::vector< M >
 &arg, std::vector< M > &res, bool always_inline, bool never_inline) const  "
 
@@ -57758,6 +57970,13 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")
+casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
+
+[INTERNAL]  Generate code for the declarations of the C function.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::factory(const std::string
 &name, const std::vector< std::string > &s_in, const std::vector<
 std::string > &s_out, const Function::AuxOut &aux, const Dict &opts) const
@@ -58429,10 +58648,9 @@ const  "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::codegen_declarations(CodeGenerator &g) const  "
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
 
-[INTERNAL]  Generate code for the declarations of the C function.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -59877,6 +60095,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::call_gen(const MXVector
 &arg, MXVector &res, casadi_int npar, bool always_inline, bool never_inline)
 const  "
@@ -60107,6 +60331,12 @@ std::vector< std::vector< M >> &aseed, casadi_int npar) const  "
 std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
 
 %feature("docstring")  casadi::Nlpsol::serialize_body(SerializingStream &s)
 const  "
@@ -61495,6 +61725,12 @@ std::vector< M > &arg, casadi_int &npar) const  "
 &s) const  "
 
 [INTERNAL]  Serialize an object without type information.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -63978,10 +64214,9 @@ multiplying.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_default_in(casadi_int
-ind) const  "
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -64049,6 +64284,13 @@ elements.
 %feature("docstring")  casadi::SharedObjectInternal::weak() "
 
 [INTERNAL]  Get a weak reference to the object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_default_in(casadi_int
+ind) const  "
+
+[INTERNAL]  Get default input value.
 
 ";
 
@@ -65179,6 +65421,12 @@ const  "
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -66514,6 +66762,12 @@ Get string representation.
 
 
 // File: classcasadi_1_1SlicotDple.xml
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::Dple::get_name_out(casadi_int i)  "
 
 [INTERNAL]  Names of function input and outputs.
@@ -68549,6 +68803,12 @@ persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
 "
 
@@ -69270,6 +69530,11 @@ Andersson
 |                  |                 | Statistics are   |                  |
 |                  |                 | now always       |                  |
 |                  |                 | collected.       |                  |
++------------------+-----------------+------------------+------------------+
+| h                | OT_DOUBLE       | Step size        | casadi::Smoothin |
+|                  |                 | [default:        | g                |
+|                  |                 | computed from    |                  |
+|                  |                 | abstol]          |                  |
 +------------------+-----------------+------------------+------------------+
 | h_iter           | OT_INT          | Number of        | casadi::Smoothin |
 |                  |                 | iterations to    | g                |
@@ -70566,6 +70831,12 @@ casadi::FunctionInternal::codegen_sparsities(CodeGenerator &g) const  "
 %feature("docstring")  casadi::Smoothing::get_abstol() const  "
 
 [INTERNAL]  Get absolute tolerance.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -72594,6 +72865,12 @@ bool persistent=false) "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::print_dimensions(std::ostream &stream) const  "
 
@@ -73970,6 +74247,12 @@ size_t &sz_res, size_t &sz_iw, size_t &sz_w) const  "
 %feature("docstring")  casadi::FunctionInternal::sz_iw() const  "
 
 [INTERNAL]  Get required length of iw field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 
@@ -75848,6 +76131,12 @@ const  "
 const  "
 
 [INTERNAL]  Input/output dimensions.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::instructions_sx() const  "
+
+[INTERNAL]  get SX expression associated with instructions
 
 ";
 

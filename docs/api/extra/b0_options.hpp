@@ -224,6 +224,7 @@
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>h</td><td>OT_DOUBLE</td><td>Step size [default: computed from abstol]</td><td>casadi::BackwardDiff</td></tr>
 <tr><td>h_iter</td><td>OT_INT</td><td>Number of iterations to improve on the step-size [default: 1 if error estimate available, otherwise 0]</td><td>casadi::BackwardDiff</td></tr>
 <tr><td>h_max</td><td>OT_DOUBLE</td><td>Maximum step size [default 0]</td><td>casadi::BackwardDiff</td></tr>
 <tr><td>h_min</td><td>OT_DOUBLE</td><td>Minimum step size [default inf]</td><td>casadi::BackwardDiff</td></tr>
@@ -657,6 +658,7 @@
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>h</td><td>OT_DOUBLE</td><td>Step size [default: computed from abstol]</td><td>casadi::CentralDiff</td></tr>
 <tr><td>h_iter</td><td>OT_INT</td><td>Number of iterations to improve on the step-size [default: 1 if error estimate available, otherwise 0]</td><td>casadi::CentralDiff</td></tr>
 <tr><td>h_max</td><td>OT_DOUBLE</td><td>Maximum step size [default 0]</td><td>casadi::CentralDiff</td></tr>
 <tr><td>h_min</td><td>OT_DOUBLE</td><td>Minimum step size [default inf]</td><td>casadi::CentralDiff</td></tr>
@@ -1254,6 +1256,7 @@
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>h</td><td>OT_DOUBLE</td><td>Step size [default: computed from abstol]</td><td>casadi::FiniteDiff</td></tr>
 <tr><td>h_iter</td><td>OT_INT</td><td>Number of iterations to improve on the step-size [default: 1 if error estimate available, otherwise 0]</td><td>casadi::FiniteDiff</td></tr>
 <tr><td>h_max</td><td>OT_DOUBLE</td><td>Maximum step size [default 0]</td><td>casadi::FiniteDiff</td></tr>
 <tr><td>h_min</td><td>OT_DOUBLE</td><td>Minimum step size [default inf]</td><td>casadi::FiniteDiff</td></tr>
@@ -1345,6 +1348,7 @@
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>h</td><td>OT_DOUBLE</td><td>Step size [default: computed from abstol]</td><td>casadi::ForwardDiff</td></tr>
 <tr><td>h_iter</td><td>OT_INT</td><td>Number of iterations to improve on the step-size [default: 1 if error estimate available, otherwise 0]</td><td>casadi::ForwardDiff</td></tr>
 <tr><td>h_max</td><td>OT_DOUBLE</td><td>Maximum step size [default 0]</td><td>casadi::ForwardDiff</td></tr>
 <tr><td>h_min</td><td>OT_DOUBLE</td><td>Minimum step size [default inf]</td><td>casadi::ForwardDiff</td></tr>
@@ -3305,6 +3309,7 @@
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOL</td><td>Deprecated option (ignored): Statistics are now always collected.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>h</td><td>OT_DOUBLE</td><td>Step size [default: computed from abstol]</td><td>casadi::Smoothing</td></tr>
 <tr><td>h_iter</td><td>OT_INT</td><td>Number of iterations to improve on the step-size [default: 1 if error estimate available, otherwise 0]</td><td>casadi::Smoothing</td></tr>
 <tr><td>h_max</td><td>OT_DOUBLE</td><td>Maximum step size [default 0]</td><td>casadi::Smoothing</td></tr>
 <tr><td>h_min</td><td>OT_DOUBLE</td><td>Minimum step size [default inf]</td><td>casadi::Smoothing</td></tr>
