@@ -142,3 +142,6 @@ endif()
 # DaeBuilder
 add_executable(daebuilder daebuilder.cpp)
 target_link_libraries(daebuilder casadi)
+
+add_executable(casadi_mem casadi_mem.cpp)
+target_link_libraries(casadi_mem casadi)
