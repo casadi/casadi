@@ -66,13 +66,13 @@ namespace casadi {
   }
 
   ClangCompiler::~ClangCompiler() {
-    if (act_) delete act_;
-    if (myerr_) delete myerr_;
-    if (executionEngine_) delete executionEngine_;
-    if (context_) delete context_;
+    if (act_) delete act_; // NOLINT(readability-delete-null-pointer)
+    if (myerr_) delete myerr_; // NOLINT(readability-delete-null-pointer)
+    if (executionEngine_) delete executionEngine_; // NOLINT(readability-delete-null-pointer)
+    if (context_) delete context_; // NOLINT(readability-delete-null-pointer)
   }
 
-  Options ClangCompiler::options_
+  const Options ClangCompiler::options_
   = {{&ImporterInternal::options_},
      {{"include_path",
        {OT_STRING,
@@ -203,7 +203,7 @@ namespace casadi {
     paths << include_path_ << pathsep;
     std::string path;
     while (std::getline(paths, path, pathsep)) {
-      compInst.getHeaderSearchOpts().AddPath(path.c_str(), clang::frontend::System, false, false);
+      compInst.getHeaderSearchOpts().AddPath(path, clang::frontend::System, false, false);
     }
 
     // Create an LLVM context (NOTE: should use a static context instead?)

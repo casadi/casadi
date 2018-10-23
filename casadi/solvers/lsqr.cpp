@@ -40,6 +40,7 @@ namespace casadi {
     plugin->doc = Lsqr::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &Lsqr::options_;
+    plugin->deserialize = &Lsqr::deserialize;
     return 0;
   }
 

@@ -44,6 +44,10 @@ namespace casadi {
 
     /** \brief  Destructor */
     ~Norm() override {}
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Norm(DeserializingStream& s) : MXNode(s) {}
   };
 
   /** \brief Represents a Frobenius norm
@@ -90,6 +94,13 @@ namespace casadi {
 
     /** \brief Get the operation */
     casadi_int op() const override { return OP_NORMF;}
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new NormF(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit NormF(DeserializingStream& s) : Norm(s) {}
   };
 
   /** \brief Represents a 2-norm (spectral norm)
@@ -110,6 +121,13 @@ namespace casadi {
 
     /** \brief Get the operation */
     casadi_int op() const override { return OP_NORM2;}
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new Norm2(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Norm2(DeserializingStream& s) : Norm(s) {}
   };
 
   /** \brief 1-norm
@@ -120,7 +138,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    Norm1(const MX& x) : Norm(x) {}
+    explicit Norm1(const MX& x) : Norm(x) {}
 
     /** \brief  Destructor */
     ~Norm1() override {}
@@ -130,6 +148,13 @@ namespace casadi {
 
     /** \brief Get the operation */
     casadi_int op() const override { return OP_NORM1;}
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new Norm1(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Norm1(DeserializingStream& s) : Norm(s) {}
   };
 
   /** \brief Represents an infinity-norm operation on a MX
@@ -140,7 +165,7 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    NormInf(const MX& x) : Norm(x) {}
+    explicit NormInf(const MX& x) : Norm(x) {}
 
     /** \brief  Destructor */
     ~NormInf() override {}
@@ -150,6 +175,13 @@ namespace casadi {
 
     /** \brief Get the operation */
     casadi_int op() const override { return OP_NORMINF;}
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new NormInf(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit NormInf(DeserializingStream& s) : Norm(s) {}
   };
 
 } // namespace casadi

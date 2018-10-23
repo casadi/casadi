@@ -37,6 +37,7 @@ namespace casadi {
     plugin->doc = Qrqp::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &Qrqp::options_;
+    plugin->deserialize = &Qrqp::deserialize;
     return 0;
   }
 
@@ -53,7 +54,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options Qrqp::options_
+  const Options Qrqp::options_
   = {{&Conic::options_},
      {{"max_iter",
        {OT_INT,
@@ -69,7 +70,13 @@ namespace casadi {
         "Print header [true]."}},
       {"print_iter",
        {OT_BOOL,
-        "Print iterations [true]."}}
+        "Print iterations [true]."}},
+      {"print_info",
+       {OT_BOOL,
+        "Print info [true]."}},
+      {"min_lam",
+       {OT_DOUBLE,
+        "Smallest multiplier treated as inactive for the initial active set [0]."}}
      }
   };
 
@@ -79,23 +86,26 @@ namespace casadi {
 
     // Default options
     max_iter_ = 1000;
-    tol_ = 1e-8;
     print_iter_ = true;
     print_header_ = true;
     du_to_pr_ = 1000.;
+    min_lam_ = 0.;
+    print_info_ = true;
 
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="max_iter") {
         max_iter_ = op.second;
-      } else if (op.first=="tol") {
-        tol_ = op.second;
       } else if (op.first=="print_iter") {
         print_iter_ = op.second;
       } else if (op.first=="print_header") {
         print_header_ = op.second;
+      } else if (op.first=="print_info") {
+        print_info_ = op.second;
       } else if (op.first=="du_to_pr") {
         du_to_pr_ = op.second;
+      } else if (op.first=="min_lam") {
+        min_lam_ = op.second;
       }
     }
 
@@ -109,8 +119,31 @@ namespace casadi {
     kkt_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
 
     // Setup memory structure
+    set_qp_prob();
+
+    // Allocate memory
+    casadi_int sz_w, sz_iw;
+    casadi_qp_work(&p_, &sz_iw, &sz_w);
+    alloc_iw(sz_iw, true);
+    alloc_w(sz_w, true);
+
+    if (print_header_) {
+      // Print summary
+      print("-------------------------------------------\n");
+      print("This is casadi::QRQP\n");
+      print("Number of variables:                       %9d\n", nx_);
+      print("Number of constraints:                     %9d\n", na_);
+      print("Number of nonzeros in H:                   %9d\n", H_.nnz());
+      print("Number of nonzeros in A:                   %9d\n", A_.nnz());
+      print("Number of nonzeros in KKT:                 %9d\n", kkt_.nnz());
+      print("Number of nonzeros in QR(V):               %9d\n", sp_v_.nnz());
+      print("Number of nonzeros in QR(R):               %9d\n", sp_r_.nnz());
+    }
+  }
+
+  void Qrqp::set_qp_prob() {
     p_.du_to_pr = du_to_pr_;
-    p_.print_iter = print_iter_;
+    p_.min_lam = min_lam_;
     p_.sp_a = A_;
     p_.sp_h = H_;
     p_.sp_at = AT_;
@@ -124,49 +157,29 @@ namespace casadi {
     p_.nx = nx_;
     p_.na = na_;
     p_.nz = nx_+na_;
-
-    // Allocate memory
-    casadi_int sz_w, sz_iw;
-    casadi_qp_work(&p_, &sz_iw, &sz_w);
-    alloc_iw(sz_iw, true);
-    alloc_w(sz_w, true);
-
-    if (print_header_) {
-      // Print summary
-      print("-------------------------------------------\n");
-      print("This is QRQP.\n");
-      print("Number of variables:                       %9d\n", nx_);
-      print("Number of constraints:                     %9d\n", na_);
-      print("Number of nonzeros in H:                   %9d\n", H_.nnz());
-      print("Number of nonzeros in A:                   %9d\n", A_.nnz());
-      print("Number of nonzeros in KKT:                 %9d\n", kkt_.nnz());
-      print("Number of nonzeros in QR(V):               %9d\n", sp_v_.nnz());
-      print("Number of nonzeros in QR(R):               %9d\n", sp_r_.nnz());
-      print("Work in progress!\n");
-    }
   }
 
   int Qrqp::init_mem(void* mem) const {
-    //auto m = static_cast<QrqpMemory*>(mem);
+    if (Conic::init_mem(mem)) return 1;
+    auto m = static_cast<QrqpMemory*>(mem);
+    m->return_status = "";
     return 0;
   }
 
   int Qrqp::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    Conic::eval(arg, res, iw, w, mem);
     auto m = static_cast<QrqpMemory*>(mem);
     // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
-    // Check inputs
-    if (inputs_check_) {
-      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
-    }
     // Setup data structure
     casadi_qp_data<double> d;
     d.prob = &p_;
     d.nz_h = arg[CONIC_H];
     d.g = arg[CONIC_G];
     d.nz_a = arg[CONIC_A];
-    casadi_qp_init(&d, iw, w);
+    d.verbose = print_info_ ? 1 : 0;
+    casadi_qp_init(&d, &iw, &w);
     // Pass bounds on z
     casadi_copy(arg[CONIC_LBX], nx_, d.lbz);
     casadi_copy(arg[CONIC_LBA], na_, d.lbz+nx_);
@@ -174,12 +187,13 @@ namespace casadi {
     casadi_copy(arg[CONIC_UBA], na_, d.ubz+nx_);
     // Pass initial guess
     casadi_copy(arg[CONIC_X0], nx_, d.z);
+    casadi_fill(d.z+nx_, na_, nan);
     casadi_copy(arg[CONIC_LAM_X0], nx_, d.lam);
     casadi_copy(arg[CONIC_LAM_A0], na_, d.lam+nx_);
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;
     // Return flag
-    int flag;
+    int flag = 0;
     // Constraint to be flipped, if any
     casadi_int index=-2, sign=0, r_index=-2, r_sign=0;
     // QP iterations
@@ -191,6 +205,16 @@ namespace casadi {
       casadi_qp_flip(&d, &index, &sign, r_index, r_sign);
       // Form and factorize the KKT system
       casadi_qp_factorize(&d);
+      // Termination message
+      if (index==-1) {
+        casadi_qp_log(&d, "QP converged");
+        m->return_status = "success";
+      } else if (iter>=max_iter_) {
+        casadi_qp_log(&d, "QP terminated: max iter");
+        m->return_status = "Maximum number of iterations reached";
+        m->unified_return_status = SOLVER_RET_LIMITED;
+        flag = 1;
+      }
       // Print iteration progress:
       if (print_iter_) {
         if (iter % 10 == 0) {
@@ -203,32 +227,173 @@ namespace casadi {
               d.mina, d.imina, d.tau, d.msg);
         d.msg[0] = '\0';
       }
-      // Successful return if still no change
-      if (index==-1) {
-        flag = 0;
-        break;
-      }
-      // Too many iterations?
-      if (++iter>max_iter_) {
-        casadi_warning("Maximum number of iterations reached");
-        flag = 1;
-        break;
-      }
+      // Terminate loop?
+      if (index==-1 || flag!=0) break;
+      // Start a new iteration
+      iter++;
       // Calculate search direction
       if (casadi_qp_calc_step(&d, &r_index, &r_sign)) {
-        casadi_warning("Failed to calculate search direction");
+        if (print_iter_) print("QP terminated: No search direction\n");
+        m->return_status = "Failed to calculate search direction";
         flag = 1;
         break;
       }
       // Line search in the calculated direction
       casadi_qp_linesearch(&d, &index, &sign);
+      InterruptHandler::check();
     }
     // Get solution
     casadi_copy(&d.f, 1, res[CONIC_COST]);
     casadi_copy(d.z, nx_, res[CONIC_X]);
     casadi_copy(d.lam, nx_, res[CONIC_LAM_X]);
     casadi_copy(d.lam+nx_, na_, res[CONIC_LAM_A]);
-    return flag;
+    // Return
+    if (verbose_) casadi_warning(m->return_status);
+    m->success = flag == 0;
+    return 0;
+  }
+
+
+  void Qrqp::codegen_body(CodeGenerator& g) const {
+    g.add_auxiliary(CodeGenerator::AUX_QP);
+    g.local("d", "struct casadi_qp_data");
+    g.local("p", "struct casadi_qp_prob");
+
+        // Setup memory structure
+    g << "p.du_to_pr = " << du_to_pr_ << ";\n";
+    g << "p.min_lam = " << min_lam_ << ";\n";
+    g << "p.sp_a = " << g.sparsity(A_) << ";\n";
+    g << "p.sp_h = " << g.sparsity(H_) << ";\n";
+    g << "p.sp_at = " << g.sparsity(AT_) << ";\n";
+    g << "p.sp_kkt = " << g.sparsity(kkt_) << ";\n";
+    g << "p.sp_v = " << g.sparsity(sp_v_) << ";\n";
+    g << "p.sp_r = " << g.sparsity(sp_r_) << ";\n";
+    g << "p.prinv = " << g.constant(prinv_) << ";\n";
+    g << "p.pc =  " << g.constant(pc_) << ";\n";
+
+    g << "p.dmin = casadi_real_min;\n";
+    g << "p.inf = casadi_inf;\n";
+    g << "p.nx = " << nx_ << ";\n";
+    g << "p.na = " << na_ << ";\n";
+    g << "p.nz = " << nx_+na_ << ";\n";
+
+    g << "d.prob = &p;\n";
+    g << "d.nz_h = arg[" << CONIC_H << "];\n";
+    g << "d.g = arg[" << CONIC_G << "];\n";
+    g << "d.nz_a = arg[" << CONIC_A << "];\n";
+    g << "d.verbose = " << (print_info_ ? 1 : 0) << ";\n";
+    g << "casadi_qp_init(&d, &iw, &w);\n";
+
+    g.comment("Pass bounds on z");
+    g << g.copy("arg[" + str(CONIC_LBX)+ "]", nx_, "d.lbz") << "\n";
+    g << g.copy("arg[" + str(CONIC_LBA)+ "]", na_, "d.lbz+" + str(nx_)) << "\n";
+    g << g.copy("arg[" + str(CONIC_UBX)+ "]", nx_, "d.ubz") << "\n";
+    g << g.copy("arg[" + str(CONIC_UBA)+ "]", na_, "d.ubz+" + str(nx_)) << "\n";
+
+    g.comment("Pass initial guess");
+    g << g.copy("arg[" + str(CONIC_X0)+ "]", nx_, "d.z") << "\n";
+    g << g.fill("d.z+"+str(nx_), na_, "NAN") << "\n";
+    g << g.copy("arg[" + str(CONIC_LAM_X0)+ "]", nx_, "d.lam") << "\n";
+    g << g.copy("arg[" + str(CONIC_LAM_A0)+ "]", na_, "d.lam+" + str(nx_)) << "\n";
+
+    g.comment("Reset solver");
+    g << "if (casadi_qp_reset(&d)) return 1;\n";
+
+    g.local("flag", "int");
+    g << "flag = 0;\n";
+
+    g.comment("Constraint to be flipped, if any");
+    g.local("index", "casadi_int");
+    g.local("sign", "casadi_int");
+    g.local("r_index", "casadi_int");
+    g.local("r_sign", "casadi_int");
+    g << "index = -2;sign=0;r_index=-2;r_sign=0;\n";
+
+    g.comment("QP iterations");
+
+    g.local("iter", "casadi_int");
+    g << "iter = 0;\n";
+    g << "while (1) {\n";
+
+    g.comment("Calculate dependent quantities");
+    g << "casadi_qp_calc_dependent(&d);\n";
+
+    g.comment("Make an active set change");
+    g << "casadi_qp_flip(&d, &index, &sign, r_index, r_sign);\n";
+
+    g.comment("Form and factorize the KKT system");
+    g << "casadi_qp_factorize(&d);\n";
+
+    g.comment("Termination message");
+    g << "  if (iter>=" << max_iter_ << ") {\n";
+    g << "    flag = 1;\n";
+    g << "  }\n";
+
+    g.comment("Terminate loop?");
+    g << "  if (index==-1 || flag!=0) break;\n";
+
+    g.comment("Start a new iteration");
+    g << "  iter++;\n";
+    g.comment("Start a new iteration");
+    // Calculate search direction
+    g << "  if (casadi_qp_calc_step(&d, &r_index, &r_sign)) {\n";
+    g << "    flag = 1;\n";
+    g << "    break;\n";
+    g << "}\n";
+
+    g.comment("Line search in the calculated direction");
+    g << "  casadi_qp_linesearch(&d, &index, &sign);\n";
+    g << "}\n";
+
+    g.comment("Get solution");
+    g << g.copy("&d.f", 1, "res[" + str(CONIC_COST) + "]") << "\n";
+    g << g.copy("d.z", nx_, "res[" + str(CONIC_X) + "]") << "\n";
+    g << g.copy("d.lam", nx_, "res[" + str(CONIC_LAM_X) + "]") << "\n";
+    g << g.copy("d.lam+"+str(nx_), na_, "res[" + str(CONIC_LAM_A) + "]") << "\n";
+
+    g << "return flag;\n";
+  }
+
+  Dict Qrqp::get_stats(void* mem) const {
+    Dict stats = Conic::get_stats(mem);
+    auto m = static_cast<QrqpMemory*>(mem);
+    stats["return_status"] = m->return_status;
+    return stats;
+  }
+
+  Qrqp::Qrqp(DeserializingStream& s) : Conic(s) {
+    s.version("Qrqp", 1);
+    s.unpack("Qrqp::AT", AT_);
+    s.unpack("Qrqp::kkt", kkt_);
+    s.unpack("Qrqp::sp_v", sp_v_);
+    s.unpack("Qrqp::sp_r", sp_r_);
+    s.unpack("Qrqp::prinv", prinv_);
+    s.unpack("Qrqp::pc", pc_);
+    s.unpack("Qrqp::max_iter", max_iter_);
+    s.unpack("Qrqp::print_iter", print_iter_);
+    s.unpack("Qrqp::print_header", print_header_);
+    s.unpack("Qrqp::print_info", print_info_);
+    s.unpack("Qrqp::du_to_pr", du_to_pr_);
+    s.unpack("Qrqp::min_lam", min_lam_);
+    set_qp_prob();
+  }
+
+  void Qrqp::serialize_body(SerializingStream &s) const {
+    Conic::serialize_body(s);
+
+    s.version("Qrqp", 1);
+    s.pack("Qrqp::AT", AT_);
+    s.pack("Qrqp::kkt", kkt_);
+    s.pack("Qrqp::sp_v", sp_v_);
+    s.pack("Qrqp::sp_r", sp_r_);
+    s.pack("Qrqp::prinv", prinv_);
+    s.pack("Qrqp::pc", pc_);
+    s.pack("Qrqp::max_iter", max_iter_);
+    s.pack("Qrqp::print_iter", print_iter_);
+    s.pack("Qrqp::print_header", print_header_);
+    s.pack("Qrqp::print_info", print_info_);
+    s.pack("Qrqp::du_to_pr", du_to_pr_);
+    s.pack("Qrqp::min_lam", min_lam_);
   }
 
 } // namespace casadi

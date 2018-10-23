@@ -24,6 +24,7 @@
 
 
 #include "map.hpp"
+#include "serializing_stream.hpp"
 
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
@@ -39,13 +40,13 @@ namespace casadi {
 
   Function Map::create(const std::string& parallelization, const Function& f, casadi_int n) {
     // Create instance of the right class
-    string name = f.name() + "_" + str(n);
+    string suffix = str(n) + "_" + f.name();
     if (parallelization == "serial") {
-      return Function::create(new Map(name, f, n), Dict());
+      return Function::create(new Map("map" + suffix, f, n), Dict());
     } else if (parallelization== "openmp") {
-      return Function::create(new MapOmp(name, f, n), Dict());
+      return Function::create(new OmpMap("ompmap" + suffix, f, n), Dict());
     } else if (parallelization== "thread") {
-      return Function::create(new MapThread(name, f, n), Dict());
+      return Function::create(new ThreadMap("threadmap" + suffix, f, n), Dict());
     } else {
       casadi_error("Unknown parallelization: " + parallelization);
     }
@@ -53,6 +54,36 @@ namespace casadi {
 
   Map::Map(const std::string& name, const Function& f, casadi_int n)
     : FunctionInternal(name), f_(f), n_(n) {
+  }
+
+  void Map::serialize_body(SerializingStream &s) const {
+    FunctionInternal::serialize_body(s);
+    s.pack("Map::f", f_);
+    s.pack("Map::n", n_);
+  }
+
+  void Map::serialize_type(SerializingStream &s) const {
+    FunctionInternal::serialize_type(s);
+    s.pack("Map::class_name", class_name());
+  }
+
+  Map::Map(DeserializingStream& s) : FunctionInternal(s) {
+    s.unpack("Map::f", f_);
+    s.unpack("Map::n", n_);
+  }
+
+  ProtoFunction* Map::deserialize(DeserializingStream& s) {
+    std::string class_name;
+    s.unpack("Map::class_name", class_name);
+    if (class_name=="Map") {
+      return new Map(s);
+    } else if (class_name=="OmpMap") {
+      return new OmpMap(s);
+    } else if (class_name=="ThreadMap") {
+      return new ThreadMap(s);
+    } else {
+      casadi_error("class name '" + class_name + "' unknown.");
+    }
   }
 
   Map::~Map() {
@@ -167,7 +198,7 @@ namespace casadi {
           }
         }
       }
-      *it = (*it)(Slice(), ind);
+      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Get output expressions
@@ -185,7 +216,7 @@ namespace casadi {
           }
         }
       }
-      *it = (*it)(Slice(), ind);
+      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Construct return function
@@ -218,7 +249,7 @@ namespace casadi {
           }
         }
       }
-      *it = (*it)(Slice(), ind);
+      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Get output expressions
@@ -236,7 +267,7 @@ namespace casadi {
           }
         }
       }
-      *it = (*it)(Slice(), ind);
+      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Construct return function
@@ -251,10 +282,10 @@ namespace casadi {
     return eval_gen(arg, res, iw, w, m);
   }
 
-  MapOmp::~MapOmp() {
+  OmpMap::~OmpMap() {
   }
 
-  int MapOmp::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  int OmpMap::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
 #ifndef WITH_OPENMP
     return Map::eval(arg, res, iw, w, mem);
 #else // WITH_OPENMP
@@ -292,7 +323,7 @@ namespace casadi {
 #endif  // WITH_OPENMP
   }
 
-  void MapOmp::codegen_body(CodeGenerator& g) const {
+  void OmpMap::codegen_body(CodeGenerator& g) const {
     size_t sz_arg, sz_res, sz_iw, sz_w;
     f_.sz_work(sz_arg, sz_res, sz_iw, sz_w);
     g << "casadi_int i;\n"
@@ -317,7 +348,11 @@ namespace casadi {
       << "if (flag) return 1;\n";
   }
 
-  void MapOmp::init(const Dict& opts) {
+  void OmpMap::init(const Dict& opts) {
+#ifndef CASADI_WITH_THREAD
+    casadi_warning("CasADi was not compiled with WITH_THREAD=ON. "
+                   "Falling back to serial evaluation.");
+#endif // CASADI_WITH_THREAD
     // Call the initialization method of the base class
     Map::init(opts);
 
@@ -332,7 +367,7 @@ namespace casadi {
   }
 
 
-  MapThread::~MapThread() {
+  ThreadMap::~ThreadMap() {
   }
 
   void ThreadsWork(const Function& f, casadi_int i,
@@ -363,7 +398,7 @@ namespace casadi {
     ret = f(arg1, res1, iw + i*sz_iw, w + i*sz_w, ind);
   }
 
-  int MapThread::eval(const double** arg, double** res, casadi_int* iw, double* w,
+  int ThreadMap::eval(const double** arg, double** res, casadi_int* iw, double* w,
       void* mem) const {
 
 #ifndef CASADI_WITH_THREAD
@@ -403,11 +438,15 @@ namespace casadi {
 #endif // CASADI_WITH_THREAD
   }
 
-  void MapThread::codegen_body(CodeGenerator& g) const {
+  void ThreadMap::codegen_body(CodeGenerator& g) const {
     Map::codegen_body(g);
   }
 
-  void MapThread::init(const Dict& opts) {
+  void ThreadMap::init(const Dict& opts) {
+#ifndef CASADI_WITH_THREAD
+    casadi_warning("CasADi was not compiled with WITH_THREAD=ON. "
+                   "Falling back to serial evaluation.");
+#endif // CASADI_WITH_THREAD
     // Call the initialization method of the base class
     Map::init(opts);
 

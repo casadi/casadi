@@ -28,8 +28,8 @@
 
 #include "generic_type.hpp"
 
-#include <ctime>
 #include <chrono>
+#include <ctime>
 
 namespace casadi {
   /// \cond INTERNAL

@@ -98,7 +98,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -204,8 +204,18 @@ namespace casadi {
     std::vector<double> abstolv_;
     double first_time_;
 
-    //  Initial values for \p xdot and \p z
+    //  Initial values for \p xdot
     std::vector<double> init_xdot_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new IdasInterface(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit IdasInterface(DeserializingStream& s);
   };
 
 } // namespace casadi

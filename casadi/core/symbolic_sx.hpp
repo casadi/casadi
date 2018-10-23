@@ -61,6 +61,16 @@ public:
   std::string print(const std::string& arg1, const std::string& arg2) const override {
     return name_;
   }
+
+  void serialize_node(SerializingStream& s) const override {
+    s.pack("SymbolicSX::name", name_);
+  }
+
+  static SXNode* deserialize(DeserializingStream& s) {
+    std::string name;
+    s.unpack("SymbolicSX::name", name);
+    return new SymbolicSX(name);
+  }
 };
 
 } // namespace casadi

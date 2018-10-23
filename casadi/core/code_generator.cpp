@@ -26,8 +26,8 @@
 
 #include "code_generator.hpp"
 #include "function_internal.hpp"
-#include <iomanip>
 #include <casadi_runtime_str.h>
+#include <iomanip>
 
 using namespace std;
 namespace casadi {
@@ -35,6 +35,7 @@ namespace casadi {
   CodeGenerator::CodeGenerator(const string& name, const Dict& opts) {
     // Default options
     this->verbose = true;
+    this->verbose_runtime = false;
     this->mex = false;
     this->cpp = false;
     this->main = false;
@@ -46,6 +47,8 @@ namespace casadi {
     this->with_export = true;
     this->with_import = false;
     this->include_math = true;
+    this->infinity = "INFINITY";
+    this->real_min = "";
     avoid_stack_ = false;
     indent_ = 2;
 
@@ -53,6 +56,8 @@ namespace casadi {
     for (auto&& e : opts) {
       if (e.first=="verbose") {
         this->verbose = e.second;
+      } else if (e.first=="verbose_runtime") {
+        this->verbose_runtime = e.second;
       } else if (e.first=="mex") {
         this->mex = e.second;
       } else if (e.first=="cpp") {
@@ -75,6 +80,10 @@ namespace casadi {
         this->with_import = e.second;
       } else if (e.first=="include_math") {
         this->include_math = e.second;
+      } else if (e.first=="infinity") {
+        this->infinity = e.second.to_string();
+      } else if (e.first=="real_min") {
+        this->real_min = e.second.to_string();
       } else if (e.first=="indent") {
         indent_ = e.second;
         casadi_assert_dev(indent_>=0);
@@ -82,6 +91,21 @@ namespace casadi {
         avoid_stack_ = e.second;
       } else {
         casadi_error("Unrecongnized option: " + str(e.first));
+      }
+    }
+
+    // If real_min is not specified, make an educated guess
+    if (this->real_min.empty()) {
+      std::stringstream ss;
+      ss << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+      if (casadi_real=="float") {
+        ss << std::numeric_limits<float>::min();
+        this->real_min = ss.str();
+      } else if (casadi_real=="double") {
+        ss << std::numeric_limits<double>::min();
+        this->real_min = ss.str();
+      } else {
+        this->real_min = "<NOT SPECIFIED>";
       }
     }
 
@@ -374,6 +398,8 @@ namespace casadi {
     for (casadi_int i=0; i<exposed_fname.size(); ++i) {
       s << " '" << exposed_fname[i] << "'";
     }
+    s << "\\n";
+    s << "Note: you may use function.generate_input to create a command string.";
     s << "\\n\");\n";
 
     // End main
@@ -387,10 +413,10 @@ namespace casadi {
 
     // Prefix internal symbols to avoid symbol collisions
     s << "/* How to prefix internal symbols */\n"
-      << "#ifdef CODEGEN_PREFIX\n"
-      << "  #define NAMESPACE_CONCAT(NS, ID) _NAMESPACE_CONCAT(NS, ID)\n"
-      << "  #define _NAMESPACE_CONCAT(NS, ID) NS ## ID\n"
-      << "  #define CASADI_PREFIX(ID) NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)\n"
+      << "#ifdef CASADI_CODEGEN_PREFIX\n"
+      << "  #define CASADI_NAMESPACE_CONCAT(NS, ID) _CASADI_NAMESPACE_CONCAT(NS, ID)\n"
+      << "  #define _CASADI_NAMESPACE_CONCAT(NS, ID) NS ## ID\n"
+      << "  #define CASADI_PREFIX(ID) CASADI_NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)\n"
       << "#else\n"
       << "  #define CASADI_PREFIX(ID) " << this->name << "_ ## ID\n"
       << "#endif\n\n";
@@ -779,6 +805,32 @@ namespace casadi {
       add_auxiliary(AUX_FILL);
       this->auxiliaries << sanitize_source(casadi_qr_str, inst);
       break;
+    case AUX_QP:
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_QR);
+      add_auxiliary(AUX_MAX);
+      add_auxiliary(AUX_FMIN);
+      add_auxiliary(AUX_FMAX);
+      add_auxiliary(AUX_TRANS);
+      add_auxiliary(AUX_AXPY);
+      add_auxiliary(AUX_MV);
+      add_auxiliary(AUX_BILIN);
+      add_auxiliary(AUX_INF);
+      add_auxiliary(AUX_REAL_MIN);
+      add_include("stdarg.h");
+      add_include("stdio.h");
+      add_include("math.h");
+
+      this->auxiliaries << sanitize_source(casadi_qp_str, inst);
+      break;
+    case AUX_NLP:
+      this->auxiliaries << sanitize_source(casadi_nlp_str, inst);
+      break;
+    case AUX_SQPMETHOD:
+      add_auxiliary(AUX_QP);
+      add_auxiliary(AUX_NLP);
+      this->auxiliaries << sanitize_source(casadi_sqpmethod_str, inst);
+      break;
     case AUX_LDL:
       this->auxiliaries << sanitize_source(casadi_ldl_str, inst);
       break;
@@ -788,6 +840,26 @@ namespace casadi {
       add_auxiliary(AUX_NORM_INF);
       add_auxiliary(AUX_QR);
       this->auxiliaries << sanitize_source(casadi_newton_str, inst);
+      break;
+    case AUX_MAX_VIOL:
+      this->auxiliaries << sanitize_source(casadi_max_viol_str, inst);
+      break;
+    case AUX_VFMIN:
+      this->auxiliaries << sanitize_source(casadi_vfmin_str, inst);
+      break;
+    case AUX_VFMAX:
+      this->auxiliaries << sanitize_source(casadi_vfmax_str, inst);
+      break;
+    case AUX_REGULARIZE:
+      add_auxiliary(AUX_FABS);
+      add_auxiliary(AUX_FMIN);
+      this->auxiliaries << sanitize_source(casadi_regularize_str, inst);
+      break;
+    case AUX_BOUNDS_CONSISTENCY:
+      add_auxiliary(AUX_ISINF);
+      add_auxiliary(AUX_FMAX);
+      add_auxiliary(AUX_FMIN);
+      this->auxiliaries << sanitize_source(casadi_bound_consistency_str, inst);
       break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
@@ -849,6 +921,48 @@ namespace casadi {
                         << "  return fmax(x, y);\n"
                         << "#endif\n"
                         << "}\n\n";
+      break;
+    case AUX_FABS:
+      shorthand("fabs");
+      this->auxiliaries << "casadi_real casadi_fabs(casadi_real x) {\n"
+                        << "/* Pre-c99 compatibility */\n"
+                        << "#if __STDC_VERSION__ < 199901L\n"
+                        << "  return x>0 ? x : -x;\n"
+                        << "#else\n"
+                        << "  return fabs(x);\n"
+                        << "#endif\n"
+                        << "}\n\n";
+      break;
+    case AUX_ISINF:
+      shorthand("isinf");
+      this->auxiliaries << "casadi_real casadi_isinf(casadi_real x) {\n"
+                        << "/* Pre-c99 compatibility */\n"
+                        << "#if __STDC_VERSION__ < 199901L\n"
+                        << "  return x== INFINITY || x==-INFINITY;\n"
+                        << "#else\n"
+                        << "  return isinf(x);\n"
+                        << "#endif\n"
+                        << "}\n\n";
+      break;
+    case AUX_MIN:
+      this->auxiliaries << "casadi_int casadi_min(casadi_int x, casadi_int y) {\n"
+                        << "  return x>y ? y : x;\n"
+                        << "}\n\n";
+      break;
+    case AUX_MAX:
+      this->auxiliaries << "casadi_int casadi_max(casadi_int x, casadi_int y) {\n"
+                        << "  return x>y ? x : y;\n"
+                        << "}\n\n";
+      break;
+    case AUX_INF:
+      this->auxiliaries << "#ifndef casadi_inf\n"
+                        << "  #define casadi_inf " << this->infinity << "\n"
+                        << "#endif\n\n";
+      break;
+    case AUX_REAL_MIN:
+      this->auxiliaries << "#ifndef casadi_real_min\n"
+                        << "  #define casadi_real_min " << this->real_min << "\n"
+                        << "#endif\n\n";
       break;
     }
   }
@@ -1238,6 +1352,13 @@ namespace casadi {
         continue;
       }
 
+      // If line starts with "// C-VERBOSE", skip the next line
+      if (!verbose_runtime && line.find("// C-VERBOSE") != string::npos) {
+        // Ignore next line
+        std::getline(stream, line);
+        continue;
+      }
+
       // Ignore other C++ style comment
       if ((n1 = line.find("//")) != string::npos) line.erase(n1);
 
@@ -1337,5 +1458,87 @@ namespace casadi {
     return "casadi_ldl_solve(" + x + ", " + str(nrhs) + ", " + sp_lt + ", "
            + lt + ", " + d + ", " + p + ", " + w + ");";
   }
+
+  std::string CodeGenerator::
+  fmax(const std::string& x, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_FMAX);
+    return "casadi_fmax(" + x + ", " + y + ");";
+  }
+
+  std::string CodeGenerator::
+  fmin(const std::string& x, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_FMIN);
+    return "casadi_fmin(" + x + ", " + y + ");";
+  }
+
+  std::string CodeGenerator::
+  vfmax(const std::string& x, casadi_int n, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_VFMAX);
+    return "casadi_vfmax(" + x + ", " + str(n) + ", " + y + ");";
+  }
+
+  std::string CodeGenerator::
+  vfmin(const std::string& x, casadi_int n, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_VFMIN);
+    return "casadi_vfmin(" + x + ", " + str(n) + ", " + y + ");";
+  }
+
+  std::string CodeGenerator::
+  vfmax(const std::string& x, const std::string& n, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_VFMAX);
+    return "casadi_vfmax(" + x + ", " + n + ", " + y + ");";
+  }
+
+  std::string CodeGenerator::
+  vfmin(const std::string& x, const std::string& n, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_VFMIN);
+    return "casadi_vfmin(" + x + ", " + n + ", " + y + ");";
+  }
+
+  std::string CodeGenerator::
+  max(const std::string& x, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_MAX);
+    return "casadi_max(" + x + ", " + y + ")";
+  }
+
+  std::string CodeGenerator::
+  min(const std::string& x, const std::string& y) {
+    add_auxiliary(CodeGenerator::AUX_MIN);
+    return "casadi_min(" + x + ", " + y + ")";
+  }
+
+
+  std::string CodeGenerator::
+  max_viol(casadi_int n, const std::string& x, const std::string& lb, const std::string& ub) {
+    add_auxiliary(CodeGenerator::AUX_MAX_VIOL);
+    return "casadi_max_viol(" + str(n) + ", " + x+ ", " + lb + ", " + ub + ")";
+  }
+
+  std::string CodeGenerator::
+  norm_inf(casadi_int n, const std::string& x) {
+    add_auxiliary(CodeGenerator::AUX_NORM_INF);
+    return "casadi_norm_inf(" + str(n) + ", " + x + ")";
+  }
+
+  std::string CodeGenerator::
+  lb_eig(const Sparsity& sp_h, const std::string& h) {
+    add_auxiliary(CodeGenerator::AUX_REGULARIZE);
+    return "casadi_lb_eig(" + sparsity(sp_h) + ", " + h + ")";
+  }
+
+  std::string CodeGenerator::
+  regularize(const Sparsity& sp_h, const std::string& h, const std::string& reg) {
+    add_auxiliary(CodeGenerator::AUX_REGULARIZE);
+    return "casadi_regularize(" + sparsity(sp_h) + ", " + h + ", " + reg + ");";
+  }
+
+  std::string CodeGenerator::
+  bound_consistency(casadi_int n, const std::string& x,
+    const std::string& lam, const std::string& lbx, const std::string& ubx) {
+      add_auxiliary(CodeGenerator::AUX_BOUNDS_CONSISTENCY);
+      return "casadi_bound_consistency(" + str(n) + ", " + x + ", " + lam +
+             ", " + lbx + ", " + ubx + ")";
+    }
+
 
 } // namespace casadi

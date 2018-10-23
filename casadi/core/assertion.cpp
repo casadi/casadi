@@ -24,6 +24,7 @@
 
 
 #include "assertion.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -111,6 +112,15 @@ namespace casadi {
     if (arg[0]!=res[0]) {
       g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << '\n';
     }
+  }
+
+  void Assertion::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("Assertion::fail_message", fail_message_);
+  }
+
+  Assertion::Assertion(DeserializingStream& s) : MXNode(s) {
+    s.unpack("Assertion::fail_message", fail_message_);
   }
 
 } // namespace casadi

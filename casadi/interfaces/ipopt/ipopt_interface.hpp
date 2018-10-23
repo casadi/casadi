@@ -124,7 +124,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -190,6 +190,16 @@ namespace casadi {
     std::vector<bool> nl_ex_;
     Dict var_string_md_, var_integer_md_, var_numeric_md_,
       con_string_md_, con_integer_md_, con_numeric_md_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new IpoptInterface(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit IpoptInterface(DeserializingStream& s);
   };
 
 } // namespace casadi

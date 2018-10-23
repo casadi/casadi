@@ -479,6 +479,18 @@ class Sparsitytests(casadiTestCase):
 
     self.assertTrue(DM(J.sparsity_out(0))[:X.nnz(),:].sparsity()==Sparsity.diag(100))
 
+  @memory_heavy()
+  def test_jacsparsityHierarchicalSymm(self):
+    GlobalOptions.setHierarchicalSparsity(False)
+    sp = Sparsity.banded(4129,1)
+
+    x = MX.sym("x",sp.size1())
+
+    H = bilin(MX.ones(sp),x,x)
+    sp2 = hessian(H,x)[0].sparsity()
+    self.assertTrue(sp==sp2)
+
+
   def test_rowcol(self):
     n = 3
 
@@ -534,6 +546,14 @@ class Sparsitytests(casadiTestCase):
     B = D[[e for e,k in zip(z,zres) if k>=0]]
     self.checkarray(A,B)
     self.assertFalse(np.any(D[[e for e,k in zip(z,zres) if k==-1]]))    
+
+  def test_serialize(self):
+    for a in [Sparsity(), Sparsity.dense(4,5), Sparsity.lower(5)]:
+      b = Sparsity.deserialize(a.serialize())
+      if a.is_null():
+        self.assertTrue(b.is_null())
+      else:
+        self.checkarray(IM(a,1),IM(b,1))
 
 if __name__ == '__main__':
     unittest.main()

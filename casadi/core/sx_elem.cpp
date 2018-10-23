@@ -24,7 +24,7 @@
 
 
 #include "sx_elem.hpp"
-#include "matrix.hpp"
+#include "sx.hpp"
 #include <stack>
 #include <cassert>
 #include "calculus.hpp"
@@ -329,7 +329,7 @@ namespace casadi {
             } else if (nn%2 == 1) { // odd power
               return x*pow(x, nn-1);
             } else { // even power
-              SXElem rt = pow(x, nn/2);
+              SXElem rt = pow(x, static_cast<casadi_int>(nn/2));
               return rt*rt;
             }
           } else if (y->to_double()==0.5) {
@@ -591,6 +591,14 @@ namespace casadi {
     } else {
       casadi_error("Cannot check regularity for symbolic SXElem");
     }
+  }
+
+  void SXElem::serialize(SerializingStream& s) const {
+    return (*this)->serialize(s);
+  }
+
+  SXElem SXElem::deserialize(DeserializingStream& s) {
+    return SXElem::create(SXNode::deserialize(s));
   }
 
 } // namespace casadi

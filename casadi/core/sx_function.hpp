@@ -33,7 +33,7 @@
 namespace casadi {
   /** \brief  An atomic operation for the SXElem virtual machine */
   struct ScalarAtomic {
-    casadi_int op;     /// Operator index
+    int op;     /// Operator index
     int i0;
     union {
       double d;
@@ -182,9 +182,15 @@ class CASADI_EXPORT SXFunction :
   /// Default input values
   std::vector<double> default_in_;
 
+    /** \brief Serialize an object without type information */
+  void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize without type information */
+  static ProtoFunction* deserialize(DeserializingStream& s);
+
   ///@{
   /** \brief Options */
-  static Options options_;
+  static const Options options_;
   const Options& get_options() const override { return options_;}
   ///@}
 
@@ -217,17 +223,15 @@ class CASADI_EXPORT SXFunction :
   void export_code_body(const std::string& lang,
     std::ostream &stream, const Dict& options) const override;
 
-  /** \brief Serialize */
-  void serialize(std::ostream &stream) const override;
-
-  /** \brief Build function from serialization */
-  static Function deserialize(std::istream &stream);
-
   /// With just-in-time compilation using OpenCL
   bool just_in_time_opencl_;
 
   /// With just-in-time compilation for the sparsity propagation
   bool just_in_time_sparsity_;
+
+protected:
+  /** \brief Deserializing constructor */
+  explicit SXFunction(DeserializingStream& s);
 };
 
 

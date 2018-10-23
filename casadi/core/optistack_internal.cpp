@@ -24,6 +24,7 @@
 
 #include "optistack_internal.hpp"
 #include "nlpsol.hpp"
+#include "conic.hpp"
 #include "function_internal.hpp"
 #include "global_options.hpp"
 
@@ -63,6 +64,9 @@ class InternalOptiCallback : public FunctionInternal {
 
   void reset() { i=0; }
 
+  // eval_dm has been defined instead of eval
+  bool has_eval_dm() const override { return true;}
+
   /// Evaluate the function numerically
   std::vector<DM> eval_dm(const std::vector<DM>& arg) const override {
     DMDict r;
@@ -86,8 +90,8 @@ class InternalOptiCallback : public FunctionInternal {
     mutable casadi_int i;
 };
 
-OptiNode* OptiNode::create() {
-return new OptiNode();
+OptiNode* OptiNode::create(const std::string& problem_type) {
+return new OptiNode(problem_type);
 }
 
 
@@ -170,7 +174,7 @@ std::string OptiNode::describe(const MX& expr, casadi_int indent) const {
       }
     } else {
       std::vector<MX> s = symvar(expr);
-      if (s.size()==0) {
+      if (s.empty()) {
         description+= "Constant epxression.";
       } else {
         description+= "General expression, dependent on " + str(s.size()) + " symbols:";
@@ -233,7 +237,8 @@ MX OptiNode::g_lookup(casadi_int i) const {
   return MX();
 }
 
-OptiNode::OptiNode() : count_(0), count_var_(0), count_par_(0), count_dual_(0) {
+OptiNode::OptiNode(const std::string& problem_type) :
+    count_(0), count_var_(0), count_par_(0), count_dual_(0) {
   f_ = 0;
   instance_number_ = instance_count_++;
   user_callback_ = nullptr;
@@ -242,6 +247,10 @@ OptiNode::OptiNode() : count_(0), count_var_(0), count_par_(0), count_dual_(0) {
   store_initial_[OPTI_DUAL_G] = {};
   store_latest_[OPTI_VAR] = {};
   store_latest_[OPTI_DUAL_G] = {};
+  casadi_assert(problem_type=="nlp" || problem_type=="conic",
+    "Specified problem type '" + problem_type + "'unknown. "
+    "Choose 'nlp' (default) or 'conic'.");
+  problem_type_ = problem_type;
   mark_problem_dirty();
 }
 
@@ -380,16 +389,21 @@ std::string OptiNode::return_status() const {
   return "unknown";
 }
 
-bool OptiNode::return_success() const {
+bool OptiNode::return_success(bool accept_limit) const {
   Dict mystats;
   try {
     mystats = stats();
   } catch (...) {
     //
   }
-  if (mystats.find("success")!=mystats.end())
-    return mystats.at("success");
-  return false;
+  bool success = false;
+  if (mystats.find("success")!=mystats.end()) success = mystats.at("success");
+  if (!accept_limit) return success;
+
+  bool limited = false;
+  if (mystats.find("unified_return_status")!=mystats.end())
+    limited = mystats.at("unified_return_status")=="SOLVER_RET_LIMITED";
+  return success || limited;
 }
 
 Function OptiNode::casadi_solver() const {
@@ -901,7 +915,7 @@ bool OptiNode::old_callback() const {
   return !cb->associated_with(this);
 }
 // Solve the problem
-OptiSol OptiNode::solve() {
+OptiSol OptiNode::solve(bool accept_limit) {
 
   if (problem_dirty()) {
     bake();
@@ -925,11 +939,15 @@ OptiSol OptiNode::solve() {
       opts["iteration_callback"] = callback_;
     }
 
-    casadi_assert(solver_name_!="",
+    casadi_assert(!solver_name_.empty(),
       "You must call 'solver' on the Opti stack to select a solver. "
       "Suggestion: opti.solver('ipopt')");
 
-    solver_ = nlpsol("solver", solver_name_, nlp_, opts);
+    if (problem_type_=="conic") {
+      solver_ = qpsol("solver", solver_name_, nlp_, opts);
+    } else {
+      solver_ = nlpsol("solver", solver_name_, nlp_, opts);
+    }
     mark_solver_dirty(false);
   }
 
@@ -938,7 +956,7 @@ OptiSol OptiNode::solve() {
 
   std::string ret = return_status();
 
-  casadi_assert(return_success(),
+  casadi_assert(return_success(accept_limit),
     "Solver failed. You may use opti.debug.value to investigate the latest values of variables."
     " return_status is '" + ret + "'");
 
@@ -1125,7 +1143,7 @@ void OptiNode::set_value_internal(const MX& x, const DM& v) {
 
   // Purge empty rows
   std::vector<casadi_int> filled_rows = sum2(J).get_row();
-  J = J(filled_rows, all);
+  J = J(filled_rows, all); // NOLINT(cppcoreguidelines-slicing)
 
   // Get rows and columns of the mapping
   std::vector<casadi_int> row, col;

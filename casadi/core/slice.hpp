@@ -34,6 +34,9 @@
 #include "generic_type.hpp"
 
 namespace casadi {
+  class SerializingStream;
+  class DeserializingStream;
+
 
   /** \brief Class representing a Slice
    *
@@ -98,6 +101,12 @@ namespace casadi {
     Dict info() const {
       return {{"start", start}, {"stop", stop}, {"step", step}};
     }
+
+    /** \brief Serialize an object */
+    void serialize(SerializingStream& s) const;
+
+    /** \brief Deserialize without type information */
+    static Slice deserialize(DeserializingStream& s);
   };
 
   /// Construct from an index vector (requires is_slice(v) to be true)

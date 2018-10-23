@@ -29,6 +29,7 @@
 #include <stack>
 #include "function_internal.hpp"
 #include "factory.hpp"
+#include "serializing_stream.hpp"
 
 // To reuse variables we need to be able to sort by sparsity pattern
 #include <unordered_map>
@@ -192,6 +193,21 @@ namespace casadi {
     Sparsity get_sparsity_out(casadi_int i) override { return out_.at(i).sparsity();}
     /// @}
 
+    /** \brief Deserializing constructor */
+    explicit XFunction(DeserializingStream& s);
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief  Helper functions to avoid recursion limit
+     *
+     * The out member is problematic to de/serialize before the sorted algorithm
+     * has a chance of laying out the expression graph efficiently
+    */
+    //@{
+    void delayed_serialize_members(SerializingStream &s) const;
+    void delayed_deserialize_members(DeserializingStream &s);
+    //@}
+
     // Data members (all public)
 
     /** \brief  Inputs of the function (needed for symbolic calculations) */
@@ -223,6 +239,35 @@ namespace casadi {
       "Mismatching number of output names");
       name_out_ = name_out;
     }
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  XFunction<DerivedType, MatType, NodeType>::
+  XFunction(DeserializingStream& s) : FunctionInternal(s) {
+    s.version("XFunction", 1);
+    s.unpack("XFunction::in", in_);
+    // 'out' member needs to be delayed
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>::
+  delayed_deserialize_members(DeserializingStream& s) {
+    s.unpack("XFunction::out", out_);
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>::
+  delayed_serialize_members(SerializingStream& s) const {
+    s.pack("XFunction::out", out_);
+  }
+
+  template<typename DerivedType, typename MatType, typename NodeType>
+  void XFunction<DerivedType, MatType, NodeType>::
+  serialize_body(SerializingStream& s) const {
+    FunctionInternal::serialize_body(s);
+    s.version("XFunction", 1);
+    s.pack("XFunction::in", in_);
+    // 'out' member needs to be delayed
   }
 
   template<typename DerivedType, typename MatType, typename NodeType>
@@ -503,13 +548,13 @@ namespace casadi {
         }
 
         // Evaluate symbolically
-        if (fseed.size()>0) {
-          casadi_assert_dev(aseed.size()==0);
+        if (!fseed.empty()) {
+          casadi_assert_dev(aseed.empty());
           if (verbose_) casadi_message("Calling 'ad_forward'");
           static_cast<const DerivedType*>(this)->ad_forward(fseed, fsens);
           if (verbose_) casadi_message("Back from 'ad_forward'");
-        } else if (aseed.size()>0) {
-          casadi_assert_dev(fseed.size()==0);
+        } else if (!aseed.empty()) {
+          casadi_assert_dev(fseed.empty());
           if (verbose_) casadi_message("Calling 'ad_reverse'");
           static_cast<const DerivedType*>(this)->ad_reverse(aseed, asens);
           if (verbose_) casadi_message("Back from 'ad_reverse'");
@@ -853,67 +898,68 @@ namespace casadi {
 
   template<typename DerivedType, typename MatType, typename NodeType>
   void XFunction<DerivedType, MatType, NodeType>
-  ::export_code(const std::string& lang, std::ostream &ss, const Dict& options) const {
+  ::export_code(const std::string& lang, std::ostream &stream, const Dict& options) const {
 
     casadi_assert(!has_free(), "export_code needs a Function without free variables");
 
     casadi_assert(lang=="matlab", "Only matlab language supported for now.");
 
     // start function
-    ss << "function [varargout] = " << name_ << "(varargin)" << std::endl;
+    stream << "function [varargout] = " << name_ << "(varargin)" << std::endl;
 
     // Allocate space for output argument (segments)
     for (casadi_int i=0;i<n_out_;++i) {
-      ss << "  argout_" << i <<  " = cell(" << nnz_out(i) << ",1);" << std::endl;
+      stream << "  argout_" << i <<  " = cell(" << nnz_out(i) << ",1);" << std::endl;
     }
 
     Dict opts;
     opts["indent_level"] = 1;
-    export_code_body(lang, ss, opts);
+    export_code_body(lang, stream, opts);
 
     // Process the outputs
     for (casadi_int i=0;i<n_out_;++i) {
       const Sparsity& out = sparsity_out_.at(i);
       if (out.is_dense()) {
         // Special case if dense
-        ss << "  varargout{" << i+1 <<  "} = reshape(vertcat(argout_" << i << "{:}), ";
-        ss << out.size1() << ", " << out.size2() << ");" << std::endl;
+        stream << "  varargout{" << i+1 <<  "} = reshape(vertcat(argout_" << i << "{:}), ";
+        stream << out.size1() << ", " << out.size2() << ");" << std::endl;
       } else {
         // For sparse outputs, export sparsity and call 'sparse'
         Dict opts;
         opts["name"] = "sp";
         opts["indent_level"] = 1;
         opts["as_matrix"] = false;
-        out.export_code("matlab", ss, opts);
-        ss << "  varargout{" << i+1 <<  "} = ";
-        ss << "sparse(sp_i, sp_j, vertcat(argout_" << i << "{:}), sp_m, sp_n);" << std::endl;
+        out.export_code("matlab", stream, opts);
+        stream << "  varargout{" << i+1 <<  "} = ";
+        stream << "sparse(sp_i, sp_j, vertcat(argout_" << i << "{:}), sp_m, sp_n);" << std::endl;
       }
     }
 
     // end function
-    ss << "end" << std::endl;
-    ss << "function y=nonzeros_gen(x)" << std::endl;
-    ss << "  if isa(x,'casadi.SX') || isa(x,'casadi.MX') || isa(x,'casadi.DM')" << std::endl;
-    ss << "    y = x{:};" << std::endl;
-    ss << "  elseif isa(x,'sdpvar')" << std::endl;
-    ss << "    b = getbase(x);" << std::endl;
-    ss << "    f = find(sum(b~=0,2));" << std::endl;
-    ss << "    y = sdpvar(length(f),1,[],getvariables(x),b(f,:));" << std::endl;
-    ss << "  else" << std::endl;
-    ss << "    y = nonzeros(x);" << std::endl;
-    ss << "  end" << std::endl;
-    ss << "end" << std::endl;
-    ss << "function y=if_else_zero_gen(c,e)" << std::endl;
-    ss << "  if isa(c+e,'casadi.SX') || isa(c+e,'casadi.MX') || isa(c+e,'casadi.DM')" << std::endl;
-    ss << "    y = if_else(c, e, 0);" << std::endl;
-    ss << "  else" << std::endl;
-    ss << "    if c" << std::endl;
-    ss << "        y = x;" << std::endl;
-    ss << "    else" << std::endl;
-    ss << "        y = 0;" << std::endl;
-    ss << "    end" << std::endl;
-    ss << "  end" << std::endl;
-    ss << "end" << std::endl;
+    stream << "end" << std::endl;
+    stream << "function y=nonzeros_gen(x)" << std::endl;
+    stream << "  if isa(x,'casadi.SX') || isa(x,'casadi.MX') || isa(x,'casadi.DM')" << std::endl;
+    stream << "    y = x{:};" << std::endl;
+    stream << "  elseif isa(x,'sdpvar')" << std::endl;
+    stream << "    b = getbase(x);" << std::endl;
+    stream << "    f = find(sum(b~=0,2));" << std::endl;
+    stream << "    y = sdpvar(length(f),1,[],getvariables(x),b(f,:));" << std::endl;
+    stream << "  else" << std::endl;
+    stream << "    y = nonzeros(x);" << std::endl;
+    stream << "  end" << std::endl;
+    stream << "end" << std::endl;
+    stream << "function y=if_else_zero_gen(c,e)" << std::endl;
+    stream << "  if isa(c+e,'casadi.SX') || isa(c+e,'casadi.MX') "
+              "|| isa(c+e,'casadi.DM')" << std::endl;
+    stream << "    y = if_else(c, e, 0);" << std::endl;
+    stream << "  else" << std::endl;
+    stream << "    if c" << std::endl;
+    stream << "        y = x;" << std::endl;
+    stream << "    else" << std::endl;
+    stream << "        y = 0;" << std::endl;
+    stream << "    end" << std::endl;
+    stream << "  end" << std::endl;
+    stream << "end" << std::endl;
 
 
   }

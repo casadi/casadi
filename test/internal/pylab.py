@@ -36,6 +36,7 @@ ylabel = nullfun
 show = nullfun
 figure = nullfun
 legend = nullfun
+step = nullfun
 spy = nullfun
 title = nullfun
 grid = nullfun

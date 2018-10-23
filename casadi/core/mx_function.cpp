@@ -28,6 +28,7 @@
 #include "global_options.hpp"
 #include "casadi_interrupt.hpp"
 #include "io_instruction.hpp"
+#include "serializing_stream.hpp"
 
 #include <stack>
 #include <typeinfo>
@@ -52,7 +53,7 @@ namespace casadi {
   MXFunction::~MXFunction() {
   }
 
-  Options MXFunction::options_
+  const Options MXFunction::options_
   = {{&FunctionInternal::options_},
      {{"default_in",
        {OT_DOUBLEVECTOR,
@@ -674,9 +675,11 @@ namespace casadi {
       if (nfwd==0) return;
 
       // Check if seeds need to have dimensions corrected
+      casadi_int npar = 1;
       for (auto&& r : fseed) {
-        if (!matching_arg(r)) {
-          return ad_forward(replace_fseed(fseed), fsens);
+        if (!matching_arg(r, npar)) {
+          casadi_assert_dev(npar==1);
+          return ad_forward(replace_fseed(fseed, npar), fsens);
         }
       }
 
@@ -824,9 +827,11 @@ namespace casadi {
       if (nadj==0) return;
 
       // Check if seeds need to have dimensions corrected
+      casadi_int npar = 1;
       for (auto&& r : aseed) {
-        if (!matching_res(r)) {
-          return ad_reverse(replace_aseed(aseed), asens);
+        if (!matching_res(r, npar)) {
+          casadi_assert_dev(npar==1);
+          return ad_reverse(replace_aseed(aseed, npar), asens);
         }
       }
 
@@ -1321,7 +1326,7 @@ namespace casadi {
     }
 
     // Construct indent string
-    std::string indent = "";
+    std::string indent;
     for (casadi_int i=0;i<indent_level;++i) {
       indent += "  ";
     }
@@ -1625,7 +1630,6 @@ namespace casadi {
     for (auto&& e : algorithm_) {
       if (e.op==OP_CALL) {
         Function d = e.data.which_function();
-        d.disp(uout());
         if (d.is_a("conic", true)) {
           if (!dep.is_null()) return {};
           dep = d;
@@ -1634,6 +1638,52 @@ namespace casadi {
     }
     if (dep.is_null()) return {};
     return dep.stats(1);
+  }
+
+  void MXFunction::serialize_body(SerializingStream &s) const {
+    XFunction<MXFunction, MX, MXNode>::serialize_body(s);
+
+    s.version("MXFunction", 1);
+    s.pack("MXFunction::n_instr", algorithm_.size());
+
+    // Loop over algorithm
+    for (const auto& e : algorithm_) {
+      s.pack("MXFunction::alg::data", e.data);
+      s.pack("MXFunction::alg::arg", e.arg);
+      s.pack("MXFunction::alg::res", e.res);
+    }
+
+    s.pack("MXFunction::workloc", workloc_);
+    s.pack("MXFunction::free_vars", free_vars_);
+    s.pack("MXFunction::default_in", default_in_);
+
+
+    XFunction<MXFunction, MX, MXNode>::delayed_serialize_members(s);
+  }
+
+
+  MXFunction::MXFunction(DeserializingStream& s) : XFunction<MXFunction, MX, MXNode>(s) {
+    s.version("MXFunction", 1);
+    size_t n_instructions;
+    s.unpack("MXFunction::n_instr", n_instructions);
+    algorithm_.resize(n_instructions);
+    for (casadi_int k=0;k<n_instructions;++k) {
+      AlgEl& e = algorithm_[k];
+      s.unpack("MXFunction::alg::data", e.data);
+      e.op = e.data.op();
+      s.unpack("MXFunction::alg::arg", e.arg);
+      s.unpack("MXFunction::alg::res", e.res);
+    }
+
+    s.unpack("MXFunction::workloc", workloc_);
+    s.unpack("MXFunction::free_vars", free_vars_);
+    s.unpack("MXFunction::default_in", default_in_);
+
+    XFunction<MXFunction, MX, MXNode>::delayed_deserialize_members(s);
+  }
+
+  ProtoFunction* MXFunction::deserialize(DeserializingStream& s) {
+    return new MXFunction(s);
   }
 
 } // namespace casadi

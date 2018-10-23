@@ -133,7 +133,21 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override { return {{"f", f_}, {"n", n_}}; }
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "Map"; }
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s);
+
   protected:
+    /** \brief Deserializing constructor */
+    explicit Map(DeserializingStream& s);
+
     // Constructor (protected, use create function)
     Map(const std::string& name, const Function& f, casadi_int n);
 
@@ -151,17 +165,17 @@ namespace casadi {
       \author Joel Andersson
       \date 2015
   */
-  class CASADI_EXPORT MapOmp : public Map {
+  class CASADI_EXPORT OmpMap : public Map {
     friend class Map;
-  protected:
+  public:
     // Constructor (protected, use create function in Map)
-    MapOmp(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
+    OmpMap(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
 
     /** \brief  Destructor */
-    ~MapOmp() override;
+    ~OmpMap() override;
 
     /** \brief Get type name */
-    std::string class_name() const override {return "MapOmp";}
+    std::string class_name() const override {return "OmpMap";}
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
@@ -174,6 +188,10 @@ namespace casadi {
 
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit OmpMap(DeserializingStream& s) : Map(s) {}
   };
 
   /** A map Evaluate in parallel using std::thread
@@ -183,17 +201,17 @@ namespace casadi {
       \author Joris Gillis
       \date 2018
   */
-  class CASADI_EXPORT MapThread : public Map {
+  class CASADI_EXPORT ThreadMap : public Map {
     friend class Map;
-  protected:
+  public:
     // Constructor (protected, use create function in Map)
-    MapThread(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
+    ThreadMap(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
 
     /** \brief  Destructor */
-    ~MapThread() override;
+    ~ThreadMap() override;
 
     /** \brief Get type name */
-    std::string class_name() const override {return "MapThreads";}
+    std::string class_name() const override {return "ThreadMap";}
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
@@ -206,6 +224,10 @@ namespace casadi {
 
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit ThreadMap(DeserializingStream& s) : Map(s) {}
   };
 
 } // namespace casadi

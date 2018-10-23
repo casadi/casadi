@@ -116,6 +116,16 @@ namespace casadi {
     signal_t get_function(const std::string& symname);
 #endif // SWIG
 
+    /// \cond INTERNAL
+#ifndef SWIG
+    /** \brief  Create from node */
+    static Importer create(ImporterInternal* node);
+
+    /** \brief  Create from node and initialize */
+    static Importer create(ImporterInternal* node, const Dict& opts);
+#endif // SWIG
+    /// \endcond
+
     /** \brief Does a meta entry exist? */
     bool has_meta(const std::string& cmd, casadi_int ind=-1) const;
 
@@ -164,6 +174,12 @@ namespace casadi {
       return to<casadi_int>(cmd, ind);
     }
 #endif // SWIG
+
+    /** \brief Serialize an object */
+    void serialize(SerializingStream &s) const;
+
+    /** \brief Deserialize with type disambiguation */
+    static Importer deserialize(DeserializingStream& s);
   };
 
 } // namespace casadi

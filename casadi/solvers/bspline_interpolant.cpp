@@ -36,6 +36,7 @@ namespace casadi {
     plugin->doc = BSplineInterpolant::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &BSplineInterpolant::options_;
+    plugin->deserialize = &BSplineInterpolant::deserialize;
     return 0;
   }
 
@@ -44,7 +45,7 @@ namespace casadi {
     Interpolant::registerPlugin(casadi_register_interpolant_bspline);
   }
 
-  Options BSplineInterpolant::options_
+  const Options BSplineInterpolant::options_
   = {{&Interpolant::options_},
       {{"degree",
        {OT_INTVECTOR,
@@ -305,6 +306,28 @@ namespace casadi {
                   const std::vector<std::string>& onames,
                   const Dict& opts) const {
     return S_->get_jacobian(name, inames, onames, opts);
+  }
+
+  BSplineInterpolant::BSplineInterpolant(DeserializingStream& s) : Interpolant(s) {
+    s.version("BSplineInterpolant", 1);
+    s.unpack("BSplineInterpolant::degree", degree_);
+    s.unpack("BSplineInterpolant::linear_solver", linear_solver_);
+    s.unpack("BSplineInterpolant::s", S_);
+    int algo;
+    s.unpack("BSplineInterpolant::algorithm", algo);
+    algorithm_ = static_cast<FittingAlgorithm>(algo);
+    s.unpack("BSplineInterpolant::smooth_linear_frac", smooth_linear_frac_);
+  }
+
+  void BSplineInterpolant::serialize_body(SerializingStream &s) const {
+    Interpolant::serialize_body(s);
+
+    s.version("BSplineInterpolant", 1);
+    s.pack("BSplineInterpolant::degree", degree_);
+    s.pack("BSplineInterpolant::linear_solver", linear_solver_);
+    s.pack("BSplineInterpolant::s", S_);
+    s.pack("BSplineInterpolant::algorithm", static_cast<int>(algorithm_));
+    s.pack("BSplineInterpolant::smooth_linear_frac", smooth_linear_frac_);
   }
 
 } // namespace casadi

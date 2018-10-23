@@ -83,6 +83,14 @@ namespace casadi {
 
     /** \brief Get required length of w field */
     size_t sz_w() const override { return size1();}
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new Project(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Project(DeserializingStream& s) : MXNode(s) {}
+
   };
 
 } // namespace casadi

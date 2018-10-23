@@ -26,7 +26,10 @@
 #ifndef CASADI_MX_HPP
 #define CASADI_MX_HPP
 #include "shared_object.hpp"
-#include "matrix.hpp"
+#include "matrix_fwd.hpp"
+#include "sx_fwd.hpp"
+#include "dm.hpp"
+#include "generic_matrix.hpp"
 #include "generic_expression.hpp"
 #include "generic_type.hpp"
 #include "printable.hpp"
@@ -36,6 +39,8 @@ namespace casadi {
   /** \brief  Forward declaration */
   class MXNode;
   class Function;
+  class SerializingStream;
+  class DeserializingStream;
 
   /** \brief MX - Matrix expression
 
@@ -275,6 +280,12 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const;
 
+    /** \brief Serialize an object */
+    void serialize(SerializingStream& s) const;
+
+    /** \brief Deserialize with type disambiguation */
+    static MX deserialize(DeserializingStream& s);
+
     /// \cond INTERNAL
     /// Get the temporary variable
     casadi_int get_temp() const;
@@ -304,7 +315,7 @@ namespace casadi {
     ///@}
 
     /** \brief  Identity matrix */
-    static MX eye(casadi_int ncol);
+    static MX eye(casadi_int n);
 
 #ifndef SWIG
     /// Get a const pointer to the node
@@ -434,7 +445,7 @@ namespace casadi {
     static void substitute_inplace(const std::vector<MX>& v,
                                   std::vector<MX>& vdef,
                                   std::vector<MX>& ex, bool reverse);
-    static MX solve(const MX& A, const MX& b, const std::string& lsolver="qr",
+    static MX solve(const MX& a, const MX& b, const std::string& lsolver="qr",
                     const Dict& dict = Dict());
     static MX inv_minor(const MX& A);
     static MX inv_node(const MX& A);
@@ -492,13 +503,13 @@ namespace casadi {
                                          const std::vector<MX>& boundary,
                                          const Dict& options);
     static MX lift(const MX& x, const MX& x_guess);
-    static DM evalf(const MX& x);
+    static DM evalf(const MX& m);
     ///@}
     /// \endcond
 
 #endif // SWIG
 
-    MX printme(const MX& y) const;
+    MX printme(const MX& b) const;
 
 #if !defined(SWIG) || defined(DOXYGEN)
 /**

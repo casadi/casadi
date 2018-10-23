@@ -329,9 +329,9 @@ class SXtests(casadiTestCase):
     # Create function
     f = fun(x,y)
     if GlobalOptions.getSimplificationOnTheFly():
-      self.assertEqual(str(f),'[SX(((3-sin(sq(x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong')
+      self.assertEqual(str(f),'[SX(((3-sin(sq(x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong '+str(f))
     else:
-      self.assertEqual(str(f),'[SX(((3-sin((x*x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong'+str(f))
+      self.assertEqual(str(f),'[SX(((3-sin((x*x)))-y)), SX((sqrt(y)*x))]','SX representation is wrong '+str(f))
     fcn = Function("fcn", [vertcat(*[x,y])],[vertcat(*f)])
 
     self.assertEqual(repr(fcn),'Function(fcn:(i0[2])->(o0[2]) SXFunction)','SX representation is wrong')
@@ -1038,7 +1038,8 @@ class SXtests(casadiTestCase):
   def test_large_hessian(self):
     import pickle
 
-    A = pickle.load(open("../data/apoa1-2.pkl","r"))
+    A = Sparsity.from_file("../data/apoa1-2.mtx")
+
 
     H = DM(A,list(range(A.nnz())))
     H = H + H.T

@@ -26,8 +26,8 @@
 #ifndef CASADI_CASADI_META_HPP
 #define CASADI_CASADI_META_HPP
 
-#include <string>
 #include <casadi/core/casadi_export.h>
+#include <string>
 
 namespace casadi {
   /**

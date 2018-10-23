@@ -554,7 +554,7 @@ class Functiontests(casadiTestCase):
 
 
     print(fun.map(3,"thread",2))
-    
+
 
     self.checkfunction_light(fun.map(2,"thread",1),fun.map(2),inputs=[hcat(X_[:2]),hcat(Y_[:2]),hcat(Z_[:2]),hcat(V_[:2])])
     self.checkfunction_light(fun.map(3,"thread",1),fun.map(3),inputs=[hcat(X_[:3]),hcat(Y_[:3]),hcat(Z_[:3]),hcat(V_[:3])])
@@ -904,8 +904,8 @@ class Functiontests(casadiTestCase):
 
     for a,r in pairs:
       self.assertTrue(same(F(a), r))
-      self.check_codegen(F,inputs=[a])
-
+      self.check_codegen(F,inputs=[a],check_serialize=True)
+      self.check_serialize(F,[a])
 
     X = MX.sym("x")
 
@@ -926,6 +926,7 @@ class Functiontests(casadiTestCase):
     for a,r in pairs:
       self.assertTrue(same(J(a), r))
       self.check_codegen(J,inputs=[a])
+      self.check_serialize(J,[a])
 
   def test_2d_interpolant(self):
     grid = [[0, 1, 4, 5],
@@ -990,6 +991,7 @@ class Functiontests(casadiTestCase):
     for a,r in pairs:
       self.checkarray(J(a).T, r)
       self.check_codegen(J,inputs=[a])
+      self.check_serialize(J,[a])
 
   def test_1d_interpolant_uniform(self):
     grid = [[0, 1, 2]]
@@ -1060,6 +1062,7 @@ class Functiontests(casadiTestCase):
     LUTH = LUT.hessian_old(0, 0)
 
     self.check_codegen(LUT, [vertcat(0.2,0.3)])
+    self.check_serialize(LUT, [vertcat(0.2,0.3)])
     #scipy.interpolate.interpn(d_knots, data, [0.2,0.3], method='splinef2d')
 
     interp = scipy.interpolate.RectBivariateSpline(d_knots[0], d_knots[1], data)
@@ -1590,7 +1593,7 @@ class Functiontests(casadiTestCase):
 
     f = Function("ffff",[x],[sin(x)])
     fm = f.mapaccum("mapaccum",100,1,{"base":4})
-   
+
     c = CodeGenerator('me')
     c.add(fm)
     code= c.dump()
@@ -1615,24 +1618,25 @@ class Functiontests(casadiTestCase):
     d_flat1 = data1.ravel(order='F')
 
     LUT1 = casadi.interpolant('name','linear',d_knots,d_flat1)
-    
+
     data = np.vstack((data0.ravel(order='F'),data1.ravel(order='F'))).ravel(order='F')
 
     d_flat = data.ravel(order='F')
 
-    
+
     LUT = casadi.interpolant('name','linear',d_knots,d_flat)
-    
-    
+
+
     x = MX.sym("x")
     y = MX.sym("y")
-    
-    
+
+
     LUT_sep = Function('f',[x,y],[vertcat(LUT0(vertcat(x,y)),LUT1(vertcat(x,y)))])
     LUT = Function('f',[x,y],[LUT(vertcat(x,y))])
-    
+
     self.checkfunction(LUT,LUT_sep, inputs=[0.2,0.333])
     self.check_codegen(LUT,inputs=[0.2,0.333])
+    self.check_serialize(LUT,inputs=[0.2,0.333])
 
   def test_2d_bspline_multiout(self):
     np.random.seed(0)
@@ -1652,24 +1656,25 @@ class Functiontests(casadiTestCase):
     d_flat1 = data1.ravel(order='F')
 
     LUT1 = casadi.interpolant('name','bspline',d_knots,d_flat1)
-    
+
     data = np.vstack((data0.ravel(order='F'),data1.ravel(order='F'))).ravel(order='F')
 
     d_flat = data.ravel(order='F')
 
-    
+
     LUT = casadi.interpolant('name','bspline',d_knots,d_flat)
-    
-    
+
+
     x = MX.sym("x")
     y = MX.sym("y")
-    
-    
+
+
     LUT_sep = Function('f',[x,y],[vertcat(LUT0(vertcat(x,y)),LUT1(vertcat(x,y)))])
     LUT = Function('f',[x,y],[LUT(vertcat(x,y))])
-    
+
     self.checkfunction(LUT,LUT_sep, inputs=[0.2,0.333])
     self.check_codegen(LUT,inputs=[0.2,0.333])
+    self.check_serialize(LUT,inputs=[0.2,0.333])
 
   def test_codegen_avoid_stack(self):
     x = SX.sym("x",3,3)
@@ -1677,59 +1682,93 @@ class Functiontests(casadiTestCase):
     np.random.seed(0)
     self.check_codegen(f,inputs=[np.random.random((3,3))])
     self.check_codegen(f,inputs=[np.random.random((3,3))], opts={"avoid_stack": True})
-  
-
-  def test_sx_serialize(self):
-    x = SX.sym("x")
-    y = x+3
-    z = sin(y)
-
-    f = Function('f',[x],[z])
-    fs = Function.deserialize(f.serialize())
-
-    self.checkfunction(f,fs,inputs=[2])
-
-    x = SX.sym("x")
-    y = x+3
-    z = sin(y)
-
-    f = Function('f',[x],[z,np.nan,-np.inf,np.inf])
-    fs = Function.deserialize(f.serialize())
-    self.checkfunction(f,fs,inputs=[2])
-
-    x = SX.sym("x")
-    y = SX.sym("y", Sparsity.lower(3))
-    z = x+y
-    z1 = sparsify(vertcat(z[0],0,z[1]))
-    z2 = z.T
-
-    f = Function('f',[x,y],[z1,z2,x**2],["x","y"],["a","b","c"])
-    fs = Function.deserialize(f.serialize())
-    
-    self.assertEqual(fs.name_in(0), "x")
-    self.assertEqual(fs.name_out(0), "a")
-    self.assertEqual(fs.name(), "f")
-
-    self.checkfunction(f,fs,inputs=[3.7,np.array([[1,0,0],[2,3,0],[4,5,6]])],hessian=False)
 
 
-    fs = pickle.loads(pickle.dumps(f))
-    self.checkfunction(f,fs,inputs=[3.7,np.array([[1,0,0],[2,3,0],[4,5,6]])],hessian=False)
+  def test_serialize(self):
+    for opts in [{"debug":True},{}]:
+      x = SX.sym("x")
+      y = x+3
+      z = sin(y)
 
-    x = SX.sym("x")
-    p = SX.sym("p")
+      f = Function('f',[x],[z])
+      fs = Function.deserialize(f.serialize(opts))
 
-    f = Function('f',[x],[p])
+      self.checkfunction(f,fs,inputs=[2])
 
-    with self.assertInException("Cannot serialize SXFunction with free parameters"):
+      x = SX.sym("x")
+      y = x+3
+      z = sin(y)
+
+      f = Function('f',[x],[z,np.nan,-np.inf,np.inf])
+      fs = Function.deserialize(f.serialize(opts))
+      self.checkfunction(f,fs,inputs=[2])
+
+      x = SX.sym("x")
+      y = SX.sym("y", Sparsity.lower(3))
+      z = x+y
+      z1 = sparsify(vertcat(z[0],0,z[1]))
+      z2 = z.T
+
+      f = Function('f',[x,y],[z1,z2,x**2],["x","y"],["a","b","c"])
+      fs = Function.deserialize(f.serialize(opts))
+
+      self.assertEqual(fs.name_in(0), "x")
+      self.assertEqual(fs.name_out(0), "a")
+      self.assertEqual(fs.name(), "f")
+
+      self.checkfunction(f,fs,inputs=[3.7,np.array([[1,0,0],[2,3,0],[4,5,6]])],hessian=False)
+
+
+      fs = Function.deserialize(f.serialize(opts))
+      self.checkfunction(f,fs,inputs=[3.7,np.array([[1,0,0],[2,3,0],[4,5,6]])],hessian=False)
+
+      x = SX.sym("x")
+      p = SX.sym("p")
+
+      f = Function('f',[x],[p])
+
+      #SXFunction with free parameters
       pickle.loads(pickle.dumps(f))
 
 
-    x = MX.sym("x")
-    f = Function('f',[x],[x**2])
+      x = MX.sym("x")
+      f = Function('f',[x],[x**2])
 
-    with self.assertInException("'serialize' not defined for MXFunction"):
-      pickle.loads(pickle.dumps(f))
+      fs = Function.deserialize(f.serialize(opts))
+      self.checkfunction(f,fs,inputs=[3.7],hessian=False)
+
+
+      x = MX.sym("x")
+      y = MX.sym("y",2)
+
+      w = if_else(x, atan2(3*norm_fro(y)*y,x), x-y, True)
+      z = sin(2*x)*w[0]+1
+      g = Function("g",[x,y],[w-x])
+      gmap = g.map(2, "thread", 2)
+      gmapsx = gmap.expand()
+
+      q = gmap(horzcat(2*x,x-y[1]),horzcat(z+y,cos(z+y)))+1/gmapsx(horzcat(2*x,x-y[1]),repmat(z+y,1,2))
+
+      q = solve(q,2*y,"lapackqr")
+      q+= bilin(DM([[1,3],[7,8]]),q,2*q)
+      
+      f = Function("f",[x,y],[q+1,jacobian(q, vertcat(x, y))])
+
+      fs = Function.deserialize(f.serialize(opts))
+      self.checkfunction(f,fs,inputs=[1.1, vertcat(2.7,3)],hessian=False)
+
+  @memory_heavy()
+  def test_serialize_recursion_limit(self):
+      for X in [SX,MX]:
+        x = X.sym("x")
+
+        y = x 
+        for i in range(10000):
+          y = sin(y)
+
+        f = Function('foo',[x],[y])
+        Function.deserialize(f.serialize())
+
 
   def test_string(self):
     x=MX.sym("x")
@@ -1776,6 +1815,24 @@ class Functiontests(casadiTestCase):
       finv_par = finv.map(200, 'thread',4)
       res = finv_par(numpy.ones(200), numpy.linspace(0, 10, 200))
       self.checkarray(norm_inf(res.T-sqrt(numpy.linspace(0, 10, 200))),0, digits=5)
+
+  def test_mapped_eval(self):
+      x = SX.sym('x')
+      y = SX.sym('y', 2)
+      f = Function('f', [x,y], [sin(x)*y], ['x','y'], ['r'])
+      r1 = f(1, DM([3,4]))
+      r2 = f(2, DM([3,4]))
+      r3 = f(3, DM([3,4]))
+      r_all = f(DM([[1,2,3]]), DM([3,4]))
+      self.checkarray(r_all, horzcat(r1,r2,r3), "Mapped evaluation (DM)")
+
+      z = MX.sym("z", 1, 3);
+      rz = f(z, DM([3,4]))
+      F = Function('F', [z], [rz]);
+      r_mx = F(DM([[1,2,3]]))
+      self.checkarray(r_all, r_mx, "Mapped evaluation (MX)")
+
+
 
 if __name__ == '__main__':
     unittest.main()

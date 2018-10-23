@@ -42,7 +42,7 @@ namespace casadi {
 
   const std::string ImporterInternal::infix_ = "importer";
 
-  Options ImporterInternal::options_
+  const Options ImporterInternal::options_
   = {{},
      {{"verbose",
        {OT_BOOL,
@@ -62,6 +62,9 @@ namespace casadi {
 
     // Initialize object
     init(opts);
+
+    // Revisit class hierarchy in reverse order
+    finalize();
   }
 
   void ImporterInternal::init(const Dict& opts) {
@@ -214,6 +217,11 @@ namespace casadi {
 
   DllLibrary::DllLibrary(const std::string& bin_name)
     : ImporterInternal(bin_name), handle_(nullptr) {
+
+    init_handle();
+  }
+
+  void DllLibrary::init_handle() {
 #ifdef WITH_DL
 #ifdef _WIN32
     handle_ = LoadLibrary(TEXT(name_.c_str()));
@@ -231,6 +239,10 @@ namespace casadi {
 #else // WITH_DL
     casadi_error("CommonExternal: WITH_DL  not activated");
 #endif // WITH_DL
+  }
+
+  void DllLibrary::finalize() {
+    init_handle();
   }
 
   DllLibrary::~DllLibrary() {
@@ -279,6 +291,45 @@ namespace casadi {
     auto it = external_.find(symname);
     casadi_assert_dev(it!=external_.end() && it->second.first);
     return it->second.second;
+  }
+
+  void ImporterInternal::serialize(SerializingStream& s) const {
+    serialize_type(s);
+    serialize_body(s);
+  }
+
+  void ImporterInternal::serialize_type(SerializingStream& s) const {
+    s.pack("ImporterInternal::type", class_name());
+  }
+
+  void ImporterInternal::serialize_body(SerializingStream& s) const {
+    s.version("ImporterInternal", 1);
+    s.pack("ImporterInternal::name", name_);
+    s.pack("ImporterInternal::meta", meta_);
+    s.pack("ImporterInternal::external", external_);
+  }
+
+  ImporterInternal::ImporterInternal(DeserializingStream& s) {
+    s.version("ImporterInternal", 1);
+    s.unpack("ImporterInternal::name", name_);
+    s.unpack("ImporterInternal::meta", meta_);
+    s.unpack("ImporterInternal::external", external_);
+  }
+
+  ImporterInternal* ImporterInternal::deserialize(DeserializingStream& s) {
+    std::string class_name;
+    s.unpack("ImporterInternal::type", class_name);
+    if (class_name=="DllLibrary") {
+      return DllLibrary::deserialize(s);
+    } else {
+       casadi_error("Cannot deserialize type '" + class_name + "'");
+    }
+  }
+
+  ImporterInternal* DllLibrary::deserialize(DeserializingStream& s) {
+    DllLibrary* ret = new DllLibrary(s);
+    ret->finalize();
+    return ret;
   }
 
 } // namespace casadi

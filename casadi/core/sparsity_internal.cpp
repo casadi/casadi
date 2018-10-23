@@ -30,7 +30,6 @@
 #include <climits>
 #include <cstdlib>
 #include <cmath>
-#include "matrix.hpp"
 
 using namespace std;
 
@@ -75,7 +74,7 @@ namespace casadi {
   }
 
   casadi_int SparsityInternal::postorder_dfs(casadi_int j, casadi_int k,
-                                      casadi_int* head, casadi_int* next,
+                                      casadi_int* head, const casadi_int* next,
                                       casadi_int* post, casadi_int* stack) {
     /* Modified version of cs_tdfs in CSparse
       Copyright(c) Timothy A. Davis, 2006-2009
@@ -460,7 +459,7 @@ namespace casadi {
   }
 
   SparsityInternal::~SparsityInternal() {
-    if (btf_) delete btf_;
+    delete btf_;
   }
 
   const SparsityInternal::Btf& SparsityInternal::btf() const {
@@ -2376,6 +2375,42 @@ namespace casadi {
     return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
+  bool SparsityInternal::is_stacked(const Sparsity& y, casadi_int n) const {
+    // Quick true if the objects are equal
+    if (n==1 && is_equal(y)) return true;
+    // Get sparsity patterns
+    casadi_int size1 = this->size1();
+    casadi_int size2 = this->size2();
+    const casadi_int* colind = this->colind();
+    const casadi_int* row = this->row();
+    casadi_int y_size1 = y.size1();
+    casadi_int y_size2 = y.size2();
+    const casadi_int* y_colind = y.colind();
+    const casadi_int* y_row = y.row();
+    // Make sure dimensions are consistent
+    if (size1!=y_size1 || size2!=n*y_size2) return false;
+    // Make sure number of nonzeros are consistent
+    casadi_int nnz = colind[size2], y_nnz = y_colind[y_size2];
+    if (nnz!=n*y_nnz) return false;
+    // Quick return if dense
+    if (y_nnz==y_size1*y_size2) return true;
+    // Offset
+    casadi_int offset = 0;
+    // Skip the initial zero
+    colind++;
+    // For all repeats
+    for (int i=0; i<n; ++i) {
+      // Compare column offsets
+      for (int c=0; c<y_size2; ++c) if (y_colind[c+1]+offset != *colind++) return false;
+      // Compare row indices
+      for (int k=0; k<y_nnz; ++k) if (y_row[k] != *row++) return false;
+      // Update nonzero offset
+      offset += y_nnz;
+    }
+    // Equal if reached this point
+    return true;
+  }
+
   bool SparsityInternal::is_equal(const Sparsity& y) const {
     // Quick true if the objects are the same
     if (this == y.get()) return true;
@@ -3535,7 +3570,7 @@ namespace casadi {
     }
 
     // Construct indent string
-    std::string indent = "";
+    std::string indent;
     for (casadi_int i=0;i<indent_level;++i) {
       indent += "  ";
     }

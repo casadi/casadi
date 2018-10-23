@@ -37,6 +37,7 @@ namespace casadi {
     plugin->doc = Newton::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &Newton::options_;
+    plugin->deserialize = &Newton::deserialize;
     return 0;
   }
 
@@ -53,7 +54,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options Newton::options_
+  const Options Newton::options_
   = {{&Rootfinder::options_},
      {{"abstol",
        {OT_DOUBLE,
@@ -66,7 +67,10 @@ namespace casadi {
         "Maximum number of Newton iterations to perform before returning."}},
       {"print_iteration",
        {OT_BOOL,
-        "Print information about each iteration"}}
+        "Print information about each iteration"}},
+      {"line_search",
+       {OT_BOOL,
+        "Enable line-search (default: true)"}}
      }
   };
 
@@ -80,6 +84,7 @@ namespace casadi {
     abstol_ = 1e-12;
     abstolStep_ = 1e-12;
     print_iteration_ = false;
+    line_search_ = true;
 
     // Read options
     for (auto&& op : opts) {
@@ -91,6 +96,8 @@ namespace casadi {
         abstolStep_ = op.second;
       } else if (op.first=="print_iteration") {
         print_iteration_ = op.second;
+      } else if (op.first=="line_search") {
+        line_search_ = op.second;
       }
     }
 
@@ -99,9 +106,14 @@ namespace casadi {
     casadi_assert(!linsol_.is_null(),
                           "Newton::init: linear_solver must be supplied");
 
+    set_function(oracle_, "g");
+
+
     // Allocate memory
     alloc_w(n_, true); // x
     alloc_w(n_, true); // F
+    alloc_w(n_, true); // dx trial
+    alloc_w(n_, true); // F trial
     alloc_w(sp_jac_.nnz(), true); // J
   }
 
@@ -111,6 +123,8 @@ namespace casadi {
      auto m = static_cast<NewtonMemory*>(mem);
      m->x = w; w += n_;
      m->f = w; w += n_;
+     m->x_trial = w; w += n_;
+     m->f_trial = w; w += n_;
      m->jac = w; w += sp_jac_.nnz();
   }
 
@@ -130,6 +144,7 @@ namespace casadi {
       if (m->iter >= max_iter_) {
         if (verbose_) casadi_message("Max iterations reached.");
         m->return_status = "max_iteration_reached";
+        m->unified_return_status = SOLVER_RET_LIMITED;
         success = false;
         break;
       }
@@ -137,7 +152,7 @@ namespace casadi {
       // Start a new iteration
       m->iter++;
 
-      // Use x to evaluate J
+      // Use x to evaluate g and J
       copy_n(m->iarg, n_in_, m->arg);
       m->arg[iin_] = m->x;
       m->res[0] = m->jac;
@@ -168,23 +183,52 @@ namespace casadi {
           abstolStep = max(abstolStep, fabs(m->f[i]));
         }
         if (abstolStep <= abstolStep_) {
-          if (verbose_) casadi_message("Converged to acceptable tolerance: " + str(abstolStep_));
+          if (verbose_) casadi_message("Minimal step size reached: " + str(abstolStep_));
           break;
         }
       }
 
+      double alpha = 1;
+      if (line_search_) {
+        copy_n(m->iarg, n_in_, m->arg);
+        m->arg[iin_] = m->x_trial;
+        copy_n(m->ires, n_out_, m->res);
+        m->res[iout_] = m->f_trial;
+        while (1) {
+          // Xtrial = Xk - alpha*J^(-1) F
+          copy_n(m->x, n_, m->x_trial);
+          casadi_axpy(n_, -alpha, m->f, m->x_trial);
+          calc_function(m, "g");
+
+          double abstol_trial = casadi_norm_inf(n_, m->f_trial);
+          if (abstol_trial<=(1-alpha/2)*abstol) {
+            copy_n(m->x_trial, n_, m->x);
+            break;
+          }
+          if (alpha*abstolStep <= abstolStep_) {
+            if (verbose_) casadi_message("Linesearch did not find a descent step "
+                                         "for step size " + str(alpha*abstolStep));
+            success = false;
+            break;
+          }
+          alpha*= 0.5;
+        }
+        if (!success) break;
+      } else {
+        // X = Xk - J^(-1) F
+        casadi_axpy(n_, -alpha, m->f, m->x);
+      }
+
       if (print_iteration_) {
         // Only print iteration header once in a while
-        if (m->iter % 10==0) {
+        if ((m->iter-1) % 10 ==0) {
           printIteration(uout());
         }
 
         // Print iteration information
-        printIteration(uout(), m->iter, abstol, abstolStep);
+        printIteration(uout(), m->iter, abstol, abstolStep, alpha);
       }
 
-      // Update Xk+1 = Xk - J^(-1) F
-      casadi_axpy(n_, -1., m->f, m->x);
     }
 
     // Get the solution
@@ -203,19 +247,23 @@ namespace casadi {
     stream << setw(5) << "iter";
     stream << setw(10) << "res";
     stream << setw(10) << "step";
+    if (line_search_) stream << setw(10) << "alpha";
     stream << std::endl;
     stream.unsetf(std::ios::floatfield);
   }
 
   void Newton::printIteration(std::ostream &stream, casadi_int iter,
-                              double abstol, double abstolStep) const {
+                              double abstol, double abstolStep, double alpha) const {
+
+    std::ios_base::fmtflags f = stream.flags();
     stream << setw(5) << iter;
     stream << setw(10) << scientific << setprecision(2) << abstol;
     stream << setw(10) << scientific << setprecision(2) << abstolStep;
+    if (line_search_) stream << setw(10) << scientific << setprecision(2) << alpha;
 
     stream << fixed;
     stream << std::endl;
-    stream.unsetf(std::ios::floatfield);
+    stream.flags(f);
   }
 
   int Newton::init_mem(void* mem) const {
@@ -232,6 +280,28 @@ namespace casadi {
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter;
     return stats;
+  }
+
+
+  Newton::Newton(DeserializingStream& s) : Rootfinder(s) {
+    s.version("Newton", 1);
+    s.unpack("Newton::max_iter", max_iter_);
+    s.unpack("Newton::abstol", abstol_);
+    s.unpack("Newton::abstolStep", abstolStep_);
+    s.unpack("Newton::print_iteration", print_iteration_);
+    s.unpack("Newton::error_on", error_on_);
+    s.unpack("Newton::line_search", line_search_);
+  }
+
+  void Newton::serialize_body(SerializingStream &s) const {
+    Rootfinder::serialize_body(s);
+    s.version("Newton", 1);
+    s.pack("Newton::max_iter", max_iter_);
+    s.pack("Newton::abstol", abstol_);
+    s.pack("Newton::abstolStep", abstolStep_);
+    s.pack("Newton::print_iteration", print_iteration_);
+    s.pack("Newton::error_on", error_on_);
+    s.pack("Newton::line_search", line_search_);
   }
 
 } // namespace casadi

@@ -489,3 +489,14 @@ if ~is_octave
   assert(~isempty(strfind(msg,'Given a repeated matrix, computes the sum of repeated parts.')))
 end
 
+x = SX.sym('x');
+s = StringSerializer();
+s.pack(x);
+s.pack(sin(x));
+ 
+data = s.encode();
+ 
+s = StringDeserializer(data);
+a = s.unpack();
+b = s.unpack();
+

@@ -62,7 +62,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 

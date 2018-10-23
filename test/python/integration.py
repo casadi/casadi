@@ -52,9 +52,14 @@ try:
 except:
   pass
 
-integrators.append(("collocation",["dae","ode"],{"rootfinder":"kinsol","number_of_finite_elements": 18}))
+integrators.append(("collocation",["dae","ode"],{"rootfinder":"newton","number_of_finite_elements": 18}))
 
 integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000}))
+
+integrators.append(("collocation",["dae","ode"],{"rootfinder":"newton","number_of_finite_elements": 18,"simplify":True,"rootfinder":"fast_newton"}))
+
+integrators.append(("rk",["ode"],{"number_of_finite_elements": 1000,"simplify":True}))
+
 
 print("Will test these integrators:")
 for cl, t, options in integrators:
@@ -335,6 +340,8 @@ class Integrationtests(casadiTestCase):
                   integrator_in[k]=v
 
               self.checkfunction(integrator,fs,inputs=integrator_in,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
+              self.check_pure(integrator,inputs=integrator_in)
+              self.check_serialize(integrator,inputs=integrator_in)
 
 
 
@@ -345,7 +352,7 @@ class Integrationtests(casadiTestCase):
 
     num=self.num
     tstart = SX.sym("tstart")
-    tend = SX.sym("tstart")
+    tend = SX.sym("tend")
 
 
     for Integrator, features, options in integrators:
@@ -360,12 +367,12 @@ class Integrationtests(casadiTestCase):
           dout_ = copy.copy(dout)
           rdin_ = copy.copy(rdin)
           rdout_ = copy.copy(rdout)
-          z = SX.sym("x", din_["x"].shape)
+          z = SX.sym("z", din_["x"].shape)
           din_["z"] = z
           dout_["ode"] = z
           dout_["alg"] = ( dout["ode"] - z) * (-0.8)
           if len(rdin_)>0:
-            rz = SX.sym("rx", rdin_["rx"].shape)
+            rz = SX.sym("rz", rdin_["rx"].shape)
             rdin_["rz"] = rz
             rdin_["z"] = z
             rdout_["ode"] = rz
@@ -482,6 +489,7 @@ class Integrationtests(casadiTestCase):
 
             self.checkfunction(integrator,fs,inputs=integrator_in,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
 
+            if "kinsol" not in str(opts): self.check_serialize(integrator,inputs=integrator_in)
 
   def setUp(self):
     # Reference solution is x0 e^((t^3-t0^3)/(3 p))
@@ -918,6 +926,8 @@ class Integrationtests(casadiTestCase):
 
     self.checkarray(qeJ_out,Jr,"jacobian of Nonlin ODE")
 
+    self.check_thread_safety(qeJ,inputs=[A, p0])
+
     qeJf=Function("qeJf", [q0,par],[vec(qeJ(q0,par))])
 
     H=qeJf.jacobian_old(0,0)
@@ -1026,8 +1036,6 @@ class Integrationtests(casadiTestCase):
       res = intg_par(x0=numpy.linspace(0, 10, 40))
       self.checkarray(norm_inf(res["xf"].T-exp(-1)*numpy.linspace(0, 10, 40)),0, digits=5)
 
-      if Integrator=="cvodes": continue
-      if Integrator=="idas": continue
 
       intg = integrator("Integrator",Integrator,{"x":x,"rx":rx,"ode":-x,"rode": rx}, options)
 

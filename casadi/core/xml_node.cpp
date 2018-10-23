@@ -36,7 +36,7 @@ namespace casadi {
   }
 
   bool XmlNode::hasAttribute(const string& attribute_name) const {
-    map<string, string>::const_iterator it = attributes_.find(attribute_name);
+    auto it = attributes_.find(attribute_name);
     return it!=attributes_.end();
   }
 
@@ -47,17 +47,17 @@ namespace casadi {
   }
 
   const XmlNode& XmlNode::operator[](casadi_int i) const {
-    return const_cast<XmlNode*>(this)->operator[](i);
+    return const_cast<XmlNode*>(this)->operator[](i); // NOLINT
   }
 
   bool XmlNode::hasChild(const string& childname) const {
-    map<string, casadi_int>::const_iterator it = child_indices_.find(childname);
+    auto it = child_indices_.find(childname);
     return it!=child_indices_.end();
   }
 
   XmlNode& XmlNode::operator[](const string& childname) {
     // Find the child
-    map<string, casadi_int>::const_iterator it = child_indices_.find(childname);
+    auto it = child_indices_.find(childname);
 
     // check that the child was indeed found
     if (it == child_indices_.end()) {
@@ -69,7 +69,7 @@ namespace casadi {
   }
 
   const XmlNode& XmlNode::operator[](const string& childname) const {
-    return const_cast<XmlNode*>(this)->operator[](childname);
+    return const_cast<XmlNode*>(this)->operator[](childname); // NOLINT
   }
 
   void XmlNode::set_attribute(const string& attribute_name, const string& attribute) {
@@ -109,7 +109,7 @@ namespace casadi {
       stream << string(indent+2, ' ') << "Text: " << text_ << endl;
 
     // Print attributes
-    for (map<string, string>::const_iterator it=attributes_.begin(); it != attributes_.end(); ++it)
+    for (auto it=attributes_.begin(); it != attributes_.end(); ++it)
       stream << string(indent+2, ' ') << "attribute " << it->first << " = " << it->second << endl;
 
     // Print Children
@@ -120,7 +120,7 @@ namespace casadi {
   }
 
   bool XmlNode::checkName(const string& str) const {
-    return name_.compare(str) == 0;
+    return name_ == str;
   }
 
   void XmlNode::readString(const std::string& str, std::string& val) {
@@ -128,9 +128,9 @@ namespace casadi {
   }
 
   void XmlNode::readString(const std::string& str, bool& val) {
-    if (str.compare("true")==0)
+    if (str=="true")
       val = true;
-    else if (str.compare("false")==0)
+    else if (str=="false")
       val = false;
     else
       throw CasadiException("XML argument not true or false");

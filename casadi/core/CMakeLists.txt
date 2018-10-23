@@ -25,7 +25,14 @@ set(CASADI_PUBLIC
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
   generic_expression.hpp      # Base class for SXElem MX and Matrix<>
   generic_matrix.hpp          # Base class for Matrix<> and MX
-  matrix.hpp                  # The Matrix template class
+  matrix_fwd.hpp
+  matrix_decl.hpp
+  sx_fwd.hpp
+  sx.hpp
+  dm_fwd.hpp
+  dm.hpp
+  im_fwd.hpp
+  im.hpp
   sparsity_interface.hpp
   sparsity.hpp                # reference counted sparsity pattern
   slice.hpp                   # A "slice" in a language such as Python, A[start:stop:step], or Matlab, A(start:step:stop)
@@ -62,6 +69,7 @@ set(CASADI_PUBLIC
   variable.hpp
   dae_builder.hpp
   optistack.hpp
+  serializer.hpp
 
   # User include class with the most essential includes
   core.hpp
@@ -83,7 +91,10 @@ set(CASADI_INTERNAL
   polynomial.cpp
 
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
-  matrix.cpp
+  matrix_impl.hpp
+  sx_instantiator.cpp
+  dm_instantiator.cpp
+  im_instantiator.cpp
 
   sparse_storage.hpp   sparse_storage_impl.hpp
   sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp
@@ -168,6 +179,7 @@ set(CASADI_INTERNAL
   variable.cpp
   dae_builder.cpp
   optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
+  serializer.cpp              serializing_stream.cpp               serializing_stream.hpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp
@@ -212,3 +224,8 @@ endif()
 install(FILES ${CASADI_PUBLIC} ${CMAKE_CURRENT_BINARY_DIR}/casadi_export.h
   DESTINATION ${INCLUDE_PREFIX}/casadi/core
 )
+if(INSTALL_INTERNAL_HEADERS)
+  install(FILES ${CASADI_INTERNAL}
+    DESTINATION ${INCLUDE_PREFIX}/casadi/core
+  )
+endif()

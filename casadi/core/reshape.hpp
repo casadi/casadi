@@ -117,6 +117,12 @@ namespace casadi {
 
     /** \brief Reset the marker for an input expression */
     void reset_input() const override;
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new Reshape(s); }
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Reshape(DeserializingStream& s) : MXNode(s) {}
   };
 
 } // namespace casadi

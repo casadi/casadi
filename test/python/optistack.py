@@ -47,6 +47,21 @@ if has_nlpsol("ipopt"):
 
 class OptiStacktests(inherit_from):
 
+    def test_conic(self):
+      opti = Opti('conic')
+      x = opti.variable(2)
+      opti.minimize(dot(x,x))
+      opti.subject_to(x[0]>=2)
+      opti.subject_to(x[1]>=3)
+      opti.solver('qrqp')
+
+      sol = opti.solve()
+      self.checkarray(sol.value(x),vertcat(2,3))
+
+      with self.assertInException("conic"):
+        Opti('foo')
+
+
     def test_lookup(self):
       opti = Opti()
       x = opti.variable(2)
@@ -74,6 +89,22 @@ class OptiStacktests(inherit_from):
       opti.minimize((x-y**2)**2)
       opti.subject_to(x+y>=1)
       opti.subject_to(z+x>=1)
+      
+      opti.solver('ipopt')
+      sol = opti.solve()
+
+      self.assertEqual(sol.opti.nx,3)
+      self.assertEqual(sol.opti.ng,2)
+      self.assertEqual(sol.opti.np,0)
+      
+    def test_subject_to_list(self):
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      
+      opti.minimize((x-y**2)**2)
+      opti.subject_to([x+y>=1,z+x>=1])
       
       opti.solver('ipopt')
       sol = opti.solve()
@@ -838,5 +869,24 @@ class OptiStacktests(inherit_from):
       
       self.checkarray(sol2["x"],sol.value(opti.x))
       
+    def test_max_iter(self):
+      opti = Opti()
+      x = opti.variable()
+      opti.minimize((x-1)**6)
+      opti.solver('ipopt',{},{"max_iter":1})
+      with self.assertInException("Maximum_Iterations_Exceeded"):
+        sol = opti.solve()
+
+      sol = opti.solve_limited()
+      opti.solver('ipopt',{},{"max_iter":1000})
+      opti.subject_to(x>=1)
+      opti.subject_to(x<=-1)
+
+      with self.assertInException("Infeasible"):
+        sol = opti.solve()
+
+      with self.assertInException("Infeasible"):
+        sol = opti.solve_limited()
+
 if __name__ == '__main__':
     unittest.main()

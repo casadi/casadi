@@ -99,11 +99,23 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s);
+
     std::vector<casadi_int> lookup_mode_;
+
+  protected:
+     /** \brief Deserializing constructor */
+    explicit LinearInterpolant(DeserializingStream& s);
   };
 
   /** First order derivatives */
@@ -139,6 +151,14 @@ namespace casadi {
                                       const Dict& opts) const override;
     ///@}
 
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "Interpolant"; }
+
+    /** \brief Deserializing constructor */
+    explicit LinearInterpolantJac(DeserializingStream& s) : FunctionInternal(s) {}
   };
 
 } // namespace casadi

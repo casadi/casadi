@@ -133,8 +133,8 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static casadi_int postorder_dfs(casadi_int j, casadi_int k, casadi_int* head, casadi_int* next,
-                             casadi_int* post, casadi_int* stack);
+    static casadi_int postorder_dfs(casadi_int j, casadi_int k, casadi_int* head,
+        const casadi_int* next, casadi_int* post, casadi_int* stack);
 
     /** \brief Calculate the postorder permuation
       * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis
@@ -506,6 +506,9 @@ namespace casadi {
     /// Check if two sparsity patterns are the same
     bool is_equal(casadi_int y_nrow, casadi_int y_ncol,
                   const casadi_int* y_colind, const casadi_int* y_row) const;
+
+    /// Check if pattern is repeated
+    bool is_stacked(const Sparsity& y, casadi_int n) const;
 
     /// Enlarge the matrix along the first dimension (i.e. insert rows)
     Sparsity _enlargeRows(casadi_int nrow, const std::vector<casadi_int>& rr, bool ind1) const;

@@ -736,7 +736,9 @@ struct CVadjMemRec {
   N_Vector ca_ytmp;
 
   N_Vector *ca_yStmp;
-    
+
+  long int ilast;
+
 };
   
 

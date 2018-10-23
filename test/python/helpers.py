@@ -515,14 +515,14 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def check_codegen(self,F,inputs=None, opts=None):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",check_serialize=False):
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
       if opts is None: opts = {}
       F.generate(name, opts)
       import subprocess
-      p = subprocess.Popen("gcc -pedantic -std=c89 -fPIC -shared -Wall -Werror -Wextra -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 %s.c -o %s.so" % (name,name) ,shell=True).wait()
+      p = subprocess.Popen("gcc -pedantic -std=%s -fPIC -shared -Wall -Werror -Wextra -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 %s.c -o %s.so" % (std,name,name) ,shell=True).wait()
       F2 = external(F.name(), './' + name + '.so')
 
       Fout = F.call(inputs)
@@ -531,11 +531,45 @@ class casadiTestCase(unittest.TestCase):
       if isinstance(inputs, dict):
         self.assertEqual(F.name_out(), F2.name_out())
         for k in F.name_out():
-          self.checkarray(Fout[k],Fout2[k])
+          self.checkarray(Fout[k],Fout2[k],digits=15)
       else:
         for i in range(F.n_out()):
-          self.checkarray(Fout[i],Fout2[i])
+          self.checkarray(Fout[i],Fout2[i],digits=15)
 
+      if self.check_serialize:
+        self.check_serialize(F2,inputs=inputs)
+
+  def check_thread_safety(self,F,inputs=None,N=20):
+    
+    FP = F.map(N, 'thread',2)
+    FS = F.map(N, 'thread')
+    self.checkfunction_light(FP, FS, inputs)
+
+
+  def check_serialize(self,F,inputs=None):
+      F2 = Function.deserialize(F.serialize({"debug":True}))
+
+      Fout = F.call(inputs)
+      Fout2 = F2.call(inputs)
+
+      if isinstance(inputs, dict):
+        self.assertEqual(F.name_out(), F2.name_out())
+        for k in F.name_out():
+          self.checkarray(Fout[k],Fout2[k],digits=16)
+      else:
+        for i in range(F.n_out()):
+          self.checkarray(Fout[i],Fout2[i],digits=16)
+
+  def check_pure(self,F,inputs=None):
+      Fout = F.call(inputs)
+      Fout2 = F.call(inputs)
+
+      if isinstance(inputs, dict):
+        for k in F.name_out():
+          self.checkarray(Fout[k],Fout2[k],digits=16)
+      else:
+        for i in range(F.n_out()):
+          self.checkarray(Fout[i],Fout2[i],digits=16)
 
 class run_only(object):
   def __init__(self, args):

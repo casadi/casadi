@@ -118,9 +118,18 @@ namespace casadi {
     /** \brief Get required length of w field */
     size_t sz_w() const override;
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new Call(s); }
+
   protected:
     /** \brief  Constructor (should not be used directly) */
     explicit Call(const Function& fcn, const std::vector<MX>& arg);
+
+    /** \brief Deserializing constructor */
+    explicit Call(DeserializingStream& s);
 
     // Function to be evaluated
     Function fcn_;

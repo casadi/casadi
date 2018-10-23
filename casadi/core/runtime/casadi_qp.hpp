@@ -15,12 +15,12 @@ struct casadi_qp_prob {
   T1 inf;
   // Dual to primal error
   T1 du_to_pr;
-  // Print iterations
-  int print_iter;
   // Sparsity patterns
   const casadi_int *sp_a, *sp_h, *sp_at, *sp_kkt;
   // Symbolic QR factorization
   const casadi_int *prinv, *pc, *sp_v, *sp_r;
+  // Smallest multiplier treated as inactive for the initial active set
+  T1 min_lam;
 };
 // C-REPLACE "casadi_qp_prob<T1>" "struct casadi_qp_prob"
 
@@ -86,12 +86,14 @@ struct casadi_qp_data {
   // Primal and dual error, corresponding index
   T1 pr, du, epr, edu;
   casadi_int ipr, idu;
+  // Verbose
+  int verbose;
 };
 // C-REPLACE "casadi_qp_data<T1>" "struct casadi_qp_data"
 
 // SYMBOL "qp_init"
 template<typename T1>
-void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int* iw, T1* w) {
+void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int** iw, T1** w) {
   // Local variables
   casadi_int nnz_a, nnz_kkt, nnz_v, nnz_r;
   const casadi_qp_prob<T1>* p = d->prob;
@@ -100,26 +102,26 @@ void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int* iw, T1* w) {
   nnz_kkt = p->sp_kkt[2+p->sp_kkt[1]];
   nnz_v = p->sp_v[2+p->sp_v[1]];
   nnz_r = p->sp_r[2+p->sp_r[1]];
-  d->nz_kkt = w; w += nnz_kkt;
-  d->z = w; w += p->nz;
-  d->lbz = w; w += p->nz;
-  d->ubz = w; w += p->nz;
-  d->lam = w; w += p->nz;
-  d->dz = w; w += p->nz;
-  d->dlam = w; w += p->nz;
-  d->nz_v = w; w += std::max(nnz_v+nnz_r, nnz_kkt);
+  d->nz_kkt = *w; *w += nnz_kkt;
+  d->z = *w; *w += p->nz;
+  d->lbz = *w; *w += p->nz;
+  d->ubz = *w; *w += p->nz;
+  d->lam = *w; *w += p->nz;
+  d->dz = *w; *w += p->nz;
+  d->dlam = *w; *w += p->nz;
+  d->nz_v = *w; *w += std::max(nnz_v+nnz_r, nnz_kkt);
   d->nz_r = d->nz_v + nnz_v;
-  d->beta = w; w += p->nz;
-  d->nz_at = w; w += nnz_a;
-  d->infeas = w; w += p->nx;
-  d->tinfeas = w; w += p->nx;
-  d->sens = w; w += p->nz;
-  d->neverzero = iw; iw += p->nz;
-  d->neverupper = iw; iw += p->nz;
-  d->neverlower = iw; iw += p->nz;
-  d->lincomb = iw; iw += p->nz;
-  d->w = w;
-  d->iw = iw;
+  d->beta = *w; *w += p->nz;
+  d->nz_at = *w; *w += nnz_a;
+  d->infeas = *w; *w += p->nx;
+  d->tinfeas = *w; *w += p->nx;
+  d->sens = *w; *w += p->nz;
+  d->neverzero = *iw; *iw += p->nz;
+  d->neverupper = *iw; *iw += p->nz;
+  d->neverlower = *iw; *iw += p->nz;
+  d->lincomb = *iw; *iw += p->nz;
+  d->w = *w;
+  d->iw = *iw;
 }
 
 // SYMBOL "qp_reset"
@@ -136,10 +138,12 @@ int casadi_qp_reset(casadi_qp_data<T1>* d) {
   for (i=0; i<p->nz; ++i) {
     // Permitted signs for lam
     d->neverzero[i] = d->lbz[i]==d->ubz[i];
-    d->neverupper[i] = isinf(d->ubz[i]);
-    d->neverlower[i] = isinf(d->lbz[i]);
+    d->neverupper[i] = d->ubz[i]==p->inf;
+    d->neverlower[i] = d->lbz[i]==-p->inf;
     if (d->neverzero[i] && d->neverupper[i] && d->neverlower[i]) return 1;
-    // Correct initial active set if required
+    // Small enough lambdas are treated as inactive
+    if (!d->neverzero[i] && fabs(d->lam[i])<p->min_lam) d->lam[i] = 0.;
+    // Prevent illegal active sets
     if (d->neverzero[i] && d->lam[i]==0.) {
       d->lam[i] = d->neverupper[i]
                 || d->z[i]-d->lbz[i] <= d->ubz[i]-d->z[i] ? -p->dmin : p->dmin;
@@ -192,26 +196,25 @@ void casadi_qp_du(casadi_qp_data<T1>* d) {
   }
 }
 
+// C-VERBOSE
 // SYMBOL "qp_log"
+// C-VERBOSE
 template<typename T1>
+// C-VERBOSE
 void casadi_qp_log(casadi_qp_data<T1>* d, const char* fmt, ...) {
-  va_list args;
-  va_start(args, fmt);
-  vsnprintf(d->msg, sizeof(d->msg), fmt, args);
-  va_end(args);
-}
-
-// SYMBOL "qp_pr_index"
-template<typename T1>
-casadi_int casadi_qp_pr_index(casadi_qp_data<T1>* d, casadi_int* sign) {
-  // Try to improve primal feasibility by adding a constraint
-  if (d->lam[d->ipr]==0.) {
-    // Add the most violating constraint
-    *sign = d->z[d->ipr]<d->lbz[d->ipr] ? -1 : 1;
-    casadi_qp_log(d, "Added %lld to reduce |pr|", d->ipr);
-    return d->ipr;
+// C-VERBOSE
+  if (d->verbose) {
+// C-VERBOSE
+    va_list args;
+// C-VERBOSE
+    va_start(args, fmt);
+// C-VERBOSE
+    vsnprintf(d->msg, sizeof(d->msg), fmt, args);
+// C-VERBOSE
+    va_end(args);
+// C-VERBOSE
   }
-  return -1;
+// C-VERBOSE
 }
 
 // SYMBOL "qp_du_check"
@@ -269,7 +272,7 @@ int casadi_qp_du_free(casadi_qp_data<T1>* d, casadi_int i, int upper) {
 
 // SYMBOL "qp_du_index"
 template<typename T1>
-casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign) {
+casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign, casadi_int skip) {
   // Try to improve dual feasibility by removing a constraint
   // Local variables
   casadi_int best_ind, i;
@@ -277,12 +280,14 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign) {
   const casadi_qp_prob<T1>* p = d->prob;
   // Find the best lam[i] to make zero
   best_ind = -1;
-  best_sens = 0.;
+  best_sens = -1;
   for (i=0; i<p->nz; ++i) {
-    // Make sure variable influences du
-    if (d->sens[i]==0.) continue;
-    // Make sure removing the constraint decreases dual infeasibility
-    if (d->sens[i]>0. ? d->lam[i]>=0. : d->lam[i]<=0.) continue;
+    // Should the index be avoided?
+    if (i==skip) continue;
+    // Make sure that it's a constraint that can be removed
+    if (d->lam[i]==0 || d->neverzero[i]) continue;
+    // If variable influences du, make sure sign is right
+    if (d->lam[i]>0. ? d->sens[i]>0. : d->sens[i]<0.) continue;
     // Skip if maximum infeasibility increases
     if (casadi_qp_du_check(d, i)>d->du) continue;
     // Check if best so far
@@ -294,10 +299,27 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign) {
   // Accept, if any
   if (best_ind>=0) {
     *sign = 0;
+    // C-VERBOSE
     casadi_qp_log(d, "Removed %lld to reduce |du|", best_ind);
     return best_ind;
   } else {
     return -1;
+  }
+}
+
+// SYMBOL "qp_pr_index"
+template<typename T1>
+casadi_int casadi_qp_pr_index(casadi_qp_data<T1>* d, casadi_int* sign) {
+  // Try to improve primal feasibility by adding a constraint
+  if (d->lam[d->ipr]==0.) {
+    // Add the most violating constraint
+    *sign = d->z[d->ipr]<d->lbz[d->ipr] ? -1 : 1;
+    // C-VERBOSE
+    casadi_qp_log(d, "Added %lld to reduce |pr|", d->ipr);
+    return d->ipr;
+  } else {
+    // Try to remove blocking constraints
+    return casadi_qp_du_index(d, sign, d->ipr);
   }
 }
 
@@ -415,28 +437,18 @@ void casadi_qp_kkt_residual(casadi_qp_data<T1>* d, T1* r) {
 
 // SYMBOL "qp_zero_blocking"
 template<typename T1>
-int casadi_qp_zero_blocking(casadi_qp_data<T1>* d, casadi_int* index, casadi_int* sign) {
+int casadi_qp_zero_blocking(casadi_qp_data<T1>* d) {
   // Local variables
-  T1 dz_max;
   casadi_int i;
-  int ret;
   const casadi_qp_prob<T1>* p = d->prob;
-  ret = 0;
-  dz_max = 0.;
   for (i=0; i<p->nz; ++i) {
-    if (-d->dz[i]>dz_max && d->z[i]<=d->lbz[i]-d->epr) {
-      ret = 1;
-      if (index) *index = i;
-      if (sign) *sign = -1;
-      casadi_qp_log(d, "lbz[%lld] violated at 0", i);
-    } else if (d->dz[i]>dz_max && d->z[i]>=d->ubz[i]+d->epr) {
-      ret = 1;
-      if (index) *index = i;
-      if (sign) *sign = 1;
-      casadi_qp_log(d, "ubz[%lld] violated at 0", i);
+    if (d->dz[i]<0 && d->z[i]<=d->lbz[i]-d->epr) {
+      return 1;
+    } else if (d->dz[i]>0 && d->z[i]>=d->ubz[i]+d->epr) {
+      return 1;
     }
   }
-  return ret;
+  return 0;
 }
 
 // SYMBOL "qp_primal_blocking"
@@ -448,7 +460,7 @@ void casadi_qp_primal_blocking(casadi_qp_data<T1>* d,
   T1 trial_z;
   const casadi_qp_prob<T1>* p = d->prob;
   // Check if violation with tau=0 and not improving
-  if (casadi_qp_zero_blocking(d, index, sign)) {
+  if (casadi_qp_zero_blocking(d)) {
     d->tau = 0.;
     return;
   }
@@ -462,12 +474,14 @@ void casadi_qp_primal_blocking(casadi_qp_data<T1>* d,
       d->tau = (d->lbz[i]-d->epr-d->z[i])/d->dz[i];
       if (index) *index = d->lam[i]<0. ? -1 : i;
       if (sign) *sign = -1;
+      // C-VERBOSE
       casadi_qp_log(d, "Enforcing lbz[%lld]", i);
     } else if (d->dz[i]>0 && trial_z>d->ubz[i]+d->epr) {
       // Trial would increase maximum infeasibility
       d->tau = (d->ubz[i]+d->epr-d->z[i])/d->dz[i];
       if (index) *index = d->lam[i]>0. ? -1 : i;
       if (sign) *sign = 1;
+      // C-VERBOSE
       casadi_qp_log(d, "Enforcing ubz[%lld]", i);
     }
     if (d->tau<=0) return;
@@ -626,7 +640,7 @@ int casadi_qp_flip_check(casadi_qp_data<T1>* d, casadi_int index, casadi_int sig
   // Find best constraint we can flip, if any
   *r_index=-1;
   *r_sign=0;
-  best = inf;
+  best = p->inf;
   for (i=0; i<p->nz; ++i) {
     // Can't be the same
     if (i==index) continue;
@@ -799,6 +813,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           tau = tau_test;
           *r_index = i;
           *r_sign = -1;
+          // C-VERBOSE
           casadi_qp_log(d, "Enforced lbz[%lld] for regularity", i);
         }
       }
@@ -813,6 +828,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           tau = tau_test;
           *r_index = i;
           *r_sign = 1;
+          // C-VERBOSE
           casadi_qp_log(d, "Enforced ubz[%lld] for regularity", i);
         }
       }
@@ -827,6 +843,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           tau = tau_test;
           *r_index = i;
           *r_sign = 0;
+          // C-VERBOSE
           casadi_qp_log(d, "Dropped %s[%lld] for regularity", d->lam[i]>0 ? "lbz" : "ubz", i);
         }
       }
@@ -869,6 +886,7 @@ template<typename T1>
 void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
   // Local variables
   casadi_int i;
+  T1 r;
   const casadi_qp_prob<T1>* p = d->prob;
   // Calculate f
   d->f = casadi_bilin(d->nz_h, p->sp_h, d->z, d->z)/2.
@@ -880,25 +898,40 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
   casadi_copy(d->g, p->nx, d->infeas);
   casadi_mv(d->nz_h, p->sp_h, d->z, d->infeas, 0);
   casadi_mv(d->nz_a, p->sp_a, d->lam+p->nx, d->infeas, 1);
-  // Calculate lam[:nx] without changing the sign, dual infeasibility
+  // Calculate lam[:nx] without changing the sign accidentally, dual infeasibility
   for (i=0; i<p->nx; ++i) {
+    // No change if zero
+    if (d->lam[i]==0) continue;
+    // lam[i] with no sign restrictions
+    r = -d->infeas[i];
     if (d->lam[i]>0) {
-      d->lam[i] = fmax(-d->infeas[i], p->dmin);
-    } else if (d->lam[i]<0) {
-      d->lam[i] = fmin(-d->infeas[i], -p->dmin);
+      if (d->neverzero[i] && !d->neverlower[i]) {
+        d->lam[i] = r==0 ? p->dmin : r; // keep sign if r==0
+      } else {
+        d->lam[i] = fmax(r, p->dmin); // no sign change
+      }
+    } else {
+      if (d->neverzero[i] && !d->neverupper[i]) {
+        d->lam[i] = r==0 ? -p->dmin : r; // keep sign if r==0
+      } else {
+        d->lam[i] = fmin(r, -p->dmin); // no sign change
+      }
     }
+    // Update dual infeasibility
     d->infeas[i] += d->lam[i];
   }
   // Calculate primal and dual error
   casadi_qp_pr(d);
   casadi_qp_du(d);
   // Acceptable primal and dual error
-  d->epr = fmax(d->pr, d->du/p->du_to_pr);
-  d->edu = fmax(d->du, p->du_to_pr*d->pr);
+  d->epr = fmax(d->pr, 0.5*d->du/p->du_to_pr);
+  d->edu = fmax(d->du, 0.5*p->du_to_pr*d->pr);
   // Sensitivity in decreasing |du|
   casadi_fill(d->sens, p->nz, 0.);
-  d->sens[d->idu] = d->infeas[d->idu]>0 ? -1. : 1.;
-  casadi_mv(d->nz_a, p->sp_a, d->sens, d->sens+p->nx, 0);
+  if (d->idu>=0) {
+    d->sens[d->idu] = d->infeas[d->idu]>0 ? -1. : 1.;
+    casadi_mv(d->nz_a, p->sp_a, d->sens, d->sens+p->nx, 0);
+  }
 }
 
 template<typename T1>
@@ -927,6 +960,7 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
   if (r_index>=0 && (r_sign!=0 || casadi_qp_du_check(d, r_index)<=d->edu)) {
     *index = r_index;
     *sign = r_sign;
+    // C-VERBOSE
     casadi_qp_log(d, "%lld->%lld for regularity", *index, *sign);
   }  else if (r_index>=0 && d->tau>1e-16) {
     // Allow another regularity step
@@ -934,13 +968,13 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
   }
 
   // Improve primal or dual feasibility
-  if (*index==-1 && d->tau>1e-16 && (d->ipr>=0 || d->idu>=0)) {
+  if (*index==-1 && (d->ipr>=0 || d->idu>=0)) {
     if (p->du_to_pr*d->pr >= d->du) {
       // Try to improve primal feasibility
       *index = casadi_qp_pr_index(d, sign);
     } else {
       // Try to improve dual feasibility
-      *index = casadi_qp_du_index(d, sign);
+      *index = casadi_qp_du_index(d, sign, -1);
     }
   }
   // If a constraint was added
@@ -950,7 +984,12 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
       if (r_index>=0) {
         // Also flip r_index to avoid singularity
         d->lam[r_index] = r_sign==0 ? 0 : r_sign>0 ? p->dmin : -p->dmin;
+        // C-VERBOSE
         casadi_qp_log(d, "%lld->%lld, %lld->%lld", *index, *sign, r_index, r_sign);
+      } else if (*sign==0 && d->sens[*index]==0.) {
+        // Abort: Not worth it to sacrifice regularity
+        *index = -1;
+        return;
       }
     }
     d->lam[*index] = *sign==0 ? 0 : *sign>0 ? p->dmin : -p->dmin;

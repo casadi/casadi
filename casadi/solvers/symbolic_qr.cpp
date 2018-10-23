@@ -40,6 +40,7 @@ namespace casadi {
     plugin->doc = SymbolicQr::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &SymbolicQr::options_;
+    plugin->deserialize = &SymbolicQr::deserialize;
     return 0;
   }
 
@@ -56,7 +57,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options SymbolicQr::options_
+  const Options SymbolicQr::options_
   = {{&FunctionInternal::options_},
     {{"fopts",
       {OT_DICT,
@@ -93,7 +94,7 @@ namespace casadi {
       inv_rowperm[rowperm[k]] = k;
 
     // Permute the linear system
-    SX Aperm = A(rowperm, colperm);
+    SX Aperm = A(rowperm, colperm); // NOLINT(cppcoreguidelines-slicing)
 
     // Generate the QR factorization function
     SX Q1, R1;
@@ -109,13 +110,13 @@ namespace casadi {
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b
 
     // Permute the right hand sides
-    SX bperm = b(rowperm, Slice());
+    SX bperm = b(rowperm, Slice()); // NOLINT(cppcoreguidelines-slicing)
 
     // Solve the factorized system
     SX xperm = SX::solve(R, mtimes(Q.T(), bperm));
 
     // Permute back the solution
-    SX x = xperm(inv_colperm, Slice());
+    SX x = xperm(inv_colperm, Slice()); // NOLINT(cppcoreguidelines-slicing)
 
     // Generate the QR solve function
     vector<SX> solv_in = {Q, R, b};
@@ -127,13 +128,13 @@ namespace casadi {
     // <=> x = Pb' * Q * inv(R') * Px * b
 
     // Permute the right hand side
-    bperm = b(colperm, Slice());
+    bperm = b(colperm, Slice()); // NOLINT(cppcoreguidelines-slicing)
 
     // Solve the factorized system
     xperm = mtimes(Q, SX::solve(R.T(), bperm));
 
     // Permute back the solution
-    x = xperm(inv_rowperm, Slice());
+    x = xperm(inv_rowperm, Slice()); // NOLINT(cppcoreguidelines-slicing)
 
     // Mofify the QR solve function
     solveT_ = Function("QR_solv_T", solv_in, {x}, fopts_);
@@ -224,6 +225,23 @@ namespace casadi {
     res.resize(max(res.size(), f.sz_res()));
     iw.resize(max(iw.size(), f.sz_iw()));
     w.resize(max(w.size(), f.sz_w()));
+  }
+
+  SymbolicQr::SymbolicQr(DeserializingStream& s) : LinsolInternal(s) {
+    s.version("SymbolicQr", 1);
+    s.unpack("SymbolicQr::factorize", factorize_);
+    s.unpack("SymbolicQr::solve", solve_);
+    s.unpack("SymbolicQr::solveT", solveT_);
+    s.unpack("SymbolicQr::fopts", fopts_);
+  }
+
+  void SymbolicQr::serialize_body(SerializingStream &s) const {
+    LinsolInternal::serialize_body(s);
+    s.version("SymbolicQr", 1);
+    s.pack("SymbolicQr::factorize", factorize_);
+    s.pack("SymbolicQr::solve", solve_);
+    s.pack("SymbolicQr::solveT", solveT_);
+    s.pack("SymbolicQr::fopts", fopts_);
   }
 
 } // namespace casadi

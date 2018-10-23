@@ -27,6 +27,7 @@
 #include <vector>
 #include <algorithm>
 #include "casadi_misc.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -245,5 +246,56 @@ namespace casadi {
     casadi_assert_dev(sp.is_empty());
     return MX::zeros(sp);
   }
+
+  void ConstantDM::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("ConstantMX::type", 'a');
+  }
+
+  void ConstantDM::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    DM v = get_DM();
+    s.pack("ConstantMX::nonzeros", v.nonzeros());
+  }
+
+  ConstantDM::ConstantDM(DeserializingStream& s) : ConstantMX(s) {
+    std::vector<double> v;
+    s.unpack("ConstantMX::nonzeros", v);
+    x_ = DM(sparsity_, v);
+  }
+
+  void ZeroByZero::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("ConstantMX::type", 'z');
+  }
+
+  void ZeroByZero::serialize_body(SerializingStream& s) const {
+   // No need to serialize body at all. All info is in header.
+  }
+
+  MXNode* ConstantMX::deserialize(DeserializingStream& s) {
+    char t;
+    s.unpack("ConstantMX::type", t);
+    switch (t) {
+      case 'a':    return new ConstantDM(s);
+      case 'z':    return ZeroByZero::getInstance();
+      case 'D':
+        return new Constant<RuntimeConst<double> >(s, RuntimeConst<double>::deserialize(s));
+      case 'I':
+        return new Constant<RuntimeConst<casadi_int> >(s,
+                      RuntimeConst<casadi_int>::deserialize(s));
+      case '0':
+        return new Constant<CompiletimeConst<0> >(s, CompiletimeConst<0>::deserialize(s));
+      case '1':
+        return new Constant<CompiletimeConst<1> >(s, CompiletimeConst<1>::deserialize(s));
+      case 'm':
+        return new Constant<CompiletimeConst<(-1)> >(s, CompiletimeConst<(-1)>::deserialize(s));
+      default:
+        casadi_error("Error deserializing");
+    }
+  }
+
+  ///
+
 
 } // namespace casadi

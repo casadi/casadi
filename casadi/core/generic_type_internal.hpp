@@ -28,6 +28,7 @@
 
 #include "generic_type.hpp"
 #include "casadi_misc.hpp"
+#include "serializing_stream.hpp"
 #include "shared_object_internal.hpp"
 
 /// \cond INTERNAL
@@ -38,6 +39,7 @@ namespace casadi {
   public:
     virtual ~GenericTypeBase() {}
     virtual TypeID getType() const = 0;
+    virtual void serialize(SerializingStream& s) const = 0;
   };
 
   template<TypeID ID, typename T>
@@ -49,6 +51,14 @@ namespace casadi {
     void disp(std::ostream& stream, bool more) const override { stream << d_; }
     TypeID getType() const override { return ID;}
     T d_;
+    void serialize(SerializingStream& s) const override {
+      s.pack("GenericType::d", d_);
+    }
+    static GenericType deserialize(DeserializingStream& s) {
+      T d;
+      s.unpack("GenericType::d", d);
+      return GenericType(d);
+    }
   };
 
 } // namespace casadi

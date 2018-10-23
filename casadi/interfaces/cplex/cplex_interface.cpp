@@ -42,6 +42,7 @@ namespace casadi {
     plugin->doc = CplexInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &CplexInterface::options_;
+    plugin->deserialize = &CplexInterface::deserialize;
     return 0;
   }
 
@@ -55,7 +56,7 @@ namespace casadi {
     : Conic(name, st) {
   }
 
-  Options CplexInterface::options_
+  const Options CplexInterface::options_
   = {{&Conic::options_},
      {{"cplex",
        {OT_DICT,
@@ -124,6 +125,9 @@ namespace casadi {
       }
     }
 
+    // Initialize SDP to SOCP memory
+    sdp_to_socp_init(sdp_to_socp_mem_);
+
     // Allocate work vectors
     alloc_w(nx_, true); // g
     alloc_w(nx_, true); // lbx
@@ -138,6 +142,7 @@ namespace casadi {
   }
 
   int CplexInterface::init_mem(void* mem) const {
+    if (Conic::init_mem(mem)) return 1;
     if (!mem) return 1;
     auto m = static_cast<CplexMemory*>(mem);
 
@@ -265,10 +270,23 @@ namespace casadi {
     m->h_colind.resize(H_.size2()+1);
     m->h_row.resize(H_.nnz());
 
+    const SDPToSOCPMem& sm = sdp_to_socp_mem_;
+
+    m->socp_qind.resize(sm.indval_size);
+    m->socp_qval.resize(sm.indval_size);
+    m->socp_lbound.resize(sm.map_Q.size2());
+    m->socp_lval.resize(sm.map_Q.nnz());
+    m->socp_colind.resize(sm.map_Q.size2()+1);
+    m->socp_row.resize(sm.map_Q.nnz());
+    m->socp_lbx.resize(sm.r.back());
+
     copy_vector(A_.colind(), m->a_colind);
     copy_vector(A_.row(), m->a_row);
     copy_vector(H_.colind(), m->h_colind);
     copy_vector(H_.row(), m->h_row);
+
+    copy_vector(sm.map_Q.sparsity().colind(), m->socp_colind);
+    copy_vector(sm.map_Q.sparsity().row(), m->socp_row);
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
@@ -280,12 +298,18 @@ namespace casadi {
   inline std::string return_status_string(int status) {
     switch (status) {
     case CPX_STAT_OPTIMAL:
+    case CPXMIP_OPTIMAL:
       return "Optimal solution found";
+    case CPXMIP_OPTIMAL_TOL:
+      return "Optimal solution within tolerance found";
     case CPX_STAT_UNBOUNDED:
+    case CPXMIP_UNBOUNDED:
       return "Model is unbounded";
     case CPX_STAT_INForUNBD:
+    case CPXMIP_INForUNBD:
       return "Model is infeasible or unbounded";
     case CPX_STAT_OPTIMAL_INFEAS:
+    case CPXMIP_OPTIMAL_INFEAS:
       return "Optimal solution is available but with infeasibilities";
     case CPX_STAT_NUM_BEST:
       return "Solution available, but not proved optimal due to numeric difficulties";
@@ -293,13 +317,15 @@ namespace casadi {
       return "Solution satisfies first-order optimality conditions, "
              "but is not necessarily globally optimal";
     default:
-      return "unknown";
+      return "unknown status: " + std::to_string(status);
     }
   }
 
   int CplexInterface::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    Conic::eval(arg, res, iw, w, mem);
     auto m = static_cast<CplexMemory*>(mem);
+    const SDPToSOCPMem& sm = sdp_to_socp_mem_;
 
     // Statistics
     for (auto&& s : m->fstats) s.second.reset();
@@ -307,12 +333,7 @@ namespace casadi {
     m->fstats.at("preprocessing").tic();
 
     // Problem has not been solved at this point
-    m->success = false;
     m->return_status = -1;
-
-    if (inputs_check_) {
-      check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
-    }
 
     // Get inputs
     double* g=w; w += nx_;
@@ -380,12 +401,84 @@ namespace casadi {
       casadi_error("CPXXcopylp failed");
     }
 
-    // Preparing coefficient matrix Q
-    const CPXNNZ* qmatbeg = get_ptr(m->h_colind);
-    const CPXDIM* qmatind = get_ptr(m->h_row);
-    const double* qmatval = H;
-    if (CPXXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
+    if (nnz_in(CONIC_H) > 0) {
+      // Preparing coefficient matrix Q
+      const CPXNNZ* qmatbeg = get_ptr(m->h_colind);
+      const CPXDIM* qmatind = get_ptr(m->h_row);
+      const double* qmatval = H;
+      if (CPXXcopyquad(m->env, m->lp, qmatbeg, get_ptr(m->qmatcnt), qmatind, qmatval)) {
+        casadi_error("CPXXcopyquad failed");
+      }
     }
+
+    // =================
+    // BEGIN SOCP BLOCK
+    // =================
+
+    // Prepare lower bounds for helper variables for SOCP
+    casadi_int j=0;
+    for (casadi_int i=0;i<sm.r.size()-1;++i) {
+      for (casadi_int k=0;k<sm.r[i+1]-sm.r[i]-1;++k) {
+        m->socp_lbx[j++] = -inf;
+      }
+      m->socp_lbx[j++] = 0;
+    }
+
+    // Add helper variables for SOCP
+    if (CPXXnewcols(m->env, m->lp, sm.r.back(), nullptr,
+        get_ptr(m->socp_lbx), nullptr, nullptr, nullptr)) {
+      casadi_error("CPXXnewcols failed");
+    }
+
+    // SOCP helper constraints
+    const Sparsity& sp = sm.map_Q.sparsity();
+    const casadi_int* colind = sp.colind();
+    const casadi_int* row = sp.row();
+    const casadi_int* data = sm.map_Q.ptr();
+
+    const double* p = arg[CONIC_P];
+    const double* q = arg[CONIC_Q];
+
+    casadi_int numnz = 0;
+    // Loop over columns
+    for (casadi_int i=0; i<sp.size2(); ++i) {
+      m->socp_lbound[i] = sm.map_P[i]==-1 ? 0 : -p[sm.map_P[i]];
+      // Loop over rows
+      for (casadi_int k=colind[i]; k<colind[i+1]; ++k) {
+        casadi_int j = row[k];
+        m->socp_lval[numnz] = (q && j<nx_) ? q[data[k]] : -1;
+        numnz++;
+      }
+    }
+
+    // Adding SOCP helper constraints
+    if (CPXXaddrows(m->env, m->lp, 0, sp.size2(), sp.nnz(), get_ptr(m->socp_lbound), nullptr,
+                    get_ptr(m->socp_colind), get_ptr(m->socp_row), get_ptr(m->socp_lval),
+                    nullptr, nullptr)) {
+      casadi_error("CPXXaddrows failed");
+    }
+
+    // Loop over blocks
+    for (casadi_int i=0; i<sm.r.size()-1; ++i) {
+      casadi_int block_size = sm.r[i+1]-sm.r[i];
+
+      // Indicate x'x - y^2 <= 0
+      for (casadi_int j=0;j<block_size;++j) {
+        m->socp_qind[j] = nx_ + sm.r[i] + j;
+        m->socp_qval[j] = j<block_size-1 ? 1 : -1;
+      }
+
+      if (CPXXaddqconstr(m->env, m->lp, 0, block_size,
+                          0, 'L', nullptr, nullptr,
+                          get_ptr(m->socp_qind), get_ptr(m->socp_qind), get_ptr(m->socp_qval),
+                          nullptr)) {
+        casadi_error("CPXXaddqconstr failed");
+      }
+    }
+
+    // =================
+    // END SOCP BLOCK
+    // =================
 
     if (dump_to_file_) {
       CPXXwriteprob(m->env, m->lp, dump_filename_.c_str(), "LP");
@@ -497,7 +590,10 @@ namespace casadi {
     casadi_scal(nx_, -1., lam_x);
 
     m->return_status = CPXXgetstat(m->env, m->lp);
-    m->success = m->return_status==CPX_STAT_OPTIMAL || m->return_status==CPX_STAT_FIRSTORDER;
+    m->success  = m->return_status==CPX_STAT_OPTIMAL;
+    m->success |= m->return_status==CPX_STAT_FIRSTORDER;
+    m->success |= m->return_status==CPXMIP_OPTIMAL;
+    m->success |= m->return_status==CPXMIP_OPTIMAL_TOL;
 
     if (verbose_) casadi_message("CPLEX return status: " + return_status_string(m->return_status));
 
@@ -527,7 +623,6 @@ namespace casadi {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<CplexMemory*>(mem);
     stats["return_status"] = return_status_string(m->return_status);
-    stats["success"] = m->success;
     return stats;
   }
 
@@ -564,6 +659,32 @@ namespace casadi {
     }
   }
 
+  CplexInterface::CplexInterface(DeserializingStream& s) : Conic(s) {
+    s.version("CplexInterface", 1);
+    s.unpack("CplexInterface::opts", opts_);
+    s.unpack("CplexInterface::qp_method", qp_method_);
+    s.unpack("CplexInterface::dump_to_file", dump_to_file_);
+    s.unpack("CplexInterface::tol", tol_);
+    s.unpack("CplexInterface::dep_check", dep_check_);
+    s.unpack("CplexInterface::warm_start", warm_start_);
+    s.unpack("CplexInterface::mip", mip_);
+    s.unpack("CplexInterface::ctype", ctype_);
+    Conic::deserialize(s, sdp_to_socp_mem_);
+  }
 
+  void CplexInterface::serialize_body(SerializingStream &s) const {
+    Conic::serialize_body(s);
+
+    s.version("CplexInterface", 1);
+    s.pack("CplexInterface::opts", opts_);
+    s.pack("CplexInterface::qp_method", qp_method_);
+    s.pack("CplexInterface::dump_to_file", dump_to_file_);
+    s.pack("CplexInterface::tol", tol_);
+    s.pack("CplexInterface::dep_check", dep_check_);
+    s.pack("CplexInterface::warm_start", warm_start_);
+    s.pack("CplexInterface::mip", mip_);
+    s.pack("CplexInterface::ctype", ctype_);
+    Conic::serialize(s, sdp_to_socp_mem_);
+  }
 
 } // end namespace casadi

@@ -441,6 +441,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType SparsityInterface<MatType>::repmat(const MatType& x, casadi_int n, casadi_int m) {
+    if (n==1 && m==1) return x;
     MatType allrows = vertcat(std::vector<MatType>(n, x));
     if (n==0) allrows = MatType(0, x.size2());
     MatType ret = horzcat(std::vector<MatType>(m, allrows));
@@ -529,7 +530,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType SparsityInterface<MatType>::mtimes(const std::vector<MatType> &args) {
-    casadi_assert(args.size()>=1,
+    casadi_assert(!args.empty(),
                           "mul(std::vector<MatType> &args): "
                           "supplied list must not be empty.");
     MatType ret = args[0];

@@ -26,6 +26,7 @@
 #include "generic_type_internal.hpp"
 #include "casadi_misc.hpp"
 #include "exception.hpp"
+#include "serializing_stream.hpp"
 #include <cmath>
 
 #include "function.hpp"
@@ -147,12 +148,12 @@ namespace casadi {
   }
 
   bool GenericType::is_empty_vector() const {
-    return (is_int_vector() && to_int_vector().size()==0) ||
-      (is_int_vector_vector() && to_int_vector_vector().size()==0) ||
-      (is_double_vector_vector() && to_double_vector_vector().size()==0) ||
-      (is_double_vector() && to_double_vector().size()==0) ||
-      (is_string_vector() && to_string_vector().size()==0) ||
-      (is_bool_vector() && to_bool_vector().size()==0);
+    return (is_int_vector() && to_int_vector().empty()) ||
+      (is_int_vector_vector() && to_int_vector_vector().empty()) ||
+      (is_double_vector_vector() && to_double_vector_vector().empty()) ||
+      (is_double_vector() && to_double_vector().empty()) ||
+      (is_string_vector() && to_string_vector().empty()) ||
+      (is_bool_vector() && to_bool_vector().empty());
   }
 
   bool GenericType::is_int_vector() const {
@@ -450,7 +451,7 @@ namespace casadi {
 
   bool GenericType::operator!=(const GenericType& op2) const {
     if (is_string() && op2.is_string()) {
-      return to_string().compare(op2.to_string()) != 0;
+      return to_string() != op2.to_string();
     }
 
     if (is_int() && op2.is_int()) {
@@ -530,4 +531,65 @@ namespace casadi {
     }
   }
 
+  void GenericType::serialize(SerializingStream& s) const {
+    s.pack("GenericType::type", static_cast<int>(getType()));
+    static_cast<const GenericTypeBase*>(get())->serialize(s);
+  }
+
+  GenericType GenericType::deserialize(DeserializingStream& s) {
+    int itype;
+    s.unpack("GenericType::type", itype);
+    TypeID type = static_cast<TypeID>(itype);
+    switch (type) {
+      case OT_STRING:
+        return StringType::deserialize(s);
+      case OT_DOUBLE:
+        return DoubleType::deserialize(s);
+      case OT_INT:
+        return IntType::deserialize(s);
+      case OT_BOOL:
+        return BoolType::deserialize(s);
+      case OT_DOUBLEVECTOR:
+        return DoubleVectorType::deserialize(s);
+      case OT_DOUBLEVECTORVECTOR:
+        return DoubleVectorVectorType::deserialize(s);
+      case OT_INTVECTOR:
+        return IntVectorType::deserialize(s);
+      case OT_INTVECTORVECTOR:
+        return IntVectorVectorType::deserialize(s);
+      case OT_STRINGVECTOR:
+        return StringVectorType::deserialize(s);
+      case OT_FUNCTION:
+        return FunctionType::deserialize(s);
+      case OT_FUNCTIONVECTOR:
+        return FunctionVectorType::deserialize(s);
+      case OT_DICT:
+        return DictType::deserialize(s);
+      default:
+        casadi_error("Not implemented");
+    }
+  }
+
+  GenericType GenericType::create(SharedObjectInternal* node) {
+    GenericType ret;
+    ret.own(node);
+    return ret;
+  }
+
+
+  typedef GenericTypeInternal<OT_STRING, std::string> StringType;
+  typedef GenericTypeInternal<OT_DOUBLE, double> DoubleType;
+  typedef GenericTypeInternal<OT_INT, casadi_int> IntType;
+  typedef GenericTypeInternal<OT_BOOL, bool> BoolType;
+  typedef GenericTypeInternal<OT_DOUBLEVECTOR, std::vector<double> > DoubleVectorType;
+  typedef GenericTypeInternal<OT_DOUBLEVECTORVECTOR,
+                              std::vector< std::vector<double> > > DoubleVectorVectorType;
+  typedef GenericTypeInternal<OT_INTVECTOR, std::vector<casadi_int> > IntVectorType;
+  typedef GenericTypeInternal<OT_INTVECTORVECTOR,
+                              std::vector< std::vector<casadi_int> > > IntVectorVectorType;
+  typedef GenericTypeInternal<OT_STRINGVECTOR, std::vector<std::string> > StringVectorType;
+  typedef GenericTypeInternal<OT_FUNCTION, Function> FunctionType;
+  typedef GenericTypeInternal<OT_FUNCTIONVECTOR, std::vector<Function> > FunctionVectorType;
+  typedef GenericTypeInternal<OT_DICT, Dict> DictType;
+  typedef GenericTypeInternal<OT_VOIDPTR, void*> VoidPointerType;
 } // namespace casadi

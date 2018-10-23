@@ -54,7 +54,6 @@ class MyCallback(Callback):
     self.np = np
 
     figure(1)
-    subplot(111)
 
     x_,y_ = mgrid[-1:1.5:0.01,-1:1.5:0.01]
     z_ = DM.zeros(x_.shape)
@@ -96,10 +95,10 @@ class MyCallback(Callback):
     sol = darg['x']
     self.x_sols.append(float(sol[0]))
     self.y_sols.append(float(sol[1]))
-    subplot(111)
     if hasattr(self,'lines'):
-      self.lines[0].set_xdata(self.x_sols)
-      self.lines[0].set_ydata(self.y_sols)
+      if "template" not in matplotlib.get_backend(): # Broken for template: https://github.com/matplotlib/matplotlib/issues/8516/
+        self.lines[0].set_xdata(self.x_sols)
+        self.lines[0].set_ydata(self.y_sols)
     else:
       self.lines = plot(self.x_sols,self.y_sols,'or-')
 

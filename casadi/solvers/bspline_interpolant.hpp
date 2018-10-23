@@ -102,7 +102,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -119,8 +119,16 @@ namespace casadi {
     FittingAlgorithm algorithm_;
     double smooth_linear_frac_;
 
-    static std::vector<double> greville_points(const std::vector<double>& x, casadi_int degree);
+    static std::vector<double> greville_points(const std::vector<double>& x, casadi_int deg);
 
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new BSplineInterpolant(s); }
+
+  protected:
+     /** \brief Deserializing constructor */
+    explicit BSplineInterpolant(DeserializingStream& s);
   };
 
 

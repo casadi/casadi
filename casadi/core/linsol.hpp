@@ -66,8 +66,17 @@ namespace casadi {
     LinsolInternal* operator->();
     const LinsolInternal* operator->() const;
 
+#ifndef SWIG
     /// Check if a particular cast is allowed
     static bool test_cast(const SharedObjectInternal* ptr);
+#endif //SWIG
+
+    /// \cond INTERNAL
+#ifndef SWIG
+    /** \brief  Create from node */
+    static Linsol create(LinsolInternal* node);
+#endif // SWIG
+    /// \endcond
 
     /// Check if a plugin is available
     static bool has_plugin(const std::string& name);
@@ -121,6 +130,12 @@ namespace casadi {
 
     /// Release a memory object
     void release(casadi_int mem) const;
+
+    /** \brief Serialize an object */
+    void serialize(SerializingStream &s) const;
+
+    /** \brief Deserialize with type disambiguation */
+    static Linsol deserialize(DeserializingStream& s);
 
     #endif // SWIG
   };

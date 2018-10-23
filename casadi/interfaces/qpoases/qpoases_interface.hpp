@@ -76,7 +76,6 @@ namespace casadi {
     std::vector<double> nz;
 
     int return_status;
-    bool success;
 
     /// Constructor
     QpoasesMemory();
@@ -120,7 +119,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -160,7 +159,16 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new QpoasesInterface(s); }
+
   protected:
+    /** \brief Deserializing constructor */
+    explicit QpoasesInterface(DeserializingStream& s);
 
     ///@{
     /// Convert between qpOASES types and standard types

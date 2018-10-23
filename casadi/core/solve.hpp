@@ -99,6 +99,17 @@ namespace casadi {
 
     /// Linear Solver (may be shared between multiple nodes)
     Linsol linsol_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static MXNode* deserialize(DeserializingStream& s);
+
+    /** \brief Deserializing constructor */
+    explicit Solve(DeserializingStream& s);
   };
 
 

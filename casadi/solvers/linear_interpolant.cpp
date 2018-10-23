@@ -36,6 +36,7 @@ namespace casadi {
     plugin->doc = LinearInterpolant::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &LinearInterpolant::options_;
+    plugin->deserialize = &LinearInterpolant::deserialize;
     return 0;
   }
 
@@ -44,7 +45,7 @@ namespace casadi {
     Interpolant::registerPlugin(casadi_register_interpolant_linear);
   }
 
-  Options LinearInterpolant::options_
+  const Options LinearInterpolant::options_
   = {{&Interpolant::options_},
      {{"lookup_mode",
        {OT_STRINGVECTOR,
@@ -144,6 +145,42 @@ namespace casadi {
     g << "  " << g.interpn_grad("res[0]", m->ndim_,
       g.constant(m->grid_), g.constant(m->offset_), g.constant(m->values_),
       "arg[0]", g.constant(m->lookup_mode_), m->m_, "iw", "w") << "\n";
+  }
+
+
+  LinearInterpolant::LinearInterpolant(DeserializingStream& s) : Interpolant(s) {
+    s.unpack("LinearInterpolant::lookup_mode", lookup_mode_);
+  }
+
+  ProtoFunction* LinearInterpolant::deserialize(DeserializingStream& s) {
+    s.version("LinearInterpolant", 1);
+    char type;
+    s.unpack("LinearInterpolant::type", type);
+    switch (type) {
+      case 'f': return new LinearInterpolant(s);
+      case 'j': return new LinearInterpolantJac(s);
+      default:
+        casadi_error("LinearInterpolant::deserialize error");
+    }
+  }
+
+  void LinearInterpolant::serialize_body(SerializingStream &s) const {
+    Interpolant::serialize_body(s);
+    s.pack("LinearInterpolant::lookup_mode", lookup_mode_);
+  }
+
+  void LinearInterpolant::serialize_type(SerializingStream &s) const {
+    Interpolant::serialize_type(s);
+    s.version("LinearInterpolant", 1);
+    s.pack("LinearInterpolant::type", 'f');
+  }
+
+  void LinearInterpolantJac::serialize_type(SerializingStream &s) const {
+    FunctionInternal::serialize_type(s);
+    auto m = derivative_of_.get<LinearInterpolant>();
+    m->PluginInterface<Interpolant>::serialize_type(s);
+    s.version("LinearInterpolant", 1);
+    s.pack("LinearInterpolant::type", 'j');
   }
 
 } // namespace casadi

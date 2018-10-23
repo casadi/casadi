@@ -57,7 +57,7 @@ class CASADI_EXPORT OptiNode :
 public:
 
   /// Create Opti Context
-  OptiNode();
+  OptiNode(const std::string& problem_type);
 
   /// Destructor
   ~OptiNode();
@@ -97,7 +97,7 @@ public:
   /// @}
 
   /// Crunch the numbers; solve the problem
-  OptiSol solve();
+  OptiSol solve(bool accept_limit);
 
   /// @{
   /// Obtain value of expression at the current value
@@ -117,7 +117,7 @@ public:
   /// Get return status of solver
   std::string return_status() const;
   /// Did the solver return successfully?
-  bool return_success() const;
+  bool return_success(bool accept_limit) const;
 
   /// Get the underlying CasADi solver of the Opti stack
   Function casadi_solver() const;
@@ -261,7 +261,7 @@ public:
 
   casadi_int instance_number() const;
 
-  static OptiNode* create();
+  static OptiNode* create(const std::string& problem_type);
 
   bool problem_dirty_;
   void mark_problem_dirty(bool flag=true) { problem_dirty_=flag; mark_solver_dirty(); }
@@ -363,6 +363,9 @@ private:
 
   /// Objective verbatim as passed in with 'minimize'
   MX f_;
+
+  /// Problem type
+  std::string problem_type_;
 
   null_ptr_on_copy<OptiCallback> user_callback_;
   Function callback_;

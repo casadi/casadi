@@ -76,12 +76,18 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
     /** \brief  Initialize */
     void init(const Dict& opts) override;
+
+    /** Helper for a more powerful 'integrator' factory */
+    virtual Function create_advanced(const Dict& opts);
+
+    virtual MX algebraic_state_init(const MX& x0, const MX& z0) const { return z0; }
+    virtual MX algebraic_state_output(const MX& Z) const { return Z; }
 
     /** \brief Reset the forward problem */
     virtual void reset(IntegratorMemory* mem, double t,
@@ -218,6 +224,22 @@ namespace casadi {
     template<typename XType>
       static Function map2oracle(const std::string& name,
         const std::map<std::string, XType>& d, const Dict& opts=Dict());
+
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s);
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "Integrator"; }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Integrator(DeserializingStream& s);
   };
 
   struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
@@ -251,12 +273,15 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
     /// Initialize stage
     void init(const Dict& opts) override;
+
+    /** Helper for a more powerful 'integrator' factory */
+    Function create_advanced(const Dict& opts) override;
 
     /** \brief Create memory block */
     void* alloc_mem() const override { return new FixedStepMemory();}
@@ -303,6 +328,13 @@ namespace casadi {
 
     /// Number of algebraic variables for the discrete time integration
     casadi_int nZ_, nRZ_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit FixedStepIntegrator(DeserializingStream& s);
   };
 
   class CASADI_EXPORT ImplicitFixedStepIntegrator : public FixedStepIntegrator {
@@ -316,7 +348,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -331,6 +363,13 @@ namespace casadi {
 
     // Implicit function solver
     Function rootfinder_, backward_rootfinder_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit ImplicitFixedStepIntegrator(DeserializingStream& s);
   };
 
 } // namespace casadi

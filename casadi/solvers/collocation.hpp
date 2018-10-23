@@ -76,7 +76,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -97,6 +97,9 @@ namespace casadi {
     void resetB(IntegratorMemory* mem, double t, const double* rx,
                         const double* rz, const double* rp) const override;
 
+    MX algebraic_state_init(const MX& x0, const MX& z0) const override;
+    MX algebraic_state_output(const MX& Z) const override;
+
     // Interpolation order
     casadi_int deg_;
 
@@ -108,6 +111,15 @@ namespace casadi {
 
     /// Continuous time dynamics
     Function f_, g_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Collocation(s); }
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Collocation(DeserializingStream& s);
   };
 
 } // namespace casadi

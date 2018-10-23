@@ -97,4 +97,24 @@ namespace casadi {
     return (*this)->body(symname);
   }
 
+  void Importer::serialize(SerializingStream &s) const {
+    return (*this)->serialize(s);
+  }
+
+  Importer Importer::deserialize(DeserializingStream& s) {
+    return Importer::create(ImporterInternal::deserialize(s));
+  }
+
+  Importer Importer::create(ImporterInternal* node) {
+    Importer ret;
+    ret.own(node);
+    return ret;
+  }
+
+  Importer Importer::create(ImporterInternal* node, const Dict& opts) {
+    Importer ret = create(node);
+    ret->construct(opts);
+    return ret;
+  }
+
 } // namespace casadi

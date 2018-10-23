@@ -79,6 +79,8 @@ private:
 
   CASADI_EXPORT std::string join(const std::vector<std::string>& l, const std::string& delim=",");
 
+  /// Checsks if s starts with p
+  CASADI_EXPORT bool startswith(const std::string& s, const std::string& p);
   /**  \brief Range function
   * \param stop
   *
@@ -176,13 +178,13 @@ private:
   Apply a function f to each element in a vector
   */
   template<class T>
-  std::vector<T> applymap(T (*f)(const T&), const std::vector<T>&);
+  std::vector<T> applymap(T (*f)(const T&), const std::vector<T>& comp);
 
   /**
   Apply a function f to each element in a vector
   */
   template<class T>
-  void applymap(void (*f)(T&), std::vector<T>&);
+  void applymap(void (*f)(T&), std::vector<T>& comp);
 #endif // SWIG
   /// \endcond
 
@@ -447,7 +449,7 @@ namespace casadi {
 
   template<typename T>
   bool in_range(const std::vector<T> &v, casadi_int lower, casadi_int upper) {
-    if (v.size()==0) return true;
+    if (v.empty()) return true;
     casadi_int max = *std::max_element(v.begin(), v.end());
     if (max >= upper) return false;
     casadi_int min = *std::min_element(v.begin(), v.end());
@@ -462,7 +464,7 @@ namespace casadi {
 
   template<typename T>
   bool is_increasing(const std::vector<T> &v) {
-    if (v.size()==0) return true;
+    if (v.empty()) return true;
     T el = v[0];
     for (casadi_int i=1;i<v.size();++i) {
       if (!(v[i] > el)) return false;
@@ -473,7 +475,7 @@ namespace casadi {
 
   template<typename T>
   bool is_decreasing(const std::vector<T> &v) {
-    if (v.size()==0) return true;
+    if (v.empty()) return true;
     T el = v[0];
     for (casadi_int i=1;i<v.size();++i) {
       if (!(v[i] < el)) return false;
@@ -484,7 +486,7 @@ namespace casadi {
 
   template<typename T>
   bool is_nonincreasing(const std::vector<T> &v) {
-    if (v.size()==0) return true;
+    if (v.empty()) return true;
     T el = v[0];
     for (casadi_int i=1;i<v.size();++i) {
       if (!(v[i] <= el)) return false;
@@ -495,7 +497,7 @@ namespace casadi {
 
   template<typename T>
   bool is_nondecreasing(const std::vector<T> &v) {
-    if (v.size()==0) return true;
+    if (v.empty()) return true;
     T el = v[0];
     for (casadi_int i=1;i<v.size();++i) {
       if (!(v[i] >= el)) return false;
@@ -546,7 +548,7 @@ namespace casadi {
         stream.clear();
         std::string s;
         stream >> s;
-        if (s.compare("inf") == 0)
+        if (s=="inf")
           val = std::numeric_limits<T>::infinity();
         else
           break;
@@ -570,7 +572,7 @@ namespace casadi {
           reader.clear();
           std::string s;
           reader >> s;
-          if (s.compare("inf") == 0)
+          if (s=="inf")
             val = std::numeric_limits<T>::infinity();
           else
             break;

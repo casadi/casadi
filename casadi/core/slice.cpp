@@ -25,6 +25,7 @@
 
 #include "slice.hpp"
 #include "casadi_misc.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 namespace casadi {
@@ -116,7 +117,7 @@ namespace casadi {
   Slice CASADI_EXPORT to_slice(const std::vector<casadi_int>& v, bool ind1) {
     Slice r;
     casadi_assert(is_slice(v, ind1), "Cannot be represented as a Slice");
-    if (v.size()==0) {
+    if (v.empty()) {
       r.start=r.stop=0;
       r.step = 1;
     } else if (v.size()==1) {
@@ -210,7 +211,7 @@ namespace casadi {
     }
 
     // False if there are still elements not accounted for
-    if (it!=v.end()) return false;
+    if (it!=v.end()) return false; // NOLINT
 
     // True if reached this point
     return true;
@@ -250,6 +251,21 @@ namespace casadi {
       else              outer.stop--;
     } while (outer.stop % outer.step!=0);
     return make_pair(inner, outer);
+  }
+
+
+  void Slice::serialize(SerializingStream& s) const {
+    s.pack("Slice::start", start);
+    s.pack("Slice::stop", stop);
+    s.pack("Slice::step", step);
+  }
+
+  Slice Slice::deserialize(DeserializingStream& s) {
+    casadi_int start, stop, step;
+    s.unpack("Slice::start", start);
+    s.unpack("Slice::stop", stop);
+    s.unpack("Slice::step", step);
+    return Slice(start, stop, step);
   }
 
 } // namespace casadi

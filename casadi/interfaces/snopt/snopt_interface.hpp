@@ -27,6 +27,8 @@
 #define CASADI_SNOPT_INTERFACE_HPP
 
 #include "casadi/core/nlpsol_impl.hpp"
+#include "casadi/core/im.hpp"
+
 #include "casadi/interfaces/snopt/casadi_nlpsol_snopt_export.h"
 extern "C" {
 #include "snopt_cwrap.h" // NOLINT(build/include)
@@ -82,12 +84,7 @@ namespace casadi {
   class CASADI_NLPSOL_SNOPT_EXPORT SnoptInterface : public Nlpsol {
   public:
     // NLP functions
-    Function f_fcn_;
-    Function g_fcn_;
-    Function jac_g_fcn_;
-    Function jac_f_fcn_;
-    Function gf_jg_fcn_;
-    Function hess_l_fcn_;
+    Sparsity jacf_sp_;
     Sparsity jacg_sp_;
 
     // Constructor
@@ -109,7 +106,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -145,7 +142,7 @@ namespace casadi {
     std::string formatSecondaryStatus(int status) const;
 
     void userfun(SnoptMemory* m, int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
-                 double* x, double* fObj, double*gObj, double* fCon, double* gCon,
+                 const double* x, double* fObj, double*gObj, double* fCon, double* gCon,
                  int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru) const;
 
     casadi_int nnJac_;
@@ -157,10 +154,10 @@ namespace casadi {
     casadi_int m_;
     casadi_int iObj_;
 
-    static void userfunPtr(int * mode, int* nnObj, int * nnCon, int *nJac, int *nnL, int * neJac,
-                           double *x, double *fObj, double *gObj, double * fCon, double* gCon,
-                           int* nState, char* cu, int* lencu, int* iu, int* leniu,
-                           double* ru, int *lenru);
+    static void userfunPtr(int * mode, int* nnObj, int * nnCon, int *nJac, int *nnL, int * neJac, // NOLINT
+                           double *x, double *fObj, double *gObj, double * fCon, double* gCon, // NOLINT
+                           int* nState, char* cu, int* lencu, int* iu, int* leniu, // NOLINT
+                           double* ru, int *lenru); // NOLINT
 
     // Matrix A has a linear objective row
     bool jacF_row_;
@@ -174,6 +171,17 @@ namespace casadi {
     casadi_int Cold_;
 
     double inf_;
+
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new SnoptInterface(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit SnoptInterface(DeserializingStream& s);
 
   private:
       // options

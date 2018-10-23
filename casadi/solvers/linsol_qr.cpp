@@ -37,6 +37,7 @@ namespace casadi {
     plugin->doc = LinsolQr::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &LinsolQr::options_;
+    plugin->deserialize = &LinsolQr::deserialize;
     return 0;
   }
 
@@ -53,9 +54,25 @@ namespace casadi {
     clear_mem();
   }
 
+  const Options LinsolQr::options_
+  = {{&LinsolInternal::options_},
+     {{"eps",
+       {OT_DOUBLE,
+        "Minimum R entry before singularity is declared [1e-12]"}}
+     }
+  };
+
   void LinsolQr::init(const Dict& opts) {
     // Call the init method of the base class
     LinsolInternal::init(opts);
+
+    // Read options
+    eps_ = 1e-12;
+    for (auto&& op : opts) {
+      if (op.first=="eps") {
+        eps_ = op.second;
+      }
+    }
 
     // Symbolic factorization
     sp_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
@@ -82,7 +99,23 @@ namespace casadi {
     casadi_qr(sp_, A, get_ptr(m->w),
               sp_v_, get_ptr(m->v), sp_r_, get_ptr(m->r),
               get_ptr(m->beta), get_ptr(prinv_), get_ptr(pc_));
-    return 0;
+    // Check singularity
+    double rmin;
+    casadi_int irmin, nullity;
+    nullity = casadi_qr_singular(&rmin, &irmin, get_ptr(m->r), sp_r_, get_ptr(pc_), eps_);
+    if (nullity) {
+      if (verbose_) {
+        print("Singularity detected: Rank %lld<%lld\n", ncol()-nullity, ncol());
+        print("First singular R entry: %g<%g, corresponding to row %lld\n", rmin, eps_, irmin);
+        casadi_qr_colcomb(get_ptr(m->w), get_ptr(m->r), sp_r_, get_ptr(pc_), eps_, 0);
+        print("Linear combination of columns:\n[");
+        for (casadi_int k=0; k<ncol(); ++k) print(k==0 ? "%g" : ", %g", m->w[k]);
+        print("]\n");
+      }
+      return 1;
+    } else {
+      return 0;
+    }
   }
 
   int LinsolQr::solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const {
@@ -118,6 +151,25 @@ namespace casadi {
 
     // End of block
     g << "}\n";
+  }
+
+  LinsolQr::LinsolQr(DeserializingStream& s) : LinsolInternal(s) {
+    s.version("LinsolQr", 1);
+    s.unpack("LinsolQr::prinv", prinv_);
+    s.unpack("LinsolQr::pc", pc_);
+    s.unpack("LinsolQr::sp_v", sp_v_);
+    s.unpack("LinsolQr::sp_r", sp_r_);
+    s.unpack("LinsolQr::eps", eps_);
+  }
+
+  void LinsolQr::serialize_body(SerializingStream &s) const {
+    LinsolInternal::serialize_body(s);
+    s.version("LinsolQr", 1);
+    s.pack("LinsolQr::prinv", prinv_);
+    s.pack("LinsolQr::pc", pc_);
+    s.pack("LinsolQr::sp_v", sp_v_);
+    s.pack("LinsolQr::sp_r", sp_r_);
+    s.pack("LinsolQr::eps", eps_);
   }
 
 } // namespace casadi

@@ -54,7 +54,7 @@ namespace casadi {
     Dple::registerPlugin(casadi_register_dple_slicot);
   }
 
-  Options SlicotDple::options_
+  const Options SlicotDple::options_
   = {{&Dple::options_},
      {{"linear_solver",
        {OT_STRING,
@@ -191,7 +191,7 @@ namespace casadi {
     // Solver complexity:  K
     m->dpse_solvers.resize(3);
     for (casadi_int i=0;i<3;++i) {
-      casadi_int np = std::pow(2, i);
+      casadi_int np = std::pow(2, i); // NOLINT
 
       Sparsity sp = Sparsity::dense(np, np);
       if (K_>1)

@@ -63,7 +63,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -82,11 +82,16 @@ namespace casadi {
     /// Get a function pointer for numerical evaluation
     signal_t get_function(const std::string& symname) override;
   protected:
+    std::string base_name_;
+
     /// Temporary file
     std::string bin_name_;
 
     /// Temporary file
     std::string obj_name_;
+
+    /// Extra files
+    std::vector<std::string> extra_suffixes_;
 
     /// Cleanup temporary files when unloading
     bool cleanup_;

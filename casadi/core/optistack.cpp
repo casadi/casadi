@@ -46,8 +46,8 @@ const OptiNode* Opti::operator->() const {
 }
 
 
-Opti::Opti() {
-  own(OptiNode::create());
+Opti::Opti(const std::string& problem_type) {
+  own(OptiNode::create(problem_type));
 }
 
 MX Opti::variable(casadi_int n, casadi_int m, const std::string& attribute) {
@@ -154,7 +154,15 @@ void Opti::set_value(const std::vector<MX>& assignments) {
 
 OptiSol Opti::solve() {
   try {
-    return (*this)->solve();
+    return (*this)->solve(false);
+  } catch (exception& e) {
+    THROW_ERROR("solve", e.what());
+  }
+}
+
+OptiSol Opti::solve_limited() {
+  try {
+    return (*this)->solve(true);
   } catch (exception& e) {
     THROW_ERROR("solve", e.what());
   }

@@ -37,6 +37,7 @@ namespace casadi {
     plugin->doc = QpToNlp::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &QpToNlp::options_;
+    plugin->deserialize = &QpToNlp::deserialize;
     return 0;
   }
 
@@ -50,9 +51,10 @@ namespace casadi {
   }
 
   QpToNlp::~QpToNlp() {
+    clear_mem();
   }
 
-  Options QpToNlp::options_
+  const Options QpToNlp::options_
   = {{&Conic::options_},
      {{"nlpsol",
        {OT_STRING,
@@ -191,6 +193,18 @@ namespace casadi {
     stats["success"] = solver_stats["success"];
 
     return stats;
+  }
+
+  QpToNlp::QpToNlp(DeserializingStream& s) : Conic(s) {
+    s.version("QpToNlp", 1);
+    s.unpack("QpToNlp::solver", solver_);
+  }
+
+  void QpToNlp::serialize_body(SerializingStream &s) const {
+    Conic::serialize_body(s);
+
+    s.version("QpToNlp", 1);
+    s.pack("QpToNlp::solver", solver_);
   }
 
 } // namespace casadi

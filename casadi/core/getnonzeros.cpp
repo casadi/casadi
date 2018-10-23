@@ -25,6 +25,7 @@
 
 #include "getnonzeros.hpp"
 #include "casadi_misc.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -32,7 +33,7 @@ namespace casadi {
 
   MX GetNonzeros::create(const Sparsity& sp, const MX& x, const std::vector<casadi_int>& nz) {
     // No elements at all
-    if (nz.size()==0) return MX::zeros(sp);
+    if (nz.empty()) return MX::zeros(sp);
     // Simplify to slice
     if (is_slice(nz)) return create(sp, x, to_slice(nz));
     // Simplify to slice2
@@ -273,7 +274,7 @@ namespace casadi {
     for (casadi_int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1];
 
     // Create a sparsity pattern from vectors
-    if (r_nz.size()==0) {
+    if (r_nz.empty()) {
       res[0] = MX(osp.size());
     } else {
       Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);
@@ -314,7 +315,7 @@ namespace casadi {
       MX& res = fsens[d][0];
 
       if (arg.sparsity()==isp) { // Matching sparsity
-        if (nz.size()==0) {
+        if (nz.empty()) {
           res = MX(osp.size());
         } else {
           res = arg->get_nzref(osp, nz);
@@ -365,7 +366,7 @@ namespace casadi {
         for (casadi_int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1];
 
         // Create a sparsity pattern from vectors
-        if (r_nz.size()==0) {
+        if (r_nz.empty()) {
           res = MX(osp.size());
         } else {
           Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);
@@ -574,5 +575,59 @@ namespace casadi {
     return true;
   }
 
+  void GetNonzerosVector::serialize_body(SerializingStream& s) const {
+    GetNonzeros::serialize_body(s);
+    s.pack("GetNonzerosVector::nonzeros", nz_);
+  }
+
+  void GetNonzerosVector::serialize_type(SerializingStream& s) const {
+    GetNonzeros::serialize_type(s);
+    s.pack("GetNonzeros::type", 'a');
+  }
+
+  GetNonzerosVector::GetNonzerosVector(DeserializingStream& s) : GetNonzeros(s) {
+    s.unpack("GetNonzerosVector::nonzeros", nz_);
+  }
+
+  void GetNonzerosSlice::serialize_body(SerializingStream& s) const {
+    GetNonzeros::serialize_body(s);
+    s.pack("GetNonzerosSlice::slice", s_);
+  }
+
+  void GetNonzerosSlice::serialize_type(SerializingStream& s) const {
+    GetNonzeros::serialize_type(s);
+    s.pack("GetNonzeros::type", 'b');
+  }
+
+  GetNonzerosSlice::GetNonzerosSlice(DeserializingStream& s) : GetNonzeros(s) {
+    s.unpack("GetNonzerosSlice::slice", s_);
+  }
+
+  void GetNonzerosSlice2::serialize_body(SerializingStream& s) const {
+    GetNonzeros::serialize_body(s);
+    s.pack("GetNonzerosSlice2::inner", inner_);
+    s.pack("GetNonzerosSlice2::outer", outer_);
+  }
+
+  void GetNonzerosSlice2::serialize_type(SerializingStream& s) const {
+    GetNonzeros::serialize_type(s);
+    s.pack("GetNonzeros::type", 'c');
+  }
+
+  GetNonzerosSlice2::GetNonzerosSlice2(DeserializingStream& s) : GetNonzeros(s) {
+    s.unpack("GetNonzerosVector2::inner", inner_);
+    s.unpack("GetNonzerosVector2::outer", outer_);
+  }
+
+  MXNode* GetNonzeros::deserialize(DeserializingStream& s) {
+    char t;
+    s.unpack("GetNonzeros::type", t);
+    switch (t) {
+      case 'a': return new GetNonzerosVector(s);
+      case 'b': return new GetNonzerosSlice(s);
+      case 'c': return new GetNonzerosSlice2(s);
+      default: casadi_assert_dev(false);
+    }
+  }
 
 } // namespace casadi

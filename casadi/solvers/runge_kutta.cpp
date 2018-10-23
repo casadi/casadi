@@ -36,6 +36,7 @@ namespace casadi {
     plugin->doc = RungeKutta::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &RungeKutta::options_;
+    plugin->deserialize = &RungeKutta::deserialize;
     return 0;
   }
 
@@ -199,6 +200,19 @@ namespace casadi {
       G_ = Function("rdae", g_arg, g_res);
       alloc(G_);
     }
+  }
+
+  RungeKutta::RungeKutta(DeserializingStream& s) : FixedStepIntegrator(s) {
+    s.version("RungeKutta", 1);
+    s.unpack("RungeKutta::f", f_);
+    s.unpack("RungeKutta::g", g_);
+  }
+
+  void RungeKutta::serialize_body(SerializingStream &s) const {
+    FixedStepIntegrator::serialize_body(s);
+    s.version("RungeKutta", 1);
+    s.pack("RungeKutta::f", f_);
+    s.pack("RungeKutta::g", g_);
   }
 
 } // namespace casadi

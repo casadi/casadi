@@ -2,6 +2,30 @@ branches:
   except:
     - /.*travis.*/
 
+image:
+- Visual Studio 2013
+- Visual Studio 2015
+- Visual Studio 2017
+
+configuration:
+- Debug
+- Release
+
 build_script:
-  - cmake "-GVisual Studio 12 Win64" -H. -B_builds
-  - cmake --build _builds --config "Debug"
+  - set arch= Win64
+  - set bitness=64
+  - echo %arch%
+  - echo %APPVEYOR_BUILD_WORKER_IMAGE%
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2017" ( set vsver=15)
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2015" ( set vsver=14)
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2013" ( set vsver=12)
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2017" ( set vsyear=2017)
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2015" ( set vsyear=2015)
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2013" ( set vsyear=2013)
+  - echo %vsyear%
+  - if "%vsyear%"=="2017" (call "C:\Program Files (x86)\Microsoft Visual Studio\%vsyear%\Community\VC\Auxiliary\Build\vcvars%bitness%.bat" )
+  - set CXXFLAGS="-D_CRT_SECURE_NO_WARNINGS"
+  - set generator="-GVisual Studio %vsver% %vsyear%%arch%"
+  - echo %generator%
+  - cmake "-GVisual Studio %vsver% %vsyear%%arch%" -H. -B_builds
+  - cmake --build _builds

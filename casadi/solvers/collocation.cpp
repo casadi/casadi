@@ -38,6 +38,7 @@ namespace casadi {
     plugin->doc = Collocation::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &Collocation::options_;
+    plugin->deserialize = &Collocation::deserialize;
     return 0;
   }
 
@@ -53,7 +54,7 @@ namespace casadi {
   Collocation::~Collocation() {
   }
 
-  Options Collocation::options_
+  const Options Collocation::options_
   = {{&ImplicitFixedStepIntegrator::options_},
      {{"interpolation_order",
        {OT_INT,
@@ -80,6 +81,14 @@ namespace casadi {
 
     // Call the base class init
     ImplicitFixedStepIntegrator::init(opts);
+  }
+
+  MX Collocation::algebraic_state_init(const MX& x0, const MX& z0) const {
+    MX ret = vertcat(x0, z0);
+    return repmat(ret, deg_);
+  }
+  MX Collocation::algebraic_state_output(const MX& Z) const {
+    return Z(Slice(Z.size1()-nz_, Z.size1()));
   }
 
   void Collocation::setupFG() {
@@ -332,6 +341,23 @@ namespace casadi {
       casadi_copy(rz, nrz_, RZ);
       RZ += nrz_;
     }
+  }
+
+  Collocation::Collocation(DeserializingStream& s) : ImplicitFixedStepIntegrator(s) {
+    s.version("Collocation", 1);
+    s.unpack("Collocation::deg", deg_);
+    s.unpack("Collocation::collocation_scheme", collocation_scheme_);
+    s.unpack("Collocation::f", f_);
+    s.unpack("Collocation::g", g_);
+  }
+
+  void Collocation::serialize_body(SerializingStream &s) const {
+    ImplicitFixedStepIntegrator::serialize_body(s);
+    s.version("Collocation", 1);
+    s.pack("Collocation::deg", deg_);
+    s.pack("Collocation::collocation_scheme", collocation_scheme_);
+    s.pack("Collocation::f", f_);
+    s.pack("Collocation::g", g_);
   }
 
 } // namespace casadi

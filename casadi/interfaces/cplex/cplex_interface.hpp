@@ -77,9 +77,11 @@ namespace casadi {
     std::vector<CPXDIM> a_row, h_row;
     std::vector<CPXNNZ> a_colind, h_colind;
 
+    std::vector<CPXNNZ> socp_colind;
+    std::vector<CPXDIM> socp_qind, socp_lind, socp_row;
+    std::vector<double> socp_qval, socp_lbound, socp_lval, socp_lbx;
 
     int return_status;
-    bool success;
 
     /// Constructor
     CplexMemory();
@@ -119,7 +121,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -140,6 +142,9 @@ namespace casadi {
 
     /// Can discrete variables be treated
     bool integer_support() const override { return true;}
+
+    /// Can psd constraints be treated
+    bool psd_support() const override { return true;}
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
@@ -164,6 +169,17 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
+    /// SDP to SOCP conversion memory
+    SDPToSOCPMem sdp_to_socp_mem_;
+
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new CplexInterface(s); }
+
+  protected:
+     /** \brief Deserializing constructor */
+    explicit CplexInterface(DeserializingStream& s);
   };
 } // end namespace casadi
 /// \endcond
