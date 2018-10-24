@@ -192,11 +192,6 @@ endforeach()
 
 # Build static and/or shared
 casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL})
-target_include_directories(casadi
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/runtime>
-    $<INSTALL_INTERFACE:include>
-)
 
 file(RELATIVE_PATH TREL_INCLUDE_PREFIX "${CMAKE_INSTALL_PREFIX}" "${INCLUDE_PREFIX}")
 
