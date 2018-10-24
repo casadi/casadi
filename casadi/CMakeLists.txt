@@ -29,24 +29,27 @@ macro(casadi_library name)
     add_library(${name} SHARED ${ARGN})
   endif()
   generate_export_header(${name})
+  
+  file(RELATIVE_PATH TREL_LIB_PREFIX "${CMAKE_INSTALL_PREFIX}" "${LIB_PREFIX}")
+  file(RELATIVE_PATH TREL_BIN_PREFIX "${CMAKE_INSTALL_PREFIX}" "${BIN_PREFIX}")
 
   # Link with the core
   if(NOT "${name}" STREQUAL "casadi")
     # Not core
     target_link_libraries(${name} casadi)
     install(TARGETS ${name}
-      LIBRARY DESTINATION ${LIB_PREFIX}
-      ARCHIVE DESTINATION ${LIB_PREFIX}
-      RUNTIME DESTINATION ${BIN_PREFIX}
+      LIBRARY DESTINATION ${TREL_LIB_PREFIX}
+      ARCHIVE DESTINATION ${TREL_LIB_PREFIX}
+      RUNTIME DESTINATION ${TREL_BIN_PREFIX}
     )
   else()
     # Core
     install(TARGETS ${name}
       # IMPORTANT: Add the library to the "export-set"
       EXPORT casadi-targets
-      LIBRARY DESTINATION ${LIB_PREFIX}
-      ARCHIVE DESTINATION ${LIB_PREFIX}
-      RUNTIME DESTINATION ${BIN_PREFIX}
+      LIBRARY DESTINATION ${TREL_LIB_PREFIX}
+      ARCHIVE DESTINATION ${TREL_LIB_PREFIX}
+      RUNTIME DESTINATION ${TREL_BIN_PREFIX}
     )
   endif()
 

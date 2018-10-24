@@ -860,7 +860,8 @@ install(FILES
   DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
 
 # Install the export set for use with the install-tree
-install(EXPORT casadi-targets DESTINATION "${CMAKE_PREFIX}" COMPONENT dev)
+file(RELATIVE_PATH REL_CMAKE_PREFIX "${CMAKE_INSTALL_PREFIX}" "${CMAKE_PREFIX}")
+install(EXPORT casadi-targets DESTINATION ${REL_CMAKE_PREFIX})
 
 set(CPACK_PACKAGE_CONTACT "casadi-users@googlegroups.com")
 set(CPACK_PACKAGE_VERSION ${PACKAGE_VERSION_FULL})
