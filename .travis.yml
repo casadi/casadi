@@ -88,6 +88,7 @@ matrix:
         - popd
         - sudo apt-get install python-ipdb graphviz texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
         - pip install pydot2 lxml
+        - remote_access
         # travis-wait seems to stop at 20 mins, regardless if output is being generated
         - (while true ; do sleep 60 ; echo "ping" ; done ) &
         - pushd test && make trunktesterbot_no_unittests_py && popd
