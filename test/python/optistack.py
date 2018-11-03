@@ -47,6 +47,8 @@ if has_nlpsol("ipopt"):
 
 class OptiStacktests(inherit_from):
 
+
+    @requires_conic("qrqp")
     def test_conic(self):
       opti = Opti('conic')
       x = opti.variable(2)
