@@ -104,7 +104,7 @@ matrix:
       env:
         - TESTMODE=full-py3
         - WITH_PYTHON3=ON
-        - TRAVIS_PYTHON_VERSION=3.5
+        - TRAVIS_PYTHON_VERSION=3.7
       script:
         - sudo apt-get install cmake valgrind libgomp1 -y
         - mkdir build
