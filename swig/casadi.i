@@ -697,7 +697,18 @@ namespace std {
 
 
     PyObject* get_Python_helper(const std::string& name) {
+%#if PY_VERSION_HEX < 0x03070000
       PyObject* module = PyImport_AddModule("casadi");
+%#else
+      PyObject* c_name = PyString_FromString("casadi");
+      PyObject* module = PyImport_GetModule(c_name);
+      Py_DECREF(c_name);
+%#endif
+      if (!module) {
+        if (PyErr_Occurred()) {
+          PyErr_Clear();
+        }
+      }
       PyObject* dict = PyModule_GetDict(module);
       return PyDict_GetItemString(dict, (char*) name.c_str());
     }
