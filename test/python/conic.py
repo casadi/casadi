@@ -992,6 +992,7 @@ class ConicTests(casadiTestCase):
     self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
 
 
+  @requires_nlpsol("ipopt")
   def test_SOCP(self):
     x = MX.sym("x")
     y = MX.sym("y")
