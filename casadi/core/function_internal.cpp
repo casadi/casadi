@@ -2820,9 +2820,9 @@ namespace casadi {
       uout() << "d" << std::endl;
       buf_dyn = new char[buf_sz];
       n = vsnprintf(buf_dyn, buf_sz, fmt, args);
-      uout() << "e" << n << std::endl; 
+      uout() << "e" << n << std::endl;
     }
-    uout() << "f" << std::endl; 
+    uout() << "f" << std::endl;
     // Print buffer content
     if (n>=0) uout() << (buf_dyn ? buf_dyn : buf) << std::flush;
     // Cleanup
@@ -2830,7 +2830,7 @@ namespace casadi {
     delete[] buf_dyn;
     uout() << "h" << std::endl;
     va_end(args);
-    uout() << "i" << std::endl; 
+    uout() << "i" << std::endl;
     // Throw error if failure
     casadi_assert(n>=0, "Print failure while processing '" + string(fmt) + "'");
   }
