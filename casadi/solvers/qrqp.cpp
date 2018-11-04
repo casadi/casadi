@@ -222,6 +222,10 @@ namespace casadi {
                 "Iter", "Sing", "fk", "|pr|", "con", "|du|", "var",
                 "min_R", "con", "last_tau", "Note");
         }
+        uout() << "msg" << std::endl;
+        print("%5d\n", iter);
+        print("%9.2g\n", d.f);
+        print("%40s\n", d.msg);
         print("%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %40s\n",
               iter, d.sing, d.f, d.pr, d.ipr, d.du, d.idu,
               d.mina, d.imina, d.tau, d.msg);
