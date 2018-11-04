@@ -616,6 +616,7 @@ class typemaptests(casadiTestCase):
   def test_casting_DM(self):
     self.message("casting DM")
 
+    print("cast A")
     x = SX.sym("x")
     f = Function("f", [x],[x])
     class Foo:
@@ -623,23 +624,28 @@ class typemaptests(casadiTestCase):
         return DM([4])
 
     self.assertEqual(f(Foo()),4)
+    print("cast B")
 
     class Foo:
       def __DM__(self):
         return SX([4])
 
+
     self.assertRaises(NotImplementedError,lambda :f(Foo()))
+    print("cast C")
 
     class Foo:
       def __DM__(self):
         raise Exception("15")
 
     self.assertRaises(NotImplementedError,lambda :f(Foo()))
+    print("cast D")
 
     class Foo:
       pass
 
     self.assertRaises(NotImplementedError,lambda :f(Foo()))
+    print("cast E")
 
   def test_casting_IM(self):
     self.message("casting IM")
