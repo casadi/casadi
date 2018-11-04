@@ -2801,26 +2801,36 @@ namespace casadi {
   }
 
   void ProtoFunction::print(const char* fmt, ...) const {
+    uout() << "a" << std::endl;
     // Variable number of arguments
     va_list args;
     va_start(args, fmt);
+    uout() << "b" << std::endl;
     // Static & dynamic buffers
     char buf[256];
     size_t buf_sz = sizeof(buf);
     char* buf_dyn = nullptr;
+    uout() << "c" << std::endl;
     // Try to print with a small buffer
     casadi_int n = vsnprintf(buf, buf_sz, fmt, args);
+    uout() << "n" << n << ":" << buf_sz << std::endl;
     // Need a larger buffer?
     if (n>static_cast<casadi_int>(buf_sz)) {
       buf_sz = static_cast<size_t>(n+1);
+      uout() << "d" << std::endl;
       buf_dyn = new char[buf_sz];
       n = vsnprintf(buf_dyn, buf_sz, fmt, args);
+      uout() << "e" << n << std::endl; 
     }
+    uout() << "f" << std::endl; 
     // Print buffer content
     if (n>=0) uout() << (buf_dyn ? buf_dyn : buf) << std::flush;
     // Cleanup
+    uout() << "g" << std::endl;
     delete[] buf_dyn;
+    uout() << "h" << std::endl;
     va_end(args);
+    uout() << "i" << std::endl; 
     // Throw error if failure
     casadi_assert(n>=0, "Print failure while processing '" + string(fmt) + "'");
   }
