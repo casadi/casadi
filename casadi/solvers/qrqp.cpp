@@ -223,9 +223,17 @@ namespace casadi {
                 "min_R", "con", "last_tau", "Note");
         }
         uout() << "msg" << std::endl;
-        print("%5d\n", iter);
-        print("%9.2g\n", d.f);
-        print("%40s\n", d.msg);
+        print("%5d\n", iter);        uout() << iter << std::endl;
+        print("%5d\n", d.sing);        uout() << d.sing << std::endl;
+        print("%9.2g\n", d.f);        uout() << d.f << std::endl;
+        print("%9.2g\n", d.pr);        uout() << d.pr << std::endl;
+        print("%5d\n", d.ipr);        uout() << d.ipr << std::endl;
+        print("%9.2g\n", d.du);        uout() << d.du << std::endl;
+        print("%5d\n", d.idu);        uout() << d.idu << std::endl;
+        print("%9.2g\n", d.mina);        uout() << d.mina << std::endl;
+        print("%5d\n", d.imina);        uout() << d.imina << std::endl;
+        print("%9.2g\n", d.tau);        uout() << d.tau << std::endl;
+        print("%40s\n", d.msg);        uout() << d.msg << std::endl;
         print("%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %40s\n",
               iter, d.sing, d.f, d.pr, d.ipr, d.du, d.idu,
               d.mina, d.imina, d.tau, d.msg);
