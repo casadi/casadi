@@ -2813,6 +2813,7 @@ namespace casadi {
     uout() << "c" << std::endl;
     // Try to print with a small buffer
     casadi_int n = vsnprintf(buf, buf_sz, fmt, args);
+    buf[buf_sz-1] = '\0';
     uout() << "n" << n << ":" << buf_sz << std::endl;
     // Need a larger buffer?
     if (n>static_cast<casadi_int>(buf_sz)) {
@@ -2820,6 +2821,7 @@ namespace casadi {
       uout() << "d" << std::endl;
       buf_dyn = new char[buf_sz];
       n = vsnprintf(buf_dyn, buf_sz, fmt, args);
+      buf_dyn[buf_sz-1] = '\0';
       uout() << "e" << n << std::endl;
     }
     uout() << "f" << std::endl;
