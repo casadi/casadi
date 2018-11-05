@@ -211,6 +211,8 @@ void casadi_qp_log(casadi_qp_data<T1>* d, const char* fmt, ...) {
 // C-VERBOSE
     vsnprintf(d->msg, sizeof(d->msg), fmt, args);
 // C-VERBOSE
+    d->msg[sizeof(d->msg)-1] = '\0';
+// C-VERBOSE
     va_end(args);
 // C-VERBOSE
   }
