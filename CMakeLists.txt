@@ -482,7 +482,7 @@ if (WITH_DEPRECATED_FEATURES)
 endif()
 
 include_directories(.)
-include_directories(${CMAKE_BINARY_DIR})
+include_directories(${PROJECT_BINARY_DIR})
 
 #######################################################################
 ################# 3rd party interface #################################

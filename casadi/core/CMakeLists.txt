@@ -199,6 +199,9 @@ target_include_directories(casadi
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/runtime>
     $<INSTALL_INTERFACE:${TREL_INCLUDE_PREFIX}>
+  INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../> # <casadi.casadi.hpp>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../../> # <casadi/core/casadi_export.h>
 )
 
 if(WITH_DL)
