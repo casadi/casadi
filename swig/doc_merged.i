@@ -17001,9 +17001,9 @@ elements.
 
 ";
 
-%feature("docstring") casadi::External::get_default_in "
+%feature("docstring") casadi::External::nnz_in "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Number of input/output nonzeros.
 
 ";
 
@@ -17827,9 +17827,9 @@ Evaluate a function, overloaded.
 
 ";
 
-%feature("docstring") casadi::External::nnz_in "
+%feature("docstring") casadi::External::get_default_in "
 
-[INTERNAL]  Number of input/output nonzeros.
+[INTERNAL]  Default inputs.
 
 ";
 
@@ -24562,7 +24562,7 @@ Evaluate a function, overloaded.
 
 %feature("docstring") casadi::GenericExternal::get_default_in "
 
-[INTERNAL]  Get default input value.
+[INTERNAL]  Default inputs.
 
 ";
 
@@ -58281,54 +58281,69 @@ A textbook SQPMethod
 
 >List of available options
 
-+-----------------------+-----------+--------------------------------------+
-|          Id           |   Type    |             Description              |
-+=======================+===========+======================================+
-| beta                  | OT_DOUBLE | Line-search parameter, restoration   |
-|                       |           | factor of stepsize                   |
-+-----------------------+-----------+--------------------------------------+
-| c1                    | OT_DOUBLE | Armijo condition, coefficient of     |
-|                       |           | decrease in merit                    |
-+-----------------------+-----------+--------------------------------------+
-| hessian_approximation | OT_STRING | limited-memory|exact                 |
-+-----------------------+-----------+--------------------------------------+
-| lbfgs_memory          | OT_INT    | Size of L-BFGS memory.               |
-+-----------------------+-----------+--------------------------------------+
-| max_iter              | OT_INT    | Maximum number of SQP iterations     |
-+-----------------------+-----------+--------------------------------------+
-| max_iter_ls           | OT_INT    | Maximum number of linesearch         |
-|                       |           | iterations                           |
-+-----------------------+-----------+--------------------------------------+
-| merit_memory          | OT_INT    | Size of memory to store history of   |
-|                       |           | merit function values                |
-+-----------------------+-----------+--------------------------------------+
-| min_iter              | OT_INT    | Minimum number of SQP iterations     |
-+-----------------------+-----------+--------------------------------------+
-| min_step_size         | OT_DOUBLE | The size (inf-norm) of the step size |
-|                       |           | should not become smaller than this. |
-+-----------------------+-----------+--------------------------------------+
-| print_header          | OT_BOOL   | Print the header with problem        |
-|                       |           | statistics                           |
-+-----------------------+-----------+--------------------------------------+
-| print_iteration       | OT_BOOL   | Print the iterations                 |
-+-----------------------+-----------+--------------------------------------+
-| print_status          | OT_BOOL   | Print a status message after solving |
-+-----------------------+-----------+--------------------------------------+
-| qpsol                 | OT_STRING | The QP solver to be used by the SQP  |
-|                       |           | method [qpoases]                     |
-+-----------------------+-----------+--------------------------------------+
-| qpsol_options         | OT_DICT   | Options to be passed to the QP       |
-|                       |           | solver                               |
-+-----------------------+-----------+--------------------------------------+
-| regularize            | OT_BOOL   | Automatic regularization of Lagrange |
-|                       |           | Hessian.                             |
-+-----------------------+-----------+--------------------------------------+
-| tol_du                | OT_DOUBLE | Stopping criterion for dual          |
-|                       |           | infeasability                        |
-+-----------------------+-----------+--------------------------------------+
-| tol_pr                | OT_DOUBLE | Stopping criterion for primal        |
-|                       |           | infeasibility                        |
-+-----------------------+-----------+--------------------------------------+
++-----------------------+-------------+------------------------------------+
+|          Id           |    Type     |            Description             |
++=======================+=============+====================================+
+| beta                  | OT_DOUBLE   | Line-search parameter, restoration |
+|                       |             | factor of stepsize                 |
++-----------------------+-------------+------------------------------------+
+| c1                    | OT_DOUBLE   | Armijo condition, coefficient of   |
+|                       |             | decrease in merit                  |
++-----------------------+-------------+------------------------------------+
+| hess_lag              | OT_FUNCTION | Function for calculating the       |
+|                       |             | Hessian of the Lagrangian          |
+|                       |             | (autogenerated by default)         |
++-----------------------+-------------+------------------------------------+
+| hessian_approximation | OT_STRING   | limited-memory|exact               |
++-----------------------+-------------+------------------------------------+
+| jac_fg                | OT_FUNCTION | Function for calculating the       |
+|                       |             | gradient of the objective and      |
+|                       |             | Jacobian of the constraints        |
+|                       |             | (autogenerated by default)         |
++-----------------------+-------------+------------------------------------+
+| lbfgs_memory          | OT_INT      | Size of L-BFGS memory.             |
++-----------------------+-------------+------------------------------------+
+| max_iter              | OT_INT      | Maximum number of SQP iterations   |
++-----------------------+-------------+------------------------------------+
+| max_iter_ls           | OT_INT      | Maximum number of linesearch       |
+|                       |             | iterations                         |
++-----------------------+-------------+------------------------------------+
+| merit_memory          | OT_INT      | Size of memory to store history of |
+|                       |             | merit function values              |
++-----------------------+-------------+------------------------------------+
+| min_iter              | OT_INT      | Minimum number of SQP iterations   |
++-----------------------+-------------+------------------------------------+
+| min_step_size         | OT_DOUBLE   | The size (inf-norm) of the step    |
+|                       |             | size should not become smaller     |
+|                       |             | than this.                         |
++-----------------------+-------------+------------------------------------+
+| print_header          | OT_BOOL     | Print the header with problem      |
+|                       |             | statistics                         |
++-----------------------+-------------+------------------------------------+
+| print_iteration       | OT_BOOL     | Print the iterations               |
++-----------------------+-------------+------------------------------------+
+| print_status          | OT_BOOL     | Print a status message after       |
+|                       |             | solving                            |
++-----------------------+-------------+------------------------------------+
+| qpsol                 | OT_STRING   | The QP solver to be used by the    |
+|                       |             | SQP method [qpoases]               |
++-----------------------+-------------+------------------------------------+
+| qpsol_options         | OT_DICT     | Options to be passed to the QP     |
+|                       |             | solver                             |
++-----------------------+-------------+------------------------------------+
+| regularize            | OT_BOOL     | Automatic regularization of        |
+|                       |             | Lagrange Hessian.                  |
++-----------------------+-------------+------------------------------------+
+| regularize_margin     | OT_DOUBLE   | When regularize is true, make sure |
+|                       |             | that the smallest eigenvalue is at |
+|                       |             | least this (default: 1e-7).        |
++-----------------------+-------------+------------------------------------+
+| tol_du                | OT_DOUBLE   | Stopping criterion for dual        |
+|                       |             | infeasability                      |
++-----------------------+-------------+------------------------------------+
+| tol_pr                | OT_DOUBLE   | Stopping criterion for primal      |
+|                       |             | infeasibility                      |
++-----------------------+-------------+------------------------------------+
 
 >List of available options
 
@@ -58391,6 +58406,13 @@ A textbook SQPMethod
 |                   |               | of f,g,...,stop   |                  |
 |                   |               | the iterations    |                  |
 +-------------------+---------------+-------------------+------------------+
+| hess_lag          | OT_FUNCTION   | Function for      | casadi::Sqpmetho |
+|                   |               | calculating the   | d                |
+|                   |               | Hessian of the    |                  |
+|                   |               | Lagrangian        |                  |
+|                   |               | (autogenerated by |                  |
+|                   |               | default)          |                  |
++-------------------+---------------+-------------------+------------------+
 | hessian_approxima | OT_STRING     | limited-          | casadi::Sqpmetho |
 | tion              |               | memory|exact      | d                |
 +-------------------+---------------+-------------------+------------------+
@@ -58417,6 +58439,15 @@ A textbook SQPMethod
 | k_step            |               | callback function |                  |
 |                   |               | every few         |                  |
 |                   |               | iterations.       |                  |
++-------------------+---------------+-------------------+------------------+
+| jac_fg            | OT_FUNCTION   | Function for      | casadi::Sqpmetho |
+|                   |               | calculating the   | d                |
+|                   |               | gradient of the   |                  |
+|                   |               | objective and     |                  |
+|                   |               | Jacobian of the   |                  |
+|                   |               | constraints       |                  |
+|                   |               | (autogenerated by |                  |
+|                   |               | default)          |                  |
 +-------------------+---------------+-------------------+------------------+
 | lbfgs_memory      | OT_INT        | Size of L-BFGS    | casadi::Sqpmetho |
 |                   |               | memory.           | d                |
@@ -58477,6 +58508,14 @@ A textbook SQPMethod
 | regularize        | OT_BOOL       | Automatic         | casadi::Sqpmetho |
 |                   |               | regularization of | d                |
 |                   |               | Lagrange Hessian. |                  |
++-------------------+---------------+-------------------+------------------+
+| regularize_margin | OT_DOUBLE     | When regularize   | casadi::Sqpmetho |
+|                   |               | is true, make     | d                |
+|                   |               | sure that the     |                  |
+|                   |               | smallest          |                  |
+|                   |               | eigenvalue is at  |                  |
+|                   |               | least this        |                  |
+|                   |               | (default: 1e-7).  |                  |
 +-------------------+---------------+-------------------+------------------+
 | tol_du            | OT_DOUBLE     | Stopping          | casadi::Sqpmetho |
 |                   |               | criterion for     | d                |
