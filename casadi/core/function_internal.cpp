@@ -1785,6 +1785,22 @@ namespace casadi {
       << g.declare("casadi_int " + name_ + "_n_out(void)")
       << " { return " << n_out_ << ";}\n\n";
 
+    // Default inputs
+    bool add_defaults = false;
+    for (casadi_int i=0; i<n_in_; ++i) {
+      add_defaults |= get_default_in(i)!=0;
+    }
+    if (add_defaults) {
+      g << g.declare("casadi_real " + name_ + "_default_in(casadi_int i)") << "{\n"
+        << "switch (i) {\n";
+      for (casadi_int i=0; i<n_in_; ++i) {
+        double def = get_default_in(i);
+        if (def!=0) g << "case " << i << ": return " << g.constant(def) << ";\n";
+      }
+      g << "default: return 0;\n}\n"
+        << "}\n\n";
+    }
+
     // Input names
     g << g.declare("const char* " + name_ + "_name_in(casadi_int i)") << "{\n"
       << "switch (i) {\n";

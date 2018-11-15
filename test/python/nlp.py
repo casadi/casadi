@@ -334,6 +334,26 @@ class NLPtests(casadiTestCase):
       if "codegen" in features:
         self.check_codegen(solver,solver_in,std="c99")
 
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+      solver_in = {}
+
+      if Solver in ("worhp","knitro"):
+        with self.assertRaises(Exception):
+          solver_out = solver(**solver_in)
+        return
+
+      solver_out = solver(**solver_in)
+      self.assertTrue(solver.stats()["success"])
+      self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
+      self.assertAlmostEqual(solver_out["x"][0],1,7,str(Solver) + str(solver_out["x"][0]-1))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
+
+      if "codegen" in features:
+        self.check_codegen(solver,solver_in,std="c99")
+
+
+
   def test_IPOPTrb(self):
     self.message("rosenbrock, limited-memory hessian approx")
     x=SX.sym("x")
