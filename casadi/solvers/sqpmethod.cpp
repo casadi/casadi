@@ -104,6 +104,10 @@ namespace casadi {
       {"regularize",
        {OT_BOOL,
         "Automatic regularization of Lagrange Hessian."}},
+      {"regularize_margin",
+       {OT_DOUBLE,
+        "When regularize is true, make sure that the smallest eigenvalue is at least this "
+        "(default: 1e-7)."}},
       {"print_header",
        {OT_BOOL,
         "Print the header with problem statistics"}},
@@ -134,6 +138,7 @@ namespace casadi {
     tol_pr_ = 1e-6;
     tol_du_ = 1e-6;
     regularize_ = false;
+    regularize_margin_ = 1e-7;
     string hessian_approximation = "exact";
     min_step_size_ = 1e-10;
     string qpsol_plugin = "qpoases";
@@ -172,6 +177,9 @@ namespace casadi {
         qpsol_options = op.second;
       } else if (op.first=="regularize") {
         regularize_ = op.second;
+      } else if (op.first=="regularize_margin") {
+        regularize_margin_ = op.second;
+        casadi_assert(regularize_margin_>=0, "Margin must be >=0");
       } else if (op.first=="print_header") {
         print_header_ = op.second;
       } else if (op.first=="print_iteration") {
@@ -357,7 +365,7 @@ int Sqpmethod::solve(void* mem) const {
 
         // Determing regularization parameter with Gershgorin theorem
         if (regularize_) {
-          m->reg = std::fmax(0, -casadi_lb_eig(Hsp_, d->Bk));
+          m->reg = regularize_margin_-casadi_lb_eig(Hsp_, d->Bk);
           if (m->reg > 0) casadi_regularize(Hsp_, d->Bk, m->reg);
         }
       } else if (m->iter_count==0) {
@@ -641,7 +649,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << nlp_hess_l + "(m_arg, m_res, m_iw, m_w, 0);\n";
     g.comment("Determing regularization parameter with Gershgorin theorem");
     if (regularize_) {
-      g << "reg = " << g.fmax("0", "-" + g.lb_eig(Hsp_, "d.Bk")) << "\n";
+      g << "reg = " << regularize_margin_ << "-" + g.lb_eig(Hsp_, "d.Bk") << ";\n";
       g << "if (reg>0) " << g.regularize(Hsp_, "d.Bk", "reg") << "\n";
     }
     g.comment("Formulate the QP");
@@ -805,6 +813,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     s.unpack("Sqpmethod::Hsp", Hsp_);
     s.unpack("Sqpmethod::Asp", Asp_);
     s.unpack("Sqpmethod::regularize", regularize_);
+    s.unpack("Sqpmethod::regularize_margin", regularize_margin_);
     set_sqpmethod_prob();
   }
 
@@ -830,5 +839,6 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     s.pack("Sqpmethod::Hsp", Hsp_);
     s.pack("Sqpmethod::Asp", Asp_);
     s.pack("Sqpmethod::regularize", regularize_);
+    s.pack("Sqpmethod::regularize_margin", regularize_margin_);
   }
 } // namespace casadi

@@ -1577,13 +1577,22 @@ class NLPtests(casadiTestCase):
     self.assertTrue("H:\n[[1, 0], \n [0, -2]]" in result[0])
     self.checkarray(res["x"],DM([0,2]),digits=6)
 
-    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"regularize":True})
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"regularize":True,"regularize_margin":0})
     with capture_stdout() as result:
       res = solver(lbg=2,ubg=2)
     stats_reg = solver.stats()
     self.checkarray(res["x"],DM([0,2]),digits=6)
     self.assertTrue(stats_reg["iter_count"]==2)
     self.assertTrue("H:\n[[3, 0], \n [0, 0]]" in result[0])
+
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"regularize":True,"regularize_margin":1e-4})
+    with capture_stdout() as result:
+      res = solver(lbg=2,ubg=2)
+    stats_reg = solver.stats()
+    self.checkarray(res["x"],DM([0,2]),digits=6)
+    self.assertTrue(stats_reg["iter_count"]==2)
+    print result[0]
+    self.assertTrue("H:\n[[3.0001, 0], \n [0, 0.0001]]" in result[0])
 
     x = MX.sym("x",2)
     f = 0.5*bilin(DM([[1,0],[0,2]]),x,x)
