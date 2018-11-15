@@ -497,7 +497,7 @@ int Sqpmethod::solve(void* mem) const {
                                   casadi_int ls_trials, bool ls_success) const {
     print("%4d %14.6e %9.2e %9.2e %9.2e ", iter, obj, pr_inf, du_inf, dx_norm);
     if (rg>0) {
-      print("%7.2d ", log10(rg));
+      print("%7.2f ", log10(rg));
     } else {
       print("%7s ", "-");
     }
