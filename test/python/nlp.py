@@ -53,7 +53,7 @@ if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
 if has_conic("qrqp") and has_nlpsol("sqpmethod"):
   solvers.append(("sqpmethod",{"qpsol": "qrqp"},{"codegen"}))
   solvers.append(("sqpmethod",{"qpsol": "qrqp","max_iter_ls":0},{"codegen"}))
-  solvers.append(("sqpmethod",{"qpsol": "qrqp","regularize":True},{"codegen"}))
+  solvers.append(("sqpmethod",{"qpsol": "qrqp","regularize":True,"max_iter":500},{"codegen"}))
 
 if has_nlpsol("blocksqp"):
   try:
@@ -362,6 +362,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2}
 
     for Solver, solver_options, features in solvers:
+      if "sqpmethod"==Solver and "regularize" in str(solver_options): continue
       if "snopt"==Solver: continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -386,6 +387,7 @@ class NLPtests(casadiTestCase):
 
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options, features in solvers:
+      if "sqpmethod"==Solver and "regularize" in str(solver_options): continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -618,6 +620,7 @@ class NLPtests(casadiTestCase):
     sigma=SX.sym("sigma")
 
     for Solver, solver_options, features in solvers:
+      if "sqpmethod"==Solver and "regularize" in str(solver_options): continue
       if "snopt"==Solver: continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -645,6 +648,7 @@ class NLPtests(casadiTestCase):
     sigma=SX.sym("sigma")
 
     for Solver, solver_options, features in solvers:
+      if "sqpmethod"==Solver and "regularize" in str(solver_options): continue
       if "snopt"==Solver: continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -676,6 +680,7 @@ class NLPtests(casadiTestCase):
     sigma=SX.sym("sigma")
 
     for Solver, solver_options, features in solvers:
+      if "sqpmethod"==Solver and "regularize" in str(solver_options): continue
       if "snopt"==Solver: continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -1554,6 +1559,75 @@ class NLPtests(casadiTestCase):
       f2 = Function('f',[x,p],[z2,jacobian(z2,p)])
 
       self.checkfunction_light(f,f2,[0,0.5],digits=6)
+
+  @requires_conic("qrqp")
+  def test_regularize_sqpmethod(self):
+    
+    # Test problem that is indefinite in direction of the constraint Jacobian
+    x = MX.sym("x",2)
+    f = 0.5*bilin(DM([[1,0],[0,-2]]),x,x)
+
+    nlp = {"x":x,"f":f,"g":x[1]}
+
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True}})
+    with capture_stdout() as result:
+      res = solver(lbg=2,ubg=2)
+    stats = solver.stats()
+    self.assertTrue(stats["iter_count"]==1)
+    self.assertTrue("H:\n[[1, 0], \n [0, -2]]" in result[0])
+    self.checkarray(res["x"],DM([0,2]),digits=6)
+
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"regularize":True})
+    with capture_stdout() as result:
+      res = solver(lbg=2,ubg=2)
+    stats_reg = solver.stats()
+    self.checkarray(res["x"],DM([0,2]),digits=6)
+    self.assertTrue(stats_reg["iter_count"]==2)
+    self.assertTrue("H:\n[[3, 0], \n [0, 0]]" in result[0])
+
+    x = MX.sym("x",2)
+    f = 0.5*bilin(DM([[1,0],[0,2]]),x,x)
+
+    nlp = {"x":x,"f":f,"g":x[1]}
+
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True}})
+    with capture_stdout() as result:
+      res = solver(lbg=2,ubg=2)
+    stats = solver.stats()
+    self.assertTrue(stats["iter_count"]==1)
+    print(result[0])
+    self.assertTrue("H:\n[[1, 0], \n [0, 2]]" in result[0])
+    self.checkarray(res["x"],DM([0,2]),digits=6)
+
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"regularize":True})
+    with capture_stdout() as result:
+      res = solver(lbg=2,ubg=2)
+    stats_reg = solver.stats()
+    self.checkarray(res["x"],DM([0,2]),digits=6)
+    self.assertTrue(stats_reg["iter_count"]==1)
+    self.assertTrue("H:\n[[1, 0], \n [0, 2]]" in result[0])
+
+  def test_indefinite(self):
+    
+    # Test problem that is indefinite in direction of the constraint Jacobian
+    x = MX.sym("x",2)
+    f = 0.5*bilin(DM([[1,0],[0,-2]]),x,x)
+
+    nlp = {"x":x,"f":f,"g":x[1]}
+
+    for Solver, solver_options, features in solvers:
+      solver_in = {"lbg": 2, "ubg": 2}
+
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+      out = solver(**solver_in)
+      self.checkarray(out["x"],DM([0,2]),digits=6)
+      if "bonmin" not in str(Solver): self.checkarray(out["lam_g"],DM([4]),digits=6)
+
+      if "codegen" in features:
+        solver.generate('f.c',{"main":True})
+        solver.generate_input("in.dat",solver_in)
+        print(solver_in)
+        self.check_codegen(solver,solver_in,std="c99")
 
 if __name__ == '__main__':
     unittest.main()
