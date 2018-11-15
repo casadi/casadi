@@ -285,16 +285,16 @@ namespace casadi {
     g << "casadi_qp_init(&d, &iw, &w);\n";
 
     g.comment("Pass bounds on z");
-    g << g.copy("arg[" + str(CONIC_LBX)+ "]", nx_, "d.lbz") << "\n";
-    g << g.copy("arg[" + str(CONIC_LBA)+ "]", na_, "d.lbz+" + str(nx_)) << "\n";
-    g << g.copy("arg[" + str(CONIC_UBX)+ "]", nx_, "d.ubz") << "\n";
-    g << g.copy("arg[" + str(CONIC_UBA)+ "]", na_, "d.ubz+" + str(nx_)) << "\n";
+    g.copy_default("arg[" + str(CONIC_LBX)+ "]", nx_, "d.lbz", "-casadi_inf", false);
+    g.copy_default("arg[" + str(CONIC_LBA)+ "]", na_, "d.lbz+" + str(nx_), "-casadi_inf", false);
+    g.copy_default("arg[" + str(CONIC_UBX)+ "]", nx_, "d.ubz", "casadi_inf", false);
+    g.copy_default("arg[" + str(CONIC_UBA)+ "]", na_, "d.ubz+" + str(nx_), "casadi_inf", false);
 
     g.comment("Pass initial guess");
-    g << g.copy("arg[" + str(CONIC_X0)+ "]", nx_, "d.z") << "\n";
+    g.copy_default("arg[" + str(CONIC_X0)+ "]", nx_, "d.z", "0", false);
     g << g.fill("d.z+"+str(nx_), na_, "NAN") << "\n";
-    g << g.copy("arg[" + str(CONIC_LAM_X0)+ "]", nx_, "d.lam") << "\n";
-    g << g.copy("arg[" + str(CONIC_LAM_A0)+ "]", na_, "d.lam+" + str(nx_)) << "\n";
+    g.copy_default("arg[" + str(CONIC_LAM_X0)+ "]", nx_, "d.lam", "0", false);
+    g.copy_default("arg[" + str(CONIC_LAM_A0)+ "]", na_, "d.lam+" + str(nx_), "0", false);
 
     g.comment("Reset solver");
     g << "if (casadi_qp_reset(&d)) return 1;\n";
@@ -346,10 +346,10 @@ namespace casadi {
     g << "}\n";
 
     g.comment("Get solution");
-    g << g.copy("&d.f", 1, "res[" + str(CONIC_COST) + "]") << "\n";
-    g << g.copy("d.z", nx_, "res[" + str(CONIC_X) + "]") << "\n";
-    g << g.copy("d.lam", nx_, "res[" + str(CONIC_LAM_X) + "]") << "\n";
-    g << g.copy("d.lam+"+str(nx_), na_, "res[" + str(CONIC_LAM_A) + "]") << "\n";
+    g.copy_check("&d.f", 1, "res[" + str(CONIC_COST) + "]", false, true);
+    g.copy_check("d.z", nx_, "res[" + str(CONIC_X) + "]", false, true);
+    g.copy_check("d.lam", nx_, "res[" + str(CONIC_LAM_X) + "]", false, true);
+    g.copy_check("d.lam+"+str(nx_), na_, "res[" + str(CONIC_LAM_A) + "]", false, true);
 
     g << "return flag;\n";
   }

@@ -1043,6 +1043,26 @@ namespace casadi {
     return s.str();
   }
 
+  void CodeGenerator::copy_check(const string& arg, size_t n, const string& res,
+      bool check_lhs, bool check_rhs) {
+    std::vector<std::string> checks;
+    if (check_lhs) checks.push_back(arg);
+    if (check_rhs) checks.push_back(res);
+    if (!checks.empty()) *this << "if (" << join(checks, " && ") << ") ";
+    *this << copy(arg, n, res) << "\n";
+  }
+
+  void CodeGenerator::copy_default(const string& arg, size_t n, const string& res,
+      const string& def, bool check_rhs) {
+    *this << "if (" << arg << ") {\n";
+    if (check_rhs) *this << "if (" << res << ") ";
+    *this << copy(arg, n, res) << "\n";
+    *this << "} else {\n";
+    if (check_rhs) *this << "if (" << res << ") ";
+    *this << fill(res, n, def) << "\n";
+    *this << "}\n";
+  }
+
   string CodeGenerator::fill(const string& res,
                                   std::size_t n, const string& v) {
     stringstream s;
