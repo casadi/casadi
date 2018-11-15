@@ -1629,6 +1629,47 @@ class NLPtests(casadiTestCase):
         print(solver_in)
         self.check_codegen(solver,solver_in,std="c99")
 
+  @requires_nlpsol("ipopt")
+  def test_gauss_newton_ipopt(self):
+    x = SX.sym("x",3)
+
+    F = sin(x) - vertcat(1,2,3)*vertcat(x[2],0,0)
+    J = jacobian(F,x)
+    f = 0.5*dot(F,F)
+    p = SX.sym("x",0,1)
+    lam_f = SX.sym("x")
+    lam_g = SX.sym("x",0,1)
+    GN = Function('GN',[x,p,lam_f,lam_g],[lam_f*mtimes(J.T,J)])
+    options = {"hess_lag": GN}
+    nlp = {"x":x,"f":f}
+    with self.assertInException("Hessian must be upper triangular"):
+      solver = nlpsol("solver","ipopt",nlp,options)
+
+    # A 2-norrm problem ...
+    F = sin(x-vertcat(0.22,0.72,0.2)) - vertcat(0.1,0.5,0.99)
+    J = jacobian(F,x)
+    f = 0.5*dot(F,F)
+    H = Function("H",[x],[hessian(f,x)[0]])
+    H = H(0)
+    # with an indefinite Hessian at x0
+    self.assertTrue(np.any(np.linalg.eig(H)[0]<0))
+  
+    # Solve with Gauss-Newton -> 6 iterations
+    GN = Function('GN',[x,p,lam_f,lam_g],[lam_f*triu(mtimes(J.T,J))])
+    options = {"hess_lag": GN}
+    nlp = {"x":x,"f":f}
+    solver = nlpsol("solver","ipopt",nlp,options)
+    res = solver()
+    stats_reg = solver.stats()
+    self.assertTrue(stats_reg["iter_count"]==6)
+
+    # Solve with exact Hessian + regularization -> 9 iterations
+    nlp = {"x":x,"f":f}
+    solver = nlpsol("solver","ipopt",nlp)
+    res = solver()
+    stats_reg = solver.stats()
+    self.assertTrue(stats_reg["iter_count"]==9)
+
 if __name__ == '__main__':
     unittest.main()
     print(solvers)
