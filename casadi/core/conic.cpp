@@ -498,7 +498,7 @@ namespace casadi {
       DM::print_dense(uout(), H_, arg[CONIC_H], false);
       uout() << std::endl;
       uout() << "G:" << std::vector<double>(arg[CONIC_G], arg[CONIC_G]+nx_) << std::endl;
-      uout() << "A";
+      uout() << "A:";
       DM::print_dense(uout(), A_, arg[CONIC_A], false);
       uout() << std::endl;
       uout() << "lba:" << std::vector<double>(arg[CONIC_LBA], arg[CONIC_LBA]+na_) << std::endl;
