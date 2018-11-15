@@ -1591,7 +1591,6 @@ class NLPtests(casadiTestCase):
     stats_reg = solver.stats()
     self.checkarray(res["x"],DM([0,2]),digits=6)
     self.assertTrue(stats_reg["iter_count"]==2)
-    print result[0]
     self.assertTrue("H:\n[[3.0001, 0], \n [0, 0.0001]]" in result[0])
 
     x = MX.sym("x",2)
