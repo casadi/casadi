@@ -318,8 +318,8 @@ casadi_int casadi_qp_pr_index(casadi_qp_data<T1>* d, casadi_int* sign) {
     casadi_qp_log(d, "Added %lld to reduce |pr|", d->ipr);
     return d->ipr;
   } else {
-    // Try to remove blocking constraints
-    return casadi_qp_du_index(d, sign, d->ipr);
+    // No improvement possible
+    return -1;
   }
 }
 
@@ -967,16 +967,16 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
     *index=-2;
   }
 
-  // Improve primal or dual feasibility
-  if (*index==-1 && (d->ipr>=0 || d->idu>=0)) {
-    if (p->du_to_pr*d->pr >= d->du) {
-      // Try to improve primal feasibility
-      *index = casadi_qp_pr_index(d, sign);
-    } else {
-      // Try to improve dual feasibility
-      *index = casadi_qp_du_index(d, sign, -1);
-    }
+  // Improve primal feasibility if possible
+  if (*index==-1 && d->ipr>=0) {
+    *index = casadi_qp_pr_index(d, sign);
   }
+
+  // Improve dual feasibility if possible
+  if (*index==-1 && d->idu>=0) {
+    *index = casadi_qp_du_index(d, sign, d->ipr);
+  }
+
   // If a constraint was added
   if (*index>=0) {
     // Try to maintain non-singularity if possible
