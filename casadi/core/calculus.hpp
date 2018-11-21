@@ -250,7 +250,7 @@ namespace casadi {
   ///@}
 
 #ifdef HAS_ERF
-  using ::erf;
+  using std::erf;
 #else // HAS ERF
   inline double erf(double x) throw() {
     // Approximation found in Sourceforge and modified,
