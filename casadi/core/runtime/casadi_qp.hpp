@@ -275,7 +275,7 @@ template<typename T1>
 casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign, casadi_int skip) {
   // Try to improve dual feasibility by removing a constraint
   // Local variables
-  casadi_int best_ind, i;
+  casadi_int best_ind, i, s, best_sign;
   T1 best_sens;
   const casadi_qp_prob<T1>* p = d->prob;
   // Find the best lam[i] to make zero
@@ -284,23 +284,36 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign, casadi_in
   for (i=0; i<p->nz; ++i) {
     // Should the index be avoided?
     if (i==skip) continue;
-    // Make sure that it's a constraint that can be removed
-    if (d->lam[i]==0 || d->neverzero[i]) continue;
-    // If variable influences du, make sure sign is right
-    if (d->lam[i]>0. ? d->sens[i]>0. : d->sens[i]<0.) continue;
-    // Skip if maximum infeasibility increases
-    if (casadi_qp_du_check(d, i)>d->du) continue;
+    // Is the constraint enforced?
+    if (d->lam[i]==0) {
+      // Skip if no dual infeasibility sensitivity
+      if (d->sens[i]==0.) continue;
+      // We're enforcing constraints
+      s = d->sens[i]>0 ? 1 : -1;
+      // Make sure that enforcing the constraint is possible
+      if (s>0 ? d->neverupper[i] : d->neverlower[i]) continue;
+    } else {
+      // We're removing constraints
+      s = 0;
+      // Make sure that it's a constraint that can be removed
+      if (d->neverzero[i]) continue;
+      // If variable influences du, make sure sign is right
+      if (d->lam[i]>0. ? d->sens[i]>0. : d->sens[i]<0.) continue;
+      // Skip if maximum infeasibility increases
+      if (casadi_qp_du_check(d, i)>d->du) continue;
+    }
     // Check if best so far
     if (fabs(d->sens[i])>best_sens) {
       best_sens = fabs(d->sens[i]);
       best_ind = i;
+      best_sign = s;
     }
   }
   // Accept, if any
   if (best_ind>=0) {
-    *sign = 0;
+    *sign = best_sign;
     // C-VERBOSE
-    casadi_qp_log(d, "Removed %lld to reduce |du|", best_ind);
+    casadi_qp_log(d, "%lld->%lld to reduce |du|", best_ind, best_sign);
     return best_ind;
   } else {
     return -1;
