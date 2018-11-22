@@ -284,10 +284,10 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign, casadi_in
   for (i=0; i<p->nz; ++i) {
     // Should the index be avoided?
     if (i==skip) continue;
+    // Skip if no dual infeasibility sensitivity
+    if (d->sens[i]==0.) continue;
     // Is the constraint enforced?
     if (d->lam[i]==0) {
-      // Skip if no dual infeasibility sensitivity
-      if (d->sens[i]==0.) continue;
       // We're enforcing constraints
       s = d->sens[i]>0 ? 1 : -1;
       // Make sure that enforcing the constraint is possible
