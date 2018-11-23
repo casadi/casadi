@@ -745,6 +745,40 @@ void casadi_qp_expand_step(casadi_qp_data<T1>* d) {
   casadi_axpy(p->nx, 1., d->dlam, d->tinfeas);
 }
 
+// SYMBOL "casadi_qp_pr_direction"
+template<typename T1>
+int casadi_qp_pr_direction(casadi_qp_data<T1>* d, int sign) {
+  casadi_int i;
+  const casadi_qp_prob<T1>* p = d->prob;
+  for (i=0; i<p->nz; ++i) {
+    if (d->z[i]<=d->lbz[i]-d->epr && sign*d->dz[i]<0) {
+      // Prevent further violation of lower bound
+      return 0;
+    } else if (d->z[i]>=d->ubz[i]+d->epr && sign*d->dz[i]>0) {
+      // Prevent further violation of upper bound
+      return 0;
+    }
+  }
+  return 1;
+}
+
+// SYMBOL "casadi_qp_du_direction"
+template<typename T1>
+int casadi_qp_du_direction(casadi_qp_data<T1>* d, int sign) {
+  casadi_int i;
+  const casadi_qp_prob<T1>* p = d->prob;
+  for (i=0; i<p->nx; ++i) {
+    if (d->infeas[i] <= -d->edu && sign*d->tinfeas[i]<0) {
+      // Prevent further increase in dual infeasibility
+      return 0;
+    } else if (d->infeas[i] >= d->edu && sign*d->tinfeas[i]>0) {
+      // Prevent further increase in dual infeasibility
+      return 0;
+    }
+  }
+  return 1;
+}
+
 // SYMBOL "qp_singular_step"
 // C-REPLACE "static_cast<T1*>(0)" "0"
 template<typename T1>
@@ -772,6 +806,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   for (k=0; k<nk; ++k) {
     // Local variables
     T1 tau_min, tau_max;
+    int pos_ok, neg_ok;
     // Get a linear combination of the rows in kkt
     casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, k);
     // Which constraints can be flipped in order to increase rank?
@@ -781,52 +816,17 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     // Calculate step, dz and dlam
     casadi_copy(d->w, p->nz, d->dz);
     casadi_qp_expand_step(d);
-    // Check if primal or dual error is dominating
-    tau_min = -p->inf;
-    tau_max = p->inf;
-    if (p->du_to_pr*d->pr >= d->du) {
-      // Make sure that primal error doesn't increase in the search direction
-      if (d->z[d->ipr]>d->ubz[d->ipr]) {
-        // Upper bound violated, make sure volation doesn't increase
-        if (d->dz[d->ipr]>0) {
-          tau_max = 0;
-        } else if (d->dz[d->ipr]<0) {
-          tau_min = 0;
-        }
-        // If enforced, do not allow multiplier to cross zero
-        if (d->lam[d->ipr]>0) {
-          d->iw[d->ipr] = 0;
-          if (d->dlam[d->ipr]>0) {
-            tau_min = -d->lam[d->ipr]/d->dlam[d->ipr];
-          } else if (d->dlam[d->ipr]<0) {
-            tau_max = -d->lam[d->ipr]/d->dlam[d->ipr];
-          }
-        }
-      } else {
-        // Lower bound violated, make sure volation doesn't increase
-        if (d->dz[d->ipr]>0) {
-          tau_min = 0;
-        } else if (d->dz[d->ipr]<0) {
-          tau_max = 0;
-        }
-        // If enforced, do not allow multiplier to cross zero
-        if (d->lam[d->ipr]<0) {
-          d->iw[d->ipr] = 0;
-          if (d->dlam[d->ipr]<0) {
-            tau_min = -d->lam[d->ipr]/d->dlam[d->ipr];
-          } else if (d->dlam[d->ipr]>0) {
-            tau_max = -d->lam[d->ipr]/d->dlam[d->ipr];
-          }
-        }
-      }
-    } else {
-      // Make sure dual infeasibility doesn't increase in the search direction
-      if (d->infeas[d->idu]>0) {
-        if (d->tinfeas[d->idu]>0) tau_max = 0;
-      } else {
-        if (d->tinfeas[d->idu]<0) tau_min = 0;
-      }
+    // Is primal error increasing in the search directions?
+    pos_ok = casadi_qp_pr_direction(d, 1);
+    neg_ok = casadi_qp_pr_direction(d, -1);
+    // If both directions are possible, check dual error
+    if (pos_ok && neg_ok) {
+      pos_ok = casadi_qp_du_direction(d, 1);
+      neg_ok = casadi_qp_du_direction(d, -1);
     }
+    // Check if primal or dual error is dominating
+    tau_min = neg_ok ? -p->inf : 0;
+    tau_max = pos_ok ? p->inf : 0;
     // Can we enforce a lower bound?
     for (i=0; i<p->nz; ++i) {
       if (d->iw[i] && d->lam[i]==0. && !d->neverlower[i] && fabs(d->dz[i])>=1e-12) {
