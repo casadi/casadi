@@ -784,7 +784,7 @@ int casadi_qp_du_direction(casadi_qp_data<T1>* d, int sign) {
 template<typename T1>
 int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
   // Local variables
-  T1 tau_test, tau;
+  T1 tau_test, tau, goodness, best;
   casadi_int nnz_kkt, nk, k, i;
   const casadi_qp_prob<T1>* p = d->prob;
   // Find the columns that take part in any linear combination
@@ -801,11 +801,11 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
             d->beta, p->prinv, p->pc);
   // Best flip
   tau = p->inf;
+  best = -p->inf;
   // For all nullspace vectors
   nk = casadi_qr_singular(static_cast<T1*>(0), 0, d->nz_r, p->sp_r, p->pc, 1e-12);
   for (k=0; k<nk; ++k) {
     // Local variables
-    T1 tau_min, tau_max;
     int pos_ok, neg_ok;
     // Get a linear combination of the rows in kkt
     casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, k);
@@ -824,16 +824,15 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
       pos_ok = casadi_qp_du_direction(d, 1);
       neg_ok = casadi_qp_du_direction(d, -1);
     }
-    // Check if primal or dual error is dominating
-    tau_min = neg_ok ? -p->inf : 0;
-    tau_max = pos_ok ? p->inf : 0;
     // Can we enforce a lower bound?
     for (i=0; i<p->nz; ++i) {
       if (d->iw[i] && d->lam[i]==0. && !d->neverlower[i] && fabs(d->dz[i])>=1e-12) {
         if (!casadi_qp_du_free(d, i, 0)) continue;
-        tau_test = (d->lbz[i]-d->z[i])/d->dz[i];
-        if (tau_test<tau_min || tau_test>tau_max) continue;
-        if (fabs(tau_test)<fabs(tau)) {
+        goodness = d->lbz[i] - d->z[i];  // more violated is better
+        tau_test = goodness/d->dz[i];
+        if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
+        if (goodness>best) {
+          best = goodness;
           tau = tau_test;
           *r_index = i;
           *r_sign = -1;
@@ -846,9 +845,11 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     for (i=0; i<p->nz; ++i) {
       if (d->iw[i] && d->lam[i]==0. && !d->neverupper[i] && fabs(d->dz[i])>=1e-12) {
         if (!casadi_qp_du_free(d, i, 1)) continue;
-        tau_test = (d->ubz[i]-d->z[i])/d->dz[i];
-        if (tau_test<tau_min || tau_test>tau_max) continue;
-        if (fabs(tau_test)<fabs(tau)) {
+        goodness = d->z[i] - d->ubz[i];  // more violated is better
+        tau_test = -goodness/d->dz[i];
+        if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
+        if (goodness>best) {
+          best = goodness;
           tau = tau_test;
           *r_index = i;
           *r_sign = 1;
@@ -860,10 +861,13 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     // Can we drop a constraint?
     for (i=0; i<p->nz; ++i) {
       if (d->iw[i] && d->lam[i]!=0. && !d->neverzero[i] && fabs(d->dlam[i])>=1e-12) {
-        tau_test = -d->lam[i]/d->dlam[i]; // scaling factor since lam can be close do DMIN
-        if (tau_test<tau_min || tau_test>tau_max) continue;
+        // More slack is better
+        goodness = d->lam[i]>0 ? d->ubz[i] - d->z[i] : d->z[i] - d->lbz[i];
+        tau_test = -d->lam[i]/d->dlam[i]; // scaling factor since lam can be close to DMIN
+        if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
         // Check if best so far
-        if (fabs(tau_test)<fabs(tau)) {
+        if (goodness>best) {
+          best = goodness;
           tau = tau_test;
           *r_index = i;
           *r_sign = 0;
