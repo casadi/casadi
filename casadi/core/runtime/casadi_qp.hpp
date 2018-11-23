@@ -990,21 +990,15 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
     *sign = r_sign;
     // C-VERBOSE
     casadi_qp_log(d, "%lld->%lld for regularity", *index, *sign);
-  }  else if (r_index>=0 && d->tau>1e-16) {
-    // Allow another regularity step
-    *index=-2;
   }
-
   // Improve primal feasibility if possible
   if (*index==-1 && d->ipr>=0) {
     *index = casadi_qp_pr_index(d, sign);
   }
-
   // Improve dual feasibility if possible
   if (*index==-1 && d->idu>=0) {
     *index = casadi_qp_du_index(d, sign, d->ipr);
   }
-
   // If a constraint was added
   if (*index>=0) {
     // Try to maintain non-singularity if possible
