@@ -992,11 +992,11 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
     casadi_qp_log(d, "%lld->%lld for regularity", *index, *sign);
   }
   // Improve primal feasibility if possible
-  if (*index==-1 && d->ipr>=0) {
+  if (*index == -1 && d->pr > 1e-14) {
     *index = casadi_qp_pr_index(d, sign);
   }
   // Improve dual feasibility if possible
-  if (*index==-1 && d->idu>=0) {
+  if (*index == -1 && d->du > 1e-14) {
     *index = casadi_qp_du_index(d, sign, d->ipr);
   }
   // If a constraint was added
