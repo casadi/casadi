@@ -295,32 +295,6 @@ namespace casadi {
   }
 
 
-  inline std::string return_status_string(int status) {
-    switch (status) {
-    case CPX_STAT_OPTIMAL:
-    case CPXMIP_OPTIMAL:
-      return "Optimal solution found";
-    case CPXMIP_OPTIMAL_TOL:
-      return "Optimal solution within tolerance found";
-    case CPX_STAT_UNBOUNDED:
-    case CPXMIP_UNBOUNDED:
-      return "Model is unbounded";
-    case CPX_STAT_INForUNBD:
-    case CPXMIP_INForUNBD:
-      return "Model is infeasible or unbounded";
-    case CPX_STAT_OPTIMAL_INFEAS:
-    case CPXMIP_OPTIMAL_INFEAS:
-      return "Optimal solution is available but with infeasibilities";
-    case CPX_STAT_NUM_BEST:
-      return "Solution available, but not proved optimal due to numeric difficulties";
-    case CPX_STAT_FIRSTORDER:
-      return "Solution satisfies first-order optimality conditions, "
-             "but is not necessarily globally optimal";
-    default:
-      return "unknown status: " + std::to_string(status);
-    }
-  }
-
   int CplexInterface::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     Conic::eval(arg, res, iw, w, mem);
@@ -595,7 +569,11 @@ namespace casadi {
     m->success |= m->return_status==CPXMIP_OPTIMAL;
     m->success |= m->return_status==CPXMIP_OPTIMAL_TOL;
 
-    if (verbose_) casadi_message("CPLEX return status: " + return_status_string(m->return_status));
+    if (verbose_) {
+      char status_string[CPXMESSAGEBUFSIZE];
+      CPXXgetstatstring(m->env, m->return_status, status_string);
+      casadi_message(string("CPLEX return status: ") + status_string);
+    }
 
     // Next time we warm start
     if (warm_start_) {
@@ -622,7 +600,11 @@ namespace casadi {
   Dict CplexInterface::get_stats(void* mem) const {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<CplexMemory*>(mem);
-    stats["return_status"] = return_status_string(m->return_status);
+
+    char status_string[CPXMESSAGEBUFSIZE];
+    CPXXgetstatstring(m->env, m->return_status, status_string);
+    stats["return_status"] = std::string(status_string);
+
     return stats;
   }
 
