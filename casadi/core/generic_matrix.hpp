@@ -946,7 +946,7 @@ namespace casadi {
     MatType step = (b-a)/static_cast<MatType>(nsteps-1);
 
     for (casadi_int i=1; i<nsteps-1; ++i)
-      ret[i] = ret[i-1] + step;
+      ret[i] = a + i * step;
 
     ret[nsteps-1] = b;
     return vertcat(ret);
