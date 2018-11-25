@@ -559,7 +559,7 @@ template<typename T1>
 casadi_int casadi_qp_dual_blocking(casadi_qp_data<T1>* d) {
   // Local variables
   casadi_int i, n_tau, j, k, du_index;
-  T1 tau_k, dtau, new_infeas, tau1;
+  T1 tau_k, dtau, new_infeas, tau1, infeas, tinfeas;
   const casadi_int *at_colind, *at_row;
   const casadi_qp_prob<T1>* p = d->prob;
   // Extract sparsities
@@ -575,9 +575,24 @@ casadi_int casadi_qp_dual_blocking(casadi_qp_data<T1>* d) {
     dtau = d->w[j] - tau_k;
     // Check if maximum dual infeasibilty gets exceeded
     for (k=0; k<p->nx; ++k) {
-      new_infeas = d->infeas[k]+dtau*d->tinfeas[k];
-      if (fabs(new_infeas) > d->edu) {
-        tau1 = fmax(0., tau_k + ((new_infeas>0 ? d->edu : -d->edu)-d->infeas[k])/d->tinfeas[k]);
+      // Get infeasibility and infeasibility tangent
+      infeas  = d->infeas[k];
+      tinfeas  = d->tinfeas[k];
+      // Make sure tinfeas>0
+      if (tinfeas==0) {
+        // Skip
+        continue;
+      } else if (tinfeas<0) {
+        // Switch signs
+        infeas *= -1;
+        tinfeas *= -1;
+      }
+      // Tentative new infeasibility
+      new_infeas = infeas + dtau*tinfeas;
+      // Does infeasibility get exceeded
+      if (new_infeas > d->edu) {
+        // Sign change and exceeded
+        tau1 = tau_k + fmax(0, (d->edu - infeas)/tinfeas);
         if (tau1 < d->tau) {
           // Smallest tau found so far
           d->tau = tau1;
