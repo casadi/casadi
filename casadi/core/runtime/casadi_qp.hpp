@@ -592,10 +592,14 @@ casadi_int casadi_qp_dual_blocking(casadi_qp_data<T1>* d) {
       // Does infeasibility get exceeded
       if (new_infeas > d->edu) {
         // Sign change and exceeded
-        tau1 = tau_k + fmax(0, (d->edu - infeas)/tinfeas);
-        if (tau1 < d->tau) {
-          // Smallest tau found so far
-          d->tau = tau1;
+        tau1 = (d->edu - infeas)/tinfeas;
+        if (tau1<0) {
+          // Do not enforce
+          d->tau = tau_k;
+          du_index = -1;
+        } else if (tau_k + tau1 < d->tau) {
+          // Enforce dual blocking constraint
+          d->tau = tau_k + tau1;
           du_index = k;
         }
       }
@@ -1000,11 +1004,13 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
   // Local variables
   const casadi_qp_prob<T1>* p = d->prob;
   // Try to restore regularity if possible
-  if (r_index >= 0 && (r_sign!=0 || casadi_qp_du_check(d, r_index) <= d->edu)) {
-    *index = r_index;
-    *sign = r_sign;
-    // C-VERBOSE
-    casadi_qp_log(d, "%lld->%lld for regularity", *index, *sign);
+  if (*index == -1 && r_index >= 0) {
+    if (r_sign != 0 || casadi_qp_du_check(d, r_index) <= d->du) {
+      *index = r_index;
+      *sign = r_sign;
+      // C-VERBOSE
+      casadi_qp_log(d, "%lld->%lld for regularity", *index, *sign);
+    }
   }
   // Improve primal feasibility if possible
   if (*index == -1 && d->pr > 1e-12) {
