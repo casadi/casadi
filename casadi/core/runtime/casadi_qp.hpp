@@ -664,25 +664,26 @@ int casadi_qp_flip_check(casadi_qp_data<T1>* d, casadi_int index, casadi_int sig
   casadi_int i;
   T1 best, test;
   const casadi_qp_prob<T1>* p = d->prob;
+  // Reset return values
+  *r_index=-1;
+  *r_sign=0;
   // Calculate the difference between unenforced and enforced column index
   casadi_qp_kkt_vector(d, d->dz, index);
   // Calculate the difference between old and new column index
   if (sign==0) casadi_scal(p->nz, -1., d->dz);
-  // Make a copy before it's overwritten
-  casadi_copy(d->dz, p->nz, d->dlam);
   // Try to find a linear combination of the new columns
   casadi_qr_solve(d->dz, 1, 0, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
                   p->prinv, p->pc, d->w);
   // If dz[index]!=1, new columns must be linearly independent
   if (fabs(d->dz[index]-1.)>=1e-12) return 0;
-  // Similarly, find a linear combination of the rows
+  // Next, find a linear combination of the new rows
+  casadi_fill(d->dlam, p->nz, 0.);
+  d->dlam[index] = 1;
   casadi_qr_solve(d->dlam, 1, 1, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
                   p->prinv, p->pc, d->w);
-  // If dlam[index]!=1, new rows must be linearly independent (due to numerics?)
-  if (fabs(d->dlam[index]-1.)>=1e-12) return 0;
+  // Quick return if no linear combination can be formed (due to numerics?)
+  if (fabs(1. + casadi_qp_kkt_dot(d, d->dlam, index))>=1e-12) return 1;
   // Find best constraint we can flip, if any
-  *r_index=-1;
-  *r_sign=0;
   best = p->inf;
   for (i=0; i<p->nz; ++i) {
     // Can't be the same
@@ -712,7 +713,7 @@ int casadi_qp_flip_check(casadi_qp_data<T1>* d, casadi_int index, casadi_int sig
       }
     } else {
       // Check new dual error for affected subset from setting lam[i]=0
-      if ((test=casadi_qp_du_check(d, i)) < best && test<d->edu) {
+      if ((test=casadi_qp_du_check(d, i)) < best && test<d->du) {
         best = test;
         *r_index = i;
         *r_sign = 0;
