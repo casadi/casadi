@@ -592,14 +592,10 @@ casadi_int casadi_qp_dual_blocking(casadi_qp_data<T1>* d) {
       // Does infeasibility get exceeded
       if (new_infeas > d->edu) {
         // Sign change and exceeded
-        tau1 = (d->edu - infeas)/tinfeas;
-        if (tau1<0) {
-          // Do not enforce
-          d->tau = tau_k;
-          du_index = -1;
-        } else if (tau_k + tau1 < d->tau) {
+        tau1 = fmax(tau_k, tau_k + (d->edu - infeas)/tinfeas);
+        if (tau1 < d->tau) {
           // Enforce dual blocking constraint
-          d->tau = tau_k + tau1;
+          d->tau = tau1;
           du_index = k;
         }
       }
