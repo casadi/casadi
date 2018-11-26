@@ -219,7 +219,7 @@ void casadi_qp_log(casadi_qp_data<T1>* d, const char* fmt, ...) {
 
 // SYMBOL "qp_du_check"
 template<typename T1>
-T1 casadi_qp_du_check(casadi_qp_data<T1>* d, casadi_int i) {
+int casadi_qp_du_check(casadi_qp_data<T1>* d, casadi_int i) {
   // Local variables
   casadi_int k;
   T1 new_du;
@@ -237,7 +237,7 @@ T1 casadi_qp_du_check(casadi_qp_data<T1>* d, casadi_int i) {
       new_du = fmax(new_du, fabs(d->infeas[at_row[k]]-d->nz_at[k]*d->lam[i]));
     }
   }
-  return new_du;
+  return new_du <= d->du;
 }
 
 // SYMBOL "qp_du_free"
@@ -300,7 +300,7 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign, casadi_in
       // If variable influences du, make sure sign is right
       if (d->lam[i]>0. ? d->sens[i]>0. : d->sens[i]<0.) continue;
       // Skip if maximum infeasibility increases
-      if (casadi_qp_du_check(d, i)>d->du) continue;
+      if (!casadi_qp_du_check(d, i)) continue;
     }
     // Check if best so far
     if (fabs(d->sens[i])>best_sens) {
@@ -678,7 +678,7 @@ int casadi_qp_flip_check(casadi_qp_data<T1>* d, casadi_int index, casadi_int sig
   casadi_qr_solve(d->dlam, 1, 1, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
                   p->prinv, p->pc, d->w);
   // Quick return if no linear combination can be formed (due to numerics?)
-  if (fabs(1. + casadi_qp_kkt_dot(d, d->dlam, index))>=1e-12) return 1;
+  if (fabs(1. + casadi_qp_kkt_dot(d, d->dlam, index)) >= 1e-12) return 1;
   // Find best constraint we can flip, if any
   best = p->inf;
   for (i=0; i<p->nz; ++i) {
@@ -687,29 +687,30 @@ int casadi_qp_flip_check(casadi_qp_data<T1>* d, casadi_int index, casadi_int sig
     // Make sure constraint is flippable
     if (d->lam[i]==0 ? d->neverlower[i] && d->neverupper[i] : d->neverzero[i]) continue;
     // If dz[i]==0, column i is not part of the linear combination
-    if (fabs(d->dz[i])<1e-12) continue;
+    if (fabs(d->dz[i]) < 1e-12) continue;
     // If dot(dlam, kkt_diff(i))==0, rank won't increase
-    if (fabs(casadi_qp_kkt_dot(d, d->dlam, i))<1e-12) continue;
+    if (fabs(casadi_qp_kkt_dot(d, d->dlam, i)) < 1e-12) continue;
     // Never drop a violated constraint
-    if (d->lam[i]>0 && d->z[i]>d->ubz[i]) continue;
-    if (d->lam[i]<0 && d->z[i]<d->lbz[i]) continue;
+    //if (d->lam[i]>0 && d->z[i]>d->ubz[i]) continue;
+    //if (d->lam[i]<0 && d->z[i]<d->lbz[i]) continue;
     // Check if best so far
     if (d->lam[i]==0) {
       // Check sensitivity for positive lam[i], larger is better
-      if (!d->neverupper[i] && (test=-d->sens[i]) < best) {
+      if (!d->neverupper[i] && (test = -d->sens[i]) < best) {
         best = test;
         *r_index = i;
         *r_sign = 1;
       }
       // Check sensitivity for negative lam[i], smaller is better
-      if (!d->neverlower[i] && (test=d->sens[i]) < best) {
+      if (!d->neverlower[i] && (test = d->sens[i]) < best) {
         best = test;
         *r_index = i;
         *r_sign = -1;
       }
     } else {
       // Check new dual error for affected subset from setting lam[i]=0
-      if ((test=casadi_qp_du_check(d, i)) < best && test<d->du) {
+      test = d->lam[i] > 0 ? d->sens[i] : -d->sens[i];
+      if (casadi_qp_du_check(d, i)) {
         best = test;
         *r_index = i;
         *r_sign = 0;
@@ -1002,7 +1003,7 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
   const casadi_qp_prob<T1>* p = d->prob;
   // Try to restore regularity if possible
   if (*index == -1 && r_index >= 0) {
-    if (r_sign != 0 || casadi_qp_du_check(d, r_index) <= d->du) {
+    if (r_sign != 0 || casadi_qp_du_check(d, r_index)) {
       *index = r_index;
       *sign = r_sign;
       // C-VERBOSE
