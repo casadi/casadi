@@ -206,7 +206,7 @@ namespace casadi {
       // Form and factorize the KKT system
       casadi_qp_factorize(&d);
       // Termination message
-      if (index==-1) {
+      if (!d.sing && index == -1) {
         casadi_qp_log(&d, "QP converged");
         m->return_status = "success";
       } else if (iter>=max_iter_) {
@@ -228,7 +228,7 @@ namespace casadi {
         d.msg[0] = '\0';
       }
       // Terminate loop?
-      if (index==-1 || flag!=0) break;
+      if ((!d.sing && index == -1) || flag!=0) break;
       // Start a new iteration
       iter++;
       // Calculate search direction

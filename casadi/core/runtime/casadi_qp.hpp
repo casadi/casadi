@@ -590,9 +590,9 @@ casadi_int casadi_qp_dual_blocking(casadi_qp_data<T1>* d) {
       // Tentative new infeasibility
       new_infeas = infeas + dtau*tinfeas;
       // Does infeasibility get exceeded
-      if (new_infeas > d->du) {
+      if (new_infeas > d->edu) {
         // Sign change and exceeded
-        tau1 = fmax(tau_k, tau_k + (d->du - infeas)/tinfeas);
+        tau1 = fmax(tau_k, tau_k + (d->edu - infeas)/tinfeas);
         if (tau1 < d->tau) {
           // Enforce dual blocking constraint
           d->tau = tau1;
@@ -982,8 +982,8 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
   casadi_qp_pr(d);
   casadi_qp_du(d);
   // Acceptable primal and dual error
-  d->epr = fmax(1e-14, d->pr*0.5);
-  d->edu = fmax(d->du*0.5, d->epr);
+  d->epr = fmax(d->pr, (0.5 * p->du_to_pr) * d->du);
+  d->edu = fmax(d->du, (0.5 / p->du_to_pr) * d->pr);
   // Sensitivity in decreasing |du|
   casadi_qp_calc_sens(d, d->idu);
 }
@@ -1028,19 +1028,19 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
   }
   // If nonsingular, try to flip a constraint
   if (!d->sing) {
-    // Improve primal feasibility if possible
-    if (*index == -1 && d->pr > 1e-12) {
+    // Improve primal feasibility if dominating
+    if (*index == -1 && d->pr >= p->du_to_pr * d->du) {
       *index = casadi_qp_pr_index(d, sign);
     }
-    // Improve dual feasibility if possible
-    if (*index == -1 && d->du > 1e-12) {
+    // Improve dual feasibility if dominating
+    if (*index == -1 && d->pr <= p->du_to_pr * d->du) {
       *index = casadi_qp_du_index(d, sign, d->ipr);
     }
   }
   // If a constraint was added
   if (*index>=0) {
     // Try to maintain non-singularity if possible
-    if (casadi_qp_flip_check(d, *index, *sign, &r_index, &r_sign)) {
+    if (!d->sing && casadi_qp_flip_check(d, *index, *sign, &r_index, &r_sign)) {
       if (r_index>=0) {
         // Also flip r_index to avoid singularity
         d->lam[r_index] = r_sign==0 ? 0 : r_sign>0 ? p->dmin : -p->dmin;
