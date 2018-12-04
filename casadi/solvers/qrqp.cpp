@@ -227,8 +227,15 @@ namespace casadi {
               d.mina, d.imina, d.tau, d.msg);
         d.msg[0] = '\0';
       }
-      // Terminate loop?
-      if ((!d.sing && index == -1) || flag!=0) break;
+      // Terminate with error
+      if (flag != 0) break;
+      // Check if converged and nonsingular
+      if (!d.sing) {
+        // No active set change could be found
+        if (index == -1) break;
+        // No primal or dual error
+        if (d.ipr < 0 && d.idu < 0) break;
+      }
       // Start a new iteration
       iter++;
       // Calculate search direction

@@ -768,10 +768,10 @@ int casadi_qp_pr_direction(casadi_qp_data<T1>* d, int sign) {
   casadi_int i;
   const casadi_qp_prob<T1>* p = d->prob;
   for (i=0; i<p->nz; ++i) {
-    if (d->lbz[i] - d->z[i] >= d->pr) {
+    if (d->lbz[i] - d->z[i] >= d->epr) {
       // Prevent further violation of lower bound
       if (sign*d->dz[i]<0 || sign*d->lam[i]>0) return 0;
-    } else if (d->z[i] - d->ubz[i] >= d->pr) {
+    } else if (d->z[i] - d->ubz[i] >= d->epr) {
       // Prevent further violation of upper bound
       if (sign*d->dz[i]>0 || sign*d->dlam[i]<0) return 0;
     }
@@ -785,10 +785,10 @@ int casadi_qp_du_direction(casadi_qp_data<T1>* d, int sign) {
   casadi_int i;
   const casadi_qp_prob<T1>* p = d->prob;
   for (i=0; i<p->nx; ++i) {
-    if (d->infeas[i] <= -d->du && sign*d->tinfeas[i]<0) {
+    if (d->infeas[i] <= -d->edu && sign*d->tinfeas[i]<0) {
       // Prevent further increase in dual infeasibility
       return 0;
-    } else if (d->infeas[i] >= d->du && sign*d->tinfeas[i]>0) {
+    } else if (d->infeas[i] >= d->edu && sign*d->tinfeas[i]>0) {
       // Prevent further increase in dual infeasibility
       return 0;
     }
@@ -1055,7 +1055,5 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
     d->lam[*index] = *sign==0 ? 0 : *sign>0 ? p->dmin : -p->dmin;
     // Recalculate primal and dual infeasibility
     casadi_qp_calc_dependent(d);
-    // Reset index
-    *index=-2;
   }
 }
