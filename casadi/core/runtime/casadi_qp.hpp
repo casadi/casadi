@@ -844,50 +844,56 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     for (i=0; i<p->nz; ++i) {
       // Skip if no rank increase
       if (!d->iw[i]) continue;
-      // Can we enforce a lower bound?
-      if (d->lam[i]==0. && !d->neverlower[i] && fabs(d->dz[i])>=1e-12) {
-        if (!casadi_qp_du_free(d, i, 0)) continue;
-        goodness = d->lbz[i] - d->z[i];  // more violated is better
-        tau_test = goodness/d->dz[i];
-        if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
-        if (goodness>best) {
-          best = goodness;
-          tau = tau_test;
-          *r_index = i;
-          *r_sign = -1;
-          // C-VERBOSE
-          casadi_qp_log(d, "Enforced lbz[%lld] for regularity", i);
+      // Enforced or not?
+      if (d->lam[i]==0.) {
+        // Avoid divide-by-zero
+        if (fabs(d->dz[i])<1e-12) continue;
+        // Can we enforce a lower bound?
+        if (!d->neverlower[i] && casadi_qp_du_free(d, i, 0)) {
+          goodness = d->lbz[i] - d->z[i];  // more violated is better
+          tau_test = goodness/d->dz[i];
+          if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
+          if (goodness>best) {
+            best = goodness;
+            tau = tau_test;
+            *r_index = i;
+            *r_sign = -1;
+            // C-VERBOSE
+            casadi_qp_log(d, "Enforced lbz[%lld] for regularity", i);
+          }
         }
-      }
-      // Can we enforce an upper bound?
-      if (d->lam[i]==0. && !d->neverupper[i] && fabs(d->dz[i])>=1e-12) {
-        if (!casadi_qp_du_free(d, i, 1)) continue;
-        goodness = d->z[i] - d->ubz[i];  // more violated is better
-        tau_test = -goodness/d->dz[i];
-        if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
-        if (goodness>best) {
-          best = goodness;
-          tau = tau_test;
-          *r_index = i;
-          *r_sign = 1;
-          // C-VERBOSE
-          casadi_qp_log(d, "Enforced ubz[%lld] for regularity", i);
+        // Can we enforce an upper bound?
+        if (!d->neverupper[i] && casadi_qp_du_free(d, i, 1)) {
+          goodness = d->z[i] - d->ubz[i];  // more violated is better
+          tau_test = -goodness/d->dz[i];
+          if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
+          if (goodness>best) {
+            best = goodness;
+            tau = tau_test;
+            *r_index = i;
+            *r_sign = 1;
+            // C-VERBOSE
+            casadi_qp_log(d, "Enforced ubz[%lld] for regularity", i);
+          }
         }
-      }
-      // Can we drop a constraint?
-      if (d->lam[i]!=0. && !d->neverzero[i] && fabs(d->dlam[i])>=1e-12) {
-        // More slack is better
-        goodness = d->lam[i]>0 ? d->ubz[i] - d->z[i] : d->z[i] - d->lbz[i];
-        tau_test = -d->lam[i]/d->dlam[i]; // scaling factor since lam can be close to DMIN
-        if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
-        // Check if best so far
-        if (goodness>best) {
-          best = goodness;
-          tau = tau_test;
-          *r_index = i;
-          *r_sign = 0;
-          // C-VERBOSE
-          casadi_qp_log(d, "Dropped %s[%lld] for regularity", d->lam[i]>0 ? "lbz" : "ubz", i);
+      } else {
+        // Avoid divide-by-zero
+        if (fabs(d->dlam[i])<1e-12) continue;
+        // Can we drop a constraint?
+        if (!d->neverzero[i]) {
+          // More slack is better
+          goodness = d->lam[i]>0 ? d->ubz[i] - d->z[i] : d->z[i] - d->lbz[i];
+          tau_test = -d->lam[i]/d->dlam[i]; // scaling factor since lam can be close to DMIN
+          if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
+          // Check if best so far
+          if (goodness>best) {
+            best = goodness;
+            tau = tau_test;
+            *r_index = i;
+            *r_sign = 0;
+            // C-VERBOSE
+            casadi_qp_log(d, "Dropped %s[%lld] for regularity", d->lam[i]>0 ? "lbz" : "ubz", i);
+          }
         }
       }
     }
