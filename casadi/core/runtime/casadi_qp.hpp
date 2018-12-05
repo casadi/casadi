@@ -801,7 +801,7 @@ int casadi_qp_du_direction(casadi_qp_data<T1>* d, int sign) {
 template<typename T1>
 int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
   // Local variables
-  T1 tau_test, tau, goodness, best;
+  T1 tau_test, tau, goodness, best, best_k;
   casadi_int nnz_kkt, nk, k, i;
   const casadi_qp_prob<T1>* p = d->prob;
   // Find the columns that take part in any linear combination
@@ -817,6 +817,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   casadi_qr(p->sp_kkt, d->nz_kkt, d->w, p->sp_v, d->nz_v, p->sp_r, d->nz_r,
             d->beta, p->prinv, p->pc);
   // Best flip
+  best_k = -1;
   tau = p->inf;
   best = -p->inf;
   // For all nullspace vectors
@@ -858,6 +859,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
             tau = tau_test;
             *r_index = i;
             *r_sign = -1;
+            best_k = k;
             // C-VERBOSE
             casadi_qp_log(d, "Enforced lbz[%lld] for regularity", i);
           }
@@ -872,6 +874,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
             tau = tau_test;
             *r_index = i;
             *r_sign = 1;
+            best_k = k;
             // C-VERBOSE
             casadi_qp_log(d, "Enforced ubz[%lld] for regularity", i);
           }
@@ -891,17 +894,20 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
             tau = tau_test;
             *r_index = i;
             *r_sign = 0;
+            best_k = k;
             // C-VERBOSE
             casadi_qp_log(d, "Dropped %s[%lld] for regularity", d->lam[i]>0 ? "lbz" : "ubz", i);
           }
         }
       }
     }
-    // Break at first possible direction
-    if (*r_index>=0) break;
   }
   // Can we restore feasibility?
   if (*r_index<0) return 1;
+  // Recalculate direction
+  casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, best_k);
+  casadi_copy(d->w, p->nz, d->dz);
+  casadi_qp_expand_step(d);
   // Scale step so that that tau=1 corresponds to a full step
   casadi_scal(p->nz, tau, d->dz);
   casadi_scal(p->nz, tau, d->dlam);
