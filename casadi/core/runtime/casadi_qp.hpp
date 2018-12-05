@@ -842,6 +842,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
       pos_ok = casadi_qp_du_direction(d, 1);
       neg_ok = casadi_qp_du_direction(d, -1);
     }
+    // Skip direction if neither allowed
+    if (!pos_ok && !neg_ok) continue;
     for (i=0; i<p->nz; ++i) {
       // Skip if no rank increase
       if (!d->iw[i]) continue;
