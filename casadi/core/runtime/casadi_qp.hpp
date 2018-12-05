@@ -801,8 +801,8 @@ int casadi_qp_du_direction(casadi_qp_data<T1>* d, int sign) {
 template<typename T1>
 int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
   // Local variables
-  T1 tau_test, tau, goodness, best, best_k;
-  casadi_int nnz_kkt, nk, k, i;
+  T1 tau_test, tau, goodness, best;
+  casadi_int nnz_kkt, nk, k, i, best_k;
   const casadi_qp_prob<T1>* p = d->prob;
   // Find the columns that take part in any linear combination
   for (i=0; i<p->nz; ++i) d->lincomb[i]=0;
