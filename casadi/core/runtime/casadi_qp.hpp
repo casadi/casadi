@@ -841,9 +841,11 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
       pos_ok = casadi_qp_du_direction(d, 1);
       neg_ok = casadi_qp_du_direction(d, -1);
     }
-    // Can we enforce a lower bound?
     for (i=0; i<p->nz; ++i) {
-      if (d->iw[i] && d->lam[i]==0. && !d->neverlower[i] && fabs(d->dz[i])>=1e-12) {
+      // Skip if no rank increase
+      if (!d->iw[i]) continue;
+      // Can we enforce a lower bound?
+      if (d->lam[i]==0. && !d->neverlower[i] && fabs(d->dz[i])>=1e-12) {
         if (!casadi_qp_du_free(d, i, 0)) continue;
         goodness = d->lbz[i] - d->z[i];  // more violated is better
         tau_test = goodness/d->dz[i];
@@ -857,10 +859,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           casadi_qp_log(d, "Enforced lbz[%lld] for regularity", i);
         }
       }
-    }
-    // Can we enforce an upper bound?
-    for (i=0; i<p->nz; ++i) {
-      if (d->iw[i] && d->lam[i]==0. && !d->neverupper[i] && fabs(d->dz[i])>=1e-12) {
+      // Can we enforce an upper bound?
+      if (d->lam[i]==0. && !d->neverupper[i] && fabs(d->dz[i])>=1e-12) {
         if (!casadi_qp_du_free(d, i, 1)) continue;
         goodness = d->z[i] - d->ubz[i];  // more violated is better
         tau_test = -goodness/d->dz[i];
@@ -874,10 +874,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           casadi_qp_log(d, "Enforced ubz[%lld] for regularity", i);
         }
       }
-    }
-    // Can we drop a constraint?
-    for (i=0; i<p->nz; ++i) {
-      if (d->iw[i] && d->lam[i]!=0. && !d->neverzero[i] && fabs(d->dlam[i])>=1e-12) {
+      // Can we drop a constraint?
+      if (d->lam[i]!=0. && !d->neverzero[i] && fabs(d->dlam[i])>=1e-12) {
         // More slack is better
         goodness = d->lam[i]>0 ? d->ubz[i] - d->z[i] : d->z[i] - d->lbz[i];
         tau_test = -d->lam[i]/d->dlam[i]; // scaling factor since lam can be close to DMIN
