@@ -801,7 +801,7 @@ int casadi_qp_du_direction(casadi_qp_data<T1>* d) {
 template<typename T1>
 int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
   // Local variables
-  T1 tau_test, tau, goodness, best;
+  T1 tau_test, tau;
   casadi_int nnz_kkt, nk, k, i, best_k, best_sign, j;
   const casadi_qp_prob<T1>* p = d->prob;
   // Find the columns that take part in any linear combination
@@ -819,7 +819,6 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   // Best flip
   best_k = -1;
   tau = p->inf;
-  best = p->inf;
   // For all nullspace vectors
   nk = casadi_qr_singular(static_cast<T1*>(0), 0, d->nz_r, p->sp_r, p->pc, 1e-12);
   for (k=0; k<nk; ++k) {
@@ -862,8 +861,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           // Can we enforce a lower bound?
           if (!d->neverlower[i]) {
             tau_test = (d->lbz[i] - d->z[i]) / d->dz[i];
-            if (tau_test < best) {
-              best = tau_test;
+            if (tau_test < tau) {
               tau = tau_test;
               *r_index = i;
               *r_sign = -1;
@@ -876,8 +874,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           // Can we enforce an upper bound?
           if (!d->neverupper[i]) {
             tau_test = (d->ubz[i] - d->z[i]) / d->dz[i];
-            if (tau_test < best) {
-              best = tau_test;
+            if (tau_test < tau) {
               tau = tau_test;
               *r_index = i;
               *r_sign = 1;
@@ -895,8 +892,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
             // Wrong direction?
             if (d->dlam[i] > 0 ? d->lam[i] > 0 : d->lam[i] < 0) continue;
             tau_test = -d->lam[i] / d->dlam[i];
-            if (tau_test < best) {
-              best = tau_test;
+            if (tau_test < tau) {
               tau = tau_test;
               *r_index = i;
               *r_sign = 0;
