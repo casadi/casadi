@@ -894,12 +894,9 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           if (!d->neverzero[i]) {
             // Wrong direction?
             if (d->dlam[i] > 0 ? d->lam[i] > 0 : d->lam[i] < 0) continue;
-            tau_test = -d->lam[i]/d->dlam[i];
-            // More slack is better
-            goodness = d->lam[i]>0 ? d->ubz[i] - d->z[i] : d->z[i] - d->lbz[i];
-            // Check if best so far
-            if (-goodness < best) {
-              best = -goodness;
+            tau_test = -d->lam[i] / d->dlam[i];
+            if (tau_test < best) {
+              best = tau_test;
               tau = tau_test;
               *r_index = i;
               *r_sign = 0;
