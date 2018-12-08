@@ -802,7 +802,7 @@ template<typename T1>
 int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
   // Local variables
   T1 tau_test, tau, goodness, best;
-  casadi_int nnz_kkt, nk, k, i, best_k;
+  casadi_int nnz_kkt, nk, k, i, best_k, best_sign, j;
   const casadi_qp_prob<T1>* p = d->prob;
   // Find the columns that take part in any linear combination
   for (i=0; i<p->nz; ++i) d->lincomb[i]=0;
@@ -834,71 +834,83 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     // Calculate step, dz and dlam
     casadi_copy(d->w, p->nz, d->dz);
     casadi_qp_expand_step(d);
-    // Is primal error increasing in the search directions?
-    pos_ok = casadi_qp_pr_direction(d, 1);
-    neg_ok = casadi_qp_pr_direction(d, -1);
-    // If both directions are possible, check dual error
-    if (pos_ok && neg_ok) {
-      pos_ok = casadi_qp_du_direction(d, 1);
-      neg_ok = casadi_qp_du_direction(d, -1);
-    }
-    // Skip direction if neither allowed
-    if (!pos_ok && !neg_ok) continue;
-    for (i=0; i<p->nz; ++i) {
-      // Skip if no rank increase
-      if (!d->iw[i]) continue;
-      // Enforced or not?
-      if (d->lam[i]==0.) {
-        // Avoid divide-by-zero
-        if (fabs(d->dz[i])<1e-12) continue;
-        // Can we enforce a lower bound?
-        if (!d->neverlower[i] && casadi_qp_du_free(d, i, 0)) {
-          goodness = d->lbz[i] - d->z[i];  // more violated is better
-          tau_test = goodness/d->dz[i];
-          if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
-          if (goodness>best) {
-            best = goodness;
-            tau = tau_test;
-            *r_index = i;
-            *r_sign = -1;
-            best_k = k;
-            // C-VERBOSE
-            casadi_qp_log(d, "Enforced lbz[%lld] for regularity", i);
+    // Try both positive and negative direction
+    for (j=0; j<2; ++j) {
+      // Negate direction
+      if (j) {
+        casadi_scal(p->nz, -1., d->dz);
+        casadi_scal(p->nz, -1., d->dlam);
+        casadi_scal(p->nx, -1., d->tinfeas);
+      }
+      // Is primal error increasing in the search directions?
+      pos_ok = casadi_qp_pr_direction(d, 1);
+      neg_ok = casadi_qp_pr_direction(d, -1);
+      // If both directions are possible, check dual error
+      if (pos_ok && neg_ok) {
+        pos_ok = casadi_qp_du_direction(d, 1);
+        neg_ok = casadi_qp_du_direction(d, -1);
+      }
+      // Skip direction if neither allowed
+      if (!pos_ok && !neg_ok) continue;
+      for (i=0; i<p->nz; ++i) {
+        // Skip if no rank increase
+        if (!d->iw[i]) continue;
+        // Enforced or not?
+        if (d->lam[i]==0.) {
+          // Avoid divide-by-zero
+          if (fabs(d->dz[i])<1e-12) continue;
+          // Can we enforce a lower bound?
+          if (!d->neverlower[i] && casadi_qp_du_free(d, i, 0)) {
+            goodness = d->lbz[i] - d->z[i];  // more violated is better
+            tau_test = goodness/d->dz[i];
+            if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
+            if (goodness>best) {
+              best = goodness;
+              tau = tau_test;
+              *r_index = i;
+              *r_sign = -1;
+              best_k = k;
+              best_sign = j ? -1 : 1;
+              // C-VERBOSE
+              casadi_qp_log(d, "Enforced lbz[%lld] for regularity", i);
+            }
           }
-        }
-        // Can we enforce an upper bound?
-        if (!d->neverupper[i] && casadi_qp_du_free(d, i, 1)) {
-          goodness = d->z[i] - d->ubz[i];  // more violated is better
-          tau_test = -goodness/d->dz[i];
-          if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
-          if (goodness>best) {
-            best = goodness;
-            tau = tau_test;
-            *r_index = i;
-            *r_sign = 1;
-            best_k = k;
-            // C-VERBOSE
-            casadi_qp_log(d, "Enforced ubz[%lld] for regularity", i);
+          // Can we enforce an upper bound?
+          if (!d->neverupper[i] && casadi_qp_du_free(d, i, 1)) {
+            goodness = d->z[i] - d->ubz[i];  // more violated is better
+            tau_test = -goodness/d->dz[i];
+            if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
+            if (goodness>best) {
+              best = goodness;
+              tau = tau_test;
+              *r_index = i;
+              *r_sign = 1;
+              best_k = k;
+              best_sign = j ? -1 : 1;
+              // C-VERBOSE
+              casadi_qp_log(d, "Enforced ubz[%lld] for regularity", i);
+            }
           }
-        }
-      } else {
-        // Avoid divide-by-zero
-        if (fabs(d->dlam[i])<1e-12) continue;
-        // Can we drop a constraint?
-        if (!d->neverzero[i]) {
-          // More slack is better
-          goodness = d->lam[i]>0 ? d->ubz[i] - d->z[i] : d->z[i] - d->lbz[i];
-          tau_test = -d->lam[i]/d->dlam[i]; // scaling factor since lam can be close to DMIN
-          if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
-          // Check if best so far
-          if (goodness>best) {
-            best = goodness;
-            tau = tau_test;
-            *r_index = i;
-            *r_sign = 0;
-            best_k = k;
-            // C-VERBOSE
-            casadi_qp_log(d, "Dropped %s[%lld] for regularity", d->lam[i]>0 ? "lbz" : "ubz", i);
+        } else {
+          // Avoid divide-by-zero
+          if (fabs(d->dlam[i])<1e-12) continue;
+          // Can we drop a constraint?
+          if (!d->neverzero[i]) {
+            // More slack is better
+            goodness = d->lam[i]>0 ? d->ubz[i] - d->z[i] : d->z[i] - d->lbz[i];
+            tau_test = -d->lam[i]/d->dlam[i]; // scaling factor since lam can be close to DMIN
+            if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
+            // Check if best so far
+            if (goodness>best) {
+              best = goodness;
+              tau = tau_test;
+              *r_index = i;
+              *r_sign = 0;
+              best_k = k;
+              best_sign = j ? -1 : 1;
+              // C-VERBOSE
+              casadi_qp_log(d, "Dropped %s[%lld] for regularity", d->lam[i]>0 ? "lbz" : "ubz", i);
+            }
           }
         }
       }
@@ -907,10 +919,10 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   // Can we restore feasibility?
   if (*r_index<0) return 1;
   // Recalculate direction
-  casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, best_k);
-  casadi_copy(d->w, p->nz, d->dz);
+  casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, best_k);
   casadi_qp_expand_step(d);
   // Scale step so that that tau=1 corresponds to a full step
+  tau *= best_sign;
   casadi_scal(p->nz, tau, d->dz);
   casadi_scal(p->nz, tau, d->dlam);
   casadi_scal(p->nx, tau, d->tinfeas);
