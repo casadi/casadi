@@ -857,6 +857,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         if (d->lam[i]==0.) {
           // Avoid divide-by-zero
           if (fabs(d->dz[i])<1e-12) continue;
+          // Wrong direction
+          if (d->dz[i] < 0 ? d->z[i] < d->lbz[i] : d->z[i] > d->ubz[i]) continue;
           // Can we enforce a lower bound?
           if (!d->neverlower[i] && casadi_qp_du_free(d, i, 0)) {
             goodness = d->lbz[i] - d->z[i];  // more violated is better
