@@ -770,10 +770,10 @@ int casadi_qp_pr_direction(casadi_qp_data<T1>* d) {
   for (i=0; i<p->nz; ++i) {
     if (d->lbz[i] - d->z[i] >= d->epr) {
       // Prevent further violation of lower bound
-      if (d->dz[i]<0 || d->lam[i]>0) return 0;
+      if (d->dz[i] < 0 || d->dlam[i] > 0) return 0;
     } else if (d->z[i] - d->ubz[i] >= d->epr) {
       // Prevent further violation of upper bound
-      if (d->dz[i]>0 || d->dlam[i]<0) return 0;
+      if (d->dz[i] > 0 || d->dlam[i] < 0) return 0;
     }
   }
   return 1;
@@ -894,9 +894,9 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           if (!d->neverzero[i]) {
             // Wrong direction?
             if (d->dlam[i] > 0 ? d->lam[i] > 0 : d->lam[i] < 0) continue;
+            tau_test = -d->lam[i]/d->dlam[i];
             // More slack is better
             goodness = d->lam[i]>0 ? d->ubz[i] - d->z[i] : d->z[i] - d->lbz[i];
-            tau_test = -d->lam[i]/d->dlam[i]; // scaling factor since lam can be close to DMIN
             // Check if best so far
             if (-goodness < best) {
               best = -goodness;
