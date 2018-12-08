@@ -781,14 +781,14 @@ int casadi_qp_pr_direction(casadi_qp_data<T1>* d, int sign) {
 
 // SYMBOL "casadi_qp_du_direction"
 template<typename T1>
-int casadi_qp_du_direction(casadi_qp_data<T1>* d, int sign) {
+int casadi_qp_du_direction(casadi_qp_data<T1>* d) {
   casadi_int i;
   const casadi_qp_prob<T1>* p = d->prob;
   for (i=0; i<p->nx; ++i) {
-    if (d->infeas[i] <= -d->edu && sign*d->tinfeas[i]<0) {
+    if (d->infeas[i] <= -d->edu && d->tinfeas[i]<0) {
       // Prevent further increase in dual infeasibility
       return 0;
-    } else if (d->infeas[i] >= d->edu && sign*d->tinfeas[i]>0) {
+    } else if (d->infeas[i] >= d->edu && d->tinfeas[i]>0) {
       // Prevent further increase in dual infeasibility
       return 0;
     }
@@ -846,11 +846,10 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
       neg_ok = casadi_qp_pr_direction(d, -1);
       // If both directions are possible, check dual error
       if (pos_ok && neg_ok) {
-        pos_ok = casadi_qp_du_direction(d, 1);
-        neg_ok = casadi_qp_du_direction(d, -1);
+        pos_ok = casadi_qp_du_direction(d);
       }
       // Skip direction if neither allowed
-      if (!pos_ok && !neg_ok) continue;
+      if (!pos_ok) continue;
       for (i=0; i<p->nz; ++i) {
         // Skip if no rank increase
         if (!d->iw[i]) continue;
