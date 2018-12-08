@@ -819,7 +819,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   // Best flip
   best_k = -1;
   tau = p->inf;
-  best = -p->inf;
+  best = p->inf;
   // For all nullspace vectors
   nk = casadi_qr_singular(static_cast<T1*>(0), 0, d->nz_r, p->sp_r, p->pc, 1e-12);
   for (k=0; k<nk; ++k) {
@@ -861,11 +861,10 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           if (d->dz[i] < 0 ? d->z[i] < d->lbz[i] : d->z[i] > d->ubz[i]) continue;
           // Can we enforce a lower bound?
           if (!d->neverlower[i] && casadi_qp_du_free(d, i, 0)) {
-            goodness = d->lbz[i] - d->z[i];  // more violated is better
-            tau_test = goodness/d->dz[i];
-            if (tau_test<0) continue;
-            if (goodness>best) {
-              best = goodness;
+            tau_test = (d->lbz[i] - d->z[i]) / d->dz[i];
+            goodness = d->lbz[i] - d->z[i];
+            if (-goodness < best) {
+              best = -goodness;
               tau = tau_test;
               *r_index = i;
               *r_sign = -1;
@@ -877,11 +876,10 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           }
           // Can we enforce an upper bound?
           if (!d->neverupper[i] && casadi_qp_du_free(d, i, 1)) {
-            goodness = d->z[i] - d->ubz[i];  // more violated is better
-            tau_test = -goodness/d->dz[i];
-            if (tau_test<0) continue;
-            if (goodness>best) {
-              best = goodness;
+            tau_test = (d->ubz[i] - d->z[i]) / d->dz[i];
+            goodness = d->z[i] - d->ubz[i];
+            if (-goodness < best) {
+              best = -goodness;
               tau = tau_test;
               *r_index = i;
               *r_sign = 1;
@@ -899,10 +897,10 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
             // More slack is better
             goodness = d->lam[i]>0 ? d->ubz[i] - d->z[i] : d->z[i] - d->lbz[i];
             tau_test = -d->lam[i]/d->dlam[i]; // scaling factor since lam can be close to DMIN
-            if (tau_test<0) continue;
+            if (tau_test < 0) continue;
             // Check if best so far
-            if (goodness>best) {
-              best = goodness;
+            if (-goodness < best) {
+              best = -goodness;
               tau = tau_test;
               *r_index = i;
               *r_sign = 0;
