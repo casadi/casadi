@@ -860,7 +860,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           // Wrong direction?
           if (d->dz[i] > 0 ? d->z[i] > d->ubz[i] : d->z[i] < d->lbz[i]) continue;
           // Can we enforce a lower bound?
-          if (!d->neverlower[i] && casadi_qp_du_free(d, i, 0)) {
+          if (!d->neverlower[i]) {
             tau_test = (d->lbz[i] - d->z[i]) / d->dz[i];
             if (tau_test < best) {
               best = tau_test;
@@ -874,7 +874,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
             }
           }
           // Can we enforce an upper bound?
-          if (!d->neverupper[i] && casadi_qp_du_free(d, i, 1)) {
+          if (!d->neverupper[i]) {
             tau_test = (d->ubz[i] - d->z[i]) / d->dz[i];
             if (tau_test < best) {
               best = tau_test;
