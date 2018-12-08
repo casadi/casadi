@@ -785,10 +785,10 @@ int casadi_qp_du_direction(casadi_qp_data<T1>* d) {
   casadi_int i;
   const casadi_qp_prob<T1>* p = d->prob;
   for (i=0; i<p->nx; ++i) {
-    if (d->infeas[i] <= -d->edu && d->tinfeas[i]<0) {
+    if (d->infeas[i] <= -d->edu && d->tinfeas[i] < -1e-16) {
       // Prevent further increase in dual infeasibility
       return 0;
-    } else if (d->infeas[i] >= d->edu && d->tinfeas[i]>0) {
+    } else if (d->infeas[i] >= d->edu && d->tinfeas[i] > 1e-16) {
       // Prevent further increase in dual infeasibility
       return 0;
     }
@@ -839,8 +839,17 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         casadi_scal(p->nz, -1., d->dlam);
         casadi_scal(p->nx, -1., d->tinfeas);
       }
-      // Is primal error increasing in the search directions?
-      if (!casadi_qp_pr_direction(d)) continue;
+      // If primal feasibility if dominating
+      if (d->pr >= p->du_to_pr * d->du) {
+        // Make sure primal infeasibility doesn't increase
+        if (!casadi_qp_pr_direction(d)) continue;
+      }
+      // Improve dual feasibility if dominating
+      if (d->pr <= p->du_to_pr * d->du) {
+        // Make sure dual infeasibility doesn't increase
+        if (!casadi_qp_du_direction(d)) continue;
+        if (!casadi_qp_pr_direction(d)) continue;
+      }
       for (i=0; i<p->nz; ++i) {
         // Skip if no rank increase
         if (!d->iw[i]) continue;
