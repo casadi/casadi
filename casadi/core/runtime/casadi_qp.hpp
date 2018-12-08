@@ -826,13 +826,12 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     // Local variables
     int pos_ok, neg_ok;
     // Get a linear combination of the rows in kkt
-    casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, k);
+    casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, k);
     // Which constraints can be flipped in order to increase rank?
     for (i=0; i<p->nz; ++i) {
-      d->iw[i] = d->lincomb[i] && fabs(casadi_qp_kkt_dot(d, d->w, i))>=1e-12;
+      d->iw[i] = d->lincomb[i] && fabs(casadi_qp_kkt_dot(d, d->dz, i))>=1e-12;
     }
     // Calculate step, dz and dlam
-    casadi_copy(d->w, p->nz, d->dz);
     casadi_qp_expand_step(d);
     // Try both positive and negative direction
     for (j=0; j<2; ++j) {
@@ -863,7 +862,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           if (!d->neverlower[i] && casadi_qp_du_free(d, i, 0)) {
             goodness = d->lbz[i] - d->z[i];  // more violated is better
             tau_test = goodness/d->dz[i];
-            if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
+            if ((!pos_ok && tau_test>0) || tau_test<0) continue;
             if (goodness>best) {
               best = goodness;
               tau = tau_test;
@@ -879,7 +878,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           if (!d->neverupper[i] && casadi_qp_du_free(d, i, 1)) {
             goodness = d->z[i] - d->ubz[i];  // more violated is better
             tau_test = -goodness/d->dz[i];
-            if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
+            if ((!pos_ok && tau_test>0) || tau_test<0) continue;
             if (goodness>best) {
               best = goodness;
               tau = tau_test;
@@ -899,7 +898,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
             // More slack is better
             goodness = d->lam[i]>0 ? d->ubz[i] - d->z[i] : d->z[i] - d->lbz[i];
             tau_test = -d->lam[i]/d->dlam[i]; // scaling factor since lam can be close to DMIN
-            if ((!pos_ok && tau_test>0) || (!neg_ok && tau_test<0)) continue;
+            if ((!pos_ok && tau_test>0) || tau_test<0) continue;
             // Check if best so far
             if (goodness>best) {
               best = goodness;
