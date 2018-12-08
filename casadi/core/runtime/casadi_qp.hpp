@@ -856,9 +856,9 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         // Enforced or not?
         if (d->lam[i]==0.) {
           // Avoid divide-by-zero
-          if (fabs(d->dz[i])<1e-12) continue;
-          // Wrong direction
-          if (d->dz[i] < 0 ? d->z[i] < d->lbz[i] : d->z[i] > d->ubz[i]) continue;
+          if (fabs(d->dz[i]) < 1e-12) continue;
+          // Wrong direction?
+          if (d->dz[i] > 0 ? d->z[i] > d->ubz[i] : d->z[i] < d->lbz[i]) continue;
           // Can we enforce a lower bound?
           if (!d->neverlower[i] && casadi_qp_du_free(d, i, 0)) {
             tau_test = (d->lbz[i] - d->z[i]) / d->dz[i];
@@ -889,13 +889,14 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           }
         } else {
           // Avoid divide-by-zero
-          if (fabs(d->dlam[i])<1e-12) continue;
+          if (fabs(d->dlam[i]) < 1e-12) continue;
           // Can we drop a constraint?
           if (!d->neverzero[i]) {
+            // Wrong direction?
+            if (d->dlam[i] > 0 ? d->lam[i] > 0 : d->lam[i] < 0) continue;
             // More slack is better
             goodness = d->lam[i]>0 ? d->ubz[i] - d->z[i] : d->z[i] - d->lbz[i];
             tau_test = -d->lam[i]/d->dlam[i]; // scaling factor since lam can be close to DMIN
-            if (tau_test < 0) continue;
             // Check if best so far
             if (-goodness < best) {
               best = -goodness;
