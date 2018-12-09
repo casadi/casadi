@@ -282,8 +282,19 @@ casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign, casadi_in
   // Accept, if any
   if (best_ind>=0) {
     *sign = best_sign;
-    // C-VERBOSE
-    casadi_qp_log(d, "%lld->%lld to reduce |du|", best_ind, best_sign);
+    if (best_sign > 0) {
+      // C-VERBOSE
+      casadi_qp_log(d, "Enforced ubz[%lld] to reduce |du|", best_ind);
+    } else if (best_sign < 0) {
+      // C-VERBOSE
+      casadi_qp_log(d, "Enforced lbz[%lld] to reduce |du|", best_ind);
+    } else if (d->lam[best_ind] > 0) {
+      // C-VERBOSE
+      casadi_qp_log(d, "Dropped ubz[%lld] to reduce |du|", best_ind);
+    } else {
+      // C-VERBOSE
+      casadi_qp_log(d, "Dropped lbz[%lld] to reduce |du|", best_ind);
+    }
     return best_ind;
   } else {
     return -1;
@@ -865,20 +876,6 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   casadi_scal(p->nz, tau, d->dz);
   casadi_scal(p->nz, tau, d->dlam);
   casadi_scal(p->nx, tau, d->tinfeas);
-  // Message
-  if (*r_sign > 0) {
-    // C-VERBOSE
-    casadi_qp_log(d, "Enforced ubz[%lld] for regularity", *r_index);
-  } else if (*r_sign < 0) {
-    // C-VERBOSE
-    casadi_qp_log(d, "Enforced lbz[%lld] for regularity", *r_index);
-  } else if (d->lam[*r_index]>0) {
-    // C-VERBOSE
-    casadi_qp_log(d, "Dropped ubz[%lld] for regularity", *r_index);
-  } else {
-    // C-VERBOSE
-    casadi_qp_log(d, "Dropped lbz[%lld] for regularity", *r_index);
-  }
   return 0;
 }
 
@@ -1001,8 +998,19 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
     if (r_sign != 0 || casadi_qp_du_check(d, r_index)) {
       *index = r_index;
       *sign = r_sign;
-      // C-VERBOSE
-      casadi_qp_log(d, "%lld->%lld for regularity", *index, *sign);
+      if (*sign > 0) {
+        // C-VERBOSE
+        casadi_qp_log(d, "Enforced ubz[%lld] for regularity", *index);
+      } else if (*sign < 0) {
+        // C-VERBOSE
+        casadi_qp_log(d, "Enforced lbz[%lld] for regularity", *index);
+      } else if (d->lam[*index] > 0) {
+        // C-VERBOSE
+        casadi_qp_log(d, "Dropped ubz[%lld] for regularity", *index);
+      } else {
+        // C-VERBOSE
+        casadi_qp_log(d, "Dropped lbz[%lld] for regularity", *index);
+      }
     }
   }
   // If nonsingular and nonzero error, try to flip a constraint
