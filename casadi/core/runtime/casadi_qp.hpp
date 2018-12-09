@@ -830,8 +830,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           if (d->dz[i] > 0 ? d->z[i] > d->ubz[i] : d->z[i] < d->lbz[i]) continue;
           // Can we enforce a lower bound?
           if (!d->neverlower[i]) {
-            tau_test = (d->lbz[i] - d->z[i]) / d->dz[i];
-            if (tau_test < tau) {
+            if ((tau_test = (d->lbz[i] - d->z[i]) / d->dz[i]) < tau) {
               tau = tau_test;
               *r_index = i;
               *r_sign = -1;
@@ -841,8 +840,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           }
           // Can we enforce an upper bound?
           if (!d->neverupper[i]) {
-            tau_test = (d->ubz[i] - d->z[i]) / d->dz[i];
-            if (tau_test < tau) {
+            if ((tau_test = (d->ubz[i] - d->z[i]) / d->dz[i]) < tau) {
               tau = tau_test;
               *r_index = i;
               *r_sign = 1;
@@ -851,20 +849,16 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
             }
           }
         } else {
-          // Avoid divide-by-zero
-          if (fabs(d->dlam[i]) < 1e-12) continue;
           // Can we drop a constraint?
-          if (!d->neverzero[i]) {
-            // Wrong direction?
-            if (d->dlam[i] > 0 ? d->lam[i] > 0 : d->lam[i] < 0) continue;
-            tau_test = -d->lam[i] / d->dlam[i];
-            if (tau_test < tau) {
-              tau = tau_test;
-              *r_index = i;
-              *r_sign = 0;
-              best_k = k;
-              best_neg = neg;
-            }
+          if (fabs(d->dlam[i]) < 1e-12 || d->neverzero[i]) continue;
+          // Wrong direction?
+          if (d->dlam[i] > 0 ? d->lam[i] > 0 : d->lam[i] < 0) continue;
+          if ((tau_test = -d->lam[i] / d->dlam[i]) < tau) {
+            tau = tau_test;
+            *r_index = i;
+            *r_sign = 0;
+            best_k = k;
+            best_neg = neg;
           }
         }
       }
