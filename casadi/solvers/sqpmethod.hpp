@@ -140,6 +140,7 @@ namespace casadi {
 
     /// Regularization
     bool regularize_;
+    double regularize_margin_;
 
     /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;

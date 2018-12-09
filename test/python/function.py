@@ -1832,7 +1832,14 @@ class Functiontests(casadiTestCase):
       r_mx = F(DM([[1,2,3]]))
       self.checkarray(r_all, r_mx, "Mapped evaluation (MX)")
 
+  def test_default_arg(self):
+      x = MX.sym("x")
+      y = MX.sym("y")
+      z = MX.sym("z")
 
+      f = Function('f',[x,y,z],[x,y,z],["x","y","z"],["a","b","c"],{"default_in": [1,2,3]})
+      self.check_codegen(f,{"x":5,"z":3})
+      
 
 if __name__ == '__main__':
     unittest.main()

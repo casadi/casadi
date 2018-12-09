@@ -59,6 +59,9 @@ namespace casadi {
     incref_ = (signal_t)li_.get_function(name_ + "_incref");
     decref_ = (signal_t)li_.get_function(name_ + "_decref");
 
+    // Getting default arguments
+    get_default_in_ = (default_t)li_.get_function(name_ + "_default_in");
+
     // Getting number of inputs and outputs
     get_n_in_ = (getint_t)li_.get_function(name_ + "_n_in");
     get_n_out_ = (getint_t)li_.get_function(name_ + "_n_out");
@@ -119,6 +122,15 @@ namespace casadi {
     } else {
       // Fall back to base class
       return FunctionInternal::get_n_out();
+    }
+  }
+
+  double External::get_default_in(casadi_int i) const {
+    if (get_default_in_) {
+      return get_default_in_(i);
+    } else {
+      // Fall back to base class
+      return FunctionInternal::get_default_in(i);
     }
   }
 

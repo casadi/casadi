@@ -77,4 +77,4 @@ print('Expected: ', f.call(input_val))
 print('Got:      ', output_val)
 
 
-print f.instructions_sx()
+print(f.instructions_sx())

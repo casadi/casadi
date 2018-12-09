@@ -494,11 +494,11 @@ namespace casadi {
   int Conic::
   eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     if (print_problem_) {
-      uout() << "H:" << std::endl;
+      uout() << "H:";
       DM::print_dense(uout(), H_, arg[CONIC_H], false);
       uout() << std::endl;
       uout() << "G:" << std::vector<double>(arg[CONIC_G], arg[CONIC_G]+nx_) << std::endl;
-      uout() << "A" << std::endl;
+      uout() << "A:";
       DM::print_dense(uout(), A_, arg[CONIC_A], false);
       uout() << std::endl;
       uout() << "lba:" << std::vector<double>(arg[CONIC_LBA], arg[CONIC_LBA]+na_) << std::endl;

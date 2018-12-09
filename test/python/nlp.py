@@ -53,7 +53,7 @@ if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
 if has_conic("qrqp") and has_nlpsol("sqpmethod"):
   solvers.append(("sqpmethod",{"qpsol": "qrqp"},{"codegen"}))
   solvers.append(("sqpmethod",{"qpsol": "qrqp","max_iter_ls":0},{"codegen"}))
-  solvers.append(("sqpmethod",{"qpsol": "qrqp","regularize":True},{"codegen"}))
+  solvers.append(("sqpmethod",{"qpsol": "qrqp","regularize":True,"max_iter":500},{"codegen"}))
 
 if has_nlpsol("blocksqp"):
   try:
@@ -334,6 +334,26 @@ class NLPtests(casadiTestCase):
       if "codegen" in features:
         self.check_codegen(solver,solver_in,std="c99")
 
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+      solver_in = {}
+
+      if Solver in ("worhp","knitro"):
+        with self.assertRaises(Exception):
+          solver_out = solver(**solver_in)
+        return
+
+      solver_out = solver(**solver_in)
+      self.assertTrue(solver.stats()["success"])
+      self.assertAlmostEqual(solver_out["f"][0],0,10,str(Solver))
+      self.assertAlmostEqual(solver_out["x"][0],1,7,str(Solver) + str(solver_out["x"][0]-1))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,9,str(Solver))
+      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
+
+      if "codegen" in features:
+        self.check_codegen(solver,solver_in,std="c99")
+
+
+
   def test_IPOPTrb(self):
     self.message("rosenbrock, limited-memory hessian approx")
     x=SX.sym("x")
@@ -342,6 +362,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2}
 
     for Solver, solver_options, features in solvers:
+      if "sqpmethod"==Solver and "regularize" in str(solver_options): continue
       if "snopt"==Solver: continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -366,6 +387,7 @@ class NLPtests(casadiTestCase):
 
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options, features in solvers:
+      if "sqpmethod"==Solver and "regularize" in str(solver_options): continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -598,6 +620,7 @@ class NLPtests(casadiTestCase):
     sigma=SX.sym("sigma")
 
     for Solver, solver_options, features in solvers:
+      if "sqpmethod"==Solver and "regularize" in str(solver_options): continue
       if "snopt"==Solver: continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -625,6 +648,7 @@ class NLPtests(casadiTestCase):
     sigma=SX.sym("sigma")
 
     for Solver, solver_options, features in solvers:
+      if "sqpmethod"==Solver and "regularize" in str(solver_options): continue
       if "snopt"==Solver: continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -656,6 +680,7 @@ class NLPtests(casadiTestCase):
     sigma=SX.sym("sigma")
 
     for Solver, solver_options, features in solvers:
+      if "sqpmethod"==Solver and "regularize" in str(solver_options): continue
       if "snopt"==Solver: continue
       self.message(str(Solver))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -1534,6 +1559,166 @@ class NLPtests(casadiTestCase):
       f2 = Function('f',[x,p],[z2,jacobian(z2,p)])
 
       self.checkfunction_light(f,f2,[0,0.5],digits=6)
+
+  @requires_conic("qrqp")
+  def test_regularize_sqpmethod(self):
+    
+    # Test problem that is indefinite in direction of the constraint Jacobian
+    x = MX.sym("x",2)
+    f = 0.5*bilin(DM([[1,0],[0,-2]]),x,x)
+
+    nlp = {"x":x,"f":f,"g":x[1]}
+
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True}})
+    with capture_stdout() as result:
+      res = solver(lbg=2,ubg=2)
+    stats = solver.stats()
+    self.assertTrue(stats["iter_count"]==1)
+    self.assertTrue("H:\n[[1, 0], \n [0, -2]]" in result[0])
+    self.checkarray(res["x"],DM([0,2]),digits=6)
+
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"regularize":True,"regularize_margin":0})
+    with capture_stdout() as result:
+      res = solver(lbg=2,ubg=2)
+    stats_reg = solver.stats()
+    self.checkarray(res["x"],DM([0,2]),digits=6)
+    self.assertTrue(stats_reg["iter_count"]==2)
+    self.assertTrue("H:\n[[3, 0], \n [0, 0]]" in result[0])
+
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"regularize":True,"regularize_margin":1e-4})
+    with capture_stdout() as result:
+      res = solver(lbg=2,ubg=2)
+    stats_reg = solver.stats()
+    self.checkarray(res["x"],DM([0,2]),digits=6)
+    self.assertTrue(stats_reg["iter_count"]==2)
+    self.assertTrue("H:\n[[3.0001, 0], \n [0, 0.0001]]" in result[0])
+
+    x = MX.sym("x",2)
+    f = 0.5*bilin(DM([[1,0],[0,2]]),x,x)
+
+    nlp = {"x":x,"f":f,"g":x[1]}
+
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True}})
+    with capture_stdout() as result:
+      res = solver(lbg=2,ubg=2)
+    stats = solver.stats()
+    self.assertTrue(stats["iter_count"]==1)
+    print(result[0])
+    self.assertTrue("H:\n[[1, 0], \n [0, 2]]" in result[0])
+    self.checkarray(res["x"],DM([0,2]),digits=6)
+
+    solver = nlpsol("mysolver", "sqpmethod", nlp, {"qpsol":"qrqp","qpsol_options": {"print_problem":True},"regularize":True})
+    with capture_stdout() as result:
+      res = solver(lbg=2,ubg=2)
+    stats_reg = solver.stats()
+    self.checkarray(res["x"],DM([0,2]),digits=6)
+    self.assertTrue(stats_reg["iter_count"]==1)
+    self.assertTrue("H:\n[[1, 0], \n [0, 2]]" in result[0])
+
+  def test_indefinite(self):
+    
+    # Test problem that is indefinite in direction of the constraint Jacobian
+    x = MX.sym("x",2)
+    f = 0.5*bilin(DM([[1,0],[0,-2]]),x,x)
+
+    nlp = {"x":x,"f":f,"g":x[1]}
+
+    for Solver, solver_options, features in solvers:
+      solver_in = {"lbg": 2, "ubg": 2}
+
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+      out = solver(**solver_in)
+      self.checkarray(out["x"],DM([0,2]),digits=6)
+      if "bonmin" not in str(Solver): self.checkarray(out["lam_g"],DM([4]),digits=6)
+
+      if "codegen" in features:
+        solver.generate('f.c',{"main":True})
+        solver.generate_input("in.dat",solver_in)
+        print(solver_in)
+        self.check_codegen(solver,solver_in,std="c99")
+
+  @requires_nlpsol("sqpmethod")
+  def test_gauss_newton_sqpmethod(self):
+    x = SX.sym("x",3)
+
+    F = sin(x) - vertcat(1,2,3)*vertcat(x[2],0,0)
+    J = jacobian(F,x)
+    f = 0.5*dot(F,F)
+    p = SX.sym("x",0,1)
+    lam_f = SX.sym("x")
+    lam_g = SX.sym("x",0,1)
+    GN = Function('GN',[x,p,lam_f,lam_g],[lam_f*triu(mtimes(J.T,J))])
+    options = {"hess_lag": GN}
+    nlp = {"x":x,"f":f}
+    with self.assertInException("Hessian must be symmetric"):
+      solver = nlpsol("solver","sqpmethod",nlp,options)
+
+    # A 2-norrm problem ...
+    F = sin(x-vertcat(0.22,0.72,0.2)) - vertcat(0.1,0.5,0.99)
+    J = jacobian(F,x)
+    f = 0.5*dot(F,F)
+    H = Function("H",[x],[hessian(f,x)[0]])
+    H = H(0)
+    # with an indefinite Hessian at x0
+    self.assertTrue(np.any(np.linalg.eig(H)[0]<0))
+  
+    # Solve with Gauss-Newton -> 6 iterations
+    GN = Function('GN',[x,p,lam_f,lam_g],[lam_f*mtimes(J.T,J)])
+    options = {"regularize":True,"qpsol":"qrqp","hess_lag": GN}
+    nlp = {"x":x,"f":f}
+    solver = nlpsol("solver","sqpmethod",nlp,options)
+    res = solver()
+    stats_reg = solver.stats()
+    self.assertTrue(stats_reg["iter_count"]==6)
+
+    # Solve with exact Hessian + regularization -> 9 iterations
+    options = {"regularize":True,"qpsol":"qrqp"}
+    nlp = {"x":x,"f":f}
+    solver = nlpsol("solver","sqpmethod",nlp,options)
+    res = solver()
+    stats_reg = solver.stats()
+    self.assertTrue(stats_reg["iter_count"]==9)
+
+  @requires_nlpsol("ipopt")
+  def test_gauss_newton_ipopt(self):
+    x = SX.sym("x",3)
+
+    F = sin(x) - vertcat(1,2,3)*vertcat(x[2],0,0)
+    J = jacobian(F,x)
+    f = 0.5*dot(F,F)
+    p = SX.sym("x",0,1)
+    lam_f = SX.sym("x")
+    lam_g = SX.sym("x",0,1)
+    GN = Function('GN',[x,p,lam_f,lam_g],[lam_f*mtimes(J.T,J)])
+    options = {"hess_lag": GN}
+    nlp = {"x":x,"f":f}
+    with self.assertInException("Hessian must be upper triangular"):
+      solver = nlpsol("solver","ipopt",nlp,options)
+
+    # A 2-norrm problem ...
+    F = sin(x-vertcat(0.22,0.72,0.2)) - vertcat(0.1,0.5,0.99)
+    J = jacobian(F,x)
+    f = 0.5*dot(F,F)
+    H = Function("H",[x],[hessian(f,x)[0]])
+    H = H(0)
+    # with an indefinite Hessian at x0
+    self.assertTrue(np.any(np.linalg.eig(H)[0]<0))
+  
+    # Solve with Gauss-Newton -> 6 iterations
+    GN = Function('GN',[x,p,lam_f,lam_g],[lam_f*triu(mtimes(J.T,J))])
+    options = {"hess_lag": GN}
+    nlp = {"x":x,"f":f}
+    solver = nlpsol("solver","ipopt",nlp,options)
+    res = solver()
+    stats_reg = solver.stats()
+    self.assertTrue(stats_reg["iter_count"]==6)
+
+    # Solve with exact Hessian + regularization -> 9 iterations
+    nlp = {"x":x,"f":f}
+    solver = nlpsol("solver","ipopt",nlp)
+    res = solver()
+    stats_reg = solver.stats()
+    self.assertTrue(stats_reg["iter_count"]==9)
 
 if __name__ == '__main__':
     unittest.main()

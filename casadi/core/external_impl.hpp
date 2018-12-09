@@ -60,6 +60,9 @@ namespace casadi {
     /** \brief Names of inputs and outputs */
     name_t get_name_in_, get_name_out_;
 
+    /** \brief Get default inputs */
+    default_t get_default_in_;
+
     /** \brief Work vector sizes */
     work_t work_;
 
@@ -104,6 +107,9 @@ namespace casadi {
     size_t get_n_in() override;
     size_t get_n_out() override;
     ///@}
+
+    /** \brief Default inputs */
+    double get_default_in(casadi_int i) const override;
 
     ///@{
     /** \brief Names of function input and outputs */
