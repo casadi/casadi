@@ -776,6 +776,33 @@ int casadi_qp_du_direction(casadi_qp_data<T1>* d) {
   return 0;
 }
 
+// SYMBOL "qp_enforceable"
+template<typename T1>
+int casadi_qp_enforceable(casadi_qp_data<T1>* d, casadi_int i, casadi_int s) {
+  // Local variables
+  casadi_int k, s_mod;
+  const casadi_int *at_colind, *at_row;
+  const casadi_qp_prob<T1>* p = d->prob;
+  // Can always enforce if not at bound
+  if (fabs(d->infeas[i]) < d->edu) return 1;
+  // AT sparsity
+  at_colind = p->sp_at + 2;
+  at_row = at_colind + p->na + 1;
+  // Can we set lam[i] := s*DMIN without exceeding edu?
+  if (i<p->nx) {
+    return (s < 0) == (d->infeas[i] > 0);
+  } else {
+    for (k=at_colind[i-p->nx]; k<at_colind[i-p->nx+1]; ++k) {
+      if (d->nz_at[k] > 0) {
+        if ((s > 0) == (d->infeas[at_row[k]] > 0)) return 0;
+      } else if (d->nz_at[k] < 0) {
+        if ((s < 0) == (d->infeas[at_row[k]] > 0)) return 0;
+      }
+    }
+    return 1;
+  }
+}
+
 // SYMBOL "qp_singular_step"
 // C-REPLACE "static_cast<T1*>(0)" "0"
 template<typename T1>
@@ -832,7 +859,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
               d->dz[i] < -1e-12 : d->dz[i] > 1e-12)) {
             // Enforce lower bound?
             if (!d->neverlower[i]
-                && (tau_test = (d->lbz[i] - d->z[i]) / d->dz[i]) < tau) {
+                && (tau_test = (d->lbz[i] - d->z[i]) / d->dz[i]) < tau
+                && casadi_qp_enforceable(d, i, -1)) {
               tau = tau_test;
               *r_index = i;
               *r_sign = -1;
@@ -843,7 +871,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
               d->dz[i] > 1e-12 : d->dz[i] < -1e-12)) {
             // Enforce upper bound?
             if (!d->neverupper[i]
-                && (tau_test = (d->ubz[i] - d->z[i]) / d->dz[i]) < tau) {
+                && (tau_test = (d->ubz[i] - d->z[i]) / d->dz[i]) < tau
+                && casadi_qp_enforceable(d, i, 1)) {
               tau = tau_test;
               *r_index = i;
               *r_sign = 1;
