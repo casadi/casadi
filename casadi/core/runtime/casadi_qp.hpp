@@ -84,7 +84,7 @@ struct casadi_qp_data {
   T1 mina;
   casadi_int imina;
   // Primal and dual error, corresponding index
-  T1 pr, du, epr, edu;
+  T1 pr, du, epr, edu, e;
   casadi_int ipr, idu;
   // Verbose
   int verbose;
@@ -296,7 +296,7 @@ casadi_int casadi_qp_pr_index(casadi_qp_data<T1>* d, casadi_int* sign) {
   // Try to improve primal feasibility by adding a constraint
   if (d->lam[d->ipr]==0.) {
     // Add the most violating constraint
-    *sign = d->z[d->ipr]<d->lbz[d->ipr] ? -1 : 1;
+    *sign = d->z[d->ipr] < d->lbz[d->ipr] ? -1 : 1;
     // C-VERBOSE
     casadi_qp_log(d, "Added %lld to reduce |pr|", d->ipr);
     return d->ipr;
@@ -958,6 +958,8 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
   // Calculate primal and dual error
   casadi_qp_pr(d);
   casadi_qp_du(d);
+  // Total error (what we are trying to minimize)
+  d->e = fmax(d->pr, d->du / p->du_to_pr);
   // Acceptable primal and dual error
   d->epr = fmax(d->pr, (0.5 / p->du_to_pr) * d->du);
   d->edu = fmax(d->du, (0.5 * p->du_to_pr) * d->pr);
@@ -1003,19 +1005,19 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
       casadi_qp_log(d, "%lld->%lld for regularity", *index, *sign);
     }
   }
-  // If nonsingular, try to flip a constraint
-  if (!d->sing) {
+  // If nonsingular and nonzero error, try to flip a constraint
+  if (!d->sing && d->e > 1e-14) {
     // Improve primal feasibility if dominating
-    if (*index == -1 && d->pr >= p->du_to_pr * d->du) {
-      *index = casadi_qp_pr_index(d, sign);
+    if (d->pr >= p->du_to_pr * d->du) {
+      if (*index == -1) *index = casadi_qp_pr_index(d, sign);
     }
     // Improve dual feasibility if dominating
-    if (*index == -1 && d->pr <= p->du_to_pr * d->du) {
-      *index = casadi_qp_du_index(d, sign, d->ipr);
+    if (d->pr <= p->du_to_pr * d->du) {
+      if (*index == -1) *index = casadi_qp_du_index(d, sign, d->ipr);
     }
   }
   // If a constraint was added
-  if (*index>=0) {
+  if (*index >= 0) {
     // Try to maintain non-singularity if possible
     if (!d->sing && casadi_qp_flip_check(d, *index, *sign, &r_index, &r_sign)) {
       if (r_index>=0) {
