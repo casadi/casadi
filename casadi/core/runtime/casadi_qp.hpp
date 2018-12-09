@@ -795,7 +795,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, k);
     // Which constraints can be flipped in order to increase rank?
     for (i=0; i<p->nz; ++i) {
-      d->iw[i] = d->lincomb[i] && fabs(casadi_qp_kkt_dot(d, d->dz, i))>=1e-12;
+      d->iw[i] = d->lincomb[i] && fabs(casadi_qp_kkt_dot(d, d->dz, i)) > 1e-12;
     }
     // Calculate step, dz and dlam
     casadi_qp_expand_step(d);
@@ -818,7 +818,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         // Enforced or not?
         if (d->lam[i]==0.) {
           if (d->z[i] <= d->ubz[i] && (d->z[i] >= d->lbz[i] ?
-              d->dz[i] <= -1e-12 : d->dz[i] >= 1e-12)) {
+              d->dz[i] < -1e-12 : d->dz[i] > 1e-12)) {
             // Enforce lower bound?
             if (!d->neverlower[i]
                 && (tau_test = (d->lbz[i] - d->z[i]) / d->dz[i]) < tau) {
@@ -829,7 +829,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
               best_neg = neg;
             }
           } else if (d->z[i] >= d->lbz[i] && (d->z[i] <= d->ubz[i] ?
-              d->dz[i] >= 1e-12 : d->dz[i] <= -1e-12)) {
+              d->dz[i] > 1e-12 : d->dz[i] < -1e-12)) {
             // Enforce upper bound?
             if (!d->neverupper[i]
                 && (tau_test = (d->ubz[i] - d->z[i]) / d->dz[i]) < tau) {
@@ -842,7 +842,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           }
         } else if (!d->neverzero[i]) {
           // Drop a constraint?
-          if (d->lam[i] > 0 ? d->dlam[i] <= -1e-12 : d->dlam[i] >= 1e-12) {
+          if (d->lam[i] > 0 ? d->dlam[i] < -1e-12 : d->dlam[i] > 1e-12) {
             if ((tau_test = -d->lam[i] / d->dlam[i]) < tau) {
               tau = tau_test;
               *r_index = i;
