@@ -802,7 +802,7 @@ template<typename T1>
 int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
   // Local variables
   T1 tau_test, tau;
-  casadi_int nnz_kkt, nk, k, i, best_k, best_sign, j;
+  casadi_int nnz_kkt, nk, k, i, best_k, best_neg, neg;
   const casadi_qp_prob<T1>* p = d->prob;
   // Find the columns that take part in any linear combination
   for (i=0; i<p->nz; ++i) d->lincomb[i]=0;
@@ -831,9 +831,9 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     // Calculate step, dz and dlam
     casadi_qp_expand_step(d);
     // Try both positive and negative direction
-    for (j=0; j<2; ++j) {
+    for (neg = 0; neg < 2; ++neg) {
       // Negate direction
-      if (j) {
+      if (neg) {
         casadi_scal(p->nz, -1., d->dz);
         casadi_scal(p->nz, -1., d->dlam);
         casadi_scal(p->nx, -1., d->tinfeas);
@@ -866,7 +866,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
               *r_index = i;
               *r_sign = -1;
               best_k = k;
-              best_sign = j ? -1 : 1;
+              best_neg = neg;
               // C-VERBOSE
               casadi_qp_log(d, "Enforced lbz[%lld] for regularity", i);
             }
@@ -879,7 +879,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
               *r_index = i;
               *r_sign = 1;
               best_k = k;
-              best_sign = j ? -1 : 1;
+              best_neg = neg;
               // C-VERBOSE
               casadi_qp_log(d, "Enforced ubz[%lld] for regularity", i);
             }
@@ -897,7 +897,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
               *r_index = i;
               *r_sign = 0;
               best_k = k;
-              best_sign = j ? -1 : 1;
+              best_neg = neg;
               // C-VERBOSE
               casadi_qp_log(d, "Dropped %s[%lld] for regularity", d->lam[i]>0 ? "lbz" : "ubz", i);
             }
@@ -912,7 +912,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, best_k);
   casadi_qp_expand_step(d);
   // Scale step so that that tau=1 corresponds to a full step
-  tau *= best_sign;
+  if (best_neg) tau *= -1;
   casadi_scal(p->nz, tau, d->dz);
   casadi_scal(p->nz, tau, d->dlam);
   casadi_scal(p->nx, tau, d->tinfeas);
