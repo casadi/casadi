@@ -755,15 +755,14 @@ int casadi_qp_du_direction(casadi_qp_data<T1>* d) {
   casadi_int i;
   const casadi_qp_prob<T1>* p = d->prob;
   for (i=0; i<p->nx; ++i) {
+    // Prevent further increase in dual infeasibility
     if (d->infeas[i] <= -d->edu && d->tinfeas[i] < -1e-16) {
-      // Prevent further increase in dual infeasibility
-      return 0;
+      return 1;
     } else if (d->infeas[i] >= d->edu && d->tinfeas[i] > 1e-16) {
-      // Prevent further increase in dual infeasibility
-      return 0;
+      return 1;
     }
   }
-  return 1;
+  return 0;
 }
 
 // SYMBOL "qp_singular_step"
@@ -810,11 +809,9 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
       }
       // Make sure primal infeasibility doesn't exceed limits
       if (casadi_qp_pr_direction(d)) continue;
-      // Improve dual feasibility if dominating
-      if (d->pr <= p->du_to_pr * d->du) {
-        // Make sure dual infeasibility doesn't increase
-        if (!casadi_qp_du_direction(d)) continue;
-      }
+      // Make sure dual infeasibility doesn't exceed limits
+      if (casadi_qp_du_direction(d)) continue;
+      // Loop over potential active set changes
       for (i=0; i<p->nz; ++i) {
         // Skip if no rank increase
         if (!d->iw[i]) continue;
