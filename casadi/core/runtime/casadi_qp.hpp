@@ -959,8 +959,8 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
   casadi_qp_pr(d);
   casadi_qp_du(d);
   // Acceptable primal and dual error
-  d->epr = fmax(d->pr, (0.5 * p->du_to_pr) * d->du);
-  d->edu = fmax(d->du, (0.5 / p->du_to_pr) * d->pr);
+  d->epr = fmax(d->pr, (0.5 / p->du_to_pr) * d->du);
+  d->edu = fmax(d->du, (0.5 * p->du_to_pr) * d->pr);
   // Sensitivity in decreasing |du|
   casadi_qp_calc_sens(d, d->idu);
 }
