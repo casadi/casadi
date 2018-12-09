@@ -740,13 +740,13 @@ int casadi_qp_pr_direction(casadi_qp_data<T1>* d) {
   for (i=0; i<p->nz; ++i) {
     if (d->lbz[i] - d->z[i] >= d->epr) {
       // Prevent further violation of lower bound
-      if (d->dz[i] < 0 || d->dlam[i] > 0) return 0;
+      if (d->dz[i] < 0 || d->dlam[i] > 0) return 1;
     } else if (d->z[i] - d->ubz[i] >= d->epr) {
       // Prevent further violation of upper bound
-      if (d->dz[i] > 0 || d->dlam[i] < 0) return 0;
+      if (d->dz[i] > 0 || d->dlam[i] < 0) return 1;
     }
   }
-  return 1;
+  return 0;
 }
 
 // SYMBOL "casadi_qp_du_direction"
@@ -808,16 +808,12 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         casadi_scal(p->nz, -1., d->dlam);
         casadi_scal(p->nx, -1., d->tinfeas);
       }
-      // If primal feasibility if dominating
-      if (d->pr >= p->du_to_pr * d->du) {
-        // Make sure primal infeasibility doesn't increase
-        if (!casadi_qp_pr_direction(d)) continue;
-      }
+      // Make sure primal infeasibility doesn't exceed limits
+      if (casadi_qp_pr_direction(d)) continue;
       // Improve dual feasibility if dominating
       if (d->pr <= p->du_to_pr * d->du) {
         // Make sure dual infeasibility doesn't increase
         if (!casadi_qp_du_direction(d)) continue;
-        if (!casadi_qp_pr_direction(d)) continue;
       }
       for (i=0; i<p->nz; ++i) {
         // Skip if no rank increase
