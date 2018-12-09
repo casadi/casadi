@@ -826,10 +826,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         if (d->lam[i]==0.) {
           // Avoid divide-by-zero
           if (fabs(d->dz[i]) < 1e-12) continue;
-          // Wrong direction?
-          if (d->dz[i] > 0 ? d->z[i] > d->ubz[i] : d->z[i] < d->lbz[i]) continue;
-          // Can we enforce a lower bound?
-          if (!d->neverlower[i]) {
+          if (d->z[i] < d->lbz[i]) {
+            // Lower bound violated
             if ((tau_test = (d->lbz[i] - d->z[i]) / d->dz[i]) < tau) {
               tau = tau_test;
               *r_index = i;
@@ -837,10 +835,29 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
               best_k = k;
               best_neg = neg;
             }
-          }
-          // Can we enforce an upper bound?
-          if (!d->neverupper[i]) {
+          } else if (d->z[i] > d->ubz[i]) {
+            // Upper bound violated
             if ((tau_test = (d->ubz[i] - d->z[i]) / d->dz[i]) < tau) {
+              tau = tau_test;
+              *r_index = i;
+              *r_sign = 1;
+              best_k = k;
+              best_neg = neg;
+            }
+          } else if (d->dz[i] < 0) {
+            // Can we take up slack in lower bound
+            if (!d->neverlower[i]
+                && (tau_test = (d->lbz[i] - d->z[i]) / d->dz[i]) < tau) {
+              tau = tau_test;
+              *r_index = i;
+              *r_sign = -1;
+              best_k = k;
+              best_neg = neg;
+            }
+          } else {
+            // Can we take up slack in upper bound
+            if (!d->neverupper[i]
+                && (tau_test = (d->ubz[i] - d->z[i]) / d->dz[i]) < tau) {
               tau = tau_test;
               *r_index = i;
               *r_sign = 1;
