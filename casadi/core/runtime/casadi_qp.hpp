@@ -240,36 +240,6 @@ int casadi_qp_du_check(casadi_qp_data<T1>* d, casadi_int i) {
   return new_du <= d->du;
 }
 
-// SYMBOL "qp_du_free"
-template<typename T1>
-int casadi_qp_du_free(casadi_qp_data<T1>* d, casadi_int i, int upper) {
-  // Local variables
-  casadi_int k;
-  const casadi_int *at_colind, *at_row;
-  const casadi_qp_prob<T1>* p = d->prob;
-  // AT sparsity
-  at_colind = p->sp_at + 2;
-  at_row = at_colind + p->na + 1;
-  // Maximum infeasibility from setting from setting lam[i]=0
-  if (i<p->nx) {
-    if (upper) {
-      return d->infeas[i] + 1e-16 < d->edu;
-    } else {
-      return d->infeas[i] - 1e-16 > -d->edu;
-    }
-  } else {
-    for (k=at_colind[i-p->nx]; k<at_colind[i-p->nx+1]; ++k) {
-      if (d->nz_at[k]==0) continue;
-      if (d->nz_at[k]>0 ? upper : !upper) {
-        if (d->infeas[at_row[k]] + fabs(d->nz_at[k])*1e-16 >= d->edu) return 0;
-      } else {
-        if (d->infeas[at_row[k]] - fabs(d->nz_at[k])*1e-16 <= -d->edu) return 0;
-      }
-    }
-    return 1;
-  }
-}
-
 // SYMBOL "qp_du_index"
 template<typename T1>
 casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign, casadi_int skip) {
@@ -867,8 +837,6 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
               *r_sign = -1;
               best_k = k;
               best_neg = neg;
-              // C-VERBOSE
-              casadi_qp_log(d, "Enforced lbz[%lld] for regularity", i);
             }
           }
           // Can we enforce an upper bound?
@@ -880,8 +848,6 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
               *r_sign = 1;
               best_k = k;
               best_neg = neg;
-              // C-VERBOSE
-              casadi_qp_log(d, "Enforced ubz[%lld] for regularity", i);
             }
           }
         } else {
@@ -898,8 +864,6 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
               *r_sign = 0;
               best_k = k;
               best_neg = neg;
-              // C-VERBOSE
-              casadi_qp_log(d, "Dropped %s[%lld] for regularity", d->lam[i]>0 ? "lbz" : "ubz", i);
             }
           }
         }
@@ -907,7 +871,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     }
   }
   // Can we restore feasibility?
-  if (*r_index<0) return 1;
+  if (*r_index < 0) return 1;
   // Recalculate direction
   casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, best_k);
   casadi_qp_expand_step(d);
@@ -916,6 +880,20 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   casadi_scal(p->nz, tau, d->dz);
   casadi_scal(p->nz, tau, d->dlam);
   casadi_scal(p->nx, tau, d->tinfeas);
+  // Message
+  if (*r_sign > 0) {
+    // C-VERBOSE
+    casadi_qp_log(d, "Enforced ubz[%lld] for regularity", *r_index);
+  } else if (*r_sign < 0) {
+    // C-VERBOSE
+    casadi_qp_log(d, "Enforced lbz[%lld] for regularity", *r_index);
+  } else if (d->lam[*r_index]>0) {
+    // C-VERBOSE
+    casadi_qp_log(d, "Dropped ubz[%lld] for regularity", *r_index);
+  } else {
+    // C-VERBOSE
+    casadi_qp_log(d, "Dropped lbz[%lld] for regularity", *r_index);
+  }
   return 0;
 }
 
