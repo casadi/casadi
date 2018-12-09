@@ -817,8 +817,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
         if (!d->iw[i]) continue;
         // Enforced or not?
         if (d->lam[i]==0.) {
-          if (fabs(d->dz[i]) < 1e-12) continue;
-          if (d->z[i] < d->lbz[i] || d->dz[i] < 0) {
+          if (d->z[i] <= d->ubz[i] && (d->z[i] >= d->lbz[i] ?
+              d->dz[i] <= -1e-12 : d->dz[i] >= 1e-12)) {
             // Enforce lower bound?
             if (!d->neverlower[i]
                 && (tau_test = (d->lbz[i] - d->z[i]) / d->dz[i]) < tau) {
@@ -828,7 +828,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
               best_k = k;
               best_neg = neg;
             }
-          } else if (d->z[i] > d->ubz[i] || d->dz[i] > 0) {
+          } else if (d->z[i] >= d->lbz[i] && (d->z[i] <= d->ubz[i] ?
+              d->dz[i] >= 1e-12 : d->dz[i] <= -1e-12)) {
             // Enforce upper bound?
             if (!d->neverupper[i]
                 && (tau_test = (d->ubz[i] - d->z[i]) / d->dz[i]) < tau) {
