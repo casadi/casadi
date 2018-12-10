@@ -78087,6 +78087,11 @@ T1 > *d, casadi_int **iw, T1 **w) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_qp_calc_sens(casadi_qp_data< T1 > *d,
+casadi_int i) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::has_integrator(const std::string &name) "
 
 Check if a particular plugin is available.
@@ -78605,6 +78610,11 @@ Check if a particular plugin is available.
 Get documentation for a particular option.
 
 ";
+
+%feature("docstring")  casadi::casadi_qp_enforceable(casadi_qp_data< T1 >
+*d, casadi_int i, casadi_int s) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::replace_mat(const M &arg, const Sparsity
 &inp, casadi_int npar) "
@@ -80743,6 +80753,11 @@ strideB, casadi_int strideC) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_qp_pr_direction(casadi_qp_data< T1 >
+*d) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_qp_kkt(casadi_qp_data< T1 > *d) "
 
 [INTERNAL] ";
@@ -80780,11 +80795,6 @@ T1 *nz_r, T1 *x, casadi_int tr) "
 n_dims, const T1 *knots, const casadi_int *offset, const casadi_int *degree,
 const casadi_int *strides, const T1 *c, casadi_int m, const T1 *x, const
 casadi_int *lookup_mode, casadi_int reverse, casadi_int *iw, T1 *w) "
-
-[INTERNAL] ";
-
-%feature("docstring")  casadi::casadi_qp_du_free(casadi_qp_data< T1 > *d,
-casadi_int i, int upper) "
 
 [INTERNAL] ";
 
@@ -80865,6 +80875,11 @@ Check if the vector is strictly monotone.
 Check if a particular plugin is available.
 
 ";
+
+%feature("docstring")  casadi::casadi_qp_du_direction(casadi_qp_data< T1 >
+*d) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::simpleRK(Function f, casadi_int N=10,
 casadi_int order=4) "
@@ -80954,7 +80969,7 @@ Get NLP solver input scheme name by index.
 ";
 
 %feature("docstring")  casadi::casadi_qp_zero_blocking(casadi_qp_data< T1 >
-*d) "
+*d, casadi_int *index, casadi_int *sign) "
 
 [INTERNAL] ";
 

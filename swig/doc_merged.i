@@ -62489,6 +62489,10 @@ Number of rootfinder inputs.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::casadi_qp_calc_sens "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::has_integrator "
 
 Check if a particular plugin is available.
@@ -62533,6 +62537,10 @@ Check if a particular plugin is available.
 Get documentation for a particular option.
 
 ";
+
+%feature("docstring") casadi::casadi_qp_enforceable "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::replace_mat "
 
@@ -64241,6 +64249,10 @@ Explicitly load a plugin dynamically.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::casadi_qp_pr_direction "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qp_kkt "
 
 [INTERNAL] ";
@@ -64270,10 +64282,6 @@ Explicitly load a plugin dynamically.
 ";
 
 %feature("docstring") casadi::casadi_nd_boor_eval "
-
-[INTERNAL] ";
-
-%feature("docstring") casadi::casadi_qp_du_free "
 
 [INTERNAL] ";
 
@@ -64353,6 +64361,10 @@ Check if the vector is strictly monotone.
 Check if a particular plugin is available.
 
 ";
+
+%feature("docstring") casadi::casadi_qp_du_direction "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::simpleRK "
 
