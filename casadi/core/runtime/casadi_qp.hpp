@@ -80,6 +80,8 @@ struct casadi_qp_data {
   T1 tau;
   // Singularity
   casadi_int sing;
+  // Do we already have a search direction?
+  int has_search_dir;
   // Smallest diagonal value for the QR factorization
   T1 mina;
   casadi_int imina;
@@ -635,70 +637,30 @@ void casadi_qp_take_step(casadi_qp_data<T1>* d) {
 
 // SYMBOL "qp_flip_check"
 template<typename T1>
-int casadi_qp_flip_check(casadi_qp_data<T1>* d, casadi_int index, casadi_int sign,
-                         casadi_int* r_index, casadi_int* r_sign) {
+int casadi_qp_flip_check(casadi_qp_data<T1>* d,
+    casadi_int index, casadi_int sign) {
   // Local variables
   casadi_int i;
   T1 best, test;
   const casadi_qp_prob<T1>* p = d->prob;
-  // Reset return values
-  *r_index=-1;
-  *r_sign=0;
   // Calculate the difference between unenforced and enforced column index
-  casadi_qp_kkt_vector(d, d->dz, index);
+  casadi_qp_kkt_vector(d, d->dlam, index);
   // Calculate the difference between old and new column index
-  if (sign==0) casadi_scal(p->nz, -1., d->dz);
+  if (sign==0) casadi_scal(p->nz, -1., d->dlam);
   // Try to find a linear combination of the new columns
-  casadi_qr_solve(d->dz, 1, 0, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
-                  p->prinv, p->pc, d->w);
-  // If dz[index]!=1, new columns must be linearly independent
-  if (fabs(d->dz[index]-1.)>=1e-12) return 0;
+  casadi_qr_solve(d->dlam, 1, 0, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
+    p->prinv, p->pc, d->w);
+  // If dlam[index]!=1, new columns must be linearly independent
+  if (fabs(d->dlam[index]-1.) >= 1e-12) return 0;
   // Next, find a linear combination of the new rows
-  casadi_fill(d->dlam, p->nz, 0.);
-  d->dlam[index] = 1;
-  casadi_qr_solve(d->dlam, 1, 1, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
-                  p->prinv, p->pc, d->w);
-  // Quick return if no linear combination can be formed (due to numerics?)
-  if (fabs(1. + casadi_qp_kkt_dot(d, d->dlam, index)) >= 1e-12) return 1;
-  // Find best constraint we can flip, if any
-  best = p->inf;
-  for (i=0; i<p->nz; ++i) {
-    // Can't be the same
-    if (i==index) continue;
-    // Make sure constraint is flippable
-    if (d->lam[i]==0 ? d->neverlower[i] && d->neverupper[i] : d->neverzero[i]) continue;
-    // If dz[i]==0, column i is not part of the linear combination
-    if (fabs(d->dz[i]) < 1e-12) continue;
-    // If dot(dlam, kkt_diff(i))==0, rank won't increase
-    if (fabs(casadi_qp_kkt_dot(d, d->dlam, i)) < 1e-12) continue;
-    // Never drop a violated constraint
-    //if (d->lam[i]>0 && d->z[i]>d->ubz[i]) continue;
-    //if (d->lam[i]<0 && d->z[i]<d->lbz[i]) continue;
-    // Check if best so far
-    if (d->lam[i]==0) {
-      // Check sensitivity for positive lam[i], larger is better
-      if (!d->neverupper[i] && (test = -d->sens[i]) < best) {
-        best = test;
-        *r_index = i;
-        *r_sign = 1;
-      }
-      // Check sensitivity for negative lam[i], smaller is better
-      if (!d->neverlower[i] && (test = d->sens[i]) < best) {
-        best = test;
-        *r_index = i;
-        *r_sign = -1;
-      }
-    } else {
-      // Check new dual error for affected subset from setting lam[i]=0
-      test = d->lam[i] > 0 ? d->sens[i] : -d->sens[i];
-      if (casadi_qp_du_check(d, i)) {
-        best = test;
-        *r_index = i;
-        *r_sign = 0;
-      }
-    }
-  }
-  // Enforcing will lead to (possibly recoverable) singularity
+  casadi_fill(d->dz, p->nz, 0.);
+  d->dz[index] = 1;
+  casadi_qr_solve(d->dz, 1, 1, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
+    p->prinv, p->pc, d->w);
+  // Normalize dlam, dz
+  casadi_scal(p->nz, 1./sqrt(casadi_dot(p->nz, d->dlam, d->dlam)), d->dlam);
+  casadi_scal(p->nz, 1./sqrt(casadi_dot(p->nz, d->dz, d->dz)), d->dz);
+  // KKT system will be singular
   return 1;
 }
 
@@ -706,6 +668,11 @@ int casadi_qp_flip_check(casadi_qp_data<T1>* d, casadi_int index, casadi_int sig
 template<typename T1>
 void casadi_qp_factorize(casadi_qp_data<T1>* d) {
   const casadi_qp_prob<T1>* p = d->prob;
+  // Do we already have a search direction due to lost singularity?
+  if (d->has_search_dir) {
+    d->sing = 1;
+    return;
+  }
   // Construct the KKT matrix
   casadi_qp_kkt(d);
   // QR factorization
@@ -814,23 +781,33 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   // Find the columns that take part in any linear combination
   for (i=0; i<p->nz; ++i) d->lincomb[i]=0;
   for (k=0; k<d->sing; ++k) {
-    casadi_qr_colcomb(d->w, d->nz_r, p->sp_r, p->pc, 1e-12, k);
-    for (i=0; i<p->nz; ++i) if (fabs(d->w[i])>=1e-12) d->lincomb[i]++;
+    if (!d->has_search_dir) {
+      casadi_qr_colcomb(d->dlam, d->nz_r, p->sp_r, p->pc, 1e-12, k);
+    }
+    for (i=0; i<p->nz; ++i) if (fabs(d->dlam[i]) >= 1e-12) d->lincomb[i]++;
   }
-  // QR factorization of the transpose
-  casadi_trans(d->nz_kkt, p->sp_kkt, d->nz_v, p->sp_kkt, d->iw);
-  nnz_kkt = p->sp_kkt[2+p->nz]; // kkt_colind[nz]
-  casadi_copy(d->nz_v, nnz_kkt, d->nz_kkt);
-  casadi_qr(p->sp_kkt, d->nz_kkt, d->w, p->sp_v, d->nz_v, p->sp_r, d->nz_r,
-            d->beta, p->prinv, p->pc);
+
+  if (d->has_search_dir) {
+    // One, given search direction
+    nk = 1;
+  } else {
+    // QR factorization of the transpose
+    casadi_trans(d->nz_kkt, p->sp_kkt, d->nz_v, p->sp_kkt, d->iw);
+    nnz_kkt = p->sp_kkt[2+p->nz]; // kkt_colind[nz]
+    casadi_copy(d->nz_v, nnz_kkt, d->nz_kkt);
+    casadi_qr(p->sp_kkt, d->nz_kkt, d->w, p->sp_v, d->nz_v, p->sp_r, d->nz_r,
+              d->beta, p->prinv, p->pc);
+    // For all nullspace vectors
+    nk = casadi_qr_singular(static_cast<T1*>(0), 0, d->nz_r, p->sp_r, p->pc, 1e-12);
+  }
   // Best flip
   best_k = -1;
   tau = p->inf;
-  // For all nullspace vectors
-  nk = casadi_qr_singular(static_cast<T1*>(0), 0, d->nz_r, p->sp_r, p->pc, 1e-12);
   for (k=0; k<nk; ++k) {
-    // Get a linear combination of the rows in kkt
-    casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, k);
+    if (!d->has_search_dir) {
+      // Get a linear combination of the rows in kkt
+      casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, k);
+    }
     // Which constraints can be flipped in order to increase rank?
     for (i=0; i<p->nz; ++i) {
       d->iw[i] = d->lincomb[i] && fabs(casadi_qp_kkt_dot(d, d->dz, i)) > 1e-12;
@@ -1059,21 +1036,13 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
       if (*index == -1) *index = casadi_qp_du_index(d, sign, d->ipr);
     }
   }
+  // No search direction given by default
+  d->has_search_dir = 0;
   // If a constraint was added
   if (*index >= 0) {
-    // Try to maintain non-singularity if possible
-    if (!d->sing && casadi_qp_flip_check(d, *index, *sign, &r_index, &r_sign)) {
-      if (r_index>=0) {
-        // Also flip r_index to avoid singularity
-        d->lam[r_index] = r_sign==0 ? 0 : r_sign>0 ? p->dmin : -p->dmin;
-        // C-VERBOSE
-        casadi_qp_log(d, "%lld->%lld, %lld->%lld", *index, *sign, r_index, r_sign);
-      } else if (*sign==0 && d->sens[*index]==0.) {
-        // Abort: Not worth it to sacrifice regularity
-        *index = -1;
-        return;
-      }
-    }
+    // Detect singularity before it happens and get nullspace vectors
+    if (!d->sing) d->has_search_dir = casadi_qp_flip_check(d, *index, *sign);
+    // Perform the active-set change
     d->lam[*index] = *sign==0 ? 0 : *sign>0 ? p->dmin : -p->dmin;
     // Recalculate primal and dual infeasibility
     casadi_qp_calc_dependent(d);
