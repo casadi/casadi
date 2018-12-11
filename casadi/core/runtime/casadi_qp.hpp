@@ -897,11 +897,17 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
   }
   // Can we restore feasibility?
   if (*r_index < 0) return 1;
-  // Recalculate direction
-  casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, best_k);
-  casadi_qp_expand_step(d);
+  // Recalculate direction, if needed
+  if (--k != best_k) {
+    // Need to recalculate direction
+    casadi_qr_colcomb(d->dz, d->nz_r, p->sp_r, p->pc, 1e-12, best_k);
+    casadi_qp_expand_step(d);
+    if (best_neg) tau *= -1;
+  } else if (--neg != best_neg) {
+    // No need to recalculate, but opposite direction
+    tau *= -1;
+  }
   // Scale step so that that tau=1 corresponds to a full step
-  if (best_neg) tau *= -1;
   casadi_scal(p->nz, tau, d->dz);
   casadi_scal(p->nz, tau, d->dlam);
   casadi_scal(p->nx, tau, d->tinfeas);
