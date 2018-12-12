@@ -734,9 +734,9 @@ int casadi_qp_du_direction(casadi_qp_data<T1>* d) {
   const casadi_qp_prob<T1>* p = d->prob;
   for (i=0; i<p->nx; ++i) {
     // Prevent further increase in dual infeasibility
-    if (d->infeas[i] <= -d->edu && d->tinfeas[i] < -1e-16) {
+    if (d->infeas[i] <= -d->edu && d->tinfeas[i] < -1e-12) {
       return 1;
-    } else if (d->infeas[i] >= d->edu && d->tinfeas[i] > 1e-16) {
+    } else if (d->infeas[i] >= d->edu && d->tinfeas[i] > 1e-12) {
       return 1;
     }
   }
