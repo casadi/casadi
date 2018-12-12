@@ -77558,8 +77558,7 @@ inc_x, T1 *y, casadi_int inc_y) "
 ";
 
 %feature("docstring")  casadi::casadi_qp_flip_check(casadi_qp_data< T1 > *d,
-casadi_int index, casadi_int sign, casadi_int *r_index, casadi_int *r_sign)
-"
+casadi_int index, casadi_int sign) "
 
 [INTERNAL] ";
 
