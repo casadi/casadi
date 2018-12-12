@@ -309,9 +309,15 @@ casadi_int casadi_qp_pr_index(casadi_qp_data<T1>* d, casadi_int* sign) {
   // Try to improve primal feasibility by adding a constraint
   if (d->lam[d->ipr]==0.) {
     // Add the most violating constraint
-    *sign = d->z[d->ipr] < d->lbz[d->ipr] ? -1 : 1;
-    // C-VERBOSE
-    casadi_qp_log(d, "Added %lld to reduce |pr|", d->ipr);
+    if (d->z[d->ipr] < d->lbz[d->ipr]) {
+      *sign = -1;
+      // C-VERBOSE
+      casadi_qp_log(d, "Added lbz[%lld] to reduce |pr|", d->ipr);
+    } else {
+      *sign = 1;
+      // C-VERBOSE
+      casadi_qp_log(d, "Added ubz[%lld] to reduce |pr|", d->ipr);
+    }
     return d->ipr;
   } else {
     // No improvement possible
