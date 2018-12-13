@@ -144,6 +144,7 @@ namespace casadi {
   void Qrqp::set_qp_prob() {
     p_.du_to_pr = du_to_pr_;
     p_.min_lam = min_lam_;
+    p_.max_iter = max_iter_
     p_.sp_a = A_;
     p_.sp_h = H_;
     p_.sp_at = AT_;
@@ -205,7 +206,7 @@ namespace casadi {
       if (!d.sing && d.index == -1) {
         casadi_qp_log(&d, "QP converged");
         m->return_status = "success";
-      } else if (d.iter >= max_iter_) {
+      } else if (d.iter >= p.max_iter) {
         casadi_qp_log(&d, "QP terminated: max iter");
         m->return_status = "Maximum number of iterations reached";
         m->unified_return_status = SOLVER_RET_LIMITED;
@@ -265,6 +266,7 @@ namespace casadi {
         // Setup memory structure
     g << "p.du_to_pr = " << du_to_pr_ << ";\n";
     g << "p.min_lam = " << min_lam_ << ";\n";
+    g << "p.max_iter = " << max_iter_ << ";\n";
     g << "p.sp_a = " << g.sparsity(A_) << ";\n";
     g << "p.sp_h = " << g.sparsity(H_) << ";\n";
     g << "p.sp_at = " << g.sparsity(AT_) << ";\n";
@@ -319,7 +321,7 @@ namespace casadi {
     g << "casadi_qp_factorize(&d);\n";
 
     g.comment("Termination message");
-    g << "  if (d.iter >= " << max_iter_ << ") {\n";
+    g << "  if (d.iter >= p.max_iter) {\n";
     g << "    flag = 1;\n";
     g << "  }\n";
 
