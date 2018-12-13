@@ -1017,27 +1017,26 @@ void casadi_qp_linesearch(casadi_qp_data<T1>* d, casadi_int* index, casadi_int* 
 }
 
 template<typename T1>
-void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
-                                          casadi_int r_index, casadi_int r_sign) {
+void casadi_qp_flip(casadi_qp_data<T1>* d) {
   // Local variables
   const casadi_qp_prob<T1>* p = d->prob;
   // Try to restore regularity if possible
-  if (*index == -1 && r_index >= 0) {
-    if (r_sign != 0 || casadi_qp_du_check(d, r_index)) {
-      *index = r_index;
-      *sign = r_sign;
-      if (*sign > 0) {
+  if (d->index == -1 && d->r_index >= 0) {
+    if (d->r_sign != 0 || casadi_qp_du_check(d, d->r_index)) {
+      d->index = d->r_index;
+      d->sign = d->r_sign;
+      if (d->sign > 0) {
         // C-VERBOSE
-        casadi_qp_log(d, "Enforced ubz[%lld] for regularity", *index);
-      } else if (*sign < 0) {
+        casadi_qp_log(d, "Enforced ubz[%lld] for regularity", d->index);
+      } else if (d->sign < 0) {
         // C-VERBOSE
-        casadi_qp_log(d, "Enforced lbz[%lld] for regularity", *index);
-      } else if (d->lam[*index] > 0) {
+        casadi_qp_log(d, "Enforced lbz[%lld] for regularity", d->index);
+      } else if (d->lam[d->index] > 0) {
         // C-VERBOSE
-        casadi_qp_log(d, "Dropped ubz[%lld] for regularity", *index);
+        casadi_qp_log(d, "Dropped ubz[%lld] for regularity", d->index);
       } else {
         // C-VERBOSE
-        casadi_qp_log(d, "Dropped lbz[%lld] for regularity", *index);
+        casadi_qp_log(d, "Dropped lbz[%lld] for regularity", d->index);
       }
     }
   }
@@ -1045,21 +1044,21 @@ void casadi_qp_flip(casadi_qp_data<T1>* d, casadi_int *index, casadi_int *sign,
   if (!d->sing && d->e > 1e-14) {
     // Improve primal feasibility if dominating
     if (d->pr >= p->du_to_pr * d->du) {
-      if (*index == -1) *index = casadi_qp_pr_index(d, sign);
+      if (d->index == -1) d->index = casadi_qp_pr_index(d, &d->sign);
     }
     // Improve dual feasibility if dominating
     if (d->pr <= p->du_to_pr * d->du) {
-      if (*index == -1) *index = casadi_qp_du_index(d, sign, d->ipr);
+      if (d->index == -1) d->index = casadi_qp_du_index(d, &d->sign, d->ipr);
     }
   }
   // No search direction given by default
   d->has_search_dir = 0;
   // If a constraint was added
-  if (*index >= 0) {
+  if (d->index >= 0) {
     // Detect singularity before it happens and get nullspace vectors
-    if (!d->sing) d->has_search_dir = casadi_qp_flip_check(d, *index, *sign);
+    if (!d->sing) d->has_search_dir = casadi_qp_flip_check(d, d->index, d->sign);
     // Perform the active-set change
-    d->lam[*index] = *sign==0 ? 0 : *sign>0 ? p->dmin : -p->dmin;
+    d->lam[d->index] = d->sign==0 ? 0 : d->sign>0 ? p->dmin : -p->dmin;
     // Recalculate primal and dual infeasibility
     casadi_qp_calc_dependent(d);
   }

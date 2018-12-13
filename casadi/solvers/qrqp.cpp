@@ -200,7 +200,7 @@ namespace casadi {
       // Calculate dependent quantities
       casadi_qp_calc_dependent(&d);
       // Make an active set change
-      casadi_qp_flip(&d, &d.index, &d.sign, d.r_index, d.r_sign);
+      casadi_qp_flip(&d);
       // Form and factorize the KKT system
       casadi_qp_factorize(&d);
       // Termination message
@@ -317,7 +317,7 @@ namespace casadi {
     g << "casadi_qp_calc_dependent(&d);\n";
 
     g.comment("Make an active set change");
-    g << "casadi_qp_flip(&d, &d.index, &d.sign, d.r_index, d.r_sign);\n";
+    g << "casadi_qp_flip(&d);\n";
 
     g.comment("Form and factorize the KKT system");
     g << "casadi_qp_factorize(&d);\n";
