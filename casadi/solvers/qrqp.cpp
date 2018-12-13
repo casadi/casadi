@@ -207,7 +207,7 @@ namespace casadi {
       if (!d.sing && d.index == -1) {
         casadi_qp_log(&d, "QP converged");
         m->return_status = "success";
-      } else if (iter>=max_iter_) {
+      } else if (iter >= max_iter_) {
         casadi_qp_log(&d, "QP terminated: max iter");
         m->return_status = "Maximum number of iterations reached";
         m->unified_return_status = SOLVER_RET_LIMITED;
@@ -237,7 +237,7 @@ namespace casadi {
       // Start a new iteration
       iter++;
       // Calculate search direction
-      if (casadi_qp_calc_step(&d, &d.r_index, &d.r_sign)) {
+      if (casadi_qp_calc_step(&d)) {
         if (print_iter_) print("QP terminated: No search direction\n");
         m->return_status = "Failed to calculate search direction";
         flag = 1;
@@ -334,7 +334,7 @@ namespace casadi {
     g << "  iter++;\n";
     g.comment("Start a new iteration");
     // Calculate search direction
-    g << "  if (casadi_qp_calc_step(&d, &d.r_index, &d.r_sign)) {\n";
+    g << "  if (casadi_qp_calc_step(&d)) {\n";
     g << "    flag = 1;\n";
     g << "    break;\n";
     g << "}\n";

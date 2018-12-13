@@ -700,22 +700,22 @@ void casadi_qp_expand_step(casadi_qp_data<T1>* d) {
   // Calculate change in Lagrangian gradient
   casadi_fill(d->dlam, p->nx, 0.);
   casadi_mv(d->nz_h, p->sp_h, d->dz, d->dlam, 0); // gradient of the objective
-  casadi_mv(d->nz_a, p->sp_a, d->dz+p->nx, d->dlam, 1); // gradient of the Lagrangian
+  casadi_mv(d->nz_a, p->sp_a, d->dz + p->nx, d->dlam, 1); // gradient of the Lagrangian
   // Step in lam[:nx]
   casadi_scal(p->nx, -1., d->dlam);
   // For inactive constraints, lam(x) step is zero
-  for (i=0; i<p->nx; ++i) if (d->lam[i]==0.) d->dlam[i] = 0.;
+  for (i = 0; i < p->nx; ++i) if (d->lam[i] == 0.) d->dlam[i] = 0.;
   // Step in lam[nx:]
-  casadi_copy(d->dz+p->nx, p->na, d->dlam+p->nx);
+  casadi_copy(d->dz+p->nx, p->na, d->dlam + p->nx);
   // Step in z[nx:]
-  casadi_fill(d->dz+p->nx, p->na, 0.);
-  casadi_mv(d->nz_a, p->sp_a, d->dz, d->dz+p->nx, 0);
+  casadi_fill(d->dz + p->nx, p->na, 0.);
+  casadi_mv(d->nz_a, p->sp_a, d->dz, d->dz + p->nx, 0);
   // Avoid steps that are nonzero due to numerics
-  for (i=0; i<p->nz; ++i) if (fabs(d->dz[i])<1e-14) d->dz[i] = 0.;
+  for (i = 0; i < p->nz; ++i) if (fabs(d->dz[i]) < 1e-14) d->dz[i] = 0.;
   // Tangent of the dual infeasibility at tau=0
   casadi_fill(d->tinfeas, p->nx, 0.);
   casadi_mv(d->nz_h, p->sp_h, d->dz, d->tinfeas, 0);
-  casadi_mv(d->nz_a, p->sp_a, d->dlam+p->nx, d->tinfeas, 1);
+  casadi_mv(d->nz_a, p->sp_a, d->dlam + p->nx, d->tinfeas, 1);
   casadi_axpy(p->nx, 1., d->dlam, d->tinfeas);
 }
 
@@ -782,18 +782,18 @@ int casadi_qp_enforceable(casadi_qp_data<T1>* d, casadi_int i, casadi_int s) {
 // SYMBOL "qp_singular_step"
 // C-REPLACE "static_cast<T1*>(0)" "0"
 template<typename T1>
-int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
+int casadi_qp_singular_step(casadi_qp_data<T1>* d) {
   // Local variables
   T1 tau_test, tau;
   casadi_int nnz_kkt, nk, k, i, best_k, best_neg, neg;
   const casadi_qp_prob<T1>* p = d->prob;
   // Find the columns that take part in any linear combination
-  for (i=0; i<p->nz; ++i) d->lincomb[i]=0;
-  for (k=0; k<d->sing; ++k) {
+  for (i = 0; i < p->nz; ++i) d->lincomb[i] = 0;
+  for (k = 0; k < d->sing; ++k) {
     if (!d->has_search_dir) {
       casadi_qr_colcomb(d->dlam, d->nz_r, p->sp_r, p->pc, 1e-12, k);
     }
-    for (i=0; i<p->nz; ++i) if (fabs(d->dlam[i]) >= 1e-12) d->lincomb[i]++;
+    for (i = 0; i < p->nz; ++i) if (fabs(d->dlam[i]) >= 1e-12) d->lincomb[i]++;
   }
 
   if (d->has_search_dir) {
@@ -848,8 +848,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
                 && (tau_test = (d->lbz[i] - d->z[i]) / d->dz[i]) < tau
                 && casadi_qp_enforceable(d, i, -1)) {
               tau = tau_test;
-              *r_index = i;
-              *r_sign = -1;
+              d->r_index = i;
+              d->r_sign = -1;
               best_k = k;
               best_neg = neg;
             }
@@ -860,8 +860,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
                 && (tau_test = (d->ubz[i] - d->z[i]) / d->dz[i]) < tau
                 && casadi_qp_enforceable(d, i, 1)) {
               tau = tau_test;
-              *r_index = i;
-              *r_sign = 1;
+              d->r_index = i;
+              d->r_sign = 1;
               best_k = k;
               best_neg = neg;
             }
@@ -871,8 +871,8 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
           if (d->lam[i] > 0 ? d->dlam[i] < -1e-12 : d->dlam[i] > 1e-12) {
             if ((tau_test = -d->lam[i] / d->dlam[i]) < tau) {
               tau = tau_test;
-              *r_index = i;
-              *r_sign = 0;
+              d->r_index = i;
+              d->r_sign = 0;
               best_k = k;
               best_neg = neg;
             }
@@ -882,7 +882,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
     }
   }
   // Can we restore feasibility?
-  if (*r_index < 0) return 1;
+  if (d->r_index < 0) return 1;
   // Recalculate direction, if needed
   if (--k != best_k) {
     // Need to recalculate direction
@@ -902,14 +902,14 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_i
 
 // SYMBOL "qp_calc_step"
 template<typename T1>
-int casadi_qp_calc_step(casadi_qp_data<T1>* d, casadi_int* r_index, casadi_int* r_sign) {
+int casadi_qp_calc_step(casadi_qp_data<T1>* d) {
   // Local variables
   const casadi_qp_prob<T1>* p = d->prob;
   // Reset returns
-  *r_index = -1;
-  *r_sign = 0;
+  d->r_index = -1;
+  d->r_sign = 0;
   // Handle singularity
-  if (d->sing) return casadi_qp_singular_step(d, r_index, r_sign);
+  if (d->sing) return casadi_qp_singular_step(d);
   // Negative KKT residual
   casadi_qp_kkt_residual(d, d->dz);
   // Solve to get step in z[:nx] and lam[nx:]
@@ -1051,7 +1051,7 @@ void casadi_qp_flip(casadi_qp_data<T1>* d) {
     // Detect singularity before it happens and get nullspace vectors
     if (!d->sing) d->has_search_dir = casadi_qp_flip_check(d);
     // Perform the active-set change
-    d->lam[d->index] = d->sign==0 ? 0 : d->sign>0 ? p->dmin : -p->dmin;
+    d->lam[d->index] = d->sign==0 ? 0 : d->sign > 0 ? p->dmin : -p->dmin;
     // Recalculate primal and dual infeasibility
     casadi_qp_calc_dependent(d);
   }
