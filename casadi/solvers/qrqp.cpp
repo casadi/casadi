@@ -144,7 +144,7 @@ namespace casadi {
   void Qrqp::set_qp_prob() {
     p_.du_to_pr = du_to_pr_;
     p_.min_lam = min_lam_;
-    p_.max_iter = max_iter_
+    p_.max_iter = max_iter_;
     p_.sp_a = A_;
     p_.sp_h = H_;
     p_.sp_at = AT_;
