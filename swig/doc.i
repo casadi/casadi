@@ -76998,8 +76998,7 @@ Get type info for a particular option.
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_pr_index(casadi_qp_data< T1 > *d,
-casadi_int *sign) "
+%feature("docstring")  casadi::casadi_qp_pr_index(casadi_qp_data< T1 > *d) "
 
 [INTERNAL] ";
 
@@ -77525,8 +77524,8 @@ ndim, const T1 *grid, const casadi_int *offset, const T1 *values, const T1
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_qp_calc_step(casadi_qp_data< T1 > *d,
-casadi_int *r_index, casadi_int *r_sign) "
+%feature("docstring")  casadi::casadi_qp_calc_step(casadi_qp_data< T1 > *d)
+"
 
 [INTERNAL] ";
 
@@ -77557,8 +77556,8 @@ inc_x, T1 *y, casadi_int inc_y) "
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_flip_check(casadi_qp_data< T1 > *d,
-casadi_int index, casadi_int sign) "
+%feature("docstring")  casadi::casadi_qp_flip_check(casadi_qp_data< T1 > *d)
+"
 
 [INTERNAL] ";
 
@@ -77976,7 +77975,7 @@ Construct from an index vector (requires is_slice(v) to be true)
 ";
 
 %feature("docstring")  casadi::casadi_qp_du_index(casadi_qp_data< T1 > *d,
-casadi_int *sign, casadi_int skip) "
+casadi_int skip) "
 
 [INTERNAL] ";
 
@@ -78621,7 +78620,7 @@ Get documentation for a particular option.
 [INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_qp_primal_blocking(casadi_qp_data< T1
-> *d, casadi_int *index, casadi_int *sign) "
+> *d) "
 
 [INTERNAL] ";
 
@@ -79546,8 +79545,8 @@ const T1 *lb, const T1 *ub) "
 
 ";
 
-%feature("docstring")  casadi::casadi_qp_linesearch(casadi_qp_data< T1 > *d,
-casadi_int *index, casadi_int *sign) "
+%feature("docstring")  casadi::casadi_qp_linesearch(casadi_qp_data< T1 > *d)
+"
 
 [INTERNAL] ";
 
@@ -79670,7 +79669,7 @@ const casadi_int *sp_lt, const T1 *lt, const T1 *d, const casadi_int *p, T1
 [INTERNAL] ";
 
 %feature("docstring")  casadi::casadi_qp_singular_step(casadi_qp_data< T1 >
-*d, casadi_int *r_index, casadi_int *r_sign) "
+*d) "
 
 [INTERNAL] ";
 
@@ -80761,9 +80760,7 @@ strideB, casadi_int strideC) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_qp_flip(casadi_qp_data< T1 > *d,
-casadi_int *index, casadi_int *sign, casadi_int r_index, casadi_int r_sign)
-"
+%feature("docstring")  casadi::casadi_qp_flip(casadi_qp_data< T1 > *d) "
 
 [INTERNAL] ";
 
@@ -80968,7 +80965,7 @@ Get NLP solver input scheme name by index.
 ";
 
 %feature("docstring")  casadi::casadi_qp_zero_blocking(casadi_qp_data< T1 >
-*d, casadi_int *index, casadi_int *sign) "
+*d) "
 
 [INTERNAL] ";
 
