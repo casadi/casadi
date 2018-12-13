@@ -329,4 +329,37 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
   }
 
 
+  std::vector<bool> boolvec_not(const std::vector<bool> &v) {
+    std::vector<bool> ret(v.size());
+    std::transform(v.begin(), v.end(), ret.begin(),
+                   [](bool v) -> bool { return !v; });
+    return ret;
+  }
+
+  std::vector<bool> boolvec_and(const std::vector<bool> &lhs, const std::vector<bool> &rhs) {
+    casadi_assert(lhs.size()==rhs.size(), "Size mismatch.");
+    std::vector<bool> ret(lhs.size());
+    std::transform(lhs.begin(), lhs.end(), rhs.begin(), ret.begin(),
+                   [](bool a, bool b) -> bool { return a && b; });
+    return ret;
+  }
+
+  std::vector<bool> boolvec_or(const std::vector<bool> &lhs, const std::vector<bool> &rhs) {
+    casadi_assert(lhs.size()==rhs.size(), "Size mismatch.");
+    std::vector<bool> ret(lhs.size());
+    std::transform(lhs.begin(), lhs.end(), rhs.begin(), ret.begin(),
+                   [](bool a, bool b) -> bool { return a || b; });
+    return ret;
+  }
+
+
+  std::vector<casadi_int> boolvec_to_index(const std::vector<bool> &v) {
+    std::vector<casadi_int> ret;
+    for (casadi_int i=0;i<v.size();++i) {
+      if (v[i]) ret.push_back(i);
+    }
+    return ret;
+  }
+
+
 } // namespace casadi

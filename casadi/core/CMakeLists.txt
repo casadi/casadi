@@ -63,6 +63,7 @@ set(CASADI_PUBLIC
 
   # MISC useful stuff
   integration_tools.hpp
+  nlp_tools.hpp
   nlp_builder.hpp
   xml_node.hpp
   xml_file.hpp
@@ -174,6 +175,7 @@ set(CASADI_INTERNAL
 
   # MISC useful stuff
   integration_tools.cpp
+  nlp_tools.cpp
   nlp_builder.cpp
   xml_node.cpp
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp

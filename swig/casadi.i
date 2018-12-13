@@ -4196,6 +4196,7 @@ namespace casadi {
 %include <casadi/core/global_options.hpp>
 %include <casadi/core/casadi_meta.hpp>
 %include <casadi/core/integration_tools.hpp>
+%include <casadi/core/nlp_tools.hpp>
 %include <casadi/core/nlp_builder.hpp>
 %include <casadi/core/variable.hpp>
 %include <casadi/core/dae_builder.hpp>

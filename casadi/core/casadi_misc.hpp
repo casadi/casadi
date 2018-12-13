@@ -92,6 +92,16 @@ private:
   CASADI_EXPORT bool all(const std::vector<bool> &v);
   /// Check if any arguments are true
   CASADI_EXPORT bool any(const std::vector<bool> &v);
+  /// Invert all entries
+  CASADI_EXPORT std::vector<bool> boolvec_not(const std::vector<bool> &v);
+  /// And operation on boolean vector
+  CASADI_EXPORT std::vector<bool> boolvec_and(const std::vector<bool> &lhs,
+      const std::vector<bool> &rhs);
+  /// Or operation on boolean vector
+  CASADI_EXPORT std::vector<bool> boolvec_or(const std::vector<bool> &lhs,
+      const std::vector<bool> &rhs);
+
+  CASADI_EXPORT std::vector<casadi_int> boolvec_to_index(const std::vector<bool> &v);
 
   CASADI_EXPORT bool is_equally_spaced(const std::vector<double> &v);
 

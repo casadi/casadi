@@ -23,48 +23,36 @@
  */
 
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+#ifndef CASADI_NLP_TOOLS_HPP
+#define CASADI_NLP_TOOLS_HPP
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
+#include "casadi/core/function.hpp"
 
-// Generic tools
-#include "polynomial.hpp"
-#include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
+namespace casadi {
 
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
+  /** Detect simple bounds from general constraints
+   *
+   * Given parametric constraints:
+   * \verbatim
+   *   subject to lbg(p) <= g(x,p) <= ubg(p)
+   * \endverbatim
+   *
+   * Returns an equivalent set
+   * \verbatim
+   *   subject to  lbg(p)(!is_simple) <= g(x,p)(!is_simple) <= ubg(p)(!is_simple)
+   *               lbx(p) <= x                 <= ubx(p)
+   * \endverbatim
+   *
+   * \param[out] lam_forward (lam_g,p)->(lam_sg,lam_x)
+   * \param[out] lam_backward (lam_sg,lam_x,p)->(lam_g)
+   * */
+  CASADI_EXPORT void detect_simple_bounds(const SX& xX, const SX& p,
+      const SX& g, const SX& lbg, const SX& ubg,
+      std::vector<bool>& SWIG_OUTPUT(is_simple),
+      SX& SWIG_OUTPUT(lbx), SX& SWIG_OUTPUT(ubx),
+      Function& SWIG_OUTPUT(lam_forward),
+      Function& SWIG_OUTPUT(lam_backward));
 
-// Matrix expressions
-#include "mx.hpp"
+} // namespace casadi
 
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
-
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_tools.hpp"
-#include "nlp_builder.hpp"
-#include "variable.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
-
-#endif // CASADI_CORE_HPP
+#endif // CASADI_NLP_TOOLS_HPP

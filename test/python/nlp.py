@@ -1720,6 +1720,119 @@ class NLPtests(casadiTestCase):
     stats_reg = solver.stats()
     self.assertTrue(stats_reg["iter_count"]==9)
 
+  def test_simple_bounds_detect(self):
+
+    x = SX.sym("x",5)
+    p = SX.sym("p",1)
+
+
+    g = [
+      (1.1,  x[0]*x[1], 2),
+      (-inf,  x[4], 2), # 4 H
+      (-10,  x[0], 10),
+      (-5,  x[0], 2), # 0 H
+      (-4,  x[0], 4), # 0 L
+      (1.1,  x[4]*x[1], 2),
+      (0,  x[4], inf), # 4 L
+      (7,  x[2], 7), # 2 LH
+      (-4,  x[2], 40),
+      (9,  x[1], 9), # 1 LH
+      (-4,  x[0], 4), # 0 L
+      (-4,  x[1], 9)] # 1 H
+
+    [lbg,g,ubg]= zip(*g)
+
+    lbg = vcat(lbg)
+    ubg = vcat(ubg)
+    g = vcat(g)
+
+    [is_simple,lbx,ubx,lam_f,lam_b]=detect_simple_bounds(x,p,g,lbg,ubg)
+
+    self.checkarray(DM(lbx).T,[-4,9,7,-inf,0])
+    self.checkarray(DM(ubx).T,[2,9,7,inf,2])
+
+    def round_trip_f(arg):
+      return lam_b(*(lam_f(arg,0)+(0,)))
+
+    def round_trip_b(arg):
+      return lam_f(lam_b(*(arg+(0,))),0)
+
+
+    G = np.array([[2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1]])
+
+    for i in range(12):
+      a = DM.zeros(12,1)
+      a[i] = 2
+      b = round_trip_f(a)
+      c = round_trip_f(round_trip_f(a))
+      self.checkarray(b,G[i,:])
+      self.checkarray(b,c)
+
+    G = np.array([[-2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0,-1, 0, 0, 0, 0, 0,-1, 0],
+                  [0, 0, 0, 0, 0,-2, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0,-2, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0,-2, 0, 0],
+                  [0, 0, 0, 0,-1, 0, 0, 0, 0, 0,-1, 0],
+                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+
+
+    for i in range(12):
+      a = DM.zeros(12,1)
+      a[i] = -2
+      b = round_trip_f(a)
+      c = round_trip_f(round_trip_f(a))
+      self.checkarray(b,G[i,:])
+      self.checkarray(b,c)
+
+    G = np.array([[-2, 0, 0, 0, 0],
+                  [0, -2, 0, 0, 0],
+                  [0, 0, -2, 0, 0],
+                  [0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, -2]])
+
+
+    for i in range(5):
+      a = DM.zeros(5,1)
+      a[i] = -2
+      b = round_trip_b(([3,7],a))
+      c = round_trip_b(round_trip_b(([3,7],a)))
+      self.checkarray(b[0].T,[3,7])
+      self.checkarray(b[1],G[i,:])
+      self.checkarray(b[1],c[1])
+
+    G = np.array([[2, 0, 0, 0, 0],
+                  [0, 2, 0, 0, 0],
+                  [0, 0, 2, 0, 0],
+                  [0, 0, 0, 0, 0],
+                  [0, 0, 0, 0, 2]])
+
+
+    for i in range(5):
+      a = DM.zeros(5,1)
+      a[i] = 2
+      b = round_trip_b(([3,7],a))
+      c = round_trip_b(round_trip_b(([3,7],a)))
+      self.checkarray(b[0].T,[3,7])
+      self.checkarray(b[1],G[i,:])
+      self.checkarray(b[1],c[1])
+
 if __name__ == '__main__':
     unittest.main()
     print(solvers)
