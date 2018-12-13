@@ -254,84 +254,80 @@ int casadi_qp_du_check(casadi_qp_data<T1>* d, casadi_int i) {
 
 // SYMBOL "qp_du_index"
 template<typename T1>
-casadi_int casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int* sign, casadi_int skip) {
+void casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int skip) {
   // Try to improve dual feasibility by removing a constraint
   // Local variables
-  casadi_int best_ind, i, s, best_sign;
+  casadi_int i, s;
   T1 best_sens;
   const casadi_qp_prob<T1>* p = d->prob;
   // Find the best lam[i] to make zero
-  best_ind = -1;
+  d->index = -1;
   best_sens = -1;
-  for (i=0; i<p->nz; ++i) {
+  for (i = 0; i < p->nz; ++i) {
     // Should the index be avoided?
-    if (i==skip) continue;
+    if (i == skip) continue;
     // Skip if no dual infeasibility sensitivity
-    if (d->sens[i]==0.) continue;
+    if (d->sens[i] == 0.) continue;
     // Is the constraint enforced?
-    if (d->lam[i]==0) {
+    if (d->lam[i] == 0) {
       // We're enforcing constraints
-      s = d->sens[i]>0 ? 1 : -1;
+      s = d->sens[i] > 0 ? 1 : -1;
       // Make sure that enforcing the constraint is possible
-      if (s>0 ? d->neverupper[i] : d->neverlower[i]) continue;
+      if (s > 0 ? d->neverupper[i] : d->neverlower[i]) continue;
     } else {
       // We're removing constraints
       s = 0;
       // Make sure that it's a constraint that can be removed
       if (d->neverzero[i]) continue;
       // If variable influences du, make sure sign is right
-      if (d->lam[i]>0. ? d->sens[i]>0. : d->sens[i]<0.) continue;
+      if (d->lam[i] > 0. ? d->sens[i] > 0. : d->sens[i] < 0.) continue;
       // Skip if maximum infeasibility increases
       if (!casadi_qp_du_check(d, i)) continue;
     }
     // Check if best so far
-    if (fabs(d->sens[i])>best_sens) {
+    if (fabs(d->sens[i]) > best_sens) {
       best_sens = fabs(d->sens[i]);
-      best_ind = i;
-      best_sign = s;
+      d->index = i;
+      d->sign = s;
     }
   }
   // Accept, if any
-  if (best_ind>=0) {
-    *sign = best_sign;
-    if (best_sign > 0) {
+  if (d->index >= 0) {
+    if (d->sign > 0) {
       // C-VERBOSE
-      casadi_qp_log(d, "Enforced ubz[%lld] to reduce |du|", best_ind);
-    } else if (best_sign < 0) {
+      casadi_qp_log(d, "Enforced ubz[%lld] to reduce |du|", d->index);
+    } else if (d->sign < 0) {
       // C-VERBOSE
-      casadi_qp_log(d, "Enforced lbz[%lld] to reduce |du|", best_ind);
-    } else if (d->lam[best_ind] > 0) {
+      casadi_qp_log(d, "Enforced lbz[%lld] to reduce |du|", d->index);
+    } else if (d->lam[d->index] > 0) {
       // C-VERBOSE
-      casadi_qp_log(d, "Dropped ubz[%lld] to reduce |du|", best_ind);
+      casadi_qp_log(d, "Dropped ubz[%lld] to reduce |du|", d->index);
     } else {
       // C-VERBOSE
-      casadi_qp_log(d, "Dropped lbz[%lld] to reduce |du|", best_ind);
+      casadi_qp_log(d, "Dropped lbz[%lld] to reduce |du|", d->index);
     }
-    return best_ind;
-  } else {
-    return -1;
   }
 }
 
 // SYMBOL "qp_pr_index"
 template<typename T1>
-casadi_int casadi_qp_pr_index(casadi_qp_data<T1>* d, casadi_int* sign) {
+void casadi_qp_pr_index(casadi_qp_data<T1>* d) {
   // Try to improve primal feasibility by adding a constraint
-  if (d->lam[d->ipr]==0.) {
+  if (d->lam[d->ipr] == 0.) {
     // Add the most violating constraint
     if (d->z[d->ipr] < d->lbz[d->ipr]) {
-      *sign = -1;
+      d->sign = -1;
       // C-VERBOSE
       casadi_qp_log(d, "Added lbz[%lld] to reduce |pr|", d->ipr);
     } else {
-      *sign = 1;
+      d->sign = 1;
       // C-VERBOSE
       casadi_qp_log(d, "Added ubz[%lld] to reduce |pr|", d->ipr);
     }
-    return d->ipr;
+    d->index = d->ipr;
   } else {
     // No improvement possible
-    return -1;
+    d->index = -1;
   }
 }
 
@@ -1012,7 +1008,7 @@ void casadi_qp_linesearch(casadi_qp_data<T1>* d, casadi_int* index, casadi_int* 
     // Sensititivity in decreasing du_index
     casadi_qp_calc_sens(d, du_index);
     // Find corresponding index
-    *index = casadi_qp_du_index(d, sign, -1);
+    casadi_qp_du_index(d, -1);
   }
 }
 
@@ -1044,11 +1040,11 @@ void casadi_qp_flip(casadi_qp_data<T1>* d) {
   if (!d->sing && d->e > 1e-14) {
     // Improve primal feasibility if dominating
     if (d->pr >= p->du_to_pr * d->du) {
-      if (d->index == -1) d->index = casadi_qp_pr_index(d, &d->sign);
+      if (d->index == -1) casadi_qp_pr_index(d);
     }
     // Improve dual feasibility if dominating
     if (d->pr <= p->du_to_pr * d->du) {
-      if (d->index == -1) d->index = casadi_qp_du_index(d, &d->sign, d->ipr);
+      if (d->index == -1) casadi_qp_du_index(d, d->ipr);
     }
   }
   // No search direction given by default
