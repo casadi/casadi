@@ -194,19 +194,17 @@ namespace casadi {
     if (casadi_qp_reset(&d)) return 1;
     // Return flag
     int flag = 0;
-    // Constraint to be flipped, if any
-    casadi_int index=-2, sign=0, r_index=-2, r_sign=0;
     // QP iterations
     casadi_int iter = 0;
     while (true) {
       // Calculate dependent quantities
       casadi_qp_calc_dependent(&d);
       // Make an active set change
-      casadi_qp_flip(&d, &index, &sign, r_index, r_sign);
+      casadi_qp_flip(&d, &d.index, &d.sign, d.r_index, d.r_sign);
       // Form and factorize the KKT system
       casadi_qp_factorize(&d);
       // Termination message
-      if (!d.sing && index == -1) {
+      if (!d.sing && d.index == -1) {
         casadi_qp_log(&d, "QP converged");
         m->return_status = "success";
       } else if (iter>=max_iter_) {
@@ -232,21 +230,21 @@ namespace casadi {
       // Check if converged and nonsingular
       if (!d.sing) {
         // No active set change could be found
-        if (index == -1) break;
+        if (d.index == -1) break;
         // No primal or dual error
         if (d.ipr < 0 && d.idu < 0) break;
       }
       // Start a new iteration
       iter++;
       // Calculate search direction
-      if (casadi_qp_calc_step(&d, &r_index, &r_sign)) {
+      if (casadi_qp_calc_step(&d, &d.r_index, &d.r_sign)) {
         if (print_iter_) print("QP terminated: No search direction\n");
         m->return_status = "Failed to calculate search direction";
         flag = 1;
         break;
       }
       // Line search in the calculated direction
-      casadi_qp_linesearch(&d, &index, &sign);
+      casadi_qp_linesearch(&d, &d.index, &d.sign);
       InterruptHandler::check();
     }
     // Get solution
@@ -309,13 +307,6 @@ namespace casadi {
     g.local("flag", "int");
     g << "flag = 0;\n";
 
-    g.comment("Constraint to be flipped, if any");
-    g.local("index", "casadi_int");
-    g.local("sign", "casadi_int");
-    g.local("r_index", "casadi_int");
-    g.local("r_sign", "casadi_int");
-    g << "index = -2;sign=0;r_index=-2;r_sign=0;\n";
-
     g.comment("QP iterations");
 
     g.local("iter", "casadi_int");
@@ -326,7 +317,7 @@ namespace casadi {
     g << "casadi_qp_calc_dependent(&d);\n";
 
     g.comment("Make an active set change");
-    g << "casadi_qp_flip(&d, &index, &sign, r_index, r_sign);\n";
+    g << "casadi_qp_flip(&d, &d.index, &d.sign, d.r_index, d.r_sign);\n";
 
     g.comment("Form and factorize the KKT system");
     g << "casadi_qp_factorize(&d);\n";
@@ -337,19 +328,19 @@ namespace casadi {
     g << "  }\n";
 
     g.comment("Terminate loop?");
-    g << "  if (index==-1 || flag!=0) break;\n";
+    g << "  if (d.index==-1 || flag!=0) break;\n";
 
     g.comment("Start a new iteration");
     g << "  iter++;\n";
     g.comment("Start a new iteration");
     // Calculate search direction
-    g << "  if (casadi_qp_calc_step(&d, &r_index, &r_sign)) {\n";
+    g << "  if (casadi_qp_calc_step(&d, &d.r_index, &d.r_sign)) {\n";
     g << "    flag = 1;\n";
     g << "    break;\n";
     g << "}\n";
 
     g.comment("Line search in the calculated direction");
-    g << "  casadi_qp_linesearch(&d, &index, &sign);\n";
+    g << "  casadi_qp_linesearch(&d, &d.index, &d.sign);\n";
     g << "}\n";
 
     g.comment("Get solution");

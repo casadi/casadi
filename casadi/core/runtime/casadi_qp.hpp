@@ -88,6 +88,10 @@ struct casadi_qp_data {
   // Primal and dual error, corresponding index
   T1 pr, du, epr, edu, e;
   casadi_int ipr, idu;
+  // Pending active-set change
+  casadi_int index, sign;
+  // Feasibility restoration active-set change
+  casadi_int r_index, r_sign;
   // Verbose
   int verbose;
 };
@@ -157,6 +161,12 @@ int casadi_qp_reset(casadi_qp_data<T1>* d) {
   }
   // Transpose A
   casadi_trans(d->nz_a, p->sp_a, d->nz_at, p->sp_at, d->iw);
+  // No pending active-set change
+  d->index = -2;
+  d->sign = 0;
+  // No restoration index
+  d->r_index = -2;
+  d->r_sign = 0;
   return 0;
 }
 
