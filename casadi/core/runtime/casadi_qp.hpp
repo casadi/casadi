@@ -92,6 +92,8 @@ struct casadi_qp_data {
   casadi_int index, sign;
   // Feasibility restoration active-set change
   casadi_int r_index, r_sign;
+  // Iteration
+  casadi_int iter;
   // Verbose
   int verbose;
 };
@@ -167,6 +169,8 @@ int casadi_qp_reset(casadi_qp_data<T1>* d) {
   // No restoration index
   d->r_index = -2;
   d->r_sign = 0;
+  // Reset iteration counter
+  d->iter = 0;
   return 0;
 }
 

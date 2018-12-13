@@ -194,8 +194,6 @@ namespace casadi {
     if (casadi_qp_reset(&d)) return 1;
     // Return flag
     int flag = 0;
-    // QP iterations
-    casadi_int iter = 0;
     while (true) {
       // Calculate dependent quantities
       casadi_qp_calc_dependent(&d);
@@ -207,7 +205,7 @@ namespace casadi {
       if (!d.sing && d.index == -1) {
         casadi_qp_log(&d, "QP converged");
         m->return_status = "success";
-      } else if (iter >= max_iter_) {
+      } else if (d.iter >= max_iter_) {
         casadi_qp_log(&d, "QP terminated: max iter");
         m->return_status = "Maximum number of iterations reached";
         m->unified_return_status = SOLVER_RET_LIMITED;
@@ -215,13 +213,13 @@ namespace casadi {
       }
       // Print iteration progress:
       if (print_iter_) {
-        if (iter % 10 == 0) {
+        if (d.iter % 10 == 0) {
           print("%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %40s\n",
                 "Iter", "Sing", "fk", "|pr|", "con", "|du|", "var",
                 "min_R", "con", "last_tau", "Note");
         }
         print("%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %40s\n",
-              iter, d.sing, d.f, d.pr, d.ipr, d.du, d.idu,
+              d.iter, d.sing, d.f, d.pr, d.ipr, d.du, d.idu,
               d.mina, d.imina, d.tau, d.msg);
         d.msg[0] = '\0';
       }
@@ -235,7 +233,7 @@ namespace casadi {
         if (d.ipr < 0 && d.idu < 0) break;
       }
       // Start a new iteration
-      iter++;
+      d.iter++;
       // Calculate search direction
       if (casadi_qp_calc_step(&d)) {
         if (print_iter_) print("QP terminated: No search direction\n");
@@ -309,8 +307,6 @@ namespace casadi {
 
     g.comment("QP iterations");
 
-    g.local("iter", "casadi_int");
-    g << "iter = 0;\n";
     g << "while (1) {\n";
 
     g.comment("Calculate dependent quantities");
@@ -323,15 +319,15 @@ namespace casadi {
     g << "casadi_qp_factorize(&d);\n";
 
     g.comment("Termination message");
-    g << "  if (iter>=" << max_iter_ << ") {\n";
+    g << "  if (d.iter >= " << max_iter_ << ") {\n";
     g << "    flag = 1;\n";
     g << "  }\n";
 
     g.comment("Terminate loop?");
-    g << "  if (d.index==-1 || flag!=0) break;\n";
+    g << "  if (d.index == -1 || flag != 0) break;\n";
 
     g.comment("Start a new iteration");
-    g << "  iter++;\n";
+    g << "  d.iter++;\n";
     g.comment("Start a new iteration");
     // Calculate search direction
     g << "  if (casadi_qp_calc_step(&d)) {\n";
