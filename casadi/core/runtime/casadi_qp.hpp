@@ -649,24 +649,23 @@ void casadi_qp_take_step(casadi_qp_data<T1>* d) {
 
 // SYMBOL "qp_flip_check"
 template<typename T1>
-int casadi_qp_flip_check(casadi_qp_data<T1>* d,
-    casadi_int index, casadi_int sign) {
+int casadi_qp_flip_check(casadi_qp_data<T1>* d) {
   // Local variables
   casadi_int i;
   T1 best, test;
   const casadi_qp_prob<T1>* p = d->prob;
   // Calculate the difference between unenforced and enforced column index
-  casadi_qp_kkt_vector(d, d->dlam, index);
+  casadi_qp_kkt_vector(d, d->dlam, d->index);
   // Calculate the difference between old and new column index
-  if (sign==0) casadi_scal(p->nz, -1., d->dlam);
+  if (d->sign == 0) casadi_scal(p->nz, -1., d->dlam);
   // Try to find a linear combination of the new columns
   casadi_qr_solve(d->dlam, 1, 0, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
     p->prinv, p->pc, d->w);
   // If dlam[index]!=1, new columns must be linearly independent
-  if (fabs(d->dlam[index]-1.) >= 1e-12) return 0;
+  if (fabs(d->dlam[d->index]-1.) >= 1e-12) return 0;
   // Next, find a linear combination of the new rows
   casadi_fill(d->dz, p->nz, 0.);
-  d->dz[index] = 1;
+  d->dz[d->index] = 1;
   casadi_qr_solve(d->dz, 1, 1, p->sp_v, d->nz_v, p->sp_r, d->nz_r, d->beta,
     p->prinv, p->pc, d->w);
   // Normalize dlam, dz
@@ -1052,7 +1051,7 @@ void casadi_qp_flip(casadi_qp_data<T1>* d) {
   // If a constraint was added
   if (d->index >= 0) {
     // Detect singularity before it happens and get nullspace vectors
-    if (!d->sing) d->has_search_dir = casadi_qp_flip_check(d, d->index, d->sign);
+    if (!d->sing) d->has_search_dir = casadi_qp_flip_check(d);
     // Perform the active-set change
     d->lam[d->index] = d->sign==0 ? 0 : d->sign>0 ? p->dmin : -p->dmin;
     // Recalculate primal and dual infeasibility
