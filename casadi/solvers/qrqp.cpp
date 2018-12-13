@@ -244,7 +244,7 @@ namespace casadi {
         break;
       }
       // Line search in the calculated direction
-      casadi_qp_linesearch(&d, &d.index, &d.sign);
+      casadi_qp_linesearch(&d);
       InterruptHandler::check();
     }
     // Get solution
@@ -340,7 +340,7 @@ namespace casadi {
     g << "}\n";
 
     g.comment("Line search in the calculated direction");
-    g << "  casadi_qp_linesearch(&d, &d.index, &d.sign);\n";
+    g << "  casadi_qp_linesearch(&d);\n";
     g << "}\n";
 
     g.comment("Get solution");

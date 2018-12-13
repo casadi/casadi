@@ -445,65 +445,63 @@ void casadi_qp_kkt_residual(casadi_qp_data<T1>* d, T1* r) {
 
 // SYMBOL "qp_zero_blocking"
 template<typename T1>
-int casadi_qp_zero_blocking(casadi_qp_data<T1>* d,
-                            casadi_int* index, casadi_int* sign) {
+int casadi_qp_zero_blocking(casadi_qp_data<T1>* d) {
   // Local variables
   casadi_int i;
   T1 dz_max = 0;
   const casadi_qp_prob<T1>* p = d->prob;
   // Look for violated constraints that are not improving
-  for (i=0; i<p->nz; ++i) {
+  for (i = 0; i < p->nz; ++i) {
     if (d->dz[i] < -dz_max && d->lbz[i] - d->z[i] >= d->epr) {
       dz_max = -d->dz[i];
-      if (index) *index = i;
-      if (sign) *sign = -1;
+      d->index = i;
+      d->sign = -1;
       // C-VERBOSE
-      casadi_qp_log(d, "lbz[%lld] violated with zero step", *index);
+      casadi_qp_log(d, "lbz[%lld] violated with zero step", d->index);
     } else if (d->dz[i] > dz_max && d->z[i] - d->ubz[i] >= d->epr) {
       dz_max = d->dz[i];
-      if (index) *index = i;
-      if (sign) *sign = 1;
+      d->index = i;
+      d->sign = 1;
       // C-VERBOSE
-      casadi_qp_log(d, "ubz[%lld] violated with zero step", *index);
+      casadi_qp_log(d, "ubz[%lld] violated with zero step", d->index);
     }
   }
-  return dz_max>0;
+  return dz_max > 0;
 }
 
 // SYMBOL "qp_primal_blocking"
 template<typename T1>
-void casadi_qp_primal_blocking(casadi_qp_data<T1>* d,
-                               casadi_int* index, casadi_int* sign) {
+void casadi_qp_primal_blocking(casadi_qp_data<T1>* d) {
   // Local variables
   casadi_int i;
   T1 trial_z;
   const casadi_qp_prob<T1>* p = d->prob;
   // Check if violation with tau=0 and not improving
-  if (casadi_qp_zero_blocking(d, index, sign)) {
+  if (casadi_qp_zero_blocking(d)) {
     d->tau = 0.;
     return;
   }
   // Loop over all primal variables
-  for (i=0; i<p->nz; ++i) {
-    if (d->dz[i]==0.) continue; // Skip zero steps
+  for (i = 0; i < p->nz; ++i) {
+    if (d->dz[i] == 0.) continue; // Skip zero steps
     // Trial primal step
-    trial_z=d->z[i] + d->tau*d->dz[i];
-    if (d->dz[i]<0 && trial_z < d->lbz[i]-d->epr) {
+    trial_z = d->z[i] + d->tau * d->dz[i];
+    if (d->dz[i] < 0 && trial_z < d->lbz[i] - d->epr) {
       // Trial would increase maximum infeasibility
-      d->tau = (d->lbz[i]-d->epr-d->z[i])/d->dz[i];
-      if (index) *index = d->lam[i]<0. ? -1 : i;
-      if (sign) *sign = -1;
+      d->tau = (d->lbz[i] - d->epr - d->z[i]) / d->dz[i];
+      d->index = d->lam[i] < 0. ? -1 : i;
+      d->sign = -1;
       // C-VERBOSE
       casadi_qp_log(d, "Enforcing lbz[%lld]", i);
-    } else if (d->dz[i]>0 && trial_z > d->ubz[i]+d->epr) {
+    } else if (d->dz[i] > 0 && trial_z > d->ubz[i] + d->epr) {
       // Trial would increase maximum infeasibility
-      d->tau = (d->ubz[i]+d->epr-d->z[i])/d->dz[i];
-      if (index) *index = d->lam[i]>0. ? -1 : i;
-      if (sign) *sign = 1;
+      d->tau = (d->ubz[i] + d->epr - d->z[i]) / d->dz[i];
+      d->index = d->lam[i] > 0. ? -1 : i;
+      d->sign = 1;
       // C-VERBOSE
       casadi_qp_log(d, "Enforcing ubz[%lld]", i);
     }
-    if (d->tau<=0) return;
+    if (d->tau <= 0) return;
   }
 }
 
@@ -988,16 +986,16 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
 }
 
 template<typename T1>
-void casadi_qp_linesearch(casadi_qp_data<T1>* d, casadi_int* index, casadi_int* sign) {
+void casadi_qp_linesearch(casadi_qp_data<T1>* d) {
   // Local variables
   casadi_int du_index;
   const casadi_qp_prob<T1>* p = d->prob;
   // Start with a full step and no active set change
-  *sign = 0;
-  *index = -1;
+  d->sign = 0;
+  d->index = -1;
   d->tau = 1.;
   // Find largest possible step without exceeding acceptable |pr|
-  casadi_qp_primal_blocking(d, index, sign);
+  casadi_qp_primal_blocking(d);
   // Find largest possible step without exceeding acceptable |du|
   du_index = casadi_qp_dual_blocking(d);
   // Take primal-dual step, avoiding accidental sign changes for lam
