@@ -206,7 +206,7 @@ namespace casadi {
       if (!d.sing && d.index == -1) {
         casadi_qp_log(&d, "QP converged");
         m->return_status = "success";
-      } else if (d.iter >= p.max_iter) {
+      } else if (d.iter >= p_.max_iter) {
         casadi_qp_log(&d, "QP terminated: max iter");
         m->return_status = "Maximum number of iterations reached";
         m->unified_return_status = SOLVER_RET_LIMITED;
