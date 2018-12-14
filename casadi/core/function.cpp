@@ -32,10 +32,11 @@
 #include "nlpsol.hpp"
 #include "conic.hpp"
 #include "jit_function.hpp"
+#include "serializing_stream.hpp"
 
-#include <typeinfo>
-#include <fstream>
 #include <cctype>
+#include <fstream>
+#include <typeinfo>
 
 using namespace std;
 
@@ -265,6 +266,7 @@ namespace casadi {
   }
 
   Function Function::expand(const string& name, const Dict& opts) const {
+    casadi_assert(!has_free(), "Function with free symbols cannot be expanded.");
     vector<SX> ex_in = sx_in();
     vector<SX> ex_out = Function(*this)(ex_in);
     return Function(name, ex_in, ex_out, name_in(), name_out(), opts);
@@ -435,7 +437,7 @@ namespace casadi {
     Function base = mapaccum(N, opts);
     std::vector<MX> base_in = base.mx_in();
     std::vector<MX> out = base(base_in);
-    out[0] = out[0](Slice(), range((N-1)*size2_out(0), N*size2_out(0)));
+    out[0] = out[0](Slice(), range((N-1)*size2_out(0), N*size2_out(0))); // NOLINT
     return Function("fold_"+name(), base_in, out, name_in(), name_out(), opts);
   }
   Function Function::mapaccum(casadi_int N, const Dict& opts) const {
@@ -611,7 +613,7 @@ namespace casadi {
       for (casadi_int i=0;i<n_in();++i) {
         MX arg = MX::sym("arg", repmat(sparsity_in(i), 1, n));
         ret_in.push_back(arg);
-        MX last_arg = arg(Slice(), range((n-1)*size2_in(i), n*size2_in(i)));
+        MX last_arg = arg(Slice(), range((n-1)*size2_in(i), n*size2_in(i))); // NOLINT
         base_in.push_back(horzcat(arg, repmat(last_arg, 1, rem)));
       }
       std::vector<MX> ret_out = base(base_in);
@@ -1011,6 +1013,51 @@ namespace casadi {
     return (*this)->generate_dependencies(fname, opts);
   }
 
+  void Function::generate_input(const std::string& fname, const std::vector<DM>& arg) {
+    casadi_assert(n_in()==arg.size(), "Mismatching number of inputs. "
+                               "Expected " + str(n_in()) + ", got "
+                               + str(arg.size()) + ".");
+    // Set up output stream
+    std::ofstream of(fname);
+    of << std::setprecision(17) << std::scientific;
+
+    // Encode each input
+    for (casadi_int i=0; i<n_in(); ++i) {
+      const std::vector<double>& v = arg[i].nonzeros();
+      if (arg[i].is_scalar(true)) {
+        // Copy scalar input
+        for (casadi_int k=0;k<nnz_in(i);++k) {
+          of << v[0] << " ";
+        }
+      } else if (v.size()==nnz_in(i)) {
+        // Output non-scalar input verbatim
+        for (casadi_int k=0;k<nnz_in(i);++k) {
+          of << v[k] << " ";
+        }
+      } else {
+        casadi_error("Dimension mismatch: Expected " +
+                     sparsity_in(i).dim(true) +
+                     ", got nonzeros " + str(v.size()) + ".");
+      }
+    }
+  }
+
+  void Function::generate_input(const std::string& fname, const DMDict& arg) {
+    // Get default inputs
+    vector<DM> arg_v(n_in());
+    for (casadi_int i=0; i<arg_v.size(); ++i) {
+      arg_v[i] = default_in(i);
+    }
+
+    // Assign provided inputs
+    for (auto&& e : arg) {
+      arg_v.at(index_in(e.first)) = e.second;
+    }
+
+    // Relay to vector argument variant
+    generate_input(fname, arg_v);
+  }
+
   void Function::export_code(const std::string& lang,
       std::ostream &stream, const Dict& options) const {
     return (*this)->export_code(lang, stream, options);
@@ -1022,14 +1069,37 @@ namespace casadi {
     return (*this)->export_code(lang, stream, options);
   }
 
-  std::string Function::serialize() const {
+
+  void Function::save(const std::string &fname, const Dict& opts) const {
+    std::ofstream stream(fname, ios_base::binary | std::ios::out);
+    serialize(stream, opts);
+  }
+
+  std::string Function::serialize(const Dict& opts) const {
     std::stringstream ss;
-    serialize(ss);
+    serialize(ss, opts);
     return ss.str();
   }
 
-  void Function::serialize(std::ostream &stream) const {
-    return (*this)->serialize(stream);
+  void Function::serialize(std::ostream &stream, const Dict& opts) const {
+    SerializingStream s(stream, opts);
+    return serialize(s);
+  }
+
+  void Function::serialize(SerializingStream &s) const {
+    if (is_null()) {
+      s.pack("Function::null", true);
+    } else {
+      s.pack("Function::null", false);
+      (*this)->serialize(s);
+    }
+  }
+
+  Function Function::deserialize(DeserializingStream& s) {
+    bool is_null;
+    s.unpack("Function::null", is_null);
+    if (is_null) return Function();
+    return FunctionInternal::deserialize(s);
   }
 
   std::string Function::export_code(const std::string& lang, const Dict& options) const {
@@ -1052,7 +1122,7 @@ namespace casadi {
 
     // Check if keyword
     for (const char* kw : {"null", "jac", "hess"}) {
-      if (name.compare(kw)==0) return false;
+      if (name==kw) return false;
     }
 
     // Make sure that the first character is a letter
@@ -1075,15 +1145,16 @@ namespace casadi {
   }
 
   Function Function::deserialize(std::istream& stream) {
-    char type;
-    stream >> type;
-    switch (type) {
-      case 'S':
-        return SXFunction::deserialize(stream);
-      default:
-        casadi_error("Not implemented");
+    DeserializingStream s(stream);
+    return deserialize(s);
+  }
+
+  Function Function::load(const std::string& filename) {
+    std::ifstream stream(filename, ios_base::binary | std::ios::in);
+    if ((stream.rdstate() & std::ifstream::failbit) != 0) {
+      casadi_error("Could not open file '" + filename + "'.");
     }
-    return Function();
+    return deserialize(stream);
   }
 
   Function Function::deserialize(const std::string& s) {
@@ -1121,7 +1192,7 @@ namespace casadi {
 
     // If name became a keyword, append 1
     for (const char* kw : {"null", "jac", "hess"}) {
-      if (ss.str().compare(kw)==0) ss << "1";
+      if (ss.str()==kw) ss << "1";
     }
 
     return ss.str();
@@ -1265,17 +1336,17 @@ namespace casadi {
     }
   }
 
-  const SX Function::sx_in(casadi_int ind) const {
+  const SX Function::sx_in(casadi_int iind) const {
     try {
-      return (*this)->sx_in(ind);
+      return (*this)->sx_in(iind);
     } catch (exception& e) {
       THROW_ERROR("sx_in", e.what());
     }
   }
 
-  const SX Function::sx_out(casadi_int ind) const {
+  const SX Function::sx_out(casadi_int oind) const {
     try {
-      return (*this)->sx_out(ind);
+      return (*this)->sx_out(oind);
     } catch (exception& e) {
       THROW_ERROR("sx_out", e.what());
     }
@@ -1366,6 +1437,14 @@ namespace casadi {
       return (*this)->instruction_MX(k);
     } catch (exception& e) {
       THROW_ERROR("instruction_MX", e.what());
+    }
+  }
+
+  SX Function::instructions_sx() const {
+    try {
+      return (*this)->instructions_sx();
+    } catch (exception& e) {
+      THROW_ERROR("instructions_sx", e.what());
     }
   }
 

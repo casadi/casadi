@@ -42,8 +42,7 @@ namespace casadi {
 
   struct CASADI_NLPSOL_SCPGEN_EXPORT ScpgenMemory : public NlpsolMemory {
     // Work vectors, nonlifted problem
-    double *gk, *dxk, *lam_xk, *dlam_xk, *dlam_gk, *gfk, *gL, *b_gn;
-
+    double *dxk, *dlam, *gfk, *gL, *b_gn;
     // Memory for lifted variables
     struct VarMem {
       casadi_int n;
@@ -51,35 +50,25 @@ namespace casadi {
       double *res, *resL;
     };
     std::vector<VarMem> lifted_mem;
-
     // Penalty parameter of merit function
     double sigma;
-
     // 1-norm of last primal step
     double pr_step;
-
     // 1-norm of last dual step
     double du_step;
-
     // Regularization
     double reg;
-
     // Message applying to a particular iteration
     const char* iteration_note;
-
     // QP
     double *qpH, *qpA, *qpB, *qpL, *qpG, *qpH_times_du;
-
     // QP solver
-    double *qp_lbx, *qp_ubx, *qp_lba, *qp_uba;
-
+    double *lbdz, *ubdz;
     // Linesearch parameters
     double* merit_mem;
     casadi_int merit_ind;
-
     // Timers
     double t_eval_mat, t_eval_res, t_eval_vec, t_eval_exp, t_solve_qp, t_mainloop;
-
     // Current iteration
     casadi_int iter_count;
   };
@@ -110,7 +99,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -148,7 +137,7 @@ namespace casadi {
     // Print iteration
     void printIteration(ScpgenMemory* m, std::ostream &stream, casadi_int iter, double obj,
                         double pr_inf, double du_inf,
-                        double reg, casadi_int ls_trials, bool ls_success) const;
+                        double rg, casadi_int ls_trials, bool ls_success) const;
 
     // Evaluate the matrices in the condensed QP
     void eval_mat(ScpgenMemory* m) const;

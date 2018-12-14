@@ -133,8 +133,8 @@ namespace casadi {
       * Copyright(c) Timothy A. Davis, 2006-2009
       * Licensed as a derivative work under the GNU LGPL
       */
-    static casadi_int postorder_dfs(casadi_int j, casadi_int k, casadi_int* head, casadi_int* next,
-                             casadi_int* post, casadi_int* stack);
+    static casadi_int postorder_dfs(casadi_int j, casadi_int k, casadi_int* head,
+        const casadi_int* next, casadi_int* post, casadi_int* stack);
 
     /** \brief Calculate the postorder permuation
       * Ref: Chapter 4, Direct Methods for Sparse Linear Systems by Tim Davis

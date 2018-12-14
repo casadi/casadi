@@ -98,6 +98,16 @@ namespace casadi {
     bool is_equal(const MXNode* node, casadi_int depth) const override {
       return sameOpAndDeps(node, depth);
     }
+
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static MXNode* deserialize(DeserializingStream& s);
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Transpose(DeserializingStream& s) : MXNode(s) {}
   };
 
   /** \brief Matrix transpose (dense)
@@ -136,6 +146,12 @@ namespace casadi {
 
     /** \brief Get required length of iw field */
     size_t sz_iw() const override { return 0;}
+
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit DenseTranspose(DeserializingStream& s) : Transpose(s) {}
   };
 
 

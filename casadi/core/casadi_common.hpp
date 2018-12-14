@@ -26,19 +26,19 @@
 #ifndef CASADI_COMMON_HPP
 #define CASADI_COMMON_HPP
 
-#include <cmath>
-#include <climits>
-#include <limits>
-#include <vector>
-#include <set>
-#include <map>
-#include <utility>
-#include <sstream>
-#include <iostream>
-#include <string>
-#include <fstream>
 #include <algorithm>
+#include <climits>
+#include <cmath>
+#include <fstream>
+#include <iostream>
 #include <iterator>
+#include <limits>
+#include <map>
+#include <set>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 #ifdef SWIG
 #define SWIG_IF_ELSE(is_swig, not_swig) is_swig
@@ -135,6 +135,7 @@ namespace casadi {
   /** \brief  Function pointer types for the C API */
   typedef void (*signal_t)(void);
   typedef casadi_int (*getint_t)(void);
+  typedef double (*default_t)(casadi_int i);
   typedef const char* (*name_t)(casadi_int i);
   typedef const casadi_int* (*sparsity_t)(casadi_int i);
   typedef void* (*alloc_mem_t)(void);

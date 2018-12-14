@@ -6,11 +6,11 @@ all: unittests
 
 # Each of these targets will be tested by CasADi's trunktesterbot as individual tests.
 # These targets must all go on one line
-trunktesterbot: unittests_py examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp users_guide user_guide_snippets_py
+trunktesterbot: unittests_py examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp user_guide_snippets_py
 
-trunktesterbot_no_unittests_py: examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp users_guide user_guide_snippets_py
+trunktesterbot_no_unittests_py: examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp user_guide_snippets_py
 
-trunktesterbot_knownbugs: unittests_py_knownbugs examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp users_guide user_guide_snippets_py
+trunktesterbot_knownbugs: unittests_py_knownbugs examples_indoc_py examples_indoc_cpp examples_code_py examples_code_cpp user_guide_snippets_py
 
 # Set to -memcheck if you want to include a check for memory leaks
 MEMCHECK =
@@ -93,8 +93,9 @@ examples_code_cpp:
 	python internal/test_cppcmake.py '../docs/examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp test_opencl.cpp nlp_codegen.cpp codegen_usage.cpp stabilized_sqpmethod_nl.cpp knitro_nl.cpp worhp_nl.cpp snopt_nl.cpp rocket_snopt.cpp test_blocksqp.cpp" -skipdirs="cmake_find_package"
 	cd "../docs/examples/cplusplus/cmake_find_package" && ./run.sh && cd ../../../../test
 
-users_guide:
-	cd '../docs/users_guide/' && make snippets && cd ..
+user_guide_snippets_py:
+	cd '../docs/users_guide/' && python run_snippets.py python && cd ../..
 
-user_guide_snippets_py: users_guide
-	python internal/test_py.py '../docs/users_guide' -skipfiles="pytex.py temp_pytex.py"
+user_guide_snippets_oct:
+	cd '../docs/users_guide/' && python run_snippets.py octave && cd ../..
+

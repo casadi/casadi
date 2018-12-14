@@ -595,6 +595,8 @@ class ADtests(casadiTestCase):
 
       self.check_codegen(fun,inputs=values)
 
+      self.check_serialize(fun,inputs=values)
+
       J_ = fun_out[1]
 
       def vec(l):
@@ -647,6 +649,7 @@ class ADtests(casadiTestCase):
 
             vf_out = vf.call(vf_in)
             self.check_codegen(vf,inputs=vf_in)
+            self.check_serialize(vf,inputs=vf_in)
 
             offset = len(res)
             for d in range(ndir):
@@ -672,6 +675,7 @@ class ADtests(casadiTestCase):
 
             vf_out = vf.call(vf_in)
             self.check_codegen(vf,inputs=vf_in)
+            self.check_serialize(vf,inputs=vf_in)
             storagekey = (spmod,spmod2)
             if not(storagekey in storage):
               storage[storagekey] = []
@@ -705,6 +709,7 @@ class ADtests(casadiTestCase):
 
               vf2_out = vf2.call(vf2_in)
               self.check_codegen(vf2,inputs=vf2_in)
+              self.check_serialize(vf2,inputs=vf2_in)
               storagekey = (spmod,spmod2)
               if not(storagekey in storage2):
                 storage2[storagekey] = []
@@ -729,6 +734,7 @@ class ADtests(casadiTestCase):
           Jf_out = Jf.call(values)
 
           self.check_codegen(Jf,inputs=values)
+          self.check_serialize(Jf,inputs=values)
           self.checkarray(Jf_out[0],J_)
           self.checkarray(DM.ones(Jf.sparsity_out(0)),DM.ones(J_.sparsity()),str(out)+str(mode))
           self.checkarray(DM.ones(f.sparsity_jac(0, 0)),DM.ones(J_.sparsity()))
@@ -751,6 +757,7 @@ class ADtests(casadiTestCase):
           Hf=f.hessian_old(0, 0)
           Hf_out = Hf.call(values)
           self.check_codegen(Hf,inputs=values)
+          self.check_serialize(Hf,inputs=values)
           if H_ is None:
             H_ = Hf_out[0]
           self.checkarray(Hf_out[0],H_,failmessage=("mode: %s" % mode))

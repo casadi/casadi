@@ -37,6 +37,7 @@ namespace casadi {
     plugin->doc = CsparseInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &CsparseInterface::options_;
+    plugin->deserialize = &CsparseInterface::deserialize;
     return 0;
   }
 

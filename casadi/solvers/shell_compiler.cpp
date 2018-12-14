@@ -78,7 +78,7 @@ namespace casadi {
     }
   }
 
-  Options ShellCompiler::options_
+  const Options ShellCompiler::options_
   = {{&ImporterInternal::options_},
      {{"compiler",
        {OT_STRING,

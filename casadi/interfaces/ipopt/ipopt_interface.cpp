@@ -48,6 +48,7 @@ namespace casadi {
     plugin->doc = IpoptInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &IpoptInterface::options_;
+    plugin->deserialize = &IpoptInterface::deserialize;
     return 0;
   }
 
@@ -64,7 +65,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options IpoptInterface::options_
+  const Options IpoptInterface::options_
   = {{&Nlpsol::options_},
      {{"pass_nonlinear_variables",
        {OT_BOOL,
@@ -178,6 +179,7 @@ namespace casadi {
                         {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
       }
       hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
+      casadi_assert(hesslag_sp_.is_triu(), "Hessian must be upper triangular");
     } else if (pass_nonlinear_variables_) {
       nl_ex_ = oracle_.which_depends("x", {"f", "g"}, 2, false);
     }
@@ -347,6 +349,7 @@ namespace casadi {
 
   int IpoptInterface::solve(void* mem) const {
     auto m = static_cast<IpoptMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
 
     // Reset statistics
     m->inf_pr.clear();
@@ -373,9 +376,10 @@ namespace casadi {
     m->return_status = return_status_string(status);
     m->success = status==Solve_Succeeded || status==Solved_To_Acceptable_Level
                  || status==Feasible_Point_Found;
+    if (status==Maximum_Iterations_Exceeded) m->unified_return_status = SOLVER_RET_LIMITED;
 
     // Save results to outputs
-    casadi_copy(m->gk, ng_, m->g);
+    casadi_copy(m->gk, ng_, d_nlp->z + nx_);
 
     return 0;
   }
@@ -386,6 +390,7 @@ namespace casadi {
                         double inf_pr, double inf_du, double mu, double d_norm,
                         double regularization_size, double alpha_du, double alpha_pr,
                         int ls_trials, bool full_callback) const {
+    auto d_nlp = &m->d_nlp;
     m->n_iter += 1;
     try {
       m->inf_pr.push_back(inf_pr);
@@ -400,11 +405,11 @@ namespace casadi {
       if (!fcallback_.is_null()) {
         m->fstats.at("callback_fun").tic();
         if (full_callback) {
-          casadi_copy(x, nx_, m->x);
+          casadi_copy(x, nx_, d_nlp->z);
           for (casadi_int i=0; i<nx_; ++i) {
-            m->lam_x[i] = z_U[i]-z_L[i];
+            d_nlp->lam[i] = z_U[i]-z_L[i];
           }
-          casadi_copy(lambda, ng_, m->lam_g);
+          casadi_copy(lambda, ng_, d_nlp->lam + nx_);
           casadi_copy(g, ng_, m->gk);
         } else {
           if (iter==0) {
@@ -425,8 +430,8 @@ namespace casadi {
           m->arg[NLPSOL_F] = &obj_value;
           m->arg[NLPSOL_G] = g;
           m->arg[NLPSOL_LAM_P] = nullptr;
-          m->arg[NLPSOL_LAM_X] = m->lam_x;
-          m->arg[NLPSOL_LAM_G] = m->lam_g;
+          m->arg[NLPSOL_LAM_X] = d_nlp->lam;
+          m->arg[NLPSOL_LAM_G] = d_nlp->lam + nx_;
         }
 
         // Outputs
@@ -456,20 +461,21 @@ namespace casadi {
   finalize_solution(IpoptMemory* m, const double* x, const double* z_L, const double* z_U,
                     const double* g, const double* lambda, double obj_value,
                     int iter_count) const {
+    auto d_nlp = &m->d_nlp;
     try {
       // Get primal solution
-      casadi_copy(x, nx_, m->x);
+      casadi_copy(x, nx_, d_nlp->z);
 
       // Get optimal cost
-      m->f = obj_value;
+      d_nlp->f = obj_value;
 
       // Get dual solution (simple bounds)
       for (casadi_int i=0; i<nx_; ++i) {
-        m->lam_x[i] = z_U[i]-z_L[i];
+        d_nlp->lam[i] = z_U[i]-z_L[i];
       }
 
       // Get dual solution (nonlinear bounds)
-      casadi_copy(lambda, ng_, m->lam_g);
+      casadi_copy(lambda, ng_, d_nlp->lam + nx_);
 
       // Get the constraints
       casadi_copy(g, ng_, m->gk);
@@ -485,11 +491,12 @@ namespace casadi {
   bool IpoptInterface::
   get_bounds_info(IpoptMemory* m, double* x_l, double* x_u,
                   double* g_l, double* g_u) const {
+    auto d_nlp = &m->d_nlp;
     try {
-      casadi_copy(m->lbx, nx_, x_l);
-      casadi_copy(m->ubx, nx_, x_u);
-      casadi_copy(m->lbg, ng_, g_l);
-      casadi_copy(m->ubg, ng_, g_u);
+      casadi_copy(d_nlp->lbz, nx_, x_l);
+      casadi_copy(d_nlp->ubz, nx_, x_u);
+      casadi_copy(d_nlp->lbz+nx_, ng_, g_l);
+      casadi_copy(d_nlp->ubz+nx_, ng_, g_u);
       return true;
     } catch(exception& ex) {
       uerr() << "get_bounds_info failed: " << ex.what() << endl;
@@ -501,23 +508,24 @@ namespace casadi {
   get_starting_point(IpoptMemory* m, bool init_x, double* x,
                      bool init_z, double* z_L, double* z_U,
                      bool init_lambda, double* lambda) const {
+    auto d_nlp = &m->d_nlp;
     try {
       // Initialize primal variables
       if (init_x) {
-        casadi_copy(m->x, nx_, x);
+        casadi_copy(d_nlp->z, nx_, x);
       }
 
       // Initialize dual variables (simple bounds)
       if (init_z) {
         for (casadi_int i=0; i<nx_; ++i) {
-          z_L[i] = max(0., -m->lam_x[i]);
-          z_U[i] = max(0., m->lam_x[i]);
+          z_L[i] = max(0., -d_nlp->lam[i]);
+          z_U[i] = max(0., d_nlp->lam[i]);
         }
       }
 
       // Initialize dual variables (nonlinear bounds)
       if (init_lambda) {
-        casadi_copy(m->lam_g, ng_, lambda);
+        casadi_copy(d_nlp->lam + nx_, ng_, lambda);
       }
 
       return true;
@@ -616,7 +624,7 @@ namespace casadi {
     auto m = static_cast<IpoptMemory*>(mem);
     stats["return_status"] = m->return_status;
     stats["iter_count"] = m->iter_count;
-    if (m->inf_pr.size()>0) {
+    if (!m->inf_pr.empty()) {
       Dict iterations;
       iterations["inf_pr"] = m->inf_pr;
       iterations["inf_du"] = m->inf_du;
@@ -629,6 +637,39 @@ namespace casadi {
       stats["iterations"] = iterations;
     }
     return stats;
+  }
+
+  IpoptInterface::IpoptInterface(DeserializingStream& s) : Nlpsol(s) {
+    s.version("IpoptInterface", 1);
+    s.unpack("IpoptInterface::jacg_sp", jacg_sp_);
+    s.unpack("IpoptInterface::hesslag_sp", hesslag_sp_);
+    s.unpack("IpoptInterface::exact_hessian", exact_hessian_);
+    s.unpack("IpoptInterface::opts", opts_);
+    s.unpack("IpoptInterface::pass_nonlinear_variables", pass_nonlinear_variables_);
+    s.unpack("IpoptInterface::nl_ex", nl_ex_);
+    s.unpack("IpoptInterface::var_string_md", var_string_md_);
+    s.unpack("IpoptInterface::var_integer_md", var_integer_md_);
+    s.unpack("IpoptInterface::var_numeric_md", var_numeric_md_);
+    s.unpack("IpoptInterface::con_string_md", con_string_md_);
+    s.unpack("IpoptInterface::con_integer_md", con_integer_md_);
+    s.unpack("IpoptInterface::con_numeric_md", con_numeric_md_);
+  }
+
+  void IpoptInterface::serialize_body(SerializingStream &s) const {
+    Nlpsol::serialize_body(s);
+    s.version("IpoptInterface", 1);
+    s.pack("IpoptInterface::jacg_sp", jacg_sp_);
+    s.pack("IpoptInterface::hesslag_sp", hesslag_sp_);
+    s.pack("IpoptInterface::exact_hessian", exact_hessian_);
+    s.pack("IpoptInterface::opts", opts_);
+    s.pack("IpoptInterface::pass_nonlinear_variables", pass_nonlinear_variables_);
+    s.pack("IpoptInterface::nl_ex", nl_ex_);
+    s.pack("IpoptInterface::var_string_md", var_string_md_);
+    s.pack("IpoptInterface::var_integer_md", var_integer_md_);
+    s.pack("IpoptInterface::var_numeric_md", var_numeric_md_);
+    s.pack("IpoptInterface::con_string_md", con_string_md_);
+    s.pack("IpoptInterface::con_integer_md", con_integer_md_);
+    s.pack("IpoptInterface::con_numeric_md", con_numeric_md_);
   }
 
 } // namespace casadi

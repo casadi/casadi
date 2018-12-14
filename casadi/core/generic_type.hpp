@@ -33,7 +33,8 @@
 #include <vector>
 
 namespace casadi {
-
+  class SerializingStream;
+  class DeserializingStream;
 #if !(defined(SWIG) && !defined(SWIGXML))
 
   /** \brief  Types of options */
@@ -101,6 +102,13 @@ namespace casadi {
     /// Get a description of a type
     static std::string get_type_description(TypeID type);
 #endif
+
+    /// \cond INTERNAL
+#ifndef SWIG
+    /** \brief  Create from node */
+    static GenericType create(SharedObjectInternal* node);
+#endif // SWIG
+    /// \endcond
 
     /// Get a description of the object's type
     std::string get_description() const { return get_type_description(getType()); }
@@ -200,6 +208,12 @@ namespace casadi {
     bool operator==(const GenericType& op2) const;
     bool operator!=(const GenericType& op2) const;
 #endif // SWIG
+
+    /** \brief Serialize an object */
+    void serialize(SerializingStream& s) const;
+
+    /** \brief Deserialize with type disambiguation */
+    static GenericType deserialize(DeserializingStream& s);
   };
 
   /// C++ equivalent of Python's dict or MATLAB's struct

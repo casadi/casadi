@@ -45,6 +45,10 @@ namespace casadi {
     double* x;
     // Current residual
     double* f;
+    // Current guess
+    double* x_trial;
+    // Current residual
+    double* f_trial;
     // Current Jacobian
     double* jac;
     // Return status
@@ -82,7 +86,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -111,7 +115,16 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Newton(s); }
+
   protected:
+    /** \brief Deserializing constructor */
+    explicit Newton(DeserializingStream& s);
+
     /// Maximum number of Newton iterations
     casadi_int max_iter_;
 
@@ -124,14 +137,17 @@ namespace casadi {
     /// If true, each iteration will be printed
     bool print_iteration_;
 
-    bool error_on_;
+    /// If true, each iteration will be printed
+    casadi_int print_iteration_interval_;
+
+    bool line_search_;
 
     /// Print iteration header
     void printIteration(std::ostream &stream) const;
 
     /// Print iteration
     void printIteration(std::ostream &stream, casadi_int iter,
-                        double abstol, double abstolStep) const;
+                        double abstol, double abstolStep, double alpha) const;
   };
 
 } // namespace casadi

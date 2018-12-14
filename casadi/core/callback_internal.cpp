@@ -78,23 +78,13 @@ namespace casadi {
     self_->init();
   }
 
-  void CallbackInternal::finalize(const Dict& opts) {
+  void CallbackInternal::finalize() {
     // Finalize this
     casadi_assert(self_!=nullptr, "Callback object has been deleted");
     self_->finalize();
 
     // Finalize the base classes
-    FunctionInternal::finalize(opts);
-  }
-
-  int CallbackInternal::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    TRY_CALL(eval, self_, arg, res, iw, w, nullptr);
-  }
-
-  int CallbackInternal::
-  eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem) const {
-    TRY_CALL(eval_sx, self_, arg, res, iw, w, mem);
+    FunctionInternal::finalize();
   }
 
   std::vector<DM> CallbackInternal::eval_dm(const std::vector<DM>& arg) const {

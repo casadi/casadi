@@ -50,11 +50,18 @@
 #include "repmat.hpp"
 #include "casadi_find.hpp"
 #include "einstein.hpp"
+#include "io_instruction.hpp"
+#include "symbolic_mx.hpp"
+#include "constant_mx.hpp"
+#include "get_elements.hpp"
+#include "map.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
 #include "solve_impl.hpp"
 #include "binary_mx_impl.hpp"
+
+#include "serializing_stream.hpp"
 
 #include <typeinfo>
 
@@ -65,6 +72,7 @@ namespace casadi {
   MXNode::MXNode() {
     temp = 0;
   }
+
 
   MXNode::~MXNode() {
 
@@ -402,6 +410,47 @@ namespace casadi {
     return Dict();
   }
 
+  void MXNode::serialize(SerializingStream& s) const {
+    serialize_type(s);
+    serialize_body(s);
+  }
+
+  void MXNode::serialize_body(SerializingStream& s) const {
+    s.pack("MXNode::deps", dep_);
+    s.pack("MXNode::sp", sparsity_);
+  }
+
+  void MXNode::serialize_type(SerializingStream& s) const {
+    s.pack("MXNode::op", static_cast<int>(op()));
+  }
+
+  MXNode::MXNode(DeserializingStream& s) {
+    temp = 0;
+
+    s.unpack("MXNode::deps", dep_);
+    s.unpack("MXNode::sp", sparsity_);
+  }
+
+
+  MXNode* MXNode::deserialize(DeserializingStream& s) {
+    int op;
+    s.unpack("MXNode::op", op);
+
+    if (casadi_math<MX>::is_binary(op)) {
+      return BinaryMX<false, false>::deserialize(s);
+    } else if (casadi_math<MX>::is_unary(op)) {
+      return UnaryMX::deserialize(s);
+    }
+
+    auto it = MXNode::deserialize_map.find(op);
+    if (it==MXNode::deserialize_map.end()) {
+      casadi_error("Not implemented op " + str(casadi_int(op)) + ":" + str(OP_GETNONZEROS));
+    } else {
+      return it->second(s);
+    }
+  }
+
+
   MX MXNode::get_mac(const MX& y, const MX& z) const {
     // Get reference to transposed first argument
     MX x = shared_from_this<MX>();
@@ -475,7 +524,7 @@ namespace casadi {
 
 
   MX MXNode::get_nzadd(const MX& y, const vector<casadi_int>& nz) const {
-    if (nz.size()==0 || is_zero()) {
+    if (nz.empty() || is_zero()) {
       return y;
     } else {
       return SetNonzeros<true>::create(y, shared_from_this<MX>(), nz);
@@ -939,5 +988,56 @@ namespace casadi {
       return false;
     }
   }
+
+
+  // Note: binary/unary operations are omitted here
+  std::map<casadi_int, MXNode* (*)(DeserializingStream&)> MXNode::deserialize_map = {
+    {OP_INPUT, Input::deserialize},
+    {OP_OUTPUT, Output::deserialize},
+    {OP_PARAMETER, SymbolicMX::deserialize},
+    {OP_CONST, ConstantMX::deserialize},
+    {OP_CALL, Call::deserialize},
+    {OP_FIND, Find::deserialize},
+    //{OP_MAP, Map::deserialize}, Map is a function
+    {OP_MTIMES, Multiplication::deserialize},
+    {OP_SOLVE, Solve<false>::deserialize},
+    {OP_TRANSPOSE, Transpose::deserialize},
+    {OP_DETERMINANT, Determinant::deserialize},
+    {OP_INVERSE, Inverse::deserialize},
+    {OP_DOT, Dot::deserialize},
+    {OP_BILIN, Bilin::deserialize},
+    {OP_RANK1, Rank1::deserialize},
+    {OP_HORZCAT, Horzcat::deserialize},
+    {OP_VERTCAT, Vertcat::deserialize},
+    {OP_DIAGCAT, Diagcat::deserialize},
+    {OP_HORZSPLIT, Horzsplit::deserialize},
+    {OP_VERTSPLIT, Vertsplit::deserialize},
+    {OP_DIAGSPLIT, Diagsplit::deserialize},
+    {OP_RESHAPE, Reshape::deserialize},
+    // OP_SUBREF
+    // OP_SUBASSIGN,
+    {OP_GETNONZEROS, GetNonzeros::deserialize},
+    {OP_ADDNONZEROS, SetNonzeros<true>::deserialize},
+    {OP_SETNONZEROS, SetNonzeros<false>::deserialize},
+    {OP_GET_ELEMENTS, GetElements::deserialize},
+    // OP_ADD_ELEMENTS
+    {OP_PROJECT, Project::deserialize},
+    {OP_ASSERTION, Assertion::deserialize},
+    // OP_MONITOR
+    {OP_NORM1, Norm1::deserialize},
+    {OP_NORM2, Norm2::deserialize},
+    {OP_NORMINF, NormInf::deserialize},
+    {OP_NORMF, NormF::deserialize},
+    {OP_MMIN, MMin::deserialize},
+    {OP_MMAX, MMax::deserialize},
+    {OP_HORZREPMAT, HorzRepmat::deserialize},
+    {OP_HORZREPSUM, HorzRepsum::deserialize},
+    //OP_ERFINV,
+    //OP_PRINTME,
+    //OP_LIFT,
+    //OP_EINSTEIN
+    {-1, OutputNode::deserialize}
+  };
+
 
 } // namespace casadi

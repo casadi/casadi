@@ -24,6 +24,7 @@
 
 
 #include "map.hpp"
+#include "serializing_stream.hpp"
 
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
@@ -53,6 +54,36 @@ namespace casadi {
 
   Map::Map(const std::string& name, const Function& f, casadi_int n)
     : FunctionInternal(name), f_(f), n_(n) {
+  }
+
+  void Map::serialize_body(SerializingStream &s) const {
+    FunctionInternal::serialize_body(s);
+    s.pack("Map::f", f_);
+    s.pack("Map::n", n_);
+  }
+
+  void Map::serialize_type(SerializingStream &s) const {
+    FunctionInternal::serialize_type(s);
+    s.pack("Map::class_name", class_name());
+  }
+
+  Map::Map(DeserializingStream& s) : FunctionInternal(s) {
+    s.unpack("Map::f", f_);
+    s.unpack("Map::n", n_);
+  }
+
+  ProtoFunction* Map::deserialize(DeserializingStream& s) {
+    std::string class_name;
+    s.unpack("Map::class_name", class_name);
+    if (class_name=="Map") {
+      return new Map(s);
+    } else if (class_name=="OmpMap") {
+      return new OmpMap(s);
+    } else if (class_name=="ThreadMap") {
+      return new ThreadMap(s);
+    } else {
+      casadi_error("class name '" + class_name + "' unknown.");
+    }
   }
 
   Map::~Map() {
@@ -167,7 +198,7 @@ namespace casadi {
           }
         }
       }
-      *it = (*it)(Slice(), ind);
+      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Get output expressions
@@ -185,7 +216,7 @@ namespace casadi {
           }
         }
       }
-      *it = (*it)(Slice(), ind);
+      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Construct return function
@@ -218,7 +249,7 @@ namespace casadi {
           }
         }
       }
-      *it = (*it)(Slice(), ind);
+      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Get output expressions
@@ -236,7 +267,7 @@ namespace casadi {
           }
         }
       }
-      *it = (*it)(Slice(), ind);
+      *it = (*it)(Slice(), ind); // NOLINT
     }
 
     // Construct return function
@@ -318,6 +349,10 @@ namespace casadi {
   }
 
   void OmpMap::init(const Dict& opts) {
+#ifndef CASADI_WITH_THREAD
+    casadi_warning("CasADi was not compiled with WITH_THREAD=ON. "
+                   "Falling back to serial evaluation.");
+#endif // CASADI_WITH_THREAD
     // Call the initialization method of the base class
     Map::init(opts);
 
@@ -408,6 +443,10 @@ namespace casadi {
   }
 
   void ThreadMap::init(const Dict& opts) {
+#ifndef CASADI_WITH_THREAD
+    casadi_warning("CasADi was not compiled with WITH_THREAD=ON. "
+                   "Falling back to serial evaluation.");
+#endif // CASADI_WITH_THREAD
     // Call the initialization method of the base class
     Map::init(opts);
 

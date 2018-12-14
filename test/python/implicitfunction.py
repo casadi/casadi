@@ -64,6 +64,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
       refsol = Function("refsol", [x],[solve(A_,b_), mtimes(C_,solve(A_,b_))])
       self.checkfunction(solver,refsol,inputs=[0],digits=10)
+      if "newton" in Solver: self.check_serialize(solver,inputs=[0])
       if "codegen" in features: self.check_codegen(solver,inputs=[0])
 
       A = SX.sym("A",2,2)
@@ -76,6 +77,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
       refsol = Function("refsol", [x,A,b],[solve(A,b)])
       self.checkfunction(solver,refsol,inputs=solver_in,digits=10)
+      if "newton" in Solver: self.check_serialize(solver,inputs=solver_in)
       if "codegen" in features: self.check_codegen(solver,inputs=solver_in)
 
       A = SX.sym("A",2,2)
@@ -94,6 +96,7 @@ class ImplicitFunctiontests(casadiTestCase):
 
           refsol = Function("refsol", [x,A,b],[solve(A,b),mtimes(C_,solve(A,b))])
           self.checkfunction(solver,refsol,inputs=solver_in,digits=10)
+          if "newton" in Solver: self.check_serialize(solver,inputs=solver_in)
       if "codegen" in features: self.check_codegen(solver,inputs=solver_in)
 
   def test_missing_symbols(self):
@@ -293,16 +296,27 @@ class ImplicitFunctiontests(casadiTestCase):
 
     for Solver, options, features in solvers:
       opts = dict(options)
-      if Solver=="kinsol": opts["error_on_fail"] = False # has different default
+      opts["error_on_fail"] = False
       solver = rootfinder("solver",Solver,{'x':vertcat(x,y), 'g':vertcat(sin(x)-2,sin(y)-2)},opts)
       solver(x0=0)
       self.assertFalse(solver.stats()["success"])
 
       opts = dict(options)
-      opts["error_on_fail"] = True
       solver = rootfinder("solver",Solver,{'x':vertcat(x,y), 'g':vertcat(sin(x)-2,sin(y)-2)},opts)
       with self.assertInException("process"):
         solver(x0=0)
+
+  def test_loop(self):
+    x=SX.sym("x")
+    for Solver, options, features in solvers:
+      solver = rootfinder("solver",Solver,{"x":x,"g":x**3-2*x+2},options)
+      if Solver=="kinsol": continue
+      if Solver=="nlpsol": continue
+      if Solver=="fast_newton": continue
+      print(Solver)
+      res = solver(x0=0)["x"]
+      self.checkarray(res,-1.7692923542386)
+
 
 if __name__ == '__main__':
     unittest.main()

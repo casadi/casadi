@@ -86,6 +86,16 @@ namespace casadi {
     casadi_int op() const override { return OP_HORZREPMAT;}
 
     casadi_int n_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new HorzRepmat(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit HorzRepmat(DeserializingStream& s);
   };
 
   /** \brief Horizontal repsum
@@ -140,6 +150,16 @@ namespace casadi {
     casadi_int op() const override { return OP_HORZREPSUM;}
 
     casadi_int n_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+
+    /** \brief Deserialize without type information */
+    static MXNode* deserialize(DeserializingStream& s) { return new HorzRepsum(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit HorzRepsum(DeserializingStream& s);
   };
 
 } // namespace casadi

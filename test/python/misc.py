@@ -347,6 +347,72 @@ class Misctests(casadiTestCase):
 
     assert "casadi_nlpsol_foo" in result[1]
 
+  @memory_heavy()
+  def test_serialize(self):
+
+    x = Sparsity.upper(3)
+
+    y = SX.sym("y") # nested
+
+    si = StringSerializer()
+    si.pack([x])
+
+    z = y
+    for i in range(10000):
+      z = sin(z)
+    e = vertcat(y,z,2*z)
+    fref = Function('f',[y],[e])
+    si.pack(e)
+    data = si.encode()
+    si.pack([x])
+
+    si = StringDeserializer(data)
+
+    spx = si.unpack()
+    self.assertTrue(spx[0]==x)
+    A = si.unpack()
+    f = Function('f',[A[0]],[A])
+    self.checkfunction_light(f,fref,[7])
+    with self.assertInException("end of stream"):
+      si.unpack()
+    with self.assertInException("end of stream"):
+      si.unpack()
+
+    si = FileSerializer("foo.dat")
+    si.pack([x])
+    z = sin(y)
+    e = vertcat(y,z,2*z)
+    fref = Function('f',[y],[e])
+    si.pack(e)
+    si = None
+    si = FileDeserializer("foo.dat")
+
+    spx = si.unpack()
+    self.assertTrue(spx[0]==x)
+    A = si.unpack()
+    f = Function('f',[A[0]],[A])
+    self.checkfunction_light(f,fref,[7])
+    with self.assertInException("end of stream"):
+      si.unpack()
+    with self.assertInException("end of stream"):
+      si.unpack()
+
+
+    x = SX.sym('x')
+    s = StringSerializer()
+    s.pack(x)
+    data1 = s.encode()
+    s.pack(sin(x))
+    data2 = s.encode()
+
+    s = StringDeserializer(data1)
+    a = s.unpack()
+    with self.assertInException("end of stream"):
+      s.unpack()
+    s.decode(data2)
+    b = s.unpack()
+    with self.assertInException("end of stream"):
+      s.unpack()
 
 if __name__ == '__main__':
     unittest.main()

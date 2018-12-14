@@ -114,8 +114,7 @@ namespace casadi {
   }
 
   bool Reshape::is_valid_input() const {
-    if (!dep()->is_valid_input()) return false;
-    return true;
+    return dep()->is_valid_input();
   }
 
   casadi_int Reshape::n_primitives() const {

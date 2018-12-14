@@ -41,6 +41,7 @@ namespace casadi {
     plugin->doc = WorhpInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &WorhpInterface::options_;
+    plugin->deserialize = &WorhpInterface::deserialize;
     return 0;
   }
 
@@ -57,7 +58,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options WorhpInterface::options_
+  const Options WorhpInterface::options_
   = {{&Nlpsol::options_},
      {{"worhp",
        {OT_DICT,
@@ -88,7 +89,7 @@ namespace casadi {
     // Sort Worhp options
     casadi_int nopts = WorhpGetParamCount();
     for (auto&& op : worhp_opts) {
-      if (op.first.compare("qp")==0) {
+      if (op.first=="qp") {
         qp_opts_ = op.second;
         continue;
       }
@@ -99,7 +100,7 @@ namespace casadi {
         // Get name in WORHP
         const char* name = WorhpGetParamName(ind);
         // Break if matching name
-        if (op.first.compare(name)==0) break;
+        if (op.first==name) break;
       }
       if (ind>nopts) casadi_error("No such Worhp option: " + op.first);
 
@@ -122,15 +123,15 @@ namespace casadi {
     }
 
     // Setup NLP functions
-    f_fcn_ = create_function("nlp_f", {"x", "p"}, {"f"});
-    g_fcn_ = create_function("nlp_g", {"x", "p"}, {"g"});
-    grad_f_fcn_ = create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
-    jac_g_fcn_ = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
-    jacg_sp_ = jac_g_fcn_.sparsity_out(1);
-    hess_l_fcn_ = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+    create_function("nlp_f", {"x", "p"}, {"f"});
+    create_function("nlp_g", {"x", "p"}, {"g"});
+    create_function("nlp_grad_f", {"x", "p"}, {"f", "grad:f:x"});
+    Function jac_g_fcn = create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
+    Function hess_l_fcn = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
                                   {"transpose:hess:gamma:x:x"},
                                   {{"gamma", {"f", "g"}}});
-    hesslag_sp_ = hess_l_fcn_.sparsity_out(0);
+    jacg_sp_ = jac_g_fcn.sparsity_out(1);
+    hesslag_sp_ = hess_l_fcn.sparsity_out(0);
 
     // Temporary vectors
     alloc_w(nx_); // for fetching diagonal entries form Hessian
@@ -292,7 +293,7 @@ namespace casadi {
       m->worhp_w.DG.nnz = 0;
     }
 
-    if (true /*m->worhp_w.HM.NeedStructure*/) { // not initialized
+    if (true /*m->worhp_w.HM.NeedStructure*/) { // not initialized // NOLINT
       m->worhp_w.HM.nnz = nx_ + hesslag_sp_.nnz_lower(true);
     } else {
       m->worhp_w.HM.nnz = 0;
@@ -355,26 +356,25 @@ namespace casadi {
 
   int WorhpInterface::solve(void* mem) const {
     auto m = static_cast<WorhpMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
 
-    if (m->lbg && m->ubg) {
-      for (casadi_int i=0; i<ng_; ++i) {
-        casadi_assert(!(m->lbg[i]==-inf && m->ubg[i] == inf),
+    for (casadi_int i=0; i<ng_; ++i) {
+        casadi_assert(!(d_nlp->lbz[nx_+i]==-inf && d_nlp->ubz[nx_+i] == inf),
                         "WorhpInterface::evaluate: Worhp cannot handle the case when both "
                         "LBG and UBG are infinite."
                         "You have that case at non-zero " + str(i)+ "."
                         "Reformulate your problem eliminating the corresponding constraint.");
-      }
     }
 
     // Pass inputs to WORHP data structures
-    casadi_copy(m->x, nx_, m->worhp_o.X);
-    casadi_copy(m->lbx, nx_, m->worhp_o.XL);
-    casadi_copy(m->ubx, nx_, m->worhp_o.XU);
-    casadi_copy(m->lam_x, nx_, m->worhp_o.Lambda);
+    casadi_copy(d_nlp->z, nx_, m->worhp_o.X);
+    casadi_copy(d_nlp->lbz, nx_, m->worhp_o.XL);
+    casadi_copy(d_nlp->ubz, nx_, m->worhp_o.XU);
+    casadi_copy(d_nlp->lam, nx_, m->worhp_o.Lambda);
     if (m->worhp_o.m>0) {
-      casadi_copy(m->lam_g, ng_, m->worhp_o.Mu);
-      casadi_copy(m->lbg, ng_, m->worhp_o.GL);
-      casadi_copy(m->ubg, ng_, m->worhp_o.GU);
+      casadi_copy(d_nlp->lam+nx_, ng_, m->worhp_o.Mu);
+      casadi_copy(d_nlp->lbz+nx_, ng_, m->worhp_o.GL);
+      casadi_copy(d_nlp->ubz+nx_, ng_, m->worhp_o.GU);
     }
 
     // Replace infinite bounds with m->worhp_p.Infty
@@ -442,17 +442,17 @@ namespace casadi {
 
       if (GetUserAction(&m->worhp_c, evalF)) {
         m->arg[0] = m->worhp_o.X;
-        m->arg[1] = m->p;
+        m->arg[1] = d_nlp->p;
         m->res[0] = &m->worhp_o.F;
         calc_function(m, "nlp_f");
-        m->f = m->worhp_o.F; // Store cost, before scaling
+        d_nlp->f = m->worhp_o.F; // Store cost, before scaling
         m->worhp_o.F *= m->worhp_w.ScaleObj;
         DoneUserAction(&m->worhp_c, evalF);
       }
 
       if (GetUserAction(&m->worhp_c, evalG)) {
         m->arg[0] = m->worhp_o.X;
-        m->arg[1] = m->p;
+        m->arg[1] = d_nlp->p;
         m->res[0] = m->worhp_o.G;
         calc_function(m, "nlp_g");
         DoneUserAction(&m->worhp_c, evalG);
@@ -460,7 +460,7 @@ namespace casadi {
 
       if (GetUserAction(&m->worhp_c, evalDF)) {
         m->arg[0] = m->worhp_o.X;
-        m->arg[1] = m->p;
+        m->arg[1] = d_nlp->p;
         m->res[0] = nullptr;
         m->res[1] = m->worhp_w.DF.val;
         calc_function(m, "nlp_grad_f");
@@ -470,7 +470,7 @@ namespace casadi {
 
       if (GetUserAction(&m->worhp_c, evalDG)) {
         m->arg[0] = m->worhp_o.X;
-        m->arg[1] = m->p;
+        m->arg[1] = d_nlp->p;
         m->res[0] = nullptr;
         m->res[1] = m->worhp_w.DG.val;
         calc_function(m, "nlp_jac_g");
@@ -479,7 +479,7 @@ namespace casadi {
 
       if (GetUserAction(&m->worhp_c, evalHM)) {
         m->arg[0] = m->worhp_o.X;
-        m->arg[1] = m->p;
+        m->arg[1] = d_nlp->p;
         m->arg[2] = &m->worhp_w.ScaleObj;
         m->arg[3] = m->worhp_o.Mu;
         m->res[0] = m->worhp_w.HM.val;
@@ -513,16 +513,18 @@ namespace casadi {
     }
 
     // Copy outputs
-    casadi_copy(m->worhp_o.X, nx_, m->x);
-    casadi_copy(m->worhp_o.G, ng_, m->g);
-    casadi_copy(m->worhp_o.Lambda, nx_, m->lam_x);
-    casadi_copy(m->worhp_o.Mu, ng_, m->lam_g);
+    casadi_copy(m->worhp_o.X, nx_, d_nlp->z);
+    casadi_copy(m->worhp_o.G, ng_, d_nlp->z+nx_);
+    casadi_copy(m->worhp_o.Lambda, nx_, d_nlp->lam);
+    casadi_copy(m->worhp_o.Mu, ng_, d_nlp->lam+nx_);
 
     StatusMsg(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
 
     m->return_code = m->worhp_c.status;
     m->return_status = return_codes(m->worhp_c.status);
     m->success = m->return_code > TerminateSuccess;
+    if (m->return_code==MaxCalls || m->return_code==MaxCalls || m->return_code==Timeout)
+      m->unified_return_status = SOLVER_RET_LIMITED;
     return 0;
   }
 
@@ -588,6 +590,27 @@ namespace casadi {
     auto m = static_cast<WorhpMemory*>(mem);
     stats["return_status"] = m->return_status;
     return stats;
+  }
+
+  WorhpInterface::WorhpInterface(DeserializingStream& s) : Nlpsol(s) {
+    s.version("WorhpInterface", 1);
+    s.unpack("WorhpInterface::jacg_sp", jacg_sp_);
+    s.unpack("WorhpInterface::hesslag_sp", hesslag_sp_);
+    s.unpack("WorhpInterface::bool_opts", bool_opts_);
+    s.unpack("WorhpInterface::int_opts", int_opts_);
+    s.unpack("WorhpInterface::double_opts", double_opts_);
+    s.unpack("WorhpInterface::qp_opts", qp_opts_);
+  }
+
+  void WorhpInterface::serialize_body(SerializingStream &s) const {
+    Nlpsol::serialize_body(s);
+    s.version("WorhpInterface", 1);
+    s.pack("WorhpInterface::jacg_sp", jacg_sp_);
+    s.pack("WorhpInterface::hesslag_sp", hesslag_sp_);
+    s.pack("WorhpInterface::bool_opts", bool_opts_);
+    s.pack("WorhpInterface::int_opts", int_opts_);
+    s.pack("WorhpInterface::double_opts", double_opts_);
+    s.pack("WorhpInterface::qp_opts", qp_opts_);
   }
 
 } // namespace casadi

@@ -86,7 +86,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -120,6 +120,16 @@ namespace casadi {
 
     // Generated function options
     Dict fopts_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new SymbolicQr(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit SymbolicQr(DeserializingStream& s);
   };
 
 } // namespace casadi

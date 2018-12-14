@@ -485,7 +485,7 @@ namespace casadi {
     std::vector<Function> fun_;
 
     /// Read an equation
-    MX read_expr(const XmlNode& odenode);
+    MX read_expr(const XmlNode& node);
 
     /// Read a variable
     Variable& read_variable(const XmlNode& node);

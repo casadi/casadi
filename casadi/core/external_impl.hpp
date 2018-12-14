@@ -60,6 +60,9 @@ namespace casadi {
     /** \brief Names of inputs and outputs */
     name_t get_name_in_, get_name_out_;
 
+    /** \brief Get default inputs */
+    default_t get_default_in_;
+
     /** \brief Work vector sizes */
     work_t work_;
 
@@ -87,6 +90,9 @@ namespace casadi {
     /** \brief Get type name */
     std::string class_name() const override { return "External";}
 
+    /** \brief Initialize members that are unique */
+    virtual void init_external();
+
     /// Initialize
     void init(const Dict& opts) override;
 
@@ -101,6 +107,9 @@ namespace casadi {
     size_t get_n_in() override;
     size_t get_n_out() override;
     ///@}
+
+    /** \brief Default inputs */
+    double get_default_in(casadi_int i) const override;
 
     ///@{
     /** \brief Names of function input and outputs */
@@ -134,6 +143,19 @@ namespace casadi {
                                      const std::vector<std::string>& onames,
                                      const Dict& opts) const override;
     ///@}
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s);
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "External"; }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit External(DeserializingStream& s);
   };
 
   class CASADI_EXPORT GenericExternal : public External {
@@ -152,6 +174,9 @@ namespace casadi {
     /** \brief  Destructor */
     ~GenericExternal() override { this->clear_mem();}
 
+    /** \brief Initialize members that are unique */
+    void init_external() override;
+
     /// Initialize
     void init(const Dict& opts) override;
 
@@ -169,6 +194,13 @@ namespace casadi {
 
     /** \brief Free memory block */
     void free_mem(void *mem) const override;
+
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit GenericExternal(DeserializingStream& s);
+
   };
 
 

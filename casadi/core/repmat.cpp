@@ -25,6 +25,7 @@
 
 #include "repmat.hpp"
 #include "casadi_misc.hpp"
+#include "serializing_stream.hpp"
 
 using namespace std;
 
@@ -187,6 +188,24 @@ namespace casadi {
       << g.work(arg[0], dep(0).nnz()) << "[j+i*" << nnz << "];\n"
       << "    }\n"
       << "  }\n";
+  }
+
+  void HorzRepmat::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("HorzRepmat::n", n_);
+  }
+
+  void HorzRepsum::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("HorzRepsum::n", n_);
+  }
+
+  HorzRepmat::HorzRepmat(DeserializingStream& s) : MXNode(s) {
+    s.unpack("HorzRepmat::n", n_);
+  }
+
+  HorzRepsum::HorzRepsum(DeserializingStream& s) : MXNode(s) {
+    s.unpack("HorzRepsum::n", n_);
   }
 
 } // namespace casadi

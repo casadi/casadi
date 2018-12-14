@@ -133,7 +133,21 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override { return {{"f", f_}, {"n", n_}}; }
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "Map"; }
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s);
+
   protected:
+    /** \brief Deserializing constructor */
+    explicit Map(DeserializingStream& s);
+
     // Constructor (protected, use create function)
     Map(const std::string& name, const Function& f, casadi_int n);
 
@@ -153,7 +167,7 @@ namespace casadi {
   */
   class CASADI_EXPORT OmpMap : public Map {
     friend class Map;
-  protected:
+  public:
     // Constructor (protected, use create function in Map)
     OmpMap(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
 
@@ -174,6 +188,10 @@ namespace casadi {
 
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit OmpMap(DeserializingStream& s) : Map(s) {}
   };
 
   /** A map Evaluate in parallel using std::thread
@@ -185,7 +203,7 @@ namespace casadi {
   */
   class CASADI_EXPORT ThreadMap : public Map {
     friend class Map;
-  protected:
+  public:
     // Constructor (protected, use create function in Map)
     ThreadMap(const std::string& name, const Function& f, casadi_int n) : Map(name, f, n) {}
 
@@ -206,6 +224,10 @@ namespace casadi {
 
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit ThreadMap(DeserializingStream& s) : Map(s) {}
   };
 
 } // namespace casadi

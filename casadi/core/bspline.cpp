@@ -33,7 +33,7 @@
 using namespace std;
 namespace casadi {
 
-  Options BSplineCommon::options_
+  const Options BSplineCommon::options_
   = {{&FunctionInternal::options_},
       {{"lookup_mode",
         {OT_STRINGVECTOR,
@@ -250,7 +250,7 @@ namespace casadi {
       std::vector<casadi_int> order = range(n_dims+1);
       std::swap(order.back(), order[i+1]);
       std::vector<casadi_int> mapping = tensor_permute_mapping(coeffs_dims_, order);
-      DM coeff_matrix = DM(coeffs_).nz(mapping);
+      DM coeff_matrix = DM(coeffs_).nz(mapping); // NOLINT(cppcoreguidelines-slicing)
 
       // Cast as matrix
       coeff_matrix = reshape(coeff_matrix, -1, T.size2());
@@ -260,7 +260,7 @@ namespace casadi {
 
       // Bring axis i back to the original place
       mapping = tensor_permute_mapping(permute(coeffs_dims_new, order), order);
-      coeff_matrix = coeff_matrix.nz(mapping);
+      coeff_matrix = coeff_matrix.nz(mapping); // NOLINT(cppcoreguidelines-slicing)
 
       // Return the flat vector
       return coeff_matrix.nonzeros();
@@ -480,5 +480,83 @@ namespace casadi {
       }
       return 0;
     }
+
+
+  void BSplineCommon::serialize_body(SerializingStream &s) const {
+    FunctionInternal::serialize_body(s);
+    s.pack("BSplineCommon::sp_jac_dae", lookup_mode_);
+    s.pack("BSplineCommon::knots", knots_);
+    s.pack("BSplineCommon::offset", offset_);
+    s.pack("BSplineCommon::degree", degree_);
+    s.pack("BSplineCommon::strides", strides_);
+    s.pack("BSplineCommon::coeffs_dims", coeffs_dims_);
+    s.pack("BSplineCommon::coeffs_size", coeffs_size_);
+    s.pack("BSplineCommon::m", m_);
+  }
+
+  BSplineCommon::BSplineCommon(DeserializingStream& s) : FunctionInternal(s) {
+    s.unpack("BSplineCommon::sp_jac_dae", lookup_mode_);
+    s.unpack("BSplineCommon::knots", knots_);
+    s.unpack("BSplineCommon::offset", offset_);
+    s.unpack("BSplineCommon::degree", degree_);
+    s.unpack("BSplineCommon::strides", strides_);
+    s.unpack("BSplineCommon::coeffs_dims", coeffs_dims_);
+    s.unpack("BSplineCommon::coeffs_size", coeffs_size_);
+    s.unpack("BSplineCommon::m", m_);
+  }
+
+  void BSplineCommon::serialize_type(SerializingStream &s) const {
+    FunctionInternal::serialize_type(s);
+    s.version("BSplineCommon", 1);
+  }
+
+  void BSpline::serialize_type(SerializingStream &s) const {
+    BSplineCommon::serialize_type(s);
+    s.pack("BSplineCommon::type", 'p');
+  }
+
+  void BSplineDual::serialize_type(SerializingStream &s) const {
+    BSplineCommon::serialize_type(s);
+    s.pack("BSplineCommon::type", 'd');
+  }
+
+  ProtoFunction* BSplineCommon::deserialize(DeserializingStream& s) {
+    s.version("BSplineCommon", 1);
+    char type;
+    s.unpack("BSplineCommon::type", type);
+    switch (type) {
+      case 'p': return new BSpline(s);
+      case 'd': return new BSplineDual(s);
+      default:
+        casadi_error("BSplineCommon::deserialize error");
+    }
+  }
+
+  void BSpline::serialize_body(SerializingStream &s) const {
+    BSplineCommon::serialize_body(s);
+
+    s.version("BSpline", 1);
+    s.pack("BSpline::coeffs", coeffs_);
+  }
+
+  BSpline::BSpline(DeserializingStream& s) : BSplineCommon(s) {
+    s.version("BSpline", 1);
+    s.unpack("BSpline::coeffs", coeffs_);
+  }
+
+  void BSplineDual::serialize_body(SerializingStream &s) const {
+    BSplineCommon::serialize_body(s);
+    s.version("BSplineDual", 1);
+    s.pack("BSplineDual::x", x_);
+    s.pack("BSplineDual::reverse", reverse_);
+    s.pack("BSplineDual::N", N_);
+  }
+
+  BSplineDual::BSplineDual(DeserializingStream& s) : BSplineCommon(s) {
+    s.version("BSplineDual", 1);
+    s.unpack("BSplineDual::x", x_);
+    s.unpack("BSplineDual::reverse", reverse_);
+    s.unpack("BSplineDual::N", N_);
+  }
 
 } // namespace casadi

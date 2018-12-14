@@ -24,9 +24,9 @@
 
 
 #include "project.hpp"
-#include <vector>
-#include <sstream>
 #include "casadi_misc.hpp"
+#include <sstream>
+#include <vector>
 
 using namespace std;
 
@@ -96,6 +96,5 @@ namespace casadi {
     g << g.project(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
                            g.work(res.front(), nnz()), sparsity(), "w") << "\n";
   }
-
 
 } // namespace casadi

@@ -129,8 +129,20 @@ namespace casadi {
     const casadi_int* row() const { return sp_.row();}
     casadi_int nnz() const { return sp_.nnz();}
 
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s);
+
     // Sparsity pattern of the linear system
     Sparsity sp_;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit LinsolInternal(DeserializingStream& s);
   };
 
 } // namespace casadi

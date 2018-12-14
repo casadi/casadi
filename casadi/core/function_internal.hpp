@@ -82,7 +82,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     virtual const Options& get_options() const { return options_;}
     ///@}
 
@@ -97,7 +97,7 @@ namespace casadi {
         This function, which visits the class hierarchy in reverse order is run after
         init() has been completed.
     */
-    virtual void finalize(const Dict& opts);
+    virtual void finalize();
 
     /// Checkout a memory object
     casadi_int checkout() const;
@@ -120,7 +120,29 @@ namespace casadi {
     /** \brief Clear all memory (called from destructor) */
     void clear_mem();
 
+    /** \brief C-style formatted printing during evaluation */
+    void print(const char* fmt, ...) const;
+
+    /** \brief C-style formatted printing to string */
+    void sprint(char* buf, size_t buf_sz, const char* fmt, ...) const;
+
+    /** \brief Serialize an object */
+    void serialize(SerializingStream &s) const;
+
+    /** \brief Serialize an object without type information */
+    virtual void serialize_body(SerializingStream &s) const;
+    /** \brief Serialize type information */
+    virtual void serialize_type(SerializingStream &s) const {}
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    virtual std::string serialize_base_function() const {
+      return class_name();
+    }
+
   protected:
+    /** \brief Deserializing constructor */
+    explicit ProtoFunction(DeserializingStream& s);
+
     /// Name
     std::string name_;
 
@@ -157,7 +179,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -165,7 +187,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Finalize the object creation */
-    void finalize(const Dict& opts) override;
+    void finalize() override;
 
     /** \brief Get a public class instance */
     Function self() const { return shared_from_this<Function>();}
@@ -216,8 +238,11 @@ namespace casadi {
     virtual void eval_mx(const MXVector& arg, MXVector& res,
                          bool always_inline, bool never_inline) const;
 
+    ///@{
     /** \brief Evaluate with DM matrices */
     virtual std::vector<DM> eval_dm(const std::vector<DM>& arg) const;
+    virtual bool has_eval_dm() const { return false;}
+    ///@}
 
     ///@{
     /** \brief Evaluate a function, overloaded */
@@ -425,6 +450,9 @@ namespace casadi {
     /** *\brief get MX expression associated with instruction */
     virtual MX instruction_MX(casadi_int k) const;
 
+    /** *\brief get SX expression associated with instructions */
+    virtual SX instructions_sx() const;
+
     /** \brief Wrap in an Function instance consisting of only one MX call */
     Function wrap() const;
 
@@ -474,30 +502,17 @@ namespace casadi {
     virtual void export_code(const std::string& lang,
       std::ostream &stream, const Dict& options) const;
 
-    /** \brief Serialize */
-    virtual void serialize(std::ostream &stream) const;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
 
-    /** \brief Serialize function header */
-    void serialize_header(std::ostream &stream) const;
-
-    /** \brief Build function from serialization */
-    static void deserialize_header(std::istream& stream,
-        std::string& name,
-        std::vector<Sparsity>& sp_in, std::vector<Sparsity>& sp_out,
-        std::vector<std::string>& names_in, std::vector<std::string>& names_out,
-        casadi_int& sz_w, casadi_int& sz_iw);
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
 
     /** \brief Display object */
     void disp(std::ostream& stream, bool more) const override;
 
     /** \brief  Print more */
     virtual void disp_more(std::ostream& stream) const {}
-
-    /** \brief C-style formatted printing during evaluation */
-    void print(const char* fmt, ...) const;
-
-    /** \brief C-style formatted printing to string */
-    void sprint(char* buf, size_t buf_sz, const char* fmt, ...) const;
 
     /** \brief Get function signature: name:(inputs)->(outputs) */
     std::string definition() const;
@@ -720,6 +735,12 @@ namespace casadi {
     /** \brief  Use just-in-time compiler */
     bool jit_;
 
+    /** \brief  Cleanup jit source file */
+    bool jit_cleanup_;
+
+    /** \brief  Name if jit source file */
+    std::string jit_name_;
+
     /** \brief Numerical evaluation redirected to a C function */
     eval_t eval_;
 
@@ -796,6 +817,22 @@ namespace casadi {
     std::vector<std::vector<MatType> >
     symbolicAdjSeed(casadi_int nadj, const std::vector<MatType>& v) const;
 
+    /** Unified return status for solvers */
+    enum UnifiedReturnStatus {
+        SOLVER_RET_UNKNOWN,
+        SOLVER_RET_LIMITED
+    };
+
+    static std::string string_from_UnifiedReturnStatus(UnifiedReturnStatus status);
+
+    /** \brief Deserializing constructor */
+    explicit FunctionInternal(DeserializingStream& e);
+
+    /** \brief Deserialize with type disambiguation */
+    static Function deserialize(DeserializingStream& s);
+
+    static std::map<std::string, ProtoFunction* (*)(DeserializingStream&)> deserialize_map;
+
   protected:
     /** \brief Populate jac_sparsity_ and jac_sparsity_compact_ during initialization */
     void set_jac_sparsity(const Sparsity& sp);
@@ -806,9 +843,6 @@ namespace casadi {
 
     /** \brief Temporary memory inside a function */
     size_t sz_arg_tmp_, sz_res_tmp_, sz_iw_tmp_, sz_w_tmp_;
-
-    /** \brief Fall back to eval_DM */
-    int eval_fallback(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
   };
 
   // Template implementations

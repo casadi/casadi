@@ -143,7 +143,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -196,7 +196,7 @@ namespace casadi {
     };
 
     static Sparsity blocksparsity(casadi_int rows, casadi_int cols,
-                                   const std::vector<Block>& b, bool eye=false);
+                                   const std::vector<Block>& blocks, bool eye=false);
     static void blockptr(std::vector<double *>& vs, std::vector<double>& v,
       const std::vector<Block>& blocks, bool eye=false);
     Sparsity Asp_, Bsp_, Csp_, Dsp_, Isp_, Rsp_, Ssp_, Qsp_, bsp_, lugsp_, usp_, xsp_;

@@ -25,7 +25,15 @@
 
 %module(package="casadi",directors=1) casadi
 
- // Include all public CasADi C++
+#ifdef CASADI_WITH_COPYSIGN_UNDEF
+%{
+#ifdef copysign
+#undef copysign
+#endif
+%}
+#endif // CASADI_WITH_COPYSIGN_UNDEF
+
+// Include all public CasADi C++
 %{
 #include <casadi/casadi.hpp>
 #include <casadi/core/casadi_interrupt.hpp>
@@ -104,10 +112,15 @@
     static void mexflush(bool error) {
     }
 #else
+    // Undocumented matlab feature
+    extern "C" bool utIsInterruptPending(void);
+    extern "C" void utSetInterruptPending(bool);
+
     // Flush the command window buffer (needed in gui mode)
     static void mexflush(bool error) {
-      mexEvalString("drawnow('update');");
-      mexEvalString("pause(0.0001);");
+      if (mexEvalString("drawnow('update');pause(0.0001);")) {
+        utSetInterruptPending(true);
+      }
     }
 #endif
 
@@ -322,12 +335,12 @@ def DM_from_csc(m, check_only=True):
 %feature("customdoc:proto:constructor:style_group", MNAME "($in)");
 
 %feature("customdoc:protoline", "    $proto");
-%feature("customdoc:protoline:style_overview", "  $proto\n    $brief");
+%feature("customdoc:protoline:style_overview", "  $proto");
 %feature("customdoc:protoline:nobrief:style_overview", "  $proto");
 
-%feature("customdoc:protoline:style_group", "> $proto");
+%feature("customdoc:protoline:style_group", "  $proto");
 
-%feature("customdoc:group", "$group------------------------------------------------------------------------\n$main\n");
+%feature("customdoc:group", "\n.......\n\n::\n\n$group\n$main\n\n.............\n\n");
 
 // append works for strings
 
@@ -684,7 +697,18 @@ namespace std {
 
 
     PyObject* get_Python_helper(const std::string& name) {
+%#if PY_VERSION_HEX < 0x03070000
       PyObject* module = PyImport_AddModule("casadi");
+%#else
+      PyObject* c_name = PyString_FromString("casadi");
+      PyObject* module = PyImport_GetModule(c_name);
+      Py_DECREF(c_name);
+%#endif
+      if (!module) {
+        if (PyErr_Occurred()) {
+          PyErr_Clear();
+        }
+      }
       PyObject* dict = PyModule_GetDict(module);
       return PyDict_GetItemString(dict, (char*) name.c_str());
     }
@@ -2251,6 +2275,8 @@ namespace std {
 %casadi_template(LL LL "DM" LR LR, PREC_DMVectorVector, std::vector<std::vector< casadi::Matrix<double> > >)
 %casadi_template(LDICT("DM"), PREC_DM, std::map<std::string, casadi::Matrix<double> >)
 %casadi_typemaps("IM", PREC_IM, casadi::Matrix<casadi_int>)
+// Without CASADI_INT_TYPE, you get SwigValueWrapper
+// With it, docstrings are screwed
 %casadi_template(LL "IM" LR, PREC_IMVector, std::vector< casadi::Matrix<CASADI_INT_TYPE> >)
 %casadi_template(LL LL "IM" LR LR, PREC_IMVectorVector, std::vector<std::vector< casadi::Matrix<CASADI_INT_TYPE> > >)
 %casadi_typemaps("GenericType", PREC_GENERICTYPE, casadi::GenericType)
@@ -2466,6 +2492,11 @@ class NZproxy:
 
   def __len__(self):
     return self.matrix.nnz()
+
+  def __iter__(self):
+    for i in range(len(self)):
+      yield self[i]
+
 %}
 
 %define %matrix_helpers(Type)
@@ -2486,6 +2517,12 @@ class NZproxy:
             if s[1] is None: raise TypeError("Cannot slice with None")
             return self.get(False, s[0], s[1])
           return self.get(False, s)
+
+    def __iter__(self):
+      raise Exception("""CasADi matrices are not iterable by design.
+                      Did you mean to iterate over m.nz, with m IM/DM/SX?
+                      Did you mean to iterate over horzsplit(m,1)/vertsplit(m,1) with m IM/DM/SX/MX?
+                      """)
 
     def __setitem__(self,s,val):
           if isinstance(s,tuple) and len(s)==2:
@@ -2687,10 +2724,10 @@ namespace casadi{
 %extend Sparsity {
   %pythoncode %{
     def __setstate__(self, state):
-        self.__init__(Sparsity.from_info(state))
+        self.__init__(Sparsity.deserialize(state["serialization"]))
 
     def __getstate__(self):
-        return self.info()
+        return {"serialization": self.serialize()}
   %}
 }
 
@@ -3068,12 +3105,12 @@ DECL M casadi_hessian(const M& ex, const M& arg, M& OUTPUT1) {
   return hessian(ex, arg, OUTPUT1);
 }
 
-DECL void casadi_quadratic_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3) {
-  quadratic_coeff(ex, arg, OUTPUT1, OUTPUT2, OUTPUT3);
+DECL void casadi_quadratic_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3, bool check=true) {
+  quadratic_coeff(ex, arg, OUTPUT1, OUTPUT2, OUTPUT3, check);
 }
 
-DECL void casadi_linear_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2) {
-  linear_coeff(ex, arg, OUTPUT1, OUTPUT2);
+DECL void casadi_linear_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2, bool check=true) {
+  linear_coeff(ex, arg, OUTPUT1, OUTPUT2, check);
 }
 
 DECL casadi_int casadi_n_nodes(const M& A) {
@@ -3395,8 +3432,12 @@ casadi_graph_substitute(const std::vector< M > &ex,
 %define MX_ALL(DECL, FLAG)
 MX_FUN(DECL, (FLAG | IS_MX), MX)
 %enddef
+%include <casadi/core/matrix_fwd.hpp>
+%include <casadi/core/matrix_decl.hpp>
+%include <casadi/core/dm_fwd.hpp>
+%include <casadi/core/im_fwd.hpp>
+%include <casadi/core/sx_fwd.hpp>
 
-%include <casadi/core/matrix.hpp>
 
 %template(DM) casadi::Matrix<double>;
 %extend casadi::Matrix<double> {
@@ -3550,10 +3591,10 @@ namespace casadi{
 
   %pythoncode %{
     def __setstate__(self, state):
-        self.__init__(self.from_info(state))
+        self.__init__(IM.deserialize(state["serialization"]))
 
     def __getstate__(self):
-        return self.info()
+        return {"serialization": self.serialize()}
   %}
 }
 
@@ -3561,10 +3602,10 @@ namespace casadi{
 
   %pythoncode %{
     def __setstate__(self, state):
-        self.__init__(self.from_info(state))
+        self.__init__(DM.deserialize(state["serialization"]))
 
     def __getstate__(self):
-        return self.info()
+        return {"serialization": self.serialize()}
   %}
 
 }
@@ -3594,15 +3635,25 @@ namespace casadi{
 
   %matlabcode %{
      function s = saveobj(obj)
-        s = obj.info();
+        try
+            s.serialization = obj.serialize();
+        catch exception
+            warning(['Serializing of CasADi IM failed:' getReport(exception) ]);
+            s = struct;
+        end
      end
   %}
   %matlabcode_static %{
      function obj = loadobj(s)
-        if isstruct(s)
-           obj = casadi.IM.from_info(s);
-        else
-           obj = s;
+        try
+          if isstruct(s)
+             obj = casadi.IM.deserialize(s.serialization);
+          else
+             obj = s;
+          end
+        catch exception
+            warning(['Serializing of CasADi IM failed:' getReport(exception) ]);
+            s = struct;
         end
      end
   %}
@@ -3612,15 +3663,25 @@ namespace casadi{
 
   %matlabcode %{
      function s = saveobj(obj)
-        s = obj.info();
+        try
+            s.serialization = obj.serialize();
+        catch exception
+            warning(['Serializing of CasADi DM failed:' getReport(exception) ]);
+            s = struct;
+        end
      end
   %}
   %matlabcode_static %{
      function obj = loadobj(s)
-        if isstruct(s)
-           obj = casadi.DM.from_info(s);
-        else
-           obj = s;
+        try
+          if isstruct(s)
+             obj = casadi.DM.deserialize(s.serialization);
+          else
+             obj = s;
+          end
+        catch exception
+            warning(['Serializing of CasADi DM failed:' getReport(exception) ]);
+            s = struct;
         end
      end
   %}
@@ -3629,15 +3690,25 @@ namespace casadi{
 %extend Sparsity {
   %matlabcode %{
      function s = saveobj(obj)
-        s = obj.info();
+        try
+            s.serialization = obj.serialize();
+        catch exception
+            warning(['Serializing of CasADi Sparsity failed:' getReport(exception) ]);
+            s = struct;
+        end
      end
   %}
   %matlabcode_static %{
      function obj = loadobj(s)
-        if isstruct(s)
-           obj = casadi.Sparsity.from_info(s);
-        else
-           obj = s;
+        try
+          if isstruct(s)
+             obj = casadi.Sparsity.deserialize(s.serialization);
+          else
+             obj = s;
+          end
+        catch exception
+            warning(['Serializing of CasADi Sparsity failed:' getReport(exception) ]);
+            s = struct;
         end
      end
   %}
@@ -3648,29 +3719,8 @@ namespace casadi{
 
   %matlabcode %{
      function s = saveobj(obj)
-       try
-            if is_a(obj,'SXFunction')
-              s = struct;
-              s.serialization = obj.serialize();
-            else
-              s = struct;
-              s.code = obj.export_code('matlab');
-              s.sparsity_in = cell(obj.n_in, 1);
-              s.name_in = cell(obj.n_in, 1);
-              for i=1:obj.n_in
-                s.sparsity_in{i} = obj.sparsity_in(i-1);
-                s.name_in{i} = obj.name_in(i-1);
-              end
-              s.sparsity_out = cell(obj.n_out, 1);
-              s.name_out = cell(obj.n_out, 1);
-              for i=1:obj.n_out
-                s.sparsity_out{i} = obj.sparsity_out(i-1);
-                s.name_out{i} = obj.name_out(i-1);
-              end
-              s.type = obj.class_name();
-              s.name = obj.name;
-              warning('Serializing of CasADi Functions is still experimental');
-            end
+        try
+            s.serialization = obj.serialize();
         catch exception
             warning(['Serializing of CasADi Function failed:' getReport(exception) ]);
             s = struct;
@@ -3681,33 +3731,7 @@ namespace casadi{
      function obj = loadobj(s)
         try
           if isstruct(s)
-             if isfield(s,'serialization')
-               obj = casadi.Function.deserialize(s.serialization);
-               return;
-             elseif ~isfield(s,'code')
-               warning('Not supported');
-               obj = casadi.Function();
-               return;
-             end
-             warning('Serializing of CasADi Functions is still experimental');
-             args_in = cell(length(s.sparsity_in),1);
-             for i=1:numel(args_in)
-               if strcmp(s.type,'MXFunction')
-                 args_in{i} = casadi.MX.sym(s.name_in{i}, s.sparsity_in{i});
-               else
-                 args_in{i} = casadi.SX.sym(s.name_in{i}, s.sparsity_in{i});
-               end
-             end
-
-             alphabet= 'a':'z';
-             filename = ['temp_' alphabet(randi(length(alphabet),1,20))];
-             f = fopen([filename '.m'],'w');
-             fprintf(f, s.code);
-             fclose(f);
-             clear(filename)
-             [args_out{1:length(s.sparsity_out)}] = feval(filename, args_in{:});
-             delete([filename '.m'])
-             obj = casadi.Function(s.name, args_in, args_out, s.name_in, s.name_out);
+             obj = casadi.Function.deserialize(s.serialization);
           else
              obj = s;
           end
@@ -4176,6 +4200,51 @@ namespace casadi {
 %include <casadi/core/variable.hpp>
 %include <casadi/core/dae_builder.hpp>
 %include <casadi/core/xml_file.hpp>
+
+%feature("copyctor", "0") casadi::SerializerBase;
+%feature("copyctor", "0") casadi::DeserializerBase;
+%feature("copyctor", "0") casadi::StringSerializer;
+%feature("copyctor", "0") casadi::StringDeserializer;
+%feature("copyctor", "0") casadi::FileSerializer;
+%feature("copyctor", "0") casadi::FileDeserializer;
+%nodefaultctor casadi::SerializerBase;
+%nodefaultctor casadi::DeserializerBase;
+
+#ifdef SWIGPYTHON
+%rename("%(regex:/(unpack_\w+)/_\\1/)s", regextarget=1, fullname=1) "casadi::DeserializerBase::(unpack_\w+)";
+%rename("_pop_type") casadi::DeserializerBase::pop_type;
+%rename("%(regex:/(SERIALIZED_\w+)/_\\1/)s", regextarget=1, fullname=1) "casadi::SerializerBase::SERIALIZED_\w+";
+#endif // SWIG_PYTHON
+
+
+#ifdef SWIGMATLAB
+%rename("%(regex:/(unpack_\w+)/internal_\\1/)s", regextarget=1, fullname=1) "casadi::DeserializerBase::(unpack_\w+)";
+%rename("internal_pop_type") casadi::DeserializerBase::pop_type;
+%rename("%(regex:/(SERIALIZED_\w+)/internal_\\1/)s", regextarget=1, fullname=1) "casadi::SerializerBase::SERIALIZED_\w+";
+#endif // SWIG_PYTHON
+
+%include <casadi/core/serializer.hpp>
+
+#ifdef SWIGPYTHON
+%extend casadi::DeserializerBase {
+  %pythoncode %{
+    def unpack(self):
+      type = SerializerBase.type_to_string(self._pop_type())
+      f = getattr(self, "_unpack_"+type)
+      return f()
+  %}
+}
+#endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+%extend casadi::DeserializerBase {
+  %matlabcode %{
+    function out = unpack(self)
+      type = casadi.SerializerBase.type_to_string(self.internal_pop_type);
+      out = self.(['internal_unpack_' type]);
+    end
+  %}
+}
+#endif // SWIGMATLAB
 
 %feature("director") casadi::OptiCallback;
 

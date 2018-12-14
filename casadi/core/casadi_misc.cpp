@@ -27,14 +27,14 @@
 
 #include "casadi_misc.hpp"
 #ifdef HAVE_MKSTEMPS
-#include <unistd.h>
+#define CASADI_NEED_UNISTD
 #else // HAVE_MKSTEMPS
 #ifdef HAVE_SIMPLE_MKSTEMPS
 #ifdef _WIN32
 #include <io.h>
 #include <share.h>
 #else
-#include <unistd.h>
+#define CASADI_NEED_UNISTD
 #endif
 #include <random>
 #include <chrono>
@@ -43,6 +43,13 @@
 #include <errno.h>
 #endif // HAVE_SIMPLE_MKSTEMPS
 #endif // HAVE_MKSTEMPS
+
+#ifdef CASADI_NEED_UNISTD
+#include <unistd.h>
+#endif
+
+#undef CASADI_NEED_UNISTD
+
 using namespace std;
 
 namespace casadi {
@@ -96,16 +103,18 @@ namespace casadi {
     return ret;
   }
 
-  bool is_equally_spaced(const std::vector<double> &v) {
-    if (v.size()<=1) return true;
-
-    double margin = (v[v.size()-1]-v[0])*1e-14;
-
-    for (casadi_int i=2;i<v.size();++i) {
-      double ref = v[0]+(static_cast<double>(i)*(v[v.size()-1]-v[0]))/
-        static_cast<double>(v.size()-1);
-      if (abs(ref-v[i])>margin) return false;
+  bool is_equally_spaced(const std::vector<double>& v) {
+    // Quick return if 2 or less entries
+    if (v.size()<=2) return true;
+    // Permitted error margin
+    // NOTE(@jaeandersson) 1e-14 good idea?
+    double margin = (v.back()-v.front())*1e-14;
+    // Make sure spacing is consistent throughout
+    double spacing = v[1]-v[0];
+    for (size_t i=2; i<v.size(); ++i) {
+      if (fabs(v[i]-v[i-1]-spacing)>margin) return false;
     }
+    // Equal if reached this point
     return true;
   }
 

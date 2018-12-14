@@ -38,6 +38,7 @@ namespace casadi {
     plugin->doc = FastNewton::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &FastNewton::options_;
+    plugin->deserialize = &FastNewton::deserialize;
     return 0;
   }
 
@@ -54,7 +55,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options FastNewton::options_
+  const Options FastNewton::options_
   = {{&Rootfinder::options_},
      {{"abstol",
        {OT_DOUBLE,
@@ -162,6 +163,7 @@ namespace casadi {
     casadi_copy(M->x, n_, m->ires[iout_]);
 
     m->success = m->return_status>0;
+    if (m->return_status==0) m->unified_return_status = SOLVER_RET_LIMITED;
 
     return 0;
   }
@@ -248,6 +250,32 @@ namespace casadi {
     stats["return_status"] = return_code(m->return_status);
     stats["iter_count"] = m->iter;
     return stats;
+  }
+
+
+  FastNewton::FastNewton(DeserializingStream& s) : Rootfinder(s) {
+    s.version("Newton", 1);
+    s.unpack("Newton::max_iter", max_iter_);
+    s.unpack("Newton::abstol", abstol_);
+    s.unpack("Newton::abstolStep", abstolStep_);
+    s.unpack("Newton::jac_f_z", jac_f_z_);
+    s.unpack("Newton::sp_v", sp_v_);
+    s.unpack("Newton::sp_r", sp_r_);
+    s.unpack("Newton::prinv", prinv_);
+    s.unpack("Newton::pc", pc_);
+  }
+
+  void FastNewton::serialize_body(SerializingStream &s) const {
+    Rootfinder::serialize_body(s);
+    s.version("Newton", 1);
+    s.pack("Newton::max_iter", max_iter_);
+    s.pack("Newton::abstol", abstol_);
+    s.pack("Newton::abstolStep", abstolStep_);
+    s.pack("Newton::jac_f_z", jac_f_z_);
+    s.pack("Newton::sp_v", sp_v_);
+    s.pack("Newton::sp_r", sp_r_);
+    s.pack("Newton::prinv", prinv_);
+    s.pack("Newton::pc", pc_);
   }
 
 } // namespace casadi

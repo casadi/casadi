@@ -215,54 +215,24 @@ namespace casadi {
   using std::pow;
   using std::fmod;
   using std::atan2;
+  using std::erf;
+  using std::fmin;
+  using std::fmax;
+  using std::fabs;
+  using std::atanh;
+  using std::asinh;
+  using std::acosh;
+  using std::isnan;
+  using std::isinf;
   ///@}
 
   ///@{
   // Implement "missing" operations
-  inline double atanh(double x) throw() {
-    if (x==-1) return -inf;
-    if (x==1) return inf;
-    return 0.5*log((1+x)/(1-x));
-  }
-
-  inline double asinh(double x) throw() {
-    return log(x + sqrt(1+x*x));
-  }
-
-  inline double acosh(double x) throw() {
-    return log(x + sqrt(1+x)*sqrt(x-1));
-  }
-
-  inline casadi_int isnan(double x) throw() { return x!=x;}
-  inline casadi_int isinf(double x) throw() { return isnan(x-x);}
 
   /// Sign function, note that sign(nan) == nan
   inline double sign(double x) { return x<0 ? -1 : x>0 ? 1 : x;}
-
-  /// fmin, fmax and erf should be available if C99 and/or C++11 required
-  inline double fmin(double x, double y) throw() { return std::min(x, y);}
-  inline casadi_int fmin(casadi_int x, casadi_int y) throw() { return std::min(x, y);}
-  inline double fmax(double x, double y) throw() { return std::max(x, y);}
-  inline casadi_int fmax(casadi_int x, casadi_int y) throw() { return std::max(x, y);}
-
-  /// fabs(casadi_int) was added in C++11
-  inline casadi_int fabs(casadi_int x) throw() { return std::abs(x);}
   ///@}
 
-#ifdef HAS_ERF
-  using ::erf;
-#else // HAS ERF
-  inline double erf(double x) throw() {
-    // Approximation found in Sourceforge and modified,
-    // originally from numerical recipes in Fortran
-    double sx = x<0 ? -1 : x>0 ? 1 : x;
-    double z = sx*x;
-    double t = 1.0/(1.0+0.5*z);
-    return 1.-sx*(t*exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+
-                                       t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+
-                                                           t*(-0.82215223+t*0.17087277))))))))));
-  }
-#endif // HAS ERF
   ///@}
 
   ///@{
@@ -272,7 +242,7 @@ namespace casadi {
   inline double printme(double x, double y) {
     std::ios::fmtflags f(uout().flags());
     uout() << "|> " << y << " : ";
-    uout() << std::setprecision(16) << std::scientific;
+    uout() << std::setprecision(std::numeric_limits<double>::digits10 + 1) << std::scientific;
     uout() << x << std::endl;
     uout().flags(f);
     return x;
@@ -287,8 +257,8 @@ namespace casadi {
   #endif //HAS_COPYSIGN
 
   /// Conditional assignment
-  inline double if_else_zero(double x, double y) { return x ? y : 0;}
-  inline double if_else(double x, double y, double z) { return x ? y : z;}
+  inline double if_else_zero(double x, double y) { return x==0 ? 0 : y;}
+  inline double if_else(double x, double y, double z) { return x==0 ? z : y;}
 #ifdef HAS_ERFINV
   using ::erfinv;
 #else // HAS ERFINV

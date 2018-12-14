@@ -46,11 +46,11 @@ namespace casadi {
 
   IpoptUserClass::~IpoptUserClass() {
 #ifdef WITH_IPOPT_CALLBACK
-    if (x_) delete [] x_;
-    if (g_) delete [] g_;
-    if (z_U_) delete [] z_U_;
-    if (z_L_) delete [] z_L_;
-    if (lambda_) delete [] lambda_;
+    delete [] x_;
+    delete [] g_;
+    delete [] z_U_;
+    delete [] z_L_;
+    delete [] lambda_;
 #endif // WITH_IPOPT_CALLBACK
   }
 
@@ -86,7 +86,7 @@ namespace casadi {
   // returns the value of the objective function
   bool IpoptUserClass::eval_f(Index n, const Number* x, bool new_x, Number& obj_value) {
     mem_->arg[0] = x;
-    mem_->arg[1] = mem_->p;
+    mem_->arg[1] = mem_->d_nlp.p;
     mem_->res[0] = &obj_value;
     return solver_.calc_function(mem_, "nlp_f")==0;
   }
@@ -94,7 +94,7 @@ namespace casadi {
   // return the gradient of the objective function grad_ {x} f(x)
   bool IpoptUserClass::eval_grad_f(Index n, const Number* x, bool new_x, Number* grad_f) {
     mem_->arg[0] = x;
-    mem_->arg[1] = mem_->p;
+    mem_->arg[1] = mem_->d_nlp.p;
     mem_->res[0] = nullptr;
     mem_->res[1] = grad_f;
     return solver_.calc_function(mem_, "nlp_grad_f")==0;
@@ -103,7 +103,7 @@ namespace casadi {
   // return the value of the constraints: g(x)
   bool IpoptUserClass::eval_g(Index n, const Number* x, bool new_x, Index m, Number* g) {
     mem_->arg[0] = x;
-    mem_->arg[1] = mem_->p;
+    mem_->arg[1] = mem_->d_nlp.p;
     mem_->res[0] = g;
     return solver_.calc_function(mem_, "nlp_g")==0;
   }
@@ -115,7 +115,7 @@ namespace casadi {
     if (values) {
       // Evaluate numerically
       mem_->arg[0] = x;
-      mem_->arg[1] = mem_->p;
+      mem_->arg[1] = mem_->d_nlp.p;
       mem_->res[0] = nullptr;
       mem_->res[1] = values;
       return solver_.calc_function(mem_, "nlp_jac_g")==0;
@@ -145,12 +145,11 @@ namespace casadi {
     if (values) {
       // Evaluate numerically
       mem_->arg[0] = x;
-      mem_->arg[1] = mem_->p;
+      mem_->arg[1] = mem_->d_nlp.p;
       mem_->arg[2] = &obj_factor;
       mem_->arg[3] = lambda;
       mem_->res[0] = values;
-      if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
-      return true;
+      return !solver_.calc_function(mem_, "nlp_hess_l");
     } else {
       // Get the sparsity pattern
       casadi_int ncol = solver_.hesslag_sp_.size2();

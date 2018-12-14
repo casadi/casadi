@@ -43,6 +43,8 @@ int main(){
   SX y = SX::sym("y");
   SX z = SX::sym("z");
 
+  uout() << z.info() << std::endl;
+
   // Formulate the NLP
   SX f = pow(x,2) + 100*pow(z,2);
   SX g = z + pow(1-x, 2) - y;

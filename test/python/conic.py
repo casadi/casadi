@@ -35,40 +35,91 @@ if has_nlpsol("ipopt"):
                    "jac_d_constant":"yes",
                    "hessian_constant":"yes",
                    "tol":1e-12}
-  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False}))
+  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False, "codegen": False}))
 
 if has_nlpsol("worhp"):
   worhp_options = {"TolOpti":1e-13}
-  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True, "dual": False, "soc": False}))
+  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True, "dual": False, "soc": False, "codegen": False}))
 
 
 if has_conic("ooqp"):
-  conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False}))
+  conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False, "codegen": False}))
+
 
 if has_conic("qpoases"):
-  conics.append(("qpoases",{},{"quadratic": True, "dual": True, "soc": False}))
+  conics.append(("qpoases",{},{"quadratic": True, "dual": True, "soc": False, "codegen": False}))
+
 
 if has_conic("cplex"):
-  conics.append(("cplex",{},{"quadratic": True, "dual": True, "soc": False}))
+  conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True, "codegen": False}))
 
 
 # No solution for licensing on travis
 
 #if has_conic("gurobi"):
-#  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True}))
+#  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True, "codegen": False}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
 
 if has_conic("clp"):
-  conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False}))
+  conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False}))
 
 if has_conic("qrqp"):
-  conics.append(("qrqp",dict(max_iter=20),{"quadratic": True, "dual": True, "soc": False}))
+  conics.append(("qrqp",dict(max_iter=20),{"quadratic": True, "dual": True, "soc": False, "codegen": True}))
+
 
 print(conics)
 
+
 class ConicTests(casadiTestCase):
+
+  def test_general_unconstrained(self):
+    H = sparsify(DM([[1,0],[0,1]]))
+    G = DM([-0.7,-2.3])
+    A =  DM.zeros(0,2)
+
+    LBA = DM.zeros(0,1)
+    UBA = DM.zeros(0,1)
+
+    LBX = DM([-inf]*2)
+    UBX = DM([inf]*2)
+
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+
+    for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
+      self.message("general_convex: " + str(conic))
+
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
+
+      try:
+        less_digits=aux_options["less_digits"]
+      except:
+        less_digits=0
+
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
+
+      solver_out = solver(**solver_in)
+      try:
+          self.assertTrue(solver.stats()["success"])
+      except:
+          raise Exception(str(conic))
+
+      self.assertAlmostEqual(solver_out["x"][0],0.7,max(1,6-less_digits),str(conic))
+      self.assertAlmostEqual(solver_out["x"][1],2.3,max(1,6-less_digits),str(conic))
+
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
+
+      self.check_serialize(solver,solver_in)
 
   def test_general_convex_dense(self):
     self.message("Convex dense QP with solvers: " + str([conic for conic,options,aux_options in conics]))
@@ -167,7 +218,7 @@ class ConicTests(casadiTestCase):
 
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0,0,0]),str(conic),digits=max(1,4-less_digits))
 
-  @memory_heavy()
+
   def test_general_convex_sparse(self):
     self.message("Convex sparse QP with solvers: " + str([conic for conic,options,aux_options in conics]))
     H = c.diag([2,1,0.2,0.7,1.3])
@@ -206,6 +257,8 @@ class ConicTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
+
+
       solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],DM([0.873908,0.95630465,0,0,0]),str(conic),digits=max(1,6-less_digits))
@@ -215,6 +268,9 @@ class ConicTests(casadiTestCase):
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0,2.52184767]),str(conic),digits=max(1,6-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-6.264669320767,max(1,6-less_digits),str(conic))
+
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
 
   def test_general_nonconvex_dense(self):
     self.message("Non convex dense QP with solvers: " + str([conic for conic,options,aux_options in conics]))
@@ -295,6 +351,8 @@ class ConicTests(casadiTestCase):
 
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0,2,0]),str(conic),digits=max(1,6-less_digits))
 
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
       self.assertAlmostEqual(solver_out["cost"][0],-7.4375,max(1,6-less_digits),str(conic))
 
       A =  DM([[1, 1],[-1, 2],[2, 1]])
@@ -325,6 +383,8 @@ class ConicTests(casadiTestCase):
 
       self.assertAlmostEqual(solver_out["cost"][0],-8.4,max(1,5-less_digits),str(conic))
 
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
   @memory_heavy()
   def test_degenerate_hessian(self):
     self.message("Degenerate hessian")
@@ -373,6 +433,8 @@ class ConicTests(casadiTestCase):
 
       self.assertAlmostEqual(solver_out["cost"][0],-38.375,max(1,5-less_digits),str(conic))
 
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
 
   def test_no_inequality(self):
     self.message("No inequalities present")
@@ -467,6 +529,9 @@ class ConicTests(casadiTestCase):
 
       self.assertAlmostEqual(solver_out["cost"][0],-34,max(1,5-less_digits),str(conic))
 
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
+
   def test_standard_form(self):
     H = DM([[1,-1],[-1,2]])
     G = DM([-2,-6])
@@ -506,6 +571,9 @@ class ConicTests(casadiTestCase):
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([3.4]),str(conic),digits=max(1,5-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],-5.1,max(1,5-less_digits),str(conic))
+
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
 
   @memory_heavy()
   def test_badscaling(self):
@@ -621,6 +689,7 @@ class ConicTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
+      self.check_serialize(solver,solver_in)
       solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],DM([0.5,1.5]),str(conic),digits=max(1,5-less_digits))
@@ -629,6 +698,10 @@ class ConicTests(casadiTestCase):
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0.5,-1.5,0]),str(conic),digits=max(1,5-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],2.5,max(1,5-less_digits),str(conic))
+
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
+
 
   def test_linear2(self):
     H = DM(2,2)
@@ -667,6 +740,28 @@ class ConicTests(casadiTestCase):
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([2,0,0]),str(conic),digits=max(1,5-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],7,max(1,5-less_digits),str(conic))
+
+  def test_overconstrained(self):
+    x=SX.sym("x")
+    qp={'x':x, 'f':(x-1)**2, 'g':vertcat(*[x,x,x])}
+
+    for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
+      self.message(str(conic))
+      d= dict(qp_options)
+      solver = qpsol("mysolver", conic, qp, d)
+      solver_in = {}
+      solver_in["lbx"]=[-10]
+      solver_in["ubx"]=[10]
+      solver_in["lbg"]=[-10, -10, -10]
+      solver_in["ubg"]=[10, 10, 10]
+      solver_in["x0"]=[0]
+      solver_out = solver(**solver_in)
+      self.assertAlmostEqual(solver_out["f"][0],0,9,str(conic) )
+      self.assertAlmostEqual(solver_out["x"][0],1,5,str(conic))
+
+      if aux_options["codegen"]:
+        self.check_codegen(solver,solver_in,std="c99")
 
   @requires_conic("hpmpc")
   @requires_conic("qpoases")
@@ -897,6 +992,7 @@ class ConicTests(casadiTestCase):
     self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
 
 
+  @requires_nlpsol("ipopt")
   def test_SOCP(self):
     x = MX.sym("x")
     y = MX.sym("y")
@@ -967,7 +1063,7 @@ class ConicTests(casadiTestCase):
       solver = casadi.qpsol("msyolver",conic,{'h':h,'x': vertcat(x,y,z),"f": -2*x+1*y+5*z},qp_options)
       res = solver()
 
-      self.checkarray(res["x"],DM([-5.0147928622,-5.766930599,-8.52180472]),conic,digits=5)
+      self.checkarray(res["x"],DM([-5.0147928622,-5.766930599,-8.52180472]),conic,digits=4)
 
       self.assertTrue(solver.stats()["success"])
 

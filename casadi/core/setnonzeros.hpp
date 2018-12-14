@@ -79,6 +79,12 @@ namespace casadi {
     /// Can the operation be performed inplace (i.e. overwrite the result)
     casadi_int n_inplace() const override { return 1;}
 
+    /** \brief Deserialize with type disambiguation */
+    static MXNode* deserialize(DeserializingStream& s);
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit SetNonzeros(DeserializingStream& s) : MXNode(s) {}
   };
 
 
@@ -131,6 +137,14 @@ namespace casadi {
 
     /// Operation sequence
     std::vector<casadi_int> nz_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit SetNonzerosVector(DeserializingStream& s);
   };
 
   // Specialization of the above when nz_ is a Slice
@@ -179,6 +193,14 @@ namespace casadi {
 
     // Data member
     Slice s_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit SetNonzerosSlice(DeserializingStream& s);
   };
 
   // Specialization of the above when nz_ is a nested Slice
@@ -229,6 +251,14 @@ namespace casadi {
 
     // Data members
     Slice inner_, outer_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit SetNonzerosSlice2(DeserializingStream& s);
   };
 
 } // namespace casadi

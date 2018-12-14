@@ -36,11 +36,14 @@ namespace casadi {
   FiniteDiff::~FiniteDiff() {
   }
 
-  Options FiniteDiff::options_
+  const Options FiniteDiff::options_
   = {{&FunctionInternal::options_},
      {{"second_order_stepsize",
        {OT_DOUBLE,
         "Second order perturbation size [default: 1e-3]"}},
+      {"h",
+       {OT_DOUBLE,
+        "Step size [default: computed from abstol]"}},
       {"h_max",
        {OT_DOUBLE,
         "Maximum step size [default 0]"}},

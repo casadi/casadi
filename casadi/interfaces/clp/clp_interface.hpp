@@ -57,7 +57,6 @@ namespace casadi {
 
     int return_status;
     int secondary_return_status;
-    bool success;
 
   };
 
@@ -65,6 +64,7 @@ namespace casadi {
 
       @copydoc Conic_doc
       @copydoc plugin_Conic_clp
+
 
       \author Attila Kozma, Joel Andersson
       \date 2012
@@ -90,6 +90,12 @@ namespace casadi {
     // Get name of the class
     std::string class_name() const override { return "ClpInterface";}
 
+    ///@{
+    /** \brief Options */
+    static const Options options_;
+    const Options& get_options() const override { return options_;}
+    ///@}
+
     // Initialize the solver
     void init(const Dict& opts) override;
 
@@ -110,6 +116,25 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /// All CLP options
+    Dict opts_;
+
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new ClpInterface(s); }
+
+  protected:
+     /** \brief Deserializing constructor */
+    explicit ClpInterface(DeserializingStream& s);
+
+  private:
+    // Conversion of string to enum for options
+    static std::map<std::string, ClpIntParam> param_map_int;
+    static std::map<std::string, ClpDblParam> param_map_double;
+    static std::map<std::string, ClpSolve::SolveType> param_map_solvetype;
+    static std::map<std::string, ClpSolve::PresolveType> param_map_presolvetype;
 
   };
 } // end namespace casadi

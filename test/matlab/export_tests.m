@@ -153,22 +153,20 @@ if ~is_octave
   assert(norm(full(f(x0,A0)-f_comp(x0,A0)))<1e-9);
 
 
-  if 0
-	  x = MX.sym('x',3);
-	  A = MX.sym('A',Sparsity.lower(3));
+  x = MX.sym('x',3);
+  A = MX.sym('A',Sparsity.lower(3));
 
-	  x0 = rand(3,1);
-	  A0 = sparse(DM(Sparsity.lower(3),rand(6,1)));
+  x0 = rand(3,1);
+  A0 = sparse(DM(Sparsity.lower(3),rand(6,1)));
 
-	  f = Function('f',{x,A},{A*x});
+  f = Function('f',{x,A},{A*x});
 
-	  save('test.mat','f');
-	  d = load('test.mat');
+  save('test.mat','f');
+  d = load('test.mat');
 
-	  f_comp = d.f;
+  f_comp = d.f;
 
-	  assert(norm(full(f(x0,A0)-f_comp(x0,A0)))<1e-9);
-  end
+  assert(norm(full(f(x0,A0)-f_comp(x0,A0)))<1e-9);
 
 end
 

@@ -110,6 +110,15 @@ namespace casadi {
 
     // Get name of the class
     std::string class_name() const override { return "CSparseCholeskyInterface";}
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s) {
+      return new CSparseCholeskyInterface(s);
+    }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit CSparseCholeskyInterface(DeserializingStream& s) : LinsolInternal(s) {}
   };
 
 } // namespace casadi

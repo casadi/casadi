@@ -80,6 +80,15 @@ namespace casadi {
 
     /// Continuous time dynamics
     Function f_, g_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new RungeKutta(s); }
+  protected:
+    /** \brief Deserializing constructor */
+    explicit RungeKutta(DeserializingStream& s);
   };
 
 } // namespace casadi

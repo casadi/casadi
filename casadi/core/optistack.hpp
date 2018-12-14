@@ -91,8 +91,10 @@ class CASADI_EXPORT Opti
 public:
 
   /** \brief Create Opti Context
+   * 
+   * \param[in] problem_type of optimization 'nlp' or 'conic' (default nlp)
   */
-  Opti();
+  Opti(const std::string& problem_type="nlp");
 
   /** \brief Create a decision variable (symbol)
   *
@@ -193,6 +195,13 @@ public:
 
   /// Crunch the numbers; solve the problem
   OptiSol solve();
+
+  /** \brief Crunch the numbers; solve the problem
+   * 
+   * Allows the solver to return without error when
+   * an iteration or time limit is reached
+   */
+  OptiSol solve_limited();
 
   /// @{
   /** Obtain value of expression at the current value
@@ -546,7 +555,7 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
     */
     Dict stats() const;
 
-    Opti opti() const { return optistack_; }
+    Opti opti() const { return optistack_; } // NOLINT(cppcoreguidelines-slicing)
 
   protected:
     OptiSol(const Opti& opti);

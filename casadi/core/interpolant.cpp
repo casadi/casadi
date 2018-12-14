@@ -50,7 +50,7 @@ namespace casadi {
                        const Dict& opts) {
 
     // Dimension at least 1
-    casadi_assert(grid.size()>0, "At least one input required");
+    casadi_assert(!grid.empty(), "At least one input required");
 
     // Consistency check, number of elements
     casadi_uint nel=1;
@@ -59,7 +59,7 @@ namespace casadi {
       nel *= g.size();
     }
     casadi_assert(values.size() % nel== 0, "Inconsistent number of elements");
-    casadi_assert(values.size()>0, "Values cannot be empty");
+    casadi_assert(!values.empty(), "Values cannot be empty");
 
     // Grid must be strictly increasing
     for (auto&& g : grid) {
@@ -124,7 +124,7 @@ namespace casadi {
 
   const std::string Interpolant::infix_ = "interpolant";
 
-  Options Interpolant::options_
+  const Options Interpolant::options_
   = {{&FunctionInternal::options_},
      {{"lookup_mode",
        {OT_STRINGVECTOR,
@@ -209,4 +209,35 @@ namespace casadi {
     }
     return ret;
   }
+
+  void Interpolant::serialize_body(SerializingStream &s) const {
+    FunctionInternal::serialize_body(s);
+    s.version("Interpolant", 1);
+    s.pack("Interpolant::ndim", ndim_);
+    s.pack("Interpolant::m", m_);
+    s.pack("Interpolant::grid", grid_);
+    s.pack("Interpolant::offset", offset_);
+    s.pack("Interpolant::values", values_);
+    s.pack("Interpolant::lookup_modes", lookup_modes_);
+  }
+
+  void Interpolant::serialize_type(SerializingStream &s) const {
+    FunctionInternal::serialize_type(s);
+    PluginInterface<Interpolant>::serialize_type(s);
+  }
+
+  ProtoFunction* Interpolant::deserialize(DeserializingStream& s) {
+    return PluginInterface<Interpolant>::deserialize(s);
+  }
+
+  Interpolant::Interpolant(DeserializingStream & s) : FunctionInternal(s) {
+    s.version("Interpolant", 1);
+    s.unpack("Interpolant::ndim", ndim_);
+    s.unpack("Interpolant::m", m_);
+    s.unpack("Interpolant::grid", grid_);
+    s.unpack("Interpolant::offset", offset_);
+    s.unpack("Interpolant::values", values_);
+    s.unpack("Interpolant::lookup_modes", lookup_modes_);
+  }
+
 } // namespace casadi

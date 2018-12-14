@@ -43,6 +43,9 @@ namespace casadi {
 
     // Success?
     bool success;
+
+    // Return status
+    FunctionInternal::UnifiedReturnStatus unified_return_status;
   };
 
   /// Internal class
@@ -78,7 +81,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -182,6 +185,21 @@ namespace casadi {
     template<typename XType>
       static Function create_oracle(const std::map<std::string, XType>& d,
                                     const Dict& opts);
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s);
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "Rootfinder"; }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Rootfinder(DeserializingStream& s);
   };
 
 

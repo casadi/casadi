@@ -40,6 +40,7 @@ namespace casadi {
     plugin->doc = KnitroInterface::meta_doc.c_str();
     plugin->version = CASADI_VERSION;
     plugin->options = &KnitroInterface::options_;
+    plugin->deserialize = &KnitroInterface::deserialize;
     return 0;
   }
 
@@ -57,7 +58,7 @@ namespace casadi {
     clear_mem();
   }
 
-  Options KnitroInterface::options_
+  const Options KnitroInterface::options_
   = {{&Nlpsol::options_},
      {{"knitro",
        {OT_DICT,
@@ -150,6 +151,7 @@ namespace casadi {
 
   int KnitroInterface::solve(void* mem) const {
     auto m = static_cast<KnitroMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
 
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert_dev(m->kc==nullptr);
@@ -209,10 +211,10 @@ namespace casadi {
     }
 
     // "Correct" upper and lower bounds
-    casadi_copy(m->lbx, nx_, m->wlbx);
-    casadi_copy(m->ubx, nx_, m->wubx);
-    casadi_copy(m->lbg, ng_, m->wlbg);
-    casadi_copy(m->ubg, ng_, m->wubg);
+    casadi_copy(d_nlp->lbz, nx_, m->wlbx);
+    casadi_copy(d_nlp->ubz, nx_, m->wubx);
+    casadi_copy(d_nlp->lbz+nx_, ng_, m->wlbg);
+    casadi_copy(d_nlp->ubz+nx_, ng_, m->wubg);
     for (casadi_int i=0; i<nx_; ++i) if (isinf(m->wlbx[i])) m->wlbx[i] = -KTR_INFBOUND;
     for (casadi_int i=0; i<nx_; ++i) if (isinf(m->wubx[i])) m->wubx[i] =  KTR_INFBOUND;
     for (casadi_int i=0; i<ng_; ++i) if (isinf(m->wlbg[i])) m->wlbg[i] = -KTR_INFBOUND;
@@ -238,14 +240,14 @@ namespace casadi {
                            objFnType, get_ptr(vtype), m->wlbx, m->wubx,
                            ng_, get_ptr(contype_), get_ptr(ftype),
                            m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
-                           nnzH, get_ptr(Hrow), get_ptr(Hcol), m->x, nullptr);
+                           nnzH, get_ptr(Hrow), get_ptr(Hcol), d_nlp->z, nullptr);
       casadi_assert(status==0, "KTR_mip_init_problem failed");
     } else {
       status =
       KTR_init_problem(m->kc, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
                        m->wlbx, m->wubx, ng_, get_ptr(contype_),
                        m->wlbg, m->wubg, Jcol.size(), get_ptr(Jcol), get_ptr(Jrow),
-                       nnzH, get_ptr(Hrow), get_ptr(Hcol), m->x, nullptr); // initial lambda
+                       nnzH, get_ptr(Hrow), get_ptr(Hcol), d_nlp->z, nullptr); // initial lambda
       casadi_assert(status==0, "KTR_init_problem failed");
     }
 
@@ -268,31 +270,38 @@ namespace casadi {
     double f;
     if (mi_) {
       status =
-      KTR_mip_solve(m->kc, m->x, get_ptr(lambda), 0, &f,
+      KTR_mip_solve(m->kc, d_nlp->z, get_ptr(lambda), 0, &f,
                     nullptr, nullptr, nullptr, nullptr, nullptr, static_cast<void*>(m));
 
     } else {
       status =
-      KTR_solve(m->kc, m->x, get_ptr(lambda), 0, &f,
+      KTR_solve(m->kc, d_nlp->z, get_ptr(lambda), 0, &f,
                 nullptr, nullptr, nullptr, nullptr, nullptr, static_cast<void*>(m));
     }
     m->return_status = return_codes(status);
     m->success = status==KTR_RC_OPTIMAL_OR_SATISFACTORY ||
                  status==KTR_RC_NEAR_OPT;
+    if (status==KTR_RC_ITER_LIMIT_FEAS  ||
+        status==KTR_RC_TIME_LIMIT_FEAS  ||
+        status==KTR_RC_FEVAL_LIMIT_FEAS ||
+        status==KTR_RC_ITER_LIMIT_INFEAS  ||
+        status==KTR_RC_TIME_LIMIT_INFEAS  ||
+        status==KTR_RC_FEVAL_LIMIT_INFEAS)
+      m->unified_return_status = SOLVER_RET_LIMITED;
 
     // Output dual solution
-    casadi_copy(get_ptr(lambda), ng_, m->lam_g);
-    casadi_copy(get_ptr(lambda)+ng_, nx_, m->lam_x);
+    casadi_copy(get_ptr(lambda), ng_, d_nlp->lam + nx_);
+    casadi_copy(get_ptr(lambda)+ng_, nx_, d_nlp->lam);
 
     // Output optimal cost
-    m->f = f;
+    d_nlp->f = f;
 
     // Calculate constraints
-    if (m->g) {
-      m->arg[0] = m->x;
-      m->arg[1] = m->p;
+    if (ng_>0) {
+      m->arg[0] = d_nlp->z;
+      m->arg[1] = d_nlp->p;
       m->res[0] = nullptr;
-      m->res[1] = m->g;
+      m->res[1] = d_nlp->z + nx_;
       calc_function(m, "nlp_fg");
     }
 
@@ -312,28 +321,28 @@ namespace casadi {
     try {
       // Get a pointer to the calling object
       auto m = static_cast<KnitroMemory*>(userParams);
-
+      auto d_nlp = &m->d_nlp;
       // Direct to the correct function
       switch (evalRequestCode) {
       case KTR_RC_EVALFC:
       m->arg[0] = x;
-      m->arg[1] = m->p;
+      m->arg[1] = d_nlp->p;
       m->res[0] = obj;
       m->res[1] = c;
-      m->self.calc_function(m, "nlp_fg");
+      if (m->self.calc_function(m, "nlp_fg")) return KTR_RC_EVAL_ERR;
       break;
       case KTR_RC_EVALGA:
       m->arg[0] = x;
-      m->arg[1] = m->p;
+      m->arg[1] = d_nlp->p;
       m->res[0] = objGrad;
       m->res[1] = jac;
-      m->self.calc_function(m, "nlp_gf_jg");
+      if (m->self.calc_function(m, "nlp_gf_jg")) return KTR_RC_EVAL_ERR;
       break;
       case KTR_RC_EVALH:
         {
           double sigma = 1.;
           m->arg[0] = x;
-          m->arg[1] = m->p;
+          m->arg[1] = d_nlp->p;
           m->arg[2] = &sigma;
           m->arg[3] = lambda;
           m->res[0] = hessian;
@@ -420,6 +429,23 @@ namespace casadi {
     stats["return_status"] = m->return_status;
 
     return stats;
+  }
+
+  KnitroInterface::KnitroInterface(DeserializingStream& s) : Nlpsol(s) {
+    s.version("KnitroInterface", 1);
+    s.unpack("KnitroInterface::contype", contype_);
+    s.unpack("KnitroInterface::opts", opts_);
+    s.unpack("KnitroInterface::jacg_sp", jacg_sp_);
+    s.unpack("KnitroInterface::hesslag_sp", hesslag_sp_);
+  }
+
+  void KnitroInterface::serialize_body(SerializingStream &s) const {
+    Nlpsol::serialize_body(s);
+    s.version("KnitroInterface", 1);
+    s.pack("KnitroInterface::contype", contype_);
+    s.pack("KnitroInterface::opts", opts_);
+    s.pack("KnitroInterface::jacg_sp", jacg_sp_);
+    s.pack("KnitroInterface::hesslag_sp", hesslag_sp_);
   }
 
   KnitroMemory::KnitroMemory(const KnitroInterface& self) : self(self) {

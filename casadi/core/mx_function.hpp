@@ -26,10 +26,10 @@
 #ifndef CASADI_MX_FUNCTION_HPP
 #define CASADI_MX_FUNCTION_HPP
 
-#include <set>
-#include <map>
-#include <vector>
 #include <iostream>
+#include <map>
+#include <set>
+#include <vector>
 
 #include "x_function.hpp"
 #include "mx_node.hpp"
@@ -100,7 +100,7 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
@@ -121,6 +121,12 @@ namespace casadi {
 
     /** \brief Generate code for the body of the C function */
     void codegen_body(CodeGenerator& g) const override;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s);
 
     /** \brief Extract the residual function G and the modified function Z out of an expression
      * (see Albersmeyer2010 paper) */
@@ -203,6 +209,10 @@ namespace casadi {
 
     /// Substitute inplace, internal implementation
     void substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const;
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit MXFunction(DeserializingStream& s);
   };
 
 } // namespace casadi

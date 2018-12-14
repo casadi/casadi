@@ -67,7 +67,7 @@ namespace casadi {
     ~Lsqr() override;
 
     // Get name of the plugin
-    const char* plugin_name() const override { return "symbolicqr";}
+    const char* plugin_name() const override { return "lsqr";}
 
     // Name of the class
     std::string class_name() const override { return "Lsqr";}
@@ -94,6 +94,13 @@ namespace casadi {
 
     /// A documentation string
     static const std::string meta_doc;
+
+    /** \brief Deserialize with type disambiguation */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new Lsqr(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit Lsqr(DeserializingStream& s) : LinsolInternal(s) {}
   };
 
 } // namespace casadi

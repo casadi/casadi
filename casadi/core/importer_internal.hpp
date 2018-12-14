@@ -67,12 +67,14 @@ namespace casadi {
 
     ///@{
     /** \brief Options */
-    static Options options_;
+    static const Options options_;
     virtual const Options& get_options() const { return options_;}
     ///@}
 
     /** \brief Initialize */
     virtual void init(const Dict& opts);
+
+    virtual void finalize() {}
 
     // No static functions exposed
     struct Exposed{ };
@@ -138,6 +140,16 @@ namespace casadi {
 
     /** \brief  Verbose -- for debugging purposes */
     bool verbose_;
+
+    void serialize(SerializingStream& s) const;
+
+    virtual void serialize_type(SerializingStream& s) const;
+    virtual void serialize_body(SerializingStream& s) const;
+
+    static ImporterInternal* deserialize(DeserializingStream& s);
+
+  protected:
+    explicit ImporterInternal(DeserializingStream& s);
   };
 
   /** \brief Dynamically linked library
@@ -158,6 +170,10 @@ namespace casadi {
     // Constructor
     explicit DllLibrary(const std::string& bin_name);
 
+    void finalize() override;
+
+    void init_handle();
+
     // Destructor
     ~DllLibrary() override;
 
@@ -169,6 +185,11 @@ namespace casadi {
 
     /// Can meta information be read?
     bool can_have_meta() const override { return false;}
+
+    static ImporterInternal* deserialize(DeserializingStream& s);
+
+  protected:
+    explicit DllLibrary(DeserializingStream& s) : ImporterInternal(s) {}
   };
 
 } // namespace casadi

@@ -30,7 +30,6 @@
 #include <climits>
 #include <cstdlib>
 #include <cmath>
-#include "matrix.hpp"
 
 using namespace std;
 
@@ -75,7 +74,7 @@ namespace casadi {
   }
 
   casadi_int SparsityInternal::postorder_dfs(casadi_int j, casadi_int k,
-                                      casadi_int* head, casadi_int* next,
+                                      casadi_int* head, const casadi_int* next,
                                       casadi_int* post, casadi_int* stack) {
     /* Modified version of cs_tdfs in CSparse
       Copyright(c) Timothy A. Davis, 2006-2009
@@ -460,7 +459,7 @@ namespace casadi {
   }
 
   SparsityInternal::~SparsityInternal() {
-    if (btf_) delete btf_;
+    delete btf_;
   }
 
   const SparsityInternal::Btf& SparsityInternal::btf() const {
@@ -3571,7 +3570,7 @@ namespace casadi {
     }
 
     // Construct indent string
-    std::string indent = "";
+    std::string indent;
     for (casadi_int i=0;i<indent_level;++i) {
       indent += "  ";
     }
