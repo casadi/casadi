@@ -372,6 +372,6 @@ t0 = time.time()
 
 print("dump")
 with open(my_module+'.json', 'w') as outfile:
-    json.dump(data, outfile, indent=True)
+    json.dump(treedata, outfile, indent=True)
 print("elpased", time.time()-t0)
 t0 = time.time()
