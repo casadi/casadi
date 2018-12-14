@@ -418,8 +418,6 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   # I don't know the MSVC warnings, so do nothing for now
-  # TODO: Move to a more appropriate location.
-  set(EXTRA_CASADI_CXX_FLAGS "/bigobj")
 endif()
 #######################################################################
 ############################### Extra runtime checks ##################
