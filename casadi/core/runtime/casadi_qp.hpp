@@ -2,7 +2,8 @@
 
 // C-REPLACE "fmin" "casadi_fmin"
 // C-REPLACE "fmax" "casadi_fmax"
-// C-REPLACE "std::max" "casadi_max"
+// C-REPLACE "std::numeric_limits<T1>::min()" "casadi_real_min"
+// C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
 
 // SYMBOL "qp_prob"
 template<typename T1>
@@ -17,12 +18,12 @@ struct casadi_qp_prob {
   T1 dmin;
   // Infinity
   T1 inf;
-  // Dual to primal error
-  T1 du_to_pr;
   // Smallest multiplier treated as inactive for the initial active set
   T1 min_lam;
   // Maximum number of iterations
   casadi_int max_iter;
+  // Dual to primal error
+  T1 du_to_pr;
 };
 // C-REPLACE "casadi_qp_prob<T1>" "struct casadi_qp_prob"
 
@@ -32,6 +33,10 @@ void casadi_qp_setup(casadi_qp_prob<T1>* p) {
   p->na = p->sp_a[0];
   p->nx = p->sp_a[1];
   p->nz = p->nx + p->na;
+  p->dmin = std::numeric_limits<T1>::min();
+  p->inf = std::numeric_limits<T1>::infinity();
+  p->min_lam = 0;
+  p->max_iter = 1000;
 }
 
 // SYMBOL "qp_work"
