@@ -85,27 +85,27 @@ namespace casadi {
     Conic::init(opts);
 
     // Default options
-    max_iter_ = 1000;
+    p_.max_iter = 1000;
+    p_.du_to_pr = 1000.;
+    p_.min_lam = 0.;
     print_iter_ = true;
     print_header_ = true;
-    du_to_pr_ = 1000.;
-    min_lam_ = 0.;
     print_info_ = true;
 
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="max_iter") {
-        max_iter_ = op.second;
+        p_.max_iter = op.second;
+      } else if (op.first=="du_to_pr") {
+        p_.du_to_pr = op.second;
+      } else if (op.first=="min_lam") {
+        p_.min_lam = op.second;
       } else if (op.first=="print_iter") {
         print_iter_ = op.second;
       } else if (op.first=="print_header") {
         print_header_ = op.second;
       } else if (op.first=="print_info") {
         print_info_ = op.second;
-      } else if (op.first=="du_to_pr") {
-        du_to_pr_ = op.second;
-      } else if (op.first=="min_lam") {
-        min_lam_ = op.second;
       }
     }
 
@@ -142,9 +142,6 @@ namespace casadi {
   }
 
   void Qrqp::set_qp_prob() {
-    p_.du_to_pr = du_to_pr_;
-    p_.min_lam = min_lam_;
-    p_.max_iter = max_iter_;
     p_.sp_a = A_;
     p_.sp_h = H_;
     p_.sp_at = AT_;
@@ -264,9 +261,9 @@ namespace casadi {
     g.local("p", "struct casadi_qp_prob");
 
         // Setup memory structure
-    g << "p.du_to_pr = " << du_to_pr_ << ";\n";
-    g << "p.min_lam = " << min_lam_ << ";\n";
-    g << "p.max_iter = " << max_iter_ << ";\n";
+    g << "p.du_to_pr = " << p_.du_to_pr << ";\n";
+    g << "p.min_lam = " << p_.min_lam << ";\n";
+    g << "p.max_iter = " << p_.max_iter << ";\n";
     g << "p.sp_a = " << g.sparsity(A_) << ";\n";
     g << "p.sp_h = " << g.sparsity(H_) << ";\n";
     g << "p.sp_at = " << g.sparsity(AT_) << ";\n";
@@ -365,12 +362,12 @@ namespace casadi {
     s.unpack("Qrqp::sp_r", sp_r_);
     s.unpack("Qrqp::prinv", prinv_);
     s.unpack("Qrqp::pc", pc_);
-    s.unpack("Qrqp::max_iter", max_iter_);
+    s.unpack("Qrqp::max_iter", p_.max_iter);
     s.unpack("Qrqp::print_iter", print_iter_);
     s.unpack("Qrqp::print_header", print_header_);
     s.unpack("Qrqp::print_info", print_info_);
-    s.unpack("Qrqp::du_to_pr", du_to_pr_);
-    s.unpack("Qrqp::min_lam", min_lam_);
+    s.unpack("Qrqp::du_to_pr", p_.du_to_pr);
+    s.unpack("Qrqp::min_lam", p_.min_lam);
     set_qp_prob();
   }
 
@@ -384,12 +381,12 @@ namespace casadi {
     s.pack("Qrqp::sp_r", sp_r_);
     s.pack("Qrqp::prinv", prinv_);
     s.pack("Qrqp::pc", pc_);
-    s.pack("Qrqp::max_iter", max_iter_);
+    s.pack("Qrqp::max_iter", p_.max_iter);
     s.pack("Qrqp::print_iter", print_iter_);
     s.pack("Qrqp::print_header", print_header_);
     s.pack("Qrqp::print_info", print_info_);
-    s.pack("Qrqp::du_to_pr", du_to_pr_);
-    s.pack("Qrqp::min_lam", min_lam_);
+    s.pack("Qrqp::du_to_pr", p_.du_to_pr);
+    s.pack("Qrqp::min_lam", p_.min_lam);
   }
 
 } // namespace casadi
