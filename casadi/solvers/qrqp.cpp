@@ -150,11 +150,9 @@ namespace casadi {
     p_.sp_r = sp_r_;
     p_.prinv = get_ptr(prinv_);
     p_.pc = get_ptr(pc_);
+    casadi_qp_setup(&p_);
     p_.dmin = std::numeric_limits<double>::min();
     p_.inf = inf;
-    p_.nx = nx_;
-    p_.na = na_;
-    p_.nz = nx_+na_;
   }
 
   int Qrqp::init_mem(void* mem) const {
@@ -260,10 +258,7 @@ namespace casadi {
     g.local("d", "struct casadi_qp_data");
     g.local("p", "struct casadi_qp_prob");
 
-        // Setup memory structure
-    g << "p.du_to_pr = " << p_.du_to_pr << ";\n";
-    g << "p.min_lam = " << p_.min_lam << ";\n";
-    g << "p.max_iter = " << p_.max_iter << ";\n";
+    // Setup memory structure
     g << "p.sp_a = " << g.sparsity(A_) << ";\n";
     g << "p.sp_h = " << g.sparsity(H_) << ";\n";
     g << "p.sp_at = " << g.sparsity(AT_) << ";\n";
@@ -272,12 +267,13 @@ namespace casadi {
     g << "p.sp_r = " << g.sparsity(sp_r_) << ";\n";
     g << "p.prinv = " << g.constant(prinv_) << ";\n";
     g << "p.pc =  " << g.constant(pc_) << ";\n";
+    g << "casadi_qp_setup(&p);\n";
 
+    g << "p.du_to_pr = " << p_.du_to_pr << ";\n";
+    g << "p.min_lam = " << p_.min_lam << ";\n";
+    g << "p.max_iter = " << p_.max_iter << ";\n";
     g << "p.dmin = casadi_real_min;\n";
     g << "p.inf = casadi_inf;\n";
-    g << "p.nx = " << nx_ << ";\n";
-    g << "p.na = " << na_ << ";\n";
-    g << "p.nz = " << nx_+na_ << ";\n";
 
     g << "d.prob = &p;\n";
     g << "d.nz_h = arg[" << CONIC_H << "];\n";

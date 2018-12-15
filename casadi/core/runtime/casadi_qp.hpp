@@ -7,6 +7,10 @@
 // SYMBOL "qp_prob"
 template<typename T1>
 struct casadi_qp_prob {
+  // Sparsity patterns
+  const casadi_int *sp_a, *sp_h, *sp_at, *sp_kkt;
+  // Symbolic QR factorization
+  const casadi_int *prinv, *pc, *sp_v, *sp_r;
   // Dimensions
   casadi_int nx, na, nz;
   // Smallest nonzero number
@@ -15,10 +19,6 @@ struct casadi_qp_prob {
   T1 inf;
   // Dual to primal error
   T1 du_to_pr;
-  // Sparsity patterns
-  const casadi_int *sp_a, *sp_h, *sp_at, *sp_kkt;
-  // Symbolic QR factorization
-  const casadi_int *prinv, *pc, *sp_v, *sp_r;
   // Smallest multiplier treated as inactive for the initial active set
   T1 min_lam;
   // Maximum number of iterations
@@ -26,9 +26,17 @@ struct casadi_qp_prob {
 };
 // C-REPLACE "casadi_qp_prob<T1>" "struct casadi_qp_prob"
 
+// SYMBOL "qp_setup"
+template<typename T1>
+void casadi_qp_setup(casadi_qp_prob<T1>* p) {
+  p->na = p->sp_a[0];
+  p->nx = p->sp_a[1];
+  p->nz = p->nx + p->na;
+}
+
 // SYMBOL "qp_work"
 template<typename T1>
-void casadi_qp_work(casadi_qp_prob<T1>* p, casadi_int* sz_iw, casadi_int* sz_w) {
+void casadi_qp_work(const casadi_qp_prob<T1>* p, casadi_int* sz_iw, casadi_int* sz_w) {
   // Local variables
   casadi_int nnz_a, nnz_kkt, nnz_v, nnz_r;
   // Get matrix number of nonzeros
@@ -147,14 +155,14 @@ int casadi_qp_reset(casadi_qp_data<T1>* d) {
   // Correct lam if needed, determine permitted signs
   for (i=0; i<p->nz; ++i) {
     // Permitted signs for lam
-    d->neverzero[i] = d->lbz[i]==d->ubz[i];
-    d->neverupper[i] = d->ubz[i]==p->inf;
-    d->neverlower[i] = d->lbz[i]==-p->inf;
+    d->neverzero[i] = d->lbz[i] == d->ubz[i];
+    d->neverupper[i] = d->ubz[i] == p->inf;
+    d->neverlower[i] = d->lbz[i] == -p->inf;
     if (d->neverzero[i] && d->neverupper[i] && d->neverlower[i]) return 1;
     // Small enough lambdas are treated as inactive
     if (!d->neverzero[i] && fabs(d->lam[i]) < p->min_lam) d->lam[i] = 0.;
     // Prevent illegal active sets
-    if (d->neverzero[i] && d->lam[i]==0.) {
+    if (d->neverzero[i] && d->lam[i] == 0.) {
       d->lam[i] = d->neverupper[i]
                 || d->z[i]-d->lbz[i] <= d->ubz[i]-d->z[i] ? -p->dmin : p->dmin;
     } else if (d->neverupper[i] && d->lam[i]>0.) {
@@ -414,13 +422,13 @@ T1 casadi_qp_kkt_dot(casadi_qp_data<T1>* d, const T1* v, casadi_int i) {
   T1 r;
   const casadi_qp_prob<T1>* p = d->prob;
   // Extract sparsities
-  a_row = (a_colind = p->sp_a+2) + p->nx + 1;
-  at_row = (at_colind = p->sp_at+2) + p->na + 1;
-  h_row = (h_colind = p->sp_h+2) + p->nx + 1;
+  a_row = (a_colind = p->sp_a + 2) + p->nx + 1;
+  at_row = (at_colind = p->sp_at + 2) + p->na + 1;
+  h_row = (h_colind = p->sp_h + 2) + p->nx + 1;
   // Scalar product with the diagonal
   r = v[i];
   // Scalar product with the sparse entries
-  if (i<p->nx) {
+  if (i < p->nx) {
     for (k=h_colind[i]; k<h_colind[i+1]; ++k) r -= v[h_row[k]] * d->nz_h[k];
     for (k=a_colind[i]; k<a_colind[i+1]; ++k) r -= v[p->nx+a_row[k]] * d->nz_a[k];
   } else {
