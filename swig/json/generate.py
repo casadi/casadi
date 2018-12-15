@@ -172,8 +172,8 @@ def getCanonicalParams(d,debug=""):
   params = []
   if d.find('attributelist/parmlist') is not None:
     for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]'):
-       name = x.findall('../attribute[@name="name"]')[0].attrib['value']
-    params.append( (getCanonicalType(x.attrib['value']),"Output" if name=="OUTPUT" else "Normal") )
+      name = x.findall('../attribute[@name="name"]')[0].attrib['value']
+      params.append( (getCanonicalType(x.attrib['value']),"Output" if name=="OUTPUT" else "Normal") )
 
   return params
 print("elpased", time.time()-t0)
@@ -213,7 +213,7 @@ for name,c in classes0.items():
     storage = getAttribute(d,"storage")
 
     access = getAttribute(d,"access")
-    if access=="private": continue
+    if access in ["private", "protected"]: continue
 
     if dname == "ptr": continue # WORKAROUND FOR POTENTIAL SWIG BUG
 
@@ -235,7 +235,7 @@ for name,c in classes0.items():
 
     rettype = name
     access = getAttribute(d,"access")
-    if access=="private": continue
+    if access in ["private", "protected"]: continue
 
     if is_internal(d,msg="constructors"):
       numInternalConstructors += 1
