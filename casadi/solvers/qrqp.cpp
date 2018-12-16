@@ -64,7 +64,7 @@ namespace casadi {
         "Tolerance [1e-8]."}},
       {"du_to_pr",
        {OT_DOUBLE,
-        "How much larger dual than primal error is acceptable [1000]"}},
+        "How much larger dual than primal error is acceptable [1]"}},
       {"print_header",
        {OT_BOOL,
         "Print header [true]."}},
@@ -85,7 +85,7 @@ namespace casadi {
     Conic::init(opts);
 
     // Default options
-    p_.du_to_pr = 1000.;
+    p_.du_to_pr = 1.;
     print_iter_ = true;
     print_header_ = true;
     print_info_ = true;
