@@ -24,6 +24,8 @@ struct casadi_qp_prob {
   casadi_int max_iter;
   // Dual to primal error
   T1 du_to_pr;
+  // Primal and dual error tolerance
+  T1 constr_viol_tol, dual_inf_tol;
 };
 // C-REPLACE "casadi_qp_prob<T1>" "struct casadi_qp_prob"
 
@@ -37,6 +39,8 @@ void casadi_qp_setup(casadi_qp_prob<T1>* p) {
   p->inf = std::numeric_limits<T1>::infinity();
   p->min_lam = 0;
   p->max_iter = 1000;
+  p->constr_viol_tol = 1e-8;
+  p->dual_inf_tol = 1e-8;
 }
 
 // SYMBOL "qp_work"
@@ -1055,11 +1059,11 @@ void casadi_qp_flip(casadi_qp_data<T1>* d) {
   // If nonsingular and nonzero error, try to flip a constraint
   if (!d->sing && d->e > 1e-14) {
     // Improve primal feasibility if dominating
-    if (d->pr >= p->du_to_pr * d->du) {
+    if (d->pr >= fmax(p->constr_viol_tol, p->du_to_pr * d->du)) {
       if (d->index == -1) casadi_qp_pr_index(d);
     }
     // Improve dual feasibility if dominating
-    if (d->pr <= p->du_to_pr * d->du) {
+    if (d->pr <= fmax(p->constr_viol_tol, p->du_to_pr * d->du)) {
       if (d->index == -1) casadi_qp_du_index(d, d->ipr);
     }
   }

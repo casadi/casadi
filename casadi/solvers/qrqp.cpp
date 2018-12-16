@@ -59,9 +59,9 @@ namespace casadi {
      {{"max_iter",
        {OT_INT,
         "Maximum number of iterations [1000]."}},
-      {"tol",
+      {"constr_viol_tol",
        {OT_DOUBLE,
-        "Tolerance [1e-8]."}},
+        "Constraint violation tolerance [1e-8]."}},
       {"du_to_pr",
        {OT_DOUBLE,
         "How much larger dual than primal error is acceptable [1]"}},
@@ -94,6 +94,8 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="max_iter") {
         p_.max_iter = op.second;
+      } else if (op.first=="constr_viol_tol") {
+        p_.constr_viol_tol = op.second;
       } else if (op.first=="du_to_pr") {
         p_.du_to_pr = op.second;
       } else if (op.first=="min_lam") {
@@ -268,6 +270,7 @@ namespace casadi {
     // Copy options
     g << "p.max_iter = " << p_.max_iter << ";\n";
     g << "p.min_lam = " << p_.min_lam << ";\n";
+    g << "p.constr_viol_tol = " << p_.constr_viol_tol << ";\n";
     g << "p.du_to_pr = " << p_.du_to_pr << ";\n";
 
     g << "d.prob = &p;\n";
@@ -359,6 +362,7 @@ namespace casadi {
     set_qp_prob();
     s.unpack("Qrqp::max_iter", p_.max_iter);
     s.unpack("Qrqp::min_lam", p_.min_lam);
+    s.unpack("Qrqp::constr_viol_tol", p_.constr_viol_tol);
     s.unpack("Qrqp::du_to_pr", p_.du_to_pr);
   }
 
@@ -377,6 +381,7 @@ namespace casadi {
     s.pack("Qrqp::print_info", print_info_);
     s.pack("Qrqp::max_iter", p_.max_iter);
     s.pack("Qrqp::min_lam", p_.min_lam);
+    s.pack("Qrqp::constr_viol_tol", p_.constr_viol_tol);
     s.pack("Qrqp::du_to_pr", p_.du_to_pr);
   }
 
