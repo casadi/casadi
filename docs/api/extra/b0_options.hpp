@@ -2828,15 +2828,15 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>constr_viol_tol</td><td>OT_DOUBLE</td><td>Constraint violation tolerance [1e-8].</td><td>casadi::Qrqp</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
-<tr><td>du_to_pr</td><td>OT_DOUBLE</td><td>How much larger dual than primal error is acceptable [1000]</td><td>casadi::Qrqp</td></tr>
+<tr><td>dual_inf_tol</td><td>OT_DOUBLE</td><td>Dual feasibility violation tolerance [1e-8]</td><td>casadi::Qrqp</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td><td>casadi::Qrqp</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Smallest multiplier treated as inactive for the initial active set [0].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
-<tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance [1e-8].</td><td>casadi::Qrqp</td></tr>
 </table>
 */
 /// \endcond
@@ -2846,13 +2846,13 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
-<tr><td>du_to_pr</td><td>OT_DOUBLE</td><td>How much larger dual than primal error is acceptable [1000]</td></tr>
+<tr><td>constr_viol_tol</td><td>OT_DOUBLE</td><td>Constraint violation tolerance [1e-8].</td></tr>
+<tr><td>dual_inf_tol</td><td>OT_DOUBLE</td><td>Dual feasibility violation tolerance [1e-8]</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Smallest multiplier treated as inactive for the initial active set [0].</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td></tr>
 <tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td></tr>
 <tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td></tr>
-<tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance [1e-8].</td></tr>
 </table>
 */
 /** \addtogroup general_Qrqp
@@ -2861,15 +2861,15 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
+<tr><td>constr_viol_tol</td><td>OT_DOUBLE</td><td>Constraint violation tolerance [1e-8].</td><td>casadi::Qrqp</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
-<tr><td>du_to_pr</td><td>OT_DOUBLE</td><td>How much larger dual than primal error is acceptable [1000]</td><td>casadi::Qrqp</td></tr>
+<tr><td>dual_inf_tol</td><td>OT_DOUBLE</td><td>Dual feasibility violation tolerance [1e-8]</td><td>casadi::Qrqp</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td><td>casadi::Qrqp</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Smallest multiplier treated as inactive for the initial active set [0].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_info</td><td>OT_BOOL</td><td>Print info [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_iter</td><td>OT_BOOL</td><td>Print iterations [true].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
-<tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance [1e-8].</td><td>casadi::Qrqp</td></tr>
 </table>
 */
 /// \cond INTERNAL

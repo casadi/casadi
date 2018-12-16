@@ -47306,61 +47306,64 @@ Solve QPs using an active-set method
 
 >List of available options
 
-+--------------+-----------+-----------------------------------------------+
-|      Id      |   Type    |                  Description                  |
-+==============+===========+===============================================+
-| du_to_pr     | OT_DOUBLE | How much larger dual than primal error is     |
-|              |           | acceptable [1000]                             |
-+--------------+-----------+-----------------------------------------------+
-| max_iter     | OT_INT    | Maximum number of iterations [1000].          |
-+--------------+-----------+-----------------------------------------------+
-| min_lam      | OT_DOUBLE | Smallest multiplier treated as inactive for   |
-|              |           | the initial active set [0].                   |
-+--------------+-----------+-----------------------------------------------+
-| print_header | OT_BOOL   | Print header [true].                          |
-+--------------+-----------+-----------------------------------------------+
-| print_info   | OT_BOOL   | Print info [true].                            |
-+--------------+-----------+-----------------------------------------------+
-| print_iter   | OT_BOOL   | Print iterations [true].                      |
-+--------------+-----------+-----------------------------------------------+
-| tol          | OT_DOUBLE | Tolerance [1e-8].                             |
-+--------------+-----------+-----------------------------------------------+
++-----------------+-----------+--------------------------------------------+
+|       Id        |   Type    |                Description                 |
++=================+===========+============================================+
+| constr_viol_tol | OT_DOUBLE | Constraint violation tolerance [1e-8].     |
++-----------------+-----------+--------------------------------------------+
+| dual_inf_tol    | OT_DOUBLE | Dual feasibility violation tolerance       |
+|                 |           | [1e-8]                                     |
++-----------------+-----------+--------------------------------------------+
+| max_iter        | OT_INT    | Maximum number of iterations [1000].       |
++-----------------+-----------+--------------------------------------------+
+| min_lam         | OT_DOUBLE | Smallest multiplier treated as inactive    |
+|                 |           | for the initial active set [0].            |
++-----------------+-----------+--------------------------------------------+
+| print_header    | OT_BOOL   | Print header [true].                       |
++-----------------+-----------+--------------------------------------------+
+| print_info      | OT_BOOL   | Print info [true].                         |
++-----------------+-----------+--------------------------------------------+
+| print_iter      | OT_BOOL   | Print iterations [true].                   |
++-----------------+-----------+--------------------------------------------+
 
 Joel Andersson
 
 >List of available options
 
-+---------------+---------------+--------------------------+---------------+
-|      Id       |     Type      |       Description        |    Used in    |
-+===============+===============+==========================+===============+
-| discrete      | OT_BOOLVECTOR | Indicates which of the   | casadi::Conic |
-|               |               | variables are discrete,  |               |
-|               |               | i.e. integer-valued      |               |
-+---------------+---------------+--------------------------+---------------+
-| du_to_pr      | OT_DOUBLE     | How much larger dual     | casadi::Qrqp  |
-|               |               | than primal error is     |               |
-|               |               | acceptable [1000]        |               |
-+---------------+---------------+--------------------------+---------------+
-| max_iter      | OT_INT        | Maximum number of        | casadi::Qrqp  |
-|               |               | iterations [1000].       |               |
-+---------------+---------------+--------------------------+---------------+
-| min_lam       | OT_DOUBLE     | Smallest multiplier      | casadi::Qrqp  |
-|               |               | treated as inactive for  |               |
-|               |               | the initial active set   |               |
-|               |               | [0].                     |               |
-+---------------+---------------+--------------------------+---------------+
-| print_header  | OT_BOOL       | Print header [true].     | casadi::Qrqp  |
-+---------------+---------------+--------------------------+---------------+
-| print_info    | OT_BOOL       | Print info [true].       | casadi::Qrqp  |
-+---------------+---------------+--------------------------+---------------+
-| print_iter    | OT_BOOL       | Print iterations [true]. | casadi::Qrqp  |
-+---------------+---------------+--------------------------+---------------+
-| print_problem | OT_BOOL       | Print a numeric          | casadi::Conic |
-|               |               | description of the       |               |
-|               |               | problem                  |               |
-+---------------+---------------+--------------------------+---------------+
-| tol           | OT_DOUBLE     | Tolerance [1e-8].        | casadi::Qrqp  |
-+---------------+---------------+--------------------------+---------------+
++-----------------+---------------+------------------------+---------------+
+|       Id        |     Type      |      Description       |    Used in    |
++=================+===============+========================+===============+
+| constr_viol_tol | OT_DOUBLE     | Constraint violation   | casadi::Qrqp  |
+|                 |               | tolerance [1e-8].      |               |
++-----------------+---------------+------------------------+---------------+
+| discrete        | OT_BOOLVECTOR | Indicates which of the | casadi::Conic |
+|                 |               | variables are          |               |
+|                 |               | discrete, i.e.         |               |
+|                 |               | integer-valued         |               |
++-----------------+---------------+------------------------+---------------+
+| dual_inf_tol    | OT_DOUBLE     | Dual feasibility       | casadi::Qrqp  |
+|                 |               | violation tolerance    |               |
+|                 |               | [1e-8]                 |               |
++-----------------+---------------+------------------------+---------------+
+| max_iter        | OT_INT        | Maximum number of      | casadi::Qrqp  |
+|                 |               | iterations [1000].     |               |
++-----------------+---------------+------------------------+---------------+
+| min_lam         | OT_DOUBLE     | Smallest multiplier    | casadi::Qrqp  |
+|                 |               | treated as inactive    |               |
+|                 |               | for the initial active |               |
+|                 |               | set [0].               |               |
++-----------------+---------------+------------------------+---------------+
+| print_header    | OT_BOOL       | Print header [true].   | casadi::Qrqp  |
++-----------------+---------------+------------------------+---------------+
+| print_info      | OT_BOOL       | Print info [true].     | casadi::Qrqp  |
++-----------------+---------------+------------------------+---------------+
+| print_iter      | OT_BOOL       | Print iterations       | casadi::Qrqp  |
+|                 |               | [true].                |               |
++-----------------+---------------+------------------------+---------------+
+| print_problem   | OT_BOOL       | Print a numeric        | casadi::Conic |
+|                 |               | description of the     |               |
+|                 |               | problem                |               |
++-----------------+---------------+------------------------+---------------+
 
 Diagrams
 --------
@@ -62100,6 +62103,10 @@ Joris Gillis
 
 ";
 
+%feature("docstring") casadi::casadi_qp_du "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_mtimes "
 
 [INTERNAL]  Sparse matrix-matrix multiplication: z <- z + x*y.
@@ -62357,7 +62364,7 @@ slices.
 
 ";
 
-%feature("docstring") casadi::casadi_qp_du "
+%feature("docstring") casadi::casadi_qp_setup "
 
 [INTERNAL] ";
 
@@ -63341,25 +63348,25 @@ Solve QPs using an active-set method
 
 >List of available options
 
-+--------------+-----------+-----------------------------------------------+
-|      Id      |   Type    |                  Description                  |
-+==============+===========+===============================================+
-| du_to_pr     | OT_DOUBLE | How much larger dual than primal error is     |
-|              |           | acceptable [1000]                             |
-+--------------+-----------+-----------------------------------------------+
-| max_iter     | OT_INT    | Maximum number of iterations [1000].          |
-+--------------+-----------+-----------------------------------------------+
-| min_lam      | OT_DOUBLE | Smallest multiplier treated as inactive for   |
-|              |           | the initial active set [0].                   |
-+--------------+-----------+-----------------------------------------------+
-| print_header | OT_BOOL   | Print header [true].                          |
-+--------------+-----------+-----------------------------------------------+
-| print_info   | OT_BOOL   | Print info [true].                            |
-+--------------+-----------+-----------------------------------------------+
-| print_iter   | OT_BOOL   | Print iterations [true].                      |
-+--------------+-----------+-----------------------------------------------+
-| tol          | OT_DOUBLE | Tolerance [1e-8].                             |
-+--------------+-----------+-----------------------------------------------+
++-----------------+-----------+--------------------------------------------+
+|       Id        |   Type    |                Description                 |
++=================+===========+============================================+
+| constr_viol_tol | OT_DOUBLE | Constraint violation tolerance [1e-8].     |
++-----------------+-----------+--------------------------------------------+
+| dual_inf_tol    | OT_DOUBLE | Dual feasibility violation tolerance       |
+|                 |           | [1e-8]                                     |
++-----------------+-----------+--------------------------------------------+
+| max_iter        | OT_INT    | Maximum number of iterations [1000].       |
++-----------------+-----------+--------------------------------------------+
+| min_lam         | OT_DOUBLE | Smallest multiplier treated as inactive    |
+|                 |           | for the initial active set [0].            |
++-----------------+-----------+--------------------------------------------+
+| print_header    | OT_BOOL   | Print header [true].                       |
++-----------------+-----------+--------------------------------------------+
+| print_info      | OT_BOOL   | Print info [true].                         |
++-----------------+-----------+--------------------------------------------+
+| print_iter      | OT_BOOL   | Print iterations [true].                   |
++-----------------+-----------+--------------------------------------------+
 
 --------------------------------------------------------------------------------
 
