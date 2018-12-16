@@ -62,9 +62,9 @@ namespace casadi {
       {"constr_viol_tol",
        {OT_DOUBLE,
         "Constraint violation tolerance [1e-8]."}},
-      {"du_to_pr",
+      {"dual_inf_tol",
        {OT_DOUBLE,
-        "How much larger dual than primal error is acceptable [1]"}},
+        "Dual feasibility violation tolerance [1e-8]"}},
       {"print_header",
        {OT_BOOL,
         "Print header [true]."}},
@@ -85,7 +85,6 @@ namespace casadi {
     Conic::init(opts);
 
     // Default options
-    p_.du_to_pr = 1.;
     print_iter_ = true;
     print_header_ = true;
     print_info_ = true;
@@ -96,8 +95,8 @@ namespace casadi {
         p_.max_iter = op.second;
       } else if (op.first=="constr_viol_tol") {
         p_.constr_viol_tol = op.second;
-      } else if (op.first=="du_to_pr") {
-        p_.du_to_pr = op.second;
+      } else if (op.first=="dual_inf_tol") {
+        p_.dual_inf_tol = op.second;
       } else if (op.first=="min_lam") {
         p_.min_lam = op.second;
       } else if (op.first=="print_iter") {
@@ -271,7 +270,7 @@ namespace casadi {
     g << "p.max_iter = " << p_.max_iter << ";\n";
     g << "p.min_lam = " << p_.min_lam << ";\n";
     g << "p.constr_viol_tol = " << p_.constr_viol_tol << ";\n";
-    g << "p.du_to_pr = " << p_.du_to_pr << ";\n";
+    g << "p.dual_inf_tol = " << p_.dual_inf_tol << ";\n";
 
     g << "d.prob = &p;\n";
     g << "d.nz_h = arg[" << CONIC_H << "];\n";
@@ -363,7 +362,7 @@ namespace casadi {
     s.unpack("Qrqp::max_iter", p_.max_iter);
     s.unpack("Qrqp::min_lam", p_.min_lam);
     s.unpack("Qrqp::constr_viol_tol", p_.constr_viol_tol);
-    s.unpack("Qrqp::du_to_pr", p_.du_to_pr);
+    s.unpack("Qrqp::dual_inf_tol", p_.dual_inf_tol);
   }
 
   void Qrqp::serialize_body(SerializingStream &s) const {
@@ -382,7 +381,7 @@ namespace casadi {
     s.pack("Qrqp::max_iter", p_.max_iter);
     s.pack("Qrqp::min_lam", p_.min_lam);
     s.pack("Qrqp::constr_viol_tol", p_.constr_viol_tol);
-    s.pack("Qrqp::du_to_pr", p_.du_to_pr);
+    s.pack("Qrqp::dual_inf_tol", p_.dual_inf_tol);
   }
 
 } // namespace casadi

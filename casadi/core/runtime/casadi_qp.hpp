@@ -22,8 +22,6 @@ struct casadi_qp_prob {
   T1 min_lam;
   // Maximum number of iterations
   casadi_int max_iter;
-  // Dual to primal error
-  T1 du_to_pr;
   // Primal and dual error tolerance
   T1 constr_viol_tol, dual_inf_tol;
 };
@@ -105,7 +103,7 @@ struct casadi_qp_data {
   T1 mina;
   casadi_int imina;
   // Primal and dual error, corresponding index
-  T1 pr, du, epr, edu, e;
+  T1 pr, du, epr, edu;
   casadi_int ipr, idu;
   // Pending active-set change
   casadi_int index, sign;
@@ -277,7 +275,7 @@ int casadi_qp_du_check(casadi_qp_data<T1>* d, casadi_int i) {
 
 // SYMBOL "qp_du_index"
 template<typename T1>
-void casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int skip) {
+void casadi_qp_du_index(casadi_qp_data<T1>* d) {
   // Try to improve dual feasibility by removing a constraint
   // Local variables
   casadi_int i, s;
@@ -287,8 +285,6 @@ void casadi_qp_du_index(casadi_qp_data<T1>* d, casadi_int skip) {
   d->index = -1;
   best_sens = -1;
   for (i = 0; i < p->nz; ++i) {
-    // Should the index be avoided?
-    if (i == skip) continue;
     // Skip if no dual infeasibility sensitivity
     if (d->sens[i] == 0.) continue;
     // Is the constraint enforced?
@@ -999,11 +995,9 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
   // Calculate primal and dual error
   casadi_qp_pr(d);
   casadi_qp_du(d);
-  // Total error (what we are trying to minimize)
-  d->e = fmax(d->pr, d->du / p->du_to_pr);
   // Acceptable primal and dual error
-  d->epr = fmax(d->pr, (0.5 / p->du_to_pr) * d->du);
-  d->edu = fmax(d->du, (0.5 * p->du_to_pr) * d->pr);
+  d->epr = fmax(d->pr, (0.5 * p->constr_viol_tol / p->dual_inf_tol) * d->du);
+  d->edu = fmax(d->du, (0.5 * p->dual_inf_tol / p->constr_viol_tol) * d->pr);
   // Sensitivity in decreasing |du|
   casadi_qp_calc_sens(d, d->idu);
 }
@@ -1028,7 +1022,7 @@ void casadi_qp_linesearch(casadi_qp_data<T1>* d) {
     // Sensititivity in decreasing du_index
     casadi_qp_calc_sens(d, du_index);
     // Find corresponding index
-    casadi_qp_du_index(d, -1);
+    casadi_qp_du_index(d);
   }
 }
 
@@ -1057,14 +1051,13 @@ void casadi_qp_flip(casadi_qp_data<T1>* d) {
     }
   }
   // If nonsingular and nonzero error, try to flip a constraint
-  if (!d->sing && d->e > 1e-14) {
-    // Improve primal feasibility if dominating
-    if (d->pr >= fmax(p->constr_viol_tol, p->du_to_pr * d->du)) {
-      if (d->index == -1) casadi_qp_pr_index(d);
-    }
-    // Improve dual feasibility if dominating
-    if (d->pr <= fmax(p->constr_viol_tol, p->du_to_pr * d->du)) {
-      if (d->index == -1) casadi_qp_du_index(d, d->ipr);
+  if (!d->sing && d->index == -1) {
+    if (d->pr * p->dual_inf_tol >= p->constr_viol_tol * d->du) {
+      // Improve primal feasibility if dominating
+      if (d->pr >= p->constr_viol_tol) casadi_qp_pr_index(d);
+    } else {
+      // Improve dual feasibility if dominating
+      if (d->du >= p->dual_inf_tol) casadi_qp_du_index(d);
     }
   }
   // No search direction given by default
