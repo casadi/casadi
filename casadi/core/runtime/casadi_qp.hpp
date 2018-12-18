@@ -667,9 +667,6 @@ void casadi_qp_take_step(casadi_qp_data<T1>* d) {
 // SYMBOL "qp_flip_check"
 template<typename T1>
 int casadi_qp_flip_check(casadi_qp_data<T1>* d) {
-  // Local variables
-  casadi_int i;
-  T1 best, test;
   const casadi_qp_prob<T1>* p = d->prob;
   // Calculate the difference between unenforced and enforced column index
   casadi_qp_kkt_vector(d, d->dlam, d->index);
@@ -775,7 +772,7 @@ int casadi_qp_du_direction(casadi_qp_data<T1>* d) {
 template<typename T1>
 int casadi_qp_enforceable(casadi_qp_data<T1>* d, casadi_int i, casadi_int s) {
   // Local variables
-  casadi_int k, s_mod;
+  casadi_int k;
   const casadi_int *at_colind, *at_row;
   const casadi_qp_prob<T1>* p = d->prob;
   // Can always enforce if not at bound
@@ -1006,7 +1003,6 @@ template<typename T1>
 void casadi_qp_linesearch(casadi_qp_data<T1>* d) {
   // Local variables
   casadi_int du_index;
-  const casadi_qp_prob<T1>* p = d->prob;
   // Start with a full step and no active set change
   d->sign = 0;
   d->index = -1;
