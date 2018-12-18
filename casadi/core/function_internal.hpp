@@ -800,6 +800,10 @@ namespace casadi {
     // Finite difference method
     std::string fd_method_;
 
+    // Print input/output
+    bool print_in_;
+    bool print_out_;
+
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;
 

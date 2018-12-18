@@ -99,6 +99,8 @@ namespace casadi {
     enable_reverse_ = true;
     enable_jacobian_ = true;
     enable_fd_ = false;
+    print_in_ = false;
+    print_out_ = false;
     sz_arg_tmp_ = 0;
     sz_res_tmp_ = 0;
     sz_iw_tmp_ = 0;
@@ -251,7 +253,13 @@ namespace casadi {
         "Options to be passed to the finite difference instance"}},
       {"fd_method",
        {OT_STRING,
-        "Method for finite differencing [default 'central']"}}
+        "Method for finite differencing [default 'central']"}},
+      {"print_in",
+       {OT_BOOL,
+        "Print numerical values of inputs [default: false]"}},
+      {"print_out",
+       {OT_BOOL,
+        "Print numerical values of outputs [default: false]"}}
      }
   };
 
@@ -317,6 +325,10 @@ namespace casadi {
         fd_options_ = op.second;
       } else if (op.first=="fd_method") {
         fd_method_ = op.second.to_string();
+      } else if (op.first=="print_in") {
+        print_in_ = op.second;
+      } else if (op.first=="print_out") {
+        print_out_ = op.second;
       }
     }
 
@@ -427,11 +439,37 @@ namespace casadi {
 
   int FunctionInternal::
   eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    if (eval_) {
-      return eval_(arg, res, iw, w, mem);
-    } else {
-      return eval(arg, res, iw, w, mem);
+    if (print_in_) {
+      uout() << "Function " << name_ << " (" << this << ")" << std::endl;
+      for (casadi_int i=0; i<n_in_; ++i) {
+        uout() << "Input " << i << " (" << name_in_[i] << "): ";
+        if (arg[i]) {
+          DM::print_dense(uout(), sparsity_in_[i], arg[i], false);
+          uout() << std::endl;
+        } else {
+          uout() << "NULL" << std::endl;
+        }
+      }
     }
+    int ret;
+    if (eval_) {
+      ret = eval_(arg, res, iw, w, mem);
+    } else {
+      ret = eval(arg, res, iw, w, mem);
+    }
+    if (print_out_) {
+      uout() << "Function " << name_ << " (" << this << ")" << std::endl;
+      for (casadi_int i=0; i<n_out_; ++i) {
+        uout() << "Output " << i << " (" << name_out_[i] << "): ";
+        if (res[i]) {
+          DM::print_dense(uout(), sparsity_out_[i], res[i], false);
+          uout() << std::endl;
+        } else {
+          uout() << "NULL" << std::endl;
+        }
+      }
+    }
+    return ret;
   }
 
   void FunctionInternal::print_dimensions(ostream &stream) const {
@@ -2931,6 +2969,8 @@ namespace casadi {
     s.pack("FunctionInternal::fd_step", fd_step_);
 
     s.pack("FunctionInternal::fd_method", fd_method_);
+    s.pack("FunctionInternal::print_in", print_in_);
+    s.pack("FunctionInternal::print_out", print_out_);
 
     s.pack("FunctionInternal::sz_arg_per", sz_arg_per_);
     s.pack("FunctionInternal::sz_res_per", sz_res_per_);
@@ -2977,6 +3017,8 @@ namespace casadi {
     s.unpack("FunctionInternal::fd_step", fd_step_);
 
     s.unpack("FunctionInternal::fd_method", fd_method_);
+    s.unpack("FunctionInternal::print_in", print_in_);
+    s.unpack("FunctionInternal::print_out", print_out_);
 
     s.unpack("FunctionInternal::sz_arg_per", sz_arg_per_);
     s.unpack("FunctionInternal::sz_res_per", sz_res_per_);
