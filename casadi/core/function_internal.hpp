@@ -810,6 +810,9 @@ namespace casadi {
     bool print_in_;
     bool print_out_;
 
+    // Forward/reverse options
+    Dict forward_options_, reverse_options_;
+
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;
 
