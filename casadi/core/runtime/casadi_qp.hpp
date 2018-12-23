@@ -826,7 +826,7 @@ int casadi_qp_singular_step(casadi_qp_data<T1>* d) {
     nk = casadi_qr_singular(static_cast<T1*>(0), 0, d->nz_r, p->sp_r, p->pc, 1e-12);
   }
   // Best flip
-  best_k = -1;
+  best_k = best_neg = -1;
   tau = p->inf;
   for (k=0; k<nk; ++k) {
     if (!d->has_search_dir) {
