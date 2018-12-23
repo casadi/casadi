@@ -61796,9 +61796,37 @@ Explicitly load a plugin dynamically.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::dense_mul_nt_stride "
+%feature("docstring") casadi::detect_simple_bounds "
 
-[INTERNAL] ";
+Detect simple bounds from general constraints
+
+Given parametric constraints:
+
+::
+
+  *   subject to lbg(p) <= g(x,p) <= ubg(p)
+  * 
+
+
+
+Returns an equivalent set
+
+::
+
+  *   subject to  lbg(p)(!is_simple) <= g(x,p)(!is_simple) <= ubg(p)(!is_simple)
+  *               lbx(p) <= x                 <= ubx(p)
+  * 
+
+
+
+Parameters:
+-----------
+
+lam_forward:  (lam_g,p)->(lam_sg,lam_x)
+
+lam_backward:  (lam_sg,lam_x,p)->(lam_g)
+
+";
 
 %feature("docstring") casadi::dense_mul_tn "
 
@@ -62150,9 +62178,64 @@ Number of NLP solver outputs.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::casadi_forward_diff "
+%feature("docstring") casadi::collocation_coeff "
 
-[INTERNAL] ";
+Obtain collocation interpolating matrices.
+
+A collocation method poses a polynomial Pi that interpolates exactly through
+an initial state (0,X_0) and helper states at collocation points
+(tau_j,Xc_j) with j=1..degree.
+
+This function computes the linear mapping between dPi/dt and coefficients
+Z=[X_0 Xc].
+
+Parameters:
+-----------
+
+tau:  location of collocation points (length: degree), as obtained from
+collocation_points
+
+C:  interpolating coefficients to obtain derivatives. Size: (degree+1)-by-
+degree
+
+You may find the slopes of Pi at the collocation points as
+
+::
+
+dPi/dt @ Xc = (1/h) Z*C,
+
+
+
+with h the length of the integration interval.
+
+Parameters:
+-----------
+
+D:  interpolating coefficients to obtain end state. Size: (degree+1)-by-1
+
+You may find the end point of Pi as
+
+::
+
+Pi @X_f = Z*D
+
+
+
+Parameters:
+-----------
+
+B:  quadrature coefficients Size: degree-by-1
+
+Given quadrature righ-hand-sides 'quad' evaluated at the collocation points,
+you may find the integrated quadratures as
+
+::
+
+q = quad*B*h
+
+
+
+";
 
 %feature("docstring") casadi::to_slice2 "
 
@@ -62276,9 +62359,9 @@ Generate native code in the interfaced language for debugging
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::nlpsol_options "
+%feature("docstring") casadi::integrator "
 
-Get all options for a plugin.
+";
 
 ";
 
@@ -62514,9 +62597,9 @@ Check if a particular plugin is available.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::integrator "
+%feature("docstring") casadi::nlpsol_options "
 
-";
+Get all options for a plugin.
 
 ";
 
@@ -64260,6 +64343,10 @@ Explicitly load a plugin dynamically.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::casadi_forward_diff "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::casadi_qp_kkt "
 
 [INTERNAL] ";
@@ -64474,6 +64561,10 @@ Get the number of QP solver inputs.
 Get the documentation string for a plugin.
 
 ";
+
+%feature("docstring") casadi::dense_mul_nt_stride "
+
+[INTERNAL] ";
 
 %feature("docstring") casadi::casadi_qp_log "
 
