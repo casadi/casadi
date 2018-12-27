@@ -185,12 +185,10 @@ namespace casadi {
     casadi_copy(arg[CONIC_LAM_A0], na_, d.lam+nx_);
     // Reset solver
     if (casadi_qp_reset(&d)) return 1;
-    // Return flag
-    int flag = 0;
     while (true) {
       // Prepare QP
       casadi_qp_prepare(&d);
-      // Print iteration progress:
+      // Print iteration progress
       if (print_iter_) {
         if (d.iter % 10 == 0) {
           print("%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %40s\n",
@@ -200,19 +198,13 @@ namespace casadi {
         print("%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %40s\n",
               d.iter, d.sing, d.f, d.pr, d.ipr, d.du, d.idu,
               d.mina, d.imina, d.tau, d.msg);
-        d.msg[0] = '\0';
       }
-      // Terminate iteration
+      // Terminate iteration?
       if (d.stop) break;
-      // Start a new iteration
-      d.iter++;
-      // Calculate search direction
-      if (casadi_qp_calc_step(&d)) {
-        d.status = QP_NO_SEARCH_DIR;
-        break;
-      }
-      // Line search in the calculated direction
-      casadi_qp_linesearch(&d);
+      // Make an iteration
+      casadi_qp_iterate(&d);
+      // Terminate iteration?
+      if (d.stop) break;
       // User interrupt
       InterruptHandler::check();
     }
@@ -224,11 +216,9 @@ namespace casadi {
       case QP_MAX_ITER:
         m->return_status = "Maximum number of iterations reached";
         m->unified_return_status = SOLVER_RET_LIMITED;
-        flag = 1;
         break;
       case QP_NO_SEARCH_DIR:
         m->return_status = "Failed to calculate search direction";
-        flag = 1;
         break;
     }
     // Get solution
@@ -238,10 +228,9 @@ namespace casadi {
     casadi_copy(d.lam+nx_, na_, res[CONIC_LAM_A]);
     // Return
     if (verbose_) casadi_warning(m->return_status);
-    m->success = flag == 0;
+    m->success = d.status == QP_SUCCESS;
     return 0;
   }
-
 
   void Qrqp::codegen_body(CodeGenerator& g) const {
     g.add_auxiliary(CodeGenerator::AUX_QP);

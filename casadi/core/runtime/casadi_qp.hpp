@@ -1111,3 +1111,20 @@ void casadi_qp_prepare(casadi_qp_data<T1>* d) {
     d->stop = 1;
   }
 }
+
+// SYMBOL "qp_iterate"
+template<typename T1>
+void casadi_qp_iterate(casadi_qp_data<T1>* d) {
+  // Reset message flag
+  d->msg[0] = '\0';
+  // Start a new iteration
+  d->iter++;
+  // Calculate search direction
+  if (casadi_qp_calc_step(d)) {
+    d->status = QP_NO_SEARCH_DIR;
+    d->stop = 1;
+    return;
+  }
+  // Line search in the calculated direction
+  casadi_qp_linesearch(d);
+}
