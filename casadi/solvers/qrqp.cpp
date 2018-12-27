@@ -252,6 +252,7 @@ namespace casadi {
 
   void Qrqp::codegen_body(CodeGenerator& g) const {
     g.add_auxiliary(CodeGenerator::AUX_QP);
+    if (print_iter_) g.add_auxiliary(CodeGenerator::AUX_PRINTF);
     g.local("d", "struct casadi_qp_data");
     g.local("p", "struct casadi_qp_prob");
 
@@ -311,20 +312,44 @@ namespace casadi {
     g << "casadi_qp_factorize(&d);\n";
 
     g.comment("Termination message");
-    g << "  if (d.iter >= p.max_iter) {\n";
-    g << "    flag = 1;\n";
-    g << "  }\n";
+    g << "if (!d.sing && d.index == -1) {\n";
+    if (g.verbose_runtime) g << "casadi_qp_log(&d, \"QP converged\");\n";
+    g << "} else if (d.iter >= p.max_iter) {\n";
+    if (g.verbose_runtime) g << "casadi_qp_log(&d, \"QP terminated: max iter\");\n";
+    g << "flag = 1;\n";
+    g << "}\n";
 
-    g.comment("Terminate loop?");
-    g << "  if (d.index == -1 || flag != 0) break;\n";
+    g.comment("Print iteration progress");
+    if (print_iter_) {
+      g << "if (d.iter % 10 == 0) {\n";
+      g << g.printf("%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %40s\\n",
+              {"\"Iter\"", "\"Sing\"", "\"fk\"", "\"|pr|\"", "\"con\"", "\"|du|\"", "\"var\"",
+              "\"min_R\"", "\"con\"", "\"last_tau\"", "\"Note\""}) << "\n";
+      g << "}\n";
+      g << g.printf("%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %40s\\n",
+              {"d.iter", "d.sing", "d.f", "d.pr", "d.ipr", "d.du", "d.idu",
+              "d.mina", "d.imina", "d.tau", "d.msg"}) << "\n";
+      g << "d.msg[0] = '\\0';\n";
+    }
+
+    g.comment("Terminate with error");
+    g << "if (flag != 0) break;\n";
+    g.comment("Check if converged and nonsingular");
+    g << "if (!d.sing) {\n";
+      g.comment("No active set change could be found");
+      g << "if (d.index == -1) break;\n";
+      g.comment("No primal or dual error");
+      g << "if (d.ipr < 0 && d.idu < 0) break;\n";
+    g << "}\n";
 
     g.comment("Start a new iteration");
-    g << "  d.iter++;\n";
-    g.comment("Start a new iteration");
-    // Calculate search direction
-    g << "  if (casadi_qp_calc_step(&d)) {\n";
-    g << "    flag = 1;\n";
-    g << "    break;\n";
+    g << "d.iter++;\n";
+    g.comment("Calculate search direction");
+    g << "if (casadi_qp_calc_step(&d)) {\n";
+    if (print_iter_)
+      g << g.printf("QP terminated: No search direction\\n") << "\n";
+    g << "flag = 1;\n";
+    g << "break;\n";
     g << "}\n";
 
     g.comment("Line search in the calculated direction");
