@@ -188,22 +188,8 @@ namespace casadi {
     // Return flag
     int flag = 0;
     while (true) {
-      // Calculate dependent quantities
-      casadi_qp_calc_dependent(&d);
-      // Make an active set change
-      casadi_qp_flip(&d);
-      // Form and factorize the KKT system
-      casadi_qp_factorize(&d);
-      // Termination message
-      if (!d.sing && d.index == -1) {
-        casadi_qp_log(&d, "QP converged");
-        m->return_status = "success";
-      } else if (d.iter >= p_.max_iter) {
-        casadi_qp_log(&d, "QP terminated: max iter");
-        m->return_status = "Maximum number of iterations reached";
-        m->unified_return_status = SOLVER_RET_LIMITED;
-        flag = 1;
-      }
+      // Prepare QP
+      casadi_qp_prepare(&d);
       // Print iteration progress:
       if (print_iter_) {
         if (d.iter % 10 == 0) {
@@ -216,27 +202,34 @@ namespace casadi {
               d.mina, d.imina, d.tau, d.msg);
         d.msg[0] = '\0';
       }
-      // Terminate with error
-      if (flag != 0) break;
-      // Check if converged and nonsingular
-      if (!d.sing) {
-        // No active set change could be found
-        if (d.index == -1) break;
-        // No primal or dual error
-        if (d.ipr < 0 && d.idu < 0) break;
-      }
+      // Terminate iteration
+      if (d.stop) break;
       // Start a new iteration
       d.iter++;
       // Calculate search direction
       if (casadi_qp_calc_step(&d)) {
-        if (print_iter_) print("QP terminated: No search direction\n");
-        m->return_status = "Failed to calculate search direction";
-        flag = 1;
+        d.status = QP_NO_SEARCH_DIR;
         break;
       }
       // Line search in the calculated direction
       casadi_qp_linesearch(&d);
+      // User interrupt
       InterruptHandler::check();
+    }
+    // Check return flag
+    switch (d.status) {
+      case QP_SUCCESS:
+        m->return_status = "success";
+        break;
+      case QP_MAX_ITER:
+        m->return_status = "Maximum number of iterations reached";
+        m->unified_return_status = SOLVER_RET_LIMITED;
+        flag = 1;
+        break;
+      case QP_NO_SEARCH_DIR:
+        m->return_status = "Failed to calculate search direction";
+        flag = 1;
+        break;
     }
     // Get solution
     casadi_copy(&d.f, 1, res[CONIC_COST]);

@@ -78,11 +78,22 @@ void casadi_qp_work(const casadi_qp_prob<T1>* p, casadi_int* sz_iw, casadi_int* 
   *sz_w += p->nz; // beta
 }
 
+// SYMBOL "qp_flag_t"
+typedef enum {
+  QP_SUCCESS,
+  QP_MAX_ITER,
+  QP_NO_SEARCH_DIR
+} casadi_qp_flag_t;
+
 // SYMBOL "qp_data"
 template<typename T1>
 struct casadi_qp_data {
   // Problem structure
   const casadi_qp_prob<T1>* prob;
+  // Solver status
+  casadi_qp_flag_t status;
+  // Stop iterating
+  int stop;
   // Cost
   T1 f;
   // QP data
@@ -156,6 +167,8 @@ int casadi_qp_reset(casadi_qp_data<T1>* d) {
   // Local variables
   casadi_int i;
   const casadi_qp_prob<T1>* p = d->prob;
+  // New QP
+  d->stop = 0;
   // Reset variables corresponding to previous iteration
   d->msg[0] = '\0';
   d->tau = 0.;
@@ -1000,6 +1013,7 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
   casadi_qp_calc_sens(d, d->idu);
 }
 
+// SYMBOL "qp_linesearch"
 template<typename T1>
 void casadi_qp_linesearch(casadi_qp_data<T1>* d) {
   // Local variables
@@ -1023,6 +1037,7 @@ void casadi_qp_linesearch(casadi_qp_data<T1>* d) {
   }
 }
 
+// SYMBOL "qp_flip"
 template<typename T1>
 void casadi_qp_flip(casadi_qp_data<T1>* d) {
   // Local variables
@@ -1067,5 +1082,32 @@ void casadi_qp_flip(casadi_qp_data<T1>* d) {
     d->lam[d->index] = d->sign==0 ? 0 : d->sign > 0 ? p->dmin : -p->dmin;
     // Recalculate primal and dual infeasibility
     casadi_qp_calc_dependent(d);
+  }
+}
+
+// SYMBOL "qp_prepare"
+template<typename T1>
+void casadi_qp_prepare(casadi_qp_data<T1>* d) {
+  // Local variables
+  const casadi_qp_prob<T1>* p = d->prob;
+  // Calculate dependent quantities
+  casadi_qp_calc_dependent(d);
+  // Make an active set change
+  casadi_qp_flip(d);
+  // Form and factorize the KKT system
+  casadi_qp_factorize(d);
+  // Termination message
+  if (!d->sing && d->index == -1) {
+    casadi_qp_log(d, "Converged");
+    d->status = QP_SUCCESS;
+    d->stop = 1;
+  } else if (d->iter >= p->max_iter) {
+    casadi_qp_log(d, "Max iter");
+    d->status = QP_MAX_ITER;
+    d->stop = 1;
+  } else if (!d->sing && d->ipr < 0 && d->idu < 0) {
+    casadi_qp_log(d, "No primal or dual error");
+    d->status = QP_SUCCESS;
+    d->stop = 1;
   }
 }
