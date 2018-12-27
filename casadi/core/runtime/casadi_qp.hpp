@@ -92,8 +92,6 @@ struct casadi_qp_data {
   const casadi_qp_prob<T1>* prob;
   // Solver status
   casadi_qp_flag_t status;
-  // Stop iterating
-  int stop;
   // Cost
   T1 f;
   // QP data
@@ -167,8 +165,6 @@ int casadi_qp_reset(casadi_qp_data<T1>* d) {
   // Local variables
   casadi_int i;
   const casadi_qp_prob<T1>* p = d->prob;
-  // New QP
-  d->stop = 0;
   // Reset variables corresponding to previous iteration
   d->msg[0] = '\0';
   d->tau = 0.;
@@ -1087,7 +1083,7 @@ void casadi_qp_flip(casadi_qp_data<T1>* d) {
 
 // SYMBOL "qp_prepare"
 template<typename T1>
-void casadi_qp_prepare(casadi_qp_data<T1>* d) {
+int casadi_qp_prepare(casadi_qp_data<T1>* d) {
   // Local variables
   const casadi_qp_prob<T1>* p = d->prob;
   // Calculate dependent quantities
@@ -1100,21 +1096,24 @@ void casadi_qp_prepare(casadi_qp_data<T1>* d) {
   if (!d->sing && d->index == -1) {
     casadi_qp_log(d, "Converged");
     d->status = QP_SUCCESS;
-    d->stop = 1;
+    return 1;
   } else if (d->iter >= p->max_iter) {
     casadi_qp_log(d, "Max iter");
     d->status = QP_MAX_ITER;
-    d->stop = 1;
+    return 1;
   } else if (!d->sing && d->ipr < 0 && d->idu < 0) {
     casadi_qp_log(d, "No primal or dual error");
     d->status = QP_SUCCESS;
-    d->stop = 1;
+    return 1;
+  } else {
+    // Keep iterating
+    return 0;
   }
 }
 
 // SYMBOL "qp_iterate"
 template<typename T1>
-void casadi_qp_iterate(casadi_qp_data<T1>* d) {
+int casadi_qp_iterate(casadi_qp_data<T1>* d) {
   // Reset message flag
   d->msg[0] = '\0';
   // Start a new iteration
@@ -1122,9 +1121,10 @@ void casadi_qp_iterate(casadi_qp_data<T1>* d) {
   // Calculate search direction
   if (casadi_qp_calc_step(d)) {
     d->status = QP_NO_SEARCH_DIR;
-    d->stop = 1;
-    return;
+    return 1;
   }
   // Line search in the calculated direction
   casadi_qp_linesearch(d);
+  // Keep iterating
+  return 0;
 }

@@ -187,7 +187,7 @@ namespace casadi {
     if (casadi_qp_reset(&d)) return 1;
     while (true) {
       // Prepare QP
-      casadi_qp_prepare(&d);
+      int flag = casadi_qp_prepare(&d);
       // Print iteration progress
       if (print_iter_) {
         if (d.iter % 10 == 0) {
@@ -200,11 +200,9 @@ namespace casadi {
               d.mina, d.imina, d.tau, d.msg);
       }
       // Terminate iteration?
-      if (d.stop) break;
+      if (flag) break;
       // Make an iteration
-      casadi_qp_iterate(&d);
-      // Terminate iteration?
-      if (d.stop) break;
+      if (casadi_qp_iterate(&d)) break;
       // User interrupt
       InterruptHandler::check();
     }
