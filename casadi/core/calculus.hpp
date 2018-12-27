@@ -256,6 +256,10 @@ namespace casadi {
   inline double copysign(double x, double y) { return y>=0 ? fabs(x) : -fabs(x);}
   #endif //HAS_COPYSIGN
 
+  // Integer maximum and minimum
+  inline casadi_int casadi_max(casadi_int x, casadi_int y) { return std::max(x, y);}
+  inline casadi_int casadi_min(casadi_int x, casadi_int y) { return std::min(x, y);}
+
   /// Conditional assignment
   inline double if_else_zero(double x, double y) { return x==0 ? 0 : y;}
   inline double if_else(double x, double y, double z) { return x==0 ? z : y;}

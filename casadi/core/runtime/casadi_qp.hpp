@@ -4,7 +4,6 @@
 // C-REPLACE "fmax" "casadi_fmax"
 // C-REPLACE "std::numeric_limits<T1>::min()" "casadi_real_min"
 // C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
-// C-REPLACE "std::max" "casadi_max"
 
 // SYMBOL "qp_prob"
 template<typename T1>
@@ -55,9 +54,9 @@ void casadi_qp_work(const casadi_qp_prob<T1>* p, casadi_int* sz_iw, casadi_int* 
   // Reset sz_w, sz_iw
   *sz_w = *sz_iw = 0;
   // Temporary work vectors
-  *sz_w = std::max(*sz_w, p->nz); // casadi_project, tau memory
-  *sz_iw = std::max(*sz_iw, p->nz); // casadi_trans, tau type, allzero
-  *sz_w = std::max(*sz_w, 2*p->nz); // casadi_qr
+  *sz_w = casadi_max(*sz_w, p->nz); // casadi_project, tau memory
+  *sz_iw = casadi_max(*sz_iw, p->nz); // casadi_trans, tau type, allzero
+  *sz_w = casadi_max(*sz_w, 2*p->nz); // casadi_qr
   // Persistent work vectors
   *sz_w += nnz_kkt; // kkt
   *sz_w += p->nz; // z=[xk,gk]
@@ -74,7 +73,7 @@ void casadi_qp_work(const casadi_qp_prob<T1>* p, casadi_int* sz_iw, casadi_int* 
   *sz_iw += p->nz; // neverupper
   *sz_iw += p->nz; // neverlower
   *sz_iw += p->nz; // lincomb
-  *sz_w += std::max(nnz_v+nnz_r, nnz_kkt); // [v,r] or trans(kkt)
+  *sz_w += casadi_max(nnz_v+nnz_r, nnz_kkt); // [v,r] or trans(kkt)
   *sz_w += p->nz; // beta
 }
 
@@ -144,7 +143,7 @@ void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int** iw, T1** w) {
   d->lam = *w; *w += p->nz;
   d->dz = *w; *w += p->nz;
   d->dlam = *w; *w += p->nz;
-  d->nz_v = *w; *w += std::max(nnz_v+nnz_r, nnz_kkt);
+  d->nz_v = *w; *w += casadi_max(nnz_v+nnz_r, nnz_kkt);
   d->nz_r = d->nz_v + nnz_v;
   d->beta = *w; *w += p->nz;
   d->nz_at = *w; *w += nnz_a;
@@ -1094,16 +1093,19 @@ int casadi_qp_prepare(casadi_qp_data<T1>* d) {
   casadi_qp_factorize(d);
   // Termination message
   if (!d->sing && d->index == -1) {
-    casadi_qp_log(d, "Converged");
     d->status = QP_SUCCESS;
+    // C-VERBOSE
+    casadi_qp_log(d, "Converged");
     return 1;
   } else if (d->iter >= p->max_iter) {
-    casadi_qp_log(d, "Max iter");
     d->status = QP_MAX_ITER;
+    // C-VERBOSE
+    casadi_qp_log(d, "Max iter");
     return 1;
   } else if (!d->sing && d->ipr < 0 && d->idu < 0) {
-    casadi_qp_log(d, "No primal or dual error");
     d->status = QP_SUCCESS;
+    // C-VERBOSE
+    casadi_qp_log(d, "No primal or dual error");
     return 1;
   } else {
     // Keep iterating

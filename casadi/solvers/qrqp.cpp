@@ -252,6 +252,7 @@ namespace casadi {
     g << "p.constr_viol_tol = " << p_.constr_viol_tol << ";\n";
     g << "p.dual_inf_tol = " << p_.dual_inf_tol << ";\n";
 
+    // Setup data structure
     g << "d.prob = &p;\n";
     g << "d.nz_h = arg[" << CONIC_H << "];\n";
     g << "d.g = arg[" << CONIC_G << "];\n";
@@ -271,44 +272,11 @@ namespace casadi {
     g.copy_default("arg[" + str(CONIC_LAM_X0)+ "]", nx_, "d.lam", "0", false);
     g.copy_default("arg[" + str(CONIC_LAM_A0)+ "]", na_, "d.lam+" + str(nx_), "0", false);
 
-    g.comment("Reset solver");
+    g.comment("Solve QP");
     g << "if (casadi_qp_reset(&d)) return 1;\n";
-
-    g.local("flag", "int");
-    g << "flag = 0;\n";
-
-    g.comment("QP iterations");
-
     g << "while (1) {\n";
-
-    g.comment("Calculate dependent quantities");
-    g << "casadi_qp_calc_dependent(&d);\n";
-
-    g.comment("Make an active set change");
-    g << "casadi_qp_flip(&d);\n";
-
-    g.comment("Form and factorize the KKT system");
-    g << "casadi_qp_factorize(&d);\n";
-
-    g.comment("Termination message");
-    g << "  if (d.iter >= p.max_iter) {\n";
-    g << "    flag = 1;\n";
-    g << "  }\n";
-
-    g.comment("Terminate loop?");
-    g << "  if (d.index == -1 || flag != 0) break;\n";
-
-    g.comment("Start a new iteration");
-    g << "  d.iter++;\n";
-    g.comment("Start a new iteration");
-    // Calculate search direction
-    g << "  if (casadi_qp_calc_step(&d)) {\n";
-    g << "    flag = 1;\n";
-    g << "    break;\n";
-    g << "}\n";
-
-    g.comment("Line search in the calculated direction");
-    g << "  casadi_qp_linesearch(&d);\n";
+    g << "if (casadi_qp_prepare(&d)) break;\n";
+    g << "if (casadi_qp_iterate(&d)) break;\n";
     g << "}\n";
 
     g.comment("Get solution");
@@ -317,7 +285,7 @@ namespace casadi {
     g.copy_check("d.lam", nx_, "res[" + str(CONIC_LAM_X) + "]", false, true);
     g.copy_check("d.lam+"+str(nx_), na_, "res[" + str(CONIC_LAM_A) + "]", false, true);
 
-    g << "return flag;\n";
+    g << "return d.status != QP_SUCCESS;\n";
   }
 
   Dict Qrqp::get_stats(void* mem) const {
