@@ -4,6 +4,7 @@
 // C-REPLACE "fmax" "casadi_fmax"
 // C-REPLACE "std::numeric_limits<T1>::min()" "casadi_real_min"
 // C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
+// C-REPLACE "std::max" "casadi_max"
 
 // SYMBOL "qp_prob"
 template<typename T1>
