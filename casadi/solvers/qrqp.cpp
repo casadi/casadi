@@ -286,11 +286,11 @@ namespace casadi {
       // Print header
       g << "if (d.iter % 10 == 0) {\n";
       g << "if (casadi_qp_print_header(&d, buf, sizeof(buf))) break;\n";
-      g << g.printf("%120s\\n", "buf") << "\n";
+      g << g.printf("%s\\n", "buf") << "\n";
       g << "}\n";
       // Print iteration
       g << "if (casadi_qp_print_iteration(&d, buf, sizeof(buf))) break;\n";
-      g << g.printf("%120s\\n", "buf") << "\n";
+      g << g.printf("%s\\n", "buf") << "\n";
     }
     g << "if (flag || casadi_qp_iterate(&d)) break;\n";
     g << "}\n";

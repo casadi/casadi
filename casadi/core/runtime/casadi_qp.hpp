@@ -102,7 +102,9 @@ struct casadi_qp_data {
   // Numeric QR factorization
   T1 *nz_at, *nz_kkt, *beta, *nz_v, *nz_r;
   // Message buffer
-  char msg[40];
+  const char *msg;
+  // Message index
+  casadi_int msg_ind;
   // Stepsize
   T1 tau;
   // Singularity
@@ -166,7 +168,7 @@ int casadi_qp_reset(casadi_qp_data<T1>* d) {
   casadi_int i;
   const casadi_qp_prob<T1>* p = d->prob;
   // Reset variables corresponding to previous iteration
-  d->msg[0] = '\0';
+  d->msg = 0;
   d->tau = 0.;
   d->sing = 0;
   // Correct lam if needed, determine permitted signs
@@ -239,27 +241,6 @@ void casadi_qp_du(casadi_qp_data<T1>* d) {
   }
 }
 
-// C-VERBOSE
-// SYMBOL "qp_log"
-// C-VERBOSE
-template<typename T1>
-// C-VERBOSE
-void casadi_qp_log(casadi_qp_data<T1>* d, const char* fmt, ...) {
-// C-VERBOSE
-  if (d->verbose) {
-// C-VERBOSE
-    va_list args;
-// C-VERBOSE
-    va_start(args, fmt);
-// C-VERBOSE
-    vsnprintf(d->msg, sizeof(d->msg), fmt, args);
-// C-VERBOSE
-    va_end(args);
-// C-VERBOSE
-  }
-// C-VERBOSE
-}
-
 // SYMBOL "qp_du_check"
 template<typename T1>
 int casadi_qp_du_check(casadi_qp_data<T1>* d, casadi_int i) {
@@ -323,18 +304,15 @@ void casadi_qp_du_index(casadi_qp_data<T1>* d) {
   // Accept, if any
   if (d->index >= 0) {
     if (d->sign > 0) {
-      // C-VERBOSE
-      casadi_qp_log(d, "Enforced ubz[%lld] to reduce |du|", d->index);
+      d->msg = "Enforced ubz to reduce |du|";
     } else if (d->sign < 0) {
-      // C-VERBOSE
-      casadi_qp_log(d, "Enforced lbz[%lld] to reduce |du|", d->index);
+      d->msg = "Enforced lbz to reduce |du|";
     } else if (d->lam[d->index] > 0) {
-      // C-VERBOSE
-      casadi_qp_log(d, "Dropped ubz[%lld] to reduce |du|", d->index);
+      d->msg = "Dropped ubz to reduce |du|";
     } else {
-      // C-VERBOSE
-      casadi_qp_log(d, "Dropped lbz[%lld] to reduce |du|", d->index);
+      d->msg = "Dropped lbz to reduce |du|";
     }
+    d->msg_ind = d->index;
   }
 }
 
@@ -346,13 +324,12 @@ void casadi_qp_pr_index(casadi_qp_data<T1>* d) {
     // Add the most violating constraint
     if (d->z[d->ipr] < d->lbz[d->ipr]) {
       d->sign = -1;
-      // C-VERBOSE
-      casadi_qp_log(d, "Added lbz[%lld] to reduce |pr|", d->ipr);
+      d->msg = "Added lbz to reduce |pr|";
     } else {
       d->sign = 1;
-      // C-VERBOSE
-      casadi_qp_log(d, "Added ubz[%lld] to reduce |pr|", d->ipr);
+      d->msg = "Added ubz to reduce |pr|";
     }
+    d->msg_ind = d->ipr;
     d->index = d->ipr;
   } else {
     // No improvement possible
@@ -485,14 +462,14 @@ int casadi_qp_zero_blocking(casadi_qp_data<T1>* d) {
       dz_max = -d->dz[i];
       d->index = i;
       d->sign = -1;
-      // C-VERBOSE
-      casadi_qp_log(d, "lbz[%lld] violated with zero step", d->index);
+      d->msg = "lbz violated with zero step";
+      d->msg_ind = d->index;
     } else if (d->dz[i] > dz_max && d->z[i] - d->ubz[i] >= d->epr) {
       dz_max = d->dz[i];
       d->index = i;
       d->sign = 1;
-      // C-VERBOSE
-      casadi_qp_log(d, "ubz[%lld] violated with zero step", d->index);
+      d->msg = "ubz violated with zero step";
+      d->msg_ind = d->index;
     }
   }
   return dz_max > 0;
@@ -520,15 +497,15 @@ void casadi_qp_primal_blocking(casadi_qp_data<T1>* d) {
       d->tau = (d->lbz[i] - d->epr - d->z[i]) / d->dz[i];
       d->index = d->lam[i] < 0. ? -1 : i;
       d->sign = -1;
-      // C-VERBOSE
-      casadi_qp_log(d, "Enforcing lbz[%lld]", i);
+      d->msg = "Enforcing lbz";
+      d->msg_ind = i;
     } else if (d->dz[i] > 0 && trial_z > d->ubz[i] + d->epr) {
       // Trial would increase maximum infeasibility
       d->tau = (d->ubz[i] + d->epr - d->z[i]) / d->dz[i];
       d->index = d->lam[i] > 0. ? -1 : i;
       d->sign = 1;
-      // C-VERBOSE
-      casadi_qp_log(d, "Enforcing ubz[%lld]", i);
+      d->msg = "Enforcing ubz";
+      d->msg_ind = i;
     }
     if (d->tau <= 0) return;
   }
@@ -1044,18 +1021,15 @@ void casadi_qp_flip(casadi_qp_data<T1>* d) {
       d->index = d->r_index;
       d->sign = d->r_sign;
       if (d->sign > 0) {
-        // C-VERBOSE
-        casadi_qp_log(d, "Enforced ubz[%lld] for regularity", d->index);
+        d->msg = "Enforced ubz for regularity";
       } else if (d->sign < 0) {
-        // C-VERBOSE
-        casadi_qp_log(d, "Enforced lbz[%lld] for regularity", d->index);
+        d->msg = "Enforced lbz for regularity";
       } else if (d->lam[d->index] > 0) {
-        // C-VERBOSE
-        casadi_qp_log(d, "Dropped ubz[%lld] for regularity", d->index);
+        d->msg = "Dropped ubz for regularity";
       } else {
-        // C-VERBOSE
-        casadi_qp_log(d, "Dropped lbz[%lld] for regularity", d->index);
+        d->msg = "Dropped lbz for regularity";
       }
+      d->msg_ind = d->index;
     }
   }
   // If nonsingular and nonzero error, try to flip a constraint
@@ -1095,18 +1069,18 @@ int casadi_qp_prepare(casadi_qp_data<T1>* d) {
   // Termination message
   if (!d->sing && d->index == -1) {
     d->status = QP_SUCCESS;
-    // C-VERBOSE
-    casadi_qp_log(d, "Converged");
+    d->msg = "Converged";
+    d->msg_ind = -2;
     return 1;
   } else if (d->iter >= p->max_iter) {
     d->status = QP_MAX_ITER;
-    // C-VERBOSE
-    casadi_qp_log(d, "Max iter");
+    d->msg = "Max iter";
+    d->msg_ind = -2;
     return 1;
   } else if (!d->sing && d->ipr < 0 && d->idu < 0) {
     d->status = QP_SUCCESS;
-    // C-VERBOSE
-    casadi_qp_log(d, "No primal or dual error");
+    d->msg = "No primal or dual error";
+    d->msg_ind = -2;
     return 1;
   } else {
     // Keep iterating
@@ -1118,7 +1092,7 @@ int casadi_qp_prepare(casadi_qp_data<T1>* d) {
 template<typename T1>
 int casadi_qp_iterate(casadi_qp_data<T1>* d) {
   // Reset message flag
-  d->msg[0] = '\0';
+  d->msg = 0;
   // Start a new iteration
   d->iter++;
   // Calculate search direction
@@ -1140,7 +1114,7 @@ template<typename T1>
 int casadi_qp_print_header(casadi_qp_data<T1>* d, char* buf, size_t buf_sz) {
   int flag;
   // Print to string
-  flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %40s",
+  flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s  %4s",
           "Iter", "Sing", "fk", "|pr|", "con", "|du|", "var",
           "min_R", "con", "last_tau", "Note");
   // Check if error
@@ -1158,7 +1132,7 @@ int casadi_qp_print_iteration(casadi_qp_data<T1>* d, char* buf, int buf_sz) {
   int flag;
   // Print iteration data without note to string
   flag = snprintf(buf, buf_sz,
-    "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g",
+    "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g  ",
     (int)d->iter, (int)d->sing, d->f, d->pr, (int)d->ipr, d->du, (int)d->idu,
     d->mina, (int)d->imina, d->tau);
   // Check if error
@@ -1169,12 +1143,18 @@ int casadi_qp_print_iteration(casadi_qp_data<T1>* d, char* buf, int buf_sz) {
   // Rest of buffer reserved for iteration note
   buf += flag;
   buf_sz -= flag;
-  // Print iteration note
-  flag = snprintf(buf, buf_sz, " %40s", d->msg);
-  // Check if error
-  if (flag < 0) {
-    d->status = QP_PRINTING_ERROR;
-    return 1;
+  // Print iteration note, if any
+  if (d->msg) {
+    if (d->msg_ind > -2) {
+      flag = snprintf(buf, buf_sz, "%s, i=%d", d->msg, (int)d->msg_ind);
+    } else {
+      flag = snprintf(buf, buf_sz, "%s", d->msg);
+    }
+    // Check if error
+    if (flag < 0) {
+      d->status = QP_PRINTING_ERROR;
+      return 1;
+    }
   }
   // Successful return
   return 0;
