@@ -62155,6 +62155,10 @@ Get the number of integrator outputs.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::casadi_qp_prepare "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::external "
 
 Load a just-in-time compiled external function File name given.
@@ -62310,6 +62314,10 @@ Check if the vector is strictly increasing.
 [INTERNAL] ";
 
 %feature("docstring") casadi::dense_copy_stride "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::casadi_qp_iterate "
 
 [INTERNAL] ";
 

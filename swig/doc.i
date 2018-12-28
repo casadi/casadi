@@ -77409,6 +77409,10 @@ casadi_int K, const double *a, double *t, double *z, double *dwork, double
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_qp_prepare(casadi_qp_data< T1 > *d) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::external(const std::string &name, const Dict
 &opts=Dict()) "
 
@@ -77582,6 +77586,10 @@ casadi_int n, casadi_int alpha) "
 
 %feature("docstring")  casadi::dense_copy_stride(casadi_int n, casadi_int m,
 const double *A, double *B, casadi_int strideA, casadi_int strideB) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_qp_iterate(casadi_qp_data< T1 > *d) "
 
 [INTERNAL] ";
 
