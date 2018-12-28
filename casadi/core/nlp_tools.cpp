@@ -153,7 +153,7 @@ void detect_simple_bounds(const SX& x, const SX& p,
     SX lam_x_backward = SX::sym("lam_x", nx);
 
 
-    SX lam_sg_forward = lam_g_forward(sgi);
+    SX lam_sg_forward = lam_g_forward(sgi); // NOLINT(cppcoreguidelines-slicing)
     SX lam_x_forward = SX::zeros(nx, 1);
     SX lam_g_backward = SX::zeros(ng, 1);
     lam_g_backward(nsgi) = lam_sg_backward;
@@ -175,14 +175,14 @@ void detect_simple_bounds(const SX& x, const SX& p,
 
     // Compute lam_x from lam_g
     for (casadi_int i=0;i<n_groups;++i) {
-      SX l = lam_sg_forward(sgsi_groups[i]);
+      SX l = lam_sg_forward(sgsi_groups[i]); // NOLINT(cppcoreguidelines-slicing)
       SX lt = (l<0);
       SX gt = !lt;
       lam_x_forward(sxi_groups[i]) += l*(lt*lcomp[i]+gt*ucomp[i]);
     }
 
     // Compute lam_g from lam_x
-    SX l = lam_x_backward(sxi_ref);
+    SX l = lam_x_backward(sxi_ref); // NOLINT(cppcoreguidelines-slicing)
     SX lt = (l<0);
     SX gt = !lt;
     SX lam_xl = l*lt/count_lb(sxi_ref);
@@ -194,7 +194,7 @@ void detect_simple_bounds(const SX& x, const SX& p,
 
     // Construct Functions for mappings
     lam_forward = Function("lam_forward",
-      {lam_g_forward, p}, {lam_g_forward(nsgi), lam_x_forward},
+      {lam_g_forward, p}, {lam_g_forward(nsgi), lam_x_forward},// NOLINT(cppcoreguidelines-slicing)
       {"lam_g", "p"}, {"lam_sg", "lam_x"});
     casadi_assert_dev(!lam_forward.has_free());
     lam_backward = Function("lam_backward",
