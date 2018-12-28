@@ -166,7 +166,7 @@ namespace casadi {
     // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
     // Message buffer
-    char buf[40];
+    char buf[121];
     // Setup data structure
     casadi_qp_data<double> d;
     d.prob = &p_;
@@ -195,11 +195,11 @@ namespace casadi {
         if (d.iter % 10 == 0) {
           // Print header
           if (casadi_qp_print_header(&d, buf, sizeof(buf))) break;
-          uout() << buf;
+          uout() << buf << "\n";
         }
-        print("%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %40s\n",
-              d.iter, d.sing, d.f, d.pr, d.ipr, d.du, d.idu,
-              d.mina, d.imina, d.tau, d.msg);
+        // Print iteration
+        if (casadi_qp_print_iteration(&d, buf, sizeof(buf))) break;
+        uout() << buf << "\n";
       }
       // Terminate iteration?
       if (flag) break;

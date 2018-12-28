@@ -1137,7 +1137,7 @@ template<typename T1>
 int casadi_qp_print_header(casadi_qp_data<T1>* d, char* buf, size_t buf_sz) {
   int flag;
   // Print to string
-  flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %40s\n",
+  flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %40s",
           "Iter", "Sing", "fk", "|pr|", "con", "|du|", "var",
           "min_R", "con", "last_tau", "Note");
   // Check if error
@@ -1152,5 +1152,27 @@ int casadi_qp_print_header(casadi_qp_data<T1>* d, char* buf, size_t buf_sz) {
 // SYMBOL "qp_print_iteration"
 template<typename T1>
 int casadi_qp_print_iteration(casadi_qp_data<T1>* d, char* buf, int buf_sz) {
+  int flag;
+  // Print iteration data without note to string
+  flag = snprintf(buf, buf_sz,
+    "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g",
+    (int)d->iter, (int)d->sing, d->f, d->pr, (int)d->ipr, d->du, (int)d->idu,
+    d->mina, (int)d->imina, d->tau);
+  // Check if error
+  if (flag < 0) {
+    d->status = QP_PRINTING_ERROR;
+    return 1;
+  }
+  // Rest of buffer reserved for iteration note
+  buf += flag;
+  buf_sz -= flag;
+  // Print iteration note
+  flag = snprintf(buf, buf_sz, " %40s", d->msg);
+  // Check if error
+  if (flag < 0) {
+    d->status = QP_PRINTING_ERROR;
+    return 1;
+  }
+  // Successful return
   return 0;
 }
