@@ -201,10 +201,8 @@ namespace casadi {
         if (casadi_qp_print_iteration(&d, buf, sizeof(buf))) break;
         uout() << buf << "\n";
       }
-      // Terminate iteration?
-      if (flag) break;
       // Make an iteration
-      if (casadi_qp_iterate(&d)) break;
+      if (flag || casadi_qp_iterate(&d)) break;
       // User interrupt
       InterruptHandler::check();
     }
@@ -240,6 +238,7 @@ namespace casadi {
     if (print_iter_) g.add_auxiliary(CodeGenerator::AUX_PRINTF);
     g.local("d", "struct casadi_qp_data");
     g.local("p", "struct casadi_qp_prob");
+    g.local("flag", "int");
 
     // Setup memory structure
     g << "p.sp_a = " << g.sparsity(A_) << ";\n";
@@ -281,7 +280,7 @@ namespace casadi {
     g.comment("Solve QP");
     g << "if (casadi_qp_reset(&d)) return 1;\n";
     g << "while (1) {\n";
-    g << "if (casadi_qp_prepare(&d)) break;\n";
+    g << "flag = casadi_qp_prepare(&d);\n";
     if (print_iter_) {
       g << "if (d.iter % 10 == 0) {\n";
       g << g.printf("%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %40s\\n",
@@ -292,7 +291,7 @@ namespace casadi {
               {"(int)d.iter", "(int)d.sing", "d.f", "d.pr", "(int)d.ipr", "d.du", "(int)d.idu",
               "d.mina", "(int)d.imina", "d.tau", "d.msg"}) << "\n";
     }
-    g << "if (casadi_qp_iterate(&d)) break;\n";
+    g << "if (flag || casadi_qp_iterate(&d)) break;\n";
     g << "}\n";
 
     g.comment("Get solution");
