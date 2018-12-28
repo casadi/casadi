@@ -1132,6 +1132,9 @@ int casadi_qp_iterate(casadi_qp_data<T1>* d) {
   return 0;
 }
 
+// The following routines require stdio
+#ifndef CASADI_PRINTF
+
 // SYMBOL "qp_print_header"
 template<typename T1>
 int casadi_qp_print_header(casadi_qp_data<T1>* d, char* buf, size_t buf_sz) {
@@ -1176,3 +1179,5 @@ int casadi_qp_print_iteration(casadi_qp_data<T1>* d, char* buf, int buf_sz) {
   // Successful return
   return 0;
 }
+
+#endif  // CASADI_PRINTF

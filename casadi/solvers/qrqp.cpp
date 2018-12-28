@@ -239,6 +239,7 @@ namespace casadi {
     g.local("d", "struct casadi_qp_data");
     g.local("p", "struct casadi_qp_prob");
     g.local("flag", "int");
+    g.local("buf[121]", "char");
 
     // Setup memory structure
     g << "p.sp_a = " << g.sparsity(A_) << ";\n";
@@ -282,14 +283,14 @@ namespace casadi {
     g << "while (1) {\n";
     g << "flag = casadi_qp_prepare(&d);\n";
     if (print_iter_) {
+      // Print header
       g << "if (d.iter % 10 == 0) {\n";
-      g << g.printf("%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %40s\\n",
-              {"\"Iter\"", "\"Sing\"", "\"fk\"", "\"|pr|\"", "\"con\"", "\"|du|\"", "\"var\"",
-              "\"min_R\"", "\"con\"", "\"last_tau\"", "\"Note\""}) << "\n";
+      g << "if (casadi_qp_print_header(&d, buf, sizeof(buf))) break;\n";
+      g << g.printf("%120s\\n", "buf") << "\n";
       g << "}\n";
-      g << g.printf("%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %40s\\n",
-              {"(int)d.iter", "(int)d.sing", "d.f", "d.pr", "(int)d.ipr", "d.du", "(int)d.idu",
-              "d.mina", "(int)d.imina", "d.tau", "d.msg"}) << "\n";
+      // Print iteration
+      g << "if (casadi_qp_print_iteration(&d, buf, sizeof(buf))) break;\n";
+      g << g.printf("%120s\\n", "buf") << "\n";
     }
     g << "if (flag || casadi_qp_iterate(&d)) break;\n";
     g << "}\n";
