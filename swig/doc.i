@@ -77413,6 +77413,11 @@ casadi_int K, const double *a, double *t, double *z, double *dwork, double
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_qp_print_header(casadi_qp_data< T1 >
+*d, char *buf, size_t buf_sz) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::external(const std::string &name, const Dict
 &opts=Dict()) "
 
@@ -78668,6 +78673,11 @@ Check if a particular plugin is available.
 
 %feature("docstring")  casadi::casadi_bound_consistency(casadi_int n, T1 *x,
 T1 *lam, const T1 *lbx, const T1 *ubx) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::dense_mul_nn2(casadi_int n, casadi_int m,
+casadi_int l, const double *A, const double *B, double *C) "
 
 [INTERNAL] ";
 
@@ -80342,11 +80352,6 @@ Joel Andersson
 
 ";
 
-%feature("docstring")  casadi::casadi_bfgs(const casadi_int *sp_h, T1 *h,
-const T1 *dx, const T1 *glag, const T1 *glag_old, T1 *w) "
-
-[INTERNAL] ";
-
 %feature("docstring")  casadi::rootfinder_in() "
 
 Get rootfinder input scheme.
@@ -81090,8 +81095,8 @@ strideA, casadi_int strideB, casadi_int strideC) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::casadi_qp_log(casadi_qp_data< T1 > *d, const
-char *fmt,...) "
+%feature("docstring")  casadi::casadi_bfgs(const casadi_int *sp_h, T1 *h,
+const T1 *dx, const T1 *glag, const T1 *glag_old, T1 *w) "
 
 [INTERNAL] ";
 
@@ -81112,8 +81117,8 @@ m, const double *A, double *B, casadi_int strideA, casadi_int strideB) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::dense_mul_nn2(casadi_int n, casadi_int m,
-casadi_int l, const double *A, const double *B, double *C) "
+%feature("docstring")  casadi::casadi_qp_print_iteration(casadi_qp_data< T1
+> *d, char *buf, int buf_sz) "
 
 [INTERNAL] ";
 

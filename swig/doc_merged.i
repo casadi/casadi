@@ -62159,6 +62159,10 @@ Get the number of integrator outputs.
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::casadi_qp_print_header "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::external "
 
 Load a just-in-time compiled external function File name given.
@@ -62598,6 +62602,10 @@ Check if a particular plugin is available.
 ";
 
 %feature("docstring") casadi::casadi_bound_consistency "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::dense_mul_nn2 "
 
 [INTERNAL] ";
 
@@ -64209,10 +64217,6 @@ Joel Andersson
 
 ";
 
-%feature("docstring") casadi::casadi_bfgs "
-
-[INTERNAL] ";
-
 %feature("docstring") casadi::rootfinder_in "
 
 Get rootfinder input scheme name by index.
@@ -64574,7 +64578,7 @@ Get the documentation string for a plugin.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::casadi_qp_log "
+%feature("docstring") casadi::casadi_bfgs "
 
 [INTERNAL] ";
 
@@ -64595,7 +64599,7 @@ Get DPLE input scheme name by index.
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::dense_mul_nn2 "
+%feature("docstring") casadi::casadi_qp_print_iteration "
 
 [INTERNAL] ";
 
