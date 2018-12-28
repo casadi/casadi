@@ -173,7 +173,6 @@ namespace casadi {
     d.nz_h = arg[CONIC_H];
     d.g = arg[CONIC_G];
     d.nz_a = arg[CONIC_A];
-    d.verbose = print_info_ ? 1 : 0;
     casadi_qp_init(&d, &iw, &w);
     // Pass bounds on z
     casadi_copy(arg[CONIC_LBX], nx_, d.lbz);
@@ -263,7 +262,6 @@ namespace casadi {
     g << "d.nz_h = arg[" << CONIC_H << "];\n";
     g << "d.g = arg[" << CONIC_G << "];\n";
     g << "d.nz_a = arg[" << CONIC_A << "];\n";
-    g << "d.verbose = " << (print_info_ ? 1 : 0) << ";\n";
     g << "casadi_qp_init(&d, &iw, &w);\n";
 
     g.comment("Pass bounds on z");
