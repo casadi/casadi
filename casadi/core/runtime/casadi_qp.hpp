@@ -81,7 +81,8 @@ void casadi_qp_work(const casadi_qp_prob<T1>* p, casadi_int* sz_iw, casadi_int* 
 typedef enum {
   QP_SUCCESS,
   QP_MAX_ITER,
-  QP_NO_SEARCH_DIR
+  QP_NO_SEARCH_DIR,
+  QP_PRINTING_ERROR
 } casadi_qp_flag_t;
 
 // SYMBOL "qp_data"
@@ -1128,5 +1129,28 @@ int casadi_qp_iterate(casadi_qp_data<T1>* d) {
   // Line search in the calculated direction
   casadi_qp_linesearch(d);
   // Keep iterating
+  return 0;
+}
+
+// SYMBOL "qp_print_header"
+template<typename T1>
+int casadi_qp_print_header(casadi_qp_data<T1>* d, char* buf, size_t buf_sz) {
+  int flag;
+  // Print to string
+  flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %40s\n",
+          "Iter", "Sing", "fk", "|pr|", "con", "|du|", "var",
+          "min_R", "con", "last_tau", "Note");
+  // Check if error
+  if (flag < 0) {
+    d->status = QP_PRINTING_ERROR;
+    return 1;
+  }
+  // Successful return
+  return 0;
+}
+
+// SYMBOL "qp_print_iteration"
+template<typename T1>
+int casadi_qp_print_iteration(casadi_qp_data<T1>* d, char* buf, int buf_sz) {
   return 0;
 }

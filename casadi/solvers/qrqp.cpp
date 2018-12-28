@@ -165,6 +165,8 @@ namespace casadi {
     auto m = static_cast<QrqpMemory*>(mem);
     // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
+    // Message buffer
+    char buf[40];
     // Setup data structure
     casadi_qp_data<double> d;
     d.prob = &p_;
@@ -191,9 +193,9 @@ namespace casadi {
       // Print iteration progress
       if (print_iter_) {
         if (d.iter % 10 == 0) {
-          print("%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %40s\n",
-                "Iter", "Sing", "fk", "|pr|", "con", "|du|", "var",
-                "min_R", "con", "last_tau", "Note");
+          // Print header
+          if (casadi_qp_print_header(&d, buf, sizeof(buf))) break;
+          uout() << buf;
         }
         print("%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %40s\n",
               d.iter, d.sing, d.f, d.pr, d.ipr, d.du, d.idu,
@@ -217,6 +219,9 @@ namespace casadi {
         break;
       case QP_NO_SEARCH_DIR:
         m->return_status = "Failed to calculate search direction";
+        break;
+      case QP_PRINTING_ERROR:
+        m->return_status = "Printing error";
         break;
     }
     // Get solution
