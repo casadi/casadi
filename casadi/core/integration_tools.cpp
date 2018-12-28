@@ -284,7 +284,7 @@ namespace casadi {
       B_[j] = ip(1.0);
     }
     C = DM(C_);
-    C = C(Slice(), Slice(1, deg+1));
+    C = C(Slice(), Slice(1, deg+1)); // NOLINT(cppcoreguidelines-slicing)
     D = DM(D_);
     B = DM(std::vector<double>(B_.begin()+1, B_.end()));
   }
