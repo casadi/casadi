@@ -890,15 +890,17 @@ namespace casadi {
                         << "{ return c!=0 ? x : y;}\n\n";
       break;
     case AUX_PRINTF:
+      this->auxiliaries << "#ifndef CASADI_PRINTF\n";
       if (this->mex) {
         this->auxiliaries << "#ifdef MATLAB_MEX_FILE\n"
                           << "  #define CASADI_PRINTF mexPrintf\n"
                           << "#else\n"
                           << "  #define CASADI_PRINTF printf\n"
-                          << "#endif\n\n";
+                          << "#endif\n";
       } else {
-        this->auxiliaries << "#define CASADI_PRINTF printf\n\n";
+        this->auxiliaries << "#define CASADI_PRINTF printf\n";
       }
+      this->auxiliaries << "#endif\n\n";
       break;
     case AUX_FMIN:
       shorthand("fmin");

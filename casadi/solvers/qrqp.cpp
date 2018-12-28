@@ -232,6 +232,7 @@ namespace casadi {
 
   void Qrqp::codegen_body(CodeGenerator& g) const {
     g.add_auxiliary(CodeGenerator::AUX_QP);
+    if (print_iter_) g.add_auxiliary(CodeGenerator::AUX_PRINTF);
     g.local("d", "struct casadi_qp_data");
     g.local("p", "struct casadi_qp_prob");
 
@@ -276,6 +277,16 @@ namespace casadi {
     g << "if (casadi_qp_reset(&d)) return 1;\n";
     g << "while (1) {\n";
     g << "if (casadi_qp_prepare(&d)) break;\n";
+    if (print_iter_) {
+      g << "if (d.iter % 10 == 0) {\n";
+      g << g.printf("%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %40s\\n",
+              {"\"Iter\"", "\"Sing\"", "\"fk\"", "\"|pr|\"", "\"con\"", "\"|du|\"", "\"var\"",
+              "\"min_R\"", "\"con\"", "\"last_tau\"", "\"Note\""}) << "\n";
+      g << "}\n";
+      g << g.printf("%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %40s\\n",
+              {"(int)d.iter", "(int)d.sing", "d.f", "d.pr", "(int)d.ipr", "d.du", "(int)d.idu",
+              "d.mina", "(int)d.imina", "d.tau", "d.msg"}) << "\n";
+    }
     g << "if (casadi_qp_iterate(&d)) break;\n";
     g << "}\n";
 
