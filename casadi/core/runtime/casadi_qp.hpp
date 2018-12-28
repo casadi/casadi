@@ -123,8 +123,6 @@ struct casadi_qp_data {
   casadi_int r_index, r_sign;
   // Iteration
   casadi_int iter;
-  // Verbose
-  int verbose;
 };
 // C-REPLACE "casadi_qp_data<T1>" "struct casadi_qp_data"
 
