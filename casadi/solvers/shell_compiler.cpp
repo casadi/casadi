@@ -209,7 +209,7 @@ namespace casadi {
     cccmd << " " + compiler_output_flag << obj_name_;
 
     // Compile into an object
-    if (verbose_) uout() << "calling \"" << cccmd.str() + "\"" << std::endl;
+    if (verbose_) casadi_message("calling \"" + cccmd.str() + "\"");
     if (system(cccmd.str().c_str())) {
       casadi_error("Compilation failed. Tried \"" + cccmd.str() + "\"");
     }
@@ -226,7 +226,7 @@ namespace casadi {
     ldcmd << " " << obj_name_ << " " + linker_output_flag + bin_name_;
 
     // Compile into a shared library
-    if (verbose_) uout() << "calling \"" << ldcmd.str() << "\"" << std::endl;
+    if (verbose_) casadi_message("calling \"" + ldcmd.str() + "\"");
     if (system(ldcmd.str().c_str())) {
       casadi_error("Linking failed. Tried \"" + ldcmd.str() + "\"");
     }
