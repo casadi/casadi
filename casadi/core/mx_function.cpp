@@ -719,6 +719,13 @@ namespace casadi {
         }
       }
 
+      if (!enable_forward_) {
+        // Do the non-inlining call from FunctionInternal
+        // NOLINTNEXTLINE(bugprone-parent-virtual-call)
+        FunctionInternal::call_forward(in_, out_, fseed, fsens, false, false);
+        return;
+      }
+
       // Work vector, forward derivatives
       std::vector<std::vector<MX> > dwork(workloc_.size()-1);
       fill(dwork.begin(), dwork.end(), std::vector<MX>(nfwd));
@@ -870,6 +877,25 @@ namespace casadi {
           }
           return;
         }
+      }
+
+      if (!enable_reverse_) {
+        vector<vector<MX> > v;
+        // Do the non-inlining call from FunctionInternal
+        // NOLINTNEXTLINE(bugprone-parent-virtual-call)
+        FunctionInternal::call_reverse(in_, out_, aseed, v, false, false);
+        for (casadi_int i=0; i<v.size(); ++i) {
+          for (casadi_int j=0; j<v[i].size(); ++j) {
+            if (!v[i][j].is_empty()) { // TODO(@jaeandersson): Hack
+              if (asens[i][j].is_empty()) {
+                asens[i][j] = v[i][j];
+              } else {
+                asens[i][j] += v[i][j];
+              }
+            }
+          }
+        }
+        return;
       }
 
       // Split up aseed analogous to symbolic primitives
