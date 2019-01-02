@@ -70,6 +70,53 @@ namespace casadi {
       Function& SWIG_OUTPUT(lam_backward));
 */
 
+
+  /** \brief Check sos structure and generate defaults
+   */
+  template <class T>
+  void check_sos(casadi_int nx, const std::vector< std::vector<T> >& groups,
+                  std::vector< std::vector<double> >& weights,
+                  std::vector< casadi_int >& types) {
+    // Checks on presence
+    if (groups.empty()) {
+      casadi_assert(weights.empty(), "Missing sos_groups.");
+      casadi_assert(types.empty(),   "Missing sos_groups.");
+    }
+
+    // Checks on dimensions
+    casadi_int sos_num = groups.size();
+
+    casadi_assert(weights.empty() || weights.size()==sos_num,
+      "sos_weights has incorrect size");
+
+    // Set default types
+    if (!groups.empty() && types.empty())
+      types.resize(sos_num, 1);
+
+    // Set default weights
+    if (weights.empty()) {
+      for (const auto& e : groups) {
+        std::vector<double> w(e.size());
+        for (casadi_int i=0;i<w.size();++i) w[i] = i;
+        weights.push_back(w);
+      }
+    }
+
+    casadi_assert(types.size()==sos_num,
+      "sos_types has incorrect size");
+
+    // Group-wise dimension check
+    for (casadi_int i=0;i<weights.size();++i) {
+      casadi_assert(weights[i].size()==groups[i].size(),
+        "Dimension mismatch in weights for group " + str(i) + ": "
+        "Expected " + str(groups[i].size()) + ", got " + str(weights[i].size()));
+    }
+
+    // Checks on contents
+    for (casadi_int t : types) casadi_assert(t==1 || t==2, "SOS type must be either 1 or 2.");
+    for (const auto& v : groups) casadi_assert(in_range(v, 0, nx), "Index out of bound");
+  }
+
 } // namespace casadi
 
 #endif // CASADI_NLP_TOOLS_HPP

@@ -36,23 +36,22 @@ if has_nlpsol("ipopt"):
                    "hessian_constant":"yes",
                    "tol":1e-12,
                    "print_level":0}
-  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False, "codegen": False}))
+  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
 if has_nlpsol("worhp"):
   worhp_options = {"TolOpti":1e-13}
-  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True, "dual": False, "soc": False, "codegen": False}))
-
+  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True, "dual": False, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
 if has_conic("ooqp"):
-  conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False, "codegen": False}))
+  conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
 
 if has_conic("qpoases"):
-  conics.append(("qpoases",{"printLevel":"low"},{"quadratic": True, "dual": True, "soc": False, "codegen": False}))
+  conics.append(("qpoases",{"printLevel":"low"},{"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete": False, "sos":False}))
 
 
-if has_conic("cplex"):
-  conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True, "codegen": False}))
+if 1 or has_conic("cplex"):
+  conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True, "codegen": False, "discrete": True, "sos": True}))
 
 
 # No solution for licensing on travis
@@ -64,16 +63,134 @@ if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
 #   conics.append(("sqic",{},{}))
 
 if has_conic("clp"):
-  conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False}))
+  conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
 if has_conic("qrqp"):
-  conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": True}))
+  conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": True, "discrete": False, "sos":False}))
 
 
 print(conics)
 
 
 class ConicTests(casadiTestCase):
+
+  def test_sos(self):
+    
+    H = DM(4,4)
+    G = DM([-1,-2,-3,-1])
+    A = DM([[-1,1,1,10],[1,-3,1,0],[0,1,0,-3.5]])
+    LBA = DM([-inf,-inf,0])
+    UBA = DM([20,30,0])
+    discrete = [False,True,True,True]
+    LBX = DM([0,0,0,2])
+    UBX = DM([40,inf,inf,3])
+
+
+    sos_groups = [[2,3]]
+    sos_weights = [[25.0,18.0]]
+
+    for conic, qp_options, aux_options in conics:
+      if not aux_options["discrete"]: continue
+
+
+      options = dict(qp_options)
+      options["discrete"] = discrete
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},options)
+
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
+
+      solver_out = solver(**solver_in)
+
+      self.checkarray(solver_out["x"],DM([29, 7, 22, 2]))
+
+      if not aux_options["sos"]: continue
+
+      options["sos_groups"] = sos_groups
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},options)
+      solver_out = solver(**solver_in)
+
+      self.checkarray(solver_out["x"],DM([40, 7, 0, 2]))
+
+      options["sos_weights"] = sos_weights
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},options)
+      solver_out = solver(**solver_in)
+
+      self.checkarray(solver_out["x"],DM([40, 7, 0, 2]))
+      print(solver_out["cost"])
+
+  def test_milp(self):
+    # From https://www.cs.upc.edu/~erodri/webpage/cps/theory/lp/milp/slides.pdf
+    H = DM(2,2)
+    G = DM([-1,-1])
+    A =  DM([[-2,2],[-8,10]])
+
+    LBA = DM([1,-inf])
+    UBA = DM([inf,13])
+
+    LBX = DM([0]*2)
+    UBX = DM([inf]*2)
+
+    discrete = [True,True]
+
+    for conic, qp_options, aux_options in conics:
+      if not aux_options["discrete"]: continue
+      
+      options = dict(qp_options)
+      options["discrete"] = discrete
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},options)
+
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
+
+      solver_out = solver(**solver_in)
+
+      self.checkarray(solver_out["x"],DM([1,2]))
+      self.checkarray(solver_out["cost"],DM([-3]))
+
+    H = DM(3,3)
+    G = DM([-1,-1,-5])
+    A =  DM([[-2,2,0],[-8,10,0],[0,0,7]])
+
+    LBA = DM([1,-inf,-4.0*7])
+    UBA = DM([inf,13,4.0*7])
+
+    LBX = DM([0]*2+[-5])
+    UBX = DM([inf]*2+[5])
+
+    discrete = [True,True,False]
+
+    for conic, qp_options, aux_options in conics:
+      if not aux_options["discrete"]: continue
+      
+      options = dict(qp_options)
+      options["discrete"] = discrete
+      solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},options)
+
+      solver_in = {}
+      solver_in["h"]=H
+      solver_in["g"]=G
+      solver_in["a"]=A
+      solver_in["lbx"]=LBX
+      solver_in["ubx"]=UBX
+      solver_in["lba"]=LBA
+      solver_in["uba"]=UBA
+
+      solver_out = solver(**solver_in)
+      self.checkarray(solver_out["x"],DM([1,2,4]))
+      self.checkarray(solver_out["cost"],DM([-23]))
 
   def test_general_unconstrained(self):
     H = sparsify(DM([[1,0],[0,1]]))

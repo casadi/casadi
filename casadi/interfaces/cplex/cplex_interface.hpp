@@ -178,6 +178,12 @@ namespace casadi {
     /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeserializingStream& s) { return new CplexInterface(s); }
 
+    // SOS structure
+    std::vector< double > sos_weights_;
+    std::vector<casadi_int> sos_beg_;
+    std::vector<int> sos_ind_;
+    std::vector<char> sos_types_;
+
   protected:
      /** \brief Deserializing constructor */
     explicit CplexInterface(DeserializingStream& s);

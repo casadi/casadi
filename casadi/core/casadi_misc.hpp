@@ -182,6 +182,23 @@ private:
                                                      casadi_int size);
   CASADI_EXPORT std::vector<casadi_int> lookupvector(const std::vector<casadi_int> &v);
 
+  /** \brief Flatten a nested std::vector tot a single flattened vector
+   * 
+   * Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]
+   */
+  template<class T, class S>
+  void flatten_nested_vector(const std::vector< std::vector<T> >& nested,
+                            std::vector<S>& flat);
+
+  /** \brief Flatten a nested std::vector tot a single flattened vector
+   * 
+   * Contents of nested[i] ends up in flat[indices[i]]..flat[indices[i+1]-1]
+   */
+  template<class T, class S, class I>
+  void flatten_nested_vector(const std::vector< std::vector<T> >& nested,
+                            std::vector<S>& flat,
+                            std::vector<I>& indices);
+
   /// \cond INTERNAL
 #ifndef SWIG
   /**
@@ -515,6 +532,41 @@ namespace casadi {
     if (max >= upper) return false;
     casadi_int min = *std::min_element(v.begin(), v.end());
     return (min >= lower);
+  }
+
+  template<class T, class S>
+  void flatten_nested_vector(const std::vector< std::vector<T> >& nested,
+                             std::vector<S>& flat) {
+    // Count total elements in nested
+    casadi_int N = 0;
+    for (const auto& e : nested) {
+      N += e.size();
+    }
+
+    // Populate flat, one nested section at a time
+    flat.clear();
+    flat.reserve(N);
+    for (const auto& e : nested) {
+      flat.insert(flat.end(), e.begin(), e.end());
+    }
+  }
+
+  template<class T, class S, class I>
+  void flatten_nested_vector(const std::vector< std::vector<T> >& nested,
+                             std::vector<S>& flat,
+                             std::vector<I>& indices) {
+    // Delegate
+    flatten_nested_vector(nested, flat);
+
+    // Build up indices
+    casadi_int N = nested.size();
+    indices.resize(1, 0);
+    indices.reserve(N+1);
+    casadi_int offset = 0;
+    for (const auto& e : nested) {
+      offset += e.size();
+      indices.push_back(offset);
+    }
   }
 
   template<typename T>

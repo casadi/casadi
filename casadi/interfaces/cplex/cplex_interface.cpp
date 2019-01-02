@@ -24,6 +24,7 @@
 
 #include "cplex_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
+#include "casadi/core/nlp_tools.hpp"
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
@@ -78,7 +79,16 @@ namespace casadi {
         "Detect redundant constraints."}},
       {"warm_start",
        {OT_BOOL,
-        "Use warm start with simplex methods (affects only the simplex methods)."}}
+        "Use warm start with simplex methods (affects only the simplex methods)."}},
+      {"sos_groups",
+       {OT_INTVECTORVECTOR,
+        "Definition of SOS groups by indices."}},
+      {"sos_weights",
+       {OT_DOUBLEVECTORVECTOR,
+        "Weights corresponding to SOS entries."}},
+      {"sos_types",
+       {OT_INTVECTOR,
+        "Specify 1 or 2 for each SOS group."}}
      }
   };
 
@@ -93,6 +103,10 @@ namespace casadi {
     tol_ = 1e-6;
     dep_check_ = 0;
     warm_start_ = false;
+
+    std::vector< std::vector<casadi_int> > sos_groups;
+    std::vector< std::vector<double> > sos_weights;
+    std::vector<casadi_int> sos_types;
 
     // Read options
     for (auto&& op : opts) {
@@ -110,8 +124,25 @@ namespace casadi {
         dep_check_ = op.second;
       } else if (op.first=="warm_start") {
         warm_start_ = op.second;
+      } else if (op.first=="sos_groups") {
+        sos_groups = op.second.to_int_vector_vector();
+      } else if (op.first=="sos_weights") {
+        sos_weights = op.second.to_double_vector_vector();
+      } else if (op.first=="sos_types") {
+        sos_types = op.second.to_int_vector();
       }
     }
+
+    // Validaty SOS constraints
+    check_sos(nx_, sos_groups, sos_weights, sos_types);
+
+    // Populate SOS structures
+    flatten_nested_vector(sos_groups, sos_ind_, sos_beg_);
+    if (!sos_weights.empty())
+      flatten_nested_vector(sos_weights, sos_weights_);
+
+    for (casadi_int type : sos_types)
+      sos_types_.push_back(type==1 ? '1' : '2');
 
     // Are we solving a mixed-integer problem?
     mip_ = !discrete_.empty()
@@ -400,6 +431,17 @@ namespace casadi {
       casadi_error("CPXXcopylp failed");
     }
 
+
+    // Add SOS constraints when applicable
+    if (!sos_ind_.empty()) {
+      if (CPXXaddsos(m->env, m->lp,
+          sos_beg_.size()-1, sos_ind_.size(),
+          get_ptr(sos_types_),
+          get_ptr(sos_beg_), get_ptr(sos_ind_), get_ptr(sos_weights_), nullptr)) {
+        casadi_error("CPXXaddsos failed");
+      }
+    }
+
     if (nnz_in(CONIC_H) > 0) {
       // Preparing coefficient matrix Q
       const CPXNNZ* qmatbeg = get_ptr(m->h_colind);
@@ -668,6 +710,10 @@ namespace casadi {
     s.unpack("CplexInterface::warm_start", warm_start_);
     s.unpack("CplexInterface::mip", mip_);
     s.unpack("CplexInterface::ctype", ctype_);
+    s.unpack("CplexInterface::sos_weights", sos_weights_);
+    s.unpack("CplexInterface::sos_beg", sos_beg_);
+    s.unpack("CplexInterface::sos_ind", sos_ind_);
+    s.unpack("CplexInterface::sos_types", sos_types_);
     Conic::deserialize(s, sdp_to_socp_mem_);
   }
 
@@ -683,6 +729,10 @@ namespace casadi {
     s.pack("CplexInterface::warm_start", warm_start_);
     s.pack("CplexInterface::mip", mip_);
     s.pack("CplexInterface::ctype", ctype_);
+    s.pack("CplexInterface::sos_weights", sos_weights_);
+    s.pack("CplexInterface::sos_beg", sos_beg_);
+    s.pack("CplexInterface::sos_ind", sos_ind_);
+    s.pack("CplexInterface::sos_types", sos_types_);
     Conic::serialize(s, sdp_to_socp_mem_);
   }
 
