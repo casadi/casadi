@@ -577,6 +577,32 @@ namespace casadi {
   }
 
 
+  Dict combine(const Dict& first, const Dict& second, bool recurse) {
+    if (first.empty()) return second;
+    if (second.empty()) return first;
+    Dict ret = second;
+    update_dict(ret, first, recurse);
+    return ret;
+  }
+
+  void update_dict(Dict& target, const Dict& source, bool recurse) {
+    for (auto&& e : source) {
+      if (recurse) {
+        auto it = target.find(e.first);
+        if (it!=target.end() && it->second.is_dict()) {
+          Dict local = it->second;
+          update_dict(local, e.second, recurse);
+          it->second = local;
+          continue;
+        }
+      }
+      target[e.first] = e.second;
+    }
+  }
+
+
+
+
   typedef GenericTypeInternal<OT_STRING, std::string> StringType;
   typedef GenericTypeInternal<OT_DOUBLE, double> DoubleType;
   typedef GenericTypeInternal<OT_INT, casadi_int> IntType;

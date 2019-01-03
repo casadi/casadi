@@ -219,6 +219,44 @@ namespace casadi {
   /// C++ equivalent of Python's dict or MATLAB's struct
   typedef GenericType::Dict Dict;
 
+#ifndef SWIG
+  template<class T>
+  T get_from_dict(const Dict& d, const std::string& key, const T& default_value) {
+    auto it = d.find(key);
+    if (it==d.end()) return default_value;
+    return it->second;
+  }
+
+  template<class T>
+  Dict extract_from_dict(const Dict& d, const std::string& key, T& value) {
+    Dict ret = d;
+    auto it = ret.find(key);
+    if (it!=ret.end()) {
+        value = it->second;
+        ret.erase(it);
+    }
+    return ret;
+  }
+
+  template<class T>
+  void extract_from_dict_inplace(Dict& d, const std::string& key, T& value) {
+    auto it = d.find(key);
+    if (it!=d.end()) {
+        value = it->second;
+        d.erase(it);
+    }
+  }
+
+  /** \brief Combine two dicts. First has priority 
+   * 
+   * 
+   */
+  CASADI_EXPORT Dict combine(const Dict& first, const Dict& second, bool recurse=false);
+
+  /** \brief Update the target dictorionary in place with source elements */
+  CASADI_EXPORT void update_dict(Dict& target, const Dict& source, bool recurse=false);
+#endif
+
 } // namespace casadi
 
 
