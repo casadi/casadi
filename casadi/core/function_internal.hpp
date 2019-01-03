@@ -83,6 +83,9 @@ namespace casadi {
     virtual const Options& get_options() const { return options_;}
     ///@}
 
+    /// Reconstruct options dict
+    virtual Dict generate_options(bool is_temp=false) const;
+
     /** \brief Initialize
         Initialize and make the object ready for setting arguments and evaluation.
         This method is typically called after setting options but before evaluating.
@@ -179,6 +182,9 @@ namespace casadi {
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
+
+    /// Reconstruct options dict
+    Dict generate_options(bool is_temp=false) const override;
 
     /** \brief Initialize */
     void init(const Dict& opts) override;
@@ -772,6 +778,7 @@ namespace casadi {
 
     // Types of derivative calculation permitted
     bool enable_forward_, enable_reverse_, enable_jacobian_, enable_fd_;
+    bool enable_forward_op_, enable_reverse_op_, enable_jacobian_op_, enable_fd_op_;
 
     /// Weighting factor for derivative calculation and sparsity pattern calculation
     double ad_weight_, ad_weight_sp_;

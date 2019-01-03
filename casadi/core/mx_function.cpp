@@ -64,6 +64,13 @@ namespace casadi {
      }
   };
 
+  Dict MXFunction::generate_options(bool is_temp) const {
+    Dict opts = FunctionInternal::generate_options(is_temp);
+    //opts["default_in"] = default_in_;
+    opts["live_variables"] = live_variables_;
+    return opts;
+  }
+
   MX MXFunction::instruction_MX(casadi_int k) const {
     return algorithm_.at(k).data;
   }
@@ -94,14 +101,14 @@ namespace casadi {
     if (verbose_) casadi_message(name_ + "::init");
 
     // Default (temporary) options
-    bool live_variables = true;
+    live_variables_ = true;
 
     // Read options
     for (auto&& op : opts) {
       if (op.first=="default_in") {
         default_in_ = op.second;
       } else if (op.first=="live_variables") {
-        live_variables = op.second;
+        live_variables_ = op.second;
       }
     }
 
@@ -243,7 +250,7 @@ namespace casadi {
             casadi_int remaining = --refcount[ch_ind];
 
             // Free variable for reuse
-            if (live_variables && remaining==0) {
+            if (live_variables_ && remaining==0) {
 
               // Get a pointer to the sparsity pattern of the argument that can be freed
               casadi_int nnz = nodes[ch_ind]->sparsity().nnz();
@@ -269,7 +276,7 @@ namespace casadi {
           if (e.res[c]>=0) {
 
             // Are reuse of variables (live variables) enabled?
-            if (live_variables) {
+            if (live_variables_) {
               // Get a pointer to the sparsity pattern node
               casadi_int nnz = e.data->sparsity(c).nnz();
 
@@ -292,7 +299,7 @@ namespace casadi {
     }
 
     if (verbose_) {
-      if (live_variables) {
+      if (live_variables_) {
         casadi_message("Using live variables: work array is " + str(worksize)
                        + " instead of " + str(nodes.size()));
       } else {
@@ -1656,7 +1663,7 @@ namespace casadi {
     s.pack("MXFunction::workloc", workloc_);
     s.pack("MXFunction::free_vars", free_vars_);
     s.pack("MXFunction::default_in", default_in_);
-
+    s.pack("MXFunction::live_variables", live_variables_);
 
     XFunction<MXFunction, MX, MXNode>::delayed_serialize_members(s);
   }
@@ -1678,6 +1685,7 @@ namespace casadi {
     s.unpack("MXFunction::workloc", workloc_);
     s.unpack("MXFunction::free_vars", free_vars_);
     s.unpack("MXFunction::default_in", default_in_);
+    s.unpack("MXFunction::live_variables", live_variables_);
 
     XFunction<MXFunction, MX, MXNode>::delayed_deserialize_members(s);
   }

@@ -83,10 +83,10 @@ namespace casadi {
     print_time_ = true;
     eval_ = nullptr;
     has_refcount_ = false;
-    enable_forward_ = true;
-    enable_reverse_ = true;
-    enable_jacobian_ = true;
-    enable_fd_ = false;
+    enable_forward_op_ = true;
+    enable_reverse_op_ = true;
+    enable_jacobian_op_ = true;
+    enable_fd_op_ = false;
     print_in_ = false;
     print_out_ = false;
     sz_arg_tmp_ = 0;
@@ -260,6 +260,37 @@ namespace casadi {
     }
   }
 
+  Dict ProtoFunction::generate_options(bool is_temp) const {
+    Dict opts;
+    opts["verbose"] = verbose_;
+    return opts;
+  }
+
+  Dict FunctionInternal::generate_options(bool is_temp) const {
+    Dict opts = ProtoFunction::generate_options(is_temp);
+    opts["jac_penalty"] = jac_penalty_;
+    opts["user_data"] = user_data_;
+    opts["inputs_check"] = inputs_check_;
+    if (!is_temp) opts["jit"] = jit_;
+    opts["jit_cleanup"] = jit_cleanup_;
+    opts["compiler"] = compilerplugin_;
+    opts["jit_options"] = jit_options_;
+    opts["derivative_of"] = derivative_of_;
+    opts["ad_weight"] = ad_weight_;
+    opts["ad_weight_sp"] = ad_weight_sp_;
+    opts["max_num_dir"] = max_num_dir_;
+    opts["print_time"] = print_time_;
+    opts["enable_forward"] = enable_forward_op_;
+    opts["enable_reverse"] = enable_reverse_op_;
+    opts["enable_jacobian"] = enable_jacobian_op_;
+    opts["enable_fd"] = enable_fd_op_;
+    opts["fd_options"] = fd_options_;
+    opts["fd_method"] = fd_method_;
+    opts["print_in"] = print_in_;
+    opts["print_out"] = print_out_;
+    return opts;
+  }
+
   void FunctionInternal::init(const Dict& opts) {
     // Call the initialization method of the base class
     ProtoFunction::init(opts);
@@ -302,13 +333,13 @@ namespace casadi {
       } else if (op.first=="print_time") {
         print_time_ = op.second;
       } else if (op.first=="enable_forward") {
-        enable_forward_ = op.second;
+        enable_forward_op_ = op.second;
       } else if (op.first=="enable_reverse") {
-        enable_reverse_ = op.second;
+        enable_reverse_op_ = op.second;
       } else if (op.first=="enable_jacobian") {
-        enable_jacobian_ = op.second;
+        enable_jacobian_op_ = op.second;
       } else if (op.first=="enable_fd") {
-        enable_fd_ = op.second;
+        enable_fd_op_ = op.second;
       } else if (op.first=="fd_options") {
         fd_options_ = op.second;
       } else if (op.first=="fd_method") {
@@ -377,10 +408,10 @@ namespace casadi {
     jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity(n_out_, n_in_));
 
     // Type of derivative calculations enabled
-    enable_forward_ = enable_forward_ && has_forward(1);
-    enable_reverse_ = enable_reverse_ && has_reverse(1);
-    enable_jacobian_ = enable_jacobian_ && has_jacobian();
-    enable_fd_ = enable_fd_ && !enable_forward_;
+    enable_forward_ = enable_forward_op_ && has_forward(1);
+    enable_reverse_ = enable_reverse_op_ && has_reverse(1);
+    enable_jacobian_ = enable_jacobian_op_ && has_jacobian();
+    enable_fd_ = enable_fd_op_ && !enable_forward_;
 
     alloc_arg(0);
     alloc_res(0);
@@ -2942,6 +2973,10 @@ namespace casadi {
     s.pack("FunctionInternal::enable_reverse", enable_reverse_);
     s.pack("FunctionInternal::enable_jacobian", enable_jacobian_);
     s.pack("FunctionInternal::enable_fd", enable_fd_);
+    s.pack("FunctionInternal::enable_forward_op", enable_forward_op_);
+    s.pack("FunctionInternal::enable_reverse_op", enable_reverse_op_);
+    s.pack("FunctionInternal::enable_jacobian_op", enable_jacobian_op_);
+    s.pack("FunctionInternal::enable_fd_op", enable_fd_op_);
 
     s.pack("FunctionInternal::ad_weight", ad_weight_);
     s.pack("FunctionInternal::ad_weight_sp", ad_weight_sp_);
@@ -2990,6 +3025,10 @@ namespace casadi {
     s.unpack("FunctionInternal::enable_reverse", enable_reverse_);
     s.unpack("FunctionInternal::enable_jacobian", enable_jacobian_);
     s.unpack("FunctionInternal::enable_fd", enable_fd_);
+    s.unpack("FunctionInternal::enable_forward_op", enable_forward_op_);
+    s.unpack("FunctionInternal::enable_reverse_op", enable_reverse_op_);
+    s.unpack("FunctionInternal::enable_jacobian_op", enable_jacobian_op_);
+    s.unpack("FunctionInternal::enable_fd_op", enable_fd_op_);
 
     s.unpack("FunctionInternal::ad_weight", ad_weight_);
     s.unpack("FunctionInternal::ad_weight_sp", ad_weight_sp_);

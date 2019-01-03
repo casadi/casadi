@@ -194,6 +194,9 @@ class CASADI_EXPORT SXFunction :
   const Options& get_options() const override { return options_;}
   ///@}
 
+  /// Reconstruct options dict
+  Dict generate_options(bool is_temp) const override;
+
   /** \brief  Initialize */
   void init(const Dict& opts) override;
 
@@ -231,6 +234,9 @@ class CASADI_EXPORT SXFunction :
 
   /// With just-in-time compilation for the sparsity propagation
   bool just_in_time_sparsity_;
+
+  /// Live variables?
+  bool live_variables_;
 
 protected:
   /** \brief Deserializing constructor */
