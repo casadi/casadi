@@ -405,8 +405,12 @@ namespace casadi {
         sparsity propagation */
     virtual double sp_weight() const;
 
+    ///@{
     /** \brief Get Jacobian sparsity */
-    virtual Sparsity get_jacobian_sparsity() const;
+    Sparsity jacobian_sparsity() const;
+    virtual bool has_jacobian_sparsity() const { return false;}
+    virtual Sparsity get_jacobian_sparsity() const { return Sparsity(); }
+    ///@}
 
     ///@{
     /** \brief Get function input(s) and output(s)  */
@@ -761,6 +765,9 @@ namespace casadi {
 
     /// Cache for sparsities of the Jacobian blocks
     mutable SparseStorage<Sparsity> jac_sparsity_, jac_sparsity_compact_;
+
+    /// Cache for full Jacobian sparsity
+    mutable Sparsity jacobian_sparsity_;
 
     /// If the function is the derivative of another function
     Function derivative_of_;
