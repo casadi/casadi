@@ -70,6 +70,8 @@ namespace casadi {
       return is_double_vector_vector() || is_int_vector_vector();
     case OT_STRINGVECTOR:
       return is_string_vector() || is_string();
+    case OT_VOIDPTR:
+      return is_void_pointer() || is_int();
     default:
       return getType() == other;
     }
@@ -445,6 +447,16 @@ namespace casadi {
     return as_function_vector();
   }
 
+  void* GenericType::to_void_pointer() const {
+    if (is_void_pointer()) {
+      return as_void_pointer();
+    } else {
+      casadi_int i = as_int();
+      casadi_assert(i==0, "Only zero pointers accepted");
+      return nullptr;
+    }
+  }
+
   bool GenericType::operator==(const GenericType& op2) const {
     return !(*this != op2);
   }
@@ -512,11 +524,6 @@ namespace casadi {
 
   GenericType::GenericType(const Dict& dict) {
     own(new DictType(dict));
-  }
-
-  void* GenericType::to_void_pointer() const {
-    casadi_assert(getType()==OT_VOIDPTR, "type mismatch");
-    return as_void_pointer();
   }
 
   GenericType::GenericType(void* ptr) {

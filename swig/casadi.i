@@ -1443,8 +1443,14 @@ namespace std {
       case OT_FUNCTION: return from_tmp(a->as_function());
       case OT_FUNCTIONVECTOR: return from_tmp(a->as_function_vector());
 #ifdef SWIGPYTHON
-      case OT_NULL: return Py_None;
+      case OT_NULL:
+      case OT_VOIDPTR:
+        return Py_None;
 #endif // SWIGPYTHON
+#ifdef SWIGMATLAB
+      case OT_VOIDPTR:
+        return mxCreateDoubleScalar(0);
+#endif
       default: return 0;
       }
     }
@@ -1473,14 +1479,15 @@ namespace std {
       }
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
-      if (mxIsChar(p) && mxGetM(p)==1) {
-	if (m) {
-	  size_t len=mxGetN(p);
-	  std::vector<char> s(len+1);
-	  if (mxGetString(p, &s[0], (len+1)*sizeof(char))) return false;
-	  **m = std::string(&s[0], len);
+      if (mxIsChar(p) && mxGetM(p)<=1) {
+        if (m) {
+          if (mxGetM(p)==0) return true;
+          size_t len=mxGetN(p);
+          std::vector<char> s(len+1);
+          if (mxGetString(p, &s[0], (len+1)*sizeof(char))) return false;
+          **m = std::string(&s[0], len);
         }
-	return true;
+        return true;
       }
 #endif // SWIGMATLAB
 
