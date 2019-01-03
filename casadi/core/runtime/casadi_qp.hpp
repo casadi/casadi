@@ -4,7 +4,7 @@
 // C-REPLACE "fmax" "casadi_fmax"
 // C-REPLACE "std::numeric_limits<T1>::min()" "casadi_real_min"
 // C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
-
+// C-REPLACE "static_cast<int>" "(int) "
 // SYMBOL "qp_prob"
 template<typename T1>
 struct casadi_qp_prob {
@@ -1131,8 +1131,9 @@ int casadi_qp_print_iteration(casadi_qp_data<T1>* d, char* buf, int buf_sz) {
   // Print iteration data without note to string
   flag = snprintf(buf, buf_sz,
     "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g  ",
-    (int)d->iter, (int)d->sing, d->f, d->pr, (int)d->ipr, d->du, (int)d->idu,
-    d->mina, (int)d->imina, d->tau);
+    static_cast<int>(d->iter), static_cast<int>(d->sing), d->f, d->pr,
+    static_cast<int>(d->ipr), d->du, static_cast<int>(d->idu),
+    d->mina, static_cast<int>(d->imina), d->tau);
   // Check if error
   if (flag < 0) {
     d->status = QP_PRINTING_ERROR;
@@ -1144,7 +1145,7 @@ int casadi_qp_print_iteration(casadi_qp_data<T1>* d, char* buf, int buf_sz) {
   // Print iteration note, if any
   if (d->msg) {
     if (d->msg_ind > -2) {
-      flag = snprintf(buf, buf_sz, "%s, i=%d", d->msg, (int)d->msg_ind);
+      flag = snprintf(buf, buf_sz, "%s, i=%d", d->msg, static_cast<int>(d->msg_ind));
     } else {
       flag = snprintf(buf, buf_sz, "%s", d->msg);
     }
