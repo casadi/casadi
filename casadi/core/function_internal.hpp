@@ -811,6 +811,9 @@ namespace casadi {
     // Forward/reverse options
     Dict forward_options_, reverse_options_;
 
+    // Store a reference to a custom Jacobian
+    Function custom_jacobian_;
+
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;
 

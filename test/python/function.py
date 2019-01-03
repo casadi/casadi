@@ -1911,6 +1911,23 @@ class Functiontests(casadiTestCase):
     self.assertTrue(len(found)==1)
     self.assertTrue("fwd1_Q" in found)
 
+  def test_custom_jacobian(self):
+    x = MX.sym("x")
+    p = MX.sym("p")
+
+    n1 = MX.sym("n1")
+    n2 = MX.sym("n2")
+
+    J = Function("J",[x,p,n1,n2],[blockcat([[x*pi,1],[1,1]])])
+
+    f = Function('Q',[x,p],[x**2,2*x*p],{"custom_jacobian": J,"jac_penalty":0})
+
+    J = None
+
+    [g1,g2] = f.call([x,p],False,True)
+    JJ = Function('JJ',[x,p],[jacobian(g1+3*x,x)])
+
+    self.checkarray(JJ(5,2),5*pi+3)
 
 if __name__ == '__main__':
     unittest.main()

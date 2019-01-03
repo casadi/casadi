@@ -253,7 +253,11 @@ namespace casadi {
         "Options to be passed to a forward mode constructor"}},
       {"reverse_options",
        {OT_DICT,
-        "Options to be passed to a reverse mode constructor"}}
+        "Options to be passed to a reverse mode constructor"}},
+      {"custom_jacobian",
+       {OT_FUNCTION,
+        "Override CasADi's AD. Use together with 'jac_penalty': 0. "
+        "Note: Highly experimental. Syntax may break often."}}
      }
   };
 
@@ -360,6 +364,9 @@ namespace casadi {
         forward_options_ = op.second;
       } else if (op.first=="reverse_options") {
         reverse_options_ = op.second;
+      } else if (op.first=="custom_jacobian") {
+        custom_jacobian_ = op.second.to_function();
+        jacobian_ = custom_jacobian_;
       }
     }
 
@@ -3006,6 +3013,7 @@ namespace casadi {
     s.pack("FunctionInternal::print_out", print_out_);
     s.pack("FunctionInternal::forward_options", forward_options_);
     s.pack("FunctionInternal::reverse_options", reverse_options_);
+    s.pack("FunctionInternal::custom_jacobian", custom_jacobian_);
 
     s.pack("FunctionInternal::sz_arg_per", sz_arg_per_);
     s.pack("FunctionInternal::sz_res_per", sz_res_per_);
@@ -3060,6 +3068,9 @@ namespace casadi {
     s.unpack("FunctionInternal::print_out", print_out_);
     s.unpack("FunctionInternal::forward_options", forward_options_);
     s.unpack("FunctionInternal::reverse_options", reverse_options_);
+
+    s.unpack("FunctionInternal::custom_jacobian", custom_jacobian_);
+    if (!custom_jacobian_.is_null()) jacobian_ = custom_jacobian_;
 
     s.unpack("FunctionInternal::sz_arg_per", sz_arg_per_);
     s.unpack("FunctionInternal::sz_res_per", sz_res_per_);
