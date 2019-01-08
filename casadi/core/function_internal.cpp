@@ -89,6 +89,10 @@ namespace casadi {
     enable_fd_op_ = false;
     print_in_ = false;
     print_out_ = false;
+    dump_in_ = false;
+    dump_out_ = false;
+    dump_dir_ = ".";
+    dump_ = false;
     sz_arg_tmp_ = 0;
     sz_res_tmp_ = 0;
     sz_iw_tmp_ = 0;
@@ -248,6 +252,18 @@ namespace casadi {
       {"print_out",
        {OT_BOOL,
         "Print numerical values of outputs [default: false]"}},
+      {"dump_in",
+       {OT_BOOL,
+        "Dump numerical values of inputs to file [default: false]"}},
+      {"dump_out",
+       {OT_BOOL,
+        "Dump numerical values of outputs to file [default: false]"}},
+      {"dump",
+       {OT_BOOL,
+        "Dump function to file upon first evaluation. [false]"}},
+      {"dump_dir",
+       {OT_STRING,
+        "Directory to dump inputs/outputs to. Make sure the directory exists [.]"}},
       {"forward_options",
        {OT_DICT,
         "Options to be passed to a forward mode constructor"}},
@@ -298,6 +314,10 @@ namespace casadi {
     opts["fd_method"] = fd_method_;
     opts["print_in"] = print_in_;
     opts["print_out"] = print_out_;
+    opts["dump_in"] = dump_in_;
+    opts["dump_out"] = dump_out_;
+    opts["dump_dir"] = dump_dir_;
+    opts["dump"] = dump_;
     opts["forward_options"] = forward_options_;
     opts["reverse_options"] = reverse_options_;
     return opts;
@@ -360,6 +380,14 @@ namespace casadi {
         print_in_ = op.second;
       } else if (op.first=="print_out") {
         print_out_ = op.second;
+      } else if (op.first=="dump_in") {
+        dump_in_ = op.second;
+      } else if (op.first=="dump_out") {
+        dump_out_ = op.second;
+      } else if (op.first=="dump") {
+        dump_ = op.second;
+      } else if (op.first=="dump_dir") {
+        dump_dir_ = op.second.to_string();
       } else if (op.first=="forward_options") {
         forward_options_ = op.second;
       } else if (op.first=="reverse_options") {
@@ -465,8 +493,12 @@ namespace casadi {
         jit_dependencies(jit_name_);
       }
     }
+
     // Finalize base classes
     ProtoFunction::finalize();
+
+    // Dump if requested
+    if (dump_) dump();
   }
 
   void ProtoFunction::finalize() {
@@ -475,8 +507,58 @@ namespace casadi {
     casadi_assert_dev(mem==0);
   }
 
+  void FunctionInternal::dump_in(casadi_int id, const double** arg) const {
+    uout() << "test" << std::endl;
+    #ifdef _WIN32
+    const std::string filesep("\\");
+    #else
+    const std::string filesep("/");
+    #endif
+    std::stringstream ss;
+    ss << setfill('0') << setw(6) << id;
+    std::string count = ss.str();
+    for (casadi_int i=0;i<n_in_;++i) {
+      DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".in." + name_in_[i] + ".mtx",
+        sparsity_in_[i], arg[i]);
+    }
+  }
+
+  void FunctionInternal::dump_out(casadi_int id, double** res) const {
+    #ifdef _WIN32
+    const std::string filesep("\\");
+    #else
+    const std::string filesep("/");
+    #endif
+    std::stringstream ss;
+    ss << setfill('0') << setw(6) << id;
+    std::string count = ss.str();
+    for (casadi_int i=0;i<n_out_;++i) {
+      DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".out." + name_out_[i] + ".mtx",
+        sparsity_out_[i], res[i]);
+    }
+  }
+
+  void FunctionInternal::dump() const {
+    #ifdef _WIN32
+    const std::string filesep("\\");
+    #else
+    const std::string filesep("/");
+    #endif
+    shared_from_this<Function>().save(dump_dir_+ filesep + name_ + ".casadi");
+  }
+
+  casadi_int FunctionInternal::get_dump_id() const {
+#ifdef CASADI_WITH_THREAD
+    std::lock_guard<std::mutex> lock(dump_count_mtx_);
+#endif // CASADI_WITH_THREAD
+    return dump_count_++;
+  }
+
   int FunctionInternal::
   eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+    casadi_int dump_id = (dump_in_ || dump_out_ || dump_) ? get_dump_id() : 0;
+    if (dump_in_) dump_in(dump_id, arg);
+    if (dump_ && dump_id==0) dump();
     if (print_in_) {
       uout() << "Function " << name_ << " (" << this << ")" << std::endl;
       for (casadi_int i=0; i<n_in_; ++i) {
@@ -495,6 +577,7 @@ namespace casadi {
     } else {
       ret = eval(arg, res, iw, w, mem);
     }
+    if (dump_in_) dump_out(dump_id, res);
     if (print_out_) {
       uout() << "Function " << name_ << " (" << this << ")" << std::endl;
       for (casadi_int i=0; i<n_out_; ++i) {
@@ -3011,6 +3094,9 @@ namespace casadi {
     s.pack("FunctionInternal::fd_method", fd_method_);
     s.pack("FunctionInternal::print_in", print_in_);
     s.pack("FunctionInternal::print_out", print_out_);
+    s.pack("FunctionInternal::dump_in", dump_in_);
+    s.pack("FunctionInternal::dump_out", dump_out_);
+    s.pack("FunctionInternal::dump_dir", dump_dir_);
     s.pack("FunctionInternal::forward_options", forward_options_);
     s.pack("FunctionInternal::reverse_options", reverse_options_);
     s.pack("FunctionInternal::custom_jacobian", custom_jacobian_);
@@ -3066,6 +3152,11 @@ namespace casadi {
     s.unpack("FunctionInternal::fd_method", fd_method_);
     s.unpack("FunctionInternal::print_in", print_in_);
     s.unpack("FunctionInternal::print_out", print_out_);
+    s.unpack("FunctionInternal::dump_in", dump_in_);
+    s.unpack("FunctionInternal::dump_out", dump_out_);
+    s.unpack("FunctionInternal::dump_dir", dump_dir_);
+    // Makes no sense to dump a Function that is being deserialized
+    dump_ = false;
     s.unpack("FunctionInternal::forward_options", forward_options_);
     s.unpack("FunctionInternal::reverse_options", reverse_options_);
 
