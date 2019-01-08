@@ -1023,7 +1023,8 @@ namespace casadi {
 
   template<>
   void CASADI_EXPORT SX::to_file(const std::string& filename,
-      const std::string& format_hint) const {
+      const Sparsity& sp, const SXElem* nonzeros,
+      const std::string& format_hint) {
     casadi_error("Not implemented");
   }
 

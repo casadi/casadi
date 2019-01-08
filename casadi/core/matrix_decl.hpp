@@ -1094,12 +1094,16 @@ namespace casadi {
 
     static Matrix<Scalar> deserialize(DeserializingStream& s);
 
+    // @{
     /** Export numerical matrix to file
     *
     * Supported formats:
     *   - .mtx   Matrix Market
     */
     void to_file(const std::string& filename, const std::string& format="") const;
+    static void to_file(const std::string& filename, const Sparsity& sp,
+      const Scalar* nonzeros, const std::string& format="");
+    //@}
 
 #ifndef SWIG
     /// Sparse matrix with a given sparsity with all values same

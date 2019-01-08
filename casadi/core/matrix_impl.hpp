@@ -854,6 +854,11 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  void Matrix<Scalar>::to_file(const std::string& filename, const std::string& format) const {
+    to_file(filename, sparsity(), ptr(), format);
+  }
+
+  template<typename Scalar>
   void Matrix<Scalar>::disp(std::ostream& stream, bool more) const {
     if (is_empty()) {
       stream << "[]";
