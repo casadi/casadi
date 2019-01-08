@@ -808,11 +808,23 @@ namespace casadi {
     bool print_in_;
     bool print_out_;
 
+    // Dump input/output
+    bool dump_in_, dump_out_, dump_;
+
+    // Directory to dump to
+    std::string dump_dir_;
+
     // Forward/reverse options
     Dict forward_options_, reverse_options_;
 
     // Store a reference to a custom Jacobian
     Function custom_jacobian_;
+
+    // Counter for unique names for dumping inputs and output
+    mutable casadi_int dump_count_ = 0;
+#ifdef CASADI_WITH_THREAD
+    mutable std::mutex dump_count_mtx_;
+#endif // CASADI_WITH_THREAD
 
     /** \brief Check if the function is of a particular type */
     virtual bool is_a(const std::string& type, bool recursive) const;
@@ -852,6 +864,14 @@ namespace casadi {
     void set_jac_sparsity(const Sparsity& sp);
 
   private:
+    // @{
+    /// Dumping functionality
+    casadi_int get_dump_id() const;
+    void dump_in(casadi_int id, const double** arg) const;
+    void dump_out(casadi_int id, double** res) const;
+    void dump() const;
+    // @}
+
     /** \brief Memory that is persistent during a call (but not between calls) */
     size_t sz_arg_per_, sz_res_per_, sz_iw_per_, sz_w_per_;
 
