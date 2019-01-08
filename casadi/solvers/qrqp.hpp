@@ -108,7 +108,7 @@ namespace casadi {
     std::vector<casadi_int> prinv_, pc_;
     ///@{
     // Options
-    bool print_iter_, print_header_, print_info_;
+    bool print_iter_, print_header_, print_info_, print_lincomb_;
     ///@}
 
     void serialize_body(SerializingStream &s) const override;

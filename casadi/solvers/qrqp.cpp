@@ -74,6 +74,10 @@ namespace casadi {
       {"print_info",
        {OT_BOOL,
         "Print info [true]."}},
+      {"print_lincomb",
+       {OT_BOOL,
+        "Print dependant linear combinations of constraints [false]. "
+        "Printed numbers are 0-based incdices into the vector of [simple bounds;linear bounds]"}},
       {"min_lam",
        {OT_DOUBLE,
         "Smallest multiplier treated as inactive for the initial active set [0]."}}
@@ -88,6 +92,7 @@ namespace casadi {
     print_iter_ = true;
     print_header_ = true;
     print_info_ = true;
+    print_lincomb_ = false;
 
     // Read user options
     for (auto&& op : opts) {
@@ -105,6 +110,8 @@ namespace casadi {
         print_header_ = op.second;
       } else if (op.first=="print_info") {
         print_info_ = op.second;
+      } else if (op.first=="print_lincomb") {
+        print_lincomb_ = op.second;
       }
     }
 
@@ -201,7 +208,17 @@ namespace casadi {
         uout() << buf << "\n";
       }
       // Make an iteration
-      if (flag || casadi_qp_iterate(&d)) break;
+      flag = flag || casadi_qp_iterate(&d);
+      // Print debug info
+      if (print_lincomb_) {
+        for (casadi_int k=0;k<d.sing;++k) {
+          uout() << "lincomb: ";
+          casadi_qp_print_colcomb(&d, buf, sizeof(buf), k);
+          uout() << buf << "\n";
+        }
+      }
+      if (flag) break;
+
       // User interrupt
       InterruptHandler::check();
     }
@@ -239,6 +256,7 @@ namespace casadi {
     g.local("p", "struct casadi_qp_prob");
     g.local("flag", "int");
     g.local("buf[121]", "char");
+    if (print_lincomb_) g.local("k", "casadi_int");
 
     // Setup memory structure
     g << "p.sp_a = " << g.sparsity(A_) << ";\n";
@@ -291,6 +309,12 @@ namespace casadi {
       g << g.printf("%s\\n", "buf") << "\n";
     }
     g << "if (flag || casadi_qp_iterate(&d)) break;\n";
+    if (print_lincomb_) {
+      g << "for (k=0;k<d.sing;++k) {\n";
+      g << "casadi_qp_print_colcomb(&d, buf, sizeof(buf), k);\n";
+      g << g.printf("lincomb: %s\\n", "buf") << "\n";
+      g << "}\n";
+    }
     g << "}\n";
 
     g.comment("Get solution");
@@ -320,6 +344,7 @@ namespace casadi {
     s.unpack("Qrqp::print_iter", print_iter_);
     s.unpack("Qrqp::print_header", print_header_);
     s.unpack("Qrqp::print_info", print_info_);
+    s.unpack("Qrqp::print_lincomb_", print_lincomb_);
     set_qp_prob();
     s.unpack("Qrqp::max_iter", p_.max_iter);
     s.unpack("Qrqp::min_lam", p_.min_lam);
@@ -340,6 +365,7 @@ namespace casadi {
     s.pack("Qrqp::print_iter", print_iter_);
     s.pack("Qrqp::print_header", print_header_);
     s.pack("Qrqp::print_info", print_info_);
+    s.pack("Qrqp::print_lincomb_", print_lincomb_);
     s.pack("Qrqp::max_iter", p_.max_iter);
     s.pack("Qrqp::min_lam", p_.min_lam);
     s.pack("Qrqp::constr_viol_tol", p_.constr_viol_tol);
