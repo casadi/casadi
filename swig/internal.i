@@ -337,7 +337,7 @@
 %exception  casadi::Factory< MatType >::add_output(const std::string &s, const MatType &e) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Factory< MatType >::calculate() {
+%exception  casadi::Factory< MatType >::calculate(const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Factory< MatType >::get_input(const std::string &s) {
@@ -599,6 +599,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::generate_lifted(Function &vdef_fcn, Function &vinit_fcn) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::FunctionInternal::generate_options(bool is_temp=false) const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::FunctionInternal::getAdaptorSolverName() const  {
@@ -988,10 +991,10 @@
 %exception  casadi::GenericMatrix::forward(const std::vector< MatType > &ex, const std::vector< MatType > &arg, const std::vector< std::vector< MatType > > &v, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericMatrix::hessian(const MatType &ex, const MatType &arg) {
+%exception  casadi::GenericMatrix::hessian(const MatType &ex, const MatType &arg, MatType &output_g, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericMatrix::hessian(const MatType &ex, const MatType &arg, MatType &output_g) {
+%exception  casadi::GenericMatrix::hessian(const MatType &ex, const MatType &arg, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix::if_else(const MatType &cond, const MatType &if_true, const MatType &if_false, bool short_circuit=false) {
@@ -1846,6 +1849,9 @@
 %exception  casadi::ProtoFunction::finalize() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::ProtoFunction::generate_options(bool is_temp=false) const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::ProtoFunction::get_options() const  {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2254,9 +2260,6 @@
 %exception  casadi::check_exposed(T t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::combine(const Dict &first, const Dict &second) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::is_regular(N_Vector v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2302,7 +2305,7 @@
 %exception casadi::FStats::FStats() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::Factory< MatType >::Factory(const Function::AuxOut &aux, bool verbose=false) {
+%exception casadi::Factory< MatType >::Factory(const Function::AuxOut &aux) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::FastNewton::FastNewton(const std::string &name, const Function &f) {
