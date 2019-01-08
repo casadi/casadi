@@ -1124,6 +1124,56 @@ int casadi_qp_print_header(casadi_qp_data<T1>* d, char* buf, size_t buf_sz) {
   return 0;
 }
 
+// SYMBOL "qp_print_colcomb"
+template<typename T1>
+int casadi_qp_print_colcomb(casadi_qp_data<T1>* d, char* buf, size_t buf_sz, casadi_int j) {
+  casadi_int num_size, n_print, i, k, buf_offset, val;
+  const casadi_qp_prob<T1>* p = d->prob;
+  casadi_qr_colcomb(d->dlam, d->nz_r, p->sp_r, p->pc, 1e-12, j);
+
+  // Determine max printing size
+  num_size = 1;
+  val = p->nz-1;
+  while (val) {
+    val/=10;
+    num_size++;
+  }
+
+  if (buf_sz<=4) return 1;
+
+  // How many numbers can be printed?
+  // Need some extra space for '...'
+  // and null
+  n_print = (buf_sz-4)/num_size;
+
+  // Clear buffer
+  for (i=0;i<buf_sz;++i) buf[i]=' ';
+
+  buf_offset = 0;
+  for (i=0;i<p->nz;++i) {
+    if (fabs(d->dlam[i]) >= 1e-12) {
+      if (n_print==0) {
+        buf[buf_sz-4] = '.';
+        buf[buf_sz-3] = '.';
+        buf[buf_sz-2] = '.';
+        buf[buf_sz-1] = '\0';
+        return 1;
+      }
+      n_print--;
+      snprintf(buf+buf_offset, num_size, "%d", static_cast<int>(i));
+      // Clear null chars
+      for (k=0;k<num_size;++k) {
+        if (buf[buf_offset+k]=='\0') buf[buf_offset+k] = ' ';
+      }
+      buf_offset += num_size;
+    }
+  }
+  buf[buf_sz-1] = '\0';
+
+  // Successful return
+  return 0;
+}
+
 // SYMBOL "qp_print_iteration"
 template<typename T1>
 int casadi_qp_print_iteration(casadi_qp_data<T1>* d, char* buf, int buf_sz) {
