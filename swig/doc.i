@@ -216,6 +216,13 @@ bool more) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sparsity_out(casadi_int
 ind) const  "
 
@@ -769,6 +776,15 @@ const  "
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -781,6 +797,28 @@ const  "
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -842,6 +880,11 @@ const  "
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -940,6 +983,15 @@ const  "
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -954,6 +1006,11 @@ const  "
 |                  |                 | function inputs  | Diff             |
 |                  |                 | [default: query  |                  |
 |                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::Backward |
 | psize            |                 | perturbation     | Diff             |
@@ -2059,6 +2116,13 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 const Function &nlp) "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
 
 %feature("docstring")  casadi::Blocksqp::computeNextHessian(BlocksqpMemory
 *m, casadi_int idx, casadi_int maxQP) const  "
@@ -4734,6 +4798,13 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_partition(casadi_int
 iind, casadi_int oind, Sparsity &D1, Sparsity &D2, bool compact, bool
 symmetric, bool allow_forward, bool allow_reverse) const  "
@@ -5120,6 +5191,15 @@ buf_sz, const char *fmt,...) const  "
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -5132,6 +5212,28 @@ buf_sz, const char *fmt,...) const  "
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -5193,6 +5295,11 @@ buf_sz, const char *fmt,...) const  "
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -5290,6 +5397,15 @@ buf_sz, const char *fmt,...) const  "
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -5299,6 +5415,11 @@ buf_sz, const char *fmt,...) const  "
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -5704,6 +5825,15 @@ Base class for BSpline evaluators
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -5716,6 +5846,28 @@ Base class for BSpline evaluators
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -5777,6 +5929,11 @@ Base class for BSpline evaluators
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -5874,6 +6031,15 @@ Base class for BSpline evaluators
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -5883,6 +6049,11 @@ Base class for BSpline evaluators
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -5955,9 +6126,9 @@ original
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::self() const  "
+%feature("docstring")  casadi::FunctionInternal::finalize()  "
 
-[INTERNAL]  Get a public class instance.
+[INTERNAL]  Finalize the object creation.
 
 ";
 
@@ -6241,6 +6412,13 @@ const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -6804,9 +6982,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::finalize()  "
+%feature("docstring")  casadi::FunctionInternal::self() const  "
 
-[INTERNAL]  Finalize the object creation.
+[INTERNAL]  Get a public class instance.
 
 ";
 
@@ -7421,6 +7599,13 @@ Destructor.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")
 casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
@@ -7673,6 +7858,15 @@ Generate a function that calculates nfwd forward derivatives.
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -7685,6 +7879,28 @@ Generate a function that calculates nfwd forward derivatives.
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -7746,6 +7962,11 @@ Generate a function that calculates nfwd forward derivatives.
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -7843,6 +8064,15 @@ Generate a function that calculates nfwd forward derivatives.
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -7852,6 +8082,11 @@ Generate a function that calculates nfwd forward derivatives.
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -8665,9 +8900,16 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::oracle() const  "
+%feature("docstring")  casadi::FunctionInternal::mx_out(casadi_int ind)
+const  "
 
-[INTERNAL]  Get oracle.
+[INTERNAL]  Get function input(s) and output(s)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::mx_out() const  "
+
+[INTERNAL]  Get function input(s) and output(s)
 
 ";
 
@@ -9036,11 +9278,10 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::get_partition(casadi_int
-iind, casadi_int oind, Sparsity &D1, Sparsity &D2, bool compact, bool
-symmetric, bool allow_forward, bool allow_reverse) const  "
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
 
-[INTERNAL]  Get the unidirectional or bidirectional partition.
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -9604,16 +9845,9 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::mx_out(casadi_int ind)
-const  "
+%feature("docstring")  casadi::FunctionInternal::oracle() const  "
 
-[INTERNAL]  Get function input(s) and output(s)
-
-";
-
-%feature("docstring")  casadi::FunctionInternal::mx_out() const  "
-
-[INTERNAL]  Get function input(s) and output(s)
+[INTERNAL]  Get oracle.
 
 ";
 
@@ -9823,6 +10057,14 @@ nadj) const  "
 [INTERNAL]  Return function that calculates adjoint derivatives
 reverse(nadj) returns a cached instance if available, and calls  Function
 get_reverse(casadi_int nadj) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::get_partition(casadi_int
+iind, casadi_int oind, Sparsity &D1, Sparsity &D2, bool compact, bool
+symmetric, bool allow_forward, bool allow_reverse) const  "
+
+[INTERNAL]  Get the unidirectional or bidirectional partition.
 
 ";
 
@@ -12159,6 +12401,15 @@ std::vector< M > &res, casadi_int npar) const  "
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -12171,6 +12422,28 @@ std::vector< M > &res, casadi_int npar) const  "
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -12232,6 +12505,11 @@ std::vector< M > &res, casadi_int npar) const  "
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -12330,6 +12608,15 @@ std::vector< M > &res, casadi_int npar) const  "
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -12344,6 +12631,11 @@ std::vector< M > &res, casadi_int npar) const  "
 |                  |                 | function inputs  | iff              |
 |                  |                 | [default: query  |                  |
 |                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::CentralD |
 | psize            |                 | perturbation     | iff              |
@@ -13091,6 +13383,13 @@ generated function.
 DM > &arg) const  "
 
 [INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -13942,6 +14241,13 @@ const  "
 &type, bool recursive) const  "
 
 [INTERNAL]  Check if the function is of a particular type.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -15365,6 +15671,13 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::slice(const std::string
 &name, const std::vector< casadi_int > &order_in, const std::vector<
 casadi_int > &order_out, const Dict &opts) const  "
@@ -16352,6 +16665,15 @@ Internal class.
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -16370,6 +16692,28 @@ Internal class.
 |                  |                 | are discrete,    |                  |
 |                  |                 | i.e. integer-    |                  |
 |                  |                 | valued           |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -16431,6 +16775,11 @@ Internal class.
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -16508,6 +16857,15 @@ Internal class.
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_problem    | OT_BOOL         | Print a numeric  | casadi::Conic    |
 |                  |                 | description of   |                  |
 |                  |                 | the problem      |                  |
@@ -16521,6 +16879,11 @@ Internal class.
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -17771,6 +18134,13 @@ iind, casadi_int oind, bool compact, bool symmetric) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::forward(casadi_int nfwd)
 const  "
 
@@ -17873,6 +18243,15 @@ Internal class.
 | const_dim        | OT_BOOL         | Assume constant  | casadi::Dple     |
 |                  |                 | dimension of P   |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -17885,6 +18264,28 @@ Internal class.
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -17960,6 +18361,11 @@ Internal class.
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -18041,6 +18447,15 @@ Internal class.
 |                  |                 | positive         |                  |
 |                  |                 | definite         |                  |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -18050,6 +18465,11 @@ Internal class.
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -19250,6 +19670,13 @@ std::vector< MX > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::matching_res(const
+std::vector< M > &arg, casadi_int &npar) const  "
+
+[INTERNAL]  Check if output arguments that needs to be replaced.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_sx(const SXElem **arg,
 SXElem **res, casadi_int *iw, SXElem *w, void *mem) const  "
 
@@ -19888,10 +20315,10 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::matching_res(const
-std::vector< M > &arg, casadi_int &npar) const  "
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
 
-[INTERNAL]  Check if output arguments that needs to be replaced.
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -20157,6 +20584,15 @@ Internal class.
 |                  |                 | constant.        |                  |
 |                  |                 | Default: false.  |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -20169,6 +20605,28 @@ Internal class.
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -20230,6 +20688,11 @@ Internal class.
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -20307,6 +20770,15 @@ Internal class.
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -20316,6 +20788,11 @@ Internal class.
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -21511,6 +21988,13 @@ std::string &name, std::ostream &stream) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::uses_output() const  "
 
 [INTERNAL]  Do the derivative functions need nondifferentiated outputs?
@@ -21946,7 +22430,8 @@ std::string &s, const MatType &e) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::Factory< MatType >::calculate() "
+%feature("docstring")  casadi::Factory< MatType >::calculate(const Dict
+&opts=Dict()) "
 
 [INTERNAL] ";
 
@@ -21989,7 +22474,7 @@ std::string &s) "
 [INTERNAL] ";
 
 %feature("docstring") casadi::Factory< MatType >::Factory(const
-Function::AuxOut &aux, bool verbose=false) "
+Function::AuxOut &aux) "
 
 [INTERNAL] ";
 
@@ -22747,6 +23232,13 @@ double **arg, double **res, casadi_int *iw, double *w) const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::numel_out(casadi_int ind)
 const  "
 
@@ -23471,6 +23963,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::checkout() const  "
+
+[INTERNAL]  Checkout a memory object.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_max_in(casadi_int ind)
 const  "
 
@@ -23553,6 +24051,15 @@ const  "
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -23565,6 +24072,28 @@ const  "
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -23626,6 +24155,11 @@ const  "
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -23724,6 +24258,15 @@ const  "
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -23738,6 +24281,11 @@ const  "
 |                  |                 | function inputs  | ff               |
 |                  |                 | [default: query  |                  |
 |                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::FiniteDi |
 | psize            |                 | perturbation     | ff               |
@@ -24778,9 +25326,10 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::checkout() const  "
+%feature("docstring")
+casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
-[INTERNAL]  Checkout a memory object.
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -24819,10 +25368,10 @@ bool persistent=false) "
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::instruction_output(casadi_int k) const  "
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -25125,6 +25674,13 @@ ind) const  "
 CodeGenerator &g) const  "
 
 [INTERNAL]  Get name in codegen.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -27010,6 +27566,15 @@ std::string &parallelization) const  "
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -27022,6 +27587,28 @@ std::string &parallelization) const  "
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -27083,6 +27670,11 @@ std::string &parallelization) const  "
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -27181,6 +27773,15 @@ std::string &parallelization) const  "
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -27195,6 +27796,11 @@ std::string &parallelization) const  "
 |                  |                 | function inputs  | iff              |
 |                  |                 | [default: query  |                  |
 |                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::ForwardD |
 | psize            |                 | perturbation     | iff              |
@@ -27895,6 +28501,13 @@ oind, bool symmetric, casadi_int gr_i=1, casadi_int gr_o=1) const  "
 %feature("docstring")  casadi::ProtoFunction::clear_mem() "
 
 [INTERNAL]  Clear all memory (called from destructor)
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -29441,6 +30054,15 @@ member functions. Joel Andersson >List of available options
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -29453,6 +30075,28 @@ member functions. Joel Andersson >List of available options
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -29514,6 +30158,11 @@ member functions. Joel Andersson >List of available options
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -29591,6 +30240,15 @@ member functions. Joel Andersson >List of available options
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -29600,6 +30258,11 @@ member functions. Joel Andersson >List of available options
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -30910,6 +31573,13 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::alloc_w(size_t sz_w, bool
 persistent=false) "
 
@@ -31930,7 +32600,7 @@ Make a rank-1 update to a matrix A Calculates A + 1/2 * alpha * x*y'.
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::gradient(const MatType
-&ex, const MatType &arg) "
+&ex, const MatType &arg, const Dict &opts=Dict()) "
 
 Calculate Jacobian.
 
@@ -31949,7 +32619,7 @@ Calculate Jacobian.
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::gradient(const MatType
-&ex, const MatType &arg) "
+&ex, const MatType &arg, const Dict &opts=Dict()) "
 
 Functions called by friend functions defined here
 
@@ -32230,7 +32900,7 @@ Matrix divide (cf. backslash '\\\\' in MATLAB)
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::tangent(const MatType
-&ex, const MatType &arg) "
+&ex, const MatType &arg, const Dict &opts=Dict()) "
 
 Calculate Jacobian.
 
@@ -32249,7 +32919,7 @@ Calculate Jacobian.
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::tangent(const MatType
-&ex, const MatType &arg) "
+&ex, const MatType &arg, const Dict &opts=Dict()) "
 
 Functions called by friend functions defined here
 
@@ -32495,14 +33165,16 @@ Check if the matrix expression is square.
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::jtimes(const MatType
-&ex, const MatType &arg, const MatType &v, bool tr=false) "
+&ex, const MatType &arg, const MatType &v, bool tr=false, const Dict
+&opts=Dict()) "
 
 Functions called by friend functions defined here
 
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::jtimes(const MatType
-&ex, const MatType &arg, const MatType &v, bool tr=false) "
+&ex, const MatType &arg, const MatType &v, bool tr=false, const Dict
+&opts=Dict()) "
 
 Calculate the Jacobian and multiply by a vector from the right This is
 equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
@@ -32982,12 +33654,12 @@ Functions called by friend functions defined here
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::hessian(const MatType
-&ex, const MatType &arg) "
+&ex, const MatType &arg, const Dict &opts=Dict()) "
 
 [INTERNAL] ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::hessian(const MatType
-&ex, const MatType &arg, MatType &output_g) "
+&ex, const MatType &arg, MatType &output_g, const Dict &opts=Dict()) "
 
 [INTERNAL] ";
 
@@ -33264,14 +33936,14 @@ Get the number of rows, Octave-style syntax.
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::linearize(const MatType
-&f, const MatType &x, const MatType &x0) "
+&f, const MatType &x, const MatType &x0, const Dict &opts=Dict()) "
 
 Functions called by friend functions defined here
 
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::linearize(const MatType
-&f, const MatType &x, const MatType &x0) "
+&f, const MatType &x, const MatType &x0, const Dict &opts=Dict()) "
 
 Linearize an expression.
 
@@ -33422,6 +34094,13 @@ C++ includes: global_options.hpp ";
 "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -35106,6 +35785,13 @@ std::vector< std::vector< M > > &fseed, casadi_int npar) const  "
 casadi::FunctionInternal::codegen_incref(CodeGenerator &g) const  "
 
 [INTERNAL]  Codegen incref for dependencies.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -37422,6 +38108,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::forward(casadi_int nfwd)
 const  "
 
@@ -38560,6 +39253,13 @@ std::string &lang, std::ostream &stream, const Dict &options) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::print_option(const
 std::string &name, std::ostream &stream) const  "
 
@@ -38925,6 +39625,15 @@ Internal class
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -38937,6 +39646,28 @@ Internal class
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -38998,6 +39729,11 @@ Internal class
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -39095,6 +39831,15 @@ Internal class
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -39104,6 +39849,11 @@ Internal class
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -39784,10 +40534,9 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::eval_dm(const std::vector<
-DM > &arg) const  "
+%feature("docstring")  casadi::FunctionInternal::free_sx() const  "
 
-[INTERNAL]  Evaluate with DM matrices.
+[INTERNAL]  Get free variables (SX)
 
 ";
 
@@ -39946,6 +40695,15 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -39958,6 +40716,28 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -40019,6 +40799,11 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -40102,6 +40887,15 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -40111,6 +40905,11 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -40476,6 +41275,13 @@ const  "
 
 [INTERNAL]  Calculate derivatives by multiplying the full Jacobian and
 multiplying.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -41005,9 +41811,10 @@ elements.
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::free_sx() const  "
+%feature("docstring")  casadi::FunctionInternal::eval_dm(const std::vector<
+DM > &arg) const  "
 
-[INTERNAL]  Get free variables (SX)
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -41448,6 +42255,13 @@ class hierarchy in reverse order is run after init() has been completed.
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::ProtoFunction::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")
 casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
@@ -41544,6 +42358,15 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -41556,6 +42379,28 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -41620,6 +42465,11 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -41697,6 +42547,15 @@ A: A = L.U, with L lower and U upper triangular
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -41706,6 +42565,11 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -41859,6 +42723,13 @@ class hierarchy in reverse order is run after init() has been completed.
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::ProtoFunction::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")
 casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 
@@ -41948,6 +42819,15 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -41960,6 +42840,28 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -42021,6 +42923,11 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -42105,6 +43012,15 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -42114,6 +43030,11 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -42753,6 +43674,13 @@ const  "
 bool more) const  "
 
 [INTERNAL]  Display object.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -43884,6 +44812,13 @@ const  "
 const  "
 
 [INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -45377,6 +46312,13 @@ const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::ProtoFunction::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::LinsolLdl::free_mem(void *mem) const  "
 
 [INTERNAL]  Free memory block.
@@ -45544,6 +46486,13 @@ casadi::LinsolInternal::serialize_type(SerializingStream &s) const  "
 "
 
 [INTERNAL]  Release a memory object.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -45846,6 +46795,13 @@ C++ includes: lsqr.hpp ";
 "
 
 [INTERNAL]  Memory objects.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -47127,6 +48083,13 @@ elements.
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::print_option(const
 std::string &name, std::ostream &stream) const  "
 
@@ -47645,7 +48608,7 @@ Get get the number of non-zeros on the diagonal.
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::gradient(const
-MatrixCommon &ex, const MatrixCommon &arg) "
+MatrixCommon &ex, const MatrixCommon &arg, const Dict &opts=Dict()) "
 
 Functions called by friend functions defined here
 
@@ -47835,6 +48798,12 @@ Get a set of nonzeros
 %feature("docstring")  casadi::GenericMatrixCommon::columns() const "
 
 Get the number of columns, Octave-style syntax.
+
+";
+
+%feature("docstring")  casadi::MatrixCommon::is_one() const  "
+
+check if the matrix is 1 (note that false negative answers are possible)
 
 ";
 
@@ -48063,31 +49032,6 @@ one.
 
 ";
 
-%feature("docstring")  casadi::MatrixCommon::evalf(const MatrixCommon &expr)
-"
-
-Evaluates the expression numerically.
-
-An error is raised when the expression contains symbols
-
-";
-
-%feature("docstring") casadi::casadi_evalf "
-
-Evaluates the expression numerically.
-
-An error is raised when the expression contains symbols
-
-";
-
-%feature("docstring")  casadi::MatrixCommon::casadi_evalf "
-
-Evaluates the expression numerically.
-
-An error is raised when the expression contains symbols
-
-";
-
 %feature("docstring")  casadi::MatrixCommon::has_zeros() const  "
 
 Check if the matrix has any zero entries which are not structural zeros.
@@ -48225,64 +49169,34 @@ scalar. Wraps SXElem SXElem::dep(casadi_int ch=0) const.
 
 ";
 
-%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
-&name, casadi_int nrow=1, casadi_int ncol=1) "
+%feature("docstring")  casadi::MatrixCommon::is_zero() const  "
 
-Create an nrow-by-ncol symbolic primitive.
-
-";
-
-%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
-&name, const std::pair< casadi_int, casadi_int > &rc) "
-
-Construct a symbolic primitive with given dimensions.
+check if the matrix is 0 (note that false negative answers are possible)
 
 ";
 
-%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
-&name, const Sparsity &sp) "
+%feature("docstring")  casadi::MatrixCommon::evalf(const MatrixCommon &expr)
+"
 
-Create symbolic primitive with a given sparsity pattern.
+Evaluates the expression numerically.
 
-";
-
-%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
-&name, const Sparsity &sp, casadi_int p) "
-
-Create a vector of length p with with matrices with symbolic primitives of
-given sparsity.
+An error is raised when the expression contains symbols
 
 ";
 
-%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
-&name, casadi_int nrow, casadi_int ncol, casadi_int p) "
+%feature("docstring") casadi::casadi_evalf "
 
-Create a vector of length p with nrow-by-ncol symbolic primitives.
+Evaluates the expression numerically.
 
-";
-
-%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
-&name, const Sparsity &sp, casadi_int p, casadi_int r) "
-
-Create a vector of length r of vectors of length p with symbolic primitives
-with given sparsity.
+An error is raised when the expression contains symbols
 
 ";
 
-%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
-&name, casadi_int nrow, casadi_int ncol, casadi_int p, casadi_int r) "
+%feature("docstring")  casadi::MatrixCommon::casadi_evalf "
 
-Create a vector of length r of vectors of length p with nrow-by-ncol
-symbolic primitives.
+Evaluates the expression numerically.
 
-";
-
-%feature("docstring")  casadi::SX::to_file(const std::string &filename,
-const std::string &format="") const  "
-
-Export numerical matrix to file
-
-Supported formats: .mtx Matrix Market
+An error is raised when the expression contains symbols
 
 ";
 
@@ -48483,7 +49397,7 @@ as tval)
 
 %feature("docstring")  casadi::GenericMatrixCommon::jtimes(const
 MatrixCommon &ex, const MatrixCommon &arg, const MatrixCommon &v, bool
-tr=false) "
+tr=false, const Dict &opts=Dict()) "
 
 Functions called by friend functions defined here
 
@@ -48508,9 +49422,22 @@ Serialize an object.
 
 ";
 
-%feature("docstring")  casadi::MatrixCommon::is_one() const  "
+%feature("docstring")  casadi::MatrixCommon::to_file(const std::string
+&filename, const std::string &format="") const  "
 
-check if the matrix is 1 (note that false negative answers are possible)
+Export numerical matrix to file
+
+Supported formats: .mtx Matrix Market
+
+";
+
+%feature("docstring")  casadi::MatrixCommon::to_file(const std::string
+&filename, const Sparsity &sp, const Scalar *nonzeros, const std::string
+&format="") "
+
+Export numerical matrix to file
+
+Supported formats: .mtx Matrix Market
 
 ";
 
@@ -48558,7 +49485,7 @@ Check if the matrix expression is square.
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::tangent(const
-MatrixCommon &ex, const MatrixCommon &arg) "
+MatrixCommon &ex, const MatrixCommon &arg, const Dict &opts=Dict()) "
 
 Functions called by friend functions defined here
 
@@ -48659,7 +49586,8 @@ Matrix adjoint.
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::linearize(const
-MatrixCommon &f, const MatrixCommon &x, const MatrixCommon &x0) "
+MatrixCommon &f, const MatrixCommon &x, const MatrixCommon &x0, const Dict
+&opts=Dict()) "
 
 Functions called by friend functions defined here
 
@@ -48908,9 +49836,55 @@ Also called: slope function
 
 ";
 
-%feature("docstring")  casadi::MatrixCommon::is_zero() const  "
+%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
+&name, casadi_int nrow=1, casadi_int ncol=1) "
 
-check if the matrix is 0 (note that false negative answers are possible)
+Create an nrow-by-ncol symbolic primitive.
+
+";
+
+%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
+&name, const std::pair< casadi_int, casadi_int > &rc) "
+
+Construct a symbolic primitive with given dimensions.
+
+";
+
+%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
+&name, const Sparsity &sp) "
+
+Create symbolic primitive with a given sparsity pattern.
+
+";
+
+%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
+&name, const Sparsity &sp, casadi_int p) "
+
+Create a vector of length p with with matrices with symbolic primitives of
+given sparsity.
+
+";
+
+%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
+&name, casadi_int nrow, casadi_int ncol, casadi_int p) "
+
+Create a vector of length p with nrow-by-ncol symbolic primitives.
+
+";
+
+%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
+&name, const Sparsity &sp, casadi_int p, casadi_int r) "
+
+Create a vector of length r of vectors of length p with symbolic primitives
+with given sparsity.
+
+";
+
+%feature("docstring")  casadi::GenericMatrixCommon::sym(const std::string
+&name, casadi_int nrow, casadi_int ncol, casadi_int p, casadi_int r) "
+
+Create a vector of length r of vectors of length p with nrow-by-ncol
+symbolic primitives.
 
 ";
 
@@ -49079,7 +50053,7 @@ If y does not evaluate to 1, a runtime error is raised
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::jtimes(const MX &ex,
-const MX &arg, const MX &v, bool tr=false) "
+const MX &arg, const MX &v, bool tr=false, const Dict &opts=Dict()) "
 
 Functions called by friend functions defined here
 
@@ -49273,7 +50247,7 @@ Check if the matrix is lower triangular.
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::gradient(const MX &ex,
-const MX &arg) "
+const MX &arg, const Dict &opts=Dict()) "
 
 Functions called by friend functions defined here
 
@@ -49292,7 +50266,7 @@ Get the first dimension (i.e. number of rows)
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::linearize(const MX &f,
-const MX &x, const MX &x0) "
+const MX &x, const MX &x0, const Dict &opts=Dict()) "
 
 Functions called by friend functions defined here
 
@@ -49807,7 +50781,7 @@ symbolic primitives.
 ";
 
 %feature("docstring")  casadi::GenericMatrixCommon::tangent(const MX &ex,
-const MX &arg) "
+const MX &arg, const Dict &opts=Dict()) "
 
 Functions called by friend functions defined here
 
@@ -51053,6 +52027,13 @@ k) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::n_instructions() const  "
 
 [INTERNAL]  Get the number of atomic operations.
@@ -52227,6 +53208,13 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::get_max_in(casadi_int ind)
 const  "
 
@@ -53398,6 +54386,13 @@ Function &f, casadi_int n) "
 persistent=false) "
 
 [INTERNAL]  Ensure required length of w field.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -56729,6 +57724,15 @@ Joel Andersson
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -56741,6 +57745,28 @@ Joel Andersson
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -56808,6 +57834,11 @@ Joel Andersson
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -56890,6 +57921,15 @@ Joel Andersson
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -56899,6 +57939,11 @@ Joel Andersson
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | show_eval_warnin | OT_BOOL         | Show warnings    | casadi::OracleFu |
 | gs               |                 | generated from   | nction           |
@@ -57012,6 +58057,13 @@ s_out:   Output name(s)
 order:  Only 1 (linear) and 2 (nonlinear) allowed
 
 tr:  Flip the relationship. Return which expressions contain the variables
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -58180,9 +59232,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
 
-[INTERNAL]  Construct Prepares the function for evaluation.
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -58781,6 +59834,12 @@ multiplying.
 
 ";
 
+%feature("docstring")  casadi::ProtoFunction::construct(const Dict &opts) "
+
+[INTERNAL]  Construct Prepares the function for evaluation.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_dm(const std::vector<
 DM > &arg) const  "
 
@@ -59067,6 +60126,13 @@ bool persistent=false) "
 const  "
 
 [INTERNAL]  Obtain solver name from Adaptor.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
+"
+
+[INTERNAL]  Release a memory object.
 
 ";
 
@@ -59479,10 +60545,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::release(casadi_int mem) const
-"
+%feature("docstring")  casadi::FunctionInternal::matching_res(const
+std::vector< M > &arg, casadi_int &npar) const  "
 
-[INTERNAL]  Release a memory object.
+[INTERNAL]  Check if output arguments that needs to be replaced.
 
 ";
 
@@ -59732,6 +60798,11 @@ Solve QPs using an active-set method
 +-----------------+-----------+--------------------------------------------+
 | print_iter      | OT_BOOL   | Print iterations [true].                   |
 +-----------------+-----------+--------------------------------------------+
+| print_lincomb   | OT_BOOL   | Print dependant linear combinations of     |
+|                 |           | constraints [false]. Printed numbers are   |
+|                 |           | 0-based incdices into the vector of        |
+|                 |           | [simple bounds;linear bounds]              |
++-----------------+-----------+--------------------------------------------+
 
 Joel Andersson
 
@@ -59766,6 +60837,14 @@ Joel Andersson
 +-----------------+---------------+------------------------+---------------+
 | print_iter      | OT_BOOL       | Print iterations       | casadi::Qrqp  |
 |                 |               | [true].                |               |
++-----------------+---------------+------------------------+---------------+
+| print_lincomb   | OT_BOOL       | Print dependant linear | casadi::Qrqp  |
+|                 |               | combinations of        |               |
+|                 |               | constraints [false].   |               |
+|                 |               | Printed numbers are    |               |
+|                 |               | 0-based incdices into  |               |
+|                 |               | the vector of [simple  |               |
+|                 |               | bounds;linear bounds]  |               |
 +-----------------+---------------+------------------------+---------------+
 | print_problem   | OT_BOOL       | Print a numeric        | casadi::Conic |
 |                 |               | description of the     |               |
@@ -59819,10 +60898,10 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::matching_res(const
-std::vector< M > &arg, casadi_int &npar) const  "
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
 
-[INTERNAL]  Check if output arguments that needs to be replaced.
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -60727,6 +61806,13 @@ const  "
 
 [INTERNAL]  Return Jacobian of all input elements with respect to all output
 elements.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -62734,10 +63820,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::check_arg(const
-std::vector< M > &arg, casadi_int &npar) const  "
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
 
-[INTERNAL]  Check if input arguments have correct length and dimensions.
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -62750,6 +63836,13 @@ std::vector< M > &arg, casadi_int &npar) const  "
 %feature("docstring")  casadi::FunctionInternal::has_eval_dm() const  "
 
 [INTERNAL]  Evaluate with DM matrices.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::check_arg(const
+std::vector< M > &arg, casadi_int &npar) const  "
+
+[INTERNAL]  Check if input arguments have correct length and dimensions.
 
 ";
 
@@ -63278,6 +64371,13 @@ const  "
 %feature("docstring")  casadi::Integrator::get_n_in()  "
 
 [INTERNAL]  Number of function inputs and outputs.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::print(const char *fmt,...)
+const  "
+
+[INTERNAL]  C-style formatted printing during evaluation.
 
 ";
 
@@ -63923,10 +65023,10 @@ propagation.
 
 ";
 
-%feature("docstring")
-casadi::FunctionInternal::instruction_output(casadi_int k) const  "
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
 
-[INTERNAL]  Get the (integer) output argument of an atomic operation.
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -64069,10 +65169,10 @@ std::vector< std::vector< M > > &aseed, casadi_int npar) const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::ProtoFunction::print(const char *fmt,...)
-const  "
+%feature("docstring")
+casadi::FunctionInternal::instruction_output(casadi_int k) const  "
 
-[INTERNAL]  C-style formatted printing during evaluation.
+[INTERNAL]  Get the (integer) output argument of an atomic operation.
 
 ";
 
@@ -65244,10 +66344,10 @@ const  "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::FunctionInternal::check_arg(const
-std::vector< M > &arg, casadi_int &npar) const  "
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
 
-[INTERNAL]  Check if input arguments have correct length and dimensions.
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -66109,6 +67209,13 @@ std::string &fname) const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::FunctionInternal::check_arg(const
+std::vector< M > &arg, casadi_int &npar) const  "
+
+[INTERNAL]  Check if input arguments have correct length and dimensions.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::map(casadi_int n, const
 std::string &parallelization) const  "
 
@@ -66935,6 +68042,13 @@ std::vector< std::string > &onames, const Dict &opts) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::eval_mx(const MXVector
 &arg, MXVector &res, bool always_inline, bool never_inline) const  "
 
@@ -67310,9 +68424,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_eval_dm() const  "
+%feature("docstring")  casadi::FunctionInternal::check_res(const
+std::vector< M > &res, casadi_int &npar) const  "
 
-[INTERNAL]  Evaluate with DM matrices.
+[INTERNAL]  Check if output arguments have correct length and dimensions.
 
 ";
 
@@ -68006,10 +69121,9 @@ structure recognition for symmetric Jacobians
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::check_res(const
-std::vector< M > &res, casadi_int &npar) const  "
+%feature("docstring")  casadi::FunctionInternal::has_eval_dm() const  "
 
-[INTERNAL]  Check if output arguments have correct length and dimensions.
+[INTERNAL]  Evaluate with DM matrices.
 
 ";
 
@@ -68644,6 +69758,13 @@ const  "
 [INTERNAL]  Return function that calculates forward derivatives
 forward(nfwd) returns a cached instance if available, and calls  Function
 get_forward(casadi_int nfwd) if no cached version is available.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -69453,6 +70574,15 @@ Andersson
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -69465,6 +70595,28 @@ Andersson
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -69526,6 +70678,11 @@ Andersson
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -69624,6 +70781,15 @@ Andersson
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -69638,6 +70804,11 @@ Andersson
 |                  |                 | function inputs  | g                |
 |                  |                 | [default: query  |                  |
 |                  |                 | object]          |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | second_order_ste | OT_DOUBLE       | Second order     | casadi::Smoothin |
 | psize            |                 | perturbation     | g                |
@@ -70241,6 +71412,13 @@ generated function.
 casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 
 [INTERNAL]  Get the (integer) input arguments of an atomic operation.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -72777,6 +73955,13 @@ std::vector< MX > &arg) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::OracleFunction::finalize()  "
 
 [INTERNAL]  Finalize initialization.
@@ -74333,10 +75518,10 @@ const  "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::matching_res(const
-std::vector< M > &arg, casadi_int &npar) const  "
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
 
-[INTERNAL]  Check if output arguments that needs to be replaced.
+[INTERNAL]  Reconstruct options dict.
 
 ";
 
@@ -74450,6 +75635,13 @@ const  "
 %feature("docstring")  casadi::SharedObjectInternal::getCount() const  "
 
 [INTERNAL]  Get the reference count.
+
+";
+
+%feature("docstring")  casadi::FunctionInternal::matching_res(const
+std::vector< M > &arg, casadi_int &npar) const  "
+
+[INTERNAL]  Check if output arguments that needs to be replaced.
 
 ";
 
@@ -75086,6 +76278,13 @@ const  "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::ProtoFunction::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::SymbolicQr::alloc_mem() const  "
 
 [INTERNAL]  Create memory block.
@@ -75216,6 +76415,15 @@ Joel Andersson
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -75228,6 +76436,28 @@ Joel Andersson
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -75294,6 +76524,11 @@ Joel Andersson
 |                  |                 | passed to        | Qr               |
 |                  |                 | generated        |                  |
 |                  |                 | function objects |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -75371,6 +76606,15 @@ Joel Andersson
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -75380,6 +76624,11 @@ Joel Andersson
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -76503,6 +77752,13 @@ casadi::FunctionInternal::codegen_decref(CodeGenerator &g) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::generate_options(bool
+is_temp=false) const  "
+
+[INTERNAL]  Reconstruct options dict.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::size1_out(casadi_int ind)
 const  "
 
@@ -77171,6 +78427,15 @@ General information
 |                  |                 | constant.        |                  |
 |                  |                 | Default: false.  |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -77183,6 +78448,28 @@ General information
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -77244,6 +78531,11 @@ General information
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -77321,6 +78613,15 @@ General information
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -77330,6 +78631,11 @@ General information
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -78532,6 +79838,11 @@ Check if the vector has negative entries.
 
 ";
 
+%feature("docstring")  casadi::casadi_qp_print_colcomb(casadi_qp_data< T1 >
+*d, char *buf, size_t buf_sz, casadi_int j) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::casadi_vfmin(const T1 *x, casadi_int n, T1 r)
 "
 
@@ -78878,6 +80189,15 @@ General information
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -78896,6 +80216,28 @@ General information
 |                  |                 | are discrete,    |                  |
 |                  |                 | i.e. integer-    |                  |
 |                  |                 | valued           |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -78957,6 +80299,11 @@ General information
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -79034,6 +80381,15 @@ General information
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_problem    | OT_BOOL         | Print a numeric  | casadi::Conic    |
 |                  |                 | description of   |                  |
 |                  |                 | the problem      |                  |
@@ -79047,6 +80403,11 @@ General information
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -79546,6 +80907,11 @@ Solve QPs using an active-set method
 +-----------------+-----------+--------------------------------------------+
 | print_iter      | OT_BOOL   | Print iterations [true].                   |
 +-----------------+-----------+--------------------------------------------+
+| print_lincomb   | OT_BOOL   | Print dependant linear combinations of     |
+|                 |           | constraints [false]. Printed numbers are   |
+|                 |           | 0-based incdices into the vector of        |
+|                 |           | [simple bounds;linear bounds]              |
++-----------------+-----------+--------------------------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -79923,12 +81289,6 @@ Get the number of QP solver outputs.
 
 ";
 
-%feature("docstring")  casadi::doc_interpolant(const std::string &name) "
-
-Get the documentation string for a plugin.
-
-";
-
 %feature("docstring")  casadi::casadi_qr_colcomb(T1 *v, const T1 *nz_r,
 const casadi_int *sp_r, const casadi_int *pc, T1 eps, casadi_int ind) "
 
@@ -80083,6 +81443,15 @@ General information
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -80095,6 +81464,28 @@ General information
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -80156,6 +81547,11 @@ General information
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -80253,6 +81649,15 @@ General information
 | output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
 |                  |                 | option (ignored) | Internal         |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -80262,6 +81667,11 @@ General information
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -80453,6 +81863,15 @@ General information
 | const_dim        | OT_BOOL         | Assume constant  | casadi::Dple     |
 |                  |                 | dimension of P   |                  |
 +------------------+-----------------+------------------+------------------+
+| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
+|                  |                 | CasADi's AD. Use | Internal         |
+|                  |                 | together with    |                  |
+|                  |                 | 'jac_penalty':   |                  |
+|                  |                 | 0. Note: Highly  |                  |
+|                  |                 | experimental.    |                  |
+|                  |                 | Syntax may break |                  |
+|                  |                 | often.           |                  |
++------------------+-----------------+------------------+------------------+
 | derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
 |                  |                 | a derivative of  | Internal         |
 |                  |                 | another          |                  |
@@ -80465,6 +81884,28 @@ General information
 |                  |                 | inferred from    |                  |
 |                  |                 | the function     |                  |
 |                  |                 | name.            |                  |
++------------------+-----------------+------------------+------------------+
+| dump             | OT_BOOL         | Dump function to | casadi::Function |
+|                  |                 | file upon first  | Internal         |
+|                  |                 | evaluation.      |                  |
+|                  |                 | [false]          |                  |
++------------------+-----------------+------------------+------------------+
+| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
+|                  |                 | dump             | Internal         |
+|                  |                 | inputs/outputs   |                  |
+|                  |                 | to. Make sure    |                  |
+|                  |                 | the directory    |                  |
+|                  |                 | exists [.]       |                  |
++------------------+-----------------+------------------+------------------+
+| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | to file          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs to file  |                  |
+|                  |                 | [default: false] |                  |
 +------------------+-----------------+------------------+------------------+
 | enable_fd        | OT_BOOL         | Enable           | casadi::Function |
 |                  |                 | derivative       | Internal         |
@@ -80540,6 +81981,11 @@ General information
 |                  |                 | finite           |                  |
 |                  |                 | difference       |                  |
 |                  |                 | instance         |                  |
++------------------+-----------------+------------------+------------------+
+| forward_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | forward mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
 |                  |                 | option           | Internal         |
@@ -80621,6 +82067,15 @@ General information
 |                  |                 | positive         |                  |
 |                  |                 | definite         |                  |
 +------------------+-----------------+------------------+------------------+
+| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of inputs | Internal         |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
+| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
+|                  |                 | values of        | Internal         |
+|                  |                 | outputs          |                  |
+|                  |                 | [default: false] |                  |
++------------------+-----------------+------------------+------------------+
 | print_time       | OT_BOOL         | print            | casadi::Function |
 |                  |                 | information      | Internal         |
 |                  |                 | about execution  |                  |
@@ -80630,6 +82085,11 @@ General information
 |                  |                 | when NaN or Inf  | Internal         |
 |                  |                 | appears during   |                  |
 |                  |                 | evaluation       |                  |
++------------------+-----------------+------------------+------------------+
+| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
+|                  |                 | passed to a      | Internal         |
+|                  |                 | reverse mode     |                  |
+|                  |                 | constructor      |                  |
 +------------------+-----------------+------------------+------------------+
 | user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
 |                  |                 | field that can   | Internal         |
@@ -80811,10 +82271,9 @@ T1 h, casadi_int n_y, const casadi_finite_diff_mem< T1 > *m) "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::combine(const Dict &first, const Dict
-&second) "
+%feature("docstring")  casadi::doc_interpolant(const std::string &name) "
 
-[INTERNAL]  Combine two dictionaries, giving priority to first one.
+Get the documentation string for a plugin.
 
 ";
 
