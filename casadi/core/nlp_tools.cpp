@@ -29,10 +29,11 @@
 
 namespace casadi {
 
-void detect_simple_bounds(const SX& x, const SX& p,
-      const SX& g, const SX& lbg, const SX& ubg,
-      std::vector<bool>& is_simple,
-      SX& lbx, SX& ubx,
+template <class T>
+void detect_simple_bounds_gen(const T& x, const T& p,
+      const T& g, const T& lbg, const T& ubg,
+      std::vector<casadi_int>& gi,
+      T& lbx, T& ubx,
       Function& lam_forward,
       Function& lam_backward) {
 
@@ -53,8 +54,7 @@ void detect_simple_bounds(const SX& x, const SX& p,
     Sparsity spT = sp.T();
 
     // Reset result vector
-    is_simple.clear();
-    is_simple.resize(ng, true);
+    std::vector<bool> is_simple(ng, true);
 
     // Check nonlinearity
     std::vector<bool> is_nonlin = which_depends(g, x, 2, true);
@@ -68,25 +68,25 @@ void detect_simple_bounds(const SX& x, const SX& p,
 
     // Full-indices of all simple constraints
     std::vector<casadi_int> sgi = boolvec_to_index(is_simple);
-    std::vector<casadi_int> nsgi = boolvec_to_index(boolvec_not(is_simple));
-    SX g_bounds = g(sgi);
+    gi = boolvec_to_index(boolvec_not(is_simple));
+    T g_bounds = g(sgi);
     std::vector<casadi_int> sgi_to_sgsi = lookupvector(sgi, ng);
 
     // Detect  f2(p)x+f1(p)==0
-    Function gf = Function("gf", std::vector<SX>{x, p},
-                                  std::vector<SX>{g_bounds, jtimes(g_bounds, x, SX::ones(nx, 1))});
+    Function gf = Function("gf", std::vector<T>{x, p},
+                                  std::vector<T>{g_bounds, jtimes(g_bounds, x, T::ones(nx, 1))});
 
-    std::vector<SX> res;
-    gf.call(std::vector<SX>{0, p}, res, true, false);
-    SX f1 = res[0];
-    SX f2 = res[1];
+    std::vector<T> res;
+    gf.call(std::vector<T>{0, p}, res, true, false);
+    T f1 = res[0];
+    T f2 = res[1];
 
-    SX lb = (lbg(sgi)-f1)/abs(f2);
-    SX ub = (ubg(sgi)-f1)/abs(f2);
+    T lb = (lbg(sgi)-f1)/abs(f2);
+    T ub = (ubg(sgi)-f1)/abs(f2);
 
     // Start without simple bounds
-    lbx = -SX::inf(nx);
-    ubx = SX::inf(nx);
+    lbx = -T::inf(nx);
+    ubx = T::inf(nx);
 
     const casadi_int* xi = spT.row();
 
@@ -122,6 +122,7 @@ void detect_simple_bounds(const SX& x, const SX& p,
       k++;
     }
 
+    casadi_assert(n_groups>=1, "mismatch");
     // Take min/max group-wise to determine simple bounds
     for (casadi_int i=0;i<n_groups;++i) {
       lbx(sxi_groups[i]) = fmax(lbx(sxi_groups[i]), lb(sgsi_groups[i]));
@@ -148,26 +149,26 @@ void detect_simple_bounds(const SX& x, const SX& p,
     // Determine multiplier maps
 
     // Symbols
-    SX lam_g_forward = SX::sym("lam_g", ng);
-    SX lam_sg_backward = SX::sym("lam_g", nsgi.size());
-    SX lam_x_backward = SX::sym("lam_x", nx);
+    T lam_g_forward = T::sym("lam_g", ng);
+    T lam_sg_backward = T::sym("lam_g", gi.size());
+    T lam_x_backward = T::sym("lam_x", nx);
 
 
-    SX lam_sg_forward = lam_g_forward(sgi); // NOLINT(cppcoreguidelines-slicing)
-    SX lam_x_forward = SX::zeros(nx, 1);
-    SX lam_g_backward = SX::zeros(ng, 1);
-    lam_g_backward(nsgi) = lam_sg_backward;
+    T lam_sg_forward = lam_g_forward(sgi); // NOLINT(cppcoreguidelines-slicing)
+    T lam_x_forward = T::zeros(nx, 1);
+    T lam_g_backward = T::zeros(ng, 1);
+    lam_g_backward(gi) = lam_sg_backward;
 
     // Comparison expression per group
-    std::vector<SX> lcomp, ucomp;
+    std::vector<T> lcomp, ucomp;
     for (casadi_int i=0;i<n_groups;++i) {
       lcomp.push_back(lbx(sxi_groups[i])==lb(sgsi_groups[i]));
       ucomp.push_back(ubx(sxi_groups[i])==ub(sgsi_groups[i]));
     }
 
     // How many lb/ub are active?
-    SX count_lb = SX::zeros(lb.size());
-    SX count_ub = SX::zeros(ub.size());
+    T count_lb = T::zeros(nx);
+    T count_ub = T::zeros(nx);
     for (casadi_int i=0;i<n_groups;++i) {
       count_lb(sxi_groups[i]) += lcomp[i];
       count_ub(sxi_groups[i]) += ucomp[i];
@@ -175,18 +176,18 @@ void detect_simple_bounds(const SX& x, const SX& p,
 
     // Compute lam_x from lam_g
     for (casadi_int i=0;i<n_groups;++i) {
-      SX l = lam_sg_forward(sgsi_groups[i]); // NOLINT(cppcoreguidelines-slicing)
-      SX lt = (l<0);
-      SX gt = !lt;
+      T l = lam_sg_forward(sgsi_groups[i]); // NOLINT(cppcoreguidelines-slicing)
+      T lt = (l<0);
+      T gt = !lt;
       lam_x_forward(sxi_groups[i]) += l*(lt*lcomp[i]+gt*ucomp[i]);
     }
 
     // Compute lam_g from lam_x
-    SX l = lam_x_backward(sxi_ref); // NOLINT(cppcoreguidelines-slicing)
-    SX lt = (l<0);
-    SX gt = !lt;
-    SX lam_xl = l*lt/count_lb(sxi_ref);
-    SX lam_xu = l*gt/count_ub(sxi_ref);
+    T l = lam_x_backward(sxi_ref); // NOLINT(cppcoreguidelines-slicing)
+    T lt = (l<0);
+    T gt = !lt;
+    T lam_xl = l*lt/count_lb(sxi_ref);
+    T lam_xu = l*gt/count_ub(sxi_ref);
 
     for (casadi_int i=0;i<n_groups;++i) {
       lam_g_backward(sgi_groups[i]) = lam_xl(xsub[i])*lcomp[i]+lam_xu(xsub[i])*ucomp[i];
@@ -194,7 +195,7 @@ void detect_simple_bounds(const SX& x, const SX& p,
 
     // Construct Functions for mappings
     lam_forward = Function("lam_forward",
-      {lam_g_forward, p}, {lam_g_forward(nsgi), lam_x_forward},// NOLINT(cppcoreguidelines-slicing)
+      {lam_g_forward, p}, {lam_g_forward(gi), lam_x_forward},// NOLINT(cppcoreguidelines-slicing)
       {"lam_g", "p"}, {"lam_sg", "lam_x"});
     casadi_assert_dev(!lam_forward.has_free());
     lam_backward = Function("lam_backward",
@@ -202,5 +203,25 @@ void detect_simple_bounds(const SX& x, const SX& p,
       {"lam_sg", "lam_x", "p"}, {"lam_g"});
     casadi_assert_dev(!lam_backward.has_free());
   }
+
+void detect_simple_bounds(const SX& x, const SX& p,
+      const SX& g, const SX& lbg, const SX& ubg,
+      std::vector<casadi_int>& gi,
+      SX& lbx, SX& ubx,
+      Function& lam_forward,
+      Function& lam_backward) {
+  detect_simple_bounds_gen(x, p, g, lbg, ubg,
+    gi, lbx, ubx, lam_forward, lam_backward);
+}
+
+void detect_simple_bounds(const MX& x, const MX& p,
+      const MX& g, const MX& lbg, const MX& ubg,
+      std::vector<casadi_int>& gi,
+      MX& lbx, MX& ubx,
+      Function& lam_forward,
+      Function& lam_backward) {
+  detect_simple_bounds_gen(x, p, g, lbg, ubg,
+    gi, lbx, ubx, lam_forward, lam_backward);
+}
 
 } // namespace casadi

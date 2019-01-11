@@ -30,7 +30,8 @@
 
 namespace casadi {
 
-  /** Detect simple bounds from general constraints
+  //@{
+  /** \brief Detect simple bounds from general constraints
    *
    * Given parametric constraints:
    * \verbatim
@@ -39,7 +40,7 @@ namespace casadi {
    *
    * Returns an equivalent set
    * \verbatim
-   *   subject to  lbg(p)(!is_simple) <= g(x,p)(!is_simple) <= ubg(p)(!is_simple)
+   *   subject to  lbg(p)(gi) <= g(x,p)(gi) <= ubg(p)(gi)
    *               lbx(p) <= x                 <= ubx(p)
    * \endverbatim
    *
@@ -48,10 +49,26 @@ namespace casadi {
    * */
   CASADI_EXPORT void detect_simple_bounds(const SX& xX, const SX& p,
       const SX& g, const SX& lbg, const SX& ubg,
-      std::vector<bool>& SWIG_OUTPUT(is_simple),
+      std::vector<casadi_int>& SWIG_OUTPUT(gi),
       SX& SWIG_OUTPUT(lbx), SX& SWIG_OUTPUT(ubx),
       Function& SWIG_OUTPUT(lam_forward),
       Function& SWIG_OUTPUT(lam_backward));
+  CASADI_EXPORT void detect_simple_bounds(const MX& xX, const MX& p,
+      const MX& g, const MX& lbg, const MX& ubg,
+      std::vector<casadi_int>& SWIG_OUTPUT(gi),
+      MX& SWIG_OUTPUT(lbx), MX& SWIG_OUTPUT(ubx),
+      Function& SWIG_OUTPUT(lam_forward),
+      Function& SWIG_OUTPUT(lam_backward));
+  //@}
+
+/*
+  CASADI_EXPORT void detect_simple_bounds(const SX& xX,
+      const SX& g, const SX& lbg, const SX& ubg,
+      std::vector<casadi_int>& SWIG_OUTPUT(gi),
+      DM& SWIG_OUTPUT(lbx), DM& SWIG_OUTPUT(ubx),
+      Function& SWIG_OUTPUT(lam_forward),
+      Function& SWIG_OUTPUT(lam_backward));
+*/
 
 } // namespace casadi
 
