@@ -488,6 +488,7 @@ namespace casadi {
 
   template<typename MatType>
   MatType SparsityInterface<MatType>::veccat(const std::vector< MatType >& x) {
+    if (x.empty()) return MatType(0, 1);
     std::vector< MatType > x_vec = x;
     for (typename std::vector< MatType >::iterator it=x_vec.begin();
          it!=x_vec.end(); ++it) {
