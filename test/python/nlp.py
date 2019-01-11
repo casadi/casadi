@@ -1746,7 +1746,7 @@ class NLPtests(casadiTestCase):
     ubg = vcat(ubg)
     g = vcat(g)
 
-    [is_simple,lbx,ubx,lam_f,lam_b]=detect_simple_bounds(x,p,g,lbg,ubg)
+    [gi,lbx,ubx,lam_f,lam_b]=detect_simple_bounds(x,p,g,lbg,ubg)
 
     self.checkarray(DM(lbx).T,[-4,9,7,-inf,0])
     self.checkarray(DM(ubx).T,[2,9,7,inf,2])
