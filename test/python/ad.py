@@ -762,5 +762,27 @@ class ADtests(casadiTestCase):
             H_ = Hf_out[0]
           self.checkarray(Hf_out[0],H_,failmessage=("mode: %s" % mode))
 
+  def test_jtimes(self):
+    for X in [SX,MX]:
+      for n in [0, 1, 3]:
+        for m in [0, 1, 5]:
+          arg = X.sym("x",n,m)
+
+          for nn in [0, 1, 2]:
+            for mm in [0, 1, 4]:
+
+              ex = sumsqr(arg**2)*DM.ones(nn,mm)                 
+
+              for N in [0,1,2]:
+                if arg.shape[1]==0: N=1          
+                e = jtimes(ex,arg,repmat(DM.ones(arg.shape),1,N))
+                self.assertEqual(e.shape[0],ex.shape[0])
+                self.assertEqual(e.shape[1],ex.shape[1]*N)
+              for N in [0,1,2]:
+                if ex.shape[1]==0: N=1          
+                e = jtimes(ex,arg,repmat(DM.ones(ex.shape),1,N), True)
+                self.assertEqual(e.shape[0],arg.shape[0])
+                self.assertEqual(e.shape[1],arg.shape[1]*N)
+
 if __name__ == '__main__':
     unittest.main()

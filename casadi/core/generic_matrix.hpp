@@ -618,11 +618,37 @@ namespace casadi {
     ///@}
 
     /** \brief Calculate the Jacobian and multiply by a vector from the right
-        This is equivalent to <tt>mul(jacobian(ex, arg), v)</tt> or
-        <tt>mul(jacobian(ex, arg).T, v)</tt> for
+        
+        This is equivalent to <tt>mtimes(jacobian(ex, arg), v)</tt> or
+        <tt>mtimes(jacobian(ex, arg).T, v)</tt> for
         tr set to false and true respectively. If contrast to these
         expressions, it will use directional derivatives which is typically (but
         not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
+
+        More in-depth, two types of calls can be made:
+        \verbatim
+        e = jtimes(ex,arg,v,false); 
+        e_tr = jtimes(ex,arg,v,true);
+        \endverbatim
+
+        Here, arg, ex, and v are not limited to column vectors.
+        The shape of the return values e/e_tr is as follows.
+
+        Single seed mode:
+        \verbatim
+        e.size()==ex.size()
+        e_tr.size()==arg.size()
+        \endverbatim
+
+        Multiple seed mode (N seeds):
+        \verbatim
+        e.size2()==ex.size2()*N
+        e_tr.size2()==arg.size2()*N
+        \enverbatim
+
+        There is an ambiguity in detecting N when <tt>ex.size2()==0</tt>/<tt>arg.size2()==0</tt>.
+        In that case, we assume <tt>N=1</tt>, ie single seed mode.
+
     */
     friend inline MatType jtimes(const MatType &ex, const MatType &arg,
                                  const MatType &v, bool tr=false, const Dict& opts=Dict()) {
@@ -1160,15 +1186,37 @@ namespace casadi {
     try {
       // Assert consistent input dimensions
       if (tr) {
-        casadi_assert(v.size1() == ex.size1() && v.size2() % ex.size2() == 0,
+        if (ex.size2()==0) {
+          casadi_assert(v.size2()==0,
+                      "'v' has inconsistent dimensions");
+        } else {
+          casadi_assert(v.size2() % ex.size2() == 0,
+                      "'v' has inconsistent dimensions");
+        }
+        casadi_assert(v.size1() == ex.size1(),
                       "'v' has inconsistent dimensions");
       } else {
-        casadi_assert(v.size1() == arg.size1() && v.size2() % arg.size2() == 0,
+        if (arg.size2()==0) {
+          casadi_assert(v.size2()==0,
+                      "'v' has inconsistent dimensions");
+        } else {
+          casadi_assert(v.size2() % arg.size2() == 0,
+                      "'v' has inconsistent dimensions");
+        }
+        casadi_assert(v.size1() == arg.size1(),
                       "'v' has inconsistent dimensions");
       }
 
-      // Quick return if no seeds
-      if (v.is_empty()) return MatType(tr ? arg.size1() : ex.size1(), 0);
+      // Quick return if any part is empty
+      if (ex.is_empty() || arg.is_empty() || v.is_empty()) {
+        if (tr) {
+          casadi_int N = ex.size2()==0 ? 1 : v.size2()/ex.size2();
+          return MatType(arg.size1(), arg.size2()*N);
+        } else {
+          casadi_int N = arg.size2()==0 ? 1 : v.size2()/arg.size2();
+          return MatType(ex.size1(), ex.size2()*N);
+        }
+      }
 
       // Split up the seed into its components
       std::vector<MatType> w = horzsplit(v, tr ? ex.size2() : arg.size2());
