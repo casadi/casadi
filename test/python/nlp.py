@@ -1296,7 +1296,7 @@ class NLPtests(casadiTestCase):
 
   @requires_nlpsol("snopt")
   def test_permute(self):
-    for Solver, solver_options in solvers:
+    for Solver, solver_options, features in solvers:
       if "snopt" not in str(Solver): continue
       for permute_g in itertools.permutations(list(range(3))):
         for permute_x in itertools.permutations(list(range(4))):
@@ -1338,7 +1338,7 @@ class NLPtests(casadiTestCase):
 
   @requires_nlpsol("snopt")
   def test_permute2(self):
-    for Solver, solver_options in solvers:
+    for Solver, solver_options, features in solvers:
       if "snopt" not in str(Solver): continue
       for permute_g in itertools.permutations(list(range(3))):
         for permute_x in itertools.permutations(list(range(4))):
@@ -1380,7 +1380,7 @@ class NLPtests(casadiTestCase):
 
   @requires_nlpsol("snopt")
   def test_permute3(self):
-    for Solver, solver_options in solvers:
+    for Solver, solver_options,features in solvers:
       if "snopt" not in str(Solver): continue
       for permute_g in itertools.permutations(list(range(3))):
         for permute_x in itertools.permutations(list(range(4))):

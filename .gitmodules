@@ -4,3 +4,6 @@
 [submodule "external_packages/blasfeo/src"]
 	path = external_packages/blasfeo/src
 	url = https://github.com/jgillis/blasfeo.git
+[submodule "external_packages/snopt-interface/snopt-interface"]
+	path = external_packages/snopt-interface/snopt-interface
+	url = git@github.com:snopt/snopt-interface.git
