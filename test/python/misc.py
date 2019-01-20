@@ -347,7 +347,7 @@ class Misctests(casadiTestCase):
 
     assert "casadi_nlpsol_foo" in result[1]
 
-  @memory_heavy()
+  #@memory_heavy()
   def test_serialize(self):
 
     x = Sparsity.upper(3)
