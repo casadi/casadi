@@ -51,9 +51,10 @@ if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10},set()))
 
 if has_conic("qrqp") and has_nlpsol("sqpmethod"):
-  solvers.append(("sqpmethod",{"qpsol": "qrqp"},{"codegen"}))
-  solvers.append(("sqpmethod",{"qpsol": "qrqp","max_iter_ls":0},{"codegen"}))
-  solvers.append(("sqpmethod",{"qpsol": "qrqp","regularize":True,"max_iter":500},{"codegen"}))
+  qpsol_options = {"print_iter":False,"print_header":False}
+  solvers.append(("sqpmethod",{"qpsol": "qrqp","qpsol_options": qpsol_options},{"codegen"}))
+  solvers.append(("sqpmethod",{"qpsol": "qrqp","max_iter_ls":0,"qpsol_options": qpsol_options},{"codegen"}))
+  solvers.append(("sqpmethod",{"qpsol": "qrqp","regularize":True,"max_iter":500,"qpsol_options": qpsol_options},{"codegen"}))
 
 if has_nlpsol("blocksqp"):
   try:
