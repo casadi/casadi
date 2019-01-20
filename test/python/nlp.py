@@ -947,7 +947,7 @@ class NLPtests(casadiTestCase):
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
       solver_in["x0"]=[0,1]
-      if "qrqp" in str(solver_options): solver_in["x0"]=[0.5,1]
+      if "qrqp" in str(solver_options): solver_in["x0"]=[1.5,1]
       solver_in["lbx"]=[-10,-10]
       solver_in["ubx"]=[10,10]
       solver_in["lbg"]=[2.2]
@@ -974,6 +974,7 @@ class NLPtests(casadiTestCase):
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
       solver_in["x0"]=[0,1]
+      if "qrqp" in str(solver_options): solver_in["x0"]=[1.5,1]
       solver_in["lbx"]=[-10,-10]
       solver_in["ubx"]=[10,10]
       solver_in["lbg"]=[0]
