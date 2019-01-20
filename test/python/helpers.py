@@ -133,6 +133,10 @@ def toMX_fun(fun):
 
 class casadiTestCase(unittest.TestCase):
 
+  @classmethod
+  def tearDownClass(cls):
+    print("STATUS_RAN_ALL_TESTS")
+
   @contextmanager
   def assertInException(self,s):
     e = None
