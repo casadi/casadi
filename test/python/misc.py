@@ -166,7 +166,6 @@ class Misctests(casadiTestCase):
 
     #d = i.optionAllowed(n)
 
-  @unittest.skipIf(sys.version_info>=(3,0),"too lazy to fix now")
   def test_pickling(self):
 
     a = Sparsity.lower(4)
@@ -190,48 +189,47 @@ class Misctests(casadiTestCase):
     b = pickle.loads(s)
     self.checkarray(a,b)
 
-  @known_bug()
   def test_exceptions(self):
     try:
       nlpsol(123)
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "nlpsol(str,str,Function,Dict)" in e.message
-      assert "You have: nlpsol(int)" in e.message
-      assert "::" not in e.message
-      assert "std" not in e.message
+      e_message = str(e)
+      assert "nlpsol(str,str,dict:MX,dict)" in e_message
+      assert "You have: '(int)'" in e_message
+      assert "::" not in e_message
+      assert "std" not in e_message
 
     try:
-      vertcat(*123)
+      vcat(123)
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "vertcat(*[SX]" in e.message
-      assert "vertcat(*[DM" in e.message
-      assert "You have: vertcat(*int)" in e.message
-      assert "::" not in e.message
-      assert "std" not in e.message
+      e_message = str(e)
+      assert "vertcat([SX]" in e_message
+      assert "vertcat([DM]" in e_message
+      assert "You have: '(int)'" in e_message
+      assert "::" not in e_message
+      assert "std" not in e_message
 
     try:
       substitute(123)
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "substitute(SX,SX,SX)" in e.message
-      assert "substitute([SX] ,[SX] ,[SX] )" in e.message
-      assert "You have: substitute(int)" in e.message
-      assert "::" not in e.message
-      assert "std" not in e.message
+      e_message = str(e)
+      assert "substitute(SX,SX,SX)" in e_message
+      assert "substitute([SX],[SX],[SX])" in e_message
+      assert "You have: '(int)'" in e_message
+      assert "::" not in e_message
+      assert "std" not in e_message
 
     try:
       load_nlpsol(132)
       self.assertTrue(False)
-    except TypeError as e:
-      print(e.message)
-      assert "Failed to convert input to str" in e.message
-      assert "::" not in e.message
-      assert "std" not in e.message
+    except NotImplementedError as e:
+      e_message = str(e)
+      assert "load_nlpsol(str)" in e_message
+      assert "::" not in e_message
+      assert "std" not in e_message
 
     x=SX.sym("x")
 
@@ -239,49 +237,49 @@ class Misctests(casadiTestCase):
       [x]+ x
       self.assertTrue(False)
     except TypeError as e:
-      print(e.message)
+      e_message = str(e)
 
     try:
       x + [x]
       self.assertTrue(False)
     except TypeError as e:
-      print(e.message)
+      e_message = str(e)
 
     try:
       x.reshape(2)
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "reshape(SX,(int,int) )" in e.message
+      e_message = str(e)
+      assert "reshape(SX,(int,int))" in e_message
 
     try:
       x.reshape(("a",2))
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "You have: reshape((str,int))" in e.message
+      e_message = str(e)
+      assert "You have: '(SX,(str,int))'" in e_message
 
     try:
       diagsplit("s")
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "diagsplit(SX,int)" in e.message
-      assert "diagsplit(DM ,int)" in e.message
+      e_message = str(e)
+      assert "diagsplit(SX,int)" in e_message
+      assert "diagsplit(DM,int)" in e_message
 
     try:
       DM("df")
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "  DM (" in e.message
+      e_message = str(e)
+      assert "  DM(" in e_message
 
     try:
-      vertcat(*[1,SX.sym('x'),MX.sym('x')])
+      vertcat(1,SX.sym('x'),MX.sym('x'))
       self.assertTrue(False)
     except NotImplementedError as e:
-      print(e.message)
-      assert "  vertcat(*" in e.message
+      e_message = str(e)
+      assert "vertcat(" in e_message
 
   def test_getscheme(self):
     x = SX.sym("x")
