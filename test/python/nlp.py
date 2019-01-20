@@ -29,6 +29,7 @@ from types import *
 from helpers import *
 import itertools
 
+import os
 #GlobalOptions.setCatchErrorsPython(False)
 
 solvers= []
@@ -66,13 +67,10 @@ if has_nlpsol("blocksqp"):
 if has_nlpsol("bonmin"):
   solvers.append(("bonmin",{},{"discrete"}))
 
-print(solvers)
-
-try:
-  load_nlpsol("knitro")
+if "SKIP_KNITRO_TESTS" not in os.environ and has_nlpsol("knitro"):
   solvers.append(("knitro",{"knitro":{"feastol":1e-8,"opttol":1e-8}},set()))
-except:
-  pass
+
+print(solvers)
 
 class NLPtests(casadiTestCase):
   def test_iteration_interrupt(self):
