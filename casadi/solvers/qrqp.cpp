@@ -255,7 +255,7 @@ namespace casadi {
     g.local("d", "struct casadi_qp_data");
     g.local("p", "struct casadi_qp_prob");
     g.local("flag", "int");
-    g.local("buf[121]", "char");
+    if (print_iter_ || print_lincomb_) g.local("buf[121]", "char");
     if (print_lincomb_) g.local("k", "casadi_int");
 
     // Setup memory structure
