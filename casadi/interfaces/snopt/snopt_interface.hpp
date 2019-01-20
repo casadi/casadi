@@ -132,9 +132,6 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
-    /// Exact Hessian?
-    bool exact_hessian_;
-
     static std::map<int, std::string> status_;
     static std::map<int, std::string> secondary_status_;
 
