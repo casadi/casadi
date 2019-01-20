@@ -47,6 +47,7 @@ matrix:
         - sudo make -j2 install
         - popd
         - python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        - pushd test/python && python nlp.py && popd
         - pushd test && make unittests_py_valgrind && popd
       after_success:
         - cd build
