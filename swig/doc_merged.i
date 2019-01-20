@@ -62994,7 +62994,7 @@ Explicitly load a plugin dynamically.
 
 %feature("docstring") casadi::detect_simple_bounds "
 
-Detect simple bounds from general constraints
+Detect simple bounds from general constraints.
 
 Given parametric constraints:
 
@@ -63009,7 +63009,7 @@ Returns an equivalent set
 
 ::
 
-  *   subject to  lbg(p)(!is_simple) <= g(x,p)(!is_simple) <= ubg(p)(!is_simple)
+  *   subject to  lbg(p)(gi) <= g(x,p)(gi) <= ubg(p)(gi)
   *               lbx(p) <= x                 <= ubx(p)
   * 
 

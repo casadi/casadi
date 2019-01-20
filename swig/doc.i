@@ -78291,11 +78291,11 @@ T1 > *p, casadi_int *sz_iw, casadi_int *sz_w) "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::detect_simple_bounds(const SX &xX, const SX
-&p, const SX &g, const SX &lbg, const SX &ubg, std::vector< bool >
-&output_is_simple, SX &output_lbx, SX &output_ubx, Function
-&output_lam_forward, Function &output_lam_backward) "
+&p, const SX &g, const SX &lbg, const SX &ubg, std::vector< casadi_int >
+&output_gi, SX &output_lbx, SX &output_ubx, Function &output_lam_forward,
+Function &output_lam_backward) "
 
-Detect simple bounds from general constraints
+Detect simple bounds from general constraints.
 
 Given parametric constraints:
 
@@ -78310,7 +78310,42 @@ Returns an equivalent set
 
 ::
 
-  *   subject to  lbg(p)(!is_simple) <= g(x,p)(!is_simple) <= ubg(p)(!is_simple)
+  *   subject to  lbg(p)(gi) <= g(x,p)(gi) <= ubg(p)(gi)
+  *               lbx(p) <= x                 <= ubx(p)
+  * 
+
+
+
+Parameters:
+-----------
+
+lam_forward:  (lam_g,p)->(lam_sg,lam_x)
+
+lam_backward:  (lam_sg,lam_x,p)->(lam_g)
+
+";
+
+%feature("docstring")  casadi::detect_simple_bounds(const MX &xX, const MX
+&p, const MX &g, const MX &lbg, const MX &ubg, std::vector< casadi_int >
+&output_gi, MX &output_lbx, MX &output_ubx, Function &output_lam_forward,
+Function &output_lam_backward) "
+
+Detect simple bounds from general constraints.
+
+Given parametric constraints:
+
+::
+
+  *   subject to lbg(p) <= g(x,p) <= ubg(p)
+  * 
+
+
+
+Returns an equivalent set
+
+::
+
+  *   subject to  lbg(p)(gi) <= g(x,p)(gi) <= ubg(p)(gi)
   *               lbx(p) <= x                 <= ubx(p)
   * 
 
