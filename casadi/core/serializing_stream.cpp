@@ -224,12 +224,12 @@ namespace casadi {
     }
 
     void SerializingStream::pack(const Function& e) {
-      decorate('X');
+      decorate('F');
       shared_pack(e);
     }
 
     void DeserializingStream::unpack(Function& e) {
-      assert_decoration('X');
+      assert_decoration('F');
       shared_unpack<Function, FunctionInternal>(e);
     }
 
