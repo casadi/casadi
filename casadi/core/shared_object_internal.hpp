@@ -35,6 +35,7 @@ namespace casadi {
   class CASADI_EXPORT SharedObjectInternal {
     friend class SharedObject;
     friend class Memory;
+    friend class UniversalNodeOwner;
   public:
 
     /// Default constructor
