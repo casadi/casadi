@@ -69,6 +69,7 @@ branches:
     - /.*appveyor.*/
 
 before_install:
+  - (while true ; do sleep 60 ; echo "ping" ; done ) &
   - shell_session_update() { :; } # Workaround for travis-ci/travis-ci#6522
   - pushd ../../ && git clone https://github.com/casadi/testbot.git
   - pushd testbot && source recipes/setup.sh && popd
