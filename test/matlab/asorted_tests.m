@@ -530,3 +530,8 @@ A(:) = r;
 assert(nnz(a(:))==nnz(A(:)));
 assert(full(norm(a(:)-A(:)))==0);
 
+
+assert(size(MX(ones(1,4)),1)==1)
+assert(size(MX(ones(1,4)),2)==4)
+
+

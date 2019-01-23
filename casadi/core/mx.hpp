@@ -94,8 +94,10 @@ namespace casadi {
     /** \brief  Copy constructor */
     MX(const MX& x);
 
+#ifndef SWIG
     /** \brief  Create vector constant (also implicit type conversion) */
     MX(const std::vector<double> &x);
+#endif
 
     /** \brief  Create sparse matrix constant (also implicit type conversion) */
     MX(const Matrix<double> &x);
