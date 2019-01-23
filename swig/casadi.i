@@ -2647,7 +2647,10 @@ class NZproxy:
     }
 
     // Set a submatrix (index-1)
-    void paren_asgn(const Type& m, char rr) { $self->set(m, true, casadi::char2Slice(rr));}
+    void paren_asgn(const Type& m, char rr) {
+      casadi_assert_dev(rr==':');
+      $self->set(m, false, casadi::IM(casadi::range($self->numel())));
+    }
     void paren_asgn(const Type& m, const Matrix<casadi_int>& rr) { $self->set(m, true, rr);}
     void paren_asgn(const Type& m, const Sparsity& sp) { $self->set(m, true, sp);}
     void paren_asgn(const Type& m, char rr, char cc) { $self->set(m, true, casadi::char2Slice(rr), casadi::char2Slice(cc));}
