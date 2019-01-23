@@ -51005,12 +51005,6 @@ Copy constructor.
 
 ";
 
-%feature("docstring") casadi::MX::MX(const std::vector< double > &x) "
-
-Create vector constant (also implicit type conversion)
-
-";
-
 %feature("docstring") casadi::MX::MX(const MatrixCommon &x) "
 
 Create sparse matrix constant (also implicit type conversion)
