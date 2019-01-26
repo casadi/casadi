@@ -2020,10 +2020,10 @@ namespace casadi {
 
       // Copy inputs to buffers
       casadi_int offset=0;
-      g << CodeGenerator::array("const casadi_real*", "arg", n_in_, "{0}");
+      g << CodeGenerator::array("const casadi_real*", "arg", sz_arg(), "{0}");
 
       // Allocate output buffers
-      g << "casadi_real* res[" << n_out_ << "] = {0};\n";
+      g << "casadi_real* res[" << sz_res() << "] = {0};\n";
 
       // Check arguments
       g << "if (argc>" << n_in_ << ") mexErrMsgIdAndTxt(\"Casadi:RuntimeError\","
