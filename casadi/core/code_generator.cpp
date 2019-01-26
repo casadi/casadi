@@ -139,16 +139,16 @@ namespace casadi {
       add_include("string.h");
     }
 
-    // Memory struct entry point
-    if (this->with_mem) {
-      add_include("casadi/mem.h", false);
-      this->header << "#include <casadi/mem.h>\n";
-    }
-
     // Mex
     if (this->mex) {
       add_include("mex.h", false, "MATLAB_MEX_FILE");
     }
+
+    // Memory struct entry point
+    if (this->with_mem) {
+      this->header << "#include <casadi/mem.h>\n";
+    }
+
   }
 
   string CodeGenerator::add_dependency(const Function& f) {
@@ -424,11 +424,18 @@ namespace casadi {
     s << this->includes.str();
     s << endl;
 
+    // Numeric types after includes: may depend on them. e.g. mex type
     // Real type (usually double)
     generate_casadi_real(s);
 
     // Integer type (usually long long)
     generate_casadi_int(s);
+
+    // casadi/mem after numeric types to define derived types
+    // Memory struct entry point
+    if (this->with_mem) {
+      s << "#include <casadi/mem.h>\n" << endl;
+    }
 
     // Macros
     if (!added_shorthands_.empty()) {
