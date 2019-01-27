@@ -9322,6 +9322,12 @@ Get input scheme name by index.
 
 ";
 
+%feature("docstring") casadi::Callback::generate_output "
+
+Export an output file that can be checked with generated C code output.
+
+";
+
 %feature("docstring") casadi::Callback::has_free "
 
 Does the function have free variables.
@@ -24367,6 +24373,12 @@ Get input scheme name by index.
 
 Get symbolic primitives equivalent to the input expressions There is no
 guarantee that subsequent calls return unique answers.
+
+";
+
+%feature("docstring") casadi::Function::generate_output "
+
+Export an output file that can be checked with generated C code output.
 
 ";
 

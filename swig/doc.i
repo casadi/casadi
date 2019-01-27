@@ -11111,6 +11111,20 @@ Get input scheme name by index.
 
 ";
 
+%feature("docstring")  casadi::Function::generate_output(const std::string
+&fname, const DMDict &arg) "
+
+Export an output file that can be checked with generated C code output.
+
+";
+
+%feature("docstring")  casadi::Function::generate_output(const std::string
+&fname, const std::vector< DM > &arg) "
+
+Export an output file that can be checked with generated C code output.
+
+";
+
 %feature("docstring")  casadi::Function::has_free() const  "
 
 Does the function have free variables.
@@ -29927,6 +29941,20 @@ guarantee that subsequent calls return unique answers.
 
 Get symbolic primitives equivalent to the input expressions There is no
 guarantee that subsequent calls return unique answers.
+
+";
+
+%feature("docstring")  casadi::Function::generate_output(const std::string
+&fname, const DMDict &arg) "
+
+Export an output file that can be checked with generated C code output.
+
+";
+
+%feature("docstring")  casadi::Function::generate_output(const std::string
+&fname, const std::vector< DM > &arg) "
+
+Export an output file that can be checked with generated C code output.
 
 ";
 
