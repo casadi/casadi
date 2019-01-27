@@ -700,6 +700,12 @@ namespace casadi {
     void generate_input(const std::string& fname, const std::vector<DM>& arg);
     /// @}
 
+    /** \brief Export an output file that can be checked with generated C code output */
+    /// @{
+    void generate_output(const std::string& fname, const DMDict& arg);
+    void generate_output(const std::string& fname, const std::vector<DM>& arg);
+    /// @}
+
     /** \brief Export function in specific language
      *
      * Only allowed for (a subset of) SX/MX Functions
