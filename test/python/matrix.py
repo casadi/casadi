@@ -1017,6 +1017,17 @@ class Matrixtests(casadiTestCase):
       self.checkarray(np.cumsum(A,0),cumsum(B,0))
       self.checkarray(np.cumsum(A,1),cumsum(B,1))
 
+      Bs = MX.sym("B",B.shape)
+      A0 = cumsum(B,0)
+      A1 = cumsum(B,1)
+
+      self.checkarray(np.cumsum(A,0),evalf(cumsum(MX(B),0)))
+      self.checkarray(np.cumsum(A,1),evalf(cumsum(B,1)))
+
+      f = Function("f",[Bs],[A0,A1])
+      self.checkfunction(f,f.expand(),inputs = [B])
+      self.check_codegen(f,inputs=[B],check_serialize=True)
+
       #self.checkarray(np.diff(A),diff(B))
 
       #self.checkarray(np.diff(A,1),diff(B,1))
