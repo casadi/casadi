@@ -55,6 +55,7 @@
 #include "constant_mx.hpp"
 #include "get_elements.hpp"
 #include "map.hpp"
+#include "bspline.hpp"
 
 // Template implementations
 #include "setnonzeros_impl.hpp"
@@ -761,6 +762,26 @@ namespace casadi {
     }
   }
 
+  MX MXNode::get_bspline(const std::vector<double>& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<double>& coeffs,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode) const {
+    MX x = shared_from_this<MX>();
+    return MX::create(new BSpline(x, knots, offset, coeffs, degree, m, lookup_mode));
+  }
+
+  MX MXNode::get_bspline(const MX& coeffs,
+            const std::vector<double>& knots,
+            const std::vector<casadi_int>& offset,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const std::vector<casadi_int>& lookup_mode) const {
+    MX x = shared_from_this<MX>();
+    return MX::create(new BSplineParametric(x, coeffs, knots, offset, degree, m, lookup_mode));
+  }
+
   MX MXNode::get_det() const {
     return MX::create(new Determinant(shared_from_this<MX>()));
   }
@@ -1036,6 +1057,7 @@ namespace casadi {
     //OP_PRINTME,
     //OP_LIFT,
     //OP_EINSTEIN
+    {OP_BSPLINE, BSplineCommon::deserialize},
     {-1, OutputNode::deserialize}
   };
 

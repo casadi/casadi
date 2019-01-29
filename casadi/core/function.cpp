@@ -695,19 +695,15 @@ namespace casadi {
       const vector<double>& coeffs, const vector<casadi_int>& degree,
         casadi_int m, const Dict& opts) {
     try {
-      return BSpline::create(name, knots, coeffs, degree, m, opts);
+      MX x = MX::sym("x", degree.size());
+      std::vector<std::string> lookup_mode;
+      Dict opts_remainder = extract_from_dict(opts, "lookup_mode", lookup_mode);
+      Dict opts_bspline;
+      opts_bspline["lookup_mode"] = lookup_mode;
+      MX y = MX::bspline(x, DM(coeffs), knots, degree, m, opts_bspline);
+      return Function(name, {x}, {y}, opts_remainder);
     } catch (exception& e) {
       THROW_ERROR_NOOBJ("bspline", e.what(), "BSpline");
-    }
-  }
-
-  Function Function::bspline_dual(const std::string &name,
-      const std::vector< std::vector<double> >& knots, const vector<double>& x,
-      const vector<casadi_int>& degree, casadi_int m, bool reverse, const Dict& opts) {
-    try {
-      return BSplineDual::create(name, knots, x, degree, m, reverse, opts);
-    } catch (exception& e) {
-      THROW_ERROR_NOOBJ("bspline_dual", e.what(), "BSplineDual");
     }
   }
 

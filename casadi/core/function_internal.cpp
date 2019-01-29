@@ -40,7 +40,6 @@
 #include "conic_impl.hpp"
 #include "integrator_impl.hpp"
 #include "external_impl.hpp"
-#include "bspline.hpp"
 
 #include <cctype>
 #include <typeinfo>
@@ -3211,7 +3210,6 @@ namespace casadi {
     {"Rootfinder", Rootfinder::deserialize},
     {"Integrator", Integrator::deserialize},
     {"External", External::deserialize},
-    {"BSpline", BSplineCommon::deserialize},
     {"Conic", Conic::deserialize},
   };
 

@@ -184,9 +184,11 @@ namespace casadi {
     OP_PRINTME,
     OP_LIFT,
 
-    OP_EINSTEIN
+    OP_EINSTEIN,
+
+    OP_BSPLINE
   };
-  #define NUM_BUILT_IN_OPS (OP_EINSTEIN+1)
+  #define NUM_BUILT_IN_OPS (OP_BSPLINE+1)
 
   #define OP_
 
@@ -1030,6 +1032,7 @@ namespace casadi {
     case OP_PRINTME:       return F<OP_PRINTME>::check;
     case OP_LIFT:          return F<OP_LIFT>::check;
     case OP_EINSTEIN:      return F<OP_EINSTEIN>::check;
+    case OP_BSPLINE:       return F<OP_BSPLINE>::check;
     }
     return T();
   }
@@ -1550,6 +1553,7 @@ namespace casadi {
     case OP_PRINTME:        return "printme";
     case OP_LIFT:           return "lift";
     case OP_EINSTEIN:       return "einstein";
+    case OP_BSPLINE:       return "bspline";
     }
     return nullptr;
   }

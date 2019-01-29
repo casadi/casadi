@@ -1,8 +1,8 @@
 // NOLINT(legal/copyright)
-// SYMBOL "nd_boor_eval"
+// SYMBOL "nd_boor_dual_eval"
 template<typename T1>
-void casadi_nd_boor_eval(T1* ret, casadi_int n_dims, const T1* all_knots, const casadi_int* offset, const casadi_int* all_degree, const casadi_int* strides, const T1* c, casadi_int m, const T1* all_x, const casadi_int* lookup_mode, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
-  casadi_int n_iter, k, i, pivot;
+casadi_int casadi_nd_boor_dual_eval(T1* val, casadi_int* nz, casadi_int n_dims, const T1* all_knots, const casadi_int* offset, const casadi_int* all_degree, const casadi_int* strides, const T1* all_x, const casadi_int* lookup_mode, casadi_int* iw, T1* w) { // NOLINT(whitespace/line_length)
+  casadi_int n_iter, k, pivot, nnz;
   casadi_int *boor_offset, *starts, *index, *coeff_offset;
   T1 *cumprod, *all_boor;
 
@@ -17,6 +17,8 @@ void casadi_nd_boor_eval(T1* ret, casadi_int n_dims, const T1* all_knots, const 
   boor_offset[0] = 0;
   cumprod[n_dims] = 1;
   coeff_offset[n_dims] = 0;
+
+  nnz = 0;
 
   n_iter = 1;
   for (k=0;k<n_dims;++k) {
@@ -67,8 +69,10 @@ void casadi_nd_boor_eval(T1* ret, casadi_int n_dims, const T1* all_knots, const 
 
   for (k=0;k<n_iter;++k) {
     casadi_int pivot = 0;
+
     // accumulate result
-    for (i=0;i<m;++i) ret[i] += c[coeff_offset[0]+i]*cumprod[0];
+    nz[nnz] = coeff_offset[0];
+    val[nnz++] += cumprod[0];
 
     // Increment index
     index[0]++;
@@ -96,7 +100,10 @@ void casadi_nd_boor_eval(T1* ret, casadi_int n_dims, const T1* all_knots, const 
     cumprod[0] = (*(all_boor+index[0]))*cumprod[1];
 
     // Compute offset
-    coeff_offset[0] = (starts[0]+index[0])*m+coeff_offset[1];
+    coeff_offset[0] = starts[0]+index[0]+coeff_offset[1];
 
   }
+
+  return nnz;
 }
+

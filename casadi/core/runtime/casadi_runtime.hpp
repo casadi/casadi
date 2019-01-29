@@ -176,9 +176,7 @@ namespace casadi {
   void casadi_nd_boor_eval(T1* ret, casadi_int n_dims, const T1* knots, const casadi_int* offset,
                             const casadi_int* degree, const casadi_int* strides, const T1* c,
                             casadi_int m,
-                            const T1* x, const casadi_int* lookup_mode, casadi_int reverse,
-                            casadi_int* iw, T1* w);
-
+                            const T1* x, const casadi_int* lookup_mode, casadi_int* iw, T1* w);
 
   template<typename T1>
   T1 casadi_mmax(const T1* x, casadi_int n, T1 is_dense);
@@ -246,6 +244,7 @@ namespace casadi {
   #include "casadi_polyval.hpp"
   #include "casadi_de_boor.hpp"
   #include "casadi_nd_boor_eval.hpp"
+  #include "casadi_nd_boor_dual_eval.hpp"
   #include "casadi_interpn_weights.hpp"
   #include "casadi_interpn_interpolate.hpp"
   #include "casadi_interpn.hpp"

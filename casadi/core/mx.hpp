@@ -506,6 +506,21 @@ namespace casadi {
                                          const Dict& options);
     static MX lift(const MX& x, const MX& x_guess);
     static DM evalf(const MX& m);
+    static MX bspline(const MX& x,
+            const DM& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict());
+    static DM bspline_dual(const std::vector<double>& x,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            const Dict& opts = Dict());
+    static MX bspline(const MX& x, const MX& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict());
     ///@}
     /// \endcond
 
@@ -567,6 +582,31 @@ namespace casadi {
                     const std::vector<MX> &boundary = std::vector<MX>(),
                     const Dict& options = Dict()) {
       return MX::matrix_expand(e, boundary, options);
+    }
+
+
+    inline friend MX bspline(const MX& x,
+            const DM& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict()) {
+      return MX::bspline(x, coeffs, knots, degree, m, opts);
+    }
+
+    inline friend MX bspline(const MX& x, const MX& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts = Dict()) {
+      return MX::bspline(x, coeffs, knots, degree, m, opts);
+    }
+
+    inline friend DM bspline_dual(const std::vector<double>& x,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            const Dict& opts = Dict()) {
+      return MX::bspline_dual(x, knots, degree, opts);
     }
 
     /** \brief Lift the expression

@@ -35,6 +35,7 @@
 #include "expm.hpp"
 #include "serializing_stream.hpp"
 #include "im.hpp"
+#include "bspline.hpp"
 
 // Throw informative error message
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
@@ -1832,6 +1833,31 @@ namespace casadi {
 
   MX MX::find(const MX& x) {
     return x->get_find();
+  }
+
+
+  MX MX::bspline(const MX& x,
+            const DM& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts) {
+    return BSpline::create(x, knots, coeffs.nonzeros(), degree, m, opts);
+  }
+
+  MX MX::bspline(const MX& x, const MX& coeffs,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            casadi_int m,
+            const Dict& opts) {
+    return BSplineParametric::create(x, coeffs, knots, degree, m, opts);
+  }
+
+  DM MX::bspline_dual(const std::vector<double>& x,
+            const std::vector< std::vector<double> >& knots,
+            const std::vector<casadi_int>& degree,
+            const Dict& opts) {
+    return BSpline::dual(x, knots, degree, opts);
   }
 
   std::vector<MX> MX::get_input(const Function& f) {

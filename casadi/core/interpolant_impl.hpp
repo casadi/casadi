@@ -55,7 +55,7 @@ namespace casadi {
 
     ///@{
     /** \brief Number of function inputs and outputs */
-    size_t get_n_in() override { return 1;}
+    size_t get_n_in() override { return is_parametric() ? 2 : 1;}
     size_t get_n_out() override { return 1;}
     ///@}
 
@@ -87,6 +87,13 @@ namespace casadi {
         const std::vector<casadi_int>& margin_right=std::vector<casadi_int>());
 
     static std::vector<std::string> lookup_mode_from_enum(const std::vector<casadi_int>& modes);
+
+    static void stack_grid(const std::vector< std::vector<double> >& grid,
+      std::vector<casadi_int>& offset, std::vector<double>& stacked);
+
+    static void check_grid(const std::vector< std::vector<double> >& grid);
+
+    static std::vector<double> meshgrid(const std::vector< std::vector<double> >& grid);
 
     // Creator function for internal class
     typedef Interpolant* (*Creator)(const std::string& name,
@@ -131,6 +138,12 @@ namespace casadi {
     std::string serialize_base_function() const override { return "Interpolant"; }
     /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeserializingStream& s);
+
+    /** \brief Is parametric? */
+    bool is_parametric() const { return values_.empty(); }
+
+    /** \brief Size of the falttened coefficients vector */
+    casadi_int coeff_size() const;
 
   protected:
 
