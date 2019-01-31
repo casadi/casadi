@@ -902,7 +902,8 @@ namespace casadi {
     template<typename T>
     void bor(T* data, const T* val_data, const Sparsity& val_sp) const;
 
-    static std::string file_format(const std::string& filename, const std::string& format_hint);
+    static std::string file_format(const std::string& filename,
+      const std::string& format_hint, const std::set<std::string>& file_formats);
     static std::set<std::string> file_formats;
   private:
 

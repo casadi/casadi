@@ -67,6 +67,9 @@ namespace casadi {
   void DM::to_file(const std::string& filename, const Sparsity& sp,
     const double* nonzeros, const std::string& format);
 
+  template<>
+  DM DM::from_file(const std::string& filename, const std::string& format_hint);
+
 #ifndef CASADI_DM_INSTANTIATOR_CPP
   extern template class Matrix<double>;
 #endif // CASADI_DM_INSTANTIATOR_CPP

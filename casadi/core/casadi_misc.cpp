@@ -361,5 +361,15 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
     return ret;
   }
 
+  void normalized_setup(std::istream& stream) {
+    stream.imbue(std::locale("C"));
+  }
+
+  void normalized_setup(std::ostream& stream) {
+    stream.imbue(std::locale("C"));
+    stream << std::scientific;
+    stream << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+  }
+
 
 } // namespace casadi

@@ -1452,6 +1452,12 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Matrix<double> Matrix<Scalar>::from_file(const std::string& filename,
+      const std::string& format_hint) {
+    casadi_error("'from_file' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
   bool Matrix<Scalar>::is_integer() const {
     // Look for non-integers
     for (auto&& e : nonzeros()) if (!casadi_limits<Scalar>::is_integer(e)) return false;

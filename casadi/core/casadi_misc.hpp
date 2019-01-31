@@ -322,6 +322,57 @@ private:
   // Create a temporary file
   CASADI_EXPORT std::string temporary_file(const std::string& prefix, const std::string& suffix);
 
+  CASADI_EXPORT void normalized_setup(std::istream& stream);
+  CASADI_EXPORT void normalized_setup(std::ostream& stream);
+
+  inline void normalized_out(std::ostream& stream, double val) {
+    if (val==std::numeric_limits<double>::infinity()) {
+      stream << "inf";
+    } else if (val==-std::numeric_limits<double>::infinity()) {
+      stream << "-inf";
+    } else if (val!=val) {
+      stream << "nan";
+    } else {
+      stream << val;
+    }
+  }
+  inline int normalized_in(std::istream& stream, double& ret) {
+    std::streampos start = stream.tellg();
+    stream >> ret;
+    // Failed to interpret as double?
+    if (stream.fail()) {
+      // Clear error flag
+      stream.clear();
+      // Reset stream position
+      // Need to parse e.g "-inf"
+      stream.seekg(start);
+      // Might be a inf/nan
+      std::string non_reg;
+      stream >> non_reg;
+      // Break on trailing whitespace
+      if (stream.fail()) {
+        if (stream.eof()) {
+          ret = std::numeric_limits<double>::quiet_NaN();
+          return -1; // End of stream
+        } else {
+          ret = std::numeric_limits<double>::quiet_NaN();
+          return 1; // Failed to parse to string
+        }
+      }
+      if (non_reg=="inf") {
+        ret = std::numeric_limits<double>::infinity();
+      } else if (non_reg=="-inf") {
+        ret = -std::numeric_limits<double>::infinity();
+      } else if (non_reg=="nan") {
+        ret = std::numeric_limits<double>::quiet_NaN();
+      } else {
+        ret = std::numeric_limits<double>::quiet_NaN();
+        return 2; // Failed to interpretas number
+      }
+    }
+    return 0;
+  }
+
 } // namespace casadi
 
 #ifndef SWIG

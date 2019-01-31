@@ -1062,5 +1062,50 @@ class Matrixtests(casadiTestCase):
     with self.assertInException("CasADi matrices are not iterable"):
       iter(a)
 
+  def test_from_file(self):
+    a = sparsify(DM([[1,0,-6,5,0],[4,0,-4e-301,9.3e-18,0]]))
+
+    a.print_dense()
+
+    a[0,4] = 0
+    a[1,1] = 0
+    a.to_file("test.mtx")
+
+    with self.assertInException("foobar.mtx"):
+      DM.from_file("foobar.mtx")
+    b = DM.from_file("test.mtx")
+
+    self.assertTrue(a.sparsity()==b.sparsity())
+    self.checkarray(a,b)
+
+    a.to_file("test.txt")
+    b = DM.from_file("test.txt")
+    self.checkarray(a,b)
+
+    for s in ["1 00 -6 5 0\n4 0 -4e-301 9.3e-18 00\n",
+              "1 00 -6 5 0\n4 0 -4e-301 9.3e-18 00",
+              "1 00 -6 5 0 \n4 0 -4e-301 9.3e-18 00   ",
+              "1\t00\t-6\t5\t0\t\n4 0 -4e-301 9.3e-18 00\n",
+              "1 00 -6 5 0\n%foobar\n4 0 -4e-301 9.3e-18 00\n"]:
+
+      with open("test2.txt","w") as f:
+        f.write(s)
+      b = DM.from_file("test2.txt")
+      self.assertTrue(a.sparsity()==b.sparsity())
+      self.assertTrue(float(norm_1(a-b))==0)
+
+    with open("test.txt","w") as f:
+      f.write("1 aa 6\n4 8 9e-18\n")
+
+
+    with self.assertInException("Parsing"):
+      DM.from_file("test.txt")
+
+    a = DM([3, inf, -inf, np.nan])
+    a.to_file("test.txt")
+    b = DM.from_file("test.txt")
+    self.checkarray(a,b)
+
+
 if __name__ == '__main__':
     unittest.main()

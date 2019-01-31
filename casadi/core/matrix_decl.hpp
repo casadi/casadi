@@ -1098,11 +1098,16 @@ namespace casadi {
     /** Export numerical matrix to file
     *
     * Supported formats:
-    *   - .mtx   Matrix Market
+    *   - .mtx   Matrix Market (sparse)
+    *   - .txt   Ascii full precision representation (dense)
     */
     void to_file(const std::string& filename, const std::string& format="") const;
+#ifndef SWIG
     static void to_file(const std::string& filename, const Sparsity& sp,
       const Scalar* nonzeros, const std::string& format="");
+#endif
+
+    static Matrix<double> from_file(const std::string& filename, const std::string& format_hint="");
     //@}
 
 #ifndef SWIG
