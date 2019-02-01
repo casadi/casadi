@@ -2002,5 +2002,62 @@ class Functiontests(casadiTestCase):
 
     self.checkarray(JJ(5,2),5*pi+3)
 
+  def test_generate_input(self):
+    x = MX.sym("x",Sparsity.lower(3))
+    y = MX.sym("y",0,0)
+    z = MX.sym("z",2,2)
+    f = Function("f",[x,y,z],[2*x,2*y,2*z])
+    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(),DM([[1,3],[4,5]])]
+    f.generate_input("test.txt",ins)
+    ins2 = f.generate_input("test.txt")
+    self.assertEqual(len(ins),len(ins2))
+    for i,j in zip(ins,ins2):
+      self.checkarray(i,j)
+
+    out = f.call(ins)
+    f.generate_output("test.txt",out)
+    out2 = f.generate_output("test.txt")
+    self.assertEqual(len(out),len(out2))
+    for i,j in zip(out,out2):
+      self.checkarray(i,j)
+
+  def test_dump(self):
+    x = MX.sym("x",Sparsity.lower(3))
+    y = MX.sym("y",0,0)
+    z = MX.sym("z",2,2)
+    f = Function("f",[x,y,z],[2*x,2*y,2*z],["x","y","z"],["a","b","c"],{"dump":True,"dump_in":True,"dump_out":False})
+    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(),DM([[1,3],[4,5]])]
+    out = f(*ins)
+
+    F = Function.load("f.casadi")
+
+    x_num = DM.from_file("f.000000.in.x.mtx")
+    y_num = DM.from_file("f.000000.in.y.mtx")
+    z_num = DM.from_file("f.000000.in.z.mtx")
+
+    self.checkarray(x_num,ins[0])
+    self.checkarray(y_num,ins[1])
+    self.checkarray(z_num,ins[2])
+
+    a_num = DM.from_file("f.000000.out.a.mtx")
+    b_num = DM.from_file("f.000000.out.b.mtx")
+    c_num = DM.from_file("f.000000.out.c.mtx")
+
+    self.checkarray(a_num,out[0])
+    self.checkarray(b_num,out[1])
+    self.checkarray(c_num,out[2])
+
+    
+    F.generate_input("test_in.txt", [x_num,y_num,z_num])
+    F.generate_output("test_out.txt", F.call([x_num,y_num,z_num]))
+    X = DM.from_file("f.000000.in.txt")
+    A = DM.from_file("f.000000.out.txt")
+
+    Xr = DM.from_file("test_in.txt")
+    Ar = DM.from_file("test_out.txt")
+    
+    self.checkarray(Xr,X)
+    self.checkarray(Ar,A)
+
 if __name__ == '__main__':
     unittest.main()

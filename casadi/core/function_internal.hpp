@@ -726,6 +726,10 @@ namespace casadi {
     /** \brief Generate/retrieve cached serial map */
     Function map(casadi_int n, const std::string& parallelization) const;
 
+    /** \brief Export an input file that can be passed to generate C code with a main */
+    void generate_input(const std::string& fname, const double** arg) const;
+    void generate_output(const std::string& fname, double** res) const;
+
     /// Number of inputs and outputs
     size_t n_in_, n_out_;
 

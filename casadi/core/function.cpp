@@ -1015,7 +1015,8 @@ namespace casadi {
                                + str(arg.size()) + ".");
     // Set up output stream
     std::ofstream of(fname);
-    of << std::setprecision(17) << std::scientific;
+    casadi_assert(of.good(), "Error opening stream '" + fname + "'.");
+    normalized_setup(of);
 
     // Encode each input
     for (casadi_int i=0; i<n_in(); ++i) {
@@ -1023,12 +1024,14 @@ namespace casadi {
       if (arg[i].is_scalar(true)) {
         // Copy scalar input
         for (casadi_int k=0;k<nnz_in(i);++k) {
-          of << v[0] << std::endl;
+          normalized_out(of, v[0]);
+          of << std::endl;
         }
       } else if (v.size()==nnz_in(i)) {
         // Output non-scalar input verbatim
         for (casadi_int k=0;k<nnz_in(i);++k) {
-          of << v[k] << std::endl;
+          normalized_out(of, v[k]);
+          of << std::endl;
         }
       } else {
         casadi_error("Dimension mismatch: Expected " +
@@ -1038,16 +1041,53 @@ namespace casadi {
     }
   }
 
+  std::vector<DM> Function::generate_input(const std::string& fname) {
+    DM data = DM::from_file(fname, "txt");
+    casadi_assert(data.is_vector() && data.is_dense(), "Expected dense vector");
+    casadi_assert(data.numel()==nnz_in(),
+      "Dimension mismatch: file contains a vector of size " + str(data.numel())
+      + ", while size " + str(nnz_in()) + " was expected.");
 
-  void Function::generate_output(const std::string& fname, const std::vector<DM>& arg) {
-    casadi_assert(n_in()==arg.size(), "Mismatching number of inputs. "
-                               "Expected " + str(n_in()) + ", got "
-                               + str(arg.size()) + ".");
-    std::vector<DM> res = operator()(arg);
+    const std::vector<double> & nz = data.nonzeros();
+    std::vector<DM> ret;
+    casadi_int offset = 0;
+    for (casadi_int i=0;i<n_in();++i) {
+      ret.emplace_back(sparsity_in(i));
+      std::vector<double>& d = ret.back().nonzeros();
+      std::copy(nz.begin()+offset, nz.begin()+offset+nnz_in(i), d.begin());
+      offset += nnz_in(i);
+    }
+    return ret;
+  }
+
+  std::vector<DM> Function::generate_output(const std::string& fname) {
+    DM data = DM::from_file(fname, "txt");
+    casadi_assert(data.is_vector() && data.is_dense(), "Expected dense vector");
+    casadi_assert(data.numel()==nnz_out(),
+      "Dimension mismatch: file contains a vector of size " + str(data.numel())
+      + ", while size " + str(nnz_out()) + " was expected.");
+
+    const std::vector<double> & nz = data.nonzeros();
+    std::vector<DM> ret;
+    casadi_int offset = 0;
+    for (casadi_int i=0;i<n_out();++i) {
+      ret.emplace_back(sparsity_out(i));
+      std::vector<double>& d = ret.back().nonzeros();
+      std::copy(nz.begin()+offset, nz.begin()+offset+nnz_out(i), d.begin());
+      offset += nnz_out(i);
+    }
+    return ret;
+  }
+
+  void Function::generate_output(const std::string& fname, const std::vector<DM>& res) {
+    casadi_assert(n_out()==res.size(), "Mismatching number of outputs. "
+                               "Expected " + str(n_out()) + ", got "
+                               + str(res.size()) + ".");
 
     // Set up output stream
     std::ofstream of(fname);
-    of << std::setprecision(17) << std::scientific;
+    casadi_assert(of.good(), "Error opening stream '" + fname + "'.");
+    normalized_setup(of);
 
     // Encode each output
     for (casadi_int i=0; i<n_out(); ++i) {
@@ -1055,12 +1095,14 @@ namespace casadi {
       if (res[i].is_scalar(true)) {
         // Copy scalar output
         for (casadi_int k=0;k<nnz_out(i);++k) {
-          of << v[0] << std::endl;
+          normalized_out(of, v[0]);
+          of << std::endl;
         }
       } else if (v.size()==nnz_out(i)) {
         // Output non-scalar input verbatim
         for (casadi_int k=0;k<nnz_out(i);++k) {
-          of << v[k] << std::endl;
+          normalized_out(of, v[k]);
+          of << std::endl;
         }
       } else {
         casadi_error("Dimension mismatch: Expected " +
@@ -1086,20 +1128,20 @@ namespace casadi {
     generate_input(fname, arg_v);
   }
 
-  void Function::generate_output(const std::string& fname, const DMDict& arg) {
+  void Function::generate_output(const std::string& fname, const DMDict& res) {
     // Get default inputs
-    vector<DM> arg_v(n_in());
-    for (casadi_int i=0; i<arg_v.size(); ++i) {
-      arg_v[i] = default_in(i);
+    vector<DM> res_v(n_out());
+    for (casadi_int i=0; i<res_v.size(); ++i) {
+      res_v[i] = 0;
     }
 
     // Assign provided inputs
-    for (auto&& e : arg) {
-      arg_v.at(index_in(e.first)) = e.second;
+    for (auto&& e : res) {
+      res_v.at(index_out(e.first)) = e.second;
     }
 
     // Relay to vector argument variant
-    generate_output(fname, arg_v);
+    generate_output(fname, res_v);
   }
 
   void Function::export_code(const std::string& lang,

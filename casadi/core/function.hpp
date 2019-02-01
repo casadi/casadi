@@ -688,12 +688,14 @@ namespace casadi {
     /// @{
     void generate_input(const std::string& fname, const DMDict& arg);
     void generate_input(const std::string& fname, const std::vector<DM>& arg);
+    std::vector<DM> generate_input(const std::string& fname);
     /// @}
 
     /** \brief Export an output file that can be checked with generated C code output */
     /// @{
     void generate_output(const std::string& fname, const DMDict& arg);
     void generate_output(const std::string& fname, const std::vector<DM>& arg);
+    std::vector<DM> generate_output(const std::string& fname);
     /// @}
 
     /** \brief Export function in specific language

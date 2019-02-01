@@ -506,8 +506,39 @@ namespace casadi {
     casadi_assert_dev(mem==0);
   }
 
+  void FunctionInternal::generate_input(const std::string& fname, const double** arg) const {
+    // Set up output stream
+    std::ofstream of(fname);
+    casadi_assert(of.good(), "Error opening stream '" + fname + "'.");
+    normalized_setup(of);
+
+    // Encode each input
+    for (casadi_int i=0; i<n_in_; ++i) {
+      const double* v = arg[i];
+      for (casadi_int k=0;k<nnz_in(i);++k) {
+        normalized_out(of, v ? v[k] : get_default_in(i));
+        of << std::endl;
+      }
+    }
+  }
+
+  void FunctionInternal::generate_output(const std::string& fname, double** res) const {
+    // Set up output stream
+    std::ofstream of(fname);
+    casadi_assert(of.good(), "Error opening stream '" + fname + "'.");
+    normalized_setup(of);
+
+    // Encode each input
+    for (casadi_int i=0; i<n_in_; ++i) {
+      const double* v = res[i];
+      for (casadi_int k=0;k<nnz_out(i);++k) {
+        normalized_out(of, v ? v[k] : std::numeric_limits<double>::quiet_NaN());
+        of << std::endl;
+      }
+    }
+  }
+
   void FunctionInternal::dump_in(casadi_int id, const double** arg) const {
-    uout() << "test" << std::endl;
     #ifdef _WIN32
     const std::string filesep("\\");
     #else
@@ -520,6 +551,7 @@ namespace casadi {
       DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".in." + name_in_[i] + ".mtx",
         sparsity_in_[i], arg[i]);
     }
+    generate_input(dump_dir_+ filesep + name_ + "." + count + ".in.txt", arg);
   }
 
   void FunctionInternal::dump_out(casadi_int id, double** res) const {
@@ -535,6 +567,7 @@ namespace casadi {
       DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".out." + name_out_[i] + ".mtx",
         sparsity_out_[i], res[i]);
     }
+    generate_output(dump_dir_+ filesep + name_ + "." + count + ".out.txt", res);
   }
 
   void FunctionInternal::dump() const {
