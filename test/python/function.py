@@ -2059,5 +2059,90 @@ class Functiontests(casadiTestCase):
     self.checkarray(Xr,X)
     self.checkarray(Ar,A)
 
+  def test_eval_shapes(self):
+    x = MX.sym("x",Sparsity.lower(3))
+    y = MX.sym("y",3,1)
+    z = MX.sym("z",2,2)
+    f = Function("f",[x,y,z],[2*x,2*y,2*z],{"default_in":[1,2,3]})
+
+    #normal
+    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([[1,3],[4,5]])]
+    res = f.call(ins)
+    
+
+    self.checkarray(res[0],2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])))
+    self.checkarray(res[1],2*DM([9,8,7]))
+    self.checkarray(res[2],2*DM([[1,3],[4,5]]))
+
+    #Project
+    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([[1,3],[4,5]])]
+    res = f.call(ins)
+    
+
+    ins = [sparsify(DM([[1,0,0],[2,0,0],[7,8,9]])),DM([9,8,7]),DM([[1,3],[4,5]])]
+    res = f.call(ins)
+
+    self.checkarray(res[0],2*sparsify(DM([[1,0,0],[2,0,0],[7,8,9]])))
+    self.checkarray(res[1],2*DM([9,8,7]))
+    self.checkarray(res[2],2*DM([[1,3],[4,5]]))
+
+    #dual -> should this not raise an error?
+    ins = [sparsify(DM([[1,0,1],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([[1,3],[4,5]])]
+    res = f.call(ins)
+
+    #Scalar expansion
+    ins = [4,5,7]
+    res = f.call(ins)
+
+    self.checkarray(res[0],2*sparsify(DM([[4,0,0],[4,4,0],[4,4,4]])))
+    self.checkarray(res[1],2*DM([5,5,5]))
+    self.checkarray(res[2],2*DM([[7,7],[7,7]]))
+
+    #Repmat
+    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([1,3])]
+    res = f.call(ins)    
+
+    self.checkarray(res[0],2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])))
+    self.checkarray(res[1],2*DM([9,8,7]))
+    self.checkarray(res[2],2*DM([[1,1],[3,3]]))
+
+    #npar
+    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([[9,2],[8,4],[7,4]]),DM([[1,3],[4,5]])]
+    res = f.call(ins)    
+
+    self.checkarray(res[0],2*sparsify(DM([[1,0,0,1,0,0],[2,4,0,2,4,0],[7,8,9,7,8,9]])))
+    self.checkarray(res[1],2*DM([[9,2],[8,4],[7,4]]))
+    self.checkarray(res[2],2*DM([[1,3,1,3],[4,5,4,5]]))
+
+    #Tranpose
+    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]).T,DM([[1,3],[4,5]])]
+    res = f.call(ins)
+    
+
+    self.checkarray(res[0],2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])))
+    self.checkarray(res[1],2*DM([9,8,7]))
+    self.checkarray(res[2],2*DM([[1,3],[4,5]]))
+
+    # Null: note default_in only applies to dicts
+    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(),DM([1,3])]
+    res = f.call(ins)    
+
+    self.checkarray(res[0],2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])))
+    self.checkarray(res[1],2*DM([0,0,0]))
+    self.checkarray(res[2],2*DM([[1,1],[3,3]]))
+
+
+    # Wrong
+    with self.assertInException("mismatching shape"):
+      ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9],[4,5,6]])),DM([9,8,7]),DM([1,3])]
+      res = f.call(ins)    
+    with self.assertInException("mismatching shape"):
+      ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([[9,2,1],[8,4,1],[7,4,1]]),DM([[1,1,1,3],[3,4,5,6]])]
+      res = f.call(ins)
+    with self.assertInException("mismatching shape"):
+      ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([[1,1,1],[3,4,5]])]
+      res = f.call(ins)    
+
+
 if __name__ == '__main__':
     unittest.main()
