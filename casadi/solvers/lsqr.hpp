@@ -92,6 +92,10 @@ namespace casadi {
     // Solve the linear system
     int solve(void* mem, const double* A, double* x, casadi_int nrhs, bool tr) const override;
 
+    /// Generate C code
+    void generate(CodeGenerator& g, const std::string& A, const std::string& x,
+                  casadi_int nrhs, bool tr) const override;
+
     /// A documentation string
     static const std::string meta_doc;
 

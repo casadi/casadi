@@ -261,6 +261,8 @@ namespace casadi {
   #include "casadi_regularize.hpp"
   #include "casadi_newton.hpp"
   #include "casadi_bound_consistency.hpp"
+  #include "casadi_lsqr.hpp"
+
 } // namespace casadi
 
 /// \endcond

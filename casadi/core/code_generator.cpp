@@ -756,6 +756,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_norm_1_str, inst);
       break;
     case AUX_NORM_2:
+      add_auxiliary(AUX_DOT);
       this->auxiliaries << sanitize_source(casadi_norm_2_str, inst);
       break;
     case AUX_NORM_INF:
@@ -811,6 +812,15 @@ namespace casadi {
       add_auxiliary(AUX_DOT);
       add_auxiliary(AUX_FILL);
       this->auxiliaries << sanitize_source(casadi_qr_str, inst);
+      break;
+    case AUX_LSQR:
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_FILL);
+      add_auxiliary(AUX_NORM_2);
+      add_auxiliary(AUX_MV);
+      add_auxiliary(AUX_FABS);
+      add_auxiliary(AUX_SIGN);
+      this->auxiliaries << sanitize_source(casadi_lsqr_str, inst);
       break;
     case AUX_QP:
       add_auxiliary(AUX_COPY);
@@ -1468,6 +1478,14 @@ namespace casadi {
     return "casadi_qr_solve(" + x + ", " + str(nrhs) + ", " + (tr ? "1" : "0") + ", "
            + sp_v + ", " + v + ", " + sp_r + ", " + r + ", "
            + beta + ", " + prinv + ", " + pc + ", " + w + ");";
+  }
+
+  string CodeGenerator::
+  lsqr_solve(const std::string& A, const std::string&x,
+             casadi_int nrhs, bool tr, const std::string& sp, const std::string& w) {
+    add_auxiliary(CodeGenerator::AUX_LSQR);
+    return "casadi_lsqr_solve(" + A + ", " + x + ", " + str(nrhs) + ", "
+           + (tr ? "1" : "0") + ", " + sp + ", " + w + ");";
   }
 
   std::string CodeGenerator::

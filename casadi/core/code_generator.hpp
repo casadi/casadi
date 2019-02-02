@@ -216,6 +216,10 @@ namespace casadi {
                          const std::string& beta, const std::string& prinv,
                          const std::string& pc, const std::string& w);
 
+    /** \\brief LSQR solve */
+    std::string lsqr_solve(const std::string& A, const std::string&x,
+                          casadi_int nrhs, bool tr, const std::string& sp, const std::string& w);
+
     /** \brief LDL factorization */
     std::string ldl(const std::string& sp_a, const std::string& a,
                    const std::string& sp_lt, const std::string& lt,
@@ -331,7 +335,8 @@ namespace casadi {
       AUX_INF,
       AUX_REAL_MIN,
       AUX_ISINF,
-      AUX_BOUNDS_CONSISTENCY
+      AUX_BOUNDS_CONSISTENCY,
+      AUX_LSQR
     };
 
     /** \brief Add a built-in auxiliary function */
