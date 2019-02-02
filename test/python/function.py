@@ -2002,62 +2002,43 @@ class Functiontests(casadiTestCase):
 
     self.checkarray(JJ(5,2),5*pi+3)
 
-  def test_generate_input(self):
-    x = MX.sym("x",Sparsity.lower(3))
-    y = MX.sym("y",0,0)
-    z = MX.sym("z",2,2)
-    f = Function("f",[x,y,z],[2*x,2*y,2*z])
-    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(),DM([[1,3],[4,5]])]
-    f.generate_input("test.txt",ins)
-    ins2 = f.generate_input("test.txt")
-    self.assertEqual(len(ins),len(ins2))
-    for i,j in zip(ins,ins2):
-      self.checkarray(i,j)
-
-    out = f.call(ins)
-    f.generate_output("test.txt",out)
-    out2 = f.generate_output("test.txt")
-    self.assertEqual(len(out),len(out2))
-    for i,j in zip(out,out2):
-      self.checkarray(i,j)
-
   def test_dump(self):
     x = MX.sym("x",Sparsity.lower(3))
     y = MX.sym("y",0,0)
     z = MX.sym("z",2,2)
-    f = Function("f",[x,y,z],[2*x,2*y,2*z],["x","y","z"],["a","b","c"],{"dump":True,"dump_in":True,"dump_out":False})
-    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(),DM([[1,3],[4,5]])]
-    out = f(*ins)
 
-    F = Function.load("f.casadi")
+    for fmt in ["txt","mtx"]:
+      f = Function("f",[x,y,z],[2*x,2*z],["x","y","z"],["a","c"],{"dump":True,"dump_in":True,"dump_out":False,"dump_format":fmt})
+      ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(),DM([[1,3],[4,5]])]
+      out = f(*ins)
 
-    x_num = DM.from_file("f.000000.in.x.mtx")
-    y_num = DM.from_file("f.000000.in.y.mtx")
-    z_num = DM.from_file("f.000000.in.z.mtx")
+      F = Function.load("f.casadi")
 
-    self.checkarray(x_num,ins[0])
-    self.checkarray(y_num,ins[1])
-    self.checkarray(z_num,ins[2])
+      x_num = DM.from_file("f.000000.in.x." + fmt)
+      y_num = DM.from_file("f.000000.in.y." + fmt)
+      z_num = DM.from_file("f.000000.in.z." + fmt)
 
-    a_num = DM.from_file("f.000000.out.a.mtx")
-    b_num = DM.from_file("f.000000.out.b.mtx")
-    c_num = DM.from_file("f.000000.out.c.mtx")
+      self.checkarray(x_num,ins[0])
+      self.checkarray(y_num,ins[1])
+      self.checkarray(z_num,ins[2])
 
-    self.checkarray(a_num,out[0])
-    self.checkarray(b_num,out[1])
-    self.checkarray(c_num,out[2])
+      a_num = DM.from_file("f.000000.out.a." + fmt)
+      c_num = DM.from_file("f.000000.out.c." + fmt)
 
-    
-    F.generate_input("test_in.txt", [x_num,y_num,z_num])
-    F.generate_output("test_out.txt", F.call([x_num,y_num,z_num]))
-    X = DM.from_file("f.000000.in.txt")
-    A = DM.from_file("f.000000.out.txt")
+      self.checkarray(a_num,out[0])
+      self.checkarray(c_num,out[1])
 
-    Xr = DM.from_file("test_in.txt")
-    Ar = DM.from_file("test_out.txt")
-    
-    self.checkarray(Xr,X)
-    self.checkarray(Ar,A)
+      
+      F.generate_in("test_in.txt", [x_num,y_num,z_num])
+      F.generate_out("test_out.txt", F.call([x_num,y_num,z_num]))
+      X = DM.from_file("f.000000.in.txt")
+      A = DM.from_file("f.000000.out.txt")
+
+      Xr = DM.from_file("test_in.txt")
+      Ar = DM.from_file("test_out.txt")
+      
+      self.checkarray(Xr,X)
+      self.checkarray(Ar,A)
 
   def test_eval_shapes(self):
     x = MX.sym("x",Sparsity.lower(3))
@@ -2065,84 +2046,194 @@ class Functiontests(casadiTestCase):
     z = MX.sym("z",2,2)
     f = Function("f",[x,y,z],[2*x,2*y,2*z],{"default_in":[1,2,3]})
 
-    #normal
-    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([[1,3],[4,5]])]
-    res = f.call(ins)
-    
+    for ins, ref, ref_flat in [
+      #normal      
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([[1,3],[4,5]])],
+       [2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])), 2*DM([9,8,7]), 2*DM([[1,3],[4,5]])],
+       [1,2,7,4,8,9,9,8,7,1,4,3,5]),
 
-    self.checkarray(res[0],2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])))
-    self.checkarray(res[1],2*DM([9,8,7]))
-    self.checkarray(res[2],2*DM([[1,3],[4,5]]))
+      #Project
+      ([sparsify(DM([[1,0,0],[2,0,0],[7,8,9]])),DM([9,8,7]),DM([[1,3],[4,5]])],
+       [2*sparsify(DM([[1,0,0],[2,1e-30,0],[7,8,9]])),2*DM([9,8,7]),2*DM([[1,3],[4,5]])],
+       [1,2,7,0,8,9,9,8,7,1,4,3,5]),
 
-    #Project
-    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([[1,3],[4,5]])]
-    res = f.call(ins)
-    
+      #Project away
+      ([sparsify(DM([[1,0,1],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([[1,3],[4,5]])],
+       [2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])), 2*DM([9,8,7]), 2*DM([[1,3],[4,5]])],
+       [1,2,7,4,8,9,9,8,7,1,4,3,5]),
 
-    ins = [sparsify(DM([[1,0,0],[2,0,0],[7,8,9]])),DM([9,8,7]),DM([[1,3],[4,5]])]
-    res = f.call(ins)
+      #Scalar expansion
+      ([DM(4),5,7],
+       [2*sparsify(DM([[4,0,0],[4,4,0],[4,4,4]])), 2*DM([5,5,5]), 2*DM([[7,7],[7,7]])],
+       [4,4,4,4,4,4,5,5,5,7,7,7,7]),
 
-    self.checkarray(res[0],2*sparsify(DM([[1,0,0],[2,0,0],[7,8,9]])))
-    self.checkarray(res[1],2*DM([9,8,7]))
-    self.checkarray(res[2],2*DM([[1,3],[4,5]]))
 
-    #dual -> should this not raise an error?
-    ins = [sparsify(DM([[1,0,1],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([[1,3],[4,5]])]
-    res = f.call(ins)
+      #Repmat
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([1,3])],
+       [2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])), 2*DM([9,8,7]), 2*DM([[1,1],[3,3]])],
+       [1,2,7,4,8,9,9,8,7,1,3,1,3]),
 
-    #Scalar expansion
-    ins = [4,5,7]
-    res = f.call(ins)
+      #npar
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([[9,2],[8,4],[7,4]]),DM([[1,3],[4,5]])],
+       [2*sparsify(DM([[1,0,0,1,0,0],[2,4,0,2,4,0],[7,8,9,7,8,9]])), 2*DM([[9,2],[8,4],[7,4]]), 2*DM([[1,3,1,3],[4,5,4,5]])],
+       None),
 
-    self.checkarray(res[0],2*sparsify(DM([[4,0,0],[4,4,0],[4,4,4]])))
-    self.checkarray(res[1],2*DM([5,5,5]))
-    self.checkarray(res[2],2*DM([[7,7],[7,7]]))
 
-    #Repmat
-    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([1,3])]
+      # growing npar
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([[9,2],[8,4],[7,4]]),DM([[1,3,4,5,1,1,1,1],[4,5,7,8,3,3,3,3]])],
+       [2*repmat(sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),1,4), 2*repmat(DM([[9,2],[8,4],[7,4]]),1,2), 2*DM([[1,3,4,5,1,1,1,1],[4,5,7,8,3,3,3,3]])],
+       None),
+
+      # growing npar
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([[9,2,3,4],[8,4,7,8],[7,4,9,10]]),DM([[1,3,4,5],[4,5,7,8]])],
+       None,
+       None),
+
+      #Transpose
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]).T,DM([[1,3],[4,5]])],
+       [2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),2*DM([9,8,7]), 2*DM([[1,3],[4,5]])],
+       [1,2,7,4,8,9,9,8,7,1,4,3,5]),
+
+      #Null: note default_in applies only to dict style
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(),DM([1,3])],
+       [2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),2*DM([0,0,0]), 2*DM([[1,1],[3,3]])],
+       [1,2,7,4,8,9,0,0,0,1,3,1,3]),
+
+      #Null: note default_in applies only to dict style
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(3,0),DM([1,3])],
+       [2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),2*DM([0,0,0]), 2*DM([[1,1],[3,3]])],
+       [1,2,7,4,8,9,0,0,0,1,3,1,3]),
+
+      #Null: note default_in applies only to dict style
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(0,3),DM([1,3])],
+       [2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),2*DM([0,0,0]), 2*DM([[1,1],[3,3]])],
+       [1,2,7,4,8,9,0,0,0,1,3,1,3]),
+
+      #Null: should be forbidden
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(0,5),DM([1,3])],
+       [2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),2*DM([0,0,0]), 2*DM([[1,1],[3,3]])],
+       [1,2,7,4,8,9,0,0,0,1,3,1,3]),
+
+      #Null: should be forbidden
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(8,0),DM([1,3])],
+       [2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),2*DM([0,0,0]), 2*DM([[1,1],[3,3]])],
+       [1,2,7,4,8,9,0,0,0,1,3,1,3]),
+
+
+
+      # Wrong
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]).T,DM([1,3]).T],None,None),
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9],[4,5,6]])),DM([9,8,7]),DM([1,3])],None,None),
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([[9,2,1],[8,4,1],[7,4,1]]),DM([[1,1,1,3],[3,4,5,6]])],None,None),
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([[1,1,1],[3,4,5]])],None,None),
+      ([sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7,6]),DM([[1,3],[4,5]])],None,None),
+
+      ]:
+      
+      if ref is None:
+        with self.assertInException("mismatching shape"):
+          res = f.call(ins)
+      else:
+        res = f.call(ins)
+
+        for i in range(f.n_in()):
+          self.assertTrue(res[i].sparsity()==ref[i].sparsity())
+          self.checkarray(res[i],ref[i])
+
+        if ref_flat is None:
+          with self.assertInException("mismatching shape"):
+            f.nz_from_out(res)
+        else:
+          res_flat = f.nz_from_out(res)
+
+          self.checkarray(res_flat,[i*2 for i in ref_flat])
+          
+          res_re = f.nz_to_out(res_flat)
+
+          for i in range(f.n_out()):
+            self.assertTrue(res_re[i].sparsity()==ref[i].sparsity())
+            self.checkarray(res_re[i],ref[i])
+
+          f.generate_out("test.txt",res)
+          res2 = f.generate_in("test.txt")
+
+          for i in range(f.n_out()):
+            self.assertTrue(res2[i].sparsity()==ref[i].sparsity())
+            self.checkarray(res2[i],ref[i])
+
+      if ref_flat is None:
+        with self.assertInException("mismatching shape"):
+          res = f.nz_from_in(ins)
+
+        with self.assertInException("mismatching shape"):
+          f.generate_in("test.txt",ins)
+      else:
+        res = f.nz_from_in(ins)
+        self.checkarray(res,ref_flat)
+
+        in_re = f.nz_to_in(res)
+        for i in range(f.n_in()):
+          self.assertTrue(in_re[i].sparsity()==ref[i].sparsity())
+          self.checkarray(in_re[i],ref[i]/2)
+
+        f.generate_in("test.txt",ins)
+        ins2 = f.generate_in("test.txt")
+
+        for i in range(f.n_in()):
+          self.assertTrue(ins2[i].sparsity()==ref[i].sparsity())
+          self.checkarray(ins2[i],ref[i]/2)
+  
+
+    #Null dicts
+    ins = {"i0": sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])), "i2": DM([1,3])}
     res = f.call(ins)    
 
-    self.checkarray(res[0],2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])))
-    self.checkarray(res[1],2*DM([9,8,7]))
-    self.checkarray(res[2],2*DM([[1,1],[3,3]]))
+    self.checkarray(res["o0"],2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])))
+    self.checkarray(res["o1"],2*DM([2,2,2]))
+    self.checkarray(res["o2"],2*DM([[1,1],[3,3]]))
 
-    #npar
-    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([[9,2],[8,4],[7,4]]),DM([[1,3],[4,5]])]
-    res = f.call(ins)    
+    res = f.nz_from_in(f.convert_in(ins))
+    self.checkarray(res,[1,2,7,4,8,9,2,2,2,1,3,1,3])
 
-    self.checkarray(res[0],2*sparsify(DM([[1,0,0,1,0,0],[2,4,0,2,4,0],[7,8,9,7,8,9]])))
-    self.checkarray(res[1],2*DM([[9,2],[8,4],[7,4]]))
-    self.checkarray(res[2],2*DM([[1,3,1,3],[4,5,4,5]]))
+  def test_convert_in(self):
+    x = MX.sym("x")
+    y = MX.sym("y")
+    z = MX.sym("z")
+    f = Function("f",[x,y,z],[2*x,2*y,2*z,x+y],["x","y","z"],["a","b","c","d"],{"default_in": [1,2,3]})
 
-    #Tranpose
-    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]).T,DM([[1,3],[4,5]])]
-    res = f.call(ins)
-    
+    res = f.convert_in({"x":4})
+    self.checkarray(res[0],4)
+    self.checkarray(res[1],2)
+    self.checkarray(res[2],3)
 
-    self.checkarray(res[0],2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])))
-    self.checkarray(res[1],2*DM([9,8,7]))
-    self.checkarray(res[2],2*DM([[1,3],[4,5]]))
+    with self.assertInException("xy"):
+      f.convert_in({"xy":4})
 
-    # Null: note default_in only applies to dicts
-    ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM(),DM([1,3])]
-    res = f.call(ins)    
+    res = f.convert_in([7,3,4])
+    self.checkarray(res["x"],7)
+    self.checkarray(res["y"],3)
+    self.checkarray(res["z"],4)
 
-    self.checkarray(res[0],2*sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])))
-    self.checkarray(res[1],2*DM([0,0,0]))
-    self.checkarray(res[2],2*DM([[1,1],[3,3]]))
+    with self.assertInException("Incorrect"):
+      f.convert_in([7,3])
 
+    res = f.convert_out({"b":4})
+    self.checkarray(res[0],np.nan)
+    self.checkarray(res[1],4)
+    self.checkarray(res[2],np.nan)
+    self.checkarray(res[3],np.nan)
 
-    # Wrong
-    with self.assertInException("mismatching shape"):
-      ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9],[4,5,6]])),DM([9,8,7]),DM([1,3])]
-      res = f.call(ins)    
-    with self.assertInException("mismatching shape"):
-      ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([[9,2,1],[8,4,1],[7,4,1]]),DM([[1,1,1,3],[3,4,5,6]])]
-      res = f.call(ins)
-    with self.assertInException("mismatching shape"):
-      ins = [sparsify(DM([[1,0,0],[2,4,0],[7,8,9]])),DM([9,8,7]),DM([[1,1,1],[3,4,5]])]
-      res = f.call(ins)    
+    with self.assertInException("xy"):
+      f.convert_out({"xy":4})
 
+    res = f.convert_out([1,2,3,4])
+    self.checkarray(res["a"],1)
+    self.checkarray(res["b"],2)
+    self.checkarray(res["c"],3)
+    self.checkarray(res["d"],4)
+
+    with self.assertInException("Incorrect"):
+      f.convert_out([1,2,3])
 
 if __name__ == '__main__':
     unittest.main()

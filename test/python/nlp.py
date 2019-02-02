@@ -1633,7 +1633,7 @@ class NLPtests(casadiTestCase):
 
       if "codegen" in features:
         solver.generate('f.c',{"main":True})
-        solver.generate_input("in.dat",solver_in)
+        solver.generate_in("in.dat",solver.convert_in(solver_in))
         print(solver_in)
         self.check_codegen(solver,solver_in,std="c99")
 

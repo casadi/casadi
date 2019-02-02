@@ -91,6 +91,7 @@ namespace casadi {
     dump_in_ = false;
     dump_out_ = false;
     dump_dir_ = ".";
+    dump_format_ = "mtx";
     dump_ = false;
     sz_arg_tmp_ = 0;
     sz_res_tmp_ = 0;
@@ -253,16 +254,19 @@ namespace casadi {
         "Print numerical values of outputs [default: false]"}},
       {"dump_in",
        {OT_BOOL,
-        "Dump numerical values of inputs to file [default: false]"}},
+        "Dump numerical values of inputs to file (readable with DM.from_file) [default: false]"}},
       {"dump_out",
        {OT_BOOL,
-        "Dump numerical values of outputs to file [default: false]"}},
+        "Dump numerical values of outputs to file (readable with DM.from_file) [default: false]"}},
       {"dump",
        {OT_BOOL,
         "Dump function to file upon first evaluation. [false]"}},
       {"dump_dir",
        {OT_STRING,
         "Directory to dump inputs/outputs to. Make sure the directory exists [.]"}},
+      {"dump_format",
+       {OT_STRING,
+        "Choose file format to dump matrices. See DM.from_file [mtx]"}},
       {"forward_options",
        {OT_DICT,
         "Options to be passed to a forward mode constructor"}},
@@ -316,6 +320,7 @@ namespace casadi {
     opts["dump_in"] = dump_in_;
     opts["dump_out"] = dump_out_;
     opts["dump_dir"] = dump_dir_;
+    opts["dump_format"] = dump_format_;
     opts["dump"] = dump_;
     opts["forward_options"] = forward_options_;
     opts["reverse_options"] = reverse_options_;
@@ -387,6 +392,8 @@ namespace casadi {
         dump_ = op.second;
       } else if (op.first=="dump_dir") {
         dump_dir_ = op.second.to_string();
+      } else if (op.first=="dump_format") {
+        dump_format_ = op.second.to_string();
       } else if (op.first=="forward_options") {
         forward_options_ = op.second;
       } else if (op.first=="reverse_options") {
@@ -506,7 +513,7 @@ namespace casadi {
     casadi_assert_dev(mem==0);
   }
 
-  void FunctionInternal::generate_input(const std::string& fname, const double** arg) const {
+  void FunctionInternal::generate_in(const std::string& fname, const double** arg) const {
     // Set up output stream
     std::ofstream of(fname);
     casadi_assert(of.good(), "Error opening stream '" + fname + "'.");
@@ -516,20 +523,20 @@ namespace casadi {
     for (casadi_int i=0; i<n_in_; ++i) {
       const double* v = arg[i];
       for (casadi_int k=0;k<nnz_in(i);++k) {
-        normalized_out(of, v ? v[k] : get_default_in(i));
+        normalized_out(of, v ? v[k] : 0);
         of << std::endl;
       }
     }
   }
 
-  void FunctionInternal::generate_output(const std::string& fname, double** res) const {
+  void FunctionInternal::generate_out(const std::string& fname, double** res) const {
     // Set up output stream
     std::ofstream of(fname);
     casadi_assert(of.good(), "Error opening stream '" + fname + "'.");
     normalized_setup(of);
 
     // Encode each input
-    for (casadi_int i=0; i<n_in_; ++i) {
+    for (casadi_int i=0; i<n_out_; ++i) {
       const double* v = res[i];
       for (casadi_int k=0;k<nnz_out(i);++k) {
         normalized_out(of, v ? v[k] : std::numeric_limits<double>::quiet_NaN());
@@ -548,10 +555,10 @@ namespace casadi {
     ss << setfill('0') << setw(6) << id;
     std::string count = ss.str();
     for (casadi_int i=0;i<n_in_;++i) {
-      DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".in." + name_in_[i] + ".mtx",
-        sparsity_in_[i], arg[i]);
+      DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".in." + name_in_[i] + "." +
+        dump_format_, sparsity_in_[i], arg[i]);
     }
-    generate_input(dump_dir_+ filesep + name_ + "." + count + ".in.txt", arg);
+    generate_in(dump_dir_+ filesep + name_ + "." + count + ".in.txt", arg);
   }
 
   void FunctionInternal::dump_out(casadi_int id, double** res) const {
@@ -564,10 +571,10 @@ namespace casadi {
     ss << setfill('0') << setw(6) << id;
     std::string count = ss.str();
     for (casadi_int i=0;i<n_out_;++i) {
-      DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".out." + name_out_[i] + ".mtx",
-        sparsity_out_[i], res[i]);
+      DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".out." + name_out_[i] + "." +
+        dump_format_, sparsity_out_[i], res[i]);
     }
-    generate_output(dump_dir_+ filesep + name_ + "." + count + ".out.txt", res);
+    generate_out(dump_dir_+ filesep + name_ + "." + count + ".out.txt", res);
   }
 
   void FunctionInternal::dump() const {
@@ -2625,6 +2632,14 @@ namespace casadi {
     return SX::sym("r_" + str(ind), sparsity_out(ind));
   }
 
+  const DM FunctionInternal::dm_in(casadi_int ind) const {
+    return DM::zeros(sparsity_in(ind));
+  }
+
+  const DM FunctionInternal::dm_out(casadi_int ind) const {
+    return DM::zeros(sparsity_out(ind));
+  }
+
   const std::vector<SX> FunctionInternal::sx_in() const {
     vector<SX> ret(n_in_);
     for (casadi_int i=0; i<ret.size(); ++i) {
@@ -2637,6 +2652,22 @@ namespace casadi {
     vector<SX> ret(n_out_);
     for (casadi_int i=0; i<ret.size(); ++i) {
       ret[i] = sx_out(i);
+    }
+    return ret;
+  }
+
+  const std::vector<DM> FunctionInternal::dm_in() const {
+    vector<DM> ret(n_in_);
+    for (casadi_int i=0; i<ret.size(); ++i) {
+      ret[i] = dm_in(i);
+    }
+    return ret;
+  }
+
+  const std::vector<DM> FunctionInternal::dm_out() const {
+    vector<DM> ret(n_out_);
+    for (casadi_int i=0; i<ret.size(); ++i) {
+      ret[i] = dm_out(i);
     }
     return ret;
   }
@@ -2719,7 +2750,7 @@ namespace casadi {
                               const std::string& parallelization) {
     if (x.empty()) return x;
     // Check number of arguments
-    casadi_assert(x.size()==n_in_, "mapsum_mx: Wrong number of arguments");
+    casadi_assert(x.size()==n_in_, "mapsum_mx: Wrong number_i of arguments");
     // Number of parallel calls
     casadi_int npar = 1;
     // Check/replace arguments
@@ -2764,6 +2795,7 @@ namespace casadi {
     // Horizontal repmat
     if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
         && inp.size2()%arg.size2()==0) return true;
+    if (npar==-1) return false;
     // Evaluate with multiple arguments
     if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
         && arg.size2()%(npar*inp.size2())==0) {
@@ -2772,6 +2804,72 @@ namespace casadi {
     }
     // No match
     return false;
+  }
+
+  std::vector<DM> FunctionInternal::nz_in(const std::vector<double>& arg) const {
+    casadi_assert(nnz_in()==arg.size(),
+      "Dimension mismatch. Expecting " + str(nnz_in()) +
+      ", got " + str(arg.size()) + " instead.");
+
+    std::vector<DM> ret = dm_in();
+    casadi_int offset = 0;
+    for (casadi_int i=0;i<n_in_;++i) {
+      DM& r = ret.at(i);
+      std::copy(arg.begin()+offset, arg.begin()+offset+nnz_in(i), r.ptr());
+      offset+= nnz_in(i);
+    }
+    return ret;
+  }
+
+  std::vector<DM> FunctionInternal::nz_out(const std::vector<double>& res) const {
+    casadi_assert(nnz_out()==res.size(),
+      "Dimension mismatch. Expecting " + str(nnz_out()) +
+      ", got " + str(res.size()) + " instead.");
+
+    std::vector<DM> ret = dm_out();
+    casadi_int offset = 0;
+    for (casadi_int i=0;i<n_out_;++i) {
+      DM& r = ret.at(i);
+      std::copy(res.begin()+offset, res.begin()+offset+nnz_out(i), r.ptr());
+      offset+= nnz_out(i);
+    }
+    return ret;
+  }
+
+  std::vector<double> FunctionInternal::nz_in(const std::vector<DM>& arg) const {
+    // Disallow parallel inputs
+    casadi_int npar = -1;
+    if (!matching_arg(arg, npar)) {
+      return nz_in(replace_arg(arg, npar));
+    }
+
+    std::vector<DM> arg2 = project_arg(arg, 1);
+    std::vector<double> ret(nnz_in());
+    casadi_int offset = 0;
+    for (casadi_int i=0;i<n_in_;++i) {
+      const double* e = arg2.at(i).ptr();
+      std::copy(e, e+nnz_in(i), ret.begin()+offset);
+      offset+= nnz_in(i);
+    }
+    return ret;
+  }
+
+  std::vector<double> FunctionInternal::nz_out(const std::vector<DM>& res) const {
+    // Disallow parallel inputs
+    casadi_int npar = -1;
+    if (!matching_res(res, npar)) {
+      return nz_out(replace_res(res, npar));
+    }
+
+    std::vector<DM> res2 = project_res(res, 1);
+    std::vector<double> ret(nnz_out());
+    casadi_int offset = 0;
+    for (casadi_int i=0;i<n_out_;++i) {
+      const double* e = res2.at(i).ptr();
+      std::copy(e, e+nnz_out(i), ret.begin()+offset);
+      offset+= nnz_out(i);
+    }
+    return ret;
   }
 
   void FunctionInternal::setup(void* mem, const double** arg, double** res,
@@ -3129,6 +3227,7 @@ namespace casadi {
     s.pack("FunctionInternal::dump_in", dump_in_);
     s.pack("FunctionInternal::dump_out", dump_out_);
     s.pack("FunctionInternal::dump_dir", dump_dir_);
+    s.pack("FunctionInternal::dump_format", dump_format_);
     s.pack("FunctionInternal::forward_options", forward_options_);
     s.pack("FunctionInternal::reverse_options", reverse_options_);
     s.pack("FunctionInternal::custom_jacobian", custom_jacobian_);
@@ -3187,6 +3286,7 @@ namespace casadi {
     s.unpack("FunctionInternal::dump_in", dump_in_);
     s.unpack("FunctionInternal::dump_out", dump_out_);
     s.unpack("FunctionInternal::dump_dir", dump_dir_);
+    s.unpack("FunctionInternal::dump_format", dump_format_);
     // Makes no sense to dump a Function that is being deserialized
     dump_ = false;
     s.unpack("FunctionInternal::forward_options", forward_options_);

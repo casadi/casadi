@@ -272,24 +272,56 @@ namespace casadi {
       void call(const std::vector<M>& arg, std::vector<M>& res,
                bool always_inline, bool never_inline) const;
 
-    /** Helper function */
+    ///@{
+    /** Helper function
+     * 
+     * \param npar[in] normal usage: 1, disallow pararallel calls: -1
+     * \param npar[out] required number of parallel calls (or -1)
+     */
     static bool check_mat(const Sparsity& arg, const Sparsity& inp, casadi_int& npar);
+    ///@}
 
+    ///@{
     /** \brief Check if input arguments have correct length and dimensions
+     * 
+     * Raises errors.
+     *
+     * \param npar[in] normal usage: 1, disallow pararallel calls: -1
+     * \param[out] npar: max number of horizontal repetitions across all arguments (or -1)
      */
     template<typename M>
     void check_arg(const std::vector<M>& arg, casadi_int& npar) const;
+    ///@}
 
-    /** \brief Check if output arguments have correct length and dimensions */
+    ///@{
+    /** \brief Check if output arguments have correct length and dimensions
+     * 
+     * Raises errors.
+     * 
+     * \param npar[in] normal usage: 1, disallow pararallel calls: -1
+     * \param[out] npar: max number of horizontal repetitions across all arguments  (or -1)
+     */
     template<typename M>
     void check_res(const std::vector<M>& res, casadi_int& npar) const;
+    ///@}
 
     /** \brief Check if input arguments that needs to be replaced
+     * 
+     * Raises errors
+     * 
+     * \param npar[in] normal usage: 1, disallow pararallel calls: -1
+     * \param[out] npar: max number of horizontal repetitions across all arguments  (or -1)
      */
     template<typename M> bool
     matching_arg(const std::vector<M>& arg, casadi_int& npar) const;
 
-    /** \brief Check if output arguments that needs to be replaced */
+    /** \brief Check if output arguments that needs to be replaced
+     * 
+     * Raises errors
+     * 
+     * \param npar[in] normal usage: 1, disallow pararallel calls: -1
+     * \param[out] npar: max number of horizontal repetitions across all arguments  (or -1)
+     */
     template<typename M> bool
     matching_res(const std::vector<M>& arg, casadi_int& npar) const;
 
@@ -297,6 +329,16 @@ namespace casadi {
      */
     template<typename M> std::vector<M>
     replace_arg(const std::vector<M>& arg, casadi_int npar) const;
+
+    /** \brief Project sparsities 
+     * */
+    template<typename M> std::vector<M>
+    project_arg(const std::vector<M>& arg, casadi_int npar) const;
+
+    /** \brief Project sparsities 
+     * */
+    template<typename M> std::vector<M>
+    project_res(const std::vector<M>& arg, casadi_int npar) const;
 
     /** \brief Replace 0-by-0 outputs */
     template<typename M> std::vector<M>
@@ -309,6 +351,26 @@ namespace casadi {
     /** \brief Replace 0-by-0 reverse seeds */
     template<typename M> std::vector<std::vector<M>>
     replace_aseed(const std::vector<std::vector<M>>& aseed, casadi_int npar) const;
+
+    /** \brief Convert from/to input/output lists/map  */
+    /// @{
+    template<typename M>
+    std::map<std::string, M> convert_arg(const std::vector<M>& arg) const;
+    template<typename M>
+    std::vector<M> convert_arg(const std::map<std::string, M>& arg) const;
+    template<typename M>
+    std::map<std::string, M> convert_res(const std::vector<M>& res) const;
+    template<typename M>
+    std::vector<M> convert_res(const std::map<std::string, M>& res) const;
+    /// @}
+
+    /** \brief Convert from/to flat vector of input/output nonzeros */
+    /// @{
+    std::vector<double> nz_in(const std::vector<DM>& arg) const;
+    std::vector<double> nz_out(const std::vector<DM>& res) const;
+    std::vector<DM> nz_in(const std::vector<double>& arg) const;
+    std::vector<DM> nz_out(const std::vector<double>& res) const;
+    ///@}
 
     ///@{
     /** \brief Forward mode AD, virtual functions overloaded in derived classes */
@@ -418,6 +480,10 @@ namespace casadi {
     virtual const MX mx_out(casadi_int ind) const;
     virtual const std::vector<MX> mx_in() const;
     virtual const std::vector<MX> mx_out() const;
+    const DM dm_in(casadi_int ind) const;
+    const DM dm_out(casadi_int ind) const;
+    const std::vector<DM> dm_in() const;
+    const std::vector<DM> dm_out() const;
     ///@}
 
     /// Get free variables (MX)
@@ -727,8 +793,8 @@ namespace casadi {
     Function map(casadi_int n, const std::string& parallelization) const;
 
     /** \brief Export an input file that can be passed to generate C code with a main */
-    void generate_input(const std::string& fname, const double** arg) const;
-    void generate_output(const std::string& fname, double** res) const;
+    void generate_in(const std::string& fname, const double** arg) const;
+    void generate_out(const std::string& fname, double** res) const;
 
     /// Number of inputs and outputs
     size_t n_in_, n_out_;
@@ -817,6 +883,9 @@ namespace casadi {
 
     // Directory to dump to
     std::string dump_dir_;
+
+    // Format to dump with
+    std::string dump_format_;
 
     // Forward/reverse options
     Dict forward_options_, reverse_options_;
@@ -990,11 +1059,9 @@ namespace casadi {
     call_gen(arg, res, npar, always_inline, never_inline);
   }
 
-  template<typename D>
-  void FunctionInternal::
-  call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
-           casadi_int npar, bool always_inline, bool never_inline) const {
-    casadi_assert(!never_inline, "Call-nodes only possible in MX expressions");
+  template<typename M>
+  std::vector<M> FunctionInternal::
+  project_arg(const std::vector<M>& arg, casadi_int npar) const {
     casadi_assert_dev(arg.size()==n_in_);
 
     // Which arguments require mapped evaluation
@@ -1015,9 +1082,9 @@ namespace casadi {
       any_mismatch = any_mismatch || !matching[i];
     }
 
-    // Correct input sparsity via recursive call if needed
+    // Correct input sparsity
     if (any_mismatch) {
-      std::vector<Matrix<D> > arg2(arg);
+      std::vector<M> arg2(arg);
       for (casadi_int i=0; i<n_in_; ++i) {
         if (!matching[i]) {
           if (mapped[i]) {
@@ -1027,7 +1094,28 @@ namespace casadi {
           }
         }
       }
-      return call_gen(arg2, res, npar, always_inline, never_inline);
+      return arg2;
+    }
+    return arg;
+  }
+
+  template<typename M>
+    std::vector<M> FunctionInternal::
+    project_res(const std::vector<M>& arg, casadi_int npar) const {
+      return arg;
+  }
+
+  template<typename D>
+  void FunctionInternal::
+  call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
+           casadi_int npar, bool always_inline, bool never_inline) const {
+    casadi_assert(!never_inline, "Call-nodes only possible in MX expressions");
+    std::vector< Matrix<D> > arg2 = project_arg(arg, npar);
+
+    // Which arguments require mapped evaluation
+    std::vector<bool> mapped(n_in_);
+    for (casadi_int i=0; i<n_in_; ++i) {
+      mapped[i] = arg[i].size2()!=size2_in(i);
     }
 
     // Allocate results
@@ -1044,7 +1132,7 @@ namespace casadi {
 
     // Get pointers to input arguments
     std::vector<const D*> argp(sz_arg());
-    for (casadi_int i=0; i<n_in_; ++i) argp[i]=get_ptr(arg[i]);
+    for (casadi_int i=0; i<n_in_; ++i) argp[i]=get_ptr(arg2[i]);
 
     // Get pointers to output arguments
     std::vector<D*> resp(sz_res());
@@ -1073,14 +1161,17 @@ namespace casadi {
         // Dimensions
         std::string d_arg = str(arg[i].size1()) + "-by-" + str(arg[i].size2());
         std::string d_in = str(size1_in(i)) + "-by-" + str(size2_in(i));
-        casadi_error("Input " + str(i) + " (" + name_in_[i] + ") has mismatching shape. "
+        std::string e = "Input " + str(i) + " (" + name_in_[i] + ") has mismatching shape. "
                      "Got " + d_arg + ". Allowed dimensions, in general, are:\n"
                      " - The input dimension N-by-M (here " + d_in + ")\n"
                      " - A scalar, i.e. 1-by-1\n"
                      " - M-by-N if N=1 or M=1 (i.e. a transposed vector)\n"
-                     " - N-by-M1 if K*M1=M for some K (argument repeated horizontally)\n"
-                     " - N-by-P*M, indicating evaluation with multiple arguments (P must be a "
-                     "multiple of " + str(npar) + " for consistency with previous inputs)");
+                     " - N-by-M1 if K*M1=M for some K (argument repeated horizontally)\n";
+        if (npar!=-1) {
+          e += " - N-by-P*M, indicating evaluation with multiple arguments (P must be a "
+                     "multiple of " + str(npar) + " for consistency with previous inputs)";
+        }
+        casadi_error(e);
       }
     }
   }
@@ -1135,6 +1226,7 @@ namespace casadi {
       // Horizontal repmat
       return repmat(arg, 1, inp.size2()/arg.size2());
     } else {
+      casadi_assert_dev(npar!=-1);
       // Multiple evaluation
       return repmat(arg, 1, (npar*inp.size2())/arg.size2());
     }
@@ -1170,6 +1262,64 @@ namespace casadi {
     std::vector<std::vector<M> > r(aseed.size());
     for (casadi_int d=0; d<r.size(); ++d) r[d] = replace_res(aseed[d], npar);
     return r;
+  }
+
+  template<typename M>
+  std::map<std::string, M> FunctionInternal::
+  convert_arg(const std::vector<M>& arg) const {
+    casadi_assert(arg.size()==n_in_, "Incorrect number of inputs: Expected "
+                      + str(n_in_) + ", got " + str(arg.size()));
+    std::map<std::string, M> ret;
+    for (casadi_int i=0;i<n_in_;++i) {
+      ret[name_in_[i]] = arg[i];
+    }
+    return ret;
+  }
+
+  template<typename M>
+  std::vector<M> FunctionInternal::
+  convert_arg(const std::map<std::string, M>& arg) const {
+    // Get default inputs
+    std::vector<M> arg_v(n_in_);
+    for (casadi_int i=0; i<arg_v.size(); ++i) {
+      arg_v[i] = get_default_in(i);
+    }
+
+    // Assign provided inputs
+    for (auto&& e : arg) {
+      arg_v.at(index_in(e.first)) = e.second;
+    }
+
+    return arg_v;
+  }
+
+  template<typename M>
+  std::map<std::string, M> FunctionInternal::
+  convert_res(const std::vector<M>& res) const {
+    casadi_assert(res.size()==n_out_, "Incorrect number of outputs: Expected "
+                      + str(n_out_) + ", got " + str(res.size()));
+    std::map<std::string, M> ret;
+    for (casadi_int i=0;i<n_out_;++i) {
+      ret[name_out_[i]] = res[i];
+    }
+    return ret;
+  }
+
+  template<typename M>
+  std::vector<M> FunctionInternal::
+  convert_res(const std::map<std::string, M>& res) const {
+    // Get default inputs
+    std::vector<M> res_v(n_out_);
+    for (casadi_int i=0; i<res_v.size(); ++i) {
+      res_v[i] = std::numeric_limits<double>::quiet_NaN();
+    }
+
+    // Assign provided inputs
+    for (auto&& e : res) {
+      M a = e.second;
+      res_v.at(index_out(e.first)) = a;
+    }
+    return res_v;
   }
 
 } // namespace casadi

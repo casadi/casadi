@@ -684,18 +684,24 @@ namespace casadi {
     /** \brief Export / Generate C code for the dependency function */
     std::string generate_dependencies(const std::string& fname, const Dict& opts=Dict()) const;
 
-    /** \brief Export an input file that can be passed to generate C code with a main */
+    /** \brief Export an input file that can be passed to generate C code with a main
+     * 
+     * \seealso generate_out
+     * \seealso convert_in to convert between dict/map and vector
+     */
     /// @{
-    void generate_input(const std::string& fname, const DMDict& arg);
-    void generate_input(const std::string& fname, const std::vector<DM>& arg);
-    std::vector<DM> generate_input(const std::string& fname);
+    void generate_in(const std::string& fname, const std::vector<DM>& arg);
+    std::vector<DM> generate_in(const std::string& fname);
     /// @}
 
-    /** \brief Export an output file that can be checked with generated C code output */
+    /** \brief Export an output file that can be checked with generated C code output
+     * 
+     * \seealso generate_in
+     * \seealso convert_out to convert between dict/map and vector
+     */
     /// @{
-    void generate_output(const std::string& fname, const DMDict& arg);
-    void generate_output(const std::string& fname, const std::vector<DM>& arg);
-    std::vector<DM> generate_output(const std::string& fname);
+    void generate_out(const std::string& fname, const std::vector<DM>& arg);
+    std::vector<DM> generate_out(const std::string& fname);
     /// @}
 
     /** \brief Export function in specific language
@@ -779,6 +785,34 @@ namespace casadi {
     }
     const std::vector<MX> mx_out() const;
     ///@}
+
+    /** \brief Convert from/to flat vector of input/output nonzeros */
+    /// @{
+    std::vector<double> nz_from_in(const std::vector<DM>& arg) const;
+    std::vector<double> nz_from_out(const std::vector<DM>& arg) const;
+    std::vector<DM> nz_to_in(const std::vector<double>& arg) const;
+    std::vector<DM> nz_to_out(const std::vector<double>& arg) const;
+    ///@}
+
+    /** \brief Convert from/to input/output lists/map 
+    *
+    * Will raise an error when an unknown key is used or a list has incorrect size.
+    * Does not perform sparsity checking. 
+    */
+    /// @{
+    DMDict convert_in(const std::vector<DM>& arg) const;
+    std::vector<DM> convert_in(const DMDict& arg) const;
+    DMDict convert_out(const std::vector<DM>& arg) const;
+    std::vector<DM> convert_out(const DMDict& arg) const;
+    SXDict convert_in(const std::vector<SX>& arg) const;
+    std::vector<SX> convert_in(const SXDict& arg) const;
+    SXDict convert_out(const std::vector<SX>& arg) const;
+    std::vector<SX> convert_out(const SXDict& arg) const;
+    MXDict convert_in(const std::vector<MX>& arg) const;
+    std::vector<MX> convert_in(const MXDict& arg) const;
+    MXDict convert_out(const std::vector<MX>& arg) const;
+    std::vector<MX> convert_out(const MXDict& arg) const;
+    /// @}
 
     /** \brief Does the function have free variables */
     bool has_free() const;

@@ -1098,8 +1098,17 @@ namespace casadi {
     /** Export numerical matrix to file
     *
     * Supported formats:
+    * 
+    * \verbatim
     *   - .mtx   Matrix Market (sparse)
-    *   - .txt   Ascii full precision representation (dense)
+    *   - .txt   Ascii full precision representation (sparse)
+    *            Whitespace separated, aligned.
+    *            Comments with # % or /
+    *            Uses C locale
+    *            Structural zeros represented by 00
+    *            Does not scale well for large sparse matrices
+    * \endverbatim
+    * 
     */
     void to_file(const std::string& filename, const std::string& format="") const;
 #ifndef SWIG
