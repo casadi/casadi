@@ -132,6 +132,13 @@ namespace casadi {
     // Type of constraints
     std::vector<int> contype_;
 
+    // Type of complementarity constraints
+    //std::vector<int> comp_type_;
+
+    // Index pair for complementarity constraints
+    std::vector<int> comp_i1_;
+    std::vector<int> comp_i2_;
+
     /// A documentation string
     static const std::string meta_doc;
 
