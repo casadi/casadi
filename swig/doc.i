@@ -1103,9 +1103,36 @@ const  "
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -9547,9 +9574,36 @@ const  "
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -13350,9 +13404,36 @@ Internal class.
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -14960,9 +15041,36 @@ Internal class.
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -17554,9 +17662,36 @@ Internal class.
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -21431,9 +21566,36 @@ std::string, M > &arg) const  "
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -25315,9 +25477,36 @@ std::string &parallelization) const  "
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -27981,9 +28170,36 @@ member functions. Joel Andersson >List of available options
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -35507,6 +35723,20 @@ Interface to the JIT compiler SHELL
 |                      |                 | is the prefered way to set      |
 |                      |                 | custom flags.                   |
 +----------------------+-----------------+---------------------------------+
+| name                 | OT_STRING       | The file name used to write out |
+|                      |                 | compiled objects/libraries. The |
+|                      |                 | actual file names used depend   |
+|                      |                 | on 'temp_suffix' and include    |
+|                      |                 | extensions. Default:            |
+|                      |                 | 'tmp_casadi_compiler_shell'     |
++----------------------+-----------------+---------------------------------+
+| temp_suffix          | OT_BOOL         | Use a temporary (seemingly      |
+|                      |                 | random) filename suffix for     |
+|                      |                 | file names. This is desired for |
+|                      |                 | thread-safety. This behaviour   |
+|                      |                 | may defeat caching compiler     |
+|                      |                 | wrappers. Default: true         |
++----------------------+-----------------+---------------------------------+
 
 --------------------------------------------------------------------------------
 
@@ -38401,9 +38631,36 @@ Internal class
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | lookup_mode      | OT_STRINGVECTOR | Specifies, for   | casadi::Interpol |
 |                  |                 | each grid        | ant              |
@@ -39592,9 +39849,36 @@ double **res, casadi_int *iw, double *w, void *mem) const  "
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -41369,9 +41653,36 @@ A: A = L.U, with L lower and U upper triangular
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -41837,9 +42148,36 @@ A: A = Q.R, with Q orthogonal and R upper triangular
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_nrhs         | OT_INT          | Maximum number   | casadi::LapackQr |
 |                  |                 | of right-hand-   |                  |
@@ -57935,9 +58273,36 @@ Joel Andersson
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -68666,6 +69031,20 @@ Joel Andersson  Interface to the JIT compiler SHELL
 |                      |                 | is the prefered way to set      |
 |                      |                 | custom flags.                   |
 +----------------------+-----------------+---------------------------------+
+| name                 | OT_STRING       | The file name used to write out |
+|                      |                 | compiled objects/libraries. The |
+|                      |                 | actual file names used depend   |
+|                      |                 | on 'temp_suffix' and include    |
+|                      |                 | extensions. Default:            |
+|                      |                 | 'tmp_casadi_compiler_shell'     |
++----------------------+-----------------+---------------------------------+
+| temp_suffix          | OT_BOOL         | Use a temporary (seemingly      |
+|                      |                 | random) filename suffix for     |
+|                      |                 | file names. This is desired for |
+|                      |                 | thread-safety. This behaviour   |
+|                      |                 | may defeat caching compiler     |
+|                      |                 | wrappers. Default: true         |
++----------------------+-----------------+---------------------------------+
 
 >List of available options
 
@@ -68734,6 +69113,33 @@ Joel Andersson  Interface to the JIT compiler SHELL
 |                  |                 | the prefered way |                  |
 |                  |                 | to set custom    |                  |
 |                  |                 | flags.           |                  |
++------------------+-----------------+------------------+------------------+
+| name             | OT_STRING       | The file name    | casadi::ShellCom |
+|                  |                 | used to write    | piler            |
+|                  |                 | out compiled obj |                  |
+|                  |                 | ects/libraries.  |                  |
+|                  |                 | The actual file  |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on        |                  |
+|                  |                 | 'temp_suffix'    |                  |
+|                  |                 | and include      |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default: 'tmp_ca |                  |
+|                  |                 | sadi_compiler_sh |                  |
+|                  |                 | ell'             |                  |
++------------------+-----------------+------------------+------------------+
+| temp_suffix      | OT_BOOL         | Use a temporary  | casadi::ShellCom |
+|                  |                 | (seemingly       | piler            |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for file  |                  |
+|                  |                 | names. This is   |                  |
+|                  |                 | desired for      |                  |
+|                  |                 | thread-safety.   |                  |
+|                  |                 | This behaviour   |                  |
+|                  |                 | may defeat       |                  |
+|                  |                 | caching compiler |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | verbose          | OT_BOOL         | Verbose          | casadi::Importer |
 |                  |                 | evaluation  for  | Internal         |
@@ -72107,9 +72513,36 @@ Andersson
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -78419,9 +78852,36 @@ Joel Andersson
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -80630,9 +81090,36 @@ General information
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -82425,9 +82912,36 @@ General information
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
@@ -83683,9 +84197,36 @@ General information
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | lookup_mode      | OT_STRINGVECTOR | Specifies, for   | casadi::Interpol |
 |                  |                 | each grid        | ant              |
@@ -84137,9 +84678,36 @@ General information
 |                  |                 | creates.         |                  |
 |                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
+| jit_name         | OT_STRING       | The file name    | casadi::Function |
+|                  |                 | used to write    | Internal         |
+|                  |                 | out code. The    |                  |
+|                  |                 | actual file      |                  |
+|                  |                 | names used       |                  |
+|                  |                 | depend on 'jit_t |                  |
+|                  |                 | emp_suffix' and  |                  |
+|                  |                 | include          |                  |
+|                  |                 | extensions.      |                  |
+|                  |                 | Default:         |                  |
+|                  |                 | 'jit_tmp'        |                  |
++------------------+-----------------+------------------+------------------+
 | jit_options      | OT_DICT         | Options to be    | casadi::Function |
 |                  |                 | passed to the    | Internal         |
 |                  |                 | jit compiler.    |                  |
++------------------+-----------------+------------------+------------------+
+| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
+|                  |                 | (seemingly       | Internal         |
+|                  |                 | random) filename |                  |
+|                  |                 | suffix for       |                  |
+|                  |                 | generated code   |                  |
+|                  |                 | and libraries.   |                  |
+|                  |                 | This is desired  |                  |
+|                  |                 | for thread-      |                  |
+|                  |                 | safety. This     |                  |
+|                  |                 | behaviour may    |                  |
+|                  |                 | defeat caching   |                  |
+|                  |                 | compiler         |                  |
+|                  |                 | wrappers.        |                  |
+|                  |                 | Default: true    |                  |
 +------------------+-----------------+------------------+------------------+
 | max_num_dir      | OT_INT          | Specify the      | casadi::Function |
 |                  |                 | maximum number   | Internal         |
