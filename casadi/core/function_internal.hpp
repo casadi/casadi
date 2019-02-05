@@ -814,6 +814,11 @@ namespace casadi {
     /** \brief  Name if jit source file */
     std::string jit_name_;
 
+    std::string jit_base_name_;
+
+    /** \brief Use a temporary name */
+    bool jit_temp_suffix_;
+
     /** \brief Numerical evaluation redirected to a C function */
     eval_t eval_;
 

@@ -479,6 +479,9 @@ namespace casadi {
     // Prefix symbols in DLLs?
     std::string dll_export, dll_import;
 
+    // Prefix
+    std::string prefix;
+
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;

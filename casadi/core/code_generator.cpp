@@ -49,6 +49,8 @@ namespace casadi {
     this->include_math = true;
     this->infinity = "INFINITY";
     this->real_min = "";
+    bool prefix_set = false;
+    this->prefix = "";
     avoid_stack_ = false;
     indent_ = 2;
 
@@ -89,6 +91,9 @@ namespace casadi {
         casadi_assert_dev(indent_>=0);
       } else if (e.first=="avoid_stack") {
         avoid_stack_ = e.second;
+      } else if (e.first=="prefix") {
+        this->prefix = e.second.to_string();
+        prefix_set = true;
       } else {
         casadi_error("Unrecongnized option: " + str(e.first));
       }
@@ -147,6 +152,11 @@ namespace casadi {
     // Memory struct entry point
     if (this->with_mem) {
       this->header << "#include <casadi/mem.h>\n";
+    }
+
+    // Use name as default prefix
+    if (!prefix_set) {
+      this->prefix = this->name;
     }
 
   }
@@ -418,7 +428,7 @@ namespace casadi {
       << "  #define _CASADI_NAMESPACE_CONCAT(NS, ID) NS ## ID\n"
       << "  #define CASADI_PREFIX(ID) CASADI_NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)\n"
       << "#else\n"
-      << "  #define CASADI_PREFIX(ID) " << this->name << "_ ## ID\n"
+      << "  #define CASADI_PREFIX(ID) " << this->prefix << "_ ## ID\n"
       << "#endif\n\n";
 
     s << this->includes.str();

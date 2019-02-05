@@ -78,6 +78,8 @@ namespace casadi {
     inputs_check_ = true;
     jit_ = false;
     jit_cleanup_ = true;
+    jit_base_name_ = "jit_tmp";
+    jit_temp_suffix_ = true;
     compilerplugin_ = "clang";
     print_time_ = true;
     eval_ = nullptr;
@@ -204,6 +206,17 @@ namespace casadi {
       {"jit_cleanup",
        {OT_BOOL,
         "Cleanup up the temporary source file that jit creates. Default: true"}},
+      {"jit_name",
+       {OT_STRING,
+        "The file name used to write out code. "
+        "The actual file names used depend on 'jit_temp_suffix' and include extensions. "
+        "Default: 'jit_tmp'"}},
+      {"jit_temp_suffix",
+       {OT_BOOL,
+        "Use a temporary (seemingly random) filename suffix for generated code and libraries. "
+        "This is desired for thread-safety. "
+        "This behaviour may defeat caching compiler wrappers. "
+        "Default: true"}},
       {"compiler",
        {OT_STRING,
         "Just-in-time compiler plugin to be used."}},
@@ -304,6 +317,8 @@ namespace casadi {
     opts["jit_cleanup"] = jit_cleanup_;
     opts["compiler"] = compilerplugin_;
     opts["jit_options"] = jit_options_;
+    opts["jit_name"] = jit_name_;
+    opts["jit_temp_suffix_"] = jit_temp_suffix_;
     opts["derivative_of"] = derivative_of_;
     opts["ad_weight"] = ad_weight_;
     opts["ad_weight_sp"] = ad_weight_sp_;
@@ -358,6 +373,10 @@ namespace casadi {
         compilerplugin_ = op.second.to_string();
       } else if (op.first=="jit_options") {
         jit_options_ = op.second;
+      } else if (op.first=="jit_name") {
+        jit_base_name_ = op.second.to_string();
+      } else if (op.first=="jit_temp_suffix") {
+        jit_temp_suffix_ = op.second;
       } else if (op.first=="derivative_of") {
         derivative_of_ = op.second;
       } else if (op.first=="ad_weight") {
@@ -480,13 +499,18 @@ namespace casadi {
 
   void FunctionInternal::finalize() {
     if (jit_) {
-      jit_name_ = temporary_file("jit_tmp", ".c");
-      jit_name_ = std::string(jit_name_.begin(), jit_name_.begin()+jit_name_.size()-2);
-      //jit_name_ = "jit_tmp";
+      jit_name_ = jit_base_name_;
+      if (jit_temp_suffix_) {
+        jit_name_ = temporary_file(jit_name_, ".c");
+        jit_name_ = std::string(jit_name_.begin(), jit_name_.begin()+jit_name_.size()-2);
+      }
       if (has_codegen()) {
         if (verbose_) casadi_message("Codegenerating function '" + name_ + "'.");
         // JIT everything
-        CodeGenerator gen(jit_name_);
+        Dict opts;
+        // Override the default to avoid random strings in the generated code
+        opts["prefix"] = "jit";
+        CodeGenerator gen(jit_name_, opts);
         gen.add(self());
         if (verbose_) casadi_message("Compiling function '" + name_ + "'..");
         compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
@@ -3192,6 +3216,8 @@ namespace casadi {
 
     s.pack("FunctionInternal::jit", jit_);
     s.pack("FunctionInternal::jit_cleanup", jit_cleanup_);
+    s.pack("FunctionInternal::jit_temp_suffix", jit_temp_suffix_);
+    s.pack("FunctionInternal::jit_base_name", jit_base_name_);
 
     s.pack("FunctionInternal::has_refcount", has_refcount_);
 
@@ -3251,7 +3277,8 @@ namespace casadi {
 
     s.unpack("FunctionInternal::jit", jit_);
     s.unpack("FunctionInternal::jit_cleanup", jit_cleanup_);
-
+    s.unpack("FunctionInternal::jit_temp_suffix", jit_temp_suffix_);
+    s.unpack("FunctionInternal::jit_base_name", jit_base_name_);
     s.unpack("FunctionInternal::has_refcount", has_refcount_);
 
     s.unpack("FunctionInternal::derivative_of", derivative_of_);
