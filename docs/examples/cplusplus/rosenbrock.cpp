@@ -36,36 +36,27 @@ subject to   z+(1-x)^2-y == 0
 Joel Andersson, 2015-2016
 */
 
+
 int main(){
+  {
+    std::string data1, data2;
+    SX x = SX::sym("x");
+    SX y;
+    
+    {
+      StringSerializer s;
+      s.pack(x);
+      data1 = s.encode();
+      s.pack(sin(x));
+      data2 = s.encode();
+    }
 
-  // Declare variables
-  SX x = SX::sym("x");
-  SX y = SX::sym("y");
-  SX z = SX::sym("z");
-
-  uout() << z.info() << std::endl;
-
-  // Formulate the NLP
-  SX f = pow(x,2) + 100*pow(z,2);
-  SX g = z + pow(1-x, 2) - y;
-  SXDict nlp = {{"x", SX::vertcat({x,y,z})},
-                {"f", f},
-                {"g", g}};
-
-  // Create an NLP solver
-  Function solver = nlpsol("solver", "ipopt", nlp);
-
-  // Solve the Rosenbrock problem
-  DMDict arg;
-  arg["x0"] = vector<double>{2.5,3.0,0.75};
-  arg["lbg"] = arg["ubg"] = 0;
-  DMDict res = solver(arg);
-
-  //  Print solution
-  cout << "Optimal cost:                     " << double(res.at("f")) << endl;
-  cout << "Primal solution:                  " << vector<double>(res.at("x")) << endl;
-  cout << "Dual solution (simple bounds):    " << vector<double>(res.at("lam_x")) << endl;
-  cout << "Dual solution (nonlinear bounds): " << vector<double>(res.at("lam_g")) << endl;
-
+    StringDeserializer s(data1);
+    s.pop_type();
+    SX a = s.unpack_sx();
+    s.decode(data2);
+    s.pop_type();
+    SX b = s.unpack_sx();
+  }
   return 0;
 }

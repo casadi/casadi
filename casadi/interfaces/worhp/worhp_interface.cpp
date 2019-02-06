@@ -525,6 +525,8 @@ namespace casadi {
     m->success = m->return_code > TerminateSuccess;
     if (m->return_code==MaxCalls || m->return_code==MaxCalls || m->return_code==Timeout)
       m->unified_return_status = SOLVER_RET_LIMITED;
+    if (m->return_code==evalsNaN)
+      m->unified_return_status = SOLVER_RET_NAN;
     return 0;
   }
 

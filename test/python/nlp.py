@@ -73,6 +73,48 @@ if "SKIP_KNITRO_TESTS" not in os.environ and has_nlpsol("knitro"):
 print(solvers)
 
 class NLPtests(casadiTestCase):
+
+  @memory_heavy()
+  def test_nonregular_point(self):
+    x=SX.sym("x")
+
+    nlp={'x':x,'f':(x+1)**2, 'g': sqrt(x)}
+
+    for Solver, solver_options, features in solvers:
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+      solver_in = {}
+      solver_in["lbx"]=[-1000]
+      solver_in["ubx"]=[1000]
+      solver_in["lbg"]=[-1000]
+      solver_in["ubg"]=[1000]
+      solver_in["x0"] = 1e-4
+      try:
+        print(solver(**solver_in))
+      except:
+        pass
+      print solver.stats()
+      if Solver not in ["ipopt","snopt","blocksqp","bonmin"]:      
+        self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_NAN")
+      self.assertFalse(solver.stats()["success"])
+
+    nlp={'x':x,'f':x**2, 'g': sqrt(x)}
+    for Solver, solver_options, features in solvers:
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+      solver_in = {}
+      solver_in["lbx"]=[-10]
+      solver_in["ubx"]=[10]
+      solver_in["lbg"]=[-2]
+      solver_in["ubg"]=[2]
+      solver_in["x0"] = -2
+      try:
+        print(solver(**solver_in))
+        solver_out = solver(**solver_in)
+      except:
+        pass
+      if Solver not in ["ipopt","snopt","bonmin"]:      
+        self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_NAN")
+      self.assertFalse(solver.stats()["success"])
+
   def test_iteration_interrupt(self):
    for Solver, solver_options, features in solvers:
       if Solver not in ["ipopt","sqpmethod"]: continue

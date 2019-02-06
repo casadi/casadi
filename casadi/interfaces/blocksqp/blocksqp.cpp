@@ -753,7 +753,15 @@ namespace casadi {
       calcInitialHessian(m);
 
       /// Evaluate all functions and gradients for xk_0
-      (void)evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g);
+      switch (evaluate(m, &m->obj, m->gk, m->grad_fk, m->jac_g)) {
+        case -1:
+          m->unified_return_status = SOLVER_RET_NAN;
+          return -1;
+        case 0:
+          break;
+        default:
+          return 1;
+      }
       m->nDerCalls++;
 
       /// Check if converged
@@ -2786,8 +2794,7 @@ namespace casadi {
     m->res[1] = g; // g
     m->res[2] = grad_f; // grad:f:x
     m->res[3] = jac_g; // jac:g:x
-    calc_function(m, "nlp_gf_jg");
-    return 0;
+    return calc_function(m, "nlp_gf_jg");
   }
 
   casadi_int Blocksqp::
@@ -2798,8 +2805,7 @@ namespace casadi {
     m->arg[1] = d_nlp->p; // p
     m->res[0] = f; // f
     m->res[1] = g; // g
-    calc_function(m, "nlp_fg");
-    return 0;
+    return calc_function(m, "nlp_fg");
   }
 
   casadi_int Blocksqp::
@@ -2818,8 +2824,7 @@ namespace casadi {
     m->arg[2] = get_ptr(ones); // lam:f
     m->arg[3] = get_ptr(minus_lam_gk); // lam:g
     m->res[0] = exact_hess_lag; // hess:gamma:x:x
-    calc_function(m, "nlp_hess_l");
-    return 0;
+    return calc_function(m, "nlp_hess_l");;
   }
 
   BlocksqpMemory::BlocksqpMemory() {

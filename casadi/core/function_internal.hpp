@@ -924,7 +924,9 @@ namespace casadi {
     /** Unified return status for solvers */
     enum UnifiedReturnStatus {
         SOLVER_RET_UNKNOWN,
-        SOLVER_RET_LIMITED
+        SOLVER_RET_SUCCESS,
+        SOLVER_RET_LIMITED, // Out of time
+        SOLVER_RET_NAN
     };
 
     static std::string string_from_UnifiedReturnStatus(UnifiedReturnStatus status);

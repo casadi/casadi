@@ -324,8 +324,18 @@ int Sqpmethod::solve(void* mem) const {
       m->res[1] = d->gf;
       m->res[2] = d_nlp->z + nx_;
       m->res[3] = d->Jk;
-      if (calc_function(m, "nlp_jac_fg")) return 1;
-
+      switch (calc_function(m, "nlp_jac_fg")) {
+        case -1:
+          m->return_status = "Non_Regular_Sensitivities";
+          m->unified_return_status = SOLVER_RET_NAN;
+          if (print_status_)
+            print("MESSAGE(sqpmethod): No regularity of sensitivities at current point.\n");
+          return 1;
+        case 0:
+          break;
+        default:
+          return 1;
+      }
       // Evaluate the gradient of the Lagrangian
       casadi_copy(d->gf, nx_, d->gLag);
       casadi_mv(d->Jk, Asp_, d_nlp->lam+nx_, d->gLag, true);
@@ -470,6 +480,12 @@ int Sqpmethod::solve(void* mem) const {
           m->res[0] = &fk_cand;
           m->res[1] = d->z_cand + nx_;
           if (calc_function(m, "nlp_fg")) {
+            // Avoid infinite recursion
+            if (ls_iter == max_iter_ls_) {
+              ls_success = false;
+              l1_infeas = nan;
+              break;
+            }
             // line-search failed, skip iteration
             t = beta_ * t;
             continue;
@@ -642,7 +658,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "m_res[2] = d_nlp.z+" + str(nx_) + ";\n";
     g << "m_res[3] = d.Jk;\n";
     std::string nlp_jac_fg = g.add_dependency(get_function("nlp_jac_fg"));
-    g << nlp_jac_fg + "(m_arg, m_res, m_iw, m_w, 0);\n";
+    g << "if (" + nlp_jac_fg + "(m_arg, m_res, m_iw, m_w, 0)) return 1;\n";
     g.comment("Evaluate the gradient of the Lagrangian");
     g << g.copy("d.gf", nx_, "d.gLag") << "\n";
     g << g.mv("d.Jk", Asp_, "d_nlp.lam+"+str(nx_), "d.gLag", true) << "\n";
@@ -732,8 +748,13 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "m_res[1] = d.z_cand+" + str(nx_) + ";\n;";
       std::string nlp_fg = g.add_dependency(get_function("nlp_fg"));
       g << "if (" << nlp_fg << "(m_arg, m_res, m_iw, m_w, 0)) {\n";
+      g.comment("Avoid infinite recursion");
+      g << "if (ls_iter == " << max_iter_ls_ << ") {\n";
+      //g << "ls_success = 0;\n";
+      g << "break;\n";
+      g << "}\n";
       g.comment("line-search failed, skip iteration");
-      g << " t = " << beta_ << "* t;\n";
+      g << "t = " << beta_ << "* t;\n";
       g << "continue;\n";
       g << "}\n";
       g.comment("Calculating merit-function in candidate");

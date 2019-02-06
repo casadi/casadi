@@ -3186,6 +3186,8 @@ namespace casadi {
   std::string FunctionInternal::string_from_UnifiedReturnStatus(UnifiedReturnStatus status) {
     switch (status) {
       case SOLVER_RET_LIMITED:  return "SOLVER_RET_LIMITED";
+      case SOLVER_RET_NAN:  return "SOLVER_RET_NAN";
+      case SOLVER_RET_SUCCESS:  return "SOLVER_RET_SUCCESS";
       default: return "SOLVER_RET_UNKNOWN";
     }
   }
