@@ -268,6 +268,9 @@
 %exception  casadi::Expm::init(const Dict &opts) override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::External::any_symbol_found() const  {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::External::class_name() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -983,6 +986,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericExternal::alloc_mem() const override {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericExternal::any_symbol_found() const override {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericExternal::get_sparsity_in(casadi_int i) override {

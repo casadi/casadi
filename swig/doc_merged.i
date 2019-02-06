@@ -1965,7 +1965,14 @@ Evaluate exact hessian of Lagrangian.
 
 %feature("docstring") casadi::Blocksqp::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::Blocksqp::sparsity_jac "
 
@@ -8914,7 +8921,14 @@ generated function.
 
 %feature("docstring") casadi::Collocation::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::Collocation::size1_in "
 
@@ -15413,6 +15427,12 @@ Evaluate a function, overloaded.
 
 ";
 
+%feature("docstring") casadi::External::any_symbol_found "
+
+[INTERNAL]  Any symbol found?
+
+";
+
 %feature("docstring") casadi::External::jit_dependencies "
 
 [INTERNAL]  Jit dependencies.
@@ -16166,7 +16186,14 @@ C++ includes: fast_newton.hpp ";
 
 %feature("docstring") casadi::FastNewton::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::FastNewton::codegen_body "
 
@@ -19826,7 +19853,14 @@ elements.
 
 %feature("docstring") casadi::FixedStepIntegrator::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::FixedStepIntegrator::has_spfwd "
 
@@ -23231,9 +23265,9 @@ generated function.
 
 ";
 
-%feature("docstring") casadi::GenericExternal::clear_mem "
+%feature("docstring") casadi::GenericExternal::any_symbol_found "
 
-[INTERNAL]  Clear all memory (called from destructor)
+[INTERNAL]  Any symbol found?
 
 ";
 
@@ -23420,6 +23454,12 @@ original
 %feature("docstring") casadi::GenericExternal::alloc "
 
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
+
+";
+
+%feature("docstring") casadi::GenericExternal::clear_mem "
+
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -25639,7 +25679,14 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::adjViaJac "
 
@@ -27085,7 +27132,14 @@ generated function.
 
 %feature("docstring") casadi::ImplicitToNlp::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::ImplicitToNlp::finalize "
 
@@ -28818,7 +28872,14 @@ propagation.
 
 %feature("docstring") casadi::Integrator::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::Integrator::alloc_res "
 
@@ -39953,7 +40014,14 @@ structure recognition for symmetric Jacobians
 
 %feature("docstring") casadi::Newton::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::Newton::sx_in "
 
@@ -41000,7 +41068,14 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 %feature("docstring") casadi::Nlpsol::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::Nlpsol::serialize_type "
 
@@ -44775,7 +44850,14 @@ elements.
 
 %feature("docstring") casadi::OracleFunction::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::OracleFunction::fwdViaJac "
 
@@ -48431,7 +48513,14 @@ elements.
 
 %feature("docstring") casadi::Qrsqp::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::Qrsqp::size_in "
 
@@ -50172,7 +50261,14 @@ f:   Function mapping from (n+1) inputs to 1 output.
 
 %feature("docstring") casadi::Rootfinder::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::Rootfinder::has_forward "
 
@@ -51638,7 +51734,14 @@ structure recognition.
 
 %feature("docstring") casadi::RungeKutta::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::RungeKutta::size2_out "
 
@@ -53286,7 +53389,14 @@ npar[out]:  required number of parallel calls (or -1)
 
 %feature("docstring") casadi::Scpgen::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::Scpgen::tocache "
 
@@ -59938,7 +60048,14 @@ generated function.
 
 %feature("docstring") casadi::Sqpmethod::get_function "
 
-[INTERNAL] ";
+[INTERNAL]
+
+>  const Function& casadi::OracleFunction::get_function(const std::string &name) const override
+------------------------------------------------------------------------
+[INTERNAL] 
+";
+
+";
 
 %feature("docstring") casadi::Sqpmethod::get_n_out "
 

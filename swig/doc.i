@@ -2346,7 +2346,9 @@ const  "
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -11328,7 +11330,9 @@ generated function.
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -19231,6 +19235,12 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::External::any_symbol_found() const  "
+
+[INTERNAL]  Any symbol found?
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::jit_dependencies(const
 std::string &fname) "
 
@@ -20138,7 +20148,9 @@ std::string &parallelization) const  "
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -24541,7 +24553,9 @@ const  "
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -29444,9 +29458,9 @@ k) const  "
 
 ";
 
-%feature("docstring")  casadi::ProtoFunction::clear_mem() "
+%feature("docstring")  casadi::GenericExternal::any_symbol_found() const  "
 
-[INTERNAL]  Clear all memory (called from destructor)
+[INTERNAL]  Any symbol found?
 
 ";
 
@@ -29670,6 +29684,12 @@ casadi::FunctionInternal::instruction_input(casadi_int k) const  "
 bool persistent=false) "
 
 [INTERNAL]  Ensure work vectors long enough to evaluate function.
+
+";
+
+%feature("docstring")  casadi::ProtoFunction::clear_mem() "
+
+[INTERNAL]  Clear all memory (called from destructor)
 
 ";
 
@@ -33401,7 +33421,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -35171,7 +35193,9 @@ iind, casadi_int oind, bool symmetric) const  "
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -37244,7 +37268,9 @@ persistent=false) "
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -51395,7 +51421,9 @@ const  "
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -52702,7 +52730,9 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -57644,7 +57674,9 @@ std::string &lang, std::ostream &stream, const Dict &options) const  "
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -62021,7 +62053,9 @@ elements.
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -64107,7 +64141,9 @@ f:   Function mapping from (n+1) inputs to 1 output.
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -65907,7 +65943,9 @@ double **&arg, double **&res, casadi_int *&iw, double *&w) const  "
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -67932,7 +67970,9 @@ DM > &arg) const  "
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -76033,7 +76073,9 @@ std::vector< MX > &arg, const std::string &parallelization) "
 
 %feature("docstring")  casadi::OracleFunction::get_function() const  "
 
-[INTERNAL] ";
+[INTERNAL]  Get list of dependency functions -1 Indicates irregularity.
+
+";
 
 %feature("docstring")  casadi::OracleFunction::get_function(const
 std::string &name) const  "
@@ -81259,14 +81301,34 @@ casadi_int K, const double *a, double *t, double *z, double *dwork, double
 %feature("docstring")  casadi::external(const std::string &name, const Dict
 &opts=Dict()) "
 
-Load an external function File name is assumed to be ./<f_name>.so.
+Load an external function from a shared library.
+
+Parameters:
+-----------
+
+name:  Name as in the label assigned to a CasADi Function object:
+Function(name,...,...) Will be used to look up symbols/functions named eg.
+<name>_eval Use nm (linux/osx) or depends.exe (win) to check which symbols
+are present in your shared library
+
+File name is assumed to be ./<name>.so
 
 ";
 
 %feature("docstring")  casadi::external(const std::string &name, const
 std::string &bin_name, const Dict &opts=Dict()) "
 
-Load an external function File name given.
+Load an external function from a shared library.
+
+Parameters:
+-----------
+
+name:  Name as in the label assigned to a CasADi Function object:
+Function(name,...,...) Will be used to look up symbols/functions named eg.
+<name>_eval Use nm (linux/osx) or depends.exe (win) to check which symbols
+are present in your shared library
+
+bin_name:  File name of the shared library
 
 ";
 
