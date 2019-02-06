@@ -58,12 +58,14 @@ int usage_c(){
   /* Reset error */
   dlerror();
 
+  typedef long long int casadi_int;
+
   /* Typedefs */
   typedef void (*signal_t)(void);
-  typedef int (*getint_t)(void);
-  typedef int (*work_t)(int* sz_arg, int* sz_res, int* sz_iw, int* sz_w);
-  typedef const int* (*sparsity_t)(int ind);
-  typedef int (*eval_t)(const double** arg, double** res, int* iw, double* w, void* mem);
+  typedef casadi_int (*getint_t)(void);
+  typedef int (*work_t)(casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w);
+  typedef const casadi_int* (*sparsity_t)(casadi_int ind);
+  typedef int (*eval_t)(const double** arg, double** res, casadi_int* iw, double* w, void* mem);
 
   /* Memory management -- increase reference counter */
   signal_t incref = (signal_t)dlsym(handle, "f_incref");
@@ -76,20 +78,20 @@ int usage_c(){
   /* Number of inputs */
   getint_t n_in_fcn = (getint_t)dlsym(handle, "f_n_in");
   if (dlerror()) return 1;
-  int n_in = n_in_fcn();
+  casadi_int n_in = n_in_fcn();
 
   /* Number of outputs */
   getint_t n_out_fcn = (getint_t)dlsym(handle, "f_n_out");
   if (dlerror()) return 1;
-  int n_out = n_out_fcn();
+  casadi_int n_out = n_out_fcn();
 
   /* Get sizes of the required work vectors */
-  int sz_arg=n_in, sz_res=n_out, sz_iw=0, sz_w=0;
+  casadi_int sz_arg=n_in, sz_res=n_out, sz_iw=0, sz_w=0;
   work_t work = (work_t)dlsym(handle, "f_work");
   if(dlerror()) dlerror(); // No such function, reset error flags
   if (work && work(&sz_arg, &sz_res, &sz_iw, &sz_w)) return 1;
   printf("Work vector sizes:\n");
-  printf("sz_arg = %d, sz_res = %d, sz_iw = %d, sz_w = %d\n\n",
+  printf("sz_arg = %lld, sz_res = %lld, sz_iw = %lld, sz_w = %lld\n\n",
          sz_arg, sz_res, sz_iw, sz_w);
 
   /* Input sparsities */
@@ -101,32 +103,33 @@ int usage_c(){
   if (dlerror()) return 1;
 
   /* Print the sparsities of the inputs and outputs */
-  int i;
+  casadi_int i;
   for(i=0; i<n_in + n_out; ++i){
     // Retrieve the sparsity pattern - CasADi uses column compressed storage (CCS)
-    const int *sp_i;
+    const casadi_int *sp_i;
     if (i<n_in) {
-      printf("Input %d\n", i);
+      printf("Input %lld\n", i);
       sp_i = sparsity_in(i);
     } else {
-      printf("Output %d\n", i-n_in);
+      printf("Output %lld\n", i-n_in);
       sp_i = sparsity_out(i-n_in);
     }
     if (sp_i==0) return 1;
-    int nrow = *sp_i++; /* Number of rows */
-    int ncol = *sp_i++; /* Number of columns */
-    const int *colind = sp_i; /* Column offsets */
-    const int *row = sp_i + ncol+1; /* Row nonzero */
+    casadi_int nrow = *sp_i++; /* Number of rows */
+    casadi_int ncol = *sp_i++; /* Number of columns */
+    const casadi_int *colind = sp_i; /* Column offsets */
+    const casadi_int *row = sp_i + ncol+1; /* Row nonzero */
+    casadi_int nnz = sp_i[ncol]; /* Number of nonzeros */
 
     /* Print the pattern */
-    printf("  Dimension: %d-by-%d\n", nrow, ncol);
+    printf("  Dimension: %lld-by-%lld (%lld nonzeros)\n", nrow, ncol, nnz);
     printf("  Nonzeros: {");
-    int rr,cc,el;
+    casadi_int rr,cc,el;
     for(cc=0; cc<ncol; ++cc){                    /* loop over columns */
       for(el=colind[cc]; el<colind[cc+1]; ++el){ /* loop over the nonzeros entries of the column */
         if(el!=0) printf(", ");                  /* Separate the entries */
         rr = row[el];                            /* Get the row */
-        printf("{%d,%d}",rr,cc);                 /* Print the nonzero */
+        printf("{%lld,%lld}",rr,cc);                 /* Print the nonzero */
       }
     }
     printf("}\n\n");
@@ -142,7 +145,7 @@ int usage_c(){
   /* Allocate input/output buffers and work vectors*/
   const double *arg[sz_arg];
   double *res[sz_res];
-  int iw[sz_iw];
+  casadi_int iw[sz_iw];
   double w[sz_w];
 
   /* Function input and output */
