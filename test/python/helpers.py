@@ -147,6 +147,18 @@ class casadiTestCase(unittest.TestCase):
     self.assertFalse(e is None)
     self.assertTrue(s in e,msg=e + "<->" + s)
 
+  @contextmanager
+  def assertOutput(self,included,excluded):
+    with capture_stdout() as result:
+      yield
+    if not(isinstance(included,list)):
+      included = [included]
+    if not(isinstance(excluded,list)):
+      excluded = [excluded]
+    for e in included:
+      self.assertTrue(e in result[0],msg=result[0] + "<->" + e)
+    for e in excluded:
+      self.assertFalse(e in result[0],msg=result[0] + "<->" + e)
   def tearDown(self):
     t = time.time() - self.startTime
     print("deltaT %s: %.3f" % ( self.id(), t))

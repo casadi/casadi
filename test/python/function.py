@@ -2245,5 +2245,38 @@ class Functiontests(casadiTestCase):
     with self.assertInException("Incorrect"):
       f.convert_out([1,2,3])
 
+  def test_ad_weight_sp(self):
+    x = MX.sym("x",4)
+
+    f = Function('f',[x],[x])
+    
+    with self.assertOutput("1 forward sweeps needed","1 reverse sweeps needed"):
+      jacobian(f(sin(x)),x,{"helper_options": {"verbose":True, "ad_weight_sp":0}})
+    with self.assertOutput("1 reverse sweeps needed","1 forward sweeps needed"):
+      jacobian(f(sin(x)),x,{"helper_options": {"verbose":True, "ad_weight_sp":1}})
+  
+
+    x = MX.sym("x",4)
+
+    nlp = {"x":x,"f":dot(x,x),"g": sin(x)}
+
+    with self.assertOutput("1 forward sweeps needed","1 reverse sweeps needed"):
+      solver = nlpsol("solver","ipopt",nlp,{"common_options": {"helper_options": {"verbose":True, "ad_weight_sp":0}}})
+    with self.assertOutput("1 reverse sweeps needed","1 forward sweeps needed"):
+      solver = nlpsol("solver","ipopt",nlp,{"common_options": {"helper_options": {"verbose":True, "ad_weight_sp":1}}})
+
+
+    f = Function('f',[x],[x],{"verbose":True,"ad_weight_sp":1})
+    with self.assertOutput("1 reverse sweeps needed","1 forward sweeps needed"):
+      jacobian(f(sin(x)),x)
+
+    x = MX.sym("x",100)
+
+    f = Function('f',[x],[x[0]],{"verbose":True,"ad_weight_sp":0})
+
+    with self.assertOutput("2 forward sweeps needed","1 reverse sweeps needed"):
+      jacobian(f(sin(x)),x)
+
+
 if __name__ == '__main__':
     unittest.main()
