@@ -54,6 +54,12 @@ namespace casadi {
     External::init_external();
   }
 
+  bool External::any_symbol_found() const {
+    return incref_ || decref_ || get_default_in_ ||
+      get_n_in_ || get_n_out_ || get_name_in_ ||
+      get_name_out_ || work_;
+  }
+
   void External::init_external() {
     // Increasing/decreasing reference counter
     incref_ = (signal_t)li_.get_function(name_ + "_incref");
@@ -81,6 +87,13 @@ namespace casadi {
     : External(name, li) {
 
     GenericExternal::init_external();
+  }
+
+  bool GenericExternal::any_symbol_found() const {
+    return External::any_symbol_found() ||
+      get_sparsity_in_ || get_sparsity_out_ ||
+      alloc_mem_ || init_mem_ || free_mem_ ||
+      eval_;
   }
 
   void GenericExternal::init_external() {
@@ -215,6 +228,10 @@ namespace casadi {
   void External::init(const Dict& opts) {
     // Call the initialization method of the base class
     FunctionInternal::init(opts);
+
+    casadi_assert(any_symbol_found(),
+      "Could not find any function/symbol starting with '" + name_ + "_'. "
+      "Make sure to read documentation of `external()` for proper usage.");
 
     // Reference counting?
     has_refcount_ = li_.has_function(name_ + "_incref");

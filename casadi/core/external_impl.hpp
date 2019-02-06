@@ -80,6 +80,9 @@ namespace casadi {
     /** \brief Destructor */
     ~External() override = 0;
 
+    /** \brief Any symbol found? */
+    virtual bool any_symbol_found() const;
+
     // Factory
     Function factory(const std::string& name,
                              const std::vector<std::string>& s_in,
@@ -173,6 +176,9 @@ namespace casadi {
 
     /** \brief  Destructor */
     ~GenericExternal() override { this->clear_mem();}
+
+    /** \brief Any symbol found? */
+    bool any_symbol_found() const override;
 
     /** \brief Initialize members that are unique */
     void init_external() override;
