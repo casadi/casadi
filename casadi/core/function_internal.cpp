@@ -318,7 +318,7 @@ namespace casadi {
     opts["compiler"] = compilerplugin_;
     opts["jit_options"] = jit_options_;
     opts["jit_name"] = jit_name_;
-    opts["jit_temp_suffix_"] = jit_temp_suffix_;
+    opts["jit_temp_suffix"] = jit_temp_suffix_;
     opts["derivative_of"] = derivative_of_;
     opts["ad_weight"] = ad_weight_;
     opts["ad_weight_sp"] = ad_weight_sp_;
