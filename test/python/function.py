@@ -1967,6 +1967,7 @@ class Functiontests(casadiTestCase):
         self.assertTrue("[[1e-07]," in out[0])
 
   @requires_nlpsol("ipopt")
+  @requiresPlugin(Importer,"shell")
   def test_inherit_jit_options(self):
 
     x = MX.sym("x")
@@ -1982,6 +1983,14 @@ class Functiontests(casadiTestCase):
     import re
     found = set([m.group(1) for m in re.finditer("Compiling function '(\w+?)'", out[0])])
     self.assertTrue(len(found)==1)
+    self.assertTrue("fwd1_Q" in found)
+
+    with capture_stdout() as out:
+      self.check_serialize(solver,inputs={"x0": 2})
+
+    found = set([m.group(1) for m in re.finditer("Compiling function '(\w+?)'", out[0])])
+    self.assertTrue(len(found)==2)
+    self.assertTrue("Q" in found)
     self.assertTrue("fwd1_Q" in found)
 
   def test_custom_jacobian(self):

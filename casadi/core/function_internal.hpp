@@ -844,7 +844,7 @@ namespace casadi {
     void* user_data_;
 
     /// Just-in-time compiler
-    std::string compilerplugin_;
+    std::string compiler_plugin_;
     Importer compiler_;
     Dict jit_options_;
 

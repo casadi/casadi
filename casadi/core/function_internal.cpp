@@ -80,7 +80,7 @@ namespace casadi {
     jit_cleanup_ = true;
     jit_base_name_ = "jit_tmp";
     jit_temp_suffix_ = true;
-    compilerplugin_ = "clang";
+    compiler_plugin_ = "clang";
     print_time_ = true;
     eval_ = nullptr;
     has_refcount_ = false;
@@ -315,7 +315,7 @@ namespace casadi {
     opts["inputs_check"] = inputs_check_;
     if (!is_temp) opts["jit"] = jit_;
     opts["jit_cleanup"] = jit_cleanup_;
-    opts["compiler"] = compilerplugin_;
+    opts["compiler"] = compiler_plugin_;
     opts["jit_options"] = jit_options_;
     opts["jit_name"] = jit_name_;
     opts["jit_temp_suffix"] = jit_temp_suffix_;
@@ -370,7 +370,7 @@ namespace casadi {
       } else if (op.first=="jit_cleanup") {
         jit_cleanup_ = op.second;
       } else if (op.first=="compiler") {
-        compilerplugin_ = op.second.to_string();
+        compiler_plugin_ = op.second.to_string();
       } else if (op.first=="jit_options") {
         jit_options_ = op.second;
       } else if (op.first=="jit_name") {
@@ -513,7 +513,7 @@ namespace casadi {
         CodeGenerator gen(jit_name_, opts);
         gen.add(self());
         if (verbose_) casadi_message("Compiling function '" + name_ + "'..");
-        compiler_ = Importer(gen.generate(), compilerplugin_, jit_options_);
+        compiler_ = Importer(gen.generate(), compiler_plugin_, jit_options_);
         if (verbose_) casadi_message("Compiling function '" + name_ + "' done.");
         // Try to load
         eval_ = (eval_t)compiler_.get_function(name_);
@@ -3218,7 +3218,8 @@ namespace casadi {
     s.pack("FunctionInternal::jit_cleanup", jit_cleanup_);
     s.pack("FunctionInternal::jit_temp_suffix", jit_temp_suffix_);
     s.pack("FunctionInternal::jit_base_name", jit_base_name_);
-
+    s.pack("FunctionInternal::jit_options", jit_options_);
+    s.pack("FunctionInternal::compiler_plugin", compiler_plugin_);
     s.pack("FunctionInternal::has_refcount", has_refcount_);
 
     s.pack("FunctionInternal::derivative_of", derivative_of_);
@@ -3279,6 +3280,8 @@ namespace casadi {
     s.unpack("FunctionInternal::jit_cleanup", jit_cleanup_);
     s.unpack("FunctionInternal::jit_temp_suffix", jit_temp_suffix_);
     s.unpack("FunctionInternal::jit_base_name", jit_base_name_);
+    s.unpack("FunctionInternal::jit_options", jit_options_);
+    s.unpack("FunctionInternal::compiler_plugin", compiler_plugin_);
     s.unpack("FunctionInternal::has_refcount", has_refcount_);
 
     s.unpack("FunctionInternal::derivative_of", derivative_of_);
