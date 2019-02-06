@@ -36,7 +36,6 @@ try:
 except:
 	scipy_available = False
 
-@run_only(["SXslicing"])
 class SXtests(casadiTestCase):
 
   def setUp(self):
@@ -246,6 +245,7 @@ class SXtests(casadiTestCase):
       self.assertRaises(RuntimeError, lambda : mtimes(xx,yy))
 
 
+  @known_bug()  # Test refactoring, cf. #1436
   def test_SXslicing(self):
       self.message("SX slicing/indexing")
       x=SX.sym("x",3,2)

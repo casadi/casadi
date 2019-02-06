@@ -712,13 +712,12 @@ class Functiontests(casadiTestCase):
     if not has_nlpsol("ipopt"):
       return
 
-  @requires_nlpsol("ipopt")
+  @known_bug()
   def test_unknown_options_stringvector(self):
     x = SX.sym("x")
-    solver = nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"monitor": ["nlp_f"]})
-    with capture_stdout() as result:
+    solver = nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"monitor": ["eval_f"]})
+    with self.assertRaises(Exception):
       solver = nlpsol("mysolver", "ipopt", {"x":x,"f":x**2}, {"monitor": ["abc"]})
-    self.assertTrue("Ignoring monitor 'abc'. Available functions: nlp_f" in result[1])
 
   @memory_heavy()
   def test_mapaccum(self):

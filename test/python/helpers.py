@@ -301,7 +301,6 @@ class casadiTestCase(unittest.TestCase):
 
 
     if isinstance(sample,SX):
-      print("aa",x,yt)
       f = Function("f", x, yt)
     else:
       f = Function("f", x, yt)
@@ -325,7 +324,6 @@ class casadiTestCase(unittest.TestCase):
          print(f.size_in(i))
          raise e
          raise Exception("ERROR! Tried to set input with %s which is of type  %s \n%s" %(str(x0[i]), str(type(x0[i])),name))
-    print(f)
     f_out = f.call(f_in)
     zt = f_out[0].full()
     self.checkarray(yr,zt,name,failmessage)

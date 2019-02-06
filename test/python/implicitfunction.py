@@ -197,11 +197,14 @@ class ImplicitFunctiontests(casadiTestCase):
       y0 = DM([0.1,0.4])
       yy = y + y0
       n=0.2
-      f=Function("f", [y,x],[vertcat(x-arcsin(yy[0]),yy[1]**2-yy[0])])
+      f=Function("f", [y,x],[vertcat(*[x-arcsin(yy[0]),yy[1]**2-yy[0]])])
       solver=rootfinder("solver", Solver, f, options)
+      solver_in = [0]*solver.n_in();solver_in[0]=n
+      solver_out = solver(solver_in)
 
-      refsol = Function("refsol", [y,x],[vertcat(sin(x),sqrt(sin(x)))-y0]) # ,sin(x)**2])
-      self.checkfunction(solver,refsol,inputs=[n,0],digits=4,sens_der=False,failmessage=message)
+      refsol = Function("refsol", [y,x],[vertcat(*[sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
+      refsol_in = [0]*refsol.n_in();refsol_in[0]=n
+      self.checkfunction(solver,refsol,digits=5,sens_der=False,failmessage=message)
 
   def testKINSol1c(self):
     self.message("Scalar KINSol problem, n=0, constraint")
