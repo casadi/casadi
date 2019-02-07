@@ -1105,6 +1105,13 @@ class Matrixtests(casadiTestCase):
     a.to_file("test.txt")
     b = DM.from_file("test.txt")
     self.checkarray(a,b)
+  def test_norm_2(self):
+    a = np.array([1,2,3])
+    r = np.linalg.norm(a)
+    for M in [DM,MX,SX]:
+      self.checkarray(evalf(norm_2(M(a))),r)
+      self.checkarray(evalf(norm_2(M(a).T)),r)
+
 
 
 if __name__ == '__main__':

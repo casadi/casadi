@@ -1114,7 +1114,7 @@ namespace casadi {
   }
 
   MX MX::norm_2(const MX& x) {
-    if (x.is_column()) {
+    if (x.is_vector()) {
       return norm_fro(x);
     } else {
       return x->get_norm_2();
