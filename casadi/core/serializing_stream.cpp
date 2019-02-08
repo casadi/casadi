@@ -325,8 +325,14 @@ namespace casadi {
   }
 
   UniversalNodeOwner::UniversalNodeOwner(UniversalNodeOwner&& rhs) noexcept :
-    node(rhs.node), is_sx(rhs.is_sx) {
+    node(std::move(rhs.node)), is_sx(std::move(rhs.is_sx)) {
     rhs.node = nullptr;
+  }
+
+  UniversalNodeOwner& operator=(UniversalNodeOwner&& other) noexcept {
+    std::swap(node, other.node);
+    std::swap(is_sx, other.is_sx);
+    return *this;
   }
 
   UniversalNodeOwner::~UniversalNodeOwner() {
