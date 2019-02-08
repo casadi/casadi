@@ -49,6 +49,8 @@ namespace casadi {
     UniversalNodeOwner(UniversalNodeOwner&& rhs) noexcept;
     UniversalNodeOwner(SharedObjectInternal* obj);
     UniversalNodeOwner(SXNode* obj);
+    UniversalNodeOwner& operator=(const UniversalNodeOwner& other) = delete;
+    UniversalNodeOwner& operator=(UniversalNodeOwner&& other) noexcept;
     ~UniversalNodeOwner();
     void* get() { return node; }
   private:
