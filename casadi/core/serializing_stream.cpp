@@ -324,7 +324,7 @@ namespace casadi {
     if (node) obj->count++;
   }
 
-  UniversalNodeOwner::UniversalNodeOwner(UniversalNodeOwner&& rhs) noexcept(true) :
+  UniversalNodeOwner::UniversalNodeOwner(UniversalNodeOwner&& rhs) noexcept :
     node(rhs.node), is_sx(rhs.is_sx) {
     rhs.node = nullptr;
   }
