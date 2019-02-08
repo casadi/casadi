@@ -579,8 +579,9 @@ namespace casadi {
     ss << setfill('0') << setw(6) << id;
     std::string count = ss.str();
     for (casadi_int i=0;i<n_in_;++i) {
-      DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".in." + name_in_[i] + "." +
-        dump_format_, sparsity_in_[i], arg[i]);
+      if (arg[i])
+        DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".in." + name_in_[i] + "." +
+          dump_format_, sparsity_in_[i], arg[i]);
     }
     generate_in(dump_dir_+ filesep + name_ + "." + count + ".in.txt", arg);
   }
@@ -595,8 +596,9 @@ namespace casadi {
     ss << setfill('0') << setw(6) << id;
     std::string count = ss.str();
     for (casadi_int i=0;i<n_out_;++i) {
-      DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".out." + name_out_[i] + "." +
-        dump_format_, sparsity_out_[i], res[i]);
+      if (res[i])
+        DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".out." + name_out_[i] + "." +
+          dump_format_, sparsity_out_[i], res[i]);
     }
     generate_out(dump_dir_+ filesep + name_ + "." + count + ".out.txt", res);
   }
@@ -640,7 +642,7 @@ namespace casadi {
     } else {
       ret = eval(arg, res, iw, w, mem);
     }
-    if (dump_in_) dump_out(dump_id, res);
+    if (dump_out_) dump_out(dump_id, res);
     if (print_out_) {
       uout() << "Function " << name_ << " (" << this << ")" << std::endl;
       for (casadi_int i=0; i<n_out_; ++i) {

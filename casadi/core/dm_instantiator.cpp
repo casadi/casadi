@@ -190,6 +190,7 @@ namespace casadi {
   void CASADI_EXPORT DM::to_file(const std::string& filename,
       const Sparsity& sp, const double* nonzeros,
       const std::string& format_hint) {
+    casadi_assert_dev(nonzeros);
     std::string format = Sparsity::file_format(filename, format_hint, {"mtx", "txt"});
     std::ofstream out(filename);
     if (format=="mtx") {
