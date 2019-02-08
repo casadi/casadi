@@ -56,8 +56,8 @@ if has_conic("cplex"):
 
 # No solution for licensing on travis
 
-#if has_conic("gurobi"):
-#  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True, "codegen": False}))
+if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
+  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True, "codegen": False}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
@@ -156,10 +156,7 @@ class ConicTests(casadiTestCase):
       solver_in["uba"]=UBA
 
       solver_out = solver(**solver_in)
-      try:
-          self.assertTrue(solver.stats()["success"])
-      except:
-          raise Exception(str(conic))
+      self.assertTrue(solver.stats()["success"])
 
       self.assertAlmostEqual(solver_out["x"][0],2.0/3,max(1,6-less_digits),str(conic))
       self.assertAlmostEqual(solver_out["x"][1],4.0/3,max(1,6-less_digits),str(conic))
@@ -1066,6 +1063,24 @@ class ConicTests(casadiTestCase):
       self.checkarray(res["x"],DM([-5.0147928622,-5.766930599,-8.52180472]),conic,digits=4)
 
       self.assertTrue(solver.stats()["success"])
+
+  def test_no_success(self):
+
+    x=SX.sym("x")
+    y=SX.sym("y")
+
+    f = x-y
+    for conic, qp_options, aux_options in conics:
+      opts = dict(qp_options)
+      opts["error_on_fail"] = False
+      solver = qpsol("solver",conic,{'x':vertcat(x,y), 'f':f,'g':vertcat(x+1,x-2)},opts)
+      solver(x0=0,lbg=0,ubg=0,lbx=[-10,-10],ubx=[10,10])
+      self.assertFalse(solver.stats()["success"])
+
+      opts["error_on_fail"] = True
+      solver = qpsol("solver",conic,{'x':vertcat(x,y), 'f':f,'g':vertcat(x+1,x-2)},opts)
+      with self.assertInException("process"):
+        solver(x0=0,lbg=0,ubg=0,lbx=[-10,-10],ubx=[10,10])
 
 if __name__ == '__main__':
     unittest.main()

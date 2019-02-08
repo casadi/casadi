@@ -47,12 +47,12 @@ if has_nlpsol("snopt"):
   solvers.append(("snopt",{"snopt": {"Verify_level": 3,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12}},set()))
 
 if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
-  qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.fixed_variable_treatment":"make_constraint","ipopt.print_level":0,"print_time":False} }
+  qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.tiny_step_tol": 1e-20, "ipopt.fixed_variable_treatment":"make_constraint","ipopt.print_level":5,"print_time":False} }
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options},set()))
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10},set()))
 
 if has_conic("qrqp") and has_nlpsol("sqpmethod"):
-  qpsol_options = {"print_iter":False,"print_header":False}
+  qpsol_options = {"print_iter":False,"print_header":False,"error_on_fail" : False}
   solvers.append(("sqpmethod",{"qpsol": "qrqp","qpsol_options": qpsol_options},{"codegen"}))
   solvers.append(("sqpmethod",{"qpsol": "qrqp","max_iter_ls":0,"qpsol_options": qpsol_options},{"codegen"}))
   solvers.append(("sqpmethod",{"qpsol": "qrqp","regularize":True,"max_iter":500,"qpsol_options": qpsol_options},{"codegen"}))

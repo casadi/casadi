@@ -82,7 +82,8 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /// Solve the QP
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int solve(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const override;
 
     /** \brief Create memory block */
     void* alloc_mem() const override { return new OoqpMemory();}

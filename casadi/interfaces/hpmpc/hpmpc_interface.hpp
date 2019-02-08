@@ -160,7 +160,8 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<HpmpcMemory*>(mem);}
 
     /** \brief  Evaluate numerically */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int solve(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const override;
 
     /** \brief Helper function */
     static void mproject(double factor, const double* x, const casadi_int* sp_x,

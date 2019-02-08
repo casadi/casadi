@@ -41,6 +41,16 @@
 /// \cond INTERNAL
 namespace casadi {
 
+  struct CASADI_CONIC_NLPSOL_EXPORT QpToNlpMemory : public ConicMemory {
+    casadi_int nlp_mem;
+
+    /// Constructor
+    QpToNlpMemory() {}
+
+    /// Destructor
+    ~QpToNlpMemory() {}
+  };
+
   /** \brief \pluginbrief{Conic,nlpsol}
 
       @copydoc Conic_doc
@@ -71,10 +81,10 @@ namespace casadi {
     std::string class_name() const override { return "QpToNlp";}
 
     /** \brief Create memory block */
-    void* alloc_mem() const override { return new ConicMemory();}
+    void* alloc_mem() const override;
 
     /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<ConicMemory*>(mem);}
+    void free_mem(void *mem) const override;
 
     ///@{
     /** \brief Options */
@@ -88,7 +98,8 @@ namespace casadi {
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
+    int solve(const double** arg, double** res,
+      casadi_int* iw, double* w, void* mem) const override;
 
     /// A documentation string
     static const std::string meta_doc;

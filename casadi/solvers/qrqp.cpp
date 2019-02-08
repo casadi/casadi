@@ -167,8 +167,7 @@ namespace casadi {
   }
 
   int Qrqp::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    Conic::eval(arg, res, iw, w, mem);
+  solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<QrqpMemory*>(mem);
     // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();

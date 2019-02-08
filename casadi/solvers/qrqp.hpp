@@ -89,7 +89,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     /** \brief Solve the QP */
-    int eval(const double** arg, double** res,
+    int solve(const double** arg, double** res,
              casadi_int* iw, double* w, void* mem) const override;
 
     /// Get all statistics

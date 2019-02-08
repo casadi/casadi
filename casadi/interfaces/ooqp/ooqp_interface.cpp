@@ -146,8 +146,7 @@ namespace casadi {
   }
 
   int OoqpInterface::
-  eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
-    Conic::eval(arg, res, iw, w, mem);
+  solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<OoqpMemory*>(mem);
     m->return_status = -1;
 
