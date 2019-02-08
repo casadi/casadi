@@ -10214,6 +10214,12 @@ npar:  max number of horizontal repetitions across all arguments (or -1)
 
 ";
 
+%feature("docstring") casadi::Conic::solve "
+
+[INTERNAL]   Solve the QP.
+
+";
+
 %feature("docstring") casadi::Conic::sz_res "
 
 [INTERNAL]  Get required length of res field.
@@ -10578,6 +10584,13 @@ Internal class.
 |                  |                 | mode AD - if     |                  |
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| error_on_fail    | OT_BOOL         | When the         | casadi::Conic    |
+|                  |                 | numerical        |                  |
+|                  |                 | process returns  |                  |
+|                  |                 | unsuccessfully,  |                  |
+|                  |                 | raise an error   |                  |
+|                  |                 | (default false). |                  |
 +------------------+-----------------+------------------+------------------+
 | fd_method        | OT_STRING       | Method for       | casadi::Function |
 |                  |                 | finite           | Internal         |
@@ -46475,6 +46488,12 @@ Joris Gillis
 |                |               | discrete, i.e.        |                 |
 |                |               | integer-valued        |                 |
 +----------------+---------------+-----------------------+-----------------+
+| error_on_fail  | OT_BOOL       | When the numerical    | casadi::Conic   |
+|                |               | process returns       |                 |
+|                |               | unsuccessfully, raise |                 |
+|                |               | an error (default     |                 |
+|                |               | false).               |                 |
++----------------+---------------+-----------------------+-----------------+
 | nlpsol         | OT_STRING     | Name of solver.       | casadi::QpToNlp |
 +----------------+---------------+-----------------------+-----------------+
 | nlpsol_options | OT_DICT       | Options to be passed  | casadi::QpToNlp |
@@ -46641,6 +46660,13 @@ get_forward(casadi_int nfwd) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::QpToNlp::has_jacobian "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
 %feature("docstring") casadi::QpToNlp::serialize_body "
 
 [INTERNAL]  Serialize an object without type information.
@@ -46740,10 +46766,9 @@ tr:  Flip the relationship. Return which expressions contain the variables
 
 ";
 
-%feature("docstring") casadi::QpToNlp::has_jacobian "
+%feature("docstring") casadi::QpToNlp::solve "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]   Solve the QP.
 
 ";
 
@@ -47606,6 +47631,12 @@ get_reverse(casadi_int nadj) if no cached version is available.
 
 ";
 
+%feature("docstring") casadi::Qrqp::solve "
+
+[INTERNAL]   Solve the QP.
+
+";
+
 %feature("docstring") casadi::Qrqp::check_res "
 
 [INTERNAL]  Check if output arguments have correct length and dimensions.
@@ -48124,6 +48155,12 @@ Joel Andersson
 | dual_inf_tol    | OT_DOUBLE     | Dual feasibility       | casadi::Qrqp  |
 |                 |               | violation tolerance    |               |
 |                 |               | [1e-8]                 |               |
++-----------------+---------------+------------------------+---------------+
+| error_on_fail   | OT_BOOL       | When the numerical     | casadi::Conic |
+|                 |               | process returns        |               |
+|                 |               | unsuccessfully, raise  |               |
+|                 |               | an error (default      |               |
+|                 |               | false).                |               |
 +-----------------+---------------+------------------------+---------------+
 | max_iter        | OT_INT        | Maximum number of      | casadi::Qrqp  |
 |                 |               | iterations [1000].     |               |
@@ -65205,6 +65242,13 @@ General information
 |                  |                 | mode AD - if     |                  |
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| error_on_fail    | OT_BOOL         | When the         | casadi::Conic    |
+|                  |                 | numerical        |                  |
+|                  |                 | process returns  |                  |
+|                  |                 | unsuccessfully,  |                  |
+|                  |                 | raise an error   |                  |
+|                  |                 | (default false). |                  |
 +------------------+-----------------+------------------+------------------+
 | fd_method        | OT_STRING       | Method for       | casadi::Function |
 |                  |                 | finite           | Internal         |

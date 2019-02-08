@@ -3171,7 +3171,7 @@ casadi_int updateType, casadi_int hessScaling) const  "
 ";
 
 %feature("docstring")  casadi::Nlpsol::eval(const double **arg, double
-**res, casadi_int *iw, double *w, void *mem) const  "
+**res, casadi_int *iw, double *w, void *mem) const final "
 
 [INTERNAL]  Evaluate numerically.
 
@@ -12047,7 +12047,7 @@ std::string &name, std::ostream &stream) const  "
 ";
 
 %feature("docstring")  casadi::Conic::eval(const double **arg, double **res,
-casadi_int *iw, double *w, void *mem) const  "
+casadi_int *iw, double *w, void *mem) const final "
 
 [INTERNAL]   Solve the QP.
 
@@ -12947,6 +12947,25 @@ const  "
 
 ";
 
+%feature("docstring")  casadi::Conic::solve(const double **arg, double
+**res, casadi_int *iw, double *w, void *mem) const  "
+
+[INTERNAL]   Solve the QP.
+
+";
+
+%feature("docstring") casadi::casadi_solve "
+
+Solve the QP.
+
+";
+
+%feature("docstring")  casadi::Conic::casadi_solve "
+
+Solve the QP.
+
+";
+
 %feature("docstring")  casadi::FunctionInternal::sz_res() const  "
 
 [INTERNAL]  Get required length of res field.
@@ -13330,6 +13349,13 @@ Internal class.
 |                  |                 | mode AD - if     |                  |
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| error_on_fail    | OT_BOOL         | When the         | casadi::Conic    |
+|                  |                 | numerical        |                  |
+|                  |                 | process returns  |                  |
+|                  |                 | unsuccessfully,  |                  |
+|                  |                 | raise an error   |                  |
+|                  |                 | (default false). |                  |
 +------------------+-----------------+------------------+------------------+
 | fd_method        | OT_STRING       | Method for       | casadi::Function |
 |                  |                 | finite           | Internal         |
@@ -52977,7 +53003,7 @@ bool persistent=false) "
 ";
 
 %feature("docstring")  casadi::Nlpsol::eval(const double **arg, double
-**res, casadi_int *iw, double *w, void *mem) const  "
+**res, casadi_int *iw, double *w, void *mem) const final "
 
 [INTERNAL]  Evaluate numerically.
 
@@ -59364,8 +59390,8 @@ ind) const  "
 
 ";
 
-%feature("docstring")  casadi::QpToNlp::eval(const double **arg, double
-**res, casadi_int *iw, double *w, void *mem) const  "
+%feature("docstring")  casadi::Conic::eval(const double **arg, double **res,
+casadi_int *iw, double *w, void *mem) const final "
 
 [INTERNAL]   Solve the QP.
 
@@ -59600,6 +59626,12 @@ Joris Gillis
 |                |               | discrete, i.e.        |                 |
 |                |               | integer-valued        |                 |
 +----------------+---------------+-----------------------+-----------------+
+| error_on_fail  | OT_BOOL       | When the numerical    | casadi::Conic   |
+|                |               | process returns       |                 |
+|                |               | unsuccessfully, raise |                 |
+|                |               | an error (default     |                 |
+|                |               | false).               |                 |
++----------------+---------------+-----------------------+-----------------+
 | nlpsol         | OT_STRING     | Name of solver.       | casadi::QpToNlp |
 +----------------+---------------+-----------------------+-----------------+
 | nlpsol_options | OT_DICT       | Options to be passed  | casadi::QpToNlp |
@@ -59787,6 +59819,13 @@ is_temp=false) const  "
 
 ";
 
+%feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
+
+[INTERNAL]  Return Jacobian of all input elements with respect to all output
+elements.
+
+";
+
 %feature("docstring")  casadi::QpToNlp::serialize_body(SerializingStream &s)
 const  "
 
@@ -59906,10 +59945,22 @@ persistent=false) "
 
 ";
 
-%feature("docstring")  casadi::FunctionInternal::has_jacobian() const  "
+%feature("docstring")  casadi::QpToNlp::solve(const double **arg, double
+**res, casadi_int *iw, double *w, void *mem) const  "
 
-[INTERNAL]  Return Jacobian of all input elements with respect to all output
-elements.
+[INTERNAL]   Solve the QP.
+
+";
+
+%feature("docstring") casadi::casadi_solve "
+
+Solve the QP.
+
+";
+
+%feature("docstring")  casadi::QpToNlp::casadi_solve "
+
+Solve the QP.
 
 ";
 
@@ -60658,8 +60709,8 @@ structure recognition.
 
 ";
 
-%feature("docstring")  casadi::Qrqp::eval(const double **arg, double **res,
-casadi_int *iw, double *w, void *mem) const  "
+%feature("docstring")  casadi::Conic::eval(const double **arg, double **res,
+casadi_int *iw, double *w, void *mem) const final "
 
 [INTERNAL]   Solve the QP.
 
@@ -60933,6 +60984,25 @@ const  "
 std::vector< M > &arg, casadi_int npar) const  "
 
 [INTERNAL]   Project sparsities.
+
+";
+
+%feature("docstring")  casadi::Qrqp::solve(const double **arg, double **res,
+casadi_int *iw, double *w, void *mem) const  "
+
+[INTERNAL]   Solve the QP.
+
+";
+
+%feature("docstring") casadi::casadi_solve "
+
+Solve the QP.
+
+";
+
+%feature("docstring")  casadi::Qrqp::casadi_solve "
+
+Solve the QP.
 
 ";
 
@@ -61559,6 +61629,12 @@ Joel Andersson
 | dual_inf_tol    | OT_DOUBLE     | Dual feasibility       | casadi::Qrqp  |
 |                 |               | violation tolerance    |               |
 |                 |               | [1e-8]                 |               |
++-----------------+---------------+------------------------+---------------+
+| error_on_fail   | OT_BOOL       | When the numerical     | casadi::Conic |
+|                 |               | process returns        |               |
+|                 |               | unsuccessfully, raise  |               |
+|                 |               | an error (default      |               |
+|                 |               | false).                |               |
 +-----------------+---------------+------------------------+---------------+
 | max_iter        | OT_INT        | Maximum number of      | casadi::Qrqp  |
 |                 |               | iterations [1000].     |               |
@@ -63458,7 +63534,7 @@ const  "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::Nlpsol::eval(const double **arg, double
-**res, casadi_int *iw, double *w, void *mem) const  "
+**res, casadi_int *iw, double *w, void *mem) const final "
 
 [INTERNAL]  Evaluate numerically.
 
@@ -68009,7 +68085,7 @@ ind) const  "
 [INTERNAL] ";
 
 %feature("docstring")  casadi::Nlpsol::eval(const double **arg, double
-**res, casadi_int *iw, double *w, void *mem) const  "
+**res, casadi_int *iw, double *w, void *mem) const final "
 
 [INTERNAL]  Evaluate numerically.
 
@@ -76605,7 +76681,7 @@ const  "
 ";
 
 %feature("docstring")  casadi::Nlpsol::eval(const double **arg, double
-**res, casadi_int *iw, double *w, void *mem) const  "
+**res, casadi_int *iw, double *w, void *mem) const final "
 
 [INTERNAL]  Evaluate numerically.
 
@@ -82896,6 +82972,13 @@ General information
 |                  |                 | mode AD - if     |                  |
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
++------------------+-----------------+------------------+------------------+
+| error_on_fail    | OT_BOOL         | When the         | casadi::Conic    |
+|                  |                 | numerical        |                  |
+|                  |                 | process returns  |                  |
+|                  |                 | unsuccessfully,  |                  |
+|                  |                 | raise an error   |                  |
+|                  |                 | (default false). |                  |
 +------------------+-----------------+------------------+------------------+
 | fd_method        | OT_STRING       | Method for       | casadi::Function |
 |                  |                 | finite           | Internal         |

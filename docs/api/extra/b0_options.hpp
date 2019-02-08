@@ -646,6 +646,7 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>clp</td><td>OT_DICT</td><td>Options to be passed to CLP. A first set of options can be found in ClpParameters.hpp. eg. 'PrimalTolerance'. There are other options in additions. 'AutomaticScaling' (bool) is recognised. 'initial_solve' (default off) activates the use of Clp's initialSolve. 'initial_solve_options' takes a dictionary with following keys (see ClpSolve.hpp):  SolveType (string), PresolveType (string),  NumberPasses, SpecialOptions (intvectorvector), IndependentOptions (intvectorvector).</td><td>casadi::ClpInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 </table>
 */
@@ -667,6 +668,7 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>clp</td><td>OT_DICT</td><td>Options to be passed to CLP. A first set of options can be found in ClpParameters.hpp. eg. 'PrimalTolerance'. There are other options in additions. 'AutomaticScaling' (bool) is recognised. 'initial_solve' (default off) activates the use of Clp's initialSolve. 'initial_solve_options' takes a dictionary with following keys (see ClpSolve.hpp):  SolveType (string), PresolveType (string),  NumberPasses, SpecialOptions (intvectorvector), IndependentOptions (intvectorvector).</td><td>casadi::ClpInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 </table>
 */
@@ -760,6 +762,7 @@
 <tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -806,6 +809,7 @@
 <tr><td>enable_forward</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobian-times-vector products - typically using forward mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -842,6 +846,7 @@
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOL</td><td>Dumps QP to file in CPLEX format.</td><td>casadi::CplexInterface</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance of solver</td><td>casadi::CplexInterface</td></tr>
@@ -875,6 +880,7 @@
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>The filename to dump to.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOL</td><td>Dumps QP to file in CPLEX format.</td><td>casadi::CplexInterface</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 <tr><td>qp_method</td><td>OT_INT</td><td>Determines which CPLEX algorithm to use.</td><td>casadi::CplexInterface</td></tr>
 <tr><td>tol</td><td>OT_DOUBLE</td><td>Tolerance of solver</td><td>casadi::CplexInterface</td></tr>
@@ -1483,6 +1489,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>gurobi</td><td>OT_DICT</td><td>Options to be passed to gurobi.</td><td>casadi::GurobiInterface</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 <tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]</td><td>casadi::GurobiInterface</td></tr>
@@ -1506,6 +1513,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>gurobi</td><td>OT_DICT</td><td>Options to be passed to gurobi.</td><td>casadi::GurobiInterface</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
 <tr><td>vtype</td><td>OT_STRINGVECTOR</td><td>Type of variables: [CONTINUOUS|binary|integer|semicont|semiint]</td><td>casadi::GurobiInterface</td></tr>
@@ -1521,6 +1529,7 @@
 <tr><td>N</td><td>OT_INT</td><td>OCP horizon</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>blasfeo_target</td><td>OT_STRING</td><td>hpmpc target</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>inf</td><td>OT_DOUBLE</td><td>HPMPC cannot handle infinities. Infinities will be replaced by this option's value.</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Max number of iterations</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>mu0</td><td>OT_DOUBLE</td><td>Max element in cost function as estimate of max multiplier</td><td>casadi::HpmpcInterface</td></tr>
@@ -1562,6 +1571,7 @@
 <tr><td>N</td><td>OT_INT</td><td>OCP horizon</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>blasfeo_target</td><td>OT_STRING</td><td>hpmpc target</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>inf</td><td>OT_DOUBLE</td><td>HPMPC cannot handle infinities. Infinities will be replaced by this option's value.</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Max number of iterations</td><td>casadi::HpmpcInterface</td></tr>
 <tr><td>mu0</td><td>OT_DOUBLE</td><td>Max element in cost function as estimate of max multiplier</td><td>casadi::HpmpcInterface</td></tr>
@@ -2684,6 +2694,7 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>artol</td><td>OT_DOUBLE</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>mutol</td><td>OT_DOUBLE</td><td>tolerance as provided with setMuTol to OOQP</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>print_level</td><td>OT_INT</td><td>Print level. OOQP listens to print_level 0, 10 and 100</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -2709,6 +2720,7 @@
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>artol</td><td>OT_DOUBLE</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>mutol</td><td>OT_DOUBLE</td><td>tolerance as provided with setMuTol to OOQP</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>print_level</td><td>OT_INT</td><td>Print level. OOQP listens to print_level 0, 10 and 100</td><td>casadi::OoqpInterface</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -2817,6 +2829,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::QpToNlp</td></tr>
 <tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::QpToNlp</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -2840,6 +2853,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th><th>Used in</th></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>nlpsol</td><td>OT_STRING</td><td>Name of solver.</td><td>casadi::QpToNlp</td></tr>
 <tr><td>nlpsol_options</td><td>OT_DICT</td><td>Options to be passed to solver.</td><td>casadi::QpToNlp</td></tr>
 <tr><td>print_problem</td><td>OT_BOOL</td><td>Print a numeric description of the problem</td><td>casadi::Conic</td></tr>
@@ -2873,6 +2887,7 @@
 <tr><td>epsNZCTests</td><td>OT_DOUBLE</td><td>Tolerance for nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>epsNum</td><td>OT_DOUBLE</td><td>Numerator tolerance for ratio tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>epsRegularisation</td><td>OT_DOUBLE</td><td>Scaling factor of identity matrix used for  Hessian regularisation.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>finalRamping</td><td>OT_DOUBLE</td><td>Final value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>growFarBounds</td><td>OT_DOUBLE</td><td>Factor to grow far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>hessian_type</td><td>OT_STRING</td><td>Type of Hessian - see qpOASES documentation [UNKNOWN|posdef|semidef|indef|zero|identity]]</td><td>casadi::QpoasesInterface</td></tr>
@@ -2966,6 +2981,7 @@
 <tr><td>epsNZCTests</td><td>OT_DOUBLE</td><td>Tolerance for nonzero curvature tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>epsNum</td><td>OT_DOUBLE</td><td>Numerator tolerance for ratio tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>epsRegularisation</td><td>OT_DOUBLE</td><td>Scaling factor of identity matrix used for  Hessian regularisation.</td><td>casadi::QpoasesInterface</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>finalRamping</td><td>OT_DOUBLE</td><td>Final value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>growFarBounds</td><td>OT_DOUBLE</td><td>Factor to grow far bounds.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>hessian_type</td><td>OT_STRING</td><td>Type of Hessian - see qpOASES documentation [UNKNOWN|posdef|semidef|indef|zero|identity]]</td><td>casadi::QpoasesInterface</td></tr>
@@ -2996,6 +3012,7 @@
 <tr><td>constr_viol_tol</td><td>OT_DOUBLE</td><td>Constraint violation tolerance [1e-8].</td><td>casadi::Qrqp</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dual_inf_tol</td><td>OT_DOUBLE</td><td>Dual feasibility violation tolerance [1e-8]</td><td>casadi::Qrqp</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td><td>casadi::Qrqp</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Smallest multiplier treated as inactive for the initial active set [0].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Qrqp</td></tr>
@@ -3031,6 +3048,7 @@
 <tr><td>constr_viol_tol</td><td>OT_DOUBLE</td><td>Constraint violation tolerance [1e-8].</td><td>casadi::Qrqp</td></tr>
 <tr><td>discrete</td><td>OT_BOOLVECTOR</td><td>Indicates which of the variables are discrete, i.e. integer-valued</td><td>casadi::Conic</td></tr>
 <tr><td>dual_inf_tol</td><td>OT_DOUBLE</td><td>Dual feasibility violation tolerance [1e-8]</td><td>casadi::Qrqp</td></tr>
+<tr><td>error_on_fail</td><td>OT_BOOL</td><td>When the numerical process returns unsuccessfully, raise an error (default false).</td><td>casadi::Conic</td></tr>
 <tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations [1000].</td><td>casadi::Qrqp</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Smallest multiplier treated as inactive for the initial active set [0].</td><td>casadi::Qrqp</td></tr>
 <tr><td>print_header</td><td>OT_BOOL</td><td>Print header [true].</td><td>casadi::Qrqp</td></tr>
