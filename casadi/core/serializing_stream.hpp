@@ -154,7 +154,8 @@ namespace casadi {
           {
             casadi_int k;
             unpack("Shared::reference", k);
-            e = T::create(static_cast<M*>(nodes.at(k).get()));
+            UniversalNodeOwner& t = nodes.at(k);
+            e = T::create(static_cast<M*>(t.get()));
           }
           break;
         default:
