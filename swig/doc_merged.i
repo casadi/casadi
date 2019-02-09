@@ -66346,6 +66346,10 @@ Check if a particular plugin is available.
 
 ";
 
+%feature("docstring") casadi::casadi_clear_casadi_int "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::load_conic "
 
 Explicitly load a plugin dynamically.
@@ -66427,6 +66431,12 @@ Explicitly load a plugin dynamically.
 %feature("docstring") casadi::casadi_qp_flip "
 
 [INTERNAL] ";
+
+%feature("docstring") casadi::casadi_clear "
+
+[INTERNAL]  CLEAR: x <- 0.
+
+";
 
 %feature("docstring") casadi::casadi_qr_trs "
 

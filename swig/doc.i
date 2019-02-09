@@ -85052,6 +85052,11 @@ Check if a particular plugin is available.
 
 ";
 
+%feature("docstring")  casadi::casadi_clear_casadi_int(casadi_int *x,
+casadi_int n) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::load_conic(const std::string &name) "
 
 Explicitly load a plugin dynamically.
@@ -85144,6 +85149,12 @@ T1 h, casadi_int n_y, const casadi_finite_diff_mem< T1 > *m) "
 %feature("docstring")  casadi::casadi_qp_flip(casadi_qp_data< T1 > *d) "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::casadi_clear(T1 *x, casadi_int n) "
+
+[INTERNAL]  CLEAR: x <- 0.
+
+";
 
 %feature("docstring")  casadi::casadi_qr_trs(const casadi_int *sp_r, const
 T1 *nz_r, T1 *x, casadi_int tr) "
