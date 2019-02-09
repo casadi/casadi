@@ -11400,6 +11400,9 @@ Add an ordinary differential equation.
 // File: classcasadi_1_1DenseTranspose.xml
 
 
+// File: classcasadi_1_1Densify.xml
+
+
 // File: classcasadi_1_1DeserializerBase.xml
 %feature("docstring") casadi::DeserializerBase "
 
@@ -58539,6 +58542,9 @@ Const access the non-zero elements.
 ";
 
 ";
+
+
+// File: classcasadi_1_1Sparsify.xml
 
 
 // File: classcasadi_1_1Sparsity.xml
